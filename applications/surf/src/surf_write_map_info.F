@@ -17,7 +17,7 @@
 *    :     WRITE_CHOP, CHOP_PA, CHOP_THROW, STATUS )
 
 *  Description:
-*     This routine writes Axis and FITS information to a rebinned
+*     This routine writes Axis, FITS nd WCS information to a rebinned
 *     map file.
 
  
@@ -84,6 +84,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'SURF_PAR'         ! REDS constants
 
 *  Arguments Given:
@@ -103,6 +104,7 @@
       INTEGER          OUT_NDF
       REAL             OUT_PIXEL
       CHARACTER * (*)  OUT_TITLE
+      LOGICAL          USEWCS
       REAL             WAVELENGTH
       LOGICAL          WRITE_CHOP
 
@@ -124,8 +126,11 @@
       DOUBLE PRECISION DTEMP    ! Scratch double
       REAL             FITS_OUT_PIXEL  ! size of pixels in output map (degrees)
       CHARACTER * 80   FITS(SCUBA__MAX_FITS) ! Output FITS array
+      INTEGER          FITSCHAN ! AST FITS channel
+      INTEGER          FRAME    ! Base frame for WCS/AST
       DOUBLE PRECISION FREQ     ! Frequency of observation
       INTEGER          I        ! Counter
+      INTEGER          ICARD    ! Counter for FITS cards
       INTEGER          ID       ! day of an input observation
       INTEGER          IM       ! month in which observation started
       CHARACTER*(DAT__SZLOC) IMAGE_LOC ! locator of IMAGE_INFO in output file
@@ -150,6 +155,7 @@
       DOUBLE PRECISION RDEPOCH  ! Julian epoch of given MJD
       CHARACTER * (80) XLAB     ! X axis label
       CHARACTER * (80) YLAB     ! Y axis label 
+      INTEGER          WCSINFO  ! WCS AST information
 
 #ifdef HAS_IRAS90
 *     IRAS90 variables
@@ -163,333 +169,364 @@
 *     Check status
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Flag to indicate whether we need a world coordinate system
+      IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ' .AND.
+     :     OUT_COORDS .NE. 'PL') THEN
+         USEWCS = .TRUE.
+      ELSE
+         USEWCS = .FALSE.
+      END IF
 
 *     set up the output axes
 
-            IF (OUT_COORDS .EQ. 'GA') THEN
-               XLAB = 'Longitude offset'
-               YLAB = 'Latitude offset'
-            ELSE IF (OUT_COORDS .EQ. 'NA') THEN
-               XLAB = 'X Nasmyth offset'
-               YLAB = 'Y Nasmyth offset'
-            ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
-               XLAB = 'Azimuth offset'
-               YLAB = 'Elevation offset'
-            ELSE
-               XLAB = 'R.A. offset'
-               YLAB = 'Declination offset'
-            END IF
+      IF (OUT_COORDS .EQ. 'GA') THEN
+         XLAB = 'Longitude offset'
+         YLAB = 'Latitude offset'
+      ELSE IF (OUT_COORDS .EQ. 'NA') THEN
+         XLAB = 'X Nasmyth offset'
+         YLAB = 'Y Nasmyth offset'
+      ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
+         XLAB = 'Azimuth offset'
+         YLAB = 'Elevation offset'
+      ELSE
+         XLAB = 'R.A. offset'
+         YLAB = 'Declination offset'
+      END IF
 
-            CALL NDF_AMAP (OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE',
-     :           OUT_A_PTR, ITEMP, STATUS)
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_NFILLR (NX_OUT, %val(OUT_A_PTR))
-               CALL SCULIB_ADDCAR (NX_OUT, %val(OUT_A_PTR), 
-     :              REAL(-I_CENTRE), %val(OUT_A_PTR))
-               CALL SCULIB_MULCAR (NX_OUT, %val(OUT_A_PTR), 
-     :              -OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
-            END IF
-            CALL NDF_ACPUT (XLAB, OUT_NDF, 'LABEL', 1, STATUS)
-            CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 1, STATUS)
-            CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 1, STATUS)
+      CALL NDF_AMAP (OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE',
+     :     OUT_A_PTR, ITEMP, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_NFILLR (NX_OUT, %val(OUT_A_PTR))
+         CALL SCULIB_ADDCAR (NX_OUT, %val(OUT_A_PTR), 
+     :        REAL(-I_CENTRE), %val(OUT_A_PTR))
+         CALL SCULIB_MULCAR (NX_OUT, %val(OUT_A_PTR), 
+     :        -OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
+      END IF
+      CALL NDF_ACPUT (XLAB, OUT_NDF, 'LABEL', 1, STATUS)
+      CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 1, STATUS)
+      CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 1, STATUS)
 
-            CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
-     :           OUT_A_PTR, ITEMP, STATUS)
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_NFILLR (NY_OUT, %val(OUT_A_PTR))
-               CALL SCULIB_ADDCAR (NY_OUT, %val(OUT_A_PTR), 
-     :              REAL(-J_CENTRE), %val(OUT_A_PTR))
-               CALL SCULIB_MULCAR (NY_OUT, %val(OUT_A_PTR),
-     :              OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
-            END IF
-            CALL NDF_ACPUT (YLAB, OUT_NDF, 'LABEL', 2, STATUS)
-            CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 2, STATUS)
-            CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
+      CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
+     :     OUT_A_PTR, ITEMP, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_NFILLR (NY_OUT, %val(OUT_A_PTR))
+         CALL SCULIB_ADDCAR (NY_OUT, %val(OUT_A_PTR), 
+     :        REAL(-J_CENTRE), %val(OUT_A_PTR))
+         CALL SCULIB_MULCAR (NY_OUT, %val(OUT_A_PTR),
+     :        OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
+      END IF
+      CALL NDF_ACPUT (YLAB, OUT_NDF, 'LABEL', 2, STATUS)
+      CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 2, STATUS)
+      CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
 
 *     and a title
 
-            CALL NDF_CPUT(OUT_TITLE, OUT_NDF, 'Title', STATUS)
-            CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
+      CALL NDF_CPUT(OUT_TITLE, OUT_NDF, 'Title', STATUS)
+      CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
 
 *     Sort out the astrometry stuff
 
-            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ' .AND.
-     :           OUT_COORDS .NE. 'PL') THEN
+      IF (USEWCS) THEN
 
-               IF (OUT_COORDS .EQ. 'RB') THEN
-                  SCS = 'EQUATORIAL(1950.0)'
-                  OUT_EPOCH = 1950.0D0
-                  RADECSYS  = 'FK4'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
-                  SCS = 'EQUATORIAL(2000.0)'
-                  OUT_EPOCH = 2000.0D0
-                  RADECSYS  = 'FK5'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'RD') THEN
+         IF (OUT_COORDS .EQ. 'RB') THEN
+            SCS = 'EQUATORIAL(B1950.0)'
+            OUT_EPOCH = 1950.0D0
+            RADECSYS  = 'FK4'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
+            SCS = 'EQUATORIAL(J2000.0)'
+            OUT_EPOCH = 2000.0D0
+            RADECSYS  = 'FK5'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'RD') THEN
 
-*       Calculate current epoch
-                  RDEPOCH = SLA_EPJ (MJD_STANDARD) 
-                  SCS = 'EQUATORIAL(J'
-                  CALL CHR_RTOC(REAL(RDEPOCH), STEMP, ITEMP)
-                  CALL CHR_APPND(STEMP, SCS, CHR_LEN(SCS))
-                  CALL CHR_APPND(')', SCS, CHR_LEN(SCS))
-                  OUT_EPOCH = RDEPOCH
-                  RADECSYS  = 'FK5'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'EQ') THEN ! We dont use EQ...
-                  SCS = 'ECLIPTIC(2000.0)'
-                  OUT_EPOCH = 2000.D0
-                  RADECSYS  = 'GAPPT'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'GA') THEN
-                  SCS = 'GALACTIC'
-                  OUT_EPOCH = 2000.0D0
-                  CTYPE1 = 'GLON-TAN'
-                  CTYPE2 = 'GLAT-TAN'
-               END IF
+*     Calculate current epoch
+            RDEPOCH = SLA_EPJ (MJD_STANDARD) 
+            SCS = 'EQUATORIAL(J'
+            CALL CHR_RTOC(REAL(RDEPOCH), STEMP, ITEMP)
+            CALL CHR_APPND(STEMP, SCS, CHR_LEN(SCS))
+            CALL CHR_APPND(')', SCS, CHR_LEN(SCS))
+            OUT_EPOCH = RDEPOCH
+            RADECSYS  = 'FK5'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'EQ') THEN ! We dont use EQ...
+            SCS = 'ECLIPTIC(J2000.0)'
+            OUT_EPOCH = 2000.D0
+            RADECSYS  = 'GAPPT'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'GA') THEN
+            SCS = 'GALACTIC(J2000.0)'
+            OUT_EPOCH = 2000.0D0
+            CTYPE1 = 'GLON-TAN'
+            CTYPE2 = 'GLAT-TAN'
+         END IF
 
 #ifdef HAS_IRAS90
 *     Create the IRAS extension
-               CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0,0,
-     :              OUT_XLOC, STATUS)
-               NP = 8
+         CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0,0,
+     :        OUT_XLOC, STATUS)
+         NP = 8
 
 *     Initialise the IRA software
-               CALL IRA_INIT (STATUS)
+         CALL IRA_INIT (STATUS)
 
 *     Set up the astrometry array
-               P (1) = OUT_LONG
-               P (2) = OUT_LAT
-               P (3) = DBLE (I_CENTRE) - 0.5D0
-               P (4) = DBLE (J_CENTRE) - 0.5D0
-               P (5) = DBLE (OUT_PIXEL)
-               P (6) = DBLE (OUT_PIXEL)
-               P (7) = 0.0D0
-               P (8) = 0.0D0
+         P (1) = OUT_LONG
+         P (2) = OUT_LAT
+         P (3) = DBLE (I_CENTRE) - 0.5D0
+         P (4) = DBLE (J_CENTRE) - 0.5D0
+         P (5) = DBLE (OUT_PIXEL)
+         P (6) = DBLE (OUT_PIXEL)
+         P (7) = 0.0D0
+         P (8) = 0.0D0
 
 *     Create the ASTROMETRY extension
-               CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, 
-     :              OUT_NDF, ITEMP, STATUS)
+         CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, 
+     :        OUT_NDF, ITEMP, STATUS)
 
-               CALL IRA_CLOSE (STATUS)
+         CALL IRA_CLOSE (STATUS)
 
 *     Create the IMAGE_INFO extension to fool IRAS90 software
-               CALL DAT_NEW(OUT_XLOC, 'IMAGE_INFO', 'IMAGE_INFO',
-     :              0,0,STATUS)
+         CALL DAT_NEW(OUT_XLOC, 'IMAGE_INFO', 'IMAGE_INFO',
+     :        0,0,STATUS)
+         
+         CALL DAT_FIND(OUT_XLOC, 'IMAGE_INFO', IMAGE_LOC,
+     :        STATUS)
 
-               CALL DAT_FIND(OUT_XLOC, 'IMAGE_INFO', IMAGE_LOC,
-     :              STATUS)
+         CALL DAT_NEW(IMAGE_LOC, 'INSTRUMENT', '_CHAR*6',
+     :        0,0,STATUS)
+         CALL CMP_PUT0C(IMAGE_LOC, 'INSTRUMENT', 'SURVEY',
+     :        STATUS)
 
-               CALL DAT_NEW(IMAGE_LOC, 'INSTRUMENT', '_CHAR*6',
-     :              0,0,STATUS)
-               CALL CMP_PUT0C(IMAGE_LOC, 'INSTRUMENT', 'SURVEY',
-     :              STATUS)
+         CALL DAT_NEW(IMAGE_LOC, 'BAND', '_INTEGER',
+     :        0,0,STATUS)
+         CALL CMP_PUT0I(IMAGE_LOC, 'BAND', 1,
+     :        STATUS)
 
-               CALL DAT_NEW(IMAGE_LOC, 'BAND', '_INTEGER',
-     :              0,0,STATUS)
-               CALL CMP_PUT0I(IMAGE_LOC, 'BAND', 1,
-     :              STATUS)
-
-               CALL DAT_NEW(IMAGE_LOC, 'TYPE', '_CHAR*8',
-     :              0,0,STATUS)
-               CALL CMP_PUT0C(IMAGE_LOC, 'TYPE', 'UNKNOWN',
-     :              STATUS)
-
-               CALL DAT_ANNUL(IMAGE_LOC, STATUS)
-
-               CALL DAT_ANNUL(OUT_XLOC, STATUS)
+         CALL DAT_NEW(IMAGE_LOC, 'TYPE', '_CHAR*8',
+     :        0,0,STATUS)
+         CALL CMP_PUT0C(IMAGE_LOC, 'TYPE', 'UNKNOWN',
+     :        STATUS)
+         
+         CALL DAT_ANNUL(IMAGE_LOC, STATUS)
+         
+         CALL DAT_ANNUL(OUT_XLOC, STATUS)
 
 #endif
 
-            END IF
+      END IF
 
 *     PLanet is special
 
-            IF (OUT_COORDS  .EQ. 'PL') THEN
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-            END IF
+      IF (OUT_COORDS  .EQ. 'PL') THEN
+         CTYPE1 = 'RA---TAN'
+         CTYPE2 = 'DEC--TAN'
+      END IF
 
 *     This is the SCUBA software so I know the instrument and telescope
 
-            INSTRUMENT = 'SCUBA'
-            TELESCOPE = 'JCMT-Hawaii'
+      INSTRUMENT = 'SCUBA'
+      TELESCOPE = 'JCMT-Hawaii'
 
 *     and write out the same information to a .MORE.FITS section
 
-            N_FITS = 0
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'OBJECT', OUT_TITLE, 'name of object', STATUS)
+      N_FITS = 0
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'OBJECT', OUT_TITLE, 'name of object', STATUS)
 
-            DO I = 1, NFILE
-               STEMP = 'FILE_'
-               ITEMP = 5
-               CALL CHR_PUTI (I, STEMP, ITEMP)
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              STEMP,FILENAME(I), 'name of input datafile', STATUS)
-            END DO
+      DO I = 1, NFILE
+         STEMP = 'FILE_'
+         ITEMP = 5
+         CALL CHR_PUTI (I, STEMP, ITEMP)
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        STEMP,FILENAME(I), 'name of input datafile', STATUS)
+      END DO
 
-            IF (OUT_COORDS.NE.'GA' .AND. OUT_COORDS.NE.'NA'
-     :           .AND.OUT_COORDS.NE.'AZ' .AND. OUT_COORDS .NE.'PL') THEN
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'RADECSYS', RADECSYS, 'Frame of reference', STATUS)
-            END IF
+      IF (OUT_COORDS.NE.'GA' .AND. OUT_COORDS.NE.'NA'
+     :     .AND.OUT_COORDS.NE.'AZ' .AND. OUT_COORDS .NE.'PL') THEN
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'RADECSYS', RADECSYS, 'Frame of reference', STATUS)
+      END IF
 
-            IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' .AND.
-     :           OUT_COORDS .NE. 'PL') THEN
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'SYSTEM', SCS, 'sky coordinate system', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :              'LONG', OUT_LONG, 'centre longitude (radians)', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :              'LAT', OUT_LAT, 'centre latitude (radians)', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :              'EPOCH', OUT_EPOCH, 'epoch of map', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS,FITS,
-     :              'EQUINOX', OUT_EPOCH, 
-     :              'epoch of mean equator and equinox', STATUS)
+      IF (USEWCS) THEN
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'SYSTEM', SCS, 'sky coordinate system', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :        'LONG', OUT_LONG, 'centre longitude (radians)', 
+     :        STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :        'LAT', OUT_LAT, 'centre latitude (radians)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :        'EPOCH', OUT_EPOCH, 'epoch of map', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS,FITS,
+     :        'EQUINOX', OUT_EPOCH, 
+     :        'epoch of mean equator and equinox', STATUS)
+         
+      END IF
 
-            END IF
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'MJD-OBS', MJD_STANDARD, 'MJD of first observation', 
+     :     STATUS)
 
-            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'MJD-OBS', MJD_STANDARD, 'MJD of first observation', 
-     :           STATUS)
-
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'TELESCOP', TELESCOPE, 'name of telescope', STATUS)
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'INSTRUME', INSTRUMENT, 'name of instrument', STATUS)
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'TELESCOP', TELESCOPE, 'name of telescope', STATUS)
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'INSTRUME', INSTRUMENT, 'name of instrument', STATUS)
 
 *     Store the wavelength (in metres) and frequency (in Hz)
 
-            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'WAVELEN', DBLE(WAVELENGTH) * 1.0D-6,
-     :           'Wavelength of the observation (metres)', STATUS)
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'WAVELEN', DBLE(WAVELENGTH) * 1.0D-6,
+     :     'Wavelength of the observation (metres)', STATUS)
 
-            FREQ = VLIGHT * 1.0D6 / DBLE(WAVELENGTH)
+      FREQ = VLIGHT * 1.0D6 / DBLE(WAVELENGTH)
 
-            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'FREQ', FREQ, 'Frequency of observation (Hz)', STATUS)
-
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'FREQ', FREQ, 'Frequency of observation (Hz)', STATUS)
+      
 *     Store SCUBA projection name
 
-            CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'SCUPROJ',OUT_COORDS, 'SCUBA output coordinate system', 
-     :           STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SCUPROJ',OUT_COORDS, 'SCUBA output coordinate system', 
+     :     STATUS)
 
 *     Pixel size as chosen in REBIN (arcsec)
 
-            RTEMP = OUT_PIXEL * REAL(R2AS) ! Generate rounding errors
+      RTEMP = OUT_PIXEL * REAL(R2AS) ! Generate rounding errors
 
-            CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'SCUPIXSZ', DBLE(RTEMP), 
-     :           'Pixel size (arcsec)', STATUS)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SCUPIXSZ', DBLE(RTEMP), 
+     :     'Pixel size (arcsec)', STATUS)
 
 *     Store the chop information
 
-            IF (WRITE_CHOP) THEN
-               CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CHOP_CRD',CHOP_CRD, 'Coordinate system of chop', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CHOP_PA', DBLE(CHOP_PA), 
-     :              'Position angle of chop', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CHOP_THR', DBLE(CHOP_THROW), 
-     :              'Size of chop throw (arcsec)', STATUS)
-            END IF
+      IF (WRITE_CHOP) THEN
+         CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CHOP_CRD',CHOP_CRD, 'Coordinate system of chop', 
+     :        STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CHOP_PA', DBLE(CHOP_PA), 
+     :        'Position angle of chop', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CHOP_THR', DBLE(CHOP_THROW), 
+     :        'Size of chop throw (arcsec)', STATUS)
+      END IF
 
 *     Put in a DATE-OBS field, converting MJD to DATE
 
-            CALL SLA_DJCL(MJD_STANDARD, IY, IM, ID, DTEMP, ITEMP)
+      CALL SLA_DJCL(MJD_STANDARD, IY, IM, ID, DTEMP, ITEMP)
 
-            ITEMP = 0
-            CALL CHR_PUTI(IY, DATEOBS, ITEMP)
-            CALL CHR_APPND('-',DATEOBS, ITEMP)
-            IF (IM .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
-            CALL CHR_PUTI(IM, DATEOBS, ITEMP)
-            CALL CHR_APPND('-',DATEOBS, ITEMP)
-            IF (ID .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
-            CALL CHR_PUTI(ID, DATEOBS, ITEMP)
-
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'DATE-OBS', DATEOBS, 'Date of first observation', 
-     :           STATUS)
+      ITEMP = 0
+      CALL CHR_PUTI(IY, DATEOBS, ITEMP)
+      CALL CHR_APPND('-',DATEOBS, ITEMP)
+      IF (IM .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
+      CALL CHR_PUTI(IM, DATEOBS, ITEMP)
+      CALL CHR_APPND('-',DATEOBS, ITEMP)
+      IF (ID .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
+      CALL CHR_PUTI(ID, DATEOBS, ITEMP)
+      
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'DATE-OBS', DATEOBS, 'Date of first observation', 
+     :     STATUS)
 
 
 *     Now need to calculate the FITS Axis info
 *     If this is NA then NDF2FITS will do this for us
 
-            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ'
-     :           .AND. OUT_COORDS .NE. 'PL') THEN
+      IF (USEWCS) THEN
 
-               OBSRA = OUT_LONG * 180.0D0 / PI
-               OBSDEC= OUT_LAT  * 180.0D0 / PI
-               FITS_OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
+         OBSRA = OUT_LONG * 180.0D0 / PI
+         OBSDEC= OUT_LAT  * 180.0D0 / PI
+         FITS_OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
+         
+         IF (OUT_COORDS.NE.'GA') THEN
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :           'OBSRA',OBSRA,
+     :           'RA of map centre (degrees; deprecated)', STATUS)
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 
+     :           'OBSDEC', OBSDEC, 
+     :           'Dec. of map centre (degrees; deprecated)',
+     :           STATUS)
+         END IF
 
-               IF (OUT_COORDS.NE.'GA') THEN
-                  CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :                 'OBSRA',OBSRA,
-     :                 'RA of map centre (degrees; deprecated)', STATUS)
-                  CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 
-     :                 'OBSDEC', OBSDEC, 
-     :                 'Dec. of map centre (degrees; deprecated)',
-     :                 STATUS)
-               END IF
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CTYPE1', CTYPE1,'TAN projection used', STATUS)
+         CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CRPIX1', I_CENTRE, 'I of centre (ref) pixel', 
+     :        STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CRVAL1', OBSRA, 'Map centre (degrees)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CDELT1',DBLE(-FITS_OUT_PIXEL), 
+     :        'increment per pixel (degrees)', 
+     :        STATUS)
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CUNIT1', 'deg','physical units of axis 1', STATUS)
+         
 
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CTYPE1', CTYPE1,'TAN projection used', STATUS)
-               CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRPIX1', I_CENTRE, 'I of centre (ref) pixel', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRVAL1', OBSRA, 'Map centre (degrees)', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CDELT1',DBLE(-FITS_OUT_PIXEL), 
-     :              'increment per pixel (degrees)', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CUNIT1', 'deg','physical units of axis 1', STATUS)
-
-
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CTYPE2', CTYPE2,'TAN projection used', STATUS)
-               CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRPIX2', J_CENTRE, 'J of centre (ref) pixel', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRVAL2', OBSDEC, 'Map centre (degrees)', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CDELT2', DBLE(FITS_OUT_PIXEL), 
-     :              'increment per pixel (degrees)', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CUNIT2','deg','physical units of axis 2', STATUS)
-
-            ELSE IF (OUT_COORDS .EQ. 'PL') THEN
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CTYPE2', CTYPE2,'TAN projection used', STATUS)
+         CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CRPIX2', J_CENTRE, 'J of centre (ref) pixel', 
+     :        STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CRVAL2', OBSDEC, 'Map centre (degrees)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CDELT2', DBLE(FITS_OUT_PIXEL), 
+     :        'increment per pixel (degrees)', 
+     :        STATUS)
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CUNIT2','deg','physical units of axis 2', STATUS)
+         
+      ELSE IF (OUT_COORDS .EQ. 'PL') THEN
 *     We should still write out tangent plane
 
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CTYPE1', CTYPE1,'TAN projection used', STATUS)
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CTYPE2', CTYPE2,'TAN projection used', STATUS)
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CTYPE1', CTYPE1,'TAN projection used', STATUS)
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CTYPE2', CTYPE2,'TAN projection used', STATUS)
 
-            END IF
+      END IF
 
 *     write out the FITS extension
 
-            NDIM =1 
-            CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', NDIM, N_FITS, 
-     :           OUT_FITSX_LOC, STATUS)
-            CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
-            CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)
+      NDIM =1 
+      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', NDIM, N_FITS, 
+     :     OUT_FITSX_LOC, STATUS)
+      CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+      CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)
 
+*     Create the AST extension
 
+      IF (USEWCS) THEN
+         CALL AST_BEGIN( STATUS )
+
+*     Create a FitsChan and fill it with FITS header cards.
+         FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 
+     :        ' ', STATUS )
+         DO ICARD = 1, N_FITS
+            CALL AST_PUTFITS( FITSCHAN, FITS( ICARD ), .FALSE., 
+     :           STATUS )
+         END DO
+         
+*     Rewind the FitsChan and read WCS information from it.
+         CALL AST_CLEAR( FITSCHAN, 'Card', STATUS )
+         WCSINFO = AST_READ( FITSCHAN, STATUS )
+
+*     Set the base frame to be GRID
+         FRAME = AST_GETFRAME( WCSINFO, AST__BASE, STATUS )
+         CALL AST_SETC( FRAME, 'Domain', 'GRID', STATUS )
+         
+*     Write the channel to the NDF
+         CALL NDF_PTWCS( WCSINFO, OUT_NDF, STATUS )
+
+*     Shut down AST
+         CALL AST_END( STATUS )
+
+      END IF
 
       END
