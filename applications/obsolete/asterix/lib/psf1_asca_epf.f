@@ -126,6 +126,9 @@
       REAL			ET			! Test EEF value
       REAL			LO_R, HI_R, MID_R	! Test radii (mm)
       REAL			OFF			! Off axis angle (arcmin)
+      REAL			TEEF			! This EEF wanted
+
+      INTEGER			I			! Loop over radii
 *.
 
 *  Check inherited global status.
