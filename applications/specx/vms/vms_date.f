@@ -22,11 +22,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     27 Jan 1994 (hme):
 *        Original version.
+*     30 Dec 1999 (timj):
+*        Check status. Use SAE_PAR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -37,12 +40,15 @@
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+
 *  Arguments Returned:
       CHARACTER * ( * ) BUF
 
 *  Local Variables:
       INTEGER NTICKS
-      INTEGER STATUS
+      INTEGER STATUS            ! Starlink status
       INTEGER SECS, MINS, HOURS
       INTEGER DAY,  MONTH, YEAR
       INTEGER WDAY, YDAY, ISDST
@@ -56,8 +62,19 @@
 
 *.
 
-      STATUS = 0
+*     Initialise status
+      STATUS = SAI__OK
+
+*     Get time
       CALL PSX_TIME( NTICKS, STATUS )
+
+      IF (STATUS .NE. SAI__OK) THEN
+         PRINT *, '-- VMS_DATE --'
+         PRINT *, '   bad status in PSX_TIME = ', STATUS
+
+         RETURN
+      END IF
+
       CALL PSX_LOCALTIME( NTICKS, SECS, MINS, HOURS,
      :   DAY, MONTH, YEAR, WDAY, YDAY, ISDST, TSTRCT, STATUS )
 
