@@ -590,6 +590,7 @@ file ^FILE - ^MESSAGE",
                              "Error mapping bytes ^FIRST:^LAST for "
                              "\'^ACCESS\' access in file ^FILE - ^MESSAGE",
                              &hds_gl_status );
+                  break;
 
 /* Otherwise, adjust the returned pointer for the effect of rounding to the */
 /* system page size.							    */
