@@ -2,7 +2,10 @@
 
 SUBDIRS = @subdirs@
 
-bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES) version.dat
+bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES)
+
+bindatadir = $(bindir)
+bindata_DATA = $(STYLE_FILES) $(DATA_FILES) $(MISC_FILES)
 
 LOCAL_LINK = kapsub/libkapsub.la atools/libatools.la ccdpack/libccdpack.la `$(srcdir)/kappa_nogks_link_adam`
 
@@ -18,14 +21,6 @@ kapview_mon_TASKS = $(KAPVIEW_TASKS)
 ndfpack_mon_SOURCES = ndfpack_mon.f $(NDFPACK_F_ROUTINES)
 ndfpack_mon_LDADD = $(LOCAL_LINK)
 ndfpack_mon_TASKS = $(NDFPACK_TASKS)
-
-#  version.dat is just the package verion in a file for kapversion command
-#  This is for backwards compatibility since, of course, we could make
-#  kapversion have the value compiled in
-
-version.dat:
-	-rm -f version.dat
-	echo $(PACKAGE_VERSION) > version.dat
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -124,24 +119,28 @@ NDFS = $(LUTS) $(TEST_FILES)
 
 #  Define the standard colour tables.
 
-LUTS = \
-bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf warm_lut.sdf \
-ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf logo_lut.sdf \
-cold_lut.sdf
+LUTS = luts/bgyrw_lut.sdf luts/cont_lut.sdf luts/fc_lut.sdf \
+luts/heat_lut.sdf luts/ikon_lut.sdf luts/warm_lut.sdf	    \
+luts/ramps_lut.sdf luts/spectrum_lut.sdf luts/zebra_lut.sdf \
+luts/grey_lut.sdf luts/logo_lut.sdf luts/cold_lut.sdf
 
 #  Define the package test data (NDFs only!).
 
-TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf iras.sdf \
-m31_issa_100.sdf m31_issa_60.sdf m31_issa_25.sdf m31_issa_12.sdf m57.sdf \
-logo.sdf scupol_i.sdf scupol_p.sdf scupol_ang.sdf \
-m31_issa_12a.sdf cobe.sdf scumos.sdf
+TEST_FILES = data/ccdframec.sdf data/comwest.sdf data/spectrum.sdf    \
+data/m31.sdf data/iras.sdf data/m31_issa_100.sdf data/m31_issa_60.sdf \
+data/m31_issa_25.sdf data/m31_issa_12.sdf data/m57.sdf data/logo.sdf  \
+data/scupol_i.sdf data/scupol_p.sdf data/scupol_ang.sdf		      \
+data/m31_issa_12a.sdf data/cobe.sdf data/scumos.sdf
 
 #  Define the plotting style files.
 
-STYLE_FILES = kappa_style.def kappa_ardplot_style.def kappa_lutview_style.def \
-kappa_keystyle.def kappa_linplot_keystyle.def kappa_vecplot_keystyle.def \
-kappa_display_keystyle.def sty0 sty1 sty2 sty3 kappa_contour_keystyle.def \
-kappa_drawnorth_style.def kappa_linplot_style.def
+STYLE_FILES = styles/kappa_style.def styles/kappa_ardplot_style.def   \
+styles/kappa_lutview_style.def styles/kappa_keystyle.def	      \
+styles/kappa_linplot_keystyle.def styles/kappa_vecplot_keystyle.def   \
+styles/kappa_display_keystyle.def styles/sty0 styles/sty1 styles/sty2 \
+styles/sty3 styles/kappa_contour_keystyle.def			      \
+styles/kappa_drawnorth_style.def styles/kappa_linplot_style.def	      \
+styles/style.def
 
 #  Define the package demo files for use with stardemo.tcl
 
@@ -149,8 +148,9 @@ DEMO_FILES = kappa.demo v0.14-5.demo v0.15-9.demo v0.16-3.demo v1.0.demo
 TEST_DEMO = v1.0
 
 #  Other miscellaneous files in kappa-source.tar
-MISC_FILES = cpoint.bit dpoint.bit minus.bit plus.bit unzoom.bit \
-uparrow.bit lutedit.help blank.bit
+MISC_FILES = misc/cpoint.bit misc/dpoint.bit misc/minus.bit \
+misc/plus.bit misc/unzoom.bit misc/uparrow.bit lutedit.help \
+misc/blank.bit
 
 
 #  Define the tasks for each monolith.
@@ -167,12 +167,19 @@ NDFPACK_TASKS = $(NDFPACK_F_ROUTINES:.f=)
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLICSCRIPTS = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
-colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
-unsharpmask.icl nfi.awk tkast.tcl dialog.tcl adamtask.tcl \
-adamMessageRelay stardemo.tcl stardemo_procs.tcl pazo.csh lutedit.tcl \
-s2p
+PUBLICSCRIPTS = $(SHELLSCRIPTS) $(ICL_FILES) $(TCL_FILES) \
+	$(AWKSCRIPTS)
 
+SHELLSCRIPTS = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
+pazo.csh s2p
+
+AWKSCRIPTS = nfi.awk
+
+ICL_FILES = colstar.icl fancylook.icl flatfield.icl kappa_proc.icl \
+multistat.icl unsharpmask.icl
+
+TCL_FILES = tkast.tcl dialog.tcl adamtask.tcl adamMessageRelay \
+stardemo.tcl stardemo_procs.tcl pazo.csh lutedit.tcl
 
 #  Define the set of all interface files.
 
