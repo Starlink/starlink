@@ -202,14 +202,14 @@ SPACE			[ \t]*
 */
 
 /* Append preval and the matched text. */
-      yyleng = preleng + strlen( yytext );
+      yyleng = preleng + strlen( (char *) yytext );
       yylval = (char *) memok( malloc( yyleng + 1 ) );
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
-         strcat( yylval, yytext );
+         strcat( yylval, (char *) yytext );
       }
       else {
-         strcpy( yylval, yytext );
+         strcpy( yylval, (char *) yytext );
       }
 
 /* Reclaim space used by preval if necessary. */
@@ -243,7 +243,7 @@ SPACE			[ \t]*
 *-
 */
       int i;
-      for ( i = 0; i < strlen( yytext ); i++ )
+      for ( i = 0; i < strlen( (char *) yytext ); i++ )
          cappend( yytext[ i ] );
       *yytext = '\0';
       yyleng = 0;
@@ -252,7 +252,7 @@ SPACE			[ \t]*
 
 
    void munch() {
-      sappend( yytext );
+      sappend( (char *) yytext );
    }
 
 

@@ -218,14 +218,14 @@ extern int yyleng;
 */
 
 /* Append preval and the matched text. */
-      yyleng = preleng + strlen( yytext );
+      yyleng = preleng + strlen( (char *) yytext );
       yylval = (char *) memok( malloc( yyleng + 1 ) );
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
-         strcat( yylval, yytext );
+         strcat( yylval, (char *) yytext );
       }
       else {
-         strcpy( yylval, yytext );
+         strcpy( yylval, (char *) yytext );
       }
 
 /* Reclaim space used by preval if necessary. */
@@ -251,7 +251,7 @@ extern int yyleng;
 *-
 */
       int i;
-      for ( i = 0; i < strlen( yytext ); i++ )
+      for ( i = 0; i < strlen( (char *) yytext ); i++ )
          cappend( yytext[ i ] );
       *yytext = '\0';
       yyleng = 0;
@@ -270,8 +270,8 @@ extern int yyleng;
 *-
 */
       char c, cl;
-      sappend( yytext );
-      c = ' ';
+      sappend( (char *) yytext );
+      c = cl = ' ';
       while ( c != LEXEOF && ( cl != '*' || c != '/' ) ) {
          cl = c;
          c = input();
@@ -291,7 +291,7 @@ extern int yyleng;
 *-
 */
       char c;
-      sappend( yytext );
+      sappend( (char *) yytext );
       while( ( c = input() ) != LEXEOF && c != '\n' )
          cappend( c );
       cappend( c );
@@ -300,7 +300,7 @@ extern int yyleng;
 
    void cpprest() {
       char c, cl;
-      c = ' ';
+      c = cl = ' ';
       while ( c != LEXEOF && ( c != '\n' || cl == '\\' ) ) {
          cl = c;
          c = input();
@@ -320,7 +320,7 @@ extern int yyleng;
 *     Store miscellaneous C preprocessor text in preval.
 *-
 */
-      sappend( yytext );
+      sappend( (char *) yytext );
       cpprest();
    }
 
@@ -346,7 +346,7 @@ extern int yyleng;
       int i, p1, p2;
 
 /* Add matched text. */
-      sappend( yytext );
+      sappend( (char *) yytext );
 
 /* Add start of tag. */
       sappend( "<a href='INCLUDE-" );
@@ -397,7 +397,7 @@ extern int yyleng;
       int i, p1, p2;
 
 /* Add matched text. */
-      sappend( yytext );
+      sappend( (char *) yytext );
 
 /* Add start of tag */
       sappend( "<a name='" );
@@ -423,7 +423,7 @@ extern int yyleng;
 
 
    void munch() {
-      sappend( yytext );
+      sappend( (char *) yytext );
    }
          
 
