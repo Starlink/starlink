@@ -279,7 +279,7 @@
 	  CALL DAT_CLONE(ILOC,DCLOC(1),STATUS)
 
 *       Spectral set?
-	  CALL SPEC_SETSEARCH(DCLOC(NDSC),SPECSET(NDSC),STATUS)
+	  CALL SPEC_SETSRCH(DCFID(NDSC),SPECSET(NDSC),STATUS)
 	  IF (SPECSET(1)) DETNO(1)=0		! Flag to use all spectra
 	ELSE
 
@@ -296,7 +296,7 @@
               CALL ADI1_PUTLOC( DCLOC(NDSC), DCFID(NDSC), STATUS )
 
 *       Spectral set?
-	      CALL SPEC_SETSEARCH(DCLOC(NDSC),SPECSET(NDSC),STATUS)
+	      CALL SPEC_SETSRCH(DCFID(NDSC),SPECSET(NDSC),STATUS)
 	      IF (SPECSET(NDSC)) THEN
 *         Find which spectra are to be used
 	        CALL DAT_NAME(LOC,NAME,STATUS)	! Name should be REFnnn
