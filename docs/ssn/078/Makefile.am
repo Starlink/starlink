@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-stardocs_DATA = @STAR_XML_DOCUMENTATION@
+stardocs_DATA = @STAR_XML_DOCUMENTATION@ ssn78.pdf $(EPSFILES)
 
 METAPOST=@METAPOST@
 # pstoimg is a bit creaky, but it should be available, since it's installed
@@ -24,5 +24,7 @@ $(EPSFILES): ssn78.mp
 .eps.gif:
 	L2HMODULE=`dirname $(PSTOIMG)` \
 	    $(PSTOIMG) -gif -scale 1.5 -antialias -out $@ $<
+
+ssn78.dvi: $(EPSFILES)
 
 MOSTLYCLEANFILES = $(EPSFILES) $(PDFFILES) $(GIFFILES)
