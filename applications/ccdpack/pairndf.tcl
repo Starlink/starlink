@@ -171,7 +171,7 @@
                            -master $aligner \
                            -title "PAIRNDF: No pairs" ]
       $aligndialog buttonconfigure Cancel -text "Pick another pair"
-      $aligndialog buttonconfigure OK -text "Continue alignment"
+      $aligndialog buttonconfigure OK -text "Complete this alignment"
       $aligndialog hide Help
       proc carryon { args } {
          global aligndialog
