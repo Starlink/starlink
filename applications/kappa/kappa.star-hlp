@@ -2160,6 +2160,8 @@ QUILT       - Generates a mosaic from equally sized 2-d data arrays,
               optionally specified from an ASCII file.
 
 3 Compression_and_expansion
+COLLAPSE    - Reduce the number of axes in an NDF by collapsing it along
+              a nominated axis.
 COMPADD     - Reduces the size of an NDF by adding values in rectangular
               boxes.
 COMPAVE     - Reduces the size of an NDF by averaging values in
