@@ -13,7 +13,7 @@ PERLBIN=@PERL@
 ECHONONL=@ECHONONL@
 
 test: local.config ../moggy
-	PERLBIN=$(PERLBIN) ECHONONL='$(ECHONONL)' ./runtests && touch test
+	PERLBIN=$(PERLBIN) ECHONONL='$(ECHONONL)' ./runtests # && touch test
 
 t3.run: t3.C ../util.o
 	$(CXX) $(CXXFLAGS) -o $@ t3.C -I.. ../util.o
