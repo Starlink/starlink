@@ -424,6 +424,11 @@ my %require_file_found = ();
 
 # The name of the Makefile currently being processed.
 my $am_file = 'BUG';
+
+# If a file name appears as a key in this hash, then it has been seen
+# as a Fortran file to be preprocessed.  This hash is possibly
+# redundant: see the FIXME in lang_ppfc_finish
+my %ppfc_sources = ();
 
 
 ################################################################
@@ -791,37 +796,76 @@ register_language ('name' => 'f77',
 		   'lder' => 'F77LD',
 		   'ld' => '$(F77)',
 		   'pure' => 1,
-		   'extensions' => ['.f', '.for', '.f90']);
+                   'extensions' => ['.f', '.for']);
 
-# Preprocessed Fortran 77
+# Fortran
+register_language ('name' => 'fc',
+                   'Name' => 'Fortran',
+                   'linker' => 'FCLINK',
+                   'link' => '$(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+                   'flags' => ['FFLAGS'],
+                   'compile' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS)',
+                   'compiler' => 'FCCOMPILE',
+                   'compile_flag' => '-c',
+                   'output_flag' => '-o',
+                   'lder' => 'FCLD',
+                   'ld' => '$(FC)',
+                   'pure' => 1,
+                   'extensions' => ['.f90', '.f95']);
+ 
+# Preprocessed Fortran
 #
-# The current support for preprocessing Fortran 77 just involves
-# passing `$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS)
-# $(CPPFLAGS)' as additional flags to the Fortran 77 compiler, since
-# this is how GNU Make does it; see the `GNU Make Manual, Edition 0.51
-# for `make' Version 3.76 Beta' (specifically, from info file
-# `(make)Catalogue of Rules').
+# Some, but not all, Fortran (f77, f90, f95) compilers know how to do
+# preprocessing.  The Autoconf AC_PROG_FPP test determines if the
+# Fortran compiler can do `enough' preprocessing, or finds a
+# standalone preprocessor if necessary (which might just be cpp).  The
+# `ppfc' support here generates build rules which use the results of
+# this test.
 #
-# A better approach would be to write an Autoconf test
-# (i.e. AC_PROG_FPP) for a Fortran 77 preprocessor, because not all
-# Fortran 77 compilers know how to do preprocessing.  The Autoconf
-# macro AC_PROG_FPP should test the Fortran 77 compiler first for
-# preprocessing capabilities, and then fall back on cpp (if cpp were
-# available).
-register_language ('name' => 'ppf77',
-		   'Name' => 'Preprocessed Fortran 77',
-		   'config_vars' => ['F77'],
-		   'linker' => 'F77LINK',
-		   'link' => '$(F77LD) $(AM_FFLAGS) $(FFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
-		   'lder' => 'F77LD',
-		   'ld' => '$(F77)',
-		   'flags' => ['FFLAGS', 'CPPFLAGS'],
-		   'compiler' => 'PPF77COMPILE',
-		   'compile' => '$(F77) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FFLAGS) $(FFLAGS)',
-		   'compile_flag' => '-c',
-		   'output_flag' => '-o',
-		   'pure' => 1,
-		   'extensions' => ['.F']);
+# It's up to Autoconf to decide whether indirect or direct compilation
+# works better; it does this by setting a number of configure-time
+# variables, and the rules we emit here depend on these variables (in
+# some cases becoming no-ops).  See the macros in Autoconf's
+# fortran.m4 for details of these.
+#
+register_language ('name' => 'ppfc',
+                   'Name' => 'Preprocessed Fortran',
+                   # autoconf support for fortran defines FC,
+                   # rather than older F77
+                   'config_vars' => ['FC'],
+                   'linker' => 'FCLINK',
+                   'link' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+                   'lder' => 'FCLD',
+                   'ld' => '$(FC)',
+                   'flags' => ['FFLAGS', 'CPPFLAGS'],
+
+                   'compile' => '$(FC) $(FPP_MAKE_FLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
+                   'compiler' => 'FCCOMPILE',
+                   'compile_flag' => '-c',
+                   'output_flag' => '-o',
+
+                   'pure' => 1,
+
+                   # We do _not_ want to list the real extensions
+                   # here, since we don't yet know what they are!
+                   # They could be `.fpp' or `.F' (depending on the
+                   # user's preference), but if we have to resort to
+                   # indirect compilation, then this FPP_COMPILE_EXT
+                   # will be set to a dummy value by Autoconf, and a
+                   # separate .fpp.f or .F.f rule will be emitted by
+                   # lang-compile.am.  Thus the rule we emit and the
+                   # label we pass around in extension_seen, for
+                   # example, uses this autoconf variable.
+                   'extensions' => ['.@FPP_COMPILE_EXT@'],
+		   '_finish' => \&lang_ppfc_finish,
+                  );
+# We do, however, need to recognise .fpp and .F sources for what they
+# are, and trigger FPP behaviour.  So add notional suffix rules here,
+# so that &derive_suffix maps these to `.@FPP_COMPILE_EXT@' at the
+# appropriate point (is this a hack, or is it clever use of available
+# facilities?).
+register_suffix_rule (INTERNAL, '.fpp', '.@FPP_COMPILE_EXT@');
+register_suffix_rule (INTERNAL, '.F',   '.@FPP_COMPILE_EXT@');
 
 # Ratfor.
 register_language ('name' => 'ratfor',
@@ -1010,6 +1054,9 @@ sub get_object_extension
 # Call finish function for each language that was used.
 sub handle_languages
 {
+    print $_ foreach keys %extension_seen;
+    print "\n";
+
     if (! option 'no-dependencies')
     {
 	# Include auto-dep code.  Don't include it if DEP_FILES would
@@ -4876,10 +4923,27 @@ sub lang_f77_rewrite
     return LANG_PROCESS;
 }
 
-# Rewrite a single preprocessed Fortran 77 file.
-sub lang_ppf77_rewrite
+# Rewrite a single Fortran file.
+sub lang_fc_rewrite
 {
     return LANG_PROCESS;
+}
+
+# Rewrite a single preprocessed Fortran file.
+sub lang_ppfc_rewrite
+{
+    my ($directory, $base, $ext) = @_;
+    my $r = &lang_fc_rewrite($directory, $base, $ext);
+    my $pfx = '';
+    if ($r == LANG_SUBDIR)
+      {
+          $pfx = $directory . '/';
+      }
+    # See note at top about this hash
+    $ppfc_sources{$pfx . $base . $ext} = 1;
+    # Cause the Fortran support to be pulled in
+    &saw_extension('.f');
+    return $r;
 }
 
 # Rewrite a single ratfor file.
@@ -5044,6 +5108,22 @@ sub lang_lex_finish
 
   &yacc_lex_finish_helper
     if count_files_for_language ('lex') > 1;
+}
+
+
+# Preprocessed Fortran
+#
+# FIXME: The original version of the routine claimed that to do the
+# overriding in a portable manner, we must write an explicit rule for
+# each .fpp file.  I don't believe this is true with the current
+# version of the generated rules, but if it is, then the ppfc_sources
+# hash contains the list of such source files.  If this is indeed
+# unnecessary, then the ppfc_sources hash is redundant, and should be
+# removed.  In this case, this subroutine is redundant also, and
+# should be removed.
+sub lang_ppfc_finish
+{
+    #print "XXX lang_ppfc_finish\n";
 }
 
 

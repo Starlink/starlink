@@ -18,16 +18,34 @@
 
 ## This file is read once per *language*, not per extension.
 
-## ------------------------- ##
-## Preprocessed Fortran 77.  ##
-## ------------------------- ##
+## ---------------------- ##
+## Preprocessed Fortran.  ##
+## ---------------------- ##
 
-## We also handle the case of preprocessing `.F' files into `.f' files.
-if %?PPF77%
-.F.f:
-	$(F77COMPILE) -F $<
-endif %?PPF77%
+## We also handle the case of preprocessing `.F/.fpp' files into `.f'
+## files.  autoconf determines whether the Fortran compiler can
+## compile preprocessable source directly (so-called `direct'
+## compilation) or whether the code must be preprocessed separately
+## (`indirect').  In the former case, it sets FPP_PREPROCESS_EXT to be
+## some dummy value, so that the rule is not used; in the latter case,
+## it sets it to be $FPP_SRC_EXT (which is `fpp' or `F', as
+## appropriate).
+##
+## FIXME: it would possibly be useful (for debugging) to simply let
+## FPP_PREPROCESS_EXT be FPP_SRC_EXT always, so that the user could
+## generate the .f file corresponding to a given .fpp file.  Would
+## this (having .fpp be the source in two different suffix rules)
+## cause any twisted `make' implementations to get confused?
+##
+## Avoiding `.fpp.f' is not just for configurability, but because
+## automake subroutine file_contents_internal, with the help of
+## Automake::Rule::define, appears to be a little bit too smart and
+## discards a rule `.fpp.f:'.
 
+if %?PPFC%
+.@FPP_PREPROCESS_EXT@.f:
+	$(FPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(FPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $< @FPP_OUTPUT@
+endif %?PPFC%
 
 
 ## -------- ##
