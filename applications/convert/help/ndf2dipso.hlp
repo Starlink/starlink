@@ -1,0 +1,62 @@
+1 NDF2DIPSO
+Writes an NDF to a DIPSO-format file, which can be read by the
+DIPSO READ command.
+
+Usage:
+
+   NDF2DIPSO IN OUT
+
+Description:
+
+   The routine reads a 1-dimensional NDF data file and writes a
+   DIPSO format file.  The NDF TITLE object is also written to the
+   DIPSO file.  Bad pixels found in the NDF result in `breaks' in
+   the DIPSO file.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.  A file extension must not be given
+   after the name.  The suggested default is the current NDF if
+   one exists, otherwise it is the current value.
+3 OUT
+OUT = FILENAME (Write)
+   Output DIPSO file.  File extension ".DAT" is assumed.
+2 Examples
+NDF2DIPSO OLD NEW
+   This converts the NDF file NEW.SDF to the DIPSO file OLD.DAT
+   file
+
+NDF2DIPSO SPECTRE SPECTRE
+   This converts the NDF called SPECTRE in file SPECTRE.SDF to
+   the DIPSO file SPECTRE.DAT.
+2 Notes
+-  Most NDF components are not supported by the DIPSO format,
+and therefore anything but the data array, axis centres, and
+data title will not be copied.
+2 Authors
+JM: Jo Murray (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1990 August 21st (JM):
+    Original version.
+
+ 1990 November 15th (JM):
+    NDF map axis data call included.
+
+ 1992 February 4 (MJC):
+    Renamed the parameters IN and OUT for consistency with other
+    applications and with the paper documentation.  Added Usage,
+    Implementation Status, and Examples items.  Improved the error
+    reports.
+2 Implementation_Status
+   -  If the NDF data array exceeds the DIPSO limits of 28000
+   elements or 1000 breaks in the data, the application will abort
+   with an appropriate error message.
+
+   -  If the NDF does not have a title, "Data from NDF" is written
+   as the DIPSO file's title.
+
+   -  If the NDF does not have an axis, the application will abort
+   with an appropriate error message.

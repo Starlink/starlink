@@ -1,0 +1,83 @@
+1 NDF2DST
+Converts an NDF to a Figaro (Version 2) DST file.
+
+Description:
+
+   This application converts an NDF to a Figaro (Vn. 2) `.DST' file.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.  The suggested default is the
+   current NDF if one exists, otherwise it is the current value.
+3 OUT
+OUT = Figaro (Write)
+   Output Figaro file name. This excludes the file extension.
+   The file created will be given extension ".DST".
+2 Notes
+The rules for the conversion are as follows:
+2 ______________________________________________________________________
+   NDF                   Figaro file
+2 ______________________________________________________________________
+           Main data array    -> .Z.DATA
+           Bad-pixel flag     -> .Z.FLAGGED
+           Units              -> .Z.UNITS
+           Label              -> .Z.LABEL
+           Variance           -> .Z.ERRORS (after processing)
+           Quality            -> It is not copied directly though bad
+                                 values indicated by QUALITY flags will
+                                 be flagged in .Z.DATA in addition to
+                                 any flagged values actually in the
+                                 input main data array.  .Z.FLAGGED is
+                                 set accordingly.
+           Title              -> .OBS.OBJECT
+           AXIS(1) structure  -> .X
+              AXIS(1) Data    -> .X.DATA
+              AXIS(1) Units   -> .X.UNITS
+              AXIS(1) Label   -> .X.LABEL
+            (Similarly for AXIS(2:6) which are renamed to
+             .Y .T .U .V or .W)
+
+           FIGARO extension:
+           .MORE.FIGARO.xxx   -> .xxx
+
+           FITS extension:
+           .MORE.FITS
+                    Items    -> .FITS.xxx
+                    Comments -> .COMMENTS.xxx
+
+           Other extensions:
+           .MORE.other       -> .MORE.other
+
+   Authors:
+      JM: Jo Murray (STARLINK)
+      MJC: Malcolm J. Currie (STARLINK)
+
+   History:
+      1991 February 1 (JM):
+         Original version.
+      1991 March 22 (JM):
+         The NDF quality array is no longer copied to the output Figaro
+         file. This is because Figaro does not supports the use of both
+         flagged values and a quality array in the same data structure.
+         Extensions in the NDF are copied from NDF.MORE to Figaro.MORE.
+      1991 September 25 (MJC):
+         Corrected looping bug, when an extension is empty.
+      1992 January 30 (MJC):
+         Added further comments to the code.  Modified to preserve the
+         type of extensions in the FIGARO.MORE structure.  Added route
+         for other extensions to the prologue.  Made the file parameters
+         IN and OUT, as given in SUN/55.  Corrected the processing of
+         character-valued card-images in the FITS extension.  Searches
+         for the comment delimiter rather than assuming where the
+         comment is located.  Reordered the annulling of the comments
+         locator to prevent an error.
+      1992 June 2 (MJC):
+         Checks for a blank FITS keyword: if found the card image is
+         omitted from the DST.
+      1992 September 2 (MJC):
+         Write FLAGGED value to DST as Figaro (DSA_) makes the opposite
+         assumption about the presence of bad pixels compared with
+         NDF_.
+
+   Bugs:
