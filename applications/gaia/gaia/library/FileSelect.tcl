@@ -86,9 +86,10 @@
 #                 16 Oct 00  Also now skips $filename and
 #                            ~$filename. These cannot be handled by
 #                            NDF (user can still enter these names by hand)
-#                 26 MAr 01  Added panedwindow to control how the
+#                 26 Mar 01  Added panedwindow to control how the
 #                            space is divided between the directory
 #                            and files views.
+#                 07 Jul 03  Added horizontal scrollbars.
 
 
 itk::usual FileSelect {}
@@ -156,14 +157,19 @@ itcl::class util::FileSelect {
 	label $fs(dirf).label -text "$itk_option(-dirlabel)"
 	set fs(dirs) [listbox $fs(dirf).list -relief sunken \
 		-yscrollcommand "$fs(dirf).vscroll set" \
+		-xscrollcommand "$fs(dirf).hscroll set" \
 		-selectmode single \
 		-exportselection no]
 
 	scrollbar $fs(dirf).vscroll -orient vertical -relief sunken \
 		-command "$fs(dirf).list yview"
 
+	scrollbar $fs(dirf).hscroll -orient horizontal -relief sunken \
+		-command "$fs(dirf).list xview"
+
 	pack $fs(dirf).label -side top -anchor w
 	pack $fs(dirf).vscroll -side right -fill y
+	pack $fs(dirf).hscroll -side bottom -fill x
 	pack $fs(dirf).list -side left -expand yes -fill both
 
 	#
@@ -174,14 +180,18 @@ itcl::class util::FileSelect {
 	label $fs(filef).label -text "$itk_option(-filelabel)"
 	set fs(files) [listbox $fs(filef).list -relief sunken \
 		-yscrollcommand "$fs(filef).vscroll set" \
+		-xscrollcommand "$fs(filef).hscroll set" \
                 -selectmode single \
 		-exportselection no]
 
 	scrollbar $fs(filef).vscroll -orient vertical -relief sunken \
 		-command "$fs(filef).list yview"
+	scrollbar $fs(filef).hscroll -orient horizontal -relief sunken \
+		-command "$fs(filef).list xview"
 
 	pack $fs(filef).label -side top -anchor w
 	pack $fs(filef).vscroll -side right -fill y
+	pack $fs(filef).hscroll -side bottom -fill x
 	pack $fs(filef).list -side left -expand yes -fill both
 
         #
