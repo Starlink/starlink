@@ -1,10 +1,14 @@
 
 Generate fonts using something like:
 
-#mktexpk --mfmode ljfour --bdpi 600 --mag magstep\(0.5\) --dpi 657 phvr8r
-
-  #mktexpk --mfmode pixpt --mag 1 --bdpi 2602 --dpi 2602 cmr10
+For TeXLive:
 
   mktexpk --mfmode ibmvga --mag 1 --bdpi 110 --dpi 110 cmr10
+  --> /var/tmp/fonts/pk/ibmvga/public/cm/cmr10.110pk
 
-puts the result in /var/tmp/fonts/pk/pixpt/public/cm/cmr10.2602pk
+for teTeX:
+
+  MakeTeXPK cmr10 110 110 1 ibmvga
+  --> /var/lib/texmf/fonts/pk/ibmvga/public/cm/cmr10.110pk
+
+use `kpsewhich pk cmr10.110pk' to find the file.
