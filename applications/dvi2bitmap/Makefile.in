@@ -78,15 +78,23 @@ dvi2bitmap_doc.tar: doc/dvi2bitmap.sgml
 	ln doc/doc.tar $@
 
 # Merge dvi2bitmap_{source,doc}.tar into a single file for general distribution
-dvi2bitmap.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
+# The following could be done more directly by using, say,
+# tarball=$(shell cat VERSION), but that's specific to GNU make, I think.
+dvi2bitmap-%.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
 	rm -Rf distrib
-	mkdir -p distrib/dvi2bitmap
-	cd distrib/dvi2bitmap; \
+	mkdir -p distrib/$(@:.tar=)
+	cd distrib/$(@:.tar=); \
 		tar xf ../../dvi2bitmap_source.tar; \
 		tar xf ../../dvi2bitmap_doc.tar
-	cd distrib; tar cf $@ dvi2bitmap
+	cd distrib; tar cf $@ $(@:.tar=)
 	mv distrib/$@ .
 	rm -Rf distrib
+
+dvi2bitmap.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
+	FN=dvi2bitmap-`cat VERSION`.tar; \
+		$(MAKE) $$FN; \
+		rm -f $@; \
+		ln -s $$FN $@
 
 version.h README dvi2bitmap.1 Makefile.starlink: VERSION
 	./propagate-version
