@@ -40,20 +40,14 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)       LOC           ! SSDS locator
+      INTEGER ID
 *-
 
-*    Status ok?
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-        CALL ADI1_GETLOC( ID, LOC, STATUS )
-        CALL SSO_GETFITEM0<T>( LOC, FLD, ITEM, VALUE, STATUS )
-
-*      Tidy up
-        IF ( STATUS .NE. SAI__OK ) THEN
+      IF(STATUS.EQ.SAI__OK) THEN
+        CALL ADI1_GETLOC(LOC,ID,STATUS)
+        CALL SSI_GETFITEM0<T>( ID, FLD, ITEM, VALUE, STATUS )
+        IF ( STATUS.NE.SAI__OK ) THEN
           CALL AST_REXIT( 'SSI_GETFITEM0<T>', STATUS )
-        END IF
-
-      END IF
-
+        ENDIF
+      ENDIF
       END
