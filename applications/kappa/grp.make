@@ -36,7 +36,9 @@ kappa_style.def tkast.tcl kappa_contour_keystyle.def \
 kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
 stardemo_procs.tcl adamMessageRelay adamtask.tcl dialog.tcl kappa.demo \
-v0.14-5.demo v0.15-9.demo v0.16-3.demo sty0 sty1 sty2 sty3 pazo.csh
+v0.14-5.demo v0.15-9.demo v0.16-3.demo sty0 sty1 sty2 sty3 pazo.csh \
+lutedit.help lutedit.tcl cpoint.bit dpoint.bit minus.bit plus.bit \
+unzoom.bit uparrow.bit cpoint.bit dpoint.bit
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl \
@@ -47,7 +49,7 @@ picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
 ardmask.par axconv.par axlabel.par axunits.par block.par collapse.par cadd.par \
 calc.par calpol.par cdiv.par centroid.par chpix.par cmult.par compadd.par \
 compave.par compick.par contour.par convolve.par colcomp.par \
-creframe.par crelut.par csub.par cursor.par display.par drawsig.par \
+creframe.par crelut.par csub.par cursor.par lutedit.par display.par drawsig.par \
 elprof.par erase.par errclip.par exp10.par expe.par expon.par ffclean.par \
 fillbad.par fitsdin.par fitsexist.par fitsexp.par fitsimp.par fitsin.par \
 fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
@@ -85,7 +87,7 @@ axlabel.hlp axunits.hlp block.hlp collapse.hlp cadd.hlp calc.hlp calpol.hlp cdiv
 centroid.hlp changes_to_kappa.hlp chpix.hlp classified_commands.hlp \
 cmult.hlp co_ordinate_systems.hlp colour_set.hlp compadd.hlp compave.hlp \
 compick.hlp contour.hlp convolve.hlp creframe.hlp crelut.hlp \
-csub.hlp cursor.hlp custom_kappa.hlp data_structures.hlp display.hlp \
+csub.hlp cursor.hlp custom_kappa.hlp data_structures.hlp lutedit.hlp display.hlp \
 div.hlp drawsig.hlp elprof.hlp erase.hlp errclip.hlp exp10.hlp expe.hlp \
 expon.hlp feedback.hlp ffclean.hlp fillbad.hlp fitsdin.hlp fitsedit.hlp \
 fitsexp.hlp fitsexist.hlp fitshead.hlp fitsimp.hlp fitsin.hlp permaxes.hlp \
@@ -145,7 +147,7 @@ segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
 sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
 tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl crelut.ifl cursor.ifl \
-drawsig.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
+drawsig.ifl lutedit.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
 gdstate.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
 idstate.ifl ardplot.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
 lutrot.ifl lutsave.ifl luttweak.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
@@ -228,7 +230,7 @@ kps1_memin.f kps1_memnm.f kps1_memou.f kps1_memsa.f kps1_memsy.f \
 kps1_memtr.f kps1_mlcof.f kps1_mlgof.f kps1_mlofl.f kps1_mlput.f \
 kps1_mlylm.f kps1_mthcd.f kps1_mthcr.f kps1_ncuco.f kps1_nom1b.f \
 kps1_nom1d.f kps1_nom1i.f kps1_nom1r.f kps1_nom1ub.f kps1_nom1uw.f \
-kps1_nom1w.f kps1_op1.f kps1_op2.f kps1_plclc.f \
+kps1_luted.c kps1_nom1w.f kps1_op1.f kps1_op2.f kps1_plclc.f \
 kps1_plcpb.f kps1_plcpd.f kps1_plcpi.f kps1_plcpr.f kps1_plcpub.f \
 kps1_plcpuw.f kps1_plcpw.f kps1_plcpy.f kps1_plmsk.f kps1_psdim.f \
 kps1_psevl.f kps1_psplt.f kps1_putb.f kps1_putc.f kps1_putd.f kps1_puti.f \
@@ -276,7 +278,7 @@ kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
 elprof.f gdclear.f gdnames.f gdset.f gdstate.f idclear.f \
-idset.f idstate.f linplot.f lutable.f \
+idset.f idstate.f linplot.f lutable.f lutedit.f \
 lutsave.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \

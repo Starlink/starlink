@@ -52,7 +52,7 @@ proc addHelp {helpmenu} {
 
 #  Add elements to the HELPTEXT global array with names equal tot he help
 #  topics, and values equal tot he associated text.
-   set f [open $KAPPA_DIR/lutedit.hlp]
+   set f [open $KAPPA_DIR/lutedit.help]
    set name ""
    while { [gets $f tx] != -1 } {   
       if { [regexp {^o (.*):$} $tx match ttl] } {

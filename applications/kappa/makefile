@@ -458,7 +458,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 PUBLIC_SCRIPTS = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk tkast.tcl dialog.tcl adamtask.tcl \
-adamMessageRelay stardemo.tcl stardemo_procs.tcl pazo.csh 
+adamMessageRelay stardemo.tcl stardemo_procs.tcl pazo.csh lutedit.tcl
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases
@@ -499,7 +499,7 @@ EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_D MSG_PAR DAT_ERR AST_PAR \
 		    IDI_ERR CTM_PAR FIO_ERR NUM_DEC_CVT NDF_ERR IDI_PAR \
 		    FIO_PAR KPG_AST AGI_ERR NUM_DEF_CVT NDF_PAR GNS_PAR \
 		    PAR_ERR GRP_PAR NUM_DEC_R PAR_PAR MAG_ERR CHR_ERR \
-		    NUM_DEC_D IRA_PAR SUBPAR_PAR NUM_DEF_R GKS_PAR
+		    NUM_DEC_D IRA_PAR SUBPAR_PAR NUM_DEF_R GKS_PAR PSX_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -518,7 +518,7 @@ gdclear.f gdnames.f gdset.f gdstate.f \
 idclear.f \
 idset.f idstate.f \
 linplot.f lutable.f \
-lutsave.f lutview.f \
+lutsave.f lutview.f lutedit.f \
 mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
 palread.f palsave.f piccur.f picdef.f \
 picempty.f picentire.f picin.f piclabel.f \
@@ -583,6 +583,8 @@ ccg1_tmn2d.f ccg1_tmn2r.f ccg1_tmn3d.f ccg1_tmn3r.f ccg1_tmr1r.f \
 ccg1_tmr3r.f ccg1_trm2d.f ccg1_trm2r.f ccg1_trm3d.f ccg1_trm3r.f \
 ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f ccg1_wmd3r.f ccg1_wtm2d.f \
 ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f ccg1_wtm4d.f ccg1_wtm4r.f
+
+KAPSUB_C_ROUTINES = kps1_luted.c
 
 KAPSUB_F_ROUTINES = crfrsb.f \
 apadsb.f cnthlt.f cntkey.f cntsbp.f curre.f ftsize.f ftsizt.f \
@@ -663,9 +665,9 @@ kps1_glibd.f kps1_glidr.f kps1_gliwr.f kps1_saxlk.f kps1_clpsr.f \
 kps1_clpsd.f kps1_prmxb.f kps1_prmxub.f kps1_prmxd.f kps1_prmxuw.f \
 kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f kps1_cremg.f kps1_crets.f \
 kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look.f kps1_look1.f kps1_look2.f \
-kps1_ltaba.f
+kps1_ltaba.f 
 
-MEM_F_ROUTINES = mem2d.f
+MEM_F_ROUTINES = 
 
 NDFPACK_F_ROUTINES = \
 axconv.f axlabel.f axunits.f erase.f \
@@ -702,7 +704,7 @@ BLOCK_DATA =
 #  C routines required for building the libraries.  This is just a
 #  list of all the C source files.
 
-C_ROUTINES = 
+C_ROUTINES = $(KAPSUB_C_ROUTINES) 
 
 #  Define the set of all interface files.
 
@@ -733,7 +735,7 @@ DATA_FILES = $(NDFS) $(NON-NDFS)
 
 #  List of ancillary data files (non-NDFs).
 
-NON-NDFS = m31_arm.FIT ccdframec.FIT
+NON-NDFS = m31_arm.FIT ccdframec.FIT 
 
 #  List of ancillary data files (NDFs).
 
@@ -762,6 +764,10 @@ kappa_display_keystyle.def sty0 sty1 sty2 sty3 kappa_contour_keystyle.def
 
 DEMO_FILES = kappa.demo v0.14-5.demo v0.15-9.demo v0.16-3.demo
 TEST_DEMO = v0.16-3
+
+#  Other miscellaneous files in kappa-source.tar
+MISC_FILES = cpoint.bit dpoint.bit minus.bit plus.bit unzoom.bit \
+uparrow.bit lutedit.help
 
 #  List of TK/TCL object libraries.
 
@@ -879,7 +885,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(MEMTASKS) \
               $(IRAF_OUTPAR_FILES) $(IRAF_PAR_FILES) $(IRAF_HELP_FILES) \
               $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
               $(IRAF_DEMO) $(IRAF_DATA) $(STYLE_FILES) $(DEMO_FILES) \
-              $(MONO_IFL)
+              $(MONO_IFL) $(MISC_FILES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -912,6 +918,7 @@ KPG_AST:	$(STAR_INC)/kpg_ast;	$(LINK) $? $@
 MAG_ERR:	$(STAR_INC)/mag_err;	$(LINK) $? $@
 ME_COM:	        me_com;           	$(LINK) $? $@
 MSG_PAR:	$(STAR_INC)/msg_par;	$(LINK) $? $@
+PSX_ERR:	$(STAR_INC)/psx_err;	$(LINK) $? $@
 NDF_ERR:	$(STAR_INC)/ndf_err;	$(LINK) $? $@
 NDF_PAR:	$(STAR_INC)/ndf_par;	$(LINK) $? $@
 NUM_CMN:	$(STAR_INC)/num_cmn;	$(LINK) $? $@
@@ -943,7 +950,7 @@ $(LINK_SCRIPT):
 
 $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
 $(I_KAPPA) $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
-$(STYLE_FILES) $(DEMO_FILES):
+$(STYLE_FILES) $(DEMO_FILES) $(MISC_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -958,7 +965,7 @@ $(KAPPA_F_ROUTINES) $(KAPPA_F2_ROUTINES) $(MEM_F_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(KAPSUB_F_ROUTINES) :
+$(KAPSUB_F_ROUTINES) $(KAPSUB_C_ROUTINES) :
 	$(TAR_OUT) kapsub_sub.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1020,7 +1027,7 @@ OBJECT_FILES = $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) $(CCDPACK_OBJECT_FIL
 
 KAPPA_OBJECT_FILES = $(KAPPA_F_ROUTINES:.f=.o) $(KAPPA_F2_ROUTINES:.f=.o) $(MEM_F_ROUTINES:.f=.o)
 
-KAPSUB_OBJECT_FILES = $(KAPSUB_F_ROUTINES:.f=.o)
+KAPSUB_OBJECT_FILES = $(KAPSUB_F_ROUTINES:.f=.o) $(KAPSUB_C_ROUTINES:.c=.o)
 
 CCDPACK_OBJECT_FILES = $(CCDPACK_F_ROUTINES:.f=.o)
 
@@ -1478,6 +1485,17 @@ install:
         done
 
 #
+#  Install the other miscellaneous files, giving them world-read permission.
+	for f in $(MISC_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 644 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f $$f;\
+           else :; fi;\
+        done
+
+#
 #  Install the help files, giving them world-read permission.
 	for f in $(HELP_FILES) ""; do \
            if test -n "$$f"; then \
@@ -1789,6 +1807,15 @@ do_deinstall:
 #
 #  Deinstall the demo files, if installed versions exist.
 	- for f in $(DEMO_FILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_BIN)/$$f .;\
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall other miscellaneous files, if installed versions exist.
+	- for f in $(MISC_FILES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_BIN)/$$f .;\
@@ -2175,7 +2202,7 @@ $(PKG_NAME)_source.tar:
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) \
                   $(LINK_SCRIPT) $(ICL_SCRIPT) $(I_KAPPA) \
                   $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
-                  $(STYLE_FILES) $(DEMO_FILES)
+                  $(STYLE_FILES) $(DEMO_FILES) $(MISC_FILES)
 
 $(PKG_NAME)_iraf.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(IRAF_STARTUP) $(IRAF_PKG_PAR) \
@@ -2189,7 +2216,7 @@ kappa_sub.tar:
 	$(TAR_IN) kappa_sub.tar $(KAPPA_F_ROUTINES) $(KAPPA_F2_ROUTINES) $(MEM_F_ROUTINES)
 
 kapsub_sub.tar:
-	$(TAR_IN) kapsub_sub.tar $(KAPSUB_F_ROUTINES)
+	$(TAR_IN) kapsub_sub.tar $(KAPSUB_F_ROUTINES) $(KAPSUB_C_ROUTINES)
 
 kappa_ccdpack.tar:
 	$(TAR_IN) kappa_ccdpack.tar $(CCDPACK_F_ROUTINES) $(I_CCDPACK)
@@ -2753,6 +2780,7 @@ lutrot.o:	 SAE_PAR DAT_PAR CTM_PAR IDI_PAR IDI_ERR PAR_ERR
 lutsave.o:	 SAE_PAR CTM_PAR IDI_ERR PAR_ERR
 luttweak.o:	 SAE_PAR DAT_PAR CTM_PAR IDI_PAR IDI_ERR PAR_ERR
 lutview.o:	 SAE_PAR NDF_PAR AST_PAR PAR_ERR CTM_PAR
+lutedit.o:	 SAE_PAR PAR_ERR PSX_ERR
 ma1to2.o:	 SAE_PAR
 ma1to3.o:	 SAE_PAR
 ma2to1.o:	 SAE_PAR PRM_PAR

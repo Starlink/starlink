@@ -35,7 +35,7 @@
 
 *  ADAM Parameters:
 *     LUT = NDF (Read)
-*        Name of an exiting colour table to be editied. This should be an 
+*        Name of an exiting colour table to be edited. This should be an 
 *        NDF containing an array of red, green and blue intensities. The 
 *        NDF must be 2-dimensional, the first dimension being 3, and the 
 *        second being arbitrary.  The method used to compress or expand the 
