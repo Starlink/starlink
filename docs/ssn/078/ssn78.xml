@@ -2974,6 +2974,11 @@ bin_MONOLITHS = foo
           <code>.../buildsupport/bin</code> directory in your path,
           and start work.</p>
 
+        <p>See also <ref id="rolldistribution"/> for how to make a
+          version of the buildsupport tools which has a default
+          installation prefix different from the buildsupport
+          installation location.</p>
+
       </subsect>
 
     </sect>
@@ -3616,22 +3621,49 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
             governed by starconf (see <ref id="starconf"/> for
             details).  Since this default is a location on your local
             machine, it might not be appropriate for a distribution
-            tarball.  Thus when you have checked out the appropriate
-            version of your software (probably via a CVS export of a
-            particular tag), you should configure it in the following
-            way:
+            tarball.  In that case, you will probably want to ensure
+            that the built distribution will install into
+            <code>/star</code> (or <code>/usr/local</code> perhaps).
+            There are two ways you can do this.</p>
+
+          <p>The more robust way is to create a special set of
+            buildsupport tools which have the desired directory as
+            their default prefix.  Say you want the distribution to
+            install by default 
+            in <code>/star</code>, but have these special buildsupport
+            tools installed in <code>/local-star/makedist</code>.  Do
+            that as follows:
 <verbatim>
-% STARCONF_DEFAULT_PREFIX=/star STARCONF_DEFAULT_STARLINK=/star ./bootstrap 
+% STARCONF_DEFAULT_PREFIX=/star ./bootstrap --buildsupport=/local-star/makedist
 </verbatim>
-            (or <kbd>env ...</kbd> on csh-type shells).  This will
-            make the default installation prefix <code>/star</code>
-            (perhaps <code>/stardev</code> would be appropriate in
-            some circumstances).  After that, the sequence
+            (or use <kbd>env ...</kbd> on csh-type shells; you would
+            typically specify <code>STARCONF_DEFAULT_STARLINK</code> here,
+            too).<index>bootstrapping!buildsupport</index>.</p>
+
+          <p>At this point, you can check out the appropriate version
+            of your software (probably via a CVS export of a
+            particular tag), put this
+            <code>/local-star/makedist/bin</code> in your path
+            (rehashing if you are using csh), and call
+            <kbd>./bootstrap; ./configure; make dist</kbd> as
+            usual.  The command <kbd>./configure --help</kbd> will
+            show you the default prefix for this
+            <code>./configure</code> script.</p>
+
+          <p>An alternative way is to create a file
+            <code>acinclude.m4</code> in the checkout directory, and
+            put in it the single line
 <verbatim>
-% ./configure
-% make dist
+m4_define([OVERRIDE_PREFIX],[/star])
 </verbatim>
-            will make the distribution properly.</p>
+            When you run <code>./bootstrap</code> after that, the
+            given prefix will be used instead of the prefix baked into
+            the installed buildsupport tools.  This method is slightly
+            fragile, and uses a partly-deprecated autoconf interface,
+            and so is not guaranteed to work for all time.  Unless you
+            plan to delete this directory as soon as you have rolled
+            your distribution, it would probably be wise to delete
+            this file and re-bootstrap the directory, to avoid confusion.</p>
 
         </subsubsect>
 
