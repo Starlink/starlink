@@ -120,6 +120,8 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\def\\setDate#1{\\def\\@Date{#1}}
 \\let\\@Copyright\\@empty
 \\long\\def\\setCopyright#1{\\def\\@Copyright{#1}}
+\\let\\@Coverimage\\@empty
+\\long\\def\\setCoverimage#1{\\def\\@Coverimage{#1}}
 % Now create the title page
 \\newenvironment{FrontMatter}{\\renewcommand\\thepage{\\roman{page}}}
   {\\cleardoublepage
@@ -144,6 +146,9 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
   \\ifx\\@Abstract\\@empty\\else		% optional
     \\vspace{10mm}\\begin{center}\\Large\\bfseries Abstract\\end{center}
       \\begin{flushleft}\\@Abstract\\end{flushleft}\\fi
+  \\ifx\\@Coverimage\\@empty\\else	% optional
+    \\vbox to 0pt{\\vspace{10mm}	% cram onto page, not onto verso
+        \\begin{center}\\fbox{\\@Coverimage}\\end{center}\\vss}\\fi
 }
 \\newenvironment{fmtAuthorlist}{\\def\\fmtAuthor##1{##1\\\\}}{}
 \\newenvironment{fmtOtherAuthors}{Also: }{}
