@@ -1,0 +1,56 @@
+#! /bin/sh -
+
+##testing autoastrom
+
+if test -z "$AUTOASTROM_DIR"; then
+    echo "No AUTOASTROM_DIR -- autoastrom must be test-installed"
+    exit 1
+fi
+if test ! -x $AUTOASTROM_DIR/autoastrom; then
+    echo "Can't find autoastrom script in directory $AUTOASTROM_DIR"
+    exit 1
+fi
+
+test -n "$KAPPA_DIR"		|| KAPPA_DIR=/star/bin/kappa
+# Need CCDPACK 4.0-1 and ATOOLS 1.3, so the following might need predefining
+test -n "$CCDPACK_DIR"		|| CCDPACK_DIR=/star/bin/ccdpack
+test -n "$ATOOLS_DIR"		|| ATOOLS_DIR=/star/bin/atools
+
+export AUTOASTROM_DIR KAPPA_DIR CCDPACK_DIR ATOOLS_DIR
+
+PREFIX=t9-temp-
+
+$AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --xxxccdcat=testndf1.ccdcat.munged \
+    --xxxndfinfo=dim1=2048,dim2=4097 \
+    --noinsert \
+    --keepfits=${PREFIX}testndf1.final-fits.fits \
+    testndf1.sdf \
+    >${PREFIX}testndf1.STDOUT \
+    2>${PREFIX}testndf1.STDERR
+
+$AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --xxxccdcat=testndf2.ccdcat.munged \
+    --xxxndfinfo=dim1=353,dim2=353 \
+    --obsdata=col=600 \
+    --noinsert \
+    --keepfits=${PREFIX}testndf2.final-fits.fits \
+    testndf2 \
+    >${PREFIX}testndf2.STDOUT \
+    2>${PREFIX}testndf2.STDERR
+
+
+
+# Dump results to stdout, removing version string
+echo "=== Test 1 ==="
+grep -v 'autoastrom, v' ${PREFIX}testndf1.STDOUT
+./fitsdump ${PREFIX}testndf1.final-fits.fits
+echo "=== Test 2 ==="
+grep -v 'autoastrom, v' ${PREFIX}testndf2.STDOUT
+./fitsdump ${PREFIX}testndf2.final-fits.fits
+
+rm -f ${PREFIX}*
+
+exit 0;

@@ -1,28 +1,58 @@
+#! /bin/sh -
 
 ##testing command-line processing
 
+if test -z "$AUTOASTROM_DIR"; then
+    echo "No AUTOASTROM_DIR -- autoastrom must be test-installed"
+    exit 1
+fi
+if test ! -x $AUTOASTROM_DIR/autoastrom; then
+    echo "Can't find autoastrom script in directory $AUTOASTROM_DIR"
+    exit 1
+fi
+
+
+# Make temporary directory to receive dumps (don't add $$ to this
+# name, since this will change between runs.
 TDIR=/tmp/t7-temp
 test -d $TDIR || mkdir $TDIR
-TTDIR=$TDIR/test-install
-test -d $TTDIR || mkdir $TTDIR
 
-AUTOASTROM_DIR=$TTDIR	# IGNORE ANY PREVIOUS SETTING -- DELETED AT END
 test -n "$KAPPA_DIR"		|| KAPPA_DIR=/star/bin/kappa
 # Need CCDPACK 4.0-1 and ATOOLS 1.3, so the following might need predefining
 test -n "$CCDPACK_DIR"		|| CCDPACK_DIR=/star/bin/ccdpack
 test -n "$ATOOLS_DIR"		|| ATOOLS_DIR=/star/bin/atools
 
-export AUTOASTROM_DIR KAPPA_DIR CCDPACK_DIR ATOOLS_DIR
 
-(cd ..; ./mk test-install) >&2
 
-$AUTOASTROM_DIR/autoastrom --dump=$TDIR/t7-temp.dump1 --temp=$TDIR/t1 t5
-$AUTOASTROM_DIR/autoastrom --dump=$TDIR/t7-temp.dump2 --temp=$TDIR/t2 --obsdata=source=FITS t5
-$AUTOASTROM_DIR/autoastrom --dump=$TDIR/t7-temp.dump3 --temp=$TDIR/t3 --obsdata=ra=+210,dec=-12:34:56,pa=-30 t5
 
-for f in $TDIR/t7-temp.dump?; do
+$AUTOASTROM_DIR/autoastrom \
+    --dump=$TDIR/dump1 \
+    --temp=$TDIR/t1 \
+    t5 \
+    > $TDIR/stdout1
+    2> $TDIR/stderr1
+
+$AUTOASTROM_DIR/autoastrom \
+    --dump=$TDIR/dump2 \
+    --temp=$TDIR/t2 \
+    --obsdata=source=FITS \
+    t5 \
+    > $TDIR/stdout2
+    2> $TDIR/stderr2
+
+$AUTOASTROM_DIR/autoastrom \
+    --dump=$TDIR/dump3 \
+    --temp=$TDIR/t3 \
+    --obsdata=ra=+210,dec=-12:34:56,pa=-30 \
+    t5 \
+    > $TDIR/stdout3
+    2> $TDIR/stderr3
+
+for f in 1 2 3; do
     echo "====================" $f
-    cat $f
+    # Remove version-number lines
+    grep -v 'autoastrom, v' $TDIR/stdout$f
+    cat $TDIR/dump$f
     echo "--------------------"
 done
 

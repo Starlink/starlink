@@ -1,4 +1,4 @@
--- autoastrom, v0.0
+==================== 1
 -- Starting monoliths...
 -- Monoliths OK
 -- Processing NDF <t5>
@@ -6,23 +6,6 @@
 -- NDF <t5> examined OK
 -- WCS information from AST
 -- Dumping state, and exiting...
--- autoastrom, v0.0
--- Starting monoliths...
--- Monoliths OK
--- Processing NDF <t5>
--- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
--- NDF <t5> examined OK
--- WCS information from FITS
--- Dumping state, and exiting...
--- autoastrom, v0.0
--- Starting monoliths...
--- Monoliths OK
--- Processing NDF <t5>
--- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
--- NDF <t5> examined OK
--- WCS information from command line
--- Dumping state, and exiting...
-==================== /tmp/t7-temp/t7-temp.dump1
 NDF=t5
 keeptemps=1
 tempDir=/tmp/t7-temp/t1
@@ -35,7 +18,7 @@ maxobj=500
 esocatname=usno@eso
 skycatconfig=<UNDEF>
 verbose=0
-dumpstatefile=/tmp/t7-temp/t7-temp.dump1
+dumpstatefile=/tmp/t7-temp/dump1
 obsdata:
     source=USER:AST:FITS
 NDFinfo hash:
@@ -602,7 +585,14 @@ $NDFinfo->{wcs}: ref to ARRAY:
     End WinMap
     End FrameSet
 --------------------
-==================== /tmp/t7-temp/t7-temp.dump2
+==================== 2
+-- Starting monoliths...
+-- Monoliths OK
+-- Processing NDF <t5>
+-- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
+-- NDF <t5> examined OK
+-- WCS information from FITS
+-- Dumping state, and exiting...
 NDF=t5
 keeptemps=1
 tempDir=/tmp/t7-temp/t2
@@ -615,7 +605,7 @@ maxobj=500
 esocatname=usno@eso
 skycatconfig=<UNDEF>
 verbose=0
-dumpstatefile=/tmp/t7-temp/t7-temp.dump2
+dumpstatefile=/tmp/t7-temp/dump2
 obsdata:
     source=FITS
 NDFinfo hash:
@@ -1147,7 +1137,14 @@ $NDFinfo->{wcs}: ref to ARRAY:
     HISTORY r106282.imh on Mon Feb  7 15:09:53 2000
     END
 --------------------
-==================== /tmp/t7-temp/t7-temp.dump3
+==================== 3
+-- Starting monoliths...
+-- Monoliths OK
+-- Processing NDF <t5>
+-- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
+-- NDF <t5> examined OK
+-- WCS information from command line
+-- Dumping state, and exiting...
 NDF=t5
 keeptemps=1
 tempDir=/tmp/t7-temp/t3
@@ -1160,7 +1157,7 @@ maxobj=500
 esocatname=usno@eso
 skycatconfig=<UNDEF>
 verbose=0
-dumpstatefile=/tmp/t7-temp/t7-temp.dump3
+dumpstatefile=/tmp/t7-temp/dump3
 obsdata:
     dec=-12:34:56
     pa=-30
