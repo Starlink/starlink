@@ -20,12 +20,14 @@
 *     also cause problems if the temperature is a few keV or less. It is
 *     recommended that the default lower limits are NOT changed.
 *    Authors : BHVAD::CGH
+*     Richard Beard (Birmingham)
 *    History :
 *     22 Aug 88 : Original
 *     1 Sept 88 : Attempts to stop floating overflow errors (BHVAD::CGH)
 *     24 Jan 89 : Minor mods (BHVAD::CGH)
 *      3 Mar 89 : ASTERIX88 version, varoius name changes (TJP)
 *     25 Feb 93 : Error handling corrected (DJA)
+*     23 Jun 97 : Replace NAG with ASTPDA (RB)
 *
 *    Type definitions :
         IMPLICIT NONE
@@ -43,9 +45,9 @@
 *    Status :
         INTEGER STATUS
 *    Function declarations :
-        REAL*8 ST_FUNCT                  ! Does most of the work
-        REAL*8 ST_GAMMA                   ! Checks the input parameter for S14AAF
-c       REAL*8 S14AAF                   ! NAG routine to evaluate Gamma function
+        REAL*8 ST_FUNCT                 ! Does most of the work
+        REAL*8 ST_GAMMA                 ! Checks the input parameter for PDA_GAMMA
+        REAL*8 PDA_GAMMA                ! PDA routine to evaluate Gamma function
 *    Local variables :
         INTEGER I,J
         INTEGER IFAIL                   ! NAG error parameter
@@ -113,41 +115,33 @@ c       REAL*8 S14AAF                   ! NAG routine to evaluate Gamma function
 * Calculate Gamma functions
         GAMPAR=ST_GAMMA(A)
         IFAIL=1
-        G1=1.0D0
-c       G1=S14AAF(GAMPAR,IFAIL)
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
+        G1=PDA_GAMMA(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
-          PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G1 '
+          PRINT *, ' IFAIL = ',IFAIL,' in PDA_GAMMA - parameter = G1 '
           STATUS=USER__001
         END IF
 *
         GAMPAR=ST_GAMMA(-3.0D0-A)
         IFAIL=1
-        G2=1.0D0
-c       G2=S14AAF(GAMPAR,IFAIL)
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
+        G2=PDA_GAMMA(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
-          PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G2 '
+          PRINT *, ' IFAIL = ',IFAIL,' in PDA_GAMMA - parameter = G2 '
           STATUS=USER__001
         END IF
 *
         GAMPAR=ST_GAMMA(2.0D0*A+4.0D0)
         IFAIL=1
-        G3=1.0D0
-c       G3=S14AAF(GAMPAR,IFAIL)
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
+        G3=PDA_GAMMA(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
-          PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G3 '
+          PRINT *, ' IFAIL = ',IFAIL,' in PDA_GAMMA - parameter = G3 '
           STATUS=USER__001
         END IF
 *
         GAMPAR=ST_GAMMA(-2.0D0*A-2.0D0)
         IFAIL=1
-        G4=1.0D0
-c       G4=S14AAF(GAMPAR,IFAIL)
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
+        G4=PDA_GAMMA(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
-          PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G4 '
+          PRINT *, ' IFAIL = ',IFAIL,' in PDA_GAMMA - parameter = G4 '
           STATUS=USER__001
         END IF
 *

@@ -59,7 +59,8 @@
 *
 *    Function declarations :
 *
-c       DOUBLE PRECISION S15ABF
+        DOUBLE PRECISION PDA_CNDFPX
+        EXTERNAL PDA_CNDFPX
 *
 *    Local constants :
 *
