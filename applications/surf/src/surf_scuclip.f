@@ -4,7 +4,7 @@
 *     SCUCLIP
 
 *  Purpose:
-*     Simple clipping on a per bolometer basis
+*     Simple sigma clipping for each bolometer
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,14 +20,14 @@
 *        The global status
 
 *  Description :
-*     - Each bolometer is analysed independently, a mean and standard 
-*       deviation are calculated, any points greater than NSIGMA sigma 
-*       from the mean are treated as spikes and removed. Note that for mapping 
-*       this despiking algorithm is only useful for very weak
-*       sources; bright sources will be removed (since a bolometer
-*       jiggles on and off bright sources). Photometry observations
-*       do not suffer from this problem as the bolometers are always on 
-*       source.
+*     Each bolometer is analysed independently, the mean and standard 
+*     deviation are calculated, any points greater than NSIGMA sigma 
+*     from the mean are treated as spikes and removed. Note that for mapping 
+*     this despiking algorithm is only useful for very weak
+*     sources; bright sources will be removed (since a bolometer
+*     jiggles on and off bright sources). Photometry observations
+*     do not suffer from this problem as the bolometers are always on 
+*     source.
 
 *  Usage:
 *     scuclip in out
@@ -42,7 +42,7 @@
 *     NSIGMA = DOUBLE (Read)
 *        Number of sigma beyond which data are thought to be spikes.
 *     OUT = NDF (Write)
-*        Output data file
+*        Output data file.
 
 *  Examples:
 *     scuclip infile outfile nsigma=5
@@ -53,7 +53,8 @@
 *     - The despiking routine is very primitive and should not be used
 *       with jiggle map data of bright sources. It can be used
 *       on PHOTOM data since the jiggle pattern never moves off source
-*       (although SIGCLIP is probably more effective).
+*       (although SIGCLIP can be used once the data has been processed
+*        by SCUPHOT).
 
 *  Implementation status:
 *     The despiking routine sets QUALITY bit 5 to bad. It does not affect
@@ -72,6 +73,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version (in REMSKY)
 *     $Log$
+*     Revision 1.3  1997/12/01 02:00:52  timj
+*     Update documentation.
+*
 *     Revision 1.2  1997/11/06 23:42:32  timj
 *     Report total number of spikes removed.
 *     Add the verbose suffix option.

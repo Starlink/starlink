@@ -4,7 +4,7 @@
 *     SCAN_RLB
 
 *  Purpose:
-*     remove the linear baseline from SCAN/MAP data
+*     Remove the linear baseline from SCAN/MAP data
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,15 +21,32 @@
  
 *  Description:
 *     This routine removes a linear baseline from each scan.
+*     It does this by fitting a straight line to the scan ends and then
+*     removing this from the entire scan.
 
 *  Usage:
 *     scan_rlb IN OUT
 
 *  ADAM Parameters:
+*     CHOP = INTEGER (Read)
+*        The basline fit is calculated over regions CHOP arcseconds from the
+*        scan ends. This region should be as large as possible but should
+*        only include baseline regions -- any scan that includes a source 
+*        detection within CHOP arcseconds of the scan ends will be rendered
+*        useless.
+*        The default value is the chop throw.
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated SCUBA data.
+*     MSG_FILTER = CHAR (Read)
+*        The messaging level. Default is NORM. There are no verbose messages.
 *     OUT = NDF (Write)
 *        The name of the output file to contain the processed data.
+
+*  Examples:
+*     scan_rlb infile \
+*        Remove linear baslines from each scan using basline regions the
+*        same size as the chop. Write the results to the default output file.
+
 
 *  Authors:
 *     JFL: John Lightfoot (jfl@roe.ac.uk)
