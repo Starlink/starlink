@@ -673,7 +673,7 @@ itcl::class gaia::Gaia {
    #  Make an AST reference WCS toolbox.
    public method make_astreference_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstReference $w_.\#auto \
+         GaiaAstReference $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \

@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarAstReference
+#     GaiaAstReference
 
 #  Type of Module:
 #     [incr Tk] class
@@ -31,9 +31,9 @@
 
 #  Invocations:
 #
-#        StarAstReference object_name [configuration options]
+#        GaiaAstReference object_name [configuration options]
 #
-#     This creates an instance of a StarAstReference object. The return is
+#     This creates an instance of a GaiaAstReference object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -55,27 +55,29 @@
 #     TopLevelWidget.
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     19-DEC-1997 (PDRAPER):
+#     19-DEC-1997 (PWD):
 #        Original version.
-#     20-JAN-1998 (PDRAPER):
+#     20-JAN-1998 (PWD):
 #        Rewrite to separate image coordinate system information from 
 #        image related stuff.
+#     23-MAY-2000 (PWD):
+#        Changed name to GaiaAstReference.
 #     {enter_further_changes_here}
 
 #-
 
 #.
 
-itk::usual StarAstReference {}
+itk::usual GaiaAstReference {}
 
-itcl::class gaia::StarAstReference {
+itcl::class gaia::GaiaAstReference {
 
    #  Inheritances:
    #  -------------
@@ -142,7 +144,7 @@ itcl::class gaia::StarAstReference {
       #  Add window help.
       global gaia_dir
       add_help_button $gaia_dir/StarAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_dir/StarAstReference.hlp "On Window..."
+      add_help_button $gaia_dir/GaiaAstReference.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

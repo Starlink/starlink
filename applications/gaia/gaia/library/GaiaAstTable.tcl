@@ -268,6 +268,9 @@ itcl::class gaia::GaiaAstTable {
    #  -----------
    destructor  {
       clear_marks
+      if { $enter_object_ != {} } {
+         catch {destroy $enter_object_}
+      }
    }
 
    #  Methods:
@@ -731,12 +734,15 @@ itcl::class gaia::GaiaAstTable {
 
    #  Add a new object to the list.
    public method enter_new_object {} {
-      catch {destroy $w_.ef}
-      StarEnterObject $w_.ef \
-         -title {Please enter the data for a new object below:} \
-         -image $itk_option(-image) \
-         -labels [$itk_component(table) cget -headings] \
-         -command [code $this enter_object]
+      if { $enter_object_ != {} } {
+         catch {destroy $enter_object_}
+      }
+      set enter_object_ \
+         [StarEnterObject $w_.ef \
+             -title {Please enter the data for a new object below:} \
+             -image $itk_option(-image) \
+             -labels [$itk_component(table) cget -headings] \
+             -command [code $this enter_object]]
    }
 
    #  Enter a new object given its data.
@@ -1036,13 +1042,13 @@ itcl::class gaia::GaiaAstTable {
 
    #  Write table contents to a named file.
    public method save_positions {filename} {
-      set fid [open $filename w]
+      set fid [::open $filename w]
       set nrows [$itk_component(table) total_rows]
       set contents [$itk_component(table) get_contents]
       for { set i 0 } { $i < $nrows } { incr i } {
          puts $fid [lindex $contents $i]
       }
-      close $fid
+      ::close $fid
    }
 
    #  Read positions from a text file.
@@ -1060,7 +1066,7 @@ itcl::class gaia::GaiaAstTable {
    #  invoke the equinox setting call back as we do not know the equinox.
    public method read_positions {filename} {
       if { [file readable $filename] } {
-         set fid [open $filename r]
+         set fid [::open $filename r]
          set ok 1
          set nlines 0
          clear_table
@@ -1092,7 +1098,7 @@ itcl::class gaia::GaiaAstTable {
                set ok 0
             }
          }
-         close $fid
+         ::close $fid
          $itk_component(table) new_info
          redraw
       } else {
@@ -1562,6 +1568,9 @@ itcl::class gaia::GaiaAstTable {
    #  Table configuration (internal).
    protected variable selectmode_ extended
    protected variable exportselection_ 0
+
+   #  StarEnterObject reference.
+   protected variable enter_object_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
