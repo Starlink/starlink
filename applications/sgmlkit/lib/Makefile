@@ -56,22 +56,30 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 %.tth-html: %.tth-eqlist
 	tth -r < $< > $@
 
-%.img-maths.stamp: %.sgml
+%.imgeq.list.stamp: %.sgml
+	# generate $$ROOT.imgeq.list
 	$(JADE) -t sgml $(JADEFLAGS) \
-		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< > $@
-	ROOT=`awk -F: '{print $$1}' $@`; \
-	$(MAKE) $$ROOT.imgeq.stamp
+		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< \
+		> tmp-make.stamp
+	ROOT=`awk -F: '{print $$1}' tmp-make.stamp`	; \
+	$(IMGEQ) $$ROOT.imgeq.list 			; \
+	$(MAKE)  $$ROOT.imgeq.gif.stamp
+	mv tmp-make.stamp $@	# ...only when successful
 
-%.imgeq-sgml %.imgeq.tex: %.img-eqlist
-	$(IMGEQ) $<
+#%.imgeq.sgml %.imgeq.tex: %.imgeq.list.stamp
+#	ROOT=`awk -F: '{print $$1}' $<`; \
+#	$(IMGEQ) $$ROOT.imgeq.list
 
+### Do not invoke the %.imgeq.gif.stamp target directly (in another makefile)
+### It's here to be invoked in a recursive make by the %.imgeq.list.stamp
+### rule.  Use the %.imgeq.list.stamp target instead.
 # processing chain is something like
 #   pnmcrop t001.ppm |pnmgamma 1.0|ppmdim 0.7| \
 #     ppmtogif -interlace -transparent rgb:b2/b2/b2 >t001.gif
 #
 # See notes in the script texttogif at
 # http://www.fourmilab.ch/webtools/textogif/textogif.html
-%.imgeq.stamp: %.imgeq.ps
+%.imgeq.gif.stamp: %.imgeq.ps
 	$(PSTOPNM) -resolution 144 $<
 	for f in `ls $(<:.imgeq.ps=)*.ppm | sed 's/\.[^.]*$$//'`; do \
 		echo $$f; \
