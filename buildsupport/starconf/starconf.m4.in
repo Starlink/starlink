@@ -708,7 +708,8 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                         STAR_DOCS_FILES($2)
                     else
                         AC_MSG_WARN([not installing docs $1])
-                    fi],
+                    fi
+                    ],
                    [dnl second arg empty -- use defaults
                     if $_star_build_docs; then
                         for d in $1
