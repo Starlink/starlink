@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.15}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {29th October 2004}
+\newcommand{\stardocdate}      {4th November 2004}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.12}
@@ -978,6 +978,41 @@ Other changes in this release
      \item Region statistics now also include values for the NDF variance
        component.
 
+\end{itemize}
+ 
+\subsection{Release - 2.8}
+
+A major release of GAIA incorporating a new NDF cube handling facility.  GAIA
+will now detect 3D input data (ideally in NDF format) and display slices along
+one of the extra dimensions. This may be animated.
+
+You can also create a new image that is a combination of images between a
+range of indices. The tool also shows the world coordinates along the extra
+dimensions. All displayed and created images can be processed like any other
+image, so you can perform photometry, region statistics etc.
+
+The following minor issues have also been fixed.
+\begin{itemize}
+
+    \item A print of the "whole image" now works when repeated.
+
+    \item The astrometry tables now offer a button to project X,Y to RA,DEC
+      to complement the reset projection of RA,DEC to X,Y.
+
+    \item Incompatibilities in the WCS are now ignored (older versions of 
+      AST cannot read newer encodings). This will naturally only effect
+      GAIA in future versions.
+
+    \item XY profiles now display a local value when a row or column contains
+      no valid values (previous this displayed zero, which occasionally 
+      made the graphs scale to silly values). 
+
+    \item Contouring toolbox bug fixed. If you entered an incorrect NDF name for
+      the second image, the error was never recovered and GAIA had to be
+      restarted. 
+
+    \item Fixed problem with coordinate readout coupling when more than one
+      interactive slice or XY profile is being used.
 \end{itemize}
 
 \section{\xlabel{acknowledgements}Acknowledgements}

@@ -19,7 +19,7 @@
     - The astrometry tables now offer a button to project X,Y to RA,DEC
       to complement the reset projection of RA,DEC to X,Y.
 
-    - Incompatabilities in the WCS are now ignored (older versions of 
+    - Incompatibilities in the WCS are now ignored (older versions of 
       AST cannot read newer encodings). This will naturally only effect
       GAIA in future versions.
 
