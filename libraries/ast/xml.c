@@ -23,6 +23,10 @@
 *     10-FEB-2004 (DSB):
 *        - Added debug conditional code to keep track of memory leaks.
 *        - Other minor bug fixes.
+*     6-FEB-2004 (DSB):
+*        DefaultURI and astXmlAddURI modified to allow a blank URI to be
+*        used to ignore a default namespace URI provided by an enclosing
+*        element.
 */
 
 
@@ -1176,6 +1180,9 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri ){
 *        namespace).
 *     uri
 *        Pointer to a null terminated string containing the namespace URI.
+*        If this is NULL or blank, and "prefix" is also NULL or blank, then 
+*        this has the same effect of there being no default namespace within
+*        the supplied element.
 *-
 */
 
@@ -1199,7 +1206,11 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri ){
 /* If no namespace prefix has been supplied, just change the default
    namespace URI. */
    if( !nc ) {
-      this->defns = astStore( this->defns, uri, strlen( uri ) + 1 );
+      if( uri ) {
+         this->defns = astStore( this->defns, uri, strlen( uri ) + 1 );
+      } else {
+         this->defns = astStore( this->defns, "", 1 );
+      }
 
 /* Otherwise, add the namespace definition to the element. */
    } else {
@@ -3364,6 +3375,13 @@ static const char *DefaultURI( AstXmlElement *elem ){
          result = DefaultURI( (AstXmlElement *) parent );   
       }
    }
+
+/* If the element has a blank default namespace URI, then return NULL
+   since the XML namespaces specification says that "The default
+   namespace can be set to the empty string. This has the same effect, 
+   within the scope of the declaration, of there being no default 
+   namespace". */
+   if( result && astChrLen( result ) == 0 ) result = NULL;
 
 /* Return the result. */
    return result;
