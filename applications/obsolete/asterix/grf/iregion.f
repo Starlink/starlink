@@ -391,7 +391,11 @@
       INTEGER STATUS
 *    Function declarations :
 *    Local constants :
+      REAL RTOD
+      PARAMETER (RTOD=180.0/3.14159265)
 *    Local variables :
+      CHARACTER*80 TEXT
+      INTEGER L
       REAL XC,YC,ANGLE,MAJOR,MINOR
 *-
 
