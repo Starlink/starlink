@@ -1,0 +1,210 @@
+\newpage
+\sstroutine{
+   NDF2ASCII
+}{
+   Writes an NDF to an ASCII file
+}{
+   \sstdescription{
+      This application converts an NDF to an ASCII file.  Only one of
+      the array components may be copied to the output file.  Preceding
+      the data there is an optional header consisting of either the
+      FITS extension with the values of certain keywords replaced by
+      information derived from the NDF, or a minimal FITS header also
+      derived from the NDF.  The output file uses LIST carriagecontrol.
+   }
+   \sstusage{
+      NDF2ASCII IN OUT [COMP] [RECLEN] NOPEREC=?
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be copied.  It may be {\tt "Data"},
+         {\tt "Quality"} or {\tt "Variance"}. {\tt ["Data"]}
+      }
+      \sstsubsection{
+         FITS = \_LOGICAL (Read)
+      }{
+         If true, any FITS extension is written to start of the output
+         file, unless there is no extension whereupon a minimal FITS
+         header is written to the ASCII file. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         FIXED = \_LOGICAL (Read)
+      }{
+         If true, the output file allocates a fixed number of
+         characters per data value.  The number of characters chosen is
+         the minimum that prevents any loss of precision, and hence is
+         dependent on the data type of the NDF array.  When FIXED is
+         {\tt FALSE}, data values are packed as efficiently as possible within
+         each record. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.
+      }
+      \sstsubsection{
+         NOPEREC = \_INTEGER (Read)
+      }{
+         The number of data values per record of the output file, when
+         FIXED is {\tt TRUE}.  It should be in the range 1 to 16383.
+         The suggested default is the current value, or 8 when there
+         is not one.
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         Name of the output formatted Fortran file.  The file will
+         normally have variable-length records when there is a header,
+         but always fixed-length records when there is no header.  It
+         has a default file extension of {\tt ".DAT"}.
+      }
+      \sstsubsection{
+         RECLEN = \_INTEGER (Write)
+      }{
+         The maximum record length in bytes of the output file.  This
+         must be between 32 and 32766.  The lower limit is further
+         increased to 80 when there is a FITS header to be copied.  It
+         is only used when FIXED is {\tt FALSE} and will default to the
+         current value, or 512 if there is no current value.  When
+         FIXED is {\tt TRUE} the application creates data records whose
+         length is the product of the number of bytes per value plus
+         one (for the space), times the number of values per record.
+         {\tt []}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         NDF2ASCII CLUSTER CLUSTER.DAT
+      }{
+         This copies the data array of the NDF called CLUSTER to an
+         ASCII file called CLUSTER.DAT.  The maximum recordlength of
+         CLUSTER.DAT is 512 bytes, and the data values are packed into
+         these records as efficiently as possible.
+      }
+      \sstexamplesubsection{
+         NDF2ASCII CLUSTER CLUSTER.DAT V
+      }{
+         This copies the variance of the NDF called CLUSTER to an
+         ASCII file called CLUSTER.DAT.  The maximum recordlength of
+         CLUSTER.DAT is 512 bytes, and the variance values are packed
+         into these records as efficiently as possible.
+      }
+      \sstexamplesubsection{
+         NDF2ASCII CLUSTER CLUSTER.DAT FIXED NOPEREC=12
+      }{
+         This copies the data array of the NDF called CLUSTER to an
+         ASCII file called CLUSTER.DAT.  There are twelve data values
+         per record in CLUSTER.DAT.
+      }
+      \sstexamplesubsection{
+         NDF2ASCII OUT=NDF234.DAT FITS RECLEN=128 IN=@234
+      }{
+         This copies the data array of the NDF called 234 to an
+         ASCII file called NDF234.DAT.  The maximum recordlength of
+         CLUSTER.DAT is 128 bytes, and the data values are packed into
+         these records as efficiently as possible.  If there is a FITS
+         extension, it is copied to NDF234.DAT with substitution of
+         certain keywords, otherwise a minimal FITS header is produced.
+      }
+   }
+   \sstnotes{
+      The details of the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+            the NDF array as selected by COMP is written to the ASCII
+            file in records following an optional header.  When FIXED is
+            {\tt FALSE} all records are padded out to the recordlength.
+
+         \sstitem
+            HISTORY is not propagated.
+
+         \sstitem
+            ORIGIN information is lost.
+
+         \sstitem
+            When a header is to be made, it is composed of FITS-like card
+            images as follows:
+      
+         \sstitemlist{
+
+            \sstitem
+               The number of dimensions of the data array is written
+               to the keyword NAXIS, and the actual dimensions to NAXIS1,
+               NAXIS2 {\it etc.} as appropriate.
+
+            \sstitem
+               If the NDF contains any linear axis structures the
+               information necessary to generate these structures is
+               written to the FITS-like headers. For example, if a linear
+               AXIS(1) structure exists in the input NDF the value of the
+               first data point is stored with the keyword CRVAL1,
+               and the incremental value between successive axis data is
+               stored in keyword CDELT1. If there is an axis label it is
+               written to keyword CRTYPE1, and axis unit is written to CTYPE1.
+               (Similarly for AXIS(2) structures {\it etc.}) FITS does not have
+               a standard method of storing axis widths and variances, so these
+               NDF components will not be propagated to the header.
+               Non-linear axis data arrays cannot be represented by CRVAL$n$
+               and CDELT$n$, and must be ignored.
+
+            \sstitem
+               If the input NDF contains TITLE, LABEL or UNITS components
+               these are stored with the keywords TITLE, LABEL or BUNITS
+               respectively.
+
+            \sstitem
+               If the input NDF contains a FITS extension, the FITS items
+               may be written to the FITS-like header, with the following
+               exceptions:
+               \begin{itemize}
+               \item BITPIX is derived from the type of the NDF data array,
+               and so it is not copied from the NDF FITS extension.
+               \item NAXIS, and NAXIS$n$ are derived from the dimensions of the
+               NDF data array as described above, so these items are not
+               copied from the NDF FITS extension.
+               \item The TITLE, LABEL, and BUNITS descriptors are only copied
+               if no TITLE, LABEL, and UNITS NDF components respectively
+               have already been copied into these headers.
+               \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$ descriptors
+               in the FITS extension are only copied if the input NDF
+               contained no linear axis structures.
+               \item The standard order of the FITS keywords is preserved,
+               thus BITPIX, NAXIS and AXIS$n$ appear immediately after the
+               first card image, which should be SIMPLE.
+               \item BSCALE and BZERO in a FITS extension are copied when
+               BITPIX is positive, {\it i.e.} the array is not floating-point.
+               \end{itemize}
+
+            \sstitem
+               An extra header record with keyword UNSIGNED and logical
+               value T is added when the array data type is one of the HDS
+               unsigned integer types.  This is done because standard FITS
+               does not support unsigned integers, and allows (in conjunction
+               with BITPIX) applications reading the unformatted file to
+               determine the data type of the array.
+
+            \sstitem
+               The last header record card will be the standard FITS END.
+         }
+
+         \sstitem
+            Other extensions are not propagated.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: ASCII2NDF; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The value of bad pixels is not written to a FITS-like header
+         record with keyword BLANK.
+      }
+   }
+}
