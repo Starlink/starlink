@@ -49,7 +49,7 @@
       INCLUDE 'SAE_PAR'          ! SSE global definitions
 
 *  Global Variables:
-      INCLUDE 'HLPCMD'           ! KAPPA help I/O
+      INCLUDE 'HLPCMD'           ! CONVERT help I/O
 *        CMD = CHARACTER * ( 80 ) (Write)
 *           The command line.
 *        LHELP = INTEGER (Write)
