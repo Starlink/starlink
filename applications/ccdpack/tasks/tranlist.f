@@ -964,7 +964,8 @@
 *  written to NDF extensions.
       IF ( .NOT. NDFS .AND. STATUS .EQ. SAI__OK ) THEN
          CALL CCD1_LNAM( 'NAMELIST', 1, NOPEN,
-     :   '# TRANLIST - output position lists', OUTGRP, .TRUE., STATUS )
+     :   '# TRANLIST - output position lists', OUTGRP, GRP__NOID,
+     :                   .TRUE., STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             CALL CCD1_MSG( ' ', '  No namelist written ', STATUS )

@@ -448,8 +448,8 @@
       IF ( STATUS .EQ. SAI__OK ) THEN 
          CALL ERR_MARK
          CALL CCD1_LNAM( 'NAMELIST', 1, NNDF, 
-     :                   '# IMPORT - NDF name list', GIDIN, .FALSE., 
-     :                   STATUS )
+     :                   '# IMPORT - NDF name list', GIDIN, GRP__NOID,
+     :                   .FALSE., STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF

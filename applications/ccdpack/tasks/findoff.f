@@ -1691,7 +1691,8 @@
 *  Write the names of the output files to a file which may be used for
 *  indirection into other applications.
          CALL CCD1_LNAM( 'NAMELIST', 1, NOPEN,
-     :   '# FINDOFF - output position lists', OUTGRP, .TRUE., STATUS )
+     :   '# FINDOFF - output position lists', OUTGRP, GRP__NOID,
+     :                   .TRUE., STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             CALL CCD1_MSG( ' ', '  No namelist written ', STATUS )

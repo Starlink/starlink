@@ -684,7 +684,8 @@
 *  indirection into other applications.
          IF ( STATUS .EQ. SAI__OK ) THEN 
             CALL CCD1_LNAM( 'NAMELIST', 1, NNDF,
-     :   '# FINDCENT - output position lists', FIOGRO, .TRUE., STATUS )
+     :   '# FINDCENT - output position lists', FIOGRO, GRP__NOID,
+     :                      .TRUE., STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN 
                CALL ERR_ANNUL( STATUS )
                CALL CCD1_MSG( ' ', '  No namelist written', STATUS )
