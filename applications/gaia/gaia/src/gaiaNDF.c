@@ -567,6 +567,7 @@ int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
 {
    int status = SAI__OK;
    emsMark();
+
    ndfUnmap( ndfid, component, &status );
    if ( status != SAI__OK ) {
       *error_mess = errMessage( &status );
@@ -648,6 +649,7 @@ static NDFinfo *getNDFInfo( const void *handle, const int index )
    NDFinfo *current = (NDFinfo *) handle;
    int count = 0;
    int status = 1;
+
    if ( current ) {
       for ( count = 1; count < index; count++ ) {
          current = current->next;
@@ -886,6 +888,10 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                  setState( state, ndfid, path, type, width, height, header,
                            hlen, &status );
              }
+             else {
+                 /* Same NDF as before, release it and continue */
+                 gaiaFreeNDF( ndfid );
+             }
          }
          if ( emess != NULL ) {
              free( emess );
@@ -994,6 +1000,7 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
 void gaiaGetIdMNDF( const void *handle, int index, int *ndfid )
 {
    NDFinfo *current = NULL;
+
    current = getNDFInfo( handle, index );
    if ( current ) {
       *ndfid = current->ndfid;
@@ -1013,6 +1020,7 @@ void gaiaGetInfoMNDF( const void *handle, int index, char **name,
                       int *hasvar, int *hasqual )
 {
    NDFinfo *current = NULL;
+
    current = getNDFInfo( handle, index );
    if ( current ) {
       *name = current->name;
@@ -1082,6 +1090,7 @@ int gaiaGetMNDF( const void *handle, int index, const char *component,
 void gaiaSetReadMNDF( const void *handle, int index, int readonly )
 {
    NDFinfo *current = getNDFInfo( handle, index );
+
    if ( current ) {
       current->readonly = readonly;
    }
@@ -1101,6 +1110,7 @@ void gaiaSetReadMNDF( const void *handle, int index, int readonly )
 int gaiaGetReadMNDF( const void *handle, int index )
 {
    NDFinfo *current = getNDFInfo( handle, index );
+
    if ( current ) {
       return current->readonly;
    }
@@ -1118,6 +1128,7 @@ int gaiaCountMNDFs( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
    int count = 0;
+
    if ( current ) {
       for ( ; current->next; current = current->next ) count++;
       count++;
@@ -1136,9 +1147,10 @@ void gaiaReleaseMNDF( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
    NDFinfo *next = NULL;
+
    do {
        /* Free NDF and header block */
-         gaiaFreeNDF( current->ndfid );
+       gaiaFreeNDF( current->ndfid );
        cnf_free( current->header );
 
        /* Free the NDFinfo structure that stored these */
@@ -1164,6 +1176,7 @@ void gaiaFreeMNDF( void *handle, int index )
 
    /*  Access the appropriate NDF information structure */
    NDFinfo *current = getNDFInfo( handle, index );
+
    if ( current ) {
       emsMark();
       ndfUnmap( current->ndfid, "*", &status );
