@@ -5,7 +5,11 @@
 *     BIG1_ABIAT
 
 *  Purpose:
-*     Harness for generic BIG1_ABIA<T> routines.
+*     To impose a reproducible pseudo-random bias frame to data.
+*     This is done in two parts: over the bias strips noise only is
+*     written, while between the bias strips noise is added to the
+*     existing value of the image.
+*     This routine is a harness for the BGG1_ABIA<T> routines.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,7 +21,7 @@
 *  Arguments:
 *     DTYPE = CHARACTER * ( * )
 *        Data type of the IMAGE array.
-*     IMAGE( DIM1, DIM2 ) = <COMM> (Given and Returned)
+*     IMAGE( 1 ) = unknown array (Given and Returned)
 *        The image to which noise is to be added.
 *     DIM1 = INTEGER (Given)
 *        First dimension of IMAGE.
