@@ -55,7 +55,8 @@
 */
 #include "cnf.h"
 #include "f77.h"
-#if defined(__GNUC__) && defined(__i386__)
+#include <config.h>
+#if defined(__GNUC__) && defined(__i386__) && HAVE_FPU_CONTROL_H
 
 #include <fpu_control.h>
 

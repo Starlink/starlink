@@ -15,9 +15,10 @@ IWIDGETS_VERSION=3.0.0
 # Check availability of [incr Tcl].  This is declared as a build dependency,
 # but we'll get along without it if it's not there because it couldn't
 # be built.
+LD_LIBRARY_PATH="${STARLINK}/lib:${LD_LIBRARY_PATH}"
 have_itcl=1
-AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl])
-AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl])
+AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[-ltcl])
+AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-ltk -ltcl])
 AC_MSG_CHECKING([whether to use incr tcl])
 if test -n "$have_itcl"
 then
@@ -26,6 +27,10 @@ then
 else
     AC_MSG_RESULT(no)
 fi
+
+dnl   Check for fpu_control.h, this isn't available for all  
+dnl   GCC implementations 
+AC_CHECK_HEADERS([fpu_control.h])
 
 AC_CONFIG_FILES(Makefile)
 AC_CONFIG_HEADERS(config.h)
