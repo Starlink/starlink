@@ -12,7 +12,7 @@ PGPLOT/t/pgplot.t
 PGPLOT/t/plot_pg.t
 PLplot/PLplot.pm
 PLplot/Makefile.PL
-PLplot/t/plplot.pl
+PLplot/t/plplot.t
 PLplot/t/plot_pl.t
 Tk/Tk.pm
 Tk/Makefile.PL
@@ -40,3 +40,5 @@ t/xmlchan.t
 t/zoommap.t
 typemap
 typemap.561
+
+META.yml                                 Module meta-data (added by MakeMaker)
