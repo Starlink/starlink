@@ -42,8 +42,10 @@ dnl AUTOHEADER="echo autoheader ignored"
 
 
 dnl   Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
+dnl   Check for system compilers first -- CC and cxx are the C++ compilers on 
+dnl   Solaris and DUX respectively
+AC_PROG_CXX(CC cxx c++ g++)
+AC_PROG_CC(cc gcc egcs)
 AC_PROG_LIBTOOL
 
 dnl  Use C to compile the AC_CHECK_FUNCS tests (using C++ can cause
@@ -86,7 +88,7 @@ AC_REPLACE_FUNCS(getopt_long getsubopt)
 dnl   Now switch to doing header checks with C++, for those headers
 dnl   which are specific to C++
 AC_LANG([C++])
-AC_CHECK_HEADERS(sstream strstream csignal)
+AC_CHECK_HEADERS(sstream strstream csignal cassert)
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
@@ -138,9 +140,10 @@ dnl   We only need to check <ostream> here, but <iostream> is on more
 dnl   machines (specifically, and irritatingly, <ostream> appears to
 dnl   be missing from egcs-2.91.66)
 AC_MSG_CHECKING(whether standard functions are in namespace std)
+stdprefix=
 AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
   AC_MSG_RESULT(no),
-  AC_TRY_COMPILE([#include <iostream>], [using namespace std;cout<<"Hello\n";],
+  AC_TRY_COMPILE([#include <iostream>], [std::cout<<"Hello\n";],
     AC_DEFINE(HAVE_STD_NAMESPACE,
 	      1,
 	      [Related to HAVE_CSTD_INCLUDE: define as 1 if you have
@@ -149,8 +152,13 @@ AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
 	      At present, we use this flag to decide if we need to
 	      dump everything into the global namespace; this is not
 	      as elegant as I'd like, but it'll do for now.])
+    stdprefix=std
     AC_MSG_RESULT(yes),
     AC_MSG_RESULT(ARGHH -- error compiling)))
+AC_DEFINE_UNQUOTED(STD,
+	 	   $stdprefix,
+		  [Define as `std' (no quotes) if standard functions are in 
+		   the std namespace; define as empty otherwise])
 
 
 dnl   Extra .lo objects, to be conditionally compiled
