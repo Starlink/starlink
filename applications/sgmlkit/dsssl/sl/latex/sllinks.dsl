@@ -71,9 +71,10 @@ it produces an <funcname/error/.
 <codebody>
 (element docxref
   (let* ((xrefent (attribute-string (normalize "doc") (current-node)))
-	 (docelem (and xrefent
-		       (document-element
-			(sgml-parse (entity-generated-system-id xrefent)))))
+	 (xrefent-sysid (and xrefent
+			     (entity-generated-system-id xrefent)))
+	 (docelem (and xrefent-sysid
+		       (document-element (sgml-parse xrefent-sysid))))
 	 (xrefid (attribute-string (normalize "loc") (current-node)))
 	 ;; xreftarget is the element the docxref refers to, or #f if
 	 ;; attribute LOC is implied or the document doesn't have such
@@ -85,28 +86,34 @@ it produces an <funcname/error/.
 		       (get-link-policy-target xreftarget no-urls: #t)))
 	 (linktext (attribute-string (normalize "text")
 				     (current-node))))
-    (if (string=? (gi docelem)
-		  (normalize "documentsummary")) ; sanity check...
-	(if xrefent
-	    (if linktext
-		(literal linktext)	;override generation of link text
-		(if xreftarget
-		    (if (car xrefurl)	; link to element by id
-			(error (car xrefurl)) ; violated policy - complain
-			(make command name: "textit"
-			      (with-mode mk-docxref
-				(process-node-list (document-element
-						    xreftarget)))
-			      (literal ": ")
-			      (with-mode section-reference
-				(process-node-list xreftarget))))
-		    (make command name: "textit" ; link to whole document
+    (if (and docelem
+	     (string=? (gi docelem)
+		       (normalize "documentsummary"))) ; sanity check...
+	(if linktext
+	    (literal linktext)	;override generation of link text
+	    (if xreftarget
+		(if (car xrefurl)	; link to element by id
+		    (error (car xrefurl)) ; violated policy - complain
+		    (make command name: "textit"
 			  (with-mode mk-docxref
-			    (process-node-list docelem)))))
-	    (error "No value for docxref's DOC attribute"))
-	(error (string-append "DOCXREF target " xrefent
-			      " has document type " (gi docelem)
-			      ": expected DOCUMENTSUMMARY")))))
+			    (process-node-list (document-element
+						xreftarget)))
+			  (literal ": ")
+			  (with-mode section-reference
+			    (process-node-list xreftarget))))
+		(make command name: "textit" ; link to whole document
+		      (with-mode mk-docxref
+			(process-node-list docelem)))))
+	(error (cond
+		(docelem (string-append "DOCXREF: target " xrefent
+					" has document type " (gi docelem)
+					": expected DOCUMENTSUMMARY"))
+		(xrefent-sysid (string-append
+				"DOCXREF: Couldn't parse " xrefent-sysid))
+		(xrefent (string-append
+			  "DOCXREF: Couldn't generate sysid for entity "
+			  xrefent))
+		(else "DOCXREF: missing DOC attribute"))))))
 
 ;; possibly due to a bug in Jade, we need to provide dummy definitions
 ;; of %starlink-document-server% and the function href-to
