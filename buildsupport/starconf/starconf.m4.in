@@ -39,6 +39,21 @@ m4_ifdef([_poss_STAR_RESTFP_FIX],
          [],
          [m4_define([_poss_STAR_RESTFP_FIX], [_STAR_RESTFP_FIX])])
 
+## Define m4 variables per_dir_{PREFIX,STARLINK} to be
+## STARCONF_DEFAULT_{PREFIX,STARLINK}.
+## If m4 variables OVERRIDE_{PREFIX,STARLINK} are defined (and
+## essentially the only way this can happen is if the appropriate
+## define statements are included in acinclude.m4), then use these
+## instead.  This means that it's possible to change the default
+## installation prefix on a per-directory basis, by creating a small
+## acinclude.m4 file just before running ./bootstrap or autoreconf.
+m4_define([per_dir_PREFIX],   [m4_ifdef([OVERRIDE_PREFIX],
+                                        [OVERRIDE_PREFIX],
+                                        [@STARCONF_DEFAULT_PREFIX@])])
+m4_define([per_dir_STARLINK], [m4_ifdef([OVERRIDE_STARLINK],
+                                        [OVERRIDE_STARLINK],
+                                        [@STARCONF_DEFAULT_STARLINK@])])
+
 test -n "$_star_per_package_dirs" || _star_per_package_dirs=false
 test -n "$_star_docs_only"        || _star_docs_only=false
 
@@ -73,9 +88,9 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # tools in one component before that component has been build and
 # installed. 
 
-AC_PREFIX_DEFAULT(@STARCONF_DEFAULT_PREFIX@)dnl
+AC_PREFIX_DEFAULT(per_dir_PREFIX)dnl
 
-test -n "$STARLINK" || STARLINK=@STARCONF_DEFAULT_STARLINK@
+test -n "$STARLINK" || STARLINK=per_dir_STARLINK
 
 # Handle the --with-starlink option.  If --with-starlink is present
 # with no argument (the default), we do nothing as this simply
@@ -87,7 +102,7 @@ test -n "$STARLINK" || STARLINK=@STARCONF_DEFAULT_STARLINK@
 # this case, the variable STARLINK is unset.
 AC_ARG_WITH(starlink,
             AS_HELP_STRING([--with-starlink],
-                           [Starlink tree to use (default ${STARLINK:=@STARCONF_DEFAULT_STARLINK@})]),
+                           [Starlink tree to use (default ${STARLINK:=per_dir_STARLINK})]),
             [if test -z "$withval" -o "$withval" = yes; then
                  : nothing needs to be done
              elif test "X$withval" = Xno; then
@@ -146,11 +161,11 @@ AC_SUBST(STARLINK)
 # to generate these.  However, we maintain FFLAGS also, so that we
 # allow both.  Avoid doing anything if $STARLINK was unset above.
 if test -n "$STARLINK"; then
-    if test "$STARLINK" != "@STARCONF_DEFAULT_PREFIX@"; then
-        FCFLAGS="$FCFLAGS -I@STARCONF_DEFAULT_PREFIX@/include"
-        FFLAGS="$FFLAGS -I@STARCONF_DEFAULT_PREFIX@/include"
-        CFLAGS="$CFLAGS -I@STARCONF_DEFAULT_PREFIX@/include"
-        LDFLAGS="$LDFLAGS -L@STARCONF_DEFAULT_PREFIX@/lib"
+    if test "$STARLINK" != "per_dir_PREFIX"; then
+        FCFLAGS="$FCFLAGS -I[]per_dir_PREFIX/include"
+        FFLAGS="$FFLAGS -I[]per_dir_PREFIX/include"
+        CFLAGS="$CFLAGS -I[]per_dir_PREFIX/include"
+        LDFLAGS="$LDFLAGS -L[]per_dir_PREFIX/lib"
     fi
     FCFLAGS="$FCFLAGS -I$STARLINK/include"
     FFLAGS="$FFLAGS -I$STARLINK/include"
