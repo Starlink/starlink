@@ -85,7 +85,8 @@
 *     11-SEP-1997 (TMG):
 *        Original version.
 *     16-JAN-1998 (DSB):
-*        Added missing IERR argument to VEC_RTOR calls.
+*        Added missing IERR argument to VEC_RTOR calls. Added call to
+*        CCD1_ORVAR to initialise the co-variance matrix.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -256,6 +257,10 @@
       CALL PSX_CALLOC( NI, '_DOUBLE', IPWRK3, STATUS )
       CALL PSX_CALLOC( NI, '_INTEGER', IPWRK4, STATUS )
       CALL PSX_CALLOC( NI, '_LOGICAL', IPWRK5, STATUS )
+
+* Initialise the variances and covariances of the order statistics
+* from n to 1, assuming an initially normal distribution.
+      CALL CCD1_ORVAR( NI, NMAT, %VAL( IPWRK3 ), %VAL( IPCOV ), STATUS )
 
 * The method for forming the median stokes parameter images depends on
 * whether we require variance information. If variances are required
