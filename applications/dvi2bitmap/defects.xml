@@ -23,7 +23,10 @@ than others.</p>
      those numbers correct.
      -->
 
-<defect status="open" 
+<defectgroup>
+<title>General</title>
+
+<defect status="closed" 
 	originator="Eitan Gurari"
 	originatoremail="gurari@cis.ohio-state.edu"
 	date='13-May-2000'>
@@ -54,6 +57,9 @@ It's quite possible I'm doing something illegitimate with the
 exceptions, but I'm also wondering if it's not gcc 2.8.1 which is at
 fault, especially as the code has survived the much fussier
 examination of the Sun and Compaq compilers.</p>
+
+<p>Thus, this is closed, unless I find that there is some problem that 
+definitely isn't down to the compiler.</p>
 
 </resolution>
 </defect>
@@ -118,5 +124,7 @@ magnified cmr10.  In other words, this appears to be yet another font
 magnification problem!  Grrr -- why is this so hard?</p>
 
 </defect>
+
+</defectgroup>
 
 </defectslist>
