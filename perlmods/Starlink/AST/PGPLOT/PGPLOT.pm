@@ -149,7 +149,7 @@ sub _GText {
       if ( defined $just && length($just) == 2 ) {
          
         # if we have a bogus justification string default it 
-        unless( $just1 =~ /[TBC]/ ) {
+        unless( $just1 =~ /^[TBC]/ ) {
            warn "_GText: bad vertical justification defaulting to 'C'\n";
            $just1 = "C";
         }
