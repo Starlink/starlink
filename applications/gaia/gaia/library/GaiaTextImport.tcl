@@ -216,7 +216,7 @@ itcl::class gaia::GaiaTextImport {
       set values_($this,separated) 1
       set values_($this,delimeter) ","
       set values_($this,comment) "\#"
-      set values_($this,fixwidths) {10,10,10,10,10}
+      set values_($this,fixwidths) {10 20 30 40 50}
       set values_($this,skip) 0
    }
 
@@ -250,7 +250,7 @@ itcl::class gaia::GaiaTextImport {
 
    #  Add input file structure controls.
    protected method add_struct_controls_ {parent} {
-      set lwidth 10
+      set lwidth 12
 
       #  Delimetered or fixed format.
       itk_component add separated {
@@ -312,18 +312,19 @@ itcl::class gaia::GaiaTextImport {
       itk_component add fixwidths {
          LabelEntry $parent.fixwidths \
             -labelwidth $lwidth \
-            -text "Field widths:" \
+            -text "Field positions:" \
             -textvariable [scope values_($this,fixwidths)] \
-            -value $values_($this,fixwidths)
+            -value $values_($this,fixwidths) \
+            -command [code $this update_fixed_ to]
       }
       pack $itk_component(fixwidths) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(fixwidths) \
-         {Widths of fields: width1,width2,...}
+         {Widths of fields: position1 position2 ... }
 
       #  Interactive tab positioning widget.
       itk_component add tabstop {
          GaiaTabStops $parent.tabstop \
-            -change_cmd [code $this update_fixed_] \
+            -change_cmd [code $this update_fixed_ from] \
             -text "No information, press update"
       }
       pack $itk_component(tabstop) -side top -fill x -ipadx 1m -ipady 1m
@@ -347,9 +348,14 @@ itcl::class gaia::GaiaTextImport {
       }
    }
 
-   #  Set the fixed widths.
-   protected method update_fixed_ {value} {
-      set values_($this,fixwidths) $value
+   #  Set/reset the fixed widths.
+   protected method update_fixed_ {action value} {
+      if { $action == "from" } {
+         set values_($this,fixwidths) $value
+      } else {
+         $itk_component(tabstop) setindices \
+            [$itk_component(fixwidths) get]
+      }
    }
 
    #  Set the delimeter symbol.
@@ -401,7 +407,6 @@ itcl::class gaia::GaiaTextImport {
          $itk_component(head3)  0,3 \
          $itk_component(head4)  0,4 \
          $itk_component(head5)  0,5
-
 
       #  Add the entry fields and radiobuttons.
       for {set i 0;set j 1} {$i < $ncolumns_} {incr i; incr j} {
@@ -503,11 +508,15 @@ itcl::class gaia::GaiaTextImport {
          if { $count > $values_($this,skip) } {
             if { $llen > 0 } {
                if { ! [string match "$values_($this,comment)*" $line] } {
-                  set ncol [parseline_ $line]
+                  if { $values_($this,separated) } {
+                     parseline_ $line
+                  } else {
+                     splitline_ $line
+                  }
                   $itk_component(table) append_row $wordlist_
                   if { $first } {
                      $itk_component(tabstop) configure -text $line
-                     set $first 0
+                     set first 0
                   }
                }
             } elseif { $llen < 0 } {
@@ -554,7 +563,7 @@ itcl::class gaia::GaiaTextImport {
       } else {
 
          #  Fixed width entries.
-         set fixwidths [split $values_($this,fixwidths) ","]
+         set fixwidths [split $values_($this,fixwidths) " "]
          set ncolumns_ [llength $fixwidths]
       }
       add_headings_
@@ -581,6 +590,20 @@ itcl::class gaia::GaiaTextImport {
          set ncol 0
       }
       return $ncol
+   }
+
+   #  Split a line into words using the fixed width position
+   #  boundaries.
+   protected method splitline_ {line} {
+      set wordlist_ {}
+      if { $line != {} } {
+         set last 0
+         foreach pos $values_($this,fixwidths) {
+            incr pos -1
+            lappend wordlist_ [string range $line $last $pos]
+            set last [expr $pos+1]
+         }
+      }
    }
 
    #  Save the converted contents to a TAB catalogue.
@@ -623,8 +646,13 @@ itcl::class gaia::GaiaTextImport {
                set llen [gets $inid line]
                if { $count > $values_($this,skip) } {
                   if { $llen > 0 } {
-                     if { ! [string match "$values_($this,comment)*" $line] } {
-                        set ncol [parseline_ $line]
+                     if { ! [string match \
+                                "$values_($this,comment)*" $line]  } {
+                        if { $values_($this,separated) } {
+                           parseline_ $line
+                        } else {
+                           splitline_ $line
+                        }
                         puts $outid [join $wordlist_ "\t"]
                      }
                   } elseif { $llen < 0 } {
@@ -714,7 +742,11 @@ itcl::class gaia::GaiaTextImport {
                if { $count > $values_($this,skip) } {
                   if { $llen > 0 } {
                      if { ! [string match "$values_($this,comment)*" $line] } {
-                        set ncol [parseline_ $line]
+                        if { $values_($this,separated) } {
+                           parseline_ $line
+                        } else {
+                           splitline_ $line
+                        }
                         if { $id != -1 } {
                            set vid [lindex $wordlist_ $id]
                         } else {

@@ -69,7 +69,7 @@ itcl::class gaia::GaiaTabStops {
       eval itk_initialize $args
 
       #  Create the display elements. These are a scrolled canvas
-      #  region with a label and a series of triangles pointing 
+      #  region with a label and a series of triangles pointing
       #  to the tab positions.
       itk_component add canvas {
          scrolledcanvas $w_.canvas \
@@ -103,11 +103,16 @@ itcl::class gaia::GaiaTabStops {
                  [expr $xo+$triwidth_] $triheight_ \
                  -tag $w_.tab_source -fill blue]
       $canvas_ bind $id <ButtonPress-1> [code $this add_stop_]
+      $canvas_ bind $id <B1-Motion> [code $this move_last_stop_ %x]
+      $canvas_ bind $id <ButtonRelease-1> [code $this update_stops_]
 
-      #  Add label to the canvas.
+      #  Add text label to the canvas.
       set labelid_ [$canvas_ create window [expr int($step_*1.5)] 0 \
                        -anchor nw -width $entwidth_ \
                        -height $entheight_ -window $label_]
+
+      #  Dragging tab-stop off visible canvas region autoscrolls.
+      bind $canvas_ <B1-Leave> [code $this view_region_ %x]
    }
 
    #  Destructor:
@@ -128,13 +133,18 @@ itcl::class gaia::GaiaTabStops {
             [expr $cx+$triwidth_] $triheight_
       }
    }
+   
+   #  Move the tab-stop that has just been created.
+   protected method move_last_stop_ {x} {
+      move_stop_ $last_id_ $x
+   }
 
    #  Remove a tab-stop.
    protected method remove_stop_ {id} {
       $canvas_ delete $id
    }
 
-   #  Add a tab-stop. 
+   #  Add a tab-stop, returns the canvas identifier.
    protected method add_stop_ {} {
       set xo 10
       set id [$canvas_ create polygon \
@@ -145,6 +155,24 @@ itcl::class gaia::GaiaTabStops {
       $canvas_ bind $id <B1-Motion> [code $this move_stop_ $id %x]
       $canvas_ bind $id <2> [code $this remove_stop_ $id]
       $canvas_ bind $id <ButtonRelease-1> [code $this update_stops_]
+      set last_id_ $id
+      return $id
+   }
+
+   #  Set the position of a tab-stop by character index.
+   protected method set_stop_ {id index} {
+
+      #  Get x position for tab-stop.
+      set cx [expr ($index+1)*$step_]
+      if { $cx < $step_ || $cx > $entwidth_+$step_ } {
+         
+         #  Off range so put at initial position.
+         set cx 10
+      }
+      $canvas_ coords $id \
+         $cx $trioffset_ \
+         [expr $cx-$triwidth_] $triheight_ \
+         [expr $cx+$triwidth_] $triheight_
    }
 
    #  Update the size of the label widget (in response to new text).
@@ -158,27 +186,40 @@ itcl::class gaia::GaiaTabStops {
       }
    }
 
-   #  Update the stop positions in characters (rather than canvas) and 
+   #  Update the stop positions in characters (rather than canvas) and
    #  initiate the changed command if needed.
    protected method update_stops_ {} {
       catch {unset indexes_}
       foreach id [$canvas_ find withtag $w_.tabs] {
          lassign [$canvas_ coords $id] x
-         append indexes_ "[expr int($x/$step_)-1] "
+         lappend indexes_ [expr int($x/$step_)-1]
       }
+      set indexes_ [lsort -integer $indexes_]
       if { $itk_option(-change_cmd) != {} } {
          eval $itk_option(-change_cmd) {$indexes_}
       }
    }
 
    #  Return the character positions of the stops.
-   public method get {} {
+   public method getindices {} {
       return $indexes_
+   }
+
+   #  Set the positions of all tab stops. The given positions are
+   #  a character based index string or list.
+   public method setindices {values} {
+      foreach id [$canvas_ find withtag $w_.tabs] {
+         $canvas_ delete $id
+      }
+      foreach index $values {
+         set id [add_stop_]
+         set_stop_ $id $index
+      }
    }
 
    #  Set the "state" of the widget. Normal or disabled.
    protected method update_state_ {} {
-      if { $itk_option(-state) == "normal" } { 
+      if { $itk_option(-state) == "normal" } {
          catch {blt::busy release $w_}
          catch {configure -foreground $itk_option(-enabledforeground)}
       } else {
@@ -234,12 +275,15 @@ itcl::class gaia::GaiaTabStops {
    #  Width and height (in pixels) of label widget.
    protected variable entwidth_ 100
    protected variable entheight_ 20
-   
+
    #  Size of a character in pixels.
    protected variable step_ 1
 
    #  Character indices of the stops.
    protected variable indexes_ {}
+
+   #  Canvas id of last tab-stop.
+   protected variable last_id_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
