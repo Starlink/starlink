@@ -827,9 +827,14 @@
      :                                                DATAROW(I)
                 GOOD_LINE = ( STATUS .EQ. SAI__OK )
                 IF ( STATUS .NE. SAI__OK ) THEN
+                  IF ( NELM .EQ. 1 ) THEN
+                    CALL MSG_SETC( 'TXT', 'unrecognised header'/
+     :                             /' keyword' )
+                  ELSE
+                    CALL MSG_SETC( 'TXT', 'data = ' )
+                  END IF
                   CALL MSG_SETC( 'DAT', DATAROW(I) )
-                  CALL IMPORT_ERROR( 'Read error, data = "^DAT"',
-     :                               CLINE )
+                  CALL IMPORT_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
                 END IF
 
               END IF
@@ -850,6 +855,9 @@
      :                                              DATAROW(I)
               GOOD_LINE = ( STATUS .EQ. SAI__OK )
               IF ( STATUS .NE. SAI__OK ) THEN
+                CALL MSG_SETC( 'DAT', DATAROW(I) )
+                CALL IMPORT_ERROR( 'Read error data = "^DAT"',
+     :                              CLINE )
                 CALL IMPORT_ERROR( 'Real conversion error', CLINE )
               END IF
 
