@@ -18,7 +18,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -27,8 +26,8 @@
 *
 *    Import :
 *
-      INTEGER                  IFILE                   ! File number
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! SSDS dataset
+      INTEGER                   IFILE                   ! File number
+      INTEGER			SID			! SSDS dataset
 *
 *    Status :
 *
@@ -52,7 +51,7 @@
 
       END
 *+  PSS_OUT_OPEN - Open output SSDS
-      SUBROUTINE PSS_OUT_OPEN( NFILE, IFILE, SLOC, STATUS )
+      SUBROUTINE PSS_OUT_OPEN( NFILE, IFILE, SID, STATUS )
 *
 *    Description :
 *
@@ -72,7 +71,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -183,7 +181,6 @@ c      END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PSS_PAR'
 *
@@ -311,7 +308,7 @@ c      END IF
 	HTEXT(1) = 'Input dataset {INP}'
 	HLINES = 5
 	CALL USI_TEXT( 1, HTEXT, HLINES, STATUS )
-	CALL HSI_PTXT( SLID, HLINES, HTEXT, STATUS )
+	CALL HSI_PTXT( SID, HLINES, HTEXT, STATUS )
 
 *      Release the dataset
 	CALL BDI_RELEASE( SID, STATUS )
@@ -351,7 +348,6 @@ c      END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
