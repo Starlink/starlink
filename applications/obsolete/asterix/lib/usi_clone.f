@@ -105,11 +105,8 @@
 
 *  Local Variables:
       CHARACTER*200		FNAME			! Input object
-      CHARACTER*(DAT__SZLOC)	LOC			! HDS file handle
 
       INTEGER			EP, PPOS		! Character pointers
-
-      LOGICAL			PRIM			! Object is primitive?
 *.
 
 *  Check inherited global status.
@@ -127,7 +124,7 @@
       CALL USI0_FNDADI( INP, IFID, STATUS )
 
 *  Get output file name
-      CALL USI_GET0C( PAR(:EP), FNAME, STATUS )
+      CALL USI_GET0C( OUT(:EP), FNAME, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      If caller specified a representation on the parameter, glue it
