@@ -37,7 +37,7 @@
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       else
-         echo -lkgs -lkpg_adam -lkpg -lira_adam -lira -lirq_adam -lirq -llpg \
+         echo -lkgs_adam -lkgs -lkpg_adam -lkpg -lira_adam -lira -lirq_adam -lirq -llpg \
            -lctg -lfts_adam -lfts -laif_adam -laif -lkapgrf \
            `cat_link_adam` `snx_link_adam` \
            `sgs_link_adam` `ndg_link_adam` \
