@@ -67,6 +67,9 @@
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.2  1998/06/17 07:42:56  timj
+*     Correct MAX_BOLS typo
+*
 *     Revision 1.1  1998/04/07 16:44:19  timj
 *     Initial revision
 *
@@ -111,7 +114,7 @@
 
 *  Local Constants:
       REAL    MAX_BOLS               ! Maximum number of bolometers
-      PARAMETER (MIN_VAR = 144)      ! A kludge since I cant use SURF_PAR
+      PARAMETER (MAX_BOLS = 144)      ! A kludge since I cant use SURF_PAR
 
 *  Local Variables:
       INTEGER BOL                    ! Loop counter
