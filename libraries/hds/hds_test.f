@@ -51,6 +51,7 @@
       INTEGER EL                 ! Number of mapped elements
       INTEGER ISUM               ! Sum of array elements
       INTEGER PNTR               ! Pointer to mapped array
+      INTEGER EXITSTATUS         ! Exit status to be reported at end
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -95,13 +96,18 @@
 *  Check if the test ran OK. If so, then report success.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( ISUM .EQ. 20100 ) ) THEN
          WRITE( *, * ) '   HDS installation test succeeded.'
+         EXITSTATUS = 0
 
 *  Otherwise, report an error.
       ELSE
          IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
          CALL EMS_REP( 'HDS_TEST_ERR',
      :   'HDS_TEST: HDS installation test failed.', STATUS )
+         EXITSTATUS = 1
       END IF
+      
+*   Use non-standard but common exit() intrinsic
+      CALL EXIT(EXITSTATUS)
 
       END
 
