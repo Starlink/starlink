@@ -2,7 +2,7 @@
 AutoAstrometry of Mosaics
 -------------------------
 
-%%VERSION%%    0.5-1
+%%VERSION%%    0.5-3
 
 
 This is a developers' release of the autoastrometry package.
@@ -23,6 +23,8 @@ Since 0.5:
     of ASTROM, nor the decompose_transform routine in autoastrom.pm,
     both of which are Copyright 1995 Patrick Wallace.  See
     README.Licence.
+  * Uses bundled ASTROM 3.7, which emits FITS WCS headers which 
+    extend the draft `Paper II' proposals.  See ASTROM docs for discussion.
 
 Notes
 -----
