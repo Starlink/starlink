@@ -22,7 +22,7 @@ use IPC::Open2;
 use Carp;
 
 my $DefaultCatalogue = 'usno@eso';
-my $MoggyCommand = '$AUTOASTROM_DIR/moggy/moggy';
+my $MoggyCommand = '$AUTOASTROM_DIR/moggy';
 #my $MoggyCommand = '$AUTOASTROM_DIR/test/dummy-slave.pl';
 my $MoggyRCSId = '$Id$ ';
 # %%VERSION%%
