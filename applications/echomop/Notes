@@ -1,5 +1,132 @@
 !-*-Mode: Text; -*-
 
+Norman took over maintenance of ECHOMOP in late 1998.
+
+Only in late-ish 2000 did I get around to much of a reorganisation of
+the source, and importing it properly into CVS.  The source is all in
+a single big directory, along with the SUN documentation, and the HTML
+version of the help.  As well, there was a separate collection of web
+pages from Martin Clayton.  This is a mess, but doing much
+reorganisation would require major reworking of the makefile, which I
+can't face just now.
+
+The HTML help appears to be generated from the echomop.hlp file, but
+I don't think I have the processing tool here.
+
+I don't have the sources for SC/3 and SG/9, which were also written by
+Martin Clayton.
+
+I think I've tidied it all up, but because of the change in structure,
+I need more work to get it to build and package up.  I've got a bundle
+of ECHOMOP bug reports now, so I need to do _something_ with it.
+
+Structure
+---------
+
+Echomop is wierd.  I'm having great difficulty understanding how the
+menu works.
+
+When you start up, echmono.f gets the `action' and passes it to
+echomop.f.  This goes through a dirty great big IF, and sets
+AUTO_OPTIONS to some sequence of menu selections, such as '6,EXIT' for
+ech_sky and '14,EXIT' for ech_result.  This turns auto_options into a
+numeric OPTION, by a very convoluted route, and then (from line 685)
+starts testing the value of the string option_module(option).  After
+that (around 814), it calls CALL ECH_ECHOMOP_OPTION
+(OPTION_MODULE(OPTION), ORDER_NUMBER, STATUS).  Thus option_module()
+maps numbers to strings, and is initialised in ech_initialise.f (hard
+to find!).  ech_echomop_option then has _another_ big IF, and calls
+routines from there.
+
+The keywords recognised here are:
+
+ECH_2D_EXT_OPT
+ECH_CHECK_FRAME
+ECH_COUNT_ORDERS
+ECH_DECOSMIC_1
+ECH_DECOSMIC_1
+ECH_DECOSMIC_2
+ECH_DETERMINE_SLOPE
+ECH_DISABLE_ORDER
+ECH_EXT_OPT
+ECH_EXTR_QUICK
+ECH_EXTR_QUICK
+ECH_FIT_2D_DISTORTION
+ECH_FIT_ORDER_TRACE
+ECH_FIT_REF_FWHMS
+ECH_FLATTEN_ORDERS
+ECH_FLATTEN_YBLAZE
+ECH_FLATTEN_YBLAZE
+ECH_GEN_REBIN_SCALE
+ECH_GEN_REBIN_SCALE
+ECH_GET_OBJ_PROFILE
+ECH_GET_REF_FWHM
+ECH_GET_SLIT_EXTENT
+ECH_GET_STAR_PROFILE
+ECH_IMAGE_COSMIC
+ECH_IMAGE_TRACE
+ECH_LOCATE_ORDERS
+ECH_LOCATE_REF_LINES
+ECH_MODEL_BACK
+ECH_MODEL_FLAT
+ECH_MODEL_PROFILE
+ECH_MODEL_SKY
+ECH_MODEL_SSKY
+ECH_MULTI_MERGE
+ECH_MULTI_MERGE
+ECH_NORMAL_YBLAZE
+ECH_NORMAL_YBLAZE
+ECH_PLOTTER
+ECH_PLOT_TRACES
+ECH_POLY_PROFILE
+ECH_REBIN_ARCORDER
+ECH_REBIN_ORDER
+ECH_SCRUNCH_ARC
+ECH_SCRUNCH_OBJ
+ECH_SCRUNCH_STAR
+ECH_SET_PARAMETER
+ECH_SET_PARAMETER
+ECH_SET_PARAMETER
+ECH_SET_PARAMETER
+ECH_TRACE_CONSISTENCY
+ECH_WAVE_CONSISTENCY
+ECH_WAVELENGTH_CALIB
+ECH_WAVELENGTH_CALIB
+ECH_WRITE_RESULTS
+
+these typically, but now always, call a routine with the same name.
+
+
+
+
+
+22-Sep-2000
+-----------
+
+ECHOMOP builds OK, as long as I reuse the sun152.htx_tar tarball I
+inherited.  Because of some fancy postprocessing, I'm unable to run
+star2html on the documentation source.  At some point, I might convert
+this to SGML rather than fight with star2html.
+
+26-Sep-2000
+-----------
+
+I put everything into CVS, more or less properly, but with a certain
+amount of faffing around as I swithered about rearranging the source
+(with the result that there's an .../echelle/ directory in the
+repository which was an abortive attempt at this).  I made and
+committed some changes to the makefile, but it wasn't until
+26-Sep-2000 (18:08) that I got around to tagging the initial state: I
+used `cvs rtag start echomop', and it warned me that aaa_indexing.f,
+ech_plotter.f and makefile already had that tag on them and it wasn't
+moving it.  That probably meant that exporting the stuff tagged with
+`start' won't produce _exactly_ the initial state, but it'll be close
+enough.
+
+I've been fiddling with the echomop web pages fairly ad lib., fixing
+up broken references and the like.  It's probably now in a reasonably
+stable state, and I can start working on it.
+
 
 Things it would be nice to do
 -----------------------------
@@ -24,21 +151,6 @@ In the demo, the ech_idwave demonstration produces an error:
 Problem: Alison Ford <af@astro.keele.ac.uk>, 16 December.
 False claim of no more disk space
 ---------------------------------------------------------------------------
-
-Echomop is wierd.  I'm having great difficulty understanding how the
-menu works.
-
-When you start up, echmono.f gets the `action' and passes it to
-echomop.f.  This goes through a dirty great big IF, and sets
-AUTO_OPTIONS to some sequence of menu selections, such as '6,EXIT' for
-ech_sky and '14,EXIT' for ech_result.  This turns auto_options into a
-numeric OPTION, by a very convoluted route, and then (about line 685)
-starts testing the value of the string option_module(option).  After
-that (around 814), it calls CALL ECH_ECHOMOP_OPTION
-(OPTION_MODULE(OPTION), ORDER_NUMBER, STATUS).  Thus option_module()
-maps numbers to strings, and is initialised in ech_initialise.f.
-ech_echomop_option then has _another_ big IF, and calls routines from
-there.
 
 I looked through ech_write_results.f, which was one of the two
 routines implicated, but couldn't find anything obviously amiss.  Not
