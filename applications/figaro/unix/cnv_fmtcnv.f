@@ -1,0 +1,34 @@
+      INTEGER FUNCTION CNV_FMTCNV (SRCFMT,DSTFMT,SRCBUF,DSTBUF,NVAL
+     :     ,NBAD)
+      CHARACTER*(*) SRCFMT,DSTFMT
+      CHARACTER*1 IN,OUT
+      IN = SRCFMT(1:1)
+      OUT = DSTFMT(1:1)
+      CALL CHR_UCASE(IN)
+      CALL CHR_UCASE(OUT)
+      IF(IN.EQ.'R') IN = 'F'
+      IF(OUT.EQ.'R') OUT = 'F'
+      IF((IN.EQ.'F').AND.(OUT.EQ.'D')) THEN
+         CALL TNW_CNV_F2D(SRCBUF,DSTBUF,NVAL)
+      ELSE IF((IN.EQ.'D').AND.(OUT.EQ.'F')) THEN
+         CALL TNW_CNV_D2F(SRCBUF,DSTBUF,NVAL)
+      ELSE
+         CALL PAR_WRUSER(
+     :        'Error, cnv_fmtcnv doesn''t implement '//IN//OUT,II)
+      ENDIF
+      CNV_FMTCNV = 0
+      END
+      SUBROUTINE TNW_CNV_D2F(SRCBUF,DSTBUF,NVAL)
+      DOUBLE PRECISION SRCBUF(NVAL)
+      REAL DSTBUF(NVAL)
+      DO I = 1, NVAL
+         DSTBUF(I) = REAL(SRCBUF(I))
+      ENDDO
+      END
+      SUBROUTINE TNW_CNV_F2D(SRCBUF,DSTBUF,NVAL)
+      REAL SRCBUF(NVAL)
+      DOUBLE PRECISION DSTBUF(NVAL)
+      DO I = 1, NVAL
+         DSTBUF(I) = DBLE(SRCBUF(I))
+      ENDDO
+      END
