@@ -116,7 +116,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 * If no Mapping was supplied, use the linear transformation coefficients.
-      IF( MAP == AST__NULL ) THEN
+      IF( MAP .EQ. AST__NULL ) THEN
 
          DO I = 1, NX
             CENX( I ) = TR( 1 ) + TR( 2 )*REAL( I ) 
