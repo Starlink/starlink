@@ -27,7 +27,6 @@
       CHARACTER*80           TEXT(8)    ! history text
       CHARACTER*80           ITEXT(4)   ! name of input file
       CHARACTER*80           OTEXT(4)   ! name of output file
-      CHARACTER*80           AXLABEL    ! AXIS labels
       CHARACTER*80           STRING     ! Axis labels/units
       LOGICAL OK			! data valid
       LOGICAL VOK			! Data VARIANCE present
@@ -36,8 +35,6 @@
       INTEGER NVQDIM			! # dimensions
       INTEGER DIMS(ADI__MXDIM)   	! data_array dimensions
       INTEGER VQDIMS(ADI__MXDIM)   	! data_array dimensions
-      INTEGER NDIMQ			! # dimensions QUALITY
-      INTEGER NDIMV			! # dimensions data VARIANCE
       INTEGER NP			! length of projected axis
       INTEGER EQDIM(ADI__MXDIM)		! equivalent output bins in input
       INTEGER ONDIM			! # dimensions for output
