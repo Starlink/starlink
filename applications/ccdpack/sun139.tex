@@ -2190,6 +2190,17 @@ starting with the characters `CCD\_'.
 Thus it is not a good idea to pick a domain which begins `CCD\_'
 if you are assigning one yourself, unless you intend it to look
 like an automatically generated one.
+The special domains which are currently used by CCDPACK are as follows:
+\begin{description}
+\item[CCD_REG]
+The object-matching alignment coordinates 
+found by the \xroutine{REGISTER} program.
+\item[CCD_WCSREG]
+The global alignment coordinates found by the \xroutine{WCSREG} program.
+\item[CCD_SET]
+The alignment coordinates inserted by the \xroutine{MAKESET} program
+denoting a Set; this has special significance to most of the registration
+programs.
 \item
 Although there is nothing to prevent multiple coordinate systems 
 in the same image having the same domain, this is likely to lead
