@@ -26,7 +26,7 @@ within sl.dsl.
 	 (content (get-best-figurecontent
 		   (node-list (select-elements kids (normalize "figurecontent"))
 			      (select-elements kids (normalize "px")))
-		   '("GIF89A" "JPEG"))))
+		   '("gif89a" "jpeg"))))
     (make element gi: "table"
 	  attributes: '(("align" "center") ("border" "1"))
       (make element gi: "tr"
@@ -77,7 +77,7 @@ within sl.dsl.
 	 (ent-notation (and ent
 			    (entity-notation ent))))
     (if ent-notation
-	(if (member ent-notation '("GIF89A" "JPEG"))
+	(if (member ent-notation '("gif89a" "jpeg"))
 	    (make empty-element gi: "img"
 		  attributes: (list (list "src" ent-sysid)
 				    (list "alt"
@@ -96,7 +96,7 @@ within sl.dsl.
 					       (normalize "figurecontent"))
 			      (select-elements kids
 					       (normalize "px")))
-		  '("GIF89A" "JPEG"))))
+		  '("gif89a" "jpeg"))))
     (if content
 	(process-node-list content)
 	(error "Can't process coverimage"))))
@@ -112,7 +112,7 @@ within sl.dsl.
 ; 				       (current-node)))
 ; 	 (best-ent (and image-ents
 ; 			(get-sysid-by-notation image-ents
-; 					       '("JPEG" "GIF89A")))))
+; 					       '("jpeg" "gif89a")))))
 ;     (if image-ents
 ; 	(if best-ent
 ; 	    (make empty-element gi: "img"
