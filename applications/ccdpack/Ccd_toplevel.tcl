@@ -110,7 +110,7 @@
 #     13-JUN-1995 (PDRAPER):
 #        Added -width and -height configuration parameters.
 #     11-APR-1997 (PDRAPER)
-#        Converted to itcl2.2. blt_busy now just called busy.
+#        Converted to itcl2.2. blt_busy now called blt::busy.
 #     {enter_changes_here}
 
 #-
@@ -233,7 +233,7 @@
 
 #  If the widget is already busy then do nothing.
                         if { ! [ info exists widgetbusy($widget) ] } {
-                           ::busy hold $widget
+                           blt::busy hold $widget
                            set widgetbusy($widget) $oldthis
                         }
                      }
@@ -249,7 +249,7 @@
 #  Only remove the busy flag if this is the correct window to do this.
                         if { [ info exists widgetbusy($widget) ] } {
                            if { $widgetbusy($widget) == $oldthis } {
-                              ::busy forget $widget
+                              blt::busy forget $widget
                               unset widgetbusy($widget)
                            }
                         }
