@@ -1353,6 +1353,27 @@ successfully on (at least):
 <row><entry>Platform<entry>Version<entry>Compiler
 <tbody>
 <row>
+<entry>powerpc-apple-darwin6.6 (MacOS X, 10.2.6)</entry>
+<entry>0.11b1</entry>
+<entry>g++ 3.1 20020420 (prerelease)</entry>
+</row>
+<row>
+<entry>sun-sparc-solaris2.9</entry>
+<entry>0.11b1</entry>
+<entry>CC: Sun WorkShop 6 update 2 C++ 5.3 2001/05/15</entry>
+</row>
+<row>
+<entry>alphaev67-dec-osf5.1</entry>
+<entry>0.11b1</entry>
+<entry>Compaq C++ V6.5-014</entry>
+</row>
+<row>
+<entry>
+i686-pc-linux-gnu (RedHat 7.3)</entry>
+<entry>0.11b1</entry>
+<entry>g++ 2.96</entry>
+</row>
+<row>
   <entry>i686-pc-linux-gnu (RedHat 7.3)</entry>
   <entry>0.10</entry>
   <entry>gcc 2.96</entry>
@@ -1423,25 +1444,15 @@ or
 </verbatim>
 depending on your shell.</p>
 
-<p>Run regression tests with <code>make test</code> in the build
+<p>Run regression tests with <code>(cd test;make)</code> in the build
 directory.  This includes a separate whole-program test which
 additionally gives advice about setting environment variables.  You
 can run this script separately with the command <code>(cd test;make
 pathtest)</code></p>
 
-<p>The program works on all the platforms on which it builds, but
-regression tests 2 and 3 fail to link when using Sun <code>CC</code>
-and Compaq <code>cxx</code>, for some arcane C++ reason I have yet to
+<p>Regression test 6 currently fails to link when using Compaq
+<code>cxx</code>, for some arcane C++ reason I have yet to 
 diagnose.  The whole-script test mentioned above works, though.</p>
-
-<!--
-<p>Notes:
-<ol>
-<li>Alphas: you may need to force the configure script to
-use the Alpha C++ compiler, <code>cxx</code>.  On the Alpha I use to
-test builds, <code/egcs-2.91.66> gets rather confused.
-</ol>
--->
 
 <subsubsect id=install.web2c>Obtaining the <code/kpathsea> library
 <update versionid="v0-7">Improved instructions on getting the
@@ -1524,17 +1535,8 @@ some indication of the machine you're running on (<kbd/uname -a> is good);
 and the output of <kbd/dvi2bitmap -V>, which shows the options you
 have enabled.
 
-<p>Things I'd like to do sometime:
-<ul>
-<li>There are an <em/awful> lot of options, aren't there.
-<li>Support PBM graphics.
-<li>I'd like to turn the whole thing into a shareable library,
-and document the API properly.  This would allow more interesting uses
-of the functionality this provides.  However, I'm scared of
-<code>libtool</code>: any brave souls out there?
-<li>Ermmm, any suggestions?
-
-</ul>
+<p>See the <code>TODO</code> list in the distribution, for the list of
+things I at least would like to see added to the code.</p>
 
 <p>Bright ideas, fixes and (especially) implementations, cheerfully
 received.
