@@ -123,6 +123,7 @@ sub index_tar;
 sub index_hlp;
 sub index_source;
 sub index_files;
+sub taggable;
 sub write_entry;
 sub uniq;
 sub tidyup;
@@ -281,12 +282,24 @@ sub index_pack {
       }
    }
 
+#  Get fully qualified path name of package file.
+
+   my $fqpack_file = $pack_file;
+   $fqpack_file =~ s%^(?!/)% cwd . '/' %e;
+
 #  Get name of package.
 
    $pack_file =~ m%^(.*/)?([^.]+)(\.tar.*)?%;
    my ($dir, $tarext) = ($1, $3);
    $package ||= $2;
    print "\nPACKAGE: $package\n";
+
+#  Check specified file is of the right type to index.
+
+   unless ($tarext || -d $pack_file) {
+      print "*** Skipping '$fqpack_file' (not tar file or directory) ***\n";
+      return;
+   }
 
 #  If any records for this package already exist in the function index, 
 #  or file index, delete them.
@@ -299,11 +312,15 @@ sub index_pack {
 
    $tasks{$package} = [ ];
 
-#  Get fully qualified pathname of package location and store in file index.
+#  Store fully qualified pathname of package in file index.
 
-   my $fqpack_file = $pack_file;
-   $fqpack_file =~ s%^(?!/)% cwd . '/' %e;
    $file_index->put("$package#", $fqpack_file);
+
+#  Clear hash of files which have been tagged in this package already 
+#  (used so that duplicate entries inside and outside of tar files are 
+#  not both processed).
+
+   %tagged = ();
 
 #  Perform the indexing.
 
@@ -314,7 +331,7 @@ sub index_pack {
       index_tar "$package#", $pack_file;
    }
    else {
-      error "Arguments must be package tar files or directories\n";
+      error "index_pack: This should not happen.\n";
    }
 
 #  Index expected files sitting naked in source directory.  These may
@@ -414,7 +431,7 @@ sub index_list {
       elsif ($ext eq 'hlp') {            #  starlink help file
          index_hlp "$path$file", $file;
       }
-      elsif (defined $tagger{$ext}) {    #  source file in taggable language
+      elsif (taggable "$path$file") {    #  source file in taggable language
          index_source "$path$file", $file;
       }
    }
