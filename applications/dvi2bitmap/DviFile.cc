@@ -78,7 +78,8 @@ DviFile::DviFile (string& fn, int res, double magmag)
     : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
       magfactor_(1.0), skipPage_(false),
-      max_drift_(0)
+      max_drift_(0),
+      widest_page_(-1), deepest_page_(-1)
 {
     PkFont::setResolution(res);
 
@@ -743,6 +744,9 @@ void DviFile::updateH_ (int hup, int hhup)
     if (dist > max_drift_)
 	hh_ = Kh + sdist*max_drift_;
 
+    if (hh_ > widest_page_)
+	widest_page_ = hh_;
+
     if (verbosity_ > normal)
 	cerr << "updateH_ ("
 	     << hup << ',' << hhup << ") -> ("
@@ -775,6 +779,10 @@ void DviFile::updateV_ (int vup)
     }
     if (dist > max_drift_)
 	vv_ = Kv + sdist*max_drift_;
+
+    if (vv_ > deepest_page_)
+	deepest_page_ = vv_;
+
     if (verbosity_ > normal)
 	cerr << "updateV_ ("
 	     << vup << ") -> ("
@@ -831,6 +839,9 @@ void DviFile::read_postamble()
 	postamble_.u = static_cast<unsigned int>(postamble_.u
 						 * (double)dvimag / 1000.0);
     }
+    // px_per_dviu_ is set in preamble
+    widest_page_ = static_cast<int>(postamble_.u * px_per_dviu_);
+    deepest_page_ = static_cast<int>(postamble_.l * px_per_dviu_);
     if (verbosity_ > normal)
 	cerr << "Postamble: l=" << postamble_.l
 	     << " u=" << postamble_.u

@@ -82,8 +82,6 @@ public:
 	verbosity_ = level;
 	return oldv;
     }
-    // currH and currY are current horiz and vert positions in pixel
-    // units, including possible drift corrections
     /**
      * Obtains the current horizontal position in pixel units,
      * including any drift corrections.
@@ -97,27 +95,37 @@ public:
      */
     int currV() const { return vv_; }
     /**
-     * Obtains the `width of the widest page'.  This figure is that
-     * obtained from the postamble of the DVI file, and is written
-     * there as information by TeX.  Note that 
-     * this isn't the same as the maximum value of {@link #currH}, any more
-     * than 0 is the minimum, but if the origin is set `appropriately' 
-     * (ie, at (1in,1in)), then everything should fit on.
+     * Obtains the `width of the widest page'.  This is either the
+     * value obtained from the postamble of the DVI file, if that was
+     * read, or else the maximum value of the horizontal position (as
+     * returned by <code>currH()</code>), if that is larger.  If the
+     * postamble has not been read, then this is initialised to -1.
+     * Note that this isn't the same as the maximum value of {@link
+     * #currH}, any more than 0 is the minimum, but if the origin is
+     * set `appropriately' (ie, at (1in,1in)), then everything should
+     * fit on.  It's not a precise figure, but can be useful as a
+     * scale for initialising bitmap sizes, for example.
      *
      * @return the horizontal size of the largest `page', in pixels
      */
-    int hSize() const { return static_cast<int>(postamble_.u * px_per_dviu_); }
+    int hSize() const { return widest_page_; }
+    //int hSize() const { return static_cast<int>(postamble_.u * px_per_dviu_); }
     /**
-     * Obtains the `height plus depth of the tallest page'.  This figure is that
-     * obtained from the postamble of the DVI file, and is written
-     * there as information by TeX.  Note that 
-     * this isn't the same as the maximum value of {@link #currV}, any more
-     * than 0 is the minimum, but if the origin is set `appropriately' 
-     * (ie, at (1in,1in)), then everything should fit on.
+     * Obtains the `height plus depth of the tallest page'.    This is either the
+     * value obtained from the postamble of the DVI file, if that was
+     * read, or else the maximum value of the vertical position (as
+     * returned by <code>currV()</code>), if that is larger.  If the
+     * postamble has not been read, then this is initialised to -1.
+     * Note that this isn't the same as the maximum value of {@link
+     * #currV}, any more than 0 is the minimum, but if the origin is
+     * set `appropriately' (ie, at (1in,1in)), then everything should
+     * fit on.  It's not a precise figure, but can be useful as a
+     * scale for initialising bitmap sizes, for example.
      *
      * @return the vertical size of the largest `page', in pixels
      */
-    int vSize() const { return static_cast<int>(postamble_.l * px_per_dviu_); }
+    int vSize() const { return deepest_page_; }
+    //int vSize() const { return static_cast<int>(postamble_.l * px_per_dviu_); }
     /**
      * Return the net magnification factor for the DVI file
      * @return the overall magnification factor applied to lengths in
@@ -169,6 +177,13 @@ private:
     // This might change in future, if the effective device units of the output
     // change (for example if we produce oversize gifs, ready for shrinking).
     int max_drift_;
+
+    // Largest width and height+depth, in pixels (ie, device units).
+    // These are either initialised to the values in the postamble,
+    // scaled to pixels, or are the maximum values of hh_ and vv_
+    // encountered so far.
+    int widest_page_;
+    int deepest_page_;
 
     Byte getByte();
     signed int getSIU(int), getSIS(int);
