@@ -308,7 +308,7 @@
    } {
       set NDF_IMAGE ""
       set IMAGE ""
-      set SECTION "(1:100,1:100)"
+      set SECTION ""
       set STD_IMSEC ""
       set maximwid 0
       set maxrimwid 0
@@ -486,6 +486,7 @@
    ColMenu $colsmenu "Background"        GWM_BADCOL
    ColMenu $colsmenu "Polygon Outlines"  GWM_POLCOL
    ColMenu $colsmenu "Selection Box"     GWM_SELCOL
+   ColMenu $colsmenu "Vectors"           GWM_VECCOL
 
 # Add items to the "Contours" sub-menu.
    set contsmenu [menu $OPTSMENU.conts]

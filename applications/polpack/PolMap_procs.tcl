@@ -2566,6 +2566,7 @@ proc GwmContour {} {
 #-
    global ATASK_OUTPUT
    global GWM_CONCOL
+   global GWM_VECCOL
    global GWM_CONTLEVS
    global GWM_CX
    global GWM_CY
@@ -2657,7 +2658,7 @@ proc GwmContour {} {
       }
 
 # Construct a suitable parameter string for KAPPA:CONTOUR.
-      set pars "mode=free noaxes nokey concol=$GWM_CONCOL heights=$GWM_CONTLEVS"
+      set pars "mode=free noaxes nokey concol=1 heights=$GWM_CONTLEVS"
 
 # Erase the image display. 
       GwmClear
@@ -2868,6 +2869,7 @@ proc GwmCreate {frmname size colours gwmname} {
    global CB_COL 
    global GWM_BADCOL
    global GWM_CONCOL
+   global GWM_VECCOL
    global GWM_BLACK
    global GWM_CAN
    global GWM_CANCEL 
@@ -2912,6 +2914,7 @@ proc GwmCreate {frmname size colours gwmname} {
 # Initialise some global variables.
    set GWM_BADCOL 	"cyan" 
    set GWM_CONCOL 	"black" 
+   set GWM_VECCOL 	"blue" 
    set GWM_CURRENT_LIST ""
    set GWM_DISPLAY_NCONT 0
    set GWM_DISPLAY_DATA ""
@@ -3077,6 +3080,9 @@ proc GwmCreate {frmname size colours gwmname} {
       Obey kapview lutable "mapping=linear coltab=grey device=$GWM_DEVICE" 1
       Obey kapview paldef "device=$GWM_DEVICE" 1
       Obey kapview palentry "device=$GWM_DEVICE palnum=0 colour=$GWM_BADCOL" 1
+      Obey kapview palentry "device=$GWM_DEVICE palnum=1 colour=$GWM_CONCOL" 1
+      Obey kapview palentry "device=$GWM_DEVICE palnum=2 colour=$GWM_VECCOL" 1
+puts "Setting pen 2 to $GWM_VECCOL"
       Obey kapview gdclear "device=$GWM_DEVICE" 1
 
    }
@@ -3358,6 +3364,7 @@ proc GwmUpdate {} {
    global GWM_CURRENT_LIST
    global GWM_DEVICE
    global GWM_DRAWN_LIST
+   global IMAGE
 
 # Cancel any selected area.
    CancelArea
@@ -3367,11 +3374,16 @@ proc GwmUpdate {} {
       ClearPosns $GWM_DRAWN_LIST
    }
 
-# Re-draw the background image.
-   if { $GWM_BACK == "CONTOUR" } {
-      GwmContour
-   } elseif { $GWM_BACK == "GREY" } {
-      GwmDisplay
+# Re-draw the background image, or clear the display if there is no
+# background.
+   if { $IMAGE != "" } {
+      if { $GWM_BACK == "CONTOUR" } {
+         GwmContour
+      } elseif { $GWM_BACK == "GREY" } {
+        GwmDisplay
+      } {
+        GwmClear
+      }
    } {
       GwmClear
    }
@@ -3617,6 +3629,7 @@ proc LoadOptions {} {
 #-
    global ATASK_BADCOL
    global ATASK_CONCOL
+   global ATASK_VECCOL
    global ATASK_NCONT
    global ATASK_BACK
    global ATASK_HAREA
@@ -3630,6 +3643,7 @@ proc LoadOptions {} {
    global ATASK_XHRCOL
    global GWM_BADCOL      
    global GWM_CONCOL      
+   global GWM_VECCOL      
    global GWM_NCONT
    global CHAR_LIST
    global CHAR_STOP
@@ -3705,6 +3719,14 @@ proc LoadOptions {} {
    } {
      set GWM_CONCOL "black"
    }
+   SetColours GWM_CONCOL
+
+   if { [info exists ATASK_VECCOL] } {
+     set GWM_VECCOL [string trim $ATASK_VECCOL]
+   } {
+     set GWM_VECCOL "blue"
+   }
+   SetColours GWM_VECCOL
 
    if { [info exists ATASK_SELCOL] } {
      set GWM_SELCOL [string trim $ATASK_SELCOL]
@@ -5512,6 +5534,7 @@ proc SaveOptions {} {
    global ATASK_NCONT
    global ATASK_BADCOL
    global ATASK_CONCOL
+   global ATASK_VECCOL
    global ATASK_BACK
    global ATASK_HAREA
    global ATASK_PHI
@@ -5523,6 +5546,7 @@ proc SaveOptions {} {
    global ATASK_XHRCOL          
    global GWM_BADCOL
    global GWM_CONCOL
+   global GWM_VECCOL
    global CHAR_LIST
    global CHAR_STOP
    global GWM_BACK
@@ -5548,6 +5572,7 @@ proc SaveOptions {} {
      set ATASK_SELCOL $GWM_SELCOL
      set ATASK_BADCOL $GWM_BADCOL
      set ATASK_CONCOL $GWM_CONCOL
+     set ATASK_VECCOL $GWM_VECCOL
      set ATASK_XHRCOL $GWM_XHRCOL
      set ATASK_XHAIR $GWM_XHAIR
      set ATASK_PLO $PLO_REQ
@@ -5812,6 +5837,8 @@ proc SetColours {var} {
 #       The colour for the background (eg "cyan").
 #     GWM_CONCOL (Read)
 #       The colour for contours.
+#     GWM_VECCOL (Read)
+#       The colour for vectors.
 #     GWM_CAN (Read)
 #        The name of the canvas widget holding the GWM image.
 #     GWM_DEVICE (Read)
@@ -5823,6 +5850,7 @@ proc SetColours {var} {
 #-
    global GWM_BADCOL
    global GWM_CONCOL
+   global GWM_VECCOL
    global GWM_CAN
    global GWM_DEVICE
    global GWM_DISPLAY_NCONT
@@ -5837,12 +5865,16 @@ proc SetColours {var} {
    if { $var == "GWM_SELCOL" } {
       $GWM_CAN itemconfigure sbox -outline $GWM_SELCOL
 
-# Re-draw the contour map if its colour has changed.
+# Change the colour of entry 1 in the KAPPA pallette. This is used
+# to draw the contours.
    } elseif { $var == "GWM_CONCOL" } {
-      if { $GWM_DISPLAY_NCONT > 0 } { 
-         set GWM_FORCE 1
-         GwmContour 
-      }
+      Obey kapview palentry "device=$GWM_DEVICE palnum=1 colour=$GWM_CONCOL" 1
+
+# Change the colour of entry 2 in the KAPPA pallette. This is used
+# to draw the vectors.
+   } elseif { $var == "GWM_VECCOL" } {
+puts "Setting pen 2 to $GWM_VECCOL"
+      Obey kapview palentry "device=$GWM_DEVICE palnum=2 colour=$GWM_VECCOL" 1
 
 # Re-draw the polygons if their colour has changed.
    } elseif { $var == "GWM_POLCOL" } {
@@ -6986,6 +7018,7 @@ proc UnZoom1 {} {
 
       }
 
+
 # Disable the unzoom button when the stack is emptied.
       if {  [llength $GWM_SECTION_STACK] == 0 } {
          $GWM_UNZOOM configure -state disabled
@@ -7487,6 +7520,7 @@ proc Zoom {} {
 
 # Display the modified section. 
          set GWM_SECTION "($ipxlo:$ipxhi,$ipylo:$ipyhi)"
+
          GwmUpdate
        } {
          Message "Selected area is too small to display."
@@ -7578,6 +7612,8 @@ proc VectorMap {} {
 #       The requested vector map section (eg "(10:200,23:68)" ).
 #    GWM_SIZE (Read)
 #       The size of the square GWM canvas item (in screen pixels).
+#    IMAGE (Read)
+#       The name of the background image (if any).
 #-
    global GWM_BACK
    global GWM_CX
@@ -7588,20 +7624,21 @@ proc VectorMap {} {
    global GWM_SECTION
    global GWM_SIZE
    global GWM_DISPLAY_VDATA
+   global IMAGE
    global VEC_CAT
 
 # Tell the user what is happening.
    set told [SetInfo "Displaying the vector map. Please wait... " 0]
 
 # Initialise the parameter string for POLPLOT...
-   set pars "cat=$VEC_CAT colmag=p colang=theta colx=x coly=y clear=no noaxes nokey"
+   set pars "cat=$VEC_CAT colmag=p colang=theta colx=x coly=y noclear noaxes nokey style=\"colour(vect)=2\""
 
 #  If there is a background image the vectors are displayed in alignment
 #  with the backgrounmd image. In this case the background image defines
 #  the area of the vector map which is to be displayed. If no background
 #  image is being displayed, then we need to determine explicitly the area 
 #  of the vector map which is to be displayed.
-   if { $GWM_BACK != "CONTOUR" && $GWM_BACK != "GREY" } {
+   if { $GWM_SECTION != "" } {
       set bnds [SecList $GWM_SECTION]
       append pars " lbnd=\[[lindex $bnds 0],[lindex $bnds 2]\]"
       append pars " ubnd=\[[lindex $bnds 1],[lindex $bnds 3]\]"
@@ -7609,6 +7646,15 @@ proc VectorMap {} {
 
 # Display the vector map
    if { [Obey polpack polplot "$pars device=$GWM_DEVICE" ] } {
+
+# If no section was provided, store the section actually displayed.
+      if { $GWM_SECTION == "" } {
+         regsub -nocase D [GetParam polpack polplot:lbnd] E result
+         scan $result "\[%g,%g\]" lox loy
+         regsub -nocase D [GetParam polpack polplot:ubnd] E result
+         scan $result "\[%g,%g\]" hix hiy
+         set GWM_SECTION "($lox:$hix,$loy:$hiy)"
+      }
 
 # Indicate that the image has been displayed.
       set GWM_DISPLAY_VDATA $VEC_CAT
