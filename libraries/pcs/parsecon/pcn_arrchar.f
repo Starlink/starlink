@@ -228,7 +228,11 @@
 *
 *            Check for delimiter within brackets embedded in token
 *
-               START = INDEX ( STRING(PTR:PTR+TOKLEN), '(' )
+               IF ( PTR+TOKLEN .LE. LENGTH ) THEN
+                  START = INDEX ( STRING(PTR:PTR+TOKLEN), '(' )
+               ELSE
+                  START = INDEX ( STRING(PTR:LENGTH), '(' )
+               ENDIF
                IF ( START .GT. 0 ) THEN
                   TBRACK = 1
                   START = START + PTR - 1
