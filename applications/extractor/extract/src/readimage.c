@@ -21,6 +21,12 @@
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
+#include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -29,9 +35,10 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include        "prefs.h"
 #include	"check.h"
 #include	"field.h"
-#include	"fitscat.h"
+#include	"fits/fitscat.h"
 #include	"interpolate.h"
 #include	"back.h"
 #include	"astrom.h"
@@ -101,7 +108,7 @@ void	readimagehead(picstruct *field)
 
   field->width = dims[0];
   field->height = dims[1];
-  field->npix = (size_t)field->width*field->height;
+  field->npix = (KINGSIZE_T)field->width*field->height;
 
   field->bscale = 1.0;
   field->bzero = 0.0;
@@ -149,7 +156,7 @@ void	readimagehead(picstruct *field)
         as->wcs_flag = 1;
       }
       if ( status != SAI__OK ) errAnnul( &status );
-    } 
+    }
     else {
       /*  No WCS */
       as->wcs_flag = 0;

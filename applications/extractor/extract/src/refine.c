@@ -5,7 +5,7 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions to refine extraction of objects.
 *
@@ -16,9 +16,15 @@
 *                         Nullify freed pointers to make sure memort
 *                         is reallocated next pass. Removed AJC
 *                         changes in this area.
+*	Last modify:	02/04/2003
+*                         (EB): 2.3
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdlib.h>
@@ -26,6 +32,7 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"plist.h"
 #include	"extract.h"
 #include        "clean.h"  /*PWD: modification here */
@@ -64,20 +71,6 @@ int	parcelout(objliststruct *objlistin, objliststruct *objlistout)
   out = RETURN_OK;
 
   xn = prefs.deblend_nthresh;
-
-/*----- allocate some memory */
-
-  if (!son)
-    if (!(son = (short *)malloc(xn*NSONMAX*nbm*sizeof(short))))
-      error(EXIT_FAILURE, "Not enough memory in ", "parcelout()");
-  if (!ok)
-    if (!(ok = (short *)malloc(xn*NSONMAX*sizeof(short))))
-      error(EXIT_FAILURE, "Not enough memory in ", "parcelout()");
-
-  if (!objlist)
-    if (!(objlist = (objliststruct *)malloc(xn*sizeof(objliststruct))))
-      error(EXIT_FAILURE, "Not enough memory in ", "parcelout()");
-
 
 /* ---- initialize lists of objects */
 
@@ -204,19 +197,28 @@ exit_parcelout:
   return out;
   }
 
+/******************************* allocparcelout ******************************/
+/*
+Allocate the memory allocated by global pointers in refine.c
+*/
+void	allocparcelout(void)
+  {
+  QMALLOC(son, short,  prefs.deblend_nthresh*NSONMAX*NBRANCH);
+  QMALLOC(ok, short,  prefs.deblend_nthresh*NSONMAX);
+  QMALLOC(objlist, objliststruct,  prefs.deblend_nthresh);
+
+  return;
+  }
+
 /******************************* freeparcelout *******************************/
 /*
-free the memory allocated by global pointers in refine.c
+Free the memory allocated by global pointers in refine.c
 */
 void	freeparcelout(void)
   {
-    /* PWD: assigned freed pointers to NULL, need for next program invocation*/
-  free(son);
-  son = NULL;
-  free(ok);
-  ok = NULL;
-  free(objlist);
-  objlist = NULL;
+  QFREE(son);
+  QFREE(ok);
+  QFREE(objlist);
   return;
   }
 
