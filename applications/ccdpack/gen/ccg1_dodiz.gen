@@ -155,12 +155,15 @@
 *  Arguments Returned:
 
 *  Local Variables:
+      CHARACTER * ( AST__SZCHR ) DMN      ! Domain of frame
+
       INTEGER X, Y                        ! Loop counter for PIXELS
       INTEGER U, V                        ! Loop counter with BND offsets
       
       INTEGER I, J                        ! Loop counters for affected pixels
       INTEGER L, M                        ! Loop counters with BND offsets
 
+      INTEGER FRM                         ! AST pointer to frame
       INTEGER IWCS                        ! Pointer to the WCS in input NDF
       INTEGER JREG                        ! Index of the CCD_REG AST frame 
       
@@ -180,18 +183,20 @@
            
 *  Get pointers to the WCS component, do it here instead of passing it down
 *  from above, we're using enough memory as it it... 
-      CALL CCD1_GTWCS(NDFIN, IWCS, STATUS)         
+      CALL CCD1_GTWCS( NDFIN, IWCS, STATUS )         
 
-*  Make sure the user has actually run REGISTER, if not warn them
-      CALL CCD1_FRDM( IWCS, 'CCD_REG', JREG, STATUS )
-              
-*  There is no CCD_REG Frame, warn the user (bad things may happen!)
-      IF( JREG .EQ. 0 ) THEN         
-         CALL MSG_SETC( 'CURR_DOM', 
-     :                  AST_GETC(FRCUR, 'Domain', STATUS))
-         CALL CCD1_MSG( ' ', '    Domain of current AST Frame: '
-     :                  //' ^CURR_DOM (WARNING)', STATUS )
-      ENDIF                 
+*  Tell the user which co-ordinate frame we'll be resampling into.
+      FRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+      DMN = AST_GETC( FRM, 'Domain', STATUS )
+      CALL MSG_SETC( 'DMN', DMN )
+      CALL CCD1_MSG( ' ', '    Resampling into the ^DMN '
+     :                  //'coordinate system', STATUS )
+
+*  If it's neither CCD_REG nor CCD_WCSREG then issue a mild warning.
+      IF ( DMN .NE. 'CCD_REG ' .AND. DMN .NE. 'CCD_WCSREG ' ) THEN
+         CALL CCD1_MSG( ' ', '      (Warning: this is not a default'//
+     :   'CCDPACK registration coordinate system)', STATUS )
+      END IF
 
 *  Check that the image is 2 dimensional, if not we're in real trouble
 *  since the pixel mapping alogrithims (ie the bit that does the actual
@@ -440,9 +445,6 @@
 *  ========================================= 
 999   CONTINUE
        
-*  Tidy up any local AST stuff
-      CALL AST_ANNUL( IWCS, STATUS )
-
 *  Time at the bar please...
       END
 

@@ -138,7 +138,6 @@
       INTEGER IUBND( NDF__MXDIM )  ! upper bounds of the input NDF
       INTEGER IWCS                 ! pointer to the input NDF WCS component
       INTEGER J                    ! just another loop counter (output dim)
-      INTEGER JREG                 ! pointer to the CCD_REG frame
       INTEGER JPIX                 ! pointer to the PIXEL frame      
       INTEGER K                    ! loop counter around the FrameSet
       INTEGER LBND( NDF__MXDIM , CCD1__MXNDF ) ! NDF lower bounds
@@ -264,18 +263,15 @@
          FRM = AST_GETFRAME( IWCS, CFRAME( I ), STATUS )
          DMN = AST_GETC( FRM, 'Domain', STATUS )
          CALL MSG_SETC( 'DMN', DMN )
-         CALL CCD1_MSG( ' ', '  Resampling into the ^DMN '
+         CALL CCD1_MSG( ' ', '    Resampling into the ^DMN '
      :                     //'coordinate system', STATUS )
 
 *  If it's neither CCD_REG nor CCD_WCSREG then issue a mild warning.
          IF ( DMN .NE. 'CCD_REG ' .AND. DMN .NE. 'CCD_WCSREG ' ) THEN
-            CALL CCD1_MSG( ' ', '    (Warning: this is not a default'//
-     :      'CCDPACK registration coordinate system)', STATUS )
+            CALL CCD1_MSG( ' ', '      (Warning: this is not a '//
+     :      'default CCDPACK registration coordinate system)', STATUS )
          END IF
 
-*  Make sure the user has actually run REGISTER, if not warn them
-         CALL CCD1_FRDM( IWCS, 'CCD_REG', JREG, STATUS )
-              
 *  Obtain the number of input and output co-ordinates for a Mapping
          NVIN = AST_GETI( MAPCUR, 'Nin', STATUS )
          NVOUT = AST_GETI( MAPCUR, 'Nout', STATUS ) 
