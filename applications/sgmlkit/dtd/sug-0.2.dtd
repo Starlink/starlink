@@ -1,16 +1,16 @@
 <!--
-	Starlink SUN DTD
+	Starlink SUG DTD
 
 	Use with doctype declaration:
 
-	<!doctype sun public '-//Starlink//DTD Starlink SUN 0.2//EN'>
+	<!doctype sug public '-//Starlink//DTD Starlink SUG 0.2//EN'>
 
 	$Id$
 -->
 
-<!entity % DTD.Version		"DTD Starlink SUN 0.2">
+<!entity % DTD.Version		"DTD Starlink SUG 0.2">
 
-<!entity % DocClass "SUN">
+<!entity % DocClass "SUG">
 
 <!-- 
   Features: require support for versioning, and allow a list of
@@ -20,10 +20,10 @@
 		-- Require an abstract -->
 <!entity % Feature.Versioning	'include'
 		-- Require version tracking in document -->
-<!entity % Feature.Routinelist	'include'
-		-- Support routine descriptions -->
-<!entity % Feature.Docnumber	'include'
-		-- require DOCNUMBER in head -->
+<!entity % Feature.Routinelist	'ignore'
+		-- No support for routine descriptions -->
+<!entity % Feature.Docnumber	'ignore'
+		-- No docnumber - there's only one SUG -->
 
 <!entity % Starlink.general
 	public "-//Starlink//DTD Starlink General 0.2//EN">

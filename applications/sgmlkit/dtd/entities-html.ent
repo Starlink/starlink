@@ -1,20 +1,32 @@
 <!--
   Additional SDATA entities, for HTML use.
+
+  I can't currently work out how to get the transformation back-end to 
+  spit out numeric entity references for nbsp, pounds and deg, so 
+  hack it for the moment.
+
+  $Id$
 -->
 
-<!entity copy   CDATA "(c)"	-- copyright sign		-->
-<!entity amp    CDATA "&"	-- ampersand			-->
-<!entity gt     CDATA ">"	-- greater than			-->
-<!entity lt     CDATA "<"	-- less than			-->
-<!entity quot   CDATA '"'	-- double quote			-->
-<!entity nbsp   CDATA "&#38;#160;"  -- non breaking space	-->
-<!entity hash   CDATA "#"	-- hash sign			-->
-<!entity pounds CDATA "&#38;#163;" -- pound sign		-->
-<!entity dollar CDATA "$"	-- dollar sign			-->
-<!entity ellip  CDATA "..."	-- ellipses			-->
-<!entity emdash CDATA "--"	-- em dash 			-->
-<!entity endash CDATA "-"	-- en dash			-->
-<!entity percent CDATA "%"	-- percent sign			-->
-<!entity deg    CDATA "&#38;#176;"	-- degree		-->
-<!entity latex	CDATA "LaTeX"	-- might as well...		-->
-<!entity tex    CDATA "TeX"	-- might as well...		-->
+<!entity copy   CDATA "(c)"	-- copyright sign	-->
+<!entity amp    CDATA "&"	-- ampersand		-->
+<!entity gt     CDATA ">"	-- greater than		-->
+<!entity lt     CDATA "<"	-- less than		-->
+<!entity quot   CDATA '"'	-- double quote		-->
+<!entity nbsp   CDATA " " 	-- non breaking space	-->
+<!entity hash   CDATA "#"	-- hash sign		-->
+<!entity pounds CDATA "UKP" 	-- pound sign		-->
+<!entity dollar CDATA "$"	-- dollar sign		-->
+<!entity ellip  CDATA "..."	-- ellipses		-->
+<!entity emdash CDATA "--"	-- em dash 		-->
+<!entity endash CDATA "-"	-- en dash		-->
+<!entity percent CDATA "%"	-- percent sign		-->
+<!entity deg    CDATA "(deg)"	-- degree		-->
+<!entity latex	CDATA "LaTeX"	-- might as well...	-->
+<!entity tex    CDATA "TeX"	-- might as well...	-->
+
+<![ignore[
+<!entity nbsp   CDATA "&#160;"  -- non breaking space	-->
+<!entity pounds CDATA "&#38;#163;" -- pound sign	-->
+<!entity deg    CDATA "&#38;#176;"	-- degree	-->
+]]>

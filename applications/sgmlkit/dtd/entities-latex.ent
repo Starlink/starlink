@@ -1,12 +1,20 @@
 <!--
   Additional SDATA entities, for LaTeX use.
+
+  The SDATA entities emerge wrongly from DSSSL (data) functions.
+  Don't know why.
+
+  $Id$
 -->
 
 <!entity copy   SDATA "\copyright{}"	-- copyright sign	-->
 <!entity amp    SDATA "\&"		-- ampersand		-->
 <!entity gt     SDATA ">"		-- greater than		-->
 <!entity lt     SDATA "<"		-- less than		-->
+<![ ignore [
 <!entity quot   SDATA '\dquote{}'	-- double quote		-->
+]]>
+<!entity quot   SDATA '"'		-- double quote		-->
 <!entity nbsp   SDATA "~"		-- non breaking space	-->
 <!entity hash	SDATA "\#"		-- hash sign		-->
 <!entity pounds	SDATA "{\normalfont\pounds{}}" -- pound sign	-->

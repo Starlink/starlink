@@ -9,12 +9,13 @@
 <!entity % DTD.Version		"DTD Starlink SSN 0.2">
 
 <!entity % DocClass "SSN">
-<!entity % req.abstract "abstract,"	-- require an abstract -->
 
 <!-- 
   Features: require support for versioning, but forbid a list of
   routine descriptions amongst the backmatter.
 -->
+<!entity % Feature.Abstract	'include'
+		-- Require an abstract -->
 <!entity % Feature.Versioning	'include'
 		-- Require version tracking in document -->
 <!entity % Feature.Routinelist	'ignore'

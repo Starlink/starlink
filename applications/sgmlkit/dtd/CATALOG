@@ -16,9 +16,14 @@ SGMLDECL starlink.decl
 
 	-- listed most general to most specific --
 
+	-- Starlink General is to be used _only_ by reference --
+	-- from within one of the other DTDs --
 PUBLIC "-//Starlink//DTD Starlink General//EN"		starlink-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.2//EN"	starlink-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.1//EN"	starlink-0.1.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SUG//EN"		sug-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.2//EN"		sug-0.2.dtd
 
 PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.2//EN"		sun-0.2.dtd
@@ -27,6 +32,15 @@ PUBLIC "-//Starlink//DTD Starlink SUN 0.1//EN"		sun-0.1.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.2//EN"		ssn-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.1//EN"		ssn-0.1.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SGP//EN"		sgp-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.2//EN"		sgp-0.2.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SC//EN"		sc-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.2//EN"		sc-0.2.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SG//EN"		sg-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.2//EN"		sg-0.2.dtd
 
 PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.2//EN"		mud-0.2.dtd

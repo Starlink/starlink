@@ -147,14 +147,6 @@
 <!--========== Parameter entities for configuration ==========-->
 <!entity % DocClass "SUN">
 
-<!--
-  The calling DTD may define %req.abstract as it wishes,
-  to make an abstract mandatory, optional or forbidden.  Alternatives
-  to this default are: "abstract,", for a required abstract, or plain
-  "" to forbid an abstract.
--->
-<!entity % req.abstract "abstract?,"	-- optional abstract -->
-
 <!--=========== Feature Switches ==========-->
 
 <!--
@@ -177,12 +169,23 @@
 -->
 <!entity % Feature.Everything		'ignore'>
 <![ %Feature.Everything [
+  <!entity % Feature.Abstract		'include'>
   <!entity % Feature.Versioning		'include'>
   <!entity % Internal.Feature.Dateonly	'include'>
   <!entity % Feature.Docnumber		'include'>
   <!entity % Feature.Routinelist	'include'>
   <!entity % Feature.EnforceLinkpolicy	'include'>
 ]]>
+
+<!--
+  If %Feature.Abstract is 'include', then an abstract is required.  If
+  it is 'ignore' then the abstract is optional.  It would be possible
+  to forbid an abstract by predefining %req.abstract to "", but that
+  is discouraged.
+
+  Default: required.
+-->
+<!entity % Feature.Abstract 'include'>
 
 <!--
   The entity %Feature.Versioning controls whether the HISTORY and UPDATE
@@ -597,6 +600,12 @@
 <!entity % export.id.optional "
 	id id #implied
 	export (export) #implied">
+
+<!-- Is the abstract required or optional? -->
+<![ %Feature.Abstract [
+<!entity % req.abstract "abstract,"	-- required abstract -->
+]]>
+<!entity % req.abstract "abstract?,"	-- optional abstract -->
 
 <!-- 
   Content model for element DOCBODY.  Presence or absence of abstract
