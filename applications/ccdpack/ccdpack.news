@@ -21,3 +21,6 @@
    - There have been some improvements and bug fixes to the percentile
      location routine used by FINDOBJ.
 
+   - The MODIFIED parameter of WCSEDIT has been withdrawn and replaced 
+     by the NAMELIST parameter.
+

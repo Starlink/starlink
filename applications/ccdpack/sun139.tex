@@ -2697,6 +2697,10 @@ the magnitude of the distortion followed by the coordinates of its centre:
 \end{eqnarray*}
 A positive $C_1$ corresponds to a pincushion distortion and 
 a negative $C_1$ corresponds to a barrel distortion.
+\item[MATH:]
+An arbitrary algebraic transformation.
+In this case you will be asked to specify the mapping between coordinate
+systems using a FORTRAN-like syntax.
 \end{description}
 So the following command would 
 add a new coordinate system, labelled `SQUASHED', 
@@ -2728,10 +2732,12 @@ giving the domain of the altered coordinate system where appropriate
 If it could not perform the requested action on any of the images
 in the list, an appropriate message will be written, but this
 does not consitute a fatal error.
-However, to find out which images were successfully modified, the
-output parameter MODIFIED can be examined using the
-KAPPA program \xref{PARGET}{sun95}{PARGET}, as in
-the following example:
+However, it does write an list to an output file (by default called
+WCSEDIT.LIS), giving the names of only those images 
+which were successfully accessed, which normally
+means those which did not have a coordinate system matching that
+given by the FRAME parameter.  So it's easy to find out which 
+images were successfully modified:
 \begin{myquote}
 \begin{verbatim}
 % wcsedit 'data?' current focal
@@ -2749,8 +2755,20 @@ data3: Current frame set to domain FOCAL
 
 data4: Current frame set to domain FOCAL
 
-% parget modified wcsedit
-data1,data3,data4
+% cat WCSEDIT.LIS
+data1
+data2
+data4
+\end{verbatim}
+\end{myquote}
+This name list file can be used as an indirection file to pass to the 
+input of another CCDPACK task.  For instance, if you want to do an
+interactive alignment of only those files which have coordinate
+systems with the name ``FOCAL'', you could follow the above command
+with this:
+\begin{myquote}
+\begin{verbatim}
+% pairndf '^WCSEDIT.LIS'
 \end{verbatim}
 \end{myquote}
 
@@ -14795,8 +14813,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             Show the coordinate systems which currently exist
       }
       The routine does not fail if some of the requested edits cannot
-      be performed, but an output parameter MODIFIED records which
-      images were successfully modified.
+      be performed, but a file whose name is given by the NAMELIST
+      parameter records which images were successfully accessed.
    }
    \sstusage{
       WCSEDIT in mode frame
@@ -15012,12 +15030,13 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [CURRENT]
       }
       \sstsubsection{
-         MODIFIED = LITERAL (Write)
+         NAMELIST = LITERAL (Read)
       } {
-         On exit, this parameter gives a comma-separated list of all the
-         images which were successfully modified.  In particular, if MODE
-         is CURRENT, this list will include all the images which contained
-         the specified frame, but exclude any which did not.
+         The name of an output file in which to write the names of all
+         the NDFs which were successfully accessed.  In particular, if
+         MODE is CURRENT, this list will include all the NDFs which 
+         contained the specified frame, but exclude any which did not.
+         [WCSEDIT.LIS]
       }
       \sstsubsection{
          SET = LITERAL (Read)
@@ -15051,9 +15070,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          wcsedit $*$ current ccd\_reg
       }{
          This sets the Current coordinate system of all the images in
-         the current directory to {\tt '}CCD\_REG{\tt '}.  The MODIFY parameter is
-         set on output to contain the names of all those images which
-         had such a frame.
+         the current directory to {\tt '}CCD\_REG{\tt '}.  The names of all the
+         images which had this coordinate system are written to the 
+         file WCSEDIT.LIS.  Any which do not appear in this file were
+         not modified by the program.
       }
       \sstexamplesubsection{
          wcsedit data$*$ remove frame=4
@@ -16232,6 +16252,9 @@ This is a major update to CCDPACK.
   \item
      There have been some improvements and bug fixes to the percentile
      location routine used by \xroutine{FINDOBJ}.
+  \item
+     The MODIFIED parameter of \xroutine{WCSEDIT} has been withdrawn and replaced
+     by the NAMELIST parameter.
   \end{itemize}
 
 

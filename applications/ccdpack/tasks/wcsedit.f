@@ -30,8 +30,8 @@
 *        -  Show the coordinate system which currently exist
 *
 *     The routine does not fail if some of the requested edits cannot
-*     be performed, but an output parameter MODIFIED records which 
-*     NDFs were successfully modified.
+*     be performed, but a file whose name is given by the NAMELIST 
+*     parameter records which NDFs were successfully accessed.
 
 *  Usage:
 *     WCSEDIT in mode frame
@@ -161,11 +161,12 @@
 *                          changed)
 *           -  SHOW     -- Display a list of the frames which exist
 *        [CURRENT]
-*     MODIFIED = LITERAL (Write)
-*        On exit, this parameter gives a comma-separated list of all the
-*        NDFs which were successfully modified.  In particular, if MODE
-*        is CURRENT, this list will include all the NDFs which contained
-*        the specified frame, but exclude any which did not.
+*     NAMELIST = LITERAL (Read)
+*        The name of an output file in which to write the names of all
+*        the NDFs which were successfully accessed.  In particular, if
+*        MODE is CURRENT, this list will include all the NDFs which 
+*        contained the specified frame, but exclude any which did not.
+*        [WCSEDIT.LIS]
 *     SET = LITERAL (Read)
 *        If MODE is SET, then this gives a string of the form 
 *        "attribute=value" which is to be applied to the frame.  The 
@@ -186,9 +187,10 @@
 *  Examples:
 *     wcsedit * current ccd_reg
 *        This sets the Current coordinate system of all the NDFs in
-*        the current directory to 'CCD_REG'.  The MODIFY parameter is
-*        set on output to contain the names of all those NDFs which
-*        had such a frame.
+*        the current directory to 'CCD_REG'.  The names of all the
+*        NDFs which had this coordinate system are written to the 
+*        file WCSEDIT.LIS.  Any which do not appear in this file were
+*        not modified by the program.
 *
 *     wcsedit data* remove frame=4
 *        The fourth coordinate frame in the WCS component of each NDF
@@ -239,6 +241,11 @@
 *        Added MathMaps.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     7-DEC-2000 (MBT):
+*        Removed the MODIFIED parameter, which was not too useful since
+*        only 132 characters could be stored.  Replaced it by the more
+*        CCDPACK-like and more robust NAMELIST parameter, which can 
+*        provide the same functionality.
 *     {enter_changes_here}
 
 *-
@@ -260,8 +267,6 @@
       EXTERNAL CHR_LEN           ! Used length of string
 
 *  Local Constants:
-      INTEGER MXMDLN             ! Maximum length of MODIFIED string
-      PARAMETER( MXMDLN = 2048 ) ! Should be long enough
       INTEGER MAXEXP             ! Maximum number of expressions for MathMap
       PARAMETER( MAXEXP = 12 )
       INTEGER MAXELN             ! Maximum length of expressions for MathMap
@@ -277,11 +282,11 @@
       CHARACTER * ( AST__SZCHR ) DOMAIN ! Domain of new frame
       CHARACTER * ( AST__SZCHR ) FRAME ! Target frame as specified
       CHARACTER * ( AST__SZCHR ) SET ! String pass to AST_SET
-      CHARACTER * ( MXMDLN ) MODIF ! List of modified NDFs
       CHARACTER * ( MAXELN ) FOREXP( MAXEXP ) ! Forward expressions for MathMap
       CHARACTER * ( MAXELN ) INVEXP( MAXEXP ) ! Inverse expressions for MathMap
       DOUBLE PRECISION COEFFS( 6 ) ! Coefficients of mapping
       INTEGER BL                 ! Buffer length
+      INTEGER FD                 ! File descriptor for namelist file
       INTEGER FRTARG             ! AST pointer to target frame
       INTEGER FRM                ! AST pointer to frame
       INTEGER FRNEW              ! AST pointer to new frame
@@ -299,8 +304,9 @@
       INTEGER NIEXP              ! Number of expressions for inverse transforms
       INTEGER NFRAME             ! Number of frames in unedited WCS component
       INTEGER NNDF               ! Number of NDFs
-      LOGICAL INVERT             ! Is mapping to be applied backwards
       LOGICAL FIBOTH             ! Do we have both forward and inverse mappings?
+      LOGICAL INVERT             ! Is mapping to be applied backwards
+      LOGICAL OPEN               ! Is namelist file open?
       LOGICAL SIMPFI             ! SimpFI attribute of MathMap
       LOGICAL SIMPIF             ! SimpIF attribute of MathMap
       LOGICAL SUCCES             ! Whether WCS has been successfully modified
@@ -337,6 +343,10 @@
          END IF
       END IF
 
+*  Open file for writing names of successfully accessed files.
+      CALL CCD1_ASFIO( 'NAMELIST', 'WRITE', 'LIST', 0, FD, OPEN, 
+     :                 STATUS )
+
 *  Print out any requisite header information.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       IF ( MODE .EQ. 'SHOW' ) THEN
@@ -357,7 +367,6 @@
       END IF
 
 *  Get ready to loop over NDFs.
-      MODIF = ' '
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Loop over NDFs.
@@ -577,38 +586,28 @@
 
             END IF
 
-            IF ( SUCCES .AND. .NOT. MODE .EQ. 'SHOW' ) THEN
-
-*  Write out the modified WCS component.
+*  Write out the modified WCS component or complain if required.
+            IF ( SUCCES .AND. MODE .NE. 'SHOW' ) THEN
                CALL NDF_PTWCS( IWCS, INDF, STATUS )
-
-*  Append the name of the successfully modified NDF to the output list.
-               IF ( CHR_LEN( MODIF ) .LT. LEN( MODIF ) - 2 ) THEN
-                  IF ( CHR_LEN( MODIF ) .GT. 0 ) 
-     :               MODIF( CHR_LEN( MODIF ) + 1: ) = ','
-                  MODIF( CHR_LEN( MODIF ) + 1: ) = NAME
-               END IF
             END IF
          END IF
 
-*  Log failure if necessary.
-         IF ( .NOT. SUCCES ) 
-     :      CALL CCD1_MSG( ' ', '      NDF not modified', STATUS )
-
+*  Write the name of the accessed NDF to the name list, if successful,
+*  or log to the user if not.
+         IF ( SUCCES ) THEN
+            CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )
+         ELSE
+            IF ( MODE .EQ. 'SHOW' ) THEN
+               CALL CCD1_MSG( ' ', '      NDF not modified', STATUS )
+            ELSE
+               CALL CCD1_MSG( ' ', 
+     :         '      NDF not successfully accessed', STATUS )
+            END IF
+         END IF
  1    CONTINUE
 
-*  Write modification list to output parameter (unless it is full, and
-*  so presumably incomplete).
-      IF ( CHR_LEN( MODIF ) .GE. LEN( MODIF ) ) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ', 
-     :   'Warning: Too many NDFs modified -', STATUS )
-         CALL CCD1_MSG( ' ',  
-     :   '         output parameter MODIFIED not written.', STATUS )
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         MODIF = ' '
-      END IF
-      CALL PAR_PUT0C( 'MODIFIED', MODIF, STATUS )
+*  Close name list file.
+      CALL FIO_CLOSE( FD, STATUS )
 
 *  Exit with error label.  Tidy up after this.
  99   CONTINUE

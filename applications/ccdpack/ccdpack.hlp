@@ -178,6 +178,9 @@
    - There have been some improvements and bug fixes to the percentile
      location routine used by FINDOBJ.
 
+   - The MODIFIED parameter of WCSEDIT has been withdrawn and replaced
+     by the NAMELIST parameter.
+
 1 ASTEXP
 Exports coordinate system information from images to an AST file
 
@@ -9239,8 +9242,8 @@ Description:
       -  Show the coordinate system which currently exist
 
    The routine does not fail if some of the requested edits cannot
-   be performed, but an output parameter MODIFIED records which
-   images were successfully modified.
+   be performed, but a file whose name is given by the NAMELIST
+   parameter records which images were successfully accessed.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COEFFS
@@ -9401,12 +9404,13 @@ MODE = LITERAL (Read)
 
       -  SHOW     -- Display a list of the frames which exist
    [CURRENT]
-3 MODIFIED
-MODIFIED = LITERAL (Write)
-   On exit, this parameter gives a comma-separated list of all the
-   images which were successfully modified.  In particular, if MODE
-   is CURRENT, this list will include all the images which contained
-   the specified frame, but exclude any which did not.
+3 NAMELIST
+NAMELIST = LITERAL (Read)
+   The name of an output file in which to write the names of all
+   the NDFs which were successfully accessed.  In particular, if
+   MODE is CURRENT, this list will include all the NDFs which 
+   contained the specified frame, but exclude any which did not.
+   [WCSEDIT.LIS]
 3 SET
 SET = LITERAL (Read)
    If MODE is SET, then this gives a string of the form
@@ -9429,9 +9433,10 @@ SIMPIF = _LOGICAL (Read)
 2 Examples
 wcsedit * current ccd_reg
    This sets the Current coordinate system of all the images in
-   the current directory to 'CCD_REG'.  The MODIFY parameter is
-   set on output to contain the names of all those images which
-   had such a frame.
+   the current directory to 'CCD_REG'.  The names of all the
+   NDFs which had this coordinate system are written to the 
+   file WCSEDIT.LIS.  Any which do not appear in this file were
+   not modified by the program.
 
 wcsedit data* remove frame=4
    The fourth coordinate frame in the WCS component of each image

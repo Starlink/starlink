@@ -18,6 +18,8 @@
 #        Original version.
 #     13-NOV-1999 (MBT):
 #        Added parameters for MathMaps.
+#     7-DEC-2000 (MBT):
+#        Removed MODIFIED parameter and inserted NAMELIST instead.
 #     {enter_further_changes_here}
 
 #-
@@ -30,7 +32,7 @@
             access READ
             vpath PROMPT
             ppath CURRENT
-            prompt {NDFs with WCS components to be modified}
+            prompt {NDFs with WCS components to be accessed}
             helpkey *
           }
 
@@ -114,12 +116,13 @@
              helpkey *
           }
 
-          parameter modified {
+          parameter namelist {
              type LITERAL
-             access WRITE
-             vpath DEFAULT
-             default { }
-             outputpar
+             access READ
+             vpath CURRENT DEFAULT
+             ppath CURRENT DEFAULT
+             default WCSEDIT.LIS
+             prompt {Output file name for list of successfully accessed images}
              helpkey *
           }
 
