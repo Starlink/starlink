@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ITTInfo.C,v 1.5 1997/11/19 21:48:44 abrighto Exp $"
+ * "@(#) $Id: ITTInfo.C,v 1.8 1999/03/22 21:41:42 abrighto Exp $"
  *
  * ITTInfo.C - member routines for class ITTInfo
  * 
@@ -12,7 +12,7 @@
  * Peter W. Draper 14/07/98  Modified interpolate to use last value 
  *                           (makes last colour pure).
  */
-static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.5 1997/11/19 21:48:44 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.8 1999/03/22 21:41:42 abrighto Exp $";
 
 
 #include <string.h>
@@ -178,3 +178,4 @@ void ITTInfo::scale(int amount, XColor* src, XColor* dest, int colorCount)
 	dest[i].blue = src[value].blue;
     }
 }
+

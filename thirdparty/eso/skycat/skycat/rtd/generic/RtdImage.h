@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: RtdImage.h,v 1.26 1998/12/24 00:37:46 abrighto Exp $"
+ * "@(#) $Id: RtdImage.h,v 1.28 1999/03/22 21:41:26 abrighto Exp $"
  *
  * RtdImage.h - class definitions for class RtdImage, a real-time image 
  * display extension for Tk.
@@ -184,7 +184,7 @@ protected:
     // Tk canvas window info
     Tk_Canvas canvas_;          // handle for image's canvas window
     const char* canvasName_;	// name of canvas window
-    short canvasX_, canvasY_; 	// X,Y offset of image in canvas (for scrolling)
+    int canvasX_, canvasY_; 	// X,Y offset of image in canvas (for scrolling)
     int prevX_, prevY_;         // saved X,Y origin from last display update
 
     // X shared memory

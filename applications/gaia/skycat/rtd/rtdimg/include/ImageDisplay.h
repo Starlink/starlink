@@ -3,7 +3,7 @@
 #define _ImageDisplay_H_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageDisplay.h,v 1.4 1998/09/23 19:14:10 abrighto Exp $" 
+ * "@(#) $Id: ImageDisplay.h,v 1.6 1999/03/22 21:41:25 abrighto Exp $" 
  *
  * ImageDisplay.h - class managing XImage to Pixmap display including
  *                  optional X shared memory extension usage
@@ -64,13 +64,18 @@ public:
     void put(Drawable, int src_x, int src_y, int dest_x, int dest_y, int width, int height);
 
     // return a pointer to the XImage data
-    unsigned char* data() {return xImage_ ? (unsigned char*)xImage_->data : (unsigned char*)NULL;}
+    unsigned char* data() {
+	return xImage_ ? (unsigned char*)xImage_->data : (unsigned char*)NULL;
+    }
 
     // clear out the image by setting all pixels to the given value
-    void clear(unsigned char val);
+    void clear(unsigned long val);
 
-    // set the value of a data pixel (wrapper to XPutPixel).
-    int putpixel( int x, int y, unsigned long value );
+    // Assign a value to a pixel (This is the "safe" method for non-byte XImages)
+    void putpixel(int x, int y, unsigned long value) {
+	// assert(xImage_ != NULL);
+	XPutPixel(xImage_, x, y, value);
+    }
 
     // other info
     int width() {return xImage_ ? xImage_->width : 0;}

@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: rtd.sh.in,v 1.13 1998/07/28 21:23:27 abrighto Exp $" 
+# "@(#) $Id: rtd.sh.in,v 1.14 1999/03/19 20:09:27 abrighto Exp $" 
 #
 # This script is used to start Tcl/Tk applications.
 #

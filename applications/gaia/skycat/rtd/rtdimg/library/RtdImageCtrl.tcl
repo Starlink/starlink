@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageCtrl.tcl,v 1.41 1998/11/16 21:24:32 abrighto Exp $"
+# "@(#) $Id: RtdImageCtrl.tcl,v 1.42 1999/03/19 20:09:39 abrighto Exp $"
 #
 # RtdImageCtrl.tcl - Widget combining an RtdImage with a control panel
 #                    zoom and panning windows.

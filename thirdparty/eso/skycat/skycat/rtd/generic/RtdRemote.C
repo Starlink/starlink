@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * "@(#) $Id: RtdRemote.C,v 1.12 1998/10/28 17:43:32 abrighto Exp $"
+ * "@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49 abrighto Exp $"
  *
  * RtdRemote.C - member routines for class RtdRemote, manages remote access 
  *               to RtdImage (server side, see ../../rtdrmt/... for client access)
@@ -10,8 +10,13 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  04/03/96  Created
+ * Peter W. Draper 13/03/98  Now stores Tcl_File handle. This is to
+ *                           work around a bug in OSF/1 Tcl which
+ *                           loses this values occasionally. 
+ * Allan Brighton  18/03/99  Added #ifdef in RtdRemote.h, since Tcl_File
+ *                           is no longer supported in tcl8...
  */
-static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.12 1998/10/28 17:43:32 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49 abrighto Exp $";
 
 
 
@@ -238,7 +243,7 @@ RtdRemote::~RtdRemote()
  */
 int RtdRemote::makeStatusFile(sockaddr_in& addr)
 {
-    int addrSize = sizeof(sockaddr_in);
+    unsigned int addrSize = sizeof(sockaddr_in);
     if (getsockname(socket_, (struct sockaddr *)&addr, &addrSize) == -1) 
 	return sys_error("getsockname");
     
@@ -266,6 +271,7 @@ int RtdRemote::enterClient(int sock)
     for (int i = 0; i < MAX_CLIENTS; i++) {
 	if (clients_[i].socket == 0) {
 	    clients_[i].socket = sock;
+            clients_[i].handle = RTD_TCL_GETFILE_(sock);
 	    clients_[i].thisPtr = this;
 	    return i;
 	}
@@ -282,8 +288,13 @@ void RtdRemote::removeClient(int sock)
     for (int i = 0; i < MAX_CLIENTS; i++) {
 	if (clients_[i].socket == sock) {
 	    Tcl_DeleteFileHandler(RTD_TCL_GETFILE_(sock));
+
+#if (TCL_MAJOR_VERSION < 8)
+            Tcl_FreeFile( clients_[i].handle );
+#endif
 	    close(sock);
 	    clients_[i].socket = 0;
+	    clients_[i].handle = 0;
 	    clients_[i].thisPtr = NULL;
 	    return;
 	}
@@ -313,7 +324,7 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-	int addrSize = sizeof(addr);
+	unsigned int addrSize = sizeof(addr);
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");

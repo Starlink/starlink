@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageColor.C,v 1.8 1998/09/23 19:14:52 abrighto Exp $"
+ * "@(#) $Id: ImageColor.C,v 1.10 1999/03/22 21:41:42 abrighto Exp $"
  *
  * ImageColor.C - member routines for class ImageColor
  * 
@@ -12,7 +12,7 @@
  * Peter W. Draper 05/03/98  Added full support for X visuals in addition
  *                           to pseudocolor (merged my changes from GAIA).
  */
-static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.8 1998/09/23 19:14:52 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.10 1999/03/22 21:41:42 abrighto Exp $";
 
 
 #include <string.h>
@@ -55,7 +55,7 @@ ImageColor::ImageColor(Display* display, Visual* visual,
     readOnly_ = 1;
 
     //  Assume all colours are available, and use them.
-    cmapSize_ = min(MAX_COLOR,int(pow( 2.0, depth_))- 1);
+    cmapSize_ = min(MAX_COLOR,int(pow( 2.0, depth_)));
   }
 
   //  If default visual isn't the same then create a local colormap.
@@ -92,7 +92,7 @@ int ImageColor::numFreeColors()
     } else {
 
       //  Readonly so all colors are free.
-      return min(MAX_COLOR,int(pow( 2.0, depth_))- 1);
+      return min(MAX_COLOR,int(pow( 2.0, depth_)));
     }
     return 0;
 }
@@ -349,7 +349,7 @@ int ImageColor::rotateColorMap(int amount)
 	memcpy(ittCells_, colorCells_, sizeof(ittCells_));
 
     storeColors(colorCells_);
-    
+
     return 0;
 }
 

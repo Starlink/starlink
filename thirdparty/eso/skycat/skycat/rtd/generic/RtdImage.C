@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdImage.C,v 1.66 1999/02/02 21:50:33 abrighto Exp $"
+ * "@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $"
  *
  * RtdImage.C - member routines for class RtdImage,
  *               implementation of the TCL rtdimage command
@@ -51,7 +51,7 @@
  *
  * Peter W. Draper 13/01/99  Changed to use non 8 bit visuals.
  */
-static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.66 1999/02/02 21:50:33 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $";
 
 #include <string.h>
 #include <ctype.h>
@@ -129,6 +129,13 @@ static RtdImage* motionView_ = NULL;
 
 // Rtd Record 
 extern "C" int RtdrecordInit(Tcl_Interp *);
+
+// this routine is defined in tclutil/tclutil/src/TkCanvasPsImage.C
+// to work around the tk canvas clipping coordinates to short range.
+extern "C" void Tk_CanvasWindowCoordsNoClip(
+    Tk_Canvas canvas, 
+    double x, double y,
+    int *screenXPtr, int *screenYPtr);
 
 /* 
  * declare a table of image subcommands and the methods that handle them.
@@ -422,20 +429,6 @@ int Rtd_Init(Tcl_Interp* interp)
     // initialize color management (once only per application)
     if (RtdImage::initColors(interp) != TCL_OK)
 	return TCL_ERROR;
-
-    // PWD: Remove this as now supports other visuals.
-    // need 8 bit color for now, but can only force it through wish option -visual
-    //
-    //    if (Tk_Depth(Tk_MainWindow(interp)) != 8) {
-    //	int depth;
-    //	Colormap colormap;
-    //	if (Tk_GetVisual(interp, Tk_MainWindow(interp), "pseudocolor 8", &depth, &colormap)) 
-    //	    return fmt_error("Unsupported X visual depth: %d: %s", 
-    //			     Tk_Depth(Tk_MainWindow(interp)),
-    //			     "please use the \"-visual pseudocolor\" command line option.");
-    //	else
-    //	    return fmt_error("Unsupported X visual depth: %d", Tk_Depth(Tk_MainWindow(interp)));
-    //    }
 
     // set up Rtd Tcl package
     if (Tcl_PkgProvide (interp, "Rtd", RTD_VERSION) != TCL_OK) {
@@ -824,20 +817,11 @@ int RtdImage::initColors(Tcl_Interp* interp)
 
     //  PWD: use "." here as "default" returns screen visual, not the
     //  "-visual" command-line option. Making this function static has 
-    //  somw drawbacks (the tkwin was previously the parent of the image?).
+    //  some drawbacks (the tkwin was previously the parent of the image?).
     Visual* visual = Tk_GetVisual(interp, tkwin, ".", &depth, &colormap);
     if (! visual)
       return TCL_ERROR;
     
-    //  PWD: remove to support non-8 bit displays
-    //     // if its 8-bit color, make sure it is pseudocolor. 
-    //     // XXX Is this too much of a restriction?
-    //     if (depth <= 8) {
-    // 	visual = Tk_GetVisual(interp, tkwin, "pseudocolor 8", &depth, &colormap);
-    // 	if (! visual)
-    // 	    return TCL_ERROR;
-    //     }
-
     Tk_MakeWindowExist(tkwin);
     colors_ = new ImageColor(Tk_Display(tkwin), visual, depth, max_colors);
     if (colors_->status() != 0) {
@@ -1760,7 +1744,7 @@ void RtdImage::displayImage(Drawable d, int imageX, int imageY,
     // and/or at large magnification. We could access the internal tkCanvas
     // object to get the unclipped int coords, but that would require including
     // private Tk header files that are not normally installed.
-    Tk_CanvasWindowCoords(canvas_, 0, 0, &canvasX_, &canvasY_);
+    Tk_CanvasWindowCoordsNoClip(canvas_, 0., 0., &canvasX_, &canvasY_);
     
     if (displaymode() == 0) { 
 	// do entire image, as needed
@@ -3234,6 +3218,7 @@ int RtdImage::cameraCmd(int argc, char* argv[])
  *      <path> cmap list
  *      <path> cmap private
  *      <path> cmap isprivate
+ *      <path> cmap isreadonly
  *
  * where the file, if specified, should contain 256 lines of R, G, B
  * values. Each line should contain 3 floating point values between 0.0
@@ -3257,6 +3242,8 @@ int RtdImage::cameraCmd(int argc, char* argv[])
  *
  * "private" says to start using a private colormap.
  * "isprivate" returns true if the colormap is private.
+ *
+ * "isreadonly" returns true if the colormap is readonly.
  */
 int RtdImage::cmapCmd(int argc, char* argv[])
 {
@@ -3309,8 +3296,6 @@ int RtdImage::cmapCmd(int argc, char* argv[])
         } else {
             return ret;
         }
-
-
     }
     if (strcmp(argv[0], "pixels") == 0) {
 	int n = colors_->colorCount();
@@ -3335,6 +3320,9 @@ int RtdImage::cmapCmd(int argc, char* argv[])
      }
      if (strcmp(argv[0], "isprivate") == 0) {
 	 return set_result(colors_->usingPrivateCmap());
+     }
+     if (strcmp(argv[0], "isreadonly") == 0) {
+	 return set_result(colors_->readOnly());
      }
   
     return error("unknown rtdimage cmap subcommand");
@@ -4159,9 +4147,12 @@ int RtdImage::scaleCmd(int argc, char* argv[])
     if ((xScale < 0 && yScale > 0) || (xScale > 0 && yScale < 0)) 
 	return error("invalid arguments, expected 2 positive or 2 negative integer values");
 
+#if 0
     // add a check for the Tk limit on canvas coords
-    if (xScale > 0 && xScale * image_->width() > 32767 || yScale > 0 && yScale * image_->height() > 32767) 
+    if (xScale > 0 && xScale * image_->width() > 32767 
+	|| yScale > 0 && yScale * image_->height() > 32767) 
 	return error("sorry, can't scale image to this size without exceeding maximum Tk canvas coordinate range");
+#endif
 
     return setScale(xScale, yScale);
 }

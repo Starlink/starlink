@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageDisplay.C,v 1.7 1998/09/23 19:14:53 abrighto Exp $"
+ * "@(#) $Id: ImageDisplay.C,v 1.9 1999/03/22 21:41:42 abrighto Exp $"
  *
  * ImageDisplay.C - member routines for class ImageDisplay,
  *                  for managing XImage to Pixmap display including
@@ -14,8 +14,7 @@
  * Peter W. Draper 04/03/98  Added putpixel member. Fixed allocation
  *                           of data to bytes_per_line*width when not
  *                           using shared memory. 
-  */
-static const char* const rcsId="@(#) $Id: ImageDisplay.C,v 1.7 1998/09/23 19:14:53 abrighto Exp $";
+ */
 
 
 
@@ -81,7 +80,7 @@ ImageDisplay::~ImageDisplay()
 
 
 /* 
- * destroy the XImaage and free any allocated shared memory
+ * destroy the XImage and free any allocated shared memory
  * if necessary
  */
 void ImageDisplay::destroyXImage() 
@@ -262,18 +261,21 @@ int ImageDisplay::update(int width, int height)
 /*
  * clear out the image by setting all pixels to the given value
  */
-void ImageDisplay::clear(unsigned char val)
+void ImageDisplay::clear(unsigned long val)
 {
-     if (xImage_) 
-	 memset(xImage_->data, val, xImage_->bytes_per_line * xImage_->height);
-}
-
-/*
- * Assign a value to a pixel, this is the "safe" method for non-byte 
- * XImages.
- */
-int ImageDisplay::putpixel(int x, int y, unsigned long value)
-{
-  if (xImage_)
-    return XPutPixel(xImage_, x, y, value );
+    if (!xImage_)
+	return;
+    
+    // byte data
+    if (depth_ == 8) {
+	memset(xImage_->data, val, xImage_->bytes_per_line * xImage_->height);
+    }
+    else {
+	//  XImage has depth greater than a byte
+	for (int i=0; i<xImage_->width; i++) {
+	    for (int j=0; j<xImage_->height; j++) {
+		XPutPixel(xImage_, i, j, val);
+	    }
+	}
+    }
 }

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdRemote.h,v 1.4 1997/04/11 10:48:15 abrighto Exp $" 
+ * "@(#) $Id: RtdRemote.h,v 1.5 1999/03/19 20:09:32 abrighto Exp $" 
  *
  * RtdRemote.h - class definitions for managing remote access to the RTD
  * 
@@ -34,6 +34,11 @@ protected:
     struct Client {
 	int socket;		// client socket for sending results
 	int callback_socket;	// socket used for callback operations
+#if (TCL_MAJOR_VERSION >= 8)
+        int handle;             // file descriptor for events
+#else
+        Tcl_File handle;        // Tcl file handle for events
+#endif
 	RtdRemote* thisPtr;	// hook to get back to class from callback
     };
     Client clients_[MAX_CLIENTS]; // array of client connection sockets
