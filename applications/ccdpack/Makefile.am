@@ -17,10 +17,11 @@ libgrf_ccdpack_la_SOURCES = grf_ccdpack.c grf.h
 
 ccdwish_SOURCES = ccdwish.c
 
-STARTCL_OBJ = -L$(libdir)/startcl -ltclAdam -ltkGwm
+STARTCL_OBJ = $(libdir)/tkGwm.o $(libdir)/tkGwmCanv.o \
+              $(libdir)/tkGwmPrint.o $(libdir)/tclAdam.o
 
-ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) \
-                `$(srcdir)/pgp_ccdpack_link` `err_link` $(STARTCL_OBJ) -ljpeg @TCL_LIBS@ -ltk @FCLIBS@
+ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) $(STARTCL_OBJ) \
+                `$(srcdir)/pgp_ccdpack_link` -ljpeg @FCLIBS@
 
 bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
                 ccdhelp

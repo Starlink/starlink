@@ -12,14 +12,17 @@ STAR_CHECK_PROGS(ifd2star)
 STAR_FC_LIBRARY_LDFLAGS
 
 STAR_MESSGEN(user_err.msg)
-STAR_PATH_TCLTK( 8.2 )
 
-TCL_VERSION=
+TCL_VERSION=8.2
 ITCL_VERSION=3.1
 IWIDGETS_VERSION=3.0.0
 
+AC_SUBST(TCL_VERSION)
 AC_SUBST(ITCL_VERSION)
 AC_SUBST(IWIDGETS_VERSION)
+
+AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
+AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init)
 
 # Check availability of [incr Tcl].  This is declared as a build dependency,
 # but we'll get along without it if it's not there because it couldn't
