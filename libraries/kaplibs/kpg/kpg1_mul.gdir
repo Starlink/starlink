@@ -72,7 +72,8 @@
 *     1996 May 20 (MJC):
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
 *     2004 Oct 1 (TIMJ):
-*        Recreate Generic version from constituent parts
+*        Recreate Generic version from constituent parts.
+*        NUM_ERROR can no longer be accessed directly
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -88,7 +89,6 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
  
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR status flag
  
 *  Arguments Given:
       LOGICAL BAD
@@ -110,6 +110,9 @@
 *  External References:
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Numeric operation successfull
+      
  
 *  Local Variables:
       INTEGER I                  ! Loop counter for array elements
@@ -137,7 +140,7 @@
 *  error status and error count.
       ELSE
          CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          NERR = 0
  
 *  No bad values present:
@@ -148,19 +151,19 @@
 *  calculation.
             DO 1 I = 1, EL
                C( I ) = A( I ) * B( I )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   C( I ) = VAL__BAD<T>
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
  
 *  Derive the variance values, again checking for overflow.
                VC( I ) = VA( I ) * B( I ) * B( I ) +
      :                   VB( I ) * A( I ) * A( I )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   VC( I ) = VAL__BAD<T>
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 1           CONTINUE
  
@@ -179,10 +182,10 @@
 *  Multiply the data values, checking for numerical overflow.
                ELSE
                   C( I ) = A( I ) * B( I )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      C( I ) = VAL__BAD<T>
                      NERR = NERR + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
  
 *  See if either input variance value is bad. If so, then set a bad
@@ -195,10 +198,10 @@
                   ELSE
                      VC( I ) = VA( I ) * B( I ) * B( I ) +
      :                         VB( I ) * A( I ) * A( I )
-                     IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                     IF ( .NOT. NUM_WASOK() ) THEN
                         VC( I ) = VAL__BAD<T>
                         NERR = NERR + 1
-                        NUM_ERROR = SAI__OK
+                        CALL NUM_CLEARERR()
                      END IF
                   END IF
                END IF

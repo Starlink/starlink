@@ -22,7 +22,7 @@ F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
 	$(KPG_DIR_GEN:.gdir=.f)
 
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
-kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn
+kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn
 
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
 kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr
@@ -42,8 +42,7 @@ kpg1_axlid.f kpg1_axlii.f kpg1_axlir.f kpg1_axliw.f kpg1_axliuw.f \
 kpg1_axlvd.f kpg1_axlvr.f kpg1_axrng.f kpg1_axtyp.f kpg1_axvld.f \
 kpg1_axvlr.f kpg1_blocd.f kpg1_blocr.f kpg1_bmedd.f kpg1_bmedr.f \
 kpg1_bor2b.f kpg1_bor2d.f kpg1_bor2i.f kpg1_bor2r.f kpg1_bor2ub.f \
-kpg1_bor2uw.f kpg1_bor2w.f kpg1_caddb.f kpg1_caddd.f kpg1_caddi.f \
-kpg1_caddr.f kpg1_caddub.f kpg1_cadduw.f kpg1_caddw.f kpg1_ccpro.f \
+kpg1_bor2uw.f kpg1_bor2w.f kpg1_ccpro.f \
 kpg1_che2d.f kpg1_che2r.f kpg1_cheld.f kpg1_cheli.f kpg1_chelr.f \
 kpg1_chepd.f kpg1_chepr.f kpg1_chevd.f kpg1_chevr.f kpg1_chaxd.f \
 kpg1_chaxr.f kpg1_chvab.f kpg1_chvad.f kpg1_chvai.f kpg1_chvar.f \
