@@ -4,7 +4,7 @@
 
 use strict;
 use Test;
-BEGIN { plan tests => 2 }
+BEGIN { plan tests => 5 }
 use Starlink::HDSPACK qw/ delobj /;
 
 $Starlink::HDSPACK::DEBUG = 1;
@@ -26,8 +26,14 @@ ok($exstat, 0);
 $status = delobj("${out}.more.fits", $status);
 ok($status, $good);
 
-unlink "${out}.sdf"
-  or die "Error removing temporary file";
+$status = delobj("${out}.more", $status);
+ok($status, $good);
+
+$status = delobj("${out}", $status);
+ok($status, $good);
+
+# File should now be gone
+ok( !-e $out.".sdf");
 
 exit;
 
