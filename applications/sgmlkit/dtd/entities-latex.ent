@@ -2,7 +2,9 @@
   Additional SDATA entities, for LaTeX use.
 
   The SDATA entities emerge wrongly from DSSSL (data) functions.
-  Don't know why.
+  Don't know why.  We can't work around this by changing these to
+  CDATA entities, because then the replacement text is carefully
+  escaped by the back-end.
 
   $Id$
 -->
