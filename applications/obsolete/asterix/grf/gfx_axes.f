@@ -30,6 +30,7 @@
           XOPTB='BCTS'
           XOPTN='N'
         ELSE
+          CALL CHR_UCASE(XOPTB)
 *  move codes to do with numbers into separate string
           XOPTN=' '
           I=INDEX(XOPTB,'N')
@@ -59,6 +60,7 @@
           YOPTB='BCTS'
           YOPTN='N'
         ELSE
+          CALL CHR_UCASE(YOPTB)
           YOPTN=' '
           I=INDEX(YOPTB,'N')
           IF (I.GT.0) THEN
