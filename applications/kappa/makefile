@@ -460,7 +460,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  it, but which are not required by users of it.
 
 PRIVATE_INCLUDES = c1_com me_com irm_com ira_par ira_com ira_err ctm_com \
-                   ctm_par fts_par hlpcmd sft_com ndg_com ndg_const ndg_err
+                   ctm_par fts_par hlpcmd sft_com ndg_const ndg_err
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -970,7 +970,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
                 FTS_PAR HLPCMD IRM_COM SFT_COM IRA_COM IRA_PAR \
-                IRA_ERR NDG_ERR NDG_CONST NDG_COM 
+                IRA_ERR NDG_ERR NDG_CONST 
 
 #
 #  Rules to set up links to locate each of the above include files.
@@ -997,7 +997,6 @@ IRA_PAR:     ira_par;                 $(LINK) $? $@
 IRM_COM:     irm_com;                 $(LINK) $? $@
 NDG_ERR:     ndg_err;                 $(LINK) $? $@
 NDG_CONST:   ndg_const;               $(LINK) $? $@
-NDG_COM:     ndg_com;                 $(LINK) $? $@
 MAG_ERR:     $(STAR_INC)/mag_err;     $(LINK) $? $@
 ME_COM:      me_com;                  $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
