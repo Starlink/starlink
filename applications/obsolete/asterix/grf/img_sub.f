@@ -1500,12 +1500,11 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  quality
         IF (I_QOK) THEN
-          CALL BDI_MAP( ID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
+          CALL BDI_MAPUB( ID, 'Quality', 'WRITE', QPTR, STATUS )
           CALL ARR_SLCOPB( 2, DIMS, %VAL(I_QPTR), LBND, UBND,
      :                     %VAL(QPTR), STATUS )
           CALL BDI_UNMAP(ID,'Quality',QPTR,STATUS)
-          CALL BDI_PUT( ID, 'QualityMask', 'UBYTE', 0, 0, I_MASK,
-     :                  STATUS )
+          CALL BDI_PUT0UB( ID, 'QualityMask', I_MASK, STATUS )
         ENDIF
 
 *  axis values
@@ -1594,9 +1593,8 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         CALL BDI_PUT1R( ID, 'Variance', NVAL, %VAL(I_VPTR_1D), STATUS)
 
 *  quality
-        CALL BDI_PUT( ID, 'Quality', 'UBYTE', 1, NVAL,
-     :                         %VAL(I_QPTR_1D), STATUS)
-        CALL BDI_PUT( ID, 'QualityMask', 'UBYTE', 0, 0, I_MASK, STATUS )
+        CALL BDI_PUT1UB( ID, 'Quality', NVAL, %VAL(I_QPTR_1D), STATUS)
+        CALL BDI_PUT0UB( ID, 'QualityMask', I_MASK, STATUS )
 
 *  axis values
         SPARR(1) = I_XBASE_1D
@@ -1963,11 +1961,10 @@ C        ENDIF
 
         CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
         IF (I_QOK) THEN
-          CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
+          CALL BDI_MAPUB(IFID,'Quality','READ',QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
           CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
-          CALL BDI_GET(IFID,'QualityMask','UBYTE',0,0,I_MASK,IDUM,
-     :                  STATUS)
+          CALL BDI_GET0UB(IFID,'QualityMask',I_MASK,STATUS)
           CALL IMG_BAD(%VAL(I_QPTR),STATUS)
           CALL BDI_UNMAP(IFID,'Quality',QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
@@ -2058,11 +2055,10 @@ c      LOGICAL VOK,QOK
 
         CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
         IF (I_QOK) THEN
-          CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
+          CALL BDI_MAPUB(IFID,'Quality','READ',QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
-          CALL BDI_GET(IFID,'QualityMask','UBYTE',0,0,I_MASK,IDUM,
-     :          STATUS)
+          CALL BDI_GET0UB(IFID,'QualityMask',I_MASK,STATUS)
         ENDIF
 
         CALL IMG_BINCUBE(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),STATUS)
@@ -2229,7 +2225,7 @@ c        ENDIF
 	print *,5
         call flush(6)
 
-        CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
+        CALL BDI_MAPUB(IFID,'Quality','READ',QPTR,STATUS)
         CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR_1D),STATUS)
         CALL BDI_UNMAP(IFID,'Quality',QPTR,STATUS)
 	print *,6

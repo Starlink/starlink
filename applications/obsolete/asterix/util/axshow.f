@@ -111,7 +111,7 @@
 
 *  Local Variables:
       CHARACTER*80              LABEL, UNITS      	! Axis attributes
-      CHARACTER*132		OBUF			! Output buffer
+      CHARACTER*79		OBUF			! Output buffer
       CHARACTER*30              RSTR              	! Axis range description
       CHARACTER*20              WSTR              	! Axis width description
 
@@ -155,7 +155,7 @@
         CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEVWID, STATUS )
 
 *    Heading
-        WRITE( OBUF, '(1X,A,T67,A)' ) 'Axis Label                '/
+        WRITE( OBUF, '(1X,A,T70,A)' ) 'Axis Label                '/
      :            /'   Size  Range', 'Widths'
         CALL AIO_WRITE( OCH, OBUF, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
@@ -190,7 +190,7 @@
           CALL MSG_MAKE( '^WID', WSTR, TLEN )
 
 *      Write to output
-          WRITE( OBUF, '(1X,I3,2X,A22,I6,2X,A,T67,A)',
+          WRITE( OBUF, '(1X,I3,2X,A22,I6,2X,A,T70,A)',
      :        IOSTAT=FSTAT ) I, LABEL, DIMS(I), RSTR, WSTR
           CALL AIO_WRITE( OCH, OBUF, STATUS )
 
