@@ -46,7 +46,6 @@ static const char RCSID[] =
 #include <cstdlib>
 #include <cstdarg>
 #include <cctype>
-//using std::exit;
 #else
 #include <stdio.h>		// for vsprintf
 #include <stdlib.h>
@@ -126,10 +125,8 @@ int bitmapW = -1;
 
 // Make resolution global -- 
 // several functions in here might reasonably want to see this.
-//int resolution = 72;		// in pixels-per-inch
-//int oneInch = 72;		// one inch, including magnification
 int resolution = PkFont::dpiBase();// in pixels-per-inch
-int oneInch = resolution;
+int oneInch = resolution;	// one inch, including magnification
 
 
 int main (int argc, char **argv)
@@ -381,32 +378,6 @@ int main (int argc, char **argv)
 		    Usage("Unrecognised argument to --font-gen");
 		}
 	    }
-	    
-// 		char *options = optarg;
-// 		char *value;
-// 		char *tokens[] = {
-// 		    (char*)"command",
-// 		    (char*)"none",
-// 		    NULL,
-// 		};
-// 		while (*options) {
-// 		    int suboptch = getsubopt(&options, tokens, &value);
-// 		    cerr << "G: suboptch=" << suboptch << " value=" << value << endl;
-// 		    switch (suboptch) {
-// 		      case 0:	// command
-// 			if (value == 0)	// simply enable it, with default cmd
-// 			    PkFont::setFontgen(true);
-// 			else
-// 			    PkFont::setFontgenCommand(value);
-// 			break;
-// 		      case 1:	// none
-// 			PkFont::setFontgen(false);
-// 			break;
-// 		      default:
-// 			Usage("bad keyword for --font-gen");
-// 			break;
-// 		    }
-//		}
 	    break;
 
 	  case 'g':		// --debug
@@ -456,17 +427,8 @@ int main (int argc, char **argv)
 	  case 'l':		// --end-page
 	  case 'p':		// --start-page
 	  case 'P':		// --page-range
-	    {
-		if (! PR.addSpec(optch, optarg))
-		    Usage("improper page spec");
-//		// DEBUG
-//		int tcounts[] = { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0,};
-//		for (int ti=0; ti<5; ti++)
-//		    cerr << "Page " << ti << ": "
-//			 << (PR.isSelected(ti, tcounts) ? "yes" : "no")
-//			 << endl;
-//		// ENDDEBUG			
-	    }
+	    if (! PR.addSpec(optch, optarg))
+		Usage("improper page spec");
 	    break;
 
 	  case 'M':		// --font-mode
@@ -480,7 +442,6 @@ int main (int argc, char **argv)
 	  case 'n':		// --nodvi
 	    // don't actually process the DVI file
 	    processing_.reset(process_dvi);
-	    //processing_.reset(process_postamble);
 	    PkFont::setFontgen(false);
 	    break;
 
@@ -759,7 +720,7 @@ int main (int argc, char **argv)
 		char *tokens[] = {
 		    (char*)"dvi",		// 0
 		    (char*)"nodvi",		// 1
-		    (char*)"XXXpreamble",		// 2
+		    (char*)"XXXpreamble",	// 2
 		    (char*)"XXXnopreamble",	// 3
 		    (char*)"postamble",		// 4
 		    (char*)"nopostamble",	// 5
@@ -911,8 +872,9 @@ int main (int argc, char **argv)
 			    // this in the output.
 			    string cmd = f->fontgenCommand();
 			    if (cmd.length() == 0)
-				throw DviError ("configuration problem: I can't create a font-generation command");
-			    //cout << (f->loaded() ? "QG " : "Qg ")
+				throw DviError
+				("configuration problem: "
+				 "I can't create a font-generation command");
 			    cout << (f->loaded()
 				     ? (fld ? "Qall-fontgen " : "Qg ")
 				     : (fld ? "Qmissing-fontgen " : "Qg "))
@@ -925,12 +887,11 @@ int main (int argc, char **argv)
 			    // If f->loaded() is true, then we're here
 			    // because FONT_INCFOUND was set, so indicate
 			    // this in the output.
-			    //cout << (f->loaded() ? "QF " : "Qf ");
 			    cout << (f->loaded()
 				     ? (fld ? "Qall-fonts " : "QF ")
 				     : (fld ? "Qmissing-fonts " : "Qf "));
 
-			    // write out font name, dpi, base-dpi, mag and MF mode
+			    // write out font name, dpi, base-dpi, mag, MF mode
 			    cout << f->name() << ' '
 				 << f->dpiBase() << ' '
 				 << f->dpiScaled() << ' '
@@ -950,7 +911,8 @@ int main (int argc, char **argv)
 	} else {
 	    // haven't read postamble
 	    if (show_font_info.any()) {
-		cerr << "Font information requested, but DVI postamble suppressed" << endl;
+		cerr << "Font information requested, "
+		     << "but DVI postamble suppressed" << endl;
 		no_font_present = true;
 	    } else {
 		all_fonts_present = true; // ...effectively
@@ -983,7 +945,6 @@ int main (int argc, char **argv)
     // Or put another way: exit zero if (a) we were processing the DVI
     // file normally and we found at least one font, or (b) we were
     // just checking the preamble and we found _all_ the fonts.
-//    if (no_font_present || (processing_==preamble_only && !all_fonts_present))
     if (no_font_present
 	|| (!processing_.test(process_dvi) && !all_fonts_present))
 	exit (1);
@@ -1126,7 +1087,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			{
 			    b.ofile_type 
 				= BitmapImage::firstBitmapImageFormat();
-			    /*
+			    /* Keep this warning?  If not, why not?
 			    cerr << "Warning: unspecified image format.  Selecting default ("
 				 << b.ofile_type << ")" << endl;
 			    */
@@ -1357,7 +1318,8 @@ bool process_special (DviFile *dvif, string specialString,
 			     << " instead." << endl;
 		    }
 		    if (!setDefault && verbosity > quiet)
-			cerr << "Warning: imageformat special should be prefixed with `default'" << endl;
+			cerr << "Warning: imageformat special "
+			     << "should be prefixed with `default'" << endl;
 		}
 	    }
 	    else if (*s == "foreground" || *s == "background")
@@ -1469,7 +1431,6 @@ string get_ofn_pattern (string dviname)
     // strip path and extension from filename
     size_t string_index = dviname.rfind(FSPATH_SEP);
     string dvirootname;
-    //if (string_index < 0)
     if (string_index == string::npos)
 	dvirootname = dviname;
     else
