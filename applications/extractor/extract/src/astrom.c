@@ -53,6 +53,12 @@ static obj2struct	*obj2 = &outobj2;
 #define D2R (PI/180.0)
 #endif
 
+static void fk5( picstruct *field, double inalp, double indec,
+                 double *outalp, double *outdec );
+static void fk4( picstruct *field, double inalp, double indec,
+                 double *outalp, double *outdec );
+
+
 /****************************** initastrom **********************************/
 /*
   Initialize astrometrical structures.
@@ -508,8 +514,8 @@ void	endastrom(picstruct *field)
 /*
  *  Tranform image world coordinates (in degrees) to FK5/J2000.
  */
-void fk5( picstruct *field, double inalp, double indec,
-          double *outalp, double *outdec )
+static void fk5( picstruct *field, double inalp, double indec,
+                 double *outalp, double *outdec )
 {
   astromstruct	*as;
   int isfk5;           /*  True if field coordinates are already FK5 */
@@ -547,8 +553,8 @@ void fk5( picstruct *field, double inalp, double indec,
 /*
  *  Tranform image world coordinates (in degrees) to FK4/B1950.
  */
-void fk4( picstruct *field, double inalp, double indec,
-          double *outalp, double *outdec )
+static void fk4( picstruct *field, double inalp, double indec,
+                 double *outalp, double *outdec )
 {
   astromstruct	*as;
   int isfk4;           /*  True if field coordinates are already FK4 */
