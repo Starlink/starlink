@@ -742,7 +742,6 @@
 *  FITS file output: Are we to use fits output?  FITS file name, temp
 *  string, then fitsio status, unit, temp integer
       LOGICAL FITSOP
-      INTEGER NFILE
       CHARACTER*(200) FITSFN
       CHARACTER*(100) FTWS
       INTEGER FTSTAT,FTUNIT,FTNAXS(2),FTI
