@@ -682,22 +682,18 @@
 	      END IF
 	      CALL MSG_PRNT('    Loaded grouping array')
 
-*          Create workspace for grouped data
-              CALL DYN_MAPR( 1, OBDAT(NDS).NDAT, OBDAT(NDS).GDPTR,
-     :                       STATUS )
-              IF ( OBDAT(NDS).QFLAG ) THEN
-                CALL DYN_MAPB( 1, OBDAT(NDS).NDAT, OBDAT(NDS).GQPTR,
-     :                         STATUS )
-              END IF
-              IF ( OBDAT(NDS).VPTR .NE. 0 ) THEN
-                CALL DYN_MAPR( 1, OBDAT(NDS).NDAT, OBDAT(NDS).GVPTR,
-     :                         STATUS )
-              END IF
-
 *          Count number of groups
               CALL FIT_GETDAT_GCNT( OBDAT(NDS).NDAT,
      :                              %VAL(OBDAT(NDS).GPTR),
      :                              OBDAT(NDS).NGDAT, STATUS )
+
+*          Create workspace for grouped data
+              CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GDPTR,
+     :                       STATUS )
+              IF ( OBDAT(NDS).QFLAG ) THEN
+                CALL DYN_MAPL( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GQPTR,
+     :                         STATUS )
+              END IF
 
 *          Set grouping flag
 	      OBDAT(NDS).GFLAG = .TRUE.
@@ -707,30 +703,21 @@
             ELSE
 	      OBDAT(NDS).GFLAG = .FALSE.
               OBDAT(NDS).GDPTR = OBDAT(NDS).DPTR
-              OBDAT(NDS).GVPTR = OBDAT(NDS).VPTR
               OBDAT(NDS).GQPTR = OBDAT(NDS).QPTR
 
             END IF
 
-*        Accumulate counts for data in likelihood case
-            IF ( LIKSTAT ) THEN
-              IF ( OBDAT(NDS).QFLAG ) THEN
-	        CALL FIT_GETDAT_COUNTSQ(OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).DPTR),
-     :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
-              ELSE
-	        CALL ARR_SUM1R( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
-     :                          RSUM, STATUS )
-                SSCALE = SSCALE + NINT(RSUM)
-              END IF
-            END IF
-
-*          Map weights as 1D array
-	    IF (WEIGHTS) THEN
+*        Map weights as 1D array
+	    IF ( WEIGHTS ) THEN
 	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).WPTR,STATUS)
+              IF ( OBDAT(NDS).GFLAG ) THEN
+                CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GVPTR,
+     :                         STATUS )
+              END IF
 	      IF (STATUS.NE.SAI__OK) GOTO 99
 	    ELSE
 	      OBDAT(NDS).WPTR=0				! Flag
+              OBDAT(NDS).GVPTR = 0
 	    END IF
 
 *        Enter weights (=inverse variances)
@@ -784,7 +771,7 @@
 	        END IF
 
 *           Scale b/g to give raw counts if it has been exposure corrected
-	        IF (BGCOR) THEN
+	        IF ( BGCOR ) THEN
 	          PTR=OBDAT(NDS).BPTR
 	          CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).BPTR,STATUS)
 	          CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
@@ -800,18 +787,6 @@
      :            STATUS)
 	        END IF
 
-*            Accumulate counts for data in likelihood case. Use quality if
-*            present in input data (rather than bgnd)
-                IF ( OBDAT(NDS).QFLAG ) THEN
-	          CALL FIT_GETDAT_COUNTSQ(OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).BPTR),
-     :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
-                ELSE
-	          CALL ARR_SUM1R( OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).BPTR), RSUM, STATUS )
-                  SSCALE = SSCALE + NINT(RSUM)
-                END IF
-
 *         No background data - set up array of zeros
 	      ELSE
 	        CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).BPTR,STATUS)
@@ -819,6 +794,33 @@
      :                      %VAL(OBDAT(NDS).BPTR),STATUS)
 	      END IF
 	    END IF
+
+*        Grouping specified? If so, group the observed data now
+            IF ( OBDAT(NDS).GFLAG ) THEN
+              CALL FIT_GROUP( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
+     :                 (OBDAT(NDS).WPTR.NE.0), %VAL(OBDAT(NDS).WPTR),
+     :                 OBDAT(NDS).QFLAG, %VAL(OBDAT(NDS).QPTR),
+     :                 %VAL(OBDAT(NDS).GPTR), OBDAT(NDS).NGDAT,
+     :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GVPTR),
+     :                 %VAL(OBDAT(NDS).GQPTR), STATUS )
+            END IF
+
+*        Accumulate counts for data in likelihood case. Use quality if
+*        present in input data (rather than bgnd)
+            IF ( LIKSTAT ) THEN
+
+*          Accumulate counts for data
+              IF ( OBDAT(NDS).QFLAG ) THEN
+	        CALL FIT_GETDAT_COUNTSQ(OBDAT(NDS).NDAT,
+     :                      %VAL(OBDAT(NDS).DPTR),
+     :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
+              ELSE
+	        CALL ARR_SUM1R( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
+     :                          RSUM, STATUS )
+                SSCALE = SSCALE + NINT(RSUM)
+              END IF
+
+            END IF
 
 *............ OBDAT set up ..............................................
 
