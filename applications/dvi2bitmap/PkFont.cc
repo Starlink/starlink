@@ -63,7 +63,6 @@ using std::ios;
 #endif
 
 
-typedef STD::vector<STD::string> string_list;
 string_list break_path (string);
     
 // define class static variables
@@ -101,18 +100,19 @@ unsigned int PkFont::fontSearchStrategies_ =
 
 string PkFont::fontSearchPath_ = "";
 #ifdef FONT_SEARCH_SCRIPT
-string PkFont::fontSearchCommand_ = FONT_SEARCH_SCRIPT;
+string PkFont::fontSearchCommandTemplate_ = FONT_SEARCH_SCRIPT;
 #else
-string PkFont::fontSearchCommand_ = "";
+string PkFont::fontSearchCommandTemplate_ = "";
 #endif /* defined FONT_SEARCH_SCRIPT */
 
-
-
 #ifdef FONT_GEN_TEMPLATE
+string PkFont::fontgenCommandTemplate_ = FONT_GEN_TEMPLATE;
 bool PkFont::makeMissingFonts_ = true;
 #else
+string PkFont::fontgenCommandTemplate_ = FONT_GEN_TEMPLATE;
 bool PkFont::makeMissingFonts_ = false;
-#endif
+#endif /* defined FONT_GEN_TEMPLATE */
+
 
 /**
  * Represents a font.
@@ -144,7 +144,6 @@ PkFont::PkFont(unsigned int dvimag,
 	bool got_path = find_font (pk_file_path);
 	if (! got_path)
 	{
-#ifdef FONT_GEN_TEMPLATE
 	    if (makeMissingFonts_)
 	    {
 		string cmd;
@@ -182,11 +181,7 @@ PkFont::PkFont(unsigned int dvimag,
 	    }
 	    else
 		throw InputByteStreamError
-		    ("can't find font file, and instructed not to make fonts");
-#else /* defined(FONT_GEN_TEMPLATE) */
-	    throw InputByteStreamError
-		("can't find font file, and don't know how to make fonts");
-#endif /* defined(FONT_GEN_TEMPLATE) */
+		    ("can't find font file, and font-generation disabled or impossible");
 	}
 	path_ = pk_file_path;
 
@@ -333,9 +328,9 @@ bool PkFont::find_font (string& path)
 
     if (! got_it
 	&& (fontSearchStrategies_ & fontSearchStrategyCommand_)
-	&& (fontSearchCommand_.length() != 0))
+	&& (fontSearchCommandTemplate_.length() != 0))
     {
-	string& cmd = substitute_font_string (fontSearchCommand_,
+	string& cmd = substitute_font_string (fontSearchCommandTemplate_,
 					      missingFontMode_,
 					      name_,
 					      dpiScaled(),
@@ -419,18 +414,16 @@ string& PkFont::search_pkpath (string path, string name, double resolution)
 
     bool found = false;
 
-    // Can't use const_iterator, since this seems to be a pointer to
-    // the wrong type in gcc.
-    for (unsigned int pathnum = 0;
-	 pathnum<pathlist.size() && !found;
-	 pathnum++)
+    for (string_list::const_iterator pi = pathlist.begin();
+	 pi != pathlist.end();
+	 pi++)
     {
-	// Each member of pathlist[] is a template as defined by
+	// Each member of pathlist is a template as defined by
 	// PkFont::substitute_font_string().  Work through each in turn.
 
 	for (int size=size_low; size<=size_high && !found; size++)
 	{
-	    fname = substitute_font_string (pathlist[pathnum],
+	    fname = substitute_font_string (*pi,
 					    PkFont::missingFontMode_,
 					    name,
 					    size,
@@ -438,7 +431,7 @@ string& PkFont::search_pkpath (string path, string name, double resolution)
 					    magnification());
 
 	    if (verbosity_ > normal)
-		cerr << "PkFont::search_pkpath: trying " << pathlist[pathnum]
+		cerr << "PkFont::search_pkpath: trying " << *pi 
 		     << "->" << fname << endl;
 
 	    struct stat S;
@@ -872,11 +865,11 @@ void PkFont::setFontSearchCommand(string cmd)
 {
     // if cmd is zero length, simply enable this
     if (cmd.length() != 0)
-	fontSearchCommand_ = cmd;
+	fontSearchCommandTemplate_ = cmd;
     setFontSearchCommand(true);
 }
 /**
- * Set the shell command which is used when searching for fonts.  The
+ * Sets the shell command which is used when searching for fonts.  The
  * specified string should be a template string with the formatting
  * characters managed by {@link #substitute_font_string}, and these
  * will be substituted with the required values before the command is
@@ -1228,6 +1221,39 @@ string_list break_path (string path)
 }
 
 /**
+ * Enables or disables font generation.  Font generation will only be
+ * enabled if there is a font-generation template command, either set
+ * through method <code>setFontgenCommand</code>, or as a compiled-in
+ * default.  If there is no such command, this method will have no effect.
+ *
+ * @param doit if true, font generation is enabled
+ */
+void PkFont::setFontgen(bool doit)
+{
+    if (fontgenCommandTemplate_.length() == 0)
+	makeMissingFonts_ = false;
+    else
+	makeMissingFonts_ = doit;
+}
+/**
+ * Set the shell command which is used when generating fonts.  The
+ * specified string should be a template string with the formatting
+ * characters managed by {@link #substitute_font_string}, and these
+ * will be substituted with the required values before the command is
+ * run.
+ *
+ * <p>This also enables font-generation, so that it has the effect of
+ * <code>setFontgen(true)</code>.
+ *
+ * @param cmd a font-generation template
+ */
+void PkFont::setFontgenCommand(string cmd)
+{
+    fontgenCommandTemplate_ = cmd;
+    makeMissingFonts_ = true;
+}
+
+/**
  * Returns a command which can be used to generate fonts.  The command
  * should return a single line containing the path to the generated
  * font file.  Return an empty string on errors, or if such a command
@@ -1239,29 +1265,26 @@ string PkFont::fontgenCommand (void)
 {
     string rval;
 
-#ifdef FONT_GEN_TEMPLATE
-    try
-    {
-	rval = substitute_font_string (FONT_GEN_TEMPLATE,
-				       missingFontMode_, name_,
-				       dpiScaled(), dpiBase(),
-				       magnification());
-	if (verbosity_ > normal)
-	    cerr << "PkFont:font_gen_string=" << rval << endl;
-    }
-    catch (PkError& e)
-    {
-	if (verbosity_ > quiet)
-	    cerr << "Warning: can't generate fontgen command ("
-		 << e.problem() << ")" << endl;
+    if (makeMissingFonts_) {
+	try
+	{
+	    rval = substitute_font_string (fontgenCommandTemplate_,
+					   missingFontMode_, name_,
+					   dpiScaled(), dpiBase(),
+					   magnification());
+	    if (verbosity_ > normal)
+		cerr << "PkFont:font_gen_string=" << rval << endl;
+	}
+	catch (PkError& e)
+	{
+	    if (verbosity_ > quiet)
+		cerr << "Warning: can't generate fontgen command ("
+		     << e.problem() << ")" << endl;
+	    rval = "";
+	}
+    } else {
 	rval = "";
     }
-
-#else /* defined(FONT_GEN_TEMPLATE) */
-
-    rval = "";
-
-#endif /* defined(FONT_GEN_TEMPLATE) */
 
     return rval;
 }
