@@ -47,6 +47,7 @@
 *     20 Mar 92 : V1.6-0  Uses quality properly. Calculations done using
 *                         variance rather than error. Checkjs zero
 *                         variance explicitly. (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -56,7 +57,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -96,7 +96,7 @@
 *    Version :
 *
       CHARACTER*30           VERSION
-         PARAMETER           (VERSION = 'COMPARE Version 1.6-0')
+         PARAMETER           (VERSION = 'COMPARE Version 1.8-0')
 *-
 
 *    Version announcement
@@ -169,7 +169,7 @@
       ELSE
 
 *      No existing errors - options are Poisson errors or unit errors
-	CALL PAR_GET0L( 'POISS_ERR', POISS, STATUS )
+	CALL USI_GET0L( 'POISS_ERR', POISS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
         CALL DYN_MAPR( 1, NELM, DVPTR, STATUS )

@@ -38,6 +38,7 @@
 *    History :
 *
 *      2 Sep 88 : V1.0-1 Original adapted from ASTERIX routine (ADM)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -137,7 +138,7 @@
 *    Version id :
 *
       CHARACTER*24           VERSION
-         PARAMETER          (VERSION = ' BINMERGE version 1.0-1')
+         PARAMETER          (VERSION = ' BINMERGE version 1.8-0')
 *-
 
 *    Version announcement
@@ -263,9 +264,9 @@
                   CALL MSG_PRNT ('WARNING: Axis units mismatch - '//
      :                                         'OUTPUT MAY BE GARBAGE!')
 
-                  CALL PAR_DEF0L ('CONT', .TRUE.)
-                  CALL PAR_GET0L ('CONT', OK, STATUS)
-                  CALL PAR_CANCL ('CONT',     STATUS)
+                  CALL USI_DEF0L ('CONT', .TRUE.)
+                  CALL USI_GET0L ('CONT', OK, STATUS)
+                  CALL USI_CANCL ('CONT',     STATUS)
 
                 END IF
 
@@ -280,9 +281,9 @@
                   CALL MSG_PRNT ('WARNING: Axis label mismatch - '//
      :                                         'OUTPUT MAY BE GARBAGE!')
 
-                  CALL PAR_DEF0L ('CONT', .TRUE.)
-                  CALL PAR_GET0L ('CONT', OK, STATUS)
-                  CALL PAR_CANCL ('CONT',     STATUS)
+                  CALL USI_DEF0L ('CONT', .TRUE.)
+                  CALL USI_GET0L ('CONT', OK, STATUS)
+                  CALL USI_CANCL ('CONT',     STATUS)
 
                 END IF
               END IF
@@ -336,7 +337,7 @@
           IF (INPUT .AND. (STATUS .NE. SAI__OK .OR. .NOT. OK)) THEN
             STATUS = SAI__OK
             CALL MSG_PRNT ('Invalid input - try again.')
-            CALL PAR_CANCL (PARNAM, STATUS)
+            CALL USI_CANCL (PARNAM, STATUS)
 
           END IF
         END IF
@@ -740,7 +741,7 @@ C        END IF
       CALL HIST_PTXT (OLOC, NLINES+2, TEXT, STATUS)
 
 *    Clean up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

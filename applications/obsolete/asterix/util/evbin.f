@@ -75,7 +75,7 @@
 *     14 Oct 88 : X_ axis bin inversion removed (PLA)
 *      4 Apr 89 : Rewrite to accomodate irregular bins (PLA)
 *     25 Sep 89 : V1.0-7  Altered to allow increasing or decreasing axes (PLA)
-*     11 Dec 89 : V1.0-8  Put structure definition in UTILIB(EVBIN_STR). Re-written
+*     11 Dec 89 : V1.0-8  Put structure definition in EVBIN_STR. Re-written
 *                         to avoid excessive paging. (BHVAD::DJA)
 *     18 Dec 89 : V1.0-9  Rationalised EVBIN_BIN7Q to avoid naming list arrays
 *                         explicitly (BHVAD::DJA)
@@ -92,6 +92,7 @@
 *                         and works twice as fast. (DJA)
 *      5 Jun 92 : V1.6-0  Fixed bug if irregular axis wasn't first axis (DJA)
 *     25 Feb 94 : V1.7-0  Updated quality handling (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -101,13 +102,12 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'LIST_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Strucure definitions:
 *
-      INCLUDE 'UTILIB(EVBIN_STR)'
+      INCLUDE 'EVBIN_STR'
 *
 *    Status :
 *
@@ -176,7 +176,7 @@
 *    Version id :
 *
       CHARACTER*24              VERSION
-         PARAMETER              ( VERSION = 'EVBIN Version 1.7-0' )
+         PARAMETER              ( VERSION = 'EVBIN Version 1.8-0' )
 *-
 
 *    Check status
@@ -281,12 +281,12 @@
       END IF
 
 *    Obtain user input
-      CALL PAR_GET0L( 'OPT1', IRREG, STATUS )
-      CALL PAR_GET0L( 'OPT2', IDVSEL, STATUS )
-      CALL PAR_GET0L( 'OPT3', ALLNUM, STATUS )
+      CALL USI_GET0L( 'OPT1', IRREG, STATUS )
+      CALL USI_GET0L( 'OPT2', IDVSEL, STATUS )
+      CALL USI_GET0L( 'OPT3', ALLNUM, STATUS )
       IF ( QUALITY ) THEN
-        CALL PAR_GET0I( 'QVAL', BADQUAL, STATUS )
-        CALL PAR_GET0L( 'QKEEP', QKEEP, STATUS )
+        CALL USI_GET0I( 'QVAL', BADQUAL, STATUS )
+        CALL USI_GET0L( 'QKEEP', QKEEP, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -303,8 +303,8 @@
 
 *        Find out if this axis is to be irregularly binned
           WRITE( PAR, '(A3,I1)' ) 'REG', I
-          CALL PAR_GET0L( PAR, D(I).REG, STATUS )
-          CALL PAR_CANCL( PAR, STATUS )
+          CALL USI_GET0L( PAR, D(I).REG, STATUS )
+          CALL USI_CANCL( PAR, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
         ELSE
@@ -333,8 +333,8 @@
 *        Find out if BINSIZE or number of bins are to be specified
           IF ( IDVSEL ) THEN
             WRITE( PAR, '(A10,I1)' ) 'USEBINSIZE', I
-            CALL PAR_GET0L( PAR, USEBINSIZE, STATUS )
-            CALL PAR_CANCL( PAR, STATUS )
+            CALL USI_GET0L( PAR, USEBINSIZE, STATUS )
+            CALL USI_CANCL( PAR, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 99
 
           ELSE IF ( ALLNUM ) THEN
@@ -347,8 +347,8 @@
 
 *        Is user going to override bin base?
           WRITE( PAR, '(A4,I1)' ) 'BASE', I
-          CALL PAR_DEF0R( PAR, D(I).LHS, STATUS )
-          CALL PAR_GET0R( PAR, D(I).LHS, STATUS )
+          CALL USI_DEF0R( PAR, D(I).LHS, STATUS )
+          CALL USI_GET0R( PAR, D(I).LHS, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Set range based on left and right bounds
@@ -364,9 +364,9 @@
 
 *          Get binsize from user
             WRITE( PAR, '(A7,I1)' ) 'BINSIZE', I
-            CALL PAR_DEF0R( PAR, D(I).BSIZE, STATUS )
-            CALL PAR_GET0R( PAR, D(I).BSIZE, STATUS )
-            CALL PAR_CANCL( PAR, STATUS )
+            CALL USI_DEF0R( PAR, D(I).BSIZE, STATUS )
+            CALL USI_GET0R( PAR, D(I).BSIZE, STATUS )
+            CALL USI_CANCL( PAR, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 99
 
             IF (D(I).QOK .AND. (D(I).BSIZE .LT. D(I).QUANTUM)) THEN
@@ -392,9 +392,9 @@
             IF (D(I).QOK .AND. (D(I).BSIZE .LT. D(I).QUANTUM)) THEN
               D(I).NBIN = INT(ARANGE / D(I).QUANTUM)
             END IF
-            CALL PAR_DEF0I( PAR, D(I).NBIN, STATUS )
-            CALL PAR_GET0I( PAR, D(I).NBIN, STATUS )
-            CALL PAR_CANCL( PAR, STATUS )
+            CALL USI_DEF0I( PAR, D(I).NBIN, STATUS )
+            CALL USI_GET0I( PAR, D(I).NBIN, STATUS )
+            CALL USI_CANCL( PAR, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 99
 
             IF ( D(I).NBIN .LE. 1 ) THEN
@@ -623,7 +623,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'UTILIB(EVBIN_STR)'
+      INCLUDE 'EVBIN_STR'
 *
 *    Import :
 *
@@ -719,7 +719,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'UTILIB(EVBIN_STR)'
+      INCLUDE 'EVBIN_STR'
 *
 *    Import :
 *
@@ -764,7 +764,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'UTILIB(EVBIN_STR)'
+      INCLUDE 'EVBIN_STR'
 *
 *    Import :
 *
@@ -878,7 +878,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'UTILIB(EVBIN_STR)'
+      INCLUDE 'EVBIN_STR'
 *
 *    Import :
 *

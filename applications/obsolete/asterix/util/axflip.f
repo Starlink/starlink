@@ -25,6 +25,7 @@
 *                         incorrectly fixed. (DJA)
 *     18 Jun 90 : V1.2-0  Bug with irregular axes fixed (DJA)
 *     10 Apr 91 : V1.4-0  Copes with primitives and datasets with no axes (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -34,7 +35,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -78,7 +78,7 @@
 *    Version :
 *
       CHARACTER*30 		VERSION
-        PARAMETER 		( VERSION = 'AXFLIP Version 1.4-0' )
+        PARAMETER 		( VERSION = 'AXFLIP Version 1.8-0' )
 *-
 
 *    Check status
@@ -142,7 +142,7 @@
 *    Select axes to flip if NDIM > 1
       IF ( NDIM .GT. 1 ) THEN
         NSEL = 0
-        CALL PAR_GET1I( 'SELAX', NDIM, SELAX, NSEL, STATUS )
+        CALL USI_GET1I( 'SELAX', NDIM, SELAX, NSEL, STATUS )
         IF ( ( STATUS .NE. SAI__OK ) .OR. ( NSEL .EQ. 0 ) ) GOTO 99
       ELSE
         NSEL = 1
@@ -263,7 +263,7 @@
       CALL USI_ANNUL( OLOC, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -285,11 +285,13 @@
 *     11 Dec 89 : Original (DJA)
 *
 *    Type definitions :
+*
       IMPLICIT NONE
+*
 *    Global constants :
+*
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *

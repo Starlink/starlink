@@ -36,6 +36,7 @@
 *                        much tidying... (PLA)
 *      9 Nov 93 : V1.5-1 Increased length of UNITS (DJA)
 *      5 May 94 : V1.7-0 Use AIO for i/o (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -55,7 +56,7 @@
 *    Local constants :
 *
       CHARACTER*(30)         	VERSION            	! version id
-        PARAMETER           	( VERSION = 'EVLIST Version 1.7-0' )
+        PARAMETER           	( VERSION = 'EVLIST Version 1.8-0' )
 *
 *    Local variables :
 *
@@ -128,9 +129,9 @@
       CONTINUE  = .TRUE.
 
       DO WHILE (CONTINUE)
-        CALL PAR_DEF1I( 'SUBSET', 2, SUBSET, STATUS )
-        CALL PAR_GET1I( 'SUBSET', 2, SUBSET, I, STATUS )
-        CALL PAR_CANCL( 'SUBSET', STATUS )
+        CALL USI_DEF1I( 'SUBSET', 2, SUBSET, STATUS )
+        CALL USI_GET1I( 'SUBSET', 2, SUBSET, I, STATUS )
+        CALL USI_CANCL( 'SUBSET', STATUS )
 
         IF (STATUS .EQ. SAI__OK) THEN
           IF (I .NE. 2) THEN

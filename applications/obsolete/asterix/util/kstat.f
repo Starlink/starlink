@@ -20,15 +20,19 @@
 *     Trevor Ponman  (BHVAD::TJP)
 *     Phil Andrews   (pla_ast88@uk.bham.sr.star)
 *    History :
-*     14 Jul 86: Original v0.5-1
-*     16 Jul 86: Double precision accumulation v0.5-2  (TJP)
-*     13/9/88: Rewritten for ASTERIX88 BDA_ etc...
+*     14 Jul 86 : V0.5-1  Original (TJP)
+*     16 Jul 86 : V0.5-2  Double precision accumulation (TJP)
+*     13 Sep 88 : V1.0-1  Rewritten for ASTERIX88 BDA_ etc...
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*
 *    Type Definitions :
+*
       IMPLICIT NONE
+*
 *    Global constants :
+*
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -62,7 +66,7 @@
 
 * Version :
       CHARACTER*22 VERSION
-         PARAMETER         ( VERSION = ' KSTAT version 1.0-1' )
+         PARAMETER         ( VERSION = ' KSTAT version 1.8-0' )
 *-
 
 *    Version announcement
@@ -141,7 +145,7 @@
               END IF
 
               IF ( CONTINUE ) THEN
-                CALL PAR_CANCL ('INP2', STATUS)
+                CALL USI_CANCL ('INP2', STATUS)
                 ILOC2 = ' '
 
               END IF

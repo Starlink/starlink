@@ -22,6 +22,7 @@
 *                        and axis errors. (DJA)
 *      3 Mar 94 : V1.7-0 Use sensible format for real numbers (DJA)
 *      4 May 94 : V1.7-1 Use AIO to do i/o (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -64,7 +65,7 @@
 *    Version id :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='BINLIST Version 1.7-1')
+        PARAMETER (VERSION='BINLIST Version 1.8-0')
 *-
 
 *    Version id
@@ -128,7 +129,7 @@
         CALL BDA_MAPQUAL_INT(ID,'R',QPTR,STATUS)
 
 *      Get slice of dataset
-        CALL PAR_GET0C( 'SLICE', SLICE, STATUS )
+        CALL USI_GET0C( 'SLICE', SLICE, STATUS )
         CALL PRS_GETSLICE( NDIM, DIMS(1), SLICE, RANGES, STATUS )
 
 *      Output the data

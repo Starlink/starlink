@@ -30,6 +30,7 @@
 *      7 Jan 93 : V1.6-0  Allow a thresholding requirement (RDS)
 *     28 Jun 93 : V1.7-0  Handle quality and writes full history (DJA)
 *     28 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -82,7 +83,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'ENMAP Version 1.7-1')
+        PARAMETER  (VERSION = 'ENMAP Version 1.8-0')
 *-
 
 *    Check status
@@ -113,7 +114,7 @@
       END IF
 
 *    Get thresholding value from the environment.
-      CALL PAR_GET0R('THRESH', THRESH, STATUS)
+      CALL USI_GET0R('THRESH', THRESH, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *   Copy the relevant parts of the input file to the output file

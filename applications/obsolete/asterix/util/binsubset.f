@@ -42,6 +42,7 @@
 *                        objects without axes fixed. (DJA)
 *     20 Oct 92 : V1.7-0 Proofed against failure to map output (DJA)
 *     19 Nov 92 : V1.7-1 Changed arguments to AXIS_VAL2PIX (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -51,7 +52,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -134,7 +134,7 @@
 *    Version :
 *
       CHARACTER*(25)         VERSION
-        PARAMETER            ( VERSION = 'BINSUBSET Version 1.7-0' )
+        PARAMETER            ( VERSION = 'BINSUBSET Version 1.8-0' )
 *-
 
 *    Version
@@ -176,13 +176,13 @@
       END DO
 
 * see if selected ranges to be kept or discarded
-      CALL PAR_GET0L( 'KEEP', KEEPDATA, STATUS )
+      CALL USI_GET0L( 'KEEP', KEEPDATA, STATUS )
 
 * see if slicing required
-      CALL PAR_GET0L( 'SLICE', SLICE, STATUS )
+      CALL USI_GET0L( 'SLICE', SLICE, STATUS )
 
 * see if selecting by index number
-      IF ( .NOT. INPRIM ) CALL PAR_GET0L('INDEX',INDEX,STATUS)
+      IF ( .NOT. INPRIM ) CALL USI_GET0L('INDEX',INDEX,STATUS)
 
 *    Display axis labels, and get min & max values
       CALL BINSUBSET_DISPAX( ILOC, INPRIM, NDIM, DIMS, AXUNT, AXLO,
@@ -215,7 +215,7 @@
         IF ( INDEX ) THEN
           CALL CHR_ITOC( DIMS(I), TEM, TLEN )
           CALL MSG_PRNT( 'Axis ^AX has '//TEM(:TLEN)//' elements' )
-          CALL PAR_DEF0C( PARNAM, '1:'//TEM(:TLEN), STATUS )
+          CALL USI_DEF0C( PARNAM, '1:'//TEM(:TLEN), STATUS )
           CALL PRS_GETRANGES (PARNAM, DTA__MXRANG, 1,1.0,
      :               REAL(DIMS(I)),RANGES(1,1,I),NRANGE(I), STATUS )
           IF ( RANGES(1,1,I) .LT. 1.0 ) THEN
@@ -233,7 +233,7 @@
           CALL MSG_SETR( 'LO', AXLO(I) )
           CALL MSG_SETR( 'HI', AXHI(I) )
           CALL MSG_MAKE( '^LO:^HI', TEM, TLEN )
-          CALL PAR_DEF0C( PARNAM, TEM(:TLEN), STATUS )
+          CALL USI_DEF0C( PARNAM, TEM(:TLEN), STATUS )
           CALL PRS_GETRANGES( PARNAM, DTA__MXRANG, 1, AXLO(I),
      :               AXHI(I),RANGES(1,1,I),NRANGE(I), STATUS )
 

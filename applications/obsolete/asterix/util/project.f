@@ -7,20 +7,19 @@
 *    Authors :
 *     Bob Vallance (BHVAD::RJV)
 *    History :
-*         3 May 90: original
+*      3 May 90 : Original (RJV)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
-*    Global variables :
 *    Local Constants :
 
       CHARACTER*(30) VERSION		! version ID
-         PARAMETER (VERSION='PROJECT Version 1.2-0')
+         PARAMETER (VERSION='PROJECT Version 1.8-0')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) ILOC       ! input dataset locator
       CHARACTER*(DAT__SZLOC) OLOC       ! output dataset locator
@@ -94,7 +93,7 @@
         CALL MSG_PRNT( 'Axis ^I is ^STRING' )
       ENDDO
 
-      CALL PAR_GET0I('AXIS',PAX,STATUS)
+      CALL USI_GET0I('AXIS',PAX,STATUS)
 
       IF (PAX.LT.1.OR.PAX.GT.NDIM) THEN
         CALL MSG_PRNT('AST_ERR: invalid axis number')

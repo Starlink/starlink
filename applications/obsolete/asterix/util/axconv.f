@@ -38,6 +38,7 @@
 *        V1.6-1 Original version.
 *      3 May 94 :
 *        V1.7-0 Removed _FILL routine in favour of ASTLIB routine (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -75,7 +76,7 @@
 *.
 *  Version
       CHARACTER*20 VERSION
-          PARAMETER (VERSION='AXCONV version 1.7-0')
+          PARAMETER (VERSION='AXCONV version 1.8-0')
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -84,7 +85,7 @@
       CALL MSG_OUT('VERS', VERSION, STATUS)
 
 *  Get name of NDF
-      CALL DAT_ASSOC('INP', 'UPDATE', LOC, STATUS)
+      CALL USI_DASSOC('INP', 'UPDATE', LOC, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_OUT(' ', '** Error opening input file **', STATUS)
@@ -231,6 +232,7 @@
       CALL DAT_ANNUL(LOC, STATUS)
 
 *    If an error occurred, then report context information.
- 999  CALL AST_ERR( STATUS )
+ 999  CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END

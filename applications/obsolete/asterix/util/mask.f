@@ -4,6 +4,7 @@
 *    Authors :
 *      BHVAD::RJV
 *    History :
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -21,7 +22,7 @@
 
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'MASK Version 1.2-0')
+      PARAMETER (VERSION = 'MASK Version 1.8-0')
 *-
       CALL MSG_PRNT(VERSION)
 
@@ -32,13 +33,13 @@
       IF (.NOT.PRIM) THEN
         CALL BDA_GETMASK(OLOC,MASKVAL,STATUS)
         CALL STR_BTOC(MASKVAL,MSTR,STATUS)
-        CALL PAR_DEF0C('MASK',MSTR,STATUS)
-        CALL PAR_GET0C('MASK',MSTR,STATUS)
+        CALL USI_DEF0C('MASK',MSTR,STATUS)
+        CALL USI_GET0C('MASK',MSTR,STATUS)
         CALL STR_CTOB(MSTR,MASKVAL,STATUS)
         CALL BDA_PUTMASK(OLOC,MASKVAL,STATUS)
       ELSE
-        CALL MSG_PRNT('! input data primitive')
         STATUS=SAI__ERROR
+        CALL ERR_REP(' ','Input data primitive', STATUS )
       ENDIF
 
       CALL AST_CLOSE()

@@ -46,6 +46,7 @@
 *                         changing done by QUALITY_<op> routines. (DJA)
 *     19 Nov 92 : V1.7-0  Updated call to AXIS_VAL2PIX (DJA)
 *     25 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -55,7 +56,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -119,7 +119,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 1.7-1')
+        PARAMETER           (VERSION = 'CQUALITY Version 1.8-0')
 *-
 
       CALL MSG_PRNT( VERSION )
@@ -131,35 +131,35 @@
       NMOD = 0
 
 *    Obtain mode from user
-      CALL PAR_GET0L( 'SET', Q_SET, STATUS )
+      CALL USI_GET0L( 'SET', Q_SET, STATUS )
       MODESET = Q_SET
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'IGNORE', Q_IGNORE, STATUS )
+        CALL USI_GET0L( 'IGNORE', Q_IGNORE, STATUS )
         MODESET = Q_IGNORE
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'RESTORE', Q_RESTORE, STATUS )
+        CALL USI_GET0L( 'RESTORE', Q_RESTORE, STATUS )
         MODESET = Q_RESTORE
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'AND', Q_AND, STATUS )
+        CALL USI_GET0L( 'AND', Q_AND, STATUS )
         MODESET = Q_AND
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'OR', Q_OR, STATUS )
+        CALL USI_GET0L( 'OR', Q_OR, STATUS )
         MODESET = Q_OR
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'EOR', Q_EOR, STATUS )
+        CALL USI_GET0L( 'EOR', Q_EOR, STATUS )
         MODESET = Q_EOR
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'NOT', Q_NOT, STATUS )
+        CALL USI_GET0L( 'NOT', Q_NOT, STATUS )
         MODESET = Q_NOT
       END IF
 
       IF ( Q_SET ) THEN
-        CALL PAR_GET0L( 'QSEL', QSEL, STATUS )
+        CALL USI_GET0L( 'QSEL', QSEL, STATUS )
       END IF
 
 *    Check status
@@ -173,7 +173,7 @@
       END IF
 
 *    Overwrite?
-      CALL PAR_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
 
 *    Get input
       IF ( OVERWRITE ) THEN
@@ -254,8 +254,8 @@
       END IF
 
 *    Get centres and radii for positions
-      CALL PAR_GET1R( 'CX', MX_PTS, XC, NXPTS, STATUS )
-      CALL PAR_GET1R( 'CY', MX_PTS, YC, NYPTS, STATUS )
+      CALL USI_GET1R( 'CX', MX_PTS, XC, NXPTS, STATUS )
+      CALL USI_GET1R( 'CY', MX_PTS, YC, NYPTS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( NXPTS .LT. 1 ) THEN
         CALL MSG_PRNT( '! No X values supplied' )
@@ -264,7 +264,7 @@
         CALL MSG_PRNT( '! Numbers of X and Y values differ' )
         STATUS = SAI__ERROR
       END IF
-      CALL PAR_GET1R( 'CR', MX_PTS, RC, NRPTS, STATUS )
+      CALL USI_GET1R( 'CR', MX_PTS, RC, NRPTS, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         IF ( ( NRPTS .NE. 1 ) .AND. ( NRPTS .NE. NXPTS ) ) THEN
           CALL MSG_PRNT( '! Numbers of radii must be 1 or same as'/

@@ -48,6 +48,8 @@
 *      1 jun 93 : V1.5-3 selection of axes to rebin (RJV)
 *     30 Jun 94 : V1.5-4 quality problem fixed (RJV)
 *      9 Sep 94 : V1.5-5 another quality problem fixed (RJV)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -135,7 +137,7 @@
 *    Version id :
 *
       CHARACTER*20 VERSION
-         PARAMETER (VERSION='REBIN Version 1.5-5')
+         PARAMETER (VERSION='REBIN Version 1.8-0')
 *-
       CALL MSG_PRNT (VERSION)
 
@@ -163,7 +165,7 @@
       IF (STATUS .NE. SAI__OK) GOTO 9000
 
 * get option number
-      CALL PAR_GET0I('OPT',OPT,STATUS)
+      CALL USI_GET0I('OPT',OPT,STATUS)
 
 * get axes to rebin
       IF (NDIM.GT.1) THEN
@@ -1820,7 +1822,7 @@
 * get rebinning factor
         IF (SEL) THEN
           PARNAM='RAT'//C(AXN:AXN)
-          CALL PAR_GET0I(PARNAM,RAT,STATUS)
+          CALL USI_GET0I(PARNAM,RAT,STATUS)
         ELSE
           RAT=1
         ENDIF
@@ -1844,7 +1846,7 @@
 * or get total number of bins
         IF (SEL) THEN
           PARNAM='NBIN'//C(AXN:AXN)
-          CALL PAR_GET0I(PARNAM,ONBIN,STATUS)
+          CALL USI_GET0I(PARNAM,ONBIN,STATUS)
         ELSE
           ONBIN=INBIN
         ENDIF
@@ -1862,7 +1864,7 @@
       ELSEIF (OPT.EQ.3.AND.SEL) THEN
 *  get bin width
         PARNAM='WID'//C(AXN:AXN)
-        CALL PAR_GET0R(PARNAM,OWID,STATUS)
+        CALL USI_GET0R(PARNAM,OWID,STATUS)
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         ONBIN=INT((UPP-LOW)*DIR/OWID)
         IF(ONBIN.LT.1) THEN

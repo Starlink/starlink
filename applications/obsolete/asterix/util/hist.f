@@ -45,6 +45,7 @@
 *     21 Sep 92 : V1.6-2 Renamed to HIST to avoid csh command clash (DJA)
 *      7 Jun 93 : V1.7-0 Report value of UPDATE_MODE (DJA)
 *      4 May 94 : V1.7-1 Use AIO to perform output (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -54,8 +55,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-      INCLUDE 'ASTLIB(HIST_CMN)'
+      INCLUDE 'HIST_CMN'
 *
 *    Status :
 *
@@ -94,7 +94,7 @@
 *    Version :
 *
       CHARACTER*30            VERSION
-        PARAMETER             ( VERSION = 'HISTORY Version 1.7-1' )
+        PARAMETER             ( VERSION = 'HISTORY Version 1.8-0' )
 *-
 
 *    Check status
@@ -121,8 +121,8 @@
       CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, OUTWIDTH, STATUS )
 
 *    How much text information ?
-      CALL PAR_DEF0I( 'LINES_OF_TEXT', MXTEXT, STATUS )
-      CALL PAR_GET0I( 'LINES_OF_TEXT', MAXLIN, STATUS )
+      CALL USI_DEF0I( 'LINES_OF_TEXT', MXTEXT, STATUS )
+      CALL USI_GET0I( 'LINES_OF_TEXT', MAXLIN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 90
       MAXLIN = MIN( MXTEXT, MAXLIN )
       MAXLIN = MAX( 0, MAXLIN )

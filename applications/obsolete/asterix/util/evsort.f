@@ -27,7 +27,8 @@
 *
 *    History :
 *
-*     11 May 93 : Original (DJA)
+*     11 May 93 : V1.7-0  Original (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -37,7 +38,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'LIST_PAR'
 *
 *    Status :
@@ -73,7 +73,7 @@
 *    Local constants :
 *
       CHARACTER*(30)         VERSION            ! version id
-        PARAMETER           (VERSION = 'EVSORT Version 1.7-0')
+        PARAMETER           (VERSION = 'EVSORT Version 1.8-0')
 *-
 
 *    Version anouncement
@@ -108,11 +108,11 @@
 *    If RAW_TIMETAG is present offer it as the default
       CALL EVSORT_FIND( NLIST, LNAMES, 'RAW_TIMETAG', I, STATUS )
       IF ( I .GT. 0 ) THEN
-        CALL PAR_DEF0C( 'SLIST', 'RAW_TIMETAG', STATUS )
+        CALL USI_DEF0C( 'SLIST', 'RAW_TIMETAG', STATUS )
       END IF
 
 *    Get list to sort by
-      CALL PAR_GET0C( 'SLIST', SLIST, STATUS )
+      CALL USI_GET0C( 'SLIST', SLIST, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Locate list to be sorted
@@ -125,7 +125,7 @@
       END IF
 
 *    Ascending order?
-      CALL PAR_GET0L( 'ASCEND', ASCEND, STATUS )
+      CALL USI_GET0L( 'ASCEND', ASCEND, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Copy input to output

@@ -25,8 +25,9 @@
 *
 *    History :
 *
-*      12 May 90 : V1.2-1 Original (RDS)
-*      28 Feb 94 : V1.7-0 Use BIT_ routines for quality manipulation (DJA)
+*     12 May 90 : V1.2-1 Original (RDS)
+*     28 Feb 94 : V1.7-0 Use BIT_ routines for quality manipulation (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -36,7 +37,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -83,7 +83,7 @@
 *     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'MEANDAT version 1.7-0')
+      PARAMETER (VERSION = 'MEANDAT version 1.8-0')
 *-
 
 *    Version id
@@ -102,7 +102,7 @@
       ENDDO
 *
 * Find how many files are wanted
-      CALL PAR_GET0I('NFILES', NFILES, STATUS)
+      CALL USI_GET0I('NFILES', NFILES, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -249,7 +249,7 @@
 *
 * By default the files are averaged, if the user sets average to NO on
 * the command line then the output will be the sum of these files.
-      CALL PAR_GET0L('AVERAGE', AVERAGE, STATUS)
+      CALL USI_GET0L('AVERAGE', AVERAGE, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -314,13 +314,10 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-*     <specification of FORTRAN structures>
+*
 *    Import :
+*
       INTEGER MAXFIL                     ! Maximum number of files to average
       INTEGER NFILES                     ! Number of files being averaged
       LOGICAL LVAR                       ! Use variances ?
@@ -357,7 +354,7 @@
       JUMPOUT=.FALSE.
       DO WHILE (.NOT. JUMPOUT)
 *
-         CALL PAR_GET0C('WTMETH', WTMETH, STATUS)
+         CALL USI_GET0C('WTMETH', WTMETH, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -365,7 +362,7 @@
 *
          IF ( INDEX('VNU', WTMETH(1:1)) .EQ. 0 ) THEN
             CALL MSG_PRNT('Weighting operation not recognised')
-            CALL PAR_CANCL('WTMETH', STATUS)
+            CALL USI_CANCL('WTMETH', STATUS)
          ELSE
             JUMPOUT=.TRUE.
          ENDIF
@@ -394,11 +391,11 @@
             CALL CHR_ITOC(FLP, CNUM, IDUM)
             PARAM='WEIGHT'//CNUM
 *
-            CALL PAR_PROMT(PARAM, 'Enter weighting for file '/
+            CALL USI_PROMT(PARAM, 'Enter weighting for file '/
      &                                             /CNUM, STATUS)
 *
 *     Ask for the weighting for this file
-            CALL PAR_GET0R(PARAM, WEIGHT, STATUS)
+            CALL USI_GET0R(PARAM, WEIGHT, STATUS)
 *
             IF (STATUS .NE. SAI__OK) GOTO 999
 *

@@ -63,7 +63,8 @@
 *     17 Feb 91 : V1.4-0 Allows merging of files with different pointing
 *                        directions. LIVE_TIME duplicates removed. Lists may
 *                        be in any order - extra lists are omitted (DJA)
-**      6 Mar 91 : V1.4-1 Bug when 1st file not earliest fixed (DJA)
+*      6 Mar 91 : V1.4-1 Bug when 1st file not earliest fixed (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -189,7 +190,7 @@
 *    Version id :
 *
       CHARACTER*22           VERSION
-         PARAMETER         ( VERSION = 'EVMERGE Version 1.4-1' )
+         PARAMETER         ( VERSION = 'EVMERGE Version 1.8-0' )
 *-
 
 *    Check status
@@ -467,7 +468,7 @@
       NIN = NIN - 1
 
 *    Create output dataset
-      CALL DAT_CREAT( 'OUT', 'EVDS', 0, 0, STATUS )
+      CALL USI_DCREAT( 'OUT', 'EVDS', 0, 0, STATUS )
       CALL USI_ASSOCO( 'OUT', 'EVDS', OLOC, STATUS )
       CALL USI_NAMEI( INLINES, TEXTI, STATUS )
 

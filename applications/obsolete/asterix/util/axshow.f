@@ -19,6 +19,7 @@
 *
 *      8 May 91 : V1.4-0  Original (DJA)
 *      4 May 94 : V1.7-0  Use AIO_ for output (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -28,7 +29,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -70,7 +70,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'AXSHOW Version 1.7-0' )
+        PARAMETER 		( VERSION = 'AXSHOW Version 1.8-0' )
 *-
 
 *    Check status
@@ -157,7 +157,7 @@
       CALL BDA_RELEASE( ILOC, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

@@ -4,6 +4,7 @@
 *    Authors :
 *      BHVAD::RJV
 *    History :
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -21,7 +22,7 @@
       CHARACTER*(DAT__SZTYP) TYPE
       CHARACTER*8 MSTR
       REAL MAGVAL
-      INTEGER IDIM,NDIM,DIMS(DAT__MXDIM),LEN
+      INTEGER NDIM,DIMS(DAT__MXDIM),LEN
       INTEGER DPTR,QPTR
       BYTE MASK
       LOGICAL OVER
@@ -30,13 +31,13 @@
 
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'MAGIC Version 1.2-0')
+      PARAMETER (VERSION = 'MAGIC Version 1.8-0')
 *-
       CALL MSG_PRNT(VERSION)
 
       CALL AST_INIT()
 
-      CALL PAR_GET0L('OVER',OVER,STATUS)
+      CALL USI_GET0L('OVER',OVER,STATUS)
 
 *  overwrite case - input becomes output
       IF (OVER) THEN
@@ -51,22 +52,19 @@
           CALL HDX_COPY(ILOC,OLOC,STATUS)
           CALL BDA_RELEASE(ILOC,STATUS)
         ELSE
-          CALL MSG_PRNT('! input is primitive')
           STATUS=SAI__ERROR
+          CALL ERR_REP( ' ', 'Input is primitive', STATUS )
         ENDIF
       ENDIF
 
       CALL BDA_CHKDATA(OLOC,DOK,NDIM,DIMS,STATUS)
       CALL BDA_CHKQUAL(OLOC,QOK,NDIM,DIMS,STATUS)
 
-      LEN=1
-      DO IDIM=1,NDIM
-        LEN=LEN*DIMS(IDIM)
-      ENDDO
+      CALL ARR_SUMDIM( NDIM, DIMS, LEN )
 
       IF (STATUS.EQ.SAI__OK.AND.DOK.AND.QOK) THEN
 
-        CALL PAR_GET0R('MAGIC',MAGVAL,STATUS)
+        CALL USI_GET0R('MAGIC',MAGVAL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL( STATUS )
           MAGVAL=VAL__BADR
@@ -74,8 +72,8 @@
 
         CALL BDA_GETMASK(OLOC,MASK,STATUS)
         CALL STR_BTOC(MASK,MSTR,STATUS)
-        CALL PAR_DEF0C('MASK',MSTR,STATUS)
-        CALL PAR_GET0C('MASK',MSTR,STATUS)
+        CALL USI_DEF0C('MASK',MSTR,STATUS)
+        CALL USI_GET0C('MASK',MSTR,STATUS)
         CALL STR_CTOB(MSTR,MASK,STATUS)
 
         CALL BDA_MAPDATA(OLOC,'U',DPTR,STATUS)
@@ -88,6 +86,7 @@
       ENDIF
 
       CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 
@@ -138,7 +137,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','! from MAGIC_WRITE',STATUS)
+          CALL AST_REXIT('MAGIC_WRITE',STATUS)
         ENDIF
       ENDIF
       END

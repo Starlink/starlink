@@ -46,13 +46,13 @@
 *     16 Jan 89 : V1.1-1  Original (BHVAD::ADM)
 *     11 Jan 90 : V1.1-2  DATA_MIN and DATA_MAX references removed (BHVAD::DJA)
 *     28 Mar 90 : V1.1-3  x and y coords made into separate parameters
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'LIST_PAR'
 *    Status :
       INTEGER STATUS
@@ -112,7 +112,7 @@
 *    Local Constants :
 *
       CHARACTER*25           VERSION            ! version ID
-        PARAMETER           (VERSION = ' EVCSUBSET Version 1.1-3')
+        PARAMETER           (VERSION = ' EVCSUBSET Version 1.8-0')
 *-
 
 *    Version announcement
@@ -209,14 +209,14 @@
        CALL MSG_PRNT ('The ^YNAME data range is ^YMIN to ^YMAX')
 
 * annular or circular subset?
-       CALL PAR_GET0L('ANNULUS',ANNTYPE,STATUS)
+       CALL USI_GET0L('ANNULUS',ANNTYPE,STATUS)
 * Central point?
-       CALL PAR_GET0R('XCENT',XCEN,STATUS)
-       CALL PAR_GET0R('YCENT',YCEN,STATUS)
+       CALL USI_GET0R('XCENT',XCEN,STATUS)
+       CALL USI_GET0R('YCENT',YCEN,STATUS)
 * Get radius/radii
-       CALL PAR_GET0R('OUTER',ORAD,STATUS)
+       CALL USI_GET0R('OUTER',ORAD,STATUS)
        IF(ANNTYPE) THEN
-         CALL PAR_GET0R('INNER',IRAD,STATUS)
+         CALL USI_GET0R('INNER',IRAD,STATUS)
        ELSE
          IRAD=0.0
        ENDIF
@@ -490,7 +490,6 @@ c        END IF
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER                INLEN            ! Length of input lists
 
@@ -549,7 +548,6 @@ c        END IF
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER                OUTLEN            ! Length of QUANTUM list
 

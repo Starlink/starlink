@@ -30,6 +30,7 @@
 *      8 Dec 89 : V1.0-0  Original (DJA)
 *      5 Oct 90 : V1.3-0  REVERSE option added (DJA)
 *      3 Nov 94 : V1.8-0  Upgraded to new graphics (DJA)
+*     24 Nov 94 : V1.8-1  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -39,7 +40,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -76,7 +76,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-         PARAMETER (VERSION = 'BINSUM Version 1.8-0')
+         PARAMETER (VERSION = 'BINSUM Version 1.8-1')
 *-
 
 *    Check status
@@ -108,7 +108,7 @@
       END IF
 
 *    Work in reverse mode?
-      CALL PAR_GET0L( 'REVERSE', REVERSE, STATUS )
+      CALL USI_GET0L( 'REVERSE', REVERSE, STATUS )
 
 *    Find total number of elements in dataset
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
@@ -219,7 +219,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *

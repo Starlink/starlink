@@ -58,9 +58,10 @@
 *
 *    History :
 *
-*     21 Feb 91 : V1.4-0  Original (DJA)
-*     11 Sep 93 : V1.7-0  EVPOLAR_CAREA renamed GEO_CAREA (DJA)
-*     25 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
+*     21 Feb 91 : V1.4-0 Original (DJA)
+*     11 Sep 93 : V1.7-0 EVPOLAR_CAREA renamed GEO_CAREA (DJA)
+*     25 Feb 94 : V1.7-1 Use BIT_ routines to do bit manipulations (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -70,7 +71,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'LIST_PAR'
       INCLUDE 'QUAL_PAR'
 *
@@ -143,7 +143,7 @@
 *    Version id :
 *
       CHARACTER*24              VERSION
-         PARAMETER              ( VERSION = 'EVPOLAR Version 1.7-1' )
+         PARAMETER              ( VERSION = 'EVPOLAR Version 1.8-0' )
 *-
 
 *    Version anouncement
@@ -197,8 +197,8 @@
         CALL BDA_MAPTDATA( QLOC, '_INTEGER', 'READ', IQPTR, STATUS )
 
 *      Get quality processing mode
-        CALL PAR_GET0I( 'QVAL',  BADQUAL, STATUS )
-        CALL PAR_GET0L( 'QKEEP', QKEEP, STATUS )
+        CALL USI_GET0I( 'QVAL',  BADQUAL, STATUS )
+        CALL USI_GET0L( 'QKEEP', QKEEP, STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -247,8 +247,8 @@
       END IF
 
 *    Get polar centre
-      CALL PAR_GET0R( 'X0', X0, STATUS )
-      CALL PAR_GET0R( 'Y0', Y0, STATUS )
+      CALL USI_GET0R( 'X0', X0, STATUS )
+      CALL USI_GET0R( 'Y0', Y0, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map workspace
@@ -260,14 +260,14 @@
      :                                     %VAL(WPTR), MAXR, STATUS )
 
 *    Get azimuthal bin size
-      CALL PAR_GET0R( 'ABINSIZE', ABINSIZE, STATUS )
+      CALL USI_GET0R( 'ABINSIZE', ABINSIZE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       NAZ = 360.0 / ABINSIZE
       CALL MSG_SETI( 'NAZ', NAZ )
       CALL MSG_PRNT( 'There will be ^NAZ azimuthal bins in the output' )
 
 *    Inform user of maximum radius, and get radial bins
-      CALL PAR_GET0L( 'REG', REG, STATUS )
+      CALL USI_GET0L( 'REG', REG, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL MSG_SETR( 'RMAX', MAXR )
       CALL MSG_SETC( 'RUNIT', ORUNIT )
@@ -282,7 +282,7 @@
       ELSE
 
 *      Get binsize
-        CALL PAR_GET0R( 'RBINSIZE', RBINSIZE, STATUS )
+        CALL USI_GET0R( 'RBINSIZE', RBINSIZE, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( RBINSIZE .LE. 0.0 ) THEN
           CALL MSG_PRNT( 'ERROR : Zero or negative radial bin width' )
@@ -290,8 +290,8 @@
         END IF
 
 *      Get number of radial bins
-        CALL PAR_DEF0I( 'NRAD', MAX(1,NINT(MAXR/RBINSIZE)), STATUS )
-        CALL PAR_GET0I( 'NRAD', NRAD, STATUS )
+        CALL USI_DEF0I( 'NRAD', MAX(1,NINT(MAXR/RBINSIZE)), STATUS )
+        CALL USI_GET0I( 'NRAD', NRAD, STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -369,7 +369,7 @@
 *    Normalise
       NORMALISE = .FALSE.
       IF ( NINDEX .EQ. 2 ) THEN
-        CALL PAR_GET0L( 'NORM', NORMALISE, STATUS )
+        CALL USI_GET0L( 'NORM', NORMALISE, STATUS )
       END IF
       IF ( NORMALISE .AND. ( STATUS .EQ. SAI__OK ) ) THEN
         IF ( REG ) THEN

@@ -8,6 +8,7 @@
 *       9 Jun 94 : 1.7-2 fix for char things not going to upper case (RJV)
 *      10 Jun 94 : 1.7-3 DUMP option (RJV)
 *       7 Sep 94 : 1.7-4 OFF added as alternative to CANCEL (RJV)
+*      24 Nov 94 : 1.7-5 SUPPRESS added (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -898,6 +899,7 @@
       INTEGER ISEL
       INTEGER FONT
       INTEGER BOLD
+      LOGICAL SUPPRESS
       LOGICAL SETT,SETF,SETS,SETB,SETO
 *-
 
@@ -909,35 +911,49 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  get individual control parameters - NULL means no change
-        CALL PAR_GET0C('TEXT',TEXT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETT=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0I('FONT',FONT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
+*  are all labels to be suppressed
+        CALL PAR_PROMT('SUPPRESS','Are all labels to be suppressed',
+     :                                                       STATUS)
+        IF (SUPPRESS) THEN
+          TEXT="     "
           SETF=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0I('BOLD',BOLD,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
           SETB=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0R('OFFSET',OFFSET,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
           SETO=.FALSE.
+
+        ELSE
+
+*  get individual control parameters - NULL means no change
+          CALL PAR_GET0C('TEXT',TEXT,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETT=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0I('FONT',FONT,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETF=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0R('SIZE',SIZE,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETS=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0I('BOLD',BOLD,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETB=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0R('OFFSET',OFFSET,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETO=.FALSE.
+          ENDIF
+
         ENDIF
 
 *  NSEL is set to 1 for LIVE mode or single dataset

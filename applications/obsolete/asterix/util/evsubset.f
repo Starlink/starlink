@@ -38,6 +38,7 @@
 *     28 Jan 94 : V1.7-4  Rejected contigous block algorithm in favour of
 *                         simply copying in BLOCKSIZE lumps - much simpler
 *                         and more efficient for sparse selection. (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -48,7 +49,6 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'LIST_PAR'
 *
 *    Status :
@@ -145,7 +145,7 @@
 *    Version :
 *
       CHARACTER*80            VERSION
-        PARAMETER            ( VERSION = 'EVSUBSET Version 1.7-4' )
+        PARAMETER            ( VERSION = 'EVSUBSET Version 1.8-0' )
 *-
 
 *    Display version
@@ -169,7 +169,7 @@
       END IF
 
 *    Index mode?
-      CALL PAR_GET0L( 'INDEX', INDEXMODE, STATUS )
+      CALL USI_GET0L( 'INDEX', INDEXMODE, STATUS )
 
 *    Find all valid LISTs in the input, and display them
       IF ( .NOT. INDEXMODE ) THEN
@@ -231,7 +231,7 @@
 
         CALL CHR_ITOC (J, PAR, LEN)
         PAR = 'KEEP'//PAR(1:LEN)
-        CALL PAR_GET0L( PAR, KEEP(J), STATUS )
+        CALL USI_GET0L( PAR, KEEP(J), STATUS )
 
         CALL CHR_ITOC (J, PAR, LEN)
         PAR = 'RANGES'//PAR(1:LEN)
@@ -304,7 +304,7 @@
 *      Get events to be kept
         CALL MSG_SETI( 'N', EVENTS )
         CALL MSG_MAKE( '1:^N', TXT, LEN )
-        CALL PAR_DEF0C( 'EVENTS', TXT(1:LEN), STATUS )
+        CALL USI_DEF0C( 'EVENTS', TXT(1:LEN), STATUS )
         CALL PRS_GETLIST( 'EVENTS', EVENTS, %VAL(ICOPY), LEN, STATUS )
 
 *      Convert list of integers into logical array

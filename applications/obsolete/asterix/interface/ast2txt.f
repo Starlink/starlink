@@ -30,6 +30,7 @@
 *      2 Mar 92 : V1.6-0  Original (DJA)
 *      6 Aug 92 : V1.6-1  Fixed bug wiudth scalar axis widths (DJA)
 *     25 Feb 94 : V1.7-0  Use BIT_ routines to do bit manipulations (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -39,7 +40,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -93,7 +93,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION = 'EXPORT Version 1.7-0')
+        PARAMETER (VERSION = 'EXPORT Version 1.8-0')
 *-
 
 *    Check status
@@ -115,7 +115,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Write IMPORT readable keywords?
-      CALL PAR_GET0L( 'IMPREAD', IMPREAD, STATUS )
+      CALL USI_GET0L( 'IMPREAD', IMPREAD, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Find out about dataset

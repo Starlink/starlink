@@ -22,6 +22,7 @@
 *     24 Nov 92 : V1.7-1  Now uses quality in 1-d case (DJA)
 *     26 Sep 93 : V1.7-2  Bug fixed in quality handling (DJA)
 *     28 Feb 94 : V1.7-3  Use BIT_ routines to do bit manipulations (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -31,7 +32,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -75,7 +75,7 @@
 *
 
       CHARACTER*30     VERSION
-        PARAMETER      (VERSION = 'AXCENTROID Version 1.7-3' )
+        PARAMETER      (VERSION = 'AXCENTROID Version 1.8-0' )
 *-
 
 *    Version id
@@ -112,7 +112,7 @@
         CALL AXIS_LIST( ILOC, NDIM, STATUS )
 
 *      Select axis
-        CALL PAR_GET0I( 'AXIS', AXIS, STATUS )
+        CALL USI_GET0I( 'AXIS', AXIS, STATUS )
         IF ( (AXIS.LT.1) .OR. (AXIS.GT.NDIM) ) THEN
           CALL MSG_PRNT( '! Invalid axis number' )
           STATUS = SAI__ERROR

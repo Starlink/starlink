@@ -76,6 +76,7 @@
 *                         of the input data. Use VAL__EPSR instead (DJA)
 *     31 Aug 94 : V1.8-2  Fixed another missing initialisation in ARD mode,
 *                         which stopped it working on UNIX (DJA)
+*     24 Nov 94 : V1.8-3  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -188,30 +189,30 @@
       NMOD = 0
 
 *    Obtain mode from user
-      CALL PAR_GET0L( 'SET', Q_SET, STATUS )
+      CALL USI_GET0L( 'SET', Q_SET, STATUS )
       MODESET = Q_SET
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'IGNORE', Q_IGNORE, STATUS )
+        CALL USI_GET0L( 'IGNORE', Q_IGNORE, STATUS )
         MODESET = Q_IGNORE
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'RESTORE', Q_RESTORE, STATUS )
+        CALL USI_GET0L( 'RESTORE', Q_RESTORE, STATUS )
         MODESET = Q_RESTORE
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'AND', Q_AND, STATUS )
+        CALL USI_GET0L( 'AND', Q_AND, STATUS )
         MODESET = Q_AND
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'OR', Q_OR, STATUS )
+        CALL USI_GET0L( 'OR', Q_OR, STATUS )
         MODESET = Q_OR
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'EOR', Q_EOR, STATUS )
+        CALL USI_GET0L( 'EOR', Q_EOR, STATUS )
         MODESET = Q_EOR
       END IF
       IF (.NOT.MODESET) THEN
-        CALL PAR_GET0L( 'NOT', Q_NOT, STATUS )
+        CALL USI_GET0L( 'NOT', Q_NOT, STATUS )
         MODESET = Q_NOT
       END IF
 
@@ -226,11 +227,11 @@
       END IF
 
 *    Overwrite?
-      CALL PAR_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
 
 *    If in SET mode see if selecting on magic values
       IF ( Q_SET ) THEN
-        CALL PAR_GET0L( 'MAGIC', MAGIC, STATUS )
+        CALL USI_GET0L( 'MAGIC', MAGIC, STATUS )
       ELSE
         MAGIC = .FALSE.
       END IF
@@ -239,15 +240,15 @@
       IF ( .NOT. MAGIC ) THEN
 
 *    Select pixels using a spatial descriptor file ?
-        CALL PAR_GET0L( 'FSEL', FSEL, STATUS )
+        CALL USI_GET0L( 'FSEL', FSEL, STATUS )
         IF (.NOT. FSEL) THEN
-          CALL PAR_GET0L( 'AXSEL', AXSEL, STATUS )
+          CALL USI_GET0L( 'AXSEL', AXSEL, STATUS )
         ELSE
           AXSEL = .FALSE.
         ENDIF
 
-        CALL PAR_GET0L( 'DATSEL', DATSEL, STATUS )
-        CALL PAR_GET0L( 'QSEL', QSEL, STATUS )
+        CALL USI_GET0L( 'DATSEL', DATSEL, STATUS )
+        CALL USI_GET0L( 'QSEL', QSEL, STATUS )
 
       ELSE
         AXSEL = .FALSE.
@@ -376,7 +377,7 @@
           CALL MSG_SETR('MIN', AXLO(J) )
           CALL MSG_SETR('MAX', AXHI(J) )
           CALL MSG_MAKE( '^MIN:^MAX', DEF, JUNK )
-          CALL PAR_DEF0C( PAR, DEF(1:CHR_LEN(DEF)), STATUS )
+          CALL USI_DEF0C( PAR, DEF(1:CHR_LEN(DEF)), STATUS )
           CALL PRS_GETRANGES( PAR, MX_BNDS, 1, AXLO(J), AXHI(J),
      :                   AXRANGES(1,1,J), NAXRANGES(J), STATUS )
 
@@ -424,7 +425,7 @@
         CALL MSG_SETR( 'MIN', DMIN )
         CALL MSG_SETR( 'MAX', DMAX )
         CALL MSG_MAKE(' ^MIN:^MAX', DEF, JUNK)
-        CALL PAR_DEF0C( 'DATRNG', DEF, STATUS )
+        CALL USI_DEF0C( 'DATRNG', DEF, STATUS )
         CALL PRS_GETRANGES( 'DATRNG', MX_BNDS, 1, DMIN, DMAX, DRANGES,
      :                                              NDRANGES, STATUS )
 
@@ -462,7 +463,7 @@
 *    Write the output quality
       IF ( Q_SET ) THEN
         IF ( MAGIC ) THEN
-          CALL PAR_DEF0C( 'QVAL','00000001', STATUS )
+          CALL USI_DEF0C( 'QVAL','00000001', STATUS )
           CALL QUALITY_GETQV( 'QVAL', 'Quality value corresponding to'/
      :                          /' magic values', QVAL, BQVAL, STATUS )
           TEXT(1)='QUALITY '//QVAL//' set for points with magic values'
@@ -1166,7 +1167,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
@@ -1212,13 +1212,13 @@
 *-
 
 *    Set prompt
-      IF ( PAR .EQ. 'QVAL' ) CALL PAR_PROMT( PAR, PRMPT, STATUS )
+      IF ( PAR .EQ. 'QVAL' ) CALL USI_PROMT( PAR, PRMPT, STATUS )
 
       GOT_VAL = .FALSE.
       DO WHILE ( ( STATUS .EQ. SAI__OK ) .AND. .NOT. GOT_VAL )
 
 *      Get user response
-        CALL PAR_GET0C( PAR, QSTR, STATUS )
+        CALL USI_GET0C( PAR, QSTR, STATUS )
 
 *      Check against alternatives
         IF ( STATUS .EQ. SAI__OK ) THEN
@@ -1249,7 +1249,7 @@
             CALL MSG_SETC( 'RESP', QSTR(:QLEN) )
             CALL MSG_PRNT( 'Invalid quality specification /^RESP/'/
      :                                            /' - try again' )
-            CALL PAR_CANCL( PAR, STATUS )
+            CALL USI_CANCL( PAR, STATUS )
           ELSE
             GOT_VAL = .TRUE.
           END IF
@@ -1283,13 +1283,9 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-*     <specification of FORTRAN structures>
+*
 *    Import :
+*
       CHARACTER*(DAT__SZLOC) LOC              ! Locator to datafile
       INTEGER NDIM                            ! No. of data dimensions
       INTEGER DIM(DAT__MXDIM)                 ! Data dimensions
@@ -1316,7 +1312,7 @@
 *    Version :
 *-
 *  get name of ARD file and open it
-      CALL PAR_GET0C('ARDFILE',AFILE,STATUS)
+      CALL USI_GET0C('ARDFILE',AFILE,STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 

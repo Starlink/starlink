@@ -25,6 +25,7 @@
 *                         thing to do. (DJA)
 *      8 May 91 : V1.4-0  Re-named from AXSWAP (DJA)
 *      6 Mar 92 : V1.6-0  OUT prompt moved back to pre-processing (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -34,7 +35,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -85,7 +85,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'AXORDER Version 1.6-0')
+        PARAMETER  (VERSION = 'AXORDER Version 1.8-0')
 *-
 
 *    Check status
@@ -143,7 +143,7 @@
         CALL AXIS_LIST( ILOC, NDIM, STATUS )
 
         NSEL = 0
-        CALL PAR_GET1I( 'SELAX', NDIM, SELAX, NSEL, STATUS )
+        CALL USI_GET1I( 'SELAX', NDIM, SELAX, NSEL, STATUS )
         IF ( ( STATUS .NE. SAI__OK ) .OR. ( NSEL .EQ. 0 ) ) GOTO 99
 
       ELSE IF ( NDIM .EQ. 2 ) THEN
@@ -326,7 +326,7 @@
       CALL USI_ANNUL( OLOC, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
