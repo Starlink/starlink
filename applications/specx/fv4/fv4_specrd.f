@@ -33,6 +33,8 @@
 *        Original version.
 *     10 May 1995 (rpt): 
 *        Added support FILHD
+*     16 Aug 2004 (timj):
+*        Use CNF_PVAL for HDS mapped data arrays 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -46,6 +48,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'STACKCOMM'        ! Specx stack
@@ -140,8 +143,8 @@
 *  Map, copy, unmap data.
 *  Fill unused stack tail with zeros.
       CALL NDF_MAP( NDF, 'DATA', '_REAL', 'READ', DPNTR, NELM, STATUS )
-*     CALL XCOPY( 4*NELM, %VAL(DPNTR), DATA )
-      CALL FV4_SPECR2( NELM, %VAL(DPNTR), DATA )
+*     CALL XCOPY( 4*NELM, %VAL(CNF_PVAL(DPNTR)), DATA )
+      CALL FV4_SPECR2( NELM, %VAL(CNF_PVAL(DPNTR)), DATA )
       CALL NDF_UNMAP( NDF, 'DATA', STATUS )
       DO 1001 I = NELM + 1, LSTK - LHEAD
          DATA(I) = 0.

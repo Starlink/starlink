@@ -28,6 +28,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -36,6 +37,8 @@
 *     02 Sep 1994 (hme):
 *        Replace the XCOPY with a new routine MV4_SPECW2 to convert bad
 *        values properly.
+*     16 Aug 2004 (timj):
+*        Use CNF_PVAL for HDS mapped data arrays 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -49,6 +52,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'STACKCOMM'        ! Specx stack
@@ -82,8 +86,8 @@
       CALL NDF_SBND( 1, 1, NELM, TNDF, STATUS )
       CALL NDF_MAP( TNDF, 'DATA', '_REAL', 'WRITE',
      :   DPNTR, NELM, STATUS )
-*     CALL XCOPY( 4*NELM, DATA, %VAL(DPNTR) )
-      CALL FV4_SPECW2( NELM, DATA, %VAL(DPNTR) )
+*     CALL XCOPY( 4*NELM, DATA, %VAL(CNF_PVAL(DPNTR)) )
+      CALL FV4_SPECW2( NELM, DATA, %VAL(CNF_PVAL(DPNTR)) )
       CALL NDF_UNMAP( TNDF, 'DATA', STATUS )
 
 *  Locate extension XLOC(1).
