@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_DECODE_REBIN_LINE(LINE, N_FOUND, NAME,
-     :     WEIGHT, SHIFT_DX, SHIFT_DY, USE_SECTION, STATUS)
+     :     WEIGHT, SHIFT_DX, SHIFT_DY, STATUS)
 *+
 *  Name:
 *     SCULIB_SPLIT_DECODE_REBIN_LINE
@@ -9,12 +9,14 @@
 
 *  Invocation:
 *      SUBROUTINE SCULIB_DECODE_REBIN_LINE(LINE, N_FOUND, NAME,
-*     :     WEIGHT, SHIFT_DX, SHIFT_DY, USE_SECTION, STATUS)
+*     :     WEIGHT, SHIFT_DX, SHIFT_DY, STATUS)
 
 *  Description:
 *     This routine takes a string and splits it into bits.
 *     The format is assumed to be:
-*         FILESPEC WEIGHT SHIFT_DX SHIFT_DY USE_SECTION
+*
+*         FILESPEC WEIGHT SHIFT_DX SHIFT_DY
+*
 *     The string is broken up from left to right.
 *     There must always be a weight if there is a shift
 *     There must always be a shift if there is a section. etc...
@@ -35,8 +37,6 @@
 *       Shift in X
 *     SHIFT_DY = REAL (Returned)
 *       Shift in Y
-*     USE_SECTION = LOGICAL (Returned)
-*       Am I using the (optional) section or the rest
 *     STATUS = INTEGER (Given and Returned)
 *        Global Status value
 
@@ -72,7 +72,6 @@
       INTEGER N_FOUND
       REAL    SHIFT_DX
       REAL    SHIFT_DY
-      LOGICAL USE_SECTION
       REAL    WEIGHT
 
 *  Status:
@@ -197,26 +196,6 @@
          END IF
 
       END IF
-
-*     Now the USE_SECTION parameter
-*     TRUE,T,Y,YES imply TRUE.
-*     FALSE,F,N,NO implies false.
-*     Anything else is error
-
-      IF (N_FOUND .EQ. 5 .AND. STATUS .EQ. SAI__OK) THEN
-
-         CALL CHR_CTOL(WORDS(5), USE_SECTION, STATUS)
-
-         IF (STATUS .NE. SAI__OK) THEN
-            N_FOUND = 4
-            CALL MSG_SETC('WT', WORDS(5))
-            CALL ERR_REP(' ','SCULIB_DECODE_REBIN_LINE: Error '//
-     :           'converting the USE_SECTION (^WT) to a LOGICAL', 
-     :           STATUS)
-         END IF
-
-      END IF
-
 
       END 
 
