@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-noinst_LTLIBRARIES = libdsa.la
+lib_LTLIBRARIES = libdsa.la
 
 libdsa_la_SOURCES = \
         $(PRIVATE_INCLUDES) \
@@ -64,7 +64,6 @@ dsa_structc.f dsa_sv_axi.f dsa_trnl_var.f dsa_typesize.f \
 dsa_unfl_dat.f dsa_unfl_x.f dsa_unmap.f dsa_use_fl.f dsa_use_ql.f \
 dsa_val_axi.f dsa_var_err.f dsa_var_ty.f dsa_wrflush.f dsa_wrname.f \
 dsa_wruser.f dsa_xcstr.f dsa_zfill.f \
- \
- dsaz_fname.f dsaz_inq_nam.f
+dsaz_fname.f dsaz_inq_nam.f
 
 FPP_ROUTINES = dsaz_tfopen.fpp
