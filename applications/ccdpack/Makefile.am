@@ -7,7 +7,7 @@ ccdsupportdir = $(bindir)
 
 ccdsupport_DATA = $(DATA_FILES) ccdpack.shl
 
-bin_SCRIPTS = $(PUBLIC_SCR)
+bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SCR)
 
 bin_PROGRAMS = ccdwish
 
@@ -104,6 +104,47 @@ CONFIG_SCR = DATASEC.DAT EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  TEK5STANDARD.DAT WHTFLAT.DAT WHTSKY.DAT \
  INTWIDEFLAT.DAT  INTWIDESKY.DAT  WHT2000FLAT.DAT  WHT2000SKY.DAT \
  INT-WFC.ast ccdpack_style.def
+
+TCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
+ CCDCopyListbox.tcl CCDCreateImportTable.tcl CCDCreateListofNames.tcl \
+ CCDDialog.tcl CCDDoReduce.tcl CCDDoSetGlobals.tcl CCDFITSDoImport.tcl \
+ CCDExtractFitsFromNDF.tcl CCDFITSImport.tcl CCDFileToNDFName.tcl \
+ CCDGetFileName.tcl CCDGetFileUpdate.tcl CCDIssueError.tcl \
+ CCDIssueInfo.tcl CCDLocateHelpFile.tcl CCDMain.tcl CCDMakeUnique.tcl \
+ CCDMonitorTask.tcl CCDNDFDoImport.tcl CCDNDFOrganize.tcl \
+ CCDNewFileName.tcl CCDOptions.tcl CCDPresent.tcl CCDReadGlobals.tcl \
+ CCDReadRestoreFile.tcl CCDReadTextLine.tcl \
+ CCDRecordDirectoryinMenu.tcl CCDReduce.tcl CCDReduceExtras.tcl \
+ CCDRemoveFromList.tcl CCDRestoreDirectoryMenu.tcl \
+ CCDRestoreFromImportFile.tcl CCDRunTask.tcl CCDSaveGlobals.tcl \
+ CCDSaveImportTable.tcl CCDSaveRestoreFile.tcl CCDSetCCDGlobals.tcl \
+ CCDSetGenGlobals.tcl CCDSetIconBitmap.tcl CCDShowHelp.tcl \
+ CCDTaskError.tcl CCDUpdateColourLists.tcl CCDUpdateFactorLists.tcl \
+ CCDUpdateLabelCount.tcl CCDVariableWait.tcl CCDViewLists.tcl \
+ CCDWindowWait.tcl Ccd_base.tcl Ccd_checkarray.tcl Ccd_choice.tcl \
+ Ccd_helpmenubar.tcl Ccd_labent.tcl Ccd_menubar.tcl \
+ Ccd_multiscrollbox.tcl Ccd_multitem.tcl Ccd_option.tcl Ccd_radioarray.tcl \
+ Ccd_reveal.tcl Ccd_scrollbox.tcl Ccd_scrolltext.tcl Ccd_table.tcl \
+ Ccd_toplevel.tcl Ccd_gwm.tcl CCDScanDetectorFiles.tcl CCDViewFile.tcl \
+ CCDSetDetector.tcl CCDGeomCheckandExit.tcl CCDGeomDrawCommand.tcl \
+ CCDGeomTransform.tcl CCDGeometry.tcl CCDGetColour.tcl CCDMax.tcl \
+ CCDMin.tcl CCDRestartTask.tcl \
+ CCDGeometryMain.tcl CCDTaskRegistry.tcl CCDTaskStart.tcl \
+ CCDCheckReduce.tcl CCDInitialize.tcl \
+ CCDTaskQuery.tcl CCDGeomSetPercent.tcl CCDExit.tcl \
+ CCDFileMonitorMain.tcl CCDDoPresent.tcl \
+ CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl \
+ CCDAddSetHeaders.tcl CCDAddSetItems.tcl CCDContainerFile.tcl \
+ CCDDoAddSetHeaders.tcl CCDItemSetIndex.tcl CCDNameListFile.tcl \
+ CCDNewSet.tcl CCDPurgeEmptySets.tcl CCDCentreWindow.tcl CCDGetSetIndices.tcl \
+ CCDFixConvert.tcl \
+ Buttoncontrol.tcl Ccdtop.tcl Control.tcl Gwmview.tcl \
+ Helpcontrol.tcl Marknumcontrol.tcl Markstylecontrol.tcl Ndfalign.tcl \
+ Ndfchoose.tcl Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl \
+ Vectordialog.tcl Waiter.tcl Wcsframecontrol.tcl Zoomcontrol.tcl \
+ Checkcontrol.tcl Markercontrol.tcl \
+ raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
+ ccdwishrc mkindex.tcl
 
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
  c1.xbm c2.xbm c3.xbm c4.xbm c5.xbm c6.xbm c7.xbm c8.xbm \
