@@ -12,6 +12,8 @@ bin_MONOLITHS = jcmtdr
 
 jcmtdr_SOURCES = jcmtdr.f
 
+pkgdata_DATA = jcmtdr.news JCMTDR_CONDITIONS
+
 # libira comes from kaplibs but we do not want all of kaplibs
 # Figaro libraries are required: -lfig -ldsa -ldta -lgen -lpar -lich
 
