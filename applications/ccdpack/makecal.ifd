@@ -196,7 +196,7 @@
             access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
-            prompt {Use Set header information?}
+            prompt "Use Set header information?[ccd_global]"
             association <-global.ccdpack_useset
             default TRUE
             helpkey *

@@ -131,7 +131,7 @@
             access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
-            prompt {Group lists using Set header information?}
+            prompt "Group lists using Set header information?[ccd_global]"
             association <-global.ccdpack_useset
             default TRUE
             helpkey *

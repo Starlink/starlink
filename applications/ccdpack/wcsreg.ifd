@@ -87,7 +87,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_useset
             default TRUE
-            prompt {Should Set information (CCD_SET frames) take precedence?}
+            prompt "Should Set information (CCD_SET frames) take precedence?[ccd_global]"
             helpkey *
           }
 

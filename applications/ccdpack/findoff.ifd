@@ -168,7 +168,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_useset
             default TRUE
-            prompt {Group lists by Set membership?}
+            prompt "Group lists by Set membership?[ccd_global]"
             helpkey *
           }
 
