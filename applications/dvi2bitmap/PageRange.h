@@ -12,7 +12,7 @@
 #define NULL 0
 #endif
 
-#include <iostream>
+//#include <iostream>
 #include <map>
 #include "verbosity.h"
 
@@ -23,7 +23,7 @@ class PageRange
 
     bool addSpec(const char *, const char *);
     bool isSelected (const int, const int*);
-    static void verbosity (const verbosities level) { verbosity_ = level; }
+    static void verbosity (const verbosities level) { verbosity_ = level; };
 
   private:
     bool useCounts_;
@@ -31,7 +31,7 @@ class PageRange
     int first_, last_;
     enum { oneRange, ranges, unset } rangeType_;
     static verbosities verbosity_;
-    map<int,bool> setPages_;
+    std::map<int,bool> setPages_;
 };
 
 #endif

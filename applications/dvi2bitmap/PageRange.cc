@@ -150,7 +150,7 @@ bool PageRange::addSpec (const char *type, const char *spec)
 	    if (rangeType_ == ranges)
 	    {
 		if (verbosity_ >= normal)
-		    cerr << "Inconsistent range specs\n";
+		    std::cerr << "Inconsistent range specs\n";
 		parseOK = false;
 	    }
 	    else
@@ -165,7 +165,7 @@ bool PageRange::addSpec (const char *type, const char *spec)
 	if (rangeType_ == ranges)
 	{
 	    if (verbosity_ >= normal)
-		cerr << "Inconsistent range specs\n";
+		std::cerr << "Inconsistent range specs\n";
 	    parseOK = false;
 	}
 	else
