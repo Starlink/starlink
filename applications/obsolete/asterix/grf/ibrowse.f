@@ -554,6 +554,7 @@
       CHARACTER*8 STRING
       CHARACTER*10 FMT
       CHARACTER*12 OPTIONS
+      CHARACTER*12 RAS,DECS
       BYTE Q
       INTEGER IXP,IYP,IXPMAX,IYPMAX
       INTEGER IX,IY
@@ -561,6 +562,7 @@
       INTEGER I1,I2,J1,J2
       INTEGER ISTAT
       INTEGER XPID,YPID,XPMID,YPMID,DID(NX,NY),FID,OID,XID,YID
+      INTEGER RAID,DECID
       INTEGER FLAG
       INTEGER ISCALE
       INTEGER NB
@@ -585,6 +587,8 @@
         CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'RA',RAID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'DEC',DECID,STATUS)
         NAME='DATA'
         DO I=1,NX
           DO J=1,NY
@@ -647,6 +651,8 @@
 *  convert to other frames
           CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
           CALL IMG_WORLDTOCEL(XW,YW,RA,DEC,STATUS)
+          CALL CONV_DEGHMS(REAL(RA),RAS)
+          CALL CONV_DEGDMS(REAL(DEC),DECS)
           CALL IMG_WORLDTOECL(XW,YW,ELON,ELAT,STATUS)
           CALL IMG_WORLDTOGAL(XW,YW,GLON,GLAT,STATUS)
 
@@ -671,16 +677,16 @@
             DO I=I1,I2
 
               II=II+1
-              IF (J.LT.I_IY1.OR.J.GT.I_IY2.OR.
-     :                      I.LT.I_IX1.OR.I.GT.I_IX2) THEN
-                STRING=' '
-              ELSE
-                IF (VAR) THEN
+              STRING=' '
+              IF (J.GE.I_IY1.AND.J.LE.I_IY2.AND.
+     :                      I.GE.I_IX1.AND.I.LE.I_IX2) THEN
+
+                IF (VAR.AND.I_VOK) THEN
                   CALL IMG_GETVAR(I,J,VAL,STATUS)
                   SCVAL=VAL*10.0**ISCALE
                   CALL IBROWSE_FMT(SCVAL,FMT)
                   WRITE(STRING,FMT,IOSTAT=ISTAT) SCVAL
-                ELSEIF (ERR) THEN
+                ELSEIF (ERR.AND.I_VOK) THEN
                   CALL IMG_GETVAR(I,J,VAL,STATUS)
                   IF (VAL.GT.0.0) THEN
                     VAL=SQRT(VAL)
@@ -690,7 +696,7 @@
                   SCVAL=VAL*10.0**ISCALE
                   CALL IBROWSE_FMT(SCVAL,FMT)
                   WRITE(STRING,FMT,IOSTAT=ISTAT) SCVAL
-                ELSEIF (SIGNIF) THEN
+                ELSEIF (SIGNIF.AND.I_VOK) THEN
                   CALL IMG_GETVAL(I,J,VAL,STATUS)
                   CALL IMG_GETVAR(I,J,VAL2,STATUS)
                   IF (VAL2.GT.0.0) THEN
@@ -701,7 +707,7 @@
                   SCVAL=VAL*10.0**ISCALE
                   CALL IBROWSE_FMT(SCVAL,FMT)
                   WRITE(STRING,FMT,IOSTAT=ISTAT) SCVAL
-                ELSEIF (QUAL) THEN
+                ELSEIF (QUAL.AND.I_QOK) THEN
                   CALL IMG_GETQUAL(I,J,Q,STATUS)
                   CALL STR_BTOC(Q,STRING,STATUS)
                 ELSE
@@ -718,8 +724,11 @@
 
           ENDDO
 
+
           CALL NBS_PUT_VALUE(XID,0,VAL__NBR,XW,STATUS)
           CALL NBS_PUT_VALUE(YID,0,VAL__NBR,YW,STATUS)
+          CALL NBS_PUT_CVALUE(RAID,0,RAS,STATUS)
+          CALL NBS_PUT_CVALUE(DECID,0,DECS,STATUS)
           CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
 
         ENDDO
