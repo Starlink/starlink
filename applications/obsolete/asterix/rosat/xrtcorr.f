@@ -593,7 +593,7 @@
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
-         CALL DYN_UNMAP(TEPNTR)
+         CALL DYN_UNMAP(TEPNTR,STATUS)
 *
       ENDIF
 

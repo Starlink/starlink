@@ -873,7 +873,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
             STATUS=SAI__OK
             CALL MSG_PRNT( 'WARNING : NIPS error fitting source' )
           ENDIF
-	  CALL DYN_UNMAP(M_PTR)
+	  CALL DYN_UNMAP(M_PTR,STATUS)
 
 	  CALL MSG_PRNT(' ')
 	  CALL MSG_FMTI('NSOUR','i4',NDET)
@@ -983,8 +983,8 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
      &      N_AZIM,N_ELEV,PSF_FUNC,PSF_COEFS,IRADIUS,IR_4SIG,RDIMS(1),
      &      RDIMS(2),%VAL(RBIN_PTR),%VAL(NP_PTR),STATUS)
 
-	    CALL DYN_UNMAP(RBIN_PTR)
-	    CALL DYN_UNMAP(NP_PTR)
+	    CALL DYN_UNMAP(RBIN_PTR,STATUS)
+	    CALL DYN_UNMAP(NP_PTR,STATUS)
 
 *
 *  and store PSF into source map
