@@ -1777,7 +1777,7 @@ F77_SUBROUTINE(adifn(cunmap))( INTEGER(id), CHARACTER(name), POINTER(vptr),
 
   _ERR_IN("ADI_CUNMAP");
 
-  adix_unmap_n( (ADIobj) *id, name, name_length, (void *) vptr, status );
+  adix_unmap_n( (ADIobj) *id, name, name_length, (void *) *vptr, status );
 
   _ERR_OUT;
   }
