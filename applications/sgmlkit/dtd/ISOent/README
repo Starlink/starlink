@@ -1,4 +1,7 @@
 
+SGML entities
+-------------
+
 I ftp'd these entities from the SGML repository at
 ftp://ftp.ifi.uio.no/pub/SGML/ENTITIES/, then renamed them to *.sdata,
 then formed the catalog from  
@@ -14,3 +17,10 @@ I added three other versions of the ISOlat1 entity set, with different
 `public text display versions', in ISOlat1-{html,latex,ent}.ent
 
 See notes on entities at http://www.sil.org/sgml/topics.html#entities
+
+
+XML entities
+------------
+
+The XML versions of the entities are lifted from the DocBk
+distribution, at http://nwalsh.com/docbook/xml/index.html
