@@ -44,7 +44,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
-            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            prompt "Write log to (Logfile,Terminal,Neither,Both)[ccd_global]"
             default Both
             helpkey *
           }
@@ -55,7 +55,7 @@
             access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
-            prompt {Name of CCDPACK logfile}
+            prompt "Name of CCDPACK logfile[ccd_global]"
             association <-global.ccdpack_logfile
             default CCDPACK.LOG
             helpkey *
