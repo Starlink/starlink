@@ -200,6 +200,9 @@ Type ? to see the main help topics.
       topic, the help facility provides a description of the specified
       subtopic.
 
+1 POLMAP
+Display a polarisation map.
+
 1 POLREG
 Extract and align O and E ray areas from a set of images.
 

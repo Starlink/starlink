@@ -58,11 +58,13 @@ setenv POLPACK_HELP INSTALL_HELP/polpack
 #  ===============================================
 #
 alias polhelp   INSTALL_BIN/polhelp 
+alias polmap    INSTALL_BIN/polmap
 alias polreg    INSTALL_BIN/polreg
 #
 #  Now do the same with alternative names.
 #
 alias pol_polhelp   INSTALL_BIN/polhelp 
+alias pol_polmap    INSTALL_BIN/pol_polmap
 alias pol_polreg    INSTALL_BIN/pol_polreg
 #
 #

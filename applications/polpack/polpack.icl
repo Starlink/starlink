@@ -33,16 +33,19 @@
 {-
 
 {  Basic command definitions.
+define polmap            $POLPACK_DIR/polpack_mon
 define polreg            $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
 
 {  Full command definitions.
+define pol_polmap        $POLPACK_DIR/polpack_mon polmap
 define pol_polreg        $POLPACK_DIR/polpack_mon polreg
 defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
 
 { Define POLPACK's help from ICL.  Note that polhelp points to help polpack
 { because polhelp doesn't work from UNIX ICL.
 defhelp  polhelp         $POLPACK_HELP
+defhelp  polmap          $POLPACK_HELP
 defhelp  polreg          $POLPACK_HELP
 
 
