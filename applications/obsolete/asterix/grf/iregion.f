@@ -325,12 +325,17 @@
         CALL MSG_SETR('YC',YC)
         CALL MSG_SETR('RAD',ORAD)
         CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD )',TEXT,L)
-        TEXT=' .AND..NOT. CIRCLE('
+
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
+
+
+        TEXT='     .AND..NOT.(CIRCLE('
         L=CHR_LEN(TEXT)
+
         CALL MSG_SETR('XC',XC)
         CALL MSG_SETR('YC',YC)
         CALL MSG_SETR('RAD',IRAD)
-        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD )',TEXT,L)
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD ))',TEXT,L)
         IF (EXCLUDE) THEN
           L=L+1
           TEXT(L:)=')'
