@@ -38,7 +38,7 @@
 #     the DTD dtddescription.dtd.  That instance is processed with the
 #     dtd2sgml.dsl DSSSL stylesheet to produce the .sgmltext file.
 #
-#     The files general-0.?.html and programcode-0.?.html are quite
+#     The files starlink-0.?.html and programcode-0.?.html are quite
 #     distinct from this.  They're also generated from the
 #     .description instances, and also contain all the description of
 #     the elements in the DTD, but they also incorporate any
@@ -48,22 +48,24 @@
 #     dtddoc.xslt.
 #
 #     How is that commentary included in the .description instance?
-#     That's done using the dtddoc.pl script, which is the
-#     right-hand-side of a mail alias such as
+#     That's done using the dtddoc.pl script, which processes a
+#     mailfile named sgml-starlink-0.7 in the directory sgml-mail.  It
+#     breaks the messages in there into separate files in the
+#     directory sgml-starlink-0.7, named after DTD elements, each of
+#     which is a document fragment consisting of a sequence of
+#     `commentary' elements as defined in the dtddescription DTD.
+#     That's then spliced into the .description file using the Perl
+#     script splice.pl.  That is, the sequence is:
 #
-#         general-0.6: |/path-to-here/dtddoc.pl general-0.6
+#         sgml-mail/sgml-starlink-0.7           (mail archive)
+#           -> sgml-starlink-0.7/elementname(s) (DTD fragments)
+#           -> starlink-0.7.description         (using splice.pl)
+#           -> starlink-0.7.html                (using dtddoc.xslt)
 #
-#     That takes an email message, and writes it out as a document
-#     fragment, consisting of a sequence of `commentary' elements as
-#     defined in the dtddescription DTD, within a subdirectory called
-#     general-0.6.  That's then spliced into the .description file
-#     using the Perl script splice.pl
+#     There's an identical sequence of actions for programcode-0.7
 #
-#     The `general-0.6' subdirectory has to be writable by the mailer
-#     (ie, group `exim', and group-writable), but it also has to be
-#     writable by the owner of this script, so that it can delete
-#     files in that subdirectory once they've been spliced into the
-#     .description file.
+#     There are no special permissions required, since the MTA is set
+#     up to deliver mail to the sgml-mail directory as user norman.
 #
 #  Authors:
 #     NG: Norman Gray (Starlink, Glasgow)
@@ -135,50 +137,66 @@ starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 
 
 # Not only is the following target not buildable after distribution,
-# it is only buildable in a directory which has a subdirectory
-# `general-0.7' (since there is no rule for building this as a
+# it is only buildable in a directory which has a file
+# `sgml-mail/sgml-starlink-0.7' (since there is no rule for building this as a
 # target).  That is, it's only usable in a directory which has been
 # set up to receive the result of the dtddoc.pl script.  See notes at top.
-general-0.7.html: starlink-0.7.description starlink-0.7.dtdsummary general-0.7
-	if test general-0.7 -nt starlink-0.7.description; then \
-		for f in `./splice.pl $@ tmp-$@ general-0.7`; do\
-			rm $$f; \
-		done; \
-		mv $@ $@.old; \
-		mv tmp-$@ $@; \
-	fi
+
+# Create the HTML file from the DTD description
+%.html: %.description
 	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
-		$< dtddoc.xslt $@ listprefix=general-0.7
+		$< dtddoc.xslt $@ listprefix=sgml-$(@:.html=)
 
-programcode-0.7.html: programcode-0.7.description programcode-0.7.dtdsummary programcode-0.7
-	if test programcode-0.7 -nt programcode-0.7.description; then \
-		echo 'splicing programcode-0.7';\
-		for f in `./splice.pl programcode-0.7.description tmp-programcode-0.7.description programcode-0.7`; do\
-			rm -f $$f; \
-		done; \
-		mv programcode-0.7.description programcode-0.7.description.old; \
-		mv tmp-programcode-0.7.description programcode-0.7.description; \
-	fi
-	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
-		programcode-0.7.description dtddoc.xslt $@ listprefix=programcode-0.7
+# Splice the DTD fragments in the directory sgml-starlink-0.7 into the
+# description file starlink-0.7.description
+%.description: sgml-%
+	for f in `./splice.pl $@ tmp-$@ $<`; do\
+		rm $$f; \
+	done
+	mv $@ $@.old
+	mv tmp-$@ $@
+
+# Following is slightly tricky, since we want to leave the input file
+# (sgml-mail/sgml-%) existing and of zero size, but still older than
+# the target.
+sgml-%: sgml-mail/sgml-%
+	mv $< $(<)-temp
+	touch $<
+	./dtddoc.pl $@ < $(<)-temp
+	cat $(<)-temp >> $<-full-archive
+	rm $(<)-temp
 
 
-# This dependence on general-0.6 is WRONG, since it fails if the
-# directory general-0.6 isn't present (which is OK, because it
-# indicates there's nothing in there to merge).  Also, this merging is
-# only needed when you're maintaining the DTD-commentary elements, and
-# NOT when you're building the documentation (which is a time when
-# there'll very probably not be a general-0.6 directory, because
-# you're working in an exported copy of the CVS repository, rather
-# than the `live' copy of the description file).  This step should
-# be taken out of the Makefile and handed over to the script
-# which invokes it.
-#starlink-0.6.description: general-0.6
-#	for f in `./splice.pl $@ tmp-$@ general-0.6`; do\
-#		rm $$f; \
-#	done
-#	mv $@ $@.old
-#	mv tmp-$@ $@
+
+starlink-0.7.html: starlink-0.7.description starlink-0.7.dtdsummary
+
+starlink-0.7.description: sgml-starlink-0.7
+
+sgml-starlink-0.7: sgml-mail/sgml-starlink-0.7
+
+programcode-0.7.html: programcode-0.7.description programcode-0.7.dtdsummary
+
+programcode-0.7.description: sgml-programcode-0.7
+
+sgml-programcode-0.7: sgml-mail/sgml-programcode-0.7
+
+
+
+#programcode-0.7.html: programcode-0.7.description programcode-0.7.dtdsummary programcode-0.7
+#	if test programcode-0.7 -nt programcode-0.7.description; then \
+#		echo 'splicing programcode-0.7';\
+#		for f in `./splice.pl programcode-0.7.description tmp-programcode-0.7.description programcode-0.7`; do\
+#			rm -f $$f; \
+#		done; \
+#		mv programcode-0.7.description programcode-0.7.description.old; \
+#		mv tmp-programcode-0.7.description programcode-0.7.description; \
+#	fi
+#	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
+#		programcode-0.7.description dtddoc.xslt $@ listprefix=programcode-0.7
+
+
+
+
 
 clean:
 	rm -f *.sgmltext *.dtdsummary sgmltext.stamp
