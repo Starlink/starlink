@@ -1,5 +1,5 @@
 *+  COMPARE - Chi-squared comparison of model array and data array
-      SUBROUTINE COMPARE(STATUS)
+      SUBROUTINE COMPARE( STATUS )
 *
 *    Description :
 *
@@ -48,6 +48,7 @@
 *                         variance rather than error. Checkjs zero
 *                         variance explicitly. (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     12 Jan 95 : V1.8-1  Updated data interfaces. Removed report of type (DJA)
 *
 *    Type definitions :
 *
@@ -56,7 +57,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -64,39 +65,35 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) DLOC            ! Data dataset locator
-      CHARACTER*(DAT__SZLOC) MLOC            ! Model dataset locator
-      CHARACTER*(DAT__SZTYP) TYPE1           ! data type of 1st dataset
-      CHARACTER*(DAT__SZTYP) TYPE2           ! data type of 2nd dataset
+      REAL                   	FACTOR          ! Renormalization factor for model
+      REAL                   	S               	! Chi-squared fit
+      REAL                   	SNEW            ! Chi-squared for scaled model
+      REAL                   	ZEQUIV          	! Equivalent normal z
 
-      REAL                   FACTOR          ! Renormalization factor for model
-      REAL                   S               ! Chi-squared fit
-      REAL                   SNEW            ! Chi-squared for scaled model
-      REAL                   ZEQUIV          ! Equivalent normal z
+      INTEGER			DFID			! Data file id
+      INTEGER                	DIMS(ADI__MXDIM)	! Dimensions of a dataset
+      INTEGER                	DPTR             	! Pointer to data array
+      INTEGER                	DQPTR           	! Data quality
+      INTEGER                	DVPTR           	! Data variance
+      INTEGER			MFID			! Model file id
+      INTEGER                	MPTR            	! Model data
+      INTEGER                	MVPTR           	! Model variance
+      INTEGER                	NDIM            	! # dimensions
+      INTEGER                	NDOF            ! # degrees of freedom for S
+      INTEGER                	NELD            	! # data elements
+      INTEGER                	NELM            	! # model elements
+      INTEGER                	NZV             ! # points with zero variance
 
-      INTEGER                DIMS(DAT__MXDIM)! Dimensions of a dataset
-      INTEGER                DPTR            ! Pointer to data array
-      INTEGER                DQPTR           ! Pointer to data quality
-      INTEGER                DVPTR           ! Pointer to data variance
-      INTEGER                MPTR            ! Pointer to model data
-      INTEGER                MVPTR           ! Pointer to model variance
-      INTEGER                NDIM            ! # dimensions
-      INTEGER                NDOF            ! # degrees of freedom for S
-      INTEGER                NELD            ! # data elements
-      INTEGER                NELM            ! # model elements
-      INTEGER                NZV             ! # points with zero variance
-
-      LOGICAL                MOD_ERR         ! Model errors present
-      LOGICAL                OK              ! Data item acceptable
-      LOGICAL                QUAL            ! Data quality present
-      LOGICAL                POISS           ! Poisson errors assumed
-      LOGICAL                PRIM            ! Primitive input ?
-      LOGICAL                SOMEBAD         ! Any bad quality points ?
+      LOGICAL                	MOD_ERR         	! Model errors present
+      LOGICAL                	OK              	! Data item acceptable
+      LOGICAL                	QUAL            	! Data quality present
+      LOGICAL                	POISS           	! Assume Poisson errors
+      LOGICAL                	SOMEBAD         	! Any bad quality points ?
 *
 *    Version :
 *
       CHARACTER*30           VERSION
-         PARAMETER           (VERSION = 'COMPARE Version 1.8-0')
+         PARAMETER           (VERSION = 'COMPARE Version 1.8-1')
 *-
 
 *    Version announcement
@@ -106,9 +103,8 @@
       CALL AST_INIT()
 
 *    Get the data
-      CALL USI_ASSOCI( 'DATA', 'READ', DLOC, PRIM, STATUS )
-      CALL DAT_TYPE(DLOC,TYPE2,STATUS)
-      CALL BDA_CHKDATA( DLOC, OK, NDIM, DIMS, STATUS )
+      CALL USI_TASSOCI( 'DATA', '*', 'READ', DFID, STATUS )
+      CALL BDI_CHKDATA( DFID, OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
       IF ( OK ) THEN
@@ -120,10 +116,9 @@
       END IF
 
 *    Get the model
-      CALL USI_ASSOCI( 'MODEL', 'READ', MLOC, PRIM, STATUS )
-      CALL DAT_TYPE(MLOC,TYPE1,STATUS)
+      CALL USI_TASSOCI( 'MODEL', '*', 'READ', MFID, STATUS )
 
-      CALL BDA_CHKDATA( MLOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( MFID, OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
       IF ( OK ) THEN
@@ -140,32 +135,22 @@
 	CALL ERR_REP( ' ','Data and model arrays are of'
      :                     //' different size', STATUS )
 	GOTO 99
-
-      ELSE
-	CALL MSG_SETC( 'MTYPE', TYPE1 )
-	IF ( TYPE1 .EQ. TYPE2 ) THEN
-	  CALL MSG_PRNT( 'Datasets are both of type ^MTYPE' )
-	ELSE
-	  CALL MSG_SETC( 'DTYPE', TYPE2 )
-	  CALL MSG_PRNT( 'Datasets are of types ^MTYPE and ^DTYPE' )
-	END IF
-
       END IF
 
 *    Model
-      CALL BDA_MAPDATA( MLOC, 'READ', MPTR, STATUS )
-      CALL BDA_CHKVAR( MLOC, MOD_ERR, NDIM, DIMS, STATUS )
+      CALL BDI_MAPDATA( MFID, 'READ', MPTR, STATUS )
+      CALL BDI_CHKVAR( MFID, MOD_ERR, NDIM, DIMS, STATUS )
       IF ( MOD_ERR ) THEN
-        CALL BDA_MAPVAR( MLOC, 'READ', MVPTR, STATUS )
+        CALL BDI_MAPVAR( MFID, 'READ', MVPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *    Data
-      CALL BDA_MAPDATA( DLOC, 'READ', DPTR, STATUS )
-      CALL BDA_CHKVAR( DLOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_MAPDATA( DFID, 'READ', DPTR, STATUS )
+      CALL BDI_CHKVAR( DFID, OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( OK ) THEN
-        CALL BDA_MAPVAR( DLOC, 'READ', DVPTR, STATUS )
+        CALL BDI_MAPVAR( DFID, 'READ', DVPTR, STATUS )
       ELSE
 
 *      No existing errors - options are Poisson errors or unit errors
@@ -184,23 +169,22 @@
       END IF
 
 *    Data quality present?
-      CALL BDA_CHKQUAL( DLOC, QUAL, NDIM, DIMS, STATUS )
+      CALL BDI_CHKQUAL( DFID, QUAL, NDIM, DIMS, STATUS )
       IF ( QUAL ) THEN
-        CALL BDA_MAPLQUAL( DLOC, 'READ', SOMEBAD, DQPTR, STATUS )
+        CALL BDI_MAPLQUAL( DFID, 'READ', SOMEBAD, DQPTR, STATUS )
         IF ( .NOT. SOMEBAD ) THEN
-          CALL BDA_UNMAPLQUAL( DLOC, STATUS )
+          CALL BDI_UNMAPLQUAL( DFID, STATUS )
           QUAL = .FALSE.
         END IF
       END IF
 
 *    Calculate chi-squared fit, renormalization factor, and improved fit
-      CALL COMPARE_CHIFIT( NELM, %VAL(DPTR), %VAL(DVPTR),
-     :                     QUAL, %VAL(DQPTR), %VAL(MPTR),
-     :                     MOD_ERR, %VAL(MVPTR),
+      CALL COMPARE_CHIFIT( NELM, %VAL(DPTR), %VAL(DVPTR), QUAL,
+     :           %VAL(DQPTR), %VAL(MPTR), MOD_ERR, %VAL(MVPTR),
      :                     S, NDOF, FACTOR, SNEW, NZV, STATUS )
 
 *    Find equivalent normal z
-      ZEQUIV=SQRT(2*S)-SQRT(2.0*NDOF-1)
+      ZEQUIV = SQRT(2*S)-SQRT(2.0*NDOF-1)
 
 *    Output results to terminal
       CALL MSG_PRNT( ' ' )
@@ -225,11 +209,11 @@
       CALL MSG_PRNT( 'New equiv. normal z : ^NEQZ' )
 
 *    Release dataset
-      CALL BDA_RELEASE( DLOC, STATUS )
-      CALL BDA_RELEASE( MLOC, STATUS )
+      CALL BDI_RELEASE( DFID, STATUS )
+      CALL BDI_RELEASE( MFID, STATUS )
 
 *    Tidy up and exit
- 99   CALL AST_CLOSE( STATUS )
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -266,7 +250,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
