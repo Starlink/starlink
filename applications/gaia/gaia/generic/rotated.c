@@ -558,7 +558,6 @@ static int XRotPaintAlignedString(
     bitmap_to_paint=item->bitmap;
 
     /* handle user stippling */
-#ifndef X11R3
     {
 	GC depth_one_gc;
 	XGCValues values;
@@ -636,7 +635,6 @@ static int XRotPaintAlignedString(
 	    }
 	}
     }
-#endif /*X11R3*/
 
     /* paint text using stipple technique */
     XSetFillStyle(dpy, my_gc, FillStippled);
@@ -881,6 +879,7 @@ static RotatedTextItem *XRotRetrieveFromCache (
 	item->angle=angle;
 	item->align=align;
 	item->magnify=style.magnify;
+        item->cached=0;
 
 	/* cache it */
 	XRotAddToLinkedList(dpy, item);
@@ -1025,19 +1024,23 @@ static RotatedTextItem *XRotCreateTextItem(
 
     /* For special angles make these numbers exact to avoid any
        rounding problems (linux seems difficult here)*/
+
+#define NEARLY_ZERO 0.0001
+#define NEARLY_ONE 0.9999
+
     special = 0;
-    if ( fabs( sin_angle ) < 0.001 ) { 
+    if ( fabs( sin_angle ) < NEARLY_ZERO ) { 
       special = 1;
       sin_angle = 0.0;
-    } else if ( fabs( sin_angle ) > 0.999 ) {
+    } else if ( fabs( sin_angle ) > NEARLY_ONE ) {
       special = 1;
       sin_angle = 1.0;
     }
 
-    if ( fabs( cos_angle ) < 0.001 ) { 
+    if ( fabs( cos_angle ) < NEARLY_ZERO ) { 
       special = 1;
       cos_angle = 0.0;
-    } else if ( fabs( cos_angle ) > 0.999 ) {
+    } else if ( fabs( cos_angle ) > NEARLY_ONE ) {
       special = 1;
       cos_angle = 1.0;
     }
@@ -1423,10 +1426,10 @@ static XImage *XRotMagnifyImage(
     /* loop over magnified image */
     for(j2=0; j2<rows_out; j2++) {
 	x=0.0;
-	j= (int) y;
+	j=(int)y;
 
 	for(i2=0; i2<cols_out; i2++) {
-	    i= (int) x;
+	    i=(int)x;
 
 	    /* bilinear interpolation - where are we on bitmap ? */
 	    /* right edge */
@@ -1472,7 +1475,7 @@ static XImage *XRotMagnifyImage(
 	    }
 
 	    /* if interpolated value is greater than 0.5, set bit */
-	    if(((1.0-t)*(1.0-u)*z1 + t*(1.0-u)*z2 + t*u*z3 + (1.0-t)*u*z4)>0.5)
+	    if(((1.0-t)*(1.0-u)*z1 + t*(1.0-u)*z2 + t*u*z3 + (1.0-t)*u*z4)>=0.5)
 		I_out->data[j2*byte_width_out+i2/8]|=128>>i2%8;
 
 	    x+=mag_inv;
@@ -1496,14 +1499,13 @@ static XImage *XRotMagnifyImage(
 /* Calculate the bounding box some text will have when painted            */
 /**************************************************************************/
 
-XPoint *XRotTextExtents(
-                        Display *dpy,
-                        XFontStruct *font,
-                        double angle,
-                        int x, 
-                        int y,
-                        char *text,
-                        int align )
+XPoint *XRotTextExtents( Display *dpy,
+                         XFontStruct *font,
+                         double angle,
+                         int x, 
+                         int y,
+                         char *text,
+                         int align )
 {
     register int i;
     char *str1, *str2, *str3;
