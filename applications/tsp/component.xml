@@ -4,7 +4,7 @@
 
 <component id="tsp">
   <version>2.3-3</version>
-  <path>applications/kappa</path>
+  <path>applications/tsp</path>
   <description>TSP - Time Series/Polarimetry Package</description>
   <abstract><p>
 TSP is an astronomical data reduction package which handles time series

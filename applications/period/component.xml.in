@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>applications/obosolete/period</path>
+  <path>applications/obsolete/period</path>
   <description>PERIOD - A Time-series analysis package</description>
   <abstract><p>
 A software package designed to search for periodicities in data.
