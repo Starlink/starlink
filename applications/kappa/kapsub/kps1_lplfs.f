@@ -40,7 +40,7 @@
 *
 *     Frame 3: Corresponds to "what we want to see" (i.e. the Frame describing 
 *              the quantities which are to be annotated on the displayed axes).
-*              It is given Domain DATAPLOT.
+*              This is a CmpFrame which is given Domain DATAPLOT.
 *        Axis 1 - The quantity to be plotted on the horizontal axis of the
 *                 graph (i.e. distance from the starting point of the profile 
 *                 if DIST is .TRUE., or the supplied Current Frame axis 
@@ -87,6 +87,10 @@
 *        Original version.
 *     9-DEC-1998 (DSB):
 *        Modified Y axis label to include NDF label component.
+*     7-JAN-2003 (DSB):
+*        Modified DATAPLOT Frame to be a CmpFrame rather than a Frame
+*        formed using AST_PICKAXES. this means that the behaviour of
+*        SpecFrame axes is retained in the DATAPLOT Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,6 +132,8 @@
       DOUBLE PRECISION POS( 2 )  ! Start and end of samples in GRID Frame
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
       INTEGER CFRM               ! Current Frame in supplied FrameSet
+      INTEGER FR1                ! Frame 1 in compound frame
+      INTEGER FR2                ! Frame 2 in compound frame
       INTEGER IAT                ! No. of characters in a string
       INTEGER ICURR              ! Index of current Frame in IWCS
       INTEGER INPRM(2)           ! Axis permutation array
@@ -332,11 +338,16 @@
 
 *  "What we want":
 *  ---------------
-*  The first axis is copied from the specified axis in the Current Frame of 
-*  the supplied FrameSet. The second (data) axis is a default Axis.
+
+*  This is a 2-D CmpFrame. The first axis is copied from the specified axis 
+*  in the Current Frame of the supplied FrameSet. The second (data) axis is a 
+*  default 1-D Axis.
       AXES( 1 ) = IAXIS
-      AXES( 2 ) = 0
-      WWWANT = AST_PICKAXES( CFRM, 2, AXES, TMAP, STATUS ) 
+      FR1 = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS ) 
+      FR2 = AST_FRAME( 1, "", STATUS ) 
+      WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
+      CALL AST_ANNUL( FR1, STATUS )
+      CALL AST_ANNUL( FR2, STATUS )
 
 *  When a SkyAxis is extracted from a SkyFrame, its Format and Digits 
 *  attributes are set, even if they were not set in the SkyFrame. This means 

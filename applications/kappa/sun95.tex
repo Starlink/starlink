@@ -24366,10 +24366,9 @@ plot (6k).
       default values which encompass the entire supplied data set. The
       current picture is usually cleared before plotting the new picture,
       but parameter CLEAR can be used to prevent this, allowing several
-      plots to be {\tt "}stacked{\tt "} together. If a new plot is drawn over an
-      existing plot, then there is an option to allow the bounds of the
-      new plot to be set to the bounds of the existing plot (see parameter
-      ALIGN).
+      plots to be {\tt "}stacked{\tt "} together. If a new plot is drawn 
+      over an existing plot, then there is an option to allow the new plot 
+      to be aligned with the existing plot (see parameter ALIGN).
 
       The input NDF may, for instance, contain a spectrum of data values
       against wavelength, or it may contain data values along a
@@ -24393,17 +24392,21 @@ plot (6k).
       \sstsubsection{
          ALIGN = \_LOGICAL (Read)
       }{
-         Controls the way in which the bounds of a new plot are
-         determined if it is drawn over an existing plot. If ALIGN
-         is FALSE, then the bounds of the new plot are specified
-         using parameters XLEFT, XRIGHT, YBOT and YTOP as usual. If ALIGN
-         is TRUE, then the bounds of the new plot are set equal to
-         the bounds of the existing plot (on both axes), and parameters
-         XLEFT, XRIGHT, YBOT and YTOP are ignored. This parameter is only
-         accessed if parameter CLEAR is FALSE, and if there is another line
-         plot within the current picture. If a null (!) value is supplied,
-         the plots are aligned if the labels on the horizontal axes are the
-         same, but they are not aligned if the labels are different. {\tt [!]}
+         Controls whether or not the new data plot should be aligned with an
+         existing data plot. If ALIGN is TRUE, the X axis values of the
+         new plot will be mapped into the coordinate system of the X axis in
+         the existing plot before being used (if this is not possible an
+         error is reported). In this case, the XLEFT, XRIGHT, YBOT and YTOP 
+         parameters are ignored and the bounds of the existing plot are used 
+         instead. If ALIGN is FALSE, the new X axis values are used without 
+         change. The bounds of the new plot are specified using parameters 
+         XLEFT, XRIGHT, YBOT and YTOP as usual, and these bounds are mapped
+         to the edges of the existing picture. The ALIGN parameter is only
+         accessed if parameter CLEAR is FALSE, and if there is another line 
+         plot within the current picture. If a null (!) value is supplied, 
+         a value of TRUE will be used if and only if a mapping can be found 
+         between the existing and the new plots. A value of FALSE will
+         be used otherwise. {\tt [!]}
       }
       \sstsubsection{
          AXES = \_LOGICAL (Read)
@@ -46079,6 +46082,11 @@ The following applications have been modified:
       \begin{itemize}
          \item The default plotting style now results in the axis units being
                included in the axis labels.
+         \item The use of the ALIGN parameter has been changed slightly.
+               If ALIGN is TRUE then the correct Mapping between new and 
+               old DATAPLOT pictures is now used (previously a unit
+               mapping was always used). The changed behaviour is described 
+               in the documentation for LINPLOT.
       \end{itemize}
 
    \item [\htmlref{WCSFRAME}{WCSFRAME}] \mbox{}
