@@ -147,8 +147,10 @@ proc buildP4Widgets1 w {
     bind $P4Widgets(LOW) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4AutoscaleBox1.html"
 
 # Set a trace on Autoscale and Whole Array
-    trace variable P4Widgets(PLOT_WHOLE) w "SetFlipOut $limitsFlipOut1"
-    trace variable P4Widgets(AUTOSCALE)  w "SetFlipOut $limitsFlipOut2"
+    #trace variable P4Widgets(PLOT_WHOLE) w "SetFlipOut $limitsFlipOut1"
+    #trace variable P4Widgets(AUTOSCALE)  w "SetFlipOut $limitsFlipOut2"
+    trace variable P4Widgets(PLOT_WHOLE) w "SetFlipOut $flipFrame1"
+    trace variable P4Widgets(AUTOSCALE)  w "SetFlipOut $flipFrame1"
 
 # Plot style
     set frame [frame $mainFrame.st]
@@ -179,7 +181,7 @@ proc buildP4Widgets1 w {
 
 # Panel for flipouts
     set flipFrame2 [frame $mainFrame.flipFrame2 -bd 2 -relief sunken]
-    pack $flipFrame2 -fill x -expand y
+    pack $flipFrame2 -fill x -expand yes
     bind $flipFrame2 <Button-2> "p4Update buildP4Widgets1 ALL"
     bind $flipFrame2 <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4FlipBox1.html"
 
@@ -346,36 +348,6 @@ proc buildP4Widgets1 w {
     return $mainFrame
 }
 
-proc NewFlipOut {master slave} {
-#+
-#  Displays a flip out panel after unmapping any existing one.
-#-
-    set currentSlave [pack slaves $master]
-    if {$currentSlave != ""} {pack forget $currentSlave}
-    if {$slave != ""} {pack $slave -side left}
-}
-
-proc SetFlipOut {w name el op} {
-  global ${name}
-  set slaves [pack slaves [winfo parent $w]]
-  set val [set ${name}($el)]
-  if {$val == 0} {
-    if {$slaves == ""} {
-      pack $w -fill x
-    } else {
-      if {$el == "PLOT_WHOLE"} {
-        pack $w -side right -fill x
-        pack $slaves -side left -fill x
-      } elseif {$el == "AUTOSCALE"} {
-        pack $w -side left -fill x
-        pack $slaves -side right -fill x
-      }
-    }
-  } else {
-    pack forget $w
-  } 
-}
-
 proc NewDisplayType {flipFrame args} {
   global P4Widgets
   global typelist
@@ -383,3 +355,64 @@ proc NewDisplayType {flipFrame args} {
   set i [lsearch -exact $typelist $P4Widgets(DISPLAY_TYPE)]
   NewFlipOut $flipFrame [lindex $widgetlist $i]
 }
+
+proc NewFlipOut {master slave} {
+#+
+#  Displays a flip out panel after unmapping any existing one.
+#-
+    set currentSlave [pack slaves $master]
+    if {$currentSlave != ""} {pack forget $currentSlave}
+    pack forget $master
+    if {$slave != ""} {
+      pack $master -fill x -expand yes -after [winfo parent ${master}].st
+      pack $slave -side left 
+    }
+}
+
+proc SetFlipOut {master name el op} {
+  global ${name}
+  set currentSlaves [pack slaves $master]
+  foreach field $currentSlaves {pack forget $field}
+
+  set plot_whole [set ${name}(PLOT_WHOLE)]
+  set autoscale [set ${name}(AUTOSCALE)]
+
+  pack forget $master
+  if {$plot_whole==0 && $autoscale==0} {
+    pack $master -fill x -expand yes -after [winfo parent ${master}].plf
+    pack ${master}.wh -side right -fill x
+    pack ${master}.as -side left -fill x
+  } elseif {$plot_whole==1 && $autoscale==0} {
+    pack $master -fill x -expand yes -after [winfo parent ${master}].plf
+    pack ${master}.as -side left -fill x
+  } elseif {$plot_whole==0 && $autoscale==1} {
+    pack $master -fill x -expand yes -after [winfo parent ${master}].plf
+    pack ${master}.wh -side right -fill x
+  } 
+}
+
+#proc SetFlipOut {w c name el op} {
+#  global ${name}
+#  puts "Window=$w Slave=$c Name=$name Element=$el Operation=$op"
+#  set slaves [pack slaves [winfo parent $c]]
+#  puts "Slaves=$slaves"
+#  set val [set ${name}($el)]
+#  puts "Value=$val"
+#  if {$val == 0} {
+#    if {$slaves == ""} {
+#      pack $c -fill x
+#    } else {
+#      if {$el == "PLOT_WHOLE"} {
+#        pack $c -side right -fill x
+#        pack $slaves -side left -fill x
+#      } elseif {$el == "AUTOSCALE"} {
+#        pack $c -side left -fill x
+#        pack $slaves -side right -fill x
+#      }
+#    }
+#  } else {
+#    pack forget $c
+#    pack forget $w
+#  } 
+#}
+
