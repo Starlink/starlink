@@ -8,9 +8,11 @@ Makefile.PL
 PGPLOT/PGPLOT.pm
 PGPLOT/Makefile.PL
 PGPLOT/t/pgplot.t
+PGPLOT/t/plot_pg.t
 Tk/Tk.pm
 Tk/Makefile.PL
 Tk/t/tk.t
+Tk/t/plot_tk.t
 arrays.c
 arrays.h
 astTypemap.c
@@ -18,12 +20,12 @@ astTypemap.h
 data/m31.sdf
 data/m31.fit
 data/m31.jpg
-data/m31.gif
 grf.h
 grf_perl.c
 ppport.h
 t/attrib.t
 t/channel.t
+t/dsb_reg.t
 t/fitschan.t
 t/fitschn0.t
 t/formats.t
