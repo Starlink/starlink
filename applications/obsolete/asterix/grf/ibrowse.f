@@ -697,7 +697,7 @@
                 ENDIF
               ENDIF
 
-              CALL NBS_PUT_CVALUE(DID(I,J),0,STRING,STATUS)
+c              CALL NBS_PUT_CVALUE(DID(I,J),0,STRING,STATUS)
 
             ENDDO
 
