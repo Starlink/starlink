@@ -79,7 +79,7 @@ dnl and surrounding thread for discussion.  However that doesn't
 dnl appear to work in fact, and the function in getopt_long.c has
 dnl different magic to avoid getting horribly tangled up.
 AC_CHECK_FUNCS(getopt)
-AC_CHECK_DECLS([getopt,getsubopt])
+AC_CHECK_DECLS([getopt,getsubopt,getopt_long])
 AC_SUBST(GETOPT_LONG_OBJ)
 AC_REPLACE_FUNCS(getopt_long getsubopt)
 
