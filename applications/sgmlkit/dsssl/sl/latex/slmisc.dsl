@@ -26,12 +26,21 @@ mode make-manifest-mode in sl.dsl.
 		   (node-list (select-elements kids
 					       (normalize "figurecontent"))
 			      (select-elements kids (normalize "px")))
-		   '("EPS" "LATEXGRAPHICS"))))
-  (make environment name: "figure"
-	(if content
+		   '("eps" "latexgraphics")))
+	 (float (attribute-string (normalize "float"))))
+  (if (and float
+	   (string=? float "float"))
+      (make environment name: "figure"
+	    parameters: `(,%latex-float-spec%)
+	    (if content
+		(process-node-list content)
+		(literal "No processable content"))
+	    (process-matching-children 'caption))
+      (make environment brackets: '("{" "}")
+	    (make empty-command name: "SetCapType"
+		  parameters: '("figure"))
 	    (process-node-list content)
-	    (literal "No processable content"))
-	(process-matching-children 'caption))))
+	    (process-matching-children 'caption)))))
 
 (element caption
   (let ((caption-details (get-caption-details (parent (current-node))))
@@ -68,11 +77,11 @@ mode make-manifest-mode in sl.dsl.
 			    (entity-notation ent))))
     (if ent-notation
 	(case ent-notation
-	  (("EPS")
+	  (("eps")
 	   (make empty-command name: "includegraphics"
 		 escape-tex?: #f
 		 parameters: (list ent-sysid)))
-	  (("LATEXGRAPHICS")
+	  (("latexgraphics")
 	   (let ((package (entity-attribute-string ent
 						   (normalize "package")
 						   (current-node))))
@@ -85,7 +94,7 @@ mode make-manifest-mode in sl.dsl.
 	(let ((cont-notation (attribute-string (normalize "notation")
 					       (current-node))))
 	  (if cont-notation
-	      (if (string=? cont-notation "LATEXGRAPHICS")
+	      (if (string=? cont-notation "latexgraphics")
 		  (make fi data: (data (current-node)))
 		  (error (string-append
 			  "Can't process inline graphics of type "
@@ -99,7 +108,7 @@ mode make-manifest-mode in sl.dsl.
 					       (normalize "figurecontent"))
 			      (select-elements kids
 					       (normalize "px")))
-		  '("EPS" "LATEXGRAPHICS"))))
+		  '("eps" "latexgraphics"))))
     (if content
 	(process-node-list content)
 	(error "Can't process coverimage"))))
@@ -196,11 +205,13 @@ to need explanation or elaboration.
     (make fi data: "\\\\")))
 
 (element verbatim
-  (make environment
-    name: "verbatim"
-    recontrol: "/-/"
-    escape-tex?: #f
-    (process-children)))
+  (make environment name: "quote"
+	(make environment name: "small"
+	      (make environment
+		name: "verbatim"
+		recontrol: "/-/"
+		escape-tex?: #f
+		(process-children)))))
 
 (element attribution
   (make command name: "textit"
