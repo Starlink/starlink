@@ -261,16 +261,16 @@ F77_SUBROUTINE(ast_text)( INTEGER(THIS),
 }
 
 F77_SUBROUTINE(ast_setgrffun)( INTEGER(THIS), CHARACTER(NAME), 
-                            void (* FUN)(), INTEGER(STATUS)
-                            TRAIL(NAME) ) {
+                               AstGrfFun FUN, INTEGER(STATUS)
+                               TRAIL(NAME) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_CHARACTER(NAME)
    char *name;
-   void (* fun)();
+   AstGrfFun fun;
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    int ifun;               /* Index into grf function list */
-   void (* wrapper)();     /* Wrapper function for C Grf routine*/
+   AstGrfWrap wrapper;     /* Wrapper function for C Grf routine*/
 
    method = "AST_SETGRFFUN";
    class = "Plot";
@@ -281,7 +281,7 @@ F77_SUBROUTINE(ast_setgrffun)( INTEGER(THIS), CHARACTER(NAME),
 /* Set the function pointer to NULL if a pointer to
    the null routine AST_NULL has been supplied. */
       fun = FUN;
-      if ( fun == (void (*)()) F77_EXTERNAL_NAME(ast_null) ) {
+      if ( fun == (AstGrfFun) F77_EXTERNAL_NAME(ast_null) ) {
          fun = NULL;
       }
 
@@ -291,21 +291,21 @@ F77_SUBROUTINE(ast_setgrffun)( INTEGER(THIS), CHARACTER(NAME),
       ifun = astGrfFunID( name, method, class );
 
       if( ifun == AST__GATTR ) {
-         wrapper = (void (*)()) FGAttrWrapper;
+         wrapper = (AstGrfWrap) FGAttrWrapper;
       } else if( ifun == AST__GAXSCALE ) {
-         wrapper = (void (*)()) FGAxScaleWrapper;
+         wrapper = (AstGrfWrap) FGAxScaleWrapper;
       } else if( ifun == AST__GFLUSH ) {
-         wrapper = (void (*)()) FGFlushWrapper;
+         wrapper = (AstGrfWrap) FGFlushWrapper;
       } else if( ifun == AST__GLINE ) {
-         wrapper = (void (*)()) FGLineWrapper;
+         wrapper = (AstGrfWrap) FGLineWrapper;
       } else if( ifun == AST__GMARK ) {
-         wrapper = (void (*)()) FGMarkWrapper;
+         wrapper = (AstGrfWrap) FGMarkWrapper;
       } else if( ifun == AST__GQCH ) {
-         wrapper = (void (*)()) FGQchWrapper;
+         wrapper = (AstGrfWrap) FGQchWrapper;
       } else if( ifun == AST__GTEXT ) {
-         wrapper = (void (*)()) FGTextWrapper;
+         wrapper = (AstGrfWrap) FGTextWrapper;
       } else if( ifun == AST__GTXEXT ) {
-         wrapper = (void (*)()) FGTxExtWrapper;
+         wrapper = (AstGrfWrap) FGTxExtWrapper;
       } else if( astOK ) {
          astError( AST__INTER, "%s(%s): AST internal programming error - "
                    "Grf function id %d not yet supported.", method, class,

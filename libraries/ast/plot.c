@@ -1399,8 +1399,8 @@ static void GQch( AstPlot *, float *, float *, const char *, const char * );
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GraphGrid( int, double, double, double, double, double ** );
-static void SetGrfFun( AstPlot *, const char *,  void (*)() );
-static void GrfWrapper( AstPlot *, const char *,  void (*)() );
+static void SetGrfFun( AstPlot *, const char *,  AstGrfFun );
+static void GrfWrapper( AstPlot *, const char *,  AstGrfWrap );
 static void Grid( AstPlot * );
 static void GridLine( AstPlot *, int, const double [], double );
 static void InitVtab( AstPlotVtab * );
@@ -4368,8 +4368,8 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)( int, double, double *, int ))
-                  this->grffun[ AST__GATTR ])( attr, value, old_value, prim );
+   return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )( attr, value, old_value, 
+                                                        prim );
 }
 
 static int CGAxScaleWrapper( AstPlot *this, float *alpha, float *beta ) {
@@ -4407,8 +4407,7 @@ static int CGAxScaleWrapper( AstPlot *this, float *alpha, float *beta ) {
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)( float *, float * ))
-                  this->grffun[ AST__GAXSCALE ])( alpha, beta );
+   return ( (AstGAxScaleFun) this->grffun[ AST__GAXSCALE ])( alpha, beta );
 }
 
 static int CGFlushWrapper( AstPlot *this ) {
@@ -4440,7 +4439,7 @@ static int CGFlushWrapper( AstPlot *this ) {
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)()) this->grffun[ AST__GFLUSH ])();
+   return ( (AstGFlushFun) this->grffun[ AST__GFLUSH ])();
 }
 
 static int CGLineWrapper( AstPlot *this, int n, const float *x, 
@@ -4480,8 +4479,7 @@ static int CGLineWrapper( AstPlot *this, int n, const float *x,
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)( int, const float *, const float * ))
-                  this->grffun[ AST__GLINE ])( n, x, y );
+   return ( (AstGLineFun) this->grffun[ AST__GLINE ])( n, x, y );
 }
 
 static int CGMarkWrapper( AstPlot *this, int n, const float *x, 
@@ -4524,8 +4522,7 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)( int, const float *, const float *, int ))
-                  this->grffun[ AST__GMARK ])( n, x, y, type );
+   return ( (AstGMarkFun) this->grffun[ AST__GMARK ])( n, x, y, type );
 
 }
 
@@ -4566,8 +4563,7 @@ static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)( float *, float * ))
-                  this->grffun[ AST__GQCH ])( chv, chh );
+   return ( (AstGQchFun) this->grffun[ AST__GQCH ])( chv, chh );
 }
 
 static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
@@ -4629,8 +4625,8 @@ static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)( const char *, float, float, const char *, float, float ))
-                  this->grffun[ AST__GTEXT ])( text, x, y, just, upx, upy );
+   return ( (AstGTextFun) this->grffun[ AST__GTEXT ])( text, x, y, just, upx, 
+                                                       upy );
 }
 
 static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
@@ -4700,10 +4696,8 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 
 */
    if ( !astOK ) return 0;
-   return ( *(int (*)( const char *, float , float, const char *, float,
-                       float, float *, float * ))
-                  this->grffun[ AST__GTXEXT ])( text, x, y, just, upx, upy,
-                                                xb, yb );
+   return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])( text, x, y, just, upx,
+                                                         upy, xb, yb );
 }
 
 static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
@@ -11970,7 +11964,7 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 
 }
 
-static void SetGrfFun( AstPlot *this, const char *name, void (* fun)() ){
+static void SetGrfFun( AstPlot *this, const char *name, AstGrfFun fun ){
 /*
 *++
 *  Name:
@@ -11986,7 +11980,7 @@ f     Register a graphics routine for use by the Plot class.
 
 *  Synopsis:
 c     #include "plot.h"
-c     void astSetGrfFun( AstPlot *this, const char *name, void (* fun)() )
+c     void astSetGrfFun( AstPlot *this, const char *name, AstGrfFun fun )
 f     CALL AST_SETGRFFUN( THIS, NAME, FUN, STATUS )
 
 *  Class Membership:
@@ -12051,7 +12045,9 @@ f        names are:
 c     fun
 f     FUN = INTEGER FUNCTION (Given)
 c        A Pointer to the function to be used to provide the
-c        functionality indicated by parameter name.
+c        functionality indicated by parameter name. The interface for
+c        each function is described below, but the function pointer should 
+c        be cast to a type of AstGrfFun when calling astSetGrfFun.
 f        The name of the routine to be used to provide the
 f        functionality indicated by parameter NAME (the name
 f        should also appear in a Fortran EXTERNAL statement in the
@@ -12294,28 +12290,28 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
    that language should set up an appropriate wrapper after calling this
    function, thus over-riding the C wrapper set up here. */
       if( ifun == AST__GATTR ) {
-         wrapper = (void (*)()) CGAttrWrapper;
+         wrapper = (AstGrfWrap) CGAttrWrapper;
 
       } else if( ifun == AST__GAXSCALE ) {
-         wrapper = (void (*)()) CGAxScaleWrapper;
+         wrapper = (AstGrfWrap) CGAxScaleWrapper;
 
       } else if( ifun == AST__GFLUSH ) {
-         wrapper = (void (*)()) CGFlushWrapper;
+         wrapper = (AstGrfWrap) CGFlushWrapper;
 
       } else if( ifun == AST__GLINE ) {
-         wrapper = (void (*)()) CGLineWrapper;
+         wrapper = (AstGrfWrap) CGLineWrapper;
 
       } else if( ifun == AST__GMARK ) {
-         wrapper = (void (*)()) CGMarkWrapper;
+         wrapper = (AstGrfWrap) CGMarkWrapper;
 
       } else if( ifun == AST__GQCH ) {
-         wrapper = (void (*)()) CGQchWrapper;
+         wrapper = (AstGrfWrap) CGQchWrapper;
 
       } else if( ifun == AST__GTEXT ) {
-         wrapper = (void (*)()) CGTextWrapper;
+         wrapper = (AstGrfWrap) CGTextWrapper;
 
       } else if( ifun == AST__GTXEXT ) {
-         wrapper = (void (*)()) CGTxExtWrapper;
+         wrapper = (AstGrfWrap) CGTxExtWrapper;
 
       } else if( astOK ) {
          astError( AST__INTER, "%s(%s): AST internal programming error - "
@@ -12475,7 +12471,7 @@ static char *GrfItem( int item, const char *text ){
    return ret;
 }
 
-static void GrfWrapper( AstPlot *this, const char *name, void (* wrapper)() ) {
+static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper ) {
 /*
 *+
 *  Name:
@@ -12489,7 +12485,7 @@ static void GrfWrapper( AstPlot *this, const char *name, void (* wrapper)() ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     void astGrfWrapper( AstPlot *this, const char *name, void (* wrapper)() )
+*     void astGrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper)
 
 *  Description:
 *     This function stores a pointer to the supplied wrapper function
@@ -12505,8 +12501,8 @@ static void GrfWrapper( AstPlot *this, const char *name, void (* wrapper)() ) {
 *        A name indicating the graphics function which is called by the
 *        supplied wrapper function. See astSetGrfFun for details.
 *     wrapper
-*        A pointer to the wrapper function. This will be cast to an
-*        appropriate type for the named grf function before being store 
+*        A pointer to the wrapper function. This will be cast to a
+*        specific type for the named grf function before being store 
 *        in the Plot.
 *-
 */
@@ -12531,32 +12527,28 @@ static void GrfWrapper( AstPlot *this, const char *name, void (* wrapper)() ) {
 /* Cast the wrapper to an interface appropriate for the wrapped grf
    function, and store it in the appropriate component of the Plot. */
    if( ifun == AST__GATTR ) {
-      this->GAttr = (int (*)( AstPlot *, int, double, double *, int )) wrapper;
+      this->GAttr = (AstGAttrWrap) wrapper;
 
    } else if( ifun == AST__GAXSCALE ) {
-      this->GAxScale = (int (*)( AstPlot *, float *, float * )) wrapper;
+      this->GAxScale = (AstGAxScaleWrap) wrapper;
 
    } else if( ifun == AST__GFLUSH ) {
-      this->GFlush = (int (*)( AstPlot *)) wrapper; 
+      this->GFlush = (AstGFlushWrap) wrapper; 
 
    } else if( ifun == AST__GLINE ) {
-      this->GLine = (int (*)( AstPlot *, int, const float *, 
-                               const float *)) wrapper; 
+      this->GLine = (AstGLineWrap) wrapper; 
 
    } else if( ifun == AST__GMARK ) {
-      this->GMark = (int (*)( AstPlot *, int , const float *, const float *, int )) wrapper;
+      this->GMark = (AstGMarkWrap) wrapper;
 
    } else if( ifun == AST__GQCH ) {
-      this->GQch = (int (*)( AstPlot *, float *, float * )) wrapper;
+      this->GQch = (AstGQchWrap) wrapper;
 
    } else if( ifun == AST__GTEXT ) {
-      this->GText = (int (*)( AstPlot *, const char *, float, float, 
-                              const char *, float, float )) wrapper;
+      this->GText = (AstGTextWrap) wrapper;
 
    } else if( ifun == AST__GTXEXT ) {
-      this->GTxExt = (int (*)( AstPlot *, const char *, float, float, 
-                               const char *, float, float, float *, 
-                               float * )) wrapper;
+      this->GTxExt = (AstGTxExtWrap) wrapper;
 
    } else if( astOK ) {
       astError( AST__INTER, "%s(%s): AST internal programming error - "
@@ -20725,6 +20717,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    int axis;                    /* Axis index, 0 or 1 */
    int bi;                      /* Index of base frame */
    int ci;                      /* Index of current frame */
+   int i;                       /* Loop count */
    int id;                      /* Plot object id */
    int naxes;                   /* No. of axes in frame */
 
@@ -20933,6 +20926,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
       new->GQch = CGQchWrapper;
       new->GText = CGTextWrapper;
       new->GTxExt = CGTxExtWrapper;
+
+      for( i = 0; i < 8; i++ ) new->grffun[i] = NULL;
 
 /* Is a title to be added to an annotated grid? Store a value of -1 to 
    indicate that no value has yet been set. This will cause a default value 
@@ -21568,12 +21563,12 @@ void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim,
    (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in);
 }
 
-void astSetGrfFun_( AstPlot *this, const char *name, void (* fun)() ){
+void astSetGrfFun_( AstPlot *this, const char *name, AstGrfFun fun ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,SetGrfFun))(this,name,fun);
 }
 
-void astGrfWrapper_( AstPlot *this, const char *name, void (* wrapper)() ){
+void astGrfWrapper_( AstPlot *this, const char *name, AstGrfWrap wrapper ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,GrfWrapper))(this,name,wrapper);
 }

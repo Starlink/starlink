@@ -554,6 +554,41 @@ f     - Strings: Text strings drawn using AST_TEXT
 /* Type Definitions */
 /* ================ */
 
+/* Pre-declare the AstPlot structure so that it can be used within the 
+   GRF function typedefs. */
+struct AstPlot;
+
+/* Interfaces for GRF functions */
+/* ---------------------------- */
+/* A general interface into which actual Grf functions should be cast 
+   before being passed as an argument to astSetGrfFun. */
+typedef void (* AstGrfFun)();              
+
+/* Interfaces for specific Grf funstions implemented in C (other languages
+   may have different interfaces). */
+typedef int (* AstGAttrFun)( int, double, double *, int );
+typedef int (* AstGAxScaleFun)( float *, float * );
+typedef int (* AstGFlushFun)();
+typedef int (* AstGLineFun)( int, const float *, const float * );
+typedef int (* AstGMarkFun)( int, const float *, const float *, int );
+typedef int (* AstGQchFun)( float *, float *);
+typedef int (* AstGTextFun)( const char *, float, float, const char *, float, float );
+typedef int (* AstGTxExtFun)( const char *, float, float, const char *, float, float, float *, float * );
+
+/* A general interface into which Grf Wrapper functions should be cast 
+   before being passed as an argument to astGrfWrapper. */
+typedef void (* AstGrfWrap)();              
+
+/* Interfaces for the wrapper functions which wrap specific Grf funstions. */
+typedef int (* AstGAttrWrap)( struct AstPlot *, int, double, double *, int );
+typedef int (* AstGAxScaleWrap)( struct AstPlot *, float *, float * );
+typedef int (* AstGFlushWrap)( struct AstPlot * );
+typedef int (* AstGLineWrap)( struct AstPlot *, int, const float *, const float * );
+typedef int (* AstGMarkWrap)( struct AstPlot *, int, const float *, const float *, int );
+typedef int (* AstGQchWrap)( struct AstPlot *, float *, float *);
+typedef int (* AstGTextWrap)( struct AstPlot *, const char *, float, float, const char *, float, float );
+typedef int (* AstGTxExtWrap)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
+
 /* Plot structure. */
 /* ------------------- */
 /* This structure contains all information that is unique to each object in
@@ -615,15 +650,15 @@ typedef struct AstPlot {
    int xrev;
    int yrev;      
    int ink;
-   void (* grffun[8])();
-   int (* GAttr)( struct AstPlot *, int, double, double *, int );
-   int (* GAxScale)( struct AstPlot *, float *, float * );
-   int (* GFlush)( struct AstPlot * );
-   int (* GLine)( struct AstPlot *, int, const float *, const float * );
-   int (* GMark)( struct AstPlot *, int, const float *, const float *, int );
-   int (* GQch)( struct AstPlot *, float *, float *);
-   int (* GText)( struct AstPlot *, const char *, float, float, const char *, float, float );
-   int (* GTxExt)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
+   AstGrfFun grffun[8];
+   AstGAttrWrap GAttr;
+   AstGAxScaleWrap GAxScale;
+   AstGFlushWrap GFlush;
+   AstGLineWrap GLine;
+   AstGMarkWrap GMark;
+   AstGQchWrap GQch;
+   AstGTextWrap GText;
+   AstGTxExtWrap GTxExt;
 
 } AstPlot;
 
@@ -648,8 +683,8 @@ typedef struct AstPlotVtab {
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
    void (* PolyCurve)( AstPlot *, int, int, int, const double * );
-   void (* SetGrfFun)( AstPlot *, const char *, void (*)() );
-   void (* GrfWrapper)( AstPlot *, const char *, void (*)() );
+   void (* SetGrfFun)( AstPlot *, const char *, AstGrfFun );
+   void (* GrfWrapper)( AstPlot *, const char *, AstGrfWrap );
    void (* Grid)( AstPlot * ); 
    void (* Mark)( AstPlot *, int, int, int, const double *, int  ); 
    void (* Text)( AstPlot *, const char *, const double [], const float [2], const char * );
@@ -809,11 +844,11 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astCurve_( AstPlot *, const double [], const double [] );
    void astGrid_( AstPlot * );
    void astMark_( AstPlot *, int, int, int, const double *, int  ); 
-   void astSetGrfFun_( AstPlot *, const char *, void (*)() );
+   void astSetGrfFun_( AstPlot *, const char *, AstGrfFun );
    void astPolyCurve_( AstPlot *, int, int, int, const double * );
    void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
 
-   void astGrfWrapper_( AstPlot *, const char *, void (*)() );
+   void astGrfWrapper_( AstPlot *, const char *, AstGrfWrap );
    int astGrfFunID_( const char *, const char *, const char *  );
 
 #if defined(astCLASS)            /* Protected */
