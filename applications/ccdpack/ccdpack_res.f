@@ -29,6 +29,8 @@
 *  History:
 *     31-OCT-1995 (PDRAPER):
 *        Original version.
+*     6-FEB-2001 (MBT):
+*        Added MAKESET, SHOWSET entries.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -46,6 +48,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL PRESENT           ! Avoids confusion with PRESENT intrinsic
 
 *  Local variables:
       CHARACTER * ( PAR__SZNAM ) ACTION ! Action name
@@ -90,6 +95,9 @@
       ELSE IF ( ACTION .EQ. 'IMPORT' ) THEN
          CALL IMPORT( STATUS )
 
+      ELSE IF ( ACTION .EQ. 'MAKESET' ) THEN
+         CALL MAKESET( STATUS )
+
       ELSE IF ( ACTION.EQ. 'PICINFO' ) THEN
          CALL PICINFO( STATUS )
 
@@ -98,6 +106,9 @@
 
       ELSE IF ( ACTION .EQ. 'SCHEDULE' ) THEN
          CALL SCHEDULE( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'SHOWSET' ) THEN
+         CALL SHOWSET( STATUS )
 
 *  If the action name is not recognised, then report an error.
       ELSE
