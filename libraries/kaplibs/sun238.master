@@ -391,13 +391,12 @@ codes are:
 \end{description}
 
 \section{Finding the Routines you Need}
-The description of each KAPLIBS routine in
-\latexelsehtml{Appendix~\ref{ro:full}}{the \htmlref{Routine Descriptions}{ro:full}}
-includes a section labelled ``Purpose:'' which contains a short description
-of the purpose of the routine. The {\tt kplsearch} command will display a
-list of the KAPLIBS routines which contain a given search phrase (or any
-sub-string of the search phrase) within the text of this ``Purpose:''
-section. Thus:
+The heading for each KAPLIBS routine in
+\latexelsehtml{Appendix~\ref{ro:full}}{the \htmlref{Routine Descriptions
+section}{ro:full}} includes a short description of the routine. The {\tt
+kplsearch} command will display a list of the KAPLIBS routines which
+contain a given search phrase (or any sub-string of the search phrase)
+within this short descriptive heading. Thus:
 
 \small
 \begin{verbatim}
@@ -406,9 +405,9 @@ section. Thus:
 \normalsize
 
 will search for routines which contain either or both of the words
-``pgplot'' and ``wcs'' within their ``purposes''. The results are usually
-ordered by relevance, but can be ordered alphabetically by including the
-``{\tt -alpha}'' option on the command.
+``pgplot'' and ``wcs'' within their short descriptions. The results are
+usually ordered by relevance, but can be ordered alphabetically by
+including the ``{\tt -alpha}'' option on the command.
 
 For more help, including descriptions of all the available options, type:
 
