@@ -70,6 +70,7 @@
 *        in the graphics database. This application can report positions in
 *        any of the co-ordinate Frames stored with each picture. The
 *        string supplied for FRAME can be one of the following:
+*
 *        - A domain name such as SKY, AXIS, PIXEL, etc. The special domains
 *        AGI_WORLD and AGI_DATA are used to refer to the world and data 
 *        co-ordinate system stored in the AGI graphics database. They can 
@@ -138,6 +139,7 @@
 *     MODE = LITERAL (Read)
 *        The method used to select the pictures in which cursor positions are 
 *        to be reported. There are three options:
+*
 *        - "Current" -- reports positions within the current picture in the 
 *        AGI database. If a position does not lie within the current picture,
 *        an extrapolated position is reported, if possible.
@@ -177,6 +179,7 @@
 *        which have valid co-ordinates.  The appearance of these graphics
 *        (colour, size, etc ) is controlled by the STYLE parameter. PLOT 
 *        can take any of the following values:
+*
 *        - "None" -- No graphics are produced.
 *       
 *        - "Mark" -- Each position is marked by the symbol specified

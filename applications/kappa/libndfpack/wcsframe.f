@@ -42,6 +42,7 @@
 *        A string specifying the new co-ordinate Frame. If a null parameter 
 *        value is supplied, then the current Frame is left unchanged. The 
 *        string can be one of the following:
+*
 *        - A domain name such as SKY, AXIS, PIXEL, etc. The two
 *        "pseudo-domains" WORLD and DATA may be supplied and will be
 *        translated into PIXEL and AXIS respectively, so long as the WCS

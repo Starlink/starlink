@@ -170,6 +170,7 @@
 *     MODE = LITERAL (Read)
 *        Specifies the way in which data values are represented. MODE
 *        can take the following values:
+*
 *        - "Histogram" -- An histogram of the points is plotted in the
 *        style of a "staircase" (with vertical lines only joining the y 
 *        values and not extending to the base of the plot).  The vertical 
@@ -193,6 +194,7 @@
 *     SHAPE = LITERAL (Read)
 *        Specifies the way in which errors are represented. SHAPE
 *        can take the following values:
+*
 *        - "Bars" -- Bars with serifs (i.e. cross pieces at each end) are
 *        drawn joining the x error limits and the y error limits. The plotting 
 *        attribute "Size(ErrBars)" (see parameter STYLE) can be used to 

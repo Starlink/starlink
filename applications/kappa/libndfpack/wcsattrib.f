@@ -35,6 +35,7 @@
 *
 *     The operation performed by this application is controlled by 
 *     parameter MODE, and can be:
+*
 *     -  display the value of an attribute.
 *     -  set a new value for an attribute.
 *     -  clear an attribute value.

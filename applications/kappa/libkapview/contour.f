@@ -173,6 +173,7 @@
 *        produced, and zero otherwise. See also parameter KEYPOS. []
 *     MODE = LITERAL (Read)
 *        The method used to select the contour levels. The options are:
+*
 *          - "Area" -- The contours enclose areas of the array for which 
 *          the equivalent radius increases by equal increments.  You 
 *          specify the number of levels.

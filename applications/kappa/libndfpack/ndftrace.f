@@ -22,6 +22,7 @@
 *  Description:
 *     This routine displays the attributes of an NDF data structure
 *     including:
+*
 *     -  its name;
 *     -  the values of its character components (title, label and
 *     units);

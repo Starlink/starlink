@@ -55,6 +55,7 @@
 *        A string specifying the basis Frame. If a null value is supplied
 *        the current co-ordinate Frame in the NDF is used. The string can 
 *        be one of the following:
+*
 *        - A domain name such as SKY, AXIS, PIXEL, etc. The two
 *        "pseudo-domains" WORLD and DATA may be supplied and will be
 *        translated into PIXEL and AXIS respectively, so long as the WCS

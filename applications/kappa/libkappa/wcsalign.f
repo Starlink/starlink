@@ -67,6 +67,7 @@
 *     IN = NDF (Read)
 *        A group of 2-dimensional input images. This should be given as 
 *        a comma separated list, in which each list element can be:
+*
 *        - an NDF name, optionally containing wild-cards and/or regular 
 *        expressions ("*", "?", "[a-z]" etc.). 
 *
@@ -93,6 +94,7 @@
 *        The method to use when sampling the input pixel values, in
 *        order to find the corresponding output pixel value. It can
 *        take the following values:
+*
 *        - "Bilinear" -- the output pixel values are calculated by 
 *        bi-linear interpolation among the four nearest pixels values 
 *        in the input image.
@@ -122,6 +124,7 @@
 *        A group of output NDFs corresponding one-for-one with the list
 *        of input NDFs given for parameter IN. This should be given as 
 *        a comma separated list, in which each list element can be:
+*
 *        - an NDF name. If the name contains an asterisk character "*",
 *        the name of the corresponding input image (without directory or
 *        file suffix) is substituted for the asterisk (for instance, "*_al" 
