@@ -111,9 +111,7 @@
         END IF
 
 *      Pad dimensions to 7D
-        DO IDIM = NDIM + 1, DAT__MXDIM
-          DIMS(IDIM) = 1
-        END DO
+        CALL AR7_PAD( NDIM, DIMS, STATUS )
 
 *      See if format specified
         CALL USI_GET0C( 'FMT', FMT, STATUS )

@@ -94,7 +94,6 @@
       INTEGER			DCPTR			! Dead time corr array
       INTEGER			DIMS(ADI__MXDIM)	! Dimensions
       INTEGER			DPTR			! Data pointer
-      INTEGER			I			! Loop over SNAMES
       INTEGER			IFID			! Input dataset id
       INTEGER                   NDIM			! Dimensionality
       INTEGER                   NELM			! Total no. of points
