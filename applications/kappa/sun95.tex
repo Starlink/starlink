@@ -10966,6 +10966,8 @@ picture.}
  Creates a 1-d profile through an N-d NDF.}
 \menuitem{PSF}{
  Determines the parameters of a model star profile by fitting star images in a two-dimensional NDF.}
+\menuitem{RESAMPLE}{
+ Applies a geometrical transformation to an NDF.}
 \menuitem{RESHAPE}{
  Reshapes an NDF, treating its arrays as vectors.}
 \menuitem{RIFT}{
@@ -11352,7 +11354,7 @@ functions as follows.
 \classitem{SQORST}
  Squashes or stretches a 2-d data array in either or both axes.
 \classitem{RESAMPLE}
- Use an arbitrary mapping to resample an NDF.
+ Applies a geometrical transformation to an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -11372,6 +11374,8 @@ functions as follows.
  Permutes the axes of an NDF.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
+\classitem{RESAMPLE}
+ Applies a geometrical transformation to an NDF.
 \classitem{RESHAPE}
  Reshapes an NDF, treating its arrays as vectors.
 \classitem{ROTATE}
@@ -33711,6 +33715,489 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 \end{htmlonly}
 
 \sstroutine{
+   RESAMPLE
+}{
+   Applies a geometrical transformation to an NDF
+}{
+   \sstdescription{
+      This application uses a specified Mapping to transform the pixel
+      positions in an NDF. The specified Mapping should transform pixel
+      co-ordinates in the input NDF into the corresponding pixel
+      co-ordinates in the output NDF.
+
+      By default, the bounds of the output pixel grid are chosen so that
+      they just encompasses all the transformed input data, but they can
+      be set explicitly using parameters LBOUND and UBOUND.
+
+      The data value stored at each output pixel is determined by
+      transforming the pixel co-ordinates at the centre of the output
+      pixel using the inverse of the supplied Mapping. This gives the
+      corresponding pixel co-ordinates in the input NDF. In general this
+      input position will not correspond to a pixel centre, and so the
+      input data arrays (Data and Variance) must be interpolated to obtain
+      the values for the output pixel. The scheme used to perform this
+      interpolation can be selected using parameter METHOD.
+
+      The Mapping to use can be supplied in several different ways (see
+      parameter MAPPING).
+   }
+   \sstusage{
+      resample in out [method]
+   }
+   \sstparameters{
+      \sstsubsection{
+         CURRENT = \_LOGICAL (Read)
+      }{
+         Specifies the Mapping to be used. If FALSE, then the Mapping to
+         use is determined using parameter MAPPING. If TRUE, then the
+         Mapping used is the Mapping from pixel co-ordinates in the input
+         NDF to the current Frame in the input NDF. The output NDF will
+         then have pixel co-ordinates which match the co-ordinates of the
+         current Frame of the input NDF (apart from a possible additional
+         scaling as per the SCALE parameter). {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The NDF to be transformed.
+      }
+      \sstsubsection{
+         LBOUND( ) = \_INTEGER (Read)
+      }{
+         The lower pixel-index bounds of the output NDF.  The number of
+         values must be equal to the number of dimensions in the output
+         NDF.  If a null value is supplied, default bounds will be used
+         which are just low enough to fit in all the transformed pixels
+         of the input NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         MAPPING = FILENAME (Read)
+      }{
+         The name of a file containing the Mapping to be used. The forward
+         direction of this Mapping should transform pixel co-ordinates in
+         the input NDF into the corresponding pixel co-ordinates in the output
+         NDF. The file may be:
+
+         \sstitemlist{
+
+            \sstitem
+            A text file containing a textual representation of the AST Mapping
+            to use. Such files can be created by WCSADD.
+
+            \sstitem
+            A text file containing a textual representation of an AST
+            FrameSet. If the FrameSet contains a Frame with Domain PIXEL,
+            then the Mapping used is the Mapping from the PIXEL Frame to the
+            current Frame. If there is no PIXEL Frame in the FrameSet, then
+            the Mapping used is the Mapping from the base Frame to the Current
+            Frame.
+
+            \sstitem
+            A FITS file. The Mapping used is the Mapping from the FITS
+            pixel co-ordinates in which the centre of the bottom left pixel
+            is at co-ordinates (1,1), to the co-ordinate system represented
+            by the primary WCS headers, CRVAL, CRPIX, \emph{etc}.
+
+            \sstitem
+            An NDF. The Mapping used is the Mapping from the PIXEL Frame
+            to the Current Frame of its WCS FrameSet.
+
+         }
+         This parameter is only used if parameter CURRENT is set to a
+         false value. The specified Mapping can be modified using
+         parameter SCALE.
+      }
+      \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The interpolation method used to resample the input array.
+         The following values are permitted:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Nearest{\tt "}   -- Nearest neighbour sampling.
+
+            \sstitem
+            {\tt "}Linear{\tt "}    -- Linear interpolation.
+
+            \sstitem
+            {\tt "}Sinc{\tt "}      -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincSinc{\tt "}  -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$sinc(k$*$pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincCos{\tt "}   -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$cos(k$*$pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincGauss{\tt "} -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$exp(-k$*$x$*$x) kernel.
+
+            \sstitem
+            {\tt "}BlockAve{\tt "}  -- Block averaging over all pixels in the
+                              surrounding N-dimensional cube.
+
+         }
+         In the above, sinc(z)=sin(z)/z.  Some of these schemes will
+         require additional parameters to be supplied via the PARAMS
+         parameter.  A more detailed discussion of these schemes is
+         given in the {\tt "}Sub-Pixel Interpolation Schemes{\tt "} section below.
+         {\tt [Nearest]}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The transformed NDF.
+      }
+      \sstsubsection{
+         PARAMS( ) = \_DOUBLE (Read)
+      }{
+         Parameters required to control the resampling scheme.  One or
+         more values may be required to specify the exact resampling
+         behaviour, according to the value of the METHOD parameter.
+         See the section on {\tt "}Sub-Pixel Interpolation Schemes{\tt "}.
+      }
+      \sstsubsection{
+         SCALE = \_DOUBLE (Read)
+      }{
+         A scaling factor which is used to modify the supplied Mapping.
+         In effect, transformed input co-ordinates would be multiplied
+         by this factor to obtain the corresponding output pixel
+         co-ordinates. If a null (!) value is supplied, a default value
+         is used. If parameter CURRENT has a false value, the default
+         scaling factor is 1.0 (no scaling), otherwise the default is
+         chosen so that the output NDF has a similar size (in pixels)
+         to the input NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         A Title for the output NDF structure.  A null value (!)
+         propagates the title from the input NDF to the output NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         TOL = \_DOUBLE (Read)
+      }{
+         The maximum tolerable geometrical distortion which may be
+         introduced as a result of approximating non-linear Mappings
+         by a set of piece-wise linear transforms.  The resampling
+         algorithm approximates non-linear co-ordinate transformations
+         in order to improve performance, and this parameter controls
+         how inaccurate the resulting approximation is allowed to be,
+         as a displacement in pixels of the input NDF.  A value of
+         zero will ensure that no such approximation is done, at the
+         expense of increasing execution time.
+         {\tt [0.2]}
+      }
+      \sstsubsection{
+         UBOUND( ) = \_INTEGER (Read)
+      }{
+         The upper pixel-index bounds of the output NDF.  The number of
+         values must be equal to the number of dimensions of the output
+         NDF.  If a null value is supplied, default bounds will be used
+         which are just high enough to fit in all the transformed pixels
+         of the input NDF. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         resample sg28948 sg28948r mapping=rotate.ast
+      }{
+         Here sg28948 is resampled into a new co-ordinate system using
+         the AST Mapping stored in a text file called rotate.ast (which
+         may have been created using WCSADD for instance).
+      }
+      \sstexamplesubsection{
+         resample flat distorted current
+      }{
+         This transforms the NDF called flat.sdf into its current
+         co-ordinate Frame, writing the result to an NDF called
+         distorted.sdf.  It uses nearest-neighbour resampling.
+         If the units of the PIXEL and current co-ordinate Frames of
+         flat are of similar size, then the pixel co-ordinates of
+         distorted will be the same as the current co-ordinates of
+         flat, but if there is a large scale discrepancy a scaling
+         factor will be applied to give the output NDF a similar size
+         to the input one.  The output NDF will be just large enough
+         to hold the transformed copies of all the pixels from {\tt "}flat{\tt "}.
+      }
+      \sstexamplesubsection{
+         resample flat distorted scale=1 method=sinccos params=[0,3]
+      }{
+         As the previous example, but the additional scaling factor will
+         not be applied even in the case of large size discrepancy,
+         and a sinc$*$cos 1-dimensional resampling kernel is used which
+         rolls off at a distance of 3 pixels from the central one.
+      }
+      \sstexamplesubsection{
+         resample flat distorted scale=0.2 method=blockave params=2
+      }{
+         In this case, an additional shrinking factor of 0.2 is being
+         applied to the output NDF (\emph{i.e.} performed following the
+         Mapping from pixel to current co-ordinates), and the resampling
+         is being done using a block averaging scheme in which a
+         cube extending two pixels either side of the central pixel
+         is averaged over to produce the output value.  If the
+         PIXEL-domain and current Frame pixels have (about) the same
+         size, this will result in every pixel from the input NDF
+         adding a contribution to one pixel of the output NDF.
+      }
+      \sstexamplesubsection{
+         resample a119 a119s lbound=[1,-20] ubound=[256,172]
+      }{
+         This transforms the NDF called a119 into an NDF called a119s.
+         It uses nearest-neighbour resampling.  The shape of a119s
+         is forced to be (1:256,-20:172) regardless of the location
+         of the transformed pixels of a119.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the input NDF contains a Variance component, a Variance
+         component will be written to the output NDF.  It will be
+         calculated on the assumption that errors on the input data
+         values are statistically independent and that their variance
+         estimates may simply be summed (with appropriate weighting
+         factors) when several input pixels contribute to an output data
+         value. If this assumption is not valid, then the output error
+         estimates may be biased. In addition, note that the statistical
+         errors on neighbouring output data values (as well as the
+         estimates of those errors) may often be correlated, even if the
+         above assumption about the input data is correct, because of
+         the sub-pixel interpolation schemes employed.
+
+         \sstitem
+         This task is based on the AST\_RESAMPLE$<$X$>$ routine described in
+         SUN/210.
+      }
+   }
+   \sstdiytopic{
+      Sub-Pixel Interpolation Schemes
+   }{
+      There is no such thing as a perfect sub-pixel interpolation
+      scheme and, in practice, all resampling will result in some
+      degradation of gridded data.  A range of schemes is therefore
+      provided, from which you can choose the one which best suits
+      your needs.
+
+      In general, a balance must be struck between schemes which tend
+      to degrade sharp features in the data by smoothing them, and
+      those which attempt to preserve sharp features. The latter will
+      often tend to introduce unwanted oscillations, typically visible
+      as {\tt "}ringing{\tt "} around sharp features and edges, especially if the
+      data are under-sampled (\emph{i.e.} if the sharpest features are less
+      than about two pixels across). In practice, a good interpolation
+      scheme is likely to be a compromise and may exhibit some aspects
+      of both these features.
+
+      For under-sampled data, some interpolation schemes may appear to
+      preserve data resolution because they transform single input
+      pixels into single output pixels, rather than spreading their
+      data between several output pixels. While this may look
+      better cosmetically, it can result in a geometrical shift of
+      sharp features in the data. You should beware of this if you
+      plan to use such features (\emph{e.g.}) for image alignment.
+
+      The following are two easy-to-use sub-pixel interpolation
+      schemes which are generally applicable:
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt "}Nearest{\tt "} -- This is the simplest possible scheme, in which
+         the value of the input pixel with the nearest centre to the
+         interpolation point is used. This is very quick to execute and
+         will preserve single-pixel features in the data, but may
+         displace them by up to half their width along each dimension. It
+         often gives a good cosmetic result, so is useful for quick-look
+         processing, but is unsuitable if accurate geometrical
+         transformation is required.
+
+         \sstitem
+         {\tt "}Linear{\tt "} -- This scheme uses linear interpolation
+         between the nearest neighbouring pixels in the
+         input grid (there are two neighbours in one dimension, four
+         neighbours in two dimensions, eight in three dimensions,
+         \emph{etc}.). It is superior to the nearest-pixel scheme (above) in not
+         displacing features in the data, yet it still executes fairly
+         rapidly. It is generally a safe choice if you do not have any
+         particular reason to favour another scheme, since it cannot
+         introduce oscillations. However, it does introduce some spatial
+         smoothing which varies according to the distance of the
+         interpolation point from the neighbouring pixels. This can
+         degrade the shape of sharp features in the data in a
+         position-dependent way. It may also show in the output variance
+         grid (if used) as a pattern of stripes or fringes.
+
+      }
+      An alternative set of interpolation schemes is based on forming
+      the interpolated value from the weighted sum of a set of
+      surrounding pixel values (not necessarily just the nearest
+      neighbours). This approach has its origins in the theory of
+      digital filtering, in which interpolated values are obtained by
+      conceptually passing the sampled data (represented by a grid of
+      delta functions) through a linear filter which implements a
+      convolution. Because the convolution kernel is continuous, the
+      convolution yields a continuous function which may then be
+      evaluated at fractional pixel positions. The (possibly
+      multi-dimensional) kernel is usually regarded as {\tt "}separable{\tt "} and
+      formed from the product of a set of identical 1-dimensional
+      kernel functions, evaluated along each dimension. Different
+      interpolation schemes are then distinguished by the choice of
+      this 1-dimensional interpolation kernel. The number of
+      surrounding pixels which contribute to the result may also be
+      varied.
+
+      From a practical standpoint, it is useful to divide the weighted
+      sum of pixel values by the sum of the weights when determining
+      the interpolated value.  Strictly, this means that a true
+      convolution is no longer being performed. However, the
+      distinction is rarely important in practice because (for
+      slightly subtle reasons) the sum of weights is always
+      approximately constant for good interpolation kernels. The
+      advantage of this technique, which is used here, is that it can
+      easily accommodate missing data and tends to minimise unwanted
+      oscillations at the edges of the data grid.
+
+      In the following schemes, which are based on a 1-dimensional
+      interpolation kernel, the first element of the PARAMS parameter
+      should be used to specify how many pixels are to contribute to the
+      interpolated result on either side of the interpolation point in
+      each dimension (the nearest integer value is used). Execution time
+      increases rapidly with this number. Typically, a value of 2 is
+      appropriate and the minimum value used will be 1 (\emph{i.e.} two pixels
+      altogether, on on either side of the interpolation point). A value
+      of zero or less may be given for PARAMS(1) to indicate that a
+      suitable number of pixels should be calculated automatically.
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt "}Sinc{\tt "} -- This scheme uses a sinc(pi$*$x) kernel, where x is the
+         pixel offset from the interpolation point and sinc(z)=sin(z)/z. This
+         sometimes features as an {\tt "}optimal{\tt "} interpolation kernel in books on
+         image processing. Its supposed optimality depends on the assumption
+         that the data are band-limited (\emph{i.e.} have no spatial frequencies above
+         a certain value) and are adequately sampled. In practice, astronomical
+         data rarely meet these requirements. In addition, high spatial
+         frequencies are often present due (\emph{e.g.}) to image defects and cosmic
+         ray events. Consequently, substantial ringing can be experienced with
+         this kernel. The kernel also decays slowly with distance, so that
+         many surrounding pixels are required, leading to poor performance.
+         Abruptly truncating it, by using only a few neighbouring pixels,
+         improves performance and may reduce ringing (if PARAMS(1) is set to
+         zero, then only two pixels will be used on either side). However, a
+         more gradual truncation, as implemented by other kernels, is generally
+         to be preferred. This kernel is provided mainly so that you can
+         convince yourself not to use it!
+
+         \sstitem
+         {\tt "}SincSinc{\tt "} -- This scheme uses an improved kernel, of the form
+         sinc(pi$*$x).sinc(k$*$pi$*$x), with k a constant, out to the point where
+         sinc(k$*$pi$*$x) goes to zero, and zero beyond. The second sinc() factor
+         provides an {\tt "}envelope{\tt "} which gradually rolls off the normal sinc(pi$*$x)
+         kernel at large offsets. The width of this envelope is specified by
+         giving the number of pixels offset at which it goes to zero by means
+         of the PARAMS(2) value, which should be at least 1.0 (in addition,
+         setting PARAMS(1) to zero will select the number of contributing
+         pixels so as to utilise the full width of the kernel, out to where it
+         reaches zero). The case given by PARAMS(1)=2, PARAMS(2)=2 is typically
+         a good choice and is sometimes known as the Lanczos kernel. This is a
+         valuable general-purpose interpolation scheme, intermediate in its
+         visual effect on images between the {\tt "}Nearest{\tt "} and {\tt "}Linear{\tt "}
+         schemes. Although the kernel is slightly oscillatory, ringing is
+         adequately suppressed if the data are well sampled.
+
+         \sstitem
+         {\tt "}SincCos{\tt "} -- This scheme uses a kernel of the form
+         sinc(pi$*$x)$*$cos(k$*$pi$*$x), with k a constant, out to the point where
+         cos(k$*$pi$*$x) goes to zero, and zero beyond. As above, the cos() factor
+         provides an envelope which gradually rolls off the sinc() kernel
+         at large offsets. The width of this envelope is specified by giving
+         the number of pixels offset at which it goes to zero by means
+         of the PARAMS(2) value, which should be at least 1.0 (in addition,
+         setting PARAMS(1) to zero will select the number of contributing
+         pixels so as to utilise the full width of the kernel, out to where it
+         reaches zero). This scheme gives similar results to the
+         {\tt "}SincSinc{\tt "} scheme, which it resembles.
+
+         \sstitem
+         {\tt "}SincGauss{\tt "} -- This scheme uses a kernel of the form
+         sinc(pi$*$x).exp(-k$*$x$*$x), with k a positive constant. Here, the sinc()
+         kernel is rolled off using a Gaussian envelope which is specified by
+         giving its full-width at half-maximum (FWHM) by means of the PARAMS(2)
+         value, which should be at least 0.1 (in addition, setting PARAMS(1)
+         to zero will select the number of contributing pixels so as to utilise
+         the width of the kernel out to where the envelope declines to 1\% of its
+         maximum value). On astronomical images and spectra, good results are
+         often obtained by approximately matching the FWHM of the
+         envelope function, given by PARAMS(2), to the point spread function
+         of the input data. However, there does not seem to be any theoretical
+         reason for this.
+
+      }
+      In addition, the following scheme is provided which is not based
+      on a 1-dimensional kernel:
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt "}BlockAve{\tt "} -- This scheme simply takes an average of all the
+         pixels on the input grid in a cube centred on the interpolation
+         point.  The number of pixels in the cube is determined by the
+         value of the first element of the PARAMS array, which gives
+         the number of pixels in each dimension on either side of the
+         central point.  Hence a block of (2 $*$ PARAMS(1))$*$$*$NDIM\_IN
+         pixels in the input grid will be examined to determine the
+         value of the output pixel.  If the input NDF has no variance,
+         then all valid pixels in this cube
+         will be averaged in to the result with equal weight.
+         If a variance is present, then each input pixel will be
+         weighted proportionally to the reciprocal of its variance; any
+         pixel without a valid variance will be discarded.  This scheme
+         is suitable where the output grid is much coarser than the
+         input grid; if the ratio of pixel sizes is R then a suitable
+         value of PARAMS(1) may be R/2.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: FLIP, ROTATE, SLIDE, WCSADD.
+      CCDPACK: TRANLIST, TRANNDF, WCSEDIT.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         No flux conservation flag has been implemented.
+
+         \sstitem
+         The LABEL, UNITS, and HISTORY components, and all extensions are
+         propagated. TITLE is controlled by the TITLE parameter. DATA,
+         VARIANCE and WCS are propagated after appropriate modification. The
+         QUALITY and AXIS components are not propagated.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+
+         \sstitem
+         There can be an arbitrary number of NDF dimensions.
+      }
+   }
+}
+
+\sstroutine{
    RESHAPE
 }{
    Reshapes an NDF, treating its arrays as vectors
@@ -43288,6 +43775,9 @@ The following new applications have been added:
       Creates or edits an graphics device colour table. It uses a graphical
       user interface to allow interactive manipulation of the colour
       table in many ways.
+   \item [\htmlref{RESAMPLE}{RESAMPLE}] \mbox{}
+      Applies an arbitrary geometrical transformation to an NDF. This is a 
+      WCS-aware replacement for the old TRANSFORMER command.
 \end{description}
 
 \subsection{Removed Commands}
@@ -43723,7 +44213,7 @@ functions as follows.
 \classitem{SQORST}
  Squashes or stretches a 2-d data array in either or both axes.
 \classitem{RESAMPLE}
- Use an arbitrary mapping to resample an NDF.
+ Applies a geometrical transformation to an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -43743,6 +44233,8 @@ functions as follows.
  Permutes the axes of an NDF.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
+\classitem{RESAMPLE}
+ Applies a geometrical transformation to an NDF.
 \classitem{RESHAPE}
  Reshapes an NDF, treating its arrays as vectors.
 \classitem{ROTATE}
