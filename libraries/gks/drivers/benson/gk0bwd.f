@@ -79,7 +79,7 @@ C# IL>=a, OL>=0
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkmc.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkwdt.par'
       INCLUDE '../../include/gkwke.par'
       INCLUDE '../../include/gkerr.cmn'

@@ -36,7 +36,7 @@ C# IL>=a, OL>=0
 *  ------------------
 *     Read   /GKERR/  Read KERROR
 *
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkerr.cmn'
 *

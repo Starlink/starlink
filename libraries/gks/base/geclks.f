@@ -36,8 +36,8 @@ C# IL>=a, OL>=0
 *     Only include files are for PARAMETERs
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
 *
 *  ERRORS
 *  ------

@@ -41,8 +41,8 @@
 *     Modify /GKYERR/ Sets KERROR
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkops.cmn'
       INCLUDE '../include/gkwcb.cmn'

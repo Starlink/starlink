@@ -35,7 +35,7 @@ C# IL>=a, OL>=0
 *     Read   /GKYSL/    KCNTN
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gksl.cmn'
       INCLUDE '../include/gkerr.cmn'
 *

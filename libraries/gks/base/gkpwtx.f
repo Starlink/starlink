@@ -42,7 +42,7 @@ C# IL>= a, OL>= 0
 *     Set    QWR5..QWR6 : Height vector from WCA (NDC)
 *     Set    QWR7..QWR8 : Concatenation point (set by utility)
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkxfd.cmn'
       INCLUDE '../include/gkwkd.cmn'

@@ -160,7 +160,7 @@ C# IL>=a, OL>=0
 *                        1 to 13 and store buffer pointer in 14.
 *     Modify /GKYERR/    KERROR
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwdt.par'
       INCLUDE '../../include/gwksgl.par'

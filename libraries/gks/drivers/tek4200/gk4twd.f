@@ -328,7 +328,7 @@
 *  COMMON BLOCK USAGE
 *  ------------------
       INCLUDE '../../include/gkhp.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwdt.par'
       INCLUDE '../../include/gkio.par'
@@ -1921,7 +1921,7 @@
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/gkerr.cmn'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkstk.cmn'
       INCLUDE '../../include/gkwca.cmn'
       INCLUDE '../../include/gkwkd.cmn'
@@ -2477,7 +2477,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwca.cmn'
@@ -2577,7 +2577,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkstk.cmn'
@@ -2650,7 +2650,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkinp.par'
       INCLUDE '../../include/gkio.par'
@@ -2731,7 +2731,7 @@
 *
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkio.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkpca.par'
       INCLUDE '../../include/gkpca.cmn'
 *
@@ -3661,7 +3661,7 @@
 *  ------------------
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkdt.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkpca.par'
       INCLUDE '../../include/gkwca.cmn'
       INCLUDE '../../include/gkpca.cmn'
@@ -3801,7 +3801,7 @@
 *
 *  COMMON BLOCK USAGE
 *  ------------------
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwke.par'
       INCLUDE '../../include/gwksgl.par'
@@ -4252,7 +4252,7 @@
 *  ------------------
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkdt.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkpca.par'
       INCLUDE '../../include/gkwca.cmn'
       INCLUDE '../../include/gkpca.cmn'
@@ -4484,7 +4484,7 @@
 *  COMMON BLOCK USAGE
 *  ------------------
       INCLUDE '../../include/gkio.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
 *
 *  LOCALS
 *  ------
@@ -5073,7 +5073,7 @@ C     ENDIF
 *  ------------------
 *
       INCLUDE '../../include/gkdt.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkwca.cmn'
       INCLUDE '../../include/gkwkd.cmn'

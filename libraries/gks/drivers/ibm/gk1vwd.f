@@ -116,7 +116,7 @@ C# IL>=a, OL>=0
 *     Modify /GKYERR/    KERROR
 *     Modify /GKYWDT/    KWDT and KNONE.
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkmc.par'
       INCLUDE '../../include/gwksgl.par'

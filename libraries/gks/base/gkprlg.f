@@ -47,7 +47,7 @@ C# IL>=a, OL>=0
 *     Modify /GKERR/    CRTNM
 *     Modify /GKFLS/    KEMFLS
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkerr.par'
       INCLUDE '../include/gkfls.par'
       INCLUDE '../include/gkdt.par'

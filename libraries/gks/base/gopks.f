@@ -96,8 +96,8 @@ C# IL>=a, OL>=0
 *     Modify /GKYFLS/  Initialise file indicators to say all files are shut
 *     Modify /GKYERR/  Initialise Error State List
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkmc.par'
       INCLUDE '../include/gkops.cmn'
       INCLUDE '../include/gkdt.par'

@@ -98,7 +98,7 @@ C# IL>=a, OL>=0
 *
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/gkmc.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwdt.par'
       INCLUDE '../../include/gkio.par'
@@ -1288,7 +1288,7 @@ C====================================================C
 *  COMMON BLOCK USAGE
 *  ------------------
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkinp.par'
@@ -1354,7 +1354,7 @@ C====================================================C
 *  COMMON BLOCK USAGE
 *  ------------------
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/gkio.par'
@@ -2338,7 +2338,7 @@ C====================================================C
 *  COMMON BLOCK USAGE
 *  ------------------
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkstk.cmn'
@@ -2542,7 +2542,7 @@ C====================================================C
 *  COMMON BLOCK USAGE
 *  ------------------
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwca.cmn'
       INCLUDE '../../include/gkwkd.cmn'
@@ -2607,7 +2607,7 @@ C====================================================C
 *
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkhp.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkerr.cmn'
       INCLUDE '../../include/gkstk.cmn'
       INCLUDE '../../include/gkwca.cmn'

@@ -31,7 +31,7 @@ C# IL>=a, OL>=0
 *  ------------------
 *     Modify /OPS/    Change GKS operating state.
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkops.cmn'
 *
 *  ERRORS

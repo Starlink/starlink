@@ -39,7 +39,7 @@
 *     Read   /GKYSL/  Transformation and clipping parameters.
 *     Modify /GKYWCA/ Set parameters in W.C.A.
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkssl.par'
       INCLUDE '../include/gkops.cmn'

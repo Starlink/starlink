@@ -38,7 +38,7 @@ C# IL>=a, OL>=1
 *     Read   /WCA/    GDP parameters (KWI1 and QWR1..6)
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkwdt.par'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkcca.cmn'

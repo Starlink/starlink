@@ -34,8 +34,8 @@ C# IL>=a, OL>=0
 *     Modify /GKYSL/   KCPCID
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkerr.cmn'
       INCLUDE '../include/gkops.cmn'

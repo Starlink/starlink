@@ -192,7 +192,7 @@ C# IL>=a, OL>=0
 *     Modify /GKYWSL/    Workstation state list
 *     Modify /GKYSTK/    Stack
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkfls.par'
       INCLUDE '../../include/gkhp.par'

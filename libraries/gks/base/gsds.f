@@ -39,8 +39,8 @@ C# IL>=a, OL>=1
 *                     KWDONE after call
 *     Read   /GKYERR/ KERROR
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkwca.cmn'

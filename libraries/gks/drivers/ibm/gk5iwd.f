@@ -46,7 +46,7 @@ C# IL>=a, OL>=0
 *
       INCLUDE '../../include/gkmc.par'
       INCLUDE '../../include/gkhp.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkdt.par'
       INCLUDE '../../include/gkwdt.par'
       INCLUDE '../../include/gkio.par'
@@ -1232,7 +1232,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
      1                      CHARHX,CHARHY,CHARWX,CHARWY,
      2                      XTXAL,YTXAL,CHAEXP,CHASP )
       INCLUDE '../../include/check.inc'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
 *
 * Purpose
 *
@@ -1419,7 +1419,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
          SUBROUTINE GK5IFI( N,X,Y,INTROR,STYLE )
       INCLUDE '../../include/check.inc'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
 *
 * Purpose
 *
@@ -1540,7 +1540,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *
 * COMMONS
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
 *
 * LOCALS
 *
@@ -1596,7 +1596,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *
 * COMMONS
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
 *
 * LOCALS
 *
@@ -1652,7 +1652,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *
 * COMMONS
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
 *
 * LOCALS
 *
@@ -1708,7 +1708,7 @@ C THIS WILL CHANGE CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 *
 * COMMONS
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
 *
 * LOCALS
 *

@@ -42,8 +42,8 @@ C# IL>=a, OL>=0
 *     Modify /GKYWCA/ Set up QWR1 ... QWR4 (rectangle limits)
 *     Modify /GKYERR/ Modify KERROR
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwca.cmn'
       INCLUDE '../include/gkerr.cmn'

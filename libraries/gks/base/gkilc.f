@@ -39,7 +39,7 @@ C# IL>=b, OL>=0
 *     Read   /WSL/    For workstation window
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkwca.cmn'
       INCLUDE '../include/gkwsl.cmn'
       INCLUDE '../include/gkerr.cmn'

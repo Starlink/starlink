@@ -53,7 +53,7 @@ C# IL>=a, OL>=1
 *  COMMON BLOCK USAGE
 *  ------------------
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkssl.par'
       INCLUDE '../include/gwksgl.par'

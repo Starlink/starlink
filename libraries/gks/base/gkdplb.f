@@ -33,7 +33,7 @@ C# IL>=a, OL>=0
 *     Read   /PLB/    Get data from bundle
 *     Modify /WKD/    Set up polyline derived data
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwdt.par'
       INCLUDE '../include/gkwkd.cmn'

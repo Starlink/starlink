@@ -42,7 +42,7 @@
 *  ------------------
 *     Read   /GKOPS/  KOPS
 *
-      INCLUDE '..//include/gks.par'
+      INCLUDE '..//include/GKS_PAR'
       INCLUDE '../include/gkops.cmn'
 *
 *  LOCALS

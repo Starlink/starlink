@@ -33,7 +33,7 @@ C# IL>=a, OL>=0
 *     Read   /FAB/    Get data from bundle
 *     Modify /WKD/    Set up fill area derived data
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwdt.par'
       INCLUDE '../include/gkwkd.cmn'

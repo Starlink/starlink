@@ -36,8 +36,8 @@ C# IL>=a, OL>=1
 *     Modify /SL/     KSTRWK, KSFAWK
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gksl.par'
       INCLUDE '../include/gkssl.par'
       INCLUDE '../include/gkwke.par'

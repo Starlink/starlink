@@ -29,8 +29,8 @@ C# IL>=a, OL>=0
 *  ------------------
 *     Read   /ERR/    Inspect KERROR
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkerr.cmn'
 *
 *  ERRORS

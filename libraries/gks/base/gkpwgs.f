@@ -33,7 +33,7 @@ C# IL>=a, OL>=0
 *  ------------------
 *
       INCLUDE '../include/gkinp.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkwpc.par'
       INCLUDE '../include/gkerr.cmn'
 *

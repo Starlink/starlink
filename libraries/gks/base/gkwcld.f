@@ -36,7 +36,7 @@ C# IL>=a, OL>=0
 *     Read   /GKYWCA/ To obtain the Workstation Index
 *     Modify /GKYWSL/ Several Workstation State List entries
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwca.cmn'
       INCLUDE '../include/gkwsl.cmn'

@@ -28,7 +28,7 @@
 *  ------------------
 *
       INCLUDE '../../include/gkdt.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkwca.cmn'
       INCLUDE '../../include/gkwkd.cmn'
       INCLUDE '../../include/gkio.par'

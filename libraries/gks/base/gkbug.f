@@ -46,7 +46,7 @@ C# IL>=a, OL>=0
 *     Modify /GKYERR/   Set error status
 *     Read   /GKOPS/    KOPS
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkerr.cmn'
       INCLUDE '../include/gkops.cmn'
 *

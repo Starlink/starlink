@@ -45,7 +45,7 @@ C# IL>=a, OL>=1
 *     Modify /WCA/ Set up before entering wkstn
 *     Read   /ERR/ Inspect KERROR
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkwca.cmn'

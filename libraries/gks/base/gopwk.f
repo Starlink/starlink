@@ -62,8 +62,8 @@ C# IL>=a, IL>=0
 *                     is not already present
 *     Modify /GKYERR/ KERROR
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkops.cmn'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkdt.cmn'

@@ -54,8 +54,8 @@ C# IL>=a, OL>=0
 *     Read   /ERR/    KERROR
 *
       INCLUDE '../include/gkwke.par'
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gksl.par'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwca.cmn'

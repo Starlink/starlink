@@ -64,7 +64,7 @@
 *                    KWTXCI, KWTXFN, QWKDAT
 *          /GKYWSL/  KCID, KDFM, KDSMT, KIMRGM
 *
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkerr.par'
       INCLUDE '../../include/gkerr.cmn'
       INCLUDE '../../include/gkmc.par'

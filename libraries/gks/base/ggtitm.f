@@ -40,8 +40,8 @@ C# IL>=a, OL>=0
 *     Read   /GKYERR/  KERROR
 *     Modify /GKYWCA/  KWI1,KWI2
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkwca.cmn'

@@ -41,7 +41,7 @@
 *     Modify /ERR/    KERROR
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkhp.par'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gksl.par'

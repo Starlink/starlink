@@ -48,7 +48,7 @@
 *             /GKYERR/  KERROR
 *             /GKZXIO/  ISWKT
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwca.cmn'
       INCLUDE '../include/gkwcb.cmn'

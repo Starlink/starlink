@@ -44,7 +44,7 @@ C# IL>=a, OL>=0
 *     Modify /GKYSL/  KSTRWK,KSPLWK
 *     Update /GKSTK/  KSTACK, QSTACK
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gksl.par'
       INCLUDE '../include/gkwke.par'

@@ -40,7 +40,7 @@
 *     Modify /GKYWCA/    Set parameters in W.C.A.
 *     Modify /GKYERR/    KERROR
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkssl.par'
       INCLUDE '../include/gkops.cmn'

@@ -33,7 +33,7 @@
 *  ------------------
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkerr.cmn'
       INCLUDE '../include/gksl.cmn'
 *

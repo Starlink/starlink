@@ -36,8 +36,8 @@ C# IL>=b, OL>=0
 *  COMMON BLOCK USAGE
 *  ------------------
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwca.cmn'
       INCLUDE '../include/gkwke.par'

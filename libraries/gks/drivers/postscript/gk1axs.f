@@ -38,7 +38,7 @@
       INCLUDE '../../include/gkhp.par'
       INCLUDE '../../include/gkio.par'
       INCLUDE '../../include/gkmc.par'
-      INCLUDE '../../include/gks.par'
+      INCLUDE '../../include/GKS_PAR'
       INCLUDE '../../include/gkerr.cmn'
       INCLUDE '../../include/gkhp.cmn'
       INCLUDE '../../include/gkwca.cmn'

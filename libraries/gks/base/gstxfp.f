@@ -39,8 +39,8 @@ C# IL>=a, OL>=0
 *     Read   /aspct/  ktxfna..(par)
 *     Read   /gks/     indivi,strngp,strokp..(par)
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gksl.par'
       INCLUDE '../include/gaspct.par'

@@ -45,7 +45,7 @@ C# IL>=a, OL>=1
 *  ------------------
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkssl.par'
       INCLUDE '../include/gksl.cmn'
       INCLUDE '../include/gkerr.cmn'

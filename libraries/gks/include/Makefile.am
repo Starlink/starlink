@@ -9,6 +9,14 @@ FPP_INC_OUT = $(FPP_INC_IN:.fpp=)
 
 noinst_INCLUDES = $(FPP_INC_OUT)
 
+include_HEADERS = $(PUBLIC_INCLUDES)
+
+#  List of public include files.  These are include files which form
+#  part of the package and may be required by users of it
+
+PUBLIC_INCLUDES = GKSE_PAR GKS_PAR
+
+
 # dependencies
 gkmc.par:	gkmc.par.fpp
 

@@ -45,8 +45,8 @@ C# IL>=a, OL>=0
 *     Read   /GKYSL/  Inspect source flags
 *     Modify /GKYERR/ KERROR
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gksl.par'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkops.cmn'

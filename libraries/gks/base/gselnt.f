@@ -43,8 +43,8 @@ C# IL>=a, OL>=0
 *                     Rectangle
 *     Modify /GKYERR/ KERROR
 *
-      INCLUDE '../include/gks.par'
-      INCLUDE '../include/gkse.par'
+      INCLUDE '../include/GKS_PAR'
+      INCLUDE '../include/GKSE_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gksl.cmn'
       INCLUDE '../include/gkerr.cmn'

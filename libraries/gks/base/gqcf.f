@@ -36,7 +36,7 @@ C# IL>=a, OL>=0
 *     Read   /GKWKE/    KQCF
 *     Modify /GKWCA/    KDAT,QDAT,KERROR,KWI1,KWI2,KWI3
 *
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkdt.par'
       INCLUDE '../include/gkwke.par'
       INCLUDE '../include/gkwca.cmn'

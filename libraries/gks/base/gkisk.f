@@ -49,7 +49,7 @@ C# IL>=b, OL>=0
 *     Read   /ERR/    KERROR (in fact modified by subsidiary routine)
 *
       INCLUDE '../include/gkdt.par'
-      INCLUDE '../include/gks.par'
+      INCLUDE '../include/GKS_PAR'
       INCLUDE '../include/gkhp.par'
       INCLUDE '../include/gkwca.cmn'
       INCLUDE '../include/gkwsl.cmn'
