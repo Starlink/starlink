@@ -590,10 +590,10 @@ iraf! {
       action unitmap {
          helplib {$ATOOLS_HELP}
 
-         parameter naxes {
+         parameter ncoord {
             position 1
             type _INTEGER
-            prompt {The number of axes in the UnitMap}
+            prompt {The number of input and output coordinates in the UnitMap}
             ppath CURRENT DEFAULT
             default 2
             helpkey *
