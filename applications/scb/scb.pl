@@ -572,7 +572,7 @@ sub query_form {
       <br>
       <input type=submit value='Retrieve'>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <a href='$htxserver/sun226.htx/node16.html#xref_BROWSER-HELP'>Help</a>
+      <a href='$htxserver/sun225.htx/node16.html#xref_BROWSER-HELP'>Help</a>
       </form>
       <hr>
    ";

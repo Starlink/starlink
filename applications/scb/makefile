@@ -371,8 +371,8 @@ PERL_MODULES = Tag.pm CTag.pm FortranTag.pm Scb.pm StarIndex.pm
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = sun226.tex
-HYPERTEXT_DOCS = sun226.htx
+LATEX_DOCS = sun225.tex
+HYPERTEXT_DOCS = sun225.htx
 
 #  List of documentation files.
 
