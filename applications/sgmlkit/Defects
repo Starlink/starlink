@@ -31,6 +31,12 @@ bibliography within source document (prog meeting)
 	Some folk don't (want to) use BibTeX, so it might be worth
 	supporting bib elements within the document.
 
+cross-references to CODECOLLECTIONs (Mark, 15 Sep)
+	Mark pointed out that this is OK from within the document
+	which references them, but it's not necessarily easy from
+	within another document.  This is potentially rather knotty, I
+	think, but it'll be quite interesting to solve.
+
 
 ### Programcode DTD
 
@@ -64,8 +70,8 @@ nested CODE elements (Mark)
 	CODE elements within other elements like STRONG don't always
 	come out in tt-type.
 
-process picture environment with maths in DC (Mark)
-	Should be fairly easy.
+process picture environments with maths in DC (Mark)
+	Should be fairly easy.  Can I do metapost at the same time?
 
 SDATA entities (Norman/Mark)
 	...are a mess.  Perhaps this should wait until I build and
@@ -83,6 +89,20 @@ LaTeX pages are smaller than standard, and different positioning (Mark)
 
 KBD in VERBATIM doesn't work (Mark)
 
+script-driven downconversion (Rodney, Mark)
+	At present, this is little more than an alias for make, and so
+	could probably be made more sophisticated without breaking
+	anything....
+
+Improve the tables implementation (Mark)
+	This is extremely sparse at present.
+
+TeX global declarations (Mark, 15 Sep)
+	A collection of \newcommands at the head of the document.
+
+Programcode formatting (Mark, 15 Sep)
+	The results are very ugly at present.
+
 
 ### General
 
@@ -93,6 +113,10 @@ Does the Makefile work on all platforms? (Mark, 16 Aug)
 	time this becomes live, we might be running Linux on the
 	alphas, too!
 
+Document templates (Mark, 15 Sep)
+	`Some hints and tips, in the form of examples, might be useful
+	too (for instance creative use of entities)'.  Oooh, I don't
+	know we ought to be encouraging `creative' use of entities....
 
 $Revision$ $Date$
 
