@@ -1302,9 +1302,9 @@ successfully on (at least):
 <entry>egcs-2.91.66</entry>
 </row>
                     <row>
-                      <entry>MacOS 10.2</entry>
+                      <entry>powerpc-apple-darwin6.4 (MacOSX 10.2)</entry>
                       <entry>0.10b1</entry>
-                      <entry>gcc ???</entry>
+                      <entry>g++ 3.1 20020420 (prerelease)</entry>
                     </row>
 <row>
 <entry>sparc-sun-solaris2.8</entry>
