@@ -303,10 +303,10 @@
    This will cause the autoloader to look there for various library files. */
       ccddir = getenv( "CCDPACK_DIR" );
       if ( ccddir != NULL ) {
-         setenv( "TCL_LIBRARY", ccddir, 0 );
-         setenv( "TK_LIBRARY", ccddir, 0 );
-         setenv( "ITCL_LIBRARY", ccddir, 0 );
-         setenv( "ITK_LIBRARY", ccddir, 0 );
+         sprintf( buffer, "%s=%s", "TCL_LIBRARY", ccddir ); putenv( buffer );
+         sprintf( buffer, "%s=%s", "TK_LIBRARY", ccddir ); putenv( buffer );
+         sprintf( buffer, "%s=%s", "ITCL_LIBRARY", ccddir ); putenv( buffer );
+         sprintf( buffer, "%s=%s", "ITK_LIBRARY", ccddir ); putenv( buffer );
       }
 
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
