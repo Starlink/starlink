@@ -137,6 +137,7 @@ sub extract_file;
 sub search_keys;
 sub package_list;
 sub getdoctitles;
+sub regex_validate;
 sub output;
 sub error;
 sub mimetype;
@@ -230,7 +231,7 @@ if ($name && $type ne 'regex') {
          } 
          elsif ($t eq 'func') {
             push @names, $name . "_" if ($name !~ /_$/);
-            push @names, lc ($name) if ($name =~ /^[A-Z0-9_]*[A-Z0-9]$/);
+            push @names, lc ($name) . '_' if ($name =~ /^[A-Z0-9_]*[A-Z0-9]$/);
          }
       }
       foreach $n (@names) {
@@ -249,6 +250,7 @@ elsif ($name && $type eq 'regex') {
 
 #  Name has been supplied as a search term.
 
+   regex_validate $name;
    if ($html) {
       header "$self: search for '" . demeta ($name) . "'";
       query_form $package;
@@ -826,16 +828,19 @@ sub search_keys {
 
    foreach $index (qw/file func/) {
       while (($name, $loc) = ${$index . '_index'}->each($package)) {
-         if ($name =~ /$regex/io) {
+         if ($name =~ m¬$regex¬io) {
             $pack = starpack $loc;
             $match{$index}{$pack}{$name} = $loc;
          }
       }
    }
 
-#  Print heading.
+#  Prepare text of regular expression in HTML-printable form.
 
    my $htregex = demeta $regex;
+
+#  Print heading.
+
    print "\n<h2>Search results: $htregex</h2>\n" if ($html);
 
    if (%match) {
@@ -890,6 +895,81 @@ sub search_keys {
       }
    }
       
+}
+
+
+########################################################################
+sub regex_validate {
+
+#+
+#  Name:
+#     regex_validate
+
+#  Purpose:
+#     Validate a regular expression.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     regex_validate ($regex);
+
+#  Description:
+#     This routine checks that Perl thinks a regular expression is correct.
+#     If so, no action is taken.
+#     If not, the error() routine is called to give an informative error.
+
+#  Arguments:
+#     $regex = string.
+#        Regular expression to be checked.
+
+#  Return value:
+
+#  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     04-NOV-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my $regex = shift;
+
+#  Evaluate the regular expression, and return if it generates no error.
+#  We use a weird character for the delimiter in order not to interfere
+#  with characters which might be within the regular expression.
+
+   my $delimiter = "¬";
+   my $evalstr = 'my $dummy = ""; $dummy =~ ';
+   $evalstr .= "m" . $delimiter . $regex . $delimiter;
+   eval $evalstr;
+
+   if ($@) {
+
+#     Prepare regular expression in a printable form.
+
+      my $prregex = $html ? demeta ($regex) : $regex;
+
+#     Call error reporting routine.
+
+      error "Invalid regular expression '$prregex'",
+         "The search term you entered is not a valid Perl 5 regular expression.
+          Perl generated the error <blockquote><code>$@</code></blockquote>\n";
+   }
+
 }
 
 
