@@ -137,7 +137,7 @@
 *    Write to ADI
         IF ( MEMBER .GT. ' ' ) THEN
           IF ( NDIM .EQ. 0 ) THEN
-            CALL ADI_CNEW0<T>( ID, MEMBER, VALUE, STATUS )
+            CALL ADI_CNEWV0<T>( ID, MEMBER, VALUE, STATUS )
           ELSE
             CALL ADI_CNEWV<T>( ID, MEMBER, NDIM, DIMS,
      :                         %VAL(VPTR), STATUS )

@@ -202,7 +202,6 @@
 
 *  Define base epoch
       CALL TCI_GETID( IFID, TIMID, STATUS )
-	call adi_print( timid,status)
       CALL ADI_THERE( TIMID, 'TAIObs', BOK, STATUS )
       IF ( BOK ) THEN
         CALL ADI_CGET0D( TIMID, 'TAIObs', BASE_TAI, STATUS )
