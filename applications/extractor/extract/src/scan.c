@@ -737,12 +737,7 @@ void  preanalyse(int no, objliststruct *objlist, int analyse_type)
 		mx,my, mx2,my2,mxy, rv, tv,
 		xm,ym, xm2,ym2,xym,
 		temp,temp2, theta,pmx2,pmy2;
-<<<<<<< scan.c
-   int		j, x, y, xmin,xmax, ymin,ymax,area2, fdnpix, dnpix;
-=======
    int		x, y, xmin,xmax, ymin,ymax,area2, fdnpix, dnpix;
-  
->>>>>>> 1.1.1.2
 
 
 /*-----  initialize stacks and bounds */
