@@ -56,7 +56,6 @@
       INTEGER			RCPTR			! Channel bounds
 
       LOGICAL 			OK			! Present & correct?
-      LOGICAL 			REG			! Regularly spaced?
 *-
 
 *  Check inherited status
