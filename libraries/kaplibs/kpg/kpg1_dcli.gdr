@@ -164,9 +164,9 @@
          IF ( .NOT. AXLIN( I ) ) THEN
             CALL MSG_SETI( 'IAXIS', I )
             CALL MSG_OUT( 'NONLINEAR',
-     :        'Axis ^IAXIS is non-linear.  Data co-ordinates '/
-     :        /'along any plot axis and in the database will '/
-     :        /'be wrong.', STATUS )
+     :        'Axis ^IAXIS is non-linear or reversed.  Data '/
+     :        /'co-ordinates along any plot axis and in the database '/
+     :        /'will be wrong.', STATUS )
 
 *          Cannot store a non-linear transformation.
 
