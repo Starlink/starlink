@@ -5,4 +5,4 @@ MANIFEST
 typemap
 t/sai.t
 t/ems.t
-
+t/token.t
