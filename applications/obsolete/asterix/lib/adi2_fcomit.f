@@ -91,6 +91,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*132		CMT			! Keyword comment
+
       INTEGER			FSTAT			! FITSIO status
       INTEGER			LUN			! Logical unit number
       INTEGER			NAXES(ADI__MXDIM)	! Dimensions
