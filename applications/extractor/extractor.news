@@ -8,6 +8,11 @@
      - Apertures should now be actually visible in the "APERTURES" 
        checkimage.
 
+     - Skycat catalogues output from detached monoliths (Tcl & ICL)
+       should now always have the correct Tab formatting. This caused
+       the "blank catalogue window" problems in GAIA when repeatedly
+       analysing the same image. 
+ 
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
