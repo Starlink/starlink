@@ -37,10 +37,6 @@ for s in "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /star
 do
     test -n "$s" && STARCONF_DEFAULT_STARLINK=$s && break
 done
-if expr $STARCONF_DEFAULT_STARLINK : '.*/$' >/dev/null; then
-    echo "STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK has trailing slash" >&2
-    exit 1
-fi
 AC_MSG_RESULT($STARCONF_DEFAULT_STARLINK)
 
 

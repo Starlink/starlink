@@ -69,20 +69,22 @@ make-starconf: make-starconf.in configure.ac
 # directories share a prefix, then make the link path relative, so
 # that we're free to move the tree later, if we want.
 install-exec-local:
-## Ensure that STARCONF_DEFAULT_PREFIX has no trailing slash
-## since this would mess up comparisons below (also checked in configure.ac)
-	expr @STARCONF_DEFAULT_PREFIX@ : '.*[^/]$$' >/dev/null || \
-	    { echo "STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@ has a trailing slash" >&2; exit 1; }
-## If the directory exists and isn't the same as @bindir@, then make the links
-	if test -d @STARCONF_DEFAULT_PREFIX@/bin -a @STARCONF_DEFAULT_PREFIX@/bin != @bindir@; then \
-	    (cd @STARCONF_DEFAULT_PREFIX@/bin && \
-		pathback=`echo @bindir@ | sed -n 's,^@STARCONF_DEFAULT_PREFIX@,..,p'`; \
-		test -n "$$pathback" || pathback=@bindir@; \
-		for f in starconf starconf-validate starconf-finder; do \
-		    rm -f $$f; \
-		    @LN_S@ $$pathback/$$f $$f; \
-		    test -n "$$MANIFEST_FILE" && echo `pwd`/$$f >>$$MANIFEST_FILE; \
-		done ); \
+## If the directory exists...
+	if test -d @STARCONF_DEFAULT_PREFIX@/bin; then \
+	  (cd @STARCONF_DEFAULT_PREFIX@/bin && \
+	    thisdir=`pwd`; \
+	    parent=`cd ..; pwd`; \
+	    starconfbindir=`cd @bindir@; pwd`; \
+	    if test $$thisdir != $$starconfbindir; then \
+## ...and it's not the same directory, then make a link
+	      pathback=`echo $$starconfbindir | sed -n "s,$$parent,..,p"`; \
+	      test -n "$$pathback" || pathback=$$starconfbindir; \
+	      for f in starconf starconf-validate starconf-finder; do \
+	        rm -f $$f; \
+		@LN_S@ $$pathback/$$f $$f; \
+		test -n "$$MANIFEST_FILE" && echo $$thisdir/$$f >>$$MANIFEST_FILE; \
+	      done; \
+	    fi ); \
 	fi; true
 
 ## It would be good to include making GenerateDependencies.class in
