@@ -62,7 +62,7 @@
                          # Whether to save CCD parameters or not
             type _LOGICAL
             access READ
-            vpath PROMPT CURRENT DEFAULT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Save CCD parameters for future restoration}
