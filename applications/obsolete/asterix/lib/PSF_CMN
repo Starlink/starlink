@@ -11,6 +11,7 @@
 *      29 Jan 94 : Added PSFINIT flag (DJA)
 *      10 Mar 94 : Last structures removed (DJA)
 *      23 Mar 95 : Split initialisation in two (DJA)
+*      27 Jul 95 : Added AUTO flag (DJA)
 *-
 
       INTEGER                   PSF_E_NONE        	! Energy modes
@@ -26,6 +27,7 @@
 *    Psf system initialised
       LOGICAL                 	PSFINIT			! System initialised?
       LOGICAL                 	PSFLIBINIT		! Library system init?
+      LOGICAL                   PSFAUTO                 ! Automatic mode
 
 *    Spatial model
       LOGICAL		        SM_SIZEDEF(PSF_NMAX) 	! Model extent defined?
@@ -111,4 +113,4 @@
      :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
      :            P_FID,
      :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
-     :          PSFLIBINIT,PSFINIT			! System initialised flag
+     :          PSFAUTO,PSFLIBINIT,PSFINIT			! System initialised flag
