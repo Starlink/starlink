@@ -128,7 +128,7 @@
       CALL KPG1_GTPOS( 'POS', IFRM0, .FALSE., CPOS, 0.0D0, STATUS )
 
 *  Write an introductory message, if necessary.
-      IF( ILEVEL .GT 1 ) THEN
+      IF( ILEVEL .GT. 1 ) THEN
          CALL MSG_BLANK( STATUS )
          BUF = ' '
          IAT = 0

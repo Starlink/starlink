@@ -822,7 +822,7 @@
       CALL LPG_PROP( NDFI, 'UNIT', 'OUT', NDFO, STATUS )
 
 *  Get a title for the new NDF from the parameter system.
-      CALL NDF1_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
+      CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Set the shape of the output NDF.
