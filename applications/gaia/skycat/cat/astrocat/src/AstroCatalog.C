@@ -999,7 +999,8 @@ int AstroCatalog::getPreview(const char* url, char*& ctype)
     }
 
     // correct Content-type after decompression
-    ctype = (is_image ? "image/x-fits" : "text/x-starbase");
+    const char *ctemp = (is_image ? "image/x-fits" : "text/x-starbase");
+    ctype = (char *) ctemp;
 
     // if we got here, then we have the FITS file, so return the file name
     return 0;

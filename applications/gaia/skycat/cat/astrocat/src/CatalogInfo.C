@@ -622,7 +622,7 @@ int CatalogInfo::load(CatalogInfoEntry* e) {
     if (!s) 
 	return 1; // http error
 
-    char* ctype = (http.content_type() ? http.content_type() : "");
+    const char* ctype = (http.content_type() ? http.content_type() : "");
     if (strcmp(ctype, "text/html") == 0) {
 	// most likely an error message
 	return http.html_error(s);

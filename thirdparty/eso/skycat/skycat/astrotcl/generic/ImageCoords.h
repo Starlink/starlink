@@ -42,7 +42,7 @@ public:
     ImageCoords(const char* x_str, const char* y_str);
 
     // return true if the coords are null
-    isNull() const {return x_ == IMAGE_COORD_NULL ||  y_ == IMAGE_COORD_NULL;}
+    int isNull() const {return x_ == IMAGE_COORD_NULL ||  y_ == IMAGE_COORD_NULL;}
 
     // set to the null value
     void setNull() {x_ = IMAGE_COORD_NULL; y_ = IMAGE_COORD_NULL;}

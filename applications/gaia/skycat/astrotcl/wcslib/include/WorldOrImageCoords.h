@@ -47,7 +47,7 @@ public:
 	: ic_(ic), isWcs_(0) {}
 
     // return true if the coords are null
-    isNull() const {return isWcs_ ? wc_.isNull() : ic_.isNull();}
+    int isNull() const {return isWcs_ ? wc_.isNull() : ic_.isNull();}
 
     // set to the null value
     void setNull() {if (isWcs_) wc_.setNull(); else ic_.setNull();}
