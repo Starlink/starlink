@@ -89,6 +89,9 @@
        create a full set of headers for creating a world coordinate system. By
        default this merging no longer occurs when the primary HDU contains a
        non dummy image. 
+     
+     - Region statistics now also include values for the NDF variance
+       component.
 
   To try out GAIA for yourself type the following command:
 
@@ -102,7 +105,7 @@
 
   Peter W. Draper (p.w.draper@durham.ac.uk)
 
-  15th April 2004
+  28th April 2004
 
 
 
