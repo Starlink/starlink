@@ -240,6 +240,7 @@
 
 *          Ensure dependencies are up to date
             CALL FIT1_COPDEP( MODEL, FPAR, STATUS )
+            CALL FIT1_COPDEPL( MODEL, FFROZEN, STATUS )
 
 *          Get initial chi-squared value
 	    CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, FPAR, FSTAT,
@@ -336,6 +337,7 @@ D	      print *,'new le: ',le(j)
 
 *            Ensure dependencies are up to date
               CALL FIT1_COPDEP( MODEL, FPAR, STATUS )
+              CALL FIT1_COPDEPL( MODEL, FFROZEN, STATUS )
 
 *        Get initial chi-squared value
 	      CALL FIT_STAT(NDS,OBDAT,INSTR,MODEL,FPAR,FSTAT,
