@@ -58,6 +58,8 @@ f     The WinMap class does not define any new routines beyond those
 *        Improved MapMerge so that WinMaps can change places with a wider
 *        range of PermMaps, allowing them to approach closer to a Mapping
 *        with which they can merge.
+*     22-FEB-1999 (DSB):
+*        Corrected logic of MapMerge method to avoid infinite looping.
 *class--
 */
 
@@ -613,6 +615,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 */
 
 /* Local Variables: */
+   AstMapping **maplt;   /* New mappings list pointer */
    AstMapping *map2;     /* Pointer to replacement Mapping */
    AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
    AstWinMap *newwm;     /* Pointer to replacement WinMap */
@@ -627,8 +630,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int i;                /* Loop counter */
    int ic[2];            /* Copies of supplied invert flags to swap */
    int invert;           /* Should the inverted Mapping be used? */
+   int *invlt;           /* New invert flags list pointer */
    int neighbour;        /* Index of Mapping with which to swap */
    int nin;              /* Number of coordinates for WinMap */
+   int nmapt;            /* No. of Mappings in list */
    int nstep1;           /* No. of Mappings backwards to next mergable Mapping */
    int nstep2;           /* No. of Mappings forward to next mergable Mapping */
    int old_winv;         /* original Invert value for supplied WinMap */
@@ -870,14 +875,22 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    and forwards as each attempts to put itself closer to the target Mapping.
    To prevent this, we only swap the pair of Mappings if the neighbouring
    Mapping could not itself merge with the target Mapping. Check to see
-   if this is the case by attempting to merge the neighbouring Mapping. */
+   if this is the case by attempting to merge the neighbouring Mapping with
+   the target Mapping. */
                map2 = astClone( (*map_list)[ neighbour ] );
-               result = astMapMerge( map2, neighbour, series, nmap, map_list, 
-                                     invert_list );
+               nmapt = *nmap - neighbour;
+               maplt = *map_list + neighbour;
+               invlt = *invert_list + neighbour;
+               result = astMapMerge( map2, 0, series, &nmapt, &maplt, &invlt );
                map2 = astAnnul( map2 );
 
-/* Only proceed if the above call produced no change in the  Mapping list. */
-               if( result == -1 ){
+/* If the above call produced a change in the  Mapping list, return the
+   remaining number of mappings.. */
+               if( result != -1 ){
+                  *nmap = nmapt + neighbour;
+
+/* Otherwise, if there was no change in the mapping list... */
+               } else {
 
                   if( !strcmp( nclass, "MatrixMap" ) ){
                      WinMat( (*map_list) + i1, (*invert_list) + i1, where - i1 );

@@ -242,6 +242,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        FITS-IRAF encodings.
 *     18-DEC-1998 (DSB):
 *        Check for "D" exponents in floating point keyword strings.
+*     12-FEB-1998 (DSB):
+*        Modified EncodeFloat to avoid exceeding the 20 character FITS 
+*        limit wherever possible if FitsDigits is positive.
 *class--
 */
 
@@ -3157,8 +3160,26 @@ static int EncodeFloat( char *buf, int digits, int width, int maxwidth,
 /* Loop until a suitably encoded value has been obtained. */
    while( 1 ){
 
-/* Write the value into the buffer. */
-      (void) sprintf( buf, "%*.*G", width, ldigits, value );
+/* Write the value into the buffer.  Most are formatted with a G specifier.
+   This will result in values between  -0.001 and -0.0001 being formatted
+   without an exponent, and thus occupying (ldigits+6) characters. With
+   an exponent, these values would be formatted in (ldigits+5) characters
+   thus saving one character. This is important because the default value
+   of ldigits is 15, resulting in 21 characters being used by the G
+   specifier. This is one more than the maximum allowed by the FITS
+   standard. Using an exponent instead would result in 20 characters
+   being used without any loss of precision, thus staying within the FITS
+   limit. Note, the precision used with the E specifier is one less than
+   with the G specifier because the digit to the left of the decimal place
+   is significant with the E specifier, and so we only need (ldigits-1)
+   significant digits to the right of the decimal point. */
+      if( value > -0.001 && value < -0.0001 ) {
+         (void) sprintf( buf, "%*.*E", width, ldigits - 1, value );
+      } else {
+         (void) sprintf( buf, "%*.*G", width, ldigits, value );
+      }
+
+/* Check that the value zero is not encoded with a minus sign (e.g. "-0."). */
       CheckZero( buf, value );
 
 /* If the formatted value includes an exponent, it will have 2 digits.
