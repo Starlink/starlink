@@ -1,3 +1,8 @@
+1999-05-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuover.f (SURF_SCUOVER): Read MJD-OBS from AST/WCS if
+	it can not be found in the FITS extension
+
 1999-05-14  Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* src/surf_scuphot.f:  Check PHOT_BB before freeing memory (since 

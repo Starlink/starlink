@@ -104,6 +104,7 @@
       IMPLICIT NONE
 
 * Global constants :
+      INCLUDE 'AST_PAR'                ! AST__ constants
       INCLUDE 'DAT_PAR'                ! DAT__ constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
@@ -118,6 +119,7 @@
       INTEGER STATUS
 *  External references :
       INTEGER CHR_LEN                  ! CHR used-string-length function
+      DOUBLE PRECISION SLA_EPJ2D       ! Convert from Julian Epoch to MJD
 
 *  Local Constants :
       INTEGER     MAX_DIM              ! max number of dims in array
@@ -169,6 +171,7 @@
       INTEGER          COLI            ! Original colour index of current pen
       LOGICAL          DEVCAN          ! The device parameter is to be cancelled?
       INTEGER          DIM (MAX_DIM)   ! array dimensions
+      DOUBLE PRECISION DTEMP           ! Temp double
       INTEGER          END_EXP         ! Last exposure
       INTEGER          END_INT         ! Last integration
       INTEGER          END_MEAS        ! Last measurement
@@ -232,6 +235,8 @@
       DOUBLE PRECISION IN_UT1          ! UT1 at start of an input observation,
                                        ! expressed as modified Julian day
       INTEGER          ITEMP           ! scratch integer
+      INTEGER          IWCS            ! AST FrameSet
+      INTEGER          IWCSNEW         ! New AST FrameSet
       INTEGER          IWKID           ! GKS workstation identifier
       INTEGER          JIGGLE_COUNT    ! number of jiggles in pattern
       INTEGER          JIGGLE_P_SWITCH ! number of jiggles per switch
@@ -416,8 +421,51 @@
      :     'SCUPROJ', OUT_COORDS, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'FILE_1', FILENAME, STATUS)
-      CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'MJD-OBS', MJD_STANDARD, STATUS)
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'MJD-OBS', MJD_STANDARD, STATUS)
+
+*     If could not find it, try reading from AST
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL ERR_ANNUL(STATUS)
+            CALL NDF_GTWCS(NDF, IWCS, STATUS)
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL ERR_REP(' ','Error reading WCS/AST in NDF'//
+     :              ' whilst looking for MJD-OBS',STATUS)
+            ELSE IF (IWCS .EQ. AST__NULL) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ','Read null AST component whilst '//
+     :              'looking for MJD-OBS', STATUS)
+            ELSE IF ( AST_GETC( IWCS, 'Class', STATUS)
+     :              .NE.'FrameSet' ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ','WCS read correctly but was not a '//
+     :              'FrameSet', STATUS)
+            ELSE
+               
+*     Select a sky frame
+*     This should set the sky frame to the current frame
+*     if it isnt already
+               IF (.NOT. AST_ISASKYFRAME(IWCS, STATUS) ) THEN
+                  IWCSNEW = AST_FINDFRAME( IWCS, 
+     :                 AST_SKYFRAME( ' ', STATUS ), ' ', STATUS ) 
+               END IF
+
+*     Read the epoch
+               DTEMP = AST_GETD(IWCS, 'Epoch', STATUS)
+
+*     Convert to MJD
+               IF (STATUS .EQ. SAI__OK) THEN
+                  MJD_STANDARD = SLA_EPJ2D( DTEMP )
+               END IF
+
+            END IF
+         
+         END IF
+
+      END IF
+
 
       IF (OUT_COORDS.NE.'AZ' .AND. OUT_COORDS.NE.'NA'
      :     .AND. OUT_COORDS.NE.'PL') THEN
