@@ -107,6 +107,7 @@
 
 *  Local Variables:
       INTEGER			OARG			! Method output
+      INTEGER			RID			! ADI string of RNAME
 *.
 
 *  Check inherited global status.
