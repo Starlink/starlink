@@ -194,7 +194,7 @@ itcl::class rtd::RtdImagePrint {
 
     protected method print {fd} {
 	global ::$w_.color ::$w_.rotate $w_.colormap ::$w_.footer
-	global ::$w_.fit_to_page
+	global ::$w_.fit_to_page ::$w_.whole
 
 	set cmd [list $canvas_ postscript \
 		     -colormode [set $w_.color] \
@@ -213,7 +213,8 @@ itcl::class rtd::RtdImagePrint {
 	    # of the displayed rtd image if available. If not then
 	    # use a bounding box that encompasses all the displayed items.
 
-	    if { ! $itk_option(-whole_canvas) } {
+           if { ! [set $w_.whole] } {
+               puts "Not printing whole canvas"
 
 		#  The origin of the image is always 0,0 for a canvas
 		#  print to work.
@@ -222,7 +223,7 @@ itcl::class rtd::RtdImagePrint {
 		set x1 [min [winfo width $canvas_] [$image_ dispwidth]]
 		set y1 [min [winfo height $canvas_] [$image_ dispheight]]
 	    } else {
-
+               puts "Printing whole canvas"
 		#  Use whole printing surface.
 		set x0 [min 0 [$canvas_ canvasx 0]]
 		set y0 [min 0 [$canvas_ canvasy 0]]
@@ -232,7 +233,8 @@ itcl::class rtd::RtdImagePrint {
 	}
 
 	#  Set the background (use a filled rectangle to simulate this).
-	if { $itk_option(-whole_canvas) } {
+       if { [set $w_.whole] } {
+           puts "set_background"
 	    set_background
 	}
 
@@ -280,7 +282,8 @@ itcl::class rtd::RtdImagePrint {
 	}
 
 	#  Remove background.
-	if { $itk_option(-whole_canvas) } {
+       if { [set $w_.whole] } {
+           puts "remove_background"
 	    remove_background
 	}
     }
