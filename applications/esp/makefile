@@ -615,11 +615,29 @@ AST_PAR:      $(STAR_INC)/ast_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
+# Generate MONO_IFL from the other IFL files, rather than extracting it
+# from the tar archive.
 $(PUBLIC_SCRIPTS) $(DATA_FILES) $(LINK_SCRIPT) $(MONO_SOURCE) \
-$(HELP_SOURCES) $(MONO_IFL) $(STARTUP_SCRIPTS) $(IFL_FILES) $(ICL_SCRIPT):
+$(HELP_SOURCES) $(STARTUP_SCRIPTS) $(IFL_FILES) $(ICL_SCRIPT):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
+
+# Generate the monolith IFL file by concatenating the individual task 
+# IFL files.
+$(MONO_IFL): $(IFL_FILES)
+	echo "# ESP ADAM monolith parameter interface"	>$(MONO_IFL)
+	echo "# Generated" `date` "from IFL files: "	>>$(MONO_IFL)
+	for f in $(IFL_FILES); do \
+		echo "#     $$f" >>$(MONO_IFL); \
+	done
+	echo ""						>>$(MONO_IFL)
+	echo "monolith ESP_MON"				>>$(MONO_IFL)
+	echo ""						>>$(MONO_IFL)
+	for f in $(IFL_FILES); do \
+		cat $$f >>$(MONO_IFL); \
+	done
+	echo "endmonolith"				>>$(MONO_IFL)
 
 $(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
