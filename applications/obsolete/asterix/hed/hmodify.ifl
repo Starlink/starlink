@@ -1,6 +1,6 @@
  INTERFACE HMODIFY
    parameter INP  
-      type 'UNIV' 
+      type 'LITERAL'
       position 1  
       PPATH 'GLOBAL'
       prompt 'Object name'
@@ -8,7 +8,7 @@
       association '<->GLOBAL.HDSOBJ' 
    endparameter                      
    parameter VAL
-     type 'UNIV'                     
+     type 'LITERAL'
      position 2                      
      prompt 'New values'             
      help 'Values to be assigned to object' 

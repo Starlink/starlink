@@ -44,6 +44,7 @@
       INTEGER NVAL                       ! number of values in object
       INTEGER OPTR                       ! pointer to mapped object
       INTEGER VPTR                       ! pointer to mapped values
+      INTEGER OBJID, VALID
       LOGICAL PRIM                       ! whether object primitive
 *    Internal References :
       LOGICAL HDX_SAMESHAPE,HDX_SAMETYPE,HDX_NUMERIC
@@ -61,7 +62,8 @@
       CALL AST_INIT()
 
 *    get locator to object if it exists
-      CALL USI_DASSOC('INP','UPDATE',OBJLOC,STATUS)
+      CALL USI_ASSOC('INP','*','UPDATE',OBJID,STATUS)
+      CALL ADI1_GETLOC(OBJID,OBJLOC,STATUS)
       IF (STATUS.EQ.SAI__OK) THEN
 
 *      check that object is primitive
@@ -79,7 +81,8 @@
           CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get values from terminal or other data object
-          CALL USI_DASSOC('VAL','READ',VALOC,STATUS)
+          CALL USI_ASSOC('VAL','*','READ',VALID,STATUS)
+          CALL ADI1_GETLOC(VALID,VALOC,STATUS)
 
           IF (STATUS.EQ.SAI__OK) THEN
 
