@@ -100,6 +100,7 @@
 *  Authors:
 *     JCMP: Jim Peden( University of Birmingham)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -158,6 +159,8 @@
 *        ADI port
 *      6 Mar 1996 V2.0-1 (DJA):
 *        Removed scalar insert to history as this now done by USI
+*      5 Feb 1998 V2.2-1 (RB):
+*        Fix ASSOC opperation for INP1 in non-OVER mode (RB)
 *     {enter_changes_here}
 
 *  Bugs:
