@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_PTHMP( FSETS, PATH, NSTEP, DMNLST, MAP, STATUS )
+      SUBROUTINE CCD1_PTHMP( FSETS, PATH, NSTEP, DMNS, MAP, STATUS )
 *+
 *  Name:
 *     CCD1_PTHMP
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_PTHMP( FSETS, PATH, NSTEP, DMNLST, MAP, STATUS )
+*     CALL CCD1_PTHMP( FSETS, PATH, NSTEP, DMNS, MAP, STATUS )
 
 *  Description:
 *     This routine uses a number of steps through a graph of conversions
@@ -27,11 +27,14 @@
 *        A set of edges forming a connected graph between the nodes 
 *        representing the framesets in the FSETS array.  The from-
 *        and to- node numbers are in positions (1,*) and (2,*).
-*        PATH(2,N-1) must be equal to PATH(1,N) for N = 2..NSTEP.
+*        Position (3,*) gives the index into DMNS of the domain in
+*        which alignment must be made.  PATH(2,N-1) must be equal 
+*        to PATH(1,N) for N = 2..NSTEP.
 *     NSTEP = INTEGER (Given)
 *        The second dimension of PATH.
-*     DMNLST = CHARACTER * ( * ) (Given)
-*        Domain list argument for passing to AST_CONVERT.
+*     DMNS( * ) = CHARACTER * ( * ) (Given)
+*        Array of domains in which alignment may occur; indexed into by
+*        PATH( 3, * ).
 *     MAP = INTEGER (Returned)
 *        AST pointer to a mapping between the Current frame of the 
 *        the first frameset in the path to the Current frame of the
@@ -49,6 +52,8 @@
 *  History:
 *     14-APR-1999 (MBT):
 *        Original version.
+*     16-FEB-2001 (MBT):
+*        Replaced DMNLST argument by DMNS argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -67,7 +72,7 @@
       INTEGER FSETS( * )
       INTEGER NSTEP
       INTEGER PATH( 4, NSTEP )
-      CHARACTER * ( * ) DMNLST
+      CHARACTER * ( * ) DMNS( * )
       
 *  Arguments Returned:
       INTEGER MAP
@@ -109,13 +114,15 @@
 
 *  Get the mapping corresponding to the first edge.
       FSMAP = AST_CONVERT( FSETS( PATH( 1, 1 ) ), 
-     :                     FSETS( PATH( 2, 1 ) ), DMNLST, STATUS )
+     :                     FSETS( PATH( 2, 1 ) ),
+     :                     DMNS( PATH( 3, 1 ) ), STATUS )
       MAP1 = AST_GETMAPPING( FSMAP, AST__BASE, AST__CURRENT, STATUS )
 
 *  Walk through path, accumulating additional mappings.
       DO 1 I = 2, NSTEP
          FSMAP = AST_CONVERT( FSETS( PATH( 1, I ) ), 
-     :                        FSETS( PATH( 2, I ) ), DMNLST, STATUS )
+     :                        FSETS( PATH( 2, I ) ), 
+     :                        DMNS( PATH( 3, I ) ), STATUS )
          MAP2 = AST_GETMAPPING( FSMAP, AST__BASE, AST__CURRENT, STATUS )
          MAP1 = AST_CMPMAP( MAP1, MAP2, .TRUE., ' ', STATUS )
  1    CONTINUE
