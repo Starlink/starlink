@@ -268,7 +268,7 @@ class Gwmview {
          itk_component add exit {
             buttoncontrol $panel.exit \
                -text "Done" \
-               -comm [ code $this deactivate ] \
+               -cmd [ code $this deactivate ] \
                -balloonstr "Finish with this window"
          }
       #  itk_component add colour {

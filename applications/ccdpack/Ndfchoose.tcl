@@ -167,20 +167,20 @@
          itk_component add showfits {
             buttoncontrol $panel.showfits \
                -text "FITS" \
-               -comm [ code $this fitsselect ] \
+               -cmd [ code $this fitsselect ] \
                -balloonstr "FITS headers in panel"
          }
          itk_component add gotpair {
             buttoncontrol $panel.gotpair \
                -text "Use this pair" \
-               -comm [ code $this configure -status inactive ] \
+               -cmd [ code $this configure -status inactive ] \
                -state disabled \
                -balloonstr "Do alignment on this pair"
          }
          itk_component add done {
             buttoncontrol $panel.done \
                -text "Exit" \
-               -comm [ code $this configure -status done ] \
+               -cmd [ code $this configure -status done ] \
                -balloonstr "Abort the application"
          }
 
