@@ -45,14 +45,6 @@
 *     resample in out [method]
 
 *  ADAM Parameters:
-*     CURRENT = _LOGICAL (Read)
-*        Specifies the Mapping to be used. If FALSE, then the Mapping to
-*        use is determined using parameter MAPPING. If TRUE, then the 
-*        Mapping used is the Mapping from pixel co-ordinates in the input 
-*        NDF to the current Frame in the input NDF. The output NDF will 
-*        then have pixel co-ordinates which match the co-ordinates of the 
-*        current Frame of the input NDF (apart from a possible additional 
-*        scaling as per the SCALE parameter). [FALSE]
 *     IN = NDF (Read)
 *        The NDF to be transformed.
 *     LBOUND( ) = _INTEGER (Read)
@@ -62,10 +54,12 @@
 *        which are just low enough to fit in all the transformed pixels 
 *        of the input NDF. [!]
 *     MAPPING = FILENAME (Read)
-*        The name of a file containing the Mapping to be used. The forward 
-*        direction of this Mapping should transform pixel co-ordinates in
-*        the input NDF into the corresponding pixel co-ordinates in the output 
-*        NDF. The file may be:
+*        The name of a file containing the Mapping to be used, or null (!)
+*        if the input NDF is to be mapped into its own current Frame. If a 
+*        file is supplied, the forward direction of the Mapping should 
+*        transform pixel co-ordinates in the input NDF into the 
+*        corresponding pixel co-ordinates in the output NDF. The file 
+*        may be:
 *
 *        - A text file containing a textual representation of the AST Mapping 
 *        to use. Such files can be created by WCSADD.
@@ -85,9 +79,12 @@
 *        - An NDF. The Mapping used is the Mapping from the PIXEL Frame
 *        to the Current Frame of its WCS FrameSet.
 *
-*        This parameter is only used if parameter CURRENT is set to a
-*        false value. The specified Mapping can be modified using
-*        parameter SCALE.
+*        If a null (!) value is supplied, the Mapping used is the Mapping 
+*        from pixel co-ordinates in the input NDF to the current Frame in 
+*        the input NDF. The output NDF will then have pixel co-ordinates 
+*        which match the co-ordinates of the current Frame of the input 
+*        NDF (apart from a possible additional scaling as specified by the
+*        SCALE parameter).
 *     METHOD = LITERAL (Read)
 *        The interpolation method used to resample the input array.
 *        The following values are permitted:
@@ -127,11 +124,13 @@
 *        A scaling factor which is used to modify the supplied Mapping. 
 *        In effect, transformed input co-ordinates would be multiplied 
 *        by this factor to obtain the corresponding output pixel
-*        co-ordinates. If a null (!) value is supplied, a default value
-*        is used. If parameter CURRENT has a false value, the default
-*        scaling factor is 1.0 (no scaling), otherwise the default is 
-*        chosen so that the output NDF has a similar size (in pixels)
-*        to the input NDF. [!]
+*        co-ordinates. If a null (!) value is supplied for SCALE, then a 
+*        default value is used which depends on the value of parameter
+*        MAPPING. If a null value is supplied for MAPPING then the default 
+*        scaling factor is chosen so that the output NDF has a similar size 
+*        (in pixels) to the input NDF. If as non-null value is supplied
+*        for MAPPING then the default scaling factor used is 1.0 (i.e. no 
+*        scaling). [!]
 *     TITLE = LITERAL (Read)
 *        A Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
@@ -158,7 +157,7 @@
 *        Here sg28948 is resampled into a new co-ordinate system using
 *        the AST Mapping stored in a text file called rotate.ast (which
 *        may have been created using WCSADD for instance).
-*     resample flat distorted current
+*     resample flat distorted mapping=\!
 *        This transforms the NDF called flat.sdf into its current
 *        co-ordinate Frame, writing the result to an NDF called
 *        distorted.sdf.  It uses nearest-neighbour resampling.
@@ -169,12 +168,12 @@
 *        factor will be applied to give the output NDF a similar size 
 *        to the input one.  The output NDF will be just large enough 
 *        to hold the transformed copies of all the pixels from "flat".
-*     resample flat distorted scale=1 method=sinccos params=[0,3]
+*     resample flat distorted mapping=\! scale=1 method=sinccos params=[0,3]
 *        As the previous example, but the additional scaling factor will
 *        not be applied even in the case of large size discrepancy,
 *        and a sinc*cos 1-dimensional resampling kernel is used which
 *        rolls off at a distance of 3 pixels from the central one.
-*     resample flat distorted scale=0.2 method=blockave params=2
+*     resample flat distorted mapping=\! scale=0.2 method=blockave params=2
 *        In this case, an additional shrinking factor of 0.2 is being
 *        applied to the output NDF (i.e. performed following the 
 *        Mapping from pixel to current co-ordinates), and the resampling
@@ -184,7 +183,7 @@
 *        PIXEL-domain and current Frame pixels have (about) the same 
 *        size, this will result in every pixel from the input NDF 
 *        adding a contribution to one pixel of the output NDF.
-*     resample a119 a119s lbound=[1,-20] ubound=[256,172]
+*     resample a119 a119s mapping=\! lbound=[1,-20] ubound=[256,172]
 *        This transforms the NDF called a119 into an NDF called a119s.
 *        It uses nearest-neighbour resampling.  The shape of a119s 
 *        is forced to be (1:256,-20:172) regardless of the location
@@ -518,20 +517,18 @@
 *  Obtain its WCS component.
       CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
 
-*  See if we will be using a separately supplied Mapping or not.
-      CALL PAR_GET0L( 'CURRENT', CURENT, STATUS )
-
-*  Get the basic Mapping we will be using.
-      IF ( CURENT ) THEN
-
-*  Resampling into the current Frame - get a Mapping from the WCS
-*  FrameSet.
+*  Attempt to get an externally supplied Mapping - read it from a file.
+*  If a null value is supplied, annul the error and indicate that the 
+*  NDF Is to be mapped into its own current Frame.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+      CALL ATL1_GTOBJ( 'MAPPING', 'Mapping', AST_ISAMAPPING, MAPX,
+     :                 STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CURENT = .TRUE.
          MAPX = IWCS
       ELSE
-
-*  Using an externally supplied Mapping - read it from a file.
-         CALL ATL1_GTOBJ( 'MAPPING', 'Mapping', AST_ISAMAPPING, MAPX,
-     :                    STATUS )
+         CURENT = .FALSE.
       END IF
 
 *  If this is a FrameSet then extract the Mapping explicitly.

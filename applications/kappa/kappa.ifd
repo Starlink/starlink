@@ -12644,16 +12644,6 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
-         parameter current {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Resample into the current Frame of the input NDF?}
-            helpkey *
-         }
-
          parameter in {
             position 1
             type NDF
@@ -12677,9 +12667,9 @@ iraf! {
 
          parameter mapping {
             type FILENAME
-            vpath PROMPT
-            ppath CURRENT
+            ppath CURRENT DEFAULT
             prompt {A file containing the Mapping}
+            default !
             helpkey *
          }
 

@@ -10967,7 +10967,7 @@ picture.}
 \menuitem{PSF}{
  Determines the parameters of a model star profile by fitting star images in a two-dimensional NDF.}
 \menuitem{RESAMPLE}{
- Applies a geometrical transformation to an NDF.}
+ Use an arbitrary mapping to resample an NDF.}
 \menuitem{RESHAPE}{
  Reshapes an NDF, treating its arrays as vectors.}
 \menuitem{RIFT}{
@@ -11024,8 +11024,6 @@ picture.}
  Edits an NDF such that array values below and above two thresholds take constant values.}
 \menuitem{TRANDAT}{
  Converts free-format text data into an NDF.}
-\menuitem{RESAMPLE}{
- Use an arbitrary mapping to resample an NDF.}
 \menuitem{TRIG}{
  Performs a trigonometric  transformation on an NDF.}
 \menuitem{VECPLOT}{
@@ -11354,7 +11352,7 @@ functions as follows.
 \classitem{SQORST}
  Squashes or stretches a 2-d data array in either or both axes.
 \classitem{RESAMPLE}
- Applies a geometrical transformation to an NDF.
+ Use an arbitrary mapping to resample an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -11375,7 +11373,7 @@ functions as follows.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
 \classitem{RESAMPLE}
- Applies a geometrical transformation to an NDF.
+ Use an arbitrary mapping to resample an NDF.
 \classitem{RESHAPE}
  Reshapes an NDF, treating its arrays as vectors.
 \classitem{ROTATE}
@@ -33746,17 +33744,6 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    }
    \sstparameters{
       \sstsubsection{
-         CURRENT = \_LOGICAL (Read)
-      }{
-         Specifies the Mapping to be used. If FALSE, then the Mapping to
-         use is determined using parameter MAPPING. If TRUE, then the
-         Mapping used is the Mapping from pixel co-ordinates in the input
-         NDF to the current Frame in the input NDF. The output NDF will
-         then have pixel co-ordinates which match the co-ordinates of the
-         current Frame of the input NDF (apart from a possible additional
-         scaling as per the SCALE parameter). {\tt [FALSE]}
-      }
-      \sstsubsection{
          IN = NDF (Read)
       }{
          The NDF to be transformed.
@@ -33773,10 +33760,12 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       \sstsubsection{
          MAPPING = FILENAME (Read)
       }{
-         The name of a file containing the Mapping to be used. The forward
-         direction of this Mapping should transform pixel co-ordinates in
-         the input NDF into the corresponding pixel co-ordinates in the output
-         NDF. The file may be:
+         The name of a file containing the Mapping to be used, or null (!)
+         if the input NDF is to be mapped into its own current Frame. If a
+         file is supplied, the forward direction of the Mapping should
+         transform pixel co-ordinates in the input NDF into the
+         corresponding pixel co-ordinates in the output NDF. The file
+         may be:
 
          \sstitemlist{
 
@@ -33803,9 +33792,12 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
             to the Current Frame of its WCS FrameSet.
 
          }
-         This parameter is only used if parameter CURRENT is set to a
-         false value. The specified Mapping can be modified using
-         parameter SCALE.
+         If a null (!) value is supplied, the Mapping used is the Mapping
+         from pixel co-ordinates in the input NDF to the current Frame in
+         the input NDF. The output NDF will then have pixel co-ordinates
+         which match the co-ordinates of the current Frame of the input
+         NDF (apart from a possible additional scaling as specified by the
+         SCALE parameter).
       }
       \sstsubsection{
          METHOD = LITERAL (Read)
@@ -33867,11 +33859,13 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          A scaling factor which is used to modify the supplied Mapping.
          In effect, transformed input co-ordinates would be multiplied
          by this factor to obtain the corresponding output pixel
-         co-ordinates. If a null (!) value is supplied, a default value
-         is used. If parameter CURRENT has a false value, the default
-         scaling factor is 1.0 (no scaling), otherwise the default is
-         chosen so that the output NDF has a similar size (in pixels)
-         to the input NDF. {\tt [!]}
+         co-ordinates. If a null (!) value is supplied for SCALE, then a
+         default value is used which depends on the value of parameter
+         MAPPING. If a null value is supplied for MAPPING then the default
+         scaling factor is chosen so that the output NDF has a similar size
+         (in pixels) to the input NDF. If as non-null value is supplied
+         for MAPPING then the default scaling factor used is 1.0 (\emph{i.e.} no
+         scaling). {\tt [!]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -33912,7 +33906,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          may have been created using WCSADD for instance).
       }
       \sstexamplesubsection{
-         resample flat distorted current
+         resample flat distorted mapping=$\backslash$!
       }{
          This transforms the NDF called flat.sdf into its current
          co-ordinate Frame, writing the result to an NDF called
@@ -33926,7 +33920,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          to hold the transformed copies of all the pixels from {\tt "}flat{\tt "}.
       }
       \sstexamplesubsection{
-         resample flat distorted scale=1 method=sinccos params=[0,3]
+         resample flat distorted mapping=$\backslash$! scale=1 method=sinccos params=[0,3]
       }{
          As the previous example, but the additional scaling factor will
          not be applied even in the case of large size discrepancy,
@@ -33934,7 +33928,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          rolls off at a distance of 3 pixels from the central one.
       }
       \sstexamplesubsection{
-         resample flat distorted scale=0.2 method=blockave params=2
+         resample flat distorted mapping=$\backslash$! scale=0.2 method=blockave params=2
       }{
          In this case, an additional shrinking factor of 0.2 is being
          applied to the output NDF (\emph{i.e.} performed following the
@@ -33947,7 +33941,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          adding a contribution to one pixel of the output NDF.
       }
       \sstexamplesubsection{
-         resample a119 a119s lbound=[1,-20] ubound=[256,172]
+         resample a119 a119s mapping=$\backslash$! lbound=[1,-20] ubound=[256,172]
       }{
          This transforms the NDF called a119 into an NDF called a119s.
          It uses nearest-neighbour resampling.  The shape of a119s
@@ -34196,7 +34190,6 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
 }
-
 \sstroutine{
    RESHAPE
 }{
