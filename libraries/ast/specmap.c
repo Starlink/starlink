@@ -67,6 +67,8 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 *  History:
 *     6-NOV-2002 (DSB):
 *        Original version.
+*     14-JUL-2003 (DSB):
+*        Added checks for NAN values produced by transformation functions.
 *class--
 */
 
@@ -158,6 +160,11 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+
+/* Seems that math.h does not include a prototype for isnan */
+int isnan( double );
+
 
 /* Module Variables. */
 /* ================= */
@@ -196,17 +203,19 @@ AstSpecMap *astSpecMapId_( int, int, const char *, ... );
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *CvtString( int, const char **, int *, int *, int *, int *, const char *[ MAX_ARGS ] );
-static double Refrac( double );
 static double BaryVel( double, double, FrameDef * );
-static double TopoVel( double, double, FrameDef * );
-static double GeoVel( double, double, FrameDef * );
-static double LsrkVel( double, double, FrameDef * );
-static double LsrdVel( double, double, FrameDef * );
-static double UserVel( double, double, FrameDef * );
-static double LgVel( double, double, FrameDef * );
 static double GalVel( double, double, FrameDef * );
+static double GeoVel( double, double, FrameDef * );
+static double LgVel( double, double, FrameDef * );
+static double LsrdVel( double, double, FrameDef * );
+static double LsrkVel( double, double, FrameDef * );
+static double Refrac( double );
+static double TopoVel( double, double, FrameDef * );
+static double UserVel( double, double, FrameDef * );
 static int CvtCode( const char * );
+static int FrameChange( int, int, double *, double *, double *, double *, int );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static int SystemChange( int, int, double *, double *, int );
 static void AddSpecCvt( AstSpecMap *, int, const double * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
@@ -2666,6 +2675,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   d = temp + f2;
                   if( d > 0.0 ) {
                      *pv = AST__C*( ( temp - f2 )/d );
+                     if( isnan( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }
@@ -2694,6 +2704,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                      d = ( AST__C - ( *pv ) )/d;
                      if( d >= 0.0 ) {
                         *pv = temp*sqrt( d );
+                        if( isnan( *pv ) ) *pv = AST__BAD;
                      } else {
                         *pv = AST__BAD;
                      }
@@ -2779,6 +2790,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
             pv++;
             if( *pv != AST__BAD && *pv != 0.0 ) {
                *pv = AST__C/( *pv );
+               if( isnan( *pv ) ) *pv = AST__BAD;
             } else {
                *pv = AST__BAD;
             }
@@ -2796,6 +2808,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
             pv++;
             if( *pv != AST__BAD ) {
                *pv = AST__C/( *pv );
+               if( isnan( *pv ) ) *pv = AST__BAD;
             } else {
                *pv = AST__BAD;
             }
@@ -2813,6 +2826,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
             pv++;
             if( *pv != AST__BAD && *pv != 0.0 ) {
                *pv = AST__C/( ( *pv )*Refrac( *pv ) );
+               if( isnan( *pv ) ) *pv = AST__BAD;
             } else {
                *pv = AST__BAD;
             }
@@ -2831,6 +2845,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
             if( *pv != AST__BAD && *pv != 0.0 ) {
                temp = AST__C/( *pv );
                *pv = temp/Refrac( temp );
+               if( isnan( *pv ) ) *pv = AST__BAD;
             } else {
                *pv = AST__BAD;
             }
@@ -2850,6 +2865,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                temp = 1.0 - ( *pv )/AST__C;
                temp *= temp;
                *pv = AST__C*( 1.0 - temp )/( 1.0 + temp );
+               if( isnan( *pv ) ) *pv = AST__BAD;
             }
          }
       } else {
@@ -2869,6 +2885,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   temp = (AST__C - *pv )/temp;
                   if( temp >= 0.0 ) {
                      *pv = AST__C*( 1.0 - sqrt( temp ) );
+                     if( isnan( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }
@@ -2892,6 +2909,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                temp = 1.0 + ( *pv )/AST__C;
                temp *= temp;
                *pv = AST__C*( temp - 1.0 )/( temp + 1.0 );
+               if( isnan( *pv ) ) *pv = AST__BAD;
             }
          }
       } else {
@@ -2911,6 +2929,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   temp = (AST__C + *pv )/temp;
                   if( temp >= 0.0 ) {
                      *pv = AST__C*( sqrt( temp ) - 1.0 );
+                     if( isnan( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }
@@ -2934,6 +2953,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                temp = 1.0 + ( *pv );
                temp *= temp;
                *pv = AST__C*( temp - 1.0 )/( temp + 1.0 );
+               if( isnan( *pv ) ) *pv = AST__BAD;
             }
          }
       } else {
@@ -2953,6 +2973,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   temp = (AST__C + *pv )/temp;
                   if( temp >= 0.0 ) {
                      *pv = sqrt( temp ) - 1.0;
+                     if( isnan( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }
