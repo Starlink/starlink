@@ -31,7 +31,7 @@
 
 *  Arguments:
 *     ID = INTEGER (given)
-*        Top level fit dataset, either an SDATA file or a fit source file
+*        Top level fit dataset, either a FileSet or a fit source file
 *     GENUS = CHARACTER*(*) (given)
 *        The fit genus
 *     FSTAT = INTEGER (given)
@@ -86,8 +86,7 @@
 *     NOTE:
 *     Temporary storage is set up by the DYN_ system; this should be
 *     initialised in the calling program with an AST_INIT, and cleared up
-*     at the end of execution with AST_CLOSE. This will also take care of
-*     initialisation and closing of the BDA_ system.
+*     at the end of execution with AST_CLOSE.
 
 *  Accuracy:
 *     {routine_accuracy}
@@ -112,25 +111,41 @@
 *     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
-*     17 Mar 87 : Original (FIT_DATGET) (BHVAD::TJP)
-*     11 Jun 87 : Data object names found and returned (TJP)
-*     26 Jun 87 : Various minor fixes (TJP)
-*     14 Apr 88 : Changed structures - renamed to FIT_DATINGET (TJP)
-*     12 Aug 88 : DLOC incorporated in OBDAT structure (TJP)
-*     16 Aug 88 : WEIGHTS argument allows disabling of weights (TJP)
-*     21 Oct 88 : FIT_MSPACE renamed to FIT_PREDSET (TJP)
-*     31 Oct 88 : Bug with bad quality (e.g. IGNOREd) data fixed (TJP)
-*     24 May 89 : ASTERIX88 conversion, handling of SPECTRAL_SETs (TJP)
-*      7 Jun 89 : Selection of detectors from spectral sets (TJP)
-*     19 Jun 89 : Spectral number included in OBDAT.DATNAME for sets (TJP)
-*     23 Jun 89 : Slice mapping for SPECTRAL_SETs fixed (TJP)
-*      7 Jul 89 : DCLOC not annulled (TJP)
-*     18 May 90 : Use of SPEC_SETSEARCH to establish SPECTRAL_SET type (TJP)
-*     10 Jun 92 : Error handling corrected. Obj.name replaced by filename (TJP)
+*     17 Mar 1987 (TJP):
+*        Original version (FIT_DATGET)
+*     11 Jun 1987 (TJP):
+*        Data object names found and returned
+*     26 Jun 1987 (TJP):
+*        Various minor fixes
+*     14 Apr 1988 (TJP):
+*        Changed structures - renamed to FIT_DATINGET
+*     12 Aug 1988 (TJP):
+*        DLOC incorporated in OBDAT structure
+*     16 Aug 1988 (TJP):
+*        WEIGHTS argument allows disabling of weights
+*     21 Oct 1988 (TJP):
+*        FIT_MSPACE renamed to FIT_PREDSET
+*     31 Oct 1988 (TJP):
+*        Bug with bad quality (e.g. IGNOREd) data fixed
+*     24 May 1989 (TJP):
+*        ASTERIX88 conversion, handling of spectral sets
+*      7 Jun 1989 (TJP):
+*        Selection of detectors from spectral sets
+*     19 Jun 1989 (TJP):
+*        Spectral number included in OBDAT.DATNAME for sets
+*     23 Jun 1989 (TJP):
+*        Slice mapping for SPECTRAL_SETs fixed
+*      7 Jul 1989 (TJP):
+*        DCLOC not annulled
+*     18 May 1990 (TJP):
+*        Use of SPEC_SETSEARCH to establish SPECTRAL_SET type
+*     10 Jun 1992 (TJP):
+*        Error handling corrected. Obj.name replaced by filename
 *     18 Jun 1992 (TJP):
 *        Likelihood fitting catered for
 *     19 Jun 1992 (TJP):
@@ -151,6 +166,8 @@
 *        Adapted from old FIT_DATINGET. PRO_ -> PRF_ etc
 *      1 Aug 1995 (DJA):
 *        Added ability to read vignetting file.
+*     29 Nov 1995 (DJA):
+*        ADI port. Use new BDI routines, FSI for spectral set access.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -164,7 +181,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 
 *  Structure Declarations:
@@ -195,51 +211,42 @@
         INTEGER 		CHR_LEN
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	ILOC			! HDS locator
-
-	CHARACTER*(DAT__SZLOC) LOC	! Component locator
-	CHARACTER*(DAT__SZLOC) DCLOC(NDSMAX)	! Data container file locators
-	CHARACTER*(DAT__SZNAM) NAME	! Object name
-	CHARACTER*(DAT__SZTYP) TYPE	! Object type
 	CHARACTER*100 FILE		! File name for HDS_TRACE
-	CHARACTER*5 SNAME		! Select component name
-	CHARACTER*2 FILENO		! File number
 	CHARACTER*2 SPECH		! Spectrum number (within set)
+
 	LOGICAL LOG			! General purpose logical
-	LOGICAL REF			! Input from reference file?
 	LOGICAL OK			! Data present and defined?
-	LOGICAL SPECSET(NDSCMAX)	! Container is a SPECTRAL_SET?
 	LOGICAL QUAL			! Data quality info available?
-	LOGICAL BAD			! Bad points present?
-	LOGICAL LIKSTAT			! Likelihood fitting?
-	LOGICAL CHISTAT			! Chi-squared fitting?
 	LOGICAL BG			! B/g data file found?
 	LOGICAL BGSUB			! B/g subtracted flag set in data?
-	LOGICAL BGCOR			! Has b/g data been exposure corrected?
 
       REAL			RSUM			! Real SSCALE
       REAL 			TEFF			! Effective exposure time
 
+      INTEGER 			BDIMS(ADI__MXDIM)	! B/g array dimensions
       INTEGER			BFID(NDSMAX)		! Bgnd datasets
       INTEGER			DCFID(NDSMAX)		! Source datasets
+      INTEGER 			DIMS(ADI__MXDIM)	! Data array dimensions
       INTEGER 			I			! Index
+      INTEGER 			NDIM			! I/p dimensionality
+      INTEGER 			NDSC			! # dataset files
+      INTEGER 			NDSTOP			! NDS at end of current container
       INTEGER			NVDIM			! Vignetting dim'ality
       INTEGER 			PTR			! General pointer
+      INTEGER 			SETSIZE			! # spectra in set
       INTEGER			TIMID			! Timing info
       INTEGER			TPTR			! Temp pointer
       INTEGER			VDIMS(ADI__MXDIM)	! Vignetting dims
       INTEGER			VFID(NDSMAX)		! Vignetting datasets
 
+      LOGICAL 			BGCOR			! B/g data been exposure corrected?
+      LOGICAL 			CHISTAT			! Chi-squared fitting?
+      LOGICAL 			LIKSTAT			! Likelihood fitting?
+      LOGICAL 			REF			! Input from ref file?
+      LOGICAL 			SPECSET(NDSCMAX)	! I/p is spectral set?
       LOGICAL			VIG			! Vignetting present?
 
-	INTEGER NDSC			! No of dataset container files
-	INTEGER NDSTOP			! NDS at end of current container
-	INTEGER SETSIZE			! No of spectra in spectral set
-	INTEGER NDIM			! Data array dimensionality
 	INTEGER NBDIM			! B/g array dimensionality
-	INTEGER DIMS(DAT__MXDIM)	! Data array dimensions
-	INTEGER BDIMS(DAT__MXDIM)	! B/g array dimensions
-	INTEGER NCOMP			! No of components in dataset
 	INTEGER N			! Dataset index
 	INTEGER INDEX			! Current spectral set selection no
 	INTEGER LDIM(2)			! Lower bound for array slice
@@ -255,8 +262,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get locator for dataset
-      CALL ADI1_GETLOC( ID, ILOC, STATUS )
+*  Is the input a file set?
+      CALL ADI_DERVD( ID, 'FileSet', REF, STATUS )
 
 *  Set statistic flags
       IF ( FSTAT .EQ. FIT__LOGL ) THEN
@@ -269,176 +276,178 @@
       END IF
 
 * Find datasets - get locators
-      CALL DAT_TYPE(ILOC,TYPE,STATUS)
-      IF ( TYPE .NE. 'REF_FILE' ) THEN
+      IF ( .NOT. REF ) THEN
 
 *    Single input dataset container (directly referenced)
-	  REF=.FALSE.
-	  NDSC=1
-          CALL ADI_CLONE( ID, DCFID(1), STATUS )
-	  CALL DAT_CLONE(ILOC,DCLOC(1),STATUS)
+	NDSC = 1
+        CALL ADI_CLONE( ID, DCFID(1), STATUS )
 
-*       Spectral set?
-	  CALL SPEC_SETSRCH(DCFID(NDSC),SPECSET(NDSC),STATUS)
-	  IF (SPECSET(1)) DETNO(1)=0		! Flag to use all spectra
-	ELSE
+*    Spectral set?
+        CALL SPEC_SETSRCH( DCFID(NDSC), SPECSET(NDSC), STATUS )
+	IF (SPECSET(1)) DETNO(1)=0		! Flag to use all spectra
 
-*    Multiple input containers, find how many & get locators
-	  REF=.TRUE.
-	  CALL DAT_NCOMP(ILOC,NCOMP,STATUS)
-	  NDSC=0
-	  DO I=1,NCOMP
-	    CALL DAT_INDEX(ILOC,I,LOC,STATUS)
-	    CALL DAT_TYPE(LOC,TYPE,STATUS)
-	    IF (TYPE.EQ.'REFERENCE_OBJ') THEN
-	      NDSC=NDSC+1
-	      CALL REF_GET(LOC,'READ',DCLOC(NDSC),STATUS)
-              CALL ADI1_PUTLOC( DCLOC(NDSC), DCFID(NDSC), STATUS )
+      ELSE
 
-*       Spectral set?
-	      CALL SPEC_SETSRCH(DCFID(NDSC),SPECSET(NDSC),STATUS)
-	      IF (SPECSET(NDSC)) THEN
-*         Find which spectra are to be used
-	        CALL DAT_NAME(LOC,NAME,STATUS)	! Name should be REFnnn
-	        SNAME='SEL'//NAME(4:CHR_LEN(NAME))
-	        CALL CMP_GET1I(ILOC,SNAME,NDETMAX,DETSEL(1,NDSC),
-     :          DETNO(NDSC),STATUS)
-	        IF (STATUS.NE.SAI__OK) THEN
-	          CALL ERR_ANNUL(STATUS)
-	          DETNO(NDSC)=0			! Flag for `all spectra'
-	        END IF
-	      END IF
-	    END IF
-	    CALL DAT_ANNUL(LOC,STATUS)
-	  END DO
-	END IF
-	IF (STATUS.NE.SAI__OK) GOTO 99
+*    User has supplied a file set
+        CALL ADI_CGET0I( ID, 'NFILE', NDSC, STATUS )
 
-* Abort if maximum permitted number of datasets is exceeded
-	IF (NDSC.GT.NDSMAX) THEN
-	  STATUS=SAI__ERROR
-	  CALL ERR_REP('BADNDS','Maximum number of input datasets exceeded',
+*    Loop over each referenced file in the file set
+        DO I = 1, NDSC
+
+*      Open the referenced file
+          CALL FSI_FOPEN( ID, I, 'BinDS', DCFID(I), STATUS )
+
+*      Is it a spectral set?
+	  CALL SPEC_SETSRCH( DCFID(I), SPECSET(I), STATUS )
+
+*      Find which spectra to use in a spectral set
+          IF ( SPECSET(I) ) THEN
+
+*        Get selection
+            CALL FSI_GETSEL( DCFID(I), I, NDETMAX, DETSEL(1,I),
+     :                       DETNO(I), STATUS )
+
+*        Trap selection absent
+            IF ( STATUS .NE. SAI__OK ) THEN
+              DETNO(I) = 0
+              CALL ERR_ANNUL( STATUS )
+            END IF
+
+          END IF
+
+        END DO
+
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Abort if maximum permitted number of datasets is exceeded
+      IF ( NDSC .GT. NDSMAX ) THEN
+	STATUS=SAI__ERROR
+        CALL ERR_REP(' ','Maximum number of input datasets exceeded',
      :    STATUS)
-	  GOTO 99
-	END IF
+	GOTO 99
+      END IF
 
-* Loop through dataset containers
-	NGOOD=0
-	SSCALE=0
-	NDS=0
-	DO N=1,NDSC
+*  Loop through dataset containers
+      NGOOD = 0
+      SSCALE = 0
+      NDS = 0
+      DO N = 1, NDSC
 
 *    Get dataset container file name and display
-	  IF (NDSC.EQ.1) THEN
-	    CALL UTIL_SHOW(DCLOC(N),'Dataset',FILE,NAME,I,STATUS)
-	  ELSE
-	    CALL CHR_ITOC(N,FILENO,NCH)
-	    CALL UTIL_SHOW(DCLOC(N),'Dataset '//FILENO(1:NCH),FILE,
-     :      NAME,NCH,STATUS)
-	  END IF
-	  IF (STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
+        CALL ADI_FOBNAM( DCFID(N), FILE, I, STATUS )
+	IF ( NDSC .EQ. 1 ) THEN
+          CALL MSG_PRNT( 'Dataset :-' )
+          CALL MSG_PRNT( '   File : '//FILE(:I) )
+	ELSE
+          CALL MSG_SETI( 'N', N )
+          CALL MSG_PRNT( 'Dataset ^N :-' )
+          CALL MSG_PRNT( '      File : '//FILE(:I) )
+        END IF
+	IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
 *    Check main data array
-	  CALL BDI_CHKDATA(DCFID(N),OK,NDIM,DIMS,STATUS)
-	  IF (STATUS.NE.SAI__OK) GOTO 99
-	  IF (.NOT.OK) THEN
-	    STATUS=SAI__ERROR
-	    CALL ERR_REP('BADDAT','Error accessing data array',STATUS)
-	    GOTO 99
-	  END IF
+        CALL BDI_CHK( DCFID(N), 'Data', OK, STATUS )
+        CALL BDI_GETSHP( DCFID(N), ADI__MXDIM, DIMS, NDIM, STATUS )
+	IF ( .NOT. OK ) THEN
+	  STATUS = SAI__ERROR
+	  CALL ERR_REP(' ','Error accessing data array',STATUS )
+        END IF
+	IF (STATUS.NE.SAI__OK) GOTO 99
 
-*      Check that spectrum is exposure corrected (i.e in ct/s)
-          CALL PRF_GET( DCFID(N), 'CORRECTED.EXPOSURE', LOG, STATUS )
-	  IF (.NOT.LOG) THEN
-	    CALL MSG_PRNT(' ')
-	    CALL MSG_PRNT('!! Warning - data must be corrected to ct/s')
-	    CALL MSG_PRNT(' ')
-	  END IF
+*    Check that spectrum is exposure corrected (i.e in ct/s)
+        CALL PRF_GET( DCFID(N), 'CORRECTED.EXPOSURE', LOG, STATUS )
+        IF ( .NOT. LOG ) THEN
+	  CALL MSG_PRNT(' ')
+	  CALL MSG_PRNT('!! Warning - data must be corrected to ct/s')
+          CALL MSG_PRNT(' ')
+	END IF
 
-*      Check existance of vignetting data
-          CALL FRI_CHK( DCFID(N), 'VIGN', VIG, STATUS )
-          IF ( VIG ) THEN
+*    Check existance of vignetting data
+        CALL FRI_CHK( DCFID(N), 'VIGN', VIG, STATUS )
+        IF ( VIG ) THEN
 
-*        Open vignetting data
-            CALL FRI_FOPEN( DCFID(N), 'VIGN', '*', 'READ', VFID(N),
-     :                      STATUS )
-
-	    IF ( STATUS .NE. SAI__OK ) THEN
-	      CALL ERR_ANNUL( STATUS )
-	      VIG = .FALSE.
-            END IF
-
+*      Open vignetting data
+          CALL FRI_FOPEN( DCFID(N), 'VIGN', '*', 'READ', VFID(N),
+     :                    STATUS )
+	  IF ( STATUS .NE. SAI__OK ) THEN
+	    CALL ERR_ANNUL( STATUS )
+	    VIG = .FALSE.
           END IF
 
-*      Check that vignetting data array is same size as main data array
-	  IF ( VIG ) THEN
-	    CALL BDI_CHKDATA( VFID(N), OK, NVDIM, VDIMS, STATUS )
-	    IF (STATUS.NE.SAI__OK) THEN
-	      CALL ERR_FLUSH(STATUS)
-	      VIG=.FALSE.
-	    ELSE IF (.NOT.OK) THEN
-	      CALL MSG_PRNT('Error accessing vignetting data array')
-	      VIG=.FALSE.
-            END IF
-	    IF (NVDIM.EQ.NDIM) THEN
-	      DO I=1,NDIM
-	        IF (VDIMS(I).NE.DIMS(I)) VIG=.FALSE.
-	      END DO
-            ELSE
-	      VIG=.FALSE.
-	    END IF
+        END IF
 
+*    Check that vignetting data array is same size as main data array
+        IF ( VIG ) THEN
+          CALL BDI_CHK( VFID(N), 'Data', OK, STATUS )
+          CALL BDI_GETSHP( VFID(N), ADI__MXDIM, VDIMS, NVDIM, STATUS )
+          IF (STATUS.NE.SAI__OK) THEN
+	    CALL ERR_FLUSH(STATUS)
+	    VIG=.FALSE.
+	  ELSE IF (.NOT.OK) THEN
+	    CALL MSG_PRNT('Error accessing vignetting data array')
+	    VIG=.FALSE.
+          END IF
+	  IF (NVDIM.EQ.NDIM) THEN
+	    DO I=1,NDIM
+	      IF (VDIMS(I).NE.DIMS(I)) VIG=.FALSE.
+	    END DO
+          ELSE
+	    VIG=.FALSE.
           END IF
 
-*      Likelihood case?
-	  IF ( LIKSTAT ) THEN
+        END IF
 
-*        Get effective exposure time
-            CALL TCI_GETID( DCFID(N), TIMID, STATUS )
-            CALL ADI_CGET0R( TIMID, 'EffExposure', TEFF, STATUS )
+*    Likelihood case?
+	IF ( LIKSTAT ) THEN
 
+*      Get effective exposure time
+          CALL TCI_GETID( DCFID(N), TIMID, STATUS )
+          CALL ADI_CGET0R( TIMID, 'EffExposure', TEFF, STATUS )
+
+	  IF (STATUS.EQ.SAI__OK) THEN
+	    CALL MSG_SETR('TEFF',TEFF)
+            CALL MSG_PRNT('    Effective exposure time ^TEFF')
+	  ELSE
+	    CALL ERR_ANNUL(STATUS)
+            CALL ADI_CGET0R( TIMID, 'Exposure', TEFF, STATUS )
 	    IF (STATUS.EQ.SAI__OK) THEN
 	      CALL MSG_SETR('TEFF',TEFF)
-	      CALL MSG_PRNT('    Effective exposure time ^TEFF')
-	    ELSE
-	      CALL ERR_ANNUL(STATUS)
-              CALL ADI_CGET0R( TIMID, 'Exposure', TEFF, STATUS )
-	      IF (STATUS.EQ.SAI__OK) THEN
-	        CALL MSG_SETR('TEFF',TEFF)
-	        CALL MSG_PRNT('Effective exposure time not found - '//
+	      CALL MSG_PRNT('Effective exposure time not found - '//
      :          'using EXPOSURE_TIME value of ^TEFF')
-	      ELSE
-	        CALL ERR_REP(' ','No exposure times found in dataset',
+            ELSE
+	      CALL ERR_REP(' ','No exposure times found in dataset',
      :          STATUS)
-	        GOTO 99
-	      END IF
+	      GOTO 99
 	    END IF
+          END IF
 
-*        Have data been b/g subtracted?
-            CALL PRF_GET( DCFID(N), 'BGND_SUBTRACTED', BGSUB, STATUS )
-	    IF ( BGSUB ) THEN
-	      CALL MSG_PRNT('    Background-subtracted data')
-	    ELSE
-	      CALL MSG_PRNT('    Not background-subtracted')
-	    END IF
+*      Have data been b/g subtracted?
+          CALL PRF_GET( DCFID(N), 'BGND_SUBTRACTED', BGSUB, STATUS )
+	  IF ( BGSUB ) THEN
+	    CALL MSG_PRNT('    Background-subtracted data')
+	  ELSE
+	    CALL MSG_PRNT('    Not background-subtracted')
+	  END IF
 
-*        Check existance of b/g data
-            CALL FRI_CHK( DCFID(N), 'BGND', BG, STATUS )
-            IF ( BG ) THEN
+*      Check existance of b/g data
+          CALL FRI_CHK( DCFID(N), 'BGND', BG, STATUS )
+          IF ( BG ) THEN
 
-*          Open b/g data
-              CALL FRI_FOPEN( DCFID(N), 'BGND', '*', 'READ', BFID(N),
+*        Open b/g data
+            CALL FRI_FOPEN( DCFID(N), 'BGND', '*', 'READ', BFID(N),
      :                        STATUS )
-
-	      IF ( STATUS .NE. SAI__OK ) THEN
-	        CALL ERR_ANNUL( STATUS )
-	        BG = .FALSE.
-	      END IF
+	    IF ( STATUS .NE. SAI__OK ) THEN
+	      CALL ERR_ANNUL( STATUS )
+	      BG = .FALSE.
             END IF
+          END IF
 
 *      Check that background data array is same size as main data array
 	    IF ( BG ) THEN
-	      CALL BDI_CHKDATA( BFID(N), OK, NBDIM, BDIMS, STATUS )
+              CALL BDI_CHK( BFID(N), 'Data', OK, STATUS )
+              CALL BDI_GETSHP( BFID(N), ADI__MXDIM, BDIMS, NBDIM,
+     :                         STATUS )
 	      IF (STATUS.NE.SAI__OK) THEN
 	        CALL ERR_FLUSH(STATUS)
 	        BG=.FALSE.
@@ -489,7 +498,7 @@
 *    Spectral set - find number of component spectra
 	    IF (NDIM.NE.2) THEN
 	      STATUS=SAI__ERROR
-	      CALL ERR_REP('BADDIM','Spectral set has incorrect '//
+	      CALL ERR_REP(' ','Spectral set has incorrect '//
      :        'dimensionality',STATUS)
 	    END IF
 	    IF (STATUS.NE.SAI__OK) GOTO 99
@@ -513,11 +522,12 @@
 	      SETSIZE = DIMS(2)
 	      CALL MSG_PRNT( 'Using all spectra' )
 	    END IF
-	    CALL BDA_UNMAP(DCLOC(N),STATUS)
+
 	  ELSE
 
 *    Not a spectral set
-	    SETSIZE=1
+	    SETSIZE = 1
+
 	  END IF
 
 *    Loop through component spectra required from a given dataset
@@ -529,7 +539,7 @@
 *       Abort if maximum permitted number of datasets is exceeded
 	    IF (NDS.GT.NDSMAX) THEN
 	      STATUS=SAI__ERROR
-	      CALL ERR_REP('BADNDS','Maximum number of input datasets '//
+	      CALL ERR_REP(' ','Maximum number of input datasets '//
      :        'exceeded',STATUS)
 	      GOTO 99
 	    END IF
@@ -554,7 +564,8 @@
 	    OBDAT(NDS).SETINDEX = SPECNO
 
 *       Map the data array
-            CALL BDI_MAPDATA( OBDAT(NDS).D_ID, 'READ', TPTR, STATUS )
+            CALL BDI_MAPR( OBDAT(NDS).D_ID, 'Data', 'READ', TPTR,
+     :                     STATUS )
 
 *       Find and map data array
 	    IF ( SPECSET(N) ) THEN
@@ -589,8 +600,8 @@
 	    IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *         For likelihood case scale to give raw counts, & accumulate SSCALE
-	    IF (LIKSTAT) THEN
-	      PTR=OBDAT(NDS).DPTR
+	    IF ( LIKSTAT ) THEN
+	      PTR = OBDAT(NDS).DPTR
 	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).DPTR,STATUS)
 	      CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
      :        %VAL(OBDAT(NDS).DPTR),STATUS)
@@ -601,9 +612,10 @@
 *       Map variance and quality and use to set up array of data weights
 
 *          Get variance (slice in case of spectral set)
-	    CALL BDI_CHKVAR(OBDAT(NDS).D_ID,OK,NDIM,DIMS,STATUS)
-	    IF (OK) THEN
-	      CALL BDI_MAPVAR(OBDAT(NDS).D_ID,'READ',TPTR,STATUS)
+            CALL BDI_CHK( OBDAT(NDS).D_ID, 'Variance', OK, STATUS )
+	    IF ( OK ) THEN
+	      CALL BDI_MAPR(OBDAT(NDS).D_ID,'Variance','READ',TPTR,
+     :                      STATUS)
 	      IF (SPECSET(N)) THEN
                 CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
      :                           %VAL(OBDAT(NDS).VPTR), STATUS )
@@ -611,7 +623,7 @@
                 OBDAT(NDS).VPTR = TPTR
 	      END IF
 	    ELSE
-	      IF (WEIGHTS) THEN
+	      IF ( WEIGHTS ) THEN
 	        CALL MSG_SETI('NDS',NDS)
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP( ' ', 'No error information available '//
@@ -623,9 +635,10 @@
 	    IF (STATUS.NE.SAI__OK) GOTO 99
 
 *          Get quality
-	    CALL BDI_CHKQUAL(OBDAT(NDS).D_ID,QUAL,NDIM,DIMS,STATUS)
+            CALL BDI_CHK( OBDAT(NDS).D_ID, 'Quality', QUAL, STATUS )
 	    IF (QUAL) THEN
-	      CALL BDI_MAPLQUAL(OBDAT(NDS).D_ID,'READ',BAD,TPTR,STATUS)
+	      CALL BDI_MAPL( OBDAT(NDS).D_ID, 'LogicalQuality',
+     :                       'READ', TPTR, STATUS )
 	      IF (SPECSET(N)) THEN
                 CALL ARR_SLCOPL( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
      :                           %VAL(OBDAT(NDS).QPTR), STATUS )
@@ -633,8 +646,8 @@
                 OBDAT(NDS).QPTR = TPTR
 	      END IF
 
-*         Set quality flag if bad values are present
-	      OBDAT(NDS).QFLAG = BAD
+*         Set quality flag
+	      OBDAT(NDS).QFLAG = .TRUE.
 
 	    ELSE
 	      OBDAT(NDS).QFLAG=.FALSE.
@@ -642,16 +655,11 @@
 	    END IF
 
 	    IF (STATUS.NE.SAI__OK) THEN
-D	      call err_flush(status)
 	      CALL ERR_ANNUL(STATUS)
 	      QUAL=.FALSE.
 	    END IF
-D	    print *,'datget;ndim,ndat,qual:',obdat(nds).ndim,
-D    :      obdat(nds).ndat,qual
-D	    print *,'qual,qflag,qptr : ',qual,obdat(nds).qflag,obdat(nds).qptr
-D	    print *,'ldim,udim :',ldim,udim
 
-*          Accumulate counts for data in likelihood case
+*        Accumulate counts for data in likelihood case
             IF ( LIKSTAT ) THEN
               IF ( OBDAT(NDS).QFLAG ) THEN
 	        CALL FIT_GETDAT_COUNTSQ(OBDAT(NDS).NDAT,
@@ -672,7 +680,7 @@ D	    print *,'ldim,udim :',ldim,udim
 	      OBDAT(NDS).WPTR=0				! Flag
 	    END IF
 
-*          Enter weights (=inverse variances)
+*        Enter weights (=inverse variances)
 	    CALL FIT_GETDAT_WTS(WEIGHTS,OBDAT(NDS).NDAT,
      :      %VAL(OBDAT(NDS).VPTR),QUAL,%VAL(OBDAT(NDS).QPTR),
      :      %VAL(OBDAT(NDS).WPTR),NGDAT)
@@ -693,7 +701,7 @@ D	    print *,'ldim,udim :',ldim,udim
               OBDAT(NDS).V_ID = VFID(N)
 
 *        Map vignetting array
-              CALL BDI_MAPDATA( VFID(N), 'READ', OBDAT(N).VIGPTR,
+              CALL BDI_MAPR( VFID(N), 'Data', 'READ', OBDAT(N).VIGPTR,
      :                          STATUS )
 	      CALL MSG_PRNT('Loaded associated vignetting array')
 
@@ -703,17 +711,17 @@ D	    print *,'ldim,udim :',ldim,udim
             OBDAT(NDS).B_ID = ADI__NULLID
 
 *        For likelihood case, Set up OBDAT.TEFF and get background data
-	    IF (LIKSTAT) THEN
+	    IF ( LIKSTAT ) THEN
 	      OBDAT(NDS).TEFF=TEFF
 	      IF (BG) THEN
 
-*              Store background object
+*            Store background object
                 OBDAT(NDS).B_ID = BFID(N)
 
-*              Map background data
-	        CALL BDI_MAPDATA( BFID(N), 'READ', TPTR, STATUS )
+*            Map background data
+	        CALL BDI_MAPR( BFID(N), 'Data', 'READ', TPTR, STATUS )
 
-*         Find and map b/g data array
+*            Find and map b/g data array
 	        IF (SPECSET(N)) THEN
                   CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
      :                             %VAL(OBDAT(NDS).BPTR), STATUS )
@@ -776,7 +784,7 @@ D	    print *,'ldim,udim :',ldim,udim
 *      Check that data are 1D
 	      IF (OBDAT(NDS).NDIM.GT.1) THEN
 	        STATUS=SAI__ERROR
-	        CALL ERR_REP('BAD_DIM','Convolution with instrument response'
+	        CALL ERR_REP(' ','Convolution with instrument response'
      :          //' is only supported for 1D data at present',STATUS)
 	        GOTO 99
 	      END IF

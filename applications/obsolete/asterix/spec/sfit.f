@@ -1,8 +1,25 @@
-*+  SFIT - Spectral fitting program
       SUBROUTINE SFIT( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     SFIT
+
+*  Purpose:
+*     Spectral fitting program
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL SFIT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Adjusts parameters in a multicomponent model to achieve minimum
 *     chi-squared or maximum likelihood fit to one or more datasets.
 *     Only a single input dataset can be entered - if multiple datasets are
@@ -13,34 +30,51 @@
 *     output and taken as the starting point for further iteration.
 *     Up to three user-defined models: FIT_USER1, _USER2 and _USER3, can be
 *     linked to a private version of the program.
-*
-*    Environment parameters :
-*
-*     LIK=LOGICAL(R)
-*            lilelihood fit (else chi-squared)
-*     INP=UNIV(R)
-*            input data (either a single dataset or a file of references).
-*     Z=REAL(R)
-*            redshift of spectrum
-*     MODEL=UNIV(R)
-*            data object containing model specification
-*     MAX=INTEGER(R)
-*            max number of iterations to be performed
-*     MINS=REAL(R)
-*            minimum `reduced statistic' slope forcing continued iteration
-*     NUPE=INTEGER(R)
-*            number of iterations between updates of model parameter file
-*     ERR=LOGICAL(R)
-*            evaluate approximate parameter errors and write to model file?
-*     OUT=LOGICAL(R)
-*            spool (or send to file) summary of fit results?
-*     FITOUT=CHAR(R)
-*            File name for fit text output
-*     APPEND=LOGICAL(R)
-*            append o/p to existing file?
-*
-*    Method :
-*
+
+*  Usage:
+*     sfit {parameter_usage}
+
+*  Environment Parameters:
+*     LIK = LOGICAL (read)
+*        Likelihood fit (else chi-squared)
+*     INP = CHAR (read)
+*        Input data (either a single dataset or a file of references).
+*     Z = REAL (read)
+*        Redshift of spectrum
+*     MODEL = CHAR (read)
+*        Data object containing model specification
+*     MAX = INTEGER (read)
+*        Max number of iterations to be performed
+*     MINS = REAL (read)
+*        Minimum `reduced statistic' slope forcing continued iteration
+*     NUPE = INTEGER (read)
+*        Number of iterations between updates of model parameter file
+*     ERR = LOGICAL (read)
+*        Evaluate approximate parameter errors and write to model file?
+*     OUT = LOGICAL (read)
+*        Spool (or send to file) summary of fit results?
+*     FITOUT = CHAR (read)
+*        File name for fit text output
+*     APPEND = LOGICAL (read)
+*        Append o/p to existing file?
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *               Get genus, data, response and model spec.
 *               Set up arrays required for fitting
 *               Loop NITMAX/NUPDATE times
@@ -69,86 +103,115 @@
 *     intact.
 *     For the spectral fitting case, a redshift may be incorporated by scaling
 *     all the model space bounds by 1+z, to shift them into the source frame.
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     Trevor Ponman (BHVAD::TJP)
-*     David J. Allan(JET-X,University of Birmingham)
-*
-*    History :
-*
-*     31 Mar 87 : V0.6-1 Original GENFIT (BHVAD::TJP)
-*     15 May 87 : V0.6-2 Parameter error estimates & printout of results (TJP)
-*     11 Jun 87 : V0.6-3 Data file names returned from FIT_DATGET & output (TJP)
-*      5 Nov 87 : V0.6-4 Changes to FIT_MODGET,_MODUP & _CHIMIN. Selectable
-*                        MINSLOPE  (TJP)
-*      3 May 88 : V0.6-5 New structures,user model hooks,global eliminated (TJP)
-*     23 May 88 : Coverted to subroutine FIT_CHIFIT, GENUS passed in (TJP)
-*      1 Jul 88 : APPEND option added (TJP)
-*     26 Oct 88 : Model spec and name included in printed output (TJP)
-*     28 Feb 89 : ASTERIX88 version, includes redshifting (TJP)
-*     24 May 89 : Orderly completion where no params are free (TJP)
-*     14 Nov 89 : Warning if no response found (TJP)
-*     11 Dec 90 : LUN closed after use (TJP)
-*     17 Dec 90 : Bug with NDOF=0 fixed (TJP)
-*      5 Aug 91 : Bug fix in printout for NIT=0 (TJP)
-*     23 May 88 : V0.6-1 Original (BHVAD::TJP)
-*      1 Jul 88 : V0.6-2 APPEND option, NDOF=0 handled (TJP)
-*     11 Aug 88 : V0.6-3 New (more efficient) SPEC_BH and FIT_FOLD (TJP/MPW)
-*     26 Oct 88 : V0.6-4 Model listed in printed output (TJP)
-*      7 Jun 89 : V1.0-1 ASTERIX88 version (TJP)
-*      7 Dec 90 : V1.4-1 Bug with multiple spectra and model compts fixed (TJP)
-*      1 May 91 : V1.5-1 Common block allows 1st run to be flagged (TJP)
-*      5 Aug 91 : V1.5-2 Minor fix to allow printout when all params frozen (TJP)
-*     26 Mar 92 :        FIT_PREDDAT passed as external (RJV)
-*      1 Apr 92 : V1.5-3 FIT_CHIFIT merged into top level (RJV)
-*     15 Jun 92 : V1.6-1 Supports likelihood fitting (TJP)
-*      3 Jul 92 :        GENUS added to FIT_DATINGET interface (TJP)
-*      9 Aug 92 : V1.6-2 Internal write replaces overwrite in printed o/p (TJP)
-*     23 Sep 92 : V1.6-3 Use D.P. for statistic (DJA)
-*      4 Dec 92 : V1.7-0 Fit error report and red-shift in subroutines (DJA)
-*     21 Dec 92 : V1.7-1 Terminal output via MSG (DJA)
-*     11 Jan 93 : V1.7-2 Output open/close moved to subroutines (DJA)
-*      8 Sep 93 : V1.7-3 Added SPEC_INIT call and removed reference to
-*                        SPEC_CMN_RZ (DJA)
-*     23 May 94 : V1.7-4 Added parameter tying (DJA)
-*     21 Jul 94 : V1.7-5 File output moved to SFIT_OPFILES (DJA)
-*     25 Jul 94 : V1.7-6 File output now completely using AIO (DJA)
-*      7 Sep 94 : V1.8-0 Print out fit probability (DJA)
-*     24 Nov 94 : V1.8-1 Now use USI for user interface (DJA)
-*     21 Apr 95 : V1.8-2 Removed explicit use of HDS (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     sfit, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     31 Mar 1987 V0.6-1 (TJP):
+*        Original GENFIT
+*     15 May 1987 V0.6-2 (TJP):
+*        Parameter error estimates & printout of results
+*     11 Jun 1987 V0.6-3 (TJP):
+*        Data file names returned from FIT_DATGET & output
+*     26 Oct 1988 V0.6-4 (TJP):
+*        Model listed in printed output
+*      7 Jun 1989 V1.0-1 (TJP):
+*        ASTERIX88 version
+*      7 Dec 1990 V1.4-1 (TJP):
+*        Bug with multiple spectra and model compts fixed
+*      1 May 1991 V1.5-1 (TJP):
+*        Common block allows 1st run to be flagged
+*      5 Aug 1991 V1.5-2 (TJP):
+*        Minor fix to allow printout when all params frozen
+*      1 Apr 1992 V1.5-3 (RJV):
+*        FIT_CHIFIT merged into top level
+*     15 Jun 1992 V1.6-1 (TJP):
+*        Supports likelihood fitting
+*      9 Aug 1992 V1.6-2 (TJP):
+*        Internal write replaces overwrite in printed o/p
+*     23 Sep 1992 V1.6-3 (DJA):
+*        Use D.P. for statistic
+*      4 Dec 1992 V1.7-0 (DJA):
+*        Fit error report and red-shift in subroutines
+*     21 Dec 1992 V1.7-1 (DJA):
+*        Terminal output via MSG
+*     11 Jan 1993 V1.7-2 (DJA):
+*        Output open/close moved to subroutines
+*      8 Sep 1993 V1.7-3 (DJA)
+*        Added SPEC_INIT call and removed reference to SPEC_CMN_RZ
+*     23 May 1994 V1.7-4 (DJA):
+*        Added parameter tying
+*     21 Jul 1994 V1.7-5 (DJA):
+*        File output moved to SFIT_OPFILES
+*     25 Jul 1994 V1.7-6 (DJA):
+*        File output now completely using AIO
+*      7 Sep 1994 V1.8-0 (DJA):
+*        Print out fit probability
+*     24 Nov 1994 V1.8-1 (DJA):
+*        Now use USI for user interface
+*     21 Apr 1995 V1.8-2 (DJA):
+*        Removed explicit use of HDS
+*     30 Nov 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIT_PAR'
-*
-*    Structure definitions :
-*
+
+*  Structure Definitions:
       INCLUDE 'FIT_STRUC'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    External references :
-*
-      EXTERNAL FIT_PREDDAT		! Data prediction routine
-*
-*    Local constants :
-*
-      INTEGER OPCHAN			! Output channel for diagnostic
-	PARAMETER (OPCHAN=6)		! messages ( <1 for no messages)
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			FIT_PREDDAT
+
+*  Local Constants:
+      INTEGER 			OPCHAN			! Output channel for diagnostic
+	PARAMETER 		( OPCHAN = 6 )		! messages ( <1 for no messages)
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'SFIT Version V2.0-0' )
+
+*  Local Variables:
       RECORD /DATASET/    	OBDAT(NDSMAX)		! Observed datasets
       RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
       RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
@@ -173,7 +236,7 @@
       INTEGER			MFID			! Model spec id
       INTEGER 			NDS			! No of datasets
       INTEGER 			NGOOD			! No. good data elements
-      INTEGER SSCALE			! Factor for scaling fitstat
+      INTEGER 			SSCALE			! Factor for scaling fitstat
       INTEGER			NC			! No. chars used in SPAR
       INTEGER NDOF			! No of degrees of freedom - should be
 					!  no of data - no of unfrozen params
@@ -200,24 +263,22 @@
 	LOGICAL NOFREE			! No parameters free
 	LOGICAL ER			! Parameter error calculation required?
 	LOGICAL OP			! Printout required?
-*
-*    Version :
-*
-      CHARACTER*30		VERSION
-	PARAMETER		(VERSION='SFIT Version 1.8-2' )
-*-
+*.
 
-*    Announce version
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Set up genus in MODEL structure
-      MODEL.GENUS='SPEC'
-
-*    Initialise ASTERIX packages
-      CALL AST_INIT
+*  Initialise ASTERIX
+      CALL AST_INIT()
       CALL SPEC_INIT( STATUS )
 
-*    Chi-squared or likelihood fitting?
+*  Set up model genus
+      MODEL.GENUS = 'SPEC'
+
+*  Chi-squared or likelihood fitting?
       CALL USI_GET0L( 'LIK', LIKSTAT, STATUS )
       CHISTAT=.NOT.LIKSTAT
       IF ( LIKSTAT ) THEN
@@ -226,25 +287,25 @@
         FSTAT=FIT__CHISQ
       END IF
 
-*    Get observed data (setting up data weights) and response
-      CALL USI_TASSOCI('INP','*','READ',IFID,STATUS)
-      WORKSPACE=.TRUE.
-      CALL FIT_GETDAT( IFID,'SPEC',FSTAT,WORKSPACE,CHISTAT,NDS,OBDAT,
-     :  NGOOD,SSCALE,PREDDAT,INSTR,STATUS)
-      IF(STATUS.NE.SAI__OK) GOTO 99
+*  Get observed data (setting up data weights) and response
+      CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
+      WORKSPACE = .TRUE.
+      CALL FIT_GETDAT( IFID, 'SPEC', FSTAT, WORKSPACE, CHISTAT, NDS,
+     :                 OBDAT, NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Look for redshift
+*  Look for redshift
       CALL SFIT_GETZ( Z, STATUS )
 
-*    Apply red-shift and check instrument response
+*  Apply red-shift and check instrument response
       DO N = 1, NDS
 
-*      Apply redshift to model space energy bounds
+*    Apply redshift to model space energy bounds
         CALL SFIT_APPRED( Z, PREDDAT(N).NMBOUND,
      :                    %VAL(PREDDAT(N).MLBNDPTR),
      :                    %VAL(PREDDAT(N).MUBNDPTR), STATUS )
 
-*      Report on success in finding instrument response if appropriate
+*    Report on success in finding instrument response if appropriate
 	IF ( PREDDAT(N).CONVOLVE ) THEN
 	  IF ( NDS .EQ. 1 ) THEN
 	    CALL MSG_PRNT('Instrument response found')
@@ -265,43 +326,44 @@
       END DO
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
-*    Get model specification
-      CALL USI_TASSOCI( 'MODEL', '*', 'UPDATE', MFID, STATUS )
-      CALL FIT_MODGET( MFID,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
-      IF(STATUS.NE.SAI__OK) GOTO 99
+*  Get model specification
+      CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', MFID, STATUS )
+      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+     :                 FROZEN, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Number of degrees of freedom for chi-squared
+*  Number of degrees of freedom for chi-squared
       IF ( CHISTAT ) THEN
 
-*      Finds NDOF from frozen array and constraints
+*    Finds NDOF from frozen array and constraints
         CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
 
-*      NDOF to be used for scaling chisq statistic
+*    NDOF to be used for scaling chisq statistic
 	SSCALE = NDOF
 
       END IF
 
-*    Set iteration limits
+*  Set iteration limits
       CALL USI_GET0I('MAX',NITMAX,STATUS)
       CALL USI_GET0R('MINS',MINSLO,STATUS)
       CALL USI_GET0I('NUP',NITUP,STATUS)
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Set up workspace for model stack
+*  Set up workspace for model stack
       CALL SFIT_MAPMODSTK( NDS, PREDDAT, MODEL.STACKPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Zero iterations means just print the statistic
+*  Zero iterations means just print the statistic
       IF ( NITMAX .EQ. 0 ) THEN
 
-*      Evaluate the statistic
+*    Evaluate the statistic
         CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARAM, FSTAT,
      :                    FIT_PREDDAT, PREDDAT, STAT, STATUS )
 
-*      Report value of statistic
+*    Report value of statistic
         CALL SFIT_OPSTAT( FSTAT, STAT, SSCALE, NGOOD, 0, STATUS )
 
-*      Goodness of fit
+*    Goodness of fit
         CALL FIT_MPROB( NDS, OBDAT, FSTAT, SSCALE, PREDDAT, STAT,
      :                  FPROB, STATUS )
         CALL MSG_SETD( 'FPROB', FPROB )
@@ -311,21 +373,23 @@
 
       END IF
 
-*    Main loop
+*  Main loop
       NIT=0
       INITIALISE=.TRUE.
       FINISHED=.FALSE.
       NOFREE=.FALSE.
       DO WHILE(NIT.LT.NITMAX.AND..NOT.FINISHED)
 
-	NRET=NIT+NITUP
+	NRET = NIT + NITUP
 	IF(NRET.GT.NITMAX) NRET=NITMAX
+
+*    Perform fit iteration
 	CALL FIT_MIN(NDS,OBDAT,INSTR,MODEL,OPCHAN,NRET,NPAR,LB,UB,
      :    FROZEN,SSCALE,INITIALISE,MINSLO,FSTAT,FIT_PREDDAT,PREDDAT,
      :    PARAM,DPAR,PEGGED,STAT,NIT,FINISHED,FITERR,STATUS)
 	IF(STATUS.NE.SAI__OK) GOTO 99
 
-*      Fitting error
+*    Fitting error
 	IF(FITERR.EQ.2.OR.FITERR.EQ.3)THEN
 
 *        No free parameters - terminate
@@ -334,13 +398,13 @@
 
 	ELSE IF(FITERR.NE.0)THEN
 
-*        Fatal fitting error
+*      Fatal fitting error
           CALL FIT_REPFERR( FITERR, STATUS )
 	  GOTO 99
 
 	END IF
 
-*      Report progress
+*    Report progress
 	CALL MSG_BLNK()
         CALL MSG_SETI( 'NIT', NIT )
         CALL MSG_PRNT( '* Iteration ^NIT *' )
@@ -375,7 +439,7 @@
 	  CALL MSG_BLNK()
 	END IF
 
-*     Update model_spec object
+*    Update model_spec object
 	CALL MSG_BLNK()
 	CALL MSG_PRNT( '** Updating model spec - do not exit '/
      :                                  /'until completed **' )
@@ -389,7 +453,7 @@
 
       END DO
 
-*    Calculate approximate parameter errors and display
+*  Calculate approximate parameter errors and display
       IF ( NOFREE ) THEN
 	ER = .FALSE.
       ELSE
@@ -405,19 +469,19 @@
 
       ELSE
 
-*      Reset array to ensure tidy print out
+*    Reset array to ensure tidy print out
         CALL ARR_INIT1R( 0.0, NPAR, PARSIG, STATUS )
 
       END IF
 
-*    Report parameter values
+*  Report parameter values
       CALL SFIT_OPTABLE( NPAR, PARAM, FROZEN, PEGGED, PARSIG, MODEL,
      :                                                   0, STATUS )
 
-*    Report value of statistic
+*  Report value of statistic
       CALL SFIT_OPSTAT( FSTAT, STAT, NDOF, NGOOD, 0, STATUS )
 
-*    Report red-shift
+*  Report red-shift
       IF ( Z .NE. 0.0 ) THEN
         CALL MSG_BLNK()
         CALL MSG_FMTR( 'Z', 'F7.5', Z )
@@ -425,33 +489,33 @@
         CALL MSG_BLNK()
       END IF
 
-*    Update model_spec errors
+*  Update model_spec errors
       IF ( ER ) THEN
 	CALL FIT_MODUP(MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,1.0,STATUS)
 	CALL MSG_PRNT( '** Error estimates entered in model spec. **' )
 	CALL MSG_BLNK()
       END IF
 
-*    Printed summary of fit results wanted?
+*  Printed summary of fit results wanted?
       CALL SFIT_OPOPEN( OP, OCI, STATUS )
 
-*    Write output?
+*  Write output?
       IF ( OP ) THEN
 
-*      Write header
+*    Write header
         CALL AIO_TITLE( OCI, VERSION, STATUS )
 
 *      File list
         CALL SFIT_OPFILES( FSTAT, NDS, OBDAT, MODEL, OCI, STATUS )
 
-*      Red-shift
+*    Red-shift
 	IF ( Z .NE. 0.0 ) THEN
           CALL MSG_FMTR( 'Z', 'F7.5', Z )
           CALL AIO_WRITE( OCI, '--- Redshifted to z = ^Z', STATUS )
           CALL AIO_BLNK( OCI, STATUS )
 	END IF
 
-*      Status of minimisation
+*    Status of minimisation
         CALL AIO_BLNK( OCI, STATUS )
         CALL MSG_SETI( 'NIT', NIT )
         CALL AIO_WRITE( OCI, 'Terminated after ^NIT iterations',
@@ -462,19 +526,19 @@
           CALL AIO_WRITE( OCI, 'Minimum not found', STATUS )
 	END IF
 
-*      Report parameter values
+*    Report parameter values
         CALL SFIT_OPTABLE( NPAR, PARAM, FROZEN, PEGGED, PARSIG,
      :                                     MODEL, OCI, STATUS )
 
-*      Value of statistic
+*    Value of statistic
         CALL SFIT_OPSTAT( FSTAT, STAT, NDOF, NGOOD, OCI, STATUS )
 
-*      Close file
+*    Close file
         CALL SFIT_OPCLOSE( OCI, STATUS )
 
       END IF
 
-*    Tidy up & exit
+*  Tidy up & exit
  99   CALL USI_ANNUL( 'MODEL', STATUS )
       CALL USI_ANNUL( 'INP', STATUS )
       CALL AST_CLOSE()
