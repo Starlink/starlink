@@ -730,7 +730,7 @@ itcl::class gaia::Gaia {
    #  Make an AST set celestial coordinates system toolbox.
    public method make_astsystem_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstSystem $w_.\#auto \
+         GaiaAstSystem $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \

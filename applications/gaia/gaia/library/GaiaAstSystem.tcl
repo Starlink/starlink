@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarAstSystem
+#     GaiaAstSystem
 
 #  Type of Module:
 #     [incr Tk] class
@@ -19,9 +19,9 @@
 
 #  Invocations:
 #
-#        StarAstSystem object_name [configuration options]
+#        GaiaAstSystem object_name [configuration options]
 #
-#     This creates an instance of a StarAstSystem object. The return is
+#     This creates an instance of a GaiaAstSystem object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -43,21 +43,23 @@
 #     TopLevelWidget.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     22-JAN-1998 (PDRAPER):
+#     22-JAN-1998 (PWD):
 #        Original version.
+#     23-MAY-2000 (PWD):
+#         Renamed GaiaAstSystem.
 #     {enter_further_changes_here}
 
 #-
 
 #.
 
-itk::usual StarAstSystem {}
+itk::usual GaiaAstSystem {}
 
-itcl::class gaia::StarAstSystem {
+itcl::class gaia::GaiaAstSystem {
 
    #  Inheritances:
    #  -------------
@@ -103,7 +105,7 @@ itcl::class gaia::StarAstSystem {
 
       #  Add window help.
       global gaia_dir
-      add_help_button $gaia_dir/StarAstSystem.hlp "On Window..."
+      add_help_button $gaia_dir/GaiaAstSystem.hlp "On Window..."
 
       #  There are only three elements that can be controlled: epoch,
       #  equinox and system. Each of these defaults to the string

@@ -26,7 +26,7 @@
 #     Note that the celestial coordinate system of the fit is
 #     restricted to being that of the reference positions (which are
 #     displayed in the table). If this needs to be changed then an
-#     additional level of control is available via the StarAstSystem
+#     additional level of control is available via the GaiaAstSystem
 #     toolbox.
 
 #  Invocations:
