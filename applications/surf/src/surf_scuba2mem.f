@@ -30,13 +30,16 @@
 
 *  ADAM Parameters:
 *     IN = CHAR (Read)
-*        The name ofthe input file to be processed. This is a demodulated
-*        data file. RESTORE should not have been run on it.
-*     LAT_OUT = CHAR (Read)
+*        The name ofthe input files to be processed. This is a demodulated
+*        data file. RESTORE should not have been run on it. Multiple
+*        file names can be specified (see the documentation on GRP).
+*        All the input files are referenced to the same output coordinate
+*        frame.
+*     LAT = CHAR (Read)
 *        The latitude of the output map centre. The supplied default value
 *        is that of the map centre of the observation in the output
 *        coordinates.
-*     LONG_OUT = CHAR (Read)
+*     LONG = CHAR (Read)
 *        The longitude of the output map centre. The supplied default value 
 *        is that of the map centre of the observation in the output
 *        coordinates.
@@ -69,6 +72,11 @@
 *  Notes:
 *     Can be used on JIGGLE and SCAN data.
 
+*  TODO:
+*     - Support 2 and 3 pos chopping
+*         Will have to check what actually happens with 3 pos chop
+*     - Probably does not work with 2/3 bol chopping
+
 *  Format of output file:
 *     SCUBA DBMEM requires the data, positions of every beam and the
 *     LST for every point. This information (along with a standard FITS
@@ -93,6 +101,10 @@
  
 *  History:
 *     $Log$
+*     Revision 1.7  1999/07/14 04:52:36  timj
+*     Allow shift of coordinate output frame.
+*     Support GRP multiple input files.
+*
 *     Revision 1.6  1999/07/05 02:20:08  timj
 *     Fix args to surf_read_rebin_ndf
 *
@@ -129,6 +141,8 @@
       INCLUDE 'PRM_PAR'                ! for VAL__ constants
       INCLUDE 'SAE_PAR'
       INCLUDE 'SURF_PAR'               ! SURF definitions
+      INCLUDE 'MSG_PAR'
+      INCLUDE 'GRP_PAR'
 
 * Status:
       INTEGER STATUS
@@ -140,8 +154,11 @@
       PARAMETER (MAX_FILE = 1)
       INTEGER     NDIM          ! Number of dimensions in output file
       PARAMETER (NDIM = 3)
+      CHARACTER * (9) TSKNAME   ! Name of task
+      PARAMETER (TSKNAME = 'SCUBA2MEM')
 
 * Local variables:
+      INTEGER ADDED             ! Number added to group this time
       REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2) 
                                        ! Angles (wplate,angrot) for each
                                        ! integration (polarimetry) 
@@ -170,9 +187,14 @@
       INTEGER DATA_PTR                  ! Pointer to input data
       CHARACTER * 128 DATA_SPEC(SCUBA__MAX_SECT) ! Array of section specs
       CHARACTER * 80  FITS ( SCUBA__MAX_FITS ) ! FITS information
+      LOGICAL FLAG                      ! GRP flag
       CHARACTER * 132 FNAME             ! Input filename
+      INTEGER GRP                       ! Group counter
+      LOGICAL HOURS                     ! .TRUE. if the angle being read in is
+                                        ! in units of hours rather than degrees
       INTEGER I                         ! Loop counter
       INTEGER IERR                      ! Position of error in VEC copy
+      INTEGER IGRP                      ! Group identifier
       CHARACTER * 256 INSTRING          ! Input filename string + section
       INTEGER INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1) ! Integration pointers
       DOUBLE PRECISION IN_DEC_CEN       ! Declination of map centre
@@ -185,6 +207,7 @@
       INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
                                        ! pointers to start of each measurement
       INTEGER NERR                      ! Number of errors in VEC_ copy
+      INTEGER NMEMBERS                  ! Number of members in group
       INTEGER NSPEC                     ! Number of SCUBA sections
       INTEGER N_BEAM                    ! Number of beams requested
       INTEGER N_BOL                     ! Number of bolometers in input file
@@ -201,6 +224,10 @@
       INTEGER OUT_A_PTR                 ! Pointer to axis
       INTEGER OUT_DATA_PTR              ! Pointer
       DOUBLE PRECISION OUT_DEC_CEN      ! Declination of output map centre
+      DOUBLE PRECISION OUT_LAT          ! longitude of output map centre 
+                                        ! (radians)
+      DOUBLE PRECISION OUT_LONG         ! longitude of output map centre
+                                        ! (radians)
       DOUBLE PRECISION OUT_RA_CEN       ! RA of output map centre
       DOUBLE PRECISION OUT_ROTATION     ! angle between apparent N and N of
                                         ! output coord system (radians)
@@ -222,10 +249,6 @@
       INTEGER VARIANCE_END              ! Pointer to end of input variance
       INTEGER VARIANCE_PTR              ! Pointer to input variance
       REAL    WAVELENGTH                ! Wavelength of data (microns)
-      DOUBLE PRECISION OUT_LAT         ! longitude of output map centre 
-                                       ! (radians)
-      DOUBLE PRECISION OUT_LONG        ! longitude of output map centre
-                                       ! (radians)
 
 * Local data:
  
@@ -237,30 +260,79 @@
       IF (STATUS .NE. SAI__OK) RETURN
  
 *     Set the MSG output level (for use with MSG_OUTIF)
- 
       CALL MSG_IFGET('MSG_FILTER', STATUS)
 
 *     start up the NDF system
- 
       CALL NDF_BEGIN
 
-*     Read the filename (and possibly a SCUBA section)
-      CALL PAR_GET0C ('IN', INSTRING, STATUS)
-         
-*     Parse the filename string
-      CALL SCULIB_SPLIT_FILE_SPEC(INSTRING, SCUBA__MAX_SECT, FNAME, 
-     :     NSPEC, DATA_SPEC, USE_SECTION, STATUS)
+*     Create a new input and output groups
+      CALL GRP_NEW('Input files', IGRP, STATUS )
 
-*     Open the input file
-      CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS) 
+*     Turn off curly brackets so that SCUBA sections work okay
+      CALL GRP_SETCC( IGRP, 'OPEN_KERNEL,CLOSE_KERNEL', '%%', STATUS )
 
+*     Read in the group members 
+      CALL GRP_GROUP('IN', GRP__NOID, IGRP, NMEMBERS, ADDED,
+     :     FLAG, STATUS)
+
+      print *,'nmembers: ',NMEMBERS, ADDED
+
+*     Read the coordinate frame of the output data
+      CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',.TRUE.,
+     :     OUT_COORDS, STATUS)
+
+      HOURS = .TRUE.
+      IF (OUT_COORDS .EQ. 'RB') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: output coordinates are FK4 B1950.0', STATUS)
+      ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: output coordinates are FK5 J2000.0', STATUS)
+      ELSE IF (OUT_COORDS .EQ. 'GA') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :     '^PKG: output coordinates are galactic', STATUS)
+         HOURS = .FALSE.
+      ELSE IF (OUT_COORDS .EQ. 'RD') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: output coordinates are apparent RA,Dec '//
+     :        '(no date as yet)', STATUS)
+      ELSE IF (OUT_COORDS .EQ. 'NA') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: output coordinates are nasmyth', STATUS)
+         HOURS = .FALSE.
+      ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: output coordinates are Az/El offsets', STATUS)
+         HOURS = .FALSE.
+      ELSE IF (OUT_COORDS .EQ. 'PL') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: output coordinates are offsets from moving centre', 
+     :        STATUS)
+         HOURS = .FALSE.
+      ELSE
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: invalid output '//
+     :        'coordinate system', STATUS)
+         END IF
+      END IF
 
 *     Read in the input data
 *     We will do automatic quality masking 
       QMF = .TRUE.
-      N_FILE = 1    ! Tell the system this is the first file
-
-      OUT_COORDS = 'RJ'  ! Output coordinates of map
+      
+*     Set the file counter to 1 since we are not trying to convert
+*     all input files to a standard MJD. We are trying to convert
+*     each frame to the supplied RA/Dec grid
+      N_FILE = 1
 
 *     Specify the required number of beams
 *     This will be adjusted by the SURF_READ_REBIN_NDF subroutine
@@ -277,118 +349,132 @@
 *     Get the required number of beams
       CALL PAR_GET0I('NBEAMS', N_BEAM, STATUS)
 
-*      N_BEAM = 3
+*     Loop over all members of the group
+
+      DO GRP = 1, NMEMBERS
+
+         IF (STATUS .NE. SAI__OK) GO TO 10
+
+*     Read in the next member
+         CALL GRP_GET(IGRP, GRP, 1, INSTRING, STATUS)
+
+*     Parse the filename string - GRP must be configured not to use {}
+         CALL SCULIB_SPLIT_FILE_SPEC(INSTRING, SCUBA__MAX_SECT, FNAME, 
+     :        NSPEC, DATA_SPEC, USE_SECTION, STATUS)
+
+         CALL MSG_SETC('FILE', FNAME)
+         CALL MSG_OUTIF(MSG__NORM, ' ','Processing file ^FILE',
+     :        STATUS)
+
+*     Open the input file
+         CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS) 
 
 *     We want the LST array
-      USELST = .TRUE.
+         USELST = .TRUE.
 
 *     Calculate the beam positions and read in the data.
 
-      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
-     :     NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-     :     N_BOL, N_POS, N_INTS, N_MEAS, N_BEAM,
-     :     IN_UT1, IN_UT1, IN_RA_CEN, 
-     :     IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, SUB_INSTRUMENT, 
-     :     OBJECT, UTDATE, UTSTART, 
-     :     BOL_ADC, BOL_CHAN, BOL_RA_PTR,
-     :     BOL_RA_END, BOL_DEC_PTR,
-     :     BOL_DEC_END, DATA_PTR, 
-     :     DATA_END, VARIANCE_PTR,
-     :     VARIANCE_END, QMF, QUALITY_PTR,
-     :     QUALITY_END, QBITS, USELST, LST_PTR,
-     :     ANG_INT, ANG_MEAS, INT_LIST, MEAS_LIST, BOLWT, STATUS)
+         CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
+     :        NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
+     :        N_BOL, N_POS, N_INTS, N_MEAS, N_BEAM,
+     :        IN_UT1, IN_UT1, IN_RA_CEN, 
+     :        IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, SUB_INSTRUMENT, 
+     :        OBJECT, UTDATE, UTSTART, 
+     :        BOL_ADC, BOL_CHAN, BOL_RA_PTR,
+     :        BOL_RA_END, BOL_DEC_PTR,
+     :        BOL_DEC_END, DATA_PTR, 
+     :        DATA_END, VARIANCE_PTR,
+     :        VARIANCE_END, QMF, QUALITY_PTR,
+     :        QUALITY_END, QBITS, USELST, LST_PTR,
+     :        ANG_INT, ANG_MEAS, INT_LIST, MEAS_LIST, BOLWT, STATUS)
 
 *     Number of points per beam
-      N_PTS = N_POS * N_BOL
+         N_PTS = N_POS * N_BOL
 
-*     JSR would rather have offsets from a map centre than apparent RA/Decs
-*     so we now have to calculate the offsets before storing the positions.
-*     Use the actual map centre for this since John will take care of any
-*     differences when coadding files.
-*     Weights will be dealt with in DBMEM
+
+*     Cancel the SHIFT parameter if this is not the first time around
+         IF (GRP .GT. 1) CALL PAR_CANCL('SHIFT', STATUS)
 
 *     Get the tangent plane shifts (in an array)
-      SHIFT(1) = 0.0
-      SHIFT(2) = 0.0
+         SHIFT(1) = 0.0
+         SHIFT(2) = 0.0
 
-      CALL PAR_DEF1R('SHIFT', 2, SHIFT, STATUS)
-      CALL PAR_GET1R('SHIFT', 2, SHIFT, ITEMP, STATUS)
+         CALL PAR_DEF1R('SHIFT', 2, SHIFT, STATUS)
+         CALL PAR_GET1R('SHIFT', 2, SHIFT, ITEMP, STATUS)
 
 *     Convert to radians
-      SHIFT(1) = SHIFT(1) / REAL(R2AS)
-      SHIFT(2) = SHIFT(2) / REAL(R2AS)
+         SHIFT(1) = SHIFT(1) / REAL(R2AS)
+         SHIFT(2) = SHIFT(2) / REAL(R2AS)
 
 *     The NA, AZ and PL frames already have offsets so we dont need
 *     to do anything with them
 
-      IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' 
-     :     .AND. OUT_COORDS.NE.'PL')) THEN
+         IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' 
+     :        .AND. OUT_COORDS.NE.'PL')) THEN
 
-*     The output centre is the same as the input centre
+*     Inform the 'RD' regridder the date of regrid
 
-         OUT_RA_CEN = IN_RA_CEN
-         OUT_DEC_CEN = IN_DEC_CEN
+            IF (OUT_COORDS .EQ. 'RD') THEN
+               CALL MSG_SETC ('UTDATE', UTDATE)
+               CALL MSG_SETC ('UTSTART', UTSTART)
+               CALL MSG_SETC('PKG', PACKAGE)
+               CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :              '^PKG: Using output coordinates of '//
+     :              'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
+            END IF
 
+*     Request the new apparent ra/dec centre
+            CALL SURF_REQUEST_OUTPUT_COORDS( TSKNAME, 'LONG', 'LAT',
+     :           OUT_COORDS, IN_RA_CEN, IN_DEC_CEN, IN_UT1, HOURS,
+     :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, OUT_LONG,
+     :           OUT_LAT, STATUS)
 
-*     convert the RA,Decs of the observed points to tangent plane offsets
-*     from the chosen output centre
-*     Can process all the beams in one go
+*     Convert everything to tangent plane offsets from the selected
+*     map centre
 
-         OUT_ROTATION = 0.0D0   ! Since we are using Apparent RA/Dec
-
-*  calculate the apparent RA,Dec of the selected output centre
-
-         CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
-     :        IN_UT1, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
- 
-         CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
-     :        0.0D0, 0.0D0, OUT_COORDS, 0.0, IN_UT1, 0.0D0, 0.0D0,
-     :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
-
-
-         CALL SCULIB_APPARENT_2_TP (N_PTS * N_BEAM, 
-     :        %val(BOL_RA_PTR), %val(BOL_DEC_PTR), 
-     :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
-     :        DBLE(SHIFT(1)), DBLE(SHIFT(2)), STATUS)
+            CALL SCULIB_APPARENT_2_TP (N_PTS * N_BEAM, 
+     :           %val(BOL_RA_PTR), %val(BOL_DEC_PTR), 
+     :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
+     :           DBLE(SHIFT(1)), DBLE(SHIFT(2)), STATUS)
             
-      ELSE
+         ELSE
 
 *     NA, AZ or PL
 
-         OUT_RA_CEN = 0.0
-         OUT_DEC_CEN = 0.0
+            OUT_RA_CEN = 0.0
+            OUT_DEC_CEN = 0.0
 
 *     Add on the tangent plane shift
 
-         IF (STATUS .EQ. SAI__OK) THEN
+            IF (STATUS .EQ. SAI__OK) THEN
 
-            CALL SCULIB_ADDCAD(N_PTS * N_BEAM,
-     :           %VAL(BOL_RA_PTR), DBLE(SHIFT(1)), 
-     :           %VAL(BOL_RA_PTR))
-            CALL SCULIB_ADDCAD(N_PTS * N_BEAM,
-     :           %VAL(BOL_DEC_PTR), DBLE(SHIFT(2)), 
-     :           %VAL(BOL_DEC_PTR))
+               CALL SCULIB_ADDCAD(N_PTS * N_BEAM,
+     :              %VAL(BOL_RA_PTR), DBLE(SHIFT(1)), 
+     :              %VAL(BOL_RA_PTR))
+               CALL SCULIB_ADDCAD(N_PTS * N_BEAM,
+     :              %VAL(BOL_DEC_PTR), DBLE(SHIFT(2)), 
+     :              %VAL(BOL_DEC_PTR))
             
-         END IF
+            END IF
 
-      END IF
+         END IF
 
 *     Convert everything to arcsec
 
-      IF (STATUS .EQ. SAI__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL SCULIB_MULCAD(N_PTS * N_BEAM,
-     :        %VAL(BOL_RA_PTR), R2AS,
-     :        %VAL(BOL_RA_PTR), STATUS)
-         CALL SCULIB_MULCAD(N_PTS * N_BEAM,
-     :        %VAL(BOL_DEC_PTR), R2AS,
-     :        %VAL(BOL_DEC_PTR), STATUS) 
+            CALL SCULIB_MULCAD(N_PTS * N_BEAM,
+     :           %VAL(BOL_RA_PTR), R2AS,
+     :           %VAL(BOL_RA_PTR), STATUS)
+            CALL SCULIB_MULCAD(N_PTS * N_BEAM,
+     :           %VAL(BOL_DEC_PTR), R2AS,
+     :           %VAL(BOL_DEC_PTR), STATUS) 
 
-      END IF
+         END IF
 
 *     Construct the output name
-      CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
-     :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
+         CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
+     :        SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
 
 *     Create the output file
 *     Would like to propogate the FITS header to the output 
@@ -401,107 +487,117 @@
 *     Get a section of the input file but make it the correct size
 *     for the output file (so that we do this instead of using NDF_SBND)
 
-      LBND(1) = 1
-      LBND(2) = 1
-      LBND(3) = 1
-      UBND(1) = N_BOL
-      UBND(2) = N_POS
-      UBND(3) = (2 * N_BEAM) + 1
+         LBND(1) = 1
+         LBND(2) = 1
+         LBND(3) = 1
+         UBND(1) = N_BOL
+         UBND(2) = N_POS
+         UBND(3) = (2 * N_BEAM) + 1
 
-      CALL NDF_SECT(IN_NDF, NDIM, LBND, UBND, SECNDF, STATUS)
+         CALL NDF_SECT(IN_NDF, NDIM, LBND, UBND, SECNDF, STATUS)
+
+*     Cancel the OUT parameter if this is not the first time around
+         IF (GRP .GT. 1) CALL PAR_CANCL('OUT', STATUS)
 
 *     Set the default output filename
-      CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
+         CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
 
 *     Propogate to the output NDF
-      CALL NDF_PROP (SECNDF, 'Units', 'OUT', OUTNDF, STATUS)
+         CALL NDF_PROP (SECNDF, 'Units', 'OUT', OUTNDF, STATUS)
 
 *     Close the input file
-      CALL NDF_ANNUL(SECNDF, STATUS)
-      CALL NDF_ANNUL(IN_NDF, STATUS)
+         CALL NDF_ANNUL(SECNDF, STATUS)
+         CALL NDF_ANNUL(IN_NDF, STATUS)
 
 *     Map the output array (DOUBLE for intial test)
-      CALL NDF_MAP(OUTNDF, 'DATA', '_REAL', 'WRITE/BAD',
-     :     OUT_DATA_PTR, ITEMP, STATUS)
+         CALL NDF_MAP(OUTNDF, 'DATA', '_REAL', 'WRITE/BAD',
+     :        OUT_DATA_PTR, ITEMP, STATUS)
 
 *     Now copy some data in.
 *     First the actual data values
 
-      CALL VEC_RTOR(.FALSE., N_PTS, %VAL(DATA_PTR),
-     :     %VAL(OUT_DATA_PTR), IERR, NERR, STATUS)
+         CALL VEC_RTOR(.FALSE., N_PTS, %VAL(DATA_PTR),
+     :        %VAL(OUT_DATA_PTR), IERR, NERR, STATUS)
 
 
 *     Go through a beam at a time
 
-      DO I = 1, N_BEAM
+         DO I = 1, N_BEAM
 
 *     Now the X positions
-         CALL VEC_DTOR(.FALSE., N_PTS, 
-     :        %VAL(BOL_RA_PTR + VAL__NBD * N_PTS * (I - 1)),
-     :        %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I - 1) * N_PTS ),
-     :        IERR, NERR, STATUS)
+            CALL VEC_DTOR(.FALSE., N_PTS, 
+     :           %VAL(BOL_RA_PTR + VAL__NBD * N_PTS * (I - 1)),
+     :           %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I - 1) * N_PTS ),
+     :           IERR, NERR, STATUS)
 
 *     Now Y
-         CALL VEC_DTOR(.FALSE., N_PTS, 
-     :        %VAL(BOL_DEC_PTR + VAL__NBD * N_PTS * (I - 1)),
-     :        %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I) * N_PTS ),
-     :        IERR, NERR, STATUS)
+            CALL VEC_DTOR(.FALSE., N_PTS, 
+     :           %VAL(BOL_DEC_PTR + VAL__NBD * N_PTS * (I - 1)),
+     :           %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I) * N_PTS ),
+     :           IERR, NERR, STATUS)
 
-      END DO
+         END DO
 
 *     Set up the axes
 *     Axis 1: Bolometer number
 *     Axis 2: LST
 *     Axis 3: Beam
       
-      CALL NDF_ACRE(OUTNDF, STATUS)
+         CALL NDF_ACRE(OUTNDF, STATUS)
 
 *     Deal with BOLOMETER axis
  
-      CALL NDF_ASTYP('_INTEGER', OUTNDF, 'CENTRE', 1, STATUS)
+         CALL NDF_ASTYP('_INTEGER', OUTNDF, 'CENTRE', 1, STATUS)
 
-      CALL NDF_AMAP(OUTNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
-     :     OUT_A_PTR, ITEMP, STATUS)
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_NFILLI (N_BOL, %val(OUT_A_PTR))
-      END IF
-      CALL NDF_ACPUT ('Bolometer', OUTNDF, 'LABEL', 1, STATUS)
-      CALL NDF_AUNMP (OUTNDF, 'CENTRE', 1, STATUS)
+         CALL NDF_AMAP(OUTNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
+     :        OUT_A_PTR, ITEMP, STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SCULIB_NFILLI (N_BOL, %val(OUT_A_PTR))
+         END IF
+         CALL NDF_ACPUT ('Bolometer', OUTNDF, 'LABEL', 1, STATUS)
+         CALL NDF_AUNMP (OUTNDF, 'CENTRE', 1, STATUS)
 
 *     Deal with LST axis
 
-      CALL NDF_ASTYP('_DOUBLE', OUTNDF, 'CENTRE', 2, STATUS)
+         CALL NDF_ASTYP('_DOUBLE', OUTNDF, 'CENTRE', 2, STATUS)
 
-      CALL NDF_AMAP(OUTNDF, 'CENTRE', 2, '_DOUBLE', 'WRITE',
-     :     OUT_A_PTR, ITEMP, STATUS)
+         CALL NDF_AMAP(OUTNDF, 'CENTRE', 2, '_DOUBLE', 'WRITE',
+     :        OUT_A_PTR, ITEMP, STATUS)
 
-      CALL VEC_DTOD(.FALSE., N_POS, 
-     :     %VAL(LST_PTR(1)), %VAL(OUT_A_PTR),
-     :     IERR, NERR, STATUS)
+         CALL VEC_DTOD(.FALSE., N_POS, 
+     :        %VAL(LST_PTR(1)), %VAL(OUT_A_PTR),
+     :        IERR, NERR, STATUS)
 
-      CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
+         CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
 
-      CALL NDF_ACPUT('LST', OUTNDF, 'LABEL', 2, STATUS)
-      CALL NDF_ACPUT('radians', OUTNDF, 'UNITS', 2, STATUS)
-
-
+         CALL NDF_ACPUT('LST', OUTNDF, 'LABEL', 2, STATUS)
+         CALL NDF_ACPUT('radians', OUTNDF, 'UNITS', 2, STATUS)
 
 *     Unmap the data and close down
-      CALL SCULIB_FREE ('IN_DATA', DATA_PTR,
-     :     DATA_END, STATUS)
-      CALL SCULIB_FREE ('IN_VARIANCE', VARIANCE_PTR,
-     :     VARIANCE_END, STATUS)
-      CALL SCULIB_FREE ('BOL_RA', BOL_RA_PTR,
-     :     BOL_RA_END, STATUS)
-      CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR,
-     :     BOL_DEC_END, STATUS)
+         CALL SCULIB_FREE ('IN_DATA', DATA_PTR,
+     :        DATA_END, STATUS)
+         CALL SCULIB_FREE ('IN_VARIANCE', VARIANCE_PTR,
+     :        VARIANCE_END, STATUS)
+         CALL SCULIB_FREE ('BOL_RA', BOL_RA_PTR,
+     :        BOL_RA_END, STATUS)
+         CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR,
+     :        BOL_DEC_END, STATUS)
 
-      CALL SCULIB_FREE('LST', LST_PTR(1), LST_PTR(2), STATUS)
+         CALL SCULIB_FREE('LST', LST_PTR(1), LST_PTR(2), STATUS)
 
 *     Close the output file
-      CALL NDF_ANNUL(OUTNDF, STATUS)
+         CALL NDF_ANNUL(OUTNDF, STATUS)
 
+*     End the loop over groups
+      END DO
+
+*     Panic exit from loop
+ 10   CONTINUE
+
+*     Close the GRoup
+      CALL GRP_DELET(IGRP, STATUS)
+
+*     Shut down NDF
       CALL NDF_END(STATUS)
-
 
       END
