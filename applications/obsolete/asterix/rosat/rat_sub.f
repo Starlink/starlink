@@ -643,7 +643,9 @@
 *    Bugs :
 *    Authors :
 *     Jeremy Ashley (LTVAD::JKA)
+*     Richard Beard (Birmingham, RB)
 *    History :
+*     9 Apr 1997: Table 102 -> 100 and shuffle others (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -768,9 +770,9 @@
       DATA VALUES(97) /'US :PSPC:EVRATE :A1_AL    ia1_evr' /
       DATA VALUES(98) /'RDF:PSPC:EVRATE :A1_AL    a1_al' /
       DATA VALUES(99) /'   :PSPC:EVRATE :A1_AL    ee_a1ll' /
-      DATA VALUES(102)/'RDF:HRI :EVRATE :PS_VALID secondary' /
-      DATA VALUES(100)/'   :HRI :EVRATE :PS_VALID ps_valid' /
-      DATA VALUES(101)/'   :    :       :TIME     time' /
+      DATA VALUES(100)/'RDF:HRI :EVRATE :PS_VALID secondary' /
+      DATA VALUES(101)/'   :HRI :EVRATE :PS_VALID ps_valid' /
+      DATA VALUES(102)/'   :    :       :TIME     time' /
       DATA VALUES(103)/'   :    :       :TIME     time' /
 *-
 *
