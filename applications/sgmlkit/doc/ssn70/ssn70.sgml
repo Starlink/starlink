@@ -21,10 +21,8 @@
 	system "../../dsssl/sl/lib/sllib.dsl" subdoc>
   <!entity dsssl.common
 	system "../../dsssl/sl/common/slcommon.dsl" subdoc>
-  <!entity dsssl.html.params
-	system "../../dsssl/sl/html/slparams.dsl" subdoc>
-  <!entity dsssl.latex.params
-	system "../../dsssl/sl/latex/slparams.dsl" subdoc>
+  <!entity dsssl.params
+	system "../../dsssl/sl/common/slparams.sgml" subdoc>
   <!entity release.notes 
 	system "../../ReleaseNotes">
   <!entity release.notes-0.2
@@ -652,7 +650,7 @@ readability, can get you into terrible messes, and is part of the
 `parser hell' which XML was designed to avoid.  I mention it purely
 for completeness.</note>
 
-<p><update versionid="post-0.2" author="ng">Added note to the effect that
+<p><update versionid="post-0.2">Added note to the effect that
 attribute names can be minimised when the value is from a set</update>
 In certain cases, attributes may have only one of a limited set of
 values.  In this case, specifying one of these values is enough to
@@ -672,7 +670,7 @@ a little more in the programcode DTD (see <ref id=doccode>).
 
 <subsect id=markup.ms export>Marked sections
 
-<update versionid="post-0.2" author="ng">Section added, with text
+<update versionid="post-0.2">Section added, with text
 relocated from appendix. 
 
 <p>A feature you will occasionally use in documents is the `marked
@@ -862,12 +860,14 @@ document by including as much element and attribute detail as you can.
 <ref id=str.backmatter>
 <entry>
 <ref id='el.sun.backmatter' text='backmatter'>,
-<ref id='el.sun.bibliography' text='bibliography'>,
 <ref id='el.sun.citation' text='citation'>,
 <ref id='el.sun.index' text='index'>,
+<ref id='el.sun.note' text='note'>
+<!--
+<ref id='el.sun.bibliography' text='bibliography'>,
 <ref id='el.sun.indexcontents' text='indexcontents'>,
-<ref id='el.sun.note' text='note'>,
 <ref id='el.sun.notecontents' text='notecontents'>
+-->
 
 <row>
 <entry>
@@ -1043,14 +1043,16 @@ id=str.code> available?
 
 <p>These defaults are generally appropriate for the type of document.
 If you need to change them for a particular document, however, you
-can.  The only case where you might plausibly need to change the
-default is in in the case of the routine-list feature, and you do this by
+can.  The only case where you are likely to need to change the
+default is in in the case of the routine-list feature, if you wish to
+add it to a document type which does not have it by default, and you do this by
 invoking the SSN DTD (for example) as follows
 <verbatim><![cdata[
 <!doctype ssn PUBLIC "-//Starlink//DTD Starlink SSN//EN" [
   <!entity % Feature.Routinelist 'include'>
 ]>
 ]]></verbatim>
+Note that the entity names are case-sensitive.
 
 <p>The top-level element in the document contains two elements, <ref
 id=el.sun.docinfo text='docinfo'> and <ref id=el.sun.docbody
@@ -1117,24 +1119,29 @@ see <ref id=str.structure>).  See also <ref id=str.xrefs> for more
 detail on cross-referencing.
 
 <subsect id=str.backmatter export>Backmatter -- notes and bibliography
+<update versionid="post-0.2">
+Removed mention of the deleted backmatter content elements</update>
 
 <p>The
 <ref id='el.sun.backmatter' text='backmatter'> element
+<!--
 includes the
 <ref id='el.sun.bibliography' text='bibliography'>,
 <ref id='el.sun.indexcontents' text='indexcontents'> and
 <ref id='el.sun.notecontents' text='notecontents'>
 elements, stocked by
+-->
+is stocked by the 
 <ref id='el.sun.citation' text='citation'>,
 <ref id='el.sun.index' text='index'> and
 <ref id='el.sun.note' text='note'>
-respectively.
+elements.
 
 <p>Within your document you may refer to books and articles using the
-citation element, and these are collected together by the (empty)
-bibliography element.  The DTD is quite generic, but in this
-application, the bibliography is implemented as a Bib&tex database, so
-that the bibliography element's `bib' attribute names a Bib&tex
+citation element, and these are collected together in the backmatter
+element.  The DTD is quite generic, but in this application, the
+bibliography is implemented as a Bib&tex database, so that the
+backmatter element's `bibliography' attribute names a Bib&tex
 <code>.bib</code> file (without the <code/.bib/ extension), and the
 citation element's content is a Bib&tex entry key.  If you use the
 template Makefile (see <ref id=proc.makefile>), the name of the
@@ -1143,12 +1150,11 @@ have Bib&tex;'s <code/BIB_INPUTS/ environment variable suitably
 defined.  There is no way (at present) to specify the bibliography
 formatting style -- the system uses a customised bibliography style
 which, incidentally, supports a URL field in bibliography entries.
-See the Bib&tex documentation
-in, for example, <citation/lamport/ for further details.
+See the Bib&tex documentation in, for example, <citation/lamport/ for
+further details.
 
-<p>You can include notes in your document with the note element, and
-if you do that, you should include the notecontents element at the end
-of your document.  At present, the notes are presented as footnotes in
+<p>You can include notes in your document with the note element.
+At present, the notes are presented as footnotes in
 the paper version of your document and collected together as endnotes
 in the online version.
 
@@ -1238,15 +1244,15 @@ using the <code/versionid/ attribute.
 ...
 <history>
 <version author=ng date='02-MAR-1999' number=0>Initial version
-<distribution author=ng date='03-MAR-1999' string='comments1'>Released
+<distribution author=ng date='03-MAR-1999' string='comm-0.1'>Released
   to programmers for comment.
-<change author=ng date='04-MAR-1999' versionid=alt99>Various tidyings
+<change author=ng date='04-MAR-1999' versionid=post-0.1>Various tidyings
 <version author=mb date='05-MAR-1999' number=1>First public release
 ...
-<p><update author=ng versionid=alt99>Corrected typos and reexpressed
+<p><update versionid=post-0.1>Corrected typos and reexpressed
 argument</update>In this section....
 ]]></verbatim>
-Presumably, the `comments1' release of the document elicited some
+Presumably, the `comm-0.1' release of the document elicited some
 comments, and the resulting changes have been logged by the change
 element immediately following it.  Any (optional) update elements
 scattered throughout the document (they can be children of the list
@@ -1358,8 +1364,9 @@ to use.  See <ref id=el.sun.figure> for more details.
 <ref id='el.sun.tgroup' text='tgroup'>,
 <ref id='el.sun.thead' text='thead'>.
 
-<p>The Starlink DTDs use the <webref
-url='http://www.oasis-open.org/html/techpubs.htm/a503.htm' >Oasis
+<p><update versionid="post-0.2">Corrected Oasis URL</update>
+The Starlink DTDs use the <webref
+url='http://www.oasis-open.org/html/a503.htm' >Oasis
 Exchange Table Model</webref> as the basis for their tables.  Even
 though it is only a portable subset of a more elaborate standard (the
 industry-standard CALS table model), there is more in the table model
@@ -1603,7 +1610,7 @@ element could be represented as:
       (function source code goes here)
 ]]></verbatim>
 
-<p><update versionid="post-0.2" author=ng>Added a note pointing out
+<p><update versionid="post-0.2">Added a note pointing out
 that returnvalue and argumentlist have optional `none'
 attributes.</update>
 Note that the <ref id=el.programcode.returnvalue
@@ -1727,7 +1734,7 @@ A <code/func/ element documents a function, with arguments, a return
 value, and the like, whereas the <code/misccode/ element documents
 `other' code (again, deliberately vague).
 
-<p><update versionid="post-0.2" author="ng">
+<p><update versionid="post-0.2">
 Paragraph rewritten to suggest using a CDATA marked section, instead
 of code edits.</update>
 The <code/codebody/ element is ignored by the processing system,
@@ -2005,6 +2012,84 @@ and a separate file, <code/ptest.for/, containing just the source code:
 only through the authorref element, pointing to the author
 element and its associated author metadata in the main file.
 
+<subsect id=doccode.devel export>Development of the programcode DTD
+
+<p>As you can see from the programcode structure in <ref
+id=figure.programcode>, the DTD recognised only two structures,
+<code/func/ (which includes subroutines since the returnvalue element
+can be given the `none' attribute) and miscellaneous-code.  Also, the
+structure of the code prologue is quite strict, with routinename,
+description, returnvalue and argument list all required, and these and
+their optional companions having a fixed order.  It's not clear that
+this element structure is ideal, and I would like to solicit feedback
+on this at this stage of the project.
+
+<p>On the one
+hand, it seemed important to make as much as possible required here,
+to encourage folk to include all the important bits of documentation.
+On the other hand, I didn't want to fall into the trap of `all the
+world is Fortran'.  On the third hand, quite a lot of the world <em/is/
+Fortran (or C or IDL or something pretty like them in terms of code
+structures), so that's obviously a class of documentable objects I
+should map quite faithfully into documentation support.
+
+<p>When I support C++, I'll have to add support in programcode for the
+notion of a class which contains methods.  Probably this'll be
+something at the same level as `codegroup' (perhaps it should simply
+<em/be/ `codegroup', with the `func' element documenting individual methods).
+I think that'll be just about all the major code structures --
+anything else can be bundled in the guards van under `misccode'
+without much loss.
+
+<p>When I discussed that with Mark Taylor, however, he suggested a
+much more flexible structure:
+<verbatim><![cdata[
+I think that imposing a rigid structure could be counterproductive.
+My feeling is that if people's (source) code fails to parse it's going 
+to be an incentive to leave it unSGMLized or just bung everything in some
+In any case there are a lot of differently prologuized
+routines out there so imposing a rigid structure on it is going to
+be an uphill job.  My inclination would be to have a single element
+for putting code into (in which case ROUTINE might be a better GI
+than FUNC) with many optional children and no compulsory ones except
+perhaps NAME.  I also think that we need a generic element in the
+content model.
+
+  <!element routine      o o   ( codeprologue, codebody )>
+  <!element codebody     o o   ( #pcdata )>
+  <!element codeprologue o o   ( routinename & purpose? & description? &
+                                 returnvalue? & argumentlist? & 
+                                 algorithm? & pitfalls? & bugs? &
+                                 examples? & usage? & notes? & other* &
+                                 authorlist? & history? )>
+
+  <!element (description | returnvalue | algorithm |
+             pitfalls | bugs | examples | usage | notes | 
+             other)      - o   ( p* )>
+
+  <!element other        - o   ( othersect* )>
+  <!element othersect    o o   ( otherhead, p* )>
+  <!element otherhead    - o   ( #pcdata )>
+]]></verbatim>
+I agree that my original may be more
+strict than is comfortable to use, but Mark's might be too far
+the other way.
+
+<p>My picture of how the programcode DTD would be used was that people
+probably wouldn't document so elaborately every routine they wrote,
+but only those they intended to incorporate into user or maintainer
+documentation; if this constituted a minority of routines, it wasn't
+necessarily inappropriate to make the structuring quite strict.  If,
+on the other hand, we envisage the majority of routines being marked
+up like so, then it would be appropriate to cut folk a little more
+slack.  The question then is, how much slack can you afford before the
+result looks shapeless?  The structure we give up here, in the
+interests of flexibility and authoring ease, is the structure that
+makes it easy to write powerful downstream tools in the future.
+
+<p>It is clear that a balance has to be struck here, and that my own
+taste would not be universal.  I'm open to suggestion.
+
 <sect id=processing export>Processing your document
 
 <p>SGML documents are processed using a suite of free tools produced
@@ -2098,12 +2183,23 @@ generate an HTML version of the document's backmatter (bibliography
 and notes), generate the HTML version of the document, then create the
 stamp file <code/ssn70.html.stamp/.
 
-<p>The name of the generated files is itself generated based on data
-within the file, and is not configurable.  Do not change it yourself,
+<p>The root of the generated files is itself generated based on data
+within the file, and is not configurable.  Do not change filenames yourself,
 since HTML cross-references are constructed using the assumption that
-no-one has been monkeying with filenames.  The root of the generated
-filenames is stored within the stamp file, followed by a colon, and so
-may be extracted with a command like:
+no-one has been monkeying with filenames.  
+
+<p>The HTML `front page' includes links to printable versions of the
+file.  The files which are linked to are controlled by the
+parameterisation variable <code/%link-extension-list%/ (see <ref
+id=appx.system.paramdsssl>).
+The stylesheet and makefile neither generate these files nor check
+that they are there -- that is left to you.  
+
+<p>You can find out the root filename and the list of linked-to files
+by examining the stamp file (which is written from the standard output
+of the stylesheet).  This file contains the filename root, a colon,
+the list of file extensions it has included links to, and another colon.
+The root may therefore be extracted with a command like:
 <verbatim>
 awk -F: '{print $1}' ssn70.html.stamp
 </verbatim>
@@ -2166,25 +2262,71 @@ convenience.
 
 </dl>
 
+<p>To help you when packaging up your document, the stylesheets write
+a manifest of the files which make a complete set.  The names of the
+manifest files can be configured as parameters (see <ref
+id=appx.system.paramdsssl>).
+
 <sect id=further export>Further information
 
 <subsect id=further.development export>Further developments
 
-<p>What's next?
-<ul>
-<li>I'd like to support XML (see <ref id=further.xml>).  This requires
+<p>What's next?  This section contains rather miscellaneous ideas for
+further work.  They're ordered from most to least work, but on the
+basis of about two seconds' reflection, so nothing should be pinned on
+this.  The work involved seems to correspond rather neatly with their
+expected utility.
+
+<dl>
+<dt>XML
+<dd>I'd like to support XML (see <ref id=further.xml>).  This requires
 a little development of the DTD but, more substantially, also requires
 investigating what level of support we can reasonably expect from
 users' browsers.  There is a great deal of work being done on XML at
 present (mid-1999) -- when the developments settle down we can start
-to exploit them.
+to exploit them.  There's a big range of possibilities here, so this
+could be a smallish task or a huge one, depending on what we wanted to do.
 
-<li>I'd like to support sophisticated searching.  The Starlink HTX
+<dt>Searching
+<dd>I'd like to support sophisticated searching.  The Starlink HTX
 system allows some context-based searching (see <docxref
 doc="sun188" loc='searching_for_information'>), and it should be easy
-to support this and more in the SGML system.
+to support this and more in the SGML system.  This would involve
+finding a suitable SGML-aware search engine.  The <webref
+url="http://info.ox.ac.uk/bnc/sara/" >BNC's SARA server</webref> might
+be a possibility: I think it's free, but I haven't yet investigated
+the extent to which it's specific to the BNC, or to its windows client.
 
-</ul>
+<dt>CSS stylesheets
+<dd>At present, the formatting is controlled by the parameters file.
+I could remove this and instead distribute a CSS stylesheet, which
+would also allow individual users to selectively override things they
+didn't like.
+
+<dt>Include elements for Examples, Notes, Warnings?
+<dd>How important is this?  It might be nice to have explicit support
+for these, but I don't want to bloat the DTD with too many features,
+so it's a question of balance.  I'd thought of something like:
+<code>&lt;callout type=warning>Switch the computer on before
+attempting to read your mail&lt;/callout></code>.  Having `type' be
+`example', `note' or `warning' gives the thing attractive symmetry,
+but would this improperly bundle different things together.
+<!--
+I think that examples should go within %body.content, and
+contain paragraphs.  Notes and warnings should be in p.content?  I'm
+not sure how necessary it is to support these so explicitly.
+-->
+
+<dt>Link colouring
+<dd>Output, for example, a little coloured dot (4x2 pixels) before all or some
+links, indicating what type of link this is.  For example, unadorned
+links are to other parts of the same document (ie, <code/&lt;ref>/), a
+red dot indicates a reference to another Starlink document (ie,
+<code/&lt;docxref>/), a blue one to a miscellaneous URL.  I've
+implemented a similar thing on another system, and it's both
+unobtrusive and rather helpful.
+
+</dl>
 
 <subsect id=further.xml export>XML
 
@@ -2601,7 +2743,7 @@ make your document unreadable and, a much more heinous crime, invalid.
 
 <subsect id=sgml.ms export>Marked sections
 
-<update versionid="post-0.2" author="ng">This section trimmed, and the
+<update versionid="post-0.2">This section trimmed, and the
 discussion of the `author-visible' uses of MSs moved to the `Marking
 up...' section.
 
@@ -2699,7 +2841,8 @@ See <ref id=doccode.languages> for details.
 &programcodedtddoc;
 
 <sect id=appx.system export>The Starlink SGML system for maintainers
-<update versionid="post-0.2">Added the HTX section</update>
+<update versionid="post-0.2">Very substantial additions -- this
+section was barely present before.</update>
 
 <p>This section is a reference for maintainers of the Starlink SGML
 system
@@ -2838,6 +2981,141 @@ that the HyTime declarations here are in fact correct.
 
 <p>See <ref id=appx.system.online> for online resources.
 
+<subsubsect id=appx.system.dsssl export>DSSSL
+
+<p>The SGML processing part of this package is implemented in DSSSL,
+which is a standard <citation/iso10179/ for device independent
+formatting of SGML documents.  DSSSL includes both a style language
+and a (DTD to DTD) transformation language.  
+
+<p>I have used James Clark's <webref
+url="http://www.jclark.com/jade/" >Jade</webref>
+implementation of DSSSL.  This implements the style language, but not
+the transformation language.<note>Although I believe Clark was involved with
+the specification of the DSSSL standard, he has said (on the <webref
+url="http://www.mulberrytech.com/dsssl/dssslist/" >DSSSList
+discussion list</webref>, May 1999) that the transformation
+language has significant weaknesses.</note>  Jade has back-ends which
+generate RTF, MIF and rather odd &tex; requiring a specialised
+&tex; format.  Clark added an SGML-transformation back-end, as a Jade
+extension of the standard, which uses non-standard flow-object
+constructors to specify SGML elements, entities and the like.  In
+addition, I added a back-end which generates &latex;.
+
+<p>It follows that the stylesheets which implement this Starlink
+package are not standards-conforming, and are specific to Jade.  This
+needs a little justification.
+
+<ul>
+<li>There are not too many alternative ways of producing HTML.  Perl
+is a contender, since the <code/SGMLSpm/ package (see <webref
+url='http://www.cpan.org' >CPAN</webref>) can parse the output of
+<code/nsgmls/.  This is perfectly legitimate, but I know from
+experience that it can become rather messy.<note>It's a matter of
+taste whether you prefer Perl or DSSSL.  DSSSL, based on Scheme Lisp,
+is undeniably odd, but I've grown to rather like it.  A language with
+no assignments, no loops, no real sequences of actions, and where
+absolutely everything is a function, has a certain rather twisted
+glamour to it, like a nature programme about fish-life four miles down
+the Marianas Trench.</note>
+
+<li>DSSSL has very good access to the SGML grove, and processes the
+document in a generally `SGML-ish' way.  This feels like keeping
+things in the family, as it were, even if the non-standard back-ends
+have something of the wicked stepmother about them.
+
+<li>One alternative is through XML and XSLT, but this would require
+doing the work to transform the document from SGML to XML (which would
+lose the subdocument processing features), and using XSLT which, from
+what I've seen of it, looks like hell on earth.
+
+</ul>
+
+<p>This does not in any way affect the standards conformance of the
+rest of the SGML system -- the various DTDs and the HyTime support --
+since the processing of documents is by design completely independent
+of the standards which define their markup.
+
+<p>See <ref id=appx.system.online> for online resources.
+
+<p><ref id=appx.system.dssslcode> includes documentation for some of
+the important DSSSL stylesheets.
+
+<p>Notes on the code:
+<ul>
+<li>In almost all cases, the code for the HTML stylesheet was
+developed first, then adapted for the &latex stylesheet.  This makes
+sense in general, as the HTML stylesheet has to do much more elaborate
+formatting and rearrangement, whereas &latex can do much of the
+simple information-shuffling itself.  It does, however, mean
+that some fragments of code are duplicated in the two stylesheets,
+even although the <code/slcommon.dsl/ stylesheet is supposed to cover
+all of that -- when it happens, this is typically an error, rather
+than some great subtlety.
+
+<li>The code started off as adaptations to Norman Walsh's DocBook stylesheets.
+In some modules -- primarily the <code/slnavig.dsl/ code which was the
+section I began development with -- there are still relics of this
+here and there.  There isn't a lint for Jade, so it's not trivial to
+find and remove these.
+
+<li>It's unattractive that the print-based stylesheet is so specific
+to &latex;, and goes against the format-independent goals of DSSSL.
+If it becomes necessary to produce another output format at the same
+level of abstraction as &latex; -- 'roff would be an example, though
+that seems unlikely -- the way to proceed would be to adapt the
+&latex; stylesheet to produce output marked in some DTD which matches
+the abstraction level of &latex; -- that is, describing sections and
+paragraphs and so on, rather than the placement on the page which is
+characteristic of the standard DSSSL FOs -- and then translate that to
+&latex; and whatever.  The latter translation would be easy, since
+there would likely be no information shuffling at all, but a
+translation task little more demanding than search and replace.
+
+</ul>
+
+<subsubsubsect id=appx.system.paramdsssl>Customising the DSSSL source
+code.
+
+<p>The DSSSL source code which produces the HTML and &latex; output
+has been parameterised to a limited extent.  As described in <ref
+id=appx.system.dssslcode>, it can therefore be customised either on the
+Jade command line, or by providing Jade with an alternative DSSSL
+parameters file.
+
+<p>Jade has a <code/-V/ option which takes a DSSSL variable name as
+argument; this variable is then given the value <code/#t/ (true),
+overriding any other definition in a stylesheet.  Several of the
+stylesheets' parameters are designed to be settable this way.  You can
+either give this option explicitly on a Jade command line, or set the
+variable <code/JADEFLAGS/ in a Makefile:
+<verbatim>
+JADEFLAGS=-V show-element-ids
+</verbatim>
+
+<p>If this type of customising is insufficient, then you may take a
+copy of the appropriate parameters file in <code
+fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slparams.dsl</code> (or the
+corresponding <code>.../latex</code> file), call it, say
+<code/my-params.dsl/, and change what parameters 
+you like.  The stylesheets refer to the parameters files by the system
+identifiers <code/sl-html-parameters/ and <code/sl-latex-parameters/,
+and these are mapped to the real files by the catalogue file in <code
+fspath>$STARLINK_SGML_DIR/dtd/CATALOG</code>.  To direct the system to
+your own parameter file instead, create a catalogue file of your own
+(conventionally given the name <code/CATALOG/), and include the line
+<verbatim>
+SYSTEM "sl-html-parameters" "my-params.dsl"
+</verbatim>
+(you can give a path relative to the location of the catalogue, and
+it's best if you quote the entry just as here).  To direct the SGML
+system to this catalogue, you must include the file at the beginning
+of the <code/SGML_CATALOG_FILES/ environment variable:
+<verbatim>
+SGML_CATALOG_FILES=./CATALOG:$SGML_CATALOG_FILES
+</verbatim>
+(or use the corresponding <code/setenv/ command).
+
 <subsect id=appx.system.software export>Supporting software
 
 <p>As well as the specifically SGML materials in this distribution --
@@ -2884,7 +3162,9 @@ version was modified by me to include an extra resolution option.
 
 </dl>
 
-<p><ref id=appx.system.dssslcode> include a selection of the more important
+<!-- FIXME Include information about dvi2bitmap -->
+
+<p><ref id=appx.system.dssslcode> includes a selection of the more important
 DSSSL code modules.
 
 <subsect id=appx.system.summaries export>Document summaries
@@ -3013,73 +3293,14 @@ generate them as the interface.
 
 </ul>
 
-<subsect id=appx.system.dsssl export>DSSSL
-
-<p>The SGML processing part of this package is implemented in DSSSL,
-which is a standard <citation/iso10179/ for device independent
-formatting of SGML documents.  DSSSL includes both a style language
-and a (DTD to DTD) transformation language.  
-
-<p>I have used James Clark's <webref
-url="http://www.jclark.com/jade/" >Jade</webref>
-implementation of DSSSL.  This implements the style language, but not
-the transformation language.<note>Although I believe Clark was involved with
-the specification of the DSSSL standard, he has said (on the <webref
-url="http://www.mulberrytech.com/dsssl/dssslist/" >DSSSList
-discussion list</webref>, May 1999) that the transformation
-language has significant weaknesses.</note>  Jade has back-ends which
-generate RTF, MIF and rather odd &tex; requiring a specialised
-&tex; format.  Clark added an SGML-transformation back-end, as a Jade
-extension of the standard, which uses non-standard flow-object
-constructors to specify SGML elements, entities and the like.  In
-addition, I added a back-end which generates &latex;.
-
-<p>It follows that the stylesheets which implement this Starlink
-package are not standards-conforming, and are specific to Jade.  This
-needs a little justification.
-
-<ul>
-<li>There are not too many alternative ways of producing HTML.  Perl
-is a contender, since the <code/SGMLSpm/ package (see <webref
-url='http://www.cpan.org' >CPAN</webref>) can parse the output of
-<code/nsgmls/.  This is perfectly legitimate, but I know from
-experience that it can become rather messy.<note>It's a matter of
-taste whether you prefer Perl or DSSSL.  DSSSL, based on Scheme Lisp,
-is undeniably odd, but I've grown to rather like it.  A language with
-no assignments, no loops, no real sequences of actions, and where
-absolutely everything is a function, has a certain rather twisted
-glamour to it, like a nature programme about fish-life four miles down
-the Marianas Trench.</note>
-
-<li>DSSSL has very good access to the SGML grove, and processes the
-document in a generally `SGML-ish' way.  This feels like keeping
-things in the family, as it were, even if the non-standard back-ends
-have something of the wicked stepmother about them.
-
-<li>One alternative is through XML and XSLT, but this would require
-doing the work to transform the document from SGML to XML (which would
-lose the subdocument processing features), and using XSLT which, from
-what I've seen of it, looks like hell on earth.
-
-</ul>
-
-<p>This does not in any way affect the standards conformance of the
-rest of the SGML system -- the various DTDs and the HyTime support --
-since the processing of documents is by design completely independent
-of the standards which define their markup.
-
-<p>See <ref id=appx.system.online> for online resources.
-
-<p><ref id=appx.system.dssslcode> includes documentation for some of
-the important DSSSL stylesheets.
-
-<subsubsect id=appx.system.dssslcode>The DSSSL source code
+<subsect id=appx.system.dssslcode export>The DSSSL source code
 
 <routinelist>
+<p>The following sections document some of the more important DSSSL
+style sheets
+<codecollection doc="dsssl.params">
 <codecollection doc="dsssl.common">
-<codecollection doc="dsssl.html.params">
-<codecollection doc="dsssl.latex.params">
-<codecollection doc=dsssl.lib>
+<codecollection doc="dsssl.lib">
 
 <subsect id=appx.system.online export>Online resources
 
