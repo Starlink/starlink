@@ -22,8 +22,8 @@ AC_PROG_LN_S
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_DECLARE_DEPENDENCIES([build], [cnf ems sae])
-STAR_DECLARE_DEPENDENCIES([link],  [chr ems psx subpar])
+STAR_DECLARE_DEPENDENCIES([build], [cnf ems sae psx])
+STAR_DECLARE_DEPENDENCIES([link],  [chr ems psx])
 
 dnl   There are two distinct sets of error codes for this package
 STAR_MESSGEN(err_err.msg)
