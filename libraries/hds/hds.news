@@ -1,5 +1,10 @@
 HDS Library
 -----------
+
+   A workaround for problems with data synchronization when using
+mapped files over NFS together with some Linux kernels has been introduced. 
+
+
    A new (V4.3-3) of the Hierarchical Data System HDS is now
 available.
 
