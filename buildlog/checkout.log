@@ -25,6 +25,8 @@ U java/source/aglib/src/lib/astrogrid-filestore-client-SNAPSHOT.jar
 U java/source/aglib/src/lib/astrogrid-registry-client-lite-SNAPSHOT.jar
 U java/source/aglib/src/lib/astrogrid-registry-common-SNAPSHOT.jar
 U java/source/aglib/src/lib/astrogrid-store-client-SNAPSHOT.jar
+cvs checkout: Updating java/source/aglib/src/resources
+U java/source/aglib/src/resources/dummy_file
 cvs checkout: Updating java/source/ant
 U java/source/ant/KEYS
 U java/source/ant/LICENSE
@@ -7706,8 +7708,6 @@ cvs checkout: Updating java/source/jetty/lib/jetty
 cvs checkout: Updating java/source/jetty/src
 cvs checkout: Updating java/source/jetty/src/lib
 U java/source/jetty/src/lib/javax.servlet.jar
-U java/source/jetty/src/lib/javax.xml.jaxp.jar
-U java/source/jetty/src/lib/org.apache.crimson.jar
 U java/source/jetty/src/lib/org.apache.jasper.jar
 U java/source/jetty/src/lib/org.mortbay.jetty.jar
 cvs checkout: Updating java/source/jniast
@@ -10060,6 +10060,7 @@ U java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableTransferable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/StoragePolicy.java
+U java/source/table/src/main/uk/ac/starlink/table/StreamStarTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/TableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/TableCopy.java
 U java/source/table/src/main/uk/ac/starlink/table/TableFormatException.java
