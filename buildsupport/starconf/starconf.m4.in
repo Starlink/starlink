@@ -437,6 +437,35 @@ func_two_();
 ])# STAR_CNF_COMPATIBLE_SYMBOLS
 
 
+# STAR_FC_LIBRARY_LDFLAGS
+# -----------------------
+#
+# Wrapper for AC_FC_LIBRARY_LDFLAGS.
+#
+# There's a library problem using gcc under OSX 10.3 (10.3.4 Panther =
+# Darwin 7.4.0), which results in the symbols restFP and saveFP being
+# undefined at link time.  There's a shortage of authoritative
+# explanations, but <http://www.ccp4.ac.uk/problems/mac_4_2.html#29>
+# gives at least one resolution.  It's not clear (to Norman) what the
+# real cause of this is, but it apparently doesn't affect OSX versions
+# before 10.3, and will presumably be fixed in versions soon after
+# this.  The following isn't terribly pretty, and will need maintainance.
+AC_DEFUN([STAR_FC_LIBRARY_LDFLAGS],
+         [AC_FC_LIBRARY_LDFLAGS
+          case $build_os in
+              darwin7*)
+                  if test "$GCC" = yes; then
+                      AC_MSG_NOTICE([Fixing the OSX 10.3 restFP problem with -lcc_dynamic])
+                      FCLIBS="$FCLIBS -lcc_dynamic"
+                  fi
+                  ;;
+              *)
+                  # No library issues
+                  ;;
+          esac
+])# STAR_FC_LIBRARY_LDFLAGS
+
+
 # STAR_LATEX_DOCUMENTATION(documentcode, [targets])
 # -------------------------------------------------
 # Generate the standard makefile targets to handle LaTeX documentation
