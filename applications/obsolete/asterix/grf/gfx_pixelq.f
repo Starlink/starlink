@@ -48,8 +48,13 @@
       INTEGER IPTR,IA
       LOGICAL COLOUR
       LOGICAL OK
+      LOGICAL LREG
 *    Local data :
 *-
+
+*  ditch concept of irregular images - too many problems
+      LREG=.TRUE.
+
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL PGBBUF()
@@ -118,7 +123,7 @@
 
         IF (STATUS.EQ.SAI__OK) THEN
 *  regular axes - plot a tile at a time
-          IF (REG) THEN
+          IF (LREG) THEN
 
             XHWID=(X(2)-X(1))/2.0
             YHWID=(Y(2)-Y(1))/2.0
