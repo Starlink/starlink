@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-package libscb;
+package Scb;
 
 #  This perl module contains some of the general routines used by 
 #  the source code index generator (scbindex.pl) and the browser itself
@@ -16,8 +16,8 @@ require Exporter;
 
 #  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf popd pushd module_name starpack rmrf
-             incdir srcdir bindir indexfile taskfile/;
+@EXPORT = qw/tarxf popd pushd module_name starpack rmrf parsetag
+             $incdir $srcdir $bindir $indexfile $taskfile/;
 
 #  Includes.
 
@@ -29,14 +29,14 @@ use Cwd;
 
 #  Directory locations.
 
-$main::srcdir = "/local/star/sources";        # head of source tree
-$main::bindir = "/star/bin";                  # Starlink binaries directory
-$main::incdir = "/star/include";              # Starlink include directory
+$srcdir = "/local/star/sources";        # head of source tree
+$bindir = "/star/bin";                  # Starlink binaries directory
+$incdir = "/star/include";              # Starlink include directory
 
 #  Index file locations.
 
-$main::indexfile = cwd . "/index";
-$main::taskfile  = cwd . "/tasks";
+$indexfile = cwd . "/index";
+$taskfile  = cwd . "/tasks";
 
 
 ########################################################################
@@ -240,6 +240,29 @@ sub popd {
    my $dir = pop @dirstack;
    chdir $dir or error "Couldn't change directory to $dir";
 }
+
+
+########################################################################
+sub parsetag {  
+   
+#  Parses an SGML-type tag to return a hash giving the values of the
+#  elements in it.  Element names are folded to lower case, and the
+#  special hash keys 'Start' and 'End' give the name of the tag;
+#  only one of 'Start' or 'End' may be defined.
+      
+   my $tag = shift;
+   my %tag = (Start => '', End => '');
+  
+   $tag =~ m%<(/?)\s*(\w+)\s*%g
+      or die "Internal: $tag doesn't look like a tag.\n";
+   $tag{ $1 ? 'End' : 'Start' } = lc $2;
+   while ($tag =~ m%(\w+)\s*(?:=\s*(?:(["'])(.*?)\2|()(\w*)))?%g) {
+      $tag{lc $1} = $3;
+   }
+   return %tag;
+}
+
+
 
 
 1;
