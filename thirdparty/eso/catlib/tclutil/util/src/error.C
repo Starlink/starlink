@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: error.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $"
+ * "@(#) $Id: error.C,v 1.2 2003/02/20 18:03:17 norman Exp $"
  *
  * error.C - error reporting routines
  * 
@@ -13,17 +13,17 @@
  *                 08/12/98  Changed for egcs compiler 
  * Allan Brighton  01/04/99  Replaced sys_errlist[] with strerror()
  *                           to get around porting problems
+ * Norman Gray     08/04/03  Removed `#ifdef __linux__' for errno.h.
+ *                           Required for RH6/egcs-2.91.66 at least.
  */
-static const char* const rcsId="@(#) $Id: error.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $";
+static const char* const rcsId="@(#) $Id: error.C,v 1.2 2003/02/20 18:03:17 norman Exp $";
 
 
 #include <stdarg.h>
 #include <stdlib.h>
 #include <iostream.h>
 #include <strstream.h>
-#ifndef __linux__
 #include <errno.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include "error.h"
@@ -70,7 +70,6 @@ int error(const char* msg1, const char* msg2, int code)
  */
 int sys_error(const char* msg1, const char* msg2)
 {
-    //extern int errno; // should be declared in errno.h, at the top
     char* s = strerror(errno);
     if (s == NULL)
 	return error(msg1, msg2);
