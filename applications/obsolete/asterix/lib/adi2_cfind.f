@@ -200,7 +200,7 @@
       CALL ADI2_CFIND_HDU( FITID, LHDU(:HLEN), CREATE, HDUID,
      :                     DIDCRE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-      if ( HDUID .EQ. ADI__NULLID ) GOTO 99
+      IF ( HDUID .EQ. ADI__NULLID ) GOTO 99
 
 *  Did we just create the primary HDU?
       IF ( DIDCRE .AND. (LHDU(:HLEN).EQ.'PRIMARY') ) THEN
@@ -540,8 +540,8 @@
               FSTAT = 0
               CALL FTMAHD( LUN, IHDU, HDUTYPE, FSTAT )
 
-*          End of file?
-              IF ( FSTAT .EQ. 107 ) THEN
+*          End of file? [ Should this be ".NE. 0"? (RB) ]
+              IF ( FSTAT .EQ. 107 .OR. FSTAT .EQ. 252 ) THEN
                 MORE = .FALSE.
 
 *          Otherwise test if found
@@ -635,11 +635,6 @@
 *      Create cache object
           CALL ADI2_CFIND_CREC( HCID, 'Hdu', HDU, 'FITShduCache',
      :                          HDUID, STATUS )
-
-*      Write name of extension (bad news? -rb)
-c         IF ( HDU .NE. 'PRIMARY' ) THEN
-c           CALL ADI2_HPKYC( HDUID, 'EXTNAME', HDU, '~', STATUS )
-c         END IF
 
 *      Mark as created
           DIDCRE = .TRUE.
@@ -1098,7 +1093,6 @@ c     END IF
       FSTAT = 0
       MORE = .TRUE.
       DO WHILE ( MORE .AND. (FSTAT .EQ. 0) )
-        if (status.ne.0) print*, icard, keywrd, value, cmnt, fstat
 
 *    Extract name and value
         CALL FTGKYN( LUN, ICARD, KEYWRD, VALUE, CMNT, FSTAT )
@@ -1663,6 +1657,147 @@ c     END IF
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'ADI2_CFIND_SCMT', STATUS )
+      END IF
+
+      END
+
+
+      SUBROUTINE ADI2_CFIND_MARK( HDUID, WRITTEN, STATUS )
+*+
+*  Name:
+*     ADI2_CFIND_MARK
+
+*  Purpose:
+*     Set Written status of all cards in a HDU
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ADI2_CFIND_MARK( HDUID, WRITTEN, STATUS )
+
+*  Description:
+*     Marks the main HDU the looks up all the card and marks them
+*     But what about the data?
+
+*  Arguments:
+*     HDUID = INTEGER (given)
+*        The FITS object containing the HDU.
+*     WRITTEN = LOGICAL (given)
+*        The status to set each card to.
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1997
+
+*  Authors:
+*    Richard Beard (ROSAT, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*    30 Apr 1997: (RB)
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER			HDUID
+      LOGICAL			WRITTEN
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			ADI2_MKIDX
+        CHARACTER*8		ADI2_MKIDX
+
+*  Local Variables:
+      CHARACTER*8		IDXSTR			! Object string for each card
+
+      INTEGER			TABID			! Card table ID
+      INTEGER			CRDID			! Card ID
+      INTEGER			IMGID			! Image ID
+      INTEGER			N, NCARD		! Number of cards and loop variable
+
+      LOGICAL			THERE
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First mark the main HDU
+      CALL ADI_CPUT0L( HDUID, 'Written', WRITTEN, STATUS )
+
+*  Find the number of cards it contains
+      CALL ADI_FIND( HDUID, 'CrdTable', TABID, STATUS )
+      CALL ADI_CGET0I( HDUID, 'CrdCount', NCARD, STATUS )
+
+*  Then mark each card
+      DO N = 1, NCARD
+        IDXSTR = ADI2_MKIDX( 'Obj_', N )
+        CALL ADI_FIND( TABID, IDXSTR, CRDID, STATUS )
+        CALL ADI_CPUT0L( CRDID, 'Written', WRITTEN, STATUS )
+      END DO
+
+*  And finally mark the data
+      CALL ADI_THERE( HDUID, 'Image', THERE, STATUS )
+      IF ( THERE ) THEN
+        CALL ADI_FIND( HDUID, 'Image', IMGID, STATUS )
+        CALL ADI_CPUT0L( IMGID, 'Written', WRITTEN, STATUS )
+      END IF
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'ADI2_CFIND_MARK', STATUS )
       END IF
 
       END
