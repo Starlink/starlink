@@ -271,6 +271,9 @@
 /* Close PGPLOT down for now. */
       cpgclos();
 
+/* Update pending Tcl events. */
+      tclupdate();
+
 /* This prevents us from resampling into a frame which has many units for
    a single pixel, which would be a waste. */
       STARCALL(
