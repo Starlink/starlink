@@ -47,6 +47,7 @@
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *      6 Dec 94 : V1.8-1  Use updated QUALITY routines (DJA)
 *     21 Feb 95 : V1.8-2  Don't die if axes unrecognised (DJA)
+*     13 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -116,7 +117,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 1.8-3')
+        PARAMETER           (VERSION = 'CQUALITY Version 2.0-0')
 *-
 
       CALL MSG_PRNT( VERSION )
@@ -187,8 +188,8 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check axes
-      CALL BDI0_FNDAXC( OFID, 'X', AORDER(1), STATUS )
-      CALL BDI0_FNDAXC( OFID, 'Y', AORDER(2), STATUS )
+      CALL AXIS_TGETORD( OFID, 'XY', MOVE_AXES, AORDER, NDIM, TDIMS,
+     :                   STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         CALL MSG_PRNT( 'Axes are not recognisable as X and Y, '/
@@ -200,6 +201,10 @@
           TDIMS(I) = DIMS(I)
         END DO
         CALL AR7_PAD( NDIM, TDIMS, STATUS )
+
+      ELSE IF ( (AORDER(1) .NE. 1) .AND. (AORDER(2).NE.2) ) THEN
+        MOVE_AXES = .TRUE.
+
       END IF
 
 *  Find length of array

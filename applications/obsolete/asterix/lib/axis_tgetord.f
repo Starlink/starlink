@@ -54,7 +54,6 @@
 *
       INTEGER                         IAX                  ! Loop over axes
       INTEGER                         IDIMS(ADI__MXDIM)    ! Input dimensions
-      INTEGER                         NAX                  ! # of axes
       INTEGER                         MIAX                 ! Moved axis index
 
       LOGICAL                         DOMOVES              ! Move axes?
