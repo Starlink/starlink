@@ -103,6 +103,11 @@ $!
 $    CMS FETCH'CF' VMS_UNIX_ASSEMBLY
 $    DELETE UNIX_RELEASE.COM;0
 $!
+$!  Fetch the include files.
+$!  ========================
+$!
+$    CMS FETCH'CF' INCLUDE_FILES
+$!
 $!  Source-code files.
 $!  =================
 $!
@@ -113,6 +118,10 @@ $!
 $!  Fetch the source code for all the generic routines.
 $!
 $    CMS FETCH'CF' CON_GENERIC_ROUTINES
+$!
+$!  Fetch the source code for all the C routines.
+$!
+$    CMS FETCH'CF' CON_C_ROUTINES
 $!
 $!  Create a list of the generic source code.
 $!

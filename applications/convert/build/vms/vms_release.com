@@ -114,7 +114,7 @@ $!
 $!  Fetch the source files.
 $!  =======================
 $!
-$    CMS FETCH'CF' CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES,APPLIC
+$    CMS FETCH'CF' CON_C_ROUTINES,CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES
 $!
 $!  Make the CONVERT source library.
 $!  ================================
@@ -153,7 +153,7 @@ $!
 $!  Create a list of the application source code with the library-insertion
 $!  command.
 $!
-$    CMS SHOW GENERATION'CF' CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES -
+$    CMS SHOW GENERATION'CF' CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES,CON_C_ROUTINES -
           /OUTPUT = VMSLIB.TMP /FORMAT = "$ INSERT #E"
 $!
 $!  Delete the temporary files.
@@ -184,6 +184,11 @@ $!
 $!  Compress the library to save disc space.
 $!
 $    LIBREDUCE
+$!
+$!  Fetch the include files.
+$!  ========================
+$!
+$    CMS FETCH'CF' INCLUDE_FILES
 $!
 $!  Create the portable help library.
 $!  =================================
