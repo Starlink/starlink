@@ -86,7 +86,24 @@ AC_ARG_WITH(starlink,
              else
                  AC_MSG_WARN([--with-starlink given nonexistent directory; ignored: using default $STARLINK instead])
              fi])
-             
+
+# Handle --without-stardocs.  Don't build and install documentation.
+# Default is --with-stardocs.
+_star_build_docs=true
+AC_ARG_WITH(stardocs,
+            AS_HELP_STRING([--without-stardocs],
+                           [Do not install built documentation (default --with)]),
+            [echo "with-stardocs: <$withval>"
+             if test -z "$withval"; then
+                 _star_build_docs=true # default
+             elif test "X$withval" = Xno; then
+                 _star_build_docs=false
+             elif test "X$withval" = Xyes; then
+                 _star_build_docs=true
+             else
+                 AC_MSG_WARN([bad arg to --with-stardocs: using yes])
+                 _star_build_docs=true
+             fi])
 
 # Everything depends on where /star is.  Declare STARLINK as a
 # `precious variable'.  Amongst other things, this will make
@@ -427,12 +444,16 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                     _STAR_EXTRA_DIST($2)
                     STAR_DOC_FILES($2)],
                    [dnl second arg empty -- use defaults
-                    for d in $1
-                    do
-                        docno=[`basename $d .tex`]
-                        _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
-                        STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
-                    done
+                    if $_star_build_docs; then
+                        for d in $1
+                        do
+                            docno=[`basename $d .tex`]
+                            _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
+                            STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
+                        done
+                    else
+                        AC_MSG_WARN([not installing docs $docno])
+                    fi
                     STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
                     STAR_CHECK_PROGS([star2html])
                    ])dnl
