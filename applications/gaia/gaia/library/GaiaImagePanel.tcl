@@ -131,7 +131,6 @@ class gaia::GaiaImagePanel {
                -labelfont $itk_option(-labelfont) \
                -anchor e \
                -relief groove \
-               -valuewidth {} \
                -labelwidth $itk_option(-labelwidth)
          }
          blt::table $w_ \

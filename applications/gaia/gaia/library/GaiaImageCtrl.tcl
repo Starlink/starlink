@@ -553,7 +553,7 @@ class gaia::GaiaImageCtrl {
       {{any *} {ndf *.sdf} {fits *.fit*}}
 
    #  Whether up, down, left and right arrows warp the cursor.
-   itk_option define -with_warp with_warp With_Warp 1
+   itk_option define -with_warp with_warp With_warp 1
 
    #  Protected variables:
    #  ====================

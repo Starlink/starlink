@@ -6,26 +6,26 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 94  Created
-# Peter W. Draper 24 Apr 98  Merged changes for controlling value
-#                            field width.
-#                 11 Aug 98  Expanded real definition to allow 1.0e6
+# Peter W. Draper 11 Aug 98  Expanded real definition to allow 1.0e6
 #                            type values.
+#                 26 Feb 99  Merged tcl8 changes from real tclutil version.
 
 itk::usual LabelEntry {}
 
 # This widget displays a label and an entry and implements convenient
 # methods for accessing and modifying the label and the value.
 
-class util::LabelEntry {
+itcl::class util::LabelEntry {
     inherit util::LabelWidget
 
     # constructor: create a new LabelEntry widget
 
     constructor {args} {
+	# Tk entry widget.
 	itk_component add entry {
 	    entry $w_.entry
 	} {
-	    keep -textvariable -relief -borderwidth
+	    keep -textvariable -relief -borderwidth -textvariable -show
 	    rename -font -valuefont valueFont ValueFont
 	}
 
@@ -35,21 +35,21 @@ class util::LabelEntry {
 
     #  Get the value in the entry
 
-    method get {} {
+    public method get {} {
 	return [$itk_component(entry) get]
     }
 
 
     # select the contents of the entry
 
-    method select {} {
+    public method select {} {
 	$itk_component(entry) select range 0 end
     }
 
 
     # called for traces on textvariable
 
-    method trace_ {args} {
+    private method trace_ {args} {
 	if {!$notrace_} {
 	    command_proc_ $itk_option(-changecmd)
 	}
@@ -58,7 +58,7 @@ class util::LabelEntry {
 
     #  called for return or keypress in entry, calls command proc with new value
 
-    method command_proc_ {cmd} {
+    private method command_proc_ {cmd} {
 	lappend cmd [$itk_component(entry) get]
 	eval $cmd
     }
@@ -67,7 +67,7 @@ class util::LabelEntry {
     # The peek procedure returns the value of the entry with the
     # char inserted at the insert position. (ripped from iwidgets::entryfield)
 
-    method peek_ {char} {
+    private method peek_ {char} {
 	set str [get]
 
 	set insertPos [$itk_component(entry) index insert]
@@ -81,7 +81,7 @@ class util::LabelEntry {
 
     #  called for keypress events when validation is on (based on code from iwidgets)
 
-    method validate_ {char sym} {
+    private method validate_ {char sym} {
 	set cmd $validate_cmd_
 
 	if {"$cmd" == "" || "$itk_option(-validate)" == ""} {
@@ -121,23 +121,24 @@ class util::LabelEntry {
 
     # validation methods used for -validate option (from iwidgets::entryfield class)
 
-    proc numeric {char} {
+    protected proc numeric {char} {
 	return [regexp {[0-9]} $char]
     }
-    proc integer {string} {
+    protected proc integer {string} {
 	return [regexp {^[-+]?[0-9]*$} $string]
     }
-    proc alphanumeric {char} {
+    protected proc alphanumeric {char} {
 	return [regexp -nocase {[0-9a-z]} $char]
     }
-    proc alphabetic {char} {
+    protected proc alphabetic {char} {
 	return [regexp -nocase {[a-z]} $char]
     }
-    proc hexidecimal {string} {
+    protected proc hexidecimal {string} {
 	return [regexp {^(0x)?[0-9a-fA-F]*$} $string]
     }
-    proc real {string} {
-        return [regexp -nocase {^[-+]?[0-9]*\.?[0-9]*([0-9]\.?e[-+]?[0-9]*)?$} $string]
+    protected proc real {string} {
+#	return [regexp {^\-?[0-9]*\.?[0-9]*$} $string]
+        return [regexp -nocase {^[-+]?[0-9]*\.?[0-9]*([0-9]\.?e[-+]?[0-9]*)?$}
     }
 
     # -- options --
@@ -159,9 +160,7 @@ class util::LabelEntry {
 
     # set the width of the value displayed
     itk_option define -valuewidth valueWidth ValueWidth {15} {
-       if { $itk_option(-valuewidth) != {} } { 
-          $itk_component(entry) config -width $itk_option(-valuewidth)
-       }
+	$itk_component(entry) config -width $itk_option(-valuewidth)
     }
 
     # set the state to normal or disabled (greyed out)
@@ -207,7 +206,13 @@ class util::LabelEntry {
 
     # widget orientation: horizontal or vertical
     itk_option define -orient orient Orient {horizontal} {
-	pack $itk_component(entry) -side $side_ -expand 1 -fill x -padx 1m -ipadx 1m
+	if {"$itk_option(-valuewidth)" == "" || $itk_option(-valuewidth) == 0} {
+	    set expand 0
+	} else {
+	    set expand 1
+	}
+	pack $itk_component(entry) \
+	    -side $side_ -expand $expand -fill x -padx 1m -ipadx 1m
     }
 
 

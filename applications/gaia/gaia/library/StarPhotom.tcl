@@ -346,7 +346,6 @@ class gaia::StarPhotom {
                -text {Frame zero point (mags) :} \
                -value $skymag_ \
                -labelwidth 25 \
-               -valuewidth {} \
                -command [code $this sky_zero_changed]
          }
       }
@@ -370,7 +369,6 @@ class gaia::StarPhotom {
 		  -text {Exposure time/qualifier:} \
 		  -value 1.0 \
 		  -labelwidth 25 \
-		  -valuewidth {}
       }
 
       #  Create a button bar with options for defining either an
