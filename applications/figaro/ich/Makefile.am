@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libich.la
+noinst_LTLIBRARIES = libich.la
 
 libich_la_SOURCES = $(F_ROUTINES) 
 
