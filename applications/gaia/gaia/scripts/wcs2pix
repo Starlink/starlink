@@ -37,7 +37,7 @@ set auto_index(::gaia::Gaia) [list source [file join \$dir start_script.tcl]]
 set auto_index(::gaia::Gaia::startGaia) [list source [file join \$dir start_script.tcl]]
 set auto_index(::gaia::GaiaImageName) [list source [file join \$dir GaiaImageName.tcl]]
 set auto_index(::gaia::GaiaProperties) [list source [file join \$dir GaiaProperties.tcl]]
-set auto_index(::gaia::GaiaProperties::instance) [list source [file join $dir GaiaProperties.tcl]]
+set auto_index(::gaia::GaiaProperties::instance) [list source [file join \$dir GaiaProperties.tcl]]
 EOF
 
 # - GaiaImageName.tcl
@@ -79,6 +79,10 @@ itcl::class gaia::GaiaImageName {
    }
    public method protect {} {
    }
+
+   public variable imagename {} {
+   }
+
    protected variable fullname_ {}
    protected variable diskfile_ {}
    protected variable slice_ {}
@@ -91,18 +95,21 @@ EOF
 
 cat > ${script_dir}/GaiaProperties.tcl <<EOF
 itcl::class gaia::GaiaProperties {
+
+   #  Singleton entry point:
+   #  ----------------------
    proc instance {} {
-      if { $instance_ == {} } {
-         set instance_ [GaiaProperties ::\#auto]
-      }
-      return $instance_
+      return [GaiaProperties ::\#auto]
    }
+
    constructor {args} {
-      eval configure $args
    }
+
    destructor {
    }
    public method restore_properties {} {
+   }
+   protected method read_file_ {filename} {
    }
    public method save_properties {} {
    }
@@ -111,8 +118,10 @@ itcl::class gaia::GaiaProperties {
    public method set_named_property {name key value} {
    }
    public method get_property {key} {
+      return {}
    }
    public method get_named_property {name key} {
+      return {}
    }
    public method unset_property {key} {
    }
@@ -122,6 +131,7 @@ itcl::class gaia::GaiaProperties {
       return {}
    }
    public method get_unnamed_key {name fullkey} {
+      return {}
    }
    public method apply_named_properties {object name} {
    }

@@ -37,7 +37,7 @@ set auto_index(::gaia::Gaia) [list source [file join \$dir start_script.tcl]]
 set auto_index(::gaia::Gaia::startGaia) [list source [file join \$dir start_script.tcl]]
 set auto_index(::gaia::GaiaImageName) [list source [file join \$dir GaiaImageName.tcl]]
 set auto_index(::gaia::GaiaProperties) [list source [file join \$dir GaiaProperties.tcl]]
-set auto_index(::gaia::GaiaProperties::instance) [list source [file join $dir GaiaProperties.tcl]]
+set auto_index(::gaia::GaiaProperties::instance) [list source [file join \$dir GaiaProperties.tcl]]
 EOF
 
 # - GaiaImageName.tcl
@@ -79,25 +79,6 @@ itcl::class gaia::GaiaImageName {
    }
    public method protect {} {
    }
-   protected method parse_name_ {} {
-   }
-   protected method get_slice_ {} {
-   }
-   protected method get_fitsext_ {} {
-   }
-   protected method get_type_ {} {
-   }
-   protected method check_type_ {} {
-      return 1
-   }
-   protected method get_diskfile_ {} {
-   }
-   protected method get_fullname_ {} {
-   }
-   protected method get_path_ {} {
-   }
-   protected method reset_ {} {
-   }
    public variable imagename {} {
    }
    protected variable fullname_ {}
@@ -107,6 +88,52 @@ itcl::class gaia::GaiaImageName {
    protected variable fitshdu_ 0
    protected variable path_ {}
    protected variable type_ {.sdf}
+}
+EOF
+
+cat > ${script_dir}/GaiaProperties.tcl <<EOF
+itcl::class gaia::GaiaProperties {
+
+   #  Singleton entry point:
+   #  ----------------------
+   proc instance {} {
+      return [GaiaProperties ::\#auto]
+   }
+
+   constructor {args} {
+   }
+
+   destructor {
+   }
+   public method restore_properties {} {
+   }
+   protected method read_file_ {filename} {
+   }
+   public method save_properties {} {
+   }
+   public method set_property {key value} {
+   }
+   public method set_named_property {name key value} {
+   }
+   public method get_property {key} {
+      return {}
+   }
+   public method get_named_property {name key} {
+      return {}
+   }
+   public method unset_property {key} {
+   }
+   public method unset_named_property {name key} {
+   }
+   public method get_named_keys {name} {
+      return {}
+   }
+   public method get_unnamed_key {name fullkey} {
+      return {}
+   }
+   public method apply_named_properties {object name} {
+   }
+   private common instance_ {}
 }
 EOF
 
