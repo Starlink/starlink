@@ -1,6 +1,14 @@
    HTX - Utilities for Accessing Hypertext Documentation
    =====================================================
 
+   Updates 1.2-9 (SER) Fixed bug when starting Netscape 4.x on 
+                       some Solaris systems.
+
+   Updates 1.2-7 (SER)
+
+   Added Mozilla browser which can be set with setenv HTX_BROWSER 
+   mozilla. This was done for RedHat 9.0. 
+
    New Features
    ------------
       Version 1.2 of the HTX Hypertext Utilities is now available.
@@ -40,7 +48,11 @@
 
    V1.2-5 (January 2003)
    ---------------------
-      Fixed broken behaviour related to change in linux sort flags.
+      Fixed broken behavior related to change in linux sort flags.
 
 
+   V1.2-6 (June 2003)
+   ---------------------
+      Stopped "Incorrectly built binary" warning for Netscape on RedHat 9.0.
+      Added Mozilla browser.
 

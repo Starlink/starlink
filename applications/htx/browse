@@ -109,6 +109,9 @@
 #        Use HTX_TMP for temporary communication files.
 #     6-JAN-1998 (RFWS):
 #        Re-define standard input to be ${HTX_TTY} for "xdisplay" if possible.
+#     29-OCT-2003 (SER)
+#        Added Mozilla. Fixed bug for Solaris when starting 
+#        netscape (redirection command for sh).
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -137,7 +140,7 @@
 
 #  Netscape.
 #  ========
-      *[Nn][Ee][Tt][Ss][Cc][Aa][Pp][Ee]*)
+      *[Nn][Ee][Tt][Ss][Cc][Aa][Pp][Ee])
 
 #  Manage scratch file space.
 #  -------------------------
@@ -232,7 +235,7 @@
 #  ---------------------------------------------
 #  Try to run netscape with "-remote" to make an existing browser invocation
 #  read the document. Suppress any error messages.
-         if ${HTX_BROWSER} 2>/dev/null -noraise -remote "${remcmd}"; then
+         if ${HTX_BROWSER} -noraise -remote "${remcmd}" > /dev/null 2>&1; then
 
 #  If successful, disable the trap associated with temporary files, if
 #  necessary.
@@ -252,11 +255,269 @@
 
 #  Start a new browser, supplying the URL generated above. Suppress warning
 #  messages if required.
-            echo "starting ${HTX_BROWSER} WWW browser..."
+            echo "Starting ${HTX_BROWSER} WWW browser..."
             if test "${HTX_WARN}" = '1'; then
-               ${HTX_BROWSER} "${url}" &
+               ${HTX_BROWSER} "${url}" > /dev/null 2>&1 &
+            else 
+               ${HTX_BROWSER} "${url}" > /dev/null 2>&1 &
+            fi
+
+#  Disable the trap associated with temporary files, if necessary.
+            if test "${HTX_WHERE}" = 'i'; then settrap; fi
+         fi
+         ;;
+
+#  Netscape7.
+#  =========
+#      *[Nn][Ee][Tt][Ss][Cc][Aa][Pp][Ee][7])
+# Set netscape 7x command
+#         netscape="netscape"
+#
+#  Manage scratch file space.
+#  -------------------------
+#  If the document to be viewed is being supplied on standard input, then
+#  we must generate a name for a temporary file to store it.
+#         if test "${HTX_WHERE}" = 'i'; then
+#
+#  Use "ls" to list all the temporary file names so far used in reverse order
+#  of their creation time.
+#            tempfiles="`ls -t ${tmpdir}/htx-browse-netscape7-${LOGNAME}-*.html \
+#                        2>/dev/null`"
+#
+#  Pass this list of file names through "sed" to extract the sequence number
+#  field, quitting once that corresponding to the most recently created file
+#  has been obtained.
+#            n="`echo "${tempfiles}" \
+#            | sed -n 's%^.*/htx-browse-netscape7-'"${LOGNAME}"'-\([1-9][0-9]*\)\.html$%\1%p
+#                      t done
+#                      b
+#                      :done
+#                      q'`"
+#
+#  If no sequence number was found, then use 1. Otherwise increment it.
+#            if test ! -n "${n}"; then n='1'; else n="`expr "${n}" + 1`"; fi
+#
+#  Generate the temporary file name and replace the URL value with it. This
+#  name must be unique to the current machine, software, browser, user and
+#  temporary document sequence number.
+#            url="${tmpdir}/htx-browse-netscape7-${LOGNAME}-${n}.html"
+#
+#  Select the names of all but the most recent few temporary files and remove
+#  these older ones if necessary.
+#            oldfiles="`echo "${tempfiles}" | tail +3`"
+#            if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
+#         fi
+#
+#  Ensure DISPLAY is set.
+#  ---------------------
+#  The DISPLAY variable is always required for netscape, so see if it is
+#  defined.
+#         wasset='1'
+#         if test ! -n "${DISPLAY}"; then
+#            wasset=''
+#
+#  If it was not defined, then search relative to directories ending in "/bin"
+#  that appear in $PATH to see if the Starlink "xdisplay" executable is
+#  available.
+#            xdisplay="`IFS=':'; for dir in ${PATH}; do
+#               case "${dir}" in */bin)
+#                  file="${dir}/../etc/xdisplay"
+#                  test -x "${file}" -a ! -d "${file}" && echo "${file}" \
+#                                                      && break;;
+#               esac
+#            done`"
+#
+#  If "xdisplay" was found, then use it to set a DISPLAY value. If possible,
+#  redirect standard input to the controlling terminal, since this affects
+#  results on some systems.
+#            if test -n "${xdisplay}"; then
+#               if test -n ${HTX_TTY}; then
+#                  DISPLAY="`${xdisplay} <${HTX_TTY}`"
+#               else
+#                  DISPLAY="`${xdisplay}`"
+#               fi
+#
+#  If it could not be found, abort with an error message.
+#            else
+#               echo >&2 \
+#               "${HTX_SCRIPT}: please set DISPLAY to identify your X display"
+#               exit 1
+#            fi
+#         fi
+#
+#  Prepare to communicate with Netscape.
+#  ------------------------------------
+#  Generate the Netscape7 remote command required to make an existing browser
+#  read the document.
+#         if test "${HTX_WHERE}" = 'l' -o "${HTX_WHERE}" = 'i'; then
+#            remcmd="openURL(file://localhost/${url})"
+#         else
+#            remcmd="openURL(${url})"
+#         fi
+#
+#  If necessary, read the document from standard input into its temporary file.
+#  Before doing so, set a trap to remove the file if this script is aborted.
+#         if test "${HTX_WHERE}" = 'i'; then
+#            settrap 'rm -f "${url}"'
+#            cat >"${url}" || exit
+#         fi
+#
+#  Try to use an existing invocation of Netscape7.
+#  ----------------------------------------------
+#  Try to run netscape with "-remote" to make an existing browser invocation
+#  read the document. Suppress any error messages.
+#
+#  Start a new invocation of Netscape7.
+#  -----------------------------------
+#  If the attempt to use an existing browser failed, then we must start a new
+#  one. Before doing so, check if the DISPLAY variable was set before invoking
+#  this script. If not, then issue a warning because running "xdisplay" each
+#  time will slow down document access.
+#         if ${netscape} -noraise -remote "${remcmd}" > /dev/null 2>&1; then
+#            if test ! "${wasset}" = '1'; then
+#               echo >&2 \
+#"${HTX_SCRIPT}: for faster access, please set DISPLAY to identify your X display"
+#            fi
+#  Start a new browser, supplying the URL generated above. Suppress warning
+#  messages if required.
+#            echo "Starting ${HTX_BROWSER} WWW browser..."
+#            if test "${HTX_WARN}" = '1'; then
+#               ${netscape} "file://${url}" > /dev/null 2>&1 &
+#            else
+#               ${netscape} "file://${url}" > /dev/null 2>&1 &
+#            fi
+#
+#  Disable the trap associated with temporary files, if necessary.
+#            if test "${HTX_WHERE}" = 'i'; then settrap; fi
+#         else
+#  If successful, disable the trap associated with temporary files, if
+#  necessary.
+#            if test "${HTX_WHERE}" = 'i'; then settrap; fi
+#         fi
+#         ;;
+#
+#  Mozilla.
+#  ========
+      *[Mm][Oo][Zz][Ii][Ll][Ll][Aa]*)
+
+#  Manage scratch file space.
+#  -------------------------
+#  If the document to be viewed is being supplied on standard input, then
+#  we must generate a name for a temporary file to store it.
+         if test "${HTX_WHERE}" = 'i'; then
+
+#  Use "ls" to list all the temporary file names so far used in reverse order
+#  of their creation time.
+            tempfiles="`ls -t ${tmpdir}/htx-browse-mozilla-${LOGNAME}-*.html \
+                        2>/dev/null`"
+
+#  Pass this list of file names through "sed" to extract the sequence number
+#  field, quitting once that corresponding to the most recently created file
+#  has been obtained.
+            n="`echo "${tempfiles}" \
+            | sed -n 's%^.*/htx-browse-mozilla-'"${LOGNAME}"'-\([1-9][0-9]*\)\.html$%\1%p
+                      t done
+                      b
+                      :done
+                      q'`"
+
+#  If no sequence number was found, then use 1. Otherwise increment it.
+            if test ! -n "${n}"; then n='1'; else n="`expr "${n}" + 1`"; fi
+
+#  Generate the temporary file name and replace the URL value with it. This
+#  name must be unique to the current machine, software, browser, user and
+#  temporary document sequence number.
+            url="${tmpdir}/htx-browse-mozilla-${LOGNAME}-${n}.html"
+
+#  Select the names of all but the most recent few temporary files and remove
+#  these older ones if necessary.
+            oldfiles="`echo "${tempfiles}" | tail +3`"
+            if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
+         fi
+
+#  Ensure DISPLAY is set.
+#  ---------------------
+#  The DISPLAY variable is always required for mozilla, so see if it is
+#  defined.
+         wasset='1'
+         if test ! -n "${DISPLAY}"; then
+            wasset=''
+
+#  If it was not defined, then search relative to directories ending in "/bin"
+#  that appear in $PATH to see if the Starlink "xdisplay" executable is
+#  available.
+            xdisplay="`IFS=':'; for dir in ${PATH}; do
+               case "${dir}" in */bin)
+                  file="${dir}/../etc/xdisplay"
+                  test -x "${file}" -a ! -d "${file}" && echo "${file}" \
+                                                      && break;;
+               esac
+            done`"
+
+#  If "xdisplay" was found, then use it to set a DISPLAY value. If possible,
+#  redirect standard input to the controlling terminal, since this affects
+#  results on some systems.
+            if test -n "${xdisplay}"; then
+               if test -n ${HTX_TTY}; then
+                  DISPLAY="`${xdisplay} <${HTX_TTY}`"
+               else
+                  DISPLAY="`${xdisplay}`"
+               fi
+
+#  If it could not be found, abort with an error message.
             else
-               ${HTX_BROWSER} 2>/dev/null "${url}" &
+               echo >&2 \
+               "${HTX_SCRIPT}: please set DISPLAY to identify your X display"
+               exit 1
+            fi
+         fi
+
+#  Prepare to communicate with Mozilla.
+#  ------------------------------------
+#  Generate the Mozilla remote command required to make an existing browser
+#  read the document.
+         if test "${HTX_WHERE}" = 'l' -o "${HTX_WHERE}" = 'i'; then
+            remcmd="openURL(file://localhost/${url})"
+         else
+            remcmd="openURL(${url})"
+         fi
+
+#  If necessary, read the document from standard input into its temporary file.
+#  Before doing so, set a trap to remove the file if this script is aborted.
+         if test "${HTX_WHERE}" = 'i'; then
+            settrap 'rm -f "${url}"'
+            cat >"${url}" || exit
+         fi
+
+#  Try to use an existing invocation of Mozilla.
+#  ----------------------------------------------
+#  Try to run netscape with "-remote" to make an existing browser invocation
+#  read the document. Suppress any error messages.
+         if ${HTX_BROWSER} -noraise -remote "${remcmd}" > /dev/null 2>&1; then
+
+#  If successful, disable the trap associated with temporary files, if
+#  necessary.
+            if test "${HTX_WHERE}" = 'i'; then settrap; fi
+
+#  Start a new invocation of Mozilla.
+#  -----------------------------------
+#  If the attempt to use an existing browser failed, then we must start a new
+#  one. Before doing so, check if the DISPLAY variable was set before invoking
+#  this script. If not, then issue a warning because running "xdisplay" each
+#  time will slow down document access.
+         else
+            if test ! "${wasset}" = '1'; then
+               echo >&2 \
+"${HTX_SCRIPT}: for faster access, please set DISPLAY to identify your X display"
+            fi
+
+#  Start a new browser, supplying the URL generated above. Suppress warning
+#  messages if required.
+            echo "Starting ${HTX_BROWSER} WWW browser..."
+            if test "${HTX_WARN}" = '1'; then
+               ${HTX_BROWSER} "file://${url}" > /dev/null 2>&1 &
+            else
+               ${HTX_BROWSER} "file://${url}" > /dev/null 2>&1 &
             fi
 
 #  Disable the trap associated with temporary files, if necessary.
@@ -530,14 +791,14 @@
 #  To invoke the browser we now create a background process that runs the
 #  browser in a child process of its own, waits for it to complete, and then
 #  invokes "mosclean" to tidy up after it.
-            echo "starting ${HTX_BROWSER} WWW browser..."
+            echo "Starting ${HTX_BROWSER} WWW browser..."
             {
 
 #  Suppress warning messages when starting the browser if required.
                if test "${HTX_WARN}" = '1'; then
-                  ${HTX_BROWSER} "${url}" &
+                  ${HTX_BROWSER} "${url}" > /dev/null 2>&1 &
                else
-                  ${HTX_BROWSER} 2>/dev/null "${url}" &
+                  ${HTX_BROWSER} "${url}" > /dev/null 2>&1 &
                fi
 
 #  Once we know the process ID of the new browser, check if a temporary file
