@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_ASLOG( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-     :                       NCOORD_OUT, OUTDIM, OUT, STATUS )
+      SUBROUTINE KPG1_ASLOG( THIS, NPOINT, NCOORD_IN, INDIM, IN, 
+     :                       FORWARD, NCOORD_OUT, OUTDIM, OUT, STATUS )
 *+
 *  Name:
 *     KPG1_ASLOG
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASLOG( NPOINT, NCOORD_IN, INDIM, IN, FORWARD, NCOORD_OUT, 
-*                      OUTDIM, OUT, STATUS )
+*     CALL KPG1_ASLOG( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD, 
+*                      NCOORD_OUT, OUTDIM, OUT, STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -21,10 +21,11 @@
 *  Description:
 *     This routine transforms axis values by taking the logarithm (base
 *     10). The inverse exponentiates the supplied axis values. It is intended 
-*     for use as a transformation routine by an AST IntraMap. It's argument 
-*     list is the same as AST_TRANN (without the initial Mapping pointer).
+*     for use as a transformation routine by an AST IntraMap.
 
 *  Arguments:
+*     THIS = INTEGER (Given)
+*        An AST pointer to the IntraMap in use.
 *     NPOINT = INTEGER (Given)
 *        The number of points to be transformed.
 *     NCOORD_IN = INTEGER (Given)
@@ -76,6 +77,8 @@
 *  History:
 *     21-SEP-1998 (DSB):
 *        Original version.
+*     23-SEP-1999 (DSB):
+*        Added argument THIS.
 *     {enter_further_changes_here}
 
 *-
@@ -87,6 +90,7 @@
       INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
+      INTEGER THIS
       INTEGER NPOINT
       INTEGER NCOORD_IN
       INTEGER INDIM

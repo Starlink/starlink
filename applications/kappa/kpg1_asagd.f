@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_ASAGD( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-     :                       NCOORD_OUT, OUTDIM, OUT, STATUS )
+      SUBROUTINE KPG1_ASAGD( THIS, NPOINT, NCOORD_IN, INDIM, IN, 
+     :                       FORWARD, NCOORD_OUT, OUTDIM, OUT, STATUS )
 *+
 *  Name:
 *     KPG1_ASAGD
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASAGD( NPOINT, NCOORD_IN, INDIM, IN, FORWARD, NCOORD_OUT, 
-*                      OUTDIM, OUT, STATUS )
+*     CALL KPG1_ASAGD( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD, 
+*                      NCOORD_OUT, OUTDIM, OUT, STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -22,10 +22,11 @@
 *     This routine transforms AGI world co-ordinates to AGI data co-ordinates
 *     using the TRANSFORM structure associated with the current AGI
 *     picture. It is intended for use as a transformation routine by an
-*     AST IntraMap. It's argument list is the same as AST_TRANN (without
-*     the initial Mapping pointer).
+*     AST IntraMap. 
 
 *  Arguments:
+*     THIS = INTEGER (Given)
+*        An AST pointer to the IntraMap in use.
 *     NPOINT = INTEGER (Given)
 *        The number of points to be transformed.
 *     NCOORD_IN = INTEGER (Given)
@@ -77,6 +78,8 @@
 *  History:
 *     3-SEP-1998 (DSB):
 *        Original version.
+*     23-SEP-1999 (DSB):
+*        Added argument THIS.
 *     {enter_further_changes_here}
 
 *-
@@ -87,6 +90,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      INTEGER THIS
       INTEGER NPOINT
       INTEGER NCOORD_IN
       INTEGER INDIM
