@@ -440,6 +440,7 @@
                   DECLARE_CHARACTER( floc, DAT__SZLOC );
                   DECLARE_CHARACTER( ftype, DAT__SZTYP );
                   DECLARE_CHARACTER( faccess, 6 );
+                  F77_POINTER_TYPE ipfits;
 
 /* Get an HDS locator. */
                   ndfXloc( ndf1->identifier, "FITS", "READ", loc, status );
@@ -451,11 +452,14 @@
                   F77_CALL(dat_mapv)( CHARACTER_ARG(floc), 
                                       CHARACTER_ARG(ftype), 
                                       CHARACTER_ARG(faccess),
-                                      (F77_POINTER_TYPE *) &ndf1->fits.data,
+                                      POINTER_ARG(&ipfits),
                                       INTEGER_ARG(&ndf1->fits.ncard),
                                       INTEGER_ARG(status)
                                       TRAIL_ARG(floc) TRAIL_ARG(ftype) 
                                       TRAIL_ARG(faccess) );
+
+/* Import the pointer value to C. */
+                  ndf1->fits.data = cnfCptr( ipfits );
                }
 
 /* There was no FITS extension; record this as effectively a mapped FITS
@@ -511,7 +515,7 @@
                   cnfExprt( key, fkey, 80 );
                   ipfits = cnfFptr( ndf1->fits.data );
                   F77_CALL(ccd1_ftget)( INTEGER_ARG(&ndf1->fits.ncard),
-                                        (F77_POINTER_TYPE *) &ipfits,
+                                        POINTER_ARG(&ipfits),
                                         INTEGER_ARG(&one),
                                         CHARACTER_ARG(fkey),
                                         CHARACTER_ARG(fvalue),
@@ -2592,6 +2596,7 @@
          double *work;
          DECLARE_CHARACTER( type, DAT__SZTYP );
          F77_LOGICAL_TYPE bad;
+         F77_POINTER_TYPE ipdata;
   
 /* We have to sort the array of new percentiles to be worked out, since
    the percentile calculation routine likes them that way. */
@@ -2611,10 +2616,11 @@
 /* Massage some arguments for fortran. */
          bad = F77_ISTRUE(ndf1->bad);
          cnfExprt( ndf1->mtype, type, DAT__SZTYP );
+         ipdata = cnfFptr( ndf1->data );
 
 /* Call the routine which does the calculations. */
          F77_CALL(ccd1_fra)( CHARACTER_ARG(type), INTEGER_ARG(&ndf1->nel),
-                             (F77_POINTER_TYPE) cnfFptr( &ndf1->data ),
+                             POINTER_ARG(&ipdata),
                              INTEGER_ARG(&nfrac), DOUBLE_ARG(afracs),
                              LOGICAL_ARG(&bad), DOUBLE_ARG(work),
                              DOUBLE_ARG(avals), INTEGER_ARG(status)
