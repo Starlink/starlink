@@ -146,9 +146,9 @@
 #        Added ARDMASK options.
 #     10-JUN-1997 (PDRAPER):
 #        Finished prologue.
-#     24-Mar-1998 (ALLAN) 
+#     24-Mar-1998 (ALLAN)
 #        Changed "rect" to "rectangle", to reslove conflict with rtd bitmap name.
-#     24-APR-1998 (ALLAN) 
+#     24-APR-1998 (ALLAN)
 #        Pass command line arguments to "clone" rather than use "after 500".
 #     12-NOV-1998 (PDRAPER):
 #        Added clear stats window button.
@@ -456,8 +456,9 @@ itcl::class gaia::GaiaArd {
       }
    }
 
-   #  Display or clear statistics for regions.
-   public method stats {mode} {
+   #  Display or clear statistics for regions, "args" is a command to
+   #  run when the task really completes.
+   public method stats {mode args} {
       if { $mode == "clear" } {
          $itk_component(statsresults) clear 0 end
          return
@@ -491,11 +492,17 @@ itcl::class gaia::GaiaArd {
                set image "[file rootname $image]${slice}"
             }
 
+	    #  Set command to run on completion.
+	    if { $args != "" } {
+	       set complete_cmd_ $args
+	    }
+
             #  And ARDSTAT on the image and file.
             blt::busy hold $w_
             update idletasks
             $ardstat_ runwith in=$image simple=f \
                oneline=t region=^${tmpfile_}
+
          } else {
             error_dialog "No image is displayed"
          }
@@ -516,6 +523,12 @@ itcl::class gaia::GaiaArd {
       blt::busy release $w_
       $itk_component(statsresults) insert end " "
       $itk_component(statsresults) see end
+
+      #  If necessary do the completion command.
+      if { $complete_cmd_ != {} } { 
+	 eval $complete_cmd_
+	 set complete_cmd_ {}
+      }
    }
 
    #  Save the stats window to the named file.
@@ -534,8 +547,9 @@ itcl::class gaia::GaiaArd {
       }
    }
 
-   #  Blank out regions and display in a new clone.
-   public method blank {mode} {
+   #  Blank out regions and display in a new clone. "args" if given, 
+   #  is a command to execute when task really finishes.
+   public method blank {mode args} {
 
       #  First save the current description to a file
       incr count_
@@ -569,6 +583,11 @@ itcl::class gaia::GaiaArd {
 
             #  Create a temporary file name.
             set tmpimage_ "GaiaArdImg${count_}"
+
+	    #  Set command to run on completion.
+	    if { $args != "" } {
+	       set complete_cmd_ $args
+	    }
 
             #  And run ARDMASK on the image and file.
             blt::busy hold $w_
@@ -709,6 +728,12 @@ itcl::class gaia::GaiaArd {
             $itk_option(-gaia) newimage_clone $file -temporary 1
          }
       }
+
+      #  If given do the completed command.
+      if { $complete_cmd_ != {} } { 
+	 eval $complete_cmd_
+	 set complete_cmd_ {}
+      }
       blt::busy release $w_
    }
 
@@ -765,6 +790,9 @@ itcl::class gaia::GaiaArd {
 
    #  Name of file to save results window into.
    protected variable logfile_ GaiaArd.Log
+
+   #  Command to perform when command completes.
+   protected variable complete_cmd_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

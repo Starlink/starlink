@@ -1906,8 +1906,10 @@ itcl::class gaia::GaiaSextractor {
    }
 
    #  Run the SExtractor program. This writes the current configs out,
-   #  runs the program and then displays the resultant catalogue.
-   public method run {} {
+   #  runs the program and then displays the resultant
+   #  catalogue. "args" are a command to run when the measurements are 
+   #  available.
+   public method run {args} {
       if { $itk_option(-sex_dir) != "" } {
 
          #  Which version of SExtrator do we have available. Look for
@@ -1951,6 +1953,11 @@ itcl::class gaia::GaiaSextractor {
             } else {
                set detect ""
             }
+
+	    #  Set the command to run when measurements are available.
+	    if { $args != "" } { 
+	       set completed_cmd_ $args
+	    }
 
             #  And run the application as required. Note "sdf" files
             #  cannot be processed by native version.
@@ -2159,6 +2166,12 @@ itcl::class gaia::GaiaSextractor {
 
          #  Do search to display symbols.
          $astrocat search
+      }
+
+      #  Issue the measurements available command if needed.
+      if { $complete_cmd_ != {} } { 
+	 eval $complete_cmd_
+	 set complete_cmd_ {}
       }
    }
 
@@ -2585,6 +2598,9 @@ itcl::class gaia::GaiaSextractor {
 
    #  Directory that contains configuration files.
    protected variable config_dir_ "/star/bin/extractor/config"
+
+   #  Command to execute when measurements are available.
+   protected variable complete_cmd_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

@@ -557,7 +557,7 @@ itcl::class gaia::GaiaApPhotom {
    }
 
    #  Measure the current objects.
-   method measure_objects {} {
+   method measure_objects {args} {
       if { [$object_list_ write_file "GaiaPhotomIn.Dat"] } {
          if { $autophotom_ == {} } {
             #  Start autophotom application.
@@ -583,13 +583,19 @@ itcl::class gaia::GaiaApPhotom {
             } else {
                set more ""
             }
-
-            #  And run the command.
             if { $usemags_ } {
                set ok "true"
             } else {
                set ok "false"
             }
+
+	    #  If args are given then set the command to be run when
+	    #  the application returns.
+	    if { $args != "" } { 
+	       set complete_cmd_ "$args"
+	    }
+
+            #  And run the command.
             blt::busy hold $w_
             update idletasks
             catch {file delete GaiaPhotomOut.Dat}
@@ -601,6 +607,7 @@ itcl::class gaia::GaiaApPhotom {
                skymag=$skymag_ \
                usemags=$ok \
                $more
+	    
          } else {
             error_dialog "No image is displayed"
          }
@@ -666,6 +673,10 @@ itcl::class gaia::GaiaApPhotom {
       blt::busy release $w_
       if { [file exists GaiaPhotomOut.Dat] } {
          $object_list_ read_file GaiaPhotomOut.Dat 1
+      }
+      if { $complete_cmd_ != {} } { 
+	 eval $complete_cmd_
+	 set complete_cmd_ {}
       }
    }
 
@@ -877,6 +888,9 @@ itcl::class gaia::GaiaApPhotom {
 
    #  Value of skymag when last known.
    protected variable skymag_ 50
+
+   #  Command to perform when command completes.
+   protected variable complete_cmd_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

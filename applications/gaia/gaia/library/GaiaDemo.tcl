@@ -759,7 +759,8 @@ itcl::class gaia::GaiaDemo {
  in elliptical apertures.
       }
       short_display {Measuring aperture magnitudes...}
-      $toolbox measure_objects
+      $toolbox measure_objects [code $this set_continue_]
+      vwait [scope continue_($this)]
       short_display {done...}
       wait_ $readtime_
       $toolbox save_objects photom.tmp
@@ -798,11 +799,13 @@ itcl::class gaia::GaiaDemo {
       move_to_side_ $toolbox
       wait_ $readtime_
       short_display {Measuring statistics...}
-      $toolbox stats all
+      $toolbox stats all [code $this set_continue_]
+      vwait [scope continue_($this)]
       wait_ $readtime_
       short_display {Removing regions...}
       $toolbox configure -replace 1
-      $toolbox blank all
+      $toolbox blank all [code $this set_continue_]
+      vwait [scope continue_($this)]
       wait_ $readtime_
       $itk_option(-rtdimage) autocut -percent 70
       $itk_option(-gaiamain) configure -temporary 0
@@ -921,7 +924,8 @@ itcl::class gaia::GaiaDemo {
       refresh_
       wait_ $readtime_
       short_display {Detecting images...}
-      $toolbox run
+      $toolbox run [code $this set_continue_]
+      vwait [scope continue_($this)]
       wait_ $readtime_
       $toolbox close
       set catname [$toolbox get_catname]
@@ -1495,7 +1499,7 @@ $catlist
    protected variable demolist_ \
        "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
         contour_ detection_ blink_ grid_ astdefine_ astreference_ \
-       astrefine_ astcopy_ skycat_ archives_"
+        astrefine_ astcopy_ skycat_ archives_"
    
    #  Interval to wait while reading text
    protected variable readtime_ 15000
