@@ -81,8 +81,8 @@
 *     14-SEP-1998 (DSB):
 *        Changed to report the first 3 bad header cards.
 *     9-DEC-1998 (DSB):
-*        Included FITS-IRAF encoding. Re-wrote final error messages to
-*        make them appropriate for use from KPG1_GTWCS.
+*        Included FITS-IRAF encoding. Do not flush errors reported within
+*        this routine. The caller now has responsibility for this.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -198,19 +198,8 @@
 *  Now import any WCS information from the FitsChan into the NDF.
       CALL FTS1_WCSIM( FC, INDF, NENCOD, ENCODS, STATUS )
 
-*  Jump to here if an error occurs. Add a context message.
+*  Jump to here if an error occurs. 
   999 CONTINUE
-      IF( STATUS .NE. SAI__OK )THEN
-         CALL ERR_REP( 'FTS1_FTWCS_ERR1', 'Error importing World '//
-     :                 'Coordinate information from a FITS header.', 
-     :                 STATUS )
-         CALL ERR_REP( 'FTS1_FTWCS_ERR2', 'No WCS information will be'//
-     :                 'available.', STATUS )
-
-*  A useful conversion may still be possible even if the WCS
-*  information cannot be imported. So if an error occurred, flush it.
-         CALL ERR_FLUSH( STATUS )
-      END IF
       
 *  End the AST context.
       CALL AST_END( STATUS )

@@ -90,6 +90,9 @@
 *        world co-ordinate information stored in NDF's WCS component.  
 *        The allowed values (case-insensitive) are:
 *
+*        - "FITS-IRAF" --- This uses keywords CRVALi, CRPIXi, CDiiijjj,
+*           CDi_j, etc., and is the system used by IRAF.
+*
 *        - "FITS-WCS" -- This uses keywords CRVALi, CDELTi, CRPIXi,
 *           PCiiijjj, etc., as described in the (draft) FITS world
 *           co-ordinate system paper by E.W.Greisen and M.Calabretta

@@ -297,7 +297,7 @@
 *  Only proceed if no error has occurred. 
                IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Attempt to create a WCS component within the NDF selected above.
+*  Attempt to create a WCS component within the NDF selected above. 
                   CALL FTS1_FTWCS( NCARD, %VAL( PNTR ), 1, INDFC, 
      :                             NENCOD, ENCODS, STATUS, %VAL( 80 ) )
 

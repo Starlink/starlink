@@ -87,6 +87,9 @@
 *        world co-ordinate information stored in NDF's WCS component.  
 *        The allowed values (case-insensitive) are:
 *
+*        - "FITS-IRAF" --- This uses keywords CRVALi, CRPIXi, CDiiijjj,
+*           CDi_j, etc., and is the system used by IRAF.
+*           
 *        - "FITS-WCS" -- This uses keywords CRVALi, CDELTi, CRPIXi,
 *           PCiiijjj, etc., as described in the (draft) FITS world
 *           co-ordinate system paper by E.W.Greisen and M.Calabretta
@@ -305,6 +308,8 @@
 *        Linux usage enabled.
 *     9-JUN-1998 (DSB):
 *        Added support for WCS component.
+*     9-DEC-1998 (DSB):
+*        Added FITS-IRAF encoding.
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -62,6 +62,8 @@
 *        Modern style.  Revised FTS1_GKEYx calls.
 *     9-JUN-1998 (DSB):
 *        Added support for WCS component.
+*     9-DEC-1998 (DSB):
+*        Flush errors reported while creating the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,8 +142,25 @@
 
 *  Make the WCS component.
 *  =======================
-      CALL FTS1_FTWCS( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS, 
-     :                 STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL FTS1_FTWCS( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS, 
+     :                    STATUS )
+
+*  Flush any errors which occurred while creating the WCS component since 
+*  failure to read WCS is not usually fatal.
+         IF( STATUS .NE. SAI__OK ) THEN
+
+            CALL ERR_REP( 'FTS1_FTWCS_ERR1', 'Error importing World '//
+     :                    'Coordinate information from a FITS header.',
+     :                     STATUS )
+            CALL ERR_REP( 'FTS1_FTWCS_ERR2', 'The output NDF will not'//
+     :                    ' contain any WCS information.', STATUS )
+
+            CALL ERR_FLUSH( STATUS )
+
+         END IF
+
+      END IF
 
 *  Make the FITS extension.
 *  ========================
