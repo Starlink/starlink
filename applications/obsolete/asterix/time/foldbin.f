@@ -430,7 +430,7 @@
 
 *  Write components to output object
       DO N = 2, NACTDIM
-        CALL BDA_AXCOPY( IFID, I, ' ', OAX(N), STATUS )
+        CALL BDI_AXCOPY( IFID, I, ' ', OAX(N), I, STATUS )
       END DO
       CALL BDI_COPY( IFID, 'Title,Label,Units', FFID, ' ', STATUS )
       IF (STATUS .NE. SAI__OK) THEN
