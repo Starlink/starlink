@@ -55,7 +55,7 @@ high-level interface to the AST library.
     </p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><build>img</build><build>generic</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -187,7 +187,7 @@ high-level interface to the AST library.
     which improves the accuracy of the photometry.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><build>agi</build><build>gks</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person><name>Peter Stetson</name><role>Original author</role></person>
@@ -298,31 +298,6 @@ and the ability to query on-line (WWW) catalogues.
     </person>
   </developers>
   <documentation> sun7</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="hdstools">
-  <version>1.0</version>
-  <path>applications/hdstools</path>
-  <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
-  <abstract><p>
-The HDSTOOLS package contains a number of tools
-to edit and display HDS objects. The tools originated in the ASTERIX
-package but have now been modified to run as normal Starlink tasks.
-  </p></abstract>
-  <dependencies >
-    <build>parsecon</build><build>dtask</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <uname>ajc</uname>
-      <name>A. J. Chipperfield</name>
-      <email>ussc@star.rl.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> sun245</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -470,7 +445,7 @@ Traces an HDS file
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kappa">
-  <version>1.3-2</version>
+  <version>1.3-1</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -494,35 +469,6 @@ packages.
     </person>
   </developers>
   <documentation> sun95 sun221</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="kaprh">
-  <version>2.0</version>
-  <path>applications/kaprh</path>
-  <description>KAPRH - A home for retired KAPPA applications</description>
-  <abstract><p>
-KAPRH is an applications package containing commands 
-which have been ``retired'' from the KAPPA package (see SUN/95). They
-are retained within KAPRH to satisfy any occasional need there may be for
-them. 
-  </p></abstract>
-  <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>kaplibs</build><build>hds</build><build>fio</build><build>gks</build><build>gns</build><build>idi</build><build>mers</build><build>ndf</build><build>prm</build><build>par</build><build>sae</build><build>trn</build><build>subpar</build><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-    </person>
-    <person>
-      <name>Malcolm Currie</name>
-      <uname>dsb</uname>
-    </person>
-  </developers>
-  <documentation> sun239</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -672,6 +618,37 @@ display of vector maps.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="scb">
+  <version>1.1-3</version>
+  <path>applications/scb</path>
+  <description>Source Code Browser</description>
+  <abstract>
+    <p>The Source Code Browser consists of two parts, an indexer program and an
+    extractor program.
+    The indexer need only be run infrequently (when the source code collection
+    changes), and the extractor can be run to extract a source file
+    by file- or function-name, either in plain text to the command line,
+    or in HTML including hyperlinks to called routines, viewable
+    using a WWW browser.  In the latter case, the extractor program
+    must be installed as a CGI script.
+    </p>
+  </abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation> sun225</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="sgmlkit">
   <version>0.7-13</version>
   <path>applications/sgmlkit</path>
@@ -776,7 +753,7 @@ display of vector maps.
     graphics user interfaces for Starlink applications in Tcl/Tk.</p>
   </abstract>
   <dependencies >
-    <build>starx</build><build>pcs</build><build>ems</build><build>gwm</build><build>mers</build><build>tcl</build><build>tk</build><build>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>starx</build><build>pcs</build><build>ems</build><build>gwm</build><build>mers</build><build>tcl</build><build>tk</build><build>nbs</build><build>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -847,6 +824,28 @@ display of vector maps.
   </developers>
   <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="init">
+  <version>1.1-26</version>
+  <path>etc/init</path>
+  <description>Starlink initialisation files</description>
+  <abstract>
+    <p>Initialisation files required for a Starlink install.
+    </p>
+  </abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Bly</name>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@starlink.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
