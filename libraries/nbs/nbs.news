@@ -1,6 +1,12 @@
 1 NBS_library
                                              Expires:  ??
 
+2.5-9
+
+  NBS library is now autonfed.
+
+2.5-4
+
 A new release (V2.5-4) of the NBS library is now available. NBS stores
 but does not make use of the type of primitive noticeboard items. In
 particular prior to version V2.5-4 the data address of primitive items

@@ -19,6 +19,7 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_LN_S
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS([time.h])
