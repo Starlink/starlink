@@ -42,6 +42,7 @@
 *                         drastically. (DJA)
 *     29 Nov 94 : V1.8-1  Fixed memory corruption bug (DJA)
 *     20 Mar 95 : V1.8-2  Trap case where dataset1==2 (DJA)
+*     10 Nov 95 : V2.0-0  ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -70,9 +71,11 @@
       REAL			AVX			! Average of 1st dataset
       REAL 			AVY			! Average of 2nd dataset
       REAL 			RESTORE			! DC restore value
+      REAL			SPARR(2)		! Spaced array vars
       REAL			XBASE, XSCALE		! X axis scaling
       REAL			YBASE, YSCALE		! Y axis scaling
 
+      INTEGER			BID			! Binned dataset id
       INTEGER			NLINES			! Amount of history
 
       INTEGER 				IDUM,M3,N3           ! Output dimensions
@@ -100,8 +103,6 @@
       INTEGER 			ODPTR			! Output data pointer
       INTEGER			OFID			! Output dataset
       INTEGER 			ONDIM                  	! Output dimensionality
-      INTEGER			QDIMS(ADI__MXDIM)	! Quality dimensions
-      INTEGER			QNDIM			! Quality dimensionality
       INTEGER 			SIZE			! Size of work arrays
 
       LOGICAL 			CYCLIC			! Cyclic mode?
@@ -113,54 +114,56 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'IXCONV Version 1.8-2' )
+        PARAMETER 		( VERSION = 'IXCONV Version 2.0-0' )
 *-
 
-*    Version announcement
+*  Version announcement
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
+*  Initialise
       CALL AST_INIT()
 
-*    Open first input dataset
-      CALL USI_TASSOCI( 'INP1', '*', 'READ', IFID1, STATUS )
-      CALL BDI_CHKDATA(IFID1,OK,NDIMS1,DIMS1,STATUS)
+*  Open first input dataset
+      CALL USI_ASSOC( 'INP1', 'BinDS', 'READ', IFID1, STATUS )
+      CALL BDI_CHK( IFID1, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID1, ADI__MXDIM, DIMS1, NDIMS1, STATUS )
       IF ( OK ) THEN
         IF ( NDIMS1 .NE. 2 ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'First input is not 2-D', STATUS )
         ELSE
-          CALL BDI_MAPDATA( IFID1, 'READ', DPTR_1, STATUS )
+          CALL BDI_MAPR( IFID1, 'Data', 'READ', DPTR_1, STATUS )
         END IF
       ELSE
         CALL ERR_REP( ' ', 'Invalid data in first dataset', STATUS )
       END IF
-      CALL BDI_CHKQUAL( IFID1, QOK1, QNDIM, QDIMS, STATUS )
+      CALL BDI_CHK( IFID1, 'Quality', QOK1, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-* Open 2nd input dataset
-      CALL USI_TASSOCI('INP2','*','READ',IFID2,STATUS)
-      CALL BDI_CHKDATA(IFID2,OK,NDIMS2,DIMS2,STATUS)
+*  Open 2nd input dataset
+      CALL USI_ASSOC( 'INP2', 'BinDS', 'READ', IFID2, STATUS )
+      CALL BDI_CHK( IFID2, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID2, ADI__MXDIM, DIMS2, NDIMS2, STATUS )
       IF (OK) THEN
         IF (NDIMS2.NE.2) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Second input is not 2-D', STATUS )
         ELSE
-          CALL BDI_MAPDATA(IFID2,'READ',DPTR_2,STATUS)
+          CALL BDI_MAPR( IFID2, 'Data', 'READ', DPTR_2, STATUS )
         END IF
       ELSE
         CALL ERR_REP( ' ', 'Invalid data in second dataset', STATUS )
       END IF
-      CALL BDI_CHKQUAL( IFID2, QOK2, QNDIM, QDIMS, STATUS )
+      CALL BDI_CHK( IFID2, 'Quality', QOK2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Warn if quality present
+*  Warn if quality present
       IF ( QOK1 .OR. QOK2 ) THEN
         CALL MSG_PRNT( 'WARNING : IXCONV is ignoring quality arrays '/
      :                 /'present in one or both inputs' )
       END IF
 
-*    Is a cyclic or non-cyclic convolution required?
+*  Is a cyclic or non-cyclic convolution required?
       IF ( (DIMS1(1).NE.DIMS2(1)) .OR. (DIMS1(2).NE.DIMS2(2)) ) THEN
         CALL MSG_SETI( 'NX', DIMS1(1) )
         CALL MSG_SETI( 'NY', DIMS1(2) )
@@ -182,24 +185,25 @@
 *    Set up OP dimensions
       ONDIM = 2
       IF ( CYCLIC ) THEN
-        ODIMS(1)=DIMS1(1)
-        ODIMS(2)=DIMS1(2)
+        ODIMS(1) = DIMS1(1)
+        ODIMS(2) = DIMS1(2)
       ELSE
-        ODIMS(1)=DIMS1(1)+DIMS2(1)
-        ODIMS(2)=DIMS1(2)+DIMS2(2)
+        ODIMS(1) = DIMS1(1)+DIMS2(1)
+        ODIMS(2) = DIMS1(2)+DIMS2(2)
       END IF
       M3 = ODIMS(1)
       N3 = ODIMS(2)
 
-*    Create new data array etc
-      CALL USI_TASSOCO( 'OUT', 'CONVOLUTION', OFID, STATUS )
+*  Create new data array etc
+      CALL BDI_NEW( 'BinDS', ONDIM, ODIMS, 'REAL', BID, STATUS )
+      CALL BDI_SETDST( BID, 'CONVOLUTION', STATUS )
+      CALL USI_CREAT( 'OUT', BID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Create data
-      CALL BDI_CREDATA(OFID,ONDIM,ODIMS,STATUS)
-
-*    Get input axes - if not regular assume pixels
-      CALL BDI_GETAXVAL( IFID1, 1, XBASE, XSCALE, IDUM, STATUS )
+*  Get input axes - if not regular assume pixels
+      CALL BDI_AXGET1R( IFID1, 1, 'SpacedData', 2, SPARR, IDUM, STATUS )
+      XBASE = SPARR(1)
+      XSCALE = SPARR(2)
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         XBASE = 0.5
@@ -208,10 +212,12 @@
         XUNITS = 'pixels'
         CALL MSG_PRNT( 'Unable to get X axis data, assuming pixels...' )
       ELSE
-        CALL BDI_GETAXLABEL( IFID1, 1, XLABEL, STATUS )
-        CALL BDI_GETAXUNITS( IFID1, 1, XUNITS, STATUS )
+        CALL BDI_AXGET0C( IFID1, 1, 'Label', XLABEL, STATUS )
+        CALL BDI_AXGET0C( IFID1, 1, 'Units', XUNITS, STATUS )
       END IF
-      CALL BDI_GETAXVAL( IFID1, 2, YBASE, YSCALE, IDUM, STATUS )
+      CALL BDI_AXGET1R( IFID1, 2, 'SpacedData', 2, SPARR, IDUM, STATUS )
+      YBASE = SPARR(1)
+      YSCALE = SPARR(2)
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         YBASE = 0.5
@@ -220,24 +226,27 @@
         YUNITS = 'pixels'
         CALL MSG_PRNT( 'Unable to get Y axis data, assuming pixels...' )
       ELSE
-        CALL BDI_GETAXLABEL( IFID1, 2, YLABEL, STATUS )
-        CALL BDI_GETAXUNITS( IFID1, 2, YUNITS, STATUS )
+        CALL BDI_AXGET0C( IFID1, 2, 'Label', YLABEL, STATUS )
+        CALL BDI_AXGET0C( IFID1, 2, 'Units', YUNITS, STATUS )
       END IF
 
-*    Create axes
-      CALL BDI_CREAXES(OFID,2,STATUS)
-      CALL BDI_PUTAXLABEL( OFID, 1, 'Lag in '//XLABEL, STATUS )
-      CALL BDI_PUTAXLABEL( OFID, 2, 'Lag in '//YLABEL, STATUS )
-      CALL BDI_PUTAXUNITS( OFID, 1, XUNITS, STATUS )
-      CALL BDI_PUTAXUNITS( OFID, 2, YUNITS, STATUS )
+*  Create axes
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Lag in '//XLABEL, STATUS )
+      CALL BDI_AXPUT0C( OFID, 2, 'Label', 'Lag in '//YLABEL, STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Units', XUNITS, STATUS )
+      CALL BDI_AXPUT0C( OFID, 2, 'Units', YUNITS, STATUS )
       XBASE = REAL(-M3)/2.0 + 0.5
       YBASE = REAL(-N3)/2.0 + 0.5
       IF ( .NOT. CYCLIC ) THEN
         XBASE = XBASE - 0.5
         YBASE = YBASE - 0.5
       END IF
-      CALL BDI_PUTAXVAL(OFID,1,XBASE*XSCALE,XSCALE,M3,STATUS)
-      CALL BDI_PUTAXVAL(OFID,2,YBASE*YSCALE,YSCALE,N3,STATUS)
+      SPARR(1) = XBASE*XSCALE
+      SPARR(2) = XSCALE
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+      SPARR(1) = YBASE*YSCALE
+      SPARR(2) = YSCALE
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
 
 *    Size of scratch arrays
       SIZE = M3*N3
@@ -255,7 +264,7 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
       CALL DYN_MAPD( 2, ODIMS, WPTR_XI, STATUS )
       CALL ARR_INIT1D( 0.0D0, M3*N3, %VAL(WPTR_XI), STATUS )
 
-*    Copy Y to (centre of) Y_Real, removing average
+*  Copy Y to (centre of) Y_Real, removing average
       CALL DYN_MAPD( 2, ODIMS, WPTR_YR, STATUS )
       IF ( SAME ) THEN
         CALL ARR_COP1D( M3*N3, %VAL(WPTR_XR), %VAL(WPTR_YR), STATUS )
@@ -264,22 +273,22 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
         CALL IXCONV_COPY2( DIMS2(1), DIMS2(2), %VAL(DPTR_2), M3, N3,
      :                   %VAL(WPTR_YR), AVY, STATUS )
       END IF
-      CALL BDI_UNMAPDATA( IFID2, STATUS )
+      CALL BDI_UNMAP( IFID2, 'Data', DPTR_2, STATUS )
 
-*    Fill Y_Imaginary array with zeroes
+*  Fill Y_Imaginary array with zeroes
       CALL DYN_MAPD( 2, ODIMS, WPTR_YI, STATUS )
       CALL ARR_INIT1D( 0.0D0, M3*N3, %VAL(WPTR_YI), STATUS )
 
-*    Trigm
+*  Trigm
       CALL DYN_MAPD( 1, 2*M3, WPTR_TM, STATUS )
 
-*    Trign
+*  Trign
       CALL DYN_MAPD( 1, 2*N3, WPTR_TN, STATUS )
 
-*    work
+*  Work
       CALL DYN_MAPD( 1, 2*M3*N3, WPTR_S, STATUS )
 
-*    Do FFT on X array
+*  Do FFT on X array
       CALL MSG_PRNT( 'Transforming first input...' )
       IFAIL=0
       CALL C06FUF( M3, N3, %VAL(WPTR_XR), %VAL(WPTR_XI), 'I',
@@ -292,7 +301,7 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
         GOTO 99
       END IF
 
-*    Do FFT on Y array
+*  Do FFT on Y array
       CALL MSG_PRNT( 'Transforming second input...' )
       IF ( SAME ) THEN
         CALL ARR_COP1D( M3*N3, %VAL(WPTR_XR), %VAL(WPTR_YR), STATUS )
@@ -309,8 +318,8 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
         END IF
       END IF
 
-*    Perform convolution. We write our output into the WPTR_S array which is
-*    big enough to hold both the real and imaginary parts of Z
+*  Perform convolution. We write our output into the WPTR_S array which is
+*  big enough to hold both the real and imaginary parts of Z
       WPTR_ZR = WPTR_S
       WPTR_ZI = WPTR_S + ODIMS(1)*ODIMS(2)*VAL__NBD
       CALL MSG_PRNT( 'Cross-correlating...' )
@@ -318,18 +327,18 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
      :                    %VAL(WPTR_YR), %VAL(WPTR_YI),
      :                    %VAL(WPTR_ZR), %VAL(WPTR_ZI), STATUS )
 
-*    Get rid of first dataset workspace
+*  Get rid of first dataset workspace
       CALL DYN_UNMAP( WPTR_XR, STATUS )
       CALL DYN_UNMAP( WPTR_XI, STATUS )
 
-*    Second dataset workspace becomes output workspace after copying ZR,ZI from
-*    WPTR_S into the Y arrays
+*  Second dataset workspace becomes output workspace after copying ZR,ZI from
+*  WPTR_S into the Y arrays
       CALL ARR_COP1D( M3*N3, %VAL(WPTR_ZR), %VAL(WPTR_YR), STATUS )
       CALL ARR_COP1D( M3*N3, %VAL(WPTR_ZI), %VAL(WPTR_YI), STATUS )
       WPTR_ZR = WPTR_YR
       WPTR_ZI = WPTR_YI
 
-*    Tranform to create output
+*  Tranform to create output
       CALL MSG_PRNT( 'Untransforming...' )
       CALL C06FUF( M3, N3, %VAL(WPTR_ZR), %VAL(WPTR_ZI), 'S',
      :             %VAL(WPTR_TM), %VAL(WPTR_TN), %VAL(WPTR_S), IFAIL )
@@ -341,20 +350,20 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
         GOTO 99
       END IF
 
-*    Unmap workspace (everything except WPTR_ZR)
+*  Unmap workspace (everything except WPTR_ZR)
       CALL DYN_UNMAP( WPTR_TM, STATUS )
       CALL DYN_UNMAP( WPTR_TN, STATUS )
       CALL DYN_UNMAP( WPTR_S, STATUS )
       CALL DYN_UNMAP( WPTR_ZI, STATUS )
 
-*    Inform user of averages
+*  Inform user of averages
       CALL MSG_SETR( 'AVX', AVX )
       CALL MSG_PRNT( 'The average of dataset 1 was ^AVX' )
       CALL MSG_SETR( 'AVY', AVY )
       CALL MSG_PRNT( 'The average of dataset 2 was ^AVY' )
 
-*    Copy result to output, adding back in mean if required. At same time
-*    rotate the array being copied so that zero shift is at centre.
+*  Copy result to output, adding back in mean if required. At same time
+*  rotate the array being copied so that zero shift is at centre.
       CALL USI_GET0L( 'DC_RESTORE', DC_RESTORE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( DC_RESTORE ) THEN
@@ -363,10 +372,10 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
         RESTORE = 0.0
       END IF
 
-*    Map the output data array
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+*  Map the output data array
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
 
-*    Bit of history here
+*  Bit of history here
       CALL HSI_ADD( OFID, VERSION, STATUS )
       HTXT(1) = 'Input 1 : {INP1}'
       HTXT(2) = 'Input 2 : {INP2}'
@@ -384,15 +393,15 @@ c      CALL BDI_UNMAPDATA( IFID1, STATUS )
       CALL USI_TEXT( 3, HTXT, NLINES, STATUS )
       CALL HSI_PTXT( OFID, NLINES, HTXT, STATUS )
 
-*    Copy the results to the output dataset. This is now a copy from double
-*    precision to single
+*  Copy the results to the output dataset. This is now a copy from double
+*  precision to single
       CALL IXCONV_COPY3( RESTORE, M3, N3, %VAL(WPTR_ZR),
      :                   %VAL(ODPTR), STATUS )
 
-*    Remove last bit of workspace
+*  Remove last bit of workspace
       CALL DYN_UNMAP( WPTR_ZR, STATUS )
 
-*    Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
