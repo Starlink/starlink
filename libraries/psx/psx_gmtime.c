@@ -74,6 +74,7 @@
 *  Authors:
 *     AJC: Alan Chipperfield (Starlink, RAL)
 *     AA: Alasdair Allan (Starlink, University of Exeter)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,10 @@
 *     30-JUN-2004 (AA):
 *        Defined *psxtmstr as NULL, otherwise we'll get an undefined
 *        symbol when linking using the new autoconf system.
+*     22-SEP-2004 (TIMJ):
+*        Remove the cast from nticks to time_t and replace with an internal
+*        variable since the cast does not work reliably if sizeof(Fortran int)
+*        != sizeof(time_t).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,6 +133,7 @@ F77_SUBROUTINE(psx_gmtime)( INTEGER(nticks),
 
 /* Local Variables:							    */
 
+   time_t timep;                 /* Local version of nticks */
    struct tm *timeptr;		 /* Pointer to a tm structure		    */
 
 /* Check inherited global status.					    */
@@ -137,7 +143,8 @@ F77_SUBROUTINE(psx_gmtime)( INTEGER(nticks),
 /* Convert the value in NTICKS to a structure contining real times.	    */
 /* It is the address of NTICKS that is passed, not its value.		    */
 
-   timeptr = gmtime( (const time_t *)nticks );
+   timep = (time_t) *nticks;
+   timeptr = gmtime( &timep );
 
    if ( timeptr != NULL ) {
 /* Extract the values from the structure.				    */

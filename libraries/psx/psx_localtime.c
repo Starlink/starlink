@@ -76,6 +76,7 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,9 @@
 *        Cast the temporary pointer to an F77 pointer.
 *     21-JUN-2000 (AJC)::
 *        Properly register and export TSTRCT (see CNF, SUN/209)
+*     22-SEP-2004 (TIMJ):
+*        Remove the cast from nticks to time_t and replace with an internal
+*        variable since the cast 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -139,6 +143,7 @@ F77_SUBROUTINE(psx_localtime)( INTEGER(nticks),
                                              /* defined in psx_gmtime       */
 /* Local Variables:							    */
 
+   time_t timep;                 /* Local version of nticks */
    struct tm *timeptr;		 /* Pointer to a tm structure		    */
 
 /* Check inherited global status.					    */
@@ -147,8 +152,8 @@ F77_SUBROUTINE(psx_localtime)( INTEGER(nticks),
 
 /* Convert the value in NTICKS to a structure contining real times.	    */
 /* It is the address of NTICKS that is passed, not its value.		    */
-
-   timeptr = localtime( (const time_t *)nticks );
+   timep = (time_t) *nticks;
+   timeptr = localtime( &timep );
 
 /* Extract the values from the structure.				    */
 

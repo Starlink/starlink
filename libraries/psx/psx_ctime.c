@@ -61,6 +61,11 @@
 *        Changed IMPORT and EXPORT macros to GENPTR.
 *     23-JUN-2000 (AJC):
 *        Tidy refs to CNF routines
+*     22-SEP-2004 (TIMJ):
+*        Use ctime_r if available.
+*        Remove the cast from nticks to time_t and replace with an internal
+*        variable since the cast does not work reliably if sizeof(Fortran int)
+*        != sizeof(time_t).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,7 +75,9 @@
 *-----------------------------------------------------------------------------
 */
 
-#include <config.h>
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 /* Global Constants:		.					    */
 
@@ -84,6 +91,8 @@
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "sae_par.h"		 /* ADAM constants			    */
 
+/* Number of characters mandated by ctime for buffer space */
+#define SZ_CTIME 26
 
 F77_SUBROUTINE(psx_ctime)( INTEGER(nticks), CHARACTER(string),
                            INTEGER(status) TRAIL(string) )
@@ -97,8 +106,12 @@ F77_SUBROUTINE(psx_ctime)( INTEGER(nticks), CHARACTER(string),
 
 /* Local Variables:							    */
 
+   time_t timep;                 /* Local version of nticks */
    int i;			 /* Loop counter			    */
-   char time_s[26];		 /* The string returned by asctime	    */
+   char time_s[SZ_CTIME+1];	 /* The string returned by asctime	    */
+#if HAVE_CTIME && !HAVE_CTIME_R
+   char * temps;                 /* Pointer to static string given by ctime */
+#endif
 
 /* Check inherited global status.					    */
 
@@ -107,7 +120,21 @@ F77_SUBROUTINE(psx_ctime)( INTEGER(nticks), CHARACTER(string),
 /* Convert NTICKS and copy it to time_s.				    */
 /* ctime requires the address of nticks, not its value.			    */
 
-   strcpy( time_s, ctime( (const time_t *)nticks ) );
+   timep = (time_t) *nticks;
+#if HAVE_CTIME_R
+   ctime_r( &timep, time_s );
+#else 
+#  if HAVE_CTIME
+   temps = ctime( &timep );
+   if (temps) {
+     strncpy( time_s, temps, (size_t)SZ_CTIME );
+   } else {
+     strcpy( time_s, "<undefined>" );
+   }
+#  else
+#    error do not know how to convert time_t to string
+#  endif
+#endif
 
 /* Remove the newline character at the end of the string.		    */
 

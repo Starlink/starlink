@@ -33,6 +33,9 @@ AC_CHECK_FUNCS([getgid])
 AC_CHECK_FUNCS([getegid])
 AC_CHECK_FUNCS([getuid])
 AC_CHECK_FUNCS([ttyname])
+AC_CHECK_FUNCS([ctime ctime_r])
+AC_CHECK_FUNCS([gmtime gmtime_r])
+AC_CHECK_FUNCS([localtime localtime_r])
 
 dnl    MinGW Windows libraries and functions. Checking for the functions,
 dnl    fails (not enough like UNIX) so must check for the declaration only.
