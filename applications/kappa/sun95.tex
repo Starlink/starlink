@@ -3349,7 +3349,8 @@ What you must do is as follows.
 over-written by the output from the next command. Alternatively, you can
 specified the device to use separately when running each command, including an
 explicit unique file name in each device specification (see above).
-\item Use \PSMERGEref\ to combine the plots.
+\item Use \PSMERGEref\ (the Starlink version, usually in /star/bin) to 
+combine the plots.
 \end{itemize}
 
 To give an example, suppose we wanted to overlay a contour plot
@@ -3360,7 +3361,7 @@ on an image.
     % gdset epsfcol_l
     % display $KAPPA_DIR/comwest lut=$KAPPA_DIR/spectrum_lut mode=ra axes
     % mv pgplot.ps display.ps
-    % contour noclear mode=au \\
+    % contour noclear mode=au noaxes \\
     % mv pgplot.ps contour.ps
     % psmerge display.ps contour.ps  > myplot.ps
     % rm display.ps contour.ps 
@@ -3373,7 +3374,7 @@ or alternatively:
 \begin{verbatim}
     % display $KAPPA_DIR/comwest device="epsfcol_l;display.ps" \
               lut=$KAPPA_DIR/spectrum_lut mode=ra axes
-    % contour noclear device="epsfcol_l;contour.ps" mode=au \\
+    % contour noclear device="epsfcol_l;contour.ps" mode=au noaxes \\
     % psmerge display.ps contour.ps  > myplot.ps
     % rm display.ps contour.ps 
 \end{verbatim}
@@ -3529,7 +3530,7 @@ Values specified using ``Ticks2'' override any supplied using ``Ticks''. \\
 A collection of attribute settings is called a \emph{plotting style}.
 Attributes which are not specified in a plotting style take on default
 values as described later. An example of a plotting style is contained in
-the file {\tt \$KAPPA\_DIR/style.def}. This file defines the default
+the file {\tt \$KAPPA\_DIR/kappa\_style.def}. This file defines the default
 style used by {\footnotesize KAPPA}.
 
 In general each graphical application will determine the plotting style
@@ -44968,7 +44969,7 @@ previously had many parameters to control the appearance of the plot
 parameter instead. The value supplied for a STYLE parameter should be a
 group of {\em plotting attributes}. Defaults for unspecified plotting
 attributes are read from text files within \$KAPPA\_DIR (\emph{e.g.}
-\verb+$KAPPA_DIR/style.def+}. Alternative defaults files may be specified 
+\verb+$KAPPA_DIR/kappa\_style.def+}. Alternative defaults files may be specified 
 by setting environment variables (\emph{e.g.} {\tt KAPPA\_STYLE}) to hold 
 the name of the defaults file to use.
 
