@@ -142,7 +142,7 @@ javadocs:
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/etc
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/util/bin
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/util/bin
      [copy] Copying 1 file to /apps/cvsbuild/java/source/util/etc
 
 create_archives:
