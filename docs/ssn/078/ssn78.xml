@@ -228,7 +228,8 @@
               <p>If you want to start building and using software from
                 the repository, then start with
                 <ref id="starlink-cvs"/> or
-                <ref id="buildingcomponents"/>.</p>
+                <ref id="buildingcomponents"/> and work outwards from
+                there.</p>
             </li>
             <li>
               <p>If you want to add another component to the
@@ -1583,27 +1584,37 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           installation of starconf, and choose which one to invoke,
           but there is unlikely any need for that).</p>
 
-        <p>Two important variables are
-          <code>STARCONF_DEFAULT_PREFIX</code><index>STARCONF_DEFAULT_PREFIX</index> and
-          <code>STARCONF_DEFAULT_STARLINK</code><index>STARCONF_DEFAULT_STARLINK</index>.
-          The first is the
-          default installation prefix of the software you are
+        <p>Two very important variables are
+          <code>STARCONF_DEFAULT_PREFIX</code><index>environment
+          variables!STARCONF_DEFAULT_PREFIX</index> and
+          <code>STARCONF_DEFAULT_STARLINK</code><index>environment
+          variables!STARCONF_DEFAULT_STARLINK</index>.  The first is
+          the default installation prefix of the software you are
           building; the second is the location of a currently built
           Starlink tree, which will be used for applications and
           include files if they are not found under
           <code>STARCONF_DEFAULT_PREFIX</code>.  The value for each of
-          these was set when starconf was itself installed (see
-          <kbd>./configure --help</kbd> within
-          <code>buildsupport/starconf</code>: having different values
-          for this is one possible reason why you might have more than
-          one starconf installation), but their value is typically
-          something like <code>/star</code>.  When you configure a
-          particular package, you can set the installation prefix with
-          the <code>--prefix</code> option to
+          these was set when starconf was itself built and installed,
+          most typically at bootstrap time (see <kbd>./configure
+          --help</kbd> within <code>buildsupport/starconf</code>:
+          having different values for this is one possible reason why
+          you might have more than one starconf installation), but
+          their value is typically something like <code>/star</code>.
+          These variables are important at <em>bootstrap time</em>,
+          either the whole-tree bootstrap from the top level, or the
+          per-component bootstrap within a single directory.  When you
+          configure a particular package, you can set the installation
+          prefix with the <code>--prefix</code> option to
           <code>./configure</code>, and you can set the location of
           the `backup' Starlink directory by setting the
-          <code>STARLINK</code> environment variable.  In general,
-          however, we recommend that you do not adjust
+          <code>STARLINK</code><index>environment
+          variables!STARLINK</index> environment variable.  Thus the
+          <code>--prefix</code> option and the <code>STARLINK</code>
+          variable are important at <em>configure</em> time rather
+          than bootstrap time, and gain their defaults from the
+          <code>STARCONF_DEFAULT_...</code> variables.</p>
+
+        <p>In general, however, we recommend that you do not adjust
           <code>--prefix</code>, and that you leave the
           <code>STARLINK</code> variable unset.</p>
 
@@ -2580,8 +2591,8 @@ autoconf  dtask     hdspar  mers     msp      psx       sst   subpar
         <p>Lines 2-4: unset the <code>STARLINK</code> and
           <code>INSTALL</code> variables, and
           set the two starconf variables as
-          shown<index>STARCONF_DEFAULT_PREFIX</index>.  For a
-          whole-tree
+          shown<index>environment variables!STARCONF_DEFAULT_PREFIX</index>.
+          For a whole-tree
           build, these two should have the same value, to ensure that
           the build uses only tools and libraries which have been
           built at an earlier point in the build.  For fuller details
@@ -2591,6 +2602,23 @@ autoconf  dtask     hdspar  mers     msp      psx       sst   subpar
           commands for manipulating the environment; you will of
           course use the csh-style <code>setenv</code> and
           <code>unsetenv</code> if you're using that shell.</p>
+
+        <p>Also at this point you should review any other environment
+          variables that might affect the build.  For example, the
+          variables <code>F77</code>, <code>FC</code> and
+          <code>CC</code> will force the build system to use the
+          specified compilers.  In particular, the default IRAF
+          installation sets the <code>F77</code> variable to be a
+          script which works happily in most cases, but which will
+          _not_ work with libtool, and will cause the build to fail
+          with opaque error messages about being `unable to infer
+          tagged configuration'.  Unless you do wish to force certain
+          compilers to be used, it is probably better to unset these
+          variables before building the software.  Try
+          <kbd>./configure --help</kbd> for a list of `some
+          influential environment variables', and <ref
+          id="configure-script"/> for more discussion of this
+          issue.</p>
 
         <p>Line 5: the directory where the components are to be
           installed can be empty, and need not exist at the
@@ -2686,99 +2714,128 @@ autoconf (GNU Autoconf) 2.59
         <p>If, on the other hand, you wish to build only one
           component, because you wish to install the latest and
           greatest version of some application, or because you want to
-          work on the CVS version, then you do not need to build the
-          entire code collection.  However you do still need a
-          complete built Starlink directory somewhere (and an
-          old-style Starlink release will not do); see the end of this
-          section for details.</p>
+          work on the CVS version, then you can do that without, in
+          principle, building the entire code collection.</p>
 
-        <p>In this case, you may need to specify two things, namely
-          where your newly-built component is to be installed, and
-          where it is to find any other Starlink applications and
-          libraries it requires.  See the end of this section for
-          details on how to do this.</p>
-
-        <p>Generally, however, you don't have to worry about
-          intricate configuration matters.  You simply move to the
-          component's directory, and give the commands
+        <p>The component directories are organised so that you can
+          build a component from a CVS checkout by moving to the
+          component's directory and giving the sequence of commands:
           <verbatim>
 % ./bootstrap
 % ./configure
 % make
 % make install
 </verbatim>
-          to build the single component from a CVS checkout.</p>
+          Before you can do this, however, you will have to do a
+          little preparation, and there are two cases.</p>
 
         <p>One of the functions of the <code>./bootstrap</code> script
           is to regenerate the <code>./configure</code> script if
-          necessary, since it is not checked in to the repository.  This
-          requires that the Starlink-specific autotools are in your
-          path, and so you must first install these `buildsupport'
-          tools if they are not installed
+          necessary, since it is not checked in to the repository.
+          This requires that the Starlink-specific autotools are in
+          your path, and so you must first install these
+          `buildsupport' tools if they are not installed
           already<index>bootstrapping!buildsupport</index>.
-          Instructions for 
-          that are <ref id="bootstrappingonly">below</ref>.</p>
+          Instructions for that are <ref id="bootstrappingonly"
+          >below</ref>.</p>
 
-        <p>That should be all you have to do before starting work.
-          The above will generate a <code>Makefile</code> which will
-          build the current component, and install it in the default
-          location which <em>starconf</em> has been configured with.</p>
+        <p>There are two cases next.  The first is where you currently
+          have a built and installed Starlink system which you either
+          built yourself earlier, or which you installed from a
+          Starlink distribution (note: a Starlink CD distribution
+          dating before 2005 doesn't count here -- though the
+          applications and libraries are essentially the same, the
+          distribution and building arrangements changed radically).
+          The second case is where you are only interested in one
+          component, but are starting from scratch, without a
+          pre-existing distribution (of course, once you successfully
+          complete the second case, you are in the situation where the
+          first case applies).</p>
 
-        <p>If you do need to adjust things, however, here's how.</p>
+        <p><strong>Case 1 -- pre-built Starlink system:</strong> This
+          is the easy one.  You need check out only the component of
+          interest (see <ref id="tool-cvs-recursion"/> for notes on
+          that).
+          <ul>
+            <li><p>Change to the component's directory.</p></li>
+            <li><p>Define the environment variable
+                <code>STARCONF_DEFAULT_STARLINK</code> to point to the top
+                of the existing tree, which might be <code>/star</code> or
+                its equivalent.</p></li>
+            <li><p>Define <code>STARCONF_DEFAULT_PREFIX</code> to
+                point to the same place if you want to install your new
+                versions there, or to a different location if you want to
+                install them separately.</p></li>
+          </ul>
+          At this point you can run <code>./bootstrap</code> as above,
+          and have these locations baked in to the configuration as
+          the defaults.</p>
 
-        <p>You control where the component is to be installed with the
-          <code>--prefix</code> option to the <code>./configure</code>
-          script.  The default value for this prefix is baked in to
-          the <code>./configure</code> script, and controlled by the
-          starconf application.</p>
+        <p>Alternatively, you can control these two locations at
+          configure time, <em>after</em> you have run
+          <code>./bootstrap</code>.  You control the installation
+          location with the <code>--prefix</code> option and the
+          location of the Starlink tree either with the
+          <code>STARLINK</code> environment variable or, better, with
+          the <code>--with-starlink</code> option.  Although the use
+          of the <code>STARLINK</code> variable is supported, it
+          involves less (easily forgettable) defaulting if you use the
+          <code>--with-starlink</code> option instead.  See <ref
+          id="configure-script"/> for details.  Having said this,
+          setting the <code>STARCONF_DEFAULT...</code> variables is
+          probably preferable, since you don't then have to remember
+          to supply the options if you run <code>./configure</code>
+          again.</p>
 
-        <p>You can control where the configuration process finds other
-          Starlink applications in a broadly similar way.  The default
-          location which is examined is specified by the
-          <code>STARCONF_DEFAULT_STARLINK</code><index>STARCONF_DEFAULT_STARLINK</index>
-          variable, which is examined just as the
-          <code>STARCONF_DEFAULT_PREFIX</code> variable was above.
-          That can be overridden by setting the environment variable
-          <code>STARLINK</code>, and that can be overridden in turn by
-          the <code>--with-starlink</code> option to the
-          <code>./configure</code> script.  We recommend that you
-          generally leave the <code>STARLINK</code> variable unset,
-          and use either the first or the last of these methods
-          instead.</p>
-
-        <p>If you are starting from scratch, and don't have a
-          pre-built Starlink directory available, then you will have
-          to build all or most of the tree, before the component
-          you're interested on can be built.  In this case, follow the
-          instructions in <ref id="bootstrapping"/>, but instead of
-          finishing with <kbd>make world</kbd> in step 9, do <kbd>make
+        <p><strong>Case 2 -- building from scratch:</strong> This
+          isn't actually much more complicated, but does take a little
+          longer.  You need to check out all of the components that
+          your component depends on; since there is (currently) no
+          automatic way to discover what this set of components is, in
+          practice you might as well check out the whole repository.  Since
+          you don't have a pre-built Starlink directory available,
+          then you will have to build all or most of the tree, before
+          the component you're interested in can be built.  In this
+          case, follow the instructions in <ref id="bootstrapping"/>
+          -- which include setting the
+          <code>STARCONF_DEFAULT_...</code> variables to suitable
+          values -- but instead of finishing with <kbd>make
+          world</kbd> in step 9, do <kbd>make
           /mystar/manifests/cpt</kbd>, where <code>/mystar</code> is
           the location you have chosen for the installation tree (as
-          in <code>STARCONF_DEFAULT_STARLINK</code>), and
+          specified in <code>STARCONF_DEFAULT_STARLINK</code>), and
           <code>cpt</code> is the component you are interested in.
           This will build and install in turn each of your component's
-          dependencies, and then the component itself.  After that,
-          you can start working on your component, in the knowledge
-          that all the libraries it depends on are indeed available in
-          the local installation tree.</p>
+          dependencies, and then the component itself.</p>
 
-        <p>If you want to keep the functioning version separate from
-          your development version, then you need to go through this
-          procedure once with <code>STARCONF_DEFAULT_STARLINK</code>
-          and <code>..._PREFIX</code> having the same values (to
-          create a functioning version), and then either bootstrap
-          your development component a second time, with
+        <p>If you are doing this because you want the latest and
+          greatest version of a particular component, then you are
+          finished.</p>
+
+        <p>If you are doing this because you want to do development
+          work on the component, then you might well want to keep the
+          functioning version separate from your development version.
+          In this case, you need to go through this procedure once
+          with <code>STARCONF_DEFAULT_STARLINK</code> and
+          <code>..._PREFIX</code> having the same values, as above.
+          Next, you change to the component's directory, and either
+          bootstrap your development component a second time, with
           <code>STARCONF_DEFAULT_PREFIX</code> set to a separate
-          installation location, or else re-run
+          installation location (you are now in the situation where
+          case 1 applies, above, and you can give the comments
+          <kbd>./bootstrap; ./configure; make</kbd>); or else re-run
           <code>./configure</code> with its <code>--prefix</code>
           option set to point to that alternative location (the first
-          mechanism simply sets the default for the second).</p>
+          mechanism simply sets the default for the second, and is
+          probably preferable for the reasons mentioned above).</p>
 
         <p>Note that part of the function of the
           <code>./configure</code> script is to find the location of
           important files and freeze them in to the Makefile.  Thus
-          you cannot, in general, change the <code>STARLINK</code> variable or
-          change your path, and have new binaries picked up.</p>
+          the <code>STARLINK</code> variable is ignored after
+          configure-time, so that you cannot, in general, change the
+          <code>STARLINK</code> variable or change your path, and have
+          new binaries picked up.</p>
 
       </subsect>
 
@@ -2890,8 +2947,8 @@ bin_MONOLITHS = foo
           the autotools plus starconf -- but does not go on to
           bootstrap the rest of the tree.  The functions of the
           variables <code>STARCONF_DEFAULT_PREFIX</code> and
-          <code>STARCONF_DEFAULT_STARLINK</code> were described in the
-          previous section: in order to configure starconf at this
+          <code>STARCONF_DEFAULT_STARLINK</code> were described in
+          <ref id="starconf"/>: in order to configure starconf at this
           stage, you must define these two variables <em>as environment
             variables</em> before running the <code>./bootstrap</code>
           script.  This will cause the tools to be installed in the
@@ -4257,27 +4314,6 @@ M Makefile.dependencies
         </subhead>
 
         <p><dl>
-            <dt>If a executable is built that is used to create some
-              file during the build, how do I prevent it from being
-              installed?</dt>
-            <dd>
-              <p>Use the <code>noinst</code> prefix when you declare
-                the program.  See <ref id="automakeoverview"/>.</p>
-            </dd>
-
-            <dt>How do I put things in
-              <code>/star/{docs,etc,examples,help}</code>?</dt>
-            <dd>
-              <p>In the <code>Makefile.am</code> use the
-                <code>DATA</code> prefixes <code>stardocs</code>,
-                <code>staretc</code>, and so on.  In
-                <code>configure.ac</code>, use the macros
-                <code>STAR_DOCS_FILES</code>,
-                <code>STAR_ETC_FILES</code> and so on.  See <ref
-                  id="macro-special-dirs"/> for details, and
-                <ref id="automakeoverview"/> for an example.</p>
-            </dd>
-
             <dt>How do I control which compiler and compiler options I
               use?</dt>
             <dd>
@@ -4299,6 +4335,133 @@ M Makefile.dependencies
                 using <code>noinst_</code> tools, the Fortran
                 preprocessor, and <code>./configure</code> variables
                 in a reasonably tidy way.</p>
+            </dd>
+
+            <dt>I want to do odd things at clean/distribution time.
+            How?<index>make targets!clean</index></dt>
+            <dd>
+              <p>Odder than what is described in <ref
+                  id="autodistrib"/>?</p>
+
+              <p>Automake also has support for extending what is cleaned
+                and what is included in the distribution, though this
+                does not have to be as elaborate as the support for
+                extended installation above.  See the
+                documentation on <code>CLEANFILES</code> and
+                <code>EXTRA_DIST</code> in the Automake manual.</p>
+            </dd>
+
+            <dt>I want to make distribution tarballs install into
+              <code>/star</code>.  How?<index>distribution!setting
+              prefix</index></dt>
+            <dd>
+              <p>See the description of <code>./bootstrap</code> in
+                <ref id="rolldistribution"/>.</p>
+            </dd>
+
+            <dt>How do I write portable Makefiles and shell scripts?</dt>
+            <dd>
+              <p>The autoconf manual has a very useful collection of
+                portability advice in its section
+                manual <webref url="&autoconfhtml;/autoconf_114.html"
+                  ><em>Portable Shell Programming</em></webref>.  Also,
+                the <webref
+                  url="http://www.unix.org/version3/"
+                  >Single Unix Specification, version 3</webref>
+                provides standardised specifications of the behaviour
+                of Unix library functions and system utilities.  The
+                Single Unix core specification is identical to POSIX.3
+                (IEEE Std 1003.1) and ISO/IEC 9945:2003.
+              </p>
+            </dd>
+
+            <dt id="tagged-error">I've just been told that libtool is
+              ``unable to infer tagged configuration''.  What on earth
+              is that supposed to mean?</dt>
+            <dd>
+              <p>I'm not sure what this is supposed to mean
+                <em>exactly</em>, but what it seems to mean in
+                practice is that libtool has become terribly confused
+                about your compiler.  Very probably, you forced
+                <code>./configure</code> to use a particular compiler
+                by specifying one of the <code>F77</code>,
+                <code>FC</code> or <code>CC</code> environment
+                variables at configure time.  You may have forgotten
+                that you have that variable set.</p>
+
+              <p>Alternatively, you may be unaware that that variable
+                is set: a known manifestation of this problem is that
+                the IRAF startup script sets <code>F77</code> to be an
+                IRAF-specific script, which works OK from the
+                command-line (given that you want to use IRAF), but
+                which leaves libtool in a confused heap.</p>
+
+              <p>This problem has also been spotted in the form
+                <code>libtool: compile: specify a tag with
+                  `--tag'</code>, with apparently the same cause.</p>
+
+              <p>See <ref id="configure-script"/> for more discussion
+                of these variables.</p>
+            </dd>
+
+            <dt>It's all going horribly wrong.  Help!</dt>
+            <dd>
+              <p>Things to think about:
+                <ol>
+                  <li>
+                    <p>Are there some stray environment variables?
+                      Environment variables such as <code>F77</code>
+                      or <code>CC</code> influence the compilers
+                      chosen at configure time, as discussed in <ref
+                        id="configure-script"/>.  There is a
+                      particular problem with the IRAF startup script
+                      often sourced from the <code>.login</code> file:
+                      see <ref id="tagged-error"/>.</p>
+                  </li>
+                  <li>
+                    <p>Are the buildsupport tools up to date?  This is
+                      fairly unlikely (once the build system becomes a
+                      production system), but might be worth
+                      checking.  See <ref id="bootstrappingonly"/>.</p>
+                  </li>
+                  <li>
+                    <p>Think how happy you are that life has been good
+                      to you so far.</p>
+                  </li>
+                </ol>
+              </p>
+            </dd>
+
+          </dl>
+        </p>
+        
+      </subsect>
+
+      <subsect id="install-faqs" export="export" indexkey="installation">
+        <subhead>
+          <title>Installation FAQs</title>
+        </subhead>
+
+        <p><dl>
+            <dt>I have an executable which creates some
+              files during the build -- how do I prevent it from being
+              installed?</dt>
+            <dd>
+              <p>Use the <code>noinst</code> prefix when you declare
+                the program.  See <ref id="automakeoverview"/>.</p>
+            </dd>
+
+            <dt>How do I install things in
+              <code>/star/{docs,etc,examples,help}</code>?</dt>
+            <dd>
+              <p>In the <code>Makefile.am</code> use the
+                <code>DATA</code> prefixes <code>stardocs</code>,
+                <code>staretc</code>, and so on.  In
+                <code>configure.ac</code>, use the macros
+                <code>STAR_DOCS_FILES</code>,
+                <code>STAR_ETC_FILES</code> and so on.  See <ref
+                  id="macro-special-dirs"/> for details, and
+                <ref id="automakeoverview"/> for an example.</p>
             </dd>
 
             <dt id="nobase-faq">Automake flattens paths when it
@@ -4328,8 +4491,7 @@ M Makefile.dependencies
                   id="config-cfitsio"/>.</p>
             </dd>
 
-            <dt>I want to do odd things at install time.
-              How?<index>installation</index></dt> 
+            <dt>I want to do odd things at install time.  How?</dt> 
             <dd>
               <p>Automake provides a couple of escape hatches for
                 installing extra material.  These are the
@@ -4415,72 +4577,8 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
                 The option <code>rm -f</code> is portable.</p>
             </dd>
 
-            <dt>I want to do odd things at clean/distribution time.
-            How?<index>make targets!clean</index></dt>
-            <dd>
-              <p>Odder than what is described in <ref
-                  id="autodistrib"/>?</p>
-
-              <p>Automake also has support for extending what is cleaned
-                and what is included in the distribution, though this
-                does not have to be as elaborate as the support for
-                extended installation above.  See the
-                documentation on <code>CLEANFILES</code> and
-                <code>EXTRA_DIST</code> in the Automake manual.</p>
-            </dd>
-
-            <dt>I want to make distribution tarballs install into
-              <code>/star</code>.  How?<index>distribution!setting
-              prefix</index></dt>
-            <dd>
-              <p>See the description of <code>./bootstrap</code> in
-                <ref id="rolldistribution"/>.</p>
-            </dd>
-
-            <dt>How do I write portable Makefiles and shell scripts?</dt>
-            <dd>
-              <p>The autoconf manual has a very useful collection of
-                portability advice in its section
-                manual <webref url="&autoconfhtml;/autoconf_114.html"
-                  ><em>Portable Shell Programming</em></webref>.  Also,
-                the <webref
-                  url="http://www.unix.org/version3/"
-                  >Single Unix Specification, version 3</webref>
-                provides standardised specifications of the behaviour
-                of Unix library functions and system utilities.  The
-                Single Unix core specification is identical to POSIX.3
-                (IEEE Std 1003.1) and ISO/IEC 9945:2003.
-              </p>
-            </dd>
-
-            <dt>I've just been told that libtool is ``unable to infer
-              tagged configuration''.  What on earth does that
-              mean?</dt>
-
-            <dd>
-              <p>I'm not what this is supposed to mean
-                <em>exactly</em>, but what it seems to mean in
-                practice is that libtool has become terribly confused
-                about your compiler.  Very probably, you forced
-                <code>./configure</code> to use a particular compiler
-                by specifying one of the <code>F77</code>,
-                <code>FC</code> or <code>CC</code> environment
-                variables at configure time.  You may have forgotten
-                that you have that variable set.  Alternatively, you
-                may be unaware that that variable is set: a known
-                manifestation of this problem is that the IRAF startup
-                script sets <code>F77</code> to be an IRAF-specific
-                script, which works OK from the command-line (given
-                that you want to use IRAF), but which leaves libtool
-                in a confused heap.</p>
-
-              <p>See <ref id="configure-script"/> for more discussion
-                of these variables.</p>
-            </dd>
-
           </dl>
-        </p>
-        
+</p>
       </subsect>
 
       <subsect id="state-faqs" export="export" indexkey="state">
@@ -5357,7 +5455,7 @@ file.f: file.$(FPP_SRC_EXT)
                   is defined, so that you can use it elsewhere in your
                   <code>configure.ac</code> file.  The value of this
                   variable depends on the
-                  <code>STARCONF_DEFAULT_STARLINK</code><index>STARCONF_DEFAULT_STARLINK</index>
+                  <code>STARCONF_DEFAULT_STARLINK</code><index>environment variables!STARCONF_DEFAULT_STARLINK</index>
                   variable which is defined by the
                   <code>./starconf.status</code> script (see <ref
                     id="starconf"/>), and can be
