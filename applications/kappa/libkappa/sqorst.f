@@ -436,7 +436,7 @@
 
 *  If using Nearest Neighbour interpolation, also map the QUALITY array.
          IF( HASQUA .AND. INTERP .EQ. AST__NEAREST ) THEN
-            CALL NDF_MAP( NDFI, 'DATA', '_UBYTE', 'READ', IPQUAI, EL, 
+            CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, EL, 
      :                    STATUS )
          ELSE
             HASQUA = .FALSE.
