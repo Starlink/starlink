@@ -106,6 +106,8 @@
       CALL GMD_PUTINDEX( LOC, NUM, ENTRY, STATUS )
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GMI_PUTINDEX', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'GMI_PUTINDEX', STATUS )
+      END IF
 
       END
