@@ -83,6 +83,9 @@
 *        are short and made allowance for proportionally spaced text.
 *     5-MAR-1998 (DSB):
 *        Modified for use with PGPLOT.
+*     11-AUG-2000 (DSB):
+*        Modified to allow suppression or replacement of key title text
+*        using the Title attribute of the supplied Plot.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,7 +132,7 @@
 
 *  Local Variables:
       CHARACTER KEYTXT*80        ! Text describing the key vector
-      CHARACTER VSCTXT*80        ! Text describing scale
+      CHARACTER VSCTXT*80        ! Title text 
       DOUBLE PRECISION ATTS( 20 )! Saved graphics attribute values
       INTEGER CUNITS             ! Number of characters in units
       INTEGER FS0                ! Fill-area Style attribute on entry
@@ -137,6 +140,8 @@
       INTEGER MAXNC              ! Length of longest line of text
       INTEGER MXUNIT             ! Max. number of characters in units
       INTEGER VSCNC              ! Significant length of VSCTXT
+      LOGICAL DRTOP              ! Draw the "Vector scale:" string?
+      LOGICAL DRTTL              ! Draw any title string?
       REAL AHSIZE                ! Arrowhead size in world coordinates
       REAL BASE                  ! Power of ten just less than KEYDAT
       REAL GAP                   ! Vertical spacing factor
@@ -171,39 +176,59 @@
 *  and get the extent of the window in world coordinates, and metres.
       CALL KPG1_GDQPC( X1, X2, Y1, Y2, XM, YM, STATUS )
 
+*  See if a Title is to be drawn for the key.
+      DRTTL = AST_GETL( IPLOT, 'DRAWTITLE', STATUS )
+
+*  See if a Title has been supplied. If so, get it.
+      IF( AST_TEST( IPLOT, 'TITLE', STATUS ) ) THEN
+         VSCTXT = AST_GETC( IPLOT, 'TITLE', STATUS )
+         VSCNC = MAX( 1, CHR_LEN( VSCTXT ) )
+
+*  Note we do not need to draw the "Vector scale" string.
+         DRTOP = .FALSE.
+
+*  Otherwise construct a default title, giving the scale as a number ofd
+*  data units per centimetre.
+      ELSE
+
+*  Note we do need to draw the "Vector scale" string.
+         DRTOP = .TRUE. 
+
 *  Format the vector scale value (data units per centimetre), using the Plot's 
 *  1st axis format attribute.
-      VSCTXT = AST_FORMAT( IPLOT, 1, DBLE( VSCALE ), STATUS )
-      VSCNC = CHR_LEN( VSCTXT )
+         VSCTXT = AST_FORMAT( IPLOT, 1, DBLE( VSCALE ), STATUS )
+         VSCNC = CHR_LEN( VSCTXT )
 
 *  Increment the position of the last significant character in order to
 *  produce a space after the VSCALE value.
-      VSCNC = VSCNC + 1
+         VSCNC = VSCNC + 1
 
 *  Decide how much of the units string will appear in the scale
 *  caption.  Get the length of the UNITS.  The allowed length in the
 *  caption is 32 characters less the space and the value, and 3 for the
 *  "/cm" in the first scale specification.
-      IF ( UNITS .NE. ' ' ) THEN
-         CUNITS = CHR_LEN( UNITS )
-         MXUNIT = 29 - VSCNC
+         IF ( UNITS .NE. ' ' ) THEN
+            CUNITS = CHR_LEN( UNITS )
+            MXUNIT = 29 - VSCNC
 
 *  Append the data units to the scale string.  Truncate the string if
 *  necessary, terminating with an ellipsis.  Otherwise just use the
 *  supplied units string.  For a null input units, set a default of
 *  "Data Units".
-         IF ( CUNITS .GT. MXUNIT ) THEN
-            CALL CHR_APPND( UNITS( 1:MXUNIT-3 ), VSCTXT, VSCNC )
-            CALL CHR_APPND( '...', VSCTXT, VSCNC )
+            IF ( CUNITS .GT. MXUNIT ) THEN
+               CALL CHR_APPND( UNITS( 1:MXUNIT-3 ), VSCTXT, VSCNC )
+               CALL CHR_APPND( '...', VSCTXT, VSCNC )
+            ELSE
+               CALL CHR_APPND( UNITS, VSCTXT, VSCNC )
+            END IF
          ELSE
-            CALL CHR_APPND( UNITS, VSCTXT, VSCNC )
+            CALL CHR_APPND( 'Data Units', VSCTXT, VSCNC )
          END IF
-      ELSE
-         CALL CHR_APPND( 'Data Units', VSCTXT, VSCNC )
-      END IF
 
 *  Now append "/cm"  (i.e. "per centimetre").
-      CALL CHR_APPND( '/cm', VSCTXT, VSCNC )
+         CALL CHR_APPND( '/cm', VSCTXT, VSCNC )
+
+      END IF
 
 *  Find the data value corresponding to a vector length equal to the
 *  largest allowed fraction of the width of the key picture.  If the 
@@ -282,10 +307,17 @@
 
 *  Produce text describing the vector scale in words.  Left justify.
       XL = X1 + 0.01 * ( X2 - X1 )
-      CALL PGTEXT( XL, YC - 0.5*HGT, 'Vector scale:' )
+      IF( DRTTL ) THEN 
 
-      YC = YC - GAP * 2.0 * HGT
-      CALL PGTEXT( XL, YC - 0.5*HGT, VSCTXT( : VSCNC ) )
+         IF( DRTOP ) THEN
+            CALL PGTEXT( XL, YC - 0.5*HGT, 'Vector scale:' )
+            YC = YC - GAP * 2.0 * HGT
+         END IF
+
+         CALL PGTEXT( XL, YC - 0.5*HGT, VSCTXT( : VSCNC ) )
+         YC = YC - GAP * 2.0 * HGT
+
+      END IF
 
 *  Find the length of the key vector, in the world co-ordinate system
 *  of the key picture.
@@ -304,7 +336,7 @@
 *  indiciating the justification.  Draw the vector justified to the
 *  left, but allowing room for the circle when the justification is
 *  left justified too.
-      YC = YC - GAP * 3.0 * HGT
+      YC = YC - GAP * HGT
       RADIUS = MIN( 0.1 * KEYLEN, ( X2 - X1 ) * CIRAD )
 
       IF ( JUST .EQ. 'START' ) THEN
