@@ -24,6 +24,7 @@
  *     Options: One or more of:
  *              -c - generate C header file    (<facility name>_err.h)
  *              -f - generate f77 include file (<facility name>_err)
+ *              -F - as -f, but with uppercase output (<facility name>_ERR)
  *              -e - generate error definition file
  *                                             (fac_<facility number>_err)
  *              -v - Output diagnostic informations about messgen run
@@ -35,6 +36,7 @@
  *  Authors:
  *     BKM: B.K. McIlwrath (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
+ *     NG: Norman Gray (Starlink)
  *     {enter_new_authors_here}
 
  *  History:
@@ -55,6 +57,8 @@
  *        Output conditional include test to C header file
  *     29-APR-2003 (BKM):
  *        Convert from sys_errlist[] to using strerrno() 
+ *     10-DEC-2003 (NG):
+ *        Add -F option
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -65,6 +69,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 
 #define MAXLINE 101
 
@@ -72,6 +77,7 @@ unsigned int errcode, fac_code=0, message_number=1, severity=0;
 char fac_name[10], fac_prefix[10];
 
 int f77_include=0, c_header=0, c_error=0, verify=0;
+int f77_uppercase=0;            /* if true, output uppercase filename */
 
 static int
 parse_facility(char buffer[MAXLINE])
@@ -195,6 +201,11 @@ process_file(char *filename)
 		}
 		if (f77_include) {
 		    sprintf(file_name, "%s_err", buffer);
+                    if (f77_uppercase) {
+                        char *p;
+                        for (p=file_name; *p!=0; p++)
+                            *p = toupper(*p);
+                    }
 		    if ((fp1 = fopen( file_name, "w")) == NULL ) {
 			fprintf(stderr, "Cannot open %s\n", file_name);
 			return;
@@ -320,6 +331,10 @@ main(int argc, char *argv[])
 		  case 'f':
 		    f77_include = 1;
 		    break;
+                  case 'F':
+                    f77_include = 1;
+                    f77_uppercase = 1;
+                    break;
 		  case 'c':
 		    c_header = 1;
 		    break;
