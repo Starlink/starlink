@@ -3153,19 +3153,27 @@
       INTEGER			MAXPT
         PARAMETER		( MAXPT = 512 )
 
+      INTEGER			MAXDEG
+        PARAMETER		( MAXDEG = 8 )
+
 *  Local Variables:
-      DOUBLE PRECISION		PFX(MAXPT)
-      DOUBLE PRECISION	       	PFY(MAXPT)
-      DOUBLE PRECISION		YP, YFIT
+      REAL			PFX(-MAXPT:MAXPT)
+      REAL			PFXN(-MAXPT:MAXPT)
+      REAL			PFXR(-MAXPT:MAXPT)
+      REAL	       		PFY(-MAXPT:MAXPT)
+      REAL			WORKC((MAXDEG*2)+1)
+      REAL			WORKA(MAXDEG+2,MAXDEG+2)
+      REAL			SUMSQ, YFIT
+      REAL			COEFFS(MAXDEG+2)
 
       REAL			MEAN			! Mean sample value
       REAL			MINFR, MAXFR		! Extreme residuals
       REAL			FR, RMSFR		! RMS frac residual
-      REAL			WRKC(MAXPT*2+1)	! Poly workspace
-
+      REAL			XMIN, XMAX
       REAL			XW1, XW2, YW1, YW2	! Worst positions
       REAL			XW, YW, R, Y2		! Pixel radius bits
 
+      INTEGER			DEG			! Degree of fit
       INTEGER			FMODE			! Fitting mode
       INTEGER			I, J			! Loop over image
       INTEGER			IR			! Radial bin number
@@ -3174,7 +3182,7 @@
       INTEGER			MINFR_X, MINFR_Y	! Min position
       INTEGER			NFR			! # residuals
       INTEGER			NGS			! # good samples
-      INTEGER			PFAIL			! PDA status code
+c      INTEGER			PFAIL			! PDA status code
       INTEGER			S			! Loop over samples
 *.
 
@@ -3251,6 +3259,8 @@
               NGS = NGS + 1
               PFX(NGS) = (REAL(I)-0.5) * I_BGM_RBIN
               PFY(NGS) = SAMM(I)
+              PFX(1-NGS) = - (REAL(I)-0.5) * I_BGM_RBIN
+              PFY(1-NGS) = SAMM(I)
             END IF
           END DO
 
@@ -3263,8 +3273,16 @@
           ELSE
 
 *        Compute coefficients
-            PFAIL = 0
-            CALL PDA_DPLINT( NGS, PFX, PFY, WRKC, PFAIL )
+c            PFAIL = 0
+c            CALL PDA_DPLINT( NGS, PFX, PFY, WRKC, PFAIL )
+
+*        Choose degree
+            DEG = 4
+
+*        Compute coefficients
+            CALL MATH_POLY( .TRUE., NGS*2, PFX(1-NGS), .FALSE., 0,
+     :                      DEG, WRKA, WRKB, PFY(1-NGS), COEFFS,
+     :                      PFXN, SUMSQ, XMAX, XMIN )
 
           END IF
 
@@ -3304,9 +3322,9 @@
                 XW = XW - I_BGM_X0
                 R = SQRT( XW*XW + Y2 ) / I_BGM_RBIN
 
-*            Evaluate polynomial
-                CALL PDA_DPOLVL( 0, DBLE(R), YFIT, YP, NGS, PFX,
-     :                           WRKC, PFAIL )
+*            Evaluate polynomial. Normalise R
+                NR = (2*R-XMAX-XMIN)/(XMAX-XMIN)
+                CALL MATH_EPOLY( 1, DEG, COEFFS, NR, YFIT, STATUS )
 
 *            Store value
                 BGMOD(I,J) = YFIT
