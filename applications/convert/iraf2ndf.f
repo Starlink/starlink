@@ -59,13 +59,14 @@
 *     -  The title of the IRAF image (object i_title in the ".imh"
 *     header file) becomes the NDF title.  Likewise headers OBJECT and
 *     BUNIT become the NDF label and units respectively.
+*     -  The pixel origin is set if any LBOUNDn headers are present.
 *     -  Lines from the IRAF image header file may be transferred to
 *     the FITS extension of the NDF, when PROFITS=TRUE.  Any 
 *     compulsory FITS keywords that are missing are added.  Certain
 *     other keywords are not propagated.  These are the IRAF "Mini
 *     World Coordinate System" (MWCS) keywords WCSDIM, DC_FLAG,
 *     WATd_nnn (d is dimension, nnn is the line number).  Certain
-*     NDF-style HISTORY lines in the header may also be ignored when
+*     NDF-style HISTORY lines in the header are also be ignored when
 *     PROHIS=TRUE (see two notes below).
 *     -  When PROFITS=TRUE, lines from the HISTORY section of the IRAF
 *     image are also extracted and added to the NDF's FITS extension as
@@ -144,6 +145,7 @@
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 *     GJP: Grant Privett (STARLINK, University of Wales, Cardiff)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -181,10 +183,20 @@
 *        Added PROFITS and PROHIS facilities.  Now propagates axis
 *        information, and the NDF label and units.  Expanded and
 *        corrected the documentation, including a second example.
-*        Improved the code structure.
+*        Improved the code structure.  Removed the conversion of the
+*        IRAF filename to lowercase.
 *     1997 September 25 (MJC):
 *        Protect against case where PROFITS=TRUE but there are no
 *        headers.
+*     13-NOV-1997 (AJC):
+*        Set bounds of NDF according to LBOUNDn keywords if any.
+*        Correct number of arguments to CON_CI2DW/CI2DR.
+*     1997 November 17 (MJC):
+*        No longer attempts to close the IRAF file if the open-file
+*        subroutine fails.  IMCLOS crashes otherwise.  Propagates all
+*        IRAF history records (including blanks) to the FITS airlock
+*        when PROFITS=TRUE.  IRAF HISTORY lines which are too long for
+*        a FITS header are truncated with an ellipsis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -242,11 +254,12 @@
       INTEGER NHDRLI             ! Number of IRAF header lines
       INTEGER NROWS              ! Number of rows
       INTEGER NTICKS             ! Returned by PSX_TIME
+      LOGICAL OPEN               ! IRAF file is open
       INTEGER PNTR( 1 )          ! Pointer to NDF data array
       LOGICAL PROFIT             ! Propagate headers to FITS
       LOGICAL PROHIS             ! Propagate NDF-style headers to
                                  ! HISTORY structure in the NDF
-      INTEGER REPNTR             ! Pointer to header propagation flags
+      INTEGER REPNTR             ! Pointer to header-propagation flags
       INTEGER SPNTR              ! Pointer to spec1 buffer workspace
       CHARACTER * ( 70 ) TITLE   ! Title of the NDF 
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF axes
@@ -259,6 +272,7 @@
 
 *  Initialise the IRAF status.
       ERR = 0
+      OPEN = .FALSE.
 
 *  Access the input IRAF image.
 *  ============================
@@ -266,9 +280,6 @@
 *  Get the name of the IRAF image.
       CALL PAR_GET0C( 'IN', IRAFIL, STATUS )
             
-*  Convert file name to lower case.
-*      CALL CHR_LCASE( IRAFIL )
-       
 *  Access mode is 1 for read only and 3 for read and write access.
       ACCESS = 1
 
@@ -281,6 +292,9 @@
      :     STATUS )
          GOTO 999
       END IF
+
+*  Record that the IRAF file was opened successfully.
+      OPEN = .TRUE.
 
 *  Obtain the shape of the IRAF image.
 *  ===================================
@@ -314,18 +328,29 @@
          GOTO 999
       END IF
 
-*  Define the bounds.
+*  Define the bounds according to any LBOUNDn keywords in the header.
+*  ==================================================================
+*
+*  Use the IRAF convention to define the array's shape.
       NCOLS = DIMS( 1 )
       NROWS = DIMS( 2 )
       NBANDS = DIMS( 3 )
 
-      LBND( 1 ) = 1
-      LBND( 2 ) = 1
-      LBND( 3 ) = 1
+*  Look for any LBOUNDn keywords.  Just use the default origin when
+*  the keyword is absent, as indicated by a non-zero IRAF status.
+      CALL IMGKWI( IMDESC, 'LBOUND1', LBND( 1 ), ERR ) 
+      IF ( ERR .NE. 0 ) LBND( 1 ) = 1
 
-      UBND( 1 ) = NCOLS
-      UBND( 2 ) = NROWS
-      UBND( 3 ) = NBANDS
+      CALL IMGKWI( IMDESC, 'LBOUND2', LBND( 2 ), ERR ) 
+      IF ( ERR .NE. 0 ) LBND( 2 ) = 1
+
+      CALL IMGKWI( IMDESC, 'LBOUND3', LBND( 3 ), ERR ) 
+      IF ( ERR .NE. 0 ) LBND( 3 ) = 1
+
+*  Set the upper bounds.
+      UBND( 1 ) = LBND( 1 ) + NCOLS - 1
+      UBND( 2 ) = LBND( 2 ) + NROWS - 1
+      UBND( 3 ) = LBND( 3 ) + NBANDS - 1
 
 *  Set the type of the NDF.
 *  ========================
@@ -365,12 +390,10 @@
 *  the IRAF image will be extracted and propagated to the NDF array.
       IF ( DTYPE .EQ. 3 ) THEN
          CALL CON_CI2DW( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
-     :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), ERR,
-     :                   STATUS )
+     :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), STATUS )
       ELSE
          CALL CON_CI2DR( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
-     :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), ERR,
-     :                   STATUS )
+     :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), STATUS )
       END IF
 
 *  Obtain other parameters.
@@ -505,7 +528,7 @@
  999  CONTINUE
 
 *  Close the IRAF image
-      CALL IMCLOS(IMDESC, ERR )
+      IF ( OPEN ) CALL IMCLOS( IMDESC, ERR )
 
 *  Check for error from IMFORT, ie err is not equal to 0.
       IF ( ERR .NE. 0 ) THEN
