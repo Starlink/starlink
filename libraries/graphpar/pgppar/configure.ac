@@ -24,10 +24,8 @@ AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae gks par])
+STAR_DECLARE_DEPENDENCIES([build], [sae gks par pgp])
 STAR_DECLARE_DEPENDENCIES([link],  [pgp psx gns chr gks])
-
-STAR_MESSGEN(pgp_err.msg)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

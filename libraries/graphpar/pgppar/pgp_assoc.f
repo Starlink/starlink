@@ -74,7 +74,7 @@
 
       INCLUDE 'GNS_PAR'          ! GNS Symbolic Constants
 
-      INCLUDE 'pgp_err'          ! PGP Error codes
+      INCLUDE 'PGP_ERR'          ! PGP Error codes
 
       INCLUDE 'pgpenv_par'       ! PGP Environment Symbolic Constants
 
