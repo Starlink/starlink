@@ -5497,8 +5497,6 @@ static int GetEncoding( AstFitsChan *this ){
    int ret;            /* Returned value */
    int icard;          /* Index of current card on entry */
 
-   int a, b, c, d;
-
 /* Check the global status. */
    if( !astOK ) return UNKNOWN_ENCODING;
 
