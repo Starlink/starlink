@@ -35,6 +35,14 @@ for pid in \
 done 
 echo " OK"
 
+# Kill ukirtfig
+echo "Killing ukirtfig task ..."
+for pid in \
+   `ps -a -f -u ${user} | grep /ukirtfig | grep -v grep | nawk '{print $2}'` ;\
+   do kill -9 ${pid} ;\
+done 
+echo " OK"
+
 # Kill global sections
 echo "Killing global sections ..."
 for section in \
