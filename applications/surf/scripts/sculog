@@ -311,13 +311,36 @@ foreach $scufile (@sortndf) {
       $fitsitem{"FILT_$i"} = undef;
     }
 
+    # If it's a planet (moving source) we need to use MEANRA
     # Convert radians RA and DEC to HMS/DMS
-    
-    $ra_rad = $fitsitem{'MEANRA'} * $pi / 180.0;
-    $dec_rad= $fitsitem{'MEANDEC'} * $pi / 180.0;
 
-    ($ra_sign, @ra) = Dr2tf(2,$ra_rad);
-    ($dec_sign, @dec) = Dr2af(1,$dec_rad);
+    @ra = ();
+    @dec = ();
+
+    if ($fitsitem{'CENT_CRD'} eq 'PLANET') {
+
+      $ra_rad = $fitsitem{'MEANRA'} * $pi / 180.0;
+      $dec_rad= $fitsitem{'MEANDEC'} * $pi / 180.0;
+
+      ($ra_sign, @ra) = Dr2tf(2,$ra_rad);
+      ($dec_sign, @dec) = Dr2af(1,$dec_rad);
+
+      # combine the result such that the minus joins with the first entry
+      # and the seconds receive the decimal places.
+      $dec[0] = $dec_sign.$dec[0] if ($dec_sign eq '-');
+      $ra[2] .= ".".pop(@ra);
+      $dec[2] .= ".".pop(@dec);
+
+    } else {
+      
+      # Read the requested map centre
+      $lat = $fitsitem{'LAT'};
+      $long = $fitsitem{'LONG'};
+
+      @ra = split(/:/,$lat);
+      @dec = split(/:/,$long);
+
+    }
 
     # Read EQUINOX
 
@@ -649,8 +672,8 @@ $date $value
 format MAP =
 @<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
-   RA:  @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
-@ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
    Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
 $mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
    Throw: @>>>> arcsec @< PA: @<<  Integrations: @<<<<  Measurements: @<<<<
@@ -668,8 +691,8 @@ $fitsitem{'OBSDEF'}, $fname
 format FLATFIELD =
 @<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
-   RA:  @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
- @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
    Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
 $mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
    Throw: @>>>> arcsec @< PA: @<<  Integrations: @<<<<  Measurements: @<<<<
@@ -720,8 +743,8 @@ $fitsitem{'OBSDEF'}, $fname
 format POINTING =
 @<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
-   RA:  @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
- @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
    Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
 $mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
    Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
@@ -740,8 +763,8 @@ $fitsitem{'OBSDEF'}, $fname
 format FOCUS = 
 @<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
-   RA: @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
- @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
    Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
 $mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
    Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
@@ -758,8 +781,8 @@ $fitsitem{'OBSDEF'}, $fname
 format ALIGN = 
 @<<<<   @<<<<<<<<<<<<<<<<   @<<<< @<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'ALIGN_AX'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
-   RA: @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
- @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
    Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
 $mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
    Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
@@ -777,8 +800,8 @@ $fitsitem{'OBSDEF'}, $fname
 format PHOTOM =
 @<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
-   RA: @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
- @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
    Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
 $mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
    Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
