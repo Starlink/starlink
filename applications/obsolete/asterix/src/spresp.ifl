@@ -2,7 +2,7 @@ INTERFACE SPRESP
 
   PARAMETER INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     ASSOCIATION '<->GLOBAL.BINDS'
     VPATH       'PROMPT'
     PPATH       'GLOBAL'
