@@ -157,6 +157,7 @@
       private method addchoice { text } {
 #-----------------------------------------------------------------------
          set val [ text2list $text ]
+         if { [ catch { $omenu index $text } ] == 0 } return
          if { $val == "custom" } {
             $omenu insert end $text
             return
