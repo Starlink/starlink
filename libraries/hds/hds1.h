@@ -5,6 +5,9 @@
 /* ===============							    */
 #include <limits.h>
 #include <string.h>
+#if defined( HAVE_CONFIG_H )    /* configure definitions                    */
+#include <config.h>
+#endif
 
 /* VMS include files:							    */
 /* =================							    */
@@ -21,14 +24,16 @@
 /* This will only need to be extended if new implementations of file	    */
 /* mapping are added (which will normally require coding changes in the	    */
 /* file access routines). The default for new machines is to assume no file */
-/* mapping unless the _mmap macro is defined.				    */
+/* mapping unless the _mmap macro is defined or the configure property	    */
+/* HAVE_MMAP is true                                                        */
 #if defined( vms )		 /* VMS implementation			    */
 #define HDS__CANMAP 1		 /* File mapping supported?		    */
 #define HDS__MAPSEQ 0		 /* Mapping best for sequential access?	    */
 #define HDS__MAPSPARSE 1	 /* Mapping best for sparse access?	    */
 #define HDS__MAPMEM 1		 /* Mapping best to reduce memory usage?    */
 
-#elif defined( _mmap )		 /* UNIX implementation using mmap:	    */
+#elif defined( _mmap) || defined( HAVE_MMAP ) 
+                                 /* UNIX implementation using mmap:	    */
 #define HDS__CANMAP 1		 /* File mapping supported?		    */
 #define HDS__MAPSEQ 1		 /* Mapping best for sequential access?	    */
 #define HDS__MAPSPARSE 1	 /* Mapping best for sparse access?	    */
@@ -70,7 +75,7 @@
 /* ================							    */
 /* Use vfork for more efficient child process creation if supported,	    */
 /* otherwise use the POSIX.1 fork function.				    */
-#if defined( _vfork )
+#if defined( _vfork ) || defined( HAVE_WORKING_VFORK )
 #define _fork vfork
 #else
 #define _fork fork

@@ -24,6 +24,10 @@ AC_PROG_LIBTOOL
 AC_C_BIGENDIAN
 AC_FC_LIBRARY_LDFLAGS
 
+dnl    Check for OS features we would like
+AC_FUNC_VFORK
+AC_FUNC_MMAP
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    MinGW doesn't have this one.
