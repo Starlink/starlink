@@ -1,20 +1,17 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
-AC_INIT(kaplibs-kpg, 2.7-3, ussc@star.rl.ac.uk)
+AC_INIT(kaplibs-ira, 2.7-3, ussc@star.rl.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([KPG_PAR])
+AC_CONFIG_SRCDIR([IRA_PAR])
 
 dnl    Include defaults for Starlink configurations
-# STAR_DEFAULTS starts
 STAR_DEFAULTS
-# ...STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
-AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 

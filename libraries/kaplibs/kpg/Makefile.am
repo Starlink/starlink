@@ -163,3 +163,5 @@ kpg1_dnag2r.f  kpg1_dr2nag.f  kpg1_nag2r.f  kpg1_r2nag.f
 
 .gdr.f:
 	$(GENERIC)  -t dr $<
+
+AM_FCFLAGS = -I../ctm -I../ira
