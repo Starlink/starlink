@@ -38,7 +38,8 @@
 *     IFRAME = LITERAL (Read)
 *        The integer index or Domain name of the Frame within the
 *        FrameSet which describes the coordinate system upon which the 
-*        new one is to be based.
+*        new one is to be based (the strings AST__BASE and AST__CURRENT 
+*        may also be supplied).
 *     MAP = LITERAL (Read) 
 *        An NDF or text file holding the Mapping which describes how to 
 *        convert coordinates from the old coordinate system (described by the
