@@ -95,6 +95,7 @@
             USED(MIAX) = .TRUE.
 
           END DO
+          IAX = LEN(AXORD)
 
 *      Any dimensions not covered by specification
           IF ( IAX .LT. NDIM ) THEN
