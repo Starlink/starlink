@@ -23,7 +23,7 @@ sc13.$(VERSION)-package.tar: \
 sc13.$(VERSION).tar-htx: sc13.sgml ReleaseNotes examples/fpp.c.sgml
 	SGML_CATALOG_FILES=$(DOCDIR)/document-summaries/CATALOG:$(STARLINK_SGML_DIR)/dtd/CATALOG \
 	BIBINPUTS=$$PWD \
-		$(SGML2DOCS) --html --tarball $@ sc13.sgml
+		$(SGML2DOCS) --html --options=sgmlnorm --tarball $@ sc13.sgml
 
 sc13.$(VERSION).tar-tex: sc13.sgml ReleaseNotes examples/fpp.c.sgml
 	SGML_CATALOG_FILES=$(DOCDIR)/document-summaries/CATALOG:$(STARLINK_SGML_DIR)/dtd/CATALOG \
@@ -40,8 +40,16 @@ sc13.$(VERSION).ps: sc13.$(VERSION).tar-tex
 		latex sc13; \
 		latex sc13; \
 		dvips sc13 -o sc13.ps
-	ln sc13.latex/sc13.ps $@
+	ln -f sc13.latex/sc13.ps $@
 
 sc13.$(VERSION)-examples.tar:
-	cd examples; $(MAKE) -f Makefile.in sc13-examples.tar
-	ln examples/sc13-examples.tar $@
+	cd examples; $(MAKE) -f Makefile.in $@
+	ln -f examples/$@ $@
+
+tidy:
+	rm -f *~
+
+clean: tidy
+	rm -f *.gz *.tar-htx *.tar-tex *.tar
+	rm -Rf sc13.htx
+	cd examples; $(MAKE) -f Makefile.in clean
