@@ -185,7 +185,7 @@ onintr SIGNAL
 if ("$pstype" == "BSD") then
    set pscmd = "ps l $$"
 else 
-   set pscmd = "ps -p $$ -opid -oppid -ocmd"
+   set pscmd = "ps -p $$ -opid -oppid -ocomm"
 endif
 set ppid = `$pscmd | getfield field=PPID`
 if ("$ppid" == "") then
@@ -196,7 +196,7 @@ endif
 if ("$pstype" == "BSD") then
    set parent_pscmd = "ps $ppid"
 else
-   set parent_pscmd = "ps -p $ppid -opid -ocmd"
+   set parent_pscmd = "ps -p $ppid -opid -ocomm"
 endif
 
 # Main loop checking process status
@@ -215,12 +215,11 @@ while (`$parent_pscmd |& getfield field=PID`)
       # Application has changed since we last looked.  
       # Write summary to log and reset values.
       #
-      printf >> $logfile "$format" \
-        "$label_last" \
-        "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" 
+      ( printf >> $logfile "$format" \
+          "$label_last" \
+          "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" ) >& /dev/null
       set rss_max = 0
       set size_max = 0
-      echo "$label_last" "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" 
    endif
 
    # Find the process we're interested in.
