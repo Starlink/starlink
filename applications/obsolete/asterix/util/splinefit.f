@@ -2,12 +2,10 @@
       SUBROUTINE SPLINEFIT( STATUS )
 *
 *    Description :
-*
 *     Computes and applies a cubic spline approximation to an arbitrary set
 *     of data points.
 *
 *    Environment parameters :
-*
 *     INP = UNIV(R)
 *        Input dataset
 *     SQ_RES = REAL(R)
@@ -22,37 +20,35 @@
 *    Bugs :
 *
 *    Authors :
-*
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham)
 *
 *    History :
-*
 *     11 Jun 91 : Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     20 Apr 95 : V1.8-1 New data interface (DJA)
 *     13 Dec 1995 : V2.0-0 ADI port (DJA)
+*     24 Jun 1997 : V2.1-0 Replace NAG with PDA (RB)
+
 *    Type definitions :
-*
       IMPLICIT NONE
-*
+
 *    Global constants :
-*
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-*
+
 *    Status :
-*
       INTEGER STATUS
-*
+
 *    Local constants :
-*
       INTEGER                   MAXLINES
         PARAMETER               ( MAXLINES = 6 )
       CHARACTER*6     		MTYPE
-        PARAMETER               ( MTYPE = 'DOUBLE' )
-*
+        PARAMETER               ( MTYPE = 'REAL' )
+      INTEGER			K
+        PARAMETER		( K = 3 )
+
 *    Local variables :
-*
       CHARACTER*80              TEXT(MAXLINES)         ! History text
 
       REAL                      SQ_RES                 ! Spline fit control
@@ -63,7 +59,7 @@
       INTEGER                   IDPTR, IVPTR, IQPTR    ! Input data
       INTEGER			IFID			! Input dataset id
       INTEGER                   IAPTR(ADI__MXDIM)      ! pointers
-      INTEGER                   LIWRK, IWRKPTR         ! NAG integer workspace
+      INTEGER                   LIWRK, IWRKPTR         ! PDA integer workspace
       INTEGER                   DIMS(ADI__MXDIM)       ! Input data size
       INTEGER                   KNOTPTR(ADI__MXDIM)    ! Knot position arrays
       INTEGER                   MAXKNOT                ! Maximum no of knots
@@ -76,14 +72,13 @@
       INTEGER			OFID			! Output dataset id
       INTEGER                   TLEN                    ! String length
       INTEGER                   WGTPTR                  ! Weights array
-      INTEGER                   LWRK,WRKPTR             ! NAG float workspace
+      INTEGER                   LWRK,WRKPTR             ! PDA float workspace
 
       LOGICAL                   OK                     ! General validity
       LOGICAL                   QUAL_OK, VAR_OK        ! Quality,variance ok?
       LOGICAL                   USE_WEIGHTS            ! Use variance & quality
-*
+
 *    Version :
-*
       CHARACTER*30		VERSION
         PARAMETER  		( VERSION = 'SPLINEFIT Version 2.1-0b' )
 *-
@@ -93,7 +88,6 @@
 
 *  Initialise
       CALL MSG_PRNT(VERSION)
-      CALL NAG_MISSING( 'E02DCF, E02DDF', STATUS )
       CALL AST_INIT()
 
 *  Get input and output
@@ -187,7 +181,7 @@
 *  Map space for knots
       MAXKNOT = 1
       DO I = 1, NDIM
-        NEST(I) = DIMS(I) + 4
+        NEST(I) = DIMS(I) + K + 1
         MAXKNOT = MAXKNOT * NEST(I)
       END DO
       CALL DYN_MAPT( 1, MAXKNOT, MTYPE, KNOTPTR(1), STATUS )
@@ -200,7 +194,7 @@
 
 *  Floating point workspace
       IF ( NDIM .EQ. 1 ) THEN
-        LWRK = 4*NELM + 16*NEST(1) + 41
+        LWRK = NELM*(K+1) + NEST(1)*(7+3*K)
       ELSE
         LWRK = 4*(DIMS(1)+DIMS(2)) + 11*(NEST(1)+NEST(2)) +
      :        NEST(1)*DIMS(1) + MAX( DIMS(2), NEST(1)) + 54
@@ -224,6 +218,7 @@
      :               %VAL(IWRKPTR), NKNOT, ACC, %VAL(ODPTR), STATUS )
 
       ELSE IF ( ( NDIM .EQ. 2 ) .AND. .NOT. USE_WEIGHTS ) THEN
+        CALL NAG_MISSING( 'E02DCF, E02DDF', STATUS )
         CALL SPLINEFIT_2D( DIMS, %VAL(IAPTR(1)), %VAL(IAPTR(2)),
      :              %VAL(IDPTR), SQ_RES, NEST, %VAL(KNOTPTR(1)),
      :                      %VAL(KNOTPTR(2)), %VAL(COEFF), LWRK,
@@ -258,7 +253,7 @@
 
 
 
-*+  SPLINEFIT_WGTD - Find weights array from input DOUBLE variances
+*+  SPLINEFIT_WGTD - Find weights array from input REAL variances
       SUBROUTINE SPLINEFIT_WGTD( N, V_OK, VAR, Q_OK, QUAL, WGT, STATUS )
 *
 *    Description :
@@ -283,17 +278,17 @@
 *
       INTEGER                    N                  ! Number of data items
       LOGICAL                    V_OK               ! Variance ok?
-      DOUBLE PRECISION           VAR(*)             ! Variance data
+      REAL                       VAR(*)             ! Variance data
       LOGICAL                    Q_OK               ! Quality ok?
       LOGICAL                    QUAL(*)            ! Quality data
 *
 *    Export :
 *
-      DOUBLE PRECISION           WGT(*)             ! Weights array
+      REAL                       WGT(*)             ! Weights array
 *
 *    Local constants :
 *
-      DOUBLE PRECISION           SMALL
+      REAL                       SMALL
          PARAMETER               ( SMALL = 1.0E-10 )
 *
 *    Local variables :
@@ -351,87 +346,76 @@
 *    Deficiencies :
 *    Bugs :
 *    Authors :
-*
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (University of Birmingham)
 *
 *    History :
-*
 *     11 Jun 91 : Original (BHVAD::DJA)
+*     24 Jun 97 : Convert to PDA (RB)
 *
 *    Type definitions :
-*
       IMPLICIT NONE
 *
 *    Global constants :
-*
       INCLUDE 'SAE_PAR'
 *
 *    Import :
-*
       INTEGER                    N                      ! Total no. of elements
-      DOUBLE PRECISION           DATA(*)                ! Data
-      DOUBLE PRECISION           AXIS(*)                ! Axis data
-      DOUBLE PRECISION           WGT(*)                 ! Weights
+      REAL                       DATA(*)                ! Data
+      REAL                       AXIS(*)                ! Axis data
+      REAL                       WGT(*)                 ! Weights
       REAL                       SFACTOR                ! Accuracy factor
       INTEGER                    NEST                   ! Max number of knots
 *
 *    Workspace :
-*
       INTEGER                    LWRK                   ! Amount of FLOAT work
-      DOUBLE PRECISION           WRK(*)                 !
-      INTEGER                    LIWRK                  ! Amount of INT work
+      REAL                       WRK(*)                 !
+      INTEGER                    LIWRK                  ! Amount of INTEGER work
       INTEGER                    IWRK(*)                !
 *
 *    Export :
-*
-      DOUBLE PRECISION           LAMBDA(*), C(*)        ! Knot positions
+      REAL                       LAMBDA(*), C(*)        ! Knot positions
       INTEGER                    NKNOT                  ! # of knots
       REAL                       FP                     ! Fit achieved
-      DOUBLE PRECISION           OUT(*)                 ! Fit data
+      REAL                       OUT(*)                 ! Fit data
 *
 *    Status :
-*
       INTEGER STATUS
 *
 *    Local variables :
-*
-      CHARACTER*1                START                  ! NAG control variable
-
-      DOUBLE PRECISION           DFP                    ! Fit residual
-
-      INTEGER                    I                      ! Loop over data values
-      INTEGER                    IFAIL                  ! NAG status
+      INTEGER                    IFAIL                  ! PDA status
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
-      START = 'C'
-      IFAIL = -1
-
 *    Perform fit
-c     CALL E02BEF(START, N, AXIS, DATA, WGT, DBLE(SFACTOR), NEST, NKNOT,
-c    :                          LAMBDA, C, DFP, WRK, LWRK, IWRK, IFAIL )
-      FP = REAL( DFP )
+      IFAIL = 0
+      CALL PDA_CURFIT( 0, N, AXIS, DATA, WGT, AXIS(1), AXIS(N), 3,
+     :                 SFACTOR, NEST, NKNOT, LAMBDA, C, FP,
+     :                 WRK, LWRK, IWRK, IFAIL )
 
 *    Trap fit failure
       IF ( IFAIL .GT. 0 ) THEN
-        IF ( IFAIL .GT. 3 ) THEN
-          CALL MSG_PRNT('The fit could not reach the requested'/
-     :                                             /' accuracy')
-        ELSE
-          CALL MSG_PRNT('! error in the spline fit')
+        IF ( IFAIL .EQ. 1 ) THEN
+          CALL MSG_PRNT( 'Insufficient storage space for spline fit' )
           STATUS = SAI__ERROR
           GOTO 99
+        ELSE IF ( IFAIL .EQ. 2 ) THEN
+          CALL MSG_PRNT( 'Impossible result from spline fit' )
+        ELSE IF ( IFAIL .EQ. 3 ) THEN
+          CALL MSG_PRNT( 'Maximum number of interations reached' )
+        ELSE IF ( IFAIL .EQ. 10 ) THEN
+          CALL MSG_PRNT( 'Input variable out of range for spline fit' )
         END IF
       END IF
 
 *    Evaluate spline
-      IFAIL = -1
-      DO I = 1, N
-c       CALL E02BBF( NKNOT, LAMBDA, C, AXIS(I), OUT(I), IFAIL )
-      END DO
+      IFAIL = 0
+      CALL PDA_SPLDER( LAMBDA, NKNOT, C, 3, 0, AXIS, OUT, N, WRK,
+     :                 IFAIL )
+
+*    Trap evaluation failure
       IF ( IFAIL .GT. 0 ) THEN
         CALL MSG_PRNT( 'Error evaulating spline fit' )
         STATUS = SAI__ERROR
@@ -470,25 +454,25 @@ c       CALL E02BBF( NKNOT, LAMBDA, C, AXIS(I), OUT(I), IFAIL )
 *    Import :
 *
       INTEGER                    DIMS(2)                ! Array size
-      DOUBLE PRECISION           DATA(*)                ! Data
-      DOUBLE PRECISION           AXIS1(*)               ! X axis data
-      DOUBLE PRECISION           AXIS2(*)               ! Y axis data
-      DOUBLE PRECISION           SFACTOR                ! Accuracy factor
+      REAL                       DATA(*)                ! Data
+      REAL                       AXIS1(*)               ! X axis data
+      REAL                       AXIS2(*)               ! Y axis data
+      REAL                       SFACTOR                ! Accuracy factor
       INTEGER                    NEST(2)                ! Max number of knots
 *
 *    Workspace :
 *
       INTEGER                    LWRK                   ! Amount of FLOAT work
-      DOUBLE PRECISION           WRK(*)                 !
+      REAL                       WRK(*)                 !
       INTEGER                    LIWRK                  ! Amount of INT work
       INTEGER                    IWRK(*)                !
 *
 *    Export :
 *
-      DOUBLE PRECISION           LAMBDA(*), MU(*), C(*) ! Knot positions
+      REAL                       LAMBDA(*), MU(*), C(*) ! Knot positions
       INTEGER                    NKNOT(2)               ! # of knots
-      DOUBLE PRECISION           FP                     ! Fit achieved
-      DOUBLE PRECISION           OUT(*)                 ! Fit data
+      REAL                       FP                     ! Fit achieved
+      REAL                       OUT(*)                 ! Fit data
 *
 *    Status :
 *
