@@ -16,12 +16,26 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-   o The Plot class defines new graphical elements Axis1, Axis2, Grid1,
-   Grid2, NumLabs1, NumLabs2, TextLab1, TextLab2, Ticks1 and Ticks2.
-   These allow graphical attributes (colour, width, etc) to be set for
-   each axis individually. Previously, graphical attributes could only be
-   set for both axes together, using graphical elements Axes, Grid,
-   NumLabs, TextLabs and Ticks.
+   - A new attribute called CarLin has been added to the FitsChan 
+class which controls the way CAR projections are handled when reading a
+FrameSet from a non-native FITS header. Setting CarLin to 1 forces
+astRead/AST_READ to ignore the FITS-WCS standard and treat any CAR
+projections as simple linear Mappings from pixel coordinates to celestial
+coordinates.
+
+   - A bug has been fixed which could result in axis Format attributes
+set by the user being ignored under certain circumstances.
+
+   - A bug in the way tick marks positions are selected in the Plot class
+has been fixed. This bug could result in extra ticks marks being displayed at 
+inappropriate positions. This bug manifested itself, for instance, if the 
+Mapping represented by the Plot was a simple Cartesian to Polar Mapping.
+In this example, the bug caused tick marks to be drawn at negative radius
+values.
+
+   - A bug has been fixed which could prevent attribute settings from
+being read correctly by astSet/AST_SET, etc., on certain platforms (MacOS, 
+for instance).
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
