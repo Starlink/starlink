@@ -78,7 +78,7 @@
 
       PARAMETER 'OUT'
          POSITION 2
-         TYPE     'FILENAME'
+         TYPE     'NDF'
 	 ACCESS   'WRITE'
 	 VPATH    'PROMPT'
 	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
