@@ -260,7 +260,7 @@
 *      Ancillary bits
           CALL HSI_COPY( IFID, OFID, STATUS )
           CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
-          CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, STATUS )
+          CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )
 
         END IF
 
