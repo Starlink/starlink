@@ -76,14 +76,14 @@
 
 *  Initialise CARD.
          CARDAR( LINENO ) = ' '
-         CALL CHR_MOVE( LINE, CARDAR( LINENO ) )
+         CALL CHR_MOVE( CARD, CARDAR( LINENO ) )
 
 *  Make an error report.
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'L', LINENO )
          CALL MSG_SETI( 'EL', EL )
-         CALL ERR_REP( 'CON_PCARD_BOUNDS,
+         CALL ERR_REP( 'CON_PCARD_BOUNDS',
      :    'The chosen record (^L) lies outside the bounds (1 to ^EL) '/
      :    /'of the card-image array.', STATUS )
       END IF

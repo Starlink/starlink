@@ -191,10 +191,6 @@
             END DO
          END IF
 
-*  Exit immediately if something has gone wrong.
-            IF ( ERR .NE. 0 ) GOTO 999
-         END DO
-
 *  Copy to the real IRAF cube, image, or spectrum.
 *  ===============================================
       ELSE
@@ -255,10 +251,6 @@
                END DO
             END DO
          END IF
-
-*  Exit immediately if something has gone wrong.
-            IF ( ERR .NE. 0 ) GOTO 999
-         END DO
 
       END IF
 
