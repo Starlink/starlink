@@ -18,6 +18,7 @@
 *      14 Aug 95: V1.8-0 Interface with GUI (RJV)
 *      11 Jan 96: V1.8-1 Remove edit mode and TSM (RJV)
 *       8 Mar 96: V2.0-0 Fixes for Linux port (DJA)
+*      22 May 96: V2.0-1 Changed environment variable for colour tables (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -32,7 +33,7 @@
       CHARACTER*10 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICOLOUR Version 2.0-0')
+      PARAMETER (VERSION = 'ICOLOUR Version 2.0-1')
 *-
       CALL USI_INIT()
 
@@ -216,9 +217,9 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
         IF (TAB.GE.1.AND.TAB.LE.6) THEN
-          CALL PSX_GETENV('AST_ROOT',FILE,STATUS)
+          CALL PSX_GETENV('AST_ETC',FILE,STATUS)
           L=CHR_LEN(FILE)
-          FILE=FILE(:L)//'/data/grafix/'//TABS(TAB)
+          FILE=FILE(:L)//'/'//TABS(TAB)
         ELSE
           CALL USI_GET0C('FILE',FILE,STATUS)
         ENDIF
@@ -242,7 +243,6 @@
           CALL GCB_SET1R('COLOUR_GREEN',I,1,COLTAB(2,I),STATUS)
           CALL GCB_SET1R('COLOUR_BLUE',I,1,COLTAB(3,I),STATUS)
         ENDDO
-
 
       ENDIF
 
