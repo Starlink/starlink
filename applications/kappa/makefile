@@ -899,21 +899,29 @@ MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
 HELP_SOURCES = $(PKG_NAME).hlp
 
-#  List of ancillary data files (NDFs only!).
+#  List of ancillary data files (all types).
 
-DATA_FILES = $(LUTS) $(TEST_FILES) 
+DATA_FILES = $(NDFS) $(NON-NDFS)
 
-#  Define the standard colour tables (NDFs only!).
+#  List of ancillary data files (non-NDFs).
+
+NON-NDFS = m31_arm.FIT
+
+#  List of ancillary data files (NDFs).
+
+NDFS = $(LUTS) $(TEST_FILES) 
+
+#  Define the standard colour tables.
 
 LUTS = \
-bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf \
+bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf brown_lut.sdf \
 ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf logo_lut.sdf
 
 #  Define the package test data (NDFs only!).
 
 TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf iras.sdf \
 m31_issa_100.sdf m31_issa_60.sdf m31_issa_25.sdf m31_issa_12.sdf m57.sdf \
-logo.sdf
+logo.sdf scupol_i.sdf scupol_p.sdf scupol_ang.sdf
 
 #  Define the plotting style files.
 
@@ -1676,9 +1684,9 @@ install:
            else :; fi;\
         done
 #
-#  Install the colour tables and test data, converting them to the
-#  native format of the platform, and giving them world-read permission.
-	for f in $(DATA_FILES) ""; do \
+#  Install the NDF data files, converting them to the native format of the 
+#  platform, and giving them world-read permission.
+	for f in $(NDFS) ""; do \
            if test -n "$$f"; then \
               $(INSTALL_BIN)/native `basename $$f .sdf`;\
               cp -p $$f $(INSTALL_BIN);\
@@ -1687,7 +1695,16 @@ install:
               $(LINK) $(INSTALL_BIN)/$$f $$f;\
            else :; fi;\
         done
-
+#
+#  Install the non-NDF data files, giving them world-read permission.
+	for f in $(NON-NDFS) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 644 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f $$f;\
+           else :; fi;\
+        done
 #
 #  Install the default style files, giving them world-read permission.
 	for f in $(STYLE_FILES) ""; do \
@@ -2002,7 +2019,7 @@ do_deinstall:
            else :; fi;\
         done
 #
-#  Deinstall the colour tables and test data files, if installed versions exist.
+#  Deinstall all data files (NDFs and non-NDFS), if installed versions exist.
 	- for f in $(DATA_FILES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
