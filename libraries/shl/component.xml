@@ -23,7 +23,7 @@
      HLPS.</p>
   </abstract>
   <dependencies >
-    <build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
   </dependencies>
   <developers>
     <person>

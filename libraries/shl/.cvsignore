@@ -1,3 +1,6 @@
+*.shl
+testhelp
+*.ifc
 config.h
 config.h.in
 starconf.status

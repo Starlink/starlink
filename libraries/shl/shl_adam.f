@@ -1,4 +1,4 @@
-      SUBROUTINE HLPS_ADAM( LIBNAM, STATUS )
+      SUBROUTINE HLPS_ADAM( LIBNAM, ISENV, STATUS )
 *+
 *  Name:
 *     HLPS_ADAM
@@ -18,7 +18,14 @@
 *  Arguments:
 *     LIBNAM = CHARACTER (Given)
 *        Name of environment variable to use to obtain the location
-*        of the required help library
+*        of the required help library. _HELP is appended to the library
+*        name, if not present, before translating environment variable.
+*        Must translate to an actual help library file (the .shl
+*        extension is optional).
+*     ISENV = LOGIVAL (Given)
+*        Indicates whether LIBNAM refers to an environment variable
+*        that must be translated to obtain the actual name of the
+*        help file (.TRUE.) or an actual help file with path. (.FALSE.)
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -116,6 +123,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -133,7 +141,29 @@
 *        Rewrote the description, added usage and implementation status.
 *     1995 November 9 (MJC):
 *        Modified for UNIX and added the Topic on Navigation.
+*     2004 July 25 (TIMJ):
+*        Make standalone from KAPPA. Now in HLPS. Additional argument.
+*        Allow for optional .shl, optional _HELP and explicit filename.
 *     {enter_further_changes_here}
+
+*  Notes:
+*     In order to use this routine from an A-task or monolith the
+*     following steps are required:
+*
+*      1. Have an IFL file matching the correct parameters for the
+*      name of the action as specified in the above section. testhelp.ifl
+*      in the HLPS distribution can be used as a template. (Copy it and
+*      change the name)
+*
+*      2. The A-task/monolith subroutine can be very thin. The following
+*      is perfectly adequate since this subroutine provides all the ADAM
+*      code required for the help library:
+*
+*          SUBROUTINE MYHELP( STATUS )
+*          CALL HLPS_ADAM( 'MYHELP', .TRUE., STATUS )
+*          END
+*
+*      which will read the environment variable call MYHELP_HELP.
 
 *  Bugs:
 *     {note_new_bugs_here}
@@ -148,6 +178,7 @@
 
 *  Arguments Give:
       CHARACTER * (*) LIBNAM   ! Name of help environment variable
+      LOGICAL ISENV            ! Is LIBNAM a file or an env var?
 
 *  Status:
       INTEGER STATUS
@@ -167,24 +198,60 @@
      :  HLPTXT*80,             ! Composite command
      :  LIBRAY*132,            ! Library name and path
      :  PATH*122,              ! Library path
-     :  TOPIC( MAXLEV )        ! Name of the topic required
+     :  TOPIC( MAXLEV ),       ! Name of the topic required
+     :  ENVVAR*80              ! Environment variable to read
 
       INTEGER
      :  I,                     ! Loop counter
      :  NC                     ! Number of characters in the help string
                                ! less trailing blanks
+      INTEGER IPOSN            ! Position in string
 *.
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Read the environment variable if we have one
+      IF ( ISENV ) THEN
+
+*  Copy environment variable name into local storage
+*  since we may need to modify it
+         ENVVAR = LIBNAM
+
+*  See if the envvar name include _HELP., appending if necessary
+*  Start searching from the end of the string
+         IPOSN = CHR_LEN( ENVVAR )
+         CALL CHR_FIND( ENVVAR, '_HELP', .FALSE., IPOSN )
+         IF (IPOSN .EQ. 0 ) THEN
+*  Not found
+            IPOSN = CHR_LEN( ENVVAR )
+            CALL CHR_APPND( '_HELP', ENVVAR, IPOSN )
+         END IF
+
 *  Translate the environment variable/logical name.
-      CALL PSX_GETENV( LIBNAM, PATH, STATUS )
+         CALL PSX_GETENV( ENVVAR, PATH, STATUS )
+      ELSE
+
+*     Assume it is a help file directly
+         PATH = LIBNAM
+
+      END IF
+
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Form the full library name.
+*  Form the full library name. Appending .shl if not present already
          NC = CHR_LEN( PATH )
-         LIBRAY = PATH( :NC )//'.shl'
+         LIBRAY = PATH( :NC )
+
+*  Do we have .shl extension? Append one if not.
+*  Start searching from the end of the string backwards
+         IPOSN = NC
+         CALL CHR_FIND( PATH, '.shl', .FALSE., IPOSN)
+         IF (IPOSN .EQ. 0) THEN
+*     Not found
+            CALL CHR_APPND( '.shl', LIBRAY, NC )
+         END IF
+
 
 *  Get topic and subtopics.
          CALL PAR_GET0C( 'TOPIC', TOPIC(1), STATUS )

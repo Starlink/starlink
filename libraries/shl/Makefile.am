@@ -5,7 +5,8 @@ bin_SCRIPTS = hlps_link hlps_link_adam
 bin_PROGRAMS = browsehlp
 
 browsehlp_SOURCES = browsehlp.c
-browsehlp_LDADD = `hlp_link` `fio_link` `err_link` `one_link` libhlps.la
+browsehlp_LDADD = `hlp_link` `fio_link` `err_link` `one_link` \
+	libhlps.la @FCLIBS@
 
 lib_LTLIBRARIES = libhlps.la libhlps_adam.la
 
@@ -33,4 +34,19 @@ ADAM_F_ROUTINES = hlps_adam.f
 # in having it separate (since F77 libraries are still required for
 # the link).
 C_ROUTINES = hlps_standalone.c
+
+# Testing
+TESTS = testhelp
+
+check_MONOLITHS = testhelp
+testhelp_TASKS = 
+testhelp_SOURCES = testhelp.f
+testhelp_LDADD = libhlps.la libhlps_adam.la \
+	`hlp_link_adam` `one_link` `fio_link_adam`
+
+testhelp_DEPENDENCIES = demo.shl
+
+# need to compile the test help file
+demo.shl: demo.hlp
+	@HLIB@ demo.hlp
 

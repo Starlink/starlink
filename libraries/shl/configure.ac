@@ -22,11 +22,17 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_FC_LIBRARY_LDFLAGS
+
+dnl    Build ADAM task for testing
+STAR_MONOLITHS
 
 dnl    This package depends on HLP
 STAR_DECLARE_DEPENDENCIES([build], [sae fio cnf hlp mers one ])
 STAR_DECLARE_DEPENDENCIES([link],  [fio cnf hlp par mers one])
 
+dnl    Help library translation (for tests)
+STAR_CHECK_PROGS(hlib)
 
 dnl    No latex documentation yet. Should it be part of HLP?
 dnl STAR_LATEX_DOCUMENTATION(sun124)

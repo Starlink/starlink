@@ -1,0 +1,42 @@
+interface KAPHELP
+# ADAM Interface file
+# Created automatically from kappa.ifd using ifd2star
+# Thu Jul  1 17:37:48 BST 2004
+   helplib '$KAPPA_HELP'
+   parameter TOPIC
+      position 1
+      type LITERAL
+      access 'READ'
+      vpath 'DEFAULT'
+      prompt 'Help topic'
+      default '         '
+      helpkey '*'
+   endparameter
+   parameter SUBTOPIC
+      position 2
+      type LITERAL
+      access 'READ'
+      vpath 'DEFAULT'
+      prompt 'Help subtopic'
+      default '         '
+      helpkey '*'
+   endparameter
+   parameter SUBSUBTOPIC
+      position 3
+      type LITERAL
+      access 'READ'
+      vpath 'DEFAULT'
+      prompt 'Help subsubtopic'
+      default '         '
+      helpkey '*'
+   endparameter
+   parameter SUBSUBSUBTOPIC
+      position 4
+      type LITERAL
+      access 'READ'
+      vpath 'DEFAULT'
+      prompt 'Help subsubsubtopic'
+      default '         '
+      helpkey '*'
+   endparameter
+endinterface
