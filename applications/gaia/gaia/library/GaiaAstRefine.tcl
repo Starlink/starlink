@@ -130,9 +130,8 @@ itcl::class gaia::GaiaAstRefine {
       set Edit [add_menubutton Edit]
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_dir/GaiaAstRefine.hlp "On Window..."
+      add_help_button astrometry "Astrometry Overview..."
+      add_help_button refine "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

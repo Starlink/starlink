@@ -147,8 +147,7 @@ itcl::class gaia::StarBlink {
         {Select images to display}
 
       #  Add help menu.
-      global gaia_dir
-      add_help_button $gaia_dir/StarBlink.hlp "On Window..."
+      add_help_button blink "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \

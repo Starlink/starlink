@@ -280,8 +280,7 @@ itcl::class gaia::GaiaApPhotom {
       configure_menubutton Colours -underline 0
 
       #  Add window help.
-      global gaia_dir
-      add_help_button GaiaApPhotom "On Window..."
+      add_help_button aperture "On Window..."
 
       #  Add the option to create a new window.
       $File add command -label {New window} \

@@ -97,8 +97,7 @@ itcl::class gaia::GaiaAstTransform {
       bind $w_ <Control-a> [code $this accept]
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaAstTransform.hlp "On Window..."
+      add_help_button transform "On Window..."
 
       #  Markers menu
       set Markers [add_menubutton Markers]

@@ -282,8 +282,7 @@ itcl::class gaia::GaiaOptPhotom {
       configure_menubutton Colours -underline 0
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaOptPhotom.hlp "On Window..."
+      add_help_button optimal "On Window..."
 
       #  Add the option to create a new window.
       $File add command -label {New window} \

@@ -129,8 +129,7 @@ itcl::class gaia::GaiaPatch {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaPatch.hlp "On Window..."
+      add_help_button patchusage "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \

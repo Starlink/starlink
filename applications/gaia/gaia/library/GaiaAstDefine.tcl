@@ -130,9 +130,8 @@ itcl::class gaia::GaiaAstDefine {
          -offvalue disabled
 
       #  Add window help.
-      global env gaia_dir
-      add_help_button $gaia_dir/GaiaAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_dir/GaiaAstDefine.hlp "On Window..."
+      add_help_button astrometry "Astrometry Overview..."
+      add_help_button define "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

@@ -196,8 +196,7 @@ itcl::class gaia::GaiaArd {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaArd.hlp "On Window..."
+      add_help_button ardusage "On Window..."
 
       #  Add short help window.
       make_short_help

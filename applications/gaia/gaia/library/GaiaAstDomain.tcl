@@ -98,8 +98,7 @@ itcl::class gaia::GaiaAstDomain {
       bind $w_ <Control-a> [code $this accept]
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaAstDomain.hlp "On Window..."
+      add_help_button domain "On Window..."
 
       #  Only one element is available. A dropdown box showing the AST
       #  domains for the current image.

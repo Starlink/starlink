@@ -238,8 +238,7 @@ itcl::class gaia::GaiaPositions {
       bind $w_ <Control-c> [code $this close]
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaPositions.hlp "On Window..."
+      add_help_button positions "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

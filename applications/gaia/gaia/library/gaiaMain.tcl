@@ -70,6 +70,7 @@ proc raise { window { above "" } } {
 #  Set the place for locating all external files.
 if { [info exists env(GAIA_DIR)] } { 
    set gaia_dir $env(GAIA_DIR)
+   set gaia_help $gaia_dir/gaia.htx
 }
 
 #  Check any command-line arguments that we've been passed. The first

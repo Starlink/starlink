@@ -104,8 +104,7 @@ itcl::class gaia::GaiaSextractor {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaSextractor.hlp "On Window..."
+      add_help_button extractor "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

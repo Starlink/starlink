@@ -116,11 +116,10 @@ itcl::class gaia::GaiaAstCopy {
       bind $w_ <Control-a> [code $this accept]
 
       #  Add window help.
-      global env gaia_dir
-      add_help_button $gaia_dir/GaiaAst.hlp "Astrometry Overview..."
+      add_help_button astrometry "Astrometry Overview..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
-      add_help_button $gaia_dir/GaiaAstCopy.hlp "On Window..."
+      add_help_button copy "On Window..."
 
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}

@@ -65,6 +65,7 @@ class gaia::GaiaHyperHelp {
     inherit iwidgets::Shell
 
     constructor {args} {}
+    destructor {}
 
     itk_option define -topics topics Topics {}
     itk_option define -helpdir helpdir Directory .
@@ -100,6 +101,8 @@ class gaia::GaiaHyperHelp {
 
     private variable _remaining 0       ;# remaining text to be rendered
     private variable _rendering 0       ;# flag - in process of rendering
+
+    private variable _tmpfile {}        ;# search result file
 }
 
 #
@@ -126,7 +129,7 @@ body gaia::GaiaHyperHelp::constructor {args} {
     pack $itk_component(menubar) -side top -fill x
 
     itk_component add -private topicmb {
-      menubutton $itk_component(menubar).topicmb -text "Topics" \
+      menubutton $itk_component(menubar).topicmb -text "File" \
            -menu $itk_component(menubar).topicmb.topicmenu \
            -underline 0 -padx 8 -pady 2
     } {
@@ -143,7 +146,7 @@ body gaia::GaiaHyperHelp::constructor {args} {
     }
 
     itk_component add -private navmb {
-      menubutton $itk_component(menubar).navmb -text "Navigate" \
+      menubutton $itk_component(menubar).navmb -text "Options" \
           -menu $itk_component(menubar).navmb.navmenu \
           -underline 0 -padx 8 -pady 2
     } {
@@ -180,28 +183,28 @@ body gaia::GaiaHyperHelp::constructor {args} {
     } {
        keep -background -cursor
     }
-    pack $itk_component(navbar) -fill both -expand 1 -side top
+    pack $itk_component(navbar) -fill x -expand 1 -side top
     
     itk_component add home {
        button $itk_component(navbar).home \
           -bitmap up_arrow \
           -command [code $this home]
     }
-    pack $itk_component(home) -side left -padx 5 -pady 5
+    pack $itk_component(home) -side left -pady 2 -padx 2
 
     itk_component add backward {
        button $itk_component(navbar).backward \
           -bitmap left_arrow \
           -command [code $this back]
     }
-    pack $itk_component(backward) -side left -padx 5 -pady 5
+    pack $itk_component(backward) -side left -pady 2 -padx 2
 
     itk_component add forward {
        button $itk_component(navbar).forward \
           -bitmap right_arrow \
           -command [code $this forward]
     }
-    pack $itk_component(forward) -side left -padx 5 -pady 5
+    pack $itk_component(forward) -side left -pady 2 -padx 2
 
     #
     # Search for text in the help (all GAIA help).
@@ -219,11 +222,29 @@ body gaia::GaiaHyperHelp::constructor {args} {
     pack $itk_component(searchtext) -side right
     bind $itk_component(searchtext) <Return> [code $this search]
 
-    itk_component add searchlabel {
-       label $itk_component(navbar).slabel -text "Word:"
-    }
-    pack $itk_component(searchlabel) -side right
+    # Initialize help file search path and name for search results.
+    global gaia_help env
+    set env(HTX_PATH) [file dirname $gaia_help]
+    set _tmpfile "/tmp/GaiaSearch[pid].html"
 
+    # 
+    # Add window action buttons for bottom.
+    #
+    itk_component add actionbar {
+       ::frame $itk_interior.actionbar
+    } {
+       keep -background -cursor
+    }
+    pack $itk_component(actionbar) -fill x -expand 1 -side bottom
+
+    itk_component add closebutton {
+       button $itk_component(actionbar).close \
+          -text "Close" \
+          -command [code $this deactivate]
+    }
+    pack $itk_component(closebutton) -fill none \
+       -expand 1 -side bottom -pady 2 -padx 2
+    
     #
     # Create a scrolledhtml object to display help pages
     #
@@ -241,21 +262,21 @@ body gaia::GaiaHyperHelp::constructor {args} {
            -relief -selectbackground -selectborderwidth \
            -selectforeground -setgrid -wrap -unknownimage
     }
-    pack $itk_component(scrtxt) -fill both -expand yes
+    pack $itk_component(scrtxt) -fill both -expand yes -side top
 
     #
     # Bind shortcut keys
     #
-   bind $itk_component(hull) <Alt-f> "[code $this forward];break"
-   bind $itk_component(hull) <Alt-b> "[code $this back];break"
-   bind $itk_component(hull) <Alt-Right> "[code $this forward];break"
-   bind $itk_component(hull) <Alt-Left> "[code $this back];break"
-   bind $itk_component(hull) <Key-Next> "[code $this _pageforward];break"
-   bind $itk_component(hull) <Key-BackSpace> "[code $this _pageback];break"
-   bind $itk_component(hull) <Key-Prior> "[code $this _pageback];break"
-   bind $itk_component(hull) <Key-Delete> "[code $this _pageback];break"
-   bind $itk_component(hull) <Key-Down> "[code $this _lineforward];break"
-   bind $itk_component(hull) <Key-Up> "[code $this _lineback];break"
+    bind $itk_component(hull) <Alt-f> "[code $this forward];break"
+    bind $itk_component(hull) <Alt-b> "[code $this back];break"
+    bind $itk_component(hull) <Alt-Right> "[code $this forward];break"
+    bind $itk_component(hull) <Alt-Left> "[code $this back];break"
+    bind $itk_component(hull) <Key-Next> "[code $this _pageforward];break"
+    bind $itk_component(hull) <Key-BackSpace> "[code $this _pageback];break"
+    bind $itk_component(hull) <Key-Prior> "[code $this _pageback];break"
+    bind $itk_component(hull) <Key-Delete> "[code $this _pageback];break"
+    bind $itk_component(hull) <Key-Down> "[code $this _lineforward];break"
+    bind $itk_component(hull) <Key-Up> "[code $this _lineback];break"
 
     wm title $itk_component(hull) "Help"
 
@@ -263,6 +284,15 @@ body gaia::GaiaHyperHelp::constructor {args} {
     if {[lsearch -exact $args -closecmd] == -1} {
       configure -closecmd [code $this deactivate]
     }
+}
+
+# ------------------------------------------------------------------
+#                        DESTRUCTOR
+# ------------------------------------------------------------------
+body gaia::GaiaHyperHelp::destructor {} {
+   if { $_tmpfile != {} } {
+      file delete $_tmpfile
+   }
 }
 
 # ------------------------------------------------------------------
@@ -298,7 +328,7 @@ configbody gaia::GaiaHyperHelp::topics {
       }
     }
     $m add separator
-    $m add command -label "Close Help" -underline 0 \
+    $m add command -label "Close Window" -underline 0 \
       -command $itk_option(-closecmd)
 }
 
@@ -444,24 +474,17 @@ body gaia::GaiaHyperHelp::back {} {
 # as an index. Assumes the Starlink "findme" command is available.
 # ------------------------------------------------------------------
 body gaia::GaiaHyperHelp::search {} {
-   global env
-   set env(HTX_PATH) $env(GAIA_HELP)/..
-   set sfile /tmp/gaiasearch.html
-   file delete $sfile
-   if { [catch {
+   file delete $_tmpfile
+   catch {
       exec findme -q -warn -html -f -m \
-         [$itk_component(searchtext) get] > $sfile
-   } msg]} {
-      #warning_dialog "failed to perform word search: $msg"
+         [$itk_component(searchtext) get] > $_tmpfile
    }
-
-
    incr _history_ndx
    set _history [lrange $_history 0 [expr $_history_ndx - 1]]
    set _history_len [expr $_history_ndx + 1]
-   lappend _history [list [file rootname [file tail $sfile]] $sfile {}]
+   lappend _history [list [file rootname [file tail $_tmpfile]] $_tmpfile {}]
    set _file {}
-   set ret [_readtopic $sfile {}]
+   set ret [_readtopic $_tmpfile {}]
 }
 
 # ------------------------------------------------------------------

@@ -10,12 +10,12 @@
 #                            Modified comment format a little for use 
 #                            with the itcldoc script to generate
 #                            man pages.
+# Peter W. Draper 01 May 01  Reclaimed to use a hypertext help system.
 
-# This is a simple class that displays the contents of a named
-# file in a text widget. The file should be set as a configuration
-# option when an instance is created. This class shares a text
-# window amongst all its instances, this means that it overwrites
-# any previous contents.
+# This is a simple class that displays the contents of a named html
+# file. The file should be set as a configuration option when an
+# instance is created. This class shares a window amongst all its
+# instances, this means that it overwrites any previous contents.
 
 itcl::class util::HelpWin {
 
@@ -28,9 +28,9 @@ itcl::class util::HelpWin {
 
       #  Preset helpdir to GAIA default.
       if { $helpdir == {} } {
-         global env
-         if { [info exists env(GAIA_HELP)] } {
-            set helpdir $env(GAIA_HELP)
+         global gaia_help
+         if { [info exists gaia_help] } {
+            set helpdir $gaia_help
          }
       }
 

@@ -231,8 +231,7 @@ itcl::class gaia::GaiaPolarimetry {
       configure_menubutton Table -underline 0 -state disabled
 
 #  Add window help.
-      global gaia_dir
-      add_help_button $gaia_dir/GaiaPolarimetry.hlp "On Window..."
+      add_help_button polarusage "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get help on the use of this window}
 

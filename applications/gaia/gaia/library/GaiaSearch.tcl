@@ -107,10 +107,9 @@ itcl::class gaia::GaiaSearch {
          set_origin
 
          #  Add option for a some help on this window (not image servers).
-         global gaia_dir
-         set m [add_help_button $gaia_dir/Catalogue.hlp "Catalogues Overview..." \
+         set m [add_help_button catalogues "Catalogues Overview..." \
                    {General information about catalogues}   ]
-         set m [add_help_button $gaia_dir/GaiaSearch.hlp "On Window..." \
+         set m [add_help_button query "On Window..." \
                    {Display help on using this window}   ]
       }
 
