@@ -41,9 +41,10 @@
 <!ELEMENT build         (#PCDATA)>
 <!ELEMENT use           (#PCDATA)>
 
-<!-- A list of developers with an interest in this component -->
+<!-- A list of developers with an interest in this component.  If the
+     uname and email address are unknown, omit the corresponding element.  -->
 <!ELEMENT developers    (person+)>
-<!ELEMENT person        (name, uname, email, role?)>
+<!ELEMENT person        (name, uname?, email?, role?)>
 
 <!-- A developer's name -->
 <!ELEMENT name          (#PCDATA)>
