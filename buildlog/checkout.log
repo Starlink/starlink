@@ -2330,6 +2330,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleDocument.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstGrid.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStrings.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStyleBox.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTicks.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java
@@ -2362,6 +2363,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharactersListener.ja
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharactersModel.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectTextField.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/StoreConfigurator.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/StringsControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TODO
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TickControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TitleControls.java
@@ -4272,813 +4274,1247 @@ cvs checkout: Updating java/source/coco/src/main/uk/ac/starlink/coco
 U java/source/coco/src/main/uk/ac/starlink/coco/Coco.java
 U java/source/coco/src/main/uk/ac/starlink/coco/CocoPanel.java
 U java/source/coco/src/main/uk/ac/starlink/coco/CoordinateConversion.java
+cvs checkout: Updating java/source/diva
+U java/source/diva/build.xml
+U java/source/diva/do_import
+cvs checkout: Updating java/source/diva/src
+cvs checkout: Updating java/source/diva/src/docs
+U java/source/diva/src/docs/COPYRIGHT
+U java/source/diva/src/docs/README.txt
+U java/source/diva/src/docs/acknowledgments.html
+U java/source/diva/src/docs/changes.html
+U java/source/diva/src/docs/copyright.html
+U java/source/diva/src/docs/diva.css
+U java/source/diva/src/docs/index.html
+U java/source/diva/src/docs/install.html
+cvs checkout: Updating java/source/diva/src/docs/api
+U java/source/diva/src/docs/api/COPYRIGHT
+U java/source/diva/src/docs/api/index.default.html
+U java/source/diva/src/docs/api/index.html
+U java/source/diva/src/docs/api/makefile
+cvs checkout: Updating java/source/diva/src/docs/api/sun
+U java/source/diva/src/docs/api/sun/COPYRIGHT
+U java/source/diva/src/docs/api/sun/package-list
+cvs checkout: Updating java/source/diva/src/docs/demo
+U java/source/diva/src/docs/demo/COPYRIGHT
+U java/source/diva/src/docs/demo/canvas.html
+U java/source/diva/src/docs/demo/graph.html
+U java/source/diva/src/docs/demo/howtorun.html
+U java/source/diva/src/docs/demo/index.html
+U java/source/diva/src/docs/demo/sketch.html
+U java/source/diva/src/docs/demo/trainer.html
+U java/source/diva/src/docs/demo/uml.html
+U java/source/diva/src/docs/demo/whiteboard.html
+cvs checkout: Updating java/source/diva/src/docs/demo/images
+U java/source/diva/src/docs/demo/images/COPYRIGHT
+U java/source/diva/src/docs/demo/images/blackjack-small.gif
+U java/source/diva/src/docs/demo/images/blackjack.gif
+U java/source/diva/src/docs/demo/images/canvas-small.gif
+U java/source/diva/src/docs/demo/images/canvas.gif
+U java/source/diva/src/docs/demo/images/caret.gif
+U java/source/diva/src/docs/demo/images/check.gif
+U java/source/diva/src/docs/demo/images/diamond.gif
+U java/source/diva/src/docs/demo/images/graph-small.gif
+U java/source/diva/src/docs/demo/images/graph.gif
+U java/source/diva/src/docs/demo/images/rectangle.gif
+U java/source/diva/src/docs/demo/images/scribble.gif
+U java/source/diva/src/docs/demo/images/sketch-demo.gif
+U java/source/diva/src/docs/demo/images/sketch-small.gif
+U java/source/diva/src/docs/demo/images/square.gif
+U java/source/diva/src/docs/demo/images/trainer-small.gif
+U java/source/diva/src/docs/demo/images/trainer.gif
+U java/source/diva/src/docs/demo/images/triangle.gif
+U java/source/diva/src/docs/demo/images/whiteboard-small.gif
+U java/source/diva/src/docs/demo/images/whiteboard.gif
+cvs checkout: Updating java/source/diva/src/docs/packages
+U java/source/diva/src/docs/packages/COPYRIGHT
+U java/source/diva/src/docs/packages/diva0.1-index.html
+U java/source/diva/src/docs/packages/diva0.2-index.html
+U java/source/diva/src/docs/packages/index.html
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas
+U java/source/diva/src/docs/packages/canvas/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/bugs.html
+U java/source/diva/src/docs/packages/canvas/faq.html
+U java/source/diva/src/docs/packages/canvas/index.html
+U java/source/diva/src/docs/packages/canvas/unresolved.html
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/design
+U java/source/diva/src/docs/packages/canvas/design/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/design/_document.tim
+U java/source/diva/src/docs/packages/canvas/design/_outline.tim
+U java/source/diva/src/docs/packages/canvas/design/architecture.html
+U java/source/diva/src/docs/packages/canvas/design/connectors.html
+U java/source/diva/src/docs/packages/canvas/design/decorators.html
+U java/source/diva/src/docs/packages/canvas/design/event-section.html
+U java/source/diva/src/docs/packages/canvas/design/event.html
+U java/source/diva/src/docs/packages/canvas/design/figure-section.html
+U java/source/diva/src/docs/packages/canvas/design/figure.html
+U java/source/diva/src/docs/packages/canvas/design/figureclasses.html
+U java/source/diva/src/docs/packages/canvas/design/figureset.html
+U java/source/diva/src/docs/packages/canvas/design/geometry.html
+U java/source/diva/src/docs/packages/canvas/design/index.html
+U java/source/diva/src/docs/packages/canvas/design/interactors.html
+U java/source/diva/src/docs/packages/canvas/design/interfaces.html
+U java/source/diva/src/docs/packages/canvas/design/jcanvas-section.html
+U java/source/diva/src/docs/packages/canvas/design/jcanvas.html
+U java/source/diva/src/docs/packages/canvas/design/layers.html
+U java/source/diva/src/docs/packages/canvas/design/manipulators.html
+U java/source/diva/src/docs/packages/canvas/design/old-stuff.html
+U java/source/diva/src/docs/packages/canvas/design/paint.html
+U java/source/diva/src/docs/packages/canvas/design/picking.html
+U java/source/diva/src/docs/packages/canvas/design/printable.html
+U java/source/diva/src/docs/packages/canvas/design/prolog.html
+U java/source/diva/src/docs/packages/canvas/design/recursion.html
+U java/source/diva/src/docs/packages/canvas/design/roles.html
+U java/source/diva/src/docs/packages/canvas/design/selection.html
+U java/source/diva/src/docs/packages/canvas/design/sites.html
+U java/source/diva/src/docs/packages/canvas/design/transforms.html
+U java/source/diva/src/docs/packages/canvas/design/wrappers.html
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/design/images
+U java/source/diva/src/docs/packages/canvas/design/images/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/design/images/connectors.gif
+U java/source/diva/src/docs/packages/canvas/design/images/decorators.gif
+U java/source/diva/src/docs/packages/canvas/design/images/dtree.gif
+U java/source/diva/src/docs/packages/canvas/design/images/etree.gif
+U java/source/diva/src/docs/packages/canvas/design/images/events.gif
+U java/source/diva/src/docs/packages/canvas/design/images/figure.gif
+U java/source/diva/src/docs/packages/canvas/design/images/figureclasses.gif
+U java/source/diva/src/docs/packages/canvas/design/images/figureset.gif
+U java/source/diva/src/docs/packages/canvas/design/images/geometry.gif
+U java/source/diva/src/docs/packages/canvas/design/images/interactors.gif
+U java/source/diva/src/docs/packages/canvas/design/images/interfaces.gif
+U java/source/diva/src/docs/packages/canvas/design/images/jcanvas.gif
+U java/source/diva/src/docs/packages/canvas/design/images/junk.gif
+U java/source/diva/src/docs/packages/canvas/design/images/layers.gif
+U java/source/diva/src/docs/packages/canvas/design/images/manipulators.gif
+U java/source/diva/src/docs/packages/canvas/design/images/paint.gif
+U java/source/diva/src/docs/packages/canvas/design/images/recursion.gif
+U java/source/diva/src/docs/packages/canvas/design/images/role.gif
+U java/source/diva/src/docs/packages/canvas/design/images/selection.gif
+U java/source/diva/src/docs/packages/canvas/design/images/sites.gif
+U java/source/diva/src/docs/packages/canvas/design/images/transforms.gif
+U java/source/diva/src/docs/packages/canvas/design/images/ttree.gif
+U java/source/diva/src/docs/packages/canvas/design/images/wtree.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/overview
+U java/source/diva/src/docs/packages/canvas/overview/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/overview/_outline.tim
+U java/source/diva/src/docs/packages/canvas/overview/index.html
+U java/source/diva/src/docs/packages/canvas/overview/intro.html
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/overview/images
+U java/source/diva/src/docs/packages/canvas/overview/images/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/overview/images/canvas.jpg
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/reviews
+U java/source/diva/src/docs/packages/canvas/reviews/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/reviews/diva.canvas-980501.html
+U java/source/diva/src/docs/packages/canvas/reviews/diva.canvas-980506.html
+U java/source/diva/src/docs/packages/canvas/reviews/diva.canvas-980608.html
+U java/source/diva/src/docs/packages/canvas/reviews/diva.canvas-980622.html
+U java/source/diva/src/docs/packages/canvas/reviews/diva.canvas-990201.html
+U java/source/diva/src/docs/packages/canvas/reviews/diva.canvas-990201.zip
+U java/source/diva/src/docs/packages/canvas/reviews/diva.canvas-990203.html
+U java/source/diva/src/docs/packages/canvas/reviews/index.html
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/spec
+U java/source/diva/src/docs/packages/canvas/spec/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.animation.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.collection.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.decorators.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.event.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.feature.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.figures.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.interactors.html
+U java/source/diva/src/docs/packages/canvas/spec/diva.canvas.swing.html
+U java/source/diva/src/docs/packages/canvas/spec/index.html
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/spec/images
+U java/source/diva/src/docs/packages/canvas/spec/images/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/spec/images/canvas.gif
+U java/source/diva/src/docs/packages/canvas/spec/images/concretefigures.gif
+U java/source/diva/src/docs/packages/canvas/spec/images/containers.gif
+U java/source/diva/src/docs/packages/canvas/spec/images/features.gif
+U java/source/diva/src/docs/packages/canvas/spec/images/figures.gif
+U java/source/diva/src/docs/packages/canvas/spec/images/predicates.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/tutorial
+U java/source/diva/src/docs/packages/canvas/tutorial/ArcTutorial.html
+U java/source/diva/src/docs/packages/canvas/tutorial/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/tutorial/CompositeFigureTutorial.html
+U java/source/diva/src/docs/packages/canvas/tutorial/ConnectorTutorial.html
+U java/source/diva/src/docs/packages/canvas/tutorial/DragTutorial.html
+U java/source/diva/src/docs/packages/canvas/tutorial/FigureTutorial.html
+U java/source/diva/src/docs/packages/canvas/tutorial/SimpleTutorial.html
+U java/source/diva/src/docs/packages/canvas/tutorial/TransformedFigureTutorial.html
+U java/source/diva/src/docs/packages/canvas/tutorial/_document.tim
+U java/source/diva/src/docs/packages/canvas/tutorial/basic.html
+U java/source/diva/src/docs/packages/canvas/tutorial/index.html
+U java/source/diva/src/docs/packages/canvas/tutorial/instructions.html
+U java/source/diva/src/docs/packages/canvas/tutorial/window.html
+cvs checkout: Updating java/source/diva/src/docs/packages/canvas/tutorial/images
+U java/source/diva/src/docs/packages/canvas/tutorial/images/ArcTutorial.gif
+U java/source/diva/src/docs/packages/canvas/tutorial/images/COPYRIGHT
+U java/source/diva/src/docs/packages/canvas/tutorial/images/CompositeFigureTutorial.gif
+U java/source/diva/src/docs/packages/canvas/tutorial/images/ConnectorTutorial.gif
+U java/source/diva/src/docs/packages/canvas/tutorial/images/DragTutorial.gif
+U java/source/diva/src/docs/packages/canvas/tutorial/images/FigureTutorial.gif
+U java/source/diva/src/docs/packages/canvas/tutorial/images/SimpleTutorial.gif
+U java/source/diva/src/docs/packages/canvas/tutorial/images/TransformedFigureTutorial.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/graph
+U java/source/diva/src/docs/packages/graph/COPYRIGHT
+U java/source/diva/src/docs/packages/graph/design.html
+U java/source/diva/src/docs/packages/graph/display.html
+U java/source/diva/src/docs/packages/graph/faq.html
+U java/source/diva/src/docs/packages/graph/graph.dtd
+U java/source/diva/src/docs/packages/graph/index.html
+U java/source/diva/src/docs/packages/graph/interaction.html
+U java/source/diva/src/docs/packages/graph/issues.html
+U java/source/diva/src/docs/packages/graph/layout.html
+U java/source/diva/src/docs/packages/graph/model.html
+U java/source/diva/src/docs/packages/graph/xml.html
+cvs checkout: Updating java/source/diva/src/docs/packages/graph/images
+U java/source/diva/src/docs/packages/graph/images/COPYRIGHT
+U java/source/diva/src/docs/packages/graph/images/diva.graph.gif
+U java/source/diva/src/docs/packages/graph/images/diva.graph.layout.gif
+U java/source/diva/src/docs/packages/graph/images/diva.graph.model.gif
+U java/source/diva/src/docs/packages/graph/images/diva.graph.modular.gif
+U java/source/diva/src/docs/packages/graph/images/filter.gif
+U java/source/diva/src/docs/packages/graph/images/flow.gif
+U java/source/diva/src/docs/packages/graph/images/flow2.gif
+U java/source/diva/src/docs/packages/graph/images/packages.gif
+U java/source/diva/src/docs/packages/graph/images/predicate.gif
+U java/source/diva/src/docs/packages/graph/images/routing.gif
+U java/source/diva/src/docs/packages/graph/images/scoping.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/graph/reviews
+U java/source/diva/src/docs/packages/graph/reviews/COPYRIGHT
+U java/source/diva/src/docs/packages/graph/reviews/diva.graph-980904.html
+U java/source/diva/src/docs/packages/graph/reviews/diva.graph-980911.html
+U java/source/diva/src/docs/packages/graph/reviews/index.html
+cvs checkout: Updating java/source/diva/src/docs/packages/graph/tutorial
+U java/source/diva/src/docs/packages/graph/tutorial/COPYRIGHT
+U java/source/diva/src/docs/packages/graph/tutorial/NodeRendererTutorial.html
+U java/source/diva/src/docs/packages/graph/tutorial/PrepopulatedTutorial.html
+U java/source/diva/src/docs/packages/graph/tutorial/SimpleTutorial.html
+U java/source/diva/src/docs/packages/graph/tutorial/TransformedFigureTutorial.html
+U java/source/diva/src/docs/packages/graph/tutorial/XmlTutorial.html
+U java/source/diva/src/docs/packages/graph/tutorial/index.html
+U java/source/diva/src/docs/packages/graph/tutorial/instructions.html
+U java/source/diva/src/docs/packages/graph/tutorial/window.html
+cvs checkout: Updating java/source/diva/src/docs/packages/graph/tutorial/images
+U java/source/diva/src/docs/packages/graph/tutorial/images/COPYRIGHT
+U java/source/diva/src/docs/packages/graph/tutorial/images/NodeRendererTutorial.gif
+U java/source/diva/src/docs/packages/graph/tutorial/images/PrepopulatedTutorial.gif
+U java/source/diva/src/docs/packages/graph/tutorial/images/SimpleTutorial.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/gui
+U java/source/diva/src/docs/packages/gui/COPYRIGHT
+U java/source/diva/src/docs/packages/gui/index.html
+cvs checkout: Updating java/source/diva/src/docs/packages/gui/design
+U java/source/diva/src/docs/packages/gui/design/COPYRIGHT
+U java/source/diva/src/docs/packages/gui/design/application.html
+U java/source/diva/src/docs/packages/gui/design/components.html
+U java/source/diva/src/docs/packages/gui/design/context.html
+U java/source/diva/src/docs/packages/gui/design/documents.html
+U java/source/diva/src/docs/packages/gui/design/index.html
+U java/source/diva/src/docs/packages/gui/design/storagepolicy.html
+cvs checkout: Updating java/source/diva/src/docs/packages/gui/images
+U java/source/diva/src/docs/packages/gui/images/COPYRIGHT
+U java/source/diva/src/docs/packages/gui/images/application.gif
+U java/source/diva/src/docs/packages/gui/images/context.gif
+U java/source/diva/src/docs/packages/gui/images/documents.gif
+U java/source/diva/src/docs/packages/gui/images/gui.gif
+U java/source/diva/src/docs/packages/gui/images/storagepolicy.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/gui/tutorial
+U java/source/diva/src/docs/packages/gui/tutorial/AppletTutorial.html
+U java/source/diva/src/docs/packages/gui/tutorial/ApplicationTutorial.html
+U java/source/diva/src/docs/packages/gui/tutorial/COPYRIGHT
+U java/source/diva/src/docs/packages/gui/tutorial/MDIApplicationTutorial.html
+U java/source/diva/src/docs/packages/gui/tutorial/TextDocument.html
+U java/source/diva/src/docs/packages/gui/tutorial/index.html
+U java/source/diva/src/docs/packages/gui/tutorial/overview.html
+cvs checkout: Updating java/source/diva/src/docs/packages/sketch
+U java/source/diva/src/docs/packages/sketch/COPYRIGHT
+U java/source/diva/src/docs/packages/sketch/brush-stroke.html
+U java/source/diva/src/docs/packages/sketch/index.html
+U java/source/diva/src/docs/packages/sketch/overview.html
+U java/source/diva/src/docs/packages/sketch/parser2dDesign.html
+U java/source/diva/src/docs/packages/sketch/parser2dUser.html
+U java/source/diva/src/docs/packages/sketch/recognition.html
+U java/source/diva/src/docs/packages/sketch/sketchIntegration.html
+cvs checkout: Updating java/source/diva/src/docs/packages/sketch/images
+U java/source/diva/src/docs/packages/sketch/images/COPYRIGHT
+U java/source/diva/src/docs/packages/sketch/images/brush-stroke-interface.gif
+U java/source/diva/src/docs/packages/sketch/images/brush-stroke.gif
+U java/source/diva/src/docs/packages/sketch/images/connections.gif
+U java/source/diva/src/docs/packages/sketch/images/graph1a.gif
+U java/source/diva/src/docs/packages/sketch/images/graph1b.gif
+U java/source/diva/src/docs/packages/sketch/images/inconsistency.gif
+U java/source/diva/src/docs/packages/sketch/images/parser2d-constituent-uml.gif
+U java/source/diva/src/docs/packages/sketch/images/parser2d-flow.gif
+U java/source/diva/src/docs/packages/sketch/images/parser2d-overview-uml.gif
+U java/source/diva/src/docs/packages/sketch/images/parser2d-relation-uml.gif
+U java/source/diva/src/docs/packages/sketch/images/parser2d-trace.gif
+U java/source/diva/src/docs/packages/sketch/images/recognitionEngine.gif
+U java/source/diva/src/docs/packages/sketch/images/scrollpane.gif
+U java/source/diva/src/docs/packages/sketch/images/sketch.gif
+U java/source/diva/src/docs/packages/sketch/images/sketch0.3.gif
+U java/source/diva/src/docs/packages/sketch/images/sketch0.3details.gif
+U java/source/diva/src/docs/packages/sketch/images/stroke-interface.gif
+U java/source/diva/src/docs/packages/sketch/images/system-high.gif
+U java/source/diva/src/docs/packages/sketch/images/voting.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/sketch/reviews
+U java/source/diva/src/docs/packages/sketch/reviews/COPYRIGHT
+U java/source/diva/src/docs/packages/sketch/reviews/diva.sketch-981024.html
+U java/source/diva/src/docs/packages/sketch/reviews/index.html
+cvs checkout: Updating java/source/diva/src/docs/packages/util
+U java/source/diva/src/docs/packages/util/COPYRIGHT
+U java/source/diva/src/docs/packages/util/gui.html
+U java/source/diva/src/docs/packages/util/index.html
+U java/source/diva/src/docs/packages/util/jester.html
+cvs checkout: Updating java/source/diva/src/docs/packages/util/design
+U java/source/diva/src/docs/packages/util/design/COPYRIGHT
+U java/source/diva/src/docs/packages/util/design/application.html
+U java/source/diva/src/docs/packages/util/design/components.html
+U java/source/diva/src/docs/packages/util/design/context.html
+U java/source/diva/src/docs/packages/util/design/index.html
+cvs checkout: Updating java/source/diva/src/docs/packages/util/images
+U java/source/diva/src/docs/packages/util/images/COPYRIGHT
+U java/source/diva/src/docs/packages/util/images/application.gif
+U java/source/diva/src/docs/packages/util/images/context.gif
+U java/source/diva/src/docs/packages/util/images/gui.gif
+cvs checkout: Updating java/source/diva/src/docs/packages/whiteboard
+U java/source/diva/src/docs/packages/whiteboard/COPYRIGHT
+U java/source/diva/src/docs/packages/whiteboard/index.html
+U java/source/diva/src/docs/packages/whiteboard/overview.html
+U java/source/diva/src/docs/packages/whiteboard/revision.html
+cvs checkout: Updating java/source/diva/src/docs/packages/whiteboard/images
+U java/source/diva/src/docs/packages/whiteboard/images/COPYRIGHT
+U java/source/diva/src/docs/packages/whiteboard/images/architecture-current-sm.gif
+U java/source/diva/src/docs/packages/whiteboard/images/architecture-current.gif
+U java/source/diva/src/docs/packages/whiteboard/images/architecture-sm.gif
+U java/source/diva/src/docs/packages/whiteboard/images/architecture.gif
+U java/source/diva/src/docs/packages/whiteboard/images/architecture2-sm.gif
+U java/source/diva/src/docs/packages/whiteboard/images/architecture2.gif
+U java/source/diva/src/docs/packages/whiteboard/images/graph1a.gif
+U java/source/diva/src/docs/packages/whiteboard/images/graph1b.gif
+U java/source/diva/src/docs/packages/whiteboard/images/parser-writer0.3.gif
+U java/source/diva/src/docs/packages/whiteboard/images/toolbar.gif
+U java/source/diva/src/docs/packages/whiteboard/images/whiteboard0.3.gif
+cvs checkout: Updating java/source/diva/src/lib
+U java/source/diva/src/lib/acme.jar
+U java/source/diva/src/lib/acme_COPYRIGHT
+U java/source/diva/src/lib/aelfred.jar
+U java/source/diva/src/lib/aelfred_COPYRIGHT
+cvs checkout: Updating java/source/diva/src/main
+cvs checkout: Updating java/source/diva/src/main/diva
+U java/source/diva/src/main/diva/import.log
+cvs checkout: Updating java/source/diva/src/main/diva/canvas
+U java/source/diva/src/main/diva/canvas/AbstractFigure.java
+U java/source/diva/src/main/diva/canvas/AbstractFigureContainer.java
+U java/source/diva/src/main/diva/canvas/AbstractSite.java
+U java/source/diva/src/main/diva/canvas/BasicZList.java
+U java/source/diva/src/main/diva/canvas/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/CanvasComponent.java
+U java/source/diva/src/main/diva/canvas/CanvasDebugUtilities.java
+U java/source/diva/src/main/diva/canvas/CanvasLayer.java
+U java/source/diva/src/main/diva/canvas/CanvasPane.java
+U java/source/diva/src/main/diva/canvas/CanvasUtilities.java
+U java/source/diva/src/main/diva/canvas/CompositeFigure.java
+U java/source/diva/src/main/diva/canvas/DamageRegion.java
+U java/source/diva/src/main/diva/canvas/Figure.java
+U java/source/diva/src/main/diva/canvas/FigureContainer.java
+U java/source/diva/src/main/diva/canvas/FigureDecorator.java
+U java/source/diva/src/main/diva/canvas/FigureLayer.java
+U java/source/diva/src/main/diva/canvas/FigureSet.java
+U java/source/diva/src/main/diva/canvas/FigureWrapper.java
+U java/source/diva/src/main/diva/canvas/GeometricSet.java
+U java/source/diva/src/main/diva/canvas/GraphicsPane.java
+U java/source/diva/src/main/diva/canvas/JCanvas.java
+U java/source/diva/src/main/diva/canvas/OverlayLayer.java
+U java/source/diva/src/main/diva/canvas/PaneWrapper.java
+U java/source/diva/src/main/diva/canvas/Site.java
+U java/source/diva/src/main/diva/canvas/SiteDecorator.java
+U java/source/diva/src/main/diva/canvas/TransformContext.java
+U java/source/diva/src/main/diva/canvas/VisibleComponent.java
+U java/source/diva/src/main/diva/canvas/ZList.java
+U java/source/diva/src/main/diva/canvas/makefile
+U java/source/diva/src/main/diva/canvas/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/canvas/connector
+U java/source/diva/src/main/diva/canvas/connector/AbstractConnector.java
+U java/source/diva/src/main/diva/canvas/connector/AbstractConnectorTarget.java
+U java/source/diva/src/main/diva/canvas/connector/ArcConnector.java
+U java/source/diva/src/main/diva/canvas/connector/ArcInteractor.java
+U java/source/diva/src/main/diva/canvas/connector/ArcManipulator.java
+U java/source/diva/src/main/diva/canvas/connector/ArcMidpointSite.java
+U java/source/diva/src/main/diva/canvas/connector/Arrowhead.java
+U java/source/diva/src/main/diva/canvas/connector/AutonomousSite.java
+U java/source/diva/src/main/diva/canvas/connector/Blob.java
+U java/source/diva/src/main/diva/canvas/connector/BoundsSite.java
+U java/source/diva/src/main/diva/canvas/connector/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/connector/CenterSite.java
+U java/source/diva/src/main/diva/canvas/connector/CenterTarget.java
+U java/source/diva/src/main/diva/canvas/connector/Connector.java
+U java/source/diva/src/main/diva/canvas/connector/ConnectorAdapter.java
+U java/source/diva/src/main/diva/canvas/connector/ConnectorEnd.java
+U java/source/diva/src/main/diva/canvas/connector/ConnectorEvent.java
+U java/source/diva/src/main/diva/canvas/connector/ConnectorInteractor.java
+U java/source/diva/src/main/diva/canvas/connector/ConnectorListener.java
+U java/source/diva/src/main/diva/canvas/connector/ConnectorManipulator.java
+U java/source/diva/src/main/diva/canvas/connector/ConnectorTarget.java
+U java/source/diva/src/main/diva/canvas/connector/FixedNormalSite.java
+U java/source/diva/src/main/diva/canvas/connector/ManhattanConnector.java
+U java/source/diva/src/main/diva/canvas/connector/ManhattanRouter.java
+U java/source/diva/src/main/diva/canvas/connector/NullSite.java
+U java/source/diva/src/main/diva/canvas/connector/ParametricSite.java
+U java/source/diva/src/main/diva/canvas/connector/PerimeterSite.java
+U java/source/diva/src/main/diva/canvas/connector/PerimeterTarget.java
+U java/source/diva/src/main/diva/canvas/connector/StraightConnector.java
+U java/source/diva/src/main/diva/canvas/connector/StraightTerminal.java
+U java/source/diva/src/main/diva/canvas/connector/Terminal.java
+U java/source/diva/src/main/diva/canvas/connector/TerminalFigure.java
+U java/source/diva/src/main/diva/canvas/connector/makefile
+U java/source/diva/src/main/diva/canvas/connector/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/canvas/demo
+U java/source/diva/src/main/diva/canvas/demo/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/demo/FigureDemo.java
+U java/source/diva/src/main/diva/canvas/demo/MainWindow.java
+U java/source/diva/src/main/diva/canvas/demo/RootPane.java
+U java/source/diva/src/main/diva/canvas/demo/SelectionPane.java
+U java/source/diva/src/main/diva/canvas/demo/SimplePane.java
+U java/source/diva/src/main/diva/canvas/demo/SpaceDemo.java
+U java/source/diva/src/main/diva/canvas/demo/SpaceWindow.java
+U java/source/diva/src/main/diva/canvas/demo/WarpImageFigure.java
+U java/source/diva/src/main/diva/canvas/demo/ZoomDemo.java
+U java/source/diva/src/main/diva/canvas/demo/demo.gif
+U java/source/diva/src/main/diva/canvas/demo/graph.tc
+U java/source/diva/src/main/diva/canvas/demo/makefile
+U java/source/diva/src/main/diva/canvas/demo/package.html
+U java/source/diva/src/main/diva/canvas/demo/pz.tc
+U java/source/diva/src/main/diva/canvas/demo/surfing.gif
+cvs checkout: Updating java/source/diva/src/main/diva/canvas/event
+U java/source/diva/src/main/diva/canvas/event/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/event/EventAcceptor.java
+U java/source/diva/src/main/diva/canvas/event/EventLayer.java
+U java/source/diva/src/main/diva/canvas/event/LayerAdapter.java
+U java/source/diva/src/main/diva/canvas/event/LayerConsumer.java
+U java/source/diva/src/main/diva/canvas/event/LayerEvent.java
+U java/source/diva/src/main/diva/canvas/event/LayerEventMulticaster.java
+U java/source/diva/src/main/diva/canvas/event/LayerListener.java
+U java/source/diva/src/main/diva/canvas/event/LayerMotionAdapter.java
+U java/source/diva/src/main/diva/canvas/event/LayerMotionListener.java
+U java/source/diva/src/main/diva/canvas/event/LayerMouseAdapter.java
+U java/source/diva/src/main/diva/canvas/event/MouseFilter.java
+U java/source/diva/src/main/diva/canvas/event/makefile
+U java/source/diva/src/main/diva/canvas/event/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/canvas/interactor
+U java/source/diva/src/main/diva/canvas/interactor/AbstractInteractor.java
+U java/source/diva/src/main/diva/canvas/interactor/ActionInteractor.java
+U java/source/diva/src/main/diva/canvas/interactor/BasicGrabHandle.java
+U java/source/diva/src/main/diva/canvas/interactor/BasicGrabHandleFactory.java
+U java/source/diva/src/main/diva/canvas/interactor/BasicSelectionModel.java
+U java/source/diva/src/main/diva/canvas/interactor/BasicSelectionRenderer.java
+U java/source/diva/src/main/diva/canvas/interactor/BoundedDragInteractor.java
+U java/source/diva/src/main/diva/canvas/interactor/BoundsConstraint.java
+U java/source/diva/src/main/diva/canvas/interactor/BoundsGeometry.java
+U java/source/diva/src/main/diva/canvas/interactor/BoundsManipulator.java
+U java/source/diva/src/main/diva/canvas/interactor/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/interactor/CircleGeometry.java
+U java/source/diva/src/main/diva/canvas/interactor/CircleManipulator.java
+U java/source/diva/src/main/diva/canvas/interactor/CompositeInteractor.java
+U java/source/diva/src/main/diva/canvas/interactor/DragInteractor.java
+U java/source/diva/src/main/diva/canvas/interactor/Geometry.java
+U java/source/diva/src/main/diva/canvas/interactor/GrabHandle.java
+U java/source/diva/src/main/diva/canvas/interactor/GrabHandleFactory.java
+U java/source/diva/src/main/diva/canvas/interactor/Interactor.java
+U java/source/diva/src/main/diva/canvas/interactor/Manipulator.java
+U java/source/diva/src/main/diva/canvas/interactor/MoveHandle.java
+U java/source/diva/src/main/diva/canvas/interactor/PathGeometry.java
+U java/source/diva/src/main/diva/canvas/interactor/PathManipulator.java
+U java/source/diva/src/main/diva/canvas/interactor/PointConstraint.java
+U java/source/diva/src/main/diva/canvas/interactor/QuadrantConstraint.java
+U java/source/diva/src/main/diva/canvas/interactor/SelectionDragger.java
+U java/source/diva/src/main/diva/canvas/interactor/SelectionEvent.java
+U java/source/diva/src/main/diva/canvas/interactor/SelectionInteractor.java
+U java/source/diva/src/main/diva/canvas/interactor/SelectionListener.java
+U java/source/diva/src/main/diva/canvas/interactor/SelectionModel.java
+U java/source/diva/src/main/diva/canvas/interactor/SelectionRenderer.java
+U java/source/diva/src/main/diva/canvas/interactor/ShapedFigure.java
+U java/source/diva/src/main/diva/canvas/interactor/makefile
+U java/source/diva/src/main/diva/canvas/interactor/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/canvas/test
+U java/source/diva/src/main/diva/canvas/test/All.java
+U java/source/diva/src/main/diva/canvas/test/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/test/ConcreteFigures.java
+U java/source/diva/src/main/diva/canvas/test/FigureTest.java
+U java/source/diva/src/main/diva/canvas/test/JCanvasTest.java
+U java/source/diva/src/main/diva/canvas/test/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/canvas/toolbox
+U java/source/diva/src/main/diva/canvas/toolbox/BackgroundedCompositeFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/BasicCanvasPane.java
+U java/source/diva/src/main/diva/canvas/toolbox/BasicController.java
+U java/source/diva/src/main/diva/canvas/toolbox/BasicEllipse.java
+U java/source/diva/src/main/diva/canvas/toolbox/BasicFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/BasicHighlighter.java
+U java/source/diva/src/main/diva/canvas/toolbox/BasicRectangle.java
+U java/source/diva/src/main/diva/canvas/toolbox/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/toolbox/GraphicsParser.java
+U java/source/diva/src/main/diva/canvas/toolbox/GridLayer.java
+U java/source/diva/src/main/diva/canvas/toolbox/IconFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/ImageFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/LabelWrapper.java
+U java/source/diva/src/main/diva/canvas/toolbox/PaintedFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/PathFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/SVGParser.java
+U java/source/diva/src/main/diva/canvas/toolbox/SVGUtilities.java
+U java/source/diva/src/main/diva/canvas/toolbox/SwingWrapper.java
+U java/source/diva/src/main/diva/canvas/toolbox/TypedDecorator.java
+U java/source/diva/src/main/diva/canvas/toolbox/VectorFigure.java
+U java/source/diva/src/main/diva/canvas/toolbox/makefile
+U java/source/diva/src/main/diva/canvas/toolbox/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/canvas/tutorial
+U java/source/diva/src/main/diva/canvas/tutorial/ArcTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/COPYRIGHT
+U java/source/diva/src/main/diva/canvas/tutorial/CompositeFigureTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/ConnectorTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/DragTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/FigureTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/IconTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/LabelTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/SimpleTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/TerminalTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/TransformedFigureTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/VectorFigureTutorial.java
+U java/source/diva/src/main/diva/canvas/tutorial/demo.gif
+U java/source/diva/src/main/diva/canvas/tutorial/makefile
+U java/source/diva/src/main/diva/canvas/tutorial/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/compat
+U java/source/diva/src/main/diva/compat/COPYRIGHT
+U java/source/diva/src/main/diva/compat/Dummy.java
+U java/source/diva/src/main/diva/compat/README.txt
+U java/source/diva/src/main/diva/compat/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/compat/canvas
+U java/source/diva/src/main/diva/compat/canvas/AbstractPaintedGraphic.java
+U java/source/diva/src/main/diva/compat/canvas/COPYRIGHT
+U java/source/diva/src/main/diva/compat/canvas/GraphicsParser.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedFigure.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedGraphic.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedImage.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedList.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedObject.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedPath.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedShape.java
+U java/source/diva/src/main/diva/compat/canvas/PaintedString.java
+U java/source/diva/src/main/diva/compat/canvas/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/compat/gui
+U java/source/diva/src/main/diva/compat/gui/BasicWindow.java
+U java/source/diva/src/main/diva/compat/gui/COPYRIGHT
+U java/source/diva/src/main/diva/compat/gui/TutorialWindow.java
+U java/source/diva/src/main/diva/compat/gui/makefile
+U java/source/diva/src/main/diva/compat/gui/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/compat/trace
+U java/source/diva/src/main/diva/compat/trace/BasicTraceRenderer.java
+U java/source/diva/src/main/diva/compat/trace/COPYRIGHT
+U java/source/diva/src/main/diva/compat/trace/TraceController.java
+U java/source/diva/src/main/diva/compat/trace/TraceModel.java
+U java/source/diva/src/main/diva/compat/trace/TracePane.java
+U java/source/diva/src/main/diva/compat/trace/TraceRenderer.java
+U java/source/diva/src/main/diva/compat/trace/TraceTutorial.java
+U java/source/diva/src/main/diva/compat/trace/TraceView.java
+U java/source/diva/src/main/diva/compat/trace/makefile
+U java/source/diva/src/main/diva/compat/trace/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/compat/util
+U java/source/diva/src/main/diva/compat/util/AndFilter.java
+U java/source/diva/src/main/diva/compat/util/COPYRIGHT
+U java/source/diva/src/main/diva/compat/util/NotFilter.java
+U java/source/diva/src/main/diva/compat/util/OrFilter.java
+U java/source/diva/src/main/diva/compat/util/PropertyIndexSet.java
+U java/source/diva/src/main/diva/compat/util/SemanticObjectChangeEvent.java
+U java/source/diva/src/main/diva/compat/util/SemanticObjectChangeListener.java
+U java/source/diva/src/main/diva/compat/util/UserObjectChangeEvent.java
+U java/source/diva/src/main/diva/compat/util/UserObjectChangeListener.java
+U java/source/diva/src/main/diva/compat/util/VisualObjectContainer.java
+U java/source/diva/src/main/diva/compat/util/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/compat/xml
+U java/source/diva/src/main/diva/compat/xml/AbstractXmlBuilder.java
+U java/source/diva/src/main/diva/compat/xml/COPYRIGHT
+U java/source/diva/src/main/diva/compat/xml/CompositeBuilder.java
+U java/source/diva/src/main/diva/compat/xml/XmlBuilder.java
+U java/source/diva/src/main/diva/compat/xml/XmlDemo.java
+U java/source/diva/src/main/diva/compat/xml/XmlDocument.java
+U java/source/diva/src/main/diva/compat/xml/XmlElement.java
+U java/source/diva/src/main/diva/compat/xml/XmlReader.java
+U java/source/diva/src/main/diva/compat/xml/XmlUtilities.java
+U java/source/diva/src/main/diva/compat/xml/XmlWriter.java
+U java/source/diva/src/main/diva/compat/xml/makefile
+U java/source/diva/src/main/diva/compat/xml/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graph
+U java/source/diva/src/main/diva/graph/AbstractGraphController.java
+U java/source/diva/src/main/diva/graph/AbstractGraphModel.java
+U java/source/diva/src/main/diva/graph/BasicEdgeController.java
+U java/source/diva/src/main/diva/graph/BasicNodeController.java
+U java/source/diva/src/main/diva/graph/COPYRIGHT
+U java/source/diva/src/main/diva/graph/EdgeController.java
+U java/source/diva/src/main/diva/graph/EdgeCreator.java
+U java/source/diva/src/main/diva/graph/EdgeInteractor.java
+U java/source/diva/src/main/diva/graph/EdgeRenderer.java
+U java/source/diva/src/main/diva/graph/GraphController.java
+U java/source/diva/src/main/diva/graph/GraphEvent.java
+U java/source/diva/src/main/diva/graph/GraphException.java
+U java/source/diva/src/main/diva/graph/GraphListener.java
+U java/source/diva/src/main/diva/graph/GraphModel.java
+U java/source/diva/src/main/diva/graph/GraphPane.java
+U java/source/diva/src/main/diva/graph/GraphUtilities.java
+U java/source/diva/src/main/diva/graph/GraphViewEvent.java
+U java/source/diva/src/main/diva/graph/GraphViewListener.java
+U java/source/diva/src/main/diva/graph/JGraph.java
+U java/source/diva/src/main/diva/graph/MutableGraphModel.java
+U java/source/diva/src/main/diva/graph/NodeController.java
+U java/source/diva/src/main/diva/graph/NodeDragInteractor.java
+U java/source/diva/src/main/diva/graph/NodeInteractor.java
+U java/source/diva/src/main/diva/graph/NodeRenderer.java
+U java/source/diva/src/main/diva/graph/SimpleGraphController.java
+U java/source/diva/src/main/diva/graph/makefile
+U java/source/diva/src/main/diva/graph/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graph/basic
+U java/source/diva/src/main/diva/graph/basic/ArcRenderer.java
+U java/source/diva/src/main/diva/graph/basic/BasicEdgeRenderer.java
+U java/source/diva/src/main/diva/graph/basic/BasicGraphController.java
+U java/source/diva/src/main/diva/graph/basic/BasicGraphDemo.htm
+U java/source/diva/src/main/diva/graph/basic/BasicGraphDemo.java
+U java/source/diva/src/main/diva/graph/basic/BasicGraphDemoApplet.java
+U java/source/diva/src/main/diva/graph/basic/BasicGraphModel.java
+U java/source/diva/src/main/diva/graph/basic/BasicLayoutTarget.java
+U java/source/diva/src/main/diva/graph/basic/BasicNodeRenderer.java
+U java/source/diva/src/main/diva/graph/basic/BubbleGraphController.java
+U java/source/diva/src/main/diva/graph/basic/BubbleGraphDemo.htm
+U java/source/diva/src/main/diva/graph/basic/BubbleGraphDemo.java
+U java/source/diva/src/main/diva/graph/basic/BubbleGraphDemoApplet.java
+U java/source/diva/src/main/diva/graph/basic/BubblePane.java
+U java/source/diva/src/main/diva/graph/basic/BubbleRenderer.java
+U java/source/diva/src/main/diva/graph/basic/COPYRIGHT
+U java/source/diva/src/main/diva/graph/basic/graph.dtd
+U java/source/diva/src/main/diva/graph/basic/graph.xml
+U java/source/diva/src/main/diva/graph/basic/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/graph/layout
+U java/source/diva/src/main/diva/graph/layout/AbstractGlobalLayout.java
+U java/source/diva/src/main/diva/graph/layout/COPYRIGHT
+U java/source/diva/src/main/diva/graph/layout/GlobalLayout.java
+U java/source/diva/src/main/diva/graph/layout/GridAnnealingLayout.java
+U java/source/diva/src/main/diva/graph/layout/IncrLayoutAdapter.java
+U java/source/diva/src/main/diva/graph/layout/IncrementalLayout.java
+U java/source/diva/src/main/diva/graph/layout/IncrementalLayoutListener.java
+U java/source/diva/src/main/diva/graph/layout/LayoutTarget.java
+U java/source/diva/src/main/diva/graph/layout/LayoutUtilities.java
+U java/source/diva/src/main/diva/graph/layout/LevelLayout.java
+U java/source/diva/src/main/diva/graph/layout/ProxyIncrLayout.java
+U java/source/diva/src/main/diva/graph/layout/RandomIncrLayout.java
+U java/source/diva/src/main/diva/graph/layout/RandomLayout.java
+U java/source/diva/src/main/diva/graph/layout/makefile
+U java/source/diva/src/main/diva/graph/layout/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graph/modular
+U java/source/diva/src/main/diva/graph/modular/BasicModularGraphModel.java
+U java/source/diva/src/main/diva/graph/modular/COPYRIGHT
+U java/source/diva/src/main/diva/graph/modular/CompositeModel.java
+U java/source/diva/src/main/diva/graph/modular/CompositeNode.java
+U java/source/diva/src/main/diva/graph/modular/CompositeNodeModel.java
+U java/source/diva/src/main/diva/graph/modular/Edge.java
+U java/source/diva/src/main/diva/graph/modular/EdgeModel.java
+U java/source/diva/src/main/diva/graph/modular/Graph.java
+U java/source/diva/src/main/diva/graph/modular/ModularGraphModel.java
+U java/source/diva/src/main/diva/graph/modular/MutableCompositeNodeModel.java
+U java/source/diva/src/main/diva/graph/modular/MutableEdgeModel.java
+U java/source/diva/src/main/diva/graph/modular/MutableModularGraphModel.java
+U java/source/diva/src/main/diva/graph/modular/MutableNodeModel.java
+U java/source/diva/src/main/diva/graph/modular/Node.java
+U java/source/diva/src/main/diva/graph/modular/NodeModel.java
+U java/source/diva/src/main/diva/graph/modular/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/graph/schematic
+U java/source/diva/src/main/diva/graph/schematic/COPYRIGHT
+U java/source/diva/src/main/diva/graph/schematic/ContextGraphView.java
+U java/source/diva/src/main/diva/graph/schematic/GraphDocument.java
+U java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java
+U java/source/diva/src/main/diva/graph/schematic/GraphEditor.htm
+U java/source/diva/src/main/diva/graph/schematic/GraphEditor.java
+U java/source/diva/src/main/diva/graph/schematic/GraphEditorApplet.java
+U java/source/diva/src/main/diva/graph/schematic/GraphView.java
+U java/source/diva/src/main/diva/graph/schematic/MultiWindowGraphEditor.java
+U java/source/diva/src/main/diva/graph/schematic/SchematicGraphController.java
+U java/source/diva/src/main/diva/graph/schematic/SchematicGraphModel.java
+U java/source/diva/src/main/diva/graph/schematic/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/graph/test
+U java/source/diva/src/main/diva/graph/test/All.java
+U java/source/diva/src/main/diva/graph/test/BasicGraphModelTest.java
+U java/source/diva/src/main/diva/graph/test/COPYRIGHT
+U java/source/diva/src/main/diva/graph/test/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/graph/toolbox
+U java/source/diva/src/main/diva/graph/toolbox/COPYRIGHT
+U java/source/diva/src/main/diva/graph/toolbox/DeletionListener.java
+U java/source/diva/src/main/diva/graph/toolbox/GraphEventMulticaster.java
+U java/source/diva/src/main/diva/graph/toolbox/GraphLogger.java
+U java/source/diva/src/main/diva/graph/toolbox/StateBubble.java
+U java/source/diva/src/main/diva/graph/toolbox/TypedNodeRenderer.java
+U java/source/diva/src/main/diva/graph/toolbox/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/graph/tutorial
+U java/source/diva/src/main/diva/graph/tutorial/COPYRIGHT
+U java/source/diva/src/main/diva/graph/tutorial/EditorTutorial.java
+U java/source/diva/src/main/diva/graph/tutorial/NestedTutorial.java
+U java/source/diva/src/main/diva/graph/tutorial/NodeRendererTutorial.java
+U java/source/diva/src/main/diva/graph/tutorial/PrepopulatedTutorial.java
+U java/source/diva/src/main/diva/graph/tutorial/SimpleTutorial.java
+U java/source/diva/src/main/diva/graph/tutorial/graph.dtd
+U java/source/diva/src/main/diva/graph/tutorial/graph.xml
+U java/source/diva/src/main/diva/graph/tutorial/makefile
+U java/source/diva/src/main/diva/graph/tutorial/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graphx
+U java/source/diva/src/main/diva/graphx/AttributeAdapter.java
+U java/source/diva/src/main/diva/graphx/AttributeProxy.java
+U java/source/diva/src/main/diva/graphx/COPYRIGHT
+U java/source/diva/src/main/diva/graphx/EdgeAdapter.java
+U java/source/diva/src/main/diva/graphx/EdgeController.java
+U java/source/diva/src/main/diva/graphx/GraphController.java
+U java/source/diva/src/main/diva/graphx/GraphException.java
+U java/source/diva/src/main/diva/graphx/GraphModel.java
+U java/source/diva/src/main/diva/graphx/GraphUtilities.java
+U java/source/diva/src/main/diva/graphx/NodeAdapter.java
+U java/source/diva/src/main/diva/graphx/NodeController.java
+U java/source/diva/src/main/diva/graphx/makefile
+U java/source/diva/src/main/diva/graphx/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graphx/event
+U java/source/diva/src/main/diva/graphx/event/COPYRIGHT
+U java/source/diva/src/main/diva/graphx/event/GraphEvent.java
+U java/source/diva/src/main/diva/graphx/event/GraphEventMulticaster.java
+U java/source/diva/src/main/diva/graphx/event/GraphListener.java
+U java/source/diva/src/main/diva/graphx/event/GraphViewEvent.java
+U java/source/diva/src/main/diva/graphx/event/GraphViewListener.java
+U java/source/diva/src/main/diva/graphx/event/makefile
+U java/source/diva/src/main/diva/graphx/event/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graphx/interaction
+U java/source/diva/src/main/diva/graphx/interaction/COPYRIGHT
+U java/source/diva/src/main/diva/graphx/interaction/EdgeCreator.java
+U java/source/diva/src/main/diva/graphx/interaction/EdgeInteractor.java
+U java/source/diva/src/main/diva/graphx/interaction/NodeDragInteractor.java
+U java/source/diva/src/main/diva/graphx/interaction/NodeInteractor.java
+U java/source/diva/src/main/diva/graphx/interaction/makefile
+U java/source/diva/src/main/diva/graphx/interaction/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graphx/toolbox
+U java/source/diva/src/main/diva/graphx/toolbox/BasicEdge.java
+U java/source/diva/src/main/diva/graphx/toolbox/BasicEdgeAdapter.java
+U java/source/diva/src/main/diva/graphx/toolbox/BasicGraphModel.java
+U java/source/diva/src/main/diva/graphx/toolbox/BasicNode.java
+U java/source/diva/src/main/diva/graphx/toolbox/BasicNodeAdapter.java
+U java/source/diva/src/main/diva/graphx/toolbox/COPYRIGHT
+U java/source/diva/src/main/diva/graphx/toolbox/ClearDeletionPolicy.java
+U java/source/diva/src/main/diva/graphx/toolbox/DefaultDeletionPolicy.java
+U java/source/diva/src/main/diva/graphx/toolbox/DeletionListener.java
+U java/source/diva/src/main/diva/graphx/toolbox/DeletionPolicy.java
+U java/source/diva/src/main/diva/graphx/toolbox/GraphLogger.java
+U java/source/diva/src/main/diva/graphx/toolbox/makefile
+U java/source/diva/src/main/diva/graphx/toolbox/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/graphx/tutorial
+U java/source/diva/src/main/diva/graphx/tutorial/COPYRIGHT
+U java/source/diva/src/main/diva/graphx/tutorial/SimpleEdgeController.java
+U java/source/diva/src/main/diva/graphx/tutorial/SimpleGraphController.java
+U java/source/diva/src/main/diva/graphx/tutorial/SimpleNodeController.java
+U java/source/diva/src/main/diva/graphx/tutorial/SimpleTutorial.java
+U java/source/diva/src/main/diva/graphx/tutorial/makefile
+U java/source/diva/src/main/diva/graphx/tutorial/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/gui
+U java/source/diva/src/main/diva/gui/AbstractApplication.java
+U java/source/diva/src/main/diva/gui/AbstractDocument.java
+U java/source/diva/src/main/diva/gui/AbstractStoragePolicy.java
+U java/source/diva/src/main/diva/gui/AbstractView.java
+U java/source/diva/src/main/diva/gui/AppContext.java
+U java/source/diva/src/main/diva/gui/AppContextDelegate.java
+U java/source/diva/src/main/diva/gui/AppletContext.java
+U java/source/diva/src/main/diva/gui/Application.java
+U java/source/diva/src/main/diva/gui/ApplicationContext.java
+U java/source/diva/src/main/diva/gui/ApplicationExceptionHandler.java
+U java/source/diva/src/main/diva/gui/ApplicationResources.java
+U java/source/diva/src/main/diva/gui/BasicFrame.java
+U java/source/diva/src/main/diva/gui/BasicPage.java
+U java/source/diva/src/main/diva/gui/BasicStoragePolicy.java
+U java/source/diva/src/main/diva/gui/COPYRIGHT
+U java/source/diva/src/main/diva/gui/ContextView.java
+U java/source/diva/src/main/diva/gui/DefaultActions.java
+U java/source/diva/src/main/diva/gui/DefaultStoragePolicy.java
+U java/source/diva/src/main/diva/gui/DesktopContext.java
+U java/source/diva/src/main/diva/gui/Document.java
+U java/source/diva/src/main/diva/gui/DocumentFactory.java
+U java/source/diva/src/main/diva/gui/ExtensionFileFilter.java
+U java/source/diva/src/main/diva/gui/GUIUtilities.java
+U java/source/diva/src/main/diva/gui/MDIApplication.java
+U java/source/diva/src/main/diva/gui/MDIContext.java
+U java/source/diva/src/main/diva/gui/MultiWindowApplication.java
+U java/source/diva/src/main/diva/gui/MultipageDocument.java
+U java/source/diva/src/main/diva/gui/MultipageModel.java
+U java/source/diva/src/main/diva/gui/MultipageParser.java
+U java/source/diva/src/main/diva/gui/MultipageWriter.java
+U java/source/diva/src/main/diva/gui/Page.java
+U java/source/diva/src/main/diva/gui/StoragePolicy.java
+U java/source/diva/src/main/diva/gui/View.java
+U java/source/diva/src/main/diva/gui/ViewAdapter.java
+U java/source/diva/src/main/diva/gui/ViewEvent.java
+U java/source/diva/src/main/diva/gui/ViewListener.java
+U java/source/diva/src/main/diva/gui/makefile
+U java/source/diva/src/main/diva/gui/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/gui/toolbox
+U java/source/diva/src/main/diva/gui/toolbox/COPYRIGHT
+U java/source/diva/src/main/diva/gui/toolbox/FigureIcon.java
+U java/source/diva/src/main/diva/gui/toolbox/FocusMouseListener.java
+U java/source/diva/src/main/diva/gui/toolbox/JCanvasPalette.java
+U java/source/diva/src/main/diva/gui/toolbox/JCanvasPanner.java
+U java/source/diva/src/main/diva/gui/toolbox/JContextMenu.java
+U java/source/diva/src/main/diva/gui/toolbox/JPalette.java
+U java/source/diva/src/main/diva/gui/toolbox/JPanner.java
+U java/source/diva/src/main/diva/gui/toolbox/JPseudoFrame.java
+U java/source/diva/src/main/diva/gui/toolbox/JShadePane.java
+U java/source/diva/src/main/diva/gui/toolbox/JStatusBar.java
+U java/source/diva/src/main/diva/gui/toolbox/JTreePane.java
+U java/source/diva/src/main/diva/gui/toolbox/ListDataModel.java
+U java/source/diva/src/main/diva/gui/toolbox/MenuCreator.java
+U java/source/diva/src/main/diva/gui/toolbox/MenuFactory.java
+U java/source/diva/src/main/diva/gui/toolbox/makefile
+U java/source/diva/src/main/diva/gui/toolbox/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/gui/tutorial
+U java/source/diva/src/main/diva/gui/tutorial/AppletTutorial.htm
+U java/source/diva/src/main/diva/gui/tutorial/AppletTutorial.java
+U java/source/diva/src/main/diva/gui/tutorial/ApplicationTutorial.java
+U java/source/diva/src/main/diva/gui/tutorial/COPYRIGHT
+U java/source/diva/src/main/diva/gui/tutorial/MDIApplicationTutorial.java
+U java/source/diva/src/main/diva/gui/tutorial/TextDocument.java
+U java/source/diva/src/main/diva/gui/tutorial/TextView.java
+U java/source/diva/src/main/diva/gui/tutorial/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/pod
+U java/source/diva/src/main/diva/pod/COPYRIGHT
+U java/source/diva/src/main/diva/pod/Channel.java
+U java/source/diva/src/main/diva/pod/Delta.java
+U java/source/diva/src/main/diva/pod/Generator.java
+U java/source/diva/src/main/diva/pod/Pod.java
+U java/source/diva/src/main/diva/pod/Protocol.java
+U java/source/diva/src/main/diva/pod/Receiver.java
+U java/source/diva/src/main/diva/pod/Transmitter.java
+U java/source/diva/src/main/diva/pod/View.java
+U java/source/diva/src/main/diva/pod/makefile
+U java/source/diva/src/main/diva/pod/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/pod/lwgraph
+U java/source/diva/src/main/diva/pod/lwgraph/BasicLWEdge.java
+U java/source/diva/src/main/diva/pod/lwgraph/BasicLWNode.java
+U java/source/diva/src/main/diva/pod/lwgraph/BasicLWPort.java
+U java/source/diva/src/main/diva/pod/lwgraph/COPYRIGHT
+U java/source/diva/src/main/diva/pod/lwgraph/LWEdge.java
+U java/source/diva/src/main/diva/pod/lwgraph/LWNode.java
+U java/source/diva/src/main/diva/pod/lwgraph/LWPort.java
+U java/source/diva/src/main/diva/pod/lwgraph/LightweightGraph.java
+U java/source/diva/src/main/diva/pod/lwgraph/LightweightNetwork.java
+U java/source/diva/src/main/diva/pod/lwgraph/Topology.java
+U java/source/diva/src/main/diva/pod/lwgraph/Traversal.java
+U java/source/diva/src/main/diva/pod/lwgraph/makefile
+U java/source/diva/src/main/diva/pod/lwgraph/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/pod/test
+U java/source/diva/src/main/diva/pod/test/All.java
+U java/source/diva/src/main/diva/pod/test/COPYRIGHT
+U java/source/diva/src/main/diva/pod/test/LightweightGraphTest.java
+U java/source/diva/src/main/diva/pod/test/LightweightNetworkTest.java
+U java/source/diva/src/main/diva/pod/test/TopologyTest.java
+U java/source/diva/src/main/diva/pod/test/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/resource
+U java/source/diva/src/main/diva/resource/COPYRIGHT
+U java/source/diva/src/main/diva/resource/DefaultBundle.java
+U java/source/diva/src/main/diva/resource/Defaults.properties
+U java/source/diva/src/main/diva/resource/RelativeBundle.java
+U java/source/diva/src/main/diva/resource/commands.tc
+U java/source/diva/src/main/diva/resource/dtd_graph.dtd
+U java/source/diva/src/main/diva/resource/dtd_sketch.dtd
+U java/source/diva/src/main/diva/resource/dtd_test.dtd
+U java/source/diva/src/main/diva/resource/img_command.gif
+U java/source/diva/src/main/diva/resource/img_copy.gif
+U java/source/diva/src/main/diva/resource/img_cut.gif
+U java/source/diva/src/main/diva/resource/img_graphIcon.gif
+U java/source/diva/src/main/diva/resource/img_highlight.gif
+U java/source/diva/src/main/diva/resource/img_new.gif
+U java/source/diva/src/main/diva/resource/img_newPage.gif
+U java/source/diva/src/main/diva/resource/img_next.gif
+U java/source/diva/src/main/diva/resource/img_open.gif
+U java/source/diva/src/main/diva/resource/img_paste.gif
+U java/source/diva/src/main/diva/resource/img_previous.gif
+U java/source/diva/src/main/diva/resource/img_save.gif
+U java/source/diva/src/main/diva/resource/img_sketch.gif
+U java/source/diva/src/main/diva/resource/makefile
+U java/source/diva/src/main/diva/resource/package.html
+U java/source/diva/src/main/diva/resource/recognizerBuilders.xml
+U java/source/diva/src/main/diva/resource/sceneBuilders.xml
+cvs checkout: Updating java/source/diva/src/main/diva/sketch
+U java/source/diva/src/main/diva/sketch/BasicInterpreter.java
+U java/source/diva/src/main/diva/sketch/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/CheckSelectionAction.java
+U java/source/diva/src/main/diva/sketch/CompositeSymbol.java
+U java/source/diva/src/main/diva/sketch/DeletionAction.java
+U java/source/diva/src/main/diva/sketch/JSketch.java
+U java/source/diva/src/main/diva/sketch/LassoSelectionAction.java
+U java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java
+U java/source/diva/src/main/diva/sketch/PenStroke.java
+U java/source/diva/src/main/diva/sketch/SketchController.java
+U java/source/diva/src/main/diva/sketch/SketchEvent.java
+U java/source/diva/src/main/diva/sketch/SketchLayer.java
+U java/source/diva/src/main/diva/sketch/SketchListener.java
+U java/source/diva/src/main/diva/sketch/SketchModel.java
+U java/source/diva/src/main/diva/sketch/SketchPane.java
+U java/source/diva/src/main/diva/sketch/SketchParser.java
+U java/source/diva/src/main/diva/sketch/SketchWriter.java
+U java/source/diva/src/main/diva/sketch/StrokeSymbol.java
+U java/source/diva/src/main/diva/sketch/Symbol.java
+U java/source/diva/src/main/diva/sketch/makefile
+U java/source/diva/src/main/diva/sketch/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/classification
+U java/source/diva/src/main/diva/sketch/classification/AbstractClassifier.java
+U java/source/diva/src/main/diva/sketch/classification/BayesClassifier.java
+U java/source/diva/src/main/diva/sketch/classification/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/classification/Classification.java
+U java/source/diva/src/main/diva/sketch/classification/Classifier.java
+U java/source/diva/src/main/diva/sketch/classification/ClassifierException.java
+U java/source/diva/src/main/diva/sketch/classification/CrossValidation.java
+U java/source/diva/src/main/diva/sketch/classification/FeatureSet.java
+U java/source/diva/src/main/diva/sketch/classification/GaussianWeightSet.java
+U java/source/diva/src/main/diva/sketch/classification/KNNClassifier.java
+U java/source/diva/src/main/diva/sketch/classification/RubineClassifier.java
+U java/source/diva/src/main/diva/sketch/classification/TrainableClassifier.java
+U java/source/diva/src/main/diva/sketch/classification/TrainingSet.java
+U java/source/diva/src/main/diva/sketch/classification/WeightSet.java
+U java/source/diva/src/main/diva/sketch/classification/WeightedEuclideanClassifier.java
+U java/source/diva/src/main/diva/sketch/classification/makefile
+U java/source/diva/src/main/diva/sketch/classification/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/demo
+U java/source/diva/src/main/diva/sketch/demo/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/demo/LineTest.java
+U java/source/diva/src/main/diva/sketch/demo/RegionLabeler.java
+U java/source/diva/src/main/diva/sketch/demo/SceneTest.java
+U java/source/diva/src/main/diva/sketch/demo/SessionTest.java
+U java/source/diva/src/main/diva/sketch/demo/SketchDemo.html
+U java/source/diva/src/main/diva/sketch/demo/SketchDemo.java
+U java/source/diva/src/main/diva/sketch/demo/SketchDemoApplet.java
+U java/source/diva/src/main/diva/sketch/demo/makefile
+U java/source/diva/src/main/diva/sketch/demo/shapes.tc
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/features
+U java/source/diva/src/main/diva/sketch/features/AreaRatioFE.java
+U java/source/diva/src/main/diva/sketch/features/AspectRatioFE.java
+U java/source/diva/src/main/diva/sketch/features/BBoxDiagonalAngleFE.java
+U java/source/diva/src/main/diva/sketch/features/BBoxDiagonalLengthFE.java
+U java/source/diva/src/main/diva/sketch/features/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/features/ConvexHull.java
+U java/source/diva/src/main/diva/sketch/features/CornerFE.java
+U java/source/diva/src/main/diva/sketch/features/CosFirstLastPtsFE.java
+U java/source/diva/src/main/diva/sketch/features/CosInitAngleFE.java
+U java/source/diva/src/main/diva/sketch/features/DistanceStartEndPtsFE.java
+U java/source/diva/src/main/diva/sketch/features/DurationFE.java
+U java/source/diva/src/main/diva/sketch/features/FEUtilities.java
+U java/source/diva/src/main/diva/sketch/features/FeatureExtractor.java
+U java/source/diva/src/main/diva/sketch/features/MaxSpeedFE.java
+U java/source/diva/src/main/diva/sketch/features/PathLengthFE.java
+U java/source/diva/src/main/diva/sketch/features/PathRatioFE.java
+U java/source/diva/src/main/diva/sketch/features/SineFirstLastPtsFE.java
+U java/source/diva/src/main/diva/sketch/features/SineInitAngleFE.java
+U java/source/diva/src/main/diva/sketch/features/StrokeBBox.java
+U java/source/diva/src/main/diva/sketch/features/StrokeHull.java
+U java/source/diva/src/main/diva/sketch/features/SumOfAbsDeltaRatioFE.java
+U java/source/diva/src/main/diva/sketch/features/SumOfAbsoluteAnglesFE.java
+U java/source/diva/src/main/diva/sketch/features/SumOfAnglesFE.java
+U java/source/diva/src/main/diva/sketch/features/SumOfSquaredAnglesFE.java
+U java/source/diva/src/main/diva/sketch/features/makefile
+U java/source/diva/src/main/diva/sketch/features/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/parser2d
+U java/source/diva/src/main/diva/sketch/parser2d/AbstractRule.java
+U java/source/diva/src/main/diva/sketch/parser2d/AndConstraint.java
+U java/source/diva/src/main/diva/sketch/parser2d/AngleRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/AreaRatioRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/BasicConstraint.java
+U java/source/diva/src/main/diva/sketch/parser2d/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/parser2d/DeltaXRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/DeltaYRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/DistanceRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/Grammar2D.java
+U java/source/diva/src/main/diva/sketch/parser2d/HeightRatioRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/NativeResults.java
+U java/source/diva/src/main/diva/sketch/parser2d/OrConstraint.java
+U java/source/diva/src/main/diva/sketch/parser2d/OverlapRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/ParsingSceneRecognizer.java
+U java/source/diva/src/main/diva/sketch/parser2d/Relation.java
+U java/source/diva/src/main/diva/sketch/parser2d/RelationConstraint.java
+U java/source/diva/src/main/diva/sketch/parser2d/RelationUtilities.java
+U java/source/diva/src/main/diva/sketch/parser2d/Rule.java
+U java/source/diva/src/main/diva/sketch/parser2d/SingleRule.java
+U java/source/diva/src/main/diva/sketch/parser2d/WidthRatioRelation.java
+U java/source/diva/src/main/diva/sketch/parser2d/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/rcl
+U java/source/diva/src/main/diva/sketch/rcl/BasicStrokeBuilder.java
+U java/source/diva/src/main/diva/sketch/rcl/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/rcl/ClassBuilder.java
+U java/source/diva/src/main/diva/sketch/rcl/SceneClassBuilder.java
+U java/source/diva/src/main/diva/sketch/rcl/StrokeSceneBuilder.java
+U java/source/diva/src/main/diva/sketch/rcl/VotingSceneBuilder.java
+U java/source/diva/src/main/diva/sketch/rcl/VotingStrokeBuilder.java
+U java/source/diva/src/main/diva/sketch/rcl/index.html
+U java/source/diva/src/main/diva/sketch/rcl/makefile
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/recognition
+U java/source/diva/src/main/diva/sketch/recognition/BasicScene.java
+U java/source/diva/src/main/diva/sketch/recognition/BasicStrokeRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/recognition/ChoiceElement.java
+U java/source/diva/src/main/diva/sketch/recognition/CompositeElement.java
+U java/source/diva/src/main/diva/sketch/recognition/MSTrainingModel.java
+U java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java
+U java/source/diva/src/main/diva/sketch/recognition/MSTrainingWriter.java
+U java/source/diva/src/main/diva/sketch/recognition/MultiStrokeRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/MultiStrokeSceneRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/Recognition.java
+U java/source/diva/src/main/diva/sketch/recognition/RecognitionSet.java
+U java/source/diva/src/main/diva/sketch/recognition/SSTrainingModel.java
+U java/source/diva/src/main/diva/sketch/recognition/SSTrainingParser.java
+U java/source/diva/src/main/diva/sketch/recognition/SSTrainingWriter.java
+U java/source/diva/src/main/diva/sketch/recognition/Scene.java
+U java/source/diva/src/main/diva/sketch/recognition/SceneBuilder.java
+U java/source/diva/src/main/diva/sketch/recognition/SceneDelta.java
+U java/source/diva/src/main/diva/sketch/recognition/SceneDeltaSet.java
+U java/source/diva/src/main/diva/sketch/recognition/SceneElement.java
+U java/source/diva/src/main/diva/sketch/recognition/SceneParser.java
+U java/source/diva/src/main/diva/sketch/recognition/SceneRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/SceneWriter.java
+U java/source/diva/src/main/diva/sketch/recognition/SimpleData.java
+U java/source/diva/src/main/diva/sketch/recognition/StrokeElement.java
+U java/source/diva/src/main/diva/sketch/recognition/StrokeRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/StrokeSceneRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/TimedStroke.java
+U java/source/diva/src/main/diva/sketch/recognition/Type.java
+U java/source/diva/src/main/diva/sketch/recognition/TypedData.java
+U java/source/diva/src/main/diva/sketch/recognition/VotingSceneRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/VotingStrokeRecognizer.java
+U java/source/diva/src/main/diva/sketch/recognition/makefile
+U java/source/diva/src/main/diva/sketch/recognition/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/test
+U java/source/diva/src/main/diva/sketch/test/All.java
+U java/source/diva/src/main/diva/sketch/test/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/test/JSketchSuite.java
+U java/source/diva/src/main/diva/sketch/test/index.html
+U java/source/diva/src/main/diva/sketch/test/makefile
+U java/source/diva/src/main/diva/sketch/test/simpleSketch.xml
+cvs checkout: Updating java/source/diva/src/main/diva/sketch/toolbox
+U java/source/diva/src/main/diva/sketch/toolbox/ApproximateStrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/AveragingStrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/BulletedData.java
+U java/source/diva/src/main/diva/sketch/toolbox/BulletedItem.java
+U java/source/diva/src/main/diva/sketch/toolbox/BulletedItems.java
+U java/source/diva/src/main/diva/sketch/toolbox/BulletedLine.java
+U java/source/diva/src/main/diva/sketch/toolbox/BulletedList.java
+U java/source/diva/src/main/diva/sketch/toolbox/COPYRIGHT
+U java/source/diva/src/main/diva/sketch/toolbox/CachingStrokeRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/CompositeTransducer.java
+U java/source/diva/src/main/diva/sketch/toolbox/DashedPathData.java
+U java/source/diva/src/main/diva/sketch/toolbox/DashedPathRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/DehookingStrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/HMMTrainer.java
+U java/source/diva/src/main/diva/sketch/toolbox/ImageTransducer.java
+U java/source/diva/src/main/diva/sketch/toolbox/InterpolateStrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/LLRSceneMetric.java
+U java/source/diva/src/main/diva/sketch/toolbox/LLRSceneRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/LineRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/ModedIncrRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/NormalizeLengthStrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/NormalizeTimeStrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/PanRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/PanZoomController.java
+U java/source/diva/src/main/diva/sketch/toolbox/PanZoomInterpreter.java
+U java/source/diva/src/main/diva/sketch/toolbox/RemoveDupPtsStrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/RetypingRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/SceneMetric.java
+U java/source/diva/src/main/diva/sketch/toolbox/SceneTranslator.java
+U java/source/diva/src/main/diva/sketch/toolbox/ScribbleRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/SketchTransducer.java
+U java/source/diva/src/main/diva/sketch/toolbox/StrokeFilter.java
+U java/source/diva/src/main/diva/sketch/toolbox/TableTransducer.java
+U java/source/diva/src/main/diva/sketch/toolbox/TextAnnotations.java
+U java/source/diva/src/main/diva/sketch/toolbox/TextBlock.java
+U java/source/diva/src/main/diva/sketch/toolbox/TextData.java
+U java/source/diva/src/main/diva/sketch/toolbox/TextLine.java
+U java/source/diva/src/main/diva/sketch/toolbox/TrainingToMatlab.java
+U java/source/diva/src/main/diva/sketch/toolbox/Transducer.java
+U java/source/diva/src/main/diva/sketch/toolbox/ZoomRecognizer.java
+U java/source/diva/src/main/diva/sketch/toolbox/makefile
+U java/source/diva/src/main/diva/sketch/toolbox/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/util
+U java/source/diva/src/main/diva/util/ArrayIterator.java
+U java/source/diva/src/main/diva/util/BasicPropertyContainer.java
+U java/source/diva/src/main/diva/util/COPYRIGHT
+U java/source/diva/src/main/diva/util/CompoundIterator.java
+U java/source/diva/src/main/diva/util/Filter.java
+U java/source/diva/src/main/diva/util/FilteredArrayIterator.java
+U java/source/diva/src/main/diva/util/FilteredIterator.java
+U java/source/diva/src/main/diva/util/IteratorAdapter.java
+U java/source/diva/src/main/diva/util/IteratorIterator.java
+U java/source/diva/src/main/diva/util/IteratorUtilities.java
+U java/source/diva/src/main/diva/util/LoggableOp.java
+U java/source/diva/src/main/diva/util/ModelParser.java
+U java/source/diva/src/main/diva/util/ModelWriter.java
+U java/source/diva/src/main/diva/util/NullArrayIterator.java
+U java/source/diva/src/main/diva/util/NullIterator.java
+U java/source/diva/src/main/diva/util/PropertyChangeMulticaster.java
+U java/source/diva/src/main/diva/util/PropertyContainer.java
+U java/source/diva/src/main/diva/util/ProxyIterator.java
+U java/source/diva/src/main/diva/util/ReverseIterator.java
+U java/source/diva/src/main/diva/util/SemanticObjectContainer.java
+U java/source/diva/src/main/diva/util/UnitIterator.java
+U java/source/diva/src/main/diva/util/UserObjectContainer.java
+U java/source/diva/src/main/diva/util/makefile
+U java/source/diva/src/main/diva/util/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/util/aelfred
+U java/source/diva/src/main/diva/util/aelfred/COPYRIGHT
+U java/source/diva/src/main/diva/util/aelfred/HandlerBase.java
+U java/source/diva/src/main/diva/util/aelfred/XmlException.java
+U java/source/diva/src/main/diva/util/aelfred/XmlHandler.java
+U java/source/diva/src/main/diva/util/aelfred/XmlParser.java
+U java/source/diva/src/main/diva/util/aelfred/makefile
+U java/source/diva/src/main/diva/util/aelfred/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/util/gui
+cvs checkout: Updating java/source/diva/src/main/diva/util/java2d
+U java/source/diva/src/main/diva/util/java2d/AbstractPaintedGraphic.java
+U java/source/diva/src/main/diva/util/java2d/COPYRIGHT
+U java/source/diva/src/main/diva/util/java2d/PaintedGraphic.java
+U java/source/diva/src/main/diva/util/java2d/PaintedImage.java
+U java/source/diva/src/main/diva/util/java2d/PaintedList.java
+U java/source/diva/src/main/diva/util/java2d/PaintedObject.java
+U java/source/diva/src/main/diva/util/java2d/PaintedPath.java
+U java/source/diva/src/main/diva/util/java2d/PaintedShape.java
+U java/source/diva/src/main/diva/util/java2d/PaintedString.java
+U java/source/diva/src/main/diva/util/java2d/Polygon2D.java
+U java/source/diva/src/main/diva/util/java2d/PolygonIterator.java
+U java/source/diva/src/main/diva/util/java2d/Polyline2D.java
+U java/source/diva/src/main/diva/util/java2d/PolylineIterator.java
+U java/source/diva/src/main/diva/util/java2d/ShapeUtilities.java
+U java/source/diva/src/main/diva/util/java2d/makefile
+U java/source/diva/src/main/diva/util/java2d/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/util/jester
+U java/source/diva/src/main/diva/util/jester/COPYRIGHT
+U java/source/diva/src/main/diva/util/jester/EventParser.java
+U java/source/diva/src/main/diva/util/jester/EventPlayer.java
+U java/source/diva/src/main/diva/util/jester/EventRecorder.java
+U java/source/diva/src/main/diva/util/jester/EventWriter.java
+U java/source/diva/src/main/diva/util/jester/TestCase.java
+U java/source/diva/src/main/diva/util/jester/TestFailedException.java
+U java/source/diva/src/main/diva/util/jester/TestHarness.java
+U java/source/diva/src/main/diva/util/jester/TestSuite.java
+U java/source/diva/src/main/diva/util/jester/TestUtilities.java
+U java/source/diva/src/main/diva/util/jester/makefile
+U java/source/diva/src/main/diva/util/jester/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/util/jester/demo
+U java/source/diva/src/main/diva/util/jester/demo/Bar.java
+U java/source/diva/src/main/diva/util/jester/demo/BarTest.java
+U java/source/diva/src/main/diva/util/jester/demo/COPYRIGHT
+U java/source/diva/src/main/diva/util/jester/demo/Foo.java
+U java/source/diva/src/main/diva/util/jester/demo/FooTest.java
+U java/source/diva/src/main/diva/util/jester/demo/makefile
+U java/source/diva/src/main/diva/util/jester/demo/package.html
+cvs checkout: Updating java/source/diva/src/main/diva/util/test
+U java/source/diva/src/main/diva/util/test/All.java
+U java/source/diva/src/main/diva/util/test/COPYRIGHT
+U java/source/diva/src/main/diva/util/test/ShapeUtilitiesTest.java
+U java/source/diva/src/main/diva/util/test/XMLElementTest.java
+U java/source/diva/src/main/diva/util/test/XMLParserTest.java
+U java/source/diva/src/main/diva/util/test/makefile
+U java/source/diva/src/main/diva/util/test/xml1.dtd
+U java/source/diva/src/main/diva/util/test/xml1.xml
+cvs checkout: Updating java/source/diva/src/main/diva/util/xml
+U java/source/diva/src/main/diva/util/xml/AbstractXmlBuilder.java
+U java/source/diva/src/main/diva/util/xml/COPYRIGHT
+U java/source/diva/src/main/diva/util/xml/CompositeBuilder.java
+U java/source/diva/src/main/diva/util/xml/XmlBuilder.java
+U java/source/diva/src/main/diva/util/xml/XmlDemo.java
+U java/source/diva/src/main/diva/util/xml/XmlDocument.java
+U java/source/diva/src/main/diva/util/xml/XmlElement.java
+U java/source/diva/src/main/diva/util/xml/XmlReader.java
+U java/source/diva/src/main/diva/util/xml/XmlUtilities.java
+U java/source/diva/src/main/diva/util/xml/XmlWriter.java
+U java/source/diva/src/main/diva/util/xml/makefile
+U java/source/diva/src/main/diva/util/xml/package.html
+U java/source/diva/src/main/diva/util/xml/xml1.xml
+cvs checkout: Updating java/source/diva/src/main/diva/whiteboard
+U java/source/diva/src/main/diva/whiteboard/COPYRIGHT
+U java/source/diva/src/main/diva/whiteboard/CommandInterpreter.java
+U java/source/diva/src/main/diva/whiteboard/HighlightInterpreter.java
+U java/source/diva/src/main/diva/whiteboard/SketchDocument.java
+U java/source/diva/src/main/diva/whiteboard/SketchStoragePolicy.java
+U java/source/diva/src/main/diva/whiteboard/SketchTest1.java
+U java/source/diva/src/main/diva/whiteboard/SketchTest2.java
+U java/source/diva/src/main/diva/whiteboard/SketchTest3.java
+U java/source/diva/src/main/diva/whiteboard/ThumbnailView.java
+U java/source/diva/src/main/diva/whiteboard/Whiteboard.java
+U java/source/diva/src/main/diva/whiteboard/WhiteboardEdits.java
+U java/source/diva/src/main/diva/whiteboard/WhiteboardState.java
+U java/source/diva/src/main/diva/whiteboard/WhiteboardView.java
+U java/source/diva/src/main/diva/whiteboard/makefile
+U java/source/diva/src/main/diva/whiteboard/package.html
 cvs checkout: Updating java/source/dom4j
-U java/source/dom4j/README
-U java/source/dom4j/build.xml
-U java/source/dom4j/do_import
 cvs checkout: Updating java/source/dom4j/docs
 cvs checkout: Updating java/source/dom4j/docs/dom4j
-U java/source/dom4j/docs/dom4j/compare.html
-U java/source/dom4j/docs/dom4j/default.css
-U java/source/dom4j/docs/dom4j/download.html
-U java/source/dom4j/docs/dom4j/faq.html
-U java/source/dom4j/docs/dom4j/goals.html
-U java/source/dom4j/docs/dom4j/guide.html
-U java/source/dom4j/docs/dom4j/index.html
-U java/source/dom4j/docs/dom4j/license.html
-U java/source/dom4j/docs/dom4j/status.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs
-U java/source/dom4j/docs/dom4j/apidocs/allclasses-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/deprecated-list.html
-U java/source/dom4j/docs/dom4j/apidocs/help-doc.html
-U java/source/dom4j/docs/dom4j/apidocs/index.html
-U java/source/dom4j/docs/dom4j/apidocs/javadoc.css
-U java/source/dom4j/docs/dom4j/apidocs/overview-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/overview-summary.html
-U java/source/dom4j/docs/dom4j/apidocs/overview-tree.html
-U java/source/dom4j/docs/dom4j/apidocs/package-list
-U java/source/dom4j/docs/dom4j/apidocs/packages.html
-U java/source/dom4j/docs/dom4j/apidocs/serialized-form.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/index-files
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-1.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-10.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-11.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-12.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-13.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-14.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-15.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-16.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-17.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-18.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-19.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-2.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-20.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-21.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-22.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-3.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-4.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-5.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-6.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-7.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-8.html
-U java/source/dom4j/docs/dom4j/apidocs/index-files/index-9.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Attribute.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Branch.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/CDATA.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/CharacterData.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Comment.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Document.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/DocumentException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/DocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/DocumentHelper.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/DocumentType.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Element.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/ElementHandler.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/ElementPath.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Entity.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/IllegalAddException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/InvalidXPathException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Namespace.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Node.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/NodeFilter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/ProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/QName.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Text.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/Visitor.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/VisitorSupport.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/XPath.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/XPathException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/package-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/package-summary.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/package-tree.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Attribute.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Branch.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/CDATA.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/CharacterData.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Comment.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Document.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/DocumentException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/DocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/DocumentHelper.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/DocumentType.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Element.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/ElementHandler.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/ElementPath.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Entity.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/IllegalAddException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/InvalidXPathException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Namespace.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Node.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/NodeFilter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/ProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/QName.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Text.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/Visitor.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/VisitorSupport.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/XPath.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/class-use/XPathException.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/DatatypeAttribute.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/DatatypeDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/DatatypeElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/DatatypeElementFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/InvalidSchemaException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/SchemaParser.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/package-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/package-summary.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/package-tree.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/class-use
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/class-use/DatatypeAttribute.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/class-use/DatatypeDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/class-use/DatatypeElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/class-use/DatatypeElementFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/class-use/InvalidSchemaException.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/datatype/class-use/SchemaParser.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/AttributeDecl.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/ElementDecl.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/ExternalEntityDecl.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/InternalEntityDecl.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/package-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/package-summary.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/package-tree.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/class-use
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/class-use/AttributeDecl.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/class-use/ElementDecl.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/class-use/ExternalEntityDecl.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/dtd/class-use/InternalEntityDecl.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/DOMReader.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/DOMWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/DocumentResult.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/DocumentSource.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/HTMLWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/OutputFormat.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/SAXContentHandler.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/SAXReader.SAXEntityResolver.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/SAXReader.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/SAXValidator.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/SAXWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/XMLResult.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/XMLWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/XPPReader.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/package-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/package-summary.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/package-tree.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/DOMReader.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/DOMWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/DocumentResult.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/DocumentSource.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/HTMLWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/OutputFormat.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/SAXContentHandler.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/SAXReader.SAXEntityResolver.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/SAXReader.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/SAXValidator.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/SAXWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/XMLResult.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/XMLWriter.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/io/class-use/XPPReader.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/Action.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/Mode.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/NullAction.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/Pattern.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/Rule.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/RuleManager.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/RuleSet.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/Stylesheet.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/package-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/package-summary.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/package-tree.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/Action.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/Mode.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/NullAction.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/Pattern.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/Rule.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/RuleManager.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/RuleSet.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/rule/class-use/Stylesheet.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/AttributeHelper.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/IndexedDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/IndexedElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/NodeComparator.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/NonLazyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/NonLazyElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/ProxyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/UserDataAttribute.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/UserDataDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/UserDataElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/XMLErrorHandler.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/package-frame.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/package-summary.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/package-tree.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/AttributeHelper.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/IndexedDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/IndexedElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/NodeComparator.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/NonLazyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/NonLazyElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/ProxyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/UserDataAttribute.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/UserDataDocumentFactory.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/UserDataElement.html
-U java/source/dom4j/docs/dom4j/apidocs/org/dom4j/util/class-use/XMLErrorHandler.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/cookbook
-U java/source/dom4j/docs/dom4j/cookbook/cookbook.css
-U java/source/dom4j/docs/dom4j/cookbook/cookbook.fo
-U java/source/dom4j/docs/dom4j/cookbook/cookbook.html
-U java/source/dom4j/docs/dom4j/cookbook/cookbook.pdf
-U java/source/dom4j/docs/dom4j/cookbook/cookbook.ps
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc
-U java/source/dom4j/docs/dom4j/javadoc/allclasses-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/deprecated-list.html
-U java/source/dom4j/docs/dom4j/javadoc/help-doc.html
-U java/source/dom4j/docs/dom4j/javadoc/index.html
-U java/source/dom4j/docs/dom4j/javadoc/javadoc.css
-U java/source/dom4j/docs/dom4j/javadoc/overview-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/overview-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/overview-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/package-list
-U java/source/dom4j/docs/dom4j/javadoc/packages.html
-U java/source/dom4j/docs/dom4j/javadoc/serialized-form.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/index-files
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-1.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-10.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-11.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-12.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-13.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-14.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-15.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-16.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-17.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-18.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-19.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-2.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-20.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-21.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-22.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-3.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-4.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-5.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-6.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-7.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-8.html
-U java/source/dom4j/docs/dom4j/javadoc/index-files/index-9.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Attribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Branch.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/CDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/CharacterData.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Comment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Document.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/DocumentException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/DocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/DocumentHelper.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/DocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Element.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/ElementHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/ElementPath.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Entity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/IllegalAddException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/InvalidXPathException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Namespace.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Node.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/NodeFilter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/ProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/QName.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Text.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/Visitor.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/VisitorSupport.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/XPath.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/XPathException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/BeanAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/BeanAttributeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/BeanDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/BeanElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/BeanMetaData.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/class-use/BeanAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/class-use/BeanAttributeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/class-use/BeanDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/class-use/BeanElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/bean/class-use/BeanMetaData.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Attribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Branch.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/CDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/CharacterData.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Comment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Document.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/DocumentException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/DocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/DocumentHelper.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/DocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Element.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/ElementHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/ElementPath.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Entity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/IllegalAddException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/InvalidXPathException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Namespace.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Node.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/NodeFilter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/ProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/QName.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Text.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/Visitor.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/VisitorSupport.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/XPath.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/class-use/XPathException.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/DatatypeAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/DatatypeDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/DatatypeElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/DatatypeElementFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/InvalidSchemaException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/SchemaParser.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/class-use/DatatypeAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/class-use/DatatypeDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/class-use/DatatypeElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/class-use/DatatypeElementFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/class-use/InvalidSchemaException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/datatype/class-use/SchemaParser.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMAttributeNodeMap.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMDocument.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMDocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMEntityReference.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMNamespace.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMNodeHelper.EmptyNodeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMNodeHelper.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/DOMText.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMAttributeNodeMap.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMDocument.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMDocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMEntityReference.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMNamespace.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMNodeHelper.EmptyNodeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMNodeHelper.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dom/class-use/DOMText.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/AttributeDecl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/ElementDecl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/ExternalEntityDecl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/InternalEntityDecl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/class-use/AttributeDecl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/class-use/ElementDecl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/class-use/ExternalEntityDecl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/dtd/class-use/InternalEntityDecl.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/DOMReader.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/DOMWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/DocumentResult.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/DocumentSource.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/HTMLWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/OutputFormat.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/SAXContentHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/SAXReader.SAXEntityResolver.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/SAXReader.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/SAXValidator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/SAXWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/XMLResult.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/XMLWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/XPPReader.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/DefaultHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/SAXDriver.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/class-use/DefaultHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/aelfred/class-use/SAXDriver.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/DOMReader.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/DOMWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/DocumentResult.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/DocumentSource.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/HTMLWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/OutputFormat.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/SAXContentHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/SAXReader.SAXEntityResolver.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/SAXReader.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/SAXValidator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/SAXWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/XMLResult.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/XMLWriter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/io/class-use/XPPReader.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/Action.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/Mode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/NullAction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/Pattern.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/Rule.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/RuleManager.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/RuleSet.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/Stylesheet.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/Action.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/Mode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/NullAction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/Pattern.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/Rule.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/RuleManager.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/RuleSet.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/class-use/Stylesheet.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/DefaultPattern.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/NodeTypePattern.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/class-use/DefaultPattern.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/rule/pattern/class-use/NodeTypePattern.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/BranchTreeNode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/DocumentTreeModel.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/LeafTreeNode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/XMLTableColumnDefinition.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/XMLTableDefinition.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/XMLTableModel.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/class-use/BranchTreeNode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/class-use/DocumentTreeModel.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/class-use/LeafTreeNode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/class-use/XMLTableColumnDefinition.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/class-use/XMLTableDefinition.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/swing/class-use/XMLTableModel.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractBranch.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractCharacterData.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractDocument.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractDocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractEntity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractNode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/AbstractText.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/BackedList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/BaseElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/ContentListFacade.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultDocument.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultDocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultEntity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultNamespace.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/DefaultText.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/ElementIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/ElementNameIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/ElementQNameIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/FilterIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/FlyweightAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/FlyweightCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/FlyweightComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/FlyweightEntity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/FlyweightProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/FlyweightText.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/NamespaceCache.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/NamespaceStack.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/QNameCache.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/SingleIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractBranch.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractCharacterData.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractDocument.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractDocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractEntity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractNode.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/AbstractText.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/BackedList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/BaseElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/ContentListFacade.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultDocument.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultDocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultEntity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultNamespace.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/DefaultText.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/ElementIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/ElementNameIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/ElementQNameIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/FilterIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/FlyweightAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/FlyweightCDATA.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/FlyweightComment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/FlyweightEntity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/FlyweightProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/FlyweightText.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/NamespaceCache.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/NamespaceStack.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/QNameCache.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/tree/class-use/SingleIterator.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/AttributeHelper.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/IndexedDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/IndexedElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/NodeComparator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/NonLazyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/NonLazyElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/ProxyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/UserDataAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/UserDataDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/UserDataElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/XMLErrorHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/AttributeHelper.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/IndexedDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/IndexedElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/NodeComparator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/NonLazyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/NonLazyElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/ProxyDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/UserDataAttribute.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/UserDataDocumentFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/UserDataElement.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/util/class-use/XMLErrorHandler.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/DefaultNamespaceContext.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/DefaultXPath.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/XPathPattern.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/class-use/DefaultNamespaceContext.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/class-use/DefaultXPath.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpath/class-use/XPathPattern.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp/ProxyXmlStartTag.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/dom4j/xpp/class-use/ProxyXmlStartTag.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Attr.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/CDATASection.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/CharacterData.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Comment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/DOMException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/DOMImplementation.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Document.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/DocumentFragment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/DocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Element.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Entity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/EntityReference.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/NamedNodeMap.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Node.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/NodeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Notation.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/Text.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Attr.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/CDATASection.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/CharacterData.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Comment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/DOMException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/DOMImplementation.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Document.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/DocumentFragment.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/DocumentType.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Element.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Entity.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/EntityReference.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/NamedNodeMap.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Node.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/NodeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Notation.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/ProcessingInstruction.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/class-use/Text.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/DocumentEvent.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/Event.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/EventException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/EventListener.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/EventTarget.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/MutationEvent.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/class-use/DocumentEvent.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/class-use/Event.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/class-use/EventException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/class-use/EventListener.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/class-use/EventTarget.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/events/class-use/MutationEvent.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/DocumentRange.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/Range.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/RangeException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/class-use/DocumentRange.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/class-use/Range.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/ranges/class-use/RangeException.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/DocumentTraversal.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/NodeFilter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/NodeIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/TreeWalker.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/class-use/DocumentTraversal.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/class-use/NodeFilter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/class-use/NodeIterator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/w3c/dom/traversal/class-use/TreeWalker.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/xml
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/xml/sax
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/AttributeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/Attributes.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ContentHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/DTDHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/DocumentHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/EntityResolver.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ErrorHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/HandlerBase.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/InputSource.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/Locator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/Parser.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/SAXException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/SAXNotRecognizedException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/SAXNotSupportedException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/SAXParseException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/XMLFilter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/XMLReader.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/AttributeList.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/Attributes.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/ContentHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/DTDHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/DocumentHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/EntityResolver.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/ErrorHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/HandlerBase.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/InputSource.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/Locator.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/Parser.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/SAXException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/SAXNotRecognizedException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/SAXNotSupportedException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/SAXParseException.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/XMLFilter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/class-use/XMLReader.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/DeclHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/LexicalHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/class-use/DeclHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/ext/class-use/LexicalHandler.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/AttributeListImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/AttributesImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/DefaultHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/LocatorImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/NamespaceSupport.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/ParserAdapter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/ParserFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/XMLFilterImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/XMLReaderAdapter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/XMLReaderFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/package-frame.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/package-summary.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/package-tree.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/package-use.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/AttributeListImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/AttributesImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/DefaultHandler.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/LocatorImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/NamespaceSupport.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/ParserAdapter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/ParserFactory.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/XMLFilterImpl.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/XMLReaderAdapter.html
-U java/source/dom4j/docs/dom4j/javadoc/org/xml/sax/helpers/class-use/XMLReaderFactory.html
 cvs checkout: Updating java/source/dom4j/docs/dom4j/style
 cvs checkout: Updating java/source/dom4j/docs/dom4j/style/images
-U java/source/dom4j/docs/dom4j/style/images/ball.gif
-U java/source/dom4j/docs/dom4j/style/images/blank.gif
-U java/source/dom4j/docs/dom4j/style/images/blueball.gif
-U java/source/dom4j/docs/dom4j/style/images/jars.gif
-U java/source/dom4j/docs/dom4j/style/images/logo.gif
 cvs checkout: Updating java/source/dom4j/lib
 cvs checkout: Updating java/source/dom4j/lib/dom4j
-U java/source/dom4j/lib/dom4j/dom4j-full.jar
 cvs checkout: Updating java/source/fits
 U java/source/fits/build.xml
 cvs checkout: Updating java/source/fits/src
@@ -6018,16 +6454,12 @@ U java/source/jsky/src/docs/README
 U java/source/jsky/src/docs/TODO
 U java/source/jsky/src/docs/VERSION
 cvs checkout: Updating java/source/jsky/src/lib
-U java/source/jsky/src/lib/diva.jar
 U java/source/jsky/src/lib/dom4j.jar
-U java/source/jsky/src/lib/fits.jar
 U java/source/jsky/src/lib/hcompress.jar
-U java/source/jsky/src/lib/image.jar
 U java/source/jsky/src/lib/jcommon.jar
 U java/source/jsky/src/lib/jel.jar
 U java/source/jsky/src/lib/jfreechart.jar
 U java/source/jsky/src/lib/log4j.jar
-U java/source/jsky/src/lib/util.jar
 cvs checkout: Updating java/source/jsky/src/main
 cvs checkout: Updating java/source/jsky/src/main/jsky
 cvs checkout: Updating java/source/jsky/src/main/jsky/app
@@ -6814,6 +7246,7 @@ U java/source/ndx/src/main/uk/ac/starlink/ndx/DefaultMutableNdx.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/DomNdxImpl.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/MutableNdx.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/Ndx.java
+U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxChooser.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxHandler.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxImpl.java
@@ -6826,19 +7259,17 @@ cvs checkout: Updating java/source/ndx/src/testcases/uk
 cvs checkout: Updating java/source/ndx/src/testcases/uk/ac
 cvs checkout: Updating java/source/ndx/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/ndx/src/testcases/uk/ac/starlink/ndx
+U java/source/ndx/src/testcases/uk/ac/starlink/ndx/ChooseNdx.java
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/CopyNdx.java
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/NdxTest.java
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/XmlNdxTest.java
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/no-ns.xml
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/redefining.xml
 cvs checkout: Updating java/source/oldarray
-U java/source/oldarray/README
-U java/source/oldarray/build.xml
 cvs checkout: Updating java/source/oldarray/docs
 cvs checkout: Updating java/source/oldarray/docs/array
 cvs checkout: Updating java/source/oldarray/lib
 cvs checkout: Updating java/source/oldarray/lib/oldarray
-U java/source/oldarray/lib/oldarray/array.jar
 cvs checkout: Updating java/source/pal
 U java/source/pal/build.xml
 cvs checkout: Updating java/source/pal/src
@@ -6928,6 +7359,7 @@ U java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplayInternalFr
 U java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplayToolBar.java
 U java/source/sog/src/main/uk/ac/starlink/sog/SOGRemoteControl.java
 U java/source/sog/src/main/uk/ac/starlink/sog/SOGRemoteServices.java
+U java/source/sog/src/main/uk/ac/starlink/sog/SOGTransferHandler.java
 U java/source/sog/src/main/uk/ac/starlink/sog/defaultgrid.xml
 U java/source/sog/src/main/uk/ac/starlink/sog/deploy.wsdd
 cvs checkout: Updating java/source/sog/src/main/uk/ac/starlink/sog/images
@@ -7475,8 +7907,6 @@ U java/source/splat/src/jni/splat_libraries
 U java/source/splat/src/jni/uk_ac_starlink_splat_imagedata_NDFJ.h
 cvs checkout: Updating java/source/splat/src/lib
 U java/source/splat/src/lib/bsh-1.2b7.jar
-U java/source/splat/src/lib/diva.jar
-U java/source/splat/src/lib/diva_copyright.txt
 U java/source/splat/src/lib/jdom.jar
 U java/source/splat/src/lib/jdom_license.txt
 U java/source/splat/src/lib/jhall.jar
@@ -7544,8 +7974,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/FuzzyBooleanCellEditor.j
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/FuzzyBooleanCellRenderer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/GlobalSpecPlotList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/HelpFrame.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/JFontChooser.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/JFontChooserFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LabelFloatJSlider.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitView.java
@@ -7580,7 +8008,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTransferHandler.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecViewerFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecXCoordTypeFrame.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowserMain.java
@@ -7633,6 +8060,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/play.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/plot.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/plus.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/plus24.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/postscriptprint.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/print.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/rainbow.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/read.gif
@@ -7727,6 +8155,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/GridControls.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ImageData.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ImageDisplayer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ImageHolder.java
+U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/JFontChooserFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/JSpec.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/JSpecWindows.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/JSpec_with_tabs.java
@@ -7759,6 +8188,7 @@ cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/util
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AsciiFileParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AvailableLocales.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AverageFilter.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/CrossCorrelate.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/ExceptionDialog.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FitVoigt.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FunctionFitter.java
@@ -7885,6 +8315,7 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/StarJTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableModel.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableNodeChooser.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableSaver.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableRowHeader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/UCDSelector.java
@@ -7916,6 +8347,8 @@ cvs checkout: Updating java/source/table/src/testcases/uk/ac
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table
 U java/source/table/src/testcases/uk/ac/starlink/table/TableTest.java
+cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/gui
+U java/source/table/src/testcases/uk/ac/starlink/table/gui/StarTableNodeChooserTest.java
 cvs checkout: Updating java/source/tamfits
 U java/source/tamfits/README
 U java/source/tamfits/build.xml
@@ -7927,6 +8360,7 @@ U java/source/tamfits/src/docs/JavaFits.doc.gz
 U java/source/tamfits/src/docs/JavaFits.ps.gz
 U java/source/tamfits/src/docs/NOTE.v091
 U java/source/tamfits/src/docs/NOTE.v093
+U java/source/tamfits/src/docs/NOTE.v096
 cvs checkout: Updating java/source/tamfits/src/lib
 cvs checkout: Updating java/source/tamfits/src/main
 cvs checkout: Updating java/source/tamfits/src/main/nom
@@ -8046,6 +8480,21 @@ cvs checkout: Updating java/source/topcat/src/docs
 U java/source/topcat/src/docs/JEL-licence
 U java/source/topcat/src/docs/Ptplot-licence
 U java/source/topcat/src/docs/Topcat.txt
+cvs checkout: Updating java/source/topcat/src/etc
+cvs checkout: Updating java/source/topcat/src/etc/demo
+cvs checkout: Updating java/source/topcat/src/etc/demo/fits
+U java/source/topcat/src/etc/demo/fits/863sub.fits
+U java/source/topcat/src/etc/demo/fits/gliese2.FIT
+U java/source/topcat/src/etc/demo/fits/tables.fit
+cvs checkout: Updating java/source/topcat/src/etc/demo/others
+U java/source/topcat/src/etc/demo/others/text1.txt
+U java/source/topcat/src/etc/demo/others/text2.txt
+cvs checkout: Updating java/source/topcat/src/etc/demo/votable
+U java/source/topcat/src/etc/demo/votable/cover.xml
+U java/source/topcat/src/etc/demo/votable/gliese2.vot
+U java/source/topcat/src/etc/demo/votable/vizier.xml.gz
+cvs checkout: Updating java/source/topcat/src/etc/demo/wdc
+U java/source/topcat/src/etc/demo/wdc/sunspots.wdc
 cvs checkout: Updating java/source/topcat/src/lib
 U java/source/topcat/src/lib/jel_g.jar
 U java/source/topcat/src/lib/jhall.jar
@@ -8065,8 +8514,10 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnIndexSpinner.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpTransformer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/JELUtils.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/LoadQueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumn.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumnModel.java
@@ -8106,23 +8557,36 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/direct.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/help.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/index.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/intro.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/invoke.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/io.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-write.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jel.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/latex-write.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-file.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-formats.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-jdbc.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-node.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-text.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/mirage.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/param.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/plot.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/release.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-file.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-formats.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-jdbc.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-text.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/script.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/stats.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets-win.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/synthetic.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/tablecopy.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/template.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/text-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/topcat.css
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/viewers.html
@@ -8130,6 +8594,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/votable-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/votable-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/wdc-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/windows.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/write.html
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/4way3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Back24.gif
@@ -8151,6 +8616,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blank24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/colmeta0.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/demo.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
@@ -8162,6 +8628,12 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/starlinklogo3.gi
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tablemeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tc3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/venn2.gif
+cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/Down.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/Home24.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/Up.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/handle-closed.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/handle-open.gif
 cvs checkout: Updating java/source/topcat/src/script
 U java/source/topcat/src/script/topcat
 cvs checkout: Updating java/source/topcat/src/testcases
@@ -8197,6 +8669,8 @@ U java/source/treeview/src/etc/demo/xml/build.xml
 cvs checkout: Updating java/source/treeview/src/etc/demo/zip
 U java/source/treeview/src/etc/demo/zip/hello.jar
 U java/source/treeview/src/etc/demo/zip/hello_src.zip
+cvs checkout: Updating java/source/treeview/src/lib
+U java/source/treeview/src/lib/commons-net-1.0.0.jar
 cvs checkout: Updating java/source/treeview/src/main
 cvs checkout: Updating java/source/treeview/src/main/uk
 cvs checkout: Updating java/source/treeview/src/main/uk/ac
@@ -8206,11 +8680,13 @@ cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/table
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/table/gui
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/treeview
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ARYDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ApplicationInvoker.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ArrayBrowser.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/AstFITSShower.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/AstTextShower.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/AsynchronousImageDisplay.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/BasicAction.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/BasicDropHandler.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/BasicTransferable.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ByteList.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/CollapseArrayImpl.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/CollapseViewer.java
@@ -8221,10 +8697,17 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/CreationState.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeBuilder.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeFactory.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeJTree.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTransferHandler.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTransferable.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTreeCellRenderer.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTreeModel.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DefaultDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DemoDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DetailViewer.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/Draggable.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/Driver.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/DuplicateDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ErrorDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSFileDataNode.java
@@ -8232,6 +8715,8 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSStreamDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/FileDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/FileDataNodeBuilder.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/FrameDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/FtpDirectoryDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/FtpLocation.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/GridPlotter.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HDSDataNode.java
@@ -8247,6 +8732,7 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/IconFactory.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ImageHDUDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ImageViewPane.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ImageViewer.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/InfoPanel.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/JDBCDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/MetaTable.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/MetamapGroup.java
@@ -8254,14 +8740,20 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayImage.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NDFDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NdxDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/NdxDisplayer.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/NdxNodeChooser.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NoSuchDataException.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/PathedDataSource.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/NodeAncestorComboBox.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/NodeExpander.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/PlainDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/ResourceListDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ScalarDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ScalingPlot.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SimpleDataNodeBuilder.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SliceViewer.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SourceDataNodeBuilder.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/StarTableDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/StaticTreeViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/StatsValues.java
@@ -8272,12 +8764,16 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/StyledTextArea.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SwingWorker.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SwitchDataSource.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TableHDUDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/TableNodeChooser.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TarBranchDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TextViewer.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeModelNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeNodeChooser.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeWriter.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeviewEntityResolver.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeviewLAF.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeviewUtil.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/VODataNodeBuilder.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableDataNode.java
@@ -8315,6 +8811,7 @@ cvs checkout: Updating java/source/treeview/src/resources/uk/ac/starlink/treevie
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Down.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Frame.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Help2.gif
+U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Home24.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Minus.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/MinusMinus.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Plus.gif
@@ -8377,18 +8874,19 @@ U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_pi.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_txt.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xtree5.gif
 cvs checkout: Updating java/source/treeview/src/resources/uk/ac/starlink/treeview/text
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/text/VOTable.dtd
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/text/astrores.dtd
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/text/build.properties
 cvs checkout: Updating java/source/treeview/src/script
+U java/source/treeview/src/script/showndx
 U java/source/treeview/src/script/treeview
-U java/source/treeview/src/script/treeview.bat
 cvs checkout: Updating java/source/treeview/src/testcases
 cvs checkout: Updating java/source/treeview/src/testcases/uk
 cvs checkout: Updating java/source/treeview/src/testcases/uk/ac
 cvs checkout: Updating java/source/treeview/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/treeview/src/testcases/uk/ac/starlink/treeview
+U java/source/treeview/src/testcases/uk/ac/starlink/treeview/ModelTest.java
+U java/source/treeview/src/testcases/uk/ac/starlink/treeview/TreeChooserTest.java
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/TreeviewTest.java
+U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demopath.cmp
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demotxt.cmp
 cvs checkout: Updating java/source/util
 U java/source/util/build.xml
@@ -8412,20 +8910,33 @@ U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
 U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
 U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/ProxySetup.java
+U java/source/util/src/main/uk/ac/starlink/util/ResourceDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/SourceReader.java
+U java/source/util/src/main/uk/ac/starlink/util/StarEntityResolver.java
 U java/source/util/src/main/uk/ac/starlink/util/SuperJar.java
+U java/source/util/src/main/uk/ac/starlink/util/TemporaryFileDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/TestCase.java
 U java/source/util/src/main/uk/ac/starlink/util/Tester.java
 U java/source/util/src/main/uk/ac/starlink/util/URLDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/URLUtils.java
+U java/source/util/src/main/uk/ac/starlink/util/UncompressInputStream.java
 U java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/gui
+U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileChooser.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFontChooser.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/GridBagLayouter.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/ProxySetupFrame.java
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/images
 U java/source/util/src/main/uk/ac/starlink/util/images/ImageHolder.java
 U java/source/util/src/main/uk/ac/starlink/util/images/accept.gif
 U java/source/util/src/main/uk/ac/starlink/util/images/close.gif
+cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/text
+U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.dtd
+U java/source/util/src/main/uk/ac/starlink/util/text/astrores.dtd
+U java/source/util/src/main/uk/ac/starlink/util/text/helpset_1_0.dtd
+U java/source/util/src/main/uk/ac/starlink/util/text/map_1_0.dtd
+U java/source/util/src/main/uk/ac/starlink/util/text/toc_1_0.dtd
 cvs checkout: Updating java/source/util/src/script
 U java/source/util/src/script/starjava
 U java/source/util/src/script/starjava.bat
@@ -8471,7 +8982,6 @@ U java/source/votable/src/main/uk/ac/starlink/votable/VOStarTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOStarValueAdapter.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableBuilder.java
-U java/source/votable/src/main/uk/ac/starlink/votable/VOTableEntityResolver.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableFormatException.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Values.java
@@ -8482,7 +8992,6 @@ cvs checkout: Updating java/source/votable/src/resources/uk/ac
 cvs checkout: Updating java/source/votable/src/resources/uk/ac/starlink
 cvs checkout: Updating java/source/votable/src/resources/uk/ac/starlink/votable
 cvs checkout: Updating java/source/votable/src/resources/uk/ac/starlink/votable/text
-U java/source/votable/src/resources/uk/ac/starlink/votable/text/VOTable.dtd
 cvs checkout: Updating java/source/votable/src/testcases
 cvs checkout: Updating java/source/votable/src/testcases/uk
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac
