@@ -56,6 +56,10 @@ alias scuhelp         ${SURF_DIR}/scuhelp
 alias scuphot         ${SURF_DIR}/scuphot
 alias scuover         ${SURF_DIR}/scuover
 alias skydip          ${SURF_DIR}/skydip
+alias bolrebin        ${SURF_DIR}/bolrebin
+alias intrebin        ${SURF_DIR}/intrebin
+alias extract_data    ${SURF_DIR}/extract_data
+
 
 #
 # These are the aliases for the scripts
@@ -86,7 +90,7 @@ echo "   SURF - SCUBA User Reduction Facility"
 echo "     Commands are now available -- (Version PKG_VERS)"
 echo " "
 echo "     Type scuhelp for help on SURF commands."
-#echo '     Type "showme sun217" to browse the hypertext documentation.'
+echo '     Type "showme sun216" to browse the hypertext documentation.'
 echo " "
 
 #
