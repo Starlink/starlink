@@ -189,6 +189,7 @@
 
 *    If mapping went ok, store the pointer & number of elements in
 *    the return argument
+        CALL ARR_SUMDIM( NDIM, DIMS, NELM )
         RVAL(1) = PTR
         RVAL(2) = NELM
         CALL ADI_NEWV1I( 2, RVAL, OARG, STATUS )
