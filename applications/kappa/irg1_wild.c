@@ -70,6 +70,9 @@
  *        Shortridge. Changes from the original are that this is now
  *        NDF foreign file format specific and is no longer general
  *        about the file types it can handle.
+ *    1997 November 14: Malcolm J. Currie (Starlink)
+ *        Altered the PATH to irg_wild to include KAPPA_DIR instead of
+ *        CCDPACK_DIR.
  *+
  */
 
@@ -367,7 +370,7 @@ F77_INTEGER_FUNCTION(irg1_ewild)( POINTER(Context) )
 static char *get_irg_wild ()
 
   /*  Local procedure to locate a copy of irg_wild. This is looked
-   *  for in CCDPACK_DIR and then somewhere on the PATH. An general
+   *  for in KAPPA_DIR and then somewhere on the PATH.  A general
    *  version of IRG would only look on the PATH.
    */
 {
@@ -388,7 +391,7 @@ static char *get_irg_wild ()
      *  Look for environment variable.
      *
      */
-    dir = getenv( "CCDPACK_DIR" );
+    dir = getenv( "KAPPA_DIR" );
     if ( dir ) {
       strcpy( irg_wild, dir );
       strcat( irg_wild, "/" );
@@ -431,4 +434,3 @@ static char *get_irg_wild ()
   return irg_wild;
 }
 
-/* @(#)irg1_wild.c   1.2   97/03/13 09:39:48   97/03/13 09:40:54 */
