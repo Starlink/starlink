@@ -1,3 +1,6 @@
+// part of dvi2bitmap
+// $Id$
+
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -25,6 +28,9 @@ InputByteStream::InputByteStream (string s, bool preload=false)
 	    if (bufcontents != buflen_)
 		throw DviError ("Couldn't preload file");
 	    eob_ = buf_ + bufcontents;
+
+	    close (fd_);
+	    fd_ = -1;
 	}
 	else
 	{
@@ -68,19 +74,20 @@ Byte InputByteStream::getByte()
     return eof_ ? 0 : *p_++;
 }
 
-const Byte *InputByteStream::getBlock (unsigned int n)
+const Byte *InputByteStream::getBlock (unsigned int pos, unsigned int len)
 {
     if (eof_)
 	return 0;
 
-    if (p_ < buf_)
+    Byte *blockp = p_ + pos;
+    if (blockp < buf_)
 	throw DviBug ("InputByteStream pointer before buffer start");
-    if (p_ > eob_)
+    if (blockp > eob_)
 	throw DviBug ("InputByteStream pointer beyond EOF");
-    if (p_+n > eob_)
+    if (blockp+len > eob_)
 	throw DviBug ("InputByteStream getBlock requested beyond EOF");
 
-    return p_;
+    return blockp;
 }
 
 bool InputByteStream::eof()
