@@ -7,15 +7,19 @@
   <!ENTITY autoconfhtml "&autoconfman;/html_node">
   <!ENTITY automakeman "http://www.gnu.org/software/automake/manual">
   <!ENTITY automakehtml "&automakeman;/html_node">
+  <!ENTITY fig-autoheader-png SYSTEM "ssn78-1.png" NDATA png>
   <!ENTITY fig-autoheader-gif SYSTEM "ssn78-1.gif" NDATA gif89a>
   <!ENTITY fig-autoheader-eps SYSTEM "ssn78-1.eps" NDATA eps>
   <!ENTITY fig-autoheader-pdf SYSTEM "ssn78-1.pdf" NDATA pdf>
+  <!ENTITY fig-autoconf-png   SYSTEM "ssn78-2.png" NDATA png>
   <!ENTITY fig-autoconf-gif   SYSTEM "ssn78-2.gif" NDATA gif89a>
   <!ENTITY fig-autoconf-eps   SYSTEM "ssn78-2.eps" NDATA eps>
   <!ENTITY fig-autoconf-pdf   SYSTEM "ssn78-2.pdf" NDATA pdf>
+  <!ENTITY fig-automake-png   SYSTEM "ssn78-3.png" NDATA png>
   <!ENTITY fig-automake-gif   SYSTEM "ssn78-3.gif" NDATA gif89a>
   <!ENTITY fig-automake-eps   SYSTEM "ssn78-3.eps" NDATA eps>
   <!ENTITY fig-automake-pdf   SYSTEM "ssn78-3.pdf" NDATA pdf>
+  <!ENTITY fig-configure-png  SYSTEM "ssn78-4.png" NDATA png>
   <!ENTITY fig-configure-gif  SYSTEM "ssn78-4.gif" NDATA gif89a>
   <!ENTITY fig-configure-eps  SYSTEM "ssn78-4.eps" NDATA eps>
   <!ENTITY fig-configure-pdf  SYSTEM "ssn78-4.pdf" NDATA pdf>
@@ -331,6 +335,7 @@
 
         <figure float="nofloat">
           <caption><px>Inputs to, and outputs from, autoconf</px></caption>
+          <figurecontent image="fig-autoconf-png"/>
           <figurecontent image="fig-autoconf-gif"/>
           <figurecontent image="fig-autoconf-eps"/>
           <figurecontent image="fig-autoconf-pdf"/>
@@ -338,6 +343,7 @@
 
         <figure float="nofloat">
           <caption><px>Inputs to, and outputs from, automake</px></caption>
+          <figurecontent image="fig-automake-png"/>
           <figurecontent image="fig-automake-gif"/>
           <figurecontent image="fig-automake-eps"/>
           <figurecontent image="fig-automake-pdf"/>
@@ -360,6 +366,7 @@
           <caption>
             <px>Inputs and outputs to configure</px>
           </caption>
+          <figurecontent image="fig-configure-png"/>
           <figurecontent image="fig-configure-gif"/>
           <figurecontent image="fig-configure-eps"/>
           <figurecontent image="fig-configure-pdf"/>
@@ -381,6 +388,7 @@
           <caption>
             <px>Inputs and outputs to autoheader</px>
           </caption>
+          <figurecontent image="fig-autoheader-png"/>
           <figurecontent image="fig-autoheader-gif"/>
           <figurecontent image="fig-autoheader-eps"/>
           <figurecontent image="fig-autoheader-pdf"/>
@@ -1137,7 +1145,8 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             do this sort of semi-licensed hacking very often.  In
             particular, you do not need to do it in the case of the
             Starlink standard directories <code>/star/docs</code>,
-            <code>/star/etc</code> and <code>/star/help</code>, since
+            <code>/star/etc</code>, <code>/star/examples</code> and
+            <code>/star/help</code>, since
             you can give these directories as prefixes to the
             <code>DATA</code> primary.  As an example, the HDS
             makefile installs a file containing the information it has
@@ -1156,14 +1165,12 @@ hds_machine.txt: hds_machine
             This is enough to build the <code>hds_machine</code>
             application at install time, run it, and install the
             results in <code>/star/help</code> (with the obvious
-            changes for prefixes <code>stardocs</code> and
-            <code>staretc</code>).  The Starlink autoconf macros <ref
-            id="macro-doc-files" ><code>STAR_DOC_FILES</code></ref>,
-            <ref id="macro-etc-files"
-            ><code>STAR_ETC_FILES</code></ref> and <ref
-            id="macro-help-files" ><code>STAR_HELP_FILES</code></ref>
+            changes for prefixes <code>stardocs</code>,
+            <code>staretc</code> and <code>starexamples</code>).
+            There are Starlink autoconf macros which 
             allow you to do the same thing from within the
-            <code>configure.ac</code> file.</p>
+            <code>configure.ac</code> file.  See <ref
+              id="macro-special-dirs"/> for details</p>
 
           <p>The remaining magic in this file is the
             <code>EXTRA_DIST</code> variable.  For all its cleverness,
@@ -3547,19 +3554,16 @@ M Makefile.dependencies
             </dd>
 
             <dt>How do I put things in
-              <code>/star/{docs,etc,help}</code>?</dt>
+              <code>/star/{docs,etc,examples,help}</code>?</dt>
             <dd>
-              <p>Use the <code>stardocs</code>, <code>staretc</code>
-                and <code>starhelp</code> <code>DATA</code> prefixes.
-                The Starlink autoconf macros <ref id="macro-doc-files"
-                ><code>STAR_DOC_FILES</code></ref>, <ref
-                id="macro-etc-files"
-                ><code>STAR_ETC_FILES</code></ref> and <ref
-                id="macro-help-files"
-                ><code>STAR_HELP_FILES</code></ref> allow you to do
-                the same thing from within the
-                <code>configure.ac</code> file.  See <ref
-                id="automakeoverview"/> for an example.</p>
+              <p>In the <code>Makefile.am</code> use the
+                <code>DATA</code> prefixes <code>stardocs</code>,
+                <code>staretc</code>, and so on.  In
+                <code>configure.ac</code>, use the macros
+                <code>STAR_DOCS_FILES</code>,
+                <code>STAR_ETC_FILES</code> and so on.  See <ref
+                  id="macro-special-dirs"/> for details, and
+                <ref id="automakeoverview"/> for an example.</p>
             </dd>
 
             <dt>How do I control which compiler and compiler options I
@@ -4541,42 +4545,25 @@ file.f: file.$(FPP_SRC_EXT)
 
         </subsect>
 
-        <subsect id='macro-doc-files' export='export'>
+        <subsect id="macro-special-dirs" export="export">
           <subhead>
-            <title>STAR_DOC_FILES and the stardocs prefix</title>
+            <title>STAR_DOCS_FILES and friends: special installation directories</title>
           </subhead>
 
-          <p><strong><code>STAR_DOC_FILES(docfiles)</code></strong></p>
-
-          <p><strong><code>stardocs_DATA</code></strong></p>
-
-          <p>Declare a list of files to be installed into the
-            Starlink documentation directory.  This can be used both
-            internally and in user <code>configure.ac</code>
-            files.</p>
-
-          <p>You can achieve the same effect by giving the list of
-            files as the value of <code>stardocs_DATA</code> in
-            Makefile.am, if that is more appropriate.</p>
-        </subsect>
-
-        <subsect id='macro-etc-files' export='export'>
-          <subhead>
-            <title>STAR_ETC_FILES and the staretc prefix</title>
-          </subhead>
-
-          <p><strong><code>STAR_ETC_FILES(etcfiles)</code></strong></p>
-
-          <p><strong><code>staretc_DATA</code></strong></p>
-
-          <p>Declare a list of files to be installed into the
-            Starlink <code>etc</code> directory.  This can be used
-            both internally and in user <code>configure.ac</code>
-            files.</p>
-
-          <p>You can achieve the same effect by giving the list of
-            files as the value of <code>staretc_DATA</code> in
-            Makefile.am, if that is more appropriate.</p>
+          <p>There are several macros and makefile variables which
+            help you install files in special directories.  These are
+            the macros <code>STAR_</code><em>X</em><code>_FILES</code>
+            for <em>X</em> in <code>DOCS</code>, <code>ETC</code>,
+            <code>EXAMPLES</code>, and <code>HELP</code>, and the
+            automake variables <code>stardocs</code>,
+            <code>staretc</code>, <code>starexamples</code> and
+            <code>starhelp</code>.  In the <code>configure.ac</code>
+            file, the macros take as argument a list of files to be
+            installed in the corresponding directory (currently
+            <code>/star/docs</code> and so on), and in the
+            <code>Makefile.am</code> the variable has as value a list
+            of files to be installed as data in the corresponding
+            place.</p>
         </subsect>
 
         <subsect id="macro-fc-library-ldflags" export="export">
@@ -4614,25 +4601,6 @@ file.f: file.$(FPP_SRC_EXT)
           <p>Obsolete -- use <ref id="macro-ac-fc-open-specifiers"
               ><code>AC_FC_OPEN_SPECIFIERS</code></ref> instead</p>
 
-        </subsect>
-
-        <subsect id='macro-help-files' export='export'>
-          <subhead>
-            <title>STAR_HELP_FILES and the starhelp prefix</title>
-          </subhead>
-
-          <p><strong><code>STAR_HELP_FILES(helpfiles)</code></strong></p>
-
-          <p><strong><code>starhelp_DATA</code></strong></p>
-
-          <p>Declare a list of files to be installed into the
-            Starlink <code>help</code> directory.  This can be used
-            both internally and in user <code>configure.ac</code>
-            files.</p>
-
-          <p>You can achieve the same effect by giving the list of
-            files as the value of <code>starhelp_DATA</code> in
-            Makefile.am, if that is more appropriate.</p>
         </subsect>
 
         <subsect id='macro-latex-documentation' export='export'>
@@ -5018,11 +4986,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
                 prefixes to
                 the <code>DATA</code> primary.  Setting these variables has
                 the same effect as giving an argument to the
-                <ref id='macro-doc-files' ><code>STAR_DOC_FILES</code></ref>,
-                <ref id='macro-etc-files' ><code>STAR_ETC_FILES</code></ref>
-                and
-                <ref id='macro-help-files' ><code>STAR_HELP_FILES</code></ref>
-                starconf macros</p>
+                <code>STAR_DOCS_FILES</code> macro (and friends).  See
+                <ref id="macro-special-dirs"/>.</p>
             </li>
 
             <li>
