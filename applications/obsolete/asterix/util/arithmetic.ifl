@@ -1,21 +1,21 @@
 Interface ARITHMETIC
    Parameter INP1
       position    1
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'First input data object'
       help        'May be scalar number, primitive or NDF object'
    EndParameter
 
    Parameter INP2
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'Second input data object'
       help        'May be scalar number, primitive or NDF object'
    EndParameter
 
    Parameter OUT
       position    3
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'Output dataset'
       help        'This may be the same as either input data object, if not prim.'
    EndParameter
@@ -29,13 +29,13 @@ Interface ARITHMETIC
    EndParameter
 
    Parameter ERRRO1
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'Error value(s) for first object'
       help        'Enter ''!'' if no errors required, otherwise a primitive HDS data object or a scalar number'
    EndParameter
 
    Parameter ERROR2
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'Error value(s) for second object'
       help        'Enter ''!'' if no errors required, otherwise a primitive HDS data object or a scalar number'
    EndParameter
