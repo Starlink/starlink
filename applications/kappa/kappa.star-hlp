@@ -4020,13 +4020,13 @@ LENGTH() = _REAL (Write)
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave around the contour map for axis
    annotation. The widths should be given as fractions of the
-   corresponding dimension of the DATA picture.
+   corresponding dimension of the current picture.
    The actual margins used may be increased to preserve the aspect
    ratio of the DATA picture. Four values may be given, in the order;
    bottom, right, top, left. If fewer than four values are given,
    extra values are used equal to the first supplied value. If these
    margins are too narrow any axis annotation may be clipped. The
-   dynamic default is 0.18 (for all edges) if annotated axes are being
+   dynamic default is 0.15 (for all edges) if annotated axes are being
    produced, and zero otherwise. See also parameter KEYPOS. []
 3 MODE
 MODE = LITERAL (Read)
@@ -6694,13 +6694,13 @@ LUT = NDF (Read)
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave around the image for axis
    annotations, given as fractions of the corresponding dimension
-   of the DATA picture. The actual margins used may be increased to
+   of the current picture. The actual margins used may be increased to
    preserve the aspect ratio of the data. Four values may be given, in
    the order - bottom, right, top, left. If less than four values are
    given, extra values are used equal to the first supplied value. If
    these margins are too narrow any axis annotation may be clipped.
    If a null (!) value is supplied, the value used is (for all edges);
-   0.2 if annotated axes are being produced; 0.06, if a simple border
+   0.15 if annotated axes are being produced; 0.04, if a simple border
    is being produced; and 0.0 if neither border nor axes are being
    produced. [current value]
 3 MODE
@@ -12824,12 +12824,12 @@ LOGFILE = FILENAME (Write)
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
-   as fractions of the corresponding dimension of the DATA picture.
+   as fractions of the corresponding dimension of the current picture.
    Four values may be given, in the order - bottom, right, top, left.
    If less than four values are given, extra values are used equal to
    the first supplied value. If these margins are too narrow any axis
    annotation may be clipped. If a null (!) value is supplied, the
-   value used is 0.18 (for all edges) if either annotated axes or
+   value used is 0.15 (for all edges) if either annotated axes or
    a key are produced, and zero otherwise. [current value]
 3 NUMBIN
 NUMBIN = _INTEGER (Read)
@@ -14698,11 +14698,11 @@ LMODE = LITERAL (Read)
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
-   as fractions of the corresponding dimension of the DATA picture.
+   as fractions of the corresponding dimension of the current picture.
    Four values may be given, in the order - bottom, right, top, left.
    If less than four values are given, extra values are used equal to
    the first supplied value. If these margins are too narrow any axis
-   annotation may be clipped. The dynamic default is 0.18 (for all
+   annotation may be clipped. The dynamic default is 0.15 (for all
    edges) if either annotated axes or a key are produced, and zero
    otherwise. []
 3 MARKER
@@ -19479,7 +19479,7 @@ LNINDX = LITERAL (Read)
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave around the contour map for axis
    annotation. The widths should be given as fractions of the
-   corresponding dimension of the DATA picture. Four values may be
+   corresponding dimension of the current picture. Four values may be
    given, in the order; bottom, right, top, left. If fewer than four
    values are given, extra values are used equal to the first supplied
    value. If these margins are too narrow any axis annotation may be
@@ -21371,11 +21371,11 @@ IN2 = NDF (Read)
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
-   as fractions of the corresponding dimension of the DATA picture.
+   as fractions of the corresponding dimension of the current picture.
    Four values may be given, in the order - bottom, right, top, left.
    If less than four values are given, extra values are used equal to
    the first supplied value. If these margins are too narrow any axis
-   annotation may be clipped. The dynamic default is 0.18 (for all
+   annotation may be clipped. The dynamic default is 0.15 (for all
    edges) if annotated axes are produced, and zero otherwise. []
 3 MARKER
 MARKER = _INTEGER (Read)
@@ -25389,12 +25389,12 @@ LOGFILE = FILENAME (Read)
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
-   as fractions of the corresponding dimension of the DATA picture.
+   as fractions of the corresponding dimension of the current picture.
    Four values may be given, in the order - bottom, right, top, left.
    If less than four values are given, extra values are used equal to
    the first supplied value. If these margins are too narrow any axis
    annotation may be clipped. If a null (!) value is upplied, the
-   value used is 0.18 (for all edges) if either annotated axes or a
+   value used is 0.15 (for all edges) if either annotated axes or a
    key are produced, and zero otherwise. [current value]
 3 MARKER
 MARKER = INTEGER (Read)
@@ -26288,11 +26288,11 @@ IN2 = NDF (Read)
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
-   as fractions of the corresponding dimension of the DATA picture.
+   as fractions of the corresponding dimension of the current picture.
    Four values may be given, in the order - bottom, right, top, left.
    If less than four values are given, extra values are used equal to
    the first supplied value. If these margins are too narrow any axis
-   annotation may be clipped. The dynamic default is 0.18 (for all
+   annotation may be clipped. The dynamic default is 0.15 (for all
    edges) if annotated axes are produced, and zero otherwise. []
 3 MARKER
 MARKER = _INTEGER (Read)
