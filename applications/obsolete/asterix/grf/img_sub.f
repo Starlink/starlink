@@ -1654,6 +1654,8 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Global constants :
         INCLUDE 'SAE_PAR'
         INCLUDE 'ADI_PAR'
+        INCLUDE 'MATH_PAR'
+        INCLUDE 'PRM_PAR'
 *  Import :
       INTEGER			IFID
 *  Export :
