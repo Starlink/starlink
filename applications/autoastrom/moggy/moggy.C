@@ -844,27 +844,25 @@ string processAstCommand (vector<string>& arglist,
 		  string astlinein;
 		  while (getline (instream, astlinein))
 		  {
-		      // top and tail whitespace from the string
-		      string::size_type startpos
-			  = astlinein.find_first_not_of (" \t\r\n");
-		      string::size_type endpos
-			  = astlinein.find_last_not_of (" \t\n\r");
+                      // Remove _trailing_ whitespace, for neatness, but don't
+                      // remove leading whitespace.  If this is a
+                      // sequence of FITS card images, then 8 leading
+                      // blanks cound as a BLANKFIELD commentary
+                      // keyword.
+                      string::size_type endpos
+                          = astlinein.find_last_not_of(" \t\n\r");
 
 		      if (verbosity > normal)
 			  Util::logstream() << "Moggy:dialogue:Input   :"
 			       << astlinein << endl;
 
-		      if (startpos < astlinein.npos)
-		      {
-			  // The string is not solely whitespace
-			  string astline = astlinein.substr
-			      (startpos, endpos-startpos+1);
-
-			  if (astline == ".")
-			      break;
-
-			  frameset.push_back(astline);
-		      }
+                      if (endpos != astlinein.npos) {
+                          // The string is not solely whitespace
+                          string astline = astlinein.substr(0, endpos+1);
+                          if (astline == ".")
+                              break;
+                          frameset.push_back(astline);
+                      }
 		  }
 
 		  ast = new AstHandler (frameset, arglist[2]);
