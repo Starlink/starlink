@@ -67,7 +67,17 @@
 *        describe the properties of the transformation (parameters
 *        XFOR, YFOR, XINV and YINV) should be given. This is
 *        optional, but the information can be used to make other
-*        applications run more efficiently.  Valid values are:
+*        applications run more efficiently.  What values are valid
+*        depends on whether the transformations are being stored as
+*        TRANSFORM structures or as AST Mappings.  
+*
+*        For AST Mappings the following can be used:
+*           - SIMPFI        -- Forward followed by inverse transformation
+*                              can be simplified to a unit mapping.
+*           - SIMPIF        -- Inverse followed by forward transformation
+*                              can be simplified to a unit mapping.
+*
+*        and for TRANSFORM structures the following can be used:
 *           - LINEAR        -- Linear and preserves straight lines.
 *           - INDEPENDENT   -- Preserves the independence of the axes.
 *           - DIAGONAL      -- Preserves the axes themselves.
@@ -81,7 +91,7 @@
 *        classification and a table of classifications of common
 *        mappings.
 *
-*        This parameter is ignored unless OUTFORMAT=TRANSFORM.
+*        This parameter is only used when IFIT=6.
 *     CLASSIFY = _LOGICAL (Read)
 *        If TRUE then this indicates that you want to classify the
 *        transform. Classifying a transformation can help in later
@@ -91,7 +101,7 @@
 *        Linear transformations are classified by this routine directly
 *        and do not use this parameter.
 *
-*        This parameter is ignored unless OUTFORMAT=TRANSFORM.
+*        This parameter is only used when IFIT=6.
 *        [FALSE]
 *     FA-FZ = LITERAL (Read)
 *        These parameters supply the values of "sub-expressions" used in
@@ -107,7 +117,7 @@
 *           FA > SQRT(X*X+Y*Y)
 *           FB > SQRT(XX*XX+YY*YY)
 *
-*        This parameter is ignored unless OUTFORMAT=TRANSFORM.
+*        This parameter is only used when IFIT=6.
 *     FITTYPE = _INTEGER (Read)
 *        The type of fit which should be used when determining the
 *        transformation between the input positions lists. This may take
@@ -363,12 +373,8 @@
 *        factor. A solution for the values PA and PB is found using a
 *        general least-squares minimization technique. Starting values
 *        for PA and PB can be given using the parameters PA and PB.
-*        Since the fittype is 6, outformat must be 'transform', so
-*        the results are coded as transform structures in the CCDPACK
-*        extensions of the NDFs (under the item TRANSFORM).  The 
-*        transform structures are arranged so that the forward 
-*        transformation maps current positions into the reference 
-*        coordinate system.
+*        Since the fittype is 6, only two position lists may be 
+*        registered in the same run.
 *
 *     register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
 *              yfor='pe+pf*x+pg*y+ph*x*y'
@@ -378,7 +384,9 @@
 *        enough, or if you just want to transform positions. A problem
 *        with proceeding with this transformation in a general fashion
 *        is deriving the inverse as this is required if you want to
-*        perform image resampling.
+*        perform image resampling using TRANNDF (though the more
+*        specialised, and less efficient, DRIZZLE can resample with
+*        only the forward transformation).
 *
 *     register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
 *              fittype=3 placein=ndf outformat=transform 
@@ -492,6 +500,9 @@
 *     1-NOV-1999 (MBT):
 *        Modified so that output is in units appropriate to Current 
 *        coordinate frame.
+*     12-NOV-1999 (MBT):
+*        Modified so that general transformations can be output into 
+*        WCS components as MathMaps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -544,7 +555,8 @@
       CHARACTER * ( CCD1__SZTRN - 3 ) YFOR ! Y mapping expression
       CHARACTER * ( CCD1__SZTRN - 3 ) YINV ! Y mapping expression
       CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to object to store transform
-      CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locator to extension or top level storage in container file
+      CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locator to ccdpack extension in NDF
+      CHARACTER * ( DAT__SZLOC ) LOCTOP ! Locator to top level storage in container file
       CHARACTER * ( FIO__SZFNM ) FNAME( CCD1__MXLIS ) ! Input filenames
       CHARACTER * ( FIO__SZFNM ) NDFNAM( CCD1__MXLIS ) ! Input filenames
       DOUBLE PRECISION FORVAL( CCD1__MTRNP ) ! Forward general coefficients
@@ -587,7 +599,7 @@
       INTEGER JREG              ! Index of OUTDM domain frame in frameset
       INTEGER MAPCP             ! AST mapping from Current to pixel frame of ref
       INTEGER MAPS( CCD1__MXLIS + 1 ) ! AST Mapping from pixel to Current frames
-      INTEGER MAPTFM            ! AST pointer for Pixel - OUTDM mapping
+      INTEGER MAPTFM( CCD1__MXLIS + 1 ) ! AST pointers for Pixel - OUTDM mapping
       INTEGER MAP1              ! Temporary AST mapping
       INTEGER MAXIN             ! Maximum number of input lists
       INTEGER MININ             ! Minimum number of input lists
@@ -622,6 +634,8 @@
       LOGICAL HAVYXI            ! references to X and Y
       LOGICAL HAVYYF            !
       LOGICAL HAVYYI            !
+      LOGICAL SIMPFI            ! OK to simplify forward then inverse mapping?
+      LOGICAL SIMPIF            ! OK to simplify inverse then forward mapping?
       LOGICAL NDFS              ! True if list names came from NDF extensions
       LOGICAL THERE             ! Flag indicating presence of object
       LOGICAL OUTREF            ! Output reference required
@@ -778,7 +792,9 @@
 *  find out were the user would like them. The two options are: in NDFs
 *  (in which case a list of NDF names will be solicited using the 
 *  parameter 'IN'), or in a single container file.
-      IF ( .NOT. NDFS ) THEN
+      IF ( NDFS ) THEN
+         PLACE = 'NDF'
+      ELSE
          CALL PAR_CHOIC( 'PLACEIN', ' ', 'NDF,FILE', .FALSE., PLACE,
      :        STATUS )
          IF ( PLACE .EQ. 'NDF' ) THEN
@@ -786,17 +802,11 @@
 *  User wants to place the results in some as yet unnamed NDFs.
 *  Create a group containing the NDFs.
             CALL CCD1_NDFGU( NDFGR, NNDF, 'IN', NOPEN, NOPEN, STATUS )
-
          ELSE
 
 *  User wants to store them as transform structures in a container file. 
-*  Open one.
             OUTFM = 'TRANSFORM'
-            CALL DAT_CREAT( 'TRFILE', 'CCDPACK_TRN', 0, 0, STATUS )
-            CALL DAT_ASSOC( 'TRFILE', 'WRITE', LOCEXT, STATUS )
          END IF
-      ELSE
-         PLACE = 'NDF'
       END IF
 
 *  How are the transformations to be written out?  If we are outputting
@@ -804,20 +814,33 @@
 *  as TRANSFORM structures.  If they are written to NDFs (PLACE = 'NDF')
 *  then find out if they are to be stored as TRANSFORM structures in
 *  the .MORE.CCDPACK component, or as frames in the WCS component.
-*  Currently for nonlinear (FITTYPE=6) fits, only TRANSFORM output is
-*  possible.
-      IF ( PLACE .EQ. 'NDF' .AND. IFIT .LE. 5 ) THEN
+      IF ( PLACE .EQ. 'NDF' ) THEN
          CALL PAR_CHOIC( 'OUTFORMAT', 'WCS', 'WCS,TRANSFORM',
      :                   .TRUE., OUTFM, STATUS )
+      ELSE
+         OUTFM = 'TRANSFORM'
+      END IF
 
-*  Get name of domain for new frame in WCS frameset.  Spaces are 
-*  removed and it is folded to upper case since this is how the 
-*  AST system will treat it.
+*  If we're going to be writing out to TRANSFORM structures, create a
+*  container file to hold them.  If their eventual destination is 
+*  in the original NDFs this will be a temporary holding space, 
+*  otherwise it is their eventual resting place.
+      IF ( OUTFM .EQ. 'TRANSFORM' ) THEN
+         IF ( PLACE .EQ. 'NDF' ) THEN
+            CALL AIF_TEMP( 'CCDPACK_TRN', 0, 0, LOCTOP, STATUS )
+         ELSE
+            CALL DAT_CREAT( 'TRFILE', 'CCDPACK_TRN', 0, 0, STATUS )
+            CALL DAT_ASSOC( 'TRFILE', 'WRITE', LOCTOP, STATUS )
+         END IF
+
+*  Otherwise, we are writing to WCS components.  We need a domain name
+*  for the new frame we will create.  Get it from the parameter system.
+*  Spaces are removed and it is folded to upper case since this is how
+*  the AST system will treat it.
+      ELSE
          CALL PAR_GET0C( 'OUTDOMAIN', OUTDM, STATUS )
          CALL CHR_RMBLK( OUTDM )
          CALL CHR_UCASE( OUTDM )
-      ELSE
-         OUTFM = 'TRANSFORM'
       END IF
 
 *  Read the data values in the input lists into workspace.
@@ -906,7 +929,7 @@
      :      ' written to .MORE.CCDPACK components of NDFs', STATUS )
          END IF
       ELSE
-         CALL DAT_MSG( 'FILE', LOCEXT )
+         CALL DAT_MSG( 'FILE', LOCTOP )
          CALL CCD1_MSG( ' ', '  Transformation structures will be'//
      :   ' written as TRANSFORM structures into ^FILE', STATUS )
       END IF
@@ -1005,130 +1028,29 @@
             CALL CCD1_TROUT( TR( 1, I ), FRMS( I ), USEWCS, STATUS )
  11      CONTINUE
 
-*  Store the transformation information.
+*  Store the transformation information, either as transform structures
+*  or as mappings.  In either case storage back in the original NDFs
+*  is deferred to a later stage.
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Loop over each data set.
             DO 7 I = 1, NOPEN
 
-               IF ( PLACE .EQ. 'NDF' ) THEN
+*  Storing in WCS format; store the mapping in an array.
+               IF ( OUTFM .EQ. 'WCS' ) THEN
+                  CALL CCD1_LNMAP( TR( 1, I ), MAPTFM( I ), STATUS )
 
-*  Open the NDF.
-                  CALL IRG_NDFEX( NDFGR, I, ID, STATUS )
-
-                  IF ( OUTFM .EQ. 'WCS' ) THEN
-
-*  Begin new AST context.
-                     CALL AST_BEGIN( STATUS )
-
-*  Get the WCS component of the NDF.
-                     CALL CCD1_GTWCS( ID, IWCS, STATUS )
-
-*  Get the original current frame index for future use.
-                     JCUR = AST_GETI( IWCS, 'Current', STATUS )
-
-*  Ensure the Current frame is the one relative to which we've got the 
-*  mapping.
-                     IF ( .NOT. USEWCS ) THEN
-                        CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-                     END IF
-                     
-*  Generate a mapping representing the linear transformation between
-*  the Current frame of this NDF and that of the reference NDF.
-                     CALL CCD1_LNMAP( TR( 1, I ), MAPTFM, STATUS )
-
-*  Combine it with the mapping between the Current and PIXEL-domain 
-*  frames of the reference NDF so that the registration frame is a 
-*  copy of the PIXEL-domain frame of the reference NDF.
-                     IF ( USEWCS ) THEN
-                        MAPTFM = AST_CMPMAP( MAPTFM, MAPCP, .TRUE., ' ',
-     :                                       STATUS )
-                        MAPTFM = AST_SIMPLIFY( MAPTFM, STATUS )
-                     END IF
-
-*  Generate a frame in domain called OUTDM, the purpose of which is to 
-*  group the frames produced by this application.  It is a doctored 
-*  copy of the frame it's defined relative to.
-                     FRREG = AST_FRAME( 2, ' ', STATUS )
-                     CALL AST_SETC( FRREG, 'Domain', OUTDM, STATUS )
-                     CALL AST_SETC( FRREG, 'Title', 
-     :                              'Alignment by REGISTER', STATUS )
-
-*  Add the OUTDM domain frame, with the appropriate mapping, to the 
-*  WCS component of the NDF.  This will become the current frame.
-                     CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAPTFM, 
-     :                                  FRREG, STATUS )
-
-*  Get the index of the OUTDM frame.
-                     JREG = AST_GETI( IWCS, 'Current', STATUS )
-
-*  Now remove any previously existing frames in the OUTDM domain;
-*  the output frameset should contain only one, to prevent confusion
-*  (note CCD1_DMPRG updates JREG if necessary).
-                     CALL CCD1_DMPRG( IWCS, OUTDM, .TRUE., JREG, 
-     :                                STATUS )
-
-*  Finally ensure that the registration domain is the Current one.
-                     CALL AST_SETI( IWCS, 'Current', JREG, STATUS )
-
-*  Write the modified WCS component back to NDF.
-                     CALL NDF_PTWCS( IWCS, ID, STATUS )
-
-*  End this AST context.
-                     CALL AST_END( STATUS )
-
-*  If we have not already written to a WCS component, write to a 
-*  TRANSFORM structure instead.
-                  ELSE IF ( OUTFM .EQ. 'TRANSFORM' ) THEN
-
-*  Make sure that the CCDPACK extension exists.
-                     CALL CCD1_CEXT( ID, .TRUE., 'UPDATE', LOCEXT, 
-     :                               STATUS )
-
-*  Does a transformation exist already?
-                     CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE, 
-     :                               STATUS )
-                     IF ( THERE ) THEN
-
-*  Need to remove old structure.
-                        CALL DAT_ERASE( LOCEXT, 'TRANSFORM', STATUS )
-                     END IF
-
-*  Add the transformation - forward, inverse and classification.
-                     CALL CCD1_WLTRN( TR( 1, I ), LOCEXT, FNAME( I ),
-     :                                IFIT, STATUS )
-                     CALL DAT_ANNUL( LOCEXT, STATUS )
-
-                  END IF
-
-*  Release NDF.
-                  CALL NDF_ANNUL( ID, STATUS )
-
-               ELSE
-
-                  IF ( OUTFM .EQ. 'TRANSFORM' ) THEN
-
-*  Putting all transformations into a container file.
-                     INAME = 'TRN_'
-                     CALL CHR_ITOC( I, INAME( 5: ), IAT )
-                     CALL DAT_NEW( LOCEXT, INAME, 'TRANSFORM',
-     :                             0, 0, STATUS )
-                     CALL DAT_FIND( LOCEXT, INAME, ELOC, STATUS )
-                     CALL CCD1_WLTRN( TR( 1, I ), ELOC, FNAME( I ),
-     :                                IFIT, STATUS )
-                     CALL DAT_ANNUL( ELOC, STATUS )
-
-                  ELSE IF ( OUTFM .EQ. 'WCS' ) THEN
-
-*  Exit with an error if we are trying to write a WCS component other
-*  than into an NDF.
-                     STATUS = SAI__ERROR
-                     CALL ERR_REP( 'REGISTER_BADPAR', 
-     : 'Output of a WCS structure must currently be to an NDF file',
-     :                                STATUS )
-                     GO TO 99
-                  END IF
-
+*  Storing in TRANSFORM format; store the transformation in a container
+*  file.
+               ELSE IF ( OUTFM .EQ. 'TRANSFORM' ) THEN
+                  INAME = 'TRN_'
+                  CALL CHR_ITOC( I, INAME( 5: ), IAT )
+                  CALL DAT_NEW( LOCTOP, INAME, 'TRANSFORM', 0, 0, 
+     :                          STATUS )
+                  CALL DAT_FIND( LOCTOP, INAME, ELOC, STATUS )
+                  CALL CCD1_WLTRN( TR( 1, I ), ELOC, FNAME( I ),
+     :                             IFIT, STATUS )
+                  CALL DAT_ANNUL( ELOC, STATUS )
                END IF
  7          CONTINUE
          END IF
@@ -1411,84 +1333,84 @@
 *  transformation.
  21      CONTINUE
          CALL PAR_GET0L( 'CLASSIFY', DOCLAS, STATUS )
+
+*  Solicit the classification.  This takes different forms according to
+*  how we are going to store the transformation.
          IF ( DOCLAS ) THEN
-            CALL PAR_CHOIV( 'CLASS', TRN__MXCLS,
-     :                      'LINEAR,INDEPENDENT,DIAGONAL,'//
-     :                      'ISOTROPIC,POSITIVE_DET,NEGATIVE_DET,'//
-     :                      'CONSTANT_DET,UNIT_DET',
-     :                      CLASES, NCLASS, STATUS )
+
+*  If we are storing it in a WCS component as a MathMap, we just need
+*  to know SimpFI and SimpIF attributes.
+            IF ( OUTFM .EQ. 'WCS' ) THEN
+               CALL PAR_CHOIV( 'CLASS', 2, 'SIMPIF,SIMPFI', CLASES,
+     :                         NCLASS, STATUS )
+               SIMPFI = .FALSE.
+               SIMPIF = .FALSE.
+               DO 86 I = 1, NCLASS
+                  IF ( CLASES( I ) .EQ. 'SIMPFI' ) THEN
+                     SIMPFI = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'SIMPIF' ) THEN
+                     SIMPIF = .TRUE.
+                  END IF
+ 86            CONTINUE
+
+*  If we are storing it as a TRANSFORM structure, there is a larger 
+*  array of classification flags.
+            ELSE
+               CALL PAR_CHOIV( 'CLASS', TRN__MXCLS,
+     :                         'LINEAR,INDEPENDENT,DIAGONAL,'//
+     :                         'ISOTROPIC,POSITIVE_DET,NEGATIVE_DET,'//
+     :                         'CONSTANT_DET,UNIT_DET',
+     :                         CLASES, NCLASS, STATUS )
 
 *  Convert these into a logical array.
-            DO 87 I = 1, TRN__MXCLS
-               CLASS( I ) = .FALSE.
- 87         CONTINUE
-            DO 88 I = 1, NCLASS
-               IF ( CLASES( I ) .EQ. 'LINEAR' ) THEN
-                  CLASS( TRN__LIN ) = .TRUE.
-               ELSE IF ( CLASES( I ) .EQ. 'INDEPENDENT' ) THEN
-                  CLASS( TRN__INDEP ) = .TRUE.
-               ELSE IF ( CLASES( I ) .EQ. 'DIAGONAL' ) THEN
-                  CLASS( TRN__DIAG ) = .TRUE.
-               ELSE IF ( CLASES( I ) .EQ. 'ISOTROPIC' ) THEN
-                  CLASS( TRN__ISOT ) = .TRUE.
-               ELSE IF ( CLASES( I ) .EQ. 'POSITIVE_DET' ) THEN
-                  CLASS( TRN__POSDT ) = .TRUE.
-               ELSE IF ( CLASES( I ) .EQ. 'NEGATIVE_DET' ) THEN
-                  CLASS( TRN__NEGDT ) = .TRUE.
-               ELSE IF ( CLASES( I ) .EQ. 'CONSTANT_DET' ) THEN
-                  CLASS( TRN__CONDT ) = .TRUE.
-               ELSE IF ( CLASES( I ) .EQ. 'UNIT_DET' ) THEN
-                  CLASS( TRN__UNIDT ) = .TRUE.
-               END IF
- 88         CONTINUE
+               DO 87 I = 1, TRN__MXCLS
+                  CLASS( I ) = .FALSE.
+ 87            CONTINUE
+               DO 88 I = 1, NCLASS
+                  IF ( CLASES( I ) .EQ. 'LINEAR' ) THEN
+                     CLASS( TRN__LIN ) = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'INDEPENDENT' ) THEN
+                     CLASS( TRN__INDEP ) = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'DIAGONAL' ) THEN
+                     CLASS( TRN__DIAG ) = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'ISOTROPIC' ) THEN
+                     CLASS( TRN__ISOT ) = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'POSITIVE_DET' ) THEN
+                     CLASS( TRN__POSDT ) = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'NEGATIVE_DET' ) THEN
+                     CLASS( TRN__NEGDT ) = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'CONSTANT_DET' ) THEN
+                     CLASS( TRN__CONDT ) = .TRUE.
+                  ELSE IF ( CLASES( I ) .EQ. 'UNIT_DET' ) THEN
+                     CLASS( TRN__UNIDT ) = .TRUE.
+                  END IF
+ 88            CONTINUE
+            END IF
+
          END IF
 
 *  Now store the transformation. One the of the transforms is the just
 *  the identity, the other is the derived one.
          DO 8 I = 1, 2
-            IF ( PLACE .EQ. 'NDF' ) THEN
 
-*  Get the NDF and access the MORE extension.
-               CALL IRG_NDFEX( NDFGR, I, ID, STATUS )
-
-*  Make sure that the CCDPACK extension exists.
-               CALL CCD1_CEXT( ID, .TRUE., 'UPDATE', LOCEXT, STATUS )
-
-*  Does a transformation exist already?
-               CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE, STATUS )
-               IF ( THERE ) THEN
-
-*  Need to remove old structure.
-                  CALL DAT_ERASE( LOCEXT, 'TRANSFORM', STATUS )
-               END IF
-
-*  Add the transformation - forward, inverse and classification.
+*  Storing in WCS format; store the mapping in an array.
+            IF ( OUTFM .EQ. 'WCS' ) THEN
                IF ( I .EQ. IPREF ) THEN
-
-*  The identity.
-                  CALL CCD1_WLTRN( IDEN, LOCEXT, FNAME( I ), 1, STATUS )
+                  MAPTFM( I ) = AST_UNITMAP( 2, ' ', STATUS )
                ELSE
-                  CALL CCD1_WGTRN( LOCEXT, FORMAP, INVMAP, UNIPAR,
-     :                             NUMUNI, FORVAL, INVVAL, FULL,
-     :                             DOCLAS, CLASS, FNAME( I ), STATUS )
+                  CALL CCD1_GGMAP( FORMAP, INVMAP, UNIPAR, NUMUNI,
+     :                             FORVAL, INVVAL, FULL, SIMPFI,
+     :                             SIMPIF, MAPTFM( I ), STATUS )
                END IF
 
-*  Release NDF.
-               CALL DAT_ANNUL( LOCEXT, STATUS )
-               CALL NDF_ANNUL( ID, STATUS )
+*  Storing in TRANSFORM format; store the transformation in a container
+*  file.
             ELSE
-
-*  Putting all transformations into a container file.
                INAME = 'TRN_'
                CALL CHR_ITOC( I, INAME( 5: ), IAT )
-               CALL DAT_NEW( LOCEXT, INAME, 'TRANSFORM',
-     :                       0, 0, STATUS )
-               CALL DAT_FIND( LOCEXT, INAME, ELOC, STATUS )
-
-*  Write the appropriate transformation.
+               CALL DAT_NEW( LOCTOP, INAME, 'TRANSFORM', 0, 0, STATUS )
+               CALL DAT_FIND( LOCTOP, INAME, ELOC, STATUS )
                IF ( I .EQ. IPREF ) THEN
-
-*  The identity.
                   CALL CCD1_WLTRN( IDEN, ELOC, FNAME( I ), 1, STATUS )
                ELSE
                   CALL CCD1_WGTRN( ELOC, FORMAP, INVMAP, UNIPAR,
@@ -1497,7 +1419,107 @@
                END IF
                CALL DAT_ANNUL( ELOC, STATUS )
             END IF
+
  8       CONTINUE
+      END IF
+
+
+*  We now have either pointers to the AST Mapping objects in an array,
+*  or the TRANSFORM structures in a container file.  It's time to 
+*  store them in wherever they ought to go eventually.
+
+      IF ( PLACE .EQ. 'NDF' ) THEN
+
+*  Loop through each NDF.
+         DO 9 I = 1, NOPEN
+
+*  Open the NDF.
+            CALL IRG_NDFEX( NDFGR, I, ID, STATUS )
+
+*  We are storing AST Mappings in the WCS component of each NDF.
+            IF ( OUTFM .EQ. 'WCS' ) THEN
+
+*  Get the WCS component of the NDF.
+               CALL CCD1_GTWCS( ID, IWCS, STATUS )
+
+*  Get the original current frame index for future use.
+               JCUR = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Generate a frame in domain called OUTDM, the purpose of which is to 
+*  group the frames produced by this application.
+               FRREG = AST_FRAME( 2, ' ', STATUS )
+               CALL AST_SETC( FRREG, 'Domain', OUTDM, STATUS )
+               CALL AST_SETC( FRREG, 'Title', 
+     :                        'Alignment by REGISTER', STATUS )
+
+*  Ensure the Current frame is the one relative to which we've got the 
+*  mapping.
+               IF ( .NOT. USEWCS ) THEN
+                  CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
+               END IF
+                     
+*  Add the OUTDM domain frame, with the appropriate mapping, to the 
+*  WCS component of the NDF.  This will become the current frame.
+               CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAPTFM( I ), 
+     :                            FRREG, STATUS )
+
+*  Get the index of the OUTDM frame.
+               JREG = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Now remove any previously existing frames in the OUTDM domain;
+*  the output frameset should contain only one, to prevent confusion
+*  (note CCD1_DMPRG updates JREG if necessary).
+               CALL CCD1_DMPRG( IWCS, OUTDM, .TRUE., JREG, STATUS )
+
+*  Finally ensure that the registration domain is the Current one.
+               CALL AST_SETI( IWCS, 'Current', JREG, STATUS )
+
+*  Write the modified WCS component back to NDF.
+               CALL NDF_PTWCS( IWCS, ID, STATUS )
+
+*  We are storing TRANSFORM structures in the .MORE.CCDPACK extension of
+*  each NDF.
+            ELSE
+
+*  Make sure that the CCDPACK extension exists.
+               CALL CCD1_CEXT( ID, .TRUE., 'UPDATE', LOCEXT, STATUS )
+
+*  If a transformation exists already, we need to remove it.
+               CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE, STATUS )
+               IF ( THERE ) THEN
+                  CALL DAT_ERASE( LOCEXT, 'TRANSFORM', STATUS )
+               END IF
+
+*  Move the TRANSFORM structure from where it is currently sitting in
+*  the container file into the CCDPACK extension of the NDF.
+               INAME = 'TRN_'
+               CALL CHR_ITOC( I, INAME( 5: ), IAT )
+               CALL DAT_FIND( LOCTOP, INAME, ELOC, STATUS )
+               CALL DAT_MOVE( ELOC, LOCEXT, 'TRANSFORM', STATUS )
+
+*  Annul the CCDPACK extension locator.
+               CALL DAT_ANNUL( LOCEXT, STATUS )
+            END IF
+
+*  Release the NDF.
+            CALL NDF_ANNUL( ID, STATUS )
+
+ 9       CONTINUE
+
+*  If the TRANSFORM structures are to go in a container file, nothing
+*  much remains to be done (the container file locator is annulled 
+*  later, after the error continuation).
+      ELSE
+
+*  Exit with an error if we are trying to write a WCS component other
+*  than into an NDF (this should not be able to happen).
+         IF ( OUTFM .EQ. 'WCS' ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'REGISTER_BADPAR', 
+     : 'Output of a WCS structure must currently be to an NDF file',
+     :                       STATUS )
+            GO TO 99
+         END IF
       END IF
 
 *  Exit with error label. Tidy up after this.
@@ -1516,7 +1538,7 @@
       CALL AST_END( STATUS )
 
 *  Release the container file with transforms.
-      IF ( PLACE .NE. 'NDF' ) CALL DAT_ANNUL( LOCEXT, STATUS )
+      IF ( PLACE .NE. 'NDF' ) CALL DAT_ANNUL( LOCTOP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
