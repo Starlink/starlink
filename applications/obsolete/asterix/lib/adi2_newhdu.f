@@ -91,11 +91,17 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External references:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
+
 *  Local Variables:
+      CHARAQCTER*20		LHDU
       CHARACTER*4		STR
 
       INTEGER			HCID			! HDU container
       INTEGER			HID			! New HDU
+      INTEGER			HLEN
       INTEGER			NDIG			! Digits used in STR
       INTEGER			NHDU			! # HDUs in file
 *.
@@ -103,12 +109,19 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Make local copy of name, and translate embedded spaces to underscores
+      LHDU = HDUNAME
+      HLEN = CHR_LEN(LHDU)
+      DO I = 1, HLEN
+        IF ( LHDU(I:I) .EQ. ' ' ) LHDU(I:I) = '_'
+      END DO
+
 *  Locate file's HDU container
       CALL ADI_FIND( FID, 'Hdus', HCID, STATUS )
 
 *  Create named component & locate it
-      CALL ADI_CNEW0( HCID, HDUNAME, 'FITShdu', STATUS )
-      CALL ADI_FIND( HCID, HDUNAME, HID, STATUS )
+      CALL ADI_CNEW0( HCID, LHDU(:HLEN), 'FITShdu', STATUS )
+      CALL ADI_FIND( HCID, LHDU(:HLEN), HID, STATUS )
 
 *  Set the HDU counter
       CALL ADI_CGET0I( FID, 'Nhdu', NHDU, STATUS )
@@ -120,7 +133,10 @@
 
 *  Write property name so that ADI can do number -> HDU name mapping
       CALL CHR_ITOC( NHDU, STR, NDIG )
-      CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), HDUNAME, STATUS )
+      CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), CNAME, STATUS )
+
+*  Write true name
+      CALL ADI_CPUT0C( HID, 'Name', HDUNAME, STATUS )
 
 *  Relase new HDU
       CALL ADI_ERASE( HID, STATUS )
