@@ -242,7 +242,9 @@ sub obeyw {
  
   my $self = shift;
   my $action = shift;    # This is the action (eg stats)
-  my $parameters = shift | " ";
+
+  my $parameters = " ";
+  if (@_) { $parameters = shift; } 
  
   # Now do the obeyw
   my $status = adamtask_obeyw($self->name(), $action, $parameters);

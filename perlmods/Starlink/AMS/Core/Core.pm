@@ -511,6 +511,7 @@ sub adamtask_sendw {
 
 
   # Return the parameter value if this is a 'getresponse'
+  $response = " " unless (defined $response);
   return ($ADAM_STATUS,$response) 
     if $reply[0] =~ 'getresponse|controlresponse';
 
@@ -686,13 +687,18 @@ sub adamtask_control {
 
   my $task = shift;
   my $command = shift;
-  my $params = shift;
+
+  # There may not be a param (eg for par_reset)
+  # So protect from -w
+  my $params = " ";
+  if (@_) { $params = shift; $params = " " unless defined $params;}
 
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
   my ($status, $result) = 
     adamtask_sendw("adam_send(\"$task\",\"$command\",\"CONTROL\",\"$params\")"); 
+
 #  return $result if $command eq 'default';
   return ($result, $status);
 
