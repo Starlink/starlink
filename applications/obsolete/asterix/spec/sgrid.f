@@ -701,6 +701,8 @@
       DO I = 1, NGRID
         IF ( AUTO ) THEN
           CALL ADI_FCLOSE( GFID(I), STATUS )
+        ELSE IF ( I .EQ. 1 ) THEN
+          CALL USI_ANNUL( 'OUT', STATUS )
         ELSE
           WRITE( PC, '(I1.1)' ) I
           CALL USI_ANNUL( 'OUT'//PC, STATUS )
