@@ -426,6 +426,15 @@ use base qw/ Starlink::AST::Mapping /;
 package Starlink::AST::Region;
 use base qw/ Starlink::AST::Frame /;
 
+package Starlink::AST::Circle;
+use base qw/ Starlink::AST::Region /;
+
+package Starlink::AST::Ellipse;
+use base qw/ Starlink::AST::Region /;
+
+package Starlink::AST::Box;
+use base qw/ Starlink::AST::Region /;
+
 package Starlink::AST::FluxFrame;
 use base qw/ Starlink::AST::Frame /;
 
