@@ -16,13 +16,24 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-  o The Frame class has a new method which returns the angle subtended 
-  by two points at a third point within a 2 or 3 dimensional Frame.
+  o The Frame class has several new method to:
 
-  o The Frame class has a new method which calculates a position which is
-  offset away from a given starting point by a specified distance along a
-  geodesic curve which passes through the starting point at a given
-  position angle. It can only be used with 2-dimensional Frames.
+    -  return the angle subtended by two points at a third point within a 
+    2 or 3 dimensional Frame.
+
+    - calculate a position which is offset away from a given starting
+    point by a specified distance along a geodesic curve which passes
+    through the starting point at a given position angle. It can only be
+    used with 2-dimensional Frames.
+
+    -  return the increment between two supplied axis values. For
+    axes belonging to SkyFrames, the returned value is normalized into
+    the range -PI to +PI.
+
+    - return an axis value a given increment away from a specified axis
+    value. For axes belonging to SkyFrames, the returned value is
+    normalized into the range -PI to +PI (for latitude axes) or zero to
+    2.PI (for longitude axes).
 
   o It is now possible to specify the primitive graphics functions used
   by the Plot class at run-time as well as at link-time. The Plot class
