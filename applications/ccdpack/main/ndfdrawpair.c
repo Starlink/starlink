@@ -279,7 +279,7 @@
       STARCALL(
          psize = getpixelsize( ndf[ 0 ], iframe[ 0 ], status );
       )
-      shrink = ( psize * zoom < 1.1 ) ? 1.0 : 1.0 / ( psize * zoom );
+      shrink = ( psize * zoom < 2.1 ) ? 1.0 : 1.0 / ( psize * zoom );
 
 /* Generate the scaled data array ready for plotting.
    This wants to be done in the main process, since it may cache the 
@@ -330,6 +330,7 @@
       int ypof[ 2 ];
       double lbox[ 2 ][ 2 ];
       double ubox[ 2 ][ 2 ];
+      double plotzoom;
 
 /* Set values from the structure passed in the argument list. */
       struct ndfdrawpair_args_t *pargs = objv[ 0 ]->internalRep.otherValuePtr;
@@ -345,6 +346,8 @@
       double ydev = pargs->ydev;
       double yorigin = pargs->yorigin;
       double zoom = pargs->zoom;
+
+      plotzoom = zoom * shrink;
       
 /* Calculate the position and extent of the pixel array. */
       for ( i = 0; i < 2; i++ ) {
@@ -386,8 +389,20 @@
       for ( i = 0; i < 2; i++ ) {
          cpgpixl( pixbloc[ i ], xpix[ i ], ypix[ i ],
                   1, xpix[ i ], 1, ypix[ i ],
-                  lbox[ i ][ 0 ], ubox[ i ][ 0 ], 
-                  lbox[ i ][ 1 ], ubox[ i ][ 1 ] );
+                  lbox[ i ][ 0 ] + 0.5 / plotzoom, 
+                  lbox[ i ][ 0 ] + ( xpix[ i ] - 0.5 ) / plotzoom,
+                  lbox[ i ][ 1 ] + 0.5 / plotzoom,
+                  lbox[ i ][ 1 ] + ( ypix[ i ] - 0.5 ) / plotzoom );
+
+/* The following call is more general (in that it doesn't rely on knowing
+ * the size of the GWM we are plottting on) but unlikely to allow PGPLOT
+ * to optimise the plotting. */
+/*
+ *     cpgpixl( pixbloc[ i ], xpix[ i ], ypix[ i ],
+ *                1, xpix[ i ], 1, ypix[ i ],
+ *                lbox[ i ][ 0 ], ubox[ i ][ 0 ],
+ *                lbox[ i ][ 1 ], ubox[ i ][ 1 ] );
+ */
       }
 
 /* Check if there is any overlap between the two images. */
@@ -448,7 +463,13 @@
 
 /* Plot the overlap block over the pixels which have already been drawn. */
          cpgpixl( overp, xhi - xlo, yhi - ylo, 1, xhi - xlo, 1, yhi - ylo,
-                  oxlo, oxhi, oylo, oyhi );
+                  oxlo + 0.5 / plotzoom,
+                  oxlo + ( xhi - xlo - 0.5 ) / plotzoom,
+                  oylo + 0.5 / plotzoom,
+                  oylo + ( yhi - ylo - 0.5 ) / plotzoom );
+     /*  cpgpixl( overp, xhi - xlo, yhi - ylo, 1, xhi - xlo, 1, yhi - ylo,
+      *           oxlo, oxhi, oylo, oyhi );
+      */
 
 /* Free the workspace. */
          free( overp );

@@ -224,6 +224,7 @@
       int *pixbloc;
       float *gbox;
       double *bbox;
+      double zoom;
       AstFrameSet *wcs;
       int ifrm;
       int xpix;
@@ -500,10 +501,10 @@
          cpgqcir( &locolour, &hicolour );
 
 /* Set the plotting coordinate limits. */
-         gbox[ 0 ] = bbox[ 0 ] = 0.0;
-         gbox[ 1 ] = bbox[ 1 ] = 0.0;
-         gbox[ 2 ] = bbox[ 2 ] = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ];
-         gbox[ 3 ] = bbox[ 3 ] = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ];
+         gbox[ 0 ] = bbox[ 0 ] = 0.5;
+         gbox[ 1 ] = bbox[ 1 ] = 0.5;
+         gbox[ 2 ] = bbox[ 2 ] = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 1.5;
+         gbox[ 3 ] = bbox[ 3 ] = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 1.5;
 
 /* Set the viewport to use all of the available surface, within the 
    constraint that the correct aspect ratio is retained. */
@@ -525,7 +526,7 @@
    would be a waste of memory. */
          factor = 1.0;
          zoom = 10.0;
-         while ( zoom > 2.0 ) {
+         while ( zoom > 2.1 ) {
             zoom = ( xphi - xplo ) / ( bbox[ 2 ] - bbox[ 0 ] ) / factor++;
          }
 
@@ -537,7 +538,9 @@
          xpix = ndf->plotarray.xdim;
          ypix = ndf->plotarray.ydim;
 
-/* The rest of the processing can be performed as an independetn background
+/* Get the grid coordinate of the top right pixel. */
+
+/* The rest of the processing can be performed as an independent background
    process, since it may take a significant amount of time and we want 
    Tcl events to continue to be serviced. */
 
@@ -549,6 +552,7 @@
          args.pixbloc = pixbloc;
          args.gbox = gbox;
          args.bbox = bbox;
+         args.zoom = ndf->plotarray.zoom;
          args.wcs = ndf->wcs;
          args.ifrm = ifrm;
          args.xpix = xpix;
@@ -1007,9 +1011,9 @@
 
 /* Set positions of the corners in the base frame. */
          xb[ 0 ] = xb[ 3 ] = 0.5;
-         xb[ 1 ] = xb[ 2 ] = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 0.5;
+         xb[ 1 ] = xb[ 2 ] = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 1.5;
          yb[ 0 ] = yb[ 1 ] = 0.5;
-         yb[ 2 ] = yb[ 3 ] = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 0.5;
+         yb[ 2 ] = yb[ 3 ] = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 1.5;
 
 /* Get the positions of the corners in the requested frame. */
          ASTCALL(
@@ -1080,7 +1084,7 @@
 /* Check syntax. */
          if ( objc + nflag < 4 ) {
             Tcl_WrongNumArgs( interp, 2, objv, 
-                              "?options from to pos ?pos ...?" );
+                              "?options? from to pos ?pos ...?" );
             return TCL_ERROR;
          }
 
@@ -1332,8 +1336,8 @@
 
 /* Construct a point at opposite corners of the Base frame. */
       for ( i = 0; i < ndf->ndim; i++ ) {
-         bpoint[ i ][ 0 ] = 1.0;
-         bpoint[ i ][ 1 ] = ndf->ubnd[ i ] - ndf->lbnd[ i ];
+         bpoint[ i ][ 0 ] = 0.5;
+         bpoint[ i ][ 1 ] = ndf->ubnd[ i ] - ndf->lbnd[ i ] + 1.5;
       }
 
 /* Construct a point at opposite corners of the selected frame. */
@@ -1386,7 +1390,7 @@
 /* Get the bounding values in the GRID (Base) frame. */
       for ( i = 0; i < ndf->ndim; i++ ) {
          lbnd[ i ] = 0.5;
-         ubnd[ i ] = ndf->ubnd[ i ] - ndf->lbnd[ i ] + 0.5;
+         ubnd[ i ] = ndf->ubnd[ i ] - ndf->lbnd[ i ] + 1.5;
       }
 
 /* Arrange for AST to use the inherited status variable for status checking. */
@@ -1426,6 +1430,7 @@
       int *pixbloc = pargs->pixbloc;
       float *gbox = pargs->gbox;
       double *bbox = pargs->bbox;
+      double zoom = pargs->zoom;
       AstFrameSet *wcs = pargs->wcs;
       int ifrm = pargs->ifrm;
       int xpix = pargs->xpix;
@@ -1444,8 +1449,20 @@
       cpgbbuf();
 
 /* Plot the image. */
-      cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix, 
-               gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+
+/* This call is more general, in that it will work regardless of the size
+ * of the GWM widget. */
+/*
+ *    cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix, 
+ *             gbox[ 0 ] + 0.5 / zoom, gbox[ 2 ] - 0.5 / zoom, 
+ *             gbox[ 1 ] + 0.5 / zoom, gbox[ 3 ] - 0.5 / zoom );
+ */
+
+/* However, this call makes use of the fact that we know the pixel size
+   of the array in memory to get PGPLOT to plot much more efficiently. */
+      cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix,
+               gbox[ 0 ] + 0.5 / zoom, gbox[ 0 ] + ( xpix - 0.5 ) / zoom,
+               gbox[ 1 ] + 0.5 / zoom, gbox[ 1 ] + ( ypix - 0.5 ) / zoom );
 
 /* Get AST to plot the axes etc. */
       ASTCALL(
@@ -1497,6 +1514,7 @@
                                    || ndf->plotarray.hival != hival 
                                    || ndf->plotarray.iframe != iframe
                                    || ndf->plotarray.zoom != zoom ) {
+         int i;
          int xdim;
          int xbase;
          int xndf;
@@ -1512,10 +1530,10 @@
          xndf = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 1;
          yndf = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 1;
          getbbox( ndf, iframe, lbox, ubox, status );
-         xbase = zoom * lbox[ 0 ];
-         ybase = zoom * lbox[ 1 ];
-         xdim = zoom * ( ubox[ 0 ] - lbox[ 0 ] ) + 1;
-         ydim = zoom * ( ubox[ 1 ] - lbox[ 1 ] ) + 1;
+         xbase = zoom * lbox[ 0 ] + 0.5 / zoom;
+         ybase = zoom * lbox[ 1 ] + 0.5 / zoom;
+         xdim = zoom * ( ubox[ 0 ] - lbox[ 0 ] ) - 1;
+         ydim = zoom * ( ubox[ 1 ] - lbox[ 1 ] ) - 1;
 
 /* If a previous plotarray exists but is the wrong size, we will need to
    deallocate that memory prior to allocating more. */
@@ -1535,14 +1553,6 @@
             }
             ndf->plotarray.exists = 1;
          }
-
-/* Store characteristics of generated array. */
-         ndf->plotarray.xdim = xdim;
-         ndf->plotarray.ydim = ydim;
-         ndf->plotarray.iframe = iframe;
-         ndf->plotarray.zoom = zoom;
-         ndf->plotarray.loval = loval;
-         ndf->plotarray.hival = hival;
 
 /* If the array is not currently mapped, we have to map it. */
          if ( ! ndf->mapped ) domapdata( ndf, status );
@@ -1575,10 +1585,18 @@
                                INTEGER_ARG(ndf->plotarray.data),
                                INTEGER_ARG(status)
                                TRAIL_ARG(ftype) );
-                               
+
 /* End the AST context. */
          astWatch( old_status );
          astEnd;
+
+/* Store characteristics of the generated array. */
+         ndf->plotarray.xdim = xdim;
+         ndf->plotarray.ydim = ydim;
+         ndf->plotarray.iframe = iframe;
+         ndf->plotarray.zoom = zoom;
+         ndf->plotarray.loval = loval;
+         ndf->plotarray.hival = hival;
       }
 
 /* Return the address of the prepared array. */
