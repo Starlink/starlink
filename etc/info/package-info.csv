@@ -65,7 +65,6 @@ IFD	S	yes			initially PWD chosen but now AA
 IMG	S	yes		CLRC		
 INFO	U		Software Librarian		Files generated externally	
 INIT	S	yes			Problem with datestamps	
-IRAF	U		Alan Chipperfield			
 IRAF	S		Software Librarian			
 IRAFSTAR	U		Alan Chipperfield			
 IRAS90	S	obsolete			Autoconfed, but not de-nagged	
@@ -120,7 +119,7 @@ PISA	S	yes
 POLMAP	S		Tim Harries		USSC last updated it.	
 POLPACK	S	yes				
 PONGO	S	yes				
-PRM	S	yes				
+PRM	S	yes			Used to be called PRIMDAT	
 PSMERGE	X		Dave Terrett		Better than `standard' version	
 PSX	X	yes				
 REF	X	yes				
@@ -133,6 +132,7 @@ SAE	X	yes
 SAOIMAGE	S		Software Librarian		external pkg	
 SCB	U	yes		CLRC	Requires classic-style source tree		
 SGS	S	yes				
+SHL	S	yes			
 SKYCAL	X		John Thorstensen		external pkg	
 SLALIB	S	yes				
 SM	U		Patricia Monger			
