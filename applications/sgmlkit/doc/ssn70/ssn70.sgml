@@ -3461,17 +3461,20 @@ copy of the appropriate parameters file in <code
 fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slparams.dsl</code> (or the
 corresponding <code>.../latex</code> file), call it, say
 <code/my-params.dsl/, and change what parameters 
-you like.  The stylesheets refer to the parameters files by the system
-identifiers <code/sl-html-parameters/ and <code/sl-latex-parameters/,
+you like.  The stylesheets refer to the parameters files by the public
+identifiers <code>PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"</code>,
+<code>PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN"</code>
+and <code>PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN"</code>,
 and these are mapped to the real files by the catalogue file in <code
-fspath>$STARLINK_SGML_DIR/dtd/CATALOG</code>.  To direct the system to
+fspath>$STARLINK_SGML_DIR/dtd/CATALOG.starlink</code>.  To direct the system to
 your own parameter file instead, create a catalogue file of your own
-(conventionally given the name <code/CATALOG/), and include the line
+(conventionally given the name <code/CATALOG/), and include the
+appropriate line like
 <verbatim>
-SYSTEM "sl-html-parameters" "my-params.dsl"
+PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN" my-params.dsl
 </verbatim>
 (you can give a path relative to the location of the catalogue, and
-it's best if you quote the entry just as here).  To direct the SGML
+it's best if you quote the entry exactly as here).  To direct the SGML
 system to this catalogue, you must include the file at the beginning
 of the <code/SGML_CATALOG_FILES/ environment variable:
 <verbatim>
@@ -3656,12 +3659,6 @@ generate them as the interface.
 
 <subsect id=appx.system.dssslcode export>The DSSSL source code
 
-<p>Unavailable, for the moment.
-
-<![ IGNORE [
-<!-- For some reason, Jade doesn't seem to apply NAMECASE GENERAL NO
-     within subdocs.  Omit these for the mo.
-     -->
 <routinelist>
 <p>The following sections document some of the more important DSSSL
 style sheets
@@ -3669,7 +3666,6 @@ style sheets
 <codecollection doc="dsssl.params">
 <codecollection doc="dsssl.common">
 <codecollection doc="dsssl.lib">
-]]>
 
 <subsect id=appx.system.online export>Online resources
 
