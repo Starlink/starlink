@@ -143,7 +143,7 @@ HELP 'Minimum value for bckgnd variance, usually used on zero pixels'
             ENDPARAMETER
 
      PARAMETER BGMODEL
-               TYPE    '_CHAR'
+               TYPE    '_UNIV'
                PROMPT  'Name of background model file'
                PPATH   'DEFAULT'
                VPATH   'DEFAULT'
