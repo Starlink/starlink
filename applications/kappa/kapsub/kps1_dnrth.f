@@ -224,18 +224,18 @@
 
 *  Choose the justification for the string.
             COSA = COS( ANG )
-            IF( COSA > COSPI8 ) THEN
+            IF( COSA .GT. COSPI8 ) THEN
                VJ = 'B'
-            ELSE IF( COSA < -COSPI8 ) THEN
+            ELSE IF( COSA .LT. -COSPI8 ) THEN
                VJ = 'T'
             ELSE 
                VJ = 'C'
             END IF
 
             SINA = SIN( ANG )
-            IF( SINA > SINPI8 ) THEN
+            IF( SINA .GT. SINPI8 ) THEN
                HJ = 'R'
-            ELSE IF( SINA < -SINPI8 ) THEN
+            ELSE IF( SINA .LT. -SINPI8 ) THEN
                HJ = 'L'
             ELSE 
                HJ = 'C'
@@ -314,18 +314,18 @@
 
 *  Choose the justification for the string.
             COSA = COS( ANG )
-            IF( COSA > COSPI8 ) THEN
+            IF( COSA .GT. COSPI8 ) THEN
                VJ = 'B'
-            ELSE IF( COSA < -COSPI8 ) THEN
+            ELSE IF( COSA .LT. -COSPI8 ) THEN
                VJ = 'T'
             ELSE 
                VJ = 'C'
             END IF
 
             SINA = SIN( ANG )
-            IF( SINA > SINPI8 ) THEN
+            IF( SINA .GT. SINPI8 ) THEN
                HJ = 'R'
-            ELSE IF( SINA < -SINPI8 ) THEN
+            ELSE IF( SINA .LT. -SINPI8 ) THEN
                HJ = 'L'
             ELSE 
                HJ = 'C'
