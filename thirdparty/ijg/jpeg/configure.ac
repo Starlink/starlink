@@ -13,12 +13,16 @@ STAR_DEFAULTS
 
 AC_PROG_MAKE_SET
 
-# Check for the presence of the jpeglib.h file.  If it's available,
-# then we don't have to do anything, and we set MAIN_TARGET to be
-# jpeglib-stamp, which the Makefile generates trivially.  If it's not
-# available, then we need to build jpeglib, so drop into the src/
-# directory and configure the software.
-AC_CHECK_HEADER([jpeglib.h],
+dnl Check for the presence of an existing JPEG library. If it's available,
+dnl then we don't have to do anything, and we set MAIN_TARGET to be
+dnl jpeglib-stamp, which the Makefile generates trivially.  If it's not
+dnl available, then we need to build jpeglib, so drop into the src/
+dnl directory and configure the software. Note this test did just check
+dnl for jpeglib.h, but that doesn't work when only the compilation fails
+dnl (which it may when using special CFLAGS, i.e. -m32 when only 64 bit
+dnl libraries are available). Use jpeg_write_scanlines as the more obvious
+dnl entry functions are really defines.
+AC_CHECK_LIB([jpeg], [jpeg_write_scanlines],
   [MAIN_TARGET=jpeglib-stamp],
   [
   # To configure jpeg, run ./configure in the source directory.
