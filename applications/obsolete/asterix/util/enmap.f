@@ -272,8 +272,8 @@
      :                   %VAL(TPTR), %VAL(ODPTR), %VAL(OQPTR), STATUS )
 
 *  Create output axes
-      CALL BDI_AXCOPY( IFID, ORDER(1), OFID, 1, STATUS )
-      CALL BDI_AXCOPY( IFID, ORDER(2), OFID, 2, STATUS )
+      CALL BDI_AXCOPY( IFID, ORDER(1), ' ', OFID, 1, STATUS )
+      CALL BDI_AXCOPY( IFID, ORDER(2), ' ', OFID, 2, STATUS )
 
 *  Copy history from the original file
       CALL HSI_COPY( IFID, OFID, STATUS )
