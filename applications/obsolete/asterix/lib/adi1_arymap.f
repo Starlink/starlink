@@ -147,7 +147,8 @@
       ELSE
 
 *    Get variant allowed under SGP/38
-        IF DAT_THERE( LOC, 'VARIANT', THERE, STATUS ) THEN
+        CALL DAT_THERE( LOC, 'VARIANT', THERE, STATUS )
+        IF ( THERE ) THEN
           CALL CMP_GET0C( LOC, 'VARIANT', VARNT, STATUS )
         ELSE
           VARNT = 'SIMPLE'
