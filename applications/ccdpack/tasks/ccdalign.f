@@ -4,7 +4,7 @@
 *     CCDALIGN
 
 *  Purpose:
-*     Interactive procedure to aid the alignment of NDFs.
+*     Aligns images graphically by interactive object selection.
 
 *  Language:
 *     Starlink Fortran 77
@@ -23,7 +23,7 @@
 *        The global status.
 
 *  Description:
-*     This procedure aids the registration of NDFs which are not
+*     This program aids the registration of NDFs which may not be
 *     related by simple offsets (see FINDOFF and PAIRNDF if they are).
 *     It also has the capability of dealing with groups of NDFs which
 *     are almost registered (frames which have not been moved on the
@@ -32,27 +32,27 @@
 *     The basic method used is to access groups of NDFs (or a series
 *     of single NDFs if all are moved between exposures) and an
 *     optional reference NDF. The first NDF of the first group or the
-*     reference NDF is then displayed and you are invited to mark the
-*     positions of centroidable image features on it using a graphical
-*     user interface.  This window then remains on the screen for 
+*     reference NDF is initially displayed and you are invited to mark
+*     the positions of centroidable image features on it using a 
+*     graphical interface.  This window then remains on the screen for 
 *     reference while you identify the same features on each of the 
 *     other sets of images in the same way.
 *
 *     After centroiding you are then given the option to stop. If
-*     you decide to then you will have labelled position lists to use
+*     you decide to, then you will have labelled position lists to use
 *     in the other CCDPACK routines (the labelled positions will be
-*     called NDF_NAME.acc). If you chose the option to continue then
+*     called NDF_NAME.acc). If you choose the option to continue then
 *     a full registration of the NDFs will be attempted. This may only
 *     be performed for 'linear' transformations.
 *
 *     After choosing a transformation type the procedure will then go on
-*     to calculate a transformation set between all the NDFs, this is
-*     then used (with the extended reference set from REGISTER) to
-*     approximate the position of all possible image features, these are
+*     to calculate a transformation set between all the NDFs; this is
+*     used (with the extended reference set from REGISTER) to
+*     approximate the position of all possible image features, which are
 *     then located by centroiding and a final registration of all NDFs
-*     is performed. The resultant NDFs then have associated lists of
-*     labelled positions and TRANSFORM structures which may be used to
-*     transform other position lists or when resampling the data.
+*     is performed.  The resultant NDFs then have associated lists of
+*     labelled positions, and attached coordinate systems which may be
+*     used to transform other position lists or when resampling the data.
 *
 *     The graphical interface used for marking features on the image
 *     should be fairly self-explanatory.  The image can be scrolled using
@@ -64,9 +64,12 @@
 *     the features from the reference image on each one), and there is 
 *     also a control for selecting the number of the next point to mark.
 *     Points are added by clicking mouse button 1 (usually the left one) 
-*     and may be removed by clicking mouse button 3 (usually the right one).
-*     When you have selected all the points you wish to on a given image,
-*     click the 'Done' button and you will be presented with the next one.
+*     and may be removed by clicking mouse button 3 (usually the right 
+*     one).  It is possible to edit the points marked on the reference
+*     image while you are marking points on the other images.  When 
+*     you have selected all the points you wish to on a given image, 
+*     click the 'Done' button and you will be presented with the next
+*     one.
 
 *  Usage:
 *     ccdalign
@@ -121,8 +124,8 @@
 *        default is 'BOTH'.
 *        [BOTH]
 *     MAXCANV = INTEGER (Read and Write)
-*        A dimension in pixels for the maximum X or Y dimension of the
-*        region in which the NDF is displayed.  Note this is the
+*        A value in pixels for the maximum initial X or Y dimension of 
+*        the region in which the image is displayed.  Note this is the      
 *        scrolled region, and may be much bigger than the sizes given
 *        by WINX and WINY, which limit the size of the window on the
 *        X display.  It can be overridden during operation by zooming
@@ -136,7 +139,7 @@
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
 *        The initial low and high percentiles of the data range to use
 *        when displaying the images; any pixels with a value lower than
-*        the first value will have the same colour, and any with a value
+*        the first element will have the same colour, and any with a value
 *        higher than the second will have the same colour.  Must be in
 *        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        This can be changed from within the GUI.
@@ -154,7 +157,7 @@
 *        allocated for display, it can be scrolled around within the
 *        window.  The window can be resized in the normal way using
 *        the window manager while the program is running.
-*        [400]
+*        [600]
 *     ZOOM = DOUBLE (Read and Write)
 *        A factor giving the initial level to zoom in to the image
 *        displayed, that is the number of screen pixels to use for one
@@ -446,7 +449,7 @@
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_PUT1D( 'PERCENTILES', 2, PERCNT, STATUS )
 
-*  Start up the CCDPACK_REG monliths which is used later in this task.
+*  Start up the CCDPACK_REG monolith which is used later in this task.
       CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
       CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_reg'
       CCDREG = 'ccdpack_reg'//PID

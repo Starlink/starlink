@@ -4,7 +4,7 @@
 *     PAIRNDF
 
 *  Purpose:
-*     Displays and manipulates image pairs to allow easy registration.
+*     Aligns images graphically by drag and drop.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,8 +20,9 @@
 *        The global status.
 
 *  Description:
-*     This routine accepts a list of NDFs which may be aligned using 
-*     simple offsets.  By making use of a graphical user interface you
+*     This routine accepts a list of NDFs which may be aligned using
+*     simple offsets in their Current coordinate frames.
+*     By making use of a graphical user interface you
 *     can indicate how pairs of NDFs are aligned with respect
 *     to each other, and mark image features to allow accurate
 *     alignments.  Once enough pairings have been specified to register
@@ -33,50 +34,63 @@
 *
 *     The graphical interface consists of two parts: a chooser which
 *     allows you to inspect pairs of NDFs to see whether they are 
-*     able to be paired and an aligner which allows you to move 
+*     able to be paired, and an aligner which allows you to move 
 *     a pair of images around so that they are registered, and to
 *     mark points in the overlapping region where the same centroidable 
 *     features exist in both images.
 *
 *     Operation is as follows.  You must first use the chooser window
 *     to select a pair of images which have a region in common.
-*     Use the tabs at each side of the screen to pick the image to
+*     Use the tabs at either side of the screen to pick the image to
 *     appear on that side.  You can use the "Show FITS" button to
 *     select one or more FITS headers to be displayed alongside
 *     each NDF if this will make it easier to identify which is which.
-*     When you have selected a pair which you wish to register, 
-*     click the "Use this pair" button.  The aligner window will
-*     then appear, displaying the two images which you selected.
-*     You can drag either of these images around the display region 
-*     by holding the mouse button down as you move the mouse; the 
-*     easiest way to align the pair is to "pick up" one image by an
-*     identifiable feature and "drop" it on the same feature in 
-*     the other image.  Where the images overlap their pixels are
-*     averaged.  If you are not happy with the positioning, you can
-*     move them again.  Once you are happy that they are aligned
-*     about right, then click in the overlap region to mark bright
-*     features which appear in both images - these will be centroided
-*     to get an accurage alignment between the images.  During this
+*     You can use the "Display cutoff" menu to select the percentiles
+*     controlling the brightness of each pixel; alignment is easier if
+*     the same features are of a similar brightness in different images.
+*     The images are displayed resampled into their Current attached 
+*     coordinate system; you can only align them using this program if 
+*     a simple offset (translation) maps one onto another in these 
+*     coordinates (or very nearly does so).  If that is not the case,
+*     you will have to set their Current coordinate system 
+*     to a different value (see WCSEDIT) or align them using a 
+*     different method.  The whole of each image will be displayed in
+*     the chooser window, and you can resize it in the usual way to 
+*     make the images appear bigger or smaller.  Select a pair with 
+*     an overlapping region which you wish to align, and click the 
+*     "Use this pair" button.  The aligner window will then appear, 
+*     displaying the two images which you have selected.
+*
+*     In the aligner window you can drag either of these images around
+*     the display region by holding down mouse button 1 (usually the 
+*     left one) as you move the mouse; the easiest way to align the pair 
+*     is to "pick up" one image by an identifiable feature and "drop" it
+*     on the same feature in the other image.  Where the images overlap
+*     their pixels will be averaged.  If they are not correctly 
+*     positioned, you can move them again.  Once you are happy that
+*     they are aligned about right, then click in the overlap region
+*     to mark features which appear in both images - these will be
+*     centroided to get an accurate alignment.  During this
 *     part you mark points by clicking with mouse button 1 (usually
 *     the left one) and you can remove them by clicking with button 3
-*     (usually the right one).  When you
-*     have aligned the images and marked shared features, or if you
-*     decide that the pair cannot be satisfactorily registered,
-*     press the "Done" button on the aligner window.  You must then
-*     select another pair and repeat the process.  Once you have
-*     made enough pairings to register the whole set, the graphical
-*     windows will disappear and the program will continue without
-*     further graphical interaction.  Apart from the first pair, 
-*     you will only be allowed to select a pair of images to align
-*     if at least one of each pair has been aligned with another
-*     image before these images are indicated by a highlighting mark 
-*     in their chooser tabs.
+*     (usually the right one).  The window can be resized, the 
+*     magnification can be changed using the "Zoom" control, and the 
+*     display region scrolled using the scrollbars.  When you have aligned 
+*     the images and marked shared features, or if you decide that
+*     the pair cannot be satisfactorily registered, click the "Done" 
+*     button.  
 *
-*     When the images are plotted in the aligner window, they are 
-*     resampled into their Current coordinate frame.  It will only be
-*     possible to align them if their Current coordinates are related
-*     to each other by a simple offset (translation) in the X and Y 
-*     directions.
+*     You will then be returned to the chooser window to select another
+*     pair and repeat the process.  After the first time however, 
+*     you will only be allowed to select a pair of images to align
+*     if at least one of them has already been aligned already.  Those
+*     which have already been done are marked with a `+' sign on their
+*     selection tabs.
+*
+*     Once you have made enough pairings to register the whole set, the
+*     graphical windows will disappear and the program will complete
+*     the global matching up of positions without any further user 
+*     interaction.
 
 *  Usage:
 *     pairndf in outlist percentiles
@@ -111,13 +125,13 @@
 *        default is "BOTH".
 *        [BOTH]
 *     MAXCANV = INTEGER (Read and Write)
-*        A dimension in pixels for the maximum X or Y dimension of the
-*        region in which the NDFs are displayed for registration.  Note 
-*        this is the scrolled region, and may be much bigger than the 
-*        sizes given by WINX and WINY, which limit the size of the window 
-*        on the X display.  It can be overridden during operation by 
-*        zooming in and out using the GUI controls, but it is intended
-*        to limit the size for the case when ZOOM is large (perhaps
+*        A value in pixels for the maximum initial X or Y dimension of 
+*        the region in which the image is displayed.  Note this is the      
+*        scrolled region, and may be much bigger than the sizes given
+*        by WINX and WINY, which limit the size of the window on the
+*        X display.  It can be overridden during operation by zooming
+*        in and out using the GUI controls, but it is intended to
+*        limit the size for the case when ZOOM is large (perhaps
 *        because the last image was quite small) and a large image
 *        is going to be displayed, which otherwise might lead to
 *        the program attempting to display an enormous viewing region.
@@ -141,7 +155,7 @@
 *        element (of the input names). The simplest modification
 *        element is the asterisk "*" which means call each of the
 *        output lists the same name as the corresponding input NDFs (but
-*        without the ".SDF" extension).
+*        without the ".sdf" extension).
 *        So,
 *           IN > *
 *           OUTLIST > *
@@ -164,12 +178,13 @@
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
 *        The default low and high percentiles of the data range to use
 *        when displaying the images; any pixels with a value lower than 
-*        the first value will have the same colour, and any with a value
-*        higher than the second will have the same colour.  This only
-*        gives the default value - the percentile settings can be set
-*        for each image individually from within the GUI to accomodate
-*        the situation where images have different brightnesses.
-*        In the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
+*        the first element will have the same colour, and any with a
+*        value higher than the second will have the same colour.  This
+*        parameter gives the default value - the percentile settings
+*        can be set for each image individually from within the GUI
+*        to accomodate the situation where images have different 
+*        brightnesses.  Must be in the range 0 <= PERCENTILES( 1 ) 
+*        <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
 *     PREVX = INTEGER (Read and Write)
 *        The initial width in pixels of the preview display for each image;
@@ -202,22 +217,30 @@
 *        normal way using the window manager while the program is running.
 *        [400]
 *     ZOOM = DOUBLE (Read and Write)
-*        A factor giving the initial level to zoom in to the image
-*        displayed, that is the number of screen pixels to use for one
-*        image pixel.  It will be rounded to one of the values
-*        ... 3, 2, 1, 1/2, 1/3 ....  The zoom can be changed
-*        interactively from within the program.  The initial value
-*        may be limited by MAXCANV.
+*        A factor giving the initial level to zoom in to the images
+*        displayed in the aligner window, that is the number of screen 
+*        pixels to use for one image pixel.  It will be rounded to one 
+*        of the values ... 3, 2, 1, 1/2, 1/3 ....  The zoom can be 
+*        changed interactively from within the program.  The initial 
+*        value may be limited by MAXCANV.
 *        [1]
 
 *  Examples:
-*     pairndf '*'  '*.dat' '[1,99]'
-*        In this routine the positional nature of the parameters is
-*        shown. All the NDFs in the current directory are displayed.
-*        Their output positions lists have the same name as the NDFs
-*        except that they have a file type of .dat. The images are 
-*        displayed using the percentile limits 1,99 which shows bright 
-*        detail well.
+*     pairndf * *.dat [1,99]
+*        This example shows the positional nature of the parameters.
+*        All the NDFs in the current directory are presented for 
+*        alignment.  Their output position lists have the same name 
+*        as the NDFs except that they have a file extension of .dat.
+*        The default image display cutoff is between the 1st and 99th
+*        percentile, which shows bright detail well.
+*
+*     pairndf in="data1,data2" outlist="d1-pos,d2-pos" zoom=2 maxcanv=0
+*        Only the two images data1 and data2 will be aligned, and the 
+*        corresponding sets of positions will be written to the
+*        files d1-pos and d2-pos.  The images will initially be 
+*        displayed for alignment at a magnification of two screen 
+*        pixels to each data pixel, even if that results in a very 
+*        large display area.
 
 *  Notes:
 *     - NDF extension items. 
@@ -265,9 +288,13 @@
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 *
-*     The DEVICE parameter also has a global association. This is not
-*     controlled by the usual CCDPACK mechanisms, instead it works in
-*     co-operation with KAPPA (SUN/95) image display/control routines.
+*     Some of the parameters (MAXCANV, PERCENTILES, PREVX, PREVY, WINX,
+*     WINY)  give initial values for quantities which can be modified 
+*     while the program is running.  Although these may be specified on
+*     the command line, it is normally easier to start the program up and
+*     modify them using the graphical user interface.  If the program
+*     exits normally, their values at the end of the run will be used
+*     as defaults next time the program starts up.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -299,7 +326,7 @@
 *-
       
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE             ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants

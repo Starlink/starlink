@@ -4,7 +4,7 @@
 *     IDICURS        
                      
 *  Purpose:          
-*     Reads coordinates from an X display device.
+*     Views and writes position lists interactively.
                      
 *  Language:         
 *     Starlink Fortran 77
@@ -38,6 +38,11 @@
 *     (usually the left one) and may be removed using mouse button 3
 *     (usually the right one).  When you have marked all the points
 *     that you wish to, click the 'Done' button.
+*
+*     Optionally (if the READLIST parameter is set true), a list of 
+*     points may be read at the start of the program; these will be 
+*     marked on the image as an initial set which may be added to or
+*     removed as if marked by the user in the first place.
 
 *  Usage:
 *     idicurs in outlist
@@ -45,9 +50,9 @@
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
 *        Gives the name of the NDF to display and get coordinates from.
-*        If multiple NDFs are using wildcards or separating their names
-*        with commas, you will be invited to mark points on each one
-*        in turn.
+*        If multiple NDFs are specified using wildcards or separating 
+*        their names with commas, the program will run on each one in
+*        turn.
 *     INEXT = _LOGICAL (Read)
 *        If the READLIST parameter is set true, then this parameter 
 *        determines where the input position list comes from.  If set
@@ -86,8 +91,8 @@
 *        default is "BOTH".
 *        [BOTH]
 *     MAXCANV = _INTEGER (Read and Write)
-*        A dimension in pixels for the maximum X or Y dimension of the
-*        region in which the NDF is displayed.  Note this is the 
+*        A value in pixels for the maximum initial X or Y dimension of
+*        the region in which the image is displayed.  Note this is the 
 *        scrolled region, and may be much bigger than the sizes given
 *        by WINX and WINY, which limit the size of the window on the
 *        X display.  It can be overridden during operation by zooming
@@ -106,20 +111,23 @@
 *        [FALSE]
 *     OUTLIST = FILENAME (Write)
 *        The name of the file which is to contain the selected
-*        positions. The positions are written using the standard 
-*        format in CCDPACK which is described in the notes section.
-*        This list will become associated with the named NDF, and
-*        may use modifications of the input NDF name.  If set null (!),
-*        no output list will be written.  This parameter is allowed
-*        to take the same value as INLIST, in which case the list will
-*        be overwritten.
+*        positions.  If the program exits normally the positions will
+*        be written to this file using the standard CCDPACK format,
+*        as described in the Notes section, and the list file will 
+*        become associated with the input NDF.  The value of this 
+*        parameter may use modifications of the input NDF name.
+*        If set null (!), no output file will be written.  This
+*        parameter is allowed to take the same value as INLIST, in
+*        which case the list will be overwritten.
 *        [*.lis]
 *     PERCENTILES( 2 ) = _DOUBLE (Read and Write)
-*        The low and high percentiles of the data range to use when 
-*        displaying the images; any pixels with a value lower than 
-*        the first value will have the same colour, and any with a value
-*        higher than the second will have the same colour.  Must be in
-*        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
+*        The initial values for the low and high percentiles of the data 
+*        range to use when displaying the images; any pixels with a value
+*        lower than the first element will have the same colour, and any 
+*        with a value higher than the second will have the same colour.
+*        Must be in the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) 
+*        <= 100.  These values can be changed interactively while the
+*        program runs.
 *        [2,98]
 *     SHOWIND = _LOGICAL (Read)
 *        If true, then the index numbers will be displayed on the image
@@ -134,7 +142,7 @@
 *        allocated for display, it can be scrolled around within the 
 *        window.  The window can be resized in the normal way using 
 *        the window manager while the program is running.
-*        [600]
+*        [450]
 *     WINY = _INTEGER (Read and Write)
 *        The height in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
@@ -169,37 +177,54 @@
 *        as the dimmest colour, but this may be changed interactively
 *        while the program is running.
 *
-*    idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
-*       The image gc6253 will be displayed, with the points stored in the
-*       position list 'found.lis' already plotted on it.  These may be
-*       added to and/or deleted, and the resulting list will be written
-*       to the file out.lis.
+*     idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
+*        The image gc6253 will be displayed, with the points stored in
+*        the position list 'found.lis' already plotted on it.  These 
+*        may be added to, moved and deleted, and the resulting list
+*        will be written to the file out.lis.
 
 *  Notes:
-*     - Output position list format.
+*     - Position list formats.
 *
-*       CCDPACK format - Position lists in CCDPACK are formatted files
-*       whose first three columns are interpreted as the following.
+*       CCDPACK supports data in two formats.
+*
+*       CCDPACK format - the first three columns are interpreted as the
+*       following.
 *
 *          - Column 1: an integer identifier
 *          - Column 2: the X position
 *          - Column 3: the Y position
 *
 *       The column one value must be an integer and is used to identify
-*       positions which may have different locations but are to be
-*       considered as the same point. Comments may be included in the
-*       file using the characters # and !. Columns may be separated by
-*       the use of commas or spaces.
+*       positions which are the same but which have different locations
+*       on different images. Values in any other (trailing) columns are
+*       usually ignored.
+*
+*       EXTERNAL format - positions are specified using just an X and
+*       a Y entry and no other entries.
+*
+*          - Column 1: the X position
+*          - Column 2: the Y position
+*
+*       This format is used by KAPPA applications such as CURSOR.
+*
+*       Comments may be included in a file using the characters "#" and
+*       "!". Columns may be separated by the use of commas or spaces.
+*
+*       Input position lists read when READLIST is true may be in either
+*       of these formats.  The output list named by the OUTLIST 
+*       parameter will be written in CCDPACK (3 column) format.
 *
 *       In all cases, the coordinates in position lists are pixel 
 *       coordinates.
 *
 *     - NDF extension items. 
 *
-*       On exit the CURRENT_LIST items in the CCDPACK extensions
-*       (.MORE.CCDPACK) of the input NDFs are set to the name of the 
-*       output list. These items will be used by other CCDPACK position 
-*       list processing routines to automatically access the list.
+*       On normal exit, unless OUTLIST is set to null (!), the 
+*       CURRENT_LIST items in the CCDPACK extensions (.MORE.CCDPACK) of 
+*       the input NDFs are set to the name of the output list. These 
+*       items will be used by other CCDPACK position list processing 
+*       routines to automatically access the list.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
@@ -216,6 +241,14 @@
 *     global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
+*
+*     Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM)
+*     give initial values for quantities which can be modified while
+*     the program is running.  Although these may be specified on the
+*     command line, it is normally easier to start the program up and
+*     modify them using the graphical user interface.  If the program
+*     exits normally, their values at the end of the run will be used
+*     as defaults next time the program starts up.
       
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -223,7 +256,8 @@
 
 *  History:
 *     17-APR-2000 (MBT):
-*        Original version.
+*        Original version (a previous file idicurs.f existed, but this 
+*        is a rewrite from scratch).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -307,7 +341,7 @@
 *  Get the NDFs and input position lists.
          IF ( INEXT ) THEN
             CALL CCD1_GTLIG( .TRUE., 'CURRENT_LIST', 'IN', 1, 
-     :                    CCD1__MXNDF, NNDF, ILSTGR, NDFGR, STATUS )
+     :                       CCD1__MXNDF, NNDF, ILSTGR, NDFGR, STATUS )
          ELSE
             CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGR, NNDF, STATUS )
             CALL CCD1_GTLIG( .FALSE., ' ', 'INLIST', NNDF, NNDF, NRET,
@@ -510,5 +544,4 @@
       CALL CCD1_END( STATUS )
 
       END
-
 * $Id$
