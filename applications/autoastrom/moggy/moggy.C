@@ -56,7 +56,16 @@ static const char RCSID[] =
 
 
 #include <iostream>
-using std::ostream;		// ????
+/* Following probably needed for Alphas, but there are other iostream issues on
+   Alphas, including an issue with __NO_USE_STD_IOSTREAM - see section 7.1.2
+   of the (Alpha) C++ Using Guide"
+using std::istream;		// ????
+using std::ostream;
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::exit;
+*/
 #include <string>
 #include <fstream>
 #include <assert.h>
