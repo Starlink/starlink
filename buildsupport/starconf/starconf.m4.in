@@ -152,11 +152,21 @@ AC_SUBST([STAR_DOCUMENTATION])
 STAR_EXTRA_DIST=
 AC_SUBST(STAR_EXTRA_DIST)
 
-# Create a PACKAGE_VERSIONINT variable, which contains the
+# Create a PACKAGE_VERSION_INTEGER variable, which contains the
 # package's version number as an integer major*1e6+minor*1e3+release.
-## NB hairy quoting: quadrigraph @S|@ is replaced by $ after m4 has run.
-PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print @S|@1*1000000+@S|@2*1000+(NF>2 ? @S|@3 : 0)}'`]
-AC_SUBST(PACKAGE_VERSIONINT)
+eval [`echo $VERSION | sed -e 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\)/PACKAGE_VERSION_MAJOR=\1; PACKAGE_VERSION_MINOR=\2; PACKAGE_VERSION_RELEASE=\3;/'`]
+test -n "$PACKAGE_VERSION_MAJOR"   || PACKAGE_VERSION_MAJOR=0
+test -n "$PACKAGE_VERSION_MINOR"   || PACKAGE_VERSION_MINOR=0
+test -n "$PACKAGE_VERSION_RELEASE" || PACKAGE_VERSION_RELEASE=0
+PACKAGE_VERSION_INTEGER=`expr $PACKAGE_VERSION_MAJOR \* 1000000 + $PACKAGE_VERSION_MINOR \* 1000 + $PACKAGE_VERSION_RELEASE`
+AC_SUBST(PACKAGE_VERSION_MAJOR)
+AC_SUBST(PACKAGE_VERSION_MINOR)
+AC_SUBST(PACKAGE_VERSION_RELEASE)
+AC_SUBST(PACKAGE_VERSION_INTEGER)
+dnl Don't put this into config.h -- subst a .h file if required.
+dnl May change this in future
+dnl AC_DEFINE_UNQUOTED([PACKAGE_VERSION_INTEGER], $PACKAGE_VERSION_INTEGER,
+dnl                    [Integer version number, in the form major*1e6+minor*1e3+release])
 
 # When we do dependency checking, using the dependencies declared in
 # the package's configure.ac, we do so by looking at what tools have
