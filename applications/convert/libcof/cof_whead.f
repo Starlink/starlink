@@ -59,7 +59,7 @@
 *          structure.  [This rule is to enable rotated axis (not
 *          supported in the NDF) to be retained in the cycle from FITS
 *          to NDF and back to FITS.]
-*        OBJECT, LABEL, BUNITS --- the values held in NDF TITLE, LABEL,
+*        OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *          and UNITS respectively are used if present, otherwise any
 *          s found in the FITS extension are used.
 *        ORIGIN and DATE --- are created automatically.  However the
@@ -160,7 +160,6 @@
                                  ! components are present
       CHARACTER CRPIX * ( SZKEY ) ! Keyword name of CRPIXn
       CHARACTER CRVAL * ( SZKEY ) ! Keyword name of CRVALn
-      CHARACTER CVALUE * ( SZVAL ) ! Accommodates keyword value
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       LOGICAL   FITSPR           ! True if FITS extension is present
       CHARACTER FITSTR * ( SZFITS ) ! FITS string
@@ -201,7 +200,7 @@
 *      structures are present, the values in the NDF FITS extension are
 *      copied.  If any are non-linear, all FITS axis information is
 *      lost.
-*    OBJECT, LABEL, BUNITS --- the values held in NDF TITLE, LABEL,
+*    OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *      and UNITS respectively are used if present, otherwise any values
 *      found in the FITS extension are used.
 *    ORIGIN and DATE --- are created automatically.  However the former
@@ -221,7 +220,7 @@
 
       IF ( COMP .NE. 'DATA' ) THEN
 
-*  Obtain the NDF's name.
+*  Write the NDF's component name.
          CALL FTPKYS( FUNIT, 'EXTNAME', COMP, 'Array component',
      :                FSTAT )
       END IF
@@ -290,7 +289,7 @@
 
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
 *  NAXISn, and possibly CDELTn, CRVALn, CRPIXn, CRTYPEn, CTYPEn,
-*  CUNITn, OBJECT, LABEL, BUNITS, DATE, BLANK, HDUCLASn, and END as
+*  CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and END as
 *  described above.  Note CROTAn are also excluded.  To avoid duplicate
 *  FITSIO banners these are also omitted, as they are written when
 *  FITSIO creates the primary headers.
@@ -319,8 +318,9 @@
 
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This tests for the Starlink ORIGIN card.
-            ORIGIN = ( KEYWRD .EQ. 'ORIGIN' ) .AND. 
-     :               ( VALUE( 2:23 ) .EQ. 'Starlink Project, U.K.' )
+            ORIGIN = KEYWRD .EQ. 'ORIGIN'
+*            ORIGIN = ( KEYWRD .EQ. 'ORIGIN' ) .AND. 
+*     :               ( VALUE( 2:23 ) .EQ. 'Starlink Project, U.K.' )
 
 *  Do the test whether to copy the FITS extension header into the output
 *  FITS file's header.
@@ -338,7 +338,7 @@
      :        ( KEYWRD( 1:5 ) .NE. 'CTYPE' .OR. .NOT. AXLFND ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CUNIT' .OR. .NOT. AXUFND ) .AND.
      :        ( KEYWRD .NE. 'LABEL' .OR. .NOT. LABFND ) .AND.
-     :        ( KEYWRD .NE. 'BUNITS' .OR. .NOT. UNTFND ) .AND.
+     :        ( KEYWRD .NE. 'BUNIT' .OR. .NOT. UNTFND ) .AND.
      :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) ) THEN
 
 *  Look for a rotated axis in the FITS extension (CROTAn is present and
