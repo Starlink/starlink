@@ -54,7 +54,7 @@
         CALL USI_INIT()
       ENDIF
 
-      CALL MSG_PRNT(VERSION)
+      CALL MSG_OUT(' ',VERSION,STATUS)
 
 *  get input image
       CALL USI_GET0C( 'INP', IFILE, STATUS )
@@ -107,18 +107,18 @@
           I_QPTR_M=0
         ENDIF
 
-        CALL MSG_PRNT(' ')
-        CALL MSG_PRNT('Checking image...')
+        CALL MSG_OUT(' ',' ',STATUS)
+        CALL MSG_OUT(' ','Checking image...',STATUS)
         CALL IMG_CHECK(IFID,STATUS)
 
         IF (I_CUBE) THEN
-          CALL MSG_PRNT('Loading image from cube....')
+          CALL MSG_OUT(' ','Loading image from cube....',STATUS)
           CALL IMG_LOADCUBE(IFID,'SLICE',STATUS)
           CALL IMG_SETWHOLE(STATUS)
           CALL IMG_SETPOS(0.0,0.0,STATUS)
           CALL IMG_MINMAX(STATUS)
         ELSE
-          CALL MSG_PRNT('Loading image....')
+          CALL MSG_OUT(' ','Loading image....',STATUS)
           CALL IMG_LOAD(IFID,STATUS)
           CALL IMG_SETWHOLE(STATUS)
           CALL IMG_SETPOS(0.0,0.0,STATUS)
@@ -128,9 +128,9 @@
 *  check compatibility with image incache
         IF (I_MEM.AND.STATUS.EQ.SAI__OK) THEN
           IF (MX.NE.I_NX.OR.MY.NE.I_NY) THEN
-            CALL MSG_PRNT(
+            CALL MSG_OUT(' ',
      :        'AST_ERR: image is different size to cached image - '/
-     :        /'deleting cacheds image')
+     :        /'deleting cacheds image',STATUS)
             CALL IMG_DELCACHE(STATUS)
             I_MEM=.FALSE.
           ENDIF
@@ -142,7 +142,7 @@
           CALL USI_GET0C('DEV',DEV,STATUS)
           CALL USI_GET0I('NX',NX,STATUS)
           CALL USI_GET0I('NY',NY,STATUS)
-          CALL MSG_PRNT('Opening device...')
+          CALL MSG_OUT(' ','Opening device...',STATUS)
           CALL GDV_OPEN(DEV,NX,NY,STATUS)
         ENDIF
 
@@ -204,7 +204,7 @@
           IF (DISP) THEN
 
 *  display image
-            CALL MSG_PRNT('Displaying image...')
+            CALL MSG_OUT(' ','Displaying image...',STATUS)
             CALL GDV_FRESH(FRESH,STATUS)
             IF (.NOT.FRESH) THEN
               CALL GDV_CLEAR(STATUS)
@@ -220,7 +220,7 @@
           ENDIF
 
         ELSE
-          CALL MSG_PRNT('AST_ERR: no image loaded')
+          CALL MSG_OUT(' ','AST_ERR: no image loaded',STATUS)
           I_OPEN=.FALSE.
           CALL ADI_FCLOSE( IFID, STATUS )
           CALL AST_CLOSE()
