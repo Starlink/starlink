@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec @WISH@ "$0" "$@"
+exec @AWISH@ "$0" "$@"
 
 #
 # gwm.tcl
