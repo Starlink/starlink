@@ -105,6 +105,7 @@
       INTEGER I                  ! Loop variable
       INTEGER IDIFF              ! Histogram index of current value
       INTEGER NOW                ! Current histogram index
+      INTEGER NGOOD              ! Number of non-BAD pixels
       INTEGER PEAK               ! Peak bin count
       LOGICAL OK                 ! Flag which controls optimisation loop
       <TYPE> DMAX                ! Data maximum
@@ -120,7 +121,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the minimum and maximum values in the array.
-      CALL CCG1_MNMX<T>( ARRAY, NPIX, BAD, DMIN, DMAX, STATUS )
+      CALL CCG1_MNMX<T>( ARRAY, NPIX, BAD, DMIN, DMAX, NGOOD, STATUS )
 
 *  Check that array was not single valued.
       IF ( DMIN .EQ. DMAX ) THEN

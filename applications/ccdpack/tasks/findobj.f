@@ -304,6 +304,8 @@
 *        pixels above the threshold, not number of objects.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     4-JUL-2000 (MBT):
+*        Modified percentile processing to reduce the effect of outliers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -334,6 +336,7 @@
       CHARACTER * ( FIO__SZFNM ) FNAME ! Position list file name
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Input data type
       DOUBLE PRECISION BINPER   ! Percent of count in one bin (please)
+      DOUBLE PRECISION CLFRAC   ! Clipped fractional position (unused)
       DOUBLE PRECISION NSIGMA   ! Number of sigmas above background
       DOUBLE PRECISION PERCEN   ! Percentile of threshold
       DOUBLE PRECISION SD       ! Background standard deviation
@@ -444,64 +447,11 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *======================================================================
-*  Histogram formation and threshold estimation section.
+*  Threshold estimation section.
 *======================================================================
 *  Start section with title.
-         CALL CCD1_MSG( ' ',
-     :'    HISTOGRAM formation and THRESHOLD estimation', STATUS )
-         CALL CCD1_MSG( ' ',
-     :'    --------------------------------------------', STATUS )
-
-*  Get fraction of values which are required in one bin for sampling
-*  to be "optimal".
-         CALL PAR_GET0D( 'BINFRAC', BINPER, STATUS )
-         BINPER = ABS( BINPER )
-
-*  Determine how many counts per bin this equates to.
-         MINBIN = INT( DBLE( EL ) * BINPER * 0.01D0 )
-
-*  Get the oversampling factor (over mean count per bin).
-         CALL PAR_GET0I( 'OVERSAMP', OVSAMP, STATUS )
-         OVSAMP = MAX( 1, OVSAMP )
-
-*  Get workspace for holding histogram. Oversample the mean pixel count
-*  per bin by a factor of OVSAMP
-         NEED = MAX( 10, MINBIN * OVSAMP )
-         CALL CCD1_MALL( NEED, '_INTEGER', IPHIST, STATUS )
-
-*  Report how the histogram is formed.
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ',
-     :'  Initial histogram parameters: ', STATUS )
-         CALL MSG_SETD( 'BINFRAC', BINPER )
-         CALL CCD1_MSG( ' ',
-     :'  Minimum fraction of counts in one bin: ^BINFRAC%%',
-     :        STATUS )
-         CALL MSG_SETI( 'NEED', NEED )
-         CALL CCD1_MSG( ' ',
-     :'  Number of bins                       : ^NEED', STATUS )
-
-*  Determine the histogram with this optimal bin fraction. Also returns
-*  the mode (bin number which contains the peak count). Note the BAD
-*  flag is updated by this routine.
-         CALL CCD1_MKHIS( ITYPE, IPIN, EL, BAD, MINBIN, NEED,
-     :                    %VAL( IPHIST ), MODE, PEAK, NBIN, ZERO, WIDTH,
-     :                    STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 98
-
-*  Report on final histogram parameters.
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ',
-     :'  Final histogram parameters:', STATUS )
-         CALL MSG_SETI( 'NBIN', NBIN )
-         CALL CCD1_MSG( ' ',
-     :'  Number of bins: ^NBIN', STATUS )
-         CALL MSG_SETI( 'PEAK', PEAK )
-         CALL CCD1_MSG( ' ',
-     :'  Peak count    : ^PEAK', STATUS )
-         CALL MSG_SETD( 'WIDTH', WIDTH )
-         CALL ccd1_msg( ' ',
-     :'  Bin width     : ^WIDTH', STATUS )
+         CALL CCD1_MSG( ' ', '    THRESHOLD estimation', STATUS )
+         CALL CCD1_MSG( ' ', '    --------------------', STATUS )
 
 *  How the threshold value is to be determined? This may be either a
 *  percentile value or a number of standard deviations above the mode.
@@ -516,17 +466,101 @@
             PERCEN = ABS( PERCEN * 0.01D0 )
 
 *  Determine what this value is.
-            CALL CCD1_HISP( %VAL( IPHIST ), NBIN, ZERO, WIDTH, PERCEN,
-     :                      THRESH, STATUS )
+            IF ( ITYPE .EQ. '_BYTE' ) THEN
+               CALL CCG1_FRACB( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
+     :                          CLFRAC, THRESH, STATUS )
 
-*  Write message abotu actions.
+            ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+               CALL CCG1_FRACUB( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
+     :                           CLFRAC, THRESH, STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+               CALL CCG1_FRACW( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
+     :                          CLFRAC, THRESH, STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+               CALL CCG1_FRACUW( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
+     :                           CLFRAC, THRESH, STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+               CALL CCG1_FRACI( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
+     :                          CLFRAC, THRESH, STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL CCG1_FRACR( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
+     :                          CLFRAC, THRESH, STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL CCG1_FRACD( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
+     :                          CLFRAC, THRESH, STATUS )
+
+            ELSE
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'TYPE', ITYPE )
+               CALL ERR_REP( 'CCD1_MKHIST',
+     :         '  CCD1_MKHIS: Unsupported data type (^TYPE).', STATUS )
+            END IF
+            
+*  Write message about actions.
             CALL MSG_SETD( 'PERCEN', PERCEN * 100.0D0 )
             CALL CCD1_MSG( ' ',
      :'  Using ^PERCEN percentile to estimate threshold', STATUS )
          ELSE
 
+*  Get fraction of values which are required in one bin for sampling
+*  to be "optimal".
+            CALL PAR_GET0D( 'BINFRAC', BINPER, STATUS )
+            BINPER = ABS( BINPER )
+
+*  Determine how many counts per bin this equates to.
+            MINBIN = INT( DBLE( EL ) * BINPER * 0.01D0 )
+
+*  Get the oversampling factor (over mean count per bin).
+            CALL PAR_GET0I( 'OVERSAMP', OVSAMP, STATUS )
+            OVSAMP = MAX( 1, OVSAMP )
+
+*  Report how the histogram is formed.
+            CALL CCD1_MSG( ' ', ' ', STATUS )
+            CALL CCD1_MSG( ' ',
+     :      '  Initial histogram parameters: ', STATUS )
+            CALL MSG_SETD( 'BINFRAC', BINPER )
+            CALL CCD1_MSG( ' ',
+     :      '  Minimum fraction of counts in one bin: ^BINFRAC%%',
+     :                     STATUS )
+            CALL MSG_SETI( 'NEED', NEED )
+            CALL CCD1_MSG( ' ',
+     :      '  Number of bins                       : ^NEED', STATUS )
+
+*  Get workspace for holding histogram. Oversample the mean pixel count
+*  per bin by a factor of OVSAMP
+            NEED = MAX( 10, MINBIN * OVSAMP )
+            CALL CCD1_MALL( NEED, '_INTEGER', IPHIST, STATUS )
+
+*  Determine the histogram with this optimal bin fraction. Also returns
+*  the mode (bin number which contains the peak count). Note the BAD
+*  flag is updated by this routine.
+            CALL CCD1_MKHIS( ITYPE, IPIN, EL, BAD, MINBIN, NEED,
+     :                       %VAL( IPHIST ), MODE, PEAK, NBIN, ZERO,
+     :                       WIDTH, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 98
+
+*  Report on final histogram parameters.
+            CALL CCD1_MSG( ' ', ' ', STATUS )
+            CALL CCD1_MSG( ' ',
+     :      '  Final histogram parameters:', STATUS )
+            CALL MSG_SETI( 'NBIN', NBIN )
+            CALL CCD1_MSG( ' ', '  Number of bins: ^NBIN', STATUS )
+            CALL MSG_SETI( 'PEAK', PEAK )
+            CALL CCD1_MSG( ' ', '  Peak count    : ^PEAK', STATUS )
+            CALL MSG_SETD( 'WIDTH', WIDTH )
+            CALL CCD1_MSG( ' ', '  Bin width     : ^WIDTH', STATUS )
+
 *  Fit the background using a gaussian.
             CALL CCD1_GAFIT( %VAL( IPHIST ), NBIN, MODE, SD, STATUS )
+
+*  Release histogram workspace.
+            CALL CCD1_MFREE( IPHIST, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *  Inform user about fit parameters.
             CALL MSG_SETD( 'MODE', DBLE( MODE - 1 ) * WIDTH + ZERO )
@@ -541,7 +575,7 @@
             CALL PAR_GET0D( 'NSIGMA', NSIGMA, STATUS )
 
 *  Set the threshold.
-            THRESH = DBLE( MODE - 1 ) * WIDTH +ZERO +
+            THRESH = DBLE( MODE - 1 ) * WIDTH + ZERO +
      :               NSIGMA * SD * WIDTH
 
 *  Tell user what is happening.
@@ -575,10 +609,6 @@
             CALL CCD1_MSG( ' ', '  Using auto-thresholding', STATUS )
          END IF
          CALL CCD1_MSG( ' ', ' ', STATUS )
-
-*  Release histogram workspace.
-         CALL CCD1_MFREE( IPHIST, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *=======================================================================
 *  End of threshold estimation section.

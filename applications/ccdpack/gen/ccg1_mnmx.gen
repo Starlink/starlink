@@ -1,4 +1,4 @@
-      SUBROUTINE CCG1_MNMX<T>( ARRAY, NPIX, BAD, <T>MIN, <T>MAX,
+      SUBROUTINE CCG1_MNMX<T>( ARRAY, NPIX, BAD, <T>MIN, <T>MAX, NGOOD,
      :                         STATUS )
 *+
 *  Name:
@@ -11,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_MNMX<T>( ARRAY, NPIX, BAD, <T>MIN, <T>MAX, STATUS )
+*     CALL CCG1_MNMX<T>( ARRAY, NPIX, BAD, <T>MIN, <T>MAX, NGOOD, 
+*                        STATUS )
 
 *  Description:
 *     This routine scan a vectorised array locating the minimum and
@@ -30,6 +31,8 @@
 *        The array minimum.
 *     <T>MAX = <COMM> (Returned)
 *        The array maximum.
+*     NGOOD = INTEGER (Returned)
+*        The number of non-BAD pixels found.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -45,6 +48,8 @@
 *        Modified to use correct numeric intercomparison (PRIMDAT not 
 *        just fortran relational operators, the latter fail for unsigned
 *        types).
+*     4-JUL-2000 (MBT):
+*        Added NGOOD returned argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,13 +74,13 @@
 *  Arguments Returned:
       <TYPE> <T>MIN
       <TYPE> <T>MAX
+      INTEGER NGOOD
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER I                  ! Loop variable
-      INTEGER NGOOD              ! Number of non-BAD values in array
       <TYPE> DUMMY               ! Local storage.
 
 *  Internal References:
@@ -128,10 +133,12 @@
                IF ( NUM_LT<T>( DUMMY, <T>MIN ) ) <T>MIN = DUMMY
                IF ( NUM_GT<T>( DUMMY, <T>MAX ) ) <T>MAX = DUMMY
  2          CONTINUE
+            NGOOD = NPIX
          END IF
       ELSE
 
 *  Empty array.
+         NGOOD = 0
          STATUS = SAI__ERROR
          CALL ERR_REP( 'CCD1_MNMX<T>2',
      : '  CCD1_MNMX<T>: Data array contains no values', STATUS )
