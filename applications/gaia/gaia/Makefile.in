@@ -149,17 +149,19 @@ LN 	     = ln -s
 all: $(demo_wish) $(demo_tcl) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
 	$(asc2tab) $(tab2asc)
 
-#  Link wish. Note AST_LIBS go first as we need to use some routines
-#  from it in preference to those in Skycat (proj.o and wcstrig.o).
+#  Link wish. Note we need proj.o and wcstrig.o from AST extracting to 
+#  ensure that these are used in preference to the versions in Skycat.
 $(demo_wish): normallib tkAppInit.o FORCE
 	@echo "linking \"$(demo_wish)\"..."
-	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
-	       $(AST_LIBS) $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB) \
+	ar x $(STARLINK)/lib/libast_wcslib.a proj.o wcstrig.o
+$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
+	       proj.o wcstrig.o $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB) \
 	       $(ADDLIBS) $(AST_LIBS) \
 	       $(RTD_LIB) $(ASTROTCL_LIB) \
 	       $(TCLUTIL_LIB) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
+	$(RM) proj.o wcstrig.o
 
 $(demo_tcl): normallib tclAppInit.o FORCE
 	@echo "linking \"$(demo_tcl)\"..."

@@ -131,14 +131,18 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 	$(MKTCLAPP) -header > gaia_stcl.h
 	$(MKTCLAPP) -f gaia_stcl.mta > gaia_stcl.c
 
+#  Link wish. Note we need proj.o and wcstrig.o from AST extracting to 
+#  ensure that these are used in preference to the versions in Skycat.
 $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
+	ar x $(STARLINK)/lib/libast_wcslib.a proj.o wcstrig.o
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
-	       $(LD_SEARCH_FLAGS) $(AST_LIBS) $(SKYCAT_LIB) $(CAT_LIB)  \
+	       $(AST_LIBS) $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB)  \
                $(AST_LIBS) $(RTD_LIB) $(ASTROTCL_LIB) \
 	       $(TCLUTIL_LIB) $(LOCAL_LIBRARY) \
 	       $(AST_LIBS) $(TCLUTIL_LIB) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
+	$(RM) proj.o wcstrig.o
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
