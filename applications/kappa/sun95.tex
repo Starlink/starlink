@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.20}
 \newcommand{\stardocnumber}    {95.20}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {18th December 2001}
+\newcommand{\stardocdate}      {8th January 2002}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.19}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -6894,8 +6894,9 @@ Frames, together with recipes for converting positions between
 them, are stored permanently in the NDFs WCS component which may be
 examined using the \htmlref{NDFTRACE}{NDFTRACE} command. Application
 \htmlref{WCSADD}{WCSADD} allows new Frames to be added to the WCS
-component (positions in the new Frame must be linearly related to the 
-corresponding positions in an existing Frame).
+component (positions in the new Frame must be related to the 
+corresponding positions in an existing Frame by one of several different
+supported types of Mapping).
 \htmlref{WCSREMOVE}{WCSREMOVE} allows Frames to be removed from the WCS
 component.
 
@@ -10648,10 +10649,10 @@ abbreviated.
 Several people have contributed complete {\footnotesize KAPPA}
 programmes, or have upgraded earlier versions, or have written original
 code (which eventually became included in {\footnotesize KAPPA} after
-reworking). Rodney Warren-Smith converted several of the old IMAGE
-applications to use the NDF\_ library, and supplied several other
+reworking). Mark Taylor and Rodney Warren-Smith both re-wrote some of the old 
+IMAGE applications to use the NDF\_ library. Rodney also supplied several other
 programmes, especially ones that now form the basis of NDFPACK. Other
-contributions have come from Mark Taylor, Alasdair Allen, Steven Beard,
+contributions have come from Alasdair Allen, Steven Beard,
 Wei Gong, Rhys Morris, Jo Murray, Grant Privett, and Richard Saxton.  The
 original {\footnotesize KAPPA} was derived from Mark McCaughrean's
 {\footnotesize RAPI2D} and Ken Hartley's {\footnotesize ASPIC Kernel},
@@ -11030,7 +11031,8 @@ picture.}
 \menuitem{KAPVERSION}{
  Check the version number of the installed package.}
 \menuitem{WCSADD}{
-Adds a new co-ordinate Frame into the WCS component of an NDF.}
+Creates a Mapping and optionally adds a new co-ordinate Frame into the 
+WCS component of an NDF.}
 \menuitem{WCSALIGN}{
 Aligns a group of 2-d NDFs using WCS information.}
 \menuitem{WCSATTRIB}{
@@ -11501,7 +11503,8 @@ functions as follows.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
 \classitem{WCSADD}
- Adds a new co-ordinate Frame into the WCS component of an NDF.
+Creates a Mapping and optionally adds a new co-ordinate Frame into the 
+WCS component of an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \classitem{WCSATTRIB}
@@ -23473,6 +23476,88 @@ plot (6k).
          \sstitem
          Uses the portable help system.
 
+      }
+   }
+}
+\sstroutine{
+   KAPVERSION
+}{
+   Checks the package version number
+}{
+   \sstdescription{
+      This application will display the installed package version number,
+      or compare the version number of the installed package against a
+      specified version number, reporting whether the installed package
+      is older, or younger, or equal to the specified version.
+   }
+   \sstusage{
+      kapversion [compare]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMPARE = LITERAL (Read)
+      }{
+         A string specifying the version number to be compared to the
+         version of the installed package. If a null (!) value is supplied,
+         the version string of the installed package is displayed, but no
+         comparison takes place. If a non-null value is supplied, the
+         version of the installed package is not displayed.
+
+         The supplied string should be in the format {\tt "}V$<$ddd$>$.$<$ddd$>$-$<$ddd$>$,
+         where {\tt "}$<$ddd$>${\tt "} represents a set of digits. The leading {\tt "}V{\tt "} can be
+         omitted, as can any number of trailing fields (missing trailing
+         fields default to zero). {\tt [!]}
+      }
+      \sstsubsection{
+         RESULT = INTEGER (Write)
+      }{
+         If a value is given for the COMPARE parameter, then RESULT is
+         set to one of the following values:
+
+         \sstitemlist{
+
+            \sstitem
+            1 -- The installed package is older than the version number
+            specified by the COMPARE parameter.
+
+            \sstitem
+            0 -- The version of the installed package is equal to the
+            version specified by the COMPARE parameter.
+
+            \sstitem
+            -1 -- The installed package is younger than the version number
+            specified by the COMPARE parameter.
+
+         }
+         The same value is also written to standard output.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         kapversion
+      }{
+         Displays the version number of the installed package.
+      }
+      \sstexamplesubsection{
+         kapversion compare={\tt "}V0.14-1{\tt "}
+      }{
+         Compares the version of the installed package with the version
+         {\tt "}V0.14-1{\tt "}, and sets the RESULT parameter appropriately. For
+         instance, if the installed package was {\tt "}V0.13-6{\tt "} then RESULT
+         would be set to -1. If the installed package was {\tt "}V0.14-1{\tt "},
+         RESULT would be set to 0. If the installed package was {\tt "}V0.14-5{\tt "}
+         RESULT would be set to $+$1.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The package version number is obtained from the {\tt "}version{\tt "} file
+         in the directory containing the package{\tt '}s installed executable files.
+         This file is created when the package is installed using the {\tt "}mk
+         install{\tt "} command. An error will be reported if this file cannot be
+         found.
       }
    }
 }
@@ -38227,109 +38312,66 @@ plot (7k).
 \end{htmlonly}
 
 \sstroutine{
-   KAPVERSION
-}{
-   Checks the package version number
-}{
-   \sstdescription{
-      This application will display the installed package version number,
-      or compare the version number of the installed package against a
-      specified version number, reporting whether the installed package
-      is older, or younger, or equal to the specified version.
-   }
-   \sstusage{
-      kapversion [compare]
-   }
-   \sstparameters{
-      \sstsubsection{
-         COMPARE = LITERAL (Read)
-      }{
-         A string specifying the version number to be compared to the
-         version of the installed package. If a null (!) value is supplied,
-         the version string of the installed package is displayed, but no
-         comparison takes place. If a non-null value is supplied, the
-         version of the installed package is not displayed.
-
-         The supplied string should be in the format {\tt "}V$<$ddd$>$.$<$ddd$>$-$<$ddd$>$,
-         where {\tt "}$<$ddd$>${\tt "} represents a set of digits. The leading {\tt "}V{\tt "} can be
-         omitted, as can any number of trailing fields (missing trailing
-         fields default to zero). {\tt [!]}
-      }
-      \sstsubsection{
-         RESULT = INTEGER (Write)
-      }{
-         If a value is given for the COMPARE parameter, then RESULT is
-         set to one of the following values:
-
-         \sstitemlist{
-
-            \sstitem
-            1 -- The installed package is older than the version number
-            specified by the COMPARE parameter.
-
-            \sstitem
-            0 -- The version of the installed package is equal to the
-            version specified by the COMPARE parameter.
-
-            \sstitem
-            -1 -- The installed package is younger than the version number
-            specified by the COMPARE parameter.
-
-         }
-         The same value is also written to standard output.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         kapversion
-      }{
-         Displays the version number of the installed package.
-      }
-      \sstexamplesubsection{
-         kapversion compare={\tt "}V0.14-1{\tt "}
-      }{
-         Compares the version of the installed package with the version
-         {\tt "}V0.14-1{\tt "}, and sets the RESULT parameter appropriately. For
-         instance, if the installed package was {\tt "}V0.13-6{\tt "} then RESULT
-         would be set to -1. If the installed package was {\tt "}V0.14-1{\tt "},
-         RESULT would be set to 0. If the installed package was {\tt "}V0.14-5{\tt "}
-         RESULT would be set to $+$1.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The package version number is obtained from the {\tt "}version{\tt "} file
-         in the directory containing the package{\tt '}s installed executable files.
-         This file is created when the package is installed using the {\tt "}mk
-         install{\tt "} command. An error will be reported if this file cannot be
-         found.
-      }
-   }
-}
-
-\sstroutine{
    WCSADD
 }{
-   Adds a new co-ordinate Frame into the WCS component of an NDF
+   Creates a Mapping and optionally adds a new co-ordinate Frame into the
+   WCS component of an NDF
 }{
    \sstdescription{
-      This application adds a new co-ordinate Frame into the WCS component
-      of an NDF. The new Frame must be linearly connected to an existing
-      Frame (called the {\tt "}basis{\tt "} Frame) in the WCS component. The linear
-      transformation is specified by parameter TR. The new Frame becomes the
-      current co-ordinate Frame in the NDF.
+      This application can be used either to add a new co-ordinate
+      Frame into the WCS component of an NDF using a specified Mapping,
+      or to store a specified Mapping in a text file for future use by
+      other applications (see parameter WRITEMAP). A number of different
+      types of Mapping can be used (see parameter MAPTYPE).
 
-      The new Frame is a copy of the basis Frame, with the new Domain
-      attribute specified by parameter DOMAIN. If necessary, other attributes
-      of the Frame (Title, Label, Format, {\it etc}) can be changed using
-      application WCSATTRIB.
+      When adding a new Frame to a WCS component (WRITEMAP=FALSE),
+      the Mapping is used to connect the the new Frame to an existing
+      one (called the {\tt "}basis{\tt "} Frame).  The newly added Frame is a copy
+      of the basis Frame, with the new Domain attribute specified by
+      parameter DOMAIN, and becomes the current co-ordinate Frame in
+      the NDF.  If necessary, other attributes of the new Frame
+      (Title, Label, Format, \emph{etc}) can be changed using application
+      WCSATTRIB.
+
+      WCSADD will only generate Mappings with the same number of
+      input and output axes; this number is determined by the number
+      of axes in the basis Frame if WRITEMAP=FALSE or by the
+      NAXES parameter if WRITEMAP=TRUE.
    }
    \sstusage{
-      wcsadd ndf frame domain [tr]
+      wcsadd ndf frame domain maptype
    }
    \sstparameters{
+      \sstsubsection{
+         CENTRE( 2 ) = \_DOUBLE (Read)
+      }{
+         The co-ordinates of the centre of a pincushion distortion.
+         Only used when MAPTYPE=PINCUSHION.  See also DISCO.
+         {\tt [0,0]}
+      }
+      \sstsubsection{
+         DIAG( ) = \_DOUBLE (Read)
+      }{
+         The elements along the diagonal of the linear transformation
+         matrix. There will be as many of these as there are axes in the
+         basis Frame.  Each effectively gives the factor by which
+         co-ordinates on the corresponding axis should be multiplied.
+         This parameter is only used when MAPTYPE=DIAG.
+      }
+      \sstsubsection{
+         DISCO = \_DOUBLE (Read)
+      }{
+         The distortion coefficient of a pincushion distortion.  Used
+         in conjunction with the CENTRE parameter, this defines the
+         forward transformation to be used as follows:
+         \begin{eqnarray*}
+            XX &=& X + D * (X - C1) * ( (X - C1)^2 + (Y - C2)^2 ) \\
+            YY &=& Y + D * (Y - C2) * ( (X - C1)^2 + (Y - C2)^2 ) 
+         \end{eqnarray*}
+         where $(X,Y)$ are the input co-ordinates, $(XX,YY)$ the output
+         co-ordinates, $D$ is DISCO, and $C1$ and C2 are the two elements of
+         CENTRE. Only used when MAPTYPE=PINCUSHION.
+      }
       \sstsubsection{
          DOMAIN = LITERAL (Read)
       }{
@@ -38339,6 +38381,7 @@ plot (7k).
          use within the WCS component, particularly the standard domain names
          such as GRID, PIXEL, AXIS and GRAPHICS. The supplied value is
          stripped of spaces, and converted to upper case before being used.
+         Only used if WRITEMAP=FALSE.
       }
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
@@ -38353,6 +38396,17 @@ plot (7k).
          suggested default is the value stored in the basis Frame.
       }
       \sstsubsection{
+         FOREXP( ) = LITERAL (Read)
+      }{
+         The expressions to be used for the forward co-ordinate
+         transformations in a MathMap.  There must be at least as many
+         expressions as the number of axes of the Mapping, but there
+         may be more if intermediate expressions are to be used.
+         Expression syntax is fortran-like; see the AST\_MATHMAP
+         documentation in SUN/210 for details.  Only used when
+         MAPTYPE=MATH.
+      }
+      \sstsubsection{
          FRAME = LITERAL (Read)
       }{
          A string specifying the basis Frame. If a null value is supplied
@@ -38362,7 +38416,7 @@ plot (7k).
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, AXIS, PIXEL, {\it etc.}\ The two
+            A domain name such as SKY, AXIS, PIXEL, \emph{etc}. The two
             {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             component of the NDF does not contain Frames with these domains.
@@ -38372,25 +38426,124 @@ plot (7k).
             the WCS component.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) 
-            (see section \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ).
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000)
+            (see section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
+         }
+      }
+      \sstsubsection{
+         INVEXP( ) = LITERAL (Read)
+      }{
+         The expressions to be used for the inverse co-ordinate
+         transformations in a MathMap.  There must be at least as many
+         expressions as the number of axes of the Mapping, but there
+         may be more if intermediate expressions are to be used.
+         Expression syntax is fortran-like; see the AST\_MATHMAP
+         documentation in SUN/210 for details.  Only used when
+         MAPTYPE=MATH.
+      }
+      \sstsubsection{
+         MAPIN = FILENAME (Read)
+      }{
+         The  name of a file containing an AST Mapping with which to
+         connect the basis Frame to the new one.  The file may be a text
+         file which contains the textual representation of an AST Mapping,
+         or a FITS file which contains the Mapping as an AST object
+         encoded in its headers, or an NDF.  If it is an NDF, the
+         Mapping from its base (GRID-domain) to current Frame will be
+         used.  Only used when MAPTYPE=FILE.
+      }
+      \sstsubsection{
+         MAPOUT = FILENAME (Write)
+      }{
+         The name of a file to which the AST Mapping will be written.
+         This can be used for instance by the RESAMPLE application.
+         Only used if WRITEMAP is TRUE.
+      }
+      \sstsubsection{
+         MAPTYPE = LITERAL (Read)
+      }{
+         The type of Mapping to be used to connect the new Frame to the
+         basis Frame.  It must be one of the following strings, each
+         of which require some additional parameters as indicated:
+
+         \sstitemlist{
+
+            \sstitem
+            DIAGONAL   -- A linear mapping with no translation
+                            of off-diagonal coefficients (see parameter DIAG)
+
+            \sstitem
+            FILE       -- A mapping defined by an AST Mapping supplied
+                            in a separate file (see parameter MAPIN)
+
+            \sstitem
+            LINEAR     -- A general linear mapping (see parameter TR)
+
+            \sstitem
+            MATH       -- A general algebraically defined mapping
+                            (see parameters FOREXP, INVEXP, SIMPFI, SIMPIF)
+
+            \sstitem
+            PINCUSHION -- A pincushion/barrel distortion (see parameters DISCO,
+                            CENTRE)
+
+            \sstitem
+            SHIFT      -- A translation (see parameter SHIFT)
+
+            \sstitem
+            UNIT       -- A unit mapping
+
+            \sstitem
+            ZOOM       -- A uniform expansion/contraction (see parameter ZOOM)
 
          }
+         {\tt [LINEAR]}
+      }
+      \sstsubsection{
+         NAXES = \_INTEGER (Read)
+      }{
+         The number of input and output axes which the Mapping will have.
+         Only used if WRITEMAP is TRUE.
       }
       \sstsubsection{
          NDF = NDF (Read and Write)
       }{
-         The NDF in which the new Frame is to be stored.
+         The NDF in which the new Frame is to be stored.  Only used if
+         WRITEMAP is FALSE.
+      }
+      \sstsubsection{
+         SHIFT( ) = \_DOUBLE (Read)
+      }{
+         A vector giving the displacement represented by the translation.
+         There must be one element for each axis.  Only used when
+         MAPTYPE=SHIFT.
+      }
+      \sstsubsection{
+         SIMPFI = \_LOGICAL (Read)
+      }{
+         The value of the Mapping{\tt '}s SimpFI attribute (whether it is
+         legitimate to simplify the forward followed by the inverse
+         transformation to a unit transformation).  Only used when
+         MAPTYPE=MATH.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         SIMPIF = \_LOGICAL (Read)
+      }{
+         The value of the Mapping{\tt '}s SimpIF attribute (whether it is
+         legitimate to simplify the inverse followed by the forward
+         transformation to a unit transformation).  Only used when
+         MAPTYPE=MATH.  {\tt [TRUE]}
       }
       \sstsubsection{
          TR( ) = \_DOUBLE (Read)
       }{
          The values of this parameter are the coefficients of a linear
-         transformation from the basis Frame specified by parameter FRAME to
-         the new Frame. For instance, if a feature has co-ordinates
-         (X,Y,Z,...) in the basis Frame, and co-ordinates (U,V,W,...) in
-         the new Frame, then the following transformations would be used,
-         depending on how many axes the two Frames have:
+         transformation from the basis Frame specified by parameter FRAME
+         to the new Frame. This parameter is only used when MAPTYPE=LINEAR.
+         For instance, if a feature has co-ordinates (X,Y,Z,...) in
+         the basis Frame, and co-ordinates (U,V,W,...) in the new Frame,
+         then the following transformations would be used, depending on
+         how many axes the two Frames have:
 
          \begin{itemize}
 
@@ -38416,14 +38569,32 @@ plot (7k).
 
          The correct number of values must be supplied (that is, N$*$(N$+$1)
          where N is the number of axes in the new and old Frames). If a
-         null value ({\tt !}) is given it is assumed that the new Frame and the
-         basis Frame are connected using a unit mapping ({\it{i.e.}}\ corresponding
-         axis values are identical in the two Frames). {\tt [!]}
+         null value (!) is given it is assumed that the new Frame and the
+         basis Frame are connected using a unit mapping (\emph{i.e.} corresponding
+         axis values are identical in the two Frames).  Only used when
+         MAPTYPE=LINEAR. {\tt [!]}
+      }
+      \sstsubsection{
+         WRITEMAP = \_LOGICAL (Read)
+      }{
+         Whether to write the Mapping out as a text file or use it to
+         add a new Frame to a WCS FrameSet.  If FALSE, the specified
+         Mapping will be used to add a new Frame to the WCS component
+         of the NDF given by parameter NDF.  If TRUE, the application
+         will instead write a text file with the name given by the
+         MAPOUT parameter which contains the Mapping.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         ZOOM = \_DOUBLE (Read)
+      }{
+         The scaling factor for a ZoomMap; every coordinate will be
+         multiplied by this factor in the forward transformation.
+         Only used when MAPTYPE=ZOOM.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         wcsadd ngc5128 pixel old\_pixel
+         wcsadd ngc5128 pixel old\_pixel unit
       }{
          This adds a new co-ordinate Frame into the WCS component of the
          NDF called ngc5128. The new Frame is given the domain OLD\_PIXEL
@@ -38432,7 +38603,7 @@ plot (7k).
          record of the original pixel co-ordinate Frame.
       }
       \sstexamplesubsection{
-         wcsadd my\_data dist-lum dist(au)-lum [0,2.0628E5,0,0,0,1]
+         wcsadd my\_data dist-lum dist(au)-lum linear tr=[0,2.0628E5,0,0,0,1]
       }{
          This adds a new co-ordinate Frame into the WCS component of the
          NDF called my\_data. The new Frame is given the domain DIST(AU)-LUM
@@ -38443,6 +38614,43 @@ plot (7k).
          values by 2.0628E5. The values on the second axis are copied
          without change. You could then use application WCSATTRIB to set
          the {\tt "}Unit{\tt "} attribute for axis 1 of the new Frame to {\tt "}AU{\tt "}.
+      }
+      \sstexamplesubsection{
+         wcsadd my\_data dist-lum dist(au)-lum diag diag=[2.0628E5,1]
+      }{
+         This does exactly the same as the previous example.
+      }
+      \sstexamplesubsection{
+         wcsadd ax322 ! shrunk zoom zoom=0.25
+      }{
+         This adds a new Frame to the WCS component of ax322 which is a
+         one-quarter-scale copy of its current co-ordinate Frame.
+      }
+      \sstexamplesubsection{
+         wcsadd cube grid slid shift shift=[0,0,1024]
+      }{
+         This adds a new Frame to the WCS component of the NDF cube
+         which matches the GRID-domain co-ordinates in the first two
+         axes, but is translated by 1024 pixels on the third axis.
+      }
+      \sstexamplesubsection{
+         wcsadd plane pixel polar math simpif simpfi \\
+                forexp=[{\tt "}r=sqrt(x$*$x$+$y$*$y){\tt "},{\tt "}theta=atan2(y,x){\tt "}] \\
+                invexp=[{\tt "}x=r$*$cos(theta){\tt "},{\tt "}y=r$*$sin(theta){\tt "}]
+      }{
+         A new Frame is added giving a polar view of the pixel
+         co-ordinates
+      }
+      \sstexamplesubsection{
+         wcsadd writemap=true naxes=2 mapout=pcd.ast maptype=pincushion \\
+                disco=5.3e-10
+      }{
+         This constructs a pincushion-type distortion Mapping centred
+         on the origin with a distortion coefficient of 5.3e-10,
+         and writes out the Mapping as a text file called pcd.ast.
+         This file could then be used by RESAMPLE to resample
+         the pixels of an NDF according to this transformation.
+         No NDF is accessed using this form of the command.
       }
    }
    \sstnotes{
@@ -38459,7 +38667,8 @@ plot (7k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
+      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
+      CCDPACK: WCSEDIT.
    }
 }
 \sstroutine{
@@ -43201,6 +43410,16 @@ The following applications have been modified:
          variances. Parameter names have changed.
       \end{itemize}
 
+   \item [\htmlref{WCSADD}{WCSADD}] \mbox{}
+      \begin{itemize}
+         \item Frames can now be added to an NDF using a wider range of
+         Mappings, including Mappings which describe pin-cushion and barrel 
+         distortion.
+         \item The selected Mapping can now be dumped to a text file
+         for use by other applications such as
+         \htmlref{RESAMPLE}{RESAMPLE}.
+      \end{itemize}
+
 \end{description}
 
 
@@ -43655,7 +43874,8 @@ functions as follows.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
 \classitem{WCSADD}
- Adds a new co-ordinate Frame into the WCS component of an NDF.
+ Creates a Mapping and optionally adds a new co-ordinate Frame into the 
+ WCS component of an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \classitem{WCSATTRIB}

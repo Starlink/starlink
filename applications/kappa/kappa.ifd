@@ -2044,9 +2044,40 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter centre {
+            size *
+            type _DOUBLE
+            access READ
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            prompt {Centre (X,Y) co-ordinates for distortion}
+            default 0.0 0.0
+            helpkey *
+         }
+
+         parameter diag {
+            size *
+            type _DOUBLE
+            access READ
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Diagonal matrix coefficients}
+            helpkey *
+         }
+
+         parameter disco {
+            type _DOUBLE
+            access READ
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Pincusion distortion coefficient}
+            helpkey *
+         }
+
          parameter domain {
             position 3
             type LITERAL
+            access READ
             ppath CURRENT
             prompt {The Domain name for the new Frame}
             helpkey *
@@ -2054,19 +2085,79 @@ package kappa {
 
          parameter epoch {
             type _DOUBLE
+            access READ
             ppath DYNAMIC CURRENT
             prompt {Epoch of observation}
             helpkey *
-          }
+         }
+
+         parameter forexp {
+            size *
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Forward transformation expressions}
+            helpkey *
+         }
 
          parameter frame {
             position 2
             type LITERAL
+            access READ
             ppath CURRENT DEFAULT
             prompt {An existing co-ordinate Frame}
             helpkey *
             default !
-          }
+         }
+
+         parameter invexp {
+            size *
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Inverse transformatijon expressions}
+            helpkey *
+         }
+
+         parameter mapin {
+            type LITERAL
+            access READ
+            ppath CURRENT
+            vpath PROMPT
+            prompt {File containing AST Mapping}
+            helpkey *
+         }
+
+         parameter mapout {
+            type LITERAL
+            access READ
+            ppath CURRENT
+            vpath PROMPT
+            prompt {File to contain output AST Mapping}
+            helpkey *
+         }
+
+         parameter maptype {
+            position 4
+            type LITERAL
+            access READ
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            prompt {Type of mapping to use}
+            default {LINEAR}
+            helpkey *
+         }
+
+         parameter naxes {
+            type _INTEGER
+            access READ
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Number of input and output axes}
+            helpkey *
+         }
 
          parameter ndf {
             position 1
@@ -2077,11 +2168,40 @@ package kappa {
             association <->GLOBAL.DATA_ARRAY
             prompt {The NDF in which to store the new Frame}
             helpkey *
-          }
+         }
+
+         parameter shift {
+            size *
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Translation coefficients}
+            helpkey *
+         }
+
+         parameter simpfi {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {Simplify forward plus inverse to unit mapping?}
+            default TRUE
+            helpkey *
+         }
+
+         parameter simpif {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {Simplify inverse plus forward to unit mapping?}
+            default TRUE
+            helpkey *
+         }
 
          parameter tr {
             size *
-            position 4
             type _DOUBLE
             access READ
             vpath DEFAULT
@@ -2089,7 +2209,26 @@ package kappa {
             prompt {Co-efficients of a linear transformation}
             default !
             helpkey *
-          }
+         }
+
+         parameter writemap {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Output Mapping to AST text file?}
+            default FALSE
+            helpkey *
+         }
+
+         parameter zoom {
+            type _DOUBLE
+            access READ
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Scaling factor}
+            helpkey *
+         }
 
       }
 

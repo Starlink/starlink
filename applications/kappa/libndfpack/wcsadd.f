@@ -60,9 +60,9 @@
 *        in conjunction with the CENTRE parameter, this defines the
 *        forward transformation to be used as follows:
 *
-*                XX = X + D * (X - C1) * ( (X - C1)**2 + (Y - C2)**2 ) )
+*                XX = X + D * (X - C1) * ( (X - C1)**2 + (Y - C2)**2 )
 *
-*                YY = Y + D * (Y - C2) * ( (X - C1)**2 + (Y - C2)**2 ) )
+*                YY = Y + D * (Y - C2) * ( (X - C1)**2 + (Y - C2)**2 )
 *
 *        where (X,Y) are the input co-ordinates, (XX,YY) the output 
 *        co-ordinates, D is DISCO, and C1 and C2 are the two elements of 
