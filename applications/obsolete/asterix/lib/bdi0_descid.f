@@ -103,7 +103,7 @@
       CHARACTER*200		FILE			! File path
       CHARACTER*40		TYPE			! ADI class name
 
-      INTEGER			CLEN, FLEN		! Lengths of strings
+      INTEGER			CLEN			! Lengths of string
       INTEGER			FID			! File identifier
 *.
 

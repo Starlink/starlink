@@ -1,4 +1,4 @@
-      SUBROUTINE BDI_GETSHP( ID, MAXNDIM, DIMS, NDIM, STATUS )
+      SUBROUTINE BDI_GETSHP( ID, MXNDIM, DIMS, NDIM, STATUS )
 *+
 *  Name:
 *     BDI_GETSHP
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI_GETSHP( ID, MAXNDIM, DIMS, NDIM, STATUS )
+*     CALL BDI_GETSHP( ID, MXNDIM, DIMS, NDIM, STATUS )
 
 *  Description:
 *     Extracts the dimensions of a data model object for subsequent
@@ -20,7 +20,7 @@
 *     ID = INTEGER (given)
 *        ADI identifier of BinDS, Array or Scalar object, or derivatives
 *        thereof
-*     MAXNDIM = INTEGER (given)
+*     MXNDIM = INTEGER (given)
 *        Maximum number of dimensions to export
 *     DIMS[NDIM] = INTEGER (returned)
 *        Sizes of each of the NDIM dimensions of the object
@@ -97,7 +97,7 @@
 *         BDI class definitions loaded?
 
 *  Arguments Given:
-      INTEGER			ID, MAXNDIM
+      INTEGER			ID, MXNDIM
 
 *  Arguments Returned:
       INTEGER			NDIM, DIMS(*)
@@ -126,18 +126,32 @@
 
 *    Set dimensions
         NDIM = 0
-        DO IDIM = 1, MAXNDIM
+        DO IDIM = 1, MXNDIM
           DIMS(IDIM) = 0
         END DO
 
       ELSE
 
-*    Read dimensions
-        CALL ADI_CGET1I( ID, 'SHAPE', MAXNDIM, DIMS, NDIM, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
+*    How big is dimensions array
+        CALL ADI_CSIZE( ID, 'SHAPE', NDIM, STATUS )
+        IF ( NDIM .GT. MXNDIM ) THEN
           STATUS = SAI__ERROR
-          CALL ERR_REP( 'BDI_GETSHP_1', 'Unable to read data object'/
-     :                /' dimensions', STATUS )
+          CALL BDI0_DESCID( ID, 'ID', STATUS )
+          CALL MSG_SET( 'ND', NDIM )
+          CALL MSG_SET( 'NA', MXNDIM )
+          CALL ERR_REP( 'BDI_GETSHP_0', 'Input object ^ID has '/
+     :                  /'^ND dimensions, where as the calling '/
+     :                  /'program can only cope with ^NA', STATUS )
+
+        ELSE
+
+*    Read dimensions
+          CALL ADI_CGET1I( ID, 'SHAPE', MXNDIM, DIMS, NDIM, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'BDI_GETSHP_1', 'Unable to read data object'/
+     :                  /' dimensions', STATUS )
+          END IF
         END IF
 
       END IF
