@@ -533,14 +533,14 @@
         IF ( I .EQ. 1 ) THEN
 
 *        Version id
-          CALL HIST_ADD( GFID(I), VERSION, STATUS )
+          CALL HSI_ADD( GFID(I), VERSION, STATUS )
 
 *        Input file(s) and model
           HBUF(1) = 'Data {INP}'
           HBUF(2) = 'Model {MODEL}'
           NHBUF = 6
           CALL USI_TEXT( 2, HBUF, NHBUF, STATUS )
-          CALL HIST_PTXT( GFID(1), NHBUF, HBUF, STATUS )
+          CALL HSI_PTXT( GFID(1), NHBUF, HBUF, STATUS )
 
 *        Grid parameters
           TEXT = 'Gridded parameters ('
@@ -549,10 +549,10 @@
             CALL MSG_SETI( 'P', GPS(J) )
             CALL MSG_MAKE( TEXT(:TLEN)//' ^P', TEXT, TLEN )
           END DO
-          CALL HIST_PTXT( GFID(1), 1, TEXT(:TLEN)//' )', STATUS )
+          CALL HSI_PTXT( GFID(1), 1, TEXT(:TLEN)//' )', STATUS )
 
         ELSE
-          CALL HIST_COPY( GFID(1), GFID(I), STATUS )
+          CALL HSI_COPY( GFID(1), GFID(I), STATUS )
         END IF
 
 *      The item being gridded
@@ -568,7 +568,7 @@
           CALL MSG_MAKE( 'Gridded values are parameter ^P, ^TAG',
      :                                               TEXT, TLEN )
         END IF
-        CALL HIST_PTXT( GFID(I), 1, TEXT(:TLEN), STATUS )
+        CALL HSI_PTXT( GFID(I), 1, TEXT(:TLEN), STATUS )
 
 *      Create and map data array
         CALL BDI_CREDATA( GFID(I), NGRIDAX, GDIMS, STATUS )
@@ -606,7 +606,7 @@
      :                              /' is ^VAL.', TEXT, TLEN )
       CALL MSG_PRNT( TEXT(:TLEN) )
       DO I = 1, NGRID
-        CALL HIST_PTXT( GFID(I), 1, TEXT(:TLEN), STATUS )
+        CALL HSI_PTXT( GFID(I), 1, TEXT(:TLEN), STATUS )
       END DO
 
 *    Update the model?
