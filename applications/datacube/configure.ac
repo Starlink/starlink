@@ -29,8 +29,10 @@ dnl    we need to link against this library, it will be included by default
 dnl    if it exists in this case.
 AC_CHECK_LIB(cc_dynamic, restFP)
 
-dnl dependances on starlink packages
-STAR_DECLARE_DEPENDENCIES(build, [ sae ndf ])
+dnl dependances on starlink packages, depends on kappa, figaro and convert
+dnl for the scripts in th epacage to work, so may as well declare them as
+dnl dependancies for build.
+STAR_DECLARE_DEPENDENCIES(build, [ ndf kappa figaro convert])
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot

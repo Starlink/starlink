@@ -20,4 +20,5 @@ starconf.status.local
 confdefs.h
 datacube.csh
 datacube.icl
+datacube_mon
 version.dat
