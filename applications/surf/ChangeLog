@@ -1,5 +1,8 @@
 1999-07-28  Tim Jenness  <timj@jach.hawaii.edu>
 
+	SURF V1.4-3 - to include this patch to surflib_process_bols
+		only (none of the other changes between 1.4-2 and here)
+	
 	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Add
 	LAT_OBS to SCULIB_CALC_APPARENT call (was not done before!!!)
 
