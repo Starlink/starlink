@@ -26,6 +26,7 @@ $AUTOASTROM_DIR/autoastrom \
     --xxxndfinfo=dim1=2048,dim2=4097 \
     --noinsert \
     --keepfits=${PREFIX}testndf1.final-fits.fits \
+    --nokeeptemps \
     testndf1.sdf \
     >${PREFIX}testndf1.STDOUT \
     2>${PREFIX}testndf1.STDERR
@@ -37,6 +38,7 @@ $AUTOASTROM_DIR/autoastrom \
     --obsdata=col=600 \
     --noinsert \
     --keepfits=${PREFIX}testndf2.final-fits.fits \
+    --nokeeptemps \
     testndf2 \
     >${PREFIX}testndf2.STDOUT \
     2>${PREFIX}testndf2.STDERR
@@ -46,14 +48,14 @@ $AUTOASTROM_DIR/autoastrom \
 # Dump results to stdout, removing version string
 echo "=== Test 1 ==="
 # Remove lines containing version-number and HTTP proxy
-grep -v '\(autoastrom, v\|HTTP proxy\)' ${PREFIX}testndf1.STDOUT
+grep -v -e 'autoastrom, v' -e 'HTTP proxy' ${PREFIX}testndf1.STDOUT
 if test -f ${PREFIX}testndf1.final-fits.fits; then
     ./fitsdump ${PREFIX}testndf1.final-fits.fits
 else
     echo "Can't find file ${PREFIX}testndf1.final-fits.fits"
 fi
 echo "=== Test 2 ==="
-grep -v '\(autoastrom, v\|HTTP proxy\)' ${PREFIX}testndf2.STDOUT
+grep -v -e 'autoastrom, v' -e 'HTTP proxy' ${PREFIX}testndf2.STDOUT
 if test -f ${PREFIX}testndf2.final-fits.fits; then
     ./fitsdump ${PREFIX}testndf2.final-fits.fits
 else

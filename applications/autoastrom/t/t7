@@ -28,6 +28,7 @@ test -n "$ATOOLS_DIR"		|| ATOOLS_DIR=/star/bin/atools
 $AUTOASTROM_DIR/autoastrom \
     --dump=$TDIR/dump1 \
     --temp=$TDIR/t1 \
+    --nokeeptemps \
     t5 \
     > $TDIR/stdout1
     2> $TDIR/stderr1
@@ -36,6 +37,7 @@ $AUTOASTROM_DIR/autoastrom \
     --dump=$TDIR/dump2 \
     --temp=$TDIR/t2 \
     --obsdata=source=FITS \
+    --nokeeptemps \
     t5 \
     > $TDIR/stdout2
     2> $TDIR/stderr2
@@ -44,6 +46,7 @@ $AUTOASTROM_DIR/autoastrom \
     --dump=$TDIR/dump3 \
     --temp=$TDIR/t3 \
     --obsdata=ra=+210,dec=-12:34:56,pa=-30 \
+    --nokeeptemps \
     t5 \
     > $TDIR/stdout3
     2> $TDIR/stderr3
@@ -51,7 +54,7 @@ $AUTOASTROM_DIR/autoastrom \
 for f in 1 2 3; do
     echo "====================" $f
     # Remove lines containing version-number and HTTP proxy
-    grep -v '\(autoastrom, v\|HTTP proxy\)' $TDIR/stdout$f
+    grep -v -e 'autoastrom, v' -e 'HTTP proxy' $TDIR/stdout$f
     cat $TDIR/dump$f
     echo "--------------------"
 done
