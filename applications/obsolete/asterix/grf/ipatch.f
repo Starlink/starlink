@@ -13,6 +13,7 @@
 *      24 Feb 94 : V1.7-2  uses BIT_* (RJV)
 *      16 Sep 94 : V1.7-3  updates data min/max (RJV)
 *      14 Dec 94 : V1.8-0  only patches within current region (RJV)
+*      16 Dec 94 : V1.8-1  paste mode (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -40,6 +41,14 @@
         CALL MSG_PRNT('AST_ERR: there are no bad pixels to patch')
       ELSE
 
+        CALL USI_GET0C('MODE',MODE,STATUS)
+        CALL CHR_UCASE(MODE)
+        IF (STATUS.EQ.SAI__OK.AND..NOT.(MODE.EQ.'INTERP'.OR.
+     :                                  MODE.EQ.'PASTE')) THEN
+          CALL MSG_PRNT('AST_ERR: invalid mode')
+          STATUS=SAI__ERRROR
+        ENDIF
+
 *  ensure transformations are correct
         CALL GTR_RESTORE(STATUS)
         CALL GCB_ATTACH('IMAGE',STATUS)
@@ -48,8 +57,13 @@
         CALL IMG_COPY(.FALSE.,.FALSE.,STATUS)
         I_CAN_UNDO=.FALSE.
 
-        CALL IPATCH_DOIT(%VAL(I_DPTR_W),%VAL(I_VPTR_W),%VAL(I_QPTR_W),
-     :                                                          STATUS)
+        IF (MODE.EQ.'INTERP') THEN
+          CALL IPATCH_INTERP(%val(I_DPTR_W),%val(I_VPTR_W),
+     :                               %val(I_QPTR_W),STATUS)
+        ELSEIF (MODE.EQ.'PASTE') THEN
+          CALL IPATCH_PASTE(%val(I_DPTR_W),%val(I_VPTR_W),
+     :                               %val(I_QPTR_W),STATUS)
+        ENDIF
 
         IF (STATUS.EQ.SAI__OK) THEN
 
@@ -69,7 +83,7 @@
       END
 
 
-      SUBROUTINE IPATCH_DOIT(D,V,Q,STATUS)
+      SUBROUTINE IPATCH_INTERP(D,V,Q,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -341,3 +355,107 @@
        ENDIF
 
        END
+
+
+
+
+      SUBROUTINE IPATCH_PASTE(D,V,Q,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import/export :
+      REAL D(I_NX,I_NY)
+      REAL V(I_NX,I_NY)
+      BYTE Q(I_NX,I_NY)
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+      BYTE BIT_ANDUB,BIT_NOTUB
+      LOGICAL IMG_INREG
+*    Local constants :
+*    Local variables :
+      CHARACTER*1 CH
+      REAL XC,YC,DX,DY
+      REAL X,Y
+      INTEGER I,J,II,JJ,I1,I2,J1,J2,II1,II2,JJ1,JJ2
+      BYTE MASK
+      LOGICAL LEFT,RIGHT
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  get source box for pasting
+        CALL IMG_GETBOX('XC','YC','XWID','YWID',XC,YC,DX,DY,STATUS)
+        CALL IMG_BOX(XC,YC,DX,DY,STATUS)
+        CALL IMG_BOXTOBOX(XC,YC,DX,DY,I1,I2,J1,J2,STATUS)
+
+*  create a mask to exclude previously patched pixels
+        MASK=BIT_ANDUB(I_MASK_W,BIT_NOTUB(QUAL__PATCHED))
+
+
+        CALL MSG_PRNT(
+     :     'Select centres of areas to paste to - X to exit')
+
+        CH=' '
+        RIGHT=.FALSE.
+        DO WHILE (.NOT.RIGHT.AND.CH.NE.'X'.AND.CH.NE.'x'.
+     :                                  STATUS.EQ.SAI__OK)
+
+          X=XC
+          Y=YC
+          CALL GFX_CURS(X,Y,LEFT,RIGHT,CH,STATUS)
+
+          CALL IMG_BOXTOBOX(X,Y,DX,DY,II1,II2,JJ1,JJ2,STATUS)
+
+          DO JJ=JJ1,JJ2
+            DO II=II1,II2
+
+              IF (BIT_ANDUB(Q(II,JJ),MASK).NE.QUAL__GOOD.AND.
+     :                                    IMG_INREG(II,JJ)) THEN
+
+                I=MIN(I_NX,MAX(1,I1+(II-II1)))
+                J=MIN(I_NY,MAX(1,J1+(JJ-JJ1)))
+
+                D(II,JJ)=D(I,J)
+                Q(II,JJ)=QUAL__PATCHED
+                IF (I_VOK) THEN
+                  V(II,JJ)=V(I,J)
+                ENDIF
+
+            ENDDO
+          ENDDO
+
+          I_PMIN=I_DMIN
+          I_PMAX=I_DMAX
+
+
+          CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,II1,II2,JJ1,JJ2,
+     :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
+     :                                            %VAL(I_DPTR_W),
+     :                                         I_PMIN,I_PMAX,STATUS)
+
+
+
+        ENDDO
+
+
+
+*  adjust quality mask
+        I_MASK_W=BIT_ANDUB(I_MASK_W,BIT_NOTUB(QUAL__PATCHED))
+
+
+      ENDIF
+
+      END
