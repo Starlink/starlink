@@ -374,7 +374,8 @@ starconf: make-starconf \
 	./make-starconf \
 		!install-with-manifest.in \
 		!acinclude.m4:starconf.m4 \
-		!Makefile.starconf
+		!Makefile.starconf \
+		*?bootstrap:bootstrap.installed
 make-starconf: make-starconf.in
 	rm -f make-starconf.tmp make-starconf
 	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp

@@ -33,7 +33,8 @@ starconf: make-starconf \
 	./make-starconf \
 		!install-with-manifest.in \
 		!acinclude.m4:starconf.m4 \
-		!Makefile.starconf
+		!Makefile.starconf \
+		*?bootstrap:bootstrap.installed
 
 # The edits of replacement variables (prefix and co) in
 # starlink.m4.in and starconf.in must be done at `make' time rather
