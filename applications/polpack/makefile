@@ -644,7 +644,7 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
+            -L/star-dev/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
             $(LDFLAGS)
 
 
