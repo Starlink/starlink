@@ -1,20 +1,85 @@
-\documentstyle[11pt]{article} 
+\documentclass[twoside,11pt]{article}
+
+%+
+%  Name:
+%     sun17.tex
+
+%  Purpose:
+%     Starlink User Note 17
+
+%  Authors:
+%     Richard M. Prestage (JAC, Hawaii)
+%     Horst Meyerdierks (ROE)
+%     John F. Lightfoot (ROE)
+%     Tim Jenness (JAC, Hawaii)
+%     Remo Tilanus (JAC, HAwaii)
+
+%  History:
+%     13 Jan 1995 (RMP):
+%        First unix release of specx
+%     9  Jan 2000 (TIMJ):
+%        Try to update document - remove VMS references
+
+%-
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
-%------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {17.6}
-\newcommand{\stardocauthors}
-   {R.\,M.\,Prestage, H.\,Meyerdierks, J.\,F.\,Lightfoot}
-\newcommand{\stardocdate}      {13 January 1995}
-\newcommand{\stardoctitle}
-   {SPECX --- A Millimetre Wave Spectral Reduction Package}
-%------------------------------------------------------------------------------
+\newcommand{\stardocsource}    {sun\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {17.7}
+\newcommand{\stardocauthors}   {R.\,M.\,Prestage, H.\,Meyerdierks,
+J.\,F.\,Lightfoot, \\ T.\,Jenness, R.\,P.\,J.\,Tilanus, R.\,Padman}
+\newcommand{\stardocdate}      {9 January 2000}
+\newcommand{\stardoctitle}     {SPECX --- A Millimetre Wave Spectral Reduction 
+Package}
+\newcommand{\stardocversion}   {6.7-6}
+\newcommand{\stardocmanual}    {Users' Manual}
+\newcommand{\stardocabstract}  {SPECX is a general purpose mm and submm
+spectral line data reduction system. This document provides an overview
+of the JAC/Starlink version of SPECX. See MUD/070 for a full manual to
+SPECX.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     {Add further history here}
+%
+% -
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
+\markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
@@ -24,68 +89,248 @@
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
-%------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
-%------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
 
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+% Environment for indenting and using a small font.
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+
+\newcommand{\text}[1]{{\small \tt #1}}
+
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
-DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-{\large Particle Physics \& Astronomy Research Council}\\
-{\large Starlink Project\\}
-{\large \stardoccategory\ \stardocnumber(tex)}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
 
-\begin{center}
-{\Large\it Version 6.2 (VMS) and 6.6 (Unix)}
-\end{center}
-\vspace{5mm}
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
 
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
-%------------------------------------------------------------------------------
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
 
-\newpage
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
 
 \section {Introduction}
 
-SPECX is a general mm and sub-mm wavelength data reduction system
-written by Rachael Padman at MRAO. At the time of writing the latest
-formally released version on the VAX is 6.2. However, pre-release copies
-of version 6.3 are widely used. Branching off from the 6.3 VMS version,
-SPECX was ported to Unix by Horst Meyerdierks of the Starlink Project
-and Rachael Padman. Remo Tilanus at JACH supplied the core routines to
-read GSD files. The software version count on Unix increased rather
-rapidly. 6.4 was the initial Unix port of 6.3, but it existed only in
-beta-test versions. The first released version was 6.5, but it lacked
-the commands to read GSD files. The current version on Unix is 6.6.
+SPECX is a general mm and sub-mm wavelength data reduction system written by
+Rachael Padman at \htmladdnormallink{MRAO}{http://www.mrao.cam.ac.uk}. At the
+time of writing the latest formally released version on the VAX is
+6.2. However, pre-release copies of version 6.3 are widely used. Branching off
+from the 6.3 VMS version, SPECX was ported to Unix by Horst Meyerdierks of the
+\htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk} and Rachael
+Padman. Remo Tilanus at JACH supplied the core routines to read GSD files and
+Tim Jenness at the JAC took over development for version 6.7. The software
+version count on Unix increased rather rapidly. 6.4 was the initial Unix port
+of 6.3, but it existed only in beta-test versions. The first released version
+was 6.5, but it lacked the commands to read GSD files.  Version 6.6 added
+support for GSD files. The current version on Unix is 6.7 which added support
+for a new \xref{HDS}{sun92}{} map format (v4.2) and routines to aid the
+reduction of raster maps. Version 6.7 is currently supported by the Joint
+Astronomy Centre and distributed by Starlink..
 
-Although SPECX may be used to process spectra obtained from many
-different instruments, Starlink users will find it particularly useful
-for the reduction of data obtained with the James Clerk Maxwell
-Telescope.  SPECX has it's own command line interpreter, and manipulates
-spectra on a pop-down stack.  The package is designed to work on a
-graphics terminal with dual-screen facility and VT emulation ({\em e.g.}
-a Pericom MG100), but can be usefully run on other graphics terminals.
-More and more, X displays are used where an {\tt xterm} client (or {\tt
-DECterm} on VMS) takes the role of the alpha-numeric screen and a GWM
-window that of the graphics screen.  Hardcopy may be output on a number
-of printers for which GKS drivers are provided by Starlink. In the Unix
-version these are mainly different PostScript printers.
+Although SPECX may be used to process spectra obtained from many different
+instruments, Starlink users will find it particularly useful for the reduction
+of data obtained with the James Clerk Maxwell Telescope.  SPECX has it's own
+command line interpreter, and manipulates spectra on a pop-down stack.  The
+package is designed to work on a variety of graphics terminals but is mainly
+used from within an X windows environement. Hardcopy may be output on a number
+of printers for which \xref{GKS}{sun83}{} drivers are provided by Starlink. In
+the Unix version these are mainly different PostScript printers.
 
 Some of the major features of SPECX are:
 \begin{itemize}
@@ -127,202 +372,53 @@ The ability to write indirect command files.
 
 A thorough description of the package is given in the ``SPECX Users' Manual''
 which has been distributed as a Starlink Miscellaneous User Document
-(MUD). At the time of writing this MUD is available from Starlink for
-version 6.2. An extended document for version 6.3 is available from
-Rachael Padman at MRAO. No document has been prepared yet for the Unix
+(MUD/70). At the time of writing this MUD is available from Starlink for
+version 6.3. No document has been prepared yet for the Unix
 version, and the document on 6.3 is the closest approximation for Unix
 users.
 
-SPECX is intended primarily for the analysis of JCMT data and can read
-such data directly from the GSD files produced at the
-telescope.
-In the VMS version there are also facilities for reading data from a
-range of other important mm-wave telescopes, {\em e.g.} Onsala,
-FCRAO, UMASS CO survey, IRAM-FITS, JCMT RxG, NRAO 8-beam (see 
-the SPECX user manual for details). 
-Spectra and maps can be output as FITS files,
-Starlink NDFs (VMS version only), or ASCII files for reading into other
-packages.
+SPECX is intended primarily for the analysis of JCMT data and can read such
+data directly from the GSD files produced at the telescope.  In the VMS
+version there are also facilities for reading data from a range of other
+important mm-wave telescopes, {\em e.g.} Onsala, FCRAO, UMASS CO survey,
+IRAM-FITS, JCMT RxG, NRAO 8-beam (see the SPECX user manual for details).
+Spectra and maps can be output as FITS files, Starlink NDFs, or ASCII files
+for reading into other packages.
 
+This document concerns itself with the unix version of specx and will
+no longer discuss the VMS version 6.2.
 
-\section {The VMS version 6.2}
-\subsection {Getting started}
+\section {Getting started}
 
 SPECX is made available by typing:
+\begin{myquote}
 \begin{verbatim}
-      $ specxstart
+% specxstart
 \end{verbatim}
+\end{myquote}
 and started by typing:
+\begin{myquote}
 \begin{verbatim}
-      $ specx 
+% specx 
 \end{verbatim}
+\end{myquote}
 The program will display the current version number and
 a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
 
+\begin{myquote}
 \begin{verbatim}
-
-                   -------------------------------------------
-                           SPECX V6.2    7th-June-1992
-                             Copyright (C) R.Padman
-                   -------------------------------------------
-
+            --------------------------------------------
+              Specx v6.7-6 (Unix) ---- 15 December 1999
+                   Copyright (C)  R.Padman & PPARC
+             Acknowledgements to Horst Meyerdierks (PPARC)
+                  Remo Tilanus & Tim Jenness (JACH)
+            --------------------------------------------
         .
         .
-
-      >> 
-\end{verbatim}
-
-Commands may then be entered to read and process data.
-SPECX commands consist of one or more keywords, separated
-by hyphens. Minimum matching is applied to each keyword
-individually. A full list of all valid SPECX commands
-may be found by entering {\tt SHOW-COMMANDS}, with a carriage return
-in response to the resulting prompt. On-line help is available
-using the command {\tt HELP}.
-
-A DCL command may be executed by preceding it with a {\tt \$}, {\em e.g.}
-
-\begin{verbatim}
-      >> $dir
-\end{verbatim}
-
-The tab and blank characters, `,', `\verb+\+' and `;' are SPECX delimiters;
-to pass these to DCL the entire string must be enclosed in single 
-inverted commas, {\em e.g.}
-
-\begin{verbatim}
-      >> '$dir/size scan*.dat'
-\end{verbatim}
-
-Control-C may be used to interrupt commands in progress.
-Control-C typed at the command level (when the
-{\tt>>} prompt is displayed) will exit the program.
-
-The EXIT command is the normal method of returning to DCL.
-
-
-\subsection {SPECX files and directories}
-
-SPECX uses and produces a variety of files. For graphics, 
-intermediate plot files (called {\tt PLOT.}nnn) are produced in the directory 
-with logical name {\tt SPECXDIR}. The {\tt SPECXSTART} command assigns 
-{\tt SPECXDIR} to {\tt SYS\$LOGIN} so that, 
-by default, the {\tt PLOT.}nnn files will appear in 
-your login directory. This may be over-ridden if you define 
-{\tt SPECXDIR} as a process logical name. For example, typing
-
-\begin{verbatim}
-      $ define SPECXDIR disk$scratch:[user.data]
-\end{verbatim}
-
-after the {\tt SPECXSTART} will cause plot files to appear in the named
-directory.
-
-SPECX uses Starlink PGPLOT for graphics  and thus will produce data  files for
-plots sent to some graphics devices ({\em e.g.} {\tt CANON.DAT} for the
-Canon laser printer, {\tt GKS\_72.PS} for a PostScript printer). These
-are created in the current default directory, and are automatically
-deleted when the plot finishes.
-
-There is an option (defaulted true) in SPECX which  allows dumping of the
-current status of the program after each  command is executed. This is saved in
-the file {\tt SPECX.DMP} in the  current default directory. If this file
-does not exist when SPECX  is started for the first time, it will be
-created. If it is
-subsequently deleted (or SPECX is started from a different  directory), the
-package will restart with default initialisation; otherwise SPECX will be
-re-started will all flags as previously  set, data files opened, and so on. 
-
-
-\subsection {Examples}
-
-New users should read the introductory chapters of the SPECX manual,
-which give explanations and examples of basic techniques. Some sample
-data and a demonstration command file are also available in the
-{\tt [.EXAMPLE]} sub-directory of {\tt SYS\_SPECX}. These can be copied
-to the user's own
-file space and tried out. The demonstration file is {\tt DEMO.SPX},
-which the user should print out and work through by typing the commands
-in from the terminal. It demonstrates the reading of JCMT data,
-the fitting of baselines and gaussians to spectra, and shows how to make
-and display a datacube. The file can also be run as an indirect command
-file by an experienced user to check that the package is working correctly.
-
-
-\subsection{Linking user-supplied subroutines}
-
-User-defined commands can be added to SPECX by making use of the
-subroutines EXTRNL1 to EXTRNL10. For the Starlink version of SPECX 
-the steps required are:
-
-\begin{itemize}
-\item
-Compile your routine:
-\begin{small}
-\begin{verbatim}
-$ specxstart
-$ @sys_specx:specxdev ! to set up logical names for include files such as SPECX
-$                     ! common blocks. These common blocks should always be
-$                     ! the official ones referred to by the logical names, and
-$                     ! not private copies.
-$ fortran extrnl1
-
-\end{verbatim}
-\end{small}
-\item
-Set up the logical names required to link with the NDF library.
-\begin{verbatim}
-$ ndf_dev
-\end{verbatim}
-
-\item
-Copy the file {\tt LINKPG\_NDF.COM} from {\tt SYS\_SPECX}. 
-and edit it to link
-in your own version of the appropriate routine. For example, the
-line:
-\begin{verbatim}
-$ link /exe=specx_v6-2 -
-\end{verbatim}
-might be replaced by:
-\begin{verbatim}
-$ link /exe=specx_v6-2 extrnl1, -
-\end{verbatim}
-\item
-Copy the CLD file {\tt SYS\_SPECX:SPECX62.CLD}, and 
-edit it to run your own version of {\tt SPECX\_V6-2.EXE}. 
-Redefine the SPECX command by typing:
-\begin{verbatim}
-$ set command specx62.cld
-\end{verbatim}
-\end{itemize}
-
-
-\section {The Unix version 6.6}
-\subsection {Getting started}
-
-SPECX is made available by typing:
-\begin{verbatim}
-      % specxstart
-\end{verbatim}
-and started by typing:
-\begin{verbatim}
-      % specx 
-\end{verbatim}
-The program will display the current version number and
-a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
-
-\begin{verbatim}
-                   -------------------------------------------
-                     Specx v6.6 (Unix) ---- 14 December 1994
-                         Copyright (C)  R.Padman & PPARC
-                      Acknowledgements to Horst Meyerdierks
-                   -------------------------------------------
-
         .
-        .
-
-      >> 
+>> 
 \end{verbatim}
+\end{myquote}
 
 Commands may then be entered to read and process data.
 SPECX commands consist of one or more keywords, separated
@@ -335,31 +431,37 @@ from the VMS version 6.3. There are some added topics on the Unix version.
 
 A shell command may be executed by preceding it with a {\tt \$}, {\em e.g.}
 
+\begin{myquote}
 \begin{verbatim}
-      >> $ls
+>> $ls
 \end{verbatim}
+\end{myquote}
+% $
 
 The tab and blank characters, `,', `\verb+\+' and `;' are SPECX delimiters;
 to pass these to the shell the entire string must be enclosed in single 
 inverted commas, {\em e.g.}
 
+\begin{myquote}
 \begin{verbatim}
-      >> '$ls -l scan*.dat'
+>> '$ls -l scan*.dat'
 \end{verbatim}
+\end{myquote}
+% $
 
-{\em Control-C cannot be used to interrupt commands in progress.
+\emph{Control-C cannot be used to interrupt commands in progress.
 Control-C typed at any time will abort the program. Open files may be
 corrupted.}
 
-The {\tt exit} command is the normal method of returning to the shell.
-SPECX can also be suspended in the usual way with Control-Z and later
-resumed with the shell command {\tt fg}.
+The {\tt exit} or \texttt{quit} commands are the normal method of returning to
+the shell.  SPECX can also be suspended in the usual way with Control-Z and
+later resumed with the shell command {\tt fg}.
 
 In some situations SPECX has to be given an end-of-file character. On
 VMS this was Control-Z. On Unix it is Control-D.
 
 
-\subsection {SPECX files and directories}
+\section {SPECX files and directories}
 
 SPECX uses and produces a variety of files. For graphics, 
 intermediate plot files (called {\tt PLOT.}nnn) are produced in the
@@ -367,23 +469,21 @@ current working directory.
 
 SPECX uses Starlink PGPLOT for graphics and thus will produce data files for
 plots sent to some graphics devices ({\em e.g.} {\tt gks74.ps}.N for a
-PostScript printer). These
-are created in the current default directory. They are not submitted to
-any printer and are not deleted. SPECX does not even report the exact
-name of the file when it is created. The user has to keep score of these
-files and send them to printers as desired.
+PostScript printer). These are created in the current default directory. They
+are not submitted to any printer and are not deleted. SPECX does not even
+report the exact name of the file when it is created. The user has to keep
+score of these files and send them to printers as desired.
 
-There is an option (defaulted true) in SPECX which  allows dumping of the
-current status of the program after each  command is executed. This is saved in
-the file {\tt specx.dmp} in the  current default directory. If this file
-does not exist when SPECX  is started for the first time, it will be
-created. If it is
-subsequently deleted (or SPECX is started from a different  directory), the
+There is an option (defaulted true) in SPECX which allows dumping of the
+current status of the program after each command is executed. This is saved in
+the file {\tt specx.dmp} in the current default directory. If this file does
+not exist when SPECX is started for the first time, it will be created. If it
+is subsequently deleted (or SPECX is started from a different directory), the
 package will restart with default initialisation; otherwise SPECX will be
-re-started will all flags as previously  set, data files opened, and so on. 
+re-started will all flags as previously set, data files opened, and so on.
 
 
-\subsection {Examples}
+\section {Examples}
 
 New users should read the introductory chapters of the SPECX manual,
 which give explanations and examples of basic techniques. There is a
@@ -392,12 +492,12 @@ necessary are in the same directory. However, this procedure is not
 commented at all. User are advised to compare it with {\tt demo.spx},
 which is a copy from the VMS version and will probably not work, but has
 comments as to the meaning of the commands.
-{\tt demo.spx} demonstrates the reading of JCMT data,
+{\tt vms\_demo.spx} demonstrates the reading of JCMT data,
 the fitting of baselines and gaussians to spectra, and shows how to make
 and display a data cube.
 
 
-\subsection{Linking user-supplied subroutines}
+\section{Linking user-supplied subroutines}
 
 User-defined commands can be added to SPECX by making use of the
 subroutines EXTRNL1 to EXTRNL10. There is currently little support for
@@ -408,26 +508,30 @@ It is relatively easy to modify the distributed source code. This is
 mainly an option for a local but site-wide version with EXTRNLn
 routines. Assuming that you are a Starlink site manager you would
 proceed as follows
+
+\begin{myquote}
 \begin{verbatim}
-      % cd /star/specx                               # 1
-      % setenv INSTALL /star
-      % ./mk deinstall
+% cd /star/specx                               # 1
+% setenv INSTALL /star
+% ./mk deinstall
 
-      % cd /star                                     # 2
-      % mv specx /star/specx /star/local/specx
+% cd /star                                     # 2
+% mv specx /star/specx /star/local/specx
 
-      % cd /star/local/specx/external                # 3
-      {Make your modifications in this directory}
+% cd /star/local/specx/external                # 3
+{Make your modifications in this directory}
 
-      % cd /star/local/specx                         # 4
-      % setenv INSTALL /star/local
-      % ./mk build
-      % ./mk clean
-      % ./mk install
+% cd /star/local/specx                         # 4
+% setenv INSTALL /star/local
+% ./mk build
+% ./mk clean
+% ./mk install
 
-      % cd /star/local/etc                           # 5
-      {Modify files login and cshrc to reflect that SPECX is in /star/local}
+% cd /star/local/etc                           # 5
+{Modify files login and cshrc to reflect that SPECX is in /star/local}
 \end{verbatim}
+\end{myquote}
+
 \begin{itemize}
 \item[1] De-install the existing package from {\tt /star/bin/specx} and
    {\tt /star/help/specx}. After this step the existing package will
@@ -444,6 +548,7 @@ proceed as follows
 \item[5] Amend the Starlink login files to reflect the different place
    for the SPECX installation.
 \end{itemize}
+
 In order to re-build SPECX you need a number of Starlink libraries and
 include files in their usual place. Non-Starlink sites may or may not
 have been issued with these libraries. As indicators, you can check
@@ -453,7 +558,7 @@ and {\tt /star/figaro/lib/libfit.a}.
 
 \section{Data formats in, and data migration to, the Unix version}
 
-Unix SPECX introduced yet another version of data formats (4.1) for
+Unix SPECX introduced yet another version of data formats (4.1 and 4.2) for
 spectra and for maps. It can read and write disk-FITS. From version 6.6
 onwards it can also read GSD files.
 
@@ -462,8 +567,8 @@ Structures (HDS), a binary format that is portable between different
 machine architectures. Thus you can take version 4.1 spectra from a Sun
 workstation to an Alpha workstation and back, without noticing it.
 
-Version 4.1 map format, too, is based on HDS. Thus maps are portable as
-well.
+Versions 4.1 and 4.2 map formats, too, are based on HDS. Thus maps are
+portable as well.
 
 Data currently held on a VMS file system can be carried across to Unix
 as detailed below. Note that the way back may not be possible, or at
@@ -539,6 +644,13 @@ least difficult.
     Kappa package. This should speed up data access somewhat.
 
     Version 4.1 map files cannot be imported back into SPECX 6.2 or 6.3.
+
+\item {\bf Map files version 4.2:}
+    This is also a portable binary format based on HDS. The structures
+have been rearranged somewhat from v4.1 to improve storage efficiency
+and to try to prevent corruption of the file if specx crashes. Version
+4.1 map files are automatically converted to v4.2.
+
 \end{itemize}
 
 Dump files and the {\tt mapplane.tmp} files are not portable. Care has to
@@ -552,5 +664,807 @@ dump in the working directory that was written by another machine.
 Starlink would like to acknowledge Rachael Padman for making
 the SPECX package available for use, assisting in its installation,
 and providing the example data.
+
+\appendix
+
+\section{Release Notes}
+
+This section includes the release notes for the more recent versions
+of specx. This is especially important for the unix versions since
+the main Specx user manual does not include any of the new features
+that were not part of SPECX v6.3.
+
+\subsection{V6.7-6}
+
+This release is primarily a Y2K bug fix release and also includes an
+updated form of SUN/17.
+
+\begin{description}
+
+\item New commands:
+\begin{itemize}
+\item Add commands to simplify reading of wideband spectra (READ-DUAL-GSD and
+READ-WIDE-SPECTRUM)
+\end{itemize}
+\item Bug fixes:
+\begin{itemize}
+\item Fix problems with year 2000
+\item Allow byte-swapping during FITS reading (was an option that
+    did nothing previously)
+\item Read and write Y2K form of DATE-OBS FITS keyword
+\end{itemize}
+\end{description}
+
+\subsection{V6.7-5}
+
+This is a maintenance update to modify the build system to continue to use
+Starlink-PGPLOT.  There is no change to functionality.
+
+\subsection{V6.7-4}
+
+At this update the graphics devices not available to GKS/PGPLOT have been
+removed from the graphics devices file (various termianl types and gif files).
+There is also a fix to prevent an error when using colour PostScript devices.
+
+\subsection{V6.7-3}
+
+This is a minor update to correct the graphics device names to use the
+GKS/PGPLOT device names, and to fix a bug in the plotting system that caused
+problenms for PostScript devices.
+
+\subsection{V6.7-2}
+
+This release includes a fix to the calculation of integration times from
+RASTER maps and some bug fixes.
+
+The changes include:
+
+\begin{itemize}
+\item Correct calculation of integration time for Raster data.
+
+     This version correctly calculates the equivalent "on+off"
+     integration time for on-the-fly spectra (e.g. a raster time of 5
+     seconds in a 55 by y raster will show up in SPECX as an
+     integration time of about 17 seconds). This change means that you
+     now can safely average raster data with regular "on+off" spectra
+     or different size raster maps.
+
+     Also, note that if you want to combine new rasters with raster
+     data in existing SPECX files, you'll either have to read the old
+     GSD raster files again or you'll have to change the integration
+     time in the headers of the data in the old SPECX files:
+
+\[
+         INT\_TIME = INT\_TIME * \frac{4}{1+\sqrt{55}}
+\]
+
+     for a raster with 55 points per row.
+
+\item Now correctly reads CLASS format FITS data via READ-FITS-SPECTRUM
+
+\item A new variable has been added which gives access to the max and min
+     values used for greyscale plots. The new symbol is MAPLIMITS(2), e.g.,
+\begin{myquote}
+\begin{verbatim}
+>> print maplimits(1)
+\end{verbatim}
+\end{myquote}
+
+   would print the minimum value used for the last greyscale.
+     This is sometimes useful from scripts.
+
+\item GET-SPECTRUM-FROM-MAP now sets the scan number stored in the header
+     to the position of the spectrum in the map. This was to get over
+     a problem encountered when writing spectra to data files that had
+     scan numbers of 0.
+
+\end{itemize}
+
+Minor technical changes:
+
+\begin{itemize}
+
+\item GSD-PREFIX can now be 32 characters instead of 16.
+
+\item The title used for dual channel data (eg RxB3) is now constructed 
+      correctly.
+
+\item System calls are now performed with the SH command on Solaris
+      (this is 10 times faster than the equivalent SYSTEM command
+      since a \texttt{.cshrc} file is not sourced).  This means that different 
+      system source files must be used on Alpha and Solaris systems.
+
+\end{itemize}
+
+\subsection{V6.7-1}
+
+This is the first full Starlink/JAC release of SPECX for UNIX and includes
+significant new functionality added at the JAC.
+
+Changes to include functionality similar to that found in the VMS version:
+\begin{itemize}
+\item command line editing
+\item exception handling (CTRL C)
+\end{itemize}
+
+Other changes:
+\begin{itemize}
+\item NEW-PLOT and OVERLAY now accept a color index (1-15) as second
+        argument. If the color index is negative, each subband (quadrant)
+        of a spectrum is plotted with a different color. The default
+        is now retained in the dump.
+
+\item Auto Y-axis scaling for NEW-PLOT, R-L-B etc now looks only at points
+        in current X-axis range. Still no autoscaling within interactive
+        graphics however.
+
+\item READ-GSD-DATA now also checks DATADIR for gsd files after current
+        directory (setenv DATADIR ... before starting Specx). Has also
+        been speeded up significantly. Reads all subscans at once. 
+        Drawback: won't re-read the disk file (even when altered) until 
+        another GSD file has been read.
+\item DAS-MERGE default for DC adjust changed to 'N'. DAS-MERGE has been 
+        changed from a script to a FORTRAN coded command.
+
+\item SET-INTERACTIVE now 'N' upon entry to SPECX.
+
+\item REGRID has been rewritten to be more robust. ** It has new questions **
+        The original functionality is retained, but it also allows you specify
+        the final number of channels and the centre (in current x-units) of
+        the regridded spectrum.
+
+\item PLOT-LINE-PARS: the bug that cause a crash when not plotting a linear
+        sequence of parameter maps (e.g 1, 2, 3) has now been fixed.
+
+\item INDEX-FILE, COMPRESS-FILE, LIST-MAP allow limits on scan nr and 
+        offset positions if more than 25 scans.
+
+\item New NDF map format - much faster. 
+        Version 4.1 maps WILL BE COPIED to the new format. 
+
+\end{itemize}
+
+New commands:
+\begin{itemize}
+\item DAS-MERGE is now a FORTRAN subroutine i.s.o. a Specx Macro.
+
+\item WRITE-FITS-CUBE (under test).
+
+\item INFO-FILE  (update NDF spectral file header information: for
+         use with SPECX macros. Ensures SPECX variables refer to
+         indicated file.)
+
+\item READ-GSD-RASTER (under test: directly reads all subscans
+         from GSD file into a SPECX file with an optional DAS-MERGE
+         along the way. Much faster than SPECX do-loop). Use the
+         new MERGE-FILES command to average overlapping spectra
+         read with this command.
+
+\end{itemize}
+
+\subsection{V6.1 -- VMS}
+
+This was a VAX only release.
+
+\begin{itemize}
+
+\item  expression\_evaluation 23-12-90  (see NEWS...)
+
+\item   new\_functions 29-12-90 (see NEWS...)
+
+\item   fixed bug in parser : can now do >> <symbol> arg1....
+
+\item   added N\_FSSP, FSS\_INTS, RLB\_INTS, changed name to BLF\_INTS
+
+\item   fixed bug in default intervals for F-S-S, R-P-B etc
+\item   fixed bug in X-V plots (sometimes came out negative)
+
+\item   fixed bug in GEN\_SPRINT, can now format strings
+
+\item   discovered bug in map\_cells .ne. integers
+
+\item   fixed bug in R-G-MAP error return
+
+\item  size of header characters on CONTOUR - not affected by s-p-par?
+\item  size of header characters in P-L-P   - reset to expand=1.0 after first plot
+
+\item   fixed bug in OPEN-MAP; left flag for map open set when crashed on entering
+  from dump (led to subsequent crash on add-to-map).
+
+\item   fixed GRID-SPECTRUM for grids of one row or column only
+
+\item   added frequency polynomial correction for AOSC etc, modified MKHIS etc
+  to plot such scans correctly. Modified XTRANS and XSNART so that MOST
+  data reduction routines now work correctly even with polynomial data.
+
+\item   fixed a but in GETPTS in that it didn't prompt with first set of defaults.
+
+\item   added parameters NC etc for CENTRD, STATS to list of built-in parameters
+
+\item   fixed bug in BINDAT to trap too few binning points.
+
+\end{itemize}
+
+\section{SPECX articles}
+
+This section contains articles written by Rachael Padman for the JCMT
+Newsletter and are included here since they may be difficult to obtain
+from other sources.
+
+\subsection{Frequency and velocity scales in SPECX -- June 1992}
+
+\subsubsection{Introduction}
+
+Traditionally, radio spectral-line analysis programs have displayed velocities
+with respect to the Local Standard of Rest (LSR), using the radio definition
+of velocity. It is now possible to observe at JCMT using Heliocentric,
+Barycentric and Telluric velocity frames, and optical and relativistic
+velocity definitions, and SPECX V6.2 (now released to Starlink) contains the
+appropriate facilities for dealing with such data.
+
+Before describing what SPECX does, it is necessary to review, briefly, what is
+required (see also Gordon 1976). We all know that any relative velocity
+between source and observer gives rise to a corresponding Doppler shift in the
+received frequency. For \emph{small} velocities, then, radioastronomers (who
+think in frequencies) write
+
+\begin{equation}
+\frac{\nu}{\nu_0} = \frac{c-v}{c} = 1-\frac{v}{c}
+\label{eqn:radio}
+\end{equation}
+
+where $v$ is the velocity \emph{away} from the observer. Likewise, optical
+astronomers write a similar formula in wavelengths:
+
+\begin{equation}
+\frac{\lambda_0}{\lambda} = \frac{c}{c+v} = 1-\frac{v}{c+v}
+\label{eqn:optical}
+\end{equation}
+
+
+Finally, it seems that extragalactic observers believe in special relativity,
+which of course tells us that: 
+
+\begin{equation}
+\frac{\nu}{\nu_0} = \sqrt{\frac{c-v}{c+v}}
+\label{eqn:special}
+\end{equation}
+
+(ignoring the smaller doppler shift due to any transverse component of
+velocity). By a simple application of the binomial theorem, we can see that
+these are all equivalent for $v << c$. A problem arises because these
+equations are used in reverse to \emph{define} a velocity, and this definition
+is often used where the approximations in (\ref{eqn:radio}) or
+(\ref{eqn:optical}) are inadmissable. Even the (special) relativistic formula
+applies only in \emph{local} frames, which are not the same thing at all as
+distant cosmological frames. So none of these formula are ``right''.
+
+Normally we reduce our velocities to one of a few commonly agreed standards:
+Radio astronomers prefer the Local Standard of Rest (LSR); extragalactic
+astronomers apparently prefer a Heliocentric system, whilst for some purposes,
+such as instrument or atmospheric diagnostics it may be the Telluric frame that
+is of most interest. Or indeed we may have some favourite other frame which is
+defined with respect to one of these "standard" frames. One that is used quite
+often is the source frame -- for example, if we want the frequency scale to be
+that appropriate to a non-moving source we have to transform all telluric
+(observed) frequencies to a frame comoving with the source. In the case of
+Orion for example this is 9 km/s wrt the LSR, and few of us know the 
+heliocentric velocity. 
+
+Thus our velocity scale is specified by four parameters:
+\begin{enumerate}
+\item      The velocity transformation law.
+\item      The rest frequency or wavelength used in the law.
+\item      The standard frame, and
+\item      The reference velocity expressed in that frame.
+\end{enumerate}
+Here I use the general term "frame" to imply this full specification.
+
+\subsubsection{Observation and display of line spectra}
+
+There are two separate issues. First, we need to \emph{observe} such that the
+line of interest actually occurs within the passband of the instrument
+(normally, but not always, at the centre of the passband). For a heterodyne
+receiver we do this by adjusting the local oscillator frequency by an amount
+equal to the \emph{total} doppler frequency shift expected for the
+line. Second, we then need to \emph{display} the spectrum. Unfortunately, the
+spectrometer is back on Earth, at the telescope, so we need to map the
+I.F. frequencies of individual spectrometerchannels onto velocity (or
+frequency) space in some other chosen frame. This `display' frame need not
+necessarily be the same as the `observation' frame.  For example, whatever the
+observation frame, we may wish to display the output in one of several
+standard frames:
+
+\begin{enumerate}
+\item    In the telluric frame, where the frequencies of spurious responses in
+       the I.F. passband (for example) can be measured, and with any luck,
+       disposed of. Or we may wish to measure absolute frequency in this frame
+       to identify telluric (atmospheric) emission and/or absorption features.
+\item  In the frame of the source (e.g., at a velocity of $V_{lsr}$ offset
+       with respect to the LSR frame itself), when we wish to measure the 
+       absolute frequency of some spectral feature, in case it is a spectral
+       line of some species other than the one we desired.
+\item  In the LSR frame, if we want to determine a velocity to use for distance
+       measurements within the galaxy.
+\item  In a heliocentric frame for velocity determinations of external galaxies
+       (I am told that this is the normal way of doing this.)
+\end{enumerate}
+
+The solution adopted in SPECX is to view all calculations of velocity and/or
+frequency as a two stage process. In the first, the spectral header information
+is used to calculate the telluric centre frequency of the observation. That is,
+we deduce the true frequency as measured at the telescope of a signal appearing
+in the centre channel of the spectrometer. SPECX then produces an `X-array'
+which contains, for each spectrometer channel, the telluric frequency
+corresponding to that channel. Finally, this array is transformed back to the
+display frame. By default the display frame is the same as the observation
+frame, which is encoded in the SPECX and GSD scan headers, but it may be
+changed to any other frame if you like. 
+
+To summarize: SPECX will normally display the data using the velocity frame
+in which it was observed; however you can use SET-VELOCITY-FRAME to select
+another frame, and optionally you can use SET-LINE-REST-FREQ to choose another
+reference frequency for the velocity transformation. Current options for
+frames include LSR, Geocentric, Heliocentric and Telluric, and you have a
+choice of Radio, Optical and Relativistic velocity laws. Because of the
+bewildering number of combinations of these variables, the header on the
+X-axis of the plot has been modified to give a full specification.
+
+\subsubsection{COMPLICATIONS. 1: Displaying the other sideband.}
+
+The command CHANGE-SIDEBAND does the following: First, it calculates the
+telluric centre frequency. Then it adds or subtracts twice the I.F. (depending
+on whether the observations are in LSB or USB respectively). Finally, it
+transforms this telluric frequency to the nominal frame of the observation,
+files it as \texttt{F\_CEN} in the scan header, and changes the sense of the
+frequency step in the spectrometer (\texttt{F\_INC}). GSD spectra stored with
+storage task V6 or earlier do not have the local oscillator frequency stored,
+so SPECX instead asks you for the current sideband and I.F.; for V7 data or
+later SPECX can deduce these from the data in the GSD scan header.
+
+Let us take a specific example. We have a RxB3i spectrum which is centred on CS
+7-6 (rest freq. 342.883 GHz) in the lower sideband.  The nominal I.F. is 1.5
+GHz. In order to look at absolute "rest frame" frequencies, we set the display
+frame to be that of the source itself: 
+
+\begin{myquote}
+\begin{verbatim}
+>> set-velocity-frame
+Output in different vel frame? (Y/N) [Y] 
+Velocity frame? (TELLuric, LSR, HELIocentric, GEOcentric) [TELL] LSR
+Velocity law definition? (OPTical, RADio, RELativistic) [RAD] RAD
+Velocity in new frame? (km/s) [  20.0] vlsr
+\end{verbatim}
+\end{myquote}
+(see Fig 1). (There is a predefined variable "vlsr" equated to the actual value
+for the current spectrum, so we can quote this in response to the last query
+rather than looking up the actual value.) 
+
+For an AOSC spectrum, we would now regrid to a linear scale (see next section
+for more details on this). Then we go ahead and change the sideband:
+\begin{myquote}
+\begin{verbatim}
+>> change-sideband
+Local oscillator frequency not defined...
+Current sideband? (U/L) [L] L
+First i.f.? (GHz) [ 1.500000] 1.5
+
+ --- Header entries changed to other sideband ---
+   Don't forget to SET-LINE-REST-FREQ to set the
+   frequency of the line you wanted to look at -
+   the old line will appear at large velocities!
+\end{verbatim}
+\end{myquote}
+
+As suggested, change the reference frequency to CO 3-2:
+\begin{myquote}
+\begin{verbatim}
+>> set-line-rest-freq
+Receiver # 1  Line rest frequency? (GHz) [  0.000000] 345.795989
+\end{verbatim}
+\end{myquote}
+
+If we have done all this correctly we now get the absolute frequency plot
+shown below (Fig 2). A macro has been provided to do all this -- just type
+IMAGE-FREQ (this calls \texttt{specx\_command:image.spx}).
+
+\subsubsection{COMPLICATIONS. 2: AOSC}
+
+It is well known that the frequency scales of Acousto-Optical spectrometers
+tend to be non-linear. To this end, the SPECX frequency calculation stuff
+contains a facility for correcting the frequency using a polynomial fit to the
+frequency error. For AOSC, the cubic term dominates, and the maximum error is
+about 0.6 MHz, but for somewhat complicated reasons, there is an
+\emph{additional} zero-order (d.c.) term of some 11 or 12 channels, or about 3
+MHz. The implication of this is that a line you might expect to come out in
+the centre channel (1024.5) of the spectrum will actually emerge some 3 MHz
+away, and to compensate for this the GSD header files correct the
+reference-frame observed frequency, \texttt{F\_CEN}, appropriately. This makes
+the display work fine, but has implications for when we want to look at image
+frequencies (as will be shown in a moment).
+
+To correct the frequency scale for AOSC data in particular, I have written a
+small macro, FRQFIX.SPX, which is kept in the "standard" command-files
+directory. It is invoked by the symbol LINEARIZE-AOSC-FREQ:
+\begin{myquote}
+\begin{verbatim}
+>> linearize-aosc-freq
+FRQFIX> Linearization turned off - reset it? (Y/N) [Y] Y
+OK, setting freq coefficients
+FRQFIX> Regrid to uniform sampling? (Y/N) [Y] Y
+ -- AOS frequency scale linearization applied --
+First and last useful channels in input:           1        2038
+Linearization has now been turned off!
+Reset if another spectrum needs correcting
+\end{verbatim}
+\end{myquote}
+
+This macro in fact \emph{also} removes the 3-MHz offset from \texttt{F\_CEN},
+instead adding it into the zero-order term of the correction polynomial, which
+simplifies calculation of the I.F. LINEARIZE also does various checks and
+tidies up the program flags. If you choose to REGRID the data at this point
+you transform the data to a truly linear scale (in current units). Otherwise
+the data will still display correctly, as long as you have the linearization
+turned on (set \texttt{fcorrect=true} or use SET-X).
+
+If you now want to look at the other sideband of AOSC data, remember that the
+effective I.F. at the centre of the passband is not what you might think it
+is, but is actually 1.503 GHz (or 3.943 GHz for RxA1 or RxB2). If on the other
+hand you apply the LINEARIZE-AOSC macro the data will be regridded onto a
+linear scale \emph{and shifted to the nominal channel}. In this case the
+I.F. is the standard 1.5 or 3.94 GHz. There is one Awful Warning: you cannot
+apply linearization to data \emph{after} you have done a CHANGE-SIDE. That
+flips the spectrometer frequency scale, and so will apply the correction 'the
+wrong way round'. So after you have done a CHANGE-SIDE, make sure that
+linearization is turned off, either through SET-X or by typing
+"\texttt{fcorrect=false}".
+
+I thank Per Friberg, Goeran Sandell and Chris Mayer for their help in
+untangling this mess, Louis Noreau for pointing out the need for other
+velocity frames and scaling laws, and Paul Feldman for bringing other
+infelicities in the velocity and frequency scaling to my attention. The system
+in SPECX V6.2 has been written from scratch, and so does not have 10 years of
+testing behind it; please bring any demonstrable faults to my attention. (I do
+not have Donald Knuth's confidence, and do not offer a steadily increasing
+reward for each bug found in my code.)
+
+\subsubsection{Efficient map-making}
+
+Finally, a brief note about map-making. People are making some really quite
+big maps. SPECX tries to hold the entire cube in virtual memory at one time,
+and in fact with various permutations of INTERPOLATE and ROTATE, may want to
+have up to 3 copies of the cube resident. If excessive paging is to be
+avoided, then it is desirable that all these fit into the available physical
+memory of the machine (the working set). The usual consequence if they do not
+is that the whole machine grinds to a halt, without any apparent error...
+
+You can minimize the amount of virtual memory required by only mapping those
+spectral channels of interest. Use TRUNCATE (or DROP-CHANNELS) to dispense
+with spectral channels lying far away from the line; use BIN-SPECTRUM where
+you have higher resolution than you need. Even if you have plenty of memory to
+spare, you can greatly speed up the map-making process by using as few
+channels as possible. To reinforce this point, when you do an OPEN-MAP you are
+now asked explicitly for the number of spectral channels in the cube. You can
+also eliminate one cube from memory altogether by using
+`interpolation-on-demand' (an option in INTERPOLATE-MAP), albeit at the cost
+of slightly increased time to make any particular map.
+
+As noted in the manual, SPECX maps are really channel maps, and no information
+is stored in the header about individual spectra. Thus if you want to map data
+taken in the other sideband from that of the map header, or taken with a
+different spectrometer etc, you first need to INVERT, SHIFT, TRUNCATE etc to
+get your spectrum into the right form. There is a new macro that does this
+automatically: it can be invoked by the command symbol CONVERT-TO-MAP-FORMAT
+this macro is stored along with all the other standard macros in the directory
+with logical name "specx\_command".) Just use this command before you
+ADD-TO-MAP to convert your current spectrum to the same frequency scaling etc
+as the map header.
+
+\subsubsection{References}
+
+M.A. Gordon. Chap 6.1 in "Methods of Experimental Physics", vol 12-C,
+    (Astrophyics -- Radio Observations). Academic Press, NY, 1976
+
+
+\subsection{More on SPECX velocity scales -- January 1993}
+
+Following publication of the last issue of the Newsletter, Pat Wallace (author
+of the \xref{SLALIB}{sun67}{} package) wrote to point out that my use of the
+phrase ``the LSR'' may have been confusing. The ``local standard of rest'' is
+strictly a defined frame, but is meant approximately to represent the basic
+solar motion with respect to the neighbouring stars. This motion is
+established by measuring the radial velocities of the stars in the solar
+neighbourhood. The number you get depends on the depth of the sample (how far
+out you go), and the spectral classes of the stars you use. Thus there are
+several determinations of the \emph{kinematic} solar motion, which differ by a
+few kilometres per second, and by a few degrees in direction. Spectral line
+radio astronomers however traditionally use the defined ``LSR'', which has a
+velocity of 20km/s in the direction of 18h,+30d(B1900), and differs slightly
+from the most modern determinations of the solar motion.
+
+Pat has recently altered the SLALIB routine \texttt{SLA\_RVLSR} to provide a
+better estimate of the {\em dynamical} solar motion --- i.e., the motion of
+the Sun with respect to the appropriate circular orbit around the galactic
+centre.  This also makes \texttt{SLA\_RVLSR} consistent with the routine
+\texttt{SLA\_RVGALC}, but unfortunately there is now a velocity difference of
+up to $\pm 3$km/s between the velocities calculated by \texttt{SLA\_RVLSR} and
+those used by radio astronomers (and SPECX). I propose {\em not} to implement
+this new definition in SPECX, as I suspect it will only cause confusion if
+Orion starts to come out with "an lsr velocity" of 6km/s. Pat Wallace's
+program \xref{RV}{sun78}{}, which is included in the JCMT utilities, {\em is}
+based on the SLALIB routines, but the older version is being retained to
+prevent undue confusion arising as a result of the change in the SLALIB
+routines.
+
+One further note: SPECX and the JCMT control system have both in fact been
+using a velocity of 20km/s towards an apex of 18h,+30d(B1950), as used in the
+original Bonn software. For consistency I will change the epoch used in SPECX
+to B1900 in the next release, but the difference in velocities will be very
+small (<<0.1km/s), so shouldn't be observable for AOSC data. The apex used in
+the telescope control software will also be changed to B1900 as soon as
+practicable. 
+
+My thanks to Pat Wallace, Chris Mayer and Per Friberg for helping me to sort
+out what was actually going on here.
+
+\subsubsection{References}
+
+\begin{enumerate}
+\item J.D.Kraus, 1966. "Radio Astronomy" p47 McGraw-Hill, NY (first edition).
+\item D.A.MacRae and G.Westerhout: "Table for the reduction of velocites to the
+    Local Standard of Rest", The Observatory, Lund, Sweden 1956. (`The Lund
+    Tables'). Uses 20km/s toward 18h,+30d(B1900)
+\item M.A.Gordon, 1976, in "Methods of Experimental Physics", vol 12-C, Chap 6.1
+    (Astrophysics -- Radio Observations), Academic Press, NY.
+\end{enumerate}
+
+\subsubsection{Bugs}
+
+One serious bug has surfaced in SPECX6.2, which means that some maps are
+``unopenable''. The program starts to open them, and then falls over. A kluge
+which fixes this in some cases is to open another map first, then open the
+offending map afterwards. However the only real fix is to replace the 
+incorrect routine. Any site which has problems can obtain a copy of the
+routine direct from me, or from John Lightfoot at ROE (REVAD::JFL).
+
+\subsubsection{JCMT Updates}
+
+A slightly revised version of SPECX (V6.2-A) is running at JCMT. This fixes
+the bug described above, and one or two other very minor problems. Changes
+include now being able to open up to 8 SPECX data files (was 3), and being
+able to change the parameters controlling the ``MRAO colour spiral'' (colour 5
+for colour-greyscale mapping). There is also a tentative implementation of
+logarithmic greyscales -- just hit the `0' key to toggle from log to linear
+and back.
+
+I have added a command definition UTILS, which prints a file that describes
+the ``system macros'' -- \texttt{.spx} files written to accomplish certain
+oft-needed functions, including those such as `map-average' and `fetch' that
+have been described in previous versions of the newsletter.
+
+
+\subsection{SPECX V6.3 for VMS and a UNIX release -- January 1994}
+
+The good news (for those for whom that sort of news is good) is that, thanks
+largely to the efforts of Horst Meyerdierks at The University of Edinburgh, and
+following an intensive burst of work over Christmas on my part, SPECX should
+shortly be available on Starlink UNIX platforms. Large parts of the port are
+complete but it is not quite clear when there will be enough of a system to be
+worth releasing it to Starlink. At the date of writing (4th January) neither
+GSD nor FITS i/o has been implemented, so there is still no way to import data
+other than by direct conversion of VAX files in SPECX internal format. Horst
+has written a standard SPECX command to do this - for the present anyway it
+produces .SDF files, which use Starlink NDF and HDS libraries. Remo Tilanus has
+been working on a GSD reader, and converting the FITS stuff should not be too
+difficult (although tape i/o will probably not be supported under UNIX), so
+with any luck it will not be too difficult to finish off V6.4. 
+
+Unfortunately a number of the nicest features of the VAX version - such as
+CTRL C
+handling and proper support for dual-screen alpha graphics terminals - are
+unlikely to be available in the first UNIX version (6.4), and users may notice
+some "debug" type statements which are unfortunately necessary to circumvent
+bugs in the f77 compiler, but for most purposes SPECX V6.4 should satisfy
+the need. With any luck it will be released to Starlink during February,
+and if not, then soon after. Whether the documentation will be
+available by then is another matter. 
+
+Horst is aware of the need to be able to export SPECX to non-Starlink
+sites without them needing to take on the whole of the Starlink environment,
+and I am assured that this will be possible. However in the first instance
+it is probable that UNIX software will be available only through ROE, or
+later through the Starlink Librarian --- in any case, probably
+not from me directly.
+
+Meanwhile, for those who do have access to a VAX still, and while
+you are at the telescope, the improvements in V6.3 should make life
+easier. In fact the release of this version has been prompted mainly
+by the successful commissioning of the DAS, which in turn has required
+major changes in the internals of SPECX to accomodate extra header
+information required to define the frequency scales accurately.
+Several new commands have been added for dealing with DAS data, while
+others have been modified slightly.
+
+Most importantly, the SPECX internal datafile and map format has changed.
+As always, SPECX 6.3 is able to read any existing files and maps you may have,
+but it is no longer able to write to them. Map files (with the .MAP 
+extension) are converted to V3 the first time they are opened by the
+new program --- if you intend also to use earlier versions of SPECX then
+make a copy of the map before you use V6.3 for the first time. This is
+not true of ordinary datafiles; you just can't write spectra to them 
+any more, but it is a simple matter to open a new file and then copy the
+spectra across one by one or in a DO loop.
+
+
+The reason these file formats have had to change is to accomodate the
+LO and IF frequencies in the header, along with the velocity of the
+source in various frames. These were not previously available in the
+GSD file, but were derived within SPECX from the specified source-frame
+centre frequency of each sub-band. This is not however a natural way to
+do things, and proved prone to error with increasingly complex data
+such as those produced by the DAS. Hence the change. Since things \emph{were}
+changing I have taken the opportunity to tidy up some other relics of
+bygone computer systems --- RA and DEC are now stored internally as R*8
+degrees, and the map offsets are stored as reals. This has meant
+changes to some of the macros supplied with SPECX, and if you use these
+variables in your own macros then you will need to modify them
+accordingly.
+
+\subsubsection{New and modified commands}
+
+\begin{itemize}
+\item CLIP-SPECTRUM       --- Sets all values in a spectrum outside of the specified
+                        range to a specified value.
+
+\item CONCATENATE-SPECTRA --- Combines all sub-bands of the spectra in X and Y stack
+                        positions into a new spectrum (the individual subbands
+                        are retained).
+
+\item WRITE               --- A version of PRINT modified to write into an SCL
+                        character variable which can then be used in response
+                        to a request of character input (a filename say)
+
+\item READ-FITS-SPECTRUM  --- Reads a SPECX or CLASS FITS spectrum from a disk-FITS
+                        file into the X stack position.
+
+\item OPEN-FITS-FILE      --- Replaces OPEN-FITS-OUTPUT-FILE, and has new questions.
+
+\item CLOSE-FITS-FILE     --- Replaces CLOSE-FITS-OUTPUT-FILE
+
+\item SET-PLOT-SCALE      --- Now lets you specify auto-scaling for the X and Y
+                        plot axes separately.
+
+\item SET-MAP-PARAMETERS  --- Now lets you specify that the map axes are to be
+                        scaled in sexagesimal form - i.e., RA and Dec in HMS.
+
+\item SHOW-VARIABLES      --- Accepts VMS-type wildcards, so that, for example, the
+                        command ``\verb+>> show-var f*+'' will return all SCL variables
+                        that begin with the letter f.
+
+\item PLOT-LINE-PARAMETERS--- As well as the existing set of parameters (Tmax, Vmax,
+                        Integrated intensity and Delta(v)), now also offers you
+                        the 1st and 2nd moments of the line profile. The 1st
+                        moment is the Centroid; the 2nd moment approximates the
+                        line width for lines of good Signal/Noise ratio.
+\end{itemize}
+
+\subsubsection{Bad channel/Magic value handling}
+
+Bad-channel handling has been available for some time in the various
+mapping functions, although it tends to go unseen (except when you
+forget to do an INTERPOLATE for sparsely sampled data). A version of
+this has now been introduced for single-spectrum data. Channels in
+spectra set to this value are not displayed on plots, or used in
+computing quantities such as maximum intensity or line width. Channels
+which end up being unspecified, as the result of a SHIFT operation say,
+are now set to the bad channel value, rather than zero as before. Bad
+channels can be interpolated over with smoothing commands such as HANN,
+SMOOTH, CONVOLVE, BIN etc.
+
+You can determine the current setting of the bad channel value by doing:
+\begin{myquote}
+\begin{verbatim}
+>> print badpix_value
+\end{verbatim}
+\end{myquote}
+and if you don't like it, you can change it by doing:
+\begin{myquote}
+\begin{verbatim}
+>> badpix_value = -100
+\end{verbatim}
+\end{myquote}
+for example. The one place where bad channels in spectra are not handled
+well is in spectra in a map cube  --- fewest problems will result if you
+smooth over such bad channels before ADDing to the map, or choose a value
+of \texttt{badpix\_value} close to zero (I tend to use 1.e-5 by default). Although
+we did have some teething problems with this feature, it seems to be working
+pretty well now --- It is particularly useful for dealing with DAS data, where
+the end channels of each subband tend to be set to $10^4$ or some such similar
+value, and totally destroy the auto-scaling of plots.
+
+Note that if you change the value of \texttt{badpix\_value} as shown above, then 
+previously ``hidden'' channels in your data will now be displayed, and/or
+used in reduction operations.
+
+
+\subsubsection{Map display}
+
+A few mostly cosmetic changes have been introduced here. Displays involving
+greyscales will mostly now have a scale-bar displayed wherever there seems
+to be most room. This is not foolproof however, and for some unfortunately
+sized maps the scale-bar may vanish off the edge of the plot area -- just
+do SET-MAP-SIZE if this is the case. Note that the scale bar will \emph{not}
+appear in the case of PLOT-LINE-PARAMETERS when more than one map is made ---
+the various maps in this case have different scales, and it did not seem
+sensible to try to generate scale-bars for each independent panel.
+
+Also, you can now display RA and Dec coordinates (only) in all forms of
+map display (GRID, CHANNEL-MAP, GREY, CONTOUR and PLOT-LINE-PAR) in 
+standard sexagesimal notation. That is, absolute positions are displayed,
+in HMS and DMS respectively. You can however still display things in the
+old way if you want -- the map centre RA and DEC are now indicated in the
+axis labels. Use SET-MAP-PARAMETERS to change the default axis scaling.
+
+
+\subsubsection{FITS i/o}
+
+There have been ongoing problems with exchanging single spectra in FITS
+format between SPECX and CLASS. We (Remo Tilanus and I) believe that
+this has now been cured, following minor changes to both programs (with
+the cooperation of the CLASS authors at IRAM). Certainly SPECX now
+seems to produce valid CLASS spectra. I have also resurrected John
+Richer's FITS reader, and with a great deal of hacking turned it into a
+standard command that reads disk-FITS spectra (SIMPLE=.TRUE. only) into
+the X position of the stack. This command is READ-FITS-SPECTRUM   ---
+open the FITS file with OPEN-FITS-FILE and close it afterwards with
+CLOSE-FITS-FILE as before (note that the names of these commands have
+been changed from OPEN-FITS-OUTPUT-FILE and CLOSE-FITS-OUTPUT-FILE
+respectively).
+
+FITS maps are more of a problem. Claire Chandler has recently modified
+WRITE-FITS-MAP to make it compatible with AIPS (it always used to be, so I
+assume that AIPS has changed too...), but this is probably \emph{not}
+compatible with CLASS. We may eventually need separate commands to write FITS
+maps for different targets.
+
+
+\subsubsection{Frequency and Velocity scaling of Plots}
+
+It is now possible to produce plots which have the image sideband 
+frequency along the top axis. To get this, all you have to do is to
+choose the absolute frequency options in SET-X-SCALE. Note however 
+that it is unlikely to be correct unless the display frame is the one
+in which the source is at rest. Since you *may* have observed with
+(say) the LSR velocity not equal to that of the source itself, I can't
+protect you from this. But in most cases it will be sufficient to do
+\begin{myquote}
+\begin{verbatim}
+>> SET-VELOCITY-FRAME yes lsr radio vlsr
+\end{verbatim}
+\end{myquote}
+That is, choose a velocity reference frame which is defined as having
+velocity offset with respect to the standard of rest the same as that
+of the source itself (modify as appropriate for heliocentric,
+geocentric or telluric frames, and for different velocities or velocity
+definitions).
+
+HOWEVER... You must realize that most plotting packages, PGPLOT
+amongst them, accept REAL*4 numbers only. So if you display things in
+absolute frequency, it is not possible to get velocities accurate to
+better than a couple of MHz in three hundred odd GHz, no matter how
+accurately they are calculated internally in SPECX. For more accurate
+displays, choose a convenient reference frequency in the absolute
+frequency option in SET-X. For  example, if you have a set of lines 
+in the range 338 -- 339 GHz, then choose a reference frequency of
+338 GHz, and remember to add this back on to any frequency you determine
+with FIT-GAUSSIAN, or using the cursor.
+
+My thanks to Remo Tilanus in particular for his help,
+provision of DAS data, and rapid turn around of queries while we
+were solving the problems associated with the DAS. My apologies to
+anyone who may have been inconvenienced by problems in the Beta-test
+version --- I hope you appreciate that it was the only way to make
+DAS data available at all.
+
 
 \end{document}
