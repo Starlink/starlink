@@ -25,9 +25,9 @@ proc red4Flux {taskname} {
     set Red4Widgets(FC_ENT01) [entry $top.e0 -width 60]
     pack $Red4Widgets(FC_LAB01) $Red4Widgets(FC_ENT01) -in $top -side left -expand yes -fill x
     $Red4Widgets(FC_ENT01) insert end $Red4Widgets(DS)
-    bind $RedWidgets(FC_LAB01) <Button-2> "red4Update red4Flux ALL"
-    bind $RedWidgets(FC_ENT01) <Button-2> "red4Update red4Flux FC_ENT01"
-    bind $RedWidgets(FC_ENT01) <Double-Button-2> "$Red4Widgets(FC_ENT01) delete 0 end"
+    bind $Red4Widgets(FC_LAB01) <Button-2> "red4Update red4Flux ALL"
+    bind $Red4Widgets(FC_ENT01) <Button-2> "red4Update red4Flux FC_ENT01"
+    bind $Red4Widgets(FC_ENT01) <Double-Button-2> "$Red4Widgets(FC_ENT01)  delete 0 end"
 
     set umid [frame $mid.um]
     set bmid [frame $mid.bm]
@@ -42,9 +42,9 @@ proc red4Flux {taskname} {
     set ilm [radiobutton $umid.lm -width 28m -height 5m -bitmap @$cgs4drBitmaps/lmag.xbm -variable Red4Widgets(FC_FIN) -value "L"]
     set ilpm [radiobutton $umid.lpm -width 28m -height 5m -bitmap @$cgs4drBitmaps/lpmag.xbm -variable Red4Widgets(FC_FIN) -value "L'"]
     pack $Red4Widgets(FC_LAB02) $Red4Widgets(FC_ENT02) $ijm $ihm $ikm $ilm $ilpm -in $umid -side left -padx 1
-    bind $RedWidgets(FC_LAB02) <Button-2> "red4Update red4Flux ALL"
-    bind $RedWidgets(FC_ENT02) <Button-2> "red4Update red4Flux FC_ENT02"
-    bind $RedWidgets(FC_ENT02) <Double-Button-2> "$Red4Widgets(FC_ENT02) delete 0 end"
+    bind $Red4Widgets(FC_LAB02) <Button-2> "red4Update red4Flux ALL"
+    bind $Red4Widgets(FC_ENT02) <Button-2> "red4Update red4Flux FC_ENT02"
+    bind $Red4Widgets(FC_ENT02) <Double-Button-2> "$Red4Widgets(FC_ENT02) delete 0 end"
     bind $ijm <Button-2> "red4Update red4Flux FC_FIN"    
     bind $ihm <Button-2> "red4Update red4Flux FC_FIN"    
     bind $ikm <Button-2> "red4Update red4Flux FC_FIN"    
@@ -83,7 +83,7 @@ proc red4Flux {taskname} {
       -variable Red4Widgets(FC_FOUT) -value "mJy"]
     pack $Red4Widgets(FC_LAB03) $owu $owh $oer $omj -in $bot -side left -padx 1 -expand yes -fill x
     set Red4Widgets(FC_FOUT) "W/m2/um"
-    bind $RedWidgets(FC_LAB03) <Button-2> "red4Update red4Flux ALL"
+    bind $Red4Widgets(FC_LAB03) <Button-2> "red4Update red4Flux ALL"
     bind $owu <Button-2> "red4Update red4Flux FC_FOUT"    
     bind $owh <Button-2> "red4Update red4Flux FC_FOUT"    
     bind $oer <Button-2> "red4Update red4Flux FC_FOUT"    
