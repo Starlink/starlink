@@ -438,6 +438,8 @@
 *
 *    Local variables :
 *
+      CHARACTER*5	   	GRP			! Object names
+
       DOUBLE PRECISION       SIGMA              ! Criterion for ignoring data points.
       DOUBLE PRECISION       MEAN               ! Mean of data points.
       DOUBLE PRECISION       SUM                ! Sum of data points.
@@ -462,10 +464,17 @@
       LOGICAL                USEWEIGHT          ! Use weights?
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Default is to use weights
+*  What to call points
+      IF ( GRP ) THEN
+        OBJ = 'group'
+      ELSE
+        OBJ = 'point'
+      END IF
+
+*  Default is to use weights
       USEWEIGHT = .TRUE.
       NBAD = 0
 
@@ -524,8 +533,8 @@
       IF ( NBAD .GT. 0 ) THEN
         CALL AIO_BLNK( OCH, STATUS )
         CALL MSG_SETI( 'NB', NBAD )
-        CALL AIO_WRITE( OCH, ' ^NB points excluded by bad data quality',
-     :                  STATUS )
+        CALL AIO_WRITE( OCH, ' ^NB '//OBJ/
+     :                  /'s excluded by bad data quality', STATUS )
         CALL AIO_BLNK( OCH, STATUS )
         IF ( NBAD .EQ. N ) THEN
           STATUS = SAI__ERROR
@@ -538,8 +547,8 @@
       IF ( NBIGW .GT. 0 ) THEN
         CALL AIO_BLNK( OCH, STATUS )
         CALL MSG_SETI( 'NB', NBIGW )
-        CALL AIO_WRITE( OCH, ' ^NB points excluded as weights too '/
-     :                  /'large to square', STATUS )
+        CALL AIO_WRITE( OCH, ' ^NB '//OBJ//' excluded as weights too'/
+     :                  /' large to square', STATUS )
         CALL AIO_BLNK( OCH, STATUS )
       END IF
       NBAD = NBAD + NBIGW
@@ -598,11 +607,7 @@
 
 *        Output sigma to be ignored, and header for ignored list.
           CALL MSG_SETD( 'SIG', SIGMA )
-          IF ( GRP ) THEN
-            CALL MSG_SETC( 'OBJ', 'groups' )
-          ELSE
-            CALL MSG_SETC( 'OBJ', 'points' )
-          END IF
+          CALL MSG_SETC( 'OBJ', OBJ//'s' )
           CALL AIO_WRITE( OCH, ' Ignoring ^OBJ > ^SIG standard '/
      :                    /'deviations from the mean.', STATUS )
 
@@ -770,7 +775,7 @@
 
 
 *+  STATISTIX_DISPLAY - writes the results to appropriate unit.
-      SUBROUTINE STATISTIX_DISPLAY( GRP, NDIM, DIMS, N, WTERR, VAROK,
+      SUBROUTINE STATISTIX_DISPLAY( OBJ, NDIM, DIMS, N, WTERR, VAROK,
      :                              MEAN, SUM, STDDEV, SKEWNESS,
      :                              KURTOSIS, MINVALUE, MAXVALUE, MINP,
      :                              MAXP,
@@ -796,7 +801,7 @@
 *
 *    Import :
 *
-      LOGICAL			GRP			! Data is grouped?
+      CHARACTER*(*)		OBJ
       INTEGER                NDIM               ! Input dimensionality
       INTEGER                DIMS(ADI__MXDIM)   ! Input dimensions
       INTEGER                OCH                ! Output channel
@@ -824,7 +829,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*5		OBJ			! Object type
       CHARACTER*79		OBUF			! Output buffer
       CHARACTER*24           	PSTR               	! Pixel index string
 
@@ -839,12 +843,6 @@
 
       WRITE( OBUF, 10 )
       CALL AIO_WRITE( OCH, OBUF, STATUS )
-
-      IF ( GRP ) THEN
-        OBJ = 'group'
-      ELSE
-        OBJ = 'point'
-      END IF
 
       WRITE( OBUF, '(7X,A1,2X,I10,1X,3A,5X,I10,1X,2A,8X,A1)' )
      :         '*', N, 'data ',OBJ,'s.', NVALID, OBJ, 's used.','*'
