@@ -14,7 +14,8 @@
 
 *  Description:
 *     This routine writes the SET header to the .MORE.CCDPACK extension
-*     of an NDF.  If one already exists it is overwritten.  
+*     of an NDF.  If one already exists it is overwritten and a mild 
+*     warning is output. 
 *
 *     Unless JSET is set equal to AST__NOFRAME, The WCS component
 *     is also modified, a new frame in the Domain CCD_SET
@@ -142,6 +143,8 @@
 *  If a SET structure exists already, erase it.
       CALL DAT_THERE( XLOC, 'SET', THERE, STATUS )
       IF ( THERE ) THEN
+         CALL CCD1_MSG( ' ', '      Removing existing SET header',
+     :                  STATUS )
          CALL DAT_ERASE( XLOC, 'SET', STATUS )
       END IF
 
