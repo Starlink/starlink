@@ -16,6 +16,8 @@
  *			B.K.McIlwrath	27/7/93 + 15/11/93
  *      Terminate returned SUBSTR:
  *                      A.J.Chipperfield  19/10/94
+ *      Fix core dump in DEC2S function when angle > 100
+ *                      T.Jenness 21 Feb 2005
  *
  ******************************************************************************
  */
@@ -237,16 +239,17 @@ func_syserr(node *n)
     char *facility, *ident, *text, *format;
     char buff[132];
 
+    format = NULL;
     arg1 = arglist[0];
     arg2 = arglist[1];
     if (isexc(val = nargs_in_range(0, 2)))
 	return val;
-    if (nargs == 2)
+    if (nargs == 2) {
 	if (isexc(val = interpret_to_integer(arg2)))
 	    return val;
 	else
 	    status = integer_part(val);
-
+    }
     if (nargs != 0) {
 	if (isexc(val = interpret_to_string(arg1)))
 	    return val;
@@ -418,6 +421,7 @@ func_dec2s(void)
     int deg, min;
     value val;
     node *arg1, *arg2, *arg3;
+    char sign;
 
     arg1 = arglist[0];
     arg2 = arglist[1];
@@ -427,6 +431,7 @@ func_dec2s(void)
     if (isexc(val = interpret_to_real(arg1)))
 	return val;
     secs = 360 * 3600 * real_part(val) / (2 * M_PI);
+    sign = ( real_part(val) > 0 ? '+' : '-' );
     if (isexc(val = interpret_to_integer(arg2)))
 	return val;
     ndp = integer_part(val);
@@ -460,13 +465,14 @@ func_dec2s(void)
   	    ++deg;
         }
     }
-    if (deg > 99 || deg < -99)
-	sprintf(res, "%c**%c%02d%c%0*.*f",
-		(deg < 0 ? '-' : '+'), sep, min, sep,
-		ndp ? ndp + 3 : 2, ndp, ndp, secs);
+    deg =  ( deg < 0 ? (-1*deg) : deg);
+    if (deg > 99)
+	sprintf(res, "%c%03d%c%02d%c%0*.*f",
+		sign,deg, sep, min, sep,
+		(ndp ? ndp + 3 : 2), ndp, secs);
     else
-	sprintf(res, "%+02d%c%02d%c%0*.*f",
-		deg, sep, min, sep, ndp ? ndp + 3 : 2, ndp, secs);
+	sprintf(res, "%c%02d%c%02d%c%0*.*f",
+		sign, deg, sep, min, sep, (ndp ? ndp + 3 : 2), ndp, secs);
     return value_string(res);
 }
 

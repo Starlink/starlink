@@ -1,3 +1,10 @@
+ICL Version 3.1-10 is released
+
+    o Lots of fixes to enable ICL to build on cygwin and OSX
+      using autoconf
+    o Fix core dump in DEC2S function when angle>100 deg
+    o Fix bug when angle is between 0 and -1
+
 ICL Version 3.1-9 is released
 
 The SEND command now works for all CONTROL messages - ie:
