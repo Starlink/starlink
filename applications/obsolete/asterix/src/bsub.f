@@ -2912,7 +2912,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER   N_AZIM, N_ELEV 	!No of grid pts in Az and Elev
 
-	INTEGER   MAX
+c	INTEGER   MAX
 
 	INTEGER   I, J			!local counters
 
