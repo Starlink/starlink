@@ -1,0 +1,56 @@
+1 EXP10
+Takes the base-10 exponential of an NDF data structure.
+
+Usage:
+
+   exp10 in out
+
+Description:
+
+   This routine takes the base-10 exponential of each  pixel of a NDF
+   to produce a new NDF data structure.
+
+   This command is a synonym for "expon base=10D0".
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   Output NDF data structure being the exponential of the input NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+exp10 a b
+   This takes exponentials to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b inherits its title
+   from a.
+
+exp10 title="Abell 4321" out=b in=a
+   This takes exponentials to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b has the title
+   "Abell 4321".
+2 Related_Applications
+   KAPPA: LOG10, LOGAR, LOGE, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+   IPOWER.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 13 (MJC):
+    Original NDF version.
+ 1997 November 5 (MJC):
+    Added WCS propagation.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+   NDF data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
