@@ -1,0 +1,71 @@
+\sstroutine{
+   CONHELP
+}{
+   Gives help about CONVERT
+}{
+   \sstdescription{
+      Displays help about {\sc CONVERT}.  The help information has classified
+      and alphabetical lists of commands, general information about
+      {\sc CONVERT} and related material; it describes individual commands in
+      detail.
+
+      Here are some of the main options:
+      \begin{tabbing}
+      abc \= \kill
+      {\tt CONHELP} \\
+      \> No parameter is given so the introduction and the top-level
+         help index is displayed.
+      \\
+      {\tt CONHELP application/topic} \\
+         \>   This gives help about the specified application or topic. \\
+      {\tt CONHELP application/topic subtopic} \\
+      \> \begin{minipage}[t]{143mm}
+            This lists help about a subtopic of the specified
+            application or topic. The hierarchy of topics has a maximum
+            of four levels.
+      \end{minipage}
+      \\
+      {\tt CONHELP SUMMARY} \\
+         \>   This shows a one-line summary of each application. \\
+      \end{tabbing}
+
+      Once in the help library, it can be navigated in the normal
+      way.  CTRL/Z (on VMS) and CTRL/D (on UNIX) to exit from any level,
+      and $<$CR$>$ to move up a level in the hierarchy.
+   }
+   \sstusage{
+      CONHELP [TOPIC] [SUBTOPIC] [SUBSUBTOPIC] [SUBSUBSUBTOPIC]
+   }
+   \sstparameters{
+      \sstsubsection{
+         TOPIC = LITERAL (Read)
+      }{
+         Topic for which help is to be given. {\tt [" "]}
+      }
+      \sstsubsection{
+         SUBTOPIC = LITERAL (Read)
+      }{
+         Subtopic for which help is to be given. {\tt [" "]}
+      }
+      \sstsubsection{
+         SUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubtopic for which help is to be given. {\tt [" "]}
+      }
+      \sstsubsection{
+         SUBSUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubsubtopic for which help is to be given. {\tt [" "]}
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Uses the portable help system.
+
+         \sstitem
+         The help libraries are slightly different for VMS and UNIX.
+      }
+   }
+}
