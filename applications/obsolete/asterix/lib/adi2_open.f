@@ -106,7 +106,6 @@
 
 *    Extract name and access mode
       CALL ADI_GET0C( FID, FSPEC, STATUS )
-      FLEN = CHR_LEN( FSPEC )
       CALL ADI_GET0C( MID, MODE, STATUS )
 
 *    Parse the file name
