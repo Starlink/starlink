@@ -10,11 +10,12 @@
 *
 *	Contents:	Astrometrical computations.
 *
+*	Last modify:	05/04/99: (EB)
 *	Last modify:	13/06/98 (EB)
 *                       04/01/99 (PWD): Converted to use NDF AST
 *                       information for coordinate transformations
 *                       (including precession).  Model of local affine
-*                       transform is retained for to modifying
+*                       transform is retained for modifying
 *                       measurements based on area and angle etc.
 *                       25/09/99 (PWD): Added astNorm calls after all
 *                       astTran2s.
