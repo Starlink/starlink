@@ -47,7 +47,7 @@
 *     1997 May 31 (MJC):
 *        Added KSTEST and SUBSTITUTE for V0.10.
 *     7-OCT-1998 (DSB):
-*        Added PROFILE LISTSHOW LISTMAKE WCSALIGN for V0.13
+*        Added COPYBAD PROFILE LISTSHOW LISTMAKE WCSALIGN for V0.13
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,6 +150,10 @@
 *  Convolves a pair of 1- or 2-dimensional NDFs together.
       ELSE IF ( NAME .EQ. 'CONVOLVE' ) THEN
          CALL CONVOLVE ( STATUS )
+
+*  Copies bad pixels from one NDF to another.
+      ELSE IF ( NAME .EQ. 'COPYBAD' ) THEN
+         CALL COPYBAD ( STATUS )
 
 *  Generate a test 2-d data array from a selection of several types.
       ELSE IF ( NAME .EQ. 'CREFRAME' ) THEN

@@ -227,7 +227,7 @@
 #     7-OCT-1998 (DSB):
 #        Version 0.13. Added internal NDG library. Added applications
 #        WCSFRAME, WCSALIGN, WCSADD, WCSATTRIB, WCSREMOVE, PROFILE,
-#        LISTMAKE, LISTSHOW, CHAIN, RESHAPE
+#        LISTMAKE, LISTSHOW, CHAIN, RESHAPE, COPYBAD
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -656,7 +656,7 @@ KAPPA_F_ROUTINES = \
 add.f aperadd.f ardgen.f ardmask.f \
 block.f cadd.f calc.f calpol.f cdiv.f \
 centroid.f chpix.f cmult.f compadd.f \
-compave.f compick.f convolve.f \
+compave.f compick.f convolve.f copybad.f \
 creframe.f csub.f kap_div.f errclip.f \
 exp10.f expe.f expon.f ffclean.f \
 fillbad.f fitsurface.f flip.f fourier.f \
@@ -741,7 +741,8 @@ medref.f medrep.f medset.f medwts.f medwv.f mfnext.f mfopen.f moscad.f \
 moscdv.f namsrv.f nmplot.f opus.f otstsb.f peepsb.f setcr.f setknt.f \
 shifts.f shiftx.f shifty.f slc2t1.f slc2t3.f sqshs.f sqshx.f sqshy.f \
 stat3d.f statsb.f statv.f strx.f stry.f thrsr.f trgscl.f trigsb.f \
-tropus.f uput.f uget.f
+tropus.f uput.f uget.f kps1_cpbd.f kps1_cpbr.f kps1_cpbi.f kps1_cpbw.f \
+kps1_cpbb.f kps1_cpbuw.f kps1_cpbub.f 
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -2430,6 +2431,7 @@ copar.o:	 SAE_PAR
 copy1d.o:	 SAE_PAR
 copy2d.o:	 SAE_PAR
 copy3d.o:	 SAE_PAR
+copybad.o:	 SAE_PAR NDF_PAR
 cpsecr.o:	 SAE_PAR
 creframe.o:	 SAE_PAR DAT_PAR PAR_ERR
 crelut.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR CTM_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
@@ -3114,7 +3116,13 @@ kps1_cntur.o:	 SAE_PAR PRM_PAR
 kps1_cnvfp.o:	 SAE_PAR
 kps1_cnvlv.o:	 SAE_PAR PRM_PAR
 kps1_cnvrp.o:	 SAE_PAR
-kps1_cuxyr.o:	 SAE_PAR PRM_PAR
+kps1_cpbd.o:	 SAE_PAR PRM_PAR
+kps1_cpbr.o:	 SAE_PAR PRM_PAR
+kps1_cpbi.o:	 SAE_PAR PRM_PAR
+kps1_cpbw.o:	 SAE_PAR PRM_PAR
+kps1_cpbb.o:	 SAE_PAR PRM_PAR
+kps1_cpbuw.o:	 SAE_PAR PRM_PAR
+kps1_cpbub.o:	 SAE_PAR PRM_PAR
 kps1_discl.o:	 SAE_PAR PRM_PAR NDF_PAR NDF_ERR SUBPAR_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
 kps1_dscld.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D

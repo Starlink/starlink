@@ -62,7 +62,7 @@
 #        IDVISIBLE.
 #     7-OCT-1998 (DSB):
 #        Added WCSSHOW, PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
-#        WCSCOPY, WCSFRAME, CHAIN, RESHAPE and WCSREMOVE for V0.13.
+#        WCSCOPY, WCSFRAME, CHAIN, RESHAPE, COPYBAD and WCSREMOVE for V0.13.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -125,6 +125,7 @@ alias compick   $KAPPA_DIR/compick
 alias contour   $KAPPA_DIR/contour
 alias contover  $KAPPA_DIR/contover
 alias convolve  $KAPPA_DIR/convolve
+alias copybad   $KAPPA_DIR/copybad
 alias creframe  $KAPPA_DIR/creframe
 alias crelut    $KAPPA_DIR/crelut
 alias csub      $KAPPA_DIR/csub
@@ -334,6 +335,7 @@ alias kap_compress  echo compress is withdrawn.  Use compave instead.
 alias kap_contour   $KAPPA_DIR/contour
 alias kap_contover  $KAPPA_DIR/contover
 alias kap_convolve  $KAPPA_DIR/convolve
+alias kap_copybad   $KAPPA_DIR/copybad
 alias kap_creframe  $KAPPA_DIR/creframe
 alias kap_crelut    $KAPPA_DIR/crelut
 alias kap_csub      $KAPPA_DIR/csub

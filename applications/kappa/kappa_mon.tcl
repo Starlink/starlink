@@ -34,6 +34,8 @@ set OutputParList(compick) {}
 set DynParList(compick) {}
 set OutputParList(convolve) {}
 set DynParList(convolve) {}
+set OutputParList(copybad) {}
+set DynParList(copybad) {}
 set OutputParList(creframe) {}
 set DynParList(creframe) {}
 set OutputParList(csub) {}

@@ -27,6 +27,7 @@ colour_table_and_palette -
        contour - Contour a 2-d NDF.
       contover - Contour a 2-d NDF overlaid on an image displayed previously.
       convolve - Convolve a pair of 1- or 2-d NDFs together.
+       copybad - Copy bad pixels from one NDF to another.
       creframe - Generate a test 2-d data array from a choice of several types.
         crelut - Create or manipulate an image-display lookup table using a
                   palette.

@@ -46,7 +46,7 @@
 {        IDVISIBLE.
 {     7-OCT-1998 (DSB):
 {        Added PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
-{        WCSCOPY, WCSFRAME, WCSSHOW and WCSREMOVE for V0.13.
+{        WCSCOPY, WCSFRAME, WCSSHOW, COPYBAD and WCSREMOVE for V0.13.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -74,6 +74,7 @@ define   compad(d)  $KAPPA_DIR/kappa_mon
 define   compav(e)  $KAPPA_DIR/kappa_mon
 define   compi(ck)  $KAPPA_DIR/kappa_mon
 define   conv(olve) $KAPPA_DIR/kappa_mon
+define   copyb(ad)  $KAPPA_DIR/kappa_mon
 define   cref(rame) $KAPPA_DIR/kappa_mon
 define   csub       $KAPPA_DIR/kappa_mon
 define   div        $KAPPA_DIR/kappa_mon
@@ -303,6 +304,7 @@ defhelp  compick    $KAPPA_HELP
 defhelp  contour    $KAPPA_HELP
 defhelp  contover   $KAPPA_HELP
 defhelp  convolve   $KAPPA_HELP
+defhelp  copybad    $KAPPA_HELP
 defhelp  creframe   $KAPPA_HELP
 defhelp  crelut     $KAPPA_HELP
 defhelp  csub       $KAPPA_HELP
@@ -505,6 +507,7 @@ define   kap_compad(d)  $KAPPA_DIR/kappa_mon compadd
 define   kap_compav(e)  $KAPPA_DIR/kappa_mon compave
 define   kap_compi(ck)  $KAPPA_DIR/kappa_mon compick
 define   kap_conv(olve) $KAPPA_DIR/kappa_mon convolve
+define   kap_copyb(ad)  $KAPPA_DIR/kappa_mon copybad
 define   kap_cref(rame) $KAPPA_DIR/kappa_mon creframe
 define   kap_csub       $KAPPA_DIR/kappa_mon csub
 define   kap_div        $KAPPA_DIR/kappa_mon div
@@ -733,6 +736,7 @@ defhelp  kap_compick    $KAPPA_HELP compick
 defhelp  kap_contour    $KAPPA_HELP contour
 defhelp  kap_contover   $KAPPA_HELP contover
 defhelp  kap_convolve   $KAPPA_HELP convolve
+defhelp  kap_copybad    $KAPPA_HELP copybad
 defhelp  kap_creframe   $KAPPA_HELP creframe
 defhelp  kap_crelut     $KAPPA_HELP crelut
 defhelp  kap_csub       $KAPPA_HELP csub

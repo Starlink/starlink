@@ -20,7 +20,7 @@
 *     takes in two NDFs (parameters IN and REF), and creates a third
 *     (parameter OUT) which is a copy of IN, except that any pixel which
 *     is set bad in the DATA array of REF, is also set bad in the DATA 
-*     and VARIANCE (if avilable) arrays in OUT.
+*     and VARIANCE (if available) arrays in OUT.
 
 *  Usage:
 *     copybad in ref out title
