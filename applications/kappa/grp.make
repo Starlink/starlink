@@ -11,18 +11,18 @@ kappa_data_alpha_OSF1 kappa_data_ix86_Linux kappa_data_sun4_Solaris \
 kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub
 
 # The contents of the kappa_source.tar file:
-kappa_source = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
+KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd irg_err irg_err.h \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f
 
 # The contents of the aif_sub.tar file:
-aif_sub = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
+AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
 aif_ptfnm.f aif_temp.f
 
 # The contents of the fts_sub.tar file:
-fts_sub = fts1_axis.f fts1_blcar.f fts1_bswap.f fts1_comnt.f fts1_crndf.f \
+FTS_SUB = fts1_axis.f fts1_blcar.f fts1_bswap.f fts1_comnt.f fts1_crndf.f \
 fts1_dread.f fts1_dtype.f fts1_edfex.f fts1_edkey.f fts1_evkey.f \
 fts1_frmt.f fts1_gkeyc.f fts1_gkeyd.f fts1_gkeyi.f fts1_gkeyl.f \
 fts1_gkeyr.f fts1_gparm.f fts1_hdlog.f fts1_i2vxd.f fts1_i2vxr.f \
@@ -35,14 +35,14 @@ fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
 fts1_findf.c fts1_rnand.c fts1_rnanr.c
 
 # The contents of the irm_sub.tar file:
-irm_sub = irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
+IRM_SUB = irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
 irm_delob.f irm_gropn.f irm_hmenu.f irm_mline.f irm_stats.f irm_staxs.f \
 irm_stgrd.f irm_stlmt.f irm_stlog.f irm_stmap.f irm_stnul.f irm_stpen.f \
 irm_stpha.f irm_table.f irm_tmenu.f irm_vmenu.f 
 
 # The contents of the kapgen_sub.tar file:
 
-kapgen_sub = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
+KAPGEN_SUB = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f \
 chvalr.f chvalw.f copad.f copai.f copar.f copy1d.f copy2d.f copy3d.f \
 cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f elnmbr.f \
@@ -149,22 +149,22 @@ nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
 kpg1_trmsz.c ctm_xcols.f
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
-kappa_data_alpha_OSF1 = bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf \
+KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf \
 heat_lut.sdf ikon_lut.sdf ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf \
 ccdframec.sdf comwest.sdf spectrum.sdf
 
 # The contents of the kappa_data_ix86_Linux.tar file:
-kappa_data_ix86_Linux = bgyrw_lut.sdf ccdframec.sdf comwest.sdf \
+KAPPA_DATA_IX86_LINUX = bgyrw_lut.sdf ccdframec.sdf comwest.sdf \
 cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf ramps_lut.sdf \
 spectrum.sdf spectrum_lut.sdf zebra_lut.sdf
 
 # The contents of the kappa_data_sun4_Solaris.tar file:
-kappa_data_sun4_Solaris = bgyrw_lut.sdf ccdframec.sdf comwest.sdf \
+KAPPA_DATA_SUN4_SOLARIS = bgyrw_lut.sdf ccdframec.sdf comwest.sdf \
 cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf ramps_lut.sdf \
 spectrum.sdf spectrum_lut.sdf zebra_lut.sdf
 
 # The contents of the kappa_ifls.tar file:
-kappa_ifls = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl \
+KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl \
 cadd.ifl calc.ifl calpol.ifl cdiv.ifl centroid.ifl chpix.ifl cmult.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl creframe.ifl csub.ifl \
 kap_div.ifl errclip.ifl exp10.ifl expe.ifl expon.ifl ffclean.ifl \
@@ -192,15 +192,8 @@ setbad.ifl setbb.ifl setbound.ifl setext.ifl setlabel.ifl setnorm.ifl \
 setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 mem2d.ifl 
 
-# The contents of the kappa_source.tar file:
-kappa_source = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
-colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
-unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
-c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd irg_err irg_err.h \
-sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f
-
 # The contents of the kappa_sub.tar file:
-kappa_sub = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
+KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
 calpol.f cdiv.f centroid.f chpix.f cmult.f compadd.f compave.f compick.f \
 convolve.f creframe.f csub.f kap_div.f errclip.f exp10.f expe.f expon.f \
 ffclean.f fillbad.f fitsurface.f flip.f fourier.f gausmooth.f glitch.f \
@@ -213,7 +206,7 @@ substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
 tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f 
 
 # The contents of the kapsub_sub.tar file:
-kapsub_sub = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
+KAPSUB_SUB = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
 ftsize.f ftsizt.f gethlp.f getv2.f gltbsb.f gltclt.f gltcsb.f hstdsp.f \
 hstlo.f hstrep.f imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f \
 inxy.f kps1_agncm.f kps1_agncp.f kps1_agncv.f kps1_agndl.f kps1_agndr.f \
@@ -283,7 +276,7 @@ slc2t3.f sqshs.f sqshx.f sqshy.f stat3d.f statsb.f statv.f strx.f stry.f \
 thrsr.f trgscl.f trigsb.f tropus.f uget.f uput.f 
 
 # The contents of the kapview_sub.tar file:
-kapview_sub = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
+KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
 elprof.f gdclear.f gdnames.f gdset.f gdstate.f greyplot.f idclear.f \
 idinvisible.f idpazo.f idset.f idstate.f inspect.f linplot.f lutable.f \
 lutflip.f luthilite.f lutrot.f lutsave.f luttweak.f lutview.f mlinplot.f \
@@ -292,7 +285,7 @@ picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
 pictrans.f picvis.f snapshot.f turbocont.f vecplot.f 
 
 # The contents of the ndfpack_sub.tar file:
-ndfpack_sub = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \
+NDFPACK_SUB = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \
 fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f hislist.f \
 hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f setbb.f \
 setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f settitle.f \
