@@ -403,6 +403,10 @@ package jcmtdr {
        obsolete { Not part of JCMT-DR. Use STARPERL instead. }
    }
 
+   command jcmt_help {
+       obey { $JCMTDR_DIR/jcmt_help }
+   }
+
    icl { defhelp   jcmtdr $JCMTDR_HELP 0 }
 
    display {
