@@ -35,20 +35,17 @@ proc red4Polysky {taskname} {
     bind $Red4Widgets(PF_INPUT) <Double-Button-2> "$Red4Widgets(PF_INPUT) delete 0 end"
     bind $Red4Widgets(PF_INPUT) <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
 
-    set pf1 [radiobutton $lev(2).f1 -text "None" -variable Red4Widgets(PF_POLYFIT) -value "NONE"]
     set pf2 [radiobutton $lev(2).f2 -text "RGs" -variable Red4Widgets(PF_POLYFIT) -value "REDUCED_GRP"]
     set pf3 [radiobutton $lev(2).f3 -text "Obj" -variable Red4Widgets(PF_POLYFIT) -value "OBJECT"]
     set pf4 [radiobutton $lev(2).f4 -text "Obj-Sky" -variable Red4Widgets(PF_POLYFIT) -value "OBJ-SKY"]
-    pack $pf1 $pf2 $pf3 $pf4 -in $lev(2) -side left 
-    bind $pf1 <Button-2> "red4Update red4Polysky PF_POLYFIT"
+    pack $pf2 $pf3 $pf4 -in $lev(2) -side left 
     bind $pf2 <Button-2> "red4Update red4Polysky PF_POLYFIT"
     bind $pf3 <Button-2> "red4Update red4Polysky PF_POLYFIT"
     bind $pf4 <Button-2> "red4Update red4Polysky PF_POLYFIT"
-    bind $pf1 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
     bind $pf2 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
     bind $pf3 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
     bind $pf4 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
-    set Red4Widgets(PF_POLYFIT) NONE
+    set Red4Widgets(PF_POLYFIT) REDUCED_GRP
 
     set l1 [label $lev(3).l1 -text "Degree"]
     set Red4Widgets(PF_DEGREE) [entry $lev(3).dg -width 15]

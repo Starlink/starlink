@@ -154,7 +154,7 @@ proc red4Update {item value} {
       selection clear $Red4Widgets(PF_INPUT) 
       $Red4Widgets(PF_INPUT) delete 0 end
       $Red4Widgets(PF_INPUT) insert end $Red4Widgets(DRG)
-      set Red4Widgets(PF_POLYFIT) NONE
+      set Red4Widgets(PF_POLYFIT) REDUCED_GRP
       selection clear $Red4Widgets(PF_DEGREE) 
       $Red4Widgets(PF_DEGREE) delete 0 end
       $Red4Widgets(PF_DEGREE) insert end 1.0
@@ -191,7 +191,7 @@ proc red4Update {item value} {
       $Red4Widgets(PF_INPUT) delete 0 end
       $Red4Widgets(PF_INPUT) insert end $Red4Widgets(DRG)
     } elseif {[string trim ${value}] == "PF_POLYFIT"} {
-      set Red4widgets(PF_POLYFIT) NONE
+      set Red4widgets(PF_POLYFIT) REDUCED_GRP
     } elseif {[string trim ${value}] == "PF_DEGREE"} {
       selection clear $Red4Widgets(PF_DEGREE) 
       $Red4Widgets(PF_DEGREE) delete 0 end
