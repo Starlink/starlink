@@ -723,6 +723,7 @@
 *    Local variables :
       CHARACTER*80 TEXT
       REAL X,Y
+      REAL XP,YP
       INTEGER L
       INTEGER I,J
       INTEGER NPIX
@@ -766,7 +767,9 @@
 
 *  write each pixel allowing for line continuation
               NPIX=NPIX+1
-              CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
+              XP=REAL(I)+0.1*I_XSCALE/ABS(I_XSCALE)
+              YP=REAL(I)+0.1*I_YSCALE/ABS(I_YSCALE)
+              CALL IMG_PIXTOWORLD(XP,YP,X,Y,STATUS)
               CALL MSG_SETR( 'X', X)
               CALL MSG_SETR( 'Y', Y)
               CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
