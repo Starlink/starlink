@@ -232,6 +232,9 @@
 #        Changed order of .SUFFIXES list so failed .gen files don't mess up.
 #     1-APR-1999 (MBT):
 #        Fixed a bug in helptask linking.
+#     1-APR-1999 (MBT):
+#        Added a number of files copied from KAPPA to assist in AST
+#        frameset manipulation.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -529,7 +532,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  it, but which are not required by users of it.
 
 PRIVATE_INCLUDES = ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
- ccd1_mospr ccd1_par ccd1_tmpcm fio1_clog hlpcmd.inc \
+ ccd1_mospr ccd1_par ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
  irg_com irg_err irg_fac irg_par irh_com irh_err irh_par ndf_const \
  user_err irg_err.h slv.h
 
@@ -618,7 +621,9 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f \
  pda_drnor.f nag1_szprd.f nag1_szslv.f nag1_szlsf.f nag1_szlsm.f \
  ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f ccd1_setex.f \
- ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f
+ ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f \
+ kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
+ ira1_chscs.f ira_seteq.f ira_iscs.f
 
 IRGSRC = irg1_axlim.f irg1_brack.f irg1_check.f irg1_fspec.f \
  irg1_lasto.f irg1_ncut.f irg1_ndfch.f irg1_slice.f \
@@ -820,8 +825,8 @@ BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
                 CCD1_MOSCM CCD1_MOSPR CCD1_PAR CCD1_TMPCM FIO1_CLOG \
-                HLPCMD.INC IRG_COM IRG_ERR IRG_FAC IRG_PAR IRH_COM \
-                IRH_ERR IRH_PAR NDF_CONST USER_ERR
+                HLPCMD.INC IRA_ERR IRA_PAR IRG_COM IRG_ERR IRG_FAC \
+                IRG_PAR IRH_COM IRH_ERR IRH_PAR NDF_CONST USER_ERR
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -843,6 +848,8 @@ GRP_PAR:	$(STAR_INC)/grp_par;      $(LINK) $? $@
 HLPCMD.INC: 	hlpcmd.inc;	          $(LINK) $? $@
 IDI_ERR:        $(STAR_INC)/idi_err;      $(LINK) $? $@
 IDI_PAR:        $(STAR_INC)/idi_par;      $(LINK) $? $@
+IRA_ERR:        ira_err;		  $(LINK) $? $@
+IRA_PAR:        ira_par;		  $(LINK) $? $@
 IRG_COM:	irg_com;		  $(LINK) $? $@
 IRG_ERR:	irg_err;		  $(LINK) $? $@
 IRG_FAC:	irg_fac;		  $(LINK) $? $@
@@ -2526,6 +2533,9 @@ gethlp.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 gthlpi.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 idicurs.o: CCD1_PAR DAT_PAR FIO_PAR IDI_ERR IDI_PAR PAR_ERR SAE_PAR
 import.o: DAT_PAR FIO_PAR SAE_PAR
+ira1_chscs.o: DAT_PAR IRA_ERR IRA_PAR PRM_PAR SAE_PAR
+ira_iscs.o: DAT_PAR IRA_ERR IRA_PAR SAE_PAR
+ira_seteq.o: DAT_PAR IRA_ERR IRA_PAR PRM_PAR SAE_PAR
 irg1_axlim.o: NDF_ERR NDF_PAR SAE_PAR
 irg1_brack.o: SAE_PAR
 irg1_check.o: IRG_COM IRG_ERR IRG_PAR IRH_ERR IRH_PAR SAE_PAR
@@ -2587,10 +2597,14 @@ irh_show.o: DAT_PAR IRH_COM IRH_ERR IRH_PAR SAE_PAR
 irm_delob.o: DAT_PAR SAE_PAR
 irm_subst.o: SAE_PAR
 kpg1_ainb.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+kpg1_asffr.o: AST_PAR NDF_PAR SAE_PAR
+kpg1_asfrm.o: AST_PAR IRA_PAR PAR_ERR PRM_PAR SAE_PAR
+kpg1_assir.o: AST_PAR IRA_PAR PRM_PAR SAE_PAR
 kpg1_bloc.o: PRM_PAR SAE_PAR
 kpg1_cadd.o: NUM_CMN NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PRM_PAR SAE_PAR
 kpg1_csub.o: NUM_CMN NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PRM_PAR SAE_PAR
 kpg1_iscl.o: NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PRM_PAR SAE_PAR
+kpg1_isscs.o: IRA_PAR SAE_PAR
 kpg1_litn.o: SAE_PAR
 kpg1_ludc.o: PRM_PAR SAE_PAR
 kpg1_mdet.o: PRM_PAR SAE_PAR
