@@ -1,0 +1,140 @@
+*  Construct the error numbers according to SUN/104
+*  CODE = 134250498 + 65536 * <fac> + 8 * <mes>
+*  The PGPLOT/GRPCKG facilty number = 1508
+      INTEGER IBASE
+      PARAMETER (IBASE=233078786)
+
+*  GKS inquiry failed
+      INTEGER GRGQFA
+      PARAMETER (GRGQFA = 8 + IBASE)
+
+*  No PGPLOT device open
+      INTEGER GRNODO
+      PARAMETER (GRNODO = 16 + IBASE)
+
+*  Cursor not available in non-interactive job
+      INTEGER GRNOIN
+      PARAMETER (GRNOIN = 24 + IBASE)
+
+*  PGPLOT Device does not have a cursor
+      INTEGER GRNOCU
+      PARAMETER (GRNOCU = 32 + IBASE)
+
+*  Error getting cursor position
+      INTEGER GRCUPO
+      PARAMETER (GRCUPO = 40 + IBASE)
+
+*  Too many cursor failures
+      INTEGER GRTMCF
+      PARAMETER (GRTMCF = 48 + IBASE)
+
+*  Unable to assign channel to terminal
+      INTEGER GRUACH
+      PARAMETER (GRUACH = 56 + IBASE)
+
+*  Error writing to terminal
+      INTEGER GREWT
+      PARAMETER (GREWT = 64 + IBASE)
+
+*  Unable to erase text screen
+      INTEGER GRUNET
+      PARAMETER (GRUNET = 72 + IBASE)
+
+*  Obsolete routine called
+      INTEGER GROBRC
+      PARAMETER (GROBRC = 80 + IBASE)
+
+*  Too many active plots
+      INTEGER GRTMAP
+      PARAMETER (GRTMAP = 88 + IBASE)
+
+*  Invalid workstation id
+      INTEGER GRIWKI
+      PARAMETER (GRIWKI = 96 + IBASE)
+
+*  Invalid workstation name
+      INTEGER GRIWKN
+      PARAMETER (GRIWKN = 104 + IBASE)
+
+*  Invalid workstation type
+      INTEGER GRIWKT
+      PARAMETER (GRIWKT = 112 + IBASE)
+
+*  Invalid workstation catagory
+      INTEGER GRICAT
+      PARAMETER (GRICAT = 120 + IBASE)
+
+*  Unable to open workstation
+      INTEGER GRUOWK
+      PARAMETER (GRUOWK = 128 + IBASE)
+
+*  Invalid PGPLOT plot identifier
+      INTEGER GRIPLI
+      PARAMETER (GRIPLI = 136 + IBASE)
+
+*  Not a valid colour
+      INTEGER GRILCO
+      PARAMETER (GRILCO = 144 + IBASE)
+
+*  Not a valid linestyle
+      INTEGER GRILLS
+      PARAMETER (GRILLS = 152 + IBASE)
+
+*  Not a valid line width
+      INTEGER GRILLW
+      PARAMETER (GRILLW = 160 + IBASE)
+
+*  Workstation was not opened by PGPLOT
+      INTEGER GRNOPG
+      PARAMETER (GRNOPG = 168 + IBASE)
+
+*  Not a valid font
+      INTEGER GRILFO
+      PARAMETER (GRILFO = 176 + IBASE)
+
+*  Unable to read font file
+      INTEGER GRURFF
+      PARAMETER (GRURFF = 184 + IBASE)
+
+*  Unable to get terminal name
+      INTEGER GRUGTN
+      PARAMETER (GRUGTN = 192 + IBASE)
+
+*  Unable to read from terminal
+      INTEGER GRURT
+      PARAMETER (GRURT = 200 + IBASE)
+
+*  Restore not preceeded by save
+      INTEGER GRNOSA
+      PARAMETER (GRNOSA = 208 + IBASE)
+
+*  PGPLOT error
+      INTEGER GRPGER
+      PARAMETER (GRPGER = 216 + IBASE)
+
+*  Not a valid fill area style
+      INTEGER GRILFS
+      PARAMETER (GRILFS = 124 + IBASE)
+
+*  PGPLOT Device is output only
+      INTEGER GROUON
+      PARAMETER (GROUON = 132 + IBASE)
+
+*  PGPLOT Device does not have a keyboard
+      INTEGER GRNOKE
+      PARAMETER (GRNOKE = 140 + IBASE)
+
+*  Error allocating dynamic memory
+      INTEGER GRDYNE
+      PARAMETER (GRDYNE = 148 + IBASE)
+
+*  Append qualifier not supported
+      INTEGER GRNOAP
+      PARAMETER (GRNOAP = 156 + IBASE)
+
+*  Unknown qualifier
+      INTEGER GRUNKQ
+      PARAMETER (GRUNKQ = 164 + IBASE)
+
+*  The next four error codes (172-196) are used by the PGPLOT ADAM
+*  parameter routines.
