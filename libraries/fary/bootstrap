@@ -1,5 +1,5 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-7, rnum=1000007
+# original bootstrap file, installed by starconf 1.0-8, rnum=1000008
 # If you _need_ to change this file, delete or replace `original' above
 # or else starconf may overwrite it with an updated version
 
@@ -11,68 +11,39 @@
 #
 # Usage:
 #     ./bootstrap
-#
-# Important environment variables:
-#
-#     STARCONF_BUILDSUPPORT: this bootstrap script executes the
-#     configuration script $STARCONF_BUILDSUPPORT/bin/starconf, and
-#     objects if it can't find it.  This script adds required files,
-#     and establishes installation directories.
-#
-# The configuration script here works with automake versions 1.6.3 and
-# 1.7.5, and autoconf 2.57, and probably not much that's significantly
-# older than those.
+
 
 # Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }
 
-if test -z "$STARCONF_BUILDSUPPORT"; then
-    # If there's a ./starconf.status script locally, use the location 
-    # it reports.
-    test -x ./starconf.status && \
-        STARCONF_BUILDSUPPORT=`./starconf.status --show buildsupport`
-fi
 
-if test -z "$STARCONF_BUILDSUPPORT"; then
-    # The `starconf' script won't necessarily be in the path.
-    STARCONF_BUILDSUPPORT=`starconf --show buildsupport 2>/dev/null`
-    # If starconf _is_ in the path, this will find the path to it.
-fi
+if starconf --show buildsupport >/dev/null 2>&1; then
 
-if test -z "$STARCONF_BUILDSUPPORT"; then
-    # Wilder guess:  We don't normally refer to the STARLINK
-    # variable, but we're running out of options.
-    if test -n "$STARLINK" -a -d $STARLINK/buildsupport; then
-        STARCONF_BUILDSUPPORT=$STARLINK/buildsupport
+    # starconf is in the path
+    echo "Using starconf in " `starconf --show buildsupport` "..."
+    echorun starconf
+
+else
+
+    # The temptation here is to use ./starconf.status to find the
+    # starconf that it came from and invoke that explicitly.  Don't do
+    # this, however: we don't want to be too clever, and it's better
+    # to be consistent with the way the autotools behave (the first
+    # one in your path is the one that works, and they don't have this
+    # sort of `phone home' cleverness in them.
+
+    echo "In directory " `pwd` " :"
+    echo "The starconf application doesn't appear to be in your path"
+
+    # This doesn't stop us being helpful, however.
+    if test -x ./starconf.status; then
+        starconf_home=`./starconf.status --show buildsupport`
+        echo "This directory was last bootstrapped with $starconf_home/bin/starconf"
     fi
-fi
 
-if test -z "$STARCONF_BUILDSUPPORT"; then
-    # Give up!
-    echo "STARCONF_BUILDSUPPORT is empty -- hope that's OK"
-else
-    echo "Using buildsupport tools in $STARCONF_BUILDSUPPORT"
-fi
-
-# Run starconf, by running the starconf script installed in
-# $STARCONF_BUILDSUPPORT.
-#
-# It is possible to recreate the current starconf configuration by
-# running the ./starconf.status script in the current directory.  At
-# present, we _do_ this as a fallback, but we might not in future.
-if test -x $STARCONF_BUILDSUPPORT/bin/starconf; then
-    echorun $STARCONF_BUILDSUPPORT/bin/starconf
-elif test -x ./starconf.status; then
-    # When starconf is run, it finishes by execing ./starconf.status
-    # with arguments which do final configuration (indicating
-    # installation location).  These arguments can be defaulted from
-    # the environment, and we rely on this here -- the script exits if
-    # the required variables are not findable.
-    echorun ./starconf.status
-else
-    echo "No starconf found, and no ./starconf.status.  Exiting"
     exit 1
 fi
+
 
 # Bootstrap any child directories
 for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
@@ -82,6 +53,7 @@ do
         (cd $d; ./bootstrap)
     fi
 done
+
 
 # If STAR_SUPPRESS_AUTORECONF is true in the environment, then we
 # suppress the call of `autoreconf'.  This is here _only_ so that the top-level
@@ -94,5 +66,6 @@ if $STAR_SUPPRESS_AUTORECONF; then
 else
     echorun autoreconf --install --symlink
 fi
+
 
 exit 0
