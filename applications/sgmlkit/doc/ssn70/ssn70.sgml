@@ -888,53 +888,48 @@ settings, <em/including> the case where both entities are set to `IGNORE'.
 <subsect id=markup.try export>Try it yourself -- running the SGML parser
 
 <p>Type the document given in <ref id=fig.simplesun/> into a file, and
-check it with the distributed SGML parser, as follows.  If the
-document is in a file <code/sun1234.sgml>, then give the command
-<kbd>nsgmls -s sun1234.sgml</kbd>.  This invokes the <code/nsgmls>
-parser, and, with the <code/-s> option, suppresses all output except
-warnings and error messages.  This means that for a valid document,
-you should see precisely no output from this command.  If you want to
-see output, leave off the <code/-s> option and the parser will produce
-a version of your document in a form which is easy for a downstream
-application to parse.  There are, for example, Perl libraries (for
-example <code/SGMLSpm>, which should be on CPAN) which
-will parse this output format and allow you to process SGML documents
-using Perl.  The crucial thing in this case is the final line in
-the output, which should be a single `C' command, indicating that the
-document conforms to its DTD.
+check it with the distributed SGML parser, as follows.  
+
+<p>Firstly, and most importantly, try converting your document to
+HTML.  This uses the script <code/sgml2docs>.  If the document is in a
+file <code/sun1234.sgml>, give the command <kbd/sgml2docs
+sun1234.sgml>, which will transform your document into a collection of
+HTML files, and package them up into a tar-file by the name of
+<code/sun1234.tar-htx>.  Alternatively, give the command
+<kbd/sgml2docs --latex sun1234.sgml>, which will transform your
+document into a &latex; file, and place it, and any figures required
+for processing into a file <code/sun1234.tar-latex>.  See <ref
+id=proc.sgml2docs/> for further details.
+
+<p>Another way of processing your document is to run the underlying
+parser on the document -- this is the most efficient way of checking
+that your document is valid, in the sense that it conforms to the DTD
+is claims to.  Give the command <kbd>parse -s sun1234.sgml</kbd> (see
+the detailed documentation for the <coderef id=parse
+collection=upconvprogs>parse</coderef> script).  This invokes the
+<code/nsgmls> parser, and, with the <code/-s> option, suppresses all
+output except warnings and error messages.  This means that for a
+valid document, you should see precisely no output from this command.
+If you want to see output, leave off the <code/-s> option and the
+parser will produce a version of your document in a form (documented
+<webref url="http://www.jclark.com/sp/sgmlsout.htm"
+>elsewhere</webref>) which is easy for a downstream application to
+parse.  If you are experiencing puzzling validation errors with a
+document, it can occasionally be useful to examine this output: if you
+can make sense of it, it gives you an authoritative account of what
+the underlying parser sees in your document.
+
+<p>There are several ways of parsing this output for yourself, should
+you want to do that.  For example, <webref
+url='http://www.cpan.org/modules/by-module/SGMLS/'
+><code>SGMLSpm</code></webref> will parse this output format and allow
+you to process SGML documents using Perl.  The crucial thing in this
+case is the final line in the output, which should be a single `C'
+command, indicating that the document conforms to its DTD.
 
 <p>If you want to try normalising your document, give the command
 <kbd>sgmlnorm sun1234.sgml</kbd>.  This transforms your document into
 an equivalent one with all omitted elements reinserted.
-
-<p>Finally, and most importantly, try converting your document to
-HTML.  This uses the script <code/sgml2docs>.  Give the command
-<kbd/sgml2docs sun1234.sgml>, which will transform your document into
-a collection of HTML files, and package them up into a tar-file by the
-name of <code/sun1234.tar-htx>.  Alternatively, give the command
-<kbd/sgml2docs --latex sun1234.sgml>, which will transform your
-document into a &latex; file, and place it, and any figures required
-for processing into a file <code/sun1234.tar-latex>.
-See <ref id=proc.sgml2docs/> for further details.  
-
-<!--
-<p>Finally, try converting your document to HTML.  This uses the
-program Jade, which is an implementation of the DSSSL formatting
-language.  Give the command 
-<kbd>jade -t sgml -d
-$STARLINK_SGML_DIR/dsssl/sl/html/sl.dsl#html sun1234.sgml</kbd>.  This
-will parse your document, and convert it to a collection of HTML
-files, with the master file named <code/SUN-1234.html> (this name is based
-on the information in the document, and is independent of what your
-source file is actually called).  The command actually spits out a
-line of text to the standard output; this is because the SGML set is
-designed to be used from within a Makefile (see <ref id=proc.makefile/>) rather
-than directly from the command line.
-
-<p>You can also convert your document to &latex;, with the command 
-<kbd>jade -t latex -d $STARLINK_SGML_DIR/dsssl/sl/latex/sl.dsl#latex
-sun1234.sgml</kbd>.
--->
 
 <p>Try making parts of your document invalid, and comparing the error
 with the error message <code/nsgmls> produces.
