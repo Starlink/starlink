@@ -108,7 +108,6 @@ hidden proc ccdpack_iraf_pars_set
    pars = getenv("NDF_TO_IRAF_PARS")
    if pars = ""
       setenv NDF_TO_IRAF_PARS "FILLBAD=!"
-      print "Warning -- bad pixel values will be retained in IRAF data."
    end if
 end proc
 ccdpack_iraf_pars_set

@@ -74,7 +74,7 @@ s1 = "NONE"
 show | match ("NDF_TO_IRAF_PARS=", stop=no ) | scan (s1)
 if ( s1 == "NONE") { 
    set NDF_TO_IRAF_PARS="FILLBAD=!"
-   print "Warning -- bad pixel values will be retained."
+} else {
 }
 
 clbye()

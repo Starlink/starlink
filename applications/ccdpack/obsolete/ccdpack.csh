@@ -179,7 +179,6 @@
 #   they are doing.
       if ( ! $?NDF_TO_IRAF_PARS ) then
          setenv NDF_TO_IRAF_PARS "FILLBAD=!"
-         echo "Warning -- bad pixel values will be retained in IRAF data."
       endif
 #
 # end

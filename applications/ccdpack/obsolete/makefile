@@ -1566,7 +1566,7 @@ install:
 	   else :; fi;\
 	done
 	for f in $(SCRTASKS) ""; do \
-	   if test -n "$$f"; then \
+	   if test -n "$$f" -a "$$f" != "xreduce" ; then \
 	      $(LINK) ./$(PKG_NAME)_scr $(INSTALL_BIN)/$$f ;\
 	   else :; fi;\
 	done
@@ -2548,7 +2548,7 @@ present.o: CCD1_PAR IRG_FAC PAR_ERR SAE_PAR
 pthlpo.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 reduce.o: MSG_PAR PRM_PAR PSX_ERR SAE_PAR
 register.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
-xreduce.o: SAE_PAR
+runxreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR

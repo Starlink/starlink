@@ -150,7 +150,7 @@
 
 #  Failed to create Gwm widget.
 	       destroy $oldthis.canvas
-               $oldthis delete
+               $this delete
 	       return
          }
 
