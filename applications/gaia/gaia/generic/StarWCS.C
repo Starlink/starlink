@@ -159,7 +159,8 @@ StarWCS::StarWCS( const char *header, const int lheader )
                         //  trivial like a formatting problem.
                         astClearStatus;
                     }
-                } else {
+                }
+                else {
                     break;
                 }
             }
@@ -198,7 +199,7 @@ StarWCS::StarWCS( const char *header, const int lheader )
 #if ( AST_MAJOR_VERS > 1 ) || \
     ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS == 8 && AST_RELEASE >= 7 ) || \
     ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS > 8 )
-                 
+
             //  CAR projections are sometimes incorrect and what is
             //  required in a linear transformation. Make this the
             //  default until someone complains that they want the
@@ -206,7 +207,7 @@ StarWCS::StarWCS( const char *header, const int lheader )
             //  that time).
 	    astSet( fitschan, "CarLin=1" );
 #endif
- 
+
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when
             //  convenient.
@@ -464,7 +465,7 @@ void StarWCS::setEquinox()
     }
 }
 
-// 
+//
 // Set the display of extra precision.
 //
 void StarWCS::extraPrecision( int value )
@@ -1050,51 +1051,82 @@ int StarWCS::astSetAttrib( const char *what, const char *value )
 
 int StarWCS::make2D()
 {
+    int inperm[MAXDIM];
+    int outperm[MAXDIM];
+    double zero[MAXDIM];
+    int i;
+    for ( i = 0; i < MAXDIM; i++ ) {
+        zero[i] = 0.0;
+    }
 
     // Find out how many dimensions the current and base frames have.
     AstFrame *baseframe = (AstFrame *) astGetFrame( wcs_, AST__BASE );
     AstFrame *skyframe = (AstFrame *) astGetFrame( wcs_, AST__CURRENT );
     int nbase = astGetI( baseframe, "Naxes" );
     int nsky = astGetI( skyframe, "Naxes" );
+    int ibase = astGetI( wcs_, "Base" );
+    int isky = astGetI( wcs_, "Current" );
+
     if ( nbase == 2 && nsky == 2 ) {
         baseframe = (AstFrame *) astAnnul( baseframe );
         skyframe = (AstFrame *) astAnnul( skyframe );
         return 1;
-    } else if ( nbase < 2 || nsky < 2 ) {
+    }
+    if ( nsky < 2 ) {
+        // Current frame has too few axes. Add in a dummy one 
+        // to make it 2D.
+        outperm[0] = 1;
+        outperm[1] = 0;
+        AstFrame* newFrame =
+            (AstFrame *) astPickAxes( skyframe, 2, outperm, NULL );
 
-        // Only one dimension. Cannot process this.
-        baseframe = (AstFrame *) astAnnul( baseframe );
-        skyframe = (AstFrame *) astAnnul( skyframe );
-        error( "Input WCS has only one dimension, need 2" );
-        return 0;
-    } else if ( nbase > MAXDIM || nsky > MAXDIM ) {
+        astShow( wcs_ );
+        astShow( skyframe );
+        astShow( newFrame );
+        
+        // Need a permmap that looses the second dimension.
+        inperm[0] = 1;
+        inperm[1] = -1;
+        outperm[0] = 1;
+        outperm[1] = -1;
+        AstMapping *map = 
+            (AstMapping *) astPermMap( 1, inperm, 2, outperm, zero, "" );
+        astShow( map );
+
+        astAddFrame( wcs_, nsky, map, newFrame );
+        astShow( wcs_ );
+
+        nsky = 2;
+        astAnnul( skyframe );
+        skyframe = (AstFrame *) astGetFrame( wcs_, AST__CURRENT );
+        isky = astGetI( wcs_, "Current" );
+
+        astAnnul( map );
+        astAnnul( newFrame );
+    }
+
+    if ( nbase > MAXDIM || nsky > MAXDIM ) {
         baseframe = (AstFrame *) astAnnul( baseframe );
         skyframe = (AstFrame *) astAnnul( skyframe );
         error( "Input WCS has two many dimensions" );
         return 0;
     }
 
-    // Record the indices of the current and base frames.
-    int ibase = astGetI( wcs_, "Base" );
-    int isky = astGetI( wcs_, "Current" );
-
     // Add the necessary frames to make the base frame 2D.
-    int outperm[MAXDIM];
     outperm[0] = 1;
     outperm[1] = 2;
-    AstFrame *newframe = (AstFrame *) astPickAxes( baseframe, 2,
-                                                   outperm, NULL );
+    if ( nbase < 2 ) outperm[1] = 0;
+    AstFrame *newframe = 
+        (AstFrame *) astPickAxes( baseframe, 2, outperm, NULL );
 
     // Create a mapping for this permutation that doesn't have <bad>
     // values as the result.
-    int inperm[MAXDIM];
     inperm[0] = 1;
     inperm[1] = 2;
-    int i;
-    for( i = 2; i < nsky; i++ ) inperm[i] = -1;
-    double zero = 0.0;
-    AstMapping *map = (AstMapping *)astPermMap( nsky, inperm, 2,
-                                                outperm, &zero, "" );
+    if ( nbase < 2 ) inperm[1] = -1;
+    for( i = 2; i < nbase; i++ ) inperm[i] = -1;
+    AstMapping *map = 
+        (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, "" );
 
     // Now add this frame to the FrameSet and make it the base
     // one. Also reinstate the skyframe as the current frame.
@@ -1105,13 +1137,13 @@ int StarWCS::make2D()
     newframe = (AstFrame *) astAnnul( newframe );
     map = (AstMapping *) astAnnul( map );
 
-    //  Now deal with skyframe. In an attempt to make sure we pick the
-    //  correct axes that correspond to those chosen for the image we
-    //  try a transformation to see which axes are jiggled. Note this
-    //  takes two goes as any other axes can be fixed at a given value
-    //  (and will be returned as this, say a constant frequency for the
-    //  whole image) so we need a genuine movement on the image to
-    //  detect the correct axes.
+    // Now deal with skyframe. In an attempt to make sure we pick the
+    // correct axes that correspond to those chosen for the image we
+    // try a transformation to see which axes are jiggled. Note this
+    // takes two goes as any other axes can be fixed at a given value
+    // (and will be returned as this, say a constant frequency for the
+    // whole image) so we need a genuine movement on the image to
+    // detect the correct axes.
     double in1[2][1];
     double out1[MAXDIM][1];
     in1[0][0] = 0.0;
@@ -1129,61 +1161,74 @@ int StarWCS::make2D()
     //  Check to see which dimensions have jiggled.
     int n = 0;
     for ( i = 0; i < nsky; i++ ) {
-        if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) n++;
+        if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
+            n++;
+        }
     }
-    if ( n > 2 || !astOK ) {
-        // Too many dimensions, must be a tricky case with a mapping that
-        // transforms from 2D into possibly all the other dimensions. Give
-        // up.
-        baseframe = (AstFrame *) astAnnul( baseframe );
-        skyframe = (AstFrame *) astAnnul( skyframe );
-        error( "Input WCS is too complex" );
-        return 0;
+    if ( ! astOK ) astClearStatus;
 
-    } else if ( n < 2 ) {
-        //  Something is horribly wrong here. All transformed values are
-        //  0.0, this probably means we cannot easily pick a reference
-        //  position to transform. Let's just try to pick out a skyframe,
-        //  (only skyframe should have the AsTime attribute) failing this
-        //  use the first two axes.
-        char astime[10];
+    if ( n != 2 ) {
+
+        // Either too many signficant dimensions or our attempt to
+        // pick out significant axes has failed.
         int naxes = 0;
-        for ( i = 1; i <= nsky; i++ ) {
-            sprintf( astime, "AsTime(%d)", i );
-            if ( astGetC( wcs_, astime ) ) {
-                naxes++;
-                out1[i][0] = 1.0;
-                out2[i][0] = 3.0;
-                if ( naxes == 2 ) break;
-            } else {
-                astClearStatus;
+        if ( n < 1 ) {
+
+            // All transformed values are 0.0, this probably means we
+            // cannot easily pick a reference position to
+            // transform. Let's just try to pick out a skyframe, (only
+            // a skyframe should have the AsTime attribute and it
+            // should only have 2 dimensions) failing this use the
+            // first two axes.
+            char astime[10];
+            for ( i = 1; i <= nsky; i++ ) {
+                sprintf( astime, "AsTime(%d)", i );
+                if ( astGetC( wcs_, astime ) ) {
+                    naxes++;
+                    out1[i][0] = 1.0;
+                    out2[i][0] = 3.0;
+                    if ( naxes == 2 ) {
+                        break;
+                    }
+                }
+                else {
+                    astClearStatus;
+                }
             }
         }
         if ( naxes != 2 ) {
+            // Fudge the transformations to pick the first two axes.
             out1[0][0] = 1.0;
-            out1[1][0] = 1.0;
             out2[0][0] = 2.0;
+            out1[1][0] = 1.0;
             out2[1][0] = 2.0;
         }
     }
 
-    //  Probably only two dimensions gave valid results. Select these as
-    //  the SkyFrame.
+    // Choose the selected axes from the skyframe (should be just 2 by
+    // now).
     n = 0;
+    int izero = -1;
     for ( i = 0; i < nsky; i++ ) {
         if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
             outperm[n++] = i + 1;
             inperm[i] = i + 1;
-        } else {
-            inperm[i] = -1;
+        }
+        else {
+            if ( out1[i][0] != AST__BAD ) { // Single valued coordinate
+                zero[abs(izero) - 1] = out1[i][0];
+            }
+            else {
+                zero[abs(izero) - 1] = 0.0;
+            }
+            inperm[i] = izero--;
         }
     }
     newframe = (AstFrame *) astPickAxes( skyframe, 2, outperm, NULL );
 
     // Create a mapping for this permutation that doesn't have <bad>
     // values as the result.
-    zero = 0.0;
-    map = (AstMapping *)astPermMap( nsky, inperm, 2, outperm, &zero, "" );
+    map = (AstMapping *)astPermMap( nsky, inperm, 2, outperm, zero, "" );
 
     // Now add this frame to the FrameSet.
     astAddFrame( wcs_, isky, map, newframe );
@@ -1198,7 +1243,8 @@ int StarWCS::make2D()
     // indicate an error.
     if ( !astOK ) {
         return 0;
-    } else {
+    } 
+    else {
         return 1;
     }
 }
@@ -1302,7 +1348,7 @@ void StarWCS::constructWarning( const char *encoding, int failed,
         //  for empty cards. We just concatenate these together.
         astClear( fitschan, "Card" );
         while ( astFindFits( fitschan, "ASTWARN", card, 1 ) ) {
-            
+
             //  See if this is a report about the equinox. If so don't
             //  show a valid one.
             equinox = strstr( card, "equinox" );

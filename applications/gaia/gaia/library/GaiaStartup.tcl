@@ -68,7 +68,7 @@ itcl::class gaia::GaiaStartup {
    constructor {args} {
 
       #  Get the properties object.
-      set props_ [GaiaProperties::instance]
+      set props_ [gaia::GaiaProperties::instance]
 
       #  Start with defaults and any previously set values.
       set_defaults_
