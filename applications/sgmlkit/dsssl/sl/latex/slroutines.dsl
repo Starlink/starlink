@@ -362,11 +362,11 @@ $Id$
 		(literal " ("
 			 (cond
 			  ((and given-att returned-att)
-			   "given and returned")
-			  (given-att "given")
-			  (returned-att "returned")
+			   "Given and Returned")
+			  (given-att "Given")
+			  (returned-att "Returned")
 			  (else		;default is given
-			   "given"))
+			   "Given"))
 			 ")")))
 	(with-mode plain-elements
 	      (process-node-list desc)))))
@@ -505,8 +505,7 @@ $Id$
   (element routineprologue
     (process-matching-children 'routinename))
   (element routinename
-    (make command name: "Code"
-	  (process-matching-children 'name)))
+    (process-matching-children 'name))
   (element name
     (process-children)))
 
