@@ -12682,6 +12682,16 @@ iraf! {
             helpkey *
           }
 
+         parameter imask {
+            size *
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Indices of good pixel in mask}
+            default !
+            helpkey *
+          }
+
          parameter in {
             position 1
             type NDF
@@ -12690,6 +12700,16 @@ iraf! {
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
             prompt {NDF to be expanded}
+            helpkey *
+          }
+
+         parameter mask {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Mask NDF}
+            default !
             helpkey *
           }
 
@@ -15472,6 +15492,15 @@ iraf! {
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
             prompt {The input images}
+            helpkey *
+          }
+
+         parameter insitu {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Modify input NDFs in-situ?}
             helpkey *
           }
 
