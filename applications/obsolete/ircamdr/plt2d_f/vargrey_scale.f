@@ -26,8 +26,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -74,7 +73,7 @@
 * =====================================================================
 
 * check status on entry
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
 	  RETURN
 	END IF
 
@@ -86,7 +85,7 @@
 * put calculated max,min values into parameter system
 	CALL PAR_PUT0R( 'CALCULATED_MAX', XMAXIMUM, STATUS)
 	CALL PAR_PUT0R( 'CALCULATED_MIN', XMINIMUM, STATUS)
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP( 'ERR', 
      :               'Error : VARGREY_SCALE : Illegal Max,Min values',
      :                   STATUS )

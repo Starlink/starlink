@@ -24,8 +24,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -70,7 +69,7 @@
 
 * check status on entry
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 'Error : PLOT_CURCOMMENT : On entry',
      :                  STATUS )
@@ -100,7 +99,7 @@
 
 	CALL PAR_GET0C( 'COMMENT_WORD', COMMENT_WORD, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 
      :                 'Error : PLOT_CURCOMMENT : after PAR_GETS',
@@ -156,7 +155,7 @@
 
 	CALL CURSOR_POSITION( STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
 	  RETURN
 

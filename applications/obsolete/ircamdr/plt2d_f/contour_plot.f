@@ -33,8 +33,7 @@
 
 * Global constants :
 
-        INCLUDE 'ADAMDEFNS'
-        INCLUDE 'ADAMERRS'
+        INCLUDE 'ADAM_DEFNS'
 
         INCLUDE 'DTDEFNS'
         INCLUDE 'DTERRS'
@@ -94,7 +93,7 @@
 
 * Test of input status OK and act if incorrect
 
-        IF ( STATUS .NE. ADAM__OK ) THEN
+        IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'ERR', 'Error : CONTOUR_PLOT : On entry',
      :                   STATUS )
           RETURN
@@ -120,7 +119,7 @@
 
         CALL PAR_GET0C( 'SUBIM_OPTION', SUBIM_OPTION, STATUS)
 
-        IF ( STATUS .NE. ADAM__OK ) THEN
+        IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'ERR', 
      :                  'Error : CONTOUR_PLOT : after PAR_GETs',
      :                   STATUS )
@@ -131,7 +130,7 @@
 
         CALL NDF_ASSOC( 'CONTOUR_IMAGE', 'READ', LOC_IMAGE, STATUS)
 
-        IF( STATUS .NE. ADAM__OK) THEN
+        IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP( 'ERR', 
      :                  'Error : CONTOUR_PLOT : During NDF_ASSOC',
      :                   STATUS )
@@ -148,7 +147,7 @@
           CALL NDF_MAP( LOC_IMAGE, 'Data', '_REAL', 'READ',
      :                  POINTER_IMAGE, NELEMENTS, STATUS)
 
-          IF( STATUS. NE. ADAM__OK)THEN
+          IF( STATUS. NE. SAI__OK)THEN
             CALL ERR_REP( 'ERR', 
      :                'Error : CONTOUR_PLOT : During NDF_MAP image',
      :                     STATUS )
@@ -181,7 +180,7 @@ D       write (6,*)  naxis(1), '  and  ', naxis(2)
           CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ', 
      :                   POINTER_IMAGE, NELEMENTS, STATUS)
 
-          IF( STATUS. NE. ADAM__OK)THEN
+          IF( STATUS. NE. SAI__OK)THEN
             CALL ERR_REP( 'ERR', 
      :            'Error : CONTOUR_PLOT : During NDF_MAP sub-image',
      :                     STATUS )
@@ -264,7 +263,7 @@ D       write (6,*)  naxis(1), '  and  ', naxis(2)
           CALL NDF_ANNUL( LOC_SUBIM, STATUS)
           CALL NDF_ANNUL( LOC_IMAGE, STATUS)
 
-          IF( STATUS .NE. ADAM__OK) THEN
+          IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP( 'ERR', 
      :            'Error : CONTOUR_PLOT : after NDF_ANNUL sub-image',
      :                     STATUS )
@@ -277,7 +276,7 @@ D       write (6,*)  naxis(1), '  and  ', naxis(2)
 
           CALL NDF_ANNUL( LOC_IMAGE,   STATUS)
 
-          IF( STATUS .NE. ADAM__OK) THEN
+          IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP( 'ERR', 
      :                    'Error : CONTOUR_PLOT : after NDF_ANNUL',
      :                     STATUS )

@@ -11,8 +11,7 @@
 
 	IMPLICIT NONE
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -49,7 +48,7 @@
 
 * get device type for image display from interface file
 	CALL PAR_GET0C( 'DEVICE_NAME', DEVICE_NAME, STATUS)
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR',
      :     	    'Error : DEVICE_OPEN : After par_get0c device name',
      :                  STATUS )
@@ -60,7 +59,7 @@
 
 * call subroutine to covert standard GKS device name to workstation ID
 	CALL DEVICE_CODE( STATUS)
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           RETURN
 	END IF
 
@@ -75,7 +74,7 @@
 
 * open GKS for plotting on device WKSTN_ID
 	CALL SGS_OPEN( WKSTN_ID, BASE_ZONE, STATUS)
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR',
      :     	    'Error : DEVICE_OPEN : After SGS_OPEN',
      :                  STATUS )

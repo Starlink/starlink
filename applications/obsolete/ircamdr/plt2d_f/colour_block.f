@@ -28,8 +28,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -84,7 +83,7 @@
 
 * check status on entry
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 	  RETURN
 	END IF
 
@@ -101,7 +100,7 @@
 
 	  CALL CURSOR_POSITION( STATUS)
 
-	  IF( STATUS. NE. ADAM__OK)THEN
+	  IF( STATUS. NE. SAI__OK)THEN
 	    RETURN
 	  END IF
 
@@ -113,7 +112,7 @@
 	  XCENTRE = INT( XREAL + 0.5)
 	  YCENTRE = INT( YREAL + 0.5)
 
-	  IF( STATUS. NE. ADAM__OK)THEN
+	  IF( STATUS. NE. SAI__OK)THEN
 	    RETURN
 	  END IF
 
@@ -140,7 +139,7 @@
 	CALL PAR_GET0C( 'CT_ANNOTATION', BLOCK_ANNOT, STATUS)
 	CALL CHR_UCASE( BLOCK_ANNOT )
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'COLOUR_BLOCK : after PAR_GETs',
      :                 STATUS )
 	  RETURN
@@ -158,7 +157,7 @@
 
 	CALL NDF_ASSOC( 'SCRATCH_NAME', 'WRITE', LOCSR, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error, creating working array ...',
      :                 STATUS )
 	  CALL NDF_ANNUL( LOCSR, STATUS )
@@ -171,7 +170,7 @@
 	CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE', 
      :	              SCRATCH_POINTER, NELEMENTS, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :               'Error : During NDF_MAP scratch image...WHOOPS',
      :                 STATUS )

@@ -24,8 +24,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -57,7 +56,7 @@
 * ================================================================
 
 * test status on entry
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 	  RETURN
 	END IF
 

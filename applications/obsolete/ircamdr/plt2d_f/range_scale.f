@@ -26,8 +26,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -73,7 +72,7 @@
 
 * check status on entry
 
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
 	  RETURN
 	END IF
 
@@ -82,7 +81,7 @@
 	CALL RANGE_MAXMIN( DATA_ARRAY, RANGE, XMAXIMUM, XMINIMUM,
      :	                   STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 	  RETURN
 	END IF
 
@@ -91,7 +90,7 @@
 	CALL PAR_PUT0R( 'CALCULATED_MAX', XMAXIMUM, STATUS)
 	CALL PAR_PUT0R( 'CALCULATED_MIN', XMINIMUM, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR',
      :               'Error : NSIGMA_SCALE : Illegal Max,Min values',
      :                  STATUS )

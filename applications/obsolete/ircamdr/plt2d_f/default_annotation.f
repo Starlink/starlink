@@ -27,8 +27,7 @@
 
 * Global constants :
 
-        INCLUDE 'ADAMDEFNS'
-        INCLUDE 'ADAMERRS'
+        INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
         INCLUDE 'DTDEFNS'
         INCLUDE 'DTERRS'
@@ -109,7 +108,7 @@
 
 * check status on entry
 
-        IF( STATUS .NE. ADAM__OK)THEN
+        IF( STATUS .NE. SAI__OK)THEN
 
           RETURN
 
@@ -129,7 +128,7 @@
         CALL PAR_GET0R( 'MAXIMUM', DEFANN_MAX, STATUS)
         CALL PAR_GET0R( 'MINIMUM', DEFANN_MIN, STATUS)
 
-        IF( STATUS. NE. ADAM__OK) THEN
+        IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :                 'Error : DEFAULT_ANNOTATION : after PAR_GETS',
      :                 STATUS )

@@ -29,8 +29,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -144,7 +143,7 @@
 
 * check status on entry
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : CUT_DISPLAY : On entry',
      :                 STATUS )
 	  RETURN
@@ -173,7 +172,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 	  CALL CURSOR_DISPLAY( STATUS)
 
-	  IF( STATUS. NE. ADAM__OK) THEN
+	  IF( STATUS. NE. SAI__OK) THEN
 	    RETURN
 	  END IF
 
@@ -186,7 +185,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 	  CALL CURSOR_DISPLAY( STATUS)
 
-	  IF( STATUS. NE. ADAM__OK) THEN
+	  IF( STATUS. NE. SAI__OK) THEN
 	    RETURN
 	  END IF
 
@@ -225,7 +224,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 	CALL PAR_GET0C( 'SUBIM_OPTION', SUBIM_OPTION, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : CUT_DISPLAY : after PAR_GETS',
      :                 STATUS )
  	  RETURN
@@ -235,7 +234,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 	CALL NDF_ASSOC( 'CUT_IMAGE', 'READ', LOC_IMAGE, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :         'Error : Cannot locate specified image, sorry ...',
      :                 STATUS )
@@ -252,7 +251,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	  CALL NDF_MAP( LOC_IMAGE, 'Data', '_REAL', 'READ',
      :	                POINTER_IMAGE, NELEMENTS, STATUS)
 
-	  IF( STATUS. NE. ADAM__OK)THEN
+	  IF( STATUS. NE. SAI__OK)THEN
 	    CALL NDF_ANNUL( LOC_IMAGE,  STATUS)
             CALL ERR_REP('ERR', 'CUT_DISPLAY : During NDF_MAP image',
      :                   STATUS )
@@ -270,7 +269,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	  CALL PAR_GET0I( 'SUBIM_YST', SUBIM_ST( 2), STATUS)
 	  CALL PAR_GET0I( 'SUBIM_YEN', SUBIM_EN( 2), STATUS)
 
-	  IF( STATUS .NE. ADAM__OK) THEN
+	  IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP('ERR', 
      :                   'CUT_DISPLAY : after PAR_GETS subim_st,en',
      :                   STATUS )
@@ -288,7 +287,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 	  CALL NDF_MAP( LOC_SUBIM, 'Data', '_REAL', 'READ', 
      :	                POINTER_IMAGE, NELEMENTS, STATUS)
 
-	  IF( STATUS. NE. ADAM__OK)THEN
+	  IF( STATUS. NE. SAI__OK)THEN
  	    CALL NDF_ANNUL( LOC_IMAGE,  STATUS)
 	    CALL NDF_ANNUL( LOC_SUBIM,  STATUS)
             CALL ERR_REP('ERR', 
@@ -353,7 +352,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
  	  CALL NDF_ANNUL( LOC_SUBIM, STATUS)
 	  CALL NDF_ANNUL( LOC_IMAGE, STATUS)
 
-	  IF( STATUS .NE. ADAM__OK) THEN
+	  IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP('ERR', 
      :                   'CUT_DISPLAY : after NDF_ANNUL sub-image',
      :                   STATUS )
@@ -366,7 +365,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
 
 	  CALL NDF_ANNUL( LOC_IMAGE,   STATUS)
 
-	  IF( STATUS .NE. ADAM__OK) THEN
+	  IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP('ERR', 
      :                   'CUT_DISPLAY : after NDF_ANNULs',
      :                   STATUS )
@@ -726,7 +725,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
      :	                  CUT_MAGNIF, XTICK_START, XTICK_INTERVAL, 
      :	                  CUT_NUMYTIC, CUT_NUMXTIC, STATUS)
 
-	  IF( STATUS .NE. ADAM__OK) THEN
+	  IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP('ERR', 
      :                   'CUT_DISPLAY : after CUT_TICKS',
      :                   STATUS )
@@ -740,7 +739,7 @@ D       write (6,*) 'CUT_DISPLAY on entry, max y:   ', max_y
      :	                    XTICK_INTERVAL, CUT_NUMYTIC, CUT_NUMXTIC, 
      :	                    STATUS)
 
-	  IF( STATUS .NE. ADAM__OK) THEN
+	  IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP('ERR', 
      :                   'CUT_DISPLAY : after CUT_NUMBERS',
      :                   STATUS )

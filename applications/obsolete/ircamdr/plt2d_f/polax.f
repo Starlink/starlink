@@ -9,8 +9,7 @@
 
 	IMPLICIT NONE
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
         INCLUDE 'SAE_PAR' 
@@ -31,7 +30,7 @@
 
 *      check input status on entry
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 'Error, on entry to POLAX ...', STATUS )
 	  RETURN

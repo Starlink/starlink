@@ -25,8 +25,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -71,7 +70,7 @@
 
 * check status on entry
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : PLOT_LINE : On entry', STATUS )
 	  RETURN
 	END IF
@@ -86,7 +85,7 @@
 	CALL PAR_GET0I( 'LINE_XEN', XLE, STATUS)
 	CALL PAR_GET0I( 'LINE_YEN', YLE, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : PLOT_LINE : after PAR_GETS', 
      :                  STATUS )
 	  RETURN

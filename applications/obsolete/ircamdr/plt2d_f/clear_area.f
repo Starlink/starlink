@@ -25,8 +25,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -75,7 +74,7 @@
 
 * check status on entry
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 	  RETURN
 	END IF
 
@@ -87,7 +86,7 @@
 	CALL PAR_GET0R( 'IM_YEN', IMYEN, STATUS)
 !	type *, 'im_xst etc = ', imxst, imyst, imxen, imyen
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP( 'ERR', 
      :                   'Error : IMAGE_CLEAR : During PAR_GETs',
      :                   STATUS )
@@ -103,7 +102,7 @@
 
 	CALL NDF_ASSOC( 'SCRATCH_NAME', 'WRITE', LOCSR, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP( 'ERR', 
      :                 'Error : IMAGE_CLEAR : during NDF_CREP scratch',
      :                   STATUS )
@@ -117,7 +116,7 @@
 	CALL NDF_MAP( LOCSR, 'DATA', '_INTEGER', 'WRITE', 
      :	              POINTER_SCRATCH, NELEMENTS, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP( 'ERR', 
      :                   'Error : IMAGE_CLEAR : During NDF_MAP scratch',
      :                   STATUS )
@@ -130,7 +129,7 @@
 	CALL IMAGE_SETVAL( NAXIS(1), NAXIS(2), %VAL( POINTER_SCRATCH), 
      :                     STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP( 'ERR', 
      :                   'Error : AREA_CLEAR : after IMAGE_SETVAL',
      :                   STATUS )
@@ -161,7 +160,7 @@
 
 	CALL NDF_ANNUL( LOCSR, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP( 'ERR', 
      :                   'Error : AREA_CLEAR : after NDF_ANNUL',
      :                   STATUS )

@@ -27,8 +27,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -80,7 +79,7 @@
 * =====================================================================
 
 * check status on entry
-	IF( STATUS .NE. ADAM__OK)THEN
+	IF( STATUS .NE. SAI__OK)THEN
 	  RETURN
 	END IF
 
@@ -134,6 +133,6 @@
 	CALL SGS_SUPTX( XU, YU)
 	CALL SGS_STXJ( TXJ)
 	CALL SGS_FLUSH
-	STATUS = ADAM__OK
+	STATUS = SAI__OK
 
 	END

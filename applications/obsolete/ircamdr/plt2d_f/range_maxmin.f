@@ -11,8 +11,7 @@
 
 	IMPLICIT NONE
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
 
@@ -39,7 +38,7 @@
 
 	CALL PAR_GET0C( 'NSIGMA_CALC', NSIGMA_CALC, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR',
      :	                'Error : RANGE_MAXMIN : illegal RANGE_CALC',
      :                  STATUS )
@@ -93,7 +92,7 @@
 	  CALL PAR_GET0I( 'NSIGMA_XSZ', SUBXSZ, STATUS)
 	  CALL PAR_GET0I( 'NSIGMA_XSZ', SUBYSZ, STATUS)
 
-	  IF( STATUS .NE. ADAM__OK) THEN
+	  IF( STATUS .NE. SAI__OK) THEN
             CALL ERR_REP('ERR',
      :	          'Error : RANGE_MAXMIN : illegal subimage area values',
      :                  STATUS )

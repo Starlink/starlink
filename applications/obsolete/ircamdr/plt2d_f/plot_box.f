@@ -26,8 +26,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -78,7 +77,7 @@
 
 * check status on entry
 
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
           CALL ERR_REP('ERR', 'Error : PLOT_BOX on entry', STATUS )
 	  RETURN
 	END IF
@@ -88,7 +87,7 @@
 	CALL PAR_GET0I( 'BOX_XSIZE', BOX_XSIZE, STATUS)
 	CALL PAR_GET0I( 'BOX_YSIZE', BOX_YSIZE, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :                  'Error : PLOT_BOX : after PAR_GET BOX SIZE',
      :                  STATUS )
@@ -99,7 +98,7 @@
 
 	CALL PAR_GET0C( 'BOX_POSITION', BOX_POSITION, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :                  'Error : PLOT_BOX : after PAR_GET BOX POSITION',
      :                  STATUS )
@@ -111,7 +110,7 @@
 	CALL PAR_GET0I( 'BOX_XCEN', BOX_XPOS, STATUS)
 	CALL PAR_GET0I( 'BOX_YCEN', BOX_YPOS, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :                  'Error : PLOT_BOX : after PAR_GET BOX POSITION',
      :                  STATUS )
@@ -122,7 +121,7 @@
 
 	CALL PAR_GET0R( 'ARCSEC_PIXEL', ARCSEC_PIXEL, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :                  'Error : PLOT_BOX : after PAR_GET ARCSEC/PIXEL',
      :                  STATUS )
@@ -134,7 +133,7 @@
 	CALL PAR_GET0I( 'BOX_PEN', PEN_NUMBER, STATUS)
 	CALL PAR_GET0C( 'BOX_COLOUR', COLOUR_CODE, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :                  'Error : PLOT_BOX : after PAR_GET BOX COLOUR',
      :                  STATUS )

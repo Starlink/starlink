@@ -16,8 +16,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -54,7 +53,7 @@
 
 * test if status ok
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
 	  RETURN
 
@@ -65,7 +64,7 @@
 	CALL PAR_GET0I( 'PEN_NUMBER', PEN_NUMBER, STATUS)
 	CALL PAR_GET0C( 'PEN_COLOUR', PEN_COLOUR, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
           CALL ERR_REP( 'ERR', 'Error : SET_PENCOL : after PAR_GETS',
      :                   STATUS )

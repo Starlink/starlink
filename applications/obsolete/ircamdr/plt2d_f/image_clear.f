@@ -26,8 +26,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
         INCLUDE 'NDF_PAR'
         INCLUDE 'NDF_ERR'
@@ -73,7 +72,7 @@
 
 * check status on entry
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
 	  RETURN
 
@@ -91,7 +90,7 @@
 	CALL PAR_GET0I( 'IM_XSIZE', NX, STATUS)
 	CALL PAR_GET0I( 'IM_YSIZE', NY, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 'Error : IMAGE_CLEAR : During PAR_GETs',
      :                  STATUS )
@@ -126,7 +125,7 @@
 
 	CALL NDF_ASSOC( 'SCRATCH_NAME', 'WRITE', LOCSR, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 
      :                'Error : IMAGE_CLEAR : During NDF_ASSOC scratch',
@@ -142,7 +141,7 @@
 	CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE', 
      :	              POINTER_SCRATCH, NELEMENTS, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 
      :                'Error : IMAGE_CLEAR : During NDF_MAP scratch',
@@ -203,7 +202,7 @@
 	CALL IMAGE_SETVAL( NAXIS(1), NAXIS(2), 
      :                     %VAL( POINTER_SCRATCH), STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 
      :                'Error : IMAGE_CLEAR : after IMAGE_SETVAL',
@@ -239,7 +238,7 @@
 
 	CALL NDF_ANNUL( LOCSR, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 
      :                'Error : IMAGE_CLEAR : after NDF_ANNULs',

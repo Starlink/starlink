@@ -23,8 +23,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -63,7 +62,7 @@
 
 * check status on entry
 
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
 	  RETURN
 	END IF
 
@@ -74,7 +73,7 @@
 	CALL PAR_GET0C( 'CROSS_COLOUR', COLOUR_CODE, STATUS)
 	CALL PAR_GET0I( 'CROSS_PEN', PEN_NUMBER, STATUS)
 
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
           CALL ERR_REP('ERR', 'Error : CURSOR_MARK after PAR_GETS',
      :                  STATUS )
 	  RETURN
@@ -85,7 +84,7 @@
 	CALL PAR_GET0R( 'X_CUR_REAL', CROSS_XCEN, STATUS)
 	CALL PAR_GET0R( 'Y_CUR_REAL', CROSS_YCEN, STATUS)
 
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
           CALL ERR_REP('ERR', 
      :           'Error : CURSOR_MARK after PAR_GET cursor position',
      :                  STATUS )

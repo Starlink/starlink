@@ -27,8 +27,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -86,7 +85,7 @@
 
 *      test status on entry
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 	  RETURN
 	END IF
 
@@ -115,7 +114,7 @@
 	CALL PAR_GET0R( 'X_CUR_REAL', XRPOS, STATUS)
 	CALL PAR_GET0R( 'Y_CUR_REAL', YRPOS, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR',
      :            'GLITCH_MARK : after PAR_GETs LAST CURSOR POSITION',
      :                  STATUS )
@@ -160,7 +159,7 @@
 	  CALL GLITCH_VALUES( XRPOS, YRPOS, X_PIXEL, Y_PIXEL,
      :	                      CURSOR_VALUE, BADPOS, STATUS)
 
-	  IF( STATUS .NE. ADAM__OK) THEN
+	  IF( STATUS .NE. SAI__OK) THEN
 
 	    BADPOS = .TRUE.
 

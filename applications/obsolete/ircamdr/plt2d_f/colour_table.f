@@ -25,8 +25,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -63,7 +62,7 @@
 
 * check status on entry
 
-	IF( STATUS . NE. ADAM__OK) THEN
+	IF( STATUS . NE. SAI__OK) THEN
 
 	  RETURN
 
@@ -73,7 +72,7 @@
 
 	CALL NDF_ASSOC( 'CT_NAME', 'READ', LOC_CT, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 'COLOUR_TABLE : after NDF_ASSOC',
      :                  STATUS )
@@ -87,7 +86,7 @@
 	CALL NDF_MAP( LOC_CT, 'Data', '_REAL', 'READ',
      :	              POINTER_CT, NELEMENTS, STATUS)
 
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
 
           CALL ERR_REP('ERR', 'COLOUR_TABLE : after NDF_MAP',
      :                  STATUS )
@@ -119,7 +118,7 @@
 	CALL WRITE_CT( NAXIS( 1), NAXIS( 2), %VAL( POINTER_CT),
      :	               STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
 	  CALL NDF_ANNUL( LOC_CT, STATUS)
 
@@ -132,7 +131,7 @@
 
 	CALL NDF_ANNUL( LOC_CT, STATUS)
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 
      :                  'COLOUR_TABLE : after NDF_ANNUL',

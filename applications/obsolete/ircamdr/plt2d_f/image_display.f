@@ -42,8 +42,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
 
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -119,7 +118,7 @@
 
 *      check status on entry
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : On entry ...', STATUS )
 	  RETURN
 	END IF
@@ -201,7 +200,7 @@
 
 	CALL NDF_ASSOC( 'IMAGE_NAME', 'READ', LOC_IMAGE, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 'Error : IMAGE NOT FOUND ...', STATUS )
 	  CALL NDF_ANNUL( LOC_IMAGE, STATUS)
@@ -233,7 +232,7 @@
 
 	  END IF
 
-	  IF( STATUS. NE. ADAM__OK) THEN
+	  IF( STATUS. NE. SAI__OK) THEN
 
             CALL ERR_REP('ERR', 'Error : During NDF_MAP image', STATUS )
 	    CALL NDF_ANNUL( LOC_IMAGE, STATUS)
@@ -275,7 +274,7 @@
 
 	  END IF
 
-	  IF( STATUS. NE. ADAM__OK) THEN
+	  IF( STATUS. NE. SAI__OK) THEN
 
             CALL ERR_REP('ERR', 'Error : During NDF_MAP sub-image', 
      :                   STATUS )
@@ -311,7 +310,7 @@
 	  CALL NDF_MAP( LOCSR, 'Data', '_INTEGER', 'WRITE', 
      :	                POINTER_SCRATCH, NELEMENTS, STATUS)
 
-	  IF( STATUS. NE. ADAM__OK) THEN
+	  IF( STATUS. NE. SAI__OK) THEN
 
             CALL ERR_REP('ERR', 'Error : During NDF_ scratch area', 
      :                   STATUS )
@@ -553,7 +552,7 @@ d      write (6,*) 'got y start, end:  ', im_yst, im_yen
 	  END IF
 	  CALL NDF_ANNUL( LOCSR, STATUS)
 	  CALL NDF_ANNUL( LOC_IMAGE, STATUS)
-	  STATUS = ADAM__OK
+	  STATUS = SAI__OK
 	  RETURN
 	END IF
 
@@ -572,7 +571,7 @@ d      write (6,*) 'got y start, end:  ', im_yst, im_yen
 
 *      test if an error occurred
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
 
           CALL ERR_REP('ERR', 'Error : just before GCA ...', STATUS )
 

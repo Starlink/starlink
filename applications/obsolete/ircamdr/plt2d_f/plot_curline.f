@@ -23,8 +23,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -64,7 +63,7 @@
 
 * check status on entry
 
-	IF( STATUS .NE. ADAM__OK) THEN
+	IF( STATUS .NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : PLOT_CURLINE : On entry',
      :                  STATUS )
 	  RETURN
@@ -75,7 +74,7 @@
 	CALL PAR_GET0I( 'LINE_PEN', PEN_NUMBER, STATUS)
 	CALL PAR_GET0C( 'LINE_COLOUR', COLOUR_CODE, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : PLOT_CURLINE : after PAR_GETS',
      :                  STATUS )
 	  RETURN
@@ -85,7 +84,7 @@
 
 	CALL CURSOR_DISPLAY( STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 	  RETURN
 	END IF
 
@@ -94,7 +93,7 @@
 	CALL PAR_GET0R( 'X_CUR_REAL', X1, STATUS)
 	CALL PAR_GET0R( 'Y_CUR_REAL', Y1, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :        'Error : PLOT_CURLINE : after PAR_GETs cursor 1 values',
      :                  STATUS )
@@ -105,7 +104,7 @@
 
 	CALL CURSOR_DISPLAY( STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 	  RETURN
 	END IF
 
@@ -114,7 +113,7 @@
 	CALL PAR_GET0R( 'X_CUR_REAL', X2, STATUS)
 	CALL PAR_GET0R( 'Y_CUR_REAL', Y2, STATUS)
 
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 
      :        'Error : PLOT_CURLINE : after PAR_GETs cursor 2 values',
      :                  STATUS )

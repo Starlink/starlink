@@ -24,8 +24,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -67,7 +66,7 @@
 * ================================================================
 
 * check status on entry
-	IF( STATUS. NE. ADAM__OK)THEN
+	IF( STATUS. NE. SAI__OK)THEN
 	  RETURN
 	END IF
 
@@ -78,7 +77,7 @@
 	CALL PAR_GET0R( 'ARCSEC_PIXEL', ARCSEC_PIXEL, STATUS)
 	CALL PAR_GET0I( 'CIRCLE_PEN', PEN_NUMBER, STATUS)
 	CALL PAR_GET0C( 'CIRCLE_COLOUR', COLOUR_CODE, STATUS)
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : PLOT_CIRCLE : after PAR_GETs',
      :                  STATUS )
 	  RETURN

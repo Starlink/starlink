@@ -24,8 +24,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -71,7 +70,7 @@
 * ================================================================
 
 * check status on entry
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : PLOT_COMMENT : On entry', 
      :                  STATUS )
 	  RETURN
@@ -92,7 +91,7 @@
 	CALL PAR_GET0C( 'COMMENT_COLOUR', COMMENT_COLOUR, STATUS)
 	CALL PAR_GET0C( 'COMMENT_ORIENT', COMMENT_ORIENT, STATUS)
 	CALL PAR_GET0C( 'COMMENT_WORD', COMMENT_WORD, STATUS)
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'Error : PLOT_COMMENT : after PAR_GETS',
      :                  STATUS )
 	  RETURN

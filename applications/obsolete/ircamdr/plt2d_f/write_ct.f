@@ -27,8 +27,7 @@
 
 * Global constants :
 
-	INCLUDE 'ADAMDEFNS'
-	INCLUDE 'ADAMERRS'
+	INCLUDE 'ADAM_DEFNS'
         INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
@@ -75,13 +74,13 @@
 * ===================================================================
 
 * check status on entry
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
 	  RETURN
 	END IF
 
 * get direction of colour table from parameter system
 	CALL PAR_GET0C( 'CT_DIRECTION', CT_DIRECTION, STATUS)
-	IF( STATUS. NE. ADAM__OK) THEN
+	IF( STATUS. NE. SAI__OK) THEN
           CALL ERR_REP('ERR', 'WRITE_CT : after PAR_GET CT_DIRECTION',
      :                  STATUS )
 	  RETURN
