@@ -12,6 +12,10 @@ Starlink::Versions - determine version numbers of Starlink applications
 
  $verstring = starversion_string('kappa');
 
+ if (starversion('surf') gt v1.5.2) {
+   ...
+ }
+
 =head1 DESCRIPTION
 
 When writing Perl programs that make use of Starlink applications
@@ -112,22 +116,29 @@ If these methds fail undefined values are returned. Note that
 this module will not look explicitly in a Starlink install tree
 unless it can not work out a directory tree to search as an alternative.
 
-Care must be taken for applications where the environment variable
-used is not the same as the application name. For example, C<figaro>
-uses C<$FIG_DIR> rather than C<$FIGARO_DIR>. In this case,
-the environment variable will not be located and C</star> (or 
-wherever) will be searched for the version number regardless of the
-actual location where FIGARO is installed. If you are interested
-in applications which do this, the simplest way to overcome
-this is to set C<FIGARO_DIR> to C<FIG_DIR> just before executing
-the C<starversion> (or related) function:
-
- $ENV{FIGARO_DIR} = $ENV{FIG_DIR};
- $version = starversion('figaro');
-
 Finally, applications that do not have an application directory
 (and therefore most likely no datestamp file), for example C<hdstrace>,
 can not have their version determined with this module.
+
+=head2 Special Cases
+
+In some cases the environment variable used to define an application
+directory can not be derived directly from the application name
+itself. Additionally, some date-stamp files use mixed case.
+
+The following cases are treated specially by the module:
+
+=over 4
+
+=item B<Figaro>
+
+Figaro uses C<FIG_DIR> rather than C<FIGARO_DIR>.
+
+=item B<StarX>
+
+The starx date-stamp file is called C<starX_datestamp>.
+
+=back
 
 =head1 FUNCTIONS
 
@@ -145,14 +156,13 @@ when C<starversion> is called in a scalar context. This allows
 versions to be compared directly using Perl.
 
   $version = starversion( 'prog' );
-  print "yes" if $version > v0.15.2;
+  print "yes" if $version gt v0.15.2;
 
 Returns undef if a version number can not be determined.
 
 =cut
 
 sub starversion {
-  local($^W) = 0; # localize warnings to hide odd number of hash warning
   my %version = _get_version( $_[0] ) or return undef;
   if (wantarray) {
     return ( $version{MAJOR}, $version{MINOR}, $version{PATCHLEVEL} );
@@ -173,7 +183,6 @@ if a version can not be determined.
 =cut
 
 sub starversion_string {
-  local($^W) = 0; # localize warnings to hide odd number of hash warning
   my %version = _get_version( $_[0] ) or return undef;
   return $version{ STRING };
 }
@@ -189,7 +198,6 @@ can not be determined.
 =cut
 
 sub starversion_major {
-  local($^W) = 0; # localize warnings to hide odd number of hash warning
   my %version = _get_version( $_[0] ) or return undef;
   return $version{ MAJOR };
 }
@@ -204,7 +212,6 @@ can not be determined.
 =cut
 
 sub starversion_minor {
-  local($^W) = 0; # localize warnings to hide odd number of hash warning
   my %version = _get_version( $_[0] ) or return undef;
   return $version{ MINOR };
 }
@@ -219,7 +226,6 @@ can not be determined.
 =cut
 
 sub starversion_patchlevel {
-  local($^W) = 0; # localize warnings to hide odd number of hash warning
   my %version = _get_version( $_[0] ) or return undef;
   return $version{ PATCHLEVEL };
 }
@@ -247,7 +253,9 @@ determined (usually because the environment variable was not set).
 
 sub _get_app_dir ($) {
   # Construct the environment variable name
-  my $env = uc($_[0]) . '_DIR';
+  my $app = uc(shift);
+  $app = 'FIG' if $app eq "FIGARO";
+  my $env = $app . '_DIR';
   return ( exists $ENV{$env} ? $ENV{$env} : undef);
 }
 
@@ -261,6 +269,9 @@ application name.
 This is simply C<$PROG_DIR/../../dates>. Returns C<undef> if
 C<_get_app_dir> returns undef. Does not check that the directory
 exists.
+
+Special cases 'figaro' since the Figaro environment variable
+is C<FIG_DIR> rather than C<FIGARO_DIR>.
 
 =cut
 
@@ -301,12 +312,17 @@ and directory.
 The directory is usually obtained via the C<_get_standard_datestamp_dir>
 or C<_get_app_datestamp_dir> routines.
 
+Special cases 'starx' since the associated date-stamp file
+is called C<starX_datestamp>.
+
 Does not check to see if the file exists.
 
 =cut
 
 sub _get_datestamp_file ($$) {
-  return File::Spec->catfile($_[0], lc($_[1]).'_datestamp');
+  my $app = lc($_[1]);
+  $app = 'starX' if $app eq 'starx';
+  return File::Spec->catfile($_[0], $app.'_datestamp');
 }
 
 
@@ -461,7 +477,7 @@ The returned hash contains the following keys:
  VERSION => perl 5.6.0 version number vm.n.p
 
 The "VERSION" key is only set for perl versions 5.6.0 and newer.
-C<undef> is returned if version can not be determined.
+An empty list is returned if version can not be determined.
 
 =cut
 
@@ -495,13 +511,14 @@ sub _get_version ($) {
 		    STRING => "V$version[0].$version[1]-$version[2]",
 		   };
     if ($] >= 5.006) {
+      # Create a perl-style version 'string' if perl 5.6.0 or newer
       $CACHE{$app}{VERSION} = eval "v$version[0].$version[1].$version[2]";
     }
   }
 
   # Return the version hash if we have a version
-  # else we dont want to add the key
-  return (defined $version[0] ? %{ $CACHE{ $app } } : undef );
+  # else we dont want to add the key so return an empty list
+  return (defined $version[0] ? %{ $CACHE{ $app } } : () );
 }
 
 
