@@ -219,7 +219,7 @@ f        specified AST_SET sets the attribute for both axes to the supplied
 f        value, AST_CLEAR clears the attributes for both axes, AST_TEST
 f        tests the attribute for axis 1, and AST_GET gets the value for
 *        axis 1.
-*     MajTickLen (double)
+*     MajTickLen(axis) (double)
 *        This attribute gives the length of the major tick marks drawn by
 c        function astGrid as a fraction of the minimum dimension of the 
 f        routine AST_GRID as a fraction of the minimum dimension of the 
@@ -230,7 +230,7 @@ f        routine AST_GRID as a fraction of the minimum dimension of the
 *        whether a grid of lines has been drawn (see attribute Grid). If a 
 *        grid has been drawn a default of zero is used (i.e. major tick 
 *        marks are not drawn). Otherwise a default of +0.015 is used.
-*     MinTickLen (double)
+*     MinTickLen(axis) (double)
 *        This attribute gives the length of the minor tick marks drawn by
 c        function astGrid as a fraction of the minimum dimension of the 
 f        routine AST_GRID as a fraction of the minimum dimension of the 
@@ -508,6 +508,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        Original version.
 *     28-OCT-1998 (DSB):
 *        Added method astPolyCurve. 
+*     12-OCT-1999 (DSB):
+*        Allow tick marks to be specified separately for both axes.
 *-
 */
 
@@ -547,8 +549,8 @@ typedef struct AstPlot {
    double centre[ 2 ];
    double gap[ 2 ];
    double labelat[ 2 ];
-   double majticklen;
-   double minticklen;
+   double majticklen[ 2 ];
+   double minticklen[ 2 ];
    double numlabgap[ 2 ];
    double size[ AST__NPID ];
    double textlabgap[ 2 ];
@@ -557,7 +559,7 @@ typedef struct AstPlot {
    double ucentre[ 2 ];
    double ugap[ 2 ];
    double ulblat[ 2 ];
-   double umjtkln;
+   double umjtkln[ 2 ];
    double width[ AST__NPID ];
    double xhi;
    double xlo;
@@ -658,14 +660,14 @@ typedef struct AstPlotVtab {
    int (* TestLabelling)( AstPlot * );
    void (* SetLabelling)( AstPlot *, int );
    void (* ClearLabelling)( AstPlot * );
-   double (* GetMajTickLen)( AstPlot * );
-   int (* TestMajTickLen)( AstPlot * );
-   void (* SetMajTickLen)( AstPlot *, double );
-   void (* ClearMajTickLen)( AstPlot * );
-   double (* GetMinTickLen)( AstPlot * );
-   int (* TestMinTickLen)( AstPlot * );
-   void (* SetMinTickLen)( AstPlot *, double );
-   void (* ClearMinTickLen)( AstPlot * );
+   double (* GetMajTickLen)( AstPlot *, int );
+   int (* TestMajTickLen)( AstPlot *, int );
+   void (* SetMajTickLen)( AstPlot *, int, double );
+   void (* ClearMajTickLen)( AstPlot *, int );
+   double (* GetMinTickLen)( AstPlot *, int );
+   int (* TestMinTickLen)( AstPlot *, int );
+   void (* SetMinTickLen)( AstPlot *, int, double );
+   void (* ClearMinTickLen)( AstPlot *, int );
    double (* GetNumLabGap)( AstPlot *, int );
    int (* TestNumLabGap)( AstPlot *, int );
    void (* SetNumLabGap)( AstPlot *, int, double );
@@ -841,15 +843,15 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astSetLabelling_( AstPlot *, int );
    void astClearLabelling_( AstPlot * );
 
-   double astGetMajTickLen_( AstPlot * );
-   int astTestMajTickLen_( AstPlot * );
-   void astSetMajTickLen_( AstPlot *, double );
-   void astClearMajTickLen_( AstPlot * );
+   double astGetMajTickLen_( AstPlot *, int );
+   int astTestMajTickLen_( AstPlot *, int );
+   void astSetMajTickLen_( AstPlot *, int, double );
+   void astClearMajTickLen_( AstPlot *, int );
 
-   double astGetMinTickLen_( AstPlot * );
-   int astTestMinTickLen_( AstPlot * );
-   void astSetMinTickLen_( AstPlot *, double );
-   void astClearMinTickLen_( AstPlot * );
+   double astGetMinTickLen_( AstPlot *, int );
+   int astTestMinTickLen_( AstPlot *, int );
+   void astSetMinTickLen_( AstPlot *, int, double );
+   void astClearMinTickLen_( AstPlot *, int );
 
    double astGetNumLabGap_( AstPlot *, int );
    int astTestNumLabGap_( AstPlot *, int );
@@ -1102,23 +1104,23 @@ astINVOKE(V,astSetCentre_(astCheckPlot(this),axis,centre))
 #define astTestCentre(this,axis) \
 astINVOKE(V,astTestCentre_(astCheckPlot(this),axis))
 
-#define astClearMajTickLen(this) \
-astINVOKE(V,astClearMajTickLen_(astCheckPlot(this)))
-#define astGetMajTickLen(this) \
-astINVOKE(V,astGetMajTickLen_(astCheckPlot(this)))
-#define astSetMajTickLen(this,majticklen) \
-astINVOKE(V,astSetMajTickLen_(astCheckPlot(this),majticklen))
-#define astTestMajTickLen(this) \
-astINVOKE(V,astTestMajTickLen_(astCheckPlot(this)))
+#define astClearMajTickLen(this,axis) \
+astINVOKE(V,astClearMajTickLen_(astCheckPlot(this),axis))
+#define astGetMajTickLen(this,axis) \
+astINVOKE(V,astGetMajTickLen_(astCheckPlot(this),axis))
+#define astSetMajTickLen(this,axis,majticklen) \
+astINVOKE(V,astSetMajTickLen_(astCheckPlot(this),axis,majticklen))
+#define astTestMajTickLen(this,axis) \
+astINVOKE(V,astTestMajTickLen_(astCheckPlot(this),axis))
 
-#define astClearMinTickLen(this) \
-astINVOKE(V,astClearMinTickLen_(astCheckPlot(this)))
-#define astGetMinTickLen(this) \
-astINVOKE(V,astGetMinTickLen_(astCheckPlot(this)))
-#define astSetMinTickLen(this,minticklen) \
-astINVOKE(V,astSetMinTickLen_(astCheckPlot(this),minticklen))
-#define astTestMinTickLen(this) \
-astINVOKE(V,astTestMinTickLen_(astCheckPlot(this)))
+#define astClearMinTickLen(this,axis) \
+astINVOKE(V,astClearMinTickLen_(astCheckPlot(this),axis))
+#define astGetMinTickLen(this,axis) \
+astINVOKE(V,astGetMinTickLen_(astCheckPlot(this),axis))
+#define astSetMinTickLen(this,axis,minticklen) \
+astINVOKE(V,astSetMinTickLen_(astCheckPlot(this),axis,minticklen))
+#define astTestMinTickLen(this,axis) \
+astINVOKE(V,astTestMinTickLen_(astCheckPlot(this),axis))
 
 #define astClearNumLabGap(this,axis) \
 astINVOKE(V,astClearNumLabGap_(astCheckPlot(this),axis))

@@ -82,8 +82,8 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     - LabelUnits(axis): Use axis unit descriptions in a Plot?
 *     - LabelUp(axis): Draw numerical Plot labels upright?
 *     - Labelling: Label and tick placement option for a Plot
-*     - MajTickLen: Length of major tick marks for a Plot
-*     - MinTickLen: Length of minor tick marks for a Plot
+*     - MajTickLen(axis): Length of major tick marks for a Plot
+*     - MinTickLen(axis): Length of minor tick marks for a Plot
 *     - MinTick(axis): Density of minor tick marks for a Plot
 *     - NumLab(axis): Draw numerical axis labels for a Plot?
 *     - NumLabGap(axis): Spacing of numerical axis labels for a Plot
@@ -249,6 +249,11 @@ f     using AST_GRID
 *        Fixed memory leaks in EdgeCrossings and EdgeLabels.
 *     16-SEP-1999 (DSB):
 *        Avoid writing out clipping limits if they are undefined.
+*     12-OCT-1999 (DSB):
+*        o  Modified use of the NumLab attribute so that setting it to zero 
+*        does not prevent exterior labels from being produced.
+*        o  Allow length of tick marks to be specified separately for
+*        both axes.
 *class--
 */
 
@@ -1214,20 +1219,20 @@ static int TestLabelling( AstPlot * );
 static void ClearLabelling( AstPlot * );
 static void SetLabelling( AstPlot *, int );
 
-static double GetMajTickLen( AstPlot * );
-static int TestMajTickLen( AstPlot * );
-static void ClearMajTickLen( AstPlot * );
-static void SetMajTickLen( AstPlot *, double );
+static double GetMajTickLen( AstPlot *, int );
+static int TestMajTickLen( AstPlot *, int );
+static void ClearMajTickLen( AstPlot *, int );
+static void SetMajTickLen( AstPlot *, int, double );
 
 static double GetTitleGap( AstPlot * );
 static int TestTitleGap( AstPlot * );
 static void ClearTitleGap( AstPlot * );
 static void SetTitleGap( AstPlot *, double );
 
-static double GetMinTickLen( AstPlot * );
-static int TestMinTickLen( AstPlot * );
-static void ClearMinTickLen( AstPlot * );
-static void SetMinTickLen( AstPlot *, double );
+static double GetMinTickLen( AstPlot *, int );
+static int TestMinTickLen( AstPlot *, int );
+static void ClearMinTickLen( AstPlot *, int );
+static void SetMinTickLen( AstPlot *, int, double );
 
 static int GetEdge( AstPlot *, int );
 static int TestEdge( AstPlot *, int );
@@ -2017,7 +2022,7 @@ MAKE_GET3(UsedGap,double,AST__BAD,this->ugap[axis],2)
 /*
 *att++
 *  Name:
-*     MajTickLen
+*     MajTickLen(axis)
 
 *  Purpose:
 *     Length of major tick marks for a Plot.
@@ -2033,6 +2038,9 @@ MAKE_GET3(UsedGap,double,AST__BAD,this->ugap[axis],2)
 c     coordinate grid (drawn with the astGrid function) by determining
 f     coordinate grid (drawn with the AST_GRID routine) by determining
 *     the length of the major tick marks drawn on the axes of a Plot.
+*     It takes a separate value for each physical axis of the Plot so 
+*     that, for instance, the setting "MajTickLen(2)=0" specifies the 
+*     length of the major tick marks drawn on the second axis.
 *
 *     The MajTickLen value should be given as a fraction of the
 *     minimum dimension of the plotting area. Negative values cause
@@ -2049,17 +2057,24 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *  Applicability:
 *     Plot
 *        All Plots have this attribute.
+
+*  Notes:
+*     - If no axis is specified, (e.g. "MajTickLen" instead of 
+*     "MajTickLen(2)"), then a "set" or "clear" operation will affect 
+*     the attribute value of all the Plot axes, while a "get" or "test" 
+*     operation will use just the MajTickLen(1) value.
+
 *att--
 */
 /* Fractional length of major tick marks. Has a value of AST__BAD when not 
 set yielding a default value of 0.015. */
-astMAKE_CLEAR(Plot,MajTickLen,majticklen,AST__BAD)
-astMAKE_GET(Plot,MajTickLen,double,0.0,( this->majticklen == AST__BAD ? 0.015 : this->majticklen))
-astMAKE_SET(Plot,MajTickLen,double,majticklen,value)
-astMAKE_TEST(Plot,MajTickLen,( this->majticklen != AST__BAD ))
+MAKE_CLEAR(MajTickLen,majticklen,AST__BAD,2)
+MAKE_SET(MajTickLen,double,majticklen,value,2)
+MAKE_TEST(MajTickLen,( this->majticklen[axis] != AST__BAD ),2)
+MAKE_GET(MajTickLen,double,0.0,( this->majticklen[axis] == AST__BAD ? 0.015 : this->majticklen[axis]),2)
 
-MAKE_GET2(Plot,UsedMajTickLen,double,0.0,this->umjtkln)
-MAKE_SET2(Plot,UsedMajTickLen,double,umjtkln,value)
+MAKE_SET3(UsedMajTickLen,double,umjtkln,value,2)
+MAKE_GET3(UsedMajTickLen,double,0.0,this->umjtkln[axis],2)
 
 /* TitleGap. */
 /* --------- */
@@ -2113,7 +2128,7 @@ astMAKE_TEST(Plot,TitleGap,( this->titlegap != AST__BAD ))
 /*
 *att++
 *  Name:
-*     MinTickLen
+*     MinTickLen(axis)
 
 *  Purpose:
 *     Length of minor tick marks for a Plot.
@@ -2129,6 +2144,9 @@ astMAKE_TEST(Plot,TitleGap,( this->titlegap != AST__BAD ))
 c     coordinate grid (drawn with the astGrid function) by determining
 f     coordinate grid (drawn with the AST_GRID routine) by determining
 *     the length of the minor tick marks drawn on the axes of a Plot.
+*     It takes a separate value for each physical axis of the Plot so 
+*     that, for instance, the setting "MinTickLen(2)=0" specifies the 
+*     length of the minor tick marks drawn on the second axis.
 *
 *     The MinTickLen value should be given as a fraction of the
 *     minimum dimension of the plotting area. Negative values cause
@@ -2146,15 +2164,19 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *  Notes:
 *     - The number of minor tick marks drawn is determined by the
 *     Plot's MinTick(axis) attribute.
+*     - If no axis is specified, (e.g. "MinTickLen" instead of 
+*     "MinTickLen(2)"), then a "set" or "clear" operation will affect 
+*     the attribute value of all the Plot axes, while a "get" or "test" 
+*     operation will use just the MinTickLen(1) value.
+
 *att--
 */
 /* Fractional length of minor tick marks. Has a value of AST__BAD when not 
 set yielding a default value of 0.007. */
-astMAKE_CLEAR(Plot,MinTickLen,minticklen,AST__BAD)
-astMAKE_GET(Plot,MinTickLen,double,0.0,( this->minticklen == AST__BAD ? 0.007 : this->minticklen))
-astMAKE_SET(Plot,MinTickLen,double,minticklen,value)
-astMAKE_TEST(Plot,MinTickLen,( this->minticklen != AST__BAD ))
-
+MAKE_CLEAR(MinTickLen,minticklen,AST__BAD,2)
+MAKE_SET(MinTickLen,double,minticklen,value,2)
+MAKE_TEST(MinTickLen,( this->minticklen[axis] != AST__BAD ),2)
+MAKE_GET(MinTickLen,double,0.0,( this->minticklen[axis] == AST__BAD ? 0.007 : this->minticklen[axis]),2)
 
 /* Labelling. */
 /* ---------- */
@@ -4822,12 +4844,28 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "majticklen" ) ) {
-      astClearMajTickLen( this );
+      astClearMajTickLen( this, 0 );
+      astClearMajTickLen( this, 1 );
+
+/* MajTickLen(axis). */
+/* ----------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearMajTickLen( this, axis - 1 );
 
 /* MinTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "minticklen" ) ) {
-      astClearMinTickLen( this );
+      astClearMinTickLen( this, 0 );
+      astClearMinTickLen( this, 1 );
+
+/* MinTickLen(axis). */
+/* ----------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearMinTickLen( this, axis - 1 );
 
 /* Labelling. */
 /* -------- */
@@ -7337,27 +7375,9 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
 
-/* Store the length in graphics coordinates of major tick marks. 
-   Use a default of zero if a grid has been drawn. */
-   if( astTestMajTickLen( this ) || !drawgrid ){
-      mjtklen = astGetMajTickLen( this )*mindim;
-   } else {
-      mjtklen = 0.0;
-   }
-
-/* Store the length in graphics coordinates of minor tick marks. */
-   mntklen = astGetMinTickLen( this )*mindim;
-
-/* See if major tick marks are required. This is the case if the length of 
-   major tick marks is not zero. */
-   major = ( mjtklen != 0.0 );
-
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
    GrfAttrs( this, TICKS_ID, 1, GRF__LINE );
-
-/* If the minor tick marks are of zero length, don't draw them. */
-   minor = ( mntklen != 0.0 );
 
 /* If ticks are to be put round the edges of the plotting area... */
 /* ============================================================== */
@@ -7371,6 +7391,24 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Do each axis. */
          for( axis = 0; axis < 2; axis++ ){
+
+/* Store the length in graphics coordinates of major tick marks for this
+   axis. Use a default of zero if a grid has been drawn. */
+            if( astTestMajTickLen( this, axis ) || !drawgrid ){
+               mjtklen = astGetMajTickLen( this, axis )*mindim;
+            } else {
+               mjtklen = 0.0;
+            }
+
+/* See if major tick marks are required. This is the case if the length of 
+   major tick marks is not zero. */
+            major = ( mjtklen != 0.0 );
+
+/* Store the length in graphics coordinates of minor tick marks. */
+            mntklen = astGetMinTickLen( this, axis )*mindim;
+
+/* If the minor tick marks are of zero length, don't draw them. */
+            minor = ( mntklen != 0.0 );
 
 /* Get the edge to be labelled with the axis values. Edge 0 is the left hand 
    edge. Edge 1 is the top edge. Edge 2 is the right-hand edge. Edge 3 is 
@@ -7453,6 +7491,24 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Do each axis. */
       for( axis = 0; axis < 2; axis++ ){
+
+/* Store the length in graphics coordinates of major tick marks for this
+   axis. Use a default of zero if a grid has been drawn. */
+         if( astTestMajTickLen( this, axis ) || !drawgrid ){
+            mjtklen = astGetMajTickLen( this, axis )*mindim;
+         } else {
+            mjtklen = 0.0;
+         }
+
+/* See if major tick marks are required. This is the case if the length of 
+   major tick marks is not zero. */
+         major = ( mjtklen != 0.0 );
+
+/* Store the length in graphics coordinates of minor tick marks. */
+         mntklen = astGetMinTickLen( this, axis )*mindim;
+
+/* If the minor tick marks are of zero length, don't draw them. */
+         minor = ( mntklen != 0.0 );
 
 /* Indicate that the tick mark lengths should not be negatated. */
          mjsign = 1.0;
@@ -9949,7 +10005,18 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "majticklen" ) ) {
-      dval = GetUsedMajTickLen( this );
+      dval = astGetMajTickLen( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
+/* MajTickLen(axis). */
+/* ----------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      dval = astGetMajTickLen( this, axis - 1 );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -9958,7 +10025,18 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "minticklen" ) ) {
-      dval = astGetMinTickLen( this );
+      dval = astGetMinTickLen( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
+/* MinTickLen(axis). */
+/* ----------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      dval = astGetMinTickLen( this, axis - 1 );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -10930,17 +11008,18 @@ f        The global status.
          SetUsedTextLab( this_nd, axis, edgeticks );
       }
       
+      if( astTestMajTickLen( this, axis ) ) {
+         SetUsedMajTickLen( this_nd, axis, astGetMajTickLen( this, axis ) );
+      } else {
+         SetUsedMajTickLen( this_nd, axis, drawgrid ? 0.0 : 
+                                           astGetMajTickLen( this, axis ) );
+      }
+
    }
 
    SetUsedGrid( this_nd, drawgrid );
    SetUsedLabelling( this_nd, edgeticks ? 0 : 1 );
    SetUsedBorder( this_nd, border );
-
-   if( astTestMajTickLen( this ) ) {
-      SetUsedMajTickLen( this_nd, astGetMajTickLen( this ) );
-   } else {
-      SetUsedMajTickLen( this_nd, drawgrid ? 0.0 : astGetMajTickLen( this ) );
-   }
 
 /* Free the memory used to hold information about the curves. */
    cdata = CleanCdata( cdata );
@@ -14413,6 +14492,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 *     This function displays the numerical labels supplied in the
 *     structure pointed to by "list". Overlapping labels are omitted, 
 *     and redundant leading fields are removed from adjacent labels.
+*     Nothing is plotted if the NumLab attribute for the axis is false.
 
 *  Parameters:
 *     this
@@ -14461,7 +14541,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 
 /* Return without action if an error has occurred, or there are no labels to 
    draw. */
-   if( !astOK || nlab == 0 || !list ) return;
+   if( !astOK || nlab == 0 || !list || !astGetNumLab( this, axis ) ) return;
 
 /* See if escape sequences are to be interpreted within text strings. */
    esc = astGetEscape( this );
@@ -15409,14 +15489,32 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == sscanf( setting, "majticklen= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetMajTickLen( this, dval );
+      astSetMajTickLen( this, 0, dval );
+      astSetMajTickLen( this, 1, dval );
+
+/* MajTickLen(axis). */
+/* ----------------- */
+   } else if ( nc = 0,
+               ( 2 == sscanf( setting, "majticklen(%d)= %lg %n",
+                              &axis, &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetMajTickLen( this, axis - 1, dval );
 
 /* MinTickLen. */
 /* ----------- */
    } else if ( nc = 0,
         ( 1 == sscanf( setting, "minticklen= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetMinTickLen( this, dval );
+      astSetMinTickLen( this, 0, dval );
+      astSetMinTickLen( this, 1, dval );
+
+/* MinTickLen(axis). */
+/* ----------------- */
+   } else if ( nc = 0,
+               ( 2 == sscanf( setting, "minticklen(%d)= %lg %n",
+                              &axis, &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetMinTickLen( this, axis - 1, dval );
 
 /* Labelling. */
 /* -------- */
@@ -15722,12 +15820,26 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "majticklen" ) ) {
-      result = astTestMajTickLen( this );
+      result = astTestMajTickLen( this, 0 );
+
+/* MajTickLen(axis). */
+/* ---------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestMajTickLen( this, axis - 1 );
 
 /* MinTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "minticklen" ) ) {
-      result = astTestMinTickLen( this );
+      result = astTestMinTickLen( this, 0 );
+
+/* MinTickLen(axis). */
+/* ---------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestMinTickLen( this, axis - 1 );
 
 /* Labelling. */
 /* -------- */
@@ -16510,7 +16622,6 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    int frdigset;       /* Was the Frame Digits attribute set originally? */
    int dig_low;        /* The lowest value to use for Digits */
    int digits;         /* New Digits value */
-   int hide;           /* Hide labels? */
    int i;              /* Tick index. */
    int nmajor;         /* No. of major tick marks */
    int nminor;         /* No. of minor tick marks */
@@ -16539,9 +16650,6 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 
 /* Get a pointer to the current Frame from the Plot. */
    frame = astGetFrame( this, AST__CURRENT );
-
-/* See if labels are to be hidden. */
-   hide = astGetNumLab( this, axis ) ? 0 : 1;
 
 /* Initialise a flag to indicate that all adjacent labels are different. */
    ok = 0;
@@ -16576,13 +16684,6 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
       fmt = astGetFormat( frame, axis );
       ok = CheckLabels( frame, axis, ticks, nmajor, labels );
 
-/* If the returned labels are not needed, free the memory. */
-      if( labels && hide ) {
-         for( i = 0; i < nmajor; i++ ){
-            if( labels[ i ] ) labels[ i ] = (char *) astFree( (void *) labels[ i ] );
-         }
-         labels = (char **) astFree( (void *) labels );
-      }
    }
 
 /* If no Format has been set for the Frame, or if the set Format results in
@@ -16714,14 +16815,6 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
                }
             }
          }
-      }
-
-/* If the returned labels are not needed, free the memory. */
-      if( labels && hide ) {
-         for( i = 0; i < nmajor; i++ ){
-            if( labels[ i ] ) labels[ i ] = (char *) astFree( (void *) labels[ i ] );
-         }
-         labels = (char **) astFree( (void *) labels );
       }
 
 /* Clear the Digits and Format values. */
@@ -18200,19 +18293,27 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    if( dval != AST__BAD ) astWriteDouble( channel, "TtlGap", set, 1, dval, 
                                          "Gap between title and edge" );
 
-/* MajTickLen. */
-/* ----------- */
-   set = TestMajTickLen( this );
-   dval = set ? GetMajTickLen( this ) : astGetMajTickLen( this );
-   if( dval != AST__BAD ) astWriteDouble( channel, "MjTkLn", set, 0, dval, 
-                                         "Major tick length" );
+/* MajTickLen(axis). */
+/* ----------------- */
+   for( axis = 0; axis < 2; axis++ ){
+      set = TestMajTickLen( this, axis );
+      dval = set ? GetMajTickLen( this, axis ) : astGetMajTickLen( this, axis );
+      if( dval != AST__BAD ) {
+         (void) sprintf( buff, "MjTkLn%d", axis + 1 );
+         astWriteDouble( channel, buff, set, 0, dval, "Major tick length" );
+      }
+   }
 
-/* MinTickLen. */
-/* ----------- */
-   set = TestMinTickLen( this );
-   dval = set ? GetMinTickLen( this ) : astGetMinTickLen( this );
-   if( dval != AST__BAD ) astWriteDouble( channel, "MnTkLn", set, 1, dval, 
-                                         "Minor tick length" );
+/* MinTickLen(axis). */
+/* ----------------- */
+   for( axis = 0; axis < 2; axis++ ){
+      set = TestMinTickLen( this, axis );
+      dval = set ? GetMinTickLen( this, axis ) : astGetMinTickLen( this, axis );
+      if( dval != AST__BAD ) {
+         (void) sprintf( buff, "MnTkLn%d", axis + 1 );
+         astWriteDouble( channel, buff, set, 1, dval, "Minor tick length" );
+      }
+   }
 
 /* Labelling. */
 /* ---------- */
@@ -18751,12 +18852,14 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 /* The length of the major tick marks as a fraction of the minimum
    dimension of the plotting area. Store AST__BAD to indicate that no
    value has been set. This will cause a default of 0.015 to be used. */
-      new->majticklen = AST__BAD;
+      new->majticklen[ 0 ] = AST__BAD;
+      new->majticklen[ 1 ] = AST__BAD;
 
 /* The length of the minor tick marks as a fraction of the minimum
    dimension of the plotting area. Store AST__BAD to indicate that no
    value has been set. This will cause a default of 0.007 to be used. */
-      new->minticklen = AST__BAD;
+      new->minticklen[ 0 ] = AST__BAD;
+      new->minticklen[ 1 ] = AST__BAD;
 
 /* Are numeric labels to be drawn upright? Store a value of -1 to indicate 
    that no value has yet been set. This will cause a default value of 0 (no)
@@ -18826,12 +18929,12 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
          new->ulbunit[ axis ] = new->labelunits[ axis ];
          new->umintk[ axis ] = new->mintick[ axis ];
          new->utxtlb[ axis ] = new->textlab[ axis ];
+         new->umjtkln[ axis ] = new->majticklen[ axis ];
       }
    
       new->ugrid = new->grid;
       new->ulbling = new->labelling;
       new->uborder = new->border;
-      new->umjtkln = new->majticklen;
 
 /* Initialise the protected Ink attribute so that visible ink is used. */
       new->ink = -1;
@@ -19169,13 +19272,43 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 
 /* MajTickLen. */
 /* ----------- */
-      new->majticklen = astReadDouble( channel, "mjtkln", AST__BAD );
-      if ( TestMajTickLen( new ) ) SetMajTickLen( new, new->majticklen );
+/* Retained in order to read old Plots - new Plots use MajTickLen(axis). */
+      new->majticklen[ 0 ] = astReadDouble( channel, "mjtkln", AST__BAD );
+      if( new->majticklen[ 0 ] != AST__BAD ) {
+         new->majticklen[ 1 ] = new->majticklen[ 0 ];
+         if ( TestMajTickLen( new, 0 ) ) SetMajTickLen( new, 0, new->majticklen[ 0 ] );
+         if ( TestMajTickLen( new, 1 ) ) SetMajTickLen( new, 1, new->majticklen[ 1 ] );
+
+/* MajTickLen(axis). */
+/* ----------------- */
+      } else {
+         for( axis = 0; axis < 2; axis++ ){
+            (void) sprintf( buff, "mjtkln%d", axis + 1 );
+            new->majticklen[ axis ] = astReadDouble( channel, buff, AST__BAD );
+            if ( TestMajTickLen( new, axis ) ) SetMajTickLen( new, axis,
+                                                        new->majticklen[ axis ] );
+         }
+      }
 
 /* MinTickLen. */
 /* ----------- */
-      new->minticklen = astReadDouble( channel, "mntkln", AST__BAD );
-      if ( TestMinTickLen( new ) ) SetMinTickLen( new, new->minticklen );
+/* Retained in order to read old Plots - new Plots use MinTickLen(axis). */
+      new->minticklen[ 0 ] = astReadDouble( channel, "mntkln", AST__BAD );
+      if( new->minticklen[ 0 ] != AST__BAD ) {
+         new->minticklen[ 1 ] = new->minticklen[ 0 ];
+         if ( TestMinTickLen( new, 0 ) ) SetMinTickLen( new, 0, new->minticklen[ 0 ] );
+         if ( TestMinTickLen( new, 1 ) ) SetMinTickLen( new, 1, new->minticklen[ 1 ] );
+
+/* MinTickLen(axis). */
+/* ----------------- */
+      } else {
+         for( axis = 0; axis < 2; axis++ ){
+            (void) sprintf( buff, "mntkln%d", axis + 1 );
+            new->minticklen[ axis ] = astReadDouble( channel, buff, AST__BAD );
+            if ( TestMinTickLen( new, axis ) ) SetMinTickLen( new, axis,
+                                                        new->minticklen[ axis ] );
+         }
+      }
 
 /* Labelling. */
 /* ---------- */
