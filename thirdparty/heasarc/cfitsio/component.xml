@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="cfitsio">
+  <version>2.4-90</version>
+  <path>thirdparty/heasarc/cfitsio</path>
+  <description>CFITSIO -- C and Fortran libraries for access to FITS files
+        </description>
+  <abstract><p>
+The CFITSIO package is a series of C functions that provide easy access
+to FITS files on disk.  It was written by William D. Pence of HEASARC
+(High Energy Astrophysics Science Archive Research Center) at the
+Goddard Space Flight Center, USA.  Starlink is grateful to William
+Pence for giving his permission for CFITSIO to be released on Starlink.
+</p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <documentation> sun227</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
