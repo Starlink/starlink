@@ -40,7 +40,6 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Create and locate POSIT box
-        CALL DAT_NEW( LOC, 'POSIT', 'EXTENSION', 0, 0, STATUS )
         CALL DAT_FIND( LOC, 'POSIT', PLOC, STATUS )
 
 *      Set number of sources

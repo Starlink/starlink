@@ -40,12 +40,21 @@
 *
       INTEGER                    N                  ! The dataset slot
 *
+*    To ensure inclusion:
+*
+      EXTERNAL			SSO0_BLK
+*
 *    Local variables :
 *
       INTEGER                    I                  ! Loop over SSO resources
 *-
 
       IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Initialise yet?
+        IF ( .NOT. SSO_INIT_Q ) THEN
+          CALL SSO_INIT( STATUS )
+        END IF
 
 *      Search for locator in table
         N = 0

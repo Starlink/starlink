@@ -154,7 +154,6 @@
 
 *    Get Asterix going
       CALL AST_INIT( )
-      CALL SSO_INIT( )
 
 *    Initialise the table description
       NFLD = 0
@@ -459,7 +458,6 @@
 
 *    Tidy up
  99   CALL AST_CLOSE()
-      CALL SSO_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

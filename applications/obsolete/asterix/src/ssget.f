@@ -104,7 +104,6 @@
 
 *    Initialise SSO system
       CALL AST_INIT()
-      CALL SSO_INIT()
 
 *    Get input object from user
       CALL USI_ASSOC( 'INP', 'SSDSset|SSDS', 'READ', SFID, STATUS )
@@ -222,8 +221,7 @@
       CALL SSI_RELEASE( SFID, STATUS )
 
 *    Tidy up
- 99   CALL SSO_CLOSE( STATUS )
-      CALL AST_CLOSE()
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
