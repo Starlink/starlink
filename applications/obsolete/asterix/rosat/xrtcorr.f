@@ -97,7 +97,6 @@
       CHARACTER*80 CALDIR                 ! Dir for XRT cal files
       CHARACTER*80 RFILE                  ! Response matrix file
       CHARACTER*80 EFILE                  ! Eff. area file
-      LOGICAL INPRIM                      ! Is input file a primitive array ?
       LOGICAL THERE                       ! Is HDS object present ?
       INTEGER DPNTR                       ! Pointer to reordered data array
       INTEGER TDPNTR                      ! Pointer to original data array
@@ -146,7 +145,7 @@
       LOGICAL DFLAG                       ! Performing dead time corrections ?
       LOGICAL LHRI                        ! HRI data ?
       BYTE MASK                           ! BADBITS mask
-      INTEGER LP,OFID
+      INTEGER LP,OFID,ifid
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
@@ -165,7 +164,7 @@
 *  Get file identifiers
       IF (OVER) THEN
         CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', IFID, STATUS )
-        CALL ADI_CLONE( IID, OFID, STATUS )
+        CALL ADI_CLONE( IFID, OFID, STATUS )
       ELSE
 
         CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
@@ -1555,7 +1554,7 @@ D        WRITE(*,*) RLP
       INTEGER NELS                       ! Tot size of array
       LOGICAL LVAR                       ! Are variances present in input file?
       LOGICAL LQUAL                      ! Is quality present in input file?
-      REAL BASE                          ! Axis base values
+      REAL			SPARR(2)		! Spaced axis values
       INTEGER			IDUM			! Dummy dimension
 *-
       IF (STATUS .NE. SAI__OK) RETURN
