@@ -40,12 +40,13 @@
 *  25 May 94 (v1.7-1) PSF structure added in HDS output files
 *  25 Aug 95 V1.8-0   Bug fix for event datasets (RJV)
 *  11 Sep 95 V1.8-1   OMD support removed (RJV)
+*  20 Dec 1995 V2.0-0 ADI port (DJA)
+*
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Global variables :
@@ -58,19 +59,17 @@
       INTEGER CHR_LEN
         EXTERNAL CHR_LEN
 *    Local Constants :
+
+      CHARACTER*80		ELISTS
+        PARAMETER		( ELISTS = 'X_CORR,Y_CORR,X_DET,'/
+     :           /'Y_DET,RAW_TIMETAG,PULSE_HEIGHT_CH,CORR_PH_CH' )
       CHARACTER*30            VERSION
-         PARAMETER          ( VERSION = 'XSORT Version 1.8-1' )
+         PARAMETER          ( VERSION = 'XSORT Version 2.0-0' )
 
 *    Local variables :
       RECORD /XRT_HEAD/ HEAD                    ! Observation header information
       RECORD /XRT_SCFDEF/ SRT, BSRT             ! Sorting parameters for source
-*                                               ! and background files
-*
-      CHARACTER*(DAT__SZLOC)  LOCS		! Locator to Binned file
-      CHARACTER*(DAT__SZLOC)  LOCB		! Locator to Binned bckgnd file
-      CHARACTER*(DAT__SZLOC)  ELOCS(7)		! Locators to EVDS source lists
-      CHARACTER*(DAT__SZLOC)  ELOCB(7)		! Locators to EVDS bckgnd lists
-      CHARACTER*30 VERS       	                ! SASS version date
+                                                ! and background files
 
       INTEGER                 SID               ! ID of source output dataset
       INTEGER                 BID               ! ID of bckgrnd output data
@@ -96,7 +95,6 @@
       INTEGER                 TOTEV_BCK         ! Number of events in bckgnd box
 
       REAL                    MRES		! Resolution of spatial mask
-
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -106,18 +104,14 @@
 *  Get directory name from user and display the available observations.
 *  Get rootname of file wanted.
       CALL XRTSORT_FILESELECT(SRT, HEAD, STATUS)
-*
 
 *  Read header info from the corresponding _HDR.SDF file
       CALL RAT_GETXRTHEAD(SRT.ROOTNAME, HEAD, STATUS)
 
-*
 * Get type of output dataset - binned or event?
       CALL USI_GET0C('TYPE', SRT.DTYPE, STATUS)
-*
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*
+
 * Check if response made sense
       CALL CHR_UCASE(SRT.DTYPE)
       IF (SRT.DTYPE(1:1).EQ.'B') THEN
@@ -129,151 +123,133 @@
         GOTO 999
       ENDIF
 
-*
 *  Get the sort control information from the user
       CALL XRTSORT_RANGESELECT(HEAD,SRT,BSRT,SDIM,BDIM,NRBIN,NAZBIN,
      :                                  MDIM,MRES,SMPTR,BMPTR,STATUS)
 
-      CALL USI_TASSOCO('OUT',SRT.DTYPE,SID,STATUS)
-      CALL ADI1_GETLOC(SID,LOCS,STATUS)
+*  Create output files
+      CALL USI_CREAT( 'OUT', ADI__NULLID, SID, STATUS )
       IF (SRT.BCKGND) THEN
-        CALL USI_TASSOCO('BOUT',SRT.DTYPE,BID,STATUS)
-        CALL ADI1_GETLOC(BID,LOCB,STATUS)
+        CALL USI_CREAT( 'BOUT', ADI__NULLID, BID, STATUS )
       ENDIF
-
       IF ( STATUS .NE. SAI__OK ) GOTO 999
-
 
 *  Sorting to a binned data set ?
       IF ( SRT.DTYPE .EQ. 'BinDS') THEN
 
-*  Create the output data set and get a pointer to mapped data array.
-         CALL XRTSORT_CRE_BINNED (HEAD, SRT, LOCS, SDIM, NRBIN,
-     &                                   SRCPTR, SQPTR, S2MPTR, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
-*
-*  Create a background dataset if required
-         IF (SRT.BCKGND) THEN
-*
-            CALL XRTSORT_CRE_BINNED (HEAD, BSRT, LOCB, BDIM, 1,
-     &                                   BCKPTR, BQPTR, B2MPTR, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
-*
-         ELSE
-*
+*    Create the output data set and get a pointer to mapped data array.
+        CALL XRTSORT_CRE_BINNED( HEAD, SRT, SID, SDIM, NRBIN,
+     :                           SRCPTR, SQPTR, S2MPTR, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*    Create a background dataset if required
+        IF ( SRT.BCKGND ) THEN
+          CALL XRTSORT_CRE_BINNED( HEAD, BSRT, BID, BDIM, 1,
+     :                             BCKPTR, BQPTR, B2MPTR, STATUS )
+          IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+        ELSE
+
 *     Dummy up a couple of arrays.
-            CALL DYN_MAPR(7,BDIM,BCKPTR,STATUS)
-            CALL DYN_MAPB(7,BDIM,BQPTR,STATUS)
-*
-            IF (STATUS .NE. SAI__OK) THEN
-               CALL MSG_PRNT('Error mapping dynamic arrays')
-               GOTO 999
-            ENDIF
-         ENDIF
-*
-*   Map a couple of workspace arrays
-         CALL DYN_MAPR(1, NRBIN, WPNTR1, STATUS)
-         CALL DYN_MAPR(1, NRBIN, WPNTR2, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
+          CALL DYN_MAPR(7,BDIM,BCKPTR,STATUS)
+          CALL DYN_MAPB(7,BDIM,BQPTR,STATUS)
+          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error mapping dynamic arrays')
             GOTO 999
-         ENDIF
-*
-*
-         CALL XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM(1), SDIM(2),
-     &          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
-     &          BDIM(1), BDIM(2), BDIM(3), BDIM(4), BDIM(5), BDIM(6),
-     &          BDIM(7), NRBIN, NAZBIN, MDIM(1), MDIM(2),
-     &          MRES,%val(SMPTR),%val(BMPTR),%val(S2MPTR),%val(B2MPTR),
-     &          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
-     &          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
-*
-*
-         CALL DYN_UNMAP(SMPTR,STATUS)
-         IF (SRT.IMAGE) THEN
-           CALL DYN_UNMAP(S2MPTR,STATUS)
-         ENDIF
-         IF (SRT.BCKGND) THEN
-           CALL DYN_UNMAP(BMPTR,STATUS)
-           IF (BSRT.IMAGE) THEN
-             CALL DYN_UNMAP(B2MPTR,STATUS)
-           ENDIF
-         ENDIF
-         CALL DYN_UNMAP(WPNTR1,STATUS)
-         CALL DYN_UNMAP(WPNTR2,STATUS)
+          ENDIF
+        ENDIF
 
-         IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*  Sorting to an Event data set
-      ELSEIF (SRT.DTYPE .EQ. 'EventDS') THEN
-*
-*   Calculate the maximum number of photons which may be put into
-*   the event lists.
-         CALL XRTSORT_PHOTONCNT(HEAD, SRT, BSRT, MAPLIM, STATUS)
-*
-*   Create & map the output Event data set.
-         CALL XRTSORT_CRE_EVENT(HEAD, SRT , MAPLIM, LOCS,
-     &                                       ELOCS, SEVPTR, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
-*
+*    Map a couple of workspace arrays
+        CALL DYN_MAPR(1, NRBIN, WPNTR1, STATUS)
+        CALL DYN_MAPR(1, NRBIN, WPNTR2, STATUS)
+        IF (STATUS .NE. SAI__OK) THEN
+          CALL MSG_PRNT('Error mapping dynamic arrays')
+          GOTO 999
+        ENDIF
+
+*    Sort the data
+        CALL XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM(1), SDIM(2),
+     :          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
+     :          BDIM(1), BDIM(2), BDIM(3), BDIM(4), BDIM(5), BDIM(6),
+     :          BDIM(7), NRBIN, NAZBIN, MDIM(1), MDIM(2),
+     :          MRES,%val(SMPTR),%val(BMPTR),%val(S2MPTR),%val(B2MPTR),
+     :          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
+     :          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
+
+*    Release workspace
+        CALL DYN_UNMAP(SMPTR,STATUS)
+        IF (SRT.IMAGE) THEN
+          CALL DYN_UNMAP(S2MPTR,STATUS)
+        ENDIF
+        IF (SRT.BCKGND) THEN
+          CALL DYN_UNMAP(BMPTR,STATUS)
+          IF (BSRT.IMAGE) THEN
+            CALL DYN_UNMAP(B2MPTR,STATUS)
+          ENDIF
+        ENDIF
+        CALL DYN_UNMAP(WPNTR1,STATUS)
+        CALL DYN_UNMAP(WPNTR2,STATUS)
+        IF (STATUS .NE. SAI__OK) GOTO 999
+
+*  Sorting to an event dataset
+      ELSE IF (SRT.DTYPE .EQ. 'EventDS') THEN
+
+*    Calculate the maximum number of photons which may be put into
+*    the event lists.
+        CALL XRTSORT_PHOTONCNT(HEAD, SRT, BSRT, MAPLIM, STATUS)
+
+*   Create and map the output Event data set.
+        CALL XRTSORT_CRE_EVENT( HEAD, SRT, MAPLIM, SID, SEVPTR, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 999
+
 *   Create background file if wanted
-         IF (SRT.BCKGND) THEN
-            CALL XRTSORT_CRE_EVENT(HEAD, BSRT, MAPLIM, LOCB,
-     &                                     ELOCB, BEVPTR, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
-*
-         ELSE
-*
+        IF (SRT.BCKGND) THEN
+          CALL XRTSORT_CRE_EVENT( HEAD, BSRT, MAPLIM, BID,
+     :                                     BEVPTR, STATUS )
+
 *     Otherwise create dummy arrays
-            DO LP=1,7
-               CALL DYN_MAPR(1, MAPLIM, BEVPTR(LP), STATUS)
-            ENDDO
-*
-*
-         ENDIF
-*
+        ELSE
+          DO LP=1,7
+            CALL DYN_MAPR(1, MAPLIM, BEVPTR(LP), STATUS)
+          END DO
+
+        END IF
+        IF ( STATUS .NE. SAI__OK ) GOTO 999
+
 *   Do the sort
-         CALL XRTSORT_SORT_EVE(HEAD, SRT, BSRT, MAPLIM,
-     &          %val(SEVPTR(1)), %val(SEVPTR(2)), %val(SEVPTR(3)),
-     &          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
-     &          %val(SEVPTR(7)), %val(BEVPTR(1)), %val(BEVPTR(2)),
-     &          %val(BEVPTR(3)), %val(BEVPTR(4)), %val(BEVPTR(5)),
-     &          %val(BEVPTR(6)), %val(BEVPTR(7)),
-     &          MDIM(1),MDIM(2),MRES,%val(SMPTR),%val(BMPTR),
-     &          TOTEV_SRC,TOTEV_BCK, STATUS )
-*
+        CALL XRTSORT_SORT_EVE(HEAD, SRT, BSRT, MAPLIM,
+     :          %val(SEVPTR(1)), %val(SEVPTR(2)), %val(SEVPTR(3)),
+     :          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
+     :          %val(SEVPTR(7)), %val(BEVPTR(1)), %val(BEVPTR(2)),
+     :          %val(BEVPTR(3)), %val(BEVPTR(4)), %val(BEVPTR(5)),
+     :          %val(BEVPTR(6)), %val(BEVPTR(7)),
+     :          MDIM(1),MDIM(2),MRES,%val(SMPTR),%val(BMPTR),
+     :          TOTEV_SRC,TOTEV_BCK, STATUS )
 
-         IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*   Tidy up and shrink lists to the number of events recorded
-         DO LP=1,7
-            CALL DAT_UNMAP(ELOCS(LP), STATUS)
-            CALL DAT_ALTER(ELOCS(LP), 1, TOTEV_SRC, STATUS)
-            CALL DAT_ANNUL(ELOCS(LP),STATUS)
-         ENDDO
-*
-         IF (SRT.BCKGND) THEN
-*
-            DO LP=1,7
-               CALL DAT_UNMAP(ELOCB(LP), STATUS)
-               CALL DAT_ALTER(ELOCB(LP), 1, TOTEV_BCK, STATUS)
-               CALL DAT_ANNUL(ELOCB(LP),STATUS)
-            ENDDO
-*
-         ELSE
-            DO LP=1,7
-               CALL DYN_UNMAP(BEVPTR(LP),STATUS)
-            ENDDO
-*
-         ENDIF
-      ENDIF
-*
-*   Put SORT box into output files
-      CALL XRTSORT_WRISORT(SID, VERSION, SRT, STATUS)
-*
+        IF (STATUS .NE. SAI__OK) GOTO 999
 
-*   Background sort box
+*    Unmap lists
+        CALL EDI_UNMAP( SID, ELISTS, STATUS )
+        IF ( SRT.BCKGND ) THEN
+          CALL EDI_UNMAP( BID, ELISTS, STATUS )
+        END IF
+
+*    Shrink lists to number of events recorded
+        CALL EDI_ALTLEN( SID, TOTEV_SRC, STATUS )
+        IF ( SRT.BCKGND ) THEN
+          CALL EDI_ALTLEN( BID, TOTEV_BCK, STATUS )
+        ELSE
+          DO LP=1,7
+            CALL DYN_UNMAP(BEVPTR(LP),STATUS)
+          ENDDO
+        END IF
+
+      END IF
+
+*  Put SORT box into output files
+      CALL XRTSORT_WRISORT( SID, VERSION, SRT, STATUS )
+
+*  Background sort box
       IF (SRT.BCKGND) THEN
          CALL XRTSORT_WRISORT(BID, VERSION,  BSRT, STATUS)
       ENDIF
@@ -286,22 +262,19 @@
          CALL HSI_NEW(BID, STATUS)
          CALL HSI_ADD(BID, VERSION, STATUS)
       ENDIF
-*
-999   CONTINUE
-*
-*   Tidy up
-      CALL USI_ANNUL('OUT',STATUS)
+
+*  Tidy up
+ 999  CALL USI_ANNUL('OUT',STATUS)
       IF (SRT.BCKGND) THEN
          CALL USI_ANNUL('BOUT',STATUS)
       ENDIF
       CALL AST_CLOSE()
-*
 
       END
 
 
-*+XRTSORT_AXES   Writes the axes info into the output datafile
-	SUBROUTINE XRTSORT_AXES(LOC,NELS,NRBIN,NAXES,AXES,HIGH,LOW,
+*+ XRTSORT_AXES - Writes the axes info into the output datafile
+	SUBROUTINE XRTSORT_AXES(FID,NELS,NRBIN,NAXES,AXES,HIGH,LOW,
      :                                      BASE,SCALE,UNITS,STATUS)
 * Description :
 *        This routine writes axes structures into an output datafile
@@ -313,14 +286,14 @@
 * History :
 *     6 Nov 88: original (LTVAD::RDS)            based on EXOLESORT_AXES
 *    17 Apr 91  now copes with a radial axis    (LTVAD::RDS)
+*    18 Dec 1995 : Use new BDI routines (DJA)
+*
 * Type Definitions :
       IMPLICIT NONE
 * Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 * Import :
-      CHARACTER*(DAT__SZLOC) LOC        !Locator of HDS file
+      INTEGER			FID	! The output file
 
       INTEGER NELS(7)                   !Number of elements in each dimension
       INTEGER NRBIN                     !Number of radial bins
@@ -334,6 +307,7 @@
 * Status :
       INTEGER STATUS
 * Local variables :
+      REAL			SPARR(2)		! Spaced array data
       CHARACTER*6 VARIANT(8)               ! The type of data-array
       INTEGER DIMENSION(8)                 ! Length of each axis
       LOGICAL NORMALISED(8)                ! Data normalised to this axis ?
@@ -341,17 +315,17 @@
       INTEGER PNTR,LP,AXLP
       INTEGER SELS(8)                      ! An array of dimensions
 *-
-* Check status:
+
+*  Check status:
       IF (STATUS .NE. SAI__OK) RETURN
-*
-* Create new element array
+
+*  Create new element array
       DO LP=1,7
-         SELS(LP) = NELS(LP)
+        SELS(LP) = NELS(LP)
       ENDDO
       SELS(8) = NRBIN
-*
-* Set up units and labels for axes
-*
+
+*  Set up units and labels for axes
       UNITS(1)='degrees'
       LABEL(1)='X position'
       UNITS(2)='degrees'
@@ -372,12 +346,11 @@
       DO LP=1,8
          VARIANT(LP)='SPACED'
       ENDDO
-*
-* Set arrays for outputting later
-*
+
+*  Set arrays for output later
       DO LP=1,NAXES
 *
-          PNTR=AXES(LP)
+        PNTR=AXES(LP)
 *
           DIMENSION(LP)=SELS(PNTR)
           SCALE(LP)=(HIGH(PNTR)-LOW(PNTR))/SELS(PNTR)
@@ -388,39 +361,35 @@
           NORMALISED(LP)=.FALSE.
 *
       ENDDO
-*
-* Create axis structure in output file
-*
-      CALL BDA_CREAXES(LOC,NAXES,STATUS)
-*
-      IF (STATUS.NE.SAI__OK) GOTO 999
-*
-* Put in components of each axis
-*
-      DO AXLP=1,NAXES
-*
-         CALL BDA_PUTAXLABEL(LOC,AXLP,LABEL(AXLP),STATUS)
-*
-         CALL BDA_PUTAXUNITS(LOC,AXLP,UNITS(AXLP),STATUS)
-*
-         CALL BDA_PUTAXNORM(LOC,AXLP,NORMALISED(AXLP),STATUS)
-*
-* Write axis data as a spaced array
-*
-         CALL BDA_PUTAXVAL(LOC, AXLP, BASE(AXLP), SCALE(AXLP),
-     &                                   DIMENSION(AXLP), STATUS)
-      ENDDO
-*
-999   CONTINUE
+
+*  Put in components of each axis
+      DO AXLP = 1, NAXES
+
+*    Axis text
+        CALL BDI_AXPUT0C( FID, AXLP, 'Label', LABEL(AXLP), STATUS )
+        CALL BDI_AXPUT0C( FID, AXLP, 'Units', UNITS(AXLP), STATUS )
+
+*    Normalisation
+        CALL BDI_AXPUT0L( FID, AXLP, 'Normalised', NORMALISED(AXLP),
+     :                    STATUS )
+
+*    Write axis data as a spaced array
+        SPARR(1) = BASE(AXLP)
+        SPARR(2) = SCALE(AXLP)
+        CALL BDI_AXPUT1R( FID, AXLP, 'SpacedData', 2, SPARR, STATUS )
+
+      END DO
+
+*  Tidy up
       IF (STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP(' ','from XRTSORT_AXES',STATUS)
-      ENDIF
-*
+        CALL AST_REXIT( 'XRTSORT_AXES', STATUS )
+      END IF
+
       END
 
-*+XRTSORT_BADTIME     Finds times when quality is outside defined range
+*+ XRTSORT_BADTIME - Finds times when quality is outside defined range
       SUBROUTINE XRTSORT_BADTIME(SRT, OBS, MAXBAD, NBAD, STBAD,
-     &                              ENBAD, STATUS)
+     :                              ENBAD, STATUS)
 *    Description :
 *      Interogates a file to find the times when data has been rejected
 *    Environment parameters :
@@ -441,10 +410,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
       INCLUDE 'INC_XRTSRT'
 *    Import :
@@ -490,13 +455,13 @@
 * Map quality arrays from file
       CALL CMP_MAPV(QLOC, 'TIME', '_REAL', 'READ', TPNTR, QLEN, STATUS)
       CALL CMP_MAPV(QLOC, 'TEMPERATURE', '_INTEGER', 'READ', TEPNTR,
-     &                                                    QLEN, STATUS)
+     :                                                    QLEN, STATUS)
       CALL CMP_MAPV(QLOC, 'GAIN', '_INTEGER', 'READ', GPNTR,
-     &                                                    QLEN, STATUS)
+     :                                                    QLEN, STATUS)
 *
 * Find the quality bad times
       CALL XRTSORT_BADTIME_DOIT(QLEN, %val(TPNTR), %val(TEPNTR),
-     &                 %val(GPNTR), SRT, MAXBAD, NBAD, STBAD, ENBAD)
+     :                 %val(GPNTR), SRT, MAXBAD, NBAD, STBAD, ENBAD)
 *
 * Unmap and annul
       CALL CMP_UNMAP(QLOC, 'TIME', STATUS)
@@ -504,14 +469,12 @@
       CALL CMP_UNMAP(QLOC, 'GAIN', STATUS)
 *
       CALL HDS_CLOSE(QLOC, STATUS)
-      CALL DAT_ANNUL(QLOC, STATUS)
-*
-999   CONTINUE
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from XRTSORT_BADTIME',STATUS)
+
+*  Tidy up
+ 999  IF (STATUS .NE. SAI__OK) THEN
+         CALL AST_REXIT( 'XRTSORT_BADTIME',STATUS)
       ENDIF
-*
+
       END
 
 *+XRTSORT_BADTIME_DOIT    Find times when quality is outside selected range
@@ -551,8 +514,8 @@
 *
 *   Check if quality is within bounds for this time
          IF (TEMP(TLP).LT.SRT.TEMP_MIN .OR. TEMP(TLP).GT.SRT.TEMP_MAX
-     &       .OR. GAIN(TLP) .LT. SRT.GAIN_MIN .OR.
-     &            GAIN(TLP) .GT. SRT.GAIN_MAX) THEN
+     :       .OR. GAIN(TLP) .LT. SRT.GAIN_MIN .OR.
+     :            GAIN(TLP) .GT. SRT.GAIN_MAX) THEN
 *
             IF (NLOW .EQ. NHIGH) THEN
                NLOW=NLOW+1
@@ -568,8 +531,9 @@
 *
       END
 
-*+XRTSORT_CRE_ASTERIX - Create an ASTERIX structure
-      SUBROUTINE XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
+
+*+ XRTSORT_CRE_ASTERIX - Create an ASTERIX structure
+      SUBROUTINE XRTSORT_CRE_ASTERIX( OUTFID, SRT, HEAD, STATUS )
 *    Description :
 *       Writes information into the .MORE.ASTERIX box.
 *    Environment parameters :
@@ -584,146 +548,123 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
+      INCLUDE 'WCI_PAR'
 *    Structure definitions :
       INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
-      CHARACTER*(DAT__SZLOC) OUTLOC
+      INTEGER			OUTFID
       RECORD /XRT_HEAD/ HEAD
       RECORD /XRT_SCFDEF/ SRT
 *    Status :
       INTEGER STATUS
 *    Local constants :
 *    Local variables:
-      INTEGER                 LOOP,LOOP2          ! Loop counter
-      REAL                    EXPO_TIM            ! Exposure time (s)
-      REAL                    OBSLEN              ! Observation length (s)time
-      CHARACTER*20	      SDATE
-      DOUBLE PRECISION	      STAI
-      DOUBLE PRECISION	      BASEUT
+      CHARACTER*7		UNITS(2)		! Axis units
 
-      CHARACTER*(DAT__SZLOC)  HEA              ! HEADER
-      CHARACTER*(DAT__SZLOC)  INS              ! INSTRUMENT
-      CHARACTER*(DAT__SZLOC)  SOR              ! SORT
-      CHARACTER*(DAT__SZLOC)  PSF              ! PSF
-      CHARACTER*(DAT__SZLOC)  AST              ! ASTERIX
-      CHARACTER*(DAT__SZLOC)  MOR              ! MORE
+      REAL                    	EXPO_TIM            	! Exposure time (s)
+      REAL                    	OBSLEN              	! Observation length (s)time
 
+      DOUBLE PRECISION		DPOINT(2)		! WCS pointing dir'n
+      DOUBLE PRECISION	        STAI			! TAI at obs start
+
+      INTEGER			DETID			! Mission strings
+      INTEGER                 	LOOP,LOOP2          	! Loop counter
+      INTEGER			PIXID, PRJID, SYSID	! WCS data
+      INTEGER			TIMID			! Timing info
+
+*  Local Data:
+      DATA			UNITS/'degree','degree'/
 *-
 
-*   Check status - return if bad
+*  Check status - return if bad
       IF (STATUS .NE. SAI__OK) RETURN
-*
-*    Create the MORE ASTERIX and HEADER boxes
-      CALL BDA_CREHEAD( OUTLOC, STATUS )
-      CALL BDA_LOCHEAD(OUTLOC, HEA, STATUS)
-*    Create an instrument extension
-      CALL BDA_CREINSTR( OUTLOC, STATUS )
-      CALL BDA_LOCINSTR( OUTLOC, INS, STATUS )
-*    Create an instrument extension
-      CALL BDA_CREPSF( OUTLOC, STATUS )
-      CALL BDA_LOCPSF( OUTLOC, PSF, STATUS )
-*    Create LIVE_TIME structure
-C     CALL BDA_CRELIVE( OUTLOC, STATUS )
-C     CALL BDA_LOCLIVE( OUTLOC, LIV, STATUS )
-*    Create and write CORRECTIONS structure for use by corrections prog
-      CALL XRT_CREPROC(OUTLOC, .FALSE., .FALSE., .FALSE., STATUS)
-*
-*   Create & write the header components.
-      CALL HDX_PUTC( HEA, 'TARGET', 1, HEAD.TARGET, STATUS )
-      CALL HDX_PUTC( HEA, 'OBSERVER', 1, HEAD.OBSERVER, STATUS )
-      CALL HDX_PUTC( HEA, 'OBSERVATORY', 1, 'ROSAT', STATUS)
-      CALL HDX_PUTC( HEA, 'INSTRUMENT', 1, 'XRT', STATUS )
-      CALL HDX_PUTD( HEA, 'AXIS_RA', 1, HEAD.AXIS_RA, STATUS )
-      CALL HDX_PUTD( HEA, 'AXIS_DEC', 1, HEAD.AXIS_DEC, STATUS )
-      CALL HDX_PUTD( HEA, 'FIELD_RA', 1, SRT.FIELD_RA, STATUS )
-      CALL HDX_PUTD( HEA, 'FIELD_DEC', 1, SRT.FIELD_DEC, STATUS )
-      CALL HDX_PUTI( HEA, 'EQUINOX', 1, 2000, STATUS )
-*
+
+*  Set corrections flags
+      CALL XRT_CREPROC( OUTFID, .FALSE., .FALSE., .FALSE., STATUS )
+
+*  Mission strings describing the observation
+      CALL DCI_NEW( 'ROSAT', 'XRT', HEAD.DETECTOR, HEAD.FILTER,
+     :              HEAD.TARGET, HEAD.OBSERVER, DETID, STATUS )
+      CALL DCI_IPUT0R( DETID, 'PIXEL_SIZE', HEAD.PIXEL, STATUS )
+      CALL DCI_IPUT0D( DETID, 'SC_BASE', HEAD.BASE_SCTIME, STATUS )
+      CALL DCI_IPUT0D( DETID, 'SC_CONV', HEAD.SCCONV, STATUS )
+      CALL DCI_IPUT0C( DETID, 'RAWDATA', HEAD.ORIGIN, STATUS )
+      CALL DCI_IPUT0C( DETID, 'SASS_VERSION', HEAD.SASS_DATE, STATUS )
+
+*  World coordinates
+*   Pixellation
       IF (HEAD.ROLLCI .LT. -180.D0) HEAD.ROLLCI = HEAD.ROLLCI + 360.D0
       IF (HEAD.ROLLCI .GT.  180.D0) HEAD.ROLLCI = HEAD.ROLLCI - 360.D0
-*
-      CALL HDX_PUTD( HEA, 'POSITION_ANGLE', 1, HEAD.ROLLCI, STATUS )
-*
-*  Times:
-      CALL HDX_PUTI( HEA, 'BASE_MJD', 1, INT(HEAD.BASE_MJD), STATUS)
-      CALL CONV_MJDDAT( HEAD.BASE_MJD, SDATE)
-      CALL HDX_PUTC( HEA, 'BASE_DATE', 1, SDATE(1:11), STATUS )
-      BASEUT = DMOD(HEAD.BASE_MJD, 1.0D0) * 86400.0
-      CALL HDX_PUTD( HEA, 'BASE_UTC', 1, BASEUT, STATUS )
-*
-*   Convert to atomic time
-      CALL TIM_MJD2TAI( HEAD.BASE_MJD, STAI)
-      CALL HDX_PUTD(HEA, 'BASE_TAI', 1, STAI, STATUS)
-*
+      CALL WCI_NEWPX( 0, 0.0, 0.0, UNITS, -HEAD.ROLLCI, PIXID, STATUS )
+*   Projection
+      DPOINT(1) = HEAD.AXIS_RA
+      DPOINT(2) = HEAD.AXIS_DEC
+      CALL WCI_NEWPRJ( 'TAN', 0, 0.0, DPOINT, 180.0D0, PRJID, STATUS )
+      DPOINT(1) = SRT.FIELD_RA
+      DPOINT(2) = SRT.FIELD_DEC
+      CALL ADI_CPUT1D( PRJID, 'NPOINT', 2, DPOINT, STATUS )
+*   Coordinate system
+      CALL WCI_NEWSYS( 'FK5', 2000.0, WCI__FLAG, SYSID, STATUS )
+
+*  Timing information. Time frame is spacecraft local frame
+      CALL TCI_NEW( 'LOCAL', TIMID, STATUS )
+
+*  Observation start
+      CALL ADI_CPUT0D( TIMID, 'MJDObs', HEAD.BASE_MJD, STATUS )
+
+*  Convert to atomic time
+      CALL TCI_MJD2TAI( HEAD.BASE_MJD, STAI )
+      CALL ADI_CPUT0D( TIMID, 'TAIObs', STAI, STATUS )
+
+*  Calculate observation length
       OBSLEN = 0.0
-      DO LOOP=1,SRT.NTIME
-         OBSLEN = OBSLEN + SRT.MAX_T(LOOP) - SRT.MIN_T(LOOP)
-      ENDDO
-      CALL HDX_PUTR( HEA, 'OBS_LENGTH', 1, OBSLEN, STATUS)
-*
-* Calculate exposure time and write to header
+      DO LOOP = 1, SRT.NTIME
+        OBSLEN = OBSLEN + SRT.MAX_T(LOOP) - SRT.MIN_T(LOOP)
+      END DO
+      CALL ADI_CPUT0R( TIMID, 'ObsLength', OBSLEN, STATUS )
+
+*  Calculate exposure time and write to header
       EXPO_TIM=0.0
       DO LOOP=1,HEAD.NTRANGE
         DO LOOP2=1,SRT.NTIME
-*
           IF ( SRT.MIN_T(LOOP2) .LT. HEAD.TEND(LOOP) .AND.
-     &          SRT.MAX_T(LOOP2) .GT. HEAD.TSTART(LOOP)) THEN
-*
+     :          SRT.MAX_T(LOOP2) .GT. HEAD.TSTART(LOOP)) THEN
             EXPO_TIM = EXPO_TIM + MIN(HEAD.TEND(LOOP), SRT.MAX_T(LOOP2))
-     &                    - MAX (HEAD.TSTART(LOOP), SRT.MIN_T(LOOP2))
+     :                    - MAX (HEAD.TSTART(LOOP), SRT.MIN_T(LOOP2))
           ENDIF
-*
         ENDDO
       ENDDO
-*
-      CALL HDX_PUTR( HEA, 'EXPOSURE_TIME', 1, EXPO_TIM, STATUS)
+      CALL ADI_CPUT0R( TIMID, 'Exposure', EXPO_TIM, STATUS )
 
-*    Create elements in the livetime extension
-C      CALL DAT_NEW ( LIV, 'ON',  '_DOUBLE', 1, SRT.NWINS, STATUS )
-C      CALL DAT_NEW ( LIV, 'OFF', '_DOUBLE', 1, SRT.NWINS, STATUS )
-C      CALL CMP_PUT1D (LIV, 'ON', SRT.NWINS, SRT.WST, STATUS)
-C      CALL CMP_PUT1D (LIV, 'OFF',SRT.NWINS, SRT.WET, STATUS)
+*  Create elements in the livetime extension
+c      CALL ADI_CPUT1D( TIMID, 'LiveOn', SRT.NWINS, SRT.WST, STATUS )
+c      CALL ADI_CPUT1D( TIMID, 'LiveOff', SRT.NWINS, SRT.WET, STATUS )
 
-*    Create elements in the instrument extension
-      CALL HDX_PUTR ( INS, 'PIXEL_SIZE', 1, HEAD.PIXEL, STATUS )
-      CALL HDX_PUTC ( INS, 'FILTER', 1, HEAD.FILTER, STATUS)
-      CALL HDX_PUTC ( INS, 'DETECTOR', 1, HEAD.DETECTOR, STATUS)
-*
-*    Write spacecraft clock start time and conversion time
-      CALL HDX_PUTD ( INS, 'SC_BASE', 1, HEAD.BASE_SCTIME, STATUS )
-      CALL HDX_PUTD ( INS, 'SC_CONV', 1, HEAD.SCCONV, STATUS )
-*
-*    Write in the raw data type - MPE, US & RDF at the moment.
-      CALL HDX_PUTC ( INS, 'RAWDATA', 1, HEAD.ORIGIN, STATUS )
-      CALL HDX_PUTC ( INS, 'SASS_VERSION',1,HEAD.SASS_DATE,STATUS )
-*
-*    Create elements in the PSF extension
-      CALL HDX_PUTC( PSF, 'LIBRARY_NAME', 1, 'PSFLIB', STATUS)
-      IF (HEAD.DETECTOR .EQ. 'HRI') THEN
-         CALL HDX_PUTC( PSF, 'ROUTINE_NAME', 1, 'XRT_HRI', STATUS)
-      ELSE
-         CALL HDX_PUTC( PSF, 'ROUTINE_NAME', 1, 'XRT_PSPC', STATUS)
-      ENDIF
-*
-C     CALL BDA_ANNUL(HEA, STATUS)
-C     CALL BDA_ANNUL(INS, STATUS)
-C     CALL BDA_ANNUL(PSF, STATUS)
-C     CALL BDA_ANNUL(LIV, STATUS)
-*
-*      Check status
-999   IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from XRTSORT_CRE_ASTERIX',STATUS)
-      ENDIF
-*
+*  Write stuff to file
+      CALL TCI_PUTID( OUTFID, TIMID, STATUS )
+      CALL WCI_PUTIDS( OUTFID, PIXID, PRJID, SYSID, STATUS )
+      CALL DCI_PUTID( OUTFID, DETID, STATUS )
+
+*  Create elements in the PSF extension
+c      CALL HDX_PUTC( PSF, 'LIBRARY_NAME', 1, 'PSFLIB', STATUS)
+c      IF (HEAD.DETECTOR .EQ. 'HRI') THEN
+c         CALL HDX_PUTC( PSF, 'ROUTINE_NAME', 1, 'XRT_HRI', STATUS)
+c      ELSE
+c         CALL HDX_PUTC( PSF, 'ROUTINE_NAME', 1, 'XRT_PSPC', STATUS)
+c      ENDIF
+
+*  Check status
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL AST_REXIT( 'XRTSORT_CRE_ASTERIX', STATUS )
+      END IF
+
       END
 
-*+XRTSORT_CRE_BINNED - Create output binned dataset
-      SUBROUTINE XRTSORT_CRE_BINNED(HEAD, SRT, OUTLOC, SDIM, NRBIN,
-     &                                    ARRPTR, QPTR, MPTR, STATUS)
+
+*+  XRTSORT_CRE_BINNED - Create output binned dataset
+      SUBROUTINE XRTSORT_CRE_BINNED(HEAD, SRT, OUTFID, SDIM, NRBIN,
+     :                                    ARRPTR, QPTR, MPTR, STATUS)
 *    Description :
 *    Environment parameters :
 *       OUTPUT             UNIV             Name of binned output file
@@ -739,7 +680,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
       INCLUDE 'PAR_ERR'
 *    Structure definitions :
       INCLUDE 'INC_XRTSRT'
@@ -747,7 +688,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *    Import :
       RECORD /XRT_HEAD/ HEAD
       RECORD /XRT_SCFDEF/ SRT
-      CHARACTER*(DAT__SZLOC)  OUTLOC            ! HDS locator to binned file
+      INTEGER			OUTFID			! Output file id
       INTEGER SDIM(7)                           ! Dimensions of binned axes
       INTEGER NRBIN                             ! Number of radial bins
 *    Import-Export :
@@ -758,7 +699,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      CHARACTER*(DAT__SZTYP)  TYPE
+      CHARACTER*15  TYPE
       CHARACTER*40 UNITS(8)
       INTEGER IDIMS(7)                          ! Dimensions of output array
       REAL LOW(8),HIGH(8)                       ! Range of each axis
@@ -766,63 +707,63 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       REAL PTOD                                 ! Pixels to degrees conversion
       INTEGER TOTELS,LP
 *-
-*   Check status - return if bad
-      IF (STATUS .NE. SAI__OK) RETURN
-*
-*   Work out dataset type
-      CALL XRT_GETTYPE(SRT.NAXES,SRT.BINAXIS,TYPE)
-*
-*   Find dimensions of output array from the SORT structure
-      TOTELS=1
-      DO LP=1,SRT.NAXES
-         IF (SRT.BINAXIS(LP) .NE. 8) THEN
-            IDIMS(LP)=SDIM(SRT.BINAXIS(LP))
-         ELSE
-            IDIMS(LP)=NRBIN
-         ENDIF
-         TOTELS=TOTELS*IDIMS(LP)
-      ENDDO
-*
-*   Write in units and title
-      CALL BDA_PUTTITLE (OUTLOC, HEAD.TITLE, STATUS)
-      CALL BDA_PUTUNITS (OUTLOC, 'Counts',    STATUS)
-*
-*   Create and map the data array
-      CALL BDA_CREDATA  (OUTLOC, SRT.NAXES, IDIMS, STATUS)
-      CALL BDA_MAPDATA (OUTLOC, 'WRITE', ARRPTR, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error creating output data array')
-         GOTO 999
-      ENDIF
-*
-      CALL BDA_CREQUAL (OUTLOC, SRT.NAXES, IDIMS, STATUS)
-      CALL BDA_MAPQUAL (OUTLOC, 'WRITE', QPTR, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error creating output quality array')
-         GOTO 999
-      ENDIF
-*
 
-*   Initialise data and quality
-      CALL ARR_INIT1R(0.0, TOTELS, %val(ARRPTR),STATUS)
-      CALL ARR_INIT1B(0, TOTELS, %val(QPTR),STATUS)
-*
-*   Calculate maximum and minimum axis values
-      PTOD = HEAD.PIXEL/3600.
-*
-*    Assume centre pixel is 0,0
+*  Check status - return if bad
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*  Work out dataset type
+      CALL XRT_GETTYPE(SRT.NAXES,SRT.BINAXIS,TYPE)
+
+*  Find dimensions of output array from the SORT structure
+      TOTELS = 1
+      DO LP = 1, SRT.NAXES
+        IF (SRT.BINAXIS(LP) .NE. 8) THEN
+          IDIMS(LP)=SDIM(SRT.BINAXIS(LP))
+        ELSE
+          IDIMS(LP)=NRBIN
+        ENDIF
+        TOTELS=TOTELS*IDIMS(LP)
+      ENDDO
+
+*  Link to interface object
+      CALL BDI_LINK( 'BinDS', SRT.NAXES, IDIMS, 'REAL', OUTFID, STATUS )
+      CALL BDI_SETDST( OUTFID, TYPE, STATUS )
+
+*  Write in units and title
+      CALL BDI_PUT0C( OUTFID, 'Title', HEAD.TITLE, STATUS )
+      CALL BDI_PUT0C( OUTFID, 'Units', 'counts', STATUS )
+
+*  Create and map the data array
+      CALL BDI_MAPR( OUTFID, 'Data', 'WRITE', ARRPTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT('Error creating output data array')
+        GOTO 99
+      END IF
+
+*  Create and map data quality
+      CALL BDI_MAPUB( OUTFID, 'Quality', 'WRITE', QPTR, STATUS )
+      CALL BDI_PUT0UB( OUTFID, 'QualityMask', QUAL__MASK, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT( 'Error creating output quality array' )
+        GOTO 99
+      ENDIF
+
+*  Initialise data and quality
+      CALL ARR_INIT1R( 0.0, TOTELS, %val(ARRPTR), STATUS )
+      CALL ARR_INIT1B( QUAL__GOOD, TOTELS, %val(QPTR), STATUS )
+
+*  Calculate maximum and minimum axis values
+      PTOD = HEAD.PIXEL / 3600.0
+
+*  Assume centre pixel is 0,0
       HIGH(1)= - (SRT.MAX_X - HEAD.SKYCX) * PTOD
       LOW(1) = - (SRT.MIN_X - HEAD.SKYCX) * PTOD
-
-*
       IF (HEAD.YSTART.LT.0) THEN
-         HIGH(2)= - (SRT.MIN_Y - HEAD.SKYCY) * PTOD
-         LOW(2) = - (SRT.MAX_Y - HEAD.SKYCY) * PTOD
+        HIGH(2)= - (SRT.MIN_Y - HEAD.SKYCY) * PTOD
+        LOW(2) = - (SRT.MAX_Y - HEAD.SKYCY) * PTOD
       ELSE
-         LOW(2)= (SRT.MIN_Y - HEAD.SKYCY) * PTOD
-         HIGH(2) = (SRT.MAX_Y - HEAD.SKYCY) * PTOD
+        LOW(2)= (SRT.MIN_Y - HEAD.SKYCY) * PTOD
+        HIGH(2) = (SRT.MAX_Y - HEAD.SKYCY) * PTOD
       ENDIF
 *
       HIGH(3)=REAL(SRT.MAX_XD) + 0.5
@@ -837,32 +778,32 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       LOW(7) =REAL(SRT.MIN_EN) - 0.5
       HIGH(8)=REAL(SRT.ELAMAX) * SRT.PTOD
       LOW(8) =REAL(SRT.ELAMIN) * SRT.PTOD
-*
-*   Create and fill axis data
-      CALL XRTSORT_AXES( OUTLOC, SDIM, NRBIN, SRT.NAXES, SRT.BINAXIS,
-     &                          HIGH, LOW, BASE, SCALE, UNITS, STATUS)
 
-*  create sort mask for images
-      IF (SRT.IMAGE) THEN
-        CALL DYN_MAPI(2,SDIM,MPTR,STATUS)
-        CALL ARX_MASK(SRT.ARDID,SDIM,BASE,SCALE,UNITS,%val(MPTR),
+*  Create and fill axis data
+      CALL XRTSORT_AXES( OUTFID, SDIM, NRBIN, SRT.NAXES, SRT.BINAXIS,
+     :                          HIGH, LOW, BASE, SCALE, UNITS, STATUS)
+
+*  Create sort mask for images
+      IF ( SRT.IMAGE ) THEN
+        CALL DYN_MAPI( 2, SDIM, MPTR, STATUS )
+        CALL ARX_MASK(SRT.ARDID,SDIM,BASE,SCALE,UNITS,%VAL(MPTR),
      :                                                     STATUS)
-      ENDIF
+      END IF
 
-*   Now create the ASTERIX box
-      CALL XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
-*
-999   CONTINUE
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ',' from XRTSORT_CRE_BINNED',STATUS)
-      ENDIF
-*
+*  Now create the ASTERIX box
+      CALL XRTSORT_CRE_ASTERIX( OUTFID, SRT, HEAD, STATUS )
+
+*  Tidy up
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'XRTSORT_CRE_BINNED', STATUS )
+      END IF
+
       END
 
-*+XRTSORT_CRE_EVENT - Create & map the output event dataset
-      SUBROUTINE XRTSORT_CRE_EVENT(HEAD, SRT, MAPLIM,
-     &                              OUTLOC, DATALOC, DATAPTR, STATUS )
+
+*+ XRTSORT_CRE_EVENT - Create & map the output event dataset
+      SUBROUTINE XRTSORT_CRE_EVENT( HEAD, SRT, MAPLIM,
+     :                              OUTFID, DPTR, STATUS )
 *    Description :
 *     Creates & maps output event dataset
 *    Parameters :
@@ -878,8 +819,6 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Structures :
       INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
@@ -888,94 +827,92 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       RECORD /XRT_HEAD/ HEAD
       RECORD /XRT_SCFDEF/ SRT
       INTEGER  MAPLIM                          ! Current mapping extent of lists
-      CHARACTER*(DAT__SZLOC)  OUTLOC           ! Locator to Event dataset
+      INTEGER			OUTFID
 *    Export :
-      CHARACTER*(DAT__SZLOC)  DATALOC(7)       ! Locators to DATA_ARRAY objects
-
-      INTEGER                 DATAPTR(7)       ! Pointers to mapped DATA_ARRAYS
+      INTEGER                 DPTR(7)       ! Pointers to mapped lists
 *    Status :
       INTEGER                 STATUS
 
 *    Local variables :
-      CHARACTER*(DAT__SZLOC)  DELLOC
       REAL MINX,MAXX,MINY,MAXY                 ! Min. and max. X values (arcmin)
+
+      INTEGER			DLID(7)			! List identifiers
+      INTEGER			I			! Loop over lists
 *-
-*   Check status
+
+*  Check status
       IF ( STATUS .NE. SAI__OK) RETURN
 
+*  Create interface object
+      CALL EDI_LINK( 'EventDS', MAPLIM, HEAD.TITLE, OUTFID, STATUS )
 
-*   Create min and max values in arcmins - note the reversal which seems
-*   to be necessary to give correct value of FIELD_MIN/MAX in output
-      MAXX = -(SRT.MIN_X - HEAD.SKYCX) * SRT.PTOD * 60.
-      MINX = -(SRT.MAX_X - HEAD.SKYCX) * SRT.PTOD * 60.
-
+*  Create min and max values in arcmins - note the reversal which seems
+*  to be necessary to give correct value of FIELD_MIN/MAX in output
+      MAXX = -(SRT.MIN_X - HEAD.SKYCX) * SRT.PTOD * 60.0
+      MINX = -(SRT.MAX_X - HEAD.SKYCX) * SRT.PTOD * 60.0
       IF (HEAD.YSTART .LT. 0) THEN
-        MAXY = -(SRT.MIN_Y - HEAD.SKYCY) * SRT.PTOD * 60.
-        MINY = -(SRT.MAX_Y - HEAD.SKYCY) * SRT.PTOD * 60.
+        MAXY = -(SRT.MIN_Y - HEAD.SKYCY) * SRT.PTOD * 60.0
+        MINY = -(SRT.MAX_Y - HEAD.SKYCY) * SRT.PTOD * 60.0
       ELSE
-        MINY = (SRT.MIN_Y - HEAD.SKYCY) * SRT.PTOD * 60.
-        MAXY = (SRT.MAX_Y - HEAD.SKYCY) * SRT.PTOD * 60.
+        MINY = (SRT.MIN_Y - HEAD.SKYCY) * SRT.PTOD * 60.0
+        MAXY = (SRT.MAX_Y - HEAD.SKYCY) * SRT.PTOD * 60.0
       ENDIF
 
+*  Define lists
+      CALL EDI_CREL0R( OUTFID, 'X_CORR', .TRUE., MINX, MAXX, 0.0,
+     :                 'arcmin', DLID(1), STATUS )
+      CALL EDI_CREL0R( OUTFID, 'Y_CORR', .FALSE., MINY, MAXY, 0.0,
+     :                 'arcmin', DLID(2), STATUS )
+      CALL EDI_CREL0I( OUTFID, 'X_DET', .FALSE., SRT.MIN_XD, SRT.MAX_XD,
+     :                 1, 'pixels', DLID(3), STATUS )
+      CALL EDI_CREL0I( OUTFID, 'Y_DET', .FALSE., SRT.MIN_YD, SRT.MAX_YD,
+     :                 1, 'pixels', DLID(4), STATUS )
+      CALL EDI_CREL0D( OUTFID, 'RAW_TIMETAG', .FALSE.,
+     :                 DBLE(SRT.MIN_T(1)), DBLE(SRT.MAX_T(SRT.NTIME)),
+     :                 0.0D0, 'seconds', DLID(5), STATUS )
+      CALL EDI_CREL0I( OUTFID, 'PULSE_HEIGHT_CH', .FALSE.,
+     :                 SRT.MIN_PH, SRT.MAX_PH, 1, 'channel no.',
+     :                 DLID(6), STATUS )
+      CALL EDI_CREL0I( OUTFID, 'CORR_PH_CH', .FALSE.,
+     :                 SRT.MIN_EN, SRT.MAX_EN, 1, 'channel_no',
+     :                 DLID(7), STATUS )
 
-*   Create the list structures to hold the event data
-      CALL LIST_CREMAP( OUTLOC, 'X_CORR', '_REAL', MAPLIM, 0.0,'arcmin',
-     &            MINX, MAXX, DATAPTR(1), DATALOC(1), STATUS)
-*
-*   Write in a flag to say that this needs to be binned backwards
-      CALL DAT_FIND( OUTLOC, 'X_CORR', DELLOC, STATUS)
-      CALL HDX_PUTL( DELLOC, 'DECREASING', 1, .TRUE., STATUS)
-      CALL DAT_ANNUL(DELLOC, STATUS)
-*
-      CALL LIST_CREMAP( OUTLOC, 'Y_CORR', '_REAL', MAPLIM, 0.0,'arcmin',
-     &            MINY, MAXY, DATAPTR(2), DATALOC(2), STATUS)
-*
-      CALL LIST_CREMAP( OUTLOC, 'X_DET', '_INTEGER', MAPLIM, 1.0,
-     &           'pixels', REAL(SRT.MIN_XD), REAL(SRT.MAX_XD),
-     &           DATAPTR(3), DATALOC(3), STATUS)
-*
-      CALL LIST_CREMAP( OUTLOC, 'Y_DET', '_INTEGER', MAPLIM, 1.0,
-     &           'pixels', REAL(SRT.MIN_YD), REAL(SRT.MAX_YD),
-     &           DATAPTR(4), DATALOC(4), STATUS)
-*
-      CALL LIST_CREMAP( OUTLOC, 'RAW_TIMETAG', '_DOUBLE', MAPLIM, 0.0d0,
-     &   'seconds', SRT.MIN_T(1), SRT.MAX_T(SRT.NTIME), DATAPTR(5),
-     &    DATALOC(5), STATUS)
-*
-      CALL LIST_CREMAP( OUTLOC, 'PULSE_HEIGHT_CH', '_INTEGER', MAPLIM,
-     &           1.0,'channel no.',REAL(SRT.MIN_PH), REAL(SRT.MAX_PH),
-     &                                  DATAPTR(6), DATALOC(6), STATUS)
-*
-      CALL LIST_CREMAP( OUTLOC, 'CORR_PH_CH', '_INTEGER', MAPLIM, 1.0,
-     &          'channel_no', REAL(SRT.MIN_EN), REAL(SRT.MAX_EN),
-     &           DATAPTR(7), DATALOC(7), STATUS)
-*
-*
-*   Initialise lists
-      CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(1)),STATUS)
-      CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(2)),STATUS)
-      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(3)),STATUS)
-      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(4)),STATUS)
-      CALL ARR_INIT1D(0.0d0, MAPLIM, %val(DATAPTR(5)),STATUS)
-      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(6)),STATUS)
-      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(7)),STATUS)
-*
-*   Write the title and units
-      CALL BDA_PUTTITLE (OUTLOC, HEAD.TITLE, STATUS)
-      CALL BDA_PUTUNITS (OUTLOC, 'Counts', STATUS)
+*  Create lists
+      DO I = 1, 7
+        CALL EDI_CREAT( OUTFID, DLID(I), STATUS )
+      END DO
 
-*
-*   Create ASTERIX structure.
-      CALL XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
-*
-999   IF (STATUS .NE. SAI__OK) THEN
-	 CALL ERR_REP(' ','from XRTSORT_CRE_EVENT', STATUS)
-      ENDIF
-*
+*  Map them
+      CALL EDI_MAPR( OUTFID, 'X_CORR,Y_CORR', 'WRITE', 0, 0, DPTR(1),
+     :               STATUS )
+      CALL EDI_MAPI( OUTFID, 'X_DET,Y_DET', 'WRITE', 0, 0, DPTR(3),
+     :               STATUS )
+      CALL EDI_MAPD( OUTFID, 'RAW_TIMETAG', 'WRITE', 0, 0, DPTR(5),
+     :               STATUS )
+      CALL EDI_MAPI( OUTFID, 'PULSE_HEIGHT_CH,CORR_PH_CH', 'WRITE',
+     :               0, 0, DPTR(6), STATUS )
+
+*  Initialise lists
+      CALL ARR_INIT1R( 0.0, MAPLIM, %val(DPTR(1)),STATUS )
+      CALL ARR_INIT1R( 0.0, MAPLIM, %val(DPTR(2)),STATUS )
+      CALL ARR_INIT1I( 0, MAPLIM, %val(DPTR(3)),STATUS )
+      CALL ARR_INIT1I( 0, MAPLIM, %val(DPTR(4)),STATUS )
+      CALL ARR_INIT1D( 0.0D0, MAPLIM, %val(DPTR(5)), STATUS )
+      CALL ARR_INIT1I( 0, MAPLIM, %val(DPTR(6)),STATUS )
+      CALL ARR_INIT1I( 0, MAPLIM, %val(DPTR(7)),STATUS )
+
+*  Create ASTERIX structure
+      CALL XRTSORT_CRE_ASTERIX( OUTFID, SRT, HEAD, STATUS )
+
+*  Tidy up
+ 99   IF (STATUS .NE. SAI__OK) THEN
+	CALL AST_REXIT( 'XRTSORT_CRE_EVENT', STATUS )
+      END IF
+
       END
 
 
-*+XRTSORT_FILESELECT - Select XRT observations to sort
+*+ XRTSORT_FILESELECT - Select XRT observations to sort
 	SUBROUTINE XRTSORT_FILESELECT(SRT, HEAD, STATUS)
 * Description :
 *         This routine allows the user to select a list of files from
@@ -1025,20 +962,20 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         CHARACTER*30 RTNAME                     ! Rootname for files
         CHARACTER*100 FILE(MAXRAW)              ! Names of files in dir.
         INTEGER NFILES                          ! No of files in dir.
-        LOGICAL LISTDIR                         ! List files on directory ?
         LOGICAL CURR				! use current directory
         INTEGER K
         INTEGER LP
-*
+*-
+
 * Check status :
         IF (STATUS .NE. SAI__OK) RETURN
-*
+
 * Find the name of the present directory and set as a default
         CALL UTIL_GETCWD(RAWDIR, STATUS)
-*
+
 * Annul the status variable if the current directory couldn't be found
         IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL(STATUS)
-*
+
 * Get directory name
         CALL USI_GET0L('CURR',CURR,STATUS)
         IF (.NOT.CURR) THEN
@@ -1049,8 +986,6 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         CALL MSG_BLNK()
 
 	IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*
 
 * Look for the header file
         CALL UTIL_FINDFILE(RAWDIR, '*_hdr.sdf', MAXRAW, FILE,
@@ -1095,15 +1030,13 @@ C     CALL BDA_ANNUL(LIV, STATUS)
           ENDIF
 
         ENDIF
-*
-*
-999     CONTINUE
-*
-        IF (STATUS .NE. SAI__OK) THEN
-           CALL ERR_REP(' ','from XRTSORT_FILESELECT' ,STATUS)
-        ENDIF
-*
-        END
+
+*  Tidy up
+ 999  IF (STATUS .NE. SAI__OK) THEN
+        CALL AST_REXIT('XRTSORT_FILESELECT' ,STATUS)
+      END IF
+
+      END
 
 *+XRTSORT_GETQLIM    Get quality limits from file and user
       SUBROUTINE XRTSORT_GETQLIM(HEAD, SRT, STATUS)
@@ -1295,7 +1228,6 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Structure definitions :
       INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
@@ -1356,7 +1288,6 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'INC_XRTHEAD'
 *    Structure definitions :
 *    Import :
@@ -1617,7 +1548,6 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         REAL ELAMIN,ELAMAX            ! Elliptic 'X' axis min and max
         REAL ELBMAX                   ! Elliptic 'Y' axis max
         REAL EXMAX,EYMAX              ! Max. axis lengths for an ellipse
-        REAL VC(3),VS(3)              ! Used in transforming input pixels
         REAL SMAXT                    ! Max. time
         REAL CBORDX,CBORDY            ! Default distance for box size
         REAL BBORDX,BBORDY            ! Border distance for bckgnd box
@@ -1628,7 +1558,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         REAL XW1,XW2,YW1,YW2
         REAL BXW,BYW		      ! Position in world coords
         REAL XWIDW,YWIDW,RADW	      ! Other parameters in world coords.
-        REAL BXWIDW,BYWIDW,BRADW      ! Other parameters in world coords.
+        REAL BXWIDW,BYWIDW      ! Other parameters in world coords.
         REAL IRADW,ORADW	      ! Inner and outer radii in world coords.
         REAL BIRADW,BORADW	      ! Inner and outer radii in world coords.
         REAL ANGLE,BANGLE	      ! Orientation  angle of ellipse
@@ -1641,15 +1571,13 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         INTEGER NXBIN,NYBIN           ! No of X and Y pixel bins
         INTEGER NREBXD,NREBYD
         INTEGER NXDBIN,NYDBIN         ! No of X and Y detector bins
-        INTEGER J,LP
+        INTEGER LP
         INTEGER ENBIN                 ! Bin width for energy axis
         INTEGER PHBIN                 ! Bin width for PHA channel axis
         INTEGER MFACT                 ! Y orientation factor (-1 or +1)
         INTEGER RES		      ! Resolution factor
         LOGICAL ANNULAR		      ! Background is annular
         LOGICAL JUMPOUT
-* Function declarations :
-        INTEGER CHR_LEN
 *
 * Statement functions :
         INTEGER NPIX
@@ -1846,7 +1774,6 @@ c        SRT.ELBMAX=Y_HWIDTH
      &                                   * PTOD * 2.0
       CBORDY=MIN(ABS(SOURCE_Y-HEAD.YSTART),ABS(SOURCE_Y-HEAD.YEND))
      &                                   * PTOD * 2.0
-
 
 *  Rectangle
       IF (SRT.SHAPE .EQ. 'R') THEN
@@ -2139,7 +2066,6 @@ c        SRT.ELBMAX=Y_HWIDTH
 *
 * Select bin widths for axes properties
 * Calculate X and Y extremes
-*
       IF ( INDEX(BIN_AXES,'1') .NE. 0) THEN
 *
 * Tell user how many raw pixels in axis
@@ -3715,15 +3641,14 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &                             /'hotspots/deadspots')
       ENDIF
 
-***   Close the files
+*  Close the files
       CALL HDS_CLOSE(ELOC, STATUS)
       IF (SRT.QUAL_LESS) CALL HDS_CLOSE(DLOC, STATUS)
 
-999   CONTINUE
-
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from XRTSORT_SORT_EVE',STATUS)
-      ENDIF
+*  Tidy up
+ 999  IF (STATUS .NE. SAI__OK) THEN
+        CALL AST_REXIT( 'XRTSORT_SORT_EVE',STATUS)
+      END IF
 
       END
 
@@ -4002,9 +3927,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       END
 
 
-
-
-
 *+XRTSORT_WRISORT    Writes the sorting conditions into selection structure
       SUBROUTINE XRTSORT_WRISORT(ID, VERSION, ASRT, STATUS)
 *    Description :
@@ -4031,20 +3953,16 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
       CALL SLN_NEWREC(VERSION,SID,STATUS)
 
-
 *  write spatial selection
       CALL SLN_PUTARD(SID,'SPACE',ASRT.ARDID,STATUS)
-
 
 *  write detector coordinate selection
       CALL SLN_PUTRNGI(SID,'XDET',1,ASRT.MIN_XD,ASRT.MAX_XD,STATUS)
       CALL SLN_PUTRNGI(SID,'YDET',1,ASRT.MIN_YD,ASRT.MAX_YD,STATUS)
 
-
 *  write time ranges
       CALL SLN_PUTRNGI(SID,'TIME',ASRT.NTIME,
      :             ASRT.MIN_T,ASRT.MAX_T,STATUS)
-
 
 *  write PH channel selection
       CALL SLN_PUTRNGI(SID,'PH_CHANNEL',1,ASRT.MIN_PH,ASRT.MAX_PH,
@@ -4053,7 +3971,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 *  write corrected PH channel selection
       CALL SLN_PUTRNGI(SID,'ENERGY',1,ASRT.MIN_EN,ASRT.MAX_EN,
      :                                                    STATUS)
-
 
       CALL SLN_PUTREC(ID,SID,STATUS)
 
@@ -4073,7 +3990,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       DOUBLE PRECISION RA,DEC
@@ -4109,8 +4025,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       END
 
 
-
-
 *+XRTSORT_AXIS2RADEC - converts  image axis coordinates to an RA/DEC
       SUBROUTINE XRTSORT_AXIS2RADEC(X,Y,TMAT,RA,DEC,STATUS)
 *    Description :
@@ -4120,8 +4034,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Global variables :
 *    Import :
       REAL X,Y
       DOUBLE PRECISION TMAT(3,3)
@@ -4150,6 +4062,5 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
         RA=RA+180.0D0
       ENDIF
       DEC=ASIN(V(3))*RTOD
-
 
       END
