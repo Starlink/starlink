@@ -563,14 +563,13 @@ CCD1_MEMCM:  ccd1_memcm;          $(LINK) $? $@
 NDG_ERR:   ndg_err;               $(LINK) $? $@
 NDG_CONST: ndg_const;             $(LINK) $? $@
 NDG_COM:   ndg_com;               $(LINK) $? $@
-NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@
 CTM_PAR:   ctm_par;               $(LINK) $? $@
 KPG_AST:   kpg_ast;               $(LINK) $? $@
 KPG_PAR:   kpg_par;               $(LINK) $? $@
 
-ast.h:   $(INSTALL)/include/ast.h;   $(LINK) $? $@
-AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
-AST_ERR:   $(INSTALL)/include/ast_err;   $(LINK) $? $@
+ast.h:   $(STAR_INC)/ast.h;   $(LINK) $? $@
+AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
+AST_ERR:   $(STAR_INC)/ast_err;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 CHR_ERR:   $(STAR_INC)/chr_err;   $(LINK) $? $@
 AGI_PAR:   $(STAR_INC)/agi_par;   $(LINK) $? $@
@@ -582,6 +581,7 @@ FIO_PAR:   $(STAR_INC)/fio_par;   $(LINK) $? $@
 GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
+NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
 NUM_CMN:   $(STAR_INC)/num_cmn;   $(LINK) $? $@
 NUM_DEC_CVT:    $(STAR_INC)/num_dec_cvt;  $(LINK) $? $@
