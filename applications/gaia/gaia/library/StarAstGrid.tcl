@@ -158,7 +158,7 @@
 
 itk::usual StarAstGrid {}
 
-class gaia::StarAstGrid {
+itcl::class gaia::StarAstGrid {
 
    #  Inheritances:
    #  -------------

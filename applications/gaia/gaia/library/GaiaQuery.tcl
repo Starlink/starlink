@@ -62,7 +62,7 @@ itk::usual GaiaQuery {}
 #  SkySearch (n) and AstroCat(n) to add support for plotting objects
 #  and displaying images.
 
-class gaia::GaiaQuery {
+itcl::class gaia::GaiaQuery {
    inherit skycat::SkyQuery
 
    #  Constructor.

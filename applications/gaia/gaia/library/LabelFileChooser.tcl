@@ -53,7 +53,7 @@
 
 itk::usual LabelFileChooser {}
 
-class gaia::LabelFileChooser {
+itcl::class gaia::LabelFileChooser {
 
    #  Inheritances:
    #  -------------

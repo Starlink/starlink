@@ -56,7 +56,7 @@
 
 itk::usual ScrollArrows {}
 
-class gaia::ScrollArrows {
+itcl::class gaia::ScrollArrows {
    
    #  Inheritances:
    #  -------------

@@ -59,7 +59,7 @@ itk::usual GaiaSearch {}
 #  SkySearch (n) and AstroCat(n) to add support for plotting objects
 #  and displaying images.
 
-class gaia::GaiaSearch {
+itcl::class gaia::GaiaSearch {
    inherit skycat::SkySearch
 
    #  Constructor.

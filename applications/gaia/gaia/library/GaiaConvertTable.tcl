@@ -51,7 +51,7 @@
 
 #.
 
-class gaia::GaiaConvertTable {
+itcl::class gaia::GaiaConvertTable {
 
    #  Inheritances:
    #  -------------

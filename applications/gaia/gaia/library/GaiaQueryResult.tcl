@@ -62,7 +62,7 @@ itk::usual GaiaQueryResult {}
 # and cat packages) with overrides for supporting foreign catalogue
 # access.
 
-class gaia::GaiaQueryResult {
+itcl::class gaia::GaiaQueryResult {
    inherit skycat::SkyQueryResult
 
    #  Constructor

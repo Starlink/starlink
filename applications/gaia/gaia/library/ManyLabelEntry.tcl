@@ -39,7 +39,7 @@
 
 itk::usual ManyLabelEntry {}
 
-class util::ManyLabelEntry {
+itcl::class util::ManyLabelEntry {
 
    # Constructor: create a new ManyLabelEntry widget.
    inherit util::FrameWidget

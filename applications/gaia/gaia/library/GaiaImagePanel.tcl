@@ -333,6 +333,8 @@ itcl::class gaia::GaiaImagePanel {
                -valuefont $itk_option(-valuefont) \
                -labelwidth [max $itk_option(-labelwidth) 5] \
                -relief flat \
+               -min_scale $itk_option(-min_scale) \
+               -max_scale $itk_option(-max_scale) \
                -image $itk_option(-image)
          } {
             keep -state

@@ -175,6 +175,9 @@ itcl::class gaia::Gaia {
 
       #  And the other changes to menus that we require.
       make_menu_changes
+
+      #  Center image first time.
+      after 0 [code $image_ center]
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -807,7 +810,7 @@ itcl::class gaia::Gaia {
       if {! [info exists rtd_library]} {
          set rtd_library .
       }
-      
+
       #  Check for a plugin or binary installation, third option is
       #  GAIA running in a proper Starlink distribution. Need to
       #  detect this and act appropriately (environment is established

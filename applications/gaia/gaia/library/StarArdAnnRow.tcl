@@ -61,7 +61,7 @@
 
 #.
 
-class gaia::StarArdAnnRow {
+itcl::class gaia::StarArdAnnRow {
 
    #  Inheritances:
    #  -------------

@@ -100,7 +100,7 @@
 
 #.
 
-class gaia::GaiaForeignExec {
+itcl::class gaia::GaiaForeignExec {
 
    #  Inheritances:
    #  -------------

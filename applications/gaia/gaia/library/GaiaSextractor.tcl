@@ -67,7 +67,7 @@
 
 itk::usual GaiaSextractor {}
 
-class gaia::GaiaSextractor {
+itcl::class gaia::GaiaSextractor {
 
    #  Inheritances:
    #  -------------

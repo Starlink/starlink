@@ -93,7 +93,7 @@
 
 itk::usual ScrollText {}
 
-class gaia::ScrollText {
+itcl::class gaia::ScrollText {
                        
    #  Inheritances:
    inherit FrameWidget

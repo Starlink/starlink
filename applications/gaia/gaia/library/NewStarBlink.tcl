@@ -117,7 +117,7 @@
 
 itk::usual StarBlink {}
 
-class gaia::StarBlink {
+itcl::class gaia::StarBlink {
 
    #  Inheritances:
    #  -------------

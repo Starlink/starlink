@@ -35,7 +35,7 @@
 
 itk::usual GaiaImageCut {}
 
-class gaia::GaiaImageCut {
+itcl::class gaia::GaiaImageCut {
    inherit rtd::RtdImageCut
 
    #  Constructor: create a new instance of this class.

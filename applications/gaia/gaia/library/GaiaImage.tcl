@@ -48,7 +48,7 @@
 #-
 itk::usual GaiaImage {}
 
-class gaia::GaiaImage {
+itcl::class gaia::GaiaImage {
    inherit rtd::RtdImage
 
    #  Create a new RtdImage widget. This is repeated from the base
