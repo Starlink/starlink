@@ -15,8 +15,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -145,7 +143,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import:
@@ -199,7 +196,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -273,7 +269,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -360,7 +355,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -405,7 +399,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -463,10 +456,8 @@
 
         CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
-
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IREGION_SLICE',STATUS)
+          CALL AST_REXIT('IREGION_SLICE',STATUS)
         ENDIF
 
       ENDIF
@@ -490,7 +481,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -589,7 +579,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -689,8 +678,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Structure definitions :
@@ -993,7 +980,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
 *    Structure definitions:
       INCLUDE 'INC_XRTHEAD'
 *    Import :
@@ -1082,7 +1068,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -1124,7 +1109,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -1169,7 +1153,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -1284,7 +1267,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -1328,7 +1310,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Export :
@@ -1373,7 +1354,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -1416,7 +1396,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -1456,7 +1435,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -1503,7 +1481,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -1540,7 +1517,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import/Export :
       CHARACTER*(*) CMD

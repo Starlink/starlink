@@ -11,7 +11,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       REAL XW,YW
 *    Export :
@@ -47,7 +46,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       REAL XP,YP
 *    Export :
@@ -83,7 +81,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER I,J
 *    Export :
@@ -128,7 +125,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER I,J
 *    Export :
@@ -163,7 +159,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER I,J
 *    Export :
@@ -209,7 +204,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER I,J
 *    Export :
@@ -255,7 +249,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Export :
 *    Global variables :
@@ -356,7 +349,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -399,7 +391,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *  Import :
 	REAL X				!input	X value
@@ -437,7 +428,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *  Import :
 	DOUBLE PRECISION RA	!input	RA (degrees)
@@ -476,7 +466,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *  Import :
 	REAL X				!input	X value
@@ -521,7 +510,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *  Import :
 	DOUBLE PRECISION LON	!input longitude (degrees)
@@ -567,7 +555,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *  Import :
 	REAL X				!input	X value
@@ -612,7 +599,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *  Import :
 	DOUBLE PRECISION L	!input	longitude (degrees)
@@ -657,7 +643,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
       INTEGER HALF
 *  Export :
@@ -705,7 +690,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -747,7 +731,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -790,7 +773,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -827,7 +809,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *  Import :
 *  Export :
@@ -864,7 +845,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
       INTEGER I1,I2,J1,J2
 *  Export :
@@ -904,7 +884,6 @@
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -944,7 +923,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -1024,7 +1002,6 @@
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -1083,7 +1060,6 @@
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -1126,7 +1102,6 @@
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -1164,7 +1139,6 @@
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -1204,7 +1178,6 @@
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -1302,7 +1275,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -1330,7 +1302,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'QUAL_PAR'
 *  Import :
         LOGICAL VAR,QUAL
@@ -1403,7 +1374,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
 *  Export :
 *  Status :
@@ -1443,7 +1413,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
       INTEGER			ID
 *  Export :
@@ -1540,7 +1509,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
         INTEGER FID
 *  Export :
@@ -1642,7 +1610,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Global constants :
         INCLUDE 'SAE_PAR'
         INCLUDE 'ADI_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
       INTEGER			IFID
 *  Export :
@@ -1806,7 +1773,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
@@ -1874,7 +1840,6 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Global constants :
         INCLUDE 'SAE_PAR'
         INCLUDE 'ADI_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
         INTEGER			IFID
 *  Export :
@@ -1980,7 +1945,6 @@ C        ENDIF
 *  Global constants :
         INCLUDE 'SAE_PAR'
         INCLUDE 'ADI_PAR'
-        INCLUDE 'DAT_PAR'
 *  Import :
         INTEGER		IFID
         CHARACTER*(*) PAR
@@ -2125,7 +2089,6 @@ c        ENDIF
 *  Global constants :
         INCLUDE 'SAE_PAR'
         INCLUDE 'ADI_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'PRM_PAR'
 *  Import :
       INTEGER           IFID
@@ -2224,7 +2187,6 @@ c        ENDIF
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
@@ -2262,7 +2224,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2297,7 +2258,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'QUAL_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
@@ -2377,7 +2337,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'QUAL_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
@@ -2459,7 +2418,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -2499,7 +2457,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2541,7 +2498,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2577,7 +2533,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2648,7 +2603,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2700,7 +2654,6 @@ c        ENDIF
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2726,7 +2679,6 @@ c        INTEGER STATUS
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'PRM_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
@@ -2775,7 +2727,6 @@ c        INTEGER STATUS
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2816,7 +2767,6 @@ c        REAL XX,XP,YP
       SUBROUTINE IMG_SETCIRC_SUB(X,Y,R,I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       REAL X,Y,R
@@ -2847,7 +2797,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2873,7 +2822,6 @@ c        REAL XX,XP,YP
       SUBROUTINE IMG_SETINV_SUB(REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       BYTE REG(I_NX,I_NY)
@@ -2902,7 +2850,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -2940,7 +2887,6 @@ c        REAL XX,XP,YP
       SUBROUTINE IMG_SETARD_SUB(MASK,I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       INTEGER MASK(I_NX,I_NY)
@@ -2973,7 +2919,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3016,7 +2961,6 @@ c        REAL XX,XP,YP
      :                                               FLAG,REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       REAL X,Y,IRAD,ORAD
@@ -3048,7 +2992,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3085,7 +3028,6 @@ c        REAL XX,XP,YP
       SUBROUTINE IMG_SETPOLY_SUB(NV,XV,YV,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       INTEGER NV
@@ -3120,7 +3062,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3165,7 +3106,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3206,7 +3146,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3246,7 +3185,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3286,7 +3224,6 @@ c        REAL XX,XP,YP
       SUBROUTINE IMG_SETBOX_SUB(I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       INTEGER I1,I2,J1,J2
@@ -3314,7 +3251,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3357,7 +3293,6 @@ c        REAL XX,XP,YP
      :                                   I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       REAL XC,YC,ANGLE,LENGTH,WIDTH
@@ -3390,7 +3325,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3433,7 +3367,6 @@ c        REAL XX,XP,YP
      :                                   I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       REAL XC,YC,ANGLE
@@ -3465,7 +3398,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3504,7 +3436,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3548,7 +3479,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3593,7 +3523,6 @@ c        REAL XX,XP,YP
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *    Import :
@@ -3662,7 +3591,6 @@ c        REAL XX,XP,YP
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *    Import :
@@ -3708,8 +3636,6 @@ c        REAL XX,XP,YP
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
       INTEGER NVERTEX
@@ -3770,7 +3696,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3808,7 +3733,6 @@ c        REAL XX,XP,YP
         IMPLICIT NONE
 
 *  Global constants :
-        INCLUDE 'DAT_PAR'
         INCLUDE 'SAE_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -3834,7 +3758,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
@@ -3871,7 +3794,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
@@ -3910,7 +3832,6 @@ c        REAL XX,XP,YP
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *    Import :
@@ -3967,7 +3888,6 @@ c        REAL XX,XP,YP
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *    Import :
@@ -4043,7 +3963,6 @@ c        REAL XX,XP,YP
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -4099,7 +4018,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
@@ -4135,7 +4053,6 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -4199,7 +4116,6 @@ c        REAL XX,XP,YP
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       CHARACTER*(*) PAR1,PAR2,PAR3,PAR4
 *    Import-Export :
@@ -4279,8 +4195,6 @@ c        REAL XX,XP,YP
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       CHARACTER*(*) PAR1,PAR2,PAR3,PAR4,PAR5
 *    Export :
@@ -4449,8 +4363,6 @@ c      REAL HWID
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       CHARACTER*(*) PAR1,PAR2,PAR3,PAR4,PAR5
 *    Export :
@@ -4567,8 +4479,6 @@ c      REAL HWID
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -4628,8 +4538,6 @@ c      REAL HWID
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -4709,8 +4617,6 @@ c      REAL HWID
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -4818,8 +4724,6 @@ c      REAL HWID
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 
 *    Import :
       INTEGER        MAXVERT                        ! Max no. of vertices
@@ -4929,7 +4833,6 @@ c      REAL HWID
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
 *  Import :
       REAL XC,YC,DX,DY
@@ -4968,7 +4871,6 @@ c      REAL HWID
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'PRM_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
@@ -5020,7 +4922,6 @@ c      REAL HWID
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
