@@ -42,6 +42,13 @@
 *     scuphot analysis in out file
 
 *  ADAM Parameters:
+*     ALLBOLS = LOGICAL (Read)
+*        By default only the observed bolometers are processed. (ie if you
+*        observed with H7 only h7 data will be stored). If ALLBOLS is set
+*        to true then all middle beam data is processed. This is useful
+*        for examining sky noise. Note that for 2 and 3 bolometer photometry
+*        ALLBOLS must be false to avoid weighting problems for the 
+*        bolometers that were observed in the left or right beams.
 *     ANALYSIS = _CHAR (Read)
 *        The method used to detemine peak. Either average or parabola.
 *     FILE = NDF (Write)
@@ -54,6 +61,10 @@
 *        This file will have the extension .sdf but this should not be
 *        specified in the name.
 
+
+*  Notes:
+*     ALLBOLS must be false for 2 and 3 bolometer photometry unless you
+*     know what you are doing.
 
 *  Algorithm:
 *        In more detail the routine works as follows. If status is good on
@@ -119,6 +130,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.13  1997/05/22 03:05:54  timj
+*     Allow all bolometers to be processed - not just the targeted ones.
+*
 *     Revision 1.12  1997/04/30 02:39:39  timj
 *     Add MSG_OUTIF
 *
@@ -202,11 +216,14 @@ c
                                        ! channel numbers of bolometers measured
                                        ! in input file
       CHARACTER*15     CENTRE_COORDS   ! coordinate system of telescope centre
+      INTEGER          COUNT           ! Number of times through loop
       INTEGER          DEM_PNTR_PTR    ! array pointer to SCUBA.DEM_PNTR array
       INTEGER          DIM (MAX_DIM)   ! array dimensions
+      INTEGER          END_BOL         ! Last bolometer
       REAL             EXPOSURE_TIME   ! exposure time per jiggle point
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
+      INTEGER          FD              ! Text file descriptor
       CHARACTER*15     FILTER          ! the name of the filter being used
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
 				       ! array of FITS keywords
@@ -377,6 +394,7 @@ c
 				       ! variance of fitted peaks in ndf
       LOGICAL          PHOTOM          ! .TRUE. if the PHOTOM application
                                        ! has already been run on the file
+      INTEGER          PHOTBB          ! Loop index
       INTEGER          PHOT_BB (SCUBA__MAX_BEAM)
                                        ! index of target bolometers in 
                                        ! input data array
@@ -390,8 +408,10 @@ c
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
+      LOGICAL          SELECT_BOLS     ! Select a bolometer?
       LOGICAL          SKY_ERROR       ! .TRUE. if SKY_ERROR application has
                                        ! been run on the data
+      INTEGER          START_BOL       ! First bolometer
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
@@ -416,16 +436,16 @@ c
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
 
-*  start up the NDF system and read in the input demodulated file
+*     start up the NDF system and read in the input demodulated file
 
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
 
-* Get bad bit mask
+*     Get bad bit mask
       CALL NDF_BB(IN_NDF, BADBIT, STATUS)
 
-*  get some general descriptive parameters of the observation
+*     get some general descriptive parameters of the observation
 
       CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC, STATUS)
       CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
@@ -438,24 +458,24 @@ c
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: input file '//
-     :        'contains too many FITS items', STATUS)
+     :           'contains too many FITS items', STATUS)
          END IF
       END IF
       CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
-     :  STATUS)
+     :     STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBSDEF',
-     :  ODF_NAME, STATUS)
+     :     ODF_NAME, STATUS)
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
-     :  RUN_NUMBER, STATUS)
+     :     RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
-     :  OBJECT, STATUS)
+     :     OBJECT, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
-     :  OBSERVING_MODE, STATUS)
+     :     OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
 
-*  get the number of history records present in the file
+*     get the number of history records present in the file
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL NDF_HNREC (IN_NDF, NREC, STATUS)
@@ -464,7 +484,7 @@ c
             NREC = 0
          END IF
 
-*  check that the mode and history of the input file are OK
+*     check that the mode and history of the input file are OK
 
          REDUCE_SWITCH = .FALSE.
          EXTINCTION = .FALSE.
@@ -493,18 +513,18 @@ c
                STATUS = SAI__ERROR
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP (' ', '^TASK: the file '//
-     :           'does not contain data from a PHOTOM observation',
-     :           STATUS)
+     :              'does not contain data from a PHOTOM observation',
+     :              STATUS)
             END IF
          END IF
- 
+         
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP (' ', '^TASK: the '//
-     :           'REDUCE_SWITCH application has not been run '//
-     :           'on the input file', STATUS)
+     :              'REDUCE_SWITCH application has not been run '//
+     :              'on the input file', STATUS)
             END IF
 
             IF (.NOT. EXTINCTION) THEN
@@ -519,13 +539,13 @@ c
                CALL MSG_SETC('TASK', TSKNAME)
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP (' ', '^TASK: the '//
-     :           'PHOTOM application has already been run on '//
-     :           'the input file', STATUS)
+     :              'PHOTOM application has already been run on '//
+     :              'the input file', STATUS)
             END IF
          END IF
       END IF
 
-*  report the run number and object of the observation
+*     report the run number and object of the observation
 
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
@@ -534,75 +554,75 @@ c
      :     '^PKG: run ^RUN was a PHOTOM observation '//
      :     'of ^OBJECT', STATUS)
 
-*  get the sub-instrument and filter used 
+*     get the sub-instrument and filter used 
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'SUB_1',
-     :  SUB_INSTRUMENT, STATUS)
+     :     SUB_INSTRUMENT, STATUS)
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'WAVE_1',
-     :  WAVELENGTH, STATUS)
+     :     WAVELENGTH, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'FILT_1',
-     :  FILTER, STATUS)
+     :     FILTER, STATUS)
 
-*  get some other FITS items that will be needed
+*     get some other FITS items that will be needed
 
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :  'EXP_TIME', EXPOSURE_TIME, STATUS)
+     :     'EXP_TIME', EXPOSURE_TIME, STATUS)
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
-     :  N_BOLS, STATUS)
+     :     N_BOLS, STATUS)
 
-*  coords of telescope centre
+*     coords of telescope centre
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :  'CENT_CRD', CENTRE_COORDS, STATUS)
+     :     'CENT_CRD', CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (CENTRE_COORDS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT',
-     :  LAT, STATUS)
+     :     LAT, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG',
-     :  LONG, STATUS)
+     :     LONG, STATUS)
 
       IF (IN_CENTRE_COORDS .EQ. 'PLANET') THEN
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT2',
-     :     LAT2, STATUS)
+     :        LAT2, STATUS)
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG2',
-     :     LONG2, STATUS)
+     :        LONG2, STATUS)
          CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'MJD1',
-     :     MJD1, STATUS)
+     :        MJD1, STATUS)
          CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'MJD2',
-     :     MJD2, STATUS)
+     :        MJD2, STATUS)
       END IF
 
-*  offset from telescope centre
+*     offset from telescope centre
 
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'MAP_X',
-     :  MAP_X, STATUS)
+     :     MAP_X, STATUS)
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'MAP_Y',
-     :  MAP_Y, STATUS)
+     :     MAP_Y, STATUS)
       OFFSET_COORDS = 'UNKNOWN'
 
-*  the UT of the observation expressed as modified Julian day
+*     the UT of the observation expressed as modified Julian day
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'UTDATE',
-     :  UTDATE, STATUS)
+     :     UTDATE, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'UTSTART',
-     :  UTSTART, STATUS)
+     :     UTSTART, STATUS)
 
-*  map the various components of the data array and check the data
-*  dimensions
+*     map the various components of the data array and check the data
+*     dimensions
 
       CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
 
       CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'READ', IN_Q_PTR,
-     :  NELM, STATUS)
+     :     NELM, STATUS)
       CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', IN_D_PTR,
-     :  NELM, STATUS)
+     :     NELM, STATUS)
       CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ', IN_V_PTR,
-     :  NELM, STATUS)
+     :     NELM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 3)                  .OR.
-     :       (DIM(1) .NE. N_BOLS)           .OR.
-     :       (DIM(2) .LT. 1)                .OR.
-     :       (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
+     :        (DIM(1) .NE. N_BOLS)           .OR.
+     :        (DIM(2) .LT. 1)                .OR.
+     :        (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI ('NDIM', NDIM)
             CALL MSG_SETI ('DIM1', DIM(1))
@@ -610,13 +630,14 @@ c
             CALL MSG_SETI ('DIM3', DIM(3))
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: data array '//
-     :        'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', STATUS)
+     :           'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', 
+     :           STATUS)
          END IF
       END IF
 
       N_POS = DIM (2)
 
-*  map the DEM_PNTR array and check its dimensions
+*     map the DEM_PNTR array and check its dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
      :     DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
@@ -636,18 +657,18 @@ c
      :     'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :     'measurement(s)', STATUS)
 
-*  get the target indices of the bolometers in the data array
+*     get the target indices of the bolometers in the data array
 
       CALL CMP_GETVI (IN_SCUBAX_LOC, 'PHOT_BB', SCUBA__MAX_BEAM,
-     :  PHOT_BB, NELM, STATUS)
+     :     PHOT_BB, NELM, STATUS)
 
-*  and the associated weights
+*     and the associated weights
 
       CALL CMP_GETVR (IN_REDSX_LOC, 'BEAM_WT', SCUBA__MAX_BEAM,
-     :  BEAM_WEIGHT, NELM, STATUS)
+     :     BEAM_WEIGHT, NELM, STATUS)
 
 
-*  get the channel and ADC numbers of the bolometers used
+*     get the channel and ADC numbers of the bolometers used
 
       CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN', 
      :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_CHAN, ITEMP, STATUS)
@@ -657,8 +678,8 @@ c
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: dimension '//
-     :        'of .SCUBA.BOL_CHAN does not match main data array',
-     :        STATUS)
+     :           'of .SCUBA.BOL_CHAN does not match main data array',
+     :           STATUS)
          END IF
       END IF
 
@@ -670,12 +691,12 @@ c
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: dimension '//
-     :        'of .SCUBA.BOL_ADC does not match main data array',
-     :        STATUS)
+     :           'of .SCUBA.BOL_ADC does not match main data array',
+     :           STATUS)
          END IF
       END IF
 
-*  Now read in the jiggle pattern itself
+*     Now read in the jiggle pattern itself
 
       WRITEMAP = .TRUE.
 
@@ -684,7 +705,7 @@ c
      :     JIGGLE_P_SWITCH, SAMPLE_PA, SAMPLE_COORDS, JIGGLE_X,
      :     JIGGLE_Y, STATUS)
 
-*  find out if the jiggle pattern corresponds to a rectangular grid
+*     find out if the jiggle pattern corresponds to a rectangular grid
 
       IF (STATUS .EQ. SAI__OK) THEN
          LBND (1) = 1
@@ -733,7 +754,7 @@ c
      :           'stored', STATUS)
          ELSE
 
-*  construct axes for 2D map
+*     construct axes for 2D map
 
             N_OBSDIM = 2
             
@@ -747,380 +768,447 @@ c
          END IF
       END IF
 
-      DO BEAM = 1, SCUBA__MAX_BEAM
-         IF (PHOT_BB(BEAM) .NE. 0) THEN
-
-*  get some scratch memory to hold the data for the target bolometers
-
-            CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_D_PTR(BEAM), 
-     :        INT_D_END(BEAM), STATUS)
-            CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_V_PTR(BEAM),
-     :        INT_V_END(BEAM), STATUS)
-            CALL SCULIB_MALLOC (N_POS * VAL__NBUB, INT_Q_PTR(BEAM),
-     :        INT_Q_END(BEAM), STATUS)
-
-*  copy the integration data from the relevant bolometer into the 
-*  temporary space - clumsy method
-
-	    IF (STATUS .EQ. SAI__OK) THEN
-		DO POS = 1, N_POS
-                   IN_OFFSET = (BEAM-1) * N_POS * N_BOLS + (POS-1) *
-     :               N_BOLS + (PHOT_BB(BEAM) - 1)
-                   OUT_OFFSET = POS - 1
- 
-                   CALL VEC_RTOR(.FALSE., 1, %val(IN_D_PTR + IN_OFFSET *
-     :                  VAL__NBR), %val(INT_D_PTR(BEAM) + OUT_OFFSET *
-     :                  VAL__NBR), IERR, NERR, STATUS)
-                   CALL VEC_RTOR(.FALSE., 1, %val(IN_V_PTR + IN_OFFSET *
-     :                  VAL__NBR), %val(INT_V_PTR(BEAM) + OUT_OFFSET *
-     :                  VAL__NBR), IERR, NERR, STATUS)
-                   CALL VEC_UBTOUB(.FALSE., 1, %val(IN_Q_PTR + IN_OFFSET
-     :                  *VAL__NBUB), %val(INT_Q_PTR(BEAM) + OUT_OFFSET *
-     :                  VAL__NBUB), IERR, NERR, STATUS)
-
-                END DO
-             END IF
-         END IF
-      END DO
-
-*  Ask for the reduction method
+*     Ask for the reduction method
 
       CALL PAR_CHOIC('ANALYSIS', 'AVERAGE','Average,Parabola', .TRUE.,
      :     ANALYSIS, STATUS)
 
 
-*  create the output file that will contain the reduced data in NDFs
+*     create the output file that will contain the reduced data in NDFs
 
       CALL PAR_GET0C ('OUT', OUT, STATUS)
       CALL HDS_NEW (OUT, OUT, 'REDS_SCUPHOT', 0, 0, OUT_LOC, STATUS)
 
-*  cycle through the beams used in this sub-instrument
-
-      IF (STATUS .EQ. SAI__OK) THEN
-
+*     Get some work space
          DO BEAM = 1, SCUBA__MAX_BEAM
-	    MEAS_1_Q (BEAM) = 1
-	    MEAS_2_N (BEAM) = 0
-
-	    DO POS = 1, SCUBA__MAX_JIGGLE
-               MEAS_N (POS,BEAM) = 0
-            END DO
-
             IF (PHOT_BB(BEAM) .NE. 0) THEN
 
-*  this sub-instrument / beam combination was used, so analyse 
-*  and store the data
+*     get some scratch memory to hold the data for the target bolometers
 
-	       CALL NDF_BEGIN 
+               CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_D_PTR(BEAM), 
+     :              INT_D_END(BEAM), STATUS)
+               CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_V_PTR(BEAM),
+     :              INT_V_END(BEAM), STATUS)
+               CALL SCULIB_MALLOC (N_POS * VAL__NBUB, INT_Q_PTR(BEAM),
+     :              INT_Q_END(BEAM), STATUS)
+            END IF
+         END DO
+
+
+*     Now fix PHOT_BB so that it gives me the bolometer I want
+*     PHOT_BB contains the bolometer number in this sub instrument
+*     Only 3 numbers and we only want to specify middle beam if 
+*     processing all of them
+
+
+      CALL PAR_GET0L('ALLBOLS', SELECT_BOLS, STATUS)
+
+      IF (SELECT_BOLS) THEN
+         PHOT_BB(1) = 0
+         PHOT_BB(3) = 0
+
+         START_BOL = 1
+         END_BOL   = N_BOLS
+
+         CALL MSG_SETC('TASK', TSKNAME)
+         CALL MSG_OUTIF(MSG__QUIET,' ','^TASK: All bolometers selected',
+     :        STATUS)
+
+      ELSE
+
+         START_BOL = PHOT_BB(2)
+         END_BOL   = PHOT_BB(2)
+
+      END IF
+
+*     Now loop over the requisite number of bolometers
+
+      COUNT = 0
+      DO PHOTBB = START_BOL, END_BOL
+
+         COUNT = COUNT + 1
+         PHOT_BB(2) = PHOTBB
+
+*     Extract data for each targeted bolometer
+
+         DO BEAM = 1, SCUBA__MAX_BEAM
+            IF (PHOT_BB(BEAM) .NE. 0) THEN
+
+*     copy the integration data from the relevant bolometer into the 
+*     temporary space - clumsy method
+
+               IF (STATUS .EQ. SAI__OK) THEN
+                  DO POS = 1, N_POS
+                     IN_OFFSET = (BEAM-1) * N_POS * N_BOLS + (POS-1) *
+     :                    N_BOLS + (PHOT_BB(BEAM) - 1)
+                     OUT_OFFSET = POS - 1
+                     
+                     CALL VEC_RTOR(.FALSE., 1, %val(IN_D_PTR + IN_OFFSET
+     :                    * VAL__NBR), %val(INT_D_PTR(BEAM) + OUT_OFFSET
+     :                    * VAL__NBR), IERR, NERR, STATUS)
+                     CALL VEC_RTOR(.FALSE., 1, %val(IN_V_PTR + IN_OFFSET
+     :                    * VAL__NBR), %val(INT_V_PTR(BEAM) + OUT_OFFSET
+     :                    * VAL__NBR), IERR, NERR, STATUS)
+                     CALL VEC_UBTOUB(.FALSE., 1, %val(IN_Q_PTR + 
+     :                    IN_OFFSET * VAL__NBUB), 
+     :                    %val(INT_Q_PTR(BEAM) + OUT_OFFSET *
+     :                    VAL__NBUB), IERR, NERR, STATUS)
+
+                  END DO
+               END IF
+            END IF
+         END DO
+
+*     cycle through the beams used in this sub-instrument
+
+         IF (STATUS .EQ. SAI__OK) THEN
+
+            DO BEAM = 1, SCUBA__MAX_BEAM
+               MEAS_1_Q (BEAM) = 1
+               MEAS_2_N (BEAM) = 0
+
+               DO POS = 1, SCUBA__MAX_JIGGLE
+                  MEAS_N (POS,BEAM) = 0
+               END DO
+
+               IF (PHOT_BB(BEAM) .NE. 0) THEN
+
+*     this sub-instrument / beam combination was used, so analyse 
+*     and store the data
+
+                  CALL NDF_BEGIN 
 
 *     Only if I am writing the JIGGLE map
-               IF (WRITEMAP) THEN
+                  IF (WRITEMAP) THEN
 
-*  first, create the NDF to hold the map data, called <bol>_map
+*     first, create the NDF to hold the map data, called <bol>_map
+
+                     CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)),
+     :                    BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
+                     NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_map'
+                     
+                     CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
+                     CALL NDF_NEW('_REAL',N_OBSDIM, LBND, UBND, PLACE, 
+     :                    IBEAM, STATUS)
+
+*     probably should store the FITS header
+                     CALL NDF_XNEW(IBEAM, 'FITS','_CHAR*80',
+     :                    1, N_FITS, OUT_FITSX_LOC, STATUS)
+                     CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+                     CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
+
+*     Create history 
+                     CALL NDF_HCRE(IBEAM, STATUS)
+
+*     Map the output data
+                     CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
+     :                    MAP_Q_PTR, NELM, STATUS)
+                     CALL NDF_MAP (IBEAM, 'DATA', '_REAL', 'WRITE/ZERO',
+     :                    MAP_D_PTR, NELM, STATUS)
+                     CALL NDF_MAP (IBEAM, 'VARIANCE','_REAL',
+     :                    'WRITE/ZERO', MAP_V_PTR, NELM, STATUS)
+
+
+*     initialise quality to bad
+
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        CALL SCULIB_CFILLB (NELM, 1, %val(MAP_Q_PTR))
+                     END IF
+
+*     construct axes
+
+                     IF (N_OBSDIM .EQ. 1) THEN
+                        CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
+     :                       'WRITE', TEMP_PTR, NELM, STATUS)
+                        IF (STATUS .EQ. SAI__OK) THEN
+                           CALL SCULIB_NFILLR (JIGGLE_COUNT, 
+     :                          %val(TEMP_PTR))
+                        END IF
+                        CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
+                     ELSE IF (N_OBSDIM .EQ. 2) THEN
+                        CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
+     :                       'WRITE', TEMP_PTR, NELM, STATUS)
+                        CALL VEC_RTOR(.FALSE., UBND(1), JIGGLE_2D_A1,
+     :                       %val(TEMP_PTR), IERR, NERR, STATUS)
+                        CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
+                        
+                        CALL NDF_AMAP (IBEAM, 'CENTRE', 2, '_REAL',
+     :                       'WRITE', TEMP_PTR, NELM, STATUS)
+                        CALL VEC_RTOR(.FALSE., UBND(2), JIGGLE_2D_A2,
+     :                       %val(TEMP_PTR), IERR, NERR, STATUS)
+                        CALL NDF_AUNMP (IBEAM, 'CENTRE', 2, STATUS)
+                     END IF
+
+*     set the beam weight
+
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        CALL NDF_XLOC (IBEAM, 'REDS', 'UPDATE',
+     :                       OUT_REDSX_LOC, STATUS)
+                        IF (STATUS .NE. SAI__OK) THEN
+                           CALL ERR_ANNUL (STATUS)
+                           CALL NDF_XNEW (IBEAM,'REDS','REDS_EXTENSION',
+     :                          0, 0, OUT_REDSX_LOC, STATUS)
+                        END IF
+                        CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
+     :                       0, 0, STATUS)
+                        CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT', 
+     :                       BEAM_WEIGHT(BEAM), STATUS)
+                        CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
+                     END IF
+
+                  END IF
+
+
+*     now create the NDF to hold the fitted peaks for each integration,
+*     called <bol>_peak
 
                   CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)),
      :                 BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
-                  NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_map'
-                  
-                  CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
-                  CALL NDF_NEW('_REAL',N_OBSDIM, LBND, UBND, PLACE, 
-     :                 IBEAM, STATUS)
+                  NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_peak'
 
-* probably should store the FITS header
-                  CALL NDF_XNEW(IBEAM, 'FITS','_CHAR*80',
+                  CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
+                  CALL NDF_NEW('_REAL',1,1,N_INTEGRATIONS, PLACE, 
+     :                 IPEAK, STATUS)
+
+*     probably should store the FITS header
+                  CALL NDF_XNEW(IPEAK, 'FITS','_CHAR*80',
      :                 1, N_FITS, OUT_FITSX_LOC, STATUS)
                   CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
                   CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
 
-* Create history 
-                  CALL NDF_HCRE(IBEAM, STATUS)
+*     Create history 
+                  CALL NDF_HCRE(IPEAK, STATUS)
 
-*  Map the output data
-                  CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
-     :                 MAP_Q_PTR, NELM, STATUS)
-                  CALL NDF_MAP (IBEAM, 'DATA', '_REAL', 'WRITE/ZERO',
-     :                 MAP_D_PTR, NELM, STATUS)
-                  CALL NDF_MAP (IBEAM, 'VARIANCE','_REAL', 'WRITE/ZERO',
-     :                 MAP_V_PTR, NELM, STATUS)
+*     Map output data
+                  CALL NDF_MAP (IPEAK, 'QUALITY', '_UBYTE', 'WRITE',
+     :                 PEAK_Q_PTR, NELM, STATUS)
+                  CALL NDF_MAP (IPEAK, 'DATA', '_REAL', 'WRITE/ZERO',
+     :                 PEAK_D_PTR, NELM, STATUS)
+                  CALL NDF_MAP (IPEAK, 'VARIANCE', '_REAL','WRITE/ZERO',
+     :                 PEAK_V_PTR, NELM, STATUS)
 
-
-*  initialise quality to bad
-
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLB (NELM, 1, %val(MAP_Q_PTR))
-                  END IF
-
-*  construct axes
-
-                  IF (N_OBSDIM .EQ. 1) THEN
-                     CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
-     :                    'WRITE', TEMP_PTR, NELM, STATUS)
-                     IF (STATUS .EQ. SAI__OK) THEN
-                        CALL SCULIB_NFILLR (JIGGLE_COUNT, 
-     :                       %val(TEMP_PTR))
-                     END IF
-                     CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
-                  ELSE IF (N_OBSDIM .EQ. 2) THEN
-                     CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
-     :                    'WRITE', TEMP_PTR, NELM, STATUS)
-                     CALL VEC_RTOR(.FALSE., UBND(1), JIGGLE_2D_A1,
-     :                    %val(TEMP_PTR), IERR, NERR, STATUS)
-                     CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
-                     
-                     CALL NDF_AMAP (IBEAM, 'CENTRE', 2, '_REAL',
-     :                    'WRITE', TEMP_PTR, NELM, STATUS)
-                     CALL VEC_RTOR(.FALSE., UBND(2), JIGGLE_2D_A2,
-     :                    %val(TEMP_PTR), IERR, NERR, STATUS)
-                     CALL NDF_AUNMP (IBEAM, 'CENTRE', 2, STATUS)
-                  END IF
-
-*  set the beam weight
+*     initialise quality to bad
 
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL NDF_XLOC (IBEAM, 'REDS', 'UPDATE',
+                     CALL SCULIB_CFILLB (NELM, 1, %val(PEAK_Q_PTR))
+                  END IF
+
+*     construct axis
+
+                  CALL NDF_AMAP (IPEAK, 'CENTRE', 1, '_INTEGER',
+     :                 'WRITE', TEMP_PTR, NELM, STATUS)
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_NFILLI (N_INTEGRATIONS, %val(TEMP_PTR))
+                  END IF
+                  CALL NDF_AUNMP (IPEAK, 'CENTRE', 1, STATUS)
+
+*     set the beam weight
+
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL NDF_XLOC (IPEAK, 'REDS', 'UPDATE',
      :                    OUT_REDSX_LOC, STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_ANNUL (STATUS)
-                        CALL NDF_XNEW (IBEAM, 'REDS', 'REDS_EXTENSION',
+                        CALL NDF_XNEW (IPEAK, 'REDS', 'REDS_EXTENSION',
      :                       0, 0, OUT_REDSX_LOC, STATUS)
                      END IF
                      CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
      :                    0, 0, STATUS)
-                     CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT', 
+                     CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT',
      :                    BEAM_WEIGHT(BEAM), STATUS)
                      CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
                   END IF
 
-               END IF
+*     Put on some axis information and labels
 
+                  CALL NDF_ACPUT('Integration',IPEAK,'LABEL',1,STATUS)
+                  CALL NDF_CPUT('Volts',IPEAK,'UNITS',STATUS)
+                  CALL NDF_CPUT(OBJECT, IPEAK, 'Title', STATUS)
+                  CALL NDF_CPUT('Fitted peak',IPEAK, 'LAB', STATUS)
 
-*  now create the NDF to hold the fitted peaks for each integration,
-*  called <bol>_peak
-
-	       CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)),
-     :           BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
-	       NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_peak'
-
-	       CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
-               CALL NDF_NEW('_REAL',1,1,N_INTEGRATIONS, PLACE, 
-     :              IPEAK, STATUS)
-
-* probably should store the FITS header
-               CALL NDF_XNEW(IPEAK, 'FITS','_CHAR*80',
-     :              1, N_FITS, OUT_FITSX_LOC, STATUS)
-               CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
-               CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
-
-* Create history 
-               CALL NDF_HCRE(IPEAK, STATUS)
-
-* Map output data
-               CALL NDF_MAP (IPEAK, 'QUALITY', '_UBYTE', 'WRITE',
-     :           PEAK_Q_PTR, NELM, STATUS)
-               CALL NDF_MAP (IPEAK, 'DATA', '_REAL', 'WRITE/ZERO',
-     :           PEAK_D_PTR, NELM, STATUS)
-               CALL NDF_MAP (IPEAK, 'VARIANCE', '_REAL', 'WRITE/ZERO',
-     :           PEAK_V_PTR, NELM, STATUS)
-
-*  initialise quality to bad
-
-	       IF (STATUS .EQ. SAI__OK) THEN
-		  CALL SCULIB_CFILLB (NELM, 1, %val(PEAK_Q_PTR))
-               END IF
-
-*  construct axis
-
-	       CALL NDF_AMAP (IPEAK, 'CENTRE', 1, '_INTEGER',
-     :           'WRITE', TEMP_PTR, NELM, STATUS)
-	       IF (STATUS .EQ. SAI__OK) THEN
-                  CALL SCULIB_NFILLI (N_INTEGRATIONS, %val(TEMP_PTR))
-               END IF
-               CALL NDF_AUNMP (IPEAK, 'CENTRE', 1, STATUS)
-
-*  set the beam weight
-
-	       IF (STATUS .EQ. SAI__OK) THEN
-                  CALL NDF_XLOC (IPEAK, 'REDS', 'UPDATE',
-     :              OUT_REDSX_LOC, STATUS)
-                  IF (STATUS .NE. SAI__OK) THEN
-                     CALL ERR_ANNUL (STATUS)
-                     CALL NDF_XNEW (IPEAK, 'REDS', 'REDS_EXTENSION',
-     :                 0, 0, OUT_REDSX_LOC, STATUS)
+                  IF (WRITEMAP) THEN
+                     IF (N_OBSDIM.GT.1) THEN
+                        CALL NDF_ACPUT('X-offset',IBEAM,'LABEL',1,
+     :                       STATUS)
+                        CALL NDF_ACPUT('Y-offset',IBEAM,'LABEL',2,
+     :                       STATUS)
+                        CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
+                        CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
+                     END IF
+                     CALL NDF_CPUT(OBJECT, IBEAM, 'Title', STATUS)
+                     CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', 
+     :                    STATUS)
                   END IF
-                  CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
-     :              0, 0, STATUS)
-                  CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT',
-     :              BEAM_WEIGHT(BEAM), STATUS)
-                  CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
-               END IF
 
-* Put on some axis information and labels
+*     cycle through the integrations coadding them as required
 
-               CALL NDF_ACPUT('Integration',IPEAK,'LABEL',1,STATUS)
-               CALL NDF_CPUT('Volts',IPEAK,'UNITS',STATUS)
-               CALL NDF_CPUT(OBJECT, IPEAK, 'Title', STATUS)
-               CALL NDF_CPUT('Fitted peak',IPEAK, 'LAB', STATUS)
+                  DO INT = 1, N_INTEGRATIONS
 
-               IF (WRITEMAP) THEN
-                  IF (N_OBSDIM.GT.1) THEN
-                     CALL NDF_ACPUT('X-offset',IBEAM,'LABEL',1,STATUS)
-                     CALL NDF_ACPUT('Y-offset',IBEAM,'LABEL',2,STATUS)
-                     CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
-                     CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
-                  END IF
-                  CALL NDF_CPUT(OBJECT, IBEAM, 'Title', STATUS)
-                  CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', STATUS)
-               END IF
+                     INT_OFFSET = (INT - 1) * JIGGLE_COUNT
 
-*  cycle through the integrations coadding them as required
+*     coadd the jiggle data for the integration into that for the measurement
 
-               DO INT = 1, N_INTEGRATIONS
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        CALL SCULIB_COADD (JIGGLE_COUNT,
+     :                       %val(INT_D_PTR(BEAM) +INT_OFFSET*VAL__NBR),
+     :                       %val(INT_V_PTR(BEAM) +INT_OFFSET*VAL__NBR),
+     :                       %val(INT_Q_PTR(BEAM)+INT_OFFSET*VAL__NBUB),
+     :                       MEAS_D(1,BEAM), MEAS_V(1,BEAM),
+     :                       MEAS_Q(1,BEAM), MEAS_N(1,BEAM),
+     :                       MEAS_D(1,BEAM), MEAS_V(1,BEAM),
+     :                       MEAS_Q(1,BEAM), MEAS_N(1,BEAM), BADBIT,
+     :                       .TRUE.)
+                        
+*     derive the measured signal for this integration
 
-                  INT_OFFSET = (INT - 1) * JIGGLE_COUNT
+                        CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (ANALYSIS,
+     :                       1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
+     :                       %val(INT_D_PTR(BEAM) +INT_OFFSET*VAL__NBR),
+     :                       %val(INT_V_PTR(BEAM) +INT_OFFSET*VAL__NBR),
+     :                       %val(INT_Q_PTR(BEAM)+INT_OFFSET*VAL__NBUB),
+     :                       PEAK_D(INT,BEAM), PEAK_V(INT,BEAM),
+     :                       PEAK_Q(INT,BEAM), RTEMP, RTEMP,
+     :                       PEAK_X(INT,BEAM), PEAK_Y(INT,BEAM),
+     :                       BADBIT, STATUS)
 
-*  coadd the jiggle data for the integration into that for the measurement
+*     coadd the fitted peak into the running mean
 
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_COADD (JIGGLE_COUNT,
-     :                    %val(INT_D_PTR(BEAM) + INT_OFFSET * VAL__NBR),
-     :                    %val(INT_V_PTR(BEAM) + INT_OFFSET * VAL__NBR),
-     :                    %val(INT_Q_PTR(BEAM) + INT_OFFSET *VAL__NBUB),
-     :                    MEAS_D(1,BEAM), MEAS_V(1,BEAM),
-     :                    MEAS_Q(1,BEAM), MEAS_N(1,BEAM),
-     :                    MEAS_D(1,BEAM), MEAS_V(1,BEAM),
-     :                    MEAS_Q(1,BEAM), MEAS_N(1,BEAM), BADBIT,
-     :                    .TRUE.)
-             
-*  derive the measured signal for this integration
+                        CALL SCULIB_COADD (1, 
+     :                       PEAK_D(INT,BEAM), PEAK_V(INT,BEAM),
+     :                       PEAK_Q(INT,BEAM),
+     :                       MEAS_2_D(BEAM), MEAS_2_V(BEAM), 
+     :                       MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
+     :                       MEAS_2_D(BEAM), MEAS_2_V(BEAM),
+     :                       MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
+     :                       BADBIT, .TRUE.)
 
-                     CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (ANALYSIS,
-     :                    1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :                    %val(INT_D_PTR(BEAM) + INT_OFFSET * VAL__NBR),
-     :                    %val(INT_V_PTR(BEAM) + INT_OFFSET * VAL__NBR),
-     :                    %val(INT_Q_PTR(BEAM) + INT_OFFSET *VAL__NBUB),
-     :                    PEAK_D(INT,BEAM), PEAK_V(INT,BEAM),
-     :                    PEAK_Q(INT,BEAM), RTEMP, RTEMP,
-     :                    PEAK_X(INT,BEAM), PEAK_Y(INT,BEAM),
-     :                    BADBIT, STATUS)
+                     END IF
+                  END DO
 
-*  coadd the fitted peak into the running mean
+*     derive the measured signal from the coadded measurement
 
-                     CALL SCULIB_COADD (1, 
-     :                    PEAK_D(INT,BEAM), PEAK_V(INT,BEAM),
-     :                    PEAK_Q(INT,BEAM),
-     :                    MEAS_2_D(BEAM), MEAS_2_V(BEAM), 
-     :                    MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
-     :                    MEAS_2_D(BEAM), MEAS_2_V(BEAM),
-     :                    MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
-     :                    BADBIT, .TRUE.)
-
-                  END IF
-               END DO
-
-*  derive the measured signal from the coadded measurement
-
-               CALL SCULIB_ANALYSE_PHOTOM_JIGGLE ('PARABOLA',
-     :              1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :              MEAS_D(1,BEAM), MEAS_V(1,BEAM), MEAS_Q(1,BEAM),
-     :              MEAS_1_D(BEAM), MEAS_1_V(BEAM), MEAS_1_Q(BEAM),
-     :              MEAS_1_A0(BEAM), MEAS_1_A1(BEAM),
-     :              MEAS_1_X(BEAM), MEAS_1_Y(BEAM),
-     :              BADBIT, STATUS)
+                  CALL SCULIB_ANALYSE_PHOTOM_JIGGLE ('PARABOLA',
+     :                 1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
+     :                 MEAS_D(1,BEAM), MEAS_V(1,BEAM), MEAS_Q(1,BEAM),
+     :                 MEAS_1_D(BEAM), MEAS_1_V(BEAM), MEAS_1_Q(BEAM),
+     :                 MEAS_1_A0(BEAM), MEAS_1_A1(BEAM),
+     :                 MEAS_1_X(BEAM), MEAS_1_Y(BEAM),
+     :                 BADBIT, STATUS)
 
 
 *     Only if I am writing the jiggle map               
 
-               IF (WRITEMAP) THEN
-* Initialise the scratch array for UNPACK_JIGGLE_SEPARATES
+                  IF (WRITEMAP) THEN
+*     Initialise the scratch array for UNPACK_JIGGLE_SEPARATES
 
-                  CALL SCULIB_MALLOC(UBND(1)*UBND(2) * VAL__NBI, 
-     :                 MAP_N_PTR, MAP_N_PTR_END, STATUS)
-                  
+                     CALL SCULIB_MALLOC(UBND(1)*UBND(2) * VAL__NBI, 
+     :                    MAP_N_PTR, MAP_N_PTR_END, STATUS)
+                     
 
-*  store the coadded measurement to the output map
+*     store the coadded measurement to the output map
 
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_UNPACK_JIGGLE_SEPARATES (JIGGLE_COUNT,
-     :                    1, MEAS_D(1,BEAM), MEAS_V(1,BEAM),
-     :                    MEAS_Q(1,BEAM), 1, JIGGLE_COUNT, IPOS, JPOS,
-     :                    UBND(1), UBND(2), %val(MAP_D_PTR), 
-     :                    %VAL(MAP_V_PTR), %val(MAP_Q_PTR), 
-     :                    %val(MAP_N_PTR), ITEMP, BADBIT, 
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        CALL SCULIB_UNPACK_JIGGLE_SEPARATES (
+     :                       JIGGLE_COUNT, 1, MEAS_D(1,BEAM), 
+     :                       MEAS_V(1,BEAM),
+     :                       MEAS_Q(1,BEAM), 1, JIGGLE_COUNT, IPOS,
+     :                       JPOS, UBND(1), UBND(2), %val(MAP_D_PTR), 
+     :                       %VAL(MAP_V_PTR), %val(MAP_Q_PTR), 
+     :                       %val(MAP_N_PTR), ITEMP, BADBIT, 
+     :                       STATUS)
+                     END IF
+                     
+                     CALL SCULIB_FREE ('MAP_N', MAP_N_PTR,MAP_N_PTR_END,
      :                    STATUS)
                   END IF
-                  
-                  CALL SCULIB_FREE ('MAP_N', MAP_N_PTR, MAP_N_PTR_END,
+
+*     store the fitted peak values to the output ndf
+
+                  CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_D(1,BEAM),
+     :                 %val(PEAK_D_PTR), IERR, NERR, STATUS)
+                  CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_V(1,BEAM),
+     :                 %val(PEAK_V_PTR), IERR, NERR, STATUS)
+                  CALL VEC_UBTOUB(.FALSE., N_INTEGRATIONS, 
+     :                 PEAK_Q(1,BEAM), %val(PEAK_Q_PTR), IERR, NERR, 
      :                 STATUS)
-               END IF
-
-*  store the fitted peak values to the output ndf
-
-               CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_D(1,BEAM),
-     :              %val(PEAK_D_PTR), IERR, NERR, STATUS)
-               CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_V(1,BEAM),
-     :              %val(PEAK_V_PTR), IERR, NERR, STATUS)
-               CALL VEC_UBTOUB(.FALSE., N_INTEGRATIONS, PEAK_Q(1,BEAM),
-     :              %val(PEAK_Q_PTR), IERR, NERR, STATUS)
 
 *     Write BIT MASK
-               CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
-               IF (WRITEMAP) CALL NDF_SBB(OUTBAD, IBEAM, STATUS) 
+                  CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
+                  IF (WRITEMAP) CALL NDF_SBB(OUTBAD, IBEAM, STATUS) 
 
-               ISBAD = .FALSE.
-               DO I = 1, N_INTEGRATIONS
-                  IF (PEAK_Q(I, BEAM).NE.0) ISBAD = .TRUE.
-               END DO
+                  ISBAD = .FALSE.
+                  DO I = 1, N_INTEGRATIONS
+                     IF (PEAK_Q(I, BEAM).NE.0) ISBAD = .TRUE.
+                  END DO
 
-               CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
+                  CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
 
-*  close the ndfs opened in this ndf context
-               CALL NDF_ANNUL(IPEAK, STATUS)
-               IF (WRITEMAP) CALL NDF_ANNUL(IBEAM, STATUS)
+*     close the ndfs opened in this ndf context
+                  CALL NDF_ANNUL(IPEAK, STATUS)
+                  IF (WRITEMAP) CALL NDF_ANNUL(IBEAM, STATUS)
 
-	       CALL NDF_END (STATUS)
+                  CALL NDF_END (STATUS)
 
-            END IF
-         END DO
-      END IF
+               END IF
+            END DO
+         END IF
+
+*       Open a file and write header if this is first time through
+
+         IF (COUNT .EQ. 1) THEN
+
+            CALL REDS_WRITE_PHOTOM_HEADER(ODF_NAME, UTDATE, UTSTART, 
+     :           ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
+     :           CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
+     :           OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
+     :           SKY_ERROR, SCUBA__MAX_BEAM,   
+     :           PHOT_BB, SCUBA__MAX_INT,
+     :           N_INTEGRATIONS, FD, STATUS)
+
+         END IF
+
+*     write the results out to an ASCII file
+
+         CALL REDS_WRITE_PHOTOM (FD, SCUBA__MAX_BEAM,   
+     :        N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, SCUBA__MAX_INT,
+     :        N_INTEGRATIONS,
+     :        PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
+     :        MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
+     :        MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
+
+      END DO
+
+      
+*     finish off
+
+*  close the file
+
+      CALL FIO_CLOSE (FD, STATUS)
 
 
-*  write the results out to an ASCII file
-
-      CALL REDS_WRITE_PHOTOM (ODF_NAME, UTDATE, UTSTART, ANALYSIS,
-     :  RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, CENTRE_COORDS,
-     :  LAT, LONG, LAT2, LONG2, MJD1, MJD2, OFFSET_COORDS, MAP_X,
-     :  MAP_Y, SAMPLE_COORDS, SAMPLE_PA, SKY_ERROR, SCUBA__MAX_BEAM,   
-     :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, SCUBA__MAX_INT,
-     :  N_INTEGRATIONS,
-     :  PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
-     :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
-     :  MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
-    
-*  finish off
-
-*  free memory
+*     free memory
 
       DO BEAM = 1, SCUBA__MAX_BEAM
          CALL SCULIB_FREE ('INT_D', INT_D_PTR(BEAM), INT_D_END(BEAM),
-     :     STATUS)
+     :        STATUS)
          CALL SCULIB_FREE ('INT_V', INT_V_PTR(BEAM), INT_V_END(BEAM),
-     :     STATUS)
+     :        STATUS)
          CALL SCULIB_FREE ('INT_Q', INT_Q_PTR(BEAM), INT_Q_END(BEAM),
-     :     STATUS)
+     :        STATUS)
       END DO
 
-*  close the input file
+*     close the input file
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
       CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
       CALL DAT_ANNUL (IN_REDSX_LOC, STATUS)
 
       CALL NDF_ANNUL (IN_NDF, STATUS)
 
-*  close the output file
+*     close the output file
 
       CALL DAT_ANNUL (OUT_LOC, STATUS)
 
-*  and close down NDF
+*     and close down NDF
 
       CALL NDF_END (STATUS)
 
