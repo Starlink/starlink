@@ -98,6 +98,10 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.16  2000/06/23 20:00:05  timj
+* - Add DATE and ORIGIN keywords
+* - Add HH:MM:SS to DATE-OBS field
+*
 * Revision 1.15  1999/08/19 03:37:45  timj
 * Header tweaks to ease production of SSN72 documentation.
 *
@@ -166,11 +170,14 @@
 *  Local Constants:
       DOUBLE PRECISION VLIGHT   ! Speed of light in metres per second
       PARAMETER (VLIGHT = 299792458.0D0)
+      DOUBLE PRECISION MJD99    ! MJD of 1 Jan 1999
+      PARAMETER ( MJD99 = 51179.0D0 )
 
 *  Local Variables:
       CHARACTER*10     CTYPE1   ! Coordinate type of output FITS
       CHARACTER*10     CTYPE2   ! Coordinate type of output FITS
-      CHARACTER*12     DATEOBS  ! Date of map obs
+      CHARACTER*24     DATEOBS  ! Date of map obs
+      DOUBLE PRECISION DJM      ! current mjd
       DOUBLE PRECISION DTEMP    ! Scratch double
       REAL             FITS_OUT_PIXEL  ! size of pixels in output map (degrees)
       CHARACTER * 80   FITS(SCUBA__MAX_FITS) ! Output FITS array
@@ -184,6 +191,7 @@
       INTEGER          ITEMP    ! Temporary variable
       INTEGER          IY       ! year in which input observation started
       INTEGER          NDIM     ! Number of dimensions in FITS array
+      INTEGER          NTICKS   ! Current time in sedonds
       INTEGER          N_FITS   ! Number of FITS entries
       DOUBLE PRECISION OBSRA    ! RA of output map (degrees)
       DOUBLE PRECISION OBSDEC   ! Dec of output map (degrees)
@@ -195,6 +203,7 @@
       REAL             RTEMP    ! Scratch real
       CHARACTER*30     SCS      ! name of sky coordinate system
       CHARACTER*80     STEMP    ! scratch string
+      INTEGER          TARRAY(9) ! Array of times from GMTIME function
       CHARACTER*5      RADECSYS ! Type of coordinate system
       DOUBLE PRECISION RDEPOCH  ! Julian epoch of given MJD
       CHARACTER * (80) XLAB     ! X axis label
@@ -418,20 +427,43 @@
 
 *     Put in a DATE-OBS field, converting MJD to DATE
 
-      CALL SLA_DJCL(MJD_STANDARD, IY, IM, ID, DTEMP, ITEMP)
+      CALL SCULIB_MJD_TO_DATEOBS( MJD_STANDARD, DATEOBS, STATUS)
 
-      ITEMP = 0
-      CALL CHR_PUTI(IY, DATEOBS, ITEMP)
-      CALL CHR_APPND('-',DATEOBS, ITEMP)
-      IF (IM .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
-      CALL CHR_PUTI(IM, DATEOBS, ITEMP)
-      CALL CHR_APPND('-',DATEOBS, ITEMP)
-      IF (ID .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
-      CALL CHR_PUTI(ID, DATEOBS, ITEMP)
-      
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'DATE-OBS', DATEOBS, 'Date of first observation', 
      :     STATUS)
+
+*     Put in a DATE field (the date the file was written)
+*     Problems are:
+*      - There is no PSX_GMTIME function !!!
+*      - Dont feel the need to call MJD_TO_DATEOBS since we PSX_GMTIME
+*        gives the Y/M/D etc and we are now always going to be writing
+*        post-1999 FITS format since we cant go back in time!
+
+      CALL PSX_TIME( NTICKS )   ! Time in seconds
+      CALL GMTIME( NTICKS, TARRAY ) ! Time array
+      TARRAY(6) = TARRAY(6) + 1900 ! 4 digit year
+      TARRAY(5) = TARRAY(5) + 1 ! Months start at 1 for SLA
+
+*     Now write into the dateobs string (do not need the fraction of second
+*     part)
+      DATEOBS = ' ' ! reset the string
+      WRITE (DATEOBS, '(I4.4,''-'',I2.2,''-'',I2.2,''T'',
+     :     I2.2,'':'',I2.2,'':'',I2.2)')
+     :     TARRAY(6), TARRAY(5), TARRAY(4), TARRAY(3), TARRAY(2), 
+     :     TARRAY(1)
+
+*     Write to the fits array
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'DATE', DATEOBS, 
+     :     'file creation data (YYYY-MM-DDThh:mm:ss UTC)', 
+     :     STATUS)
+
+
+*     Add an ORIGIN keyword
+      CALL SCULIB_PUT_FITS_C( SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'ORIGIN',  'SCUBA User Reduction Facility (SURF)',
+     :     'Origin of the FITS file', STATUS)
 
 
 *     Now need to calculate the FITS Axis info
