@@ -42,8 +42,8 @@ AC_CHECK_HEADERS([curses.h cursesX.h term.h ncurses/term.h])
 dnl    Because we build the application compifl, we need to link against
 dnl    the following components, rather than just use their include files,
 dnl    as would be the case for a purely-libraries component.
-dnl    (mers is required, since dtask/Makefile.am invokes dtask_link_adam,
-dnl    which invokes err_link_adam in turn)
+dnl    The mers dependency is so that dtask_link_adam can call
+dnl    err_link_adam at build time
 STAR_DECLARE_DEPENDENCIES(build, [cnf ems hds hlp mers psx sae])
 STAR_DECLARE_DEPENDENCIES(build, [chr], link)
 STAR_DECLARE_DEPENDENCIES(link,  [chr ems hds hlp mers psx])
