@@ -377,10 +377,13 @@ PKG_VERS = 1.0-6
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-#PUBLIC_SCRIPTS = star2html xlabel latex2html
+#PUBLIC_SCRIPTS = 
 
 #  List of documentation files.
-DOCUMENTATION=README.distrib doc.tar
+NEWS = $(PKG_NAME).news
+
+#  Do include version.h -- see notes below.
+DOCUMENTATION=README.distrib $(NEWS) version.h dvi2bitmap_doc.tar
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -388,8 +391,6 @@ DOCUMENTATION=README.distrib doc.tar
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar Makefile.starlink mk $(DOCUMENTATION)
-
-#NEWS = $(PKG_NAME).news
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -512,9 +513,9 @@ check:
 build:
 	@ if test -f .INSTALLED_$(SYSTEM); then \
            echo;\
-           echo \
-   '*** The $(PACK_NAME) package is currently installed -- please use the';\
-           echo '    "deinstall" target before re-building it';\
+           echo '*** The $(PACK_NAME) package is currently installed';\
+	   echo '    -- please use the "deinstall" target before';\
+	   echo '    re-building it';\
            echo;\
         elif $(MAKE) -f Makefile.starlink .BUILT; then \
            echo;\
@@ -530,10 +531,6 @@ build:
 #  The .BUILT target records the time of the most recent build which
 #  modified any of the built files.  It depends on all the built files
 #  being up to date (which causes them to be built).
-
-# testing for the presence of $(DATE_STAMP) is equivalent to testing
-# whether the package has been built.
-$(DATE_STAMP): .BUILT
 
 .BUILT: $(BUILT_FILES)
 #
@@ -574,7 +571,7 @@ $(DATE_STAMP): .BUILT
 	@ echo '   TAR_OUT : $(TAR_OUT)'      >>$(DATE_STAMP)
 	@ echo ''                             >>$(DATE_STAMP)
 #
-#  Record completion of the build.
+#	# Record completion of the build.
 	@ echo '$(SYSTEM)' > .BUILT
 
 #  install: Install the package for use.
@@ -627,24 +624,21 @@ install:
         fi
 
 # The .INSTALLED_$(SYSTEM) target installs dvi2bitmap by copying it
-.INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(BUILT_FILES) dvi2bitmap_doc
+.INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(BUILT_FILES) $(DOCUMENTATION)
 #	# Create .INSTALLED_$(SYSTEM), containing $$INSTALL, 
 #	# to record that the package is installed (at least in part).
 	echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 	for f in $(BUILT_FILES) ; do \
 		cp $$f $(INSTALL_BIN); \
 	done
-#	test -d $(INSTALL_DOCS)/ssn71.htx || mkdir -p $(INSTALL_DOCS)/ssn71.htx
-#	test -r dvi2bitmap_doc/HTML.manifest && \
-#		cd dvi2bitmap_doc; \
-#		cp `cat HTML.manifest` $(INSTALL_DOCS)/ssn71.htx
-#	cp dvi2bitmap_doc/SSN-71.tex $(INSTALL_DOCS)/ssn71.htx
-#	cp dvi2bitmap_doc/SSN-71.ps.gz $(INSTALL_DOCS)/ssn71.htx
+#	# Unpack and install dvi2bitmap_doc.tar
+#	# dvi2bitmap_doc.tar contains directory dvi2bitmap_doc.
 	test -d $(INSTALL_DOCS) || mkdir -p $(INSTALL_DOCS)
-	(cd dvi2bitmap_doc; $(TAR_IN) - *) | \
-		(cd $(INSTALL_DOCS); $(TAR_OUT_PIPE) -)
+	$(TAR_OUT) dvi2bitmap_doc.tar
+	(cd dvi2bitmap_doc && $(TAR_IN) - *) | \
+		(cd $(INSTALL_DOCS) && $(TAR_OUT_PIPE) -)
+	rm -Rf dvi2bitmap_doc
 	- which hlink >/dev/null && hlink $(INSTALL_DOCS)
-	cp -p dvi2bitmap_doc/ssn71.tex $(INSTALL_DOCS)
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
 	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
 	chmod 644 $(DATE_STAMP)
@@ -670,19 +664,22 @@ deinstall:
            if test "`cat .INSTALLED_$(SYSTEM)`" = "$(INSTALL)"; then \
               if $(MAKE) -f Makefile.starlink do_deinstall; then \
                  echo;\
-                 echo '*** The $(PACK_NAME) package has been deinstalled from directory $(INSTALL)';\
+                 echo '*** The $(PACK_NAME) package has been deinstalled';\
+		 echo '    from directory $(INSTALL)';\
                  echo;\
               else \
                  echo;\
-                 echo '*** "make" failed deinstalling the $(PACK_NAME) package from directory $(INSTALL)';\
+                 echo '*** "make" failed deinstalling the $(PACK_NAME)';\
+		 echo '    package from directory $(INSTALL)';\
                  echo;\
                  exit 1;\
               fi;\
            else \
               echo;\
-              echo "*** The $(PACK_NAME) package is installed in `cat .INSTALLED_$(SYSTEM)`";\
-              echo "*** and not in your INSTALL directory ($(INSTALL))";\
-              echo '*** Not deinstalled';\
+              echo "*** The $(PACK_NAME) package is installed in";\
+	      echo "    `cat .INSTALLED_$(SYSTEM)`";\
+              echo "    and not in your INSTALL directory ($(INSTALL))";\
+              echo '    Not deinstalled';\
               exit 1;\
            fi;\
         fi
@@ -719,17 +716,24 @@ do_deinstall:
 #  so, it causes the do_test target to be made, which performs the
 #  installation test.
 test:
+	@ rm -f .TESTED_$(SYSTEM)
 	@ if test ! -f .INSTALLED_$(SYSTEM); then \
            echo;\
            echo '*** The $(PACK_NAME) package is not currently installed';\
            echo;\
+	elif $(INSTALL_BIN)/dvi2bitmap -V >testtemp; then \
+	   cat testtemp; \
+	   rm -f testtemp; \
+	   touch .TESTED_$(SYSTEM); \
+	   echo;\
+	   echo '*** Installation test for $(PACK_NAME) OK';\
+	   echo;\
         else \
            echo;\
            echo \
-           '*** There is no installation test for the $(PACK_NAME) package';\
+           '*** Installation test for $(PACK_NAME) failed';\
            echo;\
         fi
-
 
 #  export: Export the installed system.
 #  -----------------------------------
@@ -740,8 +744,9 @@ test:
 #  up to date.
 export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 	@ echo
-	@ echo '*** Export copy of the built $(PACK_NAME) package is in the compressed'
-	@ echo '    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+	@ echo '*** Export copy of the built $(PACK_NAME) package'
+	@ echo '    is in the compressed tar file'
+	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
@@ -749,17 +754,15 @@ export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 #  records the time of the last build which modified any files).
 
 $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
-	#  Issue a warning if the package has not been tested.
-	@ if test ! -f .TESTED_$(SYSTEM); then \
-           echo;\
-           echo '*** Warning: the $(PACK_NAME) package has not been tested';\
-           echo;\
-        else :; fi
+	test -f .TESTED_$(SYSTEM) || \
+	    echo;\
+	    echo '*** Warning: the $(PACK_NAME) package has not been tested';\
+	    echo
 	#  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+		| compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -770,27 +773,27 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  up to date.
 export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 	@ echo
-	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
-	@ echo '    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package'
+	@ echo '    is in the compressed tar file'
+	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
-		$(NEWS) $(DATE_STAMP) $(BUILT_FILES)
+		$(DATE_STAMP) $(BUILT_FILES)
 	#  Issue a warning if the package has not been tested.
-	@ if test ! -f .TESTED_$(SYSTEM); then \
-           echo;\
-           echo '*** Warning: the $(PACK_NAME) package has not been tested';\
-           echo;\
-        else :; fi
-	#  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+	test -f .TESTED_$(SYSTEM) || \
+	    echo;\
+	    echo '*** Warning: the $(PACK_NAME) package has not been tested';\
+	    echo
+#	#  Remove any pre-existing tar files before creating new ones.
+	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 	$(TAR_IN) - mk Makefile.starlink $(NEWS) $(BUILT_FILES) \
-           $(DATE_STAMP) $(DOCUMENTATION) .BUILT  \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+		$(DATE_STAMP) $(DOCUMENTATION) .BUILT  \
+		| compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -810,16 +813,30 @@ export_source: $(EXPORT)/$(PKG_NAME).tar.Z
 #  recent than all the source files.
 $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 	# Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	test ! -f $(EXPORT)/$(PKG_NAME).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME).tar.Z
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+		| compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
 
 # Use the unconfigured Makefile.in here, since this target could be
-# built at a time when the directory has not been configured
+# built at a time when the directory has not been configured.
+#
+# In the distribuTION directory, make dvi2bitmap.tar with
+#
+#	make -f Makefile.in dvi2bitmap.tar
+#
 dvi2bitmap_source.tar: 
-	$(MAKE) -f Makefile.in dvi2bitmap.tar
-	mv dvi2bitmap.tar $(EXPORT)/dvi2bitmap_source.tar
+	@ if test -f dvi2bitmap.tar; then \
+	    $(LINK) dvi2bitmap.tar dvi2bitmap_source.tar; \
+	else \
+	    echo;\
+	    echo '*** This makefile, Makefile.starlink, regards the file';\
+	    echo '    dvi2bitmap_source.tar as a SOURCE file, and will';\
+	    echo '    NOT generate it.  If this file is missing,';\
+	    echo '    you probably have an incomplete source set.';\
+	    echo;\
+	    false;\
+	fi
 
 
 #  clean: Clean up the source directory.
@@ -850,9 +867,12 @@ unbuild: clean
 # The following rules are little subtle, since they have to work both in 
 # the distribuTION directory, where the sources live and are packaged up,
 # _and_ in the distributED directory, immediately after unpacking.  Use
-# the file dvi2bitmap.cc as a trigger: if that's missing, then we must be
-# in the distributed directory, so unpack the source bundle and move the
-# files up to the current directory.
+# the file version.h as a trigger: if that's present, then we're
+# either in the distribuTION directory, so we should not unpack the
+# sources, or else we are in an `export_run' directory, and there is
+# no dvi2bitmap_source.tar to unpack.  It it's missing, then we must be
+# in the distributed `export_source' directory, so unpack the source
+# bundle and move the files up to the current directory.
 #
 # dvi2bitmap has a feature which allows it to work around the problem
 # caused by a TeX installation in which texmf.cnf defines VARTEXFONTS to 
@@ -871,26 +891,25 @@ unbuild: clean
 # the path anyway), but the second means that the program will not
 # work unless either it is installed with the other dvi-ware, or the
 # TEXMFCNF environment variable is set appropriately.
-dvi2bitmap: dvi2bitmap.cc
-#	eval test -x "`which kpsewhich`" && grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && TEXMFCNFTEST=--enable-fake-progname ;\
-	which kpsewhich >/dev/null && grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && TEXMFCNFTEST=--enable-fake-progname ;\
-	test -n "$$TEXMFCNFTEST" && echo "Warning: faking dvi2bitmap program name" ; \
+dvi2bitmap: version.h
+	which kpsewhich >/dev/null && \
+		grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && \
+		TEXMFCNFTEST=--enable-fake-progname ;\
+	test -n "$$TEXMFCNFTEST" && \
+		echo "*** Warning: faking dvi2bitmap program name" ; \
 	CXX=$(CXX) ./configure --enable-gif --with-kpathsea $$TEXMFCNFTEST
 	$(MAKE) -f Makefile dvi2bitmap
 
 # Don't have this depending dvi2bitmap_source.tar - the latter will usually
 # be newer, but that's _not_ what we're testing here.
-dvi2bitmap.cc:
+version.h:
 	$(TAR_OUT) dvi2bitmap_source.tar
 	mv dvi2bitmap/* .
 	rmdir dvi2bitmap
 
-# doc.tar contains a directory dvi2bitmap_doc.  See doc/Makefile
-dvi2bitmap_doc: doc.tar
-	$(TAR_OUT) doc.tar
-
-dvi2bitmap.news: README
-	cp README dvi2bitmap.news
+#  This target should need to be built only in the distribuTION directory
+$(NEWS):
+	$(LINK) doc/ReleaseNotes $@
 
 #--------------------------------------------------------------------------
 
