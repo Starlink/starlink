@@ -49,6 +49,27 @@
 <!ENTITY % DTD.Version "UNKNOWN"	-- client DTD should specify this -->
 
 
+<!--========== Special entity ==========-->
+<!-- I need to be able to refer to the SGML declaration which is
+     appropriate for this DTD, from within the stylesheets.  Since
+     DSSSL doesn't have access to the entity manager (I don't think),
+     and since I can't work out how to declare entities in the catalog
+     (the ENTITY declaration seems not to work as I'd expect it to),
+     the only way round seems to be to declare an entity here which
+     points to the declaration's public-id.  This is available to the
+     stylesheets, and the catalog can resolve it ok.  I think....
+
+     I don't believe this is the best way to go about this, but I
+     _cannot_ work out a better one.
+
+     This is a copy of the corresponding declaration in the Starlink
+     General DTD.
+     -->
+<!ENTITY starlink.decl 
+	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
+	>
+
+
 <!--============================== Entities ==============================
   Collect parameter entities here.  These could be overridden by the
   invoking DTD.
@@ -57,11 +78,18 @@
 <!-- The %direction.attr ENTITY is attached to function arguments, and
      indicates which direction the argument is moving.  Calling DTDs may
      modify this as appropriate, as long as the modified version is a
-     subset of this list.
+     subset of this list.  
+
+     Once included `givenandreturned', but this was removed, and the
+     default changed, after the SGML meeting on 19991019.
      -->
-<!ENTITY % direction.attr 
-	"direction (given|returned|givenandreturned) #REQUIRED"
+<!ENTITY % direction.attr
+	"given (given) #IMPLIED
+	 returned (returned) #IMPLIED"
 	-- input or output to function -->
+<!--ENTITY % direction.attr 
+	"direction (given|returned|givenandreturned) #REQUIRED"
+	-->
 
 <!-- %language.attr ENTITY must be declared by the DTD which includes
      this one.  That DTD should declare the ENTITY as something like
@@ -132,8 +160,9 @@
 		   The document referred to should be marked up using
 		   the programcode DTD. -->
 
-<!ELEMENT docblock	O O (title, description?, authorlist?,
-			     copyright?, history?)>
+<!ELEMENT docblock	O O (title, description?,
+			     userkeywords?, softwarekeywords?,
+			     authorlist?, copyright?, history?)>
 
 <!ELEMENT routine	O O (codeopener?, routineprologue, codebody)
 		-- The specification of one function, or procedure or
@@ -214,8 +243,12 @@
      copy the declarations of URL and WEBREF from the paracontent DTD,
      and add them to the simplephrase entity.
      -->
+<!--
 <!ENTITY % Feature.Paracontent.References 'IGNORE'>
 <!ENTITY % additional.simplephrase '| funcname | webref | url'>
+-->
+<!ENTITY % Feature.Paracontent.References 'INCLUDE'>
+<!ENTITY % additional.simplephrase '| funcname'>
 
 <!ENTITY % paragraph.elements 
 	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN">
@@ -259,15 +292,28 @@
 	invocation	sstinvocation
 	examplelist	sstexamples
 	[none]		sstnotes	(subsumed within notelist)
-	notelist	sstdiytopic
+	diytopic	sstdiytopic
 	implementationstatus	sstimplementationstatus
-	bugs	sstbugs
+	bugs		sstbugs
+
+     This content model is UGLY, but is forced by the demand that
+     diytopics be allowed ad lib within the prologue.
      -->
-<!ELEMENT routineprologue O O (routinename? & purpose? & description & 
-				returnvalue? & argumentlist? &
-				parameterlist? & authorlist? & history? &
-				usage? & invocation? & examplelist? &
-				notelist? & implementationstatus? & bugs?)>
+<!ELEMENT routineprologue O O (
+				(routinename,	diytopic*)? &
+				(purpose,	diytopic*)? &
+				(description,	diytopic*)  &
+				(returnvalue,	diytopic*)? &
+				(argumentlist,	diytopic*)? &
+				(parameterlist,	diytopic*)? &
+				(authorlist,	diytopic*)? &
+				(history,	diytopic*)? &
+				(usage,		diytopic*)? & 
+				(invocation,	diytopic*)? & 
+				(examplelist,	diytopic*)? &
+				(implementationstatus,	diytopic*)? & 
+				(bugs,		diytopic*)?
+				)>
 <![ IGNORE [
 <!ELEMENT miscprologue	O O (description, history?)
 				-- content model needs future expansion? -->
@@ -285,6 +331,10 @@
 <!ELEMENT title		O O (#PCDATA)>
 <!ELEMENT description	- O (%paralist;)
 				-- longer discursive description -->
+<!ELEMENT (userkeywords | softwarekeywords)
+			- O (#PCDATA)
+				-- keywords for users, and denoting
+				   software group -->
 <!ELEMENT returnvalue	- O (%paralist;)
 				-- If there's no return value, there
 				   needn't be any explanatory text -->
@@ -358,8 +408,8 @@
 
 <!ELEMENT (usage | invocation | implementationstatus | bugs)
 			- O (%paralist;)>
-<!ELEMENT notelist	O O (othernote+)>
-<!ELEMENT othernote	- O (title, %paralist;)>
+<!--ELEMENT notelist	O O (othernote+)-->
+<!ELEMENT diytopic	- O (title, %paralist;)>
 
 
 <!ATTLIST parameter
@@ -415,6 +465,7 @@
 		#REQUIRED
 	>
 
+<![ IGNORE [
 <!-- Copy the declarations of the WEBREF and URL elements from the
      paracontent DTD.  See note above with `paragraph content', and
      see the paracontent DTD for documentation.
@@ -439,7 +490,7 @@
 	loctype		CDATA	#FIXED "#CONTENT QUERYLOC URL"
 	>
 
-
+]]>
 
 <!--========== Tables ==========-->
 <!-- Use the OASIS Exchange Table Model subset of the CALS table model.
