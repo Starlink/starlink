@@ -1,27 +1,125 @@
-	subroutine adi2_init( status )
+      SUBROUTINE ADI2_INIT( STATUS )
+*+
+*  Name:
+*     ADI2_INIT
 
-        INTEGER         STATUS
-        INTEGER         ID
-        EXTERNAL        ADI2_OPEN
-        EXTERNAL        ADI2_FCREAT
-        EXTERNAL        ADI2_FTRACE
-        EXTERNAL        ADI2_FCOMIT
-        EXTERNAL        ADI2_FCLOSE
-        EXTERNAL        ADI2_NEWLNK_ARR
+*  Purpose:
+*     Load ADI definitions required for use of FITS files
 
-        CALL ADI_DEFREP( 'FITS', ID, STATUS )
+*  Language:
+*     Starlink Fortran
 
-	CALL ADI_REQPKG( 'fits', STATUS )
+*  Invocation:
+*     CALL ADI2_INIT( STATUS )
 
-        CALL ADI_DEFMTH( 'NewLink(Array,FITSfile)', ADI2_NEWLNK_ARR,
-     :                   did, STATUS )
+*  Description:
+*     {routine_description}
 
-        CALL ADI_DEFRCB( ID, 'CreatRtn', ADI2_FCREAT, STATUS )
-        CALL ADI_DEFRCB( ID, 'CloseRtn', ADI2_FCLOSE, STATUS )
-        CALL ADI_DEFRCB( ID, 'ComitRtn', ADI2_FCOMIT, STATUS )
-        CALL ADI_DEFRCB( ID, 'OpenRtn', ADI2_OPEN, STATUS )
+*  Arguments:
+*     STATUS = INTEGER (given and returned)
+*        The global status.
 
-        CALL ADI_DEFMTH( 'FileTrace(FITSfile)', ADI2_FTRACE, DID,
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
+
+*  Keywords:
+*     package:adi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     14 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL        		ADI2_OPEN
+      EXTERNAL        		ADI2_FCREAT
+      EXTERNAL        		ADI2_FTRACE
+      EXTERNAL        		ADI2_FCOMIT
+      EXTERNAL        		ADI2_FCLOSE
+      EXTERNAL        		ADI2_NEWLNK_ARR
+
+*  Local Variables:
+      INTEGER			DID			! Dummy id (ignored)
+      INTEGER			RID			! Representation id
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Load the FITS package
+      CALL ADI_REQPKG( 'fits', STATUS )
+
+*  Locate the FITS file representation object
+      CALL ADI_LOCREP( 'FITS', RID, STATUS )
+
+      CALL ADI_DEFRCB( RID, 'CreatRtn', ADI2_FCREAT, STATUS )
+      CALL ADI_DEFRCB( RID, 'OpenRtn', ADI2_OPEN, STATUS )
+
+*  File system methods
+      CALL ADI_DEFMTH( 'FileClose(_FITSfile)', ADI2_FCLOSE, DID,
+     :                   STATUS )
+      CALL ADI_DEFMTH( 'FileComit(_FITSfile)', ADI2_FCOMIT, DID,
+     :                   STATUS )
+      CALL ADI_DEFMTH( 'FileTrace(_FITSfile)', ADI2_FTRACE, DID,
      :                   STATUS )
 
-        END
+      CALL ADI_DEFMTH( 'NewLink(_Array,_FITSfile)', ADI2_NEWLNK_ARR,
+     :                   DID, STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_INIT', STATUS )
+
+      END

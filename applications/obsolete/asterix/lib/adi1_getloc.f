@@ -86,20 +86,26 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER			ID			! Dataset object
+      INTEGER			ID
 
 *  Arguments Returned:
-      CHARACTER*(DAT__SZLOC)	LOC			! Locator to object
+      CHARACTER*(DAT__SZLOC)	LOC
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			FID			! FileObject
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Locate base file object
+      CALL ADI_GETFILE( ID, FID, STATUS )
+
 *  Extract locator
-      CALL ADI_CGET0C( ID, 'Locator', LOC, STATUS )
+      CALL ADI_CGET0C( FID, 'Locator', LOC, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_GETLOC', STATUS )

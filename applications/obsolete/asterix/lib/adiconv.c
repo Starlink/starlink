@@ -6,7 +6,6 @@
 #include <stdarg.h>
 
 #include "asterix.h"
-#include "sae_par.h"
 
 #include "aditypes.h"
 #include "adiconv.h"
@@ -14,6 +13,7 @@
 #include "adistrng.h"
 #include "adisyms.h"
 
+#include "adi_err.h"
 
 typedef
   struct {
@@ -716,16 +716,16 @@ void ADIcnvInit( ADIstatus status )
   ADIclassDef	*cdef[10];
   int		it;
 
-  cdef[ub] = _cdef_data(UT_ALLOC_ub);
-  cdef[b]  = _cdef_data(UT_ALLOC_b);
-  cdef[uw] = _cdef_data(UT_ALLOC_uw);
-  cdef[w]  = _cdef_data(UT_ALLOC_w);
-  cdef[i]  = _cdef_data(UT_ALLOC_i);
-  cdef[r]  = _cdef_data(UT_ALLOC_r);
-  cdef[d]  = _cdef_data(UT_ALLOC_d);
-  cdef[c]  = _cdef_data(UT_ALLOC_c);
-  cdef[l]  = _cdef_data(UT_ALLOC_l);
-  cdef[p]  = _cdef_data(UT_ALLOC_p);
+  cdef[ub] = _cdef_data(UT_cid_ub);
+  cdef[b]  = _cdef_data(UT_cid_b);
+  cdef[uw] = _cdef_data(UT_cid_uw);
+  cdef[w]  = _cdef_data(UT_cid_w);
+  cdef[i]  = _cdef_data(UT_cid_i);
+  cdef[r]  = _cdef_data(UT_cid_r);
+  cdef[d]  = _cdef_data(UT_cid_d);
+  cdef[c]  = _cdef_data(UT_cid_c);
+  cdef[l]  = _cdef_data(UT_cid_l);
+  cdef[p]  = _cdef_data(UT_cid_p);
 
 /* Define convertor functions */
   for( it=0; ctable[it].func; it++ )

@@ -21,6 +21,7 @@ _ESTR(Estr__AdjObjRef, "adjusting object reference count")
 _ESTR(Estr__AltObjShp, "altering object dimensions")
 _ESTR(Estr__CloFilObj, "closing file object")
 _ESTR(Estr__CloObjId,  "cloning object identifier")
+_ESTR(Estr__ComFilObj, "committing changes to file object")
 _ESTR(Estr__CopObj,    "copying object")
 _ESTR(Estr__CopObjCmp, "copying object component")
 _ESTR(Estr__CreFilObj, "creating file object")
@@ -43,6 +44,8 @@ _ESTR(Estr__DelObj,    "deleting object")
 _ESTR(Estr__DelObjCmp, "deleting object component")
 _ESTR(Estr__DelObjPrp, "deleting object property")
 _ESTR(Estr__DelStrCmp, "deleting structure component")
+_ESTR(Estr__EvlExp,    "evaluating expression")
+_ESTR(Estr__ExeFun,    "executing function")
 _ESTR(Estr__ExeMth,    "executing method")
 _ESTR(Estr__FshObjGrp, "flushing object group")
 _ESTR(Estr__GetNumCmp, "getting number of structure components")
@@ -66,6 +69,7 @@ _ESTR(Estr__LocStrCmp, "locating structure component")
 _ESTR(Estr__MapObjDat, "mapping object data")
 _ESTR(Estr__OpeFilObj, "opening file object")
 _ESTR(Estr__PriObj,    "printing object")
+_ESTR(Estr__PrsExp,    "parsing expression")
 _ESTR(Estr__PutObjDat, "putting object data")
 _ESTR(Estr__PutRefObj, "putting reference object id")
 _ESTR(Estr__SetObjDat, "setting object data")
@@ -101,7 +105,7 @@ int	ADI_G_err_ntok = 0;		/* Token count */
 char	ADI_G_err_ctx[200];		/* Current contextual error */
 #endif
 
-void adix_errcnl( ADIstatus status )
+void adix_erranl( ADIstatus status )
   {
 #ifndef NOEMS
   ems_annul_c( status );

@@ -18,45 +18,46 @@
 *
 *      Error system :
 *
-*	adic_errctx	- return error context string
-* 	adic_errmsg	- return error message given code
-*	adic_setecs	- set error code and context string
+*	adic_erranl	- Annul a reported error
+*	adic_errctx	- Return error context string
+* 	adic_errmsg	- Return error message given code
+*	adic_setecs	- Set error code and context string
 *
 *      Property handling :
 *
-*	adic_delprp	- delete named property
-*	adic_locprp	- locate named property
-*       adic_nprp	- return number of properties
-*       adic_indprp	- locate property by number
+*	adic_delprp	- Delete named property
+*	adic_locprp	- Locate named property
+*       adic_nprp	- Return number of properties
+*       adic_indprp	- Locate property by number
 *
 *      Structure handling :
 *
-*	adic_delcmp	- delete named structure component
-*	adic_loccmp	- locate named structure component
-*	adic_ncmp	- number of components in structure
-*	adic_indcmp	- locate structure component by number
+*	adic_delcmp	- Delete named structure component
+*	adic_loccmp	- Locate named structure component
+*	adic_ncmp	- Number of components in structure
+*	adic_indcmp	- Locate structure component by number
 *
 *      Reference count :
 *
 *       adic_clone	- Clone an identifier
-*	adic_refadj	- apply increment to object reference count
-*	adic_refcnt	- return object reference count
+*	adic_refadj	- Apply increment to object reference count
+*	adic_refcnt	- Return object reference count
 *
 *      Data system definitions :
 *
-*	adic_defcac	- define class allocation cluster size
-*       adic_defcls	- define a new class
-*       adic_defcpa	- define a new command parser
-*	adic_deffun	- define a function
-* 	adic_defgdp	- define generic dispatch procedure
-*	adic_defgen	- define a generic function
-*	adic_defmcf	- define a method combination form (no Fortran
+*	adic_defcac	- Define class allocation cluster size
+*       adic_defcls	- Define a new class
+*       adic_defcpa	- Define a new command parser
+*	adic_deffun	- Define a function
+* 	adic_defgdp	- Define generic dispatch procedure
+*	adic_defgen	- Define a generic function
+*	adic_defmcf	- Define a method combination form (no Fortran
 *			  equivalent)
-*	adic_defmth	- define a method
-*	adic_defprt	- define class printer method
-*       adic_defrep	- define a new file representation
-*	adic_defvar	- define a new variable value
-*	adic_dervd	- is an object derived from specified class
+*	adic_defmth	- Define a method
+*	adic_defprt	- Define class printer method
+*       adic_defrep	- Define a new file representation
+*	adic_defvar	- Define a new variable value
+*	adic_dervd	- Is an object derived from specified class?
 *
 *      Method execution :
 *
@@ -64,6 +65,7 @@
 *       adic_exec2	- execute named method with 2 arguments
 *	adic_execi	- execute named method (ADI string)
 *	adic_calnxt	- invoke next method in method hierarchy
+*	adic_nulmth	- Null method with standard argument list
 *
 *      System method interfaces :
 *
@@ -88,18 +90,22 @@
 *      Data access :
 *
 *	adic_find	 - Locate object component
+*	adic_findi	 - Locate object component with ADI name
+*       adic_[c]get	 - Get n-D object [component] values with user type
 *       adic_[c]get<t>	 - Get n-D object [component] values
+*       adic_[c]get0	 - Get scalar object [component] value with user type
 *       adic_[c]get0<t>	 - Get scalar object [component] value
+*       adic_[c]get1	 - Get 1-D object [component] values with user type
 *       adic_[c]get1<t>	 - Get 1-D object [component] values
-*	adic_[c]map	 - Map object [component] with user specified type
+*	adic_[c]map	 - Map object [component] with user type
 *	adic_[c]map<t>	 - Map object [component] with a specific type
+*       adic_[c]put	 - Put n-D object [component] values with user type
 *       adic_[c]put<t>	 - Put n-D object [component] values
+*       adic_[c]put0	 - Put scalar object [component] value with user type
 *       adic_[c]put0<t>	 - Put scalar object [component] value
+*       adic_[c]put1	 - Put 1-D object [component] values with user type
 *       adic_[c]put1<t>	 - Put 1-D object [component] values
 *	adic_[c]putid	 - Put ADI object into object [component]
-*       adic_[c]set<t>	 - Set n-D object [component] values
-*       adic_[c]set0<t>	 - Set scalar object [component] value
-*       adic_[c]set1<t>	 - Set 1-D object [component] values
 *	adic_there	 - Does an object component exist?
 *	adic_[c]unmap	 - Unmap object [component]
 *
@@ -128,13 +134,15 @@
 *
 *      Object references :
 *
-*	adic_getref	 - Read an object reference
+*	adic_[c]getref	 - Read an object [component] reference
 *	adic_newref	 - Create a reference object
-*	adic_putref	 - Write an object reference
+*	adic_[c]putref	 - Write an object [component] reference
 *
 *      Data system :
 *
+*       adi_fclone       - Create a new as a clone of an input
 *       adi_fclose       - Close a file system object
+*       adi_fcomit       - Comit any buffered file changes to disk
 *       adi_fcreat       - Create a new file system object
 *       adi_fopen        - Open existing file system object
 *
@@ -192,6 +200,11 @@
  * initialised here. The latter point allows errors which occur during
  * initialisation to be inviestigated.
  */
+void adic_erranl( ADIstatus status )
+  {
+  adix_erranl( status );
+  }
+
 void adic_errmsg( ADIstatype code, char *buf, int buflen )
   {
   adix_errmsg( code, buf, buflen );
@@ -530,6 +543,12 @@ void adic_execi( ADIobj func, int narg, ADIobj args[], ADIobj *res, ADIstatus st
   _ERR_REP( "adic_execi", Estr__ExeMth );
   }
 
+ADIobj adic_nulmth( int narg, ADIobj args[], ADIstatus status )
+  {
+  return ADI__nullid;
+  }
+
+
 /* -------------------------------------------------------------------------
  * System method interfaces
  * -------------------------------------------------------------------------
@@ -564,7 +583,7 @@ void adic_print( ADIobj id, ADIstatus status )
   _ERR_REP( "adic_print", Estr__PriObj );
   }
 
-void adic_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
+/* void adic_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
   {
   _chk_stat;
 
@@ -573,14 +592,14 @@ void adic_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
   _ERR_REP( "adic_setlnk", Estr__LnkFilObj );
   }
 
-void adic_unlnk( ADIobj id, ADIstatus status )
+ void adic_unlnk( ADIobj id, ADIstatus status )
   {
   _chk_stat;
 
   adix_unlnk( id, status );
 
   _ERR_REP( "adic_unlnk", Estr__UlnFilObj );
-  }
+  } */
 
 /* -------------------------------------------------------------------------
  * Data creation
@@ -756,13 +775,24 @@ void adic_newv1c( int nval, char *value[], ADIobj *id, ADIstatus status )
  * -------------------------------------------------------------------------
  */
 
+void adic_get( ADIobj id, char *type, int ndim, int dimx[],
+	       void *value, int dims[], ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_get_nn( 1, id, NULL, 0, type, _CSM, ndim, dimx, value, dims, status );
+
+  _ERR_REP( "adic_get", Estr__GetObjDat);
+  }
+
+
 #define _genproc(_t) \
-void _TM_name(adic_get,_t)( ADIobj id, int ndim, int dims[], \
-		_TM_ctype(_t) *value, ADIstatus status ) \
+void _TM_name(adic_get,_t)( ADIobj id, int ndim, int dimx[], \
+		_TM_ctype(_t) *value, int dims[], ADIstatus status ) \
   { \
   _chk_stat; \
-  adix_get_n( 1, id, NULL, 0, ndim, dims, &_TM_alloc(_t), \
-	     sizeof(_TM_ctype(_t)), value, NULL, status ); \
+  adix_get_n( 1, id, NULL, 0, ndim, dimx, &_TM_alloc(_t), \
+	     sizeof(_TM_ctype(_t)), value, dims, status ); \
   _ERR_REP(_TM_names(adic_get,_t), Estr__GetObjDat);}
 
 _genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
@@ -770,15 +800,24 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 _genproc(p)
 #undef _genproc
 
-void adic_getc( ADIobj id, int ndim, int dims[], int len,
-		char *value, ADIstatus status )
+void adic_getc( ADIobj id, int ndim, int dimx[], int len,
+		char *value, int dims[], ADIstatus status )
   {
   _chk_stat;
 
-  adix_get_n( 1, id, NULL, 0, ndim, dims, &_TM_alloc(c), len,
-	      value, NULL, status );
+  adix_get_n( 1, id, NULL, 0, ndim, dimx, &_TM_alloc(c), len,
+	      value, dims, status );
 
   _ERR_REP("adic_getc", Estr__GetObjDat);
+  }
+
+void adic_get0( ADIobj id, char *type, void *value, ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_get_nn( 1, id, NULL, 0, type, _CSM, 0, NULL, value, NULL, status );
+
+  _ERR_REP( "adic_get0", Estr__GetObjDat);
   }
 
 #define _genproc(_t) \
@@ -802,6 +841,16 @@ void _TM_name(adic_get0,c)( ADIobj id, int len, char *value, ADIstatus status )
 	      value, NULL, status );
 
   _ERR_REP("adic_get0c", Estr__GetObjDat);
+  }
+
+void adic_get1( ADIobj id, char *type, int mxval,
+		void *value, int *nactval, ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_get_nn( 1, id, NULL, 0, type, _CSM, 1, &mxval, value, nactval, status );
+
+  _ERR_REP( "adic_get1", Estr__GetObjDat);
   }
 
 #define _genproc(_t) \
@@ -852,6 +901,17 @@ _genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
 _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 #undef _genproc
 
+
+void adic_put0( ADIobj id, char *type, void *value, ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_put_nn( 1, id, NULL, 0, type, _CSM, 0, NULL,
+	       value, status );
+
+  _ERR_REP( "adic_put0", Estr__PutObjDat);
+  }
+
 #define _genproc(_t) \
 void _TM_name(adic_put0,_t)( ADIobj id, _TM_ctype(_t) value, ADIstatus status ) \
   { \
@@ -865,7 +925,7 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 _genproc(p)
 #undef _genproc
 
-void _TM_name(adic_put0,c)( ADIobj id, char *value, ADIstatus status )
+void adic_put0c( ADIobj id, char *value, ADIstatus status )
   {
   _chk_stat;
 
@@ -874,6 +934,16 @@ void _TM_name(adic_put0,c)( ADIobj id, char *value, ADIstatus status )
 
   _ERR_REP( "adic_put0c", Estr__PutObjDat );
   }
+
+void adic_put( ADIobj id, char *type, int ndim, int dims[],
+	       void *value, ADIstatus status )
+  {
+  _chk_stat;
+  adix_put_nn( 1, id, NULL, 0, type, _CSM, ndim, dims, value, status );
+
+  _ERR_REP( "adic_put", Estr__PutObjDat);
+  }
+
 
 #define _genproc(_t) \
 void _TM_name(adic_put,_t)( ADIobj id, int ndim, int dims[], \
@@ -899,6 +969,16 @@ void adic_putc( ADIobj id, int ndim, int dims[],
 	      _CSM, value, status );
 
   _ERR_REP( "adic_putc", Estr__PutObjDat );
+  }
+
+
+void adic_put1( ADIobj id, char *type, int nval,
+		void *value, ADIstatus status )
+  {
+  _chk_stat;
+  adix_put_nn( 1, id, NULL, 0, type, _CSM, 1, &nval, value, status );
+
+  _ERR_REP( "adic_put1", Estr__PutObjDat );
   }
 
 #define _genproc(_t) \
@@ -1094,6 +1174,17 @@ void adic_cnewv1c( ADIobj id, char *name, int nval, char *value[], ADIstatus sta
  * -------------------------------------------------------------------------
  */
 
+void adic_cget( ADIobj id, char *name, char *type, int ndim, int dimx[],
+	        void *value, int dims[], ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_get_nn( 1, id, name, _CSM, type, _CSM, ndim, dimx,
+	       value, dims, status );
+
+  _ERR_REP( "adic_cget", Estr__GetObjDat);
+  }
+
 #define _genproc(_t) \
 void _TM_name(adic_cget,_t)( ADIobj id, char *name, int ndim, int dims[], \
 	_TM_ctype(_t) *value, ADIstatus status ) \
@@ -1108,15 +1199,25 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 _genproc(p)
 #undef _genproc
 
-void adic_cgetc( ADIobj id, char *name, int ndim, int dims[], int len,
-		 char *value, ADIstatus status )
+void adic_cgetc( ADIobj id, char *name, int ndim, int dimx[], int len,
+		 char *value, int dims[], ADIstatus status )
   {
   _chk_stat;
 
-  adix_get_n( 1, id, name, _CSM, ndim, dims, &_TM_alloc(c),
-	      len, value, NULL, status );
+  adix_get_n( 1, id, name, _CSM, ndim, dimx, &_TM_alloc(c),
+	      len, value, dims, status );
 
   _ERR_REP("adic_cgetc", Estr__GetObjDat);
+  }
+
+void adic_cget0( ADIobj id, char *name, char *type, void *value,
+                 ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_get_nn( 1, id, name, _CSM, type, _CSM, 0, NULL, value, NULL, status );
+
+  _ERR_REP( "adic_cget0", Estr__GetObjDat );
   }
 
 #define _genproc(_t) \
@@ -1141,6 +1242,19 @@ void adic_cget0c( ADIobj id, char *name, int len, char *value, ADIstatus status 
 
   _ERR_REP("adic_cget0c", Estr__GetObjDat);
   }
+
+
+void adic_cget1( ADIobj id, char *name, char *type, int mxval,
+	         void *value, int *nactval, ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_get_nn( 1, id, name, _CSM, type, _CSM, 1, &mxval, value,
+               nactval, status );
+
+  _ERR_REP(_TM_names(adic_cget1,_t),Estr__GetObjDat);
+  }
+
 
 #define _genproc(_t) \
 void _TM_name(adic_cget1,_t)( ADIobj id, char *name, int mxval, \
@@ -1193,6 +1307,14 @@ _genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
 _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 #undef _genproc
 
+void adic_cput( ADIobj id, char *name, char *type, int ndim, int dims[],
+		void *value, ADIstatus status )
+  {
+  _chk_stat;
+  adix_put_nn( 1, id, name, _CSM, type, _CSM, ndim, dims, value, status );
+  _ERR_REP( "adic_cput", Estr__PutObjDat );
+  }
+
 #define _genproc(_t) \
 void _TM_name(adic_cput,_t)( ADIobj id, char *name, int ndim, int dims[], \
 		_TM_ctype(_t) *value, ADIstatus status ) \
@@ -1218,6 +1340,17 @@ void adic_cputc( ADIobj id, char *name, int ndim, int dims[],
   _ERR_REP("adic_cputc", Estr__PutObjDat);
   }
 
+void adic_cput0( ADIobj id, char *name, char *type, void *value,
+                 ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_put_nn( 1, id, name, _CSM, type, _CSM, 0, NULL, value, status );
+
+  _ERR_REP(_TM_names(adic_cput0,_t), Estr__PutObjDat);
+  }
+
+
 #define _genproc(_t) \
 void _TM_name(adic_cput0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIstatus status ) \
   { \
@@ -1239,6 +1372,17 @@ void adic_cput0c( ADIobj id, char *name, char *value, ADIstatus status )
 	      _CSM, &value, status );
 
   _ERR_REP("adic_cput0c", Estr__PutObjDat);
+  }
+
+
+void adic_cput1( ADIobj id, char *name, char *type, int nval,
+		 void *value, ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_put_nn( 1, id, name, _CSM, type, _CSM, 1, &nval, value, status );
+
+  _ERR_REP( "adic_cput1", Estr__PutObjDat);
   }
 
 #define _genproc(_t) \
@@ -1284,7 +1428,7 @@ void adic_cputid( ADIobj id, char *name, ADIobj vid, ADIstatus status )
 /* Invoke kernel routine */
   adix_putid( id, name, _CSM, vid, status );
 
-  _ERR_REP("adic_cputit", Estr__PutObjDat);
+  _ERR_REP("adic_cputid", Estr__PutObjDat);
   }
 
 void adic_cunmap( ADIobj id, char *name, void *vptr, ADIstatus status )
@@ -1305,78 +1449,13 @@ void adic_find( ADIobj id, char *name, ADIobj *cid, ADIstatus status )
   _ERR_REP( "adic_find", Estr__LocObjCmp );
   }
 
-#define _genproc(_t) \
-void _TM_name(adic_cset,_t)( ADIobj id, char *name, int ndim, int dims[], \
-		_TM_ctype(_t) *value, ADIstatus status ) \
-  { \
-  _chk_stat; \
-  adix_set_n( 1, id, name, _CSM, ndim, dims, &_TM_alloc(_t), \
-	     sizeof(_TM_ctype(_t)), \
-	     value, status ); \
-  _ERR_REP(_TM_names(adic_cset,_t), Estr__SetObjDat);}
-
-_genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
-_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
-_genproc(p)
-#undef _genproc
-
-void adic_csetc( ADIobj id, char *name, int ndim, int dims[],
-		 char **value, ADIstatus status )
+void adic_findi( ADIobj id, ADIobj name, ADIobj *cid, ADIstatus status )
   {
   _chk_stat;
 
-  adix_set_n( 1, id, name, _CSM, ndim, dims, &_TM_alloc(c), _CSM,
-	      value, status );
+  *cid = adix_findi( id, name, status );
 
-  _ERR_REP( "adic_csetc", Estr__SetObjDat );
-  }
-
-#define _genproc(_t) \
-void _TM_name(adic_cset0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIstatus status ) \
-  { \
-  _chk_stat; \
-  adix_set_n( 1, id, name, _CSM, 0, NULL, &_TM_alloc(_t), \
-	     sizeof(value), &value, status ); \
-  _ERR_REP(_TM_names(adic_cset0,_t), Estr__SetObjDat);}
-
-_genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
-_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
-_genproc(p)
-#undef _genproc
-
-void adic_cset0c( ADIobj id, char *name, char *value, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_set_n( 1, id, name, _CSM, 0, NULL, &_TM_alloc(c), _CSM,
-	       &value, status );
-
-  _ERR_REP( "adic_cset0c", Estr__SetObjDat );
-  }
-
-#define _genproc(_t) \
-void _TM_name(adic_cset1,_t)( ADIobj id, char *name, int nval, \
-		_TM_ctype(_t) *value, ADIstatus status ) \
-  { \
-  _chk_stat; \
-  adix_set_n( 1, id, name, _CSM, 1, &nval, &_TM_alloc(_t), \
-	     sizeof(_TM_ctype(_t)), value, status ); \
-  _ERR_REP(_TM_names(adic_cset1,_t), Estr__SetObjDat);}
-
-_genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
-_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
-_genproc(p)
-#undef _genproc
-
-void adic_cset1c( ADIobj id, char *name, int nval,
-		  char **value, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_set_n( 1, id, name, _CSM, 1, &nval, &_TM_alloc(c), _CSM,
-	      value, status );
-
-  _ERR_REP("adic_cset1c", Estr__SetObjDat);
+  _ERR_REP( "adic_findi", Estr__LocObjCmp );
   }
 
 void adic_there( ADIobj id, char *name, ADIlogical *there, ADIstatus status )
@@ -1603,11 +1682,29 @@ void adic_reqpkg( char *pkg, ADIstatus status )
  * Object references
  * -------------------------------------------------------------------------
  */
+void adic_cgetref( ADIobj rid, char *name, ADIobj *id, ADIstatus status )
+  {
+  _chk_stat;
+
+  *id = adix_getref( rid, name, _CSM, status );
+
+  _ERR_REP( "adic_cgetref", Estr__GetRefObj );
+  }
+
+void adic_cputref( ADIobj rid, char *name, ADIobj id, ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_putref( rid, name, _CSM, id, status );
+
+  _ERR_REP( "adic_cputref", Estr__PutRefObj );
+  }
+
 void adic_getref( ADIobj rid, ADIobj *id, ADIstatus status )
   {
   _chk_stat;
 
-  *id = adix_getref( rid, status );
+  *id = adix_getref( rid, NULL, 0, status );
 
   _ERR_REP( "adic_getref", Estr__GetRefObj );
   }
@@ -1625,7 +1722,10 @@ void adic_putref( ADIobj rid, ADIobj id, ADIstatus status )
   {
   _chk_stat;
 
-  adix_putref( rid, id, status );
+/*  adix_putref( rid, NULL, 0, id, status ); */
+
+  adix_put_n( 1, rid, NULL, 0, 0, NULL, &_TM_alloc(_t), \
+	      sizeof(id), &id, status ); \
 
   _ERR_REP( "adic_putref", Estr__PutRefObj );
   }
@@ -1635,6 +1735,16 @@ void adic_putref( ADIobj rid, ADIobj id, ADIstatus status )
  * Data system
  * -------------------------------------------------------------------------
  */
+void adic_fclone( ADIobj id, char *fspec, char *cls, ADIobj *fid,
+		  ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_fclone( id, fspec, _CSM, cls, _CSM, fid, status );
+
+  _ERR_REP( "adic_fclone", Estr__CreFilObj );
+  }
+
 void adic_fclose( ADIobj id, ADIstatus status )
   {
   _chk_stat;
@@ -1642,6 +1752,15 @@ void adic_fclose( ADIobj id, ADIstatus status )
   ADIfsysFileClose( id, status );
 
   _ERR_REP( "adic_fclose", Estr__CloFilObj );
+  }
+
+void adic_fcomit( ADIobj id, ADIstatus status )
+  {
+  _chk_stat;
+
+  ADIfsysFileComit( id, status );
+
+  _ERR_REP( "adic_fcomit", Estr__ComFilObj );
   }
 
 void adic_fcreat( char *fspec, ADIobj id, ADIobj *fid,
@@ -1766,3 +1885,121 @@ void adic_probe( ADIstatus status )
   adix_probe( status );
   }
 
+
+
+void adic_eprsc( char *string, ADIobj grammar, ADIobj *expr, ADIstatus status )
+/*
+*+
+*  Name:
+*     adic_eprsc
+
+*  Purpose:
+*     Parse an expression from a null terminated string for a given grammar
+
+*  Language:
+*     C
+
+*  Invocation:
+*     (void) adic_eprsc( string, grammar, &expr, status )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     string = char * (given)
+*        The string containing the expression to be parsed
+*     grammar = ADIobj (given)
+*        The grammar used to parse the string. Currently not used
+*     expr = ADIobj * (returned)
+*	 The parsed expression
+*     status = ADIstatus (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {routine_references}...
+
+*  Keywords:
+*     adi, adi:c, expression, parsing, grammar
+
+*  Copyright:
+*     Copyright University of Birmingham 1995.
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      4 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*.
+*/
+  {
+  _chk_stat;
+
+  *expr = ADIexprParseString( string, _CSM, grammar, status );
+
+  _ERR_REP( "adic_eprsc", Estr__PrsExp );
+  }
+
+void adic_eeval( ADIobj expr, ADIobj symlist, ADIlogical ownres,
+		 ADIobj *value, ADIstatus status )
+  {
+  _chk_stat;
+
+  *value = ADIexprEval( expr, symlist, ownres, status );
+
+  _ERR_REP( "adic_eeval", Estr__EvlExp );
+  }
+
+
+void adic_fexec( char *func, int narg, ADIobj args[], ADIobj *res, ADIstatus status )
+  {
+  ADIobj	resid;
+
+  _chk_stat;
+
+  resid = adix_fexec( func, _CSM, narg, args, status );
+
+  if ( res )
+    *res = resid;
+
+  _ERR_REP( "adic_fexec", Estr__ExeFun );
+  }
