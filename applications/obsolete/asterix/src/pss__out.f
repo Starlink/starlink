@@ -142,16 +142,6 @@
       WRITE( STIME, 10 ) PT(9:10), PT(5:7), PT(23:24), PT(12:19)
       CALL SSI_PUTPAR0C( SID, 1, 'CREATED', 20, STIME, STATUS )
 
-*    Copy input MORE box
-c      IF ( .NOT. IM_PRIM ) THEN
-c        CALL DAT_THERE( IM_LOC, 'MORE', THERE, STATUS )
-c        IF ( THERE ) THEN
-c          CALL DAT_FIND( IM_LOC, 'MORE', MLOC, STATUS )
-c          CALL SSO_PUTPARS( SLOC, 1, 'MORE', MLOC, STATUS )
-c          CALL DAT_ANNUL( MLOC, STATUS )
-c        END IF
-c      END IF
-
 *    File searched
       CALL SSI_PUTPAR0C( SID, 1, 'SEARCHED', 132, IM_FILE(:
      :                           CHR_LEN(IM_FILE)), STATUS )
