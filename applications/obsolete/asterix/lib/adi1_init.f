@@ -102,6 +102,8 @@
       EXTERNAL			GMI1_NEWLNK
       EXTERNAL			GMI1_SETLNK
 
+      EXTERNAL			SSI1_NEWLNK
+
       EXTERNAL			UDI1_COPANC
 
 *  Local Variables:
@@ -150,6 +152,12 @@
       CALL ADI_DEFMTH( 'NewLink(_MultiGraph,_HDSfile)', GMI1_NEWLNK,
      :                 DID, STATUS )
       CALL ADI_DEFMTH( 'SetLink(_MultiGraph,_HDSfile)', GMI1_SETLNK,
+     :                 DID, STATUS )
+
+*  Source search results files
+      CALL ADI_DEFMTH( 'NewLink(_SSDS,_HDSfile)', SSI1_NEWLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'NewLink(_SSDSset,_HDSfile)', SSI1_NEWLNK,
      :                 DID, STATUS )
 
 *  Ancillary copying

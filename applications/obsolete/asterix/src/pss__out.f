@@ -125,7 +125,8 @@
       END IF
 
 *    Create output
-      CALL ADI_FCREAT( SSDS, ADI__NULLID, SID, STATUS )
+      CALL ADI_NEW0( 'SSDS', SSID, STATUS )
+      CALL ADI_FCREAT( SSDS, SSID, SID, STATUS )
 
 *    Book-keeping structure
       CALL SSI_CREBOOK( SID, 1, STATUS )
