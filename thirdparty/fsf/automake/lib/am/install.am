@@ -104,8 +104,10 @@ install-manifest:
 ?!STANDARDMANIFEST?	      echo $$f>&5; \
 ?!STANDARDMANIFEST?	      test -f $$f && { chmod 666 $$f && rm -f $$f; }; \
 ?!STANDARDMANIFEST?	    done ); \
-?!STANDARDMANIFEST?	  echo "(cd $$STG/$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix))"; \
-?!STANDARDMANIFEST?	  (cd $$STG/$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix)); \
+?!STANDARDMANIFEST?	  if test -d "$$STG$(prefix)"; then \
+?!STANDARDMANIFEST?	    echo "(cd $$STG$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix))"; \
+?!STANDARDMANIFEST?	    (cd $$STG$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix)); \
+?!STANDARDMANIFEST?	  else echo "NOTE: no files installed">&2; fi; \
 ?!STANDARDMANIFEST?	  rm -Rf $$STG; \
 	  echo "</files>"                                       >&5; \
 	  echo "</manifest>"                                    >&5; \
