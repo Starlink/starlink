@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.23}
 \newcommand{\stardocnumber}    {95.23}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {9th January 2003}
+\newcommand{\stardocdate}      {24th February 2003}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -7431,7 +7431,81 @@ can be used to examine attribute values associated with the current Frame
 of an NDF, and change the values of those which are not read-only.
 
 
+\subsubsection{Specifying Attributes for sub-Frames within Compound Frames}
+Let's say you have a spectral cube in which the WCS axes are wavelength,
+RA and Dec. In this case, the current co-ordinate Frame will actually be
+a ``compound'' Frame containing two ``component'' Frames; a 1-dimensional
+spectral Frame and a 2-dimensional sky Frame. If we consider an attribute
+such as {\tt System} (which all classes of Frame have), we now seem to have
+three different Systems to consider; the {\tt System} value for the component
+spectral Frame, the {\tt System} value for the component sky Frame and the
+{\tt System} value for the compound Frame as a whole. So if we want to set the 
+spectral system to ``optical velocity'', and celestial system to
+``Galactic'' what do we do? The answer is to include the index of an axis
+within the attribute name. If WCS axis 1 is the spectral axis, 2 is the
+RA axis and 3 is the Dec. axis, then we would do the following:
 
+
+\small
+\begin{verbatim}
+    % wcsattrib fred set "System(1)" vopt
+    % wcsattrib fred set "System(2)" galactic
+\end{verbatim}
+\normalsize
+
+In fact, we could have used ``System(3)'' in place of ``System(2)'' since
+axes 2 and 3 are both contained within the same sky Frame and so setting
+the {\tt System} attribute for either one will have the same effect. We could
+now examine the attributes as follows:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred get "System(1)" 
+    % wcsattrib fred get "System(2)" 
+\end{verbatim}
+\normalsize
+
+These commands will display ``VOPT'' and ``Galactic'', as expected. Note,
+the following command:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred get "System" 
+\end{verbatim}
+\normalsize
+
+will display ``Compound'' since it is displaying the {\tt System} value of the
+compound Frame \emph{as a whole} (because no axis index was included).
+
+To continue this example, the SpecFrame class (which represents spectral
+axes) has an attribute called {\tt StdOfRest} (standard of rest). This
+attribute is specific to the SpecFrame class and is not recognised by
+other classes of Frames. If we do:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred set "StdOfRest" LSRK
+\end{verbatim}
+\normalsize
+
+we will get an error saying the attribute name is unknown. This is because 
+compound Frames do not have a StdOfRest attribute. If we want to set the
+standard of rest, we must indicate the index of the spectral axis as follows:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred set "StdOfRest(1)" LSRK
+\end{verbatim}
+\normalsize
+
+Likewise, if we wanted to set the Equinox attribute of the sky Frame, we
+could say:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred set "Equinox(2)" "J2003.5"
+\end{verbatim}
+\normalsize
 
 
 \sstroutine{
