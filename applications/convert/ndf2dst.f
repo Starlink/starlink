@@ -282,7 +282,7 @@
 *   Obtain the name of the output Figaro file, and append the standard
 *   file extension.
       CALL PAR_GET0C ('OUT', FIGFIL, STATUS )
-      FIGEXT  =  '.DST'
+      FIGEXT  =  '.dst'
       CLEN  =  CHR_LEN( FIGFIL )
       CALL CHR_UCASE( FIGFIL )
       CALL CHR_APPND( FIGEXT, FIGFIL, CLEN )
