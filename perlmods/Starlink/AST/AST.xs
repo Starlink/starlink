@@ -191,9 +191,6 @@ static void sinkWrap( void (*sink)(const char *), const char *line ) {
 }
 
 
-
-
-
 /* Need to allocate a mutex to prevent threads accessing
    the AST simultaneously. May need to protect this from
    non-threaded perl */
@@ -228,6 +225,17 @@ AV* ErrBuff;
     } \
   } STMT_END;
 
+
+/* When we call plot routines, we need to register the plot object
+   in a global variable so that the plotting infrastructure can get
+   at the callbacks */
+
+#define PLOTCALL(grfobject,code) \
+  ASTCALL( \
+    Perl_storeGrfObject( grfobject ); \
+    code \
+    Perl_clearGrfObject(); \
+  )
 
 /* This is the error handler.
  Store error messages in an array. Need to worry about thread-local storage
@@ -270,7 +278,6 @@ MODULE = Starlink::AST     PACKAGE = Starlink::AST
 BOOT:
           MUTEX_INIT(&AST_mutex);
           ErrBuff = newAV();
-          Perl_astGrfInit();
           
 double
 AST__BAD()
@@ -1868,9 +1875,12 @@ MODULE = Starlink::AST   PACKAGE = Starlink::AST::Plot  PREFIX = ast
 void
 astBorder( this )
   AstPlot * this
+ PREINIT:
+  SV* arg;
  CODE:
-  ASTCALL(
-   astBorder(this);
+  arg = ST(0);
+  PLOTCALL(arg,
+	   astBorder(this);
   )
 
 void

@@ -51,39 +51,132 @@ extern "C" {
 }
 #endif
 
+#include "arrays.h"
+
 /* Have one global hash that contains the SV* reference to the CV */
 
-static HV * GraphCB;
+static SV * CurrentPlot;
 
 /* Function Prototypes */
 /* =================== */
 static void Report( const char * );
-void Perl_astGrfInit();
 
 /* Function definitions */
 /* ==================== */
 
-/* This function creates the hash necessary to store the
-   graphics callbacks. Should be called from the BOOT section */
-void Perl_astGrfInit () {
-  GraphCB  = newHV();
+void Perl_storeGrfObject ( SV * plotobject ) {
+  CurrentPlot = plotobject;
 }
 
-/* This function allows a XS routine to store something in our hash */
-
-void Perl_astGrfSet ( AstPlot * plot, char * type, CV * callback  ) {
-
+void Perl_clearGrfObject() {
+  CurrentPlot = NULL;
 }
 
+/* An internal hash attribute name 
+   return the relevant CVREF that can be called. Uses the global static
+   object. Returns NULL if no callback is registered.
+*/
+
+SV* Perl_getcb ( char * attr ) {
+  SV** elem;
+ 
+  /* we know this is already a hash ref */
+  HV * hash_object = (HV*) SvRV( CurrentPlot );
+
+  elem = hv_fetch( hash_object, attr, strlen(attr), 0);
+
+  if (elem = NULL) {
+    return NULL;
+  } else {
+    return *elem;
+  }
+}
 
 int astGFlush( void ){
-   Report( "astGFlush");
-   return 0;
+  dSP;
+  SV * cb;
+  AV * XX;
+  AV * YY;
+  int retval;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) return 0;
+
+  cb = Perl_getcb( "_gline" );
+ 
+  if ( cb != NULL ) {
+    int count;
+    ENTER;
+    SAVETMPS;
+
+    count = perl_call_sv( SvRV(cb), G_NOARGS | G_SCALAR );
+
+    SPAGAIN;
+
+    if (count != 1) 
+      Perl_croak(aTHX_ "Returned more than 1 arg from GLine callback\n");
+
+    retval = POPi;
+
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+  } else {
+    retval = 0;
+    Report("astGFlush");
+  }
+  return retval;
 }
 
 int astGLine( int n, const float *x, const float *y ){
-   Report( "astGLine" );
-   return 0;
+  dSP;
+  SV * cb;
+  AV * XX;
+  AV * YY;
+  int retval;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) return 0;
+
+  cb = Perl_getcb( "_gline" );
+ 
+  if ( cb != NULL ) {
+    int count;
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(sp);
+    
+    /* unpack is now reverse to XS norm */
+    XX = newAV();
+    unpack1D( newRV_noinc((SV*) XX), (float *)x, 'f', n);
+    YY = newAV();
+    unpack1D( newRV_noinc((SV*) YY), (float *)y, 'f', n);
+    
+    XPUSHs( sv_2mortal(newRV_noinc((SV*) XX )));
+    XPUSHs( sv_2mortal(newRV_noinc((SV*) YY )));
+    
+    PUTBACK;
+
+    count = perl_call_sv( SvRV(cb), G_SCALAR );
+
+    SPAGAIN;
+
+    if (count != 1) 
+      Perl_croak(aTHX_ "Returned more than 1 arg from GLine callback\n");
+
+    retval = POPi;
+
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+  } else {
+    retval = 0;
+    Report("astGLine");
+  }
+  return retval;
 }
 
 int astGQch( float *chv, float *chh ){
