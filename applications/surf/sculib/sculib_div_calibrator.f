@@ -17,7 +17,7 @@
 *              Variance on DATA
 *     CALIBRATOR (NELM)   = REAL (Given)
 *              Calibration array
-*     QUALITY (NELM)      = INTEGER (Given)
+*     QUALITY (NELM)      = BYTE (Given)
 *              Quality on DATA
 *    Method :
 *    Deficiencies :
@@ -35,17 +35,16 @@
 *    Import :
       INTEGER  NELM
       REAL     CALIBRATOR (NELM)
-      INTEGER  QUALITY (NELM)
+      BYTE  QUALITY (NELM)
 *    Import-Export :
       REAL     DATA (NELM)
       REAL     VARIANCE (NELM)
 *    Export :
 *    Status :
 *    External references :
+      BYTE SCULIB_BITON
 *    Global variables :
 *    Local Constants :
-      INTEGER  GOOD, BAD
-      PARAMETER (BAD = 1, GOOD = 0)
 *    Local variables :
       INTEGER I
 *    Internal References :
@@ -54,13 +53,11 @@
 
       DO I = 1, NELM
 
-         IF (QUALITY (I) .EQ. GOOD) THEN
-            IF (CALIBRATOR(I)**2 .NE. 0.0) THEN
-               DATA (I) = DATA (I) / CALIBRATOR (I)
-               VARIANCE (I) = VARIANCE (I) / CALIBRATOR(I)**2
-            ELSE
-               QUALITY (I) = BAD
-            END IF
+         IF (CALIBRATOR(I)**2 .GT. 1.0E-8) THEN
+            DATA (I) = DATA (I) / CALIBRATOR (I)
+            VARIANCE (I) = VARIANCE (I) / CALIBRATOR(I)**2
+         ELSE
+            QUALITY(I) = SCULIB_BITON(QUALITY(I), 0) ! Set INVALID bit
          END IF
 
       END DO
