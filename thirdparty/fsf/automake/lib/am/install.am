@@ -60,12 +60,12 @@ install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 ## Starlink: install a stamp file, just in case install-manifest isn't run
 	rm -f stamp-starlink-install
-	echo "component=$(PACKAGE_NAME)" >stamp-starlink-install
-	echo "version=$(PACKAGE_VERSION)" >>stamp-starlink-install
+	echo "component=\"$(PACKAGE_NAME)\"" >stamp-starlink-install
+	echo "version=\"$(PACKAGE_VERSION)\"" >>stamp-starlink-install
 	echo "date=\"`date`\"" >>stamp-starlink-install
 	$(mkdir_p) $(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) stamp-starlink-install \
-	    $(STAR_MANIFEST_DIR)/stamp-$(PACKAGE_NAME)
+	    $(STAR_MANIFEST_DIR)/stamp-`echo $(PACKAGE_NAME) | sed 's/[^A-Za-z0-9.-]/_/g'`
 	rm -f stamp-starlink-install
 
 
