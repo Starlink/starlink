@@ -139,7 +139,7 @@
 
             END IF
             JBIT = NBIT - IBIT
-            IF ((DATUM.AND.BIT)/BIT) THEN
+            IF (AND(DATUM,BIT)/BIT) THEN
                STR(JBIT:JBIT)='1'
             END IF
             IBIT = IBIT + 1
