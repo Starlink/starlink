@@ -2,16 +2,16 @@ INTERFACE EVPHASE
 
   PARAMETER     INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.EVDS'
     PROMPT      'Enter name of input file'
-    HELP        'This must be an ASTERIX event dataset'
+    HELP        'This must be an event dataset'
   ENDPARAMETER
 
   PARAMETER     OUT
     POSITION    2
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     ASSOCIATION '->GLOBAL.EVDS'
     PROMPT      'Enter name of output file'
   ENDPARAMETER
@@ -35,6 +35,13 @@ INTERFACE EVPHASE
     TYPE        '_DOUBLE'
     PROMPT      'Third Ephemeris coeff, first derivative of period wrt time'
     HELP        'Rate of change of period, unitless'
+  ENDPARAMETER
+
+  PARAMETER TLIST
+    TYPE '_CHAR'
+    DEFAULT 'RAW_TIMETAG'
+    PPATH 'DEFAULT'
+    PROMPT 'Name of list whic htime tags events'
   ENDPARAMETER
 
 ENDINTERFACE
