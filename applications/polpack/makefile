@@ -392,7 +392,7 @@ PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
 
 I_SUB1 = ndg_com ndg_const ndg_err
 
-I_SUB2 = hlpcmd ccd1_par ccd1_memcm kpg_ast kpg_par ctm_par grf.h
+I_SUB2 = hlpcmd ccd1_par ccd1_memcm grf.h
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -416,31 +416,23 @@ F_SUB1 = ndg1_expan.f ndg1_lasto.f ndg1_ndfch.f ndg_annul.f ndg_asexp.f \
 ndg_assoc.f ndg_creat.f ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f \
 ndg_ndfpr.f ndg1_hspec.f ndg1_mspec.f ndg1_match.f ndg1_subst.f 
 
-F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
-kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kps1_flxyr.f kps1_inxyr.f kps1_plcpx.f \
-kps1_plcpy.f kps1_plmsk.f kps1_retr.f kps1_stor.f kps1_xyd2w.f pda_qsiai.f \
-polcent.f polhelp.f polka.f pthlpo.f rdndf.f segment.f sread.f \
+F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f \
+polcent.f polhelp.f polka.f pthlpo.f rdndf.f sread.f \
 wrndf.f polcal.f ndfac.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f \
 ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
 ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
 ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f polext.f \
 pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f \
-polvec.f pol1_plvec.f pol1_gtwcs.f ccd1_orvar.f pol1_stats.f pol1_stk.f \
+polvec.f pol1_plvec.f pol1_gtwcs.f ccd1_orvar.f pol1_stk.f \
 pol1_stbin.f pol1_cm1rr.f pol1_cm3rr.f ccg1_mer1r.f ccg1_mer3r.f \
 ccg1_scr1r.f ccg1_scr3r.f ccg1_clipr.f pol1_mkcat.f pol1_clcat.f \
-kpg1_chscn.f kpg1_aschp.f kpg1_asffr.f kpg1_aspsy.f kpg1_asunt.f \
-kpg1_cpctd.f kpg1_cpctr.f kpg1_cshft.f kpg1_dsfrm.f kpg1_frmmk.f \
-kpg1_gdact.f kpg1_gddat.f kpg1_gddfp.f kpg1_gdfnd.f kpg1_gdfrm.f \
-kpg1_gdplt.f kpg1_gdqpc.f kpg1_gdsav.f kpg1_grpsz.f kpg1_gtcol.f \
-kpg1_gtcta.f kpg1_gtctc.f kpg1_gtfrm.f kpg1_gtgrp.f \
-kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f \
-kpg1_prnth.f kpg1_rcatw.f kpg1_vect.f kpg1_wread.f \
-kpg1_wwrt.f kps1_vecky.f pol1_vecpl.f polplot.f kpg1_rdast.f kpg1_wrast.f \
-kpg1_short.f kpg1_isscs.f kpg1_h2ast.f kpg1_ast2h.f kpg1_chscs.f \
-kpg1_seteq.f kpg1_asget.f kpg1_wcatw.f pol1_squar.f pol1_clcnt.f \
-pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f kpg1_asrep.f \
-ccd1_repc.f pol1_rmbnd.f kpg1_gtctw.f
+pol1_cpctd.f pol1_cpctr.f \
+pol1_gtcta.f pol1_gtctc.f \
+pol1_vecky.f pol1_vecpl.f polplot.f \
+pol1_squar.f pol1_clcnt.f \
+pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f \
+ccd1_repc.f pol1_rmbnd.f pol1_gtctw.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -459,7 +451,7 @@ C_ROUTINES = $(C_SUB1) $(C_SUB2)
 
 C_SUB1 = ndg1_wild.c
 
-C_SUB2 = polpack.c kpg1_trmsz.c 
+C_SUB2 = polpack.c 
 
 #  List of platform specific C routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -478,7 +470,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polka datapic polcent segment polcal polimp polext \
+TASKS = polhelp polka datapic polcent polcal polimp polext \
 polexp polvec polplot polbin
 
 #  Monolith routine source name.
@@ -496,7 +488,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 #  List of task interface files.
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
-segment.ifl polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl \
+polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl \
 polbin.ifl 
 
 #  List of help library sources.
@@ -557,7 +549,7 @@ $(DATA_FILES)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) \
-CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST NDG_COM KPG_AST KPG_PAR CTM_PAR
+CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST NDG_COM 
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -567,9 +559,6 @@ CCD1_MEMCM:  ccd1_memcm;          $(LINK) $? $@
 NDG_ERR:   ndg_err;               $(LINK) $? $@
 NDG_CONST: ndg_const;             $(LINK) $? $@
 NDG_COM:   ndg_com;               $(LINK) $? $@
-CTM_PAR:   ctm_par;               $(LINK) $? $@
-KPG_AST:   kpg_ast;               $(LINK) $? $@
-KPG_PAR:   kpg_par;               $(LINK) $? $@
 
 ast.h:   $(STAR_INC)/ast.h;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
@@ -612,7 +601,7 @@ $(F_SUB1) $(I_SUB1) $(C_SUB1):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB2) $(I_SUB2) $(C_SUB2) $(GENLRDICSRC) grf_kappa.c:
+$(F_SUB2) $(I_SUB2) $(C_SUB2) $(GENLRDICSRC) grf_polpack.c:
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -632,7 +621,7 @@ $(PLATFORM_C) dummy_target1:
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT) grf_kappa.o
+OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT) grf_polpack.o
 
 O_SUB1 = $(F_SUB1:.f=.o) $(C_SUB1:.c=.o)
 
@@ -673,7 +662,7 @@ libpolpack.a: $(O_SUB2)
 
 #  Rule and dependencies for building the monolith.
 
-$(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) grf_kappa.o
+$(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) grf_polpack.o
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
             -L$(KAPPA_SOURCE) $(ADDLIBS) \
             `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
@@ -1497,67 +1486,12 @@ gethlp.o:	HLPCMD
 gethlp.o:	SAE_PAR     
 gthlpi.o:	HLPCMD      
 gthlpi.o:	SAE_PAR     
-kpg1_aschp.o:	SAE_PAR GRP_PAR DAT_PAR KPG_AST
-kpg1_asffr.o:	SAE_PAR AST_PAR
-kpg1_aspsy.o:	SAE_PAR DAT_PAR GRP_PAR KPG_AST
-kpg1_asunt.o:	SAE_PAR AST_PAR NDF_PAR PRM_PAR
-kpg1_chaxd.o:	NDF_PAR     
-kpg1_chaxd.o:	SAE_PAR     
-kpg1_chscn.o:	SAE_PAR DAT_PAR
-kpg1_cpctd.o:	SAE_PAR PRM_PAR
-kpg1_cpctr.o:	SAE_PAR PRM_PAR
-kpg1_dsfrm.o:	SAE_PAR AST_PAR NDF_PAR
-kpg1_flcor.o:	FIO_ERR     
-kpg1_flcor.o:	MSG_PAR     
-kpg1_flcor.o:	PAR_ERR     
-kpg1_flcor.o:	PRM_PAR     
-kpg1_flcor.o:	SAE_PAR     
-kpg1_frmmk.o:	AST_ERR AST_PAR GRP_PAR NDF_PAR PRM_PAR SAE_PAR
-kpg1_gdact.o:	SAE_PAR AST_PAR DAT_PAR AGI_PAR
-kpg1_gddat.o:	SAE_PAR AST_PAR DAT_PAR AGI_PAR
-kpg1_gddfp.o:	SAE_PAR AST_PAR
-kpg1_gdfnd.o:	SAE_PAR AST_PAR DAT_PAR AGI_PAR
-kpg1_gdfrm.o:	SAE_PAR PRM_PAR
-kpg1_gdplt.o:	SAE_PAR AST_PAR DAT_PAR
-kpg1_gdqpc.o:	SAE_PAR
-kpg1_gdsav.o:	SAE_PAR AST_PAR DAT_PAR AGI_PAR
-kpg1_grpsz.o:	SAE_PAR GRP_PAR
-kpg1_gtcol.o:	SAE_PAR
-kpg1_gtcta.o:	SAE_PAR AST_PAR CAT_PAR
-kpg1_gtctw.o:	SAE_PAR AST_PAR CAT_PAR
-kpg1_gtctc.o:	SAE_PAR CAT_PAR CAT_ERR PAR_ERR
-kpg1_gtfrm.o:	SAE_PAR AST_PAR GRP_PAR NDF_PAR PAR_ERR
-kpg1_gtgrp.o:	SAE_PAR GRP_PAR PAR_ERR
-kpg1_pgsht.o:	SAE_PAR
-kpg1_pgsty.o:	SAE_PAR AST_PAR
-kpg1_plcip.o:	SAE_PAR CTM_PAR
-kpg1_prnth.o:	SAE_PAR
-kpg1_rcatw.o:	AST_PAR CAT_PAR DAT_PAR GRP_PAR KPG_AST KPG_PAR SAE_PAR
-kpg1_rfcor.o:	DAT_PAR     
-kpg1_rfcor.o:	FIO_ERR     
-kpg1_rfcor.o:	SAE_PAR     
-kpg1_scrsz.o:	SAE_PAR     
-kpg1_vect.o:	SAE_PAR
-kpg1_wread.o:	SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
-kpg1_wwrt.o:	SAE_PAR DAT_PAR AST_PAR KPG_PAR KPG_AST
-kps1_flxyr.o:	SAE_PAR
-kps1_inxyr.o:	PAR_ERR     
-kps1_inxyr.o:	PRM_PAR     
-kps1_inxyr.o:	SAE_PAR     
-kps1_plcpx.o:	SAE_PAR     
-kps1_plcpx.o:	SAE_PAR     
-kps1_plcpx.o:	SAE_PAR     
-kps1_plcpx.o:	SAE_PAR     
-kps1_plcpx.o:	SAE_PAR     
-kps1_plcpy.o:	NDF_PAR     
-kps1_plcpy.o:	SAE_PAR     
-kps1_plmsk.o:	PRM_PAR     
-kps1_plmsk.o:	SAE_PAR     
-kps1_retr.o:	SAE_PAR     
-kps1_stor.o:	SAE_PAR     
-kps1_vecky.o:	SAE_PAR AST_PAR
-kps1_xyd2w.o:	PRM_PAR     
-kps1_xyd2w.o:	SAE_PAR     
+pol1_cpctd.o:	SAE_PAR PRM_PAR
+pol1_cpctr.o:	SAE_PAR PRM_PAR
+pol1_gtcta.o:	SAE_PAR AST_PAR CAT_PAR
+pol1_gtctw.o:	SAE_PAR AST_PAR CAT_PAR
+pol1_gtctc.o:	SAE_PAR CAT_PAR CAT_ERR PAR_ERR
+pol1_vecky.o:	SAE_PAR AST_PAR
 ndfac.o:	SAE_PAR     
 ndg1_expan.o:	DAT_PAR
 ndg1_expan.o:	GRP_PAR
@@ -1636,8 +1570,6 @@ pol1_rmbnd.o:	SAE_PAR
 pol1_rmbnd.o:	PRM_PAR
 pol1_setft.o: 	DAT_PAR
 pol1_setft.o: 	SAE_PAR
-pol1_stats.o:	PRM_PAR
-pol1_stats.o:	SAE_PAR
 pol1_stbin.o:	SAE_PAR
 pol1_stk.o:	SAE_PAR
 pol1_sto0.o:	SAE_PAR DAT_PAR PRM_PAR     
@@ -1685,29 +1617,12 @@ rdndf.o:	MSG_PAR
 rdndf.o:	NDG_ERR     
 rdndf.o:	PAR_ERR     
 rdndf.o:	SAE_PAR     
-segment.o:	NDF_PAR     
-segment.o:	PAR_ERR     
-segment.o:	PAR_PAR     
-segment.o:	PRM_PAR     
-segment.o:	SAE_PAR     
 wrndf.o:	GRP_PAR     
 wrndf.o:	MSG_PAR     
 wrndf.o:	NDG_ERR     
 wrndf.o:	PAR_ERR     
 wrndf.o:	SAE_PAR     
-kpg1_rdast.o:	SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
-kpg1_wrast.o:	SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
-kpg1_short.o:	SAE_PAR 
-kpg1_isscs.o:	SAE_PAR 
-grf_kappa.o:	grf.h ast.h
-kpg1_h2ast.o:	SAE_PAR
-kpg1_ast2h.o:	SAE_PAR
-kpg1_chscs.o:	SAE_PAR DAT_PAR PRM_PAR
-kpg1_seteq.o:	SAE_PAR PRM_PAR
-kpg1_asrep.o:	SAE_PAR AST_PAR
-kpg1_odrst.o:	SAE_PAR DAT_PAR GRP_PAR
-kpg1_asget.o:	SAE_PAR NDF_PAR AST_PAR
-kpg1_wcatw.o:	AST_PAR CAT_PAR DAT_PAR GRP_PAR KPG_AST KPG_PAR SAE_PAR
+grf_polpack.o:	grf.h ast.h
 pol1_squar.o:	SAE_PAR PRM_PAR
 pol1_clcnt.o:	SAE_PAR PRM_PAR
 pol1_stk2.o:	SAE_PAR PRM_PAR

@@ -21,14 +21,12 @@ IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl \
 adamMessageRelay adamtask.tcl dialog.tcl blank.bit tick.bit feature.bit \
-ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
-kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kpg1_trmsz.c kps1_flxyr.f \
-kps1_inxyr.f kps1_plcpx.f kps1_plcpy.f kps1_plmsk.f kps1_retr.f \
-kps1_stor.f kps1_xyd2w.f lablist left_arrow.bit pda_qsiai.f polcent.f \
+ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f \
+lablist left_arrow.bit polcent.f \
 polcent.ifl polhelp.f polhelp.ifl polpack.csh polpack.hlp polpack.icl \
 polpack_link_adam polpack_mon.f polpack_mon.ifl polpack_test polka.f \
 polka.ifl pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit \
-segment.f segment.ifl sread.f vertex.bit wrndf.f datapic.ifl polpack.c \
+sread.f vertex.bit wrndf.f datapic.ifl polpack.c \
 gui.gif hlpcmd polcal.f polcal.ifl ndfac.f pol_cale.f \
 pol_calf.f pol_calp.f pol_calti.f ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f \
 ccd1_skysr.f ccg1_cenr.f ccg1_cmltr.f ccg1_is2r.f ccg1_is3r.f ccg1_is4d.f \
@@ -38,22 +36,15 @@ ccd1_iscom.f ccd1_mall.f ccd1_mfree.f ccd1_nxwrd.f ccd1_rdlin.f \
 ccd1_rmcom.f pol1_chkex.f pol1_imfit.f pol1_knext.f pol1_deftb.f \
 pol1_lnam.f polimp.ifl polimp.f ccd1_par ccd1_memcm polexp.f polexp.ifl \
 pol1_setft.f polimp.tab irg_wild polimp.csh polexp.csh polvec.f polvec.ifl \
-pol1_plvec.f pol1_prwcs.f ccd1_orvar.f pol1_stats.f ccg1_clipr.f \
+pol1_plvec.f ccd1_orvar.f ccg1_clipr.f \
 ccg1_mer1r.f ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f pol1_clcat.f \
 pol1_cm1rr.f pol1_cm3rr.f pol1_gtwcs.f pol1_mkcat.f pol1_stbin.f \
-pol1_stk.f ctm_par grf.h grf_kappa.c kpg1_aschp.f kpg1_asffr.f \
-kpg1_asget.f kpg1_aspsy.f kpg1_ast2h.f kpg1_asunt.f kpg1_chscn.f \
-kpg1_chscs.f kpg1_cpctd.f kpg1_cpctr.f kpg1_cshft.f kpg1_dsfrm.f \
-kpg1_frmmk.f kpg1_gdact.f kpg1_gddat.f kpg1_gddfp.f kpg1_gdfnd.f \
-kpg1_gdfrm.f kpg1_gdplt.f kpg1_gdqpc.f kpg1_gdsav.f kpg1_grpsz.f \
-kpg1_gtcol.f kpg1_gtcta.f kpg1_gtctc.f kpg1_gtfrm.f kpg1_gtgrp.f \
-kpg1_h2ast.f kpg1_isscs.f \
-kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f kpg1_prnth.f \
-kpg1_rcatw.f kpg1_rdast.f kpg1_seteq.f kpg1_short.f kpg1_vect.f \
-kpg1_wcatw.f kpg1_wrast.f kpg1_wread.f kpg1_wwrt.f kpg_ast kpg_par \
-kps1_vecky.f polplot.f polplot.ifl pol1_vecpl.f pol1_clcnt.f \
+pol1_stk.f ctm_par grf.h grf_polpack.c \
+pol1_cpctd.f pol1_cpctr.f \
+pol1_gtcta.f pol1_gtctc.f \
+pol1_vecky.f polplot.f polplot.ifl pol1_vecpl.f pol1_clcnt.f \
 pol1_ctclm.f pol1_setd.f pol1_squar.f pol1_stk2.f polbin.f polbin.ifl \
-kpg1_odrst.f kpg1_asrep.f ccd1_repc.f polext.f polext.ifl kpg1_gtctw.f \
+ccd1_repc.f polext.f polext.ifl pol1_gtctw.f \
 pol1_rmbnd.f
 
 # The other files which need to be extracted from the source code

@@ -46,7 +46,7 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        vector map, showing the coordinate Frame specified by parameter
-*        COSYS. The appearance of the axes can be controlled using
+*        FRAME. The appearance of the axes can be controlled using
 *        the STYLE parameter. [TRUE]
 *     CAT = LITERAL (Read)
 *        The name of the input catalogue. This may be in any format
@@ -59,7 +59,7 @@
 *        on top of an existing DATA picture, then set CLEAR to FALSE. The
 *        vector map will then be drawn in alignment with the displayed 
 *        data. If possible, alignment occurs within the coordinate Frame 
-*        specified using parameter COSYS. If this is not possible, (for 
+*        specified using parameter FRAME. If this is not possible, (for 
 *        instance if suitable WCS information was not available when the 
 *        existing DATA picture was created), then an alignment is attempted 
 *        in PIXEL coordinates. If this is not possible, then alignment is
@@ -92,29 +92,16 @@
 *        displayed if a non-existent column name is given. See the "Notes" 
 *        section below for further details of how these positions are 
 *        interpreted. [Y]
-*     COSYS = GROUP (Read)
-*        This gives the co-ordinate Frame to be displayed along the annotated 
-*        axes (see parameter AXES). The supplied value will usually be a 
-*        Domain name such as SKY, AXIS, PIXEL, etc, but more specific Frame 
-*        descriptions can also be given by supplying a group of "name=value" 
-*        strings where "name" is the name of an AST Frame attribute (see 
-*        SUN/210), and "value" is the value to assign to it. In addition, 
-*        IRAS90 Sky Coordinate System (SCS) values (such as "EQUATORIAL(J2000)", 
-*        "GALACTIC", etc - see SUN/163) can be given. Domains "WORLD" and 
-*        "DATA" are taken as synonyms for "PIXEL" and "AXIS" (unless the 
-*        catalogue contains explicit definitions for the "WORLD" and "DATA" 
-*        Domains). The available coordinate Frames are defined by an AST 
-*        FrameSet (see SUN/210) in the supplied catalogue. If the catalogue 
-*        does not contain a FrameSet, then a default FrameSet is used 
-*        containing a single 2-dimensional Frame spanned by the axes defined 
-*        by parameters COLX and COLY. If a null (!) value is supplied for 
-*        COSYS, then the Current Frame in the FrameSet is used. If the vector 
-*        map is being drawn over an existing DATA picture (see parameter
-*        CLEAR), then the Frame specified by COSYS must exist in the FrameSet 
-*        associated with the existing picture, as well as in the supplied 
-*        catalogue. [!]
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
+*     EPOCH = _DOUBLE (Read)
+*        If a "Sky Co-ordinate System" specification is supplied (using 
+*        parameter FRAME) for a celestial co-ordinate system, then an epoch 
+*        value is needed to qualify it. This is the epoch at which the 
+*        supplied sky positions were determined. It should be given as a 
+*        decimal years value, with or without decimal places  ("1996.8" for 
+*        example). Such values are interpreted as a Besselian epoch if less 
+*        than 1984.0 and as a Julian epoch otherwise. 
 *     FILL = _LOGICAL (Read)
 *        The DATA picture containing the vector map is usually produced with 
 *        the same shape as the data. However, for maps with markedly different
@@ -122,6 +109,21 @@
 *        When FILL is TRUE, the smaller dimension of the picture is expanded
 *        to produce the largest possible picture within the current picture.  
 *        [FALSE]
+*     FRAME = LITERAL (Read)
+*        This gives the co-ordinate Frame to be displayed along the annotated 
+*        axes (see parameter AXES). If a null parameter value is supplied, 
+*        then the current Frame in the supplied catalogue is used. The 
+*        string can be one of the following:
+*        - A domain name such as SKY, AXIS, PIXEL, etc. The two
+*        "pseudo-domains" WORLD and DATA may be supplied and will be
+*        translated into PIXEL and AXIS respectively, so long as the WCS
+*        component of the NDF does not contain Frames with these domains.
+*
+*        - An integer value giving the index of the required Frame within
+*        the WCS component.
+*
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see 
+*        section "Sky Co-ordinate Systems" in SUN/95). [!]
 *     JUST = LITERAL (Read)
 *        The justification for each vector; it can take any of the
 *        following values:
@@ -222,7 +224,7 @@
 *        across the plot instead of tick marks around the edge; the border,
 *        grid and vectors are drawn in green, blue and red respectively,
 *        and slightly thicker lines are used to draw the border.
-*     polplot poltab ra dec noclear angrot=23.4 cosys=eq(B1950)
+*     polplot poltab ra dec noclear angrot=23.4 frame=eq(B1950)
 *        Produces a vector map in which the reference direction for the vectors
 *        (as defined by the value zero in the column ANG) is at the
 *        position angle 23.4 degrees (measured anti-clockwise from the
@@ -282,6 +284,8 @@
 *        Base Frame of the WCS info, instead of the Current Frame. Changed 
 *        the interpretation of parameters COLX and COLY accordingly. Defaults 
 *        for LBND and UBND changed.
+*     9-NOV-1998 (DSB):
+*        - Parameter COSYS replaced by FRAME andd EPOCH.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -424,10 +428,10 @@
 
 *  Get CAT identifiers for the columns which are to be used to define the 
 *  vector magnitudes, orientations, X and Y coordinates.
-      CALL KPG1_GTCTC( 'COLMAG', CI, CAT__FITYP, ' ', GIMAG, STATUS )
-      CALL KPG1_GTCTC( 'COLANG', CI, CAT__FITYP, ' ', GIANG, STATUS )
-      CALL KPG1_GTCTC( 'COLX', CI, CAT__FITYP, ' ', GIX, STATUS )
-      CALL KPG1_GTCTC( 'COLY', CI, CAT__FITYP, ' ', GIY, STATUS )
+      CALL POL1_GTCTC( 'COLMAG', CI, CAT__FITYP, ' ', GIMAG, STATUS )
+      CALL POL1_GTCTC( 'COLANG', CI, CAT__FITYP, ' ', GIANG, STATUS )
+      CALL POL1_GTCTC( 'COLX', CI, CAT__FITYP, ' ', GIX, STATUS )
+      CALL POL1_GTCTC( 'COLY', CI, CAT__FITYP, ' ', GIY, STATUS )
 
 *  Obtain the units of the magnitude column.
       UNITS1 = ' '
@@ -470,10 +474,10 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy each column into the corresponding array.
-      CALL KPG1_CPCTR( CI, GIMAG, NVEC, %VAL( IPMAG ), NGMAG, STATUS )
-      CALL KPG1_CPCTR( CI, GIANG, NVEC, %VAL( IPANG ), NGANG, STATUS )
-      CALL KPG1_CPCTD( CI, GIX, NVEC, %VAL( IPX ), NGX, STATUS )
-      CALL KPG1_CPCTD( CI, GIY, NVEC, %VAL( IPY ), NGY, STATUS )
+      CALL POL1_CPCTR( CI, GIMAG, NVEC, %VAL( IPMAG ), NGMAG, STATUS )
+      CALL POL1_CPCTR( CI, GIANG, NVEC, %VAL( IPANG ), NGANG, STATUS )
+      CALL POL1_CPCTD( CI, GIX, NVEC, %VAL( IPX ), NGX, STATUS )
+      CALL POL1_CPCTD( CI, GIY, NVEC, %VAL( IPY ), NGY, STATUS )
 
 *  Check the global status.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -601,10 +605,10 @@
 *  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
 *  this FrameSet will be spanned by axes corresponding to the X and Y 
 *  catalogue columns. The Current Frame is set by the user, using
-*  parameter COSYS.
+*  parameters FRAME and EPOCH.
       GIS( 1 ) = GIX
       GIS( 2 ) = GIY
-      CALL KPG1_GTCTA( 'COSYS', CI, 2, GIS, IWCS, STATUS )
+      CALL POL1_GTCTA( 'FRAME', 'EPOCH', CI, 2, GIS, IWCS, STATUS )
 
 *  Get the index of the Frame corresponding to the catalogue columns 
 *  specifying the vector positions (i.e. the Base Frame in the above
@@ -840,7 +844,7 @@
 
 *  Activate the KEY picture. This returns a pointer to an AST Plot which
 *  can be used to draw in the KEY picture.
-            CALL KPG1_GDACT( IPICK, IPLOTK, STATUS )
+            CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the vertical position in the key picture which corresponds to
@@ -854,7 +858,7 @@
 *  can be used to draw in the KEY picture.
          ELSE
             KEYOFF = KEYPOS( 2 )
-            CALL KPG1_GDACT( IPICK, IPLOTK, STATUS )
+            CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
          END IF
 
@@ -877,7 +881,7 @@
          CALL KPG1_ASSET( 'POLPLOT', 'KEYSTYLE', IPLOTK, STATUS )
 
 *  Now produce the key.
-         CALL KPS1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, YKEY,
+         CALL POL1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, YKEY,
      :                    ABS( TYPDAT ), UNITS1, JUST, STATUS )
 
       END IF

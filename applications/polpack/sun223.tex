@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.1}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {7 August 1998}
+\newcommand{\stardocdate}      {9 November 1998}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 1.1}
@@ -3427,7 +3427,7 @@ for NDF applications.
       }{
          TRUE if labelled and annotated axes are to be drawn around the
          vector map, showing the coordinate Frame specified by parameter
-         COSYS. The appearance of the axes can be controlled using
+         FRAME. The appearance of the axes can be controlled using
          the STYLE parameter. [TRUE]
       }
       \sstsubsection{
@@ -4318,6 +4318,7 @@ This section describes the major changes introduced at each release of
 POLPACK.
 \subsection{V1.1}
 \begin{enumerate}
+\item The COSYS parameter used by POLPLOT has been replaced by FRAME.
 \item A bug has been fixed which caused POLPLOT to display vectors in 
 incorrect positions when annotating the axes with sky coordinates. This bug
 was not seen if the vectors were plotted over an existing picture.

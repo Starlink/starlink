@@ -73,7 +73,7 @@
 
 *  Routine POL1_MKCAT creates the X and Y catalogue columns with names
 *  X and Y. Applications which access the WCS information in the
-*  catalogue use the routine KPG1_GTCTA to look for a Frame spanned by 
+*  catalogue use the routine POL1_GTCTA to look for a Frame spanned by 
 *  axes with Symbol attributes equal to the catalogue column names. In
 *  order for this to succeed, we ensure that he symbols on axes 1 and 2
 *  of the Base Frame correspond to the names of the catalogue columns (i.e.

@@ -93,6 +93,8 @@
 *     6-AUG-1998 (DSB):
 *        Use KPG1_GTCTW instead of KPG1_GTCTA (which has changed its
 *        behaviour).
+*     10-NOV-1998 (DSB):
+*        Rename KPG1_GTCTW as POL1_GTCTW.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -671,7 +673,7 @@
 *  information will be copied unchanged to the output catalogue when the
 *  output catalogue is closed. Report an error if no WCS information is
 *  available in the input catalogue.
-      CALL KPG1_GTCTW( CIIN, IWCS, STATUS )
+      CALL POL1_GTCTW( CIIN, IWCS, STATUS )
       IF( IWCS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLBIN_1', 'No usable WCS coordinate system '//
