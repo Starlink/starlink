@@ -31,6 +31,11 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.13  1997/04/09 02:20:01  timj
+*     Add CHANGE_* tasks
+*     Add INTREBIN
+*     Change REBIN argument to be the name of the task.
+*
 *     Revision 1.12  1997/01/11 01:30:54  timj
 *     Add BOLREBIN (as option to REBIN)
 *
@@ -96,7 +101,19 @@ c
 
       ELSE IF (NAME .EQ. 'BOLREBIN') THEN
 
-         CALL REDS_REBIN (.TRUE., STATUS)
+         CALL REDS_REBIN (NAME, STATUS)
+
+      ELSE IF (NAME .EQ. 'CHANGE_FLAT') THEN
+
+         CALL REDS_CHGFLAT (STATUS)
+
+      ELSE IF (NAME .EQ. 'CHANGE_POINTING') THEN
+
+         CALL REDS_CHGPNT (STATUS)
+
+      ELSE IF (NAME .EQ. 'CHANGE_QUALITY') THEN
+
+         CALL REDS_CHGQUAL (STATUS)
 
       ELSE IF (NAME .EQ. 'EXTINCTION') THEN
 
@@ -114,6 +131,10 @@ c
 
          CALL REDS_GET_FLAT (STATUS)
 
+      ELSE IF (NAME .EQ. 'INTREBIN') THEN
+
+         CALL REDS_REBIN (NAME, STATUS)
+
       ELSE IF (NAME .EQ. 'MODIFY') THEN
 
          CALL REDS_MODIFY (STATUS)
@@ -124,7 +145,7 @@ c
 
       ELSE IF (NAME .EQ. 'REBIN') THEN
 
-         CALL REDS_REBIN (.FALSE., STATUS)
+         CALL REDS_REBIN (NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'REDUCE_SWITCH') THEN
 
