@@ -1,33 +1,34 @@
       SUBROUTINE CCG1_DODIZ<T>( NDFIN, WEIGHT, NPXIN, ITYPE, ODAT, 
-     :                       OWHT, OCNT, OVAR, FRCUR, CMAP, IX, IY, 
-     :                       NDIMI, OX, OY,  NDIMO, ILBND, OLBND, 
-     :                       PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                       SCALE, ZERO, VARFAC, VAR, VWHT,
-     :                       STATUS )
+     :                          OWHT, OCNT, OVAR, CMAP, IX, IY,
+     :                          NDIMI, OX, OY, NDIMO, ILBND, OLBND, 
+     :                          PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                          SCALE, ZERO, VARFAC, VAR, VWHT,
+     :                          STATUS )
      
 *+
 *  Name:
-*     CCG1_DODIZx
+*     CCG1_DODIZ<T>
 
 *  Purpose:
-*     Runs though most of the drizzling algorithm, but calls CCD1_ODIZx
-*     to assign the actual input data values IDAT to the output data array.
+*     Drizzle from one NDF to another.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_DODIZx( NDFIN, WEIGHT, NPXIN, ITYPE, 
-*    :                 ODAT, OWHT, OCNT, OVAR, FRCUR, CMAP, 
-*    :                 IX, IY, NDIMI, OX, OY, NDIMO, ILBND, 
-*    :                 OLBND, PIXFRAC, GETV, GETS, GETZ, GETM,
-*    :                 SCALE, ZERO, VARFAC, VAR, VWHT, 
-*    :                 STATUS )
+*     CALL CCG1_DODIZ<T>( NDFIN, WEIGHT, NPXIN, ITYPE, 
+*    :                    ODAT, OWHT, OCNT, OVAR, CMAP, 
+*    :                    IX, IY, NDIMI, OX, OY, NDIMO, ILBND, 
+*    :                    OLBND, PIXFRAC, GETV, GETS, GETZ, GETM,
+*    :                    SCALE, ZERO, VARFAC, VAR, VWHT, 
+*    :                    STATUS )
 
 *  Description:
-*    Setup for the drizzling algorithm, works out co-ordinates of the
-*    input pixel on teh output grid, calls CCD1_BOX to work out overlap
-*    and then CCG1_ODIZx to drop the counts into the output pixels
+*     This routine does some basic setup preparatory to drizzling:
+*     it maps the relevant components of the input and output NDFs,
+*     allocates some necessary workspace, and calls the routine 
+*     which does the actual drizzling, taking account of the data
+*     type to be used.
 
 *  Arguments:
 *     NDFIN = DOUBLE PRECISION (Given)
@@ -40,14 +41,12 @@
 *        Data type of the input NDF's
 *     ODAT( OX, OY ) = REAL (Given)
 *        Data component of the output NDF
-*     OWHT( OX, OY ) = <TYPE> (Given)
+*     OWHT( OX, OY ) = DOUBLE PRECISION (Given)
 *        Weight component of the output NDF
 *     OCNT( OX, OY ) = INTEGER (Given)
 *        Count component of the output NDF
 *     OVAR( OX, OY ) = <TYPE> (Given)
 *        Variance component of the output NDF
-*     FRCUR = INTEGER (Given)
-*        Pointer to the Current AST Frame
 *     CMAP = INTEGER (Given)
 *        Pointer to the Current AST mapping
 *     IX = INTEGER (Given)
@@ -76,21 +75,22 @@
 *        Do we have a zero point for the images?
 *     GETM = LOGICAL (Given)
 *        Are we using variance maps?
-*     SCALE( CCD1__MXNDF + 1 ) = DOUBLE PRECISION (Given)
+*     SCALE = DOUBLE PRECISION (Given)
 *        Scale corrections factors
-*     ZERO( CCD1__MXNDF + 1 )  = DOUBLE PRECISION (Given)
+*     ZERO  = DOUBLE PRECISION (Given)
 *        Zero point corrections (will be ADDED to images)
 *     VARFAC = DOUBLE PRECISION (Given)
 *        Variance scaling factor (used when GETM is TRUE)
 *     VAR = LOGICAL (Given)
 *        Do we need to propogate the variances for this input image?
-*     VWHT( OX, OY ) = <TYPE> (Given)
+*     VWHT( OX, OY ) = DOUBLE PRECISION (Given)
 *        Weight component of the output NDF variance component
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value
 
 *  Authors:
 *     AA: Alasdair Allan (STARLINK, Keele University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -98,6 +98,8 @@
 *        Original version
 *     07-SEP-1999 (AA):
 *        Shipping version
+*     14-JUN-2000 (MBT):
+*        Substantial rewrite to improve efficiency and remove bugs.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -106,77 +108,64 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! no implicit typing allowed
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'DAT_PAR'        ! HDS constants
-      INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'PRM_PAR'        ! Magic-value and extreme constants
-      INCLUDE 'NDF_PAR'        ! NDF constants
-      INCLUDE 'AST_PAR'
+      INCLUDE 'DAT_PAR'          ! HDS constants
+      INCLUDE 'SAE_PAR'          ! SAE global definitions
+      INCLUDE 'PRM_PAR'          ! Magic-value and extreme constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'AST_PAR'          ! AST system constants
 
 *  Arguments Given:
-      CHARACTER * ( DAT__SZTYP ) ITYPE    ! NDF array implementation type
-      
-      DOUBLE PRECISION PIXFRAC            ! Fractional size of pixel "drop"
+      CHARACTER * ( DAT__SZTYP ) ITYPE ! NDF array implementation type
+      DOUBLE PRECISION PIXFRAC   ! Fractional size of pixel "drop"
+      INTEGER CMAP               ! Pointer to the current AST mapping
+      INTEGER NPXIN              ! Number of pixels in input NDF
+      INTEGER NDFIN              ! Pointer to the current input NDF
+      INTEGER NDIMI              ! Number of dimensions in input NDF
+      INTEGER NDIMO              ! Number of dimensions in output NDF
+      INTEGER IX, IY             ! Size of each input NDF dimension
+      INTEGER OX, OY             ! Size of each output NDF dimension
+      INTEGER ILBND( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER OLBND( NDF__MXDIM ) ! Lower bounds of output NDF
 
-      INTEGER CMAP                        ! Pointer to the current AST mapping
-      INTEGER FRCUR                       ! Pointer to the current AST frame
-      INTEGER NPXIN                       ! Number of pixels in input NDF
-      INTEGER NDFIN                       ! Pointer to the current input NDF
-      INTEGER NDIMI                       ! Number of dimensions in input NDF
-      INTEGER NDIMO                       ! Number of dimensions in output NDF
-      INTEGER IX, IY                      ! Size of each input NDF dimension
-      INTEGER OX, OY                      ! Size of each output NDF dimension
-      INTEGER ILBND( NDF__MXDIM )         ! Lower bounds of input NDF
-      INTEGER OLBND( NDF__MXDIM )         ! Lower bounds of output NDF
+      INTEGER OCNT( OX, OY )     ! Output NDF Counter
+     
+      <TYPE> ODAT( OX, OY )      ! Output NDF Data 
+      <TYPE> OVAR( OX, OY )      ! Output NDF Variance
+      DOUBLE PRECISION OWHT( OX, OY ) ! Output NDF Weights
+      DOUBLE PRECISION VWHT( OX, OY ) ! Output NDF Variance Weights
 
-      INTEGER OCNT( OX, OY )              ! Output NDF Counter
+      INTEGER IPDAT              ! Pointer to input NDF data
+      INTEGER IPVAR              ! Pointer to input NDF variances
       
-      <TYPE> ODAT( OX, OY )                 ! Output NDF Data 
-      <TYPE> OVAR( OX, OY )                 ! Output NDF Variance
-      <TYPE> OWHT( OX, OY )                 ! Output NDF Weights
-      <TYPE> VWHT( OX, OY )                 ! Output NDF Variance Weights
-
-      INTEGER IDAT                        ! Pointer to input NDF data
-      INTEGER IVAR                        ! Pointer to input NDF variances
+      DOUBLE PRECISION WEIGHT    ! Weight for current input NDF
+      DOUBLE PRECISION SCALE     ! Scale factor correction
+      DOUBLE PRECISION ZERO      ! zero point correction
+      DOUBLE PRECISION VARFAC    ! Variance scaling factor
       
-      DOUBLE PRECISION WEIGHT             ! Weight for current input NDF
-      DOUBLE PRECISION SCALE              ! Scale factor correction
-      DOUBLE PRECISION ZERO               ! zero point correction
-      DOUBLE PRECISION VARFAC             ! Variance scaling factor
-      
-      LOGICAL GETV                        ! Are we using variances as weights?
-      LOGICAL GETS                        ! Are we using scaling?
-      LOGICAL GETZ                        ! Do we have a zero point correction?
-      LOGICAL GETM                        ! Using variance maps
-      LOGICAL VAR                         ! Need to propogate the variance array
+      LOGICAL GETV               ! Are we using variances as weights?
+      LOGICAL GETS               ! Are we using scaling?
+      LOGICAL GETZ               ! Do we have a zero point correction?
+      LOGICAL GETM               ! Using variance maps
+      LOGICAL VAR                ! Need to propogate the variance array
       
 *  Arguments Returned:
 
 *  Local Variables:
-      CHARACTER * ( AST__SZCHR ) DMN      ! Domain of frame
-
-      INTEGER X, Y                        ! Loop counter for PIXELS
-      INTEGER U, V                        ! Loop counter with BND offsets
-      
-      INTEGER I, J                        ! Loop counters for affected pixels
-      INTEGER L, M                        ! Loop counters with BND offsets
-
-      INTEGER FRM                         ! AST pointer to frame
-      INTEGER IWCS                        ! Pointer to the WCS in input NDF
-      INTEGER JREG                        ! Index of the CCD_REG AST frame 
-      
-      DOUBLE PRECISION XIN( 4 ), YIN( 4 )    ! Corners of the input pixel
-      DOUBLE PRECISION XOUT( 4 ), YOUT( 4 )  ! Corners of the output pixel
-      DOUBLE PRECISION JACOB              ! Area of input pixel in output grid
-      DOUBLE PRECISION OVER               ! Overlap between input & output pixel
+      CHARACTER * ( AST__SZCHR ) DMN ! Domain of frame
+      INTEGER IPWK1              ! Pointer to workspace
+      INTEGER IPWK2              ! Pointer to workspace
+      INTEGER IPWK3              ! Pointer to workspace
+      INTEGER IPWK4              ! Pointer to workspace
+      INTEGER FRM                ! AST pointer to frame
+      INTEGER IWCS               ! Pointer to the WCS in input NDF
       
 *  Status:
-      INTEGER STATUS                      ! Global status
+      INTEGER STATUS             ! Global status
 
 *.
-
        
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -256,196 +245,92 @@
       ENDIF  
       
 
-*  Assign the input NDF Data array to IDAT
+*  Assign the input NDF Data array to IPDAT
 *  ---------------------------------------
 *
 *  Moved here from the main DRIZZLE.F code so I can be a bit more
 *  stringent on how the input data type is converted by calling the
 *  main alogrithim in a subroutine.
-      CALL NDF_MAP( NDFIN, 'Data', ITYPE, 'READ', IDAT, NPXIN, 
+      CALL NDF_MAP( NDFIN, 'Data', ITYPE, 'READ', IPDAT, NPXIN,
      :              STATUS ) 
      
-*  Assign the input NDF Variance array to IVAR
+*  Assign the input NDF Variance array to IPVAR
 *  ------------------------------------------- 
 *
 *  If we're using inverse variance maps to weight the data then
 *  map it here to pass down to the subroutine
       IF( GETM .OR. VAR ) THEN
-         CALL NDF_MAP( NDFIN, 'Variance', ITYPE, 'READ', IVAR, NPXIN, 
+         CALL NDF_MAP( NDFIN, 'Variance', ITYPE, 'READ', IPVAR, NPXIN,
      :                 STATUS )       
-      ENDIF   
+      ENDIF
 
-            
-*  Start of Main Loop
-*  ==================
-*
-*  Loop through each pixel of the input image and work out its position 
-*  in the output image. This may seem inefficent, unfortunately I haven't
-*  be able to thing of a more efficent way to do the tranforms!
-      DO 1 X = 1, IX
-         DO 2 Y = 1, IY
+*  Allocate some temporary workspace.
+      CALL CCD1_MALL( 4 * IX, '_DOUBLE', IPWK1, STATUS )
+      CALL CCD1_MALL( 4 * IX, '_DOUBLE', IPWK2, STATUS )
+      CALL CCD1_MALL( 4 * IX, '_DOUBLE', IPWK3, STATUS )
+      CALL CCD1_MALL( 4 * IX, '_DOUBLE', IPWK4, STATUS )
 
-*  Do the offset thing to the working co-ordinates
-               U = X + ILBND( 1 ) - 1
-               V = Y + ILBND( 2 ) - 1 
-                                    
-*  Define the input co-ordinate list to transform, taking account of the
-*  drop size definaed by the PIXFRAC parameter. Pixels corners are taken
-*  in clockwise direction, important for overlap area calculation coming
-*  up later in the loop
-* 
-*                XIN(1), YIN(1) x-----x XIN(2), YIN(2)
-*                               |     |
-*                               |     |                 
-*                               |     |                  
-*                XIN(4), YIN(4) x-----x XIN(3), YIN(3)
-*
-               
-            XIN(1) =   ( DBLE( X + ILBND( 1 ) - 1 ) - 1.0D0 )
-     :               + ( 1.0D0 - DSQRT(PIXFRAC) )
-            YIN(1) =     DBLE( Y + ILBND( 2 ) - 1 ) 
-     :               - ( 1.0D0 - DSQRT(PIXFRAC) )
+*  Do the resampling according to the correct data type.
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         CALL CCG1_ODB<T>( IX, IY, OX, OY, %VAL( IPDAT ),
+     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+     :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
+     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
+     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL CCG1_ODD<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
+     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+     :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
+     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
+     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         CALL CCG1_ODI<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
+     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+     :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
+     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
+     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL CCG1_ODR<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
+     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+     :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
+     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
+     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         CALL CCG1_ODUB<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
+     :                      %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+     :                      GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
+     :                      CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
+     :                      %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                      ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         CALL CCG1_ODUW<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
+     :                      %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+     :                      GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
+     :                      CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
+     :                      %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                      ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL CCG1_ODW<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
+     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+     :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
+     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
+     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+      END IF
 
-            XIN(2) =     DBLE( X + ILBND( 1 ) - 1 ) 
-     :               - ( 1.0D0 - DSQRT(PIXFRAC) )
-            YIN(2) =     DBLE( Y + ILBND( 2 )- 1  ) 
-     :               - ( 1.0D0 - DSQRT(PIXFRAC) ) 
-                      
-            XIN(3) =     DBLE( X + ILBND( 1 ) - 1 )  
-     :               - ( 1.0D0 - DSQRT(PIXFRAC) )
-            YIN(3) =   ( DBLE( Y + ILBND( 2 ) - 1 ) - 1.0D0 ) 
-     :                  + ( 1.0D0 - DSQRT(PIXFRAC) ) 
-
-            XIN(4) =   ( DBLE( X + ILBND( 1 ) - 1 ) - 1.0D0 ) 
-     :               + ( 1.0D0 - DSQRT(PIXFRAC) )
-            YIN(4) =   ( DBLE( Y + ILBND( 2 ) - 1 ) - 1.0D0 ) 
-     :               + ( 1.0D0 - DSQRT(PIXFRAC) ) 
-
-* Do the transform and work out the corresponding output co-ordinates
-            CALL AST_TRAN2( CMAP, 4, XIN, YIN, .TRUE., XOUT,
-     :                      YOUT, STATUS ) 
-           
-* Work out the area of the input pixel on the output pixel grid
-            JACOB = 0.5D0*( (XOUT(2)-XOUT(4))*(YOUT(1)-YOUT(3)) -
-     :                       (XOUT(1)-XOUT(3))*(YOUT(2)-YOUT(4)) )
-              
-* Loop over output pixels which could be affected by this pixel
-            DO J = NINT( MIN(YOUT(1),YOUT(2),YOUT(3),YOUT(4)) ),
-     :             NINT( MAX(YOUT(1),YOUT(2),YOUT(3),YOUT(4)) )
-
-            DO I = NINT( MIN(XOUT(1),XOUT(2),XOUT(3),XOUT(4)) ),
-     :             NINT( MAX(XOUT(1),XOUT(2),XOUT(3),XOUT(4)) )         
-
-*  Do the offset thing to the working co-ordinates
-               L = I - OLBND(1) + 1
-               M = J - OLBND(2) + 1  
-
-               CALL CCD1_BOX( I , J , XOUT, YOUT, OVER, STATUS )
-               IF( STATUS .EQ. SAI__ERROR ) THEN
-                     STATUS = SAI__OK
-                  CALL MSG_SETI( 'IS', I )
-                  CALL MSG_SETI( 'JS', J )
-                  CALL CCD1_MSG( ' ', 
-     :                           '    Warning: Overlap '
-     :                         //'calculation problem at '
-     :                         //' (^IS,^JS)', STATUS ) 
-               ENDIF
-                 
-*  If we have a positive overlap then
-               IF( OVER .GT. 0.0D0 ) THEN
-                   
-                  OVER = OVER/JACOB
-
-*  Call the drizzling algorithm
-*  =============================
-*
-*  The actual drizzling algorithm is now farmed out to CCG1_ODIZxy 
-*  so that I can type the incoming data from IDAT properly and
-*  shove it into the data arrays of the output mosaic. If the PRESERVE
-*  ADAM parameter is set to TRUE then the input data type will be
-*  preserved inot the output mosaic.
-
-*  Byte array
-                  IF ( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL CCG1_ODB<T>( %VAL(IDAT), ODAT, OWHT, 
-     :                                 OCNT, IX, IY, OX, OY, X, 
-     :                                 Y, I, J, L, M, SCALE, ZERO, 
-     :                                 OVER, WEIGHT, GETV, GETS, 
-     :                                 GETZ, GETM, %VAL(IVAR), 
-     :                                 VARFAC, VAR, OVAR, VWHT, 
-     :                                 STATUS )
-*  Double-precision array
-                  ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL CCG1_ODD<T>( %VAL(IDAT), ODAT, OWHT, 
-     :                                 OCNT, IX, IY, OX, OY, X, 
-     :                                 Y, I, J, L, M, SCALE, ZERO, 
-     :                                 OVER, WEIGHT, GETV, GETS, 
-     :                                 GETZ, GETM, %VAL(IVAR), 
-     :                                 VARFAC, VAR, OVAR, VWHT, 
-     :                                 STATUS )
-*  Integer array
-                  ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                     CALL CCG1_ODI<T>( %VAL(IDAT), ODAT, OWHT, 
-     :                                 OCNT, IX, IY, OX, OY, X, 
-     :                                 Y, I, J, L, M, SCALE, ZERO, 
-     :                                 OVER, WEIGHT, GETV, GETS, 
-     :                                 GETZ, GETM, %VAL(IVAR), 
-     :                                 VARFAC, VAR, OVAR, VWHT, 
-     :                                 STATUS )
-*  Single-precision array
-                  ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                     CALL CCG1_ODR<T>( %VAL(IDAT), ODAT, OWHT, 
-     :                                 OCNT, IX, IY, OX, OY, X, 
-     :                                 Y, I, J, L, M, SCALE, ZERO, 
-     :                                 OVER, WEIGHT, GETV, GETS, 
-     :                                 GETZ, GETM, %VAL(IVAR), 
-     :                                 VARFAC, VAR, OVAR, VWHT, 
-     :                                 STATUS ) 
-*  Unsigned-byte array
-                  ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL CCG1_ODUB<T>( %VAL(IDAT), ODAT, OWHT, 
-     :                                 OCNT, IX, IY, OX, OY, X, 
-     :                                 Y, I, J, L, M, SCALE, ZERO, 
-     :                                 OVER, WEIGHT, GETV, GETS, 
-     :                                 GETZ, GETM, %VAL(IVAR), 
-     :                                 VARFAC, VAR, OVAR, VWHT, 
-     :                                 STATUS )
-*  Unsigned-word array
-                  ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL CCG1_ODUW<T>( %VAL(IDAT), ODAT, OWHT, 
-     :                                 OCNT, IX, IY, OX, OY, X, 
-     :                                 Y, I, J, L, M, SCALE, ZERO, 
-     :                                 OVER, WEIGHT, GETV, GETS, 
-     :                                 GETZ, GETM, %VAL(IVAR), 
-     :                                 VARFAC, VAR, OVAR, VWHT, 
-     :                                 STATUS ) 
-*  Word array
-                  ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                     CALL CCG1_ODW<T>( %VAL(IDAT), ODAT, OWHT, 
-     :                                 OCNT, IX, IY, OX, OY, X, 
-     :                                 Y, I, J, L, M, SCALE, ZERO, 
-     :                                 OVER, WEIGHT, GETV, GETS, 
-     :                                 GETZ, GETM, %VAL(IVAR), 
-     :                                 VARFAC, VAR, OVAR, VWHT, 
-     :                                 STATUS )
-                  END IF                        
-                   
-               ENDIF
-               
-            END DO
-            END DO            
-
-*  End of Main Loop
-*  ================ 
-2        CONTINUE 
-1     CONTINUE
-
+*  Free memory.
+      CALL CCD1_MFREE( IPWK1, STATUS )
+      CALL CCD1_MFREE( IPWK2, STATUS )
+      CALL CCD1_MFREE( IPWK3, STATUS )
+      CALL CCD1_MFREE( IPWK4, STATUS )
 
 *  Clean up - Arrive here if an error occurs
 *  ========================================= 
 999   CONTINUE
        
-*  Time at the bar please...
       END
-
 * $Id$

@@ -1124,11 +1124,11 @@
       
 
 *  Create a Weight array and map it 
-      CALL CCD1_MKTMP( EL, OTYPE, WDREF, STATUS )
+      CALL CCD1_MKTMP( EL, '_DOUBLE', WDREF, STATUS )
       CALL CCD1_MPTMP( WDREF, 'WRITE', OWHT, STATUS )
       
 *  Create a Weight array for the variances and map it      
-      CALL CCD1_MKTMP( EL, OTYPE, WVREF, STATUS )
+      CALL CCD1_MKTMP( EL, '_DOUBLE', WVREF, STATUS )
       CALL CCD1_MPTMP( WVREF, 'WRITE', VWHT, STATUS )
                  
 *  Create a Count array and map it, we'll use this to count the
@@ -1246,7 +1246,7 @@
          IF ( OTYPE .EQ. '_BYTE' ) THEN
             CALL CCG1_DODIZB( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        %VAL(OCNT), %VAL(OVAR),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
@@ -1257,7 +1257,7 @@
          ELSE IF ( OTYPE .EQ. '_DOUBLE' ) THEN
             CALL CCG1_DODIZD( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        %VAL(OCNT), %VAL(OVAR),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
@@ -1268,7 +1268,7 @@
          ELSE IF ( OTYPE .EQ. '_INTEGER' ) THEN
             CALL CCG1_DODIZI( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        %VAL(OCNT), %VAL(OVAR),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
@@ -1279,7 +1279,7 @@
          ELSE IF ( OTYPE .EQ. '_REAL' ) THEN
             CALL CCG1_DODIZR( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        %VAL(OCNT), %VAL(OVAR),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
@@ -1290,7 +1290,7 @@
          ELSE IF ( OTYPE .EQ. '_UBYTE' ) THEN
             CALL CCG1_DODIZUB( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        %VAL(OCNT), %VAL(OVAR),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
@@ -1302,7 +1302,7 @@
          ELSE IF ( OTYPE .EQ. '_UWORD' ) THEN
             CALL CCG1_DODIZUW( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        %VAL(OCNT), %VAL(OVAR),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
@@ -1313,7 +1313,7 @@
          ELSE IF ( OTYPE .EQ. '_WORD' ) THEN
             CALL CCG1_DODIZW( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        %VAL(OCNT), %VAL(OVAR),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 

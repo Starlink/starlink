@@ -1,46 +1,93 @@
-      SUBROUTINE CCG1_OD<T1><T2>( IDAT, ODAT, OWHT, OCNT, IX, IY, 
-     :                            OX, OY, X, Y, I, J, L, M, SCALE,
-     :                            ZERO, OVER, WEIGHT, GETV, GETS, 
-     :                            GETZ, GETM, IVAR, VARFAC, VAR,
-     :                            OVAR, VWHT, STATUS )
+      SUBROUTINE CCG1_OD<T1><T2>( IX, IY, OX, OY, IDAT, IVAR, PIXFRAC, 
+     :                            SCALE, ZERO, WEIGHT, GETS, GETZ, GETM, 
+     :                            VARFAC, VAR, ILBND, OLBND, CMAP, 
+     :                            XIN, YIN, XOUT, YOUT,
+     :                            ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
+
 *+
 *  Name:
 *     CCG1_ODxy
 
 *  Purpose:
-*     Assigns the input data of IDAT to ODAT and calculates OWHT and OCNT
-*     Called from CCD1_DODIZ which does the bulk of the setup for the
-*     actual drizzling algorithm contained in this subroutine.
+*     Does the work for drizzling data to an output array.
 
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation:
-*      CALL CCG1_ODxy( IDAT, ODAT, OWHT, OCNT, IX, IY, OX, OY,
-*     :                X, Y, I, J, L, M, SCALE, ZERO, OVER, WEIGHT, 
-*     :                GETV, GETS, GETZ, GETM, IVAR, VARFAC, VAR,
-*     :                OVAR, VWHT, STATUS )
-
 *  Description:
-*     The actual drizzling algorithm, see:
-*
-*     Fruchter et al., "A package for the reduction of dithered undersampled
-*     images", in Casertano et al. (eds), HST Calibration Workshop, STSCI, 
-*     1997, pp. 518-528
+*     Drizzles data from an input array to an output array, possibly
+*     including variance, and writing count data as well.
+
+*  Invocation:
+*     CALL CCG1_OD<T1><T2>( IX, IY, OX, OY, IDAT, IVAR, PIXFRAC, SCALE,
+*                           ZERO, WEIGHT, GETS, GETZ, GETM, 
+*                           VARFAC, VAR, ILBND, OLBND, CMAP,
+*                           XIN, YIN, XOUT, YOUT,
+*                           ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
 
 *  Arguments:
-*     STATUS  =  INTEGER (Given and Returned).
-*        Global status value
-
-*  Notes:
-*     -  There is a routine for the following numeric data types:
-*     replace "x" in the routine name by D, R, etc as appropirate. 
+*     IX = INTEGER (Given)
+*        Size in X of input array.
+*     IY = INTEGER (Given)
+*        Size in Y of input array.
+*     OX = INTEGER (Given)
+*        Size in X of output array.
+*     OY = INTEGER (Given)
+*        Size in Y of output array.
+*     IDAT( IX, IY ) = <TYPE1> (Given)
+*        Input data array.
+*     IVAR( IX, IY ) = <TYPE1> (Given)
+*        Input variance array.
+*     PIXFRAC = DOUBLE PRECISION (Given)
+*        Fractional size of a pixel drop.
+*     SCALE = DOUBLE PRECISION (Given)
+*        Scale correction factors.
+*     ZERO = DOUBLE PRECISION (Given)
+*        Zero point correction.
+*     WEIGHT = DOUBLE PRECISION (Given)
+*        Statistical weight for the image.
+*     GETS = LOGICAL (Given)
+*        Are we scaling the images?
+*     GETZ = LOGICAL (Given)
+*        Do we have a zero point for the images?
+*     GETM = LOGICAL (Given)
+*        Are we using variance maps?
+*     VARFAC = DOUBLE PRECISION (Given)
+*        Variance scaling factor (used if GETM is true).
+*     VAR = LOGICAL (Given)
+*        Do we need to propagate the variances for this image?
+*     ILBND( 2 ) = INTEGER (Given)
+*        Lower bounds of input NDF.
+*     OLBND( 2 ) = INTEGER (Given)
+*        Lower bounds of output NDF.
+*     CMAP = INTEGER
+*        Mapping from input coordinates to output coordinates.
+*     XIN( 4, IX + 1 ) = DOUBLE PRECISION (Workspace)
+*        Workspace.
+*     YIN( 4, IX + 1 ) = DOUBLE PRECISION (Workspace)
+*        Workspace.
+*     YOUT( 4, IX + 1 ) = DOUBLE PRECISION (Workspace)
+*        Workspace.
+*     XOUT( 4, IX + 1 ) = DOUBLE PRECISION (Workspace)
+*        Workspace.
+*     ODAT( OX, OY ) = <TYPE2> (Given and Returned)
+*        Output data array.
+*     OVAR( OX, OY ) = <TYPE2> (Given and Returned)
+*        Output variance array.
+*     OWHT( OX, OY ) = DOUBLE PRECISION (Given and Returned)
+*        Output data weight component.
+*     VWHT( OX, OY ) = DOUBLE PRECISION (Given and Returned)
+*        Output variance weight component.
+*     OCNT( OX, OY ) = INTEGER (Given and Returned)
+*        Output count component.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Algorithm:
-*      When a drop with value i_{xy} and a user-defined weight w_{xy}
-*      is added to an image with pixel value I_{xy}, weight W_{xy}, and
-*      fractional pixel overlap 0 < a_{xy} < 1, the resulting value 
-*      the image I'_{xy} and weight W'_{xy} is 
+*     When a drop with value i_{xy} and a user-defined weight w_{xy}
+*     is added to an image with pixel value I_{xy}, weight W_{xy}, and
+*     fractional pixel overlap 0 < a_{xy} < 1, the resulting value 
+*     the image I'_{xy} and weight W'_{xy} is 
 *
 *                       W'_{xy} = a_{xy}w_[xy} + W_{xy}
 *
@@ -48,12 +95,17 @@
 *                          ---------------------------------
 *                                      W'_{xy}
 *
-*      For the variance array we use a user defined weight w_{xy} of
-*      one throughout, since I can't think of anything sensible to
-*      weight it by!
+*     For the variance array we use a user defined weight w_{xy} of
+*     one throughout, since I can't think of anything sensible to
+*     weight it by!
+*
+*     See Fruchter et al., "A package for the reduction of dithered 
+*     undersampled images", in Casertano et al. (eds), HST Calibration 
+*     Workshop, STSCI, 1997, pp. 518-528
 
 *  Authors:
 *     AA: Alasdair Allan (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,177 +115,213 @@
 *        Made doubly generic to cope with multiple output types
 *     26-OCT-1999 (AA):
 *        Merged CCG1_VDXY.DGEN and CCG1_ODXY.DGEN
+*     14-JUN-2000 (MBT):
+*        Substantial rewrite for efficiency, and removed some bugs.
 *     {enter_changes_here}
-
-*  Bugs:
-*     {note_bugs_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! no implicit typing allowed
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'PRM_PAR'        ! Magic-value and extreme constants
+      INCLUDE 'SAE_PAR'          ! SAE global definitions
+      INCLUDE 'PRM_PAR'          ! Magic-value and extreme constants
 
 *  Arguments Given:
-      INTEGER IX, IY                      ! Size of each input NDF dimension
-      INTEGER X, Y                        ! Current input pixel
-      INTEGER OX, OY                      ! Size of each output NDF dimension
-      INTEGER I, J                        ! Current output pixel
-      INTEGER L, M                        ! Current output pixel (adjusted)
-      
-      <TYPE1> IDAT( IX, IY )               ! Input NDF Data array
-      <TYPE1> IVAR( IX, IY )               ! Input NDF variance array
-      
-      DOUBLE PRECISION SCALE              ! Scale factor correction
-      DOUBLE PRECISION ZERO               ! zero point correction
-      DOUBLE PRECISION OVER               ! Overlap between input & output pixel
-      DOUBLE PRECISION WEIGHT             ! Weight for current input NDF
-      DOUBLE PRECISION VARFAC             ! Variance scaling factor
-      DOUBLE PRECISION XYWHT              ! Pixel weight for IDAT( X, Y )
-      
-      LOGICAL GETV                        ! Are we using variances as weights?
-      LOGICAL GETS                        ! Are we using scaling?
-      LOGICAL GETZ                        ! Do we have a zero point correction?
-      LOGICAL GETM                        ! Using variance maps
-      LOGICAL VAR                         ! Propagate variances
-      
-*  Arguments Returned:
+      INTEGER IX
+      INTEGER IY
+      INTEGER OX
+      INTEGER OY
+      <TYPE1> IDAT( IX, IY )
+      <TYPE1> IVAR( IX, IY )
+      DOUBLE PRECISION PIXFRAC
+      DOUBLE PRECISION SCALE
+      DOUBLE PRECISION ZERO
+      DOUBLE PRECISION WEIGHT
+      LOGICAL GETS
+      LOGICAL GETZ
+      LOGICAL GETM
+      DOUBLE PRECISION VARFAC
+      LOGICAL VAR
+      INTEGER ILBND( 2 )
+      INTEGER OLBND( 2 )
+      INTEGER CMAP
+
+*  Arguments Given and Returned:
+      DOUBLE PRECISION XIN( 4, IX + 1 )
+      DOUBLE PRECISION YIN( 4, IX + 1 )
+      DOUBLE PRECISION XOUT( 4, IX + 1 )
+      DOUBLE PRECISION YOUT( 4, IX + 1 )
       <TYPE2> ODAT( OX, OY )
-      <TYPE2> OWHT( OX, OY )
       <TYPE2> OVAR( OX, OY )
-      <TYPE2> VWHT( OX, OY )                
+      DOUBLE PRECISION OWHT( OX, OY )
+      DOUBLE PRECISION VWHT( OX, OY )
       INTEGER OCNT( OX, OY )
 
 *  Status:
-      INTEGER  STATUS          ! Global status
+      INTEGER  STATUS            ! Global status
 
 *  Local Constants:
 
 *  Local Variables:
-      <TYPE2> SZDAT                         ! Scaled and zeroed input data
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+      INTEGER L                  ! Offset coordinate
+      INTEGER M                  ! Offset coordinate
+      INTEGER X                  ! Loop variable
+      INTEGER Y                  ! Loop variable
+      DOUBLE PRECISION JACOB     ! Area of input pixel in output grid
+      DOUBLE PRECISION OVER      ! Overlap between input and output pixel
+      DOUBLE PRECISION XYWHT     ! Pixel weight for IDAT( X, Y )
+      DOUBLE PRECISION SZDAT     ! Scaled and zeroed input data
 
 *  Internal References:
-      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
-      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
- 
-*  Declare functions
-
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
 *.
 
 *  Check the inherited status on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  The actual drizzling algorithm
-*  ==============================   
+*  Initialise coordinate arrays; we set up the values for a notional
+*  zero'th row (the one before the first actual one) of the input array.
+*  Take account of the drop size defined by the PIXFRAC parameter.  
+*  Pixel corners are taken in a clockwise direction, as follows: 
+*
+*                XIN(1), YIN(1) x-----x XIN(2), YIN(2)
+*                               |     |
+*                               |     |
+*                               |     |
+*                XIN(4), YIN(4) x-----x XIN(3), YIN(3)
+*
+*  which is important for overlap area calculation.
+      Y = 0
+      DO X = 1, IX
+         XIN( 1, X ) = DBLE( X + ILBND( 1 ) ) - 1.5D0 - PIXFRAC * 0.5D0
+         XIN( 2, X ) = DBLE( X + ILBND( 1 ) ) - 1.5D0 + PIXFRAC * 0.5D0
+         XIN( 3, X ) = XIN( 2, X )
+         XIN( 4, X ) = XIN( 1, X )
+         YIN( 1, X ) = DBLE( Y + ILBND( 2 ) ) - 1.5D0 + PIXFRAC * 0.5D0
+         YIN( 2, X ) = YIN( 1, X )
+         YIN( 3, X ) = DBLE( Y + ILBND( 2 ) ) - 1.5D0 - PIXFRAC * 0.5D0
+         YIN( 4, X ) = YIN( 3, X )
+      END DO
+
+*  Go through the input data array and drizzle it onto the output grid.
+      DO Y = 1, IY
+
+*  Set the coordinates to transform to be correct for this row.
+         DO X = 1, IX
+            YIN( 1, X ) = YIN( 1, X ) + 1D0
+            YIN( 2, X ) = YIN( 2, X ) + 1D0
+            YIN( 3, X ) = YIN( 3, X ) + 1D0
+            YIN( 4, X ) = YIN( 4, X ) + 1D0
+         END DO
+
+*  Generate the corresponding coordinates on the output grid.  The
+*  overhead for this call is quite high, so it is much more efficient
+*  to do the coordinate transformation a row at a time.
+         CALL AST_TRAN2( CMAP, 4 * IX, XIN, YIN, .TRUE., XOUT, YOUT,
+     :                   STATUS )
+
+*  Treat each pixel individually.
+         DO X = 1, IX
+
+*  Check validity of input pixel.
+            IF ( IDAT( X, Y ) .NE. VAL__BAD<T1> ) THEN
+
+*  Work out the area of the input pixel on the output pixel grid
+               JACOB = ( ( XOUT( 2, X ) - XOUT( 4, X ) ) * 
+     :                   ( YOUT( 1, X ) - YOUT( 3, X ) )
+     :                 - ( XOUT( 1, X ) - XOUT( 3, X ) ) *
+     :                   ( YOUT( 2, X ) - YOUT( 4, X ) ) ) * 0.5D0
+
+*  Loop over output pixels which could be affected by this input pixel.
+               DO J = NINT( MIN( YOUT( 1, X ), YOUT( 2, X ), 
+     :                           YOUT( 3, X ), YOUT( 4, X ) ) ),
+     :                NINT( MAX( YOUT( 1, X ), YOUT( 2, X ),
+     :                           YOUT( 3, X ), YOUT( 4, X ) ) )
+                  DO I = NINT( MIN( XOUT( 1, X ), XOUT( 2, X ),
+     :                              XOUT( 3, X ), XOUT( 4, X ) ) ),
+     :                   NINT( MAX( XOUT( 1, X ), XOUT( 2, X ),
+     :                              XOUT( 3, X ), XOUT( 4, X ) ) )
+
+*  Offset working coordinates.
+                     L = I - OLBND( 1 ) + 1
+                     M = J - OLBND( 2 ) + 1
+
+*  Get the overlap of the input pixel with the output pixel.
+                     CALL CCD1_BOX( I, J, XOUT( 1, X ), YOUT( 1, X ), 
+     :                              OVER, STATUS )
+                     IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  If the overlap is positive then this input pixel should contribute
+*  to this output pixel.
+                     IF ( OVER .GT. 0D0 ) THEN
+                        OVER = OVER / JACOB
 
 *  Correct for scale and zero point 
-      IF ( GETS .AND. GETZ ) THEN
-         SZDAT = NUM_DTO<T2>( SCALE ) * 
-     :           NUM_<T1>TO<T2>( IDAT( X, Y ) ) 
-     :           + NUM_DTO<T2>( ZERO )
-      ELSE IF ( GETS ) THEN
-         SZDAT = NUM_DTO<T2>( SCALE ) * 
-     :           NUM_<T1>TO<T2>( IDAT( X, Y ) )
-      ELSE IF ( GETZ ) THEN
-         SZDAT = NUM_<T1>TO<T2>( IDAT( X, Y ) ) + 
-     :           NUM_DTO<T2>( ZERO )
-      ELSE
-         SZDAT = NUM_<T1>TO<T2>( IDAT( X, Y ) )
-      ENDIF
+                        SZDAT = NUM_<T1>TOD( IDAT( X, Y ) )
+                        IF ( GETS ) SZDAT = SZDAT * SCALE
+                        IF ( GETZ ) SZDAT = SZDAT + ZERO
 
 *  If we are using inverse variance maps as weights, calculate
-*  the weight for this input pixel
-      IF( GETM ) THEN
-         XYWHT = VARFAC * ( 1<CONST> / 
-     :                      NUM_<T1>TO<T2>( IVAR( X, Y ) ) )
-      ENDIF
+*  the weight for this input pixel.  If the variance is bad, there's
+*  nothing to do but set the weight of this result to zero.
+                        IF( GETM ) THEN
+                           IF ( IVAR( X, Y ) .EQ. VAL__BAD<T1> .OR.
+     :                          IVAR( X, Y ) .LE. 0<CONST1> ) THEN
+                              XYWHT = 0D0
+                           ELSE
+                              XYWHT = 
+     :                           VARFAC / NUM_<T1>TOD( IVAR( X, Y ) )
+                           END IF
+                        ELSE
+                           XYWHT = WEIGHT
+                        ENDIF
+                        IF ( XYWHT .GT. 0D0 ) THEN
                    
-*  For the case where previous drizzling has assigned VAL__BADR
-*  to the output pixel
-      IF ( ( IDAT( X, Y ) .NE. VAL__BADR ) .AND.
-     :     ( ODAT( L, M ) .EQ. VAL__BADR ) ) THEN
-         
-         IF ( GETM ) THEN
-            ODAT( L, M ) = SZDAT
-            OWHT( L, M ) = NUM_DTO<T2>( OVER * XYWHT )
-            OCNT( L, M ) = 1            
-         ELSE                        
-            ODAT( L, M ) = SZDAT
-            OWHT( L, M ) = NUM_DTO<T2>( OVER * WEIGHT )
-            OCNT( L, M ) = 1
-         ENDIF
-         
-         IF ( VAR ) THEN
-            OVAR( L, M ) = IVAR( X, Y )
-            VWHT( L, M ) = NUM_DTO<T2>( OVER )
-         ENDIF
+*  Treat the case in which the output pixel does not contain a non-bad 
+*  value.
+                           IF ( ODAT( L, M ) .EQ. VAL__BAD<T2> .OR.
+     :                          OCNT( L, M ) .EQ. 0 ) THEN
+                              ODAT( L, M ) = SZDAT
+                              OWHT( L, M ) = OVER * XYWHT
+                              OCNT( L, M ) = 1            
+                              IF ( VAR ) THEN
+                                 OVAR( L, M ) = IVAR( X, Y )
+                                 VWHT( L, M ) = OVER
+                              ENDIF
                         
-*  For the case where there hasn't been any input data drizzled 
-*  onto the output array yet
-      ELSE IF ( ( IDAT( X, Y ) .NE. VAL__BADR ) .AND.
-     :          ( ODAT( L, M ) .NE. VAL__BADR ) ) THEN
+*  Treat the case in which the output pixels does contain a non-bad
+*  value.
+                           ELSE
+                              ODAT( L, M ) = NUM_DTO<T2>(
+     :                           ( ODAT( L, M ) * OWHT( L, M )
+     :                           + XYWHT * OVER * SZDAT ) /
+     :                           ( OWHT( L, M ) + OVER * XYWHT ) )
+                              OWHT( L, M ) = 
+     :                           OWHT( L, M ) + OVER * XYWHT
+                              OCNT( L, M ) = OCNT( L, M ) + 1
+                              IF ( VAR ) THEN
+                                 OVAR( L, M ) = NUM_DTO<T2>( 
+     :                              ( OVAR( L, M ) * VWHT( L, M ) 
+     :                              + OVER * IVAR( X, Y ) ) / 
+     :                              ( VWHT( L, M ) + OVER ) )
+                                 VWHT( L, M ) = VWHT( L, M ) + OVER
+                              END IF
+                           END IF 
 
-         IF( OCNT( L, M ) .EQ. 0 ) THEN
-
-            IF( GETM ) THEN
-               ODAT( L, M ) = SZDAT
-               OWHT( L, M ) = NUM_DTO<T2>( OVER * XYWHT )
-               OCNT( L, M ) = 1            
-            ELSE                             
-               ODAT( L, M ) = SZDAT
-               OWHT( L, M ) = NUM_DTO<T2>( OVER * WEIGHT )
-               OCNT( L, M ) = 1
-            ENDIF
-            
-            IF ( VAR ) THEN
-               OVAR( L, M ) = IVAR( X, Y )
-               VWHT( L, M ) = NUM_DTO<T2>( OVER )
-            ENDIF
-            
-*  We're mid-drizzle and still going, the output pixel already has
-*  data in it and we want to stuff some more in there...
-         ELSE
-
-            IF( GETM ) THEN
-               ODAT( L, M ) = ODAT( L, M )*OWHT( L, M )
-     :                        + NUM_DTO<T2>( XYWHT * OVER ) * SZDAT
-               ODAT( L, M ) = ODAT( L, M )/
-     :                        ( OWHT( L, M) + 
-     :                          NUM_DTO<T2>( OVER * XYWHT ) )
-               OWHT( L, M ) = OWHT( L, M ) + 
-     :                        NUM_DTO<T2>( OVER * XYWHT )
-               OCNT( L, M ) = OCNT( L, M ) + 1            
-            ELSE                           
-               ODAT( L, M ) = ODAT( L, M ) * OWHT( L, M )
-     :                        + NUM_DTO<T2>( WEIGHT * OVER ) * SZDAT
-               ODAT( L, M ) = ODAT( L, M ) /
-     :                        ( OWHT( L, M) + 
-     :                          NUM_DTO<T2>( OVER * WEIGHT ) )
-               OWHT( L, M ) = OWHT( L, M ) + 
-     :                        NUM_DTO<T2>( OVER * WEIGHT )
-               OCNT( L, M ) = OCNT( L, M ) + 1
-            ENDIF
-            
-            IF ( VAR ) THEN
-               OVAR( L, M ) = OVAR( L, M ) * VWHT( L, M )
-     :                        + NUM_DTO<T2>( OVER ) * IVAR( X, Y )
-               OVAR( L, M ) = OVAR( L, M ) /
-     :                        ( VWHT( L, M) + NUM_DTO<T2>( OVER ) )
-               VWHT( L, M ) = VWHT( L, M ) + NUM_DTO<T2>( OVER )            
+                        END IF
+                     END IF
+                  END DO
+               END DO
             END IF
-                          
-         ENDIF 
-                      
-      ENDIF
-                          
+         END DO
+      END DO
 
-*  Clean up - Arrive here if an error occurs
-*  ========================================= 
-999   CONTINUE
-
-*  Time at the bar please...
+ 999  CONTINUE
+                          
       END
 * $Id$
