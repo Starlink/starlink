@@ -39,9 +39,9 @@
 
       CALL MSG_PRNT(VERSION)
 
-c     IF (.NOT.I_OPEN) THEN
-c       CALL MSG_PRNT('AST_ERR: image processing not active')
-c     ELSE
+      IF (.NOT.I_OPEN) THEN
+        CALL MSG_PRNT('AST_ERR: image processing not active')
+      ELSE
 
 
 *  get input image
