@@ -300,6 +300,8 @@
 #        Version 1.4
 #      25-JUN-1999 (BLY):
 #        Version 1.4-1: patched surf_rebin.f added to surf_sub.tar.
+#      02-JUL-1999 (TIMJ):
+#        Remove sculib_linux.c
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -681,7 +683,7 @@ C_ROUTINES = $(KAP_C_ROUTINES) $(SCULIB_C_ROUTINES)
 
 KAP_C_ROUTINES = kpg1_trmsz.c
 
-SCULIB_C_ROUTINES = sculib_linux.c
+SCULIB_C_ROUTINES = 
 
 #  List of applications/tasks in monolith.
 
