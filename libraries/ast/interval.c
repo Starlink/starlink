@@ -1245,11 +1245,11 @@ static int Overlap( AstRegion *this, AstRegion *that ){
             nc = astGetNaxes( frm );
             lbndu_this = astMalloc( sizeof( double )*(size_t)nc );
             ubndu_this = astMalloc( sizeof( double )*(size_t)nc );
-            astRegCurBox( unc_this, lbndu_this, ubndu_this ); 
+            astGetRegionBounds( unc_this, lbndu_this, ubndu_this ); 
 
             lbndu_that = astMalloc( sizeof( double )*(size_t)nc );
             ubndu_that = astMalloc( sizeof( double )*(size_t)nc );
-            astRegCurBox( unc_that, lbndu_that, ubndu_that ); 
+            astGetRegionBounds( unc_that, lbndu_that, ubndu_that ); 
 
 /* Transform the PointSet holding the limits for the second Interval into
    the Frame of the first Interval. */
@@ -2469,7 +2469,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                            unc = astGetUncFrm( reg, AST__BASE );
                            lbnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            ubnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
-                           astRegCurBox( unc, lbnd_unc, ubnd_unc );
+                           astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
                         }
 
 /* Set the gap between the limits to be equal to the uincertainty on this
@@ -2632,7 +2632,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                            unc = astGetUncFrm( reg, AST__BASE );
                            lbnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            ubnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
-                           astRegCurBox( unc, lbnd_unc, ubnd_unc );
+                           astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
                         }
 
 /* Set the gap between the limits to be equal to the uincertainty on this

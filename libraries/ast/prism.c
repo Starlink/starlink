@@ -1188,8 +1188,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 /* Get the bounding boxes of the component Regions in these Frame,
    storing the values in the supplied arrays. */
-   astRegCurBox( reg1, lbnd, ubnd ); 
-   astRegCurBox( reg2, lbnd + nax, ubnd + nax ); 
+   astGetRegionBounds( reg1, lbnd, ubnd ); 
+   astGetRegionBounds( reg2, lbnd + nax, ubnd + nax ); 
 
 /* Free resources.*/
    reg1 = astAnnul( reg1 );

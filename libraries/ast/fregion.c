@@ -17,6 +17,7 @@
 *     AST_NEGATE
 *     AST_ISAREGION
 *     AST_MAPREGION
+*     AST_GETREGIONBOUNDS
 *     AST_GETREGIONFRAME
 *     AST_OVERLAP
 *     AST_SETUNC
@@ -188,6 +189,20 @@ MAKE_AST_MASK(uw,UW,UWORD,US,unsigned short int)
 MAKE_AST_MASK(b,B,BYTE,B,signed char)
 MAKE_AST_MASK(ub,UB,UBYTE,UB,unsigned char)
 #undef MAKE_AST_MASK
+
+F77_SUBROUTINE(ast_getregionbounds)( INTEGER(THIS),
+                                     DOUBLE(LBND),
+                                     DOUBLE(UBND),
+                                     INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE(XOUT)
+   GENPTR_DOUBLE(YOUT)
+
+   astAt( "AST_GETREGIONBOUNDS", NULL, 0 );
+   astWatchSTATUS(
+      astGetRegionBounds( astI2P( *THIS ), LBND, UBND );
+   )
+}
 
 
 

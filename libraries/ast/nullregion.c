@@ -104,7 +104,7 @@ static int Overlap( AstRegion *, AstRegion * );
 static int OverlapX( AstRegion *, AstRegion * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
-static void RegCurBox( AstRegion *this, double *, double * );
+static void GetRegionBounds( AstRegion *this, double *, double * );
 
 /* Member functions. */
 /* ================= */
@@ -228,7 +228,7 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name ) {
    region->OverlapX = OverlapX;
    region->RegBaseBox = RegBaseBox;
    region->RegBaseMesh = RegBaseMesh;
-   region->RegCurBox = RegCurBox;
+   region->GetRegionBounds = GetRegionBounds;
    region->RegMesh = RegMesh;
 
 /* Store replacement pointers for methods which will be over-ridden by
@@ -547,10 +547,10 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
    return result;
 }
 
-static void RegCurBox( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd ){
 /*
 *  Name:
-*     RegCurBox
+*     GetRegionBounds
 
 *  Purpose:
 *     Returns the bounding box of an un-negated Region in the current Frame of 
@@ -561,10 +561,10 @@ static void RegCurBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     void astRegCurBox( AstRegion *this, double *lbnd, double *ubnd )
+*     void astGetRegionBounds( AstRegion *this, double *lbnd, double *ubnd )
 
 *  Class Membership:
-*     NullRegion member function (over-rides the astRegCurBox protected
+*     NullRegion member function (over-rides the astGetRegionBounds protected
 *     method inherited from the Region class).
 
 *  Description:

@@ -98,7 +98,7 @@ typedef struct AstRegionVtab {
    AstPointSet *(* RegTransform)( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
    void (* Negate)( AstRegion * );
    void (* RegBaseBox)( AstRegion *, double *, double * );
-   void (* RegCurBox)( AstRegion *, double *, double * );
+   void (* GetRegionBounds)( AstRegion *, double *, double * );
    void (* ClearUnc)( AstRegion * );
    void (* RegOverlay)( AstRegion *, AstRegion * );
    int (* DumpUnc)( AstRegion * );
@@ -203,13 +203,13 @@ int astMaskUL_( AstRegion *, AstMapping *, int, int, const int[], const int[], u
 int astMaskUS_( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int );
 void astSetUnc_( AstRegion *, AstRegion * );
 AstRegion *astGetUnc_( AstRegion *, int );
+void astGetRegionBounds_( AstRegion *, double *, double * );
 
 #if defined(astCLASS)            /* Protected */
 AstRegion *astMapRegion_( AstRegion *, AstMapping *, AstFrame * );
 AstFrame *astRegFrame_( AstRegion * );
 AstPointSet *astRegTransform_( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
 void astRegBaseBox_( AstRegion *, double *, double * );
-void astRegCurBox_( AstRegion *, double *, double * );
 void astClearUnc_( AstRegion * );
 void astRegOverlay_( AstRegion *, AstRegion * );
 int astDumpUnc_( AstRegion * );
@@ -329,6 +329,7 @@ astINVOKE(V,astMaskUL_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),inside,ndim,lbnd,ubnd,in,val))
 #define astSetUnc(this,unc) astINVOKE(V,astSetUnc_(astCheckRegion(this),unc?astCheckRegion(unc):NULL))
 #define astGetUnc(this,def) astINVOKE(O,astGetUnc_(astCheckRegion(this),def))
+#define astGetRegionBounds(this,lbnd,ubnd) astINVOKE(V,astGetRegionBounds_(astCheckRegion(this),lbnd,ubnd))
 
 /* Interfaces to protected member functions. */
 /* ----------------------------------------- */
@@ -346,7 +347,6 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegBaseGrid(this) astINVOKE(O,astRegBaseGrid_(astCheckRegion(this)))
 #define astBndBaseMesh(this,lbnd,ubnd) astINVOKE(O,astBndBaseMesh_(astCheckRegion(this),lbnd,ubnd))
 #define astRegCentre(this,cen,ptr,index,ifrm) astINVOKE(V,astRegCentre_(astCheckRegion(this),cen,ptr,index,ifrm))
-#define astRegCurBox(this,lbnd,ubnd) astINVOKE(V,astRegCurBox_(astCheckRegion(this),lbnd,ubnd))
 #define astRegFrame(this) astINVOKE(O,astRegFrame_(astCheckRegion(this)))
 #define astRegGrid(this) astINVOKE(O,astRegGrid_(astCheckRegion(this)))
 #define astRegMesh(this) astINVOKE(O,astRegMesh_(astCheckRegion(this)))

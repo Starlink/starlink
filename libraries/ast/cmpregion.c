@@ -1118,8 +1118,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    clbnd2 = astMalloc( sizeof( double )*(size_t) nax );
    cubnd2 = astMalloc( sizeof( double )*(size_t) nax );
    if( astOK ) {
-      astRegCurBox( reg1, clbnd1, cubnd1 ); 
-      astRegCurBox( reg2, clbnd2, cubnd2 ); 
+      astGetRegionBounds( reg1, clbnd1, cubnd1 ); 
+      astGetRegionBounds( reg2, clbnd2, cubnd2 ); 
 
 /* How we combine the two bounding boxes depends on the boolean operator
    associated with this CmpRegion.  For AND find the overlap of the two
