@@ -1,6 +1,6 @@
-1 KAPPA_Version_0.15-3
+1 KAPPA_Version_0.15-4
 
-   A new release of KAPPA (V0.15-3) has been made. The changes are
+   A new release of KAPPA (V0.15-4) has been made. The changes are
    described fully in sun95.16.
 
    The majority of the changes are again in the field of graphics and WCS
@@ -10,7 +10,7 @@
 
 *      Scripts which make use of any of the removed or
 *      modified parameters will fail when run with KAPPA
-*      V0.15-3. Such scripts will need to be changed to
+*      V0.15-4. Such scripts will need to be changed to
 *      take account of the new features introduced in this
 *      release. Check the lists below for details.}
 
