@@ -7,34 +7,28 @@
 *           <description of parameter>
 *    Method :
 *     The initial data array is checked for quality. Only those points
-*     with good quality are passed from TIM_GETDATA back to the main
+*     with good quality are passed from TIM_GETDAT back to the main
 *     program. The variances of these points are set to the data values
 *     if no variance array is present in the datafile.
 *    Authors :
 *     Richard Saxton (LTVAD::RDS)
 *    History :
 *     date:  changes (institution::username)
+*     ?? ??? ?? : V1.5-0 Original (RDS)
+*     11 Apr 95 : V1.8-0 Updated data interfrace (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-*     <specification of FORTRAN structures>
 *    Status :
       INTEGER STATUS
-*    Function declarations :
-*     <declarations for function references>
 *    Local constants :
       CHARACTER*30 TYPE
           PARAMETER(TYPE='Power_spectrum')
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOC            !Locator to input file
-      CHARACTER*(DAT__SZLOC) LOCO           !Locator to output file
       CHARACTER*80 PATH(4)                  !Input data path
+      INTEGER			IFID, OFID		! Dataset identifiers
       INTEGER NTOT                          !Total no of points in input array
       INTEGER NGOOD                         !No of good points in data arrays
 *    pointers:
@@ -60,22 +54,19 @@
       INTEGER VALUE,LP
       LOGICAL LVAR                          !Is variance present in data file ?
 
-*    Local data :
-*     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'LOMBSCAR Version 1.5-1')
+      PARAMETER (VERSION = 'LOMBSCAR Version 1.8-0')
 *-
+
       CALL MSG_PRNT(VERSION)
-*
-      CALL AST_INIT(STATUS)
-*
-* Get data from input file
-      CALL TIM_GETDATA(LOC, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
-     &                                           VPNTR, STATUS)
-*
+      CALL AST_INIT()
+
+*  Get data from input file
+      CALL TIM_GETDAT( IFID, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
+     :                                        VPNTR, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
+
 * Get input parameters
 *   Oversampling function
       CALL USI_GET0R('OFAC', OFAC, STATUS)
@@ -123,45 +114,31 @@
          CALL MSG_PRNT('Error obtaining virtual memory')
          GOTO 999
       ENDIF
-*
-* Call time series application
+
+*  Call time series application
       CALL TIM_FASPER(NGOOD, %val(TPNTR), %val(DPNTR), OFAC, HIFAC, F1,
-     &         %val(W1PNTR), NWORK, NWIND, %val(W2PNTR), %val(WNPNTR),
-     &         %val(W3PNTR), %val(PPNTR), DF, NOUT, PROB)
-*
-* Save the result
-      CALL TIM_OUTPUT( 'OUT', TYPE, NOUT, %val(PPNTR), DF/2.0,
-     &                                             DF, LOCO, STATUS)
-*
-* Add axis label and units
-      CALL BDA_PUTAXLABEL(LOCO, 1, 'Frequency', STATUS)
-      CALL BDA_PUTAXUNITS(LOCO, 1, 'Hz', STATUS)
-*
-* Add data label and units
-      CALL BDA_PUTLABEL(LOCO, 'Power', STATUS)
-      CALL BDA_PUTUNITS(LOCO, '(Counts/s)**2', STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error adding auxiliary info.')
-      ENDIF
-*
-* Add history
-      CALL HIST_COPY(LOC, LOCO, STATUS)
-      CALL HIST_ADD(LOCO, VERSION, STATUS)
-*
+     :         %val(W1PNTR), NWORK, NWIND, %val(W2PNTR), %val(WNPNTR),
+     :         %val(W3PNTR), %val(PPNTR), DF, NOUT, PROB)
+
+*  Save the result
+      CALL TIM_PUTOUT( 'OUT', TYPE, NOUT, %val(PPNTR), DF/2.0,
+     :                                      DF, OFID, STATUS )
+
+*  Add axis label and units
+      CALL BDI_PUTAXTEXT( OFID, 1, 'Frequency', 'Hz', STATUS )
+
+*  Add data label and units
+      CALL BDI_PUTLABEL(OFID, 'Power', STATUS)
+      CALL BDI_PUTUNITS(OFID, '(Counts/s)**2', STATUS)
+
+*  Add history
+      CALL HSI_COPY( IFID, OFID, STATUS)
+      CALL HSI_ADD(OFID, VERSION, STATUS)
       CALL USI_NAMEI(NLINES, PATH, STATUS)
-      CALL HIST_PTXT(LOCO, NLINES, PATH, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error adding history record')
-      ENDIF
-*
-999   CONTINUE
-*
-      CALL AST_CLOSE(STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from LOMBSCAR',STATUS)
-      ENDIF
-*
+      CALL HSI_PTXT(OFID, NLINES, PATH, STATUS)
+
+*   Tidy up
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
       END

@@ -35,6 +35,9 @@
 *    Status :
 *                                          ! output axis
       INTEGER STATUS
+
+*  Local Variables:
+      INTEGER			ODPTR			! Output data ptr
 *-
 
 *    Check status
