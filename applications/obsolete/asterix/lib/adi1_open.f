@@ -8,7 +8,7 @@
 *     FileHandle object pointed to by ID is updated.
 
 *  Language:
-*     Fortran
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL ADI1_OPEN( FSPEC, MODE, ID, STATUS )
@@ -50,20 +50,14 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:adi, usage:private
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (JET-X,University of Birmingham)
@@ -117,6 +111,16 @@
       CALL ADI_GET0C( FID, FSPEC, STATUS )
       FLEN = CHR_LEN( FSPEC )
       CALL ADI_GET0C( MID, MODE, STATUS )
+
+*    Length of FSPEC
+      FLEN = CHR_LEN( FSPEC )
+
+*    Look for % delimiter, so that trailing representation can be ignored
+      EP = FLEN
+      DO WHILE ( (EP.GT.0) .AND. (FSPEC(EP:EP).NE.'%') )
+        EP = EP - 1
+      END DO
+      IF ( EP .NE. 0 ) FLEN = EP - 1
 
 *    Check if slice or subcomponent delimiters present
       EP = INDEX( FSPEC, '.' )
