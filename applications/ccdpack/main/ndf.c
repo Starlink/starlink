@@ -534,7 +534,7 @@
             psize = getpixelsize( ndf, pfrm, status );
             getbbox( ndf, pfrm, bbox, bbox + 2, status );
          )
-         for ( i = 0; i < 5; i++ ) gbox[ i ] = bbox[ i ];
+         for ( i = 0; i < 4; i++ ) gbox[ i ] = (float) bbox[ i ];
 
 /* Set the viewport to use all of the available surface, within the 
    constraint that the correct aspect ratio is retained. */
@@ -935,6 +935,7 @@
          nfrac = 0;
          for ( i = 0; i < ( nperc + nextra ); i++ ) {
             PercHashKey hkey;
+            hkey.hash = NULL;
             hkey.data = percs[ i ];
             if ( Tcl_FindHashEntry( &ndf->perchash, hkey.hash ) == NULL ) {
                fracs[ nfrac++ ] = percs[ i ] * 0.01;
@@ -986,8 +987,10 @@
                PercHashValue hval;
                Tcl_HashEntry *entry;
                int new;
+               hkey.hash = NULL;
                hkey.data = fracs[ i ] * 100.0;
                entry = Tcl_CreateHashEntry( &ndf->perchash, hkey.hash, &new );
+               hval.hash = (ClientData) NULL;
                hval.data = vals[ i ];
                Tcl_SetHashValue( entry, hval.hash );
             }
@@ -999,6 +1002,7 @@
             PercHashKey hkey;
             PercHashValue hval;
             Tcl_HashEntry *entry; 
+            hkey.hash = NULL;
             hkey.data = percs[ i ];
             entry = Tcl_FindHashEntry( &ndf->perchash, hkey.hash );
             if ( entry == NULL ) {    /* kludge - sorry */
@@ -1574,7 +1578,7 @@
 */
 
 /* Check the inherited status. */
-      if ( *status != SAI__OK ) return;
+      if ( *status != SAI__OK ) return NULL;
 
 /* See whether we need to construct a new array.  If no array currently
    exists, or if the scale values are different from the ones 
