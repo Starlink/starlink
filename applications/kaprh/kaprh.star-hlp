@@ -1038,6 +1038,104 @@ DSB: David S. Berry (STARLINK)
    images.  However, when there is no scaling only integer data will
    not be type converted, but this is not expensive for the expected
    byte-type data.
+
+1 IDINVISIBLE
+Makes memory planes of an image-display device invisible.
+
+Usage:
+
+   idinvisible [planes] [device]
+
+Description:
+
+   This routine makes invisible nominated planes of an IDI-supported
+   image display, such as X-windows.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the image-display device whose memory plane is to
+   be made invisible.  The name of the base plane should be given
+   even if an overlay plane is to be made invisible.
+   [Current image display]
+3 PLANES
+PLANES() = _INTEGER (Read)
+   The numbers of the memory planes to be made invisible.  All
+   unspecified planes become visible.  If it is null the base
+   (image) memory is made invisible.  The base memory is 0 and
+   overlays are numbered consecutively from 1.  For an Ikon the
+   only overlay plane is 1.
+   [0]
+2 Examples
+idinvisible [0,1]
+   Makes only planes 0 and 1 invisible on the current image
+   display device.
+
+idinvisible device=xwindows
+   Makes the base plane invisible on the xwindows device.
+
+idinvisible 1 ikon
+   Makes the first overlay plane invisible on the Ikon device.
+2 Notes
+-  On some devices making a memory invisible may have the effect
+of making other memories visible.
+
+-  On the Ikon the visibilities are set to visible on start up,
+so that any set up change introduced by an application calling
+GKS are not lost, therefore all planes to be made invisible must
+be given in one invocation.
+2 Related_Applications
+   KAPPA: IDCLEAR, IDSTATE.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1990 July 23 (MJC):
+    Original version.
+
+ 1992 February 21 (MJC):
+    Made all the memories visible first to cope with the changed
+    behaviour of the IDI implementation.
+
+ 1992 March 26 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+1 IDPAZO
+Pans and zooms an image-display device.
+
+Description:
+
+   This routine pans all planes of an IDI-supported image display,
+   such as X-windows.  The zoom factor is controlled by the mouse
+   or trackerball buttons.
+
+   For an X-windows device, pressing the left button of the mouse
+   increases the zooming, the centre button reduces the zoom factor,
+   and the right-hand button ends the pan and zoom operation.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the image-display device to be panned and zoomed.
+   The name of the base plane should be given.
+   [Current image display]
+2 Examples
+idpazo xwindows
+   Pans and zooms the xwindows device
+
+idpazo
+   Pans and zooms the current image-display device.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1990 Apr 11 (MJC):
+    Original version.
+
+ 1991 October 28 (MJC):
+    Made exit trigger number 2.  Inceased maximum number of
+    triggers to 64.  Added a memory-visibility call.
+
+ 1992 February 19 (MJC):
+    Removed the memory-visibility call.
 1 INSPECT
 Inspects a 2-d NDF in a variety of ways.
 
@@ -1643,6 +1741,453 @@ MJC: Malcolm J. Currie (STARLINK)
     Modified for UNIX and added the Topic on Navigation.
 2 Implementation_Status
    -  Uses the portable help system.
+
+1 LUTFLIP
+Flips the colour table of an image-display device.
+
+Usage:
+
+   lutflip [device] [plane]
+
+Description:
+
+   This routine `flips' the colour table of a nominated plane of
+   an IDI-supported image display, such as X-windows.  The flip
+   reverses the order of the colours, so that the first colour
+   becomes the last and vice versa, etc.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the image-display device whose colour table is to
+   be flipped.  The name of the base plane should be given even if
+   the overlay colour table is to be flipped.
+   [Current image display]
+3 PLANE
+PLANE = _INTEGER (Read)
+   The number of the memory plane whose colour table is to be
+   flipped.  If it is null the base (image) memory's colour table
+   is reversed.  The base memory is 0 and overlays are numbered
+   consecutively from 1.  For an Ikon the only overlay plane is 1.
+   PLANE is only permitted to have a value in the range 0 to the
+   number of planes minus one. [0]
+2 Examples
+lutflip
+   This reverses the colour table on the current image-display
+   device.
+
+lutflip xwindows
+   This reverses the colour table on the xwindows device.
+
+lutflip ikon 1
+   This flips the colour table on the Ikon overlay plane.
+2 Notes
+-  Only Ikons and X-windows are supported.
+
+-  Reserved pens are not flipped.
+2 Related_Applications
+   KAPPA: LUTHILITE, LUTROT, LUTTWEAK.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1990 Apr 13 (MJC):
+    Original version.
+
+ 1991 April 10 (MJC):
+    Modified for colour-table management, specifically the reserved
+    pens are not flipped.
+
+ 1991 June 5 (MJC):
+    Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
+    than n.
+
+ 1992 March 26 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 August 5 (MJC):
+    Used new capability 18 to obtain the true number of
+    colour-table entries, which may not be a power of 2, as
+    returned by capability 14.
+
+1 LUTHILITE
+Highlights a colour table of an image-display device.
+
+Usage:
+
+   luthilite colour [device] [plane] [view]
+
+Description:
+
+   This routine adjusts the colour table of a nominated plane of
+   an IDI-supported image display, such as X-windows.  The adjustment
+   is like a highlight pen, only here it can traverse the colour
+   table, widen or thin is under mouse, joystick or trackerball
+   button control; and the colour of the highlight is arbitrary.
+   Thus particular features in an image may readily become visible.
+
+   For an Ikon or X-windows, moving the mouse left or right shifts
+   the highlight in the colour table towards lower and higher colour
+   indices respectively.  The highlight does not rotate around the
+   colour table.  Pressing the left button of the mouse reduces the
+   width of the highlight by one colour index.  Pressing the centre
+   button increases the width of the highlight by one colour index.
+   Hitting the right-hand button ends the modification of the colour
+   table.
+
+   The colour table may be viewed during its manipulation without
+   permanently altering the display memory.  The colour-table
+   display is situated via the cursor, and will disappear once the
+   highlighting is complete.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COLOUR
+COLOUR() = LITERAL (Read)
+   The colour to be used as a highlight.  It is either of these
+   alternatives.
+
+     o  A named colour from the standard colour set, which may
+     be abbreviated.  If the abbreviated name is ambiguous the
+     first match is selected.  The case of the name is ignored.
+     Some examples are "Seagreen", "Violet", and "Orchid".
+
+     o  Normalised red, green, and blue intensities separated by
+     commas or spaces.  Each value must lie in the range 0.0--1.0.
+     For example, "1.0,1.0,0.5" would give a pale yellow.
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the image-display device whose lookup table is to
+   be adjusted.  The name of the base plane should be given even
+   if the overlay lookup table is to be adjusted.
+   [Current image display]
+3 FULL
+FULL = _LOGICAL (Read)
+   If FULL is TRUE, the whole colour-table for the device is
+   may be highlighted, including the reserved pens.  When FULL
+   is FALSE, the reserved pens in the palette are unaltered.
+   [FALSE]
+3 PLANE
+PLANE = _INTEGER (Read)
+   The number of the memory plane whose lookup table is to be
+   manipulated.  If it is null the base (image) memory's lookup
+   table is adjusted.  The base memory is 0 and overlays are
+   numbered consecutively from 1.  For an Ikon the only overlay
+   plane is 1.  PLANE is only permitted to have a value in the
+   range 0 to the number of planes minus one. [0]
+3 VIEW
+VIEW = _LOGICAL (Read)
+   If TRUE the colour table is displayed during its manipulation.
+   [FALSE]
+2 Examples
+luthilite red
+   Highlights the colour table on the current image-display
+   device with a red marker.
+
+luthilite red full
+   Highlights the colour table and palette on the current
+   image-display device with a red marker.
+
+luthilite skyblue xwindows
+   Highlights the colour table on the xwindows device with a
+   sky-blue marker.
+
+luthilite [1.0,1.0,0.3] ikon 1
+   Highlights the colour table on the Ikon overlay plane in a
+   pale yellow.
+
+luthilite red view
+   Highlights the colour table on the current image-display
+   device with a red marker.  The colour table is displayed
+   during the highlighting.
+2 Notes
+-  Only Ikons and X-windows are supported.
+
+-  Initially, the highlight has a width of two colour indices,
+and it is located at the second lowest colour index.  The maximum
+width of the highlight is the larger of six and a quarter of the
+colour table, but may be narrower when there are less than 12
+colour indices.  Should the highlight prove to be unsuitable, it
+may be made invisible by reducing the width to zero.
+
+-  The rate of motion of the highlight is a function of the
+speed of cursor movement in addition to the cursor position.
+For a given cursor displacement slow motion moves the highlight
+more slowly, and faster motion moves it more rapidly.  This
+permits both fine control and swift change in the highlight's
+location.
+2 Related_Applications
+   KAPPA: LUTFLIP, LUTROT, LUTTWEAK.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1991 April 30 (MJC):
+    Original version.
+
+ 1991 June 5 (MJC):
+    Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
+    than n.
+
+ 1991 July 22 (MJC):
+    Converted RGB parameter to the more-sophisticated COLOUR.
+
+ 1991 November 15 (MJC):
+    Made exit trigger number 2.  Inceased maximum number of
+    triggers to 64.
+
+ 1991 November 21 (MJC):
+    Fixed bug so that highlight may appear in but one colour index.
+
+ 1992 February 10 (MJC):
+    Permit the highlight width to be zero.  Normalised the
+    highlight displacement by the effective number of colour
+    indices.
+
+ 1992 February 29 (MJC):
+    Added fine tuning using the cursor speed, and computed the
+    displacements in floating point to give a smoother feel.
+
+ 1992 March 26 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 August 5 (MJC):
+    Used new capability 18 to obtain the true number of
+    colour-table entries, which may not be a power of 2, as
+    returned by capability 14.
+
+ 1992 November 24 (MJC):
+    Reinstated the one-to-one correspondence between the lookup
+    table and the intensity transformation table, lost by an
+    undocumented change to X-windows driver.
+
+ 1994 April 29 (MJC):
+    Added FULL parameter.
+
+1 LUTROT
+Rotates the colour table of an image-display device.
+
+Usage:
+
+   lutrot [device] [plane]
+
+Description:
+
+   This routine rotates the colour table of a nominated plane of
+   an IDI-supported image display, such as X-windows.  The rotation
+   is under mouse, joystick or trackerball button control.
+
+   For an Ikon or X-windows, moving the mouse left or right
+   rotates the colour table towards lower and higher pen numbers
+   respectively.  Pressing the left button of the mouse resets the
+   colour table to its input state, and hitting the right-hand
+   button ends the rotation.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the image-display device whose colour table is to
+   be rotated.  The name of the base plane should be given even if
+   the overlay colour table is to be rotated.
+   [Current image-display device]
+3 FULL
+FULL = _LOGICAL (Read)
+   If FULL is TRUE, the whole colour-table for the device is
+   rotated, including the reserved pens.  When FULL is FALSE, the
+   reserved pens in the palette are unaltered.  [FALSE]
+3 PLANE
+PLANE = _INTEGER (Read)
+   The number of the memory plane whose colour table is to be
+   rotated.  If it is null the base (image) memory's colour table
+   is rotated.  The base memory is 0 and overlays are numbered
+   consecutively from 1.  For an Ikon the only overlay plane is 1.
+   PLANE is only permitted to have a value in the range 0 to the
+   number of planes minus one. [0]
+2 Examples
+lutrot
+   This enables rotation of the colour table on the current
+   image-display device.
+
+lutrot xwindows
+   This enables rotation of the colour table on the xwindows
+   device.
+
+lutrot full
+   This enables rotation of the colour table and palette on the
+   current image-display device.
+
+lutrot ikon 1
+   This enables rotation of the colour table on the Ikon overlay
+   plane.
+2 Notes
+-  Only Ikons and X-windows are supported.
+
+-  The rate of motion of the colour table is a function of the
+speed of cursor movement in addition to the cursor position.
+For a given cursor displacement slow motion rotates the colour
+table more slowly, and faster motion moves it more rapidly.  This
+permits both fine control and swift rotation.
+2 Related_Applications
+   KAPPA: LUTFLIP, LUTHILITE, LUTTWEAK.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1990 Apr 15 (MJC):
+    Original version.
+
+ 1991 April 10 (MJC):
+    Modified for colour-table management, specifically the reserved
+    pens are not rotated.
+
+ 1991 June 5 (MJC):
+    Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
+    than n.
+
+ 1991 November 15 (MJC):
+    Made exit trigger number 2.  Inceased maximum number of
+    triggers to 64.
+
+ 1992 February 10 (MJC):
+    Normalised the rotation displacement by the effective number
+    of colour indices.
+
+ 1992 February 29 (MJC):
+    Added fine tuning using the cursor speed, and computed the
+    displacements in floating point to give a smoother feel.
+
+ 1992 March 26 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 August 5 (MJC):
+    Used new capability 18 to obtain the true number of
+    colour-table entries, which may not be a power of 2, as
+    returned by capability 14.
+
+ 1994 April 29 (MJC):
+    Added FULL parameter.
+
+1 LUTTWEAK
+Tweaks a colour table of an image-display device.
+
+Usage:
+
+   luttweak [device] [plane] [view]
+
+Description:
+
+   This routine adjusts the colour table of a nominated plane of
+   an IDI-supported image display, such as X-windows.  The adjustment
+   is under mouse, joystick or trackerball button control.
+
+   For an Ikon or X-windows, moving the mouse left or right shifts
+   the colour table towards lower and higher colour indices
+   respectively.  Moving the mouse up stretches the lookup table,
+   and moving it down squashes the lookup table until it disappears,
+   then the lookup table is flipped.  If the lookup table is
+   reversed, moving down stretches, and moving up squashes.
+   Pressing the left button of the mouse resets the colour table to
+   its input state.  Pressing the centre button alters the way in
+   which a squashed lookup table is padded.  The two states are
+   white or to use the first and last colours of the input lookup
+   table, the sense depending on whether the lookup table is
+   flipped.  Hitting the right-hand button ends the modification of
+   the colour table.
+
+   The colour table may be viewed during its manipulation without
+   permanently altering the display memory.  The colour-table
+   display is situated via the cursor, and will disappear once the
+   tweaking is complete.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the image-display device whose lookup table is to
+   be adjusted.  The name of the base plane should be given even
+   if the overlay lookup table is to be adjusted.
+   [Current image-display device]
+3 FULL
+FULL = _LOGICAL (Read)
+   If FULL is TRUE, the whole colour-table for the device is
+   may be modified, including the reserved pens.  When FULL
+   is FALSE, the reserved pens in the palette are unaltered.
+   [FALSE]
+3 PLANE
+PLANE = _INTEGER (Read)
+   The number of the memory plane whose lookup table is to be
+   manipulated.  If it is null the base (image) memory's lookup
+   table is adjusted.  The base memory is 0 and overlays are
+   numbered consecutively from 1.  For an Ikon the only overlay
+   plane is 1.  PLANE is only permitted to have a value in the
+   range 0 to the number of planes minus one. [0]
+3 VIEW
+VIEW = _LOGICAL (Read)
+   If TRUE the colour table is displayed during its manipulation.
+   [FALSE]
+2 Examples
+luttweak
+   Tweaks the colour table on the current image-display device.
+
+luttweak xwindows
+   Tweaks the colour table on the xwindows device.
+
+luttweak xwindows full
+   Tweaks the colour table and palette on the xwindows device.
+
+luttweak ikon 1
+   Tweaks the colour table on the Ikon overlay plane.
+
+luttweak view
+   Tweaks the colour table on the current image-display device.
+   The colour table is displayed during the tweaking.
+2 Notes
+-  Only Ikons and X-windows are supported.
+
+-  The speed of the colour-table rotation is not linearly
+proportional to the mouse displacement; the speed of displacement
+tunes the effect so that slow motion makes a small change than
+a faster motion.  The squashing and stretching factors are also
+non-linear.
+2 Related_Applications
+   KAPPA: LUTFLIP, LUTHILITE, LUTROT.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1991 April 22 (MJC):
+    Original version.
+
+ 1991 June 5 (MJC):
+    Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
+    than n.
+
+ 1991 November 15 (MJC):
+    Made exit trigger number 2.  Inceased maximum number of
+    triggers to 64.
+
+ 1992 February 10 (MJC):
+    Normalised the rotation displacement by the effective number
+    of colour indices.
+
+ 1992 February 19 (MJC):
+    Added fine tuning using the cursor speed, and computed the
+    displacements in floating point to give a smoother feel.
+
+ 1992 March 26 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 August 5 (MJC):
+    Used new capability 18 to obtain the true number of
+    colour-table entries, which may not be a power of 2, as
+    returned by capability 14.
+
+ 1992 November 24 (MJC):
+    Reinstated the one-to-one correspondence between the lookup
+    table and the intensity transformation table, lost by an
+    undocumented change to X-windows driver.
+
+ 1994 April 29 (MJC):
+    Added FULL parameter.
+
 1 MOSAIC
     Merges several non-congruent 2-d data arrays into one output
     data array

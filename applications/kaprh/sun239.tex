@@ -907,10 +907,22 @@ KAPRH.
  Creates or manipulates an image-display lookup table using a palette.}
 \menuitem{GREYPLOT}{
  Produces a greyscale plot of a 1-d or 2-d NDF.}
+\menuitem{IDINVISIBLE}{
+ Makes memory planes of an image-display device invisible.}
+\menuitem{IDPAZO}{
+ Pans and zooms an image-display device.}
 \menuitem{INSPECT}{
  Inspects a 2-d NDF in a variety of ways.}
 \menuitem{KRHHELP}{
  Gives help about KAPRH.}
+\menuitem{LUTFLIP}{
+ Flips the colour table of an image-display device.}
+\menuitem{LUTHILITE}{
+ Highlights a colour table of an image-display device.}
+\menuitem{LUTROT}{
+ Rotates the colour table of an image-display device.}
+\menuitem{LUTTWEAK}{
+ Tweaks a colour table of an image-display device.}
 \menuitem{MOSAIC}{
  Merges several non-congruent  2-d data arrays into one output data array.}
 \menuitem{QUILT}{
@@ -2041,6 +2053,532 @@ KAPRH.
          not be type converted, but this is not expensive for the expected
          byte-type data.
       }
+   }
+}
+\sstroutine{
+   IDINVISIBLE
+}{
+   Makes memory planes of an image-display device invisible
+}{
+   \sstdescription{
+      This routine makes invisible nominated planes of an IDI-supported
+      image display, such as X-windows.
+   }
+   \sstusage{
+      idinvisible [planes] [device]
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the image-display device whose memory plane is to
+         be made invisible.  The name of the base plane should be given
+         even if an overlay plane is to be made invisible.
+         {\tt [}Current image display{\tt ]}
+      }
+      \sstsubsection{
+         PLANES() = \_INTEGER (Read)
+      }{
+         The numbers of the memory planes to be made invisible.  All
+         unspecified planes become visible.  If it is null the base
+         (image) memory is made invisible.  The base memory is 0 and
+         overlays are numbered consecutively from 1.  For an Ikon the
+         only overlay plane is 1.
+         {\tt [0]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         idinvisible [0,1]
+      }{
+         Makes only planes 0 and 1 invisible on the current image
+         display device.
+      }
+      \sstexamplesubsection{
+         idinvisible device=xwindows
+      }{
+         Makes the base plane invisible on the xwindows device.
+      }
+      \sstexamplesubsection{
+         idinvisible 1 ikon
+      }{
+         Makes the first overlay plane invisible on the Ikon device.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On some devices making a memory invisible may have the effect
+         of making other memories visible.
+
+         \sstitem
+         On the Ikon the visibilities are set to visible on start up,
+         so that any set up change introduced by an application calling
+         GKS are not lost, therefore all planes to be made invisible must
+         be given in one invocation.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: IDCLEAR, IDSTATE.
+   }
+}
+ 
+\sstroutine{
+   IDPAZO
+}{
+   Pans and zooms an image-display device
+}{
+   \sstdescription{
+      This routine pans all planes of an IDI-supported image display,
+      such as X-windows.  The zoom factor is controlled by the mouse
+      or trackerball buttons.
+
+      For an X-windows device, pressing the left button of the mouse
+      increases the zooming, the centre button reduces the zoom factor, and
+      the right-hand button ends the pan and zoom operation.
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the image-display device to be panned and zoomed.
+         The name of the base plane should be given.
+         {\tt [}Current image display{\tt ]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         idpazo xwindows
+      }{
+         Pans and zooms the xwindows device.
+      }
+      \sstexamplesubsection{
+         idpazo
+      }{
+         Pans and zooms the current image-display device.
+      }
+   }
+}
+ 
+\sstroutine{
+   LUTFLIP
+}{
+   Flips the colour table of an image-display device
+}{
+   \sstdescription{
+      This routine `flips' the colour table of a nominated plane of
+      an IDI-supported image display, such as X-windows.  The flip
+      reverses the order of the colours, so that the first colour
+      becomes the last and vice versa, {\it etc.}
+   }
+   \sstusage{
+      lutflip [device] [plane]
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the image-display device whose colour table is to
+         be flipped. The name of the base plane should be given even if
+         the overlay colour table is to be flipped.
+         {\tt [}Current image-display device{\tt ]}
+      }
+      \sstsubsection{
+         PLANE = \_INTEGER (Read)
+      }{
+         The number of the memory plane whose colour table is to be
+         flipped.  If it is null the base (image) memory's colour table
+         is reversed. The base memory is 0 and overlays are numbered
+         consecutively from 1.  For an Ikon the only overlay plane is 1.
+         PLANE is only permitted to have a value in the range 0 to the
+         number of planes minus one. {\tt [0]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         lutflip
+      }{
+         This reverses the colour table on the current image-display
+         device.
+      }
+      \sstexamplesubsection{
+         lutflip xwindows
+      }{
+         This reverses the colour table on the xwindows device.
+      }
+      \sstexamplesubsection{
+         lutflip ikon 1
+      }{
+         This flips the colour table on the Ikon overlay plane.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Only Ikons and X-windows are supported.
+
+         \sstitem
+         Reserved pens are not flipped.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LUTHILITE, LUTROT, LUTTWEAK.
+   }
+}
+\sstroutine{
+   LUTHILITE
+}{
+   Highlights a colour table of an image-display device
+}{
+   \sstdescription{
+      This routine adjusts the colour table of a nominated plane of
+      an IDI-supported image display, such as X-windows.  The adjustment
+      is like a highlight pen, only here it can traverse the colour
+      table, widen or thin is under mouse, joystick or trackerball
+      button control; and the colour of the highlight is arbitrary.
+      Thus particular features in an image may readily become visible.
+
+      For an Ikon or X-windows, moving the mouse left or right shifts
+      the highlight in the colour table towards lower and higher colour
+      indices respectively.  The highlight does not rotate around the
+      colour table.  Pressing the left button of the mouse reduces the
+      width of the highlight by one colour index.  Pressing the centre
+      button increases the width of the highlight by one colour index.
+      Hitting the right-hand button ends the modification of the colour
+      table.
+
+      The colour table may be viewed during its manipulation without
+      permanently altering the display memory.  The colour-table
+      display is situated via the cursor, and will disappear once the
+      highlighting is complete.
+   }
+   \sstusage{
+      luthilite colour [device] [plane] [view]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COLOUR() = LITERAL (Read)
+      }{
+         The colour to be used as a highlight.  It is either of these
+         alternatives.
+         \begin{itemize}
+           \item  A named colour from the standard colour set, which may
+           be abbreviated.  If the abbreviated name is ambiguous the
+           first match is selected.  The case of the name is ignored.
+           Some examples are {\tt "Seagreen"}, {\tt "Violet"}, and
+           {\tt "Orchid"}.
+
+           \item Normalised red, green, and blue intensities separated by
+           commas or spaces.  Each value must lie in the range 0.0--1.0.
+           For example, {\tt 1.0,1.0,0.5} would give a pale yellow.
+         \end{itemize}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the image-display device whose lookup table is to
+         be adjusted.  The name of the base plane should be given even
+         if the overlay lookup table is to be adjusted.
+         {\tt [}Current image-display device{\tt ]}
+      }
+      \sstsubsection{
+         FULL = \_LOGICAL (Read)
+      }{
+         If FULL is {\tt TRUE}, the whole colour-table for the device is
+         may be highlighted, including the reserved pens.  When FULL
+         is {\tt FALSE}, the reserved pens in the palette are unaltered.
+         {\tt [FALSE]}
+      }
+      \sstsubsection{
+         PLANE = \_INTEGER (Read)
+      }{
+         The number of the memory plane whose lookup table is to be
+         manipulated. If it is null the base (image) memory's lookup
+         table is adjusted.  The base memory is 0 and overlays are
+         numbered consecutively from 1.  For an Ikon the only overlay
+         plane is 1.  PLANE is only permitted to have a value in the
+         range 0 to the number of planes minus one. {\tt [0]}
+      }
+      \sstsubsection{
+         VIEW = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} the colour table is displayed during its manipulation.
+         {\tt [FALSE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         luthilite red
+      }{
+         Highlights the colour table on the current image-display
+         device with a red marker.
+      }
+      \sstexamplesubsection{
+         luthilite red full
+      }{
+         Highlights the colour table and palette on the current
+         image-display device with a red marker.
+      }
+      \sstexamplesubsection{
+         luthilite skyblue xwindows
+      }{
+         Highlights the colour table on the xwindows device with a
+         sky-blue marker.
+      }
+      \sstexamplesubsection{
+         luthilite [1.0,1.0,0.3] ikon 1
+      }{
+         Highlights the colour table on the Ikon overlay plane in a
+         pale yellow.
+      }
+      \sstexamplesubsection{
+         luthilite red view
+      }{
+         Highlights the colour table on the current image-display
+         device with a red marker.  The colour table is displayed
+         during the highlighting.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Only Ikons and X-windows are supported.
+
+         \sstitem
+         Initially, the highlight has a width of two colour indices,
+         and it is located at the second lowest colour index.  The maximum
+         width of the highlight is the larger of six and a quarter of the
+         colour table, but may be narrower when there are less than 12
+         colour indices.  Should the highlight prove to be unsuitable, it
+         may be made invisible by reducing the width to zero.
+
+         \sstitem
+         The rate of motion of the highlight is a function of the
+         speed of cursor movement in addition to the cursor position.
+         For a given cursor displacement slow motion moves the highlight
+         more slowly, and faster motion moves it more rapidly.  This
+         permits both fine control and swift change in the highlight's
+         location.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LUTFLIP, LUTROT, LUTTWEAK.
+   }
+}
+\sstroutine{
+   LUTROT
+}{
+   Rotates the colour table of an image-display device
+}{
+   \sstdescription{
+      This routine rotates the colour table of a nominated plane of
+      an IDI-supported image display, such as X-windows. The rotation
+      is under mouse, joystick or trackerball button control.
+
+      For an Ikon or X-windows, moving the mouse left or right
+      rotates the colour table towards lower and higher pen numbers
+      respectively.  Pressing the left button of the mouse resets the
+      colour table to its input state, and hitting the right-hand
+      button ends the rotation.
+   }
+   \sstusage{
+      lutrot [device] [plane]
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the image-display device whose colour table is to
+         be rotated.  The name of the base plane should be given even if
+         the overlay colour table is to be rotated.
+         {\tt [}Current image-display device{\tt ]}
+      }
+      \sstsubsection{
+         FULL = \_LOGICAL (Read)
+      }{
+         If FULL is {\tt TRUE}, the whole colour-table for the device is
+         rotated, including the reserved pens.  When FULL is {\tt FALSE},
+         the reserved pens in the palette are unaltered. 
+         {\tt [FALSE]}
+      }
+      \sstsubsection{
+         PLANE = \_INTEGER (Read)
+      }{
+         The number of the memory plane whose colour table is to be
+         rotated. If it is null the base (image) memory's colour table
+         is rotated. The base memory is 0 and overlays are numbered
+         consecutively from 1.  For an Ikon the only overlay plane is 1.
+         PLANE is only permitted to have a value in the range 0 to the
+         number of planes minus one. {\tt [0]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         lutrot
+      }{
+         This enables rotation of the colour table on the current
+         image-display device.
+      }
+      \sstexamplesubsection{
+         lutrot xwindows
+      }{
+         This enables rotation of the colour table on the xwindows
+         device.
+      }
+      \sstexamplesubsection{
+         lutrot full
+      }{
+         This enables rotation of the colour table and palette on the
+         current image-display device.
+      }
+      \sstexamplesubsection{
+         lutrot ikon 1
+      }{
+         This enables rotation of the colour table on the Ikon overlay
+         plane.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Only Ikons and X-windows are supported.
+
+         \sstitem
+         The rate of motion of the colour table is a function of the
+         speed of cursor movement in addition to the cursor position.
+         For a given cursor displacement slow motion rotates the colour
+         table more slowly, and faster motion moves it more rapidly.  This
+         permits both fine control and swift rotation.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LUTFLIP, LUTHILITE, LUTTWEAK.
+   }
+}
+\sstroutine{
+   LUTTWEAK
+}{
+   Tweaks a colour table of an image-display device
+}{
+   \sstdescription{
+      This routine adjusts the colour table of a nominated plane of
+      an IDI-supported image display, such as X-windows.  The adjustment
+      is under mouse, joystick or trackerball button control.
+
+      For an Ikon or X-windows, moving the mouse left or right shifts
+      the colour table towards lower and higher colour indices
+      respectively.  Moving the mouse up stretches the lookup table,
+      and moving it down squashes the lookup table until it disappears,
+      then the lookup table is flipped.  If the lookup table is
+      reversed, moving down stretches, and moving up squashes.
+      Pressing the left button of the mouse resets the colour table to
+      its input state.  Pressing the centre button alters the way in
+      which a squashed lookup table is padded.  The two states are
+      white or to use the first and last colours of the input lookup
+      table, the sense depending on whether the lookup table is
+      flipped.  Hitting the right-hand button ends the modification of
+      the colour table.
+
+      The colour table may be viewed during its manipulation without
+      permanently altering the display memory.  The colour-table
+      display is situated via the cursor, and will disappear once the
+      tweaking is complete.
+   }
+   \sstusage{
+      luttweak [device] [plane] [view]
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the image-display device whose lookup table is to
+         be adjusted.  The name of the base plane should be given even
+         if the overlay lookup table is to be adjusted.
+         {\tt [}Current image-display device{\tt ]}
+      }
+      \sstsubsection{
+         FULL = \_LOGICAL (Read)
+      }{
+         If FULL is {\tt TRUE}, the whole colour-table for the device is
+         may be modified, including the reserved pens.  When FULL
+         is {\tt FALSE}, the reserved pens in the palette are unaltered.
+         {\tt [FALSE]}
+      }
+      \sstsubsection{
+         PLANE = \_INTEGER (Read)
+      }{
+         The number of the memory plane whose lookup table is to be
+         manipulated.  If it is null the base (image) memory's lookup
+         table is adjusted.  The base memory is 0 and overlays are
+         numbered consecutively from 1.  For an Ikon the only overlay
+         plane is 1.  PLANE is only permitted to have a value in the
+         range 0 to the number of planes minus one. {\tt [0]}
+      }
+      \sstsubsection{
+         VIEW = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} the colour table is displayed during its manipulation.
+         {\tt [FALSE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         luttweak
+      }{
+         Tweaks the colour table on the current image-display device.
+      }
+      \sstexamplesubsection{
+         luttweak xwindows
+      }{
+         Tweaks the colour table on the xwindows device.
+      }
+      \sstexamplesubsection{
+         luttweak xwindows full
+      }{
+         Tweaks the colour table and palette on the xwindows device.
+      }
+      \sstexamplesubsection{
+         luttweak ikon 1
+      }{
+         Tweaks the colour table on the Ikon overlay plane.
+      }
+      \sstexamplesubsection{
+         luttweak view
+      }{
+         Tweaks the colour table on the current image-display device.
+         The colour table is displayed during the tweaking.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Only Ikons and X-windows are supported.
+
+         \sstitem
+         The speed of the colour-table rotation is not linearly
+         proportional to the mouse displacement; the speed of displacement
+         tunes the effect so that slow motion makes a small change than
+         a faster motion.  The squashing and stretching factors are also
+         non-linear.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LUTFLIP, LUTHILITE, LUTROT.
    }
 }
 \sstroutine{

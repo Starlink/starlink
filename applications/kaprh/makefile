@@ -447,7 +447,8 @@ F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(MONO_SOURCE) 
 
 KAPRH_F1_ROUTINES = crelut.f greyplot.f contover.f snapshot.f turbocont.f inspect.f \
-mosaic.f quilt.f
+mosaic.f quilt.f lutflip.f luthilite.f lutrot.f luttweak.f idinvisible.f \
+idpazo.f idinvisible.f idpazo.f
 
 #  Kappa f files for which there are no corresponding iraf .par files.
 KAPRH_F2_ROUTINES = krhhelp.f
@@ -463,7 +464,7 @@ kps1_imzbo.f lccell.f ncraxs.f kps1_ncuco.f kps1_clpal.f cntkey.f \
 kps1_hstcb.f kps1_hstcr.f kps1_hstcw.f kps1_hstcd.f kps1_hstcub.f \
 kps1_hstci.f kps1_hstcuw.f getv2.f hstrep.f inpe.f insl.f inxy.f peepsb.f \
 hstdsp.f imlst.f inpol.f linplt.f slc2t1.f hstlo.f inhi.f inre.f \
-inva.f linset.f thrsr.f mfnext.f mfopen.f moscad.f moscdv.f
+kps1_lutwk.f inva.f linset.f thrsr.f mfnext.f mfopen.f moscad.f moscdv.f
 
 MONO_SOURCE = kaprh_mon.f
 
@@ -1673,13 +1674,15 @@ cnthlt.o:	 SAE_PAR
 cntkey.o:	 SAE_PAR
 cntsbp.o:	 SAE_PAR
 contover.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR NDF_PAR NDF_ERR GKS_PAR
+crelut.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR CTM_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 gethlp.o:	 SAE_PAR HLPCMD
 getv2.o:	 SAE_PAR
-crelut.o:        SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR CTM_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
 hstdsp.o:	 SAE_PAR
 hstlo.o:	 SAE_PAR
 hstrep.o:	 SAE_PAR
+idinvisible.o:	 SAE_PAR IDI_ERR PAR_ERR
+idpazo.o:	 SAE_PAR IDI_PAR IDI_ERR
 imlst.o:	 SAE_PAR PRM_PAR
 inhi.o:	 SAE_PAR DAT_PAR PAR_ERR
 inpe.o:	 SAE_PAR PAR_ERR
@@ -1690,32 +1693,25 @@ inspect.o:	 SAE_PAR DAT_PAR PRM_PAR SUBPAR_PAR PAR_ERR NDF_PAR NDF_ERR
 inva.o:	 SAE_PAR PRM_PAR PAR_ERR
 inxy.o:	 SAE_PAR PRM_PAR PAR_ERR FIO_PAR FIO_ERR
 kaprh_mon.o:	 SAE_PAR
-kps1_hstcb.f:    SAE_PAR
-kps1_hstcr.f:    SAE_PAR
-kps1_hstcw.f:    SAE_PAR
-kps1_hstcd.f:    SAE_PAR
-kps1_hstcub.f:   SAE_PAR
-kps1_hstci.f:    SAE_PAR
-kps1_hstcuw.f:   SAE_PAR
-kps1_clpal.o:	 SAE_PAR 
+kps1_clpal.o:	 SAE_PAR
 kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cntur.o:	 SAE_PAR PRM_PAR
-kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dscld.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dscli.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dsclr.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dsclw.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
 kps1_fainb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_faind.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_faini.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_imzbo.o:	 SAE_PAR
+kps1_lutwk.o:	 SAE_PAR
 kps1_ncuco.o:	 SAE_PAR
 krhhelp.o:	 SAE_PAR PAR_ERR
 lccell.o:	 SAE_PAR PRM_PAR
 linplt.o:	 SAE_PAR
 linset.o:	 SAE_PAR
+lutflip.o:	 SAE_PAR CTM_PAR IDI_ERR PAR_ERR
+luthilite.o:	 SAE_PAR DAT_PAR CTM_PAR IDI_PAR IDI_ERR PAR_ERR
+lutrot.o:	 SAE_PAR DAT_PAR CTM_PAR IDI_PAR IDI_ERR PAR_ERR
+luttweak.o:	 SAE_PAR DAT_PAR CTM_PAR IDI_PAR IDI_ERR PAR_ERR
 mfnext.o:	 SAE_PAR DAT_PAR
 mfopen.o:	 SAE_PAR DAT_PAR
 mosaic.o:	 SAE_PAR DAT_PAR PAR_ERR

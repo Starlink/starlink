@@ -115,11 +115,29 @@
          ELSE IF ( NAME .EQ. 'GREYPLOT' ) THEN
             CALL GREYPLOT ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'IDINVISIBLE' ) THEN
+            CALL IDINVISIBLE ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'IDPAZO' ) THEN
+            CALL IDPAZO ( STATUS )
+
          ELSE IF ( NAME .EQ. 'INSPECT' ) THEN
             CALL INSPECT ( STATUS )
 
          ELSE IF ( NAME .EQ. 'KRHHELP' ) THEN
             CALL KRHHELP ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'LUTFLIP' ) THEN
+            CALL LUTFLIP ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'LUTHILITE' ) THEN
+            CALL LUTHILITE ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'LUTROT' ) THEN
+            CALL LUTROT ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'LUTTWEAK' ) THEN
+            CALL LUTTWEAK ( STATUS )
 
          ELSE IF ( NAME .EQ. 'MOSAIC' ) THEN
             CALL MOSAIC ( STATUS )
