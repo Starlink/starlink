@@ -68,24 +68,35 @@
       CHARACTER*(DAT__SZLOC)   PLOC                    ! Input dataset PSF
       CHARACTER*(DAT__SZLOC)   SLOC                    ! Spatial response
 
+      INTEGER			FLID
       INTEGER                  LIBID,MODID             ! Library/routine codes
 
       LOGICAL                  GOOD_PSF                ! Found a valid PSF
+      LOGICAL			ISHDS			! Input is HDS file?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Extract locator from ADI
-      CALL ADI1_GETLOC( FID, LOC, STATUS )
+*  Is linked object derived from HDS
+      CALL ADI_DERVD( FID, 'HDSfile', ISHDS, STATUS )
+      IF ( .NOT. ISHDS ) THEN
+        CALL ADI_GETLINK( FID, FLID, STATUS )
+        CALL ADI_DERVD( FLID, 'HDSfile', ISHDS, STATUS )
+      END IF
 
-*    Initialise
+*  Initialise
       GOOD_PSF = .FALSE.
 
-*    Allocate slot
+*  Allocate slot
       CALL PSF_GETSLOT( FID, SLOT, STATUS )
 
-*    Does the dataset have an attached spatial response?
+*  Does the dataset have an attached spatial response?
+      IF ( ISHDS ) THEN
+
+*    Extract locator from ADI
+        CALL ADI1_GETLOC( FID, LOC, STATUS )
+
       CALL HDX_FIND( LOC, 'MORE.ASTERIX.SPATIAL_RESP', SLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -125,6 +136,7 @@
         END IF
 
       END IF
+      END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Good psf? Check that the routine exists
@@ -136,7 +148,7 @@
         END IF
       END IF
 
-*    Set sensible default for PSF parameter, and query user
+*  Set sensible default for PSF parameter, and query user
       IF ( GOOD_PSF ) THEN
         IF ( RNAME(1:4) .EQ. 'PSF_' ) THEN
           CALL PSF_PROMPT( .TRUE., RNAME(5:), SLOT, STATUS )
@@ -147,10 +159,10 @@
         CALL PSF_PROMPT( .TRUE., 'ANAL', SLOT, STATUS )
       END IF
 
-*    Initialise
+*  Initialise
       CALL PSF_SLOTINIT( SLOT, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_ASSOCI', STATUS )
       END IF

@@ -125,8 +125,8 @@
 *        Now use USI for user interface
 *     28 Mar 1995 V1.8-1 (DJA):
 *        Use new data interface
-*     12 Sep 1995 V2.0-0 (DJA):
-*        Full ADI port
+*      3 Oct 1995 V2.0-0 (DJA):
+*        Full ADI port. Only create quality if new bad points.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -164,6 +164,7 @@
       INTEGER			IMASK			! Quality mask
       INTEGER                   LEVELS                ! Levels of input
       INTEGER                   LEVELSO               ! Levels of Output
+      INTEGER			NBAD			! New bad points
       INTEGER                   NELM                  ! # input data values
       INTEGER			OFID		      ! Output dataset id
       INTEGER                	QPTR                  ! Output quality
@@ -240,7 +241,7 @@
           CALL BDI_MAPD( OFID, 'Variance', 'UPDATE', VPTR, STATUS )
         END IF
 
-*      And quality
+*    And quality
         CALL BDI_CHK( OFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
           CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'UPDATE', QPTR,
@@ -249,12 +250,10 @@
           MASK = IMASK
 
         ELSE
-          CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', QPTR,
-     :                  STATUS )
+          CALL DYN_MAPB( 1, NELM, QPTR, STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
           MASK = QUAL__MASK
           IMASK = MASK
-          CALL BDI_PUT0I( OFID, 'QualityMask', MASK, STATUS )
         END IF
 
       END IF
@@ -296,6 +295,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Perform the operations
+      NBAD = 0
       IF ( OPER(1:1) .EQ. '-' ) THEN
         CALL OPERATE_MINUS( NELM, %VAL(DPTR), STATUS )
 
@@ -304,24 +304,31 @@
 
       ELSE IF ( OPER(1:5) .EQ. 'LOG10' ) THEN
         CALL OPERATE_LOG10( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                                   MASK, %VAL(QPTR), STATUS )
+     :                             MASK, %VAL(QPTR), NBAD, STATUS )
 
       ELSE IF ( OPER(1:3) .EQ. 'LOG' )   THEN
         CALL OPERATE_LOG( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                                 MASK, %VAL(QPTR), STATUS )
+     :                           MASK, %VAL(QPTR), NBAD, STATUS )
 
       ELSE IF ( OPER(1:4) .EQ. 'SQRT' )  THEN
         CALL OPERATE_SQRT( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                                  MASK, %VAL(QPTR), STATUS )
+     :                            MASK, %VAL(QPTR), NBAD, STATUS )
 
       ELSE IF ( OPER(1:3) .EQ. 'EXP' )   THEN
         CALL OPERATE_EXP( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                               MASK, %VAL(QPTR), STATUS )
+     :                           MASK, %VAL(QPTR), NBAD, STATUS )
 
       ELSE IF ( OPER(1:4) .EQ. '10**' )  THEN
         CALL OPERATE_ANTILOG10( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                                       MASK, %VAL(QPTR), STATUS )
+     :                                MASK, %VAL(QPTR), NBAD, STATUS )
 
+      END IF
+
+*  Write quality if new bad points, and it didn't exist in input
+      IF ( (NBAD.GT.0) .AND. .NOT. QOK ) THEN
+        CALL BDI_PUT( OFID, 'Quality', 'UBYTE', 1, NELM, %VAL(QPTR),
+     :                STATUS )
+        CALL BDI_PUT0I( OFID, 'QualityMask', MASK, STATUS )
       END IF
 
 *  Amend data label if present
@@ -348,6 +355,11 @@
 *  Release dynamic output errors if used
       IF ( PRIM .AND. ERR ) THEN
         CALL DYN_UNMAP( VPTR, STATUS )
+      END IF
+
+*  Release dynamic quality
+      IF ( .NOT. QOK ) THEN
+        CALL DYN_UNMAP( QPTR, STATUS )
       END IF
 
 *  Tidy up and exit
@@ -429,7 +441,7 @@
 
 *+  OPERATE_LOG10 - Log to the base 10
       SUBROUTINE OPERATE_LOG10( VAROK, QOK, NDAT, DATA, VAR, MASK, QUAL,
-     :                                                          STATUS )
+     :                                                  NEWBAD, STATUS )
 *    Description :
 *     DATA(I) = LOG10(DATA(I))
 *     VAR(I)  = LOG10(e)**2 * (1.0/DATA(I)**2) * VAR(I)
@@ -459,6 +471,8 @@
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
+      INTEGER                NEWBAD
+
 *    Status :
       INTEGER                STATUS
 *    Functions :
@@ -468,17 +482,16 @@
          PARAMETER         ( C = 0.1886116969479110 )
 *    Local variables :
       INTEGER                I
-      INTEGER                OLDBADQUAL
-      INTEGER                NEWBADQUAL
+      INTEGER                OLDBAD
       INTEGER                BAD
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      OLDBADQUAL = 0
-      NEWBADQUAL = 0
-      BAD        = 0
+      OLDBAD = 0
+      NEWBAD = 0
+      BAD = 0
 
       DO I = 1, NDAT
         IF ( QOK ) THEN
@@ -490,12 +503,12 @@
               DATA(I) = LOG10( DATA(I) )
 
             ELSE
-              NEWBADQUAL = NEWBADQUAL + 1
+              NEWBAD = NEWBAD + 1
               QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
 
             END IF
           ELSE
-            OLDBADQUAL =OLDBADQUAL + 1
+            OLDBAD = OLDBAD + 1
 
           END IF
         ELSE
@@ -504,19 +517,20 @@
 
           ELSE
             BAD     = BAD + 1
+            NEWBAD = NEWBAD + 1
             DATA(I) = VAL__MIND
 
           END IF
         END IF
       END DO
 
-      IF ( OLDBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', OLDBADQUAL )
+      IF ( OLDBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', OLDBAD )
         CALL MSG_PRNT( '^BAD data points excluded by QUALITY' )
       END IF
 
-      IF ( NEWBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', NEWBADQUAL )
+      IF ( NEWBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', NEWBAD )
         CALL MSG_PRNT( '^BAD NEW bad quality points (data <= 0)' )
       END IF
 
@@ -531,7 +545,7 @@
 
 *+  OPERATE_LOG - Natural Log
       SUBROUTINE OPERATE_LOG( VAROK, QOK, NDAT, DATA, VAR,
-     :                                 MASK, QUAL, STATUS)
+     :                                 MASK, QUAL, NEWBAD, STATUS)
 *    Description :
 *     DATA(I) = LOG(DATA(I))
 *     VAR(I)  = ( 1.0/DATA(I) )**2 * VAR(I)
@@ -561,22 +575,22 @@
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
+      INTEGER                NEWBAD
 *    Status :
       INTEGER                STATUS
 *    Functions :
       BYTE		     BIT_ORUB
 *    Local variables :
       INTEGER                I
-      INTEGER                OLDBADQUAL
-      INTEGER                NEWBADQUAL
+      INTEGER                OLDBAD
       INTEGER                BAD
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      OLDBADQUAL = 0
-      NEWBADQUAL = 0
+      OLDBAD = 0
+      NEWBAD = 0
       BAD        = 0
 
       IF ( QOK ) THEN
@@ -589,12 +603,12 @@
               DATA(I) = LOG( DATA(I) )
 
             ELSE
-              NEWBADQUAL = NEWBADQUAL + 1
+              NEWBAD = NEWBAD + 1
               QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
 
             END IF
           ELSE
-            OLDBADQUAL = OLDBADQUAL + 1
+            OLDBAD = OLDBAD + 1
 
           END IF
         END DO
@@ -604,6 +618,7 @@
             DATA(I) = LOG( DATA(I) )
 
           ELSE
+            NEWBAD = NEWBAD + 1
             BAD     = BAD + 1
             DATA(I) = VAL__MIND
 
@@ -611,13 +626,13 @@
         END DO
       END IF
 
-      IF ( OLDBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', OLDBADQUAL )
+      IF ( OLDBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', OLDBAD )
         CALL MSG_PRNT( '^BAD data points excluded by QUALITY' )
       END IF
 
-      IF ( NEWBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', NEWBADQUAL )
+      IF ( NEWBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', NEWBAD )
         CALL MSG_PRNT( '^BAD NEW bad quality points (data <= 0)' )
       END IF
 
@@ -631,8 +646,8 @@
 
 
 *+  OPERATE_SQRT - Square root
-      SUBROUTINE OPERATE_SQRT(VAROK, QOK, NDAT, DATA, VAR, MASK,
-     :                                             QUAL, STATUS)
+      SUBROUTINE OPERATE_SQRT( VAROK, QOK, NDAT, DATA, VAR, MASK,
+     :                         QUAL, BAD, STATUS )
 *    Description :
 *     DATA(I) = SQRT(DATA(I)) if DATA(I) > 0.0
 *     DATA(I) = 0.0 otherwise
@@ -662,12 +677,12 @@
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
+      INTEGER                BAD
 *    Status :
       INTEGER                STATUS
 *    Local variables :
       INTEGER                I
-      INTEGER                OLDBADQUAL
-      INTEGER                BAD
+      INTEGER                OLDBAD
 
       DOUBLE PRECISION       TEMP
 *-
@@ -675,7 +690,7 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      OLDBADQUAL = 0
+      OLDBAD = 0
       BAD        = 0
 
       IF ( QOK ) THEN
@@ -705,7 +720,7 @@
 
             END IF
           ELSE
-            OLDBADQUAL = OLDBADQUAL + 1
+            OLDBAD = OLDBAD + 1
 
           END IF
         END DO
@@ -722,8 +737,8 @@
         END DO
       END IF
 
-      IF ( OLDBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', OLDBADQUAL )
+      IF ( OLDBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', OLDBAD )
         CALL MSG_PRNT( '^BAD data points excluded by QUALITY' )
       END IF
 
@@ -738,7 +753,7 @@
 
 *+  OPERATE_EXP - e**(DATA)
       SUBROUTINE OPERATE_EXP( VAROK, QOK, NDAT, DATA, VAR, MASK,
-     :                                             QUAL, STATUS)
+     :                                    QUAL, NEWBAD, STATUS )
 *    Description :
 *     DATA(I) = EXP(DATA(I)) for DATA(I) < 88.0288
 *     VAR(I)  = VAR(I) * EXP( 2.0 * DATA(I) ) for DATA(I) < 40
@@ -779,16 +794,16 @@
          PARAMETER         ( MAX2 = 1.3D19 )
 *    Local variables :
       INTEGER                I
-      INTEGER                OLDBADQUAL
-      INTEGER                NEWBADQUAL
+      INTEGER                OLDBAD
+      INTEGER                NEWBAD
       INTEGER                BAD
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      OLDBADQUAL = 0
-      NEWBADQUAL = 0
+      OLDBAD = 0
+      NEWBAD = 0
       BAD        = 0
 
       IF ( QOK ) THEN
@@ -802,18 +817,18 @@
                   VAR(I) = VAR(I) * DATA(I) * DATA(I)
 
                 ELSE
-                  NEWBADQUAL = NEWBADQUAL + 1
+                  NEWBAD = NEWBAD + 1
                   QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
 
                 END IF
               END IF
             ELSE
-              NEWBADQUAL = NEWBADQUAL + 1
+              NEWBAD = NEWBAD + 1
               QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
 
             END IF
           ELSE
-            OLDBADQUAL = OLDBADQUAL + 1
+            OLDBAD = OLDBAD + 1
 
           END IF
         END DO
@@ -825,18 +840,19 @@
           ELSE
             DATA(I) = VAL__MAXD
             BAD = BAD + 1
+            NEWBAD = NEWBAD + 1
 
           END IF
         END DO
       END IF
 
-      IF ( OLDBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', OLDBADQUAL )
+      IF ( OLDBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', OLDBAD )
         CALL MSG_PRNT( '^BAD data points excluded by QUALITY' )
       END IF
 
-      IF ( NEWBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', NEWBADQUAL )
+      IF ( NEWBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', NEWBAD )
         CALL MSG_PRNT( '^BAD NEW bad quality points (too big)' )
       END IF
 
@@ -852,7 +868,7 @@
 
 *+  OPERATE_ANTILOG10 - ANTILOG base 10
       SUBROUTINE OPERATE_ANTILOG10( VAROK, QOK, NDAT, DATA, VAR, MASK,
-     :                                                  QUAL, STATUS )
+     :                                          QUAL, NEWBAD, STATUS )
 *    Description :
 *     DATA(I) = 10**(DATA(I))
 *     VAR(I)  = VAR(I) * LOG10(e)**2 * 10**( 2.0 * DATA(I) )
@@ -882,6 +898,7 @@
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
+      INTEGER                NEWBAD
 *    Status :
       INTEGER                STATUS
 *    Functions :
@@ -897,16 +914,15 @@
          PARAMETER         ( C3 = 5.301898110478398 )
 *    Local variables :
       INTEGER                I
-      INTEGER                OLDBADQUAL
-      INTEGER                NEWBADQUAL
+      INTEGER                OLDBAD
       INTEGER                BAD
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      OLDBADQUAL = 0
-      NEWBADQUAL = 0
+      OLDBAD = 0
+      NEWBAD = 0
       BAD        = 0
 
       IF ( QOK ) THEN
@@ -918,7 +934,7 @@
                   VAR(I) = C3 * VAR(I) * EXP( DATA(I) * C2 )
 
                 ELSE
-                  NEWBADQUAL = NEWBADQUAL + 1
+                  NEWBAD = NEWBAD + 1
                   QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
 
                 END IF
@@ -926,12 +942,12 @@
               DATA(I) = 10**( DATA(I) )
 
             ELSE
-              NEWBADQUAL = NEWBADQUAL + 1
-              QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
+              NEWBAD = NEWBAD + 1
+              QUAL(I) = BIT_ORUB(QUAL(I),QUAL__ARITH)
 
             END IF
           ELSE
-            OLDBADQUAL = OLDBADQUAL + 1
+            OLDBAD = OLDBAD + 1
 
           END IF
         END DO
@@ -942,17 +958,18 @@
           ELSE
             DATA(I) = VAL__MAXD
             BAD     = BAD + 1
+            NEWBAD = NEWBAD + 1
           END IF
         END DO
       END IF
 
-      IF ( OLDBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', OLDBADQUAL )
+      IF ( OLDBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', OLDBAD )
         CALL MSG_PRNT( '^BAD data points excluded by QUALITY' )
       END IF
 
-      IF ( NEWBADQUAL .GT. 0 ) THEN
-        CALL MSG_SETI( 'BAD', NEWBADQUAL )
+      IF ( NEWBAD .GT. 0 ) THEN
+        CALL MSG_SETI( 'BAD', NEWBAD )
         CALL MSG_PRNT( '^BAD NEW bad quality points (too big)' )
       END IF
 
