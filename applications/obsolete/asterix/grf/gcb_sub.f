@@ -1271,8 +1271,8 @@
      :                               0,G_CSIZ(NSTRUC,NCOMP),SID,STATUS)
           ENDDO
 *  and add one quantity to say which element of the structure is stored
-          CALL NBS_DEFINE_PRIMITIVE(ID,G_STNAME(NSTRUC),'_INTEGER',
-     :                                        0,VAL__NBI,SID,STATUS)
+c          CALL NBS_DEFINE_PRIMITIVE(ID,G_STNAME(NSTRUC),'_INTEGER',
+c     :                                        0,VAL__NBI,SID,STATUS)
         ENDDO
 
       ENDIF
@@ -1323,16 +1323,16 @@
         ENDDO
 
 
-        DO NSTRUC=1,G_NSTRUC
-          CALL NBS_FIND_ITEM(ID,G_STNAME(NSTRUC),ITEMID,STATUS)
-          CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,ZERO,STATUS)
-          DO NCOMP=1,G_NCOMP(NSTRUC)
-            CALL NBS_FIND_ITEM(ID,G_CNAME(NSTRUC,NCOMP),ITEMID,STATUS)
-            L=G_CSIZ(NSTRUC,NCOMP)
-            BUFFER=' '
-            CALL NBS_PUT_CVALUE(ITEMID,0,BUFFER(:L),STATUS)
-          ENDDO
-        ENDDO
+c        DO NSTRUC=1,G_NSTRUC
+c          CALL NBS_FIND_ITEM(ID,G_STNAME(NSTRUC),ITEMID,STATUS)
+c          CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,ZERO,STATUS)
+c          DO NCOMP=1,G_NCOMP(NSTRUC)
+c            CALL NBS_FIND_ITEM(ID,G_CNAME(NSTRUC,NCOMP),ITEMID,STATUS)
+c            L=G_CSIZ(NSTRUC,NCOMP)
+c            BUFFER=' '
+c            CALL NBS_PUT_CVALUE(ITEMID,0,BUFFER(:L),STATUS)
+c          ENDDO
+c        ENDDO
 
       ENDIF
 
