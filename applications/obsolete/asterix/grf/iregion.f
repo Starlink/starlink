@@ -77,7 +77,7 @@
             CALL IMG_SETWHOLE(STATUS)
             MERGE=.FALSE.
             CALL ARX_RESET(I_ARD_ID,STATUS)
-           ELSE
+          ELSE
 *  otherwise save current region mask and get memory to store new stuff
             RPTR=I_REG_PTR
             CALL DYN_MAPB(1,I_NX*I_NY,I_REG_PTR,STATUS)
@@ -98,7 +98,7 @@
 
 
           IF (MODE.EQ.'CIR') THEN
-            CALL IREGION_CIRCLE(EXCLUDE,STATUS)
+            CALL IREGION_CIRCLE(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'BOX') THEN
             CALL IREGION_BOX(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'POL') THEN
@@ -197,7 +197,7 @@
 
 
 *+
-      SUBROUTINE IREGION_CIRCLE(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_CIRCLE(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -212,6 +212,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
 *    Status :
@@ -230,10 +231,18 @@
         CALL IMG_GETCIRC('XC','YC','RAD',XC,YC,RAD,STATUS)
         CALL IMG_SETCIRC(XC,YC,RAD,EXCLUDE,STATUS)
 
-        IF (EXCLUDE) THEN
-          TEXT=' .NOT. (CIRCLE( '
+        IF (MODE.EQ.'AND') THEN
+          TEXT=' .AND.'
+          L=7
         ELSE
-          TEXT=' CIRCLE( '
+          TEXT=' '
+          L=1
+        ENDIF
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)=' .NOT. (CIRCLE( '
+        ELSE
+          TEXT(L:)=' CIRCLE( '
         ENDIF
         L=CHR_LEN(TEXT)
 
