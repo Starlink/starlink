@@ -156,6 +156,18 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Initialise pointers
+      FITDATA_PTR = 0
+      FITDATA_END = 0
+      X_PTR = 0
+      X_END = 0
+      WEIGHT_PTR = 0
+      WEIGHT_END = 0
+      R_PTR = 0
+      R_END = 0
+      A_PTR = 0
+      A_END = 0
+
 *     Calculate size of workspace
 *     Assume baseline region is the chop throw at each end
 
