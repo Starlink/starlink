@@ -270,7 +270,7 @@
       CALL SEDIT_LISTPAR( MFID, NPAR, PCOMP, PPAR, 6, STATUS )
 
 *    Select parameters for grid axes
-      CALL USI_GET1I( 'PARS', ADI__MXDIM, GPS, NGRIDAX, STATUS )
+      CALL PRS_GETLIST( 'PARS', ADI__MXDIM, GPS, NGRIDAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check free parameters

@@ -143,7 +143,7 @@
 *    Select axes to flip if NDIM > 1
       IF ( NDIM .GT. 1 ) THEN
         NSEL = 0
-        CALL USI_GET1I( 'SELAX', NDIM, SELAX, NSEL, STATUS )
+        CALL PRS_GETLIST( 'SELAX', NDIM, SELAX, NSEL, STATUS )
         IF ( ( STATUS .NE. SAI__OK ) .OR. ( NSEL .EQ. 0 ) ) GOTO 99
       ELSE
         NSEL = 1
