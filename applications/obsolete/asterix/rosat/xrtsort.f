@@ -630,8 +630,9 @@
         DO LOOP2=1,SRT.NTIME
           IF ( SRT.MIN_T(LOOP2) .LT. HEAD.TEND(LOOP) .AND.
      :          SRT.MAX_T(LOOP2) .GT. HEAD.TSTART(LOOP)) THEN
-            EXPO_TIM = EXPO_TIM + (MIN(HEAD.TEND(LOOP), SRT.MAX_T(LOOP2))
-     :                    - MAX (HEAD.TSTART(LOOP), SRT.MIN_T(LOOP2)))
+            EXPO_TIM = EXPO_TIM +
+     :                 ( MIN( HEAD.TEND(LOOP), SRT.MAX_T(LOOP2) ) -
+     :                   MAX( HEAD.TSTART(LOOP), SRT.MIN_T(LOOP2) ) )
           ENDIF
         ENDDO
       ENDDO
