@@ -392,7 +392,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5-6
+PKG_VERS = 0.5-7
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -400,7 +400,8 @@ PKG_VERS = 0.5-6
 #  script and any documentation files).
 
 #  List of the source files bundled into the export_source distribution
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk VERSION $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk VERSION $(DOCUMENTATION) \
+	$(MATCHPROG).tar
 
 #  Source directory for catlib is ./catlib; the directory it's
 #  installed into is CATLIBINSTALLDIR.  May be relative to current
@@ -466,7 +467,13 @@ XML_DOCS = sun242.xml
 
 #  List of documentation files.
 DOCUMENTATION = $(PKG_NAME).news \
-	$(HYPERTEXT_TARBALL) $(LATEX_TARBALL) $(XML_DOCS)
+	$(HYPERTEXT_TARBALL) $(LATEX_TARBALL) $(XML_DOCS) \
+	LICENCE
+
+# If $(MATCHPROG).tar.gz is present in the directory where the
+# distribution is prepared, then it will be included in the autoastrom
+# distribution tarball, and installed.
+MATCHPROG=match-0.7
 
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -490,7 +497,7 @@ DOCUMENTATION = $(PKG_NAME).news \
 #BUILT_FILES = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES) \
 #$(OBJECT) $(SHAREABLE_LIBRARIES) $(PUBLIC_DATA) $(STARTUP_SCRIPT) \
 #$(FAC_ERRS)
-BUILT_FILES = moggy/moggy astrom/astrom.x
+BUILT_FILES = moggy/moggy astrom/astrom.x $(MATCHPROG)/match
 
 
 ##  List of object files produced by compiling the source code and rules
@@ -713,7 +720,7 @@ install:
 #  directory using "cp -p" to preserve its date, and replaces each
 #  original file by a link to the installed copy.
 
-.INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
+.INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(BUILT_FILES)
 #
 #  Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the 
 #  package is installed (at least in part).
@@ -1259,6 +1266,14 @@ $(CATLIBINSTALLDIR)/stamp:
 			mkdir $(CATLIBINSTALLDIR)/$$dir; \
 	done
 	touch $(CATLIBINSTALLDIR)/stamp
+
+# Unpack and build match
+$(MATCHPROG)/match:
+	test -f $(MATCHPROG).tar && \
+		$(TAR_OUT) $(MATCHPROG).tar && \
+		cd $(MATCHPROG) && \
+		./configure && \
+		make
 
 #  Unpack the source tarball.  The extra test is because the makefile
 #  (always/sometimes?) wants to execute this twice.  Things get
