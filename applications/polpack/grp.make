@@ -15,6 +15,9 @@ quadfit.eps varest.eps singopt.eps fig.eps
 USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f \
 polvec.f polplot.f polbin.f polext.f polimage.f polsim.f polstack.f
 
+#  Binary data files.
+DATA = test_data.sdf
+
 #  The tasks visible within IRAF.
 IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext \
 polimage polsim polstack
