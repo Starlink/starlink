@@ -31,7 +31,7 @@ LS=/bin/ls
 if test -n "$ECHONONL"; then
     eval ${ECHONONL}
 else
-    function echononl () { echo -n $*; }
+    echononl () { echo -n $*; }
 fi
 
 filelist=""
