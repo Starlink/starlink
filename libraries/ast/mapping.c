@@ -9662,10 +9662,10 @@ f        The global status.
 *     acceptable kernels tend to be symmetrical about zero, to have a
 *     positive peak (usually unity) at zero, and to evaluate to zero
 *     whenever the pixel offset has any other integral value (this
-*     last property ensures that the interpolated values pass through
-*     the original data). An interpolation kernel may or may not have
-*     regions with negative values. You should consult a good book on
-*     image processing for more details.
+*     ensures that the interpolated values pass through the original
+*     data). An interpolation kernel may or may not have regions with
+*     negative values. You should consult a good book on image
+*     processing for more details.
 c     - If an error occurs within this function, it should use
 c     astSetStatus to set the AST error status to an error value.
 c     This will cause an immediate return from astResample<X>.
