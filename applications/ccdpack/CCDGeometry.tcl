@@ -45,6 +45,8 @@ proc CCDGeometry { Top {surekill 1} } {
 #        Added CCDimagefilters to support foreign data formats.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     4-JUL-2001 (MBT):
+#        Upgraded for Sets (now only DISPLAYs one NDF from an NDG list).
 #     {enter_further_changes_here}
 
 #-
@@ -52,6 +54,7 @@ proc CCDGeometry { Top {surekill 1} } {
 #  Global variables.
    global BBOX
    global CCDglobalpars
+   global CCDgloprefix
    global CCDprefs
    global GWMDEVICE
    global ITEM
@@ -171,7 +174,7 @@ colours (by closing any colour hogging applications) then try again."
       } else {
          set CCDimportfilter {*.sdf}
       }
-      CCDGetFileName $Topwin.restore {Select an image}
+      CCDGetFileName $Topwin.restore {Select an image} 1
       if { \$CCDimportexists } {
          set NDF \"\$CCDimportfile\"
          CCDGeomDrawCommand $Topwin $Canvas 
@@ -326,10 +329,10 @@ colours (by closing any colour hogging applications) then try again."
 #-----------------------------------------------------------------------------
 
 #  Check CCDprefs defining bias strips and useful area already.
-   if { [info exists CCDglobalpars(EXTENT)] } {
-      if { $CCDglobalpars(EXTENT) != "UNKNOWN" && 
-           $CCDglobalpars(EXTENT) != "" } { 
-         set l [split $CCDglobalpars(EXTENT) ","]
+   if { [info exists CCDglobalpars(${CCDgloprefix}EXTENT)] } {
+      if { $CCDglobalpars(${CCDgloprefix}EXTENT) != "UNKNOWN" && 
+           $CCDglobalpars(${CCDgloprefix}EXTENT) != "" } { 
+         set l [split $CCDglobalpars(${CCDgloprefix}EXTENT) ","]
          set x1 [expr [lindex $l 0] -0.5]
          set x2 [expr [lindex $l 1] -0.5]
          set y1 [expr [lindex $l 2] -0.5]
@@ -337,17 +340,17 @@ colours (by closing any colour hogging applications) then try again."
          set BBOX(extent) "$x1 $y1 $x2 $y2 world"
       }
    }
-   if { [info exists CCDglobalpars(BOUNDS)] } {
-      if { $CCDglobalpars(BOUNDS) != "UNKNOWN" && 
-           $CCDglobalpars(BOUNDS) != "" } { 
-         set l [split $CCDglobalpars(BOUNDS) ","]
+   if { [info exists CCDglobalpars(${CCDgloprefix}BOUNDS)] } {
+      if { $CCDglobalpars(${CCDgloprefix}BOUNDS) != "UNKNOWN" && 
+           $CCDglobalpars(${CCDgloprefix}BOUNDS) != "" } { 
+         set l [split $CCDglobalpars(${CCDgloprefix}BOUNDS) ","]
          set b1 [expr [lindex $l 0] -0.5]
          set b2 [expr [lindex $l 1] -0.5]
          if { [llength $l] > 2 } {
             set b3 [expr [lindex $l 2] -0.5]
             set b4 [expr [lindex $l 3] -0.5]
          }
-         if { $CCDglobalpars(DIRECTION) == "X" } {
+         if { $CCDglobalpars(${CCDgloprefix}DIRECTION) == "X" } {
             set BBOX(bias1) "$b1 $low $b2 $high world"
             if { [llength $l] > 2 } {
                set BBOX(bias2) "$b3 $low $b4 $high world"
