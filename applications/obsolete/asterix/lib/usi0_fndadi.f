@@ -29,7 +29,6 @@
       ID = ADI__NULLID
 
       I=1
-      FOUND=.FALSE.
 
 *  Scan list to find first empty slot
       DO WHILE ( (ID.EQ.ADI__NULLID .AND. (I.LE.USI__NMAX))

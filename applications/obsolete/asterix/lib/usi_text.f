@@ -35,6 +35,8 @@
 *    Status :
 *
       INTEGER STATUS
+*   Functions:
+      INTEGER			CHR_LEN
 *
 *    Local variables :
 *
