@@ -384,3 +384,36 @@ In addition, SUN/55 now describes how to convert NDFs to IDL format.
      conversion stage, so is more efficient.  It is now available for
      alpha_OSF1.  Improved the documentation.
 
+
+2 V1.1
+
+3 Changed_Applications
+
+  o  ASCII2NDF -- Added MAXLEN parameter to permit long input records
+     without impacting the efficiency of processing short records.
+
+  o  FITS2NDF --  Filters out NDF-style history from the FITS airlock.
+     Fixed bug which prevented the creation of NDF extensions which are
+     arrays of structures.  Processes the revised 2dF formats, and
+     allows arbitrary additional extensions; all 2dF extensions can now
+     be an arbitrary order.  Fixed bug which occurred when replacing
+     negative errors in IUE MXLO data.  Recognises logical binary-table
+     columns.
+
+  o  IRAF2NDF -- Sets the bounds of the NDF according to LBOUNDn
+     keywords, if present.  It no longer crashes when closing the IRAF
+     file, if there was a problem opening the IRAF file.  Propagates
+     all IRAF history records (including blanks) to the FITS airlock
+     when PROFITS=TRUE.  IRAF HISTORY lines which are too long for
+     a FITS header are truncated with an ellipsis.
+
+  o  NDF2FITS -- Modified to propagate the revised 2dF extensions.
+     Thus the OBJECT extension generates wider binary tables (from 210
+     to 224 bytes).  Now propagates primitive NDF extensions to binary
+     tables.  Does not transfer the LBOUNDn headers in the FITS
+     airlock.
+
+  o  NDF2IRAF -- Does not transfer the LBOUNDn headers in the FITS
+     airlock.
+
+

@@ -5,15 +5,15 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun55.7}
-\newcommand{\stardocnumber}    {55.7}
+\newcommand{\stardocsource}    {sun55.8}
+\newcommand{\stardocnumber}    {55.8}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield}
-\newcommand{\stardocdate}      {1997 August 1}
+\newcommand{\stardocdate}      {1997 December 3}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {User's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1328,6 +1328,14 @@ default value.
          maximum record length allowed is 512 bytes.
       }
       \sstsubsection{
+         MAXLEN = INTEGER (Read)
+      }{
+         The maximum record length in bytes of records within the input
+         text file.  Unless the records are longer than 512 bytes, you
+         can use the default value.  The suggested value is the current
+         value.  {\tt [512]}
+      }
+      \sstsubsection{
          OUT = NDF (Read and Write)
       }{
          Output NDF data structure.  When COMP is not {\tt "Data"} the NDF
@@ -1393,12 +1401,12 @@ default value.
          keywords BITPIX and UNSIGNED.
       }
       \sstexamplesubsection{
-         ascii2ndf type="\_uword" in=ngc253.dat out=ngc253 $\backslash$
+         ascii2ndf type="\_uword" in=ngc253.dat out=ngc253 maxlen=4000 $\backslash$
       }{
          This copies a data array from the text file {\tt ngc253.dat} to the
          NDF called ngc253.  The input file does not contain a header
          section.  The NDF has the current shape and data type is
-         unsigned word.
+         unsigned word.  The maximum record length is 4000 bytes.
       }
       \sstexamplesubsection{
          ascii2ndf spectrum ZZ skip=2 shape=200
@@ -2080,7 +2088,9 @@ default value.
             \sstitem
             HISTORY cards in a special format created by NDF2FITS are
             converted back into NDF history records.  This will only work
-            provided the HISTORY headers have not been tampered.
+            provided the HISTORY headers have not been tampered.  Such
+            headers are not transferred to the FITS airlock, when
+            PROFITS={\tt TRUE}.
          }
          \newpage
 
@@ -2320,24 +2330,32 @@ default value.
                converted back into NDF history records.
 
                \sstitem
-               The NDF variance is derived from the data array in the first
-               (IMAGE) sub-file.
+               The NDF variance is derived from the data array of an
+               IMAGE extension (usually the first), if present, provided the
+               IMAGE extension headers have an HDUCLAS2 keyword whose value
+               is either {\tt 'VARIANCE'} or {\tt 'ERROR'}.
 
                \sstitem
                The NDF\_CLASS extension within the NDF is filled using the
-               next FITS sub-file---a binary table.
+               a FITS binary-table extension whose EXTNAME keyword's value is
+               NDF\_CLASS.  Note: no error is reported if this extension does
+               not exist within the FITS file.
 
                \sstitem
-               The FIBRES extension is created using the second binary
-               table.  The OBJECT substructure's component names, data types,
-               and values are taken from the binary-table columns themselves,
-               and the components of the FIELD substructure are extracted
-               from recognised keywords in the binary-table's header.
+               The FIBRES extension is created from another FITS binary table
+               whose EXTNAME keyword's value is FIBRES.  The OBJECT
+               substructure's component names, data types, and values are
+               taken from the binary-table columns themselves, and the
+               components of the FIELD substructure are extracted from
+               recognised keywords in the binary-table's header.  Note:
+               no error is reported if this extension does not exist within
+               the FITS file.
 
                \sstitem
                A FITS extension in the NDF may be written to store the
                primary data unit's headers when parameter PROFITS is
-               {\tt TRUE}.
+               {\tt TRUE}.  This FITS airlock will not contain any
+               NDF-style HISTORY records.
             }
          }
       }
@@ -2346,7 +2364,7 @@ default value.
       References
    }{
       \begin{refs}
-      \item Bailey, J.A. 1996, 2dF Software Report 14, version 0.3.
+      \item Bailey, J.A. 1997, 2dF Software Report 14, version 0.5.
       \item NASA Office of Standards and Technology, 1994, {\it A User's Guide
        for the Flexible Image Transport System (FITS)}, version 3.1.
       \item NASA Office of Standards and Technology, 1995, {\it Definition of
@@ -2538,9 +2556,11 @@ default value.
       \sstsubsection{
          PROFITS = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, the headers of the IRAF file are written
+         If {\tt TRUE}, the user headers of the IRAF file are written
          verbatim to the NDF's FITS extension.  Any IRAF history
-         records are also appended to FITS extension. {\tt [TRUE]}
+         records are also appended to the FITS extension.  The FITS
+         extension is not created if there are no user headers
+         present in the IRAF file.  {\tt [TRUE]}
       }
       \sstsubsection{
          PROHIS = \_LOGICAL (Read)
@@ -2580,13 +2600,16 @@ default value.
          BUNIT become the NDF label and units respectively.
 
          \sstitem
+         The pixel origin is set if any LBOUND$n$ headers are present.
+
+         \sstitem
          Lines from the IRAF image header file may be transferred to
          the FITS extension of the NDF, when PROFITS={\tt TRUE}.  Any
          compulsory FITS keywords that are missing are added.  Certain
          other keywords are not propagated.  These are the IRAF ``Mini
          World Coordinate System'' (MWCS) keywords WCSDIM, DC\_FLAG,
          WAT$d$\_$nnn$ ($d$ is dimension, $nnn$ is the line number).
-         Certain NDF-style HISTORY lines in the header may also
+         Certain NDF-style HISTORY lines in the header are also
          be ignored when PROHIS={\tt TRUE} (see two notes below).
 
          \sstitem
@@ -3440,6 +3463,14 @@ default value.
          with the character \hash.
       }
       \sstsubsection{
+         ORIGIN = LITERAL (Read)
+      }{
+         The origin of the FITS files.  This becomes the value of the
+         ORIGIN keyword in the FITS headers.  If a null value is given
+         it defaults to {\tt "Starlink Project, U.K."}.
+         {\tt [!]}
+      }
+      \sstsubsection{
          OUT = LITERAL (Write)
       }{
          The names for the output FITS files.  These may be enclosed in double
@@ -3459,14 +3490,6 @@ default value.
          string in the output filename, for example OUT=\dqt{x$*$|cal|Starlink|}
          replaces the string {\tt "cal"} with {\tt "Starlink"} in any of
          the output names {\tt "x$*$.fit"}.
-      }
-      \sstsubsection{
-         ORIGIN = LITERAL (Read)
-      }{
-         The origin of the FITS files.  This becomes the value of the
-         ORIGIN keyword in the FITS headers.  If a null value is given
-         it defaults to {\tt "Starlink Project, U.K."}.
-         {\tt [!]}
       }
       \sstsubsection{
          PROEXTS = \_LOGICAL (Read)
@@ -3707,7 +3730,7 @@ default value.
          extension appears in the first).
 
          To propagate the OBJECT substructure, NDF2FITS creates a binary
-         table of constant width (210 bytes) with one row per fibre.  The
+         table of constant width (224 bytes) with one row per fibre.  The
          total number of rows is obtained from component NUM\_FIBRES.  If a
          possible OBJECT component is missing from the NDF, a null column
          is written for that component.  The columns inherit the data
@@ -3731,7 +3754,7 @@ default value.
       References
    }{
       \begin{refs}
-      \item Bailey, J.A. 1996, 2dF Software Report 14, version 0.3.
+      \item Bailey, J.A. 1997, 2dF Software Report 14, version 0.5.
       \item NASA Office of Standards and Technology, 1994, {\it A User's Guide
        for the Flexible Image Transport System (FITS)}, version 3.1.
       \item NASA Office of Standards and Technology, 1995, {\it Definition of
@@ -5047,6 +5070,41 @@ label and units are progagated to OBJECT and BUNIT headers.
 \item[\htmlref{TIFF2NDF}{TIFF2NDF}]  Removed \KAPPA\ dependency.  It
 uses one less conversion stage, so is more efficient.  It is now
 available for alpha\_OSF1.  The documentation has been improved.
+
+\end{description}  
+
+\newpage
+\section{Release Notes -- V1.1}
+
+\subsection{Changed applications}
+\begin{description}
+
+\item[\htmlref{ASCII2NDF}{ASCII2NDF}] Added MAXLEN parameter to permit
+long input records without impacting the efficiency of processing short
+records.
+
+\item[\htmlref{FITS2NDF}{FITS2NDF}] Filters out NDF-style history from
+the FITS airlock.  Fixed bug which prevented the creation of NDF
+extensions which are arrays of structures.  Processes the revised 2dF 
+formats, and allows arbitrary additional extensions; all 2dF extensions can
+now be an arbitrary order.  Fixed bug which occurred when replacing
+negative errors in IUE MXLO data.  It recognises logical binary-table
+columns.
+
+\item[\htmlref{IRAF2NDF}{IRAF2NDF}] Sets the bounds of the NDF according
+to LBOUND$n$ keywords, if present.  It no longer crashes when closing the
+\IRAFref\ file, if there was a problem opening the IRAF file.  Propagates
+all IRAF history records (including blanks) to the FITS airlock
+when PROFITS={\tt TRUE}.  IRAF HISTORY lines which are too long for
+a FITS header are truncated with an ellipsis.
+
+\item[\htmlref{NDF2FITS}{NDF2FITS}] Modified to propagate the revised 2dF
+extensions.  Thus the OBJECT extension generates wider binary tables
+(from 210 to 224 bytes).  Now propagates primitive NDF extensions to binary
+tables.  Does not transfer the LBOUND$n$ headers in the FITS airlock.
+
+\item[\htmlref{NDF2IRAF}{NDF2IRAF}] Does not transfer the LBOUND$n$
+headers in the FITS airlock.
 
 \end{description}  
 
