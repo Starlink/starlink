@@ -198,6 +198,9 @@ endif
 # input frame to PIXEL
 if ($newkappa == 1) then
   $kap/wcsframe ${sdf} pixel
+  if ( "$ddf" != "" ) then
+    $kap/wcsframe ${ddf} pixel
+  endif
   #$kap/wcsattrib ${sdf} set 'label(2)' 'sample'
   #$kap/wcsattrib ${sdf} set 'unit(2)' "' '"
 endif
@@ -738,6 +741,9 @@ exit
 *
 *  History:
 *     $Log$
+*     Revision 1.6  1998/12/10 20:36:39  timj
+*     Make sure that $ddf uses the PIXEL frame
+*
 *     Revision 1.5  1998/12/10 20:13:07  timj
 *     Make V0.13 KAPPA compliant
 *
