@@ -260,6 +260,8 @@ c           CALL ADI2_HGKYR( PHDU, 'CRVAL'//CAX, RVAL, CMNT, STATUS )
 
       ELSE
 
+*    Invent quality array
+
 *    Report error
         STATUS = SAI__ERROR
 

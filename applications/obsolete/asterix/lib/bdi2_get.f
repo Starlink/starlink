@@ -147,6 +147,7 @@ c          CALL ADI1_CCH2AT( CLOC, 'LOWIDTH', OARG, 'LoWidth', STATUS )
 c          CALL ADI1_CCH2AT( CLOC, 'HIWIDTH', OARG, 'HiWidth', STATUS )
 
 *    Just locate the data in the cache object
+*    Special fix for no AUNIT keyword in ROSAT files (RB)
         ELSE
           CALL ADI_FIND( CACHEID, 'Value', OARG, STATUS )
           OK = (STATUS .NE. SAI__OK)
