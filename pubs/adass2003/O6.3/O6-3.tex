@@ -1,16 +1,11 @@
 \documentclass[11pt,twoside]{article}
 
-%%% XXX Comment out or remove before submission!!!
+%%% XXX Comment out or remove before submission!!!  Also remove
+%%% reference to \RCSRevision in \title
 \def\RCS$#1: #2 ${\expandafter\def\csname RCS#1\endcsname{#2}}
 \RCS$Revision$
 
 \usepackage{adassconf}
-
-\makeatletter
-% Current adassconf.sty gets the following wrong (picky!)
-\def\vol@title{Astronomical Data Analysis Software and Systems XIII}
-\def\vol@author{Fran\c{c}ois Ochsenbein and Mark Allen eds.}
-\makeatother
 
 % NB: wierdo conference style has \title and co typeset material,
 % rather than store it, so \begin{document} must go here, and there's no
@@ -97,20 +92,21 @@
 %        UK}
 %\aindex{Taylor, M. B.}
 
-\authormark{Gray, Giaretta, Currie, Berry \& Taylor}
+\authormark{Gray, Giaretta, Berry, Currie \& Taylor}
 
 \keywords{Virtual Observatory, data models, usability, Starlink}
 
 
 
 \begin{abstract}
-Data Models exist in people's heads. Data modelling consists of making
+Data Models exist in people's heads.  Data modelling consists of making
 these explicit on paper, so that (a) we can discover if there is more
 than one important model, and (b) we can develop using the model which
-has the best impedance match with the community being targeted. Thus
-modelling is not just about communications -- about bits (or angle
-brackets!) on the wire -- but is a software quality and usability
-issue.
+has the best impedance match with the community being targeted.
+%Thus
+%modelling is not just about communications -- about bits (or angle
+%brackets!) on the wire -- but is a software quality and usability
+%issue.
 
 We contend that there is in fact more than one model relevant to the
 VO, and that while the VOTable model is an excellent and valuable fit
@@ -134,79 +130,265 @@ XSchemas, UML, OMG MDA, HUTN, RDF, and Topic Maps.
 
 \section{Language, models and usability}
 
-In linguistics, the well-known Sapir-Whorf hypothesis states that the
+In linguistics, the well-known Sapir-Whorf hypothesis claims that the
 way we conceive of the world depends on the language we use to
-describe it.  Or more compactly, we can only think what we can
-say.
+describe it.  This means that the language we use affects what we can
+think; and conversely, if we wish to have and manipulate a thought, we
+must find some language to express it in.
 
-This matters to us, since when we create software systems, we are
-often creating a `language' -- in a user-interface, an API or a
-protocol -- which users must employ to interact with an underlying
-system, be it an application, a library, or a remote service (here and
-below, we use the term `users' to apply both to astronomers using a
-mouse and programmers using an API or protocol).  If there is a good
-three-way match between the concepts in the user's head, the concepts
-implied by the language, and the concepts implicit in (some aspect of)
-the system's actual design, then the user's interactions with the
-system will be straightforward and largely error-free.  If there is a
-mismatch, they will not.  This is not just a matter of user-interface
-design; if the `user' is a programmer working with an API or a
-protocol, then this three-way match will help them write correct code
-faster, and produce an application which will in turn be usable by its
-eventual audience.
+The second point we wish to make was first made by the Emperor
+Charles~V: ``I speak Spanish to God, Italian to women, French to men
+and German to my horse''.\footnote{Another version of this is ``German
+for soldiers, French for women, Italian for princes, Spanish for
+God'': Charles -- who was born in Ghent, and so would doubtless now
+count as Dutch -- seems to have had no use for fringe languages like
+English or \textsc{.net}.}  If we wish to say several things, we may
+need several languages.
 
-We can all think of systems which fail to exhibit this full match, but
-in some cases, surely a mismatch is inevitable.  After all, a star and
-a database record surely have nothing in common except a tendency to
-generate entropy.  This is why we need a data model.
+\begin{figure}
+%\epsscale{0.75}
+\plotone{O6-3_1.eps}
+\caption{\label{f:models}Systems, users, and the languages which
+mediate between them, all have potentially separate implicit models.}
+\end{figure}
+All this talk of languages matters to us, since when we create
+software systems, we are often creating a `language' -- in a
+user-interface, an API or a protocol -- which users must employ to
+interact with the underlying system, be it an application, a library,
+or a remote service.  Each of the user, the language and the system
+has a \emph{model} associated with it (see Figure~\ref{f:models}), and
+if there is a good three-way match between the models,
+%If there is a good
+%three-way match between the concepts in the user's head, the concepts
+%implied by the language, and the concepts implicit in (some aspect of)
+%the system's actual design,
+then the user's interactions with the
+system will be straightforward and generally error-free.  If there is
+a mismatch, they will not.  This is not just a matter of
+user-interface design; if the `user' is a programmer using an
+API or protocol, then this three-way match will help them write
+correct code faster, and help produce an application which will be
+usable by its eventual mouse-wielding audience.
 
-A data model is the set of primitive concepts that we hope our user
-thinks with, the language expresses, and the underlying system
+In some cases this match is reasonably obvious (one of the likely
+reasons for the success of the web is the natural match between what
+users wanted to say, what they saw on the screen, and the HTML they
+had to type to turn one into the other); in other cases more work is
+involved (for example a user has to work quite hard to learn the model
+which allows them to exploit the tight binding between unix shell
+syntax and the underlying system); and in other situations
+(notoriously video recorder interfaces) the complete dislocation
+between the three models makes the interface language almost unusable.
+
+A data model, then, is the set of primitive concepts that we hope our
+user thinks with (or can learn to think with, by reading
+documentation), the language expresses, and the underlying system
 implements; it is the rendezvous which helps the system as a whole
 hang together.  If the model is made explicit during the development
 process, then it can itself be examined, criticised, and checked for
-consistency with itself and with the external system it is
-supposed to model, whether that is, say, CDS or `a quantity'.  Once
-the model is itself part of the language of development, we can think
-with it, and talk about it, rather than merely mumble.
+consistency with itself and with the external system it is supposed to
+model, whether that is an archive or a `quantity'.  The Sapir-Whorf
+hypothesis suggests that it is only once the model is itself part of
+the language of development, that we can think with it and talk about
+it.  That is, modelling is not just about communications -- about bits
+or angle-brackets on the wire -- but is a software quality and
+usability issue.
 
-This immediately prompts the question of just how we make the model
+It is important to note that the interface language's syntax is not a
+model.  Instead, that syntax should be chosen so as to faithfully
+reflect the language's model, which matches the user's and system's
+models.  However, we can only discuss the faithfullness of the syntax
+once we have an explicit model.
+
+This immediately prompts the question of precisely how we make the model
 explicit.  There are several obvious answers to this, of which the
-most currently fashionable will be XSchema, UML, and `a Java
-class library'.  The problem with each of these is that they each come with
-far too much baggage.  This is another aspect of the Sapir-Whorf
-hypothesis: we tend to see the world in terms of the
+most currently fashionable will be XSchema, UML, and `a Java class
+library'.  A potential problem with each of these is that they each
+come with a good deal of baggage.  This is another aspect of the
+Sapir-Whorf hypothesis: we tend to see the world in terms of the
 structure of the language we use to describe it.  That means that if
 we use XSchemas to model the world, we will discover that the world is
-made of things enclosing other things, with attributes, and if we use an O-O language,
-the world turns out to have methods.  That is, our choice of modelling
-language biases our model to have certain features, \emph{irrespective} of
-whether these features are present in the system being modelled.
+made of things enclosing other things, with attributes, and if we use
+an O-O language, the world turns out to have methods.  That is, our
+choice of modelling language biases our model to have certain
+features, \emph{irrespective} of whether these features are present in
+the system being modelled.  For example, while it is certainly
+possible to model multiple containment or circular reference with XML,
+the resulting language would likely be confusing and hard to use
+correctly.
 
-A separate problem is to start thinking about syntactical or
-presentational details too early.  If we retrofit a data model, it
-will end up being a poor model of the world, but an excellent
-model of our syntax.
+%A separate problem is to start thinking about syntactical or
+%presentational details too early.  If we retrofit a data model, it
+%will end up being a poor model of the world, but an excellent
+%model of our syntax.
 % During the UCD modelling effort, we found ourselves asking questions
 % which purported to be about astronomy, but which were really about
 % underscores.
 
-There are two strategies to deal with this.  The first is to embrace
+There are several strategies to deal with this.  The first is to
+decide that syntax is more important than anything else and let that
+lead the process (this was arguably the case for UCD1).  Another is to confront
 the problem, acknowledge that our choice of language is not neutral,
-and make sure that choice is a good one.  The second is to choose a
+and make sure that choice is a good one.  A third is to choose a
 more primitive modelling language, which will push fewer things into
 the model.  We will return to this question in section~\ref{s:techniques}.
 
 
 
-\section{Different models for the same data}
+\section{Different models for the same data -- the case of VOTable}
 
-What happens if two constituencies want different views of the same
-data?  Is that wrong?
+If there is more than one type of user, and thus more than one user
+model, we may need more than one language to achieve the three-way
+match in all important circumstances.
+
+Several of the systems in the current VO use VOTable
+syntax (Williams et~al.\ 2002).  Despite this, we claim that they do
+not all use the underlying VOTable data model.
+
+VOTable is excellent as a way of archiving catalogue metadata, and
+encoding \emph{all} the available information about a catalogue or image.
+This comes about because VOTable is extremely expressive, recursive and
+flexible, and these are advantages for some users, with the result that
+there is a good match between the user, system and (VOTable) language.
+There is another category of users, however, who do not need or want this
+sophistication, and who simply wish to extract a more modest amount of
+information (such as image and variance data) with as little knowledge as
+possible; this may be because they are busy and cannot afford the time to
+read full documentation, or because they are writing generic applications,
+and so cannot afford the luxury of reading documentation and building
+in to their application knowledge of the various ways that a set of data
+providers have exploited VOTable's flexibility.  The Simple Image Access
+(SIA) protocol implicitly uses this simple model at both the user and
+system ends, even though it uses in its responses the VOTable syntax,
+which implies a potentially much more complicated model.  The
+dissonance between models is a potential usability problem, and is
+addressable by using an alternative model such as that implied by HDX
+(Giaretta et~al.\ 2003).
+
+To illustrate what is gained by being able to discuss the data model
+explicitly, consider the following pair of RDF statements, which is
+how we might express the fact that a column with ID \texttt{raerr},
+say, is the error in an RA:
+\begin{verbatim}
+_x rdf:type :pos.eq.ra .
+_x :stat.err #raerr .
+\end{verbatim}
+(this is RDF `notation3', and expresses in pedantic detail that there
+exists a thing \texttt{\_x} which is of type \texttt{pos.eq.ra}, and that
+thing has a property \texttt{stat.err} which is in the URL
+\texttt{\#raerr}; however the details are much less important than the
+observation that such a neutral notation exists).  This prompts a
+number of valuable questions: \texttt{pos.eq.ra} appears to be a type
+whereas \texttt{stat.err} is a property (in RDF terms): did we want
+this?  Is this what we want a UCD like `stat.err;pos.eq.ra' to mean?
+If not, what?  For a given proposed UCD syntax, what would such a set
+of statements look like?  Can we construct similar sets of statements
+which our proposed syntax could not express?  Such questions are
+extremely difficult to ask in the absence of a notation which is
+distinct from the syntax under discussion.
+
 
 \section{Modelling techniques\label{s:techniques}}
 
-Acronym panic!
+Above, we illustrated using RDF as a modelling language; it is one of
+several possibilities.
+
+\paragraph{XSchema}
+
+XSchema is the World-Wide Web Consortium's (W3C) replacement for the DTD syntax which XML inherited
+from SGML.  As such, it is intended primarily for validation, but since
+modelling is involved in the process of developing a markup schema,
+it is usable as a modelling language also.  Since an XML schema is
+expressed in XML instance syntax it is rather verbose.  XSchema is also
+rather complicated, and its main benefit over DTDs is its elaborate type
+system, which looks familiar to those with a database schema background,
+as well as being the type system for a variety of other W3C standards.
+An alternative schema language is RelaxNG, which has a syntax which
+is substantially easier to read than XSchema, but which can be easily
+transformed to it.
+
+\paragraph{UML}
+
+The Unified Modelling Language is primarily intended for designing
+object-oriented systems, but it is also designed to be able to model the
+envionments those systems must operate within.  Object-oriented notions
+of subclassing and object manipulation are clearly very natural within
+UML, in the way that containment, for example, is natural in XML schemas.
+
+\paragraph{OMG standards}
+
+UML as a standard is curated by the Object Management Group
+(\htmladdnormallink{www.omg.org}{http://www.omg.org}), along with
+a collection of other object-modelling technologies including IDL and
+CORBA.  These can be tied together using yet more acronyms.  MDA
+(Model Driven Architecture) is a means of specifying
+platform-independent application descriptions (XXX add a little
+detail); XML (XML Metadata Interchange) is an XML-based modelling
+language intended to help generate and exchange mutually consistent
+XSchemas, UML and code in the form of (CORBA and IDL) interfaces.
+Since XMI suffers from the general XML verbosity, work is being done
+on HUTNs (Human-Usable Textual Notations), as more
+readable versions of XMI models.
+
+\paragraph{RDF and OWL}
+
+Resource Description Format (RDF) is a standard modelling notation
+developed by the W3C in order to support the ultimate goal of the
+Semantic Web.  As such, it is a low-level modelling language, with
+properties which make it usable by the inferencing engines which, it is
+hoped, will drive the Semantic Web; it is the modelling aspect which we
+have emphasised in the discussion above.  Base RDF is primarily concerned
+with the primitive RDF syntax, but other W3C standards such as RDFSchema
+and OWL (Ontology Language for the Web) supplement it to the point
+where it is useful for describing realistic ontologies.
+
+
+\section{Conclusions}
+
+The VO will have several distinct types of users, and thus several
+potentially incommensurable data models; since we believe this to be
+inevitable, it follows that it should be planned for, rather than
+attempting to force all applications and protocols into a single
+compromise data model.  This requires us to articulate these user or
+system data models so that we can bring about the three-way consistency
+that will be necessary for a usable and robust VO.  Linking these
+independent models is probably more profitable than attempting to develop
+some Grand Unified Data Model.
+
+
+
+
+\begin{references}
+% Reference format from proceedings instructions, which refers to
+%http://ukads.nottingham.ac.uk/cgi-bin/nph-bib_query?bibcode=1990ApJ...357....1A
+\reference
+Giaretta, D., % David,
+Taylor, M., % Mark,
+Draper, P., % Peter,
+Gray, N., % Norman
+and
+McIlwrath, B., % Brian  
+2003,
+\adassxii,
+221
+
+\reference
+Williams, R., % Roy,
+Ochsenbein, F., % Fran\c{c}ois,
+Davenhall, C., % Clive,
+Durand, D., % Daniel,
+Fernique, P., % Pierre,
+Giaretta, D., % David,
+Hanisch, R., % Robert,
+McGlynn, T., % Tom,
+Szalay, A., % Alex,
+and
+Wicenec, A., % Andreas.
+VOTable: A Proposed XML Format for Astronomical Tables, version 1.0,
+April 2002,
+online at URL \htmladdURL{http://cdsweb.u-strasbg.fr/doc/VOTable/}
+
+\end{references}
 
 \end{document}
 
