@@ -3365,7 +3365,15 @@ M Makefile.dependencies
           to bring the <code>Makefile</code> there up to date with
           respect to <code>Makefile.in</code>).  Check, with
           <kbd>cvs diff Makefile.dependencies</kbd>, that the right
-          material has been added, before committing these two files.</p>
+          material has been added, before committing these two
+          files.</p>
+
+        <p>If the component you have added should be included in the
+          `make world' build, then you should add it to the list of
+          targets listed in the <code>ALL_TARGETS</code> variable at
+          the top of the top-level <code>Makefile.in</code>.  You
+          should do this only if both this component <em>and anything
+          it depends upon</em> build successfully from scratch.</p>
       </subsect>
 
     </sect>
@@ -3692,7 +3700,14 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
                 the whole tree up to date.</p>
               <p>You can check the default installation location --
                 shown as <code>/my-star</code> above -- with
-                <kbd>./starconf-status --show STARCONF_DEFAULT_PREFIX</kbd></p>
+                <kbd>./starconf-status --show
+                STARCONF_DEFAULT_PREFIX</kbd></p>
+              <p>Also, <kbd>make world</kbd> only makes those targets
+                listed in the variable <code>ALL_TARGETS</code> within
+                the top-level Makefile.  Thus if the component you're
+                interested in isn't there, nor required by something
+                that is there and will be rebuilt, nothing will
+                happen.  See also <ref id="autoconfing-final"/>.</p>
             </dd>
 
             <dt>I know the buildsupport tools have been updated in the
@@ -3972,7 +3987,11 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             files in your source set, then automake will insert
             appropriate build rules in the generated
             <code>Makefile.in</code> on your behalf.  If, however, you
-            need to run the preprocessor `by hand' for some reason,
+            need to run the preprocessor `by hand' for some reason
+            (perhaps because you are using the preprocessor to do
+            something other than compiling <code>.fpp</code> to
+            <code>.o</code>, so that the <code>.fpp</code> file is not
+            being mentioned in a <code>_SOURCES</code> primary),
             then a suitable stanza in a <code>Makefile.am</code>
             or <code>Makefile.in</code> would be:
 <verbatim>
