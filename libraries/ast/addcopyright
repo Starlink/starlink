@@ -1,0 +1,2 @@
+
+sed -e 's/\<COPYRIGHT_STATEMENT\>/Copyright (C) 1997 Central Laboratory of the Research Councils/'

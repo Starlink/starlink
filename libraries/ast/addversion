@@ -1,0 +1,6 @@
+
+vers="`cat ${AST_REF}/version.number`"
+versno="`echo "${vers}" | sed -e 's/\-.*$//'`"
+relsno="`echo "${vers}" | sed -e 's/^.*-//'`"
+sed -e "s/\<VERSION_NUMBER\>/${versno}/g" \
+    -e "s/\<RELEASE_NUMBER\>/${relsno}/g"

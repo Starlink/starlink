@@ -1,0 +1,2971 @@
+/*
+*class++
+*  Name:
+*     WinMap
+
+*  Purpose:
+*     Map one window on to another by scaling and shifting each axis.
+
+*  Constructor Function:
+c     astWinMap
+f     AST_WINMAP
+
+*  Description:
+*     A Winmap is a linear Mapping which transforms a rectangular
+*     window in one coordinate system into a similar window in another
+*     coordinate system by scaling and shifting each axis (the window
+*     edges being parallel to the coordinate axes).
+*
+*     A WinMap is specified by giving the coordinates of two opposite
+*     corners (A and B) of the window in both the input and output
+*     coordinate systems.
+
+*  Inheritance:
+*     The WinMap class inherits from the Mapping class.
+
+*  Attributes:
+*     The WinMap class does not define any new attributes beyond those
+*     which are applicable to all Mappings.
+
+*  Functions:
+c     The WinMap class does not define any new functions beyond those
+f     The WinMap class does not define any new routines beyond those
+*     which are applicable to all Mappings.
+
+*  Copyright:
+*     <COPYRIGHT_STATEMENT>
+
+*  Authors:
+*     DSB: David Berry (Starlink)
+*     RFWS: R.F. Warren-Smith (Starlink)
+
+*  History:
+*     23-OCT-1996 (DSB):
+*        Original version.
+*     4-MAR-1997 (RFWS):
+*        Tidied public prologues.
+*     11-MAR-1997 (DSB):
+*        Added MapMerge method and associated bits.
+*     30-JUN-1997 (DSB):
+*        Bug fixed which caused the MapMerge method to generate a
+*        segmentation violation.
+*     24-MAR-1998 (RFWS):
+*        Improved output format from Dump.
+*     9-APR-1998 (DSB):
+*        MapMerge modified to allow merging of WinMaps with ZoomMaps and 
+*        and UnitMaps in parallel.
+*class--
+*/
+
+/* Module Macros. */
+/* ============== */
+/* Set the name of the class we are implementing. This indicates to
+   the header files that define class interfaces that they should make
+   "protected" symbols available. */
+#define astCLASS WinMap
+
+/* Include files. */
+/* ============== */
+/* Interface definitions. */
+/* ---------------------- */
+#include "error.h"               /* Error reporting facilities */
+#include "memory.h"              /* Memory management facilities */
+#include "object.h"              /* Base Object class */
+#include "pointset.h"            /* Sets of points/coordinates */
+#include "matrixmap.h"           /* Linear mappings */
+#include "unitmap.h"             /* Unit mappings */
+#include "zoommap.h"             /* Zoom mappings */
+#include "permmap.h"             /* Axis permutations */
+#include "mapping.h"             /* Coordinate mappings (parent class) */
+#include "channel.h"             /* I/O channels */
+#include "winmap.h"              /* Interface definition for this class */
+
+/* Error code definitions. */
+/* ----------------------- */
+#include "ast_err.h"             /* AST error codes */
+
+/* C header files. */
+/* --------------- */
+#include <float.h>
+#include <math.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+
+/* Module Variables. */
+/* ================= */
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstWinMapVtab class_vtab; /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Pointers to parent class methods which are extended by this class. */
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static const char *(* parent_getattrib)( AstObject *, const char * );
+static int (* parent_testattrib)( AstObject *, const char * );
+static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_setattrib)( AstObject *, const char * );
+
+/* External Interface Function Prototypes. */
+/* ======================================= */
+/* The following functions have public prototypes only (i.e. no
+   protected prototypes), so we must provide local prototypes for use
+   within this module. */
+AstWinMap *astWinMapId_( int, const double [], const double [], 
+                         const double [], const double [], const char *, ... );
+
+/* Prototypes for Private Member Functions. */
+/* ======================================== */
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static AstWinMap *WinUnit( AstWinMap *, AstUnitMap *, int, int );
+static AstWinMap *WinWin( AstMapping *, AstMapping *, int, int, int );
+static AstWinMap *WinZoom( AstWinMap *, AstZoomMap *, int, int, int, int );
+static const char *GetAttrib( AstObject *, const char * );
+static int CanSwap( AstMapping *, AstMapping * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static int TestAttrib( AstObject *, const char * );
+static int WinTerms( AstWinMap *, double **, double ** );
+static void ClearAttrib( AstObject *, const char * );
+static void Copy( const AstObject *, AstObject * );
+static void Delete( AstObject * );
+static void Dump( AstObject *, AstChannel * );
+static void InitVtab( AstWinMapVtab * );
+static void SetAttrib( AstObject *, const char * );
+static void WinMat( AstMapping **, int *, int );
+static void WinPerm( AstMapping **, int *, int );
+
+/* Function Macros */
+/* =============== */
+/* Macros which return the maximum and minimum of two values. */
+#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
+#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
+
+/* Macro to check for equality of floating point values. We cannot
+compare bad values directory because of the danger of floating point
+exceptions, so bad values are dealt with explicitly. */
+#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
+
+/* Member functions. */
+/* ================= */
+static int CanSwap( AstMapping *map1, AstMapping *map2 ){
+/*
+*  Name:
+*     CanSwap
+
+*  Purpose:
+*     Determine if two Mappings could be swapped.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     int CanSwap( AstMapping *map1, AstMapping *map2 )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     This function returns a flag indicating if the pair of supplied
+*     Mappings could be replaced by an equivalent pair of Mappings from the 
+*     same classes as the supplied pair, but in reversed order. Each pair
+*     of Mappings is considered to be compunded in series. The supplied 
+*     Mapings are not changed in any way.
+
+*  Parameters:
+*     map1
+*        The Mapping to be applied first.
+*     map2
+*        The Mapping to be applied second.
+
+*  Returned Value:
+*     1 if the Mappings could be swapped, 0 otherwise.
+
+*  Notes:
+*     -  One of the supplied pair of Mappings must be a WinMap.
+*     -  A value of 0 is returned if the two Mappings could be merged into
+*     a single Mapping.
+*     -  A value of 0 is returned if an error has already occurred, or if
+*     this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstMapping *nowin;        /* Pointer to non-WinMap Mapping */
+   AstPointSet *pset1;       /* PointSet holding input positions for PermMap */
+   AstPointSet *pset2;       /* PointSet holding output positions for PermMap */
+   const char *class1;       /* Pointer to map1 class string */
+   const char *class2;       /* Pointer to map2 class string */
+   const char *nowin_class;  /* Pointer to non-WinMap class string */
+   double **ptr1;            /* Pointer to pset1 data */
+   double **ptr2;            /* Pointer to pset2 data */
+   int i;                    /* Loop count */
+   int nin;                  /* No. of input coordinates for the PermMap */
+   int nout;                 /* No. of output coordinates for the PermMap */
+   int ret;                  /* Returned flag */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise */
+   ret = 0;
+
+/* Get the classes of the two mappings. */
+   class1 = astGetClass( map1 );
+   class2 = astGetClass( map2 );
+   if( astOK ){
+
+/* Get a pointer to the non-WinMap Mapping. */
+      if( !strcmp( class1, "WinMap" ) ){
+         nowin = map2;
+         nowin_class = class2;
+      } else {
+         nowin = map1;
+         nowin_class = class1;
+      }
+
+/* If it is a MatrixMap, the Mappings can be swapped. */
+      if( !strcmp( nowin_class, "MatrixMap" ) ){
+         ret = 1;
+
+/* If it is a PermMap, the Mappings can be swapped so long as the PermMap 
+   has consistent forward and inverse transformations. */
+      } else if( !strcmp( nowin_class, "PermMap" ) ){
+
+/* The PermMap must have the same number of input and output coordinates. */
+         nin = astGetNin( nowin );
+         nout = astGetNout( nowin );
+         if( nin == nout ){
+
+/* Create two PointSets, each holding two points, which can be used for
+   the input and output positions with the PermMap. */
+            pset1 = astPointSet( 2, nin, "" );
+            pset2 = astPointSet( 2, nout, "" );
+
+/* Set up the two input positions to be [1,2,3...] and [0,-1,-2,...] */
+            ptr1 = astGetPoints( pset1 );
+            if( astOK ){
+               for( i = 0; i < nin; i++ ){
+                  ptr1[ i ][ 0 ] = ( double )( i + 1 );
+                  ptr1[ i ][ 1 ] = ( double )( -i );
+               }
+            }
+
+/* Use the PermMap to transform these positions in the forward direction. */
+            astTransform( nowin, pset1, 1, pset2 );
+
+/* Now transform the results back again using the inverse PermMap. */
+            astTransform( nowin, pset2, 0, pset1 );
+
+/* See if the input positions have changed. If they have, then the PermMap
+   does not have a consistent pair of transformations. If they have not,
+   then the transformations must be consistent because we used two
+   different input positions and only one could come out unchanged by
+   chance. */
+            if( astOK ){
+               ret = 1;
+               for( i = 0; i < nin; i++ ){
+                  if( ptr1[ i ][ 0 ] != ( double )( i + 1 ) ||
+                      ptr1[ i ][ 1 ] != ( double )( -i ) ){
+                     ret = 0;
+                     break;
+                  }
+               }
+            }
+
+/* Annul the PointSets. */
+            pset1 = astAnnul( pset1 );
+            pset2 = astAnnul( pset2 );
+         }
+      }
+   }
+
+/* Return the answer. */
+   return astOK ? ret : 0;
+}
+
+static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     void ClearAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     WinMap member function (over-rides the astClearAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     WinMap, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*/
+
+/* Local Variables: */
+   AstWinMap *this;             /* Pointer to the WinMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the WinMap structure. */
+   this = (AstWinMap *) this_object;
+
+/* At the moment the WinMap class has no attributes, so pass it on to the 
+   parent method for further interpretation. */
+   (*parent_clearattrib)( this_object, attrib );
+
+}
+
+static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     WinMap member function (over-rides the protected astGetAttrib
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a WinMap, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the WinMap, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the WinMap. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Constants: */
+#define BUFF_LEN 50              /* Max. characters in result buffer */
+
+/* Local Variables: */
+   AstWinMap *this;             /* Pointer to the WinMap structure */
+   const char *result;           /* Pointer value to return */
+   double win;                  /* Win attribute value */
+   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the WinMap structure. */
+   this = (AstWinMap *) this_object;
+
+/* At the moment the WinMap class has no attributes, so pass it on to the 
+   parent method for further interpretation. */
+   result = (*parent_getattrib)( this_object, attrib );
+
+/* Return the result. */
+   return result;
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
+}
+
+static void InitVtab( AstWinMapVtab *vtab ) {
+/*
+*  Name:
+*     InitVtab
+
+*  Purpose:
+*     Initialise a virtual function table for a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     void InitVtab( AstWinMapVtab *vtab )
+
+*  Class Membership:
+*     WinMap member function.
+
+*  Description:
+*     This function initialises the component of a virtual function
+*     table which is used by the WinMap class.
+
+*  Parameters:
+*     vtab
+*        Pointer to the virtual function table. The components used by
+*        all ancestral classes should already have been initialised.
+*/
+
+/* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
+   AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
+
+/* Check the local error status. */
+   if ( !astOK ) return;
+
+/* Store a unique "magic" value in the virtual function table. This
+   will be used (by astIsAWinMap) to determine if an object belongs
+   to this class.  We can conveniently use the address of the (static)
+   class_init variable to generate this unique value. */
+   vtab->check = &class_init;
+
+/* Initialise member function pointers. */
+/* ------------------------------------ */
+/* Store pointers to the member functions (implemented here) that provide
+   virtual methods for this class. */
+   vtab->WinTerms = WinTerms;
+
+/* Save the inherited pointers to methods that will be extended, and
+   replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
+   mapping = (AstMappingVtab *) vtab;
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
+
+   parent_transform = mapping->Transform;
+   mapping->Transform = Transform;
+
+/* Store replacement pointers for methods which will be over-ridden by
+   new member functions implemented here. */
+   mapping->MapMerge = MapMerge;
+
+/* Declare the class dump, copy and delete functions.*/
+   astSetDump( vtab, Dump, "WinMap", "Map one window on to another" );
+   astSetCopy( (AstObjectVtab *) vtab, Copy );
+   astSetDelete( (AstObjectVtab *) vtab, Delete );
+
+}
+
+static int MapMerge( AstMapping *this, int where, int series, int *nmap,
+                     AstMapping ***map_list, int **invert_list ) {
+/*
+*  Name:
+*     MapMerge
+
+*  Purpose:
+*     Simplify a sequence of Mappings containing a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int MapMerge( AstMapping *this, int where, int series, int *nmap,
+*                   AstMapping ***map_list, int **invert_list )
+
+*  Class Membership:
+*     WinMap method (over-rides the protected astMapMerge method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function attempts to simplify a sequence of Mappings by
+*     merging a nominated WinMap in the sequence with its neighbours,
+*     so as to shorten the sequence if possible.
+*
+*     In many cases, simplification will not be possible and the
+*     function will return -1 to indicate this, without further
+*     action.
+*
+*     In most cases of interest, however, this function will either
+*     attempt to replace the nominated WinMap with a Mapping which it
+*     considers simpler, or to merge it with the Mappings which
+*     immediately precede it or follow it in the sequence (both will
+*     normally be considered). This is sufficient to ensure the
+*     eventual simplification of most Mapping sequences by repeated
+*     application of this function.
+*
+*     In some cases, the function may attempt more elaborate
+*     simplification, involving any number of other Mappings in the
+*     sequence. It is not restricted in the type or scope of
+*     simplification it may perform, but will normally only attempt
+*     elaborate simplification in cases where a more straightforward
+*     approach is not adequate.
+
+*  Parameters:
+*     this
+*        Pointer to the nominated WinMap which is to be merged with
+*        its neighbours. This should be a cloned copy of the WinMap
+*        pointer contained in the array element "(*map_list)[where]"
+*        (see below). This pointer will not be annulled, and the
+*        WinMap it identifies will not be modified by this function.
+*     where
+*        Index in the "*map_list" array (below) at which the pointer
+*        to the nominated WinMap resides.
+*     series
+*        A non-zero value indicates that the sequence of Mappings to
+*        be simplified will be applied in series (i.e. one after the
+*        other), whereas a zero value indicates that they will be
+*        applied in parallel (i.e. on successive sub-sets of the
+*        input/output coordinates).
+*     nmap
+*        Address of an int which counts the number of Mappings in the
+*        sequence. On entry this should be set to the initial number
+*        of Mappings. On exit it will be updated to record the number
+*        of Mappings remaining after simplification.
+*     map_list
+*        Address of a pointer to a dynamically allocated array of
+*        Mapping pointers (produced, for example, by the astMapList
+*        method) which identifies the sequence of Mappings. On entry,
+*        the initial sequence of Mappings to be simplified should be
+*        supplied.
+*
+*        On exit, the contents of this array will be modified to
+*        reflect any simplification carried out. Any form of
+*        simplification may be performed. This may involve any of: (a)
+*        removing Mappings by annulling any of the pointers supplied,
+*        (b) replacing them with pointers to new Mappings, (c)
+*        inserting additional Mappings and (d) changing their order.
+*
+*        The intention is to reduce the number of Mappings in the
+*        sequence, if possible, and any reduction will be reflected in
+*        the value of "*nmap" returned. However, simplifications which
+*        do not reduce the length of the sequence (but improve its
+*        execution time, for example) may also be performed, and the
+*        sequence might conceivably increase in length (but normally
+*        only in order to split up a Mapping into pieces that can be
+*        more easily merged with their neighbours on subsequent
+*        invocations of this function).
+*
+*        If Mappings are removed from the sequence, any gaps that
+*        remain will be closed up, by moving subsequent Mapping
+*        pointers along in the array, so that vacated elements occur
+*        at the end. If the sequence increases in length, the array
+*        will be extended (and its pointer updated) if necessary to
+*        accommodate any new elements.
+*
+*        Note that any (or all) of the Mapping pointers supplied in
+*        this array may be annulled by this function, but the Mappings
+*        to which they refer are not modified in any way (although
+*        they may, of course, be deleted if the annulled pointer is
+*        the final one).
+*     invert_list
+*        Address of a pointer to a dynamically allocated array which,
+*        on entry, should contain values to be assigned to the Invert
+*        attributes of the Mappings identified in the "*map_list"
+*        array before they are applied (this array might have been
+*        produced, for example, by the astMapList method). These
+*        values will be used by this function instead of the actual
+*        Invert attributes of the Mappings supplied, which are
+*        ignored.
+*
+*        On exit, the contents of this array will be updated to
+*        correspond with the possibly modified contents of the
+*        "*map_list" array.  If the Mapping sequence increases in
+*        length, the "*invert_list" array will be extended (and its
+*        pointer updated) if necessary to accommodate any new
+*        elements.
+
+*  Returned Value:
+*     If simplification was possible, the function returns the index
+*     in the "map_list" array of the first element which was
+*     modified. Otherwise, it returns -1 (and makes no changes to the
+*     arrays supplied).
+
+*  Notes:
+*     - A value of -1 will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstWinMap *newwm;     /* Pointer to replacement WinMap */
+   AstMatrixMap *mtr;    /* Pointer to replacement MatrixMap */
+   const char *class1;   /* Pointer to first Mapping class string */
+   const char *class2;   /* Pointer to second Mapping class string */
+   const char *nclass;   /* Pointer to neighbouring Mapping class */
+   double *b;            /* Pointer to scale terms */
+   int diag;             /* Is WinMap equivalent to a diagonal matrix? */
+   int i1;               /* Index of first WinMap to merge */
+   int i2;               /* Index of last WinMap to merge */
+   int i;                /* Loop counter */
+   int invert;           /* Should the inverted Mapping be used? */
+   int nin;              /* Number of coordinates for WinMap */
+   int nstep1;           /* No. of Mappings backwards to next mergable Mapping */
+   int nstep2;           /* No. of Mappings forward to next mergable Mapping */
+   int old_winv;         /* original Invert value for supplied WinMap */
+   int result;           /* Result value to return */
+
+/* Initialise. */
+   result = -1;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the number of axes for the WinMap. */
+   nin = astGetNin( ( *map_list )[ where ] );
+
+/* First of all, see if the WinMap can be replaced by a simpler Mapping,
+   without reference to the neighbouring Mappings in the list.           */
+/* ======================================================================*/
+/* If the shift terms in the WinMap are all zero, the WinMap can be
+   replaced by a diagonal MatrixMap (which is faster to compute). Check the 
+   shift terms. */
+   diag = 1;
+   newwm = (AstWinMap *) ( *map_list )[ where ];
+   for( i = 0; i < nin; i++ ){
+      if( !EQUAL( ( newwm->a )[ i ], 0.0 ) ){
+         diag = 0;
+         break;
+      }
+   }
+
+/* If all the shift terms are zero... */
+   if( diag ){
+
+/* Temporarily set the Invert attribute of the WinMap to the supplied
+   value. */
+      old_winv = astGetInvert( newwm );
+      astSetInvert( newwm, ( *invert_list )[ where ] );
+
+/* Get a copy of the scale terms from the WinMap. */
+      astWinTerms( newwm, NULL, &b );   
+
+/* Create a diagonal MatrixMap holding the scale terms. */   
+      mtr = astMatrixMap( nin, nin, 1, b, "" );
+
+/* Restore the Invert attribute of the supplied WinMap. */
+      astSetInvert( newwm, old_winv );
+
+/* Free the memory used to hold the scale terms. */
+      b = (double *) astFree( (void *) b );
+
+/* Annul the WinMap pointer in the list and replace it with the MatrixMap
+   pointer, and indicate that the forward transformation of the returned
+   MatrixMap should be used. */
+      (void) astAnnul( ( *map_list )[ where ] );
+      ( *map_list )[ where ] = (AstMapping *) mtr;
+      ( *invert_list )[ where ] = 0;
+
+/* Return the index of the first modified element. */
+      result = where;
+         
+/* If the WinMap itself could not be simplified, see if it can be merged
+   with the Mappings on either side of it in the list. */
+   } else {
+
+/* Store the classes of the neighbouring Mappings in the list. */
+       class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
+       class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
+
+/* In series. */
+/* ========== */
+      if ( series ) {
+
+/* We first look to see if the WinMap can be merged with one of its
+   neighbours, resulting in a reduction of one in the number of Mappings
+   in the list. WinMaps can only merge directly with another WinMap, a
+   ZoomMap, or a UnitMap. */
+         if( class1 && ( !strcmp( class1, "WinMap" ) ||
+                         !strcmp( class1, "ZoomMap" ) ||
+                         !strcmp( class1, "UnitMap" ) ) ){
+            nclass = class1;
+            i1 = where - 1;
+            i2 = where;
+
+         } else if( class2 && ( !strcmp( class2, "WinMap" ) ||
+                                !strcmp( class2, "ZoomMap" ) ||
+                                !strcmp( class2, "UnitMap" ) ) ){
+            nclass = class2;
+            i1 = where;
+            i2 = where + 1;
+
+         } else {
+            nclass = NULL;
+         }
+
+/* If the WinMap can merge with one of its neighbours, create the merged
+   Mapping. */
+         if( nclass ){
+
+            if( !strcmp( nclass, "WinMap" ) ){
+               newwm = WinWin( ( *map_list )[ i1 ], ( *map_list )[ i2 ],
+                               ( *invert_list )[ i1 ], ( *invert_list )[ i2 ],
+                               1 );
+               invert = 0;
+
+            } else if( !strcmp( nclass, "ZoomMap" ) ){
+               if( i1 == where ){
+                  newwm = WinZoom( (AstWinMap *)( *map_list )[ i1 ], 
+                                   (AstZoomMap *)( *map_list )[ i2 ],
+                           ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], 1, 1 );
+               } else {
+                  newwm = WinZoom( (AstWinMap *)( *map_list )[ i2 ], 
+                                   (AstZoomMap *)( *map_list )[ i1 ],
+                           ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], 0, 1 );
+               }
+               invert = 0;
+
+            } else {
+               newwm = astClone( ( *map_list )[ where ] );
+               invert = ( *invert_list )[ where ];
+            }
+
+/* If succesfull... */
+            if( astOK ){
+
+/* Annul the first of the two Mappings, and replace it with the merged 
+   WinMap. Also set the invert flag. */ 
+               (void) astAnnul( ( *map_list )[ i1 ] );
+               ( *map_list )[ i1 ] = (AstMapping *) newwm;
+               ( *invert_list )[ i1 ] = invert;
+
+/* Annul the second of the two Mappings, and shuffle down the rest of the 
+   list to fill the gap. */
+               (void) astAnnul( ( *map_list )[ i2 ] );
+               for ( i = i2 + 1; i < *nmap; i++ ) {
+                  ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
+                  ( *invert_list )[ i - 1 ] = ( *invert_list )[ i ];
+               }
+
+/* Clear the vacated element at the end. */
+               ( *map_list )[ *nmap - 1 ] = NULL;
+               ( *invert_list )[ *nmap - 1 ] = 0;
+
+/* Decrement the Mapping count and return the index of the first
+   modified element. */
+               ( *nmap )--;
+               result = i1;
+
+            }
+
+/* If the WinMap could not merge directly with either of its neighbours,
+   we consider whether it would be worthwhile to swap the WinMap with
+   either of its neighbours. This can only be done for certain classes
+   of Mapping (MatrixMap & some PermMaps), and will usually require both 
+   Mappings to be modified (unless they are commutative). The advantage of 
+   swapping the order of the Mappings is that it may result in the WinMap 
+   being adjacent to a Mapping with which it can merge directly on the next
+   invocation of this function, thus reducing the number of Mappings
+   in the list. */
+         } else {
+
+/* Step through each of the Mappings which follow the WinMap, looking for 
+   a Mapping with which the WinMap could merge directly. Stop when such a
+   Mapping is found, or when a Mapping is found with which the WinMap
+   cannot swap. Note the number of Mappings which separate the WinMap
+   from the Mapping with which it could merge (if any). */
+            nstep2 = -1;
+            for( i2 = where + 1; i2 < *nmap; i2++ ){
+
+               nclass = astGetClass( ( *map_list )[ i2 ] );
+               if( !strcmp( nclass, "WinMap" ) ||
+                   !strcmp( nclass, "ZoomMap" ) ||
+                   !strcmp( nclass, "UnitMap" ) ) {
+                  nstep2 = i2 - where - 1;
+                  break;
+               }
+
+               if( !CanSwap(  ( *map_list )[ where ], 
+                              ( *map_list )[ i2 ] ) ) break;
+
+            }
+
+/* Do the same working forward from the WinMap towards the start of the map
+   list. */
+            nstep1 = -1;
+            for( i1 = where - 1; i1 >= 0; i1-- ){
+
+               nclass = astGetClass( ( *map_list )[ i1 ] );
+               if( !strcmp( nclass, "WinMap" ) ||
+                   !strcmp( nclass, "ZoomMap" ) ||
+                   !strcmp( nclass, "UnitMap" ) ) {
+                  nstep1 = where - 1 - i1;
+                  break;
+               }
+
+               if( !CanSwap(  ( *map_list )[ where ], 
+                              ( *map_list )[ i1 ] ) ) break;
+            }
+
+/* Choose which neighbour to swap with so that the WinMap moves towards the
+   nearest Mapping with which it can merge. */
+            if( nstep1 != -1 && ( nstep2 == -1 || nstep2 > nstep1 ) ){
+               nclass = class1;
+               i1 = where - 1;
+               i2 = where;
+            } else if( nstep2 != -1 ){
+               nclass = class2;
+               i1 = where;
+               i2 = where + 1;
+            } else {
+               nclass = NULL;
+            }
+
+/* If there is a target Mapping in the list with which the WinMap could 
+   merge, replace the supplied Mappings with swapped Mappings to bring a
+   WinMap closer to the target Mapping. */
+            if( nclass ){
+               if( !strcmp( nclass, "MatrixMap" ) ){
+                  WinMat( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                  result = i1;
+
+               } else if( !strcmp( nclass, "PermMap" ) ){
+                  WinPerm( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                  result = i1;
+               }
+            }
+         }
+
+/* In parallel. */
+/* ============ */
+/* WinMaps are combined in parallel with neighbouring WinMaps, ZoomMaps and
+   UnitMaps. */
+      } else {
+
+/* We first look to see if the WinMap can be merged with one of its
+   neighbours, resulting in a reduction of one in the number of Mappings
+   in the list. WinMaps can only merge directly with another WinMap, a
+   ZoomMap, or a UnitMap. */
+         if( class1 && ( !strcmp( class1, "WinMap" ) ||
+                         !strcmp( class1, "ZoomMap" ) ||
+                         !strcmp( class1, "UnitMap" ) ) ){
+            nclass = class1;
+            i1 = where - 1;
+            i2 = where;
+
+         } else if( class2 && ( !strcmp( class2, "WinMap" ) ||
+                                !strcmp( class2, "ZoomMap" ) ||
+                                !strcmp( class2, "UnitMap" ) ) ){
+            nclass = class2;
+            i1 = where;
+            i2 = where + 1;
+
+         } else {
+            nclass = NULL;
+         }
+
+/* If the WinMap can merge with one of its neighbours, create the merged
+   Mapping. */
+         if( nclass ){
+
+            if( !strcmp( nclass, "WinMap" ) ){
+               newwm = WinWin( ( *map_list )[ i1 ], ( *map_list )[ i2 ],
+                               ( *invert_list )[ i1 ], ( *invert_list )[ i2 ],
+                               0 );
+               invert = 0;
+
+            } else if( !strcmp( nclass, "ZoomMap" ) ){
+               if( i1 == where ){
+                  newwm = WinZoom( (AstWinMap *)( *map_list )[ i1 ], 
+                                   (AstZoomMap *)( *map_list )[ i2 ],
+                           ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], 1, 0 );
+               } else {
+                  newwm = WinZoom( (AstWinMap *)( *map_list )[ i2 ], 
+                                   (AstZoomMap *)( *map_list )[ i1 ],
+                           ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], 0, 0 );
+               }
+               invert = 0;
+
+            } else {
+               if( i1 == where ){
+                  newwm = WinUnit( (AstWinMap *)( *map_list )[ i1 ], 
+                                   (AstUnitMap *)( *map_list )[ i2 ],
+                                   ( *invert_list )[ i1 ], 1 );
+               } else {
+                  newwm = WinUnit( (AstWinMap *)( *map_list )[ i2 ], 
+                                   (AstUnitMap *)( *map_list )[ i1 ],
+                                   ( *invert_list )[ i2 ], 0 );
+               }
+               invert = 0;
+
+            }
+
+/* If succesfull... */
+            if( astOK ){
+
+/* Annul the first of the two Mappings, and replace it with the merged 
+   WinMap. Also set the invert flag. */ 
+               (void) astAnnul( ( *map_list )[ i1 ] );
+               ( *map_list )[ i1 ] = (AstMapping *) newwm;
+               ( *invert_list )[ i1 ] = invert;
+
+/* Annul the second of the two Mappings, and shuffle down the rest of the 
+   list to fill the gap. */
+               (void) astAnnul( ( *map_list )[ i2 ] );
+               for ( i = i2 + 1; i < *nmap; i++ ) {
+                  ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
+                  ( *invert_list )[ i - 1 ] = ( *invert_list )[ i ];
+               }
+
+/* Clear the vacated element at the end. */
+               ( *map_list )[ *nmap - 1 ] = NULL;
+               ( *invert_list )[ *nmap - 1 ] = 0;
+
+/* Decrement the Mapping count and return the index of the first
+   modified element. */
+               ( *nmap )--;
+               result = i1;
+
+            }
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static void SetAttrib( AstObject *this_object, const char *setting ) {
+/*
+*  Name:
+*     astSetAttrib
+
+*  Purpose:
+*     Set an attribute value for a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     WinMap member function (over-rides the astSetAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function assigns an attribute value for a WinMap, the
+*     attribute and its value being specified by means of a string of
+*     the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in
+*     lower case with no white space present. The value to the right
+*     of the "=" should be a suitable textual representation of the
+*     value to be assigned and this will be interpreted according to
+*     the attribute's data type.  White space surrounding the value is
+*     only significant for string attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+*     setting
+*        Pointer to a null-terminated string specifying the new attribute
+*        value.
+*/
+
+/* Local Variables: */
+   AstWinMap *this;             /* Pointer to the WinMap structure */
+   double win;                  /* Win attribute value */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by sscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the WinMap structure. */
+   this = (AstWinMap *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = (int) strlen( setting );
+
+/* The WinMap class currently has no attributes, so pass it on to the parent
+   method for further interpretation. */
+   (*parent_setattrib)( this_object, setting );
+
+}
+
+static int TestAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     int TestAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     WinMap member function (over-rides the astTestAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a WinMap's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWinMap *this;             /* Pointer to the WinMap structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the WinMap structure. */
+   this = (AstWinMap *) this_object;
+
+/* The WinMap class currently has no attributes, so pass it on to the parent
+   method for further interpretation. */
+   result = (*parent_testattrib)( this_object, attrib );
+
+/* Return the result, */
+   return result;
+}
+
+static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
+                               int forward, AstPointSet *out ) {
+/*
+*  Name:
+*     Transform
+
+*  Purpose:
+*     Apply a WinMap to transform a set of points.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
+*                             int forward, AstPointSet *out )
+
+*  Class Membership:
+*     WinMap member function (over-rides the astTransform protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function takes a WinMap and a set of points encapsulated in a
+*     PointSet and transforms the points so as to map them into the 
+*     required window.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+*     in
+*        Pointer to the PointSet holding the input coordinate data.
+*     forward
+*        A non-zero value indicates that the forward coordinate transformation
+*        should be applied, while a zero value requests the inverse
+*        transformation.
+*     out
+*        Pointer to a PointSet which will hold the transformed (output)
+*        coordinate values. A NULL value may also be given, in which case a
+*        new PointSet will be created by this function.
+
+*  Returned Value:
+*     Pointer to the output (possibly new) PointSet.
+
+*  Notes:
+*     -  A null pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*     -  The number of coordinate values per point in the input PointSet must
+*     match the number of coordinates for the WinMap being applied.
+*     -  If an output PointSet is supplied, it must have space for sufficient
+*     number of points and coordinate values per point to accommodate the
+*     result. Any excess space will be ignored.
+*/
+
+/* Local Variables: */
+   AstPointSet *result;          /* Pointer to output PointSet */
+   AstWinMap *map;               /* Pointer to WinMap to be applied */
+   const char *class;            /* Object class */
+   double **ptr_in;              /* Pointer to input coordinate data */
+   double **ptr_out;             /* Pointer to output coordinate data */
+   double *axin;                 /* Pointer to next input axis value */
+   double *axout;                /* Pointer to next output axis value */
+   double *a;                    /* Pointer to next constant term */
+   double *b;                    /* Pointer to next multiplicative term */
+   double aa;                    /* Constant term */
+   double bb;                    /* Multiplicative term */
+   int coord;                    /* Loop counter for coordinates */
+   int def;                      /* Is mapping defined? */
+   int ncoord;                   /* Number of coordinates per point */
+   int npoint;                   /* Number of points */
+   int point;                    /* Loop counter for points */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Obtain a pointer to the WinMap. */
+   map = (AstWinMap *) this;
+
+/* Apply the parent mapping using the stored pointer to the Transform member
+   function inherited from the parent Mapping class. This function validates
+   all arguments and generates an output PointSet if necessary, but does not
+   actually transform any coordinate values. */
+   result = (*parent_transform)( this, in, forward, out );
+
+/* We will now extend the parent astTransform method by performing the
+   calculations needed to generate the output coordinate values. */
+
+/* Determine the numbers of points and coordinates per point from the input
+   PointSet and obtain pointers for accessing the input and output coordinate
+   values. */
+   ncoord = astGetNcoord( in );
+   npoint = astGetNpoint( in );
+   ptr_in = astGetPoints( in );      
+   ptr_out = astGetPoints( result );
+
+/* Determine whether to apply the forward or inverse mapping, according to the
+   direction specified and whether the mapping has been inverted. */
+   if ( astGetInvert( map ) ) forward = !forward;
+
+/* Report an error if the WinMap does not contain any scales or shifts. */
+   if( !(map->a && map->b) && astOK ){
+      class = astGetClass( this );
+      astError( AST__BADWM, "astTransform(%s): The supplied %s does not "
+                "contain any window information.", class, class );
+   }
+
+/* Perform coordinate arithmetic. */
+/* ------------------------------ */
+   if( astOK ){
+
+/* Store pointers to the shift and scale for the next axis. */
+      a = map->a;
+      b = map->b;
+
+/* Apply the mapping to each axis. */
+      for( coord = 0; coord < ncoord; coord++ ){
+
+/* If either the scale or shift is bad indicate that the mapping is
+   not defined on this axis. */
+         if( *a == AST__BAD || *b == AST__BAD ){
+            def = 0;
+
+/* Otherwise, get the scale and offset factors for this axis, taking account of
+   whether the mapping is inverted or not. If the mapping is undefined, set 
+   the "def" flag to indicate this. */
+         } else {
+            aa = *a;
+            bb = *b;
+
+            if( forward ){
+               def = 1;
+
+            } else if( bb != 0.0 ){
+               bb = 1.0/bb;
+               aa = -aa*bb;               
+               def = 1;
+
+            } else {
+               def = 0;
+            }
+
+         }
+
+/* Store pointers to the first inpout and output values on this axis. */
+         axin = ptr_in[ coord ];
+         axout = ptr_out[ coord ];
+
+/* If the mapping is defined, apply it to the supplied points. */
+         if( def ){
+
+            for( point = 0; point < npoint; point++ ){
+               if( *axin != AST__BAD ){
+                  *(axout++) = aa + bb*(*axin);
+               } else {
+                  *(axout++) = AST__BAD;
+               }
+               axin++;
+            }
+
+/* If the mapping is not defined, store bad values on this axis in the 
+   returned points. */
+         } else {
+            for( point = 0; point < npoint; point++ ) *(axout++) = AST__BAD;
+         }
+
+/* Point to the scale and shift for the next axis. */
+         a++;
+         b++;
+      }  
+
+   }
+
+/* Return a pointer to the output PointSet. */
+   return result;
+}
+
+static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
+/*
+*  Name:
+*     WinMat
+
+*  Purpose:
+*     Swap a WinMap and a MatrixMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     void WinMat( AstMapping **maps, int *inverts, int iwm )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     A list of two Mappings is supplied containing a WinMap and a
+*     MatrixMap. These Mappings are annulled, and replaced with 
+*     another pair of Mappings consisting of a WinMap and a MatrixMap
+*     in the opposite order. These Mappings are chosen so that their
+*     combined effect is the same as the original pair of Mappings. 
+*     The scale factors in the returned WinMap are always unity (i.e. 
+*     the differences in scaling get absorbed into the returned
+*     MatrixMap).
+
+*  Parameters:
+*     maps
+*        A pointer to an array of two Mapping pointers.
+*     inverts
+*        A pointer to an array of two invert flags.
+*     iwm
+*        The index within "maps" of the WinMap.
+
+*/
+
+/* Local Variables: */
+   AstMatrixMap *m1;             /* Pointer to Diagonal scale factor MatrixMap */
+   AstMatrixMap *m2;             /* Pointer to returned MatrixMap */
+   AstMatrixMap *mm;             /* Pointer to the supplied MatrixMap */
+   AstPointSet *pset1;           /* Shift terms from supplied WinMap */
+   AstPointSet *pset2;           /* Shift terms for returned WinMap */
+   AstWinMap *w1;                /* Pointer to the returned WinMap */
+   AstWinMap *wm;                /* Pointer to the supplied WinMap */
+   double **ptr1;                /* Pointer to pset1 data */
+   double **ptr2;                /* Pointer to pset2 data */
+   double *a;                    /* Array of shift terms from supplied WinMap */
+   double *aa;                   /* Pointer to next shift term */
+   double *b;                    /* Array of scale terms from supplied WinMap */
+   double *bb;                   /* Pointer to next scale term */
+   int i;                        /* Axis count */
+   int nin;                      /* No. of axes in supplied WinMap */
+   int nout;                     /* No. of axes in returned WinMap */
+   int old_minv;                 /* Invert value for the supplied MatrixMap */
+   int old_winv;                 /* Invert value for the supplied WinMap */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store pointers to the supplied WinMap and the MatrixMap. */
+   wm = (AstWinMap *) maps[ iwm ];
+   mm = (AstMatrixMap *) maps[ 1 - iwm ];
+
+/* Temporarily set the Invert attribute of the supplied Mappings to the
+   supplied values. */
+   old_winv = astGetInvert( wm );
+   astSetInvert( wm, inverts[ iwm ] );
+
+   old_minv = astGetInvert( mm );
+   astSetInvert( mm, inverts[ 1 - iwm ] );
+
+/* Get copies of the shift and scale terms used by the WinMap. This
+   also returns the number of axes in the WinMap. */
+   nin = astWinTerms( wm, &a, &b );   
+
+/* Create a diagonal MatrixMap holding the scale factors from the
+   supplied WinMap. */
+   m1 = astMatrixMap( nin, nin, 1, b, "" );
+
+/* Create a PointSet holding a single position given by the shift terms
+   in the supplied WinMap. */
+   pset1 = astPointSet( 1, nin, "" );
+   ptr1 = astGetPoints( pset1 );
+   if( astOK ){
+      aa = a;
+      for( i = 0; i < nin; i++ ) ptr1[ i ][ 0 ] = *(aa++);
+   }
+
+/* First deal with cases when the WinMap is applied first, followed by
+   the MatrixMap. */
+   if( iwm == 0 ){
+
+/* Multiply the diagonal matrix holding the WinMap scale factors by the 
+   supplied matrix. The resulting MatrixMap is the one to return in the 
+   map list. */
+      m2 = astMtrMult( m1, mm );
+
+/* Transform the position given by the shift terms from the supplied
+   WinMap using the supplied MatrixMap to get the shift terms for 
+   the returned WinMap. */
+      pset2 = astTransform( mm, pset1, 1, NULL );
+
+/* Now deal with cases when the MatrixMap is applied first, followed by
+   the WinMap. */
+   } else {
+
+/* Multiply the supplied MatrixMap by the diagonal matrix holding scale
+   factors from the supplied WinMap. The resulting MatrixMap is the one to 
+   return in the map list. */
+      m2 = astMtrMult( mm, m1 );
+
+/* Transform the position given by the shift terms from the supplied
+   WinMap using the inverse of the returned MatrixMap to get the shift 
+   terms for the returned WinMap. */
+      pset2 = astTransform( m2, pset1, 0, NULL );
+
+   }
+
+/* Re-instate the original value of the Invert attributes of the supplied 
+   Mappings. */
+   astSetInvert( wm, old_winv );
+   astSetInvert( mm, old_minv );
+
+/* Get pointers to the shift terms for the returned WinMap. */
+   ptr2 = astGetPoints( pset2 ); 
+
+/* Create the returned WinMap, initially with undefined corners. The number of
+   axes in the WinMap must equal the number of shift terms. */
+   nout = astGetNcoord( pset2 );
+   w1 = astWinMap( nout, NULL, NULL, NULL, NULL, "" );
+
+/* If succesful, store the scale and shift terms in the WinMap. The scale
+   terms are always unity. */
+   if( astOK ){
+      bb = w1->b;
+      aa = w1->a;
+      for( i = 0; i < nout; i++ ) {
+         *(bb++) = 1.0;
+         *(aa++) = ptr2[ i ][ 0 ];
+      }
+
+/* Replace the supplied Mappings and invert flags with the ones found
+   above. Remember that the order of the Mappings is now swapped */
+      (void) astAnnul( maps[ 0 ] );
+      (void) astAnnul( maps[ 1 ] );
+
+      maps[ 1 - iwm ] = (AstMapping *) w1;
+      inverts[ 1 - iwm  ] = astGetInvert( w1 );
+
+      maps[ iwm ] = (AstMapping *) m2;
+      inverts[ iwm  ] = astGetInvert( m2 );
+
+   }
+
+/* Annul the MatrixMap and PointSet holding the scale and shift terms from the
+   supplied WinMap. */
+   m1 = astAnnul( m1 );
+   pset1 = astAnnul( pset1 );
+
+/* Free the copies of the scale and shift terms from the supplied WinMap. */
+   b = (double *) astFree( (void *) b );
+   a = (double *) astFree( (void *) a );
+
+/* Return. */
+   return;
+}
+
+static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
+/*
+*  Name:
+*     WinPerm
+
+*  Purpose:
+*     Swap a WinMap and a PermMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     void WinPerm( AstMapping **maps, int *inverts, int iwm )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     A list of two Mappings is supplied containing a WinMap and a
+*     PermMap. These Mappings are annulled, and replaced with 
+*     another pair of Mappings consisting of a WinMap and a PermMap
+*     in the opposite order. These Mappings are chosen so that their
+*     combined effect is the same as the original pair of Mappings. 
+*     The returned PermMap is unchanged (i.e. all the changed are made
+*     to the WinMap).
+
+*  Parameters:
+*     maps
+*        A pointer to an array of two Mapping pointers.
+*     inverts
+*        A pointer to an array of two invert flags.
+*     iwm
+*        The index within "maps" of the WinMap.
+
+*  Notes:
+*     -  The PermMap must have a consistent pair of forward and inverse
+*     transformations.
+
+*/
+
+/* Local Variables: */
+   AstPermMap *pm;               /* Pointer to the supplied PermMap */
+   AstPointSet *pset1;           /* Shift & scale terms from supplied WinMap */
+   AstPointSet *pset2;           /* Permuted shift & scale terms */
+   AstWinMap *w1;                /* Pointer to the returned WinMap */
+   AstWinMap *wm;                /* Pointer to the supplied WinMap */
+   double **ptr1;                /* Pointer to pset1 data */
+   double **ptr2;                /* Pointer to pset2 data */
+   double *a;                    /* Array of shift terms from supplied WinMap */
+   double *aa;                   /* Pointer to next shift term */
+   double *b;                    /* Array of scale terms from supplied WinMap */
+   double *bb;                   /* Pointer to next scale term */
+   int i;                        /* Axis count */
+   int nin;                      /* No. of axes in supplied WinMap */
+   int old_pinv;                 /* Invert value for the supplied PermMap */
+   int old_winv;                 /* Invert value for the supplied WinMap */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store pointers to the supplied WinMap and the PermMap. */
+   wm = (AstWinMap *) maps[ iwm ];
+   pm = (AstPermMap *) maps[ 1 - iwm ];
+
+/* Temporarily set the Invert attribute of the supplied Mappings to the
+   supplied values. */
+   old_winv = astGetInvert( wm );
+   astSetInvert( wm, inverts[ iwm ] );
+
+   old_pinv = astGetInvert( pm );
+   astSetInvert( pm, inverts[ 1 - iwm ] );
+
+/* Get copies of the shift and scale terms used by the WinMap. This
+   also returns the number of axes in the WinMap. */
+   nin = astWinTerms( wm, &a, &b );   
+
+/* Create two PointSets, each holding two points, which can be used for
+   input and output positions with the PermMap. */
+   pset1 = astPointSet( 2, nin, "" );
+   pset2 = astPointSet( 2, nin, "" );
+
+/* Store the WinMap shift terms as the first position, and the WinMap
+   scale terms as the second position. */
+   ptr1 = astGetPoints( pset1 );
+   if( astOK ){
+      bb = b;
+      aa = a;
+      for( i = 0; i < nin; i++ ){
+         ptr1[ i ][ 1 ] = *(bb++);
+         ptr1[ i ][ 0 ] = *(aa++);
+      }
+   }
+
+/* Use the PermMap to permute these scale and shift terms. If the WinMap
+   is applied before the PermMap, use the forward permutation, otherwise use
+   the reverse permutation. */
+   astTransform( pm, pset1, 1 - iwm, pset2 );
+
+/* Create the returned WinMap, initially with undefined corners. */
+   w1 = astWinMap( nin, NULL, NULL, NULL, NULL, "" );
+
+/* Store the permuted scale and shift terms in the new WinMap. */   
+   ptr2 = astGetPoints( pset2 );
+   if( astOK ){
+      bb = w1->b;
+      aa = w1->a;
+      for( i = 0; i < nin; i++ ){
+         *(bb++) = ptr2[ i ][ 1 ];
+         *(aa++) = ptr2[ i ][ 0 ];
+      }
+   }
+
+/* Re-instate the original value of the Invert attributes of the supplied 
+   Mappings. */
+   astSetInvert( wm, old_winv );
+   astSetInvert( pm, old_pinv );
+
+/* Replace the supplied WinMap with the one found above, swapping the
+   order of the Mappings. The PermMap is retained unchanged. */
+   if( astOK ){
+      (void) astAnnul( maps[ iwm ] );
+
+      maps[ iwm ] = maps[ 1 - iwm ];
+      inverts[ iwm ] = inverts[ 1 - iwm ];
+
+      maps[ 1 - iwm ] = (AstMapping *) w1;
+      inverts[ 1 - iwm  ] = astGetInvert( w1 );
+   }
+
+/* Annul the PointSets. */
+   pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
+
+/* Free the copies of the scale and shift terms from the supplied WinMap. */
+   b = (double *) astFree( (void *) b );
+   a = (double *) astFree( (void *) a );
+
+/* Return. */
+   return;
+}
+
+static int WinTerms( AstWinMap *this, double **shift, double **scale ){
+/*
+*+
+*  Name:
+*     astWinTerms
+
+*  Purpose:
+*     Obtain the scale and shift terms used by a WinMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     int astWinTerms( AstWinMap *this, double **shift, double **scale )
+
+*  Class Membership:
+*     WinMap mewthod.
+
+*  Description:
+*     This function returns copies of the scale and shift terms used by a 
+*     WinMap when transforming points. Each axis of the WinMap has a scale 
+*     term B, and a shift term A, and the transformation of a point is done 
+*     by applying these to each input axis value X in turn, to get the 
+*     output axis value B.X + A. The returned terms take into account the 
+*     current setting of the Invert attribute of the WinMap. 
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+*     shift
+*        The address of a location at which to return a pointer to the
+*        start of a dynamically allocated array holding the shift terms
+*        for each axis.
+*     scale
+*        The address of a location at which to return a pointer to the
+*        start of a dynamically allocated array holding the scale terms
+*        for each axis.
+
+*  Returned Value:
+*     The number of axes in the WinMap. This is the same as the number of
+*     elements in the returned arrays.
+
+*  Notes:
+*     -  The returned arrays should be released using astFree when no
+*     longer needed.
+*     -  NULL pointers can be supplied for "scale" or "shift" if the
+*     corresponding arrays are not required.
+*     -  A value of zero will be returned, together with NULL pointers
+*     for "scale" and "shift" if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   double *a;             /* Pointer to a copy of the shift term array */
+   double *aa;            /* Pointer to the next shift term */
+   double *b;             /* Pointer to a copy of the scale term array */
+   double *bb;            /* Pointer to the next scale term */
+   int i;                 /* Axis count */
+   int result;            /* The returned number of axes */
+   size_t absize;         /* Size of shift and scale arrays */
+
+/* Initialise. */
+   result = 0;
+   if( scale ) *scale = NULL;
+   if( shift ) *shift = NULL;
+
+/* Check the global status. */
+   if ( !astOK ) return result;
+
+/* Get the number of axes in the WinMap. */
+   result = astGetNin( this );
+
+/* Create copies of the scale and shift terms from the WinMap. */
+   absize = sizeof( double )*(size_t) result;
+   b = (double *) astStore( NULL, (void *) this->b, absize );
+   a = (double *) astStore( NULL, (void *) this->a, absize );
+
+/* Check the pointers can be used. */
+   if( astOK ){
+
+/* If the WinMap is inverted, replace the scale and shift terms
+   by the corresponding values for the inverted mapping. */
+      if( astGetInvert( this ) ){
+         bb = b;
+         aa = a;
+         
+         for( i = 0; i < result; i++ ){               
+            if( *aa != AST__BAD && *bb != 0.0 && *bb != AST__BAD ){
+               *bb = 1.0/(*bb);
+               *aa *= -(*bb);
+            } else {
+               *bb = AST__BAD;
+               *aa = AST__BAD;
+            }
+
+            aa++;
+            bb++;
+
+         }
+      }
+
+/* Store the required pointers, and free arrays which are not required. */
+      if( scale ){
+         *scale = b;
+      } else {
+         b = (double *) astFree( (void *) b );
+      }
+
+      if( shift ){
+         *shift = a;
+      } else {
+         a = (double *) astFree( (void *) a );
+      }
+
+   }
+
+/* If an error has occurred, free the arrays and return zero. */
+   if( !astOK ){
+      if( scale ) *scale = (double *) astFree( (void *) *scale );
+      if( shift ) *shift = (double *) astFree( (void *) *shift );
+      result = 0;
+   }
+
+/* Return the answer. */
+   return result;
+
+}
+
+static AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv, 
+                           int win1 ){
+/*
+*  Name:
+*     WinUnit
+
+*  Purpose:
+*     Create a WinMap by merging a WinMap and a UnitMap in parallel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv, int win1 )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     This function creates a new WinMap which performs a mapping
+*     equivalent to applying the two supplied Mappings in parallel in 
+*     the directions specified by the "invert" flag (the Invert 
+*     attribute of the supplied WinMap is ignored). 
+
+*  Parameters:
+*     wm
+*        A pointer to the WinMap.
+*     um
+*        A pointer to the UnitMap.
+*     winv
+*        The invert flag to use with wm. A value of zero causes the forward
+*        mapping to be used, and a non-zero value causes the inverse
+*        mapping to be used.
+*     win1
+*        Indicates the order in which the Mappings should be applied. 
+*
+*        If win1 is non-zero:
+*           "wm" applies to the lower axis indices and "um" to the upper
+*           axis indices.
+*
+*        If win1 is zero:
+*           "um" applies to the lower axis indices and "wm" to the upper
+*           axis indices.
+
+*  Returned Value:
+*     Pointer to the new WinMap.
+
+*  Notes:
+*     -  The forward direction of the returned WinMap is equivalent to the
+*     combined effect of the two supplied Mappings, operating in the
+*     directions specified by "winv". 
+*     -  A null pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWinMap *result;            /* Pointer to output WinMap */
+   double *a;                    /* Pointer to shift term array */
+   double *aa;                   /* Pointer to next shift term */
+   double *ar;                   /* Pointer to next shift term in result */
+   double *b;                    /* Pointer to scale term array */
+   double *bb;                   /* Pointer to next scale term */
+   double *br;                   /* Pointer to next scale term in result */
+   int i;                        /* Axis index */
+   int ninw;                     /* No. of axes in the WinMap */
+   int ninu;                     /* No. of axes in the UnitMap */
+   int old_winv;                 /* Original setting of WinMap Invert attribute */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Initialise the returned pointer. */
+   result = NULL;
+
+/* Temporarily set the Invert attribute of the WinMap to the supplied 
+   value. */
+   old_winv = astGetInvert( wm );
+   astSetInvert( wm, winv );
+
+/* Create copies of the scale and shift terms from the WinMap, and store the 
+   number of axes in it. */
+   ninw = astWinTerms( wm, &a, &b );
+   
+/* Check the pointers can be used. */
+   if( astOK ){
+
+/* Get the number of axes in the UnitMap. */
+      ninu = astGetNin( um );
+
+/* Create the merged WinMap with unspecified corners. */
+      result = astWinMap( ninw + ninu, NULL, NULL, NULL, NULL, "" );
+
+/* If the WinMap applies to the lower axis indices... */
+      if( win1 ){
+
+/* Use the scale and shift terms from the WinMap for the lower axes of
+   the new WinMap. */
+         aa = a;
+         bb = b;
+         ar = result->a;
+         br = result->b;
+
+         for( i = 0; i < ninw; i++ ){               
+            *(ar++) = *(aa++);
+            *(br++) = *(bb++);
+         }
+
+/* Use the scale factor to 1.0 and the shift term to zero for the upper axes 
+   of the new WinMap. */
+         for( i = 0; i < ninu; i++ ){               
+            *(ar++) = 0.0;
+            *(br++) = 1.0;
+         }
+
+/* If the WinMap applies to the upper axis indices... */
+      } else {
+
+/* Use the scale factor to 1.0 and the shift term to zero for the lower axes 
+   of the new WinMap. */
+         ar = result->a;
+         br = result->b;
+
+         for( i = 0; i < ninu; i++ ){               
+            *(ar++) = 0.0;
+            *(br++) = 1.0;
+         }
+
+/* Use the scale and shift terms from the WinMap for the upper axes of
+   the new WinMap. */
+         aa = a;
+         bb = b;
+
+         for( i = 0; i < ninw; i++ ){               
+            *(ar++) = *(aa++);
+            *(br++) = *(bb++);
+         }
+      }
+   }
+
+/* Free the copies of the scale and shift terms from the supplied WinMap. */
+   b = (double *) astFree( (void *) b );
+   a = (double *) astFree( (void *) a );
+
+/* Re-instate the original setting of the Invert attribute for the
+   supplied WinMap. */
+   astSetInvert( wm, old_winv );
+
+/* If an error has occurred, annull the returned WinMap. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return a pointer to the output WinMap. */
+   return result;
+}
+
+static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1, 
+                          int inv2, int series ){
+/*
+*  Name:
+*     WinWin
+
+*  Purpose:
+*     Create a merged WinMap from two supplied WinMaps.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1, 
+*                        int inv2, int series )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     This function creates a new WinMap which performs a mapping
+*     equivalent to applying the two supplied WinMaps either in series 
+*     or parallel in the directions specified by the "invert" flags 
+*     (the Invert attributes of the supplied WinMaps are ignored).
+
+*  Parameters:
+*     map1
+*        A pointer to the WinMap to apply first (if in series), or to the 
+*        lower axis indices (if in parallel)
+*     map2
+*        A pointer to the WinMap to apply second (if in series), or to the 
+*        upper axis indices (if in parallel)
+*     inv1
+*        The invert flag to use with map1. A value of zero causes the forward
+*        mapping to be used, and a non-zero value causes the inverse
+*        mapping to be used.
+*     inv2
+*        The invert flag to use with map2. 
+*     series
+*        If non-zero, then the supplied WinMaps are combined in series.
+*        Otherwise, they are combined in parallel.
+
+*  Returned Value:
+*     Pointer to the new WinMap.
+
+*  Notes:
+*     -  The forward direction of the returned WinMap is equivalent to the
+*     combined effect of the two supplied WinMap, operating in the
+*     directions specified by "inv1" and "inv2". 
+*     -  A null pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWinMap *result;            /* Pointer to output WinMap */
+   AstWinMap *wm1;               /* Pointer to the first supplied WinMap */
+   AstWinMap *wm2;               /* Pointer to the second supplied WinMap */
+   double *a[ 2 ];               /* Pointers to shift term arrays */
+   double *a0;                   /* Pointer to next shift term from WinMap 1 */
+   double *a1;                   /* Pointer to next shift term from WinMap 2 */
+   double *ar;                   /* Pointer to next shift term in result */
+   double *b[ 2 ];               /* Pointers to scale term arrays */
+   double *b0;                   /* Pointer to next scale term from WinMap 1 */
+   double *b1;                   /* Pointer to next scale term from WinMap 2 */
+   double *br;                   /* Pointer to next scale term in result */
+   int i;                        /* Axis index */
+   int invert[ 2 ];              /* Array of invert flags */
+   int nin[ 2 ];                 /* No. of axes in the two WinMaps */
+   size_t absize;                /* Size of array holding scale or shift terms */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Initialise the returned pointer. */
+   result = NULL;
+
+/* Store pointers to the WinMaps. */
+   wm1 = (AstWinMap *) map1;
+   wm2 = (AstWinMap *) map2;
+
+/* Temporarily set their Invert attributes to the supplied values. */
+   invert[ 0 ] = astGetInvert( wm1 );
+   astSetInvert( wm1, inv1 );
+
+   invert[ 1 ] = astGetInvert( wm2 );
+   astSetInvert( wm2, inv2 );
+   
+/* Create copies of the scale and shift terms from the two WinMaps,
+   and store the number of axes in each WinMap. The scale and shift terms
+   returned take into account the setting of the Invert attribute. */
+   nin[ 0 ] = astWinTerms( wm1, a, b );
+   nin[ 1 ] = astWinTerms( wm2, a + 1, b + 1 );
+   
+/* Check the pointers can be used. */
+   if( astOK ){
+
+/* Series */
+/* ====== */
+      if( series ){
+
+/* Merge the scale and shift terms for the two WinMaps, overwriting the
+   terms for the first WinMap. To be merged in series, both WinMaps must
+   have the same number of axes, so it matters not whether we use nin[ 0 ]
+   or nin[ 1 ] to specify the number of axes. */
+         a0 = a[ 0 ];
+         b0 = b[ 0 ];
+         a1 = a[ 1 ];
+         b1 = b[ 1 ];
+         for( i = 0; i < nin[ 0 ]; i++ ){               
+   
+            if( *a0 != AST__BAD && *b0 != AST__BAD &&
+                *a1 != AST__BAD && *b1 != AST__BAD ){
+   
+               *a0 *= (*b1);
+               *a0 += (*a1);
+               *b0 *= (*b1);
+   
+            } else {
+               *a0 = AST__BAD;
+               *b0 = AST__BAD;
+               *a1 = AST__BAD;
+               *b1 = AST__BAD;
+            }
+   
+   /* Move on to the next axis. */
+            a0++;
+            b0++;
+            a1++;
+            b1++;
+         }
+
+/* Create the merged WinMap with unspecified corners. */
+         result = astWinMap( nin[ 0 ], NULL, NULL, NULL, NULL, "" );
+
+/* Store the merged scale and shift terms in the new WinMap. The forward 
+   transformation of this WinMap then corresponds to the combination of the 
+   two supplied WinMaps, taking into account their invert flags. */
+         a0 = a[ 0 ];
+         b0 = b[ 0 ];
+         ar = result->a;
+         br = result->b;
+         for( i = 0; i < nin[ 0 ]; i++ ){               
+            *(ar++) = *(a0++);
+            *(br++) = *(b0++);
+         }
+
+/* Parallel */
+/* ======== */
+      } else {
+
+/* Create the merged WinMap with unspecified corners. */
+         result = astWinMap( nin[ 0 ] + nin[ 1 ], NULL, NULL, NULL, NULL, "" );
+
+/* Copy the scale and shift terms into the new WinMap. */
+         a0 = a[ 0 ];
+         b0 = b[ 0 ];
+         a1 = a[ 1 ];
+         b1 = b[ 1 ];
+         ar = result->a;
+         br = result->b;
+
+         for( i = 0; i < nin[ 0 ]; i++ ){               
+            *(ar++) = *(a0++);
+            *(br++) = *(b0++);
+         }
+
+         for( i = 0; i < nin[ 1 ]; i++ ){               
+            *(ar++) = *(a1++);
+            *(br++) = *(b1++);
+         }
+      }
+   }
+
+/* Re-instate the original settings of the Invert attributes for the
+   supplied WinMaps. */
+   astSetInvert( wm1, invert[ 0 ] );
+   astSetInvert( wm2, invert[ 1 ] );
+   
+/* Free the memory. */
+   a[ 0 ] = (double *) astFree( (void *) a[ 0 ] );
+   b[ 0 ] = (double *) astFree( (void *) b[ 0 ] );
+   a[ 1 ] = (double *) astFree( (void *) a[ 1 ] );
+   b[ 1 ] = (double *) astFree( (void *) b[ 1 ] );
+
+/* If an error has occurred, annull the returned WinMap. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return a pointer to the output WinMap. */
+   return result;
+}
+
+static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv, 
+                           int zinv, int win1, int series ){
+/*
+*  Name:
+*     WinZoom
+
+*  Purpose:
+*     Create a WinMap by merging a WinMap and a ZoomMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv, 
+*                         int zinv, int win1, int series )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     This function creates a new WinMap which performs a mapping
+*     equivalent to applying the two supplied Mappings in series or
+*     parallel in the directions specified by the "invert" flags (the 
+*     Invert attributes of the supplied WinMaps are ignored). 
+
+*  Parameters:
+*     wm
+*        A pointer to the WinMap.
+*     zm
+*        A pointer to the ZoomMap.
+*     winv
+*        The invert flag to use with wm. A value of zero causes the forward
+*        mapping to be used, and a non-zero value causes the inverse
+*        mapping to be used.
+*     zinv
+*        The invert flag to use with zm.
+*     win1
+*        Indicates the order in which the Mappings should be applied. 
+*
+*        If win1 is non-zero:
+*           If in series:
+*              "wm" is applied first followed by "zm". 
+*           If in parallel:
+*              "wm" applies to the lower axis indices and "zm" to the upper
+*              axis indices.
+*
+*        If win1 is zero:
+*           If in series:
+*              "zm" is applied first followed by "wm". 
+*           If in parallel:
+*              "zm" applies to the lower axis indices and "wm" to the upper
+*              axis indices.
+*     series
+*        Should be supplied non-zero if the Mappings are to be combined in 
+*        series.
+
+*  Returned Value:
+*     Pointer to the new WinMap.
+
+*  Notes:
+*     -  The forward direction of the returned WinMap is equivalent to the
+*     combined effect of the two supplied Mappings, operating in the
+*     directions specified by "zinv" and "winv". 
+*     -  A null pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWinMap *result;            /* Pointer to output WinMap */
+   double *a;                    /* Pointer to shift term array */
+   double *aa;                   /* Pointer to next shift term */
+   double *ar;                   /* Pointer to next shift term in result */
+   double *b;                    /* Pointer to scale term array */
+   double *bb;                   /* Pointer to next scale term */
+   double *br;                   /* Pointer to next scale term in result */
+   double zfac;                  /* Zoom factor */
+   int i;                        /* Axis index */
+   int ninw;                     /* No. of axes in the WinMap */
+   int ninz;                     /* No. of axes in the ZoomMap */
+   int old_winv;                 /* Original setting of WinMap Invert attribute */
+   int old_zinv;                 /* Original setting of ZoomMap Invert attribute */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Initialise the returned pointer. */
+   result = NULL;
+
+/* Temporarily set the Invert attributes of both Mappings to the supplied 
+   values. */
+   old_winv = astGetInvert( wm );
+   astSetInvert( wm, winv );
+
+   old_zinv = astGetInvert( zm );
+   astSetInvert( zm, zinv );
+   
+/* Get the zoom factor implemented by the ZoomMap. */
+   zfac = astGetZoom( zm );
+
+/* Create copies of the scale and shift terms from the WinMap, and store the 
+   number of axes in it. */
+   ninw = astWinTerms( wm, &a, &b );
+   
+/* Check the pointers can be used. */
+   if( astOK ){
+
+/* First do series mode... */
+      if( series ) {
+
+/* Modify the WinMap scale and shift terms by the zoom factor. How this is 
+   done depends on which way round the Mappings are applied. */
+         bb = b;
+         aa = a;
+                 
+         for( i = 0; i < ninw; i++ ){               
+   
+            if( *aa != AST__BAD && *bb != AST__BAD && zfac != AST__BAD ){
+               *bb *= zfac;
+               if( win1 ) *aa *= zfac;
+            } else {
+               *bb = AST__BAD;
+               *aa = AST__BAD;
+            }
+      
+            aa++;
+            bb++;
+         }
+
+/* Create the merged WinMap with unspecified corners. */
+         result = astWinMap( ninw, NULL, NULL, NULL, NULL, "" );
+
+/* Store the merged scale and shift terms in the new WinMap. The forward 
+   transformation of this WinMap then corresponds to the combination of the 
+   two supplied Mappings, taking into account their invert flags. */
+         aa = a;
+         bb = b;
+         ar = result->a;
+         br = result->b;
+         for( i = 0; i < ninw; i++ ){               
+            *(ar++) = *(aa++);
+            *(br++) = *(bb++);
+         }
+
+/* Now do parallel mode... */
+      } else {
+
+/* Get the number of axes in the ZoomMap. */
+         ninz = astGetNin( zm );
+
+/* Create the merged WinMap with unspecified corners. */
+         result = astWinMap( ninw + ninz, NULL, NULL, NULL, NULL, "" );
+
+/* If the WinMap applies to the lower axis indices... */
+         if( win1 ) {
+
+/* Use the scale and shift terms from the WinMap for the lower axes of
+   the new WinMap. */
+            aa = a;
+            bb = b;
+            ar = result->a;
+            br = result->b;
+
+            for( i = 0; i < ninw; i++ ){               
+               *(ar++) = *(aa++);
+               *(br++) = *(bb++);
+            }
+
+/* Use the scale factor (with zero shift) from the ZoomMap for the upper axes 
+   of the new WinMap. */
+            for( i = 0; i < ninz; i++ ){               
+               *(ar++) = 0.0;
+               *(br++) = zfac;
+            }
+
+/* If the WinMap applies to the upper axis indices... */
+         } else {
+
+/* Use the scale factor (with zero shift) from the ZoomMap for the lower axes 
+   of the new WinMap. */
+            ar = result->a;
+            br = result->b;
+
+            for( i = 0; i < ninz; i++ ){               
+               *(ar++) = 0.0;
+               *(br++) = zfac;
+            }
+
+/* Use the scale and shift terms from the WinMap for the upper axes of
+   the new WinMap. */
+            aa = a;
+            bb = b;
+
+            for( i = 0; i < ninw; i++ ){               
+               *(ar++) = *(aa++);
+               *(br++) = *(bb++);
+            }
+         }
+      }
+   }
+
+/* Free the copies of the scale and shift terms from the supplied WinMap. */
+   b = (double *) astFree( (void *) b );
+   a = (double *) astFree( (void *) a );
+
+/* Re-instate the original settings of the Invert attribute for the
+   supplied Mappings. */
+   astSetInvert( wm, old_winv );
+   astSetInvert( zm, old_zinv );
+
+/* If an error has occurred, annull the returned WinMap. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return a pointer to the output WinMap. */
+   return result;
+}
+
+/* Functions which access class attributes. */
+/* ---------------------------------------- */
+/* Implement member functions to access the attributes associated with
+   this class using the macros defined for this purpose in the
+   "object.h" file. For a description of each attribute, see the class
+   interface (in the associated .h file). */
+
+/* Copy constructor. */
+/* ----------------- */
+static void Copy( const AstObject *objin, AstObject *objout ) {
+/*
+*  Name:
+*     Copy
+
+*  Purpose:
+*     Copy constructor for WinMap objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Copy( const AstObject *objin, AstObject *objout )
+
+*  Description:
+*     This function implements the copy constructor for WinMap objects.
+
+*  Parameters:
+*     objin
+*        Pointer to the WinMap to be copied.
+*     objout
+*        Pointer to the WinMap being constructed.
+
+*/
+
+/* Local Variables: */
+   AstWinMap *out;              /* Pointer to output WinMap */
+   AstWinMap *in;               /* Pointer to input WinMap */
+   int ncoord;                  /* No. of axes for the mapping */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the input and output WinMaps. */
+   in= (AstWinMap *) objin;
+   out = (AstWinMap *) objout;
+
+/* Get the number of coordinates mapped by the WinMap. */
+   ncoord = astGetNin( in );
+
+/* Allocate memory holding copies of the scales and shifts window defining the 
+   mapping. */
+   out->a = (double *) astStore( NULL, (void *) in->a, 
+                                  sizeof(double)*(size_t)ncoord );
+   out->b = (double *) astStore( NULL, (void *) in->b, 
+                                  sizeof(double)*(size_t)ncoord );
+
+/* If an error occurred, free any allocated memory. */
+   if ( !astOK ) {
+      out->a = (double *) astFree( (void *) out->a );
+      out->b = (double *) astFree( (void *) out->b );
+   }
+
+}
+
+/* Destructor. */
+/* ----------- */
+static void Delete( AstObject *obj ) {
+/*
+*  Name:
+*     Delete
+
+*  Purpose:
+*     Destructor for WinMap objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Delete( AstObject *obj )
+
+*  Description:
+*     This function implements the destructor for WinMap objects.
+
+*  Parameters:
+*     obj
+*        Pointer to the WinMap to be deleted.
+
+*  Notes:
+*     - This destructor does nothing and exists only to maintain a
+*     one-to-one correspondence between destructors and copy
+*     constructors.
+*/
+
+/* Local Variables: */
+   AstWinMap *this;              /* Pointer to WinMap */
+
+/* Obtain a pointer to the WinMap structure. */
+   this = (AstWinMap *) obj;
+
+/* Free the memory holding the scales and shifts. */
+   this->a = (double *) astFree( (void *) this->a );
+   this->b = (double *) astFree( (void *) this->b );
+
+}
+
+/* Dump function. */
+/* -------------- */
+static void Dump( AstObject *this_object, AstChannel *channel ) {
+/*
+*  Name:
+*     Dump
+
+*  Purpose:
+*     Dump function for WinMap objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Dump( AstObject *this, AstChannel *channel )
+
+*  Description:
+*     This function implements the Dump function which writes out data
+*     for the WinMap class to an output Channel.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap whose data are being written.
+*     channel
+*        Pointer to the Channel to which the data are being written.
+*/
+
+/* Local Constants: */
+#define COMMENT_LEN 50           /* Maximum length of a comment string */
+#define KEY_LEN 50               /* Maximum length of a keyword */
+
+/* Local Variables: */
+   AstWinMap *this;              /* Pointer to the WinMap structure */
+   char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
+   char comment[ COMMENT_LEN + 1 ]; /* Buffer for comment string */
+   int axis;                     /* Axis index */
+   int ncoord;                   /* No. of axes for mapping */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the WinMap structure. */
+   this = (AstWinMap *) this_object;
+
+/* Get the number of coordinates to be mapped. */
+   ncoord = astGetNin( this );
+
+/* Write out values representing the instance variables for the
+   WinMap class.  Accompany these with appropriate comment strings,
+   possibly depending on the values being written.*/
+
+/* The scales and shifts. */
+   for( axis = 0; axis < ncoord; axis++ ){
+      (void) sprintf( buff, "Sft%d", axis + 1 );
+      (void) sprintf( comment, "Shift for axis %d", axis + 1 );
+      astWriteDouble( channel, buff, (this->a)[ axis ] != 0.0, 0,
+                      (this->a)[ axis ], comment );
+      (void) sprintf( buff, "Scl%d", axis + 1 );
+      (void) sprintf( comment, "Scale factor for axis %d", axis + 1 );
+      astWriteDouble( channel, buff, (this->b)[ axis ] != 1.0, 0,
+                      (this->b)[ axis ], comment );
+   }
+
+/* Undefine macros local to this function. */
+#undef COMMENT_LEN
+#undef KEY_LEN
+}
+
+/* Standard class functions. */
+/* ========================= */
+/* Implement the astIsAWinMap and astCheckWinMap functions using the macros
+   defined for this purpose in the "object.h" header file. */
+astMAKE_ISA(WinMap,Mapping,check,&class_init)
+astMAKE_CHECK(WinMap)
+
+AstWinMap *astWinMap_( int ncoord, const double c1_in[], const double c2_in[], 
+                       const double c1_out[], const double c2_out[], 
+                       const char *options, ... ) {
+/*
+*++
+*  Name:
+c     astWinMap
+f     AST_WINMAP
+
+*  Purpose:
+*     Create a WinMap.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "winmap.h"
+c     AstWinMap *astWinMap( int ncoord,
+c                           const double ina[],  const double inb[],
+c                           const double outa[], const double outb[],
+c                           const char *options, ... )
+f     RESULT = AST_WINMAP( NCOORD, INA, INB, OUTA, OUTB, OPTIONS, STATUS )
+
+*  Class Membership:
+*     WinMap constructor.
+
+*  Description:
+*     This function creates a new WinMap and optionally initialises its
+*     attributes.
+*
+*     A Winmap is a linear Mapping which transforms a rectangular
+*     window in one coordinate system into a similar window in another
+*     coordinate system by scaling and shifting each axis (the window
+*     edges being parallel to the coordinate axes).
+*
+*     A WinMap is specified by giving the coordinates of two opposite
+*     corners (A and B) of the window in both the input and output
+*     coordinate systems.
+
+*  Parameters:
+c     ncoord
+f     NCOORD = INTEGER (Given)
+*        The number of coordinate values for each point to be
+*        transformed (i.e. the number of dimensions of the space in
+*        which the points will reside). The same number is applicable
+*        to both input and output points.
+c     ina
+f     INA( NCOORD ) = DOUBLE PRECISION (Given)
+c        An array containing the "ncoord"
+f        An array containing the
+*        coordinates of corner A of the window in the input coordinate 
+*        system.
+c     inb
+f     INB( NCOORD ) = DOUBLE PRECISION (Given)
+c        An array containing the "ncoord"
+f        An array containing the
+*        coordinates of corner B of the window in the input coordinate 
+*        system.
+c     outa
+f     OUTA( NCOORD ) = DOUBLE PRECISION (Given)
+c        An array containing the "ncoord"
+f        An array containing the 
+*        coordinates of corner A of the window in the output coordinate 
+*        system.
+c     outb
+f     OUTB( NCOORD ) = DOUBLE PRECISION (Given)
+c        An array containing the "ncoord"
+f        An array containing the
+*        coordinates of corner B of the window in the output coordinate 
+*        system.
+c     options
+f     OPTIONS = CHARACTER * ( * ) (Given)
+c        Pointer to a null-terminated string containing an optional
+c        comma-separated list of attribute assignments to be used for
+c        initialising the new WinMap. The syntax used is identical to
+c        that for the astSet function and may include "printf" format
+c        specifiers identified by "%" symbols in the normal way.
+f        A character string containing an optional comma-separated
+f        list of attribute assignments to be used for initialising the
+f        new WinMap. The syntax used is identical to that for the
+f        AST_SET routine.
+c     ...
+c        If the "options" string contains "%" format specifiers, then
+c        an optional list of additional arguments may follow it in
+c        order to supply values to be substituted for these
+c        specifiers. The rules for supplying these are identical to
+c        those for the astSet function (and for the C "printf"
+c        function).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astWinMap()
+f     AST_WINMAP = INTEGER
+*        A pointer to the new WinMap.
+
+*  Notes:
+*     - A null Object pointer (AST__NULL) will be returned if this
+c     function is invoked with the AST error status set, or if it
+f     function is invoked with STATUS set to an error value, or if it
+*     should fail for any reason.
+*--
+*/
+
+/* Local Variables: */
+   AstWinMap *new;              /* Pointer to new WinMap */
+   va_list args;                /* Variable argument list */
+
+/* Check the global status. */
+   if ( !astOK ) return NULL;
+
+/* Initialise the WinMap, allocating memory and initialising the
+   virtual function table as well if necessary. */
+   new = astInitWinMap( NULL, sizeof( AstWinMap ), !class_init, &class_vtab,
+                        "WinMap", ncoord, c1_in, c2_in, c1_out, c2_out );
+
+/* If successful, note that the virtual function table has been
+   initialised. */
+   if ( astOK ) {
+      class_init = 1;
+
+/* Obtain the variable argument list and pass it along with the options string
+   to the astVSet method to initialise the new WinMap's attributes. */
+      va_start( args, options );
+      astVSet( new, options, args );
+      va_end( args );
+
+/* If an error occurred, clean up by deleting the new object. */
+      if ( !astOK ) new = astDelete( new );
+   }
+
+/* Return a pointer to the new WinMap. */
+   return new;
+}
+
+AstWinMap *astWinMapId_( int ncoord, const double c1_in[], const double c2_in[], 
+                         const double c1_out[], const double c2_out[], 
+                         const char *options, ... ) {
+/*
+*  Name:
+*     astWinMapId_
+
+*  Purpose:
+*     Create a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     AstWinMap *astWinMapId_( int ncoord, const double c1_in[], 
+*                              const double c2_in[], const double c1_out[], 
+*                              const double c2_out[], 
+*                              const char *options, ... ) 
+
+*  Class Membership:
+*     WinMap constructor.
+
+*  Description:
+*     This function implements the external (public) interface to the
+*     astWinMap constructor function. It returns an ID value (instead
+*     of a true C pointer) to external users, and must be provided
+*     because astWinMap_ has a variable argument list which cannot be
+*     encapsulated in a macro (where this conversion would otherwise
+*     occur).
+*
+*     The variable argument list also prevents this function from
+*     invoking astWinMap_ directly, so it must be a re-implementation
+*     of it in all respects, except for the final conversion of the
+*     result to an ID value.
+
+*  Parameters:
+*     As for astWinMap_.
+
+*  Returned Value:
+*     The ID value associated with the new WinMap.
+*/
+
+/* Local Variables: */
+   AstWinMap *new;              /* Pointer to new WinMap */
+   va_list args;                /* Variable argument list */
+
+/* Check the global status. */
+   if ( !astOK ) return NULL;
+
+/* Initialise the WinMap, allocating memory and initialising the
+   virtual function table as well if necessary. */
+   new = astInitWinMap( NULL, sizeof( AstWinMap ), !class_init, &class_vtab,
+                        "WinMap", ncoord, c1_in, c2_in, c1_out, c2_out );
+
+/* If successful, note that the virtual function table has been
+   initialised. */
+   if ( astOK ) {
+      class_init = 1;
+
+/* Obtain the variable argument list and pass it along with the options string
+   to the astVSet method to initialise the new WinMap's attributes. */
+      va_start( args, options );
+      astVSet( new, options, args );
+      va_end( args );
+
+/* If an error occurred, clean up by deleting the new object. */
+      if ( !astOK ) new = astDelete( new );
+   }
+
+/* Return an ID value for the new WinMap. */
+   return astMakeId( new );
+}
+
+AstWinMap *astInitWinMap_( void *mem, size_t size, int init,
+                           AstWinMapVtab *vtab, const char *name,
+                           int ncoord, const double *c1_in, 
+                           const double *c2_in, const double *c1_out, 
+                           const double *c2_out ) {
+/*
+*+
+*  Name:
+*     astInitWinMap
+
+*  Purpose:
+*     Initialise a WinMap.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     AstWinMap *astInitWinMap( void *mem, size_t size, int init,
+*                               AstWinMapVtab *vtab, const char *name,
+*                               int ncoord, const double *c1_in, 
+*                               const double *c2_in, 
+*                               const double *c1_out, const double *c2_out ) 
+
+*  Class Membership:
+*     WinMap initialiser.
+
+*  Description:
+*     This function is provided for use by class implementations to initialise
+*     a new WinMap object. It allocates memory (if necessary) to accommodate
+*     the WinMap plus any additional data associated with the derived class.
+*     It then initialises a WinMap structure at the start of this memory. If
+*     the "init" flag is set, it also initialises the contents of a virtual
+*     function table for a WinMap at the start of the memory passed via the
+*     "vtab" parameter.
+
+*  Parameters:
+*     mem
+*        A pointer to the memory in which the WinMap is to be initialised.
+*        This must be of sufficient size to accommodate the WinMap data
+*        (sizeof(WinMap)) plus any data used by the derived class. If a value
+*        of NULL is given, this function will allocate the memory itself using
+*        the "size" parameter to determine its size.
+*     size
+*        The amount of memory used by the WinMap (plus derived class data).
+*        This will be used to allocate memory if a value of NULL is given for
+*        the "mem" parameter. This value is also stored in the WinMap
+*        structure, so a valid value must be supplied even if not required for
+*        allocating memory.
+*     init
+*        A logical flag indicating if the WinMap's virtual function table is
+*        to be initialised. If this value is non-zero, the virtual function
+*        table will be initialised by this function.
+*     vtab
+*        Pointer to the start of the virtual function table to be associated
+*        with the new WinMap.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the new object belongs (it is this
+*        pointer value that will subsequently be returned by the astGetClass
+*        method).
+*     ncoord
+*        The number of coordinate values per point.
+*     c1_in
+*        The input coordinates of corner C1 of the window.
+*     c2_in
+*        The input coordinates of corner C2 of the window.
+*     c1_out
+*        The output coordinates of corner C1 of the window.
+*     c2_out
+*        The output coordinates of corner C2 of the window.
+
+*  Returned Value:
+*     A pointer to the new WinMap.
+
+*  Notes:
+*     -  A null pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   AstWinMap *new;              /* Pointer to new WinMap */
+   double denom;                /* Denominotor */
+   int axis;                    /* Axis index */
+
+/* Check the global status. */
+   if ( !astOK ) return NULL;
+
+/* Initialise. */
+   new = NULL;
+
+/* Initialise a Mapping structure (the parent class) as the first component
+   within the WinMap structure, allocating memory if necessary. Specify that
+   the Mapping should be defined in both the forward and inverse directions. */
+   new = (AstWinMap *) astInitMapping( mem, size, init,
+                                       (AstMappingVtab *) vtab, name,
+                                       ncoord, ncoord, 1, 1 );
+
+/* If necessary, initialise the virtual function table. */
+/* ---------------------------------------------------- */
+   if ( init ) InitVtab( vtab );
+   if ( astOK ) {
+
+/* Initialise the WinMap data. */
+/* ---------------------------- */
+/* Allocate memory to hold the shift and scale for each axis. */
+      new->a = (double *) astMalloc( sizeof(double)*(size_t)ncoord );
+      new->b = (double *) astMalloc( sizeof(double)*(size_t)ncoord );
+
+/* Check the pointers can be used */
+      if( astOK ){
+
+/* Calculater and store the shift and scale for each axis. */
+         for( axis = 0; axis < ncoord; axis++ ){
+
+/* If any of the corners have not been provided, store bad values. */
+            if( !c1_in || !c1_out || !c2_in || !c2_out ) {
+               (new->b)[ axis ] = AST__BAD;
+               (new->a)[ axis ] = AST__BAD;
+
+/* Otherwise... */        
+            } else if( c2_in[ axis ] != AST__BAD && c1_in[ axis ] != AST__BAD &&
+                       c2_out[ axis ] != AST__BAD && c1_out[ axis ] != AST__BAD ){
+   
+               denom = c2_in[ axis ] - c1_in[ axis ];
+               if( denom != 0.0 ){
+                  (new->b)[ axis ] = ( c2_out[ axis ] - c1_out[ axis ] )/denom;
+                  (new->a)[ axis ] = c1_out[ axis ] - (new->b)[ axis ]*c1_in[ axis ];
+               } else {
+                  (new->b)[ axis ] = AST__BAD;
+                  (new->a)[ axis ] = AST__BAD;
+               }
+
+            } else {
+               (new->b)[ axis ] = AST__BAD;
+               (new->a)[ axis ] = AST__BAD;
+            }
+
+         }
+
+      }
+
+/* If an error occurred, clean up by deleting the new WinMap. */
+      if ( !astOK ) new = astDelete( new );
+   }
+
+/* Return a pointer to the new WinMap. */
+   return new;
+}
+
+AstWinMap *astLoadWinMap_( void *mem, size_t size, int init,
+                           AstWinMapVtab *vtab, const char *name,
+                           AstChannel *channel ) {
+/*
+*+
+*  Name:
+*     astLoadWinMap
+
+*  Purpose:
+*     Load a WinMap.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     AstWinMap *astLoadWinMap( void *mem, size_t size, int init,
+*                               AstWinMapVtab *vtab, const char *name,
+*                               AstChannel *channel )
+
+*  Class Membership:
+*     WinMap loader.
+
+*  Description:
+*     This function is provided to load a new WinMap using data read
+*     from a Channel. It first loads the data used by the parent class
+*     (which allocates memory if necessary) and then initialises a
+*     WinMap structure in this memory, using data read from the input
+*     Channel.
+*
+*     If the "init" flag is set, it also initialises the contents of a
+*     virtual function table for a WinMap at the start of the memory
+*     passed via the "vtab" parameter.
+
+*  Parameters:
+*     mem
+*        A pointer to the memory into which the WinMap is to be
+*        loaded.  This must be of sufficient size to accommodate the
+*        WinMap data (sizeof(WinMap)) plus any data used by derived
+*        classes. If a value of NULL is given, this function will
+*        allocate the memory itself using the "size" parameter to
+*        determine its size.
+*     size
+*        The amount of memory used by the WinMap (plus derived class
+*        data).  This will be used to allocate memory if a value of
+*        NULL is given for the "mem" parameter. This value is also
+*        stored in the WinMap structure, so a valid value must be
+*        supplied even if not required for allocating memory.
+*
+*        If the "vtab" parameter is NULL, the "size" value is ignored
+*        and sizeof(AstWinMap) is used instead.
+*     init
+*        A boolean flag indicating if the WinMap's virtual function
+*        table is to be initialised. If this value is non-zero, the
+*        virtual function table will be initialised by this function.
+*
+*        If the "vtab" parameter is NULL, the "init" value is ignored
+*        and the (static) virtual function table initialisation flag
+*        for the WinMap class is used instead.
+*     vtab
+*        Pointer to the start of the virtual function table to be
+*        associated with the new WinMap. If this is NULL, a pointer
+*        to the (static) virtual function table for the WinMap class
+*        is used instead.
+*     name
+*        Pointer to a constant null-terminated character string which
+*        contains the name of the class to which the new object
+*        belongs (it is this pointer value that will subsequently be
+*        returned by the astGetClass method).
+*
+*        If the "vtab" parameter is NULL, the "name" value is ignored
+*        and a pointer to the string "WinMap" is used instead.
+
+*  Returned Value:
+*     A pointer to the new WinMap.
+
+*  Notes:
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Constants. */
+#define KEY_LEN 50               /* Maximum length of a keyword */
+
+/* Local Variables: */
+   AstWinMap *new;              /* Pointer to the new WinMap */
+   char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
+   int axis;                    /* Axis index */
+   int ncoord;                  /* The number of coordinate axes */
+
+/* Initialise. */
+   new = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return new;
+
+/* If a NULL virtual function table has been supplied, then this is
+   the first loader to be invoked for this WinMap. In this case the
+   WinMap belongs to this class, so supply appropriate values to be
+   passed to the parent class loader (and its parent, etc.). */
+   if ( !vtab ) {
+      size = sizeof( AstWinMap );
+      init = !class_init;
+      vtab = &class_vtab;
+      name = "WinMap";
+   }
+
+/* Invoke the parent class loader to load data for all the ancestral
+   classes of the current one, returning a pointer to the resulting
+   partly-built WinMap. */
+   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+                         channel );
+
+/* Get the number of axis for the mapping. */
+   ncoord = astGetNin( (AstMapping *) new );
+
+/* Allocate memory to hold the scales and shifts. */
+   new->a = (double *) astMalloc( sizeof(double)*(size_t)ncoord );   
+   new->b = (double *) astMalloc( sizeof(double)*(size_t)ncoord );   
+
+/* If required, initialise the part of the virtual function table used
+   by this class. */
+   if ( init ) InitVtab( vtab );
+
+/* Note if we have successfully initialised the (static) virtual
+   function table owned by this class (so that this is done only
+   once). */
+   if ( astOK ) {
+      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
+
+/* Read input data. */
+/* ================ */
+/* Request the input Channel to read all the input data appropriate to
+   this class into the internal "values list". */
+      astReadClassData( channel, "WinMap" );
+
+/* Now read each individual data item from this list and use it to
+   initialise the appropriate instance variable(s) for this class. */
+
+/* The scales and shifts. */
+      for( axis = 0; axis < ncoord; axis++ ){
+         (void) sprintf( buff, "sft%d", axis + 1 );
+         (new->a)[ axis ] = astReadDouble( channel, buff, 0.0 );
+         (void) sprintf( buff, "scl%d", axis + 1 );
+         (new->b)[ axis ] = astReadDouble( channel, buff, 1.0 );
+      }
+   }
+
+/* If an error occurred, clean up by deleting the new WinMap. */
+   if ( !astOK ) new = astDelete( new );
+
+/* Return the new WinMap pointer. */
+   return new;
+
+/* Undefine macros local to this function. */
+#undef KEY_LEN
+}
+
+/* Virtual function interfaces. */
+/* ============================ */
+/* These provide the external interface to the virtual functions defined by
+   this class. Each simply checks the global error status and then locates and
+   executes the appropriate member function, using the function pointer stored
+   in the object's virtual function table (this pointer is located using the
+   astMEMBER macro defined in "object.h").
+
+   Note that the member function may not be the one defined here, as it may
+   have been over-ridden by a derived class. However, it should still have the
+   same interface. */
+
+int astWinTerms_( AstWinMap *this, double **scale, double **shift ){
+   if( !astOK ) return 0;
+   return (**astMEMBER(this,WinMap,WinTerms))( this, scale, shift );
+}

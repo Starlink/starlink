@@ -1,0 +1,30 @@
+AST Library
+-----------
+   The first release (V<VERSION_NUMBER>) of the Starlink AST (astrometry) library
+is now available.
+
+   AST may be used for attaching world coordinate systems (such as
+RA/Dec) to astronomical data, for retrieving and interpreting that
+information and for generating graphical output based on it.
+
+   The library should be of interest to anyone writing astronomical
+software which needs to manipulate coordinate system data, especially
+celestial coordinate systems. AST is portable and
+environment-independent.
+
+Further Details
+---------------
+   For further details, see Starlink User Note SUN/210 (Fortran
+version) or SUN/211 (C version). These are available on the WWW at:
+
+      http://star-www.rl.ac.uk/cgi-bin/htxserver/sun210.htx/
+   and
+      http://star-www.rl.ac.uk/cgi-bin/htxserver/sun211.htx/
+
+Alternatively, on Starlink systems, type:
+
+      showme sun210
+   or
+      showme sun211
+
+12/1/98

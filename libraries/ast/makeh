@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+#+
+#  Name:
+#     makeh
+
+#  Purpose:
+#     Generate the contents of the "ast.h" header file.
+
+#  Type:
+#     Perl script.
+
+#  Invocation:
+#     makeh file_list
+
+#  Description:
+#     This script processes private header files used within the AST library
+#     in order to extract the public information they contain. This information
+#     is produced in a form suitable for use in the public "ast.h" header file,
+#     which defines the public interface to the library.
+
+#  Parameters:
+#     file_list
+#        A space-separated list of the private AST header files whose public
+#        information is to be extracted.
+
+#  Result:
+#     The contents of the "ast.h" header file are written to standard output.
+
+#  Notes:
+#     - This script is specific to the AST library and contains some knowledge
+#     of the input file contents.
+#-
+
+#  Create a scratch directory.
+print( stderr
+       `if test ! -e /tmp/makeh.tmp; then mkdir /tmp/makeh.tmp; else :; fi` );
+
+#  Open each input file.
+foreach $file ( @ARGV ) {
+   open( INCLUDE, $file ) || die "Can't open input file " . $file;
+
+#  Open an output file with the same name in the temporary directory.
+   $tmp_file = $file;
+   $tmp_file =~ s|^.*/||;
+   open( TEMP, '>/tmp/makeh.tmp/' . $tmp_file );
+
+#  Read the input file and detect "#include <...>" lines, extracting the name
+#  of the header file being included.
+line: while ( <INCLUDE> ) {
+      if ( ( $header ) = /^#include\s+<(.+)>/ ) {
+
+#  If this system header file has already been included, ignore it and go on to
+#  the next input line.
+         next line if $done{ $header }++;
+
+#  Otherwise, protect the #include with an underscore to prevent the file
+#  actually being included.
+         s/^/_/;
+      }
+
+#  Also protect "#define ..." lines, to prevent macro substitution being
+#  performed by the C preprocessor. Do not do this to lines of the form
+#  "#define XXX_INCLUDED" because these are still needed to determine which
+#  AST header files get included.
+      if ( /^#define\s/ ) {
+         if ( ! /^#define\s+\w*_INCLUDED/ ) { s/^/_/ };
+      }
+
+#  Similarly add underscores to protect standard C macros.
+      s/__LINE__/___LINE__/g;
+      s/__FILE__/___FILE__/g;
+
+#  Write the modified include file.
+      print( TEMP );
+   }
+
+#  Close each file when done.
+   close( INCLUDE );
+   close( TEMP );
+}
+
+#  Open a pipe to a scipt which runs the C preprocessor and direct its output
+#  to a scratch file.
+open( CC, '| $AST_REF/ast_cpp >/tmp/ast.h' ) ||
+                                die "Can't open pipe to C preprocessor (cpp)";
+
+#  Before including each file, write an underlined heading in the form of
+#  C comments (with comment characters suitably protected so that they will
+#  be passed unchanged by cpp).
+foreach $file ( @ARGV ) {
+   $comment = $file;
+   $comment =~ s|^.*/||;
+   $comment =~ s|.h$||;
+   print( CC "/_* " . $comment . ". *_/\n" );
+   print( CC "/_* " );
+   for ( $i = 0; $i < length( $comment ) + 1; $i++ ) { print( CC '=' ) };
+   print( CC " *_/\n" );
+
+#  Write #include "xxx.h" lines to cpp so that it includes (and
+#  preprocesses) each of the temporary files created above in turn.
+   $tmp_file = $file;
+   $tmp_file =~ s|^.*/||;
+   print( CC "#include \"" . '/tmp/makeh.tmp/'. $tmp_file . "\"\n" ) };
+
+#  Close the pipe to cpp.
+close( CC ) || die "C preprocessor (cpp) error";
+
+#  Remove the temporary directory and the files it contains.
+print( stderr `rm -r /tmp/makeh.tmp` );
+
+#  Write the output preamble.
+print(
+'#if !defined(AST_INCLUDED)
+#define AST_INCLUDED
+/*
+*+
+*  Name:
+*     ast.h
+
+*  Purpose:
+*     Define the public C interface to the AST library.
+
+*  Language:
+*     ANSI C
+
+*  Type of Module:
+*     C header file.
+
+*  Description:
+*     This file defines the public C interface to the AST library. It contains
+*     all the type definitions, function prototypes, macro definitions, etc.
+*     needed to use the library.
+
+*  Copyright:
+*     <COPYRIGHT_STATEMENT>
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     ' );
+
+#  Add the current date at this point.
+( $sec, $min, $hour, $mday, $mon, $year ) = localtime;
+print( $mday, '-',
+       ( 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+         'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC' )[ $mon ], '-',
+       ( $year > 95 ? 1900 : 2000 ) + $year );
+
+print( ' (makeh):
+*        Original version, generated automatically from the internal header
+*        files by the "makeh" script.
+*     {enter_changes_here}
+*-
+*/
+
+' );
+
+#  Open the scratch file created above and read it.
+$space = 0;
+open( TEMP, '</tmp/ast.h' );
+while( <TEMP> ) {
+
+#  Remove the underscores from the protected lines and macros.
+   s/^_#include(\s)/#include$1/;
+   s/^_#define(\s)/#define$1/;
+   s/___LINE__/__LINE__/g;
+   s/___FILE__/__FILE__/g;
+
+#  Also un-protect protected comments.
+   s|/_\*|/*|g;
+   s|\*_/|*/|g;
+
+#  Convert multiple blank lines (cpp creates lots of these) into single blank
+#  lines.
+   if ( /^\s*$/ ) {
+      $space = 1;
+   } else {
+
+#  Remove additional unwanted lines that cpp creates.
+      if ( ! /^# \d+/ ) {
+         if ( $space ) { print( "\n" ) };
+         $space = 0;
+
+#  Output the lines we want to keep.
+         print;
+      }
+   }
+}
+
+#  Write closing output lines.
+print(
+'
+#endif
+' );
+
+#  Close and remove the scratch file.
+close( TEMP );
+unlink '/tmp/ast.h';

@@ -1,0 +1,183 @@
+# Class makefile created by:
+#
+#    User      : rfws
+#    Node      : rlsaxps.bnsc.rl.ac.uk
+#    Time      : Tue Jan 13 10:56:21 GMT 1998
+#    Machine   : alpha running OSF1 564 (release V4.0)
+#
+#    Directory : /home/users/rfws/software/ast/SCCS
+
+#  Default action (fetch each file from sccs).
+action = sccs get $@ -r
+
+#  Default target for files not included in this class.
+.DEFAULT:; @ echo "class makefile: warning - $@ is not in this class" >&2
+
+#  Files included in this class.
+Class_Contents: \
+COPYING.LIB LICENCE V1.0-1.class addcopyright addlinks addversion \
+ast.news ast_dev ast_err.msg ast_link ast_link_adam ast_par.source \
+ast_test.c astbad.c axis.c axis.h c2f77.c c2f77.h channel.c channel.h \
+cmpframe.c cmpframe.eps cmpframe.h cmpmap.c cmpmap.h complex.eps \
+doincludes dssmap.c dssmap.h ems.h err.h err_ems.c err_null.c error.c \
+error.h f77.h fchannel.c fcmpframe.c fcmpmap.c fdssmap.c ferror.c \
+ffitschan.c fframe.c fframeset.c fitschan.c fitschan.h flutmap.c \
+fmapping.c fmatrixmap.c fobject.c fpermmap.c fplot.c frame.c frame.f \
+frame.h frames.eps frameset.c frameset.eps frameset.h fronta.eps \
+fronta_bw.eps frontb.eps frontb_bw.eps frontc.eps frontc_bw.eps \
+fsalign.eps fsconvert.eps fsexample.eps fskyframe.c fslamap.c \
+fsmerge.eps fsphmap.c fsremap.eps funitmap.c fwcsmap.c fwinmap.c \
+fzoommap.c getatt getnewversion grf.h grf_null.c grf_pgplot.c \
+gridplot.eps gridplot_bw.eps grp.make loader.c loader.h lutmap.c \
+lutmap.h makefile makeh mapping.c mapping.eps mapping.h matrixmap.c \
+matrixmap.h memory.c memory.h mk object.c object.f object.h \
+parallel.eps permmap.c permmap.h plot.c plot.h pointset.c pointset.h \
+proj.c proj.h ref.make selectfc series.eps simpexamp.eps skyaxis.c \
+skyaxis.h skyframe.c skyframe.h sla.c slalib.h slamap.c slamap.h \
+sphmap.c sphmap.h sun210.tex sun211.tex sun_master.tex unitmap.c \
+unitmap.h version.number wcsmap.c wcsmap.h wcstrig.c wcstrig.h winmap.c \
+winmap.h zoommap.c zoommap.h
+
+#  Targets specifying the version of each file.
+COPYING.LIB:;$(action)1.1
+LICENCE:;$(action)1.2
+V1.0-1.class:;$(action)1.1
+addcopyright:;$(action)1.3
+addlinks:;$(action)1.2
+addversion:;$(action)1.1
+ast.news:;$(action)1.42
+ast_dev:;$(action)1.79
+ast_err.msg:;$(action)1.117
+ast_link:;$(action)1.68
+ast_link_adam:;$(action)1.38
+ast_par.source:;$(action)1.23
+ast_test.c:;$(action)1.36
+astbad.c:;$(action)1.26
+axis.c:;$(action)1.164
+axis.h:;$(action)1.167
+c2f77.c:;$(action)1.58
+c2f77.h:;$(action)1.74
+channel.c:;$(action)1.136
+channel.h:;$(action)1.87
+cmpframe.c:;$(action)1.252
+cmpframe.eps:;$(action)1.1
+cmpframe.h:;$(action)1.188
+cmpmap.c:;$(action)1.190
+cmpmap.h:;$(action)1.139
+complex.eps:;$(action)1.1
+doincludes:;$(action)1.2
+dssmap.c:;$(action)1.80
+dssmap.h:;$(action)1.91
+ems.h:;$(action)1.43
+err.h:;$(action)1.64
+err_ems.c:;$(action)1.51
+err_null.c:;$(action)1.51
+error.c:;$(action)1.165
+error.h:;$(action)1.179
+f77.h:;$(action)1.48
+fchannel.c:;$(action)1.55
+fcmpframe.c:;$(action)1.80
+fcmpmap.c:;$(action)1.87
+fdssmap.c:;$(action)1.74
+ferror.c:;$(action)1.45
+ffitschan.c:;$(action)1.118
+fframe.c:;$(action)1.121
+fframeset.c:;$(action)1.127
+fitschan.c:;$(action)1.160
+fitschan.h:;$(action)1.146
+flutmap.c:;$(action)1.38
+fmapping.c:;$(action)1.56
+fmatrixmap.c:;$(action)1.61
+fobject.c:;$(action)1.142
+fpermmap.c:;$(action)1.84
+fplot.c:;$(action)1.62
+frame.c:;$(action)1.235
+frame.f:;$(action)1.13
+frame.h:;$(action)1.212
+frames.eps:;$(action)1.1
+frameset.c:;$(action)1.247
+frameset.eps:;$(action)1.1
+frameset.h:;$(action)1.250
+fronta.eps:;$(action)1.1
+fronta_bw.eps:;$(action)1.1
+frontb.eps:;$(action)1.1
+frontb_bw.eps:;$(action)1.1
+frontc.eps:;$(action)1.1
+frontc_bw.eps:;$(action)1.1
+fsalign.eps:;$(action)1.1
+fsconvert.eps:;$(action)1.1
+fsexample.eps:;$(action)1.1
+fskyframe.c:;$(action)1.44
+fslamap.c:;$(action)1.35
+fsmerge.eps:;$(action)1.1
+fsphmap.c:;$(action)1.39
+fsremap.eps:;$(action)1.1
+funitmap.c:;$(action)1.86
+fwcsmap.c:;$(action)1.37
+fwinmap.c:;$(action)1.61
+fzoommap.c:;$(action)1.46
+getatt:;$(action)1.7
+getnewversion:;$(action)1.15
+grf.h:;$(action)1.25
+grf_null.c:;$(action)1.49
+grf_pgplot.c:;$(action)1.36
+gridplot.eps:;$(action)1.1
+gridplot_bw.eps:;$(action)1.1
+grp.make:;$(action)1.358
+loader.c:;$(action)1.162
+loader.h:;$(action)1.152
+lutmap.c:;$(action)1.39
+lutmap.h:;$(action)1.51
+makefile:;$(action)1.385
+makeh:;$(action)1.55
+mapping.c:;$(action)1.203
+mapping.eps:;$(action)1.1
+mapping.h:;$(action)1.153
+matrixmap.c:;$(action)1.143
+matrixmap.h:;$(action)1.147
+memory.c:;$(action)1.137
+memory.h:;$(action)1.146
+mk:;$(action)1.233
+object.c:;$(action)1.169
+object.f:;$(action)1.27
+object.h:;$(action)1.175
+parallel.eps:;$(action)1.1
+permmap.c:;$(action)1.203
+permmap.h:;$(action)1.215
+plot.c:;$(action)1.99
+plot.h:;$(action)1.99
+pointset.c:;$(action)1.180
+pointset.h:;$(action)1.148
+proj.c:;$(action)1.13
+proj.h:;$(action)1.78
+ref.make:;$(action)1.373
+selectfc:;$(action)1.2
+series.eps:;$(action)1.1
+simpexamp.eps:;$(action)1.1
+skyaxis.c:;$(action)1.181
+skyaxis.h:;$(action)1.147
+skyframe.c:;$(action)1.241
+skyframe.h:;$(action)1.202
+sla.c:;$(action)1.32
+slalib.h:;$(action)1.62
+slamap.c:;$(action)1.191
+slamap.h:;$(action)1.133
+sphmap.c:;$(action)1.61
+sphmap.h:;$(action)1.21
+sun210.tex:;$(action)1.140
+sun211.tex:;$(action)1.239
+sun_master.tex:;$(action)1.210
+unitmap.c:;$(action)1.151
+unitmap.h:;$(action)1.123
+version.number:;$(action)1.64
+wcsmap.c:;$(action)1.160
+wcsmap.h:;$(action)1.122
+wcstrig.c:;$(action)1.28
+wcstrig.h:;$(action)1.63
+winmap.c:;$(action)1.82
+winmap.h:;$(action)1.74
+zoommap.c:;$(action)1.240
+zoommap.h:;$(action)1.201
+
+#  End of class makefile.
+#%Z%%M%   %I%   %E% %U%   %D% %T%

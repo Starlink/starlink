@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+#  Reads a Latex file which contains \include{file} commands and writes
+#  the document to standard output with the text of the included files
+#  inserted.
+
+#  Read input lines.
+   while ( <> ) {
+
+#  Spot the \include{file} lines and extract the file name.
+      if ( ( $file ) = /^ *\\include{(.*)} *$/ ) {
+
+#  Read the contents of the included file.
+         open( INCLUDE, $file . ".tex" );
+         while ( <INCLUDE> ) { print; }
+         close( INCLUDE );
+
+#  Output other lines unchanged.
+      } else {
+         print;
+      }
+   }
