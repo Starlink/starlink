@@ -353,7 +353,7 @@ this window doesn't exist it will be created.
 
 A list of images can be displayed in GAIA using the command:
 \begin{quote}
-\mytt{\% gaiadispmany image\_name1 image\_name2 image\_name3 ...}
+\mytt{\% gaiadisp image\_name1 image\_name2 image\_name3 ...}
 \end{quote}
 These will be displayed in separate clones.
 
@@ -496,11 +496,12 @@ astronomical work with images:
   \textit{i.e.} FITS/IRAF or NDF WCS) then a continuous readout of the
   current RA and Dec is provided.
 
-\item Astrometric calibration. You can either fit a new
-  astrometric calibration to your image (using on-line catalogues or
-  images for reference positions), define a new one using known
-  information (such the image scale and a reference point), copy one
-  from another image and finally tweak one to make it fit better.
+\item Astrometric calibration. You can either fit a new astrometric
+  calibration to your image (using semi-automated matching between detected
+  images and on-line catalogues or you can define your own reference
+  positions), set one using known information (such the image scale and a
+  reference point), copy one from another image and finally tweak one to make
+  it fit better.
 
 \item Astrometric grid overlay. If you can read out sky coordinates
   then you can also plot a grid overlay with labelled
@@ -772,21 +773,26 @@ are best set using the \mytt{Startup options...} window located in the
 \begin{tabular}{l|l}
  option              &  Meaning \\
 \hline
- -default\_cmap      &  Change the default colour map \\
- -with\_colorramp    &  Display a colour ramp \\
- -with\_zoom\_window &  Display a zoom window \\
- -with\_pan\_window  &  Display a pan window \\
- -float\_panel       &  Detach the control panel \\
- -transient\_tools   &  Make toolboxes transient \\
- -demo\_mode         &  Make the demo toolbox available \\
+ -always\_merge      &  Merge primary and extension headers \\
+ -catalog            &  Open windows for the given catalogs on startup \\
+ -component          &  NDF component to display on startup \\
  -component          &  The NDF component (data, variance or quality) \\
+ -default\_cmap      &  Change the default colour map \\
+ -demo\_mode         &  Make the demo toolbox available \\
+ -extended\_precision&  Show milliarcsecond readout precision \\
+ -float\_panel       &  Detach the control panel \\
  -focus\_follows\_mouse & Image and entry focus follows mouse pointer \\
- -visual             & X visual (pseudocolor, truecolor, visual id)\\
+ -linear\_cartesian  &  Assume CAR projections are a linear mapping \\
  -quiet\_exit        & Issue a warning before exiting GAIA (default 0)\\
- -extended\_precision & Display RA and Dec at milli-arcsecond resolution\\
- -show\_hdu\_chooser   & Automatically show the HDU chooser (default 1)
+ -show\_hdu\_chooser & Automatically show the HDU chooser \\
+ -transient\_tools   &  Make toolboxes transient \\
+ -visual             & X visual (pseudocolor, truecolor, visual id)\\
+ -with\_colorramp    &  Display a colour ramp \\
+ -with\_pan\_window  &  Display a pan window \\
+ -with\_zoom\_window &  Display a zoom window
 \end{tabular}
 }
+The full list of options can be seen using the \mytt{--help} option.
 
 So for instance if you wanted to float the control panel (useful for
 smaller displays) and have a grey default colourmap. Then start
@@ -861,189 +867,107 @@ to read about ``SkyCat plugins''.
 
 \section{Recent \xlabel{changes}Changes}
 
-\subsection{Release - 2.6} 
-  Release 2.6 includes a new toolbox and various enhancements.
+\subsection{Release - 2.7} 
+This is a major release of GAIA incorporating two new automated astrometry
+toolboxes, a major re-write of the blink comparison toolbox and many
+changes and fixes.
 
-  The new toolbox displays maps of polarization vectors as produced by
-  the Starlink POLPACK package (\xref{SUN/223}{sun223}{}). It also
-  provides manipulation facilities for selecting map sub-sets and
-  allows the map to be re-binned.
+GAIA now offers two new toolboxes based on the Starlink 
+AUTOASTROM \xref{SUN/242}{sun242} program. These make it possible to provide a
+minimum of positional information (image centre and scale) and then fit an
+astrometric solution. They also make it possible, for the first time, to fit
+optical distortions. The new toolboxes are available at: 
+\begin{verbatim} 
+     Image-Analysis->Astrometry Calibration->Automatic position matching
+\end{verbatim}
+One is for simple use and the other for advanced use.
 
-  Additional minor changes are:
-  \begin{itemize}
-     \item You can now choose the secondary coordinate system that GAIA
-       displays in the `RA' and `Dec' coordinate readouts. This is
-       useful when your images have more than one coordinate system that
-       you'd like to view (by default NDFs have `PIXEL' and `AXIS', as
-       well as others such as celestial coordinates, FITS files may have
-       similar arrangements in the future). As a consequence of these
-       changes the `PIXEL' system is now removed from the celestial
-       coordinates and grid overlay toolboxes.
+The blink comparison toolbox has been substantially upgraded in this
+release. New features are options to alignment to NDF origins or FITS CRPIX
+values. This gives much better behaviour when comparing images of different
+dimensions. Better performance (less flickering artifacts). The ability to
+drag images and enter image coordinate offsets. All images can now be viewed
+together or one-by-one as before. Images should now always scroll and the
+`Refresh' button has been removed.
 
-     \item SuperCOSMOS surveys are now available. To access these you need
-       to remove the file \mytt{\$HOME/.skycat/skycat.cfg}, if it
-       exists, and then look in the ``Browse Catalog Directories...''
-       dialog under the \mytt{Data-Servers} menu for the sub-list
-       \mytt{SuperCOSMOS catalogues}. 
-
-
-     \item FITS file with more than one period in their names can now be
-       displayed by GAIA. However, some toolboxes are effectively
-       disabled by this as it breaks the \xref{NDF}{sun33}{} library
-       naming conventions for foreign data formats.
-
-     \item The on-line help system has been completely
-       re-engineered. This is now based on a hypertext system with text
-       search facilities.  Other improvements are the inclusion of
-       figures and a more unified presentation.
-
-     \item BITPIX -64 FITS files (i.e. double precision) can now be
-       displayed, but note that some external applications that are
-       used by GAIA cannot properly process this format
-       (e.g. \xref{AUTOPHOTOM}{sun45}{AUTOPHOTOM} and
-       \xref{EXTRACTOR}{sun226}{} which are used by the photometry 
-       and object detection toolboxes will truncate to single
-       precision floating point). 
-
-     \item The contour toolbox now has new options to use a single colour
-       and/or width for all lines.
-
-     \item The contour toolbox now has a new option for adding customised
-       colours (RGB/CMY/HSV or standard X11) to its drop-down lists.
-
-     \item You can now get a copy of the colour ramp, annotated with
-       levels, for inclusion in diagrams.
-
-     \item Importing plain text files of values is now available as an
-       option for normal catalogue windows (previously this option just
-       imported files into the positions toolbox). This allows files
-       that have space, comma, semi-colon and tab separated fields to be
-       read, as well as files with fixed-width columns.
-
-     \item The conflict with the \xref{CURSA}{sun190}{} setup for the
-       \verb+SKYCAT_CONFIG+ environment variable is now resolved by ignoring
-       \verb+SKYCAT_CONFIG+. This was causing GAIA to lock up when used behind 
-       a web proxy that had not been configured.
-
-     \item The UKSTU plate library has been removed from the default
-       catalogue list. This facility is no longer available.
-
-     \item The irritating 
-           \verb+failed to register the shmem:// driver+ 
-       warning message should now be silent. This warning was harmless.
-
-     \item The pan window should now work with very thin images (1 pixel wide).
-
-     \item The `autocut' mechanism has been modified to not use the
-       DATAMIN and DATAMAX keywords (which are often not the minimum and
-       maximum data values in an image) and a bug effecting its
-       operation when scaled images were abutted to the top-edge of the
-       display has been fixed.
-
-       There have been many complaints that autocuts do not work as
-       expected, one reason for this is that the cuts are determined
-       by using a sub-sample of the part of the image data that you
-       can see, rather than the whole image. One effect of this is
-       that percentile cuts will correctly produce different high and
-       low levels depending on what part of an image you're looking
-       at.
-
-     \item All image access (that is NDFs and FITS files) is now
-       performed using file mapping. A consequence of this is that 
-       GAIA will now display images up to 2Gb in size on machines with
-       more modest physical memory allocations (a 256Mb Linux PC will
-       display such images comfortably, but note that any analysis
-       operations may need much more memory). If you attempt this
-       you will still require a system whose virtual memory size is
-       bigger than 2Gb.
-
-     \item An error in the RMS fitting estimate for the astrometric
-       toolboxes has been corrected. Previous RMS values were all
-       underestimates by a factor $1/\sqrt{n}$.
-     
-     \item The rendering of ellipses drawn as graphics overlays (such
-       as those used to show object detections) has been improved,
-       especially at low resolutions.
-\end{itemize}
-
-\subsection{Release 2.6-9}
-
-This release contains a few updates. 
+Other changes in this release
 \begin{itemize}
-   \item New X\_PIXEL and Y\_PIXEL parameters have been added to object
-     detection toolbox (these report pixel coordinates, i.e. include
-     any origin information).
+     \item Spitzer/SIRTF FITS headers, including the optical distortion,
+       are now handled.
 
-   \item Non-transient pop-up windows that grabbed the focus during their
-     creation (for instance the NDF chooser) have had their behaviour
-     modified to not grab the focus.
+     \item The NDF component chooser now allows the variance component to be
+       displayed as expected.
 
-   \item While processing FITS astrometries stored in NDFs a report to
-     the terminal about missing FITS keywords followed by a failure to
-     load the image (with a dialog message about `missing data
-     component') could occur. This problem is now fixed.
+     \item A new default percentage autocut option has been added.
 
-   \item The astrometry fitting toolboxes (using reference positions) have
-     been upgraded to accept RA and Dec values with space separations.
-     Note that in general you should use colons as the separators.
+     \item Shared memory segments under Solaris should now be better behaved.
 
-   \item The image print window has been modified to swap the page width
-     and length values when changing between landscape and portrait
-     formats. This should make better use of the full page by default.
+     \item The handling of byte images is changed so \mytt{FITS BITPIX=8}
+       are correctly
+       interpreted as unsigned byte, not signed byte. This change mostly
+       effects the XY profile and contouring toolboxes.
+
+     \item An attempt to clear old WCS information from images before saving
+       is now made.
+
+     \item The \mytt{gaiadisp} command has been enhanced to load a list of
+       images into GAIA.
+
+     \item An experimental tabbed interface has been produced to make it
+       easier to view FITS MEF files. To try this out use the command:
+      \begin{verbatim}
+          $GAIA_DIR/tabbedgaia
+      \end{verbatim}
+
+     \item Long thin or tall images (2 pixels or more) now display a readout of
+       positions.
+
+     \item The \mytt{\$GAIA\_DIR/pix2wcs} and 
+        \mytt{\$GAIA\_DIR/wcs2pix} scripts should be
+       working again. 
+
+     \item The \mytt{\$GAIA\_DIR/displaycat} command now creates fully
+       functional 
+       catalogue windows (previous these did not include any GAIA specific
+       changes). 
+ 
+     \item The \mytt{-catalog} command-line option now accepts a list of
+       catalogues to 
+       display immediately.
+
+     \item The polarimetry toolbox now correctly processes selection expressions
+       when column names are short forms of other names (i.e. when \mytt{P}
+       and \mytt{PI},
+       \mytt{DP} and \mytt{DPI} etc. are used). Previously an attempt to
+       interpret \mytt{\$PI} as 
+        \mytt{\$P} would be made and subsequently fail.
+
+     \item Making name queries using the RedHat 9 build of GAIA failed
+       completely, sometimes causing a core dump from a child process.
+       This problem has now been resolved.
+
+     \item The interpretation of FITS -CAR projections is now a configuration
+       option. Previously this was fixed at assuming that all Cartesian
+       projections are simple linear mappings (this remains the default),
+       ignoring the possibility of spherical rotations. Refer to the CarLin
+       attribute of the AST (\xref{SUN/211}{sun211}) library for more about
+       this change. 
+
+     \item Various changes to grid overlays have been implemented.
+       This now supports AST 3.2 super-script and sub-script, font and colour
+       changes within a string. Fonts drawn on the overlay grid can now be
+       scaled with image. Better matching of postscript font size to displayed
+       size has also been implemented. A long term memory leak has been cured 
+       (only seen when drawing overlays). 
+
+     \item A new configuration option \mytt{always\_merge} controls if the
+       primary header 
+       of any FITS files are merged with those of extension being viewed to
+       create a full set of headers for creating a world coordinate system. By
+       default this merging no longer occurs when the primary HDU contains a
+       non dummy image. 
+
 \end{itemize}
-
-\subsection{This release - 2.6-12}
-
-New to this release:
-\begin{itemize}
-
-   \item A number of new catalogues and image servers are now available. 
-   When GAIA starts for the first time it will ask for permission
-   to update your configuration, unless you have a very customised
-   \mytt{\~{}/.skycat/skycat.cfg} file, you should just say yes. Some
-   highlights are 2MASS, USNO B1.0 and GSC II. 
-
-   \item The pixel table now highlights the maximum and minimum values
-   and the orientation of the Y-axis has been flipped so that the
-   sense of the values is the same as that in the image.
-
-   \item A new configuration option \mytt{-extended\_precision} has
-   been added. This makes GAIA work at approximately milli-arcsecond
-   resolution. This option can be switched on using the new
-   \mytt{File->Startup options} window.
-
-   \item A new configuration option \mytt{-show\_hdu\_chooser} has been
-   added. By default when you open a FITS or HDS file that contains
-   more than one image the HDU chooser appears so that you can select
-   between the images. On some occasions (mainly when running GAIA
-   under remote control) this behaviour is unwanted and the chooser
-   should remain inactive. This option can be switched on using the new
-   \mytt{File->Startup options} window.
-
-   \item The command-line options of GAIA can now be configured using
-   the new \mytt{File->Startup options} window. The set of options
-   selected are used whenever GAIA starts up (this removes the tedious
-   need to either specify these on the command-line, or add them to
-   your X resources).
-
-   \item When North and East are interchanged the \mytt{Show all
-   coordinates} toolbox displayed the wrong coordinates in the left
-   and right columns, and incorrectly formatted RA as DD:MM:SS and Dec
-   as HH:MM:SS. These problems are now fixed.
-
-   \item The direction arrows shown in the pan window could be
-   displayed at the wrong size, again when North and East were
-   interchanged. This problem is now fixed.
-
-   \item Fixed shape ellipses in the aperture photometry toolbox were
-   actually created using an inverted zoom factor correction (so
-   either shrank or expanded in the wrong sense). This now works
-   correctly.
-
-   \item GAIA is now released under the GNU General Public License.
-
-\end{itemize}
-
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 

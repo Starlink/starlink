@@ -41,8 +41,8 @@
      - An attempt to clear old WCS information from images before saving
        is now made.
 
-     - A new "gaiadispmany" command has been introduced to load a list of
-       images into GAIA from the command-line.
+     - The "gaiadisp" command has been enhanced to load a list of
+       images into GAIA.
 
      - An experimental tabbed interface has been produced to make it
        easier to view FITS MEF files. To try this out use the command:
