@@ -15,6 +15,7 @@
 #-
 
 #  Global variables.
+      global env
       global CCDdir
       global KAPdir
 
