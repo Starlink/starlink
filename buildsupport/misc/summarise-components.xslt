@@ -45,7 +45,7 @@ body {
   background: white;
   margin-left: 10%;
   margin-right: 10%;
-  font-family: optima, arial, helvetical, sans-serif };
+  font-family: optima, arial, helvetica, sans-serif;
   font-size: smaller;
 }
 
