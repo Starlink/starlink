@@ -3,7 +3,7 @@
 *
 *    Description :
 *
-*     Program CAST_EXP is used to cast the band-correct exposure map for
+*     Program XRTEXPMAP is used to cast the band-correct exposure map for
 *     pointed observations.  It uses detector maps created from survey
 *     data.
 *
@@ -90,8 +90,6 @@
       CHARACTER*(DAT__SZLOC)	EVRLOC			! Attitude file
       CHARACTER*10		EXT			! File root extension
       CHARACTER*79		LINE			! Output text
-      CHARACTER*(DAT__SZLOC)	MLOC			! O/p check map
-      CHARACTER*(DAT__SZLOC)	OLOC			! O/p map
       CHARACTER*(DAT__SZNAM)    TCOL 			! TIME column name
       CHARACTER 		TIMEFILE*80		! Good times list
       CHARACTER*40           	VERS                  	! SASS version
@@ -121,10 +119,12 @@
       INTEGER			IMV			! A master veto value
       INTEGER			ITIME			! Loop over time slots
       INTEGER			LUN			! Logical unit number
+      INTEGER			MFID			! O/p check map
       INTEGER			MPTR			! Output detector map
       INTEGER			NACTGTIME		! Num good time slots
       INTEGER			NATTREC			! No. attitude records
       INTEGER			NEVRREC			! No. ev rate records
+      INTEGER			OFID			! Output dataset id
       INTEGER			TEMP_PTR		! Temp data for RDF
 
       LOGICAL			BAD			! Any bad points?
@@ -203,7 +203,7 @@ c	From INTEGER to improve exposure time evaluation
       END IF
 
 *    Create output file
-      CALL USI_ASSOCO( 'OUT', 'BINDS', OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS )
 
 *    Get observation start time
       BASESC = HEAD.BASE_SCTIME
@@ -300,7 +300,7 @@ c	From INTEGER to improve exposure time evaluation
       CALL FIO_PUNIT( LUN, STATUS )
 
 *    Output detector map?
-      CALL USI_ASSOCO( 'DETMAP', 'BINDS', MLOC, STATUS )
+      CALL USI_TASSOCO( 'DETMAP', 'BINDS', MFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         MAPCHK = .FALSE.
@@ -316,12 +316,11 @@ c	From INTEGER to improve exposure time evaluation
 
 *    Write detector map if needed
       IF ( MAPCHK ) THEN
-        CALL DAT_NEW( MLOC, 'DATA_ARRAY', '_REAL', 2, DIMS, STATUS )
-        CALL CMP_MAPV( MLOC, 'DATA_ARRAY', '_REAL', 'WRITE', MPTR,
-     :                 NUM, STATUS )
+        CALL BDI_CREDATA( MFID, 2, DIMS, STATUS )
+        CALL BDI_MAPDATA( MFID, 'WRITE', MPTR, STATUS )
         CALL ARR_COP1R( DIMS(1)*DIMS(2), RMAP, %VAL(MPTR), STATUS )
-        CALL CMP_UNMAP( MLOC, 'DATA_ARRAY', STATUS )
-        CALL USI_ANNUL( MLOC, STATUS )
+        CALL BDI_RELEASE( MFID, STATUS )
+        CALL USI_TANNUL( MFID, STATUS )
       END IF
 
 *    Center the instrument map, invert the Y-axis, and turn it real.
@@ -695,24 +694,22 @@ C
       CALL AIO_REWRITE( 0, 'TERMINATE', 'DONE ', STATUS )
 
 *    Write exposure map
-      CALL BDA_CREAXES( OLOC, 2, STATUS )
-      CALL BDA_PUTAXVAL( OLOC, 1, (REAL(DIMS(1)/2)-0.5)*PIXSIZE/3600.0,
+      CALL BDI_CREAXES( OFID, 2, STATUS )
+      CALL BDI_PUTAXVAL( OFID, 1, (REAL(DIMS(1)/2)-0.5)*PIXSIZE/3600.0,
      :                        -PIXSIZE/3600.0, DIMS(1), STATUS )
-      CALL BDA_PUTAXVAL( OLOC, 2, -(REAL(DIMS(2)/2)-0.5)*PIXSIZE/3600.0,
+      CALL BDI_PUTAXVAL( OFID, 2, -(REAL(DIMS(2)/2)-0.5)*PIXSIZE/3600.0,
      :                          PIXSIZE/3600.0, DIMS(2), STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, 1, 'degrees', STATUS )
-      CALL BDA_PUTAXLABEL( OLOC, 1, 'X position', STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, 2, 'degrees', STATUS )
-      CALL BDA_PUTAXLABEL( OLOC, 2, 'Y position', STATUS )
-      CALL BDA_PUTLABEL( OLOC, 'Exposure', STATUS )
-      CALL BDA_PUTUNITS( OLOC, 'seconds', STATUS )
-      CALL BDA_PUTAXNORM( OLOC, 1, .TRUE., STATUS )
-      CALL BDA_PUTAXNORM( OLOC, 2, .TRUE., STATUS )
+      CALL BDI_PUTAXTEXT( OFID, 1, 'X position', 'degrees', STATUS )
+      CALL BDI_PUTAXTEXT( OFID, 2, 'Y position', 'degrees', STATUS )
+      CALL BDI_PUTLABEL( OFID, 'Exposure', STATUS )
+      CALL BDI_PUTUNITS( OFID, 'seconds', STATUS )
+      CALL BDI_PUTAXNORM( OFID, 1, .TRUE., STATUS )
+      CALL BDI_PUTAXNORM( OFID, 2, .TRUE., STATUS )
 
-      CALL BDA_CREDATA( OLOC, 2, DIMS, STATUS )
-      CALL BDA_MAPDATA( OLOC, 'WRITE', DPTR, STATUS )
+      CALL BDI_CREDATA( OFID, 2, DIMS, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', DPTR, STATUS )
       CALL ARR_COP1R( DIMS(1)*DIMS(2), EXPARR, %VAL(DPTR), STATUS )
-      CALL BDA_RELEASE( OLOC, STATUS )
+      CALL BDI_RELEASE( OFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
