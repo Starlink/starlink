@@ -376,20 +376,20 @@ sub get_module {
    mkdir "$tmpdir", 0777;
    chdir "$tmpdir"  or error "Failed to enter $tmpdir";
 
-#  Get logical path name from database.
+#  Get logical path name from database.  $locname is a global variable.
 
-   $location = $index->get($module, packpref => $package);
+   $locname = $index->get($module, packpref => $package);
 
 #  Generate an error if no module of the requested name is indexed.
 #  This ought not to happen, since $module should have been checked 
 #  before calling this routine.
 
-   error "Failed to find module $module" unless ($location);
+   error "Failed to find module $module" unless ($locname);
 
 #  Interpret the first element of the location as a package or symbolic
 #  directory name.  Either way, change it for a logical path name.
 
-   $location =~ /^(.+)#(.+)/i;
+   $locname =~ /^(.+)#(.+)/i;
    ($head, $tail) = ($1, $2);
 
    my ($file, $tarfile, $dir, $loc);
@@ -406,7 +406,7 @@ sub get_module {
       $file = "$incdir/$tail";
    }
    else {
-      error "Failed to interpret location $location",
+      error "Failed to interpret location $locname",
          "Probably the index file $indexfile is outdated or corrupted.";
    }
 
