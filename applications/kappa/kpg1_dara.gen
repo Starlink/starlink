@@ -308,9 +308,16 @@
          NVAL = 1
 
 *  Otherwise, get an array containing strings or numerical values.
-      ELSE
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
          CALL KPG1_MIXVD( PARAM, 3, VAL__MIND, VAL__MAXD,
      :                    VAMETH( : NCVM ), PVALS, NVAL, STATUS ) 
+
+*  If a NULL value was supplied, cancel the error and use RANGE.
+         IF ( STATUS .EQ. PAR__NULL ) {
+            CALL ERR_ANNUL( STATUS )
+            PVALS( 1 ) = 'RANGE'
+            NVAL = 1
+         }
 
 *  Abort if an error has occurred.
          IF ( STATUS .NE. SAI__OK ) GO TO 999
