@@ -62,8 +62,10 @@ f     only within textual output (e.g. from AST_WRITE).
 *        SkyAxis with the IsLatitude attribute set is legal between plus
 *        and minus 90 degrees.
 *     8-JAN-2003 (DSB):
-*        Changed private InitVtab method to protected astInitSkyAxisVtab
+*        - Changed private InitVtab method to protected astInitSkyAxisVtab
 *        method.
+*        - Modify DHmsGap to avoid decimal gap "4" which produces things
+*        like "0.0 0.4 0.8 1.2 1.6 2.0" ("4" replaced by "5").
 *class--
 */
 
@@ -1246,8 +1248,8 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
 /* Local Data: */
 /* ----------- */
 /* Table of nice decimal gaps. */
-   const double dec_table[] = { 1.0, 2.0, 4.0, 5.0, 10.0, -1.0 };
-   const int dec_nticks[] =   { 5,   4,   4,   5,   5 };
+   const double dec_table[] = { 1.0, 2.0, 5.0, 5.0, 10.0, -1.0 };
+   const int dec_nticks[] =   { 5,   4,   5,   5,   5 };
 
 /* Table of nice degrees gaps. */
    const double deg_table[] =

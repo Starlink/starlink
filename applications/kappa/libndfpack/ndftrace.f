@@ -224,6 +224,8 @@
 *        Corrected value written to parameter "WCS".
 *     20-MAR-2000 (DSB):
 *        Normalize displayed first pixel centre in current WCS Frame.
+*     10-JAN-2003 (DSB):
+*        Modified to display details of WCS SpecFrames.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -268,6 +270,7 @@
       BYTE BADBIT                ! Bad-bits mask
       INTEGER BBI                ! Bad-bits value as an integer
       CHARACTER * ( 8 ) BINSTR   ! Binary bad-bits mask string
+      CHARACTER * ( 80 ) POSBUF  ! Buffer for position
       CHARACTER * ( NDF__MXDIM * ( 2 * VAL__SZI + 3 ) - 2 ) BUF ! Text buffer for shape information
       CHARACTER * ( 80 ) CCOMP   ! Character component
       DOUBLE PRECISION CFIRST( 1, NDF__MXDIM ) ! Frame coords of first pixel
@@ -317,7 +320,8 @@
       LOGICAL REPORT             ! Report the trace?
       INTEGER SIZE               ! Total number of pixels
       LOGICAL SHOWCS             ! Display an AST dump of the WCS component?
-      CHARACTER * ( 30 ) SYS     ! Sky coordinate system
+      CHARACTER * ( 30 ) SOR     ! Spectral standard of rest
+      CHARACTER * ( 30 ) SYS     ! Coordinate system
       LOGICAL THERE              ! Whether NDF component is defined
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel-index bounds
@@ -329,6 +333,9 @@
       CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
       CHARACTER * ( NDF__SZTYP ) XTYPE( MXEXTN ) ! Extension name
       CHARACTER * 80 TEXT                        ! General text string
+      CHARACTER SIGN
+      INTEGER IDMSF(4)
+
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
@@ -956,7 +963,7 @@
             END IF
 
 *  The rest we only do if we are reporting information on the screen. Only
-*  display the Curretn Frame if parameter FULLWCS is FALSE.
+*  display the Current Frame if parameter FULLWCS is FALSE.
             IF ( REPORT .AND. ( FULLWC .OR. IFRAME .EQ. ICURR ) ) THEN
 
 *  Display the Frame index.
@@ -1057,6 +1064,161 @@
                         CALL MSG_OUT( 'WCS_PROJ',
      :         '        Projection          : ^PROJ', STATUS )
                      END IF
+
+*  If the Frame is a SpecFrame, display SpecFrame specific information...
+                  ELSE IF( AST_ISASPECFRAME( FRM, STATUS ) ) THEN
+
+*  System...
+                     SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
+                     IF( SYS .EQ. 'FREQ' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Frequency' )
+                     ELSE IF( SYS .EQ. 'ENER' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Energy' )
+                     ELSE IF( SYS .EQ. 'WAVN' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Wave number' )
+                     ELSE IF( SYS .EQ. 'WAVE' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Wavelength' )
+                     ELSE IF( SYS .EQ. 'AWAV' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Wavelength (in air)' )
+                     ELSE IF( SYS .EQ. 'VRAD' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Radio velocity' )
+                     ELSE IF( SYS .EQ. 'VOPT' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Optical velocity' )
+                     ELSE IF( SYS .EQ. 'ZOPT' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Redshift' )
+                     ELSE IF( SYS .EQ. 'BETA' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Beta factor' )
+                     ELSE IF( SYS .EQ. 'VELO' ) THEN
+                        CALL MSG_SETC( 'SYS', 'Relativistic velocity' )
+                     ELSE
+                        CALL MSG_SETC( 'SYS', SYS )
+                     END IF
+
+                     CALL MSG_SETC( 'SYS', ' (' )
+                     CALL MSG_SETC( 'SYS', AST_GETC( FRM, 'UNIT(1)', 
+     :                                             STATUS ) ) 
+                     CALL MSG_SETC( 'SYS', ')' )
+                     CALL MSG_OUT( 'WCS_SYS',
+     :         '        System              : ^SYS', STATUS )
+
+
+*  Epoch...
+                     EP = AST_GETD( FRM, 'EPOCH', STATUS )
+                     IF( EP .LT. 1984.0 ) THEN
+                        CALL MSG_SETC( 'EPOCH', 'B' )
+                     ELSE 
+                        CALL MSG_SETC( 'EPOCH', 'J' )
+                     END IF
+                     CALL MSG_SETD( 'EPOCH', EP )
+                     CALL MSG_OUT( 'WCS_EPOCH',
+     :         '        Epoch of observation: ^EPOCH', STATUS )
+
+
+*  Rest Frequency...
+                     IF( AST_TEST( FRM, 'RestFreq', STATUS ) ) THEN
+                        CALL MSG_SETD( 'RF', AST_GETD( FRM, 'RestFreq',
+     :                                                 STATUS ) )
+                        CALL MSG_SETC( 'RF', ' Hz' )
+                     ELSE
+                        CALL MSG_SETC( 'RF', '<not defined>' )
+                     END IF
+                     CALL MSG_OUT( 'WCS_RF',
+     :         '        Rest frequency      : ^RF', STATUS )
+                     
+
+*  Standard of Rest...
+                     SOR = AST_GETC( FRM, 'STDOFREST', STATUS )
+                     IF( SOR .EQ. 'NONE' ) THEN
+                        CALL MSG_SETC( 'SOR', '<not defined>' )
+
+                     ELSE IF( SOR .EQ. 'TOPOCENT' ) THEN
+                        CALL MSG_SETC( 'SOR', 'Topocentric' )
+
+                     ELSE IF( SOR .EQ. 'GEOCENTR' ) THEN
+                        CALL MSG_SETC( 'SOR', 'Geocentric' )
+
+                     ELSE IF( SOR .EQ. 'BARYCENT' ) THEN
+                        CALL MSG_SETC( 'SOR', 'Barycentric' )
+
+                     ELSE IF( SOR .EQ. 'HELIOCEN' ) THEN
+                        CALL MSG_SETC( 'SOR', 'Heliocentric' )
+
+                     ELSE IF( SOR .EQ. 'LSRK' ) THEN
+                        CALL MSG_SETC( 'SOR', 'Kinematical Local '//
+     :                                 'Standard of Rest' )
+
+                     ELSE IF( SOR .EQ. 'LSRD' ) THEN
+                        CALL MSG_SETC( 'SOR', 'Dynamical Local '//
+     :                                 'Standard of Rest' )
+
+                     ELSE IF( SOR .EQ. 'GALACTOC' ) THEN
+                        CALL MSG_SETC( 'SOR', 'GALACTIC' )
+
+                     ELSE IF( SOR .EQ. 'LOCALGRP' ) THEN
+                        CALL MSG_SETC( 'SOR', 'Local group' )
+
+                     ELSE IF( SOR .EQ. 'LOCALGRP' ) THEN
+                        CALL MSG_SETC( 'SOR', SOR )
+                     END IF
+
+                     CALL MSG_OUT( 'WCS_SOR',
+     :         '        Standard of rest    : ^SOR', STATUS )
+               
+
+* Reference position...
+                     IF( AST_TEST( FRM, 'RefRA', STATUS ) ) THEN
+                        POSBUF = ' '
+                        IAT = 0
+                        CALL CHR_APPND( AST_GETC( FRM, 'RefRA',
+     :                                           STATUS ), POSBUF, IAT )
+                        CALL CHR_APPND( ',', POSBUF, IAT )
+                        IAT = IAT + 1
+                        CALL CHR_APPND( AST_GETC( FRM, 'RefDEC',
+     :                                           STATUS ), POSBUF, IAT )
+                        IAT = IAT + 1
+                        CALL CHR_APPND( '(FK5 J2000)', POSBUF, IAT )
+                        CALL MSG_SETC( 'REF', POSBUF( : IAT ) )
+
+                     ELSE
+                        CALL MSG_SETC( 'REF', '<not defined>' )
+                     END IF
+                     CALL MSG_OUT( 'WCS_REF',
+     :         '        Reference (RA,Dec)  : ^REF', STATUS )
+
+* Observers position...
+                     IF( AST_TEST( FRM, 'GeoLon', STATUS ) ) THEN
+                        CALL sla_DR2AF( 1, AST_GETD( FRM, 'GeoLon', 
+     :                                               STATUS ),
+     :                                  SIGN, IDMSF )
+                        IAT = 0
+                        POSBUF = ' '
+                        CALL CHR_APPND( SIGN, POSBUF, IAT )
+                        CALL CHR_PUTI( IDMSF( 1 ), POSBUF, IAT )
+                        IAT = IAT + 1
+                        CALL CHR_PUTI( IDMSF( 2 ), POSBUF, IAT )
+                        IAT = IAT + 1
+                        CALL CHR_PUTI( IDMSF( 3 ), POSBUF, IAT )
+                        CALL CHR_APPND( '.', POSBUF, IAT )
+                        CALL CHR_PUTI( IDMSF( 4 ), POSBUF, IAT )
+                        CALL CHR_APPND( ',', POSBUF, IAT )
+                        IAT = IAT + 1
+
+                        CALL sla_DR2AF( 0, AST_GETD( FRM, 'GeoLat', 
+     :                                               STATUS ),
+     :                                  SIGN, IDMSF )
+                        CALL CHR_APPND( SIGN, POSBUF, IAT )
+                        CALL CHR_PUTI( IDMSF( 1 ), POSBUF, IAT )
+                        IAT = IAT + 1
+                        CALL CHR_PUTI( IDMSF( 2 ), POSBUF, IAT )
+                        IAT = IAT + 1
+                        CALL CHR_PUTI( IDMSF( 3 ), POSBUF, IAT )
+                        CALL MSG_SETC( 'OBS', POSBUF( : IAT ) )
+
+                     ELSE
+                        CALL MSG_SETC( 'OBS', '<not defined>' )
+                     END IF
+                     CALL MSG_OUT( 'WCS_REF',
+     :         '        Observer (Lon,Lat)  : ^OBS', STATUS )
 
                   END IF
 

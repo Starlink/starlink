@@ -1367,7 +1367,7 @@ static void FixConstants( UnitNode **node, int unity ) {
 *     unity
 *        If non-zero, then all multiplicative constants are set to 1.0, and 
 *        their original values are forgotten, but only if the other
-*        argument of the OP_MULT node is an OP_LDVAR Node.
+*        argument of the OP_MULT node is an OP_LDVAR, OP_POW or OP_SQRT Node.
 
 */
 
@@ -1400,11 +1400,13 @@ static void FixConstants( UnitNode **node, int unity ) {
 
 /* If an OP_MULT nodes within a simplified tree has a constant argument,
    it will always be argument zero.  If this is an OP_MULT node and arg[0]
-   is constant and "unity" is non-zero and arg[1] is an OP_LDVAR node, 
-   replace the constant value by 1.0. */
+   is constant and "unity" is non-zero and arg[1] is an OP_LDVAR, OP_POW
+   or OP_SQRT node, replace the constant value by 1.0. */
       if( unity && op == OP_MULT && 
           (*node)->arg[ 0 ]->con != AST__BAD && 
-          (*node)->arg[ 1 ]->opcode == OP_LDVAR ) {
+          ( (*node)->arg[ 1 ]->opcode == OP_LDVAR ||
+            (*node)->arg[ 1 ]->opcode == OP_SQRT ||
+            (*node)->arg[ 1 ]->opcode == OP_POW ) ) {
          (*node)->arg[ 0 ]->con = 1.0;
       }
 
@@ -2270,9 +2272,9 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
    if( !mathmap ) {
 
 /* Fix all multiplicative constants to 1.0 if they multiply an OP_LDVAR
-   node. This is on the assumption that the returned label should not 
-   include any simple unit scaling (e.g. if the output label would be 
-   "2.345*wavelength", we prefer simply to use "wavelength" since a scaled 
+   OP_SQRT or OP_POW node. This is on the assumption that the returned label 
+   should not include any simple unit scaling (e.g. if the output label would 
+   be "2.345*wavelength", we prefer simply to use "wavelength" since a scaled 
    wavelength is still a wavelength - i.e. simple scaling does not change 
    the dimensions of a quantity). */
       FixConstants( &newtree, 1 );

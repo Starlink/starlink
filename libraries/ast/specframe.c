@@ -92,6 +92,15 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
           sys == AST__AIRWAVE || \
           sys == AST__FREQ ) ? 1 : 0 )
 
+/* Macros which return the maximum and minimum of two values. */
+#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
+#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
+
+/* Macro to check for equality of floating point values. We cannot
+   compare bad values directory because of the danger of floating point
+   exceptions, so bad values are dealt with explicitly. */
+#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
+
 /* Header files. */
 /* ============= */
 /* Interface definitions. */
@@ -118,6 +127,7 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <math.h>
 
 /* Module Variables. */
 /* ================= */
@@ -167,7 +177,7 @@ static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const char *StdOfRestString( AstStdOfRestType );
 static const char *SystemString( AstFrame *, AstSystemType );
-static int MakeSpecMapping( AstSpecFrame *, AstSpecFrame *, AstSystemType, AstStdOfRestType, AstMapping ** );
+static int MakeSpecMapping( AstSpecFrame *, AstSpecFrame *, AstSystemType, AstStdOfRestType, int, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static void Copy( const AstObject *, AstObject * );
@@ -324,11 +334,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* --------- */
    } else if ( !strcmp( attrib, "restfreq" ) ) {
       astClearRestFreq( this );
-
-/* StdOfRest. */
-/* ---------- */
-   } else if ( !strcmp( attrib, "stdofrest" ) ) {
-      astClearStdOfRest( this );
 
 /* StdOfRest. */
 /* ---------- */
@@ -1577,7 +1582,8 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name ) {
 
 static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                             AstSystemType align_sys, 
-                            AstStdOfRestType align_sor, AstMapping **map ) {
+                            AstStdOfRestType align_sor, 
+                            int report, AstMapping **map ) {
 /*
 *  Name:
 *     MakeSpecMapping
@@ -1592,7 +1598,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *     #include "specframe.h"
 *     int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *                          AstSystemType align_sys, 
-*                          AstStdOfRestType align_sor, AstMapping **map )
+*                          AstStdOfRestType align_sor, 
+*                          int report, AstMapping **map )
 
 *  Class Membership:
 *     SpecFrame member function.
@@ -1642,6 +1649,9 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *        If this is AST__NOSOR, or if the StdOfRest attribute of either
 *        the target or result SpecFrame is AST__NOSOR, then it is assumed
 *        that the two SpecFrames are already in the same reference system.
+*     report
+*        Should errors be reported if no match is possible? These reports
+*        will describe why no match was possible.
 *     map
 *        Pointer to a location which is to receive a pointer to the
 *        returned Mapping. The forward transformation of this Mapping
@@ -1661,7 +1671,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 */
 
 /* Local Constants: */
-#define MAX_ARGS 5               /* Max arguments for an SpecMap conversion */
+#define MAX_ARGS 7               /* Max arguments for an SpecMap conversion */
 
 /* Local Variables: */
    AstMapping *umap1;            /* First Units Mapping */
@@ -1777,6 +1787,25 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
         args[ 4 ] = arg4; \
         astSpecAdd( specmap, cvt, args );
 
+#define TRANSFORM_6(cvt,arg0,arg1,arg2,arg3,arg4,arg5) \
+        args[ 0 ] = arg0; \
+        args[ 1 ] = arg1; \
+        args[ 2 ] = arg2; \
+        args[ 3 ] = arg3; \
+        args[ 4 ] = arg4; \
+        args[ 5 ] = arg5; \
+        astSpecAdd( specmap, cvt, args );
+
+#define TRANSFORM_7(cvt,arg0,arg1,arg2,arg3,arg4,arg5,arg6) \
+        args[ 0 ] = arg0; \
+        args[ 1 ] = arg1; \
+        args[ 2 ] = arg2; \
+        args[ 3 ] = arg3; \
+        args[ 4 ] = arg4; \
+        args[ 5 ] = arg5; \
+        args[ 6 ] = arg6; \
+        astSpecAdd( specmap, cvt, args );
+
 /* Phase 1: Convert from the target system to the selected alignment system
    (either frequency or relativistic velocity), using attributes of the target 
    frame to define the Mapping. 
@@ -1794,7 +1823,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    this case if the rest frequency has not been set in the target. */
    if( target_abs != align_abs && rest_freq == AST__BAD ) {
       match = 0;
-      if( astOK ) {
+      if( astOK && report ) {
          astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert between "
                    "spectal systems because the rest frequency (attribute "
                    "RestFreq) is undefined." );
@@ -1886,7 +1915,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
       if( !astTestRefRA( target ) || !astTestRefDec( target ) ) {
          if( target_sor != align_sor ) {
             match = 0;
-            if( astOK ) {
+            if( astOK && report ) {
                astError( AST__NOSOR, "astMatch(SpecFrame): Cannot convert "
                          "between spectal standards of rest because the "
                          "source position (attributes RefRA and RefDec) is "
@@ -1972,7 +2001,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
       if( !astTestRefRA( result ) || !astTestRefDec( result ) ) {
          if( result_sor != align_sor ) {
             match = 0;
-            if( astOK ) {
+            if( astOK && report ) {
                astError( AST__NOSOR, "astMatch(SpecFrame): Cannot convert "
                          "between spectal standards of rest because the "
                          "source position (attributes RefRA and RefDec) is "
@@ -2032,7 +2061,6 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
             TRANSFORM_2( (align_abs?"HLF2GL":"HLV2GL"), ra, dec )
    
          }         
-   
       }
    }
 
@@ -2054,7 +2082,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    this case if the rest frequency has not been set in the result. */
       if( result_abs != align_abs && rest_freq == AST__BAD ) {
          match = 0;
-         if( astOK ) {
+         if( astOK && report ) {
             astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert between "
                       "spectal systems because the rest frequency (attribute "
                       "RestFreq) is undefined." );
@@ -2157,7 +2185,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
       map2 = astSimplify( specmap );
       if( !astIsAUnitMap( map2 ) || strcmp( ures, utarg ) ) {
          match = 0;
-         if( astOK ) {         
+         if( astOK && report ) {         
             astError( AST__BADUN, "astMatch(SpecFrame): Cannot convert between "
                       "spectral axis units '%s' and '%s'.", utarg, ures );
          }
@@ -2191,6 +2219,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 #undef TRANSFORM_3
 #undef TRANSFORM_4
 #undef TRANSFORM_5
+#undef TRANSFORM_6
+#undef TRANSFORM_7
 }
 
 static int Match( AstFrame *template_frame, AstFrame *target,
@@ -2313,12 +2343,24 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* Obtain the number of axes in the target Frame. */
    target_naxes = astGetNaxes( target );
 
-/* The first criterion for a match is that the template matches as a
+/* Obtain pointers to the primary Frame which underlies the target axis. */
+   astPrimaryFrame( target, 0, &frame0, &iaxis0 );
+
+/* The first criterion for a match is that this Frame must be a SpecFrame 
+   (or from a class derived from SpecFrame). */
+   match = astIsASpecFrame( frame0 );
+
+/* Annul the Frame pointers used in the above tests. */
+   frame0 = astAnnul( frame0 );
+
+/* The next criterion for a match is that the template matches as a
    Frame class object. This ensures that the number of axes (1) and
    domain, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
-   match = (*parent_match)( template_frame, target,
-                            template_axes, target_axes, map, result );
+   if( match ) {
+      match = (*parent_match)( template_frame, target,
+                               template_axes, target_axes, map, result );
+   }
 
 /* If a match was found, annul the returned objects, which are not
    needed, but keep the memory allocated for the axis association
@@ -2326,19 +2368,6 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    if ( astOK && match ) {
       *map = astAnnul( *map );
       *result = astAnnul( *result );
-   }
-
-/* If OK so far, obtain pointers to the primary Frame which underlies
-   the target axis. */
-   if ( match && astOK ) {
-      astPrimaryFrame( target, 0, &frame0, &iaxis0 );
-
-/* The next criterion for a match is that this Frame must be a SpecFrame 
-   (or from a class derived from SpecFrame). */
-      match = astIsASpecFrame( frame0 );
-
-/* Annul the Frame pointers used in the above tests. */
-      frame0 = astAnnul( frame0 );
    }
 
 /* If the Frames still match, we next set up the axis association
@@ -2631,7 +2660,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* AlignStdOfRest. */
 /* --------------- */
    } else if ( nc = 0,
-        ( 0 == astSscanf( setting, "alignstdofrest= %n%*s %n", &off, &nc ) )
+        ( 0 == astSscanf( setting, "alignstdofrest=%n%*s %n", &off, &nc ) )
         && ( nc >= len ) ) {
 
 /* Convert the string to a StdOfRest code before use. */
@@ -2662,8 +2691,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* RefDec. */
 /* ------- */
    } else if ( nc = 0,
-              ( 0 == astSscanf( setting, "refdec= %n%*s %n", &off, &nc ) )
-              && ( nc >= len ) ) {
+              ( 0 == astSscanf( setting, "refdec=%n%*s %n", &off, &nc ) )
+              && ( nc >= 7 ) ) {
 
 /* Convert the string to a radians value before use. */
       ival = astUnformat( skyframe, 1, setting + off, &dval );
@@ -2679,8 +2708,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* RefRA. */
 /* ------ */
    } else if ( nc = 0,
-              ( 0 == astSscanf( setting, "refra= %n%*s %n", &off, &nc ) )
-              && ( nc >= len ) ) {
+              ( 0 == astSscanf( setting, "refra=%n%*s %n", &off, &nc ) )
+              && ( nc >= 6 ) ) {
 
 /* Convert the string to a radians value before use. */
       ival = astUnformat( skyframe, 0, setting + off, &dval );
@@ -2757,7 +2786,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* StdOfRest. */
 /* ---------- */
    } else if ( nc = 0,
-              ( 0 == astSscanf( setting, "stdofrest= %n%*s %n", &off, &nc ) )
+              ( 0 == astSscanf( setting, "stdofrest=%n%*s %n", &off, &nc ) )
               && ( nc >= len ) ) {
 
 /* Convert the string to a StdOfRest code before use. */
@@ -3332,11 +3361,12 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 */
 
 /* Local Variables: */
-   AstSpecFrame *target;         /* Pointer to the SpecFrame structure */
-   AstSpecFrame *temp;           /* Pointer to copy of target SpecFrame */
-   AstSystemType align_sys;      /* System in which to align the SpecFrames */
-   AstStdOfRestType align_sor;   /* Standard of rest in which to align the SpecFrames */
-   int match;                    /* Coordinate conversion is possible? */
+   AstSpecFrame *target;      /* Pointer to the SpecFrame structure */
+   AstSpecFrame *temp;        /* Pointer to copy of target SpecFrame */
+   AstSystemType align_sys;   /* System in which to align the SpecFrames */
+   AstStdOfRestType align_sor;/* Standard of rest in which to align the SpecFrames */
+   int match;                 /* Coordinate conversion is possible? */
+   int report;                /* Report errors if SpecFrames cannot be aligned? */
 
 /* Initialise the returned values. */
    *map = NULL;
@@ -3359,16 +3389,30 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* Form the result from a copy of the target. */
       *result = astCopy( target );
 
+/* Initialise a flag to indicate that MakeSpecMapping should not report
+   errors if no Mapping can be created. */
+      report = 0;
+
 /* If required, overlay the template attributes on to the result SpecFrame.
    Also get the system and standard of rest in which to align the two 
    SpecFrames. These are the values from the template (if there is a 
    template). */
       if ( template ) {
          astOverlay( template, template_axes, *result );
-         align_sys = astGetAlignSystem( template );
          if( astIsASpecFrame( template ) ) {
+            align_sys = astGetAlignSystem( template );
             align_sor = astGetAlignStdOfRest( template );
+
+/* Since we now know that both the template and target are SpecFrames, it 
+   should usually be possible to convert betwen them. If conversion is
+   *not* possible (fpr instance if no rest frequency is availalbe, etc)
+   then the user will probably be interested in knowing the reason why
+   conversion is not possible. Therefore, indicate that MakeSpecMapping 
+   should report errors if no Mapping can be created. */
+            report = 1;
+
          } else {
+            align_sys = astGetAlignSystem( target );
             align_sor = astGetAlignStdOfRest( target );
          }
 
@@ -3382,9 +3426,10 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* Generate a Mapping that takes account of changes in the sky coordinate
    system (equinox, epoch, etc.) between the target SpecFrame and the result
    SpecFrame. If this Mapping can be generated, set "match" to indicate that
-   coordinate conversion is possible. */
+   coordinate conversion is possible. If the template is a specframe,
+   report errors if a match is not possible. */
       match = ( MakeSpecMapping( target, (AstSpecFrame *) *result, 
-                align_sys, align_sor, map ) != 0 );
+                align_sys, align_sor, report, map ) != 0 );
 
 /* Result is not a SpecFrame. */
 /* ------------------------------ */
@@ -4072,7 +4117,7 @@ astMAKE_TEST(SpecFrame,RefDec,( this->refdec != AST__BAD ))
 *     Public attribute.
 
 *  Synopsis:
-*     Floating point.
+*     String
 
 *  Description:
 *     This attribute, together with the RefDec attribute, specifies the FK5 
@@ -4211,7 +4256,7 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 *  Description:
 *     This attribute identifies the standard of rest to which the spectral
 *     axis values of a SpecFrame refer, and may take any of the values
-*     listed in the "Standards of Rest" section (below).
+*     listed in the "Standards of Rest" section (below). 
 *
 *     The default StdOfRest value is "NONE".
 
@@ -4296,7 +4341,6 @@ astMAKE_SET(SpecFrame,StdOfRest,AstStdOfRestType,stdofrest,(
 
 /* Leave the value unchanged on error. */
                                             this->stdofrest ) ) )
-
 
 /* Copy constructor. */
 /* ----------------- */
