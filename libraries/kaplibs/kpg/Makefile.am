@@ -21,7 +21,8 @@ F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f)
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn
 
-KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr 
+KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
+kpg1_mixv.gdr
 
 KPG_NONGEN = bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f \
