@@ -17,7 +17,8 @@ sub match_positions ($$$$$);
 sub generate_astrom ($);
 sub run_astrom ($$);
 sub dmshms ($$);
-sub ymd2dec ($$$);
+sub ymd2je ($$$);
+sub ymd2jd ($$$);
 sub qchi ($$);
 sub canonicalise_ndfname ($);
 sub twodarray2ndf (\@$);
@@ -312,7 +313,7 @@ sub ndf_info ($$$) {
 	  if $verbose;
     } else {
 	my @now = localtime();
-	$obsdate = ymd2dec ($now[5]+1900, $now[4]+1, $now[3]);
+	$obsdate = ymd2je ($now[5]+1900, $now[4]+1, $now[3]);
 	print STDERR "ndf_info: WARNING obsdate $obsdate taken to be NOW\n"
 	  if $verbose;
     }
@@ -365,9 +366,9 @@ sub get_dates ($$$) {
 	    for ($mnum=1; $mnum<=12; $mnum++) {
 		last if ($mstr eq $months[$mnum]);
 	    }
-	    ($mnum <= 12) || carp "get_date: Unknown month $mstr\n";
+	    ($mnum>=1 && $mnum<=12) || carp "get_date: Unknown month $mstr\n";
 
-	    $dates{ndd} = ymd2dec ($dates[0], $mnum, $dates[2]);
+	    $dates{ndd} = ymd2je ($dates[0], $mnum, $dates[2]);
 	}
     }
 
@@ -402,7 +403,7 @@ sub get_dates ($$$) {
 	    ($datey,$datem,$dated,$junk) = split (/[^0-9]+/,$fitsdate,4);
 	    if (defined($datem)) {
 		defined($dated) || ($dated = 1);
-		$dates{fdd} = ymd2dec ($datey, $datem, $dated);
+		$dates{fdd} = ymd2je ($datey, $datem, $dated);
 	    }	
 	}
 
@@ -416,7 +417,7 @@ sub get_dates ($$$) {
 #    unless (defined ($obsdate)) {
 #	# Don't know -- just say NOW.
 #	my @now = localtime();
-#	$obsdate = ymd2dec ($now[5]+1900, $now[4]+1, $now[3]);
+#	$obsdate = ymd2je ($now[5]+1900, $now[4]+1, $now[3]);
 #    }
 
     return \%dates;
@@ -1464,22 +1465,32 @@ sub get_temp_files () {
     return @tempfiles;
 }
 
-# Convert year,month,day to a decimal year.  Very simple, but accurate enough.
-# Assumes input parameters are within valid ranges.
-sub ymd2dec ($$$) {
-    my ($year,$month,$day) = @_;
-    my @months = (0,
-		  31, 31, 28, 30, 31, 30,
-		  31, 31, 30, 31, 30, 31);
-    my $totday = 0;
-    my $i;
-    for ($i=1; $i<$month; $i++) {
-	$totday += $months[$i];
-    }
-    $totday += $day;
-    return $year + $totday/365.25;
+# Convert year,month,day (noon) to Julian Day number.
+sub ymd2jd {
+    # Use the standard formula to convert Gregorian dates to Julian
+    # Day numbers
+    use integer;
+    my ($year, $month, $day) = @_;
+    # Year is (1000..3000), month is in (1..12), day in (1..31).  The
+    # restriction on year is not because of any limitation on the
+    # validity of the formula, but to guard against silly parameters
+    # (eg, 2-digit dates).
+    ($year > 1000 && $year < 3000)|| croak "ymd2jd: years in 1000..3000 only";
+    ($month >= 1 && $month <= 12) || croak "ymd2jd: month $month out of range";
+    ($day >= 1 && $day <= 31)     || croak "ymd2jd: day $day out of range";
+
+    return $day - 32075 + 1461*($year+4800+($month-14)/12)/4
+      +367*($month-2-($month-14)/12*12)/12
+      -3*(($year+4900+($month-14)/12)/100)/4;
 }
 
+# Convert year,month,day to a Julian epoch (decimal year)
+# Assumes input parameters are within valid ranges.
+sub ymd2je ($$$) {
+    my ($year,$month,$day) = @_;
+
+    return 2000 + (ymd2jd($year, $month, $day) - 2451545)/365.25;
+}
 
 #+
 # Solve the equation $P(\rho) = (\sqrt{p_e)+1)/2$, for $\rho$.
