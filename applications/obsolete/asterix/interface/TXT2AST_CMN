@@ -1,4 +1,4 @@
-*+ IMPORT_CMN - Common block definition file for IMPORT
+*+ TXT2AST_CMN - Common block definition file for TXT2AST
 *-
 
 *    Data column defined?
@@ -56,10 +56,10 @@
       CHARACTER*80        CMT(MAXCMT)       	! Comments
 
 *    Character string common block
-      COMMON /IMPORT_CMN_C/ 	WD_DATA, CMT
+      COMMON /TXT2AST_CMN_C/ 	WD_DATA, CMT
 
 *    Non-character common block
-      COMMON /IMPORT_CMN/ WD_NUM, WD_LEN, WD_USED,
+      COMMON /TXT2AST_CMN/ WD_NUM, WD_LEN, WD_USED,
      :                    CMT_BUF, CMT_N,
      :                    USE_DATA, USE_VAR, USE_QUAL, USE_LOERR,
      :                      USE_UPERR, USE_AX_DATA, USE_AX_WID,
