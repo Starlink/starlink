@@ -792,6 +792,7 @@ $(MANIFEST)/gwm: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/hds: \
+		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/messgen \
