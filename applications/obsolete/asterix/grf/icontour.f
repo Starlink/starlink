@@ -29,7 +29,7 @@
 *    Local variables :
       CHARACTER*20 CONTEXT
       REAL LEVELS(16)
-      INTEGER NLEV,ILEV
+      INTEGER NLEV
       LOGICAL ACTIVE
       LOGICAL OFF
       LOGICAL FRESH

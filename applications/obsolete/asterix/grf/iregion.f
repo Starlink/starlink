@@ -1339,8 +1339,6 @@
       INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
-*    Import :
-      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -1437,10 +1435,10 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOC
-      INTEGER DIMS(2)
-      INTEGER PTR
-      LOGICAL MASK,ARDFILE
+c      CHARACTER*(DAT__SZLOC) LOC
+c      INTEGER DIMS(2)
+c      INTEGER PTR
+c      LOGICAL MASK,ARDFILE
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN

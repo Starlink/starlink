@@ -143,8 +143,6 @@
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Import :
-*    Status :
-      INTEGER STATUS
 *    Function declarations :
 *    Local constants :
       INTEGER NLINE

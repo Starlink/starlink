@@ -200,7 +200,6 @@
 *    Function declarations :
       BYTE BIT_ANDUB
 *    Local variables :
-      REAL VALVAR			   ! value weighted by variance
       REAL XPIX,YPIX
       INTEGER IX,IY
       INTEGER I1,I2,J1,J2
@@ -483,7 +482,6 @@
       BYTE BIT_ANDUB
       LOGICAL IMG_INCIRC
 *    Local variables :
-      REAL XPIX,YPIX
       REAL RGOOD
       INTEGER IX,IY
       INTEGER NGOOD
@@ -671,7 +669,6 @@
       BYTE BIT_ANDUB
       LOGICAL IMG_INREG
 *    Local variables :
-      REAL XPIX,YPIX
       REAL RGOOD
       INTEGER IX,IY
       INTEGER NGOOD
@@ -682,7 +679,6 @@
 * Initialise:
       NGOOD=0
       MERR=0.0
-
 
 * Loop over all pixels within rectangle enclosing circle
       DO IY=I_IY1,I_IY2
@@ -719,9 +715,6 @@
         RGOOD=REAL(NGOOD)
         MERR=MERR/SQRT(RGOOD)/SQRT(RGOOD-1.0)
 
-*
       ENDIF
-*
-*
+
       END
-*

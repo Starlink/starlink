@@ -244,7 +244,7 @@
 	REAL X0,Y0				! 1/e points
 	REAL SUMD,SUMV				! sum of data and error
 	REAL SUMW				! sum of weights
-	REAL WX,WY,WXY				! weights (x,y components; nett)
+	REAL WY,WXY				! weights (x,y components; nett)
 	REAL HBX,HBY				! half side of box over which
 						! Gaussian is considered
 						! non-zero
@@ -456,7 +456,7 @@
 	REAL X0,Y0				! 1/e points
 	REAL SUMD,SUMV				! sum of data and error
 	REAL SUMW				! sum of weights
-	REAL WX,WY,WXY				! weights (x,y components; nett)
+	REAL WY,WXY				! weights (x,y components; nett)
 	REAL HBX,HBY				! half side of box over which
 						! Gaussian is considered
 						! non-zero

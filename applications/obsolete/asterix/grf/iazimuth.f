@@ -249,7 +249,7 @@
       INTEGER IXP,IYP,IRAD
       INTEGER NXL,NXH,NYL,NYH                   !Range of pixels to test
       INTEGER J,K,JJ
-      REAL YOLD,XOLD,YNEW,XNEW
+      REAL YOLD,XOLD
       REAL RAD                                  !Radius of pixel from centre
       REAL THETA
       DOUBLE PRECISION RNN,RNN2                 !Normalising factors

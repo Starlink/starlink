@@ -28,7 +28,6 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC) ILOC
-      CHARACTER*80 IMG
       CHARACTER*20 DEV
       INTEGER NX,NY
       INTEGER MODE

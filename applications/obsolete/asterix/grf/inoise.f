@@ -26,7 +26,6 @@
 * Local constants :
 * Local variables :
       REAL SD                                 !Standard deviation of noise
-      LOGICAL UPDATE
 * Local data :
 * Version :
         CHARACTER*30 VERSION

@@ -104,7 +104,6 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
-      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC) SLOC
@@ -669,15 +668,11 @@
 *    Local variables :
 *
       CHARACTER*132       ARDFILE                    ! ARD file name
-      CHARACTER           CH                         ! Cursor character
       CHARACTER*132       TEXT                       ! O/p line for ARD file
 
       REAL                DVAL                       ! Data value to set
       REAL                XVERT(MAXVERT)             ! World X coord of vertices
       REAL                YVERT(MAXVERT)             ! World Y coord of vertices
-      REAL                XW, YW                     ! Cursor position
-      REAL                XMIN,XMAX
-      REAL                YMIN,YMAX
 
       INTEGER             FID                        ! ARD FIO descriptor
       INTEGER             I,J
@@ -695,7 +690,6 @@
       LOGICAL             FIRST                      ! First row to be done yet?
       LOGICAL             LOOP                       ! Looping?
       LOGICAL             OUTSIDE                    ! Invert selection?
-      LOGICAL             QUAL                       ! Set quality?
       LOGICAL             DOIT
 *
 *-
@@ -715,7 +709,6 @@
         ELSE
           DAT=.TRUE.
         ENDIF
-
 
 *      ARD file mode
         CALL USI_GET0L('ARD',ARD,STATUS)
@@ -803,7 +796,6 @@
 
           ENDIF
 
-
 *        Define bounding rectangle in pixels. If OUTSIDE mode is selected,
 *        then this is the area of the whole image
           IF ( OUTSIDE ) THEN
@@ -871,7 +863,6 @@
           CALL ARX_CLOSE(GRPID,STATUS)
 
         END IF
-
 
       END IF
 

@@ -223,9 +223,8 @@
       INTEGER IXP,IYP,IRAD
       INTEGER NXL,NXH,NYL,NYH                   !Range of pixels to test
       INTEGER J,K,KK,JJ,II
-      REAL YOLD,XOLD,YNEW,XNEW
+      REAL YOLD,XOLD
       REAL DFRAC
-      REAL RAD                                  !Radius of pixel from centre
       REAL RNN,RNN2                             !Normalising factors
       REAL XP,YP
       LOGICAL GOOD

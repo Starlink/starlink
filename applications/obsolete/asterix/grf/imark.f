@@ -33,7 +33,6 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
-      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC) SLOC
@@ -48,7 +47,6 @@
       INTEGER RAPTR,DECPTR
       INTEGER IFD
       INTEGER SYMBOL,COLOUR,BOLD
-      INTEGER CI,POS
       INTEGER NMARK
       LOGICAL OK
       LOGICAL POK
