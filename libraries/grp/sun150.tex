@@ -6,14 +6,14 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun150.5}
-\newcommand{\stardocnumber}    {150.5}
+\newcommand{\stardocsource}    {sun150.6}
+\newcommand{\stardocnumber}    {150.6}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {30th August 2001}
+\newcommand{\stardocdate}      {8th January 2003}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of\\
                                 Objects}
-\newcommand{\stardocversion}   {Version 3.1}
+\newcommand{\stardocversion}   {Version 3.2}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -961,6 +961,10 @@ group has been designated case insensitive. This is because file names on
 certain operating systems (eg UNIX) are always considered case sensitive, and so
 problems would arise while accessing indirection files if GRP was to consider
 them case {\em in}sensitive.
+
+The file name can contain shell meta-characters (references to
+environment variables for instance) which will be expanded before the
+file is used.
 
 \subsection{\label{SEC:MOD}Modification Elements}
 A modification element causes GRP to generate a set of names by copying the
@@ -3563,6 +3567,16 @@ library (see \xref{SUN/121}{sun121}{}), the CHR library (see
 Peter Draper is thanked for his work on porting the original IRH\_ package to
 UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
 improvements to the GRP\_ package.
+
+\section{Changes and New Features in V3.2}
+The following changes have occurred in the GRP\_ system since version 3.1:
+
+\begin{enumerate}
+\item Shell meta-characters (references to environment variables, for
+instance) may now be included within file names which specify
+indirection elements.
+
+\end{enumerate}
 
 \section{Changes and New Features in V3.1}
 The following changes have occurred in the GRP\_ system since version 3.0:

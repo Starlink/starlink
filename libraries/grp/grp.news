@@ -1,10 +1,10 @@
 1 GRP_library
                                              Expires: ???
 
-A new release (V3.1) of the GRP library is now available. It includes
+A new release (V3.2) of the GRP library is now available. It includes
 the following changes:
 
- - Facilities have been added to allow sections of a group expression to
-be interpreted in a verbatim manner (that is, ignoring all control
-characters).
+ - Shell meta-characters (referneces to environment variables, for
+instance) may now be included with file specifications used as
+indirection elements (e.g. "^$DATA_DIR/myfiles").
 
