@@ -92,6 +92,10 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External refernced
+      INTEGER			CHR_LEN
+        EXTERNAL		  CHR_LEN
+
 *  Local Variables:
       CHARACTER*132		ERRTEXT			! FITS error text
       CHARACTER*80		FPATH			! Sub-file stuff
@@ -99,7 +103,7 @@
       CHARACTER*6		MODE			! Access mode
 
       INTEGER			BSIZE			! FITS block size
-      INTEGER			FITSTAT			! FITS inherited status
+      INTEGER			FSTAT			! FITS inherited status
       INTEGER			FPLEN			! Length of FPATH
       INTEGER			HDU			! HDU number
       INTEGER			HDUTYP			! HDU type
@@ -133,11 +137,11 @@
         END IF
 
 *    Try to open file
-        FITSTAT = 0
-        CALL FTOPEN( LUN, FSPEC(:LFILEC), IMODE, BSIZE, FITSTAT )
+        FSTAT = 0
+        CALL FTOPEN( LUN, FSPEC(:LFILEC), IMODE, BSIZE, FSTAT )
 
 *    Opened ok?
-        IF ( FITSTAT .EQ. 0 ) THEN
+        IF ( FSTAT .EQ. 0 ) THEN
 
 *      Create the new object
           CALL ADI_NEW0( 'FITSfile', ID, STATUS )
@@ -150,21 +154,18 @@
             CALL ADI_CPUT0C( ID, 'Fpath', FPATH(:FPLEN), STATUS )
           END IF
 
-*      Write extra info into the file handle object
-          CALL ADI_CPUT0I( ID, 'Lun', LUN, STATUS )
-          CALL ADI_CPUT0I( ID, 'BlockSize', BSIZE, STATUS )
-
-*      Put in the correct access mode
-          IF ( IMODE .EQ. 0 ) THEN
-            CALL ADI_CPUT0C( ID, 'MODE', 'READ', STATUS )
-          ELSE
-            CALL ADI_CPUT0C( ID, 'MODE', 'WRITE', STATUS )
-          END IF
+*      Put in the correct access mode (is any of this necessary?)
+          CALL CHR_UCASE( MODE )
+          CALL ADI_CPUT0C( ID, 'MODE', MODE(:CHR_LEN(MODE)), STATUS )
           CALL ADI_LOCREP( 'FITS', REPID, STATUS )
           CALL ADI_CPUT0I( ID, 'REP', REPID, STATUS )
 
-*      Initialise
+*      Initialise HDU cursor
           CALL ADI_CPUT0I( ID, '.CurHdu', -1, STATUS )
+
+*      Write extra info into the file handle object
+          CALL ADI_CPUT0I( ID, 'Lun', LUN, STATUS )
+          CALL ADI_CPUT0I( ID, 'BlockSize', BSIZE, STATUS )
 
 *      Skip to HDU if specified
           IF ( HDU .GT. 0 ) THEN
@@ -176,7 +177,7 @@
           CALL FIO_PUNIT( LUN, STATUS )
 
           STATUS = ADI__RETRY
-          CALL FTGERR( FITSTAT, ERRTEXT )
+          CALL FTGERR( FSTAT, ERRTEXT )
           CALL MSG_SETC( 'REASON', ERRTEXT )
           CALL ERR_REP( ' ', '^REASON', STATUS )
 
