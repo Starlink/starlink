@@ -677,6 +677,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -877,4 +878,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 51 seconds
+Total time: 4 minutes 2 seconds
