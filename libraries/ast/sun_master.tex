@@ -22,7 +22,7 @@ f+
 \newcommand{\stardocnumber}    {210.3}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {28th September 1998}
+\newcommand{\stardocdate}      {3rd November 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -15210,7 +15210,7 @@ int type;
 
 ...
 
-astMark( plot, NMARK, NCOORD, NCOORD, in, type );
+astMark( plot, NMARK, NCOORD, NMARK, in, type );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -15314,13 +15314,71 @@ routines can often be useful for computing these
 (\secref{ss:distanceandoffset}).
 f-
 
+c+
+If you need to draw a series of curves end-to-end (when drawing a
+contour line, for example), then a more efficient alternative is to
+use astPolyCurve. This has the same effect as a sequence of
+invocations of astCurve, but allows you to supply a whole set of
+points at one time. astPolyCurve then joins them, in sequence, using
+geodesic curves:
+c-
+f+
+If you need to draw a series of curves end-to-end (when drawing a
+contour line, for example), then a more efficient alternative is to
+use AST\_POLYCURVE. This has the same effect as a sequence of calls to
+AST\_CURVE, but allows you to supply a whole set of points at the same
+time. AST\_POLYLINE then joins them, in sequence, using geodesic
+curves:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#define NCOORD 2
+#define NPOINT 100
+double coords[ NCOORD ][ NPOINT ];
+
+...
+
+astPolyCurve( plot, NPOINT, NCOORD, NPOINT, coords );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER NCOORD, NPOINT
+      DOUBLE PRECISION COORDS( NPOINT, NCOORD )
+
+      ...
+
+      CALL AST_POLYCURVE( PLOT, NPOINT, NCOORD, NPOINT, COORDS, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, NPOINT specifies how many points are to be joined and NCOORD
+specifies how many coordinates are being supplied for each point.  The
+array ``coords'' supplies the coordinates of the points in the Plot's
+physical coordinate system.
+c-
+f+
+Here, NPOINT specifies how many points are to be joined and NCOORD
+specifies how many coordinates are being supplied for each point.  The
+array COORDS supplies the coordinates of the points in the Plot's
+physical coordinate system.
+f-
+
 \subsection{Plotting Curves Parallel to Axes}
 
 c+
 As there is no Plot function to draw a ``straight line'', drawing axes
 and grid lines to represent coordinate systems requires a slightly
 different approach. The problem is that for some coordinate systems,
-these grid lines will not be geodesics, so astCurve
+these grid lines will not be geodesics, so astCurve and astPolyCurve
 (\secref{ss:plottinggeodesics}) cannot easily be used (you would have
 to resort to approximating grid lines by many small elements). Lines
 of constant celestial latitude provide an example of this, with the
@@ -15330,11 +15388,11 @@ f+
 As there is no Plot routine to draw a ``straight line'', drawing axes
 and grid lines to represent coordinate systems requires a slightly
 different approach. The problem is that for some coordinate systems,
-these grid lines will not be geodesics, so AST\_CURVE
-(\secref{ss:plottinggeodesics}) cannot easily be used (you would have
-to resort to approximating grid lines by many small elements). Lines
-of constant celestial latitude provide an example of this, with the
-exception of the equator which is a geodesic.
+these grid lines will not be geodesics, so AST\_CURVE and
+AST\_POLYCURVE (\secref{ss:plottinggeodesics}) cannot easily be used
+(you would have to resort to approximating grid lines by many small
+elements). Lines of constant celestial latitude provide an example of
+this, with the exception of the equator which is a geodesic.
 f-
 
 c+
@@ -16566,23 +16624,23 @@ occurred in the AST library between versions V1.1 and V1.2 (the
 current version):
 
 \begin{enumerate}
+c+
+\item A new function, astPolyCurve, has been introduced to allow more
+efficient plotting of multiple geodesic curves
+(\secref{ss:plottinggeodesics}).
+c-
+f+
+\item A new routine, AST\_POLYCURVE, has been introduced to allow more
+efficient plotting of multiple geodesic curves
+(\secref{ss:plottinggeodesics}).
+f-
+
 \item The command-line options ``$-$pgp'' and ``$-$pgplot'', which
 were previously synonymous when used with the ``ast\_link'' and
 ``ast\_link\_adam'' commands, are no longer synonymous. The option
 ``$-$pgp'' now causes linking with the Starlink version of PGPLOT
 (which uses GKS to generate its output), while ``$-$pgplot'' links
 with the standard (or ``native'') version of PGPLOT.
-
-c+
-\item A bug has been fixed which could occasionally cause astConvert
-to think that conversion between a CmpFrame and another Frame was
-possible when, in fact, it wasn't.
-c-
-f+
-\item A bug has been fixed which could occasionally cause AST\_CONVERT
-to think that conversion between a CmpFrame and another Frame was
-possible when, in fact, it wasn't.
-f-
 
 c+
 \item The function astMapBox has been changed to execute more quickly,
@@ -16593,6 +16651,54 @@ f+
 \item The routine AST\_MAPBOX has been changed to execute more
 quickly, although this has been achieved at the cost of some loss of
 robustness when used with difficult Mappings.
+f-
+
+c+
+\item astFindFits now ignores trailing spaces in its keyword template.
+c-
+f+
+\item AST\_FINDFITS now ignores trailing spaces in its keyword template.
+f-
+
+\item The FitsChan class is now more tolerant of common minor
+violations of the FITS standard.
+
+\item The FitsChan class now incorporates an improved test for the
+linearity of Mappings, allowing more reliable conversion of AST data
+into FITS (using ``foreign'' FITS encodings).
+
+c+
+\item Some further improvements have been made to the algorithms for
+simplifying compound Mappings, as used by astSimplify.
+c-
+f+
+\item Some further improvements have been made to the algorithms for
+simplifying compound Mappings, as used by AST\_SIMPLIFY.
+f-
+
+\item A new UnitRadius attribute has been added to the SphMap
+class. This allows improved simplification of compound Mappings
+(CmpMaps) involving SphMaps and typically improves performance when
+handling FITS world coordinate information.
+
+\item A MatrixMap no longer propagates input coordinate values of
+AST\_\_BAD automatically to all output coordinates. If certain output
+coordinates do not depend on the affected input coordinate(s) because
+the relevant matrix elements are zero, then they may now remain valid.
+
+\item A minor bug has been corrected which could cause certain
+projections which involve half the celestial sphere to produce valid
+coordinates for the other (unprojected) half of the sphere as well.
+
+c+
+\item A bug has been fixed which could occasionally cause astConvert
+to think that conversion between a CmpFrame and another Frame was
+possible when, in fact, it wasn't.
+c-
+f+
+\item A bug has been fixed which could occasionally cause AST\_CONVERT
+to think that conversion between a CmpFrame and another Frame was
+possible when, in fact, it wasn't.
 f-
 \end{enumerate}
 

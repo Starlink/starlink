@@ -172,6 +172,17 @@ static int GetNout( AstMapping * );
 static int GetReport( AstMapping * );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
+static int InterpolatePixelNearestB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, double *, int, signed char, signed char *, signed char * );
+static int InterpolatePixelNearestD( int, const int *, const int *, const double *, const double *, int, const int *, double *, int, double, double *, double * );
+static int InterpolatePixelNearestF( int, const int *, const int *, const float *, const float *, int, const int *, double *, int, float, float *, float * );
+static int InterpolatePixelNearestI( int, const int *, const int *, const int *, const int *, int, const int *, double *, int, int, int *, int * );
+static int InterpolatePixelNearestL( int, const int *, const int *, const long int *, const long int *, int, const int *, double *, int, long int, long int *, long int * );
+static int InterpolatePixelNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, double *, int, long double, long double *, long double * );
+static int InterpolatePixelNearestS( int, const int *, const int *, const short int *, const short int *, int, const int *, double *, int, short int, short int *, short int * );
+static int InterpolatePixelNearestUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, double *, int, unsigned char, unsigned char *, unsigned char * );
+static int InterpolatePixelNearestUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, double *, int, unsigned int, unsigned int *, unsigned int * );
+static int InterpolatePixelNearestUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, double *, int, unsigned long int, unsigned long int *, unsigned long int * );
+static int InterpolatePixelNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, double *, int, unsigned short int, unsigned short int *, unsigned short int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int TestInvert( AstMapping * );
@@ -201,410 +212,6 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 /* Member functions. */
 /* ================= */
 #if REBIN
-/*
-*  Name:
-*     InterpolatePixelNearest<X>
-
-*  Purpose:
-*     Resample a data grid, using the nearest-pixel interpolation scheme.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "mapping.h"
-*     int InterpolatePixelNearest<X>( int ndim_in,
-*                                     const int *lbnd_in, const int *ubnd_in,
-*                                     const <Xtype> *in, const <Xtype> *in_var,
-*                                     int npoint, const int *offset,
-*                                     double *coord, int flags, double badval,
-*                                     <Xtype> *out, <Xtype> *out_var )
-
-*  Class Membership:
-*     Mapping member function.
-
-*  Description:
-*     This is a set of functions which resample a rectangular input
-*     grid of data (and, optionally, associated statistical variance
-*     values) so as to place them into a new output grid. Each output
-*     grid point may be mapped on to a position in the input grid in
-*     an arbitrary way. Where the positions given do not correspond
-*     with a pixel centre in the input grid, the interpolation scheme
-*     used is simply to select the nearest pixel (i.e. the one whose
-*     bounds contain the supplied position). The input and output
-*     grids may have any number of dimensions, not necessarily equal.
-
-*  Parameters:
-*     ndim_in
-*        The number of dimensions in the input grid. This should be at
-*        least one.
-*     lbnd_in
-*        Pointer to an array of integers, with "ndim_in" elements.
-*        This should give the coordinates of the centres of the first
-*        pixel in the data grid along each dimension.
-*     ubnd_in
-*        Pointer to an array of integers, with "ndim_in" elements.
-*        This should give the coordinates of the centres of the last
-*        pixel in the data grid along each dimension.
-*     in
-*        Pointer to the array of data to be resampled, with an element
-*        for each pixel in the input grid. The numerical type of these
-*        data should match the function used, as given by the suffix
-*        on the function name. Note that the storage order should be
-*        such that the coordinate of the first dimension varies most
-*        rapidly and that of the final dimension least rapidly
-*        (i.e. Fortran array storage order is used).
-*     in_var
-*        An optional pointer to a second array of positive numerical
-*        values (with the same size and data type as the "in" array),
-*        which represent estimates of the statistical variance
-*        associated with each element of the "in" array. If this
-*        second array is given (along with the corresponding "out_var"
-*        array), then estimates of the variance of the resampled data
-*        will also be returned.
-*
-*        If no variance estimates are required, a NULL pointer should
-*        be given.
-*     npoint
-*        The number of points at which the input grid is to be
-*        resampled.
-*     offset
-*        Pointer to an array of integers with "npoint" elements. For
-*        each output point, this array should contain the zero-based
-*        offset in the output array(s) (i.e. the "out" and,
-*        optionally, the "out_var" arrays) at which the resampled
-*        output value(s) should be stored.
-*     coord
-*        An array of pointers to double, with "ndim_in"
-*        elements. Element "coord[icoord]" should point at the first
-*        element of an array of double (with "npoint" elements) which
-*        contain the values of coordinate number "icoord" specifying
-*        the positions in the input grid from which each output point
-*        should obtain its value. The value of input coordinate number
-*        "icoord" in the input grid, corresponding to output point
-*        "point", is therefore given by "coord[icoord][point]".
-*     flags
-*        The bitwise OR of a set of flag values which control the
-*        operation of the function. Currently, only the flag
-*        AST__USEBAD is significant and indicates whether there are
-*        "bad" (i.e. missing) data in the input array(s) which must be
-*        recognised and propagated to the output array(s).  If this
-*        flag is not set, all input values are treated literally.
-*     badval
-*        If the AST__USEBAD flag is set (above), this parameter
-*        specifies the value which is used to identify bad data and/or
-*        variance values in the input array(s). Its data type must
-*        match that of the "in" (and "in_var") arrays. The same value
-*        will also be used to flag any output array elements for which
-*        resampled values could not be obtained.  The output arrays(s)
-*        may be flagged with this value whether or not the AST__USEBAD
-*        flag is set (the function return value indicates whether any
-*        such values have been produced).
-*     out
-*        Pointer to an array with the same data type as the "in"
-*        array, into which the resampled data will be returned. Note
-*        that details of how the output grid maps on to this array
-*        (e.g. the storage order, number of dimensions, etc.) is
-*        arbitrary and is specified entirely by means of the "offset"
-*        array. The "out" array should therefore contain sufficient
-*        elements to accommodate the "offset" values supplied.  There
-*        is no requirement that all elements of the "out" array should
-*        be assigned values, and any which are not addressed by the
-*        contents of the "offset" array will be left unchanged.
-*     out_var
-*        An optional pointer to an array with the same data type and
-*        size as the "out" array, into which variance estimates for
-*        the resampled values may be returned. This array will only be
-*        used if the "in_var" array has been given. It is addressed in
-*        exactly the same way (via the "offset" array) as the "out"
-*        array. The values returned are estimates of the statistical
-*        variance of the corresponding values in the "out" array, on
-*        the assumption that all input grid values (in the "in" array)
-*        are statistically independent, so that their variance
-*        estimates (in the "in_var" array) may simply be summed.
-*
-*        If no output variance estimates are required, a NULL pointer
-*        should be given.
-
-*  Returned Value:
-*     The number of output grid points to which a data value (or a
-*     variance value if relevant) equal to "badval" has been assigned
-*     because no valid output value could be obtained. Typically, this
-*     will be because the input position corresponding to the output
-*     grid point lies outside the input grid, or because it lies
-*     inside an input pixel which itself has the value "badval" (and
-*     the AST__USEBAD flag is set).
-*
-*     The maximum value that may be returned is "npoint", and the
-*     minimum is zero (indicating that all output values were
-*     successfully obtained).
-
-*  Notes:
-*     - There is a separate function for each numerical type of
-*     gridded data, distinguished by replacing the <X> in the function
-*     name by the appropriate 1- or 2-character suffix.
-*     - Note that "lbnd_in" and "ubnd_in" together define the shape
-*     and size of the input data grid, its extent along a particular
-*     (i'th) dimension being (ubnd_in[i] - lbnd_in[i] + 1). They also
-*     define the input grid's coordinate system, with each pixel being
-*     of unit extent along each dimension with integral coordinate
-*     values at its centre.
-*     - A value of zero will be returned if any of these functions is
-*     invoked with the global error status set, or if it should fail
-*     for any reason.
-*/
-/* Define a macro to implement the function for a specific data
-   type. */
-#define MAKE_INTERPOLATE_PIXEL_NEAREST(X,Xtype,Xsigned) \
-static int InterpolatePixelNearest##X( int ndim_in, \
-                                       const int *lbnd_in, \
-                                       const int *ubnd_in, \
-                                       const Xtype *in, \
-                                       const Xtype *in_var, \
-                                       int npoint, const int *offset, \
-                                       double *coord, \
-                                       int flags, double badval, \
-                                       Xtype *out, Xtype *out_var ) { \
-\
-/* Local Variables: */ \
-   Xtype var;                    /* Variance value */ \
-   double *xn_max;               /* Pointer to upper limits array (n-d) */ \
-   double *xn_min;               /* Pointer to lower limits array (n-d) */ \
-   double x;                     /* x coordinate value */ \
-   double xmax;                  /* x upper limit */ \
-   double xmin;                  /* x lower limit */ \
-   double xn;                    /* Coordinate value (n-d) */ \
-   double y;                     /* y coordinate value */ \
-   double ymax;                  /* y upper limit */ \
-   double ymin;                  /* y lower limit */ \
-   int *stride;                  /* Pointer to array of dimension strides */ \
-   int bad;                      /* Output pixel bad? */ \
-   int idim;                     /* Loop counter for dimensions */ \
-   int ix;                       /* Number of pixels offset in x direction */ \
-   int ixn;                      /* Number of pixels offset (n-d) */ \
-   int iy;                       /* Number of pixels offset in y direction */ \
-   int off_in;                   /* Pixel offset into input array */ \
-   int point;                    /* Loop counter for output points */ \
-   int result;                   /* Returned result value */ \
-   int s;                        /* Temporary variable for strides */ \
-   int usebad;                   /* Use "bad" input pixel values? */ \
-   int usevar;                   /* Process variance array? */ \
-   int ystride;                  /* Stride along input array y direction */ \
-\
-/* Initialise. */ \
-   result = 0; \
-\
-/* Check the global error status. */ \
-   if ( !astOK ) return result; \
-\
-/* Determine if we are processing bad pixels or variances. */ \
-   usebad = flags & AST__USEBAD; \
-   usevar = in_var && out_var; \
-\
-/* Handle the 1-dimensional case optimally. */ \
-/* ---------------------------------------- */ \
-   if ( ndim_in == 1 ) { \
-\
-/* Calculate the coordinate limits of the input array. */ \
-      xmin = ( (double) lbnd_in[ 0 ] ) - 0.5; \
-      xmax = ( (double) ubnd_in[ 0 ] ) + 0.5; \
-\
-/* Loop through the list of output points. */ \
-      for ( point = 0; point < npoint; point++ ) { \
-\
-/* Obtain the x coordinate of the current point and test if it lies \
-   outside the input image, or is bad. */ \
-         x = coord[ point ]; \
-         bad = ( x < xmin ) || ( x > xmax ) || ( x == AST__BAD ); \
-         if ( !bad ) { \
-\
-/* If not, then obtain the offset within the input image of the pixel \
-   which contains the current point. */ \
-            off_in = ( (int) floor( x + 0.5 ) ) - lbnd_in[ 0 ]; \
-\
-/* If necessary, test if the input pixel is bad. */ \
-            bad = ( in[ off_in ] == badval ) && usebad; \
-         } \
-\
-/* If the output pixel is not bad, obtain its value from the input \
-   image. */ \
-         if ( !bad ) { \
-            out[ offset[ point ] ] = in[ off_in ]; \
-\
-/* If required, obtain the associated variance value and test if it is \
-   bad (if the data type is signed, also check that it is not \
-   negative). */ \
-            if ( usevar ) { \
-               var = in_var[ off_in ]; \
-               bad = ( var == badval ) && usebad; \
-               if ( Xsigned ) bad = bad || ( var < (Xtype) 0 ); \
-\
-/* If the variance value is not bad, store it in the output \
-   array. Otherwise, store a bad value and count it. */ \
-               if ( !bad ) { \
-                  out_var[ offset[ point ] ] = var; \
-               } else { \
-                  out_var[ offset[ point ] ] = badval; \
-                  result++; \
-               } \
-            } \
-\
-/* If the input data value was bad, assign a bad output value (and \
-   variance, if required) and count it. */ \
-         } else { \
-            out[ offset[ point ] ] = badval; \
-            if ( usevar ) out_var[ offset[ point ] ] = badval; \
-            result++; \
-         } \
-      } \
-\
-/* Handle the 2-dimensional case optimally. */ \
-/* ---------------------------------------- */ \
-   } else if ( ndim_in == 2 ) { \
-\
-/* Calculate the input array stride along the y direction. */ \
-      ystride = ubnd_in[ 0 ] - lbnd_in[ 0 ] + 1; \
-\
-/* Calculate the coordinate limits of the input array in each \
-   dimension. */ \
-      xmin = ( (double) lbnd_in[ 0 ] ) - 0.5; \
-      xmax = ( (double) ubnd_in[ 0 ] ) + 0.5; \
-      ymin = ( (double) lbnd_in[ 1 ] ) - 0.5; \
-      ymax = ( (double) ubnd_in[ 1 ] ) + 0.5; \
-\
-/* Loop through the list of output points. */ \
-      for ( point = 0; point < npoint; point++ ) { \
-\
-/* Obtain the x coordinate of the current point and test if it lies \
-   outside the input image, or is bad. */ \
-         x = coord[ point ]; \
-         bad = ( x < xmin ) || ( x > xmax ) || ( x == AST__BAD ); \
-         if ( !bad ) { \
-\
-/* If not, then similarly obtain and test the y coordinate. */ \
-            y = coord[ npoint + point ]; \
-            bad = ( y < ymin ) || ( y > ymax ) || ( y == AST__BAD ); \
-            if ( !bad ) { \
-\
-/* Obtain the offsets along each input image dimension of the input \
-   pixel which contains the current point. */ \
-               ix = ( (int) floor( x + 0.5 ) ) - lbnd_in[ 0 ]; \
-               iy = ( (int) floor( y + 0.5 ) ) - lbnd_in[ 1 ]; \
-\
-/* Accumulate this pixel's offset from the start of the input \
-   array. */ \
-               off_in = iy * ystride + ix; \
-\
-/* If necessary, test if the input pixel is bad. */ \
-               bad = ( in[ off_in ] == badval ) && usebad; \
-            } \
-         } \
-\
-/* If the output pixel is not bad, obtain its value from the input \
-   image. */ \
-         if ( !bad ) { \
-            out[ offset[ point ] ] = in[ off_in ]; \
-\
-/* Otherwise, assign a bad output pixel and count it. */ \
-         } else { \
-            out[ offset[ point ] ] = badval; \
-            result++; \
-         } \
-      } \
-\
-/* Handle other numbers of dimensions. */ \
-/* ----------------------------------- */ \
-   } else { \
-\
-/* Allocate workspace. */ \
-      stride = astMalloc( sizeof( int ) * (size_t) ndim_in ); \
-      xn_max = astMalloc( sizeof( double ) * (size_t) ndim_in ); \
-      xn_min = astMalloc( sizeof( double ) * (size_t) ndim_in ); \
-      if ( astOK ) { \
-\
-/* Calculate the input array stride along each dimension. */ \
-         for ( s = 1, idim = 0; idim < ndim_in; idim++ ) { \
-            stride[ idim ] = s; \
-            s *= ubnd_in[ idim ] - lbnd_in[ idim ] + 1; \
-\
-/* Calculate the coordinate limits of the input array in each \
-   dimension. */ \
-            xn_min[ idim ] = ( (double) lbnd_in[ idim ] ) - 0.5; \
-            xn_max[ idim ] = ( (double) ubnd_in[ idim ] ) + 0.5; \
-         } \
-\
-/* Loop through the list of output points. */ \
-         for ( point = 0; point < npoint; point++ ) { \
-\
-/* Initialise the offset into the input image. Then loop to obtain \
-   each coordinate of the current output point. */ \
-            off_in = 0; \
-            for ( idim = 0; idim < ndim_in; idim++ ) { \
-               xn = coord[ idim * npoint + point ]; \
-\
-/* Test if the coordinate lies outside the input image, or is bad.  If \
-   either is true, the corresponding output pixel value will be bad, \
-   so give up on this point. */ \
-               bad = ( xn < xn_min[ idim ] ) || ( xn > xn_max[ idim ] ) || \
-                     ( xn == AST__BAD ); \
-               if ( bad ) break; \
-\
-/* Obtain the offset along the current input image dimension of the \
-   input pixel which contains the current point. */ \
-               ixn = ( (int) floor( xn + 0.5 ) ) - lbnd_in[ idim ]; \
-\
-/* Accumulate this pixel's offset from the start of the input \
-   array. */ \
-               off_in += ixn * stride[ idim ]; \
-            } \
-\
-/* Once the required input pixel has been located, test if it is bad \
-   if necessary. */ \
-            bad = bad || ( ( in[ off_in ] == badval ) && usebad ); \
-\
-/* If the output pixel is not bad, obtain its value from the input \
-   image. */ \
-            if ( !bad ) { \
-               out[ offset[ point ] ] = in[ off_in ]; \
-\
-/* Otherwise, assign a bad output pixel and count it. */ \
-            } else { \
-               out[ offset[ point ] ] = badval; \
-               result++; \
-            } \
-         } \
-      } \
-\
-/* Free workspace. */ \
-      stride = astFree( stride ); \
-      xn_max = astFree( xn_max ); \
-      xn_min = astFree( xn_min ); \
-   } \
-\
-/* If an error has occurred, clear the returned result. */ \
-   if ( !astOK ) result = 0; \
-\
-/* Return the result. */ \
-   return result; \
-}
-
-/* Expand the above macro to generate a function for each required
-   data type. */
-MAKE_INTERPOLATE_PIXEL_NEAREST(LD,long double,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(D,double,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(F,float,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(L,long int,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(UL,unsigned long int,0)
-MAKE_INTERPOLATE_PIXEL_NEAREST(I,int,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(UI,unsigned int,0)
-MAKE_INTERPOLATE_PIXEL_NEAREST(S,short int,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(US,unsigned short int,0)
-MAKE_INTERPOLATE_PIXEL_NEAREST(B,signed char,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(UB,unsigned char,0)
-
-/* Undefine the macro. */
-#undef MAKE_INTERPOLATE_PIXEL_NEAREST
-
 #define MAKE_INTERPOLATE_PIXEL_LINEAR(abbrev,type,is_flt,flt_type) \
 static int InterpolatePixelLinear##abbrev( int ndim, \
                                            const int *lbnd, const int *ubnd, \
@@ -663,14 +270,14 @@ static int InterpolatePixelLinear##abbrev( int ndim, \
 /* Loop through the output points (i.e. pixel centres). */ \
       for ( point = 0; point < npoint; point++ ) { \
  \
-/* Initialise the offset into the input image. Then examine each \
+/* Initialise the offset into the input grid. Then examine each \
    coordinate from the corresponding input point in turn. */ \
          pixel = 0; \
          off = 0; \
          for ( dim = 0; dim < ndim; dim++ ) { \
             x = coord[ dim * npoint + point ]; \
  \
-/* Test if the coordinate lies outside the input image, or is bad. If \
+/* Test if the coordinate lies outside the input grid, or is bad. If \
    either is true, the corresponding output pixel value will be bad, \
    so quit. */ \
             bad = ( x < ( ( (double) lbnd[ dim ] ) ) - 0.5 ) || \
@@ -678,12 +285,12 @@ static int InterpolatePixelLinear##abbrev( int ndim, \
                   ( x == AST__BAD ); \
             if ( bad ) break; \
  \
-/* Obtain the index along the current input image dimension of the \
+/* Obtain the index along the current input grid dimension of the \
    pixel which contains the input point. */ \
             ix = (int) floor( x + 0.5 ); \
  \
 /* Accumulate this pixel's offset (in pixels) from the start of the \
-   input image. */ \
+   input grid. */ \
             pixel += ( ix - lbnd[ dim ] ) * stride[ dim ]; \
  \
 /* Calculate the offset of the input position from the pixel's centre. */ \
@@ -692,11 +299,11 @@ static int InterpolatePixelLinear##abbrev( int ndim, \
 /* Test if the position lies below (or on) the pixel's centre. */ \
             if ( dx <= 0.0 ) { \
  \
-/* If so, obtain the offsets from the start of the image (due to \
+/* If so, obtain the offsets from the start of the grid (due to \
    displacement along the current dimension) of the two pixels which \
    will contribute to the output value. If necessary, restrict the \
    pixel with the lower index to ensure it does not lie outside the \
-   input image. */ \
+   input grid. */ \
                hi[ dim ] = ix; \
                frac_hi[ dim ] = 1.0 + dx; \
                if ( ix > lbnd[ dim ] ) { \
@@ -723,7 +330,7 @@ static int InterpolatePixelLinear##abbrev( int ndim, \
             } \
  \
 /* Store the lower index involved in interpolation along each \
-   dimension and accumulate the offset from the start of the image of \
+   dimension and accumulate the offset from the start of the grid of \
    the pixel which has these indices. */ \
  \
             idim[ dim ] = lo[ dim ]; \
@@ -2637,6 +2244,456 @@ static void InitVtab( AstMappingVtab *vtab ) {
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Mapping", "Mapping between coordinate systems" );
 }
+
+/*
+*  Name:
+*     InterpolatePixelNearest<X>
+
+*  Purpose:
+*     Resample a data grid, using the nearest-pixel interpolation scheme.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int InterpolatePixelNearest<X>( int ndim_in,
+*                                     const int *lbnd_in, const int *ubnd_in,
+*                                     const <Xtype> *in, const <Xtype> *in_var,
+*                                     int npoint, const int *offset,
+*                                     double *coord, int flags, Xtype badval,
+*                                     <Xtype> *out, <Xtype> *out_var )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This is a set of functions which resample a rectangular input
+*     grid of data (and, optionally, associated statistical variance
+*     values) so as to place them into a new output grid. Each output
+*     grid point may be mapped on to a position in the input grid in
+*     an arbitrary way. Where the positions given do not correspond
+*     with a pixel centre in the input grid, the interpolation scheme
+*     used is simply to select the nearest pixel (i.e. the one whose
+*     bounds contain the supplied position). The input and output
+*     grids may have any number of dimensions, not necessarily equal.
+
+*  Parameters:
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the data grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input data grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     in
+*        Pointer to the array of data to be resampled (with an element
+*        for each pixel in the input grid). The numerical type of
+*        these data should match the function used, as given by the
+*        suffix on the function name. Note that the storage order
+*        should be such that the coordinate of the first dimension
+*        varies most rapidly and that of the final dimension least
+*        rapidly (i.e. Fortran array storage order is used).
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and data type as the "in" array),
+*        which represent estimates of the statistical variance
+*        associated with each element of the "in" array. If this
+*        second array is given (along with the corresponding "out_var"
+*        array), then estimates of the variance of the resampled data
+*        will also be returned.
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     npoint
+*        The number of points at which the input grid is to be
+*        resampled.
+*     offset
+*        Pointer to an array of integers with "npoint" elements. For
+*        each output point, this array should contain the zero-based
+*        offset in the output array(s) (i.e. the "out" and,
+*        optionally, the "out_var" arrays) at which the resampled
+*        output value(s) should be stored.
+*     coord
+*        Pointer to an array of double, with (ndim_in * npoint)
+*        elements, which contains coordinates specifying the positions
+*        in the input grid from which each output point should obtain
+*        its value. Coordinates should be stored first by point and
+*        then by coordinate number, so that coord[point + npoint *
+*        icoord] contains input coordinate number "icoord"
+*        corresponding to output point number "point" (both indices
+*        starting at zero). If any point has a coordinate value of
+*        AST__BAD associated with it, then the corresponding output
+*        data (and variance) will be set to the value given by
+*        "badval".
+*     flags
+*        The bitwise OR of a set of flag values which control the
+*        operation of the function. Currently, only the flag
+*        AST__USEBAD is significant and indicates whether there are
+*        "bad" (i.e. missing) data in the input array(s) which must be
+*        recognised and propagated to the output array(s).  If this
+*        flag is not set, all input values are treated literally.
+*     badval
+*        If the AST__USEBAD flag is set (above), this parameter
+*        specifies the value which is used to identify bad data and/or
+*        variance values in the input array(s). Its data type must
+*        match that of the "in" (and "in_var") arrays. The same value
+*        will also be used to flag any output array elements for which
+*        resampled values could not be obtained.  The output arrays(s)
+*        may be flagged with this value whether or not the AST__USEBAD
+*        flag is set (the function return value indicates whether any
+*        such values have been produced).
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the resampled data will be returned. Note
+*        that details of how the output grid maps on to this array
+*        (e.g. the storage order, number of dimensions, etc.) is
+*        arbitrary and is specified entirely by means of the "offset"
+*        array. The "out" array should therefore contain sufficient
+*        elements to accommodate the "offset" values supplied.  There
+*        is no requirement that all elements of the "out" array should
+*        be assigned values, and any which are not addressed by the
+*        contents of the "offset" array will be left unchanged.
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the resampled values may be returned. This array will only be
+*        used if the "in_var" array has been given. It is addressed in
+*        exactly the same way (via the "offset" array) as the "out"
+*        array. The values returned are estimates of the statistical
+*        variance of the corresponding values in the "out" array, on
+*        the assumption that all errors in input grid values (in the
+*        "in" array) are statistically independent, and that their
+*        variance estimates (in the "in_var" array) may simply be
+*        summed.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+
+*  Returned Value:
+*     The number of output grid points to which a data value (or a
+*     variance value if relevant) equal to "badval" has been assigned
+*     because no valid output value could be obtained. Typically, this
+*     will be because (a) the input position corresponding to the
+*     output grid point lies outside the input grid, or (b) because it
+*     lies inside an input pixel which itself has the value "badval"
+*     (and the AST__USEBAD flag is set), or (c) one or more of the
+*     coordinates specifying the position has the value AST__BAD.
+*
+*     The maximum value that may be returned is "npoint", and the
+*     minimum is zero (indicating that all output values were
+*     successfully obtained).
+
+*  Notes:
+*     - There is a separate function for each numerical type of
+*     gridded data, distinguished by replacing the <X> in the function
+*     name by the appropriate 1- or 2-character suffix.
+*     - A value of zero will be returned if any of these functions is
+*     invoked with the global error status set, or if it should fail
+*     for any reason.
+*/
+/* Define a macro to implement the function for a specific data
+   type. */
+#define MAKE_INTERPOLATE_PIXEL_NEAREST(X,Xtype,Xsigned) \
+static int InterpolatePixelNearest##X( int ndim_in, \
+                                       const int *lbnd_in, \
+                                       const int *ubnd_in, \
+                                       const Xtype *in, \
+                                       const Xtype *in_var, \
+                                       int npoint, const int *offset, \
+                                       double *coord, \
+                                       int flags, Xtype badval, \
+                                       Xtype *out, Xtype *out_var ) { \
+\
+/* Local Variables: */ \
+   Xtype var;                    /* Variance value */ \
+   const Xtype zero = (Xtype) 0; /* Zero, in appropriate data type */ \
+   double *xn_max;               /* Pointer to upper limits array (n-d) */ \
+   double *xn_min;               /* Pointer to lower limits array (n-d) */ \
+   double x;                     /* x coordinate value */ \
+   double xmax;                  /* x upper limit */ \
+   double xmin;                  /* x lower limit */ \
+   double xn;                    /* Coordinate value (n-d) */ \
+   double y;                     /* y coordinate value */ \
+   double ymax;                  /* y upper limit */ \
+   double ymin;                  /* y lower limit */ \
+   int *stride;                  /* Pointer to array of dimension strides */ \
+   int bad;                      /* Output pixel bad? */ \
+   int idim;                     /* Loop counter for dimensions */ \
+   int ix;                       /* Number of pixels offset in x direction */ \
+   int ixn;                      /* Number of pixels offset (n-d) */ \
+   int iy;                       /* Number of pixels offset in y direction */ \
+   int off_in;                   /* Pixel offset into input array */ \
+   int point;                    /* Loop counter for output points */ \
+   int result;                   /* Returned result value */ \
+   int s;                        /* Temporary variable for strides */ \
+   int usebad;                   /* Use "bad" input pixel values? */ \
+   int usevar;                   /* Process variance array? */ \
+   int ystride;                  /* Stride along input array y direction */ \
+\
+/* Initialise. */ \
+   result = 0; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
+\
+/* Determine if we are processing bad pixels or variances. */ \
+   usebad = flags & AST__USEBAD; \
+   usevar = in_var && out_var; \
+\
+/* Handle the 1-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   if ( ndim_in == 1 ) { \
+\
+/* Calculate the coordinate limits of the input array. */ \
+      xmin = ( (double) lbnd_in[ 0 ] ) - 0.5; \
+      xmax = ( (double) ubnd_in[ 0 ] ) + 0.5; \
+\
+/* Loop through the list of output points. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the x coordinate of the current point and test if it lies \
+   outside the input grid, or is bad. */ \
+         x = coord[ point ]; \
+         bad = ( x < xmin ) || ( x > xmax ) || ( x == AST__BAD ); \
+         if ( !bad ) { \
+\
+/* If not, then obtain the offset within the input grid of the pixel \
+   which contains the current point. */ \
+            off_in = ( (int) floor( x + 0.5 ) ) - lbnd_in[ 0 ]; \
+\
+/* If necessary, test if the input pixel is bad. */ \
+            bad = ( in[ off_in ] == badval ) && usebad; \
+         } \
+\
+/* If the output pixel is not bad, obtain its value from the input \
+   grid. */ \
+         if ( !bad ) { \
+            out[ offset[ point ] ] = in[ off_in ]; \
+\
+/* If required, obtain the associated variance value and test if it is \
+   bad (if the data type is signed, also check that it is not \
+   negative). */ \
+            if ( usevar ) { \
+               var = in_var[ off_in ]; \
+               bad = ( var == badval ) && usebad; \
+               if ( Xsigned ) bad = bad || ( var < zero ); \
+\
+/* If the variance value is not bad, store it in the output \
+   array. Otherwise, store a bad value and count it. */ \
+               if ( !bad ) { \
+                  out_var[ offset[ point ] ] = var; \
+               } else { \
+                  out_var[ offset[ point ] ] = badval; \
+                  result++; \
+               } \
+            } \
+\
+/* If the input data value was bad, assign a bad output value (and \
+   variance, if required) and count it. */ \
+         } else { \
+            out[ offset[ point ] ] = badval; \
+            if ( usevar ) out_var[ offset[ point ] ] = badval; \
+            result++; \
+         } \
+      } \
+\
+/* Handle the 2-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   } else if ( ndim_in == 2 ) { \
+\
+/* Calculate the input array stride along the y direction. */ \
+      ystride = ubnd_in[ 0 ] - lbnd_in[ 0 ] + 1; \
+\
+/* Calculate the coordinate limits of the input array in each \
+   dimension. */ \
+      xmin = ( (double) lbnd_in[ 0 ] ) - 0.5; \
+      xmax = ( (double) ubnd_in[ 0 ] ) + 0.5; \
+      ymin = ( (double) lbnd_in[ 1 ] ) - 0.5; \
+      ymax = ( (double) ubnd_in[ 1 ] ) + 0.5; \
+\
+/* Loop through the list of output points. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the x coordinate of the current point and test if it lies \
+   outside the input grid, or is bad. */ \
+         x = coord[ point ]; \
+         bad = ( x < xmin ) || ( x > xmax ) || ( x == AST__BAD ); \
+         if ( !bad ) { \
+\
+/* If not, then similarly obtain and test the y coordinate. */ \
+            y = coord[ point + npoint ]; \
+            bad = ( y < ymin ) || ( y > ymax ) || ( y == AST__BAD ); \
+            if ( !bad ) { \
+\
+/* Obtain the offsets along each input grid dimension of the input \
+   pixel which contains the current point. */ \
+               ix = ( (int) floor( x + 0.5 ) ) - lbnd_in[ 0 ]; \
+               iy = ( (int) floor( y + 0.5 ) ) - lbnd_in[ 1 ]; \
+\
+/* Calculate this pixel's offset from the start of the input array. */ \
+               off_in = ix + ystride * iy; \
+\
+/* If necessary, test if the input pixel is bad. */ \
+               bad = ( in[ off_in ] == badval ) && usebad; \
+            } \
+         } \
+\
+/* If the output pixel is not bad, obtain its value from the input \
+   grid. */ \
+         if ( !bad ) { \
+            out[ offset[ point ] ] = in[ off_in ]; \
+\
+/* If required, obtain the associated variance value and test if it is \
+   bad (if the data type is signed, also check that it is not \
+   negative). */ \
+            if ( usevar ) { \
+               var = in_var[ off_in ]; \
+               bad = ( var == badval ) && usebad; \
+               if ( Xsigned ) bad = bad || ( var < zero ); \
+\
+/* If the variance value is not bad, store it in the output \
+   array. Otherwise, store a bad value and count it. */ \
+               if ( !bad ) { \
+                  out_var[ offset[ point ] ] = var; \
+               } else { \
+                  out_var[ offset[ point ] ] = badval; \
+                  result++; \
+               } \
+            } \
+\
+/* If the input data value was bad, assign a bad output value (and \
+   variance, if required) and count it. */ \
+         } else { \
+            out[ offset[ point ] ] = badval; \
+            if ( usevar ) out_var[ offset[ point ] ] = badval; \
+            result++; \
+         } \
+      } \
+\
+/* Handle other numbers of dimensions. */ \
+/* ----------------------------------- */ \
+   } else { \
+\
+/* Allocate workspace. */ \
+      stride = astMalloc( sizeof( int ) * (size_t) ndim_in ); \
+      xn_max = astMalloc( sizeof( double ) * (size_t) ndim_in ); \
+      xn_min = astMalloc( sizeof( double ) * (size_t) ndim_in ); \
+      if ( astOK ) { \
+\
+/* Calculate the input array stride along each dimension. */ \
+         for ( s = 1, idim = 0; idim < ndim_in; idim++ ) { \
+            stride[ idim ] = s; \
+            s *= ubnd_in[ idim ] - lbnd_in[ idim ] + 1; \
+\
+/* Calculate the coordinate limits of the input array in each \
+   dimension. */ \
+            xn_min[ idim ] = ( (double) lbnd_in[ idim ] ) - 0.5; \
+            xn_max[ idim ] = ( (double) ubnd_in[ idim ] ) + 0.5; \
+         } \
+\
+/* Loop through the list of output points. */ \
+         for ( point = 0; point < npoint; point++ ) { \
+\
+/* Initialise the offset into the input grid. Then loop to obtain \
+   each coordinate of the current output point. */ \
+            off_in = 0; \
+            for ( idim = 0; idim < ndim_in; idim++ ) { \
+               xn = coord[ point + npoint * idim ]; \
+\
+/* Test if the coordinate lies outside the input grid, or is bad. If \
+   either is true, the corresponding output pixel value will be bad, \
+   so give up on this point. */ \
+               bad = ( xn < xn_min[ idim ] ) || ( xn > xn_max[ idim ] ) || \
+                     ( xn == AST__BAD ); \
+               if ( bad ) break; \
+\
+/* Obtain the offset along the current input grid dimension of the \
+   input pixel which contains the current point. */ \
+               ixn = ( (int) floor( xn + 0.5 ) ) - lbnd_in[ idim ]; \
+\
+/* Accumulate this pixel's offset from the start of the input \
+   array. */ \
+               off_in += ixn * stride[ idim ]; \
+            } \
+\
+/* Once the required input pixel has been located, test if it is bad \
+   if necessary. */ \
+            bad = bad || ( ( in[ off_in ] == badval ) && usebad ); \
+\
+/* If the output pixel is not bad, obtain its value from the input \
+   grid. */ \
+            if ( !bad ) { \
+               out[ offset[ point ] ] = in[ off_in ]; \
+\
+/* If required, obtain the associated variance value and test if it is \
+   bad (if the data type is signed, also check that it is not \
+   negative). */ \
+            if ( usevar ) { \
+               var = in_var[ off_in ]; \
+               bad = ( var == badval ) && usebad; \
+               if ( Xsigned ) bad = bad || ( var < zero ); \
+\
+/* If the variance value is not bad, store it in the output \
+   array. Otherwise, store a bad value and count it. */ \
+               if ( !bad ) { \
+                  out_var[ offset[ point ] ] = var; \
+               } else { \
+                  out_var[ offset[ point ] ] = badval; \
+                  result++; \
+               } \
+            } \
+\
+/* If the input data value was bad, assign a bad output value (and \
+   variance, if required) and count it. */ \
+            } else { \
+               out[ offset[ point ] ] = badval; \
+               if ( usevar ) out_var[ offset[ point ] ] = badval; \
+               result++; \
+            } \
+         } \
+      } \
+\
+/* Free workspace. */ \
+      stride = astFree( stride ); \
+      xn_max = astFree( xn_max ); \
+      xn_min = astFree( xn_min ); \
+   } \
+\
+/* If an error has occurred, clear the returned result. */ \
+   if ( !astOK ) result = 0; \
+\
+/* Return the result. */ \
+   return result; \
+}
+
+/* Expand the above macro to generate a function for each required
+   data type. */
+MAKE_INTERPOLATE_PIXEL_NEAREST(LD,long double,1)
+MAKE_INTERPOLATE_PIXEL_NEAREST(D,double,1)
+MAKE_INTERPOLATE_PIXEL_NEAREST(F,float,1)
+MAKE_INTERPOLATE_PIXEL_NEAREST(L,long int,1)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UL,unsigned long int,0)
+MAKE_INTERPOLATE_PIXEL_NEAREST(I,int,1)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UI,unsigned int,0)
+MAKE_INTERPOLATE_PIXEL_NEAREST(S,short int,1)
+MAKE_INTERPOLATE_PIXEL_NEAREST(US,unsigned short int,0)
+MAKE_INTERPOLATE_PIXEL_NEAREST(B,signed char,1)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UB,unsigned char,0)
+
+/* Undefine the macro. */
+#undef MAKE_INTERPOLATE_PIXEL_NEAREST
 
 static void Invert( AstMapping *this ) {
 /*
