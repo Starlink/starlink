@@ -62,9 +62,11 @@
 *        The centroid positions, given in the PIXEL Frame of the NDF.
 *     CURPOS( NPOS, NAXC ) = DOUBLE PRECISION (Given) 
 *        The centroid positions, given in the current Frame of the NDF.
+*        Normalized using AST_NORM on return.
 *     CURWAS( NWAS, NAXC ) = DOUBLE PRECISION (Given) 
 *        The initial guesses at the centroid positions, in the current 
-*        Frame. Only accessed if GUESS is .TRUE.
+*        Frame. Only accessed if GUESS is .TRUE. Normalized using AST_NORM on 
+*        return.
 *     I = INTEGER (Given)
 *        The index of the position to be displayed (i.e. the first array
 *        index within the arrays ERROR, PIXPOS, CURPOS and CURWAS).
@@ -78,6 +80,8 @@
 *  History:
 *     30-JUN-1999 (DSB):
 *        Original version.
+*     20-OCT-2000 (DSB):
+*        Normalize current frame positions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,6 +95,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'NDF_PAR'          ! NDF constants 
 
 *  Arguments Given:
       LOGICAL CERROR 
@@ -127,6 +132,7 @@
       CHARACTER LINE1*(MXBUF)    ! Buffer for output text
       CHARACTER LINE2*(MXBUF)    ! Buffer for output text
       CHARACTER LINE3*(MXBUF)    ! Buffer for output text
+      DOUBLE PRECISION POS( NDF__MXDIM )! Work space for a position
       INTEGER IAT1               ! Number of characters currently in LINE1
       INTEGER IAT2               ! Number of characters currently in LINE2
       INTEGER IAT3               ! Number of characters currently in LINE3
@@ -158,6 +164,15 @@
 
       END IF
 
+
+
+*  Now do the screen and log file output. Normalize the supplied current 
+*  Frame position.
+      DO J = 1, NAXC
+         POS( J ) = CURPOS( I, J )
+      END DO
+      CALL AST_NORM( CFRM, POS, STATUS )
+
 *  Now do the screen and log file output. Format a line containing 
 *  the position identifier, followed by a colon, and the centroid axis
 *  values.
@@ -169,7 +184,7 @@
       IAT1 = 5
 
       DO J = 1, NAXC 
-         CALL CHR_APPND( AST_FORMAT( CFRM, J, CURPOS( I, J ), 
+         CALL CHR_APPND( AST_FORMAT( CFRM, J, POS( J ), 
      :                               STATUS ), LINE1, IAT1 )
          IF( J .NE. NAXC ) IAT1 = IAT1 + 1
       END DO
@@ -190,13 +205,18 @@
          IAT2 = 1
       END IF
 
-*  Format a line containing the original guesses (if required).
+*  Format a line containing the normalized original guesses (if required).
       IF( GUESS ) THEN
          LINE3 = '  (was '
          IAT3 = 7
        
          DO J = 1, NAXC
-            CALL CHR_APPND( AST_FORMAT( CFRM, J, CURWAS( I, J ), 
+            POS( J ) = CURWAS( I, J )
+         END DO
+         CALL AST_NORM( CFRM, POS, STATUS )
+
+         DO J = 1, NAXC
+            CALL CHR_APPND( AST_FORMAT( CFRM, J, POS( J ), 
      :                                  STATUS ), LINE3, IAT3 )
             IF( J .NE. NAXC ) IAT3 = IAT3 + 1
          END DO
