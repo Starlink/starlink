@@ -93,7 +93,7 @@ am__objects_1 = addet.lo afin.lo airmas.lo altaz.lo amp.lo ampqk.lo \
 	smat.lo subet.lo supgal.lo svd.lo svdcov.lo svdsol.lo tp2s.lo \
 	tp2v.lo tps2c.lo tpv2c.lo ue2el.lo ue2pv.lo unpcd.lo v2tp.lo \
 	vdv.lo vn.lo vxv.lo wait.lo xy2xy.lo zd.lo
-am__objects_2 =
+am__objects_2 = random.lo gresid.lo
 am_libsla_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsla_la_OBJECTS = $(am_libsla_la_OBJECTS)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
@@ -109,6 +109,13 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	$(DEPDIR)/random.fppdefault \
 @AMDEP_TRUE@	$(DEPDIR)/rtl_random.Plo $(DEPDIR)/wait.f__vms \
 @AMDEP_TRUE@	$(DEPDIR)/wait.f__win $(DEPDIR)/wait.fdefault
+FCCOMPILE = $(FC) $(FPP_MAKE_FLAGS) $(CPPFLAGS) $(AM_FCFLAGS) \
+	$(FCFLAGS)
+LTFCCOMPILE = $(LIBTOOL) --mode=compile $(FC) $(FPP_MAKE_FLAGS) \
+	$(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)
+FCLD = $(FC)
+FCLINK = $(LIBTOOL) --mode=link $(FC) $(AM_FCFLAGS) $(FCFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -116,11 +123,6 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
-LTF77COMPILE = $(LIBTOOL) --mode=compile $(F77) $(AM_FFLAGS) $(FFLAGS)
-F77LD = $(F77)
-F77LINK = $(LIBTOOL) --mode=link $(F77LD) $(AM_FFLAGS) $(FFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libsla_la_SOURCES)
 DIST_SOURCES = $(libsla_la_SOURCES)
@@ -204,12 +206,12 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STARLINK = @STARLINK@
-STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
+STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
+STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
 STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
-STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
@@ -462,22 +464,22 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar .c .f .lo .o .obj
+.SUFFIXES: .tex .dvi .ps .htx_tar .@FPP_COMPILE_EXT@ .@FPP_PREPROCESS_EXT@ .c .f .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
-	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --startree '; \
+	      cd $(srcdir) && $(AUTOMAKE) --startree  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --startree  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  Makefile
+	  $(AUTOMAKE) --startree  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -557,7 +559,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libsla.la: $(libsla_la_OBJECTS) $(libsla_la_DEPENDENCIES) 
-	$(F77LINK) -rpath $(libdir) $(libsla_la_LDFLAGS) $(libsla_la_OBJECTS) $(libsla_la_LIBADD) $(LIBS)
+	$(FCLINK) -rpath $(libdir) $(libsla_la_LDFLAGS) $(libsla_la_OBJECTS) $(libsla_la_LIBADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -598,6 +600,18 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/wait.f__win@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/wait.fdefault@am__quote@
 
+.@FPP_COMPILE_EXT@.o:
+	$(FCCOMPILE) -c -o $@ $<
+
+.@FPP_COMPILE_EXT@.obj:
+	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.@FPP_COMPILE_EXT@.lo:
+	$(LTFCCOMPILE) -c -o $@ $<
+
+.@FPP_PREPROCESS_EXT@.f:
+	$(FPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(FPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $< @FPP_OUTPUT@
+
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
@@ -623,13 +637,13 @@ distclean-compile:
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 .f.o:
-	$(F77COMPILE) -c -o $@ $<
+	$(FCCOMPILE) -c -o $@ $<
 
 .f.obj:
-	$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .f.lo:
-	$(LTF77COMPILE) -c -o $@ $<
+	$(LTFCCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -695,8 +709,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 

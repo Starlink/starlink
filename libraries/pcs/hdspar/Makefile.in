@@ -63,16 +63,15 @@ libhdspar_adam_la_OBJECTS = $(am_libhdspar_adam_la_OBJECTS)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
-F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
-LTF77COMPILE = $(LIBTOOL) --mode=compile $(F77) $(AM_FFLAGS) $(FFLAGS)
-F77LD = $(F77)
-F77LINK = $(LIBTOOL) --mode=link $(F77LD) $(AM_FFLAGS) $(FFLAGS) \
+FCCOMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+LTFCCOMPILE = $(LIBTOOL) --mode=compile $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+FCLD = $(FC)
+FCLINK = $(LIBTOOL) --mode=link $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libhdspar_adam_la_SOURCES)
 DIST_SOURCES = $(libhdspar_adam_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
-SUFFIXES = .tex .dvi .ps .htx_tar
 INSTALL_STARDATA = $(INSTALL_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
@@ -114,6 +113,8 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
+FC = @FC@
+FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -139,18 +140,19 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STARLINK = @STARLINK@
-STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
+STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
+STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
 STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
-STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_FC = @ac_ct_FC@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -204,22 +206,22 @@ F_ROUTINES = dat_assoc.f \
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar .f .lo .o .obj
+.SUFFIXES: .f .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
-	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --startree '; \
+	      cd $(srcdir) && $(AUTOMAKE) --startree  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --startree  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  Makefile
+	  $(AUTOMAKE) --startree  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -282,7 +284,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libhdspar_adam.la: $(libhdspar_adam_la_OBJECTS) $(libhdspar_adam_la_DEPENDENCIES) 
-	$(F77LINK) -rpath $(libdir) $(libhdspar_adam_la_LDFLAGS) $(libhdspar_adam_la_OBJECTS) $(libhdspar_adam_la_LIBADD) $(LIBS)
+	$(FCLINK) -rpath $(libdir) $(libhdspar_adam_la_LDFLAGS) $(libhdspar_adam_la_OBJECTS) $(libhdspar_adam_la_LIBADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -313,13 +315,13 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .f.o:
-	$(F77COMPILE) -c -o $@ $<
+	$(FCCOMPILE) -c -o $@ $<
 
 .f.obj:
-	$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .f.lo:
-	$(LTF77COMPILE) -c -o $@ $<
+	$(LTFCCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -385,8 +387,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -399,17 +400,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-# Templates to generate documentation
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-# Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
-.tex.htx_tar:
-	- star2html $<
-	tar cf $@ ${<:.tex=.htx}
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)

@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 SOURCES = $(adamnet_SOURCES)
 
 srcdir = @srcdir@
@@ -52,7 +53,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = component.xml
-am__installdirs = $(DESTDIR)$(bindir)
+am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(starhelpdir)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = ant.$(OBJEXT) adamnet.$(OBJEXT)
@@ -77,7 +78,8 @@ SOURCES = $(adamnet_SOURCES)
 DIST_SOURCES = $(adamnet_SOURCES)
 ETAGS = etags
 CTAGS = ctags
-SUFFIXES = .tex .dvi .ps .htx_tar
+starhelpSTARDATA_INSTALL = $(INSTALL_STARDATA)
+STARDATA = $(starhelp_STARDATA)
 INSTALL_STARDATA = $(INSTALL_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
@@ -144,12 +146,12 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STARLINK = @STARLINK@
-STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
+STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
+STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
 STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
-STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
@@ -191,6 +193,8 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+starhelp_STARDATA = @starhelp_STARDATA@
+starhelpdir = @starhelpdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 adamnet_SOURCES = \
@@ -207,22 +211,22 @@ all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar .c .lo .o .obj
+.SUFFIXES: .c .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
-	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --startree '; \
+	      cd $(srcdir) && $(AUTOMAKE) --startree  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --startree  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  Makefile
+	  $(AUTOMAKE) --startree  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -375,8 +379,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -389,17 +392,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-# Templates to generate documentation
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-# Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
-.tex.htx_tar:
-	- star2html $<
-	tar cf $@ ${<:.tex=.htx}
 
 # Compile messages for message file ant_err.msg
 ANT_ERR: ant_err.msg
@@ -410,6 +402,26 @@ ant_err.h: ant_err.msg
 	$(STARLINK)/bin/messgen -c ant_err.msg
 fac_111_err: ant_err.msg
 	$(STARLINK)/bin/messgen -e ant_err.msg
+install-starhelpSTARDATA: $(starhelp_STARDATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(starhelpdir)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
+	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-starhelpSTARDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
+	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
+	done
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
@@ -541,9 +553,9 @@ distcleancheck: distclean
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(PROGRAMS) $(STARDATA)
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(bindir)
+	$(mkdir_p) $(DESTDIR)$(bindir) $(DESTDIR)$(starhelpdir)
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
@@ -591,7 +603,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-starhelpSTARDATA
 
 install-exec-am: install-binPROGRAMS
 
@@ -621,7 +633,8 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-starhelpSTARDATA
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-binPROGRAMS clean-generic clean-libtool ctags dist \
@@ -631,12 +644,13 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-binPROGRAMS install-data \
 	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-info-am
+	install-info-am install-man install-starhelpSTARDATA \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-starhelpSTARDATA
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -104,7 +104,6 @@ includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-# Templates to generate documentation
 SUFFIXES = .tex .dvi .ps .htx_tar
 stardocsSTARDATA_INSTALL = $(INSTALL_STARDATA)
 STARDATA = $(stardocs_STARDATA)
@@ -149,6 +148,8 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
+FC = @FC@
+FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -174,17 +175,19 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STARLINK = @STARLINK@
-STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
+STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
+STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
 STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
-STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
+STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_FC = @ac_ct_FC@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -508,8 +511,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -522,6 +524,7 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
+# Templates to generate documentation
 .tex.dvi:
 	latex $<
 .dvi.ps:
@@ -530,7 +533,7 @@ install-manifest: install-manifest.xml
 # tries to delete it as an intermediate.  An alternative is to use
 # .PRECIOUS, but that's not completely straightforward to arrange.
 .tex.htx_tar:
-	star2html $<
+	- star2html $<
 	tar cf $@ ${<:.tex=.htx}
 install-stardocsSTARDATA: $(stardocs_STARDATA)
 	@$(NORMAL_INSTALL)

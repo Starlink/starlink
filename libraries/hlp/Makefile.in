@@ -97,11 +97,6 @@ LTFCCOMPILE = $(LIBTOOL) --mode=compile $(FC) $(FPP_MAKE_FLAGS) \
 FCLD = $(FC)
 FCLINK = $(LIBTOOL) --mode=link $(FC) $(AM_FCFLAGS) $(FCFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
-LTF77COMPILE = $(LIBTOOL) --mode=compile $(F77) $(AM_FFLAGS) $(FFLAGS)
-F77LD = $(F77)
-F77LINK = $(LIBTOOL) --mode=link $(F77LD) $(AM_FFLAGS) $(FFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libhlp_la_SOURCES) $(crehlp_SOURCES) $(lsthlp_SOURCES) \
 	$(tsthlp_SOURCES)
 DIST_SOURCES = $(libhlp_la_SOURCES) $(crehlp_SOURCES) \
@@ -186,12 +181,12 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STARLINK = @STARLINK@
-STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
+STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
+STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
 STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
-STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
@@ -293,15 +288,15 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
-	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --startree '; \
+	      cd $(srcdir) && $(AUTOMAKE) --startree  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --startree  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  Makefile
+	  $(AUTOMAKE) --startree  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -381,7 +376,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libhlp.la: $(libhlp_la_OBJECTS) $(libhlp_la_DEPENDENCIES) 
-	$(F77LINK) -rpath $(libdir) $(libhlp_la_LDFLAGS) $(libhlp_la_OBJECTS) $(libhlp_la_LIBADD) $(LIBS)
+	$(FCLINK) -rpath $(libdir) $(libhlp_la_LDFLAGS) $(libhlp_la_OBJECTS) $(libhlp_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -422,13 +417,13 @@ clean-checkPROGRAMS:
 	done
 crehlp$(EXEEXT): $(crehlp_OBJECTS) $(crehlp_DEPENDENCIES) 
 	@rm -f crehlp$(EXEEXT)
-	$(F77LINK) $(crehlp_LDFLAGS) $(crehlp_OBJECTS) $(crehlp_LDADD) $(LIBS)
+	$(FCLINK) $(crehlp_LDFLAGS) $(crehlp_OBJECTS) $(crehlp_LDADD) $(LIBS)
 lsthlp$(EXEEXT): $(lsthlp_OBJECTS) $(lsthlp_DEPENDENCIES) 
 	@rm -f lsthlp$(EXEEXT)
-	$(F77LINK) $(lsthlp_LDFLAGS) $(lsthlp_OBJECTS) $(lsthlp_LDADD) $(LIBS)
+	$(FCLINK) $(lsthlp_LDFLAGS) $(lsthlp_OBJECTS) $(lsthlp_LDADD) $(LIBS)
 tsthlp$(EXEEXT): $(tsthlp_OBJECTS) $(tsthlp_DEPENDENCIES) 
 	@rm -f tsthlp$(EXEEXT)
-	$(F77LINK) $(tsthlp_LDFLAGS) $(tsthlp_OBJECTS) $(tsthlp_LDADD) $(LIBS)
+	$(FCLINK) $(tsthlp_LDFLAGS) $(tsthlp_OBJECTS) $(tsthlp_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -471,13 +466,13 @@ distclean-compile:
 	$(FPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(FPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $< @FPP_OUTPUT@
 
 .f.o:
-	$(F77COMPILE) -c -o $@ $<
+	$(FCCOMPILE) -c -o $@ $<
 
 .f.obj:
-	$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .f.lo:
-	$(LTF77COMPILE) -c -o $@ $<
+	$(LTFCCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

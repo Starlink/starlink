@@ -1,38 +1,9 @@
 #! /bin/sh -
-
-use_autoheader=false
-use_libtool=false
-for feature in `sed -n -e 's/^ *\(A[CM]_[A-Z_]*\).*/\1/p' configure.ac`
-do
-    case $feature in
-    AC_CONFIG_HEADER*)
-        use_autoheader=true
-        ;;
-    AM_CONFIG_HEADER*)
-        use_autoheader=true
-        ;;
-    AC_PROG_LIBTOOL)
-        use_libtool=true
-        ;;
-    esac
-done
-
-echo "use_autoheader=$use_autoheader"
-echo "use_libtool=$use_libtool"
-
-sed -e '1,/^ENDCONFIG/d' \
-    -e "s,!run_libtool!,$use_libtool," \
-    -e "s,!run_autoheader!,$use_autoheader," \
-    $0 >$0.tmp
-mv $0.tmp $0
-chmod +x $0
-exec $0
-
-ENDCONFIG
-#! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-1, rnum=1000001
+# original bootstrap file, installed by starconf 1.0-4, rnum=1000004
 # If you _need_ to change this file, delete or replace `original' above
 # or else starconf may overwrite it with an updated version
+
+# bootstrap.installed.  Generated from bootstrap.installed.in by configure.
 
 # Bootstrap a checked-out component of the Starlink software tree.
 # Run this script in a freshly checked-out directory to bring the
@@ -51,9 +22,6 @@ ENDCONFIG
 # The configuration script here works with automake versions 1.6.3 and
 # 1.7.5, and autoconf 2.57, and probably not much that's significantly
 # older than those.
-
-run_libtool=!run_libtool!
-run_autoheader=!run_autoheader!
 
 # Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }
@@ -92,32 +60,20 @@ else
     exit 1
 fi
 
-echorun aclocal
-
-# If there is an AC_CONFIG_HEADERS line in configure.ac, then we need
-# to run autoheader to do its magic.  If there is no such macro in
-# configure.ac, then we must not invoke autoheader here.
-$run_autoheader && echorun autoheader
-
-# We need to explicitly run libtoolize only if ltmain.sh is not present
-# (it won't be, in the case when we really are bootstrapping, but it might
-# be if we're running bootstrap redundantly, which ought to be OK).
-# Generally, it's (re)run implicitly by automake, which does it with
-# some extra options we probably shouldn't interfere with.
-if $run_libtool; then
-    if test ! -e ltmain.sh; then
-        echorun libtoolize
+# Bootstrap any child directories
+for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
+do
+    if test -n "$d" -a -d "$d"; then
+        echo "Bootstrapping $d..."
+        (cd $d; ./bootstrap)
     fi
-fi
+done
 
-# Generate Makefile.in, and add links to standard tools such as
-# install-sh, missing and friends.
-#
-# Use --foreign so automake doesn't check strict adherence
-# to GNU coding standards
-echorun automake --add-missing --foreign
+# If STAR_SUPPRESS_AUTORECONF is true, then we suppress the call
+# of `autoreconf'.  This is here _only_ so that the top-level bootstrap file can 
+# suppress multiple calls of this in bootstrap files in its children.
+: ${STAR_SUPPRESS_AUTORECONF=false}
 
-# Generate configure from configure.ac
-echorun autoconf
+$STAR_SUPPRESS_AUTORECONF || echorun autoreconf
 
 exit 0

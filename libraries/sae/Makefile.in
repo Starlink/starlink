@@ -104,12 +104,12 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STARLINK = @STARLINK@
-STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
+STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
+STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
 STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
-STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_STRIP = @ac_ct_STRIP@
@@ -149,15 +149,15 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
-	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --startree '; \
+	      cd $(srcdir) && $(AUTOMAKE) --startree  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --startree  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  Makefile
+	  $(AUTOMAKE) --startree  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -254,8 +254,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -553,9 +552,9 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am \
 	uninstall-stardocsSTARDATA uninstall-starhelpSTARDATA
 
 
-# Note that, although sae_err_msg[.in] exists, we only generate, install
+# Note that, although sae_err_msg exists, we only generate, install
 # and distribute, the fac_nnn_err file, and this is done automatically
-# by virtue of the STAR_FACILITY_CODE declaration in configure.ac
+# by virtue of the STAR_MESSGEN declaration in configure.ac
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

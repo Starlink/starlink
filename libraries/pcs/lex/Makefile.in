@@ -16,6 +16,7 @@
 
 
 
+
 SOURCES = $(liblex_adam_la_SOURCES)
 
 srcdir = @srcdir@
@@ -54,7 +55,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = component.xml
-am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
+am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(starhelpdir)
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblex_adam_la_LIBADD =
@@ -66,10 +67,10 @@ liblex_adam_la_OBJECTS = $(am_liblex_adam_la_OBJECTS)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
-F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
-LTF77COMPILE = $(LIBTOOL) --mode=compile $(F77) $(AM_FFLAGS) $(FFLAGS)
-F77LD = $(F77)
-F77LINK = $(LIBTOOL) --mode=link $(F77LD) $(AM_FFLAGS) $(FFLAGS) \
+FCCOMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+LTFCCOMPILE = $(LIBTOOL) --mode=compile $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+FCLD = $(FC)
+FCLINK = $(LIBTOOL) --mode=link $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(liblex_adam_la_SOURCES)
 DIST_SOURCES = $(liblex_adam_la_SOURCES)
@@ -77,7 +78,8 @@ includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-SUFFIXES = .tex .dvi .ps .htx_tar
+starhelpSTARDATA_INSTALL = $(INSTALL_STARDATA)
+STARDATA = $(starhelp_STARDATA)
 INSTALL_STARDATA = $(INSTALL_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
@@ -119,6 +121,8 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
+FC = @FC@
+FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -144,18 +148,19 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STARLINK = @STARLINK@
-STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
+STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
+STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
 STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
-STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_FC = @ac_ct_FC@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -191,6 +196,8 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+starhelp_STARDATA = @starhelp_STARDATA@
+starhelpdir = @starhelpdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 bin_SCRIPTS = lex_link_adam
@@ -213,22 +220,22 @@ all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar .f .lo .o .obj
+.SUFFIXES: .f .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
-	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --startree '; \
+	      cd $(srcdir) && $(AUTOMAKE) --startree  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --startree  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  Makefile
+	  $(AUTOMAKE) --startree  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -291,7 +298,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 liblex_adam.la: $(liblex_adam_la_OBJECTS) $(liblex_adam_la_DEPENDENCIES) 
-	$(F77LINK) -rpath $(libdir) $(liblex_adam_la_LDFLAGS) $(liblex_adam_la_OBJECTS) $(liblex_adam_la_LIBADD) $(LIBS)
+	$(FCLINK) -rpath $(libdir) $(liblex_adam_la_LDFLAGS) $(liblex_adam_la_OBJECTS) $(liblex_adam_la_LIBADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -322,13 +329,13 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .f.o:
-	$(F77COMPILE) -c -o $@ $<
+	$(FCCOMPILE) -c -o $@ $<
 
 .f.obj:
-	$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .f.lo:
-	$(LTF77COMPILE) -c -o $@ $<
+	$(LTFCCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -414,8 +421,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -428,17 +434,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-# Templates to generate documentation
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-# Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
-.tex.htx_tar:
-	- star2html $<
-	tar cf $@ ${<:.tex=.htx}
 
 # Compile messages for message file lex_err.msg
 LEX_ERR: lex_err.msg
@@ -449,6 +444,26 @@ lex_err.h: lex_err.msg
 	$(STARLINK)/bin/messgen -c lex_err.msg
 fac_360_err: lex_err.msg
 	$(STARLINK)/bin/messgen -e lex_err.msg
+install-starhelpSTARDATA: $(starhelp_STARDATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(starhelpdir)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
+	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-starhelpSTARDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
+	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
+	done
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
@@ -580,9 +595,9 @@ distcleancheck: distclean
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(HEADERS) $(STARDATA)
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
+	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(starhelpdir)
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
@@ -630,7 +645,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am: install-includeHEADERS install-starhelpSTARDATA
 
 install-exec-am: install-binSCRIPTS install-libLTLIBRARIES
 
@@ -660,7 +675,8 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES
+	uninstall-info-am uninstall-libLTLIBRARIES \
+	uninstall-starhelpSTARDATA
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-generic clean-libLTLIBRARIES clean-libtool ctags dist \
@@ -671,13 +687,14 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	install install-am install-binSCRIPTS install-data \
 	install-data-am install-exec install-exec-am \
 	install-includeHEADERS install-info install-info-am \
-	install-libLTLIBRARIES install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	install-libLTLIBRARIES install-man install-starhelpSTARDATA \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binSCRIPTS uninstall-includeHEADERS \
+	uninstall-info-am uninstall-libLTLIBRARIES \
+	uninstall-starhelpSTARDATA
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
