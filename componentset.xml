@@ -72,7 +72,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="star2html">
-  <version>1.4-6</version>
+  <version>1.4-7</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
@@ -93,12 +93,12 @@
     <person>
       <name>Peter Draper</name>
       <uname>pwd</uname>
-      <email>P.W.Draper@durham.ac.uk</email>
+      <email>p.w.draper@durham.ac.uk</email>
     </person>
   </developers>
   <documentation> sun199</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Heavily based on latex2html</p></notes>
+  <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
 
 <component id="starconf" buildsupport="yes">
@@ -356,7 +356,172 @@
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="graphpar">
+  <version>1.1-5</version>
+  <path>libraries/graphpar</path>
+  <description>ADAM Graphics Programming</description>
+  <abstract><p>
+  Libraries for incorporating graphics into ADAM applications. The
+  routines handle the necessary interactions with the ADAM parameter
+  system where a graphics device is opened for a GKS based graphics
+  package.
+  </p></abstract>
+  <dependencies >
+    <build>gkspar</build><build>pgppar</build><build>sgspar</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Sid Wright</name>
+      <uname>slw</uname>
+    </person>
+    <person>
+      <name>Dennis Kelly</name>
+      <uname>bdk</uname>
+    </person>
+  </developers>
+  <documentation> sun113</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="gkspar">
+  <version>1.1-5</version>
+  <path>libraries/graphpar/gkspar</path>
+  <description>ADAM Graphics Programming with GKS</description>
+  <abstract><p>
+  Libraries for incorporating GKS graphics into ADAM applications. The
+  routines handle the necessary interactions with the ADAM parameter
+  system where a graphics device is opened for a GKS based graphics
+  package.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>gks</build><build>par</build><link>gns</link><link>gks</link><link>gwm</link><link>starx</link><link>ems</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Sid Wright</name>
+      <uname>slw</uname>
+    </person>
+    <person>
+      <name>Dennis Kelly</name>
+      <uname>bdk</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pgppar">
+  <version>1.1-5</version>
+  <path>libraries/graphpar/gkspar</path>
+  <description>ADAM Graphics Programming with PGPLOT</description>
+  <abstract><p>
+  Libraries for incorporating GKS PGPLOT graphics into ADAM applications. The
+  routines handle the necessary interactions with the ADAM parameter
+  system where a graphics device is opened for a GKS based graphics
+  package.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>gks</build><build>par</build><build>pgp</build><link>pgp</link><link>psx</link><link>gns</link><link>chr</link><link>gks</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Sid Wright</name>
+      <uname>slw</uname>
+    </person>
+    <person>
+      <name>Dennis Kelly</name>
+      <uname>bdk</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sgspar">
+  <version>1.1-5</version>
+  <path>libraries/graphpar/sgspar</path>
+  <description>ADAM Graphics Programming with SGS</description>
+  <abstract><p>
+  Libraries for incorporating SGS graphics into ADAM applications. The
+  routines handle the necessary interactions with the ADAM parameter
+  system where a graphics device is opened for a GKS based graphics
+  package.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>gks</build><build>sgs</build><build>par</build><link>gns</link><link>chr</link><link>gks</link><link>sgs</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Sid Wright</name>
+      <uname>slw</uname>
+    </person>
+    <person>
+      <name>Dennis Kelly</name>
+      <uname>bdk</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="grp">
@@ -1008,7 +1173,7 @@ Ultrix and for SunOS and may still work for them.
       The package also includes the interface file compiler,
       COMPIFL.</p></abstract>
   <dependencies >
-    <build>chr</build><build>hds</build><build>ems</build><build>sae</build><build>subpar</build><build option='link'>string</build><link>chr</link><link>ems</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
+    <build>hds</build><build>sae</build><build option='link'>chr</build><build option='link'>ems</build><build option='link'>string</build><build option='link'>subpar</build><link>chr</link><link>ems</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1152,7 +1317,32 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="pgp">
+  <version>5.1.1-9</version>
+  <path>libraries/pgp</path>
+  <description>PGPLOT Graphics Subroutine Library (GKS version)q</description>
+  <abstract><p>
+  GKS implementation of the PGPLOT graphics library.
+  </p></abstract>
+  <dependencies >
+    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>psx</link><link>err</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Pearson</name>
+      <uname>tjp</uname>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+  </developers>
+  <documentation> sun15</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="prm">
@@ -1265,7 +1455,45 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="sgs">
+  <version>1.1-2</version>
+  <path>libraries/sgs</path>
+  <description>SGS -- Simple Graphics System</description>
+  <abstract><p> SGS is a set of subroutines for performing low-level
+  graphics input/output.  SGS is implemented above the GKS package
+  (described in SUN/83, the RAL GKS Guide and the ISO document GKS
+  7.4) which is a device independent graphics system designed to be
+  the kernel of a wide variety of graphics systems.  GKS, which is
+  very comprehensive, does not itself set out to provide the most
+  convenient interfaces for all applications, and SGS allows easy
+  access to many of its more straightforward features.</p> <p> SGS,
+  while preserving GKS concepts and indeed allowing direct GKS calls
+  to be interspersed with SGS calls, is optimised for convenience in
+  simple cases.  Many of its features are low level (for example:
+  open, draw a line, draw a text string, close), but there are some
+  routines of a slightly higher level (drawing arcs and formatted
+  numbers etc).  SGS does not include routines for high level
+  operations like drawing annotated axes or complete graphs.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>gns</build><build>ems</build><build>chr</build><build>gks</build><link>gns</link><link>ems</link><link>chr</link><link>gks</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Pat Wallace</name>
+      <uname>ptw</uname>
+    </person>
+    <person>
+      <name>David Terrett</name>
+      <uname>dlt</uname>
+    </person>
+  </developers>
+  <documentation> sun85</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sla">
