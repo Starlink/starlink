@@ -18,6 +18,7 @@ AC_ARG_WITH(sgmldir,
                            [location of the SGML Kit tools]),
             STARLINK_SGML_DIR=$withval,
             STARLINK_SGML_DIR=$STARLINK/lib)
+AC_CHECK_FILE([$STARLINK_SGML_DIR/dtd/CATALOG],,[STARLINK_SGML_DIR=/UNKNOWN])
 AC_SUBST(STARLINK_SGML_DIR)
 
 dnl  The default here isn't terribly reliable, since it relies on
@@ -27,7 +28,7 @@ AC_ARG_WITH(pstoimg,
             AS_HELP_STRING([--with-pstoimg],
                            [location of pstoimg (installed as part of star2html)]),
             PSTOIMG=$withval,
-            PSTOIMG=$STARLINK/share/star2html-l2hsys/current)
+            PSTOIMG=$STARLINK/share/star2html-l2hsys/current/pstoimg)
 AC_SUBST(PSTOIMG)
 
 AC_CONFIG_FILES(Makefile component.xml)
