@@ -351,7 +351,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar ndg.tar makefile mk $(DOCUMENTATION)
 #  set.
 
 PUBLIC_SCRIPTS = PolReg.tcl PolReg_procs.tcl CCDShowHelp.tcl dialog.tcl \
-adamtask.tcl adamMessageRelay surfit surfit.ifl
+adamtask.tcl adamMessageRelay 
 
 # List of StarTcl files which must reside in the POLPACK binary directory.
 # These should be in the STARTCL_DIR directory.
