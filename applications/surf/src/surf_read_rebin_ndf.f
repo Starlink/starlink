@@ -156,6 +156,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.24  2004/11/18 20:37:14  timj
+*     initialise some more pointers
+*
 *     Revision 1.23  2004/09/08 02:03:33  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -442,6 +445,8 @@
       VARIANCE_PTR = 0
       QUALITY_PTR = 0
       QUALITY_END = 0
+      FILE_DATA_PTR = 0
+      FILE_VARIANCE_PTR = 0
       
 *     get some general descriptive parameters of the observation
 
