@@ -1,20 +1,12 @@
 1 Update to EXTRACTOR
 
- This is a minor release of EXTRACTOR, just adding two new parameters:
- X_PIXEL and Y_PIXEL. These output NDF pixel coordinates.
-
- A patch to enable the native version to read MEF files has been
- incorporated. The extension is identified using a number in square
- brackets (0 is the primary extension), for instance:
-
-     % $EXTRACTOR_DIR/sex mef_file.fits'[1]'
-
- would process the first extension. MEF files input to SExtractor 
- should contain a primary image.
+ This is a minor release of EXTRACTOR fixing a bug in the native
+ version of SExtractor that caused a lockup when writing ASCII_SKYCAT
+ files.
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
     % showme sun226
 
- Peter W. Draper 13th September 2002 (extractor@star.rl.ac.uk).
+ Peter W. Draper 8th January 2003 (extractor@star.rl.ac.uk).
