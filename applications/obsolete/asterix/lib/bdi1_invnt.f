@@ -567,21 +567,23 @@
             CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
             CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
+*        Map it
+            CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                          PSID, PTR, NELM, STATUS )
+
 *        Scalar width present?
             IF ( STHERE ) THEN
               CALL ARR_INIT1R( ASCALE, NELM, %VAL(WPTR), STATUS )
 
 *        Convert to values to half-widths
             ELSE
-
-*          Map it
-              CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
-     :                          PSID, PTR, NELM, STATUS )
               CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR),
      :                              STATUS )
-              CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
 
             END IF
+
+*        Unmap axis data
+            CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
 
 *        Free mapped data
             CALL ADI_UNMAP( ITID, WPTR, STATUS )
