@@ -158,7 +158,7 @@ Rather than using the C<astOK> function provided to the C interface
 
 =head1 SEE ALSO
 
-The AST library can be downloaded from http://www.stalrink.ac.uk/ast
+The AST library can be downloaded from http://www.starlink.ac.uk/ast
 
 =head1 AUTHOR
 
