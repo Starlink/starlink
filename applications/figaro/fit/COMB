@@ -1,0 +1,22 @@
+C+
+C     C O M B . I N C
+C
+C     Character common variables for the FIT_ routines
+C
+C     BUFF     Is used to build up the 'line' for a single
+C              header keyword.
+C     MTERR    Holds the error description for the last TIO_
+C              error code.
+C     DEVICE   Holds the actual name of the output device in use.
+C 
+C                                  KS / CIT 11th Oct 1983
+C     Modified:
+C
+C     28th Oct 1987.  DEVICE added.  Comments for MTERR reflect
+C                     change to TIO_ from MTPCKG.  KS/AAO.
+C     26th Jul 1994.  Make common blocks SAVE. HME / UoE, Starlink.
+C+
+      CHARACTER BUFF*80,MTERR*64,DEVICE*128
+      COMMON /FIG_COMB/ BUFF,MTERR,DEVICE
+      SAVE /FIG_COMB/
+C

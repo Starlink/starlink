@@ -1,0 +1,53 @@
+C+
+C     C O M F . I N C
+C
+C     Defines the numeric common variables for the FIT_ routines.
+C
+C     FBUFF      Is the main I/O buffer, (2880 bytes) defined as a
+C                byte array.  Holds one FITS `logical' record.
+C     FBUFFS     Is the same as FBUFF, but is defined as a word array.
+C     FBUFFI     Is the same as FBUFF, but defined as a longword array.
+C     FPTR       Points to the next availabale byte in FBUFF.
+C     TBUFF      Is the large buffer in which logical blocks (built up
+C                in FBUFF) are blocked up into actual tape records.
+C     TBLOCK     Is the current blocking factor - number of logical records 
+C                in each actual tape record.
+C     MAXTBL     Is the maximum allowed value for TBLOCK (fixed parameter).
+C     BCOUNT     Is the number of logical records already held in TBUFF.
+C     MTUNIT     Is the I/O channel for the tape drive in use.
+C     MTSTAT     Is the last TIO_ package error code.
+C     LUFILE     Is the logical unit number for a disk file, if used.
+C     NOTERM     Flag used to suppress writing of a proper logical end of
+C                tape record - used by FIT_NOTERM.
+C     NOSWAP     Flag used to suppress byte swapping
+C     TDENS      Is the tape density (800,1600 or 6250, or 0 if unknown)
+C     RINDEX     Is the record index used when direct access files are
+C                being used (as happens under UNIX). If zero, direct I/O is
+C                not being used.
+C
+C                                         KS / CIT 14th June 1984
+C     Modified:
+C
+C     22nd Oct 1987.  Now uses TIO_ instead of MTPCKG.  Common is 
+C                     unchanged, except for the descriptions of MTUNIT
+C                     and MTERR.
+C     30th Jan 1990.  TBUFF, TBLOCK and BCOUNT added to support the
+C                     new large block FITS conventions.  KS/AAO.
+C     28th Jun 1990.  TDENS added.  KS/AAO.
+C      5th Mar 1993.  NOTERM added. KS/AAO.
+C     28th Apr 1993.  RINDEX added. KS/AAO.
+C     26th Jul 1994.  Make common blocks SAVE. HME / UoE, Starlink.
+C+
+      INTEGER MAXTBL
+      PARAMETER (MAXTBL=10)
+      LOGICAL NOSWAP,NOTERM
+      BYTE FBUFF(2880)
+      INTEGER*2 FBUFFS(1440)
+      INTEGER FBUFFI(720)
+      BYTE TBUFF(MAXTBL*2880)
+      INTEGER FPTR,MTUNIT,MTSTAT,LUFILE,TBLOCK,BCOUNT,TDENS,RINDEX
+      COMMON /FIT_COMF/ FPTR,MTUNIT,MTSTAT,FBUFF,LUFILE,NOSWAP,TBUFF,
+     :                  TBLOCK,BCOUNT,TDENS,NOTERM,RINDEX
+      EQUIVALENCE (FBUFFS(1),FBUFF(1)),(FBUFFI(1),FBUFF(1))
+      SAVE /FIT_COMF/
+C
