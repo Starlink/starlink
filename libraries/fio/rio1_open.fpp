@@ -1,3 +1,4 @@
+#include <config.h>
       SUBROUTINE RIO1_OPEN( UNIT, FILE, ACMODU, FORMU, RECSZ, RECLEN,
      :   STATUS )
 *+
@@ -33,20 +34,41 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Sun-specific features used:
-*     -  None
-
 *  Copyright:
-*     Copyright (C) 1996 Council for the Central Laboratory of the
-*                        Research Councils
+*     Copyright (C) 1992 Science & Engineering Research Council
 
 *  Authors:
-*     BKM: Brian McIlwrath (Starlink, RAL)
+*     PMA: Peter Allan (Starlink, RAL)
+*     NXG: Norman Gray (Starlink, Glasgow)
 *     {enter_new_authors_here}
 
 *  History:
-*     18-MAR-1996 (BKM):
-*        Original version - based on sun4 variant.
+*     17-MAR-1992 (PMA):
+*        Original version.
+*     17-MAR-1992 (PMA):
+*        Fix an apparent bug whereby the result of the INQUIRE statement
+*        was always multiplied by 4, rather then just in the case of
+*        unformatted files.
+*     31-MAR-1992 (PMA):
+*        First Sun specific version.
+*        Remove the use of BLOCKSIZE, ORGANIZATION and READONLY.
+*        Inquire the record size if it is given as zero.
+*        The record length is always given in bytes, not longwords.
+*     3-APR-1992 (PMA):
+*        Change the name of include files to lower case.
+*     19-FEB-1993 (PMA):
+*        Change the name of include files to upper case.
+*     24-SEP-1993 (PMA):
+*        Added code to check the record length. Previously it only
+*        inquired the record length, which was a bug for an access
+*        mode of WRITE.
+*     20-OCT-1993 (PMA):
+*        Remove code to multiply the record length by 4. This is only
+*        needed on DEC machines.
+*     23-DEC-1993 (PMA):
+*        INCLUDE FIO_ERR
+*     23-APR-2003 (NXG):
+*        Now uses configure to disable/enable features
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,9 +105,23 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If the record length is greater than zero, use it.
+*   If the record length is greater than zero, use it.
       IF ( RECSZ .GT. 0 ) THEN
-         RECLEN = RECSZ
+         IF ( FORMU .EQ. 'UNFORMATTED' ) THEN
+*         Convert the number of bytes to the wordlength unit used by OPEN(recl)
+#if FC_RECL_UNIT == 1
+            RECLEN = RECSZ
+#elif FC_RECL_UNIT == 2
+            RECLEN = ( RECSZ + 1 ) / 2
+#elif FC_RECL_UNIT == 4
+            RECLEN = ( RECSZ + 3 ) / 4
+#else
+#           error "Unrecognized FC_RECL_UNIT"
+#endif
+         ELSE
+            RECLEN = RECSZ
+         END IF
+
       ELSE IF( RECSZ .EQ. 0 ) THEN
 *  If the record size has been given as zero, report an error if the
 *  access mode is WRITE, otherwise inquire what the record length 
@@ -97,7 +133,9 @@
      :         // 'creating a new file', STATUS )
          ELSE
             INQUIRE( UNIT=UNIT, RECL=RECLEN )
+*         RECLEN is now, obviously, in the correct wordlength units
          END IF
+
       ELSE
 *  The record length is negative, report an error.
          STATUS = FIO__INVRL
@@ -109,24 +147,53 @@
 *  Open the file.
       IF ( ACMODU .EQ. 'READ' ) THEN
          OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
-     :      ERR=10, IOSTAT=IOERR,
-     :      RECL=RECLEN, STATUS='OLD' )
+     :        ERR=10, IOSTAT=IOERR,
+#if HAVE_FC_OPEN_ORGANISATIONRELATIVE
+     :        ORGANISATION='RELATIVE',
+#endif
+#if HAVE_FC_OPEN_READONLY
+     :        READONLY,
+#endif
+     :        RECL=RECLEN, 
+     :        STATUS='OLD' )
       ELSE IF ( ACMODU .EQ. 'WRITE' ) THEN
          OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
-     :      ERR=10, IOSTAT=IOERR,
-     :      RECL=RECLEN, STATUS='NEW' )
+     :        ERR=10, IOSTAT=IOERR,
+#if HAVE_FC_OPEN_ORGANISATIONRELATIVE
+     :        ORGANISATION='RELATIVE',
+#endif
+     :        RECL=RECLEN, STATUS='NEW' )
       ELSE IF ( ACMODU .EQ. 'UPDATE' ) THEN
          OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
-     :      ERR=10, IOSTAT=IOERR,
-     :      RECL=RECLEN, STATUS='OLD' )
+     :        ERR=10, IOSTAT=IOERR,
+#if HAVE_FC_OPEN_ORGANISATIONRELATIVE
+     :        ORGANISATION='RELATIVE',
+#endif
+     :        RECL=RECLEN, STATUS='OLD' )
       ELSE IF ( ACMODU .EQ. 'APPEND') THEN
          OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
-     :      ERR=10, IOSTAT=IOERR,
-     :      RECL=RECLEN, STATUS='UNKNOWN' )
+     :        ERR=10, IOSTAT=IOERR,
+#if HAVE_FC_OPEN_ORGANISATIONRELATIVE
+     :        ORGANISATION='RELATIVE',
+#endif
+     :        RECL=RECLEN, STATUS='UNKNOWN' )
       END IF
 
 *  Inquire the record length of the file.
       INQUIRE( UNIT=UNIT, RECL=RECLEN )
+
+      IF ( FORMU .EQ. 'UNFORMATTED' ) THEN
+*      Convert (returned) RECLEN back to bytes for unformatted files.
+#if FC_RECL_UNIT == 1
+         CONTINUE
+#elif FC_RECL_UNIT == 2
+         RECLEN = RECLEN * 2
+#elif FC_RECL_UNIT == 4
+         RECLEN = RECLEN * 4
+*      We know it's not more, else we would have failed above.
+#endif
+      END IF
+
       GOTO 999
 
 *  Handle any error condition.

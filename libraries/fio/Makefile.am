@@ -3,8 +3,14 @@
 lib_LTLIBRARIES = libfio.la libfio_adam.la
 bin_SCRIPTS = fio_link fio_link_adam
 
-libfio_la_SOURCES = $(BLOCK_DATA_STANDALONE) $(F_ROUTINES) $(PLATFORM_F)
-libfio_adam_la_SOURCES = $(BLOCK_DATA_ADAM) $(F_ROUTINES_ADAM)
+libfio_la_SOURCES = \
+	$(BLOCK_DATA_STANDALONE) \
+	$(F_ROUTINES) \
+	$(FPP_ROUTINES) \
+	$(PLATFORM_F)
+libfio_adam_la_SOURCES = \
+	$(BLOCK_DATA_ADAM) \
+	$(F_ROUTINES_ADAM)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
@@ -50,11 +56,13 @@ F_ROUTINES_ADAM = \
         rio_assoc.f \
         rio_cancl.f
 
+FPP_ROUTINES = \
+	fio1_open.fpp \
+	rio1_open.fpp
+
 # Platform-specific Fortran routines.  See corresponding stanza in configure.ac
 PLATFORM_F = \
-	fio1_open.f \
-        fio1_serr.f \
-	rio1_open.f
+        fio1_serr.f
 
 #  List of Fortran BLOCK DATA routines, for both the standalone and
 # ADAM versions of the library.

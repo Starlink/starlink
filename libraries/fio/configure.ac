@@ -10,59 +10,69 @@ dnl   Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl   Sanity-check: name a file in the source directory
-AC_CONFIG_SRCDIR([fio1_open.f])
+AC_CONFIG_SRCDIR([fio_link])
 
-dnl   Include defaults for Starlink configurations
+#   Include defaults for Starlink configurations
 STAR_DEFAULTS
 
-dnl   Checks for programs
+#   Checks for programs
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-dnl   Test what features the OPEN command can support
+#   Test what features the OPEN command can support
 AC_FC_OPEN_SPECIFIERS(readonly)
 AC_FC_OPEN_SPECIFIERS(access='append')
 AC_FC_OPEN_SPECIFIERS(blocksize=0)
 AC_FC_OPEN_SPECIFIERS(organization='RELATIVE')
-AC_FC_OPEN_SPECIFIERS(carriagecontrol='CC')
+AC_FC_OPEN_SPECIFIERS(carriagecontrol='NONE')
 AC_FC_OPEN_SPECIFIERS([access='sequential',recl=1])
 
+#   What unit does OPEN's recl specifier assume?
+AC_FC_RECL_UNIT
 
-dnl   Tests require access to monoliths
-dnl   This may be a problem if alink has not yet been installed
+
+#   Tests require access to monoliths
+#   This may be a problem if alink has not yet been installed
 STAR_MONOLITHS
 
 STAR_DECLARE_DEPENDENCIES([build], [sae par])
 STAR_DECLARE_DEPENDENCIES([link],  [chr ems mers subpar])
 
-dnl   Documentation is uncomplicated
+#  Documentation is uncomplicated
 STAR_LATEX_DOCUMENTATION(sun143)
 
-dnl   Declare options for platform-specific sources.
-dnl   The original set of extensions was [alpha_OSF1 ix86_Linux mips
-dnl   sun4 sun4_Solaris vms], which has migrated to [_dec_osf
-dnl   _pc_linux _sun_solaris _sun mips vax].  The `vax' option is
-dnl   actually the old VMS option -- which is redundant in some sense,
-dnl   since VMS not a Unix (gosh): perhaps this would be better as __ultrix.
-STAR_PLATFORM_SOURCES([fio1_open.f],
-                      [_dec_osf _pc_linux _sun_solaris _sun mips vax])
+#   Declare options for platform-specific sources.
+#   The original set of extensions was [alpha_OSF1 ix86_Linux mips
+#   sun4 sun4_Solaris vms], which has migrated to [_dec_osf
+#   _pc_linux _sun_solaris _sun mips vax].  The `vax' option is
+#   actually the old VMS option -- which is redundant in some sense,
+#   since VMS not a Unix (gosh): perhaps this would be better as __ultrix.
+#
+#   Note that fio1_open.f was originally handled this way, but has
+#   been replaced by fio1_open.fpp, and fio1_open.f{_dec_osf,
+#   _pc_linux, _sun, _sun_solaris, default, and mips} have been
+#   deleted.  fio1_open.fvax has been retained, but this is largely
+#   for historical interest.  Exactly the same for rio1_open.f ->
+#   rio1_open.fpp and rio1_open.fvax.
+#
+#   fio1_serr.f has significant platform dependencies, and
+#   can't be easily handled through this sort of configuration.
 STAR_PLATFORM_SOURCES([fio1_serr.f],
                       [_dec_osf _pc_linux _sun_solaris _sun mips vax])
-STAR_PLATFORM_SOURCES([rio1_open.f],
-                      [_dec_osf _pc_linux _sun_solaris _sun mips vax])
-dnl   The sun options require a sun_iosdef file, but if neither of these
-dnl   two matches, that's OK -- presumably we're not on a Sun.
+#   The sun options require a sun_iosdef file, but if neither of these
+#   two matches, that's OK -- presumably we're not on a Sun.
 STAR_PLATFORM_SOURCES([sun_iosdef], [_sun_solaris _sun NONE])
 
 STAR_MESSGEN(fio_err.msg)
 
-dnl   Header checks.  There are no such explicit checks at present,
-dnl   only the implicit ones.  Also config.h is not at present
-dnl   included by anything.  However we might as well include this
-dnl   stanza here, to support that in future, but also to keep down
-dnl   the length of generated command lines.
+#   Header checks.  There are no such explicit checks at present,
+#   only the implicit ones.  Also config.h is not at present
+#   included by anything.  However we might as well include this
+#   stanza here, to support that in future, but also to keep down
+#   the length of generated command lines.
 AM_CONFIG_HEADER(config.h)
 
 
