@@ -106,14 +106,6 @@ $(LIBNAME): $(LIBOBJS)
 		$(RANLIB) $@; \
 	fi
 
-%.a: $(LIBOBJS)
-	@echo Building library $@
-	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
-	@if [ ! -z "$(RANLIB)" ] ; then\
-		echo $(RANLIB) $@; \
-		$(RANLIB) $@; \
-	fi
 
 $(INSTALL_BIN)/%: %
 	@echo "Installing $@"
@@ -136,6 +128,14 @@ $(INSTALL_LIB)/%: %
 		$(RANLIB) $(RANLIBFLAGS) $@; \
 	fi
 
+%.a: $(LIBOBJS)
+	@echo Building library $@
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
+	@if [ ! -z "$(RANLIB)" ] ; then\
+		echo $(RANLIB) $@; \
+		$(RANLIB) $@; \
+	fi
 
 $(INSTALL_MAN)/man9/% \
 $(INSTALL_MAN)/man8/% \
@@ -206,10 +206,18 @@ PRM_PAR:        $(STAR_INC)/prm_par;           $(LINK) $? $@
 SAI_ERR:        $(STAR_INC)/sae_par;           $(LINK) $? $@
 SAE_PAR:        $(STAR_INC)/sae_par;           $(LINK) $? $@
 DYNAMIC_MEMORY: $(FIG_INC)/dynamic_memory;     $(LINK) $? $@
-DSA_ERRORS:     $(FIG_INC)/dsa/DSA_ERRORS;     $(LINK) $? $@
 %.INC :         ../%.INC;                      $(LINK) $? $@
 %.INC :         $(INSTALL_INCLUDE)/%.INC;      $(LINK) $? $@
+%.BLK :         ../%.BLK;                      $(LINK) $? $@
+%.BLK :         $(INSTALL_INCLUDE)/%.BLK;      $(LINK) $? $@
+%.PAR :         ../%.PAR;                      $(LINK) $? $@
+%.PAR :         $(INSTALL_INCLUDE)/%.PAR;      $(LINK) $? $@
 
+DSA_ERRORS:
+	$(TAR_OUT) $(FIGARO)/figaro_dsa.tar dsa/dsa_errors
+	$(MV) dsa/dsa_errors ./$@
+	$(RMDIR) ./dsa
+	
 include DEPENDS
 
 .PRECIOUS: %.o %.c %.f
