@@ -1,22 +1,24 @@
-      SUBROUTINE SCULIB_SET_DATA (USE_THIS, IN_DATA, N_BOLS, N_POS, 
-     :     N_BEAM, BOL_S, POS_S, VALUE, STATUS)
+      SUBROUTINE SCULIB_SET_DATA (USE_THIS, N_BOLS, N_POS,
+     :     N_BEAM, MASK, VALUE, IN_DATA, STATUS)
 *+
 *  Name:
 *     SCULIB_SET_QUAL
 
 *  Purpose:
-*     set data to a real value given a mask
+*     set data to a real value given a byte mask 
 
 *  Language:
 *     Starlink Fortran 77
 *  
 
 *    Invocation :
-*     CALL SCULIB_SET_DATA (USE_THIS, IN_DATA, N_BOLS, N_POS, N_BEAM, 
-*    :  BOL_S, POS_S, VALUE, STATUS)
-
+*     CALL SCULIB_SET_DATA (USE_THIS, IN_DATA, N_PTS, N_BEAM, MASK, 
+*    :       VALUE, STATUS)
 
 *    Description :
+*       This routine uses a byte mask (N_BOLS * N_POS) to set a data
+*       value in the output. A mask value of 1 indicates that a value
+*       should be changed. This routine does not distinguish 'beams'
 
 *    Parameters :
 *     USE_THIS   = LOGICAL (Given)
@@ -58,8 +60,7 @@
       INTEGER N_BOLS
       INTEGER N_POS
       INTEGER N_BEAM
-      INTEGER BOL_S (N_BOLS)
-      INTEGER POS_S (N_POS)
+      BYTE    MASK (N_BOLS, N_POS) 
       LOGICAL USE_THIS
       REAL    VALUE
 
@@ -84,53 +85,38 @@
 *     Do this if we are changing the section
       IF (USE_THIS) THEN
 
-*     Set the masked data to the given value
-         DO POS = 1, N_POS
-            IF (POS_S(POS) .EQ. 1) THEN
+         DO BOL = 1, N_BOLS
 
-               DO BOL = 1, N_BOLS
-                  IF (BOL_S(BOL) .EQ. 1) THEN
+            DO POS = 1, N_POS
 
-                     DO BEAM = 1, N_BEAM
+               IF (MASK(BOL,POS) .NE. 0) THEN
+
+                  DO BEAM = 1, N_BEAM
 *       Dont set BAD pixels                        
-                        IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
-                           IN_DATA(BOL, POS, BEAM) = VALUE
-                        END IF
-                     END DO
-         
-                  END IF
-               END DO
-
-            END IF
+                     IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
+                        IN_DATA(BOL, POS, BEAM) = VALUE
+                     END IF
+                  END DO
+               END IF
+            END DO
          END DO
 
+*     Set unmasked data to value
       ELSE
 
-*     If the mask specified that the unmasked data is to be affected
-*     then do this.
+         DO BOL = 1, N_BOLS
+            DO POS = 1, N_POS
 
-         DO POS = 1, N_POS
+               IF (MASK(BOL, POS) .EQ. 0) THEN
 
-            IF (POS_S(POS) .EQ. 0) THEN
-*       We KNOW that all this data is unmasked
-               DO BOL = 1, N_BOLS
                   DO BEAM = 1, N_BEAM
-                     IN_DATA(BOL, POS, BEAM) = VALUE
+*     Dont set BAD pixels                        
+                     IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
+                        IN_DATA(BOL, POS, BEAM) = VALUE
+                     END IF
                   END DO
-               END DO
-            ELSE
-*       Only set to VALUE if not masked
-               DO BOL = 1, N_BOLS
-                  IF (BOL_S(BOL) .EQ. 0) THEN
-                     DO BEAM = 1, N_BEAM
-*       Dont set BAD pixels                        
-                        IF (IN_DATA(BOL, POS, BEAM) .NE. VAL__BADR) THEN
-                           IN_DATA(BOL, POS, BEAM) = VALUE
-                        END IF
-                     END DO
-                  END IF
-               END DO
-            END IF
+               END IF
+            END DO
          END DO
 
       END IF
