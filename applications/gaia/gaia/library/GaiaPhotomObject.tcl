@@ -336,7 +336,6 @@ itcl::class gaia::GaiaPhotomObject {
       lassign [image_coord $xpos $ypos] x y
       set maj [image_dist $major]
       set ang [image_angle $angle]
-      puts "getapvals: $x, $y, $maj, $ang"
       set description \
          "[format {%10d %10f %10f %10f %10f %10f %14f %10s %10f %10f %10f} \
              $index $x $y $mag $magerr $sky $signal $code $maj \
