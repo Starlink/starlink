@@ -71,6 +71,7 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,8 @@
 *        Original version.
 *     19 Dec 1995 (DJA):
 *        Added special treatment of CLASS = '*'
+*     14 May 1997 (RB):
+*        Clone in now copy, close, open for update.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -148,6 +151,10 @@
           LFILE = FNAME(:MAX(1,CHR_LEN(FNAME)))//OUT(PPOS:)
           CALL ADI_FCLONE( IFID, LFILE, LCLASS, ID, STATUS )
         END IF
+
+*  Now close and re-open for update!
+      CALL ADI_FCLOSE( ID, STATUS )
+      CALL USI_ASSOC( 'OUT', LCLASS, 'UPDATE', ID, stATUS )
 
 *    Store in common
         CALL USI0_STOREI( OUT(:EP), ID, 'O', .FALSE., STATUS )
