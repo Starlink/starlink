@@ -1,0 +1,1961 @@
+monolith CATPAC
+#+
+#  Name:
+#     ADDPARAM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface ADDPARAM
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME                # Name of the new parameter
+      position 2
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the new parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMAT              # Format of the new parameter
+      position 3
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Format of the new parameter '
+      helpkey  '*'
+   endparameter
+
+   parameter VALUE               # Value of the new parameter
+      position 4
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Value of the new parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter COMMENT             # Comment on the new parameter.
+      position 5
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Comment associated with the new parameter'
+      helpkey  '*'
+   endparameter
+
+
+endinterface
+#+
+#  Name:
+#     ASCIICAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface ASCIICAT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter DATAFILE             # Ascii data file name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'File name of file containing the ascii data.'
+      helpkey  '*'
+   endparameter
+
+   parameter INFOFILE             # Name of the information file
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the information file.'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ASCIITOCAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface ASCIITO
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter DATAFILE             # Ascii data file name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'File name of file containing the ascii data.'
+      helpkey  '*'
+   endparameter
+
+   parameter CNAME                # Name of the next field
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the next field ! to finish.'
+      helpkey  '*'
+   endparameter
+
+   parameter CFORMAT              # Format of the field
+      position 4
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Format of the field '
+      helpkey  '*'
+   endparameter
+
+   parameter CUNIT                # Value of the new parameter
+      position 5
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Unit of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter FNULLSUP            # Null value of the field.
+      position 6
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Null values supported by this field'
+      helpkey  '*'
+   endparameter
+
+   parameter FDOMSUP            # Domain checking supported on the field.
+      position 7
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Domain checkink supported by this field'
+      helpkey  '*'
+   endparameter
+
+   parameter FDOMEXP             # Domain expression for the field.
+      position 8
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Domain expression for the field.'
+      helpkey  '*'
+   endparameter
+
+   parameter CCOMMENT             # Comment on the field.
+      position 9
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Comment on the field'
+      helpkey  '*'
+   endparameter
+
+   parameter STARTPOS             # Field start position.
+      position 10
+      type     _INTEGER
+      vpath    'PROMPT '
+      prompt   'Start position of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter PNAME                # Name of the next parameter
+      position 11
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the next parameter parameter ! to finish'
+      helpkey  '*'
+   endparameter
+
+   parameter PFORMAT              # Format of the parameter
+      position 12
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Format of the parameter '
+      helpkey  '*'
+   endparameter
+
+   parameter PUNIT                # Unit of the parameter
+      position 13
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Unit of the parameter '
+      helpkey  '*'
+   endparameter
+
+   parameter PVALUE               # Value of the parameter
+      position 14
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Value of the parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter PCOMMENT             # Comment on the parameter.
+      position 15
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Comment on the parameter'
+      helpkey  '*'
+   endparameter
+
+
+endinterface
+#+
+#  Name:
+#     CATHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     ARW: Alan Wood (STPDF)
+#     {enter_new_authors_here}
+
+#  History:
+#     1986 November 14 (MJC):
+#	 Original version.
+#     1992 August 19 (MJC):
+#     	 Added prologue, and access to help library.
+#     1993 January 5 (PDRAPER):
+#        Rename CCDHELP.
+#     19-MAR-1993 (PDRAPER):
+#     	 Rename PISAHELP.
+#     8-APR-199$ (ARW):
+#     	 Rename CATHELP.
+#     {enter_further_changes_here}
+
+#-
+
+
+interface CATHELP
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+   endparameter
+
+endinterface
+
+# @(#)pisahelp.ifl	1.1     10/7/93     1
+#+
+#  Name:
+#     JOIN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATJOIN
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT1              # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL>CATPAC_INPUT '
+      prompt      'Name of the first Catalogue. '
+      help        '*'
+   endparameter
+
+   parameter INPUT2              # Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'DEFAULT '
+      prompt      'Name of the second Catalogue. '
+      help        '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position    3
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the catalogue to be created. '
+      help        '*'
+   endparameter
+
+   parameter EXPRESS             # Join expression.
+      position    4
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT'
+      prompt      'Logical expression of the join criteria.'
+      help        '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATRENAME.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATRENAME
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPACINPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter NEWNAME              # New Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'New name of the catalogue. '
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATREPORT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATREPORT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter HEADER            # Header required flag
+      position 2
+      type     _LOGICAL
+      vpath    'DEFAULT '
+      default  TRUE
+      prompt   'Add header information to report T/F? '
+      helpkey  '*'
+   endparameter
+
+   parameter SCREEN           # Direct report to screen flag.
+      position 3
+      type     _LOGICAL
+      vpath    'DEFAULT '
+      default  TRUE
+      prompt   'Direct report to screen [T] or a file [F]?  '
+      helpkey  '*'
+   endparameter
+
+   parameter ALLFLDS           # All fields to be reported flag.
+      position 4
+      type     _LOGICAL
+      vpath    'DEFAULT '
+      default  TRUE
+      prompt   'All numeric fields to be reported T/F? '
+      helpkey  '*'
+   endparameter
+
+   parameter FLDNAMES           # Field names to be reported.
+      position 5
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'List the names of the fields to be reported.'
+      helpkey  '*'
+   endparameter
+
+   parameter MORE           # All fields to be reported flag.
+      position 6
+      type     _LOGICAL
+      vpath    'PROMPT '
+      default  TRUE
+      prompt   'More T/F? '
+      helpkey  '*'
+   endparameter
+
+
+endinterface
+#+
+#  Name:
+#     CATSEARCH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATSEARCH
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the catalogue to be created. '
+      helpkey     '*'
+   endparameter
+
+   parameter CRITERIA            # Search criteria.
+      position    3
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT'
+      prompt      'Logical expression of the search criteria.'
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATSORT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATSORT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the catalogue to be created. '
+      helpkey     '*'
+   endparameter
+
+   parameter SORTFLDS           # Names of sort fields.
+      position 3
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'List the names of the sort fields Primary, Secondary, Tetiary.'
+      helpkey     '*'
+   endparameter
+
+   parameter SORTDIR            # Sort directions.
+      position 4
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'Direction of sort for each field T for ascending.'
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     COPYCAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface COPYCAT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPACINPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter OUTPUT              # New Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'New name of the catalogue. '
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     DELCAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface DELCAT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the Catalogue to be deleted. '
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     DELCOL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface DELCOL
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME                # Name of the column to be deleted
+      position 2
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the column to be deleted'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     DELPARAM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface DELPARAM
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME                # Name of the parameter to be deleted
+      position 2
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the parameter to be deleted'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ENTRIES.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface ENTRIES
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt   'Name of the Catalogue. '
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FIELDINFO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface FIELDINFO
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter NAME                # Field Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Name of the Field. '
+      helpkey     '*'
+   endparameter
+
+   parameter INFREQ              # Information required
+      position    3
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Information required (UNITS,FORMAT,NULLVALUE,COMMENT). '
+      in          'UNITS','FORMAT','NULLVALUE','COMMENT'
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FIELDS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface FIELDS
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FK425.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface FK425
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the output Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK4               # Name of the RA field in FK4 system
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RA'
+      prompt   'Name of the RA field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK4              # Name of the DEC field in FK4 system
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DEC'
+      prompt   'Name of the DEC field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPMFK4             # Name of the RA proper motion field FK4.
+      position 5
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRA'
+      prompt   'Name of the RA proper motion field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPMFK4            # Name of the DEC proper motion field FK4.
+      position 6
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDEC'
+      prompt   'Name of the DEC proper motion field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLXFK4            # Name of the parallax field FK4.
+      position 7
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLX'
+      prompt   'Name of the parallax field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVELFK4           # Name of the radial velocity field FK4.
+      position 8
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVEL'
+      prompt   'Name of the radial velocity field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK5               # Name of the RA field in FK5 system
+      position 9
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RAJ'
+      prompt   'Name of the RA field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK5              # Name of the DEC field in FK5 system
+      position 10
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DECJ'
+      prompt   'Name of the DEC field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPMFK5             # Name of the RA proper motion field FK5.
+      position 11
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRAJ'
+      prompt   'Name of the RA proper motion field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPMFK5            # Name of the DEC proper motion field FK5.
+      position 12
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDECJ'
+      prompt   'Name of the DEC proper motion field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLXFK5            # Name of the parallax field FK5.
+      position 13
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLXJ'
+      prompt   'Name of the parallax field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVELFK5           # Name of the radial velocity field FK5.
+      position 14
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVELJ'
+      prompt   'Name of the radial velocity field in FK5'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FK45Z.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface FK45Z
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the output Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK4               # Name of the RA field in FK4 system
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RA'
+      prompt   'Name of the RA field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK4              # Name of the DEC field in FK4 system
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DEC'
+      prompt   'Name of the DEC field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter BEPOCH              # Bepoch required by SLALIB FK45Z
+      position 5
+      type     _REAL
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  '1950'
+      prompt   'BEPOCH required by SLALIB FK45Z'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK5               # Name of the RA field in FK5 system
+      position 6
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RAJ'
+      prompt   'Name of the RA field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK5              # Name of the DEC field in FK5 system
+      position 7
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DECJ'
+      prompt   'Name of the DEC field in FK5'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FK524.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface FK524
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the output Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK5               # Name of the RA field in FK5 system
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RA'
+      prompt   'Name of the RA field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK5              # Name of the DEC field in FK5 system
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DEC'
+      prompt   'Name of the DEC field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPMFK5             # Name of the RA proper motion field FK5.
+      position 5
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRA'
+      prompt   'Name of the RA proper motion field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPMFK5            # Name of the DEC proper motion field FK5.
+      position 6
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDEC'
+      prompt   'Name of the DEC proper motion field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLXFK5            # Name of the parallax field FK5.
+      position 7
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLX'
+      prompt   'Name of the parallax field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVELFK5           # Name of the radial velocity field FK5.
+      position 8
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVEL'
+      prompt   'Name of the radial velocity field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK4               # Name of the RA field in FK4 system
+      position 9
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RAB'
+      prompt   'Name of the RA field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK4              # Name of the DEC field in FK4 system
+      position 10
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DECB'
+      prompt   'Name of the DEC field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPMFK4             # Name of the RA proper motion field FK4.
+      position 11
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRAB'
+      prompt   'Name of the RA proper motion field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPMFK4            # Name of the DEC proper motion field FK4.
+      position 12
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDECB'
+      prompt   'Name of the DEC proper motion field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLXFK4            # Name of the parallax field FK4.
+      position 13
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLXB'
+      prompt   'Name of the parallax field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVELFK4           # Name of the radial velocity field FK4.
+      position 14
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVELB'
+      prompt   'Name of the radial velocity field in FK4'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FK54Z.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface FK54Z
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the output Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK5               # Name of the RA field in FK5 system
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RA'
+      prompt   'Name of the RA field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK5              # Name of the DEC field in FK5 system
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DECJ'
+      prompt   'Name of the DEC field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter BEPOCH              # Bepoch required by SLALIB FK45Z
+      position 5
+      type     _REAL
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  '1950'
+      prompt   'BEPOCH required by SLALIB FK45Z'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK4               # Name of the RA field in FK4 system
+      position 6
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RAJ'
+      prompt   'Name of the RA field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK4              # Name of the DEC field in FK4 system
+      position 7
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DEC'
+      prompt   'Name of the DEC field in FK4'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     GLOBALS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface GLOBALS
+
+endinterface
+#+
+#  Name:
+#     PARAMINFO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface PARAMINFO
+
+   helplib '$CATPAC_HELP PARAMINFO'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     'Parameters INPUT'
+   endparameter
+
+   parameter NAME                # Parameter Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Name of the Parameter. '
+      helpkey     'Parameters NAME'
+   endparameter
+
+   parameter INFREQ              # Information required
+      position    3
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Information requires (FORMAT,VALUE,COMMENT). '
+      in          'FORMAT','VALUE','COMMENT'
+      helpkey     'Parameters INFREQ'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     PARAMS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface PARAMS
+
+   helplib '$CATPAC_HELP PARAMS'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     'Parameters INPUT'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     PROPERM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface PROPERM
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the output Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter RAEP0               # Name of the RA field in EP0 system
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RA'
+      prompt   'Name of the RA field at epoch 0'
+      helpkey  '*'
+   endparameter
+
+   parameter DECEP0              # Name of the DEC field at epoch 0
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DEC'
+      prompt   'Name of the DEC field at epoch 0'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPM                # Name of the RA proper motion field
+      position 5
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRA'
+      prompt   'Name of the RA proper motion field'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPM               # Name of the DEC proper motion field.
+      position 6
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDEC'
+      prompt   'Name of the DEC proper motion field'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLX               # Name of the parallax field.
+      position 7
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLX'
+      prompt   'Name of the parallax field'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVEL              # Name of the radial velocity field.
+      position 8
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVEL'
+      prompt   'Name of the radial velocity field'
+      helpkey  '*'
+   endparameter
+
+   parameter RAEP1               # Name of the RA field at epoch 1
+      position 9
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Name of the RA field at epoch 1'
+      helpkey  '*'
+   endparameter
+
+   parameter DECEP1              # Name of the DEC field in EP1 system
+      position 10
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Name of the DEC field at epoch 1'
+      helpkey  '*'
+   endparameter
+
+   parameter EP0                # Start Epoch.
+      position 11
+      type     _REAL
+      vpath    'PROMPT '
+      prompt   'Epoch from which to start proper motion correction'
+      helpkey  '*'
+   endparameter
+
+   parameter EP1                # End Epoch.
+      position 12
+      type     _REAL
+      vpath    'PROMPT '
+      prompt   'Epoch at which to end the proper motion correction'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SAMPLE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface SAMPLE
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the catalogue to be created. '
+      helpkey     '*'
+   endparameter
+
+   parameter FREQUENCY            # Frequency of sample.
+      position    3
+      type        _INTEGER
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Sample frequency N'
+      helpkey     '*'
+   endparameter
+
+   parameter REJECT              # Reject catalogue required flag.
+      position    4
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to create a rejects catalogue.'
+      helpkey     '*'
+   endparameter
+
+
+   parameter OUTREJECT           # Reject catalogue Name
+      position    5
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the rejects catalogue to be created. '
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     UPFIELD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface UPFIELD
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME                # Name of the field
+      position 2
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMEFLG             # Name flag
+      position    3
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update field name.'
+      helpkey  '*'
+   endparameter
+
+   parameter NEWNAME             # New name for the field
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New name for the field'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMFLG             # Format flag
+      position    5
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field format.'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMAT              # Format of the new field
+      position 6
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New format of the field '
+      helpkey  '*'
+   endparameter
+
+   parameter UNITFLG             # Units flag
+      position    7
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field units.'
+      helpkey  '*'
+   endparameter
+
+   parameter UNITS               # New units of the field
+      position 8
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New units of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter NULLFLG             # Null value flag
+      position    9
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field null value.'
+      helpkey  '*'
+   endparameter
+
+   parameter NULLVAL             # New null value of the field
+      position 10
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New null value of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter COMFLG             # Comment flag
+      position    11
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field comment.'
+      helpkey  '*'
+   endparameter
+
+   parameter COMMENT             # New comment on the field.
+      position 12
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New comment associated with the field'
+      helpkey  '*'
+   endparameter
+
+
+endinterface
+#+
+#  Name:
+#     UPPARAM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface UPPARAM
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME                # Name of the parameter
+      position 2
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMEFLG             # Name flag
+      position    3
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update parameter name.'
+      helpkey  '*'
+   endparameter
+
+   parameter NEWNAME             # New name for the parameter
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New name for the parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMFLG             # Format flag
+      position    5
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the parameter format.'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMAT              # Format of the new parameter
+      position 6
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New format of the parameter '
+      helpkey  '*'
+   endparameter
+
+   parameter VALFLG             # Value flag
+      position    7
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the parameter value.'
+      helpkey  '*'
+   endparameter
+
+   parameter VALUE               # New value of the parameter
+      position 8
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New value of the parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter COMFLG             # Comment flag
+      position    9
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the parameter comment.'
+      helpkey  '*'
+   endparameter
+
+   parameter COMMENT             # New comment on the parameter.
+      position 10
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New comment associated with the parameter'
+      helpkey  '*'
+   endparameter
+
+
+endinterface
+endmonolith

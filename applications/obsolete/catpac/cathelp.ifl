@@ -1,0 +1,70 @@
+#+
+#  Name:
+#     CATHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     ARW: Alan Wood (STPDF)
+#     {enter_new_authors_here}
+
+#  History:
+#     1986 November 14 (MJC):
+#	 Original version.
+#     1992 August 19 (MJC):
+#     	 Added prologue, and access to help library.
+#     1993 January 5 (PDRAPER):
+#        Rename CCDHELP.
+#     19-MAR-1993 (PDRAPER):
+#     	 Rename PISAHELP.
+#     8-APR-199$ (ARW):
+#     	 Rename CATHELP.
+#     {enter_further_changes_here}
+
+#-
+
+
+interface CATHELP
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+   endparameter
+
+endinterface
+
+# @(#)pisahelp.ifl	1.1     10/7/93     1

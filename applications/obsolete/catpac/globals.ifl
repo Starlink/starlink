@@ -1,0 +1,19 @@
+#+
+#  Name:
+#     GLOBALS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface GLOBALS
+
+endinterface

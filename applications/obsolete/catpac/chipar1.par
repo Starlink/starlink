@@ -1,0 +1,57 @@
+*    Description :
+*     This file contains the CHI parser Global Constants.
+*    History :
+
+*   operator table
+      character*5 op_table(chi__oplo:chi__ophi)
+*
+*    operator precedence table
+      integer op_prec(chi__oplo:chi__ophi)
+*
+*   op_table (indexed by op_num)
+*
+*   (1)      dummy for eos
+      data op_table/'?    ',
+*   (2)      open bracket
+     :              '(    ',
+*   (3:6)    arithmetic operators:  + - * /
+     :              '+    ','-    ','*    ','/    ',
+*   (7:8)    comma   close bracket
+     :              ',    ',')    ',
+*   (9:14)   relational operators:  <  {  =  }  >  #
+     :              '<    ','{    ','=    ','}    ','>    ',
+     :              '#    ',
+*   (15:16)  power  concat
+     :              '**   ','//   ',
+*   (17:22)  relational operators as .LT. etc
+     :              '.LT. ','.LE. ','.EQ. ','.GE. ','.GT. ',
+     :              '.NE. ',
+*   (23:26)  logical operators:  or  xor  and  not
+     :              '.OR. ',
+     :              '.XOR.',
+     :              '.AND.',
+     :              '.NOT.',
+*   (27:28)  unary  +  -
+     :              '+    ',
+     :              '-    '/
+*
+*   op_prec, also indexed by op_num
+*
+*   (1)      dummy for eos
+      data op_prec/-3,
+*   (2)      open bracket
+     :     -2,
+*   (3:6)    arithmetic operators:  + - * /
+     :     7,7,8,8,
+*   (7:8)    comma   close bracket
+     :     -1,0,
+*   (9:14)   relational operators:  <  {  =  }  >  #
+     :     4,4,4,4,4,4,
+*   (15:16)  power  concat
+     :     9,6,
+*   (17:22)  relational operators as .LT. etc
+     :     4,4,4,4,4,4,
+*   (23:26)  logical operators:     or  xor  and  not
+     :     1,1,2,3,
+*   (27:28)  unary  +  -
+     :     10,10/

@@ -1,0 +1,21 @@
+1 CATPAC_available_for_Unix
+                                                      Expires: 94.**.**
+
+ The CATPAC package of catalogue manipulation applications has been
+ made available on Unix.   CATPAC provides some of the functionality 
+ of SCAR, pending a Unix replacement for SCAR.
+
+ To start CATPAC from the shell type:
+
+        % catpac
+ or
+        % catpacsetup
+
+ (where % is the shell promt).
+
+ CATPAC also runs under ICL, and should be loaded as follows:
+
+        ICL> load $CATPAC_DIR/catpac
+
+ Please report any problems to ussc@star.rl.ac.uk.
+

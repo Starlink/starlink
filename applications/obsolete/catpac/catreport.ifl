@@ -1,0 +1,79 @@
+#+
+#  Name:
+#     CATREPORT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATREPORT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter HEADER            # Header required flag
+      position 2
+      type     _LOGICAL
+      vpath    'DEFAULT '
+      default  TRUE
+      prompt   'Add header information to report T/F? '
+      helpkey  '*'
+   endparameter
+
+   parameter SCREEN           # Direct report to screen flag.
+      position 3
+      type     _LOGICAL
+      vpath    'DEFAULT '
+      default  TRUE
+      prompt   'Direct report to screen [T] or a file [F]?  '
+      helpkey  '*'
+   endparameter
+
+   parameter ALLFLDS           # All fields to be reported flag.
+      position 4
+      type     _LOGICAL
+      vpath    'DEFAULT '
+      default  TRUE
+      prompt   'All numeric fields to be reported T/F? '
+      helpkey  '*'
+   endparameter
+
+   parameter FLDNAMES           # Field names to be reported.
+      position 5
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'List the names of the fields to be reported.'
+      helpkey  '*'
+   endparameter
+
+   parameter MORE           # All fields to be reported flag.
+      position 6
+      type     _LOGICAL
+      vpath    'PROMPT '
+      default  TRUE
+      prompt   'More T/F? '
+      helpkey  '*'
+   endparameter
+
+
+endinterface

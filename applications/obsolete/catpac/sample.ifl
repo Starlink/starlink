@@ -1,0 +1,70 @@
+#+
+#  Name:
+#     SAMPLE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface SAMPLE
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the catalogue to be created. '
+      helpkey     '*'
+   endparameter
+
+   parameter FREQUENCY            # Frequency of sample.
+      position    3
+      type        _INTEGER
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Sample frequency N'
+      helpkey     '*'
+   endparameter
+
+   parameter REJECT              # Reject catalogue required flag.
+      position    4
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to create a rejects catalogue.'
+      helpkey     '*'
+   endparameter
+
+
+   parameter OUTREJECT           # Reject catalogue Name
+      position    5
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the rejects catalogue to be created. '
+      helpkey     '*'
+   endparameter
+
+endinterface

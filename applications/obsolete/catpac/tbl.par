@@ -1,0 +1,39 @@
+*    Description :
+*     This file includes the Global Constants for the TABLE package
+*    Authors :
+*     Z. Iqbal      (SAVAX::ZI)
+*    Global constants :
+
+      CHARACTER*(4) TBL_SUBGROUP/'_SUB'/
+
+      integer   TBL__SZNAM
+      parameter(TBL__SZNAM=20)
+      integer   TBL__SZPFORMAT
+      parameter(TBL__SZPFORMAT = 20)
+      integer   TBL__SZPCOMMENT
+      parameter(TBL__SZPCOMMENT = 80)
+      integer   TBL__SZPVALUE
+      parameter(TBL__SZPVALUE = 20)
+      integer   TBL__SZFUNIT
+      parameter(TBL__SZFUNIT = 20)
+      integer   TBL__SZFCOMMENT
+      parameter(TBL__SZFCOMMENT = 80)
+      integer   TBL__SZFFORMAT
+      parameter(TBL__SZFFORMAT = 20)
+      integer   TBL__SZFNULL
+      parameter(TBL__SZFNULL = 20)
+      integer   TBL__SZPAR
+      parameter(TBL__SZPAR = 20)
+
+
+
+      integer   TBL__PARNF
+      parameter(TBL__PARNF = 99990)
+      integer   TBL__NOTTABLE
+      parameter(TBL__NOTTABLE = 99991)
+      integer   TBL__INCOLNO
+      parameter(TBL__INCOLNO = 99992)
+      integer   TBL__ECRTAB
+      parameter(TBL__ECRTAB = 99993)
+*-
+

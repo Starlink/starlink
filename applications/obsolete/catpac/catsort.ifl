@@ -1,0 +1,61 @@
+#+
+#  Name:
+#     CATSORT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATSORT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the catalogue to be created. '
+      helpkey     '*'
+   endparameter
+
+   parameter SORTFLDS           # Names of sort fields.
+      position 3
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'List the names of the sort fields Primary, Secondary, Tetiary.'
+      helpkey     '*'
+   endparameter
+
+   parameter SORTDIR            # Sort directions.
+      position 4
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'Direction of sort for each field T for ascending.'
+      helpkey     '*'
+   endparameter
+
+endinterface

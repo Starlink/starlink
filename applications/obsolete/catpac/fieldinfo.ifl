@@ -1,0 +1,53 @@
+#+
+#  Name:
+#     FIELDINFO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface FIELDINFO
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     '*'
+   endparameter
+
+   parameter NAME                # Field Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Name of the Field. '
+      helpkey     '*'
+   endparameter
+
+   parameter INFREQ              # Information required
+      position    3
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Information required (UNITS,FORMAT,NULLVALUE,COMMENT). '
+      in          'UNITS','FORMAT','NULLVALUE','COMMENT'
+      helpkey     '*'
+   endparameter
+
+endinterface

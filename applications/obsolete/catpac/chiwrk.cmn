@@ -1,0 +1,146 @@
+*
+*  CHIWRK CHI working common block.
+*  This common block has two functions.
+*  1) It is the common block for the parser.
+*  2) It is the common block for the open catalogue information.
+*
+      integer Xsize           ! Number of elements in list
+      integer Xtype           ! Final type of expression
+      integer Xlist(CHI__MXITM)  ! Reverse Polish expression list
+      integer Xqual(CHI__MXITM)  ! Qualifiers for previous
+      integer Xrdsize         ! Number of relations
+      integer Xrdlist(CHI__MXRDS) ! Assoc relational descriptors
+      logical Xlval(CHI__MXCNS)  ! Logical constants
+      integer Xival(CHI__MXCNS)  ! Integer constants
+      real Xrval(CHI__MXCNS)     ! Real constants
+      double precision Xdval(CHI__MXCNS)! Dp constants
+      character*(chi__szcval) Xcval(CHI__MXCNS)
+*
+      common/cpcmn1/Xsize, Xtype, Xlist, Xqual,  
+     :                    Xrdsize, Xrdlist,
+     :                    Xlval, Xival, Xrval, Xdval, Xcval
+      save / cpcmn1 /
+*
+      character*(CHI__SZSTK) Xstring ! String constants
+      character*(CHI__SZEXP) Xname  ! Name of expression
+      character*(CHI__SZCUNIT) Xunit  ! Units of the expression
+      character*(CHI__SZCCMT) Xcomnt ! Comment on the expression
+*      
+      common/cpcmn2/Xname, Xunit, Xcomnt, Xstring
+      save / cpcmn2 /
+*   Common area to hold work space for expression parsing/evaluation
+*
+      integer Wlist(CHI__MXITM)         ! work stack
+      integer Wqual(CHI__MXITM)         ! qualifiers
+      integer Worigin(CHI__MXITM)       ! start position in input string
+      logical Wlval(CHI__MXCNS)         ! logical values
+      integer Wival(CHI__MXCNS)         ! integer values
+      real Wrval(CHI__MXCNS)            ! real values
+      double precision Wdval(CHI__MXCNS) ! double values
+      character*(chi__szcval) Wcval(CHI__MXCNS)
+      logical Wshomes
+*
+      common /ckcmn1/ Wdval, Wlist, Wqual, Worigin, 
+     :                      Wlval, Wival, Wrval, Wcval,
+     :                      Wshomes
+      save / ckcmn1 /
+*
+      character*(CHI__SZSTK) Wstring    ! string values
+*
+      common /ckcmn2/ Wstring
+      save / ckcmn2 /
+*  This common area include file contains the embedded function tables
+
+      character*(CHI__SZCNAME) ftions(CHI__MXFUN) ! Function names
+      integer                fsizes(CHI__MXFUN) ! Length of function names
+      integer                ftargs(CHI__MXFUN) ! Number of argumentsired
+      integer                fatype(CHI__MXFUN,CHI__MXITM) ! Data type of arguments
+      character*( 16 ) ftcons(CHI__MXFUN) ! Constraint
+      logical                ftflag(CHI__MXFUN) ! Flag for SLA functions
+      double precision       ftsave(CHI__MXFUN) ! Saved returned argument
+      character*(CHI__SZCCMT) fcomnt(CHI__MXFUN) ! Name of the result 
+      character*(CHI__SZCUNIT) funits(CHI__MXFUN) ! units of result
+      integer                fdtres(CHI__MXFUN) ! Data type of result
+
+      common/cncmn1/fsizes, ftargs, fatype, ftflag,
+     :                    ftsave, fdtres
+      save / cncmn1 /
+
+      common/cncmn2/ftions, ftcons, fcomnt, funits
+      save / cncmn2 /
+      integer Mxelem                    ! DELETE and RECOMPILE ENTIRE LIBRARY
+      integer Etype(CHI__MXELM)         ! Element type
+*      common /cm1/Mxelem,Efree,Ecd,Estart,Eend,Elen,Euexp,Efield,
+*     :                 Egelem,Egset,Enext_free,Enext,Etype,Entype,
+*     :                 Elock
+*      save / cm1 /
+
+      character*(CHI__SZCNAME) Ename(CHI__MXELM)      ! element name
+      character*(CHI__SZCFMT) Eformt(CHI__MXELM)     ! element format specifier
+      character*(CHI__SZCUNIT) Eunit(CHI__MXELM)      ! element units
+      character*( 16 ) Enull(CHI__MXELM)      ! element null value
+      character*(CHI__SZCCMT) Ecomnt(CHI__MXELM)     ! element comment
+      integer Enitems  ! Number of elements
+      common /cmcmn2/Ename,Eformt,Eunit,Enull,Ecomnt,Etype,
+     : Enitems
+      save / cmcmn2 /
+ 
+*  common area contains the the tables for the relational 
+*  sub-expressions 
+*
+      integer Rstart(CHI__MXREL)     ! Index of relation start
+      integer Rsplit(CHI__MXREL)     ! Index of relation split
+      integer Rend(CHI__MXREL)       ! Index of relation end
+      integer Rcons(CHI__MXREL)      ! Index of relational constant
+      integer Rtype(CHI__MXREL)      ! Type of relational constant
+      integer Rshape(CHI__MXREL)     ! Canonical shape of relation
+      integer Rnext_free             ! Next free descriptor
+*
+*      common/adcrel_cmn/Rfree, Rxd, Rstart, Rsplit, Rend, 
+*     :                  Rcons, Rtype, Rshape, Rnext_free
+      common/clcmn/Rstart, Rsplit, Rend, 
+     :                  Rcons, Rtype, Rshape, Rnext_free
+      save / clcmn /
+*
+*  common area contains the data read from the catalogue.
+*
+
+      INTEGER INTVALS ( CHI__NUMCOLS )
+      REAL REALVALS ( CHI__NUMCOLS )
+      DOUBLE PRECISION DOUBVALS ( CHI__NUMCOLS )
+      LOGICAL LOGVALS ( CHI__NUMCOLS )
+      CHARACTER * ( CHI__SZCVAL ) CHARVALS( CHI__NUMCOLS )
+      CHARACTER * ( 1 ) FLDTYPES( CHI__NUMCOLS )
+      LOGICAL NULLS ( CHI__NUMCOLS )
+      CHARACTER * ( CHI__SZEXP ) CUREXPRESS
+*
+      common/cacmn/intvals, realvals, doubvals, logvals, charvals, 
+     :                   fldtypes, nulls, curexpress
+      save / cacmn /
+*
+*  common area for the open catalogue information.
+*
+      integer chi__mxass
+ 
+      parameter (chi__mxass=99)
+
+      logical catsort(chi__mxass) !catalogue sorted on open.
+
+
+      integer numopencats       !Number of catalogues open.
+
+      character*(16) opacmode(chi__mxass)
+
+      character*(chi__szname) opcatnames(chi__mxass)
+      character*(3) opcatdbtyp(chi__mxass)
+      character*(132) opcatdir(chi__mxass)
+      integer opcatorigcd(chi__mxass) !Unique id to catalogue in the 
+                                 !system may be 
+                                !ids to description and data.
+
+      character*(3) database(chi__mxass) !3 character code for the database 
+                                         !from ADC (only ADC at the moment)
+*
+      common/cocmn/catsort,opcatorigcd,numopencats,database,
+     : opcatnames,opacmode,opcatdbtyp,opcatdir
+      save /cocmn/

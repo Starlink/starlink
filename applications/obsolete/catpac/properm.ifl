@@ -1,0 +1,135 @@
+#+
+#  Name:
+#     PROPERM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface PROPERM
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the output Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter RAEP0               # Name of the RA field in EP0 system
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RA'
+      prompt   'Name of the RA field at epoch 0'
+      helpkey  '*'
+   endparameter
+
+   parameter DECEP0              # Name of the DEC field at epoch 0
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DEC'
+      prompt   'Name of the DEC field at epoch 0'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPM                # Name of the RA proper motion field
+      position 5
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRA'
+      prompt   'Name of the RA proper motion field'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPM               # Name of the DEC proper motion field.
+      position 6
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDEC'
+      prompt   'Name of the DEC proper motion field'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLX               # Name of the parallax field.
+      position 7
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLX'
+      prompt   'Name of the parallax field'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVEL              # Name of the radial velocity field.
+      position 8
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVEL'
+      prompt   'Name of the radial velocity field'
+      helpkey  '*'
+   endparameter
+
+   parameter RAEP1               # Name of the RA field at epoch 1
+      position 9
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Name of the RA field at epoch 1'
+      helpkey  '*'
+   endparameter
+
+   parameter DECEP1              # Name of the DEC field in EP1 system
+      position 10
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Name of the DEC field at epoch 1'
+      helpkey  '*'
+   endparameter
+
+   parameter EP0                # Start Epoch.
+      position 11
+      type     _REAL
+      vpath    'PROMPT '
+      prompt   'Epoch from which to start proper motion correction'
+      helpkey  '*'
+   endparameter
+
+   parameter EP1                # End Epoch.
+      position 12
+      type     _REAL
+      vpath    'PROMPT '
+      prompt   'Epoch at which to end the proper motion correction'
+      helpkey  '*'
+   endparameter
+
+endinterface

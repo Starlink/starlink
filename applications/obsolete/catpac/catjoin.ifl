@@ -1,0 +1,61 @@
+#+
+#  Name:
+#     JOIN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface CATJOIN
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT1              # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL>CATPAC_INPUT '
+      prompt      'Name of the first Catalogue. '
+      help        '*'
+   endparameter
+
+   parameter INPUT2              # Catalogue Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'DEFAULT '
+      prompt      'Name of the second Catalogue. '
+      help        '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position    3
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      prompt      'Name of the catalogue to be created. '
+      help        '*'
+   endparameter
+
+   parameter EXPRESS             # Join expression.
+      position    4
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT'
+      prompt      'Logical expression of the join criteria.'
+      help        '*'
+   endparameter
+
+endinterface

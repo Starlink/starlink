@@ -1,0 +1,115 @@
+#+
+#  Name:
+#     UPPARAM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface UPPARAM
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME                # Name of the parameter
+      position 2
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMEFLG             # Name flag
+      position    3
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update parameter name.'
+      helpkey  '*'
+   endparameter
+
+   parameter NEWNAME             # New name for the parameter
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New name for the parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMFLG             # Format flag
+      position    5
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the parameter format.'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMAT              # Format of the new parameter
+      position 6
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New format of the parameter '
+      helpkey  '*'
+   endparameter
+
+   parameter VALFLG             # Value flag
+      position    7
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the parameter value.'
+      helpkey  '*'
+   endparameter
+
+   parameter VALUE               # New value of the parameter
+      position 8
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New value of the parameter'
+      helpkey  '*'
+   endparameter
+
+   parameter COMFLG             # Comment flag
+      position    9
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the parameter comment.'
+      helpkey  '*'
+   endparameter
+
+   parameter COMMENT             # New comment on the parameter.
+      position 10
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New comment associated with the parameter'
+      helpkey  '*'
+   endparameter
+
+
+endinterface

@@ -1,0 +1,934 @@
+*
+*    Description :
+*    Global constants for CHP
+*    The first part of the file defines the layout of the CHP
+*    additional information file.
+*    The second part includes the other CHP global constants.
+*
+******Start of the additional information file layout definitions *****
+*
+*    KEYWORD
+*
+      integer CHP_S_KEY			! Start of Keyword column
+      parameter(CHP_S_KEY=2)
+      integer CHP_E_KEY			! End of Keyword column
+      parameter(CHP_E_KEY=2)
+      integer CHP__SZKEY                ! Size of the keyword column
+      parameter(CHP__SZKEY= CHP_E_KEY - CHP_S_KEY + 1 )
+*
+*    Keyword is 'A' this is additional column information
+*
+*    Column name
+*
+      integer CHP_S_CNAME		! Start of column name. 
+      parameter(CHP_S_CNAME=4)
+      integer CHP_E_CNAME               ! End of column name.
+      parameter(CHP_E_CNAME=20)
+      integer CHP__SZCNAME              ! Maximum size of a Column name
+      parameter(CHP__SZCNAME=17)
+*
+*    Column Delete Indicator
+*
+      integer CHP_S_CDELIND             ! Start of Delete Indicator
+      parameter(CHP_S_CDELIND=22)
+      integer CHP_E_CDELIND		! End of Delete Indicator
+      parameter(CHP_E_CDELIND=22)
+      integer CHP__SZCDELIND            ! Max size of the Delete Ind
+      parameter(CHP__SZCDELIND=1)
+*
+*    Column Preferred Display
+*
+      integer CHP_S_CPREFD              ! Start of the column pref disp
+      parameter (CHP_S_CPREFD=24)        
+      integer CHP_E_CPREFD              ! End of the column pref disp.
+      parameter (CHP_E_CPREFD=24)
+      integer CHP__SZCPREFD             ! Max size of the Pref disp
+      parameter(CHP__SZCPREFD=1)
+*
+*    Column designation.
+*
+      integer CHP_S_CCOLDES          ! Start of column structure flag
+      parameter (CHP_S_CCOLDES=26)        
+      integer CHP_E_CCOLDES          ! End of column structure flag 
+      parameter (CHP_E_CCOLDES=26)
+      integer CHP__SZCCOLDES            ! Max size of the tructure flag
+      parameter(CHP__SZCCOLDES=1)
+*
+*    Column Assert Flag.
+*
+      integer CHP_S_CASSERT           ! Start of column assert flag.
+      parameter (CHP_S_CASSERT=28)        
+      integer CHP_E_CASSERT           ! End of column assert flag
+      parameter (CHP_E_CASSERT=28)
+      integer CHP__SZCASS             ! Max size of the assert flag
+      parameter(CHP__SZCASS=1)
+*
+*    Column Domain Checking Flag.
+*
+      integer CHP_S_CDCHK             ! Start of column domain chk flg
+      parameter (CHP_S_CDCHK=30)        
+      integer CHP_E_CDCHK             ! End of column domain chk flg.
+      parameter (CHP_E_CDCHK=30)
+      integer CHP__SZCDCHK            ! Max size of the domian flag.
+      parameter(CHP__SZCDCHK=1)
+*
+*    Column Array Shape.
+*
+      integer CHP_S_CARRSHP           ! Start of column array shape.
+      parameter (CHP_S_CARRSHP=32)        
+      integer CHP_E_CARRSHP           ! End of column array shape
+      parameter (CHP_E_CARRSHP=36)
+      integer CHP__SZCARRSHP          ! Max size of the array shape.
+      parameter(CHP__SZCARRSHP=5)
+*
+*    Column Last Modified Date.
+*
+      integer CHP_S_CLMD              ! Start of column last modified.
+      parameter (CHP_S_CLMD=38)        
+      integer CHP_E_CLMD              ! End of column last modified.
+      parameter (CHP_E_CLMD=47)
+      integer CHP__SZCLMD             ! Max size of last modified date.
+      parameter(CHP__SZCLMD=10)
+*
+*    Non standard format flag.
+*
+      integer CHP_S_CNSFLAG		! Start of non standard format flag
+      parameter(CHP_S_CNSFLAG=53)
+      integer CHP_E_CNSFLAG		! End of non standard format flag
+      parameter(CHP_E_CNSFLAG=53)
+      integer CHP__SZCNSFLAG            ! Maximum size of non standard flag
+      parameter(CHP__SZCNSFLAG=1)
+*
+*    Non standard format.
+*
+      integer CHP_S_CNSFMAT		! Start of non standard format.
+      parameter(CHP_S_CNSFMAT=55)
+      integer CHP_E_CNSFMAT		! End of non standard format
+      parameter(CHP_E_CNSFMAT=66)
+      integer CHP__SZCNSFMAT            ! Maximum size of non standard format.
+      parameter(CHP__SZCNSFMAT=12)
+*
+*    Column array type (fixed or variable)
+*
+      integer CHP_S_CARRTYP		! Start of array type.
+      parameter(CHP_S_CARRTYP=72)
+      integer CHP_E_CARRTYP		! End of array type
+      parameter(CHP_E_CARRTYP=72)
+      integer CHP__SZCARRTYP          ! Maximum size of array type.
+      parameter(CHP__SZCARRTYP=1)
+*
+*    Column hidden flag (true if CHI column is hidden at CHP)
+*
+      integer CHP_S_CHIDDEN		! Start of hidden flag.
+      parameter(CHP_S_CHIDDEN=76)
+      integer CHP_E_CHIDDEN		! End of hidden flag.
+      parameter(CHP_E_CHIDDEN=76)
+      integer CHP__SZCHIDDEN          ! Maximum size of hidden flag.
+      parameter(CHP__SZCHIDDEN=1)
+*
+*    Keyword is 'B' this is additional column information array
+*    dimensions
+*
+*    Column name
+*
+*     integer CHP_S_CNAME		! Start of column name. 
+*     parameter(CHP_S_CNAME=4)
+*     integer CHP_E_CNAME               ! End of column name.
+*     parameter(CHP_E_CNAME=20)
+*     integer CHP__SZCNAME              ! Maximum size of a Column name
+*     parameter(CHP__SZCNAME=17)
+*
+*    First array dimension.
+*
+      integer CHP_S_CDIM1               ! Start of first array dimension
+      parameter(CHP_S_CDIM1=22)
+      integer CHP_E_CDIM1		! End of first array dimension
+      parameter(CHP_E_CDIM1=31)
+      integer CHP__SZCDIM1              ! Max size of the first array
+      parameter(CHP__SZCDIM1=10)
+*
+*    Second array dimension.
+*
+      integer CHP_S_CDIM2               ! Start of second array dimension
+      parameter(CHP_S_CDIM2=33)
+      integer CHP_E_CDIM2		! End of second array dimension
+      parameter(CHP_E_CDIM2=42)
+      integer CHP__SZCDIM2              ! Max size of the second array
+      parameter(CHP__SZCDIM2=10)
+*
+*    Third array dimension.
+*
+      integer CHP_S_CDIM3               ! Start of third array dimension
+      parameter(CHP_S_CDIM3=44)
+      integer CHP_E_CDIM3		! End of third array dimension
+      parameter(CHP_E_CDIM3=53)
+      integer CHP__SZCDIM3              ! Max size of the third array
+      parameter(CHP__SZCDIM3=10)
+*
+*    Forth array dimension.
+*
+      integer CHP_S_CDIM4               ! Start of forth array dimension
+      parameter(CHP_S_CDIM4=55)
+      integer CHP_E_CDIM4		! End of forth array dimension
+      parameter(CHP_E_CDIM4=64)
+      integer CHP__SZCDIM4              ! Max size of the forth dimension.
+      parameter(CHP__SZCDIM4=10)
+*
+*    Fifth array dimension.
+*
+      integer CHP_S_CDIM5               ! Start of fifth array dimension
+      parameter(CHP_S_CDIM5=66)
+      integer CHP_E_CDIM5		! End of fifth array dimension
+      parameter(CHP_E_CDIM5=75)
+      integer CHP__SZCDIM5              ! Max size of the fifth dimension.
+      parameter(CHP__SZCDIM5=10)
+*
+*    Sixth array dimension.
+*
+      integer CHP_S_CDIM6               ! Start of sixth array dimension
+      parameter(CHP_S_CDIM6=77)
+      integer CHP_E_CDIM6		! End of sixth array dimension
+      parameter(CHP_E_CDIM6=86)
+      integer CHP__SZCDIM6              ! Max size of the sixth dimension
+      parameter(CHP__SZCDIM6=10)
+*
+*    Seventh array dimension.
+*
+      integer CHP_S_CDIM7               ! Start of seventh array dimension
+      parameter(CHP_S_CDIM7=88)
+      integer CHP_E_CDIM7		! End of sevsnth array dimension
+      parameter(CHP_E_CDIM7=97)
+      integer CHP__SZCDIM7              ! Max size of the seventh dimension
+      parameter(CHP__SZCDIM7=10)
+*
+*    Keyword is 'C' this is additional column information assert
+*    expression information
+*
+*    Column name
+*
+*     integer CHP_S_CNAME		! Start of column name. 
+*     parameter(CHP_S_CNAME=4)
+*     integer CHP_E_CNAME               ! End of column name.
+*     parameter(CHP_E_CNAME=20)
+*     integer CHP__SZCNAME              ! Maximum size of a Column name
+*     parameter(CHP__SZCNAME=17)
+*
+*    Continuation number.
+*
+      integer CHP_S_CEXPCON             ! Start of continuation number.
+      parameter(CHP_S_CEXPCON=22)
+      integer CHP_E_CEXPCON       	! End of continuation number.
+      parameter(CHP_E_CEXPCON=22)
+      integer CHP__SZCEXPCON              ! Max size of the continuation
+      parameter(CHP__SZCEXPCON=1)
+*
+*    Expression part.
+*
+      integer CHP_S_CASSEXP             ! Start of assert expression
+      parameter(CHP_S_CASSEXP=24)
+      integer CHP_E_CASSEXP	 	! End of assert expression.
+      parameter(CHP_E_CASSEXP=123)
+      integer CHP__SZCASSEXP            ! Max size of assert expression
+      parameter(CHP__SZCASSEXP=100)
+*
+*    Keyword is 'D' this is additional column information virtual
+*    column expression information
+*
+*    Column name
+*
+*     integer CHP_S_CNAME		! Start of column name. 
+*     parameter(CHP_S_CNAME=4)
+*     integer CHP_E_CNAME               ! End of column name.
+*     parameter(CHP_E_CNAME=20)
+*     integer CHP__SZCNAME              ! Maximum size of a Column name
+*     parameter(CHP__SZCNAME=17)
+*
+*    Continuation number.
+*
+*     integer CHP_S_CEXPCON             ! Start of continuation number.
+*     parameter(CHP_S_CEXPCON=22)
+*     integer CHP_E_CEXPCON       	! End of continuation number.
+*     parameter(CHP_E_CEXPCON=22)
+*     integer CHP__SZCEXPCON              ! Max size of the continuation
+*     parameter(CHP__SZCEXPCON=1)
+*
+*    Expression part.
+*
+*     integer CHP_S_CASSEXP             ! Start of assert expression
+*     parameter(CHP_S_CASSEXP=24)
+*     integer CHP_E_CASSEXP	 	! End of assert expression.
+*     parameter(CHP_E_CASSEXP=123)
+      integer CHP__SZVCEXP            ! Max size of assert expression
+      parameter(CHP__SZVCEXP=100)
+*
+*    Keyword is 'E' this is additional information for 
+*    virtual columns.
+*
+*
+*    Column name
+*
+*     integer CHP_S_CNAME		! Start of column name. 
+*     parameter(CHP_S_CNAME=4)
+*     integer CHP_E_CNAME               ! End of column name.
+*     parameter(CHP_E_CNAME=20)
+*     integer CHP__SZCNAME              ! Maximum size of a Column name
+*     parameter(CHP__SZCNAME=17)
+*
+*    Column unit
+*
+      integer CHP_S_CUNIT		! Start of Unit
+      parameter(CHP_S_CUNIT=22)
+      integer CHP_E_CUNIT		! End of Unit 
+      parameter(CHP_E_CUNIT=31)
+      integer CHP__SZCUNIT              ! Maximum size of the units
+      parameter(CHP__SZCUNIT=10)
+*
+*    Column format
+*
+      integer CHP_S_CFMT               ! Start of the column format
+      parameter (CHP_S_CFMT=33)        
+      integer CHP_E_CFMT               ! End of the column format 
+      parameter (CHP_E_CFMT=43)
+      integer CHP__SZCFMT               ! Maximum size of the colum format
+      parameter(CHP__SZCFMT=11)
+*
+*
+*    Column type
+*
+      integer CHP_S_CTYPE              ! Start of the column type
+      parameter (CHP_S_CTYPE=44)        
+      integer CHP_E_CTYPE              ! End of the column type 
+      parameter (CHP_E_CTYPE=44)
+      integer CHP__SZCTYPE             ! Maximum size of the colum type
+      parameter(CHP__SZCTYPE=1)
+*
+*   Column comment
+*
+      integer CHP_S_CCMT		! Start of parameter Comment 
+      parameter(CHP_S_CCMT=81)
+      integer CHP_E_CCMT		! End of parameter Comment 
+      parameter(CHP_E_CCMT=130)
+      integer CHP__SZCCMT	        ! Maximum size of the parameter comment
+      parameter(CHP__SZCCMT=50)
+*
+*   Column Constants
+*
+      integer CHP__NUMCOLS		! Maximum number of columns
+      parameter(CHP__NUMCOLS=128)
+*
+*    Keyword is 'F' this is parameter information
+*
+*    Parameter name
+*
+      integer CHP_S_PNAME	! Start of parameter name. 
+      parameter(CHP_S_PNAME=4)
+      integer CHP_E_PNAME	! End of parameter name.
+      parameter(CHP_E_PNAME=20)
+      integer CHP__SZPNAME              ! Maximum size of a Parameter name
+      parameter(CHP__SZPNAME=17)
+*
+*    Parameter unit
+*
+      integer CHP_S_PUNIT		! Start of Unit column
+      parameter(CHP_S_PUNIT=22)
+      integer CHP_E_PUNIT		! End of Unit column
+      parameter(CHP_E_PUNIT=31)
+      integer CHP__SZPUNIT              ! Maximum size of the units of a param
+      parameter(CHP__SZPUNIT=10)
+*
+*    Parameter format
+*
+      integer CHP_S_PFMT               ! Start of the parameter format
+      parameter (CHP_S_PFMT=33)        
+      integer CHP_E_PFMT               ! End of the parameter format 
+      parameter (CHP_E_PFMT=42)
+      integer CHP__SZPFMT               ! Maximum size of the Parameter format
+      parameter(CHP__SZPFMT=10)
+*
+*   Parameter value
+*
+      integer CHP_S_PVAL		! Start of parameter value.
+      parameter(CHP_S_PVAL=44)
+      integer CHP_E_PVAL 		! End of parameter value.
+      parameter(CHP_E_PVAL=60)
+      integer CHP__SZPVAL               ! Maximum size of the value of a Param
+      parameter(CHP__SZPVAL=17)
+*
+*   Parameter pointer value
+*
+      integer CHP_S_PPTR		! Start of parameter pointer value.
+      parameter(CHP_S_PPTR=62)
+      integer CHP_E_PPTR 		! End of parameter pointer value.
+      parameter(CHP_E_PPTR=71)
+      integer CHP__SZPPTR               ! Maximum size of the pointer of a Param
+      parameter(CHP__SZPPTR=10)
+*
+*   Parameter comment
+*
+      integer CHP_S_PCMT		! Start of parameter Comment 
+      parameter(CHP_S_PCMT=81)
+      integer CHP_E_PCMT		! End of parameter Comment 
+      parameter(CHP_E_PCMT=130)
+      integer CHP__SZPCMT	        ! Maximum size of the parameter comment
+      parameter(CHP__SZPCMT=50)
+*
+*    Keyword is 'G' this is parameter information
+*
+*    Parameter data access flag.
+*
+*    Parameter name
+*
+*     integer CHP_S_PNAME	! Start of parameter name. 
+*     parameter(CHP_S_PNAME=4)
+*     integer CHP_E_PNAME	! End of parameter name.
+*     parameter(CHP_E_PNAME=20)
+*     integer CHP__SZPNAME              ! Maximum size of a Parameter name
+*     parameter(CHP__SZPNAME=17)
+*
+      integer CHP_S_PDACC		! Start of data access flag.
+      parameter(CHP_S_PDACC=22)
+      integer CHP_E_PDACC		! End of data access flag
+      parameter(CHP_E_PDACC=22)
+      integer CHP__SZPDACC          ! Maximum size of data access flag
+      parameter(CHP__SZPDACC=1)
+*
+*    Parameter Last Modified Date.
+*
+      integer CHP_S_PLMD              ! Start of parameter last modified.
+      parameter (CHP_S_PLMD=24)        
+      integer CHP_E_PLMD              ! End of parameter last modified.
+      parameter (CHP_E_PLMD=33)
+      integer CHP__SZPLMD             ! Max size of last modified date.
+      parameter(CHP__SZPLMD=10)
+*
+*    Parameter Delete Indicator
+*
+      integer CHP_S_PDELIND             ! Start of Delete Indicator
+      parameter(CHP_S_PDELIND=35)
+      integer CHP_E_PDELIND		! End of Delete Indicator
+      parameter(CHP_E_PDELIND=35)
+      integer CHP__SZPDELIND            ! Max size of the Delete Ind
+      parameter(CHP__SZPDELIND=1)
+*
+*    Parameter Preferred Display
+*
+      integer CHP_S_PPREFD              ! Start of the parameter pref disp
+      parameter (CHP_S_PPREFD=37)        
+      integer CHP_E_PPREFD              ! End of the parameter pref disp.
+      parameter (CHP_E_PPREFD=37)
+      integer CHP__SZPPREFD             ! Max size of the Pref disp
+      parameter(CHP__SZPPREFD=1)
+*
+*    Parameter Array Shape.
+*
+      integer CHP_S_PARRSHP           ! Start of parameter array shape.
+      parameter (CHP_S_PARRSHP=39)        
+      integer CHP_E_PARRSHP           ! End of parameter array shape
+      parameter (CHP_E_PARRSHP=44)
+      integer CHP__SZPARRSHP          ! Max size of the array shape.
+      parameter(CHP__SZPARRSHP=5)
+*
+*    Parameter Structure Flag
+*
+      integer CHP_S_PPARDES          ! Start of parameter structure flag
+      parameter (CHP_S_PPARDES=46)        
+      integer CHP_E_PPARDES          ! End of parameter structure flag 
+      parameter (CHP_E_PPARDES=46)
+      integer CHP__SZPPARDES            ! Max size of the tructure flag
+*
+*    Non standard format flag.
+*
+      integer CHP_S_PNSFLAG		! Start of non standard format flag
+      parameter(CHP_S_PNSFLAG=53)
+      integer CHP_E_PNSFLAG		! End of non standard format flag
+      parameter(CHP_E_PNSFLAG=53)
+      integer CHP__SZPNSFLAG            ! Maximum size of non standard flag
+      parameter(CHP__SZPNSFLAG=1)
+*
+*    Non standard format.
+*
+      integer CHP_S_PNSFMAT		! Start of non standard format.
+      parameter(CHP_S_PNSFMAT=55)
+      integer CHP_E_PNSFMAT		! End of non standard format
+      parameter(CHP_E_PNSFMAT=66)
+      integer CHP__SZPNSFMAT            ! Maximum size of non standard format.
+      parameter(CHP__SZPNSFMAT=12)
+*
+*    Keyword is 'H' this is additional parameter information array
+*    dimensions
+*
+*    Parameter name
+*
+*     integer CHP_S_PNAME		! Start of parameter name. 
+*     parameter(CHP_S_PNAME=4)
+*     integer CHP_E_PNAME               ! End of parameter name.
+*     parameter(CHP_E_PNAME=20)
+*     integer CHP__SZPNAME              ! Maximum size of a parameter name
+*     parameter(CHP__SZPNAME=17)
+*
+*    First array dimension.
+*
+      integer CHP_S_PDIM1               ! Start of first array dimension
+      parameter(CHP_S_PDIM1=22)
+      integer CHP_E_PDIM1		! End of first array dimension
+      parameter(CHP_E_PDIM1=31)
+      integer CHP__SZPDIM1              ! Max size of the first array
+      parameter(CHP__SZPDIM1=10)
+*
+*    Second array dimension.
+*
+      integer CHP_S_PDIM2               ! Start of second array dimension
+      parameter(CHP_S_PDIM2=33)
+      integer CHP_E_PDIM2		! End of second array dimension
+      parameter(CHP_E_PDIM2=42)
+      integer CHP__SZPDIM2              ! Max size of the second array
+      parameter(CHP__SZPDIM2=10)
+*
+*    Third array dimension.
+*
+      integer CHP_S_PDIM3               ! Start of third array dimension
+      parameter(CHP_S_PDIM3=44)
+      integer CHP_E_PDIM3		! End of third array dimension
+      parameter(CHP_E_PDIM3=53)
+      integer CHP__SZPDIM3              ! Max size of the third array
+      parameter(CHP__SZPDIM3=10)
+*
+*    Forth array dimension.
+*
+      integer CHP_S_PDIM4               ! Start of fourth array dimension
+      parameter(CHP_S_PDIM4=55)
+      integer CHP_E_PDIM4		! End of fourth array dimension
+      parameter(CHP_E_PDIM4=64)
+      integer CHP__SZPDIM4              ! Max size of the fourth dimension
+      parameter(CHP__SZPDIM4=10)
+*
+*    Fifth array dimension.
+*
+      integer CHP_S_PDIM5               ! Start of fifth array dimension
+      parameter(CHP_S_PDIM5=66)
+      integer CHP_E_PDIM5		! End of fifth array dimension
+      parameter(CHP_E_PDIM5=75)
+      integer CHP__SZPDIM5              ! Max size of the fifth dimension
+      parameter(CHP__SZPDIM5=10)
+*
+*    Sixth array dimension.
+*
+      integer CHP_S_PDIM6               ! Start of sixth array dimension
+      parameter(CHP_S_PDIM6=77)
+      integer CHP_E_PDIM6		! End of sixth array dimension
+      parameter(CHP_E_PDIM6=86)
+      integer CHP__SZPDIM6              ! Max size of the sixth dimension.
+      parameter(CHP__SZPDIM6=10)
+*
+*    Seventh array dimension.
+*
+      integer CHP_S_PDIM7               ! Start of seventh array dimension
+      parameter(CHP_S_PDIM7=88)
+      integer CHP_E_PDIM7		! End of seventh array dimension
+      parameter(CHP_E_PDIM7=97)
+      integer CHP__SZPDIM7              ! Max size of the seventh dimension.
+      parameter(CHP__SZPDIM7=10)
+*
+*   Parameter Constants
+*
+      integer CHP__NUMPARS		! Maximum number of parameters
+      parameter(CHP__NUMPARS=64)
+*
+      integer CHP__SZDREC		!
+      parameter(CHP__SZDREC = 132)
+*
+*
+*   Catalogue Information
+*
+*    Keyword is 'I' this is catnotes file name.
+*
+*   Catnotes file name
+*
+      integer CHP_S_CATN		! Start of catnote filename
+      parameter(CHP_S_CATN=4)
+      integer CHP_E_CATN		! End of catnote filename
+      parameter(CHP_E_CATN=84)
+      integer CHI__SZCATN               ! Size of the catnote filename
+      parameter(CHI__SZCATN=80)
+*
+*    Keyword is 'J' this is available.
+*
+*    Keyword is 'K' this is available.
+*
+*
+*    Keyword is 'L' this is N-dimension information.
+*
+*   N-Dimension index columns
+*
+*   Number of dimension
+*
+      integer CHP_S_NUMDIM          ! Start of the number of dimensions
+      parameter (CHP_S_NUMDIM=4)
+      integer CHP_E_NUMDIM          ! End of the number of dimensions
+      parameter (CHP_E_NUMDIM=4)
+      integer CHP__SZNUMDIM         ! Size of the number of dimensions.
+      parameter (CHP__SZNUMDIM=1)
+*
+*
+*   First column name
+*
+      integer CHP_S_1ICOL           ! Start of the first index column
+      parameter (CHP_S_1ICOL=6)
+      integer CHP_E_1ICOL           ! End of the first index column
+      parameter (CHP_E_1ICOL=22)
+      integer CHP__SZ1ICOL          ! Size of the first index column
+      parameter (CHP__SZ1ICOL=17)
+*
+*   Second column name
+*
+      integer CHP_S_2ICOL           ! Start of the second index column
+      parameter (CHP_S_2ICOL=23)
+      integer CHP_E_2ICOL           ! End of the second index column
+      parameter (CHP_E_2ICOL=39)
+      integer CHP__SZ2ICOL          ! Size of the second index column
+      parameter (CHP__SZ2ICOL=17)
+*
+*   Third column name
+*
+      integer CHP_S_3ICOL           ! Start of the third index column
+      parameter (CHP_S_3ICOL=41)
+      integer CHP_E_3ICOL           ! End of the third index column
+      parameter (CHP_E_3ICOL=57)
+      integer CHP__SZ3ICOL          ! Size of the third index column
+      parameter (CHP__SZ3ICOL=17)
+*
+*   Third column name
+*
+      integer CHP_S_4ICOL           ! Start of the third index column
+      parameter (CHP_S_4ICOL=41)
+      integer CHP_E_4ICOL           ! End of the third index column
+      parameter (CHP_E_4ICOL=57)
+      integer CHP__SZ4ICOL          ! Size of the third index column
+      parameter (CHP__SZ4ICOL=17)
+*
+*   Third column name
+*
+      integer CHP_S_5ICOL           ! Start of the third index column
+      parameter (CHP_S_5ICOL=41)
+      integer CHP_E_5ICOL           ! End of the third index column
+      parameter (CHP_E_5ICOL=57)
+      integer CHP__SZ5ICOL          ! Size of the third index column
+      parameter (CHP__SZ5ICOL=17)
+*
+*   Third column name
+*
+      integer CHP_S_6ICOL           ! Start of the third index column
+      parameter (CHP_S_6ICOL=41)
+      integer CHP_E_6ICOL           ! End of the third index column
+      parameter (CHP_E_6ICOL=57)
+      integer CHP__SZ6ICOL          ! Size of the third index column
+      parameter (CHP__SZ6ICOL=17)
+*
+*   Third column name
+*
+      integer CHP_S_7ICOL           ! Start of the third index column
+      parameter (CHP_S_7ICOL=41)
+      integer CHP_E_7ICOL           ! End of the third index column
+      parameter (CHP_E_7ICOL=57)
+      integer CHP__SZ7ICOL          ! Size of the third index column
+      parameter (CHP__SZ7ICOL=17)
+*
+*    Index Last Modified Date.
+*
+      integer CHP_S_ILMD              ! Start of index last modified.
+      parameter (CHP_S_ILMD=59)        
+      integer CHP_E_ILMD              ! End of index last modified.
+      parameter (CHP_E_ILMD=68)
+      integer CHP__SZILMD             ! Max size of last modified date.
+      parameter(CHP__SZILMD=10)
+*
+*    Keyword is 'M' this is default sort order.
+*
+*   Number of sort columns
+*
+      integer CHP_S_NSORT        ! Start of the number of sort columns
+      parameter (CHP_S_NSORT=4)
+      integer CHP_E_NSORT        ! End of the number of sort columns.
+      parameter (CHP_E_NSORT=4)
+      integer CHP__SZNSORT       ! Size of the number of sort columns.
+      parameter (CHP__SZNSORT=1)
+*
+*   First Default Sort column
+*
+      integer CHP_S_FDSCOL		! Start of sort primary column
+      parameter(CHP_S_FDSCOL=6)
+      integer CHP_E_FDSCOL		! End of sort primay column
+      parameter(CHP_E_FDSCOL=23)
+      integer CHP__SZFDSCOL               ! Size of the sort primary column
+      parameter(CHP__SZFDSCOL=17)
+*
+*   First Default Sort Direction
+*
+      integer CHP_S_FDSDIR               ! Start of the primary sort
+      parameter(CHP_S_FDSDIR=25)
+      integer CHP_E_FDSDIR		! End of sort primay direction
+      parameter(CHP_E_FDSDIR=34)
+      integer CHP__SZFDSDIR               ! Size of the sort primary direction
+      parameter(CHP__SZFDSDIR= 10 )
+*
+*   Second Default Sort column
+*
+      integer CHP_S_SDSCOL		! Start of sort secondary column
+      parameter(CHP_S_SDSCOL=36)
+      integer CHP_E_SDSCOL		! End of sort secondary column
+      parameter(CHP_E_SDSCOL=43)
+      integer CHP__SZSDSCOL               ! Size of the sort secondary column
+      parameter(CHP__SZSDSCOL= 17 )
+*
+*   Second Default Sort direction
+*
+      integer CHP_S_SDSDIR		! Start of sort secondary direction.
+      parameter(CHP_S_SDSDIR=45)
+      integer CHP_E_SDSDIR		! End of sort secondary direction
+      parameter(CHP_E_SDSDIR=54)
+      integer CHP__SZSDSDIR               ! Size of the sort secondary direction
+      parameter(CHP__SZSDSDIR= 10)
+*
+*   Third Default Sort column
+*
+      integer CHP_S_TDSCOL		! Start of sort tertiary column
+      parameter(CHP_S_TDSCOL=56)
+      integer CHP_E_TDSCOL		! End of sort tertiary column
+      parameter(CHP_E_TDSCOL=73)
+      integer CHP__SZTDSCOL               ! Size of the sort tertiary column
+      parameter(CHP__SZTDSCOL= 17)
+*
+*
+*   Tertiary Sort direction
+*
+      integer CHP_S_TDSDIR		! Start of sort tertiary direction
+      parameter(CHP_S_TDSDIR=75)
+      integer CHP_E_TDSDIR		! End of sort tertiary direction
+      parameter(CHP_E_TDSDIR=84)
+      integer CHP__SZTDSDIR               ! Size of the sort tertiary direction
+      parameter(CHP__SZTDSDIR= 10)
+*
+*    Sort Default Last Modified Date.
+*
+      integer CHP_S_DSLMD              ! Start of index last modified.
+      parameter (CHP_S_DSLMD=59)        
+      integer CHP_E_DSLMD              ! End of index last modified.
+      parameter (CHP_E_DSLMD=68)
+      integer CHP__SZDSLMD             ! Max size of last modified date.
+      parameter(CHP__SZDSLMD=10)
+*
+*
+*    Keyword is 'N' this is the alternative sort orders.
+*
+*   Number of sort fileds
+*
+*     integer CHP_S_NSORT        ! Start of the number of sort columns
+*     parameter (CHP_S_NSORT=4)
+*     integer CHP_E_NSORT        ! End of the number of sort columns.
+*     parameter (CHP_E_NSORT=4)
+*     integer CHP__SZNSORT       ! Size of the number of sort columns.
+*     parameter (CHP__SZNSORT=1)
+*
+*   Primary Sort column
+*
+*     integer CHP_S_SPCOL		! Start of sort primary column
+*     parameter(CHP_S_SPCOL=6)
+*     integer CHP_E_SPCOL		! End of sort primay column
+*     parameter(CHP_E_SPFLD=23)
+*     integer CHP__SZPCOL               ! Size of the sort primary column
+*     parameter(CHP__SZPCOL=17)
+*
+*   Primary Sort Direction
+*
+*     integer CHP_S_SPDIR               ! Start of the primary sort
+*     parameter(CHP_S_SPDIR=25)
+*     integer CHP_E_SPDIR		! End of sort primay direction
+*     parameter(CHP_E_SPDIR=34)
+*     integer CHP__SZPDIR               ! Size of the sort primary direction
+*     parameter(CHP__SZPDIR= 10 )
+*
+*   Secondary Sort column
+*
+*     integer CHP_S_SSCOL		! Start of sort secondary column
+*     parameter(CHP_S_SSCOL=36)
+*     integer CHP_E_SSCOL		! End of sort secondary column
+*     parameter(CHP_E_SSCOL=43)
+*     integer CHP__SZSCOL               ! Size of the sort secondary column
+*     parameter(CHP__SZSCOL= 17 )
+*
+*   Secondary Sort direction
+*
+*     integer CHP_S_SSDIR		! Start of sort secondary direction.
+*     parameter(CHP_S_SSDIR=45)
+*     integer CHP_E_SSDIR		! End of sort secondary direction
+*     parameter(CHP_E_SSDIR=54)
+*     integer CHP__SZSDIR               ! Size of the sort secondary direction
+*     parameter(CHP__SZSDIR= 10)
+*
+*   Tertiary Sort column
+*
+*     integer CHP_S_STCOL		! Start of sort tertiary column
+*     parameter(CHP_S_STCOL=56)
+*     integer CHP_E_STCOL		! End of sort tertiary column
+*     parameter(CHP_E_STCOL=73)
+*     integer CHP__SZTCOL               ! Size of the sort tertiary column
+*     parameter(CHP__SZTCOL= 17)
+*
+*
+*   Tertiary Sort direction
+*
+*     integer CHP_S_STDIR		! Start of sort tertiary direction
+*     parameter(CHP_S_STDIR=75)
+*     integer CHP_E_STDIR		! End of sort tertiary direction
+*     parameter(CHP_E_STDIR=84)
+*     integer CHP__SZTDIR               ! Size of the sort tertiary direction
+*     parameter(CHP__SZTDIR= 10)
+*
+*    Sort Default Last Modified Date.
+*
+*     integer CHP_S_SDILMD              ! Start of index last modified.
+*     parameter (CHP_S_SDILMD=59)        
+*     integer CHP_E_SDILMD              ! End of index last modified.
+*     parameter (CHP_E_SDILMD=68)
+*     integer CHP__SZSDILMD             ! Max size of last modified date.
+*     parameter(CHP__SZSDILMD=10)
+*
+*    Keyword is 'O' this is general catalogue information
+*
+*    Catalogue name
+*
+*     integer CHP_S_CATNAME		! Start of catalogue name. 
+*     parameter(CHP_S_CATNAME=4)
+*     integer CHP_E_CATNAME               ! End of catalogue name.
+*     parameter(CHP_E_CATNAME=20)
+*     integer CHP__SZNAME              ! Maximum size of a Catalogue name
+*     parameter(CHP__SZNAME=17)
+*
+*    Extension Catalogue Flag
+*
+      integer CHP_S_CATNUMEXT            ! Start of Extension flag
+      parameter(CHP_S_CATNUMEXT=22)
+      integer CHP_E_CATNUMEXT		! End of extension flag
+      parameter(CHP_E_CATNUMEXT=22)
+      integer CHP__SZCATNUMEXT           ! Max size of the extension flag
+      parameter(CHP__SZCATNUMEXT=1)
+*
+*    Extension Catalogue Type
+*
+      integer CHP_S_CATEXTTYPE            ! Start of Extension type
+      parameter(CHP_S_CATEXTTYPE=24)
+      integer CHP_E_CATEXTTYPE		  ! End of extension type
+      parameter(CHP_E_CATEXTTYPE=24)
+      integer CHP__SZCATEXTTYPE           ! Max size of the extension ty
+      parameter(CHP__SZCATEXTTYPE=1)
+*
+*    Name of the original catalogues if this is an extension.
+*
+      integer CHP_S_CATFONAME           ! Start of the first original cat
+      parameter (CHP_S_CATFONAME=26)        
+      integer CHP_E_CATFONAME           ! Start of the first original cat
+      parameter (CHP_E_CATFONAME=42)
+      integer CHP__SZCATFONAME          ! Max size of first orig cat name.
+      parameter(CHP__SZCATFONAME=17)
+*
+*
+      integer CHP_S_CATSONAME           ! Start of the second original cat
+      parameter (CHP_S_CATSONAME=44)        
+      integer CHP_E_CATSONAME           ! Start of the second original cat
+      parameter (CHP_E_CATSONAME=60)
+      integer CHP__SZCATSONAME          ! Max size of second orig cat name.
+      parameter(CHP__SZCATSONAME=17)
+*
+*
+      integer CHP_S_CATTONAME           ! Start of the third original cat
+      parameter (CHP_S_CATTONAME=62)        
+      integer CHP_E_CATTONAME           ! Start of the third original cat
+      parameter (CHP_E_CATTONAME=78)
+      integer CHP__SZCATTONAME          ! Max size of third orig cat name.
+      parameter(CHP__SZCATTONAME=17)
+*
+*
+*
+*    Keyword is 'P' this is general catalogue information
+*
+*    Catalogue name
+*
+      integer CHP_S_CATNAME		! Start of catalogue name. 
+      parameter(CHP_S_CATNAME=4)
+      integer CHP_E_CATNAME               ! End of catalogue name.
+      parameter(CHP_E_CATNAME=20)
+      integer CHP__SZNAME              ! Maximum size of a Catalogue name
+      parameter(CHP__SZNAME=17)
+*
+*    Extension Catalogue Flag
+*
+*     integer CHP_S_CATEXTF            ! Start of Extension flag
+*     parameter(CHP_S_CATEXTF=22)
+*     integer CHP_E_CATEXTF		! End of extension flag
+*     parameter(CHP_E_CATEXTF=22)
+*     integer CHP__SZCATEXTF           ! Max size of the extension flag
+*     parameter(CHP__SZCATEXTF=1)
+*
+*    Name of the original catalogue if this is an extension.
+*
+*     integer CHP_S_CATONAME           ! Start of the original cat
+*     parameter (CHP_S_CATONAME=24)        
+*     integer CHP_E_CATONAME           ! Start of the original cat
+*     parameter (CHP_E_CATONAME=40)
+*     integer CHP__SZCATONAME          ! Max size of orig cat name.
+*     parameter(CHP__SZCATONAME=17)
+*
+*    Catalogue Delete Indicator.
+*
+      integer CHP_S_CATDELIND          ! Start of catalogue delete
+      parameter (CHP_S_CATDELIND=42)        
+      integer CHP_E_CATDELIND          ! End of catalogue del indicator
+      parameter (CHP_E_CATDELIND=42)
+      integer CHP__SZCATDELIND         ! Max size of cataloglue del ind.
+      parameter(CHP__SZCATDELIND=1)
+*
+*    Catalogue Frequency Flag.
+*
+      integer CHP_S_CATFREQ           ! Start of catalogue frequency flag.
+      parameter (CHP_S_CATFREQ=44)        
+      integer CHP_E_CATFREQ           ! End of cotalogue frequency flag
+      parameter (CHP_E_CATFREQ=44)
+      integer CHP__SZCATFREQ          ! Max size of catalogue frequency flag
+      parameter(CHP__SZCATFREQ=1)
+*
+*    Catalogue access Flag.
+*
+      integer CHP_S_CATACC             ! Start of catalogue access flg
+      parameter (CHP_S_CATACC=46)        
+      integer CHP_E_CATACC             ! End of catalogue access flg.
+      parameter (CHP_E_CATACC=46)
+      integer CHP__SZCATACC            ! Max size of catalogue access flag.
+      parameter(CHP__SZCATACC=1)
+*
+*
+****** End of the description file definitions ******
+*
+      integer CHP__NUMCATS
+      parameter(CHP__NUMCATS=8)
+*
+      integer CHP__MXDIM
+      parameter(CHP__MXDIM=7)
+*
+*      integer CHP__MXPAR
+*      parameter(CHP__MXPAR=16)
+*
+      integer CHP__SZEXP
+      parameter(CHP__SZEXP=16)
+*
+      integer CHP__SZCVAL
+      parameter(CHP__SZCVAL=16)
+*   
+      integer CHP__MXJCATS
+      parameter(CHP__MXJCATS=3)
+*   
+      integer CHP__MXIND
+      parameter(CHP__MXIND=7)
+*   
+      integer CHP__SZJEXP
+      parameter(CHP__SZJEXP=512)
+*   

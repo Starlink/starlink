@@ -1,0 +1,980 @@
+*
+* CHP_FED_CMN
+*
+* One way of viewing this common block is as a manager sitting at his
+* desk. When asked to manipulate a catalogue for a particular user
+* he needs to get the
+* information that allows him to do this. He has a file that he created
+* when he was first given the catalogue in which he placed all the
+* relevant information about the catalogue. This is the CHP information
+* file. He can open this file and spread the contents onto the desk (ie.
+* load the common block). If this is an extension catalogue he will have
+* to get his files for the originating catalogues and have their
+* contents on the desk.
+* Now he is in the position to deal with requests to manipulate the 
+* catalogue for the user.
+* The data itself is not held in his department
+* but he knows which department to ask for the data. 
+*
+**  ASIDE
+* To carry the analogy further the manager does not communicate with the
+* departments directly but through his secetary to whom he gives a standard
+* request and a department name (standard CHI) the secretary then
+* converts this request into one which is acceptable to the department
+* to which it is to be sent. On receiving the reply the secretary
+* converts the reply into a standard form before passing it back to 
+* the manager. The secretary also has access to a powerful parser
+* and can cooperate with the department to satisfy a request that the
+* department cann't handle on it's own.
+* A trainee secretary could make life easier for herself by always
+* performing the task that require a parser herself and only issuing 
+* very simply requests to the departments which he/she knows they can
+* satisfy (CHI cornerstone routines).
+** END OF ASIDE
+*
+* The managers own department has sections for dealing with
+* arrays, structures, variable length character
+* strings, catalogue notes, catalogue help or indices and order sets,
+* and parameters.
+*
+* Some departments may offer one or more of these services if they
+* do the manager, when including a new catalogue, can exploit this.
+* He must note in his file associated with this catalogue that the
+* service is being provided by the department and not by the 
+* appropriate section in his own department and so he has that
+* information on his desk whenever the catalogue is in use. Using the service 
+* of the alternative departments is more efficient than using 
+* sections within his own department.
+*
+* A trainee manager can make life easy for himself by always calling on
+* his own section to store arrays, structures, variable length character
+* strings, catalogue notes, catalogue help or indices and order sets.
+* The manager then has no contact with the departments other than
+* through the standard route of his secretary.
+*
+* Catalogues are made available in two ways.
+* 1) A user request a catalogue to be created and provides the data. In
+*    this case the manager has full control over which of the
+*    departments he uses to hold the data.
+* 2) A particular department instruct him that they have a catalogue
+*    they wish to make available. In this case he has no control over
+*    which department he uses to hold the data.
+*
+* The manager is also responsible for security on the system. A user has
+* either read only or update access to any piece of information in the
+* catalogue. This cann't be held in the managers file because he doesn't
+* know which user is going to issue a request so when manager is laying
+* out the papers on his desk he needs to request, from the departments,
+* via his secretary, 
+* and sections that hold the information, what this users access to this
+* information is.
+*
+** ASIDE
+* One of the advantages of this analogy is that it allows us to see how
+* the system can be built up incrementally. Start with a trainee manager
+* and a trainee secretary and only one department that only deals with
+* the simplest of requests. None of the sections in the managers own department
+* are open yet so we know that we won't be able to deal with all
+* requests dealing with arrays, structures etc. The secretary only deals
+* with one department and if the request involves an expression he/she
+* uses their own parser so the department only has to provide the very
+* basic (CHI cornerstone routines) service.
+* Simple enhancements can now be made to the system incrementally.
+* Including a new department that provides the basic service.
+* Opening a the section that deals with virtual columns.
+* When all the sections in our department are open then we can satisfy
+* all user requests. 
+* Now if one of the departments decides it is going to do some of the
+* work currently done by the secretary, and the secretary knows about
+* this, he/she can pass any relevant requests to the department and get
+* reply faster than /he/she could do it her/himself. A search for
+* example..
+* If one of the departments decides it is going to do some of the work 
+* currently done by the manager (eg provide parameters) then the manager
+* needs to know about this so that when he is requested to create a 
+* a new catalogue, using this department, he can exploit the service 
+* directly without going through the section in his department that
+* normally deals with parameters. He must note this in
+* his file for the catalogue so he always requests the parameter details
+* from the correct place.
+** END OF ASIDE
+*
+
+ 
+* This is the key common area for the CHP system. 
+*
+* When a CHP catalogue is first used the information about the 
+* catalogue is loaded into the common area. When the catalogue is
+* closed the information is downloaded.
+*
+* To understand this common block it is necessary to grasp some ideas.
+* In its simplest form the underlying CHI catalogue is no more
+* than a simple table handler. In this simple form it does not support
+* arrays, structures, indices, order sets, virtual columns or
+* parameters. However,
+* in the future the underlying CHI catalogues may support one or more
+* of these functions. Whenever an underlying CHI catalogue supports any
+* of these functions this must be noted in this common block.
+*     There are some functions, delete indicator, preferred display, 
+* date last modified, null support and magic values, assert and domain
+* checking that could be supported in the underlying CHI catalogue but,
+* because of the potential for confusion they are not. Any such
+* information in the underlying CHI catalogue is ignored. 
+*     The common block does not try to contain all the information that
+* defines the catalogue. Instead it does contain sufficient information
+* to allow ALL the information to be accessed. For example the comment
+* associated with a parameter is held in the common block whereas the
+* Catalogue notes associated with a catalogue are not held in the common
+* but either the name of the file that contains the notes is held or the
+* notes are held in the underlying CHI catalogue. A flag indicates if
+* the notes are held in the underlying system or not.
+*     Add to this the possibility that this is an extension to a
+* catalogue and so the information for a virtual column, for example,
+* may be in the extension catalogue, the original catalogue or the 
+* underlying CHI catalogue.
+*
+* It is usefull to describe the best way to fill the common area.
+* Information can come from
+* 1) The underlying CHI table/catalogue.
+* 2) The extra information that makes this a CHP catalogue file.
+* 3) The files that are used indirectly.
+* In the case of extension catalogues the information be may nested ie.
+* the catalogue notes consist of the catalogue notes of the extension
+* and the catalogue notes of the original catalogues.
+* (catnotes of extension (catnotes original 1, catnotes original 2)).
+*
+* If this is an join extension catalogue then deal with the extension
+* first. Find any virtual columns and parameters and load them, deal
+* with any alternative sorts or N-d indices. Deal with the actual join
+* indices and the join expression. Find the names of the joined catalogues.
+* Deal with the catnotes and cathelp files
+*
+* Only when this is finished go on to deal with the join catalogues in 
+* turn. All the columns (virtual and real) and all the parameters
+* should be loaded. Alternative sort orders and N-d indices do not have
+* to be considered because they lost thier relevance during the join.
+* Deal with the catnotes and cathelp files
+*
+* Check the dates and recalculate the join indices if required.
+*
+*
+* If this is a search extension catalogue then deal with the extension
+* first. Find any virtual columns and parameters and load them, deal
+* with any alternative sorts or N-d indices. Deal with the actual search
+* indices and the search expression. Find the names of the searched catalogue.
+* Deal with the catnotes and cathelp files
+*
+* Only when this is finished go on to deal with the searched catalogue.
+* All the columns (virtual and real) and all the parameters
+* should be loaded. Alternative sort orders and N-d indices do not have
+* to be considered because they lost thier relevance during the search.
+* Deal with the catnotes and cathelp files
+*
+* Check the dates and recalculate the search index if required.
+*
+*
+* If this is a plain extension catalogue then deal with the extension
+* first. Find any virtual columns and parameters and load them, deal
+* with any alternative sorts or N-d indices.
+* Find the names of the origin catalogue.
+* Deal with the catnotes and cathelp files
+*
+* Only when this is finished go on to deal with the origin catalogue.
+* All the columns (virtual and real) and all the parameters
+* should be loaded. Unlike join and search catalogues alternative sort 
+* orders and N-d indices have significance and must be loaded. Remember
+* at this point that an N-d index may come from the underlying CHI catalogue
+* and it is important to recognise this.
+* Deal with the catnotes and cathelp files
+*
+* Check the dates and recalculate the search index if required.
+*
+* If this is NOT an extension catalogue then 
+* find any virtual columns and parameters and load them, deal
+* with any alternative sorts or N-d indices.
+* Deal with the catnotes and cathelp files
+*
+*
+* One important factor when considering this common area is that we
+* allow for the possibility that the indices and sort orders are
+* available in the underlying system. You can not get at these indices
+* directly but you can, and should, exploit the fact that you know 
+* that they exist.
+*
+*
+* In the annotation following a '!' in the first column indicates that
+* this is applicable after the common block has been loaded. It is the
+* view of the manager when he has all the information spread out on his
+* desk. It also assumes that all arrays, structures, virtual columns, 
+* parameters, catnotes and cathelp are going to be dealt with by the 
+* sections in his department.
+* This is a simple as it can be made.
+*
+*
+* Column information
+*
+
+      integer EPorig(CHP__NUMCATS,CHP__NUMCOLS)
+! The catalogue that this column came from.
+!
+! 0 Indicates that this is a regular catalogue and that the
+!   column is in the underlying CHI catalogue.
+! 1 Indicates that this is a regular catalogue and that the
+!   column is a virtual column in the information associated with
+!   this catalogue.
+! 2 Indicates that this is a plain or search extension catalogue
+!   and that the column is in the underlying catalogue of the
+!   originating catalogue. See CPorignames to find the name of the 
+!   originating catalogue.
+! 3 Indicates that this is a join extension catalogue
+!   and that the column is in the underlying catalogue of the
+!   first originating catalogue. See CPorignames to find the name of the 
+!   originating catalogue.
+! 4 Indicates that this is a join extension catalogue
+!   and that the column is in the underlying catalogue of the
+!   second originating catalogue. See CPorignames to find the name of the 
+!   originating catalogue.
+! 5 Indicates that this is a plain or search extension catalogue
+!   and that the column is a virtual column in the information
+!   associated with the originating catalogue.
+!   See CPorignames to find the name of the 
+!   originating catalogue.
+! 6 Indicates that this is a join extension catalogue
+!   and that the column is a virtual column in the information
+!   associated with the first originating catalogue.
+!   See CPorignames to find the name of the 
+!   originating catalogue.
+! 7 Indicates that this is a join extension catalogue
+!   and that the column is a virtual column in the information
+!   associated with the second originating catalogue.
+!   See CPorignames to find the name of the 
+!   originating catalogue.
+! 8 Indicates that this is a plain or search extension catalogue
+!   and that the column is a virtual column in the information
+!   associated with this extension.
+! 9 Indicates that this is a join extension catalogue
+!   and that the column is a virtual column in the information
+!   associated with this extension.
+*
+*
+      character*( 1 ) EPtype(CHP__NUMCATS,CHP__NUMCOLS)        
+! Type of the column (C,D,I,L or R).
+!
+! The type of a column cann't be changed so it doesn't really matter 
+! where it comes from. You can work out where the column type comes
+! from by looking at EPorig and, possibly CPorignames.
+*
+*
+      character*(CHP__SZCNAME) EPname(CHP__NUMCATS,CHP__NUMCOLS)        
+! Name of the column.
+!
+! The name of a column cann't be changed so it doesn't really matter 
+! where it comes from. You can work out where the column name comes
+! from by looking at EPorig and, possibly CPorignames.
+*
+*
+      character*(CHP__SZCFMT) EPformat(CHP__NUMCATS,CHP__NUMCOLS)        
+! Format of the column.
+!
+! The format of a column can be changed so it is important to know
+! where the format came from.
+! Possibilities :-
+! 1) This is a regular catalogue and the format of the column comes
+!    from the underlying catalogue. Check the EPmdataacc to see if the
+!    user has access to alter the format. Make the change in the common
+!    block and request the change in the underlying catalogue.
+! 2) This is a regular catalogue and the format of the column comes
+!    from the information about this catalogue, the column is a virtual
+!    column. Check the EPmdataacc to see if the user has access to alter
+!    the format. Make the change in the comon block.
+! 3) This is an extension catalogue and the format of the column comes 
+!    from one of the underlying catalogue of one of the original catalogues.
+!    Check the EPmdataacc to see if the user has access to alter the
+!    format. Make the change in the common block and request the change
+!    in the underlying catalogue.
+! 4) This is an extension catalogue and the format of the column comes 
+!    from one of the information about one of the original catalogues,
+!    the column is a virtual column in one of the original catalogues.
+!    Check the EPmdataacc to see if the user has access to alter the
+!    format. Make the change in the common block.
+! 5) This is an extension catalogue and the format of the column comes 
+!    from one of the information about this extension,
+!    the column is a virtual column.
+!    Check the EPmdataacc to see if the user has access to alter the
+!    format. Make the change in the common block.
+*
+*
+      character*(CHP__SZCUNIT) EPunits(CHP__NUMCATS,CHP__NUMCOLS)        
+! Units of the column.
+!
+! The units of a column can be changed so it is important to know
+! where the units came from.
+! Possibilities :-
+! 1) This is a regular catalogue and the units of the column comes
+!    from the underlying catalogue. Check the EPmdataacc to see if the
+!    user has access to alter the units. Make the change in the common
+!    block and request the change in the underlying catalogue.
+! 2) This is a regular catalogue and the units of the column comes
+!    from the information about this catalogue, the column is a virtual
+!    column. Check the EPmdataacc to see if the user has access to alter
+!    the units. Make the change in the comon block.
+! 3) This is an extension catalogue and the units of the column comes 
+!    from one of the underlying catalogue of one of the original catalogues.
+!    Check the EPmdataacc to see if the user has access to alter the
+!    units. Make the change in the common block and request the change
+!    in the underlying catalogue.
+! 4) This is an extension catalogue and the units of the column comes 
+!    from the information about one of the original catalogues,
+!    the column is a virtual column in one of the original catalogues.
+!    Check the EPmdataacc to see if the user has access to alter the
+!    units. Make the change in the common block.
+! 5) This is an extension catalogue and the units of the column comes 
+!    from one of the information about this extension,
+!    the column is a virtual column.
+!    Check the EPmdataacc to see if the user has access to alter the
+!    units. Make the change in the common block.
+*
+*
+      character*(CHP__SZCCMT) EPcomment(CHP__NUMCATS,CHP__NUMCOLS)        
+! Comments of the column.
+!
+! The comments of a column can be changed so it is important to know
+! where the comments came from.
+! See EPformat or EPunits.
+*
+*
+      logical EPmdataacc(CHP__NUMCATS,CHP__NUMCOLS)        
+! Meta data access flag (true for update). 
+! Allows the user to change
+! the data ABOUT the columns, where permitted by the model.
+!
+! The metadata access flag of a column cann't be changed so it 
+! doesn't really matter where it comes from. It has to be worked out
+! when the catalogue details are initially loaded into the common
+! block.
+*
+*
+      logical EPdataacc(CHP__NUMCATS,CHP__NUMCOLS)        
+! Data access flag (true for update).
+! Allows the user to change the data IN the columns.
+!
+! The data access flag of a column cann't be changed so it 
+! doesn't really matter where it comes from. It has to be worked out
+! when the catalogue details are initially loaded into the common
+! block.
+*
+*
+      integer EPdatelm(CHP__NUMCATS,CHP__NUMCOLS)        
+! Date last modified of the column.
+!
+! The date last modified is to be changed every time data in an 
+! underlying catalogue is changed or added to. 
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      logical EPvcflag(CHP__NUMCATS,CHP__NUMCOLS)        
+! Virtual column flag (true for a virtual column).
+!
+! The virtual column flag of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      character*(CHP__SZVCEXP) EPvcexp(CHP__NUMCATS,CHP__NUMCOLS)        
+! Virtual column expression.
+!
+! The virtual column expression cann't be changed so it 
+! doesn't really matter where it comes from. 
+*
+*
+      character*(CHP__SZCNAME) EPvcdep(CHP__NUMCATS,CHP__NUMCOLS,
+     :            CHP__NUMCOLS)        
+! Virtual column dependent colums.
+!
+! The virtual column dependent columns cann't be changed so it 
+! doesn't really matter where it comes from. They are known from the
+! virtual column expression.
+*
+*
+      integer EPnvcdep(CHP__NUMCATS,CHP__NUMCOLS)
+! Number of virtual column dependent columns.
+!
+! The number of virtual column dependent columns cann't be changed so it 
+! doesn't really matter where it comes from. It is known from the
+! virtual column expression.
+*
+*
+      logical EPdelind(CHP__NUMCATS,CHP__NUMCOLS)        
+! Delete indicator flag of the column (TRUE if the column can be
+! deleted).
+!
+! The delete indicator flag can only be changed from true to false.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      logical EPprefdis(CHP__NUMCATS,CHP__NUMCOLS)
+! Preferred display flag of the column.
+!
+! The preferred display flag can be changed.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      integer EParrshp(CHP__NUMCATS,CHP__NUMCOLS)
+! Array shape of a column.
+!
+! The array shape of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      integer EParrdim(CHP__NUMCATS,CHP__NUMCOLS,CHP__MXDIM)
+! Array dimensions of a column.
+!
+! The array dimensions of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      logical EPassert(CHP__NUMCATS,CHP__NUMCOLS)        
+! Assert flag
+!
+! The assert flag of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      character*(CHP__SZCASSEXP) EPassexp(CHP__NUMCATS,CHP__NUMCOLS)        
+! Assert expression.
+!
+! The assert expression of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      logical EPdomchk(CHP__NUMCATS,CHP__NUMCOLS)        
+! Domain check flag.
+!
+! The domain check flag of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      integer EPcoldes(CHP__NUMCATS,CHP__NUMCOLS)        
+! Structure flag.
+!
+! The column designation of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      logical EPnsflag(CHP__NUMCATS,CHP__NUMCOLS)        
+! Non standard format flag.
+!
+! The non standard format flag of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      character*(CHP__SZCFMT) EPnsformat(CHP__NUMCATS,CHP__NUMCOLS)        
+! Non standard format.
+!
+! The non standard format can be changed.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      logical EPhidden(CHP__NUMCATS,CHP__NUMCOLS)
+! Column hidden flag (true for hidden) of a column.
+! Hidden columns are created and used by the
+! system and are never available to the user. Eg the offset of arrays.
+!
+! The column hidden flag of a column cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+*
+*
+*  Parameter information.
+*
+
+      integer PPorig(CHP__NUMCATS,CHP__NUMPARS)
+! The catalogue that this parameter came from.
+! 1 Indicates that this is a regular catalogue and that the
+!   parameter is in the information associated with
+!   this catalogue.
+! 2 Indicates that this is a plain or search extension catalogue
+!   and that the parameter is in the information
+!   associated with the originating catalogue.
+!   See CPorignames to find the name of the 
+!   originating catalogue.
+! 3 Indicates that this is a join extension catalogue
+!   and that the parameter is in the information
+!   associated with the first originating catalogue.
+!   See CPorignames to find the name of the 
+!   originating catalogue.
+! 4 Indicates that this is a join extension catalogue
+!   and that the parameter is in the information
+!   associated with the second originating catalogue.
+!   See CPorignames to find the name of the 
+!   originating catalogue.
+! 5 Indicates that this is a plain or search extension catalogue
+!   and that the parameter is the information
+!   associated with this extension.
+! 6 Indicates that this is a join extension catalogue
+!   and that the parameter is in the information
+*
+*
+      character*( 1 ) PPtype(CHP__NUMCATS,CHP__NUMPARS)        
+! Type of the parameter (C,D,I,L or R).
+!
+! The type of a parameter cann't be changed so it doesn't really matter 
+! where it comes from. 
+*
+*
+      character*(CHP__SZPNAME) PPname(CHP__NUMCATS,CHP__NUMPARS)        
+! Name of the parameter.
+!
+! The name of a parameter cann't be changed so it doesn't really matter 
+! where it comes from. 
+*
+*
+      character*(CHP__SZPUNIT) PPunit(CHP__NUMCATS,CHP__NUMPARS)        
+! Units of this parameter.
+!
+! The units of a parameter can be changed.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZPFMT) PPformat(CHP__NUMCATS,CHP__NUMPARS)        
+! Format of this parameter.
+!
+! The format of a parameter can be changed.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZPCMT) PPcomment(CHP__NUMCATS,CHP__NUMPARS)        
+! Comment of this parameter.
+!
+! The comment of a parameter can be changed.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZPVAL) PPcharval(CHP__NUMCATS,CHP__NUMPARS)        
+! Parameter value locator.
+!
+! This is a locator to the parameter. It is used in conjunction
+! with the Parrshp, Pstruct and Pextchr flags. If none of these flags
+! is set then the value of Pvalueloc is the value of the parameter
+! as an ascii string. If any of the flags is set then the Pvalueloc
+! is a character string key to the parameter (a cloakroom room check,
+! if you like, allowing you to get your coat).
+!
+! The value of a parameter can be changed either directly in the common
+! block or by checking out the array, structure or extended character 
+! string making the change and checking it back again.
+*
+*
+      integer PPptrval(CHP__NUMCATS,CHP__NUMPARS)        
+ 
+! Parameter pointer.
+!
+! This is a pointer value (coat check) to the parameter. 
+! It is used in conjunction
+! with the Parrshp, Pstruct and Pextchr flags. If none of these flags
+! is set then the value of Pvalueloc is the value of the parameter
+! as an ascii string. If any of the flags is set then the Pvalueloc
+! is a character string key to the parameter (a cloakroom room check,
+! if you like, allowing you to get your coat).
+!
+! The value of a parameter can be changed either directly in the common
+! block or by checking out the array, structure or extended character 
+! string making the change and checking it back again.
+*
+*
+      logical PPmdataacc(CHP__NUMCATS,CHP__NUMPARS)        
+! Meta data access flag (true for update). 
+! Allows the user to change
+! the data ABOUT the parameter, where permitted by the model.
+!
+! The metadata access flag of a parameter cann't be changed so it 
+! doesn't really matter where it comes from. It has to be worked out
+! when the catalogue details are initially loaded into the common
+! block.
+*
+*
+      logical PPdataacc(CHP__NUMCATS,CHP__NUMPARS)        
+! Data access flag (true for update).
+! Allows the user to change the data IN the parameter.
+!
+! The data access flag of a parameter cann't be changed so it 
+! doesn't really matter where it comes from. It has to be worked out
+! when the catalogue details are initially loaded into the common
+! block.
+*
+*
+      integer PPdatelm(CHP__NUMCATS,CHP__NUMPARS)        
+! Date last modified of the parameter.
+!
+! The date last modified is to be changed every time data in the 
+! parameter is changed or added to. 
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      logical PPdelind(CHP__NUMCATS,CHP__NUMPARS)        
+! Delete indicator flag of the parameter (TRUE if the parameter can
+! be deleted).
+!
+! The delete indicator flag can only be changed from true to false.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      logical PPprefdis(CHP__NUMCATS,CHP__NUMPARS)
+! Preferred display flag of the parameter.
+!
+! The preferred display flag can be changed.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      integer PParrshp(CHP__NUMCATS,CHP__NUMPARS)
+! Array shape of a parameter.
+!
+! The array shape of a parameter cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      integer PParrdim(CHP__NUMCATS,CHP__NUMPARS,CHP__MXDIM)
+! Array dimensions of the parameter.
+!
+! The array dimensions of a parameter cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      logical PPpardes(CHP__NUMCATS,CHP__NUMPARS)
+! Structure flag.
+!
+! The structure flag of a parameter cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      logical PPnsflag(CHP__NUMCATS,CHP__NUMPARS)        
+! Non standard format flag.
+!
+! The non standard format flag of a paramter cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      character*(CHP__SZPFMT) PPnsformat(CHP__NUMCATS,CHP__NUMPARS)        
+! Non standard format.
+!
+! The non standard format can be changed.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+* Catalogue information
+*
+
+      integer CPnumext(CHP__NUMCATS)        
+! Extension catalogue indicator.
+!
+! 0 Indicates this is not an extension.
+! 1 Indicates that this is a plain or search extension.
+! 2 or more Indicates the number of join catalogues.
+!
+! The extension catalogue indicator cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      logical CPexttype(CHP__NUMCATS)
+! Type of extension. 
+!
+! When the number of extensions is 1 this could be 
+! an Extension Search catalogue or an Extension Plain catalogue.
+! CPexttype is TRUE for a search catalogue.
+!
+! The extension type cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      character*(CHP__SZJEXP) CPsorjexp(CHP__NUMCATS)        
+! Sort or Join expression.
+!
+! The sort or join expression cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      character*(CHP__SZPVAL) CPcatnotes(CHP__NUMCATS)        
+! Catalogue notes locator.
+!
+! This is the locator for the catalogue notes.
+! 
+! The catalogue notes locator cann't be changed so it 
+! doesn't really matter where it comes from. The notes
+! can be checked out modified and checked back in, deleted or new ones
+! added.
+*
+*
+      character*(CHP__SZNAME) CPorignames(CHP__NUMCATS,CHP__MXJCATS)
+! The names of the originating catalogues to which this is an extension 
+! catalogue.
+!
+! The number of names is given by the CPnumext.
+! The originating names cann't be changed so it 
+! doesn't really matter where it comes from.
+*
+*
+      integer CPnofndi(CHP__NUMCATS)
+! The number of N-dimensional indices associated with this catalogue.
+!
+! For a extension join catalogue or an extension search catalogue only
+! indices in the extension are relevant. For a plain extension indices
+! in the extension and in the original are relevant.
+!
+! Indices can come from several sources and the number of indices is the
+! sum of the indices from all sources.
+! Possibilities are:-
+! 1) This is a regular catalogue, indices from the underlying catalogue.
+! 2) This is a regular catalogue, indices from information about this 
+!    catalogue.
+! 3) This is a plain extension catalogue, indices from the underlying
+!    catalogue of the originating catalogue.
+! 4) This is a plain extension catalogue, indices from the originating
+!    catalogue.
+! 5) This is a plain extension catalogue indices from the information
+!    about this catalogue.
+! The number of indices can be changed but only as a by-product of
+! another request.
+! Make the change in the common block.
+*
+*
+      integer CPndorig(CHP__NUMCATS,CHP__NUMCOLS)        
+! N-dimension origin of each index.
+!
+! 1 Indicates that this is a regular catalogue and the index is from
+!   the underlying catalogue.
+! 2 Indicates that this is a regular catalogue and the index is from
+!   the information about this catalogue.
+! 3 This is a plain extension catalogue and the index is from the 
+!   underlying catalogue of the originating catalogue.
+! 4 This is a plain extension catalogue and the index is from the 
+!   originating catalogue.
+! 5 This is a plain extension catalogue and the index is from the 
+!   information about this catalogue.
+! The index origin cann't be changed but it can by deleted
+! but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      integer CPnddatelm(CHP__NUMCATS,CHP__NUMCOLS)
+! The date that each N-dimensional index was last modified.
+!
+! The date last modified is to be changed every time the index
+! is recalculated.
+! It is held directly in the common block.
+! Make the change in the common block.
+*
+*
+      integer CPnumndcols(CHP__NUMCATS,CHP__NUMCOLS)
+! The number of dimensions associated with each index.
+!
+! The number of dimensions associated with an index cann't be changed 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZCNAME) CP1icol(CHP__NUMCATS,CHP__NUMCOLS)
+! The name of the first index column.
+!
+! The name of the first index column cann't be changed. 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZCNAME) CP2icol(CHP__NUMCATS,CHP__NUMCOLS)
+! The name of the second index columns
+!
+! The name of the second index column cann't be changed. 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZCNAME) CP3icol(CHP__NUMCATS,CHP__NUMCOLS)
+! The name of the third index columns
+!
+! The name of the third index column cann't be changed. 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZCNAME) CP4icol(CHP__NUMCATS,CHP__NUMCOLS)
+! The name of the fourth index columns
+!
+! The name of the forth index column cann't be changed. 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZCNAME) CP5icol(CHP__NUMCATS,CHP__NUMCOLS)
+! The name of the fifth index columns
+!
+! The name of the fifth index column cann't be changed. 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZCNAME) CP6icol(CHP__NUMCATS,CHP__NUMCOLS)
+! The name of the sixth index columns
+!
+! The name of the sixth index column cann't be changed. 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      character*(CHP__SZCNAME) CP7icol(CHP__NUMCATS,CHP__NUMCOLS)
+! The name of the seventh index columns
+!
+! The name of the sixth index column cann't be changed. 
+! It can be deleted but only as a by-product of another request.
+! Make the change in the common block.
+*
+*
+      integer CPnofasorts(CHP__NUMCATS)
+! The number of alternative sort orders associated with this catalogue.
+!
+! For a extension join catalogue or an extension search catalogue only
+! sorts in the extension are relevant. For a plain extension sorts
+! in the extension and in the original are relevant.
+!
+! Alternative sort orders can come from several sources and the number 
+! of alternative sort orders is the sum of sort orders from all sources.
+! Possibilities are:-
+! 1) This is a regular catalogue, sort orders from the underlying catalogue.
+! 2) This is a regular catalogue, sort orders from information about this 
+!    catalogue.
+! 3) This is a plain extension catalogue, sort orders from the underlying
+!    catalogue of the originating catalogue.
+! 4) This is a plain extension catalogue, sort orders from the originating
+!    catalogue.
+! 5) This is a plain extension catalogue sort orders from the information
+!    about this catalogue.
+! The number of alternative sort orders can be changed but only as a 
+! by-product of another request.f
+! Make the change in the common block.
+*
+*
+      integer CPnumascols(CHP__NUMCATS,CHP__NUMCOLS)
+! The number of sort columns associated with each alternative sort in 
+! this catalogue.
+
+      integer CPasdatelm(CHP__NUMCATS,CHP__NUMCOLS)
+! The dates that these alternative sorts indices were last modified.
+
+      integer CPasorig(CHP__NUMCATS,CHP__NUMCOLS)        
+! Origin indicator. Allows the  system to work out where the alternative
+! sort is defined, 1 it exists in the original catalogue
+! (see CPorigindord 
+! and CPaspos for the name of the file containing the indices and the
+! position in the file of this index), 2 it exists in this catalogue
+! ( see CPindandord and CPaspos for the name of the file containing
+! the indices and the position in the file of this index)
+! Note that unlike N-dimensional indices alternative sorts are not
+! part of CHI.
+
+      character*(CHP__SZCNAME) CPfascol(CHP__NUMCATS,CHP__NUMCOLS)
+! The names of the primary sort columns in the alternative sorts. 
+
+      character*(CHP__SZCNAME) CPsascol(CHP__NUMCATS,CHP__NUMCOLS)
+! The names of the primary sort columns in the alternative sorts. 
+
+      character*(CHP__SZCNAME) CPtascol(CHP__NUMCATS,CHP__NUMCOLS)
+! The names of the primary sort columns in the alternative sorts. 
+
+      character*(1) CPfasdir(CHP__NUMCATS,CHP__NUMCOLS)
+! The directions of the primary sort columns in the alternative sorts.
+
+      character*(1) CPsasdir(CHP__NUMCATS,CHP__NUMCOLS)
+! The directions of the secondary sort columns in the alternative sorts.
+
+      character*(1) CPtasdir(CHP__NUMCATS,CHP__NUMCOLS)
+! The directions of the third sort columns in the alternative sorts.
+
+      character*(CHP__SZNAME) CPname(CHP__NUMCATS)
+! The name of the catalogue.
+ 
+      logical CPdelind(CHP__NUMCATS)        
+! Delete indicator flag, comes from the extra information about the
+! catalogue.
+
+       integer CPnuments(CHP__NUMCATS)
+! Number of entries in the catalogue.
+
+      integer CPnumcols(CHP__NUMCATS)         
+! Number of columns in the catalogue includes all
+! columns from any original catalogues if this is an extension.
+
+      integer CPnumpars(CHP__NUMCATS)         
+! Number of parameters in the  catalogue includes all
+! parametes from any original catalogues if this is an extension.
+
+
+*
+      integer chp__mxass
+      parameter (chp__mxass=99)
+
+      character*(chp__szname) opcatnames(chp__mxass)
+
+      integer opcds(chp__mxass) !Unique id to catalogue in the system may be 
+                                !ids to description and data.
+
+      integer numopencats       !Number of catalogues open.
+
+      logical opacmode(chp__mxass)
+      logical opcatsys(chp__mxass)
+
+      integer CPcurcd         
+
+! Current cd.
+
+
+      common /EP_1/EPdatelm,EPnvcdep,EParrshp,EParrdim,EPtype,
+     : EPname,EPformat,EPunits,EPcomment,
+     : EPmdataacc,EPdataacc,EPorig,EPvcflag,EPvcexp,
+     : EPvcdep,EPdelind,EPprefdis,
+     : EPassert,EPassexp,EPdomchk,
+     : EPcoldes,EPnsflag,EPnsformat,EPhidden
+
+      save /EP_1/
+
+      common /P_1/PPdatelm,PParrshp,PParrdim,PPtype,PPname,PPformat,
+     : PPunit,PPcomment,
+     : PPcharval,PPptrval,PPmdataacc,PPdataacc,PPorig,
+     : PPdelind,PPprefdis,
+     : PPnsflag, PPnsformat,PPpardes
+
+      save /P_1/
+
+      common /C_1/CPnumext,CPexttype,CPnofndi,CPnumndcols,CPnddatelm,
+     : CPnofasorts,CPnumascols,CPasdatelm,CPnuments,
+     : CPnumcols,CPnumpars,CPsorjexp,
+     : CPcatnotes, CPorignames,
+     : CPndorig,CP1icol,CP2icol,CP3icol,CP4icol,CP5icol,CP6icol,CP7icol,
+     : CPasorig,CPfascol,
+     : CPsascol,CPtascol,CPfasdir,CPsasdir,CPtasdir,CPname,
+     : CPdelind
+
+      save /C_1/
+
+
+*
+      integer curnumcols
+      integer curcolpos(chp__numcols)
+      character*(chp__szname) curcat
+      character*(chp__szcname) curcnames(chp__numcols)
+      character*(16) curfmat(chp__numcols)
+      common/chpcur_cmn/curnumcols,curcolpos,curcat,curcnames,curfmat
+      save /chpcur_cmn/
+*
+      common/chpopen_cmn/opcds,numopencats,
+     : opacmode, opcatsys, opcatnames
+      save /chpopen_cmn/

@@ -1,0 +1,97 @@
+*    Description :
+*     This file contains the CHI parser Global Constants.
+*    History :
+*    Global Constants :
+      character CHI__DELIM              ! Character constant delimiter
+      parameter(CHI__DELIM='"')   
+      character CHI__DELU1              ! Open Unit delimiter
+*      parameter(CHI__DELU1='\')
+      character CHI__DELU2              ! Close Unit delimiter
+      parameter(CHI__DELU2='|')
+      integer CHI__LENGBL               ! Length of global field name delimiter
+      parameter (CHI__LENGBL=2)
+      character*(CHI__LENGBL) CHI__DELGBL ! Global fieldname delimiter
+      parameter(CHI__DELGBL='__')       ! can't use single _ as this is a 
+                                        ! valid fieldname character
+      integer CHI__SZTYP		! Size of ADC Data type flags
+      parameter(CHI__SZTYP=1)
+      integer CHI__SZREC		! Maximum size of record in bytes
+      parameter(CHI__SZREC=3072)
+      integer CHI__MXFUN                ! The number of functions allowed
+      parameter (CHI__MXFUN=62)
+      integer CHI__MXARG                ! The maximum number of char arguments of a function
+      parameter (CHI__MXARG=2)
+*
+*  Additions for new parse system
+*
+      integer CHI__OPLO            ! Lowest operator id
+      parameter(CHI__OPLO=1)
+      integer CHI__OPHI            ! Highest operator id
+      parameter(CHI__OPHI=28)
+      integer CHI__NULID           ! Op id for non-op, ie for operand
+      parameter(CHI__NULID=-1)
+      integer CHI__FPREC           ! Precedence level of functions
+      parameter(CHI__FPREC=11)
+      integer CHI__CBASE           ! Lowest type-convert operator id
+      parameter(CHI__CBASE=60)
+      integer CHI__FBASE           ! Lowest function operator id - 1
+      parameter(CHI__FBASE=100)
+      integer CHI__RELLO           ! Lowest relational operator id
+      parameter(CHI__RELLO=9)
+      integer CHI__RELHI           ! Highest relational operator id
+      parameter(CHI__RELHI=CHI__RELLO+5)
+      integer CHI__LOGLO           ! Lowest logical operator id
+      parameter(CHI__LOGLO=23)
+      integer CHI__LOGHI           ! Highest logical operator id
+      parameter(CHI__LOGHI=CHI__LOGLO+3)
+      integer CHI__UNOP            ! Lowest unary operator id
+      parameter(CHI__UNOP=CHI__LOGHI)
+      integer CHI__L               ! Logical
+      parameter(CHI__L=1)
+      integer CHI__I               ! Integer
+      parameter(CHI__I=2)
+      integer CHI__R               ! Real
+      parameter(CHI__R=3)
+      integer CHI__D               ! Double
+      parameter(CHI__D=4)
+      integer CHI__C               ! Character
+      parameter(CHI__C=5)
+      integer CHI__P               ! Radian
+      parameter(CHI__P=6)
+      integer CHI__O               ! Radian deriving from TIME
+      parameter(CHI__O=7)
+      integer CHI__Q               ! Radian deriving from ANGLE
+      parameter(CHI__Q=8)
+      integer CHI__T               ! TIME
+      parameter(CHI__T=9)
+      integer CHI__A               ! ANGLE
+      parameter(CHI__A=10)
+      integer CHI__MAXOP           ! Size of operator stack
+      parameter(CHI__MAXOP=25)     ! (was 50)
+      integer CHI__MXEXD           ! Number of expressions (as ADC__MXEXP)
+      parameter(CHI__MXEXD=40)     ! (was 80)
+      integer CHI__MXITM           ! Maximum number of items in expression
+      parameter(CHI__MXITM=50)     ! (was 100)
+      integer CHI__MXCNS           ! Number of constants in expression
+      parameter(CHI__MXCNS=CHI__MAXOP)
+      integer CHI__MXREL           ! Number of relational sub-expressions
+      parameter(CHI__MXREL=40)     ! (was 50, then 25 - too small for CHART)
+      integer CHI__MXRDS           ! Relations per expression
+      parameter(CHI__MXRDS=40)     ! (was 50, then 25 - incr just in case)
+      integer CHI__SZSTK           ! Size of string stacks
+      parameter(CHI__SZSTK=CHI__SZREC*2)
+      integer CHI__MXELM
+      parameter(CHI__MXELM=128)
+*
+*   local names for CHI numeric type codes
+*
+      integer L_type       ! logical
+      parameter(L_type=CHI__L)
+      integer I_type       ! integer
+      parameter(I_type=CHI__I)
+      integer R_type       ! real
+      parameter(R_type=CHI__R)
+      integer D_type       ! double
+      parameter(D_type=CHI__D)
+      integer C_type       ! character string
+      parameter(C_type=CHI__C)

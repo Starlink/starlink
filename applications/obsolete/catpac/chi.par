@@ -1,0 +1,37 @@
+*    Description :
+*     This file contains the Catalogue Handling System  Global Constants.
+*     Development values based on the ADC values.
+*    History :
+*     23.7.90:  Original  (STADAT::ARW)
+*    Global Constants :
+      integer CHI__SZNAME		! Maximum size of Catalogue Name
+      parameter(CHI__SZNAME=8)
+      integer CHI__NUMCATS              ! Maximum number of catalogues
+      parameter(CHI__NUMCATS=512)
+      integer CHI__MXIND                ! Maximum number of indices
+      parameter(CHI__MXIND=16)
+      integer CHI__MXSORT               ! Maximum number of sorts
+      parameter(CHI__MXSORT=16)
+*
+* Column constants
+*
+      integer CHI__NUMCOLS		! Maximum number of columns
+      parameter(CHI__NUMCOLS=512)
+      integer CHI__SZCNAME		! Maximum size of a column name
+      parameter(CHI__SZCNAME=17)
+      integer CHI__SZCFMT               ! Maximum size of the column format
+      parameter(CHI__SZCFMT=6)
+      integer CHI__SZCUNIT              ! Maximum size of the units of a column
+      parameter(CHI__SZCUNIT=10)
+      integer CHI__SZCCMT	        ! Maximum size of the columns comment
+      parameter(CHI__SZCCMT=50)
+*
+*
+      integer CHI__SZCVAL               ! Maximum size of a character value
+      parameter(CHI__SZCVAL=128)
+*
+*
+*
+      integer CHI__SZEXP		! Maximum size of an expression (search,
+      parameter(CHI__SZEXP=512)          !  reject, join, merge criteria)
+*

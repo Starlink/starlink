@@ -1,0 +1,53 @@
+#+
+#  Name:
+#     PARAMINFO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface PARAMINFO
+
+   helplib '$CATPAC_HELP PARAMINFO'
+
+   parameter INPUT               # Catalogue Name
+      position    1
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT '
+      prompt      'Name of the Catalogue. '
+      helpkey     'Parameters INPUT'
+   endparameter
+
+   parameter NAME                # Parameter Name
+      position    2
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Name of the Parameter. '
+      helpkey     'Parameters NAME'
+   endparameter
+
+   parameter INFREQ              # Information required
+      position    3
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT '
+      ppath       'CURRENT '
+      prompt      'Information requires (FORMAT,VALUE,COMMENT). '
+      in          'FORMAT','VALUE','COMMENT'
+      helpkey     'Parameters INFREQ'
+   endparameter
+
+endinterface

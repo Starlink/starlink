@@ -1,0 +1,72 @@
+*
+*  CHIH_PAR INCLUDE FILE
+*
+********************************
+*** NB This REDUCES CHIH__NUMCATS
+********************************
+      INTEGER                 CHIH__NUMCATS
+      PARAMETER               (CHIH__NUMCATS=20)
+********************************
+      INTEGER                 CHIH__NUMASS
+      PARAMETER               (CHIH__NUMASS = 2)
+      INTEGER                 CHIH__READ
+      PARAMETER               (CHIH__READ = 1)
+      INTEGER                 CHIH__WRITE
+      PARAMETER               (CHIH__WRITE = 2)
+      INTEGER                 CHIH__UPDATE
+      PARAMETER               (CHIH__UPDATE = 3)
+      INTEGER                 CHIH__NMODES
+      PARAMETER               (CHIH__NMODES = 3)
+      INTEGER                 CHIH__INITCOLSIZE
+      PARAMETER               (CHIH__INITCOLSIZE = 128)
+
+      CHARACTER*(6) CHIH_CHNAM(3)/'READ', 'WRITE', 'UPDATE'/
+      CHARACTER*(1) CHIH__DELDNOTE/'|'/
+      INTEGER       CHIH_MAXMAPSIZE/20000/
+
+
+      CHARACTER*(CHI__SZNAME) 
+     :               CHIH_CATNAME(          CHIH__NUMASS, CHIH__NUMCATS)
+      INTEGER        CHIH_NUMASSOC(                       CHIH__NUMCATS)
+      INTEGER        CHIH_LASTRECACC(       CHIH__NUMASS, CHIH__NUMCATS)
+      CHARACTER*(DAT__SZLOC)  
+     :               CHIH_LOC(              CHIH__NUMASS, CHIH__NUMCATS)
+      INTEGER        CHIH_TOTUSED(          CHIH__NUMASS, CHIH__NUMCATS)
+      INTEGER        CHIH_TOTSIZE(          CHIH__NUMASS, CHIH__NUMCATS)
+      INTEGER        CHIH_MODE(             CHIH__NUMASS, CHIH__NUMCATS)
+      CHARACTER*(CHI__SZCNAME) CHIH_FNAME(  CHI__NUMCOLS, CHIH__NUMCATS)
+      CHARACTER*(DAT__SZLOC)   CHIH_COLLOC( CHI__NUMCOLS, CHIH__NUMCATS)
+      CHARACTER*(DAT__SZLOC)   CHIH_COLDLOC(CHI__NUMCOLS, CHIH__NUMCATS)
+      CHARACTER*(DAT__SZLOC)   CHIH_COLNLOC(CHI__NUMCOLS, CHIH__NUMCATS)
+      CHARACTER*(DAT__SZLOC)   CHIH_INDLOC( CHIH__NUMCATS)
+      LOGICAL                  CHIH_COLMAPD(CHI__NUMCOLS, CHIH__NUMCATS)
+      INTEGER                  CHIH_COLPT(  CHI__NUMCOLS, CHIH__NUMCATS)
+      INTEGER                  CHIH_NULLPT( CHI__NUMCOLS, CHIH__NUMCATS)
+      INTEGER                  CHIH_MAPSEC( 2,            CHIH__NUMCATS)
+      INTEGER                  CHIH_NUMFLDS(              CHIH__NUMCATS)
+      INTEGER                  CHIH_INDPT(                CHIH__NUMCATS)
+      CHARACTER*(1)            CHIH_FLDTYPE(CHI__NUMCOLS, CHIH__NUMCATS)
+      INTEGER                  CHIH_SELCOL( CHI__NUMCOLS, CHIH__NUMCATS)
+      INTEGER                  CHIH_CATCOL( CHI__NUMCOLS, CHIH__NUMCATS)
+      CHARACTER*(DAT__SZLOC)  CHIH_SLICELOC(CHI__NUMCOLS, CHIH__NUMCATS)
+      CHARACTER*(DAT__SZLOC) CHIH_SLICENLOC(CHI__NUMCOLS, CHIH__NUMCATS)
+      CHARACTER*6    CHIH_MODECODE(4)
+      INTEGER               CHIH_CHARSIZE( CHI__NUMCOLS, CHIH__NUMCATS)
+
+      INTEGER        CURR_CAT
+      INTEGER        NCATS_OPEN
+
+      COMMON /CHIH_C/ CHIH_CATNAME,    CHIH_NUMASSOC,
+     +                  CHIH_LASTRECACC, CHIH_LOC,        
+     +                  CHIH_FNAME,      CHIH_NUMFLDS,     CHIH_COLMAPD,
+     +                  CHIH_COLLOC,     
+     +                  CHIH_COLDLOC,    CHIH_COLNLOC,     CHIH_INDLOC, 
+     +                  CHIH_COLPT,      CHIH_NULLPT,
+     +                  CHIH_INDPT,      CHIH_MAPSEC,
+     +                  CHIH_TOTUSED,    CHIH_TOTSIZE,     CHIH_MODE, 
+     +                  CHIH_FLDTYPE,    CHIH_SELCOL,      CHIH_CATCOL,
+     +                  CHIH_MODECODE,   CHIH_SLICELOC, CHIH_SLICENLOC,
+     +                  CURR_CAT, NCATS_OPEN, CHIH_CHARSIZE
+ 
+      save /CHIH_C/
+

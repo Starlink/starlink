@@ -1,0 +1,134 @@
+#+
+#  Name:
+#     UPFIELD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface UPFIELD
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter NAME                # Name of the field
+      position 2
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMEFLG             # Name flag
+      position    3
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update field name.'
+      helpkey  '*'
+   endparameter
+
+   parameter NEWNAME             # New name for the field
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New name for the field'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMFLG             # Format flag
+      position    5
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field format.'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMAT              # Format of the new field
+      position 6
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New format of the field '
+      helpkey  '*'
+   endparameter
+
+   parameter UNITFLG             # Units flag
+      position    7
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field units.'
+      helpkey  '*'
+   endparameter
+
+   parameter UNITS               # New units of the field
+      position 8
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New units of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter NULLFLG             # Null value flag
+      position    9
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field null value.'
+      helpkey  '*'
+   endparameter
+
+   parameter NULLVAL             # New null value of the field
+      position 10
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'New null value of the field'
+      helpkey  '*'
+   endparameter
+
+   parameter COMFLG             # Comment flag
+      position    11
+      type        _LOGICAL
+      access      READ
+      vpath       'DEFAULT '
+      default     FALSE
+      prompt      'T to update the field comment.'
+      helpkey  '*'
+   endparameter
+
+   parameter COMMENT             # New comment on the field.
+      position 12
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'New comment associated with the field'
+      helpkey  '*'
+   endparameter
+
+
+endinterface

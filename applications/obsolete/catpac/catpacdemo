@@ -1,0 +1,507 @@
+#!/bin/csh
+#+
+#  Name:
+#     catpacdemo.csh
+#
+#  Purpose:
+#     Starts CATPAC demonstration from the UNIX shell.
+#
+#  Type of Module:
+#     C-shell script
+#
+#  Invocation:
+#     catpacdemo
+#
+#  Description:
+#     This procedure starts CATPAC demonstration.
+#
+#  Authors:
+#     Alan R. Wood (RAL)
+#     {enter_new_authors_here}
+#
+#  History:
+#     1993 Nov 12 (ARW):
+#        Original version.
+#     {enter_further_changes_here}
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+#-
+#
+#
+stty cols 132
+echo " "
+echo " "
+echo " "
+echo "CATPAC Catalogue and Tables Applications Demonstration."
+echo "This demonstration takes the user through the majority of the "
+echo "applications available in the CATPAC Package."
+echo "It takes about 15 minutes to run through the demonstration"
+echo "and requires no user input."
+echo " "
+echo "Each application is preceeded by a brief description."
+echo " "
+echo "First thing that you might want to do is to get your data into "
+echo "the system"
+echo "An example of user data has been provided as part of the release."
+echo "The first action is to copy the file TESTDATA.DAT to the current "
+echo "directory, this will be deleted at the end."
+
+echo "cp $CATPAC_DEMO/testdata.dat testdata.dat"
+echo "cp $CATPAC_DEMO/testinfo.dat testinfo.dat" 
+cp $CATPAC_DEMO/testdata.dat testdata.dat
+cp $CATPAC_DEMO/testinfo.dat testinfo.dat
+
+sleep 20
+
+echo "Now make the CATPAC Applications available."
+
+echo "catpac"
+catpac
+echo " "
+echo "The application asciicat allows us to input data from a format "
+echo "file into a catalogue."
+echo " "
+echo "Let us look at the provided example "
+echo " "
+
+sleep 10
+
+cat testdata.dat
+
+echo "and the infomation file telling asciicat how to interpret this"
+echo "data."
+echo " "
+
+sleep 5
+
+cat testinfo.dat
+
+echo " "
+echo "Note that this example includes a sexagesimal format HH MM SS"
+echo " "
+echo "Use asciicat to create the catalogue."
+echo " "
+echo "asciicat INPUT=TEST DATAFILE=testdata.dat INFOFILE=testinfo.dat"
+asciicat INPUT=TEST DATAFILE=testdata.dat INFOFILE=testinfo.dat
+echo " "
+echo "Let us look at the catalogue that has been produced using the "
+echo "catreport application"
+echo "By default CATREPORT will present its results to the screen."
+echo " "
+
+sleep 10
+
+echo "catreport INPUT=TEST"
+catreport INPUT=TEST
+echo " "
+
+sleep 5
+
+echo "The catalogue created by asciicat is a minimum catalogue with "
+echo "no parameters and dummy information associated with the fields."
+echo "As we shall see we could add parameters and update the" 
+echo "information associated with th fields to create a more complete"
+echo "catalogue. But for now lets move on to a more realistic example."
+echo " "
+
+sleep 10
+
+echo " "
+echo "Note that the fields RA and DEC are presented in sexagesimal"
+echo "formats."
+echo " "
+
+sleep 5
+
+echo "For a more complex example of using CATREPORT let us produce"
+echo "a file that has no header information and contains only selected"
+echo "fields from the catalogue."
+echo "Perhaps this file is required as input to someother process."
+echo " "
+echo "catreport INPUT=TEST HEADER=F ALLFLDS=F"
+echo "FLDNAMES=[NAME,VALUE1,VALUE2]"
+catreport TEST HEADER=F SCREEN=F ALLFLDS=F \
+FLDNAMES='[NAME,VALUE1,VALUE2]'
+echo " "
+echo "The report is written to a file called TEST.rep."
+echo " So let us look at the file that has been produced."
+echo " "
+
+sleep 10
+
+echo " "
+echo "more TEST.rep"
+more TEST.rep
+echo " "
+
+sleep 10
+
+echo " "
+echo "Sorting a catalogue has two effects. The first is that the order"
+echo "in which the records are displayed is altered which may make a "
+echo "report more useful. The second effect of sorting is hidden from"
+echo "the user but it allows the system to perform certain joins" 
+echo "and searches more efficiently"
+echo "Let us sort the catalogue on ascending values of the field"
+echo "VALUE1."
+echo " "
+echo "catsort INPUT=TEST OUTPUT=TEST1 SORTFLDS=VALUE1 SORTDIR=T"
+catsort INPUT=TEST OUTPUT=TEST1 SORTFLDS=VALUE1 SORTDIR=T
+echo " "
+echo "And let's take a look at the resulting sorted catalogue."
+echo " "
+
+sleep 20
+
+echo "catreport INPUT=TEST1"
+catreport INPUT=TEST1
+echo " "
+
+sleep 10
+
+echo " "
+echo "It is important to keep the system free from unwanted catalogues"
+echo "so delete the catalogue that we just created."
+echo " "
+echo "delcat INPUT=TEST1"
+delcat INPUT=TEST1
+echo " "
+
+sleep 10
+
+echo "catreport displays the information in the catalogue but "
+echo "catalogues can also contain information about the catalogue."
+echo "We can associate new parameters with a catalogue using"
+echo "addparam."
+echo "A parameter has a NAME, FORMAT, VALUE and a COMMENT."
+echo " "
+echo "addparam INPUT=TEST NAME=AUTHOR FORMAT=A8 VALUE=A R Wood" 
+echo "COMMENT='Catalogue Author.'"
+addparam COMMENT='"Catalogue Author"' INPUT=TEST NAME=AUTHOR FORMAT=A8 \
+VALUE='"A R Wood"'
+echo "addparam INPUT=TEST NAME=DATE FORMAT=A7 VALUE=05DEC93" 
+echo "COMMENT='Date created.'"
+addparam COMMENT='"Date Created."' INPUT=TEST NAME=DATE FORMAT=A7 \
+VALUE=05DEC93 
+
+echo "This information is held in parameters."
+echo "(Catalogue parameters not ADAM parameters)."
+echo "We can use the PARAMS application to see the names of the "
+echo "parameters and the number of parameters associated with this"
+echo "catalogue"
+echo " "
+echo "params INPUT=TEST"
+params INPUT=TEST
+echo " "
+
+sleep 10
+
+echo "We can associate new parameters with a catalogue using"
+echo "addparam."
+echo "A parameter has a NAME, FORMAT, VALUE and a COMMENT."
+echo " "
+echo "addparam INPUT=TEST NAME=CLASS FORMAT=A5 VALUE=TYPEC" 
+echo "COMMENT='Type C data.'"
+addparam COMMENT='"Type C data"' INPUT=TEST NAME=CLASS FORMAT=A5 \
+VALUE=TYPEC 
+echo " "
+
+sleep 10
+
+echo " "
+echo "And to show that the parameter has been added show the number"
+echo "and names of the parameters associated with the TEST"
+echo "catalogue."
+echo " "
+echo "params INPUT=TEST"
+params INPUT=TEST
+echo " "
+
+sleep 10
+
+echo "We may want to look at the information in this or one of the"
+echo "other parameters."
+echo "Lets have a look at the VALUE of the AUTHOR parameter."
+echo "The information available in a parameter (INFREQ) is VALUE, "
+echo "FORMAT or COMMENT."
+echo " "
+echo "paraminfo INPUT=TEST NAME=AUTHOR INFREQ=VALUE"
+paraminfo INPUT=TEST NAME=AUTHOR INFREQ=VALUE
+echo " "
+
+sleep 10
+
+echo "Or the comment of the parameter that we have just added."
+echo " "
+echo "paraminfo INPUT=TEST NAME=CLASS INFREQ=COMMENT"
+paraminfo INPUT=TEST NAME=CLASS INFREQ=COMMENT
+echo " "
+
+sleep 10
+
+echo "It may also be useful to remove redundant parameters from a"
+echo "catalogue."
+echo " "
+echo "delparam INPUT=TEST NAME=DATE"
+delparam INPUT=TEST NAME=DATE
+echo " "
+echo "And to show that it has been removed lets look at all the"
+echo "parameters again."
+echo " "
+echo "params INPUT=TEST"
+params INPUT=TEST
+echo " "
+
+sleep 10
+
+echo " "
+echo "We can update the information associated with a parameter."
+echo " "
+echo "upparam INPUT=TEST NAME=AUTHOR COMFLG=T COMMENT='Update comment'"
+upparam INPUT=TEST NAME=AUTHOR COMFLG=T \
+COMMENT='"Update comment"'
+echo " "
+echo "And to show that the value has been updated."
+echo " "
+echo "paraminfo INPUT=TEST NAME=AUTHOR INFREQ=COMMENT"
+paraminfo INPUT=TEST NAME=AUTHOR INFREQ=COMMENT
+echo " "
+
+sleep 10
+
+echo "One way of finding out the names of the fields in a catalogue"
+echo "is to catreport the catalogue with a header. A much better way"
+echo "is to use fields which finds the the number of fields and the"
+echo "names of those fields in the catalogue."
+echo " "
+echo "fields INPUT=TEST"
+fields INPUT=TEST
+echo " "
+
+sleep 10
+
+echo " "
+echo "If we want more information about a particular field we can"
+echo "use FIELDINFO."
+echo "Let's have a look at the COMMENT for the field VALUE1 in the "
+echo "TEST catalogue."
+echo "The information available about a field (INFREQ) is UNITS, "
+echo "FORMAT or COMMENT."
+echo " "
+echo "fieldinfo INPUT=TEST NAME=VALUE1 INFREQ=COMMENT"
+fieldinfo INPUT=TEST NAME=VALUE1 INFREQ=COMMENT
+echo " "
+
+sleep 10
+
+echo " "
+echo "As with a parameter we can upated the information associated"
+echo "with a field."
+echo " "
+echo "upfield INPUT=TEST NAME=VALUE1 COMFLG=T COMMENT='Changed comment'"
+upfield INPUT=TEST NAME=VALUE1 COMFLG=T COMMENT='"Changed comment"'
+echo " "
+echo "And to show that the value has been updated."
+echo " "
+fieldinfo INPUT=TEST NAME=VALUE1 INFREQ=COMMENT
+echo "fieldinfo INPUT=TEST NAME=VALUE1 INFREQ=COMMENT"
+echo " "
+
+sleep 10
+
+echo "The last piece of information that we require about a catalogue"
+echo "is how many entries it contains. Entries gives us this."
+echo " "
+echo "entries INPUT=TEST"
+entries INPUT=TEST
+echo " "
+
+sleep 10
+
+echo " "
+echo "This next part of the demonstration shows how CATPAC can be"
+echo "used to create your own customized catalogues from existing"
+echo "catalogues. Let's take our example using the TEST catalogue"
+echo "a little further and concentrate our interest on only those"
+echo "entries with VALUE2 between 1300 and 1400."
+echo "We can use catsearch to create a new catalogue that contains"
+echo "only these entries."
+echo " "
+echo "catsearch INPUT=TEST OUTPUT=TEST1"
+echo "CRITERIA=VALUE2.GT.1300.AND.VALUE2.LT.1400"
+catsearch INPUT=TEST OUTPUT=TEST1 \
+CRITERIA='"VALUE2.GT.1300"'
+echo " "
+
+sleep 20
+
+echo " "
+echo "And let's take a look at the resulting catalogue."
+echo " "
+echo "catreport INPUT=TEST1" 
+catreport INPUT=TEST1 
+echo " "
+
+sleep 10
+
+echo " "
+echo "Delete the catalogue that we just created."
+echo " "
+echo "delcat INPUT=TEST1"
+delcat INPUT=TEST1
+echo " "
+
+sleep 10
+
+echo " "
+echo "Sample every Nth entry in a catalogue."
+echo " "
+echo "sample INPUT=TEST OUTPUT=TEST1 FREQUENCY=3"
+sample INPUT=TEST OUTPUT=TEST1 FREQUENCY=3
+echo " "
+echo "Look at the resulting catalogue."
+echo " "
+echo "catreport INPUT=TEST1"
+catreport INPUT=TEST1
+echo " "
+
+sleep 10
+
+echo " "
+echo "Delete the catalogue that we just created."
+echo " "
+echo "delcat INPUT=TEST1"
+delcat INPUT=TEST1
+echo " "
+
+sleep 10
+
+echo " "
+echo "We can delete fields from a catalogue"
+echo " "
+echo "delfield INPUT=TEST NAME=VALUE1"
+delfield INPUT=TEST NAME=VALUE1
+echo " "
+echo "Look at the fields in the catalogue."
+echo " "
+echo "fields INPUT=TEST"
+fields INPUT=TEST
+echo " "
+
+sleep 10
+
+echo " "
+echo "The SLALIB functions (SUN67) FK425, FK45Z, FK524, FK54Z and "
+echo "PROPERM are included as applications in CATPAC."
+echo "Apply fk45z."
+echo " "
+echo "fk45z INPUT=TEST OUTPUT=TEST1 RAFK4=RA DECFK4=DEC  "
+echo "BEPOCH=1950 RAFK5=RAJ DECFK5=DECJ"
+fk45z INPUT=TEST OUTPUT=TEST1 RAFK4=RA DECFK4=DEC \
+BEPOCH=1950 RAFK5=RAJ DECFK5=DECJ
+echo " "
+
+sleep 10
+
+echo " "
+echo "Look at the updated catalogue."
+echo " "
+echo "catreport INPUT=TEST1 HEADER=F SCREEN=Y ALLFLDS=F "
+echo "FLDNAMES=[RA,DEC,RAJ,DECJ]"
+catreport INPUT=TEST1 HEADER=F SCREEN=Y ALLFLDS=F \
+FLDNAMES='[RA,DEC,RAJ,DECJ]'
+echo " "
+
+sleep 10
+
+echo " "
+echo "To tidy up we delete the TEST1 catalogue."
+echo " "
+echo "delcat INPUT=TEST1"
+delcat INPUT=TEST1
+echo " "
+echo "We may wish to make a copy of a catalogue."
+echo " "
+echo "copycat INPUT=TEST OUTPUT=COPYTEST"
+copycat INPUT=TEST OUTPUT=COPYTEST
+echo " "
+echo "catreport INPUT=COPYTEST"
+catreport INPUT=COPYTEST
+echo " "
+
+sleep 10
+
+echo " "
+echo "Or rename a catalogue."
+echo " "
+echo "catrename INPUT=COPYTEST NEWNAME=TEST1"
+catrename INPUT=COPYTEST NEWNAME=TEST1
+echo " "
+echo "catreport INPUT=TEST1"
+catreport INPUT=TEST1
+echo " "
+
+sleep 10
+
+echo " "
+echo "Tidy up."
+echo " "
+echo "delcat INPUT=TEST1"
+delcat INPUT=TEST1
+echo " "
+echo "The last application is JOIN two catalogues."
+echo "Perform the join."
+echo "Note how the first 4 characters of the catalogue names are "
+echo "used to uniquely identify the field names."
+echo "A catalogue JCAT has been provided."
+echo " "
+
+echo "cp $CATPAC_DEMO/ADDFJCAT.DAT ADDFJCAT.DAT"
+echo "cp $CATPAC_DEMO/JCAT.sdf JCAT.sdf" 
+cp $CATPAC_DEMO/ADDFJCAT.DAT ADDFJCAT.DAT
+cp $CATPAC_DEMO/JCAT.sdf JCAT.sdf
+echo " "
+catjoin INPUT1=TEST INPUT2=JCAT OUTPUT=TEST1 \
+EXPRESS='"GREAT_CIRCLE(TEST_RA,TEST_DEC,JCAT_RA,JCAT_DEC).LT.0.02"'
+echo " "
+
+sleep 10
+
+echo "And look at the fields in the new catalogue"
+echo " "
+echo "fields INPUT=TEST1"
+fields INPUT=TEST1
+echo " "
+echo "and report selected fields."
+echo " "
+
+sleep 10
+
+echo "catreport INPUT=TEST1"
+catreport INPUT=TEST1
+echo " "
+
+sleep 10
+
+echo " "
+echo "To tidy up we delete the TEST catalogue"
+echo " "
+echo "delcat INPUT=TEST"
+delcat INPUT=TEST
+echo "delcat INPUT=JCAT"
+delcat INPUT=JCAT
+echo "delcat INPUT=TEST1"
+delcat INPUT=TEST1
+echo "rm TEST.rep"
+rm TEST.rep
+echo "rm testdata.dat"
+rm testdata.dat
+echo "rm testinfo.dat"
+rm testinfo.dat
+echo " "
+echo "That concludes this demonstration."
+# 
+# end of the demonstration script
+#

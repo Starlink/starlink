@@ -1,0 +1,130 @@
+#!/bin/csh
+#+
+#  Name:
+#     catpac.csh
+#
+#  Purpose:
+#     Starts CATPAC from the UNIX shell.
+#
+#  Type of Module:
+#     C-shell script
+#
+#  Invocation:
+#     catpac
+#
+#  Description:
+#     This procedure starts CATPAC for use from UNIX by defining
+#     the aliases needed to execute each application or command.
+#     It also initialises ADAM, if this has not already been
+#     done.
+#
+#  Authors:
+#     Malcolm J. Currie (STARLINK)
+#     Alan R. Wood (RAL)
+#     {enter_new_authors_here}
+#
+#  History:
+#     1993 Nov 12 (ARW):
+#        Original version.
+#        Modified for catpac from the kappa original by MJC.
+#     {enter_further_changes_here}
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+#-
+#
+#  Prepare to run ADAM applications if this has not been done already.
+#  ===================================================================
+#
+#  Here look to see if there is ADAM_USER directory.  If there is not
+#  check whether or not there is an adam file that is not a directory.
+#  If there is, issue a warning and exit.  Otherwise create the required
+#  directory.
+#
+if (-d $HOME/adam) then
+   echo -n
+else
+   if (-f $HOME/adam) then
+      echo "You have a file called adam in your home directory.  Please rename it"
+      echo "since adam must be a directory for ADAM files."
+      exit
+   else
+      mkdir $HOME/adam
+   endif
+endif
+#
+#
+#  Define symbols for the applications.
+#  ====================================
+#
+alias addparam  CATPAC_DIR/addparam
+alias asciicat  CATPAC_DIR/asciicat
+alias asciito   CATPAC_DIR/asciito
+alias cathelp   CATPAC_DIR/cathelp
+alias catjoin   CATPAC_DIR/catjoin
+alias catrename CATPAC_DIR/catrename
+alias catreport CATPAC_DIR/catreport
+alias catsearch CATPAC_DIR/catsearch
+alias catsort   CATPAC_DIR/catsort
+alias copycat   CATPAC_DIR/copycat
+alias delcat    CATPAC_DIR/delcat
+alias delfield  CATPAC_DIR/delfield
+alias delparam  CATPAC_DIR/delparam
+alias entries   CATPAC_DIR/entries
+alias fieldinfo CATPAC_DIR/fieldinfo
+alias fields    CATPAC_DIR/fields
+alias fk425     CATPAC_DIR/fk425
+alias fk45z     CATPAC_DIR/fk45z
+alias fk524     CATPAC_DIR/fk524
+alias fk54z     CATPAC_DIR/fk54z
+alias globals   CATPAC_DIR/globals
+alias paraminfo CATPAC_DIR/paraminfo
+alias params    CATPAC_DIR/params
+alias properm   CATPAC_DIR/properm
+alias sample    CATPAC_DIR/sample
+alias upfield   CATPAC_DIR/upfield
+alias upparam   CATPAC_DIR/upparam
+#
+#  Now repeat for the full command names.
+#
+alias cat_addparam  CATPAC_DIR/addparam
+alias cat_asciicat  CATPAC_DIR/asciicat
+alias cat_asciito   CATPAC_DIR/asciito
+alias cat_cathelp   CATPAC_DIR/cathelp
+alias cat_catjoin   CATPAC_DIR/catjoin
+alias cat_catrename CATPAC_DIR/catrename
+alias cat_catreport CATPAC_DIR/catreport
+alias cat_catsearch CATPAC_DIR/catsearch
+alias cat_catsort   CATPAC_DIR/catsort
+alias cat_copycat   CATPAC_DIR/copycat
+alias cat_delcat    CATPAC_DIR/delcat
+alias cat_delfield  CATPAC_DIR/delfield
+alias cat_delparam  CATPAC_DIR/delparam
+alias cat_entries   CATPAC_DIR/entries
+alias cat_fieldinfo CATPAC_DIR/fieldinfo
+alias cat_fields    CATPAC_DIR/fields
+alias cat_fk425     CATPAC_DIR/fk425
+alias cat_fk45z     CATPAC_DIR/fk45z
+alias cat_fk524     CATPAC_DIR/fk524
+alias cat_fk54z     CATPAC_DIR/fk54z
+alias cat_globals   CATPAC_DIR/globals
+alias cat_paraminfo CATPAC_DIR/paraminfo
+alias cat_params    CATPAC_DIR/params
+alias cat_properm   CATPAC_DIR/properm
+alias cat_sample    CATPAC_DIR/sample
+alias cat_upfield   CATPAC_DIR/upfield
+alias cat_upparam   CATPAC_DIR/upparam
+#
+# Define procedures and commands requiring the above symbols.
+#
+echo " "
+echo " --     Initialised for CATPAC     -- "
+echo " --  Version 1.1,    1994 January  -- "
+echo " "
+echo " --  Type cathelp for CATPAC Help  -- "
+echo " "
+#
+#  Exit the procedure.
+#
+# end

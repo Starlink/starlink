@@ -1,0 +1,1344 @@
+0 Help
+ Welcome to the CATPAC online-help system.  Here you can display
+ details about a specific CATPAC command or more-general information
+ such how to use application parameters and how to respond to prompts.
+ If you need assistance using this help system, enter "Using_help" in
+ response to the "Topic?" prompt.
+
+1 ADDPARAM
+Add a Parameter to a Catalogue
+
+Usage:
+
+   ADDPARAM INPUT NAME FORMAT VALUE COMMENT
+
+Description:
+
+   Add a new parameter to a catalogue. The new parameter requires a
+   name, format, value and comment.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NAME
+NAME = _CHAR (Read)
+   Name of the new parameter.
+3 FORMAT
+FORMAT = _CHAR (Read)
+   Format of the new parameter. A FORTRAN format detailing how the
+   parameter value should be interpreted.
+3 VALUE
+VALUE = _CHAR (Read)
+   Value to be associated with the new parameter.
+3 COMMENT
+COMMENT = _CHAR (Read)
+   Comment to be associated with the new parameter.
+2 Notes
+The value of a parameter is always a character string. The format
+determines how the value should be interpreted.
+2 Example
+   ADDPARAM TEST CLASS I2 25 'Catalogue Class'
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 ASCIITOCAT
+Create a catalogue from an ASCII file.
+
+Usage:
+
+   ASCIITOCAT INPUT DATAFILE
+
+Description:
+
+   Create a new catalogue that contains the data from an ASCII file.
+   ASCIITOCAT allows you to put your own data into a catalogue. The
+   data must be tabular. Before running this application you should
+   examine your data and decide which columns/fields in the data
+   are to included in the catalogue. For each of these fields note
+   the start position and the FORTRAN format that should be used to
+   read the data in this field. A wide range of sexagesimal formats are
+   also available. A good idea for finding the correct
+   start positions is to copy the first few entries of the data into
+   a separate file and include a first line containing
+   123456789012.....
+   Have a copy of this handy when you run the application. The
+   application first prompts for the name of the catalogue being
+   created and the name of the file from which the data is to be
+   read. During the next stage the application repeatedly prompts for
+   information about fields. For each field you will be prompted for
+   a field name, format, units, null value, comment and start
+   position. When you have defined all the fields use the ADAM null
+   value ! at the field name prompt to move onto the next stage.
+   During the final stage the application repeatedly prompts for
+   information about catalogue parameters. For each parameter you
+   will be prompted for a paramter name, format, value and comment
+   When you have defined all the parameters use the ADAM null
+   value ! at the parameter name prompt to finish.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue to be created.
+3 DATAFILE
+DATAFILE = _CHAR (Read)
+   Name of the file containing the tabular ascii data.
+3 FNAME
+FNAME = _CHAR (Read)
+   Name of the next field.
+   [Repeatedly prompted for, terminated with a !]
+3 FFORMAT
+FFORMAT = _CHAR (Read)
+   Format of the field.
+   [Repeatedly prompted for.]
+3 FUNIT
+FUNIT = _CHAR (Read)
+   Units to be associated with this field.
+   [Repeatedly prompted for.]
+3 FCOMMENT
+FCOMMENT = _CHAR (Read)
+   Comment to be associated with this field.
+   [Repeatedly prompted for.]
+3 STARTPOS
+STARTPOS = _INTEGER (Read)
+   Start position, column number, of the data for this field.
+   [Repeatedly prompted for.]
+3 PNAME
+PNAME = _CHAR (Read)
+   Name of the next parameter.
+   [Repeatedly prompted for, terminated with a !]
+3 PFORMAT
+PFORMAT = _CHAR (Read)
+   Format of the parameter.
+   [Repeatedly prompted for.]
+3 PVALUE
+PVALUE = _CHAR (Read)
+   Value to be associated with this parameter.
+   [Repeatedly prompted for.]
+3 PCOMMENT
+PCOMMENT = _CHAR (Read)
+   Comment to be associated with this parameter.
+   [Repeatedly prompted for.]
+2 Notes
+This application performs no checking on your field definition.
+This allows a degree of flexibility when interpreting your data.
+You may, for example, have a field STARID with format A10
+starting at position 15 and field STARNUM with format I4 starting
+at position 21.
+2 Example
+   ASCIITOCAT TEST TESTDATA.DAT
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 CATJOIN
+CATJOIN two catalogues.
+
+Usage:
+
+   CATJOIN INPUT1 INPUT2 OUTPUT EXPRESS
+
+Description:
+
+   Create a new catalogue by joining two catalogues. The effect of the join
+   is as follows. Consider a large catalogue that contains all the fields
+   from the INPUT1 catalogue and all the fields from the INPUT2 catalogue.
+   Into this catalogue put an entry for each combination of entries in
+   catalogues INPUT1 and INPUT2. The resulting catalogue will have N*M
+   entries where N is the number of entries in the INPUT1 catalogue and
+   M the number in the INPUT2 catalogue. Now search this catalogue for
+   those entries that satisfy the given expression.
+
+   Another way of looking at join is to say. Take every entry in turn
+   from catalogue INPUT1. Match this entry against every entry in
+   catalogue INPUT2 and if the EXPRESSion is satisfied combine both entries
+   to write to a new catalogue.
+
+   The expression should be a legal CATPAC Parser expression.
+
+   Field names in the expression must be unique so append an '_' followed
+   by the first four characters of the catalogue name. Eg. RA_IRPS, DEC_YALE
+   VALUE2_CAT1.GT.300.AND.VALUE2_CAT2.LT.500
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT1
+INPUT1 = _CHAR (Read)
+   Name of the first input catalogue.
+3 INPUT2
+INPUT2 = _CHAR (Read)
+   Name of the second input catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the catalogue to contain the merged entries.
+3 EXPRESS
+EXPRESS = _CHAR (Read)
+   The join expression.
+2 Example
+   CATJOIN CAT1 CAT2 JOINCAT VALUE2_CAT1.GT.300.AND.VALUE2_CAT2.LT.500
+
+   CATJOIN CAT1 CAT2 JOINCAT GREAT_CIRCLE(RA_CAT1,DEC_CAT1,RA_CAT2,DEC_CAT2)
+   .LT.CONVERT("ARCSEC","56")
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 CATRENAME
+Rename a catalogue.
+
+Usage:
+
+   CATRENAME INPUT NEWNAME
+
+Description:
+
+   Rename a catalogue to a new name.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NEWNAME
+NEWNAME = _CHAR (Read)
+   New name of the catalogue.
+2 Example
+   CATRENAME TEST NEWTEST
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 CATREPORT
+Produce a catalogue report.
+
+Usage:
+
+   CATREPORT TEST [HEADER] [SCREEN] [ALLFLDS] [FLDNAMES]
+
+Description:
+
+   Produces a catalogue report. A simple report is produced with or
+   without a header, to the screen or to a file (<catalogue name>.REP),
+    selecting fields or reporting all fields.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 HEADER
+HEADER = _LOGICAL (Read)
+   Add header information to the report T/F?
+   [TRUE]
+3 SCREEN
+SCREEN = _LOGICAL (Read)
+   Output to the screen (or a file) T/F?
+   [TRUE]
+3 ALLFLDS
+ALLFLDS = _LOGICAL (Read)
+   All fields to be reported T/F?
+   [TRUE]
+3 FLDNAMES
+FLDNAMES = _CHAR (Read)
+   List of field names to be reported
+2 Examples
+REPORT TEST HEADER=F SCREEN=F ALLFLDS=N FLDNAMES=[RA,DEC,VALUE1]
+   Produce a report with no header, output to a file and selecting
+   fields.
+2 Notes
+A report to the screen is limited to 80 characters and to file 132
+characters. Excess fields are ignored and a warning issued.
+Requested fields that do not appear in the catalogue are ignored.
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 CATSEARCH
+Select entries from a catalogue.
+
+Usage:
+
+   CATSEARCH INPUT OUTPUT CRITERIA
+
+Description:
+
+   Create a new catalogue that contains entries from a catalogue
+   that pass some selection criteria. The criteria should be a legal
+   CATPAC Parser expression.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the catalogue to contain the selected entries.
+3 CRITERIA
+CRITERIA = _CHAR (Read)
+   Logical expression of the selection criteria.
+2 Notes
+REJECT and CATSEARCH complement each other.
+2 Example
+   CATSEARCH TEST SEARCHTEST VALUE2.GT.300.AND.VALUE2.LT.500
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 CATSORT
+Create a new catalogue that is sorted on given fields.
+
+Usage:
+
+   CATSORT INPUT OUTPUT SORTFLDS SORTDIR
+
+Description:
+
+   Create a new catalogue that is sorted on given fields. The functionality
+   of sort is twofold. The first function is to create indexes associated
+   with the catalogue that allow efficient searching and joining. The second
+   function is a by product of the sort and that is to order a catalogue
+   for presentation.
+
+   Consider sorting the data in a telephone directory. For presentation
+   purposes sort the data by field SURNAME (Primary field) if several
+   entries are found with the same surname order these by ordering on the
+   field FIRSTINITIAL (Secondary field) and if entries are found with the
+   same surname and first initial order these by ordering on the field
+   SECONDINITIAL (Tertiary field). This catalogue would now be presented in
+   a useful way. More importantly the system has created an
+   index that allows it to perform an efficient search and join in certain
+   cases. For example, a request for entries where the SURNAME is BROWN and
+   the FIRSTINITIAL is J.
+
+   The order of field names in the SORTFLDS parameter is significant.
+   SORTFLDS(1) must contain the primary field, SORTFLDS(2) and
+   SORTFLDS(3) contain the secondary and tertiary fields.
+   Omitting either the secondary or tertiary position simply indicates
+   that there should be no secondary or tertiary ordering.
+
+   The direction of the sort for each field in given in the corresponding
+   position of the SORTDIR parameter. TRUE for ascending.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the new sorted catalogue.
+3 SORTFLDS
+SORTFLDS = _CHAR (Read)
+   Names of the Primary, Secondary and Tertiary fields for an index.
+3 SORTDIR
+SORTDIR = _LOGICAL (Read)
+   Direction of sort TRUE for descending FALSE ascending.
+2 Notes
+SORTFLDS and SORTDIR must correspond.
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 Classified_commands
+
+CATPAC applications may be classified in terms of their
+functions as follows:
+
+2 Reporting_Catalogues
+
+  CATREPORT Produce a catalogue report.
+
+2 Creating_catalogues 
+
+  From data
+
+  ASCIITOCAT Create a catalogue from an ASCII file.
+
+  From another catalogue
+
+  CATJOIN Join two catalogues.
+
+  CATSEARCH Select entries from a catalogue.
+
+  COPYCAT Make a copy of a catalogue.
+ 
+  FK425 Creates a new catalogue in the FK5 coordinate system. (See SLALIB)
+
+  FK45Z Creates a new catalogue in the FK5 coordinate system. (See SLALIB)
+
+  FK524 Creates a new catalogue in the FK4 coordinate system. (See SLALIB)
+
+  FK54Z Creates a new catalogue in the FK4 coordinate system. (See SLALIB)
+
+  PROPERM Creates a new catalogue performing proper motion corrections. 
+          (See SLALIB)
+
+  RENAME Rename a catalogue.
+
+  SAMPLE Select every Nth entry from a catalogue.
+
+2 Deleting_Catalogues
+
+  DELCAT Deletes a catalogue from the system.
+
+2 Manipulating_cataloge
+
+  Examining information about the catalogue.
+
+  ENTRIES Find the number of entries in a catalogue.
+
+  FIELDINFO Find specific information about a field in the catalogue.
+
+  FIELDS Finds the number and names of fields in a catalogue.
+
+  PARAMINFO Find specific information about a parameter in the catalogue.
+
+  PARAMS Finds the number and names of parameters in a catalogue.
+
+  Changing the information about the catalogue
+
+  ADDPARAM Adds a parameter to a catalogue.
+
+  DELPARAM Deletes a parameter from a catalogue.
+
+  UPFIELD Update the information associated with a field in the catalogue.
+
+  UPPARAM Update the information associated with a parameter in the catalogue.
+
+2 Manipulating_data
+
+  CATSORT Sort the entries in a catalogue.
+
+2 Inquiries_and_Status
+
+  GLOBALS Displays the values of the CATPAC global parameters.
+
+1 COPYCAT
+Copy a catalogue.
+
+Usage:
+
+   COPYCAT INPUT OUTPUT
+
+Description:
+
+   Copy a catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   New catalogue.
+2 Example
+   COPYCAT TEST NEWTEST
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 DELCAT
+Deletes a catalogue from the system.
+
+Usage:
+
+   DELCAT INPUT
+
+Description:
+
+   Delete a catalogue from the system.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+2 Notes
+Catalogues not created by the user may be protected and in these
+cases the Delete Catalogue application will have no effect.
+2 Example
+   DELCAT TEST
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 DELFIELD
+Delete a Field from a Catalogue
+
+Usage:
+
+   DELFIELD INPUT NAME
+
+Description:
+
+   Delete a field from a catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NAME
+NAME = _CHAR (Read)
+   Name of the field to be deleted.
+2 Example
+   DELFIELD TEST CLASS
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+1 DELPARAM
+Delete a Parameter from a Catalogue
+
+Usage:
+
+   DELPARAM INPUT NAME
+
+Description:
+
+   Delete a parameter from a catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NAME
+NAME = _CHAR (Read)
+   Name of the parameter to be deleted.
+2 Example
+   DELPARAM TEST CLASS
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+1 ENTRIES
+Finds the number of entries in a catalogue.
+
+Usage:
+
+   ENTRIES INPUT
+
+Description:
+
+   Finds the number of entries in a catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+2 Example
+   ENTRIES TEST
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 FIELDINFO
+Find specific information about a field in a catalogue.
+
+Usage:
+
+   FIELDINFO INPUT NAME INFREQ
+
+Description:
+
+   Finds the FORMAT, UNITS, or COMMENT associated with a
+   field in a catalogue. For example find the comment associated
+   with the field VALUE1 in the TEST catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NAME
+NAME = _CHAR (Read)
+   Name of the field whose information is required.
+3 INFREQ
+INFREQ = _CHAR (Read)
+   Information required. (FORMAT, UNITS or COMMENT)
+2 Example
+   FIELDINFO TEST VALUE1 COMMENT
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 FIELDS
+Find the number and names of fields in a catalogue.
+
+Usage:
+
+   FIELDS INPUT
+
+Description:
+
+   Find the number of fields and the names of thoses fields
+   in a catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+2 Example
+   FIELDS TEST
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 FK425
+Convert FK4 coordinates to FK5
+
+Usage:
+
+   FK425 INPUT OUTPUT RAFK4 DECFK4 RAPMFK4 DECPMFK4 PARLXFK4 RADVELFK4
+   RAFK5 DECFK5 RAPMFK5 DECPMFK5 PARLXFK5 RADELFK5
+
+Description:
+
+   Create a catalogue containing new fields for the Right Ascension,
+   Declination, Parallax, Radial velocity and proper motions after a
+   conversion has been made from the FK4 system coordinates. The
+   new fields are calculated using SLA_FK425. See SUN 67
+
+   Conversion from Besselian epoch 1950.0 to Julian epoch 2000.0 only
+   is provided. Proper motion corrections can be made using PROPERM.
+
+   Proper motions should be given in sec/yr and arcsecs/yr
+   Parallax should be given in arcseconds.
+   Radial velocity should be given in km/sec (+ve if receeding)
+
+   If necessary use UPDATE to convert fields into the appropriate units.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the output catalogue.
+3 RAFK4
+RAFK4 = _CHAR (Read)
+   Name of the RA field in FK4 system.
+3 DECFK4
+DECFK4 = _CHAR (Read)
+   Name of the DEC field in FK4 system.
+3 RAPMFK4
+RAPMFK4 = _CHAR (Read)
+   Name of the RA proper motion field in FK4 system.
+3 DECPMFK4
+DECPMFK4 = _CHAR (Read)
+   Name of the DEC proper motion field in FK4 system.
+3 PARLXFK4
+PARLXFK4 = _CHAR (Read)
+   Name of the parallax field in FK4 system.
+3 RADVELFK4
+RADVELFK4 = _CHAR (Read)
+   Name of the radial velocity field in FK4 system.
+3 RAFK5
+RAFK5 = _CHAR (Read)
+   Name of the RA field in FK5 system.
+3 DECFK5
+DECFK5 = _CHAR (Read)
+   Name of the DEC field in FK5 system.
+3 RAPMFK5
+RAPMFK5 = _CHAR (Read)
+   Name of the RA proper motion field in FK5 system.
+3 DECPMFK5
+DECPMFK5 = _CHAR (Read)
+   Name of the DEC proper motion field in FK5 system.
+3 PARLXFK5
+PARLXFK5 = _CHAR (Read)
+   Name of the parallax field in FK5 system.
+3 RADVELFK5
+RADVELFK5 = _CHAR (Read)
+   Name of the radial velocity field in FK5 system.
+2 Notes
+This application creates a new catalogue that contains extra fields for
+Right Ascension, Declination, Parallax, Radial velocity and proper
+motions after a conversion to FK5 system.
+The naming of these new fields can lead to confusion. Traditionally
+the field names RA and DEC are used for the Right Ascension and
+Declination fields in the catalogue. It is stongly suggested that the
+field names of Right Ascension and Declination in the new system (FK5)
+take the form RAJ, DECJ for RA Julian and DEC Julian. In the same way
+PARLX would become PARLXJ and RADVEL RADVELJ etc. You may go on to
+rename the field RA to RAB and DEC to DECB and RAJ to RA and DECJ to DEC
+using the UPFIELD application but you must also then update the Parallax,
+Radial velocity and proper motions and the catalogues Equinox parameter.
+
+Care should also be taken when renaming fields. Renaming RAJ to RA
+before renaming RA to RAB, in the above example, would result in two
+fields named RA in the same catalogue.
+2 Example
+   FK425 TEST TESTFK5 RA DEC RA_PM DEC_PM PARALLAX RAD_VEL RAJ DECJ
+   PARALLAXJ RADVELJ
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 FK45Z
+Convert FK4 coordinates to FK5
+
+Usage:
+
+   FK45Z INPUT OUTPUT RAFK4 DECFK4 BEPOCH RAFK5 DECFK5
+
+Description:
+
+   Create a catalogue containing new fields for the Right Ascension
+   and Declination. The new fields are calculated using SLA_FK45Z.
+   See SUN 67
+
+   Conversion from Besselian epoch 1950.0 to Julian epoch 2000.0 only
+   is provided.
+
+   If necessary use UPDATE to convert fields into the appropriate units.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the output catalogue.
+3 RAFK4
+RAFK4 = _CHAR (Read)
+   Name of the RA field in FK4 system.
+3 DECFK4
+DECFK4 = _CHAR (Read)
+   Name of the DEC field in FK4 system.
+3 BEBOCH
+BEBOCH = _REAL (Read)
+   Epoch
+3 RAFK5
+RAFK5 = _CHAR (Read)
+   Name of the RA field in FK5 system.
+3 DECFK5
+DECFK5 = _CHAR (Read)
+   Name of the DEC field in FK5 system.
+2 Notes
+This application creates a new catalogue that contains extra fields for
+Right Ascension, Declination
+The naming of these new fields can lead to confusion. Traditionally
+the field names RA and DEC are used for the Right Ascension and
+Declination fields in the catalogue. It is stongly suggested that the
+field names of Right Ascension and Declination in the new system (FK5)
+take the form RAJ, DECJ for RA Julian and DEC Julian. You may go on to
+rename the field RA to RAB and DEC to DECB and RAJ to RA and DECJ to DEC
+using the UPFIELD application but you must also then update the Parallax,
+Radial velocity and proper motions and the catalogues Equinox parameter.
+
+Care should also be taken when renaming fields. Renaming RAJ to RA
+before renaming RA to RAB, in the above example, would result in two
+fields named RA in the same catalogue.
+2 Example
+   FK45Z TEST TESTFK5 RA DEC BEPOCH RAJ DECJ
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 FK524
+Convert FK5 coordinates to FK4
+
+Usage:
+
+   FK524 INPUT OUTPUT RAFK5 DECFK5 RAPMFK5 DECPMFK5 PARLXFK5 RADVELFK5
+   RAFK4 DECFK4 RAPMFK4 DECPMFK4 PARLXFK4 RADVELFK4
+
+Description:
+
+   Create a catalogue containing new fields for the Right Ascension,
+   Declination, Parallax, Radial velocity and proper motions after a
+   conversion has been made from the FK5 system coordinates. The
+   new fields are calculated using SLA_FK524. See SUN 67
+
+   Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0 only
+   is provided. Proper motion corrections can be made using PROPERM.
+
+   Proper motions should be given in sec/yr and arcsecs/yr
+   Parallax should be given in arcseconds.
+   Radial velocity should be given in km/sec (+ve if receeding)
+
+   If necessary use UPDATE to convert fields into the appropriate units.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the output catalogue.
+3 RAFK5
+RAFK5 = _CHAR (Read)
+   Name of the RA field in FK5 system.
+3 DECFK5
+DECFK5 = _CHAR (Read)
+   Name of the DEC field in FK5 system.
+3 RAPMFK5
+RAPMFK5 = _CHAR (Read)
+   Name of the RA proper motion field in FK5 system.
+3 DECPMFK5
+DECPMFK5 = _CHAR (Read)
+   Name of the DEC proper motion field in FK5 system.
+3 PARLXFK5
+PARLXFK5 = _CHAR (Read)
+   Name of the parallax field in FK5 system.
+3 RADVALFK5
+RADVALFK5 = _CHAR (Read)
+   Name of the radial velocity field in FK5 system.
+3 RAFK4
+RAFK4 = _CHAR (Read)
+   Name of the RA field in FK4 system.
+3 DECFK4
+DECFK4 = _CHAR (Read)
+   Name of the DEC field in FK4 system.
+3 RAPMFK4
+RAPMFK4 = _CHAR (Read)
+   Name of the RA proper motion field in FK4 system.
+3 DECPMFK4
+DECPMFK4 = _CHAR (Read)
+   Name of the DEC proper motion field in FK4 system.
+3 PARLXFK4
+PARLXFK4 = _CHAR (Read)
+   Name of the parallax field in FK4 system.
+3 RADVALFK4
+RADVALFK4 = _CHAR (Read)
+   Name of the radial velocity field in FK4 system.
+2 Notes
+This application creates a new catalogue that contains extra fields for
+Right Ascension, Declination, Parallax, Radial velocity and proper
+motions after a conversion to FK4 system.
+The naming of these new fields can lead to confusion. Traditionally
+the field names RA and DEC are used for the Right Ascension and
+Declination fields in the catalogue. It is stongly suggested that the
+field names of Right Ascension and Declination in the new system (FK4)
+take the form RAB, DECB for RA Besselian and DEC Besselian. In the same
+way PARLX would become PARLXB and RADVEL RADVELB etc. You may go on to
+rename the field RA to RAJ and DEC to DECJ and RAB to RA and DECB to DEC
+using the UPFIELD application but you must also then update the Parallax,
+Radial velocity and proper motions and the catalogues Equinox parameter.
+
+Care should also be taken when renaming fields. Renaming RAB to RA
+before renaming RA to RAJ, in the above example, would result in two
+fields named RA in the same catalogue.
+2 Example
+   FK524 TEST TESTFK4 RA DEC RAPM DECPM PARALLAX RAD_VEL RAB DECB
+   RAPMB DECPMB PARALLAXB RADVELB
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 FK54Z
+Convert FK5 coordinates to FK4
+
+Usage:
+
+   FK54Z INPUT OUTPUT RAFK5 DECFK5 BEPOCH RAFK4 DECFK4
+
+Description:
+
+   Create a catalogue containing new fields for the Right Ascension
+   and Declination. The new fields are calculated using SLA_FK54Z.
+   See SUN 67
+
+   Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0 only
+   is provided.
+
+   If necessary use UPDATE to convert fields into the appropriate units.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the output catalogue.
+3 RAFK5
+RAFK5 = _CHAR (Read)
+   Name of the RA field in FK5 system.
+3 DECFK5
+DECFK5 = _CHAR (Read)
+   Name of the DEC field in FK5 system.
+3 BEBOCH
+BEBOCH = _REAL (Read)
+   Epoch
+3 RAFK4
+RAFK4 = _CHAR (Read)
+   Name of the RA field in FK4 system.
+3 DECFK4
+DECFK4 = _CHAR (Read)
+   Name of the DEC field in FK4 system.
+2 Notes
+This application creates a new catalogue that contains extra fields for
+Right Ascension, Declination
+The naming of these new fields can lead to confusion. Traditionally
+the field names RA and DEC are used for the Right Ascension and
+Declination fields in the catalogue. It is stongly suggested that the
+field names of Right Ascension and Declination in the new system (FK5)
+take the form RAB, DECB for RA Besslian and DEC Besslian. You may go on to
+rename the field RA to RAJ and DEC to DECJ and RAB to RA and DECB to DEC
+using the UPFIELD application but you must also then update the Parallax,
+Radial velocity and proper motions and the catalogues Equinox parameter.
+
+Care should also be taken when renaming fields. Renaming RAB to RA
+before renaming RA to RAJ, in the above example, would result in two
+fields named RA in the same catalogue.
+2 Example
+   FK54Z TEST TESTFK4 RA DEC BEPOCH RAB DECB
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 GLOBALS
+Displays the values of the CATPAC global parameters.
+
+Usage:
+
+   GLOBALS
+
+Description:
+
+   This procedure lists the meanings and values of the CATPAC global
+   parameters.  If a global parameter does not have a value, the
+   string "<undefined>" is substituted where the value would have been
+   written.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1991 July 18 (MJC):
+    Original version.
+
+ 17-OCT-1991 (ARW):
+    For CATPAC
+2 Bugs
+   None known.
+1 Help
+ This is the CATPAC online help system.  It invokes the STARLINK HELP
+ Facility to display information about a CATPAC command or topic.  If
+ you need assistance using this help library, enter "Using_help" in
+ response to the "Topic?" prompt.
+
+ CATPAC is a package for catalogue handling.
+
+1 PARAMINFO
+Find specific information about a parameter in a catalogue.
+
+Usage:
+
+   PARAMINFO TEST AUTHOR VALUE
+
+Description:
+
+   Finds the FORMAT, VALUE or COMMENT associated with a field in a
+   catalogue. For example find the VALUE associated with the
+   parameter AUTHOR in the TEST catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NAME
+NAME = _CHAR (Read)
+   Name of parameter.
+3 INFREQ
+INFREQ = _CHAR (Read)
+   Information required.(FORMAT, VALUE or COMMENT)
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 PARAMS
+Find the number and names of parameters in a catalogue.
+
+Usage:
+
+   PARAMS INPUT
+
+Description:
+
+   Find the number of parameters and the names of those parameters in
+   a catalogue.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+2 Example
+   PARAMS TEST
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 PROPERM
+Apply proper motion correction to a catalogue.
+
+Usage:
+
+   PROPERM INPUT OUTPUT RAEP0 DECEP0 RAPM DECPM PARLLAX RADVEL RAEP1
+   DECEP1 EP0 EP1
+
+Description:
+
+   Create a catalogue containing new fields for the new Right Ascension and
+   Declination after the correction has been made for proper motion.
+   Calculated using SLA_PM. See SUN 67.
+
+   Proper motions should be given in secs/yr and arcsec/yr.
+   Parallax should be given in arcseconds.
+   Radial velocity should be given in km/sec (+ve if receeding)
+
+   If necessary use UPDATE to convert fields into the appropriate units.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the output catalogue.
+3 RAEP0
+RAEP0 = _CHAR (Read)
+   Name of the RA field at epoch 0.
+3 DECEP0
+DECEP0 = _CHAR (Read)
+   Name of the DEC field at epoch 0.
+3 RAPM
+RAPM = _CHAR (Read)
+   Name of the RA proper motion field.
+3 DECPM
+DECPM = _CHAR (Read)
+   Name of the DEC proper motion field.
+3 PARALLAX
+PARALLAX = _CHAR (Read)
+   Name of the parallax field.
+3 RADVEL
+RADVEL = _CHAR (Read)
+   Name of the radial velocity field.
+3 RAEP1
+RAEP1 = _CHAR (Read)
+   Name of the RA field at epoch 1.
+3 DECEP1
+DECEP1 = _CHAR (Read)
+   Name of the DEC field at epoch 1.
+3 EP0
+EP0 = _REAL (Read)
+   Start Epoch.
+3 EP1
+EP1 = _REAL (Read)
+   End epoch.
+2 Notes
+This application creates a new catalogue that contains extra fields for
+Right Ascension and Declination after a proper motion correction.
+The naming of these new fields can lead to confusion. Traditionally
+the field names RA and DEC are used for the Right Ascension and
+Declination fields in the catalogue. It is stongly suggested that the
+field names of Right Ascension and Declination at a new epoch take the
+form RA1970, DEC1970. You may go on to rename the field RA to RA1950 and
+DEC to DEC1950 and RA1970 to RA and DEC1970 to DEC using the UPFIELD
+application but you must also then update the catalogues Epoch parameter
+to 1970.
+
+Care should also be taken when renaming fields. Renaming RA1970 to RA
+before renaming RA to RA1950, in the above example, would result in two
+fields named RA in the same catalogue.
+2 Example
+   PROPERM TEST TEST1970 RA DEC RA_PM DEC_PM PARALLAX RAD_VEL 1950 1970
+   RA1970 DEC1970
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 SAMPLE
+Select every Nth entry from a catalogue.
+
+Usage:
+
+   SAMPLE INPUT OUTPUT FREQUENCY [REJECT] [OUTREJECT]
+
+Description:
+
+   Sample a catalogue at frequency N creating a new catalogue to
+   contain the selected entries. By using the REJECT option a second
+   catalogue can be created that contains those entries that were not
+   selected.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 OUTPUT
+OUTPUT = _CHAR (Read)
+   Name of the catalogue to contain the sampled entries.
+3 FREQUENCY
+FREQUENCY = _INTEGER (Read)
+   Sample frequency N
+3 REJECT
+REJECT = _LOGICAL (Read)
+   Do you require a rejects catalogue (T/F)?
+   [FALSE]
+3 OUTREJECT
+OUTREJECT = _CHAR (Read)
+   Name of the catalogue to contain the rejected entries.
+2 Example
+   SAMPLE TEST SAMPTEST 20
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 Summary
+The growing number of CATPAC applications makes a simple list of their
+functions unwieldy.  More practically, the "Classified_commands"
+topic contains commands grouped by their functionality.
+
+1 UPFIELD
+Update Field information in a Catalogue
+
+Usage:
+
+   UPFIELD INUPT NAME [NAMEFLG] [NEWNAME] [FORMFLG] [FORMAT]
+   [UNITFLG] [UNITS] [NULLFLG] [NULLVAL] [COMFLG] [COMMENT]
+
+Description:
+
+   Update the information associated with a field in a catalogue. The
+   field has a name, format, unit, null value and comment. Any of these
+   can be updated by setting the relevant flag
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NAME
+NAME = _CHAR (Read)
+   Name of the field.
+3 NAMEFLG
+NAMEFLG = _LOGICAL (Read)
+   Name flag. Do you want to update the field name T/F?
+   [FALSE]
+3 NEWNAME
+NEWNAME = _CHAR (Read)
+   New name for the field.
+3 FORMFLG
+FORMFLG = _LOGICAL (Read)
+   Format flag. Do you want to update the field format T/F?
+   [FALSE]
+3 FORMAT
+FORMAT = _CHAR (Read)
+   New format for the format. A FORTRAN format detailing how the
+   field value should be displayed.
+3 UNITFLG
+UNITFLG = _LOGICAL (Read)
+   Unit flag. Do you want to update the field units T/F?
+   [FALSE]
+3 UNITS
+UNITS = _CHAR (Read)
+   New units to be associated with the field.
+3 NULLFLG
+NULLFLG = _LOGICAL (Read)
+   Null value flag. Do you want to update the field null value T/F?
+   [FALSE]
+3 NULLVAL
+NULLVAL = _CHAR (Read)
+   New null value to be associated with the field.
+3 COMFLG
+COMFLG = _LOGICAL (Read)
+   Comment flag. Do you want to update the field comment T/F?
+   [FALSE]
+3 COMMENT
+COMMENT = _CHAR (Read)
+   New comment to be associated with the field.
+2 Example
+   UPFIELD TEST VALUE1 COMFLG=T COMMENT="Possible error + or - 2"
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 UPPARAM
+Update a Parameter in a Catalogue
+
+Usage:
+
+   UPPARAM INPUT NAME [NAMEFLG] [NEWNAME] [FORMFLG] [FORMAT]
+   [VALFLG] [VALUE] [COMFLG] [COMMENT]
+
+Description:
+
+   Update a parameter in a catalogue. The parameter has a name
+   format, value and comment. Any of these can be updated
+   by setting the relevant flag
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INPUT
+INPUT = _CHAR (Read)
+   Name of the catalogue.
+3 NAME
+NAME = _CHAR (Read)
+   Name of the parameter.
+3 NAMEFLG
+NAMEFLG = _LOGICAL (Read)
+   Name flag. Do you want to update the parameter name T/F?
+   [FALSE]
+3 NEWNAME
+NEWNAME = _CHAR (Read)
+   New name for the parameter.
+3 FORMFLG
+FORMFLG = _LOGICAL (Read)
+   Format flag. Do you want to update the parameter format T/F?
+   [FALSE]
+3 FORMAT
+FORMAT = _CHAR (Read)
+   New format for the parameter. A FORTRAN format detailing how the
+   parameter value should be interpreted.
+3 VALFLG
+VALFLG = _LOGICAL (Read)
+   Value flag. Do you want to update the parameter value T/F?
+   [FALSE]
+3 VALUE
+VALUE = _CHAR (Read)
+   New value to be associated with the parameter.
+3 COMFLG
+COMFLG = _LOGICAL (Read)
+   Comment flag. Do you want to update the parameter comment T/F?
+   [FALSE]
+3 COMMENT
+COMMENT = _CHAR (Read)
+   New comment to be associated with the parameter.
+2 Notes
+The value of a parameter is always a character string. The format
+determines how the value should be interpreted. An error will be
+if the value and format become inconsistent.
+2 Example
+   UPPARAM TEST CLASS FORMFLG=T FORMAT=I2
+2 Authors
+ARW: Alan Wood (STARLINK)
+2 History
+ 11-OCT-1991 (ARW):
+    Original version.
+2 Bugs
+   None known.
+1 Using_Help
+ You are situated in a portable HELP library which contains help
+ information about CATPAC arranged in an hierarchical structure.  The
+ help system enables you to navigate the library by prompting when it
+ has completed displaying the previously requested help.  The
+ information displayed by the help system on a particular topic
+ includes a description of the topic and a list of subtopics that
+ further describe the topic.  These topic names are called keywords. 
+
+ At a prompt you may enter:
+
+   o  a topic or subtopic name to display the help for that topic or
+      subtopic,
+
+   o  just a <CR> to move up one level in the hierarchy, and if you
+      are at the top level it will terminate the help session,
+
+   o  a CTRL/Z on VMS or a CTRL/D on UNIX will terminate the help
+      session,
+
+   o  a question mark "?" to redisplay the text for the current topic,
+      including the list of topic or subtopic names, or
+
+   o  an ellipsis "..." to display all the text below the current point 
+      in the hierarchy.  For example, "CATREPORT..." displays information 
+      on the CATREPORT topic as well as information on all the subtopics
+      under CATREPORT.
+
+ You can abbreviate any keyword using the following rules:
+
+   1) Just give the first few characters, e.g. 'PARA' for 'Parameters'.
+
+   2) Some keywords are composed of several words separated by
+   underscores.  Each word of the keyword may be abbreviated,
+   e.g. "Colour_Set" can be shortened to "C_S".
+
+   3) The characters "%" and "*" act as wildcards, where the percent
+   sign matches any single character, and asterisk matches any
+   sequence of characters.  Thus to display information on all
+   available topics, type an asterisk (*) in reply to a prompt.
+
+   4) If a word contains but does end with an asterisk wildcard, it
+   must not be truncated.
+
+   5) The entered string must not contain leading or embedded spaces.
+
+ Ambiguous abbreviations result in all matches being displayed. 
+ 
+2 Help_Parameters
+
+ keyword ...
+
+  Specifies one or more keywords that refer to the topic  or  subtopic
+  on  which you  want  information from the help library.  Information
+  within the help library is arranged in a hierarchical  manner.   The
+  levels are:
+
+  1.  None--- If you do not specify a keyword,  CATHELP introduces the 
+      help system  and  lists the  top-level topics.  Each item in the
+      list is a keyword in the first level of the hierarchy.
+
+  2.  Topic-name---If you specify  a keyword  by naming  a topic,  the
+      help facility  describes  the  topic.  Keywords  for  additional
+      information available on this topic are listed.
+
+  3.  Topic-name subtopic---If you  specify  a  subtopic  following  a
+      topic, the help facility provides a description of the specified
+      subtopic.

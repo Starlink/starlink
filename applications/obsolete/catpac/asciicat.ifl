@@ -1,0 +1,47 @@
+#+
+#  Name:
+#     ASCIICAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface ASCIICAT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter DATAFILE             # Ascii data file name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'File name of file containing the ascii data.'
+      helpkey  '*'
+   endparameter
+
+   parameter INFOFILE             # Name of the information file
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      prompt   'Name of the information file.'
+      helpkey  '*'
+   endparameter
+
+endinterface

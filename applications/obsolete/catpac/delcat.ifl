@@ -1,0 +1,30 @@
+#+
+#  Name:
+#     DELCAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+interface DELCAT
+
+   helplib 'CATPAC_HELP:'
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the Catalogue to be deleted. '
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,161 @@
+#+
+#  Name:
+#     FK425.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ARW: Alan Wood (STARLINK)
+
+#  History:
+#     11-OCT-1991 (ARW):
+#     	 Original version.
+
+#-
+
+   helplib 'CATPAC_HELP:'
+
+interface FK425
+
+   parameter INPUT               # Catalogue Name
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association '<->GLOBAL.CATPAC_INPUT'
+      prompt   'Name of the Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTPUT              # Catalogue Name
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Name of the output Catalogue'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK4               # Name of the RA field in FK4 system
+      position 3
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RA'
+      prompt   'Name of the RA field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK4              # Name of the DEC field in FK4 system
+      position 4
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DEC'
+      prompt   'Name of the DEC field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPMFK4             # Name of the RA proper motion field FK4.
+      position 5
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRA'
+      prompt   'Name of the RA proper motion field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPMFK4            # Name of the DEC proper motion field FK4.
+      position 6
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDEC'
+      prompt   'Name of the DEC proper motion field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLXFK4            # Name of the parallax field FK4.
+      position 7
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLX'
+      prompt   'Name of the parallax field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVELFK4           # Name of the radial velocity field FK4.
+      position 8
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVEL'
+      prompt   'Name of the radial velocity field in FK4'
+      helpkey  '*'
+   endparameter
+
+   parameter RAFK5               # Name of the RA field in FK5 system
+      position 9
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RAJ'
+      prompt   'Name of the RA field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECFK5              # Name of the DEC field in FK5 system
+      position 10
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'DECJ'
+      prompt   'Name of the DEC field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter RAPMFK5             # Name of the RA proper motion field FK5.
+      position 11
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMRAJ'
+      prompt   'Name of the RA proper motion field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter DECPMFK5            # Name of the DEC proper motion field FK5.
+      position 12
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PMDECJ'
+      prompt   'Name of the DEC proper motion field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter PARLXFK5            # Name of the parallax field FK5.
+      position 13
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'PARLXJ'
+      prompt   'Name of the parallax field in FK5'
+      helpkey  '*'
+   endparameter
+
+   parameter RADVELFK5           # Name of the radial velocity field FK5.
+      position 14
+      type     _CHAR
+      vpath    'PROMPT '
+      ppath    'DEFAULT '
+      default  'RADVELJ'
+      prompt   'Name of the radial velocity field in FK5'
+      helpkey  '*'
+   endparameter
+
+endinterface
