@@ -2342,6 +2342,10 @@ sub handle_monoliths
   my $seen_global_libobjs = var ('LDADD') && &handle_lib_objects ('', 'LDADD');
 
   my @all_tasks;
+
+  # @task_monolith_pairs is a list of task:monolith pairs, so that
+  # each installed task .ifc file can be linked with the correct
+  # monolith at install time.
   my @task_monolith_pairs;
 
   foreach my $pair (@proglist) 
@@ -2463,11 +2467,11 @@ sub handle_monoliths
                ($xname . '_TASKS', $xname . '_IFC', 'star__ifc', 0, $where,
                # The transform code to run on each filename.
                sub {
-                 my ($subvar, $val, $cond, $full_cond) = @_;
+                 my ($subvar, $task, $cond, $full_cond) = @_;
                  my @r;
-                 push (@r, $val . '.ifc');
-                 push_dist_common ($val . '.ifl');
-                 push (@task_monolith_pairs, "$val:$xname");
+                 push (@r, $task . '.ifc');
+                 push_dist_common ($task . '.ifl');
+                 push (@task_monolith_pairs, "$task:$xname");
                  return @r;
                });
           push (@all_tasks, $resvar);
@@ -2504,7 +2508,8 @@ sub handle_monoliths
                                       '+', TRUE, # append in all conditions
                                       $xname . '.ifc',
                                       '', INTERNAL, VAR_ASIS);
-          push (@task_monolith_pairs, "$xname:$xname");
+          # Do NOT add $xname:$xname to @task_monolith_pairs, since
+          # this would cause the monolith to be linked to itself (bad).
         }
       else 
         {
