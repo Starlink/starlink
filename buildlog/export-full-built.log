@@ -654,4 +654,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:413: Compile failed; see the compiler error output for details.
 
-Total time: 4 minutes 40 seconds
+Total time: 4 minutes 30 seconds
