@@ -9,7 +9,7 @@ ppport.h
 typemap
 typemap.561
 PGPLOT/PGPLOT.pm
-PGPLOT/Makefile.pm
+PGPLOT/Makefile.PL
 PGPLOT/t/pgplot.t
 t/attrib.t
 t/channel.t
