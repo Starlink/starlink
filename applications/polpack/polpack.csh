@@ -52,7 +52,7 @@
 #
 #  Set up an environment variable pointing to the help library. This is refered
 #  to within the appliation interface files.
-      setenv POLPACK_HELP /star-test/help/polpack/polpack
+      setenv POLPACK_HELP INSTALL_HELP/polpack
 #
 #  Define symbols for the applications and scripts.
 #  ===============================================
