@@ -34,8 +34,9 @@ using std::exit;
 #include "DviFile.h"
 #include "PkFont.h"
 #include "Bitmap.h"
-#include "version.h"
 #include "verbosity.h"
+#include "PageRange.h"
+#include "version.h"
 
 #ifdef ENABLE_KPATHSEA
 #include "kpathsea.h"

@@ -10,7 +10,7 @@ KPATHSEA_OBJ=@KPATHSEAOBJ@
 
 EXEC=dvi2bitmap
 OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
-	BitmapImage.o XBMBitmap.o $(GIF_OBJ) $(KPATHSEA_OBJ)
+	BitmapImage.o XBMBitmap.o PageRange.o $(GIF_OBJ) $(KPATHSEA_OBJ)
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
 .SUFFIXES: .o .cc
@@ -40,6 +40,8 @@ GIFBitmap.o: GIFBitmap.cc GIFBitmap.h Bitmap.h
 XBMBitmap.o: XBMBitmap.cc XBMBitmap.h Bitmap.h
 
 kpathsea.o: kpathsea.cc kpathsea.h verbosity.h
+
+PageRange.o: PageRange.cc PageRange.h verbosity.h
 
 
 # Distribution
