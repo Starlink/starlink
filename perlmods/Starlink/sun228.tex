@@ -15,12 +15,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {228.2}
+\newcommand{\stardocnumber}    {228.3}
 \newcommand{\stardocauthors}   {T.\ Jenness, F.\ Economou\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {15 June 1999}
+\newcommand{\stardocdate}      {4 November 1999}
 \newcommand{\stardoctitle}     {STARPERL -- Starlink perl modules}
-\newcommand{\stardocversion}   {1.10}
+\newcommand{\stardocversion}   {1.11}
 \newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {The StarPerl package is a selection
 of perl modules that provide access to Starlink infrastructure libraries.
@@ -43,6 +43,16 @@ the Starlink Noticeboard system.
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
+\newcommand{\task}[1]{{\sf #1}}
+\newcommand{\Kappa}{\xref{{\sc{Kappa}}}{sun95}{}}
+\newcommand{\Figaro}{\xref{{\sc{Figaro}}}{sun86}{}}
+\newcommand{\ndfperl}{\xref{{\sc{Ndfperl}}}{sun222}{}}
+\newcommand{\ADAM}{\xref{{ADAM}}{sun144}{}}
+
+\newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
+\newcommand{\copobj}{\xref{\task{copobj}}{sun86}{COPOBJ}}
+\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
+
 
 % +
 %  Name:
@@ -300,15 +310,18 @@ the Starlink Noticeboard system.
 The Starperl package provides modules for perl/Starlink interoperability. The
 purpose of this package is to allow access to the Starlink infrastructure
 libraries from the \xref{perl}{sun193}{} programming language. Available
-modules in this release are the ADAM module (for interface with the ADAM
+modules in this release are the \ADAM module (for interface with the \ADAM
 messaging system), the EMS module and an interface to the Noticeboard system.
 
 The mechanism for reading, writing and manipulating Starlink data format files
-(NDF and HDS) from perl is documented in \xref{SUN/222}{sun222}{}.
+(NDF and HDS) from perl is documented in \xref{SUN/222}{sun222}{} although
+the higher level package Starlink::HDSPACK is included as part of this
+release.
+
 
 \section{The usefulness of this package\label{stats}}
 
-The ADAM  modules are useful in situations where there is a need for
+The \ADAM\  modules are useful in situations where there is a need for
 efficient scripting without recourse to compiled code. An example of
 such a script is to process a large number of files.
 
@@ -333,6 +346,9 @@ Additionally, it is sometimes convenient to use shared memory to pass
 information between processes on the same machine. The NBS interface
 provides a simple way of doing this from perl (even allowing the use
 of tied hashes).
+
+The Starlink::HDSPACK module provides a perl alternative to using the
+\Figaro\ \copobj\ and \delobj\ commands.
 
 \section{The Starlink Perl modules}
 
@@ -432,7 +448,7 @@ An interface to MERS (\xref{SUN/104}{sun104}{}) is provided by the
 
 \section{ADAM interface}
 
-This package provides modules that allow perl to send and receive ADAM
+This package provides modules that allow perl to send and receive \ADAM\
 messages. This allows a perl program to control ADAM monoliths without having
 to launch a new process each time a data reduction task is required (as found
 in \xref{shell scripts}{sc4}{} or using the \texttt{system} call from perl).
@@ -451,7 +467,7 @@ This is what needs to happen in such as script
 
 \item The Starlink modules are included
 
-\item The ADAM messaging is started and the KAPPA monolith is loaded
+\item The ADAM messaging is started and the \Kappa\ monolith is loaded
 
 \item Stuff happens
 
@@ -593,7 +609,7 @@ $dir = $kappa->control("default","dir");
 $kappa->control("par_reset");
 \end{verbatim}
 \end{myquote}
-
+% $
 
 
 \subsection{Constants}
@@ -688,13 +704,47 @@ tie %nb, ref($nbs), $nbs;
 print Dumper(\%nb); # list the Notice board
 \end{verbatim}
 \end{myquote}
+% $
 
 More information can be found in the Starlink::NBS man page
 (\texttt{perldoc Starlink::NBS} and in the appendix of this document).
 
+
+\section{HDS wrapper commands}
+ 
+The Starlink::HDSPACK module provides some high level HDS manipulation
+routines (cf. NDFPACK in \Kappa). Routines are provided for deleting and 
+copying HDS structures. For example:
+
+\begin{myquote}
+\begin{verbatim}
+$status = copobj("file.more.fits","file1.more", $status);
+$status = delobj("file.more.fits", $status);
+\end{verbatim}
+\end{myquote}
+
+To avoid confusion with perl prototypes, these routines have to return
+the status rather than changing the input status variable directly\footnote{it 
+could be done automatically with a prototype of (\$\\\$) but that may cause
+confusion if the routine is called with an \& since prototypes are then
+disabled}.
+ 
+These are similar to the \Figaro\ \copobj\ and \delobj\ commands.
+This module requires that \ndfperl\ is available.
+
+A more detailed description can be found in the appendix
+
 \appendix
 
 \section{Changes}
+
+\subsection{New in version 1.11}
+
+\begin{itemize}
+\item Include Starlink::HDSPACK for \texttt{copobj} and \texttt{delobj}
+support.
+
+\end{itemize}
 
 \subsection{New in version 1.10}
 
@@ -895,6 +945,7 @@ Should be either 'A' or 'I'.
 $task->tasktype('A');
 \end{verbatim}
 \end{myquote}
+% $
 
 \item[monolith]%
 \index{monolith@monolith}%
@@ -989,7 +1040,7 @@ $value = $obj->get("task","param");
 
 If the monolith has been started as an A-task the adam messaging
 system can not be used to retrieve the parameter value. Instead,
-the par\_{}get routine from the perl NDF module is invoked.
+the par\_{}get routine from the perl NDF module (\ndfperl) is invoked.
 
 \item[set]%
 \index{set@set}%
@@ -1057,6 +1108,7 @@ Only used directly to access the top level of the noticeboard
 \begin{verbatim}
    $nbs_id  = new Starlink::NBS("nbsname");
 \end{verbatim}
+% $
 
 The {\em loadnbs()\/} method is invoked with the supplied argument.
 
@@ -1363,7 +1415,73 @@ nbs_save_noticeboard(id, status)
 Note that nbs\_{}get\_{} and nbs\_{}put\_{} require a separate routine for each
 type. Additionally, the get and set routines expect array arguments.
 
+\section{Starlink::HDSPACK interface specification}%
+\index{HDSPACK.PM}
 
+This module provides wrapper routines for common HDS manipulations.
+Functions are provided for copying data structures between locations
+and for deleting structures.
+
+\subsection{Functions}%
+\index{FUNCTIONS}
+
+The following functions are available:
+
+\begin{description}
+
+\item[{\bf retrieve\_locs}]%
+\index{retrieve_locs@{\bf retrieve\_locs}}%
+\hfil\\
+Given a full path to a HDS structure, returns an array of 
+locators corresponding to each structure referenced in the path.
+\begin{verbatim}
+  ($status, @locators) = retrieve_locs("file.more.fits", $mode, $status);
+\end{verbatim}
+
+The mode argument specifies the file access type. Can be 'READ', 'WRITE'
+or 'UPDATE'.
+
+In the above example, {\tt @locators} would contain three entries,
+a locator to the file itself, a locator to the {\tt more} structure
+and a locator to the {\tt fits} component.
+
+Bad status is returned if the named components do not exist or cannot
+be opened.
+
+This routine assumes we are in a valid error context (eg {\em err\_begin()\/}
+has been called).
+
+The locators returned by this routine must be annulled by the caller.
+
+\item[{\bf copobj}]%
+\index{copobj@{\bf copobj}}%
+\hfil\\
+Copy an HDS object to a specified output structure.
+\begin{verbatim}
+  $status = copobj("file.more.fits", "file2.more.fits2", $status);
+\end{verbatim}
+
+The above example will copy the FITS component from {\tt file.sdf} to
+the {\tt FITS2} extension of {\tt file2.sdf}. If the target structure
+already exists it is overwritten.
+
+This routine assumes we are in a valid error context (eg {\em err\_begin()\/}
+has been called).
+
+\item[{\bf delobj}]%
+\index{delobj@{\bf delobj}}%
+\hfil\\
+Delete the named object structure.
+\begin{verbatim}
+  $status = delobj("file.more.fits", $status);
+\end{verbatim}
+
+This example will remove the FITS extension from {\tt file.sdf}.
+
+This routine assumes we are in a valid error context (eg {\em err\_begin()\/}
+has been called).
+
+\end{description}
 
 
 % ? End of main text
