@@ -149,7 +149,8 @@
         END IF
 
 *      Add background value
-        CALL ARR_ADD1R( BGND, I_N_AUX, %VAL(I_DPTR_AUX) )
+        CALL ARR_ADD1R( I_N_AUX, %VAL(I_DPTR_AUX), BGND,
+     :                  %VAL(I_DPTR_AUX), STATUS )
 
 *      Plot line
         CALL IMG_AUX(STATUS)

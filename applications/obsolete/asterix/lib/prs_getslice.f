@@ -149,8 +149,11 @@
             IDIM=IDIM+LOHI-1
 
 *          or other limit for current dimension
-*          this piece of trickery toggles between 1 & 2
-            LOHI=(.NOT.LOHI.AND.3)
+            IF ( LOHI .EQ. 1 ) THEN
+              LOHI = 2
+            ELSE
+              LOHI = 1
+            END IF
           END DO
         END IF
       END IF

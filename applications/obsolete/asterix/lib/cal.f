@@ -1326,7 +1326,7 @@ C Check status
 *-
 	REAL		CEM(256), GEIG(256)
 	COMMON /CAL_BMD/ GTA, GTB, GTVP, CEMA, CEMB, CEMVP, CEM, GEIG
-	SAVE CAL_BMD
+	SAVE /CAL_BMD/
 
 * Use the look up table to generate CEM c/s
 	PCN3 = MIN(PCN3,256)
@@ -1544,7 +1544,7 @@ C
 *-
 	REAL		CEM(256), GEIG(256)
 	COMMON /CAL_BMD/ GTA, GTB, GTVP, CEMA, CEMB, CEMVP, CEM, GEIG
-	SAVE CAL_BMD
+	SAVE /CAL_BMD/
 
 * Use the look up table to generate CEM c/s
 	PGID = MIN(PGID,256)
@@ -1989,7 +1989,7 @@ C
 	DOUBLE PRECISION MJDLO,MJDHI
 	COMMON /CAL_BMD/ GTA, GTB, GTVP, CEMA, CEMB, CEMVP,CEM, GEIG
 
-	SAVE CAL_BMD
+	SAVE /CAL_BMD/
 
 * The code assumes the following structure for BMD info in CAL_WFC_MASTER
 *

@@ -95,21 +95,14 @@
 *         WCI class definitions loaded?
 
 *  Arguments Given:
-      DOUBLE PRECISION		SPOS(2)			! Celestial position
-      INTEGER			PIXID			! Pixellation
-      INTEGER			PRJID			! Projection details
+      DOUBLE PRECISION		SPOS(2)
+      INTEGER			PIXID, PRJID
 
 *  Arguments Returned:
-      REAL			APOS(2)			! Axis position
+      REAL			APOS(2)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  External references:
-      EXTERNAL			SLA_DRANGE
-        DOUBLE PRECISION	SLA_DRANGE
-      EXTERNAL			SLA_DRANRM
-        DOUBLE PRECISION	SLA_DRANRM
 
 *  Local Variables:
       DOUBLE PRECISION		LAPOS(2)		! Position in axis units

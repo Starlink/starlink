@@ -3870,9 +3870,9 @@ c        REAL XX,XP,YP
 *    Local variables :
       REAL XP,YP,XPC,YPC,X,Y
       REAL AP,BP
+      REAL XMIN,XMAX,YMIN,YMAX
       REAL ANG,SANG,CANG,SA,CA
       INTEGER IA
-      INTEGER II1,II2,JJ1,JJ2
 *-
         IF (STATUS.NE.SAI__OK) RETURN
 
@@ -3883,10 +3883,10 @@ c        REAL XX,XP,YP
         CANG=COS(ANGLE*DTOR)
         SANG=SIN(ANGLE*DTOR)
 
-        I1=INT(XPC)
-        I2=NINT(XPC)
-        J1=INT(YPC)
-        J2=NINT(YPC)
+        XMIN=XC
+        XMAX=XC
+        YMIN=YC
+        YMAX=YC
 
         DO IA=0,360
 
@@ -3897,19 +3897,20 @@ c        REAL XX,XP,YP
 
           XP=XPC + AP*CA*CANG - BP*SA*SANG
           YP=YPC + AP*CA*SANG + BP*SA*CANG
-
-          II1=INT(XP)
-          II2=NINT(XP)
-          JJ1=INT(YP)
-          JJ2=NINT(YP)
-
-
-          I1=MIN(I1,II1)
-          I2=MAX(I2,II2)
-          J1=MIN(J1,JJ1)
-          J2=MAX(J2,JJ2)
+          CALL IMG_PIXTOWORLD(XP,YP,X,Y,STATUS)
+          XMIN=MIN(XMIN,X)
+          XMAX=MAX(XMAX,X)
+          YMIN=MIN(YMIN,Y)
+          YMAX=MAX(YMAX,Y)
 
         ENDDO
+
+        CALL IMG_WORLDTOPIX(XMIN,YMIN,XP,YP,STATUS)
+        I1=INT(XP)
+        J1=INT(YP)
+        CALL IMG_WORLDTOPIX(XMAX,YMAX,XP,YP,STATUS)
+        I2=NINT(XP)
+        J2=NINT(YP)
 
         I1=MAX(1,I1)
         I2=MIN(I_NX,I2)

@@ -475,8 +475,9 @@
           END IF
 
 *        Add offset
-          CALL ARR_ADD1I( ORIG(IFILE)-1, NSRC(IFILE),
-     :                  %VAL(OIDPTR+CSRC*VAL__NBI), STATUS )
+          CALL ARR_ADD1I( NSRC(IFILE), %VAL(OIDPTR+CSRC*VAL__NBI),
+     :                    ORIG(IFILE)-1,
+     :                    %VAL(OIDPTR+CSRC*VAL__NBI), STATUS )
 
 *        Reset flag marking first file with sources
           FIRST_WITH_SRC = .FALSE.

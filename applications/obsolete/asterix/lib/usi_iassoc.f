@@ -117,7 +117,7 @@
       LPAR = PAR
 
 *  Construct parameter index string
-      CALL CHR_ITOC( IDX, STR(CHR_LEN(PAR)+1:), NDIG )
+      CALL CHR_ITOC( IDX, LPAR(CHR_LEN(PAR)+1:), NDIG )
 
 *  Invoke lower level routine
       CALL USI_ASSOC( LPAR, CLASS, ACCESS, ID, STATUS )
