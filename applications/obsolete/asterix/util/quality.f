@@ -1284,7 +1284,7 @@
 
 
 *+  QUALITY_SETFSEL - Reads a spatial descriptor file and sets a mask
-	SUBROUTINE QUALITY_SETFSEL( LOC, NDIM, DIM, AXLO, AXHI,
+	SUBROUTINE QUALITY_SETFSEL( FID, NDIM, DIM, AXLO, AXHI,
      :                              SELECT, STATUS )
 *    Description :
 *     Reads a description of a spatial region from a spatial file
