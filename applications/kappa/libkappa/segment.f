@@ -87,7 +87,7 @@
 *        co-ordinate Frame of the output NDF by aligning the WCS
 *        information stored in the catalogue with the WCS information in
 *        the output NDF. A message indicating the Frame in which the
-*        positions were aligned with the output NDF is diplayed.
+*        positions were aligned with the output NDF is displayed.
 *     LOGFILE = FILENAME (Write)
 *        The name of a text file in which the co-ordinates of the
 *        polygon vertices are to be stored.  A null value (!) means that
