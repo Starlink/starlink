@@ -1861,6 +1861,9 @@ proc Step {demo body} {
          } elseif { $element == "alpha" } {
             incr i
    
+         } elseif { $element == "agitate" } {
+            incr i
+   
          } elseif { $element == "link" } {
             incr i
             set linkname [lindex $body $i]
@@ -1913,6 +1916,12 @@ proc Step {demo body} {
       } elseif { $element == "alpha" } {
          incr i
          if { ![Alpha [lindex $body $i]] } {
+            set ret 0
+            break
+         }
+
+      } elseif { $element == "agitate" } {
+         if { ![Agitate] } {
             set ret 0
             break
          }
@@ -2827,6 +2836,15 @@ proc SetCom {com args} {
 
    return $ret
 
+}
+
+proc Agitate {} {
+#  Delete the AGI database.
+   global env
+   set fl [glob $env(AGI_USER)/agi_*.sdf]
+   if { $fl != "" } {
+      file delete $fl
+   }
 }
 
 proc Alpha {state} {
