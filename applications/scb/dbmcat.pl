@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w 
+#!/usr/local/bin/perl -w 
 
 #+
 #  Name:
@@ -125,3 +125,4 @@ else {
 }
 print "\n";
 
+# $Id$
