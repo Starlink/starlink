@@ -414,6 +414,7 @@
       INCLUDE 'CCD1_MOSPR'       ! Constants specific to MAKEMOS & DRIZZLE
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
       INCLUDE 'AST_PAR'          ! AST parameters
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Global Variables:
       INCLUDE 'CCD1_MOSCM'       ! Global variables for MAKEMOS & DRIZZLE
@@ -536,7 +537,6 @@
 *  Internal references:
       INCLUDE 'NUM_DEC_CVT'      ! Conversion declarations
       INCLUDE 'NUM_DEF_CVT'      ! Conversion definitions
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *.
 
 *  Check inherited global status.

@@ -314,6 +314,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK internal constants
       INCLUDE 'GRP_PAR'          ! Standard GRP system constants
       INCLUDE 'AST_PAR'          ! Standard AST system constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -394,7 +395,6 @@
 *  Internal references:
       INCLUDE 'NUM_DEC_CVT'      ! Conversion declarations
       INCLUDE 'NUM_DEF_CVT'      ! Conversion definitions
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *.
 
 *  Check inherited global status.
