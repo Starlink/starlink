@@ -26,8 +26,11 @@ version</version>
 Slight restructuring to make it easier to find the instructions on
 generating fonts.  Fixed a couple of typos.
 
-<distribution string="2" date="05-JUL-1999" author="ng" versionid=upd3>
+<distribution string="1.0-4" date="05-JUL-1999" author="ng" versionid=upd3>
 Altered documentation of font-searching, to match new functionality.
+
+<distribution string="1.0-5" date="06-SEP-1999" author="ng"
+versionid="upd5">Changed description of configuration process.
 </distribution>
 
 </history>
@@ -65,8 +68,10 @@ This HTML documetation is also available as a
 <webref url='dvi2bitmap.single.html' >single file</webref>
 ]]>
 
-<p>This document matches version 1.0-4 of the program (you can see
-what version you have with the command <kbd/dvi2bitmap -V/).
+<p>This document matches version 1.0-5 of the program (you can see
+what version you have with the command <kbd/dvi2bitmap -V/).  This
+should currently be regarded as beta software (OK, the version
+number doesn't suggest beta software, but &ellip; it's a long story).
 
 <sect id=usage export>Usage
 <update versionid=upd3>Added a description of my usage model, to help
@@ -155,6 +160,9 @@ postamble.  Useful in conjunction with the
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
 
+<dt><code>-nf</code>
+<dd>Do process the DVI file, but don't generate missing fonts.
+
 <dt><code>-o output</code>
 <dd>Choose the output filename pattern.  The value is a 
 `printf' formatting string, with a single <code>%d</code>
@@ -205,16 +213,16 @@ warning if it finds any others.
 
 <p>If the &tex; file contains a special command:
 <verbatim>
-\special{dvi2bitmap outputfile thispage}
+\special{dvi2bitmap outputfile my_filename}
 </verbatim>
 then the output file used for the current page will be 
-<em/thispage.gif/
+<em/my_filename.gif/
 (the extension will depend on the output type selected).
 
 <subsect id=usage.exit export>Exit value
 
 <p>Exits with a non-zero status if there were any processing errors.
-`Having <em/no/ fonts present counts as a processing error; if there is
+Having <em/no/ fonts present counts as a processing error; if there is
 at least one font present, then missing fonts will be replaced by a
 more-or-less randomly chosen alternative, and the program will produce a
 warning if the <code/-Q/ option is not present, but it will return
@@ -267,7 +275,11 @@ file, which you can find using the command <kbd/kpsewhich cnf texmf.cnf/.
 
 <p>Since dvi2bitmap's default resolution is 72~dpi, as opposed to the
 usual printer resolution of 300 or 600~dpi, you are unlikely to have
-suitable fonts on your system, and will need to generate them
+suitable fonts on your system, and will need to generate them.  The
+program will generate these automatically, if it was configured with
+support for that (see <ref id=install.nonstarlink>); if it wasn't
+configured with that support, or if the automatic font generation
+fails, you might need to generate the fonts by hand.
 
 <p>How you generate fonts depends on your &tex; distribution.  As explained
 in <ref id=usage.examples>, you can determine which fonts you need using the 
@@ -311,7 +323,8 @@ distribution, so may not be present on your system.
 
 <p>dvi2bitmap is packaged in two slightly different ways, one
 which respects the bundling conventions of the <webref
-url='http://www.starlink.rl.ac.uk' >Starlink Project</webref>, and one
+url='http://www.starlink.rl.ac.uk' >Starlink Project</webref> (the
+project I work for), and one
 which is more usual for network-distributed software.  
 
 <p>When you unpack the distribution tarball, you should find at least
@@ -340,12 +353,16 @@ give the commands
 <p>This build configures support for GIFs, plus support for the
 <code/kpathsea/ library if that library is present on the system (it
 is not distributed with this package and not present by default on all
-machines).
+project machines).
 
 <subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">
   Added instructions on configuring in support for the kpathsea
   library
+</update>
+<update versionid="upd5">
+Largely rewrote the configuration instructions, in an attempt to make
+them clearer.
 </update>
 
 <p>To configure and build:
@@ -353,25 +370,25 @@ machines).
 % ./configure
 % make
 </verbatim>
-You can override the C++ compiler the configure script will choose by
-setting the environment variable <code/CXX/, either via 
-<verbatim>
-% CXX=cxx ./configure
-</verbatim>
-or
-<verbatim>
-% env CXX=cxx ./configure
-</verbatim>
-depending on your shell.
+but see the configuration options below.
 
 <p>To install, just copy the executable dvi2bitmap wherever you want it
 to live.
 
-<p>If you want to use the <code/kpathsea/ library, which means that
+<p>You can customise the program using flags to the
+<code>./configure</code> command:
+<dl>
+
+<dt><code/&ddash;with-kpathsea/
+
+<dd>If you want to use the <code/kpathsea/ library, which means that
 the program finds font files using the same mechanism and the same
-configuration file as other &tex;ware then give the configure option
+configuration file as other &tex;ware, then give the configure option
 <code/&ddash;with-kpathsea/, and make sure that the <code/kpathsea/ include
-files and library are somewhere the compiler will find them.  For this
+files and library are somewhere the compiler will find them.  
+
+<![ ignore [
+For this
 library to find its configuration files, you will either have to
 install the program where the rest of the &tex;ware lives (you can
 find this out with the command <kbd/which kpsewhich/), or tell it
@@ -380,16 +397,45 @@ environment variable <code/TEXMFCNF/ (use <kbd/kpsewhich cnf
 texmf.cnf/ to find the configuration file, and set the environment
 variable to the directory which contains that file -- I <em/think/
 that some versions of the library require <code/TEXMFCNF/ to specify
-the file rather than the directory`).  If you don't have the
+the file rather than the directory).
+]]>
+
+If you don't have the
 <code/kpathsea/ library available (I don't believe it's installed by
 the <code/TeXLive/ distribution, for example), then you can obtain a
 copy from <webref url='http://www.tug.org' >TUG</webref> or <webref
 url='http://www.tex.ac.uk' >CTAN</webref>, in <code
-fspath>/tex-archive/systems/web2c/</code> (it seems
+fspath>/tex-archive/systems/web2c/texk-n.n</code> (it seems
 you can only get <code/kpathsea/ as part of the complete web2c
 distribution, and not as a standalone library).
 
-<p>The program generates XBM bitmaps by default.  
+<dt><code/&ddash;disable-texmfcnf/
+
+<dd>The <code/kpathsea/ library finds its configuration files in two
+ways, either automatically if it is installed in the same directory as
+the rest of 
+the &tex;ware, or using the <code/TEXMFCNF/ environment variable.  The
+<code/dvi2bitmap/ program sets the latter variable internally, unless
+it finds it already set.  If this will be inconvenient, you can
+suppress this behaviour by providing the flag
+<code/&ddash;disable-texmfcnf/, or equivalently
+<code/&ddash;enable-texmfcnf=no/.
+
+<dt><code/&ddash;enable-mktexpk/ and <code/&ddash;enable-maketexpk/
+<dd>In the default configuration, the program will generate missing
+fonts using one of the standard scripts present in most &tex;
+distributions.  The configuration process looks first for
+<code/mktexpk/ then <code/MakeTeXPK/, and uses whichever it
+finds first.  If you have both scripts but wish to use
+<code/MakeTeXPK/ for some reason, you will have to give the option
+<code/&ddash;disable-mktexpk/; if you wish to disable both, you will
+have to give <code/&ddash;disable-maketexpk/ as well.  Both options
+take an optional argument giving the path to an alternative script
+with the same calling interface.
+
+<dt><code/&ddash;enable-gif/
+
+<dd>The program generates only XBM bitmaps by default.  
 If you want it to be able to generate GIFs, then give the configure
 option <code/&ddash;enable-gif/.  The GIF format is the copyright of
 CompuServe.  As far as I understand it, one does not need a licence
@@ -401,6 +447,11 @@ sorry business in the <webref
 url='http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html'
 >comp.graphics.misc FAQ</webref>
 
+</dl>
+
+<p>The <code>./configure</code> command without any options is
+equivalent to <code>./configure --with-kpathsea --enable-mktexpk</code>
+
 <p>The program builds successfully on (at least) egcs-2.90, Sun Workshop
 C++ 5.0, and Alpha Digital C++ 6.0 (with an irrelevant warning in the
 latter case).  It should be written in
@@ -411,18 +462,28 @@ don't tell me), or (3) you need to invoke some magic to get the
 compiler to be conformant (in which case tell me, if there's something
 I can do in the autoconfigure script).
 
+<p>You can override the C++ compiler the configure script will choose by
+setting the environment variable <code/CXX/, either via 
+<verbatim>
+% CXX=cxx ./configure
+</verbatim>
+or
+<verbatim>
+% env CXX=cxx ./configure
+</verbatim>
+depending on your shell.
+
 <sect id=developments export>Further developments
 
 <p>Things I'd like to do sometime:
 <ul>
-<li>I'd like to have missing PK files generated automatically.  This
-isn't too difficult, but is likely to be a tad fiddly to do well.
-
 <li>At some point I'll add an option to select which pages are
-processed.  Again, this comes under the heading of `fiddly' rather
+processed.  This comes under the heading of `fiddly' rather
 than `interestingly difficult'. 
 
 </ul>
+
+<p>Bright ideas and (especially) implementations, cheerfully received.
 
 <sect id=refs export>References
 
@@ -611,6 +672,7 @@ conversion factors wrong (I hate these!), please correct me.
 <caption>
 Sizes in TeX
 </caption>
+<tabular>
 <tgroup cols="3">
 <thead>
 <row><entry>Context<entry>Description<entry>See
@@ -676,6 +738,7 @@ reference point.
 
 </tbody>
 </tgroup>
+</tabular>
 </table>
 
 <p><ol>
@@ -721,13 +784,17 @@ in units of <code/FIXes/, so that the TFM width is a length of
 of <m/2^{-16}/ points, `px' for pixels, and <m/d\mu/ for Knuth's
 deci-micron, or <m/10^{-7}\mathrm{m}/,
 <meqnarray>
+<mline>
 1\mathrm{sp} = \frac{1}{2^{20}}\mathrm{pt} & = & 
-	\frac{25400000}{7227\times 2^{16}} d\mu \\
-7227\mathrm{pt} & = & 254\mathrm{cm} = 25400000 d\mu \\
+	\frac{25400000}{7227\times 2^{16}} d\mu
+<mline>
+7227\mathrm{pt} & = & 254\mathrm{cm} = 25400000 d\mu
+<mline>
 1\mathrm{dviu} & = & \frac{\mathrm{num}\times\mathrm{resolution}}%
-		{\mathrm{den}\times 254000} \mathrm{px} \\
+		{\mathrm{den}\times 254000} \mathrm{px}
+<mline>
 1\mathrm{dviu} & = & \frac{\mathrm{num}\times 7227}%
-		{\mathrm{den}\times 25400000} \mathrm{pt} \\
+		{\mathrm{den}\times 25400000} \mathrm{pt}
 </meqnarray>
 
 </ul>
