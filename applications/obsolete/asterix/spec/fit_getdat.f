@@ -115,6 +115,7 @@
 *  Authors:
 *     TJP: Trevor Ponman (University of Birmingham)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -172,6 +173,8 @@
 *        ADI port. Use new BDI routines, FSI for spectral set access.
 *      4 Mar 1996 (DJA):
 *        Added group loading capability
+*      5 August 1997 (RB):
+*        Map all arrays before slicing, pass FileSet to FSI.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -314,7 +317,8 @@
           IF ( SPECSET(I) ) THEN
 
 *        Get selection
-            CALL FSI_GETSEL( DCFID(I), I, NDETMAX, DETSEL(1,I),
+c DCFID(I)
+            CALL FSI_GETSEL( ID, I, NDETMAX, DETSEL(1,I),
      :                       DETNO(I), STATUS )
 
 *        Trap selection absent
@@ -638,6 +642,7 @@
 	      CALL BDI_MAPR(OBDAT(NDS).D_ID,'Variance','READ',TPTR,
      :                      STATUS)
 	      IF (SPECSET(N)) THEN
+                CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).VPTR, STATUS )
                 CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
      :                           %VAL(OBDAT(NDS).VPTR), STATUS )
 	      ELSE
@@ -661,6 +666,7 @@
 	      CALL BDI_MAPL( OBDAT(NDS).D_ID, 'LogicalQuality',
      :                       'READ', TPTR, STATUS )
 	      IF (SPECSET(N)) THEN
+                CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).QPTR, STATUS )
                 CALL ARR_SLCOPL( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
      :                           %VAL(OBDAT(NDS).QPTR), STATUS )
 	      ELSE
@@ -686,6 +692,7 @@
 	      CALL BDI_MAPI( OBDAT(NDS).D_ID, 'Grouping',
      :                       'READ', TPTR, STATUS )
 	      IF (SPECSET(N)) THEN
+                CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).GPTR, STATUS )
                 CALL ARR_SLCOPI( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
      :                           %VAL(OBDAT(NDS).GPTR), STATUS )
 	      ELSE
@@ -773,6 +780,7 @@
 
 *            Find and map b/g data array
 	        IF (SPECSET(N)) THEN
+                  CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).BPTR, STATUS )
                   CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
      :                             %VAL(OBDAT(NDS).BPTR), STATUS )
 	        ELSE
