@@ -143,6 +143,9 @@
 *        ADI port
 *     17 Apr 1996 V2.0-1 (DJA):
 *        Use new minimisation control
+*      6 Apr 2001 V2.2-2 (SFH): (some missing versions?)
+*        Fixed call to FIT_GRID and problem with an unset variable
+*        which affected likelihood fitting on linux.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -180,7 +183,7 @@
 	PARAMETER	     	( PROB_REPLY = 99 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SGRID Version 2.2-1' )
+        PARAMETER		( VERSION = 'SGRID Version 2.2-2' )
 
 *  Local Variables:
 c     RECORD /GRID_AXIS/     	GAX(ADI__MXDIM)    	! Grid axes
@@ -197,7 +200,7 @@ c     RECORD /PREDICTION/    	PREDDAT(NDSMAX)    	! Data predicted by model
       CHARACTER*80           	TEXT               	! Various o/p text
 
       DOUBLE PRECISION       	STATMIN            	! Fit statistic
-      DOUBLE PRECISION       	LNDFAC
+      DOUBLE PRECISION       	LNDFAC                  ! ln D!
 
       REAL                   BASE, SCALE        ! Grid axis values
       REAL                   LB(NPAMAX)		! Parameter lower bounds
@@ -313,12 +316,15 @@ c     RECORD /PREDICTION/    	PREDDAT(NDSMAX)    	! Data predicted by model
       CALL PRS_GETLIST( 'PARS', ADI__MXDIM, GPS, NGRIDAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*  Check free parameters
-      IF ( (NDOF+NGRIDAX) .LT. 0 ) THEN
-	STATUS = SAI__ERROR
-	CALL ERR_REP( ' ','More free parameters than data values!',
+*  Check free parameters - but only if using chi-squared as ndof is
+*  unset if liklihood is used - this is a problem on linux.
+      IF ( CHISTAT ) THEN
+        IF ( (NDOF+NGRIDAX) .LT. 0 ) THEN
+	  STATUS = SAI__ERROR
+	  CALL ERR_REP( ' ','More free parameters than data values!',
      :                                                     STATUS )
-	GOTO 99
+	  GOTO 99
+        END IF
       END IF
 
 *  Get AXISn defaults from errors
@@ -640,7 +646,8 @@ c     RECORD /PREDICTION/    	PREDDAT(NDSMAX)    	! Data predicted by model
       CALL FIT_GRID( NDS, IMOD, MCTRL, OPCHAN, NGRIDAX,
      :               NGRID, GPARS, NPAR, LB, UB, FROZEN, SSCALE,
      :               FSTAT, FIT_PREDDAT, PARAM,
-     :               STATMIN, GDPTR, %VAL(GQPTR), GQMASK, STATUS )
+     :               STATMIN, GDPTR, %VAL(GQPTR), GQMASK,
+     :               LNDFAC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Report minimum & write to history

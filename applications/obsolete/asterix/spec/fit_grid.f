@@ -2,7 +2,8 @@
       SUBROUTINE FIT_GRID( NDS, IMOD, MCTRL, OPCHAN,
      :                     NAXIS, NGRID, GRIDPAR, NPAR, LB, UB,
      :                     FROZEN, SSCALE, FSTAT, PREDICTOR, PARAM,
-     :                     STATMIN, GDATA, GQUAL, GQMASK, STATUS )
+     :                     STATMIN, GDATA, GQUAL, GQMASK,
+     :                     LNDFAC, STATUS )
 *
 *    Description :
 *
@@ -68,6 +69,12 @@
 *      1 Mar 94 : Updated quality handling for new BIT_ routines (DJA)
 *      8 Jun 94 : Use AIO_REWRITE to handle completion reporting (DJA)
 *      7 Sep 94 : Allow gridding of fit probability (DJA)
+*      6 Apr 01 : At some point this has been converted from structures
+*                 to common blocks (don't know who did it). I fixed
+*                 bugs caused by LNDFAC variable not being passed in or
+*                 out of fit_grid and fit_grid_int (SFH)
+*
+*
 *
 *    Type definitions :
 *
@@ -90,6 +97,7 @@ c     RECORD /MODEL_SPEC/ MODEL			! Model specification
       INTEGER		  MCTRL
       INTEGER 		  OPCHAN		! Output channel for diagnostic
 						! messages ( <1 for no messages)
+      DOUBLE PRECISION    LNDFAC                ! ln D!
       INTEGER             NAXIS                 ! Number of grid axes
 c     RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
       INTEGER             NGRID                 ! # of grids
@@ -186,7 +194,7 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
      :                   FROZEN, SSCALE, FSTAT, PREDICTOR,
      :                   PARAM, DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                   DIMS(5), DIMS(6), DIMS(7), USED,
-     :                   STATMIN, GDATA, GQUAL, GQMASK, STATUS )
+     :                   STATMIN, GDATA, GQUAL, GQMASK, LNDFAC, STATUS )
 
 *    Exit
  9000 IF ( STATUS .NE. SAI__OK ) THEN
@@ -264,7 +272,7 @@ c     RECORD /GRID_AXIS/  AXIS                  ! The grid axis
      :             NAXIS, NGRID, GRIDPAR, NPAR, LB, UB, FROZEN,
      :             SSCALE, FSTAT, PREDICTOR, PARAM,
      :             L1, L2, L3, L4, L5, L6, L7, USED,
-     :             STATMIN, GDATA, GQUAL, GQMASK, STATUS )
+     :             STATMIN, GDATA, GQUAL, GQMASK, LNDFAC, STATUS )
 *
 *    Description :
 *
@@ -321,6 +329,7 @@ c     RECORD /MODEL_SPEC/ MODEL			! Model specification
       INTEGER		  MCTRL
       INTEGER 		  OPCHAN		! Output channel for diagnostic
 						! messages ( <1 for no messages)
+      DOUBLE PRECISION    LNDFAC                ! ln D!
       INTEGER             NAXIS                 ! Number of grid axes
 c     RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
       INTEGER             NGRID                 ! # of grids
@@ -483,7 +492,7 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
 
 *      Just evaluate statistic
         CALL FIT_STAT( NDS, IMOD, LOCPAR, FSTAT, PREDICTOR, STAT,
-     :                 STATUS )
+     :                 LNDFAC, STATUS )
 
 *      Ok?
         IF ( STATUS .EQ. SAI__OK ) THEN
@@ -497,7 +506,7 @@ c     RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
 *    Minimise with respect to parameters not on the grid
         CALL FCI_RESET( MCTRL, STATUS )
         CALL FIT_MIN( NDS, IMOD, MCTRL, 0, .FALSE.,
-     :                NPAR, LB, UB, LOCFRO, SSCALE,
+     :                NPAR, LB, UB, LOCFRO, SSCALE, LNDFAC,
      :                FSTAT, PREDICTOR, LOCPAR, DPAR, PEGGED,
      :                STAT, FINISHED, FITERR, STATUS )
 
