@@ -133,7 +133,7 @@
       REAL XOUT( MXPNT )         ! Accurate position
       REAL YIN( MXPNT )          ! Original guess at input position
       REAL YOUT( MXPNT )         ! Accurate position
-      INTEGER FD, NBUFF
+      INTEGER FD, FDO, NBUFF
       CHARACTER BUFFER*80 
       LOGICAL TOPEN
 *.
@@ -232,7 +232,7 @@
          CALL MSG_OUT( ' ', '(^XIN,^YIN) -> (^XOUT,^YOUT)', STATUS )
 
          WRITE( TEXT, * ) XOUT( IPNT ), YOUT( IPNT )
-         FIO_WRITE( FDO, TEXT, STATUS )
+         CALL FIO_WRITE( FDO, TEXT, STATUS )
  
       END DO
 
