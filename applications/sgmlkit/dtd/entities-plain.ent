@@ -17,5 +17,6 @@
 <!entity endash CDATA "--"	-- en dash		-->
 <!entity percent CDATA "%"	-- percent sign		-->
 <!entity deg    CDATA "^o"	-- degree		-->
+<!entity tilde	CDATA "~"	-- tilde		-->
 <!entity latex  CDATA "LaTeX"	-- might as well...	-->
 <!entity tex	CDATA "TeX"	-- might as well...	-->

@@ -1,0 +1,118 @@
+<![ ignore [
+  DTD for DSSSL code.  This is based on the programcode DTD, but uses
+  the DSSSL Architecture.
+
+  Calls general programcode DTD (qv).
+
+  Invoke with
+
+    <!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.3//EN">
+
+  Author: 
+    NG: Norman Gray (Glasgow)
+
+  History: March 1999 (NG):
+    Original version
+
+  Copyright 1999, Particle Physics and Astronomy Research Council.
+]]>
+
+<!--============================== Architectures ==============================
+  Declare the use of the DSSSL architecture.  Jade extracts the DSSSL
+  architectural instance from the style-sheet it is given, so we can
+  mark the code up in this programcode DTD, and still let Jade use
+  it as long as the DSSSL architecture is declared and implemented
+  properly.  
+
+  The DSSSL notation declaration is in the generic PROGRAMCODE DTD -
+  only the notation's attribute list is here.
+-->
+<?IS10744 ArcBase DSSSL programcode>
+<!notation sgml public "ISO 8879:1986//NOTATION Standard Generalised Markup Language//EN">
+
+<!ENTITY DSSSLDTD PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN"
+	cdata sgml>
+<!-- The DSSSL notation is in the PROGRAMCODE DTD.  Its use here is... --
+	-- A base architecture used in conformance with the
+	   Architectural Form Definition Requirements of
+	   International Standard ISO/IEC 10744 --
+	>
+<!attlist #notation dsssl
+	ArcDocF
+		name #fixed dsssl-specification
+	ArcDTD
+		cdata "DSSSLDTD"
+	ArcFormA
+		name #fixed dsssl
+	ArcNamrA
+		name #fixed dsssla
+	ArcQuant
+		cdata "namelen 64"
+	ArcAuto		-- is automatic architecture mapping on?
+			   There's little need for this, really, since
+			   there's little overlap between the
+			   programcode DTD elements and the DSSSL
+			   ones, but it seems best to be explicit. --
+		(ArcAuto|nArcAuto) #fixed nArcAuto	-- off --
+	ArcIgnDA
+		cdata #fixed dssslignd
+	>
+
+<!--
+  Make the mappings: codegroup to style-specification, codebody to
+  style-specification-body, and codereference to
+  external-specification.  Add the appropriate attributes to each
+  element, to make it correspond to the architectural form.
+-->
+<!entity % codegroup.arch.atts 
+	'dsssl name #fixed style-specification
+	 id  id #implied
+	 use idrefs #implied'>
+<!entity % codereference.arch.atts
+	'dsssl name #fixed external-specification
+	 id id #required
+	 dsssla cdata #fixed "document doc specid docid"'>
+<!entity % codebody.arch.atts 
+	'dsssl name #fixed style-specification-body'
+	--'dssslignd name #fixed narcignd'-->
+
+<!--
+  Declare the PROGRAMCODE DTD to be an architecture.
+
+  This doesn't have a huge impact, but as well as being The Right HyTime
+  Thing To Do, it allows us to impose the PROGRAMCODE structure even
+  on (admittedly rare) files which do whizzy things in their internal
+  DTD subset.
+-->
+<!notation 
+	programcode
+		-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744 --
+	system ''>
+<!entity % generalcode.dtd
+	public "-//Starlink//DTD Program Source Code 0.3//EN">
+<!attlist #notation programcode
+	ArcFormA
+		name #fixed programcode
+	ArcDTD
+		cdata "%generalcode.dtd"
+	ArcDocF
+		cdata #fixed programcode
+	>
+
+<!--============================== Entities ==============================
+  Declare or specialise the required entities
+-->
+<!entity % language.attr	-- language attribute declaration --
+	 "language notation (dsssl) #fixed dsssl">
+
+<!entity % direction.attr 
+	"direction (given) #fixed given"
+	-- input or output to function -->
+
+<!--============================== DTD Body ==============================
+
+  Finally, include the text of the general DTD
+-->
+%generalcode.dtd;

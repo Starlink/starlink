@@ -60,6 +60,7 @@ SYNTAX
 		"&#RS;*+"
 		"&#RS;*-"
 		"&#RS;*"
+		"---"
          NAMES    SGMLREF
          QUANTITY SGMLREF
                   ATTSPLEN 2100

@@ -30,6 +30,7 @@
 <!entity dollar CDATA "$"	-- dollar sign		-->
 <!entity ellip  CDATA "..."	-- ellipses		-->
 <!entity percent CDATA "%"	-- percent sign		-->
+<!entity tilde	CDATA "~"	-- tilde		-->
 
 <![ include [
 <!entity latex	SDATA "L<sup>a</sup>T<small>E</small>X" >

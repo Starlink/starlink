@@ -1,0 +1,30 @@
+<!--
+	Starlink SGP DTD
+
+	Use with doctype declaration:
+
+	<!doctype sgp public '-//Starlink//DTD Starlink SGP 0.4//EN'>
+
+	$Id$
+-->
+
+<!entity % DTD.Version		"DTD Starlink SGP 0.4">
+
+<!entity % DocClass "SGP">
+
+<!-- 
+  Features: require support for versioning, and allow a list of
+  routine descriptions amongst the backmatter.
+-->
+<!entity % Feature.Abstract	'include'
+		-- Require an abstract -->
+<!entity % Feature.Versioning	'include'
+		-- Require version tracking in document -->
+<!entity % Feature.Routinelist	'ignore'
+		-- No support for routine descriptions -->
+<!entity % Feature.Docnumber	'include'
+		-- require DOCNUMBER in head -->
+
+<!entity % Starlink.general
+	public "-//Starlink//DTD Starlink General 0.4//EN">
+%Starlink.general;
