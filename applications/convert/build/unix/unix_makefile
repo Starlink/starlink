@@ -787,6 +787,14 @@ install:
 #  (at least in part).
 	@ touch .INSTALLED_$(SYSTEM)
 
+#  Make the destination directories if they do not exist.
+	if test -d $(INSTALL_BIN); then echo; \
+		else mkdir $(INSTALL_BIN); fi
+	if test -d $(INSTALL_HELP); then echo; \
+		else mkdir $(INSTALL_HELP); fi
+	if test -d $(INSTALL_LIB); then echo; \
+		else mkdir $(INSTALL_LIB); fi
+
 #  Install the public scripts, giving them world execute permission.
 	- for f in $(PUBLIC_SCRIPTS); do \
            cp -p $$f $(INSTALL_BIN);\
