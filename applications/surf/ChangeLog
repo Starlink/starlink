@@ -1,3 +1,94 @@
+1999-05-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuphot.f: Iterate over measurements as well as ints
+
+	* src/surf_write_photom_header.f (SURF_WRITE_PHOTOM_HEADER):
+	Remove 4 arguments that were not being used.
+
+	* src/surf_*: Check for POLPHOT whenever check for PHOTOM obs mode.
+
+	* starlink/makefile: Add -DPKG_VERS and
+	surf_set_app_name/surflib_trim_image
+
+	* makefile: Add polimp.scuba
+
+	* src/surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Check for
+	POLMAP and POLPHOT modes
+
+	* src/surf_*: Check history using (:LEN) rather than just equality 
+	(important when version number is present)
+
+	* src/surf_mon.f (SURF_MON): Use surf_set_app_name to set
+	application name for history recording.
+
+	* src/surf_set_app_name.F (SURF_SET_APP_NAME): Created.
+
+1999-05-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_remip.f (SURF_REMIP): The FAST_AXIS information was
+	being written before the REDS extension was opened...
+	(SURF_REMIP): Remove unused variable declarations. Check for
+	APPLICATION name in history by only comparing first few characters.
+
+	* src/surf_reduce_switch.f: Use NDF_XSTAT to look for extension
+
+	* misc/ipfile.dat: Add F12/F13 so that REMIP will work before
+	EXTINCTION.
+
+1999-05-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_remsky.f (SURF_REMSKY): Propogate UNITS
+
+	* src/surf_scuba2mem.f (SURF_SCUBA2MEM): Propogate UNITS
+
+	* src/surf_write_map_info.F (SURF_WRITE_MAP_INFO): Write FITS
+	header minus AST FITS keywords
+
+1999-05-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_fill_polpack_angles.f
+	(SURFLIB_FILL_POLPACK_ANGLES): Move initialisation out of this routine
+
+	* src/surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Initialise
+	ANG_MEAS and ANG_INT regardless of whether this is polarimetry data.
+
+	* src/surf_rebin.f (SURF_REBIN): Always set ANGROT and WPLATE
+	(even if to bad)
+
+	* src/surf_write_map_info.F (SURF_WRITE_MAP_INFO): Write OUT_UNITS 
+	rather than hard-wired volts.
+
+	* src/surf_rebin.f (SURF_REBIN): Add TRIM parameter +
+	SURFLIB_TRIM_IMAGE. Pass NDFUNITS to WRITE_MAP_INFO
+
+	* src/surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Store NDFUNITS
+	in FITS array
+
+1999-05-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_reduce_switch.f (SURF_REDUCE_SWITCH): Add status
+	checking to SCULIB_DIV_CALIBRATOR_2 call
+	(SURF_REDUCE_SWITCH): Check that EXP_POINTER is greater than 1 
+
+	* sculib/sculib_div_calibrator.f (SCULIB_DIV_CALIBRATOR): Add
+	status checking
+
+	* sculib/sculib_div_calibrator_2.f (SCULIB_DIV_CALIBRATOR_2): Add
+	status checking
+
+	* src/surf_scuphot.f (SURF_SCUPHOT): Propoogate title (and units
+	for IBEAM)
+
+	* src/surf_scuclip.f (SURF_SCUCLIP): Propogate units to output
+
+	* src/surf_scucat.f (SURF_SCUCAT): Propagate labels and units from 
+	first input file. Set badbits flag to 255 so that quality is
+	recognised. 
+
+1999-04-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/surf.csh: Use the new Starlink perl aliases
+
 1999-03-23  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_skydip.f (SURF_SKYDIP): Add real check for SAM_MODE
@@ -69,6 +160,10 @@
 
 	* surflib/surflib_calc_dual_beam.f (SURFLIB_CALC_DUAL_BEAM): Create
 
+1998-12-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* all: RELEASE V1.3 TO STARLINK - Spring '99 CDROM
+	
 1998-12-18  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* sculib_put_fits_d.f (SCULIB_PUT_FITS_D): Add fix to convert 'D'

@@ -14,9 +14,12 @@ TO DO List
   that the bounds are less than 1 for the second dim. (since EXP_POINTER
   is one and EXP_POINTER-1 is 0)
 
-
 - Add note to documentation to point out that zero level in scan maps
   is suspect.
+
+- Fix Units propogation in REBIN - always uses volts. Simply want to
+  read the units from the input files and store them in the FITS
+  header or something.
 
 -2. Make sure that VEC_?TO+ have the BAD flag set to TRUE
     so that bad values are converted correctly when changing
