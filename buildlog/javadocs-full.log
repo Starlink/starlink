@@ -735,11 +735,11 @@ javadoc-sources:
   [javadoc] our term for complex data structures that evolve with time."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Pod.java:29: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod is a "pile of data." This is any complex evolving data
   [javadoc]  structure."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A Pod is a "pile of data." "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Pod.java:29: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/WeightSet.java:26: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/classification/package-summary.html...
   [javadoc] "A WeightSet object represents a training type (e.g."
@@ -1544,4 +1544,4 @@ javadoc-sources:
   [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 17 seconds
+Total time: 1 minute 22 seconds
