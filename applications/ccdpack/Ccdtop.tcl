@@ -27,12 +27,14 @@ class Ccdtop {
 #           - widget     -- Pathname of a control-type widget
 #           - grpname    -- Unique tag identifying this group
 #
-#     addgroup grouptag heading
+#     addgroup grpname heading
 #        Adds a grouping frame to the control panel.  This can be used
 #        for grouping controls; the grpname specified here, which should
 #        be unique, must be referred to when controls are added 
-#        with the addcontrol method.
-#           - grpname    -- Tag to identify the group (see addcontrol)
+#        with the addcontrol method.  The return value of this method
+#        is the name of the group widget, which may be used to 
+#        modify the packing.
+#           - grpname    -- Tag to identify the group
 #           - heading    -- Short text string to label the group
 # 
 #     childsite
@@ -49,6 +51,11 @@ class Ccdtop {
 #        This method should be called when the initial contents and
 #        geometry of the widget have been set up.  The window will be
 #        revealed and its minimum dimensions will be set.
+#
+#     groupwin grpname
+#        Returns the name of the window given by the grpname argument.
+#        This is th control group window as set up by addgrp.
+#           - grpname    -- Tag to identify the group (see addgroup)
 #
 #     helptext text
 #        Specifies a text string which can be presented to the user to
@@ -167,9 +174,9 @@ class Ccdtop {
          incr ngroup
          itk_component add group$ngroup {
             iwidgets::labeledframe [ panel ].group$ngroup \
-               -labeltext $heading -ipadx 2 -ipady 2
+               -labeltext $heading -labelpos n -ipadx 2 -ipady 2
          }
-         pack $itk_component(group$ngroup) -side left
+         pack $itk_component(group$ngroup) -side left -fill y
          set groups($grpname) $itk_component(group$ngroup)
       }
 
@@ -280,6 +287,13 @@ class Ccdtop {
 
 #  Set binding to handle window resize events.
          bind $itk_interior <Configure> [ code $this winch ]
+      }
+
+
+#-----------------------------------------------------------------------
+      public method groupwin { grpname } {
+#-----------------------------------------------------------------------
+         return $groups($grpname)
       }
 
 
