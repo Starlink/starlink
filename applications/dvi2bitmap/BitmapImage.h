@@ -1,3 +1,7 @@
+/* Part of dvi2bitmap.
+ * Copyright 1999, Particle Physics and Astronomy Research Council.
+ * See file LICENCE for conditions.
+ */
 // $Id$
 
 #ifndef BITMAPIMAGE_HEADER_READ

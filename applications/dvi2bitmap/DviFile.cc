@@ -1,3 +1,7 @@
+// Part of dvi2bitmap.
+// Copyright 1999, Particle Physics and Astronomy Research Council.
+// See file LICENCE for conditions.
+//
 // part of dvi2bitmap
 // $Id$
 

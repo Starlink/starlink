@@ -1,3 +1,4 @@
+// Part of dvi2bitmap.
 /*
  * GIFEncode.cc - GIF image compression interface.
  *

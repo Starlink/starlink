@@ -1,6 +1,14 @@
+// Part of dvi2bitmap.
+// Copyright 1999, Particle Physics and Astronomy Research Council.
+// See file LICENCE for conditions.
+//
 // part of dvi2bitmap
 // $Id$
 
+#include "dvi2bitmap.h"
+#include "InputByteStream.h"
+
+#include <iostream>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -12,9 +20,6 @@
 #include <cerrno>
 using std::sprintf;
 #endif
-
-#include "dvi2bitmap.h"
-#include "InputByteStream.h"
 
 // Static debug switch
 int InputByteStream::verbosity_ = 1;
