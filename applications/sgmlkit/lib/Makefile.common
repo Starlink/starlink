@@ -165,12 +165,12 @@ DVI2BITMAP=dvi2bitmap
 
 all: index.html
 
-tidy:
+# Call the following two targets libtidy and libclean, so that a Makefile
+# can have a local targets of the same names without causing warnings.
+libtidy:
 	rm -f *.parse *~
 
-# If the makefile which invokes this has a localclean target, make that too.
-# Don't fail if that target isn't there.
-clean:	tidy
+libclean: tidy
 	if ls *.html.stamp >/dev/null 2>&1 ; then \
 		for f in *.html.stamp; do \
 			rm -f `awk -F: '{print $$1}' $$f`* ; \
@@ -182,7 +182,6 @@ clean:	tidy
 		done ; \
 	fi
 	rm -f *.stamp *.single.html *.manifest
-	- $(MAKE) localclean
 
 checkhtml:
 	for i in *.html; do echo $$i; $(SGMLPARSE) -s $(DECL) $$i; done
