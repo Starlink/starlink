@@ -22,6 +22,8 @@
 #        Add header and HELPLIB
 #     1997 April 29 (TIMJ)
 #        Add MSG_FILTER
+#     1997 May 21 (TimJ)
+#	 Add ALLBOLS parameter
 #     {enter_further_changes_here}
  
 #-
@@ -73,6 +75,14 @@
          PROMPT  'Name of ASCII file to contain results summary'
          PPATH   'CURRENT,DEFAULT'
 	 HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER ALLBOLS
+        TYPE '_LOGICAL'
+        PROMPT 'Select all bolometers'
+        DEFAULT 'no'
+	VPATH  'Default'
+        HELPKEY  '*'
       ENDPARAMETER
 
    ENDINTERFACE
