@@ -721,12 +721,12 @@ javadocs:
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the point at which this figure is "anchored." "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] "Set the point at which this figure is "anchored." This
   [javadoc]  must be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/tutorial/CompositeFigureTutorial.java:119: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
@@ -2850,4 +2850,4 @@ javadocs:
   [javadoc] 210 warnings
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 21 seconds
+Total time: 4 minutes 6 seconds
