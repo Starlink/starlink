@@ -30,6 +30,9 @@ STAR_DECLARE_DEPENDENCIES([build], [ast fio gks gns hds idi kaplibs mers ndf par
 dnl The KAPRH link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [agi ard cat fio gks gns grp gwm idi kaplibs mag ncar ndf ndg pda prm psx ref sgs shl sla snx trn], [link])
 
+dnl We use prohlp from sst
+STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
+
 STAR_LATEX_DOCUMENTATION(sun239)
 
 AC_CONFIG_FILES(Makefile component.xml kaprh_mon.f kaprh.ifd kapsub/Makefile)
