@@ -160,6 +160,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.31  2000/09/20 00:52:12  timj
+*     Fix SEGV when using POLPHOT data (the if statement was incorrect)
+*
 *     Revision 1.30  2000/06/28 01:30:41  timj
 *     Reset MEAS_2_Q each time round loop
 *
@@ -1077,8 +1080,8 @@ c
          CALL MSG_OUTIF(MSG__QUIET,' ','^TASK: All bolometers selected',
      :        STATUS)
 
-         IF (OBSERVING_MODE .NE. 'PHOTOM' .OR.
-     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
+         IF (OBSERVING_MODE .NE. 'PHOTOM' .AND.
+     :        OBSERVING_MODE .NE. 'POLPHOT') THEN
 *     Want to use the first beam
             PHOT_BB(2) = 0
             PHOT_BB(3) = 0
@@ -1127,7 +1130,7 @@ c
                      IN_OFFSET = (BEAM-1) * N_POS * N_BOLS + (POS-1) *
      :                    N_BOLS + (PHOT_BB(BEAM) - 1)
                      OUT_OFFSET = POS - 1
-                     
+
                      CALL VEC_RTOR(.FALSE., 1, %val(IN_D_PTR + IN_OFFSET
      :                    * VAL__NBR), %val(INT_D_PTR(BEAM) + OUT_OFFSET
      :                    * VAL__NBR), IERR, NERR, STATUS)
