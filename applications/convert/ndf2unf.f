@@ -253,14 +253,12 @@
       CALL NDF_STATE( NDF, 'Quality', THERE, STATUS )
       IF ( THERE ) THEN
          CALL CHR_APPND( ','//'Quality', COMLIS, COMLN )
-         COMLN = COMLN + 8
       END IF
 
 *  If the Variance component exists, append it to component list.
       CALL NDF_STATE( NDF, 'Variance', THERE, STATUS )
       IF ( THERE ) THEN
          CALL CHR_APPND( ','//'Variance', COMLIS, COMLN )
-         COMLN = COMLN + 9
       END IF
 
 *  Find which component to copy. 
