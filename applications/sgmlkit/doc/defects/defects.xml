@@ -141,6 +141,32 @@ not here.</p>
 </resolution>
 </defect>
 
+<defect status="closed" originator="Norman">
+<title>Document cross-references</title>
+<p>The DTD has been converted to XML, in the sense that it's possible
+to write a limited document which conforms to a XMLised version of the 
+general DTD.  However, DOCXREF elements are one of the areas where
+this is deficient.  This will require some careful thought, since
+DOCXREF at present relies on subdocument entities, which don't exist
+in XML.  It shouldn't be too hard to produce a replacement, since such 
+entities can be converted into NDATA entities with an SGML or XML notation.</p>
+<resolution status="fixed" author="Norman" date="21-aug-2003">
+<p>This was in fact easy.  dsssl/sl/{html,latex}/sllinks.dsl modified</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Norman">
+<title>Unicode entities in conversion to LaTeX</title>
+<p>The entity sets which are used when parsing XML are specified in
+terms of Unicode character points.  The HTML output appears not to
+cause problems, but it does causes problems for 
+LaTeX, which reacts badly when it encounters \char65440 or the like.
+This problem is, I'm positive, superable in LaTeX, but messy.  This
+should probably be deferred until after the rewrite of the processing
+system.  At present, it's been `fixed' by defining the `unicode'
+entities as ordinary characters.</p>
+</defect>
+
 </defectgroup>
 
 <defectgroup>
