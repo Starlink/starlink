@@ -69,17 +69,18 @@
 //  work (to get past the ast.h include file)...
 //
 extern "C" {
-  static void WCSAstTranN( AstFrameSet *map, int npoint, int ncoord_in,
-                           int indim, const double (*in)[1], int forward,
-                           int ncoord_out, int outdim, double (*out)[1] )
-  {
-      astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in,
-                forward, ncoord_out, outdim, (double (*)[])out );
-
-      //  If fails with later version of AST try:
-      //astTranN( map, npoint, ncoord_in, indim, (const double *)in,
-      //          forward, ncoord_out, outdim, (double *)out );
-  }
+    static void WCSAstTranN( AstFrameSet *map, int npoint, int ncoord_in,
+                             int indim, const double (*in)[1], int forward,
+                             int ncoord_out, int outdim, double (*out)[1] )
+    {
+#if (AST_MAJOR_VERS >= 1) && (AST_MINOR_VERS < 7)
+        astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in,
+                  forward, ncoord_out, outdim, (double (*)[])out );
+#else
+        astTranN( map, npoint, ncoord_in, indim, (const double *)in,
+                  forward, ncoord_out, outdim, (double *)out );
+#endif
+    }
 }
 
 //
