@@ -106,9 +106,106 @@
 
 *  Get locator and invoke HDS version
       CALL ADI1_GETLOC( ID, LOC, STATUS )
-      CALL PRO_GET( LOC, FLAG, VALUE, STATUS )
+      CALL PRF1_GET( LOC, FLAG, VALUE, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF_GET', STATUS )
+
+      END
+
+
+
+*+  PRF1_GET - Is a specified PROCESSING flag set?
+      SUBROUTINE PRF1_GET( LOC, NAME, VALUE, STATUS )
+*
+*    Description :
+*
+*     Returns the value of a named processing flag. The name is given as
+*     the HDS structure after the MORE.ASTERIX.PROCESSING object, eg.
+*     CORRECTED.EXPOSURE or BGND_SUBTRACTED.
+*
+*    Method :
+*
+*     If the flag exists, its value is returned. Otherwise the flag is
+*     assumed to be false.
+*
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*
+*     David J. Allan (ROSAT,BHVAD::DJA)
+*
+*    History :
+*
+*     12 Nov 93 : Original (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*
+*    Import :
+*
+      CHARACTER*(DAT__SZLOC)	LOC			! Top-level dataset
+      CHARACTER*(*)		NAME			! Processing flag name
+*
+*    Export :
+*
+      LOGICAL                   VALUE			! Processing flag value
+*
+*    Status :
+*
+      INTEGER STATUS
+*
+*    Local variables :
+*
+      CHARACTER*(DAT__SZLOC)	FLOC			! Flag object
+      CHARACTER*(DAT__SZLOC)	PLOC			! PROCESSING object
+*-
+
+*    Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Default is flag not set
+      VALUE = .FALSE.
+
+*    Does PROCESSING component exist?
+      CALL HDX_FIND( LOC, 'MORE.ASTERIX.PROCESSING', PLOC, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Does named flag exist?
+        CALL HDX_FIND( PLOC, NAME, FLOC, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+
+*        Get flag value
+          CALL DAT_GET0L( FLOC, VALUE, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            VALUE = .FALSE.
+          END IF
+
+*        Free flag structure
+          CALL DAT_ANNUL( FLOC, STATUS )
+
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+        END IF
+
+*      Free PROCESSING structure
+        CALL DAT_ANNUL( PLOC, STATUS )
+
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+      END IF
+
+*    Report any errors (these would be HDS bugs, the sensible errors having
+*    been trapped above).
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF1_GET', STATUS )
 
       END
