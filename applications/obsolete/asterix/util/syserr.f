@@ -194,7 +194,8 @@
       NEWVARA = ( .NOT. OK )
 
 *  Pass to subroutine to add in systematic errors
-      CALL SYSERR_ERRSUB( SERR, NELM, NEWVARA, %VAL(DPTR), %VAL(VPTR))
+      CALL SYSERR_ERRSUB( SERR, NELM, NEWVARA, %VAL(DPTR), %VAL(VPTR),
+     :                    STATUS )
 
 *  History file entry
       CALL HSI_ADD( OFID, VERSION, STATUS )
