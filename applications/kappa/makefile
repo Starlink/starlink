@@ -469,13 +469,13 @@ PRIVATE_INCLUDES = c1_com me_com irm_com ira_par ira_com ira_err ctm_com \
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
-                    FIO_PAR GKS_PAR GNS_PAR GRP_PAR IDI_ERR IDI_PAR \
+                    FIO_PAR GKS_PAR GNS_PAR GRP_ERR GRP_PAR IDI_ERR IDI_PAR \
                     IRA_PAR MAG_ERR MSG_PAR NDF_ERR NDF_PAR NUM_CMN \
                     NUM_DEC NUM_DEC_CVT NUM_DEC_B NUM_DEC_D NUM_DEC_I \
                     NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W \
                     NUM_DEF NUM_DEF_CVT NUM_DEF_B NUM_DEF_D NUM_DEF_I \
                     NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_PAR \
-                    PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR AST_PAR
+                    PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR AST_PAR PSX_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -987,6 +987,7 @@ FIO_PAR:     $(STAR_INC)/fio_par;     $(LINK) $? $@
 FTS_PAR:     fts_par;                 $(LINK) $? $@
 GKS_PAR:     $(STAR_INC)/gks_par;     $(LINK) $? $@
 GNS_PAR:     $(STAR_INC)/gns_par;     $(LINK) $? $@
+GRP_ERR:     $(STAR_INC)/grp_err;     $(LINK) $? $@
 GRP_PAR:     $(STAR_INC)/grp_par;     $(LINK) $? $@
 HLPCMD:      hlpcmd;                  $(LINK) $? $@
 IDI_ERR:     $(STAR_INC)/idi_err;     $(LINK) $? $@
@@ -1025,6 +1026,7 @@ NUM_DEF_W:   $(STAR_INC)/num_def_W;   $(LINK) $? $@
 PAR_PAR:     $(STAR_INC)/par_par;     $(LINK) $? $@
 PAR_ERR:     $(STAR_INC)/par_err;     $(LINK) $? $@
 PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
+PSX_ERR:     $(STAR_INC)/psx_err;     $(LINK) $? $@
 SAE_PAR:     $(STAR_INC)/sae_par;     $(LINK) $? $@
 SFT_COM:     sft_com;                 $(LINK) $? $@
 SUBPAR_PAR:  $(STAR_INC)/subpar_par;  $(LINK) $? $@
@@ -1162,8 +1164,8 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 #  them.
 
 OBJECT_LIBRARIES = \
-libkappa.a libkapview.a libndfpack.a \
-libkapsub.a libfits.a libkapgen.a libirm.a libaif.a libira.a
+libkappa.a libkapview.a libndfpack.a libkapsub.a libfits.a libkapgen.a \
+libirm.a libaif.a libira.a libndg.a
 
 #
 libaif.a: $(AIF_OBJECT_FILES)
@@ -3636,6 +3638,7 @@ ndg1_hspec.o:      GRP_PAR SAE_PAR
 ndg1_lasto.o:      SAE_PAR
 ndg1_match.o:      GRP_PAR NDG_CONST SAE_PAR
 ndg1_mspec.o:      GRP_PAR SAE_PAR
+ndg1_ndfch.o:      SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
 ndg1_subst.o:      SAE_PAR
 ndg_asexp.o:       GRP_PAR NDG_CONST NDG_ERR SAE_PAR
 ndg_assoc.o:       GRP_ERR GRP_PAR NDG_ERR PAR_ERR SAE_PAR
