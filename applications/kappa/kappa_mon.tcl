@@ -75,7 +75,7 @@ set DynParList(laplace) {}
 set OutputParList(listmake) {}
 set DynParList(listmake) {}
 set OutputParList(listshow) {dim number posns}
-set DynParList(listshow) {first last quiet}
+set DynParList(listshow) {first last quiet device}
 set OutputParList(log10) {}
 set DynParList(log10) {}
 set OutputParList(kstest) {comp dist errmean files mean nkept prob sigma}
