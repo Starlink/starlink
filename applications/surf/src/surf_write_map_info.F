@@ -2,7 +2,7 @@
      :     OUT_UNITS, MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
      :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH,
      :     FILTER, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
-     :     WPLATE, ANGROT,
+     :     WPLATE, ANGROT, TELESCOPE, INSTRUMENT,
      :     STATUS)
 *+
 *  Name:
@@ -72,6 +72,10 @@
 *     ANGROT = REAL (Given)
 *        POLPACK rotation angle between waveplate and X pixel axis
 *        (ignored if bad value)
+*     TELESCOPE = CHARACTER (Given)
+*        Name of telescope to write to FITS header
+*     INSTRUMENT = CHARACTER (Given)
+*        Name of instrument to write to FITS header
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -86,6 +90,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.13  1999/07/14 19:20:49  timj
+* Pass TELESCOPE and INSTRUMENT in from above.
+*
 * Revision 1.12  1999/05/15 01:52:14  timj
 * Remove IRAS90 code.
 * Make sure that WCS extracts FITS keywords before
@@ -115,6 +122,7 @@
       REAL             CHOP_THROW
       CHARACTER*(*)    FILENAME (NFILE)
       CHARACTER*(*)    FILTER
+      CHARACTER*(*)    INSTRUMENT
       INTEGER          I_CENTRE
       INTEGER          J_CENTRE
       DOUBLE PRECISION MJD_STANDARD
@@ -127,6 +135,7 @@
       REAL             OUT_PIXEL
       CHARACTER * (*)  OUT_TITLE
       CHARACTER * (*)  OUT_UNITS
+      CHARACTER*(*)    TELESCOPE
       LOGICAL          USEWCS
       REAL             WAVELENGTH
       REAL             WPLATE
@@ -157,7 +166,6 @@
       INTEGER          ICARD    ! Counter for FITS cards
       INTEGER          ID       ! day of an input observation
       INTEGER          IM       ! month in which observation started
-      CHARACTER*40     INSTRUMENT ! FITS instrument entry
       INTEGER          ITEMP    ! Temporary variable
       INTEGER          IY       ! year in which input observation started
       INTEGER          NDIM     ! Number of dimensions in FITS array
@@ -172,7 +180,6 @@
       REAL             RTEMP    ! Scratch real
       CHARACTER*30     SCS      ! name of sky coordinate system
       CHARACTER*80     STEMP    ! scratch string
-      CHARACTER*11     TELESCOPE ! FITS telescope entry
       CHARACTER*5      RADECSYS ! Type of coordinate system
       DOUBLE PRECISION RDEPOCH  ! Julian epoch of given MJD
       CHARACTER * (80) XLAB     ! X axis label
@@ -288,13 +295,6 @@
          CTYPE1 = 'RA---TAN'
          CTYPE2 = 'DEC--TAN'
       END IF
-
-*     This is the SCUBA software so I know the instrument and telescope
-*     This will be incorrect for UKT14 data if I ever get around to
-*     fixing that
-
-      INSTRUMENT = 'SCUBA'
-      TELESCOPE = 'JCMT-Hawaii'
 
 *     and write out the same information to a .MORE.FITS section
 
