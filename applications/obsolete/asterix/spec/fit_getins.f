@@ -95,7 +95,7 @@
               CALL BDI_MAPAXVAL( ID, 'READ', E_AX, AXPTR, STATUS )
 
 *      And check against dataset channels...
-	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCB,
+	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCC,
      :                                %VAL(RCPTR), STATUS )
 
 *      Release the axis and spec array
