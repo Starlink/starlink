@@ -27,7 +27,8 @@
 /* The following constants must be distinct from legitimate TCL return codes,
    TCL_OK, TCL_ERROR, TCL_RETURN, TCL_BREAK and TCL_CONTINUE. */
 #define CCD_CCDMSG 2112
-#define CCD_CCDERR 2113
+#define CCD_CCDLOG 2113
+#define CCD_CCDERR 2114
 
    typedef struct {
       int downfd[ 2 ];

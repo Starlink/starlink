@@ -45,8 +45,9 @@
 *        If neither the -log nor the -error flag is specified, the message
 *        will be passed directly to the ADAM message system using a
 *        MSG_OUT call.
-*     message = string
-*        This string will get output as a message.
+*     message ?message ...? = string
+*        All message arguments will be concatenated and output as the 
+*        message.  The total length must not exceed MSG__SZMSG characters.
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -59,6 +60,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include "sae_par.h"
 #include "tcl.h"
 #include "cnf.h"
@@ -73,18 +75,19 @@
                    Tcl_Obj *CONST objv[] ) {
 /**********************************************************************/
       int i;                        /* Loop variable */
-      int mleng;                    /* Length of the message */
+      int mleng;                    /* Length of the message argument */
       int nflag;                    /* Number of flag arguments */
       int nleng;                    /* Length of the name argument */
       int status[ 1 ];              /* The starlink inherited status */
       int stype;                    /* The type of message to be sent. */
       char *flag;                   /* Text of flag argument */
-      char *msg;                    /* Text of the message */
+      char *msg;                    /* Text of the message argument */
       char *name;                   /* Name of the message */
       char *usage;                  /* Usage string */
+      char buffer[ MSG__SZMSG ];    /* Message buffer */
 
 /* Set usage string. */
-      usage = "ccdputs ?-error? ?-log? ?-name name? message";
+      usage = "ccdputs ?-error? ?-log? ?-name name? message ?message ...?";
 
 /* Process flags. */
       stype = CCD_CCDMSG;
@@ -108,13 +111,22 @@
       nflag = i - 1;
 
 /* Check syntax. */
-      if ( objc + nflag != 2 ) {
-         Tcl_WrongNumArgs( interp, 1, objv, "?options? message" );
+      if ( objc + nflag < 2 ) {
+         Tcl_WrongNumArgs( interp, 1, objv, "?options? message ?message ...?" );
          return TCL_ERROR;
       }
 
 /* Get string arguments. */
-      msg = Tcl_GetStringFromObj( objv[ 1 + nflag ], &mleng );
+      *buffer = '\0';
+      for ( i = nflag + 1; i < objc; i++ ) {
+         msg = Tcl_GetStringFromObj( objv[ i ], &mleng );
+         if ( strlen( buffer ) + mleng >= MSG__SZMSG ) {
+            Tcl_SetObjResult( interp, 
+                              Tcl_NewStringObj( "Message too long", -1 ) );
+            return TCL_ERROR;
+         }
+         strcat( buffer, msg );
+      }
 
 /* There are two possibilities: either we are running as a subprocess,
    or we are running free standing.  Find out which. */
@@ -125,13 +137,13 @@
          write( ccdofd, &stype, sizeof( int ) );
          write( ccdofd, name, nleng );
          write( ccdofd, "\n", 1 );
-         write( ccdofd, msg, mleng + 1 );
+         write( ccdofd, buffer, strlen( buffer ) + 1 );
       }
       else {
 
 /* We are running freestanding.  Simply output the message to standard 
    output. */
-         printf( "%s\n", msg );
+         printf( "%s\n", buffer );
       }
 
 /* Set result and exit successfully. */
