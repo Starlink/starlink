@@ -61,6 +61,9 @@ class Ccdtop {
 #        Specifies a text string which can be presented to the user to
 #        tell him what he should be doing.
 #
+#     panel
+#        Returns the path of a frame into which controls should be placed.
+#
 #     waitpop
 #        Must occur in a matching pair with the waitpush method.
 #
@@ -71,11 +74,17 @@ class Ccdtop {
 #        no action is taken.  A waitpush should be executed any time
 #        that the widget is likely to be unresponsive to user activity
 #        for a significant amount of time (especially if attempted user
-#        activity could cause problems).  A matching waitpop must be
-#        executed after the action has completed.
+#        activity could cause problems).  Between a waitpush and its
+#        matching waitpop, a window will be displayed to the user which
+#        will inform the user what's going on, and also grab all events
+#        in the application, so that no user interaction will be possible.
+#        Additionally, any window Configure events will not have their
+#        usual effect of calling the winch method; but after the wait
+#        state has finished, the winch method will be called if one
+#        has been ignored in the mean time.
 #
-#     panel
-#        Returns the path of a frame into which controls should be placed.
+#        A matching waitpop must be executed for every waitpush after 
+#        the action has completed.
 #
 #     Ccdtop also inherits all the public methods of itk::Toplevel.
  
@@ -323,7 +332,14 @@ class Ccdtop {
       public method waitpush { msg } {
 #-----------------------------------------------------------------------
          if { [ incr waitlevel ] == 1 } {
-            set waitwin [ waiter $itk_interior.waiter -text $msg ]
+            set waitwin [ waiter $itk_interior.waiter \
+                                    -text "$msg ..." \
+                                    -animate 0 ]
+            set configact [ bind $itk_interior <Configure> ]
+            if { $configact != "" } {
+               set hadconfig 0
+               bind $itk_interior <Configure> [ code set hadconfig 1 ]
+            }
          }
       }
 
@@ -332,7 +348,15 @@ class Ccdtop {
       public method waitpop { } {
 #-----------------------------------------------------------------------
          if { [ incr waitlevel -1 ] == 0 } {
+            update idletasks
             destroy $waitwin
+            if { $configact != "" } {
+               bind $itk_interior <Configure> $configact
+               if { $hadconfig } {
+                  event generate $itk_interior <Configure>
+                  set hadconfig 0
+               }
+            }
          }
       }
 
@@ -446,8 +470,10 @@ class Ccdtop {
 ########################################################################
 
 #  Instance Variables.
+      private variable configact ""    ;# Binding code for Configure event
       private variable controls        ;# List of control widgets in panel
       private variable groups          ;# List of control groups in panel
+      private variable hadconfig 0     ;# Have we missed a Configure event?
       private variable ngroup 0        ;# Number of control groups in panel
       private variable waitlevel 0     ;# Number of active waitpush calls
       private variable waitwin         ;# Name of the waiter window
