@@ -6,7 +6,7 @@
 #           Thu Nov 27 14:08:35 GMT 1997
 
 # The names of all the tar files containing system-independant files:
-TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub kapgen_sub \
+TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub ira_sub kapgen_sub \
 kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub \
 kappa_iraf
 
@@ -19,7 +19,8 @@ KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd irg_err irg_err.h \
-sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f
+sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
+ira_err
 
 # The contents of the aif_sub.tar file:
 AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
@@ -44,6 +45,17 @@ IRM_SUB = irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
 irm_delob.f irm_gropn.f irm_hmenu.f irm_mline.f irm_stats.f irm_staxs.f \
 irm_stgrd.f irm_stlmt.f irm_stlog.f irm_stmap.f irm_stnul.f irm_stpen.f \
 irm_stpha.f irm_table.f irm_tmenu.f irm_vmenu.f 
+
+# The contents of the ira_sub.tar file:
+IRA_SUB = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
+ira1_asset.f ira1_check.f ira1_chprj.f ira1_chscs.f ira1_decod.f ira1_ecec.f \
+ira1_eqecl.f ira1_eqeq.f ira1_eqgal.f ira1_fpars.f ira1_galec.f ira1_getid.f \
+ira1_gnom.f ira1_iconv.f ira1_ictd1.f ira1_idtc1.f ira1_igtc1.f ira1_init.f \
+ira1_iprj.f ira1_iscnm.f ira1_lamb.f ira1_orth.f ira1_prec.f ira_annul.f \
+ira_close.f ira_convt.f ira_creat.f ira_ctod.f ira_ctod1.f ira_dtoc.f \
+ira_dtoc1.f ira_exprt.f ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f \
+ira_gtscs.f ira_init.f ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f \
+ira_seteq.f ira_trans.f ira_write.f
 
 # The contents of the kapgen_sub.tar file:
 
@@ -386,7 +398,7 @@ sun95_agi7.eps sun95_ardwork.eps kappa.news sun221.tex
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp \
-$(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(IRM_SUB) $(KAPGEN_SUB) \
+$(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(IRM_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
 $(KAPPA_IFLS) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
 $(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS)
@@ -395,7 +407,7 @@ $(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS)
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_agi1.eps \
 sun95_agi2.eps sun95_agi3.eps sun95_agi4.eps sun95_agi5.eps \
 sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps sun95.htx_tar kappa.news \
-aif_sub.tar fts_sub.tar irm_sub.tar kapgen_sub.tar kappa_sub.tar \
+aif_sub.tar fts_sub.tar ira_sub.tar irm_sub.tar kapgen_sub.tar kappa_sub.tar \
 kapsub_sub.tar kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
 kappa_data_sun4_Solaris.tar sun221.tex sun221.htx_tar kappa_iraf.tar
