@@ -7,7 +7,8 @@
 
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub kapgen_sub \
-kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub
+kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub \
+kappa_iraf
 
 # The names of all the tar files containing system-specific files:
 TAR_FILES_B = kappa_data_alpha_OSF1 kappa_data_ix86_Linux \
@@ -150,6 +151,82 @@ kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f \
 kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f normal.f \
 nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
 kpg1_trmsz.c ctm_xcols.f kpg1_gtcol.f
+
+# The contents of the kappa_iraf.tar file:
+KAPPA_IRAF = fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
+lutcol.cl lutcont.cl lutfc.cl lutgrey.cl lutheat.cl lutikon.cl lutneg.cl \
+lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
+picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
+ardmask.par axconv.par axlabel.par axunits.par block.par cadd.par \
+calc.par calpol.par cdiv.par centroid.par chpix.par cmult.par compadd.par \
+compave.par compick.par contour.par contover.par convolve.par \
+creframe.par crelut.par csub.par cursor.par display.par drawsig.par \
+elprof.par erase.par errclip.par exp10.par expe.par expon.par ffclean.par \
+fillbad.par fitsdin.par fitsexist.par fitsexp.par fitsimp.par fitsin.par \
+fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
+fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
+gdset.par gdstate.par glitch.par globals.par greyplot.par hiscom.par \
+hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
+idinvisible.par idpazo.par idset.par idstate.par inspect.par kap_div.par \
+kap_log10.par kap_pow.par kaphelp.par kappa.par kstest.par laplace.par \
+linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
+luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
+makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
+mosaic.par mstats.par mult.par native.par ndfcopy.par ndftrace.par \
+noglobals.par nomagic.par normalize.par numb.par outset.par ovclear.par \
+ovset.par paldef.par palentry.par palread.par palsave.par parget.par \
+paste.par piccur.par picdef.par picempty.par picentire.par picgrid.par \
+picin.par piclabel.par piclist.par picsel.par pictrans.par picvis.par \
+picxy.par pixdupe.par psf.par quilt.par rift.par rotate.par segment.par \
+setaxis.par setbad.par setbb.par setbound.par setext.par setlabel.par \
+setmagic.par setnorm.par setorigin.par setsky.par settitle.par \
+settype.par setunits.par setvar.par shadow.par slide.par snapshot.par \
+sqorst.par stats.par sub.par substitute.par surfit.par thresh.par \
+trandat.par traninvert.par tranjoin.par tranmake.par transformer.par \
+trantrace.par trig.par turbocont.par vecplot.par wiener.par zaplin.par \
+kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
+_kappa.hd kappa.men helpdb.mip 
+
+#  Contents of the doc/ directory in kappa_iraf.tar
+IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
+axlabel.hlp axunits.hlp block.hlp cadd.hlp calc.hlp calpol.hlp cdiv.hlp \
+centroid.hlp changes_to_kappa.hlp chpix.hlp classified_commands.hlp \
+cmult.hlp co_ordinate_systems.hlp colour_set.hlp compadd.hlp compave.hlp \
+compick.hlp contour.hlp contover.hlp convolve.hlp creframe.hlp crelut.hlp \
+csub.hlp cursor.hlp custom_kappa.hlp data_structures.hlp display.hlp \
+div.hlp drawsig.hlp elprof.hlp erase.hlp errclip.hlp exp10.hlp expe.hlp \
+expon.hlp feedback.hlp ffclean.hlp fillbad.hlp fitsdin.hlp fitsedit.hlp \
+fitsexp.hlp fitsexist.hlp fitshead.hlp fitsimp.hlp fitsin.hlp \
+fitslist.hlp fitsmod.hlp fitstext.hlp fitsurface.hlp fitsval.hlp \
+fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
+gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
+graphics_database.hlp greyplot.hlp hints.hlp hds_data_types.hlp \
+hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
+idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp inspect.hlp \
+interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
+linplot.hlp log10.hlp logar.hlp loge.hlp look.hlp lucy.hlp lutable.hlp \
+lutbgyrw.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutflip.hlp lutgrey.hlp \
+lutheat.hlp luthilite.hlp lutikon.hlp lutneg.hlp lutramps.hlp lutread.hlp \
+lutrot.hlp lutsave.hlp lutspec.hlp lutview.hlp luttweak.hlp lutzebra.hlp \
+makesurface.hlp manic.hlp maths.hlp median.hlp mem2d.hlp mlinplot.hlp \
+mosaic.hlp mstats.hlp mult.hlp native.hlp ndfcopy.hlp ndftrace.hlp \
+ndf_history.hlp ndf_sections.hlp noglobals.hlp nomagic.hlp normalize.hlp \
+numb.hlp outset.hlp pow.hlp ovclear.hlp ovset.hlp paldef.hlp palentry.hlp \
+palread.hlp palsave.hlp parameters.hlp parget.hlp paste.hlp picbase.hlp \
+piccur.hlp picdata.hlp picdef.hlp picempty.hlp picentire.hlp picframe.hlp \
+picgrid.hlp picin.hlp piclabel.hlp piclast.hlp piclist.hlp picsel.hlp \
+pictrans.hlp picvis.hlp picxy.hlp pixdupe.hlp problems_problems.hlp \
+procedures.hlp psf.hlp quilt.hlp requests.hlp rift.hlp sub.hlp \
+role_of_kappa.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb.hlp \
+setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
+setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
+shadow.hlp slide.hlp snapshot.hlp sqorst.hlp stats.hlp substitute.hlp \
+summary.hlp surfit.hlp thresh.hlp trandat.hlp traninvert.hlp tranjoin.hlp \
+tranmake.hlp transformer.hlp trantrace.hlp trig.hlp turbocont.hlp \
+unix_usage.hlp using_help.hlp vecplot.hlp wiener.hlp zaplin.hlp \
+automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
+image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
+iraf_usage.hlp 
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
 KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \
@@ -302,7 +379,7 @@ settype.f setunits.f setvar.f
 # repository and which end up in kappa.tar.
 UNIX_OTHERS = makefile mk sun95.tex sun95_agi1.eps sun95_agi2.eps \
 sun95_agi3.eps sun95_agi4.eps sun95_agi5.eps sun95_agi6.eps \
-sun95_agi7.eps sun95_ardwork.eps kappa.news
+sun95_agi7.eps sun95_ardwork.eps kappa.news sun221.tex
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
@@ -310,7 +387,7 @@ UNIX_RELEASE =  $(UNIX_OTHERS) \
 $(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(IRM_SUB) $(KAPGEN_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
 $(KAPPA_IFLS) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
-$(NDFPACK_SUB) 
+$(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS)
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_agi1.eps \
@@ -319,7 +396,7 @@ sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps sun95.htx_tar kappa.news \
 aif_sub.tar fts_sub.tar irm_sub.tar kapgen_sub.tar kappa_sub.tar \
 kapsub_sub.tar kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
-kappa_data_sun4_Solaris.tar
+kappa_data_sun4_Solaris.tar sun112.tex sun112.htx_tar kappa_iraf.tar
 
 #  Target for use by the grp command.
 $(action)
