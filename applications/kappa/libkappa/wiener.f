@@ -470,11 +470,6 @@
          GO TO 999
       END IF
 
-*  Unmap the DATA array.  This is done to keep the use of virtual
-*  memory to a minimum at any one time, in view of the large amount of
-*  VM needed for the internal files.
-      CALL NDF_UNMAP( INDF1, 'Data', STATUS )      
-
 *  Obtain the noise and noise power.
 *  =================================
 
@@ -482,6 +477,11 @@
 *  input array. 
       CALL KPS1_WIECS( DIMS1( 1 ), DIMS1( 2 ), %VAL( IPN1 ), STDEV,
      :                 STATUS )
+
+*  Unmap the DATA array.  This is done to keep the use of virtual
+*  memory to a minimum at any one time, in view of the large amount of
+*  VM needed for the internal files.
+      CALL NDF_UNMAP( INDF1, 'Data', STATUS )      
 
 *  For Gaussian noise, the noise power is equal to the variance of the
 *  noise.  Get the constant noise power to use, using the squared of
