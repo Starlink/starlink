@@ -1,5 +1,5 @@
-*+  REDS_CONCAT - routine to pack photometry datasets for further processing
-      SUBROUTINE REDS_CONCAT (STATUS)
+*+  REDS_SCUCAT - routine to pack photometry datasets for further processing
+      SUBROUTINE REDS_SCUCAT (STATUS)
 *    Description:
 *     This routine reads in a list of user specified files and concatenates
 *     their data, variance and quality arrays so that routines like errclip
@@ -17,9 +17,12 @@
 *    History:
 *     $Id$
 *     $Log$
-*     Revision 1.2  1996/09/18 02:16:51  timj
-*     Add bad bit mask
+*     Revision 1.3  1996/09/18 19:14:18  timj
+*     Change from CONCAT to SCUCAT
 *
+c Revision 1.2  1996/09/18  02:16:51  timj
+c Add bad bit mask
+c
 c Revision 1.1  1996/09/18  02:02:07  timj
 c Initial revision
 c
