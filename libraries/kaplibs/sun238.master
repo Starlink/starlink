@@ -19,7 +19,7 @@ libraries which were originally written as part of the KAPPA package (a
 package of general purpose image processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
-independantly of KAPPA.}
+independently of KAPPA.}
 
 % ? End of document identification
 
@@ -148,6 +148,10 @@ independantly of KAPPA.}
 \end{htmlonly}
 \newcommand{\st}[1]{{\em{#1}}}
 \newcommand{\hi}[1]{{\tt{#1}}}
+\newcommand{\latexelsehtml}[2]{#1}
+\begin{htmlonly}
+  \renewcommand{\latexelsehtml}[2]{#2}
+\end{htmlonly}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -293,7 +297,7 @@ interface to KAPLIBS routines}. Such changes will be listed within
 this document at each release. To aid developers decisions over which
 routines to use, routines which are deemed to have a significant chance
 of being changed within the foreseeable future are highlighted later in
-this document. This class of routine will normaly just include routines
+this document. This class of routine will normally just include routines
 which have only recently been written.
 
 \subsection{The Scope of this Document}
@@ -327,7 +331,7 @@ within KAPLIBS:
 \begin{description}
 
 \item [CTG\_] These are routines for accessing groups of catalogues through
-a single parameter using wild-cards, \emph{etc.}. This is analagous to
+a single parameter using wild-cards, \emph{etc.}. This is analogous to
 the way the NDG library (see \xref{SUN/95}{sun95}{}) accesses groups 
 of NDFs using a single parameter.
 
@@ -349,7 +353,7 @@ KAPPA's own {\tt fitsio}.
 \item [IRA\_] These routines were initially part of the IRAS90 Astrometry
 library (hence the IRA acronym). They are used to gain access to WCS
 information stored within NDFs in the form of IRAS90 Astrometry extension.
-This form of WCS is now depracated in favour of the NDF WCS component.
+This form of WCS is now deprecated in favour of the NDF WCS component.
 
 \item [KPG1\_] These are other general purpose routines which do not fall
 into such obvious groups.  Even within this library, though, there are
@@ -376,7 +380,7 @@ codes are:
 
 \begin{description}
 \item [d] - Double precision floating point
-\item [r] - Single precision floatin point
+\item [r] - Single precision floating point
 \item [c] - Character
 \item [i] - Single precision integer
 \item [w] - Word (usually 2 bytes integers)
@@ -385,6 +389,35 @@ codes are:
 \item [ub] - Unsigned byte (usually 1 byte unsigned integers)
 \item [l] - Logical 
 \end{description}
+
+\section{Finding the Routines you Need}
+The description of each KAPLIBS routine in
+\latexelsehtml{Appendix~\ref{ro:full}}{the \htmlref{Routine Descriptions}{ro:full}}
+includes a section labelled ``Purpose:'' which contains a short description
+of the purpose of the routine. The {\tt kplsearch} command will display a
+list of the KAPLIBS routines which contain a given search phrase (or any
+sub-string of the search phrase) within the text of this ``Purpose:''
+section. Thus:
+
+\small
+\begin{verbatim}
+   % kplsearch "pgplot wcs" 
+\end{verbatim}
+\normalsize
+
+will search for routines which contain either or both of the words
+``pgplot'' and ``wcs'' within their ``purposes''. The results are usually
+ordered by relevance, but can be ordered alphabetically by including the
+``{\tt -alpha}'' option on the command.
+
+For more help, including descriptions of all the available options, type:
+
+\small
+\begin{verbatim}
+   % kplsearch -help
+\end{verbatim}
+\normalsize
+
 
 \section{Compiling and Linking}
 To compile and link an application with the KAPLIBS package, the following
@@ -430,7 +463,7 @@ removed by the \verb+kaplibs_dev remove+ command.
 \end{latexonly}
 
 \newpage
-\section{Routine Descriptions}
+\section{\xlabel{ro_full}Routine Descriptions\label{ro:full}}
 
 % +
 %  Name:
@@ -449,7 +482,7 @@ removed by the \verb+kaplibs_dev remove+ command.
 %     This file defines LaTeX commands which allow routine documentation
 %     produced by the SST application PROLAT to be processed by LaTeX and
 %     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
+%     source prior to any statements that make of the sst commands.
 
 %  Notes:
 %     The commands defined in the style file html.sty provided with LaTeX2html 
