@@ -683,6 +683,7 @@
 *     W     working coordinates
 *     O     saved value of working coordinates before any fitting
 *     R     results mean coordinates, given
+*     X     for plate centre, values to be reported
 *
       CHARACTER KQR,KPR,KQPCG,KPPCG,KQRSG,KPRSG,KQUSG
       DOUBLE PRECISION EQR,EPR,
@@ -691,6 +692,7 @@
      :                 RAPCW,DCPCW,
      :                 RAPCO,DCPCO,
      :                 RAPCR,DCPCR,
+     :                 RAPCX,DCPCX,
 *  Reference star
      :                 RARSG,DCRSG,EQRSG,EPRSG,
      :                 RARSW,DCRSW,
@@ -1619,8 +1621,16 @@
 *  Solutions (4 unflipped, 4 flipped, 6, 6+)
       DO NSOL=0,NSOLS
 
+*     The round with NSOL=0 produces no output
+         IF (LUX.GT.0 .AND. NSOL.GT.0) WRITE (LUX, '("FIT ",I3)') NSOL
+
 *     Provisionally assume the fit is OK
          FITOK=.TRUE.
+
+*     The plate centre values to be reported (in LUX) are the given ones,
+*     unless we fit the plate centre successfully.
+         RAPCX=RAPCG
+         DCPCX=DCPCG
 
 *     Set up number and initial values of the coefficients
 *     and the number of iterations
@@ -1976,20 +1986,25 @@
 *              Report distortion coefficient and update if OK
                   IF (FITDI) THEN
                      DDI=DISTE-DISTOR
-*NORMAN
-*                     write (*,'("diste=",f10.3," distor=",f10.3,
-*     :                    " ddi=",f10.3," sigdi=",f10.3)') 
-*     :                    diste,distor,ddi,sigdi
                      IF (ABS(DDI).LT.1000D0.AND.SIGDI.LT.100D0) THEN
                         WRITE (LUR,1060) DDI,DISTE,SIGDI
                         WRITE (LUS,1060) DDI,DISTE,SIGDI
  1060                   FORMAT (1X,'Radial distortion has changed by',
      :                     SP,F8.2,' to',F8.2,'  (std dev',SS,F6.2,')'/)
-                        IF (LUX.GT.0) WRITE (LUX,
+                        IF (LUX.GT.0) THEN
+                           WRITE (LUX,
      :                       '("INFO 005 Radial distortion changed by ",
-     :                       F8.2," to",F8.2,
-     :                       "  (std dev",SS,F6.2,")")')
-     :                       DDI,DISTE,SIGDI
+     :                          F8.2," to",F8.2,
+     :                          "  (std dev",SS,F6.2,")")')
+     :                          DDI,DISTE,SIGDI
+*                        Write out the distortion coefficient DISTE 
+*                        in the units ASTROM uses (rad^{-2}) rather than the
+*                        units we carefully converted it to above (deg^{-2}),
+*                        since this will principally be used to control a 
+*                        future invocation of ASTROM.
+                           WRITE (LUX, 1081) "q", DISTE, 
+     :                          "distortion, q (rad^{-2})"
+                        ENDIF
                         DISTOR=DISTE
                      ELSE
                         WRITE (LUR,1062)
@@ -2034,7 +2049,13 @@
                            WRITE (LUR,
      :           '(26X,''to'',I6.2,2I3.2,''.'',I1,3X,A,I2.2,2I3.2,3X,'//
      :       '''(std dev'',F6.1,'' arcsec EW,'',F6.1,'' arcsec NS)''/)')
-     :               IRAVEC,KSDC,(IDCVEC(N),N=1,3),SQRT(VARX),SQRT(VARY)
+     :                          IRAVEC,KSDC,(IDCVEC(N),N=1,3),
+     :                          SQRT(VARX),SQRT(VARY)
+*                        Save these coordinates as the ones to be reported,
+*                        both to the log file, LUX, and to the FITS-WCS file.
+                           RAPCX=R
+                           DCPCX=D
+*                        Save working coordinates
                            RAPCW=RCE
                            DCPCW=DCE
                            PCOK=.TRUE.
@@ -2076,8 +2097,6 @@
 *            Write out a block of results (terminated by `ENDFIT' below)
 *            corresponding to one successful fit.
                IF (LUX.GT.0) THEN
-                  WRITE (LUX, '("FIT ",I3)') NSOL
-
                   IF (NSOL.GT.2) THEN
                      IF (FITDI) THEN
                         WRITE (LUX, 1081) "deltaq", DDI,
@@ -2192,10 +2211,11 @@
 *               We have to deal only with zenithal coordinates.
 *               The estimated and predicted coordinates here in ASTROM
 *               are in the projected plane, and are the `intermediate
-*               world coordinates' of the FITS-WCS proposals.
-                  CALL FTPKYG (FTUNIT, 'CRVAL1', RAPCG/D2R, 7,
+*               world coordinates' of the FITS-WCS proposals.  Note that we
+*               are outputting the `report' coordinates, RAPCX and DCPCX.
+                  CALL FTPKYG (FTUNIT, 'CRVAL1', RAPCX/D2R, 7,
      :                 'Projection pole -- RA', FTSTAT)
-                  CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCG/D2R, 7,
+                  CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCX/D2R, 7,
      :                 'Projection pole -- DEC', FTSTAT)
                   CALL FTPKYG (FTUNIT, 'CRPIX1', 
      :                 fnorm*pltcon(1,nsol+maxsol), 7,
@@ -2442,32 +2462,32 @@
                   WRITE (LUX, 1080) "plate", SCALE,
      :                 "(mean) plate scale, arcsec"
                   WRITE (LUX, 1080) "prms", RRMS/SCALE,
-     :                 "RRMS in pixels"
+     :                 "rrms in pixels"
+                  WRITE (LUX, 1083) "nterms", NTERMS, "no. terms in fit"
 
-*               Write out the plate centre coordinates (RAPCG, DCPCG) 
+*               Write out the plate centre coordinates (RAPCX, DCPCX) 
 *               in radians as well as sexagesimal.
-                  CALL sla_DR2TF(3,sla_DRANRM(RAPCG),KSRA,IRAVEC)
+                  CALL sla_DR2TF(1,sla_DRANRM(RAPCX),KSRA,IRAVEC)
 *               Because of the dranrm, KSRA is always '+'
-                  CALL sla_DR2AF(3,sla_DRANGE(DCPCG),KSDC,IDCVEC)
+                  CALL sla_DR2AF(0,sla_DRANGE(DCPCX),KSDC,IDCVEC)
 *               Write out the distortion coefficient DISTE 
 *               in the units ASTROM uses (rad^{-2}) rather than the
 *               units we carefully converted it to above (deg^{-2}),
 *               since this will principally be used to control a future
 *               invocation of ASTROM.
-                  WRITE (LUX, 1083) "nterms", NTERMS, "no. terms in fit"
-                  WRITE (LUX, 1081) "q", DISTE, "distortion, q"
-                  WRITE (LUX, 1082) "rarad", RAPCG,
+*                  WRITE (LUX, 1081) "q", DISTE, "distortion, q"
+                  WRITE (LUX, 1082) "rarad", RAPCX,
      :                 "projection pole RA, radians"
-                  WRITE (LUX, 1082) "decrad",DCPCG,
+                  WRITE (LUX, 1082) "decrad",DCPCX,
      :                 "projection pole Dec, radians"
                   WRITE (LUX,'("RESULT ",A10, 1X,
-     :                 I3,":",I2.2,":",I2.2,".",I3.3," # ",A)')
+     :                 I3,":",I2.2,":",I2.2,".",I1,10X,"# ",A)')
      :                 "rasex", IRAVEC,
      :                 "projection pole RA, sexagesimal"
                   WRITE (LUX,'("RESULT ",A10, 1X,
-     :                 A,I2.2,":",I2.2,":",I2.2,".",I3.3," # ",A)')
+     :                 A,I2.2,":",I2.2,":",I2.2,12X,"# ",A)')
      :                 "decsex",
-     :                 KSDC, IDCVEC,
+     :                 KSDC, (IDCVEC(N),N=1,3),
      :                 "projection pole Dec, sexagesimal"
  1080             FORMAT ("RESULT ",A10, 1X, F20.6, " # ", A)
  1081             FORMAT ("RESULT ",A10, 1X, F20.2, " # ", A)
@@ -2482,13 +2502,21 @@
      :                 FITSFN(:FTI),
      :                 "FITS-WCS output file"
 
-*               Indicate the end of the list of results for this fit
-                  WRITE (LUX, '("ENDFIT")')
                ENDIF
-
 *            End of IF(FITOK)
             END IF
          END IF
+
+*      Indicate the end of the list of results for this fit.  
+*      The fit with NSOL=0 produces no output.
+         IF (LUX.GT.0 .AND. NSOL.GT.0) THEN
+            IF (FITOK) THEN
+               WRITE (LUX, '("STATUS OK")')
+            ELSE
+               WRITE (LUX, '("STATUS BAD")')
+            ENDIF
+            WRITE (LUX, '("ENDFIT")')
+         ENDIF
 
 *     Next solution
       END DO
