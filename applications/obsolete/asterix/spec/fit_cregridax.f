@@ -27,13 +27,15 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Output dataset
+      INTEGER			ID			!
       INTEGER                  NAX                     ! Number of grid axes
       RECORD /GRID_AXIS/       GAX(NAX)                ! Grid axis block
 *
 *    Status :
 *
       INTEGER STATUS
+*
+      CHARACTER*(DAT__SZLOC)   LOC                     ! Output dataset
 *-
 
 *    Check status
