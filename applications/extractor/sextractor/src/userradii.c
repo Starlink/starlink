@@ -3,12 +3,13 @@
  *     userradii
  *
  *  Purpose:
- *     Compute average radii at various intensity levels.
+ *     Compute a series of isophotal radii.
  *
  *  Description:
- *     The user either defines the levels to be used as surface
- *     brightnesses or intensities using the parameters, RAD_TYPE
- *     and RAD_THRESH.
+ *     This routine computes a series of isophotal radii for an
+ *     object. The thresholds used for each isophote are given either
+ *     as surface brightnesses or intensities using the parameters,
+ *     RAD_TYPE and RAD_THRESH.
  *
  *     RAD_TYPE can be either "SB" or "INT" (with the obvious meanings
  *     of surface brightness or intensities).
@@ -20,34 +21,36 @@
  *
  *        step[,start,zp]
  *
- *     step being the interval between levels, start being the value
- *     of the first level and zp the data zero point (all in
- *     magnitudes per square arcsecond). If only one value is given
- *     then the starting point is assumed to be the analysis threshold
- *     and the zero point is derived from the photometric value.
+ *     step being the interval between thresholds, start being the
+ *     threshold used as the first level and zp the data zero point
+ *     (all in magnitudes per square arcsecond). If only one value is
+ *     given then the starting point is assumed to be the analysis
+ *     threshold and the zero point is derived from the photometric
+ *     value (MAG_ZEROPOINT).
  *
- *     If RAD_THRESH value is not given then the default step is 0.75
- *     magnitudes.
+ *     If a RAD_THRESH value is not given then the default step is
+ *     0.75 magnitudes.
  *
  *     If RAD_TYPE is "INT" then they are:
  *
  *        step[,start]
  *
  *     step being the interval between levels in magnitudes and start
- *     being the intensity of the first level. If start is not given
- *     then the analysis threshold is used.
+ *     being the threshold used as the first level. If start is not
+ *     given then the analysis threshold is used.
  *
  *     If no RAD_THRESH values are given then the APM analysis method
  *     is used:
  *
- *        Ii = It * 2^( i + 2 ), i = 2, NRAD
+ *        Ii = It * 2^( i + 2 ), i = 1, NRAD-1
  *
  *     where Ii = threshold for ith level, It = measurement
- *     threshold. This gives approx 0.75 magnitude steps ( = 2.5*log(2) ).
+ *     threshold. This gives approx 0.75 magnitude steps ( =
+ *     2.5*log(2) ).
  *
  *     The actual measurements are associated with the catalogue
- *     parameters, RAD0 through RAD15, the must be requested before
- *     the results will be shown.
+ *     parameters, RAD0 through RAD15, at least one of which must be
+ *     requested before the results will be calculated.
  *
  *  Authors:
  *     (PWD): Peter W. Draper (Starlink, Durham University)
@@ -102,7 +105,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
             /*  No values given. The intervals follow the APM
                 description:
 
-                   Ii = It * 2^( i + 2 ), i = 2, NRAD
+                Ii = It * 2^( i + 2 ), i = 1, NRAD-1
 
                 where Ii = threshold for ith level, It = measurement
                 threshold. This gives approx 0.75 magnitude steps
@@ -111,6 +114,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
             for ( i = 1; i < NRAD; i++ ) {
                threshs[i] = field->thresh * pow( 2, i + 2 );
             }
+            thresh[0] = field->thresh;
 
          } else if ( prefs.nrad == 1 ) {
 
