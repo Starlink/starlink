@@ -8,6 +8,8 @@
 *        Remove CARRIAGECONTROL from OPEN
 *     05 Mar 2002 (timj):
 *        More decimal places for frequency scale
+*      9 Aug 2004 (timj):
+*        SAVE the filename. Check error status of OPEN
 C-----------------------------------------------------------------------
 
       SUBROUTINE WRITE_ASCII_DATA (XSCALE, IFAIL)
@@ -43,17 +45,29 @@ C-----------------------------------------------------------------------
       INTEGER*4 NTOT
       INTEGER*4 IGETLUN, IFREELUN
 
+*  We want the previous filename to be remembered
+      SAVE FILENAME
+
       IFAIL = 0
 
 *  Get an output filename
-
       CALL GEN_GETSTR ('Name for output file?', FILENAME,
-     &                 'A40', FILENAME, ISTAT)
+     &                 'A', FILENAME, ISTAT)
 
 *  Open the output file
 
       ISTAT = IGETLUN (LUN, 'write_ascii_data', .TRUE.)
-      OPEN (LUN, FILE=FILENAME, ACCESS='SEQUENTIAL', STATUS='NEW' )
+      OPEN (LUN, FILE=FILENAME, ACCESS='SEQUENTIAL', STATUS='NEW',
+     :     IOSTAT=ISTAT)
+
+      IF (ISTAT .NE. 0) THEN
+         PRINT *, 'Could not open file "',
+     :        FILENAME(:GEN_ILEN(FILENAME)),'"'
+         PRINT *, 'Does it already exist?'
+         ISTAT = IFREELUN(LUN)
+         IFAIL = 10
+         RETURN
+      END IF
 
 *  Write the header information
 
