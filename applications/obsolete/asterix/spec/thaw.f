@@ -15,12 +15,14 @@
 *    Bugs :
 *    Authors :
 *     Trevor Ponman  (BHVAD::TJP)
+*     Richard Beard (RB)
 *    History :
 *      2 Jul 87 : V0.6-1 Original (TJP)
 *     14 Dec 88 : V0.6-2 Thaw multiple parameters, allow param resetting (TJP)
 *     20 Jun 89 : V1.0-1 ASTERIX88 release (TJP)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     20 Dec 1995 : V2.0-0 ADI port (DJA)
+*      8 Aug 1997 : V2.2-0 Ensure strings are long enough (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -38,7 +40,7 @@
 						! pmodel I
 	CHARACTER*(DAT__SZLOC) MIPJLOC		! Locator to one param of pmod I
 	CHARACTER*(DAT__SZTYP) TYP		! Object type
-	CHARACTER*25 PARNAME			! Parameter name
+	CHARACTER*30 PARNAME			! Parameter name
 	LOGICAL FROZEN				! Parameter frozen?
 	LOGICAL PVALS				! Param values entered?
 	LOGICAL GETPAR				! Parameter component accessed?
