@@ -11000,24 +11000,69 @@ Shows the current status of a graphics device.
 
 Usage:
 
-   gdstate [device]
+   gdstate [frame] [device]
 
 Description:
 
-   This application displays the current status of a graphics
-   device, including details of the current graphics-database
-   picture (e.g. its co-ordinate system and position on the display
-   surface).
+   This application displays information about the current graphics
+   database picture on a graphics device, including the extreme axis
+   values in any requested co-ordinate Frame (see parameter FRAME).
+   Information is written to various output parameters for use by
+   other applications, and is also written to the screen by default
+   (see parameter REPORT). An outline may be drawn around the current
+   picture if required (see parameter OUTLINE).
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COMMENT
 COMMENT = LITERAL (Write)
    The comment of the current picture.  Up to 132 characters
    will be written.
+3 DESCRIBE
+DESCRIBE = _LOGICAL (Read)
+   If TRUE, a detailed description is displayed of the co-ordinate
+   Frame in which the picture bounds are reported (see parameter
+   FRAME). [current value]
 3 DEVICE
 DEVICE = DEVICE (Read)
    Name of the graphics device about which information is
    required. [Current graphics device]
+3 DOMAIN
+DOMAIN = LITERAL (Write)
+   The Domain name of the current co-ordinate Frame for the current
+   picture.
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAME) for a celestial co-ordinate system, then an
+   epoch value is needed to qualify it. This is the epoch at
+   which the displayed sky co-ordinates were determined. It should
+   be given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise.
+3 FRAME
+FRAME = LITERAL (Read)
+   A string determining the co-ordinate Frame in which the bounds
+   of the current picture are to be reported. When a picture is
+   created by an application such as PICDEF, DISPLAY, etc, WCS
+   information describing the available co-ordinate systems are stored
+   with the picture in the graphics database. This application can
+   report bounds in any of the co-ordinate Frames stored with the
+   current picture. The string supplied for FRAME can be one of the
+   following:
+
+   - A domain name such as SKY, AXIS, PIXEL, BASEPIC, CURPIC, etc. The
+   special domain AGI_WORLD is used to refer to the world co-ordinate
+   system stored in the AGI graphics database. This can be useful if
+   no WCS information was store with the picture when it was created.
+
+   - An integer value giving the index of the required Frame.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+
+   If a null value (!) is supplied, bounds are reported in the
+   co-ordinate Frame which was current when the picture was created.
+   [!]
 3 LABEL
 LABEL = LITERAL (Write)
    The label of the current picture.  It is blank if there is no
@@ -11025,22 +11070,6 @@ LABEL = LITERAL (Write)
 3 NAME
 NAME = LITERAL (Write)
    The name of the current picture.
-3 NCX1
-NCX1 = _REAL (Write)
-   The lower x normalised device co-ordinate of the current
-   picture.
-3 NCX2
-NCX2 = _REAL (Write)
-   The upper x normalised device co-ordinate of the current
-   picture.
-3 NCY1
-NCY1 = _REAL (Write)
-   The lower y normalised device co-ordinate of the current
-   picture.
-3 NCY2
-NCY2 = _REAL (Write)
-   The upper y normalised device co-ordinate of the current
-   picture.
 3 OUTLINE
 OUTLINE = _LOGICAL (Read)
    If OUTLINE is TRUE, then an outline will be drawn around the
@@ -11055,49 +11084,105 @@ REPORT = _LOGICAL (Read)
    If this is FALSE the state of the graphics device is not
    reported, merely the results are written to the output
    parameters.  It is intended for use within procedures. [TRUE]
-3 WCX1
-WCX1 = _REAL (Write)
-   The lower x world co-ordinate of the current picture.
-3 WCX2
-WCX2 = _REAL (Write)
-   The upper x world co-ordinate of the current picture.
-3 WCY1
-WCY1 = _REAL (Write)
-   The lower y world co-ordinate of the current picture.
-3 WCY2
-WCY2 = _REAL (Write)
-   The upper y world co-ordinate of the current picture.
+3 STYLE
+STYLE = LITERAL (Read)
+   A group of attribute settings describing the plotting style to use
+   when drawing the outline (see parameter OUTLINE). The format
+   of the axis values reported on the screen may also be controlled.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The appearance of the outline is controlled by the attributes
+   Colour(Border), Width(Border), etc (the synonym "Outline" may be
+   used in place of "Border"). In addition, the following attributes
+   may be set in order to control the appearance of the formatted axis
+   values reported on the screen: Format, Digits, Symbol, Unit. These
+   may be suffixed with an axis number (e.g. "Digits(2)") to refer to
+   the values displayed for a specific axis. [current value]
+3 X1
+X1 = LITERAL (Write)
+   The lowest value found within the current picture for axis 1 of the
+   requested co-ordinate Frame (see parameter FRAME).
+3 X2
+X2 = LITERAL (Write)
+   The highest value found within the current picture for axis 1 of the
+   requested co-ordinate Frame (see parameter FRAME).
+3 Y1
+Y1 = LITERAL (Write)
+   The lowest value found within the current picture for axis 2 of the
+   requested co-ordinate Frame (see parameter FRAME).
+3 Y2
+Y2 = LITERAL (Write)
+   The highest value found within the current picture for axis 2 of the
+   requested co-ordinate Frame (see parameter FRAME).
 2 Examples
 gdstate
-   Shows the status of the current graphics device.
+   Shows the status of the current graphics device. The bounds of
+   the picture are displayed in the current co-ordinate Frame of
+   the picture.
 
-gdstate ps_l
-   Shows the status of the ps_l device.
+gdstate ps_l frame=basepic
+   Shows the status of the ps_l device. The bounds of the picture
+   are displayed in the BASEPIC Frame (normalised device co-ordinates
+   in which the short of the two dimensions of the display surface
+   has length 1.0).
 
-gdstate outline
-   Shows the status of the current graphics device and draws an
-   outline around the current database picture.
+gdstate outline frame=pixel style="'colour=red,width=3'"
+   Shows the status of the current graphics device and draws a
+   thick, red outline around the current database picture. The
+   bounds of the picture are displayed in the PIXEL co-ordinate
+   Frame (if available).
 
 gdstate refnam=(ndfname)
    Shows the status of the current graphics device.  If there
    is a reference data object, its name is written to the ICL
    variable NDFNAME.
 
-gdstate ncx1=(x1) ncx2=(x2) ncy1=(y1) ncy2=(y2)
+gdstate x1=(x1) x2=(x2) y1=(y1) y2=(y2) frame=basepic
    Shows the status of the current graphics device.  The bounds
    of the current picture in normalised device co-ordinates
    are written to the ICL variables: X1, X2, Y1, Y2.
 2 Notes
--  If a channel to the graphics device cannot be opened, then
-this application will still execute without error, but a reduced
-amount of information will be displayed and an outline around the
-current picture (if requested) will not be drawn.
+-  The displayed bounds are the extreme axis values found anywhere
+within the current picture. In some situations these extreme
+values may not occur on the edges of the picture. For instance, if
+the current picture represents a region including the north
+celestial pole, then displaying the picture bounds in celestial
+co-ordinates will give a declination upper limit of +90 degrees,
+whilst the RA limits will be 0 hours and (close to) 24 hours.
+
+-  Previous versions of this application reported bounds in
+"Normalised Device Co-ordinates". Similar functionality is now
+provided by setting parameter FRAME to "BASEPIC". Be aware though,
+that "Normalised Device Co-ordinates" were normalised so that the
+longer of the two axes had a length of 1.0, but BASEPIC co-ordinates
+are normalised so that the shorter of the two axes has length 1.0.
 2 Related_Applications
    KAPPA: IDSTATE.
 2 Authors
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1-DEC-1989 (RFWS):
     Original version.
@@ -11118,6 +11203,9 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1991 August 20 (MJC):
     Added output parameters and REPORT parameter.
+
+ 7-JAN-2000 (DSB):
+    Big changes for the first AST/PGPLOT version.
 1 Getting_Data_into_KAPPA
 
 KAPPA utilises general data structures within an HDS container file,
