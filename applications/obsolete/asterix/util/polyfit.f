@@ -144,7 +144,7 @@
         PARAMETER		( VERSION = 'POLYFIT Version V2.0-1' )
 
 *  Local Variables:
-      CHARACTER*80              TEXT(5)                 ! History file message
+      CHARACTER*80              HTXT			! History text
       CHARACTER*12              NAME
 
       REAL                      PARAM(12)
@@ -155,6 +155,7 @@
       INTEGER                DPTR            ! Pointer to input data array
       INTEGER                I, N            ! Dummy variables for loops.
       INTEGER			IFID			! Input dataset id
+      INTEGER			IFILES			! Input file info
       INTEGER                LDIMS(ADI__MXDIM) ! Size of each dimension
       INTEGER                NBAD            ! No.of bad quality data
       INTEGER                NBPTR           ! Pointer to number of bad points array
@@ -352,17 +353,17 @@
 
 *  History file entry
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL USI_NAMEI( I, TEXT, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
       CALL MSG_SETI( 'NDEG', NDEG )
-      I = I + 1
       IF ( POLY ) THEN
         CALL MSG_MAKE( 'Polynomial fit of degree ^NDEG produced.',
-     :                                                TEXT(I), N )
+     :                                                TEXT, N )
       ELSE
         CALL MSG_MAKE( 'Polynomial of degree ^NDEG subtracted.',
-     :                                              TEXT(I), N )
+     :                                              TEXT, N )
       END IF
-      CALL HSI_PTXT( OFID, I, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, 1, HTXT, STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()
