@@ -430,7 +430,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 4.0-0b
+PKG_VERS = 4.0-1b
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -639,7 +639,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_ftval.f ccd1_ftget.f ccd1_ftypi.f \
  ccd1_ftypl.f ccd1_gafit.f ccd1_gastc.f ccd1_gastd.f \
  ccd1_gefp.f ccd1_ggmap.f ccd1_giseq.f ccd1_gmdcp.f ccd1_gmid.f \
- ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_grpth.f ccd1_grrep.f ccd1_gtbds.f \
+ ccd1_gmmp.f ccd1_gparf.f ccd1_gpnam.f ccd1_gprmt.f ccd1_grapc.f ccd1_groff.f \
+ ccd1_grpth.f ccd1_grrep.f ccd1_gtbds.f \
  ccd1_gtcmp.f ccd1_gtcpb.f ccd1_gtcpc.f ccd1_gtdir.f \
  ccd1_gtlig.f ccd1_gtlih.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
  ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hchan.f ccd1_hisp.f ccd1_hvcon.f \
@@ -663,7 +664,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_ptbad.f ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
  ccd1_rccr.f ccd1_rdbi.f ccd1_rdlin.f ccd1_redtr.f \
  ccd1_rend.f ccd1_repc.f ccd1_rexp.f \
- ccd1_rfcr.f ccd1_rflt.f ccd1_rglo.f ccd1_rmcom.f ccd1_rmit.f \
+ ccd1_rfcr.f ccd1_rflt.f ccd1_rmcom.f ccd1_rmit.f \
  ccd1_rmsd.f ccd1_rmsk.f ccd1_rmulo.f ccd1_rnorm.f \
  ccd1_rsetu.f ccd1_rtran.f ccd1_save.f \
  ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f ccd1_splot.f \
@@ -677,7 +678,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_wrxyp.f ccd1_xadd.f ccd1_xyfmt.f fio1_cllog.f fio1_errep.f \
  fio1_msg.f fio1_msgl.f fio1_oplog.f fio1_silev.f \
  ccd1_lsfun1.f ccd1_lsfuns.f ccd1_imfit.f ccd1_ftgrp.f \
- ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_touch.f \
+ ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_kpgt.f \
+ ccd1_kpld.f ccd1_kpop.f ccd1_kpsv.f ccd1_touch.f \
  ccd1_ckdeb.f ccd1_ckccl.f ccd1_ckflc.f ccd1_resta.f \
  ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f \
  ccd1_fcov.f ccd1_c2ca.f ccd1_ca2c.f \
@@ -688,7 +690,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
  ira1_chscs.f ira_seteq.f ira_iscs.f \
  ccd1_box.f ccd1_gsrt.f ccd1_gszff.f ccd1_sgare.f ccd1_ordg.f ccd1_tran.f \
- ccd1_fspec.f ccd1_slice.f ccd1_grdel.f
+ ccd1_fspec.f ccd1_slice.f ccd1_grdel.f \
+ subpar_init.f
 
 HELPSRC = $(HELPTASK).f gethlp.f gthlpi.f kpg1_scrsz.f \
  pthlpo.f sread.f
@@ -2371,6 +2374,9 @@ ccd1_giseq.o: SAE_PAR
 ccd1_gmdcp.o: PAR_ERR PRM_PAR SAE_PAR
 ccd1_gmid.o: PRM_PAR SAE_PAR
 ccd1_gmmp.o: PRM_PAR SAE_PAR
+ccd1_gpnam.o: SAE_PAR DAT_PAR
+ccd1_gprmt.o: SAE_PAR DAT_PAR
+ccd1_gparf.o: SAE_PAR DAT_PAR FIO_PAR DAT_ERR
 ccd1_grapc.o: PRM_PAR SAE_PAR
 ccd1_grdel.o: GRP_PAR SAE_PAR
 ccd1_grpth.o: PRM_PAR SAE_PAR
@@ -2402,6 +2408,10 @@ ccd1_inser.o: SAE_PAR
 ccd1_iscom.o: SAE_PAR
 ccd1_itra.o: SAE_PAR
 ccd1_knext.o: SAE_PAR
+ccd1_kpgt.o: SAE_PAR DAT_PAR
+ccd1_kpld.o: SAE_PAR DAT_PAR
+ccd1_kpop.o: SAE_PAR
+ccd1_kpsv.o: SAE_PAR DAT_PAR
 ccd1_ktidy.o: SAE_PAR GRP_PAR
 ccd1_lasto.o: SAE_PAR
 ccd1_lastw.o: SAE_PAR
@@ -2487,7 +2497,6 @@ ccd1_resta.o: SAE_PAR GRP_PAR
 ccd1_rexp.o: MSG_PAR SAE_PAR
 ccd1_rfcr.o: SAE_PAR
 ccd1_rflt.o: MSG_PAR SAE_PAR
-ccd1_rglo.o: SAE_PAR
 ccd1_rmcom.o: SAE_PAR
 ccd1_rmit.o: DAT_PAR SAE_PAR
 ccd1_rmsd.o: SAE_PAR
@@ -2500,10 +2509,10 @@ ccd1_sched.o: SAE_PAR
 ccd1_scrch.o: SAE_PAR
 ccd1_sdect.o: FIO_ERR MSG_PAR PAR_ERR PSX_ERR SAE_PAR
 ccd1_sethd.o: SAE_PAR CCD1_PAR GRP_PAR
-ccd1_setrd.o: SAE_PAR AST_PAR DAT_PAR
+ccd1_setrd.o: SAE_PAR AST_PAR DAT_PAR CCD1_PAR
 ccd1_setsp.o: SAE_PAR AST_PAR GRP_PAR
 ccd1_setsw.o: SAE_PAR GRP_PAR AST_PAR CCD1_PAR
-ccd1_setwr.o: SAE_PAR AST_PAR DAT_PAR
+ccd1_setwr.o: SAE_PAR AST_PAR DAT_PAR CCD1_PAR
 ccd1_setpa.o: SAE_PAR
 ccd1_sgare.o: SAE_PAR
 ccd1_swlis.o: SAE_PAR AST_PAR GRP_PAR CCD1_PAR
@@ -2648,6 +2657,8 @@ ccg1_scr1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_scr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_scr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_skys.o: PRM_PAR SAE_PAR
+ccg1_spr.o: SAE_PAR DAT_PAR FIO_PAR
+ccg1_spw.o: SAE_PAR DAT_PAR FIO_PAR
 ccg1_sqb.o: PRM_PAR SAE_PAR
 ccg1_ssat.o: PRM_PAR SAE_PAR
 ccg1_stmn.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
@@ -2751,5 +2762,7 @@ ccg1_smd2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smd3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+
+subpar_init.o: DAT_PAR SAE_PAR SUBPAR_PAR
 
 # $Id$
