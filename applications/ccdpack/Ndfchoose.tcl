@@ -804,12 +804,9 @@
                          [ winfo reqheight $itk_interior ] ]
          if { $xinc != 0 || $yinc != 0 } {
             waitpush "Resizing chooser window"
-            set oldbind [ bind $itk_interior <Configure> ]
-            bind $itk_interior <Configure> ""
             configure -viewport [ list [ expr [ lindex $viewport 0 ] + $xinc ] \
                                        [ expr [ lindex $viewport 1 ] + $yinc ] ]
             update idletasks
-            bind $itk_interior <Configure> $oldbind
             waitpop
          }
       }
