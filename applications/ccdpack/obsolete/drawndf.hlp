@@ -435,7 +435,7 @@ Behaviour_of_Parameters
    values. These global values will always take precedence, except
    when an assignment is made on the command line, or in the case
    of EXTENT, if USEEXT is true.  If USESET is true, a global value
-   for USEEXT corresponding to the Set Index of each image will be
+   for EXTENT corresponding to the Set Index of each image will be
    sought.  Global values may be set and reset using the CCDSETUP 
    and CCDCLEAR commands.
 
