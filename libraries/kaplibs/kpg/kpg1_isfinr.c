@@ -9,7 +9,7 @@
 *     C
 
 *  Invocation:
-*     CALL KPG1_ISFINR( VAL, FINITE )
+*     RESULT = KPG1_ISFINR( VAL )
 
 *  Description:
 *     The routine uses the finite() system call to check the 
@@ -19,15 +19,13 @@
 *  Arguments:
 *     VAL = REAL (Given)
 *        The value to check.
-*     FINITE = LOGICAL (Returned)
-*        Is VAL a finite value?
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     23-JUN-1998 (DSB):
+*     5-DEC-2001 (DSB):
 *        Original version.
 *     {enter_changes_here}
 
@@ -39,9 +37,8 @@
 #include <math.h>
 #include "f77.h"
 
-F77_SUBROUTINE(kpg1_isfinr)( REAL(val), LOGICAL(finite) )
+F77_LOGICAL_FUNCTION(kpg1_isfinr)( REAL(val) )
 {
    GENPTR_REAL(val)
-   GENPTR_LOGICAL(finite)
-   *finite = finite( (double) *val )?F77_TRUE:F77_FALSE;
+   return finite( (double) *val ) ? F77_TRUE : F77_FALSE;
 }
