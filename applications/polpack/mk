@@ -322,7 +322,7 @@
                TCL_VERS='7.6'
                AR_IN='ar r'
                CC='gcc'
-               LDFLAGS=' -ldl'
+               LDFLAGS=' -ldl -Xlinker -rpath -Xlinker $(STAR_SHARE)'
                CFLAGS='-I$(STAR_INC) -O'
                FC='g77'
                FFLAGS='-fno-second-underscore -O'

@@ -39,7 +39,7 @@ proc Accept {} {
 
 # See if there is already a current feature with the same label as the
 # reference feature.
-      if { [FindPosn LBL $lab] == "" } {
+      if { [FindPosn LBL $lab 0] == "" } {
 
 # If not, search for an image feature at these canvas coordinates. If one is
 # found, give it the same label as the reference feature. If the
@@ -195,6 +195,9 @@ proc B1MotionBind {x y} {
 #           1 - The user starts a new mask polygon, or edits an existing one.
 #           2 - The user completes a started mask polygon.
 #           3 - The user selects a label by clicking on an existing feature.
+#     MOVE (Read)
+#        Was the shift key pressed when the button was clicked? If so, the 
+#        whole polygon is dragged instead of a single vertex.
 #     ROOTI (Read)
 #        The position index of the vertex being pointed at, or the position
 #        index of the vertex at the start of the vector being pointed at,
@@ -217,6 +220,7 @@ proc B1MotionBind {x y} {
 #-
    global CAN
    global MODE
+   global MOVE
    global ROOTX
    global ROOTI
    global ROOTY
@@ -226,7 +230,6 @@ proc B1MotionBind {x y} {
    global VID1
    global VID2
    global POINTER_PXY
-   global POINTER_CXY
 
 # Convert the screen coords to canvas coords.
    set cx [$CAN canvasx $x]
@@ -235,8 +238,6 @@ proc B1MotionBind {x y} {
 # If a cross-hair has been requested instead of a pointer, then move the
 # positions of the lines making up the cross hair.
    Xhair $cx $cy
-
-# Store the canvas coordinates of the pointer in POINTER_CXY.
 
 # Store the pixel coordinates of the pointer in POINTER_PXY.
    set pxy [CanToNDF $cx $cy]
@@ -287,8 +288,8 @@ proc B1MotionBind {x y} {
       set SELECTED_AREA [list $xmin $ymin $xmax $ymax]
 
 # If we are in mode 1 ("edit an existing polygon"), and the button was
-# pressed over a vertex, drag the vertex.
-   } {
+# pressed over a vertex, drag the vertex if the shift key was not pressed.
+   } elseif { !$MOVE } {
 
 # Set the coordinates of the vertex marker to the current pointer coords.
       $CAN coords $VID0 $cx $cy
@@ -300,7 +301,19 @@ proc B1MotionBind {x y} {
 # Move the start of the vector which starts at the vertex.
       set coords [$CAN coords $VID2]
       $CAN coords $VID2 $cx $cy [lindex $coords 2] [lindex $coords 3] 
-    }
+
+# If the shift key was pressed, drag the whole polygon.
+   } {
+
+# Find the offsets from the previous position.
+      set cxy [$CAN coords $VID0]
+      set dx [expr $cx - [lindex $cxy 0]]
+      set dy [expr $cy - [lindex $cxy 1]]
+
+# Move all canvas items which have the same tag as the root vertex.
+      $CAN move [GetPosn $ROOTI TAG] $dx $dy
+
+   }
 }
 
 proc BeginUF {} {
@@ -549,6 +562,7 @@ proc CancelArea {} {
 #-
    global CAN
    global DELETE
+   global EDITMENU
    global SELECTED_AREA
    global ZOOM
 
@@ -561,9 +575,11 @@ proc CancelArea {} {
 # Indicate that there i snow no area selected.
       set SELECTED_AREA ""
 
-# Disable the ZOOM and DELETE buttons.
+# Disable the ZOOM and DELETE buttons (etc).
       $ZOOM configure -state disabled
       $DELETE configure -state disabled
+      $EDITMENU entryconfigure Delete -state disabled
+      $EDITMENU entryconfigure Copy -state disabled
 
 # Check that the CANCEL button is in the correct state.
       Cancel check
@@ -1110,12 +1126,14 @@ proc ClearPosns {args} {
 # drawn. Do both the position markers and the vectors joining adjacent
 # vertices in a polygon.
          for {set i 0} {$i < $size} {incr i} {
-             set id [lindex $PNTID($image,$object) $i]
+
+            set id [lindex $PNTID($image,$object) $i]
             if { $id != -1 } {
                $CAN delete $id
                set PNTID($image,$object) [lreplace $PNTID($image,$object) $i $i -1]
             }
-             set vid [lindex $PNTVID($image,$object) $i]
+
+            set vid [lindex $PNTVID($image,$object) $i]
             if { $vid != -1 && $vid != "" } {
                $CAN delete $vid
                set PNTVID($image,$object) [lreplace $PNTVID($image,$object) $i $i -1]
@@ -1477,6 +1495,120 @@ proc ConvMap {gotc type} {
       }
    }
    return $ok
+}
+
+proc Copy {} {
+#+
+#  Name:
+#     Copy
+#
+#  Purpose:
+#     Take a copy of any complete polygons inside the currently selected
+#     area. The copy can be accessed using procedures SetPosn, GetPosn,
+#     etc, by supplying the above procedures with two optional trailing
+#     arguments specifying the object and image, which should both be
+#    equal to "copy".
+#
+#  Arguments:
+#     None.
+#-
+   global PASTE
+   global EDITMENU
+   global SELECTED_AREA
+   global PNTCY
+   global PNTCX
+   global PNTID
+   global PNTLBL
+   global PNTNXT
+   global PNTPY
+   global PNTPX
+   global PNTVID
+   global MODE
+ 
+# Do nothing if there is no selected area, or we are not in MODE 1
+# ("Create or edit a polygon").
+   if { $SELECTED_AREA != "" && $MODE == 1 } {
+
+# Erase any previous copied object.
+      if { $PASTE } {
+         set PASTE 0
+         $EDITMENU entryconfigure Paste -state disabled
+         unset PNTCY(copy,copy) 
+         unset PNTCX(copy,copy) 
+         unset PNTID(copy,copy) 
+         unset PNTLBL(copy,copy) 
+         unset PNTNXT(copy,copy) 
+         unset PNTPY(copy,copy) 
+         unset PNTPX(copy,copy) 
+         unset PNTVID(copy,copy) 
+         unset PNTTAG(copy,copy) 
+      }
+ 
+# Store the number of current position.
+      set size [NumPosn ""]
+
+# Store the bounds of the selected area.
+      set xmin [lindex $SELECTED_AREA 0]
+      set ymin [lindex $SELECTED_AREA 1]
+      set xmax [lindex $SELECTED_AREA 2]
+      set ymax [lindex $SELECTED_AREA 3]
+
+# Loop round each current position.
+      for {set i 0} {$i < $size} {incr i} {
+
+# Get the canvas coordinates of theposition, and the index of the next vertex.
+         set cx [GetPosn $i CX]
+         set cy [GetPosn $i CY]
+         set nxt [GetPosn $i NXT]
+
+# Loop round adjacent vertices, checking that they are within the selected 
+# area. Leave the loop if the position is not a vertex, if we arrive
+# back at the original vertex. 
+         set ok 0
+         while { $cx >= $xmin && $cx <= $xmax && 
+                 $cy >= $ymin && $cy <= $ymax && 
+                 $nxt != -1 && $nxt != "" } {
+
+# If the next vertex is the original vertex, we have been round the entire
+# polygon without going outside the selected area. Set a flag to indicate
+# that the current position can be copied, ane leave the loop. 
+            if { $nxt == $i } {
+               set ok 1 
+               break
+            }  
+
+# Get the value for this position.
+            set cx [GetPosn $nxt CX]
+            set cy [GetPosn $nxt CY]
+            set nxt [GetPosn $nxt NXT]
+         }
+
+# If this position is a vertex of a polygon which is enclosed within the
+# selected area, then add it to the copy list.
+         if { $ok } {
+            set PASTE 1
+            set cx [GetPosn $i CX]
+            set cy [GetPosn $i CY]
+            set nxt [GetPosn $i NXT]
+            set tag [GetPosn $i TAG]
+            set ident($i) [SetPosn -1 "CX CY VID NXT TAG" [list $cx $cy -1 $nxt $tag] copy copy]
+         }
+      }
+
+# Cancel the area selection.
+      CancelArea
+
+# If a polygon was copied, enable the Paste item in the Edit menu, and
+# correct the indices of the "next" vertices to refer to the arrays
+# holding the copied positions.
+      if { $PASTE } {
+         $EDITMENU entryconfigure Paste -state normal
+
+         for { set i 0 } { $i < [NumPosn "" copy copy] } { incr i } {
+            SetPosn $i "NXT" $ident([GetPosn $i NXT copy copy])
+         }
+      }
+   }
 }
 
 proc CreateMask {image object} {
@@ -1880,6 +2012,9 @@ proc DelPosn {i all args} {
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
+#     PNTTAG (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of canvas tags (one for each position).
 #     PNTVID (Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -1905,21 +2040,22 @@ proc DelPosn {i all args} {
 #-
    global CAN
    global CUROBJ_DISP
-   global IMAGE_DISP
-   global IMAGES
    global E_RAY_FEATURES
+   global IMAGES
+   global IMAGE_DISP
    global O_RAY_FEATURES
    global PNTCY
    global PNTCX
    global PNTID
    global PNTLBL
-   global RECALC_OEMAP
-   global RECALC_IMMAP
-   global RESAVE
    global PNTNXT
    global PNTPY
    global PNTPX
    global PNTVID
+   global PNTTAG
+   global RECALC_IMMAP
+   global RECALC_OEMAP
+   global RESAVE
    global V0
    global V1     
    global VCX0
@@ -2042,6 +2178,7 @@ proc DelPosn {i all args} {
       set PNTLBL($image,$object) [lreplace $PNTLBL($image,$object) $i $i]
       set PNTVID($image,$object) [lreplace $PNTVID($image,$object) $i $i]
       set PNTNXT($image,$object) [lreplace $PNTNXT($image,$object) $i $i]
+      set PNTTAG($image,$object) [lreplace $PNTTAG($image,$object) $i $i]
 
 # Indicate that we will need to re-save the output images.
       set RESAVE 1
@@ -2645,6 +2782,9 @@ proc DrawPosns {ref reg args} {
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
+#     PNTTAG (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of canvas tags (one for each position).
 #     PNTVID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -2682,6 +2822,7 @@ proc DrawPosns {ref reg args} {
    global PNTNXT
    global PNTPX
    global PNTPY
+   global PNTTAG
    global PNTVID
    global REFCOL
    global V0
@@ -2796,8 +2937,9 @@ proc DrawPosns {ref reg args} {
 # If a canvas item marking the vector has not already been created,
 # create one now, and store its index.
                set vid [lindex $PNTVID($image,$object) $i]
+               set tag [lindex $PNTTAG($image,$object) $i]
                if { $vid == -1 } {
-                  set vid [$CAN create line $cx $cy $cxn $cyn -fill $colour -tags vectors]
+                  set vid [$CAN create line $cx $cy $cxn $cyn -fill $colour -tags [list vectors $tag]]
                   set PNTVID($image,$object) [lreplace $PNTVID($image,$object) \
                                                        $i $i $vid]
 
@@ -2805,7 +2947,7 @@ proc DrawPosns {ref reg args} {
 # properties.
                } {
                   $CAN coords $vid $cx $cy $cxn $cyn 
-                  $CAN itemconfigure $vid -fill $colour
+                  $CAN itemconfigure $vid -fill $colour -tags [list vectors $tag]
                }                   
 
 # If this is the "loose" end of an incomplete mask polygon, store the
@@ -4842,7 +4984,7 @@ proc FindHelp {x y} {
 
 }
 
-proc FindPosn {names values args} {
+proc FindPosn {names values tol args} {
 #+
 #  Name:
 #     FindPosn
@@ -4868,9 +5010,12 @@ proc FindPosn {names values args} {
 #                vertex" (i.e. if the polygon is open) and null ("") if this 
 #                position is not part of a polygon). 
 #           LBL - The textual label associated with a position.
+#           TAG - A canvas tag associated with the position.
 #     values
 #        A list of values corresponding to the parameter names supplied
 #        in "names".
+#     tol
+#        The tolerance to use for CX, CY, PX and PY equality.
 #     args
 #        An optional list argument holding the image from which the 
 #        positions are derived, and the type of objects to be searched.
@@ -4914,6 +5059,9 @@ proc FindPosn {names values args} {
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
+#     PNTTAG (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of canvas tags (one for each position).
 #     PNTVID (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -4932,6 +5080,7 @@ proc FindPosn {names values args} {
    global PNTPX
    global PNTPY
    global PNTVID
+   global PNTTAG
 
 # Initialise the returned value.
    set ret ""
@@ -4965,9 +5114,10 @@ proc FindPosn {names values args} {
                set curval [lindex $array($image,$object) $i]
 
 # If it is different to the supplied position, set ret null and break out of 
-# the loop. Pixel coordinates are given a tolerance of +/- 2 pixels.
-               if { $name == "PX" || $name == "PY" } {
-                  if { $curval > [expr $supval + 2] || $curval < [expr $supval - 2] } {
+# the loop. Pixel and canvas coordinates are given a tolerance.
+               if { $name == "PX" || $name == "PY" || 
+                    $name == "CX" || $name == "CY" } {
+                  if { $curval > [expr $supval + $tol] || $curval < [expr $supval - $tol] } {
                      set ret ""
                      break
                   }
@@ -5464,7 +5614,7 @@ proc GetFeature {cx cy rlabel} {
    if { $px != "" && $py != "" } {
 
 # See if a feature already exists at these pixel coordinates.
-      if { [ FindPosn "PX PY" [list $px $py] ] != "" } {
+      if { [ FindPosn "PX PY" [list $px $py 2] ] != "" } {
 
 # If so then warn the user and ignore the position. The warning is not
 # issued if this procedure has been entered as a result of the "Accept"
@@ -5858,7 +6008,7 @@ proc GetLabel {} {
 
 # See if the label has already been used. If so, display an error 
 # message.
-            if { [FindPosn LBL $LABBUT] != "" } {
+            if { [FindPosn LBL $LABBUT 0] != "" } {
                Message "This image already has an \"$OBJTYPE($CUROBJ_DISP)\"  position labelled \"$LABBUT\". Please select a new label."
                set LABBUT " "
             }
@@ -6256,6 +6406,7 @@ proc GetPosn {i name args} {
 #                vertex" (i.e. if the polygon is open) and null ("") if this 
 #                position is not part of a polygon). 
 #           LBL - The textual label associated with a position.
+#           TAG - A canvas tag associated with the position.
 #     args
 #        An optional list argument holding the image from which the 
 #        positions are derived, and the type of objects to be used.
@@ -6297,6 +6448,9 @@ proc GetPosn {i name args} {
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
+#     PNTTAG (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of canvas tags (one for each position).
 #     PNTVID (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -6315,6 +6469,7 @@ proc GetPosn {i name args} {
    global PNTPX
    global PNTPY
    global PNTVID
+   global PNTTAG
 
 # Initialise the returned value.
    set ret ""
@@ -7742,6 +7897,7 @@ proc MarkPosn {i ref vertex} {
    global PNTCX
    global PNTCY
    global PNTID
+   global PNTTAG
    global POLPACK_DIR
 
 # Store the colour, image and object type.
@@ -7780,6 +7936,8 @@ proc MarkPosn {i ref vertex} {
 # If a canvas item marking the position has not already been created,
 # create one now, and store its index.
    set id [lindex $PNTID($image,$object) $i]
+   lappend tags [lindex $PNTTAG($image,$object) $i]
+
    if { $id == -1 } {
       set id [$CAN create bitmap $cx $cy -bitmap @$bitmap \
                           -foreground $colour -tags $tags]
@@ -8081,30 +8239,34 @@ proc NumPosn {v0 args} {
       set object [lindex $args 1]      
    }
 
-# If the total number of positions in the list is required...
-   if { $v0 == "" } {
+# Return zero if the specified positions list does not exist.
+   if { ![info exists PNTID($image,$object)] } {
+      set size 0
+
+# Otherwise...
+   } {
+
+#  If the total number of positions in the list is required...
+      if { $v0 == "" } {
 
 # Get the size of the list.
-      if { [info exists PNTID($image,$object)] } {
          set size [llength $PNTID($image,$object)]
-      } {
-         set size 0
-      }
 
 # If the number of vertices in the polygon is required...
-   } {
+      } {
 
 # Loop round counting the vertices until we arrive back at the start, or an
 # unattached vertex is found.
-      set nxt [lindex $PNTNXT($image,$object) $v0]
-      if { $nxt != "" } {
-         set size 1
-         while { $nxt != $v0 && $nxt != -1 } { 
-            incr size
-            set nxt [lindex $PNTNXT($image,$object) $nxt]
+         set nxt [lindex $PNTNXT($image,$object) $v0]
+         if { $nxt != "" } {
+            set size 1
+            while { $nxt != $v0 && $nxt != -1 } { 
+               incr size
+               set nxt [lindex $PNTNXT($image,$object) $nxt]
+            }
+         } {
+            set size 0
          }
-      } {
-         set size 0
       }
    }
 
@@ -8457,6 +8619,79 @@ proc OEMapping {image args} {
    return $ret
 }
 
+proc Paste {} {
+#+
+#  Name:
+#     Paste
+#
+#  Purpose:
+#     Add any copied polygons onto the end of the current positions list.
+#     The copied polygons are set up by procedure Copy.
+#
+#  Arguments:
+#     None.
+#-
+   global PASTE
+   global MODE
+   global NPOLY
+
+# Do nothing if there is nothing to past, or we are not in mode 1
+# ("Create or edit a polygon").
+   if { $PASTE && $MODE == 1 } {
+
+# Get a unique string to attach to the canvas tags associated with the 
+# copy positions.
+      append stag "C"
+      append stag $NPOLY
+      incr NPOLY
+
+# Go round every vertex in the arrays to be copied.
+      set size [NumPosn "" copy copy]
+      set dx ""
+      for {set i 0} {$i < $size} {incr i} {
+
+# Move this vertex slightly so that the pasted polygons do not coincide 
+# with the original polygons. The first vertex is moved until it does not
+# fall on an existing feature. Subsequent vertices are moved by the same
+# amount. Also append a unique string to the position tags.
+         set cx [GetPosn $i CX copy copy]
+         set cy [GetPosn $i CY copy copy]
+
+         if { $dx == "" } {
+            set dx 0
+            while { [FindPosn "CX CY" [list $cx $cy] 4] != "" } {
+               incr dx 5
+               set cx [expr $cx + $dx]
+               set cy [expr $cy + $dx]
+            }
+         } {
+            set cx [expr $cx + $dx]
+            set cy [expr $cy + $dx]
+         }
+
+
+# Append a unique string to the position tags.
+         set tag [GetPosn $i TAG copy copy]
+         append tag $stag
+
+# Add a new vertex to the current polygon.
+         set nxt [GetPosn $i NXT copy copy]
+         set ident($i) [SetPosn -1 "CX CY VID NXT TAG" [list $cx $cy -1 $nxt $tag]]
+      }
+
+# No go round the new vertices correcting the indices of the "next
+# vertex" so that they refer to the current arrays instead of the copy
+# arrays.
+      for {set i 0} {$i < $size} {incr i} {
+         SetPosn $ident($i) NXT $ident([GetPosn $i NXT copy copy])
+      }
+
+# Draw the new positions.
+      DrawPosns 0 0
+
+   }
+}
+
 proc PixIndSection {imsec} {
 #+
 #  Name:
@@ -8777,6 +9012,9 @@ proc ReleaseBind {x y} {
 #           1 - The user starts a new mask polygon, or edits an existing one.
 #           2 - The user completes a started mask polygon.
 #           3 - The user selects a label by clicking on an existing feature.
+#     MOVE (Read)
+#        Was a whole polygon being dragged? Otherwise, a single vertex
+#        was being dragged.
 #     ROOTI (Read)
 #        The position index of the vertex being pointed at, or the position
 #        index of the vertex at the start of the vector being pointed at,
@@ -8805,6 +9043,9 @@ proc ReleaseBind {x y} {
 #     VID2 (Read and Write)
 #        The canvas item id of the vector joining the last vertex in an
 #        incomplete (i.e. open) polygon, to the pointer.
+#     VTAG (Read and Write)
+#        The tag to give to all vertices and vectors making up the
+#        current polygon.
 #     ZOOM (Read)
 #        Path to the "Zoom" button.
 #-
@@ -8812,10 +9053,13 @@ proc ReleaseBind {x y} {
    global CANCEL
    global CURCOL
    global DELETE
+   global EDITMENU
    global F_OWNER
    global LB_B3
    global LABEL    
+   global NPOLY
    global MODE
+   global MOVE
    global ROOTI
    global ROOTX
    global ROOTY
@@ -8826,8 +9070,8 @@ proc ReleaseBind {x y} {
    global VCY0
    global VID0
    global VID2
+   global VTAG
    global ZOOM
-
 
 # If there is a selected area, check that it is of significant size. If
 # it isn't, cancel it. 
@@ -8844,6 +9088,10 @@ proc ReleaseBind {x y} {
       $ZOOM configure -state normal
       $DELETE configure -state normal
       $CANCEL configure -state normal
+      $EDITMENU entryconfigure Delete -state normal
+      if { $MODE == 1 } { 
+         $EDITMENU entryconfigure Copy -state normal
+      }
 
 # Otherwise, what we do depends on the interaction mode.
    } {
@@ -8866,22 +9114,42 @@ proc ReleaseBind {x y} {
             set cy [lindex $cxy 1]
             SetPosn $ROOTI "CX CY" [list $cx $cy]
 
+# If the whole polygon has ben moved, do the same for the other
+# vertices in the polygon.
+            if { $MOVE } {
+               set nxt [GetPosn $ROOTI NXT]
+               while {$nxt != $ROOTI && $nxt != -1 && $nxt != "" } {
+                  set id [GetPosn $nxt ID]   
+                  set cxy [$CAN coords $id]
+                  set cx [lindex $cxy 0]
+                  set cy [lindex $cxy 1]
+                  SetPosn $nxt "CX CY" [list $cx $cy]
+                  set nxt [GetPosn $nxt NXT]
+               }
+            }
+
 # If we are not dragging a vertex, then we must have initiated a new
 # polygon. Record the initial position and enter mode 2.
          } {
 
+# Create the tag to give to all vertices and edges of this new Polygon,
+# and increment the number of polygons creaqted so far.
+            set tag "P"
+            append tag $NPOLY
+            incr NPOLY
+
 # Record the new position. The index of the "next" vertex is as yet unknown
 # so set NXT to -1.
-            set newi [SetPosn -1 "CX CY NXT" [list $ROOTX $ROOTY -1]]
+            set newi [SetPosn -1 "CX CY NXT TAG" [list $ROOTX $ROOTY -1 $tag]]
 
 # Create a vector attached to the new position. It initially has zero
 # length. Store the canvas item id for this vector.
-            set vid [$CAN create line $ROOTX $ROOTY $ROOTX $ROOTY -fill $CURCOL -tags vectors]
-            SetPosn $newi VID $vid
+            set vid [$CAN create line $ROOTX $ROOTY $ROOTX $ROOTY -fill $CURCOL -tags [list vectors $tag]]
+            SetPosn $newi VID $vid 
 
 # Create the marker for the new positon, and store its canvas id.
             set id [MarkPosn $newi 0 1] 
-            SetPosn $newi ID $id
+            SetPosn $newi ID $id 
 
 # Store the global values needed to construct the new polygon.
             set V0 $newi
@@ -8889,6 +9157,7 @@ proc ReleaseBind {x y} {
             set VCX0 $ROOTX
             set VCY0 $ROOTY
             set VID2 $vid
+            set VTAG $tag
 
 # Enter mode 2.
             SetMode 2    
@@ -8904,7 +9173,7 @@ proc ReleaseBind {x y} {
 
 # Record the new position. The index of the "next" vertex is as yet unknown
 # so set NXT to -1.
-            set newi [SetPosn -1 "CX CY NXT" [list $ROOTX $ROOTY -1]]
+            set newi [SetPosn -1 "CX CY NXT TAG" [list $ROOTX $ROOTY -1 $VTAG]]
 
 # We now know the index of the "next" vertex for the previous vertex.
 # Record it.
@@ -8912,7 +9181,7 @@ proc ReleaseBind {x y} {
 
 # Create a vector attached to the new position. It initially has zero
 # length. Store the canvas item id for this vector.
-            set vid [$CAN create line $ROOTX $ROOTY $ROOTX $ROOTY -fill $CURCOL -tags vectors]
+            set vid [$CAN create line $ROOTX $ROOTY $ROOTX $ROOTY -fill $CURCOL -tags [list vectors $VTAG]]
             SetPosn $newi "VID" $vid
 
 # Create the marker for the new positon, and store its canvas id.
@@ -10268,17 +10537,24 @@ proc SetMode {mode} {
 #-
    global CAN   
    global CANCEL
+   global EDITMENU
    global MODE
    global M4_CURSOR
    global OLD_CURSOR
    global M4_XHAIR
+   global PASTE
    global PRE_MODE4
+   global SELECTED_AREA
    global V0
    global V1     
    global VCX0
    global VCY0
    global VID2
    global XHAIR
+
+# Disable the Copy and Paste entries in the Edit menu. 
+   $EDITMENU entryconfigure Copy -state disabled
+   $EDITMENU entryconfigure Paste -state disabled
 
 # If the previous mode was mode 4, change the cursor back to its previous
 # value, switching the cross-hair back on again if required. Also,
@@ -10302,8 +10578,14 @@ proc SetMode {mode} {
       SetInfo "Identify star-like features in the image..." 1
 
    } elseif { $mode == 1 } {
-      SetHelp $CAN ".  Click on a vertex and drag to move the vertex.\n.  Click on a polygon edge to insert a new vertex.\n.  Click anywhere else to start a new polygonal mask.\n.  Click anywhere else and drag to select an area." POLREG_MODE_1
+      SetHelp $CAN ".  Click on a vertex and drag to move the vertex.\n.  Click on a vertex with the shift key pressed to drag the entire polygon.\n.  Click on a polygon edge to insert a new vertex.\n.  Click anywhere else to start a new polygonal mask.\n.  Click anywhere else and drag to select an area." POLREG_MODE_1
       SetInfo "Edit or create a polygonal mask..." 1
+      if { $SELECTED_AREA != "" } {
+         $EDITMENU entryconfigure Copy -state normal
+      }
+      if { $PASTE } {
+         $EDITMENU entryconfigure Paste -state normal
+      }    
 
    } elseif { $mode == 2 } {
       SetHelp $CAN ".  Click on the first vertex to close the polygon.\n.  Click anywhere else to add another vertex to the polygon.\n.  Click and drag to select an area." POLREG_MODE_2
@@ -10379,6 +10661,7 @@ proc SetPosn {i names values args} {
 #                vertex" (i.e. if the polygon is open) and null ("") if this 
 #                position is not part of a polygon). 
 #           LBL - The textual label associated with a position.
+#           TAG - A canvas tag associated with the position.
 #     values
 #        A list of parameter values corresponding to the names in "names".
 #     args
@@ -10436,6 +10719,9 @@ proc SetPosn {i names values args} {
 #     PNTPY (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
+#     PNTTAG (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of canvas tags (one for each position).
 #     PNTVID (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of canvas item identifiers associated with the
@@ -10472,6 +10758,7 @@ proc SetPosn {i names values args} {
    global PNTPX
    global PNTPY
    global PNTVID
+   global PNTTAG
    global RECALC_IMMAP
    global RECALC_OEMAP
    global RESAVE
@@ -10511,6 +10798,7 @@ proc SetPosn {i names values args} {
       lappend PNTVID($image,$object) ""
       lappend PNTNXT($image,$object) ""
       lappend PNTLBL($image,$object) ""
+      lappend PNTTAG($image,$object) ""
    } {
       set ret $i
    }
@@ -10788,7 +11076,7 @@ proc ShowHelp {label} {
    }
 }
 
-proc SingleBind {x y} {
+proc SingleBind {x y shift} {
 #+
 #  Name:
 #    SingleBind
@@ -10801,6 +11089,8 @@ proc SingleBind {x y} {
 #       The screen X coord.
 #    y
 #       The screen Y coord.
+#    shift
+#       Was the shift key pressed when the button was clicked?
 #
 #  Globals:
 #     CAN (Read)
@@ -10833,6 +11123,7 @@ proc SingleBind {x y} {
    global CAN
    global CURCOL
    global MODE
+   global MOVE
    global ROOTI
    global ROOTX
    global ROOTY
@@ -10845,7 +11136,7 @@ proc SingleBind {x y} {
    CancelArea
 
 # Convert the screen coords to canvas coords, and record this position as
-# the "root" position which is availabel for use by other procedures.
+# the "root" position which is available for use by other procedures.
    set ROOTX [$CAN canvasx $x]
    set ROOTY [$CAN canvasy $y]
 
@@ -10858,7 +11149,7 @@ proc SingleBind {x y} {
       set id0 [$CAN find withtag current]
 
 # Get the list index of any position with this id.
-      set ROOTI [FindPosn ID $id0]
+      set ROOTI [FindPosn ID $id0 0]
 
 # If a position was found with this item id, we must be pointing at a
 # polygon vertex which is to be dragged. Store information about this
@@ -10866,13 +11157,14 @@ proc SingleBind {x y} {
       if { $ROOTI != "" } {
          set VID0 [GetPosn $ROOTI ID]
          set VID2 [GetPosn $ROOTI VID]
-         set j [FindPosn NXT $ROOTI]
+         set j [FindPosn NXT $ROOTI 0]
          set VID1 [GetPosn $j VID]
+         set MOVE $shift
 
 # If we are not pointing at a vertex, try to find a vector with the
 # current id.
       } {
-         set ROOTI [FindPosn VID $id0]
+         set ROOTI [FindPosn VID $id0 0]
 
 # If one was found, insert a new vertex into the polygon at the cursor
 # position.
@@ -10880,9 +11172,10 @@ proc SingleBind {x y} {
             set nxt [GetPosn $ROOTI NXT]
             set cx2 [GetPosn $ROOTI CX]
             set cy2 [GetPosn $ROOTI CY]
-            set vid [$CAN create line $ROOTX $ROOTY $cx2 $cy2 -fill $CURCOL -tags vectors]
-            set id [$CAN create bitmap $ROOTX $ROOTY -bitmap @$POLPACK_DIR/vertex.bit -foreground $CURCOL -tags vertices]
-            set newi [SetPosn -1 "CX CY ID VID NXT" [list $ROOTX $ROOTY $id $vid $nxt]]
+            set tag [GetPosn $ROOTI TAG]
+            set vid [$CAN create line $ROOTX $ROOTY $cx2 $cy2 -fill $CURCOL -tags [list vectors $tag]]
+            set id [$CAN create bitmap $ROOTX $ROOTY -bitmap @$POLPACK_DIR/vertex.bit -foreground $CURCOL -tags [list vertices $tag]]
+            set newi [SetPosn -1 "CX CY ID VID NXT TAG" [list $ROOTX $ROOTY $id $vid $nxt $tag]]
             SetPosn $ROOTI NXT $newi
             set VID0 $id
             set VID2 $vid
@@ -11928,6 +12221,9 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
 #     PNTPY (Read and Write)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
+#     PNTTAG (Read and Write)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of canvas tags (one for each position).
 #
 #  Notes:
 #     - The output list is not displayed on the screen by this procedure.
@@ -11947,6 +12243,8 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
    global PNTPX
    global PNTPY
    global PNTVID
+   global PNTTAG
+   global NPOLY
    global RECALC_IMMAP
    global RECALC_OEMAP
 
@@ -11972,6 +12270,7 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
    set PNTNXT($im_out,$obj_out) ""
    set PNTID($im_out,$obj_out) ""
    set PNTVID($im_out,$obj_out) ""
+   set PNTTAG($im_out,$obj_out) ""
 
 # Indicate that we will need to re-save the output images.
    set RESAVE 1
@@ -11991,6 +12290,15 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
             set RECALC_IMMAP($im) 1
          }         
       }
+
+      set stag ""
+
+# If we are creating masks, get a suffix for the canvas tags associated
+# with each position. 
+   } {
+      set stag "C"
+      append stag $NPOLY
+      incr NPOLY
    } 
 
 # If the input list is not empty.
@@ -12014,6 +12322,12 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
             } {
                lappend PNTVID($im_out,$obj_out) ""
             }
+
+# Append a unique string to the tags from the input lists.
+            set tag [lindex $PNTTAG($im_in,$obj_in) $i]
+            append tag $stag
+            lappend PNTTAG($im_out,$obj_out) $tag
+
          }
 
 # Transform the pixel coordinates and store them in the output position

@@ -254,6 +254,7 @@ STAR_ETC = $(STARLINK)/etc
 STAR_HELP = $(STARLINK)/help
 STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
+STAR_SHARE = $(STARLINK)/share
 
 #  Pathname of the root directory beneath which the built files for
 #  this package should be installed for use.  This defaults to the

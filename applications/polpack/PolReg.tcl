@@ -43,6 +43,33 @@
 #   tclproc $name $args $newbody
 #}
 
+#rename proc tclproc
+#tclproc proc {name args body} {
+#   set newbody "global CAN
+#                global GOGO
+#                global ABO
+#                if { !\$ABO && \[info exists CAN\] && \[winfo exists \$CAN\]} {
+#                   if { \[lindex \[\$CAN gettags 3\] 1\] != {P0} } {
+#                      puts \"Entering $name\"
+#                      puts \"Id 3 has tags +\[\$CAN gettags 3\]+\"
+#                      if { \$GOGO } { 
+#                         for {set i 1} { \$i < \[info level\] } { incr i} {
+#                            puts \[info level \$i\]
+#                         }
+#                         set ABO 1
+#                         Finish 0 
+#                      }
+#                   } {
+#                      set GOGO 1
+#                   }
+#                }"
+#
+#   append newbody $body
+#   tclproc $name $args $newbody
+#}
+#set GOGO 0
+#set ABO 0
+
 # Display a label asking the user to wait while the main interface is
 # constructed.
    set wait [label .wait -text "  Please Wait...  " -bd 3 -relief sunken \
@@ -131,7 +158,9 @@
    set LOCK_SCALE 0
    set LOGFILE_ID ""
    set MODE 0
+   set NPOLY 0
    set OLDVIS "VisibilityObscured"
+   set PASTE 0
    set PHI_DISP ""
    set PHI_REQ 95.0
    set PLO_DISP ""
@@ -474,21 +503,21 @@
    lappend LABEL_OFF $file
 
    set edit [menubutton $F1.edit -text Edit -menu $F1.edit.menu -background $MENUBACK ]
-   set editmenu [menu $edit.menu]
+   set EDITMENU [menu $edit.menu]
    SetHelp $edit ".  Menu of commands for editing mappings, etc." POLREG_EDIT_MENU
    lappend LABEL_OFF $edit
 
-   set opts [menubutton $F1.opts -text Options -menu $F1.opts.menu -background $MENUBACK]
+   set opts [menubutton $F1.opts -text Options -menu $F1.opts.menu -background $MENUBACK ]
    set OPTSMENU [menu $opts.menu]
    SetHelp $opts ".  Menu of commands to set up various options..." POLREG_OPTIONS_MENU
    lappend LABEL_OFF $opts
 
-   set images [menubutton $F1.images -text Images -menu $F1.images.menu -background $MENUBACK]
+   set images [menubutton $F1.images -text Images -menu $F1.images.menu -background $MENUBACK ]
    set imagesmenu [menu $images.menu]
    SetHelp $images ".  Menu of images available for display..." POLREG_IMAGES_MENU
    lappend LABEL_OFF $images
 
-   set effects [menubutton $F1.effects -text Effects -menu $F1.effects.menu -background $MENUBACK]
+   set effects [menubutton $F1.effects -text Effects -menu $F1.effects.menu -background $MENUBACK ]
    set EFFECTSMENU [menu $effects.menu]
    SetHelp $effects ".  Menu of effects to apply when displaying images." POLREG_EFFECTS_MENU
    lappend LABEL_OFF $effects
@@ -526,13 +555,17 @@
    MenuHelp $helpmenu "Pointer..."  ".  Select this menu item, and then click with the pointer over a widget to see help on the widget."
 
 # Add menu items to the File menu.
-   $filemenu add command -label "Save        " -command Save
-   $filemenu add command -label "Exit        " -command {Finish 1}
-   $filemenu add command -label "Quit        " -command {Finish 0} -accelerator "Ctrl+C"
+   $filemenu add command -label "Save        " -command Save -accelerator "Ctrl-s"
+   $filemenu add command -label "Exit        " -command {Finish 1} -accelerator "Ctrl-e"
+   $filemenu add command -label "Quit        " -command {Finish 0} -accelerator "Ctrl+q"
 
    MenuHelp $filemenu "Save        " ".  Extract the mask areas from the input images, register them, and save them in the output images."
    MenuHelp $filemenu "Exit        " ".  Store the current image registration information and exit the application."
    MenuHelp $filemenu "Quit        " ".  Quit the application, thowing away the current image registration information."
+
+   bind . <Control-s> Save
+   bind . <Control-e> {Finish 1}
+   bind . <Control-q> {Finish 0}
 
 # Add menu items to the Effects menu.
    foreach effect [list Align Fill Filter "Fit Sky" Log Maths Negate Smooth Threshold] {
@@ -557,26 +590,36 @@
    MenuHelp $EFFECTSMENU "Show Effects" ".  Show the effects which have been used on the currently displayed image."
 
 # Add menu items to the Edit menu.
-   $editmenu add command -label "Clear All    " -command {Clear "" ""}
-   $editmenu add command -label "Clear Current" -command {Clear $IMAGE_DISP $CUROBJ_DISP}
-   $editmenu add command -label "Clear Image  " -command {Clear $IMAGE_DISP ""}
-   $editmenu add command -label "Delete       " -command Delete
-   $editmenu add cascade -label "Mappings     " -menu $editmenu.mappings
+   $EDITMENU add command -label "Clear All"     -command {Clear "" ""}
+   $EDITMENU add command -label "Clear Current" -command {Clear $IMAGE_DISP $CUROBJ_DISP}
+   $EDITMENU add command -label "Clear Image"   -command {Clear $IMAGE_DISP ""}
+   $EDITMENU add command -label "Copy"          -command Copy -state disabled -accelerator "Ctrl-o"
+   $EDITMENU add command -label "Delete"        -command Delete -state disabled -accelerator "Del"
+   $EDITMENU add cascade -label "Mappings"      -menu $EDITMENU.mappings
+   $EDITMENU add command -label "Paste"         -command Paste -state disabled -accelerator "Ctrl-o"
 
-   MenuHelp $editmenu "Clear All    "   ".  Clear all mappings, image features and masks for all images."
-   MenuHelp $editmenu "Clear Current"   ".  Clear the current objects (as selected using the buttons under the \"Current:\" label) for the displayed image."
-   MenuHelp $editmenu "Clear Image  "   ".  Clear the mappings, image features and masks for the displayed image."
-   MenuHelp $editmenu "Delete       "   ".  Delete any image features within the selected area.   (Click and drag over the image to select an area)."
-   MenuHelp $editmenu "Mappings     "   ".  Edit the mappings between images, and between the E and O rays."
+   MenuHelp $EDITMENU "Clear All"       ".  Clear all mappings, image features and masks for all images."
+   MenuHelp $EDITMENU "Clear Current"   ".  Clear the current objects (as selected using the buttons under the \"Current:\" label) for the displayed image."
+   MenuHelp $EDITMENU "Clear Image"     ".  Clear the mappings, image features and masks for the displayed image."
+   MenuHelp $EDITMENU "Copy"            ".  Copy any whole polygons enclosed within the selected area. (Click and drag over the image to select an area)."
+   MenuHelp $EDITMENU "Delete"          ".  Delete any image features or vertices within the selected area.   (Click and drag over the image to select an area)."
+   MenuHelp $EDITMENU "Mappings"        ".  Edit the mappings between images, and between the E and O rays."
+   MenuHelp $EDITMENU "Paste"           ".  Paste any copied polygons to the screen."
+
+# Set up the bindings for the above menu entries.
+   bind . <Control-o> Copy
+   bind . <Control-p> Paste
+   bind . <Delete> Delete
+   bind . <KP_Delete> Delete
 
 # Create the Mappings sub-menu.
-   set edmapmenu [menu $editmenu.mappings]
+   set edmapmenu [menu $EDITMENU.mappings]
 
 # Add menu items to options menu.
    $OPTSMENU add cascade -label "Colours" -menu $OPTSMENU.cols
    $OPTSMENU add cascade -label "Feature Size" -menu $OPTSMENU.psf
    $OPTSMENU add cascade -label "Interpolation method" -menu $OPTSMENU.meth
-   $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map
+   $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map 
    $OPTSMENU add cascade -label "Sky Order" -menu $OPTSMENU.sky -state $skystate 
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
@@ -755,9 +798,8 @@
          set PNTID($image,$object) ""
          set PNTVID($image,$object) ""
          set PNTNXT($image,$object) ""
+         set PNTTAG($image,$object) ""
          set PNTLBL($image,$object) ""
-         set PNTNW1($image,$object) 0
-         set PNTNW2($image,$object) 0
       }
 
 # Make a copy of the supplied image (ensuring it is in NDF format), and
@@ -1035,7 +1077,8 @@
       }"
 
 # Execute procedure SingleBind when button 1 is clicked over the canvas.
-   $CAN bind current <ButtonPress-1> "SingleBind %x %y"
+   $CAN bind current <ButtonPress-1> "SingleBind %x %y 0"
+   $CAN bind current <Shift-ButtonPress-1> "SingleBind %x %y 1"
 
 # Execute procedure ReleaseBind when button 1 is released over the canvas.
    $CAN bind current <ButtonRelease-1> "ReleaseBind %x %y"
