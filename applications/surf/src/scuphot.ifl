@@ -44,7 +44,7 @@
 	 TYPE     '_CHAR'
 	 DEFAULT  'AVERAGE'
 	 PROMPT   'Which reduction method'
-         IN       'AVERAGE', 'PARABOLA'
+#         IN       'AVERAGE', 'PARABOLA'
  	 HELPKEY '*'
       ENDPARAMETER
 
