@@ -80,8 +80,12 @@ void Perl_clearGrfObject() {
 SV* Perl_getcb ( char * attr ) {
   SV** elem;
 
+  if (!astOK) return NULL;
+
   if (CurrentPlot == NULL ) {
-    Perl_croak(aTHX_ "Massive internal inconsistency in AstPlot Grf infrastructure");
+    astError( AST__GRFER, 
+	      "Massive internal inconsistency in AstPlot Grf infrastructure");
+    return NULL;
   }
  
   /* we know this is already a hash ref */
@@ -109,29 +113,40 @@ int astGFlush( void ){
     return 0;
   }
 
-  cb = Perl_getcb( "_gline" );
+  cb = Perl_getcb( "_gflush" );
  
-  if ( cb != NULL ) {
-    int count;
-    ENTER;
-    SAVETMPS;
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      ENTER;
+      SAVETMPS;
 
-    count = perl_call_sv( SvRV(cb), G_NOARGS | G_SCALAR );
+      count = perl_call_sv( SvRV(cb), G_NOARGS | G_SCALAR );
 
-    SPAGAIN;
+      SPAGAIN;
 
-    if (count != 1) 
-      Perl_croak(aTHX_ "Returned more than 1 arg from GLine callback\n");
+      if (astOK) {
+	if (count != 1) {
+	  astError( AST__GRFER, 
+		    "Returned more than 1 arg from GFlush callback");
+	  retval = 0;
+	} else {
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
 
-    retval = POPi;
+      PUTBACK;
 
-    PUTBACK;
-
-    FREETMPS;
-    LEAVE;
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGFlush");
+    }
   } else {
     retval = 0;
-    Report("astGFlush");
   }
   return retval;
 }
@@ -154,40 +169,51 @@ int astGLine( int n, const float *x, const float *y ){
 
   cb = Perl_getcb( "_gline" );
  
-  if ( cb != NULL ) {
-    int count;
-    ENTER;
-    SAVETMPS;
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      ENTER;
+      SAVETMPS;
 
-    PUSHMARK(sp);
+      PUSHMARK(sp);
     
-    /* unpack is now reverse to XS norm */
-    XX = newAV();
-    unpack1D( newRV_noinc((SV*) XX), (float *)x, 'f', n);
-    YY = newAV();
-    unpack1D( newRV_noinc((SV*) YY), (float *)y, 'f', n);
+      /* unpack is now reverse to XS norm */
+      XX = newAV();
+      unpack1D( newRV_noinc((SV*) XX), (float *)x, 'f', n);
+      YY = newAV();
+      unpack1D( newRV_noinc((SV*) YY), (float *)y, 'f', n);
     
-    XPUSHs( sv_2mortal(newRV_noinc((SV*) XX )));
-    XPUSHs( sv_2mortal(newRV_noinc((SV*) YY )));
+      XPUSHs( sv_2mortal(newRV_noinc((SV*) XX )));
+      XPUSHs( sv_2mortal(newRV_noinc((SV*) YY )));
     
-    PUTBACK;
+      PUTBACK;
 
-    count = perl_call_sv( SvRV(cb), G_SCALAR );
+      count = perl_call_sv( SvRV(cb), G_SCALAR );
 
-    SPAGAIN;
+      SPAGAIN;
 
-    if (count != 1) 
-      Perl_croak(aTHX_ "Returned more than 1 arg from GLine callback\n");
+      if (astOK) {
+	if (count != 1) {
+	  astError( AST__GRFER, 
+		    "Returned more than 1 arg from GLine callback");
+	  retval = 0;
+	} else {
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
 
-    retval = POPi;
+      PUTBACK;
 
-    PUTBACK;
-
-    FREETMPS;
-    LEAVE;
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGLine");
+    }
   } else {
     retval = 0;
-    Report("astGLine");
   }
   return retval;
 }
@@ -228,39 +254,50 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 
   cb = Perl_getcb( "_gattr" );
  
-  if ( cb != NULL ) {
-    int count;
-    ENTER;
-    SAVETMPS;
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      ENTER;
+      SAVETMPS;
 
-    PUSHMARK(sp);
+      PUSHMARK(sp);
     
-    XPUSHs( sv_2mortal(newSViv(attr) ) );
-    XPUSHs( sv_2mortal(newSVnv(value) ) );
-    XPUSHs( sv_2mortal(newSViv(prim) ) );
+      XPUSHs( sv_2mortal(newSViv(attr) ) );
+      XPUSHs( sv_2mortal(newSVnv(value) ) );
+      XPUSHs( sv_2mortal(newSViv(prim) ) );
     
-    PUTBACK;
+      PUTBACK;
 
-    count = perl_call_sv( SvRV(cb), G_ARRAY );
+      count = perl_call_sv( SvRV(cb), G_ARRAY );
 
-    SPAGAIN;
+      SPAGAIN;
 
-    if (count != 2) 
-      Perl_croak(aTHX_ "Must return 2 args from GAttr callback\n");
+      if (astOK) {
+	if (count != 2) {
+	  astError( AST__GRFER,
+		    "Must return 2 args from GAttr callback not %d",count);
+	  retval = 0;
+	} else {
+	  /* The status will be on the stack furthest back so we 
+	     need to read off old_val first */
+	  cache = POPn;
+	  if (old_value != NULL) *old_value = cache;
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
 
-    /* The status will be on the stack furthest back so we 
-       need to read off old_val first */
-    cache = POPn;
-    if (old_value != NULL) *old_value = cache;
-    retval = POPi;
+      PUTBACK;
 
-    PUTBACK;
-
-    FREETMPS;
-    LEAVE;
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGAttr");
+    }
   } else {
     retval = 0;
-    Report("astGAttr");
   }
   return retval;
 }

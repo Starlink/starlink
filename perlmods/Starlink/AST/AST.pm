@@ -2,6 +2,7 @@ package Starlink::AST;
 
 use strict;
 use Carp;
+use Data::Dumper;  # for dumping debug arguments
 
 use vars qw/ $VERSION /;
 
@@ -436,6 +437,24 @@ sub null {
 
 }
 
+sub __dumpargs {
+  my $call = shift;
+  print "Args for $call: ". Data::Dumper::Dumper(\@_);
+}
+
+# Callbacks to plotting system that dump input arguments
+
+sub debug {
+  my $self = shift;
+  $self->GFlush( sub {&__dumpargs("GFlush",@_); return 1; });
+  $self->GLine( sub {&__dumpargs("GLine",@_);   return 1; });
+  $self->GQch( sub {&__dumpargs("GQch",@_ );    return 1; });
+  $self->GMark( sub {&__dumpargs("GMark",@_);   return 1; });
+  $self->GText( sub {&__dumpargs("GText",@_);   return 1; });
+  $self->GTxExt( sub { &__dumpargs("GTxExt",@_);return 1; });
+  $self->GAttr( sub { &__dumpargs("GAttr",@_);  return (1,1);} );
+
+}
 
 
 package Starlink::AST::CmpFrame;
