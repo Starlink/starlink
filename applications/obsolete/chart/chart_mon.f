@@ -1,7 +1,7 @@
-      SUBROUTINE CHART( ACTION, STATUS )
+      SUBROUTINE CHART_MON( STATUS )
 *+
 *  Name:
-*     CHART
+*     CHART_MON
 
 *  Purpose:
 *     Top-level ADAM monolith routine for the CHART package
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CHART( ACTION, STATUS )
+*     CALL CHART_MON( STATUS )
 
 *  Description:
 *     This routine interprets the action name passed to it and calls
@@ -35,6 +35,7 @@
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +46,8 @@
 *     18-MAR-1993 (PMA):
 *        Add a section of code at the end of this module to ensure that
 *        all files are closed at the end of each action.
+*      3-AUG-2004 (TIMJ):
+*        Update to current spec (Task name obtained via subroutine)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,19 +61,27 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
-*  Arguments Given and Returned:
-      CHARACTER * ( * ) ACTION
-
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  Local variables
+      CHARACTER * ( 15 ) ACTION  ! Task name
+
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Convert the action name to upper case.
-      CALL CHR_UCASE( ACTION )
+*  Obtain the command from the environment.  This returns uppercase
+*  names.
+      CALL TASK_GET_NAME( ACTION, STATUS )
+
+
+*  Define the current application name for history. The package version
+*  number gets substituted in here from autoconf
+*  is contructed.
+      CALL NDF_HAPPN( ACTION // ' (CHART X.Y-Z)', STATUS )
 
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...
