@@ -19,7 +19,7 @@
 *    Export :
       CHARACTER*(*) PATH
       INTEGER L
-     Functions :
+*    Functions :
       INTEGER CHR_LEN
 *    Local Constants :
 *    Local variables :
