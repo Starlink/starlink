@@ -405,18 +405,23 @@
     (process-children)))
 
 (element figure
-  (let ((kids (children (current-node))))
-  (make element gi: "div"
-	attributes: '(("ALIGN" "CENTER"))
-	(make sequence
-	  (process-node-list (select-elements kids 'figurecontent))
-	  (process-node-list (select-elements kids 'caption))))))
+  (let* ((caption-details (get-caption-details (current-node)))
+	 (caption-id (cadr caption-details)))
+    (make sequence
+      (make element gi: "div"
+	    attributes: '(("align" "center"))
+	    (process-matching-children 'figurecontent))
+      (make element gi: "blockquote"
+	    (make element gi: "p"
+		  (if caption-id
+		      (make element gi: "a"
+			    attributes: (list (list "name" caption-id))
+			    (literal (car caption-details)))
+		      (literal (car caption-details))))
+	    (process-matching-children 'caption)))))
 
 (element caption
-  (make element gi: "p"
-	(make sequence
-	  (literal "Figure: ")
-	  (process-children))))
+  (process-children))
 
 (element figurecontent
   (let* ((alt-text (attribute-string (normalize "alt")
