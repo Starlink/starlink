@@ -54,6 +54,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 23
 *     $Log$
+*     Revision 1.4  2004/09/01 01:06:58  timj
+*     fix uninitialised warnings
+*
 *     Revision 1.3  1999/08/06 02:29:04  timj
 *     Tweak headers for use with PROLAT.
 *
@@ -106,6 +109,9 @@
 
 *.
       IF (STATUS .NE. SAI__OK) RETURN
+
+      DX = 0
+      DY = 0
 
       IF (TYPE .EQ. 'XLINEAR') THEN
 

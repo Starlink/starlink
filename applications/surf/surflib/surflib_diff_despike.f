@@ -130,6 +130,9 @@
 
 *    History:
 *     $Log$
+*     Revision 1.4  2004/09/01 01:06:58  timj
+*     fix uninitialised warnings
+*
 *     Revision 1.3  1999/08/03 19:32:49  timj
 *     Add copyright message to header.
 *
@@ -235,6 +238,10 @@
 
 *     Keep track of the total number of spikes
       NUM_SPIKES = 0
+
+*     init
+      MEAN = 0.0
+      SIGMA = 0.0
 
 *  cycle through the scans
 

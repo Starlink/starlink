@@ -72,6 +72,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.6  2004/09/01 01:06:58  timj
+*     fix uninitialised warnings
+*
 *     Revision 1.5  2002/10/07 03:15:39  timj
 *     Should now correctly calculate waveplate angles even if the observation
 *     was aborted.
@@ -131,6 +134,8 @@
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+      LAST_END = 0
 
 *     First task is to decide whether we are using SCUCD_WPLATE
 *     or calculating the positions internally

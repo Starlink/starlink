@@ -87,6 +87,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.9  2004/09/01 01:06:58  timj
+*     fix uninitialised warnings
+*
 *     Revision 1.8  2000/06/03 03:03:57  timj
 *     Support negative ring numbers
 *
@@ -208,6 +211,7 @@
 *     Set the counters
       N_SOFAR = 0
       N_BOLS_OUT = 0
+      MINUS = .FALSE.
 
 *     Set the sub_instrument index (compare upper case)
 

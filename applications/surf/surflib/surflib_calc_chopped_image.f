@@ -69,6 +69,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.5  2004/09/01 01:06:58  timj
+*     fix uninitialised warnings
+*
 *     Revision 1.4  1999/08/19 03:37:48  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -134,6 +137,9 @@
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+      L_VAR = 0.0
+      R_VAR = 0.0
 
 *     Check that NBEAMS is in range
       IF (NBEAMS .NE. 2 .AND. NBEAMS .NE. 3) THEN
