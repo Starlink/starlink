@@ -11,6 +11,8 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 16 Jun 98  Added support for web proxy servers.
+ *                 06 Aug 01  Added "Host:" header for interception
+ *                            proxy support.
  */
 static const char* const rcsId="@(#) $Id: HTTP.C,v 1.14 1998/07/20 13:29:44 abrighto Exp $";
 
@@ -672,7 +674,14 @@ int HTTP::get(const char* url)
 
     // generate the request
     ostrstream os(req, sizeof(req));
-    os << "GET " << args << " HTTP/1.0\n";
+    os << "GET " << args << " HTTP/1.0" << endl;
+
+    // PWD: add the Host: header, this is required by some
+    // interception proxy servers (these are transparent servers that
+    // sniff port 80 traffic and don't require any client
+    // configuration, this is a HTTP/1.1 standard header that does no
+    // harm for 1.0).
+    os << "Host: " << hostname_ << endl;
 
     // add the user-agent
     if (! user_agent_)
@@ -686,7 +695,9 @@ int HTTP::get(const char* url)
 
     // add newline after request and null terminate
     os << endl << ends;
-    
+    cerr << "Sending request:" << endl;
+    cerr << req << endl;
+
     // send the request
     int n = strlen(req);
     if (writen(req, n) != n) {
