@@ -22,11 +22,13 @@
 
 #include	<math.h>
 #include	<stdlib.h>
+#include        <string.h>  /*PWD : modification here */
 
 #include	"define.h"
 #include	"globals.h"
 #include	"plist.h"
 #include	"extract.h"
+#include        "clean.h"  /*PWD: modification here */
 
 #ifndef	RAND_MAX
 #define	RAND_MAX	2147483647
@@ -161,7 +163,7 @@ int	parcelout(objliststruct *objlistin, objliststruct *objlistout)
               m++;
             ok[k+xn*i] &= ok[k+1+xn*j];
             }
-          if (m>1)	
+          if (m>1)
             {
             for (h=0; (j=(int)son[k+xn*(i+NSONMAX*h)])!=-1; h++)
               if (ok[k+1+xn*j] && obj[j].fdflux-obj[j].dthresh*obj[j].fdnpix
@@ -314,7 +316,7 @@ int	gatherup(objliststruct *objlistin, objliststruct *objlistout)
           distmin = dist;
           iclst = i;
           }
-        }			
+        }
       if (p[nobj-1] > 1.0e-31)
         {
         drand = p[nobj-1]*rand()/RAND_MAX;

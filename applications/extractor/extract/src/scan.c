@@ -1,4 +1,4 @@
-  /*
+/*
  				scan.c
 
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,7 +70,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 
 /* cfield is the detection field in any case */
   cfield = dfield? dfield:field;
-  
+
 /* cdwfield is the detection weight-field if available */
   cdwfield = dwfield? dwfield:(prefs.dweight_flag?wfield:NULL);
 
@@ -535,17 +535,17 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 /*Free memory */
 
   freeparcelout();
-  free(pixel);
+  free(pixel); pixel = NULL;
   lutzfree();
-  free(info);
-  free(store);
-  free(marker);
-  free(dumscan);
-  free(psstack);
-  free(start);
-  free(end);
+  free(info); info = NULL;
+  free(store); store = NULL;
+  free(marker); marker = NULL;
+  free(dumscan); dumscan = NULL;
+  free(psstack); psstack = NULL;
+  free(start); start = NULL;
+  free(end); end = NULL;
   if (prefs.blank_flag && prefs.filter_flag)
-    free(blankpad);
+    free(blankpad); blankpad = NULL;
 
   return;
   }
@@ -644,7 +644,7 @@ void  sortit(picstruct *field, picstruct *dfield, picstruct *wfield,
 /*------ Not enough mem. for the BLANK vignet: flag the object now */
         cobj->flag |= OBJ_OVERFLOW;
         cobj->blank = cobj->dblank = NULL;
-        sprintf(gstr, "%d,%d", cobj->mx+1, cobj->my+1);
+        sprintf(gstr, "%d,%d", (int)cobj->mx+1, (int)cobj->my+1); /*PWD:*/
         warning("Memory overflow during masking for detection at ", gstr);
         }
       }
@@ -737,7 +737,7 @@ void  preanalyse(int no, objliststruct *objlist, int analyse_type)
 		xm,ym, xm2,ym2,xym,
 		temp,temp2, theta,pmx2,pmy2;
    int		j, x, y, xmin,xmax, ymin,ymax,area2, fdnpix, dnpix;
-  
+
 
 /*-----  initialize stacks and bounds */
   thresh = obj->dthresh;
@@ -771,7 +771,7 @@ void  preanalyse(int no, objliststruct *objlist, int analyse_type)
     if (ymax < y)
       ymax = y;
     fdnpix++;
-    }    
+    }
 
   if (PLISTEXIST(dthresh))
     obj->dthresh = thresh = minthresh;

@@ -10,6 +10,7 @@
 *	Contents:	low-level functions for writing LDAC FITS catalogs.
 *
 *	Last modify:	13/11/97
+*                       26/11/98 (PWD): Added global initialisations.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -21,8 +22,8 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-char	*lineout_buf, padbuf[FBSIZE];
-int	lineout_size, nlineout;
+char	*lineout_buf = NULL, padbuf[FBSIZE]; /* PWD: modification here */
+int	lineout_size = 0, nlineout = 0; /* PWD: modification here */
 
 /****** save_cat ***************************************************************
 PROTO	void save_cat(catstruct *cat, char *filename)
@@ -332,8 +333,7 @@ void	end_writeobj(catstruct *cat, tabstruct *tab)
 
   if (!(--nlineout))
     {
-    free(lineout_buf);
-    lineout_buf = NULL;
+    QFREE(lineout_buf);
     lineout_size = 0;
     }
 

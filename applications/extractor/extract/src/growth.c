@@ -48,6 +48,7 @@ Free memory occupied by growth curve stuff.
 void	endgrowth()
   {
   free(growth);	
+  growth = NULL;
 
   return;
   }

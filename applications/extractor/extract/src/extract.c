@@ -66,13 +66,13 @@ Free once for all memory space for buffers used by lutz().
 */
 void	lutzfree()
   {
-  free(discan);
-  free(info);
-  free(store);
-  free(marker);
-  free(psstack);
-  free(start);
-  free(end);
+  QFREE(discan);
+  QFREE(info);
+  QFREE(store);
+  QFREE(marker);
+  QFREE(psstack);
+  QFREE(start);
+  QFREE(end);
 
   return;
   }

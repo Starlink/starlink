@@ -62,8 +62,8 @@ VERSION 03/07/97
 void	endclean(void)
   {
   if (prefs.clean_flag)
-    free(cleanvictim);
-  free(cleanobjlist);
+    QFREE(cleanvictim);
+  QFREE(cleanobjlist);
   return;
   }
 

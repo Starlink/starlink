@@ -15,6 +15,7 @@
 */
 #include	<math.h>
 #include	<stdlib.h>
+#include        <string.h> /* PWD: modification here */
 
 #include 	"wcs/wcs.h"
 #include	"define.h"

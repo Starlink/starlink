@@ -210,6 +210,8 @@ void extractor( int *status ) {
       errStat( status );
       if ( *status == SAI__OK ) { 
         ndfBegin();
+        srand( 1 ); /* Needed for repeatable measurements as rand
+                       function is used in gatherup */
         makeit();
         errStat( status );
         ndfEnd( status );

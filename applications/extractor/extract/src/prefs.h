@@ -10,6 +10,9 @@
 *	Contents:	Keywords for the configuration file.
 *
 *	Last modify:	14/07/98
+*                       27/11/98 (PWD):
+*                          Removed ".fits" as default output file
+*                          extension.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -131,12 +134,12 @@ char *default_prefs[] =
   "ASSOCSELEC_TYPE	MATCHED",
   "BACKPHOTO_THICK	24",
   "BACKPHOTO_TYPE	GLOBAL",
-  "CHECKIMAGE_NAME	check.fits",
+  "CHECKIMAGE_NAME	check",
   "CHECKIMAGE_TYPE	NONE",
   "DETECT_TYPE		CCD",
   "FILTER_THRESH	",
   "FITS_UNSIGNED	N",
-  "FLAG_IMAGE		flag.fits",
+  "FLAG_IMAGE		flag",
   "FLAG_TYPE		OR",
   "INTERP_MAXXLAG	16",
   "INTERP_MAXYLAG	16",
@@ -148,7 +151,7 @@ char *default_prefs[] =
   "PSF_NAME		default.psf",
   "SOM_NAME		default.som",
   "VERBOSE_TYPE		NORMAL",
-  "WEIGHT_IMAGE		weight.fits",
+  "WEIGHT_IMAGE		weight",
   "WEIGHT_TYPE      	NONE",
   "WEIGHT_THRESH	",
   ""

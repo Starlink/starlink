@@ -234,7 +234,7 @@ typedef struct
   char		*rfilename;		/* pointer to the reduced image name */
   char		ident[MAXCHAR];		/* field identifier (read from FITS)*/
   char		rident[MAXCHAR];	/* field identifier (relative) */
-/*  FILE		*file;		  /* pointer the image file structure */
+    /*  FILE		*file;	     */ /* pointer the image file structure */
   char		*fitshead;		/* pointer to the FITS header */
   int		fitsheadsize;		/* FITS header size */
 /* ---- main image parameters */

@@ -10,6 +10,7 @@
 *	Contents:	low-level functions for reading LDAC FITS catalogs.
 *
 *	Last modify:	13/11/97
+*                       26/11/98 (PWD): Added global initialisations
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -20,8 +21,8 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-char	*linein_buf, padbuf[FBSIZE];
-int	linein_size, nlinein;
+char	*linein_buf = NULL, padbuf[FBSIZE]; /* PWD: modify here */
+int	linein_size = 0, nlinein = 0;       /* PWD: modify here */
 
 /****** read_cat ***************************************************************
 PROTO	catstruct read_cat(char *filename)
