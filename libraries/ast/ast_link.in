@@ -172,7 +172,7 @@
 #  references made from within a C main program. Typically, these will arise
 #  from libraries written in Fortran which the C program calls.
 #  The value here is worked out by the autoconf macro AC_F77_LIBRARY_LDFLAGS.
-      flibs='@FLIBS@'
+      flibs='@FCLIBS@'
 
 #  This function searches the directory path specified in PATH, looking for
 #  an executable file which is not a directory. If found, it echos the full
