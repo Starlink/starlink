@@ -69,7 +69,7 @@
 
 *  Save the POLPACK version number. The script which constructs the release
 *  should edit in the current version number, replacing the place holder.
-      VERS = "PKG_VERS"
+      VERS = '(@PACKAGE_VERSION@)'
       VLEN = CHR_LEN( VERS )
 
 *  Create the catalogue parameter.

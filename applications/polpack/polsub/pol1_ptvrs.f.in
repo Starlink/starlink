@@ -73,7 +73,7 @@
 
 *  Save the POLPACK version number. The script which constructs the release
 *  should edit in the current version number, replacing the place holder.
-      VERS = "PKG_VERS"
+      VERS = '(@PACKAGE_VERSION@)'
       VLEN = CHR_LEN( VERS )
 
 *  See if there is already a POLPACK extension in the NDF.
