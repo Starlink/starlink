@@ -216,6 +216,9 @@ TESTS = starx_test
 
 # Because we invoke starX_link
 starx_test_SOURCES = starx_test.c
+
+# Specify an explicit dependency rather than assume
+# that everything on LDADD is a dependency [since the back ticks confuse]
 starx_test_DEPENDENCIES = starX_link
 starx_test_LDADD = `$(srcdir)/starX_link`
 all: all-am
