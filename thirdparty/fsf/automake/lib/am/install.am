@@ -93,17 +93,19 @@ install-manifest:
 ?!STANDARDMANIFEST?	  $(mkdir_p) $(DESTDIR)$(prefix) ; \
 ## Find all the files in the staging area $STG, add any final installation
 ## location, append each of these to the manifest FD, and delete each
-## (installed) file, so that the cp below will work.  There is a potential
-## problem here in that files which are not regular files or links will not
-## appear in the manifest; but they should still be installed.
-?!STANDARDMANIFEST?	  (cd $$STG && find . -type f -o -type l | \
+## (installed) file, so that the cp below will work.  The copy below will not
+## act on anything above $STG/$(prefix), but nothing should be installed
+## there, so that oughtn't to be a problem.  We rely on starconf macro
+## STAR_SPECIAL_INSTALL_COMMAND to find a CP_RECURSIVE which will
+## copy symlinks as symlinks.
+?!STANDARDMANIFEST?	  (cd $$STG && find . ! -type d | \
 ?!STANDARDMANIFEST?	    sed "s,^\.,$$DESTDIR," | \
 ?!STANDARDMANIFEST?	    while read f; do \
 ?!STANDARDMANIFEST?	      echo $$f>&5; \
-?!STANDARDMANIFEST?	      test -f $$f && { chmod 777 $$f && rm -f $$f; }; \
+?!STANDARDMANIFEST?	      test -f $$f && { chmod 666 $$f && rm -f $$f; }; \
 ?!STANDARDMANIFEST?	    done ); \
-?!STANDARDMANIFEST?	  echo "(cd $$STG; cp -R . $${DESTDIR-/})"; \
-?!STANDARDMANIFEST?	  (cd $$STG; cp -R . $${DESTDIR-/}); \
+?!STANDARDMANIFEST?	  echo "(cd $$STG/$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix))"; \
+?!STANDARDMANIFEST?	  (cd $$STG/$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix)); \
 ?!STANDARDMANIFEST?	  rm -Rf $$STG; \
 	  echo "</files>"                                       >&5; \
 	  echo "</manifest>"                                    >&5; \

@@ -4325,23 +4325,23 @@ sub handle_install ()
   # this variable was defined, and we do want to include the manifest
   # support in the generated Makefile.in.
   my $manifestdir = var ('STAR_MANIFEST_DIR');
-  # If variable STAR_SPECIAL_INSTALL_COMMAND was defined, it's a command
+
+  # If macro STAR_SPECIAL_INSTALL_COMMAND was seen, its argument is a command
   # to use to install the component in a staging directory.
-  my $star_special_install_command = var ('STAR_SPECIAL_INSTALL_COMMAND');
+  my $make_cmd = $starlink_seen_features{'special-install'};
+
   # If $standard_manifest is true, use the standard way of creating and
   # installing a manifest; if false, use the command in
   # STAR_SPECIAL_INSTALL_COMMAND.
   my $standard_manifest = 1;
-  my $make_cmd = '';
-  if ($star_special_install_command)
+  if ($make_cmd)
     {
-      $make_cmd = $star_special_install_command->variable_value;
       # Substitute prefix _and_ exec_prefix: some older Makefile.in files
       # don't define the latter using the former.
       if ($make_cmd =~ s{\$\(MAKE\)}{\$(MAKE) prefix=\$\$prefix exec_prefix=\$\$prefix})
         {
-          # Escape newlines neatly
-          $make_cmd =~ s/\s*\n\s*/ \\\n\t  /g;
+          # The macro argument is collapsed onto a single line by the
+          # "autoconf --trace" command within &scan_autoconf_traces.
           $standard_manifest = 0;
         }
       else
@@ -4349,6 +4349,10 @@ sub handle_install ()
           err_am ("STAR_SPECIAL_INSTALL_COMMAND doesn't include \$(MAKE)");
           $make_cmd = '';
         }
+    }
+  else
+    {
+      $make_cmd = '';
     }
 
   $output_rules .= &file_contents
@@ -4939,6 +4943,7 @@ sub scan_autoconf_traces ($)
                 STAR_MESSGEN => 1,
                 STAR_MONOLITHS => 0,
                 STAR_PREDIST_SOURCES => 1,
+                STAR_SPECIAL_INSTALL_COMMAND => 1,
                 _STAR_EXTRA_DIST => 1,
 	      );
 
@@ -5137,6 +5142,10 @@ sub scan_autoconf_traces ($)
                   $starlink_predist_sources{$src} = 1;
                 }
             }
+        }
+      elsif ($macro eq 'STAR_SPECIAL_INSTALL_COMMAND')
+        {
+          $starlink_seen_features{'special-install'} = $args[1];
         }
       elsif ($macro eq '_STAR_EXTRA_DIST')
         {
