@@ -4712,7 +4712,7 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
       } else if ( latax < 0 || latax >= ncin ){
          astError( AST__WCSAX, "astInitWcsMap(%s): Specified latitude axis (%d) "
                    "does not exist within a %d dimensional coordinate system. ",
-                   name, lonax + 1, ncin );
+                   name, latax + 1, ncin );
 
 /* Report an error if the longitude or latitude axes are the same. */
       } else if ( lonax == latax ){
