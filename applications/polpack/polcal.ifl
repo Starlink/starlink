@@ -21,6 +21,8 @@
 #        VPATHs and PPATHS. TSP bits removed.
 #     9-FEB-1999 (DSB):
 #        Added DUALBEAM, NITER and NSIGMA.
+#     15-AUG-2000 (DSB):
+#        Added TRIMBAD.
 #     {enter_changes_here}
 
 #-
@@ -208,6 +210,16 @@ interface POLCAL
       ppath    'DEFAULT'
       default  0.05
       prompt   'Zero point tolerance for image inter-comparisons'
+      helpkey  '*'
+   endparameter
+
+   parameter TRIMBAD
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Trim the output cube to exclude any bad borders?'
       helpkey  '*'
    endparameter
 

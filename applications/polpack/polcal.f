@@ -139,9 +139,9 @@
 *     OUT = NDF (Read)
 *        The name of the output 3D cube holding the Stokes parameters.
 *        The x-y plane of this cube covers the overlap region of the 
-*        supplied intensity images. Plane 1 contains the total intensity. 
-*        The other planes contain either Q and U, or V, depending on the 
-*        value of parameter PMODE.
+*        supplied intensity images (but see parameter TRIMBAD). Plane 1 
+*        contains the total intensity. The other planes contain either Q 
+*        and U, or V, depending on the value of parameter PMODE.
 *     PMODE = LITERAL (Read)
 *        This parameter is only accessed by the dual-beam algorithm. It
 *        gives the mode of operation; CIRCULAR for measuring circular 
@@ -233,6 +233,9 @@
 *        fact that an image with a larger data range can tolerate a larger 
 *        error in estimating its zero-point). The TOLS value supplied must 
 *        be positive. [0.05]
+*     TRIMBAD = _LOGICAL (Read)
+*        If a TRUE value is supplied, the bounds of the output data are
+*        trimmed to remove any margins of bad pixels round the data. [FALSE]
 *     VARIANCE = _LOGICAL (Read)
 *        This parameter should be set to a TRUE value if variances are to
 *        be included in the output cube. A null (!) value results in variance 
@@ -420,7 +423,7 @@
 *     input image to the output cube. 
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2000 Central Laboratory of the Research Councils
  
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
@@ -441,6 +444,8 @@
 *        trailing length specifier for IPID strings.
 *     8-FEB-1998 (DSB):
 *        Added single beam mode.
+*     16-AUG-2000 (DSB):
+*        The TRIMBAD parameter added.
 *     {enter_changes_here}
 
 *  Bugs:

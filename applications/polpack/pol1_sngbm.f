@@ -68,6 +68,9 @@
 *        rejected from any input NDF changes by more than TOLR pixels between 
 *        two succesive iterations, then the process is assumed not to
 *        have converged. [0]
+*     TRIMBAD = _LOGICAL (Read)
+*        If a TRUE value is supplied, the bounds of the output data are
+*        trimmed to remove any margins of bad pixels round the data. [FALSE]
 *     WEIGHT = _INTEGER (Read)
 *        The weighting scheme to use:
 *
@@ -102,7 +105,7 @@
 *     current version number of the POLPACK package.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2000 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -114,6 +117,8 @@
 *     17-MAR-2000 (DSB):
 *        Modified to add a third WCS axis to the output cube describing
 *        the Stokes axis.
+*     16-AUG-2000 (DSB):
+*        The TRIMBAD parameter added.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -167,6 +172,7 @@
       LOGICAL INVAR              ! Use input variances?
       LOGICAL OUTVAR             ! Create output variances?
       LOGICAL SETVAR             ! Store input variance estimates?
+      LOGICAL TRIM               ! Trim bad margins from output cube?
       REAL ANGROT                ! ACW angle from +X to o/p ref. direction
       REAL NSIGMA                ! Rejection threshold
       REAL MNFRAC                ! Fraction of good input values required
@@ -414,12 +420,16 @@
          DEZERO = .FALSE.
       END IF
 
+*  See if we should trim any bad margins from the output NDF.
+      CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
+
 *  Calcualte the I,Q,U values.        
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
      :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
-     :                 INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, SMBOX/2, 
-     :                 SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), STATUS )
+     :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, 
+     :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), 
+     :                 STATUS )
 
 *  Tidy up.
 *  ========

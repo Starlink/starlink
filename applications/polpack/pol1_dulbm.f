@@ -92,6 +92,9 @@
 *        fact that an image with a larger data range can tolerate a larger 
 *        error in estimating its zero-point). The TOLS value supplied must 
 *        be positive. 
+*     TRIMBAD = _LOGICAL (Read)
+*        If a TRUE value is supplied, the bounds of the output data are
+*        trimmed to remove any margins of bad pixels round the data. [FALSE]
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -113,6 +116,8 @@
 *     17-MAR-2000 (DSB):
 *        Modified to add a third WCS axis to the output cube describing
 *        the Stokes axis.
+*     15-AUG-2000 (DSB):
+*        Added parameter TRIMBAD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -234,6 +239,7 @@
       LOGICAL GOTVAR             ! Was value supplied for parameter VARIANCE?
       LOGICAL VAR                ! Variance information present and
                                  ! required in output?
+      LOGICAL TRIM               ! Trim margins of bad pixels?
       LOGICAL USED( MAXIN )      ! flag for images that have been
                                  ! processed
 
@@ -880,6 +886,14 @@
      :               %VAL( IPVUEST ), %VAL( IPWEIGHT ), %VAL( IPDOUT ),
      :               %VAL( IPVOUT ), DTOR*( ANGRT - ANGROT( 1 ) ), 
      :               STATUS )
+
+*  If required, trim the output NDF to exclude any margins of bad pixels.
+      CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
+      IF( TRIM ) THEN
+         CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
+     :                    LBND( 3 ), UBND( 3 ), %VAL( IPDOUT ), STATUS )
+         CALL NDF_SBND( 3, LBND, UBND, NDFOUT, STATUS ) 
+      END IF
 
 * Release unwanted workspace.
       CALL PSX_FREE( IPIEST, STATUS )
