@@ -19,7 +19,7 @@ class InputByteStreamError : public DviError {
 
 class InputByteStream {
  public:
-    InputByteStream (string s, bool preload=false, string tryext="");
+    InputByteStream (string& s, bool preload=false, string tryext="");
     ~InputByteStream();
     bool eof();
     Byte getByte(int n=1);
