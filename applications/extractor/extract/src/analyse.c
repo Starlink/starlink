@@ -144,9 +144,11 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
   for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
     {
     pix = PLIST(pixt,value);
-    if (  pix < -BIG ) continue; /* PWD: trap BAD value in
-                                    measurement image that are not
-                                    in detection image */
+
+    /* PWD: trap BAD value in measurement image that are not in    
+     * detection image */
+    if ( pix < -BIG ) pix = thresh;
+
     if (pix>peak)
       peak = pix;
 
