@@ -398,12 +398,6 @@ sub GQch {
   return $self->{_gqch};
 }
 
-sub GFlush {
-  my $self = shift;
-  if (@_) { $self->{_gflush} = shift; }
-  return $self->{_gflush};
-}
-
 sub GMark {
   my $self = shift;
   if (@_) { $self->{_gmark} = shift; }
