@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.5}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {1st March 2000}
+\newcommand{\stardocdate}      {17th March 2000}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 2.1}
+\newcommand{\stardocversion}   {Version 2.1-1}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry data. They cover registration, sky subtraction, 
@@ -6436,13 +6436,17 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
-\subsection{V2.2}
+\subsection{V2.1-1}
 
 \begin{itemize}
 \item The way \htmlref{POLBIN}{POLBIN} chooses the location of its bins
 has been changed. The bins are now chosen so that origin of the (X,Y) 
 co-ordinate system (as defined by the X and Y columns in the input 
 catalogue), is always at the corner of a bin.
+
+\item The WCS information stored with the output cube created by 
+\htmlref{POLCAL}{POLCAL} now has three axes instead of two (the Stokes
+axis is now described in addition to the two spatial axes). 
 
 \end{itemize}
 
