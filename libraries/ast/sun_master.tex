@@ -12346,7 +12346,7 @@ f+
 Note, this splitting of long strings over several cards only occurs when
 writing AST Objects to a FitsChan using the AST\_WRITE routine and the
 {\em native} encoding. If a long string is stored in a FitsChan using
-(for instance) the AST_PUTFITS routine, it will simply be truncated.
+(for instance) the AST\_PUTFITS routine, it will simply be truncated.
 f- 
 
 \subsection{\label{ss:extractingfitscards}Extracting Individual Cards from a FitsChan}
@@ -17044,7 +17044,7 @@ changes are:
 of {\tt CDj\_i} keywords instead of a combination of {\tt PCjjjiii} and
 {\tt CDELTj} keywords.
 \item Projection parameters are now associated with particular axes and
-are represented by {tt PVi\_m} keywords instead of the {\rr PROJPm}
+are represented by {\tt PVi\_m} keywords instead of the {\tt PROJPm}
 keywords.
 \item The tangent plane projection (``TAN'') can now include optional 
 polynomial correction terms.
@@ -17104,12 +17104,12 @@ facility is only available when using NATIVE encoding.
 FITS-WCS encoding in the FitsChan class:
 \begin{itemize}
 \item Projection parameters are now associated with a particular axis and
-are specified using a new set of attributes called PVj_m. Here, ``j'' is 
+are specified using a new set of attributes called PVj\_m. Here, ``j'' is 
 the index of an axis of WcsMap, and ``m'' is the index of the projection 
 parameter.
 \item The old attributes ProjP(0) to ProjP(9) are still available but are
-now depracated in favour of the new PVj_m attributes. They are interpreted 
-as aliases for PV(axlat)_0 to PV(axlat)_9, where ``axlat'' is the index of 
+now depracated in favour of the new PVj\_m attributes. They are interpreted 
+as aliases for PV(axlat)\_0 to PV(axlat)\_9, where ``axlat'' is the index of 
 the latitude axis.
 \item The GLS projection projection has been renamed as SFL, but the 
 AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
