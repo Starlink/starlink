@@ -17053,15 +17053,6 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
-         parameter again {
-            type _LOGICAL
-            vpath PROMPT
-            ppath DEFAULT
-            prompt {Zap more of the array?}
-            default TRUE
-            helpkey *
-          }
-
          parameter colin {
             type FILENAME
             vpath PROMPT
@@ -17081,22 +17072,10 @@ iraf! {
           }
 
          parameter columns {
-            size *
-            type _DOUBLE
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Column bounds of the region to be modified}
-            helpkey *
-          }
-
-         parameter cosys {
             type LITERAL
-            vpath GLOBAL DEFAULT
-            ppath GLOBAL DYNAMIC
-            prompt {Co-ordinate system}
-            association <->GLOBAL.COORD_SYSTEM
+            prompt {Bounds on axis 1 of the area to be replaced}
+            ppath CURRENT
             helpkey *
-            default World
           }
 
          parameter device {
@@ -17129,28 +17108,27 @@ iraf! {
           }
 
          parameter lines {
-            size *
-            type _DOUBLE
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Line bounds of the region to be modified}
+            type LITERAL
+            prompt {Bounds on axis 2 of the area to be replaced}
+            ppath CURRENT
             helpkey *
           }
 
-         parameter mark {
-            type _LOGICAL
-            vpath DEFAULT
-            prompt {Mark points?}
+         parameter marker {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            prompt {The PGPLOT type for markers}
+            ppath CURRENT DEFAULT
+            default 2
             helpkey *
-            default FALSE
           }
 
          parameter mode {
             type LITERAL
-            vpath GLOBAL
-            ppath GLOBAL DYNAMIC DEFAULT
-            prompt {Mode to obtain line/column limits}
-            association <->GLOBAL.INTERACTIONMODE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Mode to obtain area limits}
             default Interface
             helpkey *
           }
@@ -17172,11 +17150,38 @@ iraf! {
             helpkey *
           }
 
+         parameter plot {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {What sort of graphics should be used?}
+            ppath CURRENT DEFAULT
+            default Adapt
+            helpkey *
+          }
+
+         parameter style {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {Style for graphics}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
          parameter title {
             position 3
             type LITERAL
             vpath DEFAULT
             prompt {Title for output image}
+            default !
+            helpkey *
+          }
+
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            prompt {The two current Frame axes to be used}
+            ppath DYNAMIC DEFAULT
             default !
             helpkey *
           }
