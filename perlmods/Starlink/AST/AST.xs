@@ -35,8 +35,31 @@ extern "C" {
 typedef int StatusType;
 typedef int WcsMapType;
 
-
 #include "ast.h"
+
+#if !defined( AstXmlChan )
+typedef void AstXmlChan;
+#else
+#define HASXMLCHAN
+#endif
+
+#if !defined( AstPolyMap )
+typedef void AstPolyMap;
+#else
+#define HASPOLYMAP
+#endif
+
+#if !defined( AstGrismMap )
+typedef void AstGrismMap;
+#else
+#define HASGRISMMAP
+#endif
+
+#if !defined( AstShiftMap )
+typedef void AstShiftMap;
+#else
+#define HASSHIFTMAP
+#endif  
 
 /* Helper functions */
 #include "arrays.h"
@@ -313,6 +336,7 @@ new( ... )
  OUTPUT:
   RETVAL
 
+
 MODULE = Starlink::AST  PACKAGE = Starlink::AST::XmlChan
 
 # Need to add proper support for the callbacks
@@ -320,9 +344,13 @@ MODULE = Starlink::AST  PACKAGE = Starlink::AST::XmlChan
 AstXmlChan *
 new( ... )
  CODE:
+#ifndef HASXMLCHAN   
+   Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.x or greater");
+#else
   ASTCALL(
    RETVAL = astXmlChan( NULL, NULL, "");
   )
+#endif  
  OUTPUT:
   RETVAL
 
@@ -333,9 +361,13 @@ new( class, options )
   char * class
   char * options
  CODE:
+#ifndef HASGRISMMAP 
+   Perl_croak(aTHX_ "GrismMap: Please upgrade to AST V3.x or greater");
+#else
   ASTCALL(
    RETVAL = astGrismMap( options );
   )
+#endif
  OUTPUT:
   RETVAL
 
@@ -508,8 +540,12 @@ MODULE = Starlink::AST   PACKAGE = Starlink::AST::PolyMap
 
 AstPolyMap *
 new( class )
- CODE:
+ CODE: 
+#ifndef HASPOLYMAP  
+   Perl_croak(aTHX_ "PolyMap: Please upgrade to AST V3.x or greater");
+#else 
   Perl_croak(aTHX_ "PolyMap not yet implemented");
+#endif
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::ShiftMap
 
@@ -522,11 +558,15 @@ new( class, shift, options )
   int ncoord;
   double * cshift;
  CODE:
+#ifndef HASSHIFTMAP  
+   Perl_croak(aTHX_ "ShiftMap: Please upgrade to AST V3.x or greater");
+#else 
   ncoord = av_len( shift );
   cshift = pack1D(newRV_noinc((SV*)shift), 'd');
   ASTCALL(
    RETVAL = astShiftMap( ncoord, cshift, options);
   )
+#endif
  OUTPUT:
   RETVAL
 
