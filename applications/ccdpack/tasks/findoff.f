@@ -1221,7 +1221,7 @@
 *  frames.  We use IPXC2 and IPYC2 as workspace and leave the result
 *  where the original values were, in IPXO2 and IPYO2.
                IF ( CNV .NE. AST__NULL ) THEN
-                  CALL AST_TRAN2( CNV, NREC( J ), 
+                  CALL AST_TRAN2( CNV, NUMI2, 
      :                            %VAL( IPXO2( COUNT ) ),
      :                            %VAL( IPYO2( COUNT ) ), .FALSE.,
      :                            %VAL( IPXC2 ), %VAL( IPYC2 ), STATUS )
