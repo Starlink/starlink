@@ -139,15 +139,18 @@
 *  Extract file locator
       CALL ADI1_GETLOC( HID, LOC, STATUS )
 
+*  Get model dimensions
+      CALL ADI_THERE( MID, 'SHAPE', THERE, STATUS )
+      IF ( THERE ) THEN
+        CALL BDI_GETSHP( MID, DAT__MXDIM, DIMS, NDIM, STATUS )
+      ELSE
+        NDIM = -1
+      END IF
+
 *  Get dimensions and basic type in create mode. If no values replace
 *  with nulls in the hope that we can get away with it! These nulls
 *  must be trapped by BDI1_CFIND1
       IF ( CREATE ) THEN
-        CALL BDI_GETSHP( MID, DAT__MXDIM, DIMS, NDIM, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_ANNUL( STATUS )
-          NDIM = -1
-        END IF
         CALL BDI_GETTYP( MID, TYPE, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
@@ -167,8 +170,8 @@
 *    Should create structure array object depending on presence
 *    of magic flag
         IF ( ISBIND ) THEN
-          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, '_'//TYPE, CNDIM,
-     :                      CDIMS, THERE, CLOC, STATUS )
+          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, '_'//TYPE,
+     :                      NDIM, DIMS, THERE, CLOC, STATUS )
         ELSE
           CALL DAT_CLONE( LOC, CLOC, STATUS )
         END IF
@@ -191,8 +194,8 @@
 *    Define dimensions
         CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
-        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//TYPE, CNDIM,
-     :                    CDIMS, THERE, CLOC, STATUS )
+        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//TYPE, NDIM,
+     :                    DIMS, THERE, CLOC, STATUS )
 
 *  Axis container
       ELSE IF ( ITEM .EQ. 'Axes' ) THEN
