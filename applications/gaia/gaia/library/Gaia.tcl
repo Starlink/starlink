@@ -141,6 +141,19 @@ itcl::class gaia::Gaia {
 
    #  Destructor:
    destructor {
+
+      #  Clear up the images list (this isn't done correctly in
+      #  SkyCat, it uses $w_ instead of $image_).
+      global ::skycat_images
+      if {[info exists skycat_images]} {
+         set tmp {}
+         foreach w $skycat_images {
+            if {[winfo exists $w] && "$w" != "$image_"} {
+               lappend tmp $w
+            }
+         }
+         set skycat_images $tmp
+      }
    }
 
    #  XXX Quit the application. Really.... Rtd doesn't.
@@ -217,7 +230,6 @@ itcl::class gaia::Gaia {
             -side top -padx 1m -pady 1m
          pack \
             [message $w.msg -text $about_skycat \
-                -width 8i \
                 -justify center \
                 -borderwidth 2 -relief groove] \
             [ProgressBar $w.progress \
@@ -712,14 +724,16 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Make a new main window, named either the next in sequence or
-   #  using a given name. This version does not use the
-   #  TopLevelWidget::start command as this blocks (stopping the
-   #  possibility of remotely determining when the clone has been
-   #  created. It also provides the ability to specify the file name
-   #  directly (thus replacing the command-line version) and to gain
-   #  access to an existing clone (by number).
-   public method noblock_clone {{clone ""} {file ""} args} {
+   #  Make a new main window with the given name (this is essential)
+   #  This version stops the TopLevelWidget::start command froming
+   #  blocks (stopping the possibility of remotely determining when the
+   #  clone has been created). It also provides the ability to specify
+   #  the file name directly (thus replacing the command-line version)
+   #  and to gain access to an existing clone (by number).
+   public method noblock_clone {name {file ""} args} {
+      global ::argv ::argc ::gaia_usage
+      set argv $args
+      set argc [llength $argv]
 
       #  If given the file replaces the one in the command-line args or
       #  is added to the list.
@@ -736,34 +750,27 @@ itcl::class gaia::Gaia {
          }
       }
 
-      #  If clone exists just return the name and display the image.
-      if { "$clone" != "" } {
-         if { [winfo exists ${prefix_}$clone] } {
-            if { $file != "" } {
-               ${prefix_}$clone open $file
-            }
-            if { $args != "" } {
-               eval configure $args
-            }
-            return ${prefix_}$clone
-         }
-         if { $clone > $clone_max_ } {
-            set clone_max_ $clone
-         }
-      } else {
-         #  New clone required.
-         set clone [expr [incr clone_max_] +1]
+      #  If named window already exists, just return.
+      if { [winfo exists $name] } {
+          if { $file != "" } {
+              $name open $file
+          }
+          if { $args != "" } {
+              eval $name configure $args
+          }
+          return $name
       }
-      incr clone_cnt_
 
-      #  Do not use TopLevelWidget::start as this blocks with a tkwait
-      #  which means we can never detect when the clone is complete.
-      global argv
-      eval gaia::Gaia ::${prefix_}$clone $argv $args
-
-      #  Wait until clone window appears.
-      tkwait visibility ${prefix_}$clone
-      return ${prefix_}$clone
+      #  use the -noop option to avoid reloading the main image 
+      #  (part of $argv list). The renames stop start method from 
+      #  blocking with a tkwait.
+      rename ::tkwait ::real_tkwait
+      rename ::false_tkwait ::tkwait
+      util::TopLevelWidget::start gaia::Gaia "" "$gaia_usage" "$name"
+      rename ::tkwait ::false_tkwait
+      rename ::real_tkwait ::tkwait
+      tkwait visibility $name
+      return $name
    }
 
    #  "Usual" clone method.
@@ -1080,4 +1087,8 @@ itcl::class gaia::Gaia {
 
    # prefix to use to create new main windows.
    common prefix_ ".gaia"
+}
+
+#  Procedure to stop tkwait from working...
+proc false_tkwait {args} {
 }

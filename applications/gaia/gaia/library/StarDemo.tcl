@@ -281,7 +281,7 @@ itcl::class gaia::StarDemo {
 			 ====================
 
   That's all for now. If you don't want to see it all happen again
-  then press the "stop" button and wait a while (control-x in 
+  then press the "stop" button and wait a while (control-q in 
   the main window will exit somewhat more quickly).
 	 }
       } else {
@@ -864,9 +864,8 @@ itcl::class gaia::StarDemo {
  other.
       }
       show_image_ frame.sdf 90 1
-      puts "cloning..."
-      set clone [::$itk_option(-gaiamain) noblock_clone "" "$demo_dir_/frame.sdf(5:,5:)"]
-      puts "continuing..."
+      set clone .gaia[expr $clone_cnt_+1]
+      $itk_option(-gaiamain) noblock_clone $clone "$demo_dir_/frame.sdf(5:,5:)"
       set cloneimg [[$clone get_image] get_image]
       update
       $clone make_toolbox blink
@@ -883,8 +882,8 @@ itcl::class gaia::StarDemo {
       $toolbox change_speed 3
       wait_ $readtime_
       $toolbox animate_off
-      $toolbox close
-      destroy $clone
+      delete object $toolbox
+      delete object $clone 
    }
 
    #  Display an astrometry grid.
@@ -993,8 +992,7 @@ itcl::class gaia::StarDemo {
       [$toolbox component crval2] configure -value {41:30:42.23}
       [$toolbox component cdelt1] configure -value -1.7
       [$toolbox component cdelt2] configure -value 1.7
-      [$toolbox component crota2] scaleCmd -2.0
-      [$toolbox component crota2] scaleCmd -2.0 ;# Needed twice
+      [$toolbox component crota2] configure -value -2.0
       display {
  Using the values in the toolbox an astrometric calibration
  will now be assigned to the image. This will be demonstrated
@@ -1007,13 +1005,15 @@ itcl::class gaia::StarDemo {
       $itk_option(-gaiamain) make_toolbox astgrid
       set plotbox [$itk_option(-gaiamain) component astgrid]
       refresh_
-      $plotbox close
+      move_to_side_ $plotbox
+      refresh_
       $plotbox read_options $demo_dir_/default.opt
       short_display {Drawing astrometry grid...}
       $plotbox draw_grid 1
+      refresh_
       scroll_ 1
-      wait_ $readtime_
       $plotbox close
+      wait_ $readtime_
       $toolbox cancel
    }
 
@@ -1096,7 +1096,7 @@ itcl::class gaia::StarDemo {
       [$toolbox component crval2] configure -value {41:30:42.23}
       [$toolbox component cdelt1] configure -value -1.7
       [$toolbox component cdelt2] configure -value 1.7
-      [$toolbox component crota2] scaleCmd -0.0
+      [$toolbox component crota2] configure -value -0.0
       short_display {Setting an approximate astrometric solution...}
       refresh_
       $toolbox accept
@@ -1172,7 +1172,7 @@ itcl::class gaia::StarDemo {
       $toolbox default_file $demo_dir_/ngc1275.fits
       $toolbox test
       display {
- Astrometry has now been copied.
+  Astrometry has now been copied from another image.
       }
       scroll_ 1
       $toolbox cancel
@@ -1206,15 +1206,11 @@ itcl::class gaia::StarDemo {
       for {set i 0} {$i < $ncats } {incr i} {
 	 append catlist "      [lindex $catalogs $i]\n"
       }
-      display "
-  The catalogues that are currently available are:
+      display "   Some of the currently available catalogues are:
 $catlist
       "
       $w_.cat delete
       show_image_ ngc1275.fits 95 2
-      uplevel #0 rename filename_dialog real_filename_dialog
-      set cmd [code $this local_filename_dialog]
-      uplevel #0 proc filename_dialog \{args\} \{return \[$cmd\]\}
       display {
  The results of a query on the NGC1275 field for the HST Guide Star 
  Catalogue will now be displayed.
@@ -1222,14 +1218,16 @@ $catlist
  Note these results can be used as reference positions when
  determining an astrometric calibration.
       }
-      set skycat_filename_ $demo_dir_/ngc1275_gsc.tab
-      AstroCat::local_catalog $itk_option(-gaiactrl) ::gaia::GaiaSearch 0
+      set toolbox [cat::AstroCat::new_catalog $demo_dir_/ngc1275_gsc.tab \
+                      $itk_option(-gaiactrl) ::gaia::GaiaSearch 0 0 local]
 
       #  Get name of catalogue window. This is the one that is
       #  displaying our file.
-      set toolbox [find_skycat_]
-      if { $toolbox == "" } {
-	 return
+      if { $toolbox == {} } { 
+         set toolbox [find_skycat_ ngc1275_gsc.tab]
+         if { $toolbox == "" } {
+            return
+         }
       }
       refresh_
       move_to_side_ $toolbox
@@ -1247,7 +1245,7 @@ $catlist
       short_display {Labelling object...}
       set table [$toolbox get_table]
       $table select_row 0
-      $toolbox label_selected_object
+      $toolbox label_selected_row
       $itk_option(-canvas) itemconfigure ngc1275_gsc.tab -fill green
       wait_ $readtime_
       $toolbox clear
@@ -1259,13 +1257,15 @@ $catlist
  image).
       }
       $toolbox quit
-      set skycat_filename_ $demo_dir_/ngc1275_ned.tab
-      AstroCat::local_catalog $itk_option(-gaiactrl) ::gaia::GaiaSearch 0
+      set toolbox [cat::AstroCat::new_catalog $demo_dir_/ngc1275_ned.tab \
+                      $itk_option(-gaiactrl) ::gaia::GaiaSearch 0 0 local]
 
       #  Get name of catalogue window.
-      set toolbox [find_skycat_]
-      if { $toolbox == "" } {
-	 return
+      if { $toolbox == {} } {
+         set toolbox [find_skycat_ ngc1275_ned.tab]
+         if { $toolbox == "" } {
+            return
+         }
       }
       refresh_
       move_to_side_ $toolbox
@@ -1283,21 +1283,12 @@ $catlist
       set table [$toolbox get_table]
       foreach row { 0 13 16 19 25 29 } {
 	 $table select_row $row
-	 $toolbox label_selected_object
+	 $toolbox label_selected_row
       }
-      $itk_option(-canvas) itemconfigure ngc1275_ned.tab -fill green
+      $itk_option(-canvas) itemconfigure ngc1275_ned.tab -fill yellow
       wait_ $readtime_
       $toolbox clear
       $toolbox quit
-
-      #  Restore filename_dialog behaviour before exiting.
-      uplevel #0 rename filename_dialog \{\}
-      uplevel #0 rename real_filename_dialog filename_dialog
-      $toolbox clear
-      $toolbox quit
-   }
-   method local_filename_dialog {} {
-      return $skycat_filename_
    }
 
    #  Other on-line capabilities. Archives and Image servers.
@@ -1317,16 +1308,15 @@ $catlist
  available for the NGC1275 field will be shown.
       }
       show_image_ ngc1275.fits 95 2
-      uplevel #0 rename filename_dialog real_filename_dialog
-      set cmd [code $this local_filename_dialog]
-      uplevel #0 proc filename_dialog \{args\} \{return \[$cmd\]\}
-      set skycat_filename_ $demo_dir_/ngc1275_hst.tab
-      AstroCat::local_catalog $itk_option(-gaiactrl) ::gaia::GaiaSearch 0
+      set toolbox [cat::AstroCat::new_catalog $demo_dir_/ngc1275_hst.tab \
+                      $itk_option(-gaiactrl) ::gaia::GaiaSearch 0 0 local]
 
       #  Get name of catalogue window.
-      set toolbox [find_skycat_]
-      if { $toolbox == "" } {
-	 return
+      if { $toolbox == {} } {
+         set toolbox [find_skycat_ ngc1275_hst.tab]
+         if { $toolbox == "" } {
+            return
+         }
       }
       refresh_
       move_to_side_ $toolbox
@@ -1337,21 +1327,27 @@ $catlist
  directly from the archive.
       }
       show_image_ preview.sdf 95 -2
-      wait_ $readtime_
 
-      #  Restore filename_dialog behaviour before exiting.
-      uplevel #0 rename filename_dialog \{\}
-      uplevel #0 rename real_filename_dialog filename_dialog
+      $itk_option(-gaiamain) make_toolbox astgrid
+      set plotbox [$itk_option(-gaiamain) component astgrid]
+      refresh_
+      $plotbox close
+      $plotbox read_options $demo_dir_/default.opt
+      short_display {Drawing astrometry grid...}
+      $plotbox draw_grid 1
+
+      wait_ $readtime_
+      $plotbox close
       $toolbox clear
       $toolbox quit
    }
 
    #  Get the name of the SkyCat instance that is displaying the
    #  current local catalogue.
-   protected method find_skycat_ {} {
+   protected method find_skycat_ {filename} {
       set toolbox ""
-      foreach w [AstroCat::instances] {
-         if { [string match "*$skycat_filename_" [$w cget -catalog]] } {
+      foreach w [cat::AstroCat::instances] {
+         if { [string match "*${filename}" [$w cget -catalog]] } {
             set toolbox $w
             break;
 	 }
@@ -1414,12 +1410,10 @@ $catlist
    protected variable running_ 0
 
    #  List of all known demos.
-#   protected variable demolist_ \
-#      "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
-#       blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
-#       skycat_ archives_"
    protected variable demolist_ \
-      "blink_"
+      "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
+       blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
+       skycat_ archives_"
    
    #  Interval to wait while reading text
    protected variable readtime_ 15000
@@ -1430,14 +1424,11 @@ $catlist
    #  Name of cloned window.
    protected variable clone_ {}
 
-   #  Name of skycat catalogue.
-   protected variable skycat_filename_ {}
-
    #  Directory for demo files.
    protected variable demo_dir_ [pwd]
 
    #  Development mode.
-   protected variable quick_start_ 1
+   protected variable quick_start_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

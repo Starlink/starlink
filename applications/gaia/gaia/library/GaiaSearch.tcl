@@ -233,6 +233,12 @@ itcl::class gaia::GaiaSearch {
       }
    }
 
+   #  Public method to label the selected object (gives access to
+   #  protected method in SkySearch).
+   public method label_selected_row {} {
+      label_selected_object
+   }
+
    #  Configuration options (public variables):
    #  =========================================
 
