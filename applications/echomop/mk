@@ -335,7 +335,7 @@
 
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
-            sun4_Solaris)
+            sun4_Solaris|sun4u_SunOS)
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
