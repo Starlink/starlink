@@ -1,0 +1,90 @@
+## BDF2NDF - Converts a Starlink Interim BDF file to an NDF.
+
+#+
+#  Name:
+#     BDF2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     Jo Murray (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1990 August 1st (JM)
+#        Original version.
+#     1991 October 30 (MJC):
+#     	 Renamed FORMAT to TYPE so that it agrees with SUN/55.  Made its
+#	 vpath DYNAMIC so that the type of the input BDF is used by
+#	 default.
+#     1992 January 30 (MJC):
+#        Renamed the parameters for the BDF and NDF to IN and OUT
+#        respectively to agree with SUN/55 and consistency.  Removed
+#	 positional parameters for the Interim files.  Added help
+#	 library.
+#     1992 August 27 (MJC):
+#     	 Made the output NDF the current data-array.
+#     {enter_further_changes_here}
+
+#-
+
+interface         BDF2NDF
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter	  IN             # Name of input BDF
+      position    1
+      type        '_CHAR'
+      access      'READ'
+      ppath       'CURRENT'
+      prompt      'BDF filename'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Name of output NDF
+      position    2
+      type        'NDF'
+      ppath       'CURRENT'
+      prompt      'Name of output NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      TYPE           # NDF data type
+      position    3
+      type        'LITERAL'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      prompt      'HDS data type required for NDF'
+      default     '_REAL'
+      helpkey     '*'
+   endparameter
+
+   parameter      DESCRIP        # Report descriptors.
+      position    4
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      prompt      'Report the BDF descriptors to the screen?'
+      default     F
+      helpkey     '*'
+   endparameter
+
+   parameter      CONNECT        # Interim connection file name
+      position    5
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      default     'BDF2NDF.TMP'
+      helpkey     '*'
+   endparameter
+
+   parameter      COMMAND        # Interim command file name
+      position    6
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      default     'USERCOM.TMP'
+      helpkey     '*'
+   endparameter
+
+endinterface
