@@ -37,6 +37,8 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *         Name of NDF to change.
+*     MSG_FILTER = CHAR (Read)
+*         Message filter level.
 *     NEW_FLAT = _CHAR (Read)
 *         Name of the new flatfield file.
 
@@ -68,6 +70,8 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'REDS_SYS'                         ! REDS constants
+      INCLUDE 'MSG_PAR'                          ! MSG__ constants
+
 *    Import :
 *    Import-Export :
 *    Export :
@@ -172,6 +176,9 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
 * initialise some flags and locators
 
       FITS_CHANGED = .FALSE.
@@ -274,8 +281,9 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation of '//
-     :  '^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
+     :     STATUS)
 
 
 *     check that the file has not already been flat-fielded
