@@ -22,7 +22,7 @@ static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.6 1998/05/18 21:22:19 ab
 /* see Apple Developer Connection Tech Notes
   http://developer.apple.com/technotes/tn2002/tn2071.html */
 #if ! ( defined(__APPLE__) && defined(__MACH__) )
-#include <netinet/in.h>*
+#include <netinet/in.h>
 #endif
 #include <math.h>
 #include <stdlib.h>
