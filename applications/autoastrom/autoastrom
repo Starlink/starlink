@@ -585,12 +585,14 @@ $helpers{moggy} = $moggy;
 
 # Obtain a catalogue covering the same part of the sky as the NDF.  We
 # don't have to assume here that the projection pole is in the centre
-# of the image, since ASTROM isn't fazed if it it's elsewhere.
+# of the image, since ASTROM isn't fazed if it's elsewhere.
+#
+# get_catalogue returns columns int-id, X, Y, ra/deg, dec/deg, int-id, mag.
 wmessage ('info', "Obtaining catalogue from $esocatname...");
 my $CAT = get_catalogue ($moggy, %$NDFinfo, $maxobj, $tempDir);
 
-# ...and write an NDF which has the columns (number, ra/rad, dec/rad, ra,
-# dec).  That is, copy the $PIXcat file, duplicating columns (3,4)
+# ...and write an NDF which has the columns (number, ra/rad, dec/rad, ra/deg,
+# dec/deg).  That is, copy the $CAT file, duplicating columns (3,4)
 # into columns (1,2) and converting them to radians (required for asttrann).
 my @catdata = txt2arr ($CAT);
 ($#catdata >= 0)
@@ -644,7 +646,7 @@ unless (defined($CCDcathash)) {
     $CCDcathash = extract_objects (\%helpers,
 				   $NDF,
 				   {maxobj => $maxobj,
-				    filtersmall => 20},
+				    filterdefects => 1},
 				   $tempDir);
     defined ($CCDcathash)
       || wmessage ('fatal', "Failed to extract objects from NDF <$NDF>");
@@ -670,9 +672,10 @@ my $iterationsleft = 7;
 
 # The following hold the state between iterations.
 #
-# $refstarndf and $astromfits have dummy initial values, but though
-# $matchinfile is obtained by converting $refstarndf, it does have a
-# valid initial value, $CAT, obtained from get_catalogue() above.
+# $refstarndf and $astromfits have dummy initial values.  $matchinfil
+# has a valid initial value, $CAT, obtained from get_catalogue()
+# above, but this is changed below to a new reference star
+# catalogue, by converting $refstarndf, below.
 my $refstarndf =      'X';	# Ref. star pixel coordinates...
 my $matchinfile =   $CAT;	# ...as a text file, input to match_positions.
 my $astromfits =     'X';	# WCS information obtained by ASTROM.
