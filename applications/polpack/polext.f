@@ -438,7 +438,7 @@
            
 *  Otherwise, index through the structure's components, obtaining locators 
 *  and the required information.
-            ELSE
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
                DO I = 1, NCOMP
 
 *  Get a locator to the I'th component.
