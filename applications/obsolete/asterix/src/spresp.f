@@ -196,7 +196,7 @@
       INTEGER			PNRAD			! Perturb polar bins
       INTEGER			POPT			! Perturbation option
       INTEGER                	PSFSIZ			! Psf size in bytes
-      INTEGER			PWPTR1, PWPTR		! Perturbation workspace
+      INTEGER		        PWPTR		        ! Perturbation workspace
       INTEGER 		     	RBIN      		! Loop over off-axis angle
       INTEGER                	RLIMIT			! Limiting psf radius
       INTEGER		     	SI_PTR			! Spatial reponse index
@@ -482,8 +482,6 @@
         IF ( POPT .EQ. 1 ) THEN
           CALL BDI_MAPR( PFID, 'Data', 'READ', PDPTR, STATUS )
           PNRAD = DIMS(1)/2 + 1
-          CALL DYN_MAPR( 1, PNRAD, PWPTR, STATUS )
-          CALL DYN_MAPI( 1, PNRAD, PWPTR1, STATUS )
 
         ELSE IF ( POPT .EQ. 2 ) THEN
           IF ( ((PDIMS(1)/2)*2 .EQ. PDIMS(1)) .OR.
@@ -550,7 +548,7 @@
 *        Perturb it?
             IF ( POPT .EQ. 1 ) THEN
               CALL SPRESP_PERT_EN( PDIMS(1), %VAL(PDPTR), PNRAD,
-     :                             %VAL(PWPTR), %VAL(PWPTR1), DIMS(1),
+     :                             DIMS(1),
      :                             DIMS(2), %VAL(CP_PTR), STATUS )
             ELSE IF ( POPT .EQ. 2 ) THEN
               CALL SPRESP_PERT_SM( PDIMS(1), PDIMS(2), %VAL(PDPTR),
@@ -585,7 +583,7 @@
 *          Perturb it?
               IF ( POPT .EQ. 1 ) THEN
                 CALL SPRESP_PERT_EN( PDIMS(1), %VAL(PDPTR), PNRAD,
-     :                             %VAL(PWPTR), %VAL(PWPTR1), DIMS(1),
+     :                               DIMS(1),
      :                               DIMS(2), %VAL(CP_PTR), STATUS )
               ELSE IF ( POPT .EQ. 2 ) THEN
                 CALL SPRESP_PERT_SM( PDIMS(1), PDIMS(2), %VAL(PDPTR),
@@ -1069,38 +1067,22 @@
 
 *  Given and Returned :
       REAL			PSF(NX,NY)
-
-*  Local Variables:
-      INTEGER                	I,J,II,JJ	       	! Loops over psf
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Make copy of psf, and zero the output
-      DO J = 1, NY
-        DO I = 1, NX
-          PWORK(I,J) = PSF(I,J)
-          PSF(I,J) = 0.0
-        END DO
-      END DO
+      CALL ARR_COP1R( NX*NY, PSF, PWORK, STATUS )
 
-*  Make smoothed output
-      DO J = 1, NY
-        DO I = 1, NX
-          DO JJ = MAX(1,J-PNY/2), MIN(NY,J+PNY/2)
-            DO II = MAX(1,I-PNX/2), MIN(NX,I+PNX/2)
-              PSF(II,JJ) = PSF(II,JJ) + PWORK(I,J) * PDATA(II-I,JJ-J)
-            END DO
-          END DO
-        END DO
-      END DO
+*  Convolve the psf
+      CALL PSF_CONVOLVE( NX, NY, PWORK, PNX, PNY, PDATA, PSF, STATUS )
 
       END
 
 
 
-      SUBROUTINE SPRESP_PERT_EN( PNBIN, PDATA, NRAD, POL, COUNT, NX,
+      SUBROUTINE SPRESP_PERT_EN( PNBIN, PDATA, NRAD, NX,
      :                           NY, PSF, STATUS )
 *+
 *  Name:
@@ -1118,11 +1100,8 @@
 *        The global status.
 
 *  Description:
-*     A polar profile of the input psf is constructed. The profile is
-*     then adjusted by a factor derived from the perturbation profile
-*     and then a copy of the 2-D psf is made where each value is
-*     scaled by its distance from the origin. Finally the psf is rescaled
-*     to its original normalisation.
+*     Each point in the input is adjusted by a factor derived from the
+*     input perturbation profile.
 
 *  Usage:
 *     {routine_name} {parameter_usage}
@@ -1195,9 +1174,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Given :
-      INTEGER			PNBIN, NX, NY, NRAD, COUNT(*)
+      INTEGER			PNBIN, NX, NY, NRAD
       REAL			PDATA(PNBIN)
-      REAL			POL(*)
 
 *  Given and Returned :
       REAL			PSF(NX,NY)
@@ -1209,7 +1187,7 @@
 *  Local Variables:
       REAL			SUM			! Psf normalisation
       REAL			XP,YP,XOLD,YOLD,SCALE,NSUM
-      INTEGER                	LCOUNT,I,J,II,JJ,K,KK	       	! Loops over psf
+      INTEGER                	I,J,II,JJ,K,KK	       	! Loops over psf
 *.
 
 *  Check inherited global status.
@@ -1223,48 +1201,6 @@
         END DO
       END DO
 
-*  Zero output arrays and counter
-      DO K = 1, NRAD
-	POL(K) = 0.0
-        COUNT(K) = 0
-      END DO
-
-*  Polar the input psf
-      DO J = 1, NY
-        YOLD = REAL(J-1) - REAL(NY)/2.0
-        DO JJ = 1, SAMPLE
-          YP = YOLD + (REAL(JJ)-0.5)/REAL(SAMPLE)
-          DO I = 1, NX
-            XOLD = REAL(I-1) - REAL(NX)/2.0
-
-            DO II = 1, SAMPLE
-              XP = XOLD + (REAL(II)-0.5)/REAL(SAMPLE)
-
-*          Find radial bin number
-              KK = INT(SQRT(XP*XP+YP*YP)*REAL(SAMPLE))/SAMPLE+1
-
-*          In valid range?
-	      IF ( (KK.GT.0) .AND. (KK.LE.NRAD) ) THEN
-                COUNT(KK) = COUNT(KK) + 1
-	        POL(KK) = POL(KK) + PSF(I,J)
-              END IF
-
-            END DO
-          END DO
-
-        END DO
-      END DO
-
-*  Adjust polar profile for varying number of counts
-      DO I = 1, NRAD
-        POL(I) = POL(I) / REAL(COUNT(I))
-      END DO
-
-*  Adjust polar profile using user supplied scale profile
-      DO I = 1, MIN( NRAD, PNBIN )
-        POL(I) = POL(I) * PDATA(I)
-      END DO
-
 *  Scale the input psf
       NSUM = 0.0
       DO J = 1, NY
@@ -1273,31 +1209,28 @@
           XOLD = REAL(I-1) - REAL(NX)/2.0
 
 *      Find weighted rescale for this psf pixel
-          LCOUNT = 0
           SCALE = 0.0
           DO JJ = 1, SAMPLE
             YP = YOLD + (REAL(JJ)-0.5)/REAL(SAMPLE)
             DO II = 1, SAMPLE
               XP = XOLD + (REAL(II)-0.5)/REAL(SAMPLE)
 
-*          Find radial bin number
+*          Find radial bin number in perturbation profile
               KK = INT(SQRT(XP*XP+YP*YP)*REAL(SAMPLE))/SAMPLE+1
 
 *          In valid range?
-	      IF ( (KK.GT.0) .AND. (KK.LE.NRAD) ) THEN
-                LCOUNT = LCOUNT + 1
-                SCALE = SCALE + POL(KK)
+	      IF ( (KK.GT.0) .AND. (KK.LE.PNBIN) ) THEN
+                SCALE = SCALE + PDATA(KK)
               END IF
 
             END DO
           END DO
 
-*      Adjust psf value
-          IF ( LCOUNT .GT. 0 ) THEN
-            SCALE = SCALE / REAL(LCOUNT)
-            PSF(I,J) = PSF(I,J) * SCALE
-          END IF
+*      Adjust scale factor for number of samples
+          SCALE = SCALE / (SAMPLE**2)
 
+*      Scale the psf and accumulate new sum
+          PSF(I,J) = PSF(I,J) * SCALE
           NSUM = NSUM + PSF(I,J)
 
         END DO
