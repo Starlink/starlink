@@ -37,29 +37,34 @@ typedef int WcsMapType;
 
 #include "ast.h"
 
-#if !defined( AstXmlChan )
-typedef void AstXmlChan;
-#else
+/* The following definitions are required for backwards compatible
+   Since AST version 2 does not have these.
+*/
+
+
+#if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 1) || AST_MAJOR_VERS >= 4 )
 #define HASXMLCHAN
+#else
+typedef void AstXmlChan;
 #endif
 
-#if !defined( AstPolyMap )
-typedef void AstPolyMap;
-#else
+#if ( AST_MAJOR_VERS >= 3 )
 #define HASPOLYMAP
+#else
+typedef void AstPolyMap;
 #endif
 
-#if !defined( AstGrismMap )
-typedef void AstGrismMap;
-#else
+#if ( AST_MAJOR_VERS >= 3 )
 #define HASGRISMMAP
+#else
+typedef void AstGrismMap;
 #endif
 
-#if !defined( AstShiftMap )
-typedef void AstShiftMap;
-#else
+#if ( AST_MAJOR_VERS >= 3 )
 #define HASSHIFTMAP
-#endif  
+#else
+typedef void AstShiftMap;
+#endif
 
 /* Helper functions */
 #include "arrays.h"
@@ -1378,7 +1383,7 @@ astSimplify( this )
 # the code used for astTran2
 
 void
-astTran( this, xin, forward )
+astTran1( this, xin, forward )
   AstMapping * this
   AV* xin
   bool forward
