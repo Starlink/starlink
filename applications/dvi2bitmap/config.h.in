@@ -50,14 +50,16 @@
 
 /* Specific functions */
 #undef HAVE_POPEN
+#undef HAVE___STRCHRNUL
 /* Define as 1 if the getopt function (and thus, which is more
  * important to us, the getopt globals, optarg, optind, opterr and
  * optopt) is defined by the system.  Define as 0 if they should be
  * defined instead by getopt_long.c
  */
-#undef HAVE_GETOPT
 #undef HAVE_DECL_GETOPT
+#undef HAVE_DECL_GETOPT_LONG
 #undef HAVE_DECL_GETSUBOPT
+#undef HAVE_GETOPT
 #undef HAVE_GETOPT_LONG
 #undef HAVE_GETSUBOPT
 
