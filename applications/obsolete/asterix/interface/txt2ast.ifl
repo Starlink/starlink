@@ -2,7 +2,7 @@ INTERFACE IMPORT
 
  PARAMETER INP
   POSITION 1
-  TYPE     'FILENAME'
+  TYPE     'LITERAL'
   PROMPT   'Name of input text file'
  ENDPARAMETER
 
