@@ -43,7 +43,11 @@ extern node *todo;                                              /* interp.c */
  *
  ******************************************************************************
  */
-char *version = "3.1-9 14/02/2000";
+#ifdef PACKAGE_VERSION
+char *version = "V " PACKAGE_VERSION;
+#else
+char *version = "Version Unknown";
+#endif
 
 /******************************************************************************
  *
