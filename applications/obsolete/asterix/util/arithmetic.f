@@ -66,6 +66,7 @@
 *                        on Solaris (DJA).
 *      1 Mar 94 : V1.7-1 Updated handling of bit quality - now use BIT_
 *                        routines and QUAL__ constants (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -144,7 +145,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
 *    Local data :
 *
       CHARACTER*30            VERSION
-         PARAMETER            (VERSION = 'ARITHMETIC Version 1.7-1')
+         PARAMETER            (VERSION = 'ARITHMETIC Version 1.8-0')
 *-
 
 *    Version id
@@ -158,7 +159,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
       IN2_UERR = .FALSE.
 
 *    Overwrite existing input?
-      CALL PAR_GET0L( 'OVER', OVER, STATUS )
+      CALL USI_GET0L( 'OVER', OVER, STATUS )
 
 *    Associate data objects
       IF ( OVER ) THEN
@@ -177,7 +178,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
 
 *    See if errors wanted for primitive input
       IF ( IN1_PRIM .OR. IN2_PRIM ) THEN
-        CALL PAR_GET0L( 'ERRORS', ERRORS, STATUS )
+        CALL USI_GET0L( 'ERRORS', ERRORS, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -219,7 +220,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
 *    Obtain errors and validate for first object
       IF ( IN1_PRIM ) THEN
         IF ( ERRORS ) THEN
-          CALL DAT_ASSOC( 'ERR1', 'READ', IN1_VLOC, STATUS)
+          CALL USI_DASSOC( 'ERR1', 'READ', IN1_VLOC, STATUS)
           IF ( STATUS .EQ. SAI__OK ) THEN
             CALL DAT_VALID( IN1_VLOC, IN1_VOK, STATUS )
             IN1_UERR = IN1_VOK
@@ -255,7 +256,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
 *    Obtain errors and validate for first second
       IF ( IN2_PRIM ) THEN
         IF ( ERRORS ) THEN
-          CALL DAT_ASSOC( 'ERR2', 'READ', IN2_VLOC, STATUS)
+          CALL USI_DASSOC( 'ERR2', 'READ', IN2_VLOC, STATUS)
           IF ( STATUS .EQ. SAI__OK ) THEN
             CALL DAT_VALID( IN2_VLOC, IN2_VOK, STATUS )
             IN2_UERR = IN2_VOK
@@ -288,7 +289,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Obtain operation type
-      CALL PAR_GET0C( 'OPER', OPER, STATUS )
+      CALL USI_GET0C( 'OPER', OPER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Select mapping mode
