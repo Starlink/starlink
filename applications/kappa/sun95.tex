@@ -11126,8 +11126,12 @@ picture.}
  Creates a 1-d profile through an N-d NDF.}
 \menuitem{PSF}{
  Determines the parameters of a model star profile by fitting star images in a two-dimensional NDF.}
+\menuitem{QUALTOBAD}{
+ Assigns bad values to pixels with given qualities.}
 \menuitem{REGRID}{
  Use an arbitrary mapping to regrid an NDF.}
+\menuitem{REMQUAL}{
+ Remove named qualities stored in an NDF Quality component.}
 \menuitem{RESHAPE}{
  Reshapes an NDF, treating its arrays as vectors.}
 \menuitem{RIFT}{
@@ -11170,6 +11174,8 @@ picture.}
  Sets new values for the variance component of an NDF data structure.}
 \menuitem{SHADOW}{
  Enhances edges in a 2-dimensional NDF using a shadow effect.}
+\menuitem{SHOWQUAL}{
+ Displays the named qualities stored in an NDF Quality component.}
 \menuitem{SLIDE}{
  Shifts pixels in an NDF by a given amount along each axis.}
 \menuitem{SQORST}{
@@ -11585,6 +11591,10 @@ functions as follows.
  Copies an NDF (or NDF section) to a new location.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
+\classitem{QUALTOBAD}
+ Assigns bad values to pixels with given qualities.
+\classitem{REMQUAL}
+ Remove named qualities stored in an NDF Quality component.
 \classitem{SETBAD}
  Sets new bad-pixel flag values for an NDF.
 \classitem{SETBB}
@@ -11597,6 +11607,8 @@ functions as follows.
  Sets a new numeric type for the data and variance components of an NDF.
 \classitem{SETVAR}
  Sets new values for the variance component of an NDF data structure.
+\classitem{SHOWQUAL}
+ Displays the named qualities stored in an NDF Quality component.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -33894,6 +33906,64 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 \end{htmlonly}
 
 \sstroutine{
+   QUALTOBAD
+}{
+   Set selected NDF pixels bad on the basis of Quality
+}{
+   \sstdescription{
+      This routine produces a copy of an input NDF in which selected pixels
+      are set bad. The selection is based on the values in the Quality
+      component of the input NDF; any pixel which holds a set of qualities
+      satisfying the quality expression given for parameter QEXP is set bad
+      in the output NDF. Named qualities can be associated with specified
+      pixels using the SETQUAL task.
+   }
+   \sstusage{
+      qualtobad in out qexp
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         QEXP = LITERAL (Read)
+      }{
+         The quality expression.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF. A null (!) value will cause the input
+         title to be used. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         qualtobad m51$*$ $*$\_clean saturated.or.glitch
+      }{
+         This example copies all NDFs starting with the string {\tt "}m51{\tt "} to
+         a set of corresponding output NDFs. The name of each output
+         NDF is formed by extending the name of the input NDF with the
+         string {\tt "}\_clean{\tt "}. Any pixels which hold either of the qualities
+         {\tt "}saturated{\tt "} or {\tt "}glitch{\tt "} are set to the bad value in the output
+         NDFs.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: REMQUAL, SETQUAL, SHOWQUAL.
+   }
+}
+
+\sstroutine{
    REGRID
 }{
    Applies a geometrical transformation to an NDF
@@ -44955,6 +45025,20 @@ linking command.
 
 \section{\xlabel{se_changes}Release Notes---V1.0\label{se:changes}}
 
+This release is a significant milestone in the history oF KAPPA, marking
+the completion of several conversion processes which have been under way
+for several years. These main changes include:
+
+\begin{itemize}
+\item All application now use the standard Starlink NDF structure for
+storing data. The old IMAGE format is no longer used.
+\item All applications are now ``WCS-aware''.
+\item All graphics are now produced using native PGPLOT.
+\item Graphics applications are no longer restricted to 8-bit displays.
+\item Use of the NDF Quality component has been simplified by the
+addition of four new applications.
+\end{itemize}
+
 \subsection{General Changes}
 \begin{itemize}
 
@@ -45026,12 +45110,22 @@ The following new applications have been added:
       Creates or edits an graphics device colour table. It uses a graphical
       user interface to allow interactive manipulation of the colour
       table in many ways.
+   \item[\htmlref{QUALTOBAD}{QUALTOBAD}] \mbox{}
+      Sets pixels bad in an NDF if they have a given combination of
+      bits set in the Quality component.
    \item [\htmlref{REGRID}{REGRID}] \mbox{}
       Applies an arbitrary geometrical transformation to an NDF. This is a 
       WCS-aware replacement for the old TRANSFORMER command.
+   \item[\htmlref{REMQUAL}{REMQUAL}] \mbox{}
+      Remove names for quality bits in an NDF. The names removed are those
+      stored previously in the NDF using SETQUAL.
    \item[\htmlref{SETQUAL}{SETQUAL}] \mbox{}
       Assigns meaningful names for the quality bits in an NDF and also
       sets the corresponding bit for selected pixels in the NDF.
+   \item[\htmlref{SHOWQUAL}{SHOWQUAL}] \mbox{}
+      Display any named qualities associated with pixels in an NDF. The
+      names displayed are those previously assigned to pixels in the NDF
+      using SETQUAL.
 \end{description}
 
 \subsection{Removed Commands}
@@ -45544,6 +45638,10 @@ functions as follows.
  Copies an NDF (or NDF section) to a new location.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
+\classitem{QUALTOBAD}
+ Assigns bad values to pixels with given qualities.
+\classitem{REMQUAL}
+ Removes named qualities stored in an NDF Quality component.
 \classitem{SETBAD}
  Sets new bad-pixel flag values for an NDF.
 \classitem{SETBB}
@@ -45556,6 +45654,8 @@ functions as follows.
  Sets a new numeric type for the data and variance components of an NDF.
 \classitem{SETVAR}
  Sets new values for the variance component of an NDF data structure.
+\classitem{SHOWQUAL}
+ Displays the named qualities stored in an NDF Quality component.
 \end{description}
 \vspace*{0.7ex}
 %
