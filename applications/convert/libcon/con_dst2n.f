@@ -81,13 +81,15 @@
 *     .OBS.TIME    ->    .MORE.FIGARO.TIME
 *     .OBS.xxxx    ->    .MORE.FIGARO.OBS.xxxx
 *
-*     .FITS.xxxx     ->  .MORE.FITS.xxxx (into value part of the string)
-*     .COMMENTS.xxxx ->  .MORE.FITS.xxxx ( "   comment "   "   "   "   )
-*     .FITS.xxxx.DATA -> .MORE.FITS.xxxx (into value part of the string)
-*     .FITS.xxxx.DESCRIPTION -> .MORE.FITS.xxxx
+*     .FITS.xxxx     ->  .MORE.FITS(n) (into value part of the string)
+*     .COMMENTS.xxxx ->  .MORE.FITS(n) ( "   comment "   "   "   "   )
+*     .FITS.xxxx.DATA -> .MORE.FITS(n) (into value part of the string)
+*     .FITS.xxxx.DESCRIPTION -> .MORE.FITS(n)
+*                                      ( "   comment "   "   "   "   )
+*     .FITS.xxxx.yyyy -> .MORE.FITS(n) (in blank-keyword hierarchical)
 
 *     .MORE.xxxx    ->   .MORE.xxxx
-*                                     ( "   comment "   "   "   "   )
+
 *     .TABLE   ->        .MORE.FIGARO.TABLE
 *     .xxxx    ->        .MORE.FIGARO.xxxx
 
@@ -102,6 +104,12 @@
 *     .X.ERRORS  ->      .AXIS[1].MORE.FIGARO.VARIANCE (after
 *                        processing)
 *     .X.WIDTH   ->      .AXIS[1].MORE.FIGARO.WIDTH
+
+*     -  In addition to creating a blank-keyword NDF FITS-extension
+*     header for each component of a non-standard DST FITS structure
+*     (.FITS.xxxx.yyyy where yyyy is not DATA or DESCRIPTION), this set
+*     of related headers are bracketed by blank lines and a comment
+*     containing the name of the structure (i.e. xxxx).
 
 *  Bad-pixel handling:
 *     The QUALITY array is only copied if the bad-pixel flag
@@ -193,6 +201,11 @@
 *        Allowed for scalar width in DST.  Fixed bug which prevented a
 *        missing axis being created whenever there was no FITS extension
 *        to write.
+*     1996 September 21 (MJC):
+*        Placed the FITS writing code in a separate subroutine, so that
+*        that ING hierarchical keywords may be written when the DST's
+*        FITS structure contains non-standard structures.  Modified the
+*        count of the FITS extension's size accordingly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -232,16 +245,17 @@
                                  ! created
       LOGICAL   AXMFEX(NDSTAX)   ! TRUE if AXIS(1...6).MORE.FIGARO
                                  ! exists
-      CHARACTER AXMOR*80         ! AXIS.MORE name
-      CHARACTER AXMORF*80        ! AXIS.MORE.FIGARO name
-      CHARACTER AXNAME*80        ! Axis structure element name
-      CHARACTER AXOUT*80         ! Name of output axis 
-      CHARACTER AXOUTD*80        ! Name of output axis data array
-      CHARACTER AXOUTV*80        ! Name of output axis variance array
-      CHARACTER AXOUTW*80        ! Name of output axis width array
+      CHARACTER AXMOR * ( 80 )   ! AXIS.MORE name
+      CHARACTER AXMORF * ( 80 )  ! AXIS.MORE.FIGARO name
+      CHARACTER AXNAME * ( 80 )  ! Axis structure element name
+      CHARACTER AXOUT * ( 80 )   ! Name of output axis 
+      CHARACTER AXOUTD * ( 80 )  ! Name of output axis data array
+      CHARACTER AXOUTV * ( 80 )  ! Name of output axis variance array
+      CHARACTER AXOUTW * ( 80 )  ! Name of output axis width array
       BYTE      BARRAY(100)      ! Used to read in BYTE type data items
       INTEGER   CDIMS(7)         ! Dimensions of character objects
-      CHARACTER COMMENT*50       ! FITS item comment
+      CHARACTER COMENT * ( 50 )  ! FITS item comment
+      LOGICAL   COMPRE           ! True if a FITS item has an comment
       INTEGER   CW               ! Length of the output width component
       DOUBLE PRECISION DARRAY(100) ! Used to read in DP type data items
       INTEGER   DIMS(7)          ! Dimensions of output data
@@ -249,21 +263,15 @@
       INTEGER   DSTAT            ! DTA_ routine returned status
       CHARACTER ENVIRN * ( 80 )  ! Environment structure name
       CHARACTER EPATH * ( 80 )   ! The effective path
-      CHARACTER ERROR*64         ! Error description
+      CHARACTER ERROR * ( 64 )   ! Error description
       LOGICAL   ERPRES           ! True if .Z.ERRORS is present
-      LOGICAL   EXIST            ! True if a FITS item has an comment
-      REAL      FARRAY(100)      ! Used to read in FLOAT type data items
       INTEGER   FDIMS(2)         ! Dimensions of FITS extension
-      CHARACTER FITCOM*80        ! Object containing FITS comment
-      CHARACTER FITNAM*90        ! Name of FITS item
+      CHARACTER FITCOM * ( 80 )  ! Object containing FITS comment
+      CHARACTER FITNAM * ( 132 ) ! Name of FITS item
       LOGICAL   FITS             ! True is a FITS structure is found
-      CHARACTER FITSTR*80        ! Contains FITS string
-      CHARACTER FITVAL*72        ! Contains FITS value 
       LOGICAL   FLAGGD           ! True if .Z.DATA contains flagged
                                  ! values
       INTEGER   I                ! Loop variable
-      INTEGER   IARRAY(100)      ! Used to read in INTEGER type data
-                                 ! items
       INTEGER   IAXIS            ! Loop index through axes
       INTEGER   IERR             ! First element to cause numerical
                                  ! errors
@@ -272,12 +280,13 @@
       INTEGER   IKOUNT           ! Counter
       INTEGER   IPOSN            ! Number of object at first level
       INTEGER   IPOSN1           ! Number of object at second level
+      INTEGER   IPOSN2           ! Number of object at third level
       INTEGER   IPTR             ! Pointer to mapped data array
       INTEGER   INQPTR           ! Pointer to output qality array
       INTEGER   K                ! Loop variable
       INTEGER   LENAME           ! Length of name
-      CHARACTER LEVEL1*80        ! Full name of environment at 1st level
-      CHARACTER LEVEL2*80        ! Full name of environment at 2nd level
+      CHARACTER LEVEL1 * ( 80 )  ! Full name of environment at 1st level
+      CHARACTER LEVEL2 * ( 80 )  ! Full name of environment at 2nd level
       INTEGER   MINLEN           ! Minimum length of input FITS string
       LOGICAL   MORE             ! Determine necessity for .MORE
       LOGICAL   MOREFG           ! Determine necessity for .MORE.FIGARO
@@ -285,23 +294,19 @@
                                  ! .MORE.FIGARO.OBS
       LOGICAL   MORFGZ           ! Determine necessity for
                                  ! .MORE.FIGARO.Z
-      CHARACTER MORNAM*80        ! Name of item in .MORE structure
+      CHARACTER MORNAM * ( 80 )  ! Name of item in .MORE structure
       INTEGER   N                ! Loop variable
-      CHARACTER NAME*64          ! Name of data object
-      CHARACTER NAME1*80         ! 1st level object
-      CHARACTER NAME2*80         ! 2nd level object
-      CHARACTER NAMOUT*80        ! Name in output structure
+      CHARACTER NAME * ( 64 )    ! Name of data object
+      CHARACTER NAME1 * ( 80 )   ! 1st level object
+      CHARACTER NAME2 * ( 80 )   ! 2nd level object
+      CHARACTER NAME3 * ( 80 )   ! 3rd level object
+      CHARACTER NAMOUT * ( 132 ) ! Name in output structure
       INTEGER   NAXIS            ! Axis number
       INTEGER   NBYTES           ! No. of BYTES
       INTEGER   NC               ! Number of characters
       INTEGER   NCC              ! Column from where the comment
                                  ! appears in the FITS card image
-      INTEGER   NCI              ! Column in input FITS character value
       INTEGER   NCPC             ! Number of characters in path comp.
-      INTEGER   NCO              ! Column in output FITS character value
-      INTEGER   NCOM             ! Length of FITS comment
-      INTEGER   NCQ              ! Position of a quote in an input FITS
-                                 ! value
       INTEGER   NDATA            ! No. of data values
       CHARACTER NDFNAM * ( 15 )  ! Name of the NDF structure
       CHARACTER NDFPAT * ( 80 )  ! Path to the NDF structure
@@ -314,14 +319,15 @@
                                  ! DTA_NMVAR
       INTEGER   NMSTA1           ! Status from 2nd-level call to
                                  ! DTA_NMVAR
+      INTEGER   NMSTA2           ! Status from FITS-substructure call to
+                                 ! DTA_NMVAR
       INTEGER   NMSTA3           ! Status from call to DTA_NMVAR with
                                  ! .MORE
       INTEGER   NPC              ! Number of characters in output name
-      INTEGER   NSTRT            ! True length of string
       INTEGER   NSTR             ! Effective length of string
       LOGICAL   OBOPEN           ! Flags output file as opened
       LOGICAL   OUOPEN           ! Flags output file as opened
-      CHARACTER OUTNDF*80        ! Name of the NDF including the path in
+      CHARACTER OUTNDF * ( 132 ) ! Name of the NDF including the path in
                                  ! the container file
       INTEGER   OTQPTR           ! Pointer to output quality array
       INTEGER   PATHHI           ! Character column of the end of a
@@ -331,17 +337,15 @@
       LOGICAL   PRIM             ! True if output data array has
                                  ! primitive form (as opposed to simple)
       LOGICAL   QUPRES           ! True if .Z.QUALITY is present
-      INTEGER*2 SARRAY(100)      ! Used to read in SHORT type data items
       REAL      START            ! Start value for creating axes arrays
-      CHARACTER STRING*64        ! Used for units and labels
+      CHARACTER STNAME * ( 16 )  ! Name of a non-standard structure in
+                                 ! the DST's FITS structure
+      CHARACTER STRING * ( 64 )  ! Used for units and labels
       LOGICAL   STRUCT           ! True if item is a structure
-      CHARACTER TYPE*16          ! Data object type
+      CHARACTER TYPE * ( 16 )    ! Data object type
+      LOGICAL   VALFIT           ! True if a FITS item is valid
       REAL      WIDTH            ! Scalar width
 
-*  Internal References:
-      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
-      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
- 
 *.
 
 *   Return immediately on bad status
@@ -522,6 +526,8 @@
                      IF ( DSTAT .EQ. 0 ) THEN
                         MORE = .TRUE.
                         FITS = .TRUE.
+                     ELSE
+                        NMSTA1 = DSTAT
                      END IF
                   END IF
                   DSTAT = 0
@@ -1503,15 +1509,46 @@
 
       IF ( FITS ) THEN
 
-*      Count the number of FITS items, ending when the list of components
-*      has been exhausted.
+*      Count the number of FITS items, ending when the list of
+*      components has been exhausted.  Allow for one level of
+*      substructure within the FITS extension.  A substructure can be
+*      counted if it is a regulation one containing the .DATA (and
+*      .COMMENT) components.  Each non-standard structure will have
+*      cause a heading comment and a blank line preceding it to appear
+*      in the FITS extension, hence these headers are added to the
+*      count.
          NFITS = 0
-            IPOSN1 = 1
+         IPOSN1 = 1
          DO WHILE ( NMSTA1 .EQ. 0 )
             CALL DTA_NMVAR( 'INPUT.FITS', IPOSN1, NAME2, NMSTA1 )
             IPOSN1 = IPOSN1 + 1
             IF ( NMSTA1 .EQ. 0 ) THEN
                NFITS = NFITS + 1
+
+*            Test if the the component is a structure not containing a
+*            .DATA component.
+               FITNAM = 'INPUT.FITS.'//NAME2
+               CALL DTA_STRUC( FITNAM, STRUCT, DSTAT )
+               IF ( STRUCT ) THEN
+                  LENAME = CHR_LEN( FITNAM )
+                  NAME = FITNAM( :LENAME )//'.DATA'
+                  CALL DTA_TYVAR( NAME, TYPE, DSTAT )
+
+*               Non-standard structure.  Count the number of components.
+*               Allow for blank cards before and after the block of
+*               hierarchical keywords.
+                  IF ( DSTAT .NE. 0 ) THEN
+                     NMSTA2 = 0
+                     NFITS = NFITS + 2
+                     IPOSN2 = 1
+                     DO WHILE ( NMSTA2 .EQ. 0 )
+                        CALL DTA_NMVAR( 'INPUT.FITS.'//NAME2, IPOSN2,
+     :                                  NAME3, NMSTA2 )
+                        IPOSN2 = IPOSN2 + 1
+                        IF ( NMSTA2 .EQ. 0 ) NFITS = NFITS + 1
+                     END DO
+                  END IF
+               END IF
             END IF
          END DO
 
@@ -1534,236 +1571,81 @@
             IF ( NMSTA1 .EQ. 0 ) THEN
 
 *            Generate the name of the FITS item.  This can be either a
-*            primitive item, or a structure.  If it is a structure, it
+*            primitive item, or a .  If it is a structure, it
 *            contains the comment as well as the data.  If it is not,
 *            the comment may be in a separate .COMMENTS structure.
                FITNAM = 'INPUT.FITS.'//NAME2
                LENAME = CHR_LEN( FITNAM )
                CALL DTA_STRUC( FITNAM, STRUCT, DSTAT )
-               EXIST = DSTAT .EQ. 0
-               NFITS = NFITS + 1      
-               IF ( EXIST ) THEN
+               COMPRE = DSTAT .EQ. 0
+               VALFIT = .TRUE.
+               IF ( COMPRE ) THEN
                   IF ( STRUCT ) THEN
                      NAME = FITNAM( :LENAME )//'.DATA'
                   ELSE
                      NAME = FITNAM
                   END IF
                   CALL DTA_TYVAR( NAME, TYPE, DSTAT )
-                  EXIST = DSTAT.EQ.0
+                  VALFIT = DSTAT.EQ.0
                END IF
 
-*            Now read the comment associated with the object, if any.
-*            FITS items may be stored with the values in the .FITS
-*            structure and comments in a separate .COMMENTS structure.
-*            Alternatively, both may be in the FITS structure, with the
-*            values in the .FITS.DATA structure and the comments in
-*            .FITS.DESCRIPTION.
-               LENAME = CHR_LEN( FITNAM )
-               IF (STRUCT) THEN
-                  FITCOM = FITNAM( :LENAME )//'.DESCRIPTION'
-               ELSE
-                  FITCOM = 'INPUT.COMMENTS.'//NAME2
-               END IF
-               CALL DTA_RDVARC( FITCOM, 50, COMMENT, DSTAT )
-               IF ( DSTAT .NE. 0 ) COMMENT = ' '
+*            Process standard structures within the FITS structure.
+               IF ( VALFIT ) THEN
 
-*            Initialise the FITS value as part of it may only be
-*            overwritten otherwise.
-               FITVAL = ' '
-
-*            Read the FITS item value. Each type possibility must be
-*            catered for separately. The item value is then converted
-*            into a character string.  Note that numeric and logical
-*            types are right justified to 20 characters.  Character
-*            values may be longer, and are left justified.
-               NDATA = 1
-               IF ( TYPE .EQ. 'BYTE' ) THEN    
-                  CALL DTA_RDVARB( NAME, NDATA, BARRAY, DSTAT )
-                  IF ( DSTAT .NE. 0 ) GOTO 450
-                  IARRAY( 1 ) = NUM_BTOI( BARRAY( 1 ) )
-                  CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
-
-               ELSE IF ( TYPE .EQ. 'CHAR' ) THEN    
-                  CALL DTA_RDVARC( NAME, FDIMS( 1 ), FITVAL, DSTAT )
-                  IF ( DSTAT .NE. 0 ) GOTO 450
-
-               ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN    
-                  CALL DTA_RDVARD( NAME, NDATA, DARRAY, DSTAT )
-                  IF ( DSTAT .NE. 0 ) GOTO 450
-                  CALL CHR_DTOC( DARRAY( 1 ), FITVAL( :20 ), NC )
-
-               ELSE IF ( TYPE .EQ. 'FLOAT' ) THEN    
-                  CALL DTA_RDVARF( NAME, NDATA, FARRAY, DSTAT )
-                  IF ( DSTAT .NE. 0 ) GOTO 450
-                  CALL CHR_RTOC( FARRAY( 1 ), FITVAL( :20 ), NC )
-
-               ELSE IF ( TYPE .EQ. 'INT' ) THEN    
-                  CALL DTA_RDVARI( NAME, NDATA, IARRAY, DSTAT )
-                  IF ( DSTAT .NE. 0 ) GOTO 450
-                  CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
-
-               ELSE IF ( TYPE .EQ. 'SHORT' ) THEN    
-                  CALL DTA_RDVARS( NAME, NDATA, SARRAY, DSTAT )
-                  IF ( DSTAT .NE. 0 ) GOTO 450
-                  IARRAY( 1 ) = NUM_WTOI( SARRAY( 1 ) )
-                  CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
-               END IF
-
-*            Initialise the FITS card-image character string.
-               FITSTR = ' '
-
-*            Format the FITS character string or "card image".  It is
-*            composed of the following items.
-*              o  A keyword occupies the first eight columns.
-*              o  An equals sign and a following blank go into spaces 8
-*                 and 9.
-*              o  The remaining spaces up to space 31 are used for the
-*                 value of the FITS item.  Hence the length of FITVAL is
-*                 20 (it used to be variable STRING*64), except for
-*                 character strings which may fill the card.
-*                 -  Character type items are left justified and other
-*                    types are right justified.
-*                 -  Character items are enclosed in quotes and must be
-*                    at least 8 characters long.  Given the comments,
-*                    it is limited to 18 characters.
-*              o  The comment delimiter is in column 32, and comments start
-*                 at column 34.
-*              o  Columns 31 and 33 are spaces.
-
-*            Find the lengths of the value and keyword.
-               NSTRT = CHR_LEN( FITVAL )
-               NSTR = NSTRT
-               NF = CHR_LEN( NAME2 )
-
-*            Start to build the FITS card image.
-               FITSTR( 1:NF ) = NAME2( 1:NF )
-               FITSTR( 9:10 ) = '= '
-
-*            Insert the value strings.
-               IF ( TYPE .EQ. 'CHAR' ) THEN
-
-*               Constrain the length of the character value.
-                  NSTR = MIN( 68, MAX( 8, NSTR ) )
-
-*               Insert the leading quote, the value, and then the
-*               trailing quote.
-                  FITSTR( 11:11 ) = ''''
-
-*               The valued can be extracted verbatim when it does not
-*               contain any quotes.  If it does include quotes these
-*               must be doubled in the FITS character value.  So first
-*               look for a quote.
-                  NCQ = INDEX( FITVAL, '''' )
-                  IF ( NCQ .EQ. 0 ) THEN
-                     FITSTR( 12:11 + NSTR ) = FITVAL( 1:NSTR )
-
-*                  Insert the trailing quote.
-                     FITSTR( NSTR+12:NSTR+12 ) = ''''
-
-*               Search for the quotes, and form the FITS value string
-*               piecemeal, adding an extra quote and appending the text
-*               between the quotes.
+*               Now read the comment associated with the object, if
+*               any.  FITS items may be stored with the values in the
+*               .FITS structure and comments in a separate .COMMENTS
+*               structure.  Alternatively, both may be in the FITS
+*               structure, with the values in the .FITS.DATA structure
+*               and the comments in .FITS.DESCRIPTION.
+                  LENAME = CHR_LEN( FITNAM )
+                  IF ( STRUCT ) THEN
+                     FITCOM = FITNAM( :LENAME )//'.DESCRIPTION'
                   ELSE
-
-*                  Start the search at the first column of the input
-*                  value, but in column 12 of the FITS card image.
-                     NCI = 1
-                     NCO = 12
-                     MINLEN = 8
-
-*               Loop until there are no more quotes in the string.
-                     DO WHILE ( NCQ .NE. 0 )
-
-*                  Extract the portion of the value up to and including
-*                  the quote.
-                        FITSTR( NCO:NCO + NCQ - 1 ) =
-     :                          FITVAL( NCI:NCI + NCQ - 1 )
-
-*                     Move the counters to the character after the
-*                     quote.
-                        NCO = NCO + NCQ
-                        NCI = NCI + NCQ
-
-*                     Add the extra quote to the FITS value and moving
-*                     the character counter along.
-                        FITSTR( NCO:NCO ) = ''''
-                        NCO = NCO + 1
-
-*                     Look for the next quote.
-                        NCQ = INDEX( FITVAL( NCI: ), '''' )
-
-*                     We do not want trailing blanks when the original
-*                     value had less than eight characters.  So
-*                     decrement the effective length of the value so we
-*                     have replaced trailing blanks with second quotes.
-                        IF ( NSTRT .LT. MINLEN ) THEN
-                           NSTR = NSTR - 1
-                           MINLEN = MINLEN - 1
-                        END IF
-                     END DO
-
-*                  Append the remainder of the text that follows the
-*                  last quote.  Increment the character counter.
-                     FITSTR( NCO:NCO + NSTR - NCI ) = FITVAL( NCI: )
-                     NCO = NCO + NSTR - NCI + 1
-
-*                  Insert the trailing quote.
-                     FITSTR( NCO:NCO ) = ''''
-
-*                  Revise the length, which will be used to specify the
-*                  location of the comment field.
-                     NSTR = NCO - 12
+                     FITCOM = 'INPUT.COMMENTS.'//NAME2
                   END IF
+                  CALL DTA_RDVARC( FITCOM, 50, COMENT, DSTAT )
+                  IF ( DSTAT .NE. 0 ) COMENT = ' '
+
+*               Create the header in the NDF's FITS extension.  The
+*               current header number is incremented by this routine.
+                  CALL CON_D2NFT( NAME, NAME2, TYPE, COMENT, OUTNDF,
+     :                            NPC, .FALSE., ' ', NFITS, STATUS )
 
                ELSE
 
-*               Insert the non-character value, right justified.
-                  FITSTR( 31-NSTR:30 ) = FITVAL( 1:NSTR )
+*               Loop through the non-standard substructure.  Set the
+*               initial structure name so that for the first item
+*               a blank header and a comment containing the structure
+*               name is written.
+                  NMSTA2 = 0
+                  IPOSN2 = 1
+                  STNAME = NAME2
+                  DO WHILE ( NMSTA2 .EQ. 0 )
 
-*               By definition the length of the value must be 20.
-                  NSTR = 20
-               END IF                
+*                  Obtain the component's name and type.
+                     CALL DTA_NMVAR( FITNAM, IPOSN2, NAME3, NMSTA2 )
+                     IF ( NMSTA2 .EQ. 0 ) THEN
+                        NAME = FITNAM( :LENAME )//'.'//NAME3
+                        CALL DTA_TYVAR( NAME, TYPE, DSTAT )
 
-*            The backslash to separate the item value from the comment
-*            and a following blank are inserted after the value if
-*            there is room. It must have capacity to write at least
-*            four characters of comment plus 3 for the comment
-*            delimiter and the spaces bracketing it.
-               IF ( NSTR .LE. 61 ) THEN
+*                  Write the FITS header to the NDF's FITS extension.
+                        CALL CON_D2NFT( NAME, NAME3, TYPE, ' ', OUTNDF,
+     :                                  NPC, .TRUE., STNAME, NFITS,
+     :                                  STATUS )
+                        STNAME = ' '
+                        IPOSN2 = IPOSN2 + 1
 
-*               For numeric data the delimiter will occur in column 32.
-                  IF ( TYPE .NE. 'CHAR' ) THEN
-                     NCC = 32
+*                  Write the trailing blank line.
+                     ELSE
+                        CALL CON_D2NFT( NAME, ' ', ' ', ' ', OUTNDF,
+     :                                  NPC, .TRUE., ' ', NFITS,
+     :                                  STATUS )
+ 
+                     END IF
+                  END DO
 
-*               The furthest left the delimiter can go is column 32,
-*               and therefore the comment must come after column 33.
-                  ELSE
-                     NCC = MAX( 32, NSTR + 14 )
-                  END IF
-
-*               Write the delimiter to the card image.
-                  FITSTR( NCC:NCC+1 ) = '/ '
-
-*               The comment itself is copied into the remaining space,
-*               provided there is a comment.
-                  NCOM = CHR_LEN( COMMENT )
-                  IF ( NCOM .GT. 0 ) THEN
-                     NCOM = MAX( CHR_LEN( COMMENT ), 79 - NCC )
-                     FITSTR( NCC + 2:NCC + 1 + NCOM ) =
-     :                 COMMENT( 1:NCOM )
-                  END IF
                END IF
-
-*            Obtain the name of the FITS extension.  (Why is this in
-*            the loop?---MJC.)
-               FDIMS( 1 ) = 1
-               FDIMS( 2 ) = NFITS
-               CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2,
-     :                         FDIMS, NAMOUT, DSTAT )
-
-*            Write the FITS card image to the FITS extension.
-               CALL DTA_WRVARC( NAMOUT, 80, FITSTR, DSTAT )
-               IF ( DSTAT .NE. 0 ) GOTO 500
             END IF
          END DO
       END IF
@@ -1846,11 +1728,6 @@
       END IF
       CALL ERR_REP( 'DST2NDF_CP1',
      :  'DST2NDF: Error copying ^LEVEL.', STATUS )
-      GOTO 500
-  450 CONTINUE
-      STATUS = DSTAT
-      CALL ERR_REP( 'DST2NDF_READER',
-     :  'DST2NDF: Error reading '//NAME//'.', STATUS )
   500 CONTINUE
 
 *   Close down everything.
