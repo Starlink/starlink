@@ -79,6 +79,20 @@ $AUTOASTROM_DIR/autoastrom \
     >${PREFIX}testndf4.STDOUT \
     2>${PREFIX}testndf4.STDERR
 
+# testnodate.sdf is testndf1.sdf but with all date and time information removed
+# from the FITS headers -- can we cope?
+
+$AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --xxxccdcat=testndf1.ccdcat.munged \
+    --xxxndfinfo=dim1=2048,dim2=4097 \
+    --defects \
+    --noinsert \
+    --keepfits=${PREFIX}testnodate.final-fits.fits \
+    --nokeeptemps \
+    testnodate.sdf \
+    >${PREFIX}testnodate.STDOUT \
+    2>${PREFIX}testnodate.STDERR
 
 
 # Dump results to stdout, removing version string
@@ -110,6 +124,13 @@ if test -f ${PREFIX}testndf4.final-fits.fits; then
     ./fitsdump ${PREFIX}testndf4.final-fits.fits
 else
     echo "Can't find file ${PREFIX}testndf4.final-fits.fits"
+fi
+echo "=== Test 5 ==="
+egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testnodate.STDOUT
+if test -f ${PREFIX}testnodate.final-fits.fits; then
+    ./fitsdump ${PREFIX}testnodate.final-fits.fits
+else
+    echo "Can't find file ${PREFIX}testnodate.final-fits.fits"
 fi
 
 rm -f ${PREFIX}*

@@ -51,6 +51,7 @@ for this image in t9 is a complete guess.
 
 
 
+--------------------
 testndf1 created the same way, but from file r106282xx.sdf:
 
 goedel:playpen> ndftrace r106282xx
@@ -89,3 +90,38 @@ goedel:playpen> ndftrace r106282xx
       FITS             <_CHAR*80>
 
 
+--------------------
+testnodate is a copy of testndf1, with the FITS headers extracted with
+'fitslist testnodate logfile=testnodate.fitscontent', all the date
+information removed: 
+
+
+ptolemy:t> diff -C2 testndf1.fitscontent testnodate.fitscontent
+*** testndf1.fitscontent        Wed Apr 16 11:33:11 2003
+--- testnodate.fitscontent      Wed Apr 16 14:56:14 2003
+***************
+*** 35,46 ****
+  RA      = '17:27:10.94'        / RA  (261.7955934398498200 degrees)
+  DEC     = '74:31:58.00'        / DEC ( 74.5327767760827700 degrees)
+- EQUINOX =               2000.0 / Epoch of reference equinox
+  XAPNOM  =        -0.0697222242 / nominal aperture in x (-251.00 arcsec)
+  YAPNOM  =         0.0905555552 / nominal aperture in y (326.00 arcsec)
+  XAPOFF  =        -0.0697222242 / total aperture offset in x (-251.00 arcsec)
+  YAPOFF  =         0.0905555552 / total aperture offset in y (326.00 arcsec)
+! JD      =      2450985.6172054 / Julian Date of midtime of observation
+! STSTART = ' 19:26:08.7'        / Local sidereal time at start of observation
+! ST      = '19:26:08.70'        / Local sidereal time at start of observation
+  AZIMUTH =           349.123111 / Mean azimuth of observation (degrees)
+  ZD      =            48.512724 / Mean zenith-distance of observation (degrees)
+--- 35,43 ----
+  RA      = '17:27:10.94'        / RA  (261.7955934398498200 degrees)
+  DEC     = '74:31:58.00'        / DEC ( 74.5327767760827700 degrees)
+  XAPNOM  =        -0.0697222242 / nominal aperture in x (-251.00 arcsec)
+  YAPNOM  =         0.0905555552 / nominal aperture in y (326.00 arcsec)
+  XAPOFF  =        -0.0697222242 / total aperture offset in x (-251.00 arcsec)
+  YAPOFF  =         0.0905555552 / total aperture offset in y (326.00 arcsec)
+! DATEXOBS= '1998-06-21T02:41:00' /  NOT a kwd, but this is the obs date
+  AZIMUTH =           349.123111 / Mean azimuth of observation (degrees)
+  ZD      =            48.512724 / Mean zenith-distance of observation (degrees)
+
+...and the result reinserted into testnodate.sdf with fitstext.
