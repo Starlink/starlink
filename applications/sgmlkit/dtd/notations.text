@@ -1,0 +1,57 @@
+<!-- $Id$ -->
+<!--========== Notations ==========
+
+  The notation declarations are broken off into this separate file, with
+  the FOSI PUBLIC "-//Starlink//DTD Notation Declarations//EN".  See
+  the main DTD for discussion.
+
+  TeX and LaTeX notations defined using the ISBN prefix, as defined in
+  ISO/IEC 9070:1991, `Information Technology - SGML support facilities
+  - Registration procedures for public text owner identifiers'
+
+  JPEG notation from the recommendations in ISO/IEC JTC1/WG4 N1958:
+  `Information Processing - Text and office systems - Using SGML
+  Public Identifiers for Specifying Data Notations'.  GIF, EPS and
+  linespecific notations from DocBook's dbnotn.mod module.
+
+  The latexmaths notation is specifically LaTeX maths, nothing else.
+  The latexgraphics notation is intended to be for verbatim LaTeX
+  including, but not limited to, a \begin{picture}...\end{picture}
+  environment, and including in principle any of the `portable'
+  graphics mechanisms described in Chapter 10 of the LaTeX Companion.
+  This is obviously abusable, but there should be the sternest rants
+  in the documentation against taking advantage of this to get up to
+  mucky hacks (you'll grow hairs on the backs of your hands, you know).
+-->
+<!notation texmaths   public 
+  "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
+<!notation latexmaths public 
+  "+//ISBN 0-201-52983//NOTATION LaTeX: A document preparation system//EN">
+<!notation latexgraphics public
+  "+//ISBN 0-201-54199//NOTATION The LaTeX Companion, ch. 10//EN">
+<!notation metapost public
+  "+//IDN cm.bell-labs.com/who/hobby/MetaPost.html//NOTATION MetaPost//EN">
+<!NOTATION JPEG     PUBLIC 
+  "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of
+    Continuous-tone Still Images (JPEG)//EN">
+<!NOTATION EPS      PUBLIC
+  "+//ISBN 0-201-18127-4::Adobe//NOTATION PostScript Language Ref. Manual//EN">
+<!NOTATION GIF89a   PUBLIC
+  "-//CompuServe//NOTATION Graphics Interchange Format 89a//EN">
+<!notation linespecific system
+  "line ends and leading white space must be preserved in output">
+
+<!entity % text.figure.notations 'linespecific | latexgraphics | metapost'
+	-- Figure notations which use only SGML characters (terminology? see
+	   8879, 9.2), which can therefore be included directly within
+	   figurecontent element -->
+
+<!attlist #notation latexgraphics
+	package		-- LaTeX packages required for this to be processed --
+		cdata
+		#implied
+	>
+
+<!-- Define this parameter entity so we can avoid reading this a 
+     second time -->
+<!entity % notations-read "IGNORE">
