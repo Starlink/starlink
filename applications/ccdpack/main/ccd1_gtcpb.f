@@ -31,7 +31,7 @@
 *     IMETH = INTEGER (Returned)
 *        An integer representing the method chosen.
 *        2  = MEAN
-*        3  = MEDIAN
+*        3  = WEIGHTED MEDIAN
 *        4  = TRIMMED MEAN
 *        5  = MODE
 *        6  = SIGMA CLIPPED MEAN
@@ -39,6 +39,7 @@
 *        8  = MINMAX MEAN
 *        9  = BROADENED MEDIAN
 *        10 = SIGMA CLIPPED MEDIAN
+*        11 = FAST MEDIAN
 *     CMODE = CHARACTER * ( * ) (Returned)
 *        The method chosen represented as a string.
 *     NITER = INTEGER (Returned)
@@ -100,8 +101,8 @@
 
 *  Find out the combination mode. Use median as the default
       CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN ,MEAN ,TRIMMED ,MODE ,'//
-     :            ' SIGMA ,THRESHOLD ,MINMAX ,BROADENED, CLIPMED', 
-     :            .FALSE., CMODE, STATUS )
+     :                ' SIGMA ,THRESHOLD ,MINMAX ,BROADENED ,'//
+     :                'CLIPMED ,FASTMED', .FALSE., CMODE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Act on the return, set the IMETH value
@@ -123,6 +124,8 @@
          IMETH = 9
       ELSE IF ( CMODE .EQ. 'CLIPMED' ) THEN
          IMETH = 10
+      ELSE IF ( CMODE .EQ. 'FASTMED' ) THEN
+         IMETH = 11
       ELSE
 
 *  Bad return set status and exit.
