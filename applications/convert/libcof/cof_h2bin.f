@@ -89,6 +89,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'DAT_ERR'          ! Data-system error constants
       INCLUDE 'PRM_PAR'          ! Primitive-data constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Arguments Given:
       CHARACTER * ( * ) LOC
@@ -176,7 +177,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *.
 

@@ -220,6 +220,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Arguments Given:
       INTEGER NDF
@@ -313,7 +314,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 

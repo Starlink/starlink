@@ -105,6 +105,7 @@
       INCLUDE 'SAE_PAR'           ! Standard SAE constants
       INCLUDE 'NDF_PAR'           ! NDF_ public constants
       INCLUDE 'PRM_PAR'           ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'           ! CNF functions
 
 *  Arguments Given:
       INTEGER   NDF               ! NDF identifier
@@ -184,7 +185,6 @@
 *  Declare and define the NUM_ type conversion functions.
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
-      INCLUDE 'CNF_PAR'
 *.
 
 *  Check the inherited global status.
