@@ -470,27 +470,33 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
     int nexpr = 0;
     char** exprList = NULL;
 
-    // this loop executes only once and is used for error handling/cleanup via "break"
+    //  This loop executes only once and is used for error
+    //  handling/cleanup via "break".
     int once = 1;
     while (once-- > 0) {
-	// check that plot columns are valid and also save the column indexes
-	// for accessing row values as variables later
-	if ((status = Tcl_SplitList(interp_, (char*)cols, &numCols, &colNames)) != TCL_OK)
-	    break;
+        //  Check that plot columns are valid and also save the column
+        //  indexes for accessing row values as variables later.
+        if ((status = Tcl_SplitList(interp_, (char*)cols,
+                                    &numCols, &colNames)) != TCL_OK) {
+            break;
+        }
 	colIndexes = new int[numCols];
 	for (int i = 0; i < numCols; i++) {
-	    if ((colIndexes[i] = r.colIndex(colNames[i])) < 0) {
-		status = error("invalid plot column: ", colNames[i]);
+	    if ( (colIndexes[i] = r.colIndex(colNames[i])) < 0 ) {
+		status = error("unrecognised column in plot expression: ", colNames[i]);
 		break;
 	    }
 	}
+        if ( status != TCL_OK ) {
+          break;
+        }
 
-	// parse symbol info, a variable length list of
-	// {shape color ratio angle label cond}
+	//  Parse symbol info, a variable length list of
+	//  {shape color ratio angle label cond}
 	if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
 	    break;
 
-	// default values
+	//  Default values
 	char* shape = "";
 	char* fg = "white"; // if no color is specified, use 2: b&w
 	char* bg = "black";
