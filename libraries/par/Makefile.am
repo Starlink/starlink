@@ -3,7 +3,7 @@
 bin_SCRIPTS = par_link_adam
 
 lib_LTLIBRARIES = libpar_adam.la
-libpar_adam_la_SOURCES = $(F_ROUTINES)
+libpar_adam_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
@@ -39,6 +39,8 @@ F_ROUTINES = \
          par_putvc.f par_putvd.f par_putvi.f par_putvl.f par_putvr.f \
          par_state.f \
          par_unset.f
+
+C_ROUTINES = par.c
 
 PUBLIC_INCLUDES = \
 	PAR_ERR \
