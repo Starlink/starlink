@@ -8,11 +8,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.4}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {13th December 2003}
+\newcommand{\stardocdate}      {7th February 2004}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within\\
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 2.5}
+\newcommand{\stardocversion}   {Version 2.6}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
@@ -525,6 +525,12 @@ GKS version of the PGPLOT graphics library. If you wish to link with the
 This will include native PGPLOT in the link list, and cause all GKS and IDI 
 related items to be removed.
 
+
+\section{Changes in Version 2.6}
+\begin{itemize}
+\item The GRF mdoule (grf\_kaplibs.c) has been upgraded to include the
+extra functions needed by AST V3.2.
+\end{itemize}
 
 \section{Changes in Version 2.5}
 \begin{itemize}

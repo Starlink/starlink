@@ -61,6 +61,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_ERR'          ! AST error constants 
 
 *  Arguments Given:
       INTEGER IPLOT
@@ -160,10 +161,12 @@
             BOX = AST_BORDER( IPLOT, STATUS )
          END IF
 
-         IF( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'KPG1_ASGRD_ERR1', 'Use WCSFRAME to change '//
-     :                    'the current co-ordinate Frame in the data,'//
-     :                    ' and try again.', STATUS )
+         IF( STATUS .EQ. AST__VSMAL ) THEN
+            CALL ERR_REP( 'KPG1_ASGRD_ERR1', 'This problem may '//
+     :         'possibly be overcome by using WCSFRAME to change '//
+     :         'the current WCS co-ordinate Frame in the data, or by '//
+     :         ' changing the program parameter values being used.', 
+     :         STATUS )
          END IF 
          CALL PGEBUF
       END IF
