@@ -26,9 +26,8 @@ dnl    automake to assume it's allowed to play there, too.
 )
 
 dnl    Find required versions of the programs we need for configuration
-AC_PROG_CC
-AC_PROG_FC
 AC_PROG_LIBTOOL
+AC_SET_MAKE
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
