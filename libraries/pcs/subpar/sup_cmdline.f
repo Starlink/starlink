@@ -2,20 +2,20 @@
 *+
 *  Name:
 *     SUBPAR_CMDLINE
- 
+
 *  Purpose:
 *     parse command line.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL SUBPAR_CMDLINE(ACTCODE,CONTEXT,CMDLINE,STATUS)
- 
+
 *  Description:
 *     Parse an ADAM command line and enter the parameter values
 *     into the parameter system
- 
+
 *  Arguments:
 *     ACTCODE = INTEGER (given)
 *        Name code for action being obeyed
@@ -24,7 +24,7 @@
 *     CMDLINE = CHARACTER*(*) (given)
 *        The command line to be parsed
 *     STATUS = INTEGER
- 
+
 *  Algorithm:
 *     A list of parameter namecodes is constructed based on the needs list
 *     or the program section of the parameter storage.
@@ -35,12 +35,13 @@
 *     how the value of the corresponding parameter is to be set.
 *     If a start array ([) is found, SUBPAR_ARRAY is used to parse the array
 *     and set the parameter value.
- 
+
 *  Authors:
 *     JAB: J A  Bailey  (AAO)
 *     AJC: A J Chipperfield (STARLINK)
 *     TJF: T J Farrell (AAO)
- 
+*     PWD: P W Draper (STARLINK)
+
 *  History:
 *     08-JAN-1987 (JAB):
 *        Original version
@@ -148,7 +149,7 @@
 *        Use SUBPAR_STORE0 to store primitve scalar values
 *     14-JAN-1999 (AJC):
 *        Prevent KEYWORDS allowing last positional parameter being
-*        overwritten if too many positional params given. 
+*        overwritten if too many positional params given.
 *     18-MAY-1999 (AJC):
 *        Remove unused variables
 *      1-JUL-1999 (AJC):
@@ -159,16 +160,19 @@
 *     20-DEC-2001 (AJC):
 *        Set PARSET on setting INTERNAL param with primitive value
 *         (thus causing NEXTPAR increment)
+*     30-SEP-2004 (PWD):
+*        Stop USTRING being indexed by greater than SUBPAR__NAMELEN.
+*        It is often indexed by SLEN, which can be up to MCLENGTH.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -177,28 +181,28 @@
       INCLUDE 'ADAM_DEFNS'
       INCLUDE 'LEX_ERR'
       INCLUDE 'LEX_PAR'
- 
+
 *  Arguments Given:
       INTEGER ACTCODE
       INTEGER CONTEXT
       CHARACTER*(*) CMDLINE
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'
- 
+
 *  External routines :
       INTEGER CHR_LEN            ! Used length of string
- 
+
 *  Local Constants:
       INTEGER MCLENGTH           ! maximum length of command line
       PARAMETER (MCLENGTH=444)
       INTEGER MAXPARS            ! maximum number of command line parame
       PARAMETER (MAXPARS=50)
       CHARACTER*15 POSTYPES(5)   ! Possible primitive data types
- 
+
 *  Local Variables:
       CHARACTER*(MCLENGTH+2) COMMAND  ! Command line with spaceCR added
       INTEGER ENDLINE             ! Position of end of command line
@@ -206,6 +210,7 @@
       INTEGER NUMPARS             ! Number of parameters
       CHARACTER*(MCLENGTH) STRING ! Parameter string from parser
       INTEGER SLEN                ! length of above
+      INTEGER ISLEN               ! SLEN index into USTRING.
       CHARACTER*(SUBPAR__NAMELEN) USTRING  ! upper case STRING
       INTEGER NAMECODE(MAXPARS)   ! Namecodes of parameters for each pos
       INTEGER I, J                ! Loop counters
@@ -221,26 +226,26 @@
       LOGICAL LVALUE              ! Conversion of logical constant
       LOGICAL NONEEDS             ! True if there is a NEEDS list
       LOGICAL SPECIAL             ! Special keywor flag for FFINDKEY
- 
+
 *  Local Data:
-      DATA POSTYPES/'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER', 
+      DATA POSTYPES/'_CHAR*', '_REAL', '_DOUBLE', '_INTEGER',
      :     '_LOGICAL'/
 *.
- 
+
       IF ( STATUS.NE.SAI__OK ) RETURN
- 
+
 *  Set error context
       CALL EMS_MARK
- 
+
 *  Find length of command line (+2 for termination)
       ENDLINE = MIN(MCLENGTH, CHR_LEN(CMDLINE)) + 2
- 
+
 *  If there is anything on the command line, process it
       IF ( ENDLINE.GT.2 ) THEN
- 
+
 *     Add a CR at end of command line
          COMMAND = CMDLINE(1:ENDLINE-2)//' '//CHAR(13)
- 
+
 *  Fill the array of parameter namecodes - If the context is CANCEL
 *  then the positions are based on the CANCEL needs list for the action
 *  Otherwise they are taken from the OBEY needs list if present. If
@@ -248,7 +253,7 @@
 *  interface file.
 *  NAMECODE(1) contains the parameter namecode for the parameter allocated
 *  position 1 etc.
- 
+
 *     Ensure NONEEDS is true unless set false.
          NONEEDS = .TRUE.
 
@@ -270,16 +275,16 @@
 *              Maximum number of positional parameters exceeded
                   STATUS = SUBPAR__XMXPOS
                   CALL EMS_SETI('MAXPARS', MAXPARS)
-                  CALL EMS_REP('SUP_CMDLINE1', 
+                  CALL EMS_REP('SUP_CMDLINE1',
      :             'SUBPAR: Maximum number (^MAXPARS) of positional '
      :             //'parameters exceeded', STATUS)
                END IF
- 
+
             END IF
- 
+
          ELSE IF ( CONTEXT.EQ.OBEY ) THEN
             IF ( NEEDOB(1,ACTCODE).LE.0 ) THEN
- 
+
 *           Parameter positions from program section of parameter store
                I = 0
                NUMPARS = 0
@@ -292,18 +297,18 @@
 *                    and copy PARPOS to NAMECODE even if zero (to overwrite
 *                    any previously set values).
                      NAMECODE(I) = PARPOS(J)
- 
+
                   ELSE IF ( PARPOS(J).NE.0 ) THEN
 *                 We are outside NAMECODE and need to allocate another
 *                 position. This is an error.
                      STATUS = SUBPAR__XMXPOS
                      CALL EMS_SETI('MAXPARS', MAXPARS)
-                     CALL EMS_REP('SUP_CMDLINE2', 
+                     CALL EMS_REP('SUP_CMDLINE2',
      :               'SUBPAR: Maximum number (^MAXPARS) of ' //
      :               'positional parameters exceeded', STATUS)
                   END IF
                END DO
- 
+
 *   Parameter positions are in OBEY NEEDS list
 *   Check there are not too many
             ELSE IF ( (NEEDOB(2,ACTCODE)-NEEDOB(1,ACTCODE)+1)
@@ -319,12 +324,12 @@
             ELSE
                STATUS = SUBPAR__XMXPOS
                CALL EMS_SETI('MAXPARS', MAXPARS)
-               CALL EMS_REP('SUP_CMDLINE3', 
+               CALL EMS_REP('SUP_CMDLINE3',
      :          'SUBPAR: Maximum number (^MAXPARS) of positional ' //
      :          'parameters exceeded', STATUS)
             END IF
          END IF
- 
+
 *  Initialise pointers and flags
          IF ( NUMPARS.GT.0 ) THEN
             NEXTPAR = NAMECODE(1)
@@ -333,13 +338,13 @@
          END IF
          NEXTINDEX = 2
          PARSET = .FALSE.
- 
+
 *  Initiate parse
- 
-         CALL LEX_CMDLINE(.TRUE., COMMAND(1:ENDLINE), ACTION, STRING, 
+
+         CALL LEX_CMDLINE(.TRUE., COMMAND(1:ENDLINE), ACTION, STRING,
      :                    SLEN, STATUS)
          DO WHILE ((STATUS.EQ.SAI__OK) .AND. (ACTION.LT.LEX__ELINE))
- 
+
 *  First deal with the ambiguous action codes
 *        Get upper case copy of STRING if we need to test for Keywords etc.
             IF ( ( ACTION .EQ. LEX__KAMBIG )
@@ -353,27 +358,29 @@
             END IF
 
             IF ( ACTION.EQ.LEX__KAMBIG ) THEN
- 
+
 *           Special or Logical Keyword, String, Name or Logical Constant
 *           See if it is one of the LOGICAL keywords
                 SPECIAL = .TRUE.
                 KEYSTART = 1
-                CALL SUBPAR_FINDKEY( USTRING(KEYSTART:SLEN), SPECIAL,
-     :                                .TRUE., KEYCODE, STATUS)
- 
+                ISLEN = MIN( SLEN, SUBPAR__NAMELEN )
+                CALL SUBPAR_FINDKEY(USTRING(KEYSTART:ISLEN),
+     :                              SPECIAL, .TRUE., KEYCODE, STATUS)
+
                 IF ( STATUS .NE. SAI__OK ) THEN
 *             Wasn't a keyword - check for NOkeyword
-                    IF ( (SLEN.GE.3) 
+                    IF ( (SLEN.GE.3)
      :              .AND. (USTRING(1:2).EQ.'NO') ) THEN
                        CALL EMS_ANNUL( STATUS )
                        KEYSTART = 3
 *                  It can't be a special keyword
                        SPECIAL = .FALSE.
 *                  See if remainder is a LOGICAL keyword
-                       CALL SUBPAR_FINDKEY( USTRING(KEYSTART:SLEN), 
-     :                             SPECIAL, .TRUE., KEYCODE, STATUS)
+                       CALL SUBPAR_FINDKEY(USTRING(KEYSTART:ISLEN),
+     :                                     SPECIAL, .TRUE., KEYCODE,
+     :                                     STATUS)
                     END IF
- 
+
                 END IF
 
 *              If failed to find keyword
@@ -381,25 +388,25 @@
 *                 Must be String, Name, MIN/MAX or Logical constant
                      CALL EMS_ANNUL(STATUS)
                      ACTION = LEX__AMBIG
- 
+
 *              Check for the special keywords
                   ELSE IF ( KEYCODE .LT. 0 ) THEN
                      IF ( KEYCODE .EQ. -1 ) THEN
                         CALL SUBPAR_ACCPT(STATUS)
                         ACTION = 0
-                   
+
                      ELSE IF ( KEYCODE .EQ. -2 ) THEN
                         CALL SUBPAR_FPROMPT(STATUS)
                         ACTION = 0
- 
+
                      ELSE IF ( KEYCODE .EQ. -3 ) THEN
                         CALL SUBPAR_RESET(STATUS)
                         ACTION = 0
 
                      END IF
- 
+
 *              Else it was the keyword of a LOGICAL parameter
-                  ELSE 
+                  ELSE
 *                 Check if the parameter is required for this action
                      J = NEXTINDEX - 1
 *                 Ensure the loop is obeyed at least once
@@ -427,20 +434,20 @@
 *                    Try next required parameter until found or finished
                         J = J + 1
                      END DO
- 
+
 *                 If it was a logical keyword but not one for this action
 *                 it must be a string, name or logical constant.
                      IF ( ACTION.NE.LEX__LOGICAL ) ACTION = LEX__AMBIG
- 
+
                   END IF
- 
+
             END IF
- 
- 
+
+
             IF ( (ACTION.EQ.LEX__AMBIG) .AND. (NEXTPAR.NE.0) ) THEN
 *           Resolve MIN/MAX, !, \, String or Name or Logical Constant
                TYPE = MOD(PARTYPE(NEXTPAR), 10)
- 
+
 *           Check for MIN or MAX
 *           Set parameter state if type allows so that the min or max value
 *           will be selected WHEN THE VALUE IS REQUESTED.
@@ -448,14 +455,15 @@
 *           (So it can be restored with correct case if there is no MIN/MAX
 *           set when the request comes).
 *           Cancel any existing value first.
-               IF ( (USTRING(1:SLEN) .EQ. 'MAX') .OR. 
-     :              (USTRING(1:SLEN) .EQ. 'MIN') ) THEN
+               ISLEN = MIN( SLEN, SUBPAR__NAMELEN )
+               IF ( (USTRING(1:ISLEN) .EQ. 'MAX') .OR.
+     :              (USTRING(1:ISLEN) .EQ. 'MIN')) THEN
                   IF ( ( TYPE .EQ. SUBPAR__REAL ) .OR.
      :                 ( TYPE .EQ. SUBPAR__INTEGER ) .OR.
      :                 ( TYPE .EQ. SUBPAR__DOUBLE ) .OR.
      :                 ( TYPE .EQ. SUBPAR__CHAR ) ) THEN
                      CALL SUBPAR_CANCL( NEXTPAR, STATUS )
-                     IF (USTRING(1:SLEN) .EQ. 'MAX') THEN
+                     IF (USTRING(1:ISLEN) .EQ. 'MAX') THEN
                         PARSTATE( NEXTPAR ) = SUBPAR__MAX
                         IF ( TYPE .EQ. SUBPAR__CHAR )
      :                     PARVALS( NEXTPAR ) = STRING
@@ -474,7 +482,7 @@
                      ACTION = LEX__NAME
 
                   END IF
- 
+
 *           Check for NULL specifier
                ELSE IF ( STRING(1:SLEN) .EQ. '!' ) THEN
 *              Set state NULL - cancel any existing value first
@@ -483,10 +491,13 @@
 *              and flag parameter set and no further action
                   PARSET = .TRUE.
                   ACTION = 0
- 
+
 *           Check for \ (ACCEPT) following KEYWORD=
-               ELSE IF ( ( USTRING(1:SLEN) .EQ. 'ACCEPT' ) .OR.
-     :                   ( USTRING(1:SLEN) .EQ. CHAR(92) ) ) THEN
+               ELSE IF (
+     :            (USTRING(1:MIN(SLEN,SUBPAR__NAMELEN)) .EQ. 'ACCEPT')
+     :            .OR.
+     :            (USTRING(1:MIN(SLEN,SUBPAR__NAMELEN )) .EQ. CHAR(92))
+     :         ) THEN
                   CALL SUBPAR_ACCPT1( NEXTPAR, STATUS )
                   PARSET = .TRUE.
                   ACTION = 0
@@ -495,8 +506,8 @@
                ELSE IF ( TYPE.EQ.SUBPAR__CHAR ) THEN
 *              Interpret as literal string
                   ACTION = LEX__STRING
- 
-               ELSE IF ( (TYPE.EQ.SUBPAR__LOGICAL) .OR. 
+
+               ELSE IF ( (TYPE.EQ.SUBPAR__LOGICAL) .OR.
      :                   (TYPE.EQ.SUBPAR__NOTYPE) ) THEN
 *              Attempt to convert the string to logical
                   STAT = SAI__OK
@@ -510,75 +521,76 @@
                      ELSE
                         STRING = 'F'
                      END IF
- 
+
                   ELSE
 *                 Not valid logical constant
 *                 Interpret as a name
                      ACTION = LEX__NAME
                   END IF
- 
+
                ELSE
 *              Not one of the special cases
 *              Interpret as a  name
                   ACTION = LEX__NAME
                END IF
- 
+
             ELSE IF ( (ACTION.EQ.LEX__AMBIG) .AND. (NEXTPAR.EQ.0) ) THEN
 *           Set LEX__NAME. Anything which will flag the attempt to use
 *           an unallocated position would do.
                ACTION = LEX__NAME
- 
+
             END IF
- 
- 
+
+
 *
 *   Now, having resolved ambiguities, handle the required action.
 *   First check for those ACTIONS which are allowed even if the command
 *   line position is unallocated.
- 
+
             IF ( ACTION.EQ.LEX__KEYWORD ) THEN
- 
+
 *   Keyword - If it matches a keyword of the command, set that
 *             parameter as the next parameter to be written
 *             and decrement index so that the next positional
 *             parameter will be used after that
-*             First get an upper case copy of STRING 
+*             First get an upper case copy of STRING
                USTRING = STRING(1:SUBPAR__NAMELEN)
                CALL CHR_UCASE ( USTRING )
-               CALL SUBPAR_FINDKEY(USTRING(1:SLEN), .FALSE., .FALSE., 
+               ISLEN = MIN( SLEN, SUBPAR__NAMELEN )
+               CALL SUBPAR_FINDKEY(USTRING(1:ISLEN), .FALSE., .FALSE.,
      :          KEYCODE, STATUS)
                IF ( STATUS .EQ. SAI__OK ) THEN
                   NEXTPAR = KEYCODE
                   NEXTINDEX = NEXTINDEX - 1
                ELSE
                   STATUS = SUBPAR__CMDSYER
- 
+
                END IF
- 
- 
+
+
             ELSE IF ( ACTION.EQ.0 ) THEN
 *  ACTION = 0 signifies "no action" required here (it was a special keyword).
 *           Get the next parameter.
                CONTINUE
- 
+
 *  All other possibilities require that this command line position is
 *  allocated to a parameter. If it is not, report an error.
             ELSE IF ( NEXTPAR.EQ.0 ) THEN
 *  Position is unallocated
                STATUS = SUBPAR__PNOTAL
                CALL EMS_SETC('STRING', STRING(1:SLEN))
-               CALL EMS_REP('SUP_CMDLINE6', 
+               CALL EMS_REP('SUP_CMDLINE6',
      :          'SUBPAR: Attempt to use ''positional'' parameter value '
      :          //'(^STRING) in an unallocated position', STATUS)
- 
+
             ELSE IF ( ACTION.EQ.LEX__NAME ) THEN
 *  Name (e.g. HDS or device name)
                CALL SUBPAR_PUTNAME(NEXTPAR, STRING(1:SLEN), STATUS)
                PARSET = .TRUE.
- 
+
 *   Primitive item (String, Integer, Real, Double Precision, Logical)
-            ELSE IF ( (ACTION.EQ.LEX__STRING) .OR. 
-     :                (ACTION.EQ.LEX__INTEGER) .OR. 
+            ELSE IF ( (ACTION.EQ.LEX__STRING) .OR.
+     :                (ACTION.EQ.LEX__INTEGER) .OR.
      :                (ACTION.EQ.LEX__REAL) .OR.
      :                (ACTION.EQ.LEX__DOUBLE) .OR.
      :                (ACTION.EQ.LEX__LOGICAL) ) THEN
@@ -588,7 +600,7 @@
 
 *           If parameter is internal cancel any previous HDS association
 *           and store the value
- 
+
                IF ( PARVPATH(1,NEXTPAR).EQ.SUBPAR__INTERNAL ) THEN
                   CALL SUBPAR_CANCL(NEXTPAR, STATUS)
                   CALL SUBPAR_PUT0C(NEXTPAR, STRING(1:SLEN), STATUS)
@@ -600,13 +612,13 @@
 *           use that type - Otherwise use the type derived from the
 *           parsing of the string
                ELSE
- 
+
                   CALL SUBPAR_STORE0( NEXTPAR, ACTION, STRING, SLEN,
      :                                LOC, STATUS )
                   CALL DAT_ANNUL( LOC, STATUS )
                   PARSET = .TRUE.
                END IF
- 
+
             ELSE IF ( ACTION.EQ.LEX__STARR ) THEN
 *     Parse an array on the command line and set parameter accordingly
                CALL SUBPAR_ARRAY( NEXTPAR, COMMAND(1:ENDLINE), LOC,
@@ -617,18 +629,18 @@
 *           The returned locator is not required
                   CALL DAT_ANNUL( LOC, STATUS )
                ENDIF
-               PARSET = .TRUE. 
+               PARSET = .TRUE.
 
             ELSE
 *     At this stage, any other ACTION is an error
                STATUS = SUBPAR__CMDSYER
                CALL EMS_SETC('STRING', STRING(1:SLEN))
-               CALL EMS_REP('SUP_CMDLINE8', 
+               CALL EMS_REP('SUP_CMDLINE8',
      :                     'SUBPAR: Command line syntax error /^STRING/'
      :                     , STATUS)
- 
+
             END IF
- 
+
 *   If a parameter was set find the next one
             IF ( PARSET ) THEN
                IF ( NEXTINDEX .LE. NUMPARS ) THEN
@@ -639,27 +651,27 @@
                NEXTINDEX = NEXTINDEX + 1
                PARSET = .FALSE.
             END IF
- 
-            CALL LEX_CMDLINE(.FALSE., COMMAND(1:ENDLINE), ACTION, 
+
+            CALL LEX_CMDLINE(.FALSE., COMMAND(1:ENDLINE), ACTION,
      :                       STRING, SLEN, STATUS)
 
 *  End of command line parsing loop
          END DO
- 
- 
+
+
 *  Check for known LEX errors
          IF ( STATUS.EQ.LEX__ENDPARSE ) THEN
             CALL EMS_ANNUL(STATUS)
          ELSE IF ( STATUS.EQ.LEX__INVCHAR ) THEN
             STATUS = SUBPAR__CMDSYER
-            CALL EMS_REP('SUP_CMDLINE9', 
-     :                   'SUBPAR: Syntax error in parsing command line', 
+            CALL EMS_REP('SUP_CMDLINE9',
+     :                   'SUBPAR: Syntax error in parsing command line',
      :                   STATUS)
          END IF
- 
+
       END IF
- 
+
 *  Release error context
       CALL EMS_RLSE
- 
+
       END
