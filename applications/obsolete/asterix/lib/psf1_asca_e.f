@@ -72,6 +72,8 @@
 *  History:
 *      1 May 1996 (DJA):
 *        Original version.
+*     21 Jun 1996 (DJA):
+*        Now assumes SIS data grouped by factor 8
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,7 +97,7 @@
       REAL			GIS_GAIN		! GIS PI gain
         PARAMETER		( GIS_GAIN = 1.07E-2 )	! keV per PI channel
       REAL			SIS_GAIN		! SIS PI gain
-        PARAMETER		( SIS_GAIN = 3.65E-3 )	! keV per PI channel
+        PARAMETER		( SIS_GAIN = 8*3.65E-3 )! keV per PI channel
 
 *  Local Variables:
       CHARACTER*4		INS			! Instrument name
