@@ -13,7 +13,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-export :
 *    Export :
@@ -93,7 +92,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       REAL COL(3,16)
       INTEGER FIRST,LAST
@@ -216,7 +214,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       INTEGER FIRST,LAST

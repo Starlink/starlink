@@ -1,4 +1,3 @@
-
 *+  GFX_WINDOW - set limits of plotting window
       SUBROUTINE GFX_WINDOW(X1,X2,Y1,Y2,SCALED,STATUS)
 
@@ -124,7 +123,7 @@
 
 
         ELSE
-          CALL ERR_REP(' ','from GFX_WINDOW',STATUS)
+          CALL AST_REXIT('GFX_WINDOW',STATUS)
         ENDIF
       ENDIF
       END

@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
       REAL MIN,MAX
@@ -304,7 +303,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
       INTEGER NCOL,COL(1,NCOL)
@@ -432,7 +430,6 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       REAL MIN,MAX
 *    Import-export :
@@ -515,7 +512,6 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       REAL X1,X2,Y1,Y2
 *    Import-export :

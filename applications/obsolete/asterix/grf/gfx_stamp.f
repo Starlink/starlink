@@ -1,4 +1,3 @@
-
 *+  GFX_STAMP - put user-specified stamp on plot
       SUBROUTINE GFX_STAMP(STATUS)
 *    Description :
@@ -11,7 +10,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Structure definitions :
 *    Import :

@@ -8,7 +8,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :

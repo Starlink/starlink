@@ -9,7 +9,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
 *    Import-export :

@@ -3799,6 +3799,14 @@
             CALL MSG_PRNT('  NumericLabelFont=^FON   '//
      :                        'NumericLabelCharSize=^SIZ   '//
      :                        'NumericLabelBoldness=^BOL')
+            CALL GCB_GETL('AXES_RADEC',OK,LVAL,STATUS)
+            IF (OK.AND.LVAL) THEN
+              CALL MSG_SETC('RAD','On')
+            ELSE
+              CALL MSG_SETC('RAD','Off')
+            ENDIF
+            CALL MSG_PRNT('  RaDecLabelling=^RAD' )
+
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'XAX'.OR.SWITCH.EQ.'AXE')
      :                                                          THEN
