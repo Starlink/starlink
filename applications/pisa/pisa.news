@@ -1,5 +1,11 @@
 1 PISA_update
 
+ V2.4-6
+
+  Now uses native PGPLOT.
+
+ V2.4-5
+
  In this release the ADDNOISE command has been changed to generate
  a different set of random numbers on each occasion that it is started.
 
