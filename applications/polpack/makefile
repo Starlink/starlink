@@ -1645,6 +1645,8 @@ pol_calti.o:	SAE_PAR
 polcal.o:	NDF_PAR     
 polcal.o:	PRM_PAR     
 polcal.o:	SAE_PAR     
+polcal.o:	PAR_ERR
+polcal.o:	DAT_PAR
 polcent.o:	PAR_ERR     
 polcent.o:	SAE_PAR     
 polexp.o:	DAT_PAR
