@@ -4,7 +4,7 @@
 *     ccdwish
 
 *  Purpose:
-*     Main routine for ccdwish shell.
+*     Main routines for ccdwish shell.
 
 *  Usage:
 *     ccdwish [-pipes ifd ofd]
@@ -73,100 +73,67 @@
       0                                  /* List terminator */
    };
 
+/* Prototypes for local functions. */
+
+   Tcl_AsyncProc ccdEndinterp;
+   void ccdSigtcl( int sig );
+   void ccdPipestcl( int ifd, int ofd );
+   int main( int argc, char **argv );
 
 
-   int ccdEndinterp( ClientData clientData, Tcl_Interp *interp, int code ) {
-/*    
-*+
-*  Name:
-*     ccdEndinterp
-*
-*  Purpose:
-*     Asynchronous event handler for Tcl interpreter process.
-*
-*  Description:
-*     This routine should be registered as the asynchronous event
-*     handler for use with Tcl interpreters.  If it is invoked
-*     (by Tcl_AsyncInvoke, as caused by a call to Tcl_AsyncMark),
-*     it will cause the interpreter with which it is associated to
-*     exit by executing an 'exit' command.  This will allow the
-*     interpreter to shut down in an orderly fashion.
-*
-*     This routine should not be invoked directly by user code.
-*
-*  Note: 
-*     This doesn't seem to work at all.  Writing an exit instruction
-*     ought to cause clean up, but when executed here it doesn't seem
-*     to get rid of the adam message relay and its associated
-*     monoliths.  It does exit the process, but then the signal alone
-*     would do that anyway.  Leave this in place for the moment in
-*     case I can work out how to make it work.
-*
-*  Arguments:
-*     interp = Tcl_Interp *
-*        A pointer to the Tcl interpreter structure, if a Tcl command has
-*        just completed.
-*     clientData = ClientData
-*        A pointer to the Tcl interpreter structure for which this handler
-*        was registered.
-*     code = int
-*        Return code of some command which has recently been executed,
-*        if a Tcl has just completed.
-*     
-*  Notes:
-*     As noted on the Tcl_Async man page, the interp and code arguments
-*     will not necessarily have anything useful in them (this will be
-*     the case if the hander is invoked while waiting for an X event,
-*     which is quite likely).  For this reason, the clientData argument
-*     is used to identify the interpreter to be shut down.
-*-    
-*/
 
-/* Local Variables. */
-      int status[ 1 ] = { SAI__OK };
-      Tcl_Interp *interpreter = (Tcl_Interp *) clientData;
-
-/* Indicate that we are about to bail out. */
-      msgOut( " ", "Process received signal; attempting to shut down cleanly.",
-              status );
-
-/* Execute an 'exit' instruction. */
-      Tcl_Eval( interpreter, "exit" );
-      fprintf( stderr, "Interpreter returned >%s<\n", interpreter->result );
-
-/* The above ought to terminate this process, but if it doesn't, then this
-   is a sensible thing to return. */
-      exit( 1 );
-   }
-
-
-   void ccdSigtcl( int sig ) {
+   int main( int argc, char **argv ) {
 /*
 *+
 *  Name:
-*     ccdSigtcl
-*
+*     main
+
 *  Purpose:
-*     Signal handler for Tcl interpreter process.
-*
-*  Description:
-*     This routine should be registered as the signal handler for
-*     signals which will cause the Tcl interpreter process to terminate.
-*     It makes sure that the Tcl Asynchronous handler routine
-*     registered in the global variable ccd_async (which routine ought
-*     to effect a clean exit) will be called at a safe point in the
-*     near future.
-*
-*  Arguments:
-*     sig = int
-*        The number of the signal which has been caught.
+*     Main routine for the CCDWISH shell.
 *-
 */
-      int status[ 1 ] = { SAI__OK };
-      msgSeti( "SIG", sig );
-      msgOut( " ", "Tcl interpreter process received signal ^SIG", status );
-      Tcl_AsyncMark( ccd_async );
+      int ifd;                       /* File descriptor of downward pipe */
+      int ofd;                       /* File descriptor of upward pipe */
+      char *ccddir;                  /* CCDPACK_DIR value */
+
+/* Set the TCL library environment variables to the same value as CCDPACK_DIR.
+   This will cause the autoloader to look there for various library files. */
+      ccddir = getenv( "CCDPACK_DIR" );
+      if ( ccddir != NULL ) {
+         ccdSetenv( "TCL_LIBRARY", ccddir, 1 );
+         ccdSetenv( "TK_LIBRARY", ccddir, 1 );
+         ccdSetenv( "ITCL_LIBRARY", ccddir, 1 );
+         ccdSetenv( "ITK_LIBRARY", ccddir, 1 );
+      }
+      fprintf( stderr, "%s %s %s %s\n",
+               getenv( "TCL_LIBRARY" ),
+               getenv( "TK_LIBRARY" ),
+               getenv( "ITCL_LIBRARY" ),
+               getenv( "ITK_LIBRARY" ) );
+
+/* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
+   If we have something which looks like a flag but is not of this form,
+   signal an error and bail out. */
+      if ( argc > 1 && *argv[ 1 ] == '-' ) {
+         if ( strcmp( argv[ 1 ], "-pipes" ) != 0 ||
+              argc != 4 ||
+              sscanf( argv[ 2 ], "%d", &ifd ) != 1 ||
+              sscanf( argv[ 3 ], "%d", &ofd ) != 1 ) {
+            fprintf( stderr, "Usage: %s [-pipes ifd ofd]\n", argv[ 0 ] );
+            exit( 1 );
+         }
+
+/* We have values for both file descriptors.  Start up a Tcl interpreter
+   and loop indefinitely. */
+         ccdPipestcl( ifd, ofd );
+      }
+
+/* We are not running in pipe mode.  Call Tk_main and run as a normal
+   freestanding wish. */
+      Tk_Main( argc, argv, Tcl_AppInit );
+      return 0;
    }
+
 
 
    void ccdPipestcl( int ifd, int ofd ) {
@@ -285,53 +252,140 @@
    }
 
 
-   int main( int argc, char **argv ) {
+   int ccdSetenv( char *name, char *value, int overwrite ) {
 /*
 *+
 *  Name:
-*     main
+*     ccdSetenv
 
 *  Purpose:
-*     Main routine for the CCDWISH shell.
+*     Set an environment variable.
+
+*  Description:
+*     This routine does the same as setenv(3) on some operating systems,
+*     but which is absent on Solaris.  It the value of an environment
+*     variable.
+
+*  Arguments:
+*     name = char *
+*        Name of the environment variable to be set.  Need not be static.
+*     value = char *
+*        Value that the environment variable is to be set to.  Need not 
+*        be static.
+*     overwrite = int
+*        If the environment variable name already exists, then the value
+*        will only be overwritten if overwrite is non-zero.
+
+*  Return value:
+*     Zero is returned on success, -1 if there was a failure in memory
+*     allocation.
 *-
 */
-      int ifd;                       /* File descriptor of downward pipe */
-      int ofd;                       /* File descriptor of upward pipe */
-      char *ccddir;                  /* CCDPACK_DIR value */
 
-/* Set the TCL library environment variables to the same value as CCDPACK_DIR.
-   This will cause the autoloader to look there for various library files. */
-      ccddir = getenv( "CCDPACK_DIR" );
-      if ( ccddir != NULL ) {
-         sprintf( buffer, "%s=%s", "TCL_LIBRARY", ccddir ); putenv( buffer );
-         sprintf( buffer, "%s=%s", "TK_LIBRARY", ccddir ); putenv( buffer );
-         sprintf( buffer, "%s=%s", "ITCL_LIBRARY", ccddir ); putenv( buffer );
-         sprintf( buffer, "%s=%s", "ITK_LIBRARY", ccddir ); putenv( buffer );
+      if ( overwrite || getenv( name ) ) {
+         char *buf;
+         int leng;
+         leng = strlen( name ) + strlen( value ) + 2;
+         if ( ( buf = malloc( leng ) ) == NULL ) return -1;
+         sprintf( buf, "%s=%s", name, value );
+         if ( putenv( buf ) != 0 ) return -1;
       }
-
-/* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
-   If we have something which looks like a flag but is not of this form,
-   signal an error and bail out. */
-      if ( argc > 1 && *argv[ 1 ] == '-' ) {
-         if ( strcmp( argv[ 1 ], "-pipes" ) != 0 ||
-              argc != 4 ||
-              sscanf( argv[ 2 ], "%d", &ifd ) != 1 ||
-              sscanf( argv[ 3 ], "%d", &ofd ) != 1 ) {
-            fprintf( stderr, "Usage: %s [-pipes ifd ofd]\n", argv[ 0 ] );
-            exit( 1 );
-         }
-
-/* We have values for both file descriptors.  Start up a Tcl interpreter
-   and loop indefinitely. */
-         ccdPipestcl( ifd, ofd );
-      }
-
-/* We are not running in pipe mode.  Call Tk_main and run as a normal
-   freestanding wish. */
-      Tk_Main( argc, argv, Tcl_AppInit );
       return 0;
    }
 
 
+
+   int ccdEndinterp( ClientData clientData, Tcl_Interp *interp, int code ) {
+/*    
+*+
+*  Name:
+*     ccdEndinterp
+*
+*  Purpose:
+*     Asynchronous event handler for Tcl interpreter process.
+*
+*  Description:
+*     This routine should be registered as the asynchronous event
+*     handler for use with Tcl interpreters.  If it is invoked
+*     (by Tcl_AsyncInvoke, as caused by a call to Tcl_AsyncMark),
+*     it will cause the interpreter with which it is associated to
+*     exit by executing an 'exit' command.  This will allow the
+*     interpreter to shut down in an orderly fashion.
+*
+*     This routine should not be invoked directly by user code.
+*
+*  Note: 
+*     This doesn't seem to work at all.  Writing an exit instruction
+*     ought to cause clean up, but when executed here it doesn't seem
+*     to get rid of the adam message relay and its associated
+*     monoliths.  It does exit the process, but then the signal alone
+*     would do that anyway.  Leave this in place for the moment in
+*     case I can work out how to make it work.
+*
+*  Arguments:
+*     interp = Tcl_Interp *
+*        A pointer to the Tcl interpreter structure, if a Tcl command has
+*        just completed.
+*     clientData = ClientData
+*        A pointer to the Tcl interpreter structure for which this handler
+*        was registered.
+*     code = int
+*        Return code of some command which has recently been executed,
+*        if a Tcl has just completed.
+*     
+*  Notes:
+*     As noted on the Tcl_Async man page, the interp and code arguments
+*     will not necessarily have anything useful in them (this will be
+*     the case if the hander is invoked while waiting for an X event,
+*     which is quite likely).  For this reason, the clientData argument
+*     is used to identify the interpreter to be shut down.
+*-    
+*/
+
+/* Local Variables. */
+      int status[ 1 ] = { SAI__OK };
+      Tcl_Interp *interpreter = (Tcl_Interp *) clientData;
+
+/* Indicate that we are about to bail out. */
+      msgOut( " ", "Process received signal; attempting to shut down cleanly.",
+              status );
+
+/* Execute an 'exit' instruction. */
+      Tcl_Eval( interpreter, "exit" );
+      fprintf( stderr, "Interpreter returned >%s<\n", interpreter->result );
+
+/* The above ought to terminate this process, but if it doesn't, then this
+   is a sensible thing to return. */
+      exit( 1 );
+   }
+
+
+   void ccdSigtcl( int sig ) {
+/*
+*+
+*  Name:
+*     ccdSigtcl
+*
+*  Purpose:
+*     Signal handler for Tcl interpreter process.
+*
+*  Description:
+*     This routine should be registered as the signal handler for
+*     signals which will cause the Tcl interpreter process to terminate.
+*     It makes sure that the Tcl Asynchronous handler routine
+*     registered in the global variable ccd_async (which routine ought
+*     to effect a clean exit) will be called at a safe point in the
+*     near future.
+*
+*  Arguments:
+*     sig = int
+*        The number of the signal which has been caught.
+*-
+*/
+      int status[ 1 ] = { SAI__OK };
+      msgSeti( "SIG", sig );
+      msgOut( " ", "Tcl interpreter process received signal ^SIG", status );
+      Tcl_AsyncMark( ccd_async );
+   }
 
 /* $Id$ */
