@@ -67,6 +67,7 @@
       INTEGER NPHA                            ! Number of PH chans in response
 *                                             ! array
       INTEGER NENERGY                         ! Number of energy channels
+      INTEGER L
       LOGICAL HRI                             ! attach HRI response
       LOGICAL PSPC                            ! attach PSPC response
 * Local data :
@@ -109,7 +110,8 @@
       ELSE
         CALDIR = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
       ENDIF
-      CALL USI_DEF0C('RESPFILE', CALDIR, STATUS)
+      L=CHR_LEN(CALDIR)
+      CALL USI_DEF0C('RESPFILE', CALDIR(:L), STATUS)
 *
 	print *,'getting response file...'
 *   Get detector response matrix name
