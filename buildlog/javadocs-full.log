@@ -1488,17 +1488,17 @@ javadoc-sources:
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/CenterSite.java:40: warning - @ is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorAdapter.java:18: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @contributor is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/StraightConnector.java:27: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/connector/Arrowhead.html...
   [javadoc] "Set the flag that says the arrowhead is "flipped." This means
   [javadoc]  that the arrowhead is drawn so that the apparent direction
   [javadoc]  of the arrowhead is the same as its normal."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says the arrowhead is "flipped." "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/CenterSite.java:40: warning - @ is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorAdapter.java:18: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @contributor is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/StraightConnector.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/CompositeFigureTutorial.java:119: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/tutorial/TransformedFigureTutorial.html...
@@ -1684,4 +1684,4 @@ javadoc-sources:
   [javadoc] 614 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 33 seconds
+Total time: 1 minute 34 seconds
