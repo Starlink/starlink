@@ -13,6 +13,8 @@
  *                 12/03/98  Remove dependency on FitsIO (delegated to
  *                           class FitsIO or other class derived from
  *                           ImageIORep.
+ * Peter W. Draper 24/06/99  Changed to use FITS_LONG as type in byte
+ *                           swapping. "long" is 8 bytes on alphas and 64 SUNs.
  */
 static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.6 1998/05/18 21:22:19 abrighto Exp $";
 
@@ -22,6 +24,16 @@ static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.6 1998/05/18 21:22:19 ab
 #include <stdlib.h>
 #include "error.h"
 #include "ImageIO.h"
+#include "config.h"
+
+// The type "long" may have up to 64 bits on alpha machines. FITS
+// defines the long we want to use as 32 bits, so use a macro to
+// replace the long data type with plain int when appropriate.
+#if SIZEOF_LONG == 8
+#define FITS_LONG int 
+#else 
+#define FITS_LONG long 
+#endif
 
 
 /*
@@ -93,7 +105,7 @@ int ImageIORep::data(const Mem& m)
 int ImageIORep::byteSwapData() 
 {
     int dsize = abs(bitpix_)/8;
-    long l = 1;
+    FITS_LONG l = 1;
     if (ntohl(l) == l || dsize == 1) {
 	// no byte swapping needed
 	return 0;
@@ -121,8 +133,8 @@ int ImageIORep::byteSwapData()
     }
     else if (dsize == 4) {
 	// copy longs
-	unsigned long* from = (unsigned long*)data_.ptr();
-	unsigned long* to = (unsigned long*)data.ptr(); 
+	unsigned FITS_LONG* from = (unsigned FITS_LONG*)data_.ptr();
+	unsigned FITS_LONG* to = (unsigned FITS_LONG*)data.ptr(); 
  	while(n--) {
 	    *to++ = ntohl(*from);
 	    from++;
