@@ -16,11 +16,13 @@
 
 #include	<math.h>
 #include	<stdlib.h>
+#include        <string.h>      /* PWD: change here */
 
 #include	"define.h"
 #include	"globals.h"
 #include	"plist.h"
 #include	"extract.h"
+#include        "clean.h"       /* PWD: change here */
 
 #ifndef	RAND_MAX
 #define	RAND_MAX	2147483647

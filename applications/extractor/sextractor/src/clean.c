@@ -22,6 +22,7 @@
 #include	"globals.h"
 #include	"check.h"
 #include	"clean.h"
+#include        "flag.h"      /* PWD change here */
 
 /*------------------------------- variables ---------------------------------*/
 

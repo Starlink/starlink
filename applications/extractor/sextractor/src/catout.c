@@ -6,10 +6,13 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*                       Peter W. Draper (Starlink, University of Durham)
 *
 *	Contents:	functions for output of catalog data.
 *
 *	Last modify:	11/08/98
+*                       24/11/98: PWD, change ASCII_SKYCAT to output
+*                                 real column names.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -273,17 +276,19 @@ void	initcat(picstruct *field)
         }
     else if (prefs.cat_type == ASCII_SKYCAT && (key = objtab->key))
       {
-      if (objtab->nkey<3)
-        error(EXIT_FAILURE,"The SkyCat format requires at least 4 parameters:",
-	      " Id Ra Dec Mag");
+        /* PWD:  fixed to not use id ra dec mag, but the real names */
+/*       if (objtab->nkey<3) */
+/*         error(EXIT_FAILURE,"The SkyCat format requires at least 4 parameters:", */
+/*               " Id Ra Dec Mag"); */
 /*--- We add a tab between rows, as required by Skycat */
       fprintf(ascfile, skycathead, 8.0);
-      for (i=1,key=key->nextkey; i++<objtab->nkey; key=key->nextkey)
+      for (i=0; i++<objtab->nkey; key=key->nextkey)
         {
-        if (i>4)
-          fprintf(ascfile, "\t%s", key->name);
-        sprintf(gstr, "\t%s", key->printf);
-        strcpy(key->printf, gstr);
+          /*           if (i>4) { */
+          fprintf(ascfile, "%s\t", key->name);
+          /*           } */
+          sprintf(gstr, "%s\t", key->printf);
+          strcpy(key->printf, gstr);
         }
       fprintf(ascfile, "\n------------------\n");
       }

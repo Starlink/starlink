@@ -1,3 +1,8 @@
+This version slightly modified by Peter W. Draper 24 November 1998. 
+- Fixed missing include files  (lint specified)
+- Changed ASCII_SKYCAT to output correct column names (fixed id, ra,
+  dec and mag no longer needed).
+
 This is V2.0.15 (August 20 1998). New features include:
 - ``Purify'' warnings and memory leaks fixed in several parts of the program.
 - BLANKing bug of CLEANed pixels fixed.

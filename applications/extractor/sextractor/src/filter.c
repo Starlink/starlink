@@ -18,6 +18,7 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include        <unistd.h>     /* PWD: change here */
 
 #include	"define.h"
 #include	"globals.h"

@@ -15,6 +15,7 @@
 */
 
 #include	<stdlib.h>
+#include        <string.h> /* PWD: change here */
 
 #include	"define.h"
 #include	"globals.h"

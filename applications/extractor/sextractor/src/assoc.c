@@ -142,7 +142,8 @@ assocstruct  *load_assoc(char *filename)
       else
         {
         mindex = -1;
-        prefs.assoc_type == ASSOC_FIRST;
+        /* PWD: change here -- prefs.assoc_type == ASSOC_FIRST;*/
+        prefs.assoc_type = ASSOC_FIRST;
         }
 
       nlist = ndata+3;

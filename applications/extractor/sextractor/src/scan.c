@@ -18,6 +18,7 @@
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
+#include        <string.h>    /* PWD: change here */
 
 #include	"define.h"
 #include	"globals.h"
@@ -644,7 +645,7 @@ void  sortit(picstruct *field, picstruct *dfield, picstruct *wfield,
 /*------ Not enough mem. for the BLANK vignet: flag the object now */
         cobj->flag |= OBJ_OVERFLOW;
         cobj->blank = cobj->dblank = NULL;
-        sprintf(gstr, "%d,%d", cobj->mx+1, cobj->my+1);
+        sprintf(gstr, "%d,%d", (int) cobj->mx+1, (int) cobj->my+1); /*PWD: change here */
         warning("Memory overflow during masking for detection at ", gstr);
         }
       }
