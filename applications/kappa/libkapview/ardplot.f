@@ -33,14 +33,13 @@
 *        The name of the ARD file containing a description of the regions
 *        to be outlined. The co-ordinate system in which positions within 
 *        this file are given should be indicated by including suitable 
-*        COFRAME or WCS statements within the file (see SUN/183). For 
-*        instance, starting the file with a line containing the text 
-*        "COFRAME(PIXEL)" will indicate that positions are specified in 
-*        pixel coordinates. The statement "COFRAME(SKY,System=FK5)" would 
-*        indicate that positions are specified in RA/DEC (FK5,J2000). If 
-*        no such statements are included, then it is assumed that positions 
-*        are given within the current co-ordinate system of the existing
-*        DATA picture.
+*        COFRAME or WCS statements within the file (see SUN/183), but will 
+*        default to pixel co-ordinates in the absence of any such 
+*        statements. For instance, starting the file with a line containing 
+*        the text "COFRAME(SKY,System=FK5)" would indicate that positions 
+*        are specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)" 
+*        indicates explicitly that positions are specified in pixel 
+*        co-ordinates. 
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
 *     REGVAL = _INTEGER (Read)
@@ -96,7 +95,7 @@
 *     device reverts to the input picture.
 
 *  Related Applications:
-*     KAPPA: ARDGEN, ARDMASK.
+*     KAPPA: ARDGEN, ARDMASK, LOOK.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -105,6 +104,8 @@
 *  History:
 *     13-SEP-2001 (DSB):
 *        Original version.
+*     25-OCT-2001 (DSB):
+*        Make pixel coords the default coord system for the ard file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,6 +181,11 @@
 
 *  Get the index of the region to draw.
       CALL PAR_GET0I( 'REGVAL', REGVAL, STATUS )      
+
+*  Select the PIXELE Frame as the current Frame in the Plot so that 
+*  pixel coords become the default coord system for the ARD file.
+      CALL KPG1_ASFFR( IPLOT, 'PIXEL', IPIX, STATUS )
+      CALL AST_SETI( IPLOT, 'CURRENT', IPIX, STATUS )
 
 *  Plot it.
       RV = REGVAL
