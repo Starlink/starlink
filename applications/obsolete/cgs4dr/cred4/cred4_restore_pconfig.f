@@ -46,6 +46,8 @@
       INVAL = 'FILE="'//CONFIG_FILE(1:CHR_LEN(CONFIG_FILE))//'" PORT=-1'
 
 *    if necessary ask user if they wish to proceed
+      ASK = .FALSE.
+      WAIT = .TRUE.
       IF ( ASK ) THEN
          CALL PAR_CANCL( 'PROCEED_DISP', STATUS )
          CALL PAR_GET0L( 'PROCEED_DISP', PROCEED, STATUS )
