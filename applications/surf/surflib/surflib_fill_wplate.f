@@ -72,6 +72,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  2000/07/06 00:00:31  timj
+*     Check that the return from SCULIB_FIND_INT is valid.
+*
 *     Revision 1.3  1999/08/03 19:32:50  timj
 *     Add copyright message to header.
 *
@@ -89,6 +92,8 @@
  
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! Status
+      INCLUDE 'PRM_PAR'         ! Bad values
+      INCLUDE 'MSG_PAR'         ! MSG__
 
 *  Arguments Given:
       INTEGER N_EXP
@@ -175,17 +180,33 @@
      :              N_MEAS, N_POS, INTEGRATION, MEASUREMENT,
      :              MSTART, MEND, STATUS)
 
+               IF (MSTART .LE. 0) THEN
+                  CALL MSG_SETI ('I', INTEGRATION)
+                  CALL MSG_SETI ('M', MEASUREMENT)
+                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :                 'SURFLIB_FILL_WPLATE: no data '//
+     :                 'for int ^I, meas ^M', STATUS)
+
+*     Fill with bad values
+                  DO I = MSTART, MEND
+                     WPLATE_OUT(I) = VAL__BADR
+                  END DO
+
+               ELSE
+
 *     Now fill the waveplate array (angle in degrees)
-               DO I = MSTART, MEND
-                  WPLATE_OUT(I) = WPLATE_POS
-               END DO
+                  DO I = MSTART, MEND
+                     WPLATE_OUT(I) = WPLATE_POS
+                  END DO
 
 *     Skip to the next waveplate positions
-               WPLATE_POS = WPLATE_POS + 22.5
+                  WPLATE_POS = WPLATE_POS + 22.5
 
 *     Stop the waveplate angle going over 360 degrees
-               IF (WPLATE_POS .GE. 360.0) THEN
-                  WPLATE_POS = WPLATE_POS - 360.0
+                  IF (WPLATE_POS .GE. 360.0) THEN
+                     WPLATE_POS = WPLATE_POS - 360.0
+                  END IF
+
                END IF
 
             END DO

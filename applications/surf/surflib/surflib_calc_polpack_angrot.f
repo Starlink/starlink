@@ -59,6 +59,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  2000/07/06 00:00:30  timj
+*     Check that the return from SCULIB_FIND_INT is valid.
+*
 *     Revision 1.2  1999/08/03 19:32:48  timj
 *     Add copyright message to header.
 *
@@ -130,23 +133,24 @@
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
 
-*     Find the start position in ANGROT_IN
-            ISTART = DEM_PNTR(1,1,INTEGRATION, MEASUREMENT)
+*     Find the start and end position of the integration
+            CALL SCULIB_FIND_INT( DEM_PNTR, 1, 1, N_INTEGRATIONS,
+     :           N_MEASUREMENTS, N_POS, INTEGRATION, MEASUREMENT,
+     :           ISTART, IEND, STATUS)
 
-*     Find the end position of the integration
-*     Have to find the next integration
-            NEXT_INT = INTEGRATION + 1
-            NEXT_MEAS = MEASUREMENT
-            IF (NEXT_INT .GT. N_INTEGRATIONS) THEN
-               NEXT_INT = 1
-               NEXT_MEAS = NEXT_MEAS + 1
-            END IF
+*     Check validity of ISTART
+            IF ( IEND .LT. 1 .OR. ISTART .LT. 1) THEN
 
-            IF (NEXT_MEAS .GT. N_MEASUREMENTS) THEN
-               IEND = N_POS
+               CALL MSG_SETI( 'I', INTEGRATION)
+               CALL MSG_SETI( 'M', MEASUREMENT)
+               CALL MSG_OUT (' ', 'SURFLIB_CALC_POLPACK_ANGROT: '//
+     :              'no data in int ^I, meas ^M', STATUS)
+
+*     Fill the output array with bad values
+               ANGROT_OUT(INTEGRATION, MEASUREMENT) = VAL__BADR
+               ANGROT_VAR(INTEGRATION, MEASUREMENT) = VAL__BADR
+
             ELSE
-               IEND = DEM_PNTR(1,1,NEXT_INT, NEXT_MEAS) - 1
-            END IF
 
 *     Allocate some dummy memory for the quality array [I really
 *     need a flag in STATR to not use QUALITY] and for the sorted
@@ -154,45 +158,47 @@
 *     since for scan maps the number of points in an integration
 *     changes depending on the length of the scan
 
-            N_PTS = IEND - ISTART + 1
+               N_PTS = IEND - ISTART + 1
 
-            CALL SCULIB_MALLOC(N_PTS * VAL__NBUB, SCRATCHQ_PTR, 
-     :           SCRATCHQ_END, STATUS)
-            CALL SCULIB_MALLOC(N_PTS * VAL__NBR, QSORT_PTR, 
-     :           QSORT_END, STATUS)
+               CALL SCULIB_MALLOC(N_PTS * VAL__NBUB, SCRATCHQ_PTR, 
+     :              SCRATCHQ_END, STATUS)
+               CALL SCULIB_MALLOC(N_PTS * VAL__NBR, QSORT_PTR, 
+     :              QSORT_END, STATUS)
 
 *     Fill the byte array with 0
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_CFILLB(N_PTS, 0, %VAL(SCRATCHQ_PTR))
-            END IF
+               IF (STATUS .EQ. SAI__OK) THEN
+                  CALL SCULIB_CFILLB(N_PTS, 0, %VAL(SCRATCHQ_PTR))
+               END IF
 
 *     Find the mean of the input angles
-            MEAN = VAL__BADD
-            STDEV = VAL__BADD
+               MEAN = VAL__BADD
+               STDEV = VAL__BADD
 
-            CALL SCULIB_STATR(N_PTS, -1.0, ANGROT_IN(ISTART), 
-     :           %VAL(SCRATCHQ_PTR), BADBIT, ITEMP, MEAN, MEDIAN, 
-     :           SUM, SUMSQ, STDEV, %VAL(QSORT_PTR) ,STATUS)
+               CALL SCULIB_STATR(N_PTS, -1.0, ANGROT_IN(ISTART), 
+     :              %VAL(SCRATCHQ_PTR), BADBIT, ITEMP, MEAN, MEDIAN, 
+     :              SUM, SUMSQ, STDEV, %VAL(QSORT_PTR) ,STATUS)
 
 
 *     Fill the output array
-            IF (MEAN .EQ. VAL__BADD) THEN
-               ANGROT_OUT(INTEGRATION,MEASUREMENT) = VAL__BADR
-            ELSE
-               ANGROT_OUT(INTEGRATION,MEASUREMENT) = SNGL(MEAN)
-     :              + POLPACK_ANG
-            END IF
+               IF (MEAN .EQ. VAL__BADD) THEN
+                  ANGROT_OUT(INTEGRATION,MEASUREMENT) = VAL__BADR
+               ELSE
+                  ANGROT_OUT(INTEGRATION,MEASUREMENT) = SNGL(MEAN)
+     :                 + POLPACK_ANG
+               END IF
 
-            IF (STDEV .EQ. VAL__BADD) THEN
-               ANGROT_VAR(INTEGRATION,MEASUREMENT) = VAL__BADR
-            ELSE
-               ANGROT_VAR(INTEGRATION,MEASUREMENT) = SNGL(STDEV ** 2)
-            END IF
+               IF (STDEV .EQ. VAL__BADD) THEN
+                  ANGROT_VAR(INTEGRATION,MEASUREMENT) = VAL__BADR
+               ELSE
+                  ANGROT_VAR(INTEGRATION,MEASUREMENT) = SNGL(STDEV ** 2)
+               END IF
 
 *     Free scratch memory
-            CALL SCULIB_FREE('SCRATCHQ', SCRATCHQ_PTR, SCRATCHQ_END,
-     :           STATUS)
-            CALL SCULIB_FREE('QSORT',QSORT_PTR, QSORT_END, STATUS)
+               CALL SCULIB_FREE('SCRATCHQ', SCRATCHQ_PTR, SCRATCHQ_END,
+     :              STATUS)
+               CALL SCULIB_FREE('QSORT',QSORT_PTR, QSORT_END, STATUS)
+               
+            END IF
 
 
          END DO
