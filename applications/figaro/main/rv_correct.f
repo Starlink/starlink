@@ -35,6 +35,7 @@
 *                   Durham
 *  JWP: J.W.Palmer Manchester, from September 1995
 *  ACD: A.C. Davenhall, Starlink, Edinburgh.
+*  MJC: Malcolm J Currie (Starlink)
 
 * History:
 *  TNW: Original version
@@ -52,6 +53,8 @@
 *       RA and DEC from the FITS header    
 *  ACD: 5-SEP-2000 Made reading year from character string more robust.
 *  ACD: 28/9/00 Remove local unused variables.
+*  MJC: 2005 February 22:  Removed NSMALL definition for f90 compiler.
+*
 *-
       implicit none
       include 'SAE_PAR'
@@ -77,8 +80,6 @@
       real lat(3),long(3)
       integer len1,lday,ldate
       real default,curyear
-      real NSMALL
-      parameter (NSMALL = -1.0*VAL__SMLR)
       integer dumi,nfnd,nfnd2,iloop,i,iloop2
       real dumr,C
       parameter (C = 2.997925e5)
@@ -159,19 +160,19 @@
       if(dsign.eq.0) then
          if(dec(1).gt.VAL__SMLR) then
             dsign = 1
-         else if(dec(1).lt.NSMALL) then
+         else if(abs(dec(1)).gt.VAL__SMLR) then
             dsign = -1
             dec(1) = abs(dec(1))
          else if(dec(2).gt.VAL__SMLR) then
             dsign = 1
-         else if(dec(2).lt.NSMALL) then
+         else if(abs(dec(2)).gt.VAL__SMLR) then
             dsign = -1
             dec(2) = abs(dec(2))
-         else if(dec(3).lt.NSMALL) then
+         else if(dec(3).gt.VAL__SMLR) then
+            dsign = 1
+         else if(abs(dec(3)).gt.VAL__SMLR) then
             dsign = -1
             dec(3) = abs(dec(3))
-         else
-            dsign = 1
          end if
       end if
       call chr_fill(' ',string)
