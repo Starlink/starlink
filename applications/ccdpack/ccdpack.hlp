@@ -151,6 +151,8 @@
 
      WCSREG: Aligns NDFs using multiple frames from their WCS components.
 
+     WCSEDIT: Modifies WCS components of a set of NDFs.
+
      XREDUCE: Starts the automated CCD data reduction GUI.
 
 1 Changes_this_release
@@ -8417,6 +8419,187 @@ PDRAPER: Peter Draper (STARLINK)
    -  All non-complex numeric data types are supported.
 
    -  There can be an arbitrary number of image dimensions.
+1 WCSEDIT
+Modifies WCS components of a set of NDFs.
+
+Usage:
+
+   WCSEDIT in mode frame
+
+Description:
+
+   This task performs a set of miscellaneous modifications to the
+   WCS (World Coordinate System) components of a list of NDFs.
+   According to the MODE parameter it can:
+
+      -  Set the Current frame
+
+      -  Add a new frame
+
+      -  Remove a frame
+
+   The routine does not fail if some of the requested edits cannot
+   be performed, but an output parameter MODIFIED records which
+   NDFs were successfully modified.
+
+   If a new frame is added it becomes the Current frame.  If a frame
+   is removed, the Current frame is not changed (unless the Current
+   frame itself is removed).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COEFFS
+COEFFS( * ) = _DOUBLE (Read)
+   If MODE is ADD, this parameter is a list of the coefficients
+   used for the mapping from the basis frame to the new frame.
+   Its meaning and the number of values required depend on the
+   value of MAPTYPE:
+
+      -  UNIT       -- No values are required
+
+      -  LINEAR     -- Six values C1-C6 are required:
+           X' = C1 + C2 * X + C3 * Y
+           Y' = C4 + C5 * X + C6 * Y
+
+      -  PINCUSHION -- Three values C1-C3 are required:
+           X' = X * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
+           Y' = Y * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
+3 DOMAIN
+DOMAIN = LITERAL (Read)
+   If MODE is ADD this gives the domain name to be used for the
+   new frame.  Spaces in the name are ignored and letters are
+   folded to upper case.  If the new frame is successfully added
+   and any frame with the same domain name already exists, it
+   will be removed, and a message will be printed to that effect.
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter BASEFRAME) for a celestial co-ordinate system, then
+   an epoch value is needed to qualify it. This is the epoch at
+   which the supplied sky positions were determined. It should be
+   given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a
+   Besselian epoch if less than 1984.0 and as a Julian epoch
+   otherwise.
+3 FRAME
+FRAME = LITERAL (Read)
+   This parameter specifies the 'basis frame', which has the
+   following meaning according to the value of the MODE parameter:
+
+      -  MODE = CURRENT -- The frame to be made Current
+
+      -  MODE = REMOVE  -- The frame to remove; if it is a domain
+                           name (see below) then all frames with
+                           that domain will be removed.
+
+      -  MODE = ADD     -- The new frame will be a copy of the
+                           basis frame, and will be mapped from it
+                           using the mapping given.
+
+   The value of this parameter can be one of the following:
+
+      -  A domain name such as SKY, AXIS, PIXEL, etc.
+
+      -  An integer value giving the index of the required Frame
+         within the WCS component.
+
+      -  A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
+         (see section "Sky Co-ordinate Systems" in SUN/95).
+   A domain name is usually the most suitable choice.
+3 IN
+IN = LITERAL (Read)
+   A list specifying the names of the NDFs whose WCS components
+   are to be modified.  The NDF names should be separated by
+   commas and may include wildcards.
+3 LOGFILE
+LOGFILE = FILENAME (Read)
+   Name of the CCDPACK logfile.  If a null (!) value is given for
+   this parameter then no logfile will be written, regardless of
+   the value of the LOGTO parameter.
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "CCDPACK.LOG".
+   [CCDPACK.LOG]
+3 LOGTO
+LOGTO = LITERAL (Read)
+   Every CCDPACK application has the ability to log its output
+   for future reference as well as for display on the terminal.
+   This parameter controls this process, and may be set to any
+   unique abbreviation of the following:
+
+      -  TERMINAL  -- Send output to the terminal only
+
+      -  LOGFILE   -- Send output to the logfile only (see the
+                      LOGFILE parameter)
+
+      -  BOTH      -- Send output to both the terminal and the
+                      logfile
+
+      -  NEITHER   -- Produce no output at all
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "BOTH".
+   [BOTH]
+3 MAPTYPE
+MAPTYPE = LITERAL (Read)
+   This parameter is required when MODE is ADD, and specifies the
+   type of mapping which connects the basis frame to the new frame.
+   It may take one of the following values:
+
+      -  UNIT
+
+      -  LINEAR
+
+      -  PINCUSHION
+   [UNIT]
+3 MODE
+MODE = LITERAL (Read)
+   The action to be performed.  It may take one of the following
+   values:
+
+      -  ADD      -- Add a new frame (which becomes Current)
+
+      -  CURRENT  -- Set the Current frame
+
+      -  REMOVE   -- Remove a frame
+   [CURRENT]
+3 MODIFIED
+MODIFIED = LITERAL (Write)
+   On exit, this parameter gives a comma-separated list of all the
+   NDFs which were successfully modified.  In particular, if MODE
+   is CURRENT, this list will include all the NDFs which contained
+   the specified frame, but exclude any which did not.
+2 Examples
+wcsedit * current ccd_reg
+   This sets the current frame of all the NDFs in the current
+   directory to the 'CCD_REG' domain.  The MODIFY parameter is
+   set on output to contain the names of all those NDFs which
+   had such a frame.
+
+wcsedit data* remove frame=4
+   The fourth frame in the WCS component of each NDF 'data*.sdf'
+   is removed.
+
+wcsedit "first,second" mode=add frame=GRID maptype=pcd
+        coeffs=[-6.8e-10,0,0] domain=NEW
+   A new frame, in the domain 'NEW', is added to the NDFs first
+   and second.  It is connected to the previously existing GRID
+   domain by a pincushion distortion mapping centred at the
+   origin with a distortion coefficient of -6.8e-10.  If any
+   frames with domain NEW already exist in those NDFs they are
+   removed.
+2 Notes
+This routine provides similar functionality to that provided by
+KAPPA applications WCSADD, WCSREMOVE and WCSFRAME, but allows
+use of CCDPACK-style NDF lists.
+2 Copyright
+   Copyright (C) 1999 Central Laboratory of the Research Councils
+2 Authors
+MBT: Mark Taylor  (STARLINK)
+2 History
+ 18-MAY-1999 (MBT):
+    Original version.
 1 WCSREG
 Aligns NDFs using multiple frames from their WCS components.
 

@@ -3438,6 +3438,8 @@ better than the median, and this is the normal default.
 
 \quickdes{TRANNDF}{Transforms (resamples) NDFs.} {TRANNDF}
 
+\quickdes{WCSEDIT}{Modifies WCS components of a set of NDFs}{WCSEDIT}
+
 \quickdes{WCSREG}{Aligns NDFs using multiple frames from their 
                   WCS components.}{WCSREG}
 
@@ -3543,8 +3545,9 @@ The CCDPACK routine descriptions are contained in the following pages.
                (see section 
                \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in 
                SUN/95).
-               A domain name is usually the most suitable choice.
          }
+         A domain name is usually the most suitable choice.
+
          Unlike the Current frame, the frame selected using this
          parameter is copied to the AST file unmodified; in particular
          it retains the same Domain name.
@@ -12475,8 +12478,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                (see section
                \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in
                SUN/95).
-               A domain name is usually the most suitable choice.
          }
+         A domain name is usually the most suitable choice.
          [PIXEL]
       }
       \sstsubsection{
@@ -12498,8 +12501,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                (see section
                \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in
                SUN/95).
-               A domain name is usually the most suitable choice.
          }
+         A domain name is usually the most suitable choice.
       }
       \sstsubsection{
          INEXT = \_LOGICAL (Read)
@@ -13239,6 +13242,240 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
 }
+\sstroutine{WCSEDIT}{
+   Modifies WCS components of a set of NDFs
+} {
+   \sstdescription{
+      This task performs a set of miscellaneous modifications to the
+      WCS (World Coordinate System) components of a list of NDFs.
+      According to the MODE parameter it can
+      \sstitemlist{
+         \sstitem
+            Set the Current frame
+         \sstitem
+            Add a new frame
+         \sstitem
+            Remove a frame
+      }
+      The routine does not fail if some of the requested edits cannot
+      be performed, but an output parameter MODIFIED records which
+      NDFs were successfully modified.
+
+      If a new frame is added it becomes the Current frame.  If a frame
+      is removed, the Current frame is not changed (unless the Current
+      frame itself is removed).
+   }
+   \sstusage{
+      WCSEDIT in mode frame
+   }
+   \sstparameters{
+      \sstsubsection{
+         COEFFS( $*$ ) = \_DOUBLE
+      } {
+         If MODE is ADD, this parameter is a list of the coefficients
+         used for the mapping from the basis frame to the new frame.
+         Its meaning and the number of values required depend on the
+         value of MAPTYPE:
+         \sstitemlist{
+            \sstitem
+               UNIT       -- No values are required
+               \begin{eqnarray*}
+                  x^\prime & = & x \\
+                  y^\prime & = & y
+               \end{eqnarray*}
+            \sstitem
+               LINEAR     -- Six values $C_1 \ldots C_6$ are required:
+               \begin{eqnarray*}
+                  x^\prime & = & C_1 + C_2 x + C_3 y \\
+                  y^\prime & = & C_4 + C_5 x + C_6 y
+               \end{eqnarray*}
+            \sstitem
+               PINCUSHION -- Three values $C_1 \ldots C_3$ are required:
+               \begin{eqnarray*}
+                  x^\prime = x * ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] ) \\
+                  y^\prime = y * ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] )
+               \end{eqnarray*}
+         }
+      }
+      \sstsubsection{
+         DOMAIN = LITERAL (Read)
+      } {
+         If MODE is ADD this gives the domain name to be used for the
+         new frame.  Spaces in the name are ignored and letters are
+         folded to upper case.  If the new frame is successfully added
+         and any frame with the same domain name already exists, it
+         will be removed, and a message will be printed to that effect.
+      }
+      \sstsubsection{
+         EPOCH = \_DOUBLE (Read)
+      } {
+         If a \qt{Sky Co-ordinate System} specification is supplied (using
+         parameter FRAME) for a celestial co-ordinate system, then
+         an epoch value is needed to qualify it. This is the epoch at
+         which the supplied sky positions were determined. It should be
+         given as a decimal years value, with or without decimal places
+         (\qt{1996.8} for example). Such values are interpreted as a
+         Besselian epoch if less than 1984.0 and as a Julian epoch
+         otherwise.
+      }
+      \sstsubsection{
+         FRAME = LITERAL (Read)
+      } {
+         This parameter specifies the \qt{basis frame}, which has the
+         following meaning according to the value of the MODE parameter:
+         \sstitemlist{
+            \sstitem
+               MODE = CURRENT -- The frame to be made Current
+            \sstitem
+               MODE = REMOVE  -- The frame to remove; if it is a domain
+                                 name (see below) then all frames with
+                                 that domain will be removed.
+            \sstitem
+                MODE = ADD    -- The new frame will be a copy of the
+                                 basis frame, and will be mapped from it
+                                 using the mapping given.
+         }
+
+         The value of the parameter can be one of the following:
+         \sstitemlist{
+            \sstitem
+               A domain name such as SKY, AXIS, PIXEL, etc.
+            \sstitem
+               An integer value giving the index of the required Frame
+               within the WCS component.
+            \sstitem
+               A \qt{Sky Co-ordinate System} (SCS) value such as
+               EQUAT(J2000)
+               (see section
+               \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in
+               SUN/95).
+         }
+         A domain name is usually the most suitable choice.
+      }
+      \sstsubsection{
+         IN = LITERAL (Read)
+      } {
+         A list specifying the names of the NDFs whose WCS components
+         are to be modified.  The NDF names should be separated by
+         commas and may include wildcards.
+      }
+      \sstsubsection{
+         LOGFILE = FILENAME (Read)
+      } {
+         Name of the CCDPACK logfile.  If a null (!) value is given for
+         this parameter, then no logfile will be written, regardless of
+         the value of the LOGTO parameter.
+
+         If the logging system has been initialised using \xroutine{CCDSETUP},
+         then the value specified there will be used. Otherwise, the
+         default is \qt{CCDPACK.LOG}.
+         [CCDPACK.LOG]
+      }
+      \sstsubsection{
+         LOGTO = LITERAL (Read)
+      } {
+         Every CCDPACK application has the ability to log its output
+         for future reference as well as for display on the terminal.
+         This parameter controls this process, and may be set to any
+         unique abbreviation of the following:
+         \sstitemlist{
+
+            \sstitem
+               TERMINAL  -- Send output to the terminal only
+
+            \sstitem
+               LOGFILE   -- Send output to the logfile only (see the
+                               LOGFILE parameter)
+
+            \sstitem
+               BOTH      -- Send output to both the terminal and the
+                               logfile
+
+            \sstitem
+               NEITHER   -- Produce no output at all
+
+         }
+         If the logging system has been initialised using \xroutine{CCDSETUP}
+         then the value specified there will be used. Otherwise, the
+         default is \qt{BOTH}.
+         [BOTH]
+      }
+      \sstsubsection{
+         MAPTYPE = LITERAL (Read)
+      } {
+         This parameter is required when MODE is ADD, and specifies the
+         type of mapping which connects the basis frame to the new frame.
+         It may take one of the following values:
+         \sstitemlist{
+            \sstitem
+               UNIT
+            \sstitem
+               LINEAR
+            \sstitem
+               PINCUSHION
+         }
+         [UNIT]
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      } {
+         The action to be performed.  It may take one of the following
+         values:
+         \sstitemlist{
+            \sstitem
+               ADD      -- Add a new frame (which becomes Current)
+            \sstitem
+               CURRENT  -- Set the Current frame
+            \sstitem
+               REMOVE   -- Remove a frame
+         }
+         [CURRENT]
+      }
+      \sstsubsection{
+         MODIFIED = LITERAL (Write)
+      } {
+         On exit, this parameter gives a comma-separated list of all the
+         NDFs which were successfully modified.  In particular, if MODE
+         is CURRENT, this list will include all the NDFs which contained
+         the specified frame, but exclude any which did not.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsedit $*$ current ccd\_reg
+      } {
+         This sets the current frame of all the NDFs in the current
+         directory to the \qt{CCD\_REG} domain.  The MODIFY parameter is
+         set on output to contain the names of all those NDFs which
+         had such a frame.
+      }
+      \sstexamplesubsection{
+         wcsedit data$*$ remove frame=4
+      } {
+         The fourth frame in the WCS component of each NDF \qt{data$*$.sdf}
+         is removed.
+      }
+      \sstexamplesubsection{
+         wcsedit \qt{first,second} mode=add frame=GRID maptype=pcd
+                 coeffs=[-6.8e-10,0,0] domain=NEW
+      } {
+         A new frame, in the domain \qt{NEW}, is added to the NDFs first
+         and second.  It is connected to the previously existing GRID
+         domain by a pincushion distortion mapping centred at the
+         origin with a distortion coefficient of -6.8e-10.  If any
+         frames with domain NEW already exist in those NDFs they are
+         removed.
+      }
+   }
+   \sstnotes{
+      This routine provides similar functionality to that provided by
+      \xref{KAPPA}{sun95}{} applications 
+      \xref{WCSADD}{sun95}{WCSADD}, 
+      \xref{WCSREMOVE}{sun95}{WCSREMOVE} and 
+      \xref{WCSFRAME}{sun95}{WCSFRAME}, but allows
+      use of CCDPACK-style NDF lists.
+   }
+}
 \sstroutine{WCSREG}{
    Aligns NDFs using multiple frames from their WCS components
 } {
@@ -13955,6 +14192,8 @@ This page left blank deliberately.
 
 \quickdes{TRANNDF}{Transforms (resamples) images.}
                   {TRANNDF}
+
+\quickdes{WCSEDIT}{Modifies WCS components of a set of NDFs}{WCSEDIT}
 
 \quickdes{WCSREG}{Aligns NDFs using multiple frames from their 
                   WCS components.}{WCSREG}
