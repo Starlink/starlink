@@ -80,6 +80,8 @@ AC_PROG_AWK
 
 AC_PATH_PROG([JAVAC], [javac], [NOJAVAC])
 AC_ARG_VAR([JAVAC], [Location of java compiler])
+AC_PATH_PROG([JAVA], [java], [NOJAVA])
+AC_ARG_VAR([JAVA], [Location of java runtime])
 
 if test "$ACLOCAL" = unknown; then
     AC_MSG_ERROR([Can't find aclocal -- have the autotools been installed?])
