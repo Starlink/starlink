@@ -51,6 +51,7 @@
 *      8 Feb 95 : V1.8-0 Corrected bug in types of MDATE and MSWITCH.
 *                        HEAD.DET was also not being set up! (DJA)
 *      9 May 95 : V1.8-1 Updated access to SSDS files (DJA)
+*      8 Aug 95 : V1.8-2 Added check for objects outside exposure map (DJA)
 *
 *    Type Definitions :
 *
@@ -111,7 +112,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XPSSCORR version 1.8-1' )
+        PARAMETER 		( VERSION = 'XPSSCORR version 1.8-2' )
 *-
 
 *    Check status
@@ -660,17 +661,26 @@
         YPIX = (-YPOS(SLP) * 7200. - YSTART) / YWID + 1
         SUM=0.0
         CNT=0
-*
 
-        DO LPX=(XPIX-PIXRAD),(XPIX+PIXRAD)
-          DO LPY=YPIX-PIXRAD,YPIX+PIXRAD
-            IF (SQRT ( REAL((XPIX-LPX)**2 + (YPIX-LPY)**2) )
+*      Trap case where point doesn't lie on exposure image
+        IF ( (XPIX+PIXRAD) .LT. 1 ) .OR.
+     :       (XPIX-PIXRAD) .GT. EDIM1 ) .OR.
+     :       (YPIX+PIXRAD) .LT. 1 ) .OR.
+     :       (YPIX-PIXRAD) .GT. EDIM2 ) ) THEN
+          CALL MSG_SETI( 'N', SLP )
+          CALL MSG_PRNT( 'Warning, source ^N does not lie on'/
+     :                   /' exposure map' )
+        ELSE
+          DO LPX = MAX(1,XPIX-PIXRAD), MIN(EDIM1,XPIX+PIXRAD)
+            DO LPY = MAX(1,YPIX-PIXRAD), MIN(EDIM2,YPIX+PIXRAD)
+              IF (SQRT ( REAL((XPIX-LPX)**2 + (YPIX-LPY)**2) )
      :                                          .LE. PIXRAD) THEN
-              SUM = SUM + EXDATA(LPX,LPY)
-              CNT = CNT + 1
-            ENDIF
+                SUM = SUM + EXDATA(LPX,LPY)
+                CNT = CNT + 1
+              ENDIF
+            ENDDO
           ENDDO
-        ENDDO
+        END IF
         EXPO_TIM = SUM / REAL(CNT)
 
 *      Find corrected flux, assuming exposure time none zero
@@ -695,7 +705,7 @@
 
 *    Tidy up
  999  IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', 'from XPSSCORR_EXP', STATUS )
+        CALL AST_REXIT( 'XPSSCORR_EXP', STATUS )
       END IF
 
       END
