@@ -187,7 +187,7 @@
 *      response structures where this gives the wrong answer
           IF ( NAME .NE. 'SPATIAL_RESP' ) THEN
             CALL BDI1_CFIND( MDID, ARGS(2), 'Data', .FALSE.,
-     :                            ALOC, NDIM, DIMS, STATUS )
+     :                       .FALSE., ALOC, NDIM, DIMS, STATUS )
           END IF
 
           IF ( (NAME .EQ. 'SPATIAL_RESP') .OR.
