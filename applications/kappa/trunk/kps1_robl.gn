@@ -1,56 +1,65 @@
-*+  ROTAS4 - rotates input array into output array for ROTATE
+      SUBROUTINE KPS1_ROBL<T>( NUMRA, LONG, SHORT, ROTSIZ, XLARGE, IDIM1,
+     :                         IDIM2, ARRIN, ODIM1, ODIM2, ARROUT, WORK,
+     :                         STATUS )
+*+
+*  Name:
+*     KPS1_ROBLx
 
-      SUBROUTINE ROTAS4( NUMRA, LONG, SHORT, ROTSIZ, XLARGE, IDIM1,
-     :                   IDIM2, ARRIN, ODIM1, ODIM2, ARROUT, WORK,
-     :                   STATUS )
-*
-*    Description :
-*
-*     The input array, ARRIN, is rotated through NUMRA right angles in
-*     the clockwise direction as a number of ROTSIZ by ROTSIZ sections.
+*  Purpose:
+*     Rotates input array into output array for ROTATE.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_ROBLx( NUMRA, LONG, SHORT, ROTSIZ, XLARGE, IDIM1, IDIM2,
+*     :                ARRIN, ODIM1, ODIM2, ARROUT, WORK, STATUS )
+
+*  Description:
+*     This routine rotates an array in 90-degree multiples by blocking
+*     (in the NDF sense) the array into square sections.  The input
+*     array, ARRIN, is rotated through NUMRA right angles in the
+*     clockwise direction as a number of ROTSIZ by ROTSIZ sections.
 *     The rotated array is put into ARROUT.
-*     An immediate return will occur if STATUS has an error value on
-*     entry.
-*
-*    Invocation :
-*
-*      CALL ROTAS4( NUMRA, LONG, SHORT, ROTSIZ, XLARGE, IDIM1, IDIM2,
-*     :             ARRIN, ODIM1, ODIM2, ARROUT, WORK, STATUS )
-*
-*    Arguments :
-*
-*     NUMRA = INTEGER( READ )
-*         Number of right-angles through which data will be rotated.
-*     LONG = INTEGER( READ )
-*         Longest dimension of the array to be rotated.
-*     SHORT = INTEGER( READ )
-*         Shortest dimension of the array to be rotated.
-*     ROTSIZ = INTEGER( READ )
-*         Size of the subsections to be rotated.
-*     XLARGE = LOGICAL( READ )
-*         Should be .TRUE. if first dimension of the array to be
-*           rotated is greater than the second.
-*     IDIM1 = INTEGER( READ )
-*         The first dimension of the 2-d array to be rotated.
-*     IDIM2 = INTEGER( READ )
-*         The second dimension of the 2-d array to be rotated.
-*     ARRIN( IDIM1, IDIM2 ) = REAL( READ )
-*         Data to be rotated.
-*     ODIM1 = INTEGER( READ )
-*         The first dimension of the output 2-d array.
-*     ODIM2 = INTEGER( READ )
-*         The second dimension of the output 2-d array.
-*     ARROUT( ODIM1, ODIM2 ) = REAL( WRITE )
-*         Will contain the rotated data.
-*     WORK( ROTSIZ, ROTSIZ ) = REAL( WRITE )
-*         Workspace to hold the subsection for rotation.
+
+*  Arguments:
+*     NUMRA = INTEGER (Given)
+*        Number of right-angles through which the data will be rotated.
+*     LONG = INTEGER (Given)
+*        Longer dimension of the array to be rotated.
+*     SHORT = INTEGER (Given)
+*        Shorter dimension of the array to be rotated.
+*     ROTSIZ = INTEGER (Given)
+*        Size of the subsections to be rotated.
+*     XLARGE = LOGICAL (Given)
+*        Should be .TRUE. if first dimension of the array to be rotated
+*        is greater than the second.
+*     IDIM1 = INTEGER (Given)
+*        The first dimension of the 2-dimensional array to be rotated.
+*     IDIM2 = INTEGER (Given)
+*        The second dimension of the 2-dimensional array to be rotated.
+*     ARRIN( IDIM1, IDIM2 ) = ? (Given)
+*        Data to be rotated.
+*     ODIM1 = INTEGER (Given)
+*        The first dimension of the output 2-dimensional array.
+*     ODIM2 = INTEGER (Given)
+*        The second dimension of the output 2-dimensional array.
+*     ARROUT( ODIM1, ODIM2 ) = ? (Returned)
+*        Will contain the rotated data.
+*     WORK( ROTSIZ, ROTSIZ ) = ? (Returned)
+*        Workspace to hold the subsection for rotation.
 *     STATUS = INTEGER( UPDATE )
-*         This is the global status, if this variable has an error
-*           value on entry then an immediate return will occur. If an
-*           error occurs during the execution of this routine STATUS 
-*           will be returned containing the appropriate error value.
+*        The global status.
 *
-*    Method :
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRIN, ARROUT, and WORK arguments of the routine must have the
+*     data type specified.
+*     - If an error occurs during the execution of this routine STATUS
+*     will be returned containing the appropriate error value.
+
+*  Algorithm:
 *     If no error on entry then
 *        ENDL is the position of the start of the last rotation box
 *          along the longer side of the input array
@@ -69,7 +78,7 @@
 *             or equal to ENDS
 *              Rotate box pointed at by INDEXL, INDEXS
 *           End for
-*           If shorter dimension of input array is not exactly divisible 
+*           If shorter dimension of input array is not exactly divisible
 *             by ROTSIZ then
 *              There will be some data left unrotated so set INDEXS to
 *                point at ENDS
@@ -93,138 +102,125 @@
 *           Endif
 *        Endif
 *     Endif
-*
-*    Authors :
-*
-*     Dave Baines (ROE::ASOC5)
-*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     27/07/1983 : Original version                     (ROE::ASOC5)
-*     17/02/1984 : Documentation brought up to standard (ROE::ASOC5)
-*     1986 Sep 9 : Renamed parameters section to arguments and tidied
-*                  (RL.STAR::CUR).
-*     1989 Aug  7: Passed array dimensions as separate variables
-*                  (RL.STAR::CUR).
-*
-*    Type Definitions :
 
-      IMPLICIT NONE
+*  Authors:
+*     DB: Dave Baines (ROE)
+*     MJC: Malcolm J. Currie (Starlink)
+*     {enter_new_authors_here}
 
-*    Global constants :
+*  History:
+*     27/07/1983 (DB):
+*        Original version.
+*     17/02/1984 (DB):
+*        Documentation brought up to standard.
+*     1986 September 9 (MJC):
+*        Renamed parameters section to arguments and tidied.
+*     1989 August 7 (MJC):
+*        Passed array dimensions as separate variables.
+*     1995 May 16 (MJC):
+*        Made generic from ROTAS4.  Used an SST prologue and modern
+*        variable declarations.  Corrected grammatical errors.
+*     {enter_further_changes_here}
 
-      INCLUDE 'SAE_PAR'
+*  Bugs:
+*     {note_any_bugs_here}
 
-*    Import :
-
-      INTEGER
-     :  IDIM1, IDIM2,
-     :  ODIM1, ODIM2,
-     :  NUMRA,
-     :  LONG,
-     :  SHORT,
-     :  ROTSIZ
-
-      LOGICAL
-     :  XLARGE
-
-      REAL
-     :  ARRIN( IDIM1, IDIM2 )
-
-*    Import-Export :
-
-      REAL
-     :  WORK( ROTSIZ, ROTSIZ )
-
-*    Export :
-
-      REAL
-     :  ARROUT( ODIM1, ODIM2 )
-
-*    Status :
-
-      INTEGER STATUS
-
-*    Local variables :
-
-      INTEGER
-     :  ENDL,                  ! Position of last rotation box along
-                               ! longest side
-     :  ENDS,                  ! Position of last rotation box along
-                               ! shortest side
-     :  INDEXL,                ! Pointer to subsection, long dimension
-     :  INDEXS                 !    "     "      "      short    "
 *-
 
-*    check for error on entry
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing allowed
 
-      IF ( STATUS .EQ. SAI__OK ) THEN
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! SAE global constants
 
-*       set up positions of last rotation box along long and short
-*       dimensions
+*  Arguments Given:
+      INTEGER NUMRA
+      INTEGER LONG
+      INTEGER SHORT
+      INTEGER ROTSIZ
+      LOGICAL XLARGE
+      INTEGER IDIM1
+      INTEGER IDIM2
+      INTEGER ODIM1
+      INTEGER ODIM2
+      <TYPE> ARRIN( IDIM1, IDIM2 )
 
-         ENDL = LONG  + 1 - ROTSIZ
-         ENDS = SHORT + 1 - ROTSIZ
+*  Arguments Returned:
+      <TYPE> ARROUT( ODIM1, ODIM2 )
+      <TYPE> WORK( ROTSIZ, ROTSIZ )
 
-*       rotate the array as a number of ROTSIZ by ROTSIZ boxes
-*       move along longer side
+*  Status:
+      INTEGER STATUS             ! Global status
 
-         DO  INDEXL = 1, ENDL, ROTSIZ
+*  Local Variables:
+      INTEGER ENDL               ! Position of last rotation box along
+                                 ! longer side
+      INTEGER ENDS               ! Position of last rotation box along
+                                 ! shorter side
+      INTEGER INDEXL             ! Pointer to subsection, long dimension
+      INTEGER INDEXS             ! Pointer to subsection, short
+                                 ! dimension
 
-*          move along shorter side
-            DO  INDEXS = 1, ENDS, ROTSIZ
+*.
 
-               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
-     :                      ARROUT, WORK, STATUS )
-            END DO
+*  Check the global inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*          check for unrotated data along shorter side of input array
+*  Set up the positions of the last rotation box along longer and
+*  shorter dimensions.
+      ENDL = LONG  + 1 - ROTSIZ
+      ENDS = SHORT + 1 - ROTSIZ
 
-            IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
+*  Rotate the array as a number of ROTSIZ by ROTSIZ boxes move along
+*  the longer side.
+      DO INDEXL = 1, ENDL, ROTSIZ
 
-*             pointer set to position af last rotation box along
-*             shorter side
+*  Move along shorter side
+         DO  INDEXS = 1, ENDS, ROTSIZ
 
-               INDEXS = ENDS
-
-               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
-     :                      ARROUT, WORK, STATUS )
-            END IF
+            CALL KPS1_RORB<T>( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
+     :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
+     :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
          END DO
 
-*       check for unrotated data along longer side of input array
+*  Check for unrotated data along the shorter side of the input array.
+         IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
 
-         IF ( MOD( LONG, ROTSIZ ) .NE. 0 ) THEN
+*  The pointer is set to position of the last rotation box along the
+*  shorter side.
+            INDEXS = ENDS
 
-*          pointer set to position of last rotaton box along longer side
+            CALL KPS1_RORB<T>( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
+     :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
+     :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
+         END IF
+      END DO
 
-            INDEXL = ENDL
+*  Check for unrotated data along the longer side of the input array.
+      IF ( MOD( LONG, ROTSIZ ) .NE. 0 ) THEN
 
-*          move along shorter side
+*  The pointer is set to the position of the last rotation box along
+*  the longer side.
+         INDEXL = ENDL
 
-            DO INDEXS = 1, ENDS, ROTSIZ
+*  Move along the shorter side.
+         DO INDEXS = 1, ENDS, ROTSIZ
 
-               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
-     :                      ARROUT, WORK, STATUS )
-            END DO
+            CALL KPS1_RORB<T>( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
+     :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
+     :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
+         END DO
 
-*          check for unrotated data along shorter side of input array
+*  Check for unrotated data along the shorter side of the input array.
+         IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
 
-            IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
+*  The pointer is set to the position of the last rotation box along
+*  the shorter side.
+            INDEXS = ENDS
 
-*             pointer set to position af last rotation box along
-*             shorter side
-
-               INDEXS = ENDS
-
-               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
-     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
-     :                      ARROUT, WORK, STATUS )
-            END IF
+            CALL KPS1_RORB<T>( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS,
+     :                         INDEXL, INDEXS, IDIM1, IDIM2, ARRIN,
+     :                         ODIM1, ODIM2, ARROUT, WORK, STATUS )
          END IF
       END IF
 
