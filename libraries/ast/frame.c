@@ -1099,7 +1099,7 @@ f     AST_DISTANCE function.
          }
 
 /* Use astAngle to get the required angle. */
-         result = astAngle( this, a, aa, b );
+         result = astAngle( this, aa, a, b );
       }
    }
 
