@@ -2281,12 +2281,17 @@ AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
           where <em>username</em> is your username on that
           system<index>CVS!repository</index>; you will need to set
           the environment variable <code>CVS_RSH</code> to
-          <code>ssh</code> to connect to the repository.  There is
-          currently anonymous web-based access to the repository at
-          <url>http://cvsweb.starlink.ac.uk</url>, and we expect to
-          offer anonymous CVS access in the near future.  See
-          <url>http://dev.starlink.ac.uk/</url> for news. [XXX add
-          details of the anoncvs setup]</p>
+          <code>ssh</code> to connect to the repository.</p>
+
+        <p>There is also anonymous CVS access to the repository.  Use
+<verbatim>
+% cvs -d :pserver:anonymous@cvs.starlink.ac.uk:/cvs login
+# password starlink
+% cvs -d :pserver:anonymous@cvs.starlink.ac.uk:/cvs &lt;cvs-command&gt;
+</verbatim>
+        There is also anonymous web-based access to the repository at
+          <url>http://cvsweb.starlink.ac.uk</url>.  See
+          <url>http://dev.starlink.ac.uk/</url> for news.</p>
 
         <p>There are a few more details about CVS,
           including a link to a CVS Primer, in <ref id="tool-cvs"/>.</p>
@@ -2297,21 +2302,17 @@ AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
           application versions for themselves and even, if they find a
           bug, offer fixes.  Anyone who finds a bug is invited to
           report it through the Project's bug-reporting system at
-          <url>http://dev.starlink.ac.uk/bugzilla/</url> [XXX fill in
-          details about how to do this without an account on
-          <code>cvs.starlink.ac.uk</code>], but if this report comes
-          with fixes, it will be <em>particularly</em> welcome.</p>
+          <url>http://dev.starlink.ac.uk/bugzilla/</url>, but if this
+          report comes with fixes, it will be <em>particularly</em>
+          welcome.</p>
 
         <p>If you do have bugfixes to offer, then you should get in
           touch with the `owner' of the component to discuss how to
           give them to the project.  You will find the owner of a
           component by looking at the file <code>component.xml</code>
-          in the component's checkout directory.  This should list
-          those who have worked on the component, and... [XXX or what
-          -- how formal should we be? -- how do we remember, ourselves,
-          who'd be likely to know most about <code>chr</code>, for
-          example? -- even with good memories, how will we know in a
-          couple of years?].</p>
+          in the component's checkout directory; this should list
+          those who have worked on the component, along with someone
+          nominated as the component's `owner'.</p>
 
         <p>If you make quite a few fixes, then it might be best to
           give you committer access to the repository, by giving you
