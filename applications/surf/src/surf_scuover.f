@@ -111,6 +111,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.20  2004/11/18 20:40:10  timj
+*     CNF_PVAL brackets were in the wrong place
+*
 *     Revision 1.19  2004/09/08 02:03:34  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -1113,7 +1116,7 @@
             DO I = 1, N_BOL
 
                CALL VEC_DTOD(.TRUE., 1, 
-     :                       %VAL(CNF_PVAL(BOL_RA_PTR+(I-1)*VAL__NBD)),
+     :                       %VAL(CNF_PVAL(BOL_RA_PTR)+(I-1)*VAL__NBD),
      :              DXTEMP, IERR, NERR, STATUS)
                CALL VEC_DTOD(.TRUE., 1, 
      :              %VAL(CNF_PVAL(BOL_DEC_PTR)+(I-1)*VAL__NBD),
