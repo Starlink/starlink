@@ -12,9 +12,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -43,6 +42,8 @@
 
       ELSE
 
+        CALL USI_INIT()
+
         CALL GCB_ATTACH('TIME',STATUS)
 
 *  make note of segments currently selected
@@ -50,7 +51,7 @@
           SEL(ISECT)=T_SEL(ISECT)
         ENDDO
 
-        CALL PAR_GET0L('KEEP',KEEP,STATUS)
+        CALL USI_GET0L('KEEP',KEEP,STATUS)
         IF (KEEP) THEN
           CALL MSG_PRNT('Select extent of data to keep...')
         ELSE
@@ -100,6 +101,9 @@
             T_CLEAR=.FALSE.
           ENDIF
         ENDIF
+
+        CALL USI_CLOSE()
+
       ENDIF
 
       END
@@ -120,7 +124,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Import :
       INTEGER SECT
       REAL XL,XR
@@ -172,7 +176,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Import :
       INTEGER SECT
       REAL XL,XR
