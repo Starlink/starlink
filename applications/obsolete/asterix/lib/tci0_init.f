@@ -94,6 +94,10 @@
 
 *  External References:
       EXTERNAL			ADI_REQPKG
+      EXTERNAL			TCI1_READ
+
+*  Local Variables:
+      INTEGER			DID			! Dummy variable
 *.
 
 *  Check inherited global status.
@@ -104,6 +108,9 @@
 
 *    Load the ADI classes
         CALL ADI_REQPKG( 'time', STATUS )
+
+*    Define methods
+        CALL ADI_DEFMTH( 'ReadTiming(HDSfile)', TCI1_READ, DID, STATUS )
 
 *    Now initialised
 	TCI_INIT = .TRUE.

@@ -131,11 +131,11 @@
         CALL ADI_NEW0( 'Timing', OARG, STATUS )
 
 *    Write its member values
+        IF ( EXPOK ) THEN
+          CALL ADI_CPUT0R( OARG, 'Exposure', EXPO, STATUS )
+        END IF
         IF ( EFFOK ) THEN
           CALL ADI_CPUT0R( OARG, 'EffExposure', EFEXPO, STATUS )
-        END IF
-        IF ( IOK ) THEN
-          CALL ADI_CPUT0R( OARG, 'Exposure', EXPO, STATUS )
         END IF
 
       END IF
