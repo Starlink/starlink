@@ -1,31 +1,41 @@
-      SUBROUTINE CCD1_FTSEC( SUBST, TEXT, INDXY, STATUS )
+      SUBROUTINE CCD1_KTIDY( TOTRN, TEXT, INDXY, STATUS )
 *+
 *  Name:
-*     CCD1_FTSEC
+*     CCD1_KTIDY
 
 *  Purpose:
-*     Substitute for TRIMSEC-like subscript in FITS-like keyword.
+*     Make suitable substitutions in a FITS-like keyword.
 
 *  Language:
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_FTSEC( SUBST, TEXT, INDXY, STATUS )
+*     CALL CCD1_KTIDY( TOTRN, TEXT, INDXY, STATUS )
 
 *  Description:
-*     This routine substitutes for a subscript in a FITS-header-like
-*     keyword indicating an index into a CHARACTER value of the form
-*     "[A:B,C:D]", as used in header cards for IRAF-compatible keywords 
-*     like TRIMSEC.
+*     This routine turns a FITS-header-like string of the form which
+*     may be found in a translation table as used by the IMPORT 
+*     utility into a string suitable for use as a token in TRANSFORM
+*     routines.
 *
-*     If the string TEXT contains one of the sequences "<X1>", "<X2>",
-*     "<Y1>" or "<Y2>" respectively, then it will be replaced by
-*     "___X1___", "___X2___", "___Y1___" or "___Y2___" respectively
-*     if SUBST is TRUE, and simply removed otherwise.
-*     Additionally the value of INDXY will be returned as 1, 2, 3, or 4 
-*     respectively.  If none of these is present, INDXY will be returned
-*     as zero.  If more than one is present, INDXY will be returned 
-*     as -1.
+*     In fact it makes two related sets of substitutions: if it finds
+*     either a character which is legal in a FITS header but not a 
+*     TRANSFORM token ('-' or '.'), or one of the special strings 
+*     '(X1)', '(X2)', '(Y1)' or '(Y2)', then it replaces them by 
+*     something identifiable but palatable to TRANSFORM.  
+*     Additionally, if exactly one substitution of the X1,X2,Y1,Y2 type
+*     has been made, the returned INDXY argument will indicate which
+*     it was.
+*
+*     If TOTRN is FALSE, then X1-type strings will be removed rather
+*     than substituted for, and illegal character substitutions will
+*     not be made at all.
+*
+*     The routine is designed to be used with TOTRN = TRUE to generate
+*     a token for use in TRANSFORM expressions, and with TOTRN = FALSE
+*     to generate a genuine FITS header.  In either case, the INDXY
+*     argument can be examined to determine whether an X1-type 
+*     string was present.
 
 *  Notes:
 *     The form of the substituted phrases could be harmlessly altered to
@@ -35,19 +45,24 @@
 *     are alphanumeric so that they can be used as part of a TRN token.
 
 *  Arguments:
-*     SUBST = LOGICAL (Given)
-*        If TRUE, then each occurrence of one of the tokens will be 
-*        replaced by a different string as described above.  If FALSE,
-*        then each such occurrence will simply be removed.
+*     TOTRN = LOGICAL (Given)
+*        If TRUE, then the strings '(X1)', '(X2)', '(Y1)' and '(Y2)'
+*        will be turned into something identifiable and the returned
+*        string will be legal as a TRANSFORM token.  If FALSE, then
+*        the strings '(X1)', '(X2)', '(Y1)' and '(Y2)' will be 
+*        removed, and the returned string will be legal as a FITS
+*        header keyword.
 *     TEXT = CHARACTER * ( * ) (Given and Returned)
 *        On entry a FITS header-like keyword, which may contain 
-*        substrings of the form "<X1>" etc.  On exit, any such occurrence
-*        will be converted to "___X1___" etc or removed.  The string 
+*        substrings of the form "(X1)" etc.  On exit, such strings
+*        will be removed or converted as described above.  The string
 *        must be long enough to accommodate such substitutions.
 *     INDXY = INTEGER (Returned)
-*        Value of 1, 2, 3 or 4 for X1, X2, Y1 or Y2 substitution.  Value
-*        of 0 if no substitution.  Value of -1 for more than one 
-*        substitution.
+*        Indicates which of '(X1)', '(X2)', '(Y1)' or '(Y2)' has
+*        been found in TEXT.  If exactly one of these has been found,
+*        INDXY will be 1, 2, 3 or 4 respectively.  If more than one
+*        was found it will be -1, and if none has been found it 
+*        will be 0.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -63,11 +78,6 @@
 *        Original version.
 *     {enter_changes_here}
 
-*  Bugs:
-*     If SUBST is FALSE, the token is actually replaced by ' ' rather
-*     than removed.  This is equivalent to advertised behaviour only 
-*     when the token is at the end of the TEXT string.
-
 *-
 
 *  Type Definitions:
@@ -75,9 +85,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'GRP_PAR'          ! GRP system constants
 
 *  Arguments Given:
-      LOGICAL SUBST
+      LOGICAL TOTRN
 
 *  Arguments Given and Returned:
       CHARACTER * ( * ) TEXT
@@ -94,59 +105,98 @@
       
 *  Local Constants:
       INTEGER NTOK
-      PARAMETER ( NTOK = 4 )     ! Number of possible token substitutions
+      PARAMETER ( NTOK = 6 )     ! Number of possible token substitutions
       
 *  Local Variables:
       INTEGER I                  ! Loop variable
-      INTEGER NREP               ! Number of replacements made altogether
-      INTEGER NT                 ! Number of replacements for current token
-      CHARACTER * 2 TOKEN( NTOK ) ! Tokens to substitute for
+      INTEGER IAT                ! Position in input string
+      INTEGER NREP( NTOK )       ! Number of replacements made per token
+      INTEGER OAT                ! Position in output string
+      INTEGER RLENG( NTOK )      ! Length of strings in REPLC
+      INTEGER SLENG              ! Length of TEXT string
+      INTEGER TOTREP             ! Number of replacements altogether
+      INTEGER TLENG( NTOK )      ! Length of strings in TOKEN
       CHARACTER * 8 REPLC( NTOK ) ! Replacements for tokens
+      CHARACTER * 4 TOKEN( NTOK ) ! Tokens to substitute for
+      CHARACTER * ( GRP__SZNAM ) WORK ! Output string
       
 *  Local Data:
-      DATA TOKEN / 'X1', 'X2', 'Y1', 'Y2' /
-      DATA REPLC / '___X1___', '___X2___', '___Y1___', '___Y2___' /
+      DATA TOKEN / '(X1)', '(X2)', '(Y1)', '(Y2)', '.', '-' /
+      DATA REPLC / '___X1___', '___X2___', '___Y1___', '___Y2___',
+     :             '___DT___', '___MI___' /
       
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise counter.
-      NREP = 0
-
-*  Loop through tokens which might get substituted for.
+*  Set some initial values.
       DO I = 1, NTOK
+         NREP( I ) = 0
+         TLENG( I ) = CHR_LEN( TOKEN( I ) )
+         RLENG( I ) = CHR_LEN( REPLC( I ) )
+      END DO
+      SLENG = CHR_LEN( TEXT )
 
-*  Attempt substitutions on the current token.
-         IF ( SUBST ) THEN
-            CALL TRN_STOK( TOKEN( I ), REPLC( I ), TEXT, NT, STATUS )
-         ELSE
-            CALL TRN_STOK( TOKEN( I ), ' ', TEXT, NT, STATUS )
-         END IF
+*  Work through the text string a character at a time, replacing tokens
+*  as they are encountered.
+      IAT = 1
+      OAT = 1
+ 1    CONTINUE
+         DO I = 1, NTOK
 
-*  Check for probable string overflow.
-         IF ( CHR_LEN( TEXT ) .EQ. LEN( TEXT ) ) THEN
+*  If this is one of the tokens, copy the replacement string to the
+*  output string.
+            IF ( TEXT( IAT : IAT + TLENG( I ) ) .EQ. TOKEN( I ) ) THEN
+               IAT = IAT + TLENG( I )
+               NREP( I ) = NREP( I ) + 1
+
+               IF ( TOTRN ) THEN
+                  WORK( OAT : ) = REPLC( I )
+                  OAT = OAT + RLENG( I  )
+               ELSE
+                  IF ( I .GT. 4 ) THEN
+                     WORK( OAT : OAT ) = TEXT( IAT : IAT )
+                     OAT = OAT + 1
+                  END IF
+               END IF
+
+*  Otherwise, copy the character unchanged.
+            ELSE
+               WORK( OAT : OAT ) = TEXT( IAT : IAT )
+               OAT = OAT + 1
+               IAT = IAT + 1
+            END IF
+         END DO
+
+*  Check that we haven't overflowed the string length.
+         IF ( OAT .GT. LEN( TEXT ) .OR. OAT .GT. LEN( WORK ) ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ',
-     :      '  CCD1_FTSEC: Keyword string too short for substitutions',
+     :      '  CCD1_KTIDY: Keyword string too short for substitutions',
      :                    STATUS )
             GO TO 99
          END IF
 
-*  If a single substitution has been made, record it.
-         IF ( NT .EQ. 1 ) INDXY = I 
+*  Go to the next character if there is one.
+      IF ( IAT .GT. SLENG ) GO TO 1
 
-*  Keep track of the total number of substitutions.
-         NREP = NREP + NT
+*  Set INDXY so that if there has been a single substitution of one of
+*  the first four tokens it is set to the index of that token, otherwise
+*  it is 0 or -1.
+      TOTREP = 0
+      DO I = 1, 4
+         IF ( NREP( I ) .EQ. 1 ) INDXY = I
+         TOTREP = TOTREP + NREP( I )
       END DO
-
-*  Adjust the value of the return parameter.
-      IF ( NREP .EQ. 0 ) THEN
+      IF ( TOTREP .EQ. 0 ) THEN
          INDXY = 0
-      ELSE IF ( NREP .GT. 1 ) THEN
+      ELSE IF ( TOTREP .GT. 1 ) THEN
          INDXY = -1
       END IF
+         
+*  Finally write the output string back to the input one for return.
+      TEXT = WORK
 
 *  Error exit label.
  99   CONTINUE
