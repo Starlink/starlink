@@ -243,7 +243,7 @@ typedef enum {
    OP_XOR,                       /* Boolean exclusive OR */
 
 /* Null operation. */
-   OP_NULL,                      /* Null operation */
+   OP_NULL                       /* Null operation */
 } Oper;
 
 /* This structure holds a description of each symbol which may appear
@@ -2117,28 +2117,28 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 /* ----------------- */
 /* Loading a "bad" value simply means assigning AST__BAD to the top of
    stack element. */
-            ARG_0( OP_LDBAD,    , *y = AST__BAD )
+            ARG_0( OP_LDBAD,    ;, *y = AST__BAD )
 
 /* The following load constants associated with the (double) floating
    point representation into the top of stack element. */
-            ARG_0( OP_LDDIG,    , *y = (double) DBL_DIG )
-            ARG_0( OP_LDEPS,    , *y = DBL_EPSILON )
-            ARG_0( OP_LDMAX,    , *y = DBL_MAX )
-            ARG_0( OP_LDMAX10E, , *y = (double) DBL_MAX_10_EXP )
-            ARG_0( OP_LDMAXE,   , *y = (double) DBL_MAX_EXP )
-            ARG_0( OP_LDMDIG,   , *y = (double) DBL_MANT_DIG )
-            ARG_0( OP_LDMIN,    , *y = DBL_MIN )
-            ARG_0( OP_LDMIN10E, , *y = (double) DBL_MIN_10_EXP )
-            ARG_0( OP_LDMINE,   , *y = (double) DBL_MIN_EXP )
-            ARG_0( OP_LDRAD,    , *y = (double) FLT_RADIX )
-            ARG_0( OP_LDRND,    , *y = (double) FLT_ROUNDS )
+            ARG_0( OP_LDDIG,    ;, *y = (double) DBL_DIG )
+            ARG_0( OP_LDEPS,    ;, *y = DBL_EPSILON )
+            ARG_0( OP_LDMAX,    ;, *y = DBL_MAX )
+            ARG_0( OP_LDMAX10E, ;, *y = (double) DBL_MAX_10_EXP )
+            ARG_0( OP_LDMAXE,   ;, *y = (double) DBL_MAX_EXP )
+            ARG_0( OP_LDMDIG,   ;, *y = (double) DBL_MANT_DIG )
+            ARG_0( OP_LDMIN,    ;, *y = DBL_MIN )
+            ARG_0( OP_LDMIN10E, ;, *y = (double) DBL_MIN_10_EXP )
+            ARG_0( OP_LDMINE,   ;, *y = (double) DBL_MIN_EXP )
+            ARG_0( OP_LDRAD,    ;, *y = (double) FLT_RADIX )
+            ARG_0( OP_LDRND,    ;, *y = (double) FLT_ROUNDS )
 
 /* Mathematical constants. */
 /* ----------------------- */
 /* The following load mathematical constants into the top of stack
    element. */
             ARG_0( OP_LDE,      value = exp( 1.0 ), *y = value )
-            ARG_0( OP_LDPI,     , *y = pi )
+            ARG_0( OP_LDPI,     ;, *y = pi )
 
 /* Functions with one argument. */
 /* ---------------------------- */
