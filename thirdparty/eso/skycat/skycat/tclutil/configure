@@ -3236,6 +3236,7 @@ echo "${ECHO_T}$CXX_INCLUDE" >&6
 #
 # -----------------------------------------------------------------------
 OSVERSION="`uname -s`-`uname -r`"
+OSNAME="`uname -s`"
 
 
 # -----------------------------------------------------------------------
@@ -3244,9 +3245,13 @@ OSVERSION="`uname -s`-`uname -r`"
 # otherwise we have to use  "makedepend", which sometimes gets confused.
 # This sets the make target to use:
 #
+# For Solaris use cc -xM1, unless using gcc.
+#
 # -----------------------------------------------------------------------
 if test "$compiler" = "gcc" ; then
     DEPEND_TARGET="dep"
+elif test "$CXX" = "CC" && test "$OSNAME" = "SunOS" ; then
+    DEPEND_TARGET="soldep"
 else
     DEPEND_TARGET="makedepend"
 fi

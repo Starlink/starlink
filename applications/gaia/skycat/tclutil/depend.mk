@@ -25,6 +25,16 @@ dep:
 	@cp Makefile Makefile.bak
 	@mv Makefile.tmp Makefile
 
+# Solaris CC supports the -xM1 option for dependencies,
+# which works better than makedepend in some cases
+soldep:
+	@echo "generating depencies in $(PWD)"
+	@sed -e '/# DO NOT DELETE THIS LINE/,$$d' < Makefile > Makefile.tmp
+	@echo '# DO NOT DELETE THIS LINE -- make depend depends on it.' >> Makefile.tmp
+	$(CXX) -xM1 $(CC_SWITCHES) $(SRCS) >> Makefile.tmp
+	@cp Makefile Makefile.bak
+	@mv Makefile.tmp Makefile
+
 # generate a file with a list of object files (full path names) for this dir
 objlist: 
 	rm -f .objs
