@@ -40,7 +40,7 @@ class BitmapError : public DviError {
 class Bitmap {
  public:
     Bitmap (const int width, const int height, const int bpp=1,
-	    bool expandable=false,
+	    bool expandable=true,
 	    const int maxwidth=-1, const int maxheight=-1);
     ~Bitmap();
 
@@ -65,7 +65,7 @@ class Bitmap {
     void crop (Margin spec, int pixels, bool absolute=false)
 	    throw (BitmapError);
     void blur ();
-    void reset();
+    void clear();
     /**
      * Sets the current bitmap to be transparent, if possible.
      * @param sw if true, the current bitmap is set to be transparent
