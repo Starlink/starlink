@@ -1225,9 +1225,9 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
           either the bootstrap script or the macro set has been
           updated in the starconf installation, in which case starconf
           will propagate the updates to your directory.
-          The <code>./starconf.status</code> script should be
-          checked into the repository, but its products other than
-          <code>./bootstrap</code> should not be.  The file
+          The <code>./starconf.status</code> script should not be
+          checked into the repository, and neither should its products
+          such as <code>./bootstrap</code>.  The file
           <code>starconf.m4</code> is the only other product at
           present, but others may appear in future (see <ref
             id="developments"/>.</p>
@@ -1665,15 +1665,7 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
           components, since the standard <code>./bootstrap</code> script
           re-invokes starconf if it can.  You can delete this file, and
           regenerate it by running starconf either explicitly, or
-          implicitly through <code>./bootstrap</code>.  (There may seem
-          a contradiction between the assertion that
-          <code>starconf.status</code> holds such local things as
-          installation locations and that it should be checked in;
-          that's true, and why the installation locations are in fact
-          held in a non-checked-in file
-          <code>starconf.status.local</code>, which you should ignore,
-          and which we mention only in order to identify it for
-          you).</p>
+          implicitly through <code>./bootstrap</code>.</p>
 
         <p><em>Build tree and installation state</em>: The last
           noteworthy state is that in the build tree as a whole.  The
@@ -1895,6 +1887,16 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co thirdparty/fsf
             <em>not</em> recurse and check out the complete repository.
             The following lines check out particular directories,
             usefully recursing into their children.</p>
+
+          <p>If you want to check out just the
+            <code>applications</code> directory, but none of its
+            children, use
+            <verbatim>
+cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
+</verbatim>
+            while in the top-level directory.  Don't do <kbd>... co -l
+              .</kbd> in the <code>applications</code> directory --
+            you'll get the top-level directory again.</p>
 
         </subsubsect>
 
@@ -2618,7 +2620,7 @@ sed -n \
 starconf-validate: the following files are required but do not exist:
         bootstrap
 starconf-validate: the following files should be checked in, but aren't
-        Makefile.am configure.ac bootstrap component.xml.in component.xml starconf.status
+        Makefile.am configure.ac bootstrap component.xml.in component.xml
 Configuring with STARCONF_DEFAULT_STARLINK=/export3/sun
 Configuring with STARCONF_DEFAULT_PREFIX=/export3/sun
 Creating starconf.m4
@@ -2642,7 +2644,7 @@ Creating acinclude.m4 from starconf.m4
 <verbatim>
 % ./bootstrap 
 starconf-validate: the following files should be checked in, but aren't
-        Makefile.am configure.ac bootstrap component.xml.in component.xml starconf.status
+        Makefile.am configure.ac bootstrap component.xml.in component.xml
 Configuring with STARCONF_DEFAULT_STARLINK=/export3/sun
 Configuring with STARCONF_DEFAULT_PREFIX=/export3/sun
 Creating starconf.m4
