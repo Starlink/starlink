@@ -93,6 +93,7 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,6 +105,8 @@
 *        Had forgotten to divide ASCALE by two for LoWidth and HiWidth
 *     10 Jul 1996 (RJV):
 *        Did LoWidth and HiWidth properly
+*     18 Mar 1997 (RB):
+*        Cope with Bounds is axis structure missing (for rebin)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -207,6 +210,7 @@
      :          (ITEM(8:).EQ.'Width') ) THEN
 
 *    Locate the data
+        CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
         CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data', .FALSE.,
      :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
@@ -215,9 +219,18 @@
         CALL ADI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
      :                    STATUS )
 
-*    Map it
-        CALL BDI1_ARYMAP( BDID, CLOC, 'REAL', 'READ', NDIM, DIMS,
-     :                    PSID, PTR, NELM, STATUS )
+*    Map it (if a valid locator)
+        IF ( CLOC .NE. DAT__NOLOC ) THEN
+          CALL BDI1_ARYMAP( BDID, CLOC, 'REAL', 'READ', NDIM, DIMS,
+     :                      PSID, PTR, NELM, STATUS )
+        ELSE
+          CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
+          CALL ADI_NEW1R( DIMS(IAX), ITID, STATUS )
+          CALL ADI_MAPR( ITID, 'WRITE', PTR, STATUS )
+          CALL ARR_REG1R( 1.0, 1.0, DIMS(IAX), %VAL(PTR), STATUS )
+          CALL ADI_UNMAP( ITID, PTR, STATUS )
+          NELM = DIMS(IAX)
+        END IF
 
 *    Create invented object and map
         CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
@@ -508,6 +521,7 @@
      :          (ITEM(8:).EQ.'Bounds') ) THEN
 
 *    Locate the data
+        CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
         CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data', .FALSE.,
      :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
@@ -517,8 +531,16 @@
      :                    STATUS )
 
 *    Map it
-        CALL BDI1_ARYMAP( BDID, CLOC, 'REAL', 'READ', NDIM, DIMS,
-     :                    PSID, PTR, NELM, STATUS )
+        IF ( CLOC .NE. DAT__NOLOC ) THEN
+          CALL BDI1_ARYMAP( BDID, CLOC, 'REAL', 'READ', NDIM, DIMS,
+     :                      PSID, PTR, NELM, STATUS )
+        ELSE
+          CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
+          CALL ADI_NEW1R( DIMS(IAX), ITID, STATUS )
+          CALL ADI_MAPR( ITID, 'WRITE', PTR, STATUS )
+          CALL ARR_REG1R( 1.0, 1.0, DIMS(IAX), %VAL(PTR), STATUS )
+          CALL ADI_UNMAP( ITID, PTR, STATUS )
+        END IF
 
 *    Widths present?
         CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width', .FALSE.,
