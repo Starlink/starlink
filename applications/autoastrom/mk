@@ -17,4 +17,4 @@ test -d moggy || {
 
 test -f makefile || echorun ./configure
 
-make $*
+make -e $*
