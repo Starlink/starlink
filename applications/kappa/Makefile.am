@@ -2,7 +2,7 @@
 
 SUBDIRS = @subdirs@
 
-bin_SCRIPTS = $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
+bin_SCRIPTS = $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES) version.dat
 
 LOCAL_LINK = kapsub/libkapsub.la atools/libatools.la ccdpack/libccdpack.la `$(srcdir)/kappa_nogks_link_adam`
 

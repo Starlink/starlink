@@ -1,6 +1,6 @@
 # Shell initialisation for package KAPPA
 # Created automatically from kappa.ifd using ifd2star
-# Thu Jul  1 11:41:21 BST 2004
+# Thu Jul  1 13:43:41 BST 2004
 
 alias mem2d $KAPPA_DIR/mem2d
 alias kap_mem2d $KAPPA_DIR/mem2d
