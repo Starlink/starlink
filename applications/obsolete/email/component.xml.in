@@ -2,9 +2,9 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" status="obsolete">
   <version>@PACKAGE_VERSION@</version>
-  <path>applications/email</path>
+  <path>applications/obsolete/email</path>
   <description>Astronomy email address searching</description>
   <abstract><p>
 One of the most common activities on networked computers is the sending

@@ -2,9 +2,9 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="email">
+<component id="email" status="obsolete">
   <version>1.4-1</version>
-  <path>applications/email</path>
+  <path>applications/obsolete/email</path>
   <description>Astronomy email address searching</description>
   <abstract><p>
 One of the most common activities on networked computers is the sending
@@ -22,6 +22,15 @@ and astronomy groups in the UK and the rest of the world.
     </person>
     <person>
       <name>G R Mellor</name>
+    </person>
+    <person>
+      <name>Chris Benn</name>
+    </person>
+    <person>
+      <name>Adrian Fish</name>
+    </person>
+    <person>
+      <name>Phil Hill</name>
     </person>
   </developers>
   <documentation> sun182</documentation>

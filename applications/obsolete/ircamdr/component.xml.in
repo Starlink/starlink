@@ -2,9 +2,9 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" status="obsolete">
   <version>@PACKAGE_VERSION@</version>
-  <path>applications/obsolete/iras90</path>
+  <path>applications/obsolete/ircamdr</path>
   <description>IRCAMDR - IRCAM3 Data Reduction Software</description>
   <abstract><p>
 The IRCAM3 data reduction and analysis software package,
