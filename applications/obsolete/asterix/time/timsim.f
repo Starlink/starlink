@@ -152,8 +152,8 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
 *  Map axis and width
-      CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', AXPTR, STATUS )
-      CALL BDI_AXMAPR( IFID, 1, 'Width', 'READ', WIPTR, STATUS )
+      CALL BDI_AXMAPR( OFID, 1, 'Data', 'READ', AXPTR, STATUS )
+      CALL BDI_AXMAPR( OFID, 1, 'Width', 'READ', WIPTR, STATUS )
 
 *  Data Simulation
       CALL BDI_MAPR( OFID, 'Data', 'WRITE', OPTR, STATUS )

@@ -145,8 +145,14 @@
         IF ( PRIM ) THEN
 
 *      Extract dimensions
-          CALL ADI_CGET1I( PSID, 'SHAPE', DAT__MXDIM, DIMS, NDIM,
-     :                     STATUS )
+          CALL ADI_THERE( PSID, 'SHAPE', THERE, STATUS )
+          IF ( THERE ) THEN
+            CALL ADI_CGET1I( PSID, 'SHAPE', DAT__MXDIM, DIMS, NDIM,
+     :                       STATUS )
+          ELSE
+            NDIM = 0
+            DIMS(1) = 0
+          END IF
 
 *      Get type used to map
           CALL ADI_CGET0C( PSID, 'Type', MTYPE, STATUS )
