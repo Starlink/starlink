@@ -31,7 +31,7 @@ dnl    List the set of active subdirectories.
 dnl    This must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS(aif ctm fts ira irq ctg lpg kpg kgs kapgrf)
+AC_CONFIG_SUBDIRS(aif fts ira irq ctg lpg kpg kgs kapgrf)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
