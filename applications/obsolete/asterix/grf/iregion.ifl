@@ -8,26 +8,20 @@ interface IREGION
   parameter SUBMODE
     position 2
     type '_CHAR'
-    default 'ADD'
+    default 'NEW'
     vpath 'DEFAULT'
     prompt 'Sub-mode'
     help 'Type HELP for a full list'
   endparameter
-  parameter EXC
-    type '_LOGICAL'
-    prompt 'Exclude this region'
-    vpath 'DEFAULT'
-    default N
-  endparameter
   parameter XC
-    position 2
+    position 3
     type '_REAL'
     ppath 'DYNAMIC'
     prompt 'X centre'
     help 'X-coord of centre in axis units'
   endparameter
   parameter YC
-    position 3
+    position 4
     type '_REAL'
     ppath 'DYNAMIC'
     prompt 'Y centre'
