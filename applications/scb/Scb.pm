@@ -17,7 +17,7 @@ require Exporter;
 #  Names of routines and variables defined here to be exported.
 
 @EXPORT = qw/tarxf popd pushd module_name starpack
-             incdir srcdir indexfile taskfile/;
+             incdir srcdir bindir indexfile taskfile/;
 
 #  Includes.
 
@@ -30,7 +30,8 @@ use Cwd;
 #  Directory locations.
 
 $main::srcdir = "/local/star/sources";        # head of source tree
-$main::incdir = "/star/include";              # include directory
+$main::bindir = "/star/bin";                  # Starlink binaries directory
+$main::incdir = "/star/include";              # Starlink include directory
 
 #  Index file locations.
 
