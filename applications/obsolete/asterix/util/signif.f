@@ -98,10 +98,10 @@
 *    Obtain data object, access and check it
       IF ( OVERWRITE ) THEN
         CALL USI_TASSOCI( 'INP', '*', 'UPDATE', OFID, STATUS )
-        CALL USI_PRIM( OFID, PRIM, STATUS )
+        CALL BDI_PRIM( OFID, PRIM, STATUS )
       ELSE
         CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-        CALL USI_PRIM( IFID, PRIM, STATUS )
+        CALL BDI_PRIM( IFID, PRIM, STATUS )
         IF ( .NOT. PRIM ) THEN
           CALL USI_SHOW( 'Output data {OUT}', STATUS )
           CALL ADI_FCOPY( IFID, OFID, STATUS )
@@ -156,7 +156,7 @@
 
         CALL USI_ASSOCI( 'WEIGHT_DATA', '*', 'READ', WFID, STATUS )
 	IF ( STATUS .NE. SAI__OK ) GOTO 99
-        CALL USI_PRIM( WFID, STATUS )
+        CALL BDI_PRIM( WFID, PRIM, STATUS )
         IF ( .NOT. PRIM ) THEN
 	  STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'A numeric data object is required.',

@@ -77,7 +77,7 @@
 
 *    Obtain data object, access and check it
       CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL USI_PRIM( IFID, INPRIM, STATUS )
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
       CALL BDI_CHKDATA (IFID, OK, NDIMS, DIM, STATUS)
       NDAT = DIM(1)
 
@@ -113,7 +113,7 @@
 
             DO WHILE ( CONTINUE )
               CALL USI_TASSOCI( 'INP2', '*', 'READ', IFID2, STATUS )
-              CALL USI_PRIM( IFID2, INPRIM, STATUS )
+              CALL BDI_PRIM( IFID2, INPRIM, STATUS )
 
               IF (STATUS .NE. SAI__OK) GOTO 99
 

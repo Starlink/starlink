@@ -148,7 +148,7 @@
      :          QUAL_OK, %VAL(IQPTR), %VAL(ODPTR), STATUS )
 
 *    Copy axis data from dataset to the other
-      CALL USI_PRIM( IFID, IN_PRIM, STATUS )
+      CALL BDI_PRIM( IFID, IN_PRIM, STATUS )
       IF ( .NOT. IN_PRIM ) THEN
 
 *       Copy axis bin info

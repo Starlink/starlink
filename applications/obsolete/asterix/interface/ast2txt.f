@@ -108,7 +108,7 @@
 
 *    Get input object
       CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL USI_PRIM( IFID, INPRIM, STATUS )
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL BDI_TYPE( IFID, TYPE, STATUS )
 
