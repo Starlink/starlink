@@ -31,7 +31,7 @@ The following methods are available:
 
 =cut
 
-use vars qw/$VERSION $AMSRUNNING $debug/;
+use vars qw/$VERSION $AMSRUNNING $debug $NOBJECTS/;
 
 $VERSION = undef;
 $VERSION = '0.01';
@@ -66,6 +66,12 @@ use Starlink::AMS::Core;
 # up more than one ADAM environment.
 
 $AMSRUNNING = 0;
+
+# Keep track of the number of objects that are created.
+# We only want to shut down the message system when this
+# count hits 0
+
+$NOBJECTS = 0;
 
 use strict;
 use Carp;
@@ -113,6 +119,9 @@ sub new {
 	unless $status == &Starlink::ADAM::SAI__OK;
     }
   }
+
+  # Increment object count
+  $NOBJECTS++;
 
   # Return to caller
   return $task;
@@ -357,6 +366,8 @@ sub init {
   my $self = shift;
   my $status = &Starlink::ADAM::SAI__ERROR;
 
+  print "AMSRUNNING is $AMSRUNNING\n" if $debug;
+
   # Start up ADAM as long as one is not already active
   # Should be able to check by trying to contact the relay
   # for now just keep a state variable
@@ -382,6 +393,7 @@ sub init {
 
       # Set the AMSRUNNING flag
       $AMSRUNNING = 1;
+      print "AMSRUNNING set to true\n" if $debug;
     }
 
   } else {
@@ -407,8 +419,17 @@ required).
 sub DESTROY {   
   my $self = shift;
 
+  $NOBJECTS--;
+
   # No point killing messaging if it was never initialised
-  my $status = $self->__adamtask_exit if $self->running;
+  # Also only kill if $NOBJECTS hits zero
+
+  if ($NOBJECTS < 1) {
+    my $status = $self->__adamtask_exit if $self->running;
+    carp "Error shutting down AMS: Status = $status\n"
+      unless $status == &Starlink::ADAM::SAI__OK;
+  }
+
   print "Returning from adamtask_exit\n" if $debug;
 }
 
@@ -527,6 +548,7 @@ sub __adamtask_exit {
   # Reset adam_started
   $self->running(0);
 
+  print "Resetting AMSRUNNING\n" if $debug;
   $AMSRUNNING = 0;
 
   return $status;
