@@ -95,6 +95,8 @@
 *        (these are written as part of the standard headers). Removed
 *        HDUCLAS cards are these are not needed and can cause problems
 *        with saved images that are converted to FITS.
+*     2004 Sep 02 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,6 +113,7 @@
       INCLUDE 'NDF_PAR'         ! NDF_ public constants
       INCLUDE 'PRM_PAR'         ! PRIMDAT public constants
       INCLUDE 'AST_PAR'         ! AST parameters
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       INTEGER NDF               ! NDF identifier
@@ -341,8 +344,8 @@
 
 *  Read the FITS headers looking for a WCS. If the headers are bad for
 *  any reason this can fail, so trap any errors.
-         CALL RTD1_DEWCS( %VAL( IPHEAD ), NHEAD, .FALSE., IWCS,
-     :                    STATUS, %VAL(80) )
+         CALL RTD1_DEWCS( %VAL( CNF_PVAL( IPHEAD ) ), NHEAD, .FALSE., 
+     :                    IWCS, STATUS, %VAL( 80 ) )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF

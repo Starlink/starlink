@@ -75,6 +75,8 @@
 *        default.
 *     30-MAY-2001 (PWD):
 *        Now supports _DOUBLE data directly rather than presuming _REAL.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,6 +93,7 @@
       INCLUDE 'NDF_PAR'         ! NDF parameters
       INCLUDE 'AST_PAR'         ! AST parameters
       INCLUDE 'PSX_ERR'         ! PSX error codes
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -194,26 +197,33 @@
 
 *  And copy the data into it.
          IF ( DTYPE .EQ. '_REAL' ) THEN
-            CALL VEC_RTOR( .FALSE., EL, %VAL( IP ),
-     :                     %VAL( IPDAT ), IERR, NERR, STATUS )
+            CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                     %VAL( CNF_PVAL( IPDAT ) ), 
+     :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .FALSE., EL, %VAL( IP ),
-     :                     %VAL( IPDAT ), IERR, NERR, STATUS )
+            CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                     %VAL( CNF_PVAL( IPDAT ) ), 
+     :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
-            CALL VEC_ITOI( .FALSE., EL, %VAL( IP ),
-     :                     %VAL( IPDAT ), IERR, NERR, STATUS )
+            CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                     %VAL( CNF_PVAL( IPDAT ) ), 
+     :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
-            CALL VEC_WTOW( .FALSE., EL, %VAL( IP ),
-     :                     %VAL( IPDAT ), IERR, NERR, STATUS )
+            CALL VEC_WTOW( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                     %VAL( CNF_PVAL( IPDAT ) ), 
+     :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
-            CALL VEC_UWTOUW( .FALSE., EL, %VAL( IP ),
-     :                       %VAL( IPDAT ), IERR, NERR, STATUS )
+            CALL VEC_UWTOUW( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                       %VAL( CNF_PVAL( IPDAT ) ), 
+     :                       IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
-            CALL VEC_BTOB( .FALSE., EL, %VAL( IP ),
-     :                     %VAL( IPDAT ), IERR, NERR, STATUS )
+            CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                     %VAL( CNF_PVAL( IPDAT ) ), 
+     :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_UBYTE' ) THEN
-            CALL VEC_UBTOUB( .FALSE., EL, %VAL( IP ),
-     :                     %VAL( IPDAT ), IERR, NERR, STATUS )
+            CALL VEC_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                       %VAL( CNF_PVAL( IPDAT ) ), 
+     :                       IERR, NERR, STATUS )
          END IF
 
 *  Check for any new quality information
@@ -222,8 +232,9 @@
             IF ( HVQUAL ) THEN
                CALL NDF_MAP( IDNEW, 'QUALITY', '_BYTE', 'WRITE', IPDAT,
      :                       EL, STATUS )
-               CALL VEC_BTOB( .FALSE., EL, %VAL( IPQUAL ),
-     :                        %VAL( IPDAT ), IERR, NERR, STATUS )
+               CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IPQUAL ) ),
+     :                        %VAL( CNF_PVAL( IPDAT ) ), IERR, NERR, 
+     :                        STATUS )
             END IF
          END IF
 
@@ -247,7 +258,8 @@
      :                  STATUS )
          CALL DAT_MAPV( FITLOC, '_CHAR*80', 'WRITE', IPFIT, NFITS,
      :                  STATUS )
-         CALL RTD1_CHEAD( HEAD, NHEAD, %VAL( IPFIT ), STATUS, %VAL(80) )
+         CALL RTD1_CHEAD( HEAD, NHEAD, %VAL( CNF_PVAL( IPFIT ) ), 
+     :                    STATUS, %VAL( 80 ) )
          CALL DAT_UNMAP( FITLOC, STATUS )
 
 *  Take control of the NDF history component, by giving values to

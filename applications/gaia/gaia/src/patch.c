@@ -3,13 +3,12 @@
  *     patchCmd
  *
  *  Purpose:
- *     Interface from RTD to RPATCH routine.
+ *     Interface from GAIA to RPATCH routine.
  *
  *  Description:
- *     This routine is designed to be called from RTD, the Real Time
- *     Display tool, as a foreign method. It accepts an info structure
- *     that gives direct access to the displayed image and an unparsed
- *     sequence of arguments.
+ *     This routine is designed to be called from GAIA as a foreign method.
+ *     It accepts an info structure that gives direct access to the displayed
+ *     image and an unparsed sequence of arguments.
  *
  *     The arguments string must contain either:
  *
@@ -59,7 +58,7 @@
  *        message if appropriate. Only set if return is 0.
  *
  *  Copyright:
- *     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
+ *     Copyright (C) 1998-2004 Central Laboratory of the Research Councils
  *
  *  Authors:
  *     PWD: Peter W. Draper (STARLINK - Durham University)
@@ -71,6 +70,8 @@
  *        Added byte swapping changes.
  *     01-JUN-2001 (PWD):
  *        Now supports double precision images.
+ *     03-SEP-2004 (PWD):
+ *        Converted to pass CNF pointers to and from Fortran.
  */
 
 #include <stdio.h>
@@ -150,26 +151,29 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
     DECLARE_LOGICAL(haveQual);               /* True when NDF has quality */
     DECLARE_LOGICAL(usevar);                 /* Use variances if available? */
     DECLARE_LOGICAL(grab);                   /* Grab quality */
-    DECLARE_POINTER(f);                      /* Pointer to image data. */
-    DECLARE_POINTER(q);                      /* Pointer to quality data. */
-    DECLARE_POINTER(qualPtr);                /* Pointer to quality data */
+    DECLARE_POINTER(fimage);                 /* Pointer to image data. */
+    DECLARE_POINTER(fqual);                  /* Pointer to quality data. */
+    DECLARE_POINTER(fqualPtr);               /* Pointer to quality data */
     DECLARE_REAL(scale);                     /* Scaling factor for noise */
 
-    /* Local variables: */
-    int i, j;
-    int undo;
-    int release;
-    char *ptr;
+    /* Local C variables: */
+    byte *qualPtr;
     char *atPtr;
-    int keep, x1, y1, x2, y2;
-    int size;
-    int usepart;
-    char *opStr;
     char *opPtr;
+    char *opStr;
+    char *ptr;
     char param[EMS__SZPAR];
-    int used;
+    int i, j;
+    int keep, x1, y1, x2, y2;
+    int release;
     int result;
+    int size;
+    int undo;
+    int used;
+    int usepart;
     int variance;
+    void *image;
+    void *qual;
 
 #ifdef _DEBUG_
     printf( "Called patchCmd \n");
@@ -293,24 +297,30 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             break;
         }
 
-        /*  Access the quality information associated with this NDF
-         *  (this is a copy not the actual values and needs to be
-         *  added to any output NDFs. */
+        /*  Access the quality information associated with this NDF (this is a
+         *  copy not the actual mapped data and needs to be added to any output
+         *  NDFs. 
+         */
         if ( ndfId != 0 ) {
             grab = F77_TRUE;
             F77_CALL(rtd1_aqual)( INTEGER_ARG(&ndfId), LOGICAL_ARG(&grab),
-                                  POINTER_ARG(&qualPtr),
+                                  POINTER_ARG(&fqualPtr),
                                   LOGICAL_ARG(&haveQual));
+            qualPtr = (void *)NULL;
+            if ( haveQual == F77_TRUE ) {
+                F77_IMPORT_POINTER( fqualPtr, qualPtr );
+            }
         } else {
             haveQual = F77_FALSE;
         }
 
-        /*  If keep is true then record the contents of the image at
-            the given bounds (this is assumed to be a bounding box of
-            the region to be replaced). */
+        /*  If keep is true then record the contents of the image at the given
+         *  bounds (this is assumed to be a bounding box of the region to be
+         *  replaced). 
+         */ 
         if ( keep ) {
             if ( undoInfo.imagePtr != (void *) NULL ) {
-                free( (void *)undoInfo.imagePtr );
+                cnfFree( (void *)undoInfo.imagePtr );
                 undoInfo.imagePtr = (void *) NULL;
             }
             undoInfo.type = info->type;
@@ -330,8 +340,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
 
                 /* Do the same for the quality component if necessary */
                 if ( haveQual == F77_TRUE ) {
-                    undoInfo.qualPtr = copyImagetoWork( BYTE_IMAGE,
-                                                        (void *)qualPtr, 0,
+                    undoInfo.qualPtr = copyImagetoWork( BYTE_IMAGE, qualPtr, 0,
                                                         nx, x1, y1, x2, y2 );
                 }
             } else {
@@ -340,10 +349,10 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             }
         }
 
-        /*  Now decide if we want to process just a part of the image
-            rather than the whole as an efficiency saving, only do
-            this if region of image to use is less than a given
-            fraction of the whole. */
+        /*  Now decide if we want to process just a part of the image rather
+         *  than the whole as an efficiency saving, only do this if region of
+         *  image to use is less than a given fraction of the whole.
+         */
         if ( xs1 == 0 && ys1 == 0 && xs2 == 0 && ys2 == 0 )  {
             usepart = 0;
         } else {
@@ -356,20 +365,17 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                 ys1 = MAX( ys1, 0 );
                 xs2 = MIN( xs2, nx );
                 ys2 = MIN( ys2, ny );
-                f = (F77_POINTER_TYPE) copyImagetoWork( info->type,
-                                                        info->imageData,
-                                                        info->swap,
-                                                        nx, xs1, ys1,
-                                                        xs2, ys2 );
+                image = copyImagetoWork( info->type, info->imageData,
+                                         info->swap, nx, xs1, ys1, xs2, ys2 );
+                F77_EXPORT_POINTER( image, fimage );
 
                 /* Do the same for the quality component if necessary */
                 if ( haveQual == F77_TRUE ) {
-                    q = (F77_POINTER_TYPE) copyImagetoWork( BYTE_IMAGE,
-                                                            (void *)qualPtr, 0,
-                                                            nx, xs1, ys1, xs2,
-                                                            ys2 );
+                    qual = copyImagetoWork( BYTE_IMAGE, (void *) qualPtr, 0,
+                                            nx, xs1, ys1, xs2, ys2 );
+                    F77_EXPORT_POINTER( qual, fqual );
                 } else {
-                    q = (F77_POINTER_TYPE) NULL;
+                    fqual = (F77_POINTER_TYPE) NULL;
                 }
 
                 /* Work out new image size and increment ranges to Fortran
@@ -387,8 +393,8 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             }
         }
         if ( !usepart ) {
-            f = (F77_POINTER_TYPE)info->imageData;
-            q = (F77_POINTER_TYPE)qualPtr;
+            F77_EXPORT_POINTER( info->imageData, fimage );
+            F77_EXPORT_POINTER( qualPtr, fqual );
             xs1 = 1, ys1 = 1, xs2 = nx, ys2 = ny;
         }
 
@@ -401,8 +407,9 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                           INTEGER_ARG(&nx), INTEGER_ARG(&ny),
                           INTEGER_ARG(&xs1), INTEGER_ARG(&ys1),
                           INTEGER_ARG(&xs2), INTEGER_ARG(&ys2),
-                          LOGICAL_ARG(&haveQual), POINTER_ARG(&q),
-                          POINTER_ARG(&f), INTEGER_ARG(&status)
+                          LOGICAL_ARG(&haveQual),
+                          POINTER_ARG(&fqual),
+                          POINTER_ARG(&fimage), INTEGER_ARG(&status)
                           TRAIL_ARG(type) TRAIL_ARG(fitFile)
                           TRAIL_ARG(newFile) );
 
@@ -411,14 +418,17 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             xs1--, ys1--;
             xs1 = MAX( xs1, 0 );
             ys1 = MAX( ys1, 0 );
-            copyWorktoImage( info->type, info->imageData, (void *) f,
+            F77_IMPORT_POINTER( fimage, image );
+            copyWorktoImage( info->type, info->imageData, (void *) image,
                              info->swap,
                              info->nx, xs1, ys1, xs2, ys2 );
 
             /* Do the same for the quality component if necessary */
             if ( haveQual == F77_TRUE ) {
-                copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, (void *) q, 0,
-                                 info->nx, xs1, ys1, xs2, ys2 );
+                F77_IMPORT_POINTER( fqual, qual );
+                copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, 
+                                 (void *) fqual, 0, info->nx, 
+                                 xs1, ys1, xs2, ys2 );
             }
         }
 
@@ -463,18 +473,24 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                              nx, x1, y1, x2, y2 );
             undoInfo.imagePtr = (void *) NULL;
             if ( undoInfo.qualPtr != (byte *)NULL ) {
-                grab = F77_FALSE;
-                F77_CALL(rtd1_aqual)( INTEGER_ARG(&info->NDFid),
-                                      LOGICAL_ARG(&grab),
-                                      POINTER_ARG(&qualPtr),
-                                      LOGICAL_ARG(&haveQual));
 
-                /* Do the same for the quality component if necessary */
+                /* Also restore quality if necessary */
                 if ( haveQual == F77_TRUE ) {
                     copyWorktoImage( BYTE_IMAGE, (void *)qualPtr,
                                      (void *)undoInfo.qualPtr, 0,
                                      nx, x1, y1, x2, y2 );
                     undoInfo.qualPtr = (void *) NULL;
+                }
+
+                /*  Free the quality we're holding from the last call to
+                 *  rtd1_aqual. 
+                 */
+                if ( qualPtr != NULL ) {
+                    grab = F77_FALSE;
+                    F77_CALL(rtd1_aqual)( INTEGER_ARG(&info->NDFid),
+                                          LOGICAL_ARG(&grab),
+                                          POINTER_ARG(&fqualPtr),
+                                          LOGICAL_ARG(&haveQual) );
                 }
             }
         }
@@ -482,12 +498,12 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
 
         /*  Request to release any resources stored by this routine. */
         if ( undoInfo.imagePtr != (void *) NULL ) {
-            free( (void *)undoInfo.imagePtr );
+            cnfFree( (void *)undoInfo.imagePtr );
             undoInfo.imagePtr = (void *) NULL;
 
             /* Do the same for the quality component if necessary */
             if ( undoInfo.qualPtr != (byte *) NULL ) {
-                free( (void *)undoInfo.qualPtr );
+                cnfFree( (void *)undoInfo.qualPtr );
                 undoInfo.qualPtr = (void *) NULL;
             }
         }
@@ -516,7 +532,7 @@ void *copyImagetoWork( enum ImageDataType type,
        case BYTE_IMAGE:
        case X_IMAGE:
            scArr = (unsigned char *) imagePtr;
-           sectPtr = (void *) malloc( size * sizeof(unsigned char) );
+           sectPtr = (void *) cnfMalloc( size * sizeof(unsigned char) );
            scPtr = (unsigned char *) sectPtr;
            for( j=y1; j < y2; j++ ) {
                for( i=x1; i < x2; i++ ) {
@@ -527,7 +543,7 @@ void *copyImagetoWork( enum ImageDataType type,
        case SHORT_IMAGE:
        case USHORT_IMAGE:
            sArr = (unsigned short *) imagePtr;
-           sectPtr = (void *) malloc( size * sizeof(unsigned short) );
+           sectPtr = (void *) cnfMalloc( size * sizeof(unsigned short) );
            sPtr = (unsigned short *) sectPtr;
            if ( swap ) {
                for( j=y1; j < y2; j++ ) {
@@ -546,7 +562,7 @@ void *copyImagetoWork( enum ImageDataType type,
        case LONG_IMAGE:
        case FLOAT_IMAGE:
            iArr = (unsigned int *) imagePtr;
-           sectPtr = (void *) malloc( size * sizeof(unsigned int) );
+           sectPtr = (void *) cnfMalloc( size * sizeof(unsigned int) );
            iPtr = (unsigned int *) sectPtr;
            if ( swap ) {
                for( j=y1; j < y2; j++ ) {
@@ -567,7 +583,7 @@ void *copyImagetoWork( enum ImageDataType type,
            double *iPtr;
            union { unsigned int halves[2]; double value; } joined;
            unsigned int tmp;
-           sectPtr = (void *) malloc( size * sizeof(double) );
+           sectPtr = (void *) cnfMalloc( size * sizeof(double) );
            iPtr = (double *) sectPtr;
            if ( swap ) {
                for( j=y1; j < y2; j++ ) {
@@ -687,5 +703,5 @@ void copyWorktoImage( enum ImageDataType type,
     }
 
     /*  Finally free the workspace. */
-    free( workPtr );
+    cnfFree( workPtr );
 }

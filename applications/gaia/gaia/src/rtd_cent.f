@@ -64,7 +64,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1998-2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     PWD: Peter Draper (STARLINK)
@@ -79,6 +79,8 @@
 *        Added byte swap changes.
 *     30-MAY-2001 (PWD):
 *        Added double precision support.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,6 +93,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
@@ -138,33 +141,41 @@
 
 *  Centroid this position.
          IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL RTD1_CENUB( XIN( I ), YIN( I ), %VAL( IPIN ), SWAP, 
-     :                       NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
-     :                       XACC, YACC, STATUS )
+            CALL RTD1_CENUB( XIN( I ), YIN( I ), 
+     :                       %VAL( CNF_PVAL( IPIN ) ), 
+     :                       SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+     :                       TOLER, XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_BYTE' ) THEN 
-            CALL RTD1_CENB( XIN( I ), YIN( I ), %VAL( IPIN ), SWAP, 
-     :                      NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
-     :                      XACC, YACC, STATUS )
+            CALL RTD1_CENB( XIN( I ), YIN( I ), 
+     :                      %VAL( CNF_PVAL( IPIN ) ), 
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+     :                      TOLER, XACC, YACC, STATUS )
+
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN 
-            CALL RTD1_CENUW( XIN( I ), YIN( I ), %VAL( IPIN ), SWAP, 
-     :                       NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
-     :                       XACC, YACC, STATUS )
+            CALL RTD1_CENUW( XIN( I ), YIN( I ), 
+     :                       %VAL( CNF_PVAL( IPIN ) ), 
+     :                       SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+     :                       TOLER, XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN 
-            CALL RTD1_CENW( XIN( I ), YIN( I ), %VAL( IPIN ), SWAP, 
-     :                      NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
-     :                      XACC, YACC, STATUS )
+            CALL RTD1_CENW( XIN( I ), YIN( I ), 
+     :                      %VAL( CNF_PVAL( IPIN ) ), 
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+     :                      TOLER, XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN 
-            CALL RTD1_CENI( XIN( I ), YIN( I ), %VAL( IPIN ), SWAP, 
-     :                      NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
-     :                      XACC, YACC, STATUS )
+            CALL RTD1_CENI( XIN( I ), YIN( I ), 
+     :                      %VAL( CNF_PVAL( IPIN ) ), 
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+     :                      TOLER, XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN 
-            CALL RTD1_CENR( XIN( I ), YIN( I ), %VAL( IPIN ), SWAP, 
-     :                      NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
-     :                      XACC, YACC, STATUS )
+            CALL RTD1_CENR( XIN( I ), YIN( I ), 
+     :                      %VAL( CNF_PVAL( IPIN ) ), 
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+     :                      TOLER, XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL RTD1_CEND( XIN( I ), YIN( I ), %VAL( IPIN ), SWAP, 
-     :                      NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
-     :                      XACC, YACC, STATUS )
+            CALL RTD1_CEND( XIN( I ), YIN( I ), 
+     :                      %VAL( CNF_PVAL( IPIN ) ), 
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT, 
+     :                      TOLER, XACC, YACC, STATUS )
          ELSE
 
 *  Unknown data type.

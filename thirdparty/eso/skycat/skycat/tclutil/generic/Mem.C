@@ -15,6 +15,8 @@
  *                           (I added this to accept memory mapped
  *                           from the NDF library, so as to avoid the
  *                           need for a memory copy).
+ *                 03/09/04  New addr arguments for Mem and Mem_Rep
+ *                           constructors. 
  */
 
 static const char* const rcsId="@(#) $Id: Mem.C,v 1.9 1998/12/03 22:11:47 abrighto Exp $";
@@ -225,7 +227,7 @@ MemRep::MemRep(void *inptr, int sz, int own)
  * If owner is non-zero, the file is deleted when this object is deleted.
  */
 MemRep::MemRep(const char *filename, int flags, int prot, int share,
-               int nbytes, int own, int verb)
+               int nbytes, int own, int verb, void *addr)
     : size(0),
       owner(own),
       refcnt(1),
@@ -278,7 +280,8 @@ MemRep::MemRep(const char *filename, int flags, int prot, int share,
 			flags,                // Read/Write, etc.
 			MMAP_DEFAULT_PERMS,   // mode
 			prot,                 // protection,
-			share);               // share map on write
+			share,                // share map on write
+                        addr);                // address to map file at
 
     if (!m_map || m_map->status() != 0) {
 	// status = error("mapping of file failed");
@@ -357,7 +360,7 @@ MemRep::~MemRep()
     }
     else if (ptr) {		// must be using plain memory
        if (newmem && owner) {
-          delete ptr;
+          delete (char *)ptr;
        } else if (owner) {
           free( ptr );
        }
@@ -572,7 +575,7 @@ Mem::Mem(const char *filename, int verbose)
 /*
  * Constructor uses mmap to map a file and adds file options
  */
-Mem::Mem(const char *filename, int options, int verbose)
+Mem::Mem(const char *filename, int options, int verbose, void *addr)
     : offset_(0), length_(0)
 {
     int flags = 0;
@@ -597,7 +600,7 @@ Mem::Mem(const char *filename, int options, int verbose)
 	return;
     }
 
-    rep_ = new MemRep(filename, flags, prot, sharing, -1, 0, verbose);
+    rep_ = new MemRep(filename, flags, prot, sharing, -1, 0, verbose, addr);
     rep_->options = options;
 }
 

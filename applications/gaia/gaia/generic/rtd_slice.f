@@ -69,6 +69,8 @@
 *  History:
 *     25-NOV-1997 (PWD):
 *        Original version based on FIGARO task SLICE.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,6 +85,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'         ! HDS parameters
       INCLUDE 'NDF_PAR'         ! NDF parameters
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -144,50 +147,57 @@
 *  Each image type is dealt with separately.
             IF ( TYPE .EQ. '_BYTE' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPB( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                              SWAP, %VAL( ISPEC ) )
+                  CALL RTD1_ETERPB( X, Y, NX, NY, 
+     :                              %VAL( CNF_PVAL( IPIN ) ), I,
+     :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPUB( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                               SWAP, %VAL( ISPEC ) )
+                  CALL RTD1_ETERPUB( X, Y, NX, NY, 
+     :                               %VAL( CNF_PVAL( IPIN ) ), I,
+     :                               SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPW( X, Y, NX, NY, %VAL( IPIN ), I,
-     ;                              SWAP, %VAL( ISPEC ) )
+                  CALL RTD1_ETERPW( X, Y, NX, NY, 
+     :                              %VAL( CNF_PVAL( IPIN ) ), I,
+     :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPUW( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                               SWAP, %VAL( ISPEC ) )
+                  CALL RTD1_ETERPUW( X, Y, NX, NY, 
+     :                               %VAL( CNF_PVAL( IPIN ) ), I,
+     :                               SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPI( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                              SWAP, %VAL( ISPEC ) )
+                  CALL RTD1_ETERPI( X, Y, NX, NY, 
+     :                              %VAL( CNF_PVAL( IPIN ) ), I,
+     :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPR( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                              SWAP, %VAL( ISPEC ) )
+                  CALL RTD1_ETERPR( X, Y, NX, NY, 
+     :                              %VAL( CNF_PVAL( IPIN ) ), I,
+     :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                DO I = 1, NELEM
-                  CALL RTD1_ETERPD( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                              SWAP, %VAL( ISPEC ) )
+                  CALL RTD1_ETERPD( X, Y, NX, NY, 
+     :                              %VAL( CNF_PVAL( IPIN ) ), I,
+     :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO

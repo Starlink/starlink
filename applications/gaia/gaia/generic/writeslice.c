@@ -39,7 +39,7 @@
  *        message if appropriate. Only set if return is 0.
  *
  *  Copyright:
- *     Copyright (C) 1998 Central Laboratory of the Research Councils
+ *     Copyright (C) 1998-2004 Central Laboratory of the Research Councils
  *
  *  Authors:
  *     PWD: Peter W. Draper (STARLINK - Durham University)
@@ -49,6 +49,8 @@
  *        Original version.
  *     20-JAN-2000 (PWD):
  *        Added byte swapping changes.
+ *     06-SEP-2004 (PWD):
+ *        Changed to use CNF pointers.
  */
 
 #include <stdio.h>
@@ -122,7 +124,8 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
     if ( strcmp( ptr,  "-file" ) == 0 ) {
       ptr = strtok( atPtr, " " );
       cnf_exprt( ptr, (char *)file, MAXFILE );
-    } else if ( strcmp( ptr,  "-line" ) == 0 ) {
+    }
+    else if ( strcmp( ptr,  "-line" ) == 0 ) {
       ptr = strtok( atPtr, " " );
       xs1 = (F77_INTEGER_TYPE) atoi( ptr );
       ptr = strtok( atPtr, " " );
@@ -131,10 +134,12 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
       xs2 = (F77_INTEGER_TYPE) atoi( ptr );
       ptr = strtok( atPtr, " " );
       ys2 = (F77_INTEGER_TYPE) atoi( ptr );
-    } else if ( strcmp( ptr,  "-nelem" ) == 0 ) {
+    }
+    else if ( strcmp( ptr,  "-nelem" ) == 0 ) {
       ptr = strtok( atPtr, " " );
       nelem = (F77_INTEGER_TYPE) atoi( ptr );
-    } else if ( strcmp( ptr,  "-name" ) == 0 ) {
+    } 
+    else if ( strcmp( ptr,  "-name" ) == 0 ) {
       ptr = strtok( atPtr, " " );
       cnf_exprt( ptr, (char *)name, MAXFILE );
     }
@@ -164,8 +169,12 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
     break;
   }
 
-  /*  Set up the image information. */
-  image = (F77_POINTER_TYPE) info->imageData;
+  /*  Set up the image information. Need to register the image pointer with
+   *  CNF so that it can be used in Fortran (when the storage used in Fortran
+   *   is less than the size of a void pointer) 
+   */
+  F77_EXPORT_POINTER( info->imageData, image );
+
   nx = (F77_INTEGER_TYPE) info->nx;
   ny = (F77_INTEGER_TYPE) info->ny;
   if ( info->swap ) {

@@ -54,6 +54,9 @@
 //        Changed to use bitpix=8 explicitly when accessing quality
 //        component. Note still assumes variance is same data type as
 //        main array.
+//     05-SEP-2004 (PWD):
+//        Modify so that all memory is allocated by HDS or CNF so that we can
+//        safely pass this into Fortran, even on 64 bit machines.
 //     {enter_changes_here}
 
 //-
@@ -110,13 +113,10 @@ int NDFIO::wcsinit()
 
 //+
 //  Read an NDF and convert a displayable data array into an ImageIO
-//  compatible object (FITS-like). The 2 flag arguments indicate
-//  whether the data should be placed into shared memory or not. The
-//  filename is the fully specified name of the file containing the
-//  NDF.
+//  compatible object (FITS-like). The filename is the fully specified name of
+//  the file containing the NDF.
 //-
-NDFIO *NDFIO::read( const char *filename, const char *component,
-                    int useShm )
+NDFIO *NDFIO::read( const char *filename, const char *component )
 {
     Mem data;
     Mem header;
@@ -128,6 +128,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
     double bzero = 0.0;
     int bitpix = 0;
     int header_records = 0;
+    int hsize = 0;
     int height = 0;
     int ndfid = 0;
     int width = 0;
@@ -135,6 +136,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
     int hasq;
     void *NDFinfo;
     void *indata;
+    void *hdata;
 
     //  Parse the input filename. This becomes an information structure
     //  that describes the NDFs (of a list of NDFs if more than one are
@@ -149,7 +151,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
             //  NDF we can display something so get the NDF information
             //  we need.
             gaiaGetInfoMNDF( NDFinfo, 1, &name, &bitpix, &width, &height,
-                             &inheader, &header_records, &ndfid, 
+                             &inheader, &header_records, &ndfid,
                              &hasv, &hasq );
 
             //  If accessing quality, then the data type is unsigned byte
@@ -164,33 +166,36 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
             // Now map the data and initialise with this pointer.
             if ( gaiaGetMNDF( NDFinfo, 1, component, &indata, &error_mess ) ) {
 
+                // Mem just accepts pointer to data.
                 data = Mem( indata, tsize, 0 );
 
-                // Copy the header.
-                header = Mem( header_length * header_records + 1, useShm );
-                memcpy( (void *) header.ptr(), inheader,
-                        header_length * header_records + 1);
+                // Copy the header. Use CNF memory so it can be passed to
+                // Fortran.
+                hsize = header_length * header_records + 1;
+                hdata = cnfMalloc( hsize );
+                memcpy( hdata, inheader, hsize );
+                header = Mem( hdata, hsize, 0 );
 
                 // Create NDFIO object with data and size.
                 return new NDFIO( NDFinfo, 1, component, ndfid,
                                   width, height, bitpix, bzero, bscale,
                                   header, data );
-            } else {
-
-            // Failed to copy the image, must have ran out of memory or some
-                // such.
+            }
+            else {
+                // Failed to copy the image, must have ran out of memory or
+                // some such.
                 error( error_mess );
                 free( error_mess );
                 return NULL;
             }
-        } else {
-
+        }
+        else {
             // Failed to get the component.
             error( "Image does not contain the component:", component );
             return NULL;
         }
-    } else {
-
+    }
+    else {
         // Failed to open NDF so issue the error message we have been
         // given (this is a dynamic C string so free it).
         error( error_mess );
@@ -209,8 +214,8 @@ int NDFIO::write( const char *pathname )
                       ndfid_, component(), (char *) header_.ptr(),
                       header_.size(), &error_mess ) ) {
       return OK;
-   } else {
-
+   }
+   else {
       // Failed to write NDF so issue the error message we have been
       // given (this is a dynamic C string so free it).
       error( error_mess );
@@ -416,11 +421,14 @@ int NDFIO::makeDisplayable( int index, const char *component )
       int bitpix = 0;
       int header_records = 0;
       int height = 0;
+      int hsize = 0;
       int ndfid = 0;
       int width = 0;
       int hasv;
       int hasq;
       void *indata;
+      void *hdata;
+
       gaiaGetInfoMNDF( NDFinfo_, index, &name, &bitpix, &width,
                        &height, &inheader, &header_records, &ndfid,
                        &hasv, &hasq );
@@ -443,21 +451,22 @@ int NDFIO::makeDisplayable( int index, const char *component )
       //  memory to store the image.
       int readonly = gaiaGetReadMNDF( NDFinfo_, index );
       if ( ! readonly ) {
-         data = Mem( tsize, 0 );
-         indata = data.ptr();
+          
+          //  Use CNF managed memory so that it is registered.
+          indata = cnfMalloc( tsize );
       }
 
       // Now copy the data into it.
       if ( gaiaGetMNDF( NDFinfo_, index, component, &indata, &error_mess ) ) {
-         if ( readonly ) {
-            //  Mem object just accepts pointer to mapped memory.
-            data = Mem( indata, tsize, 0 );
-         }
+
+         //  Mem object just accepts pointer to mapped memory.
+         data = Mem( indata, tsize, 0 );
 
          // Copy the header.
-         header = Mem( header_length * header_records + 1, header_.shared() );
-         memcpy( (void *) header.ptr(), inheader, header_length *
-                 header_records + 1);
+         hsize = header_length * header_records + 1;
+         hdata = cnfMalloc( hsize );
+         memcpy( hdata, inheader, hsize );
+         header = Mem( hdata, hsize, 0 );
 
          //  Replace image and header and update related members.
          width_ = width;
@@ -470,16 +479,16 @@ int NDFIO::makeDisplayable( int index, const char *component )
          curd_ = index;
          strncpy( component_, (char *) component, 20 );
          ndfid_ = ndfid;
-      } else {
-
+      }
+      else {
          // Failed to copy the image, must have ran out of memory or some
          // such.
          error( error_mess );
          free( error_mess );
          return 0;
       }
-
-   } else {
+   }
+   else {
       error( "Requested NDF component does not exist" );
       return 0;
    }
@@ -513,12 +522,14 @@ void NDFIO::getNDFInfo( int index, char *name, char *naxis1, char *naxis2,
    sprintf( naxis2, "%d", height );
    if ( hasv ) {
       strcpy( hasvar, "true" );
-   } else {
+   }
+   else {
       strcpy( hasvar, "false" );
    }
    if ( hasq ) {
       strcpy( hasqual, "true" );
-   } else {
+   }
+   else {
       strcpy( hasqual, "false" );
    }
 }
@@ -540,3 +551,4 @@ void NDFIO::setReadonly( int status )
 {
    gaiaSetReadMNDF( NDFinfo_, curd_, status );
 }
+

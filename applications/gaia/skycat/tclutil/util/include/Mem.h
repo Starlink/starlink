@@ -4,20 +4,24 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: Mem.h,v 1.3 1998/12/03 22:11:42 abrighto Exp $" 
+ * "@(#) $Id: Mem.h,v 1.3 1998/12/03 22:11:42 abrighto Exp $"
  *
  * Mem.h - declarations for class Mem, a class for managing memory areas,
  *         which may or may not be shared memory.
- * 
+ *
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  07 Mar 96  Created
- *                 03 Dec 96  added filename() method to return mmap filename 
- *                            or NULL if mmap is not being used. 
+ *                 03 Dec 96  added filename() method to return mmap filename
+ *                            or NULL if mmap is not being used.
  * D.Hopkinson      21/01/97  Added constructor to use when
  *                            multi-buffering  shared memory.
  * Peter W. Draper  23/01/00  Added constructor and methods for
  *                            accepting a piece of malloc'd memory.
+ *                  03/09/04  Added addr parameter to Mem and Mem_Rep
+ *                            constructors. Starlink fortran 64 bit
+ *                            interoperability requires that addresses may be
+ *                            changed.
  */
 
 #include <stdio.h>
@@ -46,16 +50,16 @@ struct MemRep {
 
     // attach to sysV shared memory
     MemRep(int size, int owner, int shmId, int verbose);
-    
+
     // create memory (sysV shared, if useShm is 1) with given size
     MemRep(int size, int useShm, int verbose);
-    
+
     // mmap the given file, create/extend if nbytes > 0
-    MemRep(const char *filename, int flags, int prot, int share, 
-           int nbytes, int owner, int verbose);
+    MemRep(const char *filename, int flags, int prot, int share,
+           int nbytes, int owner, int verbose, void *addr = NULL);
 
     // accept pointer to malloc'd memory.
-    MemRep(void *inptr, int size, int owner);  
+    MemRep(void *inptr, int size, int owner);
 
     // destructor
     ~MemRep();
@@ -78,9 +82,9 @@ struct MemRep {
  * class keeps track of who owns the (shared) memory, who is responsible
  * for deleting it when no longer needed and how many references there
  * are to the memory area. When there are no more references, we
- * can safely detach a shared memory area and if we are the "owner", 
+ * can safely detach a shared memory area and if we are the "owner",
  * delete it.
- */ 
+ */
 class Mem {
 private:
     MemRep* rep_;		// internal representation, reference counting
@@ -89,19 +93,19 @@ private:
 
 public:
     // default constructor
-    Mem() : offset_(0), length_(0), rep_(new MemRep) { 
+    Mem() : offset_(0), length_(0), rep_(new MemRep) {
     }
-    
+
     // constructor: attach (if needed) to existing shared memory area
     Mem(int size, int shmId, int owner, int verbose);
 
     // constructor: create new memory area, shared if useShm is true
-    Mem(int size, int useShm, int verbose = 0) 
+    Mem(int size, int useShm, int verbose = 0)
 	: offset_(0), length_(0), rep_(new MemRep(size, useShm, verbose)) {
     }
 
     // mmap options
-    enum MemFileOptions { 
+    enum MemFileOptions {
 	FILE_DEFAULTS = 0,   // File RDONLY, MAP_SHARED
 	FILE_RDWR = 1,       // Make mapped file writable
 	FILE_PRIVATE = 2,    // Make written segments private
@@ -112,11 +116,13 @@ public:
     Mem(const char *filename, int verbose = 0);
 
     // Constructor uses mmap to map a file and adds file options
-    Mem(const char *filename, int options, int verbose);
+    // PWD: Use the addr argument if you need to suggest an address to map
+    // the file. Starlink Fortran interoperability sometimes needs this.
+    Mem(const char *filename, int options, int verbose, void *addr = NULL);
 
-    // Constructor: creates a file of the given size and uses mmap 
-    // to map the file read/write
-    Mem(int size, const char *filename, int owner, int verbose = 0);
+    // Constructor: creates a file of the given size and uses mmap
+    // to map the file read/write.
+    Mem(int size, const char *filename, int owner, int verbose = 0 );
 
     // Constructor to use when multi-buffering shared memory.
     Mem(int size, int shmId, int owner, int verbose, int shmNum, int semId);
@@ -125,7 +131,7 @@ public:
     Mem(void *ptr, int size, int owner);
 
     // copy constructor, just copy ptr and increment ref count
-    Mem(const Mem& m) 
+    Mem(const Mem& m)
 	: rep_(m.rep_), offset_(m.offset_), length_(m.length_) {
 	    rep_->refcnt++;
     }
@@ -137,7 +143,7 @@ public:
     Mem& operator=(const Mem&);
 
     int operator==(const Mem& m) const {
-	return m.rep_ == rep_ && m.offset_ == offset_ && m.length_ == length_; 
+	return m.rep_ == rep_ && m.offset_ == offset_ && m.length_ == length_;
     }
     int operator!=(const Mem& m) const {
 	return m.rep_ != rep_ || m.offset_ != offset_ || m.length_ != length_;
@@ -153,14 +159,14 @@ public:
     void unmap() {rep_->unmap();}
 
     // remap the shared memory after a call to unmap(), optionally specifying
-    // new mapping options and a new file size 
+    // new mapping options and a new file size
     int remap(int options = 0, int newsize = -1) {
 	return rep_->remap(options, newsize);
     }
-    
+
     // remove all "owned" shared memory areas (should be called before exit)
     static void cleanup();
-    
+
     // return the working length of the memory
     int length() const {return int(length_ ? length_ : (rep_->size - offset_));}
 
@@ -177,7 +183,7 @@ public:
     int status() const {return rep_->status;}
     int verbose() const {return rep_->verbose;}
     Mem_Map* m_map() const {return rep_->m_map;}
-    
+
     // return a pointer to the internal representation
     // (This should only be used, if needed, in special cases)
     const MemRep* rep() const {return rep_;}

@@ -47,7 +47,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1998-2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     PWD: Peter Draper (STARLINK - Durham University)
@@ -58,6 +58,8 @@
 *        Original version.
 *     28-APR-2004 (PWD):
 *        Added DATSRC argument.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -73,6 +75,7 @@
       INCLUDE 'GRP_PAR'         ! GRP constants
       INCLUDE 'PRM_PAR'         ! PRIMDAT constants
       INCLUDE 'MSG_PAR'         ! Message system buffers
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       LOGICAL BAD
@@ -121,37 +124,37 @@
       REGVAL = 2
       TRCOEF( 1 ) = VAL__BADR
       CALL ARD_WORK( IGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
-     :               STATUS )
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               LBNDE, UBNDE, STATUS )
 
 *  Now calculate the statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL RTD1_STATB( BAD, DIM1 * DIM2, %VAL( IPIN ),
-     :                    %VAL( IPMASK ), NGOOD, DMIN, DMAX,
-     :                    SUM, MEAN, STDEV, STATUS )
+         CALL RTD1_STATB( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, 
+     :                    DMIN, DMAX, SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL RTD1_STATUB( BAD, DIM1 * DIM2, %VAL( IPIN ),
-     :                     %VAL( IPMASK ), NGOOD, DMIN,
+         CALL RTD1_STATUB( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN,
      :                     DMAX, SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL RTD1_STATW( BAD, DIM1 * DIM2, %VAL( IPIN ),
-     :                    %VAL( IPMASK ), NGOOD, DMIN, DMAX,
+         CALL RTD1_STATW( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN, DMAX,
      :                    SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL RTD1_STATUW( BAD, DIM1 * DIM2, %VAL( IPIN ),
-     :                     %VAL( IPMASK ), NGOOD, DMIN,
+         CALL RTD1_STATUW( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN,
      :                     DMAX, SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL RTD1_STATI( BAD, DIM1 * DIM2, %VAL( IPIN ),
-     :                    %VAL( IPMASK ), NGOOD, DMIN, DMAX,
+         CALL RTD1_STATI( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN, DMAX,
      :                    SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL RTD1_STATR( BAD, DIM1 * DIM2, %VAL( IPIN ),
-     :                    %VAL( IPMASK ), NGOOD, DMIN, DMAX,
+         CALL RTD1_STATR( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN, DMAX,
      :                    SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL RTD1_STATD( BAD, DIM1 * DIM2, %VAL( IPIN ),
-     :                    %VAL( IPMASK ), NGOOD, DMIN, DMAX,
+         CALL RTD1_STATD( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN, DMAX,
      :                    SUM, MEAN, STDEV, STATUS )
       ELSE
          STATUS = SAI__ERROR

@@ -92,6 +92,8 @@
 *        Increases workspace for noise array to 2047 from 511.
 *     15-JUL-2004 (TIMJ):
 *        Use PDA_DRANN rather than private PDA_DRNOR
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -107,6 +109,7 @@
       INCLUDE 'FIO_ERR'         ! FIO error codes
       INCLUDE 'PRM_PAR'         ! PRIMDAT constants
       INCLUDE 'GRP_PAR'         ! GRP constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       INTEGER FITGRP
@@ -189,22 +192,22 @@
       REGVAL = 2
       TRCOEF( 1 ) = VAL__BADR
       CALL ARD_WORK( FITGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
-     :               STATUS )
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               LBNDE, UBNDE, STATUS )
       CALL ARD_WORK( TMPGRP, 2, LBND, UBND, TRCOEF, .TRUE., REGVAL,
-     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
-     :               STATUS )
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               LBNDE, UBNDE, STATUS )
 
 *  Now fit this region.
-      CALL RTD1_DOFIT( NFIT, %VAL( IPMASK ), DIM1, DIM2, TYPE,
-     :                 HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX, IPTY,
+      CALL RTD1_DOFIT( NFIT, %VAL( CNF_PVAL( IPMASK ) ), DIM1, DIM2, 
+     :                 TYPE, HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX, IPTY,
      :                 NY, SIGMA, STATUS )
 
 *  Generate image mask of region to replace.
       REGVAL = 2
       CALL ARD_WORK( NEWGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
-     :               STATUS )
+     :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
+     :               LBNDE, UBNDE, STATUS )
 
 *  Fill up an array with a sample of gaussian noise. Scale these
 *  using the noise scaling factor and the sigma from the fit.
@@ -215,9 +218,10 @@
  2    CONTINUE
 
 *  And fill image part with surface plus noise.
-      CALL RTD1_REPL( NFIT, %VAL( IPMASK ), DIM1, DIM2, TYPE, IPIMG,
-     :                HAVVAR, IPVAR, HVQUAL, IPQUAL, BADBIT, IPC, IPTX,
-     :                NX, IPTY, NY, ER, NERROR, STATUS )
+      CALL RTD1_REPL( NFIT, %VAL( CNF_PVAL( IPMASK ) ), DIM1, DIM2, 
+     :                TYPE, IPIMG, HAVVAR, IPVAR, HVQUAL, IPQUAL, 
+     :                BADBIT, IPC, IPTX, NX, IPTY, NY, ER, NERROR, 
+     :                STATUS )
 
 *  Free up dynamic memory.
       CALL PSX_FREE( IPMASK, STATUS )

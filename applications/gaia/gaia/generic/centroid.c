@@ -75,11 +75,14 @@
 extern F77_SUBROUTINE(rtd_cent)( CHARACTER(type), POINTER(image),
                                  LOGICAL(swap),
 				 INTEGER(nx), INTEGER(ny),
-				 POINTER(xin),POINTER(yin),
+				 DOUBLE_ARRAY(xin),
+                                 DOUBLE_ARRAY(yin),
 				 INTEGER(nin), INTEGER(isize),
 				 DOUBLE(maxshf), INTEGER(maxit),
-				 DOUBLE(toler), POINTER(xout),
-				 POINTER(yout), INTEGER(nout),
+				 DOUBLE(toler), 
+                                 DOUBLE_ARRAY(xout),
+				 DOUBLE_ARRAY(yout), 
+                                 INTEGER(nout),
 				 INTEGER(status) TRAIL(type));
 
 int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
@@ -95,10 +98,10 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    DECLARE_INTEGER(ny);                  /* Size of image in Y */
    DECLARE_INTEGER(status);              /* Starlink STATUS */
    DECLARE_POINTER(image);               /* Pointer to image data. */
-   DECLARE_POINTER(*xin);                /* Pointer to X positions. */
-   DECLARE_POINTER(*xout);               /* Pointer to X positions. */
-   DECLARE_POINTER(*yin);                /* Pointer to Y positions. */
-   DECLARE_POINTER(*yout);               /* Pointer to Y positions. */
+   DECLARE_DOUBLE_ARRAY_DYN(fxin);       /* Pointer to X positions. */
+   DECLARE_DOUBLE_ARRAY_DYN(fxout);      /* Pointer to X positions. */
+   DECLARE_DOUBLE_ARRAY_DYN(fyin);       /* Pointer to Y positions. */
+   DECLARE_DOUBLE_ARRAY_DYN(fyout);      /* Pointer to Y positions. */
    DECLARE_LOGICAL(swap);
 
    /* Local variables: */
@@ -107,10 +110,10 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    char *opStr;
    char buffer[TCL_DOUBLE_SPACE+2];
    char param[EMS__SZPAR];
-   double *xnew;
-   double *xold;
-   double *ynew;
-   double *yold;
+   double *xin;
+   double *yin;
+   double *xout;
+   double *yout;
    int have;
    int i;
    int iend;
@@ -121,6 +124,7 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    int nin;
    int nout;
    int result;
+   int size;
    int used;
 
 #ifdef _DEBUG_
@@ -198,18 +202,29 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    }
 
    /* Now translate all these values into doubles.*/
-   xnew = (double *) malloc( (size_t) nin * sizeof(double));
-   ynew = (double *) malloc( (size_t) nin * sizeof(double));
-   xold = (double *) malloc( (size_t) nin * sizeof(double));
-   yold = (double *) malloc( (size_t) nin * sizeof(double));
+   size = nin * sizeof(double);
+   xin = cnfMalloc( size );
+   yin = cnfMalloc( size );
+   xout = cnfMalloc( size );
+   yout = cnfMalloc( size );
    for ( i = istart, j = 0; i < iend; i += 2, j++ ) {
-      xold[j] = atof( listArgv[i] );
-      yold[j] = atof( listArgv[i+1] );
+      xin[j] = atof( listArgv[i] );
+      yin[j] = atof( listArgv[i+1] );
    }
-   xin = (F77_POINTER_TYPE *) xold;
-   yin = (F77_POINTER_TYPE *) yold;
-   xout = (F77_POINTER_TYPE *) xnew;
-   yout = (F77_POINTER_TYPE *) ynew;
+
+   /* Export all arrays for use in Fortran */
+   F77_CREATE_DOUBLE_ARRAY( fxin, size );
+   F77_EXPORT_DOUBLE_ARRAY( xin, fxin, size );
+
+   F77_CREATE_DOUBLE_ARRAY( fyin, size);
+   F77_EXPORT_DOUBLE_ARRAY( yin, fyin, size );
+
+   F77_CREATE_DOUBLE_ARRAY( fxout, size );
+   F77_EXPORT_DOUBLE_ARRAY( xout, fxout, size );
+
+   F77_CREATE_DOUBLE_ARRAY( fyout, size );
+   F77_EXPORT_DOUBLE_ARRAY( yout, fyout, size );
+
 
    /*  Determine HDS type of image. */
    switch ( info->type ) {
@@ -237,9 +252,9 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    }
 
    /*  Set up the image information. */
-   image = (F77_POINTER_TYPE) info->imageData;
-   nx = (F77_INTEGER_TYPE) info->nx;
-   ny = (F77_INTEGER_TYPE) info->ny;
+   F77_EXPORT_POINTER( info->imageData, image );
+   F77_EXPORT_INTEGER( info->nx, nx );
+   F77_EXPORT_INTEGER( info->ny, ny );
    if ( info->swap ) {
       swap = F77_TRUE;
    } else {
@@ -251,24 +266,26 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    status = SAI__OK;
    F77_CALL(rtd_cent)( CHARACTER_ARG(type), POINTER_ARG(&image),
                        LOGICAL_ARG(&swap), INTEGER_ARG(&nx),
-                       INTEGER_ARG(&ny), POINTER_ARG(xin),
-                       POINTER_ARG(yin), INTEGER_ARG(&nin),
+                       INTEGER_ARG(&ny), DOUBLE_ARRAY_ARG(fxin),
+                       DOUBLE_ARRAY_ARG(fyin), INTEGER_ARG(&nin),
                        INTEGER_ARG(&isize), DOUBLE_ARG(&maxshift),
                        INTEGER_ARG(&maxit), DOUBLE_ARG(&toler),
-                       POINTER_ARG(xout), POINTER_ARG(yout),
+                       DOUBLE_ARRAY_ARG(fxout), DOUBLE_ARRAY_ARG(fyout),
                        INTEGER_ARG(&nout), INTEGER_ARG(&status)
                        TRAIL_ARG(type)); 
 
    if ( status == SAI__OK ) {
       /*  Need to encode the return values as a list of x,y coordinate
           pairs and return them as the result. */
+     F77_IMPORT_DOUBLE_ARRAY( fxout, xout, size );
+     F77_IMPORT_DOUBLE_ARRAY( fyout, yout, size );
 
       opPtr = Tcl_Alloc( EMS__SZMSG * sizeof(char) );
       opPtr[0] = '\0';
       have = EMS__SZMSG;
       used = 0;
       for ( i = 0; i < nin; i++ ) {
-         (void) sprintf( buffer, " %f %f ", xnew[i], ynew[i] );
+         (void) sprintf( buffer, " %f %f ", xout[i], yout[i] );
          need = strlen( buffer );
          if ( ( need + used + 2 ) > have ) {
             have = have + EMS__SZMSG;
@@ -302,9 +319,9 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    }
    ems_rlse_c();
    Tcl_Free( (char *) listArgv );
-   free( xnew );
-   free( ynew );
-   free( xold );
-   free( yold );
+   cnfFree( xin );
+   cnfFree( yin );
+   cnfFree( xout );
+   cnfFree( yout );
    return result;
 }

@@ -40,6 +40,8 @@
 *  History:
 *     17-NOV-1997 (PWD):
 *        Original version.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -52,6 +54,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       INTEGER NDFID
@@ -159,8 +162,9 @@
                   IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  May now copy the array and record all the necessary information,
-                     CALL RTD_CPB( .FALSE., 0, %VAL( IPIN ), EL,
-     :                             %VAL( IPMEM ), STATUS )
+                     CALL RTD_CPB( .FALSE., 0, %VAL( CNF_PVAL( IPIN ) ),
+     :                             EL, %VAL( CNF_PVAL( IPMEM ) ), 
+     :                             STATUS )
                      IDS( SLOT ) = NDFID
                      IPS( SLOT ) = IPMEM
                      HVQUAL = .TRUE.

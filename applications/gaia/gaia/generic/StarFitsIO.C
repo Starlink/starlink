@@ -48,6 +48,9 @@ static const char* const rcsId="@(#) $Id$";
 #include "Mem.h"
 #include "StarWCS.h"
 #include "StarFitsIO.h"
+extern "C" {
+#include "cnf.h"
+}
 
 // Initialize static members.
 int StarFitsIO::alwaysMerge_ = 0;
@@ -80,13 +83,33 @@ static char* getFromStdin(char* filename)
 
 
 /*
- * constructor
+ * Constructor
  */
-StarFitsIO::StarFitsIO(int width, int height, int bitpix, double bzero,
-                       double bscale, const Mem& header,
-                       const Mem& data, fitsfile* fitsio)
-  : FitsIO(width, height, bitpix, bzero, bscale, header, data, fitsio)
-{}
+StarFitsIO::StarFitsIO( int width, int height, int bitpix, double bzero,
+                        double bscale, const Mem& header,
+                        const Mem& data, fitsfile* fitsio )
+    : FitsIO( width, height, bitpix, bzero, bscale, header, data, fitsio ),
+      cnfHeaderPtr_(NULL),
+      cnfDataPtr_(NULL)
+{
+    cnfHeaderPtr_ = header.ptr();
+    cnfDataPtr_ = data.ptr();
+}
+
+/*
+ * Destructor
+ */
+StarFitsIO::~StarFitsIO()
+{
+    //  Deregister CNF pointers. Probably should but there may be multiple
+    //  registrators. CNF needs reference counting.
+    //if ( cnfHeaderPtr_ != NULL ) {
+    //    cnfUregp( cnfHeaderPtr_ );
+    //}
+    //if ( cnfDataPtr_ != NULL ) {
+    //    cnfUregp( cnfDataPtr_ );
+    //}
+}
 
 /*
  *  Read a FITS file and return an initialized StarFitsIO object for it,
@@ -121,35 +144,82 @@ StarFitsIO* StarFitsIO::read( const char* filename, int mem_options )
     }
 
     //  Check the file extension for recognized compression types.
-    filename = check_compress(filename, tmpfile, sizeof(tmpfile),
-                              istemp, 1, 0);
+    filename = check_compress( filename, tmpfile, sizeof(tmpfile),
+                               istemp, 1, 0 );
     if ( filename == NULL ) {
         if ( istemp )
             unlink( tmpfile );
         return NULL;
     }
 
-    //  If the file is read-only and read-write access was requested,
-    //  then just use readonly.
+    //  If the file is read-only and read-write access was requested, then
+    //  just use readonly.
     if ( mem_options && Mem::FILE_RDWR && access( filename, W_OK ) != 0) {
 	mem_options = 0;
+    }
+    else if ( mem_options == 0 && access( filename, W_OK ) == 0 ) {
 
-    } else if ( mem_options == 0 && access( filename, W_OK ) == 0 ) {
-
-        //  FitsIO behaviour. Map image file to memory to speed up
-        //  image loading
+        //  FitsIO behaviour. Map image file to memory to speed up image
+        //  loading
         mem_options = Mem::FILE_RDWR;
     }
 
-    Mem header( filename, mem_options, 0 );
-    if ( header.status() != 0 ) {
-        return NULL;
+    //  Map the file into memory. When mapped we need to register the header
+    //  pointer with CNF so that it can be safely passed into any Fortran
+    //  routines. If this pointer cannot be registered (the CNF mapping
+    //  function thinks this is already registered) then we need to ask for
+    //  another pointer to this file...
+
+    char *where = NULL;
+    int reg = 0;
+    int pagesize = 10 * (int) sysconf( _SC_PAGESIZE );
+    Mem *header = NULL;
+    F77_POINTER_TYPE fp;
+    void *cp;
+    int count = 0;
+    while ( count < 1000 )
+    {
+        count++;
+        header = new Mem( filename, mem_options, 0, (void *)where );
+        if ( header->status() != 0 ) {
+            return NULL;
+        }
+        reg = cnfRegp( header->ptr() );
+
+        if ( reg == 0 ) {
+            //  Cannot register the pointer, perhaps it's already known from
+            //  another shared instance. Check this before panicking.
+            fp = cnfFptr( header->ptr() );
+            cp = cnfCptr( fp );
+            if ( cp != header->ptr() ) {
+                //  Definitely cannot register pointer, unmap the file and try
+                //  a different address, offset from current position by 10
+                //  times the pagesize.
+                if ( where == NULL ) where = (char *)header->ptr();
+                where += pagesize;
+                delete header;
+                header = NULL;
+            }
+            else {
+                //  Pointer is known as right value.
+                break;
+            }
+        }
+        else if ( reg == -1 ) {
+            //  Cannot register this because of a failing memory condition.
+            if ( header != NULL ) delete header;
+        }
+        else {
+            break;
+        }
     }
 
     if ( istemp ) {
-        unlink(filename);       // will be deleted by the OS later
+        unlink( filename );       // will be deleted by the OS later
     }
-    return initialize( header );
+    StarFitsIO *ref = initialize( *header );
+    delete header;
+    return ref;
 }
 
 /*
@@ -159,36 +229,40 @@ StarFitsIO* StarFitsIO::read( const char* filename, int mem_options )
  *
  *  Rewrite from FitsIO to return StarFitsIO.
  */
-StarFitsIO* StarFitsIO::initialize(Mem& header)
+StarFitsIO* StarFitsIO::initialize( Mem& header )
 {
-    fitsfile* fitsio = openFitsMem(header);
-    if (!fitsio)
-      return NULL;
+    fitsfile* fitsio = openFitsMem( header );
+    if ( !fitsio )
+        return NULL;
 
     long headStart = 0, dataStart = 0, dataEnd = 0;
     int status = 0;
-    if (fits_get_hduaddr(fitsio, &headStart, &dataStart, &dataEnd,
-                         &status) != 0) {
+    if ( fits_get_hduaddr( fitsio, &headStart, &dataStart, &dataEnd,
+                           &status ) != 0 ) {
         cfitsio_error();
         return NULL;
     }
 
-    if (header.length() < (dataEnd - headStart)) {
+    if ( header.length() < (dataEnd - headStart) ) {
         const char* filename = header.filename();
-        if (filename)
-            log_message("FITS file has the wrong size (too short): %s",
-                        filename);
+        if ( filename )
+            log_message( "FITS file has the wrong size (too short): %s",
+                         filename );
         else
-            log_message("FITS data has the wrong size (too short)");
+            log_message( "FITS data has the wrong size (too short)" );
     }
 
     // The data part is the same mmap area as the header, with an offset
-    Mem data(header);
-    header.length(dataStart - headStart);  // set usable length of header
-    data.offset(dataStart);    // set offset for data
-    data.length(dataEnd-dataStart);
+    Mem data( header );
+    header.length( dataStart - headStart );  // set usable length of header
+    data.offset( dataStart );                // set offset for data
+    data.length( dataEnd - dataStart );
 
-    return initialize(header, data, fitsio);
+    //  Register this part with CNF. Cannot deal with failure since that would
+    //  mean modifying the data starting point.
+    cnfRegp( data.ptr() );
+
+    return initialize( header, data, fitsio );
 }
 
 /*
@@ -197,18 +271,18 @@ StarFitsIO* StarFitsIO::initialize(Mem& header)
  *
  *  Rewrite from FitsIO to return StarFitsIO.
  */
-StarFitsIO* StarFitsIO::initialize(Mem& header, Mem& data, fitsfile* fitsio)
+StarFitsIO* StarFitsIO::initialize( Mem& header, Mem& data, fitsfile* fitsio )
 {
     int bitpix = 0, width = 0, height = 0;
     double bzero = 0.0, bscale = 1.0;
-    get(fitsio, "NAXIS1", width);
-    get(fitsio, "NAXIS2", height);
-    get(fitsio, "BITPIX", bitpix);
-    get(fitsio, "BSCALE", bscale);
-    get(fitsio, "BZERO", bzero);
+    get( fitsio, "NAXIS1", width );
+    get( fitsio, "NAXIS2", height );
+    get( fitsio, "BITPIX", bitpix );
+    get( fitsio, "BSCALE", bscale );
+    get( fitsio, "BZERO", bzero );
 
     return new StarFitsIO( width, height, bitpix, bzero, bscale, header,
-                           data, fitsio);
+                           data, fitsio );
 }
 
 /*
@@ -218,7 +292,8 @@ StarFitsIO* StarFitsIO::initialize(Mem& header, Mem& data, fitsfile* fitsio)
 int StarFitsIO::getReadonly() {
     if ( header_.options() && Mem::FILE_RDWR ) {
         return 0;
-    } else {
+    } 
+    else {
         return 1;
     }
 }
@@ -502,4 +577,3 @@ int StarFitsIO::write( const char *filename )
 
     return OK;
 }
-

@@ -47,10 +47,10 @@ FSRCS =  \
  gai_c2tab.f gai_t2asc.f gai_t2cat.f rpatch.f \
  rtd1_aqual.f rtd1_ardst.f rtd1_binom.f rtd1_chead.f rtd1_crfit.f \
  rtd1_dewcs.f rtd1_dofit.f rtd1_dtrn.f rtd1_enwcs.f rtd1_evert.f \
- rtd1_gkeyc.f rtd1_gtval.f rtd1_isrt.f rtd1_patch.f rtd1_ploc.f \
+ rtd1_gkeyc.f rtd1_isrt.f rtd1_patch.f rtd1_ploc.f \
  rtd1_prsh2.f rtd1_repl.f rtd1_setar.f rtd1_sndfh.f rtd1_stint.f \
- rtd1_wcard.f rtd1_wndfh.f rtd1_wrcrd.f rtd_axlid.f rtd_axlir.f \
- rtd_cent.f rtd_cpdat.f rtd_rdndf.f rtd_slice.f rtd_wrndf.f tab2asc.f \
+ rtd1_wcard.f rtd1_wndfh.f rtd1_wrcrd.f \
+ rtd_cent.f rtd_rdndf.f rtd_slice.f rtd_wrndf.f tab2asc.f \
  tab2cat.f
 
 GSRCS =  \
@@ -173,7 +173,7 @@ man:
 # Starlink include file dependencies
 ardstat.o: GRP_PAR NDF_PAR SAE_PAR
 asc2tab.o: PAR_ERR SAE_PAR
-autocrop.o: NDF_PAR SAE_PAR
+autocrop.o: NDF_PAR SAE_PAR CNF_PAR
 cat2tab.o: CAT_PAR PAR_ERR SAE_PAR
 gai1_nxtab.o: SAE_PAR
 gai1_s2ang.o: PRM_PAR SAE_PAR
@@ -186,27 +186,26 @@ gai_t2asc.o: FIO_ERR SAE_PAR
 gai_t2cat.o: SAE_PAR
 pda_sfit.o: SAE_PAR
 rpatch.o: FIO_ERR GRP_PAR SAE_PAR
-rtd1_aqual.o: SAE_PAR
-rtd1_ardst.o: GRP_PAR MSG_PAR PRM_PAR SAE_PAR
+rtd1_aqual.o: SAE_PAR CNF_PAR
+rtd1_ardst.o: GRP_PAR MSG_PAR PRM_PAR SAE_PAR CNF_PAR
 rtd1_cenx.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 rtd1_chead.o: SAE_PAR
-rtd1_crfit.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR AST_PAR
+rtd1_crfit.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR AST_PAR CNF_PAR
 rtd1_dewcs.o: AST_PAR SAE_PAR
 rtd1_dofilx.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
-rtd1_dofit.o: PRM_PAR SAE_PAR
+rtd1_dofit.o: PRM_PAR SAE_PAR CNF_PAR
 rtd1_dtrn.o: PRM_PAR SAE_PAR
 rtd1_enwcs.o: AST_PAR SAE_PAR
 rtd1_eterpx.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR
 rtd1_gbndx.o: PRM_PAR SAE_PAR
 rtd1_gkeyc.o: SAE_PAR
 rtd1_gkeyx.o: SAE_PAR
-rtd1_gtval.o: SAE_PAR
 rtd1_isrt.o: SAE_PAR
 rtd1_mstx.o: PRM_PAR SAE_PAR
-rtd1_patch.o: FIO_ERR GRP_PAR PRM_PAR SAE_PAR
+rtd1_patch.o: FIO_ERR GRP_PAR PRM_PAR SAE_PAR CNF_PAR
 rtd1_ploc.o: SAE_PAR
 rtd1_prsh2.o: GRP_PAR SAE_PAR
-rtd1_repl.o: PRM_PAR SAE_PAR
+rtd1_repl.o: PRM_PAR SAE_PAR CNF_PAR
 rtd1_setar.o: SAE_PAR
 rtd1_sndfh.o: NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 rtd1_statx.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
@@ -214,17 +213,13 @@ rtd1_sufitx.o: PRM_PAR SAE_PAR
 rtd1_wcard.o: SAE_PAR
 rtd1_wkeyx.o: SAE_PAR
 rtd1_wndfh.o: NDF_PAR PRM_PAR SAE_PAR
-rtd1_wrcrd.o: SAE_PAR
-rtd1_wrftx.o: DAT_PAR SAE_PAR
-rtd_axlid.o: PRM_PAR SAE_PAR
-rtd_axlir.o: PRM_PAR SAE_PAR
-rtd_cent.o: SAE_PAR
-rtd_cpdat.o: NDF_PAR PRM_PAR SAE_PAR
+rtd1_wrcrd.o: SAE_PAR CNF_PAR
+rtd1_wrftx.o: DAT_PAR SAE_PAR CNF_PAR
+rtd_cent.o: SAE_PAR CNF_PAR
 rtd_cpx.o: PRM_PAR SAE_PAR
 rtd_rdndf.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR
-rtd_slice.o: DAT_PAR NDF_PAR SAE_PAR
-rtd_wrndf.o: AST_PAR DAT_PAR NDF_PAR SAE_PAR PSX_ERR
-slice.o: DAT_PAR NDF_PAR SAE_PAR
+rtd_slice.o: DAT_PAR NDF_PAR SAE_PAR CNF_PAR
+rtd_wrndf.o: AST_PAR DAT_PAR NDF_PAR SAE_PAR PSX_ERR CNF_PAR
 tab2asc.o: CAT_PAR SAE_PAR
 tab2cat.o: CAT_PAR SAE_PAR
 Contour.o: ContourTemplates.C
@@ -232,7 +227,7 @@ XYProfile.o: XYProfileTemplates.C
 RegionStats.o: RegionStatsTemplates.C
 
 LINKS = SAE_PAR PRM_PAR DAT_PAR NDF_PAR GRP_PAR FIO_ERR NUM_DEC_CVT \
-        NUM_DEF_CVT MSG_PAR AST_PAR CAT_PAR PSX_ERR PAR_ERR
+        NUM_DEF_CVT MSG_PAR AST_PAR CAT_PAR PSX_ERR PAR_ERR CNF_PAR
 
 SAE_PAR:	$(STAR_INC)/SAE_PAR
 	  $(LINK) $? $@
@@ -259,5 +254,7 @@ CAT_PAR:	$(STAR_INC)/CAT_PAR
 PSX_ERR:	$(STAR_INC)/PSX_ERR
 	  $(LINK) $? $@
 PAR_ERR:	$(STAR_INC)/PAR_ERR
+	  $(LINK) $? $@
+CNF_PAR:        $(STAR_INC)/CNF_PAR
 	  $(LINK) $? $@
 

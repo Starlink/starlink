@@ -60,7 +60,7 @@
 *        The number of X knots.
 *     FP = REAL (Returned)
 *        The standard deviation of the residuals to the fit.
-*     STATUS = INTEGER ({status_access_mode})
+*     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
@@ -70,7 +70,7 @@
 *      selecting own knots.
 
 *  Copyright:
-*     Copyright (C) 1996-2001 Central Laboratory of the Research Councils
+*     Copyright (C) 1996-2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     PWD: Peter Draper (STARLINK - Durham University)
@@ -79,6 +79,8 @@
 *  History:
 *     14-MAR-1996 (PWD):
 *        Original version.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,6 +94,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Arguments Given:
       INTEGER NFIT
@@ -160,26 +163,33 @@
 *  Estimate the size of the workspace that we will require for
 *  containing the lists of X, Y and data values.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL RTD1_MSTB( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
-     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTB( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ), 
+     :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID, 
+     :                   STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL RTD1_MSTUB( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
-     :                    XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTUB( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ), 
+     :                    .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID, 
+     :                    STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL RTD1_MSTW( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
-     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTW( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ), 
+     :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID, 
+     :                   STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL RTD1_MSTUW( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
-     :                    XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTUW( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ), 
+     :                    .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID, 
+     :                    STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL RTD1_MSTI( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
-     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTI( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ), 
+     :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID, 
+     :                   STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL RTD1_MSTR( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
-     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTR( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ), 
+     :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID, 
+     :                   STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL RTD1_MSTD( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
-     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTD( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ), 
+     :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID, 
+     :                   STATUS )
       ELSE
 
 *  Incorrect data type. Complain and give up.
@@ -206,39 +216,74 @@
 
 *  And copy the data values into these.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL RTD1_SUFITB( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
-     :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
-     :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
+         CALL RTD1_SUFITB( MASK, 
+     :                     %VAL( CNF_PVAL( IPIMG ) ), 
+     :                     %VAL( CNF_PVAL( IPVAR ) ),
+     :                     DIM1, DIM2, HAVVAR, 
+     :                     %VAL( CNF_PVAL( IPX ) ),
+     :                     %VAL( CNF_PVAL( IPY ) ), 
+     :                     %VAL( CNF_PVAL( IPZ  ) ), 
+     :                     %VAL( CNF_PVAL( IPW  ) ),
      :                     NVALID, SIGSUM, STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL RTD1_SUFITUB( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
-     :                      DIM1, DIM2, HAVVAR, %VAL( IPX ),
-     :                      %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
+         CALL RTD1_SUFITUB( MASK, 
+     :                      %VAL( CNF_PVAL( IPIMG ) ), 
+     :                      %VAL( CNF_PVAL( IPVAR ) ),
+     :                      DIM1, DIM2, HAVVAR, 
+     :                      %VAL( CNF_PVAL( IPX ) ),
+     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPZ  ) ), 
+     :                      %VAL( CNF_PVAL( IPW  ) ),
      :                      NVALID, SIGSUM, STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL RTD1_SUFITW( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
-     :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
-     :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
+         CALL RTD1_SUFITW( MASK, 
+     :                     %VAL( CNF_PVAL( IPIMG ) ), 
+     :                     %VAL( CNF_PVAL( IPVAR ) ),
+     :                     DIM1, DIM2, HAVVAR, 
+     :                     %VAL( CNF_PVAL( IPX ) ),
+     :                     %VAL( CNF_PVAL( IPY ) ), 
+     :                     %VAL( CNF_PVAL( IPZ  ) ), 
+     :                     %VAL( CNF_PVAL( IPW  ) ),
      :                     NVALID, SIGSUM, STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL RTD1_SUFITUW( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
-     :                      DIM1, DIM2, HAVVAR, %VAL( IPX ),
-     :                      %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
+         CALL RTD1_SUFITUW( MASK, 
+     :                      %VAL( CNF_PVAL( IPIMG ) ), 
+     :                      %VAL( CNF_PVAL( IPVAR ) ),
+     :                      DIM1, DIM2, HAVVAR, 
+     :                      %VAL( CNF_PVAL( IPX ) ),
+     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPZ  ) ), 
+     :                      %VAL( CNF_PVAL( IPW  ) ),
      :                      NVALID, SIGSUM, STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL RTD1_SUFITI( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
-     :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
-     :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
+         CALL RTD1_SUFITI( MASK, 
+     :                     %VAL( CNF_PVAL( IPIMG ) ), 
+     :                     %VAL( CNF_PVAL( IPVAR ) ),
+     :                     DIM1, DIM2, HAVVAR, 
+     :                     %VAL( CNF_PVAL( IPX ) ),
+     :                     %VAL( CNF_PVAL( IPY ) ), 
+     :                     %VAL( CNF_PVAL( IPZ  ) ), 
+     :                     %VAL( CNF_PVAL( IPW  ) ),
      :                     NVALID, SIGSUM, STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL RTD1_SUFITR( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
-     :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
-     :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
+         CALL RTD1_SUFITR( MASK, 
+     :                     %VAL( CNF_PVAL( IPIMG ) ), 
+     :                     %VAL( CNF_PVAL( IPVAR ) ),
+     :                     DIM1, DIM2, HAVVAR, 
+     :                     %VAL( CNF_PVAL( IPX ) ),
+     :                     %VAL( CNF_PVAL( IPY ) ), 
+     :                     %VAL( CNF_PVAL( IPZ  ) ), 
+     :                     %VAL( CNF_PVAL( IPW  ) ),
      :                     NVALID, SIGSUM, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL RTD1_SUFITD( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
-     :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
-     :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
+         CALL RTD1_SUFITD( MASK, 
+     :                     %VAL( CNF_PVAL( IPIMG ) ), 
+     :                     %VAL( CNF_PVAL( IPVAR ) ),
+     :                     DIM1, DIM2, HAVVAR, 
+     :                     %VAL( CNF_PVAL( IPX ) ),
+     :                     %VAL( CNF_PVAL( IPY ) ), 
+     :                     %VAL( CNF_PVAL( IPZ  ) ), 
+     :                     %VAL( CNF_PVAL( IPW  ) ),
      :                     NVALID, SIGSUM, STATUS )
       END IF
 
@@ -287,12 +332,18 @@
 *  And fit the surface.
       IF ( STATUS .EQ. SAI__OK ) THEN
          EPSR = VAL__EPSR
-         CALL PDA_SURFIT( 0, NVALID, %VAL( IPX ), %VAL( IPY ),
-     :                    %VAL( IPZ ), %VAL( IPW ), XMIN, XMAX, YMIN,
-     :                    YMAX, KX, KY, S, NXEST, NYEST, NMAX, EPSR,
-     :                    NX, %VAL( IPTX ), NY, %VAL( IPTY ),
-     :                    %VAL( IPC ), FP, %VAL( IPWRK1 ), LWRK1,
-     :                    %VAL( IPWRK2 ), LWRK2, %VAL( IPWRK3 ),
+         CALL PDA_SURFIT( 0, NVALID, 
+     :                    %VAL( CNF_PVAL( IPX ) ), 
+     :                    %VAL( CNF_PVAL( IPY ) ),
+     :                    %VAL( CNF_PVAL( IPZ ) ), 
+     :                    %VAL( CNF_PVAL( IPW ) ), 
+     :                    XMIN, XMAX, YMIN, YMAX, KX, KY, S, NXEST, 
+     :                    NYEST, NMAX, EPSR, NX, %VAL( IPTX ), NY, 
+     :                    %VAL( CNF_PVAL( IPTY ) ),
+     :                    %VAL( CNF_PVAL( IPC ) ), FP, 
+     :                    %VAL( CNF_PVAL( IPWRK1 ) ), LWRK1,
+     :                    %VAL( CNF_PVAL( IPWRK2 ) ), LWRK2, 
+     :                    %VAL( CNF_PVAL( IPWRK3 ) ),
      :                    LWRK3, IERROR, STATUS )
 
          IF ( STATUS .NE. SAI__OK ) THEN

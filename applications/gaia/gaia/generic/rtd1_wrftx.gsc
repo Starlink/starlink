@@ -54,6 +54,8 @@
 *        Removed PSX calls.
 *     22-NOV-1996 (PWD):
 *        Converted for RTD from IMG.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +69,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *   Arguments Given:
       CHARACTER * ( * ) ITEM
@@ -112,15 +115,16 @@
       IF ( LKEY .EQ. 'COMMENT' .OR. LKEY .EQ. 'HISTORY' .OR.
      :     LKEY .EQ. ' ' ) THEN
          CALL ERR_MARK
-         CALL RTD1_GKEY<T>( NHEAD, %VAL( IPHEAD ), 1, 'END', 0, THERE, 
-     :                      LVAL, AT, STATUS, %VAL( 80 ) )
+         CALL RTD1_GKEY<T>( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 1, 
+     :                      'END', 0, THERE,  LVAL, AT, STATUS, 
+     :                      %VAL( 80 ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
          THERE = .FALSE.
       ELSE
          CALL ERR_MARK
-         CALL RTD1_GKEY<T>( NHEAD, %VAL( IPHEAD ), 1, LKEY, 0, THERE, 
-     :                      LVAL, AT, STATUS, %VAL( 80 ) )
+         CALL RTD1_GKEY<T>( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 1, LKEY, 
+     :                      0, THERE, LVAL, AT, STATUS, %VAL( 80 ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
       END IF
@@ -136,7 +140,7 @@
 *  Now write in the value.
       NEWEND = .NOT. THERE
       IF ( .NOT. THERE ) NHEAD = NHEAD + 1
-      CALL RTD1_WKEY<T>( NHEAD, %VAL( IPHEAD ), AT, NEWEND, LKEY, 
-     :                   COMMEN, VALUE, STATUS, %VAL( 80 ) )
+      CALL RTD1_WKEY<T>( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), AT, NEWEND, 
+     :                   LKEY, COMMEN, VALUE, STATUS, %VAL( 80 ) )
       END
 

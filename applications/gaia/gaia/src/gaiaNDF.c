@@ -308,7 +308,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
    cnfExprt( (char *) component, comp, comp_length);
 
    /* Convert C pointer to Fortran pointer */
-   dataPtr = (F77_POINTER_TYPE) data;
+   F77_EXPORT_POINTER( data, dataPtr );
 
    /*  If we have a FITS header then write it out with the NDF. This
        also contains any new WCS information that might be

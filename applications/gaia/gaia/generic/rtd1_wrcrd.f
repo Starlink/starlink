@@ -29,7 +29,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1996-2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     PWD: Peter Draper (STARLINK - Durham University)
@@ -38,6 +38,8 @@
 *  History:
 *     22-NOV-1996 (PWD):
 *        Original version.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -50,6 +52,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *   Arguments Given:
       CHARACTER * ( * ) CARD
@@ -83,6 +86,6 @@
 
 *  Now write in card.
       NHEAD = NHEAD + 1
-      CALL RTD1_WCARD( CARD, NHEAD, %VAL( IPHEAD ), STATUS, %VAL( 80 ) )
+      CALL RTD1_WCARD( CARD, NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 
+     :                 STATUS, %VAL( 80 ) )
       END
-

@@ -44,6 +44,8 @@
 *        Original version.
 *     15-MAY-1998 (PWD):
 *        Added WCS to components that are propagated to new NDF.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -57,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'NDF_PAR'         ! NDF constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -94,25 +97,25 @@
 
 *  Now find the region that contains valid pixels.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL RTD1_GBNDB( %VAL( IPIN ), XDIM, YDIM,
+         CALL RTD1_GBNDB( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                    LBNDS, UBNDS, STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL RTD1_GBNDUB( %VAL( IPIN ), XDIM, YDIM,
+         CALL RTD1_GBNDUB( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                     LBNDS, UBNDS, STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL RTD1_GBNDW( %VAL( IPIN ), XDIM, YDIM,
+         CALL RTD1_GBNDW( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                    LBNDS, UBNDS, STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL RTD1_GBNDUW( %VAL( IPIN ), XDIM, YDIM,
+         CALL RTD1_GBNDUW( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                     LBNDS, UBNDS, STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL RTD1_GBNDR( %VAL( IPIN ), XDIM, YDIM,
+         CALL RTD1_GBNDR( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                    LBNDS, UBNDS, STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL RTD1_GBNDI( %VAL( IPIN ), XDIM, YDIM,
+         CALL RTD1_GBNDI( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                    LBNDS, UBNDS, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL RTD1_GBNDD( %VAL( IPIN ), XDIM, YDIM,
+         CALL RTD1_GBNDD( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                    LBNDS, UBNDS, STATUS )
       END IF
 
