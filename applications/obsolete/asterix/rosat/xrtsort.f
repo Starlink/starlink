@@ -1359,6 +1359,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *    Local variables :
       REAL BASE(2)
       REAL SCALE(2)
+      REAL XTOT,YTOT
       INTEGER I,J
       INTEGER IMIN,IMAX
       INTEGER JMIN,JMAX
@@ -1369,8 +1370,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
       SCALE(1)=-HEAD.PIXEL*MRES/3600.0
       SCALE(2)=HEAD.PIXEL*MRES/3600.0
-      BASE(1)=-MDIM(1)/2*SCALE(1)+SCALE(1)/2.0
-      BASE(2)=-MDIM(2)/2*SCALE(2)+SCALE(2)/2.0
+      BASE(1)=-MDIM1/2*SCALE(1)+SCALE(1)/2.0
+      BASE(2)=-MDIM2/2*SCALE(2)+SCALE(2)/2.0
 
 
       IMIN=MDIM1
@@ -1602,6 +1603,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         REAL PTOD                     ! Conversion of pixels to degrees
         REAL PTOR                     ! Conversion of pixels to radians
         REAL XW,YW		      ! Position in world coords
+        REAL XW1,XW2,YW1,YW2
         REAL BXW,BYW		      ! Position in world coords
         REAL XWIDW,YWIDW,RADW	      ! Other parameters in world coords.
         REAL BXWIDW,BYWIDW,BRADW      ! Other parameters in world coords.
@@ -1741,7 +1743,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
      :                                  XW,YW,XW1,XW2,YW1,YW2,STATUS)
 
 *   Get nominal centre of sort region in RA and DEC degrees
-        CALL MSG_PRNT('Specify nominal centre of region:-'
+        CALL MSG_PRNT('Specify nominal centre of region:-')
         CALL MSG_PRNT('  1 Geometric centre')
         CALL MSG_PRNT('  2 Median position')
         CALL MSG_PRNT('  3 Optical axis')
