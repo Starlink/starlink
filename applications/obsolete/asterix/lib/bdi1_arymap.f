@@ -255,7 +255,7 @@
 
 *  Store details in private store
       CALL BDI1_STOMAP( PSID, MMODE, SLOC, FPTR, PTR, NELM,
-     :                  UTIL_PLOC( BDI1_ARYDB ), TYPE,
+     :                  UTIL_PLOC( BDI1_ARYWB ), TYPE,
      :                  MODE, STATUS )
 
 *  Report any errors
