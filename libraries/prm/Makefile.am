@@ -7,7 +7,7 @@ noinst_PROGRAMS = make-prm-par
 
 
 libprm_la_SOURCES = \
-	$(F_ROUTINES)
+	$(F_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
 	$(noinst_MESSAGES) \
