@@ -233,7 +233,6 @@ webstart:
 
 dist:
      [copy] Copying 284 files to /apps/cvsbuild/java/source/diva/docs/diva
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/diva
@@ -873,4 +872,4 @@ Xlib: No protocol specified
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1085: Fatal error during transformation
 
-Total time: 3 minutes 18 seconds
+Total time: 3 minutes 19 seconds
