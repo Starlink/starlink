@@ -23,6 +23,7 @@
 *     30 Jun 94 : Improved default behaviour to trap case where no
 *                 axis labels present (DJA)
 *     10 Apr 95 : Added PI to list of allowable energy axis names (DJA)
+*     12 Apr 95 : Made test for EVDS more robust (DJA)
 *
 *    Type definitions :
 *
@@ -75,6 +76,7 @@
       LOGICAL                 PRIM              ! Dataset primitive?
       LOGICAL                 REG               ! Axis is regular?
       LOGICAL                 XOK, YOK          ! X/Y lists present?
+      LOGICAL			XTHERE			! X_CORR present?
 *-
 
 *    Check status
@@ -116,9 +118,11 @@
 *      Decide whether event or image dataset
         CALL DAT_TYPE( P_LOC(SLOT), TYPE, STATUS )
 
+        CALL DAT_THERE( P_LOC(SLOT), 'X_CORR', XTHERE, STATUS )
+
 *      If binned
         IF ( .NOT. ((TYPE(:4).EQ.'EVDS') .OR.
-     :              (TYPE(:5).EQ.'EVENT')) ) THEN
+     :              (TYPE(:5).EQ.'EVENT')) .AND. .NOT. XTHERE ) THEN
 
 *        Check data
           CALL BDA_FIND( P_LOC(SLOT), BDA, STATUS )
@@ -228,13 +232,13 @@
           END IF
 
 *      else if event...
-        ELSE
+        ELSE IF ( XTHERE ) THEN
 
 *        Set event dataset flag
           P_EVDS(SLOT) = .TRUE.
 
 *        Look for X_CORR list
-          CALL DAT_THERE( P_LOC(SLOT), 'X_CORR', XOK, STATUS )
+          XOK = XTHERE
           IF ( XOK ) THEN
             CALL DAT_FIND( P_LOC(SLOT), 'X_CORR', LLOC(1), STATUS )
             LSUF = '_CORR'

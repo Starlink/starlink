@@ -51,9 +51,12 @@
 	print *,5
 
       CALL GCB_ATTACH('IMAGE',STATUS)
+	print *,6
       CALL GCB_DETACH(STATUS)
+	print *,7
 
       CALL GDV_STATUS(ACTIVE,STATUS)
+	print *,8
       IF (ACTIVE) THEN
         CALL GCB_QCONTXT(NCONTXT,STATUS)
         IF (NCONTXT.GT.0) THEN
@@ -69,7 +72,10 @@
       ENDIF
 
       I_OPEN=.FALSE.
+	print *,9
 
       CALL AST_CLOSE()
+	print *,10
 
       END
+
