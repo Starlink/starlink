@@ -123,7 +123,7 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, NLUT, %VAL( CNF_PVAL( IPLUT ) ), 
+         CALL ATL1_GTOFL( IGRP, NLUT, 1, %VAL( CNF_PVAL( IPLUT ) ), 
      :                    STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the

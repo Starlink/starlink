@@ -1749,6 +1749,133 @@ iraf! {
 
       }
 
+      action astpolygon {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 1
+            type NDF
+            prompt {The Frame in which the Polygon is defined}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter xin {
+            position 2
+            type LITERAL
+            prompt {Group of numerical X axis values}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter yin {
+            position 3
+            type LITERAL
+            prompt {Group of numerical Y axis values}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter unc {
+            position 4
+            type LITERAL
+            prompt {The uncertainty Region}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter options {
+            position 5
+            type LITERAL
+            prompt {Options for the Polygon}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the Polygon}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
+      action astellipse {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 1
+            type NDF
+            prompt {The Frame in which the Ellipse is defined}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter form {
+            position 2
+            type _INTEGER
+            prompt {Parameter form}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter centre {
+            position 3
+            type _DOUBLE
+            prompt {Centre coords}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter point1 {
+            position 4
+            type _DOUBLE
+            prompt {Coords at axis end or axis lengths}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter point2 {
+            position 5
+            type _DOUBLE
+            prompt {Coords at a point on ellipse of position angle}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter unc {
+            position 6
+            type LITERAL
+            prompt {The uncertainty Region}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter options {
+            position 7
+            type LITERAL
+            prompt {Options for the Ellipse}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 8
+            type LITERAL
+            prompt {Name of file in which to store the Ellipse}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
 
 
 

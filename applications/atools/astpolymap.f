@@ -156,7 +156,7 @@
          CALL PSX_CALLOC( SIZE, '_DOUBLE', IPCOF, STATUS )
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, SIZE, %VAL( CNF_PVAL( IPCOF ) ), 
+         CALL ATL1_GTOFL( IGRP, SIZE, 1, %VAL( CNF_PVAL( IPCOF ) ), 
      :                    STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the
@@ -206,7 +206,7 @@
          CALL PSX_CALLOC( SIZE, '_DOUBLE', IPCOI, STATUS )
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, SIZE, %VAL( CNF_PVAL( IPCOI ) ), 
+         CALL ATL1_GTOFL( IGRP, SIZE, 1, %VAL( CNF_PVAL( IPCOI ) ), 
      :                    STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the

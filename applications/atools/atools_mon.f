@@ -198,6 +198,12 @@
       ELSE IF ( NAME .EQ. 'ASTGETACTUNIT' ) THEN
          CALL ASTGETACTUNIT( STATUS )
  
+      ELSE IF ( NAME .EQ. 'ASTPOLYGON' ) THEN
+         CALL ASTPOLYGON( STATUS )
+ 
+      ELSE IF ( NAME .EQ. 'ASTELLIPSE' ) THEN
+         CALL ASTELLIPSE( STATUS )
+ 
 
 *  If the action name is not recognised, then report an error.
       ELSE

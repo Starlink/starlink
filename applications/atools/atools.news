@@ -9,6 +9,11 @@
  high-level interface to the AST library. 
 
 
+  Changes in V1.8-1:
+
+  - New command astellipse. Creates an Ellipse.
+  - New command astpolygon. Creates a Polygon.
+
   Changes in V1.8:
 
   - New command astfluxframe. Creates a FluxFrame.

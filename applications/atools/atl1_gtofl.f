@@ -1,4 +1,4 @@
-      SUBROUTINE ATL1_GTOFL( IGRP, NEL, DATA, STATUS )
+      SUBROUTINE ATL1_GTOFL( IGRP, NEL, ISTART, DATA, STATUS )
 *+
 *  Name:
 *     ATL1_GTOFL
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL1_GTOFL( IGRP, NEL, DATA, STATUS )
+*     CALL ATL1_GTOFL( IGRP, NEL, ISTART, DATA, STATUS )
 
 *  Description:
 *     This routine read a vector of floating point values from a group,
@@ -21,9 +21,12 @@
 *     IGRP = INTEGER (Given)
 *        An identifier for the group
 *     NEL = INTEGER (Given)
-*        The size of the group.
+*        The size of the array.
 *     DATA( NEL ) = DOUBLE PRECISION (Returned)
 *        The array in which to store the values.
+*     ISTART = INTEGER (Given) 
+*        The index of the array element to receive the first value read
+*        from the group.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -34,6 +37,8 @@
 *  History:
 *     14-FEB-2001 (DSB):
 *        Original version.
+*     1-FEB-2005 (DSB):
+*        Added argument ISTART.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -51,6 +56,7 @@
 *  Arguments Given:
       INTEGER IGRP
       INTEGER NEL
+      INTEGER ISTART
 
 *  Arguments Returned:
       DOUBLE PRECISION DATA( NEL )
@@ -62,23 +68,22 @@
 *  Local Variables:
       CHARACTER FILE*(GRP__SZFNM)
       CHARACTER TEXT*(GRP__SZNAM)
-      INTEGER I
+      INTEGER I, SIZE
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Loop round the group.
-      DO I = 1, NEL
+*  Loop round the group, or as much of it as will fit in the array.
+      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
+      DO I = 1, MIN( SIZE, NEL - ISTART + 1 )
 
 *  Get this element.
          CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
 
-*  Determine the bname of the file in which the element was supplied.
-
 *  Attempt to convert it to a double.
          IF( STATUS .EQ. SAI__OK ) THEN 
-            CALL CHR_CTOD( TEXT, DATA( I ), STATUS ) 
+            CALL CHR_CTOD( TEXT, DATA( I + ISTART - 1 ), STATUS ) 
             IF( STATUS .NE. SAI__OK ) THEN
 
                CALL ERR_BEGIN( STATUS )               

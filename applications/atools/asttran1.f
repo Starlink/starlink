@@ -130,7 +130,7 @@
       CALL PSX_CALLOC( NP, '_DOUBLE', IPXOUT, STATUS )
 
 *  Read the values from the group into the memory.
-      CALL ATL1_GTOFL( IGRP1, NP, %VAL( CNF_PVAL( IPXIN ) ), STATUS )
+      CALL ATL1_GTOFL( IGRP1, NP, 1, %VAL( CNF_PVAL( IPXIN ) ), STATUS )
 
 * Transform the positions.
       CALL AST_TRAN1( THIS, NP, %VAL( CNF_PVAL( IPXIN ) ), FORWRD,
