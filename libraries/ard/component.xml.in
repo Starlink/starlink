@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/ard</path>
+  <description>ASCII Region Definition</description>
+  <abstract><p>The ARD (ASCII Region Definition) system provides a 
+     textual language for describing regions within a data array,
+     together with software for converting a textual description
+     into a pixel mask, or plotting it on a graphics device.
+     The textual language is based on a set of keywords identifying
+     simple shapes (boxes, circles, lines, etc.).
+     These keywords can be combined together using Boolean-style
+     operators (AND, OR, NOT, etc.) to create more complex shapes.
+     Data arrays can be multi-dimensional.</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
