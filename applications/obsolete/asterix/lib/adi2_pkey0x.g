@@ -110,46 +110,15 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  Local Constants:
-      {data_type} {constant_name} ! [constant_description]
-      PARAMETER ( {constant_name} = {cons} )
-
 *  Local Variables:
-      {data_type} {name}[dimensions] ! [local_variable_description]
-
-*  Internal References:
-      {data_type} {internal_name} ! [internal_description]
-      [internal_definition_statement]...
-
-*  Local Data:
-      DATA {data_elm} / {data_values}... /
-      [data_stmt]...
-
+      INTEGER			HID			! HDU identifier
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate the approriate place depending on the HDU value. Blank means
-*  primary HDU
-      IF ( HDU(1:1) .EQ. ' ' ) THEN
-        CALL ADI_THERE( FID, 'PRIMARY', THERE, STATUS )
-        IF ( .NOT. THERE ) THEN
-          CALL ADI_CNEW0( FID, 'PRIMARY', 'STRUC', STATUS )
-        END IF
-        CALL ADI_FIND( FID, 'PRIMARY', HID, STATUS )
-      ELSE
-        CALL ADI_THERE( FID, 'EXTENSIONS', THERE, STATUS )
-        IF ( .NOT. THERE ) THEN
-          CALL ADI_CNEW0( FID, 'EXTENSIONS', 'STRUC', STATUS )
-        END IF
-        CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
-        CALL ADI_THERE( EID, HDU, THERE, STATUS )
-        IF ( .NOT. THERE ) THEN
-
-        END IF
-
-      END IF
+*  Locate the HDU structure to contain the keyword
+      CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK )

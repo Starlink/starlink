@@ -105,6 +105,8 @@
 
 *  Local Variables:
       INTEGER			EID			! EXTENSIONS identifier
+
+      LOGICAL			THERE			! Object exists
 *.
 
 *  Check inherited global status.
@@ -117,7 +119,7 @@
         IF ( .NOT. THERE ) THEN
           CALL ADI_CNEW0( FID, 'PRIMARY', 'STRUC', STATUS )
         END IF
-        CALL ADI_FIND( FID, 'PRIMARY', HID, STATUS )
+        CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
 
 *  Otherwise named HDU in the EXTENSIONS structure
       ELSE
@@ -131,6 +133,9 @@
           CALL ADI_CNEW0( FID, HDU, 'STRUC', STATUS )
         END IF
         CALL ADI_FIND( FID, HDU, ID, STATUS )
+
+*  Remove temporary
+        CALL ADI_ERASE( EID, STATUS )
 
       END IF
 
