@@ -52,6 +52,7 @@ require Exporter;
 @EXPORT = qw/tarxf popd pushd starpack rmrf parsetag
              $incdir $srcdir $bindir 
              $mimetypes_file
+             $htxserver
              $func_indexfile $file_indexfile $taskfile
              %tagger/;
 
@@ -77,6 +78,10 @@ $incdir = "/star/include";              # Starlink include directory
 #  System file locations.
 
 $mimetypes_file = "/etc/mime.types";
+
+#  HTX server base URL
+
+$htxserver = "http://star-www.rl.ac.uk/cgi-bin/htxserver";
 
 #  Index file locations.
 
