@@ -188,6 +188,7 @@ typedef enum {
    OP_ACOSD,                     /* Inverse cosine (degrees) */
    OP_ASIN,                      /* Inverse sine (radians) */
    OP_ASIND,                     /* Inverse sine (degrees) */
+   OP_ASINH,                     /* Inverse hyperbolic sine */
    OP_ATAN,                      /* Inverse tangent (radians) */
    OP_ATAND,                     /* Inverse tangent (degrees) */
    OP_CEIL,                      /* C ceil function (round up) */
@@ -317,6 +318,7 @@ static const Symbol symbol[] = {
    { "aint("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_INT      },
    { "asin("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASIN     },
    { "asind("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASIND    },
+   { "asinh("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASINH    },
    { "atan("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ATAN     },
    { "atand("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ATAND    },
    { "ceil("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_CEIL     },
@@ -2171,6 +2173,9 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
                                      asin( x ) : AST__BAD )
             ARG_1( OP_ASIND,    *y = ( ABS( x ) <= 1.0 ) ?
                                      asin( x ) * r2d : AST__BAD )
+            ARG_1( OP_ASINH,    *y = ( x >= 0.0 ) ?
+                                     log( x + sqrt( x * x + 1.0 ) ) :
+                                     -log( -x + sqrt( x * x + 1.0 ) ) )
             ARG_1( OP_ATAN,     *y = atan( x ) )
             ARG_1( OP_ATAND,    *y = atan( x ) * r2d )
             ARG_1( OP_CEIL,     *y = ceil( x ) )
