@@ -13452,93 +13452,101 @@ iraf! {
       action slide {
          alias {slid(e) shif(t)}
 
-         parameter inpic {
+         helplib {$KAPPA_HELP}
+
+         parameter abs {
+            position 3
+            size *
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Absolute translation vector}
+            helpkey *
+         }
+
+         parameter fid {
+            size *
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Co-ordinates of fiducial point}
+            helpkey *
+         }
+
+         parameter in {
             position 1
-            type IMAGE
+            type NDF
             access READ
             vpath PROMPT
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {Image to be shifted}
-            help "Name of the IMAGE structure containing the 2-d data array to be shifted."
-          }
+            prompt {Input NDF}
+            helpkey *
+         }
 
-         parameter outpic {
+         parameter method {
+            position 4
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Interpolation method}
+            default LINEAR
+            helpkey *
+         }
+
+         parameter obj {
+            size *
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Co-ordinates of standard object}
+            helpkey *
+         }
+
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary resampling parameters}
+            helpkey *
+         }
+
+         parameter out {
             position 2
-            type IMAGE
+            type NDF
             access WRITE
             vpath PROMPT
+            ppath GLOBAL
             association ->GLOBAL.DATA_ARRAY
-            prompt {Image after being shifted}
-            help "Name given to the IMAGE structure to hold the data array after being shifted."
-          }
-
-         parameter otitle {
-            position 3
-            type _CHAR
-            vpath DEFAULT
-            prompt {Title for output image}
-            default {KAPPA - Slide}
-            help "Character string used as a title for the output IMAGE structure."
-          }
+            prompt {Output NDF}
+            helpkey *
+         }
 
          parameter stype {
-            position 4
-            type _CHAR
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Shift type: Relative or Absolute}
-            help "Shift relative a to known fiducial point or an absolute shift to be applied to the data array."
-          }
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Shift type}
+            default Absolute
+            helpkey *
+         }
 
-         parameter absx {
-            position 5
-            type _REAL
-            vpath PROMPT
-            prompt {Absolute shift in x}
-            help "Give the absolute shift of the data array in pixels in the x direction."
-          }
-
-         parameter absy {
-            position 6
-            type _REAL
-            vpath PROMPT
-            prompt {Absolute shift in y}
-            help "Give the absolute shift of the data array in pixels in the y direction."
-          }
-
-         parameter fidx {
-            position 7
-            type _REAL
-            vpath PROMPT
-            prompt {x position of fiducial point}
-            help "The x position of where you would like the standard object to be."
-          }
-
-         parameter fidy {
-            position 8
-            type _REAL
-            vpath PROMPT
-            prompt {y position of fiducial point}
-            help "The y position of where you would like the standard object to be."
-          }
-
-         parameter objx {
-            position 9
-            type _REAL
-            vpath PROMPT
-            prompt {x position of standard object}
-            help "The x position of where the standard object is."
-          }
-
-         parameter objy {
-            position 10
-            type _REAL
-            vpath PROMPT
-            prompt {y position of standard object}
-            help "The y position of where the standard object is."
-          }
-
+         parameter title {
+            type LITERAL
+            access READ
+            prompt {Title for output NDF}
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            helpkey *
+         }
+            
       }
 
       action sqorst {

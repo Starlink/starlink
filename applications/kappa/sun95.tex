@@ -11054,9 +11054,9 @@ picture.}
 \menuitem{SHADOW}{
  Enhances edges in a 2-dimensional NDF using a shadow effect.}
 \menuitem{SLIDE}{
- Realigns a 2-d data array via an $x$-$y$ shift.}
+ Shifts pixels in an NDF by a given amount along each axis.}
 \menuitem{SQORST}{
- Squashes or stretches a 2-d  data array in either or both axes.}
+ Squashes or stretches an NDF.}
 \menuitem{STATS}{
  Computes simple statistics for an NDF's pixels.}
 \menuitem{SUB}{
@@ -11395,7 +11395,7 @@ functions as follows.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
 \classitem{SQORST}
- Squashes or stretches a 2-d data array in either or both axes.
+ Squashes or stretches an NDF.
 \classitem{REGRID}
  Use an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
@@ -11426,7 +11426,7 @@ functions as follows.
 \classitem{SETBOUND}
  Sets new bounds for an NDF.
 \classitem{SLIDE}
- Realigns a 2-d data array via an $x$-$y$ shift.
+ Shifts pixels in an NDF by a given amount along each axis.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -37140,64 +37140,163 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
 (120k).
 \end{htmlonly}
 
-\manroutine {{\manheadstyle{SLIDE}}}{ Realigns a 2-d data array via an
-{$x$}-{$y$} shift.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  The data array in the input {\mantt{IMAGE}} structure is shifted, in either
-  or both of the {$x$} and {$y$} axes, to produce the new array, in the
-  output image structure. The shifts in {$x$} and {$y$} are either input as
-  absolute {$x$} and {$y$} shifts by the user, or alternatively, are
-  calculated from the co-ordinates of two points provided by the
-  user. These are a fiducial point, with co-ordinates {\mantt {\%FIDX}},
-  {\mantt {\%FIDY}}, and a standard object, with co-ordinates {\mantt {\%OBJX}},
-  {\mantt {\%OBJY}}. The shift in {$x$} is then given by
-  {\mantt {\%FIDX}}{$-$}{\mantt {\%OBJX}} and the shift in {$y$} is given by
-  {\mantt {\%FIDY}}{$-$}{\mantt {\%OBJY}}. The output data array is padded with
-  zeros in the regions not occupied by the shifted input array.  Fractional
-  shifts are computed by bilinear interpolation.
+\sstroutine{
+   SLIDE
+}{
+   Realigns an NDF using a translation
+}{
+   \sstdescription{
+      The pixels of an NDF are shifted by a given number of pixels along
+      each pixel axis. The shift need not be an integer number of pixels,
+      and pixel interpolation will be performed if necessary using the
+      scheme selected by parameter METHOD. The shifts to use are specified
+      either by an absolute vector given by the ABS parameter or by the
+      difference between a fiducial point and a standard object given by
+      the FID and OBJ parameters respectively.  In each case the co-ordinates
+      are specified in the NDF{\tt '}s pixel co-ordinate Frame.
+   }
+   \sstusage{
+      slide in out abs method
+   }
+   \sstparameters{
+      \sstsubsection{
+         ABS( ) = \_DOUBLE (Read)
+      }{
+         Absolute shifts in pixels. The number of values supplied must
+         match the number of pixel axes in the NDF. Only used if
+         STYPE={\tt "}Absolute{\tt "}.
+      }
+      \sstsubsection{
+         FID( ) = \_DOUBLE (Read)
+      }{
+         Position of the fiducial point in pixel co-ordinates. The number
+         of values supplied must match the number of pixel axes in the NDF.
+         Only used if STYPE={\tt "}Relative{\tt "}.
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The NDF to be translated.
+      }
+      \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The interpolation method used to perform the translation.
+         The following values are permitted:
 
-  The magic-value method is used for processing bad data.
+         \sstitemlist{
 
-\manroutineitem {Invocation }{}
-  SLIDE
+            \sstitem
+            {\tt "}Nearest{\tt "}   -- Nearest neighbour sampling.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  {\mantt{IMAGE}} structure containing the 2-d data array to be shifted.
-\manparameterentry {{\mantt{READ}} }{{\mantt{STYPE}}  }{{\mantt{\_CHAR}}}
-  The sort of shift is to be used. The choice is {\mantt{'Relative'}} or
-  {\mantt{'Absolute'}}.
-\manparameterentry {{\mantt{READ}} }{{\mantt{ABSX}}  }{{\mantt{\_REAL}}}
-  Absolute {$x$} shift in pixels. ({\mantt{Absolute}} shift)
-\manparameterentry {{\mantt{READ}} }{{\mantt{ABSY}}  }{{\mantt{\_REAL}}}
-  Absolute {$y$} shift in pixels. ({\mantt{Absolute}} shift)
-\end{manparametertable}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{FIDX}}  }{{\mantt{\_REAL}}}
-  {$x$}-co-ordinate of the fiducial point. ({\mantt{Relative}} shift)
-\manparameterentry {{\mantt{READ}} }{{\mantt{FIDY}}  }{{\mantt{\_REAL}}}
-  {$y$}-co-ordinate of the fiducial point. ({\mantt{Relative}} shift)
-\manparameterentry {{\mantt{READ}} }{{\mantt{OBJX}}  }{{\mantt{\_REAL}}}
-  {$x$}-co-ordinate of the standard object. ({\mantt{Relative}} shift)
-\manparameterentry {{\mantt{READ}} }{{\mantt{OBJY}}  }{{\mantt{\_REAL}}}
-  {$y$}-co-ordinate of the standard object. ({\mantt{Relative}} shift)
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}} }{{\mantt{IMAGE}}}
-  {\mantt{IMAGE}} structure to contain the 2-d data array after being
-  shifted.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}} }{{\mantt{\_CHAR}}}
-  Will be used as the {\mantt{TITLE}} component for the output
-  {\mantt{IMAGE}} structure. \mbox{{\mantt ['KAPPA - Slide']}}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+            \sstitem
+            {\tt "}Linear{\tt "}    -- Linear interpolation.
 
-\manroutineitem {Authors }{}
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-  Dave Baines ({\mantt{ROE}}::{\mantt{ASOC5}})
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-\end{manroutinedescription}
+            \sstitem
+            {\tt "}Sinc{\tt "}      -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincSinc{\tt "}  -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$sinc(k$*$pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincCos{\tt "}   -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$cos(k$*$pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincGauss{\tt "} -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$exp(-k$*$x$*$x) kernel.
+
+            \sstitem
+            {\tt "}BlockAve{\tt "}  -- Block averaging over all pixels in the
+                              surrounding N-dimensional cube.
+
+         }
+         In the above, sinc(z)=sin(z)/z.  Some of these schemes will
+         require additional parameters to be supplied via the PARAMS
+         parameter.  A more detailed discussion of these schemes is
+         given in the {\tt "}Sub-Pixel Interpolation Schemes{\tt "} section below.
+         {\tt ["Linear"]}
+      }
+      \sstsubsection{
+         OBJ = LITERAL (Read)
+      }{
+         Position of the standard object in pixel co-ordinates. The number
+         of values supplied must match the number of pixel axes in the NDF.
+         Only used if STYPE={\tt "}Relative{\tt "}.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The translated NDF.
+      }
+      \sstsubsection{
+         PARAMS( ) = \_DOUBLE (Read)
+      }{
+         Parameters required to control the resampling scheme.  One or
+         more values may be required to specify the exact resampling
+         behaviour, according to the value of the METHOD parameter.
+         See the section on {\tt "}Sub-Pixel Interpolation Schemes{\tt "}.
+      }
+      \sstsubsection{
+         STYPE = LITERAL (Read)
+      }{
+         The sort of shift to be used.  The choice is {\tt "}Relative{\tt "} or
+         {\tt "}Absolute{\tt "}. {\tt ["Absolute"]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF. A null (!) value will cause the input
+         title to be used. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         slide m31 m31\_acc [3.2,2.3]
+      }{
+         The pixels in the NDF m31 are shifted by 3.2 pixels in X and
+         2.3 pixels in Y, and written to NDF m31\_acc. Linear interpolation
+         is used to produce the output data (and, if present, variance) array.
+      }
+      \sstexamplesubsection{
+         slide m31 m31\_acc [3.2,2.3] nearest
+      }{
+         The same as the previous example except that nearest neighbour
+         resampling is used.  This will be somewhat faster, but may
+         result in features shifted by up to half a pixel.
+      }
+      \sstexamplesubsection{
+         slide speca specb stype=rel fid=11.2 obj=11.7
+      }{
+         The pixels in the NDF speca are shifted by 0.5 (\emph{i.e.} 11.7 - 11.2)
+         pixels and the output NDF is written as specb.
+      }
+      \sstexamplesubsection{
+         slide speca specb stype=abs abs=0.5
+      }{
+         This does just the same as the previous example.
+      }
+   }
+   \sstdiytopic{
+      Sub-Pixel Interpolation Schemes
+   }{
+      When performing the translation the pixels are resampled from
+      the input grid to the output grid by default using linear
+      interpolation.  For many purposes this default scheme will
+      be adequate, but for greater control over the resampling
+      process the METHOD and PARAMS parameters can be used.  Detailed
+      discussion of the use of these parameters can be found in the
+      {\tt "}Sub-pixel Interpolation Schemes{\tt "} section of the REGRID task
+      documentation.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: REGRID, SQORST, WCSADD
+   }
+}
 
 
 \sstroutine{
@@ -44418,7 +44517,7 @@ functions as follows.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
 \classitem{SQORST}
- Squashes or stretches a 2-d data array in either or both axes.
+ Squashes or stretches an NDF.
 \classitem{REGRID}
  Applies a geometrical transformation to an NDF.
 \classitem{WCSALIGN}
@@ -44449,7 +44548,7 @@ functions as follows.
 \classitem{SETBOUND}
  Sets new bounds for an NDF.
 \classitem{SLIDE}
- Realigns a 2-d data array via an $x$-$y$ shift.
+ Shifts pixels in an NDF by a given amount along each axis.
 \end{description}
 \vspace*{0.7ex}
 %
