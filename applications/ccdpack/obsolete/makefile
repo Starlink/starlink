@@ -979,10 +979,15 @@ check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
 #  their version numbers.
 
 rcsrevs: RCS
+	echo > rcsrevs \
+           "#  Names and current revision numbers of files under RCS control."
+	echo >> rcsrevs \
+           "#  Package" `echo $(PKG_NAME) | tr a-z A-Z` "version V$(PKG_VERS)."
+	echo >> rcsrevs "#  "
 	for f in $(RCSFILES); do \
            echo $$f":" `rlog -r $$f | awk '/^revision [0-9]/ {print $$2}'`; \
         done \
-        > rcsrevs
+        >> rcsrevs
 
 #  Rules for building release files from RCS repository.
 
