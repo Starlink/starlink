@@ -20,9 +20,9 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
+AC_FC_LIBRARY_LDFLAGS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_FC_LIBRARY_LDFLAGS
 
 dnl    Build ADAM task for testing
 STAR_MONOLITHS

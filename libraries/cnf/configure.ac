@@ -19,9 +19,9 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
+AC_FC_LIBRARY_LDFLAGS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_FC_LIBRARY_LDFLAGS
 
 dnl   Check if BSD bcopy function is available, if not should use memmove.
 AC_CHECK_FUNCS(memmove bcopy)
