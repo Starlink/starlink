@@ -32,6 +32,7 @@
       LOGICAL FLAG
       LOGICAL OK
       LOGICAL XLOG,YLOG			! whether axes are log
+      LOGICAL FIRST
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
