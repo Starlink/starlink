@@ -3876,12 +3876,13 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       INTEGER SID
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-
+	print *,1
 *  write spatial selection
       CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTARD(SID,'Spatial',ASRT.ARDID,STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
+	print *,2
 
 *  write detector coordinate selection
       CALL SLN_NEWREC(VERSION,SID,STATUS)
@@ -3893,6 +3894,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      :                                                     STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
+	print *,3
 
 *  write time ranges
       CALL SLN_NEWREC(VERSION,SID,STATUS)
@@ -3900,6 +3902,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      :             ASRT.MIN_T,ASRT.MAX_T,STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
+	print *,4
 
 *  write PH channel selection
       CALL SLN_NEWREC(VERSION,SID,STATUS)
