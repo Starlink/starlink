@@ -19,29 +19,21 @@ PUBLIC_EXE = atclsh awish
 
 PUBLIC_INCLUDES = tclAdam.h tkGwm.h tkNbs.h tclNbs.h
 
-##  List of public object files.  These are object files which form
-##  part of the package and may be required by users of it.  They will be
-##  installed in the $(INSTALL_LIB) directory.
-
-PUBLIC_OBJECTS = tclAdam.o tkGwm.o tclNbs.o tkGwmPrint.o tkGwmCanv.o
-
 ##  List of private include files.  These are additional include files
 ##  which form part of the package and are required in order to build
 ##  it, but which are not required by users of it.
 
 PRIVATE_INCLUDES = tkGwm_sys.h
 
-##  List of private object files.  These are additional object files
-##  which form part of the package and are required in order to build
-##  it, but which are not required by users of it.
-
-PRIVATE_OBJECTS = tclAppInit.o tkAppInit.o
-
 ##  C routines required for building the package.  This is just a list of
 ##  all the C source files.
 
-C_ROUTINES = tclAdam.c tkGwm.c tkGwmPrint.c tclNbs.c tclAppInit.c tkAppInit.c \
-             tkGwmCanv.c
+C_ROUTINES = tclAppInit.c tkAppInit.c \
+             $(GWM_ROUTINES) $(NBS_ROUTINES) $(ADAM_ROUTINES)
+
+GWM_ROUTINES = tkGwm.c tkGwmPrint.c tkGwmCanv.c
+ADAM_ROUTINES = tclAdam.c
+NBS_ROUTINES = tclNbs.c
 
 ##  List of tk library files.
 
@@ -67,33 +59,34 @@ pubobjdir=$(libdir)
 
 # Dependencies.
 
-libadam_la_SOURCES = tclAdam.c
-libadam_la_LIBADD = `ams_link_adam` `ems_link_adam`
+# Backwards compatibility problem. We can not call this library libgwm
+# and the actual GWM shared library libgwm since the linker will not know
+# that it has to load a libgwm twice.
 
-libgwm_la_SOURCES = tkGwm.c tkGwmPrint.c tkGwmCanv.c
-libgwm_la_LIBADD = `gwm_link_adam` `chr_link_adam`
+libtclAdam_la_SOURCES = $(ADAM_ROUTINES)
+libtclAdam_la_LIBADD = `ams_link_adam` `ems_link_adam`
 
-atclsh_SOURCES = tclAppInit.c tclNbs.c
-atclsh_LDADD = $(LDADD) `ams_link_adam` `nbs_link` -ladam
+libtkGwm_la_SOURCES = $(GWM_ROUTINES)
+libtkGwm_la_LIBADD = `gwm_link_adam` `chr_link_adam` `ems_link_adam`
 
-awish_SOURCES = tkAppInit.c tclNbs.c
-awish_LDADD = $(LDADD) tkGwm.o tkGwmPrint.o tkGwmCanv.o libadam.la \
-             `nbs_link` `ams_link_adam` `gwm_link_adam` `chr_link_adam`
 
-# Need to link awish statically so that the libgwm tcl interface
-# can access symbols in the libgwm library itself. This is because
-# awish (strangely) can dynamically link against libgwm.so and problems
-# ensue [I can't understand why we don't just statically link the tcl
-# interface library into awish since there is little saving involed (given 
-# that libgwm is already included - timj]
-awish_LDFLAGS = -static
+# Note that linking against libtclAdam.la automatically links in the
+# relevant AMS libraries from the libtclAdam line above
+atclsh_SOURCES = tclAppInit.c $(NBS_ROUTINES)
+atclsh_LDADD = `nbs_link` libtclAdam.la
+
+# Note that linking against libtclAdam and libtkGwm automatically
+# brings in AMS and GWM libraries from the lib definition above
+awish_SOURCES = tkAppInit.c $(NBS_ROUTINES)
+awish_LDADD = `nbs_link` `chr_link_adam` \
+	libtclAdam.la libtkGwm.la
 
 # Define what is to be done with which sets of files.
 
 bin_PROGRAMS = $(PUBLIC_EXE)
-libsys_LTLIBRARIES = libadam.la libgwm.la
+libsys_LTLIBRARIES = libtclAdam.la libtkGwm.la
 include_HEADERS = $(PUBLIC_INCLUDES)
-pubobj_DATA = $(PUBLIC_OBJECTS)
+pubobj_DATA = $(GWM_ROUTINES:.c=.o) $(ADAM_ROUTINES:.c=.o) $(NBS_ROUTINES:.c=.o)
 binsys_SCRIPTS = $(PUBLIC_SCR)
 binsys_DATA = $(HELP_FILES)
 libsys_DATA = $(LIBRARY_FILES) tclIndex
@@ -102,8 +95,13 @@ TESTS = tester.sh
 
 #  Rules.
 
+# In principal it would be more efficient to use a static awish
+# for things like gwm since that would save on shared library overhead
+# Trivial to switch to awish, just change gwmXrefresh.in to use AWISH
+# rather than WISH
 edit = sed -e 's,@WISH\@,@WISH@,g' \
            -e 's,@ATCLSH\@,$(bindir)/atclsh,g' \
+           -e 's,@AWISH\@,$(bindir)/awish,g' \
            -e 's,@LIBSYS\@,$(libsysdir),g'
 
 gwm: Makefile $(srcdir)/gwm.in
@@ -137,7 +135,7 @@ tclIndex: $(LIBRARY_FILES)
 	echo 'auto_mkindex . *.tcl' | @TCLSH@
 	echo >> tclIndex ''
 	echo >> tclIndex \
-           'set auto_index(gwm) [list load [file join $$dir libgwm.so] tkGwm]'
+           'set auto_index(gwm) [list load [file join $$dir libtkGwm.so] tkGwm]'
 	echo >> tclIndex \
-           'set auto_index(adam_start) [list load [file join $$dir libadam.so] tclAdam]'
-	
+           'set auto_index(adam_start) [list load [file join $$dir libtclAdam.so] tclAdam]'
+
