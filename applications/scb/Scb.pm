@@ -56,13 +56,13 @@ use Exporter;
 
 #  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf mkdirp popd pushd starpack rmrf parsetag
+@EXPORT = qw/tarxf mkdirp popd pushd starpack rmrf parsetag taggable 
              $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
              $mimetypes_file
              $htxserver
              $docslisfile
              $func_indexfile $file_indexfile $taskfile
-             %tagger/;
+             %tagged %tagger/;
 
 @EXPORT_OK = qw/error/;
 
@@ -74,7 +74,7 @@ use vars qw/ $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
              $htxserver
              $docslisfile
              $func_indexfile $file_indexfile $taskfile
-             %tagger/;
+             %tagger %tagged/;
 
 #  Map error handler routine to that from the main:: namespace.
 
@@ -141,6 +141,14 @@ $func_indexfile = "$indexdir/func";
 $file_indexfile = "$indexdir/file";
 $taskfile       = "$indexdir/tasks";
 
+#  List of files which are not to be tagged.  Each entry is a regular
+#  expression; if it matches the file's logical pathname then no tagging
+#  will be attempted on the file.  Files can be excluded for any reason
+#  you like, but one would be files which are known to take a very long
+#  time to tag in the current implementation of the tagging routine.
+
+my @notag = qw/tixSamLib.c$/;
+
 #  Language-specific tagging routines.
 #     By defining the hash of references to functions %tagger, file tagging 
 #     can be done without explicit reference to any of the tagging routines.
@@ -190,6 +198,114 @@ my $gzcat = "gzip -dc";
 ########################################################################
 #  Subroutines.
 ########################################################################
+
+
+########################################################################
+sub taggable {
+
+#+
+#  Name:
+#     taggable
+
+#  Purpose:
+#     Determine if tagging should be attempted on a given file.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     $retval = $taggable ($location);
+
+#  Description:
+#     This Boolean function returns whether tagging should be attempted
+#     on a given filename.  It decides this on the basis of whether there
+#     is an appropriate tagging routine available, whether effectively
+#     the same file has been tagged already, and whether it matches
+#     a list of files which have been marked explicitly to avoid.
+#
+#     Calling this routine constitutes an assertion that tagging will
+#     be done, if the return value is true.  Thus, if it is called again
+#     on a file with the same name, since the last time %tagged was cleared, 
+#     it will return false.
+#
+#     The list of which files have already been tagged is the global
+#     hash %tagged, which may be cleared by other routines.
+#     In fact it may be a good idea to clear this periodically if it can
+#     be done safely, so that it doesn't take up too much memory.
+
+#  Arguments:
+#     $location = string.
+#        Logical pathname of the file whose taggability is to be assessed.
+
+#  Return value:
+#     $retval = boolean.
+#        True if tagging should be attempted on this file; else false.
+
+#  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     04-NOV-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my $location = shift;
+
+#  Generate the name of the file as it would be if it were outside all the
+#  tar files.
+
+   my $untarloc = $location;
+   $untarloc =~ s%[^/#>]+>%%g;
+
+#  Get filename extension.
+
+   my $ext = '';
+   $ext = $1 if ($location =~ /\.([^.]+)$/);
+
+#  A file is presumed taggable until found untaggable.
+
+   my $retval = 1;
+
+#  A tagging routine must exist.
+
+   $retval &&= defined $tagger{$ext};
+
+#  A file which ultimately lives in the same place must not have been 
+#  tagged already (since the %tagger hash was last cleared - it is the
+#  responsibility of the calling routine to clear this at appropriate
+#  points).
+
+   $retval &&= !exists $tagged{$untarloc};
+
+#  The file (either in its tar file location or outside it) must not have
+#  been included by (regular expression) name in the list of files to skip.
+
+   my $notag;
+   foreach $notag (@notag) {
+      $retval &&= ($location !~ /$notag/)
+              &&  ($untarloc !~ /$notag/);
+   }
+
+#  If this is going to be tagged mark it as such (calling this routine 
+#  constitutes an assertion that the tagging will be done).
+
+   $tagged{$untarloc} = 1 if $retval;
+   
+   return $retval;
+}
 
 
 ########################################################################

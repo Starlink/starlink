@@ -1379,8 +1379,8 @@ sub output {
       my $pre;
       $ext = '';
       $ext = $1 if ($file =~ /\.([^.]+)$/);
-      if ($rtagger = $tagger{$ext}) {
-         eval { $tagged = &$rtagger (join ('', <FILE>), $ext) };
+      if ($taggable $file) {
+         eval { $tagged = &{$tagger{$ext}} (join ('', <FILE>), $ext) };
          error "Internal: tagging error: $@" if ($@);
 
 #     Turn the pseudo-HTML produced by the tagging routine into real
