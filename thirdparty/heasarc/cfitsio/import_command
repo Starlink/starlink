@@ -8,3 +8,7 @@ cvs import -ko -I! -m "CFITSIO-2-4-40b" thirdparty/heasarc/cfitsio/cfitsio CFITS
 
 #  Update when added to CVS.
 cvs import -ko -I! -m "CFITSIO-2-4-90" thirdparty/heasarc/cfitsio/cfitsio CFITSIO V2-4-90
+
+#  Update, 2005 February 24, Norman
+cvs import -ko -I! -m "Import of CFITSIO 2.510" thirdparty/heasarc/cfitsio/cfitsio CFITSIO cfitsio-2-510
+
