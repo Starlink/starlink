@@ -10,7 +10,7 @@ nodist_include_HEADERS = DCV_FUN
 
 staretc_DATA = $(AUX_FILES)
 
-#  List of package auxilliary files.  These are text files uesd by GENERIC.
+#  List of package auxiliary files.  These are text files uesd by GENERIC.
 AUX_FILES = byte byte_asterix \
 	character character_asterix \
 	double double_asterix \
@@ -27,9 +27,6 @@ dcv_ttoub.f: dcv_ttoub.gen
 	env GENERIC_DIR=. ./generic -t bdirwW dcv_ttoub.gen
 dcv_ttouw.f: dcv_ttouw.gen
 	env GENERIC_DIR=. ./generic -t bBdirw dcv_ttouw.gen
-## DCV_FUN: DCV_FUN.f
-## 	cp DCV_FUN.f DCV_FUN
-## DCV_FUN.f: DCV_FUN.fpp
 DCV_FUN: DCV_FUN.fpp
 	$(FPP) $(FPPFLAGS) $(CPPFLAGS) -I. DCV_FUN.fpp $(FPP_OUTPUT)
 
