@@ -74,6 +74,10 @@
 *        these columns will be formed by prepending the letter D to the
 *        start of the column names listed above.
 *
+*        IF RADEC is TRUE, the columns will also contain RA and DEC
+*        columns, so long as the input cube contains appropriate WCS 
+*        information.
+*
 *        When measuring circular polarization, the columns describing Q
 *        and U will be replaced by equivalent columns describing V; and
 *        the ANG value will be zero if the normalised Stokes parameter V 
@@ -122,6 +126,12 @@
 *     Q = NDF (Write)
 *        An output NDF holding the Q Stokes parameter. A null value can be
 *        supplied if this output image is not required. [!]
+*     RADEC = _LOGICAL (Read)
+*        If TRUE, columns holding the RA and DEC (FK5, J2000) are added
+*        to the output catalogue, if the input cube contains the necessary 
+*        WCS information. If FALSE, no RA and DEC columns are written. For
+*        large catalogues, creating RA and DEC columns can cause a
+*        significant delay. For this reason, the default value is NO. [NO]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
@@ -180,6 +190,8 @@
 *     11-MAY-1999 (DSB):
 *        Pass LBND to POL1_GTWCS so that it can set up the correct
 *        GRID-PIXEL mapping in IWCS.
+*     17-MAY-2000 (DSB):
+*        Added optional RA and DEC columns to the output catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
