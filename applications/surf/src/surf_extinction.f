@@ -1063,22 +1063,22 @@
          SUB_POINTER = 1
          SUB_REQUIRED = SUB_INSTRUMENT(SUB_POINTER)
       ELSE
-*     Put all possible answers in a string
-         SUBLIST = ''
-         IPOSN = 0
-         DO I = 1, N_SUB
-            CALL CHR_APPND(SUB_INSTRUMENT(I), SUBLIST, IPOSN)
-            CALL CHR_APPND(',',SUBLIST,IPOSN)
-         END DO
-*     Ask for the sub array
-         IF (N_SUB .GT. 0) THEN
-         CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
-     :        .TRUE., SUB_REQUIRED, STATUS)
-         CALL CHR_UCASE (SUB_REQUIRED)
-         END IF
-
          SUB_POINTER = VAL__BADI
+
+*     Put all possible answers in a string
          IF (N_SUB .GT. 0) THEN
+            SUBLIST = ''
+            IPOSN = 0
+            CALL CHR_APPND(SUB_INSTRUMENT(1), SUBLIST, IPOSN)
+            DO I = 2, N_SUB
+               CALL CHR_APPND(',',SUBLIST,IPOSN)
+               CALL CHR_APPND(SUB_INSTRUMENT(I), SUBLIST, IPOSN)
+            END DO
+*     Ask for the sub array
+            CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
+     :           .TRUE., SUB_REQUIRED, STATUS)
+            CALL CHR_UCASE (SUB_REQUIRED)
+
             DO I = 1, N_SUB
                IF (SUB_REQUIRED .EQ. SUB_INSTRUMENT(I)) THEN
                   SUB_POINTER =I 
