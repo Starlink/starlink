@@ -1,0 +1,54 @@
+dnl
+dnl   Configure script for dvi2bitmap
+dnl
+dnl   $Id$
+
+AC_INIT(dvi2bitmap.cc)
+
+dnl   Say where the install-sh, config.guess and config.sub scripts are
+AC_CONFIG_AUX_DIR(config)
+
+dnl   Checks for programs.
+AC_PROG_CXX
+
+dnl   use C++ to compile test programs
+AC_LANG_CPLUSPLUS
+
+dnl   Checks for header files.  I don't actually use these defines within
+dnl   the program, so there doesn't seem much point in testing for them. 
+dnl   I think everything I use is in invoked in the place it's supposed to
+dnl   be according to the C++ standard (with the possible exception of the
+dnl   things in GIFBitmap.cc), so if anything goes wrong here, it's the 
+dnl   compiler's fault, not mine.
+dnl AC_HEADER_STDC
+dnl AC_CHECK_HEADERS(fcntl.h unistd.h)
+
+dnl   Checks for library functions (...nor these)
+dnl AC_FUNC_VPRINTF
+dnl AC_CHECK_FUNCS(strerror)
+
+dnl   What type of system are we on?
+dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
+dnl   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
+dnl   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
+dnl   This is defined by default when the compiler is invoked with
+dnl   `-std strict_ansi', but that's a little harder to arrange in here.
+AC_CANONICAL_HOST
+case "$host" in
+  alpha*) test "$CXX" -eq "cxx" && AC_DEFINE(__USE_STD_IOSTREAM) ;;
+esac
+
+dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
+AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
+AC_TRY_COMPILE([#include <cstdio>],,
+  AC_MSG_RESULT(yes),
+  AC_DEFINE(NO_CSTD_INCLUDE) AC_MSG_RESULT(no))
+
+dnl   Specify support for GIF output
+AC_SUBST(GIFOBJ)
+AC_ARG_ENABLE(gif, 
+[  --enable-gif            Enable output of GIF files],
+   AC_DEFINE(ENABLE_GIF) GIFOBJ="GIFBitmap.o")
+
+
+AC_OUTPUT(Makefile)
