@@ -8,6 +8,7 @@ interface TONOFF
   parameter FILE
     position 2
     type '_CHAR'
+    Association '<->GLOBAL.MJDFILE'
     prompt 'Filename'
     help 'File to write on/off times to'
   endparameter

@@ -207,6 +207,23 @@ Interface QUALITY
     Help      'Name of the ARD, spatial description file'
   EndParameter
 
+  Parameter TSEL
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'use a file of on-off times?'
+    Help      'Match time axis to a list of on-off times in MJD'
+  EndParameter
+
+  Parameter MJDFILE
+    Type      '_char'
+    Vpath     'prompt'
+    Ppath     'global,current'
+    Prompt    'On-off time filename'
+    Association '<->GLOBAL.MJDFILE'
+    Help      'Name of the file containing list of on-off times'
+  EndParameter
+
   Parameter XDIM
     Type      '_integer'
     Vpath     'prompt'
@@ -222,6 +239,13 @@ Interface QUALITY
     Ppath     'default'
     Prompt    'Which axis is the Y axis ?'
     default    2
+    Help      'Specify the number of the axis e.g. 1'
+  EndParameter
+
+  Parameter TDIM
+    Type      '_integer'
+    Vpath     'prompt'
+    Prompt    'Which axis is the time axis ?'
     Help      'Specify the number of the axis e.g. 1'
   EndParameter
 
