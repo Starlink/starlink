@@ -422,7 +422,7 @@ I_SUB1 = hlpcmd ccd1_par ccd1_memcm cat1_par cat3_fit_cmn cat1_cats_cmn
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR AST_PAR \
 PAR_PAR PRM_PAR FIO_ERR FIO_PAR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
 NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R TRN_ERR CHR_ERR CAT_PAR AST_ERR \
-AGI_PAR CAT_ERR DAT_ERR ast.h 
+AGI_PAR CAT_ERR DAT_ERR ast.h NDG_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
