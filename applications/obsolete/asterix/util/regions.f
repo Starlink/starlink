@@ -40,7 +40,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -51,6 +50,7 @@
 *  Local constants :
       INTEGER MAXLST
         PARAMETER (MAXLST = 20)
+
 *  Local Variables:
       CHARACTER*80 TEXT                  ! ARD text
       CHARACTER*132 AFILE                 ! ARD filename
@@ -431,7 +431,6 @@
 
             CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
 
-
             TEXT='     .AND..NOT.CIRCLE('
             L=CHR_LEN(TEXT)
 
@@ -445,8 +444,6 @@
             ENDIF
 
             CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
-
-
 
          ELSE
 
