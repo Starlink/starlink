@@ -1256,33 +1256,6 @@ that is required is to move around in it.
 
 
 
-% \section{Extending the code}
-% 
-% As it stands, SCB will index all the files in each package,
-% and the functions and subroutines which can be identified
-% within C and Fortran source files. 
-% The latter are indexed using the names which the linker 
-% invoked by the Unix linker gives them on the supported 
-% platforms -- that is C functions are indexed using exactly the
-% names they have in the source code, and Fortran functions and
-% subroutines by lowercase versions of the names, with a single
-% underscore appended.
-% 
-% This is sufficient to cover a large proportion of the Starlink
-% source code, but it may be desirable in future to index 
-% code in a different language, or to use more efficient or more
-% accurate parsing routines for the languages already handled.
-% Hooks are present in the SCB programs to enable this, 
-% and this section explains how these can be used.
-% 
-% Three problems arise in extending the package to deal with additional
-% languages.  The first is writing a parsing routine 
-% which understands the source code in the new language,
-% the second is telling the SCB package when to use this, 
-% and the third is causing SCB to maintain an index of 
-% callable routines in the new language.
-% 
-% \subsection{Writing a parser routine for use with SCB}
 
 
 
