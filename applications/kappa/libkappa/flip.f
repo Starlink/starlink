@@ -30,10 +30,10 @@
 *  ADAM Parameters:
 *     AXIS = _LOGICAL (Read)
 *        If a TRUE value is given for this parameter (the default),
-*        then any axis values associated with the NDF dimension being
-*        reversed will also be reversed in the same way.  If a FALSE
-*        value is given, then all axis values will be left unchanged.
-*        [TRUE]
+*        then any axis values and WCS information associated with the 
+*        NDF dimension being reversed will also be reversed in the same 
+*        way.  If a FALSE value is given, then all axis values and WCS
+*        information will be left unchanged. [TRUE]
 *     DIM = _INTEGER (Read)
 *        The number of the dimension along which the NDF's pixels
 *        should be reversed.  The value should lie between 1 and the
@@ -71,7 +71,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
 *     input NDF and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -81,6 +81,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -89,6 +90,8 @@
 *     1992 March 3 (MJC):
 *        Replaced AIF parameter-system calls by the extended PAR
 *        library.
+*     11-JUN-1998 (DSB):
+*        Added propagation of the NDF WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,11 +119,13 @@
       INTEGER EL                 ! Number of elements mapped
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Dimension to reverse pixels along
+      INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds
       INTEGER NDF1               ! Input NDF identifier
       INTEGER NDF2               ! Output NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER PNTR1( 1 )         ! Pointer to mapped input array
       INTEGER PNTR2( 1 )         ! Pointer to mapped output array
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds
       LOGICAL AXIS               ! Reverse axis arrays?
       LOGICAL BAD                ! Bad-pixel flag
       LOGICAL THERE              ! Whether component is defined
@@ -142,8 +147,8 @@
       CALL NDF_DIM( NDF1, NDF__MXDIM, DIM, NDIM, STATUS )
 
 *  Create the output NDF, propagating the axis and units values (some of
-*  the propagated axis values may later be over-written).
-      CALL NDF_PROP( NDF1, 'Axis,Units', 'OUT', NDF2, STATUS )
+*  the propagated axis values and WCS component may later be over-written).
+      CALL NDF_PROP( NDF1, 'Axis,Units,Wcs', 'OUT', NDF2, STATUS )
 
 *  Determine which NDF dimension the pixels are to be reversed along.
 *  Only do this if there is a choice.
@@ -289,6 +294,34 @@
                CALL NDF_AUNMP( NDF2, ACOMP( ICOMP ), IDIM, STATUS )
             END IF
  2       CONTINUE
+      END IF
+
+*  Propagate the WCS component.
+*  ============================
+      IF( AXIS ) THEN
+
+*  Set up a matrix and offset vector describing the linear mapping from 
+*  input pixel coordinates to output pixel coordinates. First of all
+*  set the matrix and vector to a unit transformation.
+         DO I = 1, NDIM*NDIM
+            MATRIX( I ) = 0.0D0
+         END DO
+
+         DO I = 1, NDIM
+            OFFSET( I ) = 0.0D0
+            MATRIX( NDIM*( I - 1 ) + I ) = 1.0D0
+         END DO
+   
+*  Now change the scale factor for the flipped axis to -1.0
+         MATRIX( NDIMI*( IDIM - 1 ) + IDIM ) = -1.0D0
+
+*  Set the offset for the flipped axis.
+         CALL NDF_DIM( NDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         OFFSET( IDIM ) = DBLE( UBND( IDIM ) + LBND( IDIM ) - 1 )
+
+*  Propagate the WCS component.
+         CALL KPG1_ASPRP( NDIMI, NDFI, NDFO, MATRIX, OFFSET, STATUS )
+
       END IF
 
 *  Obtain a new title for the output NDF.
