@@ -404,24 +404,23 @@ int main (int argc, char **argv)
 		break;
 	      case 'V':		// display version
 		cout << version_string << "\nOptions:\n";
-#if ENABLE_GIF
-		cout << "ENABLE_GIF\n";
-#endif
-#if ENABLE_PNG
-		cout << "ENABLE_PNG\n";
-#endif
-#if ENABLE_KPATHSEA
-		cout << "ENABLE_KPATHSEA\n";
-#endif
+
+		cout << "ENABLE_GIF       "
+		     << (ENABLE_GIF ? "yes" : "no") << '\n';
+		cout << "ENABLE_PNG       "
+		     << (ENABLE_PNG ? "yes" : "no") << '\n';
+
+		cout << "ENABLE_KPATHSEA  "
+		     << (ENABLE_KPATHSEA ? "yes" : "no") << '\n';
 #ifdef DEFAULT_TEXMFCNF
 		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
 #endif
 #ifdef FAKE_PROGNAME
 		cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << '\n';
 #endif
-#ifdef ENABLE_FONT_GEN
-		cout << "ENABLE_FONT_GEN\n";
-#endif
+
+		cout << "ENABLE_FONT_GEN  "
+		     << (ENABLE_FONT_GEN ? "yes" : "no") << '\n';
 #ifdef MKTEXPK
 		cout << "  MKTEXPK=" << MKTEXPK << '\n';
 #endif
