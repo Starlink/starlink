@@ -71,6 +71,8 @@ verbosities DviFile::verbosity_ = normal;
 // good anyway).  But this isn't really a fix.  I suspect this might
 // be a GCC error, but I can't pin it down accurately enough to
 // identify a specific fault.
+//
+// XXX This note was added in 2000 or so.  Is this problem still open?
 
 /**
  * Constructs a new <code>DviFile</code> object.
@@ -117,7 +119,8 @@ DviFile::DviFile (string& fn,
       current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
       netmag_(1.0), skipPage_(false),
       max_drift_(0),
-      widest_page_(-1), deepest_page_(-1), have_read_postamble_(false)
+      widest_page_(-1), deepest_page_(-1),
+      have_preread_postamble_(false), have_read_to_postamble_(false)
 {
     PkFont::setResolution(res);
 
@@ -157,7 +160,10 @@ DviFile::~DviFile()
 /**
  * Skips to the end of the page.  This reads the DVI file at high
  * speed until it finds the next end-of-page event, which it returns,
- * leaving the DVI file positioned appropriately.
+ * leaving the DVI file positioned appropriately.  If there are in
+ * fact no more pages -- if the last end-of-page event has already
+ * been returned -- then return either a {@link DviFilePostamble} event
+ * or zero, just like {@link #getEvent}.
  *
  * @return the next end-of-page event
 */
@@ -170,16 +176,18 @@ DviFileEvent *DviFile::getEndOfPage()
 /**
  * Gets an event from the DVI file.
  * 
- * <p>This is the routine which does most of the actual work.  It scans
- * through the file reading opcodes.  Most of these it handles itself,
- * but certain ones it handles by returning an event to the calling routine.
- * The last event it'll return is a {@link #DviFilePostamble} event, and it'll return
- * 0 if called afterwards.
+ * <p>This is the routine which does most of the actual work.  It
+ * scans through the file reading opcodes.  Most of these it handles
+ * itself, but certain ones it handles by returning an event to the
+ * calling routine.  The last event it'll return is a {@link
+ * DviFilePostamble} event, after which <code>eof()</code> will be
+ * true, and this method will return only zero.
  *
  * <p>The events which can be returned are all of the subclasses of
  * {@link DviFileEvent}, qv.
  *
- * @return the next event from the DVI file
+ * @return the next event from the DVI file, or zero if
+ * <code>eof()</code> is true
  */
 DviFileEvent *DviFile::getEvent()
 {
@@ -192,9 +200,8 @@ DviFileEvent *DviFile::getEvent()
     DviFileEvent *gotEvent = 0;	// non-zero when we've got an event
     Byte opcode = 255;		// illegal opcode
     int i1;
-    bool end_of_file = false;
 
-    if (end_of_file)
+    if (eof())
 	return 0;
 
     // Add in any pending update of the horizontal position.
@@ -575,7 +582,8 @@ DviFileEvent *DviFile::getEvent()
 	      case 248:		// post
 		// don't process it in any way
 		gotEvent = new DviFilePostamble();
-		end_of_file = true;
+                have_read_to_postamble_ = true;
+                skipPage_ = false;
 		break;
 	      case 249:		// post_post
 		// This shouldn't happen within getEvent
@@ -689,12 +697,15 @@ unsigned int DviFile::getUIU(int n)
     }
 }
 /**
- * Indicates whether we are at the end of the DVI file
+ * Indicates whether we are at the end of the DVI file.  This is true
+ * if the underlying file is closed, <em>or</em> if we have
+ * read all the pages and {@link #getEvent} has returned a {@link
+ * DviFilePostamble} event.
  * @return true if we are at EOF
  */
 bool DviFile::eof()
 {
-    return (dvif_ == 0 || dvif_->eof());
+    return (have_read_to_postamble_ || dvif_ == 0 || dvif_->eof());
 }
 
 /**
@@ -930,7 +941,7 @@ void DviFile::read_postamble()
 	}
     }
 
-    have_read_postamble_ = true;
+    have_preread_postamble_ = true;
     dvifile->seek(0);
 }
 

@@ -157,11 +157,15 @@ public:
     /**
      * Reports whether the DVI file postamble was read when this file
      * was opened.  This affects the semantics of such methods as
-     * {@link #getFontSet}.
+     * {@link #getFontSet}.  Note that this only reports whether the
+     * postamble was read at the <em>start</em> of processing, and it
+     * does not become true when the postamble is discovered at the
+     * end; it is not an end-of-file indicator.  For that, see the
+     * {@link #eof} method.
      *
      * @return true if the postamble was (successfully) read
      */
-    bool haveReadPostamble() const { return have_read_postamble_; }
+    bool haveReadPostamble() const { return have_preread_postamble_; }
 
 private:
     string fileName_;
@@ -218,7 +222,8 @@ private:
 		  : static_cast<int>(netmag_*(double)i)); }
     void read_postamble()
 	    throw (DviError);
-    bool have_read_postamble_;
+    bool have_preread_postamble_; /* we sought to it at beginning */
+    bool have_read_to_postamble_; /* we have read through to end */
     void process_preamble(DviFilePreamble *);
     void fnt_def_(double fontmag, int nbytes);
     void check_duplicate_font(int);
