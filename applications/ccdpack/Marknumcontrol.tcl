@@ -62,8 +62,8 @@
                -wrap false \
                -textvariable [ scope value ]
          }
-         pack $itk_component(marknum)
-         pack $itk_component(control)
+         pack $itk_component(marknum) -fill y
+         pack $itk_component(control) -fill y
          eval itk_initialize $args
          clear
       }
