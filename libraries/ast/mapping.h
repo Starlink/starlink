@@ -427,6 +427,7 @@ double astRateId_( AstMapping *, double *, int, int, double * );
 #endif
 
 #if defined(astCLASS)            /* Protected */
+double *astLinearApprox_( AstMapping *, int, int, const double *, const double *, double );
 AstPointSet *astTransform_( AstMapping *, AstPointSet *, int, AstPointSet * );
 int astGetInvert_( AstMapping * );
 int astGetNin_( AstMapping * );
@@ -537,6 +538,7 @@ astINVOKE(V,astRateId_(astCheckMapping(this),at,ax1,ax2,d2))
 #endif
 
 #if defined(astCLASS)            /* Protected */
+#define astLinearApprox astLinearApprox_
 #define astClearInvert(this) \
 astINVOKE(V,astClearInvert_(astCheckMapping(this)))
 #define astClearReport(this) \

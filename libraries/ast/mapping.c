@@ -109,6 +109,17 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Added method astRate.
 *     2-SEP-2004 (DSB):
 *        Free resources before leaving astRate.
+*     31-AUG-2004 (DSB):
+*        Make the LinearApprox function protected rather than private,
+*        rename it to astLinearApprox, and make the bounds parameters of
+*        type double rather than int. Also, correct the size of the fit
+*        coefficient array (was "(nin+1)*nout", now is "(nout+1)*nin").
+*        Also correct the index of the first gradient coefficient from
+*        "fit+nout" to "fit+nin". These errors have probably never been
+*        noticed because they make no difference if nin=nout, which is
+*        usually the case.
+*     6-SEP-2004 (DSB):
+*        Make astRate more robust by adding checks for unusal conditions.
 *class--
 */
 
@@ -220,7 +231,6 @@ static int ResampleLD( AstMapping *, int, const int [], const int [], const long
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
-static double *LinearApprox( AstMapping *, int, int, const int *, const int *, double );
 static double LocalMaximum( const MapData *, double, double, double [] );
 static double MapFunction( const MapData *, const double [], int * );
 static double MaxD( double, double );
@@ -903,7 +913,7 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 /* Local Variables: */
    double x[ RATE_ORDER + 2 ], y[ RATE_ORDER + 2 ], dh, off, s2, e;   
    PN *ret;
-   int i0, i;
+   int i0, i, n;
 
 /* Initialise */
    ret = NULL;
@@ -960,13 +970,21 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 /* Loop round evaluating the polynomial fit and incrementing the sum of
    the squared residuals. */
          s2 = 0.0;
+         n = 0;
          for( i = 0; i <= RATE_ORDER + 1; i++ ) {
-            e = EvaluatePN( ret, x[ i ] - x0 ) + off - y[ i ];
-            s2 += e*e;
+            if( y[ i ] != AST__BAD ) {
+               e = EvaluatePN( ret, x[ i ] - x0 ) + off - y[ i ];
+               s2 += e*e;
+               n++;
+            }
          }
    
 /* Evaluate the rms residual. */
-         *rms = sqrt( s2/( RATE_ORDER + 2 ) );
+         if( n > 1 ) {
+            *rms = sqrt( s2/( RATE_ORDER + 2 ) );
+         } else {
+            *rms = AST__BAD;
+         }
       }
    }
 
@@ -5388,22 +5406,24 @@ f        The global status.
    if ( astGetInvert( this ) != invert ) astSetInvert( this, invert );
 }
 
-static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
-                             const int *lbnd, const int *ubnd, double tol ) {
+double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
+                          const double *lbnd, const double *ubnd, double tol ) {
 /*
+*+
 *  Name:
-*     LinearApprox
+*     astLinearApprox
 
 *  Purpose:
 *     Obtain a linear approximation to a Mapping, if appropriate.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "mapping.h"
-*     double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
-*                           const int *lbnd, const int *ubnd, double tol )
+*     double *astLinearApprox( AstMapping *this, int ndim_in, int ndim_out,
+*                              const double *lbnd, const double *ubnd, 
+*                              double tol )
 
 *  Class Membership:
 *     Mapping member function.
@@ -5430,12 +5450,12 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
 *        The number of output dimensions for the Mapping. This should
 *        equal the Mapping's Nout attribute and should be at least 1.
 *     lbnd
-*        Pointer to an array of integers with "ndim_out"
+*        Pointer to an array of doubles with "ndim_out"
 *        elements. These should specify the lower bounds of the output
 *        grid and hence the lower bounds of the region of output
 *        coordinate space over which linearity is required.
 *     ubnd
-*        Pointer to an array of integers with "ndim_out"
+*        Pointer to an array of doubles with "ndim_out"
 *        elements. These should specify the upper bounds of the output
 *        grid and hence the upper bounds of the region of output
 *        coordinate space over which linearity is required.
@@ -5453,13 +5473,25 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
 *     array of fit coefficients. This should be freed by the caller
 *     (e.g. using astFree) when no longer required.
 *
-*     If the transformation is not sufficiently linear, then a NULL
+*     If the inverse transformation is not sufficiently linear, then a NULL
 *     pointer is returned.
+*
+*     The first 'ndim_in' elements hold the constant offsets for the
+*     Mapping input axes. The remaining elements hold the gradients. So if 
+*     the Mapping has 3 inputs and 2 outputs the transformation is:
+*
+*     X_in = result[0] + result[3]*X_out + result[4]*Y_out 
+*     Y_in = result[1] + result[5]*X_out + result[6]*Y_out 
+*     Z_in = result[2] + result[7]*X_out + result[8]*Y_out
+*
+*     Thus the returned array will contain ( ( ndim_out + 1 ) * ndim_in )
+*     elements.
 
 *  Notes:
 *     - A NULL pointer will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
+*-
 */
 
 /* Local Variables: */
@@ -5507,9 +5539,14 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
 /* Further initialisation. */
    linear = 1;
 
-/* Allocate space for the fit coefficients. */
+/* Allocate space for the fit coefficients. The fit goes from the output
+   space of the Mapping (which has "nout" axes) to the input space of the
+   Mapping (which has "nin" axes). So there will be "nin" rows of
+   coefficients (one for each Mapping input), and each row will have
+   "nout+1" values (one constant term plus one coefficient for each
+   Mapping output), making a total of "nin*(nout+1)". */
    fit = astMalloc( sizeof( double ) *
-                    (size_t) ( ( ndim_in + 1 ) * ndim_out ) );
+                    (size_t) ( ( ndim_out + 1 ) * ndim_in ) );
       
 /* Create a PointSet to hold output coordinates and obtain a pointer
    to its coordinate arrays. */
@@ -5525,7 +5562,7 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
       for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
          for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
             ptr_out_f[ coord_out ][ point ] =
-               0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+               0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
          }
          ptr_out_f[ face / 2 ][ point ] = ( face % 2 ) ?
                                           ubnd[ face / 2 ] : lbnd[ face / 2 ];
@@ -5544,7 +5581,7 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
 /* ----------------------------------------- */
 /* Obtain pointers to the locations in the fit coefficients array
    where the gradients and zero points should be stored. */
-      grad = fit + ndim_out;
+      grad = fit + ndim_in;
       zero = fit;
 
 /* On the assumption that the transformation applied above is
@@ -5604,7 +5641,7 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
          ii = 0;
          for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
             for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               x0 = 0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+               x0 = 0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
                zero[ coord_in ] -= grad[ ii++ ] * x0;
             }
          }
@@ -5652,8 +5689,8 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
          if ( ndim_out == 1 ) {
             for ( point = 0; point < npoint; point++ ) {
                frac = ( (double) ( point + 1 ) ) / (double) ( npoint + 1 );
-               ptr_out_t[ 0 ][ point ] = ( 1.0 - frac ) * (double) lbnd[ 0 ] +
-                                         frac * (double) ubnd[ 0 ];
+               ptr_out_t[ 0 ][ point ] = ( 1.0 - frac ) * lbnd[ 0 ] +
+                                         frac * ubnd[ 0 ];
             }
 
 /* Otherwise, generate one point at the grid centre. */
@@ -5661,7 +5698,7 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
             point = 0;
             for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
                ptr_out_t[ coord_out ][ point ] =
-                  0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+                  0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
             }
             point++;
 
@@ -5670,11 +5707,11 @@ static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
             for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
                for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
                   ptr_out_t[ coord_out ][ point ] =
-                     0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+                     0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
                }
                ptr_out_t[ face / 2 ][ point ] =
-                  0.5 * ( ( (double) ( ( face % 2 ) ? ubnd[ face / 2 ] :
-                                                      lbnd[ face / 2 ] ) ) +
+                  0.5 * ( ( ( ( face % 2 ) ? ubnd[ face / 2 ] :
+                                             lbnd[ face / 2 ] ) ) +
                           ptr_out_t[ face / 2 ][ 0 ] );
                point++;
             }
@@ -6960,7 +6997,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
 /* Local Variables: */
 #define MXY 100
    double x0, h, s1, s2, sp, r, dh, ed2, ret, rms, h0, x[MXY], y[MXY];
-   int nin, nout, i, ixy;
+   int nin, nout, i, ixy, fitted, fitok;
    PN *fit;
 
 /* Initialise */
@@ -7052,9 +7089,9 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
    
       fit = astFree( fit );
 
-/* If the derivative estimate does not change over the interval, return
-   it. */
-      if( ed2 == 0.0 ) {
+/* If the derivative estimate does not change significantly over the interval, 
+   return it. */
+      if( ed2 <= 1.0E-10*fabs( s1/h ) ) {
          ret = s1;
          if( d2 ) *d2 = ed2;
  
@@ -7090,20 +7127,36 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
    Starting at the step size found above, note log10( normalised rms error of
    fit ) at increasing step sizes until the rms error exceeds the 0.2 of
    the rms function value. Each new step size is a factor 10 times the previous 
-   step size. */
+   step size. Once the step size is so large rgat we cannot fit the
+   polynomial, break out of the loop. */
          h0 = h;
          ixy = 0;
          rms = 0.1*sp - 1;
-         while( rms < 0.2*sp && ixy < MXY ) {
+         fitted = 0;
+         while( rms < 0.2*sp && ixy < MXY && ( !fitted || fitok ) ) {
             fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
             if( fit ) {
-               if( fit->coeff[ 1 ] != 0.0 ) {
-                  y[ ixy ] = log10( rms/( h0*fabs( fit->coeff[ 1 ] ) ) );
+               fitted = 1;
+               fitok = 1;
+
+/* If we come across an exact fit, use it to determine the returned
+   values and break. */
+               if( rms == 0.0 ) { 
+                  ret = fit->coeff[ 1 ];
+                  if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
+                  fit = astFree( fit );
+                  break;
+
                } else {
-                  y[ ixy ] = AST__BAD;
+                  if( fit->coeff[ 1 ] != 0.0 ) {
+                     y[ ixy ] = log10( rms/( h0*fabs( fit->coeff[ 1 ] ) ) );
+                  } else {
+                     y[ ixy ] = AST__BAD;
+                  }
+                  fit = astFree( fit );
                }
-               fit = astFree( fit );
             } else {
+               fitok = 0;
                y[ ixy ] = AST__BAD;
             }
             x[ ixy ] = ixy;
@@ -7111,78 +7164,94 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
             h0 *= 10.0;
          }
 
-/* Now run down from the largest step size to the smallest looking for
-   the first step size at which the error increases rather than decreasing. */
-         h0 = AST__BAD;
-         while( ixy-- > 0 ){
-            if( y[ ixy - 1 ] != AST__BAD && y[ ixy ] != AST__BAD ) {         
-               if( y[ ixy - 1 ] > y[ ixy ] ) {         
-                  h0 = x[ ixy ];
-      
-                  x[ 0 ] = x[ ixy - 1 ];
-                  x[ 1 ] = x[ ixy ];
-                  x[ 2 ] = x[ ixy + 1 ];
-      
-                  y[ 0 ] = y[ ixy - 1 ];
-                  y[ 1 ] = y[ ixy ];
-                  y[ 2 ] = y[ ixy + 1 ];
-      
-                  break;
+/* If we found a step size which gave zero rms error, use it. Otherwise, run 
+   down from the largest step size to the smallest looking for the first step 
+   size at which the error increases rather than decreasing. */
+         if( ret == AST__BAD ) {
+            h0 = AST__BAD;
+            ixy--;
+            while( --ixy > 0 ){
+               if( y[ ixy - 1 ] != AST__BAD && 
+                   y[ ixy ] != AST__BAD &&
+                   y[ ixy + 1 ] != AST__BAD ) {         
+                  if( y[ ixy - 1 ] > y[ ixy ] ) {         
+                     h0 = x[ ixy ];
+         
+                     x[ 0 ] = x[ ixy - 1 ];
+                     x[ 1 ] = x[ ixy ];
+                     x[ 2 ] = x[ ixy + 1 ];
+         
+                     y[ 0 ] = y[ ixy - 1 ];
+                     y[ 1 ] = y[ ixy ];
+                     y[ 2 ] = y[ ixy + 1 ];
+         
+                     break;
+                  }
                }
             }
-         }
 
 /* If no minimum could be found in the above loop, continue decreasing
    the step size below the value set above until a minimum is found. */
-         if( h0 == AST__BAD ) {
-            h0 = h;
-            ixy = 0;
-            while( y[ 0 ] < y[ 1 ] ) {
-   
-               h0 *= 0.1;
-               ixy--;
-               fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
-               if( fit ) {
-                  x[ 2 ] = x[ 1 ];
-                  x[ 1 ] = x[ 0 ];
-                  y[ 2 ] = y[ 1 ];
-                  y[ 1 ] = y[ 0 ];
-                  if( fit->coeff[ 1 ] != 0.0 ) {
-                     x[ 0 ] = ixy;
-                     y[ 0 ] = log10( rms/( h0*fabs( fit->coeff[ 1 ] ) ) );
+            if( h0 == AST__BAD ) {
+               h0 = h;
+               ixy = 0;
+               while( y[ 0 ] < y[ 1 ] ) {
+      
+                  h0 *= 0.1;
+                  ixy--;
+                  fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+                  if( fit ) {
+                     x[ 2 ] = x[ 1 ];
+                     x[ 1 ] = x[ 0 ];
+                     y[ 2 ] = y[ 1 ];
+                     y[ 1 ] = y[ 0 ];
+
+                     if( rms == 0.0 ) { 
+                        ret = fit->coeff[ 1 ];
+                        if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
+                        fit = astFree( fit );
+                        break;
+
+                     } else if( fit->coeff[ 1 ] != 0.0 ) {
+                        x[ 0 ] = ixy;
+                        y[ 0 ] = log10( rms/( h0*fabs( fit->coeff[ 1 ] ) ) );
+
+                     } else {
+                        h0 *= 10.0;
+                        x[ 0 ] = AST__BAD;
+                        break;
+                     }
+                     fit = astFree( fit );
                   } else {
                      h0 *= 10.0;
                      x[ 0 ] = AST__BAD;
                      break;
                   }
-                  fit = astFree( fit );
-               } else {
-                  h0 *= 10.0;
-                  x[ 0 ] = AST__BAD;
-                  break;
                }
             }
-         }
 
 /* If we have found a error which is lower than either of its
    neighbouring errors, fit a quadratic through the three points and find
    the power of ten which correspnds to the minimum of the function. */
-         if( x[ 0 ] != AST__BAD ) {
-            fit = InterpPN( 3, x, y );
-            if( fit ){
-               if( fit->coeff[ 2 ] > 0.0 ) {
-                  h0 = h*pow( 10.0, -0.5*fit->coeff[ 1 ]/fit->coeff[ 2 ] );
+            if( ret == AST__BAD ) {
+               if( x[ 0 ] != AST__BAD ) {
+                  fit = InterpPN( 3, x, y );
+                  if( fit ){
+                     if( fit->coeff[ 2 ] > 0.0 ) {
+                        h0 = h*pow( 10.0, -0.5*fit->coeff[ 1 ]/fit->coeff[ 2 ] );
+                     }
+                     fit = astFree( fit );
+                  }
                }
-               fit = astFree( fit );
-            }
-         }
 
 /* Use the best estimate of h to calculate the returned derivatives. */
-         fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
-         if( fit ) {         
-            ret = fit->coeff[ 1 ];
-            if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
-            fit = astFree( fit );
+               fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+               if( fit ) {         
+                  ret = fit->coeff[ 1 ];
+                  if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
+                  fit = astFree( fit );
+               }
+            }
          }
       }
    }
@@ -8532,6 +8601,8 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 */
                       
 /* Local Variables: */
+   double *flbnd;                /* Array holding floating point lower bounds */
+   double *fubnd;                /* Array holding floating point upper bounds */
    double *linear_fit;           /* Pointer to array of fit coefficients */
    int *hi;                      /* Pointer to array of section upper bounds */
    int *lo;                      /* Pointer to array of section lower bounds */
@@ -8539,6 +8610,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
    int dim;                      /* Output section dimension size */
    int dimx;                     /* Dimension with maximum section extent */
    int divide;                   /* Sub-divide the output section? */
+   int i;                        /* Loop count */
    int mxdim;                    /* Largest output section dimension size */
    int npix;                     /* Number of pixels in output section */
    int npoint;                   /* Number of points for obtaining a fit */
@@ -8580,7 +8652,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
    }
    
 /* Calculate how many sample points will be needed (by the
-   LinearApprox function) to obtain a linear fit to the Mapping's
+   astLinearApprox function) to obtain a linear fit to the Mapping's
    inverse transformation. */
    npoint = 1 + 4 * ndim_out + 2 * nvertex;
 
@@ -8616,9 +8688,32 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 
 /* If neither of the above apply, then attempt to fit a linear
    approximation to the Mapping's inverse transformation over the
-   range of coordinates covered by the output section. */
+   range of coordinates covered by the output section. We need to 
+   temporarily copy the integer bounds into floating point arrays to 
+   use astLinearApprox. */
    } else {
-      linear_fit = LinearApprox( this, ndim_in, ndim_out, lbnd, ubnd, tol );
+
+/* Allocate memory for floating point bounds */
+      flbnd = astMalloc( sizeof( double )*(size_t) ndim_out );
+      fubnd = astMalloc( sizeof( double )*(size_t) ndim_out );
+      if( astOK ) {
+
+/* Copy the bounds into these arrays */
+         for( i = 0; i < ndim_out; i++ ) {
+            flbnd[ i ] = (double) lbnd[ i ];
+            fubnd[ i ] = (double) ubnd[ i ];
+         }
+
+/* Get the linear approximation to the inverse transformation. */
+         linear_fit = astLinearApprox( this, ndim_in, ndim_out, flbnd, fubnd, 
+                                       tol );
+      } else {
+         linear_fit = NULL;
+      }
+
+/* Free resources */
+      flbnd = astFree( flbnd );
+      fubnd = astFree( fubnd );
 
 /* If a linear fit was obtained, we will use it and therefore do not
    wish to sub-divide further. Otherwise, we sub-divide in the hope
@@ -8771,7 +8866,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *
 *        The way in which the fit coefficients are stored in this
 *        array and the number of array elements are as defined by the
-*        LinearApprox function.
+*        astLinearApprox function.
 *     ndim_in
 *        The number of dimensions in the input grid. This should be at
 *        least one.
@@ -8972,7 +9067,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* If a linear fit to the Mapping has been provided, then obtain
    pointers to the array of gradients and zero-points comprising the
    fit. */
-         grad = linear_fit + ndim_out;
+         grad = linear_fit + ndim_in;
          zero = linear_fit;
 
 /* Create a PointSet to hold the input grid coordinates and obtain an
@@ -9705,7 +9800,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *
 *        The way in which the fit coefficients are stored in this
 *        array and the number of array elements are as defined by the
-*        LinearApprox function.
+*        astLinearApprox function.
 *     ndim_in
 *        The number of dimensions in the input grid. This should be at
 *        least one.
