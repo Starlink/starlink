@@ -198,7 +198,7 @@
         ENDIF
         DO WHILE (I.LE.IN)
           IF (QOK) THEN
-            GOOD=((IQ(I).AND.MASK).EQ.QUAL_GOOD)
+            GOOD=((IQ(I).AND.MASK).EQ.QUAL__GOOD)
           ELSE
             GOOD=.TRUE.
           ENDIF

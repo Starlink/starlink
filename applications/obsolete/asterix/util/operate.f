@@ -530,7 +530,7 @@
 
             ELSE
               NEWBADQUAL = NEWBADQUAL + 1
-              QUAL(I)    = BIT_ORUB(QUAL(I),QUAL_ARITH)
+              QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
 
             END IF
           ELSE

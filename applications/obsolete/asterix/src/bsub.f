@@ -57,6 +57,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
+      INCLUDE 'QUAL_PAR'
 *
 *    Global variables :
 *

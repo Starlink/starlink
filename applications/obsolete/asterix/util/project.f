@@ -271,7 +271,7 @@
                     IF (VOK) THEN
                       VOUT(J1,J2,J3,J4,J5,J6)=0.0
                     ENDIF
-                    QUAL=QUAL_GOOD
+                    QUAL=QUAL__GOOD
 
 *  sum along projected axis
                     DO IPAX=1,DPAX
@@ -279,7 +279,7 @@
 
                       IF (QOK) THEN
                         GOOD=((QIN(I1,I2,I3,I4,I5,I6,I7)
-     :                         .AND.MASK).EQ.QUAL_GOOD)
+     :                         .AND.MASK).EQ.QUAL__GOOD)
                         QUAL=QUAL.OR.
      :                         QIN(I1,I2,I3,I4,I5,I6,I7)
                       ELSE
@@ -305,7 +305,7 @@
 *  renormalise where necessary and set output quality
                     IF (N.GT.0) THEN
                       IF (QOK) THEN
-                        QOUT(J1,J2,J3,J4,J5,J6)=QUAL_GOOD
+                        QOUT(J1,J2,J3,J4,J5,J6)=QUAL__GOOD
                       ENDIF
                       IF (NORM) THEN
                         OUT(J1,J2,J3,J4,J5,J6)=
