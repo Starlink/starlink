@@ -360,8 +360,6 @@ MemRep::~MemRep()
           delete ptr;
        } else if (owner) {
           free( ptr );
-       } else {
-          fprintf( stderr, "Would release now" );
        }
     }
 
