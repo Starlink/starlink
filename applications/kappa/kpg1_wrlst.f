@@ -5,7 +5,7 @@
 *     KPG1_WRLST
 
 *  Purpose:
-*     Writes a set of positions to a text file as a positions list.
+*     Writes a set of positions to a text file as a CAT catalogue.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,17 +15,11 @@
 *                      ID0, IDENTS, NULL, STATUS )
 
 *  Description:
-*     This routine saves a set of positions in a text file. Information
-*     describing associated co-ordinate Frames can also be stored in the 
-*     file, allowing subsequent applications to interpret the positions.
-*     Files written with this routine can be read using KPG1_RDLST.
-*
-*     The first column in the created file is an integer "identifier" for 
-*     each position. Subsequent columns give axis values on axis 1, 2, etc. 
-*     Columns are separated by white space. Whole line and end of line 
-*     comments are included by starting the comment with a # character. 
-*     The supplied FrameSet (if any) is stored as a block of comment lines
-*     at the end of the file.
+*     This routine saves a set of positions in a text file as a CAT
+*     catalogue (see SUN/181). Information describing associated co-ordinate 
+*     Frames can also be stored in the file as textual information, allowing 
+*     subsequent applications to interpret the positions. Files written with 
+*     this routine can be read using KPG1_RDLST (and also XCATVIEW etc).
 *
 *     The positions are stored in the file as Base Frame positions within
 *     the supplied FrameSet, although they can be supplied within any of
@@ -106,7 +100,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER FILE*80          ! File name (not used)
       INTEGER IPW                ! Pointer to work space
       INTEGER MAP                ! AST Pointer to Mapping
       INTEGER NBAX               ! No. of axes in BASE FRAME
@@ -114,11 +107,6 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Get a value for the parameter. The file name is not actually needed
-*  yet, but it is obtained so that we can abort if a null value is given
-*  before spending time creating a positions list which may not be wanted.
-      CALL PAR_GET0C( PARAM, FILE, STATUS )
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
@@ -145,7 +133,7 @@
 *  Abort if an error occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Transform the supplied positions into the stored Frame, storing them
+*  Transform the supplied positions into the Base Frame, storing them
 *  in the workspace.
          CALL AST_TRANN( MAP, NPOS, NAX, ARRDIM, POS, .TRUE., NBAX, 
      :                   NPOS, %VAL( IPW ), STATUS ) 

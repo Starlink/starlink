@@ -44,7 +44,7 @@
 *  be stored). The array is expanded if this proves insufficient. It is
 *  always truncated after the data have been written.
       INTEGER KPG__INAST
-      PARAMETER ( KPG__INAST = 64 )
+      PARAMETER ( KPG__INAST = 256 )
 
 *  Minimum length of _CHAR array elements accepted as valid when
 *  reading AST data that has been stored in HDS.

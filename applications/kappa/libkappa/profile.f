@@ -27,66 +27,66 @@
 *     The samples can be placed at specified positions within the input NDF,
 *     or can be spaced evenly along a poly-line joining a set of vertices
 *     (see parameter MODE). The positions of the samples may be saved in an 
-*     output positions list (see parameter OUTLIST).
+*     output positions list (see parameter OUTCAT).
 
 *  Usage:
-*     profile in out start finish [nsamp]
+*     profile in out start finish nsamp
 
 *  ADAM Parameters:
 *     FINISH = LITERAL (Read)
 *        The co-ordinates of the last sample in the profile, in the current 
-*        co-ordinate Frame of the NDF (supplying a colon ":" will display 
-*        details of the required co-ordinate Frame). The position should be 
-*        supplied as a list of formatted axis values separated by commas or
-*        spaces. This parameter is only accessed if parameter MODE is set to 
-*        "Curve" and a null (!) value is given for INLIST. If the last (top 
-*        right) pixel in the NDF has valid co-ordinates in the current 
-*        co-ordinate Frame, then these co-ordinates will be used as the 
-*        suggested default. Otherwise there will be no suggested default.
-*     GEODESIC = _LOGICAL (Read)
+*        co-ordinate Frame of the NDF (supplying ":" will display details of 
+*        the required co-ordinate Frame). The position should be supplied as 
+*        a list of formatted axis values separated by spaces. This parameter 
+*        is only accessed if parameter MODE is set to "Curve" and a null
+*        (!) value is given for INCAT. If the last (top right) pixel in the 
+*        NDF has valid co-ordinates in the current co-ordinate Frame of the 
+*        NDF, then these co-ordinates will be used as the suggested default. 
+*        Otherwise there will be no suggested default.
+*     GEODESIC = LOGICAL (Read)
 *        If TRUE then the line segments which form the profile will be
 *        geodesic curves within the current co-ordinate Frame of the NDF.
-*        Otherwise, the line segments are simple straight lines within the 
-*        current co-ordinate Frame. This parameter is only accessed if 
-*        parameter MODE is set to "Curve".
+*        Otherwise, the line segments are simple straight lines. This
+*        parameter is only accessed if parameter MODE is set to "Curve".
 *
-*        As an example, consider a profile through an all-sky image consisting 
-*        of a single line segment which starts at RA=0h DEC=80d and finishes 
-*        at RA=12h DEC=80d. If GEODESIC is FALSE, the line segment will be a 
-*        line of constant declination, i.e. the "straight" line from the 
-*        position (0,80) to the position (12,80), passing through (1,80), 
-*        (2,80), etc. If GEODESIC is TRUE, then the line segment will be the 
-*        curve of shortest distance on the celestial sphere between the start 
-*        and end. In this particular case, this will be a great circle 
-*        passing through the north celestial pole. [FALSE]
+*        As an example, consider a profile consisting of a single line segment 
+*        which starts at RA=0h DEC=+80d and finishes at RA=12h DEC=+80d. If
+*        GEODESIC is FALSE, the line segment will be a line of constant 
+*        declination, i.e. the "straight" line from the position (0,80) to the 
+*        position (12,80), passing through (1,80), (2,80), etc. If GEODESIC 
+*        is TRUE, then the line segment will be the curve of shortest 
+*        distance on the celestial sphere between the start and end. In this 
+*        particaular case, this will be a great circle passing through the 
+*        north celestial pole. [FALSE]
 *     IN = NDF (Read)
-*        The input NDF structure containing the data to be profiled.
-*     INLIST = FILENAME (Read)
-*        A text file containing a set of vertices or sample positions defining 
+*        Input NDF structure containing the data to be profiled.
+*     INCAT = FILENAME (Read)
+*        A catalogue containing a set of vertices or sample positions defining 
 *        the required profile. The file should be in the format of a "positions
 *        list" such as produced by applications CURSOR and LISTMAKE. If a
 *        null value (!) is given then parameters START and FINISH will be
 *        used to obtain the vertex positions. If parameter MODE is given the 
-*        value "Curve", then the parameter INLIST is only accessed if a value 
+*        value "Curve", then the parameter INCAT is only accessed if a value 
 *        is given for it on the command line (otherwise a null value is
 *        assumed). 
 *     MODE = LITERAL (Read)
 *        The mode by which the sample positions are selected. The options
 *        are:
+*
 *        - "Curve" -- The samples are placed evenly along a curve specified 
 *        by a set of vertices obtained from the user. The line segments
 *        joining these vertices may be linear or geodesic (see parameter 
 *        GEODESIC). Multiple vertices may be supplied using a text file
-*        (see parameter INLIST). Alternatively, a single line segment can
+*        (see parameter INCAT). Alternatively, a single line segment can
 *        be specified using parameters START and FINISH. The number of
-*        samples to place along the curve is specified by parameter NSAMP.
+*        samples to take along the curve is specified by parameter NSAMP.
 *       
 *        - "Points" -- The positions at which samples should be taken are 
 *        given explicitly by the user in a text file (see parameter
-*        INLIST). No other sample positions are used.
+*        INCAT). No other sample positions are used.
 *
 *        [Curve]
-*     NSAMP = _INTEGER (Read)
+*     NSAMP = INTEGER (Read)
 *        The number of samples required along the length of the profile.
 *        The first sample is at the first supplied vertex, and the last
 *        sample is at the last supplied vertex. The sample positions are 
@@ -95,43 +95,38 @@
 *        more than the length of the profile in pixels. Only accessed if
 *        parameter MODE is given the value "Curve". [!]
 *     OUT = NDF (Write)
-*        The output NDF. The pixel array will be 1-dimensional with length 
-*        specified by parameter NSAMP, but the corresponding N-dimensional 
-*        positions in the original NDF will be retained in the WCS
-*        component. In particular, the current co-ordinate Frame from the
-*        input NDF is retained, and the original N-dimensional pixel 
-*        co-ordinate Frame will be retained with domain PIXEL_ND (so long 
-*        as no Frame already exists with this domain).
-*     OUTLIST = FILENAME (Write)
-*        An output positions list in which to store the sample positions 
-*        This is the name of a text file which can be used to communicate 
+*        The output NDF. This will be 1-dimensional with length specified
+*        by parameter NSAMP. 
+*     OUTCAT = FILENAME (Write)
+*        An output positions list in which to store the sample positions.
+*        This is the name of a catalogue which can be used to communicate 
 *        positions to subsequent applications. It includes information 
-*        describing the available co-ordinate Frames as well as the positions 
-*        themselves. If a null value is supplied, no output positions list 
-*        is produced. [!]
+*        describing the available WCS co-ordinate Frames as well as the 
+*        positions themselves. If a null value is supplied, no output 
+*        positions list is produced. [!]
 *     START = LITERAL (Read)
 *        The co-ordinates of the first sample in the profile, in the current 
-*        co-ordinate Frame of the NDF (supplying a colon ":" will display 
-*        details of the required co-ordinate Frame). The position should be 
-*        supplied as a list of formatted axis values separated by commas or
-*        spaces. This parameter is only accessed if parameter MODE is set to 
-*        "Curve" and a null (!) value is given for INLIST. If the first
-*        (bottom left) pixel in the NDF has valid co-ordinates in the current 
-*        co-ordinate Frame, then these co-ordinates will be used as the 
-*        suggested default. Otherwise there will be no suggested default.
+*        co-ordinate Frame of the NDF (supplying ":" will display details of 
+*        the required co-ordinate Frame). The position should be supplied as 
+*        a list of formatted axis values separated by spaces. This parameter 
+*        is only accessed if parameter MODE is set to "Curve" and a null
+*        (!) value is given for INCAT. If the first (bottom left) pixel in 
+*        the NDF has valid co-ordinates in the current co-ordinate Frame of 
+*        the NDF, then these co-ordinates will be used as the suggested 
+*        default. Otherwise there will be no suggested default.
 
 *  Examples:
-*     profile my_data prof "0 0" "100 100" 40 outlist=samps
+*     profile my_data prof "0 0" "100 100" 40 outcat=samps
 *        Create a 1-dimensional NDF called prof, holding a profile of the 
 *        data values in the input NDF my_data along a profile starting at
-*        pixel co-ordinates [0.0,0.0] and ending at pixel co-ordinates
+*        pixel co-ordinates [0.0,0.0] and ending at pixle co-ordinates
 *        [100.0,100.0]. The profile consists of 40 samples spread evenly
 *        (in the pixel co-ordinate Frame) between these two positions.
 *        This example assumes that the current co-ordinate Frame in the NDF 
 *        my_data represents pixel co-ordinates. This can be ensured by
 *        issuing the command "wcsframe my_data pixel" before running
-*        profile. An output text file is created called samps containing
-*        the positions of all samples in the profile, together with
+*        profile. A FITS binary catalogue is created called samps.fit 
+*        containing the positions of all samples in the profile, together with
 *        information describing all the co-ordinate Frames in which the
 *        positions of the samples are known. This file may be examined
 *        using application LISTSHOW.
@@ -140,23 +135,33 @@
 *        assumed that the current co-ordinate Frame in the input NDF my_data 
 *        is an equatorial (RA/DEC) system. It creates a 1-dimensional 
 *        profile starting at RA=15:32:47 DEC=23:40:08, and ending at the same 
-*        RA, and DEC=23:42:00. The number of points in the profile is 
+*        RA and DEC=23:42:00. The number of points in the profile is 
 *        determined by the resolution of the data.
-*     profile allsky prof inlist=prof_path npoint=200 geodesic outlist=aa
+*     profile allsky prof incat=prof_path npoint=200 geodesic outcat=aa
 *        This examples creates a profile of the NDF allsky through a set of 
-*        points given in a text file called prof_path. Such files can be
-*        created (for example) using application CURSOR. Each line segment 
-*        is a geodesic curve. The profile is sampled at 200 points. The
-*        samples positions are written to the output positions list aa.
-*     profile allsky2 prof2 mode=point inlist=aa 
+*        points given in a FITS binary catalogue called prof_path.fit. Such 
+*        catalogues can be created (for example) using application CURSOR. 
+*        Each line segment is a geodesic curve. The profile is sampled at 200 
+*        points. The samples positions are written to the output positions 
+*        list aa.fit.
+*     profile allsky2 prof2 mode=point incat=aa 
 *        This examples creates a profile of the NDF allsky2 containing
-*        samples at the positions given in the positions list aa. Thus,
+*        samples at the positions given in the positions list aa.fit. Thus,
 *        the profiles created by this example and the previous example 
 *        will sample the two images allsky and allsky2 at the same
 *        positions and so can be compared directly.
 
+*  Notes:
+*     -  This application uses the conventions of the CURSA package (SUN/190)
+*     for determining the formats of input and output positions list 
+*     catalogues. If a file type of .fits is given, then the catalogue is 
+*     assumed to be a FITS binary table. If a file type of .txt is given, 
+*     then the catalogue is assumed to be stored in a text file in "Small 
+*     Text List" (STL) format. If no file type is given, then ".fit" is 
+*     assumed. 
+
 *  Related Applications:
-*     KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; 
+*     KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; CURSA: XCATVIEW
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, WCS, LABEL, 
@@ -242,7 +247,7 @@
       INTEGER NERR               ! No. of numeric errors which occurred
       INTEGER NP                 ! No. of elements in profile
       INTEGER NPOS               ! No. of profile positions given
-      INTEGER STATE              ! State of parameter INLIST
+      INTEGER STATE              ! State of parameter INCAT
       LOGICAL BADD               ! Any bad values in profile data values?
       LOGICAL BADV               ! Any bad values in profile variance values?
       LOGICAL FRIPW1             ! Free pointer IPW1?
@@ -326,29 +331,29 @@
       CALL PAR_CHOIC( 'MODE', 'Curve', 'Curve,Points', .TRUE., MODE, 
      :                STATUS )
 
-*  Set a dynamic default for INLIST if required.
-      IF( MODE .EQ. 'CURVE' ) CALL PAR_DEF0C( 'INLIST', '!', STATUS )
+*  Set a dynamic default for INCAT if required.
+      IF( MODE .EQ. 'CURVE' ) CALL PAR_DEF0C( 'INCAT', '!', STATUS )
 
 *  The following messing about is required because there seems to be no
 *  way of setting a null dynamic default for a parameter. If it were
 *  possible, it would be better to set a dynamic default of "!" for
-*  INLIST when in CURVE mode, and not set any dynamic default when in
+*  INCAT when in CURVE mode, and not set any dynamic default when in
 *  POINTS mode. The ifl file could then have vpath=dynamic,global.
 *  Instead...
 
-*  See if a value has been assigned to the parameter INLIST on the command 
+*  See if a value has been assigned to the parameter INCAT on the command 
 *  line.
-      CALL PAR_STATE( 'INLIST', STATE, STATUS )
+      CALL PAR_STATE( 'INCAT', STATE, STATUS )
              
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  If a value for INLIST was supplied on the command line, or if we are
+*  If a value for INCAT was supplied on the command line, or if we are
 *  in POINTS mode, attempt to read positions along the path from a file 
 *  specified by the user. Positions are returned in the Base Frame of the 
 *  FrameSet stored in the positions list.
       IF( STATE .EQ. PAR__ACTIVE .OR. MODE .EQ. 'POINTS' ) THEN
-         CALL KPG1_RDLST( 'INLIST', .FALSE., IWCSIN, NPOS, NAXIN, IPW1,
+         CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSIN, NPOS, NAXIN, IPW1,
      :                    IPID, TITLE, STATUS )
 
 *  If succesful, indicate that the IPW1 pointer can be used.
@@ -390,7 +395,7 @@
         CALL AST_TRANN( MAPIN, NPOS, NAXIN, NPOS, %VAL( IPW1 ),
      :                  .TRUE., NCAX, NPOS, %VAL( IPFIL ), STATUS ) 
 
-*  If no positions were obtained using INLIST, use START and FINISH instead.
+*  If no positions were obtained using INCAT, use START and FINISH instead.
       ELSE 
 
 *  The suggested default for the start of the profile is the first pixel. 
@@ -490,13 +495,13 @@
          CALL KPS1_PRFMK( MODE, NDIM, DIM, %VAL( IPDAT ), VAR, 
      :                    %VAL( IPVAR ), IWCS, NCAX, NPOS, NPOS, 
      :                    %VAL( IPFIL ), GEO, 0, %VAL( IPID ), 
-     :                    'OUTLIST', TITLE( : LTTL ), NP, IPPDAT,
+     :                    'OUTCAT', TITLE( : LTTL ), NP, IPPDAT,
      :                    IPPVAR, BADD, BADV, STATUS )
 
       ELSE
          CALL KPS1_PRFMK( MODE, NDIM, DIM, %VAL( IPDAT ), VAR, 
      :                    %VAL( IPVAR ), IWCS, NCAX, NPOS, NPOS, ENDS, 
-     :                    GEO, 1, 0, 'OUTLIST', TITLE( : LTTL ), NP, 
+     :                    GEO, 1, 0, 'OUTCAT', TITLE( : LTTL ), NP, 
      :                    IPPDAT, IPPVAR, BADD, BADV, STATUS )
       END IF
 

@@ -24,13 +24,11 @@
 *     using a cursor and displays them on your terminal. The selected
 *     positions may be marked in various ways on the device (see parameter
 *     PLOT), and can be written to an output positions list so that subsequent
-*     applications can make use of them (see parameter OUTLIST). The format 
+*     applications can make use of them (see parameter OUTCAT). The format 
 *     of the displayed positions may be controlled using parameter STYLE.
 *
 *     Positions may be reported in several different co-ordinate Frames
-*     (see parameter FRAME). Optionally, the corresponding pixel 
-*     co-ordinates at each position may also be reported (see parameter
-*     SHOWPIXEL).
+*     (see parameter FRAME).
 *
 *     The picture or pictures within which positions are required can be 
 *     selected in several ways (see parameters MODE and NAME). 
@@ -40,24 +38,24 @@
 *     (see parameter QUIET).
 
 *  Usage:
-*     cursor [mode] [name] [outlist] [device]
+*     cursor [mode] [name] [outcat] [device]
 
 *  ADAM Parameters:
-*     CLOSE = _LOGICAL (Read)
+*     CLOSE = LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
-*        "Chain" or "Poly". If TRUE, polygons will be closed by joining 
-*        the first position to the last position. [current value]
-*     DESCRIBE = _LOGICAL (Read)
+*        "Chain" or "Poly". If TRUE, polgons will be closed by joining 
+*        the first position to the last position. [Current value]
+*     DESCRIBE = LOGICAL (Read)
 *        If TRUE, a detailed description of the co-ordinate Frame in which 
 *        subsequent positions will be reported is produced each time a 
-*        position is reported within a new picture. [current value]
+*        position is reported within a new picture. [Current value]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation.  This device must support cursor
-*        interaction. [current graphics device]
-*     EPOCH = _DOUBLE (Read)
-*        If a "Sky Co-ordinate System" specification is supplied (using 
-*        parameter FRAME) for a celestial co-ordinate system, then an 
-*        epoch value is needed to qualify it. This is the epoch at 
+*        interaction. [The current graphics device]
+*     EPOCH = DOUBLE PRECISION (Read)
+*        If an IRAS90 Sky Co-ordinate System specification is supplied
+*        (using parameter FRAME) for a celestial co-ordinate system, 
+*        then an epoch value is needed to qualify it. This is the epoch at 
 *        which the supplied sky positions were determined. It should be
 *        given as a decimal years value, with or without decimal places 
 *        ("1996.8" for example). Such values are interpreted as a Besselian 
@@ -70,7 +68,8 @@
 *        in the graphics database. This application can report positions in
 *        any of the co-ordinate Frames stored with each picture. The
 *        string supplied for FRAME can be one of the following:
-*        - A domain name such as SKY, AXIS, PIXEL, etc. The special domains
+*
+*        - A Domain name such as SKY, AXIS, PIXEL, etc. The special Domains
 *        AGI_WORLD and AGI_DATA are used to refer to the world and data 
 *        co-ordinate system stored in the AGI graphics database. They can 
 *        be useful if no WCS information was store with the picture when 
@@ -78,22 +77,22 @@
 *
 *        - An integer value giving the index of the required Frame.
 *
-*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see 
-*        section "Sky Co-ordinate Systems" in SUN/95).
+*        - An IRAS90 Sky Co-ordinate System (SCS) values such as 
+*        EQUAT(J2000) (see SUN/163).
 *
 *        If a null value (!) is supplied, positions are reported in the 
 *        co-ordinate Frame which was current when the picture was created. 
 *        [!]
-*     GEODESIC = _LOGICAL (Read)
+*     GEODESIC = LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Chain" or "Poly". It specifies whether the curves drawn between
-*        positions should be straight lines, or should be geodesic curves.
+*        positions should be stright lines, or should be geodesic curves.
 *        In many co-ordinate Frames geodesic curves will be simple straight 
 *        lines. However, in others (such as the majority of celestial 
 *        co-ordinates Frames) geodesic curves will be more complex curves 
 *        tracing the shortest path between two positions in a non-linear 
 *        projection. [FALSE]
-*     INFO = _LOGICAL (Read)
+*     INFO = LOGICAL (Read)
 *        If TRUE then messages are displayed describing the use of the
 *        mouse prior to obtaining the first position. Note, these
 *        informational messages are not suppressed by setting parameter 
@@ -109,26 +108,27 @@
 *        The name of the text file in which the formatted co-ordinates of 
 *        positions selected with the cursor may be stored. This is intended
 *        primarily for recording the screen output, and not for communicating 
-*        positions to subsequent applications (use parameter OUTLIST for this 
+*        positions to subsequent applications (use parameter OUTCAT for this 
 *        purpose). A null string (!) means that no file is created.  [!]
-*     MARKER = _INTEGER (Read)
+*     MARKER = INTEGER (Read)
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Chain" or "Mark". It specifies the symbol with which each
 *        position should be marked, and should be given as an integer 
 *        PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot, 
 *        2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The 
 *        value must be larger than or equal to -31. [current value]
-*     MAXPOS = _INTEGER (Read)
+*     MAXPOS = INTEGER (Read)
 *        The maximum number of positions which may be supplied before the
-*        application terminates. The number must be in the range 1 to 200. 
-*        [200]
-*     MINPOS = _INTEGER (Read)
+*        application terminates. The number must be in the range 1 to 500. 
+*        [500]
+*     MINPOS = INTEGER (Read)
 *        The minimum number of positions which may be supplied. The user
 *        is asked to supply more if necessary. The number must be in the
 *        range 0 to the value of parameter MAXPOS. [0]
 *     MODE = LITERAL (Read)
 *        The method used to select the pictures in which cursor positions are 
 *        to be reported. There are three options:
+*
 *        - "Current" -- reports positions within the current picture in the 
 *        AGI database. If a position does not lie within the current picture,
 *        an extrapolated position is reported, if possible.
@@ -152,20 +152,23 @@
 *     NUMBER = _INTEGER (Write)
 *        The number of positions selected with the cursor (excluding
 *        invalid positions).
-*     OUTLIST = FILENAME (Write)
-*        An output positions list in which to store the valid selected 
-*        positions (only positions in the first selected picture are 
-*        recorded). This is the name of a text file which can be used to
-*        communicate positions to subsequent applications. It includes
-*        information describing the available co-ordinate Frames as well as
-*        the positions themselves. If you want a simple record of the 
-*        positions displayed on the screen, use parameter LOGFILE instead. 
-*        If a null value is supplied, no output positions list is produced. [!]
+*     OUTCAT = FILENAME (Write)
+*        An output catalogue in which to store the valid selected positions.
+*        The catalogue has the form of a positions list such as created by 
+*        application LISTMAKE. Only positions in the first selected picture 
+*        are recorded. This application uses the conventions of the CURSA 
+*        package (SUN/190) for determining the format of the catalogue. If a 
+*        file type of .fits is given, then the catalogue is stored as a FITS 
+*        binary table. If a file type of .txt is given, then the catalogue 
+*        is stored in a text file in "Small Text List" (STL) format. If no 
+*        file type is given, then ".fit" is assumed. If a null value is 
+*        supplied, no output positions list is produced. [!]
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the selected positions 
 *        which have valid co-ordinates.  The appearance of these graphics
 *        (colour, size, etc ) is controlled by the STYLE parameter. PLOT 
 *        can take any of the following values:
+*
 *        - "None" -- No graphics are produced.
 *       
 *        - "Mark" -- Each position is marked by the symbol specified
@@ -182,50 +185,27 @@
 *        position. Parameters MARKER, GEODESIC and CLOSE are used to
 *        specify the symbols and lines to use.
 *
-*        [current value]
-*     QUIET = _LOGICAL (Read)
+*        [Current value]
+*     QUIET = LOGICAL (Read)
 *        If TRUE then positions are not reported on the screen. Output 
 *        parameters and files are still created. The display of informational 
 *        messages describing the use of the cursor is controlled by the 
 *        parameter INFO. [FALSE]
-*     SHOWPIXEL = _LOGICAL (Read)
-*        If TRUE, the pixel co-ordinates of each selected position are
-*        shown on a separate line, following the co-ordinates requested 
-*        using parameter FRAME. If pixel co-ordinates are being displayed
-*        anyway (see parameter FRAME) then a value of FALSE is used for. 
-*        SHOWPIXEL. [current value]
 *     STYLE = LITERAL (Read)
-*        A group of attribute settings describing the plotting style to use 
-*        when drawing the graphics specified by parameter PLOT. The format 
-*        of the positions reported on the screen may also be controlled.
+*        The name of a text file containing a description of the plotting 
+*        style to use when drawing the graphics specified by parameter PLOT. 
+*        By specifying suitable values for Frame attributes (eg Digits(1),
+*        Digits(2), Symbol(1), Symbol(2), etc), it can also be used to 
+*        control the format for the displayed axis values.
 *
-*        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
-*
-*        Each individual attribute setting should be of the form:
-*
-*           <name>=<value>
-*        
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). [current value] 
-*
-*        In addition to the attributes which control the appearance of
-*        the graphics (Colour, Font, etc), the following attributes may
-*        be set in order to control the appearance of the formatted axis 
-*        values reported on the screen: Format, Digits, Symbol, Unit. These
-*        may be suffixed with an axis number (eg "Digits(2)") to refer to 
-*        the values displayed for a specific axis. [current value]
-*
+*        Each line in the file should contain a string of the form 
+*        <name>=<value>, in which <name> is the name of an attribute, 
+*        and <value> is the value to assign to the attribute. The file may 
+*        contain blank lines and comment lines starting with a hash (#) sign. 
+*        Default values will be used for any unspecified attributes. All
+*        attributes will be defaulted if a null value (!) is supplied,
+*        or if the specified file cannot be accessed. [Current value]
+
 *  Examples:
 *     cursor frame=pixel
 *        This obtains co-ordinates within any visible picture for the
@@ -244,12 +224,12 @@
 *        Frames are described as they are used. Each selected point is
 *        marked with PGPLOT marker 3 (an asterisk). The markers are 
 *        red and are twice the default size.
-*     cursor current maxpos=2 minpos=2 plot=poly quiet outlist=slice
+*     cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice
 *        Exactly two positions are obtained within the current picture, 
 *        and are joined with a straight line. The positions are written to 
-*        a text file called slice but are not displayed on the screen. The
-*        text file may be used to communicate the positions to later 
-*        applications.
+*        a FITS binary catalogue called slice.fit but are not displayed on 
+*        the screen. The catalogue may be used to communicate the positions 
+*        to later applications (LISTSHOW, PROFILE, etc).
 *     cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
 *        This obtains co-ordinates within any visible DATA picture on
 *        the current graphics device.  The style to use is read from
@@ -265,10 +245,6 @@
 *     -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 *     position where there are no pictures of the selected name, the
 *     co-ordinates in the BASE picture are reported.
-*     -  Pixel co-ordinates are formatted with 1 decimal place unless a
-*     format has already been specified by setting the Format attributes
-*     for the axes of the PIXEL co-ordinate Frame (eg using application
-*     WCSATTRIB).
 *     -  Positions can be removed (the instructions state how), starting
 *     from the most-recent one.  Such positions are excluded from the 
 *     output positions list and log file (if applicable). If graphics
@@ -366,12 +342,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN            ! Used length of a string
-
 *  Local Constants:
       INTEGER MAXPTS             ! Maximum number of positions
-      PARAMETER ( MAXPTS = 200 )
+      PARAMETER ( MAXPTS = 500 )
 
       INTEGER SZNAM              ! Length of picture name
       PARAMETER ( SZNAM = 15 )
@@ -387,9 +360,10 @@
 
 *  Local Variables:
       CHARACTER AMES( 3 )*30     ! Informational messages about use of cursor
-      CHARACTER ATTRIB*10        ! Attribute name
+      CHARACTER ATTRIB*20        ! AST attribute name
       CHARACTER COMENT*256       ! Comment for the latest picture
       CHARACTER DOM*20           ! Domain of Current Frame in Plot
+      CHARACTER FMT*30           ! Formatted axis value
       CHARACTER KEYS*3           ! Keys which activate each cursor action
       CHARACTER LABEL*( SZNAM )  ! Picture label
       CHARACTER LINE*256         ! Text buffer for screen
@@ -399,24 +373,20 @@
       CHARACTER PLOT*15          ! Nature of required graphics
       CHARACTER PNAME*( DAT__SZNAM )! Name for the latest picture
       CHARACTER PURP*80          ! Purpose for using cursor
+      CHARACTER S( NDF__MXDIM )*30! Axis symbol
+      CHARACTER U( NDF__MXDIM )*30! Axis Units string
       DOUBLE PRECISION CXY( NDF__MXDIM )! Current Frame position
       DOUBLE PRECISION FINISH( NDF__MXDIM )! Position at end of polygon edge
       DOUBLE PRECISION GXY( 2 )  ! Graphics position
-      DOUBLE PRECISION PXY( NDF__MXDIM )! PIXEL Frame position
       DOUBLE PRECISION START( NDF__MXDIM ) ! Position at start of polygon edge
       DOUBLE PRECISION XB        ! Cursor X position in BASE world co-ords
       DOUBLE PRECISION XY( MAXPTS, NDF__MXDIM ) ! Array of all x,y data co-ordinates
-      DOUBLE PRECISION XYOUT( MAXPTS, NDF__MXDIM ) ! X,Y co-ords in 1st picture
       DOUBLE PRECISION YB        ! Cursor Y position in BASE world co-ords
       INTEGER ACT                ! Cursor choice
       INTEGER BMAP               ! GRAPHICS to BASE world co-ords Mapping
       INTEGER CHAN               ! Pointer to AST channel
-      INTEGER FRM1               ! Pointer to required Frame
-      INTEGER FRM2               ! Pointer to required secondary Frame
-      INTEGER GRPSIZ             ! No. of elements in a GRP group
       INTEGER ICOL( NDF__MXDIM ) ! Minimum column no. for start of each field
       INTEGER I                  ! Loop count
-      INTEGER IAGDAT             ! Index of AGI_DATA Frame
       INTEGER IAT                ! No. of characters in the string
       INTEGER ICURR              ! Original Current Frame index
       INTEGER IGRP               ! GRP identifier for group of formatted posns
@@ -424,17 +394,13 @@
       INTEGER IMODE              ! Mode of operation
       INTEGER IPIC               ! AGI id for current picture
       INTEGER IPIC0              ! Current (input) picture identifier
-      INTEGER IPIC1              ! Picture identifier for 1st selected picture
       INTEGER IPIC2              ! AGI id for new picture
       INTEGER IPICB              ! BASE picture identifier
-      INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLOT              ! Plot for current picture
       INTEGER IPLOTB             ! Plot for BASE picture
       INTEGER IPLOTP             ! Plot for drawing polygons
       INTEGER JAT                ! No. of characters in the string
       INTEGER JCOL( NDF__MXDIM ) ! Minimum column no. for start of each field
-      INTEGER MAP1               ! Pointer to Base->Current Mapping
-      INTEGER MAP2               ! Pointer to Base->secondary Frame Mapping
       INTEGER MAXP               ! Max. no. of positions which may be supplied.
       INTEGER MINP               ! Min. no. of positions which may be supplied.
       INTEGER NACT               ! No. of cursor actions 
@@ -456,11 +422,9 @@
       LOGICAL INFO               ! Display mouse instructions?
       LOGICAL LOOP               ! Continue to get a new cursor position?
       LOGICAL NEWPIC             ! Reading first position in a new picture?
-      LOGICAL PGOOD              ! Are all pixel axis values good?
       LOGICAL PLURAL             ! Use the plural form of a word in a message?
       LOGICAL QUIET              ! Run quietly?
       LOGICAL SAME               ! Is given picture same as current picture?
-      LOGICAL SHPIX              ! Are additional PIXEL co-ords to be displayed?
       REAL OLDSIZ                ! Original marker size
       REAL X1                    ! PGPLOT X world coord at bottom left
       REAL X2                    ! PGPLOT X world coord at top right
@@ -501,9 +465,6 @@
 *  See if Frame descriptions are required.
       CALL PAR_GET0L( 'DESCRIBE', DESC, STATUS )
 
-*  See if PIXEL co-ords are to be displayed on a separate line.
-      CALL PAR_GET0L( 'SHOWPIXEL', SHPIX, STATUS )
-
 *  See if we are to supress display all information on the screen.
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
 
@@ -516,7 +477,7 @@
 
 *  Get the other parameter values needed to describe the graphics, and 
 *  set the rubber band mode to use (none, unless linear "Poly" graphics are
-*  being produced, in which case use a straight line rubber band).
+*  being produced, in which case use a stright line rubber band).
       RBMODE = 0
 
       IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN
@@ -698,9 +659,6 @@
       NP = 0
       NOUTPS = 0
 
-*  Initialise the AGI identifier for the first selected picture.
-      IPIC1 = -1
-
 *  Loop until no more positions are required, or an error occurs.
       LOOP = .TRUE.
       DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
@@ -791,11 +749,19 @@
 *  Decide if the cursor is situated in the same picture as last time.
             CALL AGI_ISAMP( IPIC, SAME, STATUS )
 
-*  If there is a new picture, replace the current picture identifier with the 
-*  new one. Dont annul the current AGI identifier since we may need it later 
-*  on (to compare with IPIC1).
+*  If there is a new picture, annul the current AGI identifier, and replace 
+*  it with the new one.
             IF( .NOT. SAME ) THEN
+               CALL AGI_ANNUL( IPIC, STATUS )
                IPIC = IPIC2
+
+*  Note information about positions in the first selected picture. These
+*  are the only positions written to the output positions list file.
+               IF( NP .GT. 0 .AND. NOUTPS .EQ. 0 ) THEN
+                  NOUTPS = NP
+                  NOUTAX = NAX
+                  NOUTIP = AST_CLONE( IPLOT, STATUS )
+               END IF
 
 *  Annul the pointer for the current Plot.
                CALL AST_ANNUL( IPLOT, STATUS )
@@ -830,61 +796,6 @@
 *  that the Format of each axis value (for instance) can be controlled 
 *  using STYLE.
                CALL KPG1_ASSET( 'CURSOR', 'STYLE', IPLOT, STATUS )
-
-*  Get the number of axes in the selected Frame.
-               NAX = AST_GETI( IPLOT, 'NAXES', STATUS )
-
-*  Get the simplified Mapping from Base (GRAPHICS) Frame to the Current 
-*  (selected) Frame.
-               MAP1 = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, AST__BASE,
-     :                                              AST__CURRENT, 
-     :                                              STATUS ), STATUS )
-
-*  Get a pointer to the Current Frame.
-               FRM1 = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
-
-*  Attempt to find a PIXEL Frame.
-               CALL KPG1_ASFFR( IPLOT, 'PIXEL', IPIX, STATUS )
-
-*  If found, get a pointer to it.
-               IF( IPIX .NE. AST__NOFRAME ) THEN
-                  FRM2 = AST_GETFRAME( IPLOT, IPIX, STATUS )
-
-*  If no format has already been set for the pixel axes, set them so that
-*  the displayed pixel co-ords have 1 decimal place. Loop round each
-*  pixel axis.
-                  DO I = 1, AST_GETI( FRM2, 'NAXES', STATUS )
-
-*  Form the name of the Format attribute for this axis.
-                     ATTRIB = 'FORMAT('
-                     IAT = 7
-                     CALL CHR_PUTI( I, ATTRIB, IAT )
-                     CALL CHR_APPND( ')', ATTRIB, IAT )
-
-*  If is not already set, set the Format to %8.1f (i.e. minimum field of
-*  10 characters including 1 decimal place).
-                     IF( .NOT. AST_TEST( FRM2, ATTRIB( : IAT ), 
-     :                                   STATUS ) ) THEN
-                        CALL AST_SETC( FRM2, ATTRIB( : IAT ), '%8.1f', 
-     :                                 STATUS )
-                     END IF
-
-                  END DO
-
-*  If PIXEL co-ordinates are to be displayed as well as the required
-*  co-ordinate Frame get the simplified Mapping from Base (GRAPHICS) Frame 
-*  to the PIXEL Frame.
-                  IF( SHPIX ) THEN
-                     MAP2 = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, 
-     :                                                   AST__BASE,
-     :                                                   IPIX, STATUS ), 
-     :                                    STATUS )
-                  END IF
-
-*  Store a null pointer if there is no PIXEL Frame.
-               ELSE
-                  FRM2 = AST__NULL
-               END IF
 
 *  Put out a blank line.
                IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
@@ -932,67 +843,93 @@
      :                    'co-ordinate Frame:', STATUS )
                END IF
 
-*  If this is the first selected picture, store an AGI identifier for it.
-*  Also, note the number of axes in the first picture, and store the 
-*  Plot for the first picture. This information is needed when creating the
-*  output positions list.  
-               IF( IPIC1 .EQ. -1 ) THEN
-                  CALL AGI_ICURP( IPIC1, STATUS )
-                  NOUTAX = NAX
-                  NOUTIP = AST_COPY( IPLOT, STATUS )
-               END IF
+*  Get the number of axes in the selected Frame.
+               NAX = AST_GETI( IPLOT, 'NAXES', STATUS )
+
+*  Save the units and axis symbol strings for use in messages. 
+               DO I = 1, NAX
+                  ATTRIB = 'Unit('
+                  IAT = 5
+                  CALL CHR_PUTI( I, ATTRIB, IAT )
+                  CALL CHR_APPND( ')', ATTRIB, IAT )
+
+                  U( I ) = AST_GETC( IPLOT, ATTRIB( : IAT ), STATUS) 
+                  CALL KPG1_PGESC( U( I ), STATUS )
+
+                  ATTRIB = 'Symbol('
+                  IAT = 7
+                  CALL CHR_PUTI( I, ATTRIB, IAT )
+                  CALL CHR_APPND( ')', ATTRIB, IAT )
+
+                  S( I ) = AST_GETC( IPLOT, ATTRIB( : IAT ), STATUS) 
+                  CALL KPG1_PGESC( S( I ), STATUS )
+
+               END DO
 
             END IF
 
-*  Map the GRAPHICS position into the required Frame, and format the results 
-*  including axis symbols. 
+*  Transform the cursor position from GRAPHICS co-ordinates into the
+*  required Frame.
+            GXY( 1 ) = DBLE( XC )
+            GXY( 2 ) = DBLE( YC )
+            CALL AST_TRANN( IPLOT, 1, 2, 1, GXY, .TRUE., NAX, 1, CXY,
+     :                      STATUS )
+
+*  Format the results on each axis. Tab each axis value at a multiple
+*  of 10 columns. If this is the first position given in a new Frame,
+*  include the Unit strings (if they are not blank).
             LINE = ' '
             IAT = 1
-            CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, .TRUE., NEWPIC, 
-     :                       IAT, LINE, ICOL, GOOD, CXY, STATUS )
-
-*  Display the formatted values on the screen if required.
-            IF( .NOT. QUIET ) CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
-
-*  Now format the position again, for inclusion in the log file. Do not
-*  include axis symbols or units.
             LOGLIN = ' '
             JAT = 1
-            CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, .FALSE., NEWPIC, 
-     :                       JAT, LOGLIN, JCOL, GOOD, CXY, STATUS )
 
-*  Append the formatted values to the GRP group which will be written out
-*  to the log file at the end.
-            CALL GRP_PUT( IGRP, 1, LOGLIN( : JAT ), 0, STATUS ) 
+            GOOD = .TRUE.
 
-*  If required, show the corresponding pixel co-ordinates. Do not display
-*  them if pixel co-ords are already being displayed.
-            IF( SHPIX .AND. IPIX .NE. AST__NOFRAME .AND.
-     :          DOM .NE. 'PIXEL' ) THEN
+            DO I = 1, NAX
 
-*  Map the GRAPHICS position into the PIXEL Frame, and format the results 
-*  without axis symbols. Indent by 3 spaces.
-               LINE = ' ('
-               IAT = 2
-               CALL KPS1_CURFM( FRM2, MAP2, XC, YC, NAX, .FALSE., 
-     :                          NEWPIC, IAT, LINE, ICOL, PGOOD, PXY, 
-     :                          STATUS )
-               CALL CHR_APPND( ')', LINE, IAT )
+*  Are all axis values good?
+               IF( CXY( I ) .EQ. AST__BAD ) GOOD = .FALSE.
 
-*  Display the formatted values on the screen if required.
-               IF( .NOT. QUIET ) THEN
-                  CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
-                  CALL MSG_BLANK( STATUS )
+*  Format the axis value.
+               FMT = AST_FORMAT( IPLOT, I, CXY( I ), STATUS )
+
+*  Store it in the log file buffer without symbols, equals signs, etc.
+               CALL CHR_APPND( FMT, LOGLIN, JAT )
+
+*  Create a "symbol=value" string.
+               CALL CHR_APPND( S( I ), LINE, IAT )
+               CALL CHR_APPND( ' =', LINE, IAT )
+               IAT = IAT + 1
+               CALL CHR_APPND( FMT, LINE, IAT )
+
+*  If this is the first position in a new picture, append the axis units.
+               IF( NEWPIC .AND. U( I ) .NE. ' ' ) THEN
+                  IAT = IAT + 1
+                  CALL CHR_APPND( '(', LINE, IAT )
+                  CALL CHR_APPND( U( I ), LINE, IAT )
+                  CALL CHR_APPND( ')', LINE, IAT )
                END IF
 
-*  Append it to the current line in the log file.
-               CALL GRP_GRPSZ( IGRP, GRPSIZ, STATUS )
-               CALL GRP_GET( IGRP, GRPSIZ, 1, LOGLIN, STATUS ) 
-               IAT = CHR_LEN( LOGLIN ) + 3
-               CALL CHR_APPND( LINE, LOGLIN, IAT )
-               CALL GRP_PUT( IGRP, 1, LOGLIN( : IAT ), GRPSIZ, STATUS ) 
+*  Tab to the start of the next column. Subsequent positions use the 
+*  same tabs even though the field widths will be smaller (due to the 
+*  abscence of the units strings).
+               IF( NEWPIC ) THEN
+                  IAT = 6*( 1 + IAT/6 )
+                  JAT = 6*( 1 + JAT/6 )
+                  ICOL( I ) = IAT
+                  JCOL( I ) = JAT
+               ELSE
+                  IAT = MAX( ICOL( I ), 6*( 1 + IAT/6 ) )
+                  JAT = MAX( JCOL( I ), 6*( 1 + JAT/6 ) )
+               END IF
 
-            END IF
+            END DO
+
+*  Display the formatted values on the screen.
+            IF( .NOT. QUIET ) CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
+
+*  Append the formatted values to the GRP group.
+            CALL GRP_PUT( IGRP, 1, LOGLIN( : JAT ), 0, STATUS ) 
 
 *  If good, include the current Frame position in the list of returned 
 *  positions.
@@ -1010,23 +947,6 @@
 *  Also store the GRAPHICS Frame positions.
                XAC( NP ) = XC       
                YAC( NP ) = YC       
-
-*  If the current picture is the same as the first selected picture, store
-*  the position in the array of positions to be written to the output
-*  positions list.
-               CALL AGI_ISAMP( IPIC1, SAME, STATUS )
-               IF( SAME ) THEN
-                  NOUTPS = NOUTPS + 1
-
-                  DO I = 1, NAX
-                     XYOUT( NOUTPS, I ) = CXY( I )
-                  END DO
-   
-                  DO I = NAX + 1, NDF__MXDIM
-                     XYOUT( NOUTPS, I ) = AST__BAD
-                  END DO
-
-               END IF                
 
 *  Produce any required graphics. First deal with markers.
                IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN               
@@ -1097,7 +1017,6 @@
      :                       '(^POS).', STATUS )
 
 *  Set the next cursor position to the position which is to be forgotten.
-*  These are GRAPHICS co-ords.
                XC = XAC( NP )            
                YC = YAC( NP )            
 
@@ -1163,52 +1082,6 @@
 *  Reduce the size of the group to remove the last entry.
                CALL GRP_SETSZ( IGRP, NP, STATUS )
 
-*  We now need to decide whether the position should also be removed from 
-*  the list of positions to write to the ouptput positions list. This is 
-*  only the case if the position lies within the first selected picture.
-
-*  In ANCHOR or CURRENT mode, the position must be in the original picture
-*  since the picture cannot change.
-               IF( IMODE .NE. DYN ) THEN
-                  SAME = .TRUE.
-
-*  In DYNAMIC mode we need to find the picture and check it is the same.
-               ELSE
-
-*  Transform the cursor position from GRAPHICS co-ordinates into the AGI
-*  world co-ordinate system of the BASE picture.
-                  CALL AST_TRAN2( BMAP, 1, DBLE( XC ), DBLE( YC ), 
-     :                            .TRUE., XB, YB, STATUS ) 
-
-*  Temporarily, make the BASE picture the current AGI picture,
-                  CALL AGI_SELP( IPICB, STATUS )
-
-*  Get the last picture of the chosen name which encompasses the cursor
-*  position. If found it becomes the current AGI picture.
-                  CALL AGI_RCLP( NAME, REAL( XB ), REAL( YB ), IPIC2, 
-     :                           STATUS )
-
-*  Watch for the case when there is no picture of that name at the
-*  selected position. Annul the error and use the BASE picture.  
-                  IF( STATUS .EQ. AGI__NONAM ) THEN
-                     CALL ERR_ANNUL( STATUS )
-                     CALL AGI_IBASE( IPIC2, STATUS )
-                     CALL AGI_SELP( IPIC2, STATUS )
-                  END IF
-
-*  See if this picture is the same as the first selected picture.
-                  CALL AGI_ISAMP( IPIC1, SAME, STATUS )
-
-*  Re-instate the original current AGI picture,
-                  CALL AGI_SELP( IPIC, STATUS )
-
-               END IF
-
-*  If this picture is the same as the first selected picture, we need to
-*  remove this position from the output list. It's the last position, so
-*  just reduce the number of positions to write out by one.
-               IF( SAME ) NOUTPS = NOUTPS - 1
-
             END IF
 
          END IF
@@ -1272,21 +1145,17 @@
 *  Create a a logfile containing formatted values if required.
          CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP, STATUS ) 
 
-*  The Plot stored in the output positions list must not have an AGI_DATA 
-*  Frame since there is no guarantee that the correct AGI picture will be 
-*  current when it is used in another subsequent application (the mapping 
-*  routine KPG1_ASAGD uses the TRANSFORM structure from the AGI picture 
-*  which is current at the time KPG1_ASAGD is called). Find and remove
-*  any AGI_DATA Frame in the Plot.
-         CALL KPG1_ASFFR( NOUTIP, 'AGI_DATA', IAGDAT, STATUS )
-
-         IF( IAGDAT .NE. AST__NOFRAME ) THEN
-            CALL AST_REMOVEFRAME( NOUTIP, IAGDAT, STATUS )
+*  If all positions have been supplied in the same picture, the details
+*  of the picture will not yet have been saved, so do it now.
+         IF( NOUTAX .EQ. 0 ) THEN
+            NOUTPS = NP
+            NOUTAX = NAX
+            NOUTIP = IPLOT
          END IF
 
 *  Create an output positions list if required.
          IF( NOUTPS .GT. 0 ) THEN
-            CALL KPG1_WRLST( 'OUTLIST', MAXPTS, NOUTPS, NOUTAX, XYOUT,
+            CALL KPG1_WRLST( 'OUTCAT', MAXPTS, NOUTPS, NOUTAX, XY,
      :                       AST__CURRENT, NOUTIP, 'Output from CURSOR', 
      :                       1, 0, .TRUE., STATUS )
          END IF

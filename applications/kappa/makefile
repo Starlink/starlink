@@ -487,7 +487,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
                     NUM_DEF NUM_DEF_CVT NUM_DEF_B NUM_DEF_D NUM_DEF_I \
                     NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_PAR \
                     PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR AST_PAR PSX_ERR \
-                    AST_ERR AGI_PAR
+                    AST_ERR AGI_PAR CAT_PAR CAT_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -616,7 +616,7 @@ kpg1_prsar.f kpg1_psfsd.f kpg1_psfsr.f kpg1_px2ax.f kpg1_pxdpb.f \
 kpg1_pxdpd.f kpg1_pxdpi.f kpg1_pxdpr.f kpg1_pxdpub.f kpg1_pxdpuw.f \
 kpg1_pxdpw.f kpg1_qcol.f kpg1_qidat.f kpg1_qncol.f kpg1_qntld.f \
 kpg1_qntlr.f kpg1_qsrtc.f kpg1_qsrti.f kpg1_qsrtr.f kpg1_qvid.f \
-kpg1_rdast.f kpg1_rdls2.f kpg1_rdlst.f kpg1_retrr.f kpg1_rfcod.f \
+kpg1_rdast.f kpg1_rdlst.f kpg1_retrr.f kpg1_rfcod.f \
 kpg1_rfcor.f kpg1_rgndf.f kpg1_rmapb.f kpg1_rmapd.f kpg1_rmapi.f \
 kpg1_rmapr.f kpg1_rmapub.f kpg1_rmapuw.f kpg1_rmapw.f kpg1_satkc.f \
 kpg1_satkd.f kpg1_sclof.f kpg1_scrsz.f kpg1_sdimp.f kpg1_sdtrn.f \
@@ -635,7 +635,9 @@ kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_vect.f kpg1_verb.f \
 kpg1_wgndf.f kpg1_wmodr.f kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f \
 kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
-normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f 
+normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
+kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
+kpg1_wcatw.f kpg1_srcta.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -966,6 +968,8 @@ AGI_PAR:     $(STAR_INC)/agi_par;     $(LINK) $? $@
 AST_PAR:     $(STAR_INC)/ast_par;     $(LINK) $? $@
 AST_ERR:     $(STAR_INC)/ast_err;     $(LINK) $? $@
 C1_COM:      c1_com;                  $(LINK) $? $@
+CAT_ERR:     $(STAR_INC)/cat_err;     $(LINK) $? $@
+CAT_PAR:     $(STAR_INC)/cat_par;     $(LINK) $? $@
 CHR_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
 CTM_COM:     ctm_com;                 $(LINK) $? $@
 CTM_PAR:     ctm_par;                 $(LINK) $? $@
@@ -2754,6 +2758,8 @@ kpg1_csubr.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF
 kpg1_csubub.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UB NUM_DEF_CVT NUM_DEF_UB
 kpg1_csubuw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_DEF_UW
 kpg1_csubw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_ctcpd.o:    SAE_PAR PRM_PAR CAT_PAR
+kpg1_ctcpi.o:    SAE_PAR PRM_PAR CAT_PAR
 kpg1_d2w2r.o:	 SAE_PAR PRM_PAR
 kpg1_danot.o:	 SAE_PAR
 kpg1_dauni.o:	 SAE_PAR
@@ -3000,9 +3006,9 @@ kpg1_qsrtc.o:	 SAE_PAR
 kpg1_qsrti.o:	 SAE_PAR
 kpg1_qsrtr.o:	 SAE_PAR
 kpg1_qvid.o:	 SAE_PAR GKS_PAR CTM_PAR GNS_PAR
+kpg1_rcatw.o:    SAE_PAR DAT_PAR AST_PAR CAT_PAR GRP_PAR KPG_AST
 kpg1_rdast.o:	 SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
-kpg1_rdls2.o:	 SAE_PAR GRP_PAR NDF_PAR AST_PAR
-kpg1_rdlst.o:	 SAE_PAR FIO_ERR GRP_PAR DAT_PAR AST_PAR KPG_AST
+kpg1_rdlst.o:    SAE_PAR CAT_PAR CAT_ERR NDF_PAR AST_PAR
 kpg1_retrr.o:	 SAE_PAR
 kpg1_rfcod.o:	 SAE_PAR DAT_PAR FIO_ERR
 kpg1_rfcor.o:	 SAE_PAR DAT_PAR FIO_ERR
@@ -3026,8 +3032,10 @@ kpg1_sgdig.o:	 SAE_PAR
 kpg1_sgdim.o:	 SAE_PAR NDF_PAR
 kpg1_short.o:	 SAE_PAR
 kpg1_slice.o:	 SAE_PAR
+kpg1_snkta.o:    SAE_PAR DAT_PAR GRP_PAR KPG_PAR KPG_AST
 kpg1_solin.o:	 SAE_PAR
 kpg1_sqsud.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_srcta.o:    SAE_PAR DAT_PAR GRP_PAR KPG_PAR AST_PAR KPG_AST
 kpg1_ssazd.o:	 SAE_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 kpg1_ssazr.o:	 SAE_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 kpg1_sscof.o:	 SAE_PAR NUM_CMN
@@ -3080,12 +3088,13 @@ kpg1_vasvw.o:	 SAE_PAR PRM_PAR
 kpg1_vec2n.o:	 SAE_PAR NDF_PAR
 kpg1_vect.o:	 SAE_PAR
 kpg1_verb.o:	 SAE_PAR PSX_ERR
+kpg1_wcatw.o:    SAE_PAR DAT_PAR CAT_PAR GRP_PAR AST_PAR KPG_AST
 kpg1_wgndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 kpg1_wmodr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_wrast.o:	 SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
 kpg1_wread.o:	 SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
-kpg1_wrls2.o:	 SAE_PAR GRP_PAR DAT_PAR PRM_PAR AST_PAR KPG_AST
-kpg1_wrlst.o:	 SAE_PAR AST_PAR PAR_ERR
+kpg1_wrls2.o:    SAE_PAR CAT_PAR NDF_PAR AST_PAR
+kpg1_wrlst.o:    SAE_PAR AST_PAR PAR_ERR
 kpg1_wwrt.o:	 SAE_PAR DAT_PAR AST_PAR KPG_PAR KPG_AST
 kpg1_xyd2w.o:	 SAE_PAR PRM_PAR
 kpg1_xyzwd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
