@@ -351,7 +351,7 @@
 
 /* Construct a command to source the file. */
       ccddir = getenv( "CCDPACK_DIR" );
-      if ( ccddir != NULL && index( filename, '/' ) != NULL ) {
+      if ( ccddir != NULL && index( filename, '/' ) == NULL ) {
          sprintf( buffer, "source %s/%s", ccddir, filename );
       }
       else {
