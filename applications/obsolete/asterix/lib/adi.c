@@ -5256,7 +5256,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
       adix_locrcb( rid, "CREAT_RTN", _CSM, &ortn, status );
 
 /* Try to create the file */
-      adix_fcreat_int( ortn, fid, id, &fileid, status );
+      adix_fcreat_int( ortn, fid, id, fileid, status );
 
       found = _ok(status);		/* Opened ok? */
       }
@@ -5277,7 +5277,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
                      8, &ortn, status );
 
 /* Try to create the file */
-        adix_fcreat_int( ortn, fid, id, &fileid, status );
+        adix_fcreat_int( ortn, fid, id, fileid, status );
 
         if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
