@@ -150,7 +150,11 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
       \\@tempswatrue
       \\ifhmode\\@@par\\penalty\\interlinepenalty\\fi
     \\fi}%
-  \\obeylines \\verbatim@font \\@noligs
+  <!-- Omit the \@noligs command that's present in LaTeX's {verbatim}
+       environment.  It makes things like ' active, which ends up
+       swallowing following spaces.  The \tt fonts don't have (many?)
+       ligatures anyway, so nothing's lost. -->
+  \\obeylines \\verbatim@font
   \\everypar \\expandafter{\\the\\everypar \\unpenalty}%
   \\obeyspaces\\Verbatim@space%
 }
