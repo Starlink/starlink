@@ -39,16 +39,17 @@ Description:
    transform only two lists may be registered at any time.
 
    The results from REGISTER are reported via the logging system
-   and then coded either as new frames with a domain name given
-   by the OUTDOMAIN parameter in the WCS component of the NDFs,
-   or as TRANSFORM structures, containing the final algebraic
-   solutions for each input list.  Transform structures may be
-   stored in the CCDPACK exensions of the associated NDFs or within
-   a named HDS container file if no associated NDFs exist.  Whether
-   TRANSFORM structures or frames within the WCS components are
-   chosen, they can be used by the applications TRANLIST and
-   TRANNDF to transform position lists and resample the actual
-   datasets respectively.
+   and then coded either as new coordinate systems or as TRANSFORM
+   structures containing the final algebraic solutions for each
+   input list.  The new coordinate systems will be a copy of the
+   pixel coordinate system of the reference image, and are stored in
+   the WCS components of the associated images. Transform structures
+   may be stored in the CCDPACK exensions of the associated images or
+   within a named HDS container file if no associated images exist.
+   Whether TRANSFORM structures or frames within the WCS components
+   are chosen, they can be used by the applications TRANNDF and
+   TRANLIST to resample the datasets or transform position lists
+   respectively.
 
 Parameters
 
@@ -61,7 +62,19 @@ CLASS( ) = LITERAL (Read)
    describe the properties of the transformation (parameters
    XFOR, YFOR, XINV and YINV) should be given. This is
    optional, but the information can be used to make other
-   applications run more efficiently.  Valid values are:
+   applications run more efficiently.  What values are valid
+   depends on whether the transformations are being stored as
+   TRANSFORM structures or as AST Mappings.
+
+   For AST Mappings the following can be used:
+
+      - SIMPFI        -- Forward followed by inverse transformation
+                         can be simplified to a unit mapping.
+
+      - SIMPIF        -- Inverse followed by forward transformation
+                         can be simplified to a unit mapping.
+
+   and for TRANSFORM structures the following can be used:
 
       - LINEAR        -- Linear and preserves straight lines.
 
@@ -83,7 +96,7 @@ CLASS( ) = LITERAL (Read)
    classification and a table of classifications of common
    mappings.
 
-   This parameter is ignored unless OUTFORMAT=TRANSFORM.
+   This parameter is only used when IFIT=6.
 
 CLASSIFY
 
@@ -96,7 +109,7 @@ CLASSIFY = _LOGICAL (Read)
    Linear transformations are classified by this routine directly
    and do not use this parameter.
 
-   This parameter is ignored unless OUTFORMAT=TRANSFORM.
+   This parameter is only used when IFIT=6.
    [FALSE]
 
 FA-FZ
@@ -115,7 +128,7 @@ FA-FZ = LITERAL (Read)
       FA > SQRT(X*X+Y*Y)
       FB > SQRT(XX*XX+YY*YY)
 
-   This parameter is ignored unless OUTFORMAT=TRANSFORM.
+   This parameter is only used when IFIT=6.
 
 FITTYPE
 
@@ -130,13 +143,11 @@ FITTYPE = _INTEGER (Read)
 
       - 3 -- shift of origin and magnification
 
-      - 4 -- shift of origin, rotation and magnification (solid
-             body)
+      - 4 -- shift of origin, rotation and magnification (solid body)
 
       - 5 -- a full six parameter fit
 
       - 6 -- self defined function
-
    [5]
 
 FULL
@@ -158,14 +169,14 @@ FULL = _LOGICAL (Read)
 IN
 
 IN = LITERAL (Read)
-   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of NDF
+   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of image
    names in which to store the WCS frames or transformation
    structures is required. This list of names must correspond
    exactly to the order of the associated input lists. A listing
    of the order of inputs is shown before this parameter is
    accessed.
 
-   The NDF names may (although this is probably not advisable)
+   The image names may (although this is probably not advisable)
    be specified using wildcards, or may be specified using an
    indirection file (the indirection character is "^").
 
@@ -174,10 +185,10 @@ INLIST
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated NDFs. If NDFNAMES is TRUE the names of the
+   of the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the NDFs themselves should be given (and may include
+   images (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the images themselves should be given (and may include
    wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -226,14 +237,14 @@ NDFNAMES
 
 NDFNAMES = _LOGICAL (Read)
    This parameter specifies whether the names of the input
-   positions lists are stored in the CCDPACK extensions of NDFs.
-   If TRUE then the INLIST parameter accesses a list of NDFs
+   positions lists are stored in the CCDPACK extensions of images.
+   If TRUE then the INLIST parameter accesses a list of images
    which are used to get the associated positions lists. If FALSE
    then INLIST just accesses the position list names directly.
 
    If the names of the lists are stored in the CCDPACK NDF
    extension then the final WCS frame information or
-   transformation structure is also written to the NDF
+   transformation structure is also written to the image
    extension.
 
    If a global value for this parameter has been set using
@@ -244,11 +255,11 @@ OUTDOMAIN
 
 OUTDOMAIN = LITERAL (Read)
    If OUTFORMAT is 'WCS', the transformation information is
-   written as a new frame to the WCS component of the NDF.
-   The frame normally has a Domain name of 'CCD_REG', but
-   that can be overridden with this parameter.  When this
-   frame is added, any previously existing frame which has
-   the same Domain is removed.
+   written as a new coordinate frame to the WCS component of the
+   image.  The frame normally has a Domain name of 'CCD_REG', but
+   that can be overridden with this parameter.  When this frame
+   is added, any previously existing frame which has the same
+   Domain is removed.
 
    The name is converted to upper case, and whitespace is removed.
    [CCD_REG]
@@ -258,25 +269,26 @@ OUTFORMAT
 OUTFORMAT = LITERAL (Read)
    If NDFNAMES is TRUE, or PLACEIN is 'NDF', then this parameter
    specifies how the transformation is to be written into the
-   NDFs.  There are two possible values:
+   images.  There are two possible values:
 
       - WCS       -- written into WCS component of the NDF
 
       - TRANSFORM -- written as a TRANSFORM structure into the
                      .MORE.CCDPACK extension of the NDF
 
-   If WCS is chosen, then a new frame, with a Domain value given
-   by OUTDOMAIN, is inserted into the WCS component of the NDF
-   (a new WCS component is created if none previously existed).
-   A mapping between this and the 'PIXEL' domain is defined,
-   which is the unit mapping in the case that the NDF in question
-   is the reference set.  If any frame in the domain OUTDOMAIN
-   already exists in the WCS component, it will be erased, so
-   that after successful processing by REGISTER it will contain
-   only one such frame.
+   If WCS is chosen, then a new coordinate frame, with a Domain
+   (name) value given by OUTDOMAIN, is added to the WCS
+   component of the image (a new WCS component is created if none
+   previously existed).  A mapping between these coordinates and
+   pixel coordinates is defined, which is the unit mapping in
+   the case that the image in question is the reference set.  If
+   any frame in the domain OUTDOMAIN already exists in the WCS
+   component, it will be erased, so that after successful
+   processing by REGISTER it will contain only one frame so
+   named.
 
-   WCS is currently only possible for linear transformations
-   (FITTYPE values between 1 and 5).
+   OUTFORMAT=WCS is currently only possible for linear
+   transformations (FITTYPE values between 1 and 5).
    [WCS]
 
 PA-PZ
@@ -335,13 +347,12 @@ USEWCS
 USEWCS = _LOGICAL (Read)
    This parameter specifies whether the coordinates in the
    position lists should be transformed from Pixel coordinates
-   into the coordinates of the Current frame of the WCS
-   component of the associated NDF before use.  It should
-   normally be set TRUE, in which case the transformation type
-   set by the FITTYPE parameter is the type which will be fit
-   between the Current coordinate frames of the NDFs.
-   Otherwise the fit will be between the Pixel coordinate
-   frames.
+   into the Current coordinate system of the associated image
+   before use.  It should normally be set TRUE, in which case
+   the transformation type set by the FITTYPE parameter is the
+   type which will be fit between the Current coordinate frames
+   of the image.  Otherwise the fit will be between the positions
+   in pixel coordinates.
 
    This parameter is ignored if NDFNAMES is not TRUE.
    [TRUE]
@@ -411,64 +422,63 @@ YINV = LITERAL (Read)
 Examples
 
 register inlist='*' fittype=1
-   In this example all the NDFs in the current directory are
-   accessed and their associated position lists are opened.
-   A global fit between all the datasets is then performed
-   which results in estimates for the offsets from the first
-   input NDF's position.  These offsets are between the Current
-   coordinate frames of the NDFs.  The results are then coded
-   as new frames, with the domain name 'CCD_REG', in the WCS
-   component of the NDFs.  Actual registration of the images
-   can then be achieved by aligning all the NDFs in the CCD_REG
-   domain.
+   In this example all the images in the current directory are
+   accessed and their associated position lists are opened.  A
+   global fit between all the datasets is then performed which
+   results in estimates for the offsets from the first input
+   image's position.  These offsets are between the Current
+   coordinate systems of the images.  The results are then
+   attached as new coordinate systems, labelled 'CCD_REG', in
+   the WCS component of the images.  Actual registration of the
+   images  can then be achieved by aligning all the images in the
+   CCD_REG domain using TRANNDF.
 
 register inlist='*' trtype=5 outdomain=result-set1
    This example works as above but this time the global
    transformations are derived for a full 6-parameter linear fit
    (which allows offset, rotation, magnification and shear).
-   The results are coded as frames in the Domain 'RESULT-SET1'.
+   The results are coded as coordinate frames with the Domain
+   'RESULT-SET1'.
 
-register inlist='"myndf1,myndf2"' fittype=4 refpos=2
+register inlist='"myimage1,myimage2"' fittype=4 refpos=2
    In this example a solid body fit is performed between the
-   position lists associated with the NDFs myndf1 and myndf2.
+   position lists associated with the images myimage1 and myimage2.
    The reference positions are chosen to be those associated with
-   myndf2, so that the CCD_REG frame coordinates will be the
-   same as the Current frame in NDF myndf2.
+   myimage2, so that the CCD_REG frame coordinates will be the
+   same as the pixel coordinates of image myimage2.
 
 register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
-   In this example the position lists associated with the NDFs
+   In this example the position lists associated with the images
    one and two are said to be related by the algebraic
    expressions "pa+pb*x" and "pa+pb*y", which indicates that a
    single offset applies in both directions and a single scale
    factor. A solution for the values PA and PB is found using a
    general least-squares minimization technique. Starting values
    for PA and PB can be given using the parameters PA and PB.
-   Since the fittype is 6, outformat must be 'transform', so
-   the results are coded as transform structures in the CCDPACK
-   extensions of the NDFs (under the item TRANSFORM).  The
-   transform structures are arranged so that the forward
-   transformation maps current positions into the reference
-   coordinate system.
+   Since the fittype is 6, only two position lists may be
+   registered in the same run.
 
-register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
+register inlist='"image1,image2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
          yfor='pe+pf*x+pg*y+ph*x*y'
    In this example a non-linear transformation is fit between the
-   positions associated with the NDFs ndf1 and ndf2. This analysis
+   positions associated with the images image1 and image2. This analysis
    may help in determining whether a 6-parameter fit is good
    enough, or if you just want to transform positions. A problem
    with proceeding with this transformation in a general fashion
    is deriving the inverse as this is required if you want to
-   perform image resampling.
+   perform image resampling using TRANNDF (though the more
+   specialised, and less efficient, DRIZZLE can resample with
+   only the forward transformation).
 
 register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
          fittype=3 placein=ndf outformat=transform
-         in='"ndf1,ndf2,ndf3"'
+         in='"image1,image2,image3"'
    In this example the input position lists are not associated
-   with NDFs (ndfnames=false) and have to be specified by name
+   with images (ndfnames=false) and have to be specified by name
    (no wildcards allowed). Since the position lists are not
-   associated with NDFs there is no natural home for the
+   associated with images there is no natural home for the
    transform structures. In this example it has been decided to
-   place the transforms in NDFs anyway. PLACEIN could also be
+   place the transforms in images anyway. PLACEIN could also be
    given as "file" in which case the transform structures are
    written to a container file, under the items TRN_1, TRN_2 ...
 
@@ -584,4 +594,12 @@ History
 
  21-MAY-1999 (MBT):
     Added USEWCS parameter.
+
+ 1-NOV-1999 (MBT):
+    Modified so that output is in units appropriate to Current
+    coordinate frame.
+
+ 12-NOV-1999 (MBT):
+    Modified so that general transformations can be output into
+    WCS components as MathMaps.
 .endhelp

@@ -1,6 +1,6 @@
 .help wcsedit Starlink ccdpack
 .nf
-Modifies WCS components of a set of NDFs.
+Modifies or examines WCS components of a set of images.
 
 Usage:
 
@@ -9,20 +9,22 @@ Usage:
 Description:
 
    This task performs one of a set of modifications to the WCS
-   (World Coordinate System) components of a list of NDFs.
+   (World Coordinate System) components of a list of images.
    According to the value of the MODE parameter it will:
 
-      -  Set the Current frame
+      -  Set the Current coordinate system
 
-      -  Add a new frame
+      -  Add a new coordinate system
 
-      -  Remove a frame
+      -  Remove a coordinate system
 
-      -  Set an attribute for a frame
+      -  Set an attribute for a coordinate system
+
+      -  Show the coordinate system which currently exist
 
    The routine does not fail if some of the requested edits cannot
    be performed, but an output parameter MODIFIED records which
-   NDFs were successfully modified.
+   images were successfully modified.
 
 Parameters
 
@@ -51,11 +53,12 @@ COEFFS( * ) = _DOUBLE (Read)
 DOMAIN
 
 DOMAIN = LITERAL (Read)
-   If MODE is ADD this gives the domain name to be used for the
+   If MODE is ADD this gives the Domain (name) to be used for the
    new frame.  Spaces in the name are ignored and letters are
    folded to upper case.  If the new frame is successfully added
-   and any frame with the same domain name already exists, it
-   will be removed, and a message will be printed to that effect.
+   and any frame with the same domain name already exists, the
+   old one will be removed, and a message will be printed to that
+   effect.
    [CCD_WCSEDIT]
 
 EPOCH
@@ -69,6 +72,16 @@ EPOCH = _DOUBLE (Read)
    ("1996.8" for example). Such values are interpreted as a
    Besselian epoch if less than 1984.0 and as a Julian epoch
    otherwise.
+
+FOREXP_*
+
+FOREXP * ( * ) = LITERAL (Read)
+   If MODE=ADD and MAPTYPE=MATH, this gives the expressions to
+   be used for the forward transformation to be added.  There
+   must be at least two expressions (for the two coordinates)
+   but there may be more if intermediate expressions are to
+   be used.  Expression syntax is fortran-like; see the
+   AST_MATHMAP documentation in SUN/210 for details.
 
 FRAME
 
@@ -89,6 +102,8 @@ FRAME = LITERAL (Read)
 
       -  MODE = SET     -- The frame whose attributes are to be set
 
+      -  MODE = SHOW    -- This parameter is ignored
+
    The value of this parameter can be one of the following:
 
       -  A domain name such as SKY, AXIS, PIXEL, etc.
@@ -106,9 +121,9 @@ FRAME = LITERAL (Read)
 IN
 
 IN = LITERAL (Read)
-   A list specifying the names of the NDFs whose WCS components
-   are to be modified.  The NDF names should be separated by
-   commas and may include wildcards.
+   A list specifying the names of the images whose WCS components
+   are to be modified or examined.  The image names should be
+   separated by commas and may include wildcards.
 
 INVERT
 
@@ -116,6 +131,16 @@ INVERT = _LOGICAL (Read)
    If set TRUE the mapping defined by COEFFS will be applied in
    the reverse direction.
    [FALSE]
+
+INVEXP_*
+
+INVEXP * ( * ) = LITERAL (Read)
+   If MODE=ADD and MAPTYPE=MATH, this gives the expressions to
+   be used for the inverse transformation to be added.  There
+   must be at least two expressions (for the two coordinates)
+   but there may be more if intermediate expressions are to
+   be used.  Expression syntax is fortran-like; see the
+   AST_MATHMAP documentation in SUN/210 for details.
 
 LOGFILE
 
@@ -156,14 +181,16 @@ MAPTYPE
 
 MAPTYPE = LITERAL (Read)
    This parameter is required when MODE is ADD, and specifies the
-   type of mapping which connects the target frame to the new frame.
+   type of mapping which maps from the target frame to the new frame.
    It may take one of the following values:
 
-      -  UNIT
+      -  UNIT       -- A Unit mapping
 
-      -  LINEAR
+      -  LINEAR     -- A linear mapping
 
-      -  PINCUSHION
+      -  PINCUSHION -- A pincushion distortion
+
+      -  MATH       -- A general algebraic mapping
    [UNIT]
 
 MODE
@@ -181,14 +208,16 @@ MODE = LITERAL (Read)
 
       -  SET      -- Set frame attributes (Current frame is not
                      changed)
+
+      -  SHOW     -- Display a list of the frames which exist
    [CURRENT]
 
 MODIFIED
 
 MODIFIED = LITERAL (Write)
    On exit, this parameter gives a comma-separated list of all the
-   NDFs which were successfully modified.  In particular, if MODE
-   is CURRENT, this list will include all the NDFs which contained
+   images which were successfully modified.  In particular, if MODE
+   is CURRENT, this list will include all the images which contained
    the specified frame, but exclude any which did not.
 
 SET
@@ -198,37 +227,66 @@ SET = LITERAL (Read)
    "attribute=value" which is to be applied to the frame.  The
    string is passed straight to the AST_SET routine (see SUN/210).
 
+SIMPFI
+
+SIMPFI = _LOGICAL (Read)
+   If MODE=SET and MAPTYPE=MATH, this gives the value of the
+   mapping's SimpFI attribute (whether it is legitimate to simplify
+   the forward followed by the inverse transformation to a unit
+   transformation).
+   [TRUE]
+
+SIMPIF
+
+SIMPIF = _LOGICAL (Read)
+   If MODE=SET and MAPTYPE=MATH, this gives the value of the
+   mapping's SimpIF attribute (whether it is legitimate to simplivy
+   the inverse followed by the forward transformation to a unit
+   transformation).
+   [TRUE]
+
 Examples
 
 wcsedit * current ccd_reg
-   This sets the current frame of all the NDFs in the current
-   directory to the 'CCD_REG' domain.  The MODIFY parameter is
-   set on output to contain the names of all those NDFs which
+   This sets the Current coordinate system of all the images in
+   the current directory to 'CCD_REG'.  The MODIFY parameter is
+   set on output to contain the names of all those images which
    had such a frame.
 
 wcsedit data* remove frame=4
-   The fourth frame in the WCS component of each NDF 'data*.sdf'
-   is removed.
+   The fourth coordinate frame in the WCS component of each image
+   'data*.sdf' is removed.
 
 wcsedit "first,second" mode=add frame=GRID maptype=pincushion
-        coeffs=[-6.8e-10,0,0] domain=NEW
-   A new frame, in the domain 'NEW', is added to the NDFs first
-   and second.  It is connected to the previously existing GRID
-   domain by a pincushion distortion mapping centred at the
-   origin with a distortion coefficient of -6.8e-10.  If any
-   frames with domain NEW already exist in those NDFs they are
-   removed.
+        coeffs=[-6.8e-8,0,0] domain=NEW
+   A new coordinate system, called 'NEW', is added to the images
+   first  and second.  It is connected to the previously
+   existing GRID domain by a pincushion distortion mapping
+   centred at the origin with a distortion coefficient of
 
-wcsedit ndf1 set ! set="domain=NEW,title=New frame"
-   This changes the value of the Domain attribute of the current
-   frame in the WCS component of NDF1 to the name "NEW" and
-   sets the Title attribute of the frame to "New frame".
+   -6.8e-8.  If any frames with domain NEW already exist in
+   those images they are removed.
+
+wcsedit image1 set ! set="domain=NEW,title=New frame"
+   This changes the value of the Domain attribute of the Current
+   coordinate frame in the WCS component of image1 to the name
+   "NEW" and  sets the Title attribute of the frame to "New
+   frame".
+
+wcsedit image1 show
+   This displays all the coordinate frames in image1 with their
+   Domains and titles, and indicates which one is Current.
+
+wcsedit frm mode=add frame=pixel maptype=math simpif simpfi
+        forexp=["r=sqrt(x*x+y*y)","theta=atan2(y,x)"]
+        invexp=[x=r*cos(theta),y=r*sin(theta)]
+   Adds a frame giving a polar coordinate view of the PIXEL frame.
 
 Notes
 
 This routine provides similar functionality to that provided by
 KAPPA applications WCSADD, WCSREMOVE and WCSFRAME, but allows
-use of CCDPACK-style NDF lists.
+use of CCDPACK-style image lists.
 
 Copyright
 
@@ -242,4 +300,10 @@ History
 
  18-MAY-1999 (MBT):
     Original version.
+
+ 2-NOV-1999 (MBT):
+    Added SHOW mode.
+
+ 13-NOV-1999 (MBT):
+    Added MathMaps.
 .endhelp

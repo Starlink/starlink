@@ -1,6 +1,6 @@
 .help astexp Starlink ccdpack
 .nf
-Exports AST FrameSet information from NDFs into an external file.
+Exports coordinate system information from images to an AST file
 
 Usage:
 
@@ -8,42 +8,42 @@ Usage:
 
 Description:
 
-   This task exports coordinate system information from a set of NDFs,
-   writing it to an AST file.  For each NDF a frameset is written
+   This task exports coordinate system information from a set of images,
+   writing it to an AST file.  For each image a frameset is written
    containing information about how to map between a selected Base
-   frame and the NDF's Current frame.  Each frameset is identified
-   by a key which is derived from the NDF itself, and matches keys
-   which can be derived from other NDFs to which similar framesets
+   frame and the image's Current frame.  Each frameset is identified
+   by a key which is derived from the image itself, and matches keys
+   which can be derived from other images to which similar framesets
    ought to apply.  The key should be generated in the same way when
    the AST file is used for importing the mapping information by
    ASTIMP.  Currently these keys can be generated according to a
-   FITS header card or the order in which the NDFs are presented.
+   FITS header card or the order in which the images are presented.
    Additional information may be written describing what use to
-   make of FITS headers in the NDFs.
+   make of FITS headers in the images.
 
    Used together, the framesets written out to an AST file can thus
    contain information about the positioning of images in a set of
-   related NDFs.
+   related images.
 
-   AST files written out by this application can be applied to
-   other NDFs of similar origin using the ASTIMP application, so
+   AST files written out by this program can be applied to
+   other images of similar origin using the ASTIMP program, so
    that registration information present in the WCS components of
-   one set of NDFs (put there for instance by the REGISTER or WCSEDIT
-   applications) can be transferred using ASTIMP and ASTEXP to
+   one set of images (put there for instance by the REGISTER or
+   WCSEDIT programs) can be transferred using ASTIMP and ASTEXP to
    another similar set.  This "similar set" will typically be one
    from chips in the same mosaic camera instrument.
 
-   A 2-frame frameset is output for each NDF.  The Base frame is one
+   A 2-frame frameset is output for each image.  The Base frame is one
    selected by the BASEFRAME parameter, and is identical in the
-   exported frameset to the one in the original NDF.  The Current frame
+   exported frameset to the one in the original image.  The Current frame
    in the exported frameset is the same as the Current frame in the
-   original NDF, but may be given a different Domain name by the
+   original image, but may be given a different Domain name by the
    OUTDOMAIN parameter.
 
    Under normal circumstances, the Current frames of all the input
-   NDFs should share the same Domain name, and so should the frames
+   images should share the same Domain name, and so should the frames
    identified by the BASEFRAME parameter.   A warning will be issued
-   if this is not the case.  Warnings will also be issued if the NDF
+   if this is not the case.  Warnings will also be issued if the image
    identifiers are not all unique.
 
 Parameters
@@ -70,14 +70,12 @@ BASEEPOCH = _DOUBLE (Read)
 BASEFRAME
 
 BASEFRAME = LITERAL (Read)
-   This parameter specifies the WCS frame from the NDFs
+   This parameter specifies the WCS frame from the images
    relative to which the Current frames will be defined in the
    output AST file.  To be useful, this must specify a frame
-   which occurs in all the NDFs in the IN list, and can be
-   expected to occur in any NDF to which the AST file will
-   later be applied using ASTIMP.  AXIS is a good choice since
-   this may be applicable to frames which have been modified,
-   for instance by an application like KAPPA's COMPAVE.
+   which occurs in all the images in the IN list, and can be
+   expected to occur in any image to which the AST file will
+   later be applied using ASTIMP.
 
    The value of the parameter can be one of the following:
 
@@ -93,7 +91,7 @@ BASEFRAME = LITERAL (Read)
    Unlike the Current frame, the frame selected using this
    parameter is copied to the AST file unmodified; in particular
    it retains the same Domain name.
-   [AXIS]
+   [PIXEL]
 
 FITSID
 
@@ -110,8 +108,9 @@ FITSID = LITERAL (Read)
 FITSROT
 
 FITSROT = LITERAL (Read)
-   This parameter gives the name of a FITS header keyword whose
-   value will be used to rotate the frames when they are imported.
+   If this parameter is not null, it gives the name of a FITS
+   header keyword whose value gives a number of degrees to
+   rotate the coordinate system by when it is imported.
    If any lower case characters are given, they are converted
    to upper case.  This may be a compound name to handle
    hierarchical keywords, in which case it has the form
@@ -131,17 +130,17 @@ IDTYPE = LITERAL (Read)
 
       -  INDEX   -- ID is given by an integer as taken from the
                     INDICES parameter.  This normally gives the
-                    frameset generated from the N'th NDF in the
+                    frameset generated from the N'th image in the
                     IN list an ID with index N.
    [INDEX]
 
 IN
 
 IN = LITERAL (Read)
-   A list of NDFs from which framesets are to be extracted.
+   A list of images from which framesets are to be extracted.
    The Current frame of each should normally be the same, and
-   should be a frame in which the different NDFs are correctly
-   registered.  The NDF names may be specified using wildcards,
+   should be a frame in which the different images are correctly
+   registered.  The image names may be specified using wildcards,
    or may be specified using an indirection file (the indirection
    character is "^").
 
@@ -149,11 +148,11 @@ INDICES
 
 INDICES( * ) = _INTEGER (Read)
    If IDTYPE is set to INDEX, then this parameter is a list of
-   integers with as many elements as there are NDFs accessed by
+   integers with as many elements as there are images accessed by
    the IN parameter.  It gives the sequence of indices N to be
    used for generating the ID values.   If set null (!) the
-   NDFs will be considered in the order 1,2,3,... which will
-   normally be appropriate unless the NDFs are being presented
+   images will be considered in the order 1,2,3,... which will
+   normally be appropriate unless the images are being presented
    in an order different from that in which they are likely to
    be presented to ASTIMP.
    [!]
@@ -201,13 +200,14 @@ OUTDOMAIN = LITERAL (Read)
    to choose a value which is not likely to exist previously
    in the WCS components of the NDFs to which ASTFILE will be
    applied.  A suitable value might be the name of the
-   instrument from which the NDFs are obtained.
+   instrument from which the images are obtained.
 
-   Note that the frames which are written to the AST file are the
-   Current frames of the NDFs supplied; this parameter only gives
-   the name that the frames will have in the AST file, and
-   consequently the name by which they will be known when the
-   WCS information is imported into other NDFs using ASTIMP.
+   Note that the frames which are written to the AST file are
+   always the Current frames of the images supplied; this
+   parameter only gives the name that the frames will have in
+   the AST file, and consequently the name by which they will be
+   known when the WCS information is imported into other images
+   using ASTIMP.
 
    The name is converted to upper case, and whitespace is removed.
    [CCD_EXPORT]
@@ -217,37 +217,38 @@ Examples
 astexp reg_data* camera.ast idtype=fitsid fitsid=CHIPNUM
        outdomain=camera
    This will save the information about the relative positioning
-   of the NDFs 'reg_data*' to the file 'camera.ast', calling the
+   of the images 'reg_data*' to the file 'camera.ast', calling the
    alignment domain 'CAMERA'.  The file 'camera.ast' can later be
    used by the ASTIMP application to add the same coordinate
-   information to a different set of NDFs from the same instrument.
-   Before running this, the NDFs 'reg_data*' should be correctly
+   information to a different set of images from the same instrument.
+   Before running this, the images 'reg_data*' should be correctly
    aligned in their Current domain.  CHIPNUM must be the name
    of a FITS header keyword present in the FITS extension of each
-   NDF whose value distinguishes the CCDs from each other
+   image whose value distinguishes the CCDs from each other
    (presumably present in the unreduced data).  The mappings
-   between the frame in the 'AXIS' domain of the input NDFs and
-   their Current frames are recorded.
+   between the pixel coordinates and Current coordinates of the
+   input images are recorded.
 
-astexp "im1,im2,im3" astfile=camera.ast baseframe=PIXEL
+astexp "im1,im2,im3" astfile=camera.ast baseframe=axis
        title="Focal plane alignment" accept
    In this case the OUTDOMAIN parameter takes its default value
-   of 'CCD_EXPORT', but mappings are between the Current domains
-   of the input NDFs and their 'PIXEL' domains.  This would be
-   appropriate if these NDFs, or NDFs to which camera.ast will
-   be applied in future, might have no valid 'AXIS' domain frames
-   in their WCS components.  No suitable FITS header is available
-   to distinguish the different types of NDF, so the IDTYPE
-   parameter is allowed to assume its default value of INDEX.
-   When camera.ast is used for importing framset information,
-   the NDFs from the three different chips must be listed in the
-   same order as when this command was invoked.  The title of the
-   output Current frame will be as given.
+   of 'CCD_EXPORT', but mappings are between the Current
+   coordinates of the input images and their 'AXIS' coordinates.
+   This could be a good idea if the images had been shrunk using
+   KAPPA's COMPAVE or something similar, which modifies the
+   PIXEL coordinates but leaves the AXIS coordinates unchanged.
+   No suitable FITS header is available to distinguish the
+   different types of image, so the IDTYPE parameter is allowed to
+   assume its default value of INDEX.  When camera.ast is used
+   for importing frameset information, the images from the three
+   different chips must be listed in the same order as when this
+   command was invoked.  The title of the output Current frame
+   will be as given.
 
-astexp r10595[2,3,4,5] wfc.ast outdomain=WFC
+astexp "r10595[2345]" wfc.ast outdomain=wfc
        idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA
    This exports the alignment information from the four named
-   NDFs to a file wfc.ast.  The CHIPNAME FITS header identifies
+   images to a file wfc.ast.  The CHIPNAME FITS header identifies
    the source CCD for each, and the ROTSKYPA FITS header gives
    a number of degrees to rotate each frame additional to the
    relative alignment information.
@@ -291,17 +292,17 @@ AST file format:
       frame and a Current frame) and a mapping between them.
       The domains of all the Base frames should normally be the
       same, and likewise for all the Current frames.  For the
-      NDFs to which the file will be applied by ASTIMP, their
+      images to which the file will be applied by ASTIMP, their
       WCS components should contain frames in the same domain
       as the AST file's Base frame.
 
-      The ID of each frameset is used to determine, for each NDF,
+      The ID of each frameset is used to determine, for each image,
       which of the framesets in the file should be applied to it.
       This ID is a string which can assume one of the following
       forms:
 
       -  "FITSID KEY VALUE"
-            This will match an NDF if the first FITS header card
+            This will match an image if the first FITS header card
             with the keyword KEY has the value VALUE.  If the
             value is of type CHARACTER it must be in single
             quotes. KEY may be compound (of the form
@@ -311,7 +312,7 @@ AST file format:
       -  "INDEX N"
             This associates a frameset with an integer N.
             Usually N will take the values 1,2,3,... for the
-            framesets in the file.  Typically the N'th NDF in a
+            framesets in the file.  Typically the N'th image in a
             list will match the one with an ID of "INDEX N".
 
    Modifiers:
@@ -326,13 +327,13 @@ AST file format:
       rotation is carried out after the mapping defined by
       the frameset itself.
 
-      Global modifiers affect all NDFs processed with the AST
-      file.  Frameset modifiers affect only those NDFs which
+      Global modifiers affect all images processed with the AST
+      file.  Frameset modifiers affect only those images which
       correspond to their frameset.
 
    Rigorous error checking of the AST file is not performed, so
    that unhelpful modifications to the WCS components of the
-   target NDFs may occur if it is not in accordance with these
+   target images may occur if it is not in accordance with these
    requirements.
 
 Behaviour_of_parameters

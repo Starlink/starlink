@@ -1,6 +1,6 @@
 .help wcsreg Starlink ccdpack
 .nf
-Aligns NDFs using multiple frames from their WCS components.
+Aligns images using multiple attached coordinate systems
 
 Usage:
 
@@ -8,45 +8,47 @@ Usage:
 
 Description:
 
-   This application takes a set of NDFs which have World Coordinate
+   This application takes a set of images which have World Coordinate
    System (WCS) components, and tries to align them all according
-   to a given list of frame domains.  If successful, it adds a
-   new frame to the WCS component of each within which they are
-   all aligned.  The TRANLIST or TRANNDF applications can then be
-   used on the resulting NDFs.
+   to a given list of coordinate system domains (labels).  If
+   successful, it adds a new coordinate frame to the WCS component
+   of each within which they are all aligned.  The TRANLIST or
+   TRANNDF applications can then be used on the resulting images.
 
    This can be of use when different kinds of alignment information
-   are available between different members of a set of NDFs.  By
-   supplying an ordered list of domains within which to align,
-   the best alignment available can be made between different
-   members of the set, falling back on second or third choices
-   of alignment types where first choices are not available.
+   are available between different members of a set of images.  By
+   supplying an ordered list of coordinate systems within which to
+   align, the best alignment available can be made between
+   different  members of the set, falling back on second or third
+   choices of alignment types where first choices are not
+   available.
 
-   The application operates on a set of NDFs, IN.  A list of
+   The application operates on a set of images, IN.  A list of
    domains DOMAINS within which to align, in order of preference,
-   is specified, and a reference NDF is denoted by REFPOS.  On
-   successful completion, a new frame (which becomes Current), with
-   a domain given by OUTDOMAIN (default CCD_WCSREG) is added to
-   each of the NDFs in the input set.  Any previously existing
-   frames with this domain will be removed.
+   is specified, and a reference image is denoted by REFPOS.  On
+   successful completion, a new coordinate frame (which becomes
+   Current), with a domain given by OUTDOMAIN (default CCD_WCSREG)
+   is added to each of the images in the input set.  Any previously
+   existing frames with this domain will be removed.
 
-   For the reference NDF, there is a unit mapping between the new
-   frame and its initial Current frame.  For each other NDF, the
-   program attempts to find a mapping from the reference NDF to it.
-   If it and the reference NDF do not share frames in any of the
-   domains given by the DOMAINS parameter, it will try to use the
-   WCS components of intermediate NDFs to find a path between them;
-   this path is a subgraph of a graph in which the nodes are the
-   NDFs and an edge exists between two nodes if the NDFs share a
-   domain in the given list.  The shortest available path which
-   connects a pair is chosen, and if there is more than one which
-   meets this criterion, one which uses domains nearest the head of
-   the list is preferred.
+   The new coordinate system is a copy of the pixel coordinate
+   system of the reference image, so for the reference image there is
+   a unit mapping between its pixel and new Current coordinates.
+   For each other image, the program attempts to find a mapping from
+   the reference image to it.  If it and the reference image do not
+   share frames in any of the domains given by the DOMAINS
+   parameter, it will try to use the WCS components of intermediate
+   images to find a path between them; this path is a subgraph of a
+   graph in which the nodes are the images and an edge exists between
+   two nodes if the images share a domain in the given list.  The
+   shortest available path which connects a pair is chosen, and if
+   there is more than one which meets this criterion, one which
+   uses domains near the head of the list is preferred.
 
    If the graph is not fully connected, a list of the existing
    subgraphs is output, and the program will normally terminate,
    however it can be made to continue with registration of the
-   connected NDFs by setting the OVERRIDE parameter.
+   connected images by setting the OVERRIDE parameter.
 
 Parameters
 
@@ -57,23 +59,23 @@ DOMAINS
 DOMAINS( * ) = LITERAL (Read)
    This parameter should be a list of frame domains, in order
    of preference for achieving alignment.  Alignment paths
-   between NDFs are selected by shortness of path, but in case
+   between images are selected by shortness of path, but in case
    of a tie, those using domains nearest the start of this list
    are used by preference.
 
 IN
 
 IN = LITERAL (Read)
-   A list of the names of the NDFs which are to be aligned.  The
+   A list of the names of the images which are to be aligned.  The
    names should be separated by commas and may include wildcards.
    They may alternatively be specified using an indirection file
    (the indirection character is "^").
 
-   If the application is successful, a new frame with a domain
-   determined by the OUTDOMAIN parameter will be added to each of
-   the IN files containing the alignment information.  This frame 
-   will be made the new Current frame.
-
+   If the program is successful, a new coordinate system with a
+   domain determined by the OUTDOMAIN parameter will be added to
+   the WCS component of each of the IN files containing the
+   alignment information.  These will become the new Current
+   coordinates.
 
 LOGFILE
 
@@ -114,7 +116,7 @@ OUTDOMAIN
 
 OUTDOMAIN = LITERAL (Read)
    This gives the name of the domain for the new frame which is
-   added to the WCS components of the NDFs on successful
+   added to the WCS components of the images on successful
    completion.  If any frames in the same domain previously exist
    in the WCS component, they are removed.  The name is converted
    to upper case, and whitespace is removed.
@@ -123,12 +125,12 @@ OUTDOMAIN = LITERAL (Read)
 OVERRIDE
 
 OVERRIDE = _LOGICAL (Read)
-   If not all the NDFs can be aligned using the domains given in
-   DOMAINS then the application will report on which sets of NDFs
+   If not all the images can be aligned using the domains given in
+   DOMAINS then the application will report on which sets of images
    form connectable subsets of the IN list.  In this case, if this
    parameter is set FALSE, then the application will exit with an
    error message.  If it is set TRUE however, it will continue and
-   insert new frames in those NDFs which can be reached from the
+   insert new frames in those images which can be reached from the
    one indicated by REFPOS, making no change to the others, except
    to remove any frames in the domain OUTDOMAIN which already exist.
    [FALSE]
@@ -137,44 +139,55 @@ REFPOS
 
 REFPOS = _INTEGER (Read)
    The position within the IN list which corresponds to the
-   reference NDF.  The registration frame is a copy of (and 
-   unitmapped to) the Current frame of the reference NDF,
-   and for each other NDF the program tries to find a path from
-   it to the reference NDF going from one NDF to another only
+   reference image.  The registration frame is a copy of (and
+   unitmapped to) the pixel frame of the reference image,
+   and for each other image the program tries to find a path from
+   it to the reference image going from one image to another only
    when they both have frames in the same one of the entries in
-   the DOMAINS list. 
+   the DOMAINS list.
    [1]
 
 Examples
 
 wcsreg * [ccd_reg,sky]
-   In this example all the NDFs in the current directory are
-   being aligned.  All contain a frame in their WCS components
-   in the SKY domain with approximate information about the
-   pointing, added by the telescope system at observation time.
-   Some of the NDFs however overlap, and have been run through
-   the REGISTER program which has added a frame in the CCD_REG
-   domain containing more accurate alignment information derived
-   from matching objects between different images.  Where two
-   of the images have frames in the CCD_REG domain, this will
-   be used to align them, but where they do not, the program
-   will fall back on the less accurate SKY domain for alignment.
-   The new frame added will be given the default domain name
+   In this example all the images in the current directory are
+   being aligned.  All have an attached SKY coordinate sysetm
+   with approximate information about the pointing, added by the
+   telescope system at observation time.  Some of the images
+   however overlap, and have been run through the REGISTER
+   program which has added a CCD_REG coordinate system
+   containing more accurate alignment information derived from
+   matching objects between different images.  Where two of the
+   images have CCD_REG coordinates, these will be used to align
+   them, but where they do not, the program will fall back on
+   the less accurate SKY coordinates for alignment.  The new
+   coordinate frame added will be given the default name
    CCD_WCSREG.
 
-   After this process, the NDFs can be presented to TRANNDF for
+   After this process, the images can be presented to TRANNDF for
    resampling prior to making a mosaic.
 
 wcsreg "obs1_*,obs2_*" outdomain=final
        domains=[ccd_reg,inst_obs1,inst_obs2]
-   NDFs with names starting 'obs1_' and 'obs2_' are aligned.
-   Where they share the CCD_REG domain this will be used for
-   alignment, but otherwise the domains INST_OBS1 and INST_OBS2
-   will be used.  These domains perhaps contain information about
-   the relative alignment of CCDs on the focal plane of the
-   instrument, and may have been added to the WCS component
-   using the ASTIMP application.  The name FINAL is used for the
-   new domain added to the WCS component.
+   images with names starting 'obs1_' and 'obs2_' are aligned.
+   Where they share CCD_REG coordinates this will be used for
+   alignment, but otherwise the INST_OBS1 and INST_OBS2
+   coordinate systems will be used.  These perhaps contain
+   information about the relative alignment of CCDs on the focal
+   plane of the instrument, and may have been added to the WCS
+   component using the ASTIMP application.  The name FINAL is
+   used for the new domain added to the WCS component.
+
+wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 [sky]
+   Here wcsreg is being used with a somewhat different intent.
+   The images named are already fully aligned in  SKY
+   coordinates, but executing this command has the effect of
+   aligning them in a new coordinate system which is a copy of
+   the pixel coordinate system of 'skyfr2'.  Since this has
+   units which are the size of pixels, the resulting image files
+   are suitable for resampling using TRANNDF.  This would not
+   have been the case for the files initially, since the SKY
+   coordinates have units of radians.
 
 Behaviour_of_parameters
 

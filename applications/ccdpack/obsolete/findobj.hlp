@@ -45,15 +45,16 @@ BINFRAC = _DOUBLE (Read)
    accuracy.
    [2.5]
 
-IN
-
+COUNTS
 
 COUNTS = _INTEGER (Write)
-
    On exit this parameter contains a list of the number of objects
    detected in each input image. This may be useful in scripts
    where the values can be accessed using the KAPPA (SUN/95) PARGET
    command.
+
+IN
+
 IN = LITERAL (Read)
    A list of image names which contain the data components to be
    scanned for image features.  The image names should be separated
@@ -131,6 +132,7 @@ OUTLIST = LITERAL (Read)
    element (of the input image names). The simplest modification
    element is the asterisk "*" which means call each of the
    output lists the same name as the corresponding input images
+   (but without the ".sdf" extension).
    So,
       IN > *
       OUTLIST > *
@@ -156,9 +158,10 @@ OUTLIST = LITERAL (Read)
    pixels in the group.
    [*.DAT]
 
-OVERRIDE = _LOGICAL (Read)
+OVERRIDE
 
-   If TRUE then it is not a fatal error to detect no objects on an 
+OVERRIDE = _LOGICAL (Read)
+   If TRUE then it is not a fatal error to detect no objects on an
    image. In this case the output list of positions will not be
    written and the value in the COUNTS parameter will be set to 0.
    [FALSE]
@@ -235,16 +238,15 @@ Notes
 
 - Threshold estimation.
 
-  FINDOBJ is optimised to determine a reliable detection
-  threshold and is not concerned with the accurate
-  determination of the background value on a frame (as it
-  performs no photometric measurements). For this reason the
-  histogram which it uses to determine the background value is
-  made in such a way that it is usually very well sampled
-  (probably oversampled, for most other purposes). FINDOBJ
-  should not be used in a manner for which it is not suited
-  without understanding how if differs from other more
-  specialized routines.
+  FINDOBJ is optimised to determine a reliable detection threshold
+  and is not concerned with the accurate determination of the
+  background value on a frame (as it performs no photometric
+  measurements). For this reason the histogram which it uses to
+  determine the background value is made in such a way that it is
+  usually very well sampled (probably oversampled, for most other
+  purposes). FINDOBJ should not be used in a manner for which it
+  is not suited without understanding how if differs from other
+  more specialized routines.
 
 - Histogram formation and gaussian fitting.
 
@@ -257,13 +259,13 @@ Notes
   fixed peak value and position (the mode of the histogram) and
   iterates rejecting bins whose counts fall below 20 percent of
   the peak value, stopping when either 3 iterations have been
-  performed or the standard deviation does not change by more
-  than one bin width in data values.
+  performed or the standard deviation does not change by more than
+  one bin width in data values.
 
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input images are set to the names of the
+  (.MORE.CCDPACK) of the input NDFs are set to the names of the
   appropriate output lists. These items will be used by other
   CCDPACK position list processing routines to automatically
   access the lists.
@@ -285,6 +287,9 @@ Notes
   file using the characters # and !. Columns may be separated by
   the use of commas or spaces.
 
+  In all cases the coordinates in position lists are pixel
+  coordinates.
+
 Behaviour_of_parameters
 
    Most parameters retain their current value as default. The
@@ -294,14 +299,15 @@ Behaviour_of_parameters
    The exceptions to this rule are:
 
       - THRESH   -- dynamic value
+
       - OVERRIDE -- always FALSE
 
    Retaining parameter values has the advantage of allowing you to
-   define the default behaviour of the application but does mean
-   that additional care needs to be taken when re-using the
-   application after a break of sometime. The intrinsic default
-   behaviour of the application may be restored by using the RESET
-   keyword on the command line.
+   define the default behaviour of the application but does mean that
+   additional care needs to be taken when re-using the application
+   after a break of sometime. The intrinsic default behaviour of the
+   application may be restored by using the RESET keyword on the
+   command line.
 
    Certain parameters (LOGTO and LOGFILE) have global values. These
    global values will always take precedence, except when an
@@ -322,6 +328,22 @@ History
 
  6-OCT-1995 (PDRAPER):
     Updated for CCDPACK 2.0.
+
+ 25-APR-1996 (PDRAPER):
+    Added trap and error message for situation when no pixels
+    are above the threshold.
+
+ 3-MAR-1997 (PDRAPER):
+    Removed top-level locator control (foreign data access upgrades).
+
+ 12-NOV-1998 (PDRAPER):
+    Changed to write the output parameter COUNTS and to add the
+    ability to continue after not finding objects on a frame (added
+    for ORAC-DR)
+
+ 15-OCT-1999 (PDRAPER):
+    Fixed a bug in above that was actually reporting number of
+    pixels above the threshold, not number of objects.
 
 Implementation_Status
 

@@ -10,12 +10,11 @@ Usage:
 Description:
 
    This routine is designed to determine which positions in many
-   unaligned and unlabeled lists match, subject to the condition
-   that the transformations between the lists are well modeled by
-   simple translations.  Although the representation of the positions
-   in the lists themselves is in pixel coordinates, the lists may
-   be related by translations in the Current frames of the WCS
-   components of the associated NDFs.
+   unaligned and unlabelled lists match, subject to the condition
+   that the transformations between the lists are well modelled by
+   simple translations.  Although the position lists are written
+   in pixel coordinates, the objects can be related by translations
+   in the Current coordinate system of the associated images.
 
    The results from this routine are labelled position lists (one
    for each input list) which may be used to complete image
@@ -42,11 +41,10 @@ COMPLETE = _DOUBLE (Read)
 ERROR
 
 ERROR = _DOUBLE (Read)
-   The error in the X and Y positions. This value is used to
-   determine which positions match within an error box (SLOW) or
-   as a bin size (FAST). An inaccurate value may result in
-   excessive false or null matches.  This value is in the Current
-   coordinate frame if USEWCS is true.
+   The error, in pixels, in the X and Y positions. This value is
+   used to determine which positions match within an error box
+   (SLOW) or as a bin size (FAST). An inaccurate value may result
+   in excessive false or null matches.
    [1.0]
 
 FAILSAFE
@@ -68,10 +66,10 @@ INLIST
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated NDFs. If NDFNAMES is TRUE the names of the
+   of the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the NDFs themselves should be given in response (and may
+   images (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the images themselves should be given in response (and may
    include wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -120,17 +118,16 @@ MAXDISP
 
 MAXDISP = _DOUBLE (Read)
    This parameter gives the maximum acceptable displacement
-   between the original alignment of the NDFs and the
+   (in pixels) between the original alignment of the images and the
    alignment in which the objects are matched.  If frames have
    to be displaced more than this value to obtain a match, the
    match is rejected.  This will be of use when USEWCS is set
    and the alignment defined by the WCS components of the
-   NDFs is fairly accurate.  It should be set to the maximum
+   images is fairly accurate.  It should be set to the maximum
    expected inaccuracy in that alignment.  If null, arbitrarily
    large displacements are allowed, although note that a
    similar restriction is effectively imposed by setting the
-   RESTRICT parameter.  The value of this parameter is in the
-   units of the Current frame if USEWCS is true.
+   RESTRICT parameter.
    [!]
 
 MINMATCH
@@ -150,10 +147,8 @@ MINSEP
 MINSEP = _DOUBLE (Read)
    Positions which are very close may cause false matches by being
    within the error box of other positions. The value of this
-   parameter controls how close objects may be before they are
-   both rejected (this occurs before pattern-matching).
-   This value is in pixel coordinates, regardless of the value of
-   USEWCS.
+   parameter controls how close (in pixels) objects may be before
+   they are both rejected (this occurs before pattern-matching).
    [Dynamic -- 5.0*ERROR]
 
 NAMELIST
@@ -165,7 +160,7 @@ NAMELIST = LITERAL (Read)
    This file may be used in an indirection expression to input
    all the position lists output from this routine into another
    routine (say REGISTER), if the associating position lists with
-   NDFs option is not being used.
+   images option is not being used.
    [FINDOFF.LIS]
 
 NDFNAMES
@@ -189,13 +184,13 @@ OUTLIST = FILENAME (Write)
    A list of names specifying the result files. These contain
    labelled positions which can be used in registration.
    The names of the lists may use modifications of the
-   input names (NDF names if available otherwise the names of the
+   input names (image names if available otherwise the names of the
    position lists). So if you want to call the output lists
-   the same name as the input NDFs except to add a type use.
+   the same name as the input images except to add a type use.
 
       OUTLIST > *.find
 
-   If no NDF names are given (NDFNAMES is FALSE) then if you want
+   If no image names are given (NDFNAMES is FALSE) then if you want
    to change the extension of the files (from ".find" to ".off"
    in this case) use
 
@@ -213,12 +208,12 @@ OVERRIDE = LOGICAL (Read)
    incomplete solution. Such solutions will result when only a
    subset of the input position lists have been matched.
 
-   In this case, if the associating position lists with NDFs option
-   has been chosen, then any NDFs for which matching was not
+   In this case, if the associating position lists with images option
+   has been chosen, then any images for which matching was not
    achieved will have their associated position lists removed
    from their .MORE.CCDPACK extensions.  Thus after running
    FINDOFF with OVERRIDE set to TRUE, any position list associated
-   with an NDF is guaranteed to be one which has been matched, and
+   with an image is guaranteed to be one which has been matched, and
    not just one left over from the previously associated unmatched
    list.
 
@@ -232,20 +227,19 @@ OVERRIDE = LOGICAL (Read)
 RESTRICT
 
 RESTRICT = LOGICAL (Read)
-   This parameter determines whether the Current coordinate frame
+   This parameter determines whether the Current coordinate system
    is used to restrict the choice of objects to match with each
    other.  If set TRUE, then the only objects which are
    considered for matching are those which would appear in
-   the overlap of two frames given that their PIXEL-domain to
-   Current frame mapping is exact, and that these frames refer
-   to the same coordinate space.  If it is set FALSE, then
-   no such restriction is made.
+   the overlap of two frames given that they are correctly
+   aligned in their Current coordinate system.  If it is set
+   FALSE, then all objects in both frames are considered for
+   matching.
 
-   This parameter should therefore be set TRUE if the translational
-   part of the information about the coordinate frames in the
-   WCS components is fairly accurate (especially in the case that
-   there are many objects and a small overlap), and FALSE if it
-   is not.
+   This parameter should therefore be set TRUE if the frames
+   are quite well aligned in their Current coordinate systems
+   (especially in the case that there are many objects and a
+   small overlap), and FALSE if they are not.
 
    This parameter is ignored if USEWCS is FALSE.
    [FALSE]
@@ -266,16 +260,11 @@ USEWCS
 USEWCS = LOGICAL (Read)
    This parameter specifies whether the coordinates in the
    position lists should be transformed from Pixel coordinates
-   into the coordinates of the Current frame of the WCS
-   component of the associated NDF before use.  FINDOFF can only
-   match objects between frames which are related by a simple
-   translation (shift in X and Y), so if the pixel coordinates
-   of the NDFs are related by a more complicated transformation
-   it is necessary to encode this information in the WCS
-   components of the NDFs (or resample the images first).
-   If the Current frame of the WCS component is related to the
-   Pixel frame by a translation, the setting of this parameter
-   is usually unimportant (but see also the RESTRICT parameter).
+   into the Current coordinate system of the associated image
+   before use.
+   If the Current coordinates are related to pixel coordinates
+   by a translation, the setting of this parameter is usually
+   unimportant (but see also the RESTRICT parameter).
 
    This parameter is ignored if NDFNAMES is false.
    [TRUE]
@@ -283,11 +272,11 @@ USEWCS = LOGICAL (Read)
 Examples
 
 findoff inlist='*' error=1 outlist='*.off'
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are used.
-   The coordinates used for object matching are those in the
-   position lists transformed into the Current frames of the
-   WCS components of the NDFs.  The matched position lists are
+   The images are related by a simple offset (translation) in
+   their Current coordinate system, although not necessarily
+   their pixel coordinate system.  The matched position lists are
    named *.off.  The method used is to try the FAST algorithm,
    switching to SLOW if FAST fails. The completeness measure
    is used when forming the spanning tree.  Matches with
@@ -301,33 +290,31 @@ findoff usecom=false
    In this example the completeness factor is derived but not used
    to weight the edges of the spanning tree.
 
-findoff error=0.002 minsep=0.008
-   In this example very precise measurements (or small units)
-   are being used. The intrinsic error in the measurements is
-   around 0.002 and positions within a box 0.008 of each other are
-   rejected.
+findoff error=8 minsep=100
+   In this example very fuzzy measurements (or small pixels) are
+   being used.  The intrinsic error in the measurements is around
+   8 pixels and positions within a box 100 pixels of each other
+   are rejected.
 
 findoff inlist='data*' outlist='*.off' restrict=true
-   This form would be used if the NDFs 'data*' have WCS components
-   which are already approximately correct.  The Current domain
-   of each should be set to the domain in which they are all
-   (approximately) registered.  Setting the RESTRICT parameter
-   then tells FINDOFF to consider only objects in the region which
-   the WCS components say ought to overlap between pairs of frames.
-   This can save a lot of time if there are many objects and a
-   small overlap, but will result in failure of the program if
-   the WCS components are not translationally registered
-   reasonably well.
+   This form would be used if the images 'data*' are already
+   approximately aligned in their Current coordinates. Setting the
+   RESTRICT parameter then tells FINDOFF to consider only objects
+   in the region which the WCS components say ought to overlap
+   between pairs of frames. This can save a lot of time if there
+   are many objects and a small overlap, but will result in
+   failure of the program if the images are not translationally
+   aligned reasonably well in the first place.
 
 findoff inlist='data*' outlist='*.off' restrict minmatch=2
         maxdisp=20 minsep=30
-   In this example the NDFs are sparsely populated, and a pair
+   In this example the images are sparsely populated, and a pair
    will be considered to match if as few as two matching objects
-   can be found.  The NDFs have been initially aligned in the
-   Current frames of their WCS components to an accuracy of 20
-   or better.  As an additional safeguard, no objects within
-   30 units (in coordinates of the Current frame) of each other
-   in the same NDF are used for matching.
+   can be found.  The images have been initially aligned in their
+   Current coordinate systems to an accuracy of 20 or better.  As
+   an additional safeguard, no objects within 30 units (in
+   coordinates of the Current frame) of each other in the same image
+   are used for matching.
 
 Notes
 
@@ -412,7 +399,7 @@ Notes_on_Algorithms
    SNGL algorithm may be useful if there really is only one object,
    correctly identified, in all the frames.  If this is not the
    case, it should only be used when USEWCS is true and MAXDISP is
-   set to a low value, indicating that the alignment of the NDFs in
+   set to a low value, indicating that the alignment of the images in
    the Current frames of their WCS components is already fairly
    accurate.
 
@@ -503,4 +490,12 @@ History
  20-MAY-1999 (MBT):
     Major changes to fix major misconceptions about the best way
     for it to work.
+
+ 28-OCT-1999 (MBT):
+    Modified so that ERROR and MAXDISP are in units of pixels (not
+    current coordinates).
+
+ 1-NOV-1999 (MBT):
+    Modified so that output is in units appropriate to current
+    coordinate frame.
 .endhelp

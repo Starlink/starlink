@@ -12,8 +12,8 @@ Description:
    Transformations are defined either by a set of 6 coefficients
    for the linear transform, by an algebraic expression given by
    you, by using a forward or inverse mapping from a TRANSFORM
-   structure, or by a mapping between two frames stored in a
-   WCS component.
+   structure, or by a mapping between two coordinate sytems
+   in the WCS component of the image.
 
 Parameters
 
@@ -88,9 +88,9 @@ FRAMEOUT
 
 FRAMEOUT = LITERAL (Read)
    If TRTYPE="WCS" then the transformation is a mapping from the
-   frame specified by the FRAMEIN parameter to that specified
-   by this parameter.  The value of this parameter can be one of
-   the following:
+   coordinate frame specified by the FRAMEIN parameter to that
+   specified by this parameter.  The value of this parameter can
+   be one of the following:
 
    - A domain name such as SKY, AXIS, PIXEL, etc.
 
@@ -109,19 +109,19 @@ INEXT = _LOGICAL (Read)
    If NDFNAMES is TRUE and the transformation is to be specified
    using a WCS component (TRTYPE="WCS"), then this parameter
    controls whether or not the WCS component should be located
-   in each of the NDFs.  If set FALSE, the WCSFILE parameter will
+   in each of the images.  If set FALSE, the WCSFILE parameter will
    be used.
 
    If NDFNAMES is TRUE and the transformation is to be specified
    using a TRANSFORM structure (TRTYPE="STRUCT") then this
    parameter controls whether or not the structure should be
-   located in the CCDPACK extension of each of the NDFs.  If
+   located in the CCDPACK extension of each of the images.  If
    set FALSE, the TRANSFORM parameter will be used.
 
    If this option is chosen then the WCS component or transform
-   structure in EACH NDF will be applied to the associated
+   structure in EACH image will be applied to the associated
    position list. So for instance if you have a set of registered
-   NDFs and positions these may be transformed all at once to and
+   images and positions these may be transformed all at once to and
    from the reference coordinate system.
    [TRUE]
 
@@ -130,10 +130,10 @@ INLIST
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists which
    contain the positions and, if NDFNAMES is TRUE, the names of
-   the associated NDFs. If NDFNAMES is TRUE the names of the
+   the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of
-   the NDFs (in the CCDPACK extension item CURRENT_LIST) and the
-   names of the NDFs themselves should be given in response (and
+   the images (in the CCDPACK extension item CURRENT_LIST) and the
+   names of the images themselves should be given in response (and
    may include wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -206,14 +206,14 @@ OUTLIST
 
 OUTLIST = FILENAME (Write)
    A list of names specifying the result files. The names of the
-   lists may use modifications of the input names (NDF names if
+   lists may use modifications of the input names (image names if
    available otherwise the names of the position lists). So if
    you want to call the output lists the same name as the input
-   NDFs except to add a type use.
+   images except to add a type use.
 
       OUTLIST > *.FIND
 
-   If no NDF names are given (NDFNAMES is FALSE) then if you want
+   If no image names are given (NDFNAMES is FALSE) then if you want
    to change the extension of the files (from ".CENT" to ".TRAN"
    in this case) use
 
@@ -275,18 +275,18 @@ TRTYPE = LITERAL (Read)
    (TRANSFORM).
 
    WCS means that the transformation will be taken from the WCS
-   component of an NDF.  In this case the name of the NDF
+   component of an image.  In this case the name of the image
    containing the WCS component should be supplied (this will be
-   picked up automatically through the association of an NDF
+   picked up automatically through the association of an image
    and a position list if NDFNAMES and INEXT are both TRUE).
-   The transformation will be that between the frames defined by
-   the FRAMEIN and FRAMEOUT parameters.
+   The transformation will be that between the coordinate systems
+   defined by the FRAMEIN and FRAMEOUT parameters.
 
    STRUCT signifies that a transform structure (probably created
    by REGISTER or CCDEDIT) is to be applied to the data. In this
    case the name of the object containing the structure should
    be supplied (this will be picked up automatically through the
-   association of an NDF and a position list if NDFNAMES and
+   association of an image and a position list if NDFNAMES and
    INEXT are both TRUE) and whether to use the forward or inverse
    mappings (the FORWARD parameter).
    [COEFF]
@@ -317,8 +317,8 @@ WCSFILE
 
 WCSFILE = NDF (Read)
    If TRTYPE="WCS" and INEXT is false, then this parameter gives
-   the name of the NDF containing the WCS component which is to
-   be used for the transformation.
+   the name of the image containing the WCS component containing
+   coordinate systems to be used for the transformation.
 
 XFOR
 
@@ -351,26 +351,26 @@ YFOR = LITERAL (Read)
 Examples
 
 tranlist inlist='*' outlist='*.reg' trtype=wcs framein=pixel
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are opened.
-   The WCS component of each NDF is used to transform the
+   The WCS component of each image is used to transform the
    coordinates in the position lists from pixel coordinates to
-   coordinates in the Current coordinate frame.  The output
+   coordinates in the Current coordinate system.  The output
    lists are called ndf-name.reg and are associated with the
-   NDFs.
+   images.
 
 tranlist inlist='*' outlist='*.tran' trtype=struct forward=false
-   In this example transform structures in each of the NDFs in
+   In this example transform structures in each of the images in
    the current directory are used to transform their associated
    position lists.  The inverse mappings are used.
 
 tranlist inlist='*_reduced' outlist='*.off' trtype=coeff
          tr='[10,1,0,20,0,1]'
-   In this example the position lists associated with the NDFs
+   In this example the position lists associated with the images
    *_reduced are transformed using the linear fit coefficients
    [10,1,0,20,0,1] resulting in a shift of all the positions in
    these lists of +10 in X and +20 in Y. The output lists are
-   called ndf_name.off and are now associated with the NDFs.
+   called ndf_name.off and are now associated with the images.
 
 tranlist inlist='*_resam' outlist='*.rot' trtype=coeff
          tr='[0,0.707,-0.707,0,0.707,0.707]'
@@ -381,7 +381,7 @@ tranlist inlist='*_resam' outlist='*.rot' trtype=coeff
 tranlist inlist=here outlist=reflected.dat trtype=express
          xfor=-x yfor=-y
    In this example a transformation expression is used to reflect
-   the positions stored in the list associated with NDF here
+   the positions stored in the list associated with image here
    about the X and Y axes. A similar effect could be achieved
    with trtype=coeff and tr=[0,-1,0,0,0,-1].
 
@@ -393,7 +393,7 @@ tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
          py=Y-centre-value ps=scale_factor
    In this example a general transformation (which is of the type
    used when applying pin cushion distortions) is applied to the
-   position list associated with the NDF ndf_with_list. The
+   position list associated with the image ndf_with_list. The
    transformation is parameterised with an offset and scale
    (converts pixel coordinates to one projection radius units)
    applied to the input coordinates and a pincushion distortion
@@ -402,11 +402,11 @@ tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
 tranlist ndfnames=false inlist='"list1,list2,list3"'
          outlist='"outlist1,outlist2,outlist3"' namelist=newfiles
    In this example the input position lists are not associated
-   with NDFs (ndfnames=false) And have to be specified by name
+   with images (ndfnames=false) And have to be specified by name
    (no wildcards allowed). The output lists are also specified in
    this fashion, but, the same effect could have been achieved
    with outlist=out* as the input list names are now used as as
-   modifiers for the output list names (the NDF names are always
+   modifiers for the output list names (the image names are always
    used when they are available -- see previous examples). The
    names of the output lists are written to the file newfiles,
    this could be used to specify the names of these files to

@@ -99,22 +99,22 @@ CORRECT = LITERAL (Write)
 GENVAR
 
 GENVAR = _LOGICAL (Read)
-   If GENVAR is set to TRUE and all the input NDFs supplied
+   If GENVAR is set to TRUE and all the input images supplied
    contain statistical error (variance) information, then
    variance information will also be calculated for the output
-   mosaic NDF, provided that USEVAR is also TRUE.
+   mosaic image, provided that USEVAR is also TRUE.
 
-   Otherwise if GENVAR is TRUE and either USEVAR is FALSE or
-   some of the input NDFs do not contain error information, then
-   output variances will be generated using the natural
-   variations in the input data. Obviously this method should
-   only be used if there are many input datasets, which also
-   provide good coverage of the output area. If this option is
-   chosen any regions of the output image that have only one
-   input value will have their associated variances set bad.
+   Otherwise if GENVAR is TRUE and either USEVAR is FALSE or some
+   of the input images do not contain error information, then output
+   variances will be generated using the natural variations in the
+   input data. Obviously this method should only be used if there
+   are many input datasets, which also provide good coverage of
+   the output area. If this option is chosen any regions of the
+   output image that have only one input value will have their
+   associated variances set bad.
 
    The default for this parameter depends on the presence of error
-   information in the input NDFs. If all have error information
+   information in the input images. If all have error information
    then the default is TRUE, otherwise it is FALSE.
 
    [DYNAMIC]
@@ -234,7 +234,7 @@ METHOD = LITERAL (Read)
       -  CLIPMED   -- A sigma clipped median (like SIGMA except
                       that the median of the clipped values is used)
 
-      -  FASTMED    -- Unweighted median of the input data values
+      -  FASTMED   -- Unweighted median of input data values
    [MEDIAN]
 
 MIN
@@ -319,7 +319,7 @@ OPTOV = _INTEGER (Read)
 
 OUT
 
-OUT = image (Write)
+OUT = NDF (Write)
    Name of the image to contain the output mosaic. This is normally
    mandatory. However, if the "input" images are being modified (by
    setting the MODIFY parameter to TRUE), then it may optionally
@@ -349,7 +349,7 @@ PRESERVE = _LOGICAL (Read)
 
 REF
 
-REF = image (Read)
+REF = NDF (Read)
    If scale-factor and/or zero-point corrections are being
    applied (see the SCALE and ZERO parameters) then, by default,
    these are normalised so that the median corrections are unity
@@ -413,8 +413,9 @@ SIGMAS
 
 SIGMAS = _REAL (Read)
    Number of standard deviations at which to reject values if the
-   "mode", "sigma" or "clipmed" data combination methods are selected
-   (see the METHOD parameter). This value must be positive. [4.0]
+   "mode", "sigma" or "clipmed" data combination methods are
+   selected (see the METHOD parameter). This value must be
+   positive. [4.0]
 
 SKYSUP
 
@@ -511,6 +512,7 @@ USEVAR = _LOGICAL (Read)
    (based on the natural variations of the input images) and all
    your input images contain variances then you will need to set
    this parameter FALSE (see GENVAR).
+
    [TRUE]
 
 WEIGHTS
@@ -539,7 +541,7 @@ WRITESZ
 WRITESZ = _LOGICAL (Read)
    If set to TRUE then MAKEMOS will output a file containing the
    scale and zero-point corrections (see SCALE and ZERO parameters)
-   which can be read into the DRIZZLE A-task. IF SCALE and ZERO are
+   which can be read into the DRIZZLE program. IF SCALE and ZERO are
    both set to FALSE, no file will be generated
    [FALSE]
 
@@ -739,11 +741,13 @@ Copyright
    Copyright (C) 1992 Science & Engineering Research Council
    Copyright (C) 1998-1999 Central Laboratory of the Research Councils
 
-
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
+
 PDRAPER: Peter Draper (STARLINK)
+
+AALLAN: Alasdair Allan (Keele University, STARLINK)
 
 History
 
@@ -767,16 +771,43 @@ History
     Removed VMS references and changed examples to show C-shell
     usage.
 
+ 18-SEP-1996 (PDRAPER):
+    Removed all NAG calls.
+
+ 3-MAR-1997 (PDRAPER):
+    Removed top-level locator control (foreign data access upgrade).
+
+ 31-JAN-1998 (PDRAPER):
+    Added clipmed combination method.
+
+ 25-JUN-1998 (PDRAPER):
+    Stopped the propagation of quality from the first NDF to the
+    output. This was not the right thing to do when the NDFs are
+    padded to match bounds (regions of BAD quality are introduced).
+
+ 18-NOV-1998 (PDRAPER):
+    Added fastmed combination method.
+
+ 26-NOV-1998 (PDRAPER):
+    Now propagates NDF WCS components.
+
+ 15-JAN-1999 (PDRAPER):
+    Added changed to support estimation of output variances from
+    input data.
+
+ 13-SEP-1999 (AALLAN)
+    Added WRITESZ and CORRECT parameters and associated chaanges
+
 Implementation_Status
 
    - MAKEMOS supports "bad" pixel values and all non-complex data
      types, with arithmetic being performed using the appropriate
      floating point type. It can process images with any number of
-     dimensions. The DATA, TITLE and VARIANCE components of an NDF
+     dimensions. The DATA, TITLE and VARIANCE components of an image
      are directly supported, with the AXIS, HISTORY, LABEL
      and UNITS components and all extensions being propagated from
-     the first input NDF supplied (note that AXIS values, if
+     the first input image supplied (note that AXIS values, if
      present, will normally be extrapolated as a result of
      propagation to the output mosaic, which will typically have a
-     larger extent than any of the input NDFs).
+     larger extent than any of the input images).
 .endhelp
