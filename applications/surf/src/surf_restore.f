@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_RESTORE (STATUS)
+      SUBROUTINE SURF_RESTORE (STATUS)
 *+
 *  Name:
 *     RESTORE
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_RESTORE( STATUS )
+*     CALL SURF_RESTORE( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -27,6 +27,8 @@
 *     restore IN OUT
 
 *  ADAM Parameters:
+*     CHOP = INTEGER (Read)
+*        Chop throw in arcseconds.
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated SCUBA data.
 *     OUT = NDF (Write)
@@ -54,7 +56,8 @@
 *    Global constants:
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
-      INCLUDE 'REDS_SYS'                ! REDS constants
+      INCLUDE 'SURF_PAR'                ! SURF constants
+      INCLUDE 'MSG_PAR'                 ! for MSG__ constants
 
 *    Status:
       INTEGER STATUS
@@ -68,11 +71,11 @@
 *    Local variables:
       LOGICAL      ABORTED              ! .TRUE. if observation was
                                         ! aborted
+      BYTE             BADBIT           ! Bad bit mask
       CHARACTER*15 CHOP_COORDS          ! coordinate system of chop
       CHARACTER*15 CHOP_FUN             ! chop mode used in observation
       REAL         CHOP_THROW           ! chopper throw (arcsec)
       INTEGER      DIM (MAXDIM)         ! the dimensions of an array
-      INTEGER      EXPOSURE             ! exposure index in DO loop
       LOGICAL      EXTINCTION           ! .TRUE. if the EXTINCTION application
                                         ! has already been run on the 
                                         ! input file
@@ -80,7 +83,6 @@
                                         ! array of FITS keyword lines
       INTEGER      I                    ! DO loop variable
       INTEGER      INDF                 ! NDF identifier of input file
-      INTEGER      INTEGRATION          ! integration index in DO loop
       INTEGER      ITEMP                ! scratch integer
       INTEGER      IN_DATA_PTR          ! pointer to data array of input file
       INTEGER      IN_DEM_PNTR_PTR      ! pointer to input .SCUBA.DEM_PNTR
@@ -100,7 +102,6 @@
       INTEGER      LAST_EXP             ! exposure where abort occurred
       INTEGER      LAST_INT             ! integration where abort occurred
       INTEGER      LAST_MEAS            ! measurement where abort occurred
-      INTEGER      MEASUREMENT          ! measurement index in DO loop
       INTEGER      NDIM                 ! the number of dimensions in an array
       INTEGER      NREC                 ! number of history records in file
       INTEGER      N_BOL                ! number of bolometers measured 
@@ -126,11 +127,17 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
 *  start up the NDF system and read in the demodulated data file
 
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', INDF, STATUS)
+
+* Read in badbit mask
+      CALL NDF_BB(INDF, BADBIT, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -189,8 +196,9 @@
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a MAP observation '//
-     :  'of object ^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a MAP observation '//
+     :     'of object ^OBJECT', STATUS)
 
 *  check that the history of the input file is OK
 
@@ -246,6 +254,11 @@
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'CHOP_THR',
      :  CHOP_THROW, STATUS)
 
+*     Ask for the chop throw
+
+      CALL PAR_DEF0R('CHOP', CHOP_THROW, STATUS)
+      CALL PAR_GET0R('CHOP', CHOP_THROW, STATUS)
+
 *  find out if the observation was aborted
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
@@ -259,7 +272,7 @@
 *  map the various components of the data array and check the data dimensions 
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
-      CALL NDF_MAP (INDF, 'QUALITY', '_INTEGER', 'READ',
+      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
      :  IN_QUALITY_PTR, ITEMP, STATUS)
       CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
      :  ITEMP, STATUS)
@@ -295,9 +308,10 @@
       CALL MSG_SETC ('PKG', PACKAGE)
 
       IF (.NOT. ABORTED) THEN
-         CALL MSG_OUT (' ', '^PKG: file contains data for ^N_E '//
-     :     'exposure(s) in ^N_I integration(s) in '//
-     :     '^N_M measurement(s)', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: file contains data for ^N_E '//
+     :        'exposure(s) in ^N_I integration(s) in '//
+     :        '^N_M measurement(s)', STATUS)
       ELSE
 
 *  get the exposure, integration, measurement numbers at which the
@@ -310,15 +324,17 @@
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
-         CALL MSG_OUT (' ', '^PKG: the observation should have '//
-     :     'had ^N_E exposure(s) in ^N_I integrations in ^N_M '//
-     :     'measurement(s)', STATUS)
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: the observation should have '//
+     :        'had ^N_E exposure(s) in ^N_I integrations in ^N_M '//
+     :        'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
          CALL MSG_SETI ('N_I', LAST_INT)
          CALL MSG_SETI ('N_M', LAST_MEAS)
-         CALL MSG_OUT (' ', ' - However, the observation was '//
-     :     'ABORTED during exposure ^N_E of integration ^N_I '//
-     :     'of measurement ^N_M', STATUS)
+         CALL MSG_OUTIF (MSG__NORM,' ', 
+     :        ' - However, the observation was '//
+     :        'ABORTED during exposure ^N_E of integration ^N_I '//
+     :        'of measurement ^N_M', STATUS)
       END IF         
 
 *  now open the output NDF, propagating it from the input file
@@ -327,46 +343,42 @@
 
 *  map the various components of the output data array
 
+      CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :  OUT_QUALITY_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'DATA', '_REAL', 'WRITE', 
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUTNDF, 'QUALITY', '_INTEGER', 'WRITE',
-     :  OUT_QUALITY_PTR, ITEMP, STATUS)
+
+* Bad bit mask
+      CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
 
 *  now go through the various exposures in the observation
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-         DO MEASUREMENT = 1, N_MEASUREMENTS
-            DO INTEGRATION = 1, N_INTEGRATIONS
-               DO EXPOSURE = 1, N_EXPOSURES
-
 *  deconvolve the data using the routine appropriate for the chop
 *  function used
 
-                  IF ((CHOP_FUN .EQ. 'SQUARE')    .OR.
-     :                (CHOP_FUN .EQ. 'SCUBAWAVE')  .OR.
-     :                (CHOP_FUN .EQ. 'RAMPWAVE')) THEN
-                     CALL SCULIB_2POS_DECONV (N_EXPOSURES,
-     :                 N_INTEGRATIONS, N_MEASUREMENTS, 
-     :                 %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
-     :                 %val(IN_DATA_PTR), %val(IN_VARIANCE_PTR),
-     :                 %val(IN_QUALITY_PTR), SAMPLE_DX, CHOP_THROW,
-     :                 %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :                 %val(OUT_QUALITY_PTR), STATUS)
-                  ELSE IF (CHOP_FUN .EQ. 'TRIPOS') THEN
-                     CALL SCULIB_3POS_DECONV (N_EXPOSURES,
-     :                 N_INTEGRATIONS, N_MEASUREMENTS,
-     :                 %val(IN_DEM_PNTR_PTR), N_BOL, N_POS,
-     :                 %val(IN_DATA_PTR), %val(IN_VARIANCE_PTR),
-     :                 %val(IN_QUALITY_PTR), SAMPLE_DX, CHOP_THROW,
-     :                 %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :                 %val(OUT_QUALITY_PTR), STATUS)
-                  END IF
-               END DO
-            END DO
-         END DO
+         IF ((CHOP_FUN .EQ. 'SQUARE')    .OR.
+     :        (CHOP_FUN .EQ. 'SCUBAWAVE')  .OR.
+     :        (CHOP_FUN .EQ. 'RAMPWAVE')) THEN
+            CALL SCULIB_2POS_DECONV (N_EXPOSURES,
+     :           N_INTEGRATIONS, N_MEASUREMENTS, 
+     :           %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
+     :           %val(IN_DATA_PTR), %val(IN_VARIANCE_PTR),
+     :           %val(IN_QUALITY_PTR), SAMPLE_DX, CHOP_THROW,
+     :           %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
+     :           %val(OUT_QUALITY_PTR), BADBIT, STATUS)
+         ELSE IF (CHOP_FUN .EQ. 'TRIPOS') THEN
+            CALL SCULIB_3POS_DECONV (N_EXPOSURES,
+     :           N_INTEGRATIONS, N_MEASUREMENTS,
+     :           %val(IN_DEM_PNTR_PTR), N_BOL, N_POS,
+     :           %val(IN_DATA_PTR), %val(IN_VARIANCE_PTR),
+     :           %val(IN_QUALITY_PTR), SAMPLE_DX, CHOP_THROW,
+     :           %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
+     :           %val(OUT_QUALITY_PTR), BADBIT, STATUS)
+         END IF
 
 *  unmap the main data array
 
