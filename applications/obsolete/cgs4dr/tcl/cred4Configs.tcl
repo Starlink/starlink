@@ -56,11 +56,15 @@ proc cred4Configs {taskname} {
           set bv2 [dialogShow .cred4File .cred4File]
 	  if {$bv2==0} {
             exec /usr/bin/rm -f $config_file
-            $taskname obey save_config "config_file=$config_file" -inform "cgs4drInform $taskname %V"
+            set save_done -1
+            $taskname obey save_config "config_file=$config_file" -inform "cgs4drInform $taskname %V" -endmsg {set save_done 1}
+            tkwait variable save_done
           }
           destroy .cred4File
 	} else {
-          $taskname obey save_config "config_file=$config_file" -inform "cgs4drInform $taskname %V"
+          set save_done -1
+          $taskname obey save_config "config_file=$config_file" -inform "cgs4drInform $taskname %V" -endmsg {set save_done 1}
+          tkwait variable save_done
 	}
       }
 
@@ -77,7 +81,9 @@ proc cred4Configs {taskname} {
           set message "cred4Configs error : File $config_file does not exist!"
           cgs4drInform $taskname $message
 	} else {
-          $taskname obey restore_config "config_file=$config_file" -inform "cgs4drInform $taskname %V"
+          set rest_done -1
+          $taskname obey restore_config "config_file=$config_file" -inform "cgs4drInform $taskname %V" -endmsg {set rest_done 1}
+          tkwait variable rest_done
 	}
       }
 
