@@ -31,6 +31,8 @@
 # Commits to the top-level and buildsupport directories are sent to stardev
 ^\.*$			mail -s "[CVS top level] "%s stardev@jiscmail.ac.uk
 ^buildsupport/starconf	mail -s "[CVS buildsupport] "%s stardev@jiscmail.ac.uk
+# Toby White is working on autoconf, too
+^thirdparty/fsf/autoconf	mail -s "[CVS autotools] "%s stardev@jiscmail.ac.uk, tow21@cam.ac.uk
 ^thirdparty/fsf		mail -s "[CVS autotools] "%s stardev@jiscmail.ac.uk
 #
 ^java/source/hdx	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
