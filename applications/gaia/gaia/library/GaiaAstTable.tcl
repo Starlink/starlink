@@ -80,6 +80,8 @@
 #     29-AUG-2001 (PWD):
 #        Renamed StarEnterObject to GaiaEnterObject. Added some
 #        checks for the RA and Dec field formats.
+#     14-JUN-2002 (PWD):
+#        Changed so that ra and dec may have space separated fields.
 #     {enter_further_changes_here}
 
 #-
@@ -396,7 +398,7 @@ itcl::class gaia::GaiaAstTable {
       #  Always unset marks_ as others can delete things on canvas.
       catch  { unset marks_ }
       lassign [$itk_option(-rtdimage) scale] xs ys
-      if { $xs <0 } {
+      if { $xs < 0 } {
          set scale [expr $itk_option(-msize)/abs($xs)]
       } else {
          set scale [expr $xs*$itk_option(-msize)]
@@ -715,16 +717,31 @@ itcl::class gaia::GaiaAstTable {
    }
 
    #  Check that the format of the celestial coordinates entered is
-   #  correct, i.e. no spaces as separators.
+   #  correct, normally there should be just one field (hh:mm:ss or
+   #  dd:mm:ss), make this so if not correct (assume spaces should be :).
    protected method check_ra_and_dec_ {data} {
       set ra [lindex $data 1]
+      set lenra [llength $ra]
+      if { $lenra > 1 && $lenra < 4 } {
+         regsub -all {[\ ]+} [string trim $ra] ":" newra
+         set data [lreplace $data 1 1 $newra]
+         set lenra 1
+      }
+
       set dec [lindex $data 2]
-      if { [llength $ra] > 1 || [llength $dec] > 1 } { 
+      set lendec [llength $dec]
+      if { $lendec > 1 && $lendec < 4 } {
+         regsub -all {[\ ]+} [string trim $dec] ":" newdec
+         set data [lreplace $data 2 2 $newdec]
+         set lendec 1
+      }
+
+      if { $lenra > 1 || $lendec > 1 } { 
          error_dialog \
             "Celestial coordinates are required to have the format hh/dd:mm:ss.ss or dd.ddd"
-         return 0
+         return ""
       }
-      return 1
+      return $data
    }
 
    #  Replace an object line in the table.
@@ -733,7 +750,8 @@ itcl::class gaia::GaiaAstTable {
          info_dialog "No changes were made" $w_
          return
       }
-      if { ! [check_ra_and_dec_ $new_data] } {
+      set new_data [check_ra_and_dec_ $new_data]
+      if { $new_data == "" } {
          return
       }
       set id [lindex $new_data 0]
@@ -770,7 +788,8 @@ itcl::class gaia::GaiaAstTable {
 
    #  Enter a new object given its data.
    public method enter_object {new_data} {
-      if { ! [check_ra_and_dec_ $new_data] } {
+      set new_data [check_ra_and_dec_ $new_data]
+      if { $new_data == "" } {
          return
       }
       set id [lindex $new_data 0]
@@ -1084,7 +1103,9 @@ itcl::class gaia::GaiaAstTable {
    }
 
    #  Read positions from a named text file. This file must have
-   #  either 2, 3 or 5 space separated words and can contain comment
+   #  either 2, 3 or 5 space separated words, if the ra and decs are 
+   #  colon separated, if 7 or 9 words are located then the ra and
+   #  decs are assumed space separated. The file can contain comment
    #  lines starting with an #. Note for this type of table we do not
    #  invoke the equinox setting call back as we do not know the equinox.
    public method read_positions {filename} {
@@ -1109,13 +1130,24 @@ itcl::class gaia::GaiaAstTable {
                      set y -1
                   } elseif { $nword == 5 } {
                      lassign $line id ra dec x y
+                  } elseif { $nword == 7 } {
+                     lassign $line id ra ram ras dec decm decs
+                     set ra "$ra:$ram:$ras"
+                     set dec "$dec:$decm:$decs"
+                     set x -1
+                     set y -1
+                  } elseif { $nword == 9 } {
+                     lassign $line id ra ram ras dec decm decs x y
+                     set ra "$ra:$ram:$ras"
+                     set dec "$dec:$decm:$decs"
                   } else {
                      set ok 0
                      error "Cannot interpret line: $line"
                   }
                   if { $ok } {
                      set new_data [list $id $ra $dec $x $y]
-                     if { ! [check_ra_and_dec_ $new_data] } {
+                     set new_data [check_ra_and_dec_ $new_data]
+                     if { $new_data == "" } {
                         error_dialog "Cannot interpret line: $line"
                         return
                      }
