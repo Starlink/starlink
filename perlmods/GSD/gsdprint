@@ -8,10 +8,12 @@
 # History:
 #  April 1996 (TIMJ)
 #    Original version
-#  May 2000 (TIMJ)
+#  2000 May 12 (TIMJ)
 #    Use modern perl and the new OO interfacce
 #  2000 May 15 (TIMJ)
 #    Merge with GSDFORMAT
+#  2000 May 16 (TIMJ)
+#    Add PDL option
 
 # Load in the GSD module
 use GSD qw//;
@@ -37,12 +39,13 @@ my $noread = 0;
 my $noarray = 0;
 my $list = 0;
 my $formatted = 0;
+my $pdl = 0;
 
 # Parse options
 GetOptions('help|?' => \$help, man => \$man, noread => \$noread, 
 	   'data' => \$printdata, 'version' => \$version,
 	   'noarray' => \$noarray, 'list' => \$list,
-	   'formatted' => \$formatted ) 
+	   'formatted' => \$formatted, 'pdl' => \$pdl ) 
   or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -56,6 +59,14 @@ pod2usage(-verbose => 2) if $man;
   print "Use the -h option for more information\n";
     exit;
 };
+
+# If we are using the PDL interface
+my $gsdclass = 'GSD';
+if ($pdl) {
+  require GSD::PDL;
+  $gsdclass = 'GSD::PDL';
+}
+
 
 # Check if we are called gsdformat
 $formatted = 1 if $0 =~ /gsdformat/;
@@ -101,7 +112,7 @@ die "$!: $filename does not exist\n"
 
 
 # Open the GSD file
-my $gsd = new GSD($filename);
+my $gsd = new $gsdclass($filename);
 
 die "Problem opening file. $filename may not be a GSD file\n"
   unless defined $gsd;
@@ -171,16 +182,20 @@ for my $i (1.. $gsd->nitems) {
     if (($i != $gsd->nitems) || $printdata)  {
       print "  Data:\n";
 
-      # Print the data in blocks of 4
-      for my $j (0..$#values) {
-	if ($type =~ /C/i) {
-	  printf "%20s ",$values[$j];
-	} else {
-	  printf "%15g",$values[$j];
+      # Print the data in blocks of 4 if we are not using PDL interface
+      if ($pdl) {
+	print $values[0],"\n";
+      } else {
+	for my $j (0..$#values) {
+	  if ($type =~ /C/i) {
+	    printf "%20s ",$values[$j];
+	  } else {
+	    printf "%15g",$values[$j];
+	  }
+	  print "\n" unless ((1+$j)%4);
 	}
-	print "\n" unless ((1+$j)%4);
+	print "\n" if (scalar(@values)%4);
       }
-      print "\n" if (scalar(@values)%4);
     }
 
 
@@ -345,6 +360,13 @@ support is only required when the user is prompted for input
 Print out the list of known GSD item names along with the 
 translation to JCMT name and a short description of the
 item. Program exits immediately afterwards.
+
+=item B<-pdl>
+
+Use the PDL interface to print the data values. This will
+allow the dimensionality of the data to be retained when
+printing but will generate badly formatted output for extremely
+large arrays.
 
 =item B<-formatted>
 
