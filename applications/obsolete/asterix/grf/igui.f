@@ -526,6 +526,8 @@
               CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
             ENDDO
 
+            I=I+1
+
           ENDDO
 
         ELSEIF (NAME.EQ.'NOTE') THEN
