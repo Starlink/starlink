@@ -2,10 +2,10 @@
 AutoAstrometry of Mosaics
 -------------------------
 
-%%VERSION%%    0.5-6
+%%VERSION%%    0.5-7
 
 
-This is a developers' release of the autoastrometry package.
+This is a beta release of the autoastrometry package.
 
 Documentation, including release notes, is in sun242.tar-htx
 
@@ -13,6 +13,8 @@ Changes
 -------
 
 Since 0.5: 
+  * In 0.5-7: Fixed crashing error in 0.5-6; now works without `match'
+    being installed; now distribute `match' with autoastrom.
   * Fixed typo in function name which made some informational
     messages fatal.
   * Extractor sometimes claims to detect objects with a negative flux
@@ -53,15 +55,21 @@ errors somewhere.
 
 This version includes plugins, and specifically a plugin to support
 the `match' application to be found at
-<http://acd188a-005.rit.edu/match/>.  The distribution does not,
-however, include the match distribution, so you need to build that
-yourself and install it in the directory $AUTOASTROM_DIR.
+<http://acd188a-005.rit.edu/match/>.  The distribution includes a copy
+of the match distribution, but if you wish to replace this one with
+any newer one, you can (if its output is compatible with earlier
+versions): build it yourself and install it in the directory
+$AUTOASTROM_DIR.
 
-The regression test t/t9 (which consists of two runs of autoastrom
-right after each other) seems to hang on rlspc5 at RAL (though it
-works on my box in Glasgow), with an error which suggests that the
-Perl/ADAM system has got itself into a terminal fankle.  I suspect
-that this is caused by something like the monoliths from the first run
-not being fully shut down before the second starts, but I don't have a 
-more specific explanation than that.
+Regression tests: A couple of the regression tests in directory t/
+(namely t/t7 and t/t9) are poor ones, since they depend far too much
+on details of the output, and are thus inappropriately sensitive to
+roundoff error, so that they almost always fail, entirely spuriously.
+Bah!  Ignore errors in these two tests.  Also, the test t/t9 (which
+consists of two runs of autoastrom right after each other) seems to
+hang on some machines, with an error which suggests that the Perl/ADAM
+system has got itself into a terminal fankle.  I suspect that this is
+caused by something like the monoliths from the first run not being
+fully shut down before the second starts, but I don't have a more
+specific explanation than that.  Like I said, it's a poor test.
 

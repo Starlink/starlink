@@ -1,5 +1,34 @@
 <!-- $Id$ -->
 
+<subsect id="release-0.5.7" export="export">
+<subhead><title>Version 0.5-7</title></subhead>
+
+<p>This is release 0.5-7, 2003 July 28</p>
+
+<p>Changes in this version:
+<ul>
+  <li><p>In 0.5-7: Fixed crashing error in 0.5-6; now works without `match'
+    being installed; now distribute `match'
+    (<url>http://acd188a-005.rit.edu/match/</url>) with autoastrom.</p></li> 
+  <li><p>Fixed typo in function name which made some informational
+    messages fatal.</p></li>
+  <li><p>Extractor sometimes claims to detect objects with a negative flux
+    -- such objects are now silently ignored.</p></li>
+  <li><p>Assorted changes to configuration to make it more robust.</p></li>
+  <li><p>All of autoastrom that originates purely within Starlink has been
+    released under the GPL.  This does NOT include the bundled version
+    of ASTROM, nor the decompose_transform routine in autoastrom.pm,
+    both of which are Copyright 1995 Patrick Wallace.  See
+    README.Licence.</p></li>
+  <li><p>Uses bundled ASTROM 3.7, which emits FITS WCS headers which 
+    extend the draft `Paper II' proposals.  See ASTROM docs for
+    discussion.</p></li>
+</ul>
+</p>
+</subsect>
+
+
+
 <subsect id="release-0.5.3" export="export">
 <subhead><title>Version 0.5-3</title></subhead>
 

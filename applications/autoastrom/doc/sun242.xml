@@ -1,5 +1,5 @@
 <!DOCTYPE sun PUBLIC "-//Starlink//DTD Starlink SUN 0.7 (XML)//EN"
-	"/home/norman/s/src/sgml/w/sgml/dtd/sun-xml-0.7.dtd"
+	"/home/norman/Data/w/starlink/sgml/dtd/sun-xml-0.7.dtd"
 [
 	<!ENTITY releasenotes SYSTEM "ReleaseNotes">
 	<!ENTITY version SYSTEM "../VERSION">
