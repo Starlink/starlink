@@ -1978,7 +1978,7 @@ sub handle_lib_objects
 	     }
 	   return ();
 	 }
-       elsif ($val =~ m{^`(\$\(srcdir\)/)?[a-z_]*_link(_adam)?( *-[a-z-]+)*`$})
+       elsif ($val =~ m{^`(\$\(srcdir\)/)?[a-z_]*_link(_adam)?`$})
          {
            # This is a Starlink extension.  It is common for Starlink
            # libraries to provide a short script, with a name matching
@@ -1996,6 +1996,9 @@ sub handle_lib_objects
            # `X_link`, `X_link_adam` (where "X" is any sequence of
            # letters and underscores), and either of these preceded by
            # precisely "$(srcdir)/", which can be useful for testing targets.
+           #
+           # It is not possible to include any spaces in the value,
+           # since these are parsed away at an earlier stage.
            return ();
          }
        elsif ($val !~ /^\@.*\@$/)
