@@ -1228,28 +1228,16 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/CheckSelectionAction.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/CompositeSymbol.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/DeletionAction.java:26: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/LassoSelectionAction.java:28: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:35: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/MultiStateInterpreter.html...
   [javadoc] "The timeout for single/double/triple/.."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The timeout for single/double/triple/.. clicks,
   [javadoc]  in milliseconds."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/PenStroke.java:27: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchController.java:58: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchEvent.java:20: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchLayer.java:26: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchModel.java:24: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchPane.java:29: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/StrokeSymbol.java:23: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/classification/TrainableClassifier.html...
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
   [javadoc]  this classifier can support multiple calls to "train"."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/classification/BayesClassifier.html...
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
@@ -1258,13 +1246,25 @@ javadoc-sources:
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
   [javadoc]  p.d.f. calculation."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/CrossValidation.java:17: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/classification/RubineClassifier.html...
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
   [javadoc]  this classifier can support multiple calls to "train"."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/LassoSelectionAction.java:28: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:35: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/PenStroke.java:27: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchController.java:58: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchEvent.java:20: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchLayer.java:26: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchModel.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchPane.java:29: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/StrokeSymbol.java:23: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/CrossValidation.java:17: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/demo/LineTest.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/demo/RegionLabeler.java:70: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/demo/SceneTest.java:50: warning - @rating is an unknown tag.
@@ -1311,6 +1311,17 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/rcl/ClassBuilder.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/rcl/SceneClassBuilder.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/rcl/StrokeSceneBuilder.java:22: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/recognition/SceneElement.html...
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: Tag @see: Malformed: Scene, StrokeElement, CompositeElement, ChoiceElement
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/recognition/BasicScene.html...
+  [javadoc] "Return true if the supports of the two elements (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the supports of the two elements (i.e. the
+  [javadoc]  sets elements that they cover) are identical."
+  [javadoc] "Return true if the supports of the two elements (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the supports of the two elements (i.e. the
+  [javadoc]  sets elements that they cover) are identical."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/rcl/VotingSceneBuilder.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/rcl/VotingStrokeBuilder.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/ChoiceElement.java:57: warning - @rating is an unknown tag.
@@ -1318,24 +1329,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/MultiStrokeRecognizer.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/Scene.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/recognition/SceneElement.html...
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: Tag @see: Malformed: Scene, StrokeElement, CompositeElement, ChoiceElement
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneRecognizer.java:16: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/StrokeElement.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/StrokeRecognizer.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/TypedData.java:53: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:45: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:510: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/recognition/BasicScene.html...
-  [javadoc] "Return true if the supports of the two elements (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if the supports of the two elements (i.e. the
-  [javadoc]  sets elements that they cover) are identical."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
-  [javadoc] "Return true if the supports of the two elements (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if the supports of the two elements (i.e. the
-  [javadoc]  sets elements that they cover) are identical."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/MSTrainingParser.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/MSTrainingParser.java:120: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/MSTrainingParser.java:137: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#endElement
@@ -1684,7 +1684,7 @@ dist:
 
 install:
 [loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 74 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 76 files to /apps/cvsbuild/starjava/docs
      [echo] Executing DIVA target: install
 
 prepare:
@@ -2019,6 +2019,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
@@ -2427,4 +2428,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 41 seconds
+Total time: 7 minutes 32 seconds

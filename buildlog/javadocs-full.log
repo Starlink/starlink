@@ -37,7 +37,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
-     [copy] Copying 52 files to /apps/cvsbuild/java/source/jniast/build/java
+     [copy] Copying 54 files to /apps/cvsbuild/java/source/jniast/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
@@ -1550,4 +1550,4 @@ javadoc-sources:
   [javadoc] 577 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 11 seconds
+Total time: 1 minute 9 seconds

@@ -326,7 +326,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
-     [copy] Copying 52 files to /apps/cvsbuild/java/source/jniast/build/java
+     [copy] Copying 54 files to /apps/cvsbuild/java/source/jniast/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:

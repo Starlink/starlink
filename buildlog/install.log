@@ -230,7 +230,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/jniast
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/i386
 [loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 74 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 76 files to /apps/cvsbuild/starjava/docs
      [echo] Executing DIVA target: install
 
 prepare:
@@ -936,8 +936,34 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Dec 13, 2004 5:19:18 AM uk.ac.starlink.ast.AstPackage isAvailable
-  [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
+  [javadoc] Dec 14, 2004 5:19:45 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] INFO: java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
+  [javadoc] java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
+  [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:146)
+  [javadoc] 	at uk.ac.starlink.ast.AstObject.<clinit>(AstObject.java:43)
+  [javadoc] 	at uk.ac.starlink.ast.AstPackage.isAvailable(AstPackage.java:36)
+  [javadoc] 	at uk.ac.starlink.topcat.TopcatUtils.canSplat(TopcatUtils.java:248)
+  [javadoc] 	at uk.ac.starlink.topcat.JELUtils.getActivationStaticClasses(JELUtils.java:169)
+  [javadoc] 	at uk.ac.starlink.topcat.doc.XmlDoclet.<init>(XmlDoclet.java:84)
+  [javadoc] 	at uk.ac.starlink.topcat.doc.XmlDoclet.start(XmlDoclet.java:48)
+  [javadoc] 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+  [javadoc] 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+  [javadoc] 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+  [javadoc] 	at java.lang.reflect.Method.invoke(Method.java:324)
+  [javadoc] 	at com.sun.tools.javadoc.DocletInvoker.invoke(DocletInvoker.java:193)
+  [javadoc] 	at com.sun.tools.javadoc.DocletInvoker.start(DocletInvoker.java:92)
+  [javadoc] 	at com.sun.tools.javadoc.Start.parseAndExecute(Start.java:301)
+  [javadoc] 	at com.sun.tools.javadoc.Start.begin(Start.java:120)
+  [javadoc] 	at com.sun.tools.javadoc.Main.execute(Main.java:41)
+  [javadoc] 	at com.sun.tools.javadoc.Main.main(Main.java:31)
+  [javadoc] Caused by: java.lang.UnsatisfiedLinkError: no jniast in java.library.path
+  [javadoc] 	at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1403)
+  [javadoc] 	at java.lang.Runtime.loadLibrary0(Runtime.java:788)
+  [javadoc] 	at java.lang.System.loadLibrary(System.java:832)
+  [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:111)
+  [javadoc] 	... 16 more
+  [javadoc] Dec 14, 2004 5:19:45 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] WARNING: JNIAST load failed - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
@@ -945,6 +971,7 @@ docs:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs/sun253
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
+Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253.fo
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toFo.xslt
      [java] [ERROR] Areas pending, text probably lost in lineusing the properties "jel.classes" and "jel.classes.activation", not
@@ -976,6 +1003,7 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
      [copy] Copying 197 files to /apps/cvsbuild/java/source/topcat/docs/topcat
      [copy] Copied 1 empty directory to 1 empty directory under /apps/cvsbuild/java/source/topcat/docs/topcat
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/topcat
@@ -1134,4 +1162,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 27 seconds
+Total time: 5 minutes 45 seconds

@@ -7721,7 +7721,39 @@ cvs checkout: Updating java/source/jniast/lib/jniast
 cvs checkout: Updating java/source/jniast/src
 cvs checkout: Updating java/source/jniast/src/ast
 U java/source/jniast/src/ast/README
-U java/source/jniast/src/ast/ast_source.tar
+U java/source/jniast/src/ast/ast_link
+U java/source/jniast/src/ast/cmpframe.c
+U java/source/jniast/src/ast/cmpmap.c
+U java/source/jniast/src/ast/dsbspecframe.c
+U java/source/jniast/src/ast/fac_1521_err
+U java/source/jniast/src/ast/fitschan.c
+U java/source/jniast/src/ast/fluxframe.c
+U java/source/jniast/src/ast/frame.c
+U java/source/jniast/src/ast/frameset.c
+U java/source/jniast/src/ast/grf.h
+U java/source/jniast/src/ast/grismmap.c
+U java/source/jniast/src/ast/lutmap.c
+U java/source/jniast/src/ast/mapping.c
+U java/source/jniast/src/ast/mathmap.c
+U java/source/jniast/src/ast/matrixmap.c
+U java/source/jniast/src/ast/object.c
+U java/source/jniast/src/ast/pcdmap.c
+U java/source/jniast/src/ast/permmap.c
+U java/source/jniast/src/ast/plot.c
+U java/source/jniast/src/ast/polymap.c
+U java/source/jniast/src/ast/shiftmap.c
+U java/source/jniast/src/ast/skyframe.c
+U java/source/jniast/src/ast/slamap.c
+U java/source/jniast/src/ast/specfluxframe.c
+U java/source/jniast/src/ast/specframe.c
+U java/source/jniast/src/ast/specmap.c
+U java/source/jniast/src/ast/sphmap.c
+U java/source/jniast/src/ast/tranmap.c
+U java/source/jniast/src/ast/unitmap.c
+U java/source/jniast/src/ast/wcsmap.c
+U java/source/jniast/src/ast/winmap.c
+U java/source/jniast/src/ast/xmlchan.c
+U java/source/jniast/src/ast/zoommap.c
 cvs checkout: Updating java/source/jniast/src/jni
 U java/source/jniast/src/jni/AstException.c
 U java/source/jniast/src/jni/AstObject.c
@@ -7730,6 +7762,7 @@ U java/source/jniast/src/jni/CmpFrame.c
 U java/source/jniast/src/jni/CmpMap.c
 U java/source/jniast/src/jni/DSBSpecFrame.c
 U java/source/jniast/src/jni/FitsChan.c
+U java/source/jniast/src/jni/FluxFrame.c
 U java/source/jniast/src/jni/Frame.c
 U java/source/jniast/src/jni/FrameSet.c
 U java/source/jniast/src/jni/GrfEscape.c
@@ -7746,6 +7779,7 @@ U java/source/jniast/src/jni/PolyMap.c
 U java/source/jniast/src/jni/ShiftMap.c
 U java/source/jniast/src/jni/SkyFrame.c
 U java/source/jniast/src/jni/SlaMap.c
+U java/source/jniast/src/jni/SpecFluxFrame.c
 U java/source/jniast/src/jni/SpecFrame.c
 U java/source/jniast/src/jni/SpecMap.c
 U java/source/jniast/src/jni/SphMap.c
@@ -7786,6 +7820,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/CmpMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/DSBSpecFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/DssMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/FitsChan.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/FluxFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Frame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/FrameSet.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Grf.java
@@ -7804,6 +7839,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/ShiftMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SkyAxis.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SkyFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SlaMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/SpecFluxFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SpecFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SpecMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SphMap.java
@@ -7837,6 +7873,7 @@ U java/source/jniast/src/perl/CmpFrame.pl
 U java/source/jniast/src/perl/CmpMap.pl
 U java/source/jniast/src/perl/DSBSpecFrame.pl
 U java/source/jniast/src/perl/FitsChan.pl
+U java/source/jniast/src/perl/FluxFrame.pl
 U java/source/jniast/src/perl/Frame.pl
 U java/source/jniast/src/perl/FrameSet.pl
 U java/source/jniast/src/perl/GrismMap.pl
@@ -7852,6 +7889,7 @@ U java/source/jniast/src/perl/PolyMap.pl
 U java/source/jniast/src/perl/ShiftMap.pl
 U java/source/jniast/src/perl/SkyFrame.pl
 U java/source/jniast/src/perl/SlaMap.pl
+U java/source/jniast/src/perl/SpecFluxFrame.pl
 U java/source/jniast/src/perl/SpecFrame.pl
 U java/source/jniast/src/perl/SpecMap.pl
 U java/source/jniast/src/perl/SphMap.pl
