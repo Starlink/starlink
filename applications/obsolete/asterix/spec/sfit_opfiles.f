@@ -63,8 +63,8 @@
         CALL MSG_SETC( 'DFILE', OBDAT(I).DATNAME )
         CALL AIO_IWRITE( OCI, 21, '^DFILE', STATUS )
         IF ( FSTAT .EQ. FIT__LOGL ) THEN
-          IF ( OBDAT(I).BLOC .NE. DAT__NOLOC ) THEN
-            CALL HDS_TRACE( OBDAT(I).BLOC, NLEV, PATH, FILE, STATUS )
+          IF ( OBDAT(I).B_ID .NE. ADI__NULLID ) THEN
+            CALL ADI_FTRACE( OBDAT(I).B_ID, NLEV, PATH, FILE, STATUS )
           ELSE
             FILE = '** Unable to find bgnd - assumed negligible **'
           END IF
