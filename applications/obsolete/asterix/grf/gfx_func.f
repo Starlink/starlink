@@ -43,7 +43,10 @@
         IF (OK.AND.FLAG) THEN
 
           CALL GCB_GETC('FUNC_TYPE',OK,TYPE,STATUS)
-          IF (.NOT.OK) THEN
+          IF (OK) THEN
+            CALL CHR_UCASE(TYPE)
+            TYPE=TYPE(:4)
+          ELSE
             TYPE='POLY'
           ENDIF
 
