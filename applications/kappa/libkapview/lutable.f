@@ -459,8 +459,8 @@
 *
 *  The only case where it is not needed is when the lookup table and
 *  mapping are both given on the command line.
-         CALL PAR_STATE( 'COLTAB', TABSTA, STATUS )
-         CALL PAR_STATE( 'MAPPING', MAPSTA, STATUS )
+         CALL NDG_STATE( 'COLTAB', TABSTA, STATUS )
+         CALL NDG_STATE( 'MAPPING', MAPSTA, STATUS )
          LOOP = TABSTA .NE. PAR__ACTIVE .OR.
      :          MAPSTA .NE. PAR__ACTIVE
 

@@ -332,7 +332,7 @@
 *  co-ordinates are supplied on the command line.  If so, we set a 
 *  flag to indicate that only one centroid is to be determined.
       ELSE
-         CALL PAR_STATE( PARAM, STATE, STATUS )
+         CALL NDG_STATE( PARAM, STATE, STATUS )
          IF ( STATE .EQ. SUBPAR__ACTIVE ) THEN
             SINGLE = .TRUE.
          ELSE

@@ -1122,7 +1122,7 @@
 *    If the inspection option is specified on the command line then
 *    there will be no looping.
 
-      CALL PAR_STATE( 'OPTION', ACTOPT, STATUS )
+      CALL NDG_STATE( 'OPTION', ACTOPT, STATUS )
       CMLOPT = ACTOPT .EQ. SUBPAR__ACTIVE
 
 *    The main loop.

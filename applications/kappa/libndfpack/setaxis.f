@@ -375,7 +375,7 @@
 *  Determine whether or not to loop.  Looping does not occur if the
 *  NEWVAL is given on the command line, i.e. it is already in the active
 *  state.
-         CALL PAR_STATE( 'NEWVAL', ACTVAL, STATUS )
+         CALL NDG_STATE( 'NEWVAL', ACTVAL, STATUS )
 
 *  Map the array component of the axis in update mode.
          TYPE = DEFTYP

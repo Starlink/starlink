@@ -268,7 +268,7 @@
          ELSE IF ( MODE .EQ. 'INTERFACE' ) THEN
 
 *  Find if the comment was given on the command line.
-            CALL PAR_STATE( 'COMMENT', CONSTA, STATUS )
+            CALL NDG_STATE( 'COMMENT', CONSTA, STATUS )
 
 *  Read the comments a line at a time.
             LOOP = .TRUE.

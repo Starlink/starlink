@@ -552,7 +552,7 @@
       ZBAD = ZAP .EQ. 'BAD'
 
       IF ( ENVIRO ) THEN
-         CALL PAR_STATE( 'LINCOL', LCSTA, STATUS )
+         CALL NDG_STATE( 'LINCOL', LCSTA, STATUS )
          LCDEF = LCSTA .EQ. SUBPAR__ACTIVE
       END IF
 
