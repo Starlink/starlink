@@ -323,7 +323,7 @@
             WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
      :           REXISQ, ITERATION
  20         FORMAT ('eta = ', F6.2, '          b = ', F6.2,
-     :           '  tau = ', F6.2, '  X = ', F7.1, '  N = ', I4)
+     :           '  tau = ', F7.3, '  X= ', F7.1, '  N= ', I4)
 
             CALL MSG_SETC ('BUFFER', BUFFER)
             CALL MSG_OUT (' ', ' ^BUFFER', STATUS)
