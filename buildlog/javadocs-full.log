@@ -871,8 +871,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharactersEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharactersModel.java:18: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectTextField.java:33: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreConfiguration.java:70: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreConfiguration.java:295: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/util/gui/StoreConfiguration.html...
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e."
@@ -880,6 +878,8 @@ javadoc-sources:
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e. get this Element then write the configuration data
   [javadoc]  attached to it). "
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreConfiguration.java:70: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreConfiguration.java:295: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreControlFrame.java:56: warning - Tag @link: reference not found: SourceSource
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreFileUtils.java:68: warning - Tag @link: reference not found: getConfigDirectory
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedListener.java:15: warning - @copyright is an unknown tag.
@@ -1544,4 +1544,4 @@ javadoc-sources:
   [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 32 seconds
+Total time: 1 minute 29 seconds
