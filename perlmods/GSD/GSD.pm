@@ -465,7 +465,7 @@ sub DESTROY {
   # Since this is called when the GLOB is tidied up
   # we need check that we have an argument on the stack
   # from an object
-  if (scalar(@_) && ref($_[0]) eq 'HASH' ) {
+  if (scalar(@_) && UNIVERSAL::isa($_[0],'HASH') ) {
     gsdClose($_[0]->{FPTR},
 	     $_[0]->{FILE_DSC},
 	     $_[0]->{ITEM_DSC},
