@@ -100,11 +100,15 @@
  
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
 *     1995 April 16 (MJC):
 *        Original version based on R.F. Warren-Smith's FILLIN.
+*     21-MAY-1998 (DSB):
+*        Added protection against division by zero if there are any
+*        zero variance values.
 *     {enter_changes_here}
  
 *  Bugs:
