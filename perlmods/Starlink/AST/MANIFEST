@@ -9,6 +9,7 @@ arrays.h
 ppport.h
 typemap
 typemap.561
+grf.h
 PGPLOT/PGPLOT.pm
 PGPLOT/Makefile.PL
 PGPLOT/t/pgplot.t
