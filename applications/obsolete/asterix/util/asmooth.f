@@ -23,7 +23,7 @@
 *     SNR = REAL(R)
 *       Target signal to noise in smoothed output
 *     FILTER = INTEGER(R)
-*       Filter variety, 1=gaussian, 2=tophat, 3=cosine
+*       Filter variety, 1=gaussian, 2=tophat
 *     WSTART = INTEGER(R)
 *       Starting guess for mask width
 *     WMAXSZ = INTEGER(R)
@@ -73,6 +73,7 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Alastair J.R. Sanderson
 *
 *    History :
 *
@@ -86,6 +87,7 @@
 *     24 Nov 94 : V1.8-1  Now use USI for user interface (DJA)
 *     26 Mar 95 : V1.8-2  Use new data interface (DJA)
 *       7 Dec 1995 : V2.0-0 ADI port (DJA)
+*       1 Jun 1999 : V2.3-0 Minor corrections to level spacings etc. (AJRS)
 *
 *    Type definitions :
 *
@@ -156,7 +158,7 @@
 *    Version :
 *
       CHARACTER*30           	VERSION
-        PARAMETER            	( VERSION = 'ASMOOTH Version 2.2-0')
+        PARAMETER            	( VERSION = 'ASMOOTH Version 2.3-0')
 *-
 
 *  Check status
@@ -296,17 +298,19 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
 *    Linearly spaced levels
         IF ( OPTION .EQ. 1 ) THEN
           DO I = 1, NLEVEL
-            LEVEL(I) = DMIN + (REAL(I)-0.5)*(DMAX-DMIN)/REAL(NLEVEL)
+            LEVEL(I) = DMIN + (REAL(I)-1.0)*(DMAX-DMIN)/REAL(NLEVEL)
           END DO
+          LEVEL(NLEVEL+1)=DMAX
 
 *    Logarithmically spaced levels
         ELSE
 
           DO I = 1, NLEVEL
-            LEVEL(I) = LOG10(DMIN) + (REAL(I)-0.5)*
+            LEVEL(I) = LOG10(DMIN) + (REAL(I)-1.0)*
      :               (LOG10(DMAX)-LOG10(DMIN))/REAL(NLEVEL)
             LEVEL(I) = 10.0**LEVEL(I) - BIAS
           END DO
+          LEVEL(NLEVEL+1)=DMAX
 
 *      RESTORE data min and max
           DMIN = DMIN - BIAS
@@ -320,22 +324,23 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
         CALL USI_GET1R( 'LEVS', ASM__MXLEV, LEVEL, NLEVEL, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
+*  Shift levels up to accomodate Min and Max as outer boundaries
+        DO I=NLEVEL,1,-1
+           LEVEL(I+1)=LEVEL(I)
+        END DO
+*  Add the data minimum and maximum as the lower and upper bounds on the
+*  outside levels
+        LEVEL(1)=DMIN
+        LEVEL(NLEVEL+2)=DMAX
+*  Increment levels counter to accomodate extra level
+        NLEVEL=NLEVEL+1
+
       ELSE
         CALL MSG_SETI( 'OPT', OPTION )
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid selection option /^OPT/', STATUS )
         GOTO 99
       END IF
-
-*  Add the data maximum as the last level, and the minimum as the lower
-*  bound on the first
-      NLEVEL = NLEVEL + 1
-      LEVEL(NLEVEL) = DMAX
-      DO I = NLEVEL, 1, -1
-        LEVEL(I+1) = LEVEL(I)
-      END DO
-      LEVEL(1) = DMIN
-      NLEVEL = NLEVEL + 1
 
 *  Filter choice
       CALL USI_GET0I( 'FILTER', FILTER, STATUS )
@@ -598,6 +603,7 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
 
 *          User interest
             CALL MSG_SETI( 'LAYER', ILEVEL )
+*  Multiply widths(1) by 2 to give FWHM
             CALL MSG_SETR( 'WID', WIDTHS(1) )
             IF ( FILTER .EQ. 1 ) THEN
               CALL MSG_SETC( 'UNIT', 'FWHM' )
@@ -930,7 +936,7 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
 *    Local constants :
 *
       REAL                   WSCALE                ! Allowable range for scale
-        PARAMETER            ( WSCALE = 30.0 )
+        PARAMETER            ( WSCALE = 100.0 )
 *
 *    Local variables :
 *
@@ -960,10 +966,9 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
       DO I = 1, 3
         WIDTH(I) = REAL(WSTART)*CV
       END DO
+
       CALL ASMOOTH_GENWGT( FILTER, NSDIM, L1, L2, L3, L4, L5,
      :                    L6, L7, WIDTH, WGT, WSUM2, WTRUNC, STATUS )
-
-*    Adjust sum of weights
       IF ( ABS((WSUM2-TWSUM)/TWSUM) .GT. 0.005 ) THEN
         IF ( WSUM2 .GT. TWSUM ) THEN
           LB = CV
@@ -995,10 +1000,12 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Alastair Sanderson (:AJRS)
 *
 *    History :
 *
 *     24 Nov 92 : Original (DJA)
+*      9 Jun 99 : Cosine option removed (AJRS)
 *
 *    Type definitions :
 *
@@ -1032,11 +1039,9 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
 *
 *    Local constants :
 *
-      INTEGER                ASM__GAUSS, ASM__BOX,
-     :                       ASM__COSINE
+      INTEGER                ASM__GAUSS, ASM__BOX
         PARAMETER            ( ASM__GAUSS = 1,
-     :                         ASM__BOX = 2,
-     :                         ASM__COSINE = 3 )
+     :                         ASM__BOX = 2 )
 *
 *    Local variables :
 *
@@ -1064,13 +1069,12 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
 
 *      Convert full width to radius
         BOXWID = WIDTH(1)/2.0
-        WTRUNC = NINT(BOXWID + 1.0)
+        WTRUNC = INT(BOXWID + 1.0)
         IF ( NDIM .EQ. 1 ) THEN
           NORM = 1.0 / (BOXWID*2.0)
         ELSE IF ( NDIM .EQ. 2 ) THEN
           NORM = 1.0 / (MATH__PI*BOXWID**2)
         END IF
-
       ELSE IF ( FILTER .EQ. ASM__GAUSS ) THEN
         SIGMA = WIDTH(1) / (2.0*SQRT(2.0*LOG(2.0)))
         SIGMA2 = SIGMA**2
@@ -1081,11 +1085,6 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
           NORM = 1.0/(2.0*MATH__PI*SIGMA2)
           WTRUNC = NINT(3.0 * SIGMA+1.0)
         END IF
-
-      ELSE IF ( FILTER .EQ. ASM__COSINE ) THEN
-
-        NORM = 1.0
-        WTRUNC = WIDTH(1)*1.1
 
       ELSE
         STATUS = SAI__ERROR
@@ -1130,8 +1129,6 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
                       ELSE IF ( FILTER .EQ. ASM__GAUSS ) THEN
                         S1 = D1*D1
                         FNV = DEXP(DBLE(-S1/SIGMA2/2.0))
-                      ELSE IF ( FILTER .EQ. ASM__COSINE ) THEN
-                        FNV = COS(D1 * MATH__PI * 2.0 / WIDTH(1))+1.0
                       END IF
                       WGT(I,J,K,L,M,N,O) = FNV*NORM
                     END DO
@@ -1146,9 +1143,6 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
                         END IF
                       ELSE IF ( FILTER .EQ. ASM__GAUSS ) THEN
                         FNV = DEXP(DBLE(-(S1+S2)/SIGMA2/2.0))
-                      ELSE IF ( FILTER .EQ. ASM__COSINE ) THEN
-                        FNV = COS(SQRT(S1) * MATH__PI * 2.0
-     :                                           / WIDTH(1))+1.0
                       END IF
                       WGT(I,J,K,L,M,N,O) = FNV*NORM
                     END DO

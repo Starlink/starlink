@@ -60,7 +60,7 @@ INTERFACE ASMOOTH
   DEFAULT 1
   PPATH   'DEFAULT'
   VPATH   'PROMPT'
-  HELP    '1) Gauss, 2) Box, 3) Cosine'
+  HELP    '1) Gauss, 2) Box'
  ENDPARAMETER
 
  PARAMETER WSTART
