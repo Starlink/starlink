@@ -315,8 +315,7 @@ setbad.ifl setbb.ifl setbound.ifl setext.ifl setlabel.ifl setnorm.ifl \
 setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 mem2d.ifl wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
-reshape.ifl copybad.ifl wcstran.ifl scatter.ifl kappa_mon.ifl \
-kapview_mon.ifl ndfpack_mon.ifl 
+reshape.ifl copybad.ifl wcstran.ifl scatter.ifl 
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \

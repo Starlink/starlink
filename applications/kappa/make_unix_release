@@ -67,18 +67,6 @@
 #  Ensure all files are accessable.
       chmod 777 *
 
-# Create the monolith interface files.
-      foreach m (kappa kapview ndfpack)
-         rm -f ${m}_mon.ifl
-         echo "Monolith ${m}_mon" > ttt
-         foreach f (`grp ${m}_sub`)
-            set ifl = `basename $f .f`.ifl
-            cat $ifl >> ttt
-         end
-         echo "endmonolith" >> ttt
-         mv -f ttt ${m}_mon.ifl
-      end
-
 #  Edit in the current package version number into any required source files.
       set vers = `grep "PKG_VERS = " makefile`
       if ( "$vers" == "" ) then
