@@ -3,9 +3,10 @@
   $Id$
 -->
 
-<subsect id=release-0.3 export>Release Notes, version DR-0.3
+<subsect id=release-0.4 export>Release Notes, version DR-0.4
 
-<p>This is developers' release 0.3.
+<p>This (will be) developers' release 0.4.  You are looking at an
+unreleased version of this document.
 
 <p>The system relies on the DSSSL engine Jade, but
 it does <em/not/ contain a pre-built version of Jade.  See <ref
@@ -13,64 +14,15 @@ id=install> for further details of obtaining and building Jade.
 
 <subsubsect>New in this release
 
-<p>Additional features include some hooks for customising the
-output, described in <ref id=appx.system.paramdsssl>.  The generation
-of the backmatter was rewritten.  Numerous other fixes and tweaks.
+<p>None yet.
 
 <subsubsect>Changes
 
-<p>Mostly from the last to-do list.
+<p>None yet.
 <dl>
 
-<dt>Changes in DTD
-<dd>UPDATE element can now go at the end of the SUBHEAD (ie,
-effectively before the beginning of the section content.  BACKMATTER
-is now an empty element, with a 
-`bibliography' attribute, so elements bibliography, indexcontents and
-notecontents have disappeared.  Addition of `type' formatting-hint
-attribute to code element.  Addition of %simplephrase formatting
-elements to content model of verbatim.
-
-<dt>Finish documentation
-<dd>Considerable additions to the developer/maintainer section.
-Various other corrections and additions, some required by changes to
-the DTD in this release.
-
-<dt>Output of HTML down-converter should be compatible with HTX.
-<dd>Output modified with this intent.  FIXME: not yet checked against hlink.
-
 <dt>Coverpage image in DTD
-<dd>Done
-
-<dt>BOS and manifest support
-<dd>There's no support for extraction of the BOS (the `bounded object set', a
-formally-definable list of the entities required in a `complete'
-source document set) from a source document.  This is easy to extract
-yourself: any files included in an SGML document must be declared as
-entities in the Declaration Subset, you you can construct a BOS by hand
-perfectly reliably.
-<p>The stylesheets now generate a manifest of generated files, in
-<code/HTML.manifest/ and <code/LaTeX.manifest/ (configurable).
-
-<dt>Dealing with exported labels: emit a TOC of
-exported IDs at end, with links both ways
-<dd>The `link policy' is expressed in DTD.  The exported-id list has
-been catered for by adding a customisation variable
-<code/show-element-ids/ (see <ref id=appx.system.paramdsssl>) so that
-you can prepare a version of the document which displays these IDs.
-This isn't quite the same thing, but the other can be added if anyone
-feels strongly about it.
-
-<dt>Sectioning: the references to CODECOLLECTION sections within
-ROUTINECODE elements come out with the wrong numbers.
-<dd>Fixed
-
-<dt>Include a print button in the generated HTML.
-<dd>Done.
-
-<dt>Updated Jade patches
-<dd>I've fixed a couple of buglets in the Jade back-end I produced.
-The stylesheets now need version <code/1.2.1-starlink-1.0b2/.
+<dd>Now appears in &latex output, too.
 
 </dl>
 
@@ -130,24 +82,21 @@ This is both perfectly generic, and usefully visible.
 <dt>Development of the programcode DTD
 <dd>As discussed in <ref id=doccode.devel>, I am uncertain of the
 optimal balance between flexibility and structure in the programcode
-DTD.  We need to reach a consensus on this before the structure is frozen.
+DTD.  We need to reach a consensus on this before the structure is
+frozen.
+
+<dt>Extend table support
+<dd>The table support really is rudimentary.  This should be improved
+a bit at least.
 
 <dt>Bugs in Jade's LaTeX back-end
 <dd>There's a deficiency in the &latex; back-end I added to
 Jade.  There's some weakness in the way that
 characters are output, which results in SDATA entities not being
-processed properly, when
-the character data is obtained via (data) rather than
-(process-children).  Unfortunately, I think that fixing this
-one is going to need more knowledge of Jade internals than I have to
-hand right now.  The only available workaround is to avoid using any
-of the entities in <ref id=table.entities> within `DT' elements (which
-is the only place the stylesheet uses the feature which triggers the
-bug).  If you fall victim to the bug, the only effect would be a
-<code/&amp;#65533/ or <code/\\char65533/ in the output, which might
-confuse a browser or &latex, but do nothing worse.
-
-<dt>Bugs in the mk script
-<dd>There are currently a few missing targets in the installation makefile.
+processed properly.  Having discussed this with James Clark (after
+submitting a `bug fix' to him, I discovered that this is in fact a
+documented limitation of Jade, and that processing of SDATA entities
+in this way is probably not the correct way to do this), this is not
+likely to be fixed soon.
 
 </dl>
