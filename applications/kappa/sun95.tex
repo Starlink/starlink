@@ -8715,14 +8715,13 @@ the mask unaltered, whereas the second switches off the same bits.
 
 Now remembering which bit corresponds to which could be a strain on
 the memory.  It would be better if some meaning was attached to each
-bit through a name.  There are four general tasks in the
-\IRASref\ package which address this. [We plan to integrate them into the
-more-natural home of the {\footnotesize NDFPACK} sub-package of {\footnotesize KAPPA}.]
+bit through a name.  There are four general tasks which address this. 
 SETQUAL sets quality values and names; SHOWQUAL lists the named qualities;
 REMQUAL removes named qualities; and QUALTOBAD uses a logical expression
 containing the named quality properties to create a copy of your NDF
 in which pixels satisfying the quality expression are set bad.
-See Section~4.3 of \xref{SUN/163}{sun163}{} for details.
+See \hyperref{``Using Quality Names''}{section }{}{se:qnames} for more 
+information about using these tasks.
 
 \subsection{\xlabel{se_removebad}Removing bad pixels\label{se:removebad}}
 
@@ -8795,6 +8794,122 @@ with the \htmlref{PASTE}{PASTE} and \htmlref{SEGMENT}{SEGMENT} tasks.
 \normalsize
 The dataset old is a copy of dataset new, except in the 22-pixel region
 (10,~29) to (20,~30), where the values originate from the fudge dataset.
+
+\newpage
+\section{\xlabel{se_qnames}Using Quality Names\label{se:qnames}}
+
+\subsection{Introduction}
+As described in \hyperref{``Masking, Bad Values, and Quality''}{section}
+{}{se:masking},
+an {\small NDF} may optionally contain a component called {\small
+QUALITY}. If this component exists, it will be an array with the same
+bounds as the main {\small DATA} array. Each element in the {\small QUALITY}
+array can be used to store several flags which are associated with the
+corresponding element in the {\small DATA} array. These flags may be used to
+indicate that the {\small DATA} value holds some specified property. For
+instance, one of the flags may be used to indicate if the corresponding
+{\small DATA} values are saturated, another may be used to indicate if
+the {\small DATA}
+value lies within a background area, and so on. 
+
+The user is free to use the flags in whatever way seems most
+suited to the particular process being performed. The user can
+set (or reset) any of the flags within any sub-region of the {\small NDF}
+using application {\small SETQUAL}.
+Each of the flags is referred to by a ``Quality Name''
+specified by the user. Names which reflect the nature of the
+quality should be used, e.g. the quality name ``SATURATED'' could
+be used to flag saturated data values. These quality names get
+stored within the {\small NDF} and can be used to refer to the quality
+flag when running later applications. The terminology adopted here
+is that an element of the {\small DATA} array ``holds'' the quality
+``SATURATED'' (for instance) if the flag which is associated with
+the quality name ``SATURATED'' is set for the corresponding 
+element within the {\small QUALITY} array.
+
+The number of quality names which can be stored within an {\small NDF} is
+limited and therefore it may become necessary to remove quality names
+which are no longer needed to make room for new ones. The applications
+{\small SHOWQUAL} and {\small REMQUAL} allow the user to do this. {\small
+SHOWQUAL} displays a list of the quality names currently defined within
+an {\small NDF}, and {\small REMQUAL} removes specified quality names
+from an {\small NDF}.
+
+Some applications have a parameter {\small QEXP} which may be used to
+specify that the application is only to use data values which hold a
+specified selection of qualities.  As an example, when running {\small
+QUALTOBAD} the user could (for instance) specify a value of
+``BACKGROUND'' for the {\small QEXP} parameter. This means that only
+those data values for which the flag associated with the quality name
+``BACKGROUND'' is set, are to be set bad. The quality name ``BACKGROUND''
+must previously have been defined and assigned to the appropriate data
+values using application {\small SETQUAL}.
+
+The specification of the data values to be used by an application
+can be more complex than this, and can depend on several
+qualities combined together using ``Boolean'' operators. For
+instance, assigning the value ``.NOT. (SOURCE\_A .OR. SOURCE\_B)''
+would cause the application to use only those data values which
+hold neither of the qualities SOURCE\_A and/or SOURCE\_B. These
+sort of strings are  known as ``quality expressions''. 
+
+\subsection{Quality Names}
+Quality names are names by which the user refers to particular flags
+stored  in the {\small QUALITY} component of the {\small NDF}. They
+must not be longer than 15 characters. Leading blanks are ignored, and
+they are always stored in upper case, even if they are supplied by the
+user in lower case. Embedded blanks are considered to  be significant.
+Quality names must not contain any period characters (``.''), and there
+are three reserved names which cannot be used; these are ``ANY'', 
+``IRQ\_BAD\_SLOT'' and ``IRQ\_FREE\_SLOT''. 
+
+\subsection{Quality Expressions}
+Quality names may be combined together using Boolean operators
+into complex ``quality expressions''. The quality expression is
+evaluated at each element within the {\small NDF} by substituting a value
+of true or false for each quality name used in the expression,
+depending on whether or not that element holds the specified
+quality. Elements are used if the quality expression evaluates
+to a true value. Boolean operators are delimited on each side by
+a period (eg ``.AND.'' ). The operands on which these operators
+act must be either a quality name (which must be defined within
+the {\small NDF}), or one of the Boolean constants .TRUE and .FALSE.
+Parentheses can be used to nest expressions. 
+
+Quality expressions can be up to 254 characters long, and must
+not contain more than 40 symbols (Boolean operators, constants,
+or quality names). Some attempts are made to simplify a quality
+expression to reduce the run time needed to evaluate the
+expression for every data value.
+
+The precedence of the Boolean  operators decreases in the following
+order; .NOT., .AND., .OR., .XOR., .EQV. (the final two have equal 
+precedence). In an expression such as ( A .XOR. B .EQV. C .XOR. D ) in
+which all operators have equal precedence, the evaluation proceeds from
+left to right., i.e. the expression is evaluated as ( ( ( A .XOR. B )
+.EQV. C ) .XOR. D ). If there is any doubt about the order in which an
+expression will be evaluated, parentheses should be used to ensure the
+required order of evaluation. 
+
+\begin{description}
+\item [.NOT.] -
+The expression (.NOT.A) is true only if A is false.
+
+\item [.AND.] -
+The expression (A.AND.B) is true only if A and B are both true.
+
+\item [.OR.] -
+The expression (A.OR.B) is true if either (or both) of A or B are
+true. 
+
+\item [.XOR.] -
+The expression (A.XOR.B) is true if either A is true and B is
+false, or A is false and B is true. 
+
+\item [.EQV.] -
+The expression (A.EQV.B) is true if either A is true and B is
+true, or A is false and B is false. 
+\end{description}
 
 \newpage
 \section{\xlabel{se_multinvoc}Processing Groups of Data Files\label{se:multinvoc}}
@@ -11041,6 +11156,8 @@ picture.}
  Sets a new value for one or all of an NDF's axis-normalisation flags.}
 \menuitem{SETORIGIN}{
  Sets a new pixel origin for an NDF.}
+\menuitem{SETQUAL}{
+ Assign a specified quality to selected pixels within an NDF.}
 \menuitem{SETSKY}{
  Stores WCS Information in an NDF.}
 \menuitem{SETTITLE}{
@@ -11474,6 +11591,8 @@ functions as follows.
  Sets a new value for the quality bad-bits mask of an NDF.
 \classitem{SETBOUND}
  Sets new bounds for an NDF.
+\classitem{SETQUAL}
+ Assign a specified quality to selected pixels within an NDF.
 \classitem{SETTYPE}
  Sets a new numeric type for the data and variance components of an NDF.
 \classitem{SETVAR}
@@ -36452,6 +36571,219 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    }
 }
 \sstroutine{
+   SETQUAL
+}{
+   Assign a specified quality to selected pixels within an NDF
+}{
+   \sstdescription{
+      This routine assigns (or optionally removes) the quality
+      specified by parameter QNAME to (or from) selected pixels in an
+      NDF. 
+
+      The user can select the pixels to be operated on in one of three
+      ways (see parameter SELECT):
+
+      \sstitemlist{
+
+         \sstitem
+         By giving a `mask{\tt '} NDF. Pixels with bad values in the mask NDF
+         will be selected from the corresponding input NDF.
+
+         \sstitem
+         By giving a list of pixel indices for the pixels which are to
+         be selected.
+
+         \sstitem
+         By giving an ARD file  containing a description of the regions of
+         the NDF which are to be selected. The ARD system (see SUN/183) uses a
+         textual language to describe geometric regions of an array. Text
+         files containing ARD description suitable for use with this
+         routine can be created interactively using the KAPPA routine
+         ARDGEN.
+
+      }
+      The operation to be performed on the pixels is specified by
+      parameter FUNCTION. The given quality may be assigned to or
+      removed from pixels within the NDF. The pixels operated on
+      can either be those selected by the user (as described above),
+      or those not selected.  The quality of all other pixels is left
+      unchanged (unless the parameter FUNCTION is given the value NS$+$HU
+      or NU$+$HS). Thus for instance if pixel (1,1) already held the
+      quality specified by QNAME, and the quality was then assigned to
+      pixel (2,2) this would not cause the quality to be removed from
+      pixel (1,1).
+   }
+   \sstusage{
+      setqual ndf qname comment mask
+   }
+   \sstparameters{
+      \sstsubsection{
+         ARDFILE = FILENAME (Read)
+      }{
+         The name of the ARD file containing a description of the parts
+         of the NDF to be `selected{\tt '}. The ARD parameter is only prompted
+         for if the SELECT parameter is given the value {\tt "}ARD{\tt "}. The co-ordinate
+         system in which positions within this file are given should be
+         indicated by including suitable COFRAME or WCS statements within
+         the file (see SUN/183), but will default to pixel co-ordinates
+         in the absence of any such statements. For instance, starting the
+         file with a line containing the text {\tt "}COFRAME(SKY,System=FK5){\tt "} would
+         indicate that positions are specified in RA/DEC (FK5,J2000). The
+         statement {\tt "}COFRAME(PIXEL){\tt "} indicates explicitly that positions are
+         specified in pixel co-ordinates.
+      }
+      \sstsubsection{
+         COMMENT = LITERAL (Read)
+      }{
+         A comment to store with the quality name.  This parameter is
+         only prompted for if the NDF does not already contain a
+         definition of the quality name.
+      }
+      \sstsubsection{
+         FUNCTION = LITERAL (Read)
+      }{
+         This parameter specifies what function is to be performed on
+         the {\tt "}selected{\tt "} pixels specified using parameters MASK, LIST or
+         ARD. It can take any of the values {\tt "}HS{\tt "}, {\tt "}HU{\tt "}, {\tt "}NS{\tt "}, {\tt "}NU{\tt "},
+         {\tt "}HS$+$NU{\tt "} or {\tt "}HU$+$NS{\tt "}
+
+         \sstitemlist{
+
+            \sstitem
+            HS:  Ensure that the quality specified by QNAME is held by
+                 all the selected pixels. The quality of all other
+                 pixels is left un-changed.
+
+            \sstitem
+            HU:  Ensure that the quality specified by QNAME is held by all
+                 the pixels which have not been selected. The quality of
+                 the selected pixels is left un-changed.
+
+            \sstitem
+            NS:  Ensure that the quality specified by QNAME is not held by
+                 any of the selected pixels. The quality of all other
+                 pixels is left un-changed.
+
+            \sstitem
+            NU:  Ensure that the quality specified by QNAME is not held by
+                 any of the pixels which have not been selected. The
+                 quality of the selected pixels is left un-changed.
+
+            \sstitem
+            HS$+$NU:  Ensure that the quality specified by QNAME is held by
+                 all the selected pixels and not held by any of the other
+                 pixels.
+
+            \sstitem
+            HU$+$NS:  Ensure that the quality specified by QNAME is held by
+                 all the pixels which have not been selected and not held
+                 by any of the selected pixels.
+                                                                       {\tt ["HS"]}
+         }
+      }
+      \sstsubsection{
+         LIST = LITERAL (Read)
+      }{
+         A group of pixels positions within the input NDF listing the
+         pixels which are to be `selected{\tt '} (see parameter FUNCTION).
+         Each position should be giving as a list of pixel indices
+         (eg X1, Y1, X2, Y2,...  for a two dimensional NDF). LIST is
+         only prompted for if parameter SELECT is given the value LIST.
+      }
+      \sstsubsection{
+         MASK = NDF (Read)
+      }{
+         A mask NDF used to define the `selected{\tt '} pixels within the
+         input NDF (see parameter FUNCTION). The mask should be aligned
+         pixel-for-pixel with the input NDF.  Pixels which are bad in
+         the mask NDF are `selected{\tt '}. The quality of any pixels which
+         lie outside the bounds of the mask NDF are left unaltered.  This
+         parameter is only prompted for if the parameter SELECT is given
+         the value MASK.
+      }
+      \sstsubsection{
+         NDF = NDF (Update)
+      }{
+         The NDF in which the quality information is to be stored.
+      }
+      \sstsubsection{
+         QNAME = LITERAL (Read)
+      }{
+         The quality name. If the supplied name is not already defined
+         within the input NDF, then a definition of the name is
+         added to the NDF. The user is warned if the quality name is
+         already defined within the NDF.
+      }
+      \sstsubsection{
+         SELECT = LITERAL (Read)
+      }{
+         This parameter determines how the pixels are selected, and can
+         take the values {\tt "}Mask{\tt "}, {\tt "}List{\tt "} or {\tt "}ARD{\tt "} (see parameters MASK, LIST
+         and ARD). {\tt ["Mask"]}
+      }
+      \sstsubsection{
+         XNAME = LITERAL (Read)
+      }{
+         If an NDF already contains any quality name definitions then
+         new quality names are put in the same extension as the old
+         names.  If no previous quality names have been stored in the
+         NDF then parameter XNAME will be used to obtain the name of an
+         NDF extension in which to store the new quality name.  The
+         extension will be created if it does not already exist (see
+         parameter XTYPE). {\tt [QUALITY\_NAMES]}
+      }
+      \sstsubsection{
+         XTYPE = LITERAL (Read)
+      }{
+         If a new NDF extension is created to hold quality names (see
+         parameter XNAME), then parameter XTYPE is used to obtain the
+         HDS data type for the created extension. The run time default
+         is to give the extension a type identical to its name.       {\tt []}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         setqual m51 saturated {\tt "}Saturated pixels{\tt "} m51\_cut
+      }{
+         This example ensures that the quality {\tt "}SATURATED{\tt "} is defined
+         within the NDF {\tt "}M51{\tt "}. The comment {\tt "}Saturated pixels{\tt "} is stored
+         with the quality name if it did not already exist in the NDF.
+         The quality SATURATED is then assigned to all pixels for which
+         the corresponding pixel in NDF M51\_CUT is bad. The quality of
+         all other pixels is left unchanged.
+      }
+      \sstexamplesubsection{
+         setqual {\tt "}m51,cena{\tt "} source\_a select=list list=$\wedge$source\_a.lis function=hs$+$nu
+      }{
+         This example ensures that pixels within the two NDFs m51 and
+         cena which are included in the list of pixel indices held in
+         text file source\_a.lis, have the quality {\tt "}SOURCE\_A{\tt "}, and also
+         ensures that none of the pixels which were not included in
+         source\_a.lis have the quality.
+      }
+      \sstexamplesubsection{
+         setqual m51 source\_b select=ard ard=background.ard
+      }{
+         This example assigns the quality {\tt "}source\_b{\tt "} to pixels of the
+         NDF {\tt "}m51{\tt "} as described by an ARD description stored in the text
+         file {\tt "}background.ard{\tt "}. This text file could for instance have
+         been created using KAPPA routine ARDGEN.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All the quality names which are currently defined within an
+         NDF can be listed by application SHOWQUAL.  Quality name
+         definitions can be removed from an NDF using application REMQUAL.
+         If there is no room for any more quality names to be added to the
+         NDF then REMQUAL can be used to remove a quality name in order to
+         make room for the new quality names.
+      }
+   }
+}
+\sstroutine{
    SETSKY
 }{
    Stores new  WCS information within an NDF
@@ -44616,7 +44948,7 @@ If you have applications which used to link against any of these
 libraries, you should now include {\tt `kaplibs\_link\_adam`} in your
 linking command.
 
-\section{\xlabel{se_changes}Release Notes---V0.19\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V1.0\label{se:changes}}
 
 \subsection{General Changes}
 \begin{itemize}
@@ -44692,6 +45024,9 @@ The following new applications have been added:
    \item [\htmlref{REGRID}{REGRID}] \mbox{}
       Applies an arbitrary geometrical transformation to an NDF. This is a 
       WCS-aware replacement for the old TRANSFORMER command.
+   \item[\htmlref{SETQUAL}{SETQUAL}] \mbox{}
+      Assigns meaningful names for the quality bits in an NDF and also
+      sets the corresponding bit for selected pixels in the NDF.
 \end{description}
 
 \subsection{Removed Commands}
@@ -45210,6 +45545,8 @@ functions as follows.
  Sets a new value for the quality bad-bits mask of an NDF.
 \classitem{SETBOUND}
  Sets new bounds for an NDF.
+\classitem{SETQUAL}
+ Assign a specified quality to selected pixels within an NDF.
 \classitem{SETTYPE}
  Sets a new numeric type for the data and variance components of an NDF.
 \classitem{SETVAR}
