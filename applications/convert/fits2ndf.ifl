@@ -1,0 +1,86 @@
+## FITS2NDF - Converts FITS files into NDFs
+
+#+
+#  Name:
+#     FITS2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1996 January 26 (MJC):
+#	 Original version.
+#     1997 March 11 (MJC):
+#     	 Changed from GROUP types back to LITERAL.
+#     {enter_further_changes_here}
+
+#-
+
+interface FITS2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      FMTCNV         # Apply scale and zero
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Apply BSCALE and BZERO to data values in the FITS file(s)?'
+      helpkey     '*'
+      default     'TRUE'
+   endparameter
+
+   parameter      IN             # Input FITS file(s)
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      prompt      'Input FITS file(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # Log-file name
+      position    4
+      type        'FILENAME'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Filename to store FITS headers'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF(s)
+      position    2
+      type        'LITERAL'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+# Omit output association until wildcards are commonly accepted.
+#     association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      PROEXTS        # Propagate the FITS-file's extensions
+      type        '_LOGICAL'
+      prompt      'Propagate the extensions of the FITS file?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFITS        # Propagate the FITS headers 
+      type        '_LOGICAL'
+      prompt      'Create a NDF extension called FITS to store the headers?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,777 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}
+
+% an environment for references (for the SST sstdiytopic command).
+\newenvironment{refs}{\vspace{-4ex} % normally 3ex
+                      \begin{list}{}{\setlength{\topsep}{0mm}
+                                     \setlength{\partopsep}{0mm}
+                                     \setlength{\itemsep}{0mm}
+                                     \setlength{\parsep}{0mm}
+                                     \setlength{\leftmargin}{1.5em}
+                                     \setlength{\itemindent}{-\leftmargin}
+                                     \setlength{\labelsep}{0mm}
+                                     \setlength{\labelwidth}{0mm}}
+                    }{\end{list}}
+
+\begin{document}
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     10-DEC-1991 (RFWS):
+%        Refer to font files in lower case for UNIX compatibility.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Specify a variant of the itemize environment where the top separation
+%  is reduced.  It is needed because a \vspace is ignored in the
+%  \sstitemlist command.
+\newenvironment{sstitemize}{%
+  \vspace{-4.3ex}\begin{itemize}}{\end{itemize}}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{sstitemize}
+     #1
+  \end{sstitemize}
+}
+
+%  Format a list of items while in paragraph mode, and where there
+%  is a heading, thus the negative vertical space is not needed.
+\newcommand{\ssthitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+\newpage
+\sstroutine{
+   FITS2NDF
+}{
+   Converts FITS files into NDFs
+}{
+   \sstdescription{
+      This application converts one or more files in the FITS format
+      into NDFs.  It can process an arbitrary FITS file to produce an
+      NDF, using NDF extensions to store information conveyed in table
+      and image components of the FITS file.  While no information is
+      lost, in many common cases this would prove inconvenient
+      especially as no meaning is attached to the NDF extension
+      components.  Therefore, FITS2NDF recognises certain data products
+      (currently IUE Final Archive, ISO, and 2dF), and provides
+      tailored conversions that map the FITS data better on to the NDF
+      components.  For instance, a FITS IMAGE extension storing data
+      errors will have its data array transferred to the NDF's VARIANCE
+      (after being squared).  In addition, FITS2NDF can restore
+      NDFs converted to FITS by the sister task NDF2FITS.
+
+      Details of the supported special formats and rules for processing
+      them are given in topic {\tt "Special Formats"}; the general-case
+      processing rules are described in the {\tt "Notes"}.
+   }
+   \sstusage{
+      fits2ndf in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         FMTCNV = LITERAL (Read)
+      }{
+         This specifies whether or not format conversion will occur.
+         The conversion applies the values of the FITS keywords BSCALE
+         and BZERO to the FITS data to generate the {\tt "}true{\tt "} data values.
+         This applies to IMAGE extensions, as well as the primary data
+         array.  If BSCALE and BZERO are not given in the FITS header,
+         they are taken to be 1.0 and 0.0 respectively.
+
+         If FMTCNV={\tt FALSE}, the HDS type of the data array in the NDF
+         will be the equivalent of the FITS data format on tape
+         ({\em{e.g.}}\ BITPIX = 16 creates a \_WORD array).  If {\tt TRUE},
+         the data array in the NDF will be converted from the FITS data
+         type on tape to \_REAL or \_DOUBLE in the NDF.  The choice of
+         floating-point data type depends on the number of significant
+         digits in the BSCALE and BZERO keywords.
+
+         FMTCNV must be enclosed in double quotes and may be a list of
+         comma-separated values to be applied to each conversion in
+         turn.  An error results if more values than the number of
+         input FITS files are supplied.  If too few are given, the last
+         value in the list applied to all the conversions; thus a
+         single value is applied to all the input files.  If more than
+         one line is required to enter the information at a prompt then
+         place a {\tt "-"} at the end of each line where a continuation line
+         is desired.  {\tt ["TRUE"]}
+      }
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         The names of the FITS-format files to be converted to NDFs.
+         It may be a list of file names or direction specifications
+         separated by commas and enclosed in double quotes.  FITS file
+         names may include the regular expressions ({\tt "$*$"},
+         {\tt "?"}, {\tt "[a-z]"} {\em etc.}).  Indirection may occur
+         through text files (nested up to seven deep).  The indirection
+         character is {\tt "$\wedge$"}.  If extra prompt lines are
+         required, append the continuation character {\tt "-"} to the
+         end of the line.  Comments
+         in the indirection file begin with the character {\tt "\#"}.
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         The names for the output NDFs.  These may be enclosed in
+         double quotes and specified as a list of comma-separated names,
+         OR, using modification elements to specify output NDF names
+         based on the input filenames.  Indirection may be used if
+         required.
+
+         The simplest modification element is the asterisk {\tt "$*$"}, which
+         means call the output NDF files the same name (without any
+         directory specification) as the corresponding input FITS file,
+         but with file extension {\tt ".sdf"}.
+
+         Other types of modification can also occur so OUT = {\tt "x$*$"} would
+         mean that the output files would have the same name as the
+         input FITS files except for an {\tt "x"} prefix.  You can also
+         replace a specified string in the output filename, for example
+         OUT={\tt "x$*$/cal/Starlink/"} replaces the string
+         {\tt "cal"} with {\tt "Starlink"} in any of the output names
+         {\tt "x$*$"}.
+      }
+      \sstsubsection{
+         PROEXTS = \_LOGICAL (Read)
+      }{
+         This governs how any extension (here called a sub-file) within
+         the FITS file are processed in the general case.  If {\tt TRUE}, any
+         FITS sub-file is propagated to the NDF as an NDF extension
+         called NDF\_EXT\_$n$, where $n$ is the number of the extension.  If
+         {\tt FALSE}, any FITS-file extensions are ignored.  The {\tt "Notes"} of
+         the general conversion contain details of where and in what
+         form the various FITS extensions are stored in the NDF.
+
+         This parameter is ignored when the supplied FITS file is one
+         of the special formats, but excluding NDF2FITS-created files,
+         whose structure in terms of multiple FITS objects is defined.
+         Specialist NDF extensions may be created in this case.  See
+         topic {\tt "Special Formats"} for details.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         PROFITS = \_LOGICAL (Read)
+      }{
+         If TRUE, the primary headers of the FITS file are written
+         verbatim to the NDF's FITS extension.  {\tt [TRUE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         fits2ndf 256.fit f256 fmtcnv=f
+      }{
+         This converts the FITS file called {\tt 256.fit} to the NDF called
+         f256.  The data type of the NDF's data array matches that of
+         the FITS primary data array.  A FITS extension is created in
+         f256, and FITS sub-files are propagated to NDF extensions.
+      }
+      \sstexamplesubsection{
+         fits2ndf 256.fit f256 noprofits noproexts
+      }{
+         As the previous example except there will be a format conversion
+         from a FITS integer data type to floating point in the NDF
+         using the BSCALE and BZERO keywords, and there will be no
+         extensions written within f256.
+      }
+      \sstexamplesubsection{
+         fits2ndf "$*$.fit,p$*$.fits" $*$
+      }{
+         This converts a set of FITS files given by the list
+         {\tt "$*$.fit,p$*$.fits"}, where {\tt $*$} is the match-any-character wildcard.
+         The resultant NDFs take the filenames of the FITS files, so if
+         one of the FITS files was {\tt parker.fits}, the resultant NDF would
+         be called parker.  Format conversion is performed on integer
+         data types.  A FITS extension is created in each NDF and any
+         FITS sub-files present are propagated to NDF extensions.
+      }
+      \sstexamplesubsection{
+         fits2ndf swp25000.mxlo mxlo25000
+      }{
+         This converts the IUE MXLO FITS file called {\tt swp25000.mxlo} to
+         the NDF called mxlo25000.
+      }
+      \sstexamplesubsection{
+         fits2ndf "data/$*$.silo" "silo$*$$|$swp$|$$|$" noprofits
+      }{
+         This converts all the IUE SILO FITS files with file extension
+         {\tt .silo} in directory data to NDFs in the current directory.
+         Each name of an NDF is derived from the corresponding FITS
+         filename; the original name has the {\tt "swp"} removed and
+         {\tt "silo"} is prefixed.  So for example, {\tt swp25000.silo}
+         would become an NDF called silo25000.  No FITS extension is created.
+      }
+      \sstexamplesubsection{
+         fits2ndf "abc.fit,def.fts" "fgh,ijk" fmtcnv="F,T" noproexs
+      }{
+         This converts the FITS files {\tt abc.fit} and {\tt def.fts} to the NDFs
+         called fgh and ijk respectively.  Format conversion is applied
+         to {\tt abc.fit} but not to {\tt def.fts}.  FITS extensions are created
+         in the NDFs but there are no extensions for any FITS sub-files
+         that may be present.
+      }
+   }
+   \sstnotes{
+      Some sources of FITS files that require special conversion
+      rules, particularly because they use binary tables, are
+      recognised.  Details of the processing for these is given within
+      topic {\tt "Special Formats"}.  Both NDF and FITS use the term
+      extension, and they mean different things.  Thus to avoid
+      confusion in the descriptions below, the term `sub-file' is used
+      to refer to a FITS IMAGE, TABLE or BINTABLE extension.
+
+      The general rules for the conversion are as follows.
+
+      \sstitemlist{
+
+         \sstitem
+         The primary data array of the FITS file becomes the NDF's data
+         array.  There is an option using parameter FMTCNV to convert
+         integer data to floating point using the values of FITS keywords
+         BSCALE and BZERO.
+
+         \sstitem
+         Any integer array elements with value equal to the FITS
+         keyword BLANK become bad values in the NDF data array.  Likewise
+         any floating-point data set to an IEEE not-a-number value also
+         become bad values in the NDF's data array.  The BAD\_PIXEL flag is
+         set appropriately.
+
+         \sstitem
+         NDF quality and variance arrays are not created.
+
+         \sstitem
+         A verbatim copy of the FITS primary header is placed in the
+         NDF's FITS extension when parameter PROFITS is {\tt TRUE}.
+
+         \sstitem
+         Here are details of the processing of standard items from the
+         the FITS header, listed by FITS keyword.
+
+         \ssthitemlist{
+
+            \sstitem
+            CRVAL$n$, CDELT$n$, CRPIX$n$, CTYPE$n$, CUNIT$n$ --- define
+            the NDF's AXIS structure along the $n^{\rm th}$ axis.  For
+            a given axis CRVAL$n$, CRPIX$n$, and CDELT$n$ must all
+            be present to define the axis
+            centres.  Where one or more of these is absent, the axis
+            centres become pixel co-ordinates, and if this applies to all
+            dimensions in a multiple-axis dataset, no NDF AXIS structure
+            is made.  CTYPE$n$ defines the label and CUNIT$n$ the units for
+            the $n^{\rm th}$ axis.
+
+            \sstitem
+            OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
+            title, label, and units components respectively.
+
+            \sstitem
+            LBOUND$n$ --- if present, this specifies the pixel origin for
+            the $n^{\rm th}$ dimension.
+         }
+
+         \sstitem
+         Additional sub-files within the FITS files are converted into
+         extensions within the NDF if parameter PROEXTS is {\tt TRUE}.  These
+         extensions are named FITS\_EXT\_$m$ for the $m^{\rm th}$ sub-file.
+
+         \sstitem
+         An IMAGE sub-file is treated like the primary data array, and
+         follows the rules give above.  However, the resultant NDF is an
+         extension of the main NDF.
+
+         \sstitem
+         A BINTABLE or TABLE sub-file are converted into a structure
+         of type TABLE.  This has a NROWS component specifying the
+         number of rows, and a COLUMNS structure containing a series of
+         further structures, each of which has has the name of the
+         corresponding column in the FITS table.  These COLUMN structures
+         contain a column of table data values in component DATA,
+         preserving the original data type; and optional UNITS and COMMENT
+         components which specify the column's units and the meaning of
+         the column.  Thus for example, for the third sub-file of NDF
+         called ABC, the data for column called RA would be located in
+         ABC.MORE.NDF\_EXT\_3.COLUMNS.RA.DATA.
+
+         \sstitem
+         A random-group FITS file creates an NDF for each group.  As
+         they are related observations the series of NDFs are stored in a
+         single HDS container file whose name is still given by parameter
+         OUT.  Each group NDF has component name FITS\_G$n$, where $n$ is the
+         group number.
+
+         Each group NDF contains the full header in the FITS extension,
+         appended by the set of group parameters.  The group parameters
+         are evaluated using their scales and offsets, and made to look
+         like FITS cards.  The keywords of these FITS cards are derived
+         from the values of PTYPE$m$ in the main header, where $m$ is the
+         number of the group parameter.
+      }
+   }
+   \sstdiytopic{
+      Special Formats
+   }{
+      \sstitemlist{
+
+         \sstitem
+         NDF2FITS
+
+         \ssthitemlist{
+
+            \sstitem
+            This is recognised by the presence of an HDUCLAS1 keyword set
+            to {\tt 'NDF'}.  The conversion is similar to the general case, except
+            the processing of FITS sub-files and HISTORY headers.
+
+            \sstitem
+            An IMAGE sub-file converts to an NDF variance-array component,
+            provided the keyword HDUCLAS2 is present and has a value that is
+            either {\tt 'VARIANCE'} or {\tt 'ERROR'}.
+
+            \sstitem
+            An IMAGE sub-file converts to an NDF quality-array component,
+            provided the keyword HDUCLAS2 is present and has value
+            {\tt 'QUALITY'}.
+
+            \sstitem
+            FITS ASCII and binary tables become NDF extensions, however,
+            the original structure path and data type are restored using
+            the values of the EXTNAME and EXTTYPE keywords respectively.
+            An extension may be an array of structures, the shape being stored
+            in the EXTSHAPE keyword.  The shapes of multi-dimensional arrays
+            within the extensions are also restored.
+
+            \sstitem
+            HISTORY cards in a special format created by NDF2FITS are
+            converted back into NDF history records.  This will only work
+            provided the HISTORY headers have not been tampered.
+         }
+         \newpage
+
+         \sstitem
+         IUE Final Archive LILO, LIHI, SILO, SIHI
+
+         \ssthitemlist{
+
+            \sstitem
+            This converts an IUE LI or SI product stored as a FITS primary
+            data array and IMAGE extension containing the quality into an
+            NDF.  Other FITS headers are used to create AXIS structures (SI
+            products only), and character components.
+
+            \sstitem
+            Details of the conversion are:
+
+            \ssthitemlist{
+
+               \sstitem
+               The primary data array of the FITS file becomes NDF main
+               data array.  The value of parameter FMTCNV controls whether
+               keywords BSCALE and BZERO are applied to scale the data;
+               FMTCNV along with the number of significant characters in the
+               keywords decide the data type of the array.  It is expected
+               that this will be \_REAL if FMTCNV is TRUE, and \_WORD
+               otherwise.
+
+               \sstitem
+               The quality array comes from the IMAGE extension of the
+               FITS file.  The twos complement values are divided by $-$128 to
+               obtain the most-significant 8 bits of the 14 in use.  There is
+               no check that the dimension and axis-defining FITS headers in
+               this extension match those of the main data array.  The
+               standard indicates that they will be the same.
+
+               \sstitem
+               The FILENAME header value becomes the NDF's TITLE component.
+
+               \sstitem
+               The BUNIT header value becomes the NDF's UNITS component.
+
+               \sstitem
+               The CDELT$n$, CRPIX$n$, and CRVAL$n$ define the axis centres.
+               CTYPE$n$ defines the axis labels.  Axis information is only
+               available for the SILO and SIHI products.
+
+               \sstitem
+               The primary headers may be written to the NDF's FITS
+               extension when parameter PROFITS is {\tt TRUE}.
+            }
+         }
+         \bigskip
+
+         \sstitem
+         IUE Final Archive MXLO
+
+         \ssthitemlist{
+
+            \sstitem
+            This will usually be a single 1-dimensional NDF, however, if
+            the binary table contains more than one row, a series of NDFs are
+            stored in a single HDS container file whose name is specified by
+            parameter OUT.  The name of each NDF is the row number.  Thus for
+            OUT=ABC, the second observation will be in NDF ABC.2.
+
+            \sstitem
+            Only the most-significant 8 bits of the quality flags are
+            transferred to the NDF.
+
+            \sstitem
+            The primary headers may be written to the standard FITS
+            airlock extension when PROFITS is {\tt TRUE}.
+
+            \sstitem
+            The conversion from binary-table columns and headers to NDF
+            objects is as follows:
+            \medskip
+
+            \begin{tabular}{lp{100mm}}
+            NPOINTS            &   Number of elements \\
+            WAVELENGTH         &   Start wavelength, axis label and units \\
+            DELTAW             &   Incremental wavelength \\
+            FLUX               &   Data array, label, units, bad-pixel flag \\
+            SIGMA              &   Data-error array \\
+            QUALITY            &   Quality array \\
+            remaining columns  &   Component in IUE\_MX extension (NET and
+                                   BACKGROUND are NDFs) \\
+            \end{tabular}
+         }
+         \bigskip
+
+         \sstitem
+         ISO CAM auto-analysis (CMAP, CMOS)
+
+         \ssthitemlist{
+
+            \sstitem
+            The CAM auto-analysis FITS products have a binary table
+            using the {\tt "}Green Bank{\tt "} convention, where rows
+            of the table represent a series of observations, and each
+            row is equivalent to a normal simple header and data unit.  Thus
+            most of the columns have the same names as
+            the standard FITS keywords.
+
+            \sstitem
+            If there is only one observation, a normal NDF is produced; if
+            there are more than one, the HDS container file of the supplied
+            NDF is used to store a series of NDFs---one for each
+            observation---called OBS$n$, where $n$ is the observation number.
+            Each observation comprises three rows in the binary table
+            corrsponding to the flux, the r.m.s. errors, and the integration
+            times.
+
+            \sstitem
+            The conversion from binary-table columns to NDF objects is as
+            follows:
+            \medskip
+
+            \begin{tabular}{lp{100mm}}
+            ARRAY              &   Data, error, exposure arrays depending
+                                   on the value of column TYPE \\
+            BLANK              &   Data blank ({\tt{i.e.}}\ undefined value) \\
+            BUNIT              &   Data units \\
+            BSCALE             &   Data scale factor \\
+            BZERO              &   Data offset \\
+            CDELT$n$           &   Pixel increment along axis $n$ \\
+            CRPIX$n$           &   Axis $n$ reference pixel \\
+            CRVAL$n$           &   Axis $n$ co-ordinate of reference pixel \\
+            CTYPE$n$           &   Label for axis $n$ \\
+            CUNIT$n$           &   Units for axis $n$ \\
+            NAXIS              &   Number of dimensions \\
+            NAXIS$n$           &   Dimension of axis $n$ \\
+            remaining columns  &   keyword in FITS extension \\
+            \end{tabular}
+            \medskip
+
+            Some of these remaining columns overwrite the (global) values
+            in the primary headers.  The integration times are stored as
+            an NDF within an extension called EXPOSURE.
+            \medskip
+
+            The creation of axis information and extensions does not occur
+            for the error array, as these are already generated when the
+            data-array row in the binary table is processed.
+            \medskip
+
+            The BITPIX column is ignored as the data type is determined
+            through the use the TFORM$n$ keyword and the value of FMTCNV in
+            conjunction with the BSCALE and BZERO columns.
+         }
+         \bigskip
+
+         \sstitem
+         ISO LWS auto-analysis (LWS AN)
+
+         \ssthitemlist{
+            \sstitem
+            The conversion from binary-table columns to NDF objects is
+            as follows:
+            \medskip
+
+            \begin{tabular}{ll}
+               LSANFLX            &   Data array, label, and units \\
+               LSANFLXU           &   Data errors, hence variance \\
+               LSANDET            &   Quality (bits 1 to 4) \\
+               LSANSDIR           &   Quality (bit 5) \\
+               LSANRPID           &   Axis centres, labels, and units
+                                      $x$-$y$ positions---dimensions 1 and 2) \\
+               LSANSCNT           &   Axis centre, label, and unit (scan
+                                      (count index---dimension 4) \\
+               LSANWAV            &   Axis centre, label, and unit
+                                      (wavelength---dimension 3) \\
+               LSANWAVU           &   Axis errors (wavelength---dimension 3) \\
+               LSANFILL           &   not copied \\
+               remaining columns  &   column name in LWSAN extension \\
+            \end{tabular}
+         }
+         \bigskip
+
+         \sstitem
+         ISO SWS auto-analysis (SWS AA)
+
+         \ssthitemlist{
+            \sstitem
+            The conversion from binary-table columns to NDF objects is
+            as follows:
+            \medskip
+
+            \begin{tabular}{ll}
+               SWAAWAVE           &   Axis centres, label, and units \\
+               SWAAFLUX           &   Data array, label, and units \\
+               SWAASTDV           &   Data errors, hence variance \\
+               SWAADETN           &   Quality \\
+               SWAARPID           &   not copied \\
+               SWAASPAR           &   not copied \\
+               remaining columns  &   column name in SWSAA extension \\
+            \end{tabular}
+         }
+         \bigskip
+
+         \sstitem
+         AAO 2dF
+
+         \ssthitemlist{
+
+            \sstitem
+            The conversion is restricted to a 2dF archive FITS file
+            created by task NDF2FITS.  FITS2NDF restores the original NDF.
+            It creates the 2dF FIBRES extension and its constituent
+            structures, and NDF\_CLASS extension.  In addition the variance,
+            axes, and HISTORY records are converted.
+
+            \sstitem
+            The HISTORY propagation assumes that the FITS HISTORY headers
+            have not been tampered.
+
+            \sstitem
+            Details of the conversion are:
+
+            \ssthitemlist{
+
+               \sstitem
+               The primary data array becomes the NDF's data array.  Any
+               NaN values present become bad values in the NDF.
+
+               \sstitem
+               The keywords CRVAL$n$, CDELT$n$, CRPIX$n$, CTYPE$n$, CUNIT$n$ are
+               used to create the NDF axis centres, labels, and units.
+
+               \sstitem
+               The OBJECT, LABEL, BUNIT keywords define the NDF's title,
+               label, and units components respectively, if they are defined.
+
+               \sstitem
+               HISTORY cards in a special format created by NDF2FITS are
+               converted back into NDF history records.
+
+               \sstitem
+               The NDF variance is derived from the data array in the first
+               (IMAGE) sub-file.
+
+               \sstitem
+               The NDF\_CLASS extension within the NDF is filled using the
+               next FITS sub-file---a binary table.
+
+               \sstitem
+               The FIBRES extension is created using the second binary
+               table.  The OBJECT substructure's component names, data types,
+               and values are taken from the binary-table columns themselves,
+               and the components of the FIELD substructure are extracted
+               from recognised keywords in the binary-table's header.
+
+               \sstitem
+               A FITS extension in the NDF may be written to store the
+               primary data unit's headers when parameter PROFITS is
+               {\tt TRUE}.
+            }
+         }
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \begin{refs}
+      \item Bailey, J.A. 1996, 2dF Software Report 14, version 0.3.
+      \item NASA Office of Standards and Technology, 1994, {\it A User's Guide
+       for the Flexible Image Transport System (FITS)}, version 3.1.
+      \item NASA Office of Standards and Technology, 1995, {\it Definition of
+       the Flexible Image Transport System (FITS)}, version 1.1.
+      \end{refs}
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      \CONVERT: NDF2FITS; \KAPPA: FITSDIN, FITSIN.
+   }
+}
+\end{document}
