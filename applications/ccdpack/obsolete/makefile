@@ -599,7 +599,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_rfcr.f ccd1_rflt.f ccd1_rglo.f ccd1_rmcom.f \
  ccd1_rmsd.f ccd1_rmsk.f ccd1_rmulo.f ccd1_rnorm.f \
  ccd1_rsetu.f ccd1_rtran.f ccd1_save.f \
- ccd1_sched.f ccd1_scrch.f ccd1_soff.f ccd1_spair.f \
+ ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f ccd1_spair.f \
  ccd1_stao.f ccd1_start.f ccd1_strgr.f \
  ccd1_stsat.f ccd1_stvb.f ccd1_subcs.f ccd1_szlsf.f \
  ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tcout.f ccd1_tfun.f \
@@ -2346,6 +2346,7 @@ ccd1_sched.o: SAE_PAR
 ccd1_scrch.o: SAE_PAR
 ccd1_sdect.o: FIO_ERR MSG_PAR PAR_ERR PSX_ERR SAE_PAR
 ccd1_setpa.o: SAE_PAR
+ccd1_sngl.o: PRM_PAR SAE_PAR
 ccd1_soff.o: PRM_PAR SAE_PAR
 ccd1_spair.o: IDI_ERR IDI_PAR NDF_PAR SAE_PAR
 ccd1_stao.o: SAE_PAR
@@ -2509,7 +2510,7 @@ ccg1_wtm3.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 debias.o: CCD1_PAR DAT_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 findcent.o: CCD1_PAR DAT_PAR FIO_PAR NDF_PAR PAR_ERR SAE_PAR
 findobj.o: CCD1_PAR DAT_PAR FIO_PAR NDF_PAR PAR_ERR SAE_PAR
-findoff.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
+findoff.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR
 fio1_cllog.o: FIO1_CLOG SAE_PAR
 fio1_errep.o: FIO1_CLOG SAE_PAR
 fio1_msg.o: FIO1_CLOG SAE_PAR
