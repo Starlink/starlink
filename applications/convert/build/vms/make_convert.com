@@ -62,7 +62,7 @@ FIGARO_LIBS:DTA/LIB,-
 DYN/LIB,-
 CNV/LIB,-
 KAPPA_DIR:AIF/LIB,-
-KAPPA_DIR:PAR/LIB,-
+CONVERT_DIR:PART/LIB,-
 SYS$LIBRARY:VAXCRTL/L 'P1'
 $!
 $!  Purge old versions of the executable file.
