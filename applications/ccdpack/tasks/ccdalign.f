@@ -214,6 +214,11 @@
 *        cleaner this way anyway.
 *     11-OCT-2000 (MBT):
 *        Rewrote using Tcl instead of IDI.
+*     10-NOV-2000 (MBT):
+*        Fixed a serious bug present since the WCS upgrade in 1999 which
+*        meant that it simply didn't do the alignment properly, because
+*        it was getting confused about what position lists were in
+*        what coordinates.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -260,6 +265,7 @@
       CHARACTER * ( 30 ) LISTID ! Identifier in filename for list
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       CHARACTER * ( GRP__SZNAM ) REFNAM ! Name of reference NDF
+      CHARACTER * ( GRP__SZNAM ) REGNAM ! Name of reference NDF for REGISTER
       CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list file
       CHARACTER * ( FIO__SZFNM ) NAMLST ! File name list
       CHARACTER * ( 30 ) CCDREG ! Message system name for ccdpack_reg
@@ -555,6 +561,7 @@
 *  Need a list of all the input NDFs. To get this we create a new file
 *  ccdalign_ndfs.list and copy the contents of all the groups files
 *  into it.
+      REGNAM = ' '
       CALL CCD1_OPFIO( 'ccdalign_ndfs.list', 'WRITE', 'LIST', 0, FDOUT, 
      :                 STATUS )
       DO 6 I = 1, NGROUP - 1
@@ -565,10 +572,12 @@
          CALL ERR_MARK
 
 *  While we can read this file, copy its contents into the total list.
+*  Save the name of the very first NDF in the list for use later.
  7       CONTINUE
          IF ( STATUS .EQ. SAI__OK ) THEN 
             CALL FIO_READ( FD, NDFNAM, NDFLEN, STATUS )
             CALL FIO_WRITE( FDOUT, NDFNAM, STATUS )
+            IF ( REGNAM .EQ. ' ' ) REGNAM = NDFNAM
             GO TO 7
          END IF
          IF ( STATUS .EQ. FIO__EOF ) THEN 
@@ -590,29 +599,55 @@
       CMD( OPLEN + 1: ) = ' ndfnames=true '//
      :      'inlist=^ccdalign_ndfs.list '//
      :      'refpos=1 '//
-     :      'outref=ccdalign_ref.ext accept'
+     :      'usewcs=true '//
+     :      'outdomain=ccd_reg1 '//
+     :      'outref=ccdalign_ref.ext reset accept'
       CALL SLV_OBEYW( CCDREG, 'register', CMD, ' ', STATUS )
 
 *  Now need to transform all the extended reference set to the coordinates of
 *  all the other NDFs before re-centroiding to get accurate positions for any
 *  image features beyond the initial reference set.
 *  Associate extended reference set with all NDFs
+
+*  Transform the reference list from pixel coordinates of the reference 
+*  NDF to CCD_REG1 coordinates, in which all the frames are registered.
+      CALL MSG_SETC( 'REGNAM', REGNAM )
+      CALL MSG_LOAD( ' ', 
+     :               'logto=n '//
+     :               'ndfnames=false '//
+     :               'inlist=ccdalign_ref.ext '//
+     :               'trtype=wcs '//
+     :               'framein=pixel '//
+     :               'frameout=ccd_reg1 '//
+     :               'outlist=ccdalign_reg.ext '//
+     :               'wcsfile=^REGNAM '//
+     :               'forward=true reset accept', CMD, OPLEN, STATUS )
+      CALL SLV_OBEYW( CCDREG, 'tranlist', CMD, ' ', STATUS )
+
+*  Associate this single position list, which corresponds to global
+*  CCD_REG1 frame, with each of the NDFs.
       CMD = 'logto=n '//
      :      'mode=alist '//
      :      'in=^ccdalign_ndfs.list '//
-     :      'inlist=ccdalign_ref.ext accept'
+     :      'inlist=ccdalign_reg.ext accept'
       CALL SLV_OBEYW( CCDREG, 'ccdedit', CMD, ' ', STATUS )
+
+*  Now write a new position list for each NDF with the points from the
+*  reference list but transformed into its own Pixel coordinates, which
+*  is the more usual CCDPACK format.
       CMD = 'logto=n '//
      :      'ndfnames=true '//
      :      'inlist=^ccdalign_ndfs.list '//
      :      'outlist=*.ext '//
      :      'inext=true '//
-     :      'forward=false '//
+     :      'forward=true '//
      :      'trtype=wcs '//
-     :      'framein=ccd_reg '//
+     :      'framein=ccd_reg1 '//
      :      'frameout=pixel '//
      :      'accept'
       CALL SLV_OBEYW( CCDREG, 'tranlist', CMD, ' ', STATUS )
+
+*  Centroid the positions.
       CMD = 'logto=n '//
      :      'ndfnames=true '//
      :      'outlist=*.acc '//
@@ -629,7 +664,8 @@
       CMD( OPLEN + 1: ) = ' ndfnames=true '//
      :      'inlist=^ccdalign_ndfs.list '//
      :      'refpos=1 '//
-     :      'outref=ccdalign_ref.ext '//
+     :      'usewcs=true '//
+     :      'outdomain=ccd_reg '//
      :      'logto=both accept reset'
       CALL SLV_OBEYW( CCDREG, 'register', CMD, ' ', STATUS )
 
