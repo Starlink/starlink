@@ -62,7 +62,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -268,7 +268,7 @@
         CALL ADI_FTRACE( IFID2, NLEV, LABEL, FILE, STATUS )
         CALL BDI_PUT0C( DFID, 'Label', LABEL, STATUS )
       ELSE
-        CALL BDI_COPY( IFID1, 'Title,Label,Units', OFID, ' ', STATUS )
+        CALL BDI_COPY( IFID1, 'Title,Label,Units', DFID, ' ', STATUS )
       END IF
 
 *    GCB control (format output as markers)
