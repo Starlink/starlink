@@ -10,26 +10,24 @@
 itk::usual LabelCommandMenu {}
 
 # This widget displays a label and a menubutton with a list of
-# associated commands. This can be used as a means of providing access 
+# associated commands. This can be used as a means of providing access
 # to many commands from a single button.
 
 itcl::class gaia::LabelCommandMenu {
-   inherit util::FrameWidget
+   inherit util::LabelWidget
 
    #  Constructor:
    constructor {args} {
       set menu $w_.mb.m
       itk_component add mb {
-         menubutton $w_.mb -menu $menu
+         menubutton $w_.mb -menu $menu \
+            -indicatoron 1 -padx 2 -pady 2
       } {
-         keep -indicatoron -relief -borderwidth -state \
-            -text -anchor -width
-         rename -font -labelfont labelFont Font
+         keep -relief -borderwidth -state
          ignore -disabledforeground
       }
-      pack $itk_component(mb) \
-         -side left -fill x -expand 1 -padx 1m -ipadx 1m
-      
+      pack $itk_component(mb) -side right -fill x -padx 1m -ipadx 1m
+
       itk_component add menu {
          menu $menu
       } {
@@ -39,11 +37,11 @@ itcl::class gaia::LabelCommandMenu {
       set default_bg_ [$itk_component(mb) cget -background]
       eval itk_initialize $args
    }
-   
+
    #  Destructor:
    destructor {
    }
-   
+
    #  Remove all of the items in the menu
    method clear {} {
       $itk_component(menu) delete 0 end
@@ -54,7 +52,6 @@ itcl::class gaia::LabelCommandMenu {
       $itk_component(menu) add separator
    }
 
-
    #  Add a command item to the menu.
    #  The args may be the options:
    #     -command <the cmd to execute when item is selected>
@@ -63,7 +60,7 @@ itcl::class gaia::LabelCommandMenu {
    #     -background <color of menu item and button when chosen>
    #     -font <font of menu item and button when chosen>
    #
-   #  The -command option should always be supplied (otherwise nothing 
+   #  The -command option should always be supplied (otherwise nothing
    #  will happen).
    method add {args} {
 
@@ -102,11 +99,11 @@ itcl::class gaia::LabelCommandMenu {
          }
       }
       eval $cmd
-	
+
       #  Save label or bitmap name for later reference
       set names_($id) 1
    }
-   
+
    #  Return true if the LabelMenu contains the given item
    #  (specified by the label or bitmap name).
    method contains {name} {

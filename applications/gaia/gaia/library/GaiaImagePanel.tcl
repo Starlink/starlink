@@ -68,19 +68,19 @@ itcl::class gaia::GaiaImagePanel {
       blt::table $w_
       add_short_help $w_ {Image information area}
 
-      #  Make a frame at the lower right of the panel that optionally
-      #  holds the "Auto Set" button, ...
-      itk_component add lrframe {
-         frame $w_.lrframe
-      }
-
       #  Add a series of buttons to set the cut levels.
       if {$itk_option(-showcut) } {
+         itk_component add aframe {
+            frame $w_.aframe -borderwidth 2 -relief flat
+         }
+         set lwidth [expr $itk_option(-labelwidth)+6]
          itk_component add autocut {
-            LabelCommandMenu $itk_component(lrframe).autocut \
+            LabelCommandMenu $itk_component(aframe).autocut \
                -text "Auto Cut:" \
+               -labelwidth $lwidth \
                -labelfont $itk_option(-labelfont) \
-               -valuefont $itk_option(-valuefont)
+               -valuefont $itk_option(-valuefont) \
+               -anchor e
          }
          foreach value {100 99.5 99 98 95 90 80 70 60 50} {
             $itk_component(autocut) add \
@@ -90,13 +90,15 @@ itcl::class gaia::GaiaImagePanel {
 
          #  Select a colour table.
          itk_component add autocolor {
-            LabelCommandMenu $itk_component(lrframe).autocolor \
+            LabelCommandMenu $itk_component(aframe).autocolor \
                -text "Color Map:" \
+               -labelwidth $lwidth \
                -labelfont $itk_option(-labelfont) \
-               -valuefont $itk_option(-valuefont)
+               -valuefont $itk_option(-valuefont) \
+               -anchor e
          }
          foreach {name value} \
-            {default real greyscale ramp color rainbow3 heat heat} {
+            {default real greyscale ramp color bgyrw heat heat pastel pastel} {
             $itk_component(autocolor) add \
                -label "$name" \
                -command [code $this set_colormap_ $value] \
@@ -104,20 +106,25 @@ itcl::class gaia::GaiaImagePanel {
 
          #  Select an ITT table.
          itk_component add autoitt {
-            LabelCommandMenu $itk_component(lrframe).autoitt \
+            LabelCommandMenu $itk_component(aframe).autoitt \
                -text "Intensity Map:" \
+               -labelwidth $lwidth \
                -labelfont $itk_option(-labelfont) \
-               -valuefont $itk_option(-valuefont)
+               -valuefont $itk_option(-valuefont) \
+               -anchor e
          }
          foreach {name value} \
-            {default ramp {hist equalize} equa log log {negative ramp} neg} {
+            {default ramp {hist equalize} equa log log 
+            {negative ramp} neg wrapped lasritt} {
             $itk_component(autoitt) add \
                -label "$name" \
                -command [code $this set_ittmap_ $value] \
          }
-         pack $itk_component(autocut) -side top -fill x
-         pack $itk_component(autocolor) -side top -fill x
-         pack $itk_component(autoitt) -side top -fill x
+         pack $itk_component(autocut) -expand 1 -ipadx 1m -ipady 1m
+         pack $itk_component(autocolor) -expand 1 -ipadx 1m -ipady 1m
+         pack $itk_component(autoitt) -expand 1 -ipadx 1m -ipady 1m
+         blt::table $w_ \
+            $itk_component(aframe) 3,2 -rowspan 3 -anchor w
       }
 
       #  The RtdImage code sets this array for us to speed up the panel
@@ -276,12 +283,12 @@ itcl::class gaia::GaiaImagePanel {
          }
          blt::table $w_ \
             $itk_component(min)     3,0 -fill x -anchor w \
-            $itk_component(max)     3,1 -fill x -anchor w \
-            $itk_component(bitpix)  3,2 -fill x -anchor w
-         
+            $itk_component(max)     3,1 -fill x -anchor w
+#            $itk_component(bitpix)  3,2 -fill x -anchor w
+
          add_short_help $itk_component(min) {Estimated minimum raw image value}
          add_short_help $itk_component(max) {Estimated maximum raw image value}
-         add_short_help $itk_component(bitpix) {Raw image FITS data type code}
+#         add_short_help $itk_component(bitpix) {Raw image FITS data type code}
       }
       
       # cut level controls
@@ -316,8 +323,7 @@ itcl::class gaia::GaiaImagePanel {
          }
          blt::table $w_ \
             $itk_component(low)     4,0 -fill x -anchor w \
-            $itk_component(high)    4,1 -fill x -anchor w \
-            $itk_component(lrframe) 4,2 -fill x -anchor w -rowspan 2
+            $itk_component(high)    4,1 -fill x -anchor w
          
          add_short_help $itk_component(low) {Image low cut value, type return after editing value}
          add_short_help $itk_component(high) {Image high cut value, type return after editing value}
@@ -342,7 +348,6 @@ itcl::class gaia::GaiaImagePanel {
          blt::table $w_ \
             $itk_component(trans)   5,0 -fill x -anchor w -columnspan 2
       }
-      
       blt::table configure $w_ c2 -padx 1m
    }
 

@@ -113,7 +113,7 @@ itcl::class gaia::GaiaImageCtrl {
    protected method make_panel_info {panel} {
       #  Add info panel
       feedback "info panel..."
-        
+
       # Info panel, GaiaImagePanel object used to display image controls
       itk_component add info {
          gaia::GaiaImagePanel $panel.info \
@@ -281,7 +281,7 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Create a graph to display the image data values along the line
    #  just created.
-   #  "line_id" is the canvas id of the line.
+   #     "line_id" is the canvas id of the line.
    #  Extended to call derived class that also saves slice as an
    #  image.
    public method make_spectrum {line_id x0 y0 x1 y1} {
@@ -380,7 +380,6 @@ itcl::class gaia::GaiaImageCtrl {
             maybe_delete_
             delete_temporary_
          }
-
          if {[file isfile $image]} {
             configure -file $file
          } else {
@@ -389,7 +388,6 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
-   
    #  Reload the image file, if there is one
    #  (redefined from parent class, since we use different mmap flags here
    #  that cause the inherited version to not work).
@@ -472,7 +470,7 @@ itcl::class gaia::GaiaImageCtrl {
    }
 
    #  Clear the current image display and remove an windows that
-   #  access it (extend parent class version to also deal with 
+   #  access it (extend parent class version to also deal with
    #  temporary images).
    public method clear {} {
 
@@ -488,10 +486,10 @@ itcl::class gaia::GaiaImageCtrl {
    #  Load a FITS file (internal version: use -file option/public
    #  variable), modified to deal with image slices.
    public method load_fits_ {} {
-      
+
       #  See if the image should be saved (image server types).
       check_save
-      
+
       #  Deal with any slice specification.
       set image $itk_option(-file)
       set i1 [string last {(} $image]
@@ -505,6 +503,7 @@ itcl::class gaia::GaiaImageCtrl {
          set old_height [$image_ height]
          busy {
             set center_ok_ 0
+            puts "Opening: $itk_option(-file)"
             if {[catch {$image_ config -file $itk_option(-file) \
                            -component $itk_option(-component)} msg]} {
                error_dialog $msg $w_
@@ -535,7 +534,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  temporary files are retained until all instances are released).
    private method only_user_ {} {
       global ::tcl_version
-      if { $tcl_version >= 8.0 } { 
+      if { $tcl_version >= 8.0 } {
          foreach inst [itcl::find objects "*" -isa "GaiaImageCtrl"] {
             if { $inst != $this } {
                if { $last_file_ == [$inst cget -file] } {

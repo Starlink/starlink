@@ -167,12 +167,16 @@ itcl::class gaia::Gaia {
    public method init {} {
 
       #  If not first window then show splash screen (better than no feedback).
-      if { $itk_option(-number) != 1 } { 
+      if { $itk_option(-number) != 1 } {
          make_init_window 1
       }
 
-      #  Do base class inits.
+      #  Do base class inits. Note stop creation of cat menu so we can
+      #  override use of SkySearch class.
+      set curval $itk_option(-cat)
+      set itk_option(-cat) 0
       SkyCat::init
+      set itk_option(-cat) $curval
 
       #  Get the clone number for this window.
       set clone_ $itk_option(-number)
@@ -193,6 +197,12 @@ itcl::class gaia::Gaia {
       feedback "filters..."
       if { $itk_option(-filters) } {
          make_filters_menu
+      }
+
+      #  Add the catalogue menu.
+      if {$itk_option(-cat)} {
+         cat::AstroCat::add_catalog_menu \
+            $w_ [code $image_] ::gaia::GaiaSearch $itk_option(-debug)
       }
 
       #  Add the SkyCat graphics features (really a plugin, but we're
@@ -223,7 +233,7 @@ itcl::class gaia::Gaia {
       rtd_set_cmap $w
       wm title $w "GAIA::SkyCat loading..."
       wm withdraw $w_
-      if { ! $plain } { 
+      if { ! $plain } {
          set gaia_logo [image create pixmap -id gaia_logo]
          pack \
             [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
@@ -629,7 +639,7 @@ itcl::class gaia::Gaia {
    #  When image is flipped etc. we may want to redraw some items
    #  that are to expense to flip via Tcl commands.
    #  If auto is set 1 then the grid is only redrawn if automatic
-   #  redraws are on. 
+   #  redraws are on.
    protected method redraw_specials_ { {auto 0} } {
       if { [info exists itk_component(astgrid) ] &&
            [winfo exists $itk_component(astgrid) ] } {
@@ -793,8 +803,8 @@ itcl::class gaia::Gaia {
           return $name
       }
 
-      #  use the -noop option to avoid reloading the main image 
-      #  (part of $argv list). The renames stop start method from 
+      #  use the -noop option to avoid reloading the main image
+      #  (part of $argv list). The renames stop start method from
       #  blocking with a tkwait.
       rename ::tkwait ::real_tkwait
       rename ::false_tkwait ::tkwait
