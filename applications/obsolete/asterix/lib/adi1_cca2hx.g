@@ -88,6 +88,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
@@ -102,7 +103,10 @@
 *  Local Variables:
       <TYPE>			VALUE			! Intermediate value
 
+      INTEGER			DIMS(ADI__MXDIM)	! Data dimensions
       INTEGER			MID			! Member identifier
+      INTEGER			NDIM			! Member dimensionality
+      INTEGER			VPTR			! Data address
 
       LOGICAL			THERE			! Object exists?
 *.
@@ -130,14 +134,34 @@
           CALL DAT_ERASE( LOC, CMP, STATUS )
         END IF
 
+*    Get dimensions
+        CALL ADI_SHAPE( MID, ADI__MXDIM, DIMS, NDIM, STATUS )
+
 *    Create the HDS value
-        CALL DAT_NEW0<T>( LOC, CMP, STATUS )
+        CALL DAT_NEW( LOC, CMP, '<HTYPE>', NDIM, DIMS, STATUS )
 
-*    Read the ADI data
-        CALL ADI_GET0<T>( MID, VALUE, STATUS )
+*    Scalar?
+        IF ( NDIM .EQ. 0 ) THEN
 
-*    Write to HDS
-        CALL CMP_PUT0<T>( LOC, CMP, VALUE, STATUS )
+*      Read the ADI data
+          CALL ADI_GET0<T>( MID, VALUE, STATUS )
+
+*      Write to HDS
+          CALL CMP_PUT0<T>( LOC, CMP, VALUE, STATUS )
+
+        ELSE
+
+*      Map the ADI data
+          CALL ADI_MAP<T>( MID, 'READ', VPTR, STATUS )
+
+*      Write to HDS
+          CALL CMP_PUTN<T>( LOC, CMP, NDIM, DIMS, %VAL(VPTR), DIMS,
+     :                      STATUS )
+
+*      Unmap the ADI data
+          CALL ADI_UNMAP( MID, VPTR, STATUS )
+
+        END IF
 
       END IF
 

@@ -239,7 +239,7 @@
         IF ( OK ) THEN
           CALL BDI_MAPLQUAL( MFID, 'READ', ANYBAD, MQPTR, STATUS )
           IF ( ANYBAD ) THEN
-            CALL MSG_PRNT( 'Using model quality array...' )
+            CALL MSG_OUT( ' ', 'Using model quality array...', STATUS )
           ELSE
             CALL BDI_UNMAPLQUAL( MFID, STATUS )
           END IF
@@ -290,7 +290,7 @@
 *      Report counts in model
         MTOT = MTOT*TEFF
         CALL MSG_SETR( 'C', MTOT )
-        CALL MSG_PRNT( 'Model contains ^C counts' )
+        CALL MSG_OUT( ' ', 'Model contains ^C counts', STATUS )
 
 *      Introduce to psf system
         CALL PSF_INTRO( MFID, MPSF, STATUS )
@@ -333,8 +333,6 @@
 *      Invent some WCS stuff
         CALL WCI_NEWPRJ( 'TAN', 0, 0.0, SPOINT, 180D0, PRJID, STATUS )
         CALL WCI_NEWSYS( 'FK5', 2000.0, 2000D0, SYSID, STATUS )
-	call adi_print( prjid, status )
-	call adi_print( sysid, status )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -483,7 +481,7 @@
  12       FORMAT ( 2A, I4.4 )
           WRITE( ONAME, 12 ) OROOT(:CHR_LEN(OROOT)), '_', IFILE+FFILE-1
           CALL MSG_SETI( 'N', IFILE+FFILE-1 )
-          CALL MSG_PRNT( 'Creating file ^N' )
+          CALL MSG_OUT( ' ', 'Creating file ^N', STATUS )
         END IF
 
 *      Open file
@@ -549,15 +547,6 @@
 *        Write data units
           CALL BDI_PUTUNITS( OFID, 'counts', STATUS )
 
-*        Create structures to hold simulation parameters
-C          CALL DAT_NEW( MORELOC, 'SIM_DATA', 'EXTENSION', 0, 0, STATUS )
-C          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
-C          CALL DAT_NEW0I( SIMLOC, 'SEED', STATUS )
-C          CALL DAT_NEW0I( SIMLOC, 'BCOUNT', STATUS )
-C          IF ( NSRC .GT. 0 ) THEN
-C            CALL DAT_NEW1I( SIMLOC, 'SCOUNT', NSRC, STATUS )
-C          END IF
-
 *        Associate psf if first time through
           IF ( NSRC .GT. 0 ) THEN
             CALL PSF_TASSOCO( OFID, PSLOT, STATUS )
@@ -572,10 +561,6 @@ C          END IF
 *        Copy everything from first dataset
           CALL ADI_FCOPY( FOFID, OFID, STATUS )
 
-*        Locate MORE and SIM_DATA
-C          CALL DAT_FIND( OLOC, 'MORE', MORELOC, STATUS )
-C          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
-
         END IF
 
 *      Map output data
@@ -584,11 +569,11 @@ C          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
 
 *      Dump counts to user
         CALL MSG_SETI( 'NB', NBACK )
-        CALL MSG_PRNT( 'Background ^NB counts' )
+        CALL MSG_OUT( ' ', 'Background ^NB counts', STATUS )
         DO ISRC = 1, NSRC
           CALL MSG_SETI( 'N', ISRC )
           CALL MSG_SETI( 'SC', SCOUNT(ISRC) )
-          CALL MSG_PRNT( 'Source ^N ^SC counts' )
+          CALL MSG_OUT( ' ', 'Source ^N ^SC counts', STATUS )
         END DO
 
 *      Generate random positions
@@ -602,17 +587,14 @@ C          CALL DAT_FIND( MORELOC, 'SIM_DATA', SIMLOC, STATUS )
         END IF
 
 *      Create image
-        CALL IMSIM_INT( OFID, PSLOT, SEED,
-     :                  XBASE, XSCALE, YBASE, YSCALE,
-     :                  NSRC, SCOUNT, WIDS, NBACK, MOK, %VAL(MIPTR),
-     :                  XSCALE*TOR, YSCALE*TOR, TOR,
+        CALL IMSIM_INT( OFID, PSLOT, SEED, XBASE, XSCALE, YBASE,
+     :                  YSCALE, NSRC, SCOUNT, WIDS, NBACK, MOK,
+     :                  %VAL(MIPTR), XSCALE*TOR, YSCALE*TOR, TOR,
      :                  ODIMS(1), ODIMS(2), %VAL(ODPTR), IFILE, PSW2,
      :                  %VAL(PDPTR), PIN, %VAL(PIPTR),
      :                  XPOS, YPOS, NOUT, STATUS )
 
 *      Always unmap data and release from BDA
-C        CALL DAT_ANNUL( MORELOC, STATUS )
-C        CALL DAT_ANNUL( SIMLOC, STATUS )
 	CALL BDI_UNMAPDATA( OFID, STATUS )
         CALL BDI_RELEASE( OFID, STATUS )
 
@@ -629,6 +611,7 @@ C        CALL DAT_ANNUL( SIMLOC, STATUS )
 *    Free model
       IF ( MOK ) THEN
         CALL BDI_RELEASE( MFID, STATUS )
+        CALL ADI_FCLOSE( MFID, STATUS )
       END IF
 
 *    Tidy up
@@ -735,11 +718,11 @@ C        CALL DAT_ANNUL( SIMLOC, STATUS )
       TPW = PW*2+1
 
 *    Write simulation parameters
-C      CALL CMP_PUT0I( SIMLOC, 'SEED', ISEED, STATUS )
-C      CALL CMP_PUT0I( SIMLOC, 'BCOUNT', NMOD, STATUS )
-C      IF ( NSRC .GT. 0 ) THEN
-C        CALL CMP_PUT1I( SIMLOC, 'SCOUNT', NSRC, SCOUNT, STATUS )
-C      END IF
+      CALL AUI_PUT0I( OFID, 'SIM_DATA.SEED', ISEED, STATUS )
+      CALL AUI_PUT0I( OFID, 'SIM_DATA.BCOUNT', NMOD, STATUS )
+      IF ( NSRC .GT. 0 ) THEN
+        CALL AUI_PUT1I( OFID, 'SIM_DATA.SCOUNT', NSRC, SCOUNT, STATUS )
+      END IF
 
 *    Jump over this bit if no source
       IF ( NSRC .EQ. 0 ) GOTO 50
