@@ -50,8 +50,6 @@
       CHARACTER*80            	HTXT(5)    		! History text
       CHARACTER*10              NSTR              	!
 
-      CHARACTER*(ADI__SZTYP)    OBTYPE            	! Object type
-
       INTEGER                   DIMS(ADI__MXDIM)  	! Input dimensions
       INTEGER                   IDPTR,IVPTR,IQPTR 	! Input data pointers
       INTEGER                   QDIMS(ADI__MXDIM) 	! Input quality dimensions
