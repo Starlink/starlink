@@ -31,7 +31,9 @@
  *     07 Mar 2001 Avoid multiple XOpenDisplay() calls by making the "display"
  *                 identifier static and use this value if defined.
  *     27 Apr 2001 Undo the change to pixels/inch above.
-  */
+ *     29 May 2003 Correct bug for 24-bit displays when image buffer size
+ *                 calculation was incorrect for 32-bits/pixel
+ */
 
 /*
  * Certain symbols in fcntl.h may not get defined
@@ -3072,15 +3074,25 @@ static XVisualInfo *gwm_visual_info(Display *display, int screen, Visual *visual
 static int gwm_get_image(GWMdev *gwm, int npix)
 {
   unsigned nbyte;  /* The number of bytes in the buffer */
+  XPixmapFormatValues *pixmaps;
+  int npixmap;
+  int i, bpp;
 /*
  * Determine the required size of the buffer. This is determined by
  * the size of a pixel (the depth of the window), the number of
  * pixels required, and the max depth that gwmdriv allows (32-bit).
- * In order to allow for 32-bit pixels round up the total number of
- * bytes to an integral number of 32-bit words.
  */
   gwm->image.npix = npix;
-  nbyte = ((gwm->color.vi->depth * npix + 31) / 32) * 4;
+  pixmaps = XListPixmapFormats(gwm->display, &npixmap); 
+  bpp = 32;
+  for(i=0; i<npixmap; i++) {
+     if(pixmaps[i].depth == gwm->color.vi->depth) {
+        bpp = pixmaps[i].bits_per_pixel;
+        break;
+        }
+  }
+  XFree(pixmaps);
+  nbyte = bpp*npix/8;
   gwm->image.buff = (unsigned char *) malloc(nbyte * sizeof(char));
   if(!gwm->image.buff)  {
     sprintf(errbuff, "%s: Failed to allocate image buffer.\n", GWM_IDENT);
