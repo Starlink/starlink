@@ -48,7 +48,7 @@ common_built_drivers="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.l
 dnl   Add the png driver if the PNG header and library are available.
 AC_CHECK_HEADER(png.h,
                 AC_CHECK_LIB(png, png_info_init,
-                             [BUILT_DRIVERS="$BUILT_DRIVERS pndriv.lo"],
+                             [LIBS="$LIBS -lpng";BUILT_DRIVERS="$BUILT_DRIVERS pndriv.lo"],
                              [AC_MSG_WARN(PNG libraries not found)],
                              [-lz]))
 
