@@ -575,6 +575,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *     19-JAN-2004 (DSB):
 *        Added loggap and loglabel to the AstPlot structure. Added 
 *        LogGap and LogLabel accessor methods.
+*     21-MAR-2005 (DSB):
+*        - Added the Clip attribute.
 *-
 */
 
@@ -710,6 +712,7 @@ typedef struct AstPlot {
    int border;
    int clip_axes;
    int clip_frame;
+   int clip;
    int clipop;
    int colour[ AST__NPID ];
    int drawaxes[ 2 ];
@@ -814,6 +817,10 @@ typedef struct AstPlotVtab {
    int (* TestClipOp)( AstPlot * );
    void (* SetClipOp)( AstPlot *, int );
    void (* ClearClipOp)( AstPlot * );
+   int (* GetClip)( AstPlot * );
+   int (* TestClip)( AstPlot * );
+   void (* SetClip)( AstPlot *, int );
+   void (* ClearClip)( AstPlot * );
    int (* GetGrf)( AstPlot * );
    int (* TestGrf)( AstPlot * );
    void (* SetGrf)( AstPlot *, int );
@@ -1010,6 +1017,11 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
    int astTestBorder_( AstPlot * );
    void astSetBorder_( AstPlot *, int );
    void astClearBorder_( AstPlot * );
+
+   int astGetClip_( AstPlot * );
+   int astTestClip_( AstPlot * );
+   void astSetClip_( AstPlot *, int );
+   void astClearClip_( AstPlot * );
 
    int astGetClipOp_( AstPlot * );
    int astTestClipOp_( AstPlot * );
@@ -1302,6 +1314,15 @@ astINVOKE(V,astGetBorder_(astCheckPlot(this)))
 astINVOKE(V,astSetBorder_(astCheckPlot(this),border))
 #define astTestBorder(this) \
 astINVOKE(V,astTestBorder_(astCheckPlot(this)))
+
+#define astClearClip(this) \
+astINVOKE(V,astClearClip_(astCheckPlot(this)))
+#define astGetClip(this) \
+astINVOKE(V,astGetClip_(astCheckPlot(this)))
+#define astSetClip(this,clip) \
+astINVOKE(V,astSetClip_(astCheckPlot(this),clip))
+#define astTestClip(this) \
+astINVOKE(V,astTestClip_(astCheckPlot(this)))
 
 #define astClearClipOp(this) \
 astINVOKE(V,astClearClipOp_(astCheckPlot(this)))

@@ -21,6 +21,9 @@ with a percent character (%), then axis values are now formatted and
 unformatted as a decimal radians value, using the Format syntax of a
 simple Frame.
 
+- The Plot class has a new attribute called Clip which controls the
+clipping performed by AST at the plot boundary.
+
 
 
 

@@ -20740,10 +20740,14 @@ occurred in the AST library between versions V3.5 and V3.6 (the
 current version):
 
 \begin{enumerate}
+
 \item If the Format attribute associated with an axis of a SkyFrame
 starts with a percent character (``\verb+%+''), then axis values are
 now formatted and unformatted as a decimal radians value, using the
 Format syntax of a simple Frame.
+
+\item The Plot class has a new attribute called Clip which controls the
+clipping performed by AST at the plot boundary.
 
 \end{enumerate}
 

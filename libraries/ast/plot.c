@@ -70,6 +70,7 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     Plot also has the following attributes:
 *
 *     - Border: Draw a border around valid regions of a Plot?
+*     - Clip: Clip lines and/or markers at the Plot boundary?
 *     - ClipOp: Combine Plot clipping limits using a boolean OR?
 *     - Colour(element): Colour index for a Plot element
 *     - DrawAxes(axis): Draw axes for a Plot?
@@ -534,6 +535,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Modified GridLines to use appropriate algorithm for choosing
 *        start of grid lines in cases where one axis has logarithmic tick 
 *        spacing and the other has linear tick spacing.
+*     21-MAR-2005 (DSB):
+*        - Added the Clip attribute.
 *class--
 */
 
@@ -1401,6 +1404,7 @@ static int Crv_ink;
 static int Crv_nbrk;
 static int Crv_nent = 0;
 static int Crv_out;
+static int Crv_clip;
 static void (*Crv_map)( int, double *, double *, double *, const char *, const char * );
 
 /* The lower and upper bounds of the graphics coordinates enclosing all
@@ -1508,6 +1512,11 @@ static int GetClipOp( AstPlot * );
 static int TestClipOp( AstPlot * );
 static void ClearClipOp( AstPlot * );
 static void SetClipOp( AstPlot *, int );
+
+static int GetClip( AstPlot * );
+static int TestClip( AstPlot * );
+static void ClearClip( AstPlot * );
+static void SetClip( AstPlot *, int );
 
 static int GetGrf( AstPlot * );
 static int TestGrf( AstPlot * );
@@ -2006,6 +2015,50 @@ astMAKE_GET(Plot,Border,int,1,(this->border == -1 ? 1 : this->border))
 
 MAKE_SET2(Plot,UsedBorder,int,uborder,( value ? 1 : 0 ))
 MAKE_GET2(Plot,UsedBorder,int,1,this->uborder)
+
+/* Clip */
+/* ---- */
+/*
+*att++
+*  Name:
+*     Clip
+
+*  Purpose:
+*     Clip lines and/or markers at the Plot boundary?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This attribute controls whether curves and markers are clipped at the 
+*     boundary of the graphics box specified when the Plot was created. A 
+*     value of 3 implies both markers and curves are clipped at the Plot
+*     boundary. A value of 2 implies markers are clipped, but not curves. A 
+*     value of 1 implies curves are clipped, but not markers. A value of
+*     zero implies neither curves nor markers are clipped. The default
+*     value is 1. Note, this attributes controls only the clipping
+*     performed internally within AST. The underlying graphics system may
+*     also apply clipping. In such cases, removing clipping using this
+*     attribute does not guarantee that no clipping will be visible in the 
+*     final plot.
+*
+c     The astClip function
+f     The AST_CLIP routine
+*     can be used to establish generalised clipping within arbitrary
+*     regions of the Plot.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+*att--
+*/
+astMAKE_CLEAR(Plot,Clip,clip,-1)
+astMAKE_GET(Plot,Clip,int,0,(this->clip == -1 ? 1 : this->clip))
+astMAKE_TEST(Plot,Clip,( this->clip != -1 ))
+astMAKE_SET(Plot,Clip,int,clip,((value>=0&&value<=3)?value:(astError( AST__ATTIN, "astSetClip(Plot): Invalid value %d supplied for Clip attribute", value ), this->clip)))
 
 /* ClipOp */
 /* ------ */
@@ -4006,6 +4059,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Crv_ybrk = cdata->ybrk;
       Crv_vxbrk = cdata->vxbrk;
       Crv_vybrk = cdata->vybrk;
+      Crv_clip = astGetClip( this ) & 1;
 
 /* Set up a list of points spread evenly over the curve. */
       for( i = 0; i < CRV_NPNT; i++ ){
@@ -6147,10 +6201,15 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "border" ) ) {
       astClearBorder( this );
 
-/* OuClipOp. */
+/* ClipOp. */
 /* ------- */
    } else if ( !strcmp( attrib, "clipop" ) ) {
       astClearClipOp( this );
+
+/* Clip. */
+/* ----- */
+   } else if ( !strcmp( attrib, "clip" ) ) {
+      astClearClip( this );
 
 /* Grf. */
 /* ---- */
@@ -6283,7 +6342,7 @@ c     This function defines regions of a Plot which are to be clipped.
 f     This routine defines regions of a Plot which are to be clipped.
 *     Any subsequent graphical output created using the Plot will then
 *     be visible only within the unclipped regions of the plotting
-*     area.
+*     area. See also the Clip attribute.
 
 *  Parameters:
 c     this
@@ -6330,7 +6389,8 @@ f     - Only one clipping Frame may be active at a time. This routine
 *     setting up new clipping limits.
 c     - The clipping produced by this function is in addition to that
 f     - The clipping produced by this routine is in addition to that
-*     which always occurs at the edges of the plotting area
+*     specified by the Clip attribute which occurs at the edges of the 
+*     plotting area
 c     established when the Plot is created (see astPlot). The
 f     established when the Plot is created (see AST_PLOT). The
 *     underlying graphics system may also impose further clipping.
@@ -6868,6 +6928,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 *        A pointer to a function which can be called to map "n" distances 
 *        along the curve (supplied in "dd") into graphics coordinates 
 *        (stored in "xx" and "yy"). See function "Map1" as an example.
+*     Crv_clip = int (Read)
+*        Should lines be clipped at the edge of the plotting area?
 
 *  Notes:
 *     - The CRV_TRACE conditional compilation blocks in this function
@@ -6971,7 +7033,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
       last_x = *x;
       last_y = *y;
       all_bad = ( *x < Crv_xlo || *x > Crv_xhi || 
-                  *y < Crv_ylo || *y > Crv_yhi );
+                  *y < Crv_ylo || *y > Crv_yhi ) && Crv_clip;
    } else {
       last_ok = 0;
       all_bad = 1;
@@ -7013,8 +7075,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 
 /* If the point is within the plotting area, set the "all_bad" flag to
    indicate that at least 1 point is within the plotting area. */
-         if( *px >= Crv_xlo && *px <= Crv_xhi &&
-             *py >= Crv_ylo && *py <= Crv_yhi ) all_bad = 0;
+         if( !Crv_clip || ( *px >= Crv_xlo && *px <= Crv_xhi &&
+                            *py >= Crv_ylo && *py <= Crv_yhi ) ) all_bad = 0;
 
 /* If the point marking the start of the segment was also good, find and 
    store the increments and squared length for the segment, incrementing 
@@ -7469,9 +7531,10 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 *  Description:
 *     This functions draws a straight line from (xa,ya) to (xb,yb), breaking 
 *     the line at the edges of the plotting area defined by Crv_xlo, Crv_xhi,
-*     Crv_ylo and Crv_yhi. If the line does not start at the end of the 
-*     previous line plotted by this function, then information describing
-*     the break in the curve is stored in external arrays.
+*     Crv_ylo and Crv_yhi if Crv_clip is non-zero. If the line does not start 
+*     at the end of the previous line plotted by this function, then 
+*     information describing the break in the curve is stored in external 
+*     arrays.
 
 *  Parameters:
 *     xa
@@ -7493,6 +7556,8 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 *     Crv_ink = int (Read)
 *        If zero then no line is drawn even if the line intersects the
 *        plotting space, but break information (etc) is still returned.
+*     Crv_clip = double (Read)
+*        Clip lines at boundary of plotting space?
 *     Crv_xlo = double (Read)
 *        Lower x limit of the plotting space.
 *     Crv_xhi = double (Read)
@@ -7580,8 +7645,10 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 /* If either end is outside the zone, replace the given coordinates with
    the end coordinates of the section of the line which lies within the
    zone. */
-   if( xa < Crv_xlo || xa > Crv_xhi || xb < Crv_xlo || xb > Crv_xhi ||
-       ya < Crv_ylo || ya > Crv_yhi || yb < Crv_ylo || yb > Crv_yhi ){
+   if( Crv_clip && ( xa < Crv_xlo || xa > Crv_xhi || 
+                     xb < Crv_xlo || xb > Crv_xhi ||
+                     ya < Crv_ylo || ya > Crv_yhi ||  
+                     yb < Crv_ylo || yb > Crv_yhi ) ){
 
 /* Find the distance from point B towards point A at which the
    line cuts the two x bounds of the zone (distance at point B is
@@ -8010,6 +8077,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Crv_ybrk = cdata->ybrk;
       Crv_vxbrk = cdata->vxbrk;
       Crv_vybrk = cdata->vybrk;
+      Crv_clip = astGetClip( this ) & 1;
 
 /* Set up a list of points spread evenly over the curve. */
       for( i = 0; i < CRV_NPNT; i++ ){
@@ -12399,6 +12467,7 @@ f        The global status.
       Crv_ybrk = Curve_data.ybrk;
       Crv_vxbrk = Curve_data.vxbrk;
       Crv_vybrk = Curve_data.vybrk;
+      Crv_clip = astGetClip( this ) & 1;
 
 /* Set up a list of points spread evenly over the curve. */
       for( i = 0; i < CRV_NPNT; i++ ){
@@ -13225,6 +13294,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* ------- */
    } else if ( !strcmp( attrib, "clipop" ) ) {
       ival = astGetClipOp( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* Clip. */
+/* ----- */
+   } else if ( !strcmp( attrib, "clip" ) ) {
+      ival = astGetClip( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -15486,6 +15564,7 @@ f        The global status.
    double labelat[ 2 ];    /* Axis values at which tick marks are put */
    int axis;               /* Physical axis index */
    int border;             /* Draw a border? */
+   int clip;               /* Original Clip attribute value */
    int dounits[2];         /* Include Units in each axis label? */
    int drawgrid;           /* Is a grid of lines to be drawn? */
    int clredge;            /* Clear the Edge attributes before returning? */
@@ -15536,6 +15615,14 @@ f        The global status.
                 "Frame of the supplied %s is invalid - this number should "
                 "be 2.", method, class, naxes, class );
    } 
+
+/* Ensure that all lines are clipped at the plot boundary.*/
+   if( astTestClip( this ) ) {
+      clip = astGetClip( this );
+      astSetClip( this, 1 );
+   } else {      
+      clip = -1;
+   }
 
 /* If the protected attribute "Ink" is set to zero, then the plot
    is drawn in "invisble ink" (i.e. all the calculations needed to
@@ -15733,6 +15820,9 @@ f        The global status.
 /* Restore the original value of the flag which says whether graphical 
    escape sequences should be incldued in any returned text strings. */
    astEscapes( escs );
+
+/* Restore the original value of the Clip attribute. */
+   if( clip != -1 ) astSetClip( this, clip );
 
 /* Copy the total bounding box to the box which is returned by
    astBoundingBox. */
@@ -16832,6 +16922,10 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->SetClipOp = SetClipOp;
    vtab->GetClipOp = GetClipOp;
    vtab->TestClipOp = TestClipOp;
+   vtab->ClearClip = ClearClip;
+   vtab->SetClip = SetClip;
+   vtab->GetClip = GetClip;
+   vtab->TestClip = TestClip;
    vtab->ClearGrf = ClearGrf;
    vtab->SetGrf = SetGrf;
    vtab->GetGrf = GetGrf;
@@ -18300,6 +18394,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
    Crv_ybrk = cdata->ybrk;
    Crv_vxbrk = cdata->vxbrk;
    Crv_vybrk = cdata->vybrk;
+   Crv_clip = astGetClip( this ) & 1;
 
 /* Create a set of evenly spaced values between 0.0 and 1.0. These are the
    offsets the edge of the plotting zone at which the mapping is tested. */
@@ -19308,11 +19403,14 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    double **ptr2;          /* Pointer to graphics positions */
    double *xpd;            /* Pointer to next double precision x value */ 
    double *ypd;            /* Pointer to next double precision y value */ 
+   double xx;              /* X axis value */
+   double yy;              /* Y axis value */
    float *x;               /* Pointer to single precision x values */ 
    float *xpf;             /* Pointer to next single precision x value */ 
    float *y;               /* Pointer to single precision y values */ 
    float *ypf;             /* Pointer to next single precision y value */ 
    int axis;               /* Axis index */
+   int clip;               /* Clips marks at plot boundary? */
    int i;                  /* Loop count */
    int naxes;              /* No. of axes in the base Frame */
    int nn;                 /* Number of good marker positions */
@@ -19395,13 +19493,20 @@ f     - If any marker position is clipped (see AST_CLIP), then the
       ypd = ptr2[ 1 ];
    
 /* Convert the double precision values to single precision, rejecting
-   any bad marker positions. */
+   any bad marker positions. If clipping is switched on, also clip any
+   markers with centres outside the plotting area. */
+      clip = astGetClip( this ) & 2;
       nn = 0;
       for( i = 0; i < nmark; i++ ){
          if( *xpd != AST__BAD && *ypd != AST__BAD ){
-            nn++;
-            *(xpf++) = (float) *(xpd++);
-            *(ypf++) = (float) *(ypd++);
+            xx = *(xpd++);
+            yy = *(ypd++);
+            if( !clip || ( xx >= this->xlo && xx <= this->xhi &&
+                           yy >= this->ylo && yy <= this->yhi ) ) {
+               nn++;
+               *(xpf++) = (float) xx;
+               *(ypf++) = (float) yy;
+            }
          } else {
             xpd++;
             ypd++;
@@ -20514,6 +20619,7 @@ f        The global status.
       Crv_xhi = this->xhi;
       Crv_ylo = this->ylo;
       Crv_yhi = this->yhi;
+      Crv_clip = astGetClip( this ) & 1;
 
 /* Set up a list of points spread evenly over each curve segment. */
       for( i = 0; i < CRV_NPNT; i++ ){
@@ -21100,6 +21206,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         ( 1 == astSscanf( setting, "clipop= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetClipOp( this, ival );
+
+/* Clip. */
+/* ----- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "clip= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetClip( this, ival );
 
 /* Grf. */
 /* ---- */
@@ -21910,6 +22023,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* ------- */
    } else if ( !strcmp( attrib, "clipop" ) ) {
       result = astTestClipOp( this );
+
+/* Clip. */
+/* ----- */
+   } else if ( !strcmp( attrib, "clip" ) ) {
+      result = astTestClip( this );
 
 /* Grf. */
 /* ---- */
@@ -25663,6 +25781,16 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    ival = set ? GetClipOp( this ) : astGetClipOp( this );
    astWriteInt( channel, "ClpOp", set, 0, ival, "Clip using logical OR?" );
 
+/* Clip. */
+/* ----- */
+   set = TestClip( this );
+   ival = set ? GetClip( this ) : astGetClip( this );
+   astWriteInt( channel, "Clip", set, 0, ival, 
+                ((ival == 0)?"Do not clip at plot edges": 
+                ((ival == 1)?"Clip curves at plot edges": 
+                ((ival == 2)?"Clip markers at plot edges":
+                             "Clip markers and curves at plot edges"))));
+
 /* DrawTitle. */
 /* --------- */
    set = TestDrawTitle( this );
@@ -26477,6 +26605,12 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    be used. */
       new->invisible = -1;
 
+/* By default clip markers but not curves at the boundary of the plotting
+   area. This was the only behaviour available prior to the introduction of
+   the Clip attribute, and is chosen as the default to maintain backwards
+   compatibility. */
+      new->clip = -1;
+
 /* Is clipping to be done using a logical OR operation between the axes? 
    Store a value of -1 to indicate that no value has yet been set. This will 
    cause a default value of 0 (no, i.e. a logical AND) to be used. */
@@ -26809,6 +26943,11 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* ------- */
       new->clipop = astReadInt( channel, "clpop", -1 );
       if ( TestClipOp( new ) ) SetClipOp( new, new->clipop );
+
+/* Clip. */
+/* ----- */
+      new->clip = astReadInt( channel, "clip", -1 );
+      if ( TestClip( new ) ) SetClip( new, new->clip );
 
 /* DrawTitle. */
 /* --------- */
