@@ -38,11 +38,12 @@
 #     pathname'; this resembles an ordinary pathname except that
 #     it starts with one of the literals 'SOURCE' or 'INCLUDE',
 #     and may contain the special character '>' which indicates
-#     inclusion in a (possibly compressed) tar file.  Thus possible
-#     logical pathnames would be:
-
-    #           missing.
-
+#     inclusion in a (possibly compressed) tar file.  Thus some
+#     example logical pathnames would be:
+#
+#         SOURCE/ast.tar.Z>ast_source.tar>frame.f
+#         SOURCE/figaro/figaro_applic.tar>applic/bclean.f
+#         INCLUDE/par_err
 #
 #     The resulting DBM file can then be read by a separate program to
 #     locate the source code for a module, using no information other
@@ -86,14 +87,14 @@ $generic = "generic";
 
 #  Declarations.
 
-local $path;      # Logical path name used for recording module position.
-
 sub index_list;
 sub index_incdir;
 sub index_dir;
 sub index_tar;
 sub index_f;
 sub index_gen;
+sub indexinc_list;
+sub write_entry;
 sub pushd;
 sub popd;
 
@@ -116,17 +117,13 @@ tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
 
 #  Index include files.
 
-$path = 'INCLUDE/';
 chdir $incdir or die "Couldn't enter $incdir\n";
-index_incdir '.';
-@a = %locate;
-print "Include files indexed: ", $#a;
+index_incdir "INCLUDE/", ".";
 
 #  Index source files.
 
-$path = 'SOURCE/';
 chdir $srcdir or die "Couldn't enter $srcdir\n";
-index_dir '.';
+index_dir "SOURCE/", ".";
 
 #  Terminate processing.
 
@@ -145,25 +142,28 @@ sub index_list {
 #  naked file of an interesting type, a tar file, or a directory, and 
 #  hand off to a routine designed to deal with that type.  
 #  Any other files are ignored.
-#
-#  Arguments are a list of files in the current directory to be 
-#  examined and indexed.
-#
-#  Must be entered with 
-#     $path               logical pathname of the current directory.
 
-   foreach $file (@_) {
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my @files = @_;        #  Files in current directory to be indexed.
+
+#  Local variables.
+
+   my $file;
+
+   foreach $file (@files) {
       if (-d $file) {                 #  directory.
-         index_dir $file; 
+         index_dir $path, $file; 
       }
       elsif ($file =~ /\.tar\b/) {    #  tar archive (possibly compressed).
-         index_tar $file;
+         index_tar $path, $file;
       }
       elsif ($file =~ /\.f$/) {       #  fortran source file.
-         index_f $file;
+         index_f $path, $file;
       }
       elsif ($file =~ /\.gen$/) {     #  generic fortran source file.
-         index_gen $file;
+         index_gen $path, $file;
       }
    }
 }
@@ -173,17 +173,14 @@ sub index_list {
 sub index_dir {
 
 #  Examine and index a directory file.
-#
-#  Argument is a directory name in the current directory.
-#
-#  Must be entered with 
-#     $path               logical pathname of the current directory.
 
-   my $dir = shift;
+#  Arguments.
 
-   local $path = "$path$dir/";
+   my $path = shift;      #  Logical pathname of current directory.
+   my $dir = shift;       #  Directory in current directory to be indexed.
+
    pushd $dir;
-   index_list <*>;
+   index_list "$path$dir/", <*>;
    popd;
 }
 
@@ -191,16 +188,11 @@ sub index_dir {
 sub index_tar {
 
 #  Examine and index a (possibly compressed) tar file.
-#
-#  Argument is a tarfile name in the current directory.
-#
-#  Must be entered with 
-#     $path               logical pathname of the current directory.
 
-   my $tarfile = shift;
-   local $path = "$path$tarfile>";
+#  Arguments.
 
-   $tarfile = cwd . '/' . $tarfile;
+   my $path = shift;      #  Logical pathname of current directory.
+   my $tarfile = shift;   #  Tarfile in current directory to be indexed.
 
 #  Define a (possibly null) decompression filter.
 
@@ -214,24 +206,25 @@ sub index_tar {
 
 #  Define pipelines for listing and extracting from tar file.
 
-   my $tcomm = "$filter{$ext} $tarfile | $tar tf -";
-   my $xcomm = "$filter{$ext} $tarfile | $tar xf -";
+   my $fqtarfile = cwd . '/' . $tarfile;
+   my $tcomm = "$filter{$ext} $fqtarfile | $tar tf -";
+   my $xcomm = "$filter{$ext} $fqtarfile | $tar xf -";
 
 #  Unpack tar file.
 
    pushd $tmpdir;
-   system "$xcomm"            and die "Error in command '$xcomm': $?\n";
-   open TART, "$tcomm|"       or  die "Error in command '$tcomm'\n";
+   system "$xcomm"        and die "Error in command '$xcomm': $?\n";
+   open TART, "$tcomm|"   or  die "Error in command '$tcomm'\n";
    my @files;
    while (<TART>) {
       chomp;
       push @files, $_;
    }
-   close TART                 or  die "Error closing '$tcomm'\n";
+   close TART             or  die "Error closing '$tcomm'\n";
 
 #  Pass list of files to indexing routine.
 
-   index_list @files;
+   index_list "$path$tarfile>", @files;
    
 #  Tidy up.
 
@@ -240,35 +233,27 @@ sub index_tar {
 }
 
 ########################################################################
-sub tarlevel {
-
-#  This is a compact, although rather obscure, routine to count the
-#  number of '>' characters in a string.  When applied to the logical
-#  pathname, a high number indicates that it's buried deep in layers 
-#  of tar files, and a low number that it's easier to get to.
-
-   return ($_[0] =~ y/>/>/);
-}
-
-########################################################################
-sub index_fortran {
+sub index_fortran_file {
 
 #  Examine and index a fortran source file.
 #
-#  Argument is a fortran source file name in the current directory.
-#
-#  Must be entered with 
-#     $path               logical pathname of the current FILE (not dir).
-
 #  Note the parsing is not perfect - it would be fooled for instance
 #  by a subroutine definition in which the name of the subroutine was
 #  split between continuation lines.
+#
+#  Probably this could be made (much) more efficient, but it's not 
+#  expected that this code should have to be run very often.
 
-   my $file = shift;
-   my $global;
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of FILE to be indexed.
+   my $file = shift;      #  File in current directory to be indexed.
+
+#  Local constants.
+
    my @ftypes = qw/INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL
                     CHARACTER BYTE UBYTE WORD UWORD/;
-   my $ftypdef = '(' . join ('|', @ftypes) . ')\**(\(.*\))?[0-9]*';
+   my $ftypdef = '(' . join ('|', @ftypes) . ')\**(\([^\)]\))?[0-9]*';
 
 #  Open source file and cycle through it.
 
@@ -282,21 +267,14 @@ sub index_fortran {
       chomp;                            # Discard end of line character.
       s/^......//;                      # Discard first six characters.
       s/ //g;                           # Remove spaces.
+      next unless ($_);                 # Ignore empty lines.
       tr/a-z/A-Z/;                      # Fold case to upper.
       s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
 
-#     Identify lines containing global module names.
+#     Write to database if line contains a module name.
 
-      if (/^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/) {
-         $global = $2;
-         printf "%-20s <-  %s\n", $global, $path if ($verbose);
-
-#        Index except where a more accessible path has already been found.
-
-         $locate{$global} = $path
-            unless (   defined ($locate{$global})
-                    && tarlevel ($locate{$global}) > tarlevel ($path) );
-      }
+      write_entry $2, $path
+         if (/^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/);
    }
    close F;
 }
@@ -305,32 +283,37 @@ sub index_fortran {
 sub index_f {
 
 #  Examine and index a fortran source file.
-#
-#  Argument is a fortran source file name in the current directory.
-#
-#  Must be entered with 
-#     $path               logical pathname of the current directory.
 
-   my $file = shift;
-   local $path = "$path$file";
-   index_fortran $file;
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my $file = shift;      #  .f file in current directory to be indexed.
+
+   index_fortran_file "$path$file", $file;
 }
 
 ########################################################################
 sub index_gen {
 
 #  Examine and index a .gen (fortran Generic) source file.
-#
-#  Argument is a generic source file name in the current directory.
-#
-#  Must be entered with 
-#     $path               logical pathname of the current directory.
 
-   my $file = shift;
-   local $path = "$path$file";
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my $file = shift;      #  .gen file in current directory to be indexed.
+
+#  Process file to produce normal fortran source code.
+
    system "$generic $file" and die "Command '$generic $file' failed: $?\n";
-   $file =~ s/\.gen$/.f/;
-   index_fortran $file;
+
+#  Hand file over to routine which handles normal fortran source code.
+
+   my $ffile = $file;
+   $ffile =~ s/\.gen$/.f/;
+   index_fortran_file "$path$file", $ffile;
+
+#  Tidy up.
+
    unlink $file or die "Failed to remove file $file\n";
 }
 
@@ -339,33 +322,75 @@ sub index_incdir {
 
 #  Examine and index a directory of files containing include files.
 
-   my $dir = shift;
-   local $path = "$path$dir/";
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my $dir = shift;       #  Directory in current directory to be indexed.
+
    pushd $dir;
-   indexinc_list (<*>);
+   indexinc_list "$path$dir/", <*>;
    popd;
 }
 
 ########################################################################
 sub indexinc_list {
-   my $include;
-   foreach $file (@_) {
-      $include = undef;
-      if ($file =~ /\.h$/) {
-         $include = $file;
+
+#  Examine and index a list of include files.
+
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my @files = @_;        #  Files in current directory to be indexed.
+
+#  Local variables.
+
+   foreach $file (@files) {
+      if ($file =~ /\.h$/) {              #  C type header file.
+         write_entry $file, "$path$file";
       }
-      elsif ($file !~ /\./) {
-         $include = $file;
-         $include =~ tr/a-z/A-Z/;
-      }
-      if ($include) {
-         printf "%-20s <-  %s\n", $include, "$path$file" if ($verbose);
-         $locate{$include} = "$path$file";
+      elsif ($file !~ /\./) {             #  Fortran type header file.
+         write_entry uc ($file), "$path$file";
       }
    }
 }
    
 
+########################################################################
+sub tarlevel {
+
+#  This is a compact, although rather obscure, routine to count the
+#  number of '>' characters in a string.  When applied to the logical
+#  pathname, a high number indicates that it's buried deep in layers 
+#  of tar files, and a low number that it's easier to get to.
+
+#  Arguments.
+
+   my $path = shift;
+
+   return ($path =~ y/>/>/);
+}
+
+########################################################################
+sub write_entry {
+
+#  Write index entry to database.
+
+#  Arguments.
+
+   my $name = shift;      #  Name of module.
+   my $location = shift;  #  Logical pathname of module.
+
+#  Optionally log entry to stdout.
+
+   printf "%-20s <-  %s\n", $name, $location if ($verbose);
+
+#  Write entry to database, except if a more accessible entry already
+#  exists.
+
+   $locate{$name} = $location
+       unless (   defined ($locate{$name})
+               && tarlevel ($locate{$name}) > tarlevel ($location) );
+}
 
 ########################################################################
 sub pushd {
