@@ -97,7 +97,7 @@
 *  seeds to be used each time because the PIDs will be different. If the
 *  application is run repeatedly in the same process (eg ICL), then the
 *  seed will be set in the above (DONE=.TRUE.) block.
-         SEED = REAL( ( MOD( NTICKS, NORM ) + PID )* 2 + 1 )
+         SEED = REAL( ( MOD( NTICKS, NORM ) + 100*PID )* 2 + 1 )
 
 *  Indicate the seed has been set.
          DONE = .TRUE.
@@ -106,5 +106,7 @@
 
 *  Return the seed value
       KPG1_SEED = SEED
+
+      write(*,*) seed
 
       END
