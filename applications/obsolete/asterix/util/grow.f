@@ -159,8 +159,8 @@
 *  Check dimensions are compatible
       IF ( GDIM .NE. DIMS(AXIS) ) THEN
         CALL MSG_SETI( 'A', AXIS )
-        CALL BDI_DESCID( 'G', GFID, STATUS )
-        CALL BDI_DESCID( 'INP', IFID, STATUS )
+        CALL BDI0_DESCID( 'G', GFID, STATUS )
+        CALL BDI0_DESCID( 'INP', IFID, STATUS )
         CALL ERR_REP( ' ', 'Dimension of ^G does not match size '/
      :                /'of axis ^A of ^INP', STATUS )
         GOTO 99
@@ -202,19 +202,10 @@
       END IF
 
 *  Switch on axis value
-      IF ( AXIS .EQ. 1 ) THEN
-        CALL GROW_AX1( DIMS(1), DIMS(2), DIMS(3), DIMS(4), DIMS(5),
+      CALL GROW_INT( AXIS, DIMS(1), DIMS(2), DIMS(3), DIMS(4), DIMS(5),
      :                 DIMS(6), DIMS(7), DOK, %VAL(IDPTR), %VAL(GDPTR),
      :                 QOK, %VAL(IQPTR), %VAL(GQPTR), VOK, %VAL(IVPTR),
      :                 %VAL(GVPTR), STATUS )
-
-      ELSE IF ( AXIS .EQ. 2 ) THEN
-      ELSE IF ( AXIS .EQ. 3 ) THEN
-      ELSE IF ( AXIS .EQ. 4 ) THEN
-      ELSE IF ( AXIS .EQ. 5 ) THEN
-      ELSE IF ( AXIS .EQ. 6 ) THEN
-      ELSE IF ( AXIS .EQ. 7 ) THEN
-      END IF
 
 *  Free the inputs
       CALL USI_CANCL( 'INP', STATUS )
@@ -228,27 +219,29 @@
 
 
 
-      SUBROUTINE GROW_AX1( L1, L2, L3, L4, L5, L6, L7, DOK, DATA,
+      SUBROUTINE GROW_INT( AXIS, L1, L2, L3, L4, L5, L6, L7, DOK, DATA,
      :                     GDATA, QOK, QUAL, GQUAL, VOK, VAR, GVAR,
      :                     STATUS )
 *+
 *  Name:
-*     GROW_AX1
+*     GROW_INT
 
 *  Purpose:
-*     Grow a dataset into the 1st axis of another
+*     Grow a dataset into the AXIS'th axis of another
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL GROW_AX1( L1, L2, L3, L4, L5, L6, L7, DOK, DATA, GDATA,
+*     CALL GROW_INT( AXIS, L1, L2, L3, L4, L5, L6, L7, DOK, DATA, GDATA,
 *                    QOK, QUAL, GQUAL, VOK, VAR, GVAR, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
+*     AXIS = INTEGER (given)
+*        Axis to grow into
 *     L<N> = INTEGER (given)
 *        Size of dimension <N>
 *     DOK = LOGICAL (given)
@@ -318,12 +311,12 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER			L1, L2, L3, L4, L5, L6, L7
+      INTEGER			AXIS, L1, L2, L3, L4, L5, L6, L7
       LOGICAL			DOK, QOK, VOK
       REAL			GDATA(*), GVAR(*)
       BYTE			GQUAL(*)
 
-*  Arguments Returned:
+*  Arguments Given and Returned:
       REAL			DATA(L1,L2,L3,L4,L5,L6,L7),
      :                          VAR(L1,L2,L3,L4,L5,L6,L7)
       BYTE			QUAL(L1,L2,L3,L4,L5,L6,L7)
@@ -333,6 +326,10 @@
 
 *  Local Variables:
       INTEGER			I, J, K, L, M, N, O 	! Loop variables
+      INTEGER			IND(7)
+      EQUIVALENCE		(IND(1),I), (IND(2),J),
+     :                          (IND(3),K), (IND(4),L),
+     :                          (IND(5),M), (IND(6),N), (IND(7),O)
 *.
 
 *  Check inherited global status.
@@ -349,21 +346,21 @@
 *              Copy data?
                   IF ( DOK ) THEN
                     DO I = 1, L1
-                      DATA(I,J,K,L,M,N,O) = GDATA(I)
+                      DATA(I,J,K,L,M,N,O) = GDATA(IND(AXIS))
                     END DO
                   END IF
 
 *              Copy quality?
                   IF ( QOK ) THEN
                     DO I = 1, L1
-                      QUAL(I,J,K,L,M,N,O) = GQUAL(I)
+                      QUAL(I,J,K,L,M,N,O) = GQUAL(IND(AXIS))
                     END DO
                   END IF
 
 *              Copy variance?
                   IF ( QOK ) THEN
                     DO I = 1, L1
-                      VAR(I,J,K,L,M,N,O) = GVAR(I)
+                      VAR(I,J,K,L,M,N,O) = GVAR(IND(AXIS))
                     END DO
                   END IF
 
