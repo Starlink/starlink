@@ -388,8 +388,8 @@ int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
       return ( this->*t->fptr )( argc, argv );
     }
   }
-  // Not found at this scope.
-  return RtdImage::call( name, len, argc, argv );
+  // Not found at this scope, down to Skycat.
+  return Skycat::call( name, len, argc, argv );
 }
 
 
