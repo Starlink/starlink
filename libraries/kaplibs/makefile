@@ -559,7 +559,7 @@ kpg1_gkeyi.f kpg1_gkeyr.f kpg1_gkeyw.f kpg1_gnlbu.f kpg1_gntit.f \
 kpg1_gpcol.f kpg1_gtaxi.f kpg1_gtaxv.f kpg1_gtchv.f kpg1_gtgrp.f \
 kpg1_gtndf.f kpg1_gtpos.f kpg1_gtwcs.f kpg1_h2ast.f kpg1_hconr.f \
 kpg1_hmltd.f kpg1_hmltr.f kpg1_hmsg.f kpg1_hrcpr.f \
-kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f \
+kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f kpg1_reprt.f \
 kpg1_hstfd.f kpg1_hstfr.f kpg1_hstlo.f kpg1_hstqb.f \
 kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
 kpg1_hstqw.f kpg1_iderr.f kpg1_imprg.f kpg1_incor.f kpg1_isclb.f \
@@ -2115,6 +2115,7 @@ kpg1_qvid.o:	 SAE_PAR GKS_PAR CTM_PAR GNS_PAR
 kpg1_rcatw.o:    SAE_PAR DAT_PAR AST_PAR CAT_PAR GRP_PAR KPG_AST
 kpg1_rdast.o:	 SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
 kpg1_rdlst.o:    SAE_PAR CAT_PAR CAT_ERR NDF_PAR AST_PAR
+kpg1_reprt.o:	 SAE_PAR
 kpg1_retrr.o:	 SAE_PAR
 kpg1_rfcod.o:	 SAE_PAR DAT_PAR FIO_ERR
 kpg1_rfcor.o:	 SAE_PAR DAT_PAR FIO_ERR

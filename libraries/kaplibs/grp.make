@@ -68,7 +68,7 @@ kpg1_gntit.f kpg1_gpcol.f kpg1_gtndf.f kpg1_hcond.f kpg1_hconr.f \
 kpg1_hmltd.f kpg1_hmltr.f kpg1_hmsg.f kpg1_hrcpr.f \
 kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f kpg1_hstab.f \
 kpg1_hstad.f kpg1_hstai.f kpg1_hstar.f kpg1_hstaub.f kpg1_hstauw.f \
-kpg1_hstaw.f kpg1_hstlo.f kpg1_hstqb.f \
+kpg1_hstaw.f kpg1_hstlo.f kpg1_hstqb.f kpg1_reprt.f \
 kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
 kpg1_hstqw.f kpg1_iderr.f kpg1_imprg.f kpg1_incod.f kpg1_incor.f \
 kpg1_isclb.f kpg1_iscld.f kpg1_iscli.f kpg1_isclr.f kpg1_isclw.f \
