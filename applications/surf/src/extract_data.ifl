@@ -44,6 +44,8 @@
 #        Remove USE_SECTION
 #     1997 Spetember 4 (TIMJ)
 #        Change message in DUMMY
+#     1998 Dec 8 (TIMJ)
+#        Correct prompt for LONG_OUT
 #     {enter_further_changes_here}
 
 #-
@@ -125,7 +127,7 @@
 
       PARAMETER LONG_OUT
          TYPE    '_CHAR'
-         PROMPT  'Longitude of of output map centre in hh (or dd) mm ss.ss format'
+         PROMPT  'Longitude of output map centre in hh (or dd) mm ss.ss format'
 	 HELPKEY  '*'
       ENDPARAMETER
 
