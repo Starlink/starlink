@@ -9,7 +9,7 @@ SCULIB = /jcmt_sw/sun4_Solaris/lib
 
 LIBS = -L$(SCULIB) -lsculib -lV77 -lnag
 IRAS = -L/star/iras90 -lira -L/star/kappa -lkapgen
-STARLINK = -L/star/lib `ndf_link_adam` `fio_link_adam` `sla_link_adam` `agi_link_adam`
+STARLINK = -L/star/lib `ndf_link_adam` `fio_link_adam` `sla_link_adam` `agi_link_adam` `hlp_link_adam`
 ADAMLIBS = $(IRAS) $(STARLINK)
 
 # Includes
