@@ -76,6 +76,8 @@
 *  History:
 *     11 Sep 1995 (DJA):
 *        Original version.
+*     22 Feb 1996 (DJA):
+*        Changes in string concatenation for Linux port
 *     {enter_changes_here}
 
 *  Bugs:
@@ -98,6 +100,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*9		LKEY			! Local key name
+
       INTEGER			KCID			! Keywords list
       INTEGER			NCARD			! HDU card number
       INTEGER			OKID			! Existing keyword data
@@ -110,6 +114,10 @@
 
 *  Locate keywords container
       CALL ADI_FIND( HDUID, 'Keys', KCID, STATUS )
+
+*  Make CRC name
+      LKEY(1:1) = 'K'
+      LKEY(2:) = KEY
 
 *  Does our keyword exist?
       IF ( UPDATE ) THEN
@@ -135,7 +143,8 @@
         IF ( THERE ) THEN
           CALL ADI_CPUT0I( KID, '.Icard', NCARD, STATUS )
         ELSE
-          CALL ADI2_ADDCRC( HDUID, 'K'//KEY, KID, NCARD, STATUS )
+          CALL ADI2_ADDCRC( HDUID, LKEY(:LEN(KEY)+1), KID, NCARD,
+     :                      STATUS )
           CALL ADI_CPUT0L( KID, '.New', .TRUE., STATUS )
 
         END IF
@@ -145,7 +154,8 @@
 
       ELSE
 
-        CALL ADI2_ADDCRC( HDUID, 'K'//KEY, KID, NCARD, STATUS )
+        CALL ADI2_ADDCRC( HDUID, LKEY(:LEN(KEY)+1), KID, NCARD,
+     :                    STATUS )
 
       END IF
 
