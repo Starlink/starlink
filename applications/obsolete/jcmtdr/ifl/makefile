@@ -382,6 +382,7 @@ export_source:
 $(MONOLITH).ifc: a.ifl $(TASKS:.task=.ifl) z99999.ifl
 	cat a.ifl $(TASKS:.task=.ifl) z99999.ifl > $(MONOLITH).ifl
 	$(COMPIFL) $(MONOLITH).ifl
-	$(RM) $(MONOLITH).ifl
+
+#	$(RM) $(MONOLITH).ifl
 
 #  End of make file.

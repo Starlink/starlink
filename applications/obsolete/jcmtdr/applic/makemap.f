@@ -103,7 +103,7 @@
 *  GSD constants
 
       INCLUDE 'PRM_PAR'
-      INCLUDE 'GSD_PARS'
+      INCLUDE 'GSD_PAR'
 
 *  general astronomical parameters
 
