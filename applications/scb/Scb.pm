@@ -70,29 +70,38 @@ use Cwd;
 
 #  The capitalised variable names in this section may be replaced by
 #  environment variables or mk script variables by the makefile at 
-#  build time.  However, the script will work before such replacements 
-#  have taken place.
+#  build time.  The sequences "$VARIABLE_NAME" are substituted for 
+#  by sed(1), so it is important that the quoting syntax is not modified
+#  in these assignments.
+#
+#  Note that the script is written in such a way as to work even before 
+#  such replacements have taken place.
 
 #  Starlink source tree directory locations.
 
-$star   = "$STARLINK"    || "/star";
-$srcdir = "$SOURCES_DIR" || "$star/sources";
+my $STARLINK = "/star"; 
+my $SOURCES_DIR = "$STARLINK/sources"; 
+
+$star = "$STARLINK";
+$srcdir = "$SOURCES_DIR";
 $bindir = "$star/bin";
 $incdir = "$star/include";
-
 $srcdir = "/local/star/src/from-ussc";
 $srcdir = "/local/star/sources";
 
 #  System file locations.
 
-$mimetypes_file = "$MIMETYPES_FILE" || "/etc/mime.types";
+my $MIMETYPES_FILE = "/etc/mime.types"; 
+$mimetypes_file = "$MIMETYPES_FILE";
 
 #  HTX server base URL
 
-$htxserver = "$HTXSERVER_URL" || "http://star-www.rl.ac.uk/cgi-bin/htxserver";
+my $HTXSERVER_URL = "http://star-www.rl.ac.uk/cgi-bin/htxserver";
+$htxserver = "$HTXSERVER_URL";
 
 #  Index file locations.
 
+my $INDEX_DIR = "";
 $indexdir = "$INDEX_DIR" || cwd;
 $func_indexfile = "$indexdir/func";
 $file_indexfile = "$indexdir/file";

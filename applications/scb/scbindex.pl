@@ -98,7 +98,6 @@ $| = 1;
 
 #  Required libraries.
 
-use lib (".", "$PERL_MOD_DIR");
 use Cwd;
 use Scb;
 use StarIndex;

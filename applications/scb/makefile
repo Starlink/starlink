@@ -356,25 +356,36 @@ BUILT_FILES = $(ALL_SCRIPTS) $(PERL_MODULES)
 
 #  Rules for extracting source files from the source archive.
 
-$(ALL_SCRIPTS) $(PERL_MODULES):
+$(ALL_SCRIPTS):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 	mv $@ $@.gen
-	$(SUBST_CP) $@.gen > $@
+	$(VARLIB_SUBST) $@.gen > $@
+	chmod 755 $@
 	rm -f $@.gen
 
-#  The build is done by filtering through the following sed script, which
-#  substitutes makefile variables for some of the variables in the scripts.
+$(PERL_MODULES):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+	mv $@ $@.gen
+	$(VAR_SUBST) $@.gen > $@
+	chmod 644 $@
+	rm -f $@.gen
 
-SUBST_CP = sed \
-            -e'1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5)%' \
+#  The build is done by filtering through the following sed commands, which
+#  substitute makefile macros for some of the variables in the scripts.
+
+VAR_SUBST = sed \
             -e's%"$$STARLINK"%"$(STARLINK)"%' \
-            -e's%"$$PERL_MOD_DIR"%"$(PERL_MOD_DIR)"%' \
             -e's%"$$INDEX_DIR"%"$(INDEX_DIR)"%' \
             -e's%"$$SOURCES_DIR"%"$(SOURCES_DIR)"%' \
             -e's%"$$HTXSERVER_URL"%"$(HTXSERVER_URL)"%' \
             -e's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
+
+VARLIB_SUBST = $(VAR_SUBST) \
+            -e'1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(PERL_MOD_DIR)%'
 
 #  Name of the date stamp file. This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.
