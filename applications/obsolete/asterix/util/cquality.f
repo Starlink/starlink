@@ -370,7 +370,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Count points selected
-      CALL ARR_NBAD( NELM, %VAL(CPTR), NFROM, STATUS )
+      CALL QUALITY_CNTSEL( NELM, %VAL(CPTR), NFROM, STATUS )
 
 *  Inform user of altered points
       CALL MSG_SETI( 'NFROM', NFROM )
