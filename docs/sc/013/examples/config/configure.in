@@ -1,0 +1,94 @@
+dnl  Autoconf script for configuring the Makeifle for the
+dnl  SC/13 demo programs.
+
+AC_INIT(fpp.c)
+AC_REVISION($Id$)dnl
+
+AC_CONFIG_AUX_DIR(config)
+
+AC_PROG_CC
+AC_PROG_F77
+
+dnl  What bytesex does this machine have?  Strictly redundant with the 
+dnl  AC_CANONICAL_SYSTEM test below, but more direct.
+AC_C_BIGENDIAN
+if test "$ac_cv_c_bigendian" = "yes"; then
+    AC_DEFINE(BIGENDIAN,1)
+else
+    AC_DEFINE(BIGENDIAN,0)
+fi
+
+
+dnl  What options do we need to pass to the compiler to get it to
+dnl  include profiling code?  Allow this to be specified with
+dnl  --with-profiling=<option>.  If that isn't present, then look
+dnl  for the program gprof in the path, and set profilingoption to -pg 
+dnl  if we find it.
+AC_SUBST(PROFILINGOPTION)
+PROFILINGOPTION=''
+
+AC_SUBST(NOUNDERSCORES)
+NOUNDERSCORES=''
+
+
+dnl  Is gprof available?
+AC_ARG_ENABLE(profiling,
+[  --enable-profiling=opt  Give the compiler option to include profiling code],
+  PROFILINGOPTION=$enableval,
+  AC_CHECK_PROG(PROFILINGOPTION, gprof, -pg, ""))
+
+AC_ARG_ENABLE(nounderscore,
+[  --enable-nounderscore=opt  
+                          Give the compiler option to suppress
+                          trailing underscores in symbol names],
+  NOUNDERSCORES=$enableval)
+
+
+# We know what these options are for GCC/G77:
+dnl if test "$PROFILINGOPTION" != "no"; then
+dnl   if test "$GCC" = "yes" -a -z "$PROFILINGOPTION"; then
+dnl      PROFILINGOPTION='-pg'
+dnl   fi
+dnl fi
+if test "$NOUNDERSCORES" != "no"; then
+  if test "$G77" = "yes"; then
+    if test -z "$PROFILINGOPTION"; then
+      PROFILINGOPTION='-pg'
+    fi
+    if test -z "$NOUNDERSCORES"; then
+      NOUNDERSCORES="-fno-underscoring"
+    fi
+  fi
+fi
+
+dnl echo "PROFILINGOPTION=$PROFILINGOPTION  NOUNDERSCORES=$NOUNDERSCORES"
+if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
+    AC_CANONICAL_SYSTEM
+    echo "Target system $target"
+    case "$target" in
+      sparc-*-*) 
+        if test -z "$PROFILINGOPTION" -o "$PROFILINGOPTION" != "no"; then 
+            PROFILINGOPTION=-pg
+        fi
+        if test -z "$NOUNDERSCORES" -o "$NOUNDERSCORES" != "no"; then
+            NOUNDERSCORES=-ext_names=plain
+        fi
+        ;;
+      dnl AC_MSG_ERROR... OR AC_MSG_WARN
+      *)
+        AC_MSG_WARN([
+  I can't work out how to specify the profiling and
+  no-underscore options for your C/Fortran compilers.
+  You can specify them with the --enable-profiling=<option>
+  and --enable-nounderscore=<option> configure commands.
+  If you know, can you mail norman@astro.gla.ac.uk
+  with the appropriate options, quoting the compiler type
+      $target.
+  Thanks.])
+         ;;
+    esac
+fi
+
+
+
+AC_OUTPUT(Makefile)
