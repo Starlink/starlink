@@ -814,7 +814,7 @@
       TR2( 3 ) = REAL( LBND( 2 ) ) - 0.5 - TR2( 4 )
 
 *  Allocate work arrays.
-      IF( EQMAP .NE. AST_NULL ) THEN
+      IF( EQMAP .NE. AST__NULL ) THEN
          CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW1, STATUS )
          CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
       ELSE 
@@ -835,7 +835,7 @@
      :                 %VAL( IPW2 ), STATUS )
 
 *  Free the work space.
-      IF( EQMAP .NE. AST_NULL ) THEN
+      IF( EQMAP .NE. AST__NULL ) THEN
          CALL PSX_FREE( IPW1, STATUS )   
          CALL PSX_FREE( IPW2, STATUS )   
       END IF
