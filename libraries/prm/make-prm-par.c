@@ -66,6 +66,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#if STDC_HEADERS
+#  include <signal.h>
+#endif
+
 #if HAVE_ASSERT_H
 #  include <assert.h>
 #else
@@ -103,6 +107,7 @@
 #if FLT_RADIX != 2
 #  error "make-prm-par.c: No, let's NOT worry about non-binary processors right now"
 #endif
+
 
 
 /* 
@@ -239,8 +244,11 @@ void par_d(const char* name, double val);
 /* Helper functions */
 const char* todaysdate(void);
 const char* tohex(Number *p);
-void generate_test_output(FILE*);
 void assumption(const int, const char*);
+int sigfpe_on_denormalized(void);
+void sigfpe_on_denormalized_test(void);
+static int sigfpe_on_denormalized_result = -1; /* -1 means not initialised */
+void sigfpe_on_denormalized_handler(int i);
 void Usage(void);
 
 /* Conditional functions, to replace possibly missing library functions */
@@ -253,6 +261,8 @@ float  nextafterf(float, float);
 #if FLOAT_IS_IEEE
 float min_denorm_f(void);
 double min_denorm_d(void);
+float min_norm_f(void);
+double min_norm_d(void);
 #endif
 
 /* config.h defines WORDS_BIGENDIAN to be 1 if we're on a big-endian
@@ -263,23 +273,26 @@ double min_denorm_d(void);
 #endif
 
 /*
- * At one time we generated testing output here.  Omit it.
+ * We can generate testing code.  If macro TEST_CODE is defined
+ * non-zero, then we support an option -t which names a file to
+ * receive a Fortran program, which can be compiled and run to make
+ * some checks on the values we generate.  The program should exit
+ * with zero status if everything's OK.
  * 
- * I have gone to extraordinary lengths to try to write this out in a
+ * I have gone to some lengths to try to write this out in a
  * form where they can be compared for equality, but have failed,
  * because there are just too many subtleties in integer and
  * floating-point conversions (this is essentially why we're doing all
- * this convert-to-hex nonsense, after all).
+ * this convert-to-hex nonsense, after all).  The tests aren't
+ * completely reliable, therefore, and if they seem to indicate a
+ * failure, then you should be at least as suspicious of the test as
+ * of the failing behaviour.
  *
  * Grr.  Anyway, it really isn't worth wasting any more time on, as
  * the generated numbers look right on both the byte-orderings we care
  * about.  So yes, we're going to be in trouble if we ever try to do
  * this on some funky hardware, but in that case we're probably in
  * trouble anyway.
- *
- * There are two test harnesses below.  One lot writes out testing
- * code as part of the par_i and par_f functions, the other, using
- * generate_test_output, wrote a standalong test program.
  *
  * The test code in question is surrounded by "#if
  * TEST_CODE...#endif".
@@ -337,6 +350,8 @@ int main (int argc, char **argv)
         }
     }
 
+    sigfpe_on_denormalized_test();
+
     /*
      * Set the precisions (globally, so they're visible in par_f).
      *
@@ -362,12 +377,6 @@ int main (int argc, char **argv)
 #  error "Don't know the number of decimals required for output"
 #endif /* FLOAT_IS_IEEE */
 
-/*     if (TestOutput) { */
-/*         generate_test_output(TestOutput); */
-/*         fclose(TestOutput); */
-/*         exit(0); */
-/*     } */
-
     if (FortranOutput == 0 && COutput == 0 && TestOutput == 0)
         Usage();
 
@@ -382,16 +391,17 @@ int main (int argc, char **argv)
 "*     Fortran include file.\n"
 "\n"
 "*  Purpose:\n"
-"*     Define public constants for the PRIMDAT system.\n"
+"*     Define public constants for the PRM system.\n"
 "\n"
 "*  Description:\n"
 "*     This file defines machine-dependent public constants for the\n"
-"*     PRIMDAT system.\n"
+"*     PRM system (used to be called PRIMDAT).\n"
 "\n"
 "*  Machine-specific features used:\n"
 "*     The Fortran compiler %s support the \"'hex'X\" notation.\n"
 "*     The machine %s appear to have IEEE floats.\n"
 "*     The machine is %s-endian\n"
+"*     The CPU %s throw SIGFPE on denormalized numbers.\n"
 "\n"
 "*  Authors:\n"
 "*     RFWS: R.F. Warren-Smith (STARLINK, RAL)\n"
@@ -408,9 +418,10 @@ int main (int argc, char **argv)
 "\n"
 "*-\n"
 "\n",
-                (FC_HAVE_HEX_NUMBERS ? "DOES" : "DOES NOT"),
-                (FLOAT_IS_IEEE       ? "DOES" : "DOES NOT"),
-		(WORDS_BIGENDIAN     ? "BIG"  : "LITTLE"),
+                (FC_HAVE_HEX_NUMBERS      ? "DOES" : "DOES NOT"),
+                (FLOAT_IS_IEEE            ? "DOES" : "DOES NOT"),
+		(WORDS_BIGENDIAN          ? "BIG"  : "LITTLE"),
+		(sigfpe_on_denormalized() ? "DOES" : "DOES NOT"),
                 progname, todaysdate(), progname);
     }
 
@@ -425,15 +436,16 @@ int main (int argc, char **argv)
 "*     C include file.\n"
 "\n"
 "*  Purpose:\n"
-"*     Define public constants for the PRIMDAT system.\n"
+"*     Define public constants for the PRM system.\n"
 "\n"
 "*  Description:\n"
 "*     This file defines machine-dependent public constants for the\n"
-"*     PRIMDAT system.\n"
+"*     PRM system (used to be called PRIMDAT).\n"
 "\n"
 "*  Machine-specific features used:\n"
 "*     The machine %s appear to have IEEE floats.\n"
 "*     The machine is %s-endian\n"
+"*     The CPU %s throw SIGFPE on denormalized numbers.\n"
 "\n"
 "*  Authors:\n"
 "*     RFWS: R.F. Warren-Smith (STARLINK, RAL)\n"
@@ -451,8 +463,9 @@ int main (int argc, char **argv)
 "*-\n"
 "*/\n"
 "\n",
-                (FLOAT_IS_IEEE       ? "DOES" : "DOES NOT"),
-		(WORDS_BIGENDIAN     ? "BIG"  : "LITTLE"),
+                (FLOAT_IS_IEEE            ? "DOES" : "DOES NOT"),
+		(WORDS_BIGENDIAN          ? "BIG"  : "LITTLE"),
+		(sigfpe_on_denormalized() ? "DOES" : "DOES NOT"),
                 progname, todaysdate(), progname);
     }
 
@@ -465,12 +478,14 @@ int main (int argc, char **argv)
 "*    The Fortran compiler %s support the \"'hex'X\" notation\n"
 "*    The machine %s appear to have IEEE floats.\n"
 "*    The machine is %s-endian\n"
+"*    The CPU %s throw SIGFPE on denormalized numbers.\n"
 "*\n"
 "*  Test program generated by %s, %s\n"
 "*\n",
-                    (FC_HAVE_HEX_NUMBERS ? "DOES" : "DOES NOT"),
-                    (FLOAT_IS_IEEE       ? "DOES" : "DOES NOT"),
-		    (WORDS_BIGENDIAN     ? "BIG"  : "LITTLE"),
+                    (FC_HAVE_HEX_NUMBERS      ? "DOES" : "DOES NOT"),
+                    (FLOAT_IS_IEEE            ? "DOES" : "DOES NOT"),
+		    (WORDS_BIGENDIAN          ? "BIG"  : "LITTLE"),
+		    (sigfpe_on_denormalized() ? "DOES" : "DOES NOT"),
                     progname, todaysdate());
 
             fprintf(TestOutput, FLINE("PROGRAM prmtest"));
@@ -567,10 +582,18 @@ int main (int argc, char **argv)
     par_i(-2, "VAL__SMLW", 1);
     par_i(-4, "VAL__SMLI", 1);
 #if FLOAT_IS_IEEE
-    /* Note that the following are denormalised numbers: this is not epsilon */
+    /* Note that the following are potentially denormalised numbers:
+       this is not epsilon */
     {
-	float f = min_denorm_f();
-	double d = min_denorm_d();
+	float f;
+	double d;
+	if (sigfpe_on_denormalized()) {
+	    f = min_norm_f();
+	    d = min_norm_d();
+	} else {
+	    f = min_denorm_f();
+	    d = min_denorm_d();
+	}
 	par_fp(1, "VAL__SMLR", &f);
 	par_fp(2, "VAL__SMLD", &d);
     }
@@ -678,6 +701,7 @@ void par_i(const int size, const char* name, int val)
                     type, name, name, val);
         }
     }
+
 #if TEST_CODE
     if (TestOutput && size > 0) {
         /* Write out a test only if size is positive (indicating that
@@ -695,6 +719,7 @@ void par_i(const int size, const char* name, int val)
                 val, name, val, name, name);
     }
 #endif /* TEST_CODE */
+
     if (COutput) {
         if (val >= 0)
             fprintf(COutput, "#define %s %d\n", name, val);
@@ -807,7 +832,7 @@ void par_fp(const int size, const char* name, void* valp)
 	fprintf(FortranOutput,
 		"      %s %s\n      PARAMETER ( %s = '%s'X )\n\n",
 		type, name, name, tohex(&N));
-#else
+#else /* !FC_HAVE_HEX_NUMBERS */
 	if (issingle)
 	    fprintf(FortranOutput,
 		    "      %s %s\n      PARAMETER ( %s = %.*E )\n\n",
@@ -816,8 +841,9 @@ void par_fp(const int size, const char* name, void* valp)
 	    fprintf(FortranOutput,
 		    "      %s %s\n      PARAMETER ( %s = %.*lE )\n\n",
 		    type, name, name, double_precision, N.v.d);
-#endif
+#endif /* FC_HAVE_HEX_NUMBERS */
     }
+
 #if TEST_CODE
     if (TestOutput) {
         int precision = (issingle ? float_precision : double_precision);
@@ -851,6 +877,7 @@ void par_fp(const int size, const char* name, void* valp)
                 name, varname, varname);
     }
 #endif /* TEST_CODE */
+
     if (COutput) {
         if (issingle)
             /* Include trailing F to indicate a single-precision constant */
@@ -950,132 +977,6 @@ const char* tohex(Number* p)
     return c;
 }
 
-#if TEST_CODE
-/*
- * Generate a test program.  The resulting Fortran program should be
- * compiled and run, and should exit 0 on a successful test.  All
- * that's tested at the moment is whether the tohex function is
- * working.
- *
- * Uses non-standard but common EXIT intrinsic.
- */
-void generate_test_output(FILE *out)
-{
-    Number N;
-    const char *p;
-
-    fprintf(out,
-"*  Test program.  Should exit 0 on success\n"
-"*\n"
-"*  Compiler characteristics:\n"
-"*    Fortran compiler %s support the \"'hex'X\" notation\n"
-"*    The machine %s appear to have IEEE floats.\n"
-"*    The machine %s big-endian\n"
-"*\n"
-"*  Test program generated by %s, %s\n"
-"*\n",
-            (FC_HAVE_HEX_NUMBERS ? "DOES" : "DOES NOT"),
-            (FLOAT_IS_IEEE       ? "DOES" : "DOES NOT"),
-	    (WORDS_BIGENDIAN     ? "IS"   : "IS NOT"),
-            progname, todaysdate());
-
-    fprintf(out, FLINE("PROGRAM prmtest"));
-
-    fprintf(out, "* int=%d  long int=%d  long long int=%d  int64_t=%d\n",
-           sizeof(int), sizeof(long int), sizeof(long long int),
-           sizeof(int64_t));
-    fprintf(out, FLINE("IMPLICIT NONE"));
-    fprintf(out, FLINE("INTEGER NFAILS"));
-    fprintf(out, FLINE("INTEGER XI"));
-    fprintf(out, FLINE("REAL X1"));
-    fprintf(out, FLINE("DOUBLEPRECISION X2"));
-    fprintf(out, FLINE("NFAILS=0"));
-    fprintf(out, "\n\n");
-
-
-#if FC_HAVE_HEX_NUMBERS
-    fprintf(out, "*  Tests mostly concerned with the tohex function\n");
-
-    fprintf(out, "*  Tests on INTEGER\n");
-#define TI(n)							\
-    N.v.i = n;							\
-    N.nbytes = 4;						\
-    p = tohex(&N);						\
-    fprintf(out, FLINE("xi = '%s'X"), p);			\
-    fprintf(out, FLINE("if (%d .ne. xi) then"), n);		\
-    fprintf(out, FLINE("    write(*,*)"));			\
-    fprintf(out, "     :'Fail: %d (%s) != %s'\n", n, #n, p);	\
-    fprintf(out, FLINE("    nfails=nfails+1"));			\
-    fprintf(out, FLINE("endif"))
-
-    TI(0);
-    TI(1);
-
-    TI(UINT8_MAX-1);            /* VAL__MAXUB */
-    TI(INT8_MAX);               /* VAL__MAXB, NUM__MAXB */
-    TI(UINT16_MAX-1);           /* VAL__MAXUW */
-    TI(INT16_MAX);              /* VAL__MAXW, NUM__MAXW */
-    TI(INT32_MAX);              /* VAL__MAXI, NUM__MAXI */
-
-    TI(INT8_MIN+1);             /* VAL__MINB */
-    TI(INT16_MIN+1);            /* VAL__MINW */
-    TI(INT32_MIN+1);            /* VAL__MINI */
-    TI(INT8_MIN);               /* NUM__MINB */
-    TI(INT16_MIN);              /* NUM__MINW */
-    TI(INT32_MIN);              /* NUM__MINI */
-
-    fprintf(out, "*  Tests on REAL\n");
-#define TF(n)								\
-    N.v.f = n;								\
-    N.nbytes = 4;							\
-    p = tohex(&N);							\
-    fprintf(out, FLINE("x1 = '%s'X"), p);				\
-    fprintf(out, FLINE("if (%.*e .ne. x1) then"), float_precision, n);	\
-    fprintf(out, FLINE("    write(*,*)"));				\
-    fprintf(out, "     :'Fail: %.*e (%s) != %s'\n",			\
-            float_precision, n, #n, p);					\
-    fprintf(out, FLINE("    nfails=nfails+1"));				\
-    fprintf(out, FLINE("endif"))
-    
-    TF(1.0);
-    TF(-1.0);
-    TF(-FLT_MAX);               /* VAL__BADR, NUM__MINR */
-    TF(FLT_EPSILON);            /* VAL__EPSR */
-    TF(FLT_MAX);                /* VAL__MAXR, NUM__MAXR */
-    TF(nextafterf(-FLT_MAX, 0)); /* VAL__MINR */
-    TF(min_denorm_f());         /* VAL__SMLR */
-
-    fprintf(out, "*  Tests on DOUBLE PRECISION\n");
-#define TD(n)								\
-    N.v.d = n;								\
-    N.nbytes = 8;							\
-    p = tohex(&N);							\
-    fprintf(out, FLINE("x2 = '%s'X"), p);				\
-    fprintf(out, FLINE("if (%.*e .ne. x2) then"), double_precision, n);	\
-    fprintf(out, FLINE("    write(*,*)"));				\
-    fprintf(out, "     :'Fail: %.*e (%s)\n     : != %s'\n",		\
-            double_precision, n, #n, p);				\
-    fprintf(out, FLINE("    nfails=nfails+1"));				\
-    fprintf(out, FLINE("endif"))
-
-    TD(1.0);
-    TD(-1.0);
-    TD(DBL_EPSILON);            /* VAL__EPSD */
-#  if 0
-    /* can't check the following using this simple-minded test */
-    TD(8,-DBL_MAX);
-    TD(nextafter(-DBL_MAX, 0)); /* VAL__MIND */
-    TD(min_denorm_d());         /* VAL__SMLD */
-#  endif
-#else /* FC_HAVE_HEX_NUMBERS */
-    fprintf(out, "*  This compiler doesn't support hex numbers -- nothing to test\n");
-#endif /* FC_HAVE_HEX_NUMBERS */
-
-    fprintf(out, "*  EXIT intrinsic is non-standard but common\n");
-    fprintf(out, FLINE("call exit(nfails)"));
-    fprintf(out, FLINE("end"));
-}
-#endif /* TEST_CODE */
 
         
 #if !HAVE_NEXTAFTERF
@@ -1083,7 +984,7 @@ void generate_test_output(FILE *out)
  * Replacement nextafter functions.  These are NOT general
  * implementations of these functions: they work only for negative
  * IEEE floats (of either endianness), and always take the next after
- * in the direction of positive numbers.  The won't work for VAX
+ * in the direction of positive numbers.  They won't work for VAX
  * floats, for example (because while VAX integers are little-endian,
  * VAX floats are PDP-endian, with the sign bit in the middle, so
  * simply adjusting the aliased integer's LSB will make bigger changes
@@ -1140,17 +1041,121 @@ double min_denorm_d(void)
     n.u = 1;
     return n.d;
 }
+
+float min_norm_f(void)
+{
+    union {
+	float f;
+	struct {
+#if WORDS_BIGENDIAN
+	    unsigned int s : 1;
+	    unsigned int e : 8;
+	    unsigned int m : 23;
+#else
+	    unsigned int m : 23;
+	    unsigned int e : 8;
+	    unsigned int s : 1;
+#endif
+	} ieee;
+    } f;
+    f.ieee.s = 0;
+    f.ieee.e = 1;
+    f.ieee.m = 0;
+    return f.f;
+}
+
+double min_norm_d(void)
+{
+    union {
+	double f;
+	struct {
+#if WORDS_BIGENDIAN
+	    unsigned int s  : 1;
+	    unsigned int e  : 11;
+	    unsigned int m  : 20;
+	    unsigned int m2 : 32;
+#else
+	    unsigned int m2 : 32;
+	    unsigned int m  : 20;
+	    unsigned int e  : 11;
+	    unsigned int s  : 1;
+#endif
+	} ieee;
+    } f;
+	
+    f.ieee.s = 0;
+    f.ieee.e = 1;
+    f.ieee.m = 0;
+    f.ieee.m2 = 0;
+    return f.f;
+}
 #endif /* FLOAT_IS_IEEE */
+
+/* Return true/non-zero if using denormalized numbers throws a SIGFPE
+   (Alphas do this). */
+int sigfpe_on_denormalized(void)
+{
+    /* first, ensure that sigfpe_on_denormalized_test() has in fact
+       been called */
+    assert(sigfpe_on_denormalized_result > 0);
+    return sigfpe_on_denormalized_result;
+}
+
+/*
+ * Perform the test of whether denormalized numbers throw SIGFPE.  It
+ * would be nice to fold this into the sigfpe_on_denormalized test,
+ * but that's slightly tricky if we want to get the result of the test
+ * immediately after performing it.  Since the FPE, if it happens, is
+ * handled asynchronously, if sigfpe_on_denormalized_result is zero
+ * after the denormalized arithmetic, we can't tell if this is because
+ * there was no FPE, or because the handler hasn't kicked in yet.
+ * There are various ways to handle this, but we don't need that much
+ * dangerous cunning, since we can conveniently perform this test at
+ * the beginning of the program, and examing its result separately.
+ *
+ * Function signal(2) is deprecated for its unreliable semantics.
+ * We don't care, however, since we are extremely unlikely to get any
+ * multiple FPEs between the two calls to signal(2).
+ */
+void sigfpe_on_denormalized_test(void)
+{
+    float testfloat;
+
+    sigfpe_on_denormalized_result = 0; /* initialise to false */
+
+    signal(SIGFPE, &sigfpe_on_denormalized_handler);
+
+    testfloat = min_denorm_f();
+    testfloat += 1;
+
+    if (testfloat == 3.141592657) {
+	/* Meaningless test, to ensure that the value of testfloat
+	   is used, thus ensuring that the calculation is not
+	   skipped by the compiler. */
+	printf("Impossible test passed!\n");
+	exit(1);
+    }
+
+    signal(SIGFPE, SIG_DFL);	/* reset signal handling */
+}
+
+/* Helper for sigfpe_on_denormalized_test */
+void sigfpe_on_denormalized_handler(int i)
+{
+    sigfpe_on_denormalized_result = 1; /* true */
+    
+    return;
+}
+
+
 
 void Usage(void)
 {
     fprintf(stderr, "Usage: %s [-fFortranIncludeFile] [-cCIncludeFile]"
 #if TEST_CODE
-	    " [-tTestProgram.f]\n"
-#else
-	    "\n"
+	    " [-tTestProgram.f]"
 #endif /* TEST_CODE */
-	    ,
+	    "\n",
             progname);
     exit(1);
 }
