@@ -123,10 +123,10 @@
       END IF
 
 *  Scale by vignetting array if present
-      IF ( OBDAT(N).V_ID .NE. ADI__NULLID ) THEN
-	CALL VEC_MULR( .FALSE., OBDAT(N).NDAT, %VAL(OBDAT(N).VIGPTR),
-     :                 PRED, PRED, IERR, NERR, STATUS )
-      END IF
+c      IF ( OBDAT(N).V_ID .NE. ADI__NULLID ) THEN
+c	CALL VEC_MULR( .FALSE., OBDAT(N).NDAT, %VAL(OBDAT(N).VIGPTR),
+c     :                 PRED, PRED, IERR, NERR, STATUS )
+c      END IF
 
 *  Scale up by TEFF and add background if count model is required
       IF ( COUNTMODEL ) THEN
