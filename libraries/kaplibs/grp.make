@@ -236,7 +236,7 @@ irq1_sbad1d.f irq1_sbad1i.f irq1_sbad1r.f irq1_sbad1ub.f \
 irq1_sbad1uw.f irq1_sbad1w.f 
 
 # A group of all the generic source files.
-GENERIC_SOURCES = $(KPG_GEN)
+GENERIC_SOURCES = $(KPG_GEN) $(IRQ_GEN)
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kaplibs.tar.
