@@ -1,0 +1,57 @@
+#  The developer may edit this file.
+
+SYS_SCRIPTS = /ukirt_sw/scr
+
+#  The host architecture performing the build,
+#HOST_ARCH = $(shell /bin/csh $(SYS_SCRIPTS)/which_system)
+HOST_ARCH = $(SYSTEM)
+BUILD_ARCHS=$(HOST_ARCH)
+
+# must be either YES or NO
+UNIX_OPT =YES
+UNIX_WARN=YES
+
+# Position of Starlink includes, libs and bins
+STARLINK = /star
+STAR_INC   =$(STARLINK)/include
+STAR_BIN   =$(STARLINK)/bin
+STAR_LIB   =$(STARLINK)/lib
+
+# Position of Figaro includes, libs and bins
+FIGARO   = /star/figaro
+FIG_INC    =$(FIGARO)
+FIG_BIN    =$(FIGARO)
+FIG_LIB    =$(FIGARO)
+
+# Linking symbols etc
+ALINK  = $(STAR_BIN)/alink 
+ILINK  = $(STAR_BIN)/ilink
+COMPIFL= $(STAR_BIN)/compifl
+
+ifndef INSTALL_LOCATION
+INSTALL_LOCATION = $(APPLIC_INSTALL)
+endif
+
+ifdef T_A
+
+INSTALL_LOCATION_LIB        = $(INSTALL_LOCATION)/lib
+INSTALL_LOCATION_BIN        = $(INSTALL_LOCATION)/bin
+INSTALL_LIB                 = $(INSTALL_LOCATION_LIB)/$(T_A)
+INSTALL_BIN                 = $(INSTALL_LOCATION_BIN)/$(T_A)
+INSTALL_INCLUDE             = $(INSTALL_LOCATION)/include
+INSTALL_DOC                 = $(INSTALL_LOCATION)/doc
+INSTALL_PROC                = $(INSTALL_LOCATION)/prc
+INSTALL_MAN                 = $(INSTALL_LOCATION)/man
+
+INSTALL_NDF		    = $(INSTALL_LOCATION)/ndf
+INSTALL_DST		    = $(INSTALL_LOCATION)/dst
+INSTALL_DEMO		    = $(INSTALL_LOCATION)/demo
+INSTALL_TCL		    = $(INSTALL_LOCATION)/tcl
+
+OBDIR = O.$(T_A)
+
+#  Architecture specific definitions
+include $(APPLIC_CONFIG)/CONFIG.$(T_A)
+
+endif
+

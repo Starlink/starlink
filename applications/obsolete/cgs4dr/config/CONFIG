@@ -1,0 +1,14 @@
+# $Id$
+#
+# Example application configuration file. Application wide definitions
+# can be placed in this file.
+#
+# This file includes the file $(APPLIC_TOP)/config/CONFIG.Defs which 
+# contains some macros which override where files are installed, which
+# target architectures should be built for, and where external
+# application files should be looked for.
+#
+
+include $(APPLIC_TOP)/config/CONFIG.Defs
+
+include $(APPLIC_CONFIG)/CONFIG

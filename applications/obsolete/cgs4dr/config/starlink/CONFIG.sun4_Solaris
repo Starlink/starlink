@@ -1,0 +1,55 @@
+# Compiler and utility invocation (supply path to compiler here)
+CC           = /opt/SUNWspro/bin/cc
+FC           = /opt/SUNWspro/bin/f77
+AR_IN	     = ar -r
+LINK	     = ln -s
+RANLIB       = 
+TAR_IN	     = tar -cvhf
+TAR_OUT	     = tar -xf
+INSTALL      = /usr/ucb/install
+
+# Compiler and linker flags
+FEXTEND_FLAG = -e
+UNIX_LDPATHS = -L/usr/ucblib -L$(INSTALL_LIB)
+UNIX_LDLIBS  = -lucb
+COPTIM_YES   = -O
+COPTIM_NO    =
+FOPTIM_YES   = -O
+FOPTIM_NO    =
+CWARN_YES    = -Xc -v -w
+CWARN_NO     = -Xa
+
+# ------- Try not to change anything below this line ----------------------
+#
+# BUILD_TYPE e.g. Vx or Unix (NT?)
+BUILD_TYPE = Unix
+ 
+# Include files
+UNIX_INCLUDES = -I. -I.. -I$(STAR_INC)
+
+# Compiler flags for the C preprocessor, C and Fortran
+UNIX_CPPFLAGS = $(UNIX_INCLUDES) $(USR_INCLUDES) -DUNIX -DSOLARIS
+UNIX_CFLAGS   = $(COPTIM_$(UNIX_OPT)) $(CWARN_$(UNIX_WARN)) 
+UNIX_FFLAGS   = $(FOPTIM_$(UNIX_OPT)) $(FEXTEND_FLAG)
+
+# Generalized definitions for C preprocessor, C, Fortran and the linker.
+CPPFLAGS = $(USR_CPPFLAGS) $(ARCH_CPPFLAGS) $(UNIX_CPPFLAGS)
+CFLAGS   = $(USR_CFLAGS)   $(ARCH_CFLAGS)   $(UNIX_CFLAGS)
+FFLAGS   = $(USR_FFLAGS)   $(ARCH_FFLAGS)   $(UNIX_FFLAGS)
+LDPATHS  = $(USR_LDPATHS)  $(ARCH_LDPATHS)  $(UNIX_LDPATHS)
+LDLIBS   = $(USR_LDLIBS)   $(ARCH_LDLIBS)   $(UNIX_LDLIBS)
+
+LDFLAGS  = $(LDPATHS) $(LDLIBS)
+
+# Compilation, link and dependency definitions
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) -c
+LINK.c	  = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
+DEPENDS.c = -$(COMPILE.c) -xM $(SRCS.c)      
+
+COMPILE.f = $(FC) $(FFLAGS) -c
+LINK.f	  = $(FC) $(FFLAGS) $(LDFLAGS)
+DEPENDS.f = $(SYS_SCRIPTS)/listdep $(SRCS.f) | sed 's,^../,,' 
+
+
+
+

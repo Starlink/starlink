@@ -1,0 +1,55 @@
+#
+#  $Id$
+#
+#  Rules file for application directories which are not build
+#  directories. (The latter are usually created by the make process
+#  and have the name O.*).
+#
+#  Nick Rees
+#
+
+#  A pattern rule to make a sub directory
+
+TEMPLATES = $(APPLIC_TEMPLATES)/$(APPLIC_DIR_TYPE)
+
+mkdir.% :
+	@dir=`echo $* | sed 's/:.*$$//'`;				\
+	if [ ! -r "$${dir}" ]; then					\
+	    if [ "`echo $* | grep -c :`" = "0" ]; then			\
+		if [ -d $(APPLIC_TEMPLATES)/$${dir} ]; then		\
+		    dir_type="$${dir}";					\
+		else							\
+		    dir_type="$(APPLIC_DIR_TYPE)";			\
+		fi;							\
+	    else							\
+		dir_type=`echo $* | sed 's/^.*://'`;			\
+	    fi;								\
+	    if [ "$${dir_type}" != "" -a -d $(APPLIC_TEMPLATES)/$${dir_type} ]; then		\
+		echo Making directory $${dir} of type $${dir_type};	\
+		mkdir -p $${dir};					\
+		if [ "$${dir_type}" != "config" ]; then			\
+		    echo DIRS += `basename $${dir}` >>			\
+			$${dir}/../$(APPLIC_SUBDIR_FILE);		\
+		    ln -s ../.applTop $${dir}/.applTop;			\
+		fi;							\
+		( cd $(APPLIC_TEMPLATES)/$${dir_type} ;			\
+		    find . -name CVS -prune -o -print |cpio -o 2> /dev/null) |\
+		    ( cd $${dir} ; cpio -imd 2> /dev/null );		\
+	    else							\
+		echo "Directory type $${dir_type} does not exist" ;	\
+	    fi ;							\
+	else								\
+	    echo "Directory $${dir} already exists";			\
+	fi
+
+#  Propagate down the directory tree if the sub directory file exists,
+#  otherwise attempt to build in subdirectories of this directory.
+
+ifeq ($(shell test -f "$(APPLIC_SUBDIR_FILE)" && echo exists),exists)
+#  If this directory contains subdirectories then this propagates down them
+   include $(APPLIC_SUBDIR_FILE)
+   include $(APPLIC_CONFIG)/RULES_DIRS
+else
+#  If this directory doesn't contain subdirectories this ends the propagation
+   include $(APPLIC_CONFIG)/RULES_ARCHS
+endif

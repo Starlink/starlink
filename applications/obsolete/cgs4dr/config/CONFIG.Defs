@@ -1,0 +1,19 @@
+
+# This file is created and edited by the applSetup command. The variables
+# it creates are documented in the .applTop/config/CONFIG file.  It can
+# also be edited by hand to change some of the defaults used in the make
+# process.  However, do it with due care and attention, knowing it will
+# be overwritten by the next applSetup invocation.
+# 
+# If you want do override any of these variables on a permanent basis (for
+# example, this may be appropriate for APPLIC_DEPENDS) it be done in the
+# .applTop/config/CONFIG file.
+
+APPLIC_INSTALL     =/home/npr/cgs4dr
+APPLIC_VERSION     =.
+APPLIC_SUBDIR_FILE =Makefile.Dirs
+APPLIC_PWD_CMD     =pwd
+APPLIC_TARGETS     =
+APPLIC_DEPENDS     =
+APPLIC_TEMPLATES   =/ukirt_sw/epics/R3.12.2.2/extensions/templates/uae
+APPLIC_CONFIG      =$(APPLIC_TOP)/config/starlink
