@@ -1,3 +1,4 @@
+#include <config.h>
       SUBROUTINE ARD1_CNTDR( IPLOT, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, 
      :                       YSIZE, CONT, MAXPTS, XY, DONE, STATUS )
 *+

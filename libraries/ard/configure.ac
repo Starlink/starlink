@@ -40,8 +40,7 @@ dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
 dnl    which correspond to it.
 STAR_MESSGEN(ard_err.msg)
 
-dnl    If you wish to configure extra files, you can add them to this
-dnl    declaration.
+AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    This is the bit that does the actual work
