@@ -157,6 +157,7 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PIXEL','_CHAR',0,10,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'X','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'Y','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'RA','_CHAR',0,12,SID,STATUS)
