@@ -128,7 +128,11 @@
 
 *  Get the record length of the file.
       CALL FIO_UNIT( FDL, LUNIT, STATUS )
-      INQUIRE ( UNIT = LUNIT, RECL = RECLEN )
+      INQUIRE( UNIT = LUNIT, RECL = RECLEN )
+
+*  On some operating systems such as Solaris the record length is
+*  returned as zero.  Supply a sensible default in this case.
+      IF ( RECLEN .EQ. 0 ) RECLEN = 80
 
 *  Find the maximum number of characters that can be output in the
 *  caption.
