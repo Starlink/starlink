@@ -18,7 +18,7 @@
 #undef EXTERN
 
 #if HAVE_JPEGLIB_H
-#include "jpeglib.h"
+#include <jpeglib.h>
 #endif
 
 /*
