@@ -146,7 +146,7 @@ F77_SUBROUTINE(tc1)( CHARACTER(c) TRAIL(c) )
 F77_SUBROUTINE(tc2)( CHARACTER_ARRAY(ca), INTEGER(nc), CHARACTER(line)
                      TRAIL(ca) TRAIL(line) )
 
-/* Add up the numbers stored in the array wa and put the results in w.	    */
+/* Extract the strings from ca and put them together into string line       */
 {
    GENPTR_CHARACTER_ARRAY(ca)	    /* The array of characters 		    */
    GENPTR_INTEGER(nc)		    /* The number of elements in the array  */

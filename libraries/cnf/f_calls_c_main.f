@@ -69,7 +69,7 @@
          LA( J ) = MOD( J, 2 ) .EQ. 1
       END DO
       CALL TL( LA, NL, L )
-      PRINT '(A,I4,A,L)',
+      PRINT '(A,I4,A,L1)',
      :   'The statement ''The number of odd values in the first ',NL,
      :   ' integers is 5'' is ',L
 
@@ -111,6 +111,7 @@
      :   'The character variable has been set to: ',C
 
       DO J = 1, NC
+         CA(J) = ' ' ! Initialise full array (needed on some compilers)
          CH = CHAR( 64 + J )
          CA( J )( 1:5 ) = CH // CH // CH // CH // CH
       END DO
@@ -133,7 +134,7 @@
      :   'The value of function FR is ',FR(0.0)
       PRINT '(A,F10.4)',
      :   'The value of function FD is ',FD(0.0D0)
-      PRINT '(A,L)',
+      PRINT '(A,L1)',
      :   'The value of function FL is ',FL(.TRUE.)
       PRINT '(A,A)',
      :   'The value of function FC is ',FC('Hello')

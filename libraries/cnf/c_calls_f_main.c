@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "f77.h"
 
 #define NI 10
@@ -10,7 +12,7 @@
 #define NUW 21
 #define NC 5
 
-main()
+int main()
 {
    int j;
    DECLARE_INTEGER(ni);
@@ -122,4 +124,6 @@ main()
       cnf_imprt( caf[j], (sizeof caf)/NC, c1c );
       printf( "The %dth element of the character array is: %s\n", j, c1c );
    }
+
+   return EXIT_SUCCESS;
 }
