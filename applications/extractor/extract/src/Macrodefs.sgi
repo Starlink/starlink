@@ -1,0 +1,11 @@
+#
+# macro definitions for the cc compiler on SGI machines
+#
+# E.BERTIN 1999
+#
+SEXMACHINE= sgi
+CC    = cc				# the C compiler
+COPTS = -O				# options for the C compiler
+CD    = cd
+CP    = cp
+RM    = rm -f

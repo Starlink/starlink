@@ -1,0 +1,11 @@
+#
+# macro definitions for the egcs ANSI-C Compiler on PC-LINUX systems (Pentium-Pro and above)
+#
+# E.BERTIN 1999
+#
+SEXMACHINE= linux
+CC    = insure				# the C compiler
+COPTS = -DPC_LINUX -g -O3 -m486 -funroll-loops # options for the C compiler
+CD    = cd
+CP    = cp
+RM    = rm -f
