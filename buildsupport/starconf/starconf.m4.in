@@ -319,7 +319,8 @@ AC_DEFUN([STAR_MESSGEN],
 # distributed files, and issues a warning if they are.
 AC_DEFUN([STAR_PREDIST_SOURCES],
 [m4_ifval([$1], [], [AC_FATAL([$0: called with no stamp file])])dnl
-for marker in $1
+_star_tmp='$1'
+for marker in $_star_tmp
 do
     if test -f $marker; then
         _star_predist_marker_present=:
@@ -333,10 +334,11 @@ do
                 # we do want to build sourceset files
                 _star_predist_status=predist
                 PREDIST=
-                echo "In predistribution state"
+                AC_MSG_NOTICE([in predistribution state])
             else
                 # leave default PREDIST='#'
                 _star_predist_status=postdist
+                AC_MSG_NOTICE([in post-distribution state])
             fi
             ;;
         predist)
@@ -1230,8 +1232,9 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
                     fi
                 fi
                 # Don't even try linking with -lcc_dynamic.  It may work, but
-                # will be unpredictable: 
-                # http://lists.apple.com/mhonarc/fortran-dev/msg00769.html
+                # will be unpredictable:
+                # http://lists.apple.com/archives/fortran-dev/2004/Jul/msg00036.html
+                # (was http://lists.apple.com/mhonarc/fortran-dev/msg00769.html)
                 if test $star_cv_restfp_fixup = yes; then
                     AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext -L/usr/lib -lgcc)
                     if test $ac_status = 0; then
@@ -1265,7 +1268,8 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
        # the sources.  AC_FC_LIBRARY_LDFLAGS (which defines FCLIBS) does
        # things differently, because there the user knows they want these
        # extra libraries.
-       LIBS="$LIBS -L/usr/lib -lgcc"
+       AC_SUBST(C_FC_FCLINK_MAGIC, "-L/usr/lib -lgcc")
+       AC_SUBST(C_FC_PPFC_FCLINK_MAGIC, "-L/usr/lib -lgcc")
        ;;
      nofortran)
        AC_MSG_NOTICE([No Fortran in path, so presumably no g77/gcc library problems])
