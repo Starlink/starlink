@@ -1,0 +1,102 @@
+1 Changes_to_CONVERT
+
+2 V0.4
+
+The original purpose of this release was to fix bugs, however, it
+was convenient to include some new applications for handling ordinary
+files. There are five new commands.
+
+3 Global_changes
+
+  o  The documentation has largely been rewritten.  Application
+     descriptions are expanded, and standardised; they include
+     examples and usage.
+
+  o  Online help is provided.
+
+  o  The parameter names are consistent.  IN is used for the input
+     file, OUT for the output file, and the data type is TYPE.
+     In the previous version there was a mismatch between the
+     application, which used parameter FORMAT, and the documentation.
+
+  o  The global parameter GLOBAL.DATA_ARRAY (current NDF) is used to
+     suggest a default for the name of an input NDF, and it is
+     updated when an output NDF is created.
+
+  o  NDF sections may be used when converting from an NDF.
+
+  o  Many bugs have been fixed, particularly in the area of FITS
+     headers, and descriptors.
+
+  o  Corrected the error reporting to adhere to Starlink standards.
+
+
+3 New_applications
+
+There are five new applications.
+
+   ASCII2NDF converts an ASCII file to an NDF. 
+   NDF2ASCII converts an NDF to an ASCII file. 
+   NDF2IRAF converts an NDF to an IRAF (OIF) image. 
+   NDF2UNF converts an NDF to a sequential unformatted file. 
+   UNF2NDF converts a sequential unformatted file to an NDF.
+
+3 Extended_and_corrected_applications
+  
+Here is a summary of the main modifications.
+
+  o BDF2NDF and NDF2BDF can handle La Palma ING-style FITS headers.
+    They process NDF units, and axis labels.
+
+  o BDF2NDF and NDF2BDF parameter TYPE has a dynamic default
+    equivalent to the data type of the input BDF or NDF, rather than
+    being defaulted to R or _REAL respectively.
+
+  o The NDF axis structure will now always be valid when made by
+    BDF2NDF.  Missing axis centres are filled with pixel co-ordinates.
+
+  o NDF2BDF prevents special keywords from being copied from the FITS
+    header when there are overriding objects present in the
+    NDF; these objects are formatted into FITS-like descriptors.
+
+  o BDF2NDF and DST2NDF will now generate card images in the FITS
+    extension that conform to the FITS standard.  Long strings
+    (>18 characters) are only truncated at the end of the card.
+    NDF2DST correctly processes character-valued card-images in the
+    FITS extension; it searches for the comment delimiter rather
+    than assuming where the comment is located.  NDF2DST does not
+    propagate FITS header cards with blank keywords.
+
+  o DST2NDF and NDF2DST will process axis arrays with greater than
+    one dimension.  They are situated in the axis Figaro extension.
+    Both applications can process axis variance.
+
+  o In DST2NDF certain objects in the DST are relocated in the NDF
+    to be where the Figaro DSA_ library expects them.  NDF2DST moves
+    them from their new locations.  The objects are .OBS.SECZ,
+    .OBS.TIME, .Z.MAGFLAG, .Z.RANGE and they now reside in the
+    top-level Figaro extension of an NDF.
+
+  o DST2NDF preserves the type of the OBS structure within the NDF.
+    It can process up to 7 dimensions.  Axis width is processed as
+    a numeric array, rather than a character scalar.
+
+  o The DST2NDF no longer creates a phantom two-dimensional FITS
+    structure when there is an empty FITS structure within the DST
+    file.
+
+  o The bad-pixel processing has changed in DST2NDF.  Quality is
+    only copied if the bad-pixel flag is false or absent.  In this
+    case a simple NDF is made with its bad-pixel flag likewise set
+    to false.
+
+  o NDF2DST preserves the type of extensions in the FIGARO.MORE
+    structure.  It writes the FLAGGED value to the DST file, as
+    Figaro (DSA_) makes the opposite assumption, compared with
+    the NDF, about the presence of bad pixels when the bad-pixel
+    flag is absent.
+
+  o NDF2DST propagates axis-variance and width arrays, and the
+    contents of any axis Figaro extension.  If there is only one
+    object in the Figaro extension, it is now copied to the DST.
+
