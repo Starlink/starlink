@@ -102,12 +102,12 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! Component locator
 
-      INTEGER			VALUE			! Intermediate value
-
       INTEGER			DIMS(DAT__MXDIM)	! Dimensions
       INTEGER			NDIM			! Dimensionality
       INTEGER			NELM			! Number of elements
       INTEGER			VPTR			! Mapped data
+
+      BTYE			VALUE			! Intermediate value
 
       LOGICAL			THERE			! Object exists?
 *.
@@ -141,28 +141,28 @@
 
 *    Read the HDS data
         IF ( NDIM .EQ. 0 ) THEN
-          CALL DAT_GET0I( CLOC, VALUE, STATUS )
+          CALL DAT_GET( CLOC, '_UBYTE', 0, 0, VALUE, STATUS )
         ELSE
-          CALL DAT_MAPV( CLOC, '_INTEGER', 'READ', VPTR, NELM, STATUS )
+          CALL DAT_MAPV( CLOC, '_UBYTE', 'READ', VPTR, NELM, STATUS )
         END IF
 
 *    Write to ADI
         IF ( MEMBER .GT. ' ' ) THEN
           CALL ADI_CNEW( ID, MEMBER, 'UBYTE', NDIM, DIMS, STATUS )
           IF ( NDIM .EQ. 0 ) THEN
-            CALL ADI_CPUT0I( ID, MEMBER, VALUE, STATUS )
+            CALL ADI_CPUT0( ID, 'UBYTE', MEMBER, VALUE, STATUS )
           ELSE
-            CALL ADI_CPUTI( ID, MEMBER, NDIM, DIMS,
-     :                         %VAL(VPTR), STATUS )
+            CALL ADI_CPUT( ID, 'UBYTE', MEMBER, NDIM, DIMS,
+     :                                 %VAL(VPTR), STATUS )
           END IF
 
 *    Simple object
         ELSE
-          CALL ADI_NEW( ID, 'UBYTE', NDIM, DIMS, STATUS )
+          CALL ADI_NEW( 'UBYTE', NDIM, DIMS, ID, STATUS )
           IF ( NDIM .EQ. 0 ) THEN
-            CALL ADI_PUT0I( ID, VALUE, STATUS )
+            CALL ADI_PUT0( ID, 'UBYTE', VALUE, STATUS )
           ELSE
-            CALL ADI_PUTI( ID, NDIM, DIMS, %VAL(VPTR), STATUS )
+            CALL ADI_PUT( ID, 'UBYTE', NDIM, DIMS, %VAL(VPTR), STATUS )
           END IF
 
         END IF
