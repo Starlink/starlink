@@ -1198,6 +1198,7 @@
 *  Get the saturation value. This may be available in the NDF extension
 *  so have a look if required. If none is found then just prompt the
 *  user for the saturation value.
+            EXTSAT = .FALSE.
             IF ( USEEXT ) THEN
                CALL CCG1_FCH0D( IDIN, 'SATURATION', SATVAL, EXTSAT,
      :                          STATUS )
