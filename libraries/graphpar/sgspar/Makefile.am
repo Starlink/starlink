@@ -35,4 +35,4 @@ sgs_test_SOURCES = sgs_test.f
 sgs_test_LDADD = $(LDADD) `$(srcdir)/sgs_link_adam` `par_link_adam` -lpthread
 
 sgspar_test_SOURCES = sgspar_test.f
-sgspar_test_LDADD = libsgspar_adam.la `sgs_link_adam` `par_link_adam`
+sgspar_test_LDADD = libsgspar_adam.la `$(srcdir)/sgs_link_adam` `par_link_adam`

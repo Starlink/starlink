@@ -29,4 +29,4 @@ pgp_test_SOURCES = pgp_test.f
 pgp_test_LDADD = $(LDADD) `$(srcdir)/pgp_link_adam` `par_link_adam` -lpthread
 
 pgppar_test_SOURCES = pgppar_test.f
-pgppar_test_LDADD = libpgppar_adam.la `pgp_link_adam` `par_link_adam`
+pgppar_test_LDADD = libpgppar_adam.la `$(srcdir)/pgp_link_adam` `par_link_adam`

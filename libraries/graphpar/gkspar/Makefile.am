@@ -33,4 +33,4 @@ gks_test_LDADD = $(LDADD) `$(srcdir)/gks_link_adam` `par_link_adam` -lpthread
 
 
 gkspar_test_SOURCES = gkspar_test.f
-gkspar_test_LDADD = libgkspar_adam.la `gks_link_adam` `par_link_adam` `err_link_adam`
+gkspar_test_LDADD = libgkspar_adam.la `$(srcdir)/gks_link_adam` `par_link_adam` `err_link_adam`
