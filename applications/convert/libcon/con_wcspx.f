@@ -34,14 +34,18 @@
 *  Notes:
 *     - Various assumptions are made about the meaning of several items
 *     in the SPECX extensions. These are described in the code comments.
+*     - Double Sideband is always assumed
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     27-JAN-2003 (DSB):
 *        Original version.
+*      6-AUG-2004 (TIMJ):
+*        Convert to use DSBSpecFrame
 *     {enter_changes_here}
 
 *  Bugs:
@@ -80,6 +84,7 @@
       CHARACTER CMONTH*3     ! Month as a three-character abbreviation
       CHARACTER EPOCH*50     ! Epoch string
       CHARACTER MONTHS(12)*3 ! Months of the year.
+      CHARACTER SIDEBAND*3   ! USB or LSB?
       CHARACTER SOR*10       ! Value for StdOfRest attribute
       CHARACTER UTDATE*15    ! UT date of the observation
       CHARACTER UTIME*15     ! UT time of the observation
@@ -93,6 +98,7 @@
       DOUBLE PRECISION DDEC  ! Dec offset (arc-seconds)
       DOUBLE PRECISION DEC   ! Central Dec (degrees)
       DOUBLE PRECISION DRA   ! RA offset (seconds)
+      DOUBLE PRECISION IFFREQ! IF Frequency (GHz)
       DOUBLE PRECISION MJD   ! Modified Julian Date of observation
       DOUBLE PRECISION POSANG! Position angle of Y axis (degs East of North)
       DOUBLE PRECISION RA    ! Central RA (degrees)
@@ -122,6 +128,7 @@
       INTEGER SKYFRM         ! Pointer to AST SkyFrame
       INTEGER SPCFRM         ! Pointer to AST SpecFrame
       INTEGER YEAR           ! Year 
+      LOGICAL ISDSB          ! Is this a double sideband observation?
       LOGICAL THERE          ! Does object exist?
       REAL DAYS              ! Time of observation as fraction of a day
       REAL SEC               ! Seconds of observation
@@ -141,21 +148,36 @@
 *  Get the dimensions of the output NDF, in pixels.
       CALL NDF_DIM( INDF, 3, DIM, NDIM, STATUS )
 
+*  For now, assume that all specx files are dual sideband. This is wrong
+*  but good enough for testing. It's also highly likely that SSB observations
+*  might like to look in the other sideband for line contamination.
+*  Either this should always be true, or we should prompt for it.
+      ISDSB = .TRUE.
+
 *  First create an AST SpecFrame to represent the spectral axis. This
 *  will be used as axis 1 within the Frame which is finally added to the 
 *  WCS component of the output NDF.
 *  ===================================================================
 
-*  Create a SpecFrame describing frequency in units of GHz.
-      SPCFRM = AST_SPECFRAME( 'System=freq,unit=GHz', STATUS )
+*  Create a [DSB]SpecFrame describing frequency in units of GHz.
+      IF (ISDSB) THEN
+         SPCFRM = AST_DSBSPECFRAME( 'System=freq,unit=GHz', STATUS )
+      ELSE
+         SPCFRM = AST_SPECFRAME( 'System=freq,unit=GHz', STATUS )
+      END IF
 
 *  Set its attributes so that they correspond to the information stored
 *  in the SPECX extensions in the input map...
 
+*  Since the DSB SpecFrame attributes can only be derived from
+*  knowledge of the observed sideband which in specx requires JFINC
+*  we defer setting of these attributes until JFINC and JFCEN are
+*  read. [alternatively we could move those reads up]
+
 *  Rest frequency. Convert from kHz to GHz.
       CALL NDF_XGT0I( IMAP, 'SPECX', 'JFREST(1)', JFREST, STATUS )
       CALL AST_SETD( SPCFRM, 'RestFreq', DBLE( JFREST )*1.0D-6, STATUS )
- 
+
 *  Source position. We create an FK4 B1950 SkyFrame which AST_SETREFPOS 
 *  will use to interpret the supplied values. 
       CALL NDF_XGT0D( IMAP, 'SPECX', 'RA_DEC(1)', RA, STATUS )
@@ -299,6 +321,33 @@
 *  Get the frequency increment per pixel, in Hz. Convert to GHz.
       CALL NDF_XGT0I( IMAP, 'SPECX', 'JFINC(1)', JFINC, STATUS)
       CD3 = DBLE( JFINC )*1.0E-9
+
+*  Since this is a convenient time, configure the DSB-ness
+      IF (ISDSB) THEN
+
+         CALL AST_SETD( SPCFRM, 'DSBCentre', CRVAL3, STATUS)
+
+*  For dual sideband instruments we need to get the IF frequency
+*  This is always in GHz in specx. It must be -ve if the observed
+*  sideband is upper, positive if we are in LSB
+         CALL NDF_XGT0D( IMAP, 'SPECX', 'IFFREQ(1)', IFFREQ, STATUS )
+
+*  Calculate which sideband we are in and fix the sign of the IF
+*  Note that the sign of the IF controls the observed sideband, the
+*  sideband attribute controls the current sideband setting
+         IF (JFINC .GT. 0) THEN
+            SIDEBAND = 'USB'
+            IFFREQ = IFFREQ * -1.0D0
+         ELSE
+            SIDEBAND = 'LSB'
+         END IF
+
+*   Set sideband and IF
+         CALL AST_SETC(SPCFRM, 'SideBand', SIDEBAND, STATUS)
+         CALL AST_SETD( SPCFRM, 'IF', IFFREQ, STATUS)
+
+      END IF
+
 
 *  Now create a SkyFrame describing the spatial position (RA,Dec), and
 *  the 3D Mapping which goes from 3D GRID coords to (RA,Dec,Freq). 
