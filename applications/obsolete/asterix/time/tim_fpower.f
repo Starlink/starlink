@@ -87,14 +87,14 @@
          CALL TIM_FPOWER_POWER(%VAL(DPTR),NARR,DATA,NDAT)
 
 *      Free work space
-         CALL DYN_UNMAP( DPTR )
-         CALL DYN_UNMAP( WPTR )
+         CALL DYN_UNMAP( DPTR, STATUS )
+         CALL DYN_UNMAP( WPTR, STATUS )
 
       END IF
 
 *   Exit
  99   IF (STATUS.NE.SAI__OK) THEN
-         CALL ERR_REP('EXERR', '...from TIM_FPOWER', STATUS )
+         CALL AST_REXIT( 'TIM_FPOWER', STATUS )
       END IF
 
       END

@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL DYN_MAP<T>( [p]... )
+*     CALL DYN_MAP<T>( NDIM, DIMS, PTR, STATUS )
 
 *  Description:
 *     Allocate a dynamic array of specified dimensions of type <TYPE>.
