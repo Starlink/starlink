@@ -179,9 +179,9 @@
         CALL MSG_PRNT( 'WARNING: Datasets have different axis units' )
       END IF
       IF ( ULEN(1) .GT. 0 ) THEN
-        OUNITS = '('//UNITS(1)(1:ULEN(1))//')^-1)'
+        OUNITS = '('//UNITS(1)(1:ULEN(1))//')^-1'
       ELSE IF ( ULEN(2) .GT. 0 ) THEN
-        OUNITS = '('//UNITS(2)(1:ULEN(2))//')^-1)'
+        OUNITS = '('//UNITS(2)(1:ULEN(2))//')^-1'
       END IF
 
 *  If one array is larger than the other then truncate it
@@ -509,7 +509,7 @@
 
       INTEGER I
 
-      DO I = 1, M
+      DO I = 1, N
         C(1,I) = X(I)
         C(2,I) = Y(I)
       END DO
