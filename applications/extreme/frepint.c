@@ -350,7 +350,7 @@
    tokens, squashing up spaces to retain as much of the formatting as 
    possible if we have the chance. */
                      if ( col + nc + ( pc - tbuf[ j ].string ) 
-                              - MIN( nspc, skipspc ) <= 73 ) {
+                              - MINIMUM( nspc, skipspc ) <= 73 ) {
                         for ( k = i + 1; k <= j; k++ ) {
                            for ( qc = tbuf[ k ].string; c = *qc; qc++ ) {
                               if ( c == ' ' && skipspc && 

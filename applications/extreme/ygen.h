@@ -48,9 +48,9 @@
    than the preceding fluff. */
       char *ymatst;
 
-/* Useful macro. */
-#define MAX(x,y) ((x) > (y) ? (x) : (y))
-#define MIN(x,y) ((x) < (y) ? (x) : (y))
+/* Useful macros. */
+#define MAXIMUM(x,y) ((x) > (y) ? (x) : (y))
+#define MINIMUM(x,y) ((x) < (y) ? (x) : (y))
 
 /*
 *  These definitions set up variables to be used for passing text to
