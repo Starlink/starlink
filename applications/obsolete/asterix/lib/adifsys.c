@@ -106,7 +106,7 @@ ADIobj adix_setlnk( ADIobj id, ADIobj lid, char *clist, int clen,
 /* or must be present in the supplied list of class names */
     otdef = _DTDEF(id);
     if ( adix_chkder( _DTDEF(rval), otdef, status ) ||
-         adix_chkcls( clist, clen, otdef->name ) ) {
+         adix_chk_in_cls( clist, clen, otdef->name ) ) {
 
 /* Destroy the original L.H.S, and return the new object */
       adic_erase( &id, status );
