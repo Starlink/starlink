@@ -4,8 +4,8 @@
 *     THRESH
 
 *  Purpose:
-*     Edits an NDF such that array values below and above two thresholds
-*     take constant values.
+*     Edits an NDF to replace values between or outside given limits
+*     with specified constant values.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,17 +21,25 @@
 *        The global status.
 
 *  Description:
-*     This application creates from an input NDF structure an NDF with
-*     an array component whose values are edited as follows.  Array
-*     values between and including the upper and lower thresholds are
-*     copied from the input to output array.  Any values in the input
-*     array greater than the upper threshold will be set to one
-*     specified value, and anything less than the lower threshold will
-*     be set to another specified value, in the output data array.
-*     Thus if the replacement values equal their respective thresholds
-*     this application creates an NDF constrained to lie between two
-*     bounds.  Each replacement value may be the bad-pixel value for
-*     masking.
+*     This application creates an output NDF by copying values from an
+*     input NDF, replacing all values within given data ranges by 
+*     a user-specified constant or by the bad value. Upper and lower
+*     thresholds are supplied using parameters THRLO and THRHI. 
+*
+*     If THRLO is less than or equal to THRHI, values between and 
+*     including the two thresholds are copied from the input to output 
+*     array.  Any values in the input array greater than the upper 
+*     threshold will be set to the value of parameter NEWHI, and anything 
+*     less than the lower threshold will be set to the value of parameter
+*     NEWLO, in the output data array. Thus the output NDF is constrained 
+*     to lie between the two bounds.  
+*
+*     If THRLO is greater than THRHI, values greater than or equal to
+*     THRLO are copied from the input to output array, together with
+*     values less than or equal to THRHI.  Any values between THRLO and
+*     THRHI will be set to the value of parameter NEWLO in the output NDF.
+*
+*     Each replacement value may be the bad-pixel value for masking.
 
 *  Usage:
 *     thresh in out thrlo thrhi newlo newhi [comp]
@@ -48,19 +56,20 @@
 *        Input NDF structure containing the array to have thresholds
 *        applied.
 *     NEWLO = LITERAL (Read)
-*        This defines the value to which all input array-element values
+*        This gives the value to which all input array-element values
 *        less than the lower threshold are set.  If this is set to
 *        "Bad", the bad value is substituted.  Numerical values of
 *        NEWLO must lie in within the minimum and maximum values of the
 *        data type of the array being processed.  The suggested default
 *        is the lower threshold.
 *     NEWHI = LITERAL (Read)
-*        This defines the value to which all input array-element values
+*        This gives the value to which all input array-element values
 *        greater than the upper threshold are set.  If this is set to
 *        "Bad", the bad value is substituted.  Numerical values of
 *        NEWHI must lie in within the minimum and maximum values of the
 *        data type of the array being processed.  The suggested default
-*        is the upper threshold.
+*        is the upper threshold. This parameter is ignored if THRLO is
+*        greater than THRHI.
 *     OUT = NDF (Write)
 *        Output NDF structure containing the thresholded version of
 *        the array.
@@ -71,7 +80,7 @@
 *        current value.
 *     THRLO = _DOUBLE (Read)
 *        The lower threshold value within the input array.  It must lie
-*        in within the minimum and maximum values of the data type of
+*        within the minimum and maximum values of the data type of
 *        the array being processed.  The suggested default is the
 *        current value.
 *     TITLE = LITERAL (Read)
@@ -81,8 +90,12 @@
 *  Examples:
 *     thresh zzcam zzcam2 100 500 0 0
 *        This copies the data array in the NDF called zzcam to the NDF
-*        called zzcam2.  Any data value less than 100 and greater than
+*        called zzcam2.  Any data value less than 100 or greater than
 *        500 in zzcam is set to 0 in zzcam2.
+*     thresh zzcam zzcam2 500 100 0
+*        This copies the data array in the NDF called zzcam to the NDF
+*        called zzcam2.  Any data value less than 500 and greater than
+*        100 in zzcam is set to 0 in zzcam2.
 *     thresh zzcam zzcam2 100 500 0 0 comp=Variance
 *        As above except that the data array is copied unchanged and the
 *        thresholds apply to the variance array.
@@ -95,18 +108,6 @@
 *        All data values outside the range -0.02 to 0.02 in the NDF
 *        called pavo become bad in the NDF called pavosky.  All values
 *        within this range are copied from pavo to pavosky.
-
-*  Algorithm:
-*     -  Find which array component to process.
-*     -  Associate the input NDF.  If variance or quality is requested
-*     check that it is indeed present.  Abort if not.
-*     -  Create the output NDF, propagating the unmodified arrays.
-*     Map the input and output arrays to be processed.
-*     -  For the appropriate data type obtain the thresholds and the
-*     values to be substituted, and perform the replacements.
-*     -  Report the number of replacements above and below the
-*     thresholds.
-*     -  Write final error message and tidy the NDF system.
 
 *  Related Applications:
 *     KAPPA: HISTEQ, MATHS; Figaro: CLIP, IDIFF, RESCALE.
@@ -135,6 +136,9 @@
 *        Use the bad-pixel flag.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     6-DEC-2000 (DSB):
+*        Allow THRLO to be greater than THRHI in order to exclude a range
+*        of data values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -368,34 +372,55 @@
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
+*  First report results when replacing data outside a given range.
+         IF ( NREPHI .LE. 0 ) THEN
+
 *  Report the number of replacements in the array that were below the
 *  threshold.
-         CALL MSG_SETC( 'COMPS', MCOMP )
-         CALL MSG_SETI( 'NREP', NREPLO )
-         IF ( NREPLO .NE. 1 ) THEN
-            CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
-     :        'There were ^NREP elements changed in the ^COMPS array '/
-     :        /'below the threshold.', STATUS )
-         ELSE
-            CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
-     :        'There was ^NREP element changed in the ^COMPS array '/
-     :        /'below the threshold.', STATUS )
-         END IF
+            CALL MSG_SETC( 'COMPS', MCOMP )
+            CALL MSG_SETI( 'NREP', NREPLO )
+            IF ( NREPLO .NE. 1 ) THEN
+               CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
+     :           'There were ^NREP elements changed in the ^COMPS '/
+     :           /'array below the threshold.', STATUS )
+            ELSE
+               CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
+     :           'There was ^NREP element changed in the ^COMPS '/
+     :           /'array below the threshold.', STATUS )
+            END IF
 
 *  Report the number of replacements in the array that were above the
 *  threshold.
-         CALL MSG_SETC( 'COMPS', MCOMP )
-         CALL MSG_SETI( 'NREP', NREPHI )
-         IF ( NREPHI .NE. 1 ) THEN
-            CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
-     :        'There were ^NREP elements changed in the ^COMPS array '/
-     :        /'above the threshold.', STATUS )
+            CALL MSG_SETC( 'COMPS', MCOMP )
+            CALL MSG_SETI( 'NREP', NREPHI )
+            IF ( NREPHI .NE. 1 ) THEN
+               CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
+     :           'There were ^NREP elements changed in the ^COMPS '/
+     :           /'array above the threshold.', STATUS )
+            ELSE
+               CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
+     :           'There was ^NREP element changed in the ^COMPS '/
+     :           /'array above the threshold.', STATUS )
+            END IF
+
+
+*  Now report results when replacing data inside a given range.
          ELSE
-            CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
-     :        'There was ^NREP element changed in the ^COMPS array '/
-     :        /'above the threshold.', STATUS )
+
+*  Report the number of replacements in the array.
+            CALL MSG_SETC( 'COMPS', MCOMP )
+            CALL MSG_SETI( 'NREP', NREPLO )
+            IF ( NREPLO .NE. 1 ) THEN
+               CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
+     :           '^NREP elements were changed in the ^COMPS '/
+     :           /'array.', STATUS )
+            ELSE
+               CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
+     :           'One element was changed in the ^COMPS '/
+     :           /'array.', STATUS )
+            END IF
+
          END IF
-      END IF
 
 *  If there may have been bad values substituted, set the bad-pixel
 *  flag.

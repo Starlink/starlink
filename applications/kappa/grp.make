@@ -80,11 +80,13 @@ kpg1_fracd.f kpg1_fraci.f kpg1_fracw.f kpg1_fracb.f kpg1_fracub.f \
 kpg1_fracuw.f kpg1_mixvr.f kpg1_mixvd.f kpg1_mixvi.f kpg1_mixvw.f \
 kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f \
 kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
-kpg1_hstaub.f kpg1_hstauw.f kpg1_hstfd.f kpg1_hstfr.f 
+kpg1_hstaub.f kpg1_hstauw.f kpg1_hstfd.f kpg1_hstfr.f kpg1_thrsb.f \
+kpg1_thrsd.f kpg1_thrsi.f kpg1_thrsr.f kpg1_thrsub.f kpg1_thrsuw.f \
+kpg1_thrsw.f 
 
 # Generic source files needed for kapgen_sub.tar:
 KAPGEN_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
-kpg1_hsta.gen kpg1_hstf.gen
+kpg1_hsta.gen kpg1_hstf.gen kpg1_thrs.gen
 
 # Non-generic source files needed for kapgen_sub.tar:
 KAPGEN_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
@@ -179,8 +181,7 @@ kpg1_statub.f kpg1_statuw.f kpg1_statw.f kpg1_stdsd.f kpg1_stdsr.f \
 kpg1_stfld.f kpg1_stflr.f kpg1_storb.f kpg1_stord.f kpg1_stori.f \
 kpg1_storr.f kpg1_storub.f kpg1_storuw.f kpg1_storw.f kpg1_tdlib.f \
 kpg1_tdlid.f kpg1_tdlii.f kpg1_tdlir.f kpg1_tdliub.f kpg1_tdliuw.f \
-kpg1_tdliw.f kpg1_thrsb.f kpg1_thrsd.f kpg1_thrsi.f kpg1_thrsr.f \
-kpg1_thrsub.f kpg1_thrsuw.f kpg1_thrsw.f kpg1_trald.f kpg1_tralr.f \
+kpg1_tdliw.f kpg1_trald.f kpg1_tralr.f \
 kpg1_trbod.f kpg1_trbor.f kpg1_trlib.f kpg1_trlid.f kpg1_trlii.f \
 kpg1_trlir.f kpg1_trliub.f kpg1_trliuw.f kpg1_trliw.f kpg1_trpid.f \
 kpg1_trpir.f kpg1_trspb.f kpg1_trspd.f kpg1_trspi.f kpg1_trspr.f \
@@ -368,13 +369,15 @@ KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
 KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_sparb.f kps1_spard.f kps1_spari.f \
 kps1_sparr.f kps1_sparub.f kps1_sparuw.f kps1_sparw.f kps1_pgftb.f \
 kps1_pgftd.f kps1_pgfti.f kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f \
-kps1_pgftw.f kps1_clpsr.f kps1_clpsd.f kps1_dsclb.f kps1_dscld.f kps1_dscli.f \
-kps1_dsclr.f kps1_dsclw.f kps1_stpab.f kps1_stpad.f kps1_stpai.f kps1_stpar.f \
-kps1_stpaub.f kps1_stpauw.f kps1_stpaw.f 
+kps1_pgftw.f kps1_clpsr.f kps1_clpsd.f kps1_dsclb.f kps1_dscld.f \
+kps1_dscli.f kps1_dsclr.f kps1_dsclw.f kps1_stpab.f kps1_stpad.f \
+kps1_stpai.f kps1_stpar.f kps1_stpaub.f kps1_stpauw.f kps1_stpaw.f \
+kps1_thgtb.f kps1_thgtd.f kps1_thgti.f kps1_thgtr.f kps1_thgtub.f \
+kps1_thgtuw.f kps1_thgtw.f 
 
 # Generic source files needed for kapsub_sub.tar:
 KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen \
-kps1_stpa.gen
+kps1_stpa.gen kps1_thgt.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
@@ -425,8 +428,7 @@ kps1_rprfr.f kps1_rprfub.f kps1_rprfuw.f kps1_rprfw.f kps1_skyft.f \
 kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f kps1_skyfn.f kps1_subid.f kps1_subir.f \
 kps1_sucld.f kps1_suclr.f kps1_supeb.f kps1_supei.f kps1_supev.f \
 kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f kps1_susf.f \
-kps1_suskd.f kps1_suskr.f kps1_thgtb.f kps1_thgtd.f kps1_thgti.f \
-kps1_thgtr.f kps1_thgtub.f kps1_thgtuw.f kps1_thgtw.f kps1_trdrd.f \
+kps1_suskd.f kps1_suskr.f kps1_trdrd.f \
 kps1_trdri.f kps1_trdrr.f kps1_trncl.f kps1_trndd.f kps1_trndi.f \
 kps1_trndr.f kps1_trnvd.f kps1_trnvi.f kps1_trnvr.f kps1_trop1.f \
 kps1_trop2.f kps1_vecky.f kps1_vecpl.f kps1_wieap.f kps1_wiecp.f \

@@ -30644,8 +30644,8 @@ DSB: David S. Berry (STARLINK)
    is performed using single- or double-precision floating point for
    FITTYPE = "Spline" or "Polynomial" respectively.
 1 THRESH
-Edits an NDF such that array values below and above two thresholds
-take constant values.
+Edits an NDF to replace values between or outside given limits
+with specified constant values.
 
 Usage:
 
@@ -30653,17 +30653,25 @@ Usage:
 
 Description:
 
-   This application creates from an input NDF structure an NDF with
-   an array component whose values are edited as follows.  Array
-   values between and including the upper and lower thresholds are
-   copied from the input to output array.  Any values in the input
-   array greater than the upper threshold will be set to one
-   specified value, and anything less than the lower threshold will
-   be set to another specified value, in the output data array.
-   Thus if the replacement values equal their respective thresholds
-   this application creates an NDF constrained to lie between two
-   bounds.  Each replacement value may be the bad-pixel value for
-   masking.
+   This application creates an output NDF by copying values from an
+   input NDF, replacing all values within given data ranges by
+   a user-specified constant or by the bad value. Upper and lower
+   thresholds are supplied using parameters THRLO and THRHI.
+
+   If THRLO is less than or equal to THRHI, values between and
+   including the two thresholds are copied from the input to output
+   array.  Any values in the input array greater than the upper
+   threshold will be set to the value of parameter NEWHI, and anything
+   less than the lower threshold will be set to the value of parameter
+   NEWLO, in the output data array. Thus the output NDF is constrained
+   to lie between the two bounds.
+
+   If THRLO is greater than THRHI, values greater than or equal to
+   THRLO are copied from the input to output array, together with
+   values less than or equal to THRHI.  Any values between THRLO and
+   THRHI will be set to the value of parameter NEWLO in the output NDF.
+
+   Each replacement value may be the bad-pixel value for masking.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COMP
@@ -30680,7 +30688,7 @@ IN = NDF  (Read)
    applied.
 3 NEWLO
 NEWLO = LITERAL (Read)
-   This defines the value to which all input array-element values
+   This gives the value to which all input array-element values
    less than the lower threshold are set.  If this is set to
    "Bad", the bad value is substituted.  Numerical values of
    NEWLO must lie in within the minimum and maximum values of the
@@ -30688,12 +30696,13 @@ NEWLO = LITERAL (Read)
    is the lower threshold.
 3 NEWHI
 NEWHI = LITERAL (Read)
-   This defines the value to which all input array-element values
+   This gives the value to which all input array-element values
    greater than the upper threshold are set.  If this is set to
    "Bad", the bad value is substituted.  Numerical values of
    NEWHI must lie in within the minimum and maximum values of the
    data type of the array being processed.  The suggested default
-   is the upper threshold.
+   is the upper threshold. This parameter is ignored if THRLO is
+   greater than THRHI.
 3 OUT
 OUT = NDF (Write)
    Output NDF structure containing the thresholded version of
@@ -30707,7 +30716,7 @@ THRHI = _DOUBLE (Read)
 3 THRLO
 THRLO = _DOUBLE (Read)
    The lower threshold value within the input array.  It must lie
-   in within the minimum and maximum values of the data type of
+   within the minimum and maximum values of the data type of
    the array being processed.  The suggested default is the
    current value.
 3 TITLE
@@ -30717,8 +30726,13 @@ TITLE = LITERAL (Read)
 2 Examples
 thresh zzcam zzcam2 100 500 0 0
    This copies the data array in the NDF called zzcam to the NDF
-   called zzcam2.  Any data value less than 100 and greater than
+   called zzcam2.  Any data value less than 100 or greater than
    500 in zzcam is set to 0 in zzcam2.
+
+thresh zzcam zzcam2 500 100 0
+   This copies the data array in the NDF called zzcam to the NDF
+   called zzcam2.  Any data value less than 500 and greater than
+   100 in zzcam is set to 0 in zzcam2.
 
 thresh zzcam zzcam2 100 500 0 0 comp=Variance
    As above except that the data array is copied unchanged and the
@@ -30753,6 +30767,10 @@ DSB: David S. Berry (STARLINK)
 
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
+
+ 6-DEC-2000 (DSB):
+    Allow THRLO to be greater than THRHI in order to exclude a range
+    of data values.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
