@@ -251,7 +251,7 @@
 *        there are fewer strings than contours, then the supplied pens are 
 *        cycled through again, starting at the beginning. Each string should
 *        be a comma-separated list of plotting attributes to be used when drawing 
-*        the contour. For instance, the string "width=0.02,colour=red,style=2"
+*        the contour. For instance, the string "width=10.0,colour=red,style=2"
 *        produces a thick, red, dashed contour. Attributes which are
 *        unspecified in a string default to the values implied by parameter 
 *        STYLE. If a null value (!) is given for PENS, then the pens 
