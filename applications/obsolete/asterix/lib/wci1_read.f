@@ -155,7 +155,7 @@
 
 *  Introduce the locator to the PSF system
       IF ( ARGS(1) .EQ. ADI__NULLID ) THEN
-        CALL PSF_INTRO( ARGS(1), IPSF, STATUS )
+        CALL PSF_INTRO( ARGS(2), IPSF, STATUS )
       ELSE
         CALL PSF_INTRO( ARGS(1), IPSF, STATUS )
       END IF
