@@ -36,6 +36,7 @@
       set exclude_files {
          CCDMain.tcl 
          CCDGeometryMain.tcl
+         CCDFileMonitorMain.tcl
          CCDBindings.tcl
          CCDOptions.tcl
          mkindex.tcl 
