@@ -1,7 +1,7 @@
  /*
  * Copyright (c) 1991-1994 The Regents of the University of California.
  * Copyright (c) 1994-1995 Sun Microsystems, Inc.
- * Copyright (c) 1997-1998 Central Laboratory of the Research Councils
+ * Copyright (c) 1997-2000 Central Laboratory of the Research Councils
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -31,8 +31,11 @@
  *     PWD: P.W. Draper (Durham University, U.K).
  *
  *  Changes:
- *     30-JUL-1997: (PWD)
+ *     30-JUL-1997 (PWD):
  *        Original version, based on rtdWord.
+ *     28-MAR-2000 (PWD):
+ *        Added -scale as a configuration option. Fixing this 
+ *        allows creation at different "scales" to be harmonized.
  *-
  *.
  */
@@ -106,6 +109,9 @@ static Tk_ConfigSpec configSpecs[] = {
 
   {TK_CONFIG_INT, "-width", (char *) NULL, (char *) NULL,
    "1", Tk_Offset(MarkItem, width), TK_CONFIG_DONT_SET_DEFAULT},
+
+  {TK_CONFIG_DOUBLE, "-scale", (char *) NULL, (char *) NULL,
+   "1", Tk_Offset(MarkItem, scale), TK_CONFIG_DONT_SET_DEFAULT},
 
   {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
    (char *) NULL, 0, 0}
