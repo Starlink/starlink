@@ -19,7 +19,7 @@
 *     starndard.
 *     Adds to the start of array FITSAR, the three lines required
 *     by the FITS standard to start every FITS file. Namely the
-*     SIMPLE= T, BITPIX= , and NDIM = lines.
+*     SIMPLE= T, BITPIX= , and NAXIS = lines.
 
 *  Arguments:
 *     EL = INTEGER (Given)
@@ -75,6 +75,7 @@
       PARAMETER ( CARDLE = 80 )
 
 *  Local Variables:
+      CHARACTER * 1 BUFDIM       ! Buffer for dimension number
       CHARACTER * 10 BUFFER      ! Buffer for text manipulation
       INTEGER IDIM               ! Loop counter
       INTEGER LINENO             ! Line number
@@ -109,6 +110,8 @@
 
 *  Append the comment.
       CALL CHR_MOVE( '/ FITS standard', FITSAR( LINENO )( 32: ) )
+
+*  Report the value in verbose mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( LINENO ), STATUS )
 
 *  Write the BITPIX header.
@@ -126,8 +129,13 @@
       CALL CHR_MOVE( '=',      FITSAR( LINENO )( 9:9 ) )
       CALL CHR_ITOC( BITPIX, BUFFER, NCHARS )
       CALL CHR_MOVE( BUFFER( :NCHARS ), FITSAR( LINENO )( 31-NCHARS: ) )
+
+*  Append the comment.
+      CALL CHR_MOVE( '/ Data type (bits per element)',
+     :               FITSAR( LINENO )( 32: ) )
+
+*  Report the value in verbose mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( LINENO ), STATUS )
-      
 
 *  Write the NAXIS header.
 *  =======================
@@ -142,6 +150,11 @@
 *  Write the number of dimensions to the line.
       CALL CHR_MOVE( '=',     FITSAR( LINENO )( 9:9 ) )
       CALL CHR_ITOC( NDIM, FITSAR( LINENO )( 30:30 ), NCHARS )
+
+*  Append the comment.
+      CALL CHR_MOVE( '/ Number of dimensions', FITSAR( LINENO )( 32: ) )
+
+*  Report the value in verbose mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( LINENO ), STATUS )
 
 *  Write the NAXISn headers.
@@ -156,13 +169,13 @@
          FITSAR( LINENO ) = ' '
 
 *  Write the keyword appending the dimension number into a buffer.
-         CALL CHR_MOVE( 'NDIM', FITSAR( LINENO )( 1: ) )
-         CALL CHR_ITOC( IDIM, BUFFER, NCHARS )
+         CALL CHR_MOVE( 'NAXIS', FITSAR( LINENO )( 1: ) )
+         CALL CHR_ITOC( IDIM, BUFDIM, NCHARS )
 
 *  Remove any leading blanks in the buffer and copy it to the next
 *  element of the array of FITS headers.
-         CALL CHR_LDBLK( BUFFER )
-         CALL CHR_MOVE( BUFFER, FITSAR( LINENO )( 6: ) )
+         CALL CHR_LDBLK( BUFDIM )
+         CALL CHR_MOVE( BUFDIM, FITSAR( LINENO )( 6: ) )
 
 *  Append the equals sign and the number of elements along the current
 *  dimension.
@@ -171,6 +184,13 @@
 
 *  Right justify the length.      
          CALL CHR_MOVE( BUFFER, FITSAR( LINENO )( 31-NCHARS: ) )
+
+*  Append the comment.
+         CALL CHR_MOVE( '/ Size of dimension',
+     :                  FITSAR( LINENO )( 32: ) ) 
+         CALL CHR_MOVE( BUFDIM, FITSAR( LINENO )( 52: ) ) 
+
+*  Report the value in verbose mode.
          CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( LINENO ), STATUS )
       END DO
 
