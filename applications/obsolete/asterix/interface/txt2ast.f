@@ -1499,6 +1499,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
@@ -1542,6 +1543,8 @@
 *
 *    Local variables :
 *
+      CHARACTER*(DAT__SZLOC)	OLOC			!
+
       REAL                BASE, SCALE            ! Regular axis parameters
       REAL                DVAL                   ! Two data values
       REAL                RQUAL                  ! Quality value
@@ -1721,9 +1724,10 @@
       IF ( USE_DATA ) THEN
         IF ( PRIM ) THEN
           CALL USI_DCREAT( 'OUT', TYPE, NDIM, DIMS, STATUS )
-          CALL USI_DASSOC( 'OUT', 'WRITE', OFID, STATUS )
-          CALL DAT_MAPR( OFID, 'WRITE', NDIM, DIMS, PTR_DATA, STATUS )
-          CALL USI_STORE( OFID, 'O', STATUS )
+          CALL USI_DASSOC( 'OUT', 'WRITE', OLOC, STATUS )
+          CALL DAT_MAPR( OLOC, 'WRITE', NDIM, DIMS, PTR_DATA, STATUS )
+          CALL USI0_STORE( 'OUT', OLOC, 'O', STATUS )
+          CALL ADI1_PUTLOC( OLOC, OFID, STATUS )
         ELSE
           CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
           CALL BDI_MAPDATA( OFID, 'WRITE', PTR_DATA, STATUS )
