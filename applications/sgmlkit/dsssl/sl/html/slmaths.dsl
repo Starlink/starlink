@@ -167,7 +167,7 @@ appropriate arguments
 
 ;; cross-referencing
 (define (href-to-fragid-mlabel target)
-  (string-append "#" (img-eqnref target)))
+  (img-eqnref target))
 (mode section-reference
   (element mlabel
     (literal (string-append "Eqn.(" (get-equation-number) ")"))))
