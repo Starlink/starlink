@@ -64,7 +64,7 @@
 *        High value used in the generated data array (RA and RL modes).
 *     LBOUND( 2 ) = _INTEGER (Read)
 *        Lower pixel bounds of the output NDF. Only accessed if parameter 
-*        LIKE is set to null (!). [1,1]
+*        LIKE is set to null (!). 
 *     LIKE = NDF (Read)
 *        An optional template NDF which, if specified, will be used to
 *        define the bounds for the output NDF. If a null value (!) is 
@@ -127,7 +127,7 @@
 *        Title for the output NDF ["KAPPA - Creframe"]
 *     UBOUND( 2 ) = _INTEGER (Read)
 *        Upper pixel bounds of the output NDF. Only accessed if parameter 
-*        LIKE is set to null (!). [64,64]
+*        LIKE is set to null (!). 
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, a Variance component is added to the output NDF
 *        representing the noise added to the field. If a null (!) value is

@@ -7925,7 +7925,6 @@ package kappa {
          parameter lbound {
             position 3
             type _INTEGER
-            vpath DEFAULT
             prompt {Lower bounds of the output NDF}
             ppath CURRENT DEFAULT
             default 1
@@ -8058,7 +8057,6 @@ package kappa {
          parameter ubound {
             position 4
             type _INTEGER
-            vpath DEFAULT
             prompt {Upper bounds of the output NDF}
             ppath CURRENT DEFAULT
             default 64

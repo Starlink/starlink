@@ -413,7 +413,7 @@
 
 *  Annul the locators.
                CALL DAT_ANNUL( LOC4, STATUS )
-               CALL DAT_ANNUL( LOC6, STATUS )
+               CALL DAT_ANNUL( LOC5, STATUS )
             END IF
          END DO
 
