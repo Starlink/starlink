@@ -1,6 +1,6 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-10, rnum=1000010
-# If you _need_ to change this file, delete or replace `original' above
+# original bootstrap file, installed by starconf 1.1, rnum=1001000
+# If you _need_ to change this file, delete `original' in the line above,
 # or else starconf may overwrite it with an updated version
 
 # bootstrap.installed.  Generated from bootstrap.installed.in by configure.
@@ -11,6 +11,22 @@
 #
 # Usage:
 #     ./bootstrap
+
+
+# The starconf below might update bootstrap, if a newer version is
+# available.  Unfortunately, this confuses sh, which appears _not_ to
+# keep open the script it's reading, but to reopen it afresh for each
+# line (!?).  So rewrite this script to a temporary file and exec it.
+tempfile="$0.tmp"
+rm -f $tempfile
+exec 8>$tempfile
+sed '1,/^#EOH/d' $0 >&8            # strip out the indirection to here
+echo "exec rm -f $tempfile" >&8    # remove the temporary file at the end
+exec 8<&-                          # close the fd
+exec /bin/sh $tempfile             # exec the temporary
+#EOH                               # magic comment
+
+
 
 
 # Echo a command then run it, terminating the script if the command fails
@@ -78,5 +94,6 @@ else
     echorun autoreconf --install --symlink
 fi
 
+# Don't invoke exit.  This script is run with the indirection
+# described above, which adds a trailing command here.
 
-exit 0
