@@ -336,6 +336,13 @@
 *     character string identifying the quantity stored in each plane of
 *     the cube. For linear polarimetry, it is set to "IQU", and for
 *     circular polarimetry it is set to "IV".
+*     -  An item named ANGROT is added to the POLPACK extension. It gives
+*     the anti-clockwise angle within the XY plane from the first pixel axis 
+*     (X) to the reference direction of the Stokes vectors. The reference
+*     direction will be north if the first input NDF has a celestial
+*     co-ordinate Frame within its WCS component. Otherwise, the
+*     reference direction will be the second pixel axis (i.e. ANGROT will
+*     be +90 degrees).
 *     -  WCS and AXIS components are propagated from the first supplied
 *     input image to the output cube. 
 

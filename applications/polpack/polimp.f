@@ -75,6 +75,7 @@
 *              STOKES?  PPCKSTOK
 *              T?       PPCKT
 *              WPLATE?  PPCKWPLT
+*              VERSION? PPCKVERS
 *
 *        See the topic "Table Format" for information on how to create 
 *        translation tables. [!]
@@ -234,6 +235,8 @@
 *     2-JUL-1998 (DSB):
 *        Default control table changed to make all items optional. Delete
 *        POLPACK extensions if an error occurs.
+*     1-APR-1999 (DSB):
+*        Added VERSION.
 *     {enter_changes_here}
 
 *  Bugs:

@@ -1,5 +1,5 @@
       SUBROUTINE POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, T, EPS, 
-     :                       IGRP2, LBNDO, UBNDO, STATUS )
+     :                       IGRP2, LBNDO, UBNDO, ANGRT, STATUS )
 *+
 *  Name:
 *     POL1_SNGHD
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, EPS, IGRP2, 
-*                      LBNDO, UBNDO, STATUS )
+*                      LBNDO, UBNDO, ANGRT, STATUS )
 
 *  Description:
 *     This routine gets the POLPACK extension items required to calculate
@@ -30,8 +30,8 @@
 *        and .FALSE. otherwise.
 *     PHI( NNDF ) = REAL (Returned)
 *        Work space to hold the effective analyser angle for each input
-*        NDF, in radians. The returned values assume that the reference
-*        direction for the Stokes vectors will be the image X pixel axis.
+*        NDF, in radians. These are the ACW angles from the reference
+*        direction (returned by ANGRT) to the effective analyser position.
 *     ANLIND( NNDF ) = INTEGER (Returned)
 *        Work space to hold the analyser index for each input NDF. The
 *        returned integer values are indices into the IGRP2 group.
@@ -54,6 +54,9 @@
 *     UBNDO( 3 ) = INTEGER (Returned)
 *        The upper bounds required for the output NDF so that it encompasses 
 *        the entire area of all input images (i.e. padded, not trimmmed)
+*     ANGRT = REAL (Returned)
+*        The anti-clockwise angle from the +ve X axis to the reference
+*        direction required for the Stokes vectors, in degrees.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -112,6 +115,7 @@
       INTEGER I                  ! Index of current input NDF
       INTEGER IANAL              ! Index of analyser id within current group
       INTEGER INDF               ! NDF identifier for the current input NDF
+      INTEGER IWCS               ! AST pointer to a WCS FrameSet
       INTEGER LBND( 2 )          ! Lower bounds of input NDF
       INTEGER UBND( 2 )          ! Upper bounds of input NDF
       INTEGER NDIM               ! No. of axes in input NDF
@@ -162,6 +166,24 @@
 *  current NDF also has a defined VARIANCE component.
          IF( VAR ) CALL NDF_STATE( INDF, 'VARIANCE', VAR, STATUS )
 
+*  If this is the first input NDF, decide on the reference direction for the 
+*  output Stokes vectors. 
+         IF( I .EQ. 1 ) THEN
+
+*  Get the WCS FrameSet from the first NDF.
+            CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+
+*  Get the required angle in degrees.
+            CALL POL1_ANGRT( IWCS, 
+     :                       0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ),
+     :                       0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ),
+     :                       ANGRT, STATUS )
+
+*  Annul the FrameSet pointer.
+            CALL AST_ANNUL( IWCS, STATUS )
+
+         END IF
+
 *  See if the NDF has a POLPACK extension. If not, report an error.
          CALL NDF_XSTAT( INDF, 'POLPACK', THERE, STATUS )
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
@@ -176,7 +198,8 @@
 *  Get a locator to the POLPACK extension.
          CALL NDF_XLOC( INDF, 'POLPACK', 'READ', XLOC, STATUS )
 
-*  Get the ANGROT value. Use 0.0 if it is missing.
+*  Get the ANGROT value. Use 0.0 if it is missing. This is the ACW angle
+*  from +X to the zero analyser position.
          CALL DAT_THERE( XLOC, 'ANGROT', THERE, STATUS )
          IF( THERE ) THEN
             CALL CMP_GET0R( XLOC, 'ANGROT', ANGROT, STATUS ) 
@@ -189,11 +212,11 @@
          IF( THERE ) THEN
             CALL CMP_GET0R( XLOC, 'WPLATE', H, STATUS ) 
 
-*  Store the effective analyser angle for this NDF. This is the angle
-*  between the X axis and a pretend analyser (with no half-wave plate),
-*  which would have the same effect as the fixed analyser/have-wave plate
-*  combination.
-            PHI( I ) = 2*H + ANGROT
+*  Store the effective analyser angle for this NDF. This is the ACW angle
+*  between the required reference direction (ANGRT) and a pretend analyser 
+*  (with no half-wave plate), which would have the same effect as the fixed 
+*  analyser/have-wave plate combination.
+            PHI( I ) = 2*H + ANGROT - ANGRT
 
 *  If there is no half-wave plate position in the POLPACK extension, look
 *  for an analyser position. Report an error if neither is present.
@@ -212,9 +235,9 @@
 *  Get the analyser angle, in degrees.
             CALL CMP_GET0R( XLOC, 'ANLANG', ALPHA, STATUS ) 
 
-*  Store the effective analyser angle for this NDF (angle from the X axis
-*  to the analyser).
-            PHI( I ) = ALPHA + ANGROT
+*  Store the effective analyser angle for this NDF (ACW angle from the
+*  required reference direction (ANGRT) to the analyser).
+            PHI( I ) = ALPHA + ANGROT - ANGRT
 
          END IF
 

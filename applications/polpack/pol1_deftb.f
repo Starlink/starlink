@@ -22,6 +22,7 @@
 *           WPLATE?     PPCKWPLT
 *           RAY?        PPCKRAY 
 *           STOKES?     PPCKSTOK
+*           VERSION?    PPCKVERS
 
 *  Arguments:
 *     FITGRP( 2 ) = INTEGER (Returned)
@@ -48,6 +49,8 @@
 *     2-JUL-1998 (DSB):
 *        Make all extension items optional (i.e. terminate them with a
 *        question mark in the table).
+*     1-APR-1999 (DSB):
+*        Added VERSION.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,10 +74,10 @@
 
 *  Local Constants:
       INTEGER NFITS              ! No. of FITS keywords used in table
-      PARAMETER ( NFITS = 6 ) 
+      PARAMETER ( NFITS = 7 ) 
 
       INTEGER NEXT               ! No. of extension items specified in table
-      PARAMETER ( NEXT = 6 ) 
+      PARAMETER ( NEXT = 7 ) 
 
 *  Local Variables:
       CHARACTER * ( 20 ) FITSNM( NFITS ) ! Names of FITS keywords
@@ -85,19 +88,19 @@
 
 *  Define the default control table information.
       DATA FITSNM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :              'PPCKRAY', 'PPCKSTOK' /,
+     :              'PPCKRAY', 'PPCKSTOK', 'PPCKVERS' /,
 
      :     FITSTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
-     :             '_CHAR' /,
+     :             '_CHAR', '_CHAR' /,
 
      :     EXTNM / 'ANGROT?', 'FILTER?', 'IMGID?', 'WPLATE?', 'RAY?', 
-     :             'STOKES?' /,
+     :             'STOKES?', 'VERSION?' /,
 
      :     EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
-     :             '_CHAR' /,
+     :             '_CHAR', '_CHAR' /,
 
      :     EXTFUN / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :              'PPCKRAY', 'PPCKSTOK' /
+     :              'PPCKRAY', 'PPCKSTOK', 'PPCKVERS' /
 
 *.
 

@@ -76,8 +76,8 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Constants:
-      INTEGER NCOMP              ! No. of recognised compoents
-      PARAMETER ( NCOMP = 9 )
+      INTEGER NCOMP              ! No. of recognised components
+      PARAMETER ( NCOMP = 10 )
 
       INTEGER NMLEN              ! Length of each name string
       PARAMETER ( NMLEN = 15 )
@@ -97,7 +97,8 @@
      :             'STOKES',
      :             'ANLANG',
      :             'T',
-     :             'EPS' /
+     :             'EPS',
+     :             'VERSION' /
 
       DATA TYPES / '_REAL',
      :             '_CHAR',
@@ -107,7 +108,8 @@
      :             '_CHAR',
      :             '_REAL',
      :             '_REAL',
-     :             '_REAL' /
+     :             '_REAL',
+     :             '_CHAR' /
 
 *.
 

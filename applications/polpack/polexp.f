@@ -59,6 +59,7 @@
 *        -  PPCKSTOK  (STOKES)
 *        -  PPCKT     (T)
 *        -  PPCKWPLT  (WPLATE)
+*        -  PPCKVERS  (VERSION)
 
 *  Examples:
 *     polexp in=^names.lis
@@ -76,6 +77,8 @@
 *  History:
 *     12-DEC-1997 (DSB):
 *        Original version.
+*     1-APR-1999 (DSN):
+*        Added VERSION.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,7 +99,7 @@
 
 *  Local Constants:
       INTEGER NITEM              ! The number of POLPACK extension items
-      PARAMETER( NITEM = 9 )
+      PARAMETER( NITEM = 10 )
 
 *  Local Variables:
       CHARACTER CARD*80                    ! A FITS header card
@@ -125,10 +128,11 @@
 
       DATA FTNAM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
      :             'PPCKRAY',  'PPCKSTOK', 'PPCKT', 'PPCKEPS', 
-     :             'PPCKANLA' /,
+     :             'PPCKANLA', 'PPCKVERS' /,
 
      :     ITNAM / 'ANGROT',   'FILTER',   'IMGID',    'WPLATE', 
-     :             'RAY',      'STOKES', 'T', 'EPS', 'ANLANG' /,
+     :             'RAY',      'STOKES', 'T', 'EPS', 'ANLANG',
+     :             'VERSION' /,
 
      :     COMMNT / 'POLPACK: (X-axis) to (zero analyser posn) in degs',
      :              'POLPACK: Filter',
@@ -138,7 +142,8 @@
      :              'POLPACK: Identifiers for planes of data',
      :              'POLPACK: Analyser transmission factor',
      :              'POLPACK: Analyser efficiency factor',
-     :              'POLPACK: Analyser angle'/
+     :              'POLPACK: Analyser angle'.
+     :              'POLPACK: Version number'/
 
 *.
 
@@ -166,7 +171,7 @@
          ELSE IF( NNDF .EQ. 1 ) THEN
             CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
          ELSE
-            CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
+            CALL MSG_OUT( ' ', '  No input images to process. ',STATUS )
          END IF
    
          CALL MSG_BLANK( STATUS )

@@ -75,6 +75,18 @@
       echo "endmonolith" >> ttt
       mv -f ttt polpack_mon.ifl
 
+#  Edit in the current package version number into any required source files.
+      set vers = `grep "PKG_VERS = " makefile`
+      if ( $vers == "" ) then
+         echo "Can't get package version number from makefile."
+         exit
+      endif
+
+      foreach file (pol1_ptvrs.f)
+         sed -e s#PKG_VERS#$vers[3]#g $file > temp
+         mv -f temp $file
+      end
+
 #  Tar up the source files and then remove them.
       tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` 
       rm -f `grp unix_source` 
