@@ -111,6 +111,9 @@
 *        data frames, and if FALSE it is a set of unreduced data frames
 *        as well as corredponding bias and flat field frames.
 *        [FALSE]
+*     SEED = _INTEGER (Read)
+*        The seed for the random number generator.
+*        [32767]
 *     TYPE = LITERAL (Read)
 *        The type of the output data. This should be set to the
 *        file extension used to identify any output foreign data
@@ -203,8 +206,10 @@
 
 *  External References:
       INTEGER CHR_LEN
-      EXTERNAL CHR_LEN
-
+      EXTERNAL CHR_LEN          ! Get non-blank length of string
+      DOUBLE PRECISION PDA_DSTART
+      EXTERNAL PDA_DSTART       ! Initialise random number generator
+      
 *  Local Variables:
       CHARACTER * ( 10 ) TYPE   ! Foreign data type
       CHARACTER * ( 3 ) COUNT   ! Current frame no.
@@ -241,6 +246,7 @@
       INTEGER IPXT              ! Pointer to transformed X positions
       INTEGER IPY               ! Y positions
       INTEGER IPYT              ! Pointer to transformed Y positions
+      INTEGER ISEED             ! Random number generator seed
       INTEGER IWCS              ! AST pointer to WCS component
       INTEGER JPIX              ! Index of PIXEL domain frame in frameset
       INTEGER MAPTFM            ! AST pointer to mapping between domains
@@ -260,12 +266,12 @@
       DOUBLE PRECISION ANGLE( CCD1__MXNDF ) ! Orientation of output frames
       DOUBLE PRECISION ANGLR    ! Orientation of current frame in radians
       DOUBLE PRECISION DEGRA    ! Degrees - Radians conversion factor
+      DOUBLE PRECISION DUMMY    ! Dummy variable
       DOUBLE PRECISION ORG( 2 * CCD1__MXNDF ) ! Origin coords for output frames
       DOUBLE PRECISION PI       ! Pi
       DOUBLE PRECISION TR( 6 )  ! Coefficients for linear transformation
 
 *  Local data. This names follow the ING/WHT convention.
-
       DATA  BLOCK / 
      :'NAXIS   =                    2 /',
      :'NAXIS1  =                      /',
@@ -376,6 +382,10 @@
 
 *  See if we are going to write into container files.
       CALL PAR_GET0L( 'CONTAINER', CNTNR, STATUS )
+
+*  Get the random number generator seed and initialise the generator.
+      CALL PAR_GET0I( 'SEED', ISEED, STATUS )
+      DUMMY = PDA_DSTART( ISEED )
 
 *  Get base names for NDFs.
       CALL PAR_GET0C( 'DATANAME', BASDAT, STATUS )

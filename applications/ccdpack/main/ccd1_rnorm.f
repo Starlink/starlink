@@ -15,7 +15,9 @@
 
 *  Description:
 *     The routine calls the PDA library function PDA_DRNOR to return the
-*     pseudo random number
+*     pseudo random number.  Before the first call of this routine,
+*     PDA_DSTART must have been called to initialise the random number
+*     generator.
 
 *  Arguments:
 *     A = REAL (Given)
@@ -32,6 +34,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -39,6 +42,8 @@
 *        Original version.
 *     19-SEP-1996 (PDRAPER):
 *        Now uses PDA routine instead of NAG routine.
+*     15-MAR-2001 (MBT):
+*        Removed call to PDA_DSTART.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -59,23 +64,13 @@
 *  External References:
       EXTERNAL PDA_DRNOR
       DOUBLE PRECISION PDA_DRNOR ! Pseudo random normal number generator
-      EXTERNAL PDA_DSTART
-      DOUBLE PRECISION PDA_DSTART ! Seed for generator
 
 *  Local Variables:
       DOUBLE PRECISION AA        ! buffer for A
       DOUBLE PRECISION BB        ! buffer for B
       INTEGER ISEED              ! seed value for generator
-      LOGICAL FIRST              ! whether generator is seeded
-      DATA ISEED /32767/
-      DATA FIRST /.TRUE./
-      SAVE FIRST
 *.
 
-      IF ( FIRST ) THEN
-         AA = PDA_DSTART(ISEED)
-         FIRST = .FALSE.
-      END IF
       AA = DBLE( A )
       BB = DBLE( B )
       CCD1_RNORM = REAL( PDA_DRNOR() ) * BB + AA
