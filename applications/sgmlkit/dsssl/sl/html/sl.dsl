@@ -1,8 +1,7 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
 <!entity sldocs.dsl		system "sldocs.dsl">
-<!entity slall.dsl		system "slall.dsl">
+<!entity slmisc.dsl		system "slmisc.dsl">
 <!entity slsect.dsl		system "slsect.dsl">
-<!entity version.dsl		system "version.dsl">
 <!entity slroutines.dsl		system "slroutines.dsl">
 
 <!entity slparams.dsl		system "slparams.dsl" subdoc>
@@ -12,7 +11,10 @@
 <!entity slnavig.dsl		system "slnavig.dsl" subdoc>
 <!entity maths.dsl		system "slmaths.dsl" subdoc>
 <!entity tables.dsl		system "sltables.dsl" subdoc>
+<!entity sllinks.dsl		system "sllinks.dsl" subdoc>
 ]>
+
+<![ ignore [ $Id$ ]]>
 
 <docblock>
 <title>Starlink to HTML stylesheet
@@ -69,8 +71,13 @@ Miscellaneous parameters, which control detailed behaviour of the stylesheet.
 <description>
 Simple support for tables.
 
+<codereference doc="sllinks.dsl" id=code.links
+<title>Inter- and Intra-document linking
+<description>Handles <code/ref/, <code/docxref/, <code/webref/ and <code/url/.
+Imposes the link policy.
+
 <codegroup 
-  use="code.lib code.common code.maths code.html code.navig code.params code.tables" 
+  use="code.lib code.common code.maths code.html code.navig code.params code.tables code.links" 
   id=html>
 <title>HTML-specific stylesheet code
 <description>
@@ -96,8 +103,9 @@ transformation extensions of Jade.</description>
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
 (define debug
   (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
-</codebody>
-</misccode>
+
+(define %stylesheet-version%
+  "Starlink HTML Stylesheet version 0.1")
 
 <!-- include the other parts by reference -->
 
@@ -105,30 +113,20 @@ transformation extensions of Jade.</description>
 
 &sldocs.dsl
 
-<misccode>
-<description>The other functions, which I'll get round to documenting
-individually when I can
-<codebody>
-&version.dsl
-
 &slsect.dsl
-&slall.dsl
-</codebody>
-</misccode>
+
+&slmisc.dsl
 
 <misccode>
 <description>
-<p>Declare the handlers for the root element, and for the manifest
-mode.
-</description>
+The root rule.  This generates the HTML documents, then generates the
+manifest and extracts the maths to an external document for postprocessing.
 <codebody>
 (root
  (make sequence
    (process-children)
    (make-manifest)
    (get-maths)))
-</codebody>
-</misccode>
 
 <func>
 <routinename>make-manifest
@@ -158,10 +156,6 @@ name of a file to hold the manifest.
       (make formatting-instruction data: "
 ")
       )))
-</codebody>
-</func>
-
-</codegroup>
 
 <codegroup>
 <title>The default rule
@@ -186,5 +180,3 @@ specification parts.  See the DSSSL standard, sections 7.1 and 12.4.1.
 ;	(literal "/" (gi))
 ;	(make entity-ref name: "gt")
 ;	))
-</misccode>
-</codegroup>

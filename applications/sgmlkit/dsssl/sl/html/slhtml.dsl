@@ -1,4 +1,5 @@
 <!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
+<![ ignore [ $Id$]]>
 
 <docblock>
 <title>HTML-specific support
@@ -21,35 +22,22 @@ Council.
 <title>HTML-specific support
 
 <func>
-<codeprologue>
-<routinename>
-<name>html-document
+<routinename>html-document
 <description>
 <p>Every element which is potentially a chunk should be passed to
 <funcname/html-document/ as its body-sosofo argument.  If it is in fact to
 be chunked, then this creates a new entity with that body as its
 contents, if not, it evaluates simply to body-sosofo.
-</description>
 <returnvalue type="sosofo">Either a new entity, or <code/body-sosofo/,
 depending on whether the element is to be chunked.
-<argumentlist>
-<parameter>
-<name>title-sosofo
-<type>sosofo
-<description>
-<p>A sosofo which will form the title of the document, if it is made
-into a separate entity
-</description>
-</parameter>
-<parameter>
-<name>body-sosofo
-<type>sosofo
-<description>
-<p>The body of the element
-</description>
-</parameter>
-</argumentlist>
-</codeprologue>
+<parameter>title-sosofo
+  <type>sosofo
+  <description>A sosofo which will form the title of the document, if it
+  is made into a separate entity
+<parameter>body-sosofo
+  <type>sosofo
+  <description>The body of the element
+<codebody>
 (define (html-document title-sosofo body-sosofo)
   (let ((doc-sosofo 
 	 (if (or (chunk?) (node-list=? (current-node) (document-element)))
@@ -80,40 +68,24 @@ into a separate entity
 		public-id: %html-pubid%)
 	      doc-sosofo)
 	    doc-sosofo))))
-</func>
 
 <func>
-<codeprologue>
-<routinename>
-<name>href-to
-<description>
-<p>Return the HTML HREF for the given node.  If chunking has been
+<routinename>href-to
+<description>Return the HTML HREF for the given node.  If chunking has been
 turned off, just return the fragment identifier.
 <returnvalue type="string">An HTML HREF which can be used to refer to
 the current node.
-<argumentlist>
-<parameter>
-<name>target
-<type>node-list
-<description>
-<p>The href returned refers to the node passed as <code/target/
-</description>
-</parameter>
-<parameter keyword>
-<name>reffrag
-<type>boolean
-<description>
-<p>If reffrag is false, don't append the fragid to the HREF.  
-</parameter>
-<parameter keyword>
-<name>full-url
-<type>boolean
-<description>
-<p>If full-url is true, prefix
-<code/%starlink-document-server%/ to the returned URL.
-</parameter>
-</argumentlist>
-</codeprologue>
+<parameter>target
+  <type>node-list
+  <description>The href returned refers to the node passed as <code/target/
+<parameter keyword>reffrag
+  <type>boolean
+  <description>If reffrag is false, don't append the fragid to the HREF.  
+<parameter keyword>full-url
+  <type>boolean
+  <description>If full-url is true, prefix
+  <code/%starlink-document-server%/ to the returned URL.
+<codebody>
 (define (href-to target #!key (reffrag #t) (full-url #f))
   (let* ((id (attribute-string (normalize "id") target))
 	 (entfile (html-file target))
@@ -127,17 +99,14 @@ the current node.
 			   entfile fragid)
 	    entfile)
 	fragid)))
-</func>
 
 <func>
-<codeprologue>
-<routinename>
-<name>$standard-html-header$
+<routinename>$standard-html-header$
 <description>
-<p>A hook function to add additional tags to the HEAD of your HTML files
+A hook function to add additional tags to the HEAD of your HTML files
 <returnvalue type=sosofo>Sosofo inserted in the head of HTML files
 <argumentlist none>
-</codeprologue>
+<codebody>
 (define ($standard-html-header$)
   (let* (
 ;	 (home (nav-home (current-node)))
@@ -213,13 +182,11 @@ the current node.
 ;      ($user-html-header$ home up prev next)
 
       )))
-</func>
 
 <misccode>
-<miscprologue>
 <description>
 <p>Various other hooks for inserting code within the HTML file
-</miscprologue>
+<codebody>
 (define ($user-html-header$ #!optional 
 			    (home (empty-node-list))
 			    (up (empty-node-list))
@@ -245,4 +212,3 @@ the current node.
 
 (define ($html-body-end$)
   (empty-sosofo))
-</misccode>

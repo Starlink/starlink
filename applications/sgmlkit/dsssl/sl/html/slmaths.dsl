@@ -3,6 +3,7 @@
   <!entity slnavig.dsl		system "slnavig.dsl" subdoc>
   <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
 ]>
+<![ ignore [ $Id$ ]]>
 
 <docblock>
 <title>Maths in the Starlink DTD

@@ -1,4 +1,17 @@
-<!-- -*- mode: sgml; sgml-parent-document: ("sl\.dsl" "CODEGROUP" "CODEGROUP" '("PROGRAMCODE" "CODEGROUP")); -*- -->
+<![ ignore [
+Title:
+  Starlink stylesheet - routine list
+
+Author:
+  Norman Gray, Glasgow (NG)
+
+Revision history
+  February 1999 (original version)
+
+Copyright 1999, Particle Physics and Astronomy Research Council
+
+$Id$
+]]>
 
 <misccode>
 <description>Constructors for the ROUTINELIST element
@@ -30,6 +43,7 @@
 (mode routine-ref
   (element codegroup
     (make sequence
+      (make empty-element gi: "hr")
       (make element gi: "h2"
 	    (literal "Code group: ")
 	    (with-mode routine-ref-get-reference
@@ -40,18 +54,24 @@
 			(attribute-string (normalize "doc")))))
       ;; possibly make this a link, in future
       (make sequence
+	(make empty-element gi: "hr")
 	(make element gi: "h2"
 	      (literal "Code reference"))
 	(make element gi: "p"
 	      (make sequence
-		(literal "Refers to code in document ")
+		(literal "Refers to ")
 		(make element gi: "cite"
 		      (with-mode routine-ref-get-reference
 			(process-node-list ref-docelem)))))
 	(process-children))))
   (element docblock
     (process-children))
-  (element title			; discard, in this mode
+  (element title
+    (make element gi: "h1"
+	  (process-children)))
+  (element (codereference docblock title) ; discard, in this mode
+    (empty-sosofo))			; (see mode routine-ref-get-reference)
+  (element (codegroup docblock title)	; discard, in this mode
     (empty-sosofo))			; (see mode routine-ref-get-reference)
   (element authorlist
     (make sequence
@@ -220,5 +240,3 @@
   (element name
     (process-children)))
 
-</codebody>
-</misccode>
