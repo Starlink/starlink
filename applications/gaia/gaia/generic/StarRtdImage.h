@@ -195,6 +195,9 @@ public:
   //  Contour command.
   int contourCmd( int argc, char *argv[] );
 
+  //  HDU command.
+  int hduCmd( int argc, char *argv[] );
+
 protected:
 
   //  Pointer to structure that holds the image configuration options.

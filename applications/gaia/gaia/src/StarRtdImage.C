@@ -96,6 +96,12 @@
 //     06-APR-1999 (PWD):
 //        Added contour command. Lots of restructuring of gridplot
 //        command.
+//     14-JUN-1999 (PWD):
+//        Added "hdu" command to stop use of this facility. There is a 
+//        fundermental problem with memory mapped FITS files that
+//        stops the use of these commands (basically the disk file is
+//        not available to add/read HDUs). When time permits this
+//        problem should be worked around.
 //-
 
 #include <string.h>
@@ -175,6 +181,7 @@ public:
   { "contour",       &StarRtdImage::contourCmd,      1, 6 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
+  { "hdu",           &StarRtdImage::hduCmd,          0,  6},
   { "origin",        &StarRtdImage::originCmd,       2, 2 },
   { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
   { "slice",         &StarRtdImage::sliceCmd,       11, 11},
@@ -3632,4 +3639,26 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
   } else {
     return (AstPlot *) NULL;
   }
+}
+
+//+
+//   StarRtdImage::hduCmd
+//
+//   Purpose:
+//      Overrides the "hdu" command of Skycat. None of this
+//      functionality is implemented in GAIA, and at present cannot be 
+//      (because we byte swap FITS files these are memory mapped and
+//      not available for access by the FitsIO library).
+//
+//-
+int StarRtdImage::hduCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+  cout << "Called StarRtdImage::hduCmd" << endl;
+#endif
+
+  if ( !image_ ) {
+    return TCL_OK;
+  }
+  return error( "Sorry the HDU commands are not available" );
 }
