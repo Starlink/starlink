@@ -119,7 +119,8 @@
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,
 *     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
-*     propagates all extensions.  QUALITY is not propagated.
+*     propagates all extensions.  QUALITY is also propagated if possible
+*     (i.e. if no axes are collapsed).
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -183,6 +184,8 @@
       INTEGER IPDI             ! Pointer to mapped input data array
       INTEGER IPDO             ! Pointer to mapped output data array
       INTEGER IPDUM            ! Pointer to dummy mapped data
+      INTEGER IPQI             ! Pointer to mapped input quality array
+      INTEGER IPQO             ! Pointer to mapped output quality array
       INTEGER IPVI             ! Pointer to mapped input variance array
       INTEGER IPVO             ! Pointer to mapped output variance array
       INTEGER IPWKC            ! Pointer to workspace
@@ -210,6 +213,7 @@
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       LOGICAL GOTAX            ! Does an AXIS component exist?
+      LOGICAL GOTQUL           ! Does a QUALITY component exist?
       LOGICAL GOTVAR           ! Does a VARIANCE component exist?
       LOGICAL USED( NDF__MXDIM ) ! Is input array axis used in output array?
 
@@ -575,7 +579,6 @@
      :                    %VAL( IPDO ), STATUS )
       END IF
 
-
 *  Unmap the data arrays.
       CALL NDF_UNMAP( INDF1, 'DATA', STATUS )
       CALL NDF_UNMAP( INDF2, 'DATA', STATUS )
@@ -633,6 +636,28 @@
 *  Unmap the variance arrays.
          CALL NDF_UNMAP( INDF1, 'VARIANCE', STATUS )
          CALL NDF_UNMAP( INDF2, 'VARIANCE', STATUS )
+      END IF
+         
+*  If necessary do the same for the quality array. This is only possible
+*  if no axes are being collapsed.
+      CALL NDF_STATE( INDF1, 'QUALITY', GOTQUL, STATUS )
+      IF ( GOTQUL .AND. NUSED .EQ. NDIMI ) THEN
+
+*  Map the variance arrays of the input and output NDFs. Quality values
+*  are always unsigned bytes.
+         CALL NDF_MAP( INDF1, 'QUALITY', '_UBYTE', 'READ', IPQI, NEL,
+     :                 STATUS )
+         CALL NDF_MAP( INDF2, 'QUALITY', '_UBYTE', 'WRITE', IPQO, NEL,
+     :                 STATUS )
+
+*  Do the quality pixel copying.
+         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( IPQI ), NDIMO, DIMO,
+     :                     AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                     %VAL( IPQO ), STATUS )
+
+*  Unmap the quality arrays.
+         CALL NDF_UNMAP( INDF1, 'QUALITY', STATUS )
+         CALL NDF_UNMAP( INDF2, 'QUALITY', STATUS )
       END IF
          
 *  Release the workspace.

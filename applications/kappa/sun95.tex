@@ -27411,7 +27411,8 @@ plot (6k).
          \sstitem
          This routine correctly processes the AXIS, DATA, VARIANCE,
          LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
-         propagates all extensions.  QUALITY is not propagated.
+         propagates all extensions.  QUALITY is also propagated if possible
+         (\emph{i.e.} if no input axes are collapsed).
 
          \sstitem
          Processing of bad pixels and automatic quality masking are
