@@ -38,10 +38,11 @@
       textlab(2)=1
 
 #  Set colours for various elements of the plot.
+      colour=1
       colour(border)=4
       colour(grid)=3
-      colour(ticks)=3
       colour(numlab)=5
+      colour(ticks)=3
       colour(axes)=3
 
 #  Set the size of the text to use for numerical and textual axis labels.
