@@ -237,6 +237,12 @@ if ( -e @bindir@/extractor/extractor.csh) then
 endif
 
 #
+#  EXTREME
+if ( -e @bindir@/extreme/extreme.csh) then
+   setenv EXTREME_DIR @bindir@/extreme
+endif
+
+#
 #  FIGARO
 if ( -e @bindir@/figaro/figaro.csh ) then
    setenv FIG_DIR @bindir@/figaro

@@ -238,6 +238,16 @@ else
 endif
 
 #
+#   Extreme
+#
+
+if ( -e @bindir@/extreme/extreme.csh ) then 
+   alias extreme source @bindir@/extreme/extreme.csh
+else
+   alias extreme '@staretcdir@/notinst extreme'
+endif
+
+#
 #   Figaro
 #   Includes startup for merged Specdre.
 
