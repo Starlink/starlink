@@ -168,7 +168,7 @@ Norman
 
 
 ---------------------------------------------------------------------------
-Norman Gray                        http://www.astro.gla.ac.uk/users/norman/
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
 Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 </body>
 </commentary>
@@ -522,7 +522,7 @@ Norman
 
 
 ---------------------------------------------------------------------------
-Norman Gray                        http://www.astro.gla.ac.uk/users/norman/
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
 Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 </body>
 </commentary>
@@ -960,7 +960,7 @@ just forgotten?
 
 ---------------------------------------------------------------------------
 | Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
-| mbt@ast.cam.ac.uk    http://www.ast.cam.ac.uk/~mbt/        01223 337535 |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
 ---------------------------------------------------------------------------
 </body>
 </commentary>
@@ -1085,6 +1085,122 @@ document, rather than a <em>point</em> of the document.
 rather than generating it based on the target.
 </p>
 </attribute>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Wed, 19 Apr 2000 16:25:30 +0100 (BST)</date>
+<subject>&lt;ref> substructure</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Wed Apr 19 16:25:26 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk></otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 19 Apr 2000 16:25:26 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12hwM1-00013Y-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 19 Apr 2000 16:25:25 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12hwM6-00026n-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 19 Apr 2000 16:25:30 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10004181428500.6333-100000@goedel.astro.gla.ac.uk></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+The model for the ref element is, as one might expect, a little more
+subtle than first thoughts suggested.
+
+The most obvious model is version 1:
+
+   See &lt;ref id=x>
+     &lt;reftext media=screen>this section&lt;/reftext>
+     &lt;reftext media=print>section &lt;refinfo>secnum&lt;/refinfo>&lt;/reftext>
+   &lt;/ref>
+
+That could be compressed somewhat using tag omission features, and
+shortrefs, with &lt;refinfo>secnum&lt;/refinfo> being written as, say, %secnum%
+(this would apply to SGML only, not to XML).  The media types could be
+those in HTML4[1].  I would propose that a ref with no content (that is,
+either &lt;ref id=x>&lt;/ref> or &lt;ref id=x/> be formatted as a parenthetical
+reference with magic text (as an author, _I_ want to use this).
+
+This has the advantage of being nicely self-contained.  However,
+the problem I perceive with this is that the reftext element is less
+general than it could be, which is unattractive; it means that the only
+place in which one can specify alternate text is within a reference
+rather than anywhere else (if we ignore the possibilities of using
+&lt;![%Only.paper[...]]&gt; marked sections, which we probably should as it
+has that fatal combination of flexibility and screwupability which makes
+it so attractive as a hack); and it means that there's one more element
+to learn about.
+
+
+Version 2:
+
+    See &lt;ref id=x>
+     &lt;span media=screen>this section&lt;/span>
+     &lt;span media=print>section &lt;refinfo>secnum&lt;/refinfo>&lt;/span>
+   &lt;/ref>
+
+This appears identical except for the change reftext->span: the difference
+is that span would be an element which is not specific to ref elements,
+but could be used elsewhere in the document, to mark out text, such as a
+sentence, which is specific to a particular media type.  It's available
+in HTML4[2], though it doesn't have a media attribute there.  It could
+have other attributes added in future, if we wanted.
+
+The media attribute could be added to elements like p, or even sect,
+to indicate paragraphs or complete sections which were for one media
+type alone.
+
+This, I think, is a nice idea.  The problem with this appears when you
+consider span's content model.  Given that we want the span element to
+be able to delimit whole sentences, at least, span should probably be
+included in the set %simplephrase (see [3]), with a (fairly comprehensive)
+content model of %phrase.  However, this means that a ref could contain
+a span, which could contain another ref, at which point things get very
+complicated.  This means we either give span a very restricted content
+model, which makes it not really different from reftext above and loses
+general usefulness, or...
+
+
+Version 3:
+
+    See
+     &lt;span media=screen>&lt;ref id=x>this section&lt;/ref>&lt;/span>
+     &lt;span media=print>&lt;ref id=x>section &lt;refinfo>secnum&lt;/refinfo>&lt;/ref>&lt;/span>
+
+This has the disadvantage that you have to type the ref element twice
+(though that's no great hardship really, and the closing tags
+could be omitted in most cases).  What it gains us is that the span
+element now sits at the most appropriate point in the element
+hierarchy, and ref can have a content model of '(#pcdata | refinfo)*',
+which is nice and simple, and specifically doesn't allow refs within
+refs.
+
+
+So:
+
+In what sort of situations would we actually _want_ to specify
+alternate text?  If we do actually want flexibility at a finer
+granularity than we'd get by adding media attributes to sections and
+paragraphs, then I believe version 3 is what we want (I think the
+marked section route should be sat on pretty firmly).  If we don't
+need that much flexibility, so that the only time we'd want
+alternating text is within references, then version 1 is the one to go
+for.  Version 2 is too much of a hybrid: I already find it confusing
+and I've just invented it!
+
+Norman
+
+
+
+[1] <url>http://www.w3.org/TR/html4/types.html#h-6.13</url>
+[2] <url>http://www.w3.org/TR/html4/struct/global.html#h-7.5.4</url>
+[3] <url>http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Paragraph%20Elements%200.7//EN</url>
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+</body>
+</commentary>
 <!--splice:ref-->
 </element>
 
@@ -1479,7 +1595,7 @@ Norman
 
 -- 
 ---------------------------------------------------------------------------
-Norman Gray                        http://www.astro.gla.ac.uk/users/norman/
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
 Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 
 
