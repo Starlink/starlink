@@ -227,7 +227,7 @@
 
 *  External References:
       EXTERNAL CCD1_SZPRD       ! Service routine for PDA_LSQR
-      EXTERNAL CCD1_DQEDS       ! Service routine for DQED
+      EXTERNAL CCD1_DQEDS       ! Service routine for PDA_DQED
 
 *  Local Variables:
       DOUBLE PRECISION ACOND    ! (unused)
@@ -267,10 +267,10 @@
       INTEGER N                 ! Number of unknowns
       INTEGER NWT1              ! Number of scale factor weights
       INTEGER NWT2              ! Number of zero point weights
-      INTEGER IOPT( 17 )        ! DQED options
+      INTEGER IOPT( 17 )        ! PDA_DQED options
       INTEGER IND( CCD1__MXNDF * 2 ) ! Constraint types
       INTEGER MCON              ! Linear constraint count
-      DOUBLE PRECISION ROPT( 1 ) ! DQED options
+      DOUBLE PRECISION ROPT( 1 ) ! PDA_DQED options
       DOUBLE PRECISION BL( CCD1__MXNDF * 2 ) ! Lower bounds on solution
       DOUBLE PRECISION BU( CCD1__MXNDF * 2 ) ! Upper bounds on solution
 *.
@@ -464,7 +464,7 @@
          DO 3 I = 1, N
             WRK1( I ) = 0.0D0
             
-*  There are no constraints on the non-reference data, so let DQED know
+*  There are no constraints on the non-reference data, so let PDA_DQED know
 *  about this.
             IND( I ) = 4
             BL( I ) = 0.0D0
@@ -506,7 +506,7 @@
             BU( CCD1_IREF + NIN ) = BU( CCD1_IREF )
          END IF
 
-*  Perform initialisations for DQED.
+*  Perform initialisations for PDA_DQED.
          MCON = 0               ! No linear constraints (just simple ones)
          IOPT( 1 ) = 1          ! Print no information
          IOPT( 2 ) = 0          ! "" 
@@ -515,8 +515,8 @@
          WRK2( 2 ) = 17 * NMAX + 40 ! Workspace length
 
 *  And solve the system.
-         CALL DQED( CCD1_DQEDS, M, N, MCON, IND, BL, BU, WRK1, WRK3,
-     :              M, FSUMSQ, INFO, IOPT, ROPT, WRK2, WRK4 )
+         CALL PDA_DQED( CCD1_DQEDS, M, N, MCON, IND, BL, BU, WRK1, WRK3,
+     :                  M, FSUMSQ, INFO, IOPT, ROPT, WRK2, WRK4 )
 
 *  If there is no solution, then report an error.
          IF ( INFO .GT. 8 ) THEN
