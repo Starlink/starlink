@@ -1,5 +1,6 @@
       SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, SCUOVER, N_BEAMS, 
-     :     N_BOL, N_POS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
+     :     N_BOL, N_POS, N_POS_BEAMS, N_SWITCHES, N_EXPOSURES, 
+     :     N_INTEGRATIONS, 
      :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT, 
      :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
      :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
@@ -11,7 +12,7 @@
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
      :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
      :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
-     :     BOL_DEC, BOL_RA, NDATA, NVARIANCE,
+     :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, USE_LST, LST_DATA,
      :     STATUS)
 *+
 *  Name:
@@ -25,7 +26,7 @@
 
 *  Invocation:
 *     SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, SCUOVER, N_BEAMS, 
-*    :     N_BOL, N_POS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
+*    :     N_BOL, N_POS, N_POS_BEAMS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
 *    :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT, 
 *    :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
 *    :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
@@ -37,7 +38,7 @@
 *    :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
 *    :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
 *    :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
-*    :     BOL_DEC, BOL_RA, NDATA, NVARIANCE,
+*    :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, USE_LST, LST_DATA,
 *    :     STATUS)
 
 *  Description:
@@ -76,6 +77,9 @@
 *        Number of bolometers in the input data
 *     N_POS = _INTEGER (Given)
 *        Number of `samples' taken
+*     N_POS_BEAMS = INTEGER (Given & Returned)
+*        Number of beam positions to be returned per point. Can only be
+*        reduced. If equals 3 then order is M,L,R
 *     N_SWITCHES = _INTEGER (Given)
 *        Number of switches
 *     N_EXPOSURES = _INTEGER (Given)
@@ -196,18 +200,20 @@
 *        First tau value (EXTINCTION only)
 *     SECOND_TAU = _REAL (Given)
 *        Second tau value (EXTINCTION only)
-*     BOL_DEC(N_BOL, N_POS) = _DOUBLE (Returned)
+*     BOL_DEC(N_BOL, N_POS, N_POS_BEAMS) = _DOUBLE (Returned)
 *         Apparent DEC of bolometers for each measurement for MJD_STANDARD
-*     BOL_RA(N_BOL, N_POS) = _DOUBLE (Returned)
+*         Depending on N_POS_BEAMS can contain M, L and R beam positions.
+*     BOL_RA(N_BOL, N_POS, N_POS_BEAMS) = _DOUBLE (Returned)
 *         Apparent RA of bolometers for each measurement for MJD_STANDARD
+*         Depending on N_POS_BEAMS can contain M, L and R beam positions.
 *     NDATA(N_BOL, N_POS, N_BEAMS) = _REAL (Given & Returned)
 *         Extinction corrected data (EXTINCTION only)
 *     NVARIANCE(N_BOL, N_POS, N_BEAMS) = _REAL (Given & Returned)
 *         Extinction corrected variance (EXTINCTION only)
-*     ELEVATION(N_POS) = _DOUBLE (Returned)
-*        Elevation of each N_POS offset
-*     PAR_ANGLE(N_POS) = _DOUBLE (Returned)
-*        PAR_ANGLE of each N_POS offset
+*     USE_LST = LOGICAL (Given)
+*         Do we return the LST positions? (TRUE  then we do)
+*     LST_DATA(N_POS) = DOUBLE (Returned)
+*         LST for each position.
 *     STATUS = _INTEGER (Given & Returned)
 *        Global status
 
@@ -318,19 +324,24 @@
       INTEGER          START_MEAS
       DOUBLE PRECISION SECOND_LST
       REAL             SECOND_TAU
+      LOGICAL          USE_LST
 
 *     Arguments Returned:      
-      DOUBLE PRECISION BOL_DEC(N_BOL, N_POS)
-      DOUBLE PRECISION BOL_RA(N_BOL, N_POS)
+      DOUBLE PRECISION BOL_DEC(N_BOL, N_POS, N_POS_BEAMS)
+      DOUBLE PRECISION BOL_RA(N_BOL, N_POS, N_POS_BEAMS)
+      DOUBLE PRECISION LST_DATA ( N_POS )
 
 *     Given & Returned
       REAL             NDATA(N_BOL, N_POS, N_BEAMS)
       REAL             NVARIANCE(N_BOL, N_POS, N_BEAMS)
+      INTEGER          N_POS_BEAMS
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local constants:
+      DOUBLE PRECISION ARCSEC2RAD         ! arcsec 2 radians conversion
+      PARAMETER (ARCSEC2RAD = 4.84813681110D-6)
       DOUBLE PRECISION PI
       PARAMETER (PI = 3.14159265359D0)
 
@@ -339,13 +350,19 @@
       LOGICAL          AZNASCAN_PL      ! Is the source moving with Az/NA/SCAN?
       DOUBLE PRECISION ARRAY_DEC_CENTRE ! apparent DEC of array centre (rads)
       DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (rads)
+      INTEGER          BM               ! Loop counter for beam pos
       INTEGER          BEAM             ! Loop counter for N_BEAMS
+      CHARACTER*(1)    BEAMS(5)         ! Beam names
       INTEGER          BOL_COORDS_OFFSET! Offset used in CALC_BOL_COORDS
       CHARACTER*(10)   CENTRE_COORDS    ! Centre coords of observation centre
       REAL             CENTRE_DU3       ! dU3 Nasmyth coordinate of point on 
                                         ! focal plane that defines tel axis
       REAL             CENTRE_DU4       ! dU3 Nasmyth coordinate of point on 
                                         ! focal plane that defines tel axis
+      CHARACTER*(5)    CHOP_CRD         ! Chop coordinate system
+      CHARACTER*(20)   CHOP_FUN         ! Chop function
+      REAL             CHOP_PA          ! Chop position angle
+      REAL             CHOP_THROW       ! Chop in arcseconds
       DOUBLE PRECISION CURR_MJD         ! MJD for current sample
       INTEGER          DATA_OFFSET      ! Offset in BOL_RA and BOL_DEC
       REAL             DEC_START        ! declination at start of SCAN 
@@ -371,6 +388,8 @@
       INTEGER          MEASUREMENT      ! Loop counter for N_MEASUREMENTS
       DOUBLE PRECISION MYLAT            ! Lat for use with MAP_X/Y offsets
       DOUBLE PRECISION MYLONG           ! Long for use with MAP_X/Y offsets
+      DOUBLE PRECISION NEW_ARRAY_DEC    ! Map centre of beam
+      DOUBLE PRECISION NEW_ARRAY_RA     ! Map centre of beam
       CHARACTER *(2)   OFFSET_COORDS    ! Coordinate system of offsets
       REAL             OFFSET_X         ! X offset of measurement in OFF_COORDS
       REAL             OFFSET_Y         ! Y offset of measurement in OFF_COORDS
@@ -430,6 +449,27 @@
      :        'exposures (^NM)', STATUS)
       END IF
 
+*     Sort out beam names
+
+      IF (N_POS_BEAMS .EQ. 1) THEN
+         BEAMS(1) = 'M'
+      ELSE IF (N_POS_BEAMS .EQ. 2) THEN
+         BEAMS(1) = 'L'
+         BEAMS(2) = 'R'
+      ELSE IF (N_POS_BEAMS .EQ. 3) THEN
+         BEAMS(1) = 'M'
+         BEAMS(2) = 'L'
+         BEAMS(3) = 'R'
+      ELSE
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI('N',N_POS_BEAMS)
+            CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: The requested '//
+     :           'number of beams (^N) is out of range (1-3)',
+     :           STATUS)
+         END IF
+      END IF
+
 *     Get some values from the FITS array
 
       CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS,
@@ -453,6 +493,25 @@
 *     Get the file version number
       CALL SCULIB_GET_FITS_I(N_FITS, N_FITS, FITS,
      :     'VERSION', SCUCD_VERSION, STATUS)
+
+*     Need some information on the CHOP
+      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 
+     :     'CHOP_THR', CHOP_THROW, STATUS)
+      CHOP_THROW = CHOP_THROW * REAL(ARCSEC2RAD)
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+     :     'CHOP_CRD', CHOP_CRD, STATUS)
+      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 
+     :     'CHOP_PA', CHOP_PA, STATUS)
+      CHOP_PA = CHOP_PA * REAL(ARCSEC2RAD)
+
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
+     :     'CHOP_FUN', CHOP_FUN, STATUS)
+
+*     Translate LO to a real coordinate system
+      IF (CHOP_CRD .EQ. 'LO') THEN
+         CHOP_CRD = LOCAL_COORDS
+      END IF
+
 
 
 *     Determine the offset coordinate system
@@ -609,6 +668,12 @@
                      LST = EXP_LST + DBLE(I - EXP_START) *
      :                    DBLE(EXP_TIME) * 1.0027379D0 * 
      :                    2.0D0 * PI / (3600.0D0 * 24.0D0)
+
+
+*     Store the LST
+                     
+                     IF (USE_LST) LST_DATA(I) = LST
+
 
 *     Now need to work out the actual map centre at this time if
 *     we are rebinning a moving source (PL)
@@ -771,87 +836,122 @@
                         BOL_COORDS_OFFSET = DATA_OFFSET
                      END IF
 
+*     Loop over each beam for the output positions
+
+                     DO BM = 1, N_POS_BEAMS
+
+*     Add on the chop throw to the map centre
+
+                        IF (BEAMS(BM) .NE. 'M') THEN
+
+                           CALL SCULIB_ADD_CHOP(
+     :                          BEAMS(BM), ARRAY_RA_CENTRE,
+     :                          ARRAY_DEC_CENTRE, CHOP_CRD, CHOP_PA,
+     :                          CHOP_FUN, CHOP_THROW, LST, IN_UT1,
+     :                          LAT_OBS,
+     :                          RA_START, RA_END, DEC_START, DEC_END,
+     :                          NEW_ARRAY_RA, NEW_ARRAY_DEC, 
+     :                          STATUS)
+
+                        ELSE
+
+                           NEW_ARRAY_RA = ARRAY_RA_CENTRE
+                           NEW_ARRAY_DEC = ARRAY_DEC_CENTRE
+
+                        END IF
+
+*     For each beam position I calculate a new map centre
+*     and then calculate bolometer offsets from that.
+*     Essentially just another LOCAL_COORDS addition (with the
+*     complication of SC and CHOP_PA)
+
+
 *     now call a routine to work out the apparent RA,Dec of the measured
 *     bolometers at this position
 
-                     ELEVATION = VAL__BADD
-                     PAR_ANGLE = VAL__BADD
+                        ELEVATION = VAL__BADD
+                        PAR_ANGLE = VAL__BADD
 
-                     CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
-     :                    ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, LST, 
-     :                    LAT_OBS, OFFSET_COORDS, OFFSET_X, 
-     :                    OFFSET_Y, IN_ROTATION, N_POINT,
-     :                    N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
-     :                    NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN,
-     :                    BOL_ADC, BOL_DU3, BOL_DU4,
-     :                    CENTRE_DU3, CENTRE_DU4,
-     :                    BOL_RA(1, BOL_COORDS_OFFSET), 
-     :                    BOL_DEC(1, BOL_COORDS_OFFSET),
-     :                    ELEVATION, PAR_ANGLE, STATUS)
-
-                     IF (EXTINCTION) THEN
+                        CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
+     :                       NEW_ARRAY_RA, NEW_ARRAY_DEC, LST, 
+     :                       LAT_OBS, OFFSET_COORDS, OFFSET_X, 
+     :                       OFFSET_Y, IN_ROTATION, N_POINT,
+     :                       N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
+     :                       NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN,
+     :                       BOL_ADC, BOL_DU3, BOL_DU4,
+     :                       CENTRE_DU3, CENTRE_DU4,
+     :                       BOL_RA(1, BOL_COORDS_OFFSET, BM), 
+     :                       BOL_DEC(1, BOL_COORDS_OFFSET, BM),
+     :                       ELEVATION, PAR_ANGLE, STATUS)
+                        
+                        IF (EXTINCTION) THEN
 *     work out the zenith sky opacity at this LST
 
-                        IF (LST .LE. FIRST_LST) THEN
-                           TAUZ = FIRST_TAU
-                        ELSE IF (LST .GE. SECOND_LST) THEN
-                           TAUZ = SECOND_TAU
-                        ELSE
-                           TAUZ = FIRST_TAU + (SECOND_TAU-FIRST_TAU) *
-     :                          (LST - FIRST_LST) /
-     :                          (SECOND_LST - FIRST_LST)
-                        END IF
-                        
+                           IF (LST .LE. FIRST_LST) THEN
+                              TAUZ = FIRST_TAU
+                           ELSE IF (LST .GE. SECOND_LST) THEN
+                              TAUZ = SECOND_TAU
+                           ELSE
+                              TAUZ = FIRST_TAU + (SECOND_TAU-FIRST_TAU)
+     :                             * (LST - FIRST_LST) /
+     :                             (SECOND_LST - FIRST_LST)
+                           END IF
+                           
 *     correct the bolometer data for the sky opacity
 
-                        DO BEAM = 1, N_BEAMS
+                           DO BEAM = 1, N_BEAMS
 
-                           CALL SCULIB_CORRECT_EXTINCTION (
-     :                          NUM_ADC * NUM_CHAN, N_BOL,
-     :                          NDATA(1, DATA_OFFSET, BEAM), 
-     :                          NVARIANCE(1, DATA_OFFSET, BEAM),
-     :                          BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ,
-     :                          STATUS)
-                        END DO
-                     ELSE
-
+                              CALL SCULIB_CORRECT_EXTINCTION (
+     :                             NUM_ADC * NUM_CHAN, N_BOL,
+     :                             NDATA(1, DATA_OFFSET, BEAM), 
+     :                             NVARIANCE(1, DATA_OFFSET, BEAM),
+     :                             BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ,
+     :                             STATUS)
+                           END DO
+                        ELSE
+                           
 *     Convert the apparent RA/Decs to tangent plane offsets
 *     from the moving centre if we are using the 'PL' output system
 *     or want to calculate Az and NA
 
-                        IF (OUT_COORDS .EQ. 'PL' .OR. AZNASCAN) THEN
+                           IF (OUT_COORDS .EQ. 'PL' .OR. AZNASCAN) THEN
 
-                           CALL SCULIB_APPARENT_2_TP (N_BOL,
-     :                          BOL_RA(1,DATA_OFFSET), 
-     :                          BOL_DEC(1,DATA_OFFSET),
-     :                          MAP_RA_CEN, MAP_DEC_CEN, 0.0D0,
-     :                          0.0D0, 0.0D0, STATUS)
-
+                              CALL SCULIB_APPARENT_2_TP (N_BOL,
+     :                             BOL_RA(1,DATA_OFFSET, BM), 
+     :                             BOL_DEC(1,DATA_OFFSET, BM),
+     :                             MAP_RA_CEN, MAP_DEC_CEN, 0.0D0,
+     :                             0.0D0, 0.0D0, STATUS)
+                              
 *     If we are trying to do NA/AZ for RASTER data then we have to convert
 *     the coordinates from apparent RA/Dec to tangent plane offsets and
 *     then into Az or NA coordinates using an elevation dependent rotation.
 *     Convert these TP offsets to Az or NA
-                           IF (AZNASCAN) THEN
+                              IF (AZNASCAN) THEN
 
-                              CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(
-     :                             OUT_COORDS, 1, N_BOL, ELEVATION,
-     :                             PAR_ANGLE, BOL_RA(1, DATA_OFFSET),
-     :                             BOL_DEC(1,DATA_OFFSET), STATUS)
+                                 CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(
+     :                                OUT_COORDS, 1, N_BOL, ELEVATION,
+     :                                PAR_ANGLE, 
+     :                                BOL_RA(1, DATA_OFFSET, BM),
+     :                                BOL_DEC(1,DATA_OFFSET, BM), 
+     :                                STATUS)
 
-                           END IF
+                              END IF
 
-                        ELSE
+                           ELSE
 *     convert the coordinates to apparent RA,Dec on MJD_STANDARD
-                           IF (OUTCRDS .EQ. 'RA') THEN
-                              IF (N_MAP .NE. 1) THEN
-                                 CALL SCULIB_STANDARD_APPARENT (
-     :                                N_BOL, BOL_RA(1,DATA_OFFSET), 
-     :                                BOL_DEC(1, DATA_OFFSET),
-     :                                IN_UT1, MJD_STANDARD, STATUS)
+                              IF (OUTCRDS .EQ. 'RA') THEN
+                                 IF (N_MAP .NE. 1) THEN
+                                    CALL SCULIB_STANDARD_APPARENT (
+     :                                   N_BOL, 
+     :                                   BOL_RA(1,DATA_OFFSET, BM), 
+     :                                   BOL_DEC(1, DATA_OFFSET, BM),
+     :                                   IN_UT1, MJD_STANDARD, STATUS)
+                                 END IF
                               END IF
                            END IF
                         END IF
-                     END IF
+
+                     END DO  ! End the BM loop
                   END DO
 
 *     If we are using SCAN_REVERSAL then multiply every other
