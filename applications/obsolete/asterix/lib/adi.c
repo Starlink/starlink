@@ -4217,19 +4217,15 @@ void adix_primth( int narg, int farg, int nmth,
       while ( imth <= nmth ) {
 	ADIobj  adslist;        /* Method arg direct superclass list */
 	ADIobj acls;
-	int     jarg = iarg;
+	int     jarg = iarg + 1;
 
 /* Locate current method and the next one */
 	_GET_CARCDR(mthd,nxtmthd,curp);
 	cura = _mthd_args(mthd);
 
 /* Skip to the iarg'th argument for this method */
-	if ( jarg ) {
-	  while ( jarg-- )
-	    _GET_CARCDR( carcura, cura, cura );
-	  }
-	else
-	  carcura = _CAR(cura);
+	while ( jarg-- )
+	  _GET_CARCDR( carcura, cura, cura );
 
 /* Locate class definition object */
 	acls = ADIkrnlFindClsI( carcura, status );
@@ -4282,7 +4278,7 @@ void adix_primth( int narg, int farg, int nmth,
 
 	while ( imth < nleft ) {
 
-	  int     jarg = iarg;
+	  int     jarg = iarg + 1;
 	  ADIobj	*mthdadr;
 	  ADIobj  mthd;
 	  ADIobj  *anext;
@@ -4295,12 +4291,8 @@ void adix_primth( int narg, int farg, int nmth,
 	  next = *anext;
 
 /*    Skip to the iarg'th argument for this method */
-	  if ( jarg ) {
-	    while ( jarg-- )
-	      _GET_CARCDR(carcura,cura,cura);
-	    }
-	  else
-	    carcura = _CAR(cura);
+	  while ( jarg-- )
+	    _GET_CARCDR(carcura,cura,cura);
 
 /*    This method's argument matches the current one in the ranked list?
  *    Shove to the front of the list, unless there are no intervening out
