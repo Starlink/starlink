@@ -249,7 +249,8 @@
 *  Expand the name using the original name to supply defaults for any
 *  fields of the file specification which the user did not specify 
 *  (except the file type).
-            CALL IRG1_FSPEC( NAME, FSPEC0( :IAT ), ' ', FSPEC, STATUS )
+            CALL IRG1_FSPEC( NAME( :IAT ), FSPEC0( :NAMEND ), ' ', 
+     :                       FSPEC, STATUS )
          ELSE
 
 *  Otherwise just use the name.
