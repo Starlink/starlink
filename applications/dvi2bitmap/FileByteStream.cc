@@ -58,7 +58,10 @@ using std::endl;
  * <code>tryext</code> to the end of it.
  *
  * <p>The file to be opened must be a seekable object -- that is, it
- * must be a regular file, rather than a named pipe or a socket.
+ * must be a regular file, rather than a named pipe or a socket.  The
+ * constructor checks this, and throws an exception if this is not the
+ * case. If you wish to open a named pipe, you can do so using {@link
+ * InputByteStream#InputByteStream(string)}.
  *
  * @param filename the file to be opened
  * @param tryext a file extension, including any dot, which should be
