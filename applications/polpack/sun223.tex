@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.5}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {17th July 2000}
+\newcommand{\stardocdate}      {11th August 2000}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 2.1-4}
+\newcommand{\stardocversion}   {Version 2.1-5}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry data. They cover registration, sky subtraction, 
@@ -4826,15 +4826,17 @@ for NDF applications.
       \sstsubsection{
          KEYPOS() = \_REAL (Read)
       }{
-         Two values giving the position of the key. The first value gives
-         the gap between the right hand edge of the contour map and the left
-         hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The
-         second value gives the vertical position of the top of the key (1.0
-         for the highest position, 0.0 for the lowest). If the second value
-         is not given, the top of the key is placed level with the top of the
-         vector map. Both values should be in the range 0.0 to 1.0. If a
-         key is produced, then the right hand margin specified by parameter
-         MARGIN is ignored. [current value]
+         Two values giving the position of the key. The first value gives 
+         the gap between the right hand edge of the vector map and the left 
+         hand edge of the key (0.0 for no gap, 1.0 for the largest gap). A
+         positive value will place the key to the right of (i.e. outside)
+         the vector map, and a negative value will place the key inside
+         the vector map. The second value gives the vertical position of the 
+         top of the key (1.0 for the highest position, 0.0 for the lowest). 
+         If the second value is not given, the top of the key is placed 
+         level with the top of the vector map. Both values should be in the 
+         range 0.0 to 1.0. If a key is produced, then the right hand margin 
+         specified by parameter MARGIN is ignored. [current value]
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)
@@ -4862,6 +4864,14 @@ for NDF applications.
          \xref{SUN/95}{sun95}{} for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
+
+         By default the key starts with two lines of text, the first
+	 being {\tt "}Vector scale:{\tt "} and the second giving a
+	 numerical value for the scale in units per centimetre. These two
+	 lines may be replaced by assigning alternative text to the Title
+	 attribute using this parameter. If no text is required, either
+	 assign a blank value for Title, or set the DrawTitle attribute
+	 to zero.
 
          The appearance of the text in the key is controlled using {\tt "}String{\tt "}
          attributes (\emph{e.g.} COLOUR(STRINGS), FONT(STRINGS), \emph{etc.} - the synonym
@@ -6464,7 +6474,7 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
-\subsection{V2.1-4}
+\subsection{V2.1-5}
 
 \begin{itemize}
 \item The way \htmlref{POLBIN}{POLBIN} chooses the location of its bins
@@ -6483,6 +6493,15 @@ suitable WCS information is available. See the new parameter RADEC.
 \item The WCS FrameSet stored within catalogues by \htmlref{POLBIN}{POLBIN} 
 and \htmlref{POLVEC}{POLVEC} now include a GRID Frame describing the 
 grid co-ordinate system of the Stokes cube.
+
+\item \htmlref{POLPLOT}{POLPLOT} now allows the key to be placed inside the
+vector map by giving a negative value for the KEYPOS parameter. The text
+included in the key can be specified using the Title attribute of
+parameter KEYSTYLE.
+
+\item The default vector scaling used by \htmlref{POLPLOT}{POLPLOT} has been 
+improved in cases where debiassing causes many zero length vectors to be 
+present.
 
 \end{itemize}
 
