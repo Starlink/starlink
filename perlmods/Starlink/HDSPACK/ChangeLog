@@ -1,3 +1,7 @@
+2003-03-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* HDSPACK.pm (setobj): Add setobj and set_hdsobj
+
 2003-03-07  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* t/wrapper.t: Create

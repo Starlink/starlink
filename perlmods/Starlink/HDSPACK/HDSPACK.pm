@@ -13,10 +13,12 @@ Starlink::HDSPACK - routines for high level HDS manipulation
   $status = creobj("file", "NDF", $status);
   $status = creobj("file.DATA_ARRAY", "ARRAY", $status);
   $status = creobj("file.DATA_ARRAY.DATA", "_REAL",[20,30], $status);
+  $status = setobj("file.more.xxx",52.5,$status);
 
   copy_hdsobj("file.more.fits","file1.more") or die "Oops";
   create_hdsobj("file.DATA_ARRAY","ARRAY") or die "Oops2";
   delete_hdsobj("file.more.fits") or die "Oops3";
+  set_hdsobj("file.more.xxx", 52.5) or die "Oops4";
 
 =head1 DESCRIPTION
 
@@ -46,8 +48,8 @@ use constant SAI__ERROR => &NDF::SAI__ERROR;
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $DEBUG = 0;
-@EXPORT_OK = qw( copobj retrieve_locs delobj creobj
-		 copy_hdsobj create_hdsobj delete_hdsobj
+@EXPORT_OK = qw( copobj retrieve_locs delobj creobj setobj
+		 copy_hdsobj create_hdsobj delete_hdsobj set_hdsobj
 	       );
 
 =head1 FUNCTIONS
@@ -80,6 +82,41 @@ sub create_hdsobj {
   err_begin( $status );
 
   $status = creobj( $path, $type, $dims, $status );
+
+  return _status_toperl( $status );
+}
+
+=item B<set_hdsobj>
+
+Set the value of an HDS object within an HDS structure.
+
+  set_hdsobj( $path, $value );
+
+Returns 1 if successful, false otherwise. See C<creobj>
+for more details on the arguments.
+
+Scalar values can be stored in scalar items and individual
+elements of a data array can be addressed using parentheses:
+
+ set_hdsobj("file.data_array(5,5)", 52);
+
+
+Array values can be supplied in vectorized form by using a reference
+to an array. Note that an error will be raised if the number of
+elements in the array does not match the number of elements in the HDS
+object I<or> if the values overflow the underlying type.
+
+
+=cut
+
+sub set_hdsobj {
+  my ($path, $value) = @_;
+
+  # Status stuff
+  my $status = SAI__OK;
+  err_begin( $status );
+
+  $status = setobj( $path, $value, $status );
 
   return _status_toperl( $status );
 }
@@ -230,7 +267,7 @@ has been called).
 sub copobj {
 
   croak 'Usage: copobj(source, target, status)' unless scalar(@_) == 3;
-  
+
   # Read args
   my ($source, $target, $status) = @_;
 
@@ -321,6 +358,121 @@ sub copobj {
 
   return $status;
 }
+
+=item B<setobj>
+
+Set the value of the named HDS object.
+
+ $status = setobj("file.xxx", "hello");
+ $status = setobj("file.more.fits", \@fits);
+
+Scalar values can be stored in scalar items and individual
+elements of a data array can be addressed using parentheses:
+
+ $status = setobj("file.data_array(5,5)", 52, $status);
+
+Array values can be supplied in vectorized form by using a reference
+to an array. Note that an error will be raised if the number of
+elements in the array does not match the number of elements in the HDS
+object I<or> if the values overflow the underlying type.
+
+The HDS object must refer to an HDS structure and not simply a root filename.
+
+This routine assumes we are in a valid error context (eg err_begin()
+has been called).
+
+=cut
+
+sub setobj {
+  croak 'Usage: setobj(object, newval, status)' unless scalar(@_) == 3;
+
+  my ($object, $newval, $status) = @_;
+
+  # Return status if not good
+  return $status if $status != SAI__OK;
+
+  # Check that arg is defined
+  unless (defined $object) {
+    $status = SAI__ERROR;
+    err_rep('NOSOURCE','Starlink::HDSPACK::setobj - no object defined', $status);
+    return $status;
+  }
+  if (!defined $newval) {
+    $status = SAI__ERROR;
+    my $msg = 'Starlink::HDSPACK::setobj - No new value supplied';
+    err_rep('BADNEW',$msg, $status);
+    return $status;
+  }
+
+  # Find the HDS locator referenced
+  my @srclocs;
+  ($status, @srclocs) = retrieve_locs($object, 'UPDATE', $status)
+    if length($object) > 0;
+
+  # If no locators were retrieved we assume that an entire container
+  # was specified - this is not good
+  if (scalar(@srclocs) == 0) {
+
+    if ($status == SAI__OK) {
+      $status = SAI__ERROR;
+      err_rep('','An HDS object must be specified. Not just a filename!',
+	     $status);
+    }
+
+  } else {
+
+    # First get the type
+    dat_type( $srclocs[-1], my $type, $status);
+
+    # Since DAT_PUT was never implemented! We have to do it ourselves
+    if ($type =~  /BYTE|INT|WORD/) {
+      # Rely on type conversion
+      if (ref $newval) {
+	dat_putvi($srclocs[-1], scalar(@$newval), @$newval, $status);
+      } else {
+	# Bug in old NDF module so must be explicit
+	NDF::dat_put0i($srclocs[-1], $newval, $status);
+      }
+    } elsif ($type =~ /DOUBLE/) {
+      if (ref $newval) {
+	dat_putvd($srclocs[-1], scalar(@$newval), @$newval, $status);
+      } else {
+	dat_put0d($srclocs[-1], $newval, $status);
+      }
+    } elsif ($type =~ /LOG/) {
+      if (ref $newval) {
+	dat_putvl($srclocs[-1], scalar(@$newval), @$newval, $status);
+      } else {
+	dat_put0l($srclocs[-1], $newval, $status);
+      }
+    } elsif ($type =~ /REAL/) {
+      if (ref $newval) {
+	dat_putvr($srclocs[-1], scalar(@$newval), @$newval, $status);
+      } else {
+	dat_put0r($srclocs[-1], $newval, $status);
+      }
+    } elsif ($type =~ /CHAR/) {
+      if (ref $newval) {
+	dat_putvc($srclocs[-1], scalar(@$newval), @$newval, $status);
+      } else {
+	dat_put0c($srclocs[-1], $newval, $status);
+      }
+    } elsif ($status == SAI__OK){
+      $status = SAI__ERROR;
+      err_rep('',"Type retrieved from structure was not supported: $type",
+	     $status);
+    }
+
+    # Then write the data
+#    dat_put( $srclocs[-1], $type, )
+
+
+
+  }
+
+  return $status;
+}
+
 
 =item B<delobj>
 
