@@ -40,6 +40,10 @@
 *     <{enter_changes_here}>
 */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 /* Header files. */
 /* ============= */
 /* C run-time library header files. */
