@@ -297,7 +297,8 @@
         DO ISET=1,SET
 
           NUMS=0
-
+	print *,'searching for numbers...'
+	call flush(6)
 *  locate start of sequence of numbers
           NUMERIC=.FALSE.
           DO WHILE (.NOT.NUMERIC.AND.I.LT.L)
@@ -313,6 +314,8 @@
                 I=I+1
               ENDIF
             ELSE
+	print *,'found numbers'
+	call flush(6)
               NUMERIC=.TRUE.
             ENDIF
           ENDDO
@@ -333,7 +336,10 @@
               ENDIF
             ENDDO
             IF (BRACKET) THEN
+	print *,'found end of numbers'
+	call flush(6)
               CEND=I-1
+	print *,text(cstart:cend)
               NUMS=NCOMMA+1
             ENDIF
           ENDIF
