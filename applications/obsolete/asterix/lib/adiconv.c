@@ -224,7 +224,7 @@ void ADIcnvCC( ADImta *idd, int nval, char *in, ADImta *odd,
 #define _cnv_to_c(_T,_t,_caste,_fmt) \
 void ADIcnv##_T##C( ADImta *idd, int n, char *in, ADImta *odd, \
 		    char *out, int *nerr, ADIstatus status ) { \
-  char          buf[30]; \
+  char          buf[80]; \
   _TM_ctype(_t)	*iptr = (_TM_ctype(_t) *) in; \
   int           ival = n; \
  _declare_c_tr(o,odd); \
@@ -262,7 +262,7 @@ void ADIcnvLC( ADImta *idd, int n, char *in, ADImta *odd,
 
 int ADIcnvCtoD( char *dat, int dlen, ADIdouble *val )
   {
-  char		buf[30];
+  char		buf[80];
   char		*dptr = dat;
   int		ic;
   int		len = dlen;
