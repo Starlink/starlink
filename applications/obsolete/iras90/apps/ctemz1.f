@@ -57,6 +57,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'I90_DAT'          ! IRAS90 data.
+      INCLUDE 'IRC_ERR'          ! NAG error
 
 *  Arguments Given:
       DOUBLE PRECISION T
@@ -149,8 +150,14 @@
 
 *  Find a cubic spline which interpolates the integrand values.
       IFAIL = -1
-      CALL E01BAF( SIZE( BAND ), NU, INTGND, LK, CK, MXSIZ + 4, WORK,
-     :             6*MXSIZ + 16, IFAIL ) 
+*      CALL E01BAF( SIZE( BAND ), NU, INTGND, LK, CK, MXSIZ + 4, WORK,
+*     :             6*MXSIZ + 16, IFAIL ) 
+
+      STATUS = IRC__NAGER
+      CALL ERR_REP('CTEMZ1_ERR0',
+     :     'NAG not compiled into this version of IRAS90.',
+     :     STATUS)
+      GO TO 999
 
 *  Report an error if something went wrong in the NAG routine.
       IF( IFAIL .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -165,7 +172,13 @@
 
 *  Now evaluate the definite integral under the cubic spline.
       IFAIL = -1
-      CALL E02BDF( SIZE( BAND ) + 4, LK, CK, FLUX, IFAIL )
+*      CALL E02BDF( SIZE( BAND ) + 4, LK, CK, FLUX, IFAIL )
+
+      STATUS = IRC__NAGER
+      CALL ERR_REP('CTEMZ1_ERR0',
+     :     'NAG not compiled into this version of IRAS90.',
+     :     STATUS)
+      GO TO 999
 
 *  Report an error if something went wrong in the NAG routine.
       IF( IFAIL .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN

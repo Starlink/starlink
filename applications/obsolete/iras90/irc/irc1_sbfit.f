@@ -194,7 +194,12 @@
 *  which gives the solar longitude (mean of date) as a function of the
 *  UTC since sample number 1.
       IFAIL = 1
-      CALL G02CAF( J, WORK( 1, 3 ), WORK( 1, 1 ) , RESULT, IFAIL )
+      STATUS = IRC__NAGER
+      CALL ERR_REP( 'IRC1_SBFIT_ERR4',
+     :     'NAG routine G02CAF not implemented. Need to replace '//
+     :     'with call to PDA_DPOLFT', STATUS)
+      GO TO 999
+*      CALL G02CAF( J, WORK( 1, 3 ), WORK( 1, 1 ) , RESULT, IFAIL )
 
 *  Check the IFAIL value.
       IF( IFAIL .NE. 0 ) THEN
@@ -220,7 +225,7 @@
 *  which gives the clock angle as a function of the UTC since sample
 *  number 1.
       IFAIL = 1
-      CALL G02CAF( J, WORK( 1, 3 ), WORK( 1, 2 ), RESULT, IFAIL )
+*      CALL G02CAF( J, WORK( 1, 3 ), WORK( 1, 2 ), RESULT, IFAIL )
 
 *  Check the IFAIL value.
       IF( IFAIL .NE. 0 ) THEN

@@ -235,8 +235,14 @@
 
 *  Fit a cubic spline to the X coordinate values.
          IFAIL = 1
-         CALL E01BAF( NSTEP, FITSMP, FITX, LAMX, CX, NSTEP + 4, DW1,
-     :                6*NSTEP + 16, IFAIL )
+*         CALL E01BAF( NSTEP, FITSMP, FITX, LAMX, CX, NSTEP + 4, DW1,
+*     :                6*NSTEP + 16, IFAIL )
+
+         STATUS = IRC__NAGER
+         CALL ERR_REP('IRC1_IMCOI_ERR0',
+     :        'NAG not compiled into this version of IRAS90.',
+     :        STATUS)
+         GO TO 999
 
 *  Check the IFAIL value.
          IF( IFAIL .NE. 0 ) THEN
@@ -250,8 +256,14 @@
 
 *  Fit a cubic spline to the Y coordinate values.
          IFAIL = 1
-         CALL E01BAF( NSTEP, FITSMP, FITY, LAMY, CY, NSTEP + 4, DW1,
-     :                6*NSTEP + 16, IFAIL )
+*         CALL E01BAF( NSTEP, FITSMP, FITY, LAMY, CY, NSTEP + 4, DW1,
+*     :                6*NSTEP + 16, IFAIL )
+
+         STATUS = IRC__NAGER
+         CALL ERR_REP('IRC1_IMCOI_ERR0',
+     :        'NAG not compiled into this version of IRAS90.',
+     :        STATUS)
+         GO TO 999
 
 *  Check the IFAIL value.
          IF( IFAIL .NE. 0 ) THEN
@@ -289,7 +301,13 @@
 *  Evaluate the cubic spline giving the image X coordinate at the centre
 *  of the sample, together with its first three derivatives.
          IFAIL = 1
-         CALL E02BCF( NCAP7, LAMX, CX, DBLE( SAMP ), 1, SX, IFAIL )
+*         CALL E02BCF( NCAP7, LAMX, CX, DBLE( SAMP ), 1, SX, IFAIL )
+
+         STATUS = IRC__NAGER
+         CALL ERR_REP('IRC1_IMCOI_ERR0',
+     :        'NAG not compiled into this version of IRAS90.',
+     :        STATUS)
+         GO TO 999
 
 *  Check the IFAIL value.
          IF( IFAIL .NE. 0 ) THEN

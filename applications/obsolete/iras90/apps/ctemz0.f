@@ -85,6 +85,7 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants.
       INCLUDE 'I90_DAT'          ! IRAS90 data.
+      INCLUDE 'IRC_ERR'          ! NAG error
 
 *  Arguments Given:
       INTEGER BAND1
@@ -191,8 +192,14 @@
 *  Find a cubic spline which gives the temperature values as a function
 *  of ratio values.
       IFAIL = -1
-      CALL E01BAF( NTEMP, RATIO, TEMP, %VAL( IPLKR ), %VAL( IPCKR ),
-     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL ) 
+*      CALL E01BAF( NTEMP, RATIO, TEMP, %VAL( IPLKR ), %VAL( IPCKR ),
+*     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL ) 
+
+         STATUS = IRC__NAGER
+         CALL ERR_REP('CTEMZ0_ERR0',
+     :        'NAG not compiled into this version of IRAS90.',
+     :        STATUS)
+         GO TO 999
 
 *  Report an error if something went wrong in the NAG routine.
       IF( IFAIL .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -206,8 +213,14 @@
 *  Find a cubic spline which gives BAND1 flux values as a function of
 *  temperature.
       IFAIL = -1
-      CALL E01BAF( NTEMP, TEMP, SB1, %VAL( IPLKF1 ), %VAL( IPCKF1 ),
-     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL ) 
+*      CALL E01BAF( NTEMP, TEMP, SB1, %VAL( IPLKF1 ), %VAL( IPCKF1 ),
+*     :             NTEMP + 4, WORK, 6*NTEMP + 16, IFAIL ) 
+
+      STATUS = IRC__NAGER
+      CALL ERR_REP('CTEMZ0_ERR0',
+     :     'NAG not compiled into this version of IRAS90.',
+     :     STATUS)
+      GO TO 999
 
 *  Report an error if something went wrong in the NAG routine.
       IF( IFAIL .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN

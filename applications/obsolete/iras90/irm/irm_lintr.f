@@ -83,6 +83,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants.
+      INCLUDE 'IRC_ERR'          ! For NAG errors
 
 *  Arguments Given:
       INTEGER N
@@ -345,8 +346,15 @@
  
 *  Call NAG routine F04AEF to solve the linear normal equations
             IFAIL = 1
-            CALL F04AEF( A, 4, B, 4, 4, 1, ANS, 4, WKSPCE, AA, 4, BB,
-     :                   4, IFAIL )
+*            CALL F04AEF( A, 4, B, 4, 4, 1, ANS, 4, WKSPCE, AA, 4, BB,
+*     :                   4, IFAIL )
+
+         STATUS = IRC__NAGER
+         CALL ERR_REP('IRM_LINTR_ERR0',
+     :        'NAG not compiled into this version of IRAS90.',
+     :        STATUS)
+         GO TO 999
+
  
 *  If successful, assign result to the transformation coefficients
             IF( IFAIL .EQ. 0 ) THEN
@@ -380,8 +388,14 @@
  
 *  Call NAG routine F04AEF to solve linear normal equations
             IFAIL = 1
-            CALL F04AEF( A, 4, B, 4, 3, 2, ANS, 4, WKSPCE, AA, 4, BB,
-     :                   4, IFAIL )
+*            CALL F04AEF( A, 4, B, 4, 3, 2, ANS, 4, WKSPCE, AA, 4, BB,
+*     :                   4, IFAIL )
+
+            STATUS = IRC__NAGER
+            CALL ERR_REP('IRM_LINTR_ERR0',
+     :           'NAG not compiled into this version of IRAS90.',
+     :           STATUS)
+            GO TO 999
  
 *  If successful,  assign results to transformation coefficients
             IF( IFAIL .EQ. 0 ) THEN

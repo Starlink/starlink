@@ -114,6 +114,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants.
       INCLUDE 'MSG_PAR'          ! MSG_ constants.
+      INCLUDE 'IRC_ERR'          ! NAG error
 
 *  Arguments Given:
       INTEGER EL
@@ -211,7 +212,13 @@
 *  temperature) corresponding to this ratio value. The NAG routine also
 *  returns the first three derivatives in T(2),T(3) and T(4).
                IFAIL = -1
-               CALL E02BCF( LCK, LKR, CKR, RATIO, .TRUE., T, IFAIL )
+*               CALL E02BCF( LCK, LKR, CKR, RATIO, .TRUE., T, IFAIL )
+
+               STATUS = IRC__NAGER
+               CALL ERR_REP('CTEMZ4_ERR0',
+     :              'NAG not compiled into this version of IRAS90.',
+     :              STATUS)
+               GO TO 999
 
 *  Report an error if anything went wrong in the NAG routine.
                IF( IFAIL .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
