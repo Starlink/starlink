@@ -3,7 +3,7 @@
 
 <component id="starconf">
   <description>Starlink autoconf support</description>
-  <path>/buildsupport/starconf</path>
+  <path>buildsupport/starconf</path>
   <dependencies/>  <!-- none -->
   <developers>
     <person>
