@@ -172,12 +172,10 @@
         PARAMETER		( VERSION = 'EVMERGE Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*20		AXNAMS(2)		! Spatial axis names
       CHARACTER*20  	        LNAME(MXLST)  		! Names of input lists
       CHARACTER*40		LUNIT, UNIT(MXLST)   	! Units of input lists
       CHARACTER*7               MTYPE			! List mapping type
       CHARACTER*80           	TEXTI(MXTEXT)           ! Input files
-      CHARACTER*80           	TEXT(22)                ! History text
       CHARACTER*20		TLNAME			! Time list name
       CHARACTER*20		XLNAME, YLNAME	        ! X, Y list names
 
@@ -206,7 +204,6 @@
       INTEGER			OTIMID			! O/p timing info
       INTEGER			PIXID(MXINP),		! World coordinates
      :                 		 PRJID(MXINP), SYSID(MXINP)
-      INTEGER                	QPTR(MXLST)         	! Pointer to mapped input QUANTUM list
       INTEGER			T_AX, X_AX, Y_AX	! List numbers
       INTEGER                	START                   ! Start position for copy
       INTEGER                	TBASE                   ! Timing origin file #
