@@ -216,6 +216,20 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        when creating the "pixel-to-relative physical" transformation
 *        matrix. Previously, zero CDELT values could cause the matrix to
 *        be non-invertable.
+*     4-SEP-1998 (DSB):
+*        - Indicate that SphMaps created by this class when using FITS-WCS
+*        encoding all operate on the unit sphere. This aids simplification.
+*        - Fix a bug in StoreFits which caused CD matrices to be indexed 
+*        incorrectly (sometimes causing floating exceptions) if they do not
+*        describe a celestial longitude/latitude system.
+*        - Changed astFindFits to ignore trailing spaces in the keyword 
+*        template.
+*        - astSplit changed so that an error is not reported if a textual
+*        keyword value ends before column 20.
+*     7-OCT-1998 (DSB):
+*        - Corrected test for linearity in LinearMap to include a factor
+*        of the test vector length. Also LinearMap now uses a simplified 
+*        Mapping.
 *class--
 */
 
@@ -3838,13 +3852,13 @@ c        Pointer to a null-terminated character string containing a
 f        A character string containing a
 *        template for the keyword to be found. In the simplest case,
 *        this should simply be the keyword name (the search is case
-*        insensitive). However, this template may also contain "field
-*        specifiers" which are capable of matching a range of
-*        characters (see the "Keyword Templates" section for
-*        details). In this case, the first card with a keyword which
-*        matches the template will be found. To find the next FITS
-*        card regardless of its keyword, you should use the template
-*        "%f".
+*        insensitive and trailing spaces are ignored). However, this
+*        template may also contain "field specifiers" which are
+*        capable of matching a range of characters (see the "Keyword
+*        Templates" section for details). In this case, the first card
+*        with a keyword which matches the template will be found. To
+*        find the next FITS card regardless of its keyword, you should
+*        use the template "%f".
 c     card
 f     CARD = CHARACTER * ( 80 ) (Returned)
 c        An array of at least 81 characters (to allow room for a
@@ -3954,6 +3968,8 @@ f     RESULT = AST_FINDFITS( FITSCHAN, 'CRVAL%1d', CARD, .TRUE., STATUS )
 */
 
 /* Local Variables: */
+   char *c;               /* Pointer to next character to check */
+   char *lname;           /* Pointer to copy of name without trailing spaces */
    const char *class;     /* Object class */ 
    const char *method;    /* Calling method */ 
    int ret;               /* Was a card found? */
@@ -3965,13 +3981,20 @@ f     RESULT = AST_FINDFITS( FITSCHAN, 'CRVAL%1d', CARD, .TRUE., STATUS )
    method = "astFindFits";
    class = astGetClass( this ); 
 
+/* Get a local copy of the keyword template. */
+   lname = (char *) astStore( NULL, (void *) name, strlen(name) + 1 );
+
+/* Terminate it to exclude trailing spaces. */
+   c = lname + strlen(lname) - 1;
+   while( *c == ' ' && c >= lname ) *(c--) = 0;
+
 /* Use the private FindKeyCard function to find the card and make it the
    current card. Always use the supplied current card (if any) if the 
    template is "%f" or "%0f". */
-   if ( !strcmp( name, "%f" ) || !strcmp( name, "%0f" ) ){ 
+   if ( !strcmp( lname, "%f" ) || !strcmp( lname, "%0f" ) ){ 
       ret = astFitsEof( this ) ? 0 : 1;
    } else {
-      ret = FindKeyCard( this, name, method, class );
+      ret = FindKeyCard( this, lname, method, class );
    }
 
 /* Only proceed if the card was found. */
@@ -3987,6 +4010,9 @@ f     RESULT = AST_FINDFITS( FITSCHAN, 'CRVAL%1d', CARD, .TRUE., STATUS )
       ret = 1;
 
    }
+
+/* Free the memory holding the local copy of the keyword template. */
+   lname = (char *) astFree( (void *) lname );
 
 /* If an errror has occurred, return zero. */
    if( !astOK ) ret = 0;
@@ -6622,6 +6648,7 @@ static int LinearMap( AstMapping *map, int nin, int nout, double *matrix,
    double orig;                       /* Constant term on this axis */
    double sumerr2;                    /* Squared distance between 2 points */
    double sum;                        /* Sum of axis values */
+   double tvl;                        /* Squared length of test vector */
    int i;                             /* Loop count */
    int j;                             /* Loop count */
    int ret;                           /* Returned value */
@@ -6640,12 +6667,20 @@ static int LinearMap( AstMapping *map, int nin, int nout, double *matrix,
    if( astOK ){
 
 /* We now store unit vectors along each of the input axes in the PointSet. 
-   The first extra point is the supplied test point. The second extra point is
-   the origin. */
+   The first extra point is the supplied test point. The second extra point 
+   is the origin. At the same time form the squared length of the test
+   vector. */
+      tvl = 0.0;
       for( i = 0; i < nin; i++ ){
          p = ptr1[ i ];
          for( j = 0; j < nin; j++ ) *(p++) = 0.0;
-         *(p++) = ( test[ i ] != AST__BAD ) ? test[ i ] : 1000.0;
+         if( test[ i ] != AST__BAD ) {
+            *(p++) = test[ i ];
+            tvl += test[ i ]*test[ i ];
+         } else {
+            *(p++) = 1000.0;
+            tvl += 1000000.0;
+         }
          *p = 0.0;
          ptr1[ i ][ i ] = 1.0;
       }
@@ -6680,10 +6715,10 @@ static int LinearMap( AstMapping *map, int nin, int nout, double *matrix,
             sumerr2 += err*err;
          }
 
-/* If the squared distance is less than the supplied maximum error, the 
-   Mapping is considered to be linear. Copy it to the returned array, row 
-   by row. */
-         if( sumerr2 < maxerr ){
+/* If the squared distance is less than the supplied maximum error times
+   the squared length of the test vector, the Mapping is considered to be 
+   linear. Copy it to the returned array, row by row. */
+         if( sumerr2 < tvl*maxerr ){
             ret = 1;
             q = matrix;
             for( i = 0; i < nin; i++ ){
@@ -9610,15 +9645,10 @@ int astSplit_( const char *card, char **name, char **value,
 
 /* If the previous character was a quote, then we have found a single
    isolated quote which therefore marks the end of the string value. 
-   Report an error if the terminating quote is before column 20. Break
-   out of the loop. The pointer "d" is left pointing to the first character
+   The pointer "d" is left pointing to the first character
    after the terminating quote. */
                      if( lq ){
-                        if( (size_t)( d - card ) < FITSSTCOL - 1 )
-                           astError( AST__BDFTS, "%s(%s): Keyword string "
-                                     "value ends before column %d.", method,
-                                     class, FITSSTCOL );
-                        break;
+                        if( (size_t)( d - card ) < FITSSTCOL - 1 ) break;
 
 /* If the last character was not a quote, copy it to the returned string. */
                      } else {
@@ -10723,14 +10753,17 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
                 
 /* If a CD matrix was supplied (i.e. the product of the PC matrix and 
    the diagonal matrix of primary CDELT values), convert it to the PC
-   matrix. The CDELT values implied by the CD matrix are converted from
-   degrees to radians and used in preference to any CDELT keywords which 
-   have been supplied. */
+   matrix. The CDELT values implied by the CD matrix are used in preference 
+   to any CDELT keywords which have been supplied. They are converted from 
+   degrees to radians if they correspond to celestial longitude or
+   latitude axes. */
                if( cd ) {
                   newwcs = 0;
                   SplitMat( naxis, store->pc, store->cdelt );
-                  store->cdelt[ store->axlat ] *= AST__DD2R;
-                  store->cdelt[ store->axlon ] *= AST__DD2R;
+                  if( store->axlat != -1 && store->axlon != -1 ) {
+                     store->cdelt[ store->axlat ] *= AST__DD2R;
+                     store->cdelt[ store->axlon ] *= AST__DD2R;
+                  }
                }
             }
 
@@ -12243,8 +12276,11 @@ static AstCmpMap *WcsNative( FitsStore *store, AstWcsMap *wcsmap,
 /* Create the SphMap which converts spherical coordinates to Cartesian
    coordinates (stage 6 in the prologue). This asumes that axis 0 is the 
    longitude axis, and axis 1 is the latitude axis. This will be ensured
-   by a PermMap created later. */
-      sphmap = astSphMap( "" );
+   by a PermMap created later. Indicate that the SphMap will only be used 
+   to transform points on a unit sphere. This enables a forward SphMap
+   to be combined with an inverse SphMap into a UnitMap, and thus aids
+   simplification. */
+      sphmap = astSphMap( "UnitRadius=1" );
       astInvert( sphmap );
 
 /* Create a unit MatrixMap to be the basis of the MatrixMap which rotates
