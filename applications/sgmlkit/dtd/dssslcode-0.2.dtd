@@ -71,7 +71,7 @@
 <!entity % codereference.arch.atts
 	'dsssl name #fixed external-specification
 	 id id #required
-	 dsssla cdata #fixed "document doc"'>
+	 dsssla cdata #fixed "document doc specid docid"'>
 <!entity % codebody.arch.atts 
 	'dsssl name #fixed style-specification-body'
 	--'dssslignd name #fixed narcignd'-->
