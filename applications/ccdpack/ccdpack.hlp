@@ -170,7 +170,7 @@ Exports AST FrameSet information from NDFs into an external file.
 
 Usage:
 
-   ASTEXP in astfile outdomain baseframe fitsid
+   ASTEXP in astfile outdomain baseframe
 
 Description:
 
@@ -182,20 +182,22 @@ Description:
    which can be derived from other NDFs to which similar framesets
    ought to apply.  The key should be generated in the same way when
    the AST file is used for importing the mapping information by
-   ASTIMP.  Currently the only way these keys can be generated is
-   by use of the FITSID parameter.
+   ASTIMP.  Currently these keys can be generated according to a
+   FITS header card or the order in which the NDFs are presented.
+   Additional information may be written describing what use to
+   make of FITS headers in the NDFs.
 
    Used together, the framesets written out to an AST file can thus
-   contain information about the relative positioning of different
-   images in a set of related NDFs
+   contain information about the positioning of images in a set of
+   related NDFs.
 
    AST files written out by this application can be applied to
    other NDFs of similar origin using the ASTIMP application, so
    that registration information present in the WCS components of
-   one set of NDFs (put there for instance by the REGISTER application)
-   can be transferred using ASTIMP and ASTEXP to another similar set.
-   This "similar set" will typically be one from chips in the same
-   mosaic camera instrument.
+   one set of NDFs (put there for instance by the REGISTER or WCSEDIT
+   applications) can be transferred using ASTIMP and ASTEXP to
+   another similar set.  This "similar set" will typically be one
+   from chips in the same mosaic camera instrument.
 
    A 2-frame frameset is output for each NDF.  The Base frame is one
    selected by the BASEFRAME parameter, and is identical in the
@@ -213,8 +215,7 @@ Description:
 For information on individual parameters, select from the list below:
 3 ASTFILE
 ASTFILE = LITERAL (Read)
-   The name of the file to be written containing the sequence
-   of framesets.
+   The name of the AST file to be written.
 3 BASEEPOCH
 BASEEPOCH = _DOUBLE (Read)
    If a "Sky Co-ordinate System" specification is supplied (using
@@ -234,7 +235,7 @@ BASEFRAME = LITERAL (Read)
    expected to occur in any NDF to which the AST file will
    later be applied using ASTIMP.  AXIS is a good choice since
    this may be applicable to frames which have been modified,
-   for instance by a WCS-aware application like KAPPA's COMPAVE.
+   for instance by an application like KAPPA's COMPAVE.
 
    The value of the parameter can be one of the following:
 
@@ -251,6 +252,26 @@ BASEFRAME = LITERAL (Read)
    parameter is copied to the AST file unmodified; in particular
    it retains the same Domain name.
    [AXIS]
+3 FITSID
+FITSID = LITERAL (Read)
+   If the IDTYPE parameter has the value FITSID, this parameter
+   gives the FITS header keyword whose value distinguishes
+   frames with different coordinate system information.
+   If any lower case characters are given, they are converted
+   to upper case.  This may be a compound name to handle
+   hierarchical keywords, in which case it has the form
+   keyword1.keyword2 etc.  Each keyword must be no longer than
+   8 characters.
+3 FITSROT
+FITSROT = LITERAL (Read)
+   This parameter gives the name of a FITS header keyword whose
+   value will be used to rotate the frames when they are imported.
+   If any lower case characters are given, they are converted
+   to upper case.  This may be a compound name to handle
+   hierarchical keywords, in which case it has the form
+   keyword1.keyword2 etc.  Each keyword must be no longer than
+   8 characters.
+   [!]
 3 IDTYPE
 IDTYPE = LITERAL (Read)
    This parameter destermines the form of the ID value which
@@ -278,23 +299,12 @@ INDICES( * ) = _INTEGER (Read)
    If IDTYPE is set to INDEX, then this parameter is a list of
    integers with as many elements as there are NDFs accessed by
    the IN parameter.  It gives the sequence of indices N to be
-   used for generating the ID values.  Its default value is a
-   list with the appropriate number of elements starting
-   1,2,3,...  This default will normally be appropriate unless
-   the NDFs are being presented in an unusual order, or an order
-   different from that in which they are likely to be presented
-   to ASTIMP.
-   [Dynamic: 1,2,3...]
-3 FITSID
-FITSID = FILENAME (Read)
-   If the IDTYPE parameter has the value FITSID, this parameter
-   gives the FITS header keyword whose value distinguishes
-   frames with different coordinate system information.
-   If any lower case characters are given, they are converted
-   to upper case.  This may be a compound name to handle
-   hierarchical keywords, in which case it has the form
-   keyword1.keyword2 etc.  Each keyword must be no longer than
-   8 characters.
+   used for generating the ID values.   If set null (!) the
+   NDFs will be considered in the order 1,2,3,... which will
+   normally be appropriate unless the NDFs are being presented
+   in an order different from that in which they are likely to
+   be presented to ASTIMP.
+   [!]
 3 LOGFILE
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -329,14 +339,11 @@ LOGTO = LITERAL (Read)
 3 OUTDOMAIN
 OUTDOMAIN = LITERAL (Read)
    This parameter gives the name of the new alignment domain for
-   the frames written out to the AST file.  Its value is
-   usually not important, but care should be taken that it does
-   not clash with other useful domains which already exist in
-   the WCS components of the NDFs to which ASTFILE will be applied
-   (by the ASTIMP application).  For this reason it is often not a
-   good idea to use the same name as the Current domain of the
-   NDFs listed in the IN parameter.  A suitable value might be the
-   name of the instrument from which the NDFs are derived.
+   the frames written out to the AST file.  It is a good idea
+   to choose a value which is not likely to exist previously
+   in the WCS components of the NDFs to which ASTFILE will be
+   applied.  A suitable value might be the name of the
+   instrument from which the NDFs are obtained.
 
    Note that the frames which are written to the AST file are the
    Current frames of the NDFs supplied; this parameter only gives
@@ -376,6 +383,14 @@ astexp "im1,im2,im3" astfile=camera.ast baseframe=PIXEL
    the NDFs from the three different chips must be listed in the
    same order as when this command was invoked.  The title of the
    output Current frame will be as given.
+
+astexp r10595[2,3,4,5] wfc.ast outdomain=WFC
+       idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA
+   This exports the alignment information from the four named
+   NDFs to a file wfc.ast.  The CHIPNAME FITS header identifies
+   the source CCD for each, and the ROTSKYPA FITS header gives
+   a number of degrees to rotate each frame additional to the
+   relative alignment information.
 2 Notes
 AST file format:
    The AST file is designed to be written by ASTEXP and read by
@@ -387,30 +402,71 @@ AST file format:
    are to be undertaken.  The format of the file is explained
    here.
 
-   The AST file consists of a sequence of framesets.  Each
-   frameset has an ID, and contains two frames (a Base frame and
-   a Current frame) and a mapping between them.  The domains of
-   all the Base frames should normally be the same, and likewise
-   for all the Current frames.  For the NDFs to which the file
-   will be applied by ASTIMP, their WCS components should contain
-   frames in the same domain as the AST file's Base frame.
+   The AST file consists of the following, in order:
 
-   The ID of each frameset is used to determine, for each NDF,
-   which of the framesets in the file should be applied to it.
-   This ID is a string which can assume one of the followin forms:
+      <global modifiers>
+      (blank line)
+      <frameset 1>
+      <frameset 1 modifiers>
+      (blank line)
+      <frameset 1>
+      <frameset 2 modifiers>
+      (blank line)
+        ...
+      (end of file)
 
-   -  "FITSID KEY VALUE"
-         This will match an NDF if the first FITS header card
-         with the keyword KEY has the value VALUE.  If the value
-         is of type CHARACTER it must be in single quotes. KEY
-         may be compound (of the form keyword1.keyword2 etc) to
-         permit reading of hierarchical keywords.
+   Characters after a '#' character are normally ignored.  The
+   constituent parts are composed as follows:
 
-   -  "INDEX N"
-         This associates a frameset with an integer N.  Usually
-         N will take the values 1,2,3,... for the framesets
-         in the file.  Typically the N'th NDF in a list will
-         match the one with an ID of "INDEX N".
+   Blank line:
+      A single blank line, which may contain spaces but no comments.
+
+   Frameset:
+      The framesets are written in AST native format, as explained
+      in SUN/210.
+
+      Each frameset has an ID, and contains two frames (a Base
+      frame and a Current frame) and a mapping between them.
+      The domains of all the Base frames should normally be the
+      same, and likewise for all the Current frames.  For the
+      NDFs to which the file will be applied by ASTIMP, their
+      WCS components should contain frames in the same domain
+      as the AST file's Base frame.
+
+      The ID of each frameset is used to determine, for each NDF,
+      which of the framesets in the file should be applied to it.
+      This ID is a string which can assume one of the following
+      forms:
+
+      -  "FITSID KEY VALUE"
+            This will match an NDF if the first FITS header card
+            with the keyword KEY has the value VALUE.  If the
+            value is of type CHARACTER it must be in single
+            quotes. KEY may be compound (of the form
+            keyword1.keyword2 etc) to permit reading of
+            hierarchical keywords.
+
+      -  "INDEX N"
+            This associates a frameset with an integer N.
+            Usually N will take the values 1,2,3,... for the
+            framesets in the file.  Typically the N'th NDF in a
+            list will match the one with an ID of "INDEX N".
+
+   Modifiers:
+      Modifiers describe additional modifications to be made
+      to the framesets on import.  They are of the form
+
+         USE keyword arguments
+
+      Currently the only modifier defined is FITSROT, which
+      defines the name of a FITS header which specifies how
+      many degrees to rotate the image before use.  This
+      rotation is carried out after the mapping defined by
+      the frameset itself.
+
+      Global modifiers affect all NDFs processed with the AST
+      file.  Frameset modifiers affect only those NDFs which
+      correspond to their frameset.
 
    Rigorous error checking of the AST file is not performed, so
    that unhelpful modifications to the WCS components of the
@@ -452,22 +508,21 @@ Usage:
 
 Description:
 
-   This task reads AST FrameSet information from a suitable file
+   This task reads alignment information from an AST file
    and uses it to modify the WCS components of the given NDFs.
    A frame in a new domain is added (the same for each NDF) within
-   which a set of NDFs can be aligned.  This alignment may be used to
-   assist FINDOFF in registering the images, or as a substititute
-   for performing registration by matching objects.  The newly
-   added domain is made the Current domain of the WCS components.
-
-   AST files for use by this application are intended to be those
-   written by the ASTEXP application, but with care frameset files
-   written from other applications or doctored by hand could be used.
+   which a set of NDFs can be aligned.  The newly added domain
+   is made the Current domain of the WCS components.
 
    If the WCS component of the NDF has a frame whose Domain has
    the same value as that of the Current frame of the frameset
    being imported, it will be overwritten, and a warning message
    issued.
+
+   AST files for use by this application will normally be those
+   written by the ASTEXP application, and may either be standard
+   ones designed for use with a particular instrument, or prepared
+   by the user.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 ASTFILE
@@ -482,6 +537,15 @@ ASTFILE = LITERAL (Read)
    written by other applications or doctored by hand, if this
    is done with care, and with knowledge of AST objects (SUN/210).
    The format of the file is explained in the Notes section.
+3 FITSROT
+FITSROT = LITERAL (Read)
+   The name of a FITS header whose value is an angle through
+   which all the imported frames should be rotated.  This
+   rotation is done after the mappings given in the AST file
+   itself have been applied.  If this parameter is supplied it
+   overrides any value given in the modification parts of the
+   AST file.
+   [!]
 3 IN
 IN = LITERAL (Read)
    A list of NDF names whose WCS components are to be modified
@@ -496,12 +560,11 @@ INDICES( * ) = _INTEGER (Read)
    each NDF, what its index number is.  Thus if only one NDF is
    given in the IN list, and the value of INDICES is [3], then
    the frameset with the identifier 'INDEX 3' will be chosen.
-   Its default value is a list with the appropriate number of
-   elements starting 1,2,3,...  This default will normally be
-   appropriate unless the NDFs are being presented in an unusual
-   order, i.e. different from that in which they were presented
-   to ASTEXP when generating the AST file.
-   [Dynamic: 1,2,3,...]
+   If set null (!) the NDFs will be considered in the order
+   1,2,3,... which will be appropriate unless the NDFs are being
+   presented in a different order from that in which they were
+   presented to ASTEXP when generating the AST file.
+   [!]
 3 INDOMAIN
 INDOMAIN = LITERAL (Read)
    The Domain name to be used for the Current frames of the
@@ -539,6 +602,12 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+3 ROT
+ROT = _DOUBLE (Read)
+   An angle through which all the imported frames should be
+   rotated.  This rotation is done after the mappings in the AST
+   file itself have been applied.
+   [0]
 2 Examples
 astimp data* camera.ast obs1
    This will apply the AST file "camera.ast" to all the NDFs in
@@ -568,30 +637,71 @@ AST file format:
    are to be undertaken.  The format of the file is explained
    here.
 
-   The AST file consists of a sequence of framesets.  Each
-   frameset has an ID, and contains two frames (a Base frame and
-   a Current frame) and a mapping between them.  The domains of
-   all the Base frames should normally be the same, and likewise
-   for all the Current frames.  For the NDFs to which the file
-   will be applied by ASTIMP, their WCS components should contain
-   frames in the same domain as the AST file's Base frame.
+   The AST file consists of the following, in order:
 
-   The ID of each frameset is used to determine, for each NDF,
-   which of the framesets in the file should be applied to it.
-   This ID is a string which can assume one of the followin forms:
+      <global modifiers>
+      (blank line)
+      <frameset 1>
+      <frameset 1 modifiers>
+      (blank line)
+      <frameset 1>
+      <frameset 2 modifiers>
+      (blank line)
+        ...
+      (end of file)
 
-   -  "FITSID KEY VALUE"
-         This will match an NDF if the first FITS header card
-         with the keyword KEY has the value VALUE.  If the value
-         is of type CHARACTER it must be in single quotes. KEY
-         may be compound (of the form keyword1.keyword2 etc) to
-         permit reading of hierarchical keywords.
+   Characters after a '#' character are normally ignored.  The
+   constituent parts are composed as follows:
 
-   -  "INDEX N"
-         This associates a frameset with an integer N.  Usually
-         N will take the values 1,2,3,... for the framesets
-         in the file.  Typically the N'th NDF in a list will
-         match the one with an ID of "INDEX N".
+   Blank line:
+      A single blank line, which may contain spaces but no comments.
+
+   Frameset:
+      The framesets are written in AST native format, as explained
+      in SUN/210.
+
+      Each frameset has an ID, and contains two frames (a Base
+      frame and a Current frame) and a mapping between them.
+      The domains of all the Base frames should normally be the
+      same, and likewise for all the Current frames.  For the
+      NDFs to which the file will be applied by ASTIMP, their
+      WCS components should contain frames in the same domain
+      as the AST file's Base frame.
+
+      The ID of each frameset is used to determine, for each NDF,
+      which of the framesets in the file should be applied to it.
+      This ID is a string which can assume one of the following
+      forms:
+
+      -  "FITSID KEY VALUE"
+            This will match an NDF if the first FITS header card
+            with the keyword KEY has the value VALUE.  If the
+            value is of type CHARACTER it must be in single
+            quotes. KEY may be compound (of the form
+            keyword1.keyword2 etc) to permit reading of
+            hierarchical keywords.
+
+      -  "INDEX N"
+            This associates a frameset with an integer N.
+            Usually N will take the values 1,2,3,... for the
+            framesets in the file.  Typically the N'th NDF in a
+            list will match the one with an ID of "INDEX N".
+
+   Modifiers:
+      Modifiers describe additional modifications to be made
+      to the framesets on import.  They are of the form
+
+         USE keyword arguments
+
+      Currently the only modifier defined is FITSROT, which
+      defines the name of a FITS header which specifies how
+      many degrees to rotate the image before use.  This
+      rotation is carried out after the mapping defined by
+      the frameset itself.
+
+      Global modifiers affect all NDFs processed with the AST
+      file.  Frameset modifiers affect only those NDFs which
+      correspond to their frameset.
 
    Rigorous error checking of the AST file is not performed, so
    that unhelpful modifications to the WCS components of the
@@ -2984,7 +3094,7 @@ Usage:
 
 Description:
 
-   This routine processes a list of images, locating and centroiding
+   This routine processes a list of NDFs, locating and centroiding
    image features (such as stars) which have groups of connected
    pixels above threshold values.
 
@@ -3001,8 +3111,8 @@ For information on individual parameters, select from the list below:
 3 AUTOTHRESH
 AUTOTHRESH = _LOGICAL (Read)
    If this parameter is TRUE then a threshold determined by
-   this routine for each of the images will be used. If FALSE then
-   you will be prompted for a threshold value for each image.
+   this routine for each of the NDFs will be used. If FALSE then
+   you will be prompted for a threshold value for each NDF.
    [TRUE]
 3 BINFRAC
 BINFRAC = _DOUBLE (Read)
@@ -3014,15 +3124,16 @@ BINFRAC = _DOUBLE (Read)
    mode estimates made from the histogram but decreases the
    accuracy.
    [2.5]
-3 IN
-3 COUNTS = _INTEGER (Write)
+3 COUNTS
+COUNTS = _INTEGER (Write)
    On exit this parameter contains a list of the number of objects
    detected in each input image. This may be useful in scripts
    where the values can be accessed using the KAPPA (SUN/95) PARGET
    command.
+3 IN
 IN = LITERAL (Read)
-   A list of image names which contain the data components to be
-   scanned for image features.  The image names should be separated
+   A list of NDF names which contain the data components to be
+   scanned for image features.  The NDF names should be separated
    by commas and may include wildcards.
 3 LOGFILE
 LOGFILE = FILENAME (Read)
@@ -3082,25 +3193,26 @@ OUTLIST = LITERAL (Read)
 
    These may be specified as list of comma separated names,
    using indirection if required, OR, as a single modification
-   element (of the input image names). The simplest modification
+   element (of the input NDF names). The simplest modification
    element is the asterisk "*" which means call each of the
-   output lists the same name as the corresponding input images
+   output lists the same name as the corresponding input NDFs
+   (but without the ".sdf" extension).
    So,
       IN > *
       OUTLIST > *
-   signifies that all the images in the current directory should be
+   signifies that all the NDFs in the current directory should be
    used and the output lists should have the same names.
 
    Other types of modification can also occur, such as,
       OUTLIST > *_objs.dat
-   which means call the position lists the same as the input images
+   which means call the position lists the same as the input NDFs
    but put "_objs.dat" after the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUTLIST > *|_debias|_images.dat|
    this replaces the string "_debias" with "_images.dat" in any
    of the output names.
 
-   If wildcarded names for the input images are used then is it
+   If wildcarded names for the input NDFs are used then is it
    recommended that wildcards are also used for the position list
    names (the order of input names is not guaranteed).
 
@@ -3109,8 +3221,9 @@ OUTLIST = LITERAL (Read)
    intensity information) and finally the mean intensity of
    pixels in the group.
    [*.DAT]
-3 OVERRIDE = _LOGICAL (Read)
-   If TRUE then it is not a fatal error to detect no objects on an 
+3 OVERRIDE
+OVERRIDE = _LOGICAL (Read)
+   If TRUE then it is not a fatal error to detect no objects on an
    image. In this case the output list of positions will not be
    written and the value in the COUNTS parameter will be set to 0.
    [FALSE]
@@ -3137,14 +3250,14 @@ THRESH = _DOUBLE (Read)
    features.  Connected pixel groups above this threshold form
    image features. This parameter is only used if the AUTOTHRESH
    parameter is set FALSE. In this case a value may be supplied
-   for each image which is being processed.
+   for each NDF which is being processed.
    [Dynamic default]
 3 TOUCH
 TOUCH = _LOGICAL (Read)
    If TRUE then pixel groups may contact the edges of the data
    array. Contact is defined as any pixel in the connected group
    of pixels being on the first or last column or row of the
-   actual data array (not including any image origin information).
+   actual data array (not including any NDF origin information).
    Setting this FALSE decreases the probability of incomplete
    pixel groups being centroided which would result in inaccurate
    positions.
@@ -3158,31 +3271,30 @@ USEPER = _LOGICAL (Read)
    [TRUE]
 2 Examples
 findobj in='*' minpix=10 outlist='*.find'
-   In this example FINDOBJ processes all the images in the current
+   In this example FINDOBJ processes all the NDFs in the current
    directory locating objects with connected pixel groups which
    have more than 9 pixels above the threshold.
 
-findobj '"image1,image2,image10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
+findobj '"ndf1,ndf2,ndf10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
         useper=false nsigma=3
    In this example FINDOBJ estimates the threshold using the mode
    value in the histogram of data values as an estimate of the
    background and the fit of a gaussian to this to estimate the
-   background standard deviation. The threshold used for each image
+   background standard deviation. The threshold used for each NDF
    is then 3 times the standard deviation above the estimated
    background.
 2 Notes
 - Threshold estimation.
 
-  FINDOBJ is optimised to determine a reliable detection
-  threshold and is not concerned with the accurate
-  determination of the background value on a frame (as it
-  performs no photometric measurements). For this reason the
-  histogram which it uses to determine the background value is
-  made in such a way that it is usually very well sampled
-  (probably oversampled, for most other purposes). FINDOBJ
-  should not be used in a manner for which it is not suited
-  without understanding how if differs from other more
-  specialized routines.
+  FINDOBJ is optimised to determine a reliable detection threshold
+  and is not concerned with the accurate determination of the
+  background value on a frame (as it performs no photometric
+  measurements). For this reason the histogram which it uses to
+  determine the background value is made in such a way that it is
+  usually very well sampled (probably oversampled, for most other
+  purposes). FINDOBJ should not be used in a manner for which it
+  is not suited without understanding how if differs from other
+  more specialized routines.
 
 - Histogram formation and gaussian fitting.
 
@@ -3195,13 +3307,13 @@ findobj '"image1,image2,image10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
   fixed peak value and position (the mode of the histogram) and
   iterates rejecting bins whose counts fall below 20 percent of
   the peak value, stopping when either 3 iterations have been
-  performed or the standard deviation does not change by more
-  than one bin width in data values.
+  performed or the standard deviation does not change by more than
+  one bin width in data values.
 
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input images are set to the names of the
+  (.MORE.CCDPACK) of the input NDFs are set to the names of the
   appropriate output lists. These items will be used by other
   CCDPACK position list processing routines to automatically
   access the lists.
@@ -3222,6 +3334,9 @@ findobj '"image1,image2,image10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
   considered as the same point. Comments may be included in the
   file using the characters # and !. Columns may be separated by
   the use of commas or spaces.
+
+  In all cases the coordinates in position lists are pixel
+  coordinates.
 2 Behaviour_of_parameters
    Most parameters retain their current value as default. The
    "current" value is the value assigned on the last run of the
@@ -3230,14 +3345,15 @@ findobj '"image1,image2,image10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
    The exceptions to this rule are:
 
       - THRESH   -- dynamic value
+
       - OVERRIDE -- always FALSE
 
    Retaining parameter values has the advantage of allowing you to
-   define the default behaviour of the application but does mean
-   that additional care needs to be taken when re-using the
-   application after a break of sometime. The intrinsic default
-   behaviour of the application may be restored by using the RESET
-   keyword on the command line.
+   define the default behaviour of the application but does mean that
+   additional care needs to be taken when re-using the application
+   after a break of sometime. The intrinsic default behaviour of the
+   application may be restored by using the RESET keyword on the
+   command line.
 
    Certain parameters (LOGTO and LOGFILE) have global values. These
    global values will always take precedence, except when an
@@ -3254,6 +3370,18 @@ PDRAPER: Peter Draper (STARLINK)
 
  6-OCT-1995 (PDRAPER):
     Updated for CCDPACK 2.0.
+
+ 25-APR-1996 (PDRAPER):
+    Added trap and error message for situation when no pixels
+    are above the threshold.
+
+ 3-MAR-1997 (PDRAPER):
+    Removed top-level locator control (foreign data access upgrades).
+
+ 12-NOV-1998 (PDRAPER):
+    Changed to write the output parameter COUNTS and to add the
+    ability to continue after not finding objects on a frame (added
+    for ORAC-DR)
 2 Implementation_Status
    - This routine correctly processes the DATA and QUALITY components
      of an NDF data structure. Bad pixels and all non-complex numeric
@@ -3270,8 +3398,11 @@ Description:
 
    This routine is designed to determine which positions in many
    unaligned and unlabeled lists match, subject to the condition
-   that the transformations between the lists are well modelled by
-   simple translations.
+   that the transformations between the lists are well modeled by
+   simple translations.  Although the representation of the positions
+   in the lists themselves is in pixel coordinates, the lists may
+   be related by translations in the Current frames of the WCS
+   components of the associated NDFs.
 
    The results from this routine are labelled position lists (one
    for each input list) which may be used to complete image
@@ -3295,7 +3426,8 @@ ERROR = _DOUBLE (Read)
    The error in the X and Y positions. This value is used to
    determine which positions match within an error box (SLOW) or
    as a bin size (FAST). An inaccurate value may result in
-   excessive false or null matches.
+   excessive false or null matches.  This value is in the Current
+   coordinate frame if USEWCS is true.
    [1.0]
 3 FAILSAFE
 FAILSAFE = _LOGICAL (Read)
@@ -3356,8 +3488,8 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 MAXDISP
 MAXDISP = _DOUBLE (Read)
-   This parameter gives the maximum acceptable displacement in
-   pixels between the original alignment of the NDFs and the
+   This parameter gives the maximum acceptable displacement
+   between the original alignment of the NDFs and the
    alignment in which the objects are matched.  If frames have
    to be displaced more than this value to obtain a match, the
    match is rejected.  This will be of use when USEWCS is set
@@ -3366,7 +3498,8 @@ MAXDISP = _DOUBLE (Read)
    expected inaccuracy in that alignment.  If null, arbitrarily
    large displacements are allowed, although note that a
    similar restriction is effectively imposed by setting the
-   RESTRICT parameter.
+   RESTRICT parameter.  The value of this parameter is in the
+   units of the Current frame if USEWCS is true.
    [!]
 3 MINMATCH
 MINMATCH = _INTEGER (Read)
@@ -3384,6 +3517,8 @@ MINSEP = _DOUBLE (Read)
    within the error box of other positions. The value of this
    parameter controls how close objects may be before they are
    both rejected (this occurs before pattern-matching).
+   This value is in pixel coordinates, regardless of the value of
+   USEWCS.
    [Dynamic -- 5.0*ERROR]
 3 NAMELIST
 NAMELIST = LITERAL (Read)
@@ -3435,20 +3570,30 @@ OVERRIDE = LOGICAL (Read)
    incomplete solution. Such solutions will result when only a
    subset of the input position lists have been matched.
 
-   This situation would ideally indicate that one, or more, of the
-   input lists are from positions not coincident with the others,
-   in which case it is perfectly legimate to proceed, however, the
-   more likely scenario is that they have too few positions and
-   have consequently been rejected.
+   In this case, if the associating position lists with NDFs option
+   has been chosen, then any NDFs for which matching was not
+   achieved will have their associated position lists removed
+   from their .MORE.CCDPACK extensions.  Thus after running
+   FINDOFF with OVERRIDE set to TRUE, any position list associated
+   with an NDF is guaranteed to be one which has been matched, and
+   not just one left over from the previously associated unmatched
+   list.
+
+   Incomplete matching would ideally indicate that one, or more,
+   of the input lists are from positions not coincident with the
+   others, in which case it is perfectly legimate to proceed.
+   However, it is equally possible that they have too few positions
+   and have consequently been rejected.
    [TRUE]
 3 RESTRICT
 RESTRICT = LOGICAL (Read)
-   This parameter determines whether the mapping between coordinate
-   systems of NDF pairs is used to restrict the choice of objects
-   to match with each other.  If set TRUE, then only objects
-   which would appear in the overlap of two frames if the
-   mapping determined by the WCS components of each NDF pair
-   were accurate are tested for matching.  If it is set FALSE, then
+   This parameter determines whether the Current coordinate frame
+   is used to restrict the choice of objects to match with each
+   other.  If set TRUE, then the only objects which are
+   considered for matching are those which would appear in
+   the overlap of two frames given that their PIXEL-domain to
+   Current frame mapping is exact, and that these frames refer
+   to the same coordinate space.  If it is set FALSE, then
    no such restriction is made.
 
    This parameter should therefore be set TRUE if the translational
@@ -3470,28 +3615,18 @@ USECOM = LOGICAL (Read)
    [TRUE]
 3 USEWCS
 USEWCS = LOGICAL (Read)
-   This parameter specifies whether the World Coordinate System
-   information in the NDF should be used to make guesses about
-   how to align the frames.  If set true, and if a mapping
-   between the coordinates of each pair of NDFs can be found in
-   the domain of the Current coordinate frame of either of the pair
-   then this mapping is applied before the match is attempted.
-   Additionally, if the parameter RESTRICT is TRUE, the objects
-   chosen for matching up between each pair of images are only
-   those which would overlap in that pair if the WCS coordinate
-   information in both NDFs were accurate.  No other restriction
-   is made on the basis of this information however.  Since the
-   algorithms rely on shifting images in the X and Y directions
-   therefore, they will be capable of matching up objects even if
-   there is a significant (if RESTRICT is TRUE) or an arbitrarily
-   large (if RESTRICT is FALSE) translational error in the
-   coordinate system of the chosen domain, but other large errors
-   in the mapping (e.g. rotational alignment) will not be
-   tolerated.
-
-   If this parameter is set FALSE, then object matching proceeds
-   on the assumption that the coordinate frames of all NDFs
-   are the same apart from a translation.
+   This parameter specifies whether the coordinates in the
+   position lists should be transformed from Pixel coordinates
+   into the coordinates of the Current frame of the WCS
+   component of the associated NDF before use.  FINDOFF can only
+   match objects between frames which are related by a simple
+   translation (shift in X and Y), so if the pixel coordinates
+   of the NDFs are related by a more complicated transformation
+   it is necessary to encode this information in the WCS
+   components of the NDFs (or resample the images first).
+   If the Current frame of the WCS component is related to the
+   Pixel frame by a translation, the setting of this parameter
+   is usually unimportant (but see also the RESTRICT parameter).
 
    This parameter is ignored if NDFNAMES is false.
    [TRUE]
@@ -3499,14 +3634,14 @@ USEWCS = LOGICAL (Read)
 findoff inlist='*' error=1 outlist='*.off'
    In this example all the NDFs in the current directory are
    accessed and their associated position lists are used.
-   Before object matching is attempted any transformations
-   implied by aligning the images in the Current frames
-   of the NDFs' WCS components are applied to the position list
-   coordinates.  The matched position lists are named *.off.
-   The method used is to try the FAST algorithm, switching to SLOW
-   if FAST fails. The completeness measure is used when forming
-   the spanning tree.  Matches with completenesses less than
-   0.5 and or with less than three positions, are rejected.
+   The coordinates used for object matching are those in the
+   position lists transformed into the Current frames of the
+   WCS components of the NDFs.  The matched position lists are
+   named *.off.  The method used is to try the FAST algorithm,
+   switching to SLOW if FAST fails. The completeness measure
+   is used when forming the spanning tree.  Matches with
+   completenesses less than 0.5 and or with less than three
+   positions, are rejected.
 
 findoff fast nofailsafe
    In this example the only the FAST algorithm is used.
@@ -3540,7 +3675,8 @@ findoff inlist='data*' outlist='*.off' restrict minmatch=2
    can be found.  The NDFs have been initially aligned in the
    Current frames of their WCS components to an accuracy of 20
    or better.  As an additional safeguard, no objects within
-   30 pixels of each other in the same NDF are used for matching.
+   30 units (in coordinates of the Current frame) of each other
+   in the same NDF are used for matching.
 2 Notes
 - Position list formats.
 
@@ -3572,6 +3708,9 @@ findoff inlist='data*' outlist='*.off' restrict minmatch=2
   Comments may be included in a file using the characters "#" and
   "!". Columns may be separated by the use of commas or spaces.
 
+  In all cases, the coordinates in position lists are pixel
+  coordinates.
+
 - NDF extension items.
 
   If NDFNAMEs is TRUE then the names of the input position lists
@@ -3590,7 +3729,7 @@ findoff inlist='data*' outlist='*.off' restrict minmatch=2
    size when forming histograms.
 
    Which algorithm you should use depends on the number of points
-   your positions lists contain and the expected size of the overlaps
+   your position lists contain and the expected size of the overlaps
    between the datasets. Obviously it is much easier to detect two
    lists with most of their positions in common. With small overlaps
    a serious concern is the likelihood of finding a `false' match.
@@ -3699,6 +3838,10 @@ MBT: Mark Taylor (STARLINK)
  26-APR-1999 (MBT):
     Now erases .MORE.CCPACK.CURRENT_LIST component for unmatched
     NDFs.
+
+ 20-MAY-1999 (MBT):
+    Major changes to fix major misconceptions about the best way
+    for it to work.
 1 FLATCOR
 Divides a series of images by a flatfield
 
@@ -7018,6 +7161,8 @@ CLASS( ) = LITERAL (Read)
    See SUN/61 Appendix B for details of transformation
    classification and a table of classifications of common
    mappings.
+
+   This parameter is ignored unless OUTFORMAT=TRANSFORM.
 3 CLASSIFY
 CLASSIFY = _LOGICAL (Read)
    If TRUE then this indicates that you want to classify the
@@ -7027,6 +7172,8 @@ CLASSIFY = _LOGICAL (Read)
    in SUN/61 which should be consulted before using this option.
    Linear transformations are classified by this routine directly
    and do not use this parameter.
+
+   This parameter is ignored unless OUTFORMAT=TRANSFORM.
    [FALSE]
 3 FA-FZ
 FA-FZ = LITERAL (Read)
@@ -7042,6 +7189,8 @@ FA-FZ = LITERAL (Read)
       YINV > PA*SIND(FB/PA)*YY/FB
       FA > SQRT(X*X+Y*Y)
       FB > SQRT(XX*XX+YY*YY)
+
+   This parameter is ignored unless OUTFORMAT=TRANSFORM.
 3 FITTYPE
 FITTYPE = _INTEGER (Read)
    The type of fit which should be used when determining the
@@ -7174,8 +7323,8 @@ OUTFORMAT = LITERAL (Read)
                      .MORE.CCDPACK extension of the NDF
 
    If WCS is chosen, then a new frame, with a Domain value given
-   by OUTDOMAIN, is inserted into the WCS extension of the NDF
-   (a new WCS extension is created if none previously existed).
+   by OUTDOMAIN, is inserted into the WCS component of the NDF
+   (a new WCS component is created if none previously existed).
    A mapping between this and the 'PIXEL' domain is defined,
    which is the unit mapping in the case that the NDF in question
    is the reference set.  If any frame in the domain OUTDOMAIN
@@ -7227,6 +7376,20 @@ TRFILE = TRFILE (Read)
    If PLACEIN is given as "FILE" then the value of this parameter
    specifies the name of the container file to be used to store
    the resultant transformation structures.
+3 USEWCS
+USEWCS = _LOGICAL (Read)
+   This parameter specifies whether the coordinates in the
+   position lists should be transformed from Pixel coordinates
+   into the coordinates of the Current frame of the WCS
+   component of the associated NDF before use.  It should
+   normally be set TRUE, in which case the transformation type
+   set by the FITTYPE parameter is the type which will be fit
+   between the Current coordinate frames of the NDFs.
+   Otherwise the fit will be between the Pixel coordinate
+   frames.
+
+   This parameter is ignored if NDFNAMES is not TRUE.
+   [TRUE]
 3 XFOR
 XFOR = LITERAL (Read)
    If FITTYPE=6 then this parameter specifies the parameterised
@@ -7286,11 +7449,13 @@ register inlist='*' fittype=1
    In this example all the NDFs in the current directory are
    accessed and their associated position lists are opened.
    A global fit between all the datasets is then performed
-   which results in estimates for the offsets from the first input
-   NDF's position.  The results are then coded as new frames,
-   given the domain name 'CCD_REG' in the WCS component of the
-   NDFs.  Actual registration of the images can then be achieved
-   by aligning all the NDFs in the CCD_REG domain.
+   which results in estimates for the offsets from the first
+   input NDF's position.  These offsets are between the Current
+   coordinate frames of the NDFs.  The results are then coded
+   as new frames, with the domain name 'CCD_REG', in the WCS
+   component of the NDFs.  Actual registration of the images
+   can then be achieved by aligning all the NDFs in the CCD_REG
+   domain.
 
 register inlist='*' trtype=5 outdomain=result-set1
    This example works as above but this time the global
@@ -7302,7 +7467,8 @@ register inlist='"myndf1,myndf2"' fittype=4 refpos=2
    In this example a solid body fit is performed between the
    position lists associated with the NDFs myndf1 and myndf2.
    The reference positions are chosen to be those associated with
-   myndf2.
+   myndf2, so that the CCD_REG frame coordinates will be the
+   same as the Current frame in NDF myndf2.
 
 register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
    In this example the position lists associated with the NDFs
@@ -7321,7 +7487,7 @@ register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
 
 register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
          yfor='pe+pf*x+pg*y+ph*x*y'
-   In this example an non-linear transformation is fit between the
+   In this example a non-linear transformation is fit between the
    positions associated with the NDFs ndf1 and ndf2. This analysis
    may help in determining whether a 6-parameter fit is good
    enough, or if you just want to transform positions. A problem
@@ -7374,6 +7540,9 @@ register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
   Files with EXTERNAL format may be used with this application but
   all positions have to be present in all lists, no missing
   positions are allowed.
+
+  In all cases, the coordinates in position lists are pixel
+  coordinates.
 
 - NDF extension items.
 
@@ -7439,6 +7608,9 @@ MBT: Mark Taylor (STARLINK)
 
  11-MAR-1999 (MBT):
     Changed to use WCS components as well as TRANSFORM structures.
+
+ 21-MAY-1999 (MBT):
+    Added USEWCS parameter.
 1 SCHEDULE
 Schedules an automated CCDPACK reduction.
 
@@ -7819,6 +7991,9 @@ FRAMEOUT = LITERAL (Read)
 
    - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
      (see section "Sky Co-ordinate Systems" in SUN/95).
+
+   - Null (!), indicating the Current frame.
+   [!]
 3 INEXT
 INEXT = _LOGICAL (Read)
    If NDFNAMES is TRUE and the transformation is to be specified
@@ -8038,15 +8213,13 @@ YFOR = LITERAL (Read)
    "X" and "Y".
 2 Examples
 tranlist inlist='*' outlist='*.reg' trtype=wcs framein=pixel
-         frameout=ccd_reg
    In this example all the NDFs in the current directory are
    accessed and their associated position lists are opened.
    The WCS component of each NDF is used to transform the
    coordinates in the position lists from pixel coordinates to
-   coordinates in the frame with a domain 'CCD_REG' (the
-   domain written by default by the REGISTER program).  The
-   output lists are called ndf-name.reg and are associated
-   with the NDFs.
+   coordinates in the Current coordinate frame.  The output
+   lists are called ndf-name.reg and are associated with the
+   NDFs.
 
 tranlist inlist='*' outlist='*.tran' trtype=struct forward=false
    In this example transform structures in each of the NDFs in
@@ -8428,9 +8601,9 @@ Usage:
 
 Description:
 
-   This task performs a set of miscellaneous modifications to the
-   WCS (World Coordinate System) components of a list of NDFs.
-   According to the MODE parameter it can:
+   This task performs one of a set of modifications to the WCS
+   (World Coordinate System) components of a list of NDFs.
+   According to the value of the MODE parameter it will:
 
       -  Set the Current frame
 
@@ -8438,13 +8611,11 @@ Description:
 
       -  Remove a frame
 
+      -  Set an attribute for a frame
+
    The routine does not fail if some of the requested edits cannot
    be performed, but an output parameter MODIFIED records which
    NDFs were successfully modified.
-
-   If a new frame is added it becomes the Current frame.  If a frame
-   is removed, the Current frame is not changed (unless the Current
-   frame itself is removed).
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COEFFS
@@ -8455,14 +8626,16 @@ COEFFS( * ) = _DOUBLE (Read)
    value of MAPTYPE:
 
       -  UNIT       -- No values are required
+           X' = X
+           Y' = Y
 
       -  LINEAR     -- Six values C1-C6 are required:
            X' = C1 + C2 * X + C3 * Y
            Y' = C4 + C5 * X + C6 * Y
 
       -  PINCUSHION -- Three values C1-C3 are required:
-           X' = X * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
-           Y' = Y * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
+           X' = X + C1 * (X - C2) * ( (X - C2)**2 + (Y - C3)**2 ) )
+           Y' = Y + C1 * (Y - C3) * ( (X - C2)**2 + (Y - C3)**2 ) )
 3 DOMAIN
 DOMAIN = LITERAL (Read)
    If MODE is ADD this gives the domain name to be used for the
@@ -8470,6 +8643,7 @@ DOMAIN = LITERAL (Read)
    folded to upper case.  If the new frame is successfully added
    and any frame with the same domain name already exists, it
    will be removed, and a message will be printed to that effect.
+   [CCD_WCSEDIT]
 3 EPOCH
 EPOCH = _DOUBLE (Read)
    If a "Sky Co-ordinate System" specification is supplied (using
@@ -8492,8 +8666,11 @@ FRAME = LITERAL (Read)
                            that domain will be removed.
 
       -  MODE = ADD     -- The new frame will be a copy of the
-                           basis frame, and will be mapped from it
-                           using the mapping given.
+                           basis frame (though Domain and Title
+                           will be changed), and will be mapped
+                           from it using the mapping given.
+
+      -  MODE = SET     -- The frame whose attributes are to be set
 
    The value of this parameter can be one of the following:
 
@@ -8504,12 +8681,20 @@ FRAME = LITERAL (Read)
 
       -  A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
          (see section "Sky Co-ordinate Systems" in SUN/95).
-   A domain name is usually the most suitable choice.
+
+      - The Null (!) value; in this case the Current frame is used.
+   A domain name, or !, is usually the most suitable choice.
+   [!]
 3 IN
 IN = LITERAL (Read)
    A list specifying the names of the NDFs whose WCS components
    are to be modified.  The NDF names should be separated by
    commas and may include wildcards.
+3 INVERT
+INVERT = _LOGICAL (Read)
+   If set TRUE the mapping defined by COEFFS will be applied in
+   the reverse direction.
+   [FALSE]
 3 LOGFILE
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -8562,7 +8747,11 @@ MODE = LITERAL (Read)
 
       -  CURRENT  -- Set the Current frame
 
-      -  REMOVE   -- Remove a frame
+      -  REMOVE   -- Remove a frame (Current frame is not changed
+                     unless the Current one is removed)
+
+      -  SET      -- Set frame attributes (Current frame is not
+                     changed)
    [CURRENT]
 3 MODIFIED
 MODIFIED = LITERAL (Write)
@@ -8570,6 +8759,11 @@ MODIFIED = LITERAL (Write)
    NDFs which were successfully modified.  In particular, if MODE
    is CURRENT, this list will include all the NDFs which contained
    the specified frame, but exclude any which did not.
+3 SET
+SET = LITERAL (Read)
+   If MODE is SET, then this gives a string of the form
+   "attribute=value" which is to be applied to the frame.  The
+   string is passed straight to the AST_SET routine (see SUN/210).
 2 Examples
 wcsedit * current ccd_reg
    This sets the current frame of all the NDFs in the current
@@ -8581,7 +8775,7 @@ wcsedit data* remove frame=4
    The fourth frame in the WCS component of each NDF 'data*.sdf'
    is removed.
 
-wcsedit "first,second" mode=add frame=GRID maptype=pcd
+wcsedit "first,second" mode=add frame=GRID maptype=pincushion
         coeffs=[-6.8e-10,0,0] domain=NEW
    A new frame, in the domain 'NEW', is added to the NDFs first
    and second.  It is connected to the previously existing GRID
@@ -8589,6 +8783,11 @@ wcsedit "first,second" mode=add frame=GRID maptype=pcd
    origin with a distortion coefficient of -6.8e-10.  If any
    frames with domain NEW already exist in those NDFs they are
    removed.
+
+wcsedit ndf1 set ! set="domain=NEW,title=New frame"
+   This changes the value of the Domain attribute of the current
+   frame in the WCS component of NDF1 to the name "NEW" and
+   sets the Title attribute of the frame to "New frame".
 2 Notes
 This routine provides similar functionality to that provided by
 KAPPA applications WCSADD, WCSREMOVE and WCSFRAME, but allows
@@ -8605,13 +8804,13 @@ Aligns NDFs using multiple frames from their WCS components.
 
 Usage:
 
-   WCSREG in domainlist
+   WCSREG in domains
 
 Description:
 
    This application takes a set of NDFs which have World Coordinate
    System (WCS) components, and tries to align them all according
-   to an ordered list of frame domains.  If successful, it adds a
+   to a given list of frame domains.  If successful, it adds a
    new frame to the WCS component of each within which they are
    all aligned.  The TRANLIST or TRANNDF applications can then be
    used on the resulting NDFs.
@@ -8624,7 +8823,7 @@ Description:
    of alignment types where first choices are not available.
 
    The application operates on a set of NDFs, IN.  A list of
-   domains DOMAINLIST within which to align, in order of preference,
+   domains DOMAINS within which to align, in order of preference,
    is specified, and a reference NDF is denoted by REFPOS.  On
    successful completion, a new frame (which becomes Current), with
    a domain given by OUTDOMAIN (default CCD_WCSREG) is added to
@@ -8636,17 +8835,18 @@ Description:
    program attempts to find a mapping from the reference NDF to it.
    If it and the reference NDF do not share frames in any of the
    domains given by the DOMAINS parameter, it will try to use the
-   WCS components of intermediate NDFs to find a path between them,
-   using only the domains given.  The shortest available path which
-   provides a link is chosen, and if there is more than one which
+   WCS components of intermediate NDFs to find a path between them;
+   this path is a subgraph of a graph in which the nodes are the
+   NDFs and an edge exists between two nodes if the NDFs share a
+   domain in the given list.  The shortest available path which
+   connects a pair is chosen, and if there is more than one which
    meets this criterion, one which uses domains nearest the head of
    the list is preferred.
 
-   If there is no path from the reference NDF to one of the other
-   NDFs using the domains given, then no new frame will be written
-   to that NDF (and a message indicating failure will be output),
-   but any previously existing frames in the output domain will
-   be removed.
+   If the graph is not fully connected, a list of the existing
+   subgraphs is output, and the program will normally terminate,
+   however it can be made to continue with registration of the
+   connected NDFs by setting the OVERRIDE parameter.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 DOMAINS
@@ -8720,10 +8920,10 @@ OVERRIDE = _LOGICAL (Read)
 3 REFPOS
 REFPOS = _INTEGER (Read)
    The position within the IN list which corresponds to the
-   reference NDF.  For each domain in DOMAINLIST, alignment will
+   reference NDF.  For each domain in DOMAINS, alignment will
    be attempted with the reference NDF first, and the mapping
    between the output frame and the first matching name in
-   DOMAINLIST is a unit mapping.
+   DOMAINS is a unit mapping.
    [1]
 2 Examples
 wcsreg * "ccd_reg,sky"
@@ -8745,7 +8945,7 @@ wcsreg * "ccd_reg,sky"
    resampling prior to making a mosaic.
 
 wcsreg "obs1_*,obs2_*" outdomain=final
-       domainlist="ccd_reg,inst_obs1,inst_obs2"
+       domains="ccd_reg,inst_obs1,inst_obs2"
    NDFs with names starting 'obs1_' and 'obs2_' are aligned.
    Where they share the CCD_REG domain this will be used for
    alignment, but otherwise the domains INST_OBS1 and INST_OBS2

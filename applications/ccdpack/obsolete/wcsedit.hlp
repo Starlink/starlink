@@ -1,6 +1,6 @@
 .help wcsedit Starlink ccdpack
 .nf
-Modify WCS component of a set of NDFs.
+Modifies WCS components of a set of NDFs.
 
 Usage:
 
@@ -8,15 +8,21 @@ Usage:
 
 Description:
 
-   This task performs a set of miscellaneous modifications to the
-   WCS (World Coordinate System) components of a list of NDFs.
-   According to the MODE parameter it can
+   This task performs one of a set of modifications to the WCS
+   (World Coordinate System) components of a list of NDFs.
+   According to the value of the MODE parameter it will:
 
-      - Set the Current frame
+      -  Set the Current frame
 
-      - Add a new frame
+      -  Add a new frame
 
-      - Remove a frame
+      -  Remove a frame
+
+      -  Set an attribute for a frame
+
+   The routine does not fail if some of the requested edits cannot
+   be performed, but an output parameter MODIFIED records which
+   NDFs were successfully modified.
 
 Parameters
 
@@ -24,30 +30,33 @@ For information on individual parameters, select from the list below:
 
 COEFFS
 
-COEFFS( * ) = _DOUBLE
+COEFFS( * ) = _DOUBLE (Read)
    If MODE is ADD, this parameter is a list of the coefficients
    used for the mapping from the basis frame to the new frame.
    Its meaning and the number of values required depend on the
    value of MAPTYPE:
 
       -  UNIT       -- No values are required
+           X' = X
+           Y' = Y
 
       -  LINEAR     -- Six values C1-C6 are required:
            X' = C1 + C2 * X + C3 * Y
            Y' = C4 + C5 * X + C6 * Y
 
       -  PINCUSHION -- Three values C1-C3 are required:
-           X' = X * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
-           Y' = Y * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
+           X' = X + C1 * (X - C2) * ( (X - C2)**2 + (Y - C3)**2 ) )
+           Y' = Y + C1 * (Y - C3) * ( (X - C2)**2 + (Y - C3)**2 ) )
 
 DOMAIN
 
 DOMAIN = LITERAL (Read)
    If MODE is ADD this gives the domain name to be used for the
    new frame.  Spaces in the name are ignored and letters are
-   folded to upper case.  If any frame with the same domain
-   name already exists, it will be removed, and a message will
-   be printed to that effect.
+   folded to upper case.  If the new frame is successfully added
+   and any frame with the same domain name already exists, it
+   will be removed, and a message will be printed to that effect.
+   [CCD_WCSEDIT]
 
 EPOCH
 
@@ -64,21 +73,35 @@ EPOCH = _DOUBLE (Read)
 FRAME
 
 FRAME = LITERAL (Read)
-   This parameter specifies the frame to be made current (if
-   MODE is CURRENT) or removed (if MODE is REMOVE), or to serve
-   as the "basis" frame - the one relative to which the new frame
-   is added (if MODE is ADD).
+   This parameter specifies the 'basis frame', which has the
+   following meaning according to the value of the MODE parameter:
+
+      -  MODE = CURRENT -- The frame to be made Current
+
+      -  MODE = REMOVE  -- The frame to remove; if it is a domain
+                           name (see below) then all frames with
+                           that domain will be removed.
+
+      -  MODE = ADD     -- The new frame will be a copy of the
+                           basis frame (though Domain and Title
+                           will be changed), and will be mapped
+                           from it using the mapping given.
+
+      -  MODE = SET     -- The frame whose attributes are to be set
 
    The value of this parameter can be one of the following:
 
-   - A domain name such as SKY, AXIS, PIXEL, etc.
+      -  A domain name such as SKY, AXIS, PIXEL, etc.
 
-   - An integer value giving the index of the required Frame
-     within the WCS component.
+      -  An integer value giving the index of the required Frame
+         within the WCS component.
 
-   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
-     (see section "Sky Co-ordinate Systems" in SUN/95).
-   A domain name is usually the most suitable choice.
+      -  A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
+         (see section "Sky Co-ordinate Systems" in SUN/95).
+
+      - The Null (!) value; in this case the Current frame is used.
+   A domain name, or !, is usually the most suitable choice.
+   [!]
 
 IN
 
@@ -86,6 +109,13 @@ IN = LITERAL (Read)
    A list specifying the names of the NDFs whose WCS components
    are to be modified.  The NDF names should be separated by
    commas and may include wildcards.
+
+INVERT
+
+INVERT = _LOGICAL (Read)
+   If set TRUE the mapping defined by COEFFS will be applied in
+   the reverse direction.
+   [FALSE]
 
 LOGFILE
 
@@ -129,11 +159,11 @@ MAPTYPE = LITERAL (Read)
    type of mapping which connects the basis frame to the new frame.
    It may take one of the following values:
 
-      - UNIT
+      -  UNIT
 
-      - LINEAR
+      -  LINEAR
 
-      - PINCUSHION
+      -  PINCUSHION
    [UNIT]
 
 MODE
@@ -142,11 +172,15 @@ MODE = LITERAL (Read)
    The action to be performed.  It may take one of the following
    values:
 
-      - ADD      -- Add a new frame
+      -  ADD      -- Add a new frame (which becomes Current)
 
-      - CURRENT  -- Set the Current frame
+      -  CURRENT  -- Set the Current frame
 
-      - REMOVE   -- Remove a frame
+      -  REMOVE   -- Remove a frame (Current frame is not changed
+                     unless the Current one is removed)
+
+      -  SET      -- Set frame attributes (Current frame is not
+                     changed)
    [CURRENT]
 
 MODIFIED
@@ -156,6 +190,13 @@ MODIFIED = LITERAL (Write)
    NDFs which were successfully modified.  In particular, if MODE
    is CURRENT, this list will include all the NDFs which contained
    the specified frame, but exclude any which did not.
+
+SET
+
+SET = LITERAL (Read)
+   If MODE is SET, then this gives a string of the form
+   "attribute=value" which is to be applied to the frame.  The
+   string is passed straight to the AST_SET routine (see SUN/210).
 
 Examples
 
@@ -169,7 +210,7 @@ wcsedit data* remove frame=4
    The fourth frame in the WCS component of each NDF 'data*.sdf'
    is removed.
 
-wcsedit "first,second" mode=add frame=GRID maptype=pcd
+wcsedit "first,second" mode=add frame=GRID maptype=pincushion
         coeffs=[-6.8e-10,0,0] domain=NEW
    A new frame, in the domain 'NEW', is added to the NDFs first
    and second.  It is connected to the previously existing GRID
@@ -177,6 +218,11 @@ wcsedit "first,second" mode=add frame=GRID maptype=pcd
    origin with a distortion coefficient of -6.8e-10.  If any
    frames with domain NEW already exist in those NDFs they are
    removed.
+
+wcsedit ndf1 set ! set="domain=NEW,title=New frame"
+   This changes the value of the Domain attribute of the current
+   frame in the WCS component of NDF1 to the name "NEW" and
+   sets the Title attribute of the frame to "New frame".
 
 Notes
 

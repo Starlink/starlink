@@ -100,6 +100,9 @@ FRAMEOUT = LITERAL (Read)
    - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
      (see section "Sky Co-ordinate Systems" in SUN/95).
 
+   - Null (!), indicating the Current frame.
+   [!]
+
 INEXT
 
 INEXT = _LOGICAL (Read)
@@ -348,15 +351,13 @@ YFOR = LITERAL (Read)
 Examples
 
 tranlist inlist='*' outlist='*.reg' trtype=wcs framein=pixel
-         frameout=ccd_reg
    In this example all the NDFs in the current directory are
    accessed and their associated position lists are opened.
    The WCS component of each NDF is used to transform the
    coordinates in the position lists from pixel coordinates to
-   coordinates in the frame with a domain 'CCD_REG' (the
-   domain written by default by the REGISTER program).  The
-   output lists are called ndf-name.reg and are associated
-   with the NDFs.
+   coordinates in the Current coordinate frame.  The output
+   lists are called ndf-name.reg and are associated with the
+   NDFs.
 
 tranlist inlist='*' outlist='*.tran' trtype=struct forward=false
    In this example transform structures in each of the NDFs in

@@ -8,22 +8,21 @@ Usage:
 
 Description:
 
-   This task reads AST FrameSet information from a suitable file
+   This task reads alignment information from an AST file
    and uses it to modify the WCS components of the given NDFs.
    A frame in a new domain is added (the same for each NDF) within
-   which a set of NDFs can be aligned.  This alignment may be used to
-   assist FINDOFF in registering the images, or as a substititute
-   for performing registration by matching objects.  The newly
-   added domain is made the Current domain of the WCS components.
-
-   AST files for use by this application are intended to be those
-   written by the ASTEXP application, but with care frameset files
-   written from other applications or doctored by hand could be used.
+   which a set of NDFs can be aligned.  The newly added domain
+   is made the Current domain of the WCS components.
 
    If the WCS component of the NDF has a frame whose Domain has
    the same value as that of the Current frame of the frameset
    being imported, it will be overwritten, and a warning message
    issued.
+
+   AST files for use by this application will normally be those
+   written by the ASTEXP application, and may either be standard
+   ones designed for use with a particular instrument, or prepared
+   by the user.
 
 Parameters
 
@@ -43,6 +42,17 @@ ASTFILE = LITERAL (Read)
    is done with care, and with knowledge of AST objects (SUN/210).
    The format of the file is explained in the Notes section.
 
+FITSROT
+
+FITSROT = LITERAL (Read)
+   The name of a FITS header whose value is an angle through
+   which all the imported frames should be rotated.  This
+   rotation is done after the mappings given in the AST file
+   itself have been applied.  If this parameter is supplied it
+   overrides any value given in the modification parts of the
+   AST file.
+   [!]
+
 IN
 
 IN = LITERAL (Read)
@@ -60,12 +70,11 @@ INDICES( * ) = _INTEGER (Read)
    each NDF, what its index number is.  Thus if only one NDF is
    given in the IN list, and the value of INDICES is [3], then
    the frameset with the identifier 'INDEX 3' will be chosen.
-   Its default value is a list with the appropriate number of
-   elements starting 1,2,3,...  This default will normally be
-   appropriate unless the NDFs are being presented in an unusual
-   order, i.e. different from that in which they were presented
-   to ASTEXP when generating the AST file.
-   [Dynamic: 1,2,3,...]
+   If set null (!) the NDFs will be considered in the order
+   1,2,3,... which will be appropriate unless the NDFs are being
+   presented in a different order from that in which they were
+   presented to ASTEXP when generating the AST file.
+   [!]
 
 INDOMAIN
 
@@ -110,6 +119,14 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 
+ROT
+
+ROT = _DOUBLE (Read)
+   An angle through which all the imported frames should be
+   rotated.  This rotation is done after the mappings in the AST
+   file itself have been applied.
+   [0]
+
 Examples
 
 astimp data* camera.ast obs1
@@ -142,30 +159,71 @@ AST file format:
    are to be undertaken.  The format of the file is explained
    here.
 
-   The AST file consists of a sequence of framesets.  Each
-   frameset has an ID, and contains two frames (a Base frame and
-   a Current frame) and a mapping between them.  The domains of
-   all the Base frames should normally be the same, and likewise
-   for all the Current frames.  For the NDFs to which the file
-   will be applied by ASTIMP, their WCS components should contain
-   frames in the same domain as the AST file's Base frame.
+   The AST file consists of the following, in order:
 
-   The ID of each frameset is used to determine, for each NDF,
-   which of the framesets in the file should be applied to it.
-   This ID is a string which can assume one of the followin forms:
+      <global modifiers>
+      (blank line)
+      <frameset 1>
+      <frameset 1 modifiers>
+      (blank line)
+      <frameset 1>
+      <frameset 2 modifiers>
+      (blank line)
+        ...
+      (end of file)
 
-   -  "FITSID KEY VALUE"
-         This will match an NDF if the first FITS header card
-         with the keyword KEY has the value VALUE.  If the value
-         is of type CHARACTER it must be in single quotes. KEY
-         may be compound (of the form keyword1.keyword2 etc) to
-         permit reading of hierarchical keywords.
+   Characters after a '#' character are normally ignored.  The
+   constituent parts are composed as follows:
 
-   -  "INDEX N"
-         This associates a frameset with an integer N.  Usually
-         N will take the values 1,2,3,... for the framesets
-         in the file.  Typically the N'th NDF in a list will
-         match the one with an ID of "INDEX N".
+   Blank line:
+      A single blank line, which may contain spaces but no comments.
+
+   Frameset:
+      The framesets are written in AST native format, as explained
+      in SUN/210.
+
+      Each frameset has an ID, and contains two frames (a Base
+      frame and a Current frame) and a mapping between them.
+      The domains of all the Base frames should normally be the
+      same, and likewise for all the Current frames.  For the
+      NDFs to which the file will be applied by ASTIMP, their
+      WCS components should contain frames in the same domain
+      as the AST file's Base frame.
+
+      The ID of each frameset is used to determine, for each NDF,
+      which of the framesets in the file should be applied to it.
+      This ID is a string which can assume one of the following
+      forms:
+
+      -  "FITSID KEY VALUE"
+            This will match an NDF if the first FITS header card
+            with the keyword KEY has the value VALUE.  If the
+            value is of type CHARACTER it must be in single
+            quotes. KEY may be compound (of the form
+            keyword1.keyword2 etc) to permit reading of
+            hierarchical keywords.
+
+      -  "INDEX N"
+            This associates a frameset with an integer N.
+            Usually N will take the values 1,2,3,... for the
+            framesets in the file.  Typically the N'th NDF in a
+            list will match the one with an ID of "INDEX N".
+
+   Modifiers:
+      Modifiers describe additional modifications to be made
+      to the framesets on import.  They are of the form
+
+         USE keyword arguments
+
+      Currently the only modifier defined is FITSROT, which
+      defines the name of a FITS header which specifies how
+      many degrees to rotate the image before use.  This
+      rotation is carried out after the mapping defined by
+      the frameset itself.
+
+      Global modifiers affect all NDFs processed with the AST
+      file.  Frameset modifiers affect only those NDFs which
+      correspond to their frameset.
 
    Rigorous error checking of the AST file is not performed, so
    that unhelpful modifications to the WCS components of the
