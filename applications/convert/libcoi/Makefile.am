@@ -19,10 +19,10 @@ F_GEN_FILES = $(GEN_ROUTINES:.gen=.f)
 INCLUDE_FILES = COI_CNM
 
 # Rules for generating Fortran from generic code.
-GENERIC=@GENERIC@
+FGENERIC=@FGENERIC@
 
 .gen.f:
-	$(GENERIC) -t rd $<
+	$(FGENERIC) -t rd $<
 
 ##  The Fortran intermediary files should be cleaned away sometime.
 ##  Since they are distributed make this maintainer-clean.

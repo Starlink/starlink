@@ -36,5 +36,5 @@ ADAM_F_ROUTINES = irq_getqx.f
 #  Run generic to get numeric types.
 GFLAGS = n
 .gen.f:
-	$(GENERIC) -t $(GFLAGS) $<
+	$(FGENERIC) -t $(GFLAGS) $<
 

@@ -33,16 +33,16 @@ DIRW_GEN_ROUTINES = cof_escox.gdirw cof_mxmnx.gdirw cof_scofx.gdirw
 CDILR_GEN_ROUTINES = cof_gkeyx.gcdilr
 
 # Rules for generating Fortran from generic code.
-GENERIC=@GENERIC@
+FGENERIC=@FGENERIC@
 
 .gdirw.f:
 	$(LN_S) $< $(<:.gdirw=.gen)
-	$(GENERIC) -t dirw $(<:.gdirw=.gen)
+	$(FGENERIC) -t dirw $(<:.gdirw=.gen)
 	$(RM) $(<:.gdirw=.gen)
 
 .gcdilr.f:
 	$(LN_S) $< $(<:.gcdilr=.gen)
-	$(GENERIC) -t cdilr $(<:.gcdilr=.gen)
+	$(FGENERIC) -t cdilr $(<:.gcdilr=.gen)
 	$(RM) $(<:.gcdilr=.gen)
 
 

@@ -61,49 +61,49 @@ I_GEN_ROUTINES = con_ekeyx.gi
 D_GEN_ROUTINES = con_fillx.gd
 
 # Rules for generating Fortran from generic code.
-GENERIC=@GENERIC@
+FGENERIC=@FGENERIC@
 
 .gen.f:
-	$(GENERIC) -t rd $<
+	$(FGENERIC) -t rd $<
 
 .gwr.f:
 	$(LN_S) $< $(<:.gwr=.gen)
-	$(GENERIC) -t wr $(<:.gwr=.gen)
+	$(FGENERIC) -t wr $(<:.gwr=.gen)
 	$(RM) $(<:.gwr=.gen)
 
 .gdir.f:
 	$(LN_S) $< $(<:.gdir=.gen)
-	$(GENERIC) -t dir $(<:.gdir=.gen)
+	$(FGENERIC) -t dir $(<:.gdir=.gen)
 	$(RM) $(<:.gdir=.gen)
 
 .gdrli.f:
 	$(LN_S) $< $(<:.gdrli=.gen)
-	$(GENERIC) -t drli $(<:.gdrli=.gen)
+	$(FGENERIC) -t drli $(<:.gdrli=.gen)
 	$(RM) $(<:.gdrli=.gen)
 
 .gn.f:
 	$(LN_S) $< $(<:.gn=.gen)
-	$(GENERIC) -t n $(<:.gn=.gen)
+	$(FGENERIC) -t n $(<:.gn=.gen)
 	$(RM) $(<:.gn=.gen)
 
 .gdl.f:
 	$(LN_S) $< $(<:.gdl=.gen)
-	$(GENERIC) -t dl $(<:.gdl=.gen)
+	$(FGENERIC) -t dl $(<:.gdl=.gen)
 	$(RM) $(<:.gdl=.gen)
 
 .gwir.f:
 	$(LN_S) $< $(<:.gwir=.gen)
-	$(GENERIC) -t wir $(<:.gwir=.gen)
+	$(FGENERIC) -t wir $(<:.gwir=.gen)
 	$(RM) $(<:.gwir=.gen)
 
 .gi.f:
 	$(LN_S) $< $(<:.gi=.gen)
-	$(GENERIC) -t i $(<:.gi=.gen)
+	$(FGENERIC) -t i $(<:.gi=.gen)
 	$(RM) $(<:.gi=.gen)
 
 .gd.f:
 	$(LN_S) $< $(<:.gd=.gen)
-	$(GENERIC) -t d $(<:.gd=.gen)
+	$(FGENERIC) -t d $(<:.gd=.gen)
 	$(RM) $(<:.gd=.gen)
 
 ##  The Fortran intermediary files should be cleaned away sometime.

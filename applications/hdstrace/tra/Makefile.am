@@ -14,4 +14,4 @@ G_ROUTINES = tra_putx.gen
 #  Run generic to get numeric types.
 GFLAGS = n
 .gen.f:
-	$(GENERIC)  -t $(GFLAGS) $<
+	$(FGENERIC)  -t $(GFLAGS) $<
