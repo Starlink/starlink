@@ -40,12 +40,6 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
 {
     B = new Byte[W*H];
     memset ((void*)B, 0, W*H);
-#if 0
-    bbL = W;			// initialise bounding box with extremes
-    bbR = 0;			// `crossed'
-    bbT = H;
-    bbB = 0;
-#endif
     ibbL = ibbT = INT_MAX;	// numeric_limits<int>::max();
     ibbR = ibbB = INT_MIN;	// numeric_limits<int>::min();
 
@@ -100,12 +94,6 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
     // Note that we update the bounding box to the border of the
     // newly painted bitmap, rather than the position of the first
     // black pixels within the bitmap.
-#if 0
-    if (x+col1 < bbL) bbL = x+col1;
-    if (x+col2 > bbR) bbR = x+col2;
-    if (y+row1 < bbT) bbT = y+row1;
-    if (y+row2 > bbB) bbB = y+row2;
-#endif
     if (x   < ibbL) ibbL = x;
     if (x+w > ibbR) ibbR = x+w;
     if (y   < ibbT) ibbT = y;
@@ -140,12 +128,6 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
 	for (int col=col1; col<col2; col++)
 	    B[row*W+col] = max_colour_;
 
-#if 0
-    if (col1 < bbL) bbL = col1;
-    if (col2 > bbR) bbR = col2;
-    if (row1 < bbT) bbT = row1;
-    if (row2 > bbB) bbB = row2;
-#endif
     if (x   < ibbL) ibbL = x;
     if (x+w > ibbR) ibbR = x+w;
     if (y   < ibbT) ibbT = y;
@@ -323,10 +305,6 @@ void Bitmap::write (const string filename, const string format)
     if (!frozen_)
 	freeze();
 
-    if (empty())
-	throw BitmapError ("attempt to write empty bitmap");
-    int hsize = (cropped_ ? cropR-cropL : W);
-    int vsize = (cropped_ ? cropB-cropT : H);
     if (verbosity_ > normal)
 	cerr << "Bitmap::write: "
 	     << " cropped=" << cropped_
@@ -340,6 +318,11 @@ void Bitmap::write (const string filename, const string format)
 	     << " cropB=" << cropB
 	     << " W="<<W<<" H="<<H
 	     << '\n';
+
+    if (empty())
+	throw BitmapError ("attempt to write empty bitmap");
+    int hsize = (cropped_ ? cropR-cropL : W);
+    int vsize = (cropped_ ? cropB-cropT : H);
     BitmapImage *bi = BitmapImage::newBitmapImage(format, hsize, vsize, bpp_);
     if (cropped_)
 	for (int row=cropT; row<cropB; row++)
