@@ -251,7 +251,6 @@
       CHARACTER * ( 30 ) KAPVIE ! Message system name for kapview_mon
       CHARACTER * ( GRP__SZNAM ) NDFNMS( MAXGRP ) ! Names of lead NDFs in groups
       INTEGER CCDGID            ! Id for CCDPACK_REG monolith
-      INTEGER CCDRID            ! Id for CCDPACK_RES monolith
       INTEGER FD                ! File identifier
       INTEGER FDOUT             ! File identifier
       INTEGER FITTYP            ! Transformation type
@@ -262,7 +261,6 @@
       INTEGER IPIND             ! Pointer to identifiers for list positions
       INTEGER IPXPOS            ! Pointer to X coordinates of list positions
       INTEGER IPYPOS            ! Pointer to Y coordinates of list positions
-      INTEGER KAPVID            ! Id for Kappa view monolith
       INTEGER LENG              ! Returned length of string
       INTEGER MAXCNV            ! Initial maximum dimension of display region
       INTEGER NDFLEN            ! length of NDF name
@@ -271,7 +269,6 @@
       INTEGER NL                ! Length of NULL string
       INTEGER NNDF              ! Number of NDFs passed to GUI script
       INTEGER NPOINT( MAXGRP )  ! Number of positions marked for each NDF
-c     INTEGER NVAL              ! Dummy
       INTEGER OPLEN             ! String length
       INTEGER REFLEN            ! Length of reference NDF name
       INTEGER REFPOS            ! Position of the reference NDF in the list
@@ -294,9 +291,7 @@ c     INTEGER NVAL              ! Dummy
 *  Find out the environment we're running under. If it's IRAF then
 *  INDEF is used instead of ! as a NULL symbol. 
       CALL CCD1_SETEX( NULL, NL, STATUS )
-      CCDRID = -1
       CCDGID = -1
-      KAPVID = -1
 
 *  Start the application and introduce ourselves.
       CALL CCD1_START( 'CCDALIGN', STATUS )
@@ -305,30 +300,8 @@ c     INTEGER NVAL              ! Dummy
      :     '  An interactive aid for aligning groups of NDFs.', STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  Get the display device.
-c     CALL MSG_BLANK( STATUS )
-c     CALL MSG_OUT( ' ',
-c    :     '  Give the name of an image display device', STATUS )
-c     CALL MSG_BLANK( STATUS )
-c     CALL PAR_GET0C( 'DEVICE', DEVICE, STATUS )
-c     CMD = 'DEVICE='//DEVICE
-c     CALL SLV_OBEYW( KAPVIE, 'idset', CMD, ' ', STATUS )
-c     IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Get a percentile range for displaying the images. Note we store these
-*  as a string as KAPPA display tries to set up defaults and we
-*  need to override this behaviour.
-      CALL MSG_BLANK( STATUS )
-      CALL MSG_OUT( ' ',
-     :     '  What percentile range do you want to use when '//
-     :     'displaying images?',
-     :             STATUS )
-      CALL MSG_BLANK( STATUS )
+*  Get a default percentile range for displaying the images.
       CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
-c     CALL MSG_SETR( 'LOW', PERCEN( 1 ) )
-c     CALL MSG_SETR( 'HIGH', PERCEN( 2 ) )
-c     CALL MSG_LOAD( ' ', '[^LOW,^HIGH]', PERC, OPLEN, STATUS )
-c     IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Write a message indicating that the user should return lists of
 *  all the NDFs to process. Each group contains NDFs which have not
@@ -403,105 +376,6 @@ c     IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       HAVREF = ( NGNDF .GT. 0 )
 
-*  Now display the reference image or the very first NDF.
-c     IF ( HAVREF ) THEN
-c        CALL CCD1_OPFIO( 'ccdalign_ref.list', 'READ', 'LIST', 0,
-c    :                    FD, STATUS )
-c     ELSE
-c        CALL CCD1_OPFIO( 'ccdalign_ndf1.list', 'READ', 'LIST', 0,
-c    :               FD, STATUS )
-c     END IF
-c     CALL FIO_READ( FD, REFNAM, REFLEN, STATUS )
-c     CALL FIO_CLOSE( FD, STATUS )
-c     CALL CCD1_OPLOG( STATUS )
-c     CALL CCD1_MSG( ' ', ' ', STATUS )
-c     CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
-c     CALL CCD1_MSG( ' ', '  Using reference NDF ^REFNDF', STATUS )
-c     CALL CCD1_MSG( ' ', ' ', STATUS )
-
-*  Display this NDF.
-c     CALL MSG_BLANK( STATUS )
-c     CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
-c     CALL MSG_OUT( ' ', '  Displaying NDF ^REFNDF', STATUS )
-c     CALL MSG_BLANK( STATUS )
-c     CMD = 'in='//REFNAM( :REFLEN )//' '//
-c    :      'mode=percentiles '//
-c    :      'percentiles='//PERC//' accept'
-c     CALL SLV_OBEYW( KAPVIE, 'display', CMD, ' ', STATUS )
-c     IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Now use the cursor routine to read the image feature positions.
-c     CALL MSG_BLANK( STATUS )
-c     LINE = 'Use the cursor to mark the image features. Remember '//
-c    :       'the order as this is important for later '//
-c    :       'identifications.'
-c     CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
-c     CALL MSG_BLANK( STATUS )
-
-*  Activate the cursor routine. If this is the first NDF of the first group
-*  then use all the NDF names of this group as the IN parameter. This will
-*  associate this position list with all the NDFs.
-c     IF ( HAVREF ) THEN
-c        CMD = 'in='//REFNAM( :REFLEN)//' '//
-c    :         'outlist='//REFNAM( :REFLEN)//'.fea accept reset'
-c     ELSE
-c        CMD = 'in=^ccdalign_ndf1.list'//' '//
-c    :         'outlist='//REFNAM( :REFLEN)//'.fea accept reset'
-c     END IF
-c     CALL SLV_OBEYW( CCDREG, 'idicurs', CMD, ' ', STATUS )
-
-*  Now plot the identifiers of the image features.
-c     CMD = 'inlist='//REFNAM( :REFLEN)//'.fea '//
-c    :      'mtype=-1 '//
-c    :      'palnum=3 '//
-c    :      'ndfnames=false accept'
-c     CALL SLV_OBEYW( CCDREG, 'plotlist', CMD, ' ', STATUS )
-
-*  See if user wants a hardcopy of the display.
-c     CALL PAR_GET0L( 'HARDCOPY', HCOPY, STATUS )
-c     IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Do the hardcopy if asked.
-c     IF ( HCOPY ) THEN
-c        CALL MSG_BLANK( STATUS )
-c        CALL MSG_OUT( ' ',
-c    :        '  Give the name of a device that can be printed to.',
-c    :                 STATUS )
-c        CALL MSG_BLANK( STATUS )
-c        CALL PAR_GET0C( 'HARDDEV', HDEV, STATUS )
-c        IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Get a snapshot.
-c        CALL MSG_OUT( ' ',
-c    :'  Capturing snapshot of display... Select portion of interest',
-c    :                 STATUS )
-c        INQUIRE( FILE='snapshot.ps', EXIST=EXISTS )
-c        IF ( EXISTS ) THEN
-c           CMD = 'rm snapshot.ps'
-c           CALL CCD1_EXEC( CMD, STATUS )
-c        END IF
-c        CMD = 'odevice='//HDEV( :CHR_LEN(HDEV) )//';snapshot.ps '//
-c    :         'whole=false '//
-c    :         'negative=true accept'
-c        CALL SLV_OBEYW( KAPVIE, 'snapshot', CMD, ' ', STATUS )
-
-*  Need to print the output.
-c2       CONTINUE
-c        CALL PAR_GET0C( 'PRINTCMD', CMD, STATUS )
-c        IF ( STATUS .NE. SAI__OK ) GO TO 99
-c        IF ( CMD .EQ. ' ' ) THEN
-c           CMD = 'lpr snapshot.ps'
-c        END IF
-c        IF ( INDEX( CMD, 'snapshot.ps' ) .EQ. 0 ) THEN 
-c           CALL MSG_OUT( ' ', 
-c    :'   You must give a command that will print the file snapshot.ps', 
-c    :                    STATUS )
-c           CALL PAR_CANCL( 'PRINTCMD', STATUS )
-c           GO TO 2
-c        END IF
-c        CALL CCD1_EXEC( CMD, STATUS )
-c     END IF
-
 *  Get the names of the NDFs to be displayed (one from each group).
       DO 3 I = 1, NGROUP - 1
          CALL MSG_SETI( 'IGROUP', I ) 
@@ -553,7 +427,7 @@ c     END IF
       CALL PAR_PUT0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_PUT0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
-      CALL PAR_PUT1D( 'PERCENTILES', PERCNT, 2, STATUS )
+      CALL PAR_PUT1D( 'PERCENTILES', 2, PERCNT, STATUS )
 
 *  Start up monliths which are used later in this task.
 *  CCDPACK_REG
@@ -568,19 +442,6 @@ c     END IF
      :      '$CCDPACK_DIR/ccdpack_reg', STATUS )
          GO TO 99
       END IF
-
-*  KAPVIEW_MON
-c     CALL PSX_GETENV( 'KAPPA_DIR', CMD, STATUS )
-c     CMD = CMD( :CHR_LEN( CMD ) )//'/kapview_mon'
-c     KAPVIE = 'kapview_mon'//PID
-c     KAPVID = SLV_LOADW( KAPVIE, CMD, .TRUE., TIMOUT, STATUS )
-c     IF ( STATUS .NE. SAI__OK ) THEN
-c        STATUS = SAI__ERROR
-c        CALL ERR_REP( 'FAILED',
-c    :'Sorry cannot proceed. Failed to load monolith '//
-c    :'$KAPPA_DIR/kapview_mon', STATUS )
-c        GO TO 99
-c     END IF
 
 *  Now write the position lists corresponding to the marked images, 
 *  and associate the appropriate NDFs with those lists.
@@ -824,9 +685,7 @@ c     END IF
       CALL CCD1_MFREE( -1, STATUS )
 
 *  Stop any detached processes.
-      IF ( CCDRID .GT. 0 ) CALL SLV_KILLW( CCDRID, STATUS )
       IF ( CCDGID .GT. 0 ) CALL SLV_KILLW( CCDGID, STATUS )
-c     IF ( KAPVID .GT. 0 ) CALL SLV_KILLW( KAPVID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'CCDALIGN_ERR',
      :                  'CCDALIGN: failed to align CCD frames.',
