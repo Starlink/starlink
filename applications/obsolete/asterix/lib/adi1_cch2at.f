@@ -112,7 +112,7 @@
 *  Get HDS type
       IF ( CMP .GT. ' ' ) THEN
         CALL DAT_THERE( LOC, CMP, THERE, STATUS )
-        IF ( THERE )
+        IF ( THERE ) THEN
           CALL CMP_TYPE( LOC, CMP, TYPE, STATUS )
         ELSE
           GOTO 99

@@ -102,6 +102,8 @@
 
 *  Local Variables:
       CHARACTER*15		CLASS			! Object type
+
+      LOGICAL			THERE			! Member object exists?
 *.
 
 *  Check inherited global status.
@@ -109,7 +111,12 @@
 
 *  Does the member exist?
       IF ( MEMBER .GT. ' ' ) THEN
-        CALL ADI_CTYPE( ID, MEMBER, CLASS, STATUS )
+        CALL ADI_THERE( ID, MEMBER, THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CTYPE( ID, MEMBER, CLASS, STATUS )
+        ELSE
+          GOTO 99
+        END IF
       ELSE
         CALL ADI_TYPE( ID, CLASS, STATUS )
       END IF
@@ -140,6 +147,6 @@
       END IF
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_CCA2HT', STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_CCA2HT', STATUS )
 
       END
