@@ -9713,8 +9713,6 @@ package kappa {
 
 iraf! {
 
-      icl {defstring kaph(elp) !$KAPPA_DIR/kaphelp}
-      icl {defstring kap_kaph(elp) !$KAPPA_DIR/kaphelp}
       action kaphelp {
          alias {kaph(elp)}
 
@@ -11571,7 +11569,7 @@ iraf! {
       }
 
       action mstats {
-         alias {msta(ts))}
+         alias {msta(ts)}
 
          helplib {$KAPPA_HELP}
 
@@ -15748,99 +15746,99 @@ iraf! {
    }
 
    command transformer {
-      obsolete { The transformer command has been retired to the KAPRH package. See SUN/239. Use "regrid" instead. }
+      obsolete { The transformer command has been retired to the KAPRH package (see SUN/239). Use "regrid" instead. }
    } 
 
    command traninvert {
-      obsolete { The traninvert command has been retired to the KAPRH package. See SUN/239. }
+      obsolete { The traninvert command has been retired to the KAPRH package (see SUN/239). }
    } 
 
    command tranjoin {
-      obsolete { The tranjoin command has been retired to the KAPRH package. See SUN/239. }
+      obsolete { The tranjoin command has been retired to the KAPRH package (see SUN/239). }
    } 
 
    command tranmake {
-      obsolete { The tranmake command has been retired to the KAPRH package. See SUN/239. }
+      obsolete { The tranmake command has been retired to the KAPRH package (see SUN/239). }
    } 
 
    command trantrace {
-      obsolete { The trantrace command has been retired to the KAPRH package. See SUN/239. }
+      obsolete { The trantrace command has been retired to the KAPRH package (see SUN/239). }
    } 
 
    command idset {
-      obsolete { The idset command has been retired to the KAPRH package. See SUN/239. Use "gdset" instead. }
+      obsolete { The idset command has been retired to the KAPRH package (see SUN/239). Use "gdset" instead. }
    } 
 
    command idclear {
-      obsolete { The idclear command has been retired to the KAPRH package. See SUN/239. Use "gdclear" instead. }
+      obsolete { The idclear command has been retired to the KAPRH package (see SUN/239). Use "gdclear" instead. }
    } 
 
    command idstate {
-      obsolete { The idstate command has been retired to the KAPRH package. See SUN/239. Use "gdstate" instead. }
+      obsolete { The idstate command has been retired to the KAPRH package (see SUN/239). Use "gdstate" instead. }
    } 
 
    command ovset {
-      obsolete { The ovset command has been retired to the KAPRH package. See SUN/239. }
+      obsolete { The ovset command has been retired to the KAPRH package (see SUN/239). }
    } 
 
    command ovclear {
-      obsolete { The ovclear command has been retired to the KAPRH package. See SUN/239. }
+      obsolete { The ovclear command has been retired to the KAPRH package (see SUN/239). }
    } 
 
    command idinvisible {
-      obsolete { The idinvisible command has been moved to the KAPRH package. See SUN/239. }
+      obsolete { The idinvisible command has been moved to the KAPRH package (see SUN/239). }
    } 
 
    command idpazo {
-      obsolete { The idpazo command has been moved to the KAPRH package. See SUN/239. }
+      obsolete { The idpazo command has been moved to the KAPRH package (see SUN/239). }
    } 
 
    command lutflip {
-      obsolete { The lutflip command has been moved to the KAPRH package. See SUN/239. }
+      obsolete { The lutflip command has been moved to the KAPRH package (see SUN/239). }
    } 
 
    command luthilite {
-      obsolete { The luthilite has been moved to the KAPRH package. See SUN/239. }
+      obsolete { The luthilite has been moved to the KAPRH package (see SUN/239). }
    } 
 
    command lutrot {
-      obsolete { The lutrot command has been moved to the KAPRH package. See SUN/239. }
+      obsolete { The lutrot command has been moved to the KAPRH package (see SUN/239). }
    } 
 
    command luttweak {
-      obsolete { The luttweak command has been moved to the KAPRH package. See SUN/239. }
+      obsolete { The luttweak command has been moved to the KAPRH package (see SUN/239). }
    } 
 
    command contover {
-      obsolete { The contover command has been retired. Use "contour clear=no" instead or use the contover command in the KAPRH package. See SUN/239. }
+      obsolete { The contover command has been retired. Use "contour clear=no" instead or use the contover command in the KAPRH package (see SUN/239). }
    } 
 
    command greyplot {
-      obsolete { The greyplot command has been retired. Use "display key=y" instead or use the greyplot command in the KAPRH package. See SUN/239. }
+      obsolete { The greyplot command has been retired. Use "display key=y" instead or use the greyplot command in the KAPRH package (see SUN/239). }
    } 
 
    command inspect {
-      obsolete { The inspect command has been retired. Use Gaia instead or use the inspect command in the KAPRH package. See SUN/239. }
+      obsolete { The inspect command has been retired. Use Gaia instead or use the inspect command in the KAPRH package (see SUN/239). }
    } 
 
    command mosaic {
-      obsolete { The mosaic command has been retired. Use ccdpack:makemos or use the mosaic command in the KAPRH package. See SUN/239. }
+      obsolete { The mosaic command has been retired. Use ccdpack:makemos or use the mosaic command in the KAPRH package (see SUN/239). }
    } 
 
    command quilt {
-      obsolete { The quilt command has been retired. Use ccdpack:makemos or use the quilt command in the KAPRH package. See SUN/239. }
+      obsolete { The quilt command has been retired. Use ccdpack:makemos or use the quilt command in the KAPRH package (see SUN/239). }
    } 
 
    command snapshot {
-      obsolete { The snapshot command has been retired. Use a utility such as gimp or xv or use the snapshot command in the KAPRH package. See SUN/239. }
+      obsolete { The snapshot command has been retired. Use a utility such as gimp or xv or use the snapshot command in the KAPRH package (see SUN/239). }
    } 
 
    command turbocont {
-      obsolete { The turbocont command has been retired. Use "contour" instead or use the turbocont command in the KAPRH package. See SUN/239. }
+      obsolete { The turbocont command has been retired. Use "contour" instead or use the turbocont command in the KAPRH package (see SUN/239). }
    } 
 
    command crelut {
-      obsolete { The crelut command has been retired. Use "lutedit" instead or use the crelut command in the KAPRH package. See SUN/239. }
+      obsolete { The crelut command has been retired. Use "lutedit" instead or use the crelut command in the KAPRH package (see SUN/239). }
    } 
 
    icl {defhelp kappa $KAPPA_HELP 0}
