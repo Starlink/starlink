@@ -16,7 +16,7 @@ require AutoLoader;
 
 # Version derived from CVS repository:  '$Revision$ '
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -617,7 +617,7 @@ sub fits_extract_key_val ($) {
   ($keyword, $value, $comment) = split(/=|\s\//,$fits_entry);
 
   # Return if no value
-  return ($keyword, undef, undef) unless defined $value;
+  return ($keyword, '', '') unless defined $value;
 
 
   # Tidy up the keyword

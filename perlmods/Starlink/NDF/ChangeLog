@@ -1,3 +1,7 @@
+1999-04-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm (fits_extract_key_val): Return null rather than undef
+
 1998-10-15  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* PDL/NDF.pm: Check for array extensions and skip them.
