@@ -367,7 +367,7 @@ links which navigate between documents
 <description>
 <p>Code which is common to both the HTML and print stylesheets.
 
-<codegroup use="code.maths.tth code.lib code.common code.navig" id=maths.main>
+<codegroup use="code.maths.img code.lib code.common code.navig" id=maths.main>
 <title>Extract document maths
 <description>This codegroup is used as a standalone stylesheet, to extract
 the maths from a document without doing any further processing.
