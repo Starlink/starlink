@@ -1,5 +1,7 @@
 import edu.hawaii.jach.gsd.GSDItem;
 import edu.hawaii.jach.gsd.GSDObject;
+import java.io.File;
+import java.util.Iterator;
 
 class TestGSD {
 
@@ -8,7 +10,7 @@ class TestGSD {
 		try {
 			GSDObject gsd =
                // new GSDObject("/stardev/bin/specx/obs_das_0011.dat");
-               new GSDObject("/home/timj/dev/scuba/jcmtdr/rxa_146.dat");
+               new GSDObject(new File("/home/timj/data/jcmt/jcmtdr/rxa_146.dat"));
             
 			gsd.print();
 			System.out.println(gsd);
@@ -17,6 +19,13 @@ class TestGSD {
 			// Get the items
 			GSDItem[] allitems = gsd.items();
 			System.out.println(allitems[20]);
+
+
+			Iterator all = gsd.getItemIterator();
+			while ( all.hasNext() ) {
+			    GSDItem next = (GSDItem)all.next();
+			    System.out.println(next);
+			}
 
             // This is designed to cause a problem
 			// System.out.println(gsd.itemByNum(0));
