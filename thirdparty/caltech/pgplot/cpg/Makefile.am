@@ -28,5 +28,5 @@ check_PROGRAMS = cpgdemo
 cpgdemo_SOURCES = $(DEMO_ROUTINES)
 DEMO_ROUTINES = cpgdemo.c
 cpgdemo_LDADD = \
-  libcpgplot.la ../src/libpgplot_base.la ../src/libpgplot_drivers.la
+  libcpgplot.la ../src/libpgplot_base.la ../drivers/libpgplot_drivers.la
 
