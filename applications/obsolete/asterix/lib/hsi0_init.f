@@ -83,16 +83,15 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'HSI_CMN'					! HSI globals
-*        HSI_INIT = LOGICAL (given and returned)
-*           HSI definitions load attempted?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
+
       EXTERNAL			HSI1_ADD
       EXTERNAL			HSI1_COPY
       EXTERNAL			HSI1_GETCTR
@@ -117,7 +116,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check not already initialised?
-      IF ( .NOT. HSI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( HSI__PKG ) ) THEN
 
 *    Load the ADI classes
         CALL ADI_REQPKG( 'history', STATUS )
@@ -159,7 +158,7 @@
      :                   DID, STATUS )
 
 *    Now initialised
-	HSI_INIT = .TRUE.
+        CALL AST_SPKGI( HSI__PKG )
 
       END IF
 

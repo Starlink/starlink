@@ -85,6 +85,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			IFID, NLINE
@@ -111,7 +112,7 @@
       IF ( NLINE .LT. 1 ) RETURN
 
 *  Check initialised
-      IF ( .NOT. AST_PKGI( HSI__PKG ) ) CALL HSI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( HSI__PKG ) ) CALL HSI0_INIT( STATUS )
 
 *  Get base file object
       CALL ADI_GETFILE( IFID, IARG(1), STATUS )
