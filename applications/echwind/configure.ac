@@ -18,6 +18,8 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+STAR_CNF_COMPATIBLE_SYMBOLS
+
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.

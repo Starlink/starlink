@@ -18,5 +18,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+STAR_CNF_COMPATIBLE_SYMBOLS
+
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT
