@@ -27,6 +27,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     11-JUL-1996 (RFWS):
@@ -37,6 +38,9 @@
 *        Added AST_MAPBOX.
 *     12-NOV-1998 (RFWS):
 *        Added AST_RESAMPLE<X>.
+*     22-NOV-2000 (DSB):
+*        Pass the "flags" argument by reference instead of by value in the
+*        MAKE_AST_RESAMPLE_UINTERP macro.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -102,7 +106,7 @@ static void ast_resample_uinterp##X( int ndim, \
                               INTEGER_ARRAY_ARG(offset), \
                               DOUBLE_ARRAY_ARG(coords[ 0 ]), \
                               DOUBLE_ARRAY_ARG(params), \
-                              INTEGER_ARG(flags), \
+                              INTEGER_ARG(&flags), \
                               Ftype##_ARG(&badval), \
                               Ftype##_ARRAY_ARG(out), \
                               Ftype##_ARRAY_ARG(out_var), \
