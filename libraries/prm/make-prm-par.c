@@ -38,6 +38,14 @@
  *     The actual values of the bad values are based on the extreme
  *     values of the integer and float types, and matches those in HDS,
  *     as defined in dat1_init_ndr.c.
+ *
+ *  Usage:
+ *
+ *       ./make-prm-par [-fFortranInclude] [-cCInclude] [-tTestProgram]
+ *
+ *     -f Write a Fortran include file
+ *     -c Write a C include file
+ *     -t Write a test file
 
 
  *  Authors:
@@ -58,6 +66,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#if HAVE_ASSERT_H
+#  include <assert.h>
+#else
+#  if NDEBUG
+#    define assert(x)
+#  else
+#    define assert(x) if (!(x)) {                       \
+        fprintf(stderr, "assertion \"" #x               \
+                "\" failed: file \"%s\", line %d\n",    \
+                __FILE__, __LINE__);                    \
+        exit(1);                                        \
+    }
+#  endif
+#endif
 
 /* Make sure that FC_HAVE_HEX_NUMBERS has a value */
 #ifndef FC_HAVE_HEX_NUMBERS
@@ -192,6 +214,7 @@ typedef union {
 int float_precision, double_precision;
 FILE* FortranOutput;
 FILE* COutput;
+FILE* TestOutput;
 
 
 void comment(const char* comment);
@@ -201,6 +224,7 @@ void par_f(const int size, const char* name, double val);
 /* Helper functions */
 const char* todaysdate(void);
 const char* tohex(int size, Number *p);
+void generate_test_output(FILE*);
 void assumption(const int, const char*);
 void Usage(void);
 
@@ -223,17 +247,6 @@ int main (int argc, char **argv)
         if (**argv != '-')
             Usage();
         switch (*++*argv) {
-          case 'f':
-            ++*argv;
-            if (**argv == '\0')
-                Usage();
-            if ((FortranOutput = fopen(*argv, "w")) == 0) {
-                fprintf(stderr, "%s: can't open file %s for output\n",
-                        progname, *argv);
-                exit(1);
-            }
-            break;
-
           case 'c':
             ++*argv;
             if (**argv == '\0')
@@ -245,13 +258,32 @@ int main (int argc, char **argv)
             }
             break;
 
+          case 'f':
+            ++*argv;
+            if (**argv == '\0')
+                Usage();
+            if ((FortranOutput = fopen(*argv, "w")) == 0) {
+                fprintf(stderr, "%s: can't open file %s for output\n",
+                        progname, *argv);
+                exit(1);
+            }
+            break;
+
+          case 't':
+            ++*argv;
+            if (**argv == '\0')
+                Usage();
+            if ((TestOutput = fopen(*argv, "w")) == 0) {
+                fprintf(stderr, "%s: can't open file %s for output\n",
+                        progname, *argv);
+                exit(1);
+            }
+            break;
+
           default:
             Usage();
         }
     }
-
-    if (FortranOutput == 0 && COutput == 0)
-        Usage();
 
     /*
      * Set the precisions (globally, so they're visible in par_f).
@@ -277,6 +309,15 @@ int main (int argc, char **argv)
 #else
 #  error "Don't know the number of decimals required for output"
 #endif
+
+    if (TestOutput) {
+        generate_test_output(TestOutput);
+        fclose(TestOutput);
+        exit(0);
+    }
+
+    if (FortranOutput == 0 && COutput == 0)
+        Usage();
 
 
     if (FortranOutput) {
@@ -358,6 +399,9 @@ int main (int argc, char **argv)
                 (FLOAT_IS_IEEE        ? "DOES" : "DOES NOT"),
                 progname, todaysdate(), progname);
     }
+
+
+
     
     comment("Bad values, used for flagging undefined data.");
     par_i(-1, "VAL__BADUB",  UINT8_MAX);
@@ -584,6 +628,10 @@ void par_f(const int size, const char* name, double val)
                 N.d = val;
                 nbytes = sizeof(double);
             }
+            /*
+            fprintf(stderr, "par_f: N=%g (%s), nbytes=%d\n",
+                    val, name, nbytes);
+            */
             fprintf(FortranOutput,
                     "      %s %s\n      PARAMETER ( %s = '%s'X )\n\n",
                     type, name, name, tohex(nbytes, &N));
@@ -613,7 +661,9 @@ void par_f(const int size, const char* name, double val)
 /*
  * Check that an assumption is true.  If the TEST argument is true
  * (non-zero), then return immediately.  Otherwise, print the message
- * to stderr and exit with a non-zero (failure) status.
+ * to stderr and exit with a non-zero (failure) status.  That is, this
+ * is effectively an assert with better manners, and documentation of
+ * where our possibly dubious processor assumptions are located.
  */
 void assumption(const int test, const char*msg)
 {
@@ -640,18 +690,43 @@ const char *todaysdate(void)
 const char* tohex(int size, Number* p)
 {
     static char c[17];
-    int64_t pi = p->i;
     int i;
+    static char *hexdigits = "0123456789ABCDEF";
+#if WORDS_BIGENDIAN
+    unsigned char *bp;
+#else
+    int64_t pi = p->i;
+#endif
+
+    assumption(sizeof(int64_t) <= 17-1,
+               "tohex assumes that 16 bytes is big enough for int64_t");
 
     memset((void*)c, 0, sizeof(c));
+
+#if WORDS_BIGENDIAN
+    bp = (unsigned char*)&p->i;
+    for (i=0; i<2*size; bp++) {
+        c[i++] = hexdigits[(*bp & 0xf0) >> 4];
+        c[i++] = hexdigits[*bp & 0x0f];
+    }
+#else /* WORDS_BIGENDIAN */
+    for (i=2*size-1; i>=0; i--, pi>>=4) {
+        c[i] = hexdigits[pi & 0xf];
+    }
+    /*
     for (i=2*size-1; i>=0; i--, pi>>=4) {
         int64_t t = pi & 0xf;
         if (t < 10)
             c[i] = '0' + t;
         else
             c[i] = 'A' - 10 + t;
-        /* printf("pi=%llx  t=%llx  c[%d]=%x\n", pi, t, i, c[i]); */
+        printf("pi=%llx  t=%llx  c[%d]='%c'\n", pi, t, i, c[i]);
     }
+    */
+#endif /* WORDS_BIGENDIAN */
+
+    assert (c[16] == '\0');
+    
     return c;
 }
 
@@ -686,6 +761,94 @@ int testhex(void)
 
 #endif
 
+/*
+ * XXX Generate a test program -- INCOMPLETE -- DO NOT COMMIT
+ */
+void generate_test_output(FILE *out)
+{
+    Number N;
+    const char *p;
+
+#define FLINE(s) "      " s "\n"
+
+    fprintf(out,
+"*  Test program.  Should exit 0 on success\n"
+"*\n"
+"*  Compiler characteristics:\n"
+"*    Fortran compiler %s support the \"'hex'X\" notation\n"
+"*    The machine %s appear to have IEEE floats.\n"
+"*\n"
+"*  Test program generated by %s, %s\n"
+"*\n",
+            (FC_HAVE_HEX_NUMBERS ? "DOES" : "DOES NOT"),
+            (FLOAT_IS_IEEE        ? "DOES" : "DOES NOT"),
+            progname, todaysdate());
+
+    fprintf(out, FLINE("PROGRAM prmtest"));
+
+    fprintf(out, "* int=%d  long int=%d  long long int=%d  int64_t=%d\n",
+           sizeof(int), sizeof(long int), sizeof(long long int),
+           sizeof(int64_t));
+    fprintf(out, FLINE("IMPLICIT NONE"));
+    fprintf(out, FLINE("INTEGER NFAILS"));
+    fprintf(out, FLINE("REAL X1"));
+    fprintf(out, FLINE("DOUBLEPRECISION X2"));
+    fprintf(out, FLINE("NFAILS=0"));
+    fprintf(out, "\n\n");
+
+
+#if FC_HAVE_HEX_NUMBERS
+    fprintf(out, "*  Tests mostly concerned with the tohex function\n");
+
+#define TF(n)                                                           \
+    N.f = n;                                                            \
+    p = tohex(4,&N);                                                    \
+    fprintf(out, FLINE("x1 = '%s'X"), p);                               \
+    fprintf(out, FLINE("if (%.*e .ne. x1) then"), float_precision, n);  \
+    fprintf(out, FLINE("    write(*,*)"));                              \
+    fprintf(out, "     :'Fail: %.*e (%s) != %s'\n",                     \
+            float_precision, n, #n, p);                                 \
+    fprintf(out, FLINE("    nfails=nfails+1"));                         \
+    fprintf(out, FLINE("endif"));
+    
+    TF(1.0);
+    TF(-1.0);
+    TF(-FLT_MAX);               /* VAL__BADR, NUM__MINR */
+    TF(FLT_EPSILON);            /* VAL__EPSR */
+    TF(FLT_MAX);                /* VAL__MAXR, NUM__MAXR */
+    TF(nextafterf(-FLT_MAX, 0)); /* VAL__MINR */
+    TF(min_denorm_f());         /* VAL__SMLR */
+    
+#define TD(n)                                                           \
+    N.d = n;                                                            \
+    p = tohex(8,&N);                                                    \
+    fprintf(out, FLINE("x2 = '%s'X"), p);                               \
+    fprintf(out, FLINE("if (%.*e .ne. x2) then"), double_precision, n); \
+    fprintf(out, FLINE("    write(*,*)"));                              \
+    fprintf(out, "     :'Fail: %.*e (%s)\n     : != %s'\n",\
+            double_precision, n, #n, p);                                \
+    fprintf(out, FLINE("    nfails=nfails+1"));                         \
+    fprintf(out, FLINE("endif"));
+
+    TD(1.0);
+    TD(-1.0);
+    TD(DBL_EPSILON);            /* VAL__EPSD */
+#  if 0
+    /* can't check the following using this simple-minded test */
+    TD(8,-DBL_MAX);
+    TD(nextafter(-DBL_MAX, 0)); /* VAL__MIND */
+    TD(min_denorm_d());         /* VAL__SMLD */
+#  endif
+#else /* FC_HAVE_HEX_NUMBERS */
+    fprintf(out, "*  This compiler doesn't support hex numbers -- nothing to test\n");
+#endif /* FC_HAVE_HEX_NUMBERS */
+
+    fprintf(out, "*  EXIT intrinsic is non-standard but common\n");
+    fprintf(out, FLINE("call exit(nfails)"));
+    fprintf(out, FLINE("end"));
+}
+
+        
 #if !HAVE_NEXTAFTER
 /* 
  * Replacement nextafter functions.  These are NOT general
@@ -750,7 +913,7 @@ double min_denorm_d(void)
 
 void Usage(void)
 {
-    fprintf(stderr, "Usage: %s [-fFortranIncludeFile] [-cCIncludeFile]\n",
+    fprintf(stderr, "Usage: %s [-fFortranIncludeFile] [-cCIncludeFile] [-tTestProgram.f]\n",
             progname);
     exit(1);
 }
