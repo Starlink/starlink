@@ -52,6 +52,7 @@
 *  Authors:
 *     A.J.Chipperfield (Starlink, RAL)
 *     Norman Gray (Starlink, Glasgow)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +63,8 @@
 *     25-Feb-2004 (NG):
 *        Converted to a more generic version, merging three
 *        platform-dependent versions.
+*      9-AUG-2004 (TIMJ):
+*        Reinstate the fallback to emsSyser (at least for g77 case)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,6 +94,7 @@
 int strcmp(const char*, const char*);
 #endif
 
+#define STRING_EQ(a,b) (strcmp((a), (b)) == 0)
 
 #define AC_FC 	   "@FC@"
 #define AC_is_gnu  "@ac_compiler_gnu@"
@@ -189,10 +193,22 @@ F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
          was done before: if we've failed to recognise the error code,
          it's more likely that we've mixed up our compilers than that
          the system error code will be useful. */
-      ems1Stok( ctok,
-                msg_printf( "ems_fioer: unrecognised IOSTAT value %d "
-                            "(compiler=%s)",
-                            *iostat, msgInfo->name ) );
+
+     /*  Unless that is, we know we are on a Gnu compiler where
+	 g77 is known to return errno for less than 100. It is easier
+	 to put the test here rather than extending the g77 lookup
+	 code to act like the alpha version (ie an external lookup
+	 routine). Of course, the external look up function is 
+	 more correct than this hack...
+     */
+     if ( STRING_EQ( AC_is_gnu, "yes") && *iostat < 100 ) {
+       emsSyser( ctok, *iostat );
+     } else {	   
+       ems1Stok( ctok,
+		 msg_printf( "ems_fioer: unrecognised IOSTAT value %d "
+			     "(compiler=%s)",
+			     *iostat, msgInfo->name ) );
+     }
    }
 
    return;
@@ -230,7 +246,6 @@ F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
  *    above, at compile time.  However it is not feasible to work
  *    through the necessary logic in the preprocessor.
  */
-#define STRING_EQ(a,b) (strcmp((a), (b)) == 0)
 
 static const MessageInfo* getMessageInfo(void)
 {
