@@ -64,7 +64,7 @@ dist-hook:
 
 # Generate library documentation using Doxygen
 libdocdir = @DOXYGEN_OUTPUT_DIRECTORY@
-$(libdocdir):
+$(libdocdir): Doxyfile
 	doxygen
 
 # doc/ directory has its own simple makefile
@@ -72,5 +72,5 @@ manual.tar: VERSION
 	cd doc; $(MAKE) doc.tar
 	mv doc/doc.tar ./manual.tar
 
-VERSION:
+VERSION: configure.ac
 	echo $(VERSION) >VERSION
