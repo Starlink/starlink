@@ -97,7 +97,7 @@
       REAL TOTAL_WEIGHT (NI,NJ)
       REAL WAVELENGTH
       INTEGER WEIGHTSIZE
-      REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE)
+      REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
 
 *  Arguments Returned:
       REAL CONV_DATA_SUM (NI, NJ)
@@ -140,7 +140,6 @@
       REAL SCALESQ
       REAL RES_SCAL
       REAL RAD_OV_SCAL
-
       REAL SMALL
 *   local data
 *.
@@ -149,7 +148,7 @@
 
 * Set up small to prevent comparing REAL to 0.0
 
-      SMALL = VAL__SMLR * 10.0
+      SMALL = VAL__SMLR
 
 *  set x and y axis pixel increments, x increases to left hence -ve.
 
@@ -180,7 +179,7 @@
       DO PIX = 1, NPIX
 
          IF (IN_DATA(PIX) .NE. VAL__BADR) THEN
-         
+
 *  find the coords (INEAR, JNEAR) of the output pixel nearest to the current
 *  input pixel. 
 
