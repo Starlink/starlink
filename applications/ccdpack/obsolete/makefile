@@ -442,7 +442,7 @@ SOURCE_FILES = makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
 PUBLIC_SCRIPTS = $(SHELL_SCRIPTS) $(TCL_SCRIPTS) $(ICL_SCRIPTS) \
                  $(STANDALONE_SCRIPTS) $(CONFIG_SCRIPTS)
 
-SHELL_SCRIPTS = ccdfork ccdexercise ccdpack_back xreduce \
+SHELL_SCRIPTS = ccdfork ccdexercise wcsexercise ccdpack_back xreduce \
  ccdexecute ccdwww geometry ccdpack_ex1.csh ccdpack_ex2.csh \
  ccdpack_ex3.csh ccdpack_ex4.csh ccdpack_ex5.csh ccdpack_ex6.csh \
  ccdpack_ex7.csh ccdpack_ex8.csh glitch2ard filemonitor irg_wild \
@@ -770,9 +770,9 @@ HELPTASK = ccdhelp
 
 #  List of ancilliary data files.
 
-DATA_FILES = ccdtest.ard ccdtest_obj.dat c1.xbm c2.xbm c3.xbm c4.xbm \
- c5.xbm c6.xbm c7.xbm c8.xbm ccdbitmap ccdbitmap64 import.table \
- export.table
+DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
+ c1.xbm c2.xbm c3.xbm c4.xbm c5.xbm c6.xbm c7.xbm c8.xbm \
+ ccdbitmap ccdbitmap64 import.table export.table
 
 #  Lists of Latex and hypertext documents.
 
@@ -2006,7 +2006,7 @@ do_test:
 	@ echo
 	@ echo '$(PACK_NAME) does not have a make driven installation test'
 	@ echo
-	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
+	@ echo 'To test $(PACK_NAME), you should run the demonstration scripts,'
 	@ echo 'thus (% is the shell prompt):'
 	@ echo
 	@ echo ' % cd /empty_directory'
@@ -2014,6 +2014,7 @@ do_test:
 	@ echo ' % xdisplay'
 	@ echo ' % $(PKG_NAME)'
 	@ echo ' % ccdexercise'
+	@ echo ' % wcsexercise'
 	@ echo
 #
 #  Note the test has been run.
@@ -2255,7 +2256,7 @@ ccd1_gtcmp.o: SAE_PAR
 ccd1_gtcpb.o: SAE_PAR
 ccd1_gtcpc.o: SAE_PAR
 ccd1_gtdir.o: SAE_PAR
-ccd1_gtlig.o: DAT_PAR IRG_FAC SAE_PAR
+ccd1_gtlig.o: DAT_PAR IRG_FAC SAE_PAR USER_ERR
 ccd1_gtlis.o: DAT_PAR IRG_FAC SAE_PAR
 ccd1_gtmlg.o: IRG_FAC SAE_PAR
 ccd1_gtmli.o: IRG_FAC SAE_PAR
@@ -2635,7 +2636,7 @@ plotlist.o: CCD1_PAR FIO_PAR SAE_PAR
 present.o: CCD1_PAR IRG_FAC PAR_ERR SAE_PAR
 pthlpo.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 reduce.o: MSG_PAR PRM_PAR PSX_ERR SAE_PAR
-register.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
+register.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR USER_ERR
 runxreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
