@@ -571,7 +571,7 @@
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO
 
-      CALL FIO_WRITE( FD, ' ID }', STATUS )
+      CALL FIO_WRITE( FD, ' }', STATUS )
 
 *  Write a list of the quantities stored in each column out to the text file.
       CALL FIO_WRITE( FD, 'set uses_ { \\', STATUS )
@@ -589,7 +589,7 @@
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO
 
-      CALL FIO_WRITE( FD, ' ID }', STATUS )
+      CALL FIO_WRITE( FD, ' }', STATUS )
 
 *  Write a list of the heading formats out to the text file.
       CALL FIO_WRITE( FD, 'set hfmts_ { \\', STATUS )

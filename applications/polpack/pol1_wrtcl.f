@@ -177,7 +177,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  See if we need to construct ID values.
-      MAKERD = ( GCOL( IDCOL ) .EQ. CAT__NOID )
+      MAKEID = ( GCOL( IDCOL ) .EQ. CAT__NOID )
 
 *  Store some random row numbers. The X/Y and RA/DEC values at these rows
 *  are saved in local arrays as the rows are accessed. The row which is 
