@@ -131,6 +131,7 @@ typedef struct configInfo {
     int colour;
     char tag[TAGLEN+14];
     int smooth;
+    int resize;
 } configInfo;
 
 static configInfo ConfigInfo;
@@ -259,7 +260,7 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
     /*  Set the default configuration information. */
     ConfigInfo.style = 1.0;
     ConfigInfo.width = 1.0;
-    ConfigInfo.size = 1.0;
+    /*ConfigInfo.size = 1.0;*/
     ConfigInfo.font = 0;
     ConfigInfo.colour = 0;
     ConfigInfo.smooth = 0;
@@ -413,17 +414,39 @@ void astTk_LineType( int segments, int smooth ) {
  *        no effect for line-segments.
  *-
  */
-    if ( smooth ) {
-        ConfigInfo.smooth = 1;
-    } else {
-        ConfigInfo.smooth = 0;
-    }
+    ConfigInfo.smooth = smooth;
     
     if ( segments ) {
         LineType = SEGMENTS;
     } else {
         LineType = POLYLINE;
     }
+}
+
+void astTk_ResizeFonts( int resize ) {
+/*
+ *+
+ *  Name:
+ *     astTk_ResizeFonts
+
+ *  Purpose:
+ *     Sets whether fonts are resized.
+
+ *  Synopsis:
+ *     include "grf_tkcan.h"
+ *     void astTk_ResizeFonts( int resize )
+
+ *  Description:
+ *     When fonts are drawn onto a canvas they can either be made to resize
+ *     themselves to match any scale changes or not. This function allows you
+ *     to configure this behaviour. By default resizing is switched off.
+
+ *  Parameters:
+ *     int resize
+ *        Whether fonts are resized or not, 0 for false, 1 for true.
+ *-
+ */
+    ConfigInfo.resize = resize;
 }
 
 int astGFlush( void ){
@@ -865,11 +888,12 @@ int astGText( const char *text, float x, float y, const char *just,
         /* Now display the text. */
         (void) sprintf ( buffer, 
                          "%s create rtd_word %f %f -word {%s} -angle %f "
-                         "-anchor %s -scale %f -font %s -fill %s -tag {%s}\n",
+                         "-anchor %s -scale %f -font %s -fill %s -tag {%s} "
+                         "-resize %d \n",
                          Canvas, (double) x, (double) y, text, angle, anchor,
                          ConfigInfo.size, Fonts[ConfigInfo.font],
                          Colours[ConfigInfo.colour],
-                         ConfigInfo.tag );
+                         ConfigInfo.tag, ConfigInfo.resize );
         if ( Tcl_Eval( Interp, buffer ) != TCL_OK ) {
             astError( AST__GRFER, "astGText: Failed to draw text." );
             return 0;
@@ -1346,9 +1370,10 @@ static int textBBox( double x, double y, const char *text,
         options, as well as the position and angle. Note we use an
         unlikely canvas tag to arrange control of the item. */
     (void) sprintf ( buffer, "%s create rtd_word %f %f -word {%s} -angle %f "
-                     "-anchor %s -scale %f -font %s -tag grf_word_temp \n",
+                     "-anchor %s -scale %f -font %s -resize %d "
+                     "-tag grf_word_temp \n",
                      Canvas, x, y, text, angle, anchor, ConfigInfo.size,
-                     Fonts[ConfigInfo.font] );
+                     Fonts[ConfigInfo.font], ConfigInfo.resize );
     if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
         
         /*  Now get the bounding box of the text and then remove it (note
