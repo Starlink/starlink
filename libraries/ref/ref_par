@@ -1,0 +1,6 @@
+*    Description :
+*     This file contains the Internal Global Constants for REF.
+*    Global Constants :
+      integer REF__SZREF
+      parameter(REF__SZREF = 200)	! Size of reference field
+*-

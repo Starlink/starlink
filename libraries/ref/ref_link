@@ -1,0 +1,2 @@
+echo -lref `hds_link` `ems_link` \
+| awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
