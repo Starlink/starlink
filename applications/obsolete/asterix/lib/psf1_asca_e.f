@@ -115,7 +115,6 @@
 
 *  Get instrument
       CALL PSF0_GETID0C( PSID, 'Instr', INS, STATUS )
-      SIS = (INS .EQ. 'SIS' )
 
 *  Find energy in keV, and then energy bin number 1->2, 2->3 etc, and
 *  coerce into the range 0 to 10
@@ -125,7 +124,7 @@
         CALL PSF0_GETID0R( PSID, 'ChanScale', CSCALE, STATUS )
 
 *      Convert users PHA to raw PHA
-        IF ( SIS ) THEN
+        IF ( INS .EQ. 'SIS' ) THEN
           ENERGY = (REAL(PHALO) + REAL(PHAHI))*SIS_GAIN*CSCALE/2.0
         ELSE
           ENERGY = (REAL(PHALO) + REAL(PHAHI))*GIS_GAIN*CSCALE/2.0
