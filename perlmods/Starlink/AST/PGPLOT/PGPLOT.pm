@@ -714,4 +714,25 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 =cut
 
+package Starlink::AST::Plot;
+
+use strict;
+use vars qw/ $VERSION /;
+
+use Starlink::AST::PGPLOT;
+
+sub pgplot {
+  my $self = shift;
+  
+  $self->GFlush(\&Starlink::AST::PGPLOT::_GFlush);  
+  $self->GLine(\&Starlink::AST::PGPLOT::_GLine);
+  $self->GMark(\&Starlink::AST::PGPLOT::_GMark);
+  $self->GText(\&Starlink::AST::PGPLOT::_GText);
+  $self->GTxExt(\&Starlink::AST::PGPLOT::_GTxExt);
+  $self->GQch(\&Starlink::AST::PGPLOT::_GQch);
+  $self->GAttr(\&Starlink::AST::PGPLOT::_GAttr);
+  
+  return 1; 
+}
+
 1;
