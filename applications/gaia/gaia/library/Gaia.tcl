@@ -824,7 +824,7 @@ itcl::class gaia::Gaia {
             -canvas [$image_ get_canvas] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -clone_cmd [code $this make_toolbox astreference 1] \
+            -clone_cmd [code $this make_toolbox positions 1] \
             -really_die $cloned
       }
    }
