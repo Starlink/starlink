@@ -459,7 +459,7 @@
 *     WRITESZ = _LOGICAL (Read)
 *        If set to TRUE then MAKEMOS will output a file containing the
 *        scale and zero-point corrections (see SCALE and ZERO parameters)
-*        which can be read into the DRIZZLE A-task. IF SCALE and ZERO are
+*        which can be read into the DRIZZLE program. IF SCALE and ZERO are
 *        both set to FALSE, no file will be generated
 *        [FALSE]
 *     ZERO = _LOGICAL (Read)
@@ -1487,7 +1487,7 @@
       
 *  If we want the SCALE and ZERO point information to be written to a
 *  file then we do so here -- this file can be input into the DRIZZLE
-*  A-task via the CORRECT parameter.
+*  program via the CORRECT parameter.
       CALL PAR_GET0L( 'writesz', WRSAZ, STATUS )
       
 *  Should we output data?
