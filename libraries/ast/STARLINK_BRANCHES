@@ -12,3 +12,5 @@ DEV-nxg-20040830-ast-timeframe
 ------------------------------
 
 Branch created on 2004 August 30, to support Norman's TimeFrame work.
+Should probably have the trunk merged to it at some point, before much
+more work is done on TimeFrame.
