@@ -1511,6 +1511,9 @@ unbuild: clean
 #  files).  These are normally generated automatically from the source
 #  files.
 
+agchax.o:	 IRM_COM
+agchcu.o:	 SAE_PAR IRM_COM
+agchil.o:	 IRM_COM
 aif_antmp.o:	 SAE_PAR DAT_PAR
 aif_asfio.o:	 SAE_PAR PAR_ERR
 aif_flnam.o:	 SAE_PAR
@@ -1518,6 +1521,27 @@ aif_getvm.o:	 SAE_PAR DAT_PAR
 aif_opfio.o:	 SAE_PAR PAR_ERR
 aif_ptfnm.o:	 SAE_PAR
 aif_temp.o:	 SAE_PAR DAT_PAR
+bad2db.o:	 SAE_PAR PRM_PAR
+bad2dd.o:	 SAE_PAR PRM_PAR
+bad2di.o:	 SAE_PAR PRM_PAR
+bad2dr.o:	 SAE_PAR PRM_PAR
+bad2dub.o:	 SAE_PAR PRM_PAR
+bad2duw.o:	 SAE_PAR PRM_PAR
+bad2dw.o:	 SAE_PAR PRM_PAR
+bttn3.o:	 SAE_PAR
+chvalb.o:	 SAE_PAR PRM_PAR
+chvali.o:	 SAE_PAR PRM_PAR
+chvall.o:	 SAE_PAR PRM_PAR
+chvalr.o:	 SAE_PAR PRM_PAR
+chvalw.o:	 SAE_PAR PRM_PAR
+copad.o:	 SAE_PAR
+copai.o:	 SAE_PAR
+copar.o:	 SAE_PAR
+copy1d.o:	 SAE_PAR
+copy2d.o:	 SAE_PAR
+copy3d.o:	 SAE_PAR
+cpsecr.o:	 SAE_PAR
+creout.o:	 SAE_PAR PAR_ERR
 ctg1_appen.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
 ctg1_asexp.o:	 SAE_PAR CTG_CONST CTG_ERR GRP_PAR
 ctg1_catch.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
@@ -1537,6 +1561,13 @@ ctg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
 ctg_gtsup.o:	 SAE_PAR GRP_PAR
 ctg_ptsup.o:	 SAE_PAR GRP_PAR
 ctg_setsz.o:	 SAE_PAR GRP_PAR
+curpts.o:	 SAE_PAR
+dimlst.o:	 SAE_PAR
+drebar.o:	 SAE_PAR
+dynclr.o:	 SAE_PAR
+elnmbi.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+elnmbr.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+exparr.o:	 SAE_PAR PRM_PAR
 fts1_astwn.o:	 SAE_PAR AST_PAR 
 fts1_axis.o:	 SAE_PAR DAT_PAR PRM_PAR
 fts1_chvai.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
@@ -1593,6 +1624,9 @@ fts1_wkeyd.o:	 SAE_PAR
 fts1_wkeyi.o:	 SAE_PAR
 fts1_wkeyl.o:	 SAE_PAR
 fts1_wkeyr.o:	 SAE_PAR
+gthlpi.o:	 SAE_PAR HLPCMD
+icmmm.o:	 SAE_PAR PRM_PAR
+inset.o:	 SAE_PAR
 ira1_aito.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira1_ascre.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
 ira1_asdef.o:	 SAE_PAR IRA_PAR
@@ -1664,8 +1698,8 @@ kpg1_asffr.o:	 SAE_PAR NDF_PAR AST_PAR
 kpg1_asfgt.o:	 SAE_PAR AST_PAR NDF_PAR
 kpg1_asfil.o:	 SAE_PAR FIO_ERR GRP_PAR AST_PAR
 kpg1_asfrm.o:	 SAE_PAR AST_PAR PRM_PAR PAR_ERR IRA_PAR
-kpg1_asget.o:	 SAE_PAR NDF_PAR AST_PAR PRM_PAR
 kpg1_asgdp.o:    SAE_PAR NDF_PAR AST_PAR 
+kpg1_asget.o:	 SAE_PAR NDF_PAR AST_PAR PRM_PAR
 kpg1_asgfr.o:	 SAE_PAR DAT_PAR GRP_PAR GRP_ERR KPG_AST
 kpg1_asgfw.o:	 SAE_PAR DAT_PAR GRP_PAR KPG_AST
 kpg1_asgrd.o:	 SAE_PAR AST_PAR
@@ -2121,6 +2155,8 @@ kpg1_xyzwd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_xyzwr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_zones.o:	 SAE_PAR
 kpg1_zopic.o:	 SAE_PAR
+ld2ar.o:	 SAE_PAR PRM_PAR
+logarr.o:	 SAE_PAR PRM_PAR
 lpg1_init.o:	 DAT_PAR LPG_CONST GRP_PAR LPG_COM
 lpg1_ptpar.o:	 SAE_PAR GRP_PAR DAT_PAR
 lpg1_tidy.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
@@ -2133,6 +2169,15 @@ lpg_crep.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_CO
 lpg_prop.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
 lpg_start.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
 lpg_state.o:	 SAE_PAR DAT_PAR LPG_CONST LPG_COM
+ncraxs.o:	 SAE_PAR
+ncrbck.o:	 SAE_PAR
+ncropn.o:	 SAE_PAR PAR_ERR
+normal.o:	 SAE_PAR
+nxtnam.o:	 SAE_PAR
+powarr.o:	 SAE_PAR PRM_PAR
+pthlpo.o:	 SAE_PAR HLPCMD
+zero1d.o:	 SAE_PAR
+zero2d.o:	 SAE_PAR
 
 #-------------------------------------------------------------------------------
 #
