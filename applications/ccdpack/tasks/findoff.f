@@ -267,7 +267,7 @@
 *       to contain the name of the appropriate output lists.
 
 *  Notes on Algorithms:
-*     The pattern-matching process uses two algorithms, one which
+*     The pattern-matching process uses two main algorithms, one which
 *     matches all the point pair-offsets between any two input lists, 
 *     looking for the matches with the most common positions, and one 
 *     which uses a statistical method based on a histogram of the 
@@ -298,6 +298,18 @@
 *     the SLOW algorithm when you have small datasets and do not
 *     expect large areas (numbers of positions) of overlap.
 *
+*     A third algorithm, referred to as SNGL, is used automatically if 
+*     one or both of the lists in a pair contains only a single object.
+*     In this case object matching is trivial and, of course, may 
+*     easily be in error.  SNGL can only be used if the MINMATCH
+*     parameter has been set to 1, which should be done with care.  The
+*     SNGL algorithm may be useful if there really is only one object, 
+*     correctly identified, in all the frames.  If this is not the 
+*     case, it should only be used when USEWCS is true and MAXDISP is 
+*     set to a low value, indicating that the alignment of the NDFs in
+*     the Current frames of their WCS components is already fairly 
+*     accurate.
+*
 *     The global registration process works by forming a graph with
 *     each position list at a node and with connecting edges of weight
 *     the number of matched position-pairs. The edge weights may be
@@ -325,13 +337,13 @@
 *        In this example all the NDFs in the current directory are
 *        accessed and their associated position lists are used.  
 *        Before object matching is attempted any transformations 
-*        implied by registering the images in the Current frames
+*        implied by aligning the images in the Current frames
 *        of the NDFs' WCS components are applied to the position list
-*        coordinates.  The matched positions are named *.off. The 
-*        method used is to try the FAST algorithm, switching to SLOW 
+*        coordinates.  The matched position lists are named *.off.
+*        The method used is to try the FAST algorithm, switching to SLOW 
 *        if FAST fails. The completeness measure is used when forming 
 *        the spanning tree.  Matches with completenesses less than 
-*        0.5 and with less than three positions are rejected.
+*        0.5 and or with less than three positions, are rejected.
 *
 *     findoff fast nofailsafe
 *        In this example the only the FAST algorithm is used.
@@ -357,6 +369,15 @@
 *        small overlap, but will result in failure of the program if 
 *        the WCS components are not translationally registered 
 *        reasonably well.
+*
+*     findoff inlist='data*' outlist='*.off' restrict minmatch=2
+*             maxdisp=20 minsep=30
+*        In this example the NDFs are sparsely populated, and a pair 
+*        will be considered to match if as few as two matching objects
+*        can be found.  The NDFs have been initially aligned in the 
+*        Current frames of their WCS components to an accuracy of 20
+*        or better.  As an additional safeguard, no objects within 
+*        30 pixels of each other in the same NDF are used for matching.
 
 *  Behaviour of parameters:
 *     Most parameters retain their current value as default. The
