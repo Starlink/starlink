@@ -45,7 +45,7 @@
              MAKECAL
              MAKEFLAT
 
-     - The package now requires AST 1.3 to build.
+     - The package now requires AST 1.4 to build.
 
 
   * A new application, DRIZZLE, has been introduced.  This resamples and
