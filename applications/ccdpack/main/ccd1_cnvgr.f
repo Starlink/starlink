@@ -1,5 +1,5 @@
-      SUBROUTINE CCD1_CNVGR( IFSETS, NFSET, DMNS, NDMN, GRAPH, NEDGE,
-     :                       STATUS )
+      SUBROUTINE CCD1_CNVGR( IFSETS, NFSET, DMNS, NDMN, USESET, SNAME,
+     :                       GRAPH, NEDGE, STATUS )
 *+
 *  Name:
 *     CCD1_CNVGR
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_CNVGR( IFSETS, NFSET, DMNS, NDMN, GRAPH, NEDGE, 
-*                      STATUS )
+*     CALL CCD1_CNVGR( IFSETS, NFSET, DMNS, NDMN, USESET, SNAME, GRAPH,
+*                      NEDGE, STATUS )
 
 *  Description:
 *     This routine creates a representation of a graph in which the
@@ -23,7 +23,9 @@
 *     then the second, and so on.  The graph is returned as a series
 *     of edges, each containing the node numbers, the index of the 
 *     domain used for matching, and an index into any associated data
-*     created.
+*     created.  If USESET is true, then the first domain in DMNS
+*     is only used if the corresponding SNAME values match; in this
+*     way Set-based alignment can be taken account of.
 
 *  Arguments:
 *     IFSETS( NFSET ) = INTEGER (Given)
@@ -34,6 +36,13 @@
 *        Ordered list of domains in which frame matching should occur.
 *     NDMN = INTEGER (Given)
 *        Dimension of DMNS.
+*     USESET = LOGICAL (Given)
+*        If true, then the first domain in DMNS will be ignored unless
+*        the elements of the SNAME array for the two framesets being
+*        matched are the same.
+*     SNAME( NFSET ) = CHARACTER * ( * ) (Given)
+*        If USESET is true, then this array is used to store the Set
+*        Name attribute corresponding to each frameset.
 *     GRAPH( 4, * ) = INTEGER (Returned)
 *        The graph as a set of edges, with node numbers (1,*) and (2,*),
 *        match domain indices (3,*), and index into associated data
@@ -63,6 +72,8 @@
 *  History:
 *     14-APR-1999 (MBT):
 *        Original version.
+*     16-FEB-2001 (MBT):
+*        Upgraded for Set alignment.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -82,6 +93,8 @@
       INTEGER IFSETS( NFSET )
       INTEGER NDMN
       CHARACTER * ( * ) DMNS( NDMN )
+      LOGICAL USESET
+      CHARACTER * ( * ) SNAME( NFSET )
       
 *  Arguments Returned:
       INTEGER GRAPH( 4, * )
@@ -91,13 +104,15 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( AST__SZCHR ) DMNLST ! Comma-separated domain list
+      CHARACTER * ( AST__SZCHR ) DLIST ! Domain list for conversion
       CHARACTER * ( AST__SZCHR ) DMCNV ! Domain in which conversion took place
+      CHARACTER * ( AST__SZCHR ) NDLIST ! Domain list omitting first element
+      CHARACTER * ( AST__SZCHR ) ODLIST ! Domain list including first element
       INTEGER COUNT              ! Position in original list of edges
       INTEGER CNV                ! AST pointer to conversion frameset
       INTEGER FRBAS              ! Base frame of frameset
       INTEGER I                  ! Loop variable
-      INTEGER IDMN               ! Index in DMNLST of conversion domain
+      INTEGER IDMN               ! Index in DLIST of conversion domain
       INTEGER J                  ! Loop variable
       INTEGER K                  ! Loop variable
       
@@ -111,8 +126,13 @@
       COUNT = 0
 
 *  Set up the domain list parameter to AST_CONVERT, which needs to be an
-*  ordered comma-separated list of the domains for conversion.
-      CALL CCD1_DLCAT( DMNS, NDMN, ',', DMNLST, STATUS )
+*  ordered comma-separated list of the domains for conversion.  If
+*  we are doing Set-based alignment, construct a list omitting the
+*  first element too.
+      CALL CCD1_DLCAT( DMNS, NDMN, ',', ODLIST, STATUS )
+      IF ( USESET ) THEN
+         CALL CCD1_DLCAT( DMNS( 2 ), NDMN - 1, ',', NDLIST, STATUS )
+      END IF
 
 *  Begin new AST context.
       CALL AST_BEGIN( STATUS )
@@ -123,8 +143,16 @@
             COUNT = COUNT + 1
 
 *  Attempt conversion between framesets.
-            CNV = AST_CONVERT( IFSETS( I ), IFSETS( J ), DMNLST, 
-     :                         STATUS )
+            IF ( USESET ) THEN
+               IF ( SNAME( I ) .EQ. SNAME( J ) ) THEN
+                  DLIST = ODLIST
+               ELSE
+                  DLIST = NDLIST
+               END IF
+            ELSE
+               DLIST = ODLIST
+            END IF
+            CNV = AST_CONVERT( IFSETS( I ), IFSETS( J ), DLIST, STATUS )
 
 *  If conversion is successful, write a new edge to the graph.
             IF ( CNV .NE. AST__NULL ) THEN
