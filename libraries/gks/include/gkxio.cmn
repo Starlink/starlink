@@ -1,0 +1,11 @@
+* ---------------
+*  BEGIN INCLUDE       GKXIO.CMN      PJWR      07/11/86
+* ---------------
+
+      LOGICAL ISWKT(KWK), ISPREC(KWK), ERPREC
+
+      COMMON /GKZXIO/ ISWKT, ISPREC, ERPREC
+
+* ---------------
+*   END INCLUDE
+* ---------------
