@@ -82,7 +82,7 @@
 <!ENTITY % simplephrase	"| em | strong | quote | code | kbd | cite | m
 			%additional.simplephrase;">
 <!ENTITY % structuring	"| blockquote | dl | ul | ol | verbatim | linespecific 
-			%update.or
+			%update.or;
 			%additional.structuring;">
 <!ENTITY % maths	"| mequation | meqnarray">
 <!ENTITY % simpletext	"#PCDATA %simplephrase;">
@@ -99,9 +99,8 @@
 
      The id attribute is a bit of a pain to implement, but useful.
      -->
-<!ENTITY % p.model 
-    (%phrase; %structuring; %additional.special; )*'>
-<!ELEMENT p %MOO; (%p.model;)>
+<!ENTITY % p.model '(%phrase; %structuring; %additional.special; )*'>
+<!ELEMENT p %MOO; %p.model;>
 <!ATTLIST p
 	id	ID	#IMPLIED
 	>
@@ -115,7 +114,7 @@
      exclusions.  It'll also help find `missing end tag' errors.
      -->
 <!ENTITY % px.model '(%phrase; %structuring;)*'>
-<!ELEMENT px %MOO; (%px.model;)>
+<!ELEMENT px %MOO; %px.model;>
 
 <!ELEMENT em		%MXX; (%phrase;)*>
 <!ELEMENT strong	%MXX; (%phrase;)*>
@@ -129,8 +128,8 @@
      Allow %references within CODE: see verbatim below.
      -->
 <!ENTITY % code.model '(#PCDATA %references;)*'>
-<!ELEMENT code	%MXX; (%code.model;)>
-<!ELEMENT kbd	%MXX; (%code.model;)>
+<!ELEMENT code	%MXX; %code.model;>
+<!ELEMENT kbd	%MXX; %code.model;>
 			<!-- literal text -->
 <!ATTLIST code
 	type	(fspath)	#IMPLIED
@@ -155,13 +154,13 @@
      the other elements, too.
      -->
 <!ENTITY % verbatim.model '(#PCDATA %simplephrase; %references;)*'>
-<!ELEMENT verbatim %MXX; (%verbatim.model;)>
+<!ELEMENT verbatim %MXX; %verbatim.model;>
 				<!-- verbatim text -->
 <!ELEMENT blockquote %MXX; (attribution?, px+)>
 				<!-- extended quotation -->
-<!ELEMENT quote %MXX; (attribution?, (%phrase;)+)>
+<!ELEMENT quote %MXX; (%phrase;)*>
 				<!-- simple quotation  -->
-<!ELEMENT attribution %MXX; ((%phrase;)+)>
+<!ELEMENT attribution %MXX; (%phrase;)*>
 				<!-- source of quotation -->
 
 <!ELEMENT linespecific %MXX; (line+)>
@@ -391,10 +390,10 @@
      -->
 <!NOTATION URL 
 	PUBLIC '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'
-	%CATALOGSYSID;
+	"http://goedel.astro.gla.ac.uk/catalogue/public/-//IETF/RFC1738//NOTATION%20Uniform%20Resource%20Locator//EN"
 	>
 
-<!ELEMENT webref %MXX; (%simpletext;)+>
+<!ELEMENT webref %MXX; (%simpletext;)*>
 <!ATTLIST webref
 	url		CDATA	#REQUIRED
 
@@ -469,11 +468,12 @@
 <!--========== Lists ==========-->
 <!ENTITY % dl.model '%update.fc; (dt,dd)+'>
 <!ELEMENT dl %MXX; (%dl.model;)>
-<!ELEMENT dt %MXO; (%phrase;)+>
+<!ELEMENT dt %MXO; (%phrase;)*>
 <!ELEMENT dd %MXO; (p)+>
 
 <!ENTITY % oul.model '%update.fc; (li)+'>
-<!ELEMENT (ol|ul) %MXX; (%oul.model;)>
+<!ELEMENT ol %MXX; (%oul.model;)>
+<!ELEMENT ul %MXX; (%oul.model;)>
 <!ELEMENT li %MXO; (p)+>
 
 <!ATTLIST dl	compact		(compact) #IMPLIED>
