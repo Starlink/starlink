@@ -41,7 +41,7 @@ atools.hlp: $(atools_mon_TASKS:=.f) history.help atools.star-hlp
 	   $(prohlp) in=$${f} out=$${f}.help ;\
 	done
 	cat atools.star-hlp *.help > atools.hlp
-	rm *.help
+	rm $(atools_mon_TASKS:=.f.help)
 
 history.help: atools.news
 	./make_history_help
@@ -51,7 +51,7 @@ history.help: atools.news
 	@HLIB@ $<
 
 # Rule for creating various components from the ifd file.
-atools.csh atools.icl atools_mon.ifl $(TASKS:=.ifl): atools.ifd
+atools.csh atools.icl atools_mon.ifl $(atools_mon_TASKS:=.ifl): atools.ifd
 	@IFD2STAR@ atools
 
 ##  Any misc PISA files that have no where else.
