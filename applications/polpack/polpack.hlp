@@ -7,6 +7,8 @@
 
 1 Introduction
 
+A general introduction to POLPACK.
+
 POLPACK is a package of applications for mapping the linear or circular
 polarization of extended astronomical objects, using data obtained from a
 dual-beam polarimeter. It is assumed that the analyser is stepped in
@@ -48,6 +50,9 @@ analyser positions to be used (described in SUN/223).
 Type ? to see the main help topics.
 
 1 Using_Help
+
+ How to get help on POLPACK commands. 
+
  You are situated in a portable HELP library which contains help
  information about POLPACK arranged in an hierarchical structure.  The
  help system enables you to navigate the library by prompting when it
@@ -117,6 +122,8 @@ Type ? to see the main help topics.
       subtopic.
 
 1 Group Expressions
+
+A description of the syntax used to specify groups of objects.
 
 Several of the POLPACK applications have parameters which are described
 as being associated with "groups" (or "lists") of objects. For instance,
