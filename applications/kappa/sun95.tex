@@ -16996,7 +16996,10 @@ default value.
       on the current image-display device. The minimum and maximum data
       values to be displayed can be selected in several ways (see
       parameter MODE). Data values outside these limits are displayed
-      with the colour of the nearest limit.
+      with the colour of the nearest limit. A colour ramp showing the 
+      relationship between colour and data value can be displayed (see
+      parameter KEY).
+
 
       Annotated axes or a simple border can be drawn around the image (see
       parameters AXES and BORDER). The appearance of these may be controlled
@@ -17131,7 +17134,7 @@ default value.
          alternative to {\tt "}Variance{\tt "} and causes the square root of the
          variance values to be displayed).  If {\tt "}Quality{\tt "} is specified,
          then the quality values are treated as numerical values (in
-         the range 0 to 255). {\tt [{\tt "}Data{\tt "}]}
+         the range 0 to 255). {\tt ["Data"]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
@@ -17165,6 +17168,55 @@ default value.
          IN = NDF (Read)
       }{
          The input NDF structure containing the data to be displayed.
+      }
+      \sstsubsection{
+         KEY = \_LOGICAL (Read)
+      }{
+         TRUE if a key to the colour table is to be produced to the right
+         of the display. This takes the form of a colour ramp, annotated
+         with data value. The appearance of this key can be controlled using
+         parameter KEYSTYLE, and its horizontal position can be controlled 
+         using parameter KEYPOS. If the key is required in a different
+         location, set KEY=NO and use application LUTVIEW after
+         displaying the image. {\tt [TRUE] }
+      }
+      \sstsubsection{
+         KEYPOS = \_REAL (Read)
+      }{
+         A value giving the gap between the right hand edge of the display
+         and the left hand edge of the key (0.0 for no gap, 1.0 for the 
+         largest gap). If a key is produced, then the right hand margin 
+         specified by parameter MARGIN is ignored. {\tt [current value]}
+      }
+      \sstsubsection{
+         KEYSTYLE = GROUP (Read)
+      }{
+         A group of attribute settings describing the plotting style to use
+         for the key (see parameter KEY).
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         Axis 1 is always the {\tt "}data value{\tt "} axis. So for instance, 
+         to set the label for the data value axis, assign a value to 
+         {\tt "Label(1)"} in the supplied style. {\tt [current value]}
       }
       \sstsubsection{
          LOW = \_DOUBLE (Read)
@@ -43878,6 +43930,11 @@ The following applications have been modified:
          A bug has been fixed which resulted in CURSOR running out of
          picture identifiers (and consequently aborting) if more than
          40 positions were given.
+
+      \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{}
+         New parameters KEY, KEYPOS and KEYSTYLE have been added, allowing
+         DISPLAY to create a key containing a colour ramp in the same style 
+         as LUTVIEW.
 
       \item [\htmlref{EXP10}{EXP10}] \mbox{}
          This command is now a synonym for {\tt expon base=10D0}.
