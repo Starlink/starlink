@@ -1433,25 +1433,22 @@ UNIX).
 <component id="tsp">
   <version>2.3-3</version>
   <path>applications/kappa</path>
-  <description>KAPPA - Kernel Application Package</description>
+  <description>TSP - Time Series/Polarimetry Package</description>
   <abstract><p>
-KAPPA is an applications package comprising about 180
-general-purpose commands for image processing, data visualisation, and
-manipulation of the standard Starlink data format---the NDF.  It is
-intended to work in conjunction with Starlink's various specialised
-packages.
+TSP is an astronomical data reduction package which handles time series
+data and polarimetric data. These facilities are missing from most existing
+data reduction packages which are usually oriented towards either spectroscopy
+or image processing or both. Where facilities for polarimetry or time series
+data have been provided they have usually not been sufficiently general
+to handle data from a variety of different instruments.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build>sla</build><build>figaro</build><build>ndf</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-    </person>
-    <person>
-      <name>Malcolm Currie</name>
-      <uname>mjc</uname>
+      <name>Jeremy Bailey</name>
+      <uname>jb</uname>
     </person>
   </developers>
   <documentation> sun66</documentation>
