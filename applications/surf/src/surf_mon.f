@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.14  1997/05/01 18:28:07  timj
+*     Add CHANGE_DATA.
+*
 *     Revision 1.13  1997/04/09 02:20:01  timj
 *     Add CHANGE_* tasks
 *     Add INTREBIN
@@ -102,6 +105,10 @@ c
       ELSE IF (NAME .EQ. 'BOLREBIN') THEN
 
          CALL REDS_REBIN (NAME, STATUS)
+
+      ELSE IF (NAME .EQ. 'CHANGE_DATA') THEN
+
+         CALL REDS_CHGDATA (STATUS)
 
       ELSE IF (NAME .EQ. 'CHANGE_FLAT') THEN
 
