@@ -5677,7 +5677,8 @@ target: dependency
             <title>STAR_CNF_COMPATIBLE_SYMBOLS</title>
           </subhead>
 
-          <p><strong><code>STAR_CNF_COMPATIBLE_SYMBOLS</code></strong><index>CNF</index></p>
+          <p><strong><code>STAR_CNF_COMPATIBLE_SYMBOLS</code></strong><index>CNF</index>
+            <index seealso="CNF">C and Fortran, mixing</index></p>
 
           <p>Work out what is required to have the Fortran compiler
             produce library symbols which are compatible with those
@@ -6016,6 +6017,39 @@ target: dependency
             <code>STAR_DEFAULTS</code> macro which should make
             configuration somewhat faster in this case.  Certain other
             macros, such as <code>STAR_MESSGEN</code><index>starconf!macros!STAR_MESSGEN</index>, are disabled.</p>
+
+        </subsect>
+
+        <subsect id="macro-star-initialise-fortran" export="export"
+          indexkey="starconf!macros!STAR_INITIALISE_FORTRAN">
+          <subhead>
+            <title>STAR_INITIALISE_FORTRAN</title>
+          </subhead>
+
+          <p><strong><code>STAR_INITIALISE_FORTRAN</code></strong></p>
+
+          <p>Define a macro which can be used in a C or C++
+            main<index>C and Fortran, mixing</index>
+            program to initialise the Fortran RTL, including, for
+            example, doing whatever work is required so that the
+            Fortran <code>getarg()</code> function works.  This
+            defines the macro
+            <code>STAR_INITIALISE_FORTRAN(argc,argv)</code>.  If
+            nothing is required or possible on a particular platform,
+            then this expands, harmlessly, to nothing.</p>
+
+          <p>You might use this as follows:
+<verbatim>
+#include &lt;config.h&gt;
+
+int main(int argc, char** argv)
+{
+    STAR_INITIALISE_FORTRAN(argc, argv);
+
+    /* etc */
+}
+</verbatim>
+</p>
 
         </subsect>
 
