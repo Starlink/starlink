@@ -227,7 +227,6 @@
       export FC
       export CC
       export CXX
-      export CFLAGS
       export LINK
       export SOURCE_VARIANT
       export RANLIB
@@ -253,8 +252,6 @@
                CC='cc'
                CXX='cxx'
                FC='f77'
-               CFLAGS=''
-               FFLAGS=''
                DEC_CXX='-std arm'; export DEC_CXX  # Need for V6 compiler & AST
                LINK='ln -s'
                RANLIB='ranlib'
@@ -272,8 +269,6 @@
                CC='c89'
                CXX='cxx'
                FC='f77'
-               CFLAGS=''
-               FFLAGS=''
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -290,8 +285,6 @@
                CC='gcc'
                CXX='g++'
                FC='f77'
-               CFLAGS=''
-               FFLAGS=''
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -306,8 +299,6 @@
                CC='cc'
                CXX='CC'
                FC='f77'
-               CFLAGS=''
-               FFLAGS=''
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xmf'
@@ -323,8 +314,6 @@
 	       CC='gcc'
                CXX='g++'
                FC='g77'
-               CFLAGS=''
-               FFLAGS=''
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
