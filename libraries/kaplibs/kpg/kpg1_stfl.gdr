@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_STFL<T>( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+      SUBROUTINE KPG1_STFL<T>( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                         DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                         MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
      :                         IFIL, STATUS )
@@ -14,7 +14,7 @@
 *     Starlink Fortran 77.
  
 *  Invocation:
-*     CALL KPG1_STFLx( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+*     CALL KPG1_STFLx( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
 *                      DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
 *                      MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
 *                      IFIL, STATUS )
@@ -24,6 +24,8 @@
 *     the routines KPG1_STATx and KPG1_HSTAx to a text file.
  
 *  Arguments:
+*     IWCS = INTEGER (Given)
+*        Pointer to WCS FrameSet.
 *     NDIM = INTEGER (Given)
 *        Number of dimensions of the array whose statistics are being
 *        displayed.
@@ -86,6 +88,7 @@
 *     positions.
  
 *  Authors:
+*     DSB: David S. Berry (STARLINK)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -96,6 +99,9 @@
 *     1996 March 11 (MJC):
 *        Redo addition of the ordered statistics and checking for bad
 *        values (originally c.1992).
+*     6-AUG-2004 (DSB):
+*        Re-instated generic source and added argument IWCS. Display WCS
+*        coords instead of AXIS coords. 
 *     {enter_changes_here}
  
 *  Bugs:
@@ -109,8 +115,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'AST_PAR'          ! AST_ functions
  
 *  Arguments Given:
+      INTEGER IWCS
       INTEGER NDIM
       INTEGER EL
       INTEGER NGOOD
@@ -138,7 +147,10 @@
       CHARACTER * ( 5 ) PCENT    ! Buffer for formatting percentages
       CHARACTER * ( 80 ) BUF1    ! Text buffer
       CHARACTER * ( 80 ) BUF2    ! Text buffer
+      DOUBLE PRECISION POSIN( NDF__MXDIM ) ! Input pixel coords
+      DOUBLE PRECISION POS( NDF__MXDIM ) ! Ouput WCS coords
       INTEGER I                  ! Loop counter for dimensions
+      INTEGER NWCS               ! Number of current Frame coords
       INTEGER NC1                ! No. of characters in BUF1
       INTEGER NC2                ! No. of characters in BUF2
  
@@ -150,6 +162,9 @@
  
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Store the number of WCS axes.
+      NWCS = AST_GETI( IWCS, 'NAXES', STATUS ) 
  
 *  Display the pixel sum.
       CALL FIO_WRITE( IFIL, ' ', STATUS )
@@ -186,30 +201,43 @@
             CALL FIO_WRITE( IFIL, BUF1( : NC1 ), STATUS )
          END IF
  
-*  Format the indices and co-ordinates of the centre of the minimum
+*  Format the indices and WCS co-ordinates of the centre of the minimum
 *  pixel as character strings.
-         IF ( MINP( 1 ) .NE. VAL__BADI .AND.
-     :        MINC( 1 ) .NE. VAL__BADD ) THEN
+         IF ( MINP( 1 ) .NE. VAL__BADI ) THEN
+
+*  First do the pixel indices.
             NC1 = 0
-            NC2 = 0
             CALL CHR_PUTC( '            At pixel            : (', BUF1,
      :                     NC1 )
+            DO I = 1, NDIM
+               IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF1, NC1 )
+               CALL CHR_PUTI( MINP( I ), BUF1, NC1 )
+            END DO
+            CALL CHR_PUTC( ')', BUF1, NC1 )
+ 
+            CALL FIO_WRITE( IFIL, BUF1( : NC1 ), STATUS )
+
+*  Now do the WCS coords. Transform the pixel coords to WCS coords.
+            DO I = 1, NDIM
+               POSIN( I ) = DBLE( MINP( I ) ) + 0.5D0
+            END DO
+            CALL AST_TRANN( IWCS, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
+     :                      POS, STATUS )
+
+*  Now create the WCS text string.
+            NC2 = 0
             CALL CHR_PUTC( '            Co-ordinate         : (', BUF2,
      :                     NC2 )
-            DO 1 I = 1, NDIM
-               IF ( I .GT. 1 ) THEN
-                  CALL CHR_PUTC( ', ', BUF1, NC1 )
-                  CALL CHR_PUTC( ', ', BUF2, NC2 )
-               END IF
-               CALL CHR_PUTI( MINP( I ), BUF1, NC1 )
-               CALL CHR_PUTR( SNGL( MINC( I ) ), BUF2, NC2 )
-    1       CONTINUE
-            CALL CHR_PUTC( ')', BUF1, NC1 )
+            DO I = 1, NDIM
+               IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF2, NC2 )
+               CALL CHR_APPND( AST_FORMAT( IWCS, I, POS, STATUS ), BUF2, 
+     :                        NC2 )
+            END DO
             CALL CHR_PUTC( ')', BUF2, NC2 )
  
-*  Display the minimum pixel's indices and co-ordinates.
-            CALL FIO_WRITE( IFIL, BUF1( : NC1 ), STATUS )
+*  Display it.
             CALL FIO_WRITE( IFIL, BUF2( : NC2 ), STATUS )
+
          END IF
  
 *  Display the maximum pixel value found.
@@ -223,28 +251,41 @@
  
 *  Format the indices and co-ordinates of the centre of the maximum
 *  pixel as character strings.
-         IF ( MAXP( 1 ) .NE. VAL__BADI .AND.
-     :        MAXC( 1 ) .NE. VAL__BADD ) THEN
+         IF ( MAXP( 1 ) .NE. VAL__BADI ) THEN
+
+*  First do the pixel indices.
             NC1 = 0
-            NC2 = 0
             CALL CHR_PUTC( '            At pixel            : (', BUF1,
      :                     NC1 )
+            DO I = 1, NDIM
+               IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF1, NC1 )
+               CALL CHR_PUTI( MAXP( I ), BUF1, NC1 )
+            END DO
+            CALL CHR_PUTC( ')', BUF1, NC1 )
+ 
+            CALL FIO_WRITE( IFIL, BUF1( : NC1 ), STATUS )
+
+*  Now do the WCS coords. Transform the pixel coords to WCS coords.
+            DO I = 1, NDIM
+               POSIN( I ) = DBLE( MAXP( I ) ) + 0.5D0
+            END DO
+            CALL AST_TRANN( IWCS, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
+     :                      POS, STATUS )
+
+*  Now create the WCS text string.
+            NC2 = 0
             CALL CHR_PUTC( '            Co-ordinate         : (', BUF2,
      :                     NC2 )
-            DO 2 I = 1, NDIM
-               IF ( I .GT. 1 ) THEN
-                  CALL CHR_PUTC( ', ', BUF1, NC1 )
-                  CALL CHR_PUTC( ', ', BUF2, NC2 )
-               END IF
-               CALL CHR_PUTI( MAXP( I ), BUF1, NC1 )
-               CALL CHR_PUTR( SNGL( MAXC( I ) ), BUF2, NC2 )
-    2       CONTINUE
-            CALL CHR_PUTC( ')', BUF1, NC1 )
+            DO I = 1, NDIM
+               IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF2, NC2 )
+               CALL CHR_APPND( AST_FORMAT( IWCS, I, POS, STATUS ), BUF2, 
+     :                        NC2 )
+            END DO
             CALL CHR_PUTC( ')', BUF2, NC2 )
  
-*  Display the maximum pixel's indices and co-ordinates.
-            CALL FIO_WRITE( IFIL, BUF1( : NC1 ), STATUS )
+*  Display it.
             CALL FIO_WRITE( IFIL, BUF2( : NC2 ), STATUS )
+
          END IF
  
 *  Display the median value.
