@@ -118,6 +118,8 @@
 *  primary HDU
       IF ( HDU(1:1) .EQ. ' ' ) THEN
         CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
+        CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
+        CREATED = (NHDU.EQ.0)
 
 *  Otherwise named HDU in the EXTENSIONS structure
       ELSE
@@ -146,7 +148,9 @@
         CALL ADI_CPUT0C( ID, '.HDU_'//STR(:NDIG), HDU, STATUS )
 
 *    Ensure previous HDU's data areas are defined
-        CALL ADI2_CHKPRV( FID, NHDU-1, .FALSE., STATUS )
+        IF ( NHDU .GT. 1 ) THEN
+          CALL ADI2_CHKPRV( FID, NHDU-1, .FALSE., STATUS )
+        END IF
 
 *    Mark HDU data area as undefined
         CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )

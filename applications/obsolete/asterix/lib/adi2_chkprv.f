@@ -104,7 +104,6 @@
       INTEGER			FSTAT			! FITSIO status
       INTEGER			IHDU			! Loop over HDUs
       INTEGER			LUN			! Logical unit
-      INTEGER			NHDU			! HDU count
       INTEGER			NKEY			! Keyword count
       INTEGER			OHID			! Old HDU object
 
