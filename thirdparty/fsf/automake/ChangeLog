@@ -1,3 +1,9 @@
+2004-07-30  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* automake.in: Recognises all of
+	AC_CANONICAL_(BUILD|HOST|SYSTEM|TARGET), and adds
+	config.{sub,guess} if any of them are present
+
 2004-01-12  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* configure.ac, NEWS: Bump version to 1.8.2.
