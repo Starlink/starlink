@@ -119,14 +119,14 @@ DviFile::DviFile (string& fn,
 		  bool read_post,
 		  bool seekable)
     throw (DviError)
-    : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
+    : fileName_(fn), resolution_(res),
+      pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), extmag_(externalmag),
       netmag_(1.0), skipPage_(false),
       max_drift_(0),
       widest_page_(-1), deepest_page_(-1),
       have_preread_postamble_(false), have_read_to_postamble_(false)
 {
-
     if (resolution_ == 0)	// then default it
 	resolution_ = PkFont::dpiBase();
     PkFont::setResolution(resolution_);
