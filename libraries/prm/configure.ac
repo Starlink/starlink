@@ -29,6 +29,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 AC_CHECK_HEADERS([fenv.h limits.h float.h stdint.h time.h])
 AC_CHECK_FUNCS([nextafter nextafterf])
 AC_CHECK_TYPES([int32_t, int64_t])
+AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short int)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
