@@ -68,5 +68,7 @@ parent of the node.
 <codebody>
 (define cadr (lambda (x) (car (cdr x))))
 (define caddr (lambda (x) (car (cdr (cdr x)))))
+(define cadddr (lambda (x) (car (cdr (cdr (cdr x))))))
+(define caddddr (lambda (x) (car (cdr (cdr (cdr (cdr x)))))))
 </codebody>
 </misccode>
