@@ -13,9 +13,7 @@
 *     CALL GCB1_LOAD( NARG, ARGS, OARG, STATUS )
 
 *  Description:
-*     Loads the GCB from an HDS file. At the moment just invokes the HDS
-*     specific routine GCB_LOAD which should eventually be incorporated
-*     into this routine.
+*     Loads the GCB from an HDS file.
 
 *  Arguments:
 *     NARG = INTEGER (given)
@@ -88,22 +86,27 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
+      INCLUDE 'GCB_PAR'
+
+*  Global Variables:
+      INCLUDE 'GCB_CMN'
 
 *  Arguments Given:
-      INTEGER                   NARG                    ! # arguments
-      INTEGER                   ARGS(*)                 ! Method arguments
+      INTEGER                   NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER                   OARG                    ! Returned data
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			ADI1_GETLOC
-
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! HDS file handle
+      CHARACTER*(DAT__SZLOC)	GCBLOC			! GRAFIX_CONTROL object
+      CHARACTER*(DAT__SZLOC)	GLOC			! GRAFIX box
+
+      INTEGER			GCBPTR			! Ptr to mapped GCB
+
+      LOGICAL			OK			! Read from file?
 *.
 
 *  Check inherited global status.
@@ -112,8 +115,39 @@
 *  Extract locator from 1st argument
       CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
 
-*  Invoke old routine
-      CALL GCB_LOAD( LOC, STATUS )
+*  Initialise
+      OK = .FALSE.
+      AOK = .FALSE.
+
+*  GRAFIX box exists?
+      CALL ADI1_LOCGRAF( ARGS(1), .FALSE., GLOC, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*    GCB in file?
+        CALL DAT_THERE( GLOC, 'GRAFIX_CONTROL', OK, STATUS )
+        IF ( OK ) THEN
+          CALL DAT_FIND( GLOC, 'GRAFIX_CONTROL', GCBLOC, STATUS )
+          CALL DAT_SIZE( GCBLOC, NBYTE, STATUS )
+          CALL DAT_MAP( GCBLOC, '_BYTE', 'READ', 1, NBYTE,
+     :                                    GCBPTR, STATUS )
+          CALL GCB_LOAD_SUB( %VAL(GCBPTR), %val(G_MEMPTR), STATUS )
+
+          CALL DAT_ANNUL( GCBLOC, STATUS )
+
+*      Read it ok?
+          OK = (STATUS.EQ.SAI__OK)
+
+        END IF
+
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+
+      END IF
+
+*  If not ok clear GCB in memory
+      IF ( .NOT. OK ) THEN
+        CALL GCB_CLEAR( STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB1_LOAD', STATUS )
