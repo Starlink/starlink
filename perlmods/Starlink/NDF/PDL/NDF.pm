@@ -1086,7 +1086,7 @@ sub whdr {
   my ($outndf, $pdl, $status) = @_;
 
   my ($key, %header, @fitsdim, $fitsloc, $value);
-  my (%unused, @fits, $hashref, %header);
+  my (%unused, @fits, $hashref, $hdr);
  
   # Return if bad status
   return 0 if $status != &NDF::SAI__OK;
@@ -1097,7 +1097,7 @@ sub whdr {
  
   # Retrieve and check header from PDL
   my $hdr = $pdl->gethdr;
-  if (ref($header) eq 'HASH') {
+  if (ref($hdr) eq 'HASH') {
     %header = %$hdr;
   } else {
     %header = ();
