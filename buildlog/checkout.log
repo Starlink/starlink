@@ -7315,9 +7315,11 @@ U java/source/table/src/main/uk/ac/starlink/table/TextTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/UCD.java
 U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfo.java
+U java/source/table/src/main/uk/ac/starlink/table/ValueInfoMapGroup.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
-U java/source/table/src/main/uk/ac/starlink/table/gui/InputFieldStack.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MultilineJTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/NumericCellRenderer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLDialog.java
@@ -7339,7 +7341,10 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
+U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
+U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SizingScrollPane.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableViewer.java
@@ -7710,6 +7715,7 @@ U java/source/util/src/main/uk/ac/starlink/util/DataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/FileDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/GenericNioBuffer.java
 U java/source/util/src/main/uk/ac/starlink/util/Loader.java
+U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
 U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/SourceReader.java
 U java/source/util/src/main/uk/ac/starlink/util/TestCase.java
