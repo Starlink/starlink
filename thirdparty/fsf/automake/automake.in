@@ -2315,7 +2315,8 @@ sub handle_programs
 #   sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
 sub handle_monoliths
 {
-  my @proglist = &am_install_var ('monoliths', 'MONOLITHS', 'bin');
+  my @proglist = &am_install_var ('monoliths', 'MONOLITHS',
+                                  'bin', 'check', 'noinst');
   return if ! @proglist;
 
   my $seen_global_libobjs =
