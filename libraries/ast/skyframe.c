@@ -86,7 +86,7 @@ f     The SkyFrame class does not define any new routines beyond those
 *     21-JUN-2001 (DSB):
 *        Added astAngle and astOffset2.
 *     4-SEP-2001 (DSB):
-*        Added NegLon attribute.
+*        Added NegLon attribute, and astResolve method.
 *class--
 */
 
@@ -230,6 +230,7 @@ static void InitVtab( AstSkyFrameVtab * );
 static void Norm( AstFrame *, double[] );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
+static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
 static void SetEpoch( AstSkyFrame *, double );
@@ -2261,6 +2262,7 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    frame->Angle = Angle;
    frame->Distance = Distance;
    frame->Norm = Norm;
+   frame->Resolve = Resolve;
    frame->Offset = Offset;
    frame->Offset2 = Offset2;
 
@@ -3851,6 +3853,191 @@ static double ReadDateTime( const char *value ) {
 
 /* Return the result. */
    return result;
+}
+
+static void Resolve( AstFrame *this_frame, const double point1[], 
+                     const double point2[], const double point3[],
+                     double point4[], double *d1, double *d2 ){
+/*
+*  Name:
+*     Resolve
+
+*  Purpose:
+*     Resolve a vector into two orthogonal components
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void Resolve( AstFrame *this, const double point1[], 
+*                   const double point2[], const double point3[],
+*                   double point4[], double *d1, double *d2 )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astResolve method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function resolves a vector into two perpendicular components.
+*     The vector from point 1 to point 2 is used as the basis vector.
+*     The vector from point 1 to point 3 is resolved into components 
+*     parallel and perpendicular to this basis vector. The lengths of the 
+*     two components are returned, together with the position of closest 
+*     aproach of the basis vector to point 3. 
+*
+*     Each vector is a geodesic curve. For a SkyFrame, these are great
+*     circles on the celestial sphere.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     point1
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the start of the basis vector,
+*        and of the vector to be resolved.
+*     point2
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the basis vector.
+*     point3
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the vector to be
+*        resolved.
+*     point4
+*        An array of double, with one element for each Frame axis
+*        in which the coordinates of the point of closest approach of the
+*        basis vector to point 3 will be returned.
+*     d1
+*        The address of a location at which to return the distance from
+*        point 1 to point 4 (that is, the length of the component parallel 
+*        to the basis vector). Positive values are in the same sense as 
+*        movement from point 1 to point 2.
+*     d2
+*        The address of a location at which to return the distance from
+*        point 4 to point 3 (that is, the length of the component
+*        perpendicular to the basis vector). Positive values are to the
+*        right of the basis vector when moving from point 1 to point 2.
+
+*  Notes:
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value, or if the required
+*     output values are undefined.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   const int *perm;              /* Pointer to axis permutation array */
+   double n1[ 3 ];               /* Unit normal to grt crcl thru p1 and p2 */
+   double n2[ 3 ];               /* Unit normal to grt crcl thru p3 and p4 */
+   double p1[ 2 ];               /* Permuted coordinates for point1 */
+   double p2[ 2 ];               /* Permuted coordinates for point2 */
+   double p3[ 2 ];               /* Permuted coordinates for point3 */
+   double p4[ 2 ];               /* Permuted coordinates for point4 */
+   double v1[ 3 ];               /* 3-vector for p1 */
+   double v2[ 3 ];               /* 3-vector for p2 */
+   double v3[ 3 ];               /* 3-vector for p3 */
+   double v4[ 3 ];               /* 3-vector for p4 */
+   double v5[ 3 ];               /* 3-vector 90 degs away from p1 */
+   double vmod;                  /* Modulus of vector */
+   double vtemp[ 3 ];            /* Temporary vector workspace */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Store initial bad output values. */
+   point4[ 0 ] = AST__BAD;
+   point4[ 1 ] = AST__BAD;
+   *d1 = AST__BAD;
+   *d2 = AST__BAD;
+
+/* Check that all supplied values are OK. */
+   if ( ( point1[ 0 ] != AST__BAD ) && ( point1[ 1 ] != AST__BAD ) &&
+        ( point2[ 0 ] != AST__BAD ) && ( point2[ 1 ] != AST__BAD ) &&
+        ( point3[ 0 ] != AST__BAD ) && ( point3[ 1 ] != AST__BAD ) ) {
+
+/* If so, obtain a pointer to the SkyFrame's axis permutation array. */
+      perm = astGetPerm( this );
+      if ( astOK ) {
+
+/* Apply the axis permutation array to obtain the coordinates of the 
+   three supplied point in the required (longitude,latitude) order. */
+         p1[ perm[ 0 ] ] = point1[ 0 ];
+         p1[ perm[ 1 ] ] = point1[ 1 ];
+         p2[ perm[ 0 ] ] = point2[ 0 ];
+         p2[ perm[ 1 ] ] = point2[ 1 ];
+         p3[ perm[ 0 ] ] = point3[ 0 ];
+         p3[ perm[ 1 ] ] = point3[ 1 ];
+
+/* Convert each point into a 3-vector of unit length. */
+         slaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
+         slaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
+         slaDcs2c( p3[ 0 ], p3[ 1 ], v3 );
+
+/* Find the cross product between the first two vectors, and normalize is. 
+   This is the unit normal to the great circle plane defining parallel 
+   distance. */
+         slaDvxv( v2, v1, vtemp );
+         slaDvn( vtemp, n1, &vmod );
+
+/* Return with bad values if the normal is undefined (i.e. if the first two 
+   vectors are identical or diametrically opposite). */
+         if( vmod > 0.0 ) {
+
+/* Now take the cross product of the normal vector and v1. This gives a
+   point, v5, on the great circle which is 90 degrees away from v1, in the
+   direction of v2. */
+            slaDvxv( v1, n1, v5 );
+
+/* Find the cross product of the outlying point (point 3), and the vector
+   n1 found above, and normalize it. This is the unit normal to the great 
+   circle plane defining perpendicular distance. */
+            slaDvxv( v3, n1, vtemp );
+            slaDvn( vtemp, n2, &vmod );
+
+/* Return with bad values if the normal is undefined (i.e. if the
+   outlying point is normal to the great circle defining the basis 
+   vector). */
+            if( vmod > 0.0 ) {
+
+/* The point of closest approach, point 4, is the point which is normal
+   to both normal vectors (i.e. the intersection of the two great circles).
+   This is the cross product of n1 and n2. No need to normalize this time 
+   since both n1 and n2 are unit vectors, and so v4 will already be a
+   unit vector. */
+               slaDvxv( n1, n2, v4 );
+
+/* The dot product of v4 and v1 is the cos of the parallel distance,
+   d1, whilst the dot product of v4 and v5 is the sin of the parallel
+   distance. Use these to get the parallel distance with the correct
+   sign, in the range -PI to +PI. */
+               *d1 = atan2( slaDvdv( v4, v5 ), slaDvdv( v4, v1 ) );
+
+/* The dot product of v4 and v3 is the cos of the perpendicular distance,
+   d2, whilst the dot product of n1 and v3 is the sin of the perpendicular
+   distance. Use these to get the perpendicular distance with the correct
+   sign, in the range -PI to +PI. */
+               *d2 = atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) );
+
+/* Convert the 3-vector representing the intersection of the two planes 
+   back into spherical cooordinates and then constrain the longitude result 
+   to lie in the range 0 to 2*pi. */
+               slaDcc2s( v4, &p4[ 0 ], &p4[ 1 ] );
+               p4[ 0 ] = slaDranrm( p4[ 0 ] );
+
+/* Permute the result coordinates to undo the effect of the SkyFrame
+   axis permutation array. */
+               point4[ 0 ] = p4[ perm[ 0 ] ];
+               point4[ 1 ] = p4[ perm[ 1 ] ];
+            }
+         }
+      }
+   }
+
+   return;
+
 }
 
 static void SetAsTime( AstSkyFrame *this, int axis, int value ) {

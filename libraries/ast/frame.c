@@ -67,6 +67,7 @@ c     - astOffset: Calculate an offset along a geodesic curve
 c     - astOffset2: Calculate an offset along a geodesic curve in a 2D Frame
 c     - astPermAxes: Permute the order of a Frame's axes
 c     - astPickAxes: Create a new Frame by picking axes from an existing one
+c     - astResolve: Resolve a vector into two orthogonal components
 c     - astUnformat: Read a formatted coordinate value for a Frame axis
 f     - AST_ANGLE: Calculate the angle subtended by two points at a third point
 f     - AST_AXDISTANCE: Calculate the distance between two axis values
@@ -80,6 +81,7 @@ f     - AST_OFFSET: Calculate an offset along a geodesic curve
 c     - AST_OFFSET2: Calculate an offset along a geodesic curve in a 2D Frame
 f     - AST_PERMAXES: Permute the order of a Frame's axes
 f     - AST_PICKAXES: Create a new Frame by picking axes from an existing one
+f     - AST_RESOLVE: Resolve a vector into two orthogonal components
 f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 
 *  Notes:
@@ -124,7 +126,11 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     18-JUL-1999 (RFWS):
 *        Fixed memory leak in ConvertX.
 *     21-JUN-2001 (DSB):
-*        Added astAngle and astOffset2.
+*        Added methods astAngle and astOffset2.
+*     29-AUG-2001 (DSB):
+*        Added methods astAxDistance and astAxOffset.
+*     4-SEP-2001 (DSB):
+*        Added method astResolve.
 *class--
 */
 
@@ -639,6 +645,7 @@ static void Overlay( AstFrame *, const int *, AstFrame * );
 static void PermAxes( AstFrame *, const int[] );
 static void PrimaryFrame( AstFrame *, int, AstFrame **, int * );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
+static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAttrib( AstObject *, const char * );
 static void SetAxis( AstFrame *, int, AstAxis * );
 static void SetDigits( AstFrame *, int );
@@ -3639,6 +3646,7 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->AxOffset = AxOffset;
    vtab->Offset = Offset;
    vtab->Offset2 = Offset2;
+   vtab->Resolve = Resolve;
    vtab->Overlay = Overlay;
    vtab->PermAxes = PermAxes;
    vtab->PickAxes = PickAxes;
@@ -4792,6 +4800,166 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
       }
       printf( ")\n" );
    }
+}
+
+static void Resolve( AstFrame *this, const double point1[], 
+                       const double point2[], const double point3[],
+                       double point4[], double *d1, double *d2 ){
+/*
+*++
+*  Name:
+c     astResolve
+f     AST_RESOLVE
+
+*  Purpose:
+*     Resolve a vector into two orthogonal components
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     void Resolve( AstFrame *this, const double point1[], 
+c                   const double point2[], const double point3[],
+c                   double point4[], double *d1, double *d2 );
+f     CALL AST_RESOLVE( THIS, POINT1, POINT2, POINT3, POINT4, D1, D2, 
+f                       STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function resolves a vector into two perpendicular components.
+f     This routine resolves a vector into two perpendicular components.
+*     The vector from point 1 to point 2 is used as the basis vector.
+*     The vector from point 1 to point 3 is resolved into components 
+*     parallel and perpendicular to this basis vector. The lengths of the 
+*     two components are returned, together with the position of closest 
+*     aproach of the basis vector to point 3.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+c     point1
+f     POINT1( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This marks the start of the basis vector,
+*        and of the vector to be resolved.
+c     point2
+f     POINT2( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the basis vector.
+c     point3
+f     POINT3( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the vector to be
+*        resolved.
+c     point4
+f     POINT4( * ) = DOUBLE PRECISION (Returned)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        in which the coordinates of the point of closest approach of the
+*        basis vector to point 3 will be returned.
+c     d1
+f     D1 = DOUBLE PRECISION (Returned)
+c        The address of a location at which to return the distance from
+f        The distance from
+*        point 1 to point 4 (that is, the length of the component parallel 
+*        to the basis vector). Positive values are in the same sense as 
+*        movement from point 1 to point 2.
+c     d2
+f     D2 = DOUBLE PRECISION (Returned)
+c        The address of a location at which to return the distance from
+f        The distance from
+*        point 4 to point 3 (that is, the length of the component
+*        perpendicular to the basis vector). Positive values are to the
+*        right of the basis vector when moving from point 1 to point 2.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+c     - Each vector used in this function is the path of
+f     - Each vector used in this routine is the path of
+*     shortest distance between two points, as defined by the
+c     astDistance function.
+f     AST_DISTANCE function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value, or if the required
+*     output values are undefined.
+*--
+*/
+
+/* Local Variables: */
+   double bv;                    /* Length of basis vector */
+   double c;                     /* Component length */
+   double dp;                    /* Dot product */
+   int axis;                     /* Loop counter for axes */
+   int naxes;                    /* Number of Frame axes */
+   int ok;                       /* OK to proceed? */
+
+/* Check the global error status. */
+   *d1 = AST__BAD;
+   *d2 = AST__BAD;
+   if ( !astOK ) return;
+
+/* Determine the number of Frame axes. */
+   naxes = astGetNaxes( this );
+
+/* Initialize bad values, and check if the supplied vectors are good. */
+   ok = 1;
+   for( axis = 0; axis < naxes; axis++ ){
+      point4[ axis ] = AST__BAD;
+      if( point1[ axis ] == AST__BAD ||
+          point2[ axis ] == AST__BAD ||
+          point3[ axis ] == AST__BAD ) ok = 0;
+   }
+
+/* Check the supplied values. */
+   if ( ok ) {
+
+/* Find the dot product of the basis vector with the vector joining point 1 
+   and point 3. At the same time form the squared length of the basis
+   vector. */
+      dp = 0.0;
+      bv = 0.0;
+      for( axis = 0; axis < naxes; axis++ ){
+         c = point2[ axis ] - point1[ axis ];
+         dp += c * ( point3[ axis ] - point1[ axis ] );
+         bv += c * c;
+      }
+
+/* Check the basis vector does not have zero length, and convert the
+   squared length into a length. */
+      if( bv > 0.0 ) {
+         bv = sqrt( bv );
+
+/* The dot product is the required distance d1 multiplied by the length
+   of the basis vector. Form the distance d1. */
+         *d1 = dp/bv;
+
+/* Offset away from point 1 towards point 2 by a distance of d1. */
+         for( axis = 0; axis < naxes; axis++ ){
+            point4[ axis ] = point1[ axis ] + 
+                             (*d1/bv)*( point2[ axis ] - point1[ axis ] );
+         }   
+
+/* Finally, form the required length d2. */
+         *d2 = 0.0;
+         for( axis = 0; axis < naxes; axis++ ){
+            c = ( point3[ axis ] - point4[ axis ] );
+            *d2 += c*c;
+         }
+         *d2 = sqrt( *d2 );
+
+      }
+   }
+
+   return;
+
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting ) {
@@ -7911,6 +8079,12 @@ void astPrimaryFrame_( AstFrame *this, int axis1,
                       AstFrame **frame, int *axis2 ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,PrimaryFrame))( this, axis1, frame, axis2 );
+}
+void astResolve_( AstFrame *this, const double point1[], const double point2[],
+                 const double point3[], double point4[], double *d1, 
+                 double *d2 ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,Resolve))( this, point1, point2, point3, point4, d1, d2 );
 }
 void astSetAxis_( AstFrame *this, int axis, AstAxis *newaxis ) {
    if ( !astOK ) return;

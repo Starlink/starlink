@@ -235,6 +235,8 @@
 *           Permute the order of a Frame's axes.
 *        astPickAxes
 *           Create a new Frame by picking axes from an existing one.
+*        astResolve
+*           Resolve a vector into two orthogonal components.
 *        astUnformat
 *           Read a formatted coordinate value for a Frame axis.
 
@@ -443,6 +445,8 @@
 *        Added astAngle and astOffset2.
 *     29-AUG-2001 (DSB):
 *        Added astAxDistance and astAxOffset.
+*     4-SEP-2001 (DSB):
+*        Added astResolve.
 *-
 */
 
@@ -571,6 +575,7 @@ typedef struct AstFrameVtab {
    void (* Overlay)( AstFrame *, const int *, AstFrame * );
    void (* PermAxes)( AstFrame *, const int[] );
    void (* PrimaryFrame)( AstFrame *, int, AstFrame **, int * );
+   void (* Resolve)( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
    void (* SetAxis)( AstFrame *, int, AstAxis * );
    void (* SetDigits)( AstFrame *, int );
    void (* SetDirection)( AstFrame *, int, int );
@@ -638,6 +643,7 @@ double astAxDistance_( AstFrame *, int, double, double );
 double astAxOffset_( AstFrame *, int, double, double );
 double astOffset2_( AstFrame *, const double[2], double, double, double[2] );
 void astOffset_( AstFrame *, const double[], const double[], double, double[] );
+void astResolve_( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 
 #if defined(astCLASS)            /* Protected */
 AstFrame *astPickAxes_( AstFrame *, int, const int[], AstMapping ** );
@@ -779,6 +785,8 @@ astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist))
 astINVOKE(V,astOffset_(astCheckFrame(this),point1,point2,offset,point3))
 #define astOffset2(this,point1,angle,offset,point2) \
 astINVOKE(V,astOffset2_(astCheckFrame(this),point1,angle,offset,point2))
+#define astResolve(this,point1,point2,point3,point4,d1,d2) \
+astINVOKE(V,astResolve_(astCheckFrame(this),point1,point2,point3,point4,d1,d2))
 
 #if defined(astCLASS)            /* Protected */
 #define astFormat(this,axis,value) \

@@ -27,6 +27,7 @@
 *     AST_OFFSET2
 *     AST_PERMAXES
 *     AST_PICKAXES
+*     AST_RESOLVE
 *     AST_UNFORMAT
 
 *  Copyright:
@@ -47,6 +48,8 @@
 *        Added AST_ANGLE and AST_OFFSET2.
 *     29-AUG-2001 (DSB):
 *        Added AST_AXDISTANCE and AST_AXOFFSET.
+*     4-SEP-2001 (DSB):
+*        Added AST_RESOLVE.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -298,6 +301,28 @@ F77_DOUBLE_FUNCTION(ast_offset2)( INTEGER(THIS),
       RESULT = astOffset2( astI2P( *THIS ), POINT1, *ANGLE, *OFFSET, POINT2 );
    )
    return RESULT;
+}
+
+F77_SUBROUTINE(ast_resolve)( INTEGER(THIS),
+                             DOUBLE_ARRAY(POINT1),
+                             DOUBLE_ARRAY(POINT2),
+                             DOUBLE_ARRAY(POINT3),
+                             DOUBLE_ARRAY(POINT4),
+                             DOUBLE(D1),
+                             DOUBLE(D2),
+                             INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(POINT1)
+   GENPTR_DOUBLE_ARRAY(POINT2)
+   GENPTR_DOUBLE_ARRAY(POINT3)
+   GENPTR_DOUBLE_ARRAY(POINT4)
+   GENPTR_DOUBLE(D1)
+   GENPTR_DOUBLE(D2)
+
+   astAt( "AST_RESOLVE", NULL, 0 );
+   astWatchSTATUS(
+      astResolve( astI2P( *THIS ), POINT1, POINT2, POINT3, POINT4, D1, D2 );
+   )
 }
 
 F77_SUBROUTINE(ast_permaxes)( INTEGER(THIS),
