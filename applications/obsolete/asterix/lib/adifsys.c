@@ -676,8 +676,9 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
 	if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
-	else
+	else if ( _valid_q(cdr) ) {	/* Don't annul status if last file */
 	  adic_erranl( status );
+          }
 	}
 
       if ( ! found )			/* Next one */
@@ -688,7 +689,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
   if ( ! found ) {			/* Not found? */
     ADIstatype	istat = *status;
-    *status = SAI__ERROR;
+    *status = SAI__OK;
 
     adic_erase( &fid, status );		/* Release strings created */
     adic_erase( &mid, status );
