@@ -35,8 +35,10 @@
 #        Add LOOP parameter
 #     1997 June 19 (TIMJ)
 #        Remove USE_SECTION
-#     1997 Spetember 4 (TIMJ)
+#     1997 September 4 (TIMJ)
 #        Change message in DUMMY
+#     1998 January 22 (TIMJ)
+#        Add SIZE, WEIGHTS and TIMES
 #     {enter_further_changes_here}
 
 #-
@@ -159,5 +161,26 @@
          PROMPT  'Name of container file to contain rebinned map'
 	 HELPKEY  '*'
       ENDPARAMETER
+
+       PARAMETER WEIGHTS
+         TYPE '_LOGICAL'
+         DEFAULT 'FALSE'
+         PROMPT 'Store the weights array'
+         VPATH 'DEFAULT'
+      ENDPARAMETER
+         
+      PARAMETER TIMES
+         TYPE '_LOGICAL'
+         DEFAULT 'FALSE'
+         PROMPT 'Store the times array'
+         VPATH 'DEFAULT'
+      ENDPARAMETER
+
+      PARAMETER SIZE
+         TYPE '_INTEGER'
+         PROMPT 'Number of pixels in output map (NX,NY)'
+         HELPKEY '*'
+      ENDPARAMETER
+
          
    ENDINTERFACE
