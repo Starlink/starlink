@@ -26,9 +26,8 @@ STAR_DECLARE_BUILD_DEPENDENCIES(sae)
 dnl    Calls FAMS functions, in the AMS package
 STAR_DECLARE_USE_DEPENDENCIES(mers ams)
 
-dnl    List the sun/ssn/... numbers which document this package and
-dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun114)
+dnl    The documentation for this package is maintained as part of
+dnl    the PCS package 
 
 dnl    There is a .msg file in this directory, and this adds Makefile
 dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
