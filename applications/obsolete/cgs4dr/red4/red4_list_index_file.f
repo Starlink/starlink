@@ -117,13 +117,15 @@
      :       /'Time  Exposure Grating Glambda Slit    '/
      :       /'CVF     '/
      :       /'Filters Mode      Grp Row,Col,Os '/
-     :       /'Cfindx Airmass', STATUS)
+*    :       /'Cfindx Airmass', STATUS)
+     :       /'Cfindx', STATUS)
             CALL FIO_WRITE( OUTPUT_FD,
      :       '-----------    --- ----     '/ 
      :       /'----  -------- ------- ------- ----    '/
      :       /'---     '/
      :       /'------- ----      --- ---------- '/
-     :       /'------ -------', STATUS)
+*    :       /'------ -------', STATUS)
+     :       /'------', STATUS)
 
 *          Read the first record
             RECNUM = 1
@@ -156,12 +158,13 @@
      :             OBSREC.DET_NROWS, 
      :             OBSREC.DET_NCOLUMNS, 
      :             OBSREC.DET_NINCR, 
-     :             OBSREC.CNFINDEX,
-     :             OBSREC.AIRMASS
+     :             OBSREC.CNFINDEX
+*    :             OBSREC.AIRMASS
  1                FORMAT( 1X, A14, 1X, A1, 3X, A6, 1X, F7.3, 1X,
      :             F8.4, 1X, A7, 1X, F7.3, 3( 1X, A7 ), 1X,
      :             A9, I4, 1X, I3, ',', I3, ',', I2,
-     :             1X, I6, 1X, F7.3 )
+*    :             1X, I6, 1X, F7.3 )
+     :             1X, I6, 1X )
                   CALL FIO_WRITE (OUTPUT_FD, OUTPUT_TEXT, OSTATUS)
                   IF (OSTATUS .NE. SAI__OK) THEN
                      OSTATUS = SAI__ERROR

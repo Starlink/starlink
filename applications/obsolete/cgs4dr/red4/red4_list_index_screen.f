@@ -118,10 +118,12 @@
 
             CALL MSG_OUT( ' ', 'Observation   Qly Type     '/ 
      :       /'Time  Mode      Grp Row,Col,Os '/
-     :       /'Cfindx Airmass', STATUS )
+*    :       /'Cfindx Airmass', STATUS )
+     :       /'Cfindx', STATUS )
             CALL MSG_OUT( ' ', '-----------   --- ----     '/
      :       /'----  ----      --- ---------- '/
-     :       /'------ -------', STATUS )
+*    :       /'------ -------', STATUS )
+     :       /'------', STATUS )
          ELSE
 
             CALL MSG_OUT( ' ', 'Observation   Qly Type     '/ 
@@ -138,6 +140,83 @@
 
 *       Repeat until an error or end-of-file occurs
          DO WHILE ( STATUS .EQ. SAI__OK )
+
+*          In verbose mode, write record to screen first
+            IF ( VERBOSE ) THEN
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.OBSNUM' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.OBSNUM )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.OBSERVATION' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.OBSERVATION )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.QUALITY' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.QUALITY )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.TYPE' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.TYPE )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.START_TIME' )
+              CALL MSG_SETR( 'ITMVAL', OBSREC.START_TIME )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.INTTYPE' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.INTTYPE )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.GRPNUM' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.GRPNUM )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.CNFINDEX' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.CNFINDEX )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.EXPOSURE_TIME' )
+              CALL MSG_SETR( 'ITMVAL', OBSREC.EXPOSURE_TIME )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.DET_NCOLUMNS' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.DET_NCOLUMNS )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.DET_NROWS' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.DET_NROWS )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.DET_ENC_BASE' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.DET_ENC_BASE )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.DET_INCR' )
+              CALL MSG_SETR( 'ITMVAL', OBSREC.DET_INCR )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.DET_NINCR' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.DET_NINCR )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.GRATING_NAME' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.GRATING_NAME )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.GRATING_WVLNGTH' )
+              CALL MSG_SETR( 'ITMVAL', OBSREC.GRATING_WVLNGTH )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.GRATING_ANGLE' )
+              CALL MSG_SETR( 'ITMVAL', OBSREC.GRATING_ANGLE )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.GRATING_ORDER' )
+              CALL MSG_SETI( 'ITMVAL', OBSREC.GRATING_ORDER )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.SLIT_NAME' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.SLIT_NAME )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.SLIT_ANGLE' )
+              CALL MSG_SETR( 'ITMVAL', OBSREC.SLIT_ANGLE )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.CVF_NAME' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.CVF_NAME )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.CVF_WAVELENGTH' )
+              CALL MSG_SETR( 'ITMVAL', OBSREC.CVF_WAVELENGTH )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SETC( 'ITMNAM', 'OBSREC.FILTERS' )
+              CALL MSG_SETC( 'ITMVAL', OBSREC.FILTERS )
+              CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+*             CALL MSG_SETC( 'ITMNAM', 'OBSREC.AIRMASS' )
+*             CALL MSG_SETR( 'ITMVAL', OBSREC.AIRMASS )
+*             CALL MSG_OUT( ' ', '^ITMNAM = ^ITMVAL', STATUS )
+              CALL MSG_SYNC( STATUS )
+            ENDIF
 
 *          If the quality is neither good nor bad then skip the record.
 *          (NOTE - tried to test for a blank observation name but this
@@ -160,11 +239,12 @@
      :             OBSREC.DET_NROWS, 
      :             OBSREC.DET_NCOLUMNS, 
      :             OBSREC.DET_NINCR, 
-     :             OBSREC.CNFINDEX,
-     :             OBSREC.AIRMASS
+     :             OBSREC.CNFINDEX
+*    :             OBSREC.AIRMASS
  2                FORMAT( A14, A1, 3X, A6, 1X, F7.3, 1X,
      :             A9, I4, 1X, I3, ',', I3, ',', I2,
-     :             1X, I6, 1X, F7.3 )
+*    :             1X, I6, 1X, F7.3 )
+     :             1X, I6, 1X )
                ELSE
 
                   WRITE( LINE, 1)
