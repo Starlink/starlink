@@ -1533,8 +1533,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
         for ( point = 0; point < npoint; point++ ) { \
            if ( ( alpha[ point ] == AST__BAD ) || \
                 ( delta[ point ] == AST__BAD ) ) { \
-              alpha[ point ] == AST__BAD; \
-              delta[ point ] == AST__BAD; \
+              alpha[ point ] = AST__BAD; \
+              delta[ point ] = AST__BAD; \
 	   } else { \
               function \
 	   } \

@@ -79,5 +79,6 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
 
    astError( AST__OCLUK, "astGetLoader: Object of unknown class \"%s\" cannot "
                          "be loaded.", class );
+   return NULL;
 #undef LOAD
 }

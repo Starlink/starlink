@@ -533,33 +533,33 @@ static void (* parent_setattrib)( AstObject *, const char * );
    projections. The last entry in the list should be for the AST__WCSBAD 
    projection. This marks the end of the list. */
 static PrjData PrjInfo[] = {
-   AST__AZP,  "zenithal perspective", "-AZP",  1,  1,  1, azpfwd, azprev, AST__DPIBY2,
-   AST__TAN,  "gnomonic", "-TAN",  0,  0,  0, tanfwd, tanrev, AST__DPIBY2,
-   AST__SIN,  "orthographic", "-SIN",  1,  0,  2, sinfwd, sinrev, AST__DPIBY2,
-   AST__STG,  "stereographic", "-STG",  0,  0,  0, stgfwd, stgrev, AST__DPIBY2,
-   AST__ARC,  "zenithal equidistant", "-ARC",  0,  0,  0, arcfwd, arcrev, AST__DPIBY2,
-   AST__ZPN,  "zenithal polynomial", "-ZPN",  0,  0, 10, zpnfwd, zpnrev, AST__DPIBY2,
-   AST__ZEA,  "zenithal equal area", "-ZEA",  0,  0,  0, zeafwd, zearev, AST__DPIBY2,
-   AST__AIR,  "Airy", "-AIR",  1,  1,  1, airfwd, airrev, AST__DPIBY2,
-   AST__CYP,  "cylindrical perspective", "-CYP",  1,  2,  2, cypfwd, cyprev, 0.0,
-   AST__CAR,  "Cartesian", "-CAR",  0,  0,  0, carfwd, carrev, 0.0,
-   AST__MER,  "Mercator", "-MER",  0,  0,  0, merfwd, merrev, 0.0,
-   AST__CEA,  "cylindrical equal area", "-CEA",  1,  1,  1, ceafwd, cearev, 0.0,
-   AST__COP,  "conical perspective", "-COP",  1,  1,  2, copfwd, coprev, AST__BAD,
-   AST__COD,  "conical equidistant", "-COD",  1,  1,  2, codfwd, codrev, AST__BAD,
-   AST__COE,  "conical equal area", "-COE",  1,  1,  2, coefwd, coerev, AST__BAD,
-   AST__COO,  "conical orthomorphic", "-COO",  1,  1,  2, coofwd, coorev, AST__BAD,
-   AST__BON,  "Bonne's equal area", "-BON",  1,  1,  1, bonfwd, bonrev, 0.0,
-   AST__PCO,  "polyconic", "-PCO",  0,  0,  0, pcofwd, pcorev, 0.0,
-   AST__GLS,  "sinusoidal", "-GLS",  0,  0,  0, glsfwd, glsrev, 0.0,
-   AST__PAR,  "parabolic", "-PAR",  0,  0,  0, parfwd, parrev, 0.0,
-   AST__AIT,  "Hammer-Aitoff", "-AIT",  0,  0,  0, aitfwd, aitrev, 0.0,
-   AST__MOL,  "Mollweide", "-MOL",  0,  0,  0, molfwd, molrev, 0.0,
-   AST__CSC,  "cobe quadrilateralized spherical cube", "-CSC",  0,  0,  0, cscfwd, cscrev, 0.0,
-   AST__QSC,  "quadrilateralized spherical cube", "-QSC",  0,  0,  0, qscfwd, qscrev, 0.0,
-   AST__TSC,  "tangential spherical cube", "-TSC",  0,  0,  0, tscfwd, tscrev, 0.0,
-   AST__NCP,  "AIPS north celestial pole", "-NCP",  0,  0,  0,   NULL,   NULL, 0.0,
-   AST__WCSBAD, "<null>",   "    ",  0,  0,  0,   NULL,   NULL, 0.0 };
+   { AST__AZP,  "zenithal perspective", "-AZP",  1,  1,  1, azpfwd, azprev, AST__DPIBY2 },
+   { AST__TAN,  "gnomonic", "-TAN",  0,  0,  0, tanfwd, tanrev, AST__DPIBY2 },
+   { AST__SIN,  "orthographic", "-SIN",  1,  0,  2, sinfwd, sinrev, AST__DPIBY2 },
+   { AST__STG,  "stereographic", "-STG",  0,  0,  0, stgfwd, stgrev, AST__DPIBY2 },
+   { AST__ARC,  "zenithal equidistant", "-ARC",  0,  0,  0, arcfwd, arcrev, AST__DPIBY2 },
+   { AST__ZPN,  "zenithal polynomial", "-ZPN",  0,  0, 10, zpnfwd, zpnrev, AST__DPIBY2 },
+   { AST__ZEA,  "zenithal equal area", "-ZEA",  0,  0,  0, zeafwd, zearev, AST__DPIBY2 },
+   { AST__AIR,  "Airy", "-AIR",  1,  1,  1, airfwd, airrev, AST__DPIBY2 },
+   { AST__CYP,  "cylindrical perspective", "-CYP",  1,  2,  2, cypfwd, cyprev, 0.0 },
+   { AST__CAR,  "Cartesian", "-CAR",  0,  0,  0, carfwd, carrev, 0.0 },
+   { AST__MER,  "Mercator", "-MER",  0,  0,  0, merfwd, merrev, 0.0 },
+   { AST__CEA,  "cylindrical equal area", "-CEA",  1,  1,  1, ceafwd, cearev, 0.0 },
+   { AST__COP,  "conical perspective", "-COP",  1,  1,  2, copfwd, coprev, AST__BAD },
+   { AST__COD,  "conical equidistant", "-COD",  1,  1,  2, codfwd, codrev, AST__BAD },
+   { AST__COE,  "conical equal area", "-COE",  1,  1,  2, coefwd, coerev, AST__BAD },
+   { AST__COO,  "conical orthomorphic", "-COO",  1,  1,  2, coofwd, coorev, AST__BAD },
+   { AST__BON,  "Bonne's equal area", "-BON",  1,  1,  1, bonfwd, bonrev, 0.0 },
+   { AST__PCO,  "polyconic", "-PCO",  0,  0,  0, pcofwd, pcorev, 0.0 },
+   { AST__GLS,  "sinusoidal", "-GLS",  0,  0,  0, glsfwd, glsrev, 0.0 },
+   { AST__PAR,  "parabolic", "-PAR",  0,  0,  0, parfwd, parrev, 0.0 },
+   { AST__AIT,  "Hammer-Aitoff", "-AIT",  0,  0,  0, aitfwd, aitrev, 0.0 },
+   { AST__MOL,  "Mollweide", "-MOL",  0,  0,  0, molfwd, molrev, 0.0 },
+   { AST__CSC,  "cobe quadrilateralized spherical cube", "-CSC",  0,  0,  0, cscfwd, cscrev, 0.0 },
+   { AST__QSC,  "quadrilateralized spherical cube", "-QSC",  0,  0,  0, qscfwd, qscrev, 0.0 },
+   { AST__TSC,  "tangential spherical cube", "-TSC",  0,  0,  0, tscfwd, tscrev, 0.0 },
+   { AST__NCP,  "AIPS north celestial pole", "-NCP",  0,  0,  0,   NULL,   NULL, 0.0 },
+   { AST__WCSBAD, "<null>",   "    ",  0,  0,  0,   NULL,   NULL, 0.0 } };
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -2180,7 +2180,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    double dval;                  /* Double precision value */
    int axis;                     /* Zero based axis index */
    int i;                        /* Parameter index */
-   int id;                       /* Zero based graphical object id */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
 

@@ -198,7 +198,6 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
    const char *class2;       /* Pointer to map2 class string */
    const char *nowin_class;  /* Pointer to non-WinMap class string */
    double **ptr1;            /* Pointer to pset1 data */
-   double **ptr2;            /* Pointer to pset2 data */
    int i;                    /* Loop count */
    int nin;                  /* No. of input coordinates for the PermMap */
    int nout;                 /* No. of output coordinates for the PermMap */
@@ -384,8 +383,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstWinMap *this;             /* Pointer to the WinMap structure */
    const char *result;           /* Pointer value to return */
-   double win;                  /* Win attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -994,9 +991,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Variables: */
    AstWinMap *this;             /* Pointer to the WinMap structure */
-   double win;                  /* Win attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1913,7 +1908,6 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
    int i;                        /* Axis index */
    int invert[ 2 ];              /* Array of invert flags */
    int nin[ 2 ];                 /* No. of axes in the two WinMaps */
-   size_t absize;                /* Size of array holding scale or shift terms */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;

@@ -77,6 +77,7 @@ f     only within textual output (e.g. from AST_WRITE).
 
 /* C header files. */
 /* --------------- */
+#include <ctype.h>
 #include <limits.h>
 #include <math.h>
 #include <stdarg.h>
@@ -2639,7 +2640,6 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 */
 
 /* Local Constants: */
-   const int mxlen = 20;         /* Max. length of string in error messages */
 #define FMT_LEN 50               /* Length of format buffer */
 
 /* Local Variables: */
@@ -2648,7 +2648,6 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    char last_sep;                /* Previous separator character */
    char sep;                     /* Separator character */
    char sep_used;                /* Separator character being used */
-   char sepstr[ 2 ];             /* Separator character as string */
    char sign[ 2 ];               /* Sign character as string */
    const char *field_start[ 3 ]; /* Pointer to start of each field */
    const char *fmt;              /* Pointer to SkyAxis Format string */

@@ -540,8 +540,8 @@ int astGTxExt( const char *text, float x, float y, const char *just,
    char lj[ 2 ];
    float udx, udy, vdx, vdy, vx, vy, uplen, xbox[ 4 ], 
          ybox[ 4 ], uxu, uyu, uxd, uyd, ux, uy;   
-   float angle, height, width, test, xl, yl;
-   float alpha, beta, xc, yc, hu, hd, a, b, vlen;
+   float angle, width, test, xl, yl;
+   float alpha, beta, xc, yc, hu, hd, a, b;
    int i;   
 
 /* Initialise the returned values to indicate no box available. */
@@ -939,7 +939,6 @@ static void ccpgline(int n, float xpts[], float ypts[] ){
    F77_INTEGER_TYPE N;
    F77_REAL_TYPE *XX;
    F77_REAL_TYPE *YY;
-   float *xp, *yp;
    int i;
 
    XX = (F77_REAL_TYPE *) astMalloc( sizeof( F77_REAL_TYPE )*(size_t) n );
@@ -967,7 +966,6 @@ static void ccpgpt(int n, float xpts[], float ypts[], int symbol){
    F77_REAL_TYPE *XX;
    F77_REAL_TYPE *YY;
    F77_INTEGER_TYPE SYMBOL;
-   float *xp, *yp;
    int i;
 
    XX = (F77_REAL_TYPE *) astMalloc( sizeof( F77_REAL_TYPE )*(size_t) n );

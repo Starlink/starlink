@@ -338,6 +338,7 @@ static double DownhillSimplex( const MapData *mapdata, double acc, int maxcall,
    ncoord = mapdata->nin;
    nvertex = ncoord + 1;
    f = astMalloc( sizeof( double ) * (size_t) ncoord );
+printf( "f1=%p\n", f );
    xx = astMalloc( sizeof( double ) * (size_t) ( ncoord * nvertex ) );
    xcent = astMalloc( sizeof( double ) * (size_t) ncoord );
    xnew = astMalloc( sizeof( double ) * (size_t) ncoord );
@@ -412,7 +413,7 @@ static double DownhillSimplex( const MapData *mapdata, double acc, int maxcall,
          }
       }
    }
-   result = f[ 0 ];
+printf( "f2=%p\n", f );
    f = astFree( f );
    xx = astFree( xx );
    xcent = astFree( xcent );

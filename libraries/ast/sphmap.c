@@ -218,8 +218,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstSphMap *this;             /* Pointer to the SphMap structure */
    const char *result;           /* Pointer value to return */
-   double win;                  /* Win attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -569,9 +567,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Variables: */
    AstSphMap *this;             /* Pointer to the SphMap structure */
-   double win;                  /* Win attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1163,7 +1159,6 @@ AstSphMap *astInitSphMap_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstSphMap *new;              /* Pointer to new SphMap */
-   int axis;                    /* Axis index */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1273,7 +1268,6 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstSphMap *new;              /* Pointer to the new SphMap */
-   char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
 
 /* Initialise. */
    new = NULL;
