@@ -495,7 +495,7 @@ extern node *todo;						/* interp.c */
  */
 #define YYMAXDEPTH 600
 
-char *errormessage; 		/* used by lex.c */
+char *errormessage = NULL; 		/* used by lex.c */
 static int optparam;              /* Flag used to indicate that a PROCedure
 				 * argument is optional. BKM 04/05/95
 				 */
