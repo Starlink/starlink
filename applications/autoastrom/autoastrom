@@ -27,7 +27,7 @@ my $progpath;			# Path to program.
 ($progpath = $0) =~ s+/[^/]*$++;
 
 my $NDF = undef;		# Name of the NDF to be processed
-                                # (that is, without the .sdf
+                                # (with or without the .sdf
                                 # extension) 
 
 my $keeptemps = 1;		# Keep temporary files for later debugging.
@@ -197,6 +197,7 @@ $retainwcs = $optionset{wcs}		if defined($optionset{wcs});
 $NDF = $ARGV[0];
 
 defined($NDF) || die "Usage: $Usage\n";
+$NDF =~ s/\.sdf$//;		# remove any .sdf extension
 
 
 # Do some processing and defaulting of options.
