@@ -1,0 +1,253 @@
+#!/bin/sh
+#+
+#  Name:
+#     news2html
+#
+#  Purpose:
+#     Present a prettier WWW interface to Starlink News items.
+#
+#  Version:
+#     1.1
+#
+#  Language:
+#     Bourne Shell (sh)
+#
+#  Description:
+#     Generates an HTML formatted file ($NEWS_HTML) containing the 
+#     subject headings from all news item files in $NEWSDIR which point 
+#     to the relevant text file in the `news' subdirectory of the HTTP 
+#     default directory.
+#
+#  Syntax:
+#     news2html [-date | -alpha]
+#
+#  Arguments:
+#     -date  :  Sort output with newest items first (default).
+#     -alpha :  Sort output alphabetically.
+#
+#  Notes:
+#     This script should be run any time the contents of $NEWS_DIR changes.
+#
+#     The use of a subshell removes the need for continually redirecting
+#     stdout of each 'echo' command since we just redirect the output of
+#     the subshell as a whole.
+#
+#     The command line switches can be abbreviated to -d and -a.
+#
+#     The script assumes that there is a directory called 'news' in the
+#     same directory as the NEWS_HTML file which contains all the news items.
+#     It is probably best to use a symbolic link ('man ln') to point the
+#     'news' directory to $NEWS_DIR.
+#
+#  Authors:
+#     Adrian Fish    (afish@star.ucl.ac.uk)
+#     Martin Dunstan (mnd@uk.ac.st-andrews)
+#     {enter_new_authors_here}
+#
+#  History:
+#     07-Sep-1994: (afish) Original C-Shell version.
+#     12-Sep-1994: (mnd)
+#                  Worked around C-Shell bug when quoting the " character.
+#                  Simplified the main loop.
+#                  Keep the user informed of what is going on.
+#                  Output full HTML including <head> and <body> fields.
+#                  Uses a unique temporary filename using the process ID ($$).
+#                  Converted to Bourne Shell: fewer bugs than C-Shell.
+#                  Delete temporary file if script terminates abnormally.
+#                  Run main loop in a sub-shell and redirect its output.
+#     13-Sep-1994: (mnd)
+#                  Fixed the problem with different versions of 'echo'.
+#                  Added the option to sort by date or alphabetically.
+#     27-Sep-1995: v1.1 (bly)
+#                  Modified news topic parsing to allow for no underscores
+#                  in title.
+#     {enter_changes_here}
+#
+#-
+#.
+
+#-----------------------------------------------------------------------
+# Initialise some useful variables. Note that you will probably want to
+# change 'NEWS_HTML'. To create a unique temporary file we use the
+# process ID of this shell which is stored in $$.
+#
+# Change NEWS_MAINT to the name of the maintainer of the News page at
+# your site and NEWS_EMAIL to the email address of $NEWS_MAINT.
+
+NEWS_DIR="LOCALNEWS"
+NEWS_HTML="NEWSINDEX"
+NEWS_TMP="/tmp/news.html.$$"
+
+NEWS_MAINT="MAINTAINER"
+NEWS_EMAIL="NEWSEMAIL"
+
+#-----------------------------------------------------------------------
+# Determine which version of 'echo' to use. If your OS isn't handled by
+# this then either change the ECHO assignment for the '*' entry or add
+# your own case statement to handle it.
+#
+# Note: we want to be able to use '\c' to suppress newline characters.
+#       SunOS:   use /usr/5bin for System V 'echo'.
+#       Dec OSF: use /bin/echo which handles -n switch and '\c'.
+
+case `uname -s` in
+   SunOS) ECHO=/usr/5bin/echo ;;
+    OSF*) ECHO=/bin/echo      ;;
+       *) ECHO=/bin/echo      ;;
+esac
+
+#-----------------------------------------------------------------------
+# Parse the command line arguments.
+
+NewestFirst="Newest First"
+Alphabetical="Alphabetical Order"
+
+order=$NewestFirst
+got_date=0
+got_alpha=0
+syntax="Syntax: `basename $0` [-date | -alpha]"
+
+while [ $# -gt 0 ]
+do
+   case $1 in
+      -a*) if [ $got_alpha -ne 0 ]
+           then
+              $ECHO "-alpha switch already specified!" 1>&2
+           elif [ $got_date -ne 0 ]
+           then
+              $ECHO "Error: conflicting switches." 1>&2
+              $ECHO $syntax 1>&2
+              exit 1
+           else
+              order=$Alphabetical
+              got_alpha=1
+           fi
+           ;;
+      -d*) if [ $got_date -ne 0 ]
+           then
+              $ECHO "-date switch already specified!" 1>&2
+           elif [ $got_alpha -ne 0 ]
+           then
+              $ECHO "Error: conflicting switches." 1>&2
+              $ECHO $syntax 1>&2
+              exit 1
+           else
+              order=$NewestFirst
+              got_date=1
+           fi
+           ;;
+        *) $ECHO "Error: '$1' is not a valid switch." 1>&2
+           $ECHO $syntax 1>&2
+           exit 1
+           ;;
+   esac
+
+   shift
+done
+
+$ECHO ""
+
+#-----------------------------------------------------------------------
+# Determine todays date (for the address of the page).
+
+day=`date +%d`
+mon=`date +%m`
+yer=`date | awk '{print $6}'`
+
+case $day in
+  1*) abbrev="th";;
+  *1) abbrev="st";;
+  *2) abbrev="nd";;
+  *3) abbrev="rd";;
+   *) abbrev="th";;
+esac
+
+month=`$ECHO "January February March April May June July August September October November December" | awk "{print \\$$mon}"`
+
+today="$day$abbrev $month $yer"
+
+#-----------------------------------------------------------------------
+# Install an exit handler to remove the temporary file.
+
+trap '/bin/rm -f $NEWS_TMP;exit 0' 0 1 2 3 4 5 6 7 8 9
+
+#-----------------------------------------------------------------------
+# Generate suitable titles and headings. We run the next bit in a
+# sub-shell so that we can grab the output of the sub-shell and redirect
+# it to where we need it. This is much better than lots of redirections
+# after each output statement.
+
+(
+   cat << __END_OF_TEXT__
+<html>
+   <!-- Generated by '`basename $0`' by $NEWS_EMAIL -->
+
+   <head>
+      <title>Starlink News Items ($order)</title>
+      <link rev="made" href="$NEWS_EMAIL ($NEWS_MAINTT)">
+   </head>
+
+   <body>
+
+      <h1>Starlink News Items ($order)</h1>
+      <hr>
+
+      <ul>
+__END_OF_TEXT__
+
+#-----------------------------------------------------------------------
+# Get available topic titles and create HTML subject lines. These are
+# output as unordered list items. We keep the user informed by writing
+# the current filename to stderr.
+
+   cd $NEWS_DIR
+
+   if [ "$order" = "$NewestFirst" ]
+   then
+      for file in `ls -t`
+      do
+         $ECHO "Processing '$file' ...\c" 1>&2
+#         topic=`head -1 $file | grep -v == |  awk '{print $2}' | tr '_' ' '`
+         topic=`head -1 $file | grep -v == \
+            |  awk '{print substr($0, 3 , length($0))}' | tr '_' ' '`
+         $ECHO "         <li><a href=\"news/$file\"> $topic</a></li>"
+         $ECHO " done." 1>&2
+      done
+   else
+      for file in *
+      do
+         $ECHO "Processing '$file' ...\c" 1>&2
+#         topic=`head -1 $file | grep -v == |  awk '{print $2}' | tr '_' ' '`
+         topic=`head -1 $file | grep -v == \
+            |  awk '{print substr($0, 3 , length($0))}' | tr '_' ' '`
+         $ECHO "         <li><a href=\"news/$file\"> $topic</a></li>"
+         $ECHO " done." 1>&2
+      done | sort -f +2
+   fi
+
+   cat << __END_OF_TEXT__
+      </ul>
+
+      <hr>
+      <address>
+         <b>news2html:</b> Starlink News Items ($order)<br>
+         $NEWS_MAINT<tt> ($NEWS_EMAIL)</tt><br>
+         $today<br>
+      </address>
+
+   </body>
+</html>
+
+__END_OF_TEXT__
+
+#-----------------------------------------------------------------------
+# Close the subshell and redirect it's stdout into the $NEWS_TMP file.
+
+) > $NEWS_TMP
+
+#-----------------------------------------------------------------------
+# Move the temporary file into the desired directory.
+
+mv -f $NEWS_TMP $NEWS_HTML
+
+#-----------------------------------------------------------------------

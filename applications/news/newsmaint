@@ -1,0 +1,136 @@
+#!PERL -s
+#
+# Program: newsmaint
+# Version: 1.0
+# Date   : 12/7/94
+# Author : Geoff Mellor (grm@star.le.ac.uk)
+# Descrip: newsmaint lists news items with expiry
+#          dates and prompts for deletion
+#
+#------------------------------------------------------------------------
+#
+# set up variables
+#
+# site configurable:
+#
+$newsdir = "LOCALNEWS"; # news directory
+#
+# script works these out for itself:
+#
+$home = $ENV{"HOME"};
+$rows = 24;
+#
+ system "stty rows 24";
+#
+ while (true) {
+     opendir(FL,"$newsdir");              # get a list of news files into @files
+     @files = grep(!/^\./,readdir(FL));
+     foreach (@files) {
+         $_ = $newsdir . "/" . $_;           # add dir spec to filename
+     }
+     &all_news_titles;                       # lists all news items
+     if ($morein eq "") {
+         print "Topic for deletion ? ";                
+         chop($topic=<STDIN>);
+         if ($topic eq "") {                 # exit if no topic selected
+             last;
+         } elsif ($topic eq "?"){            # "?" to repeat topics
+             redo;
+         }
+     } else {
+         $topic=$morein;
+         $morein="";
+     }
+     &delete_item_l1;                        # delete news item 
+ }                                           # commencing in "$topic"
+exit;
+#
+#----------------------------------------------------------------------------
+#
+# subroutines
+#
+#----------------------------------------------------------------------------
+#
+#subroutine: all_news_items 
+#   descrip: displays a list of all news items
+#
+ sub all_news_titles {
+     system "clear";                             # clear screen,
+     print "Current Items: \n";                  # output titles,
+     print "\n";                                 # keep track of rows printed
+     $rowsout=2;                                 # so we can paginate.
+     foreach $filename (@files) {                              # for all files in newsdir:
+         if ($rowsout >= ($rows - 2)){           # when we get a pageful
+             if (&more("titles")) {              # call more to paginate
+                return;                          # exit if return value = 1
+             }
+         }
+         &get_l1_title;                          # get title of news item
+         printf "%-45s\t%s\n", $title, $expiry;  # and print
+         $rowsout++;
+     }
+     print "\n";    
+ }
+#
+#----------------------------------------------------------------------------
+#
+#subroutine:  get_l1_title
+#   descrip:  gets title of news item and formats for output
+#             gets expiry date too and tidies output string
+#
+ sub get_l1_title {
+     open (FILE, $filename);
+     chop($title = <FILE>);
+     $title  =~ s/^[1-2] // && $title =~ s/_/ /g;
+     $title  = substr($title,0,44);
+     chop($expiry = <FILE>);
+     $expiry =~ /./ || chop($expiry = <FILE>); #(try third line down)
+     
+     $expiry =~ s/^\s+// && $expiry =~ s/xpiry/xpires/;   
+     $expiry =~ /xpir/ || ($expiry = "Expires: No expiry date set");
+     $expiry =~ s/^.*(Exp.*)\)/$1/
+ }
+#
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: delete_item_l1
+#    descrip: delete news item
+#
+ sub delete_item_l1 {
+     foreach $filename (@files) {
+         &get_l1_title;
+         if ($title =~ /^$topic/i) {
+             print "Delete \"$title\" ?: ";
+             chop($delete=<STDIN>);
+             if ($delete =~ /^[yY]/) {
+                unlink($filename) || die "Cannot delete $filename ";
+                print "$filename deleted \n";
+                sleep 2
+             }
+         }
+     }
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: more
+#    descrip: paginates output
+#
+ sub more {
+     $morein="";                                 # reset value of morein          
+     print "\n";
+     if ($_[0] eq "titles") {                    # different message for different points
+         print " <title> select topic for deletion, <RET> display more topics: ";
+     } else {
+         print " <RET> to continue: ";
+     }
+     chop($morein=<STDIN>);
+     if ($morein ne "") {                        # morein contains an action
+        return 1;                                # so return immediately
+     }
+     system"clear";
+     print "\n";
+     $rowsout=0;
+ }
+#

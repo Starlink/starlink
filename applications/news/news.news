@@ -1,0 +1,11 @@
+1 NEWS_v2.1
+                                                       Expires: **.**.**
+
+News version 2.1 has now been released.  News items are now displayed
+in reverse chronological order together with their submission date
+by default.
+
+The -t option will display topics alphabetically by title.
+
+It is now possible to quit various levels within news using "q"
+

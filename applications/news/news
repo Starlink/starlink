@@ -1,0 +1,436 @@
+#!PERL -s
+#
+# Program: news
+# Version: 2.1
+# Date   : 1/6/95    
+# Author : Geoff Mellor (grm@star.le.ac.uk)
+# Descrip: 
+#    v2.0: News system (see help subroutine for use).
+#          news has been rewritten and improved
+#          by using perl. Important improvements:
+#           1) new news checking vastly speeded up
+#           2) news now supports two levels of news
+#           3) news can print out selected items
+#           4) news items can be saved to user files
+#
+#    v2.1:  1) Topics are now, by default, ordered by age
+#             and are displayed with their submission date.
+#           2) "-t" will display topics alphabetically by title.
+#           3) "q" allows exit from various levels
+#
+#
+# News format:
+#
+# news supports the standard starlink news format:
+#  A "1" or "2" in column one indicates a level 1
+# or level 2 news item. Item title should follow
+# the level number with words separated by underscores.
+# One level 1 item per text file with any number of
+# level 2 associated subtopics. Topics should have
+# an expiry date, right justified on the line
+# following the title.
+#
+#------------------------------------------------------------------------
+#
+# To do:
+#
+# Allow news to paginate for different terminal sizes.
+# (news currently sets terminal to 24 rows before starting).
+#
+#------------------------------------------------------------------------
+#
+# Local configuration
+#
+# 1) news expects the perl binary in /usr/bin. edit line 1
+#    of this script if it resides elsewhere on your system.
+# 2) $newsdir points to the news directory -modify if not in 
+#    the standard starlink directory
+# 3) $printc is the default printer command - modify to suit
+#
+#------------------------------------------------------------------------
+#
+require "timelocal.pl";
+#
+# set up variables
+#
+# site configurable:
+#
+$newsdir = "LOCALNEWS"; # news directory
+$printc  = "LOCALPRINT"; # local print command
+#
+# script works these out for itself:
+#
+$home = $ENV{"HOME"};                            # home directory
+$rows = 24;                                      # no. rows on screen (fixed)
+$pdtopic = join($",@ARGV);                       # predefined NEWS topic
+$now = time;                                     # current time
+#
+@month = (Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec); # month list
+#
+# get a list of news files into @files and use associative
+# arrays to tie these to the date file was inserted into the
+# system and the topic title of the news file
+#
+ opendir(FL,"$newsdir");
+ @files = grep(!/^\./,readdir(FL));
+ foreach (@files) {
+     $_ = $newsdir . "/" . $_;                   # add dir spec to filename
+     $fileages{$_} = $now - (-M $_)*86400;       # file ages in secs 
+     ($sec,$min,$hour,$mday,$mon,$year) = localtime($fileages{$_});
+     $year += 1900;
+     $filedates{$_} = "$mday $month[$mon] $year";# file dates for display  
+     open (FILE, $_);
+     chop($filetitles{$_} = <FILE>);             # file titles for display
+     $filetitles{$_} =~ s/^[1-2] // && $filetitles{$_} =~ s/_/ /g ;
+ }
+#
+# Determine how the topic list shall be sorted
+#
+if ($t){                                 # sort @files by title if -t option 
+@files = sort by_title keys(%filetitles);
+} else {                                 # default action - sort @files by date
+@files  = sort by_date keys(%fileages);
+}
+# main control loop:
+# action determined by command line arguments
+#
+if ($n){
+    &new_news;                                   # display new news items    
+} elsif ($h){
+    &help;
+} else {                                         # main NEWS option
+    system "stty rows 24";                       # for now sets term to 24 rows
+    while (true) {
+        if ($pdtopic eq "") {                    # no topic defined, so:
+            &all_news_titles;                    # lists all news items
+            if ($morein eq "") {                 
+                print "Topic ? ";                # select topic to display
+                chop($topic=<STDIN>);
+                if ($topic eq "") {              # exit if no topic selected
+                    last;
+                } elsif ($topic eq "?"){         # "?" to repeat topics
+                    redo;
+                } elsif ($topic eq "h"){         # "h" to help
+                    &help("inside");
+                    redo;
+                }
+            } elsif ($morein =~ /^q\b/i) {       # exit news if "q" entered
+                 last;
+            } else {
+                $topic=$morein;                  # topic has been entered at "more" stage
+                $morein="";
+            }
+        } else {
+            $topic = $pdtopic;                   # set topic
+            $pdtopic = "";                       # reset pdtopic
+        }
+        &display_item_l1;                        # display news item 
+    }                                            # commencing in "$topic"
+}
+exit;
+#
+#----------------------------------------------------------------------------
+#
+# subroutines
+#
+#----------------------------------------------------------------------------
+#
+#subroutine: by_date
+#   descrip: sorts @files by age of files
+#
+sub by_date {
+       $fileages{$b} <=> $fileages{$a};
+}
+#
+#----------------------------------------------------------------------------
+#
+#subroutine: by_title
+#   descrip: sorts @files alphabetically by title
+#
+sub by_title {
+       $filetitles{$a} cmp $ filetitles{$b};
+}
+#
+#----------------------------------------------------------------------------
+#subroutine: all_news_items 
+#   descrip: displays a list of all news items
+#
+ sub all_news_titles {
+     system "clear";                             # clear screen,
+     print "Information Available: \n";          # output titles,
+     print "\n";                                 # keep track of rows printed
+     $rowsout=2;                                 # so we can paginate.
+     foreach $filename (@files) {                              # for all files in newsdir:
+         if ($rowsout >= ($rows - 2)){           # when we get a pageful
+             if (&more_titles) {              # call more to paginate
+                return;                          # exit if return value = 1
+             }
+         }
+         write;                                  # output formatted title info
+         $rowsout++;
+     }
+     print "\n";    
+ }
+#
+#----------------------------------------------------------------------------
+#
+#subroutine:  get_l2_title
+#   descrip:  gets titles of subtopics and lists for
+#             subsequent choice
+ sub get_l2_title {
+     while (true) {
+         close (FILE);                           #
+         open (FILE, $filename);                 # reopen file, start again
+         print "\n";
+         print "Subtopics: \n";
+         print "\n"; 
+         while (<FILE>) {                        # search for level 2 titles
+             if (/^2/) {
+                 s/2 // && s/_/ /g;
+                 print $_;
+             }
+         }
+         print "\n";
+         print "Subtopic ?: ";                   # choose a subtopic
+         chop($topic=<STDIN>);
+         if ($topic eq "") {                     # not interested, so leave
+             last;                               # at this point
+         }
+         &display_item_l2;                       # display chosen subtopic
+     }
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: display_item_l1
+#    descrip: display news item
+#
+ sub display_item_l1 {
+OUT: foreach $filename (@files) {                #
+         if ($filetitles{$filename} =~ /^$topic/i) {  # compare all news titles 
+             system "clear";                          # with "$topic"
+             open(FILE, $filename);
+             print " \n";                        # 
+             $rowsout=1;                         # remember no. rows printed
+             while (<FILE>) {                    # print text until a level 2
+                 if (/^2/) {                     # title is found.
+                     &get_l2_title;              # then display subtopics
+                     last OUT;
+                     } else {
+                     if ($rowsout >= ($rows - 2)){
+                        &more_topics;
+                     }
+                     print $_;
+                     $rowsout++;
+                 }
+             }
+             while ($rowsout < ($rows - 1)){     # when finished, skip to end
+                 print " \n";                    # of current screen
+                 $rowsout++; 
+             }                                   
+             print "[q]uit [p]rint, [e]xport, <RET> to continue ";
+             chop($l1_action=<STDIN>);
+             if ($l1_action =~ /^p/i) {
+                 &print;
+             } elsif ($l1_action =~ /^e/i) {
+                 &export;
+             } elsif ($l1_action =~ /^q/i) {
+                 last OUT;
+             }                     
+         }
+     }
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: display_item_l2
+#    descrip: display level 2 news item
+#
+ sub display_item_l2 {                           #
+     close (FILE);                               # when found, close file
+     open (FILE, $filename);
+     while (<FILE>) {
+         if (/^2/) {
+             s/^2 // && s/_/ /g;                 # compare each subtopic title 
+             if (/^$topic/i) {                   # and print selected one
+                 s/2 // && s/_/ /g; 
+                 system "clear";    
+                 print " \n";       
+                 print $_;          
+                 $rowsout=2;        
+                 while (<FILE>) {                # followed by subtopic text
+                     if (/^2/) {                 # until next subtopic title
+                         last;
+                     }
+                     if ($rowsout >= ($rows - 1)){
+                         &more_topics;
+                     }
+                     print $_;
+                     $rowsout++;
+                 }
+                 while ($rowsout < ($rows - 1)){ # when finished, skip to end
+                     print " \n";                # of current screen
+                     $rowsout++; 
+                 }                                   
+                 print "[q]uit, [p]rint, [e]xport, <RET> to continue ";
+                 chop($l1_action=<STDIN>);
+                 if ($l1_action =~ /^p/i) {
+                     &print;
+                 } elsif ($l1_action =~ /^e/i) {
+                     &export;
+                 } elsif ($l1_action =~ /^q/i) {
+                     last OUT;
+                 }                     
+             }
+         }
+     }
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: more_titles
+#    descrip: paginates title output
+#
+ sub more_titles {
+     $morein="";                                 # reset value of morein          
+     print "\n";
+     print " [q]uit, <title> display topic, <RET> display more topics: ";
+     chop($morein=<STDIN>);
+     if ($morein ne "") {                        # morein contains an action
+        return 1;                                # so return immediately
+     }
+     system"clear";
+     print "\n";
+     $rowsout=0;
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: more_topics
+#    descrip: paginates topic output
+#
+ sub more_topics {
+     $morein="";                                 # reset value of morein          
+     print "\n";
+     print " [q]uit, <RET> to continue: ";
+     chop($morein=<STDIN>);
+     if ($morein =~ /^q\b/i) {                   # quit if "q" entered
+                last OUT;
+     }
+     system"clear";
+     print "\n";
+     $rowsout=0;
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: print
+#    descrip: prints topic
+#
+ sub print {
+     print "print using command \"$printc\" ? ";
+     if (<STDIN> =~ /^[^yY]/) {
+         print "enter print command: ";
+         chop($printc=<STDIN>);
+     }
+     system "$printc $filename";
+     print "$printc $filename \n";
+     sleep 2;
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: export
+#    descrip: exports topic to current directory
+#
+ sub export {
+     print "enter filename in home directory for export: ";
+     chop($expfile=<STDIN>);
+     system "cp $filename $home/$expfile";
+     print "copied to $home/$expfile\n";
+     sleep 2;
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: new_news
+#    descrip: get time of last news update from modification date
+#             of .newsstat in HOME directory. Create if not there.
+#
+ sub new_news {                                  #
+     if (-e "$home/.newsstat") {                 # if .newsstat exists, get 
+         $accdate = (-M "$home/.newsstat");      # time of last access
+         open(NEWSSTAT, ">$home/.newsstat");     # update .newsstat
+         close(NEWSSTAT);
+     } else {
+         $accdate = 0;                           # never accessed news before
+         open(NEWSSTAT, ">$home/.newsstat");     # so create .newsstat
+         close(NEWSSTAT);
+         chmod(0755, "$home/.newsstat");
+     }
+#
+     foreach $filename (@files) {
+         $date = -M $filename;                   # get news files' mod dates
+         if ((-M $filename) < $accdate) {        # if newer than last access
+             if ($items eq "") {                  
+                 print "\n";
+                 print "There is new NEWS on:\n";
+                 print "\n";
+                 print "\n";
+                 ++$items;
+             }
+         print "   $filetitles{$filename}\n";      # print title
+         }
+     }
+     if ($items ne "") {                         # add a blank line after
+         print "\n";                             # news items
+     }
+ }
+#
+#----------------------------------------------------------------------------
+#
+# subroutine: help
+#    descrip: tells you what's what
+#
+ sub help { 
+     system "clear";
+     print " \n";
+     print " \t \t \t News v2.1 \n";
+     print " \t \t \t --------- \n";
+     print " \n";
+     print " News can be invoked with the following options: \n";
+     print " \n";
+     print " news  \t \t displays list of all news items \n";
+     print " news -n \t displays new news items since last login \n";
+     print " news -t \t displays topics alphabetically rather than by date \n";
+     print " news -h \t this help page \n";
+     print " news <topic> \t displays specified news item \n";
+     print " \n";
+     print " Within news, topics can be printed [p] or exported to \n";
+     print " the user's filespace [e] after reading. Just make the \n";
+     print " appropriate selection when prompted. A default or \n";
+     print " customised print command can be used. [q] can be used \n";
+     print " to quit out of various levels. \n";
+     print " \n";
+     print " Note: when prompted for a topic, \"?\" will repeat the  \n";
+     print " topic list and \"h\" will produce this help page \n";
+     if ($_[0] eq "inside") {
+         $rowsout = 20;  
+         while ($rowsout < ($rows - 1)){     # when finished, skip to end
+             print " \n";                    # of current screen
+             $rowsout++; 
+         }                                   
+         print "<RET> to continue ";
+         $dummy=<STDIN>;
+     }
+ }
+#
+#----------------------------------------------------------------------------
+#
+# output format for title display
+#
+format STDOUT =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  @>>>>>>>>>>>
+$filetitles{$filename}, $filedates{$filename}
+.
+
