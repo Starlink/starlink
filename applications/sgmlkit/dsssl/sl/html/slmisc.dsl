@@ -148,9 +148,11 @@ to need explanation or elaboration.
 	(make element gi: "u"
 	      (process-children))))
 
+;; Put an extra bit of space around verbatim elements
 (element verbatim
-  (make element gi: "pre"
-	(process-children)))
+  (make element gi: "blockquote"
+	(make element gi: "pre"
+	      (process-children))))
 
 (element quote
   (make sequence
