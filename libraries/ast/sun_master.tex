@@ -17,13 +17,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.16}
+\newcommand{\stardocnumber}    {211.17}
 c-
 f+
-\newcommand{\stardocnumber}    {210.16}
+\newcommand{\stardocnumber}    {210.17}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {13th July 2004}
+\newcommand{\stardocdate}      {9th August 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -9403,6 +9403,109 @@ velocity error introduced by the correction will be about 0.03 $km/s$. As
 another example, the maximum error when correcting from the observers
 rest frame to the local group is about 5 $km/s$ over a 1 degree field of
 view.
+
+\subsection{\label{ss:handlingdualsidebandspectra}Handling Dual-Sideband Spectra}
+Dual sideband super-heterodyne receivers produce spectra in which each channel
+contains contributions from two different frequencies, referred to as the
+``upper sideband frequency'' and the ``lower sideband frequency''. In the
+rest frame of the observer (topocentric), these are related to each other as 
+follows:
+
+\begin{quote}
+\begin{small}
+\begin{eqnarray}
+\label{eqn:dsb}
+   f_{lsb} & = & 2.f_{LO} - f_{usb}
+\end{eqnarray}
+\end{small}
+\end{quote}
+
+where $f_{LO}$ is a fixed frequency known as the ``local oscillator
+frequency''. In other words, the local oscillator frequency is always
+mid-way between any pair of corresponding upper and lower sideband
+frequencies\footnote{Note, this simple relationship only applies if all
+frequencies are topocentric.}. If you want to describe the spectral axis
+of such a spectrum using a SpecFrame you must choose whether you want the
+SpecFrame to describe $f_{lsb}$ or $f_{usb}$ - a basic SpecFrame cannot
+describe both sidebands simultaneously. However, there is a sub-class of
+SpecFrame, called DSBSpecFrame, which overcomes this difficulty.
+
+A DSBSpecFrame has a SideBand attribute which indicates if the
+DSBSpecFrame is currently being used to describe the upper or lower
+sideband spectral axis. The value of this attribute can be changed at any
+time. If you use the 
+c+
+astConvert
+c-
+f+
+AST\_CONVERT
+f-
+function to find the Mapping between two DSBSpecFrames, the setting for
+the two SideBand attributes will be taken into account. Thus, if you take
+a copy of a DSBSpecFrame, toggle its SideBand attribute, and then use
+c+
+astConvert
+c-
+f+
+AST\_CONVERT
+f-
+to find a Mapping from the original to the modified copy, the resulting 
+Mapping will be of the form of equation \ref{eqn:dsb} (if the
+DSBSpecFrame has its StdOfRest attribute set to ``Topocentric'').
+
+In general, when finding a Mapping between two arbitrary DSBSpecFrames, 
+the total Mapping is made of of three parts in series:
+
+\begin{enumerate}
+\item A Mapping which converts the first DSBSpecFrame into its upper
+sideband representation. If the DSBSpecFrame already represents its upper
+sideband, this Mapping will be a UnitMap.
+\item A Mapping which converts from the first to the second DSBSpecFrame,
+treating them as if they were both basic SpecFrames. This takes account of 
+any difference in units, standard of rest, system, \emph{etc} between the
+two DSBSpecFrames. 
+\item A Mapping which converts the second DSBSpecFrame from its upper
+sideband representation to its current sideband. If the DSBSpecFrame 
+currently represents its upper sideband, this Mapping will be a UnitMap.
+\end{enumerate}
+
+If an attempt is made to find the Mapping between a DSBSpecFrame and a
+basic SpecFrame, then the DSBSpecFrame will be treated like a basic
+SpecFrame. In other words, the returned Mapping will not be affected by
+the setting of the SideBand attribute (or any of the other attributes
+specific to the DSBSpecFrame class).
+
+In practice, the local oscillator frequency for a dual sideband
+instrument may not be easily available to an observer. Instead, it is
+common practice to specify the spectral position of some central feature
+in the observation (commonly the centre of the instrument passband),
+together with an ``intermediate frequency''. Together, these two values
+allow the local oscillator frequency to be determined. The intermediate
+frequency is the difference between the topocentric frequency at the
+central spectral position and the topocentric frequency of the local
+oscillator. So:
+
+\begin{quote}
+\begin{small}
+\begin{eqnarray}
+\label{eqn:dsb}
+   f_{LO} & = & f_{central} + f_{IF}
+\end{eqnarray}
+\end{small}
+\end{quote}
+
+The DSBSpecFrame class uses the DSBCentre attribute to
+specify the central spectral position, and the IF attribute to specify
+the intermediate frequency. The DSBCentre value is given and returned in the
+spectral system described by the DSBSpecFrame (thus you do not need to
+calculate the corresponding topocentric frequency yourself - this will be
+done automatically by the DSBSpecFrame when you assign a new value to the
+DSBCentre attribute). The value assigned to the IF attribute should
+always be a topocentric frequency in units of Hz, however a negative
+value may be given to indicate that the DSBCentre value is in the upper
+sideband (that is, if $IF < 0$  then $f_{central} > f_{LO}$). A positive
+value for IF indicates that the DSBCentre value is in the lower sideband
+(that is, if $IF > 0$  then $f_{central} < f_{LO}$).
 
 
 \cleardoublepage
@@ -20321,12 +20424,10 @@ include erroneous axis numbers when referring to missing parameter values.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.3}
+\subsection{Changes Introduced in V3.3}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V3.2 and V3.3 (the
-current version):
+occurred in the AST library between versions V3.2 and V3.3:
 
 \begin{enumerate}
 
@@ -20380,6 +20481,22 @@ f+
 \item The names of the installed AST include files have been changed to
 upper case.
 f-
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.4}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.3 and V3.4 (the
+current version):
+
+\begin{enumerate}
+
+\item Addition of a new class classed DSBSpecFrame. This is a 
+sub-class of SpecFrame which can be used to describe spectral axes
+associated with dual sideband spectral data.
 
 \end{enumerate}
 
