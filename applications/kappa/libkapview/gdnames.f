@@ -28,12 +28,13 @@
 *     brief descriptive comment.
      
 *  Algorithm:
-*     A call is made to the SGS routine SGS_WNAME and a suitable
+*     A call is made to the PGPLOT routine PGLDEV and a suitable
 *     service routine is provided.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,6 +42,8 @@
 *        Original version (RFWS).
 *     1990 Mar 31 (MJC):
 *        Renamed from SHODEV to GDNAMES for consistency (MJC).
+*     1999 Jul 19 (TDCA):
+*        Replaced call to SGS_WNAME with call to PGLDEV.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -55,9 +58,6 @@
 *    Status:
       INTEGER STATUS             ! Global status
 
-*    External References:
-      EXTERNAL NAMSRV            ! Routine to display device names
-
 *.
 
 *  Check inherited global status.
@@ -68,8 +68,8 @@
       CALL MSG_OUT( 'HEADING', 'Graphics devices available:', STATUS )
       CALL MSG_OUT( 'BLANK', ' ', STATUS )
    
-*  Call SGS_WNAME to display the list of devices.
-      CALL SGS_WNAME( NAMSRV, 0, STATUS )
+*  Call PGLDEV to display the list of devices.
+      CALL PGLDEV
 
 *  Put a blank line at the end of the list.
       CALL MSG_OUT( 'BLANK', ' ', STATUS )
