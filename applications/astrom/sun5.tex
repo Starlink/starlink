@@ -1073,8 +1073,10 @@ predictions is available, warnings are issued and the astrometry is done
 using mean place.  If any of the three observation data records appears
 twice, the new information supplants the old, and no error is reported.
 
-The TIME record can either specify the UT date and time or, optionally,
-the local sidereal time, for mid-exposure.  If the time record specifies
+The TIME record specifies the time for mid-exposure; this can be
+given as a UT date and time (as five numbers, year, month, day, hour,
+minutes), or a local sidereal time (hour and minutes) or a Julian epoch
+(a single float).  If the time record specifies
 a UT, and an epoch is specified on the plate data record, the latter is
 ignored.  If the ST option is used, the epoch on the plate data record
 must be specified (and should be accurate to a day or two if the annual
