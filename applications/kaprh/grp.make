@@ -60,7 +60,7 @@ inxy.f kaprh_mon.f kps1_clpal.f kps1_cnser.f kps1_cntur.f \
 kps1_fainb.f kps1_faind.f kps1_faini.f kps1_fainr.f kps1_fainw.f \
 kps1_imzbo.f kps1_lutwk.f kps1_ncuco.f kps1_trncl.f kps1_wltrn.f \
 kps1_wptrn.f lccell.f linplt.f linset.f mfnext.f mfopen.f moscad.f \
-moscdv.f ncraxs.f peepsb.f slc2t1.f thrsr.f
+moscdv.f ncraxs.f peepsb.f slc2t1.f thrsr.f kps1_linv.f
 
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KAPSUB_GEN) 

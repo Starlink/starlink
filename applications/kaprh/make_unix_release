@@ -105,7 +105,7 @@
       end
       cat kaprh.star-hlp *.help > new.hlp
       mv new.hlp kaprh.hlp
-      rm *.help
+      rm *.help kaprh.star-hlp
 
 #  Generate the IRAF documentation.
       ifd_irafhlpgen kaprh

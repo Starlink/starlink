@@ -467,7 +467,7 @@ kps1_hstcb.f kps1_hstcr.f kps1_hstcw.f kps1_hstcd.f kps1_hstcub.f \
 kps1_hstci.f kps1_hstcuw.f getv2.f hstrep.f inpe.f insl.f inxy.f peepsb.f \
 hstdsp.f imlst.f inpol.f linplt.f slc2t1.f hstlo.f inhi.f inre.f \
 kps1_lutwk.f inva.f linset.f thrsr.f mfnext.f mfopen.f moscad.f moscdv.f \
-kps1_wltrn.f kps1_wptrn.f kps1_trncl.f
+kps1_wltrn.f kps1_wptrn.f kps1_trncl.f kps1_linv.f
 
 MONO_SOURCE = kaprh_mon.f
 
@@ -1704,6 +1704,7 @@ inva.o:	 SAE_PAR PRM_PAR PAR_ERR
 inxy.o:	 SAE_PAR PRM_PAR PAR_ERR FIO_PAR FIO_ERR
 kaprh_mon.o:	 SAE_PAR
 kps1_clpal.o:	 SAE_PAR
+kps1_linv.o:	 SAE_PAR
 kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cntur.o:	 SAE_PAR PRM_PAR
 kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
