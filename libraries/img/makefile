@@ -634,7 +634,7 @@ $(STARTUP_SCRIPT) $(FAC_ERRS) $(EXAMPLES):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-#  Rules for creating the source archive from an SCCS repository.
+#  Rules for creating the source archive from an RCS repository.
 
 check_source: $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 
@@ -645,7 +645,7 @@ RAW_SOURCE = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
 GEN_SOURCE = $(G_ROUTINES) $(GSD_ROUTINES) $(GSC_ROUTINES) 
 
 $(PKG_NAME)_source.tar:
-	sccs get $(RAW_SOURCE) $(GEN_SOURCE)
+	co $(RAW_SOURCE) $(GEN_SOURCE)
 	for f in $(GSD_ROUTINES) ""; do \
 	   if test -n "$$f"; then \
 	      source=`basename $$f .gsd`.gen; \
@@ -672,9 +672,9 @@ $(PKG_NAME)_source.tar:
 	$(TAR_IN) $(PKG_NAME)_source.tar $(RAW_SOURCE) $(GF_ROUTINES)
 	@ $(RM)  $(RAW_SOURCE) $(GF_ROUTINES)
 
-#  Rule for getting the documentation from an SCCS repository.
+#  Rule for getting the documentation from an RCS repository.
 $(DOCUMENTATION):
-	sccs get $(LATEX_DOCS) $(PKG_NAME).news
+	co $(LATEX_DOCS) $(PKG_NAME).news
 	cp $(HOME)/img/html/$(HYPERTEXT_DOCS:.htx=.htx_tar.gz) .
 	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar.gz)
 
