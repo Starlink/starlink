@@ -44,6 +44,8 @@
 *  History:
 *     02-MAR-1999 (MBT):
 *        Original version.
+*     06-SEP-2000 (MBT):
+*        Moved most of the work out to new routine CCD1_FTGET.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,21 +70,12 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      EXTERNAL CHR_LEN
-      INTEGER CHR_LEN            ! Length of string
-
 *  Local Variables:
-      CHARACTER * ( 80 ) CVAL     ! Character value of selected FITS card
       INTEGER ICARD               ! Index of target card
       INTEGER IPFITS              ! Pointer to FITS array
-      INTEGER LENGTH              ! Length of FITS array elements
-      CHARACTER * ( DAT__SZLOC ) LOC ! Locator for FITS extension
-      LOGICAL LVAL                ! Logical value of selected FITS card
-      REAL RVAL                   ! Real value of selected FITS card
       INTEGER NCARD               ! Number of cards in mapped FITS array
-      INTEGER NCHAR               ! Number of characters in conversion
       LOGICAL THERE               ! Whether requested item is present
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator for FITS extension
       
 *.
 
@@ -104,61 +97,17 @@
 *  Find and map FITS extension.
       CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
       CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', IPFITS, NCARD, STATUS )
-      LENGTH = 80
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-   
-*  Defer delivery of error messages.
-      CALL ERR_MARK
 
-*  In the following calls to FTS1_GKEY<T> look out for fortran magic 
-*  getting the FITS character array lengths passed. 
+*  Extract the value of the required FITS header card.
+      CALL CCD1_FTGET( NCARD, IPFITS, 1, FTSKEY, FTSVAL, ICARD, STATUS )
 
-*  Attempt to get numerical value for named keyword.
-      CALL FTS1_GKEYR( NCARD, %VAL( IPFITS ), 1, FTSKEY, THERE, RVAL,
-     :                 ICARD, STATUS, %VAL( LENGTH ) )
-      IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
-         CALL CHR_RTOC( RVAL, FTSVAL, NCHAR )
-         GO TO 1
-      ELSE IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_ANNUL( STATUS )
-      END IF
-
-*  Attempt to get logical value for named keyword.
-      CALL FTS1_GKEYL( NCARD, %VAL( IPFITS ), 1, FTSKEY, THERE, LVAL,
-     :                 ICARD, STATUS, %VAL( LENGTH ) )
-      IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
-         CALL CHR_LTOC( LVAL, FTSVAL, NCHAR )
-         GO TO 1
-      ELSE IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_ANNUL( STATUS )
-      END IF
-
-*  Attempt to get character value for named keyword.
-      CALL FTS1_GKEYC( NCARD, %VAL( IPFITS ), 1, FTSKEY, THERE, CVAL,
-     :                 ICARD, STATUS, %VAL( LENGTH ) )
-      IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
-         FTSVAL = '''' // CVAL
-         FTSVAL( CHR_LEN( FTSVAL ) + 1: ) = ''''
-         GO TO 1 
-      ELSE IF ( STATUS .NE. SAI__OK ) THEN 
-         CALL ERR_ANNUL( STATUS )
-      END IF
-
-*  No conversion could be made.
-      STATUS = SAI__ERROR
-      CALL MSG_SETC( 'HEAD', FTSKEY )
-      CALL ERR_REP( 'CCD1_FTVAL', 
-     :'  Failed to find value for FITS header ^HEAD', STATUS )
-
-*  Release error context.
- 1    CONTINUE
-      CALL ERR_RLSE 
-
-*  Tidy up and exit.
+*  Release HDS resources associated with FITS header.
  99   CONTINUE
-
       CALL DAT_UNMAP( LOC, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
+*  Exit.
       END
+
 * $Id$
