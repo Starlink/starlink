@@ -36,7 +36,13 @@
 *        make sure that flux is not removed from the data.
 *     BOLOMETERS = CHAR (Read)
 *        List of sky bolometers (either by number in the data file, or
-*        by id (eg H7,G3))
+*        by id (eg H7,G3)), or by ring number (r0,r1, etc) or even
+*        'all' for all bolometers. Any bolometer can be removed by
+*        prefixing the id with a minus sign.
+*        For example:
+*            [all,-r4,-r1,h8]  would select all the bolometers then
+*                              remove bolometers from rings 4 and 1
+*                              and add h8.
 *     IN = NDF (Read)
 *        This is the name of the input demodulated data file
 *     ITER_SIGMA = REAL (Read)
@@ -57,7 +63,9 @@
 *                   is repeated until no bolometers are dropped from the
 *                   mean.
 *     MSG_FILTER = CHAR (Read)
-*        Message output level. Default is NORM
+*        Message output level. Default is NORM. In verbose mode the
+*        selected bolometers are listed and the mean value removed from
+*        each frame.
 *     OUT = NDF (Write)
 *        Output data file
 
@@ -88,6 +96,10 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.11  1997/11/06 22:20:53  timj
+*     Decode the bolometer strings in a subroutine.
+*     Report the number and bolometer list (if verbose).
+*
 *     Revision 1.10  1997/11/04 23:28:10  timj
 *     Remove clipping.
 *
@@ -114,8 +126,10 @@
 *  External references :
 
 *  Local Constants :
-      INTEGER          MAX__BOL                  ! max number of bolometers
-      PARAMETER (MAX__BOL = 100)                 ! that can be specified
+      INTEGER          LLEN             ! Length of output line
+      PARAMETER (LLEN = 78)
+      INTEGER          MAX__BOL         ! max number of bolometers
+      PARAMETER (MAX__BOL = 100)        ! that can be specified
       INTEGER          MAXDIM
       PARAMETER (MAXDIM = 4)
       CHARACTER * 10   TSKNAME          ! Name of task
@@ -123,11 +137,8 @@
 
 *  Local variables :
       LOGICAL          ADD_BACK         ! Add on the mean sky level
-      INTEGER          B                ! Loop counter
-      INTEGER          BB               ! Loop counter
       BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop
-      INTEGER          BOL              ! Loop counter
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers measured in
                                         ! input file
@@ -153,7 +164,6 @@
       CHARACTER*132    FNAME            ! Input filename
       INTEGER          I                ! DO loop variable
       INTEGER          INDF             ! NDF identifier of input file
-      INTEGER          IN_DATA_PTR      ! pointer to data array of input file
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                         ! locator to FITS extension in input
                                         ! file
@@ -163,11 +173,14 @@
       CHARACTER*(DAT__SZLOC) IN_SCUCDX_LOC
                                         ! locator to SCUCD extension in input
                                         ! file
+      INTEGER          IPOSN            ! Position in string
       INTEGER          ITEMP            ! scratch integer
       DOUBLE PRECISION LAT_RAD          ! latitude of telescope centre (radians)
       DOUBLE PRECISION LAT2_RAD         ! latitude of telescope centre at MJD2
                                         ! (radians)
       INTEGER          LBND (MAXDIM)    ! lower bounds of array
+      CHARACTER*(4 * SCUBA__NUM_CHAN * SCUBA__NUM_ADC ) LINE
+                                        ! Scratch string for bolometer list
       DOUBLE PRECISION LONG_RAD         ! longitude of telescope centre 
                                         ! (radians)
       DOUBLE PRECISION LONG2_RAD        ! apparent RA of telescope centre at
@@ -179,6 +192,7 @@
                                         ! was at LAT2,LONG2 for PLANET centre
                                         ! coordinate system
       CHARACTER * (10) MODE             ! Method of sky removal
+      INTEGER          MSG_LEV          ! Messaging level
       INTEGER          NDIM             ! the number of dimensions in an array
       INTEGER          NREC             ! number of history records in file
       INTEGER          N_BEAMS          ! number of beams for which data have
@@ -201,13 +215,12 @@
       INTEGER          RUN_NUMBER       ! run number of observation
       CHARACTER*15     SAMPLE_MODE      ! SAMPLE_MODE of observation
       INTEGER          SECNDF           ! NDF id of section
-      INTEGER          SKY_ADC          ! ADC of sky bol
-      CHARACTER*3      SKYBOLC(MAX__BOL)       ! indices or names of 
+      CHARACTER*5      SKYBOLC(MAX__BOL)       ! indices or names of 
                                                ! bolometers whose data are to
                                                ! be treated as sky
       INTEGER          SKYBOLS(MAX__BOL)! Indices of sky bolometers
-      INTEGER          SKY_CHAN         ! Chan of SKY bol
       CHARACTER*80     STEMP            ! scratch string
+      CHARACTER*10     SUB_INSTRUMENT   ! Sub instrument name
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       INTEGER          UBND(MAXDIM)     ! Upper bounds of section
 
@@ -321,10 +334,27 @@
 *  get the sub-instrument and wavelength of the data, check for consistency
  
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SUB_1', STEMP, STATUS)
+     :     'SUB_1', SUB_INSTRUMENT, STATUS)
       
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'WAVE_1', RTEMP, STATUS)
+
+*     Remsky only works (so far) for array observations
+
+      CALL CHR_UCASE(SUB_INSTRUMENT)
+      IF ((SUB_INSTRUMENT .NE. 'SHORT') .AND.
+     :     (SUB_INSTRUMENT .NE. 'LONG')) THEN
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('PKG', PACKAGE)
+            CALL MSG_SETC('TSK', TSKNAME)
+            CALL ERR_REP(' ','^PKG: ^TSK can only be run on '//
+     :           'array data.', STATUS)
+
+         END IF
+
+      END IF
 
 *  Nasmyth coords of point on focal plane that the telescope is tracking
 *  on the sky
@@ -371,12 +401,9 @@
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
      :  N_BOLS, STATUS)
 
-*  map the various components of the data array and check the data dimensions 
+*     Check the dimensions of the data array
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
-
-      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
-     :  ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
@@ -412,8 +439,6 @@
 
       N_POS = DIM (2)
 
-      CALL NDF_UNMAP(INDF, '*', STATUS)
-
 *  get the bolometer description arrays
 
       CALL SCULIB_GET_BOL_DESC(IN_SCUBAX_LOC, SCUBA__NUM_CHAN,
@@ -444,49 +469,89 @@
          CALL PAR_GET1C ('BOLOMETERS', MAX__BOL, SKYBOLC,
      :        N_SKYBOLS, STATUS)
 
-         N_GOODBOLS = 0
-         DO B = 1, N_SKYBOLS
-            CALL CHR_CTOI (SKYBOLC(B), BOL, STATUS)
-            IF (STATUS .EQ. SAI__OK) THEN
-               N_GOODBOLS = N_GOODBOLS + 1
-               SKYBOLS(N_GOODBOLS) = BOL
-            ELSE
-               CALL ERR_ANNUL (STATUS)
-               CALL SCULIB_BOLDECODE (SKYBOLC(B),SKY_ADC, SKY_CHAN,
-     :              STATUS)
- 
-*  search for the bolometer in the index
+*     Decode the array strings into a list of bolometer numbers
+         CALL SURFLIB_DECODE_REMSKY_STRING(SUB_INSTRUMENT,
+     :        N_SKYBOLS, SKYBOLC, N_BOLS, BOL_ADC, BOL_CHAN,
+     :        SKYBOLS, N_GOODBOLS, STATUS)
 
-               IF (STATUS .EQ. SAI__OK) THEN
- 
-                  DO BB = 1, N_BOLS
-                     IF ((SKY_ADC .EQ. BOL_ADC(BB)) .AND.
-     :                    (SKY_CHAN .EQ. BOL_CHAN(BB))) THEN
-                        N_GOODBOLS = N_GOODBOLS + 1
-                        SKYBOLS(N_GOODBOLS) = BB
-                     END IF
-                  END DO
-                  
-               ELSE
-                  CALL ERR_ANNUL (STATUS)
-                  CALL MSG_SETC('BOL', SKYBOLC(B))
-                  CALL MSG_SETC('PKG', PACKAGE)
-                  CALL MSG_OUTIF (MSG__QUIET, ' ',
-     :                 '^PKG: Bolometer ^BOL not found', 
-     :                 STATUS)
-               END IF
-            END IF
-         END DO
 
 *     Raise an error if no bolometers are present
 
-         IF (N_GOODBOLS .LE. 0) THEN
+         IF (N_GOODBOLS .LE. 0 .AND. STATUS .EQ. SAI__OK) THEN
 
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP(' ', '^TASK: None of the selected bolometers'//
-     :           ' were present in the data',
+            CALL ERR_REP(' ', '^TASK: None of the selected '//
+     :           'bolometers  were present in the data',
      :           STATUS)
+
+         END IF
+
+*     Print a message informing the user of the number of selected bolometers
+         CALL MSG_SETI('NB',N_GOODBOLS)
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ',
+     :        '^PKG: Using ^NB sky bolometers', STATUS)
+
+*     Check the message filter level. If it is VERBOSE then we can
+*     construct a string of the bolometer names
+*     Otherwise it is a waste of time
+
+         CALL MSG_IFLEV(MSG_LEV)
+
+         IF (MSG_LEV .EQ. MSG__VERB) THEN
+
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__VERB, ' ', 
+     :           '^PKG: Selected sky bolometers:', STATUS)
+
+*     Write the bolometers into a string 
+
+            IF (STATUS .EQ. SAI__OK) THEN
+               LINE = ' '
+               IPOSN = 0
+               DO I = 1, N_GOODBOLS
+
+*     If the string is now longer than MSG__SZMSG - 28
+*     then we end up with ellipsis (...).
+*     In order to overcome this I will force the string onto
+*     a single line and then split it myself. This means I have to
+*     clear the output string occassionally.
+*     (since MSG can not display a string longer than MSG__SZMSG)
+*     The extra check is there to make sure that LLEN is smaller than
+*     MSG__SZMSG. The '10' is there to account for the package name.
+
+                  IF ((IPOSN .GT. (MSG__SZMSG - 10)) .OR.
+     :                 (IPOSN .GT. (LLEN - 10))) THEN
+                     CALL MSG_SETC('BL',LINE)
+                     CALL MSG_SETC('PKG', PACKAGE)
+                     CALL MSG_OUTIF(MSG__VERB, ' ',
+     :                    '^PKG: ^BL', STATUS)
+                     
+                     IPOSN = 0
+                     LINE = ' '
+                  
+                  END IF
+
+*     Convert the index to a string
+                  CALL CHR_ITOC(SKYBOLS(I), STEMP, ITEMP)
+                  IF(IPOSN.GT.0) THEN 
+                     CALL CHR_APPND(', ',LINE,IPOSN)
+                     IPOSN = IPOSN + 1 ! Since len does not see last space
+                  END IF
+                  CALL CHR_APPND(STEMP, LINE, IPOSN)
+               END DO
+            END IF
+
+*     Print more information in verbose mode
+*     Have to deal with the problem of the string being longer than
+*     MSG__SZMSG and not being able to display all the bolometers
+            
+            CALL MSG_SETC('BL',LINE)
+            CALL MSG_SETC('PKG', PACKAGE)
+            CALL MSG_OUTIF(MSG__VERB, ' ',
+     :           '^PKG: ^BL', STATUS)
+
 
          END IF
 
