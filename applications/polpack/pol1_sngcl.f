@@ -136,7 +136,7 @@
 
 *  Store bad output values if the denominator is zero, or if less than
 *  three input images contributed to this output pixel.
-         IF( DEN .EQ. 0.0 .OR. COUNT( I ) .LT. 3.0 ) THEN
+         IF( DEN .EQ. 0.0 .OR. COUNT( I ) .LT. 3 ) THEN
 
             DOUT( I, 1 ) = VAL__BADR
             DOUT( I, 2 ) = VAL__BADR

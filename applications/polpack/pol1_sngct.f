@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI,
-     :                       EPS, DIM3, STOKES, NSIGMA, TVAR, DOUT, 
-     :                       STATUS )
+     :                       EPS, DIM3, STOKES, NSIGMA, TVAR, TOL, CONV, 
+     :                       NREJ, DOUT, STATUS )
 *+
 *  Name:
 *     POL1_SNGCT
@@ -13,7 +13,8 @@
 
 *  Invocation:
 *     CALL POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI, EPS, 
-*                      DIM3, STOKES, NSIGMA, TVAR, DOUT, STATUS )
+*                      DIM3, STOKES, NSIGMA, TVAR, TOL, CONV, NREJ,
+*                      DOUT, STATUS )
 
 *  Description:
 *     This routine rejects input intensity values which deviate by more
@@ -51,7 +52,19 @@
 *     TVAR = REAL (Given)
 *        The mean variance in the image. Used only within screen messages.
 *        Not displayed if it is VAL_BADR.
-*     DOUT( NEL ) = REAL (Given)
+*     TOL = INTEGER (Given)
+*        If the difference between the number of pixels rejected during
+*        this iteration, and the number rejected during the previous 
+*        iteration (as supplied in NREJ) is less than TOL, then the NDF
+*        is presumed to have converged.
+*     CONV = LOGICAL (Given and Returned)
+*        Return .FALSE. if this NDF has not yet converged. Unchanged
+*        otherwise. Supplied value is ignored if ITER is zero.
+*     NREJ = INTEGER (Given and Returned)
+*        On entry, the number of pixel rejected from this NDF on the
+*        previous iteration. On exit, the number of pixel rejected during 
+*        this iteration. Supplied value is ignored if ITER is zero.
+*     DOUT( NEL ) = REAL (Returned)
 *        The output intensity values. Each pixel value is either a copy 
 *        of the corresponding input pixel value, or VAL__BADR (if it
 *        deviates by more than NSIGMA standard deviations form the model).
@@ -96,6 +109,11 @@
       REAL STOKES( NEL, DIM3 )
       REAL NSIGMA
       REAL TVAR
+      INTEGER TOL
+
+*  Arguments Given and Returned:
+      LOGICAL CONV
+      INTEGER NREJ
 
 *  Arguments Returned:
       REAL DOUT( NEL )
@@ -109,7 +127,7 @@
       INTEGER IAT
       INTEGER LPATH
       INTEGER NGOOD
-      INTEGER NREJ
+      INTEGER NREJL
       REAL EXPECT
       REAL K1
       REAL K2
@@ -126,6 +144,9 @@
             DOUT( I ) = DIN( I )
          END DO
 
+         NREJ = 0
+         CONV = .FALSE.
+
 *  Otherwise...
       ELSE
 
@@ -136,6 +157,7 @@
          VARFAC = NSIGMA**2
 
 *  Initialise.
+         NREJL = NREJ
          NREJ = 0
          NGOOD = 0
 
@@ -158,17 +180,25 @@
 *  the supplied input data value.
                IF( ( DIN( I ) - EXPECT )**2 .GT. VIN( I )*VARFAC ) THEN
                   DOUT( I ) = VAL__BADR
-                  NREJ = NREJ + 1
                ELSE
                   DOUT( I ) = DIN( I )
-                  NGOOD = NGOOD + 1
                END IF
 
 *  If any of the input values are bad, return a bad output value.
             ELSE
                DOUT( I ) = VAL__BADR
             END IF
-   
+
+*  Update the number of remaining good pixels, and the number of rejcetd
+*  pixels.   
+            IF( DOUT( I ) .NE. VAL__BADR ) THEN
+               NGOOD = NGOOD + 1
+
+            ELSE IF( DIN( I ) .NE. VAL__BADR ) THEN
+               NREJ = NREJ + 1
+
+            END IF
+
          END DO
 
 *  Get the ndf name, and find the end of the directory path (i.e. the
@@ -186,13 +216,12 @@
              
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
-         IF( ILEVEL .GT. 1 ) THEN
+         IF( ILEVEL .GT. 2 ) THEN
             CALL MSG_BLANK( STATUS )
    
             CALL MSG_SETC( 'NDF', PATH( IAT : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( 'POL1_SNGCT_MSG1', '   Iteration: ^ITER  --'//
-     :                    ' ''^NDF''', STATUS )
+            CALL MSG_OUT( 'POL1_SNGCT_MSG1', '   ''^NDF''', STATUS )
 
             CALL MSG_SETI( 'NREJ', NREJ )
             CALL MSG_SETI( 'NGOOD', NGOOD )
@@ -204,6 +233,7 @@
                CALL MSG_OUT( 'POL1_SNGFL_MSG3', '      RMS '//
      :                       'noise estimate: ^NOISE', STATUS )
             END IF
+
 *  If required, warn the user if no good pixels remain in this NDF.
          ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
             CALL MSG_SETC( 'NDF', PATH( IAT : LPATH ) )
@@ -212,6 +242,13 @@
      :                    'pixels remain in ''^NDF'' after ^ITER '//
      :                    'rejection iterations.', STATUS )
 
+         END IF
+
+*  See if the NDF has converged (i.e. if the difference between the
+*  number of pixels rejected in this iteration, and the number rejected in
+*  the previous iteration, is less than TOL.
+         IF( ABS( NREJ - NREJL ) .GT. TOL ) THEN
+            CONV = .FALSE.
          END IF
 
       END IF

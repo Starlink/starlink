@@ -359,7 +359,7 @@ PKG_NAME = polpack
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.0-4
+PKG_VERS = 2.0-3
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -444,7 +444,7 @@ ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f ccg1_wtm2r.f ccg1_wtm3r.f \
 datapic.f gethlp.f gthlpi.f pol1_chkex.f pol1_clcat.f pol1_angrt.f \
 pol1_clcnt.f pol1_cm1rr.f pol1_cm3rr.f pol1_cpctd.f pol1_cpctr.f \
 pol1_ctclm.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
-pol1_gtwcs.f pol1_knext.f pol1_lnam.f pol1_mkcat.f \
+pol1_gtwcs.f pol1_knext.f pol1_lnam.f pol1_mkcat.f pol1_sngmn.f \
 pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
 pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_vecky.f pol1_vecpl.f \
 pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
@@ -1807,6 +1807,7 @@ pol1_sngad.o:	 SAE_PAR PRM_PAR
 pol1_sngbm.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR
 pol1_sngcl.o:	 SAE_PAR PRM_PAR
 pol1_snghd.o:	 SAE_PAR DAT_PAR
+pol1_sngmn.o:	 SAE_PAR 
 pol1_sngsm.o:	 SAE_PAR PRM_PAR
 pol1_sngsv.o:	 SAE_PAR GRP_PAR
 pol1_squar.o:	 SAE_PAR PRM_PAR

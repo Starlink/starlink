@@ -69,7 +69,9 @@
 *        describing such things as warnings and the E and F factors
 *        adopted (in dual-beam mode). A value of 2 produces more verbose 
 *        output including details of each iteration in the iterative
-*        processes used by both dual and single beam modes. [1]
+*        processes used by both dual and single beam modes. A value of
+*        3 produces additional details about each individual input image in
+*        single beam mode. [1]
 *     IN = NDF (Update)
 *        A group specifying the names of the input intensity images. This
 *        may take the form of a comma separated list, or any of the other 
@@ -77,27 +79,30 @@
 *        only is required unless the SETVAR parameter is assigned a TRUE
 *        value.
 *     MAXIT = _INTEGER (Read)
-*        This parameter is only accessed by the dual-beam algorithm. It
-*        specifies the maximum number of iterations to be used when 
-*        inter-comparing pairs of input images to determine their relative 
-*        scale-factor and/or zero-point. If the specified number of 
-*        iterations is exceeded without achieving the accuracy required by 
-*        the settings of the TOLS and TOLZ parameters, then a warning message 
-*        will be issued, but the results will still be used. The value given 
-*        for MAXIT must be at least one. [30]
-*     NITER = _INTEGER (Read)
-*        This parameter is only accessed by the single-beam algorithm. It
-*        specifies the maximum number of iterations to be used when 
-*        estimating input variances or rejecting aberrant input values. 
-*        The default value depends on the value supplied for parameter
-*        WEIGHTS. If WEIGHTS indicates that estimates of the input
+*        This parameter is only accessed by both single and dual-beam 
+*        algorithm, but is used slightly differently in each case. 
+*
+*        In dual beam mode, it specifies the maximum number of iterations 
+*        to be used when inter-comparing pairs of input images to determine 
+*        their relative scale-factor and/or zero-point. If the specified 
+*        number of iterations is exceeded without achieving the accuracy 
+*        required by the settings of the TOLS and TOLZ parameters, then a 
+*        warning message will be issued, but the results will still be used. 
+*        The value given for MAXIT must be at least one. The runtime
+*        default value is 30.
+
+*        In single-beam mode, it specifies the maximum number of iterations 
+*        to be used when estimating input variances or rejecting aberrant 
+*        input values. The default value depends on the value supplied for 
+*        parameter WEIGHTS. If WEIGHTS indicates that estimates of the input
 *        variances are to be made (i.e. if WEIGHTS has the value 2 or 3), 
-*        then the default value is 4. Otherwise, if variances in the input 
+*        then the default value is 8. Otherwise, if variances in the input 
 *        NDFs are to be used (i.e. if WEIGHTS is 1), the default is zero. 
 *        This is because each iteration is a computationally expensive 
 *        process, and so iterations should only be performed if they are 
-*        really necessary. NITER is always fixed at zero if WEIGHTS is 4
-*        (i.e. if all input data are given constant weight). []
+*        really necessary. MAXIT is always fixed at zero if WEIGHTS is 4
+*        (i.e. if all input data are given constant weight). See also
+*        parameter TOLR. []
 *     NSIGMA = _REAL (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the threshold at which to reject input data values. If
@@ -174,8 +179,28 @@
 *        may be, and would consequently give no information about the input
 *        variances. In this case, a larger value of SMBOX (say 9) may be
 *        necessary. [3]
+*     MINFRAC = _REAL (Read)
+*        This parameter is only accessed by the single-beam algorithm
+*        when iteratively rejecting input values (i.e. if MAXIT is
+*        greater than zero). It controls how much good input data is 
+*        required to form a good output pixel. It is given as a fraction 
+*        in the range 0 to 1. The miminum number of good input values 
+*        required to form a good output value at a particular pixel is 
+*        equal to this fraction multiplied by the number of input NDFs 
+*        which have good values for the pixel. The number is rounded to 
+*        the nearest integer and limited to at least 3. If ILEVEL is
+*        greater than 1, then the percentage of output pixels which fail 
+*        this test is displayed. [0.0]
 *     TITLE = LITERAL (Read)
 *        A title for the output cube. [Output from POLCAL]
+*     TOLR = _INTEGER (Read)
+*        This parameter is only accessed by the single-beam algorithm. It
+*        specifies the convergence criterion for the iterative process
+*        which estimates the input variances, and rejects bad input values.
+*        If the number of pixels rejected from any input NDF changes by more 
+*        than TOLR pixels between two succesive iterations, then the process 
+*        is assumed not to have converged and another iteration will be 
+*        performed unless MAXIT iterations have already been performed. [0]
 *     TOLS = _REAL (Read)
 *        This parameter is only accessed by the dual-beam algorithm. It
 *        defines the accuracy tolerance to be achieved when inter-comparing 
@@ -213,19 +238,19 @@
 *        input images do not have associated variances then estimates of 
 *        the variances are made for all input images based on the spread of 
 *        data values. The reciprocal of these variances are used as weights. 
-*        An error will be reported if parameter NITER is set to zero, thus
+*        An error will be reported if parameter MAXIT is set to zero, thus
 *        preventing the iterative estimation of input variances.
 *
 *        - 3 -- Use estimates of the variances for all input images based 
 *        on the spread of data values. The reciprocal of these variances 
 *        are used as weights. Any variances supplied with the input images 
-*        are ignored. An error will be reported if parameter NITER is set to 
+*        are ignored. An error will be reported if parameter MAXIT is set to 
 *        zero, thus preventing the iterative estimation of input variances.
 *
 *        - 4 -- Use a constant weight of 1.0 for all input images. Any 
 *        variances supplied with the input images are ignored. The
 *        iterative rejection of bad input values controlled by parameter
-*        NITER is not available in this mode.
+*        MAXIT and TOLR is not available in this mode.
 *
 *        The dual-beam algorithm always uses scheme 1. [1]
  
@@ -263,7 +288,7 @@
 *        If the input intensity images do not contain usable variances,
 *        then estimates of these variances can be made from the spread of
 *        supplied data values. This is an expensive iterative process
-*        (see parameters NITER and WEIGHTS). Initially, Stokes vectors
+*        (see parameters TOLR and WEIGHTS). Initially, Stokes vectors
 *        are estimated assigning a uniform constant weight to all input
 *        data values. The I, Q and U images are then smoothed by fitting
 *        a quadratic surface to the data within a box centred on each
@@ -286,12 +311,16 @@
 *        NSIGMA times the standard deviation expected for the pixel value.
 *        This standard deviation may be derived from the variances in the 
 *        input data file, or from the variances estimated from the spread
-*        of data values.
+*        of data values. If many input values are rejected at a particular 
+*        pixel it may indicate an entirely corrupt pixel, in which case you 
+*        may want to ignore the pixel altogether by setting it bad in the 
+*        output cube. This can be done using parameter MINFRAC.
 *
 *        After rejecting such values, the algorithm goes on to re-calculate 
 *        the Stokes vectors excluding the rejected input values, weighting
 *        the input data values as specified by parameter WEIGHTS. This 
-*        process is repeated a number of times given by parameter NITER. 
+*        process is repeated a number of times given by parameters TOLR
+*        and MAXIT.
 *
 *        There are a couple of restrictions in single-beam mode. Firstly,
 *        there is currently no facility for measuring circular

@@ -131,8 +131,6 @@
 *        Added Q,U and V outputs.
 *     6-APR-1999 (DSB):
 *        Added rotation of reference direction (ANGRT).
-*     12-MAY-1999 (DSB):
-*        Corrected calculation of variances for P and Theta (linear mode).
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -73,19 +73,20 @@ interface POLCAL
    parameter   MAXIT
       type     _INTEGER
       access   READ
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
+      vpath    'DYNAMIC,DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
       default  30
-      prompt   'Maximum number of iterations in dual-beam mode'
+      prompt   'Maximum number of iterations'
       helpkey  '*'
    endparameter
 
-   parameter   NITER
-      type     _INTEGER
+   parameter   MINFRAC 
+      type     _REAL
       access   READ
-      vpath    'DYNAMIC'
-      ppath    'DYNAMIC'
-      prompt   'Maximum number of iterations in single-beam mode'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0
+      prompt   'Minimum fraction of good input pixels required'
       helpkey  '*'
    endparameter
 
@@ -117,6 +118,16 @@ interface POLCAL
       default  'LINEAR'
       ppath    'DEFAULT'
       prompt   'Polarimetric mode (LINEAR or CIRCULAR)'
+      helpkey  '*'
+   endparameter
+
+   parameter SETVAR 
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Store estimated variances in input images?'
       helpkey  '*'
    endparameter
 
@@ -157,6 +168,16 @@ interface POLCAL
       default  'Output from POLCAL'
       ppath    'DYNAMIC, DEFAULT'
       prompt   'Title for output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter   TOLR
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0
+      prompt   'Iterative convergence criterion in single-beam mode'
       helpkey  '*'
    endparameter
 

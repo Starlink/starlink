@@ -32,12 +32,12 @@
 *        The global status.
 
 *  Parameters used:
-*     NITER = _INTEGER (Read)
-*        The number of rejection iterations to perform. [2]
+*     MAXIT = _INTEGER (Read)
+*        The maximum number of rejection iterations to perform. 
 *     NSIGMA = _REAL (Read)
 *        The rejection threshold for aberant points, expressed as a
 *        multiple of the standard deviation of the intensity data.
-*        This parameter is not prompted for if NITER is zero. [3.0]
+*        This parameter is not prompted for if MAXIT is zero. [3.0]
 *     OUT = NDF (Write)
 *        The output NDF holding the Stokes vector cube.
 *     SETVAR = _LOGICAL (Read)
@@ -48,8 +48,24 @@
 *        The size of the box to use when smoothing Stokes vectors prior to
 *        estimating the input variances (in pixels). Only accessed if input 
 *        variances are being estimated.
+*     MINFRAC = _REAL (Read)
+*        This controls how much good input data is required to form a
+*        good output pixel. It is given as a fraction in the range 0 to 1.
+*        The miminum number of good input values required to form a good
+*        output value at a particular pixel is equal to this fraction 
+*        multiplied by the number of input NDFs which have good values 
+*        for the pixel. The number is rounded to the nearest integer and 
+*        limited to at least 3. [0.0]
 *     TITLE = LITERAL (Read)
 *        A title for the output cube.
+*     TOLR = _INTEGER (Read)
+*        Specifies the convergence criterion for the iterative process
+*        which estimates the input variances, and rejects bad input values.
+*        No more iterations are performed once convergence is reached, or
+*        once MAXIT iterations have been performed. If the number of pixels 
+*        rejected from any input NDF changes by more than TOLR pixels between 
+*        two succesive iterations, then the process is assumed not to
+*        have converged. [0]
 *     WEIGHT = _INTEGER (Read)
 *        The weighting scheme to use:
 *
@@ -129,13 +145,15 @@
       INTEGER IPEPS              ! Pointer to analyser efficiency factors
       INTEGER IPPHI              ! Pointer to effective analyser angles
       INTEGER IPT                ! Pointer to analyser transmission factors
+      INTEGER IPNREJ             ! Pointer to no. of rejected pixels storage
       INTEGER IPTVAR             ! Pointer to input mean variance estimates
       INTEGER IWCS               ! Pointer to output WCS FramSet
       INTEGER LBNDO( 3 )         ! Lower bounds of output NDF
-      INTEGER NITER              ! No. of rejection iterations to perform
+      INTEGER MAXIT              ! Max. no. of rejection iterations to perform
       INTEGER NNDF               ! No. of input NDFs
       INTEGER PLACE              ! Place holder for co-variances NDF
       INTEGER SMBOX              ! Full size of smoothign box in pixels
+      INTEGER TOL                ! Convergence criterion
       INTEGER UBNDO( 3 )         ! Upper bounds of output NDF
       INTEGER WEIGHT             ! Weighting scheme to use
       INTEGER WSCH               ! Weighting scheme to use
@@ -144,6 +162,7 @@
       LOGICAL SETVAR             ! Store input variance estimates?
       REAL ANGROT                ! ACW angle from +X to o/p ref. direction
       REAL NSIGMA                ! Rejection threshold
+      REAL MNFRAC                ! Fraction of good input values required
 *.
 
 *  Check the inherited global status.
@@ -155,6 +174,7 @@
       IPT = 0
       IPEPS = 0
       IPTVAR = 0
+      IPNREJ = 0
       IGRP2 = GRP__NOID      
 
 *  Begin an NDF context.
@@ -179,6 +199,10 @@
 *  Allocate workspace to estimates of mean variance in each input NDF.
       CALL PSX_CALLOC( NNDF, '_REAL', IPTVAR, STATUS )
 
+*  Allocate workspace to hold the number of pixels rejected from each
+*  input NDF.
+      CALL PSX_CALLOC( NNDF, '_INTEGER', IPNREJ, STATUS )
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999     
 
@@ -186,25 +210,31 @@
 *  are being used for all input data, no iterations can be performed since
 *  there are no estimates of the input variances.
       IF( WEIGHT .EQ. 4 ) THEN
-         NITER = 0
+         MAXIT = 0
 
 *  Otherwise...
       ELSE
 
-*  Set the dynamic default for NITER. This depends on the weighting scheme.
+*  Set the dynamic default for MAXIT. This depends on the weighting scheme.
 *  Use a default of zero if variances will be obtained from the input NDFs
-*  (because its so slow to iterate), and 4 if they will be estimated from
+*  (because its so slow to iterate), and 8 if they will be estimated from
 *  the spread of data values (since we've *GOT* to iterate to make variance
 *  estimates).
          IF( WEIGHT .EQ. 1 ) THEN 
-            CALL PAR_DEF0I( 'NITER', 0, STATUS )
+            CALL PAR_DEF0I( 'MAXIT', 0, STATUS )
          ELSE 
-            CALL PAR_DEF0I( 'NITER', 4, STATUS )
+            CALL PAR_DEF0I( 'MAXIT', 8, STATUS )
          END IF
 
 *  Get the number of rejection iterations to perform.
-         CALL PAR_GET0I( 'NITER', NITER, STATUS )
-         NITER = MAX( 0, NITER )
+         CALL PAR_GET0I( 'MAXIT', MAXIT, STATUS )
+         MAXIT = MAX( 0, MAXIT )
+      END IF
+
+*  If any iterations are being performed, get the convergence criterion.
+      IF( MAXIT .GT. 0 ) THEN
+         CALL PAR_GET0I( 'TOLR', TOL, STATUS )
+         TOL = ABS( TOL )
       END IF
 
 *  Get the required headers. This also returns the required bounds for
@@ -217,7 +247,7 @@
 
 *  Choose the weighting scheme to use, taking account of the
 *  availability of input variances. Also, estimates of input variances
-*  can only be made if we are allowed to iterate (i.e. if niter is
+*  can only be made if we are allowed to iterate (i.e. if MAXIT is
 *  greater than zero). WSCH = 1, 2, 3 corresponds to "use NDF variances", 
 *  "use estimated variances", and "use constant variances".
       IF( WEIGHT .EQ. 1 ) THEN
@@ -230,14 +260,14 @@
       ELSE IF( WEIGHT .EQ. 2 ) THEN
          IF( INVAR ) THEN
             WSCH = 1
-         ELSE IF( NITER .GT. 0 ) THEN
+         ELSE IF( MAXIT .GT. 0 ) THEN
             WSCH = 2
          ELSE
             WSCH = 3
          END IF
 
       ELSE IF( WEIGHT .EQ. 3 ) THEN
-         IF( NITER .GT. 0 ) THEN
+         IF( MAXIT .GT. 0 ) THEN
             WSCH = 2
          ELSE
             WSCH = 3
@@ -254,7 +284,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'POL1_SNGBM_ERR1', 'Output variances have '//
      :                    'been requested but cannot be produced. See'//
-     :                    ' parameters VARIANCE, WEIGHTS and NITER.', 
+     :                    ' parameters VARIANCE, WEIGHTS and TOLR.', 
      :                    STATUS )
          ELSE
             OUTVAR = .TRUE.
@@ -339,9 +369,14 @@
 *  Calculate the Stokes vectors and store them in the output NDF.
 *  ==============================================================
 *  Get the rejection threshold if any iterations are to be performed.
-      IF( NITER .GT. 0 ) THEN
+      IF( MAXIT .GT. 0 ) THEN
          CALL PAR_GET0R( 'NSIGMA', NSIGMA, STATUS )
          NSIGMA = MAX( 0.0, NSIGMA )
+
+*  Also get the minimum fraction of good input values required.
+         CALL PAR_GDR0R( 'MINFRAC', 0.0, 0.0, 1.0, .FALSE., MNFRAC, 
+     :                   STATUS )
+
       END IF
 
 *  Get the size of the box to use when smoothing Stokes vectors prior to 
@@ -359,8 +394,9 @@
 *  Calcualte the I,Q,U values.        
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
-     :                 %VAL( IPTVAR ), IGRP2, INDFO, INDFC, NITER, 
-     :                 NSIGMA, ILEVEL, SMBOX/2, SETVAR, STATUS )
+     :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
+     :                 INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, SMBOX/2, 
+     :                 SETVAR, MNFRAC, STATUS )
 
 *  Tidy up.
 *  ========
@@ -373,6 +409,7 @@
       IF( IPT .NE. 0 ) CALL PSX_FREE( IPT, STATUS )
       IF( IPEPS .NE. 0 ) CALL PSX_FREE( IPEPS, STATUS )
       IF( IPTVAR .NE. 0 ) CALL PSX_FREE( IPTVAR, STATUS )
+      IF( IPNREJ .NE. 0 ) CALL PSX_FREE( IPNREJ, STATUS )
 
 *  Delete the group holding analyser identifiers.
       IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )

@@ -1,6 +1,7 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
-     :                       EPS, TVAR, IGRP2, INDFO, INDFC, NITER, 
-     :                       NSIGMA, ILEVEL, HW, SETVAR, STATUS )
+     :                       EPS, TVAR, NREJ, IGRP2, TOL, INDFO, INDFC, 
+     :                       MAXIT, NSIGMA, ILEVEL, HW, SETVAR, MNFRAC,
+     :                       STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -13,8 +14,8 @@
 
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
-*                      TVAR, IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
-*                      HW, SETVAR, STATUS )
+*                      TVAR, NREJ, IGRP2, TOL, INDFO, INDFC, MAXIT, NSIGMA,
+*                      ILEVEL, HW, SETVAR, MNFRAC, STATUS )
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
@@ -28,7 +29,7 @@
 *     the supplied input variance value if supplied, or the standard
 *     deviation estimated from the residuals). New I,Q,U values are then 
 *     found excluding the rejected input values. This rejection process is 
-*     repeated NITER times.
+*     repeated up to MAXIT times (see also TOL).
 
 *  Arguments:
 *     IGRP1 = INTEGER (Given)
@@ -68,6 +69,8 @@
 *        The analyser efficiency factor for each input NDF. 
 *     TVAR( NNDF ) = REAL (Given)
 *        Workspace to hold an estimate of the mean variance in each input NDF.
+*     NREJ( NNDF ) = INTEGER (Returned)
+*        Workspace to hold the number of pixels rejected from each NDF.
 *     IGRP2 = INTEGER (Given)
 *        A GRP identifier for a group holding the unique analyser identifiers 
 *        found in the supplied NDFs. These are text strings which identify 
@@ -75,6 +78,13 @@
 *        string "DEFAULT" is used if no analyser identifier is supplied for
 *        an NDF. Each unique identifier is included only once in the
 *        returned group.
+*     TOL = INTEGER (Given)
+*        The convergence criterion for leaving the iterative loop. If the
+*        the number of pixels rejected from the image changes by
+*        less than or equal to TOL pixels for all images, then the process is
+*        presumed to have converged. No more iterations are performed if
+*        convergence has been reached or it the maximum number of
+*        iterations (given by MAXIT) has been reached.
 *     INDFO = INTEGER (Given)
 *        An NDF identifier for the output NDF in which to store the 
 *        I, Q and U values, relative to a reference direction parallel to
@@ -84,16 +94,16 @@
 *        QU co-variances associated with the Stokes vectors stored in INDFO.
 *        The NDF should be 2D with the same bounds as INDFO. This argument is 
 *        ignored if VAR is .FALSE. 
-*     NITER = INTEGER (Given)
-*        The number of rejection iterations to perform. If this is zero
+*     MAXIT = INTEGER (Given)
+*        The maximum number of rejection iterations to perform. If this is zero
 *        then no rejection iterations are performed.
 *     NSIGMA = REAL (Given)
 *        The number of standard deviations at which input data points are
-*        rejected when iterating. Ignored if NITER is zero.
+*        rejected when iterating. Ignored if MAXIT is zero.
 *     ILEVEL = INTEGER (Given)
 *        The information level. Zero produces no screen output; 1 gives
-*        brief details of each iteration; 2 gives full details of each
-*        iteration.
+*        brief details of each iteration; 2 gives some details of each
+*        iteration; 3 gives full details of each iteration.
 *     HW = INTEGER (Given)
 *        The half size of the box to use when smoothing STokes vectors
 *        prior to estimating input variances (in pixels). The full size
@@ -102,6 +112,14 @@
 *        If TRUE, and if WSCH is 2, then a constant value is stored in the 
 *        VARIANCE component of each input NDF on exit. This constant value 
 *        is the mean variance estimated in the image.
+*     MNFRAC = REAL (given)
+*        This controls how much good input data is required to form a
+*        good output pixel. It is given as a fraction in the range 0 to 1.
+*        The miminum number of good input values required to form a good
+*        output value at a particular pixel is equal to this fraction 
+*        multiplied by the number of input NDFs which have good values 
+*        for the pixel. The number is rounded to the nearest integer and 
+*        limited to at least 3. 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -140,14 +158,17 @@
       REAL T( NNDF )
       REAL EPS( NNDF )
       REAL TVAR( NNDF )
+      INTEGER NREJ( NNDF )
       INTEGER IGRP2
+      INTEGER TOL
       INTEGER INDFO
       INTEGER INDFC
-      INTEGER NITER
+      INTEGER MAXIT
       REAL NSIGMA
       INTEGER ILEVEL
       INTEGER HW
       LOGICAL SETVAR
+      REAL MNFRAC
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -158,6 +179,7 @@
       INTEGER DIM3               ! Dimension of output cube on axis 3
       INTEGER EL                 ! No. of elements in a plane of the output NDF
       INTEGER I                  ! Index of current input NDF
+      INTEGER IERR               ! Index of first numerical error
       INTEGER INDF               ! NDF identifier for the current input NDF
       INTEGER INDFS              ! NDF identifier for the input section
       INTEGER IPCOUT             ! Pointer to output (co-variance) DATA array
@@ -173,7 +195,8 @@
       INTEGER IPMT31             ! Pointer to column 3 row 1 image
       INTEGER IPMT32             ! Pointer to column 3 row 2 image
       INTEGER IPMT33             ! Pointer to column 3 row 3 image
-      INTEGER IPN                ! Pointer to work array holding image counts
+      INTEGER IPN                ! Pointer to array holding curr. image counts
+      INTEGER IPNIN              ! Pointer to array holding orig. image counts
       INTEGER IPVEST             ! Pointer to estimated input variances
       INTEGER IPVIN              ! Pointer to input VARIANCE array
       INTEGER IPVOUT             ! Pointer to output VARIANCE array
@@ -188,13 +211,19 @@
       INTEGER LBND( 3 )          ! Lower bounds of output NDF
       INTEGER NDIM               ! No. of axes in output NDF
       INTEGER NEL                ! No. of elements in whole output NDF
+      INTEGER NERR               ! Number of numerical errors
       INTEGER NW                 ! No. of elements in work array
+      INTEGER TOTREJ             ! Total number of input pixels rejected
       INTEGER UBND( 3 )          ! Upper bounds of output NDF
       LOGICAL CANDO              ! Is write access available?
+      LOGICAL CONV               ! Has variance estimation converged?
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise pointers to dynamic memory.
+      IPNIN = 0
 
 *  Get the bounds and dimensions of the output NDF.
       CALL NDF_BOUND( INDFO, 3, LBND, UBND, NDIM, STATUS )
@@ -304,6 +333,14 @@
      :                       %VAL( IPN ), TVAR, %VAL( IPVEST ), STATUS )
          END IF
 
+*  Display the iteration number of required.
+         IF( ILEVEL .GT. 1 ) THEN
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_SETI( 'ITER', ITER )
+            CALL MSG_OUT( 'POL1_SNGSV_MSG1', ' Iteration: ^ITER...',
+     :                    STATUS )
+         END IF
+
 *  On the zeroth iteration, initialise the variance estimate image to hold 
 *  1.0 at every pixel. Do not do this if variances in the input NDFs will
 *  be used.
@@ -326,6 +363,11 @@
       CALL POL1_FILLR( 0.0, EL, %VAL( IPMT32 ), STATUS )
       CALL POL1_FILLR( 0.0, EL, %VAL( IPMT33 ), STATUS )
       CALL POL1_FILLR( 0.0, EL, %VAL( IPN ), STATUS )
+
+*  Indicate that we have not yet found an unconverged NDF during this
+*  iteration.
+      CONV = .TRUE.
+      TOTREJ = 0
 
 *  Loop round each NDF.
       DO I = 1, NNDF
@@ -363,7 +405,10 @@
          CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, %VAL( IPDIN ), 
      :                    %VAL( IPVIN ), T( I ), PHI( I ), EPS( I ), 
      :                    DIM3, %VAL( IPDOUT ), NSIGMA, TVAR( I ), 
-     :                    %VAL( IPDCUT ), STATUS )
+     :                    TOL, CONV, NREJ( I ), %VAL( IPDCUT ), STATUS )
+
+*  Update the total number of pixels rejected from all images.
+         TOTREJ = TOTREJ + NREJ( I )
 
 *  Update the work arrays to include the effect of the current input NDF.
          CALL POL1_SNGAD( EL, %VAL( IPDCUT ), %VAL( IPVIN ), 
@@ -379,8 +424,29 @@
 
       END DO
 
+*  Report the total number of pixels rejected (except for the zeroth
+*  iteration).
+      IF( ITER .GT. 0 .AND. ILEVEL .GT. 1 ) THEN
+         IF( ILEVEL .GT. 2 ) CALL MSG_BLANK( STATUS )
+         CALL MSG_SETI( 'TOTREJ', TOTREJ )
+         CALL MSG_OUT( 'POL1_SNGSV_MSG2', '   Total number of '//
+     :                 'aberrant input pixels rejected: ^TOTREJ',
+     :                 STATUS )
+      END IF
+
 *  Calculate the output Stokes vectors, variances, and co-variances.
 *  =================================================================
+
+*  If this is the zeroth iteration, take a copy of the number of good
+*  input images at each pixel. This is done now before any bad input
+*  values ahev been rejected.
+      IF( ITER .EQ. 0 .AND. MAXIT .GT. 0 ) THEN 
+         CALL PSX_CALLOC( EL, '_INTEGER', IPNIN, STATUS )     
+         CALL VEC_RTOI( .FALSE., EL, %VAL( IPN ), %VAL( IPNIN ), IERR,
+     :                  NERR, STATUS )
+      END IF
+
+*  Now calculate the output values.
       CALL POL1_SNGCL( EL, 
      :                 %VAL( IPIE1 ),  %VAL( IPIE2 ),  %VAL( IPIE3 ), 
      :                 %VAL( IPMT11 ), %VAL( IPMT21 ), %VAL( IPMT31 ), 
@@ -390,11 +456,31 @@
      :                 %VAL( IPCOUT ), STATUS )
 
 *  Go back to recalculate the output I,Q,U values excluding aberrant input
-*  data values unless we have already done the required number of iterations.
-      IF( STATUS .EQ. SAI__OK .AND. ITER .LT. NITER ) THEN
+*  data values unless we have already done the maximum number of
+*  iterations, or if the process has converged.
+      IF( STATUS .EQ. SAI__OK .AND. ITER .LT. MAXIT .AND. 
+     :    .NOT. CONV ) THEN
          ITER = ITER + 1
-         IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
+         IF( ILEVEL .GT. 2 ) CALL MSG_BLANK( STATUS )
          GO TO 10
+      END IF
+
+*  Warn the user if convergence was not reached.
+      IF( .NOT. CONV .AND. ITER .EQ. MAXIT .AND. MAXIT .GT. 0 .AND. 
+     :     ILEVEL .GT. 1 ) THEN
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETI( 'MAXIT', MAXIT )
+         CALL MSG_OUT( 'POL1_SNGSV_MSG0', ' Failed to reached '//
+     :                 'convergence in ^MAXIT iteration.', STATUS )
+         CALL MSG_BLANK( STATUS )
+      END IF
+
+*  Set bad any output pixels which were contributed to by fewer than the
+*  required minimum number of uinput images.
+      IF( MAXIT .GT. 0 ) THEN
+         CALL POL1_SNGMN( EL, %VAL( IPNIN ), MNFRAC, %VAL( IPN ),
+     :                    ILEVEL, %VAL( IPDOUT ), %VAL( IPVOUT ), 
+     :                    %VAL( IPCOUT ), STATUS )
       END IF
 
 *  If required set the VARIANCE component of each input NDF to the mean
@@ -453,6 +539,7 @@
       CALL PSX_FREE( IPMT32, STATUS )
       CALL PSX_FREE( IPMT33, STATUS )
       CALL PSX_FREE( IPN, STATUS )     
+      IF( IPNIN .NE. 0 ) CALL PSX_FREE( IPNIN, STATUS )     
       CALL PSX_FREE( IPX4, STATUS )     
       CALL PSX_FREE( IPX3Y, STATUS )     
       CALL PSX_FREE( IPX2Y2, STATUS )     

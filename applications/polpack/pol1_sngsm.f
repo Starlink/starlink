@@ -23,7 +23,7 @@
 
 *  Arguments:
 *     ILEVEL = INTEGER (Given)
-*        The level of information to display on the screen. Values above 1
+*        The level of information to display on the screen. Values above 2
 *        result in a message being displayed indicating which images
 *        (I,Q, or U) are being smoothed.
 *     HW = INTEGER (Given)
@@ -180,7 +180,7 @@
 
 *  Tell the user what is happening since this routine can take a long
 *  time to run.
-         IF( ILEVEL .GT. 1 ) THEN
+         IF( ILEVEL .GT. 2 ) THEN
 
             IF( IZ .EQ. 1 ) THEN
                CALL MSG_SETC( 'S', 'I' ) 
@@ -421,7 +421,5 @@
          END DO
 
       END DO
-
-      IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
 
       END
