@@ -110,7 +110,7 @@
             C1=CHR_LEN(TEXT)+1
           ENDDO
           C1=INDEX(TEXT,'(')
-          C2=INDEX(TEXT(C1:,')')
+          C2=INDEX(TEXT(C1:),')')
           READ(TEXT(C1+1:C2-1),*) X1,Y1,R1
           C1=INDEX(TEXT(C2:),'(')
           C2=INDEX(TEXT(C1:),')')
