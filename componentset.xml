@@ -1,6 +1,5 @@
 <!DOCTYPE componentset SYSTEM "componentinfo.dtd">
 <componentset>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="astrom">
   <version>3.8</version>
@@ -24,13 +23,12 @@
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun5</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="atools">
   <version>1.8</version>
@@ -48,16 +46,15 @@ high-level interface to the AST library.
   </dependencies>
   <developers>
     <person>
-      <uname>dsb</uname>
       <name>David S. Berry</name>
+      <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation></documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ccdpack">
   <version>4.0-18</version>
@@ -92,17 +89,15 @@ high-level interface to the AST library.
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Peter Draper</name>
       <uname>pwd</uname>
     </person>
   </developers>
-  <!-- <documentation> sun139</documentation> -->
   <bugreports>ccdpack@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="coco">
   <version>2.2-8</version>
@@ -124,9 +119,7 @@ system are supported.
   </developers>
   <documentation> sun56</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="convert">
   <version>1.5-5</version>
@@ -144,6 +137,8 @@ Starlink applications, and a number of other common data formats.
     <person>
       <name>Malcolm J. Currie</name>
       <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>G.J.Privett</name>
@@ -162,9 +157,7 @@ Starlink applications, and a number of other common data formats.
   </developers>
   <documentation> sun55</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cursa">
   <version>6.4-1</version>
@@ -195,13 +188,13 @@ on-line catalogues via the Internet.
     <person>
       <name>Mark Taylor</name>
       <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun190 ssn76</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="daophot">
   <version>1.3-3</version>
@@ -222,13 +215,16 @@ on-line catalogues via the Internet.
     <person><name>Peter Stetson</name><role>Original author</role></person>
     <person><name>Nicholas Eaton</name></person>
     <person><name>Grant Privett</name></person>
-    <person><name>Mark Taylor</name></person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
-  <!-- <documentation> sun42</documentation> -->
+  <documentation> sun42</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="datacube">
   <version>1.0-4</version>
@@ -250,9 +246,7 @@ cube manipulation. </p></abstract>
   </developers>
   <documentation> sun237 sc16</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="dipso">
   <version>3.6-4</version>
@@ -266,16 +260,15 @@ cube manipulation. </p></abstract>
   </dependencies>
   <developers>
     <person>
-      <uname>pwd</uname>
       <name>David S. Berry</name>
+      <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun50</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="docfind">
   <version>1.3-1</version>
@@ -297,9 +290,7 @@ cube manipulation. </p></abstract>
   </developers>
   <documentation> sun38</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="dvi2bitmap">
   <version>0.13b2</version>
@@ -323,9 +314,7 @@ cube manipulation. </p></abstract>
   </developers>
   <documentation></documentation>
   <bugreports>norman@astro.gla.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="echomop">
   <version>3.3-7</version>
@@ -355,12 +344,16 @@ cube manipulation. </p></abstract>
     <person>
       <name>Martin Clayton</name>
     </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun152</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="echwind">
   <version>3.1-4</version>
@@ -388,9 +381,7 @@ proposal, or before or during an observing run.
   </developers>
   <documentation> sun53</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="esp">
   <version>0.11</version>
@@ -412,6 +403,7 @@ proposal, or before or during an observing run.
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Mark Taylor</name>
@@ -424,9 +416,7 @@ proposal, or before or during an observing run.
   </developers>
   <documentation> sun180</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="extractor">
   <version>2.3-1</version>
@@ -446,13 +436,12 @@ variety of formats.
       <name>Peter W. Draper</name>
       <uname>pwd</uname>
       <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun226</documentation>
   <bugreports>extractor@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="extreme">
   <version>0.1-1</version>
@@ -483,13 +472,11 @@ variety of formats.
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation> ssn73</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="figaro">
   <version>5.6-2</version>
@@ -523,8 +510,10 @@ wide range of images and spectra.
       <name>Clive Davenhall</name>
     </person>
     <person>
-      <name>Malcolm Currie</name>
+      <name>Malcolm J Currie</name>
       <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Mark Taylor</name>
@@ -550,9 +539,7 @@ wide range of images and spectra.
   </developers>
   <documentation> sun86</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="findcoords">
   <version>1.0-1</version>
@@ -574,9 +561,7 @@ and its coordinates are displayed.
   </developers>
   <documentation> sun240</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gaia">
   <version>2.8-0</version>
@@ -598,13 +583,12 @@ and the ability to query on-line (WWW) catalogues.
       <name>Peter W. Draper</name>
       <uname>pwd</uname>
       <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun214</documentation>
   <bugreports>gaia@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="generic">
   <version>1.1-2</version>
@@ -627,9 +611,7 @@ and the ability to query on-line (WWW) catalogues.
   </developers>
   <documentation> sun7</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hdstools">
   <version>1.0</version>
@@ -645,16 +627,19 @@ package but have now been modified to run as normal Starlink tasks.
   </dependencies>
   <developers>
     <person>
-      <uname>ajc</uname>
       <name>A. J. Chipperfield</name>
+      <uname>ajc</uname>
       <email>ussc@star.rl.ac.uk</email>
     </person>
-  </developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>  </developers>
   <documentation> sun245</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hdstrace">
   <version>1.2-2</version>
@@ -668,14 +653,15 @@ Traces an HDS file
   </dependencies>
   <developers>
     <person>
-      <name>Malcolm Currie</name>
+      <name>Malcolm J Currie</name>
+      <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun102</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="htx">
   <version>1.2-10</version>
@@ -706,20 +692,16 @@ Traces an HDS file
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
-  <!-- <documentation> sun188</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="icl">
   <version>3.1-9</version>
@@ -743,9 +725,7 @@ Traces an HDS file
   </developers>
   <documentation> sg5</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ifd">
   <version>1.2-8</version>
@@ -763,14 +743,17 @@ Traces an HDS file
   </dependencies>
   <developers>
     <person>
+      <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
       <name>Alan Chipperfield</name>
     </person>
   </developers>
-  <!-- <documentation> ssn68</documentation> -->
   <bugreports>ussc@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kappa">
   <version>1.4-1</version>
@@ -790,6 +773,8 @@ packages.
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Malcolm Currie</name>
@@ -798,9 +783,7 @@ packages.
   </developers>
   <documentation> sun95 sun221</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kaprh">
   <version>2.0</version>
@@ -819,6 +802,8 @@ them.
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Malcolm Currie</name>
@@ -827,7 +812,6 @@ them.
   </developers>
   <documentation> sun239</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="messgen">
@@ -859,11 +843,11 @@ them.
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="news">
   <version>2.1-2</version>
@@ -890,9 +874,7 @@ them.
   </developers>
   <documentation> sun195</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="chart" status="obsolete">
   <version>4.0-1</version>
@@ -930,9 +912,7 @@ or perform astrometric reductions.
   </developers>
   <documentation> sun32</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="email" status="obsolete">
   <version>1.4-1</version>
@@ -967,9 +947,7 @@ and astronomy groups in the UK and the rest of the world.
   </developers>
   <documentation> sun182</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="iras90" status="obsolete">
   <version>1.1-2</version>
@@ -998,9 +976,7 @@ IRAS90 is a suite of programs for processing IRAS data.
   </developers>
   <documentation> sun161 sun163 sun165</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ircamdr" status="obsolete">
   <version>1.1-2</version>
@@ -1026,9 +1002,7 @@ file extension stored in the standard Starlink NDF data format.
   </developers>
   <documentation> sun41</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="period" status="obsolete">
   <version>5.0-3</version>
@@ -1056,9 +1030,7 @@ A software package designed to search for periodicities in data.
   </developers>
   <documentation> sun167 ssn25 period_history</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="photom">
   <version>1.9-0</version>
@@ -1071,20 +1043,17 @@ A software package designed to search for periodicities in data.
   <dependencies >
     <build>pcs</build><build>ard</build><build>fio</build><build>grp</build><build>ndf</build><build>agi</build><build>sgs</build><build>pgp</build><build>gns</build><build>gks</build><sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
-  <!-- <documentation> sun45</documentation> -->
+  <documentation> sun45</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pisa">
   <version>2.4-7</version>
@@ -1098,16 +1067,15 @@ A software package designed to search for periodicities in data.
   </dependencies>
   <developers>
     <person>
-      <uname>pwd</uname>
       <name>Peter W. Draper</name>
+      <uname>pwd</uname>
       <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun109</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="polpack">
   <version>3.1-3</version>
@@ -1126,6 +1094,8 @@ display of vector maps.
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Tim Gledhill</name>
@@ -1134,9 +1104,7 @@ display of vector maps.
   </developers>
   <documentation> sun223</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pongo">
   <version>2.0-3</version>
@@ -1169,9 +1137,7 @@ package.
   </developers>
   <documentation> sun137</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="psmerge">
   <version>1.0-6</version>
@@ -1199,9 +1165,7 @@ package.
   </developers>
   <documentation> sun164</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="rv">
   <version>2.4-5</version>
@@ -1220,6 +1184,8 @@ package.
     <person>
       <name>Patrick Wallace</name>
       <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Chris Clayton</name>
@@ -1228,9 +1194,7 @@ package.
   </developers>
   <documentation> sun78</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="scb">
   <version>1.1-3</version>
@@ -1255,13 +1219,11 @@ package.
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation> sun225</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sgmlkit">
   <version>0.7-13</version>
@@ -1281,6 +1243,7 @@ package.
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Mark Taylor</name>
@@ -1291,7 +1254,6 @@ package.
   <documentation> ssn70</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="spt">
   <version>1.3-1</version>
@@ -1316,9 +1278,7 @@ UNIX).
   </developers>
   <documentation> sun111</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sst">
   <version>1.1</version>
@@ -1348,12 +1308,16 @@ UNIX).
     <person>
       <name>R. F. Warren-Smith</name>
     </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+      <email>P.W.Draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun110</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="star2html">
   <version>1.4-7</version>
@@ -1378,13 +1342,13 @@ UNIX).
       <name>Peter Draper</name>
       <uname>pwd</uname>
       <email>P.W.Draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun199</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="startcl">
   <version>1.5-5</version>
@@ -1407,12 +1371,16 @@ UNIX).
       <uname>dlt</uname>
       <email>dlt@star.rl.ac.uk</email>
     </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+      <email>P.W.Draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun186 sun219</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="starx">
   <version>1.2-1</version>
@@ -1431,9 +1399,7 @@ UNIX).
   </developers>
   <documentation> ssn21</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="tsp">
   <version>2.3-3</version>
@@ -1453,14 +1419,11 @@ to handle data from a variety of different instruments.
   <developers>
     <person>
       <name>Jeremy Bailey</name>
-      <uname>jb</uname>
     </person>
   </developers>
   <documentation> sun66</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="xdisplay">
   <version>2.2</version>
@@ -1488,7 +1451,6 @@ to handle data from a variety of different instruments.
   </developers>
   <documentation> sun129</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="starconf" buildsupport="yes">
@@ -1508,13 +1470,11 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ssn78">
   <version>0.1</version>
   <path>docs/ssn/078</path>
   <description>Description of the build system</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies >
     <sourceset>sgmlkit</sourceset>
   </dependencies>
@@ -1527,9 +1487,7 @@ to handle data from a variety of different instruments.
   </developers>
   <documentation> ssn78</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="info">
   <version>2004.1-1</version>
@@ -1545,13 +1503,12 @@ to handle data from a variety of different instruments.
   <developers>
     <person>
       <name>USSC</name>
+      <email>ussc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="init">
   <version>1.1-26</version>
@@ -1566,14 +1523,13 @@ to handle data from a variety of different instruments.
   </dependencies>
   <developers>
     <person>
-      <name>Martin Bly</name>
+      <name>USSC</name>
+      <email>ussc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="agi">
   <version>2.1-1</version>
@@ -1596,13 +1552,12 @@ to handle data from a variety of different instruments.
       <name>David Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun48</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ard">
   <version>2.0-5</version>
@@ -1625,13 +1580,12 @@ to handle data from a variety of different instruments.
       <name>David Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun183</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ary">
   <version>1.1-9</version>
@@ -1649,10 +1603,15 @@ to handle data from a variety of different instruments.
       <name>Rodney Warren-Smith</name>
       <uname>rfws</uname>
     </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun11</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="ast">
@@ -1677,6 +1636,7 @@ to handle data from a variety of different instruments.
       <name>David Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Norman Gray</name>
@@ -1687,7 +1647,6 @@ to handle data from a variety of different instruments.
   <documentation> sun210 sun211</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cat">
   <version>8.1</version>
@@ -1700,22 +1659,20 @@ astronomical catalogues and similar tabular datasets.
   <dependencies >
     <build>ast</build><build>sae</build><build>par</build><build>prm</build><link>cfitsio</link><link>par</link><link>mers</link><link>sla</link><link>chr</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>M.B.Taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
   <documentation> sun181</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>
 No longer under active control.
 </p></notes>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="chr">
   <version>2.2-5</version>
@@ -1747,12 +1704,15 @@ No longer under active control.
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>  </developers>
   <documentation> sun40</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cnf">
   <version>4.1-1</version>
@@ -1782,12 +1742,15 @@ No longer under active control.
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>  </developers>
   <documentation> sun209</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ems">
   <version>2.0-7</version>
@@ -1812,10 +1775,14 @@ No longer under active control.
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>  </developers>
   <documentation> ssn4</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="fio">
@@ -1834,7 +1801,6 @@ No longer under active control.
   <developers>
     <person>
       <name>Peter M Allan</name>
-      <uname>NONE</uname>
       <email>P.M.Allan@rl.ac.uk</email>
     </person>
     <person>
@@ -1842,34 +1808,33 @@ No longer under active control.
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
+    <person>
+      <name>Malcolm J Currie</name>
+      <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun143</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gks">
   <version>1.37-1</version>
   <path>libraries/gks</path>
   <description>The tarlink RAL/ICL GKS graphics package.</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies >
     <build>cnf</build><build>gwm</build><link>ems</link><link>gwm</link><link>starx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Dave L Terrett</name>
       <uname>dlt</uname>
     </person>
   </developers>
-  -->
-  <!-- <documentation> sun83</documentation> -->
+  <documentation> sun83</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gns">
   <version>1.1-4</version>
@@ -1903,9 +1868,7 @@ No longer under active control.
   </developers>
   <documentation> sun57</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="graphpar">
   <version>1.1-5</version>
@@ -1941,9 +1904,7 @@ No longer under active control.
   </developers>
   <documentation> sun113</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="grp">
   <version>3.3</version>
@@ -1964,13 +1925,12 @@ No longer under active control.
       <name>David Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun150</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gsd">
   <version>1.0-1</version>
@@ -2006,9 +1966,7 @@ No longer under active control.
   </developers>
   <documentation> sun229</documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gwm">
   <version>1.5-1</version>
@@ -2033,9 +1991,7 @@ No longer under active control.
   </developers>
   <documentation> sun130</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hds">
   <version>4.3-4</version>
@@ -2072,12 +2028,16 @@ No longer under active control.
     <person>
       <name>M. D. Lawden</name>
     </person>
+    <person>
+      <name>Brian McIlwrath</name>
+      <uname>bkm</uname>
+      <email>B.K.McIlwrath@rl.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun92</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hlp">
   <version>3.3-2</version>
@@ -2096,12 +2056,12 @@ No longer under active control.
       <name>P T Wallace</name>
       <uname>ptw</uname>
       <email>ptw@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun124</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="idi">
   <version>1.4-5</version>
@@ -2131,9 +2091,7 @@ No longer under active control.
   </developers>
   <documentation> sun65</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="img">
   <version>1.3-1</version>
@@ -2152,11 +2110,11 @@ understand.
       <name>Peter W. Draper</name>
       <uname>pwd</uname>
       <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun160</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="jpl">
@@ -2173,6 +2131,8 @@ understand.
     <person>
       <name>Pat Wallace</name>
       <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>A. J. J. Broderick</name>
@@ -2181,9 +2141,7 @@ understand.
   </developers>
   <documentation> sun87</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kaplibs">
   <version>2.8-2</version>
@@ -2203,13 +2161,12 @@ independently of KAPPA.</p></abstract>
       <name>D.S. Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun238</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="mag">
   <version>1.1-4</version>
@@ -2251,9 +2208,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun171</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="mers">
   <version>1.8</version>
@@ -2283,9 +2238,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun104</documentation> 
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="nbs">
   <version>2.5-9</version>
@@ -2314,9 +2267,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun77</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ndf">
   <version>1.5-9</version>
@@ -2342,13 +2293,13 @@ Ultrix and for SunOS and may still work for them.
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> ssn20 sun33</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ndg">
   <version>5.2-2</version>
@@ -2368,13 +2319,12 @@ Ultrix and for SunOS and may still work for them.
       <name>David Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun2</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="one">
   <version>1.1-5</version>
@@ -2411,9 +2361,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun234</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="par">
   <version>2.3</version>
@@ -2441,6 +2389,7 @@ Ultrix and for SunOS and may still work for them.
       <name>Malcolm J. Currie</name>
       <uname>mjc</uname>
       <email>M.J.Currie@rl.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Alan J Chipperfield</name>
@@ -2450,9 +2399,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun114</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pcs">
   <version>4.1-1</version>
@@ -2482,7 +2429,6 @@ Ultrix and for SunOS and may still work for them.
          duplication, so that Alan Chipperfield appears numerous
          times. -->
 
-    <!--libraries/pcs/adam-->
     <person>
       <name>John Cooke (REVAD::JAC)</name>
     </person>
@@ -2494,7 +2440,6 @@ Ultrix and for SunOS and may still work for them.
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/adamnet-->
     <person>
       <name>B.D.Kelly (REVAD::BDK)</name>
     </person>
@@ -2504,33 +2449,28 @@ Ultrix and for SunOS and may still work for them.
       <email>b.k.mcilwrath@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/ams-->
     <person><name>Ian Jenkins (IRJ)</name></person>
     <person><name>Dennis Kelly (BDK)</name></person>
     <person><name>Brian McIlwrath (BKM)</name></person>
     <person><name>Alan Chipperfield (AJC)</name></person>
     <person><name>David Terrett (DLT)</name></person>
 
-    <!--libraries/pcs/atimer-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs-->
     <person>
       <name>Alan J Chipperfield</name>
     </person>
 
-    <!--libraries/pcs/dtask-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/hdspar-->
     <person>
       <name>B D Kelly, ROE</name>
     </person>
@@ -2540,7 +2480,6 @@ Ultrix and for SunOS and may still work for them.
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/lex-->
     <person>
       <name>Jeremy Bailey (AAOEPP::JAB)</name>
     </person>
@@ -2554,7 +2493,6 @@ Ultrix and for SunOS and may still work for them.
       <email>t.jenness@jach.hawaii.edu</email>
     </person>
 
-    <!--libraries/pcs/messys-->
     <person>
       <name>B D Kelly (REVAD::BDK)</name>
     </person>
@@ -2562,14 +2500,12 @@ Ultrix and for SunOS and may still work for them.
       <name>Alan J Chipperfield (RLVAD::AJC)</name>
     </person>
 
-    <!--libraries/pcs/misc-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/msp-->
     <person>
       <name>B D Kelly (ROE)</name>
     </person>
@@ -2579,7 +2515,6 @@ Ultrix and for SunOS and may still work for them.
       <email>a.j.chipperfield@ral.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/parsecon-->
     <person>
       <name>B D Kelly (ROE)</name>
     </person>
@@ -2589,26 +2524,22 @@ Ultrix and for SunOS and may still work for them.
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/sock-->
     <person>
       <name>B D Kelly</name>
     </person>
 
-    <!--libraries/pcs/string-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/subpar-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
 
-    <!--libraries/pcs/task-->
     <person>
       <name>B D Kelly</name>
     </person>
@@ -2617,12 +2548,24 @@ Ultrix and for SunOS and may still work for them.
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
+
+    <!-- I'll take this, since I've worked on it last, but we should
+         probably have more than one -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>USSC</name>
+      <email>ussc@star.rl.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Documentation is in the pcs-docs subdirectory.</p></notes>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pda">
   <version>0.5-1</version>
@@ -2641,6 +2584,8 @@ Ultrix and for SunOS and may still work for them.
     <person>
       <name>David Berry</name>
       <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>Peter Draper</name>
@@ -2657,9 +2602,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun194</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pgp">
   <version>5.1.1-9</version>
@@ -2673,6 +2616,12 @@ Ultrix and for SunOS and may still work for them.
   </dependencies>
   <developers>
     <person>
+      <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
       <name>Tim Pearson</name>
       <uname>tjp</uname>
     </person>
@@ -2683,9 +2632,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun15</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="prm">
   <version>1.4-1</version>
@@ -2709,12 +2656,16 @@ Ultrix and for SunOS and may still work for them.
     <person>
       <name>Alan J Chipperfield</name>
     </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun39</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="psx">
   <version>0.5</version>
@@ -2741,7 +2692,6 @@ Ultrix and for SunOS and may still work for them.
   <documentation> sun121</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ref">
   <version>1.1-4</version>
@@ -2770,9 +2720,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun31</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sae">
   <version>1.0</version>
@@ -2795,9 +2743,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
  <documentation> sun191</documentation> 
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sgs">
   <version>1.1-2</version>
@@ -2826,6 +2772,8 @@ Ultrix and for SunOS and may still work for them.
     <person>
       <name>Pat Wallace</name>
       <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
     <person>
       <name>David Terrett</name>
@@ -2834,9 +2782,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun85</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="shl">
   <version>1.0-1</version>
@@ -2865,12 +2811,13 @@ Ultrix and for SunOS and may still work for them.
     <person>
       <name>Malcolm Currie</name>
       <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation></documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sla">
   <version>2.4-12</version>
@@ -2889,12 +2836,12 @@ Ultrix and for SunOS and may still work for them.
       <name>Patrick Wallace</name>
       <uname>ptw</uname>
       <email>ptw@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun67</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="snx">
   <version>1.1-1</version>
@@ -2925,9 +2872,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun90</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="trn">
   <version>0.9-5</version>
@@ -2951,18 +2896,21 @@ Ultrix and for SunOS and may still work for them.
       <name>Rodney Warren-Smith</name>
       <uname>rfws</uname>
     </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun61</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pgplot">
   <version>5.2.2-2</version>
   <path>thirdparty/caltech/pgplot</path>
   <description>Native PGPLOT</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies >
     <build>cnf</build><build>gwm</build><build>psx</build><build>mers</build><build>chr</build><link>gwm</link><link>cnf</link><link>psx</link><link>mers</link><link>chr</link>
   </dependencies>
@@ -2975,23 +2923,20 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   -->
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="autoconf" buildsupport="yes">
   <version>2.59</version>
   <path>thirdparty/fsf/autoconf</path>
   <description>Starlink autoconf</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies/>
   <developers>
-    <!-- Cast of thousands, but locally to Starlink... -->
     <person>
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <bugreports>@PACKAGE_BUGREPORT</bugreports>
@@ -3000,13 +2945,11 @@ Ultrix and for SunOS and may still work for them.
       to autoconf-patches@gnu.org in January 2004, and were being
       examined after that.</p></notes>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="automake" buildsupport="yes">
   <version>1.8.2-starlink</version>
   <path>thirdparty/fsf/automake</path>
   <description>GNU automake, patched</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies>
     <!-- hard-code these, rather than requiring us to put
          STAR_DEFAULTS in configure.ac -->
@@ -3014,11 +2957,11 @@ Ultrix and for SunOS and may still work for them.
     <build>libtool</build>
   </dependencies>
   <developers>
-    <!-- Cast of thousands, but locally to Starlink... -->
     <person>
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
@@ -3033,21 +2976,19 @@ Ultrix and for SunOS and may still work for them.
   <version>1.5</version>
   <path>thirdparty/fsf/libtool</path>
   <description>GNU libtool</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies/>
   <developers>
-    <!-- Cast of thousands, but locally to Starlink... -->
     <person>
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>This version of libtool is unpatched -- just the standard
       version.</p></notes>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="m4" buildsupport="noauto">
   <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
@@ -3062,11 +3003,18 @@ Ultrix and for SunOS and may still work for them.
   <path>thirdparty/fsf/m4</path>
   <description>GNU m4</description>
   <dependencies/>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
     on 2004-03-07</p></notes>
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cfitsio">
   <version>2.4-90</version>
@@ -3083,24 +3031,19 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>William Pence</name>
     </person>
   </developers>
-  -->
   <documentation> sun227</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="jpeg">
   <version>6b</version>
   <path>thirdparty/ijg/jpeg</path>
   <description>Independent JPEG Group library</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies >
     
   </dependencies>
@@ -3108,11 +3051,8 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
     <person>
     </person>
   </developers-->
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ncar">
   <version>1.3-1</version>
@@ -3142,40 +3082,34 @@ GKS (SUN/83) should be used.</p></abstract>
     </person>
   </developers>
   -->
-  <!-- <documentation> sun88</documentation> -->
+  <documentation> sun88</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="itcl">
   <version>3.1.0</version>
   <path>thirdparty/tclsys/itcl</path>
   <description>[incr Tcl]</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies >
     <build>tcl</build><build>tk</build>
   </dependencies>
-  <!--
   <developers>
+    <!-- Tcl is maintained by Scriptics, but this part of the tree
+         is maintained by... -->
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="tcl">
   <version>8.2.3</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies >
     
   </dependencies>
@@ -3186,19 +3120,16 @@ GKS (SUN/83) should be used.</p></abstract>
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="tk">
   <version>8.2.3</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>
-  <!-- <abstract><p></p></abstract> -->
   <dependencies >
     <build>tcl</build>
   </dependencies>
@@ -3209,10 +3140,9 @@ GKS (SUN/83) should be used.</p></abstract>
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
 </component>
 </componentset>
