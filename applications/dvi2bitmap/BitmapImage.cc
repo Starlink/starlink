@@ -25,6 +25,8 @@ const string *BitmapImage::softwareversion = 0;
 const string *BitmapImage::inputfilename = 0;
 const string *BitmapImage::furtherinfo = 0;
 
+// Compile a list of bitmap formats.  First member of this list is the
+// default.
 const char *BitmapImage::formats[] = {
 #if ENABLE_PNG
     "png",
