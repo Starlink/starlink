@@ -158,9 +158,9 @@ itcl::class util::LabelEntryScale {
           set bitmap1 left
           set bitmap2 right
        } else {
-          set arrowside top
-          set bitmap1 incr
-          set bitmap2 decr
+          set arrowside bottom
+          set bitmap1 decr
+          set bitmap2 incr
        }
        pack $itk_component(scaleframe) -fill x -side $side_
        if {$itk_option(-show_arrows)} {

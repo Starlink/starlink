@@ -3,17 +3,22 @@
 #     GaiaImageMBand.tcl
 
 #  Purpose:
-#     Defines a class for controlling the mband.
+#     Defines a class for controlling the gband.
 
 #  Type of Module:
 #     [incr Tk] class
 
 #  Description:
 #     This class redefines the RtdImageMBand class to work in image
-#     coordinates. This is done so that an initial reference position
+#     coordinates and with the GAIA "gband" command. 
+#
+#     Image coordinates are used so that an initial reference position
 #     defined by the first <3> press remains correct if the image is
 #     scrolled or zoomed. The large format of images means that offsets
 #     can quite often extend beyond the visible part of the image.
+#
+#     The "gband" command works without a WCS and for non-celestial
+#     coordinate systems.
 
 #  Invocation:
 #     GaiaImageMBand name [configuration options]
@@ -28,28 +33,13 @@
 #  History:
 #     29-APR-1999 (PDRAPER):
 #        Original version, based on RtdImageMBand.
+#     14-JUL-1999 (PDRAPER):
+#        Modified to use gband command.
 #     {enter_changes_here}
 
 #-
 
-# E.S.O. - VLT project 
-# "@(#) $Id$"
-#
-# RtdImageMBand.tcl - itcl class to display a "measure band" 
-#                     showing the distance between 2 points in world coordinates
-#
-# See man page RtdImagMBand(n) for a complete description.
-#
-# 
-# who             when       what
-# --------------  ---------  ----------------------------------------
-# Allan Brighton  01 Jun 95  Created
-
-
 itk::usual GaiaImageMBand {}
-
-# GaiaImageMBand is an itcl widget class used to display a "measure
-# band" showing the distance between two points in world coordinates.
 
 itcl::class gaia::GaiaImageMBand {
     inherit util::FrameWidget
@@ -71,10 +61,6 @@ itcl::class gaia::GaiaImageMBand {
 
     public method start {x y} {
 	$canvas_ delete mband
-
-	if {"[$image_ wcscenter]" == ""} {
-	    return
-	}
 
         # get coordinates in image and canvas
         $image_ convert coords $x $y screen x y image
@@ -162,7 +148,7 @@ itcl::class gaia::GaiaImageMBand {
 
     method mband {x y show_angle} {
         $image_ convert coords $x $y screen x y image
-	$image_ mband $x_ $y_ $x $y image $show_angle
+	$image_ gband $x_ $y_ $x $y image $show_angle
 	update idletasks
     }
 
