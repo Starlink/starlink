@@ -256,6 +256,13 @@
             CALL ADI_GET0C( KID, CVALUE, STATUS )
             CALL FTPKYS( LUN, KEY, CVALUE, CMT, FSTAT )
           END IF
+          IF ( FSTAT .NE. 0 ) THEN
+            CALL ADI2_FITERP( FSTAT, STATUS )
+            CALL MSG_SETC( 'KEY', STATUS )
+            CALL ERR_REP( ' ', 'Error comitting keyword ^KEY to disk',
+     :                    STATUS )
+            FSTAT = 0
+          END IF
           CALL ADI_CPUT0L( KID, '.COMMITTED', .TRUE., STATUS )
         END IF
         CALL ADI_ERASE( KID, STATUS )
