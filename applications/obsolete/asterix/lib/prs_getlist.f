@@ -36,7 +36,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Get input from user
-        CALL PAR_GET0C( PAR, INPUT, STATUS )
+        CALL USI_GET0C( PAR, INPUT, STATUS )
 
 *      Parse it
         CALL PRS_GETLIST_INT( INPUT, NMAX, LIST, NITEM, STATUS )
