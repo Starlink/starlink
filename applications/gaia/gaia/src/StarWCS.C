@@ -815,9 +815,13 @@ int StarWCS::make2D()
   } else if ( nbase < 2 || nsky < 2 ) {
 
     // Only one dimension. Cannot process this.
+    baseframe = (AstFrame *) astAnnul( baseframe );
+    skyframe = (AstFrame *) astAnnul( skyframe );
     error( "Input WCS has only one dimension, need 2" );
     return 0;
   } else if ( nbase > MAXDIM || nsky > MAXDIM ) {
+    baseframe = (AstFrame *) astAnnul( baseframe );
+    skyframe = (AstFrame *) astAnnul( skyframe );
     error( "Input WCS has two many dimensions" );
     return 0;
   }
@@ -882,6 +886,8 @@ int StarWCS::make2D()
     // Too many dimensions, must be a tricky case with a mapping that
     // transforms from 2D into possibly all the other dimensions. Give
     // up.
+    baseframe = (AstFrame *) astAnnul( baseframe );
+    skyframe = (AstFrame *) astAnnul( skyframe );
     error( "Input WCS is too complex" );
     return 0;
 
@@ -937,6 +943,8 @@ int StarWCS::make2D()
 
   // If the above went well then assume we're in the clear, otherwise
   // indicate an error.
+  baseframe = (AstFrame *) astAnnul( baseframe );
+  skyframe = (AstFrame *) astAnnul( skyframe );
   if ( !astOK ) {
     return 0;
   } else {

@@ -1354,7 +1354,9 @@ itcl::body ::skycat::SkySearch::add_history {skycat filename} {
 		      $timestamp $preview]]
 
    $astrocat_ open $catalog
-   $astrocat_ save $catalog 1 $data $equinox
+   catch {
+      $astrocat_ save $catalog 1 $data $equinox
+   }
 
    # update history catalog window, if it is showing
    set w [cat::AstroCat::get_instance [file tail $catalog]]

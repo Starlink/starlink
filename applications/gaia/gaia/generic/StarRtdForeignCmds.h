@@ -71,17 +71,21 @@ struct StarImageInfo {
 #ifdef __cplusplus
 extern "C" {
 #endif
-  int patchCmd( struct StarImageInfo *infoPtr, char *args, char **errStr );
-  int writesliceCmd( struct StarImageInfo *infoPtr, char *args, char **errStr ); 
-  int centroidCmd( struct StarImageInfo *infoPtr, char *args, char **errStr ); 
 
+int patchCmd( struct StarImageInfo *infoPtr, char *args, char **errStr );
+int writesliceCmd( struct StarImageInfo *infoPtr, char *args, char **errStr ); 
+int centroidCmd( struct StarImageInfo *infoPtr, char *args, char **errStr ); 
 
-//  Define structure used to access foreign commands and enter the
-//  names that they will be known by and the address of the function.
+  /*
+    //  Define structure used to access foreign commands and enter the
+    //  names that they will be known by and the address of the
+    //  function.
+  */
+#ifdef __cplusplus
 static struct StarRtdForeignCmds {
 
   // Command name (as passed to RTD foreign method)
-  const char *name;       
+  char *name;       
 
   // Ptr to foreign function
   int (*fptr)( StarImageInfo *infoPtr, char *args, char **errStr );   
@@ -91,7 +95,9 @@ static struct StarRtdForeignCmds {
   { "writeslice", &writesliceCmd },
   { "centroid", &centroidCmd }
 };
+#endif
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* StarRtdForeignCmds */
