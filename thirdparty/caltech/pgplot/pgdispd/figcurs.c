@@ -19,6 +19,7 @@
 
 /* The standard include files */
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 
@@ -113,7 +114,9 @@ XEvent event;
 	void getbuttonval();
 	int getkeyval();
 
-	char *malloc();
+	/*
+        char *malloc();
+        */
 
 	if (event.type == ButtonPress) getbuttonval(event.xbutton.button, &val);
 	else if (!getkeyval(event, &val)) return(1);

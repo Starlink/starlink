@@ -90,6 +90,7 @@ static char rcsid[]="@(#)$Id$";
 
 /* The system include files */
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 
@@ -165,7 +166,9 @@ int *retbuflen;	/* the length of retbuf */
 	void drawline();	/* draw a line in the bitmap window */
 	Pixmap XCreatePixmap();
 
-	char *malloc();
+	/*
+        char *malloc();
+        */
 
 	if (!len & savedshorts)
 	{ /* an incomplete command was sent! */
