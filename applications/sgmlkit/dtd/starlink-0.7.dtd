@@ -1,0 +1,1003 @@
+<![ IGNORE [
+  This is the Starlink General DTD.  It should not be used
+  independently, but invoked from another DTD via:
+
+    <!ENTITY % Starlink.general
+	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN">
+    %Starlink.general;
+
+  The DTD should define the following parameter entities:
+
+    DocClass       : as SUN, SGP, etc
+    req.abstract   : see below
+    DTD.Version    : version of the calling DTD
+
+  Defaults for these (except DTD.Version) are given below.
+
+  Certain entities have both a public and a system identifier -- the
+  latter is a URL derived from the pubid.  This string is maintained
+  by the sed script add-sysids.sed, which demands that the sysid is a
+  string, alone on a line immediately following a line which includes
+  the string `PUBLIC'.
+
+  Author:
+    NG: Norman Gray (Glasgow)
+
+  History: March 1999 (NG):
+    Original version
+    $Id$
+
+  Copyright 2000, Particle Physics and Astronomy Research Council.
+]]>
+
+<!ENTITY % DTD.General.Version "DTD Starlink General 0.7">
+
+<!ENTITY % XML.Variant "IGNORE">
+
+<![ %XML.Variant; [
+  <!ENTITY % Full.SGML.Only "IGNORE">
+  <!ENTITY % MXX "">
+  <!ENTITY % MXO "">
+  <!ENTITY % MOO "">
+  <!-- A couple of entities for syntax removed from SGML -->
+  <!ENTITY % CONREF "#IMPLIED">
+  <!ENTITY % CURRENT "#REQUIRED">
+]]>
+<!ENTITY % Full.SGML.Only "INCLUDE">
+<!ENTITY % MXX "- -">
+<!ENTITY % MXO "- O">
+<!ENTITY % MOO "O O">
+<!ENTITY % CONREF "#CONREF">
+<!ENTITY % CURRENT "#CURRENT">
+
+<!-- XML requires that all external entities have a SYSTEM identifier.
+     All public IDs in this file which are not protected by a
+     Full.SGML.Only marked section, should therefore have suitable
+     system identifiers.  These must MATCH the entries in the catalog file.
+     -->
+
+
+<!--========== Architectures ==========-->
+<!-- Bracket all the HyTime stuff within a %Full.SGML.Only marked section.
+     I imagine it's possible to declare architectures within XML
+     _somehow_, but I don't want to worry about that just now.
+     -->
+<![ %Full.SGML.Only; [
+<!-- The HyTime standard is ISO 10744:1997, referred to as simply
+     `HyTime' below.
+     -->
+
+<!-- See Hytime A.3 for AFDR definition.
+
+     The PI here is that described in HyTime A.3.3.  In, examples posted
+     to comp.text.sgml by, eg, Kimber, I've seen the PI as simply
+     <?ArcBase blah>, but that might simply be a hangover from an earlier
+     version - it doesn't appear to be blessed by the standard.  It seems
+     to be the form of the PI which SP once recognised - no longer true.
+     -->
+<?IS10744 ArcBase HyTime documentsummary>
+
+<!-- Define the AFDRMeta and HyTime notations -->
+<!NOTATION AFDRMeta 
+	PUBLIC "ISO/IEC 10744:1997//NOTATION AFDR Meta-DTD Notation//EN">
+
+<!NOTATION
+	HyTime	-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744. --
+
+	PUBLIC 'ISO/IEC 10744:1997//NOTATION
+               Hypermedia/Time-based Structuring Language (HyTime)//EN'
+	>
+
+<!-- I'm slightly confused about _precisely_ how to declare this.  HyTime
+     A.3.4.3 gives several templates; I'm not completely sure which one
+     is correct, because I don't deeply follow the distinctions, but this
+     one appears to work!  One Kimber example (also on c.t.s) declares
+     this as <!...ndata afdrmeta>, but that is plausibly a mistyping, as
+     NDATA is specifically for data the parser isn't supposed to examine.
+     -->
+<!ENTITY HyTime.DTD 
+	PUBLIC 'ISO/IEC 10744:1997//DTD 
+               AFDR Meta-DTD Hypermedia/Time-based Structuring Language (HyTime)//EN'
+	CDATA AFDRMeta
+	>
+
+
+<!ATTLIST #NOTATION HyTime	
+	-- cf. 10744:1997 11.1.3, Minimal HyTime document --
+	ArcFormA	NAME	HyTime
+	ArcNamrA	NAME	HyNames
+	ArcSuprA	NAME	sHyTime
+	ArcIgnDA	NAME	HyIgnD
+	ArcDocF		NAME	#FIXED	HyDoc
+	ArcDTD		CDATA	"HyTime.DTD"
+	ArcQuant	CDATA	#FIXED	"NAMELEN 9 LITLEN 2048"
+		-- rflocatt entity is longer than 1024 --
+	ArcDataF	NAME	#FIXED	HyBridN
+	ArcBridF	NAME	#FIXED	HyBrid
+	ArcAuto		(ArcAuto|nArcAuto)	nArcAuto
+	ArcOptSA	NAMES	"GenArc base links locs"
+
+	-- Support attributes for HyTime only --
+	hyqcnt		NUMBER	32
+	locs		CDATA	"refloc"
+	links		CDATA	#FIXED	"clink"
+	exrefs		NAME	exrefs
+	manyanch	NUMBER	2
+	>
+
+<!-- The declaration for the DocumentSummary architecture is simple.
+     Since all the elements in the architecture have matching names in
+     this DTD, the automatic mapping takes care of all of it.  See HyTime
+     A.3.6.2, `Architectural markup minimisation'.
+     -->
+<!NOTATION 
+	documentsummary
+	 	-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744. --
+	SYSTEM ''>
+<!ENTITY documentsummary.dtd
+	PUBLIC "-//Starlink//DTD Document Summary 0.2//EN"
+	CDATA AFDRMeta
+	>
+<!ATTLIST #NOTATION documentsummary
+	ArcFormA
+		NAME
+		documentsummary
+	ArcDTD
+		CDATA
+		"documentsummary.dtd"
+	ArcNamrA
+		CDATA
+		#FIXED "docsumma"
+	>
+]]>
+
+<!--========== Notations ==========-->
+<!-- Read in the set of defined data notations.
+
+     These are kept in a separate file, because one of the notations (at
+     present) defines data attributes (see 8879, Sect. 11.4).  If we want
+     to define, in the DTD subset, entities which use any of these
+     attributes, the notation declaration must come first (see
+     Sect. 11.4.1.2, whereas notation definitions can be used before they
+     are defined (Sect. 11.4.1.1)).  We can arrange this by explicitly
+     reading in the notation declarations in the DTD subset using the
+     formula below.  This is certainly a bit clunky, but clear.
+
+     The subset defines the entity %notations-read to be IGNORE, so that
+     the subset can't be read twice.
+     -->
+<!ENTITY % notations-read "INCLUDE">
+<![ %notations-read; [
+
+<![ %Full.SGML.Only; [
+<!ENTITY % notations-subset 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
+	>
+]]>
+<!ENTITY % notations-subset 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
+	"notations.text"
+	>
+%notations-subset;
+
+]]>
+
+<![ %Full.SGML.Only; [
+<!-- First declare the DSSSL notation, so we can refer to SDQL queries.
+     (this comes from dsssl/style-sheet.dtd).
+     This doesn't live with the notations above, because it's used
+     within this DTD, rather than being a notation for user data.
+     -->
+<!NOTATION DSSSL
+	PUBLIC "ISO/IEC 10179:1996//NOTATION DSSSL Architecture Definition Document//EN" 
+	>
+<!-- A document architecture conforming to the
+     Architectural Form Definition Requirements of ISO/IEC 10744. -->
+]]>
+
+<!--========== Parameter entities for configuration ==========-->
+<!ENTITY % DocClass "SUN">
+
+<!--=========== Feature Switches ==========-->
+
+<!-- Use %Only.paper and %Only.web in source documents to distinguish
+     variant texts for paper and hypertext versions.  More
+     meta-information than the ones below, which concern themselves with
+     the features of the DTD, and which are intended to be used only within
+     this DTD.  Note that it is possible for some document instances to
+     be invalid unless one of these is defined.  Also note that these
+     can only be used in SGML documents, since XML forbits
+     INCLUDE/IGNORE marked sections in instances.
+     -->
+<!ENTITY % Only.paper	"IGNORE">
+<!ENTITY % Only.web	"IGNORE">
+
+<!-- Use %Feature.Everything to switch on _all_ the features.  Note that
+     this is here purely for documentation purposes, and should not be
+     used for any user-visible document type.  Since it defines both
+     %Feature.versioning and %Internal.Feature.dateonly, it isn't even
+     fully consistent.
+     -->
+<!ENTITY % Feature.Everything		'IGNORE'>
+<![ %Feature.Everything; [
+  <!ENTITY % Feature.Abstract		'INCLUDE'>
+  <!ENTITY % Feature.Versioning		'INCLUDE'>
+  <!ENTITY % Internal.Feature.Dateonly	'INCLUDE'>
+  <!ENTITY % Feature.Docnumber		'INCLUDE'>
+  <!ENTITY % Feature.Routinelist	'INCLUDE'>
+  <!ENTITY % Feature.EnforceLinkPolicy	'INCLUDE'>
+]]>
+
+<!-- If %Feature.Abstract is 'INCLUDE', then an abstract is required.  If
+     it is 'IGNORE' then the abstract is optional.  It would be possible
+     to forbid an abstract by predefining %req.abstract to "", but that
+     is discouraged.
+
+     Default: required.
+     -->
+<!ENTITY % Feature.Abstract 'INCLUDE'>
+
+<!-- The entity %Feature.Versioning controls whether the HISTORY and UPDATE
+     elements are permitted in the document.  It may be turned off by
+     declaring it as 'IGNORE' in the including DTD or possibly by the
+     document instance in a declaration subset (though the latter should
+     probably be discouraged other than for MUDs).
+
+     Default: absent
+     -->
+<!ENTITY % Feature.Versioning	'IGNORE'>
+
+<!-- The entity %Internal.Feature.Dateonly controls whether we have a
+     simple DATE element in place of the HISTORY one.  It is NOT intended
+     to be set outside this DTD - if you want this, then set
+     %Feature.Versioning to be 'IGNORE'.  
+
+     ONE OR THE OTHER, BUT NOT BOTH, of %Feature.Versioning and
+     %Internal.Feature.Dateonly must be set to INCLUDE.  If both are set, chaos
+     will probably ensue, but I can't work out how to report such an
+     error from the DTD.
+     -->
+<![ %Feature.Versioning; [
+  <!ENTITY % Internal.Feature.Dateonly 'IGNORE'>
+]]>
+<!ENTITY % Internal.Feature.Dateonly	'INCLUDE'>
+
+<!-- The entity %Feature.Docnumber controls whether the DOCNUMBER element
+     is required in the head, or forbidden
+
+     Default: absent
+     -->
+<!ENTITY % Feature.Docnumber	'IGNORE'>
+
+<!-- The entity %Feature.Routinelist controls whether the ROUTINELIST
+     element is permitted in the backmatter.
+
+     Default: absent
+     -->
+<!ENTITY % Feature.Routinelist 'IGNORE'>
+
+<!-- The entity %Feature.EnforceLinkPolicy controls whether the link
+     policy described below is enforced by the DTD.  Set this to IGNORE
+     to relax the policy.
+
+     Default: enforced
+     -->
+<!ENTITY % Feature.EnforceLinkPolicy 'INCLUDE'>
+
+
+<!--========== Special entity ==========-->
+<!-- I need to be able to refer to the SGML declaration which is
+     appropriate for this DTD, from within the stylesheets.  Since
+     DSSSL doesn't have access to the entity manager (I don't think),
+     and since I can't work out how to declare entities in the catalog
+     (the ENTITY declaration seems not to work as I'd expect it to),
+     the only way round seems to be to declare an entity here which
+     points to the declaration's public-id.  This is available to the
+     stylesheets, and the catalog can resolve it ok.  I think....
+
+     I don't believe this is the best way to go about this, but I
+     _cannot_ work out a better one.
+     -->
+<![ %Full.SGML.Only; [
+<!ENTITY starlink.decl 
+	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
+	>
+]]>
+<!ENTITY starlink.decl 
+	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
+	"starlink.decl"
+	>
+
+
+<!--========== Entities for special symbols ==========-->
+<!-- There's a feature here I don't understand.  I had thought that the
+     appropriate way to switch between entity sets (for LaTeX or HTML
+     output) was to use SDATA entities.  However, when I do that - doing
+     something like <!ENTITY copy SDATA "(c)">, what emerges from the
+     Jade Transform back-end is what looks like a multibyte character
+     reference &#65533, independently of what I have in the actual SDATA
+     entity declaration.  The LaTeX-Transform back-end I wrote emits
+     SDATA entity content verbatim.  I can't find any enlightenment in
+     Goldfarb, either; the HTML entities are therefore currently defined
+     using CDATA character entities.  
+     -->
+
+<!ENTITY % LaTeX.entities 'IGNORE'>
+<!ENTITY % HTML.entities 'IGNORE'>
+
+<![ %Full.SGML.Only; [
+<![ %LaTeX.entities; [
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX"
+	>
+<!ENTITY % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"
+	>
+]]>
+<![ %HTML.entities; [
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//HTML"
+	>
+<!ENTITY % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"
+	>
+]]>
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//PLAIN"
+	>
+<!ENTITY % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN"
+	>
+]]>
+
+<!-- Finally, the XML versions -->
+<!ENTITY % ISOents
+	PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//Unicode"
+	"ISOent/xml/iso-lat1.ent"
+	>
+<!-- Most of these `additional' entities are selections from the ISO set. -->
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//Unicode"
+	"entities-unicode.ent"
+	>
+
+%Additional.Char.Ents;
+%ISOents;
+
+
+<![ %Full.SGML.Only; [
+<!--======== Shortrefs ==========-->
+<!-- Have double-dash as a shortref for &endash, but don't define a
+     separate shortref for emdash.  This way, we could switch between
+     endash and emdash by changing this declaration. 
+     -->
+<!SHORTREF textabbrevsmap	"--"	endash
+				"_"	underscore
+				"~"	nbsp>
+<!-- Enable this map in the following elements.  This means it's
+     enabled in all of %body.content, plus miscellaneous other places
+     like the abstract, plus section and other titles
+     -->
+<!USEMAP textabbrevsmap (p | px | table | figure | title)>
+<!-- ...but suspend it where it's liable to cause trouble (thanks Mark!) -->
+<!USEMAP #EMPTY (m|mequation|meqnarray|verbatim|code|kbd)>
+
+]]>
+
+<!--========== Abbreviations ==========-->
+
+<!-- none? -->
+
+
+<!--========== Overall document structure ==========-->
+
+<!ENTITY % DTD.Version 'Unknown'><!-- Include so that this DTD is valid
+				      on its own (for the benefit of
+				      DTD-documenting tools) -->
+<!ENTITY % gversion.attr "generalversion CDATA #FIXED '%DTD.General.Version;'">
+<!ENTITY % version.attr "version CDATA #FIXED '%DTD.Version;'">
+
+<!ELEMENT %DocClass; %MOO; (docinfo, docbody)>
+<!ATTLIST %DocClass;
+	%gversion.attr;
+	%version.attr;
+	urllinkpolicy
+		CDATA
+		#FIXED automatic
+	>
+	<!-- attributes:
+		urllinkpolicy	Declare the URL policy for the
+				DocumentSummary architecture.  The
+				architectural instance has the same
+				structure as this document, so that
+				URLs for link targets may be
+				generated automatically.  See the
+				DocumentSummary architecture DTD
+				for discussion.
+	-->
+<!--========== Document head parameterisation ==========-->
+<![ %Feature.Everything; [
+    <!ENTITY % history ',history,docdate'>
+]]>
+<![ %Feature.Versioning; [
+    <!ENTITY % history ',history'>
+    <!-- three different update parameter entities, to cope with
+         different contexts (there must be an easier way!) -->
+    <!ENTITY % update.fc 'update*,'> <!-- following comma -->
+    <!ENTITY % update.pc ',update*'> <!-- preceding comma -->
+    <!ENTITY % update.or '| update'> <!-- following or -->
+]]>
+<!ENTITY % history ',docdate'>
+<!ENTITY % update.fc ''>
+<!ENTITY % update.pc ''>
+<!ENTITY % update.or ''>
+<!-- either HISTORY or DOCDATE elements will be present in DTD -->
+
+<![ %Feature.Docnumber;[
+    <!ENTITY % docnumber ',docnumber'>
+]]>
+<!ENTITY % docnumber ''>
+
+
+<!--========== Paragraph/body-content elements ==========-->
+<!-- This inclusion declares the P and PX elements, and their content.
+     These need to be after the declaration of the %update entity
+     -->
+
+<!ENTITY % additional.special "| index | note | draftnote">
+<!ENTITY % additional.structuring "| tabular">
+<!ENTITY % additional.references  "| citation">
+
+<![ %Full.SGML.Only; [
+<!ENTITY % paragraph.elements 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.7//EN"
+	>
+]]>
+<!ENTITY % paragraph.elements 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.7//EN"
+	"paracontent-0.7.dtd"
+	>
+%paragraph.elements;
+
+<!--========== Other body-content elements ==========-->
+<!-- These are additional elements to the ones included above.  These
+     need to be mentioned in the entities declared immediately above
+     the paragraph.elements inclusion.
+     -->
+
+<!ELEMENT citation %MXX; (#PCDATA)>	<!-- bibliography reference -->
+<!ATTLIST citation
+	noref	(noref)	#IMPLIED
+	>
+	<!-- attributes:
+		noref	noref means don't make any reference in the text:
+			just include an entry in the bibliography
+	-->
+
+<!ELEMENT note %MXX; (px)+>
+	<!-- foot/endnotes -->
+<!ELEMENT draftnote %MXX; (#PCDATA)>
+	<!-- Notes during drafting -->
+
+<!ELEMENT index %MXX; (#PCDATA)>
+<!ATTLIST index
+	key	CDATA	#IMPLIED
+	>
+	<!-- attributes:
+		key	key, if not element contents 
+	-->
+
+
+
+<!--========== Document head ==========-->
+<!-- Fix the order of the elements in docinfo.model.  There's no real
+     reason why we need the order to be arbitrary (and it can always be
+     loosened up later on), and using the `,' connector rather than `&'
+     makes the DTD more nearly conformant with XML.  Also, 
+     having the order fixed means that the AUTHORLIST start tag can be
+     made omissable.
+     -->
+<!ENTITY % docinfo.model 
+	'title , authorlist , keyword*, manualtype?, softwareversion?
+	%docnumber; %history; ,
+	coverimage?, copyright?, mapidlist?'>
+<!ELEMENT docinfo %MOO; (%docinfo.model;)>
+
+<!-- The TITLE element contains the document title, or the section title
+     if it's used within a subhead element.  In that latter context, it
+     can be followed by a displaytitle element.
+
+     The title element deliberately has a rather simple content model
+     because it's this element which is most likely to appear
+     in contexts remote from the General DTD (such as the DocumentSummary,
+     or HTML TITLE elements, or some cavern in this search engine we keep
+     talking about), so any markup in there would have to be reprocessed
+     (which would typically mean stripped) every time it's transformed.
+     This element is therefore defined with a model which is such that
+     simply stripping the markup from the TITLE content would be a
+     reasonable `transformation': this is a restriction the document
+     author might need to be aware of, so this should be documented.
+
+     As a companion to this, the DISPLAYTITLE element has a full content
+     model, and is intended to be used as a presentation title.
+     *** I've presently removed the DISPLAYTITLE element, since there's
+     unlikely to be any need for cross references within titles, and this
+     can add significant complication.
+     -->
+<!ELEMENT title		%MOO; (%simpletext;)*>
+			<!-- contains document title.  The opening and
+			     closing tags are marked as omissable: they
+			     typically won't be omitted, in the
+			     document head, but the same element is used
+			     as the first subelement of SUBHEAD, and
+			     both have to be omissable if we're to be
+			     able to write section headings as
+			     `<sect>title...' 
+			     -->
+<![ IGNORE [
+<!ELEMENT displaytitle	%MXO; (%simpletext; | %references; | %special;)*
+					-- displayable alternative title -->
+]]>
+
+<!ELEMENT authorlist	%MOO; (author+, otherauthors?, editors?)>
+			<!-- contains author names -->
+<!ELEMENT otherauthors	%MXO; (author+)>
+<!ELEMENT editors	%MXO; (author+)>
+			<!-- other contributors -->
+<!ELEMENT author	%MXO; (#PCDATA)>
+			<!-- contains author's name -->
+<!ELEMENT keyword	%MXO; (#PCDATA)>
+			<!-- contains a keyword for document -->
+
+<!ELEMENT manualtype	%MXO; (#PCDATA)>
+			<!-- type of manual -->
+<!ELEMENT softwareversion %MXO; (#PCDATA)>
+			<!-- free text indicating program version this
+			     document corresponds to (as opposed to
+			     document version) -->
+
+<!ATTLIST author
+	email		CDATA	#IMPLIED
+	webpage		CDATA	#IMPLIED
+	affiliation	CDATA	#IMPLIED
+	role		CDATA	#IMPLIED	
+	id		ID	#REQUIRED
+	>
+	<!-- attributes:
+		email		author's email address
+		webpage		author's home page
+		affiliation	author's physical address/affiliation, etc
+		role		editor, maintainer, etc
+		id		eg, initials, referred to in element UPDATE
+		-->
+<!ATTLIST manualtype
+	type	(users|programmers|programmers.c|programmers.fortran|other)
+		#REQUIRED
+	>
+	<!-- attributes:
+		type	what type of manual is this?
+		-->
+
+<!-- ID substitution: It is always possible for IDs to (have to)
+     change, but since exported IDs may well be referred to from
+     outside the current document, it is necessary to declare a
+     remapping.  Use the MAPID element to do this: resolve a reference
+     to this element as if it were a reference to the element pointed
+     to by newid, possibly also warning or issuing an error about a
+     deprecation.
+     -->
+<!ELEMENT mapidlist	%MOO (mapid+)>
+<!ELEMENT mapid		%MXO EMPTY>
+<!ATTLIST mapid
+	from		ID	#REQUIRED
+	to		IDREF	#REQUIRED
+	export		(export) #FIXED export
+	>
+	<!-- attributes
+		from		the now-obsolete id
+		to		replacement
+		export		for compatibility/consistency
+		-->
+
+
+
+<![ %Feature.Docnumber; [
+    <!ELEMENT docnumber %MXO; (#PCDATA)>
+			<!-- document number in series -->
+    <!ATTLIST docnumber
+	unassigned	(unassigned)	#IMPLIED
+	documenttype	CDATA		#FIXED %DocClass;
+	>
+	<!-- attributes:
+		unassigned	indicates that no number has (yet?)
+				been assigned to this document, and so
+				that any content should be ignored
+		documenttype	Declare the type of the document
+				element. This is redundant for
+				processing of _this_ DTD (but might
+				make it more convenient), but is
+				needed for the DocumentSummary DTD,
+				which doesn't otherwise know what the
+				original document type was. 
+		-->
+]]>	<!-- %Feature.Docnumber; -->
+
+<![ %Feature.Versioning; [
+<!-- Versioning is simple.  The history consists of a sequence of
+     versions, distributions and changes, regarded as events.  Versions
+     are significant releases of the software or manual, distributions
+     are less significant, and might mark a bugfix release, or a
+     beta-release for comments.  Changes simply mark some edit, for
+     whatever reason.  The last two have an optional versionid
+     attribute.  This can be used as the target of the update element's
+     versionid attribute.  The update elements are scattered throughout
+     the document, and mark the location of some change; they are optional.
+     -->
+<!ELEMENT history	%MXO; (version, (version | distribution | change)*)>
+<!ELEMENT version	%MXO; (px+)>
+<!ELEMENT distribution	%MXO; (px+)>
+<!ELEMENT change	%MXO; (px+)>
+			<!-- contain free-text notes on the release or
+			     change -->
+
+<!ATTLIST version
+	number		CDATA		#REQUIRED
+	date		CDATA		#REQUIRED
+	author		IDREF		#REQUIRED
+	>
+	<!-- attributes:
+		number		Identifies the version.  This will
+				typically be something like '1' or '2'.
+				These numbers are not generated
+				automatically, to allow the numbering to
+				start other than on one, or omitting some
+				numbers, but the expectation is that
+				successive version elements will increment
+				this number.
+
+		date		Date the version was made/released.  If this is
+				omitted, then the date proffered on the
+				output will be taken from the last
+				distribution or change after this.  I've
+				made this required, since I don't know what
+				to do if this is omitted but there's _no_
+				later distribution or change.  Format:
+				dd-MMM-yyyy
+
+		author		Who approved the release of this version?
+		-->
+<!ATTLIST distribution
+	string		CDATA		#REQUIRED
+	date		CDATA		#REQUIRED	
+	author		IDREF		#REQUIRED
+	versionid	ID		#IMPLIED
+	>
+	<!-- attributes:
+		string		Identifies the distribution.  This will
+				typically be something like '1' or
+				'2', but could be 'draft' or something
+				descriptive. Perhaps I should make
+				this a NAME declared value, to forbid
+				spaces.
+
+		date		The date this distribution was
+				made. Format: dd-MMM-yyyy
+
+		author		Whom the release is attributable to.
+				This links to one of the author
+				elements.
+
+		versionid	An id to allow UPDATE elements to
+				refer to a specific version.  It can
+				be anything, but a sensible format is
+				v10-5, for example (it can't start
+				with a number)
+		-->
+<!ATTLIST change
+	date		CDATA		#REQUIRED
+	author		IDREF		%CURRENT;
+	versionid	ID		#IMPLIED
+	>
+	<!-- attributes:
+		date		Date the change was made. Format: dd-MMM-yyyy
+
+		author		Who made the change.  This links to
+				one of the author elements. 
+
+		versionid	An id to allow UPDATE elements to
+				refer to a specific version.  See the
+				`distribution' element 
+		-->
+	
+]]>	<!-- %Feature.Versioning; -->
+
+<![ %Internal.Feature.Dateonly; [
+<!-- Instead of the elaborate history mechanism, we can have just a
+     plain document date.
+     -->
+<!ELEMENT docdate %MXO; (#PCDATA)>
+]]>	<!-- %Internal.Feature.Dateonly; -->
+
+<!ELEMENT coverimage %MXO; (figurecontent*, px*)>
+			<!-- Display the image on the coverpage.
+			     See the discussion of `figurecontent'
+			     below.
+			     -->
+<!ATTLIST coverimage
+	alt	CDATA	#IMPLIED
+	>
+	<!-- attributes:
+		alt		Alternate text for image
+		-->
+
+<!ELEMENT copyright %MXO; (p+)>
+			<!-- Replace the copyright boilerplate with this
+			     text.  It's declared as a paragraph
+			     sequence instead of #PCDATA, in case we
+			     want it to include, for example, licence
+			     or distribution information. 
+			     -->
+
+<!--========== Document body ==========-->
+<![ %Feature.Routinelist; [
+  <!ENTITY % body.content '(routinelist | (p | table | figure)*)'>
+]]>
+<!ENTITY % body.content '(p | table | figure)*'>
+
+<!ENTITY % appendix.content "sect+">
+
+<!-- Express a link policy on certain elements.  Those elements which
+     have %export.id.required have both the ID element and the EXPORT as
+     required attributes.  ID is, of course, a unique ID for this
+     section, figure, or whatever.  If EXPORT is present, then the
+     document commits itself to maintaining this ID in future: that is,
+     it can safely be linked to from outside.
+
+     If an element has %export.id.optional in its attribute list, then it
+     may specify an ID, and it may export it, but neither is required.
+     -->
+<![ %Feature.EnforceLinkPolicy; [
+  <!ENTITY % export.id.required "
+	id ID #REQUIRED
+	export (export) #REQUIRED">
+]]>
+<!-- If %Feature.EnforceLinkPolicy; is IGNORE, then make all the
+     attributes implied
+     -->
+<!ENTITY % export.id.required "
+	id ID #IMPLIED
+	export (export) #IMPLIED">
+<!ENTITY % export.id.optional "
+	id ID #IMPLIED
+	export (export) #IMPLIED">
+
+<!-- Is the abstract required or optional? -->
+<![ %Feature.Abstract; [
+<!ENTITY % req.abstract "abstract,">
+			<!-- required abstract -->
+]]>
+<!ENTITY % req.abstract "abstract?,">
+			<!-- optional abstract -->
+
+<!-- Content model for element DOCBODY.  
+
+     Presence or absence of abstract is controlled by definition of
+     %req.abstract.  Instead of the sect* clause of the content model,
+     we could have `(sect+ | part+)?', and include either a sequence
+     of SECTs or a sequence of PARTs, but I don't see the need for
+     this extra complication right now.
+
+     As for appendices, I considered <!ELEMENT appendix - O (...)> with
+     the same content model as for SECT, but this way (with <!ELEMENT
+     appendices - O (sect+)> ) we have the same structure within
+     appendices as outside, and it seems simply neater.  The only
+     drawback is that we no longer have `<appendix>appendix title'
+     reminding us we're in an appendix, and searching for something in an
+     appendix's title (within an SGML aware search engine, for example)
+     will need a further level of qualification.  But these both seem
+     disposable.
+     -->
+<!ENTITY % docbody.model 
+	       '%req.abstract; 
+		%body.content;,
+		sect*,
+		appendices?,
+		backmatter?'>
+
+<!ELEMENT docbody %MOO; (%docbody.model;)>
+
+<!--========== Sectioning ==========-->
+
+<!--
+<!ELEMENT part          %MXO; (subhead, %body.content;, sect*)>
+...and add `part|' to the %section list
+-->
+<!ELEMENT sect          %MXO; (subhead, %body.content;, subsect*)>
+<!ELEMENT subsect       %MXO; (subhead, %body.content;, subsubsect*)>
+<!ELEMENT subsubsect    %MXO; (subhead, %body.content;, subsubsubsect*)>
+<!ELEMENT subsubsubsect %MXO; (subhead, %body.content;)>
+
+<!ELEMENT appendices	%MXO; (%appendix.content;)>
+
+<!ATTLIST sect
+	%export.id.required;
+	indexkey 	CDATA	#IMPLIED
+	>
+<!ATTLIST subsect
+	%export.id.required;
+	indexkey 	CDATA	#IMPLIED
+	>
+<!ATTLIST subsubsect
+	%export.id.optional;
+	indexkey	CDATA	#IMPLIED
+	>
+<!ATTLIST subsubsubsect
+	%export.id.optional;
+	indexkey	CDATA	#IMPLIED
+	>
+	<!-- attributes:
+		indexkey 	contains the text of an index entry
+				which points to this section.
+		-->
+
+<!ELEMENT backmatter    %MXO; EMPTY>
+<!ATTLIST backmatter
+	bibliography	CDATA	#IMPLIED
+	>
+	<!-- attributes:
+		bibliography		bibliography name
+		-->
+
+<!-- Subhead and title are the header and title for (sub*)sections -->
+<!ENTITY % subhead.model 'title %update.pc;'>
+<!ELEMENT subhead %MOO; (%subhead.model;)>
+
+<!-- UPDATE elements can appear in several places.  They are intended to
+     tie in closely with the releases appearing in the HISTORY element,
+     and the authors listed at the top.
+     -->
+
+<![ %Feature.Versioning; [
+<!ELEMENT update %MXO; (px+)>
+
+<!-- It might be worth including a modification-type attribute, such
+     as `added', `deleted' or `changed'.  Or is that becoming unduly
+     cumbersome?
+     -->
+<!ATTLIST update
+	versionid	IDREF	#REQUIRED
+	>
+	<!-- attributes:
+		versionid	version/release when the alteration
+				was made. ID matches one DISTRIBUTION
+				or CHANGE element
+  		-->
+]]>	<!-- %Feature.Versioning; -->
+
+<!ELEMENT abstract %MXX; (px)+>
+
+<!--========== Routine list ==========-->
+<![ %Feature.Routinelist; [
+
+<!ELEMENT routinelist		%MXO; (p*, codecollection+)>
+<!ELEMENT codecollection	%MXO; EMPTY>
+<!ATTLIST codecollection
+	doc		ENTITY	#REQUIRED
+	ids		CDATA	#IMPLIED
+	>
+	<!-- attributes:
+		doc		document with source marked up in one
+				of the clients of the programcode
+				architecture. 
+
+		ids		if this attribute is present, then
+				only the elements with these ids
+				should be processed.
+		-->
+]]>	<!-- %Feature.Routinelist; -->
+
+<!--========== Tables ==========-->
+<!-- Use the XML version of the OASIS Exchange Table Model subset of
+     the CALS table model, as defined in OASIS Technical Resolution TR
+     9901:1999 (see http://www.oasis-open.org/html/tm9901.htm).  This
+     is an XML version of the Exchange Table Model subset, as defined
+     in OASIS Technical Resolution TR 9503:1995 (see
+     http://www.oasis-open.org/html/a503.htm for discussion, and
+     http://www.oasis-open.org/html/publtext.htm for public texts),
+     which this DTD originally used.  There are no differences between
+     the two which are significant to us.
+
+     The Exchange Table Model can be customised.  Adjust the table entry
+     model, and remove the %titles entity
+
+     Also rename the table element to `tabular'.  This fits in well with
+     the LaTeX model folk will be familiar with, and allows us to
+     separate the floating plus captioning plus ID stuff from the
+     lining-it-up-in-columns of tabular layouts.
+     -->
+<!ENTITY % table.model '%update.fc; caption, tabular'>
+<!ELEMENT table %MXX; (%table.model;)>
+<!ATTLIST table
+	float (float|nofloat) "float"
+	%export.id.optional;
+	>
+
+<!ENTITY % tbl.table.name 'tabular'>
+<!ENTITY % tbl.table-titles.mdl ''>
+<!ENTITY % tbl.entry.mdl '(%phrase;)*'>
+<![ %Full.SGML.Only; [
+<!ENTITY % calstbls 
+	PUBLIC "-//OASIS//DTD Exchange Table Model 19960430//EN"
+	>
+]]>
+<!ENTITY % calstbls 
+	PUBLIC "-//OASIS//DTD XML Exchange Table Model 19990315//EN"
+	"oasis-exchange-table-xml.dtd"
+	>
+%calstbls;
+
+
+<!-- The FIGURE element contains a sequence of _alternatives_ for the
+     figure's content.  The application may choose any one of these
+     alternatives as the effective content of the figure.  If there are
+     none it can use, it should fail gracefully, but the way in which it
+     fails is not defined here.
+
+     The FIGURECONTENT element contains content in a specified notation.
+     Text notations for figures (ie, notations using character data as
+     opposed to non-SGML data, as described in 8879, B.13) may be
+     included directly within the element.  Alternatively, and
+     necessarily if the notation is a non-text format, the content of the
+     element may be specified in an external entity.  It would be good
+     practice for such an entity declaration to hava a data content
+     notation (8879, 10.6.5) (for example <!ENTITY figure.test system
+     "file.eps" ndata eps>); the implementation should warn if the
+     (required) notation on the element conflicts with that for the
+     entity, but should let the latter prevail.
+
+     The figurecontent element may be followed by one or more paragraphs.
+     These should collectively be taken to be a single further
+     alternative (though typically, such an alternative will be the only
+     one proffered).
+
+     At some point, I should make a HyTime declaration of the
+     transclusion element FIGURECONTENT.
+     -->
+<!ENTITY % figure.model '%update.fc; caption, figurecontent*, px*'>
+<!ELEMENT figure %MXX; (%figure.model;)>
+<!ELEMENT figurecontent %MXO; (#PCDATA)>
+
+<!ATTLIST figure
+	float		(float|nofloat)		"float"
+	alt		CDATA			#IMPLIED
+	%export.id.optional;
+	>
+	<!-- attributes:
+		float		may it be unanchored from its position?
+		alt		descriptive alternative text.
+		-->
+<!ATTLIST figurecontent	
+	image	
+		ENTITY
+		%CONREF;
+	notation	
+		NOTATION(%text.figure.notations;)
+		#IMPLIED
+	>
+	<!-- attributes:
+		image		entity for figure content.
+
+		notation	notation for figure content.  If the
+				`image' attribute is present, then
+				this attribute must not be; the
+				application should report an error if
+				neither is present. Non-text notations
+				must be specified in entity
+				declaration. 
+		-->
+
+<!ELEMENT caption %MXO; (px+)>	<!-- common to table and figure -->

@@ -1,0 +1,30 @@
+<!--
+	Starlink SUG DTD
+
+	Use with DOCTYPE declaration:
+
+	<!DOCTYPE sug PUBLIC '-//Starlink//DTD Starlink SUG 0.7//EN'>
+
+	$Id$
+-->
+
+<!ENTITY % DTD.Version		"DTD Starlink SUG 0.7">
+
+<!ENTITY % DocClass "sug">
+
+<!-- 
+  Features: require support for versioning, and allow a list of
+  routine descriptions amongst the backmatter.
+-->
+<!ENTITY % Feature.Abstract	'INCLUDE'
+		-- Require an abstract -->
+<!ENTITY % Feature.Versioning	'INCLUDE'
+		-- Require version tracking in document -->
+<!ENTITY % Feature.Routinelist	'IGNORE'
+		-- No support for routine descriptions -->
+<!ENTITY % Feature.Docnumber	'IGNORE'
+		-- No docnumber - there's only one SUG -->
+
+<!ENTITY % Starlink.general
+	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN">
+%Starlink.general;

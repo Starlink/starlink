@@ -1,0 +1,32 @@
+<!--
+	Starlink MUD DTD - miscellaneous user document
+
+	<!DOCTYPE mud PUBLIC '-//Starlink//DTD Starlink MUD 0.7//EN'>
+
+	$Id$
+-->
+
+<!ENTITY % DTD.Version		'DTD Starlink MUD 0.7'>
+
+<!ENTITY % DocClass 'mud'>
+
+<!--
+  MUDs are, by definition, for miscellaneous documents.  That means
+  that for this document type, it will often be legitimate to override
+  these feature settings in the declaration subset.
+-->
+<!ENTITY % Feature.Abstract	'IGNORE'
+		-- Abstract optional -->
+<!ENTITY % Feature.Versioning	'IGNORE'
+		-- no versioning by default in MUDs-->
+<!ENTITY % Feature.Routinelist	'IGNORE'
+		-- MUDs should not, by default support routine
+		   descriptions -->
+<!ENTITY % Feature.Docnumber	'INCLUDE'
+		-- Require a document number -->
+<!ENTITY % Feature.EnforceLinkpolicy 'IGNORE'
+		-- Don't enforce the link policy: let sections omit ID -->
+
+<!ENTITY % Starlink.general
+	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN">
+%Starlink.general;
