@@ -1,6 +1,7 @@
 <!doctype ssn public "-//Starlink//DTD Starlink SSN//EN" [
   <!entity bookmarks 'http://www.astro.gla.ac.uk/users/norman/bookmarks'>
-  <!entity sun188.summary system "sun188.summary" subdoc>
+  <!entity sun188.summary 
+	public "-//Starlink//DOCUMENT Summary SUN/188//EN" subdoc>
   <!entity sl.stylesheet system '../../dsssl/sl/html/sl.dsl' subdoc>
   <!entity sl.lib.stylesheet system '../../dsssl/sl/lib/sllib.dsl' subdoc>
   <!entity sl.common.stylesheet system '../../dsssl/sl/common/slcommon.dsl' subdoc>
@@ -35,8 +36,10 @@ and discussing next steps.
 <change date="30-JAN-1999" versionid=draft.r2 author=ng>Assorted rewrites.
 <change date="09-FEB-1999" >Tweaks to bring it up to date, prior to
 programmers' meeting.
-</history>
 
+<copyright>
+Copyright 1999, Particle Physics and Astronomy Research Council
+</copyright>
 
 <abstract>My notes on the current state of the Starlink DTD.  These
 notes should be regarded as a draft, until this system is released as

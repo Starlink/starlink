@@ -1,6 +1,6 @@
 #SGMLDIR=/home/norman/s/src/sgml/w/sgml
 # relies on env var STARLINK_SGML_DIR being set correctly
-include $(STARLINK_SGML_DIR)/lib/Makefile
+include $(STARLINK_SGML_DIR)/lib/Makefile.common
 
 #JADEFLAGS=-V nochunks
 
