@@ -637,7 +637,7 @@ kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
 normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
-kpg1_wcatw.f kpg1_srcta.f gropen.f
+kpg1_wcatw.f kpg1_srcta.f gropen.f kpg1_ctass.f kpg1_ctcre.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -2759,8 +2759,10 @@ kpg1_csubr.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF
 kpg1_csubub.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UB NUM_DEF_CVT NUM_DEF_UB
 kpg1_csubuw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_DEF_UW
 kpg1_csubw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_ctass.o:	 SAE_PAR CAT_PAR PAR_ERR
 kpg1_ctcpd.o:    SAE_PAR PRM_PAR CAT_PAR
 kpg1_ctcpi.o:    SAE_PAR PRM_PAR CAT_PAR
+kpg1_ctcre.o:	 SAE_PAR CAT_PAR PAR_ERR
 kpg1_d2w2r.o:	 SAE_PAR PRM_PAR
 kpg1_danot.o:	 SAE_PAR
 kpg1_dauni.o:	 SAE_PAR

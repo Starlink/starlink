@@ -51,7 +51,7 @@
       INCLUDE 'PAR_ERR'
 
 *  Arguments Given:
-      CHARACTER PARAM*(*),
+      CHARACTER PARAM*(*)
       CHARACTER MODE*(*)
 
 *  Arguments Returned:

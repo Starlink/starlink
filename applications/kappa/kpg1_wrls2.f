@@ -126,7 +126,7 @@
       FRM = AST_GETFRAME( LWCS, AST__BASE, STATUS )
 
 *  Create the output catalogue.
-      CALL CAT_CREAT( PARAM, CI, STATUS )
+      CALL KPG1_CTCRE( PARAM, CI, STATUS )
 
 *  Store the supplied title as the catalogue's TITLE parameter. 
       CALL CAT_PPTAC( CI, 'TITLE', MAX( 1, CHR_LEN( TITLE ) ), 
