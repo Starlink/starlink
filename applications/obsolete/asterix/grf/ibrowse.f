@@ -517,7 +517,7 @@
       INTEGER I,J,II,JJ
       INTEGER I1,I2,J1,J2
       INTEGER ISTAT
-      INTEGER XPID,YPID,XPMID,YPMID,DID(NX,NY),FID,OID,XID,YID
+      INTEGER DID(NX,NY)
       INTEGER RAID,DECID
       INTEGER FLAG
       INTEGER ISCALE
@@ -539,14 +539,6 @@
         Y=I_Y
 
 *  locate noticeboard items
-        CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'XP',XPID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'RA',RAID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'DEC',DECID,STATUS)
         NAME='DATA'
         DO I=1,NX
           DO J=1,NY
@@ -563,12 +555,10 @@
             CALL NBS_FIND_ITEM(I_NBID,NAME,DID(I,J),STATUS)
           ENDDO
         ENDDO
-        CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
 
 *  get device size
-        CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,NB,STATUS)
-        CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,NB,STATUS)
+        CALL IMG_NBGET0I('XPMAX',IXPMAX,STATUS)
+        CALL IMG_NBGET0I('YPMAX',IYPMAX,STATUS)
 
 *  get plot window parameters
         CALL PGQVP(3,XP1,XP2,YP1,YP2)
@@ -580,12 +570,12 @@
         FLAG=1
 *  wait for signal to start browsing
         DO WHILE (FLAG.NE.0)
-          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+          CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
         ENDDO
         DO WHILE (FLAG.EQ.0)
 
 *  get current display option
-          CALL NBS_GET_CVALUE(OID,0,OPTIONS,NB,STATUS)
+          CALL IMG_NBGET0C('OPTIONS',OPTIONS,STATUS)
           VAR=.FALSE.
           ERR=.FALSE.
           SIGNIF=.FALSE.
@@ -602,8 +592,8 @@
           ENDIF
 
 *  get current cursor position in device coords
-          CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
-          CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
+          CALL IMG_GET0I('XP',IXP,STATUS)
+          CALL IMG_GET0I('YP',IYP,STATUS)
           IYP=IYPMAX-IYP
 
 *  convert to world coords
@@ -612,6 +602,7 @@
 
 
 *  get pixel numbers for box being inspected
+          CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
           IX=INT(XP+0.5)
           IY=INT(YP+0.5)
 
@@ -680,6 +671,7 @@
           ENDDO
 
           CALL IMG_SETPOS(XW,YW,STATUS)
+          CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
 
         ENDDO
 
