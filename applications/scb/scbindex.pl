@@ -453,19 +453,19 @@ sub index_list {
 
 #     Directory.
 
-      if (-d $file) {
+      if (-d $file && -r _ && -x _) {
          index_dir "$path$file/", $file; 
       }
 
 #     Tar archive (possibly compressed).
 
-      elsif ($file =~ /\.tar\b/) {
+      elsif ($file =~ /\.tar\b/ && -r $file) {
          index_tar "$path$file>", $file;
       }
 
 #     Starlink help file.
 
-      elsif ($ext eq 'hlp') {
+      elsif ($ext eq 'hlp' && -r $file) {
          index_hlp "$path$file", $file;
       }
 
