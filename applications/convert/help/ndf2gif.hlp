@@ -33,32 +33,37 @@ ndf2gif horse
    This converts the NDF called horse (in file old.sdf)
    into a GIF file horse.gif.
 2 Notes
-This initial version of the script handles only 256 grey levels
+- This initial version of the script handles only 256 grey levels
 and does not use the image colour lookup table so absolutes data
 values may be lost.
 
-The PBMPLUS utilities {\tt tifftopnm} and {\tt ppmtogif}
+- The PBMPLUS utilities {\tt tifftopnm} and {\tt ppmtogif}
 must be available on your PATH.
+
+- At the time of writing, this utility uses a special Netpbm version
+of tifftopnm on alpha OSF/1 due to a problem with tifftopnm in the
+standard release of PBMPLUS.  Netpbm is based on PBMPLUS but
+contains many improvements and additions.
+
 2 Related_Applications
    CONVERT: GIF2NDF
 2 Authors
-MJC: M.J.Currie (Starlink - RAL)
+MJC: Malcolm J. Currie (STARLINK)
 
 GJP: G.J.Privett (Starlink - UWCC)
 
 AJC: A.J.Chipperfield (Starlink - RAL)
 2 History
- 24-NOV-1995 (GJP):
-    Original version.
+ 1995 March 2 (MJC):
+    Original conversion.
 
- 13-NOV-1995 (AJC):
-    Add default output file
-    Add error reporting and exit at each stage.
-2 Bugs
-   At the time of writing, this utility does not work on alpha OSF/1
-   due to a problem with tifftopnm in the standard release of 
-   PBMPLUS. OSF/1 users should use a copy of tifftopnm obtained from 
-   Netpbm which is based on PBMPLUS but contains many improvements and
-   additions. A suitable version may be obtained via WWW at
-   http://www.astro.cf.ac.uk/pub/Grant.Privett/. Alternatively, contact
-   Grant Privet, gjp@astronomy.cardiff.ac.uk.
+ 1995 October 24 (GJP):
+    Added prologue and revised to avoid using KAPPA.
+
+ 1995 November 13 (AJC):
+    Added default output file, and error reporting and exit at each
+    stage.
+
+ 1997 July 15 (MJC):
+    Used a special tifftopnm for alpha_OSF1.
+
