@@ -29,11 +29,14 @@
 
 #  Authors:
 #     DSB: David S. Berry (Starlink)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     16-JAN-2001 (DSB):
 #        Original version.
+#     28-JUL-2004 (TIMJ):
+#        Add SHL
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -41,7 +44,7 @@
 
 #-
 
-      echo `kaplibs_link_adam -nogks` \
+      echo `kaplibs_link_adam -nogks` `shl_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
