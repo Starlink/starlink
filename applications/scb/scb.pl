@@ -694,7 +694,7 @@ sub package_list {
          ";
          foreach $doc (sort @docs) {
             print "<dt><a href='", docurl ($doc), "'>", uc ($doc), "</a>",
-                  "<dd>", $rdoctitles->{$doc}, "\n";
+                  "<dd>", ($rdoctitles->{$doc} || ""), "\n";
          }
          print "</dl>\n";
       }

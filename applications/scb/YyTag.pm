@@ -1,0 +1,151 @@
+package YyTag;
+
+#+
+#  Name:
+#     YyTag.pm
+
+#  Purpose:
+#     Lex/Yacc based routines for adding tags to source code.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     use YyTag;
+
+#  Description:
+#     This module contains the routines for adding HTML-like tags to C
+#     and Fortran source code.  It is a harness for the external programs
+#     which do the work. 
+#
+#     No names are exported, but the routines which are intended for use
+#     from outside this module are:
+#        - YyTag::ctag 
+#        - YyTag::fortrantag.
+#
+#     Each of these takes a single argument, the filehandle providing
+#     input for the tagger, and returns a single string containing all
+#     the tagged text.  Failures can occur, for instance if new processes
+#     can't be obtained for some reason, but this should only happen
+#     under unusual circumstances.  In the case that the tagging routines
+#     get into trouble, they should (at worst) return the unmodified
+#     text from the supplied filehandle.  These routines do not close
+#     the input filehandles.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     07-DEC-1999 (MBT):
+#        Initial revision.
+
+#-
+
+
+#  Declare functions.
+
+sub dotag;
+
+#  Determine the location of the tagging binaries.  
+#  The following assignment is edited by the install script.
+
+my( $SCB_DIR ) = ".";
+my( $scb_dir ) = "$SCB_DIR";
+
+
+#  Define the functions to be used externally in terms of the generic 
+#  dotag function.
+
+sub ctag { dotag "$scb_dir/ctag", @_; }
+sub fortrantag { dotag "$scb_dir/ftag", @_; }
+
+
+sub dotag {
+#+
+#  Name:
+#     dotag
+
+#  Purpose:
+#     Generic harness routine for lex/yacc based tagging routines.
+
+#  Language:
+#     Perl 5
+
+#  Arguments:
+#     $tagprog = string
+#        Pathname of the tagger binary to use.
+#     $fhin = filehandle
+#        Filehandle from which the input is to be read.
+
+#  Return Value:
+#     $tagged = string
+#        A string containing all of the tagged text.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     07-DEC-1999 (MBT):
+#        Initial revision.
+
+#-
+
+#  Get arguments.
+
+   my( $tagprog ) = shift( @_ );
+   my( $fhin ) = shift( @_ );
+
+#  We do slightly complicated things to arrange for use of the input file
+#  descriptor as input to the tagging program, since bidirectional IPC is
+#  a good thing to avoid.
+
+#  Fork.
+
+   my( $pid ) = open OUT, "-|";
+   if ( ! defined $pid ) {
+      die "Process fork failed: $!\n";
+   }
+
+#  Child process; because of the open() above the output is to the 
+#  OUT file; now set it up so that its input is from the right place,
+#  the input filehandle, and exec() the tagging program.
+
+   if ( $pid == 0 ) {
+      close STDIN;
+      open (STDIN, "<& " . fileno ($fhin)) or die "Failed to reopen file\n";
+      exec $tagprog;
+   }
+
+#  Return value is the catenation of the output.
+
+   my $tagged = join "", <OUT>;
+
+#  If there should be some error in the tagging, then we return the untagged
+#  text instead.
+
+   if ( ! close OUT ) { 
+      print STDERR "Tagging routine failed.\n";
+      $tagged = "";
+      while ( <$fhin> ) {
+         s/&/&amp;/g;
+         s/</&lt;/g;
+         s/>/&gt;/g;
+         $tagged .= $_;
+      }
+   }
+
+#  Return.
+
+   return $tagged;
+}
+
+
+1;

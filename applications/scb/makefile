@@ -1091,6 +1091,35 @@ unbuild: clean
 
 #-------------------------------------------------------------------------------
 #
+#  Private targets - will not work for a normal source distribution.
+#  ================================================================
+
+SOURCE_CONTENTS = $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(PERL_MODULES) \
+                  $(YY_SOURCES) $(AUX_FILES)
+
+TEST_CONTENTS = test test/Makefile test/scb_c_test.c test/scb_f_test.c \
+                test/scb_locase.c
+
+check_source:
+	$(TAR_IN) $(PKG_NAME)_source.tar \
+              $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) \
+              $(PERL_MODULES) $(YY_SOURCES) $(AUX_FILES)
+	cd test; make -s clean
+	$(TAR_IN) $(PKG_NAME)_test.tar test
+	rm -rf /tmp/sun225
+	mkdir /tmp/sun225
+	cp sun225.tex /tmp/sun225
+	cd /tmp/sun225; \
+           latex sun225; latex sun225; latex sun225; star2html -aux sun225
+	( cd /tmp/sun225; tar cf - sun225.htx ) > sun225.htx_tar
+
+clean_source:
+	rm -f $(PKG_NAME)_source.tar $(PKG_NAME)_test.tar sun225.htx_tar
+
+                                         
+
+#-------------------------------------------------------------------------------
+#
 #  End of makefile.
 #.
 

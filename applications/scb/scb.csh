@@ -27,7 +27,8 @@
 #  The following definitions allow the file to run without having been
 #  edited by the install process without causing an error.  This mode of
 #  use should not however be necessary under normal circumstances.
-      set STARLINK = "/star"
+      if ( ! $?STARLINK ) set STARLINK = "/star"
+      if ( ! $?INSTALL ) set INSTALL = $STARLINK
       set SCB_INDEX = "$INSTALL/etc/scb"
       set SCB_SOURCES = "$STARLINK/sources"
       set SCB_BROWSER_TMP = "/usr/tmp/scb"
@@ -52,6 +53,7 @@
 #  We now unset the C-shell variables which would otherwise mask the
 #  environment variables.
       unset STARLINK
+      unset INSTALL
       unset SCB_INDEX
       unset SCB_SOURCES
       unset SCB_BROWSER_TMP
