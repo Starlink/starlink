@@ -83,7 +83,7 @@ ZOOMI           <zoom factor invalid>
 ILOST           <FrameSet integrity lost>
 ITFER           <error in IntraMap transformation function>
 ITFNI           <IntraMap transformation function name invalid>
-MBDNF           <Mapping bounds not found>
+MBBNF           <Mapping bounding box not found>
 MRITF           <multiple registration of IntraMap transformation function>
 OCLUK           <Object class unknown>
 UNFER           <error while unformatting a coordinate value>
