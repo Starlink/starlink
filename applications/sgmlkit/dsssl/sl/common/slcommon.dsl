@@ -24,10 +24,10 @@ and
 <func>
 <routinename>getdocinfo
 <description>
-<p>Return a node-list consisting of the specified child of the docinfo element
-for the current grove, or false if there is no such child.
+<p>Obtain the specified child of the docinfo element for the current grove.
 That is, <code>(getdocinfo 'title)</code> returns the current document's title
-<returnvalue type="node-list">
+<returnvalue type="node-list">Return a node-list consisting of the
+  specified child, or false if there is no such child.
 <parameter>type
   <type>symbol
   <description>
@@ -52,11 +52,11 @@ That is, <code>(getdocinfo 'title)</code> returns the current document's title
 <func>
 <routinename>getdocbody
 <description>
-<p>Return a node-list consisting of the specified child of the docbody element
-for the current grove, or false if there is no such child.
+<p>Obtain the specified child of the docbody element for the current grove.
 That is, <code>(getdocbody 'abstract)</code> returns the current document's 
 abstract.
-<returnvalue type="node-list">
+<returnvalue type="node-list">Return a node-list consisting of the 
+  specified child, or false if there is no such child.
 <parameter>type
   <type>symbol
   <description>
@@ -413,11 +413,16 @@ Return a list containing
 <li>distribution id: contents of the string attribute of the last
     DISTRIBUTION element.
 </ul>
-If there's no history element, then the first two elements will be
+Each element of the list is <code/#f/ (as opposed to blank) if the
+corresponding information is unavailable.
+
+<p>If there's no history element, then the first two elements will be
 the same, with the contents of the DOCDATE element, and the last
 two will be <code/#f/.
-We don't check whether the dates are sensible (ie, whether the last
+
+<p>We don't check whether the dates are sensible (ie, whether the last
 element really does have the latest date).
+
 <returnvalue type=list>(version date version-number distribution-id)
 <argumentlist>
 <parameter optional default="(current-node)">
