@@ -1,4 +1,4 @@
-      SUBROUTINE ASTRML (LUI, LUR, LUS, LUX, FTPREF)
+      SUBROUTINE ASTRML (LUI, LUR, LUS, LUX, FTPREF, FITSWCSSTYLE)
 *+
 *     - - - - - - -
 *      A S T R M L
@@ -8,11 +8,12 @@
 *
 *  Given:
 *
-*     LUI   i     I/O unit number for input file
-*     LUR   i     I/O unit number for report file
-*     LUS   i     I/O unit number for synopsis file
-*     LUX   i     I/O unit number for log file (zero to suppress)
-*     FRPREF s    Filename prefix for generated FITS files (' ' to suppress)
+*     LUI     i      I/O unit number for input file
+*     LUR     i      I/O unit number for report file
+*     LUS     i      I/O unit number for synopsis file
+*     LUX     i      I/O unit number for log file (zero to suppress)
+*     FRPREF  s      Filename prefix for generated FITS files (' ' to suppress)
+*     FITSWCSSTYLE s WCS style to use for the FITS headers
 *
 *  Both the report and the synopsis file contain Fortran printer
 *  format codes.  In the case of the synopsis file, the code is
@@ -28,13 +29,14 @@
 *           sla_DCMPF, sla_PXY, sla_XY2XY
 *
 *  P T Wallace   Starlink   8 April 1998
+*  Norman Gray   Starlink   2 May 2003
 *
 *-
 
       IMPLICIT NONE
 
       INTEGER LUI,LUR,LUS,LUX
-      CHARACTER*(*) FTPREF
+      CHARACTER*(*) FTPREF, FITSWCSSTYLE
 
 *+
 *
@@ -2141,7 +2143,7 @@
                         IF (LUX.GT.0) WRITE (LUX,1069)
  1068                   FORMAT (1X,
      :                   'Plate centre cannot reliably be determined!'/)
- 1069                   FORMAT ('WARNING 007 Plate centre cannot ',
+ 1069                   FORMAT ('WARNING 008 Plate centre cannot ',
      :                       'reliably be determined!')
                         FITOK=.FALSE.
                      END IF
@@ -2289,60 +2291,7 @@
                   WRITE (FTWS, '("ASTROM astrometric solution: ",i2,
      :                 "-component solution")'), NTERMS
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
-                  
-                  CALL FTPKYS (FTUNIT, 'CTYPE1', 'RA---TAN',
-     :                 'RA -- tangent-plane projection', FTSTAT)
-                  CALL FTPKYS (FTUNIT, 'CTYPE2', 'DEC--TAN',
-     :                 'DEC -- tangent-plane projection', FTSTAT)
-                  CALL FTPKYS (FTUNIT, 'RADESYS', 'FK5', 
-     :                 'Celestial coordinates in FK5 system', FTSTAT)
-*               Default equinox J2000
-                  CALL FTPKYG (FTUNIT, 'EQUINOX', 2000.0D0, 1,
-     :                 'Equator and equinox of J2000.0', FTSTAT)
-*               Native longitude of celestial pole.  This is the
-*               default, as specified in C&G
-                  IF (DCPCG/D2R.LT.90D0) THEN
-                     CALL FTPKYG (FTUNIT, 'LONPOLE', 180D0, 0,
-     :                    'Native longitude of celestial pole',
-     :                    FTSTAT)
-                  ELSE
-                     CALL FTPKYG (FTUNIT, 'LONPOLE', 0D0, 0,
-     :                    'Native longitude of celestial pole',
-     :                    FTSTAT)
-                  ENDIF
 
-*               Coordinates of reference point.
-*               We have to deal only with zenithal coordinates.
-*               The estimated and predicted coordinates here in ASTROM
-*               are in the projected plane, and are the `intermediate
-*               world coordinates' of the FITS-WCS proposals.  Note that we
-*               are outputting the `report' coordinates, RAPCX and DCPCX.
-                  CALL sla_DR2TF(1,sla_DRANRM(RAPCX),KSRA,IRAVEC)
-*               Because of the dranrm, KSRA is always '+'
-                  WRITE (FTWS, '("Projection pole -- RA =  ",
-     :                 I3,":",I2.2,":",I2.2,".",I1)')
-     :                 IRAVEC
-                  CALL FTPKYG (FTUNIT, 'CRVAL1', RAPCX/D2R, 7,
-     :                 FTWS, FTSTAT)
-                  CALL sla_DR2AF(0,sla_DRANGE(DCPCX),KSDC,IDCVEC)
-                  WRITE (FTWS, '("Projection pole -- Dec = ",
-     :                 A,I2.2,":",I2.2,":",I2.2)')
-     :                 KSDC, (IDCVEC(N),N=1,3)
-                  CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCX/D2R, 7,
-     :                 FTWS, FTSTAT)
-                  CALL FTPKYG (FTUNIT, 'CRPIX1', 
-     :                 FNORM*PLTCON(1,NSOL+MAXSOL), 7,
-     :                 'Projection pole -- x-pixels', FTSTAT)
-                  CALL FTPKYG (FTUNIT, 'CRPIX2', 
-     :                 FNORM*PLTCON(4,NSOL+MAXSOL), 7,
-     :                 'Projection pole -- y-pixels', FTSTAT)
-*               Note that the coordinates, and the
-*               transformation matrix, are required to be in degrees
-*               rather than radians.
-                  CALL FTPKYS (FTUNIT, 'CUNIT1', 'deg', 
-     :                 'RA always given in degrees', FTSTAT)
-                  CALL FTPKYS (FTUNIT, 'CUNIT2', 'deg', 
-     :                 'Dec always given in degrees', FTSTAT)
 *               Write a comment, summarising the transformation matrix.
 *               Reuse the results of the sla_DCMPF call above.
                   WRITE (FTWS,'("Mean scale",F6.2,"arcsec, nonperp",
@@ -2350,71 +2299,58 @@
      :                 SCALE, PERP/D2R, ORIENT/D2R,
      :                 (XSCALE*YSCALE.LT.0D0)
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
-*               Transformation matrix, again in units of degrees, not radians
-                  CALL FTPKYD (FTUNIT, 'CD1_1',
-     :                 PLTCON(2,NSOL)/FNORM/D2R, 7,
-     :                 'Transformation to intermed. world coords',
-     :                 FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'CD2_1',
-     :                 PLTCON(BVALS+2,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'CD1_2',
-     :                 PLTCON(3,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'CD2_2',
-     :                 PLTCON(BVALS+3,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
-*               Include the relevant coefficients of the TAN distortion.
-*               If we write the undistorted gnomonic projection
-*               coordinates as (\xi, \eta), following C&G, and the distorted 
-*               coordinates (ie, the plate coordinates) as (x,y), then
-*               ASTROM handles the relationship between these as
-*               x=\xi(1+q\rho^2) and y=\eta(1+q\rho^2), where
-*               \rho^2=\xi^2+\eta^2.  We need to invert this, to give
-*               (\xi,\eta) as a function of (x,y).  Write r^2=x^2+y^2
-*               and Q=1/(1+q\rho^2), so that \rho^2=Qr^2.  Substitute
-*               \rho^2 into Q, then Q into itself, and expand, keeping
-*               terms to O(r^6), to obtain Q=1 - qr^2 + 3q^2r^4 -
-*               12q^3r^6 + O(r^8), and the distortion functions become
-*               \xi=Q(r)x, \eta=Q(r)y.  The parameter q in this program
-*               has units rad^{-2} (I'm pretty sure), but since the FITS 
-*               files work in degrees, we need to convert it to deg^{-2}.
-                  WRITE (FTWS,'("Projection geometry: ",A)') KPROJ
-                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
-                  DISTORD2 = DISTOR*(D2R**2)
-                  WRITE (FTWS, '("ASTROM q=",F10.4,"rad**-2 = ",
-     :                 F10.4,"deg**-2")') DISTOR, DISTORD2
-                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
 
-                  CALL FTPKYD (FTUNIT, 'PV1_0', 0D0, 7,
-     :                 'Distortion function for x: a_0=0', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_1', 1D0, 7,
-     :                 'a_1 x     = 1', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_7', -DISTORD2, 7,
-     :                 'a_7 x^3   = -q', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_9', -DISTORD2, 7,
-     :                 'a_9 xy^2  = -q', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_17', 3*DISTORD2**2, 7,
-     :                 'a_17 x^5  = 3q^2', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_21', 3*DISTORD2**2, 7,
-     :                 'a_21 xy^4 = 3q^2', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_31', -12*DISTORD2**3, 7,
-     :                 'a_31 x^7  = -12q^3', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_37', -12*DISTORD2**3, 7,
-     :                 'a_37 xy^6 = -12q^3', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_0', 0D0, 7,
-     :                 'Distortion function for y: b_0=0', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_1', 1D0, 7,
-     :                 'b_1 y     = 1', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_7', -DISTORD2, 7,
-     :                 'b_7 y^3   = -q', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_9', -DISTORD2, 7,
-     :                 'b_9 yx^2  = -q', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_17', 3*DISTORD2**2, 7,
-     :                 'b_17 y^5  = 3q^2', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_21', 3*DISTORD2**2, 7,
-     :                 'b_21 yx^4 = 3q^2', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_31', -12*DISTORD2**3, 7,
-     :                 'b_31 y^7  = -12q^3', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_37', -12*DISTORD2**3, 7,
-     :                 'b_37 yx^6 = -12q^3', FTSTAT)
+*               Write the WCS headers out in the style requested in FITSWCSSTYLE
+                  I=1
+                  DO WHILE(FITSWCSSTYLE(I:I).NE.' '
+     :                 .AND.I.LT.LEN(FITSWCSSTYLE))
+                     I=I+1
+                  ENDDO
+                  I=I-1
+                  IF (FITSWCSSTYLE(1:I).EQ."qtan") then
+*                  Write out WCS headers to FTUNIT
+                     CALL WFWCS0 (FTUNIT,
+     :                    RAPCX,
+     :                    DCPCX,
+     :                    DCPCG,
+     :                    FNORM*PLTCON(1,NSOL+MAXSOL),
+     :                    FNORM*PLTCON(4,NSOL+MAXSOL),
+     :                    PLTCON(2,NSOL)/FNORM,
+     :                    PLTCON(3,NSOL)/FNORM,
+     :                    PLTCON(BVALS+2,NSOL)/FNORM,
+     :                    PLTCON(BVALS+3,NSOL)/FNORM,
+     :                    KPROJ,
+     :                    DISTOR,
+     :                    'QV',
+     :                    FTSTAT)
+                  ELSE IF (FITSWCSSTYLE(1:I).EQ."xtan") then
+*                  Write out WCS headers to FTUNIT
+                     CALL WFWCS0 (FTUNIT,
+     :                    RAPCX,
+     :                    DCPCX,
+     :                    DCPCG,
+     :                    FNORM*PLTCON(1,NSOL+MAXSOL),
+     :                    FNORM*PLTCON(4,NSOL+MAXSOL),
+     :                    PLTCON(2,NSOL)/FNORM,
+     :                    PLTCON(3,NSOL)/FNORM,
+     :                    PLTCON(BVALS+2,NSOL)/FNORM,
+     :                    PLTCON(BVALS+3,NSOL)/FNORM,
+     :                    KPROJ,
+     :                    DISTOR,
+     :                    'PV',
+     :                    FTSTAT)
+                  ELSE
+                     WRITE (LUS,
+     :                    '(" Unrecognised FITS WCS style, ", a,
+     :                    ".  FITS writing abandoned")')
+     :                    FITSWCSSTYLE(1:I)
+                     WRITE (LUX,
+     :                    '("ERROR 015 Unrecognised FITS WCS style, ",
+     :                    a,".  FITS writing abandoned")')
+     :                    FITSWCSSTYLE(1:I)
+                     FITSOP=.FALSE.
+                     GOTO 1070
+                  ENDIF
 
 *               Write date of observation
                   IF (GOTPEP) THEN
@@ -2468,7 +2404,7 @@
                      ENDDO
                   ENDIF
                ENDIF
-*            End of FITS writing -- error exit
+*            End of FITS writing, and error exit
  1070          CONTINUE
 
                WRITE (LUS,
@@ -2526,7 +2462,7 @@
                   WRITE (LUS,
      :          '(1X,A,I6,SP,F14.3,F10.3,SS,F10.3)') RNAME(I),I,DX,DY,DR
                   IF (LUX.GT.0) WRITE (LUX,
-     :                 '("INFO RESIDUAL ",I6,3F14.3)')
+     :                 '("RESIDUAL ",I6,3F14.3)')
      :                 I,DX,DY,DR
 
 *              Next reference star
@@ -2908,45 +2844,58 @@
  990  CONTINUE
       WRITE (LUR,8990) INBUF
       WRITE (LUS,8990) INBUF
+      IF (LUX.GT.0) WRITE (LUX, 8890)
  8990 FORMAT (1X,A/
      :        1X,'*************** INVALID DATA ****************')
+ 8890 FORMAT ('ERROR 012 Invalid data')
       GO TO 998
 
 *  Premature end of data
  991  CONTINUE
       WRITE (LUR,8991)
       WRITE (LUS,8991)
+      IF (LUX.GT.0) WRITE (LUX,8891)
  8991 FORMAT (1X,'----------- PREMATURE END OF DATA -----------')
+ 8891 FORMAT ('ERROR 016 Premature end of data')
       GO TO 997
 
 *  Plate epoch required
  992  CONTINUE
       WRITE (LUR,8992)
       WRITE (LUS,8992)
+      IF (LUX.GT.0) WRITE (LUX, 8892)
  8992 FORMAT (1X,'******* PLATE EPOCH WAS NOT SPECIFIED *******')
+ 8892 FORMAT ('ERROR 017 Plate epoch was not specified')
       GO TO 997
 
 *  Too many reference stars
  993  CONTINUE
       WRITE (LUR,8993) MAXREF
       WRITE (LUS,8993) MAXREF
+      IF (LUX.GT.0) WRITE (LUX,8893) MAXREF
  8993 FORMAT (1X,'**** TOO MANY REFERENCE STARS; MAX',I4,' ****')
+ 8893 FORMAT ('ERROR 018 Too many reference stars: max=',I4)
       GO TO 997
 
 *  Numerical disasters
  994  CONTINUE
       WRITE (LUR,8994) FITERR,NSOL
       WRITE (LUS,8994) FITERR,NSOL
+      IF (LUX.GT.0) WRITE (LUX,8894) FITERR, NSOL
+      
  8994 FORMAT (/1X,A/
      :        1X,'--------------- FIT',I2,
      :                                ' ABORTED ---------------')
+ 8894 FORMAT ('ERROR 009 ',A,': fit ', I2, ' aborted')
       GO TO 997
 
 *  No solution
  995  CONTINUE
       WRITE (LUR,8995)
       WRITE (LUS,8995)
+      IF (LUX.GT.0) WRITE (LUX, 8895)
  8995 FORMAT (1X,'--------- UNKNOWNS BUT NO SOLUTION ----------')
+ 8895 FORMAT ('ERROR 019 Unknowns but no solution
 
 *  Skip rest of input records if any
  997  CONTINUE
