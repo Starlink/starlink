@@ -95,7 +95,9 @@
 
 *  If an error occurred, annul the catalogue.
       IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_BEGIN( STATUS )
          CALL CAT_TRLSE( CI, STATUS )
+         CALL ERR_END( STATUS )
          CI = CAT__NOID
       END IF
 

@@ -260,7 +260,9 @@
             CALL GRP_PUT( IGRPH, 1, EXT, 0, STATUS )
 
 *  Release the catalogue identifier.
+            CALL ERR_BEGIN( STATUS )
             CALL CAT_TRLSE( CI, STATUS ) 
+            CALL ERR_END( STATUS )
 
          END IF
 
