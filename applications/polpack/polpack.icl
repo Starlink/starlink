@@ -44,6 +44,7 @@ define polmap            $POLPACK_DIR/polpack_mon
 define polka             $POLPACK_DIR/polpack_mon
 define polvec            $POLPACK_DIR/polpack_mon
 define polbin            $POLPACK_DIR/polpack_mon
+define polsim            $POLPACK_DIR/polpack_mon
 define polplot           $POLPACK_DIR/polpack_mon
 define polimage          $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
@@ -57,6 +58,7 @@ define pol_polmap        $POLPACK_DIR/polpack_mon polmap
 define pol_polka         $POLPACK_DIR/polpack_mon polka
 define pol_polvec        $POLPACK_DIR/polpack_mon polvec
 define pol_polbin        $POLPACK_DIR/polpack_mon polbin
+define pol_polsim        $POLPACK_DIR/polpack_mon polsim
 define pol_polplot       $POLPACK_DIR/polpack_mon polplot
 define pol_polimage      $POLPACK_DIR/polpack_mon polimage
 defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
@@ -72,6 +74,7 @@ defhelp  polext          $POLPACK_HELP
 defhelp  polimp          $POLPACK_HELP
 defhelp  polvec          $POLPACK_HELP
 defhelp  polbin          $POLPACK_HELP
+defhelp  polsim          $POLPACK_HELP
 defhelp  polplot         $POLPACK_HELP
 defhelp  polimage        $POLPACK_HELP
 
