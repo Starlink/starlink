@@ -87,7 +87,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'SURF_SYS'                         ! SURF constants
+      INCLUDE 'SURF_PAR'                         ! SURF constants
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
       INCLUDE 'PAR_ERR'
 
