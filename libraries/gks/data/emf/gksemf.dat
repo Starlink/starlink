@@ -1,0 +1,233 @@
+-9999 This routine should never be called
+-2104 Segment support not loaded
+-2103 Text support not loaded
+-2102 Cell array support not loaded
+-2101 Fill area support not loaded
+-2100 Workstation driver not loaded
+-2020 Segment does not exist in Workstation Independent Segment Storage
+-2019 Internal inconsistency in heap management
+-2018 Attempt to call non-existent workstation driver - workstation type index
+      is corrupt
+-2017 Argument to internal GKS routine specifies an array that is too small
+-2016 Heap pointer is invalid
+-2015 CSS is not open
+-2014 Segment has not been selected on CSS
+-2013 No free pages in CSS
+-2012 Segment does not exist on CSS
+-2011 Entry already exists
+-2010 Incorrect workstation driver called
+-2009 Incorrect number of input devices specified in the workstation description
+      table file
+-2008 Invalid stack space deallocation
+-2007 Entry not found in list
+-2006 Value of internal enumeration type is invalid
+-2005 Workstation description table file does not contain the requested
+      information or is corrupt
+-2004 Documented condition to be satisfied by parameter(s) of internal routine
+      is not satisfied
+-2003 Corrupt workstation control block
+-2002 Workstation driver has been entered with an unsupported entrypoint
+-2001 Workstation driver has been entered with an invalid entrypoint
+-2000 Stack space has not been deallocated
+-1048 Previous error was detected while interpreting a metafile item
+-1047 Input argument had invalid length
+-1046 Reserved - please report the occurrence of this error
+-1045 At least one character string has been truncated
+-1044 Reserved - please report the occurrence of this error
+-1043 Reserved - please report the occurrence of this error
+-1042 Error while trying to open internal segment store
+-1041 Error while trying to close internal segment store
+-1040 Entry already exists
+-1039 Reserved - please report the occurrence of this error
+-1038 Reserved - please report the occurrence of this error
+-1037 Reserved - please report the occurrence of this error
+-1036 Reserved - please report the occurrence of this error
+-1035 Reserved - please report the occurrence of this error
+-1034 Reserved - please report the occurrence of this error
+-1033 Reserved - please report the occurrence of this error
+-1032 Reserved - please report the occurrence of this error
+-1031 Reserved - please report the occurrence of this error
+-1030 Reserved - please report the occurrence of this error
+-1029 Reserved - please report the occurrence of this error
+-1028 Reserved - please report the occurrence of this error
+-1027 Reserved - please report the occurrence of this error
+-1026 Reserved - please report the occurrence of this error
+-1025 Reserved - please report the occurrence of this error
+-1024 Reserved - please report the occurrence of this error
+-1023 Reserved - please report the occurrence of this error
+-1022 Reserved - please report the occurrence of this error
+-1021 Reserved - please report the occurrence of this error
+-1020 Reserved - please report the occurrence of this error
+-1017 Entry not found in list
+-1016 Internal error detected within GKS
+-1014 Error while trying to close the error file
+-1013 Error while trying to close the database file
+-1012 Error while trying to close the error message file
+-1011 Error while trying to close the workstation description table file
+-1010 Unable to access the error file
+-1009 Unable to access the database file
+-1008 Unable to access the error message file
+-1007 Unable to access the workstation description table file
+-1006 A non-inquiry function has been called while GKS is in the error state
+-1004 No room for another bundle of this type on this workstation
+    1 GKS not in proper state:  GKS shall be in the state GKCL
+    2 GKS not in proper state:  GKS shall be in the state GKOP
+    3 GKS not in proper state:  GKS shall be in the state WSAC
+    4 GKS not in proper state:  GKS shall be in the state SGOP
+    5 GKS not in proper state:  GKS shall be either in the state WSAC or in the
+      state SGOP
+    6 GKS not in proper state:  GKS shall be either in the state WSOP or in the
+      state WSAC
+    7 GKS not in proper state:  GKS shall be in one of the states WSOP, WSAC or
+      SGOP
+    8 GKS not in proper state:  GKS shall be in one of the states GKOP, WSOP,
+      WSAC or SGOP
+   20 Specified workstation identifier is invalid
+   21 Specified connection identifier is invalid
+   22 Specified workstation type is invalid
+   23 Specified workstation type does not exist
+   24 Specified workstation is open
+   25 Specified workstation is not open
+   26 Specified workstation cannot be opened
+   27 Workstation Independent Segment Storage is not open
+   28 Workstation Independent Segment Storage is already open
+   29 Specified workstation is active
+   30 Specified workstation is not active
+   31 Specified workstation is of category MO
+   32 Specified workstation is not of category MO
+   33 Specified workstation is of category MI
+   34 Specified workstation is not of category MI
+   35 Specified workstation is of category INPUT
+   36 Specified workstation is Workstation Independent Segment Storage
+   37 Specified workstation is of category OUTIN
+   38 Specified workstation is neither of category INPUT nor of category OUTIN
+   39 Specified workstation is neither of category OUTPUT nor of category OUTIN
+   40 Specified workstation has no pixel store readback capability
+   41 Specified workstation type is not able to generate the specified
+      generalized drawing primitive
+   42 Maximum number of simultaneously open workstations would be exceeded
+   43 Maximum number of simultaneously active workstations would be exceeded
+   50 Transformation number is invalid
+   51 Rectangle definition is invalid
+   52 Viewport is not within the Normalized Device Coordinate unit square
+   53 Workstation window is not within the Normalized Device Coordinate unit
+      square
+   54 Workstation viewport is not within the display space
+   60 Polyline index is invalid
+   61 A representation for the specified polyline index has not been defined on
+      this workstation
+   62 A representation for the specified polyline index has not been predefined
+      on this workstation
+   63 Linetype is equal to zero
+   64 Specified linetype is not supported on this workstation
+   65 Linewidth scale factor is less than zero
+   66 Polymarker index is invalid
+   67 A representation for the specified polymarker index has not been defined
+      on this workstation
+   68 A representation for the specified polymarker index has not been
+      predefined on this workstation
+   69 Marker type is equal to zero
+   70 Specified marker type is not supported on this workstation
+   71 Marker size scale factor is less than zero
+   72 Text index is invalid
+   73 A representation for the specified text index has not been defined on this
+      workstation
+   74 A representation for the specified text index has not been predefined on
+      this workstation
+   75 Text font is equal to zero
+   76 Requested text font is not supported for the specified precision on this
+      workstation
+   77 Character expansion factor is less than or equal to zero
+   78 Character height is less than or equal to zero
+   79 Length of character up vector is zero
+   80 Fill area index is invalid
+   81 A representation for the specified fill area index has not been defined on
+      this workstation
+   82 A representation for the specified fill area index has not been predefined
+      on this workstation
+   83 Specified fill area interior style is not supported on this workstation
+   84 Style (pattern or hatch) index is equal to zero
+   85 Specified pattern index is invalid
+   86 Specified hatch style is not supported on this workstation
+   87 Pattern size value is not positive
+   88 A representation for the specified pattern index has not been defined on
+      this workstation
+   89 A representation for the specified pattern index has not been predefined
+      on this workstation
+   90 Interior style PATTERN is not supported on this workstation
+   91 Dimensions of colour array are invalid
+   92 Colour index is less than zero
+   93 Colour index is invalid
+   94 A representation for the specified colour index has not been defined on
+      this workstation
+   95 A representation for the specified colour index has not been predefined on
+      this workstation
+   96 Colour is outside range [0,1]
+   97 Pick identifier is invalid
+  100 Number of points is invalid
+  101 Invalid code in string
+  102 Generalized drawing primitive identifier is invalid
+  103 Content of generalized drawing primitive data record is invalid
+  104 At least one active workstation is not able to generate the specified
+      generalized drawing primitive
+  105 At least one active workstation is not able to generate the specified
+      generalized drawing primitive under the current transformations and
+      clipping rectangle
+  120 Specified segment name is invalid
+  121 Specified segment name is already in use
+  122 Specified segment does not exist
+  123 Specified segment does not exist on specified workstation
+  124 Specified segment does not exist on Workstation Independent Segment
+      Storage
+  125 Specified segment is open
+  126 Segment priority is outside the range [0,1]
+  140 Specified input device is not present on workstation
+  141 Input device is not in REQUEST mode
+  142 Input device is not in SAMPLE mode
+  143 EVENT and SAMPLE input mode are not available at this level of GKS
+  144 Specified prompt and echo type is not supported on this workstation
+  145 Echo area is outside display space
+  146 Contents of input data record are invalid
+  147 Input queue has overflowed
+  148 Input queue has not overflowed since GKS was opened or the last invocation
+      of INQUIRE INPUT QUEUE OVERFLOW
+  149 Input queue has overflowed, but associated workstation has been closed
+  150 No input value of the correct class is in the current event report
+  151 Timeout is invalid
+  152 Initial value is invalid
+  153 Number of points in the initial stroke is greater than the buffer size
+  154 Length of the initial string is greater than the buffer size
+  160 Item type is not allowed for user items
+  161 Item length is invalid
+  162 No item is left in GKS Metafile input
+  163 Metafile item is invalid
+  164 Item type is not a valid GKS item
+  165 Content of item data record is invalid for the specified item type
+  166 Maximum item data record length is invalid
+  167 User item cannot be interpreted
+  168 Specified function is not supported in this level of GKS
+  180 Specified escape function is not supported
+  181 Specified escape function identification is invalid
+  182 Contents of escape data record are invalid
+  200 Specified error file is invalid
+  300 Storage overflow has occurred in GKS
+  301 Storage overflow has occurred in segment storage
+  302 Input/Output error has occurred while reading
+  303 Input/Output error has occurred while writing
+  304 Input/Output error has occurred while sending data to a workstation
+  305 Input/Output error has occurred while receiving data from a workstation
+  306 Input/Output error has occurred during program library management
+  307 Input/Output error has occurred while reading workstation description
+      table
+  308 Arithmetic error has occurred
+ 2000 Enumeration type out of range -- the INTEGER passed as a GKS enumerated
+      type is not within the range of valid values
+ 2001 Output parameter size insufficient -- a FORTRAN array or string being
+      passed as an output parameter is too small to contain the returned
+      information
+ 2002 List element or set member not available -- for a non-empty list or set,
+      a value less than zero or greater than the size of a list or set was
+      passed as the requested list element or set member in an inquiry routine
+ 2003 Invalid data record -- the data record cannot be decoded, or there was a
+      problem encountered when the data record was created, making the result
+      invalid
