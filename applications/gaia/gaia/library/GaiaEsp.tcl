@@ -420,7 +420,7 @@ itcl::class gaia::GaiaEsp {
 		blt::busy hold $w_
 
 		if {$star_app_ == {} || $star_app_name_ != $invoke_cmd} {
-		    set star_app_ [StarApp #auto \
+		    set star_app_ [GaiaApp #auto \
 			    -show_output $itk_component(status) \
 			    -notify [code $this completed_${whichpage}_] \
 			    -application $invoke_cmd
@@ -1226,7 +1226,7 @@ itcl::class gaia::GaiaEsp {
 	# Establish a control object for this task, if not already done
 	blt::busy hold $w_
 
-	set hsub_star_app_ [StarApp #auto \
+	set hsub_star_app_ [GaiaApp #auto \
 		-show_output $itk_component(status) \
 		-notify [code $this completed_bg_from_hsub_] \
 		-application $invoke_cmd

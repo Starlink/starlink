@@ -619,7 +619,7 @@ itcl::class gaia::GaiaOptPhotom {
             if { $autophotom_ == {} } {
                #  Start autophotom application.
                global env
-               set autophotom_ [StarApp \#auto -application \
+               set autophotom_ [GaiaApp \#auto -application \
                                    $env(PHOTOM_DIR)/autophotom \
                                    -notify [code $this measured_objects]]
             }

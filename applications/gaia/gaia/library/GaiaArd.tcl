@@ -484,7 +484,7 @@ itcl::class gaia::GaiaArd {
          #  Now startup the Ardstat application.
          if { $ardstat_ == {} } {
             global gaia_dir
-            set ardstat_ [StarApp \#auto -application \
+            set ardstat_ [GaiaApp \#auto -application \
                              $gaia_dir/ardstat \
                              -notify [code $this measured_stats_] \
                              -show_output $itk_component(statsresults)]
@@ -569,7 +569,7 @@ itcl::class gaia::GaiaArd {
          #  Now startup the Ardmask application.
          if { $ardmask_ == {} } {
             global env
-            set ardmask_ [StarApp \#auto -application \
+            set ardmask_ [GaiaApp \#auto -application \
                              $env(KAPPA_DIR)/ardmask \
                              -notify [code $this modified_image_]]
          }
@@ -632,7 +632,7 @@ itcl::class gaia::GaiaArd {
 	   #  Now startup the Ardmask application.
 	   if { $ardmask_ == {} } {
               global env
-              set ardmask_ [StarApp \#auto -application \
+              set ardmask_ [GaiaApp \#auto -application \
                                $env(KAPPA_DIR)/ardmask \
                                -notify [code $this modified_image_]]
 	   }
@@ -670,7 +670,7 @@ itcl::class gaia::GaiaArd {
       #  Now startup the autocrop application.
       if { $autocrop_ == {} } {
          global gaia_dir
-         set autocrop_ [StarApp \#auto -application \
+         set autocrop_ [GaiaApp \#auto -application \
                            $gaia_dir/autocrop \
                            -notify [code $this modified_image_]]
       }

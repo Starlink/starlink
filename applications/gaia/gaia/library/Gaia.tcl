@@ -1294,7 +1294,7 @@ itcl::class gaia::Gaia {
       lappend argv $file_types
       incr argc 2
 
-      # need this for library/StarApp.tcl  to find adamtask.tcl
+      # need this for library/GaiaApp.tcl  to find adamtask.tcl
       if {! [info exists env(TCLADAM_DIR)]} {
          set env(TCLADAM_DIR) $gaia_dir/demos
       }

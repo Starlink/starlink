@@ -2162,7 +2162,7 @@ itcl::class gaia::GaiaSextractor {
                #  Establish a control object for this task,if not already done.
                blt::busy hold $w_
                if { $star_sex_ == {} } {
-                  set star_sex_ [StarApp \#auto \
+                  set star_sex_ [GaiaApp \#auto \
                                     -show_output $itk_component(status) \
                                     -notify [code $this completed_] \
                                     -see_end 1 \
@@ -2196,7 +2196,7 @@ itcl::class gaia::GaiaSextractor {
       }
    }
 
-   #  Message when task is completed (StarApp only).
+   #  Message when task is completed (GaiaApp only).
    protected method completed_ {} {
 
       #  Now display the catalogue overlaid on the image.
@@ -2405,7 +2405,6 @@ itcl::class gaia::GaiaSextractor {
    #  complete, so we can proceed. The number we should use here
    #  is 1000 or the size of the catalogue.
    protected method set_maxobjs_ {catalogue} {
-
       set maxobjs [find_maxobjs_]
       set ok [$astrocatnames_($catalogue) set_maxobjs $maxobjs]
       if { ! $ok } {
