@@ -114,7 +114,7 @@
       DOUBLE PRECISION PARAMS( * )
       LOGICAL HASVAR
       LOGICAL HASQUA
-      LOGICAL HASAX
+      LOGICAL HASAXI
       <TYPE> DATI( * )
       <TYPE> VARI( * )
       BYTE QUAI( * )
