@@ -40,7 +40,7 @@
 #    AUTOASTROM_TEMPDIR (default /tmp):
 #        Location for temporary autoastrom files
 #    EXTRACTOR_DIR (default $STARLINK/bin/extractor):
-#        Location of the SExtractor binary and config files
+#        Location of the EXTRACTOR binary and config files
 #    KAPPA_DIR (default $STARLINK/bin/kappa):
 #        Location of the kappa binary and config files
 #
@@ -105,7 +105,7 @@ my $extractorcatalogue = undef; # If defined, a catalogue in Extractor
                                 # a run of Extractor, to produce...
 
 my $CCDcat = undef;		# The catalogue of objects obtained
-                                # by SExtractor from the CCD.  It's a
+                                # by EXTRACTOR from the CCD.  It's a
                                 # reference to an array of references
                                 # to hashes, with some or all of fields
                                 # {id}, {x}, {y}, {ra}, {dec} and others.
@@ -116,7 +116,7 @@ my $matchcatalogue = undef;     # If defined, receives a dump of the
 
 my $CCDcatdumpname = undef;	# If defined, a dump of the catalogue
                                 # of objects on the CCD, as obtained
-                                # from SExtractor.  Set only by the
+                                # from EXTRACTOR.  Set only by the
                                 # debugging/testing option xxxccdcat,
                                 # and used only via the {fromdump} and
                                 # {todump} options to extract_objects.
@@ -128,6 +128,9 @@ my $monolithTimeout = 180;	# Timeout for monoliths.  Needs to be
                                 # larger than default 60s.
 
 my $monolithMessages = 1;	# Display monolith messages.
+
+my $maxfit = 9;		        # Maximum number fitting parameters.
+                                # should be one of 6,7 or 9.
 
 my $maxobj = 500;		# Maximum number of objects to
                                 # manipulate.  This number is
@@ -152,6 +155,9 @@ my $cmdlineobsdata = undef;	# Source for WCS information.  Can be
 
 my $matchplugin = undef;	# Name of plugin which is to be used
                                 # to do the matching.  Default if undefined.
+
+my $bestfitlog = undef;         # Name of optional file for logging
+                                # the best ASTROM fits results.
 
 my %filterdefects = ();
 
@@ -191,7 +197,8 @@ use NDF;
 # Use the getopt library
 use Getopt::Long;
 
-
+# Sometimes we need to log to a file and standard error/output.
+use IO::Tee;
 
 # The following requires that the variable AUTOASTROM_DIR be defined
 # at _compile_ time (so that the setting of it above will never
@@ -216,7 +223,7 @@ foreach my $app ("$ENV{KAPPA_DIR}/kappa_mon",
 # CCDPACK version 4.0.1 or better, to get the propagation of extra
 # columns.
 if (Starlink::Versions::starversion_lt('ccdpack', '4.0-1')) {
-    wmessage 'fatal', "We have CCDPack version "
+    wmessage 'fatal', "We have CCDPACK version "
       .Starlink::Versions::starversion_string('ccdpack')
       .", but we need 4.0-1 or better\n";
 }
@@ -254,6 +261,7 @@ END { tidy_and_shutdown ('exithandler'); }	# deletes temporary files
 # xxx* are for testing and debugging only.
 my %optionset = ();
 GetOptions (\%optionset,
+	    "bestfitlog=s",	# Name for log of ASTROM's best fit
 	    "catalogue=s",	# SkyCat name of online catalogue to use
             "ccdcatalogue=s",   # Name of an extractor catalogue to read
 	    "defects=s",	# Defects removal keywords
@@ -264,6 +272,7 @@ GetOptions (\%optionset,
 	    "match=s",		# name of plugin to do the matching
             "matchcatalogue=s", # Name of a file to receive a
                                 # catalogue of matches
+	    "maxfit=i",		# maximum number of fit parameters (6,7,9)
 	    "maxobj=i",		# maximum number of objects to process
 	    "messages!",	# show messages from monoliths?
 	    "obsdata=s",	# source of WCS info (AST/FITS)
@@ -281,8 +290,9 @@ GetOptions (\%optionset,
 if (defined($optionset{help}) && $optionset{help}) {
     print "Usage: $0 [options] NDF-file\n";
     print "Options: [and defaults; if no default, value is generated]\n";
+    print "\tbestfitlog    Name of log file for best fit parameters\n";
     print "\tcatalogue     SkyCat name of online catalogue to use [$esocatname]\n";
-    print "\tccdcatalogue  Name of an extractor catalogue to read\n";
+    print "\tccdcatalogue  Name of an EXTRACTOR catalogue to read\n";
     print "\tdefects       Filter out defects [no]\n";
     print "\thelp          Print this help\n";
     print "\tinsert        Insert WCS info into NDF at end? [", ($insertwcs ? "true" : "false"), "]\n";
@@ -290,6 +300,7 @@ if (defined($optionset{help}) && $optionset{help}) {
     print "\tkeeptemps     Keep temporary files? [", ($deletetemps ? "false" : "true"), "]\n";
     print "\tmatch         Name of plugin to do matching [", (defined($matchplugin) ? $matchplugin : ''), "]\n";
     print "\tmatchcatalogue Name of a file to receive list of matches\n";
+    print "\tmaxfit        Maximum number of fit parameters (6,7,9)[$maxfit]\n";
     print "\tmaxobj        Maximum number of objects to process [$maxobj]\n";
     print "\tmessages      Show messages from monoliths? [", ($monolithMessages ? "true" : "false"), "]\n";
     print "\tobsdata       WCS info=AST/FITS/[kwd-list] ['']\n";
@@ -310,6 +321,7 @@ $NDF = $ARGV[0];
 defined($NDF) || wmessage 'fatal', "Usage: $Usage";
 $NDF =~ s/\.sdf$//;		# remove any .sdf extension
 
+$bestfitlog = $optionset{bestfitlog}	if defined ($optionset{bestfitlog});
 $esocatname = $optionset{catalogue}	if defined ($optionset{catalogue});
 $insertwcs = $optionset{insert}		if defined ($optionset{insert});
 $retainwcs = $optionset{keepfits}	if defined ($optionset{keepfits});
@@ -317,6 +329,7 @@ $deletetemps = (!$optionset{keeptemps})	if defined ($optionset{keeptemps});
 $matchplugin = $optionset{match}	if defined ($optionset{match});
 $matchcatalogue = $optionset{matchcatalogue}
   					if defined ($optionset{matchcatalogue});
+$maxfit = $optionset{maxfit}		if defined ($optionset{maxfit});
 $maxobj = $optionset{maxobj}		if defined ($optionset{maxobj});
 $monolithMessages = $optionset{messages} if defined ($optionset{messages});
 $cmdlineobsdata = $optionset{obsdata}	if defined ($optionset{obsdata});
@@ -463,36 +476,36 @@ $ENV{NDF_TEMP_FITS} = 'temp_fits_^name^fxscl';
 $helpers{kappa} = new Starlink::AMS::Task
   ("kappa_mon_$$", "$ENV{KAPPA_DIR}/kappa_mon");
 $helpers{kappa}->contactw
-  || wmessage 'fatal', "Error launching Kappa - timeout";
+  || wmessage 'fatal', "Error launching KAPPA - timeout";
 
 # ... and KAPPA's NDFPACK
 $helpers{ndfpack} = new Starlink::AMS::Task
   ("ndfpack_mon_$$", "$ENV{KAPPA_DIR}/ndfpack_mon");
 $helpers{ndfpack}->contactw
-  || wmessage 'fatal', "Error launching NDFPack - timeout";
+  || wmessage 'fatal', "Error launching NDFPACK - timeout";
 
-# ... and CCDPack
+# ... and CCDPACK
 $helpers{ccdpack} = new Starlink::AMS::Task
   ("ccd_mon_$$", "$ENV{CCDPACK_DIR}/ccdpack_reg");
 $helpers{ccdpack}->contactw
-  || wmessage 'fatal', "Error launching CCDPack - timeout";
+  || wmessage 'fatal', "Error launching CCDPACK - timeout";
 
-# ... and SExtractor
+# ... and EXTRACTOR
 #
-# SExtractor is called with a custom config file which is set up to
+# EXTRACTOR is called with a custom config file which is set up to
 # put output in the place pointed to by the AUTOASTROMTEMPCATALOGUE
 # environment variable.
 $ENV{AUTOASTROMTEMPCATALOGUE} = "$tempDir/extractor-temp";
 $helpers{extractor} = new Starlink::AMS::Task
   ("extractor_mon_$$", "$ENV{EXTRACTOR_DIR}/extractor");
 $helpers{extractor}->contactw
-  || wmessage 'fatal', "Error launching extractor -- timeout";
+  || wmessage 'fatal', "Error launching EXTRACTOR -- timeout";
 
 # ... and ATOOLS
 $helpers{atools} = new Starlink::AMS::Task
   ("atools_mon_$$", "$ENV{ATOOLS_DIR}/atools_mon");
 $helpers{atools}->contactw
-  || wmessage 'fatal', "Error launching atools -- timeout";
+  || wmessage 'fatal', "Error launching ATOOLS -- timeout";
 
 wmessage ('info', "Monoliths OK");
 
@@ -684,6 +697,8 @@ if ($dumpstatefile) {
 	      (defined($monolithTimeout) ? $monolithTimeout : "<UNDEF>"));
     printf D ("monolithMessages=%s\n",
 	      (defined($monolithMessages) ? $monolithMessages : "<UNDEF>"));
+    printf D ("maxfit=%s\n",
+	      (defined($maxfit) ? $maxfit : "<UNDEF>"));
     printf D ("maxobj=%s\n",
 	      (defined($maxobj) ? $maxobj : "<UNDEF>"));
     printf D ("esocatname=%s\n",
@@ -747,6 +762,12 @@ defined($catcathash)
   || wmessage ('fatal', "Catalogue query failed");
 
 my $catcat = $catcathash->{catalogue};
+
+# The specified region of the catalogue may not contain any valid rows
+# (within the query box/region).
+( defined($catcat->[0]->{ra}) && defined($catcat->[0]->{dec}) )
+  || wmessage ('fatal',
+	       "Catalogue query did not return any positions");
 
 # write an NDF which has the columns (number, ra/rad, dec/rad, ra/deg,
 # dec/deg and mag.  That is, copy the id, ra and dec entries in each element
@@ -856,8 +877,13 @@ my $astromfits = 'X';		# WCS information obtained by ASTROM.
 # (and we switch between these at the end of the loop) -- if the
 # actual number of parameters is to be lowered to 6, that'll be done
 # within generate_astrom.
-my @astromnterms = (9);
-#my @astromnterms = (7, 9);
+#
+# PWD: or not. In this version the maximum attempted fitting term
+# is set by the user defined maxfit parameter. This may have the
+# values 6,7 or 9, 9 being the default. The actual value used is
+# still determined in generate_astrom.
+#
+my @astromnterms = $maxfit;
 my $ntermidx = 0;	# Index into @astromnterms
 
 my %lastastrom;			# Hash holding the results of the last
@@ -917,12 +943,22 @@ while ($iterno < $iterationsleft) {
                      "Can't write match position list $matchcatalogue");
             last;               # JUMP OUT
         };
-        print MPL "# 1 NUMBER Running object number\n# 2 X_WORLD\n# 3 Y_WORLD\n# 4 X_IMAGE\n# 5 Y_IMAGE\n";
+        print MPL 
+"# 1 NUMBER Running object number\n# 2 X_WORLD\n# 3 Y_WORLD\n# 4 MAG\n#5 X_IMAGE\n# 6 Y_IMAGE\n# 7 DELTR\n";
+        my $dr = 0.0;
         for (my $i=0; $i<=$#{$catlist}; $i++) {
-            printf MPL ("%d  %f  %f  %f  %f\t# %d/%d\n",
+          $dr = sqrt(
+                     ($ccdlist->[$i]->{x} - $catlist->[$i]->{x})*
+                     ($ccdlist->[$i]->{x} - $catlist->[$i]->{x}) +
+                     ($ccdlist->[$i]->{y} - $catlist->[$i]->{y})*
+                     ($ccdlist->[$i]->{y} - $catlist->[$i]->{y})
+                    );
+            printf MPL ("%d  %f  %f  %f  %f  %f  %f\t# %d/%d\n",
                         $i,
                         $catlist->[$i]->{ra}, $catlist->[$i]->{dec},
+                        $catlist->[$i]->{mag},
                         $ccdlist->[$i]->{x}, $ccdlist->[$i]->{y},
+                        $dr,
                         $catlist->[$i]->{id}, $ccdlist->[$i]->{id});
         }
         close (MPL);
@@ -961,13 +997,26 @@ while ($iterno < $iterationsleft) {
     defined($fitdetailsref) || wmessage ('fatal', "run_astrom failed");
     my @fitdetails = @$fitdetailsref;
 
-    # Summarise the fits we obtained.
-    if ($verbose) {
-	print STDERR
+    # Summarise the fits we obtained. This can be logged was well as
+    # written to STDERR, or not, so use a Tee to manage this.
+    my $OUTPUT = new IO::Tee( \*STDERR, );
+    my $BESTLOG = undef;
+    if ( defined ( $bestfitlog ) ) {
+        if ( open( $BESTLOG, ">", $bestfitlog ) ) {
+            if ( $verbose ) {
+                $OUTPUT = new IO::Tee( \*STDERR , $BESTLOG );
+            } else {
+                $OUTPUT = new IO::Tee( $BESTLOG, );
+            }
+        }
+    }
+
+    if ( $verbose || defined( $bestfitlog ) ) {
+	print $OUTPUT
 	  "    n nterms         centre        prms       q FITS-WCS\n";
 	foreach my $k (0..$#fitdetails) {
 	    if ($fitdetails[$k]->{STATUS}) {
-		printf STDERR ("%5d %3d %11.11s %12.12s %4.1f %7.7s %s\n",
+		printf $OUTPUT ("%5d %3d %11.11s %12.12s %4.1f %7.7s %s\n",
 			       $k,
 			       $fitdetails[$k]->{nterms},
 			       $fitdetails[$k]->{rasex},
@@ -982,7 +1031,7 @@ while ($iterno < $iterationsleft) {
 			       ? "...".substr($fitdetails[$k]->{wcs},-29)
 			       : $fitdetails[$k]);
 	    } else {
-		printf STDERR "    %d    NO FIT\n", $k;
+		printf $OUTPUT ( "%5d NO FIT\n", $k );
 	    }
 	}
     }
@@ -1000,24 +1049,27 @@ while ($iterno < $iterationsleft) {
 	%lastastrom = %{$fitdetails[$k]}; # provisionally
 	if ($lastastrom{STATUS}) {
 	    # This fit was OK
-	    if ($verbose) {
-		printf STDERR ("ASTROM: best fit: %d of %d\n",
+	    if ($verbose || defined( $bestfitlog ) ) {
+		printf $OUTPUT ("ASTROM: best fit: %d of %d\n",
 			       $k+1, $#fitdetails+1);
 		foreach my $kw (sort keys %lastastrom) {
-		    printf STDERR "\t%s => %s\n", $kw, $lastastrom{$kw};
+		    printf $OUTPUT "\t%s => %s\n", $kw, $lastastrom{$kw};
 		}
 	    }
 	    last;
 	} else {
-	    if ($verbose) {
-		printf STDERR ("ASTROM: Fit %d of %d rejected",
+	    if ($verbose || defined( $bestfitlog ) ) {
+		printf $OUTPUT ("ASTROM: Fit %d of %d rejected",
 			       $k+1, $#fitdetails+1);
-		print STDERR " (",$lastastrom{nterms}, " terms)"
+		print $OUTPUT " (",$lastastrom{nterms}, " terms)"
 		  if (defined($lastastrom{nterms}));
-		print STDERR "\n";
+		print $OUTPUT "\n";
 	    }
 	    $bestfitfailed = 1;
 	}
+    }
+    if ( defined( $bestfitlog) ) {
+       close( $BESTLOG );
     }
 
     # At least one of the fits worked, didn't it?
@@ -1168,7 +1220,7 @@ sub tidy_and_shutdown {
     # Get rid of all the temporary files we've accumulated.
     if ($deletetemps && defined($tempDir) && -d $tempDir && -w $tempDir) {
 	print STDERR "Getting rid of temporary files\n";
-	system "rm -Rf $tempDir";
+	system( "rm -Rf $tempDir" );
 	$deletetemps = 0;	# don't come here again
     }
 
