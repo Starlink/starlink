@@ -13,7 +13,7 @@ application.
   $extractor->detect_thresh( 1.0 );
   my $clean_param = $extractor->clean_param;
 
-  $catalogue = $extractor->extract( $ndf );
+  $catalogue = $extractor->extract( frame => $ndf, filter => $filter );
 
 =head1 DESCRIPTION
 
@@ -126,7 +126,7 @@ sub parse_config {
 
   return if ! defined( $config );
 
-  open my $fh, $config or croak "Could not open $config: $!\n";
+  open my $fh, $config or croak "Could not open $config: $!";
   while ( my $line = <$fh> ) {
 
     chomp $line;
@@ -221,13 +221,13 @@ sub extract {
 
 # Deal with arguments.
   if( !defined( $args{'frame'} ) ) {
-    croak "Must pass frame name in order to do source extraction.\n";
+    croak "Must pass frame name in order to do source extraction";
   }
   if( !defined( $args{'filter'} ) ) {
-    croak "Must pass filter in order to do source extraction.\n";
+    croak "Must pass filter in order to do source extraction";
   }
   if( !UNIVERSAL::isa( $args{'filter'}, "Astro::WaveBand" ) ) {
-    croak "Must pass filter as Astro::WaveBand object in order to do source extraction.\n";
+    croak "Must pass filter as Astro::WaveBand object in order to do source extraction";
   }
   my $ndf = $args{'frame'};
   my $filter = $args{'filter'};
