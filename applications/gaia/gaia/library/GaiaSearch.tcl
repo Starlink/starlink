@@ -180,16 +180,6 @@ class gaia::GaiaSearch {
       }
    }
 
-   #  Return the equinox.
-   public method get_equinox {} {
-      return [$searchopts_ get_equinox]
-   }
-
-   #  Return the name of the TableList
-   public method get_table {} {
-      return $results_
-   }
-   
    #  Return the iswcs value of the current catalogue.
    public method iswcs {} {
       return [$w_.cat iswcs]

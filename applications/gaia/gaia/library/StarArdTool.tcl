@@ -44,7 +44,7 @@
 #
 #        -rtdimage rtd_image_name
 #
-#     Sets the name of the GaiaImage object used to display the
+#     Sets the name of the GaiaImageCtrl object used to display the
 #     image.
 # 
 #        -selected_colour colour

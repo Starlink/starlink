@@ -57,7 +57,7 @@
 
 #.
 
-class rtd::Queue {
+class gaia::Queue {
    constructor {} {}
    destructor {}
 

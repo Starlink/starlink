@@ -347,7 +347,7 @@ class gaia::StarBlink {
       set n_ 0
       foreach w $clones {
          itk_component add image$n_ {
-            GaiaImage $itk_component(Frame).image$n_ -graphics 0 \
+            RtdImage $itk_component(Frame).image$n_ -graphics 0 \
                -scrollbars 0
          }
          set canvas_($n_) [$itk_component(image$n_) get_canvas]

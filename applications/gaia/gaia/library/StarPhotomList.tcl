@@ -15,7 +15,7 @@
 #     listbox and bindings may be associated with actions in the list.
 #
 #     The objects (and more importantly their properties) can be
-#     displayed graphically in a GaiaImage widget. A state is
+#     displayed graphically in a GaiaImageCtrl widget. A state is
 #     associated with each object -- selected, displayed or new -- and
 #     the object appears graphically in the correct form. Objects that
 #     are displayed are drawn in a different colour to those that are
@@ -604,7 +604,7 @@ class gaia::StarPhotomList {
    #  Name of canvas.
    public variable canvas {} {}
 
-   #  Name of GaiaImage type object for converting aperture sizes
+   #  Name of GaiaImageCtrl type object for converting aperture sizes
    #  into displayed canvas sizes.
    public variable rtdimage {} {}
 

@@ -58,16 +58,10 @@ import add ::iwidgets
 
 #  Make GAIA modified core Tcl code available in preference to 
 #  the normal versions.
-source $gaia_library/LabelEntry.tcl
-source $gaia_library/LabelEntryScale.tcl 
-source $gaia_library/udialog.tcl
-
-#source $gaia_library/RtdImageCtrl.tcl 
-source $gaia_library/RtdImagePick.tcl
-source $gaia_library/RtdImagePixTable.tcl 
-source $gaia_library/RtdImageTrans.tcl 
-source $gaia_library/RtdImageZoomView.tcl
-source $gaia_library/Batch.tcl
+#source $gaia_library/LabelEntry.tcl
+#source $gaia_library/LabelEntryScale.tcl 
+#source $gaia_library/udialog.tcl
+#source $gaia_library/Batch.tcl
 
 #  Set interface for strict Motif compliance.
 set tk_strictMotif 1

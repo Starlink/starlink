@@ -70,7 +70,6 @@ class gaia::GaiaImageCtrl {
 
       #  Remove options we're overriding from base classes.
       itk_option remove RtdImage::scrollbars
-      itk_option remove RtdImage::graphics
       itk_option remove RtdImage::show_object_menu
       itk_option remove RtdImage::drag_scroll
       itk_option remove RtdImage::with_warp
@@ -546,6 +545,7 @@ class gaia::GaiaImageCtrl {
       utilReUseWidget gaia::GaiaImageCut $w_.cut \
          -image $this \
          -transient 1 \
+         -shorthelpwin $itk_option(-shorthelpwin) \
          -command [code $itk_component(info) updateValues]
    }
 

@@ -138,7 +138,7 @@ itcl::class util::LabelEntry {
     }
     protected proc real {string} {
 #	return [regexp {^\-?[0-9]*\.?[0-9]*$} $string]
-        return [regexp -nocase {^[-+]?[0-9]*\.?[0-9]*([0-9]\.?e[-+]?[0-9]*)?$}
+        return [regexp -nocase {^[-+]?[0-9]*\.?[0-9]*([0-9]\.?e[-+]?[0-9]*)?$} $string]
     }
 
     # -- options --

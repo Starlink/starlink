@@ -45,40 +45,6 @@ class gaia::GaiaImageCut {
       eval itk_initialize $args
    }
 
-   #  Add a short help window. Change the text in one part.
-   method make_short_help {} {
-      TopLevelWidget::make_short_help
-      add_short_help $itk_component(graph) \
-         {Graph: shows distribution of pixel values in image \
-             {bitmap b1} ... {bitmap b1} = Zoom in, {bitmap b3} = Zoom out, Cancel zoom}
-      add_short_help $itk_component(percent) \
-         {Auto set: {bitmap b1} = set so that given percent of pixels are within cut levels}
-
-      add_short_help [$itk_component(lowcut) component scale] \
-         {Low cut: {bitmap dragb1} = adjust low cut value}
-
-      add_short_help [$itk_component(lowcut) component entry] \
-         {Low cut: enter low cut value}
-
-      add_short_help [$itk_component(highcut) component scale] \
-         {High cut: {bitmap dragb1} = adjust high cut value}
-
-      add_short_help [$itk_component(highcut) component entry] \
-         {High cut: enter high cut value}
-
-      add_short_help $itk_component(set) \
-         {Set: {bitmap b1} = set cut levels to selected values}
-
-      add_short_help $itk_component(reset) \
-         {Reset: {bitmap b1} = no cut levels used}
-
-      add_short_help $itk_component(median) \
-         {Median Filter: {bitmap b1} = apply median filtering algorithm to set cut levels}
-
-      add_short_help $itk_component(close) \
-         {Close: {bitmap b1} = close this window}
-   }
-
    #  Override the make the control panel to make changes in the way
    #  that the slider widget's limits and resolutions are set.
    method make_controls {} {
@@ -102,9 +68,9 @@ class gaia::GaiaImageCut {
       set from [$image_ min]
       set to [$image_ max]
       if {$to <= $from} {
-         if {[$image_ isclear]} {
-            # no image is loaded ?
-            wm withdraw $w_
+         # no image is loaded ?
+         if {[$image_ isclear] || ! $initialised_ } {
+            quit
             return
          }
       }
@@ -134,7 +100,12 @@ class gaia::GaiaImageCut {
       update_xaxis
 
       # plot the distribution of pixel values
-      $image_ graphdist $graph_ elem $itk_option(-num_points) $graph_.xVector $graph_.yVector
+      if {[catch {
+         $image_ graphdist $graph_ elem $itk_option(-num_points) \
+            $xVector_ $yVector_} msg]} {
+         #warning_message $msg
+      }
+      #update_increment
    }
 
    #  Set entry values of the lowcut scale widget and update scale

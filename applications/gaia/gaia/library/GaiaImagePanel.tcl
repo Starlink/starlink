@@ -10,10 +10,8 @@
 
 #  Description:
 #     This is class extends the RtdImagePanel class to add the extras
-#     facilities required for the GAIA interface. This mainly consists
-#     of the ability to make the control panel float (i.e. appear in 
-#     a separate top-level window). We also defined the automatic cuts
-#     to use a set of percentiles instead of one median filter.
+#     facilities required for the GAIA interface. This consists of the 
+#     extras needed to add autocuts and colour/intensity table controls.
 
 #  Invocation:
 #     GaiaImagePanel name [configuration options]
@@ -33,6 +31,8 @@
 #        Original version
 #     3-FEB-1999 (PDRAPER):
 #        Added quick selections for color and itt tables.
+#     2-MAR-1999 (PDRAPER):
+#        Converted for skycat 2.3.2.
 #     {enter_changes_here}
 
 #-
@@ -55,7 +55,8 @@ class gaia::GaiaImagePanel {
       make_layout
    }
 
-   # Override the make_layout method so the panel can be made to float
+   #  Override the make_layout method so the panel has percentiles
+   #  cuts and colour table controls added.
    method make_layout {} {
       if { ! $make_now_ } { 
          #  Hack to stop base constructor from calling this method

@@ -427,7 +427,7 @@ class gaia::StarCanvasObject {
    #  Name of canvas.
    public variable canvas {} {}
 
-   #  Name of GaiaImage type object for converting aperture size
+   #  Name of GaiaImageCtrl type object for converting aperture size
    #  into displayed canvas size and coordinates to image.
    public variable rtdimage {} {}
 

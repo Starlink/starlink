@@ -18,6 +18,7 @@
 #                        process exit without executing any exit
 #                        handlers. This was causing problems with
 #                        Starlink infrastructure s/w (HDS).
+#            02 Mar 99   Merged skycat 2.3.2 changes
 
 itk::usual Batch {}
 
@@ -26,7 +27,7 @@ itk::usual Batch {}
 # process is just a copy of the current one and has a copy of the
 # memory and open files. 
 
-class util::Batch {
+itcl::class util::Batch {
     # dummy inherit, just to catch Destroy event for clean up...
     inherit util::FrameWidget
 
@@ -52,7 +53,7 @@ class util::Batch {
     # can be interrupted.  The option $command is evaluated
     # when the results when done.
 
-    method bg_eval {cmd} {
+    public method bg_eval {cmd} {
 	if {$itk_option(-debug)} {
 	    fg_eval $cmd
 	    return
@@ -87,7 +88,7 @@ class util::Batch {
     # evaluate the given command in the foreground (useful for debugging)
     # The option $command is evaluated when the results when done.
 
-    method fg_eval {cmd} {
+    public method fg_eval {cmd} {
 	set status [catch $cmd result]
 	eval $itk_option(-command) $status [list $result]
     }
@@ -95,7 +96,7 @@ class util::Batch {
 
     # read the pipe from the child process
     
-    method read_pipe {rfd wfd} {
+    protected method read_pipe {rfd wfd} {
 	set status [read $rfd 1]
 	close $rfd
 	close $wfd
@@ -110,14 +111,16 @@ class util::Batch {
 	    return
 	}
 	eval $itk_option(-command) $status [list $info]
+	catch {wait -nohang $bg_pid_}
     }
 
 
     # interrupt the current search 
 
-    method interrupt {} {
+    public method interrupt {} {
 	catch {exec kill $bg_pid_}
 	catch {file delete $itk_option(-tmpfile)}
+	catch {wait -nohang $bg_pid_}
    }
 
     
