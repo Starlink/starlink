@@ -11,5 +11,20 @@
  corresponding ATOOLS command are noted in the documentation for the
  command.
 
- 
+1 SHOW
 
+ This is a tcl script which allows you to browse an AST Object in a
+ heirarchical manner. The AST object must be contained in a text file (to
+ examine the WCS FrameSet of an NDF, use the wcsshow command in KAPPA).
+ 
+ Invocation:
+
+    %  show <file>
+ 
+ where <file> is the name of the text file containing the AST object. An
+ error will be reported if no file is specified on the command line.
+
+
+
+
+ 
