@@ -33,11 +33,9 @@
 *
 *     3) Sky subtraction within each aligned sub-region.
 *
-*     4) Calculation of a Stokes vector for each pixel.
-*
-*     In the current version of POLKA, step 4) is only available when
-*     processing dual-beam data (see parameter DUALBEAM). It is hoped that
-*     the next release will remove this restriction.
+*     4) Calculation of a Stokes vector for each pixel. This step
+*     may be omitted if required by supplying a null value for
+*     parameter OUT_S. 
 *
 *     The inputs to this application are a set of intensity frames which
 *     have been corrected to remove any instrumental effects
@@ -63,10 +61,10 @@
 *     Graphical User Interface (GUI) is used to obtain all the information
 *     required to produce the output data files from the user. This includes
 *     identifying stars, masks and sky regions on each of the supplied input
-*     images. This is the labour-intensive bit. Once this has been completed to
-*     the satisfaction of the user, the second stage is entered in which the
-*     output data files are created. Once initiated, no further interaction on
-*     the part of the user is required. This is the computationally intensive
+*     images. This is the labour-intensive bit. Once this has been completed
+*     your satisfaction, the second stage is entered in which the
+*     output data files are created. Once initiated, no further interaction 
+*     on your part is required. This is the computationally intensive
 *     bit. The GUI makes use of various applications from POLPACK, KAPPA and 
 *     CCDPACK to perform all these tasks. Note, if the find the image
 *     display area too small for comfort you can make it bigger using the
@@ -351,7 +349,7 @@
 *     the current directory.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -366,14 +364,14 @@
 *     3-JUL-1998 (DSB):
 *        Change parameter MODE to PMODE. 
 *     12-FEB-1999 (DSB):
-*        Allow WPLATE to take any value (not just 0.0, 22.5, 45.0 or 67.5),
+*        - Allow WPLATE to take any value (not just 0.0, 22.5, 45.0 or 67.5),
 *        and allow ANLANG to be used in place of WPLATE.
+*        - Remove restriction which prevented linear Stokes vectors being
+*        produced in single-beam mode.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
-
-
       
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -499,16 +497,6 @@
          CALL WRNDF( 'OUT_S', GRP__NOID, 1, 0, ' ', IGRP4, SIZEO,
      :                STATUS )
 
-*  Report an error if stokes vectors are equested in single beam mode.
-         IF( IGRP4 .NE. GRP__NOID .AND. .NOT. DBEAM .AND. 
-     :       STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'POLKA_ERR_1', 'The current version of '//
-     :                    'POLKA cannot produce Stokes vectors in '//
-     :                    'single-beam mode.', STATUS )
-            GO TO 999
-         END IF
-
 *  If not processing polarimetry data, always use single-beam mode, and do
 *  not produce Stokes vectors.
       ELSE
@@ -520,20 +508,19 @@
       IF( IGRP4 .NE. GRP__NOID ) THEN
          IF( SIZEO .GT. 0 ) THEN
 
-*  POLCAL (which calculates the Stokes parameters) does not at the moment 
-*  support single-beam mode, so report an error if single-beam mode has
-*  been selected.
-            IF( .NOT. DBEAM .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'POLKA_ERR2b', 'The facility for '//
-     :               'creating Stokes paremeters in single beam mode '//
-     :               'has not yet been implemented.', STATUS )
-               GO TO 999
-            END IF
-
 *  See if linear or circular polarization is being measured.
             CALL PAR_CHOIC( 'PMODE', 'LINEAR', 'LINEAR,CIRCULAR', 
      :                      .TRUE., MODE, STATUS )
+
+*  Circular polarisation cannot be produced in single-beam mode (as yet).
+            IF( .NOT. DBEAM .AND. MODE .EQ. 'CIRCULAR' .AND. 
+     :         STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'POLKA_ERR2b', 'The facility for '//
+     :               'measuring circular polarization in single beam '//
+     :               'mode has not yet been implemented.', STATUS )
+               GO TO 999
+            END IF
 
 *  Check that all of the input object frames have POLPACK extensions 
 *  containing WPLATE or ANLANG values. Also check the image is 2d.
