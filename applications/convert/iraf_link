@@ -1,0 +1,8 @@
+
+IRAFLIBS=
+for f in iraf/libimfort.a iraf/libsys.a iraf/libvops.a iraf/libos.a iraf/libcompat.a ; do
+  if test -f $f; then
+    IRAFLIBS="$IRAFLIBS $f"
+  fi
+done
+echo $IRAFLIBS
