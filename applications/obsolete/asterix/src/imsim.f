@@ -541,6 +541,11 @@
 *        Create the data
           CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
 
+*        Write timing
+          IF ( TIMID .NE. ADI__NULLID ) THEN
+            CALL TCI_PUTID( OFID, TIMID, STATUS )
+          END IF
+
 *        Write astrometry
           CALL WCI_PUTIDS( OFID, PIXID, PRJID, SYSID, STATUS )
 
