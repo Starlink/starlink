@@ -10,4 +10,4 @@
 #
 # For example:
 #ALL mail %s -s "CVS notification"
-ALL mail %s -s "Starlink CVS notification"
+ALL mail %1s -s "Starlink CVS notification"
