@@ -147,4 +147,4 @@ NUM_DEF_CVT: NUM_DEF_CVT.fpp
 PRM_PAR prm_par.h: make-prm-par
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
-BUILT_SOURCES = PRM_ERR prm_err.h
+BUILT_SOURCES = PRM_ERR prm_err.h PRM_PAR prm_par.h
