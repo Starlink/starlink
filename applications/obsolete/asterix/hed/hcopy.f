@@ -203,8 +203,6 @@
 *            are different then chose which end of the output dimension
 *            list to compare with depending on presence of 1's. The default
 *            is to compare the bottom dimensions
-              CDLO = 1
-              CDHI = NDIM
               IF ( NDIM .EQ. ONDIM ) THEN
                 SAME = HCOPY_CDIM( NDIM, DIMS, ODIMS )
               ELSE
