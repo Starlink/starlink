@@ -1,0 +1,148 @@
+  GAIA TODO LIST
+  ==============
+
+Note not many of these are likely as time and funding are short...
+
+  o CCD Mosaics
+
+     - Display CCD Mosaics as a single exposure
+
+     - Display CCD Mosaics with correct orientations (using a tiling
+       scheme of some kind)
+
+  o FITS images
+
+     - Add warnings or other work around for multiple period names
+
+
+  o Add facilities to replace INSPECT
+
+      - Histograms of regions
+
+  o Lookup tables
+
+      - Highlighting of specific ranges
+
+      - LUT creation/manpulation
+
+  o Astrometry solutions
+
+      - Add facilities for doing plate solutions (i.e. distorted
+        ones), probably using the new AUTOASTROM
+
+      - Display displacement vectors to display fit quality
+
+      - Support latest FITS-WCS projections
+ 
+      - Read TAB tables directly
+
+      - Import columns by property not order (do not assume ID RA DEC...).
+
+      - Grab other astrometry-type tables (incl positions).
+
+      - Filter objects:
+           - by maximum offset (arcsec)
+           - by signal to noise determined by centroid (reject faints...)
+
+  o ESP toolbox
+
+      - Extend report of results and add results analysis
+       
+      - GAUFIT analyses
+
+  o Slices
+
+      - Add ability to thicken slice (average over several pixels)
+
+      - Record slices as text file (just NDF at present)
+
+  o Printing
+
+      - Add ability to print whole of image/graphics, not just displayed
+        part. This is needed so that large images can be printed at pixel
+        resolution.
+
+      - Create and display true-colour images (from several images in
+        different filters)
+
+  o Variants
+
+      - Do HP/UX port -- of USSC to merge support for GAIA plugin
+
+      - Create production standalone version (includes parts of other
+        packages as necessary).
+
+      - Add native IRAF image display support (hard)
+
+  o Configuration
+
+      - Extend startup options configuration to other toolboxes
+
+      - Add simple applications building facilities.
+
+      - Add toolbar to control toolboxes or unify behaviour about
+        withdrawal and related graphics etc (i.e. offer option to 
+        keep contours visible when toolbox "closed").
+
+  o Update to latest Skycat version (always)
+
+      - Bias subtraction code
+
+      - Selection of 2D image planes from 3D arrays (WFI images)
+
+  o Catalogues
+
+      - Release CDS interface
+
+      - Increase search box maximum
+
+      - Add Landolt catalogue
+
+  o Regions
+       
+      - display a list of regions and allow table-based control
+
+  o Contours
+
+      - cheat offset correction for image WCS alignments (more
+        convenient than toolbox shift).   
+
+  o Image Analysis:
+         
+      - integrate GAUFIT 
+      
+      - add convolution toolbox (inc gaussians)
+
+      - add image orientation/rescaling facilities (geometric
+        resampling). 
+
+  o Blinking:
+
+      - pre-align images.
+
+  o Photom toolbox
+     
+      - add RA/Dec to the displayed coordinates.
+
+  o Positions toolbox:
+   
+      - utilReUseWidget to keep configuration when fails
+
+      - Save/push to proper catalogue
+
+      - Generate IDs if none specified (and others are).
+
+  o Graphics toolbox:
+
+      - add facilities to draw figures and text from text files (easier
+        than the save graphics facilities) and to work with RA/DEC 
+        coordinates. Idea is to have proper diagramming facilities.
+
+  o Image display:
+
+      - deal with small images better (5x5 size cannot see zoom)
+
+  o On-help line:
+  
+      - get external links following to work and then add some.
+

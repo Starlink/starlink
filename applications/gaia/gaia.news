@@ -3,8 +3,10 @@
   New to this release:
 
     - A number of new catalogues and image servers are now available. 
-      To access these delete your skycat.cfg file (found in ~/.skycat)
-      and restart GAIA. Some highlights are 2MASS, USNO B1.0 and GSC II.
+      When GAIA starts for the first time it will ask for permission
+      to update your configuration, unless you have a very customised
+      ~/.skycat/skycat.cfg file, you should just say yes. Some
+      highlights are 2MASS, USNO B1.0 and GSC II. 
 
     - A new configuration option "-extended_precision" has been
       added. This makes GAIA work at approximately milli-arcsecond

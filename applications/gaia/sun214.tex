@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.13}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {15th April 2003}
+\newcommand{\stardocdate}      {6th May 2003}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.9}
@@ -991,10 +991,11 @@ This release contains a few updates.
 New to this release:
 \begin{itemize}
 
-   \item A number of new catalogues and image servers are now
-   available. To access these delete your skycat.cfg file (found in
-   \mytt{\~{}/.skycat/}) and restart GAIA. Some highlights are 2MASS
-   and USNO B1.0 from CDS and GSC II from ESO.
+   \item A number of new catalogues and image servers are now available. 
+   When GAIA starts for the first time it will ask for permission
+   to update your configuration, unless you have a very customised
+   \mytt{\~{}/.skycat/skycat.cfg} file, you should just say yes. Some
+   highlights are 2MASS, USNO B1.0 and GSC II. 
 
    \item The pixel table now highlights the maximum and minimum values
    and the orientation of the Y-axis has been flipped so that the
@@ -1032,6 +1033,8 @@ New to this release:
    actually created using an inverted zoom factor correction (so
    either shrank or expanded in the wrong sense). This now works
    correctly.
+
+   \item GAIA is now released under the GNU General Public License.
 
 \end{itemize}
 

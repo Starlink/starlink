@@ -1,0 +1,26 @@
+                   Starlink Software Licence (GAIA)
+                   ================================
+ 
+ 
+PREAMBLE
+ 
+The purpose of this document is to state the terms and conditions under
+which Starlink software and documentation ("the Software") may be used.
+
+APPLICABILITY
+
+All the material in this distribution of GAIA, except the code found
+in the "gaia_tcl.tar" and "gaia_skycat.tar" files is covered by these
+terms and conditions. The code in these two tar files contains their
+own terms and conditions.
+
+NOTICE TO USER:
+ 
+BY USING THE SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
+WHICH APPLY TO ITS USE.
+ 
+1. The Software is owned by the Council for the Central Laboratory of the
+Research Councils ("CCLRC").
+ 
+2. The Software is made available under the GNU General Public License
+a copy of which can be found in the file "COPYING".

@@ -1,0 +1,54 @@
+
+            GAIA -- Graphical Astronomy and Image Analysis Tool
+            ===================================================
+
+This directory contains a release of Starlink GAIA.
+
+GAIA(1) is an image display and analysis tool for astronomy. It can
+handle images in the Starlink(2) specific NDF format and the more
+generally recognised FITS format.
+
+GAIA is a derivative of the SkyCat(3) image display and catalogue
+browsing tool, developed as part of the VLT(4) project at ESO(5).
+
+GAIA provides the usual facilities of image display tools -- display,
+pan, zoom, colour table manipulations -- plus a comprehensive set of
+more astronomically useful ones such as aperture & optimal photometry,
+contouring, source detection, surface photometry, arbitrary region
+analysis, celestial coordinate readout, calibration and modification,
+grid overlays, blink comparison, defect patching and the ability to
+query on-line (WWW) catalogue for catalogues and images.
+
+To get started look at the main document SUN/214 (Starlink User Note
+214), which should be part of the release. Try the command:
+
+   % showme sun214
+
+Or alternatively look for the "sun214.htx" directory and load the
+"sun214.html" file into a HTML browser. GAIA has an on-line help
+system which should be consulted next.
+
+If you have any comments, bug reports etc. about GAIA then email
+"GAIA support" at:
+
+   gaia@star.rl.ac.uk
+
+Releases of GAIA should be found at the "Starlink Software Store":
+
+   http://www.starlink.ac.uk/store/store.html
+
+or can be obtained on a Starlink CDROM release, also available from
+the Starlink web site. Source code for GAIA should be also available
+at that site, or contact GAIA support.
+
+Note that GAIA and SkyCat are free software under the terms of the GNU
+General Public License. See the files GAIA_CONDITIONS and COPYING for
+further details.
+
+Peter W. Draper (p.w.draper@durham.ac.uk) 6th May 2003.
+
+(1) http://www.starlink.ac.uk/
+(2) http://www.starlink.ac.uk/gaia/
+(3) http://archive.eso.org/skycat/
+(4) http://www.eso.org/vlt/
+(5) http://www.eso.org/

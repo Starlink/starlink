@@ -529,7 +529,12 @@ HYPERTEXT_DOCS = sun214.htx
 #  List of documentation files.
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
-                $(PKG_NAME).news $(HYPERTEXT_HELP:.htx=.htx_tar)
+                $(PKG_NAME).news $(HYPERTEXT_HELP:.htx=.htx_tar) \
+		$(LICENCE)
+
+#  Conditions of use files.
+
+LICENCE = COPYING README TODO $(PACK_NAME)_CONDITIONS
 
 #  List of files that should be created and copied into the runtime
 #  directory for a sucessful build of GAIA.

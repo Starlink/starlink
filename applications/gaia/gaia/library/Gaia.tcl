@@ -447,7 +447,7 @@ itcl::class gaia::Gaia {
       add_menuitem $m.print command "Ramp..." \
          {Print annotated postscript copy of colour ramp to file or printer} \
          -command [code $this print_ramp_]
-      
+
       bind $w_  <Control-n> [code $this clone]
       bind $w_  <Control-q> [code $this quit]
 
@@ -1058,7 +1058,7 @@ itcl::class gaia::Gaia {
 
          #  Failed so remove the command (only way to trap this).
          $image_ configure -real_time_command {}
-      }   
+      }
    }
 
    #  Image has been cleared so reset any toolboxes that require it
@@ -1327,17 +1327,15 @@ itcl::class gaia::Gaia {
          set config_file [utilGetConfigFilename .skycat skycat.cfg]
          if {[file exists $config_file]} {
             set env(CATLIB_CONFIG) "file:$config_file"
+            check_config_file_ $config_file
          } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
             set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
          } else {
-            #  No config file, so use GAIA version.
-            if { [file exists $gaia_dir/skycat2.0.cfg] } {
-               file copy $gaia_dir/skycat2.0.cfg $config_file
-               set env(CATLIB_CONFIG) "file:$config_file"
-            }
+            copy_default_config_file_ $config_file
+            set env(CATLIB_CONFIG) "file:$config_file"
          }
       }
-      
+
       #  Initialise any proxy server.
       cat::AstroCat::check_proxies
 
@@ -1356,6 +1354,81 @@ itcl::class gaia::Gaia {
 
       #  Start the application
       util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"
+   }
+
+   #  Copy the default config file to another file. If the target file
+   #  already exists a backup copy is made.
+   protected proc copy_default_config_file_ { config_file } {
+      global ::gaia_dir
+      if { [file exists $gaia_dir/skycat2.0.cfg] } {
+         set backupname ""
+         set today ""
+         if { [file exists $config_file] } {
+            set today [clock format [clock seconds] -format "%d-%b-%Y"]
+            set backupname ${config_file}_${today}
+            file copy -force $config_file ${backupname}
+         }
+         file copy -force $gaia_dir/skycat2.0.cfg $config_file
+
+         #  Make a directory entry that access the old configs.
+         if { $backupname != "" } {
+            ::astrocat tmpcat
+            tmpcat load ${backupname} "Configuration of $today"
+            ::cat::CatalogInfo::save {} {}
+            destroy tmpcat
+         }
+      }
+   }
+
+   #  If user has a local config file then this may need to be updated
+   #  from time to time as features are added to the default file.
+   #  The match string should be set to something new in the
+   #  default file.
+   protected proc check_config_file_ { config_file } {
+      set newmatch "*2MASS*"
+
+      #  Search the file for the string match.
+      set ok 0
+      set fileid [::open $config_file "r"]
+      while { [gets $fileid line] >= 0 } {
+         if { [string match $newmatch $line] } {
+            set ok 1
+            break;
+         }
+      }
+      close $fileid
+      if { !$ok } {
+         set msg \
+"Your local catalogue configuration file '$config_file'
+is out of date. Do you want to update it?"
+         set choice [choice_dialog $msg {OK Details Cancel} {OK}]
+
+         if { $choice == "Details" } {
+            set detailsmsg \
+"The local catalogue configuration file '$config_file'
+contains a description of catalogues that are shown in the
+Data-Servers menus. It appears that this file is now out of date with
+respect to the system default version (which may contain new
+catalogues and image servers) and you should probably allow it to be
+updated.
+When you open local catalogues of your own, or have ones created for
+you locally (the object detection toolbox does this), or apply
+configuration changes (such as changing the colour of the overlay
+markers) these preferences are recorded in this configuration
+file. Since you may not want to loose these changes a copy of your
+existing configuration file will be made (stamped with todays date)
+and added as a directory to the list of catalogue directories before
+applying the update. Using the \"Browse Catalog Directories...\"
+window gives you access to this."
+            info_dialog $detailsmsg
+
+            # After details re-choose.
+            set choice [choice_dialog $msg {OK Cancel} {OK}]
+         }
+         if { $choice == "OK" } {
+            copy_default_config_file_ $config_file
+         }
+      }
    }
 
    #  Set up the STARLINK environment based on the given
@@ -1455,8 +1528,8 @@ itcl::class gaia::Gaia {
       return [[$image_ get_image] urlget $itk_option(-eso_config_file)]
    }
 
-   #  Attempt to load ESO config file is completed. If succeeded in
-   #  contact them overwrite the local ~/.skycat/skycat.cfg file and
+   #  Invoked an attempt to load ESO config file is completed. If
+   #  successful overwrite the local ~/.skycat/skycat.cfg file and
    #  force a local reload.
    protected method loaded_eso_config_ {status msg} {
       blt::busy release $w_
@@ -1513,7 +1586,7 @@ itcl::class gaia::Gaia {
 
          #  Wait for import to complete and get the catalogue name.
          lassign [$importer_ activate] outfile
-         if { $outfile != {} && [file exists $outfile] } { 
+         if { $outfile != {} && [file exists $outfile] } {
             cat::AstroCat::open_catalog_window \
                $outfile \
                [code $image_] \
