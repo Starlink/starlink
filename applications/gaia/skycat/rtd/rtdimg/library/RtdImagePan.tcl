@@ -10,6 +10,8 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 95  Created
+# Peter W. Draper 15 Feb 01  Changed notify_cmd method to deal with
+#                            very narrow images (spectra).
 itk::usual RtdImagePan {}
 
 # This widget displays a "view" of another RtdImage widget at a
@@ -167,24 +169,31 @@ itcl::class rtd::RtdImagePan {
     }
 
     
-    
     # this method is called when the user moves or resizes the panning rect.
     # op is set to "resize" or "move" (resize not currently supported)
+    # PWD: changed to deal with very narrow images (i.e. spectra).
 
     public method notify_cmd {op} {
-	if {$panImageWidth_ == 0} {
-	    return
-	}
-	lassign [$canvas_ coords $panner_] x1 y1 x2 y2
-	if {"$op" == "move" && $panImageWidth_>2 && $panImageHeight_>2} {
-	    $target_canvas_ xview moveto [expr $x1/($panImageWidth_-1)]
-	    $target_canvas_ yview moveto [expr $y1/($panImageHeight_-1)]
-	    $target_image_ pan update
-	    $itk_option(-target_image) maybe_center
-	} 
-	return 0
+       if {$panImageWidth_ == 0 && $panImageHeight_ == 0} {
+          return
+       }
+       lassign [$canvas_ coords $panner_] x1 y1 x2 y2
+       if {"$op" == "move" } {
+          if {$panImageWidth_ > 1} {
+             $target_canvas_ xview moveto [expr $x1/($panImageWidth_-1)]
+          } else {
+             $target_canvas_ xview moveto $x1
+          }
+          if { $panImageHeight_ > 1 } {
+             $target_canvas_ yview moveto [expr $y1/($panImageHeight_-1)]
+          } else {
+             $target_canvas_ yview moveto $y1
+          }
+          $target_image_ pan update
+          $itk_option(-target_image) maybe_center
+       }
+       return 0
     }
-
 
     # draw an ra,dec compass indicating N and E by following lines along ra and dec
     # near the center of the image
