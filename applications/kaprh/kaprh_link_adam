@@ -34,11 +34,14 @@
 
 #  Authors:
 #     DSB:  David S. Berry (STARLINK)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
-#     33-MAY-2001 3 (DSB):
+#     23-MAY-2001 (DSB):
 #        Original version.
+#     28-JUL-2004 (TIMJ):
+#        Add SHL
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -53,7 +56,7 @@
            `ndf_link_adam` \
            `agi_link_adam` `fio_link_adam` `ref_link_adam` \
            `ard_link_adam` `grp_link_adam` `trn_link_adam` \
-           `prm_link_adam` `hlp_link` `mag_link_adam` \
+           `prm_link_adam` `shl_link_adam` `mag_link_adam` \
            `sla_link` `psx_link_adam` `pda_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

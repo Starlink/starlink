@@ -36,6 +36,7 @@
 #     MJC:  Malcolm J. Currie (STARLINK)
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -53,6 +54,8 @@
 #        no graphics), and CAT.
 #     11-JUL-2001 (DSB):
 #        Replace most of the library list with `kaplibs_link_adam`.
+#     28-JUL-2004 (TIMJ):
+#        Add SHL
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -85,6 +88,7 @@
 
 #  Echo the link list.
       echo `ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
+           `shl_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
