@@ -82,7 +82,7 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_construct_out.f sculib_get_filename.f sculib_par_get.f \
 	sculib_apparent_2_mp.f sculib_scan_2_rd.f sculib_add_chop.f \
 	sculib_fix_scan_v10.f sculib_gauss_wtinit.f sculib_skydip_var.f \
-	sculib_noise_mean.f 
+	sculib_noise_mean.f sculib_find_int.f
 
 FCPPSOURCES = sculib_skydip_temperatures.F sculib_bessel_wtinit.F 
 
@@ -316,6 +316,6 @@ sculib_wtfn_regrid_2.o: PRM_PAR SAE_PAR
 sculib_wtfn_regrid_3.o: PRM_PAR SAE_PAR
 sculib_bessel_wtinit.o: SAE_PAR
 sculib_skydip_temperatures.o: SAE_PAR
-
+sculib_find_int.o: SAE_PAR
 
 
