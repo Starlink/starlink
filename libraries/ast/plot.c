@@ -7270,8 +7270,9 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
       if( gaps[ j ] <= 0.0 ){
          gaps[ j ] = ( ptr2[ j ][ ngood[ j ] - 1 ] - ptr2[ j ][ 0 ] )/MAJTICKS_OPT;;
          if( gaps[ j ] <= 0.0 ){
-            astError( AST__VSMAL, "%s(%s): The range of axis values "
-                      "covered by the plot is too small.", method, class );
+            astError( AST__VSMAL, "%s(%s): The range of coordinate values "
+                      "covered by axis %d is too small to plot.", method, 
+                      class, j + 1 );
          }
 
       }
