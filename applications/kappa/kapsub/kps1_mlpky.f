@@ -99,6 +99,7 @@
       CHARACTER LINE*(LINELN)    ! Text string
       CHARACTER TEXT*255         ! Text string
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
+      INTEGER BG                 ! Original text background colour
       INTEGER I                  ! loop counter
       INTEGER IAT                ! Line break position
       INTEGER NLAB               ! No. of supplied labels
@@ -128,6 +129,11 @@
 
 *  Get the current PGPLOT character heights in world coordinates.
       CALL PGQCS( 4, XCH, HGT )
+
+*  Save the current PGPLOT background colour for text, and indicate that
+*  the background should be cleared before writing the text.
+      CALL PGQTBG( BG )
+      CALL PGSTBG( 0 )
 
 *  Set the default character height. This will be over-ridden if an 
 *  explicit character height has been set in the supplied Plot. HGT
@@ -253,6 +259,9 @@
          END IF
 
       END DO
+
+*  Re-instate the original PGPLOT background colour for text.
+      CALL PGSTBG( BG )
 
 *  Flush the output.
       CALL PGUPDT

@@ -734,7 +734,7 @@
 *  If so, see how large a gap is required between the DATA picture and
 *  the key. This replaces the MARGIN value for the right hand edge.
       IF( KEY ) THEN
-         CALL PAR_GDR0R( 'KEYPOS', 0.0, 0.0, 0.99 - MARGIN( 4 ) - KW, 
+         CALL PAR_GDR0R( 'KEYPOS', 0.0, -1.0, 0.99 - MARGIN( 4 ) - KW, 
      :                   .FALSE., KEYPOS, STATUS )
          IF( KEYPOS( 1 ) .GE. 0.0 ) THEN
             MARGIN( 2 ) = KEYPOS( 1 )
