@@ -1,0 +1,4 @@
+byname,b,h,n,,,"Clear parameters by specific name"
+logto,s,q,"Both",,,"Write log to (Logfile,Terminal,Neither,Both) [G]"
+logfile,s,q,"CCDPACK.LOG",,,"Name of CCDPACK logfile [G]"
+names,s,a,,,,"Parameter names"

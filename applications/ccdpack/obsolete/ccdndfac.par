@@ -1,0 +1,6 @@
+namelist,s,h,"CCDNDFAC.LIS",,,"Name of output file for NDF namelist"
+echo,b,h,y,,,"Echo NDF names to user"
+maxndf,i,h,INDEF,,,"Maximum number of NDFs to access"
+in,s,a,INDEF,,,"List of NDFs"
+logto,s,q,"Both",,,"Write log to (Logfile,Terminal,Neither,Both) [G]"
+logfile,s,q,"CCDPACK.LOG",,,"Logfile name [G]"

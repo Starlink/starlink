@@ -1,0 +1,14 @@
+conserve,b,h,y,,,"Conserve flux?"
+in,s,a,,,,"List of NDFs"
+out,s,a,,,,"Output NDF"
+method,s,h,"Nearest",,,"Re-sampling method"
+shape,s,h,"AUTO",,,"Method used to get bounds of output NDFs"
+inext,b,h,y,,,"Locate transform structure in NDF extensions"
+lbound,struct,h,,,,"Lower bounds of the output NDFs"
+INDEF
+ubound,struct,h,,,,"Upper bounds of the output NDFs"
+INDEF
+transform,f,a,,,,"Transformation structure"
+logto,s,q,"Both",,,"Write log to (Logfile,Terminal,Neither,Both) [G]"
+logfile,s,q,"CCDPACK.LOG",,,"Logfile name [G]"
+title,s,h,"Output from TRANNDF",,,"Title for the output NDFs"
