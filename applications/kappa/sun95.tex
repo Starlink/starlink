@@ -3824,6 +3824,85 @@ may be synonyms recognised by other other applications.} So if you set a
 value for an attribute and it seems to have no effect, it may be worth
 checking that you have used the correct spelling for the attribute name.
 
+\subsection{\xlabel{se_escseq}Graphical Escape Sequences\label{se:escseq}}
+
+Strings used for axis labels, plot titles, {\it etc}, can include special
+``escape sequences'' which control the appearance of subsequent text when
+the string is drawn as part of a plot.\footnote{When displayed in a
+non-graphical environment (for instance, on an alpha-numeric terminal)
+the characters forming an escape sequence are stripped out of the string
+before the string is displayed.} Escape sequences are introduced using a
+percent character. Any unrecognised, illegal or incomplete escape
+sequences are printed literally. The following escape sequences are
+currently recognised (``...'' represents a string of one or more decimal
+digits):
+\begin{description}
+\item[\%\%] - Print a literal ``\%'' character.
+
+\item[\%$^...+$]  - Draw subsequent characters as super-scripts. The digits
+           ``...'' give the distance from the base-line of ``normal'' 
+           text to the base-line of the super-script text, scaled 
+           so that a value of ``100'' corresponds to the height of 
+           ``normal'' text.
+\item[\%$^+$]     - Draw subsequent characters with the normal base-line.
+
+\item[\%$v...+$]  - Draw subsequent characters as sub-scripts. The digits
+           ``...'' give the distance from the base-line of ``normal'' 
+           text to the base-line of the sub-script text, scaled 
+           so that a value of ``100'' corresponds to the height of 
+           ``normal'' text.
+
+\item[\%$v+$]  - Draw subsequent characters with the normal base-line
+           (equivalent to \%$^+$).
+
+\item[\%$>...+$]  - Leave a gap before drawing subsequent characters.
+           The digits ``...'' give the size of the gap, scaled 
+           so that a value of ``100'' corresponds to the height of 
+           ``normal'' text.
+
+\item[\%$<...+$]  - Move backwards before drawing subsequent characters.
+           The digits ``...'' give the size of the movement, scaled 
+           so that a value of ``100'' corresponds to the height of 
+           ``normal'' text.
+
+\item[\%$s...+$]  - Change the Size attribute for subsequent characters. The
+           digits ``...'' give the new Size as a fraction of the 
+           ``normal'' Size, scaled so that a value of ``100'' corresponds 
+           to 1.0;
+
+\item[\%$s+$]  - Reset the Size attribute to its ``normal'' value.
+
+\item[\%$w...+$]  - Change the Width attribute for subsequent characters. The
+           digits ``...'' give the new width as a fraction of the 
+           ``normal'' Width, scaled so that a value of ``100'' corresponds 
+           to 1.0;
+
+\item[\%$w+$]     - Reset the Wize attribute to its ``normal'' value.
+
+\item[\%$f...+$]  - Change the Font attribute for subsequent characters. The
+           digits ``...'' give the new Font value.
+
+\item[\%$f+$] - Reset the Font attribute to its ``normal'' value.
+
+\item[\%$c...+$]  - Change the Colour attribute for subsequent characters. The
+           digits ``...'' give the new Colour value.
+
+\item[\%$c+$]  - Reset the Colour attribute to its ``normal'' value.
+
+\item[\%$t...+$]  - Change the Style attribute for subsequent characters. The
+           digits ``...'' give the new Style value.
+
+\item[\%$t+$]  - Reset the Style attribute to its ``normal'' value.
+
+\item[\%$-$]  - Push the current graphics attribute values onto the top of 
+           the stack (see ``\%+'').
+
+\item[\%$+$]  - Pop attributes values of the top the stack (see ``\%-''). If
+           the stack is empty, ``normal'' attribute values are restored.
+\end{description}
+
+PGPLOT escape sequences may also be included in strings which are to be drawn.
+
 \subsection{Descriptions of Plotting Attributes}
 
 This section lists the available plotting attributes. Note, the default
@@ -7827,6 +7906,11 @@ could say:
          \sstitem
          ``{\tt l}'': Use a letter (``{\tt h}''/``{\tt d}'', ``{\tt m}'' or ``{\tt s}'' as appropriate) to
          separate fields.
+
+         \sstitem
+         ``{\tt g}'': This is the same as ``l'', except that the
+         separator characters are displayed as small super-scripts when drawn
+         on a graphical device.
 
          \sstitem
          ``{\tt d}'': Include a degrees field. Expressing the angle purely in
@@ -24937,8 +25021,9 @@ plot (6k).
    \sstdescription{
       This application creates a plot of array value against position for
       a 1-dimensional NDF. The vertical axis of the plot represents array
-      value (or the logarithm of the array value - see parameter YLOG),
-      and the horizontal axis represents position.
+      value, and the horizontal axis represents position. These can be
+      mapped in various ways onto the screen (\emph{e.g.} linearly, logarithmically,
+      \emph{etc}, see parameters XMAP and YMAP).
 
       The plot may take several different forms such as a {\tt "}join-the-dots{\tt "}
       plot, a {\tt "}staircase{\tt "} plot, a {\tt "}chain{\tt "} plot, \emph{etc}, (see parameter MODE).
@@ -25000,35 +25085,34 @@ plot (6k).
          TRUE if labelled and annotated axes are to be drawn around the
          plot. If a null (!) value is supplied, the value used is FALSE if
          the plot is being aligned with an existing plot (see parameter
-         ALIGN), and TRUE otherwise. Parameters USEAXIS and YLOG determine
-         the quantities used to annotated the horizontal and vertical axes
-         respectively. The width of the margins left for the annotation
-         may be controlled using parameter MARGIN. The appearance of the
-         axes (colours, fonts, \emph{etc}) can be controlled using the parameter
-         STYLE. {\tt [!]}
+         ALIGN), and TRUE otherwise. Parameter USEAXIS determines the
+         quantity used to annotated the horizontal axis. The width of the
+         margins left for the annotation may be controlled using parameter
+         MARGIN. The appearance of the axes (colours, fonts, \emph{etc}) can be
+         controlled using the parameter STYLE. {\tt [!]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
       }{
-         If TRUE the current picture is cleared before the plot is 
-         drawn. If CLEAR is FALSE not only is the existing plot retained, 
-         but also the previous plot can be used to specify the axis 
-         limits (see parameter ALIGN). Thus you can generate a composite 
-         plot within a single set of axes, say using different colours or 
+         If TRUE the current picture is cleared before the plot is
+         drawn. If CLEAR is FALSE not only is the existing plot retained,
+         but also the previous plot can be used to specify the axis
+         limits (see parameter ALIGN). Thus you can generate a composite
+         plot within a single set of axes, say using different colours or
          modes to distinguish data from different datasets. Note,
          alignment between the two plots is controlled by the AlignSystem
          attribute of the data being displayed. For instance, if you have
          an existing plot showing a spectrum plotted against radio
-         velocity and you overlay another spectrum, also in radio velocity 
-         but with a different rest frequency, the appearance of the final 
-         plot will depend on the value of the AlignSystem attribute of the 
+         velocity and you overlay another spectrum, also in radio velocity
+         but with a different rest frequency, the appearance of the final
+         plot will depend on the value of the AlignSystem attribute of the
          second spectrum. If AlignSystem is {\tt "}Wavelen{\tt "} (this is the default)
-         then the two spectra will be aligned in wavelength, but if 
+         then the two spectra will be aligned in wavelength, but if
          AlignSystem is {\tt "}vrad{\tt "} they will be aligned in radio velocity.
          There will be no difference in effect between these two forms of
          alignment unless the rest frequency is different in the two
          spectra. Likewise, the AlignStdOfRest attribute of the second
-         spectrum controlls the standard of rest in which alignment occurs.
+         spectrum control{\tt '}s the standard of rest in which alignment occurs.
          These attributes (like all other attributes) may be examined and
          modified using WCSATTRIB.
       }
@@ -25040,7 +25124,7 @@ plot (6k).
          {\tt "}Variance{\tt "} and causes the square root of the variance values
          to be displayed).  If {\tt "}Quality{\tt "} is specified, then the quality
          values are treated as numerical values (in the range 0 to
-         255). {\tt ["Data"]}
+         255). {\tt [Data]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
@@ -25055,8 +25139,7 @@ plot (6k).
          depending on what is available in the supplied dataset.  The
          parameter SHAPE controls the appearance of the error bars, and
          XSIGMA and YSIGMA control their lengths. The ERRBAR parameter is
-         ignored unless the parameter COMP is set to {\tt "}Data{\tt "}. 
-         {\tt [FALSE]}
+         ignored unless the parameter COMP is set to {\tt "}Data{\tt "}. {\tt [FALSE]}
       }
       \sstsubsection{
          FREQ = \_INTEGER (Read)
@@ -25140,7 +25223,9 @@ plot (6k).
             for YTOP is set to the maximum data value plus 5\% of the data range.
             If only one value is supplied, the second value defaults to the
             supplied value. If no values are supplied, both values default to
-            {\tt "}2.5{\tt "}.
+            {\tt "}2.5{\tt "}. Care should be taken with this mode if YMAP is set to {\tt "}Log{\tt "}
+            since the extension to the data range caused by this mode may result
+            in the axis encompassing the value zero.
 
             \sstitem
             {\tt "}Percentile{\tt "} -- The default values for YBOT and YTOP are set to
@@ -25165,8 +25250,7 @@ plot (6k).
 
          }
          The method name can be abbreviated to a single character, and is
-         case insensitive. The initial value is {\tt "}Extended{\tt "}. 
-         {\tt [current value]}
+         case insensitive. The initial value is {\tt "}Extended{\tt "}. {\tt [current value]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -25328,6 +25412,40 @@ plot (6k).
          parameter ALIGN. {\tt [!]}
       }
       \sstsubsection{
+         XMAP = LITERAL (Read)
+      }{
+         Specifies how the quantity represented by the X axis is mapped
+         onto the screen. The options are:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Pixel{\tt "} -- The mapping is such that pixel index within the
+            input NDF increases linearly across the screen.
+
+            \sstitem
+            {\tt "}Distance{\tt "} -- The mapping is such that distance along the curve
+            within the current WCS Frame of the input NDF increases linearly
+            across the screen.
+
+            \sstitem
+            {\tt "}Log{\tt "} -- The mapping is such that the logarithm (base 10) of
+            the value used to annotate the axis increases linearly across
+            the screen. An error will be reported if the dynamic range of
+            the axis is less than 100, or if the range specified by XLEFT
+            and XRIGHT encompasses the value zero.
+
+            \sstitem
+            {\tt "}Linear{\tt "} -- The mapping is such that the value used to annotate
+            the axis increases linearly across the screen.
+
+            \sstitem
+            {\tt "}Default{\tt "} -- One of {\tt "}Linear{\tt "} or {\tt "}log{\tt "} is chosen automatically,
+            depending on which one produces a more even spread of values on the
+            screen. {\tt [DEFAULT]}
+         }
+      }
+      \sstsubsection{
          XRIGHT = LITERAL (Read)
       }{
          The axis value to place at the right hand end of the horizontal
@@ -25350,18 +25468,41 @@ plot (6k).
       }{
          The axis value to place at the bottom end of the vertical
          axis. If a null (!) value is supplied, the value used is
-         determined by parameter LMODE. The value of LBOT may be
-         greater than or less than the value supplied for YTOP, and
-         should be supplied as a floating point value for the quantity
-         specified by parameter YLOG. See also parameter ALIGN. {\tt [!]}
+         determined by parameter LMODE. The value of YBOT may be
+         greater than or less than the value supplied for YTOP. If
+         parameter YMAP is set to {\tt "}ValueLog{\tt "}, then the supplied value
+         should be the logarithm (base 10) of the bottom data value.
+         See also parameter ALIGN. {\tt [!]}
       }
       \sstsubsection{
-         YLOG = \_LOGICAL (Read)
+         YMAP = LITERAL (Read)
       }{
-         TRUE if the value displayed on the vertical axis is to be the
-         logarithm of the supplied data values. If TRUE, then the values
-         supplied for parameters YTOP and YBOT should be values for the
-         logarithm of the data value, not the data value itself. {\tt [FALSE]}
+         Specifies how the quantity represented by the Y axis is mapped
+         onto the screen. The options are:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Linear{\tt "} -- The data values are mapped linearly onto the
+            screen.
+
+            \sstitem
+            {\tt "}Log{\tt "} -- The data values are logged logarithmically onto the
+            screen. An error will be reported if the dynamic range of
+            the axis is less than 100, or if the range specified by YTOP and
+            YBOT encompasses the value zero. For this reason, care should
+            be taken over the choice of value for parameter LMODE, since
+            some choices could result in the Y range being extended so far
+            that it encompasses zero.
+
+            \sstitem
+            {\tt "}ValueLog{\tt "} -- This is similar to {\tt "}Log{\tt "} except that, instead
+            of mapping the data values logarithmically onto the screen,
+            this option maps the log (base 10) of the data values linearly
+            onto the screen. If this option is selected, the values supplied
+            for parameters YTOP and YBOT should be values for the logarithm of
+            the data value, not the data value itself. {\tt [Linear]}
+         }
       }
       \sstsubsection{
          YSIGMA = LITERAL (Read)
@@ -25376,9 +25517,10 @@ plot (6k).
          The axis value to place at the top end of the vertical
          axis. If a null (!) value is supplied, the value used is
          determined by parameter LMODE. The value of LTOP may be
-         greater than or less than the value supplied for YBOT, and
-         should be supplied as a floating point value for the quantity
-         specified by parameter YLOG. See also parameter ALIGN. {\tt [!]}
+         greater than or less than the value supplied for YBOT. If
+         parameter YMAP is set to {\tt "}ValueLog{\tt "}, then the supplied value
+         should be the logarithm (base 10) of the bottom data value.
+         See also parameter ALIGN. {\tt [!]}
       }
    }
    \sstexamples{
@@ -25421,14 +25563,14 @@ plot (6k).
          co-ordinate Frame in the NDF has an axis with symbol {\tt "}dec{\tt "}.
       }
       \sstexamplesubsection{
-         linplot prof useaxis=2 ybot=1.0 ytop=3.0 ylog
+         linplot prof useaxis=2 ybot=10 ytop=1000.0 ymap=log xmap=log
       }{
-         This plots the logarithm (base 10) of the data values in the
-         entire 1-dimensional NDF called prof, against the value described
-         by the second axis in the current co-ordinate Frame of the NDF.
-         The bottom of the vertical axis corresponds to a data value of
-         10.0 and the top corresponds to a data value of 1000.0 (10 to
-         the power 3.0).
+         This plots the data values in the entire 1-dimensional NDF called
+         prof, against the value described by the second axis in the current
+         co-ordinate Frame of the NDF. The values represented by both
+         axes are mapped logarithmically onto the screen. The bottom of the
+         vertical axis corresponds to a data value of 10.0 and the top
+         corresponds to a data value of 1000.0.
       }
       \sstexamplesubsection{
          linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d style=$\wedge$my\_sty
@@ -47030,6 +47172,23 @@ The following applications have been modified:
 
 \section{\xlabel{se_changes}Release Notes---V1.2\label{se:changes}}
 
+\begin{itemize}
+
+\item The graphics system now supports the use of graphical escape sequences
+to control the attributes (placement, size, colour, etc) of sub-strings 
+within labels or titles. See 
+\hyperref{``Graphical Escape Sequences''}{section }{}{se:escseq}
+for more information.
+
+\item Celestial positions can now be formatted so that the sub-fields are
+separated by appropriate small super-script characters  (``h'', ``m'', ``s'', 
+etc) when included within a plot. This facility is controlled by the
+new ``g'' option within the Format attribute of the relevant axis (see
+\hyperref{``Using World Co-ordinate Systems''}{section }{}{se:wcsuse}).
+
+\end{itemize}
+
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -47058,6 +47217,16 @@ The following applications have been modified:
 	       less than 300 input values, the output variance is
 	       calculated as before using the order statistics
 	       variance-covariance array.
+      \end{itemize}
+
+   \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
+      \begin{itemize}
+         \item New parameters XMAP and YMAP have been added to control
+               the mapping of each axis onto the screen. These can, for
+               instance, produce logarithmic axes.
+         \item The YLOG parameter has been removed. Using a value of
+               ``ValueLog'' for parameter YMAP eill produce the same
+               effect as setting YLOG to TRUE.
       \end{itemize}
 
 \end{description}
