@@ -249,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.75  2002/09/18 22:04:01  timj
+*     BOLREBIN had an uninitialised pointer.
+*
 *     Revision 1.74  2000/05/11 19:57:45  timj
 *     Add SFACTOR to documentation header
 *
@@ -1870,6 +1873,7 @@ c
                      ABOL_VAR_END(I) = 0
                      ABOL_RA_PTR(I) = 0
                      ABOL_RA_END(I) = 0
+                     ABOL_DEC_PTR(I) = 0
                      ABOL_DEC_END(I) = 0
                   END IF
 

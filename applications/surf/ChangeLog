@@ -1,3 +1,8 @@
+2002-09-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_rebin.f (SURF_REBIN): bolrebin has a problem on linux
+	with unnintialised pointer.
+
 2002-09-15  Tim Jenness  <timj@jach.hawaii.edu>
 
 	************** V1.6-9 ******************
