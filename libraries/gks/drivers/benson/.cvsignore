@@ -1,3 +1,7 @@
+stamp-h1
+.deps
+.libs
+*.lo
 *.la
 Makefile
 Makefile.in
