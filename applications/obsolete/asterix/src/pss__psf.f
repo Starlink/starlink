@@ -279,7 +279,13 @@
         NIPOS = 1
       ELSE
         NIPOS = 3
-        MAXOFF = 1.0*MATH__DTOR
+
+*    Is psf field width hint available? If not use 1.5 degrees
+        CALL PSF_QHINT( PSF_HAN, PSF_H_FLDSIZ, HOK, MAXOFF, STATUS )
+        IF ( .NOT. HOK ) THEN
+          MAXOFF = 1.5*MATH__DTOR
+        END IF
+
       END IF
 
 *    Use centre of f.o.v
@@ -290,7 +296,7 @@
       DO IPOS = 1, NIPOS
 
 *      Choose image position
-        X0 = MAXOFF*FLOAT(IPOS-1)*0.5
+        X0 = MAXOFF*FLOAT(IPOS-1)/REAL(NIPOS)
         PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
 
 *      Get profile
