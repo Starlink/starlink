@@ -138,65 +138,70 @@ string Util::runCommandPipe (string cmd, string envs, int *statusp)
  	string defenvs = "PATH HOME LOGNAME SHELL TMPDIR";
 	string_list envlist;
 	if (envs == "") {
-	    envlist = tokenise_string(defenvs);
-	} else {
-	    STD::map<string,string> env;
-	    for (string_list e = tokenise_string(envs);
-		 ! e.empty();
-		 e.pop_front()) {
-		if (e.front() == "+") {
-		    e.pop_front(); // the "+"
-		    string_list de = tokenise_string(defenvs);
-		    while (! de.empty()) {
-			e.push_front(de.front());
-			de.pop_front();
-		    }
-		    cerr << "Added: now";
-		    for (string_list::const_iterator ci = e.begin();
-			 ci != e.end();
-			 ci++) {
-			cerr << " " << *ci;
-		    }
-		    cerr << endl;
-		} 
-		string& s = e.front();
-		int si = s.find('=');
-		if (si == string::npos) {
-		    // no setting found
-		    char *envval = getenv(s.c_str());
-		    if (envval != 0) {
-			cerr << "set [" << s << "]=" << envval << endl;
-			env[s] = envval;
-		    }
-		} else {
-		    // value found
-		    env[s.substr(0,si)] = s.substr(si+1);
-		    cerr << "substr: [" << s.substr(0,si) << "]=" << s.substr(si+1) << endl;
-		}
-	    }
-	    for (STD::map<string,string>::const_iterator mi = env.begin();
-		 mi != env.end();
-		 mi++) {
-		string v = mi->first;
-		v.append("=");
-		v.append(mi->second);
-		envlist.push_back(v);
-	    }
+            envs = "+";         // triggers processing below
 	}
-	
-	for (string_list::const_iterator si = envlist.begin();
-	     si != envlist.end();
-	     si++) {
-	    cerr << "envlist: " << *si << endl;
-	}
+        STD::map<string,string> env;
+        for (string_list e = tokenise_string(envs);
+             ! e.empty();
+             e.pop_front()) {
+            if (e.front() == "+") {
+                e.pop_front(); // the "+"
+                string_list de = tokenise_string(defenvs);
+                while (! de.empty()) {
+                    e.push_front(de.front());
+                    de.pop_front();
+                }
+                if (verbosity_ > normal) {
+                    cerr << "Added: now";
+                    for (string_list::const_iterator ci = e.begin();
+                         ci != e.end();
+                         ci++) {
+                        cerr << " " << *ci;
+                    }
+                    cerr << endl;
+                }
+            } 
+            string& s = e.front();
+            int si = s.find('=');
+            if (si == string::npos) {
+                // no setting found
+                char *envval = getenv(s.c_str());
+                if (envval != 0) {
+                    //cerr << "set [" << s << "]=" << envval << endl;
+                    env[s] = envval;
+                }
+            } else {
+                // value found
+                env[s.substr(0,si)] = s.substr(si+1);
+                //cerr << "substr: [" << s.substr(0,si) << "]=" << s.substr(si+1) << endl;
+            }
+        }
+        for (STD::map<string,string>::const_iterator mi = env.begin();
+             mi != env.end();
+             mi++) {
+            string v = mi->first;
+            v.append("=");
+            v.append(mi->second);
+            envlist.push_back(v);
+        }
+
+	if (verbosity_ > normal) {
+            cerr << "Final envlist:";
+            for (string_list::const_iterator si = envlist.begin();
+                 si != envlist.end();
+                 si++) {
+                cerr << "  " << *si << endl;
+            }
+        }
 
 	char **envp = string_list_to_array(envlist);
 
 	execve(argv[0], argv, envp);
 
 	// This is an error
-	cerr << "Error executing " << argv[0]
-	     << ": " << strerror(errno) << endl;
+        if (verbosity_ > normal)
+            cerr << "Error executing " << argv[0]
+                 << ": " << strerror(errno) << endl;
 
 	exit(EXIT_FAILURE);
 
