@@ -132,7 +132,7 @@ sub error;
 
 $tmpdir = $scbindex_tmpdir;
 rmrf $tmpdir;
-system ("mkdir", "-p", $tmpdir) and error "Failed to create $tmpdir: $!\n";
+mkdirp $tmpdir, 0755;
 
 #  Set up signal handler.  Note this is not entirely safe since tidyup
 #  does non-trivial work and so (probably) calls some non-reentrant 

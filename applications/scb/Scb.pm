@@ -56,7 +56,7 @@ require Exporter;
 
 #  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf popd pushd starpack rmrf parsetag
+@EXPORT = qw/tarxf mkdirp popd pushd starpack rmrf parsetag
              $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
              $mimetypes_file
              $htxserver
@@ -276,6 +276,82 @@ sub tarxf {
    else {
       return undef;
    }
+}
+
+
+########################################################################
+sub mkdirp {
+
+#+
+#  Name:
+#     mkdirp
+
+#  Purpose:
+#     Make directory and parents if necessary.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     mkdirp ($dir, $mode)
+
+#  Description:
+#     Creates the given directory and, if required, its parents (like
+#     mkdir -p).  Any directories created are given the specified 
+#     access mode.  Directories which already exist are not modified.
+#     The routine exits using the 'error' routine if any of the creations
+#     fails.  The given access mode is not modified by the current umask.
+
+#  Arguments:
+#     $dir = string.
+#        Filename of the directory to be created.
+#     $mode = integer.
+#        Access mode (presumably in octal) for creation of new directories.
+
+#  Return value:
+
+#  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     03-NOV-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($dir, $mode) = @_;
+   $dir .= '/';
+
+#  Change umask so that mode supplied to mkdir is not modified, saving the
+#  old value.
+
+   my $umask = umask 0;
+
+#  Step through directory name a ('/'-delimited) element at a time, creating
+#  any which don't already exist.
+
+   for (my $i = 0; $i >= 0;  $i = index ($dir, '/', $i+1)) {
+      $element = substr $dir, 0, $i;
+      unless (-d $element || $element eq '') {
+         mkdir $element, $mode or error "mkdir $dir: $!";
+      }
+   }
+
+#  Restore old umask.
+
+   umask $umask;
 }
 
 

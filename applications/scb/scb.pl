@@ -1021,8 +1021,7 @@ sub get_module {
 #  Set up scratch directory.
 
    $tmpfiles = 1;
-   system (qw/mkdir -p -m 0777/, $tmpdir)
-      and die "Failed to create $tmpdir: $!\n";
+   mkdirp $tmpdir, 0777;
    pushd $tmpdir;
 
 #  Interpret the first element of the location as a package or symbolic
