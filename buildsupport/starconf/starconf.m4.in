@@ -888,15 +888,17 @@ AC_DEFUN([STAR_CHECK_PROGS],
 # Declare a special install command.  Note that we do not examine the
 # actual command here -- that is done by automake.  All we do is find
 # a way of copying a directory tree, preserving symlinks, as used by
-# the install targets in automake/lib/am/install.am.  Try 'cp -R'
-# then pax, and if both fail, collapse.
-dnl link test is `test -h': more portable than -L, according to autoconf notes
-dnl `cp --no-dereference' is GNU cp: -P gives a compatibility warning
-dnl include broken link in test: OSX 10.2 cp fails to copy these
+# the install targets in automake/lib/am/install.am.  Try 'cp -R' and
+# variants, then pax, and if both fail, collapse.
+dnl Link test is `test -h': more portable than -L, according to autoconf notes.
+dnl `cp --no-dereference' is GNU cp: -P gives a compatibility warning.
+dnl Include broken link in test: some cp fail to copy these (OSX 10.2, Sol9).
+dnl Option -f is probably a good plan, but no failures spotted so far.
+dnl In pax, `-p e' fails with broken links; `-p p' is OK.
 AC_DEFUN([STAR_SPECIAL_INSTALL_COMMAND],
    [AC_REQUIRE([AC_PROG_LN_S])dnl
     AC_PATH_PROG(CP, cp)dnl
-dnl    AC_PATH_PROG(PAX, pax)dnl
+    AC_PATH_PROG(PAX, pax)
     AC_CACHE_CHECK([how to do a recursive directory copy],
                    [star_cv_cp_r],
                    [rm -Rf conftest*
@@ -909,7 +911,7 @@ dnl    AC_PATH_PROG(PAX, pax)dnl
                         star_cv_cp_r="$CP -R"
                     else
                         star_cv_cp_r=
-                        for try in "$CP -R --no-dereference -p -f" "$CP -R -P -p -f" "$CP -R -P -p" "$CP -R -p" "${PAX-false} -r -w -p e"
+                        for try in "$CP -R --no-dereference -p -f" "$CP -R -P -p -f" "$CP -R -P -p" "$CP -R -p" "${PAX-false} -r -w -p p"
                         do
                             rm -Rf conftest-d2/*
                             if (cd conftest-d1; $try . ../conftest-d2 2>/dev/null); then
