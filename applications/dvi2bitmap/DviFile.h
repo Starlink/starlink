@@ -17,8 +17,11 @@
 #include "verbosity.h"
 
 // I think the GCC 2.8.1 stack implementation may be buggy.  
-// Setting this to 1 switches on a home-made version
+// Setting this to 1 switches on a home-made version.
+// This hasn't received _extensive_ testing, but seems to work OK.
+#ifndef HOMEMADE_POSSTATESTACK
 #define HOMEMADE_POSSTATESTACK 0
+#endif
 
 class DviFileEvent;
 class DviFilePreamble;
