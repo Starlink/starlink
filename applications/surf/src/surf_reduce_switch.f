@@ -112,6 +112,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.15  1997/04/24 02:22:35  timj
+*     Add ability to select an individual switch via the SWITCH parameter.
+*
 *     Revision 1.14  1997/04/01 22:46:01  timj
 *     Use SCULIB_GET_DEM_PNTR
 *     Use PKG and TASK for package name.
@@ -258,6 +261,8 @@ c
                                        ! of SCUCD when the observation
                                        ! finished
       CHARACTER*20 STEMP               ! scratch string
+      INTEGER      SWITCH              ! Which switch to use (0,1,2,3) for
+                                       ! Reduce, 1st, 2nd, 3rd
       INTEGER      SWITCHES            ! number of switches implied by
                                        ! SWITCH_MODE
       CHARACTER*15 SWITCH_MODE         ! switch mode used
@@ -566,6 +571,16 @@ c
       CALL PAR_GET0I('SPIKE_LEVEL', SPIKE_LEVEL, STATUS)
       SPIKE_LEVEL = SPIKE_LEVEL * 256
 
+*  Ask which switch we are going to keep
+*     0:  Reduce as normal
+*     1:  Select 1st switch
+*     2:  Select 2nd switch
+*     3:  Select 3rd switch
+
+      SWITCH = 0
+      CALL PAR_DEF0I('SWITCH', 0, STATUS)
+      CALL PAR_GET0I('SWITCH', SWITCH, STATUS)
+
 *  get some scratch memory and copy the different sections of the data array
 *  into it
 
@@ -769,35 +784,107 @@ c
                         BEAM_OFFSET = (BEAM - START_BEAM) * N_POS *
      :                    N_BOLS
 
-                        CALL SCULIB_REDUCE_SWITCH (CHOP_FUNCTION,
-     :                    N_SWITCHES, N_SWITCH_POS * N_BOLS,
-     :                    %val(DEMOD_DATA_PTR + 
-     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_VARIANCE_PTR + 
-     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_QUALITY_PTR + 
-     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBUB),
-     :                    %val(DEMOD_DATA_PTR +
-     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_VARIANCE_PTR + 
-     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_QUALITY_PTR + 
-     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBUB),
-     :                    %val(DEMOD_DATA_PTR + 
-     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_VARIANCE_PTR + 
-     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_QUALITY_PTR + 
-     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBUB),
-     :                    BEAM,
-     :                    %val(OUT_DATA_PTR + (BEAM_OFFSET +
-     :                    (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
-     :                    %val(OUT_VARIANCE_PTR + (BEAM_OFFSET +
-     :                    (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
-     :                    %val(OUT_QUALITY_PTR + (BEAM_OFFSET +
-     :                    (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
-     :                    BEAM_WEIGHT(BEAM),
-     :                    STATUS)
+                        IF (SWITCH .EQ. 0) THEN
+
+                           CALL SCULIB_REDUCE_SWITCH (CHOP_FUNCTION,
+     :                          N_SWITCHES, N_SWITCH_POS * N_BOLS,
+     :                          %val(DEMOD_DATA_PTR + 
+     :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
+     :                          %val(DEMOD_VARIANCE_PTR + 
+     :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
+     :                          %val(DEMOD_QUALITY_PTR + 
+     :                          (SWITCH1_START - 1) * N_BOLS*VAL__NBUB),
+     :                          %val(DEMOD_DATA_PTR +
+     :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBR),
+     :                          %val(DEMOD_VARIANCE_PTR + 
+     :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBR),
+     :                          %val(DEMOD_QUALITY_PTR + 
+     :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBUB),
+     :                          %val(DEMOD_DATA_PTR + 
+     :                          (SWITCH3_START - 1) * N_BOLS* VAL__NBR),
+     :                          %val(DEMOD_VARIANCE_PTR + 
+     :                          (SWITCH3_START - 1) * N_BOLS *VAL__NBR),
+     :                          %val(DEMOD_QUALITY_PTR + 
+     :                          (SWITCH3_START - 1) * N_BOLS*VAL__NBUB),
+     :                          BEAM,
+     :                          %val(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          %val(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          %val(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
+     :                          BEAM_WEIGHT(BEAM),
+     :                          STATUS)
+
+                        ELSE IF (SWITCH .EQ. 1) THEN
+*     Should do this with %LOC
+                           CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
+     :                          %VAL(DEMOD_DATA_PTR + 
+     :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
+     :                          %VAL(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          IERR, NERR, STATUS)
+
+                           CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
+     :                          %VAL(DEMOD_VARIANCE_PTR + 
+     :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
+     :                          %VAL(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          IERR, NERR, STATUS)
+
+                           CALL VEC_UBTOUB(.FALSE., N_SWITCH_POS*N_BOLS,
+     :                          %VAL(DEMOD_QUALITY_PTR + 
+     :                          (SWITCH1_START - 1) * N_BOLS*VAL__NBUB),
+     :                          %VAL(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
+     :                          IERR, NERR, STATUS)
+
+                        ELSE IF (SWITCH .EQ. 2) THEN
+*     Should do this with %LOC
+                           CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
+     :                          %VAL(DEMOD_DATA_PTR + 
+     :                          (SWITCH2_START - 1) * N_BOLS* VAL__NBR),
+     :                          %VAL(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          IERR, NERR, STATUS)
+
+                           CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
+     :                          %VAL(DEMOD_VARIANCE_PTR + 
+     :                          (SWITCH2_START - 1) * N_BOLS* VAL__NBR),
+     :                          %VAL(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          IERR, NERR, STATUS)
+
+                           CALL VEC_UBTOUB(.FALSE., N_SWITCH_POS*N_BOLS,
+     :                          %VAL(DEMOD_QUALITY_PTR + 
+     :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBUB),
+     :                          %VAL(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
+     :                          IERR, NERR, STATUS)
+
+                        ELSE IF (SWITCH .EQ. 3) THEN
+*     Should do this with %LOC
+                           CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
+     :                          %VAL(DEMOD_DATA_PTR + 
+     :                          (SWITCH3_START - 1) * N_BOLS* VAL__NBR),
+     :                          %VAL(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          IERR, NERR, STATUS)
+
+                           CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
+     :                          %VAL(DEMOD_VARIANCE_PTR + 
+     :                          (SWITCH3_START - 1) * N_BOLS* VAL__NBR),
+     :                          %VAL(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                          IERR, NERR, STATUS)
+
+                           CALL VEC_UBTOUB(.FALSE., N_SWITCH_POS*N_BOLS,
+     :                          %VAL(DEMOD_QUALITY_PTR + 
+     :                          (SWITCH3_START - 1) * N_BOLS*VAL__NBUB),
+     :                          %VAL(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
+     :                          IERR, NERR, STATUS)
+                        END IF
                      END DO
 
 *  increment the output offset
