@@ -620,7 +620,7 @@ C  Cosine bell
         REAL RE,RS,RW
         INTEGER I,J,K,L,II,JJ,KK
         INTEGER LM,LM2,LDIM
-        INTEGER NGAP,IGAP,NXT,NGG
+        INTEGER NGAP,IGAP,NGG
         INTEGER DIMS(4)                     ! Dimensions loop
 *-
 
