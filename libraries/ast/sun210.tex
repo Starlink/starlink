@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.4}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {8th June 1999}
+\newcommand{\stardocdate}      {15th June 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -10353,18 +10353,18 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
-   \sstreturnedvalue{
-      \sstsubsection{
-         AST\_CLONE = INTEGER
-      }{
-         A duplicate pointer to the same Object.
-      }
-   }
    \sstapplicability{
       \sstsubsection{
          Object
       }{
          This function applies to all Objects.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_CLONE = INTEGER
+      }{
+         A duplicate pointer to the same Object.
       }
    }
    \sstnotes{
@@ -10653,33 +10653,6 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
-   \sstreturnedvalue{
-      \sstsubsection{
-         AST\_CONVERT = INTEGER
-      }{
-         If the requested coordinate conversion is possible, the
-         function returns a pointer to a FrameSet which describes the
-         conversion. Otherwise, a null \htmlref{Object}{Object} pointer (AST\_\_NULL) is
-         returned without error.
-
-         If a FrameSet is returned, it will contain two Frames. Frame
-         number 1 (its base Frame) will describe the source coordinate
-         system, corresponding to the FROM argument. Frame number 2
-         (its current Frame) will describe the destination coordinate
-         system, corresponding to the TO argument. The Mapping
-         which inter-relates these two Frames will perform the
-         required conversion between their respective coordinate
-         systems.
-
-         Note that a FrameSet may be used both as a Mapping and as a
-         Frame.  If the result is used as a Mapping (e.g. with
-         \htmlref{AST\_TRAN2}{AST_TRAN2}), then it provides a means of converting coordinates
-         from the source to the destination coordinate system (or
-         vice versa if its inverse transformation is selected). If it
-         is used as a Frame, its attributes will describe the
-         destination coordinate system.
-      }
-   }
    \sstapplicability{
       \sstsubsection{
          Frame
@@ -10756,6 +10729,33 @@ Object            - Base class for all AST Objects
          it by specifying its domain in the DOMAINLIST string, or (b)
          making it the base Frame, since this is always considered
          first.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_CONVERT = INTEGER
+      }{
+         If the requested coordinate conversion is possible, the
+         function returns a pointer to a FrameSet which describes the
+         conversion. Otherwise, a null \htmlref{Object}{Object} pointer (AST\_\_NULL) is
+         returned without error.
+
+         If a FrameSet is returned, it will contain two Frames. Frame
+         number 1 (its base Frame) will describe the source coordinate
+         system, corresponding to the FROM argument. Frame number 2
+         (its current Frame) will describe the destination coordinate
+         system, corresponding to the TO argument. The Mapping
+         which inter-relates these two Frames will perform the
+         required conversion between their respective coordinate
+         systems.
+
+         Note that a FrameSet may be used both as a Mapping and as a
+         Frame.  If the result is used as a Mapping (e.g. with
+         \htmlref{AST\_TRAN2}{AST_TRAN2}), then it provides a means of converting coordinates
+         from the source to the destination coordinate system (or
+         vice versa if its inverse transformation is selected). If it
+         is used as a Frame, its attributes will describe the
+         destination coordinate system.
       }
    }
    \sstexamples{
@@ -10858,18 +10858,18 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
-   \sstreturnedvalue{
-      \sstsubsection{
-         AST\_COPY = INTEGER
-      }{
-         Pointer to the new Object.
-      }
-   }
    \sstapplicability{
       \sstsubsection{
          Object
       }{
          This function applies to all Objects.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_COPY = INTEGER
+      }{
+         Pointer to the new Object.
       }
    }
    \sstnotes{
@@ -11565,34 +11565,6 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
-   \sstreturnedvalue{
-      \sstsubsection{
-         AST\_FINDFRAME = INTEGER
-      }{
-         If the search is successful, the function returns a pointer
-         to a FrameSet which contains the Frame found and a
-         description of how to convert to (and from) the coordinate
-         system it represents. Otherwise, a null \htmlref{Object}{Object} pointer
-         (AST\_\_NULL) is returned without error.
-
-         If a FrameSet is returned, it will contain two Frames. Frame
-         number 1 (its base Frame) represents the target coordinate
-         system and will be the same as the (base Frame of the)
-         target. Frame number 2 (its current Frame) will be a Frame
-         representing the coordinate system which the function
-         found. The Mapping which inter-relates these two Frames will
-         describe how to convert between their respective coordinate
-         systems.
-
-         Note that a FrameSet may be used both as a Mapping and as a
-         Frame. If the result is used as a Mapping (e.g. with
-         astTran2), then it provides a means of converting coordinates
-         from the target coordinate system into the new coordinate
-         system that was found (and vice versa if its inverse
-         transformation is selected). If it is used as a Frame, its
-         attributes will describe the new coordinate system.
-      }
-   }
    \sstapplicability{
       \sstsubsection{
          Frame
@@ -11639,6 +11611,34 @@ Object            - Base class for all AST Objects
          attribute of the target FrameSet will be modified on exit to
          identify the Frame whose match with the target was eventually
          accepted.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_FINDFRAME = INTEGER
+      }{
+         If the search is successful, the function returns a pointer
+         to a FrameSet which contains the Frame found and a
+         description of how to convert to (and from) the coordinate
+         system it represents. Otherwise, a null \htmlref{Object}{Object} pointer
+         (AST\_\_NULL) is returned without error.
+
+         If a FrameSet is returned, it will contain two Frames. Frame
+         number 1 (its base Frame) represents the target coordinate
+         system and will be the same as the (base Frame of the)
+         target. Frame number 2 (its current Frame) will be a Frame
+         representing the coordinate system which the function
+         found. The Mapping which inter-relates these two Frames will
+         describe how to convert between their respective coordinate
+         systems.
+
+         Note that a FrameSet may be used both as a Mapping and as a
+         Frame. If the result is used as a Mapping (e.g. with
+         astTran2), then it provides a means of converting coordinates
+         from the target coordinate system into the new coordinate
+         system that was found (and vice versa if its inverse
+         transformation is selected). If it is used as a Frame, its
+         attributes will describe the new coordinate system.
       }
    }
    \sstexamples{
@@ -12242,18 +12242,18 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
-   \sstreturnedvalue{
-      \sstsubsection{
-         AST\_GET$<$X$>$ = $<$X$>$type
-      }{
-         The attribute value, in the data type corresponding to $<$X$>$.
-      }
-   }
    \sstapplicability{
       \sstsubsection{
          Object
       }{
          These functions apply to all Objects.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_GET$<$X$>$ = $<$X$>$type
+      }{
+         The attribute value, in the data type corresponding to $<$X$>$.
       }
    }
    \sstexamples{
@@ -12910,19 +12910,19 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         These functions apply to all Objects.
+      }
+   }
    \sstreturnedvalue{
       \sstsubsection{
          AST\_ISA$<$CLASS$>$ = LOGICAL
       }{
          .TRUE. if the Object belongs to the class called $<$CLASS$>$ (or to
          a class derived from it), otherwise .FALSE..
-      }
-   }
-   \sstapplicability{
-      \sstsubsection{
-         Object
-      }{
-         These functions apply to all Objects.
       }
    }
    \sstexamples{
@@ -15811,19 +15811,19 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         This routine applies to all Objects.
+      }
+   }
    \sstreturnedvalue{
       \sstsubsection{
          AST\_TEST = LOGICAL
       }{
          .TRUE. if a value has previously been explicitly set for the
          attribute (and hasn't been cleared), otherwise .FALSE..
-      }
-   }
-   \sstapplicability{
-      \sstsubsection{
-         Object
-      }{
-         This routine applies to all Objects.
       }
    }
    \sstnotes{
@@ -16514,15 +16514,6 @@ Object            - Base class for all AST Objects
          The global status.
       }
    }
-   \sstreturnedvalue{
-      \sstsubsection{
-         AST\_UNFORMAT = INTEGER
-      }{
-         The number of characters read from the string in order to
-         obtain the coordinate value. This will include any white
-         space which occurs before or after the value.
-      }
-   }
    \sstapplicability{
       \sstsubsection{
          Frame
@@ -16545,6 +16536,15 @@ Object            - Base class for all AST Objects
       }{
          The input formats accepted by a FrameSet are determined by
          its current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_UNFORMAT = INTEGER
+      }{
+         The number of characters read from the string in order to
+         obtain the coordinate value. This will include any white
+         space which occurs before or after the value.
       }
    }
    \sstnotes{
@@ -22763,6 +22763,14 @@ to -0.0001.
 
 \item A bug has been fixed which could cause a FitsChan to lose the
 comment associated with a string value in a FITS header.
+
+\item A FitsChan now reports an error if it reads a FITS header which
+identifies a non-standard sky projection (previously, this was
+accepted without error and a Cartesian projection used instead).
+
+\item A bug has been fixed which could prevent conversion between the
+coordinate systems represented by two CmpFrames. This could only occur
+if the CmpFrames contained a relatively large number of nested Frames.
 
 %\item A bug has been fixed which could cause a program to crash if
 %FrameSets were nested inside each other (for example, if one \htmlref{FrameSet}{FrameSet}
