@@ -78,6 +78,8 @@
 *        Original version.
 *     29 Jan 1997 (RB):
 *        Cope with a null GCB
+*     03 Feb 1997 (RB):
+*        Add 'BYTE' to ADI2_DCOP_IN call
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,7 +127,7 @@
       IF ( STATUS .EQ. SAI__OK .AND. GCBDAT .NE. ADI__NULLID ) THEN
 
 *    Map the HDU data
-        CALL ADI2_DCOP_IN( GCBDAT, GCBPTR, NBYTE, STATUS )
+        CALL ADI2_DCOP_IN( GCBDAT, GCBPTR, NBYTE, 'BYTE', STATUS )
 
 *    If no error, attempt to load data
         IF ( STATUS .EQ. SAI__OK ) THEN
