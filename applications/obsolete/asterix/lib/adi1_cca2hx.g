@@ -136,11 +136,12 @@
         IF ( CMP .GT. ' ' ) THEN
           CALL DAT_THERE( LOC, CMP, THERE, STATUS )
           IF ( THERE ) THEN
-            CALL DAT_ERASE( LOC, CMP, STATUS )
+C            CALL DAT_ERASE( LOC, CMP, STATUS )
+          ELSE
+            CALL DAT_NEW( LOC, CMP, '<HTYPE>', NDIM, DIMS, STATUS )
           END IF
 
 *      Create the HDS value
-          CALL DAT_NEW( LOC, CMP, '<HTYPE>', NDIM, DIMS, STATUS )
           CALL DAT_FIND( LOC, CMP, CLOC, STATUS )
 
         ELSE
