@@ -895,7 +895,7 @@ TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf iras.sdf
 
 #  Define the plotting style files.
 
-STYLE_FILES = style.def
+STYLE_FILES = kappa_style.def
 
 #  List of TK/TCL object libraries.
 
