@@ -170,7 +170,7 @@
      :                 FSI1_GETSEL, DID, STATUS )
       CALL ADI_DEFMTH( 'WriteSel(_FileSet,_HDSfile,_INTEGER,_)',
      :                 FSI1_PUTSEL, DID, STATUS )
-      CALL ADI_DEFMTH( 'ReadRef(_FileSet,_HDSfile,_INTEGER)',
+      CALL ADI_DEFMTH( 'ReadRef(_FileSet,_HDSfile,_INTEGER,_CHAR)',
      :                 FSI1_GETREF, DID, STATUS )
       CALL ADI_DEFMTH( 'WriteRef(_FileSet,_HDSfile,_INTEGER,_)',
      :                 FSI1_PUTREF, DID, STATUS )
