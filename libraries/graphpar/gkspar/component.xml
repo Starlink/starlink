@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gkspar">
+  <version>1.1-5</version>
+  <path>libraries/graphpar/gkspar</path>
+  <description>ADAM Graphics Programming with GKS</description>
+  <abstract><p>
+  Libraries for incorporating GKS graphics into ADAM applications. The
+  routines handle the necessary interactions with the ADAM parameter
+  system where a graphics device is opened for a GKS based graphics
+  package.
+  </p></abstract>
+  <dependencies >
+    <build>sae</build><build>gks</build><build>par</build><link>gns</link><link>gks</link><link>gwm</link><link>starx</link><link>ems</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Sid Wright</name>
+      <uname>slw</uname>
+    </person>
+    <person>
+      <name>Dennis Kelly</name>
+      <uname>bdk</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
