@@ -81,7 +81,7 @@
       my( $usage ) = "Usage:  $self htxdir [ latexfile ]\n";
 
 #  Set default file locations and configuration options.
-      my( $dtdname ) = "-//Starlink//DTD Document Summary 0.5//EN";
+      my( $dtdname ) = "-//Starlink//DTD Document Summary 0.7//EN";
       my( $starlink ) = $ENV{ 'STARLINK' } || "/star";
       my( $docslisfile ) = "$starlink/docs/docs_lis";
 
