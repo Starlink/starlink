@@ -174,10 +174,10 @@
          CALL ERR_MARK
 
 *  Try to open the GASP header file for the dimension information.
-*  Since the file is opened for read access, the recordsize need not be
-*  specified (set to zero).  If we cannot open the header file then we
-*  must prompt for the values.
-         CALL RIO_OPEN( HDRFIL, 'READ', 'UNFORMATTED', 0, FD, STATUS )
+*  Since the file is opened for read access, the recordsize should not
+*  be specified (set to zero), however in practice...  If we cannot open
+*  the header file then we must prompt for the values. 
+         CALL RIO_OPEN( HDRFIL, 'READ', 'UNFORMATTED', 16, FD, STATUS ) 
 
 *  Flush the error.
          IF ( STATUS .NE. SAI__OK ) THEN

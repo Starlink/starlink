@@ -97,8 +97,10 @@
       CALL CHR_MOVE( '.dat', DATFIL( NAMLEN+1: ) )
 
 *  Try to open the GASP data file.  Since the file is opened for read
-*  access, the recordsize need not be specified (set to zero).
-      CALL RIO_OPEN( DATFIL, 'READ', 'UNFORMATTED', 0, FD, STATUS )
+*  access, the recordsize should not need to be specified (set to zero),
+*  however in practice...
+      CALL RIO_OPEN( DATFIL, 'READ', 'UNFORMATTED', 2 * WIDTH, FD,
+     :               STATUS )
 
 *  Inquire the unit number of the data file.
       CALL FIO_UNIT( FD, UNIT, STATUS )
