@@ -3,20 +3,20 @@
 
 # These are modified on copy from the scripts directory
 bin_SCRIPTS = fluxes.csh fluxnow.csh
-
+dist_noinst_SCRIPTS = fluxes_link_adam scripts/fluxes.csh scripts/fluxnow.csh
 
 bin_MONOLITHS = fluxes
 fluxes_SOURCES = fluxes.f
 fluxes_LDADD = `$(srcdir)/fluxes_link_adam`
 
 fluxesnewsdir = $(datadir)/doc/fluxes-@PACKAGE_VERSION@
-fluxesnews_DATA = FLUXES_CONDITIONS starlink/fluxes.news
+dist_fluxesnews_DATA = FLUXES_CONDITIONS starlink/fluxes.news
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun213_fig1.eps
 
 # The path here is ignored for the install location
 filterdir = $(bindir)
-filter_DATA = data/scuba.dat data/ukt14.dat data/ukt14_old.dat
+dist_filter_DATA = data/scuba.dat data/ukt14.dat data/ukt14_old.dat
 
 
 # IFL files
