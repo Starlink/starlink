@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.6}
 \newcommand{\stardocauthors}   {Peter W. Draper}
-\newcommand{\stardocdate}      {12 November 1999}
+\newcommand{\stardocdate}      {22 November 1999}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.3}
@@ -646,6 +646,7 @@ more interesting are:
  -transient\_tools   &  Make toolboxes transient \\
  -demo\_mode         &  Make the demo toolbox available \\
  -component          &  The NDF component (data, variance or quality) \\
+ -focus\_follows\_mouse & Focus for entry areas follows mouse \\
 \end{tabular}
 }
 
@@ -686,6 +687,16 @@ are:
 These define the upper and lower limits for zooming the main
 image. These are normally set to \mytt{20} and \mytt{-6}
 respectively.
+
+The CDE window manager has some problems with the
+\mytt{focus\_follows\_mouse} property (seen when the focus policy is
+`click-to-focus' with `autoraise'). In this case try the command:
+\begin{quote}
+\begin{verbatim}
+% gaia image_name -focus_follows_mouse 0
+\end{verbatim}
+\end{quote}
+Add this to your X preferences if you always want this behaviour.
 
 \subsection{\xlabel{proxy_servers}Proxy servers}
 Access to the World Wide Web may be restricted (by a firewall or maybe
@@ -965,7 +976,7 @@ Internally there have been many changes to GAIA, one consequence of
 which is that most of the keyboard shortcuts are changed. Most
 notably the interactive slice is now bound to \mytt{<control-a>}.
 
-\subsection{This release 2.3-2}
+\subsection{This release 2.3-3}
 This is a minor update to GAIA with the following fixes:
 \begin{itemize}
   \item A percentiles option has been added to automatic contour
@@ -995,8 +1006,13 @@ This is a minor update to GAIA with the following fixes:
   \item Blank pixels in unsigned word NDFs should be be handled 
         correctly.
 
-  \item The on-line help for the photometry toolbox should be
-        available again. 
+  \item The on-line help for the photometry toolboxes should be
+        available again.  
+
+  \item A new configuration option \mytt{-focus\_follows\_mouse} has
+        been added to stop problems with \mytt{autoraise} and
+        \mytt{click-to-focus} when using the CDE window manager. Set
+        this option to $0$ (false). 
 \end{itemize}
 
 

@@ -28,9 +28,15 @@
 
     - Blank pixels in unsigned word NDFs should be be handled 
       correctly.
+ 
+    - It should now be possible to plot POLPACK maps again.
 
     - The on-line help for the photometry toolbox should be
       available again. 
+
+    - A new configuration option "-focus_follows_mouse" has been added
+      to stop problems with "autoraise" and "click-to-focus" when
+      using the CDE window manager. Set this option to 0 (false).
 
   To try out GAIA for yourself type the following command:
 
@@ -42,4 +48,4 @@
 
       gaia@star.rl.ac.uk
 
-  Peter Draper 12th November 1999.
+  Peter Draper 22nd November 1999.
