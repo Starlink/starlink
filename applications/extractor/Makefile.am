@@ -92,9 +92,6 @@ distclean-local:
 extractor.ifl: extract/src/extractor.ifl
 	cp -p extract/src/extractor.ifl .
 
-extractor.icl: extract/src/extractor.icl
-	cp -p extract/src/extractor.icl .
-
 #  Rule IFL to IFC compilation.
 .ifl.ifc:
 	@COMPIFL@ $<
@@ -111,3 +108,15 @@ dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 	(cd $(distdir)/extract; make distclean);
 	(cd $(distdir)/sextractor; make distclean);
+
+# Fixup scripts with bin location
+# The scripts needs to have installation locations edited into them
+edit = sed \
+	-e 's,@bindir\@,$(bindir),g' \
+	-e 's,@starhelpdir\@,$(starhelpdir),g' \
+	-e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
+
+extractor.csh: extractor.csh.in
+	-rm -f extractor.csh
+	$(edit) $(srcdir)/extractor.csh.in > extractor.csh.tmp
+	mv extractor.csh.tmp extractor.csh

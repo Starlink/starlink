@@ -46,7 +46,7 @@ define extract $EXTRACTOR_DIR/extractor
 {  Tell the user that EXTRACTOR commands are now available.
 
 print " "
-print "   EXTRACTOR commands are now available -- (Version PKG_VERS)"
+print "   EXTRACTOR commands are now available -- (Version @PACKAGE_VERSION@)"
 print " "
 {print "   Type `extractorhelp' or `help extractor' for help on EXTRACTOR commands"
 {print " "
