@@ -72,8 +72,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     6 Mar 1995 (DJA):
+*      6 Mar 1995 (DJA):
 *        Original version.
+*     20 Dec 1995 (DJA):
+*        Write instrument specific stuff
 *     {enter_changes_here}
 
 *  Bugs:
@@ -102,10 +104,15 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! HEADER object
       CHARACTER*(DAT__SZLOC)	INLOC			! INSTRUMENT object
+      CHARACTER*15		IPNAME			! Instrument par name
 
+      INTEGER			ICMP			! Loop over pars in instr box
       INTEGER			MID			! Mission strings info
+      INTEGER			IIPID			! Instrument par cmp
+      INTEGER			IPID			! Instrument par box
+      INTEGER			NCMP			! # pars in instr box
 
-      LOGICAL			DOK, FOK		! Things present?
+      LOGICAL			DOK, FOK, OK		! Things present?
 *.
 
 *  Check inherited global status.
@@ -140,6 +147,39 @@
 
 *    Also write FILTER to header
         CALL ADI1_CCA2HC( MID, 'Filter', HLOC, 'FILTER', STATUS )
+
+      END IF
+
+*  Instrument specific stuff
+      CALL ADI_THERE( MID, 'InstrPars', OK, STATUS )
+      IF ( OK ) THEN
+
+*    Locate instrument parameters container
+        CALL ADI_FIND( MID, 'InstrPars', IPID, STATUS )
+
+*    Locate INSTRUMENT structure, creating if necessary
+        CALL ADI1_LOCINSTR( ARGS(1), .TRUE., INLOC, STATUS )
+
+*    Loop over components
+        CALL ADI_NCMP( MID, NCMP, STATUS )
+        DO ICMP = 1, NCMP
+
+*      Index the component
+          CALL ADI_INDCMP( IPID, ICMP, IIPID, STATUS )
+
+*      Get components name
+          CALL ADI_NAME( IIPID, IPNAME, STATUS )
+
+*      Copy data to HDS
+          CALL AID1_CCA2HT( IIPID, ' ', INLOC, IPNAME, STATUS )
+
+*      Release the component
+          CALL ADI_ERASE( IIPID, STATUS )
+
+        END DO
+
+*    Release instrument parameters container
+        CALL ADI_ERASE( IPID, STATUS )
 
       END IF
 
