@@ -275,11 +275,22 @@ you have the fonts available, or are prepared to wait for them to be
 generated, a better way is to use the <code/-m> option to magnify the
 DVI file, and then the <code/-s> option to scale it back down to the
 correct size.
-<code/-PT> makes the output bitmap have a transparent background, if
+<p>The <code/-PT> option makes the output bitmap have a transparent
+background, if 
 that's supported by the particular format you choose using option
 <code/-t>.  The options <code/-Pb> and <code/-Pt> disable blurring and
-transparency, respectively.  By default, bitmaps are not blurred, but
-are transparent if possible.
+transparency, respectively.
+<p>By default, bitmaps are not blurred, but are transparent if possible.
+<p>For PNG files, the output bitmap uses a
+palette plus an alpha channel; these are calculated in such a way that
+if you display the resulting bitmap on the same colour background as
+<code/dvi2bitmap> was using (which is white by default, but can be
+specified using the <ref id=usage.special>background special</>) then
+the result should look identical to the result with no transparency
+information, but probably progressively worse the further the
+background moves from this.  I suppose, but can't at present check,
+that this implies that you should choose a mid-grey background colour
+when making such transparent PNGs.  I'd welcome advice on this point.
 
 <dt><code/-q>
 <dd>Quiet mode -- suppress chatter.  

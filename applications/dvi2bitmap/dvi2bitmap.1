@@ -209,8 +209,10 @@ generated, a better way is to use the
 option to magnify the DVI file, and then the
 .I "\-s"
 option to scale it back down to the correct size.
+.IP
+The 
 .I "\-PT"
-makes the output bitmap have a transparent background, if
+option makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
 .I "\-t"
 The options
@@ -218,8 +220,21 @@ The options
 and
 .I "\-Pt"
 disable blurring and
-transparency, respectively.  By default, bitmaps are not blurred, but
-are transparent if possible.
+transparency, respectively.
+.IP
+By default, bitmaps are not blurred, but are transparent if possible.
+.IP
+For PNG files, the output bitmap uses a
+palette plus an alpha channel; these are calculated in such a way that
+if you display the resulting bitmap on the same colour background as
+.I dvi2bitmap
+was using (which is white by default, but can be
+specified using the `background' special) then
+the result should look identical to the result with no transparency
+information, but probably progressively worse the further the
+background moves from this.  I suppose, but can't at present check,
+that this implies that you should choose a mid-grey background colour
+when making such transparent PNGs.  I'd welcome advice on this point.
 .TP
 .I "\-q"
 Quiet mode -- suppress some chatter.
