@@ -62,7 +62,7 @@
             INQUIRE(FILE=BUFF,EXIST=ISAFILE,
      :         DIRECT=ISDIR,SEQUENTIAL=ISSEQ)
 *  exclude directories
-            ISAFILE=(ISAFILE.AND.(ISDIR.EQ.'YES'.OR.ISSEQ.EQ.'YES'))
+c           ISAFILE=(ISAFILE.AND.(ISDIR.EQ.'YES'.OR.ISSEQ.EQ.'YES'))
             IF (.NOT.ISAFILE) THEN
               INQUIRE(FILE=BUFF(1:L)//'.sdf',EXIST=ISAFILE)
             ENDIF
