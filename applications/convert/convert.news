@@ -1,11 +1,13 @@
 1 CONVERT_Version_1.5-5
 
- Added FITS-AIPS++ encoding to FITS2NDF and NDF2FITS.
+ Added FITS-AIPS++ and FITS-CLASS encodings to FITS2NDF and NDF2FITS.
 
  Clarified the description of UNF2NDF parameter TYPE so that it
  is clear that the type given should also be of the input data, not 
  just the output NDF.
 
+ SPECX2NDF now creates NDF files using the new double sideband specframe.
+ See the AST documentation for more details on double sideband spectra.
 
 1 CONVERT_Version_1.5-4
  Added IRAF compatibility libs for Linux systems. Convert should now
