@@ -16,6 +16,7 @@ hidden proc ccdexercise
 {
 {  Authors:
 {     PDRAPER: Peter Draper (STARLINK)
+{     MBT: Mark Taylor (STARLINK)
 {     {enter_new_authors_here}
 {
 {  History:
@@ -27,6 +28,8 @@ hidden proc ccdexercise
 {        DCL version
 {     11-SEP-1995 (PDRAPER):
 {        UNIX version
+{     11-MAY-1999 (MBT):
+{        Modified to use WCS-aware CCDPACK applications.
 {     {enter_further_changes_here}
 {-
       defstring echo print
@@ -61,7 +64,6 @@ hidden proc ccdexercise
         gdset (device) accept
         gdclear accept
         paldef accept
-        palentry colour=white palnum=0 accept
      endif
 {
 {  Initialise CCDPACK.
@@ -124,8 +126,9 @@ hidden proc ccdexercise
      ccdgenerate ~
          nseq=4 ~
          file=(object_file) ~
-         ubnds=[128,128,166,128,128,201,166,201] ~
-         lbnds=[1,1,39,1,1,74,39,74] ~
+         pixels=[128,128] ~
+         origins=[-1,-1,-40,15,-10,-74,-35,-70] ~
+         angles=[0,30,0,0] ~
          accept
 {    end ccdgenerate
 {
@@ -151,6 +154,7 @@ hidden proc ccdexercise
             in=data1 ~
             mode=percentiles ~
             percentiles=[2,98] ~
+            style="colour(numlab)=red,grid=1,colour(grid)=black" ~
             accept
 {       end display
         picsel ~
@@ -432,6 +436,8 @@ hidden proc ccdexercise
      findoff ~
          inlist=reduced_data? ~
          ndfnames=true ~
+         usewcs=true ~
+         restrict=true ~
          outlist=*.off ~
          accept
 {    end findoff
@@ -489,9 +495,24 @@ hidden proc ccdexercise
      echo " "
      register ~
          inlist=reduced_data? ~
-         fittype=1 ~
+         fittype=2 ~
          accept
 {    end register
+{
+{  Export the registration information to an AST file.
+     echo " "
+     echo "  Write World Coordinate System information about the alignment"
+     echo "  of these frames to an external file 'ccdexercise.ast' as a"
+     echo "  record of their mutual alignment."
+     echo " "
+     astexp ~
+         in=reduced_data? ~
+         astfile=ccdexercise.ast ~
+         idtype=fitsid ~
+         fitsid=iseq ~
+         outdomain=matched ~
+         accept
+{    end astexp
 {
 {  Resample the data.
      echo " "
@@ -511,12 +532,12 @@ hidden proc ccdexercise
 {  Normalise it.
      echo " "
      echo "  Normalising and combining the aligned datasets."
-     ECHO " "
+     echo " "
      makemos ~
          in=resamp_data? ~
          scale=true ~
          zero=true ~
-         out=MOSAIC ~
+         out=mosaic ~
          accept
 {    end makemos
 {
@@ -527,7 +548,7 @@ hidden proc ccdexercise
         echo " "
         gdclear accept
         display ~
-            in=MOSAIC ~
+            in=mosaic ~
             mode=percentiles ~
             percentiles=[2,98] ~
             accept
@@ -545,3 +566,4 @@ hidden proc ccdexercise
      end exception
 end proc
 { ?W?     ?G?     ?R?
+{ $Id$
