@@ -478,7 +478,6 @@ $(MACHINE_SPECIFIC_F_ROUTINES) $(SPP_F_ROUTINES) $(ATASK_F_ROUTINES) \
 $(BLOCK_DATA) $(C_ROUTINES) $(INTERFACE_FILES) $(IRAF_LIBRARIES) \
 $(HELP_SOURCE) $(TEST_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
-
 #
 #  Rules for extracting machine specific source files from the source
 #  archive.
@@ -554,7 +553,7 @@ dst2ndf: dst2ndf.o $(OBJECT_LIBRARIES)
 gasp2ndf: gasp2ndf.o $(OBJECT_LIBRARIES)
 	alink gasp2ndf.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
-iraf2ndf: iraf2ndf.o $(OBJECT_LIBRARIES)
+iraf2ndf: iraf2ndf.o $(OBJECT_LIBRARIES) $(IRAF_LIBRARIES)
 	if test "$(SYSTEM)" = "sun4" -o "$(SYSTEM)" = "mips" ; then \
 	   alink iraf2ndf.o libcon.a libconspp.a \
 	                libimfort.a libsys.a libvops.a libos.a \
@@ -576,7 +575,7 @@ ndf2dst: ndf2dst.o $(OBJECT_LIBRARIES)
 ndf2gasp: ndf2gasp.o $(OBJECT_LIBRARIES)
 	alink ndf2gasp.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
-ndf2iraf: ndf2iraf.o $(OBJECT_LIBRARIES)
+ndf2iraf: ndf2iraf.o $(OBJECT_LIBRARIES) $(IRAF_LIBRARIES)
 	if test "$(SYSTEM)" = "sun4" -o "$(SYSTEM)" = "mips" ; then \
 	   alink ndf2iraf.o libcon.a libconspp.a \
 	                libimfort.a libsys.a libvops.a libos.a \
@@ -940,21 +939,21 @@ test:
 #  installation test.
 
 do_test: $(EXTERNAL_INCLUDES)
-	
+#
 #  Note the test has not yet succeeded.
-	
+#
 	@- if test -f .TESTED_$(SYSTEM); then rm .TESTED_$(SYSTEM); else :; fi
-	
+#
 #  Extract the test data file from the archive.
-	
+#
 	$(TAR_OUT) $(PKG_NAME)_source.tar $(TEST_FILES)
 
 #  Execute the test.  Remove the test data when done. 
 	./dst2ndf $(TEST_FILES:.dst=) $(TEST_FILES:.dst=)
 	rm $(TEST_FILES) $(TEST_FILES:.dst=.sdf)
-	
+#
 #  Note the test has been run.
-	
+#
 	@ touch .TESTED_$(SYSTEM)
 	@ echo "   Test of $(PKG_NAME) installation completed."
 
@@ -1037,8 +1036,8 @@ clean:
 	@- rm $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
               $(MACHINE_SPECIFIC_F_ROUTINES) $(SPP_F_ROUTINES) \
               $(ATASK_F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
-              $(INTERFACE_FILES) $(HELP_SOURCE) \
-              $(OBJECT_FILES) $(SPP_OBJECT_FILES) \
+              $(INTERFACE_FILES) $(HELP_SOURCE) $(IRAF_LIBRARIES) \
+              $(OBJECT_FILES) $(SPP_OBJECT_FILES) $(TEST_FILES) \
               $(ATASK_OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@ echo
 	@ echo '*** Intermediate files removed'
