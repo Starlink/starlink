@@ -498,7 +498,7 @@ native precision (float, double etc).  Trailing spaces are removed
 when character values are returned.
 
 In a scalar context, array items are returned as references to
-arrays (unless they happen to be PDL objects (see L<GSD::PDL>
+arrays (unless they happen to be PDL objects (see L<GSD::PDL>)
 in which case the PDL is returned).
 
 Returns undef on error.
@@ -630,7 +630,7 @@ setup (eg setting up a tie to an array and a hash for the same GSD
 file is inefficient if the GSD file has to be opened separately for
 each tie).
 
-  tie %hash, 'GSD', 
+  tie %hash, 'GSD';
 
 The object associated with the tie can be retrieved either
 by storing the return value directly or by using the C<tied>
@@ -641,8 +641,9 @@ Note that following Perl convention, the first element in the array
 (position 0) is GSD item 1.
 
 Also, array items are returned in an array reference since hashes
-and arrays can only return scalar items. A PDL sub-class could be
-written to return PDL objects instead.
+and arrays can only return scalar items. The L<GSD::PDL|GSD::PDL>
+module can be used for the tie in order to return PDL objects
+rather than perl arrays.
 
 The array and hash are readonly.
 
