@@ -53,29 +53,18 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CTM_PAR'          ! Colout Table Management constants
       INCLUDE 'DAT_PAR'          ! DAT constants
-      INCLUDE 'DAT_ERR'          ! DAT error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN            ! Used length of a string
-
 *  Local Variables:
-      CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
-      CHARACTER PATH*132         ! Path to the container file
       CHARACTER PLOC*(DAT__SZLOC)! Locator to LUT array 
-      INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER I                  ! Colour index
       INTEGER LP                 ! Lowest available colour index
-      INTEGER NC                 ! Number of characters in the buffer
-      INTEGER NDIM               ! Number of array dimensions
       INTEGER PNTR               ! Pointer to mapped array
       INTEGER UP                 ! Lowest available colour index
       LOGICAL DONE               ! LUT loaded?
-      LOGICAL GWM                ! Is current device a GWM window?
-      LOGICAL RDONLY             ! Is the GWM colour table read-only?
       REAL D                     ! Increment in intensity  
       REAL RGB                   ! Current intensity  
 *.
@@ -95,123 +84,21 @@
 *  are reserved for annotations.
       LP = CTM__RSVPN
 
-*  Construct the name of the HDS container file containing the LUT
-*  information.
-*  ===================================================================
+*  Get a locator for the HDS array holding the colour table to use.
+      CALL KPG1_LTGET( PLOC, STATUS )
 
-*  Translate the environment variable/logical name for ADAM_USER.
-      CALL PSX_GETENV( 'ADAM_USER', PATH, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-*  ADAM_USER may not be defined so annul the error and try a different
-*  route to the file.
-         CALL ERR_ANNUL( STATUS )
-
-*  Obtain the home directory.
-         CALL PSX_GETENV( 'HOME', PATH, STATUS )
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'KPG1_LTLOD_1', '$HOME not defined.', 
-     :                    STATUS )
-            GO TO 999
-         END IF
-
-*  Generate the path of the ADAM_USER.
-         NC = CHR_LEN( PATH )
-         CALL CHR_APPND( '/adam', PATH, NC )
-
-      ELSE
-
-*  Find the length of the path for ADAM_USER.
-         NC = CHR_LEN( PATH )
-  
-      END IF
-
-*  Generate the full pathname to the file.
-      CALL CHR_APPND( '/kappa_lut', PATH, NC )
-
-*  Get a locator for the top level object in the container file.
-*  ========================================================================
-
-*  Attempt to open the file assuming it exists.
-      CALL HDS_OPEN( PATH( : NC ), 'READ', LOC, STATUS ) 
-
-*  If the file was not found, annul the error.
-      IF( STATUS .EQ. DAT__FILNF ) THEN
-         CALL ERR_ANNUL( STATUS )         
-
-*  Otherwise, change the colour table to reflect the LUT stored in
-*  the file.
-      ELSE
-
-*  Get a locator to the component within the HDS container file which
-*  contains the LUT to be used.
-         CALL KPG1_PGLOC( LOC, PLOC, STATUS )
-
-*  If a component with the right name exists, use it.
-         IF( PLOC .NE. DAT__NOLOC ) THEN
-
-*  Get its dimensions.
-            CALL DAT_SHAPE( PLOC, 2, DIMS, NDIM, STATUS )
-
-*  Report an error if it is has the wrong number of dimensions.
-            IF( NDIM .NE. 2 .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL DAT_MSG( 'DAT', PLOC )
-
-               IF( NDIM .EQ. 1 ) THEN
-                  CALL ERR_REP( 'KPG1_LTLOD_2', 'The colour table '//
-     :                          'stored in HDS object ''^DAT'' '//
-     :                          'has only 1 dimension. It should '//
-     :                          'have 2.', STATUS )
-               ELSE
-                  CALL MSG_SETI( 'NDIM', NDIM )
-                  CALL ERR_REP( 'KPG1_LTLOD_3', 'The colour table '//
-     :                         'stored in HDS object ''^DAT'' has '//
-     :                         '^NDIM dimensions. It should have 2.',
-     :                          STATUS )
-               END IF
-        
-            END IF
-
-*  Report an error if it is has the wrong number of colour guns.
-            IF( DIMS( 1 ) .NE. 3 .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL DAT_MSG( 'DAT', PLOC )
-      
-               IF( DIMS( 1 ) .EQ. 1 ) THEN
-                  CALL ERR_REP( 'KPG1_LTLOD_4', 'The colour table '//
-     :                        'stored in HDS object ''^DAT'' has '//
-     :                        'only 1 colour gun. It should have 3.',
-     :                        STATUS )
-               ELSE
-                  CALL MSG_SETI( 'NG', DIMS( 1 ) )
-                  CALL ERR_REP( 'KPG1_LTLOD_5', 'The colour table '//
-     :                        'stored in HDS object ''^DAT'' has '//
-     :                        '^NG colour guns. It should have 3.',
-     :                        STATUS )
-               END IF
-      
-            END IF
-
-*  Retrieve the LUT from the array.
-*  ===================================
-*  Map the array. 
-            CALL DAT_MAPV( PLOC, '_REAL', 'READ', PNTR, EL, STATUS ) 
+*  If found, map the array. 
+      IF( PLOC .NE. DAT__NOLOC ) THEN
+         CALL DAT_MAPV( PLOC, '_REAL', 'READ', PNTR, EL, STATUS ) 
 
 *  Load the LUT into the colour table.
-            CALL KPG1_PGLUT( DIMS( 2 ), %VAL( PNTR ), LP, UP, 
-     :                       .FALSE., STATUS )
+         CALL KPG1_PGLUT( EL/3, %VAL( PNTR ), LP, UP, .FALSE., STATUS )
 
 *  If no error has occurred, indicate that the LUT is loaded.
-            IF( STATUS .EQ. SAI__OK ) DONE = .TRUE.
+         IF( STATUS .EQ. SAI__OK ) DONE = .TRUE.
  
-*  Release the component locator.
-            CALL DAT_ANNUL( PLOC, STATUS )
-
-         END IF
-
-*  Close the HDS container file.
-         CALL DAT_ANNUL( LOC, STATUS )
+*  Release the component locator. 
+         CALL DAT_ANNUL( PLOC, STATUS )
 
       END IF
 

@@ -629,7 +629,7 @@ kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
 kpg1_hstaub.f kpg1_hstauw.f kpg1_bl1dr.f kpg1_bl1dd.f kpg1_bl1di.f \
 kpg1_bl1dw.f kpg1_bl1db.f kpg1_bl1dub.f kpg1_bl1duw.f \
 kpg1_lutk2.f kpg1_lutk3.f kpg1_lutk4.f kpg1_pglut.f kpg1_lstar.f  \
-kpg1_ltlod.f  kpg1_ltsav.f kpg1_pgloc.f
+kpg1_ltlod.f  kpg1_ltget.f kpg1_ltsav.f kpg1_pgloc.f
 
 CTG_F_ROUTINES = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
