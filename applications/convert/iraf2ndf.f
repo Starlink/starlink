@@ -29,30 +29,82 @@
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
 *        The name of the IRAF image.  Note that this excludes the
-*        extension.
-*     OUT = NDF (Write).
+*        ".imh" file extension.
+*     OUT = NDF (Write)
 *        The name of the NDF to be produced.
+*     PROFITS = _LOGICAL (Read)
+*        If TRUE, the headers of the IRAF file are written
+*        verbatim to the NDF's FITS extension.  Any IRAF history
+*        records are also appended to FITS extension. [TRUE]
+*     PROHIS = _LOGICAL (Read)
+*        This parameter decides whether or not to create NDF HISTORY
+*        records.  Only the IRAF headers with keyword HISTORY, and
+*        which originated from NDF HISTORY records are used.  If
+*        PROHIS=TRUE, NDF HISTORY records are created.  [TRUE]
 
 *  Examples:
 *     iraf2ndf ell_galaxy new_galaxy
 *        Converts the IRAF image ell_galaxy (comprising files
-*        ell_galaxy.imh and ell_galaxy.hdr) to an NDF called new_galaxy.
+*        ell_galaxy.imh and ell_galaxy.pix) to an NDF called new_galaxy.
+*     iraf2ndf ell_galaxy new_galaxy noprofits noprohis
+*        As above, except no FITS extension is created, and NDF-style
+*        HISTORY lines in ell_galaxy.imh are not transferred to HISTORY
+*        records in NDF new_galaxy.
 
 *  Notes:
 *     The rules for the conversion are as follows:
 *     -  The NDF data array is copied from the ".pix" file.
 *     -  The title of the IRAF image (object i_title in the ".imh"
-*     header file) becomes the NDF title.
-*     -  Lines from the IRAF image header file are transferred to the
-*     FITS extension of the NDF, any compulsory FITS keywords that are
-*     missing are added.
-*     -  If there is a FITS extension in the NDF, then the elements up
-*     to the first END keyword of this are added to the `user area' of
-*     the IRAF header file.
-*     -  Lines from the HISTORY section of the IRAF image are also
-*     extracted and added to the NDF's FITS extension as FITS HISTORY
-*     lines.  Two extra HISTORY lines are added to record the original
-*     name of the image and the date of the format conversion.
+*     header file) becomes the NDF title.  Likewise headers OBJECT and
+*     BUNIT become the NDF label and units respectively.
+*     -  Lines from the IRAF image header file may be transferred to
+*     the FITS extension of the NDF, when PROFITS=TRUE.  Any 
+*     compulsory FITS keywords that are missing are added.  Certain
+*     other keywords are not propagated.  These are the IRAF "Mini
+*     World Coordinate System" (MWCS) keywords WCSDIM, DC_FLAG,
+*     WATd_nnn (d is dimension, nnn is the line number).  Certain
+*     NDF-style HISTORY lines in the header may also be ignored when
+*     PROHIS=TRUE (see two notes below).
+*     -  When PROFITS=TRUE, lines from the HISTORY section of the IRAF
+*     image are also extracted and added to the NDF's FITS extension as
+*     FITS HISTORY lines.  Two extra HISTORY lines are added to record
+*     the original name of the image and the date of the format
+*     conversion.
+*     -  When PROHIS=TRUE, any HISTORY lines in the IRAF headers, which
+*     originated from an NDF2IRAF conversion of NDF HISTORY records.
+*     Such headers are not transferred to the FITS airlock, when
+*     PROFITS=TRUE.
+*     -  Most axis information can be propagated either from standard
+*     FITS-like keywords, or certain MCWS headers.  Supported systems
+*     and formats are listed below.
+*        o  FITS
+*           - linear
+*           - log-linear
+*        o  Equispec
+*           - linear
+*           - log-linear
+*        o  Multispec
+*           - linear
+*           - log-linear
+*           - Chebyshev and Legendre polynomials
+*           - Linear and cubic Spline
+*           - Explicit list of co-ordinates
+*
+*     However, for Multispec axes, only the first (spec1) axis
+*     co-ordinates are transferred to the NDF AXIS centres.  Any
+*     spec2...specn co-ordinates, present when the data array is not
+*     one-dimensional or multiple fits have been stored, are ignored.
+*     The weights for multiple fits are thus also ignored.  The data
+*     type of the axis centres is _REAL or _DOUBLE depending on the
+*     number of significant digits in the co-ordinates or coefficients.
+*
+*     The axis labels and units are also propagated, where present, to
+*     the NDF AXIS structure.  In the FITS system, these are derived
+*     from the CTYPEn and CUNITn keywords.  In the MWCS, these
+*     components originate in the label and units parameters.
+
+*     The redshift correction, when present, is applied to the MCWS
+*     axis co-ordinates.
 
 *  Related Applications:
 *     CONVERT: NDF2IRAF.
@@ -60,14 +112,13 @@
 *  Pitfalls:
 *     -  Bad pixels in the IRAF image are not replaced.
 *     -  Some of the routines required for accessing the IRAF header
-*     file are written in SPP. Macros are used to find the start of the
+*     file are written in SPP.  Macros are used to find the start of the
 *     header line section, this constitutes an `Interface violation' as
 *     these macros are not part of the IMFORT interface specification.
 *     It is possible that these may be changed in the future, so
 *     beware.
 
 *  Implementation Status:
-*     -  It is only supported for sun4_Solaris and alpha_OSF1 systems.
 *     -  Only handles one-, two-, and three-dimensional IRAF files.
 *     -  The NDF produced has type _WORD or _REAL corresponding to the
 *     type of the IRAF image.  (The IRAF imfort FORTRAN subroutine
@@ -80,26 +131,16 @@
 *     -  There is no facility for taking an IRAF bad-pixel-mask file,
 *     to set bad pixels in the NDF.
 
-*  External Routines Used:
-*     IRAF IMFORT subroutine library:
-*        IMOPEN(), IMGSIZ(), IMGKWC(), IMCLOS(), IMEMSG()
-*     Home-grown routines:
-*        NLINES(), NHIST(), GETLIN(), GETHIS()
-
 *  References:
-*     -  IRAF User Handbook Volume 1A
-*     "A User's Guide to FORTRAN Programming in IRAF, The IMFORT
-*     Interface", by Doug Tody.
-
-*  Machine-specific features used:
-*     -  Linking
-*     See makefile
+*     IRAF User Handbook Volume 1A: "A User's Guide to FORTRAN
+*     Programming in IRAF, the IMFORT Interface", by Doug Tody.
 
 *  Keywords:
 *     CONVERT, IRAF
 
 *  Authors:
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+*     GJP: Grant Privett (STARLINK, University of Wales, Cardiff)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
@@ -123,7 +164,7 @@
 *        extension.
 *     08-AUG-1995 (GJP):
 *        Modified the method used to obtain the date/time string to
-*        avoid the use of pointer. Gave up PSX_ASCTIME and used
+*        avoid the use of pointer.  Gave up PSX_ASCTIME and used
 *        PSX_CTIME instead.
 *     09-AUG 1995 (GJP):
 *        Removed erroneous mention of LIN2MAP, PREFITS and PUTLIN.
@@ -134,7 +175,12 @@
 *     11-AUG-1995 (GJP):
 *        Added a check to see if any header lines were found before 
 *        calling GETLIN to obtain them.
-**     {enter_further_changes_here}
+*     1997 April and July (MJC):
+*        Added PROFITS and PROHIS facilities.  Now propagates axis
+*        information, and the NDF label and units.  Expanded and
+*        corrected the documentation, including a second example.
+*        Improved the code structure.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -146,11 +192,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! HDS constants
-      INCLUDE 'DAT_ERR'          ! HDS error constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'PSX_ERR'          ! PSX error constants
-      INCLUDE 'CMP_ERR'          ! CMP error constants
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       
@@ -159,68 +201,51 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Finds the length of a string less
-                                 ! trailuing blanks
+                                 ! trailing blanks
 
 *  Local Constants:
-      INTEGER FITSLN             ! Length of a FITS header
-      PARAMETER ( FITSLN = 80 )
-
-      INTEGER FITSHI             ! Length of a FITS HISTORY value
-      PARAMETER ( FITSHI = 70 )
-
-      INTEGER LENHIS             ! Length of IRAF image history area 
-      PARAMETER ( LENHIS = 511 )
-
       INTEGER NDIM               ! Maximum number of dimensions the 
       PARAMETER ( NDIM = 3 )     ! application can handle
 
-      INTEGER STRLEN             ! Length of output title string.
+      INTEGER STRLEN             ! Length of output title string
       PARAMETER ( STRLEN = 80 )
         
 *  Local Variables:
       INTEGER ACCESS             ! IRAF access mode
-      LOGICAL ADFITS             ! Are there FITS keywords not present
-                                 ! in the IRAF image which must be
-                                 ! added?
-      INTEGER BITPIX             ! FITS BITPIX value
-      INTEGER ERR                ! IRAF error indicator
-      CHARACTER * ( FITSLN ) CARD ! FITS card image.
-      INTEGER DIMS( NDF__MXDIM ) ! Length of axes.
+      INTEGER BUFLEN             ! Text-buffer length
+      INTEGER BUPNTR             ! Pointer to buffer workspace
+      INTEGER DIMS( NDF__MXDIM ) ! Length of axes
       INTEGER DTYPE              ! IRAF data-type code
       INTEGER EL                 ! Number of pixels in image
-      INTEGER EMPTY              ! Number of empty IRAF History lines
+      INTEGER ERR                ! IRAF error indicator
       INTEGER FIPNTR( 1 )        ! Pointer to FITS extension
-      CHARACTER * ( DAT__SZLOC ) FITLOC ! Locator to the FITS extension
-      CHARACTER * ( FITSHI ) HISTRN ! Somewhere to put the whole
-                                 ! history string of the IRAF image
       INTEGER IMDESC             ! Image descriptor returned by
                                  ! IMOPEN() for IMFORT routines
       CHARACTER * ( STRLEN ) IMERRM ! IMFORT error message text
       CHARACTER * ( STRLEN ) IRAFIL ! Input IRAF image name
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Type of the NDF
       INTEGER K                  ! Loop counter
+      CHARACTER * ( 70 ) LABEL   ! Label of the NDF 
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF axes
-      INTEGER LINENO             ! Line number
       INTEGER LIPNTR             ! Pointer to a line of pixels
       INTEGER MDIM               ! Number of axes
-      INTEGER NAMLEN             ! Length of output message
       INTEGER NBANDS             ! Number of bands
-      INTEGER NCHARS             ! Number of characters in the IRAF
-                                 ! image's history string
+      INTEGER NCHARS             ! Number of characters in the character
+                                 ! component
       INTEGER NCOLS              ! Number of columns
       INTEGER NDF                ! NDF identifier of output NDF
       INTEGER NHDRLI             ! Number of IRAF header lines
-      INTEGER NHISTL             ! Number of IRAF history lines
-      INTEGER NREJEC             ! Number of rejected FITS cards
       INTEGER NROWS              ! Number of rows
       INTEGER NTICKS             ! Returned by PSX_TIME
       INTEGER PNTR( 1 )          ! Pointer to NDF data array
-      CHARACTER * ( 132 ) TITLE  ! Title of the NDF 
-      CHARACTER * ( 25 ) TIMEST  ! The time in an ascii string.
+      LOGICAL PROFIT             ! Propagate headers to FITS
+      LOGICAL PROHIS             ! Propagate NDF-style headers to
+                                 ! HISTORY structure in the NDF
+      INTEGER REPNTR             ! Pointer to header propagation flags
+      INTEGER SPNTR              ! Pointer to spec1 buffer workspace
+      CHARACTER * ( 70 ) TITLE   ! Title of the NDF 
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF axes
-      INTEGER XLINES             ! Number of NDF extension lines
-      INTEGER XDIMS( 1 )         ! Number of dimensions in FITS
-                                 ! extension
+      CHARACTER * ( 70 ) UNITS   ! Units of the NDF 
 
 *.
 
@@ -343,6 +368,15 @@
      :                   STATUS )
       END IF
 
+*  Obtain other parameters.
+*  ========================
+
+*  Determine whether or not the FITS extension is to be created.
+      CALL PAR_GET0L( 'PROFITS', PROFIT, STATUS )
+
+*  Determine whether or not other HISTORY records are to be regenerated.
+      CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
+
       IF ( STATUS .NE. SAI__OK ) GOTO 980
             
 *  Get and validate header and history records.
@@ -356,283 +390,30 @@
       CALL MSG_SETI( 'NH', NHDRLI )
       CALL MSG_OUTIF( MSG__VERB, ' ', 'There are ^NH header lines '/
      :  /'to propagate.', STATUS )
-     
-*  Call RAHM's SPP routine nhist.x to discover the number of history
-*  lines in the image.  These are records of what IRAF has done to this
-*  particular file.  They become FITS HISTORY lines.
-*
-*  The HISTORY area of an IRAF image is currently 511 characters long.
-*  It contains several items detailing what has happened to an image,
-*  e.g. `New copy of gal1' etc.  Each item is terminated by a newline,
-*  while the whole history area is terminated by a SPP end-of-string
-*  (EOS) character.  The NCHARS parameter reveals how many characters
-*  are in the IRAF history area, currently (1992 October) this is a
-*  maximum of 511.  Once the history area is full, later additions are
-*  truncated or lost.
-      CALL NHIST( IMDESC, NHISTL, NCHARS )
-     
-*  Check for empty lines.
-      EMPTY = 0
-      DO 5 K = 1, NHISTL
-         CARD = ' '
-         CALL GETHIS( IMDESC, K, HISTRN )
-         IF ( CHR_LEN( HISTRN ) .EQ. 0 ) EMPTY = EMPTY + 1
-    5 CONTINUE
 
-*  Derive the number of non-blank header lines, and report it when
-*  verbose reporting is switched on.
-      NHISTL = NHISTL - EMPTY
-      CALL MSG_SETI( 'NHISTL', NHISTL )
-      CALL MSG_OUTIF( MSG__VERB, ' ',
-     :  'There are ^NHISTL history lines.', STATUS )
-      
-*  Check whether each history entry is properly terminated by a newline
-*  character.  In the history area, each entry should be terminated
-*  with a newline character.  We should never go more than FITSHI
-*  characters without encountering a newline.  Any more than FITSHI
-*  chars will not fit into a FITS standard HISTORY line.
-      IF ( NCHARS .GT. FITSHI .AND. NHISTL .LE. 1 ) THEN
-         NHISTL = 0
-         CALL MSG_OUT( ' ', 'HISTORY parsing error.  The HISTORY '/
-     :     /'information in the IRAF image is too long or not '/
-     :     /'delimited by newlines.', STATUS )
-      ELSE
-         CALL MSG_SETI( 'NHISTL', NHISTL )
-         CALL MSG_OUTIF( MSG__VERB, ' ', 'Number of HISTORY lines '/
-     :     /'in the header is ^NHISTL', STATUS )
-      END IF
-     
-*  Calculate the size of the FITS extension.
-*  =========================================
-
-*  Get the first header line to see if it contains
-*  SIMPLE =        T  / Comment.....
-*
-*  Otherwise, will have to add it. The FITS extension should, after
-*  all, contain lines conforming to the FITS standard. Only carried out if 
-*  a header was found.
-
-      CARD=' '
-      IF ( NHDRLI .GT. 0 ) CALL GETLIN( IMDESC, 1, CARD )
-      ADFITS = .FALSE.
-      IF ( INDEX( CARD( 1:8 ), 'SIMPLE' ) .EQ. 0 .OR.
-     :     CARD( 30:30 ) .NE. 'T' ) THEN
-         CALL MSG_OUTIF( MSG__VERB, ' ',
-     :      'Inserting mandatory FITS keywords not present in the '/
-     :      /'IRAF image into the NDF''s FITS extension.', STATUS )
-         ADFITS = .TRUE.
+*  Instruct that the FITS airlock is to use all the headers regardless
+*  whether or not they are NDF-style HISTORY records.  This uses a
+*  logical work array to flag whether or not to propagate the header to
+*  the airlock.
+      IF ( PROFIT .OR. PROHIS ) THEN
+         CALL PSX_CALLOC( NHDRLI, '_LOGICAL', REPNTR, STATUS )
+         CALL CON_CONSL( .TRUE., NHDRLI, %VAL( REPNTR ), STATUS )
       END IF
 
-*  XLINES is the number of lines there will be in the final extension.
-*  We always need one extra for the mandatory END card image, and two
-*  for the extra history cards that say IRAF2NDF was used.  When the
-*  mandatory card images are added there needs to be three lines for
-*  SIMPLE, BITPIX, and NAXIS cards, and one card for each dimension in
-*  MDIM (NAXISn keyword).  In practice some of the mandatory FITS
-*  headers may not be present, and the extension will need to be
-*  truncated at the end.
-      XLINES = NHDRLI + NHISTL + 2 + 1
+*  Deal with the NDF-style history records.  Search for such records,
+*  transfer their information back into NDF HISTORY records, and flag
+*  that these headers should not to be propagated to the FITS airlock.
+*  This is to avoid growing duplication of potentially bulky text
+*  especially if a user is mixing Starlink and IRAF tasks.
+      IF ( PROHIS )
+     :   CALL COI_CHISR( IMDESC, NDF, NHDRLI, %VAL( REPNTR ), STATUS )
 
-      IF ( ADFITS ) XLINES = XLINES + 3 + MDIM
+*  Propagate the FITS headers, and include mandatory headers too.
+      IF ( PROFIT ) CALL COI_HEADS( IMDESC, IRAFIL, NDF, NHDRLI,
+     :  %VAL( REPNTR ), PROHIS, STATUS )
 
-*  Create and map the FITS extension.
-*  ==================================
-
-*  Set the first member of an array to the dimensionality of the
-*  80-character array required.
-      XDIMS( 1 ) = XLINES
-      
-*  Create the NDF extension.
-      CALL NDF_XNEW( NDF, 'FITS', '_CHAR*80', 1, XDIMS, FITLOC, STATUS )
-            
-*  Map the array so that it can be passed to subroutines for filling.
-      CALL DAT_MAPV( FITLOC, '_CHAR*80', 'WRITE', FIPNTR, XLINES,
-     :               STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 980
-
-*  Fill the FITS extension with the user-area headers.
-*  ===================================================
-
-*  Need to ascertain the type of the IRAF image to know what value to
-*  give the FITS BITPIX keyword.
-      IF ( DTYPE .EQ. 3 ) THEN
-         BITPIX = 16
-      ELSE
-         BITPIX = -32
-      END IF
-
-*  Write the mandatory FITS headers which appear at the start of the
-*  header records.  Since the character array is mapped the length must
-*  be passed for this to work under UNIX.  It has no effect under VMS.
-      IF ( ADFITS ) THEN
-         CALL CON_WFMAN( XLINES, MDIM, DIMS, BITPIX,
-     :                   %VAL( FIPNTR( 1 ) ), STATUS, %VAL( FITSLN ) )
-
-         IF ( STATUS .NE. SAI__OK) GOTO 999
-      
-*  If the FITS stuff has been written, then next line is (4+MDIM).
-         LINENO = 4 + MDIM
-      ELSE
-
-*  Otherwise start at the first line.
-         LINENO = 1
-      END IF
-
-*  Initialise the number of rejected header cards.
-      NREJEC = 0
-
-*  Loop for each line of the FITS header (after any mandatory keywords
-*  have been written).
-      DO K = LINENO, LINENO + NHDRLI - 1
-
-*  Initialise the card.
-         CARD = ' '
-
-*  Extract each line in the user area.
-         CALL GETLIN( IMDESC, K - LINENO + 1, CARD )
-
-*  Do we need to write this card to the FITS extension?  No, if it is
-*  the END card, as that will be written after the history cards; no,
-*  if it is a mandatory keyword already written to the start of the
-*  header.  Report FITS card image in verbose-message mode.
-         IF ( CARD( 1:8 ) .NE. 'END     ' .AND. .NOT. ( ADFITS .AND.
-     :        ( CARD( 1:6 ) .EQ. 'SIMPLE' .OR.
-     :          CARD( 1:5 ) .EQ. 'NAXIS' .OR.
-     :          CARD( 1:6 ) .EQ. 'BITPIX' ) )  ) THEN
-
-            CALL MSG_SETC( 'CARD', CARD )
-            CALL MSG_OUTIF( MSG__VERB, ' ', '^CARD', STATUS )
-
-*  Put it into the FITS extension.  Note again that the length of the
-*  mapped character array is passed by value for UNIX.
-            CALL CON_PCARD( CARD, K - NREJEC, XLINES,
-     :                      %VAL( FIPNTR( 1 ) ), STATUS,
-     :                      %VAL( FITSLN ) )
-         ELSE
-
-*  Count the number of cards excluded.
-*  array element after inserting the header lines.
-             NREJEC = NREJEC + 1
-         END IF
-
-      END DO
-
-*  Update the position in the FITS header to index the first empty
-*  array element after inserting the header lines.
-      LINENO = LINENO + NHDRLI - NREJEC
-
-*  Append the history records in the FITS extension.
-*  =================================================
-
-*  Loop for each history line.
-      DO K = LINENO, LINENO + NHISTL - 1
-
-*  Initialise the card.
-         CARD = ' '
-
-*  Extract the history line.
-         CALL GETHIS( IMDESC, K - LINENO + 1 , HISTRN )
-
-*  Prefix the FITS HISTORY keyword.
-         CALL CHR_MOVE( 'HISTORY', CARD( 1: ) )
-         CALL CHR_MOVE( HISTRN, CARD( 10: ) )
-
-*  Report the FITS HISTORY line in verbose-message mode.
-         CALL MSG_SETC( 'CARD', CARD )      
-         CALL MSG_OUTIF( MSG__VERB, ' ', '^CARD', STATUS )
-
-*  Put it into the FITS extension.  Note again that the length of the
-*  mapped character array is passed by value for UNIX.
-         CALL CON_PCARD( CARD, K, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                   %VAL( FITSLN ) )
-      END DO
-
-*  Update LINENO to point to the last element of the array.
-      LINENO = LINENO + NHISTL
-
-*  Insert a history record in the FITS extension for the conversion.
-*  =================================================================
-
-*  Add the history information from the IRAF image by adding a FITS-
-*  format HISTORY line to the FITS extension to say where the image
-*  came from.
-
-*  Initialise the card.
-      CARD = ' '
-
-*  Copy information to a string
-      CALL CHR_MOVE( 'HISTORY Image converted using STARLINK'/
-     :  /' utility IRAF2NDF from the IRAF image', CARD ) 
-
-*  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                %VAL( FITSLN ) )
-
-*  Report the HISTORY line in verbose-message mode.
-      CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
-      
-*  Increment the position in the FITS header.
-      LINENO =  LINENO + 1
-      
-*  Initialise the line.
-      CARD = ' '
-      
-*  Find the current time count.
-      CALL PSX_TIME( NTICKS, STATUS )
-      CALL MSG_SETC( 'IRAFIL', IRAFIL )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Find the date and time.
-         CALL PSX_CTIME( NTICKS, TIMEST, STATUS )
-
-*  Create the history text.
-         CALL MSG_SETC( 'TIME', TIMEST )
-         CALL MSG_LOAD( ' ', 'HISTORY ^IRAFIL.imh on ^TIME', CARD,
-     :                  NAMLEN, STATUS )
-      ELSE
-         CALL MSG_LOAD( ' ', 'HISTORY ^IRAF_NAME.', CARD, NAMLEN,
-     :                  STATUS )
-      END IF
-      
-*  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                %VAL( FITSLN ) )
-
-*  Report the HISTORY line in verbose-message mode.
-      CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
-      
-*  Increment the position in the FITS header.
-      LINENO =  LINENO + 1
-
-*  Write the termination card image in the FITS extension.
-*  =======================================================      
-
-*  Initialise the line.
-      CARD = ' '
-
-*  Write the card.      
-      CALL CHR_MOVE( 'END', CARD )
-
-*  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                %VAL( FITSLN ) )
-
-*  Report the HISTORY line in verbose-message mode.
-      CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
-
-*  Tidy the extension.
-*  ===================
-
-*  Truncate the extension where necessary.  Note that the size argument
-*  is a vector, and that the array must be unmapped first.
-      IF ( LINENO .LT. XLINES ) THEN
-         CALL DAT_UNMAP( FITLOC, STATUS )
-         XDIMS( 1 ) = LINENO
-         CALL DAT_ALTER( FITLOC, 1, XDIMS, STATUS )
-      END IF
-
-*  Annul the locator.
-      CALL DAT_ANNUL( FITLOC, STATUS )
+*  Free the work space.
+      CALL PSX_FREE( REPNTR, STATUS )
 
 *  Write the IRAF image's title to the NDF title.
 *  ==============================================      
@@ -646,8 +427,58 @@
 
 *  Write the title to the NDF.
       ELSE
-         CALL NDF_CPUT( TITLE, NDF, 'TITLE', STATUS )
+         NCHARS = CHR_LEN( TITLE )
+         CALL NDF_CPUT( TITLE( :NCHARS ), NDF, 'TITLE', STATUS )
       END IF
+
+*  Write the NDF UNITS component.
+*  ==============================
+
+*  Get the title of the IRAF image using imfort routine imgkwc.
+      CALL IMGKWC( IMDESC, 'BUNIT', UNITS, ERR )
+
+*  Ignore a bad status.  Just do not write a title.
+      IF ( ERR .NE. 0 ) THEN
+         ERR = 0
+
+*  Write the title to the NDF.
+      ELSE
+         NCHARS = CHR_LEN( UNITS)
+         CALL NDF_CPUT( UNITS( :NCHARS ), NDF, 'UNITS', STATUS )
+      END IF
+
+*  Write the NDF LABEL component.
+*  ==============================
+
+*  Get the title of the IRAF image using imfort routine imgkwc.
+      CALL IMGKWC( IMDESC, 'OBJECT', LABEL, ERR )
+
+*  Ignore a bad status.  Just do not write a title.
+      IF ( ERR .NE. 0 ) THEN
+         ERR = 0
+
+*  Write the title to the NDF.
+      ELSE
+         NCHARS = CHR_LEN( LABEL )
+         CALL NDF_CPUT( LABEL( :NCHARS ), NDF, 'LABEL', STATUS )
+      END IF
+
+*  Transfer axis information.
+*  ==========================
+*
+*  Obtain workspace for multi-line MWCS header values, and spec1
+*  parameter.
+      BUFLEN = 68 * ( NHDRLI - 10 )
+      CALL PSX_MALLOC( BUFLEN, BUPNTR, STATUS )
+      CALL PSX_MALLOC( BUFLEN, SPNTR, STATUS )
+
+*  Create the axis structure.
+      CALL COI_AXIMP( IMDESC, NDF, %VAL( BUPNTR ), %VAL( SPNTR ),
+     :                STATUS, %VAL( BUFLEN ), %VAL( BUFLEN ) )
+
+*  Free the buffers.
+      CALL PSX_FREE( BUPNTR, STATUS )
+      CALL PSX_FREE( SPNTR, STATUS )
 
 *  Closedown sequence.
 *  ===================
