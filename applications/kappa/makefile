@@ -628,7 +628,7 @@ kpg1_trbor.f kpg1_trlib.f kpg1_trlid.f \
 kpg1_trlii.f kpg1_trlir.f kpg1_trliub.f kpg1_trliuw.f kpg1_trliw.f \
 kpg1_trpid.f kpg1_trpir.f kpg1_trspb.f kpg1_trspd.f kpg1_trspi.f \
 kpg1_trspr.f kpg1_trspub.f kpg1_trspuw.f kpg1_trspw.f \
-kpg1_unz2d.f kpg1_unz2r.f \
+kpg1_unz2d.f kpg1_unz2r.f kpg1_map.f \
 kpg1_vasvb.f kpg1_vasvd.f kpg1_vasvi.f kpg1_vasvr.f kpg1_vasvub.f \
 kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_vect.f kpg1_wmodb.f \
 kpg1_wmodd.f kpg1_wmodi.f kpg1_wmodr.f kpg1_wmodub.f kpg1_wmoduw.f \
@@ -796,7 +796,7 @@ C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES)
 
 FITS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 
-KAPGEN_C_ROUTINES = irg1_wild.c kpg1_trmsz.c 
+KAPGEN_C_ROUTINES = irg1_wild.c kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c
 
 #  Define the set of all interface files.
 
@@ -2785,6 +2785,7 @@ kpg1_ludcd.o:      SAE_PAR PRM_PAR
 kpg1_ludcr.o:      SAE_PAR PRM_PAR
 kpg1_lutin.o:      SAE_PAR
 kpg1_macol.o:      SAE_PAR
+kpg1_map.o:	   SAE_PAR PRM_PAR
 kpg1_mdetd.o:      SAE_PAR PRM_PAR
 kpg1_mdetr.o:      SAE_PAR PRM_PAR
 kpg1_meanb.o:      SAE_PAR PRM_PAR
