@@ -153,11 +153,6 @@
 //        FITS headers (actually turned out to be an AST bug).
 //-
 
-// For the cxx on the alphas
-#ifndef __USE_STD_IOSTREAM 
-#define __USE_STD_IOSTREAM 
-#endif 
-
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -227,6 +222,7 @@ public:
     { "astdomains",    &StarRtdImage::astdomainsCmd,   0, 0 },
     { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
     { "astget",        &StarRtdImage::astgetCmd,       1, 1 },
+    { "astpix2cur",    &StarRtdImage::astpix2curCmd,   2, 2 },
     { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 2 },
     { "astread",       &StarRtdImage::astreadCmd,      1, 1 },
     { "astrefine",     &StarRtdImage::astrefineCmd,    4, 4 },
@@ -951,7 +947,8 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             }
             message << ends;
             set_result( message.str() );
-            message.freeze( false );
+            //message.freeze( false );
+            message.rdbuf()->freeze( 0 );
         }
         return result;
     } else {
@@ -2513,6 +2510,61 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
 }
 
 //+
+//  StarRtdImage::astpix2curCmd
+//
+//  Purpose:
+//     Given an image X and Y position return them as formatted 
+//     coordinates in the current frame.
+//
+//  Input:
+//     X and Y position
+//
+//  Result:
+//     Formatted position transformed into the current frame.
+//
+//  Notes:
+//     This provides some of the functionality of the convert command,
+//     but avoids any issues to do with equinoxes, celestial
+//     coordinates systems (FK5/FK4 etc.) and epochs.
+//-
+int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astpix2curCmd" << endl;
+#endif
+
+    //  Extract the input X and Y positions.
+    double x;
+    double y;
+    if (Tcl_GetDouble( interp_, argv[0], &x ) != TCL_OK
+        || Tcl_GetDouble( interp_, argv[1], &y ) != TCL_OK) {
+        return TCL_ERROR;
+    }
+
+    //  Convert to current coordinates. Note we get result as
+    //  degrees. Convert back to radians...
+    double ra;
+    double dec;
+    if ( image_->wcs().pix2wcs( x, y, ra, dec ) == 0 ) {
+        ra /= R2D;
+        dec /= R2D;
+        
+        //  Format the values according to the current frame.
+        StarWCS* wcsp = getStarWCSPtr();
+        AstFrameSet *wcs = wcsp->astWCSClone();
+        const char *ra_buf = astFormat( wcs, 1, ra );
+        const char *dec_buf = astFormat( wcs, 2, dec );
+        Tcl_AppendElement( interp_, (char *) ra_buf );
+        Tcl_AppendElement( interp_, (char *) dec_buf );
+        astAnnul( wcs );
+        return TCL_OK;
+    }
+    else {
+        return error( "failed to transform positions" );
+    }
+}
+
+//+
 //   StarRtdImage::decodeLinear
 //
 //   Purpose:
@@ -3042,7 +3094,8 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
 
     os << ends;
     int result = eval( os.str() );
-    os.freeze( false );
+    os.rdbuf()->freeze( 0 );
+    //os.freeze( false );
     return result;
 }
 
@@ -3094,7 +3147,8 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
 
     os << ends;
     int result = eval( os.str() );
-    os.freeze( false );
+    os.rdbuf()->freeze( 0 );
+    //os.freeze( false );
     return result;
 }
 
@@ -4314,7 +4368,8 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     }
     os << ends;
     set_result( os.str() );
-    os.freeze( false );
+    os.rdbuf()->freeze( 0 );
+    //os.freeze( false );
     return TCL_OK;
 }
 

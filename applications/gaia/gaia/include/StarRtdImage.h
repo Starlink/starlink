@@ -166,6 +166,9 @@ class StarRtdImage : public Skycat {
    //  Straight-forward conversion from X,Y position to WCS.
    int astpix2wcsCmd( int argc, char *argv[] );
 
+   //  Straight-forward conversion from X,Y position to current coordinates.
+   int astpix2curCmd( int argc, char *argv[] );
+
    //  Derive simple statistics for creating WCS systems from scratch.
    int astbootstatsCmd( int argc, char *argv[] );
 
