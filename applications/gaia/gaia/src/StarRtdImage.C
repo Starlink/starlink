@@ -181,6 +181,9 @@
 //  Size of buffer used for Tcl commands.
 static const int eval_buf_size_ = 1024;
 
+//  Size of buffer used temporary filenames.
+static const int file_buf_size_ = 1024;
+
 //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
 static const double rad_ = pi_/180.;
@@ -4772,9 +4775,10 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
       int nndf = ndf->getNDFNum();
 
       //  Need NDF path
-      char ndfpath[80], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
+      char ndfpath[file_buf_size_], naxis1[32], naxis2[32],
+          hasvar[32], hasqual[32]; 
       ndf->getNDFInfo( nndf, ndfpath, naxis1, naxis2, hasvar, hasqual );
-      char buffer[1024];
+      char buffer[file_buf_size_];
 
       if ( strcmp( ndfpath, file() ) == 0 ) {
          //  Top-level NDF, just return name.
