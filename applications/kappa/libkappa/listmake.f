@@ -198,7 +198,7 @@
 *     one greater than the largest identifier in the input positions list.
 
 *  Related Applications:
-*     KAPPA: CURSOR, LISTSHOW; CURSA: XCATVIEW, CATSELECT
+*     KAPPA: CURSOR, LISTSHOW; CURSA: XCATVIEW, CATSELECT.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

@@ -50,7 +50,7 @@
 *     will result if they have no pixels in common.
 
 *  Related Applications:
-*     KAPPA: SUBSTITUTE, NOMAGIC, FILLBAD, PASTE, GLITCH
+*     KAPPA: SUBSTITUTE, NOMAGIC, FILLBAD, PASTE, GLITCH.
 
 *  Implementation Status:
 *     -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,

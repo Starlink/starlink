@@ -308,7 +308,7 @@
 *     If no file type is given, then ".fit" is assumed. 
 
 *  Related Applications:
-*     KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT
+*     KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
