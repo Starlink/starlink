@@ -520,6 +520,7 @@
 *
 *    Functions :
 *
+      REAL			AXV
       REAL                     PSS_CASH_SIG
       INTEGER                  UTIL_PLOC
 *
@@ -531,8 +532,6 @@
 *    Local variables :
 *
       CHARACTER*12             FNAME                   ! Diagnostic mode o/p
-      CHARACTER*80             TEXT                    ! Output text
-      CHARACTER*80             TITLE                   ! Input image title
       CHARACTER 		RASTR*9, DECSTR*10	! Position formatted
 
       DOUBLE PRECISION		CELPOS(2)	       	! Source position
@@ -552,7 +551,6 @@
       INTEGER                   K                       ! Convergence loop
       INTEGER			OBOX			! Output src id
       INTEGER		       	SID		       	! Diag o/p identifier
-      INTEGER                   TLEN                    ! used length of TEXT
 *
 *    Local data :
 *
