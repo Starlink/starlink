@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.11  1999/10/20 23:44:10  rpt
+#        Bug fix: also re-paint flat-field window if new run selected
+#
 #        Revision 1.10  1999/08/03 19:32:32  timj
 #        Add copyright message to header.
 #
@@ -137,6 +140,8 @@ my ($wbg, $wfg, $bbg, $bfg, $tc, $fc, $pc, $qc, $cc, $bc, $dc);
 my ($listfont, $plotfont, $labelfont, $newplot, $op_message, %pinfo);
 my ($w_control, $w_obsdate, $w_chop, $w_choperr, $w_cal, $w_calerr);
 my $bwmode;
+my $plot_id;
+my $flat_id; 
 
 # Canvas dimensions
 my $xplot   = 660;
@@ -1019,6 +1024,9 @@ sub plot {
 	    $C->delete('all') ;
 	}
 
+        # Set plot Id
+        $plot_id = "${obsdate}_${run}_${plotvar}";
+
         # Re-activate buttons
 	$w_choperr->configure( -state => 'active');
 	$w_chop->configure( -state => 'active');
@@ -1200,6 +1208,10 @@ sub plot {
 		   -fill => $dc);
     }
 
+    if (defined $BW) {
+       &plot_lwsw;
+    }
+
     # Allow print area to be selected
     if ($newplot) {
       $C->Tk::bind('<1>' => [sub {area_down(@ARG)}, \%pinfo]);
@@ -1248,6 +1260,9 @@ sub plot_lwsw {
     my $mtop    =  30;  
     my $mbottom = 360;
     
+    # Set flat Id
+    $flat_id = "${obsdate}_${run}_${plotvar}";
+
     # Define alternative mode for Mode button
     $newmode = ( $ffmode eq "names" ? "numbers" : "names" );
 
