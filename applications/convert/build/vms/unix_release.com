@@ -10,7 +10,7 @@ $!  Type of Module:
 $!     DCL command procedure.
 $!
 $!  Invovation:
-$!     @UNIX_RELEASE [CLASS] [PLATFORM]
+$!     @UNIX_RELEASE [CLASS]
 $!
 $!  Description:
 $!     This procedure assembles a UNIX release of the CONVERT package.  It
@@ -23,14 +23,6 @@ $!     CLASS
 $!        The optional name of the CMS class for the release to be
 $!        assembled.  If this parameter is not supplied, then the most
 $!        recent version of the system will be used.
-$!     PLATFORM
-$!        The optional name of the platform on which the release is to be
-$!        assembled.  It can take the values "SUN4" or "MIPS" for SUN
-$!        running SunOS and DECstation operating Ultrix respectively.
-$!        If this parameter is not supplied, or another value is given
-$!        "SUN4" will be assumed.  Note that Solaris and OSF are not
-$!        available because IRAF has yet to be ported to these operating
-$!        systems.
 $!
 $!  Notes:
 $!     Execution of this procedure should normally be followed by
@@ -74,20 +66,6 @@ $    ELSE
 $       CF = ""
 $    ENDIF
 $!
-$!  Identify the platform type.
-$!
-$    IF ( P2 .NES. "" )
-$    THEN
-$       IF ( P2 .NES. "SUN4" .AND. P2 .NES. "MIPS" )
-$       THEN
-$          WRITE SYS$OUTPUT "''P2' not recognised.  Using SUN4."
-$          P2 = "SUN4"
-$       ENDIF
-$    ELSE
-$       P2 = "SUN4"
-$    ENDIF
-$    WRITE SYS$OUTPUT "Assembling files for a ''P2'"
-$!
 $!  Use the CONVERT CMS library.
 $!
 $    CMS SET LIBRARY DISK$ADAM:[CUR.CONVERT.CMS]
@@ -113,11 +91,11 @@ $!  =================
 $!
 $!  Fetch all the Fortran routine source-code files.
 $!
-$    CMS FETCH'CF' CON_FORTRAN_ROUTINES,AIF_FORTRAN_ROUTINES,APPLIC,IRAF_SPP_FOR
+$    CMS FETCH'CF' CO*_FORTRAN_ROUTINES,AIF_FORTRAN_ROUTINES,APPLIC,IRAF_SPP_FOR
 $!
 $!  Fetch the source code for all the generic routines.
 $!
-$    CMS FETCH'CF' CON_GENERIC_ROUTINES
+$    CMS FETCH'CF' CO*_GENERIC_ROUTINES
 $!
 $!  Fetch the source code for all the C routines.
 $!
@@ -125,7 +103,7 @@ $    CMS FETCH'CF' CON_C_ROUTINES
 $!
 $!  Create a list of the generic source code.
 $!
-$    CMS SHOW GENERATION'CF' CON_GENERIC_ROUTINES -
+$    CMS SHOW GENERATION'CF' CO*_GENERIC_ROUTINES -
         /OUTPUT = GENERIX.TMP /FORMAT = "#E"
 $!
 $!  Call a procedure to generate the Fortran source from the generic
@@ -165,11 +143,7 @@ $!  ==============
 $!
 $!  Fetch the IRAF libraries
 $!
-$    CMS FETCH'CF' IRAF_'P2'_LIBRARIES
-$!
-$!  Rename the files to their generic form.
-$!
-$    RENAME *.A_'P2' *.A
+$    CMS FETCH'CF' IRAF_SOLARIS_LIBRARIES,IRAF_ALPHA_OSF1_LIBRARIES
 $!
 $!  Help source files.
 $!  ==================
