@@ -163,10 +163,7 @@
       REAL                   AXLO(ADI__MXDIM)   ! axis low
       REAL                   AXHI(ADI__MXDIM)   ! axis high
       REAL                   DIR(ADI__MXDIM)	! axis direction indicator
-      REAL                   BASE               ! Base value of regular axis
       REAL                   RANGES(2,DTA__MXRANG,ADI__MXDIM)  ! item ranges
-      REAL                   SCALE              ! Used in copying values from input to output axes
-      REAL                   WID                ! WIDTH of uniform axis
 
       INTEGER                DIMS(ADI__MXDIM)   ! Input DATA_ARRAY dimensions
       INTEGER                HU                 ! History lines used
@@ -182,7 +179,6 @@
       INTEGER                OWPTR(ADI__MXDIM)  ! Pointer to output axis widths
       INTEGER                ONDIM              ! Number of output dimensions
       INTEGER                PARENT(ADI__MXDIM) ! parent axis of output
-      INTEGER                SIZ                ! size of this & that
       INTEGER                TPTR               ! pointer to temp mapped array of logicals
       INTEGER                I, J, K            ! Loop counters
       INTEGER                NELM               ! Total length of input data
@@ -204,11 +200,11 @@
       LOGICAL                OK                 ! object is ok
       LOGICAL                KEEP(ADI__MXDIM)   ! Are ranges those to keep?
       LOGICAL                KEEPDATA
+      LOGICAL			PRIM			! Input is primitive?
       LOGICAL 		     SLICE
       LOGICAL                INDEX              ! select by index
       LOGICAL                QUALOK             ! Input QUALITY OK?
       LOGICAL                VAROK              ! Input VARIANCE OK?
-      LOGICAL                NORM               ! Axes normalised?
       LOGICAL                SEL(ADI__MXDIM)    ! Has axis been selected on?
 *.
 
@@ -572,12 +568,11 @@
       INTEGER                NAX                ! Number of axes
 *    Status :
       INTEGER STATUS
-<*    Local variables :
+*    Local variables :
       CHARACTER*80 		AXLAB              	! axis labels
 
       INTEGER			AXPTR			! Ptr to axis values
       INTEGER                	I                  	! loop variable
-      INTEGER                	SIZ                	! dummy
 *-
 
 *    Status check
@@ -604,9 +599,7 @@
           CALL MSG_SETI( 'I', I )
           CALL MSG_SETC( 'NAME', AXLAB )
           CALL MSG_PRNT( ' ^I ^NAME' )
-          CALL BDI_AXCHK( FID, I, 'Data', OK, STATUS )
-
-          CALL BDI_MAPAXVAL( FID, 'READ', I, AXPTR, STATUS )
+          CALL BDI_AXMAPR( FID, I, 'Data', 'READ', AXPTR, STATUS )
           CALL ARR_ELEM1R( AXPTR, DIMS(I), 1, AXLO(I), STATUS )
           CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
 
