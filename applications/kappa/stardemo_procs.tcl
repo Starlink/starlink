@@ -2792,7 +2792,6 @@ proc Resize {} {
    Obey kapview paldef "device=$DEVICE" 1
    Obey kapview gdclear "device=$DEVICE" 1
    Obey kapview gdset "device=$DEVICE" 1
-   Obey kapview idset "device=$DEVICE" 1
    set DOING ""
 
 #  Re-instate the original binding for Configure.
@@ -2878,7 +2877,6 @@ proc AdamReset {} {
 
 #  Re-establish the graphics devices.
       Obey kapview gdset "device=$DEVICE" 1
-      Obey kapview idset "device=$DEVICE" 1
       Obey kapview gdclear ""
    }
    return 1
