@@ -516,6 +516,9 @@
 /* Close PGPLOT down for now. */
          cpgclos();
 
+/* Update pending Tcl events. */
+         tclupdate();
+
 /* Set the zoom factor so that PGPLOT can optimise the plotting.  Basically
    this entails making the pixel array the same shape as the plotting 
    surface.  However, making it a lot bigger than the plotting surface
