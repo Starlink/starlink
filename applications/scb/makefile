@@ -293,7 +293,7 @@ SCB_SOURCES = $(STARLINK)/sources
 
 #  Starlink document HTTP server.
 
-HTXSERVER_URL = http://star-www.rl.ac.uk/cgi-bin/htxserver/
+HTX_SERVER = http://star-www.rl.ac.uk/cgi-bin/htxserver/
 
 #  Location of mime.types file.
 
@@ -422,7 +422,7 @@ VAR_SUBST = sed \
             -e 's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
             -e 's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
             -e 's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
-            -e 's%"$$HTXSERVER_URL"%"$(HTXSERVER_URL)"%' \
+            -e 's%"$$HTX_SERVER"%"$(HTX_SERVER)"%' \
             -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
 
 VARLIB_SUBST = $(VAR_SUBST) \

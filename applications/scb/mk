@@ -144,17 +144,19 @@
 #           Temporary directory used by indexer program.  Environment 
 #           variable value at runtime overrides value at build time.
 # 
-#        HTXSERVER_URL (http://star-www.rl.ac.uk/cgi-bin/htxserver/)
+#        HTX_SERVER (http://star-www.rl.ac.uk/cgi-bin/htxserver/)
 #           URL of HTTP server which serves HTX versions of Starlink
 #           documents.  Appending, e.g. 'sun1.htx/sun1.html' should 
 #           be a reference to the top level of the HTML version of 
-#           the Starlink document so named.
+#           the Starlink document so named.  In fact this does not 
+#           have to be a proper HTX server, in that it will not need
+#           to resolve xref_-type cross-references.  Thus a URL
+#           pointing to the top of the /star/docs tree would be suitable.
 #
 #        MIMETYPES_FILE (/etc/mime.types)
 #           This should give the location of a MIME type mapping file.  
 #           However, not much functionality is lost if the file named
-#           by this variable does not exist; in particular, no errors
-#           are generated.
+#           by this variable does not exist.
 #
 #     The following "local" make macros are used in the associated
 #     makefile and should normally be overridden by environment variable
@@ -295,7 +297,7 @@
       export SCB_INDEX
       export SCB_BROWSER_TMP
       export SCB_INDEXER_TMP
-      export HTXSERVER_URL
+      export HTX_SERVER
       export MIMETYPES_FILE
 
 #  Check that the SYSTEM environment variable is defined.

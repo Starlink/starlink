@@ -130,8 +130,8 @@ $mimetypes_file = "$MIMETYPES_FILE";
 
 #  HTX server base URL
 
-my $HTXSERVER_URL = "http://star-www.rl.ac.uk/cgi-bin/htxserver";
-$htxserver = "$HTXSERVER_URL";
+my $HTX_SERVER = "http://star-www.rl.ac.uk/cgi-bin/htxserver";
+$htxserver = "$HTX_SERVER";
 
 #  Index file locations.
 
