@@ -145,12 +145,15 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2004 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.36  2004/09/08 00:57:56  timj
+*     Register %LOC pointer with CNF
+*
 *     Revision 1.35  2001/02/22 02:49:56  timj
 *     Support raster skydips in new TCS
 *
@@ -294,6 +297,7 @@ c
       INCLUDE 'PAR_ERR'                 ! for PAR__ constants
       INCLUDE 'PRM_PAR'                 ! for VAL__ constants
       INCLUDE 'SURF_PAR'                ! SURF  constants
+      INCLUDE 'CNF_PAR'                 ! For CNF_PREG and CNF_PVAL
 
 *  Arguments Given:
 
@@ -405,6 +409,8 @@ c
       INTEGER IN_DATA_PTR               ! pointer to data array of input file
       INTEGER IN_NDF                    ! NDF identifier of input file
       INTEGER IN_QUAL_PTR               ! pointer to qual array of input file
+      LOGICAL ISAREFREG                 ! Was AREF pointer newly registered?
+      LOGICAL ISDREFREG                 ! Was DREF pointer newly registered?
       REAL    JSKY (SCUBA__MAX_MEAS)    ! Average SKY data for used SUB-INS
       REAL    JSKY_VAR (SCUBA__MAX_MEAS)! Variance of JSKY
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
@@ -1391,8 +1397,8 @@ c
             LABEL = 'Jsky'
             TITLE = 'Skydip'
             BADPIX = .FALSE.  ! I remove all bad data points
-            DREF = %LOC(JSKY)
-            AREF = %LOC(AIRMASS)
+            DREF = CNF_PREG(%LOC(JSKY), ISDREFREG)
+            AREF = CNF_PREG(%LOC(AIRMASS), ISAREFREG)
 
          ELSE
 *     Model parameters and create
@@ -1401,8 +1407,8 @@ c
             LABEL = 'Jsky'
             TITLE = 'Skydip (model)'
             BADPIX = .FALSE.
-            DREF = %LOC(J_THEORETICAL)   ! Reference to data
-            AREF = %LOC(AIR_MODEL)       ! Reference to axis
+            DREF = CNF_PREG(%LOC(J_THEORETICAL), ISDREFREG) ! Reference to data
+            AREF = CNF_PREG(%LOC(AIR_MODEL), ISAREFREG)     ! Reference to axis
 
             AIRSTEP = (AIRMASS(NKEPT) - AIRMASS(1)) /
      :           (N_MODEL - 1)
@@ -1414,6 +1420,24 @@ c
      :              STATUS)
             END DO
 
+         END IF
+
+*     Check that our pointer registration was okay
+         IF (AREF .EQ. 0 .OR. CNF_PVAL(AREF) .EQ. 0) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'SKYDIP_AREF_CNF_ERR',
+     :              'Unable to register AREF pointer with CNF',
+     :              STATUS )
+            END IF
+         END IF
+         IF (DREF .EQ. 0 .OR. CNF_PVAL(DREF) .EQ. 0) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'SKYDIP_DREF_CNF_ERR',
+     :              'Unable to register DREF pointer with CNF',
+     :              STATUS )
+            END IF
          END IF
 
 *     Find out the name of the output file
@@ -1529,6 +1553,10 @@ c
 
 *     Tidy up
             CALL NDF_ANNUL(OUT_NDF, STATUS)
+
+*  Release the %LOC pointers from CNF so that it can be re-used
+            IF (ISAREFREG .AND. AREF .NE. 0) CALL CNF_UNREGP( AREF )
+            IF (ISDREFREG .AND. DREF .NE. 0) CALL CNF_UNREGP( DREF )
 
          ENDIF
 
