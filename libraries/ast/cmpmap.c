@@ -1995,8 +1995,8 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
    coordinates. Combine these results to obtain a result for the overall
    CmpMap. If neither transformation direction is available, then report an
    error. */
-   map_f = astGetTranDef( map1, 1 ) && astGetTranDef( map2, 1 );
-   map_i = astGetTranDef( map1, 0 ) && astGetTranDef( map2, 0 );
+   map_f = astGetTranForward( map1 ) && astGetTranForward( map2 );
+   map_i = astGetTranInverse( map1 ) && astGetTranInverse( map2 );
    if ( astOK ) {
       if ( !map_f && !map_i ) {
          astError( AST__INTRD, "astInitCmpMap(%s): The two Mappings supplied "
