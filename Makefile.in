@@ -25,6 +25,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/ast \
 	$(MANIFEST)/astrom \
 	$(MANIFEST)/atimer \
+	$(MANIFEST)/atools \
 	$(MANIFEST)/cat \
         $(MANIFEST)/ccdpack \
 	$(MANIFEST)/chr \
