@@ -389,7 +389,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.0
+PKG_VERS = 0.2
 
 # XXX fix location of catlib distribution
 # Originally from ftp://ftp.eso.org/pub/archive/skycat/README.html
@@ -714,7 +714,7 @@ install:
 #  they contain and linking with other documents.
 	if test -n "$(HYPERTEXT_DOCS)"; then \
            pwd=`pwd`;\
-           (cd $(INSTALL_DOCS);\
+           (cd $(INSTALL_DOCS) && \
            for f in $(HYPERTEXT_DOCS) ""; do \
               if test -n "$$f"; then\
                  $(TAR_OUT) $$pwd/$${f}_tar;\
@@ -876,7 +876,7 @@ do_test: $(EXTERNAL_INCLUDES)
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 	@ echo "Testing moggy"
-	cd moggy; make test
+	cd moggy && make test
 	@ echo "There is not yet an installed AUTOASTROM test."
 #
 #  Note the test has been run.
@@ -987,12 +987,13 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 		$(EXPORT)/$(PKG_NAME).tar.Z
 
 #  Make the source tarball, making sure that the source directories
-#  are properly clean first.  Here and below, use the Makefile.in
-#  within moggy, since the Makefile is a generated file which may not
-#  be present.  Also ensure that the moggy configure script is present.
+#  are properly clean first.  When cleaning out moggy, check that
+#  there is indeed a Makefile (there won't be, if the directory is
+#  already clean).  Also ensure that the moggy configure script is present.
 $(PKG_NAME)_source.tar:
-	cd astrom; ./mk unbuild
-	cd moggy; make -f Makefile.in distclean; make -f Makefile.in configure
+	cd astrom && ./mk unbuild
+	cd moggy && test -f Makefile &&	make distclean
+	cd moggy && make -f Makefile.in configure
 	test ! -f $(PKG_NAME)_source.tar || rm -f $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc
 
@@ -1002,8 +1003,8 @@ $(PKG_NAME)_source.tar:
 #  Remove all intermediate files.  Do not remove built files.
 clean:
 	rm -f *~ core
-	cd astrom; ./mk clean
-	cd moggy; make -f Makefile.in tidy
+	-cd astrom && ./mk clean
+	-cd moggy && make -f Makefile.in tidy
 #	@- rm -rf source 1>/dev/null 2>/dev/null
 #	@- rm -f $(F_ROUTINES) $(OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@ echo
@@ -1016,8 +1017,8 @@ clean:
 #  Remove all intermediate files and all built files, and note that the
 #  package is no longer built or tested.
 unbuild: clean
-	cd astrom; ./mk unbuild
-	cd moggy; make -f Makefile.in clean
+	-cd astrom && ./mk unbuild
+	-cd moggy && make -f Makefile.in clean
 	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
@@ -1032,7 +1033,7 @@ unbuild: clean
 
 # First configure and build the moggy package.
 moggy/moggy: moggy/Makefile
-	cd moggy; make
+	cd moggy && make
 
 moggy/Makefile: moggy
 	@ if test ! -r $(CATLIB_DISTRIBUTION); then \
@@ -1043,12 +1044,17 @@ moggy/Makefile: moggy
 	cd moggy && ./configure --with-catlib=../$(CATLIB_DISTRIBUTION)
 
 astrom/astrom.x: astrom
-	cd astrom; ./mk build
+	cd astrom && ./mk build
 
 #  Unpack the source tarball.  The extra test is because the makefile
 #  (always/sometimes?) wants to execute this twice.
 moggy astrom: $(PKG_NAME)_source.tar
 	test -d moggy -a -d astrom || $(TAR_OUT) $(PKG_NAME)_source.tar
+
+#  Propagate the version number
+autoastrom.news makefile moggy/Moggy.pm: VERSION
+	support/propagate-version autoastrom.news makefile moggy/Moggy.pm
+
 
 #------------------------------------------------------------------------------
 #
