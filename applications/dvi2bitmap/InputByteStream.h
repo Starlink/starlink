@@ -54,6 +54,7 @@ class InputByteStream {
     ~InputByteStream();
 
     bool eof();
+    virtual void close();
     Byte getByte(void)
 	    throw (InputByteStreamError);
     const Byte *getBlock(unsigned int length)
@@ -104,21 +105,6 @@ class InputByteStream {
     void bufferSeek(unsigned int pos)
 	    throw (InputByteStreamError);
     void reloadBuffer(void);
-    /**
-     * Register a function to be called when the stream file
-     * descriptor is closed.  Note that this is not the same as being
-     * called when the stream reaches EOF, which might happen more
-     * than once if an extending class has, for example, reset the
-     * file pointer after EOF.
-     *
-     * @param fn callback function
-     */
-    void closedFD(void);
-    /*    void closeCallback(void (*fn)(void));*/
-/*     void closeCallback(void (*fn)(void)) { */
-/* 	close_callback_ = fn; */
-/* 	//cerr << "registered close_callback_=" << fn << endl; */
-/*     } */
     /**
      * Returns the verbosity setting of this class
      */

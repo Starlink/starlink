@@ -30,29 +30,28 @@
 #define PIPE_STREAM_HEADER_READ 1
 
 #include <InputByteStream.h>
+#include <sys/types.h>
 
 class PipeStream : public InputByteStream {
  public:
     PipeStream (string cmd, string envs="")
 	    throw (InputByteStreamError);
+    ~PipeStream();
     string getResult(void)
 	    throw (InputByteStreamError);
+    virtual void close(void);
+    int getStatus(void);
     /**
-     * Return the status of the command at the end of the pipe.  This
-     * is only available after the command has run to completion.
+     * Returns the PID of the running process.  After the process has
+     * finished, this will return zero.
      *
-     * @return the exit status of the process, or negative if no
-     * status is yet available
+     * @return the process's PID, or zero if it has finished
      */
-    int getStatus(void) const { return pipe_status_; };
-    int getPid(void) const { return pid_; };
- protected:
-    void closedFD(void);
+    pid_t getPid(void) const { return pid_; };
  private:
     int pipe_status_;
-    int pid_;
+    pid_t pid_;
     const string orig_command_;
-    /* void read_status_(void); */
 };
 
 

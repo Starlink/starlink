@@ -118,16 +118,16 @@ PipeStream::PipeStream (string cmd, string envs)
     if (pipe(fd))
 	throw new DviError("runCommandPipe: failed to create pipe");
 
-    int pid_ = fork();
+    pid_ = fork();
     if (pid_ < 0) {
 	throw new DviError("runCommandPipe: failed to fork");
     } else if (pid_ == 0) {
 	// ...in child.  We will write to the pipe, so immediately
 	// close the reading end
-	close(fd[0]);
+	::close(fd[0]);
 	// And we want our stdout to go down the writing end
 	dup2(fd[1], STDOUT_FILENO);
-	close(fd[1]);
+	::close(fd[1]);
 
 	char **argv = Util::string_list_to_array(Util::tokenise_string(cmd));
 
@@ -192,8 +192,6 @@ PipeStream::PipeStream (string cmd, string envs)
 
 	char **envp = Util::string_list_to_array(envlist);
 
-	// XXX should ignore SIGPIPE ?
-
 	execve(argv[0], argv, envp);
 
 	// This is an error
@@ -208,11 +206,9 @@ PipeStream::PipeStream (string cmd, string envs)
     } else {
 
 	// ... in parent.  Close the writing end.
-	close(fd[1]);
+	::close(fd[1]);
 
 	bindToFileDescriptor(fd[0]);
-
-	//InputByteStream::closeCallback((void(*)())&PipeStream::read_status_);
     }
 #else  /* HAVE_PIPE */
     throw new InputByteStreamError("Have no pipe() function");
@@ -220,17 +216,33 @@ PipeStream::PipeStream (string cmd, string envs)
 
 }
 
-void PipeStream::closedFD(void)
+PipeStream::~PipeStream()
 {
-    cerr << "PipeStream::closedFD..." << endl;
-    waitpid(pid_, &pipe_status_, 0);
-    InputByteStream::closedFD();
+    close();
 }
 
-// void PipeStream::read_status_(void)
-// {
-//     waitpid(pid_, &pipe_status_, 0);
-// }
+void PipeStream::close(void)
+{
+    cerr << "PipeStream::close..." << endl;
+    if (pid_ > 0) {
+	waitpid(pid_, &pipe_status_, 0);
+	pid_ = 0;
+    }
+    InputByteStream::close();
+}
+
+/**
+ * Returns the status of the command at the end of the pipe.  Since this
+ * is only available after the command has run to completion, this
+ * also waits until the command has finished, and then closes the stream.
+ *
+ * @return the exit status of the process.
+ */
+int PipeStream::getStatus(void)
+{
+    close();
+    return pipe_status_;
+};
 
 /**
  * Returns the contents of the stream as a string.  If some of the

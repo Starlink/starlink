@@ -45,6 +45,11 @@
 #endif
 #include <unistd.h>
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/types.h>		// for stat
+#include <sys/stat.h>		// for stat
+#endif
+
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::sprintf;
@@ -53,10 +58,10 @@ using std::endl;
 
 // Static debug switch
 verbosities InputByteStream::verbosity_ = normal;
-unsigned int InputByteStream::default_buffer_length_ = 512;
+unsigned int InputByteStream::default_buffer_length_ = 0;
 
 InputByteStream::InputByteStream()
-    : eof_(true), close_callback_(0)
+    : eof_(true)
 {
     // empty
 }
@@ -106,13 +111,17 @@ InputByteStream::InputByteStream(string srcspec)
  */
 InputByteStream::~InputByteStream ()
 {
-    close_fd_();
+    close();
     if (buf_ != 0)
 	delete[] buf_;
 }
 
 /**
- * Indicate whether we are at the end of the file
+ * Indicates whether we are at the end of the file.  This method does
+ * not return true until <em>after</em> a failed attempt to read past
+ * the end of file; that is, it does not return true immediately
+ * after the last byte has been read from the file.
+ *
  * @return true if we are at the end of the file
  */
 bool InputByteStream::eof()
@@ -164,28 +173,53 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
     if (bufsize < 0)
 	throw InputByteStreamError("InputByteStream: negative bufsize");
 
-    buflen_ = (bufsize == 0 ? default_buffer_length_ : bufsize);
+    buflen_ = 0;
+    if (buflen_ == 0 && bufsize != 0)
+	buflen_ = bufsize;
+    if (buflen_ == 0 && default_buffer_length_ != 0)
+	buflen_ = default_buffer_length_;
+
+#ifdef HAVE_SYS_STAT_H
+    struct stat S;
+    if (fstat(fd_, &S) == 0) {
+	if (verbosity_ > normal)
+	    cerr << "File descriptor " << fd_ << " OK:"
+		 << " st_rdev=" << S.st_rdev
+		 << " st_mode=" << S.st_mode
+		 << " (pipe? " << S_ISFIFO(S.st_mode) << ")"
+		 << " st_size=" << S.st_size
+		 << " st_blksize=" << S.st_blksize
+		 << endl;
+	if (buflen_ == 0)
+	    buflen_ = S.st_blksize;
+    } else {
+	string errmsg = strerror(errno);
+	throw InputByteStreamError("File descriptor not open: " + errmsg);
+    }
+#endif	/* HAVE_SYS_STAT_H */
+
+    if (buflen_ == 0)
+	buflen_ = 1024;
+
+    //buflen_ = (bufsize == 0 ? default_buffer_length_ : bufsize);
     buf_ = new Byte[buflen_];
     if (verbosity_ > normal)
 	cerr << "InputByteStream: reading from fd " << fileno
 	     << ", name=" << fname_
+	     << ", buffer length=" << buflen_
 	     << endl;
 
     if (fillBufferAndClose) {
 	size_t real_length = certainly_read_(fd_, buf_, buflen_);
 	p_ = buf_;
 	eob_ = buf_ + real_length;
-	close_fd_();
+	close();
     } else {
-	read_buf_();
+	eob_ = p_ = buf_;
 	assert(p_ == buf_);
     }
 
-    if (eof()) {
-	close_fd_();
-    } else {
-	assert(buf_ <= p_ && p_ < eob_);
-    }
+    assert(buf_ <= p_ && p_ <= eob_);
     
     return true;
 }
@@ -194,8 +228,8 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
 /**
  * Opens a source.  The source is specified as in {@link
  * #InputByteStream(string)}.  Throws an exception on any problems,
- * so that if it returns, it has successfully opened, or determined
- * the existence of, the file.
+ * so that if it returns, it has successfully opened the file, or determined
+ * that the file descriptor is (syntactically) valid.
  *
  * @param srcspec a source specification
  * @return an open file descriptor
@@ -232,6 +266,8 @@ int InputByteStream::openSourceSpec(string srcspec)
     if (fd < 0 && srcfn.size() == 0)
 	throw InputByteStreamError("InputByteStream: no source spec!");
 
+    assert(!(fd >= 0 && srcfn.size() > 0)); // not _both_ specified
+
     if (srcfn.size() > 0) {
 	assert(fd < 0);
 	fd = open(srcfn.c_str(), O_RDONLY);
@@ -266,11 +302,11 @@ size_t InputByteStream::certainly_read_(int fd, Byte* b, size_t len)
 {
     size_t totread = 0;
     ssize_t thisread;
-    
+
+    assert(fd >= 0);
+
     while (len > 0
 	   && (thisread = read(fd, (void*)b, len)) > 0) {
-	cerr << "certainly_read_: read " << thisread
-	     << ", len=" << len << endl;
 	b += thisread;
 	len -= thisread;
 	totread += thisread;
@@ -285,8 +321,10 @@ size_t InputByteStream::certainly_read_(int fd, Byte* b, size_t len)
 
 /**
  * Reads a byte from the stream.  This method does not signal
- * an error at end-of-file; use the {@ #eof} method to detect if the
- * stream is at an end.
+ * an error at end-of-file; if {@ #eof} is true or <em>becomes</em>
+ * true as a result of this attempt to read past the end of the file,
+ * then we return zero.  That is, <code>eof()</code> does not return
+ * true immediately the last byte in the file has been read.
  *
  * @return the byte read, or zero if we are at the end of the file
  * @throws InputByteStreamError if there is some problem reading the stream
@@ -297,11 +335,20 @@ Byte InputByteStream::getByte(void)
     if (eof_)
 	return 0;
 
-    assert(buf_ <= p_ && p_ < eob_);
+    assert(buf_ <= p_ && p_ <= eob_);
 
-    Byte result = *p_;
-    if (++p_ == eob_)
-	read_buf_();
+    if (p_ == eob_)
+	read_buf_();		// alters p_ and eob_, and possible eof_
+
+    Byte result;
+    
+    if (eof_)
+	result = 0;
+    else
+	result = *p_++;
+
+    assert(buf_ <= p_ && p_ <= eob_);
+
     return result;
 }
 
@@ -320,10 +367,9 @@ const Byte *InputByteStream::getBlock(unsigned int length)
 {
     Byte *ret;
 
-    assert(buf_ <= p_ && p_ < eob_);
+    assert(buf_ <= p_ && p_ <= eob_);
 
-    if (length < eob_-p_) {
-	// not <=, since we must leave p_<eob_
+    if (length <= eob_-p_) {
 	ret = p_;
 	p_ += length;
 	//cerr << "small: p_@" << p_-buf_ << endl;
@@ -337,9 +383,9 @@ const Byte *InputByteStream::getBlock(unsigned int length)
 	}
 	bool read_ok;
 	size_t inbufalready = eob_-p_;
-	int mustread = length-inbufalready+1; // so (p_=(buf_+length))==eob_-1
-	if (length < buflen_) {
-	    // not length<=buflen_, since we must leave p_<eob_
+	int mustread = length-inbufalready; // so (p_=(buf_+length)) <= eob_
+	if (length <= buflen_) {
+	    // whole block will fit in current buffer
 	    memmove((void*)buf_, (void*)p_, inbufalready);
 	    read_ok = (certainly_read_(fd_,
 				       buf_+inbufalready,
@@ -348,7 +394,7 @@ const Byte *InputByteStream::getBlock(unsigned int length)
 	    //cerr << "medium: read_ok=" << (read_ok?"true":"false");
 	} else {
 	    // must expand buffer
-	    int newbuflen = length * 3 / 2;
+	    int newbuflen = length * 3 / 2; // decent size
 	    Byte* newbuf = new Byte[newbuflen];
 	    memcpy((void*)newbuf, (void*)p_, inbufalready);
 	    read_ok = (certainly_read_(fd_,
@@ -368,18 +414,11 @@ const Byte *InputByteStream::getBlock(unsigned int length)
 	    throw InputByteStreamError(errmsg);
 	}
 	ret = buf_;
-	p_ = buf_ + length;
-	eob_ = buf_ + length + 1; // p_ = eob_-1 (ie, p_<eob_)
+	eob_ = p_ = buf_ + length;
 	//cerr << "; p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_ << endl;
     }
-    
-//     cerr << "(ret=";
-//     Byte *x=buf_;
-//     for (int i=0; i<10; i++)
-// 	cerr << *x++;
-//     cerr << ")" << endl;
 
-    assert(buf_ <= p_ && p_ < eob_);
+    assert(buf_ <= p_ && p_ <= eob_);
 
     return ret;
 }
@@ -411,6 +450,8 @@ void InputByteStream::read_buf_ ()
 	     << ", eob=buf+" << eob_-buf_
 	     << endl;
     p_ = buf_;
+
+    assert(buf_ <= p_ && (eof_ || buf_ < eob_) && p_ <= eob_);
 }
 
 /**
@@ -425,7 +466,7 @@ void InputByteStream::skip (unsigned int increment)
     if (eof())
 	throw InputByteStreamError("Skip while at EOF");
 
-    assert(buf_ <= p_ && p_ < eob_);
+    assert(buf_ <= p_ && p_ <= eob_);
 
     if (fd_ < 0) {
 	// better be in the buffer already
@@ -440,6 +481,8 @@ void InputByteStream::skip (unsigned int increment)
 	    increment -= (eob_-p_);
 	    read_buf_();		// changes p_ and eob_
 	    while (increment >= (eob_-p_)) {
+		if (eof_)
+		    throw InputByteStreamError("skip past end of file");
 		read_buf_();	// changes p_ and eob_
 		increment -= (eob_-p_);
 	    }
@@ -447,7 +490,7 @@ void InputByteStream::skip (unsigned int increment)
 	p_ += increment;
     }
     
-    assert(buf_ <= p_ && p_ < eob_);
+    assert(buf_ <= p_ && p_ <= eob_);
 }
 
 /**
@@ -473,7 +516,7 @@ void InputByteStream::bufferSeek(unsigned int offset)
     cerr << "bufferSeek to " << offset << "; eof=" << (eof_ ? "true" : "false")
 	 << ", p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_
 	 << endl;
-    assert(buf_ <= p_ && p_ < eob_);
+    assert(buf_ <= p_ && p_ <= eob_);
 }
 
 /**
@@ -482,29 +525,25 @@ void InputByteStream::bufferSeek(unsigned int offset)
  */
 void InputByteStream::reloadBuffer(void)
 {
-    read_buf_();
-    assert(buf_ <= p_ && p_ < eob_);
+    p_ = eob_;			// triggers reading of buffer
+    eof_ = false;		// we guess -- harmless if wrong
+    if (verbosity_ > normal)
+	cerr << "InputByteStream::reloadBuffer: p=buf+" << p_-buf_
+	     << " eob=buf+" << eob_-buf_
+	     << " eof=" << (eof_ ? "true" : "false")
+	     << endl;
+    assert(buf_ <= p_ && p_ <= eob_);
 }
 
-void InputByteStream::close_fd_(void)
+void InputByteStream::close(void)
 {
+    if (verbosity_ > normal)
+	cerr << "InputByteStream::close" << endl;
+    
     if (fd_ >= 0)
-	close (fd_);
+	::close (fd_);
     fd_ = -1;
-    this->closedFD();
-//     if (close_callback_ != 0)
-// 	(*close_callback_)();
 }
-
-void InputByteStream::closedFD(void)
-{
-    cerr << "InputByteStream::closedFD..." << endl;
-}
-
-// void InputByteStream::closeCallback(void (*fn)(void)) {
-//     close_callback_ = fn;
-//     cerr << "registered close_callback_=" << fn << endl;
-// }
 
 /**
  * Sets the default buffer size to be used for reading files.
