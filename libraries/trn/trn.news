@@ -1,5 +1,8 @@
 1 TRANSFORM - co-ordinate transformation library
                                                       Expires: **.**.** 
+ V0.9-5
+    Change to the build system to use Gnu autoconf.
+
  V0.9-4:
     TRANSFORM V0,9-4 implements internal changes to permit the use of
     64-bit addresses in Fortran on platforms which require it. There
