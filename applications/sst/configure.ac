@@ -22,6 +22,11 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+dnl    Check if sys/wait.h exists and is POSIX compatible
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_FUNCS(memcpy)
+
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
