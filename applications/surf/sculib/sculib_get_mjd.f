@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_GET_MJD(N_FITS, FITS, MJD, STATUS)
+*     CALL SCULIB_GET_MJD(N_FITS, FITS, MJD, EPOCH, STATUS)
 
 *  Description:
 *     This routine retrieves the UTSTART and UTDATE values from the FITS
@@ -24,15 +24,14 @@
 *     MJD = DOUBLE PRECISION (Returned)
 *        Modified Julian date of observation
 *     EPOCH = _REAL (Returned)
-*        Epoch of observation
+*        Julian Epoch of observation
 *     STATUS = _INTEGER (Given & Returned)
 *        Global status
 
-*  Prior Requirements:
-*     The locator to the structure must already be available.
-
 *  Notes:
-*     This routine does not annul the locator.
+*     Uses the UTDATE and UTSTART FITS headers. These must be present.
+*     The date is stored in UTDATE in format YYYY:M:D
+*     The time is stored in UTSTART in format HH:MM:SS.SS
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -40,7 +39,7 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2000 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
