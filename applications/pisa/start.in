@@ -49,7 +49,7 @@ alias pisawww       '$PISA_DIR/pisawww'
 #
 #  Show that the PISA commands are now available.
 echo " "
-echo "   PISA commands are now available - (Version PKG_VERS)"
+echo "   PISA commands are now available - (Version @VERSION@)"
 echo " "
 echo "   For help use the commands pisahelp or pisawww"
 echo " "

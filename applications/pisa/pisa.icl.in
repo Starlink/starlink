@@ -36,7 +36,7 @@ defhelp pisa2ard      $PISA_HELP
 { Print welcome message
 {
 print " "
-print "   PISA commands are now available - (Version PKG_VERS)"
+print "   PISA commands are now available - (Version @VERSION@)"
 print " "
 print "   For help use the commands help pisa or pisawww"
 print " "

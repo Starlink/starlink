@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = start pisa.icl pisa_demo pisa_demo.icl pisa_proc.icl \
- pisahelp.ifc
+dist_bin_SCRIPTS = start pisa.icl pisa_demo pisa_demo.icl pisa_proc.icl \
+ pisahelp.ifc pisawww
 
-noinst_SCRIPTS = pisa_link_adam
+dist_noinst_SCRIPTS = pisa_link_adam
 
 bin_MONOLITHS = pisa_mon pisa_mon4
 
@@ -29,6 +29,7 @@ pisa_mon4_LDADD = $(LDADD) `pisa_link_adam`
 pisa_mon4_TASKS = pisafind4 pisafit4
 
 bin_PROGRAMS = pisahelp
+pisahelp_SOURCES = pisahelp.f $(HELPSRC)
 
 SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \
          ellpse.f extend.f featur.f fitplo.f gtmlim.f \
@@ -59,8 +60,8 @@ HELPSRC = gethlp.f gthlpi.f kpg1_scrsz.f pthlpo.f sread.f
 ##
 ##pisahelp_TASKS = pisahelp
 
-pisahelp: pisahelp.f $(HELPSRC)
-	@ALINK@ pisahelp.o -o pisahelp $(HELPSRC:.f=.o)
+pisahelp: pisahelp.f $(HELPSRC:.f=.o)
+	@ALINK@ pisahelp.f -o pisahelp $(HELPSRC:.f=.o)
 
 ##  The on-line help.
 HELP_SOURCES = pisahelp.hlp
@@ -82,4 +83,4 @@ pisasupport_DATA = frame.sdf frame_stars.acc clustan.dat findinfo.dat \
 dist_pkgdata_DATA = pisa.news
 
 ##  Things for distribution that are not picked up otherwise.
-EXTRA_DIST = $(pisasupport_DATA) $(HELP_SOURCES)
+EXTRA_DIST = $(pisasupport_DATA) $(HELP_SOURCES) sun109fig.ps

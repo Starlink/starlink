@@ -10,7 +10,7 @@
       
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>agi</build><build>cat</build><build>chr</build><build>fio</build><build>ndf</build><build>par</build><build>pda</build><build>prm</build><build>sae</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>agi</build><build>cat</build><build>chr</build><build>fio</build><build>ndf</build><build>par</build><build>pda</build><build>prm</build><build>sae</build>
   </dependencies>
   <developers>
     <person>
