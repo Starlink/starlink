@@ -45,6 +45,7 @@
 *  first invocation do global initialisation
       IF (.NOT.I_OPEN) THEN
         CALL AST_INIT()
+        I_BGM_ON = .FALSE.
       ELSE
         CALL USI_INIT()
       ENDIF

@@ -380,9 +380,13 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+	print *,'In NEW'
+	call flush(6)
 
 *  Reset internals
       CALL IBGND_RESET( .TRUE., .TRUE., .TRUE., STATUS )
+	print *,'done RESET'
+	call flush(6)
 
 *  Allocate space for the background data surface, quality (and errors?). If
 *  image size has changed we need to increase existing allocations
@@ -397,14 +401,20 @@
         CALL DYN_MAPB( 1, I_NX*I_NY, I_BGM_QPTR, STATUS )
         I_BGM_NELM = I_NX*I_NY
       END IF
+	print *,'done ALLOC'
+	call flush(6)
 
 *  Initialise the the background model quality array. This is ok for points
 *  inside the current region, and bad outside and for bad input pixels
       CALL IBGND_SETQ( I_NX, I_NY, %VAL(I_QPTR),
      :                 %VAL(I_BGM_QPTR), STATUS )
+	print *,'done SETQ'
+	call flush(6)
 
 *  Set the sample mode to the whole image, simple mean and compute the samples
       CALL IBGND_SETSAMP( 'WHOLE', 'MEAN', STATUS )
+	print *,'done SETSAMP'
+	call flush(6)
 
 *  Switch modelling on
       I_BGM_ON = (STATUS.EQ.SAI__OK)
