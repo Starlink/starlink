@@ -7,7 +7,7 @@
 *     Create a new history structure in a dataset
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL HSI_NEW( IFID, STATUS )
@@ -61,13 +61,13 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     {routine_references}...
+*     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:hsi, usage:public
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -103,7 +103,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL ADI_CGET0C( IFID, '.LOCATOR', ILOC, STATUS )
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
       CALL HIST_NEW( ILOC, STATUS )
 
 *  Report any errors

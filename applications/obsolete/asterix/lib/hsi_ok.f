@@ -7,7 +7,7 @@
 *     Check that history exists for the dataset
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL HSI_OK( IFID, OK, STATUS )
@@ -62,13 +62,13 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     {routine_references}...
+*     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:hsi, usage:public
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -108,7 +108,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Simply invoke HDS routine for now
-      CALL ADI_CGET0C( IFID, '.LOCATOR', ILOC, STATUS )
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
       CALL HIST_OK( ILOC, OK, STATUS )
 
 *  Report any errors

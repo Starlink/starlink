@@ -7,7 +7,7 @@
 *     Copy history from first dataset to the second
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL HSI_COPY( IFID, OFID, STATUS )
@@ -64,13 +64,13 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     {routine_references}...
+*     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:hsi, usage:public
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -109,8 +109,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Simply extract locators and invoke HDS version for the momemnt
-      CALL ADI_CGET0C( IFID, '.LOCATOR', ILOC, STATUS )
-      CALL ADI_CGET0C( OFID, '.LOCATOR', OLOC, STATUS )
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
+      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
       CALL HIST_COPY( ILOC, OLOC, STATUS )
 
 *  Report any errors

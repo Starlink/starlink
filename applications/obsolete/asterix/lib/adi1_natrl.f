@@ -7,7 +7,7 @@
 *     Attempt to define the natural class for an HDS object
 
 *  Language:
-*     Fortran
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL ADI1_NATRL( ID, CLASS, STATUS )
@@ -54,10 +54,10 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:adi, usage:private
 
 *  Copyright:
 *     {routine_copyright}
@@ -109,7 +109,7 @@
       CLASS = ' '
 
 *    Retrieve the locator from the property list
-      CALL ADI_CGET0C( ID, '.LOCATOR', FLOC, STATUS )
+      CALL ADI_GETLOC( ID, FLOC, STATUS )
 
 *    Is it primitive?
       CALL DAT_PRIM( FLOC, PRIM, STATUS )
