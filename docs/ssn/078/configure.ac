@@ -7,7 +7,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 AC_CONFIG_SRCDIR(ssn78.xml)
 
-STAR_DEFAULTS
+STAR_DEFAULTS(docs-only)
 
 AC_PATH_PROGS(JADE, [jade openjade], jade)
 AC_PATH_PROGS(SGMLNORM, [sgmlnorm osgmlnorm], sgmlnorm)
