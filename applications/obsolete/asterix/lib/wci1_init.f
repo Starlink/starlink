@@ -118,7 +118,7 @@
         CALL ADI_REQPKG( 'wcs', STATUS )
 
 *    Define the methods
-        CALL ADI_DEFMTH( 'ReadWCS(_BinDS,_HDSfile)', WCI1_READ, DID,
+        CALL ADI_DEFMTH( 'ReadWCS(_,_HDSfile)', WCI1_READ, DID,
      :                   STATUS )
         CALL ADI_DEFMTH( 'ReadWCS(_BinDS,_FITSfile)', WCI2_READ, DID,
      :                   STATUS )

@@ -135,7 +135,11 @@
       CALL ADI_GETLINK( ID, FILID, STATUS )
 
 *  Simply invoke the ReadWCS method
-      CALL ADI_EXEC2( 'ReadWCS', ID, FILID, RESID, STATUS )
+      IF ( FILID .EQ. ADI__NULLID ) THEN
+        CALL ADI_EXEC2( 'ReadWCS', ADI__NULLID, ID, RESID, STATUS )
+      ELSE
+        CALL ADI_EXEC2( 'ReadWCS', ID, FILID, RESID, STATUS )
+      END IF
 
 *  If ok, extract results
       IF ( (STATUS .EQ. SAI__OK) .AND. (RESID.NE.ADI__NULLID) ) THEN

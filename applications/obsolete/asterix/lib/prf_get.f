@@ -86,6 +86,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
       INCLUDE 'DAT_PAR'					! HDS constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			ID
@@ -109,16 +110,19 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Derived from HDSfile?
+      VALUE = .FALSE.
       CALL ADI_GETLINK( ID, LID, STATUS )
-      CALL ADI_DERVD( LID, 'HDSfile', ISHDS, STATUS )
-      IF ( ISHDS ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+      ELSE IF ( LID .NE. ADI__NULLID ) THEN
 
-*    Get locator and invoke HDS version
-        CALL ADI1_GETLOC( ID, LOC, STATUS )
-        CALL PRF1_GET( LOC, FLAG, VALUE, STATUS )
-      ELSE
-        VALUE = .FALSE.
+        CALL ADI_DERVD( LID, 'HDSfile', ISHDS, STATUS )
+        IF ( ISHDS ) THEN
 
+*      Get locator and invoke HDS version
+          CALL ADI1_GETLOC( ID, LOC, STATUS )
+          CALL PRF1_GET( LOC, FLAG, VALUE, STATUS )
+        END IF
       END IF
 
 *  Report any errors
