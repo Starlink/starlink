@@ -101,6 +101,7 @@
 *  Local Variables:
       INTEGER			ARGS(4)			! Method arguments
       INTEGER			C1, C2			! Character pointers
+      INTEGER			IATTR			! Iteration counter
       INTEGER			OARG			! Method return value
 *.
 
@@ -119,7 +120,7 @@
       ARGS(4) = LID
 
 *  Loop over items to update
-      CALL UDI0_CREITI( ATTRS, C1, C2, STATUS )
+      CALL UDI0_CREITI( ATTRS, C1, C2, IATTR, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
 *    Construct string for this item
@@ -134,7 +135,7 @@
         CALL ERR_END( STATUS )
 
 *    Advance iterator to next attribute
-        CALL UDI0_ADVITI( ATTRS, C1, C2, STATUS )
+        CALL UDI0_ADVITI( ATTRS, C1, C2, IATTR, STATUS )
 
       END DO
 

@@ -150,8 +150,7 @@
       CALL ADI_NEWV0I( HINDEX, ARGS(7), STATUS )
 
 *  Loop over lists while more of them and status is ok
-      IITEM = 1
-      CALL UDI0_CREITI( LISTS, C1, C2, STATUS )
+      CALL UDI0_CREITI( LISTS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
 *    Construct string for this item
@@ -178,8 +177,7 @@
         CALL ERR_END( STATUS )
 
 *    Advance iterator to next list
-        CALL UDI0_ADVITI( LISTS, C1, C2, STATUS )
-        IITEM = IITEM + 1
+        CALL UDI0_ADVITI( LISTS, C1, C2, IITEM, STATUS )
 
       END DO
 
