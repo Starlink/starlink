@@ -1,7 +1,7 @@
 INTERFACE SDATA
   parameter OUT
     position 1
-    type 'UNIV'
+    type 'LITERAL'
     vpath 'prompt'
     association '->global.fit_data'
     prompt 'Object to contain references'
@@ -17,13 +17,13 @@ INTERFACE SDATA
   endparameter
   parameter INP1
     position 2
-    type 'UNIV'
+    type 'LITERAL'
     prompt 'Dataset 1'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP2
     position 3
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 2'
@@ -31,7 +31,7 @@ INTERFACE SDATA
   endparameter
   parameter INP3
     position 4
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 3'
@@ -39,7 +39,7 @@ INTERFACE SDATA
   endparameter
   parameter INP4
     position 5
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 4'
@@ -47,7 +47,7 @@ INTERFACE SDATA
   endparameter
   parameter INP5
     position 6
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 5'
@@ -55,7 +55,7 @@ INTERFACE SDATA
   endparameter
   parameter INP6
     position 7
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 6'
@@ -63,7 +63,7 @@ INTERFACE SDATA
   endparameter
   parameter INP7
     position 8
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 7'
@@ -71,7 +71,7 @@ INTERFACE SDATA
   endparameter
   parameter INP8
     position 9
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 8'
@@ -79,7 +79,7 @@ INTERFACE SDATA
   endparameter
   parameter INP9
     position 10
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 9'
@@ -87,161 +87,161 @@ INTERFACE SDATA
   endparameter
   parameter INP10
     position 11
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 10'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP11
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     prompt 'Dataset 11'
     default !
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP12
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 12'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP13
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 13'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP14
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 14'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP15
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 15'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP16
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 16'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP17
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 17'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP18
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 18'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP19
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 19'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP20
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 20'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP21
-    type 'UNIV'
+    type 'LITERAL'
     default !
     ppath 'default'
     prompt 'Dataset 21'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP22
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 22'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP23
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 23'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP24
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 24'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP25
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 25'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP26
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 26'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP27
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 27'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP28
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 28'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP29
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 29'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP30
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 30'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP31
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 31'
     help 'Name of dataset to be referenced - null to terminate'
   endparameter
   parameter INP32
-    type 'UNIV'
+    type 'LITERAL'
     ppath 'default'
     default !
     prompt 'Dataset 32'
