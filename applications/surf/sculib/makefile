@@ -63,7 +63,7 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_extract_2dim_d.f sculib_skyfunc.f sculib_skyfuncd.f \
 	sculib_get_dem_pntr.f sculib_get_lst_strt.f sculib_get_bol_desc.f \
 	sculib_get_jiggle.f sculib_get_raster.f sculib_get_mjd.f \
-	sculib_process_bols.f sculib_get_sub_inst.f
+	sculib_process_bols.f sculib_get_sub_inst.f sculib_wtfn_regrid.f
 
 OBJS = ${FSOURCES:.f=.o}
 
