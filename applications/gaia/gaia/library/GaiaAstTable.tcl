@@ -1277,7 +1277,7 @@ itcl::class gaia::GaiaAstTable {
          if { $x <= $width && $x > 0.0 && $y <= $height && $y > 0.0 } {
             $itk_component(table) append_row [list $id $ra $dec $x $y]
          } else {
-            remove_mark_ $id
+            catch {remove_mark_ $id} msg
          }
       }
       $itk_component(table) new_info
