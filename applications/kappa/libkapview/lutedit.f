@@ -56,7 +56,7 @@
 *        is supplied a default image is used. 
 
 *  Related Applications:
-*     KAPPA: LUTABLE, LUTFLIP, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE; 
+*     KAPPA: LUTABLE, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE; 
 *     Figaro: COLOUR.
 
 *  Authors:

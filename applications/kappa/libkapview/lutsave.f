@@ -60,7 +60,7 @@
 *        image-display device to an NDF called redshift.
 
 *  Related Applications:
-*     KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTTWEAK.
+*     KAPPA: LUTREAD, LUTABLE, LUTEDIT, LUTVIEW.
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

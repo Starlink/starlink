@@ -151,8 +151,7 @@
 *     when subsequent graphics applications are run.
 
 *  Related Applications:
-*     KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTSAVE,
-*     LUTTWEAK, LUTVIEW; Figaro: COLOUR.
+*     KAPPA: LUTREAD, LUTSAVE, LUTEDIT, LUTVIEW; Figaro: COLOUR.
 
 *  Implementation Status:
 *     -  Processing of bad pixels and automatic quality masking are
