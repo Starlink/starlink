@@ -1,4 +1,8 @@
 #! /bin/sh -
+#    Copyright 2000, 2001, Council of the Central
+#    Laboratory of the Research Councils.  See
+#    http://www.starlink.rl.ac.uk/store/conditions.html for
+#    conditions.
 
 RCSID='$Id$'
 ident_string='Starlink SGML Kit, release ((PKG_VERS))'
@@ -103,11 +107,22 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #     system find the bibliography database.
 #
 #  <authorlist>
-#  <author id=ng email='norman@astro.gla.ac.uk' affiliation='Starlink, Glasgow'>
+#  <author id=ng 
+#          webpage='http://www.astro.gla.ac.uk/users/norman/'
+#          email='norman@astro.gla.ac.uk'
+#          affiliation='Starlink, Glasgow University'>
 #     Norman Gray
 #
+#  <copyright>
+#    <p>Copyright 2000, 2001, Council of the Central
+#    Laboratory of the Research Councils.  See
+#    <url>http://www.starlink.rl.ac.uk/store/conditions.html</url> for
+#    conditions.
+#
 #  <history>
-#     <change author=ng date='29-SEP-1999'>Initial version.
+#    <change author=ng date='29-SEP-1999'>Initial version.
+#    <change author=ng date='16-Jan-2001'>Added explicit (rather
+#      than defaulted) copyright statement.
 #-
 
 LIBDIR=${STARLINK_SGML_DIR}/lib

@@ -1,4 +1,8 @@
 #! /usr/bin/perl -w
+#    Copyright 2000, 2001, Council of the Central
+#    Laboratory of the Research Councils.  See
+#    http://www.starlink.rl.ac.uk/store/conditions.html for
+#    conditions.
 
 $RCSID='$Id$';
 $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
@@ -95,11 +99,19 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #  <authorlist>
 #  <author id=ng
 #          webpage='http://www.astro.gla.ac.uk/users/norman/'
-#	   affiliation='Glasgow University'>
+#	   affiliation='Starlink, Glasgow University'>
 #     Norman Gray
 #
+#  <copyright>
+#    <p>Copyright 2000, 2001, Council of the Central
+#    Laboratory of the Research Councils.  See
+#    <url>http://www.starlink.rl.ac.uk/store/conditions.html</url> for
+#    conditions.
+#
 #  <history>
-#    <change author=ng date='26-APR-2000'>Initial version. 
+#    <change author=ng date='26-APR-2000'>Initial version.
+#    <change author=ng date='16-Jan-2001'>Added explicit (rather
+#      than defaulted) copyright statement.
 #
 #  <diytopic>Notes
 #
@@ -124,7 +136,8 @@ $docdecl  = undef;		# SGML declaration to be passed to sx
 
 $SX = defined($ENV{SX}) ? $ENV{SX} : 'sx -xempty -xcomment';
 
-$catalogue_server = 'http://goedel.astro.gla.ac.uk/catalogue/public';
+$catalogue_server = 'http://dummy.catalogue.server/catalogue/public';
+#$catalogue_server = 'http://goedel.astro.gla.ac.uk/catalogue/public';
 $found_subdoc = 0;		# used/set in parse_entitydef
 
 $declaration_subset = 0;	# flag: in declaration subset

@@ -1,4 +1,8 @@
 #! /bin/sh
+#    Copyright 2000, Council of the Central
+#    Laboratory of the Research Councils.  See
+#    http://www.starlink.rl.ac.uk/store/conditions.html for
+#    conditions.
 
 #+
 #  <routinename id=sgml2hlp>
@@ -43,6 +47,12 @@
 #  <authorlist>
 #  <author id=mbt>
 #     MBT: Mark Taylor
+#
+#  <copyright>
+#    <p>Copyright 2000, 2001, Council of the Central
+#    Laboratory of the Research Councils.  See
+#    <url>http://www.starlink.rl.ac.uk/store/conditions.html</url> for
+#    conditions.
 #
 #  <history>
 #     <change author=mbt date='5-APR-2000'>Initial version.
