@@ -10718,7 +10718,7 @@ proc SetMode {mode} {
       SetInfo "Identify star-like features in the image..." 1
 
    } elseif { $mode == 1 } {
-      CursorBind [list vertices vectors] [list fleur pencil]
+      CursorBind [list vertices vectors] [list hand2 pencil]
       SetHelp $CAN ".  Click on a vertex and drag to move the vertex.\n.  Click on a vertex with the shift key pressed to drag the entire polygon.\n.  Click on a polygon edge to insert a new vertex.\n.  Click anywhere else to start a new polygonal mask.\n.  Click anywhere else and drag to select an area." POLREG_MODE_1
       SetInfo "Edit or create a polygonal mask..." 1
       if { $SELECTED_AREA != "" } {

@@ -347,7 +347,7 @@
 
 # Store a flag indicating if Stokes parameter cube should be created, and
 # if so, store the name of the cube to create.
-   if { $stokes != "" } {
+   if { [info exists stokes] && $stokes != "" } {
       set STOKES 1
       set STKOUT $stokes
    } {
