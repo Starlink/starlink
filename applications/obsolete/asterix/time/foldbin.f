@@ -343,7 +343,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       CALL BDI_CREVAR(FFID,NACTDIM,IDIM,STATUS)
       CALL BDI_CREAXES(FFID,NACTDIM,STATUS)
       DO L=1,NACTDIM
-      CALL BDI_CREAXVAL(FFID,L,.FALSE.,IDIM(L),STATUS)
+        CALL BDI_CREAXVAL(FFID,L,.FALSE.,IDIM(L),STATUS)
       ENDDO
       CALL BDI_CREQUAL(FFID,NACTDIM,IDIM,STATUS)
       CALL BDI_MAPDATA(FFID,'WRITE',FDPTR,STATUS)
@@ -354,17 +354,14 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
-      CALL DAT_NEW(FFID,'N_OCCUPANTS','_INTEGER',NACTDIM,IDIM,STATUS)
-      CALL CMP_MAPN( FFID, 'N_OCCUPANTS', '_INTEGER',
-     :                       'WRITE', NACTDIM, FNPTR,IDIM,STATUS)
+
+*  Workspace
+      CALL DYN_MAPI( NACTDIM, IDIM, FNPTR, STATUS )
       IDIM(1)=1
-      CALL DAT_NEW(FFID,'CHISQUARED','_REAL',NACTDIM,IDIM,STATUS)
-      CALL DAT_NEW(FFID,'DEG_OF_FREEDOM','_INTEGER',NACTDIM,IDIM,STATUS)
-      CALL CMP_MAPN(FFID,'CHISQUARED','_REAL','WRITE',NACTDIM,FCPTR,
-     :                                    IDIM,STATUS)
-      CALL CMP_MAPN(FFID,'DEG_OF_FREEDOM','_INTEGER','WRITE',NACTDIM,
-     :                             FFPTR,IDIM,STATUS)
+      CALL DYN_MAPR( NACTDIM, IDIM, FCPTR, STATUS )
+      CALL DYN_MAPI( NACTDIM, IDIM, FFPTR, STATUS )
       IDIM(1)=NBINS
+
 *    Set output quality to GOOD (as all bad data has been excluded)
       CALL ARR_SUMDIM(NACTDIM,IDIM,NELM2)
       CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(FQPTR),STATUS)
@@ -404,34 +401,45 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 
 *    Write components to output object
       N=2
-      DO WHILE (N.LE.NACTDIM)
-      CALL BDI_COPAXIS(IFID,FFID,OAX(N),N,STATUS)
-      N=N+1
-      ENDDO
+      DO WHILE ( N .LE. NACTDIM )
+        CALL BDI_COPAXIS(IFID,FFID,OAX(N),N,STATUS )
+        N=N+1
+      END DO
       CALL BDI_COPTEXT( IFID, FFID, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
       CALL BDI_PUTAXLABEL(FFID,1,'Phase',STATUS)
       CALL BDI_PUTAXNORM(FFID,1,.TRUE.,STATUS)
-*    Copy other info from input to output file
+
+*  Copy other info from input to output file
       CALL BDI_COPMORE( IFID, FFID, STATUS )
 
+*  Write auxilliary stuff
+      CALL AUI_PUTNI( FFID, 'N_OCCUPANTS', NACTDIM, IDIM, %VAL(FNPTR),
+     :                STATUS )
+      IDIM(1) = 1
+      CALL AUI_PUTNR( FFID, 'CHISQUARED', NACTDIM, IDIM, %VAL(FCPTR),
+     :                STATUS )
+      CALL AUI_PUTNI( FFID, 'DEG_OF_FREEDOM', NACTDIM, IDIM,
+     :                %VAL(FFPTR), STATUS )
+      IDIM(1)=NBINS
+
 *    Add history records
-      CALL HIST_COPY( IFID, FFID, STATUS )
-      CALL HIST_ADD( FFID, VERSION, STATUS )
+      CALL HSI_COPY( IFID, FFID, STATUS )
+      CALL HSI_ADD( FFID, VERSION, STATUS )
       HTXT(1) = 'Input {INP}'
       HTXT(2) = 'Folded output {OUT}'
       CALL MSG_SETR( 'PERIOD', PERIOD )
       CALL MSG_SETC( 'UNITS', UNITS )
       CALL MSG_MAKE( 'The data has been folded into a period of '/
      :                          /'^PERIOD ^UNITS', HTXT(3), HLEN )
-      CALL MSG_SETR( 'EPOCH', REAL(ZEROEPOCH) )
+      CALL MSG_SETD( 'EPOCH', ZEROEPOCH )
       CALL MSG_MAKE('The epoch of phase zero was ^EPOCH', HTXT(4),
      :                                                       HLEN)
       USED = MAXHTXT
       CALL USI_TEXT( 4, HTXT, USED, STATUS )
-      CALL HIST_PTXT(FFID,USED,HTXT,STATUS)
+      CALL HSI_PTXT(FFID,USED,HTXT,STATUS)
 
 *  Output CHISQR value to user if 1D dataset
       IF ( NACTDIM .EQ. 1 ) THEN
