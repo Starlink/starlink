@@ -71,6 +71,8 @@
 *           Get the number of coordinate values per point from a PointSet.
 *        astPermPoints
 *           Permute coordinates within a PointSet.
+*        astSetNpoint
+*           Reduce the size of a PointSet.
 
 *  Other Class Functions:
 *     Public:
@@ -353,6 +355,7 @@ typedef struct AstPointSetVtab {
    int (* GetNcoord)( const AstPointSet * );
    int (* GetNpoint)( const AstPointSet * );
    void (* PermPoints)( AstPointSet *, int, const int[] );
+   void (* SetNpoint)( AstPointSet *, int );
    void (* SetPoints)( AstPointSet *, double ** );
    void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet * );
 } AstPointSetVtab;
@@ -396,6 +399,7 @@ void astSetSubPoints_( AstPointSet *, int, int, AstPointSet * );
 void astPermPoints_( AstPointSet *, int, const int[] );
 int astGetNcoord_( const AstPointSet * );
 int astGetNpoint_( const AstPointSet * );
+void astSetNpoint_( AstPointSet *, int );
 #endif
 
 /* Function interfaces. */
@@ -457,5 +461,7 @@ astINVOKE(V,astPermPoints_(astCheckPointSet(this),forward,perm))
 astINVOKE(V,astGetNpoint_(astCheckPointSet(this)))
 #define astGetNcoord(this) \
 astINVOKE(V,astGetNcoord_(astCheckPointSet(this)))
+#define astSetNpoint(this,np) \
+astINVOKE(V,astSetNpoint_(astCheckPointSet(this),np))
 #endif
 #endif
