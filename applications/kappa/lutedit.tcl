@@ -1779,6 +1779,7 @@ proc openNamed {file force} {
 #
    global LUTFILE
    global UWIN
+   global INITLUT
 
    set ret 1
 
@@ -1803,8 +1804,9 @@ proc openNamed {file force} {
    } else {
       set LUTFILE $file
 
-#  Empty the editor.
-      emptyEditor
+#  Empty the editor, unless thisi the first time (i.e. nothing has been 
+#  displayed)
+      if { $INITLUT == "" } { emptyEditor }
 
 #  Set the name of the top level window.
       wm  title $UWIN "LutEdit $file"
@@ -1855,10 +1857,12 @@ proc drawCPoint {} {
    global YOFF
    global YSCALE
 
-   foreach ent $CTRL($RGBNOW) {
-      set v [lindex $LUT($RGBNOW) $ent]
-      $CAN2 create image [expr $XE0+$XE1*$ent] [expr $YOFF-$v*$YSCALE] -image $CPIM -tags [list cp cp-$RGBNOW cp-$RGBNOW-$ent]
-   } 
+   if { [info exists CTRL($RGBNOW)] } {
+      foreach ent $CTRL($RGBNOW) {
+         set v [lindex $LUT($RGBNOW) $ent]
+         $CAN2 create image [expr $XE0+$XE1*$ent] [expr $YOFF-$v*$YSCALE] -image $CPIM -tags [list cp cp-$RGBNOW cp-$RGBNOW-$ent]
+      } 
+   }
 }
 
 proc drawCurve {col} {
@@ -4164,7 +4168,7 @@ proc doResize {} {
 #  specified initial LUT if any.
       if { $INITLUT != "" } {
          set done [openNamed $INITLUT 1]
-         if { !$done } { 
+         if { $done } { 
             set LUTFILE $INITLUT 
             set KEEPFILE 1 
          }
@@ -4857,6 +4861,7 @@ proc WaitFor {name args} {
    set NEGIMAGE 0
    set NENT [expr $UP-$LP+1]
    set NENTM1 [expr $NENT-1]
+   set NEW 0
    set NN "NO"
    set NOLD 0
    set KEEPFILE 0
@@ -4874,7 +4879,7 @@ proc WaitFor {name args} {
    set ZOOMY 1
    set TKT 0
 
-#   set LOGFILE_ID stdio
+   set LOGFILE_ID stdio
 
 #  Name this application (for xresources etc.)
    tk appname lutedit
@@ -4978,6 +4983,7 @@ proc WaitFor {name args} {
    } else {
       set IMAGE $KAPPA_DIR/m31
    }
+
    if { $argc >= 1 } { 
       set INITLUT [lindex $argv 0] 
    } else {
