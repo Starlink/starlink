@@ -24,6 +24,9 @@
       INTEGER NS,KK,JX,LX,ICROWD
       REAL SMARGE(NS),DSMARGE(512),DRMAX,DRMIN,S
 
+      IMAX = 0
+      IMIN = 0
+
       ICROWD=0
       IBEG=KK+1
       IEND=NS-KK
