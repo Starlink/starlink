@@ -27,27 +27,27 @@
 
 interface NDF2PGM
 
-  helplib        $CONVERT_HELP
+   helplib        $CONVERT_HELP
 
-  parameter      IN              # The name of the source NDF image to be used.
-     position    1
-     type        'NDF'
-     access      'READ'
-     prompt      'NDF to convert'
-     ppath       'GLOBAL,CURRENT,DEFAULT'
-     vpath       'PROMPT'
-     association '<->GLOBAL.DATA_ARRAY'
-     helpkey     '*'
-  endparameter
+   parameter      IN             # The name of the source NDF image to be used.
+      position    1
+      type        'NDF'
+      access      'READ'
+      prompt      'NDF to convert'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      vpath       'PROMPT'
+      association '<->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
 
-  parameter      OUT             # The output PGM file.
-     position    2
-     type        '_CHAR'
-     access      'UPDATE'
-     prompt      'PGM filename'
-     ppath       'CURRENT,DEFAULT'
-     vpath       'PROMPT'
-     helpkey     '*'
-  endparameter
+   parameter      OUT            # The output PGM file.
+      position    2
+      type        '_CHAR'
+      access      'UPDATE'
+      prompt      'PGM filename'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'PROMPT'
+      helpkey     '*'
+   endparameter
 
 endinterface
