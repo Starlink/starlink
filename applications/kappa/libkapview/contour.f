@@ -219,7 +219,7 @@
 *        If TRUE, the plotting pens are cycled through the contours to
 *        aid identification of the contour heights.  Only accessed if 
 *        pen definitions are not supplied using parameter PENS. [FALSE]
-*     PENS = GROUP (Given)
+*     PENS = GROUP (Read)
 *        A group of strings, separated by semi-colons, each of which specifies
 *        the appearance of a pen to be used to draw a contour. The first 
 *        string in the group describes the pen to use for the first contour, 

@@ -5586,7 +5586,7 @@ PENROT = _LOGICAL (Read)
    aid identification of the contour heights.  Only accessed if
    pen definitions are not supplied using parameter PENS. [FALSE]
 3 PENS
-PENS = GROUP (Given)
+PENS = GROUP (Read)
    A group of strings, separated by semi-colons, each of which specifies
    the appearance of a pen to be used to draw a contour. The first
    string in the group describes the pen to use for the first contour,
@@ -9302,7 +9302,7 @@ MEMORY = _LOGICAL (Read)
    maximum dimension along an axis is given by parameter BLOCK.
    [FALSE]
 3 NITER
-NITER = INTEGER (Given)
+NITER = INTEGER (Read)
    The number of iterations of the relaxation algorithm.  This
    value cannot be less than two, since this is the minimum
    number required to ensure that all bad values are assigned a
@@ -9779,7 +9779,7 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 KEYWORD
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
 
    The name of the keyword whose existence in the FITS extension is
    to be tested.  A name may be compound to handle hierarchical
@@ -10572,7 +10572,7 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COMMENT
-COMMENT = LITERAL (Given)
+COMMENT = LITERAL (Read)
    The comments to be written to the KEYWORD keyword for the
    "Update" and "Write" editing commands.  A null value (!)
    gives a blank comment.  The special value "$C" means use the
@@ -10614,7 +10614,7 @@ EDIT = LITERAL (Read)
    command.  The FITS extension is created first should it not
    exist.
 3 KEYWORD
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
    The name of the keyword to be edited in the FITS extension.  A
    name may be compound to handle hierarchical keywords, and it
    has the form keyword1.keyword2.keyword3 etc.  The maximum
@@ -10650,7 +10650,7 @@ MODE = LITERAL (Read)
 NDF = NDF (Read and Write)
    The NDF in which the FITS extension is to be edited.
 3 NEWKEY
-NEWKEY = LITERAL (Given)
+NEWKEY = LITERAL (Read)
    The name of the keyword to replace the KEYWORD keyword.  It is
    only accessed when EDIT="Rename".  A name may be compound to
    handle hierarchical keywords, and it has the form
@@ -10659,7 +10659,7 @@ NEWKEY = LITERAL (Given)
    than 8 characters, and be a valid FITS keyword comprising only
    alphanumeric characters, hyphen, and underscore.
 3 POSITION
-POSITION = LITERAL (Given)
+POSITION = LITERAL (Read)
    The position keyword name.  A position name may be compound to
    handle hierarchical keywords, and it has the form
    keyword1.keyword2.keyword3 etc.  The maximum number of
@@ -10694,7 +10694,7 @@ TABLE = FILENAME (Read)
    format of this file is described under "File Format".  For
    illustrations, see under "Examples of the File Format".
 3 VALUE
-VALUE = LITERAL (Given)
+VALUE = LITERAL (Read)
    The new value of the KEYWORD keyword for the "Update" and
    "Write" editing commands.  The special value "$V" means use the
    current value of the KEYWORD keyword.  This makes it possible
@@ -11257,7 +11257,7 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 KEYWORD
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
 
    The name of an existing keyword in the FITS extension whose value
    is to be reported.  A name may be compound to handle hierarchical
@@ -11313,7 +11313,7 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COMMENT
-COMMENT = LITERAL (Given)
+COMMENT = LITERAL (Read)
    The comments to be written to the KEYWORD keyword.  A null value
    (!) gives a blank comment.  The special value "$C" means use the
    current comment.  In addition "$C(keyword)" requests that the
@@ -11321,7 +11321,7 @@ COMMENT = LITERAL (Given)
    to the keyword being edited.  If this positional keyword does not
    exist, the comment is is blank.
 3 KEYWORD
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
    The name of the new keyword in the FITS extension.  A name may
    be compound to handle hierarchical keywords, and it has the
    form keyword1.keyword2.keyword3 etc.  The maximum number of
@@ -11340,7 +11340,7 @@ NDF = NDF (Read)
    The NDF containing the FITS extension into which the new FITS
    keyword.
 3 POSITION
-POSITION = LITERAL (Given)
+POSITION = LITERAL (Read)
    The position keyword name.  A position name may be compound to
    handle hierarchical keywords, and it has the form
    keyword1.keyword2.keyword3 etc.  The maximum number of keywords
@@ -11363,7 +11363,7 @@ STRING = _LOGICAL (Read)
    treated as a string for the purpose of writing the FITS header.
    [FALSE]
 3 VALUE
-VALUE = LITERAL (Given)
+VALUE = LITERAL (Read)
    The new value of the KEYWORD keyword.  The special value "$V"
    means use the current value of the KEYWORD keyword.  This makes
    it possible to modify a comment, leaving the value unaltered.
@@ -18461,7 +18461,7 @@ Description:
 2 Arguments
 For information on individual arguments, select from the list below:
 3 LUT
-LUT = LITERAL (Given)
+LUT = LITERAL (Read)
    The file containing the lookup table.  It is passed to the
    parameter LUT but not validated.
 2 Parameters
@@ -28624,10 +28624,10 @@ SHAPE( ) = _INTEGER (Read)
    if it already exists, otherwise it is the current value.  It
    is only accessed when OPTION="Put".
 3 XNAME
-XNAME = LITERAL (Given)
+XNAME = LITERAL (Read)
    The name of the extension to modify.
 3 XTYPE
-XTYPE = LITERAL (Given)
+XTYPE = LITERAL (Read)
    The type of the extension to create.  The suggested default is
    the current value or "EXT" when there is no current value.
 2 Examples
@@ -29556,7 +29556,7 @@ IN = NDF (Read)
 OUT = NDF (Write)
    The output NDF containing the enhanced image.
 3 SHIFT
-SHIFT( 2 )  =  _INTEGER (Given)
+SHIFT( 2 )  =  _INTEGER (Read)
    The shift in x and y pixel indices to be used in the
    enhancement.  If the x shift is positive, positive features
    in the original array will appear to be lit from the positive

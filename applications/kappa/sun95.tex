@@ -10960,7 +10960,7 @@ default value.
          pen definitions are not supplied using parameter PENS. [FALSE]
       }
       \sstsubsection{
-         PENS = GROUP (Given)
+         PENS = GROUP (Read)
       }{
          A group of strings, separated by semi-colons, each of which specifies
          the appearance of a pen to be used to draw a contour. The first
@@ -14375,7 +14375,7 @@ plot (101k).
          {\tt [FALSE]}
       }
       \sstsubsection{
-         NITER = INTEGER (Given)
+         NITER = INTEGER (Read)
       }{
          The number of iterations of the relaxation algorithm.  This
          value cannot be less than two, since this is the minimum
@@ -14906,7 +14906,7 @@ plot (101k).
    }
    \sstparameters{
       \sstsubsection{
-         KEYWORD = LITERAL (Given)
+         KEYWORD = LITERAL (Read)
       }{
          The name of the keyword whose existence in the FITS extension
          is to be tested.  A name may be compound to handle hierarchical
@@ -15752,7 +15752,7 @@ plot (101k).
    }
    \sstparameters{
       \sstsubsection{
-         COMMENT = LITERAL (Given)
+         COMMENT = LITERAL (Read)
       }{
          The comments to be written to the KEYWORD keyword for the
          {\tt "Update"} and {\tt "Write"} editing commands.  A null
@@ -15804,7 +15804,7 @@ plot (101k).
          \end{description}
       }
       \sstsubsection{
-         KEYWORD = LITERAL (Given)
+         KEYWORD = LITERAL (Read)
       }{
          The name of the keyword to be edited in the FITS extension.  A
          name may be compound to handle hierarchical keywords, and it
@@ -15846,7 +15846,7 @@ plot (101k).
          The NDF in which the FITS extension is to be edited.
       }
       \sstsubsection{
-         NEWKEY = LITERAL (Given)
+         NEWKEY = LITERAL (Read)
       }{
          The name of the keyword to replace the KEYWORD keyword.  It is
          only accessed when EDIT={\tt "Rename"}.  A name may be compound to
@@ -15857,7 +15857,7 @@ plot (101k).
          alphanumeric characters, hyphen, and underscore.
       }
       \sstsubsection{
-         POSITION = LITERAL (Given)
+         POSITION = LITERAL (Read)
       }{
          The position keyword name.  A position name may be compound to
          handle hierarchical keywords, and it has the form
@@ -15899,7 +15899,7 @@ plot (101k).
          illustrations, see under {\tt "}Examples of the File Format{\tt "}.
       }
       \sstsubsection{
-         VALUE = LITERAL (Given)
+         VALUE = LITERAL (Read)
       }{
          The new value of the KEYWORD keyword for the {\tt "Update"} and
          {\tt "Write"} editing commands.  The special value {\tt "\$V"}
@@ -16589,7 +16589,7 @@ plot (101k).
    }
    \sstparameters{
       \sstsubsection{
-         KEYWORD = LITERAL (Given)
+         KEYWORD = LITERAL (Read)
       }{
          The name of an existing keyword in the FITS extension whose value
          is to be reported.  A name may be compound to handle hierarchical
@@ -16656,7 +16656,7 @@ plot (101k).
    }
    \sstparameters{
       \sstsubsection{
-         COMMENT = LITERAL (Given)
+         COMMENT = LITERAL (Read)
       }{
          The comments to be written to the KEYWORD keyword.  A null value
          ({\tt !}) gives a blank comment.  The special value {\tt "\$C"}
@@ -16666,7 +16666,7 @@ plot (101k).
          the comment is is blank.
       }
       \sstsubsection{
-         KEYWORD = LITERAL (Given)
+         KEYWORD = LITERAL (Read)
       }{
          The name of the new keyword in the FITS extension.  A name may
          be compound to handle hierarchical keywords, and it has the
@@ -16689,7 +16689,7 @@ plot (101k).
          keyword.
       }
       \sstsubsection{
-         POSITION = LITERAL (Given)
+         POSITION = LITERAL (Read)
       }{
          The position keyword name.  A position name may be compound to
          handle hierarchical keywords, and it has the form
@@ -16718,7 +16718,7 @@ plot (101k).
          writing the FITS header. {\tt [FALSE]}
       }
       \sstsubsection{
-         VALUE = LITERAL (Given)
+         VALUE = LITERAL (Read)
       }{
          The new value of the KEYWORD keyword.  The special value {\tt "\$V"}
          means use the current value of the KEYWORD keyword.  This makes
@@ -22663,7 +22663,7 @@ plot (10k).
    }
    \sstarguments{
       \sstsubsection{
-        LUT = LITERAL (Given)
+        LUT = LITERAL (Read)
       }{
            The file containing the lookup table.  It is passed to the
            parameter LUT but not validated.
@@ -30668,12 +30668,12 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          is only accessed when OPTION={\tt "Put"}.
       }
       \sstsubsection{
-         XNAME = LITERAL (Given)
+         XNAME = LITERAL (Read)
       }{
          The name of the extension to modify.
       }
       \sstsubsection{
-         XTYPE = LITERAL (Given)
+         XTYPE = LITERAL (Read)
       }{
          The type of the extension to create.  The suggested default is
          the current value or {\tt "EXT"} when there is no current value.
@@ -31715,7 +31715,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          The output NDF containing the enhanced image.
       }
       \sstsubsection{
-         SHIFT( 2 )  =  \_INTEGER (Given)
+         SHIFT( 2 )  =  \_INTEGER (Read)
       }{
          The shift in $x$ and $y$ pixel indices to be used in the
          enhancement.  If the $x$ shift is positive, positive features
