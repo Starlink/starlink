@@ -185,8 +185,11 @@
 *     CALL BDI_PUT1( ID, LID, ITEM, DATA, STATUS )
 
 *  Description:
-*     Writes the items specified by the ITEMS string with the specified
-*     TYPE. Should only be used for numeric items.
+*     Writes the items specified by the ITEMS string. Supports the following
+*     high level abstractions in addition to simple items.
+*
+*       Axis_<n>_SpacedData  - Converts to expanded array
+*       Axis_<n>_ScalarWidth - Ditto
 
 *  Arguments:
 *     ID = INTEGER (given)
@@ -272,26 +275,61 @@
 
 *  Local Variables:
       CHARACTER*20		LITEM			! Local item name
+      CHARACTER*15              LTYPE                   ! Local type
+
+      DOUBLE PRECISION		SPARR(2)		! Spaced array info
 
       INTEGER			ARGS(4)			! Function args
+      INTEGER			DIMS(ADI__MXDIM)	! Dataset dimensions
+      INTEGER			IAX			! Axis number
+      INTEGER			LDATA			! Local data copy
       INTEGER			LITL			! Used length of LITEM
+      INTEGER			NDIM			! Dimensionality
       INTEGER			OARG			! Return value
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  First function argument is the identifier
-      ARGS(1) = ID
-      ARGS(2) = LID
-      ARGS(4) = DATA
-
-*  Second is the linked file object
-      CALL ADI_GETLINK( ID, ARGS(2), STATUS )
-
 *  Check item name is valid, and make a local copy. Removes any
 *  special item names such as E_Axis_Label.
       CALL BDI0_CHKITM( ID, ITEM, LITEM, LITL, STATUS )
+
+*  Check specials
+      IF ( (LITEM(1:5) .EQ. 'Axis_') .AND.
+     :          (LITEM(8:17).EQ.'SpacedData') ) THEN
+
+*    Decode axis number
+        CALL CHR_CTOI( LITEM(6:6), IAX, STATUS )
+
+*    Get shape of data
+        CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
+
+*    Create new object in same type as supplied spaced data
+        CALL ADI_TYPE( DATA, LTYPE, STATUS )
+        CALL ADI_NEW1( LTYPE, DIMS(IAX), LDATA, STATUS )
+
+*    Extract spaced parameters
+        CALL ADI_GET1D( DATA, 2, SPARR, NDAT, STATUS )
+
+*    Map temporary object
+        CALL ADI_MAPD( LDATA, 'WRITE', DPTR, STATUS )
+        CALL ARR_REG1D( SPARR(1), SPARR(2), DIMS(IAX), %VAL(DPTR),
+     :                  STATUS )
+        CALL ADI_UNMAP( LDATA, DPTR, STATUS )
+
+*    Change local item
+        LITEM = LITEM(:7)//'Data'
+
+      ELSE
+        CALL ADI_CLONE( DATA, LDATA, STATUS )
+
+      END IF
+
+*  First function argument is the identifier
+      ARGS(1) = ID
+      ARGS(2) = LID
+      ARGS(4) = LDATA
 
 *  Check that item can be written
       CALL BDI0_CHKOP( LITEM(:LITL), 'Put', STATUS )
@@ -309,9 +347,10 @@
      :                  STATUS )
       END IF
 
-*  Release the item string and our temporary data object
+*  Release the item string and our temporary data objects
       CALL ERR_BEGIN( STATUS )
       CALL ADI_ERASE( ARGS(3), STATUS )
+      CALL ADI_ERASE( LDATA, STATUS )
       CALL ERR_END( STATUS )
 
 *  Report any errors
