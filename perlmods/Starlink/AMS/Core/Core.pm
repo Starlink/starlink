@@ -35,6 +35,30 @@ should be used if at all possible.
 
 =cut
 
+use strict;
+use Carp;
+use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $AUTOLOAD);
+
+require Exporter;
+ 
+@ISA = qw(Exporter);
+
+# EXTERNAL MODULES
+
+# This module requires the Starlink::ADAM module so that we can access
+# the ADAM messaging system
+ 
+use Starlink::ADAM qw/:adam/;
+
+# Use the IO routines to create the pipe handle
+use IO::Pipe;
+
+# Use the Proc module to start the monoliths and keep track of process IDs
+use Proc::SimpleKill;
+
+
+
+# Global variable definitions
 # Global variables
 
 # $RELAY is the filehandle to the pipe communicating with the relay
@@ -49,11 +73,11 @@ should be used if at all possible.
 # $ERRHAND  file handle to use for error messages
 # $MSGHAND  file handle to use for normal messages
 
-my ($RELAY, $RELAY_NAME, $RELAY_PATH, $RELAY_MESSID, %PIDS, %TASKS,
-   $adam_started);
 
 use vars qw/$ADAM_STATUS $PARAMREP_SUB $msg_hide $err_hide
-  $ERRHAND $MSGHAND $TIMEOUT/;
+  $ERRHAND $MSGHAND $TIMEOUT $RELAY $RELAY_NAME $RELAY_PATH 
+  $RELAY_MESSID %PIDS %TASKS $adam_started /;
+
 
 $RELAY_NAME = undef;
 
@@ -69,28 +93,6 @@ $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 # Default timeout is 30 seconds
 $TIMEOUT = 30;
 
-use strict;
-use Carp;
-use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $AUTOLOAD);
-
-require Exporter;
- 
-@ISA = qw(Exporter);
- 
-# This module requires the Starlink::ADAM module so that we can access
-# the ADAM messaging system
- 
-use Starlink::ADAM qw/:adam/;
-
-# Use the IO routines to create the pipe handle
-use IO::Pipe;
-
-# Use the Proc module to start the monoliths and keep track of process IDs
-use Proc::SimpleKill;
-
-# Ask for parameters with readline
-#use Term::ReadLine;
- 
 # Items to export into callers namespace by default. Use tags
 # to be more specific
  
@@ -131,6 +133,8 @@ likely that the messaging system is not running correctly (eg
 because the system was shutdown uncleanly - try removing named pipes
 from the ~/adam directory).
 
+Status is returned.
+
 =cut
 
 sub adamtask_init {
@@ -145,6 +149,8 @@ sub adamtask_init {
     }
   }
 
+  return &Starlink::ADAM::SAI__OK if $adam_started;
+
   # Set the task name
   $taskname = "perl_ams" . $$;
 
@@ -158,14 +164,11 @@ sub adamtask_init {
 
   $adam_started = 1;
 
-
   # Start the relay process
   # Hardwire the location
 
 #  my $relay_dir = "/local/lib/perl5/site_perl/Starlink/";
   my $relay = "MessageRelay.pl";
-
-#  open (RELAY, "$relay_dir/$relay $taskname |");
 
   # Create pipe
   # Relay should be executable and in the users path.
@@ -188,6 +191,8 @@ sub adamtask_init {
   $RELAY_NAME = $reply[1];
   $RELAY_PATH = $reply[3];
   $RELAY_MESSID = $reply[4];
+
+  # print "RELAY NAME is $RELAY_NAME and $reply[1]\n";
 
   # Reply to the obey
 #  print "Replying to OBEY\n";
@@ -283,13 +288,23 @@ sub adamtask_message {
   return ($status,undef);
 }
 
-=item adamtask($name, $image)
+=item adamtask($name, $image, {options})
 
 This command is used to start adam tasks. $name is the name of the
 task in the messaging system (and should be used for all future
 accesses to the task) and $image is the name of the image file to be
 spawned (eg /star/bin/kappa/kappa_mon to load the basic KAPPA
 monolith).
+
+The options must be supplied in the form of a hash reference.
+Allowed options are 'TASKTYPE' (can be either 'I' or 'A').
+Default is 'A'.
+
+Example:
+
+  $obj = new Starlink::AMS::Task("kappa_mon",
+                                 "$ENV{KAPPA_DIR}/kappa_mon",
+                                 { TASKTYPE => 'A' });
 
 =cut
 
@@ -302,12 +317,35 @@ monolith).
 
 sub adamtask {
 
+  croak 'Usage: adamtask name, [file], [options]' 
+    if (scalar(@_) < 1);
+
   # Arguments
-  my ($taskname, $image) = @_;
+  my $taskname = shift;
+
+
+  # Try to find the options
+  my ($opthash, $image);
+  my %options = ();
+  if (@_) {
+    my $tmp = shift;
+    if (not ref($tmp)) {
+      $image = $tmp;
+      if (@_) {
+	$tmp = shift;
+	$opthash = $tmp if ref($tmp) eq 'HASH';
+      }
+    } else {
+      $opthash = $tmp;
+    }
+  }
+  %options = %$opthash if defined $opthash;
 
   # Variables
   my ($adam_task_type, $adam_task_type_set, $icl_task_name, 
       $icl_task_name_set);
+
+#  print "Image is $image, Options $opthash\n";
 
   if ($image =~ /./) {
 
@@ -318,8 +356,14 @@ sub adamtask {
       $adam_task_type = $ENV{ADAM_TASK_TYPE};
       $adam_task_type_set = 1;
     }
-    $ENV{ADAM_TASK_TYPE} = 'I';
-    
+
+    if (exists $options{'TASKTYPE'}) {
+      $ENV{ADAM_TASK_TYPE} = $options{'TASKTYPE'};
+    } else {
+      $ENV{ADAM_TASK_TYPE} = 'A';
+    }
+    print STDOUT "ADAM_TASK_TYPE = $ENV{ADAM_TASK_TYPE}\n";
+
     # Set the message system name as well
     if (exists $ENV{ICL_TASK_NAME}) {
       $icl_task_name = $ENV{ICL_TASK_NAME};
@@ -567,6 +611,12 @@ to in the form: "action:param". For example, to get the input NDF for
 stats we can say '$value = adamtask_set("kappa", "stats:ndf")'
 
 The parameter value and status are returned in an array context.
+Status is not returned if the routine is called in a scalar context.
+
+This routine can not be used to retrieve parameters from A-tasks
+(eg if the monolith was launched as an A-task rather than an I-task).
+In that case the par_get routine supplied in the perl NDF module
+should be used (where the task name will be 'monolith.task').
 
 =cut
 
@@ -586,7 +636,12 @@ sub adamtask_get {
 
   my ($status, $result) = adamtask_sendw("adam_send(\"$task\",\"$param\",\"GET\",\"\")");
 
-  return ($result, $status);
+  if (wantarray) {
+    return ($result, $status);
+  } else {
+    return $result;
+  }
+
 
 }
 
@@ -781,6 +836,15 @@ This command should always be issued before exiting perl.
 Note that if the higher level interface (Starlink::AMS::Init) is used
 neither adamtask_init nor adamtask_exit need be called explicitly.
 
+Currently this command is run automatically on exit from the program
+(via an END{} block). Note that the exit handler will not be executed
+when signals are not caught. In order to trap these signals you may
+need
+
+  use sigtrap qw/die normal-signals error-signals/;
+
+at the top of your program.
+
 =cut
 
 # adamtask_exit
@@ -859,6 +923,20 @@ $PARAMREP_SUB = sub {
 
 };
 
+
+# Start up ADAM messaging
+#adamtask_init;
+#print "Starting ADAM\n";
+
+
+# Exit handler
+END {
+  adamtask_exit;
+  print "ADAM exited\n";
+}
+
+
+
 1;
 
 __END__
@@ -933,7 +1011,9 @@ value) and should return the required value.
 
  o Check status after every obey but make sure that the system is exited
    cleanly (via adamtask_exit) if you decide to stop early because of
-   bad status.
+   bad status. An exit handler is invoked automatically (via an END{}
+   block) so that adam messaging will be shut down during normal
+   exit of perl.
 
  o Monoliths can be started by other processes and accessed from the
    current program so long as the identifying name of the monolith
