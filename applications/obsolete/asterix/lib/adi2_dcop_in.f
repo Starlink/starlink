@@ -70,11 +70,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *      5 Jun 1996 (DJA):
 *        Original version.
+*      27 Jan 1997 (RB)
+*        Add image type conversion
 *     {enter_changes_here}
 
 *  Bugs:
@@ -174,106 +177,3 @@
 
       END
 
-
-      SUBROUTINE ADI2_IMGCNV ( CACHEID, PTR, DTYPE, STATUS )
-
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'ADI_PAR'
-
-      INTEGER			CACHEID
-      INTEGER			PTR
-      CHARACTER*(*)		DTYPE
-      INTEGER			STATUS
-
-      INTEGER			NDIM, DIMS(ADI__MXDIM)
-      CHARACTER*8		TYPE
-      INTEGER			NELM
-      INTEGER			NID, NPTR
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Do we need to bother?
-      CALL ADI_CGET0C( CACHEID, 'TYPE', TYPE, STATUS )
-      IF ( TYPE .EQ. DTYPE ) GOTO 99
-
-*  Create space for the final data type
-      CALL ADI_CGET1I( CACHEID, 'SHAPE', ADI__MXDIM, DIMS, NDIM, STATUS )
-      CALL ADI_NEW( DTYPE, NDIM, DIMS, NID, STATUS )
-      CALL ADI_MAP( NID, DTYPE, 'WRITE', NPTR, STATUS )
-
-*  Number of elements mapped
-      CALL ARR_SUMDIM( NDIM, DIMS, NELM )
-
-*  Switch on the final data type
-      IF ( DTYPE .EQ. 'REAL' ) THEN
-        CALL ADI2_IC2R( PTR, TYPE, %VAL(NPTR), NELM, STATUS )
-      ELSE
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'T', DTYPE )
-        CALL ERR_REP( 'ADI2_IMGCNV', 'Can''t cope with final data type ^T', STATUS )
-      END IF
-
-*  Swap over the pointers
-      PTR = NPTR
-
-*  Remove the copied data
-c     CALL ADI_ERASE( NID, STATUS )
-
-*  Report any errors
- 99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'ADI2_IMGCNV', STATUS )
-      END IF
-
-      END
-
-
-      SUBROUTINE ADI2_IC2R( PTR, TYPE, DATA, NELM, STATUS )
-
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-      INTEGER			PTR
-      CHARACTER*(*)		TYPE
-      REAL			DATA(*)
-      INTEGER			NELM
-      INTEGER			STATUS
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Switch on initial data type
-      IF ( TYPE .EQ. 'WORD' ) THEN
-        CALL ADI2_ICW2R( %VAL(PTR), DATA, NELM, STATUS )
-      ELSE
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'T', TYPE )
-        CALL ERR_REP( 'ADI2_IC2R', 'Can''t cope with initial data type ^T', STATUS )
-      END IF
-
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'ADI2_IC2R', STATUS )
-      END IF
-
-      END
-
-
-      SUBROUTINE ADI2_ICW2R( DIN, DOUT, NELM, STATUS )
-
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-      INTEGER*2			DIN(*)
-      REAL			DOUT(*)
-      INTEGER			NELM
-      INTEGER			STATUS
-      INTEGER			I
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Convert all the data
-      DO I = 1, NELM
-        DOUT(I) = REAL(DIN(I))
-      END DO
-
-      END
