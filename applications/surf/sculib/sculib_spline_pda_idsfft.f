@@ -131,7 +131,6 @@
 
       MODE = 2
       DATA_OFFSET = 1
-      print *,'Hello from PDA_IDSFFT',STATUS
 
       CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NX_OUT,
      :     NY_OUT, X_OUT, Y_OUT, DATA_OUT, %VAL(IWK_PTR), %VAL(WK_PTR),
