@@ -5,7 +5,8 @@ WriteMakefile(
     'EXE_FILES' => [ 'MessageRelay.pl' ],
     'INSTALLSCRIPT' => '/star/bin',
     'NAME'      => 'Starlink::AMS',
-    'VERSION' => '0.05', # finds $VERSION
+    'VERSION'   => '1.00', # finds $VERSION
+    'DIR'       => [ qw/ Core Init Task /],
     'linkext'   => {LINKTYPE=>'' }, # no link needed
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
                     'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'}
