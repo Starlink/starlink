@@ -60,9 +60,26 @@
 #  Initialise the glob pattern list.
       set patterns {}
 
+#  Work out whether [incr Tcl] is present.
+      set hasItcl 0;
+      set hasItk 0;
+      foreach ext [info loaded] {
+         set extname [lindex $ext 1]
+         if { $extname == "Itcl" } { set hasItcl 1 }
+         if { $extname == "Itk" } { set hasItk 1 }
+      }
+
+#  Work out a list of files to read when constructing the index.
+      set files [glob {[a-z]*.tcl} {[a-z]*.tk}]
+      if { $hasItcl && $hasItk } {
+         lappend files [glob {[A-Z]*.tcl} {[A-Z]*.tk} *.itcl *.itk]
+      } {
+         lappend exclude_files itcl.tcl itk.tcl
+      }
+
 #  Generate a list of the .tcl files to use; all of them apart from 
 #  named exceptions.
-      foreach file [glob *.tcl *.tk *.itcl *.itk] {
+      foreach file $files {
          if { [lsearch -exact $exclude_files $file] == -1 } {
             lappend patterns $file
          }

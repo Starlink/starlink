@@ -13,12 +13,15 @@
  * SCCS: @(#) tkAppInit.c 1.22 96/05/29 09:47:08
  */
 
+#include "config.h"
 #include "tk.h"
-#include "itk.h"
 #include "tclAdam.h"
 #include "tkGwm.h"
 #include <stdlib.h>
 /* #include "blt.h" */
+#ifdef HAVE_ITCL
+#  include "itk.h"
+#endif /* HAVE_ITCL */
 
 /* include tclInt.h for access to namespace API */
 #include "tclInt.h"
@@ -101,12 +104,14 @@ Tcl_AppInit(interp)
      *
      * where "Mod" is the name of the module.
      */
+#ifdef HAVE_ITCL
     if (Itcl_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
     if (Itk_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
+#endif /* HAVE_ITCL */
     if (Tcladam_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
@@ -121,8 +126,10 @@ Tcl_AppInit(interp)
     if (Ndf_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
+#ifdef HAVE_ITCL
     Tcl_StaticPackage(interp, "Itcl", Itcl_Init, Itcl_SafeInit);
     Tcl_StaticPackage(interp, "Itk", Itk_Init, (Tcl_PackageInitProc *) NULL);
+#endif /* HAVE_ITCL */
     Tcl_StaticPackage(interp, "Tcladam", Tcladam_Init, (Tcl_PackageInitProc *) NULL);
 /*
     Tcl_StaticPackage(interp, "Blt", Blt_Init, (Tcl_PackageInitProc *) NULL);
@@ -142,6 +149,7 @@ Tcl_AppInit(interp)
      *  default into the global namespace.  Fix up the autoloader
      *  to do the same.
      */
+#ifdef HAVE_ITCL
     if (Tcl_Import(interp, Tcl_GetGlobalNamespace(interp),
             "::itk::*", /* allowOverwrite */ 1) != TCL_OK) {
         return TCL_ERROR;
@@ -159,6 +167,7 @@ Tcl_AppInit(interp)
     if (Tcl_Eval(interp, "auto_mkindex_parser::slavehook { _%@namespace import -force ::itcl::class }") != TCL_OK) {
         return TCL_ERROR;
     }
+#endif /* HAVE_ITCL */
 
     /*
      * Call Tcl_CreateCommand for application-specific commands, if

@@ -7,5 +7,19 @@ AC_PROG_FC
 AC_PROG_CC
 AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
+
+# Check availability of [incr Tcl].  This is declared as a build dependency,
+# but we'll get along without it if it's not there because it couldn't
+# be built.
+have_itcl=1
+AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl])
+AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl])
+if test -n "$have_itcl"
+then
+    AC_DEFINE(HAVE_ITCL, 1, [Is incr Tcl present?])
+fi
+AM_CONDITIONAL(HAVE_ITCL, $have_itcl)
+
 AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_HEADERS(config.h)
 AC_OUTPUT

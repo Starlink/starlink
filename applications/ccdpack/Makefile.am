@@ -6,7 +6,7 @@ SUBDIRS = @subdirs@
 ccdsupportdir = $(bindir)
 
 ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
-                  $(TCL_SUPPORT_NOEXE) $(TCL_INDEX)
+                  $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) $(TCL_INDEX)
 
 bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
 
@@ -112,7 +112,12 @@ CONFIG_SCR = DATASEC.DAT EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  INTWIDEFLAT.DAT  INTWIDESKY.DAT  WHT2000FLAT.DAT  WHT2000SKY.DAT \
  INT-WFC.ast ccdpack_style.def
 
-TCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
+TCL_SCR = \
+ raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
+ ccdwishrc \
+ mkindex.tcl
+
+ITCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDCopyListbox.tcl CCDCreateImportTable.tcl CCDCreateListofNames.tcl \
  CCDDialog.tcl CCDDoReduce.tcl CCDDoSetGlobals.tcl CCDFITSDoImport.tcl \
  CCDExtractFitsFromNDF.tcl CCDFITSImport.tcl CCDFileToNDFName.tcl \
@@ -149,10 +154,7 @@ TCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  Helpcontrol.tcl Marknumcontrol.tcl Markstylecontrol.tcl Ndfalign.tcl \
  Ndfchoose.tcl Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl \
  Vectordialog.tcl Waiter.tcl Wcsframecontrol.tcl Zoomcontrol.tcl \
- Checkcontrol.tcl Markercontrol.tcl \
- raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
- ccdwishrc \
- mkindex.tcl
+ Checkcontrol.tcl Markercontrol.tcl
 
 TCL_INDEX = tclIndex
 
@@ -193,9 +195,14 @@ TCL_SUPPORT_IWIDGETS = buttonbox.itk calendar.itk canvasprintbox.itk \
 TCL_SUPPORT_EXE = $(TCL_SUPPORT_BIN)
 
 TCL_SUPPORT_NOEXE = $(TCL_SCR) $(TCL_SUPPORT_TCL) $(TCL_SUPPORT_TK) \
- $(TCL_SUPPORT_STARTCL) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
- $(TCL_SUPPORT_IWIDGETS)
+ $(TCL_SUPPORT_STARTCL) 
 
+if HAVE_ITCL
+   ITCL_SUPPORT_NOEXE = $(ITCL_SCR) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
+                        $(TCL_SUPPORT_IWIDGETS)
+else
+   ITCL_SUPPORT_NOEXE =
+endif
 
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
  c1.xbm c2.xbm c3.xbm c4.xbm c5.xbm c6.xbm c7.xbm c8.xbm \
@@ -244,7 +251,7 @@ $(TCL_SUPPORT_ITK):
 	cp $(STAR_LIB)/itk$(ITCL_VERSION)/$@ $@
 $(TCL_SUPPORT_IWIDGETS):
 	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERSION)/scripts/$@ $@
-$(TCL_INDEX): $(TCL_SCR) $(TCL_SUPPORT_NOEXE) ccdwish
+$(TCL_INDEX): $(TCL_SCR) $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) ccdwish
 	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
         $(srcdir)/ccdwish mkindex.tcl
 
