@@ -6,6 +6,8 @@ use Net::SMTP;
 use strict;
 
 # Config:
+# Number of days in the reporting interval
+my $interval = 2;
 # URL where cvsweb lives 
 my $cvswebhome = 'http://cvsweb.starlink.ac.uk/cvsweb.cgi';
 # Where the results will be reported to be
@@ -209,7 +211,6 @@ sub Usage();
 
 my $startdate;
 my $enddate;
-my $interval = 1;          # number of days in the reported interval;
 
 
 my %myopts;
@@ -258,14 +259,14 @@ unless (defined($startdate) && defined($enddate)) {
     unless (defined $enddate) {
         ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
             = localtime($timenow);
-        $enddate = sprintf("%04d-%02d-%02dT%02d:%02d",
+        $enddate = sprintf("%04d-%02d-%02d %02d:%02d",
                            $year+1900, $mon+1, $mday, $hour, $min);
     }
     unless (defined $startdate) {
         ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
             = localtime($timenow-$interval*24*3600);
         
-        $startdate = sprintf("%04d-%02d-%02dT%02d:%02d",
+        $startdate = sprintf("%04d-%02d-%02d %02d:%02d",
                              $year+1900, $mon+1, $mday, $hour, $min);
     }
 }
@@ -278,7 +279,7 @@ unless (-d "CVS") {
 }
 
 # Read in the list of commit info
-my $cvslogcmd = sprintf("cvs log -N -S -d '%s<%s'",
+my $cvslogcmd = sprintf("cvs -q log -N -S -d '%s<%s'",
                         $startdate, $enddate);
 open(COMMITS, "$cvslogcmd |") || die "Can't read commit info";
 my $cvslog = CVSLog::read(*COMMITS);
@@ -287,7 +288,7 @@ close(COMMITS);
 defined $cvslog || die "Error reading commit log";
 
 
-printf HTML <<'EOD', $startdate, $enddate;
+print HTML <<'EOD';
 <DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
@@ -339,8 +340,9 @@ tr.r1 {
 </style>
 </head>
 <body>
-<h1>Commits between %s and %s</h1>
 EOD
+print HTML "<h1>Commits between $startdate and $enddate</h1>";
+
 
     
 my $i = 0;
@@ -415,6 +417,9 @@ if (defined $reportmail && $cvslog->have_entries) {
                "",
                "Committed files:",
                "");
+    foreach my $e ($cvslog->get_entries) {
+        push(@msg, "    ".$e->file);
+    }
 
     sendmail({ from => $reportfrom,
                to => $reportmail,
@@ -445,9 +450,6 @@ sub sendmail(%) {
         return 0;
     };
 
-    print "Banner: ", $smtp->banner, "\n";
-    print "Domain: ", $smtp->domain, "\n";
-
     my $status = 1;
     
     $status &= $smtp->mail($param->{from});
@@ -459,6 +461,7 @@ sub sendmail(%) {
     $status &= $smtp->datasend("To: ".$param->{to}."\n");
     $status &= $smtp->datasend("From: ".$param->{from}."\n");
     $status &= $smtp->datasend("Subject: ".$param->{subject}."\n");
+    $status &= $smtp->datasend("Date: ".localtime()."\n");
     $status &= $smtp->datasend("\n");
     foreach my $line (@{$param->{message}}) {
         $status &= $smtp->datasend($line . "\n");
@@ -474,7 +477,8 @@ sub Usage() {
     printf STDERR <<"EOD";
 Usage: $0 [options] [startdate [enddate]]
 Arguments:
-    startdate, enddate: start and end of interval, format yyyy-mm-dd
+    startdate, enddate: start and end of interval, format 'yyyy-mm-dd hh:mm'
+    or other CVS-style time specs.
 Options:
     -c path         path to a current checkout
                     (default: $checkoutdir)
