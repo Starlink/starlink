@@ -41,6 +41,8 @@
 #    22-JAN-2002 (AJC):
 #       Escape harmfull characters (like (), quotes and comma) in
 #       command-print and command-obsolete messages
+#    30-JUL-2004 (TIMJ):
+#       Add .sh output file
 
 source @bindir@/ifd_front.tcl
 
@@ -68,6 +70,13 @@ global Universe
       }
    }
 
+   proc sh {text} {
+      global pkg_sh
+      foreach line [split $text \n] {
+         puts $pkg_sh $line
+      }
+   }
+
 proc adamonly {defn} {
 
    eval $defn
@@ -76,14 +85,17 @@ proc adamonly {defn} {
 proc comment_start_hook {comment} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
 
     if {$comment=={}} {
        puts $pkg_icl ""
        puts $pkg_csh ""
+       puts $pkg_sh ""
     } else {
        foreach line [split $comment \n] {
           puts $pkg_icl "\{ $line"
           puts $pkg_csh "# $line"
+          puts $pkg_sh "# $line"
        }
     }
 }
@@ -92,6 +104,7 @@ proc package_start_hook {name} {
 
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     global Current
     global Date
     global Ifd
@@ -99,8 +112,10 @@ proc package_start_hook {name} {
     set Current(prefix) ""
     puts "Creating $name.icl"
     puts "Creating $name.csh"
+    puts "Creating $name.sh"
     set pkg_icl [open $name.icl w]
     set pkg_csh [open $name.csh w]
+    set pkg_sh [open $name.sh w]
     puts $pkg_icl "\{ ICL initialisation for package [string toupper $name]"
     puts $pkg_icl "\{ Created automatically from $Ifd using ifd2star"
     puts $pkg_icl "\{ $Date"
@@ -108,26 +123,36 @@ proc package_start_hook {name} {
     puts $pkg_csh "# Shell initialisation for package [string toupper $name]"
     puts $pkg_csh "# Created automatically from $Ifd using ifd2star"
     puts $pkg_csh "# $Date"
+
+    puts $pkg_sh "# Shell initialisation for package [string toupper $name]"
+    puts $pkg_sh "# Created automatically from $Ifd using ifd2star"
+    puts $pkg_sh "# $Date"
 }
 proc package_end_hook {name} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     close $pkg_icl
     close $pkg_csh
+    close $pkg_sh
 }
 
 proc display_start_hook {message} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     puts $pkg_icl ""
     puts $pkg_csh ""
+    puts $pkg_sh ""
     foreach line [split $message \n] {
       regsub -all \" $line ' line
       puts $pkg_icl "print \"$line\""
       puts $pkg_csh "echo \"$line\""
+      puts $pkg_sh "echo \"$line\""
     }
     puts $pkg_icl ""
     puts $pkg_csh ""
+    puts $pkg_sh ""
 }
 
 proc defhelp_start_hook {topic entry lib} {
@@ -187,6 +212,7 @@ proc action_end_hook {name} {
     global task_ifl
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     global Current
     global Aliases
 
@@ -225,6 +251,14 @@ proc action_end_hook {name} {
     puts $pkg_csh "alias $name $Current(exepath)/$name"
     if [string length $Current(prefix)] {
        puts $pkg_csh "alias $Current(prefix)_$name $Current(exepath)/$name"
+    }
+
+
+# Write the .sh file
+    puts $pkg_sh ""
+    puts $pkg_sh "alias $name='$Current(exepath)/$name'"
+    if [string length $Current(prefix)] {
+       puts $pkg_sh "alias $Current(prefix)_$name='$Current(exepath)/$name'"
     }
 }
 
@@ -376,6 +410,7 @@ proc command_end_hook {name} {
     global Cmdcsh
     global pkg_icl
     global pkg_csh
+    global pkg_sh
 
     set aliased 0
     foreach alias $Aliases {
@@ -406,10 +441,18 @@ proc command_end_hook {name} {
     if [string length $Current(prefix)] {
        puts $pkg_csh "alias $Current(prefix)_$name $Cmdcsh"
     }
+
+# Write the .sh file
+    puts $pkg_sh ""
+    puts $pkg_sh "alias $name=$Cmdcsh"
+    if [string length $Current(prefix)] {
+       puts $pkg_sh "alias $Current(prefix)_$name=$Cmdcsh"
+    }
 }
 proc print_start_hook {mess} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     global Current
     global Cmdicl
     global Cmdcsh
@@ -431,6 +474,7 @@ proc print_start_hook {mess} {
 proc obey_start_hook {command} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     global Current
     global Cmdicl
     global Cmdcsh
@@ -442,6 +486,7 @@ proc obey_start_hook {command} {
 proc task_start_hook {action} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     global Current
     global Cmdicl
     global Cmdcsh
@@ -453,6 +498,7 @@ proc task_start_hook {action} {
 proc task_end_hook {action} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     global Current
     global Cmdicl
     global Cmdcsh
@@ -472,17 +518,19 @@ proc taskparam_start_hook { val } {
 proc obsolete_start_hook {mess} {
     global pkg_icl
     global pkg_csh
+    global pkg_sh
     global Current
     global Cmdicl
     global Cmdcsh
 
-    set Cmdcsh "echo $mess"
+    set Cmdcsh "$mess"
     regsub -all {'} $Cmdcsh {\\\\\\'} Cmdcsh
     regsub -all {"} $Cmdcsh {\\\\\\"} Cmdcsh
     regsub -all {;} $Cmdcsh {\\\\\\;} Cmdcsh
     regsub -all {\$} $Cmdcsh {\\\\\\$} Cmdcsh
     regsub -all {\(} $Cmdcsh {\\\\\\(} Cmdcsh
     regsub -all {\)} $Cmdcsh {\\\\\\)} Cmdcsh
+    set Cmdcsh "'echo $Cmdcsh'"
 
     regsub -all ' $mess '' mess
     set mess "'$mess'"

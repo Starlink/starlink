@@ -70,6 +70,7 @@ proc obsolete_start_hook {mess} {}
 
 proc icl {text} {}
 proc csh {text} {}
+proc sh {text} {}
 proc cl {text} {}
 
 proc unknown {name args} {
