@@ -228,7 +228,7 @@ display of vector maps.}
 % degrees symbol
 \newcommand{\dgs}{\hbox{$^\circ$}} 
 \begin{htmlonly}
-\renewcommand{\dgs}{degrees} 
+\renewcommand{\dgs}{ degrees} 
 \end{htmlonly}
 
 \newcommand{\dash}{--}
@@ -4328,7 +4328,7 @@ for NDF applications.
 \end{tabbing}
  
       This concatenates the value of the FITS keyword NAME, the string
-      {\texttt " -  "}, and the value of the sub-expression:
+      \texttt{ " -  "}, and the value of the sub-expression:
  
 \begin{tabbing}
  xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \= \kill
@@ -6741,7 +6741,7 @@ text to be used for the default key heading.
 
 \item A new logical-valued parameter called INTEGRATE has been added to 
 \htmlref{POLBIN}{POLBIN}. If set to a true value, the output catalogue
-contains only a single vector formed by binning {\emph all} vectors
+contains only a single vector formed by binning \emph{all} vectors
 within the input catalogue. Otherwise, the output catalogue contains 
 vectors for a grid of bins determined by the BOX parameter, as before.
 
@@ -6858,10 +6858,10 @@ catalogue.
 \item The reference direction for Stokes parameters created by
 \htmlref{POLCAL}{POLCAL}, \htmlref{POLBIN}{POLBIN} and
 \htmlref{POLVEC}{POLVEC} has been changed.
-Prior to V2.0 the reference direction was the WPLATE=0 position ({\emph
+Prior to V2.0 the reference direction was the WPLATE=0 position (\emph{
 i.e.} the direction of the fixed analyser). As of V2.0, the reference
 direction will be north if there is WCS information available to define
-north, or the positive Y axis ({\emph i.e.} the second pixel axis)
+north, or the positive Y axis (\emph{i.e.} the second pixel axis)
 otherwise. \htmlref{POLVEC}{POLVEC} and \htmlref{POLBIN}{POLBIN} can still read data sets
 created by earlier versions of POLPACK which use the previous convention, but will 
 write data sets using the new convention.
@@ -6870,7 +6870,7 @@ write data sets using the new convention.
 \htmlref{POLVEC}{POLVEC} which
 give the orientation of the polarization vectors are now referred to the
 same reference direction as the Stokes parameters. Previously, these
-angles were measured anti-clockwise form the positive X axis ({\emph
+angles were measured anti-clockwise form the positive X axis (\emph{
 i.e.} the first pixel axis). They are now measured anti-clockwise from
 the same reference direction as the Stokes parameters.
 \htmlref{POLPLOT}{POLPLOT}

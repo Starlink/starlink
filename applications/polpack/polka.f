@@ -24,7 +24,7 @@
 *     cube containing a Stokes vector for every measured pixel on the sky.
 *     It may also be used as an image alignment tool for non-polarimetric 
 *     data (see parameter POL). It cannot be used with 3D intensity
-      frames (\emph{e.g.} spectropolarimetry data).
+*     frames (e.g. spectropolarimetry data).
 *
 *     The main processes applied to the data are:
 *
