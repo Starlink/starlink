@@ -1,67 +1,43 @@
 1 Update to GAIA
 
-  A new release of GAIA (v2.4) is now available. This release includes
-  a new toolbox and some minor improvements/fixes.
+  A new release of GAIA, v2.5, is now available. This release includes
+  a new toolbox and some improvements and bug fixes.
 
-  The new toolbox provides an interactive environment for doing the
-  surface photometry of extended sources (i.e. galaxies) and
-  inspecting the results. It is based on the ESP (SUN/180) package
-  commands ELLPRO and ELLFOU.
+  The new toolbox provides the long awaited ability to identify and
+  record image positions interactively. It also allows the import of
+  coordinates stored in text files (of various formats) and the
+  transformation of these positions from various celestial coordinate
+  systems to that of a displayed image (for instance this allows you
+  to read positions in FK4 and precess to FK5). Each position can also
+  be labelled for visual identification in plots and mean image
+  properties (such as seeing) can be calculated.
+
+  Another major change in this release is support for multiple
+  extension FITS files. It is now possible to select amongst images
+  stored in these files and to view any FITS catalogues. A similar
+  feature has also been introduced for accessing multiple NDFs stored
+  in the same container file (and their components. i.e. variances and
+  quality). This facility should be obvious when an MEF is loaded into
+  GAIA.
 
   Minor changes are detailed below:
 
-    - It is expected that work to make the LEDAS catalogues available
-      should be completed by the time of this release (these will
-      appear in the "Browse Catalog Directories..." item under the
-      "Data-Servers" menu).
+      - The SExtractor toolbox has been updated to work with the
+        latest version of EXTRACTOR and SExtractor (see SUN/226).
 
-    - A new configuration option "-focus_follows_mouse" has been
-      added. This follows complaints from users of Solaris CDE that
-      the window manager default configuration allows pop-up windows
-      to disappear (behind the main window) and sometime flash
-      uncontrollably. To stop this happening by default means that
-      everyone will now need to point at a text entry field and click
-      in it before changing the text and also click in the main window
-      before scrolling using the arrow keys. To restore the old
-      behaviour see the section in SUN/214 about configuration options
-      ("%showme sun214 configuration_options").
+      - The SExtractor toolbox no longer requires that you press
+        <Return> to update any text fields (this seemed to cause a lot
+        of confusion).
 
-    - A percentiles option has been added to automatic contour
-      generation.
+      - A new command-line option -quiet_exit has been
+        introduced. This can make GAIA ask before exiting the main
+        window. The default remains to not ask.
 
-    - The "automatic" generation option now correctly uses the image
-      to be contoured not the displayed image.
+      - The file selection dialog now attempts to preserve the last
+        filter pattern.
 
-    - The measure band can now display pixels and non-celestial
-      coordinate system offsets.
-
-    - The SExtractor toolbox increment and decrement arrows now work
-      the "obvious" way around.
-
-    - Automatic NDF history recording should be working again.
-
-    - Displaying NDFs stored within container files is now supported.
-
-    - Floating point images of size 35000x2048 pixels are now known to
-      display (if you have sufficient VM). Bigger images may also work.
-
-    - Pixel coordinates (which include the NDF origin) can now be
-      selected as the "celestial" coordinate system (see the
-      "Celestial coordinates..." toolbox)
-
-    - Blank pixels in unsigned word NDFs should be be handled
-      correctly.
-
-    - It should now be possible to plot POLPACK polarization data
-      again, although X and Y coordinates should still not include any
-      NDF origin offsets.
-
-    - The on-line help for the photometry toolbox is available
-      again.
-
-    - The ability to zoom around an object in the main display has
-      been added (this is controlled using Shift-1 and Shift-2 mouse
-      buttons).
+      - GAIA should now work correctly with X servers whose default
+        visual doesn't match the requested visual.
 
 
   To try out GAIA for yourself type the following command:
@@ -74,20 +50,6 @@
 
       gaia@star.rl.ac.uk
 
-  Peter W. Draper (P.W.Draper@durham.ac.uk) &
-  Norman Gray (ESP toolbox - norman@astro.gla.ac.uk)
+  Peter W. Draper (P.W.Draper@durham.ac.uk)
 
-  27th January 2000.
-
-
-  2.5 - MEF support / multiple NDF access support.
-
-      - EXTRACTOR updates
-
-      - EXTRACTOR toolbox, removed need to press <Return> to update
-        values
-
-      - New command-line option -quiet_exit.
-
-      - File selection dialog now attempts to preserve filter pattern.
-        (stops empty file lists).
+  15th May 2000.

@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.8}
 \newcommand{\stardocauthors}   {Peter W. Draper \& Norman Gray}
-\newcommand{\stardocdate}      {11 May 2000}
+\newcommand{\stardocdate}      {15 May 2000}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.5}
@@ -172,7 +172,8 @@ the ability to query on-line (WWW) catalogues.}
 %end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\mytt}[1]{{\tt{#1}}}
+\newcommand{\mytt}[1]{{\texttt{#1}}}
+\newcommand{\mybold}[1]{{\textbf{#1}}}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -286,10 +287,10 @@ GAIA is an image display tool (c.f. SAOimage), but with the additional
 capability of being extendable to integrate other programs.  At
 present extensions are provided that cover the astronomically
 interesting areas of aperture \& optimal photometry, automatic source
-detection, surface photometry, contouring, arbitrary region
-analysis, celestial coordinate readout, calibration and modification,
-grid overlays, blink comparison, image defect patching and the ability
-to connect to resources available in on-line (WWW) catalogues and
+detection, surface photometry, contouring, arbitrary region analysis,
+celestial coordinate readout, calibration and modification, grid
+overlays, blink comparison, image defect patching and the ability to
+connect to resources available in on-line (WWW) catalogues and
 archives.
 
 GAIA is a derivative of the
@@ -346,10 +347,10 @@ consequently not support any IRAF cursor commands.
 \section{Problems}
 
 If you have any problems with GAIA (or suggestions for improvements),
-then send an email message to 
+then send an email message to
 \htmladdnormallink{\mytt{gaia@star.rl.ac.uk}}{mailto:gaia@star.rl.ac.uk}.
-The GAIA home page (which should have a current list of known bugs and 
-work arounds) is at 
+The GAIA home page (which should have a current list of known bugs and
+work arounds) is at
 \htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
 
 \section{\xlabel{what_does_it_actually_do}What does it actually do?}
@@ -413,7 +414,7 @@ astronomical work with images:
   EXTRACTOR (\xref{SUN/226}{sun226}{}) package, a derivative of
   SExtractor.
 
-\item Extended surface photometry. This allows the interactive 
+\item Extended surface photometry. This allows the interactive
   identification of extended objects (galaxies) and profile
   measurements using ellipse fitting. The resultant fits are shown
   over the images and the measurements can be inspected (based on the
@@ -440,6 +441,13 @@ astronomical work with images:
   (as quickly as your hardware/CPU combination allow), or
   you can cycle through them by hand.
 
+\item Interactive position marking: Mark and label positions on your
+  images and print or record them for future reference. This also
+  allows positions to be read in from text files and input sky
+  coordinates to be precessed to different celestial coordinate
+  systems. Mean seeing and shape parameters of any marked stars are
+  also available as part of this analysis.
+
 \item Celestial coordinates readout. If your data have suitable
   astrometric calibration data available (in recognised headers
   {\em i.e.} FITS/IRAF or NDF WCS) then a continuous readout of the
@@ -458,7 +466,7 @@ astronomical work with images:
   celestial coordinate system (from say FK5 to  Galactic {\em etc.}).
 
 \item Celestial coordinate system control. You can change the celestial
-  coordinate system used by your image to a new one (two/from FK5,
+  coordinate system used by your image to a new one (to/from FK5,
   FK4, Ecliptic, Geocentric apparent, Galactic and SuperGalactic).
 
 \item Sky coordinate offsets. This feature also relies on being
@@ -520,10 +528,10 @@ modified. So you can edit, sort, select and delete records.
 
 \subsubsection{Catalogue formats}
 Local catalogues may be stored in several formats. The ``native''
-version is called a ``tab table''. This is a simple text file in which
-the values of the various fields are separated by a single
-\mytt{<TAB>} character and the catalogue headers are separated from
-these by a dashed line:
+version is called a ``tab separated table'' (TST). This is a simple
+text file in which the values of the various fields are separated by a
+single \mytt{<TAB>} character and the catalogue headers are separated
+from these by a dashed line:
 \begin{quote}
 \begin{verbatim}
 #  comment
@@ -531,7 +539,7 @@ keyword1: value1
 keyword2: value2
 
 ...
-ID           RA             DEC          MAG     ...
+ID   <TAB>   RA     <TAB>   DEC   <TAB>  MAG     ...
 --           --             ---          ---
 OBJ1 <TAB>   210.00 <TAB>   54.00 <TAB>  16.1
 OBJ2 <TAB>   210.01 <TAB>   54.01 <TAB>  15.1
@@ -541,21 +549,24 @@ OBJ2 <TAB>   210.01 <TAB>   54.01 <TAB>  15.1
 The usual format of a catalogue is as above, {\em i.e.} an object identifier
 followed by an RA and DEC (in J2000 decimal degrees). Note the
 \mytt{<TAB>} strings shouldn't be typed in, they are shown explicitly
-just to make clear where they should be placed.
+just to make clear where they should be placed. The TST format is also
+recognised by the CURSA package (\xref{SUN/190}{sun190}{}), which also
+contains a description of this format.
 
-Other formats that can be read by GAIA (with a performance penalty)
-are those supported by the CURSA (\xref{SUN/190}{sun190}{}) package
-({\em i.e.} FITS-tables and STL format) and the ``ASCII\_HEAD'' format of
-the SExtractor/EXTRACTOR package (\xref{SUN/226}{sun226}{}).
+Additional formats that can be also read by GAIA (with a performance
+penalty) are those supported by the \xref{CURSA}{sun190}{} package
+({\em i.e.} FITS-tables and STL format) and the ``ASCII\_HEAD'' format
+of the SExtractor/EXTRACTOR package (\xref{SUN/226}{sun226}{}).
 
-The format that is used to open a catalogue, is determined by the file
-extension:
+The format that is used to open or write a catalogue, is determined by
+the file extension:
 \begin{itemize}
-\item \textbf{FITS tables}, accepted file types: \texttt{.FIT .fit .FITS .fits .GSC .gsc}
-\item \textbf{STL}, accepted file types: \texttt{.TXT .txt}
-\item \textbf{ASCII\_HEAD}, accepted file types: \texttt{.asc .ASC .lis .LIS}
+\item \mybold{FITS tables}, accepted file types: \mytt{.FIT .fit .FITS .fits .GSC .gsc}
+\item \mybold{STL}, accepted file types: \mytt{.TXT .txt}
+\item \mybold{ASCII\_HEAD}, accepted file types: \mytt{.asc .ASC .lis .LIS}
 \end{itemize}
-All other file extensions are assumed to indicate a native ``tab-table''.
+All other file extensions are assumed to indicate a TST (the preferred
+extensions for these are \mytt{.tab} or \mytt{.TAB}).
 
 \subsubsection{Using your own local catalogues}
 A useful feature of local catalogues is that you can create your own
@@ -566,7 +577,7 @@ orientated lines over an image you would need a tab table that
 contained the following sort of information:
 \begin{quote}
 \begin{verbatim}
-# File created by: pdraper on June 15, 1998 at 10:24:04
+# File created by: pwd on June 15, 1999 at 10:24:04
 id_col: 0
 x_col: 1
 y_col: 2
@@ -598,14 +609,14 @@ colour {\em etc.}. Now if you look in the file
 symbol parameter is recorded together which the description for your
 local catalogue (which you can then edit into your tab files).
 
-To find out more about tab tables and how to configure plot symbols
-you should consult the ESO document
+To find out more about the TST format and how to configure plot
+symbols you should consult the ESO document
 \htmladdnormallinkfoot{``Astronomical Catalog Library''.}
 {http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz}
 
-\textbf{FITS tables:} much of the above also applies to FITS tables
-that GAIA will read, {\em i.e.} FITS keywords with the names \mytt{X\_COL},
-\mytt{Y\_COL} and \mytt{SYMBOL} will be interpreted
+\mybold{FITS tables:} much of the above also applies to FITS tables
+that GAIA will read, {\em i.e.} FITS keywords with the names
+\mytt{X\_COL}, \mytt{Y\_COL} and \mytt{SYMBOL} will be interpreted
 correctly. Special parameter names that are longer than 8 characters
 (such as \mytt{search\_cols}, \mytt{sort\_order}, \mytt{show\_cols}
 and \mytt{copyright}) should be truncated. Long symbol expressions can
@@ -654,7 +665,8 @@ more interesting are:
  -transient\_tools   &  Make toolboxes transient \\
  -demo\_mode         &  Make the demo toolbox available \\
  -component          &  The NDF component (data, variance or quality) \\
- -focus\_follows\_mouse & Image and entry focus follows mouse pointer
+ -focus\_follows\_mouse & Image and entry focus follows mouse pointer \\
+ -visual             & X visual to use (pseudocolor, truecolor, visual id...)
 \end{tabular}
 }
 
@@ -723,7 +735,7 @@ To do this, start up GAIA, select the \mytt{Data-Servers} menu and
 choose any remote catalogue. Now in the catalogue window select the
 \mytt{Options} menu and choose the \mytt{Proxies...} item.
 
-Now fill in the two fields (consult your system adminstrator if you're
+Now fill in the two fields (consult your system administrator if you're
 unclear what to enter here) and press \mytt{OK}.
 
 \section{\xlabel{gaia_demonstration}GAIA demonstration}
@@ -752,179 +764,7 @@ the version of SkyCat that GAIA is based on are also available at
 to extend SkyCat or GAIA at the user interface level are recommended
 to read about ``SkyCat plugins''.
 
-\section{\xlabel{changes}Changes}
-\subsection{Release 2.0}
-In this release GAIA has undergone major internal changes. It is now
-based on the SkyCat tool from ESO (previous it was based solely on
-RTD). This introduces the capabilities to browse on-line catalogue and
-archive information. GAIA has also been upgraded to use the new
-Starlink astrometry library (AST, see \xref{SUN/210}{sun210}{} or
-\xref{SUN/211}{sun211}{}). This provides the ability to read a larger
-range of FITS header information (including the draft FITS--WCS
-standard) and to plot celestial coordinate grids.
-
-This release also includes a test system to allow the astrometric
-calibration of images. This can use on-line catalogues as lists of
-reference positions for performing fits and tweaking existing
-calibrations.  Astrometry can also be directly defined and copied from
-other images.
-
-
-Other changes of less impact are:
-\begin{itemize}
-\item GAIA can now be started from the IRAF CL command language.
-\item The blink tool has been improved to deal with image resizing.
-\item A new toolbox for getting image statistics has been added (this
-is part of SkyCat).
-\item The image slice can now be saved to a file (and used in other
-applications).
-\item The artificial noise scale length in the patch toolbox has been
-increased so that replacing larger regions shows less artifacts due to
-noise repetition.
-\item The main control panel can now be hidden at any time (see menu View).
-\item The patch toolbox now processes NDF quality information.
-\item The patch toolbox now correctly reports the initial annulus scale factor.
-\item It is now possible to restore sky regions in the photometry toolbox.
-\item Aperture photometry and ARD regions now work on flipped and
-rotated images.
-\item Extra facilities for controlling the line graphics ({\em i.e.} removal)
-have been added to the graphics menu.
-\item GAIA will now accept NDF slices.
-\item The version of RTD that GAIA now uses has been upgraded from
-      2.3 to 2.18.
-\end{itemize}
-
-\subsection{Release 2.1}
-
-GAIA has been updated to add in some new features and fix a number of
-bugs.
-\begin{itemize}
-    \item The version of SkyCat that GAIA uses has been upgraded to
-      2.0.7. This enhances the web catalogue interface to allow
-      the selection of more than one site (LEDAS is now also available
-      by default) and to give full control of the marker colour,
-      shapes and sizes.
-
-    \item  Statistics are now available in the region table.
-
-    \item  Line graphics can now be saved to a text file and restored.
-
-    \item Temporary file deletion (as used by regions toolbox) is now
-      reworked to stop timing errors causing the occasional file to
-      be offered for deletion while still displayed.
-
-    \item Colour depths greater than 8 are now supported. Note that using
-      this facility will result in a considerable slow down of the
-      interface and is not extensively tested on SUNs and Alphas
-      (since I do not have access to these).
-
-    \item GAIA now supports catalogue access using proxy servers (uses
-      the {\tt http\_proxy} environment variable).
-
-    \item The gaiadisp command now works if you use ``xhost'' (cl users
-      note). Previously you had to use ``xauth''.
-
-    \item The image regions statistics output is now cleaned of some messy
-      carriage returns (which were printed as a strange character).
-
-    \item The fonts on OSF/1 now look slightly better, still not perfect.
-      This problem resulted from the changing the fonts to speed up
-      the starting time on SUNs.
-
-    \item The problem with the "fixed" font not being recognised when
-      printing a gridded image is now fixed.
-
-    \item Arrow head printing now uses the correct colour.
-
-    \item The percentiles algorithm has been modified. This should now
-      give fewer unusual ranges.
-
-    \item Printing using the "whole image" option (which is necessary
-      when capturing astrometry grids) has been modified to retain
-      the aspect ratio of the visible image area.
-
-    \item Printing of zoomed images is now much more efficient. Files
-      should now be much smaller and produced more quickly.
-
-    \item It is now possible to patch columns and rows.
-
-    \item Patch now works for single pixels (previously broken).
-
-    \item Aperture photometry has been modified to move the cursor along
-      with the aperture when using arrow keys for fine adjustments.
-
-    \item Aperture photometry now allows an exposure time to be used. This
-      can be a simple constant or read from a FITS keyword.
-
-    \item Axis normalisation is now correct when FITS positions of the
-      RA/Dec axes are swapped (this mainly effects HST archive previews).
-
-    \item White in the grid plotting and image colour tables is now pure.
-
-    \item Grid overlays can now be drawn just for the part of the image
-      that is displayed. This works especially well for zoomed images.
-
-    \item Regions extracted using the regions toolbox now retain the
-      astrometry information (you can use this feature to extract
-      rectangular regions of your image and draw sky coordinate grids
-      over them).
-
-    \item Facilities for flipping astrometry reference positions
-      independently of the image have been added.
-
-    \item The ESO SkyCat configuration file can now be loaded in
-      preference to the default one supplied with GAIA.
-
-    \item The "Hide Popup Windows" item now works with GAIA toolboxes.
-
-    \item A demonstration toolbox is now provided with GAIA.
-
-    \item The colour of blank pixels can now be set.
-
-    \item The interactive slice now displays the original image X and Y
-      coordinates as well as the data value.
-
-\end{itemize}
-\subsection{Release - 2.2}
-
-The main change in this release is that GAIA has been updated to
-include a new toolbox for controlling the EXTRACTOR/SExtractor
-programs (see \xref{SUN/226}{sun226}{}).
-
-This toolbox allows the interactive adjustment of most of SExtractor's
-myriad detection and catalogue parameters. It can plot the results as
-a series of detection ellipses over the image and displays the
-contents of the output catalogue. The catalogue window allows sorting
-and range selection, as well as interacting with the display ellipses
-(so you can click on an ellipse and see the associated values, or
-click on a catalogue row and see the associated ellipse).
-
-The catalogue handling of GAIA has also been extended to allow it to
-read the formats used by the \xref{CURSA}{sun190}{} package
-({\em i.e.} FITS-tables) and the ASCII\_HEAD format of SExtractor.
-
-Other minor changes in this release include:
-\begin{itemize}
-\item  The problem with restoring detached sky regions in the photometry
-  toolbox should now be fixed.
-
-\item Fixed fonts should now print correctly
-
-\item The blink toolbox now has control over which images are viewed
-  and an arrow cluster for controlling the mobile image position.
-
-\item The rotation limits in the "Type in known calibration..."
-  toolbox have been extended to -180 to +180 degrees
-  (was 0 to 180).
-
-\item On-line help for the catalogue window has been added.
-
-\item The image regions toolbox has been extended to include a "clear"
-  button for the statistics output.
-
-\item  Plotting catalogues with many thousands of entries has been
-  considerably speeded up.
-\end{itemize}
+\section{Recent \xlabel{changes}Changes}
 
 \subsection{Release - 2.3}
   This release includes two new toolboxes and many other enhancements.
@@ -958,7 +798,7 @@ Other minor changes in this release include:
       This supports the new parameters:
         \begin{itemize}
            \item \mytt{BACK\_TYPE}, \mytt{BACK\_VALUE} and \mytt{THRESH\_TYPE}.
-        \end{itemize} 
+        \end{itemize}
 
     \item Sextractor bug fixes:
         \begin{itemize}
@@ -991,7 +831,7 @@ Internally there have been many changes to GAIA, one consequence of
 which is that most of the keyboard shortcuts are changed. Most
 notably the interactive slice is now bound to \mytt{<control-a>}.
 
-\subsection{This release 2.4}
+\subsection{Release - 2.4}
 This is a minor release of GAIA that includes a new toolbox and some
 minor improvements/fixes.
 
@@ -1002,7 +842,7 @@ commands ELLPRO and ELLFOU.
 
 This is a minor update to GAIA with the following fixes:
 \begin{itemize}
-\item It is expected that work to make the 
+\item It is expected that work to make the
       \htmladdnormallinkfoot{LEDAS}{http://ledas-www.star.le.ac.uk/}
       catalogues available should be completed by the time of this
       release (these will appear in the ``Browse Catalog
@@ -1023,7 +863,7 @@ This is a minor update to GAIA with the following fixes:
       generation.
 
 \item The ``automatic'' generation option now correctly uses the image
-      to be contoured not the displayed image. 
+      to be contoured not the displayed image.
 
 \item The measure band can now display pixels and non-celestial
       coordinate system offsets.
@@ -1046,7 +886,7 @@ This is a minor update to GAIA with the following fixes:
       correctly.
 
 \item It should now be possible to plot POLPACK polarization data
-      again, although X and Y coordinates should still not include any 
+      again, although X and Y coordinates should still not include any
       NDF origin offsets.
 
 \item The on-line help for the photometry toolbox is available
@@ -1058,6 +898,48 @@ This is a minor update to GAIA with the following fixes:
 
 \end{itemize}
 
+\subsection{This release - 2.5}
+  This release includes a new toolbox and some improvements and bug
+  fixes.
+
+  The new toolbox provides the long awaited ability to identify and
+  record image positions interactively. It also allows the import of
+  coordinates stored in text files (of various formats) and the
+  transformation of these positions from various celestial coordinate
+  systems to that of a displayed image (for instance this allows you
+  to read positions in FK4 and precess to FK5). Each position can also
+  be labelled for visual identification in plots and mean image
+  properties (such as seeing) can be calculated.
+
+  Another major change in this release is support for multiple
+  extension FITS files. It is now possible to select amongst images
+  stored in these files and to view any FITS catalogues. A similar
+  feature has also been introduced for accessing multiple NDFs stored
+  in the same container file (and their components. i.e. variances and
+  quality). This facility should be obvious when an MEF is loaded into
+  GAIA.
+
+  Minor changes are detailed below:
+  \begin{itemize}
+
+    \item The SExtractor toolbox has been updated to work with the
+    latest version of EXTRACTOR and SExtractor (see
+    \xref{SUN/226}{sun226}{}).
+
+    \item The SExtractor toolbox no longer requires that you press
+    \mytt{<Return>} to update any text fields (this seemed to cause a
+    lot of confusion).
+
+    \item A new command-line option \mytt{-quiet\_exit} has been
+    introduced. This can make GAIA ask before exiting the main
+    window. The default remains to not ask.
+
+    \item The file selection dialog now attempts to preserve the last
+    filter pattern.
+
+    \item GAIA should now work correctly with X servers whose default
+    visual doesn't match the requested visual.
+  \end{itemize}
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 
@@ -1065,17 +947,17 @@ Many thanks go to Allan Brighton, Thomas Herlin, Miguel Albrecht,
 Daniel Durand and Peter Biereichel, who are responsible for the
 \htmladdnormallink{SkyCat}{http://archive.eso.org/skycat/}
 developments at ESO, in particular for making their software free for
-general use. 
+general use.
 GAIA and SkyCat are both based on the scripting language
 \htmladdnormallinkfoot{Tcl/Tk}{http://www.scriptics.com/} developed by
 John Ousterhout and the \htmladdnormallinkfoot{[incr Tcl]}
 {http://www.tcltk.com/} object oriented extensions developed by
-Michael McLennan.  
+Michael McLennan.
 They also make use of many other extensions and scripts developed by
-the Tcl community. 
+the Tcl community.
 Thanks are also due to the many people who helped test out GAIA and
 iron out minor and major problems (in particular Tim Jenness, Tim
-Gledhill and Nigel Metcalfe). 
+Gledhill and Nigel Metcalfe).
 
 % ? End of main text
 \end{document}
