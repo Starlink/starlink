@@ -461,7 +461,7 @@ atl1_gtgrp.f atl1_rdgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
 atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
-atl1_rdch.f atl1_rdfch.f 
+atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f
 
 F_SUB2 = 
 
@@ -497,7 +497,8 @@ C_SUB2 =
 
 TASKS = astaddframe astclear astget astset asttest astcmpframe \
 astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
-astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert
+astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
+astlutmap
 
 #  Monolith routine source name.
 
@@ -1356,6 +1357,7 @@ atl1_gtgrp.o: SAE_PAR GRP_PAR
 atl1_gtobj.o: SAE_PAR AST_PAR NDF_PAR 
 atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
 atl1_rdgrp.o: SAE_PAR GRP_PAR AST_PAR
+atl1_gtofl.o: SAE_PAR GRP_PAR 
 atl1_setop.o: SAE_PAR AST_PAR GRP_PAR PAR_ERR
 atlhelp.o   : SAE_PAR PAR_ERR
 atools_mon.o: SAE_PAR 
@@ -1375,6 +1377,7 @@ astgetframe.o  : SAE_PAR AST_PAR
 astgetmapping.o: SAE_PAR AST_PAR     
 astconvert.o   : SAE_PAR AST_PAR PAR_ERR
 astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
+astlutmap.o    : SAE_PAR AST_PAR
 astunitmap.o   : SAE_PAR NDF_PAR AST_PAR
 astpermmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR
 
