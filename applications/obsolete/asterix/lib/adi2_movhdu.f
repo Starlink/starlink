@@ -85,7 +85,7 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
 
 *  Arguments Given:
       INTEGER                   FID                     ! File identifier
@@ -110,7 +110,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate the HDU
+*  Locate the HDU, forcing its creation
       CALL ADI2_LOCHDU( FID, HDU, ID, STATUS )
 
 *  Get the HDU number
@@ -125,14 +125,17 @@
       CALL ADI2_GETLUN( FID, LUN, STATUS )
       FSTAT = 0
       CALL ADI_CGET0L( ID, 'Created', CREATED, STATUS )
-      IF ( .NOT. CREATED ) THEN
+      IF ( CREATED ) THEN
+        CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
+        IF ( FSTAT .EQ. 107 ) FSTAT = 0
         CALL FTCRHD( LUN, FSTAT )
         IF ( FSTAT .NE. 0 ) THEN
           CALL ADI2_FITERP( FSTAT, STATUS )
         END IF
         CALL ADI_CPUT0L( ID, 'Created', .TRUE., STATUS )
+      ELSE
+        CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
       END IF
-      CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
       IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN
         CALL ADI2_FITERP( FSTAT, STATUS )
       ELSE IF ( FSTAT .EQ. 107 ) THEN
