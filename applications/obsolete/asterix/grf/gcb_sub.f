@@ -997,7 +997,7 @@
 
 
 *+  GCB_SETC_SUB - set a real value at specified location in GCB
-      SUBROUTINE GCB_SETC_SUB(CVAL,DISP,SIZ,GCB,STATUS)
+      SUBROUTINE GCB_SETC_SUB(CVAL,DISP,SIZ,FMT,GCB,STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -1012,7 +1012,7 @@
       INCLUDE 'GCB_CMN'
 *    Structure definitions :
 *    Import :
-      CHARACTER*(*) CVAL
+      CHARACTER*(*) CVAL,FMT
       INTEGER DISP
       INTEGER SIZ
 *    Import-Export :
