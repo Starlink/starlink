@@ -1,0 +1,12 @@
+FACILITY PRM
+100,ARGIN,argument/operand invalid
+101,FLTDZ,floating point divide by zero
+102,FLTOF,floating point overflow
+103,FLTUF,floating point underflow
+104,INTDZ,integer divide by zero
+105,INTOF,integer overflow
+106,LOGZN,logarithm of zero or negative number
+107,SLOST,numerical significance lost
+108,SQRNG,square root of negative number
+109,UDEXP,undefined exponentiation
+110,FPERR,floating point error

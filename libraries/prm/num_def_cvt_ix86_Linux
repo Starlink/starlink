@@ -1,0 +1,204 @@
+*+
+*  Name:
+*     NUM_DEF_CVT
+
+*  Type of Module:
+*     Fortran include file.
+
+*  Purpose:
+*     Define NUM_ functions for type conversion.
+
+*  Description:
+*     This file defines the NUM_ statement functions which perform type
+*     conversion between all the supported PRIMDAT data types.
+
+*  Notes:
+*     This file should be preceded by the file NUM_DEC_CVT which
+*     declares the function data types and their arguments.
+
+*  Machine-specific features used:
+*     This version is specific to DECstation systems using the DEC
+*     Fortran compiler.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-OCT-1991 (RFWS):
+*        Original version, derived from the SUN4 file.
+*     05-OCT-1995 (BKM):
+*        Linux version with some NUM1 routines implemented in C.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+
+*  Preliminary definitions:
+*  =======================
+*  These are unlikely to vary between machines and are defined first to
+*  ensure legal statement ordering below.
+      NUM1_WTOI( NUM_ARGW ) = NUM_ARGW
+      NUM1_ITOW( NUM_ARGI ) = NUM_ARGI
+
+
+*  Machine dependent definitions:
+*  =============================
+*  These conversions between the unsigned integer types are not
+*  directly supported by normal Fortran implementations, so we must
+*  invoke whatever intrinsic functions are appropriate on the machine
+*  in use.
+
+* 05-OCT-1995: Linux does not have the VMS intrinsic extensions used below
+*              so the following NUM1 routines are implemented in the file
+*              num1_cvt.c.
+
+*     NUM1_UBTOI( NUM_ARGUB ) = JZEXT( NUM_ARGUB )
+*     NUM1_UBTOUW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
+*     NUM1_UBTOW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
+*     NUM1_UWTOI( NUM_ARGUW ) = JZEXT( NUM_ARGUW )
+*     NUM1_WTOUB( NUM_ARGW )   =
+*    :   IIEOR( NUM_ARGW, IIAND( - IIAND( NUM_ARGW, 128 ), -256 ) )
+*     NUM1_ITOUW( NUM_ARGI )   =
+*    :  JIAND( 65535, NUM1_WTOI( NUM1_ITOW( NUM_ARGI - 32768 ) )
+*    :                           + 65536 ) - 32768
+      
+
+*  Functions resulting in BYTE.
+*  ===========================
+
+      NUM_BTOB( NUM_ARGB )    = NUM_ARGB
+
+      NUM_UBTOB( NUM_ARGUB )  = NUM1_UBTOW( NUM_ARGUB )
+
+      NUM_DTOB( NUM_ARGD )    = NINT( NUM_ARGD )
+
+      NUM_ITOB( NUM_ARGI )    = NUM_ARGI
+
+      NUM_RTOB( NUM_ARGR )    = NINT( NUM_ARGR )
+
+      NUM_WTOB( NUM_ARGW )    = NUM_ARGW
+
+      NUM_UWTOB( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
+ 
+
+*  Functions resulting in DOUBLE PRECISION.
+*  =======================================
+
+      NUM_BTOD( NUM_ARGB )    = NUM_ARGB
+
+      NUM_UBTOD( NUM_ARGUB )  = DBLE( NUM1_UBTOI( NUM_ARGUB ) )
+
+      NUM_DTOD( NUM_ARGD )    = NUM_ARGD
+
+      NUM_ITOD( NUM_ARGI )    = DBLE( NUM_ARGI )
+
+      NUM_RTOD( NUM_ARGR )    = DBLE( NUM_ARGR )
+
+      NUM_WTOD( NUM_ARGW )    = DBLE( NUM_ARGW )
+
+      NUM_UWTOD( NUM_ARGUW )  = DBLE( NUM1_UWTOI( NUM_ARGUW ) )
+ 
+
+*  Functions resulting in INTEGER.
+*  ==============================
+
+      NUM_BTOI( NUM_ARGB )    = NUM_ARGB
+
+      NUM_UBTOI( NUM_ARGUB )  = NUM1_UBTOI( NUM_ARGUB )
+
+      NUM_DTOI( NUM_ARGD )    = NINT( NUM_ARGD )
+
+      NUM_ITOI( NUM_ARGI )    = NUM_ARGI
+
+      NUM_RTOI( NUM_ARGR )    = NINT( NUM_ARGR )
+
+      NUM_WTOI( NUM_ARGW )    = NUM_ARGW
+
+      NUM_UWTOI( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
+ 
+
+*  Functions resulting in REAL.
+*  ===========================
+
+      NUM_BTOR( NUM_ARGB )    = NUM_ARGB
+
+      NUM_UBTOR( NUM_ARGUB )  = REAL( NUM1_UBTOI( NUM_ARGUB ) )
+
+      NUM_DTOR( NUM_ARGD )    = SNGL( NUM_ARGD )
+
+      NUM_ITOR( NUM_ARGI )    = REAL( NUM_ARGI )
+
+      NUM_RTOR( NUM_ARGR )    = NUM_ARGR
+
+      NUM_WTOR( NUM_ARGW )    = REAL( NUM_ARGW )
+
+      NUM_UWTOR( NUM_ARGUW )  = REAL( NUM1_UWTOI( NUM_ARGUW ) )
+ 
+
+*  Functions resulting in WORD.
+*  ===========================
+
+      NUM_BTOW( NUM_ARGB )    = NUM_ARGB
+
+      NUM_UBTOW( NUM_ARGUB )  = NUM1_UBTOW( NUM_ARGUB )
+
+      NUM_DTOW( NUM_ARGD )    = NINT( NUM_ARGD )
+
+      NUM_ITOW( NUM_ARGI )    = NUM_ARGI
+
+      NUM_RTOW( NUM_ARGR )    = NINT( NUM_ARGR )
+
+      NUM_WTOW( NUM_ARGW )    = NUM_ARGW
+
+      NUM_UWTOW( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
+
+
+*  Functions resulting in UNSIGNED BYTE.
+*  ====================================
+
+      NUM_WTOUB( NUM_ARGW )   = NUM1_WTOUB( NUM_ARGW )
+
+      NUM_BTOUB( NUM_ARGB )   =
+     :                         NUM_WTOUB( NUM_BTOW( NUM_ARGB ) )
+
+      NUM_UBTOUB( NUM_ARGUB ) = NUM_ARGUB
+
+      NUM_DTOUB( NUM_ARGD )   =
+     :                         NUM_WTOUB( NUM_DTOW( NUM_ARGD ) )
+
+      NUM_ITOUB( NUM_ARGI )   =
+     :                         NUM_WTOUB( NUM_ITOW( NUM_ARGI ) )
+
+      NUM_RTOUB( NUM_ARGR )   =
+     :                         NUM_WTOUB( NUM_RTOW( NUM_ARGR ) )
+
+      NUM_UWTOUB( NUM_ARGUW ) =
+     :                         NUM_WTOUB( NUM_UWTOW( NUM_ARGUW ) )
+ 
+ 
+*  Functions resulting in UNSIGNED WORD.
+*  ====================================
+
+      NUM_ITOUW( NUM_ARGI )   = NUM1_ITOUW( NUM_ARGI )
+
+      NUM_BTOUW( NUM_ARGB )   =
+     :                         NUM_ITOUW( NUM_BTOI( NUM_ARGB ) )
+
+      NUM_UBTOUW( NUM_ARGUB ) = NUM1_UBTOUW( NUM_ARGUB )
+
+      NUM_DTOUW( NUM_ARGD )   =
+     :                         NUM_ITOUW( NUM_DTOI( NUM_ARGD ) )
+
+      NUM_RTOUW( NUM_ARGR )   =
+     :                         NUM_ITOUW( NUM_RTOI( NUM_ARGR ) )
+
+      NUM_WTOUW( NUM_ARGW )   =
+     :                         NUM_ITOUW( NUM_WTOI( NUM_ARGW ) )
+
+      NUM_UWTOUW( NUM_ARGUW ) = NUM_ARGUW
+
+*.

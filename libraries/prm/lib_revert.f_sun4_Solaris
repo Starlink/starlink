@@ -1,0 +1,44 @@
+      SUBROUTINE LIB$REVERT
+*+
+*  Name:
+*     LIB$REVERT
+
+*  Purpose:
+*     Revert to original behaviour on numerical error.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL LIB$REVERT
+
+*  Description:
+*     This routine re-establishes the original numerical error
+*     behaviour after a previous call to LIB$ESTABLISH. It is provided
+*     as a look-alike for the VAX/VMS routine of the same name, but
+*     only provides the functions required by (and documented for) the
+*     PRIMDAT facility.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-OCT-1991 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*.
+
+*  Revert to the original error behaviour.
+      CALL NUM_REVRT
+
+      END

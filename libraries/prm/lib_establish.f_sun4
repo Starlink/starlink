@@ -1,0 +1,59 @@
+      SUBROUTINE LIB$ESTABLISH( ROUTIN )
+*+
+*  Name:
+*     LIB$ESTABLISH
+
+*  Purpose:
+*     Establish a numerical error handler.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL LIB$ESTABLISH( ROUTIN )
+
+*  Description:
+*     This routine establishes a numerical error handler. It is
+*     provided as a look-alike for the VAX/VMS routine of the same
+*     name, but only provides the functions required by (and documented
+*     for) the PRIMDAT facility.
+
+*  Arguments:
+*     ROUTIN = SUBROUTINE (Given)
+*        The numerical error handler. This routine should be declared
+*        as EXTERNAL in the routine which calls LIB$ESTABLISH. The user
+*        routine NUM_TRAP is provided for this purpose.
+
+*  Notes:
+*     The error handler established by this routine remains in effect
+*     until a subsequent call to LIB$REVERT at which point the previous
+*     numerical error behaviour will be re-established. Note that
+*     although matching calls to these two routines will cancel, they
+*     may not be nested.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     29-OCT-1991 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  External References:
+      EXTERNAL ROUTIN
+
+*.
+
+*  Establish the error handler.
+      CALL NUM_HANDL( ROUTIN )
+
+      END

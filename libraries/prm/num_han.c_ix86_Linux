@@ -1,0 +1,201 @@
+/* Declare/revert numerical error handling functions for Linux systems.	    */
+/* Derived from OSF1 version which also does nothing! */
+
+#include <signal.h>
+#include "sae_par.h"		 /* Standard SAE_ constants		    */
+#include "prm_err.h"		 /* PRM_ error codes			    */
+
+/* Global Variable Definitions:						    */
+   volatile struct		 /* Fortran NUM_CMN common block.	    */
+   {
+      int num_error;		 /* Global numerical error status	    */
+   } num_cmn_;
+
+/* Static Variables:							    */
+
+   void num_handl_( void ( *routin )() )
+   {
+/*
+*+
+*  Name:
+*     NUM_HANDL
+
+*  Purpose:
+*     Establish a handler for numerical errors.
+
+*  Language:
+*     C
+
+*  Invocation:
+*     CALL NUM_HANDL( ROUTIN )
+
+*  Description:
+*     This routine declares a signal handler to handle numerical errors
+*     such as overflow or divide by zero.
+
+*  Arguments:
+*     ROUTIN = SUBROUTINE (Given)
+*        The numerical error handler.  It should be declared as
+*        EXTERNAL in the routine which calls NUM_HANDL. The routine
+*        NUM_TRAP is provided for this purpose.
+
+*  Machine-specific features used:
+*     This routine is specific to DECstation (MIPS) systems.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-FEB-1993 (DLT):
+*        Original version from mips version by RFWS.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* Exit the routine.							    */
+      return;
+   }
+
+   void num_revrt_( void )
+   {
+/*
+*+
+*  Name:
+*     NUM_REVRT
+
+*  Purpose:
+*     Revert to original numerical error behaviour.
+
+*  Language:
+*     C
+
+*  Invocation:
+*     CALL NUM_REVRT
+
+*  Description:
+*     This routine causes the handling of numerical errors to revert to
+*     its original behaviour after a previous call to NUM_HANDL. Note
+*     that although matching calls to NUM_HANDL and NUM_REVRT cancel,
+*     they may not be nested.
+
+*  Machine-specific features used:
+*     This version is specific to DECstation (MIPS) systems.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-OCT-1991 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Exit the routine.							    */
+      return;
+   }   
+
+   int matherr()
+   {
+/*+									    */
+/* Name:								    */
+/*    matherr								    */
+
+/* Purpose:								    */
+/*    Replace standard maths library matherr routine.			    */
+
+/* Invocation:								    */
+/*    matherr( );							    */
+/*									    */
+/* Description:								    */
+/*    This function replaces the standard matherr routine in the maths	    */
+/*    library. It does nothing and is simply intended to supress the	    */
+/*    printing of warning messages when argument errors occur in calls to   */
+/*    maths library functions.						    */
+
+/* Parameters:								    */
+/*    void								    */
+
+/* Returned Value:							    */
+/*    void								    */
+
+/* Authors:								    */
+/*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    {@enter_new_authors_here@}					    */
+
+/* History:								    */
+/*    4-NOV-1991 (RFWS):						    */
+/*       Original version.						    */
+/*    {@enter_changes_here@}						    */
+
+/* Bugs:								    */
+/*    {@note_any_bugs_here@}						    */
+
+/*-									    */
+
+/*.									    */
+
+/* Exit the routine.							    */
+      return;
+   }
+
+   void num_trap_( int sig, int code )
+   {
+/*
+*+
+*  Name:
+*     NUM_TRAP
+
+*  Purpose:
+*     Handle numerical errors.
+
+*  Language:
+*     C
+
+*  Invocation:
+*     CALL NUM_HANDL( NUM_TRAP )
+
+*  Description:
+*     This routine is intended to be passed to NUM_HANDL as a handler
+*     for numerical errors. Once established, any numerical error will
+*     be handled by this routine until NUM_REVRT is called. If the
+*     global variable NUM_ERROR is set to SAI__OK, NUM_TRAP will set it
+*     to a suitable error status value in response to the numerical
+*     error, otherwise it will leave its value unchanged.
+
+*  Arguments:
+*     There is no need to refer to this routine's arguments in order to
+*     use it.
+
+*  Machine-specific features used:
+*     This version is specific to DECstation (MIPS) systems.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-NOV-1991 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/*.									    */
+
+/* Exit the routine.							    */
+      return;
+   }

@@ -1,0 +1,63 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*           Declarations for NUM_ UNSIGNED BYTE functions              *
+*           ---------------------------------------------              *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*    endhistory
+*
+ 
+ 
+*   UNSIGNED BYTE arithmetic functions.
+      BYTE NUM_ADDUB
+      BYTE NUM_SUBUB
+      BYTE NUM_MULUB
+      BYTE NUM_DIVUB
+      BYTE NUM_IDVUB
+      BYTE NUM_PWRUB
+      BYTE NUM_NEGUB
+ 
+ 
+*   UNSIGNED BYTE functions with a single UNSIGNED BYTE argument.
+      BYTE NUM_SQRTUB
+      BYTE NUM_LOGUB
+      BYTE NUM_LG10UB
+      BYTE NUM_EXPUB
+      BYTE NUM_ABSUB
+      BYTE NUM_NINTUB
+      BYTE NUM_INTUB
+ 
+ 
+*   UNSIGNED BYTE functions with two UNSIGNED BYTE arguments.
+      BYTE NUM_MINUB
+      BYTE NUM_MAXUB
+      BYTE NUM_DIMUB
+      BYTE NUM_MODUB
+      BYTE NUM_SIGNUB
+ 
+ 
+*   Logical functions comparing two UNSIGNED BYTE numbers.
+      LOGICAL NUM_EQUB
+      LOGICAL NUM_NEUB
+      LOGICAL NUM_GTUB
+      LOGICAL NUM_GEUB
+      LOGICAL NUM_LTUB
+      LOGICAL NUM_LEUB
+
+ 
+ 
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*           Declarations for NUM_ UNSIGNED BYTE functions              *
+*                                                                      *
+*                               END                                    *
+************************************************************************

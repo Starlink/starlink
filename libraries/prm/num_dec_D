@@ -1,0 +1,80 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*          Declarations for NUM_ DOUBLE PRECISION functions            *
+*          ------------------------------------------------            *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*    endhistory
+*
+ 
+ 
+*   DOUBLE PRECISION arithmetic functions.
+      DOUBLE PRECISION NUM_ADDD
+      DOUBLE PRECISION NUM_SUBD
+      DOUBLE PRECISION NUM_MULD
+      DOUBLE PRECISION NUM_DIVD
+      DOUBLE PRECISION NUM_IDVD
+      DOUBLE PRECISION NUM_PWRD
+      DOUBLE PRECISION NUM_NEGD
+ 
+ 
+*   DOUBLE PRECISION functions with a single DOUBLE PRECISION argument.
+      DOUBLE PRECISION NUM_SQRTD
+      DOUBLE PRECISION NUM_LOGD
+      DOUBLE PRECISION NUM_LG10D
+      DOUBLE PRECISION NUM_EXPD
+      DOUBLE PRECISION NUM_SIND
+      DOUBLE PRECISION NUM_COSD
+      DOUBLE PRECISION NUM_TAND
+      DOUBLE PRECISION NUM_SINDD
+      DOUBLE PRECISION NUM_COSDD
+      DOUBLE PRECISION NUM_TANDD
+      DOUBLE PRECISION NUM_ASIND
+      DOUBLE PRECISION NUM_ACOSD
+      DOUBLE PRECISION NUM_ATAND
+      DOUBLE PRECISION NUM_ASNDD
+      DOUBLE PRECISION NUM_ACSDD
+      DOUBLE PRECISION NUM_ATNDD
+      DOUBLE PRECISION NUM_SINHD
+      DOUBLE PRECISION NUM_COSHD
+      DOUBLE PRECISION NUM_TANHD
+      DOUBLE PRECISION NUM_ABSD
+      DOUBLE PRECISION NUM_NINTD
+      DOUBLE PRECISION NUM_INTD
+ 
+ 
+*   DOUBLE PRECISION functions with two DOUBLE PRECISION arguments.
+      DOUBLE PRECISION NUM_MIND
+      DOUBLE PRECISION NUM_MAXD
+      DOUBLE PRECISION NUM_DIMD
+      DOUBLE PRECISION NUM_MODD
+      DOUBLE PRECISION NUM_SIGND
+      DOUBLE PRECISION NUM_ATN2D
+      DOUBLE PRECISION NUM_AT2DD
+ 
+ 
+*   Logical functions comparing two DOUBLE PRECISION numbers.
+      LOGICAL NUM_EQD
+      LOGICAL NUM_NED
+      LOGICAL NUM_GTD
+      LOGICAL NUM_GED
+      LOGICAL NUM_LTD
+      LOGICAL NUM_LED
+
+ 
+ 
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*          Declarations for NUM_ DOUBLE PRECISION functions            *
+*                                                                      *
+*                               END                                    *
+************************************************************************
