@@ -335,7 +335,7 @@ PRIVATE_INCLUDES = ccd1_par
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = ssn69.tex
-HYPERTEXT_DOCS = ssn69.htx
+# HYPERTEXT_DOCS = ssn69.htx
 
 #  List of documentation files.
 
@@ -346,6 +346,8 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 TASKS = ccdbgen
 
 TASKSRC = $(TASKS:=.f)
+
+TASKOBJ = $(TASKS:=.o)
 
 IFL_FILES = $(TASKS:=.ifl)
 
@@ -359,7 +361,7 @@ DATA_FILES = ccdtest.ard ccdbig_obj.dat
 
 #  List of object files produced by compiling the source code.
 
-OBJECT_FILES = $(SUBOBJ)
+OBJECT_FILES = $(SUBOBJ) $(TASKOBJ)
 
 #-------------------------------------------------------------------------------
 
@@ -427,8 +429,16 @@ SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) \
 
 #  Rules for building source files.
 
-$(PKG_NAME)_source.tar: check_uptodate
+$(PKG_NAME)_source.tar:
+	for f in $(SOURCE_CONTENTS); do \
+           if test -f $$f; then \
+              ci $$f;\
+           else :; fi;\
+        done
+	co $(SOURCE_CONTENTS)
+	rm -f $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(SOURCE_CONTENTS)
+	rm -f $(SOURCE_CONTENTS)
 
 #  Suffix rules.
 
@@ -461,7 +471,7 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 #  Pathnames of directories into which files may be placed when the
 #  package is installed.
 
-INSTALL_BIN = $(INSTALL)/bin
+INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
 INSTALL_ETC = $(INSTALL)/etc
@@ -652,8 +662,8 @@ install:
 #  package is installed (at least in part).
 	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 #
-#  Install the shell scripts, giving them world execute permission.
-	for f in $(SHELL_SCRIPTS) ""; do \
+#  Install the executables, giving them world execute permission.
+	for f in $(SHELL_SCRIPTS) $(TASKS) ""; do \
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_BIN);\
               chmod 755 $(INSTALL_BIN)/$$f;\
@@ -674,9 +684,9 @@ install:
 #  Install the interface files, giving them world read permission.
 	for f in $(IFC_FILES) ""; do \
            if test -n "$$f"; then \
-              $(CP) $$f $(INSTALL_BIN);\
+              cp -p $$f $(INSTALL_BIN);\
               chmod 644 $(INSTALL_BIN)/$$f;\
-              $(RM) $$f;\
+              rm -f $$f;\
               $(LINK) $(INSTALL_BIN)/$$f $$f;\
            else :; fi;\
         done
@@ -684,9 +694,9 @@ install:
 #  Install the data files, giving them world read permission.
 	for f in $(DATA_FILES) ""; do \
            if test -n "$$f"; then \
-              $(CP) $$f $(INSTALL_BIN);\
+              cp -p $$f $(INSTALL_BIN);\
               chmod 644 $(INSTALL_BIN)/$$f;\
-              $(RM) $$f;\
+              rm -f $$f;\
               $(LINK) $(INSTALL_BIN)/$$f $$f;\
            else :; fi;\
         done
@@ -768,8 +778,8 @@ do_deinstall:
 #  Note the package will need to be tested again.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-#  Deinstall the shell script files, if installed versions exist.
-	- for f in $(SHELL_SCRIPTS) ""; do \
+#  Deinstall the executables, if installed versions exist.
+	- for f in $(SHELL_SCRIPTS) $(TASKS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_BIN)/$$f .;\
