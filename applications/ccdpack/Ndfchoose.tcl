@@ -154,7 +154,7 @@
          }
          itk_component add showfits {
             button $panel.showfits \
-               -text "Show FITS" \
+               -text "FITS" \
                -command [ code $this fitsselect ]
          }
          itk_component add gotpair {
@@ -445,7 +445,7 @@
                      high=[ lindex $scalevals 1 ] \
                      margin=0 \
                      style=\"drawtitle=0,tickall=1,$displaystyle\" \
-                  "
+                  " "Displaying image [ $ndf name ]" $itk_interior
 
 #  It may be a good idea to unmap the NDF here (although it may not).
                $ndf mapped 0
@@ -796,6 +796,15 @@
             }
          }
          set lastvp $viewport
+      }
+
+
+#-----------------------------------------------------------------------
+      public variable state { } {
+#-----------------------------------------------------------------------
+         if { ! [ isvalid ] } {
+            $itk_component(gotpair) configure -state disabled
+         }
       }
 
 
