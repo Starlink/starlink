@@ -42,7 +42,13 @@
         the system, but it should expand to cover tagging, branching,
         and other source maintenance patterns as well.</px>
 
-      <px><strong>This is a draft document: $Id$</strong></px>
+      <px><strong>This is a draft document, in more-or-less constant flux:
+          $Id$</strong></px>
+
+      <px>See <span
+          media="print"><url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn78/ssn78.xml</url></span><span media='screen'><webref url="http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn78/ssn78.xml">the repository</webref></span> for 
+        changes and its current status.</px>
+
     </abstract>
 
     <sect id="intro" export="export">
@@ -410,6 +416,14 @@
           and the manual isn't going to make things better or worse.
         </p>
 
+        <p>It's also worth looking at the <webref
+            url="http://www.gnu.org/prep/standards_48.html">`Release
+            Process'</webref> section of the GNU Coding Standards
+          document.  Though we are not necessarily following these
+          standards, this section both describes what is conventional
+          packaging in the open-source world, and outlines the
+          conventions which the autotools are designed to support.</p>
+
         <subsubsect id="autoconfoverview">
           <subhead>
             <title>Autoconf</title>
@@ -472,9 +486,10 @@ const char version[] = "@PACKAGE_VERSION@";
             tree.  A typical <code>Makefile.in</code> might include
             lines like
             <verbatim>
-LN_S=@LN_S@
+LN_S = @LN_S@
+CC = @CC@
 myfile.o: myfile.c
-        @CC@ -o myfile.o myfile.c
+        $(CC) -o myfile.o myfile.c
 </verbatim>
             That, combined with autoconf macros
             <code>AC_PROG_CC</code> and <code>AC_PROG_LN_S</code>,
@@ -511,7 +526,14 @@ AC_CHECK_FUNCS([strchr])
 #define HAVE_SYS_WAIT_H 1
 #define HAVE_STRCHR 1
 </verbatim>
-            After including this file into your source code with 
+            Whereas most configured files are substituted as a result
+            of being mentioned in a <code>AC_CONFIG_FILES()</code>
+            macro, the <code>config.h.in</code> input file is
+            configured through
+            <code>AC_CONFIG_HEADERS(config.h)</code>, which does its
+            configuration in a slightly different way.</p>
+
+          <p>After including this file into your source code with 
             <verbatim>
 #include &lt;config.h&gt;
 </verbatim>
@@ -633,7 +655,16 @@ AC_CHECK_FUNCS([strchr])
             <code>config.h.in</code> (this file name is conventional, but
             not required).  <span media="all">See autoconf
               <webref url="&autoconfhtml;/autoconf_27.html">4.8
-                Configuration Header Files</webref>.</span></p>
+                Configuration Header Files</webref>.</span>  If you
+            want to put extra information into this file, use the
+            <code>AC_DEFINE</code> macro: a declaration like
+            <code>AC_DEFINE(SPECIALCASE,1)</code> would insert
+            <code>#define SPECIALCASE 1</code> into the
+            <code>config.h</code>; autoheader also spots this and puts
+            a suitable template into <code>config.h.in</code>.  See
+            the autoconf manual, section <webref
+              url="&autoconfhtml;/autoconf_82.html">Defining C
+              preprocessor symbols</webref>, for further details.</p>
 
           <p>Line 9: This does the work of substituting the results of
             the various tests into the files being configured.  For each
@@ -947,12 +978,17 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             location.  Since it includes the installation location, it
             should <em>not</em> be generated at configure time or
             install time, but instead at make time, so that the user
-            may specify an installation prefix at make time (through
+            is free to specify one installation prefix at configure time
+            (through <kbd>./configure --prefix=www</kbd>), override
+            this with another prefix at make time (through
             <kbd>make prefix=xxx</kbd>) and specify a
             <em>different</em> one -- presumably a staging location or
             something similar -- at installation time (through
-            <kbd>make prefix=yyy install</kbd>).  This is discussed in
-            section
+            <kbd>make prefix=yyy install</kbd>).  It is the prefix at
+            <em>build</em> time that is to be baked into the code, if
+            any such baking has to be done.  This is one of the GNU
+            conventions mentioned in <ref id="tooloverview"/>, and is
+            discussed in a little more detail in section
             <webref url="&autoconfhtml;/autoconf_24.html">4.7.2
               Installation Directory Variables</webref> of the autoconf
             manual.  This is why we have to include a makefile-style
@@ -1355,6 +1391,146 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             </dl></p>
 
         </subsubsect>
+
+      </subsect>
+
+      <subsect id="tool-state" export="export">
+        <subhead>
+          <title>A few remarks on state</title>
+        </subhead>
+
+        <p>There is quite a lot of state held within the starconf
+          build tree.  This section contains a few notes on where this
+          state is, and how to handle it.</p>
+
+        <p><em>Autotool state</em>: The most obvious state within the
+          tree is the existence of the <code>configure</code> and
+          <code>Makefile.in</code> files which are the generated by
+          autoconf and automake.  Files <code>config.h.in</code> and
+          <code>aclocal.m4</code>, are also part of this process,
+          inasmuch as they are generated by autoreconf:
+          <code>config.h.in</code> is based on the declarations
+          within <code>configure.ac</code>; <code>aclocal.m4</code> is a
+          local cache of m4 macros, drawn from the autoconf, automake
+          and libtool installations, plus the contents of
+          <code>acinclude.m4</code> (see below for this).  Other objects
+          generated by the autotools are the cache directory
+          <code>autom4te.cache</code> and the tool links
+          <code>config.guess</code>, <code>config.sub</code>,
+          <code>depcomp</code>, <code>install-sh</code>,
+          <code>ltmain.sh</code>, <code>missing</code> and
+          <code>stamp-h1</code>.  All of this can be happily blown away
+          by hand, and a lot of it is removed by <kbd>make
+            maintainer-clean</kbd>, though this doesn't remove things like
+          <code>config.h.in</code> which are required for
+          <code>./configure</code> to run.  Most of this state is
+          maintained reliably by the dependencies within
+          <code>Makefile.in</code> -- for example if you update
+          <code>Makefile.am</code>, then a simple <kbd>make</kbd> will
+          remake <code>Makefile.in</code> and regenerate
+          <code>Makefile</code> before using the new
+          <code>Makefile</code> to do the build.  If you have removed
+          this state or suspect that it may be out of date, then
+          autoreconf will always regenerate it -- it's always safe to
+          rerun autoreconf.</p>
+
+        <p><em>Configuration state</em>: When <code>./configure</code>
+          runs, its most obvious effect is to transform the
+          <code>.in</code> files into their corresponding configured
+          results.  However at the same time, it creates a log file in
+          <code>config.log</code> (which can be handy to examine if a
+          configure script fails or appears to give wrong answers), a
+          cache in <code>config.cache</code> if you ran
+          <code>./configure</code> with the <code>-C</code> option, it
+          creates the directory-specific <code>./libtool</code> script,
+          and it creates a file <code>config.status</code>.  This last
+          file holds most of <code>./configure</code>'s state, and can
+          be used to either regenerate a particular file
+          (<kbd>./config.status Makefile</kbd>) or else to update itself
+          (<kbd>./config.status --recheck</kbd> has the effect of
+          rerunning <code>./configure</code> with the same options such
+          as <code>--prefix</code> which were given to the
+          <code>./configure</code> script last time).  You won't often
+          have to run <code>./config.status</code> yourself, but it's
+          reassuring to know what it's doing when the makefile runs it
+          for you.  It is always regenerated afresh by running
+          <code>./configure</code>.</p>
+
+        <p><em>Build state</em>: The compiled files are obviously part
+          of the build state, and can be removed by <kbd>make
+            clean</kbd> and regenerated with plain <kbd>make</kbd>.  Less
+          obviously part of this state are the directory
+          <code>.libs</code>, which is libtool's' workspace and holds
+          different types of objects and libraries, and
+          <code>.deps</code>, which holds dependency information gleaned
+          as part of the last build.  Less obviously still are those
+          (few) <code>.in</code> files which are configured as part of
+          the build.  As mentioned in <ref id="automakeoverview"/>,
+          so-called `installation directory variables' should be
+          substituted at make time rather than build time, with a
+          hand-written makefile rule in <code>Makefile.am</code>.</p>
+
+        <p><em>Starconf state</em>: The <ref id="starconf">starconf
+            section</ref> described the <code>starconf.status</code>
+          script, and some of the state that it holds on behalf of the
+          starconf application.  This is deliberately sticky state, and
+          this file is intended to be checked in to the repository.  As
+          well as holding your default installation locations, it also
+          holds some files which are maintained by the starconf
+          application but associated with your component, which includes
+          the standard <code>./bootstrap</code> script and the
+          collection of starconf m4 macros <code>starconf.m4</code>.  
+          The starconf application and the standard bootstrap script
+          both run <code>./starconf.status</code> at the correct time,
+          but you can also run it yourself if you think you need to.
+          Running <code>./starconf.status</code> unpacks these two (only
+          two at present) files and in the latter case copies it to
+          overwrite <code>acinclude.m4</code>, as hinted above.  This
+          means that these files are kept with your application, but if
+          starconf is updated, then this update will propagate to all
+          components, since the standard <code>./bootstrap</code> script
+          re-invokes starconf if it can.  You can delete this file, and
+          regenerate it by running starconf either explicitly, or
+          implicitly through <code>./bootstrap</code>.  (There may seem
+          a contradiction between the assertion that
+          <code>starconf.status</code> holds such local things as
+          installation locations and that it should be checked in;
+          that's true, and why the installation locations are in fact
+          held in a non-checked-in file
+          <code>starconf.status.local</code>, which you should ignore,
+          and which we mention only in order to identify it for
+          you).</p>
+
+        <p><em>Build tree and installation state</em>: The last
+          noteworthy state is that in the build tree as a whole.  The
+          top-level makefile requires some state in order to manage its
+          bootstrapping `make world' build.  This build is organised by
+          representing the build and link dependencies between
+          components by makefile dependencies between the components'
+          installed manifests, which are installed in the
+          <code>.../manifests</code> directory alongside, and at the
+          same time, as the component is installed by the
+          <code>install-manifest</code> target.  Thus this is state held
+          <em>outside of the build tree</em>.  If the `make world' build
+          sees that a manifest file is up-to-date with respect to the
+          dependencies expressed in <code>Makefile.dependencies</code>,
+          it makes <em>no attempt to build it</em>, even if the
+          component itself has been updated and itself needs rebuilding
+          and reinstalling.  A slight wrinkle here is that the
+          `buildsupport' tools -- namely starconf and the autotools --
+          are not explicitly listed as being a dependency of anything,
+          since they are in fact a dependency of everything.  Since they
+          are rather a special case, these are built within the
+          top-level bootstrap script, and the best way to run that `by
+          hand' is via the command <kbd>./bootstrap
+            --buildsupport-only</kbd>, noting that the remarks about
+          dependencies above apply to this process also.  Thus, if you
+          update a component -- including one of the buildsupport
+          components -- and wish the top-level `make world' build to
+          notice this, the best way to do this is to first delete that
+          component's manifest file from the installation tree.  This
+          process might change slightly with starconf developments
+          (see <ref id="developments"/>).</p>
 
       </subsect>
 
@@ -2943,77 +3119,100 @@ AC_SUBST(STAR_MANIFEST_DIR)
           generic changes to support the added Fortran
           autoconf macros, but the majority of the changes
           are in the service of Starlink's specific requirements.  They
-          are summarised here.</p>
+          are summarised here.
+          <ul>
+            <li>
+              <p>Addition of the <code>MONOLITHS</code> and
+                <code>TASKS</code> primaries: These function rather like
+                the <code>PROGRAMS</code> primary, in that the the
+                <code>MONOLITHS</code> primary specifies one or more
+                monoliths to install, and the <code>TASKS</code> one or
+                more IFL tasks to associate with it.  Like the
+                <code>PROGRAMS</code> primary, each <code>MONOLITHS</code>
+                variable should have a <code>xxx_SOURCES</code> variable
+                associated with it.  Starlink <code>automake</code> also
+                emits the makefile rules to compile <code>.ifl</code>
+                files to <code>.ifc</code> files.</p>
+            </li>
 
-        <p>Addition of the <code>MONOLITHS</code> and <code>TASKS</code>
-          primaries: These function rather like the <code>PROGRAMS</code>
-          primary, in that the the <code>MONOLITHS</code> primary
-          specifies one or more monoliths to install, and the
-          <code>TASKS</code> one or more IFL tasks to associate with it.
-          Like the <code>PROGRAMS</code> primary, each
-          <code>MONOLITHS</code> variable should have a
-          <code>xxx_SOURCES</code> variable associated with it.  Starlink
-          <code>automake</code> also emits the makefile rules to compile
-          <code>.ifl</code> files to <code>.ifc</code> files.</p>
+            <li>
+              <p>Addition of the
+                <code>stardocs</code>,
+                <code>staretc</code>
+                and
+                <code>starhelp</code>
+                prefixes to
+                the <code>DATA</code> primary.  Setting these variables has
+                the same effect as giving an argument to the
+                <ref id='macro-doc-files' ><code>STAR_DOC_FILES</code></ref>,
+                <ref id='macro-etc-files' ><code>STAR_ETC_FILES</code></ref>
+                and
+                <ref id='macro-help-files' ><code>STAR_HELP_FILES</code></ref>
+                starconf macros</p>
+            </li>
 
-        <p>Addition of the
-          <code>stardocs</code>,
-          <code>staretc</code>
-          and
-          <code>starhelp</code>
-          prefixes to
-          the <code>DATA</code> primary.  Setting these variables has
-          the same effect as giving an argument to the
-          <ref id='macro-doc-files' ><code>STAR_DOC_FILES</code></ref>,
-          <ref id='macro-etc-files' ><code>STAR_ETC_FILES</code></ref>
-          and
-          <ref id='macro-help-files' ><code>STAR_HELP_FILES</code></ref>
-          starconf macros</p>
+            <li>
+              <p>Extra <code>LDADD</code> options: In standard
+                <code>automake</code>, the content of the
+                <code>LDADD</code> variables must be a list of extra
+                objects to add to a program, or extra libraries,
+                specified through <code>-l</code> and <code>-L</code>
+                flags.  In Starlink <code>automake</code>, you can also
+                specify extra libraries using the standard Starlink
+                <code>*_link</code> and <code>*_link_adam</code>
+                commands.  You can add tokens matching
+                <code>`*_link`</code> or <code>`*_link_adam`</code> to
+                the <code>LDADD</code> variable, or either of these
+                preceded by exactly <code>$(srcdir)/</code>, which you
+                may need to do only in the case of test code.</p>
+            </li>
 
-        <p>Extra <code>LDADD</code> options: In standard
-          <code>automake</code>, the content of the <code>LDADD</code>
-          variables must be a list of extra objects to add to a program,
-          or extra libraries, specified through <code>-l</code> and
-          <code>-L</code> flags.  In Starlink <code>automake</code>, you
-          can also specify extra libraries using the standard Starlink
-          <code>*_link</code> and <code>*_link_adam</code> commands.
-          You can add tokens matching <code>`*_link`</code> or
-          <code>`*_link_adam`</code> to the <code>LDADD</code> variable, or
-          either of these preceded by exactly <code>$(srcdir)/</code>,
-          which you may need to do only in the case of test code.</p>
+            <li>
+              <p>Starlink <code>automake</code> spots use of the
+                <code>STAR_MESSGEN</code> and
+                <code>STAR_LATEX_DOCUMENTATION</code> macros in the associated
+                <code>configure.ac</code>, and produces
+                appropriate extra build rules in the generated
+                <code>Makefile.in</code>.  If the
+                <code>STAR_MANIFEST_DIR</code> is to be substituted by
+                autoconf, then Starlink automake
+                will add the <code>install-manifest</code> target to the
+                generated makefile.</p>
+            </li>
 
-        <p>Starlink <code>automake</code> spots use of the
-          <code>STAR_MESSGEN</code> and
-          <code>STAR_LATEX_DOCUMENTATION</code> macros in the associated
-          <code>configure.ac</code>, and produces
-          appropriate extra build rules in the generated
-          <code>Makefile.in</code>.  If the
-          <code>STAR_MANIFEST_DIR</code> is to be substituted by
-          autoconf, then Starlink automake
-          will add the <code>install-manifest</code> target to the
-          generated makefile.</p>
+            <li>
+              <p>Default strictness: Starlink automake adds the
+                <code>--startree</code> strictness level to the default
+                <code>--foreign</code>, <code>--gnu</code> and
+                <code>--gnits</code>.  At present, it
+                is almost indistinguishable from <code>--foreign</code>, and
+                is the default (the default for GNU automake is
+                <code>--gnu</code> strictness -- see also <ref
+                  id="developments"/>).</p>
+            </li>
 
-        <p>Default strictness: Starlink automake adds the
-          <code>--startree</code> strictness level to the default
-          <code>--foreign</code>, <code>--gnu</code> and
-          <code>--gnits</code>.  At present, it
-          is almost indistinguishable from <code>--foreign</code>, and
-          is the default (the default for GNU automake is
-          <code>--gnu</code> strictness -- see also <ref
-            id="developments"/>).</p>
+            <li>
+              <p>All of the installation rules have been modified to recognise
+                the presence of the <code>MANIFEST_FILE</code> environment
+                variable, and if it is present, to append the path to the
+                installed file to the file named in the variable.  The new
+                <code>install-manifest</code> target manages this
+                variable.</p>
+            </li>
 
-        <p>All of the installation rules have been modified to recognise
-          the presence of the <code>MANIFEST_FILE</code> environment
-          variable, and if it is present, to append the path to the
-          installed file to the file named in the variable.  The new
-          <code>install-manifest</code> target manages this variable.</p>
+            <li>
+              <p>The <code>missing</code> script which is installed as part of
+                Starlink automake respects the
+                <code>MISSING_SUPPRESS_RUN</code> environment variable.</p>
+            </li>
 
-        <p>The <code>missing</code> script which is installed as part of
-          Starlink automake respects the
-          <code>MISSING_SUPPRESS_RUN</code> environment variable.</p>
-
-        <p>The package version is reported as
-          <code>1.8.2-starlink</code> rather than plain 1.8.2.</p>
+            <li>
+              <p>The package version is reported as
+                <code>1.8.2-starlink</code> rather than plain
+                1.8.2.</p>
+            </li>
+          </ul>
+        </p>
       </sect>
 
       <sect id="developments" export="export">
@@ -3056,7 +3255,9 @@ AC_SUBST(STAR_MANIFEST_DIR)
               <p>The description of the tree-wide bootstrapping
                 process in <ref id="bootstrapping"/> is likely to
                 change as more of the Starlink legacy and new code is
-                brought under this build system umbrella.</p>
+                brought under this build system umbrella.  The
+                interface to the `make world' build may well change
+                (see <ref id="tool-state"/>).</p>
             </li>
 
             <li>
