@@ -20,7 +20,7 @@ for DEC Alphas running OSF/1. Historically it has been supported for DEC
 Ultrix and for SunOS and may still work for them.
     </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><build>hds</build><build>psx</build><build>err</build><link>par</link><link>hds</link><link>psx</link><link>err</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><build>hds</build><build>psx</build><build>mers</build><link>par</link><link>hds</link><link>psx</link><link>mers</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
