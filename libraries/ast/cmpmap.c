@@ -67,7 +67,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        - Changed private InitVtab method to protected astInitCmpMapVtab
 *        method.
-*        - 
+*     8-JAN-2003 (DSB):
+*        - Modified MapMerge so that a parallel CmpMap can swap with a
+*        suitable PermMap lower neighbour.
 *class--
 */
 
@@ -88,6 +90,7 @@ f     The CmpMap class does not define any new routines beyond those
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate Mappings (parent class) */
 #include "channel.h"             /* I/O channels */
+#include "permmap.h"             /* Coordinate permutation Mappings */
 #include "cmpmap.h"              /* Interface definition for this class */
 
 /* Error code definitions. */
@@ -796,13 +799,18 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Local Variables: */
    AstCmpMap *cmpmap1;           /* Pointer to first CmpMap */
    AstCmpMap *cmpmap2;           /* Pointer to second CmpMap */
-   AstMapping *map;              /* Pointer to Mapping */
+   AstMapping *map;              /* Pointer to nominated CmpMap */
    AstMapping *new1;             /* Pointer to new CmpMap */
    AstMapping *new2;             /* Pointer to new CmpMap */
    AstMapping *new;              /* Pointer to replacement Mapping */
    AstMapping *simp1;            /* Pointer to simplified Mapping */
    AstMapping *simp2;            /* Pointer to simplified Mapping */
+   AstPermMap *permmap1;         /* Pointer to first PermMap */
    const char *class;            /* Pointer to Mapping class string */
+   int *inperm;                  /* Pointer to copy of PermMap inperm array */
+   int *outperm;                 /* Pointer to copy of PermMap outperm array */
+   int canswap;                  /* Can nominated Mapping swap with lower neighbour? */
+   int i;                        /* Coordinate index */
    int imap1;                    /* Index of first Mapping */
    int imap2;                    /* Index of second Mapping */
    int imap;                     /* Loop counter for Mappings */
@@ -813,6 +821,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int invert2a;                 /* Invert flag for sub-Mapping */
    int invert2b;                 /* Invert flag for sub-Mapping */
    int invert;                   /* Invert attribute value */
+   int j;                        /* Coordinate index */
+   int nc;                       /* No. of coordinates */
    int new_invert;               /* New Invert attribute value */
    int nin2a;                    /* No. input coordinates for sub-Mapping */
    int nin2b;                    /* No. input coordinates for sub-Mapping */
@@ -1081,6 +1091,144 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                ( *nmap )--;
                result = imap1;
             }
+         }
+      }
+   }
+
+/* If we are merging the Mapings in series, and if the nominated CmpMap 
+   is a parallel CmpMap, and if the lower neighbour is a PermMap, it may 
+   be possible to swap the PermMap and the CmpMap. This may allow one of 
+   the two swapped Mappings to merge with its new neighbour. 
+   ==================================================================== */
+
+/* Only do this if no simplification occurred above, and if the Mappings
+   are being merged in series, and if the nominated Mapping is not the
+   first in the list. */
+   if( result == -1 && where > 0 ){
+
+/* Obtain the indices of the two potential Mappings to be swapped. */
+      imap1 = where - 1;
+      imap2 = where;
+
+/* Obtain a pointer to the CmpMap. */
+      cmpmap2 = (AstCmpMap *) ( *map_list )[ imap2 ];
+
+/* Obtain the Class string of the first (previous) Mapping and
+   determine if it is a PermMap. Also check that the nominated Mapping is 
+   a parallel CmpMap. */
+      class = astGetClass( ( *map_list )[ imap1 ] );
+      if ( astOK && !strcmp( class, "PermMap" ) && !cmpmap2->series) {
+
+/* Indicate we have no new Mapping to store. */
+         new = NULL;
+
+/* If suitable, obtain a pointer to the PermMap. */
+         permmap1 = (AstPermMap *) ( *map_list )[ imap1 ];
+
+/* Obtain the current values of the Invert attribute in the Mappings. */
+         invert1 = astGetInvert( permmap1 );
+         invert2 = astGetInvert( cmpmap2 );
+
+/* Temporarily set the Invert attributes of both Mappings to the values 
+   supplied in the "invert_list" parameter. */
+         astSetInvert( permmap1, ( *invert_list )[ imap1 ] );     
+         astSetInvert( cmpmap2, ( *invert_list )[ imap2 ] );     
+
+/* In order to swap the Mappings, the PermMap must have the same number 
+   of inputs and outputs (this will equal the number of inputs to the
+   nominated Cmpmap). */
+         nc = astGetNout( permmap1 );
+         if( astGetNin( permmap1 ) == nc ) {
+
+/* Get the number of inputs to the two components of the nominated parallel 
+   CmpMap. */
+            nin2a = astGetNin( cmpmap2->map1 );
+            nin2b = astGetNin( cmpmap2->map2 );
+
+/* Get the input and output axis permutation arrays from the PermMap */
+            inperm =astGetInPerm( permmap1 );
+            outperm =astGetOutPerm( permmap1 );
+
+/* In order to swap the Mappings, the PermMap outputs which feed the
+   inputs of the first component of the parallel CmpMap must be copied
+   from a contiguous block at the end of the list of PermMap inputs.
+   Likewise, the PermMap outputs which feed the inputs of the second 
+   component of the parallel CmpMap must be copied from a contiguous block 
+   at the beggining of the list of PermMap inputs. Also, there must be a
+   one-to-one correspondance between inputs and outputs in the PermMap.
+   Check that the first block of nin2a PermMap outputs are copied from
+   the last block of nin2a PermMap inputs, and vica-versa. */
+            canswap = 1;
+            for( i = 0, j = nc - nin2a; i < nin2a; i++, j++ ) {
+               if( outperm[ i ] != j || inperm[ j ] != i ) {
+                  canswap = 0;
+                  break;
+               }
+            }
+
+/* Check that the first block of nin2b PermMap inputs are copied from
+   the last block of nin2b PermMap outputs, and vica-versa. */
+            for( i = 0, j = nc - nin2b; i < nin2b; i++, j++ ) {
+               if( inperm[ i ] != j || outperm[ j ] != i ) {
+                  canswap = 0;
+                  break;
+               }
+            }
+
+/* If the Mappings can be swapped.. */
+            if( canswap ) {
+
+/* Create a new parallel CmpMap with the component mappings of the
+   nominated parallel CmpMap reversed. First temporarily set the Invert 
+   attributes of the component Mappings to the values they had when 
+   the CmpMap was created. */
+               invert2a = astGetInvert( cmpmap2->map1 );
+               invert2b = astGetInvert( cmpmap2->map2 );
+               astSetInvert( cmpmap2->map1, cmpmap2->invert1 );
+               astSetInvert( cmpmap2->map2, cmpmap2->invert2 );
+
+/* Create the new parallel Cmpmap, with the component Mappings in reverse 
+   order. */
+               new = (AstMapping *) astCmpMap( cmpmap2->map2, cmpmap2->map1, 
+                                               0, "" );
+
+/* Re-instate the original Invert attributes in the component Mappings. */
+               astSetInvert( cmpmap2->map1, invert2a );
+               astSetInvert( cmpmap2->map2, invert2b );
+
+            }
+
+/* Release the arrays holding the input and output permutation arrays
+   copied from the PermMap. */
+            inperm = astFree( inperm );
+            outperm = astFree( outperm );
+         }
+
+/* Re-instate the original values of the Invert attributes of both
+   Mappings. */
+         astSetInvert( permmap1, invert1 );     
+         astSetInvert( cmpmap2, invert2 );     
+
+/* If the Mappings can be swapped... */
+         if( astOK && new ) {
+
+/* Annul the supplied pointer to the nominated CmpMap. */
+            ( *map_list )[ imap2 ] = astAnnul( ( *map_list )[ imap2 ] );
+
+/* Copy the PermMap pointer to the slot previously occupied by the
+   nominated CmpMap pointer. Likewise, copy the invert flag. */
+            ( *map_list )[ imap2 ] = ( *map_list )[ imap1 ];
+            ( *invert_list )[ imap2 ] = ( *invert_list )[ imap1 ];
+
+/* Store a pointer to the new CmpMap in the slot previously occupied by
+   the PermMap. Set the corresponding invert flag to zero to indicate
+   that the CmpMap has not been inverted. */
+            ( *map_list )[ imap1 ] = new;
+            ( *invert_list )[ imap1 ] = 0;
+
+/* Return the index of the first modified element. */
+            result = imap1;
+
          }
       }
    }
