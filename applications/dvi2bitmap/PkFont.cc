@@ -91,6 +91,13 @@ PkFont::PkFont(unsigned int dvimag,
     path_ = "";
     name_ = name;
 
+    if (verbosity_ > normal)
+	cerr << "PkFont::PkFont " << name
+	     << " c=" << c
+	     << " s=" << s
+	     << " d=" << d
+	     << '\n';
+
     try
     {
 	string pk_file_path;
@@ -349,12 +356,13 @@ void PkFont::read_font (InputByteStream& pkf)
 
 
     if (verbosity_ > normal)
-	cerr << "PK file " << name_ << " '" << preamble_.comment << "\'\n"
-	     << "designSize="  << preamble_.designSize
+	cerr << "PkFont::read_font " << name_
+	     << " '" << preamble_.comment << "\'"
+	     << " designSize="  << preamble_.designSize
 	     << " cs=" << preamble_.cs
 	     << " hppp=" << preamble_.hppp
 	     << " vppp=" << preamble_.vppp
-	     << '\n';
+	     << "...\n";
 
     // Now scan through the file, reporting opcodes and character definitions
     bool end_of_scan = false;
@@ -391,7 +399,12 @@ void PkFont::read_font (InputByteStream& pkf)
 		    packet_length -= 7*4;
 
 		    if (verbosity_ > debug)
-			cerr << "char " << static_cast<int>(g_cc)
+			cerr << "chardef L "
+			     << static_cast<int>(g_cc)
+			     << "=`"
+			     << (g_cc>' ' && g_cc<='~' ?static_cast<char>(g_cc)
+						       :'?')
+			     << "\' "
 			     << hex
 			     << ": opcode=" << static_cast<int>(opcode)
 			     << " pl=" << packet_length
@@ -436,7 +449,12 @@ void PkFont::read_font (InputByteStream& pkf)
 		    packet_length -= 3 + 5*2;
 
 		    if (verbosity_ > debug)
-			cerr << "char " << static_cast<int>(g_cc)
+			cerr << "chardef XS "
+			     << static_cast<int>(g_cc)
+			     << "=`"
+			     << (g_cc>' ' && g_cc<='~' ?static_cast<char>(g_cc)
+						       :'?')
+			     << "\' "
 			     << hex
 			     << ": opcode=" << static_cast<int>(opcode)
 			     << " pl=" << packet_length
@@ -480,7 +498,12 @@ void PkFont::read_font (InputByteStream& pkf)
 		packet_length -= 8;
 
 		if (verbosity_ > debug)
-		    cerr << "char " << static_cast<int>(g_cc)
+		    cerr << "chardef S "
+			 << static_cast<int>(g_cc)
+			 << "=`"
+			 << (g_cc>' ' && g_cc<='~' ? static_cast<char>(g_cc)
+						   : '?')
+			 << "\' "
 			 << hex
 			 << ": opcode=" << static_cast<int>(opcode)
 			 << " pl=" << packet_length
@@ -504,12 +527,12 @@ void PkFont::read_font (InputByteStream& pkf)
 		pkf.skip(packet_length);
 	    }
 	    if (verbosity_ > debug)
-		cerr << "Char " << g_cc
+		cerr << "charsizes " << g_cc
 		     << " tfm=" << g_tfmwidth
 		     << " w="   << g_w
 		     << " h="   << g_h
 		     << " off=(" << g_hoff << ',' << g_voff
-		     << ")\n\tat " << pos
+		     << ") at " << pos
 		     << '(' << packet_length << ")\n";
 	}
 	else			// opcode is command
@@ -550,6 +573,9 @@ void PkFont::read_font (InputByteStream& pkf)
 	    }
 	}
     }
+
+    if (verbosity_ > normal)
+	cerr << "PkFont::read_font ...finished reading " << name_ << '\n';
 }
 
 // Return magnification, including both font scaling and overall DVI
