@@ -151,6 +151,9 @@
 *        Some bug fixes and improvements.
 *     1996 September 11 (MJC):
 *        Simplified the error message when the FITS file exists.
+*     1996 December 13 (MJC):
+*        Released the FIO file unit number, and used a buffer for some
+*        concatenated error messages."
 *     1997 January 13 (MJC):
 *        Added PROHIS argument and calls to enable propagation of
 *        history information from the HISTORY component to the FITS
@@ -159,6 +162,12 @@
 *     1997 March 16 (MJC):
 *        Allowed BITPIX argument to select the NDF's FITS extension
 *        BITPIX value to be propagated.
+*     1997 August 17 (MJC):
+*        Initialised FITSIO status.
+*     1997 November 7 (MJC):
+*        Changed the data type of the 2dF fibres extension.
+*     1997 December 2 (MJC):
+*        Initialised the second FITSIO status.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -860,8 +869,10 @@
 
   999 CONTINUE      
 
-*  Close the FITS file.
+*  Close the FITS file.  Use another status to ensure that the file is
+*  closed even if there has been an earlier FITSIO error.
       IF ( OPEN ) THEN
+         FSTATC = FITSOK
          CALL FTCLOS( FUNIT, FSTATC )
          IF ( FSTATC .GT. FITSOK ) THEN
             BUFFER = 'Error closing the FITS file '//FILNAM( :NCF )//'.'
