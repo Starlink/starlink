@@ -1,6 +1,8 @@
 *  History:
 *      1 Aug 2000 (ajc):
 *        Change TYPE * to PRINT *
+*      12 May 2003 (timj)
+*        SAVE DXYS (prevent uninitialized warning)
 C-----------------------------------------------------------------
 
       SUBROUTINE READ_GSD (IERR)
@@ -37,6 +39,11 @@ C   Formal parameters
       INCLUDE  'GSD_VAR.INC'
       INCLUDE  'GSD_FILE.INC'
       INCLUDE  'STAKPAR'
+
+C   Note that DXYS is the default prompt for the X&Y arcsec offsets.
+C   It must be retained between calls to this routine so that the values
+C   are retained from previous calls when making the default prompt.
+      SAVE DXYS
 
       IERR = 0
 
