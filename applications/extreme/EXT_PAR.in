@@ -26,27 +26,27 @@
 
 *  Long integer constants with small integer values for convenience in
 *  passing to functions.
-      INTEGER * 8 EXT__0
-      INTEGER * 8 EXT__1
-      INTEGER * 8 EXT__2
-      INTEGER * 8 EXT__3
-      INTEGER * 8 EXT__4
-      INTEGER * 8 EXT__5
-      INTEGER * 8 EXT__6
-      INTEGER * 8 EXT__7
-      INTEGER * 8 EXT__8
-      INTEGER * 8 EXT__9
-      INTEGER * 8 EXT__10
-      INTEGER * 8 EXT__M1
-      INTEGER * 8 EXT__M2
-      INTEGER * 8 EXT__M3
-      INTEGER * 8 EXT__M4
-      INTEGER * 8 EXT__M5
-      INTEGER * 8 EXT__M6
-      INTEGER * 8 EXT__M7
-      INTEGER * 8 EXT__M8
-      INTEGER * 8 EXT__M9
-      INTEGER * 8 EXT__M10
+      @integer8@ EXT__0
+      @integer8@ EXT__1
+      @integer8@ EXT__2
+      @integer8@ EXT__3
+      @integer8@ EXT__4
+      @integer8@ EXT__5
+      @integer8@ EXT__6
+      @integer8@ EXT__7
+      @integer8@ EXT__8
+      @integer8@ EXT__9
+      @integer8@ EXT__10
+      @integer8@ EXT__M1
+      @integer8@ EXT__M2
+      @integer8@ EXT__M3
+      @integer8@ EXT__M4
+      @integer8@ EXT__M5
+      @integer8@ EXT__M6
+      @integer8@ EXT__M7
+      @integer8@ EXT__M8
+      @integer8@ EXT__M9
+      @integer8@ EXT__M10
 
       PARAMETER( EXT__0 = 0 )
       PARAMETER( EXT__1 = 1 )

@@ -28,7 +28,7 @@
 *-
 
 *  Declaration of statement function.
-      INTEGER * 8 EXT_ITOX
+      @integer8@ EXT_ITOX
 
 *  Declaration of statement function dummy arguments.
       INTEGER     EXT_ARGI

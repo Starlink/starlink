@@ -3,7 +3,7 @@
 bin_SCRIPTS = do-xxx cmp-xxx extmk extmakefile $(DO_FILTERS) $(CMP_FILTERS) \
               extreme.csh
 
-bin_PROGRAMS = $(FILTERS) $(DO_FILTERS)
+bin_PROGRAMS = $(FILTERS)
 
 include_HEADERS = EXT_DEC EXT_DEF EXT_PAR extreme.h
 
@@ -24,4 +24,6 @@ $(DO_FILTERS): do-xxx
 $(CMP_FILTERS): cmp-xxx
 	cp cmp-xxx $@
 
+ssn73.tex: ssn73-pre.tex mkdoc
+	$(srcdir)/mkdoc 
 

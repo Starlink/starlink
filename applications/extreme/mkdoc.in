@@ -44,6 +44,6 @@
         cmp-xxx.tex \
         do-xxx.tex \
            >>tmp.ssn73.tex
-     sed -n '/%%%% End filter descriptions/,$p' <ssn73.tex >>tmp.ssn73.tex
+     sed -n '/%%%% End filter descriptions/,$p' <ssn73-pre.tex >>tmp.ssn73.tex
      mv tmp.ssn73.tex ssn73.tex
 

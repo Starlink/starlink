@@ -2264,6 +2264,543 @@ as well as the new ones.
 \section{Description of tools\label{sec:commands}}
 
 %%%% Begin filter descriptions
+\newpage
+\sstroutine{
+   crepint
+}{
+   Replace int by INT\_BIG in C
+}{
+   \sstdescription{
+      This program is a filter which takes C source code and replaces
+      occurrences of the type specifier `int{\tt '} by the identifier
+      `INT\_BIG{\tt '}.  This identifier can then be assigned a preprocessor
+      value of a suitable integral type (int or long) either using an
+      include file or with a -DINT\_BIG=(type) flag on the C compiler
+      command line.
+
+      It{\tt '}s not quite as simple as replacing every semantically significant
+      occurrence of the `int{\tt '} identifier; `short int{\tt '} and `long int{\tt '} type
+      specifiers will be left alone.
+
+      If a use of int appears to be declaring a symbol called `main{\tt '} or
+      `argc{\tt '}, then this will be left alone too, and a warning written
+      to standard error to the effect that it is not being changed.
+
+      Additionally, references to the $<$limits.h$>$ macros INT\_MAX, INT\_MIN
+      and UINT\_MAX are replaced by INT\_BIG\_MAX, INT\_BIG\_MIN and
+      UINT\_BIG\_MAX respectively.  If any of these substitutions are
+      made, then a line `\#include {\tt "}extreme.h{\tt "}{\tt '} is added after the
+      `\#include $<$limits.h$>${\tt '} line which is presumably in the file.
+      If $<$limits.h$>$ is not included in the input file, a warning is
+      written to standard error.
+
+      Explicit declarations which are implicitly of type int will have
+      an INT\_BIG token inserted - for instance `static x, y;{\tt '} will be
+      changed to `static INT\_BIG x, y;{\tt '}.
+
+      The program will write a warning on standard error for certain
+      constructions in the code which are likely to cause trouble after
+      the mass redeclaration of int as INT\_BIG has occurred, since in
+      some places the type int, and not INT\_BIG, is still required.
+      These constructions are:
+      \sstitemlist{
+
+         \sstitem
+            Inclusion of system header files other than those of the C
+              standard library, since these may indicate use of functions
+              other than those warned about above with arguments of type
+              pointer to int.
+
+         \sstitem
+            Use of functions from the C standard library which may require
+              changes.
+
+      }
+      The functions from the C standard library which may require changes
+      are the following:
+      \sstitemlist{
+
+         \sstitem
+            Format strings in formatted I/O which may need changes
+              because they use variable argument lists or require
+              arguments of type pointer to int.
+
+         \sstitem
+            The frexp() math function whose second argument must be
+              a pointer to int
+
+         \sstitem
+            The signal() function whose second argument is a function
+              which must take an int argument
+
+         \sstitem
+            The bsearch() and qsort() functions which take a comparison
+              function as argument, and this function must be of type int
+
+      }
+      In the case of potentially dangerous format strings, for
+      convenience a comment is inserted in the output code on the line
+      before the function call is made.  The comment will contain the
+      character string `crepint: {\tt '}.  The warning to standard error
+      notes that the comment line has been inserted.
+
+      The following constructions are also likely to cause trouble, but
+      will not be warned about by the program:
+      \sstitemlist{
+
+         \sstitem
+            Use of functions without prototypes.  If header files are
+              omitted or old style function declarations are used then the
+              ANSI C machinery for doing type conversion at function call
+              time will not work.  Gcc{\tt '}s `-Wstrict-prototypes{\tt '} and
+              `-Wimplicit-function-declaration{\tt '} flags are useful for this.
+
+         \sstitem
+            Implicit declarations, which are implicitly of type int.
+              If a name is declared simply by mentioning it without any type
+              or type qualifiers, it is implicitly of type int, and so
+              should become delcared as INT\_BIG.  This program does not
+              find these.  Such implicit declarations (only?) occur in
+              function declarations.  The Tru64 Unix C compiler{\tt '}s `-protois{\tt '}
+              flag or gcc{\tt '}s `-Wimplicit-int{\tt '} flag are useful for identifying
+              these.
+
+      }
+      The program tries to adjust padding whitespace outside comments
+      so that the spacing of the output looks OK.
+
+      No changes are made to comment lines so that, for instance, the
+      Synopsis stanza of function prologues will not have formal argument
+      types changed from `int{\tt '} to `INT\_BIG{\tt '}.
+
+      Source code which makes sufficiently inventive use of the C
+      will stand a good chance of confusing this program.
+   }
+   \sstusage{
+      crepint [ in [ out ] ]
+   }
+   \sstnotes{
+      Although this program behaves as a filter, it is written on
+      the assumption that it will be run on a file of a finite length:
+      it may buffer large amounts of input before writing output, and
+      it may not free up memory.
+   }
+}
+\newpage
+\sstroutine{
+   frepint
+}{
+   Replace INTEGER by INTEGER$*$8 in Fortran 77
+}{
+   \sstdescription{
+      This program is a filter which takes FORTRAN 77 source code
+      and modifies it so that INTEGER declarations are rewritten as
+      `INTEGER $*$ 8{\tt '}.  It also attempts to warn if there are usages which
+      might cause trouble given this change.
+
+      Additionally, if there appear to be actual arguments to subroutines
+      or functions which are literal integers, the program will attempt
+      to replace them with symbolic constants, and to define these
+      constants in the declaration section of the module.  Thus the line
+
+         CALL SUB( X, 5, STATUS )
+
+      will be replaced by
+
+         CALL SUB( X, INT\_\_5, STATUS )
+
+      and the corresponding declaration statements
+
+         INTEGER $*$ 8 INT\_\_5
+
+      and
+
+         PARAMETER ( INT\_\_5 = 5 )
+
+      will be inserted in the declaration section of the module.
+      The program will attempt to insert these declarations near an
+      INCLUDE statement, and if it cannot find one, it will write a
+      warning to standard error, including the text of the declarations
+      that it would have made.
+
+      Attention is paid to fortran 77 source format, so that lines
+      more than 72 characters long are avoided (unless they were there
+      in the first place).
+
+      Some attention is paid to the aesthetic qualities of the output:
+      line breaks are made, where possible, following the usage in, e.g.,
+      KAPPA.  An attempt is made to copy the style of case usage from the
+      input.
+
+      No changes are made to comment lines so that, for instance, the
+      Arguments stanza of subroutine prologues will not have argument
+      types modified from `INTEGER{\tt '} to `INTEGER $*$ 8{\tt '}.
+
+      No change is made to references to INTEGER type in IMPLICIT
+      statements.
+
+      The program will write a warning on standard error for certain
+      constructions in the code which are likely to cause trouble after
+      the mass redeclaration of INTEGER as INTEGER$*$8 has occurred.
+      These constructions are:
+      \sstitemlist{
+
+         \sstitem
+            INTEGER $*$ n declarations which already exist in the code
+              (these are not modified)
+
+         \sstitem
+            EQUIVALENCE statements
+
+         \sstitem
+            Use of INTEGER Specific names for standard intrinsic functions
+              (IABS, ISIGN, MAX0, AMAX0, MIN0, IMIN0).  IDIM could also go in
+              this list, but since it is a common variable name, and an
+              uncommon intrinsic, no warning is given for IDIM.
+
+         \sstitem
+            Any module (SUBROUTINE, FUNCTION or BLOCK DATA) which does not
+              include an IMPLICIT NONE statement.
+      }
+   }
+   \sstusage{
+      frepint [ in [ out ] ]
+   }
+   \sstnotes{
+      The program is not infallible at identifying function calls, which
+      it needs to do in order to replace integer literals, since they
+      look like array references.  It uses the rule of thumb that it if
+      the would-be function name contains an underscore it is a function,
+      otherwise it is an array.
+
+      It will also not identify an INTEGER-type expression as such unless
+      it is a single integer literal; for instance the expression `3 $*$ 5{\tt '}
+      as actual argument of a subroutine/function ought to be retyped,
+      but will not be spotted.
+
+      In a few cases, the line breaks are not made in very beautiful places.
+      They should, however, always be correct.
+
+      Although this program behaves as a filter, it is written on
+      the assumption that it will be run on a file of a finite length:
+      it may buffer large amounts of input before writing output, and
+      it may not free up memory.
+   }
+}
+\newpage
+\sstroutine{
+   inscnf
+}{
+   Wrap \%VAL arguments with CNF\_PVAL in Fortran 77
+}{
+   \sstdescription{
+      This is a filter which takes FORTRAN 77 source code
+      and modifies it so that text which is the argument of a \%VAL
+      directive is wrapped in a call to CNF\_PVAL; i.e. input text
+
+         \%VAL( IPTR )
+
+      is changed to
+
+         \%VAL( CNF\_PVAL( IPTR ) )
+
+      If the call to CNF\_PVAL is already present no change is made,
+      and a warning is emitted.  Lines with no references to the \%VAL
+      directive are left alone.
+
+      Additionally, for each program unit in which a call to CNF\_PVAL
+      has been made, an attempt is made to insert a line like
+
+         INCLUDE {\tt '}CNF\_PAR{\tt '}        ! For CNF\_PVAL function
+
+      This is inserted after the last INCLUDE line which already exists
+      in the program unit.  If there are no INCLUDE lines there, this
+      line is not inserted, and a warning message is printed to standard
+      error.
+
+      Attention is paid to Fortran 77 source format, so that lines
+      more than 72 characters long are avoided (unless they were there
+      in the first place).
+
+      Characters {\tt '}$\backslash$r{\tt '} (carriage return) and {\tt '}$\backslash$t{\tt '} (tab) might possibly
+      cause erroneous line breaking - if any are encountered a warning
+      is given (these should not be in the source really).
+      Code using columns 73-80 of the source cards for comments is
+      likely to be mangled (nobody does this any more do they?).
+
+      Under certain improbable circumstances it is possible for the
+      program to get stuck trying to break a line; in this case it will
+      exit with error status and an error message.
+
+      Some attention is paid to the aesthetic qualities of the output:
+      line breaks are made, where possible, following the usage in, e.g.,
+      KAPPA.  An attempt is made to copy the style of case usage and bracket
+      spacing from the input.
+
+      This program wraps ALL occurrences of \%VAL in a call to CNF\_PVAL,
+      unless they are already so wrapped.  If it suspects that \%VAL
+      may not be a legitimate candidate for this treatment, it will
+      output a warning message to standard error.  It will do this in
+      the following cases:
+      \sstitemlist{
+
+         \sstitem
+           \%VAL is on the last argument in the argument list (this
+             suggests that it might be a trailing string length)
+
+         \sstitem
+           The argument of \%VAL looks like an integer constant
+
+         \sstitem
+           The argument of \%VAL looks like a Starlink-style symbolic
+             constant (has two adjacent underscore characters).
+      }
+   }
+   \sstusage{
+      inscnf [ in [ out ] ]
+   }
+   \sstnotes{
+      Although this program behaves as a filter, it is written on
+      the assumption that it will be run on a file of a finite length:
+      it may buffer large amounts of input before writing output, and
+      it may not free up memory.
+   }
+}
+\newpage
+\sstroutine{
+   extmk
+}{
+   Modify mk file for use with EXTREME data sets
+}{
+   \sstdescription{
+      This is a simple filter which takes a Starlink mk file as input and
+      writes as output a file which should provide the additional
+      functionality required for EXTREME use, i.e. it adds new
+      SYSTEM types of alpha\_OSF1\_64 and sun4\_Solaris\_64, provides
+      for use of the INTEGER8 macro to preprocess Fortran source code
+      before compilation, and modifies the C compilation flags for
+      use with the INT\_BIG macro.
+
+      The changes it attempts to make are as follows:
+      \sstitemlist{
+
+         \sstitem
+            Add comment blocks describing the two new values of SYSTEM
+
+         \sstitem
+            Modify the comment describing the default value of CFLAGS
+
+         \sstitem
+            Add a comment describing the INTEGER8 environment variable
+
+         \sstitem
+            Export the INTEGER8 environment variable
+
+         \sstitem
+            Modify SYSTEM-specific settings for existing SYSTEMs
+
+         \sstitem
+            Add support for the two new SYSTEMs
+
+      }
+      If it is unable to make any of the modifications it would like to,
+      it will print an explanatory message saying what it could not do.
+
+      The only change which might be required which this script does not
+      make is to set values for the SOURCE\_VARIANT variable.  Depending
+      on how the system-specific compilation is going to be done, it
+      may be desirable to add SOURCE\_VARIANT={\tt '}alpha\_OSF1{\tt '} in the new
+      alpha\_OSF1\_64 stanza, and SOURCE\_VARIANT={\tt '}sun4\_Solaris{\tt '} in the
+      new sun4\_Solaris\_64 stanza.  If required, this must be done by hand.
+
+      This script is not extremely intelligent - unless the mk file
+      follows the usual pattern quite closely, the output may be in
+      error, or complete rubbish.  It is intended as a convenience,
+      and if it does not work, then it will be necessary to make the
+      modifications by hand; this is not too arduous.
+   }
+   \sstusage{
+      extmk $<$ mk $>$ mk.new
+   }
+}
+\newpage
+\sstroutine{
+   extmakefile
+}{
+   Modify makefile for use with EXTREME data sets
+}{
+   \sstdescription{
+      This is a simple filter which takes a Starlink makefile as input
+      and writes as output a file which provides some of the changes
+      required for EXTREME use.  Not all the requisite changes can be
+      made however, and the resulting file will need some edits to be
+      made by hand.
+
+      The changes it attempts to make are as follows:
+      \sstitemlist{
+
+         \sstitem
+            Add {\tt '} -DINT\_BIG=int{\tt '} to the default CFLAGS macro
+
+         \sstitem
+            Add {\tt '}INTEGER8 = INTEGER{\tt '} default macro setting
+
+         \sstitem
+            Add definition of the REPLACE\_INTEGER8 macro
+
+         \sstitem
+            Add a rule for extracting Fortran source files from source archive
+
+         \sstitem
+            Add code for recording the INTEGER8 macro in the datestamp file
+
+      }
+      If it is unable to make any of the modifications it would like to,
+      it will print an explanatory message saying what it could not do.
+
+      Various changes will still need to be made by hand after generating
+      a new makefile by running this script.  The principal one is
+      splitting files between Fortran and non-Fortran ones, so that the
+      non-Fortran files can be extracted using the old rule, but the
+      Fortran files can be extracted using the new rule inserted by this
+      script (the dummy target {\tt '}\$(FORTRAN\_FILES){\tt '} is written as a
+      placeholder for such files).  This may require splitting up
+      existing macros, for instance splitting PRIVATE\_INCLUDES into
+      PRIVATE\_C\_INCLUDES and PRIVATE\_F\_INCLUDES.
+
+      This script is not extremely intelligent - unless the makefile
+      follows the usual pattern quite closely, the output may be in
+      error.  It is strongly advised that the input and output are
+      compared using diff.  If there are problems, it may be necessary
+      to make the modifications by hand; this is not too arduous.
+   }
+   \sstusage{
+      extmakefile $<$ makefile $>$ makefile.new
+   }
+}
+\newpage
+\sstroutine{
+   cmp-xxx
+}{
+   Compare filtered source with original for unwanted changes
+}{
+   \sstdescription{
+      This script checks an original source code file against a version
+      of it run through the one of the source code filter programs in
+      the EXTREME package.  It should be invoked under the name `cmp-xxx{\tt '}
+      to check the effects of the filter `xxx{\tt '}.
+
+      The available filters xxx are:
+      \sstitemlist{
+
+         \sstitem
+            \xroutine{inscnf} -- Wrap \%VAL invocations in CNF\_PVAL calls
+
+         \sstitem
+            \xroutine{crepint} -- Change int type to INT\_BIG in C
+
+         \sstitem
+            \xroutine{frepint} -- Change INTEGER to INTEGER $*$ 8 in Fortran
+
+      }
+      If a file containing the filtered source code already exists, it
+      can be given as the second command-line argument, otherwise the
+      file given as the first command-line argument will be run through
+      the appropriate filter before the comparison is made.
+
+      The script uses its knowledge of the changes made by each of the
+      filters to identify changes which are unexpected.  The idea is to
+      serve as a check that the the source code filter program itself
+      has not made a mistake.  The parsing done by this script is much
+      less careful than that done by the filters, so it may make
+      mistakes - apparent discrepancies reported by this script should
+      be investigated, but may well not indicate genuine problems.
+
+      If an apparent discrepancy is found, the script prints the
+      first line from each file in which a discrepancy exists.
+      The text printed is not the text as it appears in the files, but
+      a version mangled by this program for comparison - whitespace,
+      formatting, and other things may have been changed.  The printed
+      text should however make it easy enough to find the relevant point
+      in the input file.
+
+      If there is an apparent discrepancy the exit status of the program
+      will be non-zero; if the files match then there is no output and
+      exit status is zero.
+   }
+   \sstusage{
+      cmp-xxx file [ newfile ]
+   }
+}
+\newpage
+\sstroutine{
+   do-xxx
+}{
+   Apply source code filter xxx to a set of files
+}{
+   \sstdescription{
+      This is a driver script to run one of the filter programs in
+      the EXTREME package which modifies source code.  It should be
+      invoked under the name `do-xxx{\tt '} to run the filter `xxx{\tt '}.
+
+      The available filters xxx are:
+      \sstitemlist{
+
+         \sstitem
+            \xroutine{inscnf} -- Wrap \%VAL invocations in CNF\_PVAL calls
+
+         \sstitem
+            \xroutine{crepint} -- Change int type to INT\_BIG in C
+
+         \sstitem
+            \xroutine{frepint} -- Change INTEGER to INTEGER $*$ 8 in Fortran
+
+      }
+      For each of its command line arguments (files) it:
+      \sstitemlist{
+
+         \sstitem
+            Runs the filter xxx.
+
+         \sstitem
+            Writes a line to the file ./xxx.log saying how many lines were
+              changed.
+
+         \sstitem
+            If and only if changes were made, it writes the modified file
+              under the same name into the directory ./xxx.changed.
+
+         \sstitem
+            If the filter wrote any warnings to standard error, these are
+              summarised to standard output.
+
+         \sstitem
+            Checks that the input file and output file don{\tt '}t look different
+              in any unexpected ways, and writes a warning if they do.
+
+         \sstitem
+            For Fortran files, checks that no lines have been extended
+              beyond 72 characters (this should not be possible, it{\tt '}s just
+              an extra precaution).
+
+      }
+      It then writes a short summary of the run, including a report of
+      whether any files gained new dependencies on include files.
+      Thus anything which the filter or this script thinks may require
+      human attention is written to standard output while modified
+      files are written to a new directory.
+
+      As part of its checking, it invokes a script called \xroutine{cmp-xxx} on
+      each pair of (original, changed) files; these scripts are
+      crude checks that the changes made have not done anything to the
+      source code to change its intention other than what should have
+      been done.  They have been written in a fairly quick and dirty
+      way however, and may well turn up false positives or false negatives.
+   }
+   \sstusage{
+      do-xxx files
+   }
+}
 %%%% End filter descriptions
 
 % ? End of main text
