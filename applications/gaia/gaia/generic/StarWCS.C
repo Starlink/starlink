@@ -85,13 +85,8 @@ extern "C" {
                              int indim, const double (*in)[1], int forward,
                              int ncoord_out, int outdim, double (*out)[1] )
     {
-//#if !defined( AST_MAJOR_VERS) || ( (AST_MAJOR_VERS>=1) && (AST_MINOR_VERS<7))
-//        astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in,
-//                  forward, ncoord_out, outdim, (double (*)[])out );
-//#else
         astTranN( map, npoint, ncoord_in, indim, (const double *)in,
                   forward, ncoord_out, outdim, (double *)out );
-//#endif
     }
 }
 
@@ -137,13 +132,11 @@ StarWCS::StarWCS( const char *header, const int lheader )
     if ( ! astOK ) astClearStatus;
 
     if ( header ) {
-        //int lheader = strlen( header ); // Now an argument.
         if ( lheader > 1 ) {
 
             // Have a character buffer which can be read in as a AST object.
             // This should be a FITS header which we need to read it in
             // through a FITS channel.
-            // XXX ??? how to deal with other sources.
             AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
             char card[81];
             char *ptr = (char *) header;
@@ -241,7 +234,8 @@ StarWCS::StarWCS( const char *header, const int lheader )
                     astClearStatus;
                     wcs_ = (AstFrameSet *) astAnnul( wcs_ );
                     print_error( "Failed to read a 2D World Coordinate System from FITS headers");
-                } else {
+                } 
+                else {
                     initCelestial();
                 }
             }
@@ -318,14 +312,16 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
             wcs_ = astcopy;
             error( "Failed to read a 2D World Coordinate System from FITS headers");
             return 0;
-        } else {
+        } 
+        else {
 
             initCelestial();
 
             // Release the old WCS.
             astcopy = (AstFrameSet *) astAnnul( astcopy );
         }
-    } else {
+    } 
+    else {
 
         //  Not a valid FrameSet
         if ( !astOK ) astClearStatus;
@@ -370,7 +366,8 @@ void StarWCS::setSecPix()
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } else {
+    } 
+    else {
         point1[1] = xout[0];
         point1[0] = yout[0];
         point2[1] = xout[1];
@@ -380,7 +377,8 @@ void StarWCS::setSecPix()
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         xSecPix_ = 0.0;
-    } else {
+    } 
+    else {
         xSecPix_ = dist * r2d_ * 3600.0;
     }
 
@@ -398,7 +396,8 @@ void StarWCS::setSecPix()
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } else {
+    } 
+    else {
         point1[1] = xout[0];
         point1[0] = yout[0];
         point2[1] = xout[1];
@@ -408,7 +407,8 @@ void StarWCS::setSecPix()
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         ySecPix_ = 0.0;
-    } else {
+    } 
+    else {
         ySecPix_ = dist * r2d_ * 3600.0;
     }
 }
@@ -440,9 +440,11 @@ void StarWCS::setEquinox()
             //  Get a string version of the equinox to display.
             if ( equinox_ == 2000.0 ) {
                 strcpy( equinoxStr_, "J2000" );
-            } else if ( equinox_ == 1950.0 ) {
+            } 
+            else if ( equinox_ == 1950.0 ) {
                 strcpy( equinoxStr_, "B1950" );
-            } else {
+            } 
+            else {
                 if ( ok ) {
                     sprintf( equinoxStr_, "%g %s", equinox_, system );
                     if ( ! astOK ) astClearStatus;
@@ -601,7 +603,8 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
         if ( raIndex_ == 1 ) {
             ra = point[0] * r2d_;
             dec = point[1] * r2d_;
-        } else {
+        } 
+        else {
             dec = point[0] * r2d_;
             ra = point[1] * r2d_;
         }
@@ -626,7 +629,8 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     if ( raIndex_ == 1 ) {
         oldx[0] = ra * d2r_;  // Convert into radians.
         oldy[0] = dec * d2r_;
-    } else {
+    } 
+    else {
         oldy[0] = ra * d2r_;
         oldx[0] = dec * d2r_;
     }
@@ -634,7 +638,8 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     if ( ! astOK ) {
         astClearStatus;
         return error("can't convert world coords");
-    } else {
+    } 
+    else {
         x = newx[0];
         y = newy[0];
 
@@ -676,7 +681,8 @@ int StarWCS::anyWcs2pix( double inx, double iny, int notcelestial,
     if ( ! astOK ) {
         astClearStatus;
         return error( "can't convert world coords" );
-    } else {
+    } 
+    else {
         outx = newx[0];
         outy = newy[0];
     }
@@ -724,7 +730,8 @@ int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
         xin[1] = 1.0;
         yin[0] = 0.0;
         yin[1] = 0.0;
-    } else {
+    } 
+    else {
         xin[0] = 0.0;
         xin[1] = 0.0;
         yin[0] = 0.0;
@@ -743,7 +750,8 @@ int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
         xin[1] = 0.0;
         yin[0] = 0.0;
         yin[1] = 1.0;
-    } else {
+    } 
+    else {
         xin[0] = 0.0;
         xin[1] = 1.0;
         yin[0] = 0.0;
@@ -779,7 +787,8 @@ double StarWCS::dist(double ra0, double dec0, double ra1, double dec1) const
     if ( raIndex_ == 1 ) {
         point1[0] = ra0 * d2r_, point2[0] = ra1 * d2r_;
         point1[1] = dec0 * d2r_, point2[1] = dec1 * d2r_;
-    } else {
+    } 
+    else {
         point1[1] = ra0 * d2r_, point2[1] = ra1 * d2r_;
         point1[0] = dec0 * d2r_, point2[0] = dec1 * d2r_;
     }
@@ -820,7 +829,8 @@ double StarWCS::width() const
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } else {
+    } 
+    else {
         point1[1] = xout[0];
         point1[0] = yout[0];
         point2[1] = xout[1];
@@ -837,7 +847,8 @@ double StarWCS::width() const
     //  estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = xSecPix_ * nxpix_;
-    } else {
+    } 
+    else {
         dist *= 60.0 * r2d_;
     }
     return dist;
@@ -872,7 +883,8 @@ double StarWCS::height() const
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } else {
+    } 
+    else {
         point1[1] = xout[0];
         point1[0] = yout[0];
         point2[1] = xout[1];
@@ -888,7 +900,8 @@ double StarWCS::height() const
     //  is same coordinate. If so use arcsec per pixel estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = ySecPix_ * nypix_;
-    } else {
+    } 
+    else {
         dist *= 60.0 * r2d_;
     }
     return dist;
@@ -923,7 +936,8 @@ double StarWCS::radius() const
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } else {
+    } 
+    else {
         point1[1] = xout[0];
         point1[0] = yout[0];
         point2[1] = xout[1];
@@ -942,7 +956,8 @@ double StarWCS::radius() const
         dist = sqrt ( 0.25 * xSecPix_ * nxpix_ * xSecPix_ * nxpix_
                       + 0.25 * ySecPix_ * nypix_ * ySecPix_ * nypix_ );
 
-    } else {
+    } 
+    else {
         dist *= 60.0 * r2d_;
     }
     return dist;
@@ -1035,7 +1050,8 @@ int StarWCS::set( double ra, double dec,
     AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
     if ( fitsset != AST__NULL ) {
         wcs_ = fitsset;
-    } else {
+    } 
+    else {
         if ( ! astOK ) astClearStatus;
         fitschan = (AstFitsChan *) astAnnul( fitschan );
         return error("Cannot locate a valid world coordinate system");
@@ -1490,7 +1506,8 @@ const char *StarWCS::getWarning()
 {
     if ( warnings_ ) {
         return warnings_;
-    } else {
+    } 
+    else {
         return NULL;
     }
 }
