@@ -52,6 +52,13 @@ using std::map;
 // I think the GCC 2.8.1 stack implementation may be buggy.  
 // Setting this to 1 switches on a home-made version.
 // This hasn't received _extensive_ testing, but seems to work OK.
+// This is pretty crappy, though, and I intend to remove it next time
+// I'm feeling brave.  If you have to enable this to get this library
+// to compile, therefore, tell me (norman@astro.gla.ac.uk) so that I
+// don't discard this.  If you need to enable this, then you should
+// probably call the DviFile constructors with read_post true, so
+// that the maximum stack size can be read from the postamble, and
+// the homemade posstack therefore initialised to the correct length.
 #ifndef HOMEMADE_POSSTATESTACK
 #define HOMEMADE_POSSTATESTACK 0
 #endif
@@ -66,8 +73,10 @@ class DviFile {
 public:
     // magmag is a factor by which the file's internal
     // magnification should be increased.
-    DviFile (string& s, int resolution, double magmag=1.0);
-    DviFile (const char* s, int resolution, double magmag=1.0);
+    DviFile (string& s, int resolution,
+	     double magmag=1.0, bool read_postamble=true);
+    DviFile (const char* s, int resolution,
+	     double magmag=1.0, bool read_postamble=true);
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
@@ -131,7 +140,7 @@ public:
      * @return the overall magnification factor applied to lengths in
      * the DVI file.  A value of 1.0 implies no magnification at all.
      */
-    double magnification() const { return magfactor_; }
+    double magnification() const { return netmag_; }
     /**
      * Converts a length in points to one in pixels, using the current
      * magnifications and any other relevant parameters.
@@ -140,12 +149,23 @@ public:
      * @return the given length, in pixels
      */
     int pt2px (double npt) const
-	    { return static_cast<int>(px_per_dviu_*dviu_per_pt_*magfactor_*npt+0.5); };
+	    { return static_cast<int>(px_per_dviu_*dviu_per_pt_*netmag_*npt+0.5); };
     /**
      * Gets the name of this DVI file.
      * @return the open file name as a string
      */
     const string *filename () const { return &fileName_; }
+
+    const PkFont* getFallbackFont(const PkFont* desired);
+
+    /**
+     * Reports whether the DVI file postamble was read when this file
+     * was opened.  This affects the semantics of such methods as
+     * {@link #getFontSet}.
+     *
+     * @return true if the postamble was (successfully) read
+     */
+    bool haveReadPostamble() const { return have_read_postamble_; }
 
 private:
     string fileName_;
@@ -164,11 +184,12 @@ private:
     double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
     // resolution is in pixels-per-inch
     const int resolution_;
-    // magmag is a factor by which the file's internal magnification
-    // should be increased
-    const double magmag_;
-    // ...resulting in a net magnification of:
-    double magfactor_;
+    // extmag is a factor by which the file's internal magnification
+    // should be increased (1.0 = no magnification).  This is set
+    // externally to the DVI file.
+    const double extmag_;
+    // ...resulting in a net magnification of (1.0 = no magnification):
+    double netmag_;
 
     // tell getEvent to skip this page
     bool skipPage_;
@@ -196,12 +217,13 @@ private:
 	string comment;
     } preamble_;
     inline int magnify_(int i) const
-	{ return (magfactor_==1.0
+	{ return (netmag_==1.0
 		  ? i
-		  : static_cast<int>(magfactor_*(double)i)); }
+		  : static_cast<int>(netmag_*(double)i)); }
     void read_postamble ();
+    bool have_read_postamble_;
     void process_preamble(DviFilePreamble *);
-    void fnt_def_(unsigned int dvimag, int nbytes);
+    void fnt_def_(double fontmag, int nbytes);
     void check_duplicate_font(int);
     int pixel_round(int);
     int charWidth_ (int charno);
@@ -285,7 +307,12 @@ private:
     FontSet fontSet_;
  public:
     /**
-     * Obtains a representation of the set of fonts contained in this DVI file
+     * Obtains a representation of the set of fonts contained in this
+     * DVI file.  If the postamble was read, then the
+     * <code>FontSet</code> returned by this method will be complete;
+     * if not, it will simply represent the set of fonts read so far
+     * in the file.
+     *
      * @return a pointer to the FontSet for this file
      */
     const FontSet* getFontSet() const { return &fontSet_; }
