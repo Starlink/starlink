@@ -330,10 +330,10 @@ which combine some or all of the main source code collection
 with their own development versions of packages.
 
 The remainder of this document describes installation and use of
-the package, and some details of its internal operation.
+the package, and some details of its internal workings.
 Its operation should be fairly intuitive however,
-and it is perfectly possible to learn to use it by playing around
-with it, perhaps with reference to section \ref{BROWSER-HELP}.
+and it is perfectly possible to learn to use it just by playing around,
+perhaps with reference to section \ref{BROWSER-HELP}.
 
 
 
@@ -361,7 +361,7 @@ These variables are:
 \begin{description}
 \item[SCB\_SOURCES]
 The directory containing the Starlink source code.  
-This directory should contain nothing but Starlink source packages,
+This directory should contain only Starlink source packages,
 each of which must be {\em either\/} in a directory named after the package
 {\em or\/} in a tar file named {\tt package.tar}, optionally compressed
 using {\tt compress} or {\tt gzip} (and named with a suffix .Z or .gz 
@@ -428,6 +428,29 @@ Note that the variables defining installation directories
 etc.\ must be defined at {\em build} time, 
 and not between building and installation.
 
+The program uses a DBM file to store the indices on disk.
+There will always be at least one library available on your system
+which Perl can use to do this, and there may be 
+several --- different implementations each have their own pros and cons.  
+SCB will try to find 
+the BSD DB library or the Gnu DBM library.
+If these are not available then it will use one of the implementations
+that is.  For most purposes this will work without any problems, but
+these other implementations often impose limits which interfere slightly
+with SCB's operation. 
+In practice, the only effect of this is likely to be that the 
+{\tt makefile} entry for a few of the packages cannot be written ---
+if this is the case, then warning messages like 
+\begin{quote}
+\begin{verbatim}
+!!! Failed to write makefile => package#makefile (block size limit?)
+\end{verbatim}
+\end{quote}
+will be written by {\tt scbindex.pl}.
+This is not a very serious handicap, but can be fixed by 
+installing GDBM or BSD DB, which are available in the public domain.
+
+
 SCB requires Perl 5.  It was developed using version 5.004\_04.
 Earlier versions of Perl may work, but have not been tested.
 
@@ -466,14 +489,9 @@ ScriptAlias /cgi-bin/star/ /star/bin/cgi/
 \end{verbatim}
 \end{quote}
 Alternatively, the script {\tt /star/bin/cgi/scb.pl} may be copied 
-into an existing CGI directory.
-The script does make use of external libraries in the directory 
-defined by PERL\_MOD\_DIR (typically {\tt /star/lib/perl5}), 
-but as long as this was
-defined (in the {\tt mk} script or by an environment variable)
-at build time, the CGI script will locate the libraries correctly
-even if copied away from its installed position.
-Renaming the script is also permissible.
+into an existing CGI directory;
+if correctly installed it should still work if its name or location 
+are changed.
 
 Every attempt has been made to make the CGI script secure against
 abuse by users of the browsing facility,
@@ -548,7 +566,7 @@ and print to the screen each index entry as it is encountered.
 If the entire Starlink source code collection is installed, 
 this will take a matter of hours.  Some indication of how far the indexing
 has progressed can be seen by looking at which package is currently
-being indexed (the package name is given before the `\#' sign on the 
+being indexed (the package name is given before the `{\tt \#}' sign on the 
 printed lines, e.g. lines which look like
 \begin{quote}
 \begin{verbatim}
@@ -657,7 +675,7 @@ you can do the following:
 % scbindex.pl ~/star/sources/figaro
 \end{verbatim}
 \end{quote}
---- first a private copy is made of the global indexes using 
+--- first a private copy is made of the global indices using 
 the supplied {\tt scbcp.pl} utility (see section \ref{sec:scbcp}),
 and then the Figaro parts are overwritten using {\tt scbindex.pl}.
 If the modified sources were 
@@ -669,8 +687,8 @@ then the last line above could be replaced by
 % scbindex.pl ./figaro.tar.Z
 \end{verbatim}
 \end{quote}
-It would be possible to make personal index of Figaro only,
-in which case the {\tt scbcp.pl} step could be avoided, 
+It would be possible to make personal index containing Figaro only,
+in which case the copying step could be avoided, 
 but then hyperlinks to routines in other Starlink packages 
 would not work.
 
@@ -722,7 +740,8 @@ indexing and extraction is done.
 
 \subsection{\xlabel{sec:extract-commandline}\label{sec:extract-commandline}Command line operation}
 
-However the package has been installed, it should be 
+Whether or not the package has been installed as a CGI script,
+it should be 
 possible to use the extractor program, {\tt scb.pl},
 to view the source code from the Unix shell.
 
@@ -772,7 +791,7 @@ has exactly the same effect as the former example.
 Routine names are indexed by the names the Unix linker gives them.
 For C functions, this means the name of the function as in the 
 source code should be used.
-For Fortran functions and subroutines however, the indexed name is 
+For Fortran functions and subroutines, the indexed name is 
 formed by appending an underscore to the lower case name of the 
 routine.  
 If the underscore is omitted however, and no routine by that name
@@ -783,7 +802,7 @@ the underscore appended.
 \subsubsection{\xlabel{sec:extract-package}\label{sec:extract-package}{\tt package} argument}
 
 If the extractor can find a Fortran subroutine or function, 
-or a C function or macro definition with the name supplied on
+or a C function or macro definition, with the name supplied on
 the command line, it will extract the relevant source file.
 However it is sometimes necessary to restrict the search
 further, since there may be more than one source file answering
@@ -802,7 +821,7 @@ Note that the package argument only serves as a hint to the
 extractor program: if the requested file/routine occurs in the
 specified package, then that one is retrieved.  If it does not,
 but it does exist in another package, then that one is retrieved.
-Thus, given that there is no {\tt help.f} in CCDPACK,
+Thus, given that there is no file {\tt help.f} in CCDPACK,
 \begin{quote}
 \begin{verbatim}
 % scb.pl help.f package=ccdpack
@@ -874,6 +893,9 @@ fit_mgauss_              => twodspec#twodspec_opt.tar>opt/fit_mgauss.f
 If the {\tt package} argument is given as well as the {\tt type=regex}
 argument, then only the package specified will be searched.
 
+More flexible pattern matching searches are possible 
+with inventive use of the {\tt dbmcat.pl} command described
+in section \ref{sec:dbmcat}.
 
 
 
@@ -904,10 +926,10 @@ as a CGI program as described in section \ref{sec:install-cgi}
 then the Starlink source code can be browsed as a set of 
 hypertext pages hyperlinked together 
 at function/subroutine calls and file includes.
-It should be fairly intuitive how to use the pages generated,
+Using the pages generated should be quite intuitive,
 so the following discussion does not give exact instructions
 but clears up a few points.
-The best way to see how it works is to play around with it.
+The best way to see how it works is to play with it.
 
 The URL of the source code browser will depend on exactly how
 the installation has been performed, but it will look something
@@ -949,7 +971,7 @@ Describes how to interpret the ``Name of item'' box.  Select one of:
    For most practical purposes, Perl regular expressions are a superset
    of ordinary regular expressions, so they can be treated like the 
    argument of a `{\tt grep -i}' command.
-   A case sensitive search can be achieved by prepending `(?-i)' to the
+   A case sensitive search can be achieved by prepending `{\tt (?-i)}' to the
    regular expression; however this requires Perl 5.005.
 \end{description}
 \item[Name of package (optional)]
@@ -1024,9 +1046,9 @@ is the location of the file in
 the source tree.  The notation is specific to this package,
 but quite easy to understand: 
 it's like a Unix pathname except that
-a `\#' sign denotes inclusion in a package, 
+a `{\tt \#}' sign denotes inclusion in a package, 
 and a 
-`\latex{$}>\latex{$}'
+`\verb|>|'
 sign denotes inclusion in a tar file.
 So for instance the location
 \begin{quote}
@@ -1056,7 +1078,8 @@ This section is not required reading for users of the package.
 
 \subsection{\xlabel{sec:internals-indices}\label{sec:internals-indices}Index files}
 
-The indexing program builds disk-based indices, and the browser program
+The indexing program {\tt scbindex.pl} builds disk-based indices, and the 
+extractor program, which is the same as the browser program  {\tt scb.pl}
 interrogates them.  There are three indices:
 \begin{description}
 \item[Tasks]
@@ -1066,7 +1089,7 @@ loose, but it is intended to be programs which can be invoked by
 typing their names from the Unix shell, ICL, or other external
 environment).
 Only the name of each task is stored here; 
-for each task there will be a corresponding entry for
+for each task there will be a corresponding entry giving its location within
 that package in the Routines index.
 This index also serves as a list of all the
 packages which have been indexed.
@@ -1123,11 +1146,13 @@ defined in the supplied module {\tt StarIndex.pm}.
 The corresponding files are much larger than the Tasks file 
 (a couple of megabytes or more each),
 but because of the way they are implemented 
-(currently as a hash of flattened lists tied to an NDBM file), 
+(as a hash of flattened lists tied to a DBM file of some sort), 
 any given entry can be accessed by key very quickly.
 The design of these objects was dictated chiefly by the requirements
 of the browser program, as explained in 
 section \ref{sec:internals-extractor}).
+More detailed documentation of the implementation of these indices
+can be found in the StarIndex.pm module itself.
 
 It is possible to examine the File and Routines indices 
 directly from the command line by using the supplied {\tt dbmcat.pl}
@@ -1142,7 +1167,7 @@ source code: the indexer needs to know which
 functions/subroutines are indexed in each source file so that
 it can write the Routines index, and the extractor needs to know
 what is a reference to another file so that it can generate
-hyperlinks, and also the position of function/subroutine 
+hyperlinks, as well as the position of function/subroutine 
 definitions so that references can point to the right place in
 source files (via {\tt <a~name='...'>} tags).
 
@@ -1188,9 +1213,9 @@ each of the Starlink packages in turn, writing the name and
 location of each task, file and function into the appropriate 
 indices.
 
-For each package being indexed, every file in 
-its directory or tar archive, 
-and in any subdirectories or subarchives thereof, is examined. 
+For each package, the indexer program examines 
+every file in the package directory or tar archive, 
+and in any subdirectories or subarchives thereof.
 Any file within a tar archive 
 is written to the Files index
 (files which only occur outside tar files are omitted
@@ -1217,12 +1242,12 @@ the current package has been indexed.
 
 The extractor program {\tt scb.pl} functions in two main modes;
 as a normal program which can be invoked from the Unix shell and
-outputs plain text,
+outputs plain text (described in section \ref{sec:extract-commandline}),
 and as a CGI program which is run under the control of an HTTP server
-to produce (predominantly) HTML output.
+to produce (predominantly) HTML output (described in \ref{sec:extract-cgi}).
 
 In command line mode, the main function of the extractor
-program is to locate 
+program is to locate and output
 the file or routine requested using whatever arguments it
 has been given (see section \ref{sec:extract-commandline}),
 which may require pulling it out from within tar archives.
@@ -1239,10 +1264,8 @@ a formatted (and hopefully informative) error message.
 More commonly however, for instance if invoked with no arguments
 at all, it will present a form and/or a series of links 
 enabling the user to re-invoke the program 
-in such a way as to present the source file required.
-The philosophy here is to put the user in a better position 
-to find what he or she is looking for; the form/links
-listed may or may not be what are expected, but they should be useful.
+in such a way as to present the source file required,
+or get closer to being able to do that.
 
 Marking the source code up with HTML anchor tags 
 is done partly by the extractor program itself, 
@@ -1416,7 +1439,7 @@ rec_unlock           => hds#hds_source.tar>rec_unlock.c
 
 \subsection{\xlabel{sec:scbcp}\label{sec:scbcp}{\tt scbcp.pl}}
 
-The {\tt scbcp.pl} utility copies all the indexes which have
+The {\tt scbcp.pl} utility copies all the indices which have
 been written by {\tt scbindex.pl} (see section \ref{sec:internals-indices})
 from one directory to another.
 
