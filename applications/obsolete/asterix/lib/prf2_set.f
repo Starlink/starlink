@@ -117,15 +117,15 @@
         KEY = 'BGNDSUB'
         CMNT = 'Data is background subtracted?'
 
-      ELSE IF ( NAME .EQ. 'CORRECTED.EXPOSURE', STATUS )
+      ELSE IF ( NAME .EQ. 'CORRECTED.EXPOSURE' ) THEN
         KEY = 'EXPCOR'
         CMNT = 'Data is exposure corrected?'
 
-      ELSE IF ( NAME .EQ. 'CORRECTED.VIGNETTING', STATUS )
+      ELSE IF ( NAME .EQ. 'CORRECTED.VIGNETTING' ) THEN
         KEY = 'VIGCOR'
         CMNT = 'Data is corrected for vignetting?'
 
-      ELSE IF ( NAME .EQ. 'CORRECTED.DEAD_TIME', STATUS )
+      ELSE IF ( NAME .EQ. 'CORRECTED.DEAD_TIME' ) THEN
         KEY = 'DTCOR'
         CMNT = 'Data is dead time corrected?'
 
