@@ -108,7 +108,8 @@
       INTEGER OP1                ! Index of opening parenthesis in translation
       INTEGER OP2                ! Index of opening parenthesis in text
       INTEGER UP                 ! The highest colour index available
-      LOGICAL MATCH              ! Does synonym match text?
+      LOGICAL NMATCH             ! Does synonym name match text?
+      LOGICAL QMATCH             ! Does synonym qualifier match text?
       LOGICAL VALID1             ! Is synonym group identifier valid?
       LOGICAL VALID2             ! Is attribute name group identifier valid?
 *.
@@ -200,22 +201,30 @@
             ANAME = ' '
             AQUAL = ' '
 
+*  See if the attribute name in the supplied text matches the attribute
+*  name in the synonym. A blank name in the synonym matches any supplied
+*  name, in which case retain the supplied attribute name.
+            IF( NPLEN .EQ. 0 ) THEN
+               NMATCH = .TRUE.
+               ANAME = NAME( : NTLEN )
+
 *  If the synonym contains an attribute name, see if it matches the
-*  supplied attribute name.
-            IF( NPLEN .GT. 0 ) THEN
+*  supplied attribute name. If it does, use the translated name, or
+*  (if the translation contained no name) the supplied name.
+            ELSE 
                IF( NTLEN .GT. 0 ) THEN
                   IF( SY( : NPLEN ) .EQ. NAME( : NTLEN ) ) THEN
-                     MATCH = .TRUE.
+                     NMATCH = .TRUE.
                   ELSE
-                     MATCH = .FALSE.
+                     NMATCH = .FALSE.
                   END IF
                ELSE
-                  MATCH = .FALSE.
+                  NMATCH = .FALSE.
                END IF
 
 *  If it does, and if the translation contains an attribute name, return the 
 *  attribute name from the translation. Otherwise, use the supplied name.
-               IF( MATCH .AND. NRLEN .GT. 0 ) THEN
+               IF( NMATCH .AND. NRLEN .GT. 0 ) THEN
                   ANAME = TRAN( : NRLEN )
 
                ELSE IF( NTLEN .GT. 0 ) THEN
@@ -223,50 +232,48 @@
 
                END IF
 
-*  If the synonym does not contain an attribute name, use the attribute
-*  name from the supplied text (if any). A blank synonym name matches
-*  all supplied names, so set MATCH = .TRUE..
-            ELSE IF( NTLEN .GT. 0 ) THEN
-               ANAME = NAME( : NTLEN )
-               MATCH = .TRUE.
             END IF
 
-*  If the synonym name did not match the supplied name, then use the
-*  supplied qualifier (if any).
-            IF( .NOT. MATCH ) THEN
-               IF( CL2 .GT. 0 ) AQUAL = NAME( OP2 : CL2 )
-                 
-*  Otherwise, if the supplied text contains a qualifier, we need to 
-*  compare the qualifier with any qualifier included in the synonym.
-            ELSE IF( CL2 .GT. 0 ) THEN
-
-*  If the synonym does not contain a qualifier, or if the supplied
-*  qualifier is blank, then use the qualifier as supplied.
-               IF( CL .LE. OP + 1 .OR. CL2 .EQ. OP2 + 1 ) THEN
+*  Now see if the qualifier in the supplied text matches the qualiier
+*  in the synonym. A blank qualifier in the synonym matches any supplied
+*  qualifier, so retain the supplied qualifier. If there is no supplied
+*  qualifier, use any qualifier in the translation.
+            IF( OP + 1 .GT. CL - 1 ) THEN
+               QMATCH = .TRUE.
+               IF( CL2 .GT. OP2 + 1 ) THEN
                   AQUAL = NAME( OP2 : CL2 )
-
-*  If the synonym contains a qualifier, see if it matches the supplied
-*  qualifier, allowing minimum abbreviations indicated by an asterisk in 
-*  the synonym. The comparison is case insensitive. If it does, use the 
-*  qualifier from the synonym translation (if any).
-               ELSE IF( KPG1_SHORT( SY( OP + 1 : CL - 1 ),
-     :                              NAME( OP2 + 1 : CL2 - 1 ),
-     :                              '*', .FALSE., STATUS ) ) THEN
-                  IF( OP1 .GT. 0 ) AQUAL = TRAN( OP1 : CL1 )
-
-*  If the qualifiers from the synonym and supplied text are different,
-*  use the qualifier form the supplied text.
-               ELSE
-                  AQUAL = NAME( OP2 : CL2 )
+               ELSE IF( CL1 .GT. OP1 + 1 ) THEN
+                  AQUAL = TRAN( OP1 : CL1 )
                END IF
 
+*  If the synonym contains a qualifier, but there is no supplied qualifier
+*  the qualifiers do not match.
+            ELSE IF( OP2 + 1 .GT. CL2 - 1 ) THEN
+               QMATCH = .FALSE.
+
+*  If both the synonym and supplied string contain qualifiers, see if they
+*  match, allowing minimum abbreviations indicated by an asterisk in 
+*  the synonym. The comparison is case insensitive. If it does, use the 
+*  qualifier from the synonym translation (if any).
+            ELSE IF( KPG1_SHORT( SY( OP + 1 : CL - 1 ),
+     :                           NAME( OP2 + 1 : CL2 - 1 ),
+     :                           '*', .FALSE., STATUS ) ) THEN
+               QMATCH = .TRUE.
+               IF( OP1 .GT. 0 ) AQUAL = TRAN( OP1 : CL1 )
+
+*  Otherwise, the qualifiers do not match.
+            ELSE
+               QMATCH = .FALSE.
             END IF
 
-*  Construct a new attribute name + qualifier string.
-            NAME = ' '
-            IAT = 0
-            CALL CHR_APPND( ANAME, NAME, IAT )
-            CALL CHR_APPND( AQUAL, NAME, IAT )
+*  If both name and qualifier match, construct a new attribute name + 
+*  qualifier string.
+            IF( QMATCH .AND. NMATCH ) THEN 
+               NAME = ' '
+               IAT = 0
+               CALL CHR_APPND( ANAME, NAME, IAT )
+               CALL CHR_APPND( AQUAL, NAME, IAT )
+            END IF
 
          END DO
 

@@ -32,13 +32,13 @@
 *        from the user. It can be a list, separated by commas,
 *        comprising any reasonable combination of the following formats:
 *
-*           ALL or *: All integers between 1 and NUM
+*           ALL or * - All integers between 1 and NUM
 *
-*           xx,yy,zz: A list of integers.
+*           xx,yy,zz - A list of integers.
 *
-*           xx-yy: All integers between xx and yy inclusively. When xx
-*                  is omitted the range begins from 1, when yy is
-*                  omitted the range ends with UPNUM.
+*           xx:yy - All integers between xx and yy inclusively. When xx
+*                   is omitted the range begins from 1, when yy is
+*                   omitted the range ends with UPNUM.
 *
 *        Any number can be specified more than once but it has the same
 *        effect as just entering it once.
@@ -55,6 +55,7 @@
 *  Authors:
 *     WG: Wei Gong (IPMAF)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (DSB):
 *     {enter_new_authors_here}
 
 *  History:
@@ -66,6 +67,9 @@
 *     1991 July 8 (MJC):
 *        Increased the size of the item buffer and allowed for * as wild
 *        card.
+*     12-AUG-1999 (DSB):
+*        Use ":" instead of "-" as a range specifier. This is to avoid
+*        confusion with negative pixel indices.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,8 +188,8 @@
                END DO
       
 *  If a range is defined, get its begin and end limits.
-            ELSE IF ( INDEX( SCT, '-' ) .NE. 0 ) THEN
-               CALL IRM1_RGLMT( SCT, '-', BERNGI, BELG, EDRNGI, EDLG,
+            ELSE IF ( INDEX( SCT, ':' ) .NE. 0 ) THEN
+               CALL KPG1_RGLMT( SCT, ':', BERNGI, BELG, EDRNGI, EDLG,
      :                          STATUS )
 
 *  Check status, if error, report the error and go to error processing.
