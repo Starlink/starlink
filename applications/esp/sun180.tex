@@ -8,10 +8,10 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {180.5}
-\newcommand{\stardocauthors}   {Norman Gray\\Grant Privett\\Mark Taylor}
+\newcommand{\stardocauthors}   {Norman Gray\\Mark Taylor\\Grant Privett}
 \newcommand{\stardocdate}      {15 November 1999}
 \newcommand{\stardoctitle}     {ESP --- Extended Surface Photometry}
-\newcommand{\stardocversion}   {Version 0.9}
+\newcommand{\stardocversion}   {Version 0.10}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {%
 ESP (\textbf{E}xtended {\bf S}urface {\bf P}hotometry) is a package 
@@ -149,6 +149,8 @@ profiling results.
  
 % in-line verbatims
 \newcommand{\myverb}[1]{{\small \verb+{#1}+}}
+
+\newcommand{\LineBreak}{\hfill\break\hbox{}\qquad}
  
 
 % ? End of document specific commands
@@ -317,17 +319,51 @@ conjunction with other packages like;
 It allows you to define areas to exclude in the analysis
 using keyword descriptions in text ARD files.
 
-\subsection{What's new in this release}
-\xlabel{WHATSNEW}
-This release of ESP includes modifications to the application GAUFIT
-(introduced in release 180.3), to give it an alternative fitting
-algorithm; this should be slightly faster and more robust, and it
-allows us to give uncertainties on the fit parameters.  Also, the
-application can now report the parameters for fitted gaussians as
-FWHM or sigma, and in units of arcsecs or pixels.
-
 The ESP web page is at
 \htmladdnormallink{\texttt{http://www.astro.gla.ac.uk/users/norman/star/esp/}}{http://www.astro.gla.ac.uk/users/norman/star/esp/}
+
+\subsection{What's new in this release}
+\xlabel{WHATSNEW}
+
+ESP has been modified to be aware of the World Coordinate 
+System (WCS) components of NDFs.
+
+The COSYS parameter has been removed from all ESP applications, 
+so that all user input and output is now in the Current 
+co-ordinate system of the NDF.  The Current co-ordinate system 
+is a characteristic of the WCS component of the NDF.  
+Thus, instead of setting COSYS to use either 'Data' or 'World'
+co-ordinate sytems, you should now set the Current frame of the 
+NDF's WCS component (e.g. using KAPPA's WCSFRAME apllication) 
+to the desired co-ordinate system before running the ESP 
+application.
+
+Output to data files is however in Base (WCS GRID frame) 
+co-ordinates, which are pixel co-ordinates guaranteed to start 
+at (1,1).
+
+For NDFs which have a WCS component with a SKY frame in it, the
+PSIZE parameter (pixel size in arc seconds) is now determined 
+automatically rather than being solicited from the user.
+This can be overridded by specifying it on the command line.
+
+ESP applications which generate output NDFs from input NDFs now
+propagate the WCS component where appropriate.
+
+
+
+
+
+% What's new, for documentation release 180.4
+%This release of ESP includes modifications to the application GAUFIT
+%(introduced in version 0.9), to give it an alternative fitting
+%algorithm; this should be slightly faster and more robust, and it
+%allows us to give uncertainties on the fit parameters.  Also, the
+%application can now report the parameters for fitted gaussians as
+%FWHM or sigma, and in units of arcsecs or pixels.
+%
+%The ESP web page is at
+%\htmladdnormallink{\texttt{http://www.astro.gla.ac.uk/users/norman/star/esp/}}{http://www.astro.gla.ac.uk/users/norman/star/esp/}
 
 % What's new, for release 180.3:
 %\subsection{Whats new in this release}
@@ -971,7 +1007,7 @@ sensible S/N ratio and displays this.
 Next, it makes a full estimate of the profile at that radius before dropping
 down to smaller radii and then increasing upward again until
 one of the profiling limits (see LIM1, LIM2 and RLIM in Appendix 
-\ref{des:ellpro})
+\ref{des:ELLPRO})
 is exceeded. Results of the
 profiling activity are displayed as they are calculated. This is done to allow
 you to see what progress is being made.
@@ -1555,11 +1591,11 @@ must be examined.
 
 GAUFIT now contains two distinct fitting algorithms: the original one,
 which obtained the fit parameters by hunting through a region of
-parameter space constrained by you, and a new one (as of release
-180.4), which uses a non-linear least-squares algorithm to obtain the
+parameter space constrained by you, and a new one (as of version 0.9),
+which uses a non-linear least-squares algorithm to obtain the
 parameters and their uncertainties.  For further details on the new
 algorithm, see the detailed description of GAUFIT in
-section~\ref{des:gaufit}.  The interface has not changed radically,
+section~\ref{des:GAUFIT}.  The interface has not changed radically,
 but I will show two complete examples below.
 
 \subsubsection{GAUFIT: original fitting algorithm}
@@ -1961,7 +1997,7 @@ The application can be used with the following syntax:
 This leads to the NDF p2 being examined, using the whole image, smoothing 
 the histogram with a filter of radius 4 counts and displaying the histogram on
 device x2windows. Full details of the parameters may be found in Appendix 
-\ref{des:histpeak}.
+\ref{des:HISTPEAK}.
 
 The alternative to using the whole image is to use an ARD file to define the
 parts of the image to be ignored. In that case the syntax is:
@@ -1977,7 +2013,7 @@ ARD file definition areas.dat (note the use of the `\^{ }' character).
 The histogram generated to 
 calculate the modal value is smoothed using a Gaussian filter 
 of radius 4 counts. The histogram generated is displayed on 
-device x2w. Other examples are shown in Appendix \ref{des:histpeak}.
+device x2w. Other examples are shown in Appendix \ref{des:HISTPEAK}.
 
 Full details of ARD files may be found in Appendix \ref{app:bad}.
 
@@ -2121,7 +2157,7 @@ pixels used to make up the histogram required will be taken from an
 area of the image 64x64 pixels in size. In the unlikely event
 of an image being smaller than the requested number of pixels required,
 all the non-bad image pixels will be employed. Other examples are given in
-Appendix \ref{des:loback}
+Appendix \ref{des:LOBACK}
 
 If an object location 
 is not within the bounds of the image requested then an
@@ -2180,7 +2216,7 @@ The application can be used with the following syntax:
 This looks at the ARD text file areas.dat (note the use of the 
 `\^{ }' character) and then sets the pixels defined 
 in p2 to be bad. The image so generated is output as the NDF masked.
-Other examples may be found in Appendix \ref{des:mask}.
+Other examples may be found in Appendix \ref{des:MASK}.
 
 
 \subsection{Removing other image contamination}
@@ -2244,7 +2280,7 @@ then pixel size must also be supplied via the PSIZE parameter.
 In this example all pixels in the image galaxy with a pixel value 
 greater than BACK$+$10$\times$SIGMA are identified. Then, all the pixels 
 within a radius of 1.5 arc second of the bright pixels are set to the 
-bad value. Other examples may be found in Appendix \ref{des:mask}.
+bad value. Other examples may be found in Appendix \ref{des:MASK}.
 
 
 \section{Examining image flatness}
@@ -2318,7 +2354,7 @@ The final skewness values calculated are multiplied by the factor
 As usual, if the image contains a SKY co-ordinate frame then PSIZE
 need not be speficied.
 Other examples may be 
-found in Appendix \ref{des:skew}.
+found in Appendix \ref{des:SKEW}.
 
 \section{Highlighting faint diffuse objects}
 \label{sec:highlighting}
@@ -2443,7 +2479,7 @@ Using this example a hybrid correlation image is generated which has been
 optimised to detect galaxies of 15 arc second scale length on the 
 image p2. No pixels have been excluded from the calculations. 
 Other examples of the syntax required to use this application are given
-Appendix \ref{des:selfcw}.
+Appendix \ref{des:SELFCW}.
 
 
 \section{Obtaining galaxy cross-sections}
@@ -2470,13 +2506,13 @@ or on another device, showing how its brightness varies as a
 function of distance outward from the galaxy centre. The graphs displayed 
 can show the brightness in terms of brightness above sky (expressed in SIGMA)
 or magnitudes versus one of four transformations for the radius 
-(see Appendix \ref{des:sector}). Once this is done, you are prompted to 
+(see Appendix \ref{des:SECTOR}). Once this is done, you are prompted to 
 indicate, from the graph, 
 the radius range for the data points to be used to calculate the scale 
 length of the galaxy. Finally, the scale length is calculated,
 and some information about the data derived is displayed. 
 
-Various parameters exist (see Appendix \ref{des:sector}) which allow it 
+Various parameters exist (see Appendix \ref{des:SECTOR}) which allow it 
 to be used more
 efficiently, in particular, it can output the results to a text 
 file for later examination (possibly using MONGO or some similar package) or,
@@ -2951,53 +2987,53 @@ along the way.
 % set up a mini table of contents for this section pointing into next section.
 %
 {\bf CORR}{ --- Cross-correlates a galaxy template with an image.}
-\pageref{des:corr}
+\pageref{des:CORR}
 
 {\bf ELLFOU}{ --- Ellipse fits galaxies by contour analysis.}
-\pageref{des:ellfou}
+\pageref{des:ELLFOU}
 
 {\bf ELLPRO}{ --- Ellipse fits galaxies by intensity analysis.}
-\pageref{des:ellpro}
+\pageref{des:ELLPRO}
 
 {\bf FASTMED}{ --- Variable size median filtering.}
-\pageref{des:fast}
+\pageref{des:FASTMED}
 
 {\bf GAUFIT}{ --- 2-D Gaussian fit to a source.}
-\pageref{des:gaufit}
+\pageref{des:GAUFIT}
 
 {\bf GRAPHS}{ --- Display and analyse profile results.}
-\pageref{des:graphs}
+\pageref{des:GRAPHS}
 
 {\bf HISTPEAK}{ --- Determine image pixel count statistics.}
-\pageref{des:histpeak}
+\pageref{des:HISTPEAK}
 
 {\bf HSUB}{ --- An application employing HISTPEAK as a subroutine.}
-\pageref{des:hsub}
+\pageref{des:HSUB}
 
 {\bf LOBACK}{ --- Determines the background value at numerous image locations}
-\pageref{des:loback}
+\pageref{des:LOBACK}
 
 {\bf MASK}{ --- Uses an ARD file definition to set to bad the specified pixels
 of an image.}
-\pageref{des:mask}
+\pageref{des:MASK}
 
 {\bf MIXUP}{ --- Scrambles the positions of all the pixels on an image.}
-\pageref{des:mixup}
+\pageref{des:MIXUP}
 
 {\bf SECTOR}{ --- Generates a pie-slice profile of a galaxy/sector.}
-\pageref{des:sector}
+\pageref{des:SECTOR}
 
 {\bf SELFC}{ --- Self-correlates an image on a given scale.}
-\pageref{des:selfc}
+\pageref{des:SELFC}
 
 {\bf SELFCW}{ --- Self/cross-correlates a galaxy template with an image.}
-\pageref{des:selfcw}
+\pageref{des:SELFCW}
 
 {\bf SKEW}{ --- Highlights flatfielding problems.}
-\pageref{des:skew}
+\pageref{des:SKEW}
 
 {\bf TOPPED}{ --- Removes bright parts of an image.}
-\pageref{des:topped}
+\pageref{des:TOPPED}
 
 \newpage
 \section{Description of the ESP routines}
@@ -3275,10 +3311,26 @@ The ESP routine descriptions are contained in the following pages.
 %  End of "sst.tex" layout definitions.
 % .
 
+% Insert the routine descriptions as follows:
+%
+%    % for i in corr ellfou ellpro fastmed gaufit graphs histpeak hsub \
+%        loback mask mixup sector selfc selfcw skew topped; do \
+%      prolat document=no $i.f out=$i.tex; \
+%      done
+%    % cat *.tex | sed '/sstroutine/{N;N;N;s/\n//g;s/{ *\([A-Z]*\) *}{ */{\1}{\\label{des:\1}/;}' >rd.list
+%
+% Then delete everything between %%%BEGINSST and %%%ENDSST, and
+% replace it with rd.list.
+%
+% The output of prolat needs some fixing up, to do with linebreaks and
+% inverted commas being crazily mapped to {\tt '}.
+%
+% The command for the .hlp libraries is `prohlp $i.f out=$i.hlp'
+
+
+%%%BEGINSST
 \newpage
-\sstroutine{CORR
-}{\label{des:corr}
-   Performs cross-correlations on an image using a galaxy template
+\sstroutine{CORR}{\label{des:CORR}Performs cross-correlations on an image using a galaxy template
 }{
    \sstdescription{
       Performs calculations to cross-correlate a circular shaped
@@ -3294,10 +3346,10 @@ The ESP routine descriptions are contained in the following pages.
       radius are identified. The values for each of these in turn have
       their background values subtracted and the result (F1)
       multiplied by a factor (F2) generated using an exponential function.
-      The values obtained from all the surrounding image pixels
-      are summed. The total generated is divided by using a 
-      normalisation value created by taking the sums of squares for 
-      F1 and F2, multiplying them together and taking the square root.
+      The values obtained for all the surrounding image pixels are
+      summed. The total generated is divided by using a normalisation
+      value created by taking the sums of square for F1 and F2,
+      multiplying them together and then taking the square root.
       This normalised sum is placed in the
       appropriate pixel of the output image and the program moves on
       to the next input image pixel to be considered.
@@ -3321,11 +3373,11 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          BACK = \_REAL (Read)
       }{
-         The modal pixel value found in the input NDF.
-         The units are counts.
+         The modal pixel count value found in the input NDF.
+         Units counts.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF image that is to be examined.
       }
@@ -3338,29 +3390,31 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          NSIGMA = \_REAL(Read)
       }{
-         The number of SIGMA above the sky level
-         value at which the pixel count cutoff occurs.
+         The number of standard deviations above the sky level
+         count value, where the pixel count cutoff occurs.
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the NDF data that will be created.
       }
       \sstsubsection{
          PSIZE = \_REAL (Read)
       }{
-         The size of each image pixel. The units are arc seconds.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          SCALE = \_REAL (Read)
       }{
          The scale length of the galaxies to be highlighted in the
-         output image. The units are arc seconds.
+         output image. Units arc seconds.
       }
       \sstsubsection{
          SIGMA = \_REAL (Read)
       }{
-         The standard deviation of the background of the pixels in the 
+         The standard deviations of the background pixel count within the
          input NDF. Should be determined using a routine such as
          HISTPEAK which ignores outliers.
       }
@@ -3373,31 +3427,31 @@ The ESP routine descriptions are contained in the following pages.
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{corr in=hh out=cor1 scale=8. psize=0.3 
-                        back=74. useall=y mult=1.}
-   }{
+         corr in=hh1826 out=correl scale=8. psize=0.3 back=7437.
+\LineBreak
+            useall=true mult=1000.
+      }{
 
-        Correlates image HH with a mask/template optimised for
-        galaxies of 8 arc seconds scale length. The pixel size on the
-        image is .3 arc second, the background value 74 and
-        all the pixels on the image can be used in the calculation.
-        The output image is to be named COR1.
-
-   }
+         Correlates image HH1826 with a mask/template optimised for
+         galaxies of 8 arc seconds scale length. The pixel size on the
+         image is .3 arc second, the background count value 7437 and
+         all the pixels on the image can be used in the calculation.
+         The output image is to be named CORREL.
+      }
       \sstexamplesubsection{
-         \parbox{143mm}{corr in=fn1 out=fn4 scale=4 psize=2 mult=1000. 
-                        back=66 useall=n sigma=15 nsigma=3}
-   }{
+         corr in=forn out=forn4 scale=4. psize=0.22 mult=1000. back=666
+\LineBreak
+            useall=false sigma=15 nsigma=3
+      }{
 
-        Correlates image FN1 with a mask/template optimised for
-        galaxies of 4 arc seconds scale length. The pixel size is 2
-        arc seconds and the background value 66.
+         Correlates image FORN with a mask/template optimised for
+         galaxies of 4 arc seconds scale length. The pixel size is .22
+         arc seconds and the background count value 666.
 
-        Pixels that are brighter than 66$+$15$\times$3 counts are not
-        included in the correlation calculations (USEALL=FALSE).
-        The output image is to be named FN4.
-
-     }
+         Pixels that are brighter than 666$+$15x3 counts are not
+         included in the correlation calculations (USEALL=FALSE).
+         The output image is to be named FORN4.
+      }
    }
    \sstnotes{
       It is assumed that the x and y axis pixels are of the same size.
@@ -3406,15 +3460,10 @@ The ESP routine descriptions are contained in the following pages.
       application should be used in conjunction with MIXUP to allow noise
       equivalent images to be generated and correlated thereby
       establishing a 3 sigma limit.
-
-      The program indicates its progress by showing the percentage of
-      the image processed every 50 image columns.
    }
 }
 \newpage
-\sstroutine{ELLFOU
-}{\label{des:ellfou}
-   Ellipse fitting galaxy profiles using contour analysis
+\sstroutine{ELLFOU}{\label{des:ELLFOU}Ellipse fitting galaxy profiles using contour analysis
 }{
    \sstdescription{
       Performs the calculations to fit galaxy profiles using ellipses.
@@ -3426,22 +3475,22 @@ The ESP routine descriptions are contained in the following pages.
       galaxy (and a number of other parameters) must be specified
       interactively (using cursor or keyboard) by the user.
 
-      If MODE is FALSE, a list containing the location of
+      If MODE is false, a list containing the location of
       galaxies within an image, is obtained from an ASCII file.
       profiles are generated for all these objects.
 
-      If MODE is TRUE, a value for the parameter CURSOR
-      is required. If CURSOR is TRUE, then a cursor/mouse is used in
-      (conjunction with the most recent image displayed) to determine
+      If MODE is true, a value for the parameter CURSOR
+      is required. If CURSOR is true, then a cursor/mouse is used (in
+      conjunction with the most recent image displayed) to determine
       information such as proposed galaxy centre and the largest
-      ellipse radius to be used. If CURSOR is FALSE, a keyboard is
+      ellipse radius to be used. If CURSOR is false, a keyboard is
       used for all input required by the application.
    }
    \sstusage{
-      ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT AUTOL AUTOLT 
-      \newline\hspace*{2.5em} FRZORI [CURSOR] [IN] [COSYS] [ORIGIN] (FINE)  
-      \newline\hspace*{2.5em} [RLIM] (LIM1) (LIM2) [SAME] [AGAIN] 
-      \newline\hspace*{2.5em} [INFILE] [IMGDEV]
+      ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT\\
+\hbox{}\qquad             AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FINE)\\{}
+\hbox{}\qquad             [RLIM] (LIM1) (LIM2) [SAME] [AGAIN] [INFILE]\\{}
+\hbox{}\qquad             [IMGDEV] (COLOUR) (ANGCON) (ANGOFF) (FRACT)
    }
    \sstparameters{
       \sstsubsection{
@@ -3451,15 +3500,15 @@ The ESP routine descriptions are contained in the following pages.
          on the current input image. Profiling is repeated if
          AGAIN=TRUE.
       }
-       \sstsubsection{
-         ANGCON = \_LOGICAL(Read)
+      \sstsubsection{
+         ANGCON=\_LOGICAL (Read)
       }{
-         Direction of increasing angle convention. True is clockwise.
+         Position angle convention. TRUE=clockwise positive
       }
       \sstsubsection{
-         ANGOFF = \_REAL(Read)
+         ANGOFF=\_REAL (Read)
       }{
-         Position angle offset.
+         Positive angle offset. Units degrees.
       }
       \sstsubsection{
          ARDFIL=\_CHAR (Read)
@@ -3473,24 +3522,23 @@ The ESP routine descriptions are contained in the following pages.
          Is a better estimate of the galaxy centre position to be
          obtained? If AUTOL=FALSE the user estimate is employed,
          otherwise the application examines the area of the image near
-         the defined co-ordinates for a better estimate.
+         the user defined co-ordinates for a better estimate.
       }
       \sstsubsection{
          AUTOLT=\_LOGICAL (Read)
       }{
-         Should a centroid (Y) or weighted mean (N) method
-         be used for the centre estimation?
+         The type of centroiding method used. N=centroid, Y=weighted mean
       }
       \sstsubsection{
          BACK=\_REAL (Read)
       }{
-         The background value for the image. The units are counts.
+         The background count value for the image. Units counts.
       }
       \sstsubsection{
-         COSYS=\_CHAR (Read)
+         COLOUR=\_INTEGER (Read)
       }{
-         Use world or data co-ordinates for image pixel positions?
-         (W=world, D=data)
+         Colour of the pen used to mark the position of the galaxy
+         centre.
       }
       \sstsubsection{
          CURSOR=\_LOGICAL (Read)
@@ -3500,10 +3548,15 @@ The ESP routine descriptions are contained in the following pages.
          CURSOR=TRUE.
       }
       \sstsubsection{
-         DEVICE=DEVICE (Read)
+         DEVICE=\_DEVICE (Read)
       }{
          The name of the graphics device on which the graph of results
          should be displayed.
+      }
+      \sstsubsection{
+         FRACT=\_REAL (Read)
+      }{
+         Fraction of pixels that must be present for a fit to be okay.
       }
       \sstsubsection{
          FINE=\_REAL (Read)
@@ -3518,11 +3571,11 @@ The ESP routine descriptions are contained in the following pages.
          FRZORI=\_LOGICAL (Read)
       }{
          Allows the origin given (or the values determined via AUTOL)
-         to remain unchanged throughout the run. The origin is free 
-         to move if FRZORI=FALSE.
+         to remain unchanged throughout the current profiling
+         operation. The origin is free to move if FRZORI=FALSE.
       }
       \sstsubsection{
-         IMGDEV=DEVICE (Read)
+         IMGDEV=\_DEVICE (Read)
       }{
          Name of the graphics device displaying the current image.
       }
@@ -3530,20 +3583,21 @@ The ESP routine descriptions are contained in the following pages.
          INFILE=\_CHAR (Read)
       }{
          Name of a text file containing the co-ordinates of galaxies
-         to be profiled. (Only used in file mode i.e. MODE=FALSE). The
-         file may also contain a third column containing the
-         background value. If this is found to be absent the
-         global background value (BACK) is substituted.
+         to be profiled. (Only used in file mode i.e. MODE=FALSE).
+         Co-ordinates are in the Current co-ordinate frame of the WCS
+         component of IN.  The file may also contain a third column
+         containing the background count value. If this is found to be
+         absent the global background count value (BACK) is substituted.
       }
       \sstsubsection{
-         IN=NDF (Read)
+         IN=\_NDF (Read)
       }{
          The name of the source NDF data structure/file.
       }
       \sstsubsection{
          LIM1=\_REAL (Read)
       }{
-         The maximum ratio that is permitted between the mean
+         The maximum ratio that is permitted between the average mean
          count value of the two preceeding radii profiled and that of
          the current radius. If this ratio is exceeded, the profiling
          operation stops.
@@ -3552,7 +3606,7 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          LIM2=\_REAL (Read)
       }{
-         The lower limit for mean profile value. If the mean count
+         The lower limit for mean profile count value. If the mean count
          value for the current profile drops below this value the
          profiling operation stops. Must be issued from the command line.
       }
@@ -3560,13 +3614,13 @@ The ESP routine descriptions are contained in the following pages.
          MODE=\_LOGICAL (Read)
       }{
          Whether the application is to run in file input mode or
-         interactively. Interactive MODE=TRUE. File MODE=FALSE.
+         interactively. Interactive MODE=TRUE. File mode=FALSE.
       }
       \sstsubsection{
-         ORIGIN=\_REAL (Read)
+         ORIGIN=\_CHAR (Read)
       }{
-         Image indices for the galaxy origin point to be used. The units are
-         pixels.
+         Image co-ordinates for the galaxy origin point to be used. To be
+         given in the Current coordinate system of the source NDF.
       }
       \sstsubsection{
          OUT=\_CHAR (Read)
@@ -3577,99 +3631,109 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          PSIZE=\_REAL (Read)
       }{
-         Size of the image pixels in arc seconds.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          RLIM=\_REAL (Read)
       }{
-         Radius at which the profiling will be stopped. The units are pixels.
+         Radius at which the profiling will be stopped. Units pixels.
       }
       \sstsubsection{
          SAME=\_LOGICAL (Read)
       }{
          Is the results graph to be displayed on the device currently
-         displaying the input image? Only valid if CURSOR is TRUE.
-         If SAME is set to TRUE then the user is prompted to identify
+         displaying the input image? Only valid if CURSOR is true.
+         If SAME is set to true then the user is prompted to identify
          the quadrant of the input device in which graph will be
          displayed.
       }
       \sstsubsection{
          SIGMA=\_REAL (Read)
       }{
-         The standard deviation of the background value. The units are
-         counts.
+         The standard deviation of the background count value. Units counts.
       }
       \sstsubsection{
          ZEROP=\_REAL (Read)
       }{
-         Zero point of the scale for surface brightness plots. The units are
-         magnitudes per square arc seconds.
+         Zero point of the scale for surface brightness plots. Units
+         magnitudes per arc seconds.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{ellfou mode=t back=620 sigma=39 
-             psize=1 zerop=27 ardfil=\^{ }ardf 
-             device=xw out=elf autol=t frzori=t cursor=t
-             same=t}
+         ellfou mode=true back=6200. sigma=390. psize=1.
+\LineBreak
+             zerop=27.5 ardfil=$\wedge$ardfile.dat device=xwindow
+\LineBreak
+             out=elf autol=true frzori=true cursor=true
+\LineBreak
+             same=true
       }{
- 
          Profiles are obtained for the image co-ordinates determined
          using the cursor/mouse on the DATA image currently displayed
-         on device XW. The background value of that image is
-         620 with an associated standard deviation of 39. The
-         magnitude scale assumed has a zero point of 27, all profiles
+         on device XWINDOW. The background count value of that image is
+         6200 with an associated standard deviation of 390. The
+         magnitude scale assumed has a zero point of 27.5, all profiles
          will be output to text file ELF, the final results will
-         also be plotted on the XW device and the galaxy centre
+         also be plotted on the XWINDOW device and the galaxy centre
          co-ordinates are allowed to vary.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{ellfou mode=y back=126 sigma=45 psize=2
-             zerop=26 ardfil=\^{ }ardf device=xw out=elf2 
-             autol=y frzori=y cursor=y same=n imgdev=x2w}
+         ellfou mode=true back=1267. sigma=45. psize=2.
+\LineBreak
+             zerop=26.2 ardfil=$\wedge$ardfile.dat device=xwindow
+\LineBreak
+             out=elf2 autol=true frzori=true cursor=true
+\LineBreak
+             same=false imgdev=x2windows
       }{
 
          Profiles are obtained for the current data image on device
-         XW. The results are output onto device X2W. An ARD file 
-         definition in ardf is used to identify parts of the 
-         image that may not be used in the profiling operation. An 
-         attempt will be made to improve the co-ordinates indicated
+         XWINDOW. The results are output onto device X2WINDOWS. An
+         ARD file definition in ARDFILE.DAT is used to identify parts
+         of the image that may be used in the profiling operation.
+         An attempt will be made to improve the co-ordinates indicated
          via the cursor/mouse but the galaxy centre co-ordinates will
          not be allowed to vary from one profile to the next.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{ellfou mode=t back=620 sigma=39 psize=1 
-             zerop=27 ardfil=\^{ }ardf out=e1 autol=t frzori=t
-             cursor=f in=p2 cosys=w origin=[96,92] rlim=10.
-             imgdev=x2w}
+         ellfou mode=true back=6200 sigma=390. zerop=27.5
+\LineBreak
+             ardfil=$\wedge$ardfile.dat out=elf autol=true frzori=true
+\LineBreak
+             cursor=false in=p2 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
+\LineBreak
+             rlim=10. imgdev=x2windows
       }{
 
-         Profiles for the object at world co-ordinates 96,92 on image
-         p2 are obtained out to a radius of 10 pixels. The results are
-         output to device X2W and to a file text file ELF. The
-         background is 620 with an associated standard deviation
-         of 390.
-
+         Profiles for the object at the co-ordinates indicated on image
+         P2 are obtained out to a radius of 10 pixels. The Current
+         co-ordinate frame of P2 is in the {\tt '}SKY{\tt '} domain.  Pixel size in
+         arcseconds is determined automatically from the SKY co-ordinates.
+         The results are output to device X2WINDOWS and to a file text
+         file ELF. The background count is 6200 with an associated
+         standard deviation of 390.
       }
       \sstexamplesubsection{
-         \parbox{143mm}{ellfou mode=n infile=coord ardfil=\^{ }ardf 
-             in=jet frzori=n cosys=w back=371 sigma=23 rlim=20 
-             psize=1 zerop=26 autol=n}
+         ellfou mode=false infile=coords ardfil=$\wedge$ardfile.dat in=jet
+\LineBreak
+             frzori=false back=3713 sigma=23 rlim=20 psize=0.5
+\LineBreak
+             zerop=26.2 autol=false
       }{
 
-         The program is operated in file mode where the world
-         co-ordinates of the galaxies to be profiled are read from file
-         COORD. An ARD file ardfile.dat is used to identify parts of
-         the image that cannot be used. The global value for the
-         background value is input in case the COORD file does not
+         The program is operated in file mode where co-ordinates
+         of the galaxies to be profiled are read from file
+         COORDS. An ARD file ARDFILE.DAT is used to identify parts of
+         the image that can be used. The global value for the
+         background count value is input in case the COORDS file does not
          contain a third column with local background values in.
          The image used as the source is JET. During profiling the
          galaxy centre is allowed to vary from that originally
          provided in the file. The profiling operation ceases
          if the ellipse radius reaches 20 pixels.
-
       }
    }
    \sstnotes{
@@ -3677,10 +3741,8 @@ The ESP routine descriptions are contained in the following pages.
       from the command line.
    }
 }
-\newpage 
-\sstroutine{ELLPRO
-}{\label{des:ellpro}
-   Performs an ellipse fitting galaxy profile using simple
+\newpage
+\sstroutine{ELLPRO}{\label{des:ELLPRO}Performs an ellipse fitting galaxy profile using simple
    intensity analysis
 }{
    \sstdescription{
@@ -3699,18 +3761,18 @@ The ESP routine descriptions are contained in the following pages.
       by the user may be refined by the application before the first
       profile is generated.
 
-      The centre of the galaxy position may be input interactively, 
-      MODE=TRUE), or, if there are many galaxies to be considered,
-      may be read in from a text file (MODE=FALSE). In addition, when 
-      in MODE=TRUE the galaxy can be identified using a cursor 
-      (CURSOR=TRUE) as opposed to a keyboard entry of its co-ordinates.
+      The position of the centre of the galaxy in question may be
+      input interactively, MODE=TRUE), or (if there are many galaxies
+      to be considered) may be read in from a text file (MODE=FALSE).
+      In addition, when in MODE=TRUE the galaxy can be identified
+      using a cursor (CURSOR=TRUE) as opposed to a keyboard entry of
+      its co-ordinates.
    }
    \sstusage{
-      ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
-      \newline\hspace*{2.5em} AUTOL AUTOLT FRZORI [CURSOR] [COSYS] [IN] 
-      \newline\hspace*{2.5em} [ORIGIN] (FAST) (FINE) [RLIM] (LIM1) (LIM2) 
-      \newline\hspace*{2.5em} (LIM3) (FRACT) [SAME] [AGAIN] [INFILE) 
-      \newline\hspace*{2.5em} [IMGDEV]
+      ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT \\{}
+\hbox{}\qquad             AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FAST)\\{}
+\hbox{}\qquad             (FINE) [RLIM] (LIM1) (LIM2) (LIM3) (FRACT) [SAME]\\{}
+\hbox{}\qquad             [AGAIN] [INFILE) [IMGDEV] (COLOUR) (ANGCON) (ANGOFF)
    }
    \sstparameters{
       \sstsubsection{
@@ -3719,15 +3781,16 @@ The ESP routine descriptions are contained in the following pages.
          Allows the user to elect to repeat the profiling operation
          on the current input image.
       }
-       \sstsubsection{
-         ANGCON = \_LOGICAL(Read)
+      \sstsubsection{
+         ANGCON=\_LOGICAL (Read)
       }{
-         Direction of increasing angle convention. True is clockwise.
+         Angle rotation convention. Defines if clockwise or
+         anticlockwise is considered positive. TRUE=Clockwise.
       }
       \sstsubsection{
-         ANGOFF = \_REAL(Read)
+         ANGOFF=\_REAL (Read)
       }{
-         Position angle offset.
+         Angular offset for position angles generated. Units degrees.
       }
       \sstsubsection{
          ARDFIL=\_CHAR (Read)
@@ -3739,33 +3802,32 @@ The ESP routine descriptions are contained in the following pages.
          AUTOL=\_LOGICAL (Read)
       }{
          Is a better estimate of the galaxy centre position to be
-         obtained? If AUTOL=TRUE the program attempts to find a better
+         obtained? If AUTOL=True the program attempts to find a better
          candidate for the galaxy centre.
       }
       \sstsubsection{
          AUTOLT=\_LOGICAL (Read)
       }{
-         Should a centroid (Y) or weighted mean (N) method
-         be used for the centre estimation?
+         The type of centroiding method used. N=centroid, Y=weighted mean
       }
       \sstsubsection{
          BACK=\_REAL (Read)
       }{
-         The background value for the image. The units are counts.
+         The background count value for the image. Units counts.
       }
       \sstsubsection{
-         COSYS=\_CHAR (Read)
+         COLOUR = \_INTEGER (Given)
       }{
-         Use world or data co-ordinate system? (D=data W=world)
+         Colour of the pen used to mark galaxy centres.
       }
       \sstsubsection{
          CURSOR=\_LOGICAL (Read)
       }{
          Whether the galaxy locations are to be identified using the
-         graphics cursor or the keyboard. TRUE=cursor. FALSE=keyboard.
+         graphics cursor or the keyboard. True=cursor. False=keyboard.
       }
       \sstsubsection{
-         DEVICE=DEVICE (Read)
+         DEVICE=\_DEVICE (Read)
       }{
          Name of the graphics device on which the results graph should
          be displayed.
@@ -3774,7 +3836,7 @@ The ESP routine descriptions are contained in the following pages.
          FAST=\_LOGICAL (Read)
       }{
          Is the faster method of profiling to be used? Default value is
-         TRUE. The slower version should yield better values at low
+         true. The slower version should yield better values at low
          radii values since surface interpolation (rather than
          bi-linear) is used. The surface generated by the slow method to
          model the galaxy near its centre is a 8x8 bi-cubic spline, so
@@ -3805,36 +3867,38 @@ The ESP routine descriptions are contained in the following pages.
          to remain unchanged throughout if FRZORI=TRUE.
       }
       \sstsubsection{
-         IMGDEV=DEVICE (Read)
+         IMGDEV=\_DEVICE (Read)
       }{
-         Name of the graphics graphics device displaying an image.
+         Name of the graphics device displaying an image.
       }
       \sstsubsection{
          INFILE=\_CHAR (Read)
       }{
          Name of a text file containing the co-ordinates of galaxies
          to be profiled. (Only used in file mode i.e. MODE=FALSE)
+         Co-ordinates are in the Current coordinate system of the
+         WCS component of IN.
       }
       \sstsubsection{
-         IN=NDF (Read)
+         IN=\_NDF (Read)
       }{
          The name of the source NDF data structure/file.
       }
       \sstsubsection{
          LIM1=\_REAL (Read)
       }{
-         The maximum ratio that is permitted between the mean
-         value of the two preceeding radii profiled and that of
+         The maximum ratio that is permitted between the average mean
+         count value of the two preceeding radii profiled and that of
          the current radius. If this value is exceeded, the profiling
          operation stops.
       }
       \sstsubsection{
          LIM2=\_REAL (Read)
       }{
-         The lower limit for mean profile value (above sky).
-         If the mean value for the current profile drops below
-         this value the profiling operation stops. The units 
-         are SIGMA.
+         The lower limit for mean profile count value (above sky).
+         If the mean count value for the current profile drops below
+         this value the profiling operation stops. Units
+         are standard deviations.
       }
       \sstsubsection{
          LIM3=\_REAL (Read)
@@ -3844,38 +3908,38 @@ The ESP routine descriptions are contained in the following pages.
          ellipticity. At radii beyond these, parameters are no longer
          modified. The position angle, origin and ellipticity are not
          frozen if a value of zero or less than zero is suggested.
-         The units are pixels
+         Units are pixels
       }
       \sstsubsection{
          MINMOD=\_INTEGER (Read)
       }{
-        Which type of ellipse-residual minimisation is to be used.
+         Which type of ellipse-residual minimisation is to be used.
 
-     The type of residual to be calculated is specified as 0, 1 or 2.
-     This also 
-     controls which type of statistic is returned in the final column
-     of the ELLPRO output file.  It's not completely clear what is the
-     best type of residual to 
-     use.  The original one -- a weighted standard error, selected by
-     giving this parameter the option~0 -- is rational,
-     but not obviously ideal.  I've added here the range and the
-     squared-differences as alternatives, selectable by
-     options~1 and~2 respectively.
+         The type of residual to be calculated is specified as 0, 1 or
+         2.  This also controls which type of statistic is returned in
+         the final column of the ELLPRO output file.  It's not
+         completely clear what is the best type of residual to use.  The
+         original one -- a weighted standard error, selected by giving
+         this parameter the option$\sim$0 -- is rational, but not obviously
+         ideal.  I've added here the range and the squared-differences
+         as alternatives, selectable by options$\sim$1 and$\sim$2 respectively.
 
-     I don't really recommend you play with this unless you wish to
-     experiment.  If this parameter makes much of a difference, the
-     ESP maintainer would be interested to hear about it.
-         }
+         I don't really recommend you play with this unless you wish to
+         experiment.  If this parameter makes much of a difference, the
+         ESP maintainer would be interested to hear about it.
+      }
       \sstsubsection{
          MODE=\_LOGICAL (Read)
       }{
          Whether the application is to run in file input mode or
-         interactively. Interactive MODE=TRUE. File MODE=FALSE.
+         interactively. Interactive MODE=TRUE. File mode=FALSE.
       }
       \sstsubsection{
          ORIGIN=\_REAL (Read)
       }{
-         Image indices for the origin point to be used. The units are pixels.
+         Image co-ordinates for the origin point to be used.  Co-ordinates
+         are in the Current co-ordinate system of the WCS component
+         of IN.
       }
       \sstsubsection{
          OUT=\_CHAR (Read)
@@ -3886,76 +3950,85 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          PSIZE=\_REAL (Read)
       }{
-         Size of the image pixels in arc seconds.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          RLIM=\_REAL (Read)
       }{
-         Radius at which the profiling will be stopped. The units are pixels.
+         Radius at which the profiling will be stopped. Units pixels.
       }
       \sstsubsection{
          SAME=\_LOGICAL (Read)
       }{
          Is the results graph to be displayed on the device currently
-         displaying the input image? Only valid if CURSOR is TRUE.
-         If SAME is set to TRUE then the user is prompted to identify
+         displaying the input image? Only valid if CURSOR is true.
+         If SAME is set to true then the user is prompted to identify
          the quadrant of the input device in which graph will be
          displayed.
       }
       \sstsubsection{
          SIGMA=\_REAL (Read)
       }{
-         The standard deviation of the background value. The units are counts.
+         The standard deviation of the background value. Units counts.
       }
       \sstsubsection{
          ZEROP=\_REAL (Read)
       }{
-         Zero point of the scale for surface brightness plots. The units are
-         magnitudes per square arc second.
+         Zero point of the scale for surface brightness plots. Units
+         magnitudes per arc seconds.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{ellpro mode=t back=620 sigma=39 psize=1.
-             zerop=27 ardfil=\^{ }ardf device=xw out=elp1 autol=t 
-             frzori=f cursor=f cosys=d in=p2 rlim=10 origin=[96,92]}
+         ellpro mode=true back=6200 sigma=390
+\LineBreak
+             zerop=27.5 ardfil=$\wedge$ardfile.dat device=xwindows
+\LineBreak
+             out=elp1.dat autol=true frzori=false cursor=false
+\LineBreak
+             in=p2 rlim=10 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
       }{
 
-         Performs profiling on an object positioned at (pixel
-         co-ordinates) 96,92 on image p2. The profile determined will
-         be output to a graphical display on device XW and to
-         text file elp1. The galaxy centre provided will be
-         refined by the application and during profiling the galaxy centre
-         will be allowed to change. The profiling will be stopped at
-         a radius of 10 pixels.
-
+         Performs profiling on an object positioned at the co-ordinates
+         indicated on image P2; the Current co-ordinate system of P2 is
+         in the SKY domain.  Pixel size in arcseconds will be determined
+         automatically from the SKY co-ordinates.  The profile
+         determined will  be output to a graphical display on device
+         XWINDOWS and to text file ELP1.DAT. The galaxy centre
+         provided will be refined by the application and during
+         profiling the galaxy centre will be allowed to change. The
+         profiling will be stopped at a radius of 10 pixels.
       }
       \sstexamplesubsection{
-         \parbox{143mm}{ellpro mode=y back=6200 sigma=390 psize=1 
-              zerop=27 ardfil=\^{ }ardf device=xw out=elp1
-              autol=n frzori=y cursor=y}
+         ellpro mode=true back=6200 sigma=390 psize=1. zerop=27.5
+\LineBreak
+              ardfil=$\wedge$ardfile.dat device=xwindows out=elp1.dat
+\LineBreak
+              autol=false frzori=true cursor=true
       }{
 
          Performs profiling on a galaxy identified using a cursor/mouse
          and the most recently displayed image. The ARD area definition
-         contained in the file ardf is used to mask out bad
+         contained in the file ARDFILE.DAT is used to mask out bad
          parts of the image. The galaxy centre identified by the user
          is not refined by the software and is not allowed to change
          during profiling. The galaxy location is defined using a
          cursor/mouse on the most recently displayed image.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{ellpro mode=false back=760 sigma=12 psize=.4 
-              zerop=27 ardfil=\^{ }ardf in=p2 infile=p2log.dat
-              out=outp cosys=w autol=t frzori=f}
+         ellpro mode=false back=760 sigma=12 psize=0.44 zerop=27.5
+\LineBreak
+              ardfil=$\wedge$arddef.dat in=p2 infile=p2log.dat
+\LineBreak
+              out=output.dat autol=true frzori=false
       }{
 
-         The application reads the object locations in file p2log.dat
-         (taking them as world co-ordinates) and performs profiling on
-         those locations on image p2. The profiling output is displayed
-         on the text screen and is also placed in file outp.
-
+         The appliication reads the object locations in file P2LOG.DAT
+         (in the Current co-ordinates of P2) and performs profiling on
+         those locations on image P2. The profiling output is displayed
+         on the text screen and is also placed in file OUTPUT.DAT.
       }
    }
    \sstnotes{
@@ -3964,9 +4037,8 @@ The ESP routine descriptions are contained in the following pages.
    }
 }
 \newpage
-\sstroutine{FASTMED
-}{\label{des:fast}
-   Applies a square median filter of the specified size to an input image
+\sstroutine{FASTMED}{\label{des:FASTMED}Applies a square median filter of user defined size to an input
+   image
 }{
    \sstdescription{
       The method used employs a rolling histogram and allows
@@ -3975,7 +4047,7 @@ The ESP routine descriptions are contained in the following pages.
       The median pixel value in the region surrounding each input
       image pixel is  calculated. This value is then subtracted from
       the value of the pixel being considered. Finally, the original
-      background value is added to the result, which is placed in the
+      background count is added to the result, which is placed in the
       corresponding pixel of the output image.
    }
    \sstusage{
@@ -3985,41 +4057,38 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          BACK = \_REAL (Read)
       }{
-         Image background value. The units are counts.
+         Image background count value. Units counts.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF to which the filter will be applied.
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the output NDF that will be created.
       }
       \sstsubsection{
          SIGMA = \_REAL (Read)
       }{
-         Standard deviation of the background value.
-         The units are counts.
+         Standard deviation of the background count value. Units counts.
       }
       \sstsubsection{
          WIDTH = \_INTEGER (Read)
       }{
-         The width of the median filter to be employed. The units are pixels.
+         The width of the filter to be employed. Units pixels.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{fast in=field out=flatgal back=760. sigma=27. width=72}
+         fastmed in=field out=flatgal back=760. sigma=27. width=72
       }{
-
          In this example, a 72x72 pixel filter will be applied to
-         the input image field. The resulting median filtered image
-         will be placed in output image flatgal. The input image
-         (field) had a global background value of 760. with
+         the input image FIELD. The resulting median filtered image
+         will be placed in output image FLATGAL. The input image
+         (FIELD) had a global background count value of 760 with
          an associated standard deviation of 27 counts.
-
       }
    }
    \sstnotes{
@@ -4029,409 +4098,256 @@ The ESP routine descriptions are contained in the following pages.
       be most obvious at the image edges and corners. For this reason
       some users may find it necessary to clip the output image by
       WIDTH/2 pixels on each edge to generate better results.
-
-      The program indicates its progress by showing the percentage of
-      the image processed every 50 image columns.
    }
 }
 \newpage
-\sstroutine{GAUFIT (original)
-}{\label{des:gaufit}\xlabel{GAUFIT}
-   Performs a 2-D Gaussian fit of multiple sources.
+\sstroutine{GAUFIT}{\label{des:GAUFIT}Performs a 2-D Gaussian fit of multiple sources
 }{
    \sstdescription{
+      Uses a minimisation routine to determine the 2-D Gaussian profiles
+      of multiple sources on an NDF format image. This will be especially
+      useful for those using JCMT data (see also \xref\{JCMTDR\}\{sun132\}\{\}).
 
-     Uses a minimisation routine to determine the 2-D Gaussian profiles
-     of multiple sources on an NDF format image. This will be especially
-     useful for those using JCMT data (see also \xref{JCMTDR}{sun132}{}).
+      Source locations can be specified using a cursor or by
+      text file. The user is allowed to restrain the extent to which
+      each minimisation iteration is allowed to modify the location,
+      breadth or position angle of the sources. This is
+      essential when the package is used with overlapping sources.
 
-     Source locations can be specified using a cursor or by 
-     text file. The user is allowed to restrain the extent to which 
-     each minimisation iteration is allowed to modify the location, 
-     breadth or position angle of the sources. This is 
-     essential when the package is used with overlapping sources.
+      Input text files must contain the x and y coordinates of the
+      source in the Current co-ordinates of the NDF, and may in
+      addition contain estimates for the position angle, Sa, Sb
+      (std deviation of the Gaussian functions in 2 directions -
+      major axis then minor) and the peak value.
 
-     Input text files must contain the x and y coordinates of the 
-     source and may in addition contain estimates for the position 
-     angle, Sa, Sb (std deviation of the Gaussian functions in 2 
-     directions -- major axis then minor.  If the parameter FWHM is
-     set true, these will be read as FWHM rather than s.d.) and the
-     peak value.
-  
-     Output image options are for the generation of the complete whole 
-     image model or an image containing the residuals in the regions 
-     surrounding the sources.
+      Output image options are for the generation of the complete whole
+      image model or an image containing the residuals in the regions
+      surrounding the sources.
 
-There are two separate fitting algorithms within GAUFIT, a non-linear
-least-squares routine (selectable with parameter LSQFIT=true) or the
-original parameter-search routine.  This section describes the
-original version, the next the updated one.
-   
+      There are two separate fitting algorithms within GAUFIT, a
+      non-linear least-squares routine (selectable with parameter
+      LSQFIT=true) or the original parameter-search routine.  Some of
+      the parameters below have slightly different behaviour in the two
+      modes, or are only available in one mode or the other.  These are
+      indicated by prefacing the variant descriptions with either [PS:]
+      for parameter-search mode (lsqfit=false) or [LSQ:] for
+      least-squares (lsqfit=true)
    }
    \sstusage{
-      GAUFIT IN OUT MODE BACK SIGMA NSIGMA COSYS DEVICE
-      AUTOL COLOUR INFILE MODEL MODTYP ANGCON ANGOFF 
-      FWHM LSQFIT=false PSIZE NITER
-      ANGINC SAINC SBINC PINC XINC YINC
+      GAUFIT IN INFILE OUT MODE MODEL IMGDEV\\{}
+\hbox{}\qquad   MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE\\{}
+\hbox{}\qquad   BACK SIGMA NSIGMA\\{}
+\hbox{}\qquad   LSQFIT=false AUTOL XINC YINC SAINC SBINC PINC ANGINC NITER\\{}
+
+      GAUFIT IN INFILE OUT MODE MODEL IMGDEV\\{}
+\hbox{}\qquad   MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE\\{}
+\hbox{}\qquad   BACK SIGMA NSIGMA\\{}
+\hbox{}\qquad   LSQFIT=true CALCSD MAXITER
    }
    \sstparameters{
       \sstsubsection{
-        ANGCON = \_LOGICAL (Read)
+         ANGCON = \_LOGICAL (Read)
       }{
-           Angle rotation convention. Defines if clockwise or
-           anticlockwise is considered positive. TRUE=Clockwise.
+         Angle rotation convention. Defines if clockwise or
+         anticlockwise is considered positive. TRUE=Clockwise.
       }
       \sstsubsection{
-        ANGINC = \_REAL (Read)
+         ANGINC = \_REAL (Read)
       }{
-           The amount by which the angle of a source may vary.
-           Arbitrary range 0 to 1. 1 = free to move as required.
-           0 = unable to move.  
+         [PS:] The amount by which the angle of a source may vary.
+         Arbitrary range 0 to 1. 1 = free to move as required.
+         0 = unable to move.
       }
       \sstsubsection{
-        ANGOFF = \_REAL (Read) 
+         ANGOFF = \_REAL (Read)
       }{
-           Angular offset for position angles generated. Units degrees.
+         Angular offset for position angles generated. Units degrees.
       }
       \sstsubsection{
-        AUTOL = \_LOGICAL (Read)
+         AUTOL = \_LOGICAL (Read)
       }{
-           Is the source origin provided to be refined?
+         [PS:] Is the source origin provided to be refined?
       }
       \sstsubsection{
-        BACK = \_REAL (Read)
+         BACK = \_REAL (Read)
       }{
-           The background value for the image.
+         The background value for the image.  [LSQ:] You may give this
+         as a negative number, to have the routine obtain and report the
+         best-fit background; in this case, the SIGMA and NSIGMA
+         parameters are ignored.
       }
       \sstsubsection{
-        COLOUR = \_INTEGER (Read)
+         CALCSD = \_LOGICAL (Read)
       }{
-           Colour of the pen used to mark source centres.
+         [LSQ:] Should we calculate and display parameter uncertainties?
+         A significant part of the calculation is taken up with this
+         calculation, so if you do not want the uncertainties, you will save
+         time by opting not to calculate them.
       }
       \sstsubsection{
-        COSYS = \_CHAR (Read)
+         COLOUR = \_INTEGER (Read)
       }{
-           Use world or data co-ordinate system? (D=data W=world)
+         Colour of the pen used to mark source centres.
       }
       \sstsubsection{
-        DEVICE = DEVICE (Read) 
+         FWHM = \_LOGICAL (Read)
       }{
-           Name of the graphics device on which the results graph should 
-           be displayed.
+         Are the gaussian widths to be read and written as FWHM or
+         standard deviations?
       }
       \sstsubsection{
-        FWHM = \_LOGICAL (Read)
+         IMGDEV = \_DEVICE (Read)
       }{
-           Are the gaussian widths to be read and written as FWHM or
-   standard deviations?
+         Name of the graphics device on which the results graph should
+         be displayed.
       }
       \sstsubsection{
-        INFILE = \_CHAR (Read)
+         INFILE = \_CHAR (Read)
       }{
-           Name of a text file containing the source co-ordinates
-           to be profiled.
+         Name of a text file containing the co-ordinates of sources
+         to be profiled.  Co-ordinates are in the Current co-ordinate
+         system of the WCS component of IN.
       }
       \sstsubsection{
-        IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
-           The name of the source NDF data structure/file.
+         The name of the source NDF data structure/file.
       }
       \sstsubsection{
-        LSQFIT = \_LOGICAL (Read)
+         LSQFIT = \_LOGICAL (Read)
       }{
-           Is the application to use the least-squares fitting
-   routine?  Must be LSQFIT=FALSE to use this variant of the routine.
+         Is the application to use the least-squares fitting
+         routine, or the older parameter-search method?
       }
       \sstsubsection{
-        MODE = \_LOGICAL (Read)
+         MAXITER = \_INTEGER (Read)
       }{
-           Whether the application is to run in file input mode or 
-           interactively. Interactive MODE=TRUE. File MODE=FALSE.
+         [LSQ:] Upper-bound on the iteration count within the
+         least-squares method
+         (-1 indicates that you are happy
+         with the default limit).  The default maximum count is large, and
+         intended as an upper bound on the iteration count, to stop it spinning
+         its wheels uselessly on some pathological dataset.  You should not
+         need to change this unless you suspect that the limit is genuinely
+         being reached by a correct calculation.
       }
       \sstsubsection{
-        MODEL = NDF (Read)
+         MODE = \_LOGICAL (Read)
       }{
-           The output NDF.
+         Whether the application is to run in file input mode or
+         interactively. Interactive MODE=TRUE. File mode=FALSE.
       }
       \sstsubsection{
-        MODTYP = \_CHAR (Read)
+         MODEL = \_NDF (Read)
       }{
-           The type of output NDF file to be created. MODTYP=R gives
-           residuals near the sources. MODTYP=W gives the whole
-           image model. Angular offset for position angles generated. Units degrees.
+         The output NDF.
       }
       \sstsubsection{
-	NITER = \_INTEGER (Read)
+         MODTYP=\_CHAR (Read)
       }{
-         The number of iterations the fitting routine is to use.
+         The type of output NDF file to be created. MODTYP=R gives
+         residuals near the sources. MODTYP=W gives the whole
+         image model.
       }
       \sstsubsection{
-        NSIGMA = \_REAL (Read)
+         NITER = \_INTEGER (Read)
       }{
-           Number of sigma above sky at which pixels are considered 
-           to be significant.
+         [PS:] The number of iterations performed by the parameter-search
+         routine.
       }
       \sstsubsection{
-        OUT = \_CHAR (Read)
+         NSIGMA = \_REAL (Read)
       }{
-           File name for the output text file containing the profile 
-           data.
+         Number of sigma above sky at which pixels are considered
+         to be significant. [LSQ:] If you give back=-1, then this is ignored.
       }
       \sstsubsection{
-        PINC = \_REAL (Read)
+         OUT = \_CHAR (Read)
       }{
-           The amount by which the peak of a source may vary.
-           1 = free to move as required. 0 = unable to move.  
+         File name for the output text file containing the profile
+         data.
       }
       \sstsubsection{
-        PSIZE = \_REAL (Read)
+         PINC = \_REAL (Read)
       }{
-           The pixel size, in units of arcseconds.  If entered as
-   null, then sizes will be displayed in units of pixels.
+         [PS:] The amount by which the peak of a source may vary.
+         1 = free to move as required. 0 = unable to move.
       }
       \sstsubsection{
-        SAINC = \_REAL (Read)
+         PSIZE = \_REAL (Read)
       }{
-           The amount by which the standard deviation of a source may vary
-           per iteration. Largest axis. 1 = free to move as required. 
-           0 = unable to move.  
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
-        SBINC = \_REAL (Read)
+         SAINC = \_REAL (Read)
       }{
-           The amount by which the standard deviation of a source may vary
-           per iteration. Smallest axis.
+         [PS:] The amount by which the standard deviation of a source may vary
+         per iteration. Largest axis. 1 = free to move as required.
+         0 = unable to move.
       }
       \sstsubsection{
-        SIGMA = \_REAL (Read)
+         SBINC = \_REAL (Read)
       }{
-           Standard deviation of the sky count.
+         [PS:] The amount by which the standard deviation of a source may vary
+         per iteration. Smallest axis.
       }
       \sstsubsection{
-        XINC = \_REAL (Read)
+         SIGMA = \_REAL (Read)
       }{
-           The amount by which the x coordinate of a source may vary
-           per iteration. 1 = free to move as required.
-           0 = unable to move.  
+         Standard deviation of the sky count. [LSQ:] If you give
+         back=-1, then this is ignored.
       }
       \sstsubsection{
-        YINC = \_REAL (Read)
+         XINC = \_REAL (Read)
       }{
-           The amount by which the x coordinate of a source may vary
-           per iteration. 1 = free to move as required.
-           0 = unable to move.  
+         [PS:] The amount by which the x coordinate of a source may vary
+         per iteration. 1 = free to move as required.
+         0 = unable to move.
+      }
+      \sstsubsection{
+         YINC = \_REAL (Read)
+      }{
+         [PS:] The amount by which the x coordinate of a source may vary
+         per iteration. 1 = free to move as required.
+         0 = unable to move.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{gaufit mode=false infile=coords.dat in=image 
-                               cosys=w modtyp=w model=imodel }
-   }{
+         gaufit mode=false infile=coords.dat in=image out=sources
+\LineBreak
+             modtyp=w model=imodel
+      }{
 
-           Will read source coordinates from the text file coords.dat. 
-           The image on which these appear is image, the output image 
-           containing the model for each pixel will be imodel.
-           The coordinates provided by the file will be assumed to be
-           in the form of world coordinates.
-
-   }
-      \sstexamplesubsection{
-         \parbox{143mm}{gaufit mode=true out=test1 modtyp=r angoff=90}
-   }{
-
-           The sources will be identified by cursor. The output 
-           image test1 will only show the residual (discrepancy 
-           between the models and the source image in the vicinity
-           of the sources). The resultant position angles will be
-           modified by 90 degrees.
-
+         Will read source coordinates from the text file coords.dat.
+         The image on which these appear is image, the output image
+         containing the model for each pixel will be imodel.
+         The coordinates provided by the file are in the Current
+         coordinate system of the WCS component of the NDF image.
       }
-   }
-   \sstnotes{
-      The residuals generated by this program have arbitrary units.
+      \sstexamplesubsection{
+         gaufit mode=true out=test1 modtyp=r angoff=90
+      }{
+         The sources will be identified by cursor. The output
+         image test1 will only show the residual (discrepancy
+         between the models and the source image in the vicinity
+         of the sources. The resultant position angles will be
+         modified by 90 degrees.
+      }
+      \sstexamplesubsection{
+         gaufit mode=true lsqfit=true back=-1 out=test1 angoff=90
+      }{
+         The sources will be identified by cursor. The resultant
+         position angles will be modified by 90 degrees.  The source
+         positions will be identified using a least-squares fitting
+         technique, which will also fit the background.
+      }
    }
 }
 \newpage
-\sstroutine{GAUFIT (least-sq)
-}{\label{des:gaufit2}
-   Performs a 2-D Gaussian fit of multiple sources.
-}{
-   \sstdescription{
-     Uses a least-squares fitting routine to determine the 2-D
-     Gaussian profiles 
-     of multiple sources on an NDF format image. This will be especially
-     useful for those using JCMT data (see also \xref{JCMTDR}{sun132}{}).
-
-     Source locations can be specified using a cursor or by 
-     text file.
-
-     Input text files must contain the x and y coordinates of the 
-     source and may in addition contain estimates for the position 
-     angle, Sa, Sb (std deviation of the Gaussian functions in 2 
-     directions -- major axis then minor.  If the parameter FWHM is
-     set true, these will be read as FWHM rather than s.d.) and the
-     peak value.
-  
-     Output image options are for the generation of the complete whole 
-     image model or an image containing the residuals in the regions 
-     surrounding the sources.
-
-There are two separate fitting algorithms within GAUFIT, a non-linear
-least-squares routine (selectable with parameter LSQFIT=true) or the
-original parameter-search routine.  This section describes the
-updated version, the previous the original one.
-   }
-   \sstusage{
-      GAUFIT IN OUT MODE BACK SIGMA CALCSD NSIGMA COSYS DEVICE
-      COLOUR INFILE MODEL ANGCON ANGOFF 
-      FWHM LSQFIT=true PSIZE NITER
-   }
-   \sstparameters{
-      \sstsubsection{
-        ANGCON = \_LOGICAL (Read)
-      }{
-           Angle rotation convention. Defines if clockwise or
-           anticlockwise is considered positive. TRUE=Clockwise.
-      }
-      \sstsubsection{
-        ANGOFF = \_REAL (Read) 
-      }{
-           Angular offset for position angles generated. Units degrees.
-      }
-      \sstsubsection{
-        BACK = \_REAL (Read)
-      }{
-           The background value for the image.  If you give this as a
-   negative value, the routine will obtain and report the best-fit background.
-      }
-      \sstsubsection{
-        CALCSD = \_LOGICAL (Read)
-      }{
-        Should we calculate and display parameter uncertainties?
-   A significant part of the calculation is taken up with this
-   calculation, so if you do not want the uncertainties, you will save
-   time by opting not to calculate them.
-	}
-      \sstsubsection{
-        COLOUR = \_INTEGER (Read)
-      }{
-           Colour of the pen used to mark source centres.
-      }
-      \sstsubsection{
-        DEVICE = DEVICE (Read) 
-      }{
-           Name of the graphics device on which the results graph should 
-           be displayed.
-      }
-      \sstsubsection{
-        FWHM = \_LOGICAL (Read)
-      }{
-           Are the gaussian widths to be read and written as FWHM or
-   standard deviations?
-      }
-      \sstsubsection{
-        INFILE = \_CHAR (Read)
-      }{
-           Name of a text file containing the source co-ordinates
-           to be profiled.
-      }
-      \sstsubsection{
-        IN = NDF (Read)
-      }{
-           The name of the source NDF data structure/file.
-      }
-      \sstsubsection{
-        LSQFIT = \_LOGICAL (Read)
-      }{
-           Is the application to use the least-squares fitting
-   routine?  Must be LSQFIT=TRUE to use this variant of the routine.
-      }
-      \sstsubsection{
-        MAXITER = \_LOGICAL (Read)
-	}{
-	Maximum number of iterations (-1 indicates that you are happy
-with the default limit).  The default maximum count is large, and
-intended as an upper bound on the iteration count, to stop it spinning
-its wheels uselessly due to some programming error.  You should not
-need to change this unless you suspect that the limit is genuinely
-being reached by a correct calculation.
-}
-      \sstsubsection{
-        MODE = \_LOGICAL (Read)
-      }{
-           Whether the application is to run in file input mode or 
-           interactively. Interactive MODE=TRUE. File MODE=FALSE.
-      }
-      \sstsubsection{
-        MODEL = NDF (Read)
-      }{
-           The output NDF.
-      }
-      \sstsubsection{
-	NITER = \_INTEGER (Read)
-      }{
-         The maximum number of iterations before the routine abandons
-   the calculation.  This is only a guard to prevent the routine
-   running away on a pathological dataset.  You should normally use
-   the default, obtained by giving this parameter as a negative
-   number.
-      }
-      \sstsubsection{
-        NSIGMA = \_REAL (Read)
-      }{
-           Number of sigma above sky at which pixels are considered 
-           to be significant (only if BACK was specified).
-      }
-      \sstsubsection{
-        OUT = \_CHAR (Read)
-      }{
-           File name for the output text file containing the profile 
-           data.
-      }
-      \sstsubsection{
-        PSIZE = \_REAL (Read)
-      }{
-           The pixel size, in units of arcseconds.  If entered as
-   null, then sizes will be displayed in units of pixels.
-      }
-      \sstsubsection{
-        SIGMA = \_REAL (Read)
-      }{
-           Standard deviation of the sky count (only if BACK was specified).
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         \parbox{143mm}{gaufit mode=false lsqfit=true infile=coords.dat
-                               in=image cosys=w back=-1 model=imodel }
-   }{
-
-           Will read source coordinates from the text file coords.dat. 
-           The image on which these appear is image, the output image 
-           containing the model for each pixel will be imodel.
-           The coordinates provided by the file will be assumed to be
-           in the form of world coordinates.
-
-   }
-      \sstexamplesubsection{
-         \parbox{143mm}{gaufit mode=true lsqfit=true out=test1
-                               angoff=90}
-   }{
-
-           The sources will be identified by cursor. The resultant
-           position angles will be modified by 90 degrees.
-
-      }
-   }
-   \sstnotes{This variant of the GAUFIT application has appeared for
-   the first time in this release, and I would be grateful to receive
-   any comments on its robustness and suitability.
-   }
-}
-\newpage
-\sstroutine{GRAPHS
-}{\label{des:graphs}
-   Displays/analyses the results generated using SECTOR,
+\sstroutine{GRAPHS}{\label{des:GRAPHS}Displays/analyses the results generated using SECTOR,
    ELLFOU or ELLPRO
 }{
    \sstdescription{
@@ -4458,26 +4374,30 @@ being reached by a correct calculation.
       alternatively, several such files concatenated together.
       In both modes, the name of the text file created by GRAPHS to
       store results in, is supplied by the user.
+
+      The X and Y co-ordinates output by SECTOR, ELLFOU and ELLPRO,
+      and hence those plotted by GRAPHS, are in the Base frame
+      coordinate system (units pixels) of the processed NDF images.
    }
    \sstusage{
-      GRAPHS MODE INFILE OUT RRANGE [AGAIN] [CURSOR] [DEVICE] [FITLIM]
-      \newline\hspace*{2.5em} [RADISP] [WHATD]
+      GRAPHS MODE INFILE OUT RRANGE [AGAIN] [CURSOR] [DEVICE]\\{}
+\hbox{}\qquad   [FITLIM] [RADISP] [WHATD] (LOWLIM) (ANGCON) (ANGOFF)
    }
    \sstparameters{
       \sstsubsection{
          AGAIN = \_LOGICAL(Read)
       }{
-         Should the profile be displayed/anaylsed again?
-      }    
-       \sstsubsection{
-         ANGCON = \_LOGICAL(Read)
-      }{
-         Direction of increasing angle convention. True is clockwise.
+         Should the profile be displayed/analysed again?
       }
       \sstsubsection{
-         ANGOFF = \_REAL(Read)
+         ANGCON = \_LOGICAL (Read)
       }{
-         Position angle offset.
+         Position angle rotation convention. TRUE=clockwise positive.
+      }
+      \sstsubsection{
+         ANGOFF = \_REAL (Read)
+      }{
+         Position angle offset. Units degrees.
       }
       \sstsubsection{
          CURSOR = \_LOGICAL (Read)
@@ -4495,8 +4415,8 @@ being reached by a correct calculation.
       \sstsubsection{
          FITLIM = \_REAL (Read)
       }{
-         The range of radius values over which the scale length {\tt'}fits{\tt '}
-         are to be calculated.
+         The range of radius values over which the scale length `fits'
+         are to be calculated. Units arc seconds.
       }
       \sstsubsection{
          INFILE = \_CHAR (Read)
@@ -4504,7 +4424,13 @@ being reached by a correct calculation.
          Name of the text file containing the galaxy profile.
       }
       \sstsubsection{
-         MODE = \_LOGICAL (Read)
+         LOWLIM = \_REAL (Read)
+      }{
+         The radius below which a profile will not be included
+         in the automatic radius calculation. Units arc seconds.
+      }
+      \sstsubsection{
+         MODE = LOGICAL (Read)
       }{
          Is the application to be used interactively or in file mode?
          TRUE = interactive. FALSE = file mode.
@@ -4532,15 +4458,15 @@ being reached by a correct calculation.
 
             \sstitem
             R = linear
-            The radius values displayed are the semi-major axis
-            dimensions when using ELLPRO/ELLFOU input files and distance
+            The radius values displayed are the equivalent radius
+            (R$*$) when using ELLPRO/ELLFOU input files and distance
             from the galaxy origin when using SECTOR derived files.
          }
       }
       \sstsubsection{
          RRANGE =\_CHAR (Read)
       }{
-         Should the radius range be selected automatically? 
+         Should the radius range be selected automatically?
       }
       \sstsubsection{
          WHATD = \_CHAR (Read)
@@ -4549,7 +4475,7 @@ being reached by a correct calculation.
          \sstitemlist{
 
             \sstitem
-            B   = Brightness of the profile in terms of sky i.e. (I-Back)/SIGMA
+            B   = Brightness of the profile in terms of sky i.e. (I-Back)/Sigma
 
             \sstitem
             C   = Count value of the profile
@@ -4588,61 +4514,60 @@ being reached by a correct calculation.
             S   = Surface brightness of the profile
 
             \sstitem
-            X   = $x$ co-ordinate
+            X   = X co-ordinate (Base frame)
 
             \sstitem
-            Y   = $y$ co-ordinate
+            Y   = Y co-ordinate (Base frame)
          }
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{graphs mode=true infile=results out=scales 
-            rrange=t cursor=t whatd=s radisp=r device=xw}
+         graphs mode=true infile=results.dat out=scales.dat rrange=true
+\LineBreak
+            cursor=true whatd=s radisp=r device=xwindows
       }{
 
-         The file results is examined and its contents displayed
+         The file RESULTS.DAT is examined and its contents displayed
          graphically as required. The first display will be of linear
          radius versus surface brightness and will be shown on
          device XWINDOWS. The radius range for the isophotes to be
          employed in the scale length calculation are selected
          interactively via the mouse/ball.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{graphs mode=t infile=profs out=lengths 
-            rrange=f fitlim=1,20 cursor=f whatd=p radisp=l device=x2w}
+         graphs mode=true infile=profs.dat out=lengths.dat rrange=false
+\LineBreak
+            fitlim=1,20 cursor=false whatd=p radisp=l
+\LineBreak
+            device=x2windows
       }{
 
-         The results stored in file profs are read one after the
-         other The profiles and {\tt '}fits{\tt '} may be observed 
-         interactively as graphs on device X2W. The first display will be 
-         of log(radius) versus position angle. The radius range used
+         The results stored in file PROFS.DAT are read one after the.
+         other The profiles and {\tt '}fits{\tt '} may be observed interactively as
+         graphs on device X2WINDOWS. The first display will be of
+         log(radius) versus position angle. The radius range used
          when calculating the scale length is 1 to 20 arc seconds.
-         results are output to file lengths.
-
+         results are output to file LENGTHS.DAT.
       }
       \sstexamplesubsection{
-         \parbox{143mm}{graphs mode=f infile=elf1 out=lengths 
-            rrange=t}
+         graphs mode=false infile=elf1.dat out=lengths.dat rrange=true
       }{
-
-         The profile data required is read in from file elf1.
+         The profile data required is read in from file ELF1.DAT.
          Data from isophotes chosen by the application
          are selected for use in the scale length analysis.
-         The results are output to file lengths.
-
+         The results are output to file LENGTHS.DAT.
       }
       \sstexamplesubsection{
-         \parbox{143mm}{graphs mode=f infile=profs out=scales 
-             rrange=f fitlim=0.5,7}
+         graphs mode=false infile=profs.dat out=scales.dat rrange=false
+\LineBreak
+             fitlim=0.5,7
       }{
 
-         Profile data read in from file profs is analysed to
+         Profile data read in from file PROFS.DAT is analysed to
          determine the scale length using isophotes with a radius in
          the range 0.5 to 7 arc seconds. The results are output into
-         text file scales.
-
+         text file SCALES.DAT.
       }
    }
    \sstnotes{
@@ -4651,24 +4576,22 @@ being reached by a correct calculation.
 
       Within ESP the scale lengths are calculated by assuming an
       exponential brightness profile for spiral galaxies and an
-      exponential modified by a 
-      quarter power law for elliptical galaxies. The scale length
-      value given is derived from the decay constant of the 
-      exponential functions. 
-
+      exponential modified by a quarter power law for elliptical
+      galaxies. The scale length
+      value given is derived from the decay constant of the
+      exponential functions.
    }
 }
 \newpage
-\sstroutine{HISTPEAK
-}{\label{des:histpeak}
-   Establish the mean, mode, median and other statistics
+\sstroutine{HISTPEAK}{\label{des:HISTPEAK}Establish the mean, mode, median and other statistics
    for NDF image files
 }{
    \sstdescription{
       Allows the user to input the name of an NDF image file and
-      then constructs an image pixel value versus occurence
+      then constructs an image count value versus occurence
       histogram. This is used to allow count median, mode, kurtosis,
-      standard deviation and skewness values to be estimated.
+      standard deviation, background count standard deviation and skewness
+      values to be estimated.
 
       The user may also select which parts of the image are to be
       used. The options implemented are:
@@ -4695,22 +4618,21 @@ being reached by a correct calculation.
          \sstitem
          projected mode. Calculated by extrapolating the lengths of a
            series of chords through the peak to zero length and
-           determining the pixel value at which this occurs.
+           determining the count value at which this occurs.
 
          \sstitem
          interpolated mode. Calculated by assuming a Normal form
-           for the histogram peak and {\tt '}fitting{\tt '} a function to it.
+           for the histogram peak and `fitting' a function to it.
            The function is then used to provide both a modal value and
-           its associated standard deviation.
+           the background count standard deviation.
 
       }
-      Estimates of the standard deviation of pixel values
-      and the standard deviation of the background value are generated.
-
+      An estimate of the standard deviation of pixel count values
+      and the background count standard deviation are generated.
    }
    \sstusage{
       HISTPEAK IN USE SFACT DEVICE [ARDFIL]
-    }
+   }
    \sstparameters{
       \sstsubsection{
          ARDFIL = \_CHAR (Read)
@@ -4719,14 +4641,14 @@ being reached by a correct calculation.
          the parts of the image to be ignored.
       }
       \sstsubsection{
-         DEVICE = DEVICE (Read)
+         DEVICE = \_DEVICE (Read)
       }{
          The name or number of the graphics display type to be
          used when displaying the histogram. ! may be used if
          graphics are not required.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF data structure/file that is to be
          examined.
@@ -4734,14 +4656,14 @@ being reached by a correct calculation.
       \sstsubsection{
          LOW = \_REAL (Write)
       }{
-         The lowest pixel value found in the parts of the
-         image that were used. The units are counts.
+         The lowest pixel count value found in the parts of the
+         image that were used. Units counts.
       }
       \sstsubsection{
          HIGH = \_REAL (Write)
       }{
-         The highest pixel value found in the parts of the
-         image that were used. The units are counts.
+         The highest pixel count value found in the parts of the
+         image that were used. Units counts.
       }
       \sstsubsection{
          KURT = \_DOUBLE (Write)
@@ -4752,17 +4674,17 @@ being reached by a correct calculation.
       \sstsubsection{
          MEAN = \_DOUBLE (Write)
       }{
-         The mean pixel value calculated using the pixels found
-         in the parts of the image used. The units are counts.
+         The mean pixel count value calculated using the pixels found
+         in the parts of the image used. Units counts.
       }
       \sstsubsection{
          MEDIAN = \_DOUBLE (Write)
       }{
-         The median pixel value calculated using the pixels
-         found in the parts of the image used. The units are counts.
+         The median pixel count value calculated using the pixels
+         found in the parts of the image used. Units counts.
       }
       \sstsubsection{
-         MODE = \_DOUBLE (Write)
+         MODE = DOUBLE (Write)
       }{
          The modal value of the unsmoothed histogram generated
          when using only pixels from the parts of the image requested.
@@ -4772,9 +4694,9 @@ being reached by a correct calculation.
       }{
          The modal value of the histogram calculated by
          assuming that near the histogram peak a Normal distribution
-         is present and then {\tt '}fitting{\tt '} it. The {\tt '}fit{\tt '} 
-         obtained supplies the value for the background
-         standard deviation (see SIGMA).
+         is present and then {\tt '}fitting{\tt '} it. The {\tt '}fit{\tt '} obtained
+         supplies the value for the histogram peak and also an
+         accurate estimate of the background count standard deviation.
       }
       \sstsubsection{
          MODEP = \_DOUBLE (Write)
@@ -4783,7 +4705,7 @@ being reached by a correct calculation.
          by taking a number of chords through the histogram and
          by examining the length of chord versus height relationship
          extrapolates to a zero chord length. Assumes that the
-         histogram peak is probably a skewed distribution.
+         histogram peak is probably a skewed distribution (SIGMA).
       }
       \sstsubsection{
          MODES = \_DOUBLE (Write)
@@ -4794,33 +4716,32 @@ being reached by a correct calculation.
       \sstsubsection{
          PEAKV = \_DOUBLE (Write)
       }{
-         The peak number of pixels found with a given value
+         The peak number of pixels found with a given count value
          in the unsmoothed count versus occurence histogram.
       }
       \sstsubsection{
          PEAKVS = \_DOUBLE (Write)
       }{
-         The peak number of pixels found with a given value
+         The peak number of pixels found with a given count value
          in the smoothed count versus occurence histogram.
       }
       \sstsubsection{
          PEAKVI = \_DOUBLE (Write)
       }{
-         The peak number of pixels found with a given value
+         The peak number of pixels found with a given count value
          as estimated by fitting a Normal distribution to the
          peak of the count versus occurence histogram.
       }
       \sstsubsection{
          SDEV = \_DOUBLE (Write)
       }{
-         Estimates for the standard distribution of the image
-         pixel values. The units are counts.
+         The standard deviation of the pixel count value calculated
+         using only the good pixels from the image areas requested.
       }
       \sstsubsection{
          SIGMA = \_DOUBLE (Write)
       }{
-         The standard deviation value of the background value calculated
-         using only the good pixels from the image areas requested.
+         Estimates for the background count standard deviation. Units counts.
       }
       \sstsubsection{
          SFACT = \_INTEGER (Read)
@@ -4837,14 +4758,15 @@ being reached by a correct calculation.
 
             \sstitem
             $>$0 to indicate the radius of the Gaussian filter.
-            The units are counts.
+            Values greater than HIS\_\_SFLIM (see include file) are not
+            allowed. Units counts.
          }
       }
       \sstsubsection{
          SFACTA = \_INTEGER (Write)
       }{
          The Gaussian filter radius actually employed by the application.
-         See SFACT. The units are counts.
+         See SFACT. Units counts.
       }
       \sstsubsection{
          SKEW = \_DOUBLE (Write)
@@ -4863,52 +4785,46 @@ being reached by a correct calculation.
          Defines the method by which the areas of the image to be
          used in building up the pixel count histogram are to be
          selected.
-            USE={\tt '}W{\tt '} All the image pixels are used.
-            USE={\tt '}A{\tt '} The image pixels are selected using an ARD file
+            USE=`W' All the image pixels are used.
+            USE=`A' The image pixels are defined using an ARD file
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{histpeak in=galaxy sfact=3 use=w device=ikon1}
+         histpeak in=galaxy sfact=3 use=w device=ikon1
       }{
-
-         The statistics are calculated for the image galaxy, using the
+         The statistics are calculated for the image GALAXY, using the
          all the non-bad pixels on the image and the results displayed
          on the default device as text and graphically on device IKON1.
          The histogram used to calculate the interpolated mode and
-         its standard deviation is smoothed using a Gaussian filter of
+         background standard deviation is smoothed using a Gaussian filter of
          radius 3 counts.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{histpeak in=galaxy2 sfact=-1 use=a device=xwindows 
-            ardfil=\^{ }okay.dat}
+         histpeak in=galaxy2 sfact=-1 use=a device=xwindows 
+\LineBreak
+ardfil=$\wedge$okay.dat
       }{
-
-         The statistics are calculated for the image galaxy2, using 
-         all the non-bad pixels on the image specified in ARD file okay.dat
+         The statistics are calculated for the image GALAXY2, using
+         the image pixels defined by ARD file OKAY.DAT
          and the results displayed
          on the default device as text and graphically on device XWINDOWS.
          A smoothed histogram is used to calculate the interpolated mode and
-         its associated standard deviation. The width of the smoothing filter is 
+         background standard deviation. The width of the smoothing filter is
          chosen by the application.
-
       }
    }
    \sstimplementationstatus{
-
       The current version will not accept a pixel value range greater
       than the largest integer value possible.
    }
 }
 \newpage
-\sstroutine{HSUB
-}{\label{des:hsub}
-   A subroutine version of HISTPEAK for developers
+\sstroutine{HSUB}{\label{des:HSUB}A subroutine version of HISTPEAK for developers
 }{
    \sstdescription{
       A subroutine version of HISTPEAK that has been designed to be
-      easily transplanted into the users ADAM applications. It establishes
+      easily transplanted into the users ADAM programs. It establishes
       the mode, median and other statistics for NDF image files. Calls a
       subroutine based upon a modified version of HISTPEAK to obtain
       values for the mode, skewness and kurtosis values for an NDF image.
@@ -4927,7 +4843,7 @@ being reached by a correct calculation.
    }
    \sstparameters{
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF data structure/file that is to be
          examined.
@@ -4947,15 +4863,16 @@ being reached by a correct calculation.
 
             \sstitem
             $>$0 to indicate the radius of the Gaussian filter to use.
-            The value returned is that actually
-            employed. The units are counts.
+            Values greater than HSB\_\_SFLIM (see include file HSUB\_PAR)
+            are not allowed. The value returned is that actually
+            employed. Units counts.
          }
       }
       \sstsubsection{
          TYPE = \_INTEGER (Read)
       }{
          Allows the user to define which method is to be used to
-         calculate the modal pixel value.
+         calculate the modal count value.
          1 = raw histogram
          2 = smoothed histogram
          3 = extrapolate the length of chords through histogram peak
@@ -4970,42 +4887,36 @@ being reached by a correct calculation.
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{hsub in=ic3374 sfact=0 type=0}
+         hsub in=ic3374 sfact=0 type=0
       }{
-    
-         A histogram of the values in image ic3374 is constructed.
+         A histogram of the values in image IC3374 is constructed.
          The image is not smoothed (SFACT=0) and the results returned
          correspond to the highest value (1-4) of TYPE that was
          obtainable.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{hsub in=galaxy sfact=10 type=4}
+         hsub in=galaxy sfact=10 type=4
       }{
-
-         A histogram of the values in image galaxy is used. The image
+         A histogram of the values in image GALAXY is used. The image
          is smoothed (SFACT=10) using a Gaussian filter of radius 10.
          The results required are those for the smoothed histogram
          only.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{hsub in=forn4 sfact=6 type=3}
+         hsub in=forn4 sfact=6 type=3
       }{
-
          A histogram of the values in image FORN4 is used. The image
          is smoothed using a gaussian filter of radius 6 and the
          results returned those for the projected mode value.
-
       }
    }
    \sstnotes{
       HSUB should be viewed as a coding example for users wishing
       to incorporate the functions of HISTPEAK into their own
-      applications.
+      programs.
 
-      This application is intended to form the basis of a user ADAM
-      application requiring image statistics. The user requiring other
+      This application is intended to form the basis of a user
+      program requiring image statistics. The user requiring other
       data from the application will need to modify subroutines HSUB
       and HISTPEA2 so that the desired parameters (say mean or median)
       are passed between them.
@@ -5016,9 +4927,7 @@ being reached by a correct calculation.
    }
 }
 \newpage
-\sstroutine{LOBACK
-}{\label{des:loback}
-   Establishes the local mode values for parts of an image
+\sstroutine{LOBACK}{\label{des:LOBACK}Establishes the local mode values for parts of an image
 }{
    \sstdescription{
       Establishes the local mode values for parts of an image
@@ -5032,33 +4941,28 @@ being reached by a correct calculation.
       contiguous data points believed to be present in the object at
       the image location specified.
 
-      The latter method is intended specifically for use with PISA, 
-      RGASP{\tt '}s IMAGES or IRAF{\tt '}s FOCAS output files.
+      The latter method is intended specifically for use with RGASP's
+      IMAGES or IRAF's FOCAS output files.
 
       All co-ordinates are read from a two or three columns
       ASCII text file. If two columns are present then these are
       taken as representing the image co-ordinates required for the
-      regions of the image to be considered. If three columns are
-      present the third column represents the width of the area
+      regions of the image to be considered.  Co-ordinates are in
+      the Current coordinate system of the NDF. If three columns are
+      present the third column respresents the width of the area
       to be sampled or the number of contiguous pixels detected there
-      by PISA, FOCAS or IMAGES.
+      by FOCAS or IMAGES.
 
       The selection of the number of pixels to used in the histogram is
       defined by the user subject to a lower limit of 1024 pixels
       (32x32).
    }
    \sstusage{
-      LOBACK IN INFILE SFACT THIRD COSYS OUT WIDE
+      LOBACK IN INFILE SFACT THIRD OUT WIDTH
    }
    \sstparameters{
       \sstsubsection{
-         COSYS = \_CHAR (Read)
-      }{
-         Defines whether the co-ordinates are provided as data
-         (COSYS=D) or world (COSYS=W).
-      }
-      \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF data structure/file that is to be
          examined.
@@ -5069,7 +4973,8 @@ being reached by a correct calculation.
          The name of the ASCII text file containing the image
          co-ordinates and number of pixels to be used at each location
          or the number of contiguous pixels found there by FOCAS or
-         IMAGES.
+         IMAGES.  Co-ordinates are in the Current co-ordinate system
+         of IN.
       }
       \sstsubsection{
          OUT = \_CHAR (Read)
@@ -5091,7 +4996,9 @@ being reached by a correct calculation.
 
             \sstitem
             $>$0 to indicate the radius of the Gaussian filter to use.
-            The value returned is that employed. The units are counts.
+            Values greater than LOB\_\_SFLIM (see include file) are not
+            allowed.
+            The value returned is that employed. Units counts.
          }
       }
       \sstsubsection{
@@ -5104,14 +5011,14 @@ being reached by a correct calculation.
          taken from the image around the required location
          (THIRD=FALSE).
 
-         The value supplied via the third text column is used to 
-         determine how big an area of image must be used when
-         calculating the background. This is done by assuming
-         that all the pixels in the object are in a square
-         area and then determining the width of that area.
-         The width used in the end is 3 times that of the
-         object. 
- 
+          The value supplied via the third text column is used to
+          determine how big an area of image must be used when
+          calculating the background. This is done by assuming
+          that all the pixels in the object are in a square
+          area and then determining the width of that area.
+          The width used in the end is 3 times that of the
+          object.
+
          However, the WIDTH parameter
          overrides this if less than 32x32 pixels (as defined by the
          WIDTH parameter limits in the LOBACK.IFL file) are to be used.
@@ -5119,43 +5026,42 @@ being reached by a correct calculation.
          filled under most circumstances.
       }
       \sstsubsection{
-         WIDE = \_INTEGER (Read)
+         WIDTH = \_INTEGER (Read)
       }{
          The width of the square area of the image from which pixel
          values will be taken to construct the histogram. The minimum
          permitted value is 32 (as defined in the LOBACK.IFL file).
-         The units are pixels.
+         Units pixels.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{loback in=p2 infile=coords sfact=0 third=t 
-             cosys=w out=backs wide=64}
+         loback in=p2 infile=coords.dat sfact=0 third=true
+\LineBreak
+             out=backs.dat width=64
       }{
-            
-         Reads the world co-ordinate data stored in text file COORDS
-         and determines the background value within a 64x64 pixel
-         area surrounding each of those locations. The histogram
-         generated to do this will not be smoothed. The output will be
-         into text file backs. Since THIRD is TRUE, the third
-         column represents the number of pixels thought to make up
-         the object.
 
+         Reads the data stored in text file COORDS (in co-ordinates
+         of the Current frame of P2) and determines the background
+         count value within a 64x64 pixel  area surrounding each of
+         those locations. The histogram generated to do this will not
+         be smoothed. The output will be into text file BACKS.DAT.
+         Since THIRD is true, the third column represents the number
+         of pixels thought to make up the object.
       }
       \sstexamplesubsection{
-         \parbox{143mm}{loback in=p2 infile=coords sfact=4 third=f 
-             cosys=w out=outp width=35 }
+         loback in=p2 infile=coords.dat sfact=4 third=false
+\LineBreak
+             out=output.dat width=35
       }{
-             
-         Determines the background value within a 35x35 pixel
-         area surrounding each of the locations identified in
-         COORDS. The histogram generated to do this will be
-         smoothed using a Gaussian 4 counts wide. The output will be
-         into text file outp. Since THIRD is FALSE, the third
-         column represent the lower limit of pixels to be taken from
-         the image to make up the histogram. The co-ordinate system
-         used is world.
 
+         Determines the background count value within a 35x35 pixel
+         area surrounding each of the locations identified in
+         COORDS.DAT. The histogram generated to do this will be
+         smoothed using a Gaussian 4 counts wide. The output will be
+         into text file OUTPUT.DAT. Since THIRD is false, the third
+         column represent the lower limit of pixels to be taken from
+         the image to make up the histogram.
       }
    }
    \sstnotes{
@@ -5169,9 +5075,7 @@ being reached by a correct calculation.
    }
 }
 \newpage
-\sstroutine{MASK
-}{\label{des:mask}
-   Uses an ARD file to set some pixels of a given image to bad
+\sstroutine{MASK}{\label{des:MASK}Uses an ARD file to set some pixels of a given image to bad
 }{
    \sstdescription{
       Allows the user to input the name of an NDF image file and
@@ -5191,86 +5095,78 @@ being reached by a correct calculation.
          the parts of the image to be masked out i.e. set to bad.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the source NDF.
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the output NDF.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{mask in=ic3374 ardfil=\^{ }ardfile.txt out=ic3374a}
+         mask in=ic3374 ardfil=$\wedge$ardfile.txt out=ic3374a
       }{
-
-         This example uses as the source image ic3374 and sets
+         This example uses as the source image IC3374 and sets
          the pixels specified by the ARD description contained in
-         ardfile.txt to the bad value. The resultant image is output
-         as ic3374a.
-
+         ARDFILE.TXT to the bad value. The resultant image is output
+         as IC3374A.
       }
    }
 }
 \newpage
-\sstroutine{MIXUP
-}{\label{des:mixup}
-   To mixup the position of all the pixels in an image
+\sstroutine{MIXUP}{\label{des:MIXUP}To mixup the position of all the pixels in an image
 }{
    \sstdescription{
       Creates an equivalent noise image by swapping the positions of
       pairs of pixels taken from an image. This ensures that
-      structure due to galaxies/stars etc. is spread randomly
-      throughout the image but the pixel value statistics are retained.
+      structure due to galaxies/stars etc is spread randomly
+      throughout the image but the count value statistics are retained.
 
       The routine may be used in conjunction with SKEW, SELFC,
       SELFCW or CORR when searching for low contrast objects. It
       provides comparison noise images which may be used to determine
-      the significance of {\tt '}objects{\tt '} identified by the other 
-      applications.
+      the significance of `objects' identified by the other applications.
    }
    \sstusage{
       MIXUP IN OUT
    }
    \sstparameters{
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF that is to be scrambled.
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the NDF data that will be created.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{mixup in=ic3374 out=ic3374m}
+         mixup in=ic3374 out=ic3374m
       }{
-
-         The pixel positions in the input file 3374 will be
-         scrambled and the resulting image output as ic3374m.
-                                                       
+         The pixel positions in the input file IC3374 will be
+         scrambled and the resulting image output as IC3374M.
       }
    }
 }
 \newpage
-\sstroutine{SECTOR
-}{\label{des:sector}
-   May be used to display the average pixel values within a wedge
+\sstroutine{SECTOR}{\label{des:SECTOR}May be used to display the average pixel values within a wedge
    shaped sector/slice of the image
 }{
    \sstdescription{
       May be used to display the average pixel values within a wedge
       shaped sector/slice of the image. The sector is in the form of a
-      wedge drawn outward from the galaxy origin point.
+      wedge (of user defined size) drawn outward from the galaxy
+      origin point.
 
       The results are displayed as mean pixel value (in terms of level
       relative to sky or surface brightness) versus distance from the
-      galaxy origin. Pixel values are summed over all the pixels
+      galaxy origin. Pixel count values are summed over all the pixels
       at a given distance from the origin.
 
       Options include:
@@ -5298,16 +5194,14 @@ being reached by a correct calculation.
 
       }
       The application is not intended to replace ELLPRO or ELLFOU
-      profiling applications, but merely to allow the user to obtain
+      profiling application, but merely to allow the user to obtain
       quickly a first approximation to the brightness cross-section of
       an interactively selected galaxy.
    }
    \sstusage{
-      SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL
-      \newline\hspace*{2.5em} ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG]
-      \newline\hspace*{2.5em} [ANGWID] [RLIM] [COSYS] [SAME] [AGAIN] [ORIGIN]
-      \newline\hspace*{2.5em} (COLOUR)
-
+      SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL\\{}
+\hbox{}\qquad   ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG]\\{}
+\hbox{}\qquad   [ANGWID] [RLIM] [SAME] [AGAIN] [ORIGIN] (COLOUR)
    }
    \sstparameters{
       \sstsubsection{
@@ -5319,7 +5213,7 @@ being reached by a correct calculation.
          ANGWID = \_REAL (Read)
       }{
          The angular width of the slice/wedge/sector to be considered.
-         The units are degrees.
+         Units degrees.
       }
       \sstsubsection{
          ARDFIL = \_CHAR (Read)
@@ -5337,17 +5231,12 @@ being reached by a correct calculation.
       \sstsubsection{
          BACK = \_REAL (Read)
       }{
-         The background value for the image. The units are counts.
+         The background value for the image. Units counts.
       }
       \sstsubsection{
          COLOUR = \_INTEGER (Read)
       }{
-         Pen colour used when showing the galaxy centre.
-      }
-      \sstsubsection{
-         COSYS = \_CHAR (Read)
-      }{
-         Use a data or world co-ordinate system? (D=data W=world).
+         Colour used when showing the galaxy centre and profiling radius.
       }
       \sstsubsection{
          CURSOR = \_LOGICAL (Read)
@@ -5356,7 +5245,7 @@ being reached by a correct calculation.
          graphics cursor or the keyboard.
       }
       \sstsubsection{
-         DEVICE = DEVICE (Read)
+         DEVICE = \_DEVICE (Read)
       }{
          The name of the display device on which the results graphs
          should be displayed.
@@ -5365,15 +5254,15 @@ being reached by a correct calculation.
          FITLIM = \_REAL (Read)
       }{
          The range of radius values over which the scale length {\tt '}fits{\tt '}
-         are to be calculated.
+         are to be calculated.  Units arc seconds.
       }
       \sstsubsection{
-         IMGDEV = DEVICE (Read)
+         IMGDEV = \_DEVICE (Read)
       }{
          Name of the graphics device displaying the image.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the source NDF data structure/file.
       }
@@ -5387,7 +5276,8 @@ being reached by a correct calculation.
       \sstsubsection{
          ORIGIN = \_REAL (Read)
       }{
-         Image indices for the origin point to be used. The units are pixels.
+         Image indices for the origin point to be used. Given in the
+         Current coordinate system of the WCS component of IN.
       }
       \sstsubsection{
          OUT = \_CHAR (Read)
@@ -5400,12 +5290,14 @@ being reached by a correct calculation.
       }{
          The position angle of the sector relative to the top of the
          image. Convention is clockwise increases angle and the image
-         $y$ axis represents 0 degrees. The units are degrees.
+         Y axis represents 0 degrees. Units degrees.
       }
       \sstsubsection{
          PSIZE = \_REAL (Read)
       }{
-         Size of the image pixels in arc seconds. The units are arc secs.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          RADISP = \_CHAR (Read)
@@ -5443,79 +5335,87 @@ being reached by a correct calculation.
       \sstsubsection{
          SIGMA = \_REAL (Read)
       }{
-         The standard deviation of the background value. The units are counts.
+         The standard deviation of the background value. Units counts.
       }
       \sstsubsection{
          SURF = \_LOGICAL (Read)
       }{
          Are the pixel values to be expressed as surface brightness.
-         If TRUE, then the output is surface brightness, otherwise the
-         display shows brightness in terms of sigma above sky
-         level. i.e. (I-Back)/Sigma
+         If true then the output is surface brightness, otherwise the
+         display shows brightness in terms of sigma above sky.
+         i.e. (I-Back)/SIGMA
       }
       \sstsubsection{
          ZEROP = \_REAL (Read)
       }{
-         Zero point of the scale for surface brightness plots. The units are
+         Zero point of the scale for surface brightness plots. Units
          magnitudes per square arc second.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{sector cursor=t ardfil=\^{ }ar1 back=620 
-             sigma=39 psize=1 surf=t radisp=r mirror=t autol=t 
-             zerop=27 out=x2w device=xw imgdev=xw same=f}
+         sector cursor=true ardfil=$\wedge$ardup.dat back=6200 sigma=390
+\LineBreak
+             psize=0.96 surf=true radisp=r mirror=true autol=true
+\LineBreak
+             zerop=27.5 out=x2windows device=x2windows
+\LineBreak
+             imgdev=xwindows same=false
       }{
 
          Profiles an object identified on the currently displayed
          image using a cursor/mouse. The resulting profile is displayed
-         as linear radius versus surface brightness. ARD file AR1 is
+         as linear radius versus surface brightness. ARD file ARDUP is
          used to identify parts of the image that may not be used.
-         The source image is currently displayed on device XW and
-         the graphs will appear on device X2W. The galaxy centre
+         The source image is currently displayed on device XWINDOW and
+         the graphs will appear on device X2WINDOW. The galaxy centre
          co-ordinate identified is refined automatically. The radius
          limits to be employed when calculating scale length are
          defined using the cursor/mouse.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{sector cursor=f ardfil=\^{ }ardf back=76 
-             sigma=2 psize=.3 surf=t radisp=q mirror=f autol=f
-             zerop=26 in=ic3374 device=xw fitlim=0,20
-             posang=25 angwid=5 rlim=25 cosys=d origin=47,123}
+         sector cursor=false ardfil=$\wedge$ardfile.dat back=760 sigma=23
+\LineBreak
+             surf=true radisp=q mirror=false autol=false
+\LineBreak
+             zerop=26.4 in=ic3374 out=ic3374.pro device=xwindows
+\LineBreak
+             fitlim=0,20 posang=25 angwid=5
+\LineBreak
+             rlim=25 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
       }{
 
-         An object located at co-ordinates 47,123 or image ic3374 is
-         profiled in the 25 degree direction out to a distance of 25
-         arc seconds. The wedge/sector used will be 5 degrees wide
-         and the scale length will be calculated using data obtained
-         in the radius range 0-20 arc seconds. The user supplied
-         estimate of the galaxy centre will not be refined. The graphs
-         generated will be quarter power radius versus surface
+         An object located at the co-ordinates indicated on image IC3374
+         is profiled in the 25 degree direction out to a distance of 25
+         arc seconds. The Current co-ordinate frame of IC3374 is in
+         the SKY domain. The pixel size in arcseconds is determined
+         automatically from the SKY coordinate frame. The wedge/sector
+         used will be 5 degrees wide and the scale length will be
+         calculated using data obtained in the radius range 0-20 arc
+         seconds. The user supplied estimate of the galaxy centre will
+         not be refined. Output is to the text file ic3374.pro. The
+         graphs generated will be quarter power radius versus surface
          brightness.
-
       }
    }
 }
 \newpage
-\sstroutine{SELFC
-}{\label{des:selfc}
-   To perform self-correlations on an NDF image file
+\sstroutine{SELFC}{\label{des:SELFC}To perform self-correlations on an NDF image file
 }{
    \sstdescription{
-      Performs an self-correlation calculation on an input NDF image
+      Performs a self-correlation calculation on an input NDF image
       file. The resulting correlation image/plot is stored to disk.
 
       The self-correlated image may be used to find flat-fielding
       faults and faint diffuse objects of a given size.
 
       To reduce the influence of bright objects or cosmic rays;
-      the user may elect to employ a cut out pixel value where
+      the user may elect to employ a cut out pixel count value where
       any pixel found to be above that value is ignored. The cutout
       value is determined by the user inputting a global mode value
-      (usually the sky background value - obtained via HISTPEAK),
-      the background count standard deviation and the number of
-      standard deviations above sky level at which the cutout should occur.
+      (usually the sky background count - obtained via HISTPEAK),
+      the background count standard deviation and the number of standard
+      deviations above sky level at which the cutout should occur.
 
       The user is required to enter a value for the size of object(s)
       of interest (roughly the template size) and also the image pixel
@@ -5526,8 +5426,8 @@ being reached by a correct calculation.
       and all pixel pairs within that circle, that lie on opposite
       sides of the centre from each other, are stored.
 
-      Each pair is then considered in turn and the modal pixel value
-      subtracted from each. The resultant residual pixel values
+      Each pair is then considered in turn and the modal count value
+      subtracted from each. The resultant residual pixel count values
       are then multiplied together. The values found for all the pairs
       are then summed, the total divided by the number of pixel pairs
       found and the square root taken. In the event of a negative sum
@@ -5539,8 +5439,8 @@ being reached by a correct calculation.
       are correlated.
 
       The method assumes some sort of symmetry is present in the
-      objects detected but, despite this, appears to work well on 
-      a wide range of image types.
+      objects detected but appears to work well on a wide range of
+      image types.
 
       A border is present in the output image which the same width
       as the radius of the template. All pixels within this border
@@ -5553,40 +5453,42 @@ being reached by a correct calculation.
       \sstsubsection{
          BACK = \_REAL (Read)
       }{
-         The modal pixel value found in the input NDF.
-         The units are counts.
+         The modal pixel count value found in the input NDF.
+         Units counts.
       }
       \sstsubsection{
          DIAM = \_REAL (Read)
       }{
          The diameter of the galaxies to be searched for in the
-         image. The units are arc seconds.
+         image. Units arc seconds.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF data that is to be examined.
       }
       \sstsubsection{
          NSIGMA = \_REAL(Read)
       }{
-         The number of standard deviations (SIGMA) above the sky level
-         value at which the pixel count cutoff occurs.
+         The number of standard deviations above the sky level
+         count value, where the pixel count cutoff occurs.
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the NDF that will be created.
       }
       \sstsubsection{
          PSIZE = \_REAL (Read)
       }{
-         The size of each pixel. The units are arc seconds.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          SIGMA = \_REAL (Read)
       }{
-         The standard deviation of the background value of the pixels in the
+         The standard deviation of the background count within the
          input NDF. Should be determined using a routine such as
          HISTPEAK which ignores outliers.
       }
@@ -5599,43 +5501,33 @@ being reached by a correct calculation.
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{selfc in=search out=scorr diam=15 psize=1 
-            back=727 useall=true}
+         selfc in=search out=scorr diam=15. psize=0.5 back=727.
+\LineBreak
+            useall=true
       }{
-
-         A self-correlation is carried out on image galaxies. The
+         A self-correlation is carried out on image GALAXIES. The
          search is for an object 15 arc seconds across. The image
-         pixel size is 1 arc seconds and the background level
+         pixel size is .5 arc seconds and the background count level
          is 727. USEALL=TRUE ensures that no pixels are excluded from
          the correlation calculation.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{selfc in=plate out=plates diam=5 psize=1 
-            back=6600 useall=false sigma=35 nsigma=5}
+         selfc in=plate out=plates diam=5. back=6600.
+\LineBreak
+            useall=false sigma=35. nsigma=5.
       }{
-
          A self-correlation is carried out on image PLATE. The search
-         is for an object 5 arc seconds across. The image pixel size
-         is 1 arc second and the background level is 6600.
-         Since USEALL=FALSE, all pixels with a value above
-         6600$+$35$\times$5 are excluded from the correlation calculation.
-         The output image is named PLATES
-
+         is for an object 5 arc seconds across.  The background count
+         level is 6600 and the image pixel size in arc seconds will
+         be determined from a SKY coordinate frame in the image{\tt '}s WCS
+         component if possible.  Since USEALL=FALSE, all pixels with
+         a count value above 6600$+$35.x5. are excluded from the
+         correlation calculation.  The output image is named PLATES.
       }
    }
    \sstnotes{
       It is assumed through out that the x and y axis pixels
       sizes are the same.
-
-      Within ESP the scale lengths are calculated by assuming an
-      exponential brightness profile for spiral galaxies and a
-      quarter power law for elliptical galaxies. The scale length
-      value given is derived from the decay constant of the 
-      exponential functions. 
- 
-      The program indicates its progress by showing the percentage of
-      the image processed every 50 image columns.
    }
    \sstimplementationstatus{
       At present suitable normalisation factors have not been
@@ -5648,9 +5540,7 @@ being reached by a correct calculation.
    }
 }
 \newpage
-\sstroutine{SELFCW
-}{\label{des:selfcw}
-   To perform mixed cross-self-correlations on an NDF image file
+\sstroutine{SELFCW}{\label{des:SELFCW}To perform mixed cross-self-correlations on an NDF image file
 }{
    \sstdescription{
       Performs a mixed cross-self-correlation calculation on an input
@@ -5665,10 +5555,10 @@ being reached by a correct calculation.
       requested by the user.
 
       To reduce the influence of bright objects or cosmic rays;
-      the user may elect to employ a cut out pixel value where
+      the user may elect to employ a cut out pixel count value where
       any pixel found to be above that value is ignored. The cutout
       value is determined by the user inputting a global background
-      value (available via HISTPEAK), the background
+      count value (available via HISTPEAK), the background count
       standard deviation and the number of standard deviations above
       sky level at which the cutout should occur.
 
@@ -5694,19 +5584,19 @@ being reached by a correct calculation.
       \sstsubsection{
          BACK = \_REAL (Read)
       }{
-         The modal pixel value found in the input NDF.
-         The units are counts.
+         The modal pixel count value found in the input NDF.
+         Units counts.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF that is to be examined.
       }
       \sstsubsection{
          NSIGMA = \_REAL(Read)
       }{
-         The number of background value standard deviation above the sky 
-         value at which the pixel count cutoff occurs.
+         The number of standard deviations above the sky level
+         count value at which the pixel count cutoff occurs.
       }
       \sstsubsection{
          MULT = \_REAL (Read)
@@ -5714,25 +5604,27 @@ being reached by a correct calculation.
          A multiplying factor used to modify the output range.
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the NDF that will be created.
       }
       \sstsubsection{
          PSIZE = \_REAL (Read)
       }{
-         The size of each pixel. The units are arc seconds.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          SCALE = \_REAL (Read)
       }{
          The scale length of the galaxies being searched for.
-         The units are arc seconds.
+         Units arc seconds.
       }
       \sstsubsection{
          SIGMA = \_REAL (Read)
       }{
-         The standard deviation of the background value for the pixels in the
+         The standard deviation of the pixel background count within the
          input NDF. Should be determined using a routine such as
          HISTPEAK which ignores outliers.
       }
@@ -5745,31 +5637,30 @@ being reached by a correct calculation.
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{selfcw in=p2 out=scp2 scale=15 psize=.96 
-             back=1000 useall=true}
+         selfcw in=p2 out=scp2 scale=15. psize=0.96 back=1000.2
+\LineBreak
+             useall=true
       }{
-
          A self-correlation image, optimised for galaxies of a 15 arc
-         second scale length, is generated using image p2 as the input
-         source image and scp2 as the output image. The pixel size
-         on the image is .96 arc second and the background value
-         for the source image is 1000
-
+         second scale length, is generated using image P2 as the input
+         source image and SCP2 as the output image. The pixel size
+         on the image is .96 arc second and the background count value
+         for the source image is 1000.2
       }
       \sstexamplesubsection{
-         \parbox{143mm}{selfcw in=ls1 out=ls2 scale=8 psize=1 back=444
-             useall=false sigma=12 nsigma=4}
+         selfcw in=lsbg1 out=lsbg2 scale=8. back=444.  useall=false
+\LineBreak
+             sigma=12. nsigma=4.
       }{
-
          A self-correlation image, optimised for galaxies of a 8 arc
-         second scale length, is generated using image p2 as the input
-         source image and scp2 as the output image. The pixel size
-         on the image is 1. arc second and the background value
-         for the source image is 444.
+         second scale length, is generated using image P2 as the input
+         source image and SCP2 as the output image.  The background
+         count value for the source image is 444 and the pixel size
+         in arc seconds will be determined from a SKY frame in the
+         image{\tt '}s WCS component if possible.
 
-         All pixels with a pixel value greater than 444.$+$12.$\times$4. are
+         All pixels with a count value greater than 444.$+$12.x4. are
          excluded from the correlation calculations.
-
       }
    }
    \sstnotes{
@@ -5780,15 +5671,10 @@ being reached by a correct calculation.
       application should be used in conjunction with MIXUP to allow noise
       equivalent images to be generated and correlated thereby
       establishing a 3 sigma limit.
-
-      The program indicates its progress by showing the percentage of
-      the image processed every 50 image columns.
    }
 }
 \newpage
-\sstroutine{SKEW
-}{\label{des:skew}
-   Generates a skewness representation of the image
+\sstroutine{SKEW}{\label{des:SKEW}Generates a skewness representation of the image
 }{
    \sstdescription{
       Performs skewness calculations on an input NDF image
@@ -5800,33 +5686,34 @@ being reached by a correct calculation.
       \sstitemlist{
 
          \sstitem
-         the user may elect to employ a cut out pixel value
+         the user may elect to employ a cut out pixel count value
            where any pixel found to be above that value is ignored. The
-           cutout value is determined by the user inputing a global mode
-           value, its standard deviation (available via
+           cutout value is determined by the user inputting a global mode
+           value, the background count standard deviation (available via
            HISTPEAK) and the number of standard deviations above sky level
            at which the cutout should be.
 
          \sstitem
-         A local mean value may be used as the mode.
+         a local mean value may be used as the mode.
 
       }
       The user is required to enter the size of the sampling area
-      and the pixel size (in arc secs). This is used to define the
+      and the pixel size in arc secs. This is used to define the
       width of pixel template radius employed. It is assumed that
       pixels are the same size in the x and y directions.
 
       The skewness value assigned to each pixel of the output image
       is calculated using the values of pixel count found for all the
       non-bad pixels within the calculated radius. The value obtained
-      is multiplied by 1000 (or some other defined value) to make display
+      is multiplied by 1000 (or a user defined value) to make display
       easier.
 
-      The modal pixel value used during the calculation is either the
-      global value, or a local value calculated as required.
+      The modal count value used during the calculation is either the
+      global value (defined by the user) or a local value calculated
+      as required.
 
       The resultant value is some measure of the extent to which the
-      pixel values surrounding a given pixel are not distributed
+      pixel count values surrounding a given pixel are not distributed
       in a Gaussian manner.
 
       A border is present in the final output image which is the same
@@ -5834,24 +5721,25 @@ being reached by a correct calculation.
       border have been assigned the value bad.
    }
    \sstusage{
-      SKEW IN OUT MODET WIDTH PSIZE MULT [BACK] [SIGMA] [NSIGMA] [USEALL]
+      SKEW IN OUT MODET WIDTH PSIZE MULT [BACK] [SIGMA]\\{}
+\hbox{}\qquad  [NSIGMA] [USEALL]
    }
    \sstparameters{
       \sstsubsection{
          BACK = \_REAL (Read)
       }{
-         The background pixel value found in the input NDF.
-         The units are counts. Only used if MODET = TRUE.
+         The background pixel count value found in the input NDF.
+         Units counts. Only used if MODET = TRUE.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF that is to be examined.
       }
       \sstsubsection{
          MODET = \_LOGICAL (Read)
       }{
-         Used to indicate whether a global modal pixel value
+         Used to indicate whether a global modal count value
          is to be used when calculating the skewness values.
          The alternative is for the application to calculate and use the
          local mode value. See BACK. Using a local background
@@ -5866,29 +5754,31 @@ being reached by a correct calculation.
       \sstsubsection{
          NSIGMA = \_REAL(Read)
       }{
-         The number of background standard deviations above the sky 
-         value at which the pixel count cutoff occurs.
+         The number of standard deviations above the sky level
+         count value, where the pixel count cutoff occurs.
          Only employed if a global pixel count modal value is
          in use (MODET = TRUE).
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the NDF that will be created.
       }
       \sstsubsection{
          PSIZE = \_REAL (Read)
       }{
-         The width of each pixel. The units are arc seconds.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          SIGMA = \_REAL (Read)
       }{
-         The standard deviation of the background value of the pixels in
-         the input NDF. Should be determined using a routine such as
+         The standard deviation of the back ground count within the
+         input NDF. Should be determined using a routine such as
          HISTPEAK which ignores outliers. Only employed if a global
          pixel count modal value is in use (MODET = TRUE).
-         The units are counts.
+         Units counts.
       }
       \sstsubsection{
          USEALL = \_LOGICAL (Read)
@@ -5902,46 +5792,44 @@ being reached by a correct calculation.
          WIDTH = \_REAL (Read)
       }{
          The width of the sampling area/filter to be passed over the
-         image. The units are arc seconds.
+         image. Units arc seconds.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{skew in=ic3374 out=skewed modet=false width=10. psize=0.5
-           mult=1000}
+         skew in=ic3374 out=skewed modet=false width=10. psize=0.5
+\LineBreak
+           mult=1000
       }{
-
-         A skewness image named skewed is generated using ic3374 as
+         A skewness image named SKEWED is generated using IC3374 as
          the source image. The sampling area from which pixels are
          selected is 10 arc seconds across. The individual pixel size
          is .5 arc seconds so the area is 20 pixels across. All the
          skewness values generated for the output image are multiplied
          by a factor of 1000, and local background values are used
          throughout.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{skew in=jet out=sjet modet=true width=5. psize=1.
-           mult=1000. back=2010. useall=true}
+         skew in=jet out=sjet modet=true width=5. mult=1000.
+\LineBreak
+           back=2010. useall=true
       }{
-
          An output image SJET is generated using JET as the source
-         image. The pixel size is 1 arc second, the background 
-         2010. and all the pixels in the image can be used in the
-         calculation. The sampling area width is 5 arc seconds. All
-         the pixels in the image can be used in the calculation.
-
+         image. The background count is 2010 and the pixel size will
+         be determined from the WCS component of the source image.
+         All the pixels in the image can be used in the calculation.
+         The sampling area width is 5 arc seconds. All the pixels
+         in the image can be used in the calculation.
       }
       \sstexamplesubsection{
-         \parbox{143mm}{skew in=sgp27 out=result modet=t width=8 psize=1 
-           mult=1000 back=4505 sigma=23 nsigma=10 useall=f}
+         skew in=sgp27 out=result modet=true width=8. psize=1. mult=1000.
+\LineBreak
+           back=4505. sigma=23.7 nsigma=10. useall=false
       }{
-
          The output image generated is created by assuming a global
-         background of 4505 and a standard deviation
-         of 23 counts. All pixels of a value greater
-         than 4505$+$23$\times$10 are excluded from the calculations.
-
+         background count of 4505. with an associated standard deviation
+         of 23.7 counts. All pixels of a count value greater
+         than 4505$+$23.7x10. are excluded from the calculations.
       }
    }
    \sstimplementationstatus{
@@ -5951,25 +5839,16 @@ being reached by a correct calculation.
       plots showing other statistical quantities such as kurtosis
       or S/N.
    }
-   \sstnotes{
-      It is assumed that the x and y axis pixels sizes are the same
-      size.
-
-      The program indicates its progress by showing the percentage of
-      the image processed every 50 image columns.
-   }
 }
 \newpage
-\sstroutine{TOPPED
-}{\label{des:topped}
-   Remove all pixel values above a certain limit from
+\sstroutine{TOPPED}{\label{des:TOPPED}Remove all pixel values above a certain limit from
    an NDF image file
 }{
    \sstdescription{
       Sets to bad, all the pixels with a count above the threshold
       level. An option allows the close neighbours of the bright pixel
       to be set to bad as well. Close neighbours are considered to be
-      those pixels within a defined radius of the bright pixel.
+      those pixels within a user defined radius of the bright pixel.
 
       A further option allows all bad pixels in the output image to be
       assigned a random value. The values chosen are taken from a
@@ -5982,10 +5861,10 @@ being reached by a correct calculation.
       \sstsubsection{
          BACK = \_REAL (Read)
       }{
-         The background (sky) value. The units are counts.
+         The background count value. Units counts.
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = \_NDF (Read)
       }{
          The name of the NDF that is to be examined.
       }
@@ -5998,61 +5877,65 @@ being reached by a correct calculation.
       \sstsubsection{
          NSIGMA = \_REAL (Read)
       }{
-         The number of background standard deviations above sky at which the
-         cutoff occurs. 
+         The number of standard deviations above sky at which the
+         cutoff occurs.
       }
       \sstsubsection{
-         OUT = NDF (Write)
+         OUT = \_NDF (Write)
       }{
          The name of the output NDF that will be created.
       }
       \sstsubsection{
          PSIZE = \_REAL (Read)
       }{
-         The size of each pixel. The units are arc seconds.
+         The size of each pixel in arc seconds.  If the image contains
+         a SKY co-ordinate frame this value will be determined
+         automatically.
       }
       \sstsubsection{
          SIGMA = \_REAL (Read)
       }{
-         The standard deviation of the background pixel value. The units are counts.
+         The background pixel count standard deviation value. Units
+         counts.
       }
       \sstsubsection{
          WIDTH = \_REAL (Read)
       }{
          The width of the circle around a bright pixel within which
-         pixels will be set to bad. The units are arc seconds.
+         pixels will be set to bad. Units arc seconds.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         \parbox{143mm}{topped in=eggs out=scrambled width=2.5 psize=0.44 
-             back=1000. sigma=23. nsigma=8. noise=false}
+         topped in=eggs out=scrambled width=2.5 psize=0.44 back=1000.
+\LineBreak
+             sigma=23. nsigma=8. noise=false
       }{
-
          Uses EGGS as the input image and finds all pixels within the
-         image that have a count greater than 1000.$+$8.$\times$23. These are
+         image that have a count greater than 1000.$+$8.x23. These are
          all set to the bad value. In addition, all pixels within a
          radius of 1.25 arc seconds are also set to bad.
-
       }
       \sstexamplesubsection{
-         \parbox{143mm}{topped in=obj out=cut width=4 psize=1 back=6200
-             sigma=390 nsigma=10 noise=t}
+         topped in=objects out=cut width=4. back=6200. sigma=390.
+\LineBreak
+             nsigma=10. noise=true
       }{
-
-         Uses OBJ as the input image and finds all pixels within
-         the image that have a value greater than 6200$+$10$\times$390.
+         Uses OBJECTS as the input image and finds all pixels within
+         the image that have a count value greater than 6200.$+$10.x390..
          These are all set to random values, as are all the pixels
-         within a radius of 2 arc seconds.
-
+         within a radius of 2. arc seconds. Pixel size in arc seconds
+         will be determined if possible from the WCS component of the
+         image.
       }
    }
    \sstnotes{
       The distribution of pixel values used when NOISE=TRUE comes
       from a Normal (Gaussian) distribution. In some circumstances,
-      particularly for low pixel values, this may not be appropriate.
+      particularly for low count values, this may not be appropriate.
    }
 }
+%%%ENDSST
 
 \newpage
 
@@ -6489,53 +6372,53 @@ ic3374c
 \label{app:backpage}
 
 {\bf CORR}{ --- Cross-correlates a galaxy template with an image.}
-\pageref{des:corr}
+\pageref{des:CORR}
 
 {\bf ELLFOU}{ --- Ellipse fits galaxies by contour analysis.}
-\pageref{des:ellfou}
+\pageref{des:ELLFOU}
 
 {\bf ELLPRO}{ --- Ellipse fits galaxies by intensity analysis.}
-\pageref{des:ellpro}
+\pageref{des:ELLPRO}
 
 {\bf FASTMED}{ --- Variable size median filtering.}
-\pageref{des:fast}
+\pageref{des:FASTMED}
 
 {\bf GAUFIT}{ --- 2-D Gaussian fit to source.}
-\pageref{des:gaufit}
+\pageref{des:GAUFIT}
 
 {\bf GRAPHS}{ --- Display and analyse profile results.}
-\pageref{des:graphs}
+\pageref{des:GRAPHS}
 
 {\bf HISTPEAK}{ --- Determine image pixel count statistics.}
-\pageref{des:histpeak}
+\pageref{des:HISTPEAK}
 
 {\bf HSUB}{ --- An application employing HISTPEAK as a subroutine.}
-\pageref{des:hsub}
+\pageref{des:HSUB}
 
 {\bf LOBACK}{ --- Determines the background value at numerous image locations}
-\pageref{des:loback}
+\pageref{des:LOBACK}
 
 {\bf MASK}{ --- Uses an ARD file definition to set to bad the specified pixels
 of an image.}
-\pageref{des:mask}
+\pageref{des:MASK}
 
 {\bf MIXUP}{ --- Scrambles the positions of all the pixels on an image.}
-\pageref{des:mixup}
+\pageref{des:MIXUP}
 
 {\bf SECTOR}{ --- Generates a pie-slice profile of a galaxy/source.}
-\pageref{des:sector}
+\pageref{des:SECTOR}
 
 {\bf SELFC}{ --- Self-correlates an image on a given scale.}
-\pageref{des:selfc}
+\pageref{des:SELFC}
 
 {\bf SELFCW}{ --- Self/cross-correlates a galaxy template with an image.}
-\pageref{des:selfcw}
+\pageref{des:SELFCW}
 
 {\bf SKEW}{ --- Highlights flatfielding problems.}
-\pageref{des:skew}
+\pageref{des:SKEW}
 
 {\bf TOPPED}{ --- Removes bright parts of an image.}
-\pageref{des:topped}
+\pageref{des:TOPPED}
 
 
 \end{document}

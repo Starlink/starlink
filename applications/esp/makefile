@@ -150,7 +150,8 @@
 #  Implementation Deficiencies:
 #
 #  Copyright:
-#     Copyright (C) 1995 Rutherford Appleton Laboratory
+#     Copyright (C) 1996, 1997, 1998, 1999 
+#            Central Laboratory of the Research Councils
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink, RAL)
@@ -246,6 +247,8 @@
 #        Added modules gaufit2.f and nsg.f to F_SUB1
 #     15-JUN-1998 (NG):
 #        Altered make rule .hlp.shl to include PKG_VERS in help library.
+#     15-NOV-1999 (NG, MBT):
+#        Various minor fixes to build procedure.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -419,7 +422,7 @@ PKG_LINK = ESP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.9-5
+PKG_VERS = 0.10-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the

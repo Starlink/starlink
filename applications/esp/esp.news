@@ -4,16 +4,30 @@
  The ESP package has been rereleased on Unix.  This is a package for
  Extended Surface Photometry, aimed at photometry of large galaxies. 
 
- The only package to change in this release is GAUFIT, which has been
- modified to give it an alternative fitting algorithm; this should be
- slightly faster and more robust, and it allows us to give
- uncertainties on the fit parameters.  Also, the application can
- now report the parameters for fitted gaussians as FWHM or sigma, and
- in units of arcsecs or pixels.
+ ESP has been modified to be aware of the World Coordinate 
+ System (WCS) components of NDFs.
 
- This version of ESP also contains a number of bug fixes and the 
- document SUN/180 has been upgraded to include information on the new
- facilities within GAUFIT. 
+ The COSYS parameter has been removed from all ESP applications, 
+ so that all user input and output is now in the Current 
+ co-ordinate system of the NDF.  The Current co-ordinate system 
+ is a characteristic of the WCS component of the NDF.  
+ Thus, instead of setting COSYS to use either 'Data' or 'World'
+ co-ordinate sytems, you should now set the Current frame of the 
+ NDF's WCS component (e.g. using KAPPA's WCSFRAME apllication) 
+ to the desired co-ordinate system before running the ESP 
+ application.
+
+ Output to data files is however in Base (WCS GRID frame) 
+ co-ordinates, which are pixel co-ordinates guaranteed to start 
+ at (1,1).
+
+ For NDFs which have a WCS component with a SKY frame in it, the
+ PSIZE parameter (pixel size in arc seconds) is now determined 
+ automatically rather than being solicited from the user.
+ This can be overridded by specifying it on the command line.
+
+ ESP applications which generate output NDFs from input NDFs now
+ propagate the WCS component where appropriate.
 
  ESP is available for Unix shell or ICL. To start ESP in the shell, type:
  

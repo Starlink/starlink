@@ -1,4 +1,4 @@
-*+
+*
 *   This module contains a call to the non-linear solving routine NSG, as
 *   contained in module dnsg.f.
 *
@@ -57,7 +57,7 @@
 *     gau1_fmode hasn't been altered at all; gau2_* still have writes;
 *     make sure to restrict the output gaussian angle to +/- pi,
 *     worrying about what this will do to the corresponding error.
-*-
+*
 
 
 

@@ -18,7 +18,8 @@
 
 *  Description: 
 *     Uses a minimisation routine to determine the 2-D Gaussian profiles
-*     of multiple sources on an NDF format image.
+*     of multiple sources on an NDF format image. This will be especially
+*     useful for those using JCMT data (see also \xref{JCMTDR}{sun132}{}).
 *
 *     Source locations can be specified using a cursor or by 
 *     text file. The user is allowed to restrain the extent to which 
@@ -36,28 +37,46 @@
 *     image model or an image containing the residuals in the regions 
 *     surrounding the sources.
 *
+*     There are two separate fitting algorithms within GAUFIT, a
+*     non-linear least-squares routine (selectable with parameter
+*     LSQFIT=true) or the original parameter-search routine.  Some of
+*     the parameters below have slightly different behaviour in the two
+*     modes, or are only available in one mode or the other.  These are
+*     indicated by prefacing the variant descriptions with either [PS:]
+*     for parameter-search mode (lsqfit=false) or [LSQ:] for
+*     least-squares (lsqfit=true)
+*   
 *      
 *  Usage:
-*     GAUFIT MODE BACK IMGDEV SIGMA NSIGMA OUT IN MODEL  
-*            MODTYPE INFILE COLOUR ANGCON ANGOFF AUTOL 
-*            XINC YINC SAINC SBINC PINC ANGINC
- 
+*     GAUFIT IN INFILE OUT MODE MODEL IMGDEV
+*            MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE
+*            BACK SIGMA NSIGMA
+*            LSQFIT=false AUTOL XINC YINC SAINC SBINC PINC ANGINC NITER
+* 
+*     GAUFIT IN INFILE OUT MODE MODEL IMGDEV
+*            MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE
+*            BACK SIGMA NSIGMA
+*            LSQFIT=true CALCSD MAXITER
+
 *  ADAM Parameters:                   
 *     ANGCON = _LOGICAL (Read)
 *        Angle rotation convention. Defines if clockwise or
 *        anticlockwise is considered positive. TRUE=Clockwise.
 *     ANGINC = _REAL (Read)
-*        The amount by which the angle of a source may vary.
+*        [PS:] The amount by which the angle of a source may vary.
 *        Arbitrary range 0 to 1. 1 = free to move as required.
 *        0 = unable to move.  
 *     ANGOFF = _REAL (Read) 
 *        Angular offset for position angles generated. Units degrees.
 *     AUTOL = _LOGICAL (Read)
-*        Is the source origin provided to be refined?
+*        [PS:] Is the source origin provided to be refined?
 *     BACK = _REAL (Read)
-*        The background value for the image.
+*        The background value for the image.  [LSQ:] You may give this
+*        as a negative number, to have the routine obtain and report the
+*        best-fit background; in this case, the SIGMA and NSIGMA
+*        parameters are ignored.
 *     CALCSD = _LOGICAL (Read)
-*        Should we calculate and display parameter uncertainties?
+*        [LSQ:] Should we calculate and display parameter uncertainties?
 *        A significant part of the calculation is taken up with this
 *        calculation, so if you do not want the uncertainties, you will save
 *        time by opting not to calculate them.
@@ -77,12 +96,14 @@
 *        The name of the source NDF data structure/file.
 *     LSQFIT = _LOGICAL (Read)
 *        Is the application to use the least-squares fitting
-*        routine?  Must be LSQFIT=TRUE to use this variant of the routine.
-*     MAXITER = _LOGICAL (Read)
-*        Maximum number of iterations (-1 indicates that you are happy
+*        routine, or the older parameter-search method?
+*     MAXITER = _INTEGER (Read)
+*        [LSQ:] Upper-bound on the iteration count within the
+*        least-squares method 
+*        (-1 indicates that you are happy
 *        with the default limit).  The default maximum count is large, and
 *        intended as an upper bound on the iteration count, to stop it spinning
-*        its wheels uselessly due to some programming error.  You should not
+*        its wheels uselessly on some pathological dataset.  You should not
 *        need to change this unless you suspect that the limit is genuinely
 *        being reached by a correct calculation.
 *     MODE = _LOGICAL (Read)
@@ -95,39 +116,37 @@
 *        residuals near the sources. MODTYP=W gives the whole
 *        image model.
 *     NITER = _INTEGER (Read)
-*        The maximum number of iterations before the routine abandons
-*        the calculation.  This is only a guard to prevent the routine
-*        running away on a pathological dataset.  You should normally use
-*        the default, obtained by giving this parameter as a negative
-*        number.
+*        [PS:] The number of iterations performed by the parameter-search
+*        routine.
 *     NSIGMA = _REAL (Read)
 *        Number of sigma above sky at which pixels are considered 
-*        to be significant.
+*        to be significant. [LSQ:] If you give back=-1, then this is ignored.
 *     OUT = _CHAR (Read)
 *        File name for the output text file containing the profile 
 *        data.
 *     PINC = _REAL (Read)
-*        The amount by which the peak of a source may vary.
+*        [PS:] The amount by which the peak of a source may vary.
 *        1 = free to move as required. 0 = unable to move.  
 *     PSIZE = _REAL (Read)
 *        The size of each pixel in arc seconds.  If the image contains
 *        a SKY co-ordinate frame this value will be determined 
 *        automatically.
 *     SAINC = _REAL (Read)
-*        The amount by which the standard deviation of a source may vary
+*        [PS:] The amount by which the standard deviation of a source may vary
 *        per iteration. Largest axis. 1 = free to move as required. 
 *        0 = unable to move.  
 *     SBINC = _REAL (Read)
-*        The amount by which the standard deviation of a source may vary
+*        [PS:] The amount by which the standard deviation of a source may vary
 *        per iteration. Smallest axis.
 *     SIGMA = _REAL (Read)
-*        Standard deviation of the sky count.
+*        Standard deviation of the sky count. [LSQ:] If you give
+*        back=-1, then this is ignored.
 *     XINC = _REAL (Read)
-*        The amount by which the x coordinate of a source may vary
+*        [PS:] The amount by which the x coordinate of a source may vary
 *        per iteration. 1 = free to move as required.
 *        0 = unable to move.  
 *     YINC = _REAL (Read)
-*        The amount by which the x coordinate of a source may vary
+*        [PS:] The amount by which the x coordinate of a source may vary
 *        per iteration. 1 = free to move as required.
 *        0 = unable to move.  
 *
@@ -148,6 +167,13 @@
 *        between the models and the source image in the vicinity
 *        of the sources. The resultant position angles will be
 *        modified by 90 degrees.
+*
+*     gaufit mode=true lsqfit=true back=-1 out=test1 angoff=90
+*
+*        The sources will be identified by cursor. The resultant
+*        position angles will be modified by 90 degrees.  The source
+*        positions will be identified using a least-squares fitting
+*        technique, which will also fit the background.
 *
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
