@@ -365,13 +365,18 @@
         STATUS=SAI__ERROR
       ENDIF
 
-*  Close dataset if opened in this invokation
-      IF (.NOT.LIVE) THEN
+*  Close dataset if opened in this invocation
+      IF (LIVE) THEN
+*  update local caches for image processing
+        IF (CONTEXT.EQ.'IMAGE') THEN
+          CALL IMG_GCB(STATUS)
+        ENDIF
+      ELSE
         IF (.NOT.G_OPEN) THEN
           CALL USI_ANNUL( 'INP', STATUS )
         ENDIF
         CALL GCB_DETACH(STATUS)
-      END IF
+      ENDIF
 
       CALL AST_ERR(STATUS)
 

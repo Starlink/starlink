@@ -1468,6 +1468,41 @@
       END
 
 
+*+ IMG_GCB
+	SUBROUTINE IMG_GCB(STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+*  Import :
+*  Export :
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (I_DISP) THEN
+          IF (I_CACHE.EQ.0) THEN
+            CALL GCB_CRECACHE(I_CACHE,STATUS)
+          ENDIF
+          CALL GCB_CACHE(I_CACHE,STATUS)
+        ELSEIF (I_PLOT) THEN
+          IF (I_CACHE_1D.EQ.0) THEN
+            CALL GCB_CRECACHE(I_CACHE_1D,STATUS)
+          ENDIF
+          CALL GCB_CACHE(I_CACHE_1D,STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
+
 *+ IMG_PLOT - plot 1D data
 	SUBROUTINE IMG_PLOT(STATUS)
 
