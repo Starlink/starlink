@@ -64,6 +64,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 *
 *  Authors :
 *     DLT: David Terrett (Starlink RAL)
+*     TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -71,6 +72,8 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 *        Orignal version
 *      05-MAR-1999 (DLT):
 *        Use attributes of window instead of default attributes of X server
+*      13-MAR-2004 (TIMJ):
+*        pix_id is not a pointer and so can not be initialised with a NULL
 *     {enter_changes_here}
 *
 *  Bugs:
@@ -168,7 +171,7 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
     if (!(pix_array)) return GWM_MEM_ALLOC;
 
   /*  From now on there are resources to be deallocated if an error occurs */
-    pix_id = NULL;
+    pix_id = 0;
 
 /*	  
 **  Allocate the number of colour cells requested - read/write if the server
