@@ -121,6 +121,13 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+     [echo] Executing VO target: deinstall
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+deinstall:
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+real_deinstall:
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
@@ -254,6 +261,10 @@ clean:
      [echo] Executing VOTable target: clean
 
 clean:
+     [echo] Executing VO target: clean
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+clean:
      [echo] Executing JAIUtil target: clean
 
 clean:
@@ -377,7 +388,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 125 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 126 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 10 empty directories to 1 empty directory under /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -414,6 +425,12 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/java
      [copy] Copying 53 files to /apps/cvsbuild/java/source/votable/build/java
+     [echo] Executing VO target: javadoc-sources
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/vo/build/java
+     [copy] Copying 11 files to /apps/cvsbuild/java/source/vo/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -476,6 +493,6 @@ javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
 
 BUILD FAILED
-/apps/cvsbuild/java/source/build.xml:554: No supported regular expression matcher found
+/apps/cvsbuild/java/source/build.xml:561: No supported regular expression matcher found
 
-Total time: 46 seconds
+Total time: 45 seconds

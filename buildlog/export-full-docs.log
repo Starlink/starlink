@@ -81,6 +81,9 @@ javadoc-sources:
      [echo] Executing VOTable target: javadoc-sources
 
 javadoc-sources:
+     [echo] Executing VO target: javadoc-sources
+
+javadoc-sources:
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -141,6 +144,8 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.astrogrid...
   [javadoc] Loading source files for package uk.ac.starlink.votable...
   [javadoc] Loading source files for package uk.ac.starlink.votable.dom...
+  [javadoc] Loading source files for package org.us_vo.www...
+  [javadoc] Loading source files for package uk.ac.starlink.vo...
   [javadoc] Loading source files for package uk.ac.starlink.hdx...
   [javadoc] Loading source files for package uk.ac.starlink.jaiutil...
   [javadoc] Loading source files for package uk.ac.starlink.mirage...
@@ -1902,7 +1907,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 148 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 150 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2072,6 +2077,35 @@ dist:
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 54 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing VO target: install
+
+prepare:
+
+check_packages:
+
+ws_sources:
+[axis-wsdl2java] WSDL2Java http://nvo.stsci.edu/voregistry/registry.asmx?WSDL
+
+build:
+    [javac] Compiling 79 source files to /apps/cvsbuild/java/source/vo/build/classes
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 30 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -2229,7 +2263,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -2430,4 +2463,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 18 seconds
+Total time: 8 minutes 3 seconds

@@ -9739,6 +9739,7 @@ U java/source/table/src/main/uk/ac/starlink/table/formats/WDCTableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
 U java/source/table/src/main/uk/ac/starlink/table/gui/BasicTableConsumer.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/BasicTableLoadDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/FileChooserLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/LoadWorker.java
@@ -10602,6 +10603,32 @@ U java/source/util/src/testcases/uk/ac/starlink/util/URLUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/XMLUtilTest.java
 cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink/util/gui
 U java/source/util/src/testcases/uk/ac/starlink/util/gui/RendererTest.java
+cvs checkout: Updating java/source/vo
+U java/source/vo/.properties
+U java/source/vo/build.xml
+cvs checkout: Updating java/source/vo/src
+cvs checkout: Updating java/source/vo/src/main
+cvs checkout: Updating java/source/vo/src/main/uk
+cvs checkout: Updating java/source/vo/src/main/uk/ac
+cvs checkout: Updating java/source/vo/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/vo/src/main/uk/ac/starlink/vo
+U java/source/vo/src/main/uk/ac/starlink/vo/BeanTableModel.java
+U java/source/vo/src/main/uk/ac/starlink/vo/CheckBoxMenu.java
+U java/source/vo/src/main/uk/ac/starlink/vo/ConeSearch.java
+U java/source/vo/src/main/uk/ac/starlink/vo/ConeSearchDialog.java
+U java/source/vo/src/main/uk/ac/starlink/vo/MetaColumnModel.java
+U java/source/vo/src/main/uk/ac/starlink/vo/RegistryInterrogator.java
+U java/source/vo/src/main/uk/ac/starlink/vo/RegistryPanel.java
+U java/source/vo/src/main/uk/ac/starlink/vo/RegistryQueryPanel.java
+U java/source/vo/src/main/uk/ac/starlink/vo/RegistryTable.java
+U java/source/vo/src/main/uk/ac/starlink/vo/ValueConverter.java
+U java/source/vo/src/main/uk/ac/starlink/vo/ValueField.java
+cvs checkout: Updating java/source/vo/src/testcases
+cvs checkout: Updating java/source/vo/src/testcases/uk
+cvs checkout: Updating java/source/vo/src/testcases/uk/ac
+cvs checkout: Updating java/source/vo/src/testcases/uk/ac/starlink
+cvs checkout: Updating java/source/vo/src/testcases/uk/ac/starlink/vo
+U java/source/vo/src/testcases/uk/ac/starlink/vo/RegistryTest.java
 cvs checkout: Updating java/source/votable
 U java/source/votable/.properties
 U java/source/votable/build.xml

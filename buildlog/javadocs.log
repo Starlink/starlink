@@ -1580,9 +1580,10 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:54: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:54: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:54: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:86: warning - Tag @link: reference not found: uk.ac.starlink.astrogrid.MyspaceTableLoadDialog
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:90: warning - Tag @link: reference not found: uk.ac.starlink.astrogrid.MyspaceTableLoadDialog
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:90: warning - Tag @link: reference not found: uk.ac.starlink.vo.ConeSearchDialog
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 9 warnings
      [echo] Executing NDTools target: javadocs
 
 prepare:
@@ -1719,6 +1720,23 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.votable...
   [javadoc] Loading source files for package uk.ac.starlink.votable.dom...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
+     [echo] Executing VO target: javadocs
+
+prepare:
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/vo/docs/vo/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.vo...
   [javadoc] Constructing Javadoc information...
   [javadoc] Standard Doclet version 1.4.1
 
@@ -2813,4 +2831,4 @@ javadocs:
   [javadoc] 205 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 29 seconds
+Total time: 3 minutes 36 seconds

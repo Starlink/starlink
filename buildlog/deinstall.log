@@ -144,6 +144,14 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/votable/.votable.install
+     [echo] Executing VO target: deinstall
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+deinstall:
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/vo/.vo.install
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
@@ -218,4 +226,4 @@ real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/.frog.install
 
 BUILD SUCCESSFUL
-Total time: 20 seconds
+Total time: 23 seconds

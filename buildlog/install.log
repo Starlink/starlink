@@ -475,7 +475,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/table
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 148 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 150 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -677,6 +677,42 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/votable
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 54 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing VO target: install
+
+prepare:
+
+check_packages:
+
+ws_sources:
+[axis-wsdl2java] WSDL2Java http://nvo.stsci.edu/voregistry/registry.asmx?WSDL
+
+build:
+    [javac] Compiling 90 source files to /apps/cvsbuild/java/source/vo/build/classes
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/vo/lib/vo
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/vo/bin/vo
+    [mkdir] Created dir: /apps/cvsbuild/java/source/vo/etc/vo
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/bin/vo
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/vo
+    [mkdir] Created dir: /apps/cvsbuild/starjava/etc/vo
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/vo
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 30 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -940,7 +976,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Dec 22, 2004 5:19:36 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 24, 2004 5:20:52 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] INFO: java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:146)
@@ -966,7 +1002,7 @@ docs:
   [javadoc] 	at java.lang.System.loadLibrary(System.java:832)
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:111)
   [javadoc] 	... 16 more
-  [javadoc] Dec 22, 2004 5:19:36 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 24, 2004 5:20:52 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST load failed - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1165,4 +1201,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 44 seconds
+Total time: 6 minutes 6 seconds

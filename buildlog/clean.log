@@ -143,6 +143,14 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/votable/build
    [delete] Deleting directory /apps/cvsbuild/java/source/votable/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/votable/docs
+     [echo] Executing VO target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/vo/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/vo/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/vo/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/vo/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/vo/etc
      [echo] Executing JAIUtil target: clean
 
 clean:
@@ -230,4 +238,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 BUILD SUCCESSFUL
-Total time: 23 seconds
+Total time: 27 seconds

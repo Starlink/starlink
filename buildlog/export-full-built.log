@@ -420,7 +420,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 148 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 150 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -590,6 +590,35 @@ dist:
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 54 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing VO target: install
+
+prepare:
+
+check_packages:
+
+ws_sources:
+[axis-wsdl2java] WSDL2Java http://nvo.stsci.edu/voregistry/registry.asmx?WSDL
+
+build:
+    [javac] Compiling 79 source files to /apps/cvsbuild/java/source/vo/build/classes
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 30 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -948,4 +977,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 6 minutes 17 seconds
+Total time: 6 minutes 1 second
