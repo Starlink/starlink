@@ -85,6 +85,7 @@
    }
 
 # Print out the footer.
+   print "            REG_SOURCE = 0\n";
    print "         ELSE\n";
    print "            REG_SOURCE = 0\n";
    print "         END IF\n";
