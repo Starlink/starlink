@@ -71,6 +71,8 @@
 *     14-SEP-1992 (DSB):
 *        Original version, modified from KAPPA equivalent written by 
 *        MJC.
+*      8-AUG-2004 (TIMJ):
+*        Use SHL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,30 +85,18 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'PAR_ERR'        ! Parameter-system errors
+
 
 *  Status:
       INTEGER STATUS
 
 *  External References:
-      INTEGER
-     :  CHR_LEN                ! Length of character strings ignoring
-                               ! trailing blanks
 
 *  Local Constants:
-      INTEGER MAXLEV           ! Maximum number of help levels
-      PARAMETER ( MAXLEV = 4 )
 
 *  Local Variables:
-      CHARACTER*19
-     :  HLPTXT*80,             ! Composite command
-     :  LIBRAY*132,            ! Library name 
-     :  TOPIC( MAXLEV )        ! Name of the topic required
+      CHARACTER*32 LIBRAY
 
-      INTEGER
-     :  I,                     ! Loop counter
-     :  NC                     ! Number of characters in the help string
-                               ! less trailing blanks
 *.
 
 *  Check the inherited status.
@@ -116,54 +106,9 @@
       CALL PAR_GET0C( 'LIBRARY', LIBRAY, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Form the full library name.
-         NC = CHR_LEN( LIBRAY )
-         IF( LIBRAY( NC - 3: ) .NE. '.SHL' .AND.
-     :       LIBRAY( NC - 3: ) .NE. '.shl' ) THEN
-            CALL CHR_APPND( '.shl', LIBRAY, NC )
-         END IF
+*  Open the help library application layer
+      CALL SHL_ADAM( LIBRAY, .TRUE., STATUS)
 
-*  Get topic and subtopics.
-         CALL PAR_GET0C( 'TOPIC', TOPIC(1), STATUS )
-         CALL PAR_CANCL( 'TOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBTOPIC', TOPIC(2), STATUS )
-         CALL PAR_CANCL( 'SUBTOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBSUBTOPIC', TOPIC(3), STATUS )
-         CALL PAR_CANCL( 'SUBSUBTOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBSUBSUBTOPIC', TOPIC(4), STATUS )
-         CALL PAR_CANCL( 'SUBSUBSUBTOPIC', STATUS )
-
-*  Concatenate the help topics into a single string
-         HLPTXT = TOPIC( 1 )
-         NC = CHR_LEN( TOPIC( 1 ) ) + 1
-         DO I = 2, MAXLEV
-            CALL CHR_APPND( ' '//TOPIC( I ), HLPTXT, NC )
-         END DO
-
-*  Use a null string when something has gone wrong obtaining the
-*  topics and sub-topics.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_ANNUL( STATUS )
-            HLPTXT = '         '
-         END IF
-
-*  Get help text.
-         CALL IRM_GTHLP( LIBRAY, HLPTXT, STATUS )
-      END IF
-
-*  If a parameter null or abort value was given, annul the error.
-      IF( STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT ) THEN
-         CALL ERR_ANNUL( STATUS )
-      END IF
-
-*  If an error occurred, then report a contextual message.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'I90HELP_ERR1',
-     :                 'I90HELP: Error displaying help.',
-     :                  STATUS )
       END IF
       
       END
