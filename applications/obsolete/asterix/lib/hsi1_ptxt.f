@@ -99,6 +99,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
+      CHARACTER*1		NUL			! String separator
+        PARAMETER		( NUL = CHAR(0) )
       INTEGER			TLEN			! History text length
         PARAMETER		( TLEN = 80 )
 
@@ -110,14 +112,17 @@
       CHARACTER*(DAT__SZLOC)	TXLOC			! TEXT structure
       CHARACTER*(DAT__SZLOC)	TXCLOC			! TEXT cell
 
-      CHARACTER*132		LINE			! Line of text
+      CHARACTER*512		LINE			! Line of text
 
       INTEGER			CID			! String array slice
       INTEGER			CURREC			! Current rec number
+      INTEGER			I			! Loop over LINE
       INTEGER			ILINE 			! Loop over lines
+      INTEGER			IPOS, NPOS		! String pointers
       INTEGER			IVERB			! Verbosity
       INTEGER			NL 			! # existing lines
       INTEGER			NLINE 			! # lines to write
+      INTEGER			NNUL			! # nulls in LINE
 
       LOGICAL			THERE			! Exists already?
 *.
@@ -179,21 +184,47 @@
         END IF
 
 *    Write lines one at a time
+        JLINE = NL + 1
         DO ILINE = 1, NLINE
 
-*      Locate ILINE'th ADI string
+*      Locate ILINE'th ADI string and get its data
           CALL ADI_CELL( ARGS(2), 1, ILINE, CID, STATUS )
-
-*      Locate the (NL+ILINE)'th HDS string
-          CALL DAT_CELL( TXLOC, 1, NL + ILINE, TXCLOC, STATUS )
-
-*      Extract the string and write it
-          CALL ADI_GET0C( CID, LINE, STATUS )
-          CALL DAT_PUT0C( TXCLOC, LINE(:TLEN), STATUS )
-
-*      Release the sliced objects
+          CALL ADI_CLEN( CID, LLEN, STATUS )
+          CALL ADI_GET0C( CID, LINE(:LLEN), STATUS )
           CALL ADI_ERASE( CID, STATUS )
-          CALL DAT_ANNUL( TXCLOC, STATUS )
+
+*      If the string contains nulls we need to split it into several
+*      lines. Count the nulls and extend the text array
+          NNUL = 0
+          DO I = 1, LLEN
+            IF ( LINE(I:I) .EQ. NUL ) NNUL = NNUL + 1
+          END DO
+          IF ( NNUL .GT. 0 ) THEN
+            CALL DAT_SIZE( TXLOC, NL, STATUS )
+            CALL DAT_ALTER( TXLOC, 1, NL + NNUL, STATUS )
+          END IF
+
+*      Write each bit of LINE to a new HDS string
+          IPOS = 1
+          DO WHILE ( IPOS .LE. LLEN )
+
+*        Find position of next null
+            NPOS = INDEX( LINE(IPOS:), NUL )
+            IF ( NPOS .EQ. 0 ) THEN
+              NPOS = LLEN + 1
+            ELSE
+              NPOS = NPOS + IPOS
+            END IF
+
+*        Write the HDS string
+            CALL DAT_CELL( TXLOC, 1, JLINE, TXCLOC, STATUS )
+            CALL DAT_PUT0C( TXCLOC, LINE(IPOS:NPOS-1), STATUS )
+            CALL DAT_ANNUL( TXCLOC, STATUS )
+
+*        Next bit of line
+            IPOS = NPOS + 1
+
+          END DO
 
         END DO
 
