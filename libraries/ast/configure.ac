@@ -40,7 +40,7 @@ AC_PATH_PROG(PERL, perl, [/usr/bin/env perl], [$STARLINK/Perl/bin:$PATH])
 AC_CHECK_FUNCS([isnan])
 AC_CHECK_DECLS([isnan],,,[#include <math.h>
                          ])
-STAR_DECLARE_DEPENDENCIES(sourceset, sst)
+STAR_DECLARE_DEPENDENCIES(sourceset, [sst htx])
 STAR_DECLARE_DEPENDENCIES(build, sla)
 
 #   Declare the message file.  
