@@ -1,5 +1,5 @@
 package Starlink::NBS;
-
+use Starlink::EMS;
 use 5.004;
 use strict;
 use Carp;
@@ -16,7 +16,7 @@ require AutoLoader;
 
 
 # VERSION number
-$VERSION = '1.0';
+$VERSION = '1.01';
 
 
 # Set up export tags just in case somebody doesn't want to use
@@ -112,8 +112,6 @@ Starlink::NBS - Perl extension for accessing NBS noticeboards
 This module provides an OO interface to the NBS system.
 
 
-=cut
-
 =head1 METHODS
 
 The available methods are
@@ -127,8 +125,8 @@ The available methods are
 
 =item new
 
-  Create a new instance of a Starlink::NBS object.
-  Only used directly to access the top level of the noticeboard
+Create a new instance of a Starlink::NBS object.
+Only used directly to access the top level of the noticeboard
 
    $nbs_id  = new Starlink::NBS("nbsname");
 
@@ -163,11 +161,11 @@ sub new {
 
 =item General access methods
 
-  These methods are for accessing the "instance" data:
-    name, path, id, top, status, nchilds
+These methods are for accessing the "instance" data:
+    name, path, id, top, status, nchilds, debug
 
-  With args they set the values.
-  Without args they retrieve the values
+With args they set the values.
+Without args they retrieve the values
 
 =cut
 
@@ -216,6 +214,12 @@ sub status {
   return $self->{Status};
 }
 
+sub debug {
+  my $self = shift;
+  if (@_) { $self->{Debug} = shift; }
+  return $self->{Debug};
+}
+
 sub nchilds {
   # This routine calculates the number of children
   # associated with an object
@@ -257,7 +261,7 @@ sub isokay {
 
 =item loadnbs
 
-  Method to load a top level noticeboard
+Method to load a top level noticeboard
 
 =cut
 
@@ -287,7 +291,7 @@ sub loadnbs {
 
 =item type
 
-  Find the storage type of an object
+Find the storage type of an object
 
     Arguments: None (but uses the current status of the object)
     Returns:  ($type, $status)
@@ -307,7 +311,7 @@ sub type {
 
 =item primitive
 
-  Determines whether the object is a primitive
+Determines whether the object is a primitive
 
   Arguments: None (but uses the current status of the object)
   Returns:  ($prim, $status)
@@ -332,7 +336,7 @@ sub primitive {
 
 =item name
 
-  Find the name of the object
+Find the name of the object
 
    Arguments:  None (but uses the current status of the object)
    Returns:  ($name, $status)
@@ -354,16 +358,16 @@ sub name {
 
 =item size
 
-  Find the size of the item
+Find the size of the item
 
     Arguments: None (but uses the current status of the object)
     Returns: ($size, $maxsize, $status)
 
-  Returns status = NBS__NOPRIMITIVE if the object is not a primitive.
-  Returns status = NBS__NILID  if the object is not defined
+Returns status = NBS__NOPRIMITIVE if the object is not a primitive.
+Returns status = NBS__NILID  if the object is not defined
 
-  The returned size is the number of entries that can be contained.
-  (ie not bytes unless a _CHAR) and depends on the type of the object.
+The returned size is the number of entries that can be contained.
+(ie not bytes unless a _CHAR) and depends on the type of the object.
 
 =cut
 
@@ -380,7 +384,7 @@ sub size {
   # If we have a primitive then we can proceed
   if ($primitive) {
 
-    print "It is a primitive\n";
+    print "primitive Name = ". ($self->name)[0] ."\n" if $self->debug;
     # Now get the size in bytes
     nbs_get_size($self->id, $bmaxsize, $bsize, $status);
 
@@ -405,7 +409,7 @@ sub size {
 
 
   } else {
-   print "It is not a primitive\n";
+   print "It is not a primitive\n" if $self->debug;
    $status = &NBS__NOTPRIMITIVE;
  
   }
@@ -452,15 +456,14 @@ sub nth_name {
 
 =item find
 
-  Find an item in a noticeboard. The full path name must be given.
-  The item must exist below the current object.
+Find an item in a noticeboard. The full path name must be given.
+The item must exist below the current object.
 
   Arguments: Full name of object (separated by dots)
              An object relative to the current object can be
              given if it starts with a '.'
    
-  Returns an object blessed into Starlink::NBS
-
+Returns an object blessed into Starlink::NBS
 
 =cut
 
@@ -534,8 +537,8 @@ sub find {
 
 =item get
 
-  Get the item corresponding to the current object.
-  Must be a primitive object
+Get the item corresponding to the current object.
+Must be a primitive object
 
   Arguments: None (uses current status of object)
   Returns:   Status and The values (in array context)
@@ -587,7 +590,8 @@ sub get {
 
         # Type not found
         $status = &NBS__IMPOSSIBLE;
-        print "Type $type is not supported\n";
+	my $name = ($self->name)[0];
+        print "Cannot get data for $name from item of type $type\n";
 
       }
     }
@@ -605,7 +609,7 @@ sub get {
 
 =item put
 
-  Put values into the object
+Put values into the object
 
    Arguments: Values (however many values are supported)
    Returns:  Status
@@ -641,7 +645,7 @@ sub put {
         nbs_put_value_i($self->id, $#values+1, \@values, $status);
 
       } elsif ($type eq '_REAL') {
-  
+
         nbs_put_value_f($self->id, $#values+1, \@values, $status);
 
       } elsif ($type eq '_DOUBLE') {
@@ -654,14 +658,14 @@ sub put {
 
       } elsif ($type eq '_CHAR') {
   
-        $string = $values[0]; # This routine needs a string
-        nbs_put_value_c($self->id, $string, $status);
+        nbs_put_value_c($self->id, $values[0], $status);
 
       } else {
 
         # Type not found
         $status = &NBS__IMPOSSIBLE;
-        print "Type $type is not supported\n";
+	my $name = ($self->name)[0];
+        print "Cannot put data for $name into item of type $type\n";
 
       }
     } 
@@ -767,7 +771,7 @@ object points to a structure a reference to a perl hash is returned.
 If the object points to a primitive a reference to a perl scalar is
 returned.
 
-=cut 
+=cut
 
 sub tienbs {
   my $self = shift;
@@ -838,7 +842,9 @@ sub TIEHASH {
 
   # Return undef if bad status
   if ($status != &SAI__OK) {
-    carp "NBS::Tiehash: Error checking whether object is primitive";
+    ems1_get_facility_error($status, my $facility, my $ident, my $text);
+    carp "NBS::Tiehash: Error checking whether object is primitive\n".
+      "$status: $text\n";
     return undef;
   }
 
@@ -855,9 +861,11 @@ sub TIEHASH {
 # Do it by counting arguments. If there is only one argument
 # to fetch, then assume it is
 
+# Returns an array reference if there is more than one value
+
 sub FETCH {
   my $self = shift;
-  my ($obj, $status, $value, %newtie, $prim);
+  my ($obj, $status, @values, %newtie, $prim);
 
   if (@_) {
     print "TIED hash\n" if $self->debug;
@@ -873,9 +881,13 @@ sub FETCH {
     ($prim, $status) = $obj->primitive;
     if ($status == &SAI__OK) {
       if ($prim) {
-	($status, $value) = $obj->get;
+	($status, @values) = $obj->get;
 	if ($status == &SAI__OK) {
-	  return $value;
+	  if ($#values == 0) {
+	    return $values[0];
+	  } else {
+	    return \@values;
+	  }
 	} else {
 	  return undef;
 	}
@@ -896,7 +908,7 @@ sub FETCH {
     # We know we are a primitive
     print "TIED scalar\n" if $self->debug;
     
-    ($status, $value) = $self->get;
+    ($status, my $value) = $self->get;
     if ($status == &SAI__OK) {
       return $value;
     } else {
@@ -910,10 +922,11 @@ sub FETCH {
 sub STORE {
   my $self = shift;
   my ($value,$status,$prim);
+  my $key = ''; # for error message
 
   # If we have two args left then we are tieing a hash
   if (scalar(@_) == 2) {
-    my $key = shift;
+    $key = shift;
     $value = shift;
 
     $key = "." . $key unless $key =~ /^\./;
@@ -930,6 +943,9 @@ sub STORE {
 	# If we have been given a scalar
 	if (not ref($value)) {
 	  $status = $obj->put($value);
+	} elsif (ref($value) eq 'ARRAY'){
+	  # An array is okay (I dont like expanding the array
+	  $status = $obj->put(@$value);
 	} else {
 	  # Trying to write a reference to a primitive
 	  $status = &NBS__PRIMITIVE;
@@ -963,9 +979,11 @@ sub STORE {
   }
 
   if ($status != &SAI__OK) {
-    my $name = ($self->name)[1];
-    carp "NBS::STORE: Error storing $value in ".$name."\n";
-  }
+    my $name = ($self->name)[0];
+    ems1_get_facility_error($status, my $facility, my $ident, my $text);
+    carp "NBS::STORE: Error storing $value in $name$key\n".
+      "$status: $text\n";
+  } 
 
 
 }
@@ -1057,13 +1075,13 @@ __END__
 
 =head1 NON-METHODS
 
-  In addition to the OO implementation. Direct hooks to the NBS library
-  can be accessed. They can be imported into your global namespace by
-  using:
+In addition to the OO implementation. Direct hooks to the NBS library
+can be accessed. They can be imported into your global namespace by
+using:
 
       use Starlink::NBS qw/:nbslib/;
 
-  The available commands are:
+The available commands are:
 
     nbs_find_item(envid, name, id, status)
     nbs_find_noticeboard( noticeboard, topid, status)
@@ -1099,9 +1117,13 @@ __END__
     nbs_restore_noticeboard(name, save_name, status)
     nbs_save_noticeboard(id, status)
 
-  Note that nbs_get_ and nbs_put_ require a separate routine for each
-  type. Additionally, the get and set routines expect array arguments.
+Note that nbs_get_ and nbs_put_ require a separate routine for each
+type. Additionally, the get and set routines expect array arguments.
 
+=head1 REQUIREMENTS
+
+This module requires the Starlink::EMS module for error reporting
+facilities.
 
 =head1 MORE INFORMATION
 
