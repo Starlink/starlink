@@ -24,6 +24,8 @@
  *                           y0_. This could be wrong for zoomed
  *                           images that do not fill the display area
  *                           making the region used overrun. 
+ *                 19/03/01  Made sure that x1 and y1 in getMinMax,
+ *                           never run off the edges of image.
  *
  * This file is included in the .C files for classes derived from class
  * ImageData. The file defines a number of member functions that are
@@ -145,21 +147,21 @@ void CLASS_NAME::getMinMax()
 {
     DATA_TYPE* rawImage = (DATA_TYPE*)image_.dataPtr();
     DATA_TYPE* p;
-    DATA_TYPE  value;
+    register DATA_TYPE value;
     
     // use area of image that is visible.
     // if we are looking at the whole image, ignore the margin
     int w = x1_ - x0_ + 1, h = y1_ - y0_ + 1;
     int xmargin = 0, ymargin = 0;
-    if (w == width_)
+    if ( w == width_ )
 	xmargin = int(w * 0.02);
-    if (h == height_)
+    if ( h == height_ )
 	ymargin = int(h * 0.02);  // PWD: change here, test was y0_ == 0
 
     int x0 = x0_ + xmargin;
     int y0 = y0_ + ymargin;
-    int x1 = x1_ - xmargin;
-    int y1 = y1_ - ymargin;
+    int x1 = min( x1_ - xmargin, width_ - 1 ); // PWD: stop running
+    int y1 = min( y1_ - ymargin, height_ - 1 );// off edges
     w = x1 - x0 + 1;
     h = y1 - y0 + 1;
 
@@ -179,7 +181,6 @@ void CLASS_NAME::getMinMax()
     int yincr = h/256;
     if (yincr == 0)
 	yincr++;
-
 
     // try to speed things up a bit on large images:
     // don't examine every pixel, just look at a few sample lines
@@ -225,7 +226,7 @@ void CLASS_NAME::getMinMax()
 	for (int y = y0; y <= y1; y+=yincr) {
 	    p = rawImage + y*width_+x0; 
 	    for (int x = x0; x <= x1; x+=xincr, p+=xincr) {
-		register DATA_TYPE value = NTOH(*p);
+		value = NTOH(*p);
 		if (ISNAN(value))
 		    continue;
 		if (value < minValue_) 

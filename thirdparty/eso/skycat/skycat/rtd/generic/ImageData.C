@@ -39,6 +39,10 @@
  *                           visuals. Renamed setXImageData to setXImage.
  *
  * Peter W. Draper 13/01/99  Merged my changes into SkyCat 2.2.
+ *
+ * Peter W. Draper 19/03/01  Stopped use of DATAMIN and DATAMAX
+ *                           keywords, these are often incorrect, a
+ *                           fact which cannot be worked around. 
  */
 static const char* const rcsId="@(#) $Id: ImageData.C,v 1.36 1999/03/22 21:42:02 abrighto Exp $";
 
@@ -847,35 +851,37 @@ void ImageData::shrinkToFit(int width, int height)
  * set the default cut levels for the image to the min/max pixel
  * value. If DATAMIN and DATAMAX are defined in the FITS header,
  * use them, otherwise scan the image for the approx. min/max
- * values. 
+ * values. PWD: remove DATAMIN and DATAMAX dependence. When these are
+ * incorrect there's no way around it.
  */
 void ImageData::setDefaultCutLevels()
 {
-    double d1, d2;
-    if (image_.get("DATAMIN", d1) == 0 && image_.get("DATAMAX", d2) == 0 && d1 < d2) {
-	// note that DATAMIN and MAX are AFTER adding bzero and multiplying 
-	// by bscale. We only use these values to display to the user, but
-	// not internally, since we are going to scale everything to bytes
-	// in the end anyway.
-	minValue_ = unScaleValue(d1);
-	maxValue_ = unScaleValue(d2);
+//    double d1, d2;
+//    if (image_.get("DATAMIN", d1) == 0 && image_.get("DATAMAX", d2) == 0 && d1 < d2) {
+//	// note that DATAMIN and MAX are AFTER adding bzero and multiplying 
+//	// by bscale. We only use these values to display to the user, but
+//	// not internally, since we are going to scale everything to bytes
+//	// in the end anyway.
+//	minValue_ = unScaleValue(d1);
+//	maxValue_ = unScaleValue(d2);
+//    }
+//    else {
+
+    // scan image for min/max pixel value. Note that at this point,
+    // we don't know how much of the image we will actually display,
+    // so if the image is really huge, just take a 1k x 1k area in
+    // the center.
+    int xc = width_/2, yc = height_/2;
+    if (xc > 512) {
+        x0_ = xc-512;
+        x1_ = xc+512;
     }
-    else {
-	// scan image for min/max pixel value. Note that at this point,
-	// we don't know how much of the image we will actually display,
-	// so if the image is really huge, just take a 1k x 1k area in
-	// the center.
-	int xc = width_/2, yc = height_/2;
-	if (xc > 512) {
-	    x0_ = xc-512;
-	    x1_ = xc+512;
-	}
-	if (yc > 512) {
-	    y0_ = yc-512;
-	    y1_ = yc+512;
-	}
-	getMinMax();
+    if (yc > 512) {
+        y0_ = yc-512;
+        y1_ = yc+512;
     }
+    getMinMax();
+//    }
     // set default cut levels 
     setCutLevels(minValue_, maxValue_, 0);
 }
