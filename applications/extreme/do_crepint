@@ -36,7 +36,7 @@
 ###### Change the following assignments to configure the script ######
 
 #  Set up source and destination directories, and logfile.
-      destdir="./changed"
+      destdir="./crepint.changed"
       logfile="./crepint.log"
 
 ###### Nothing after this line needs to be changed for normal configuration ###

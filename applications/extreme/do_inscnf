@@ -36,7 +36,7 @@
 ###### Change the following assignments to configure the script ######
 
 #  Set up source and destination directories, and logfile.
-      destdir="./changed"
+      destdir="./inscnf.changed"
       logfile="./inscnf.log"
 
 ###### Nothing after this line needs to be changed for normal configuration ###
