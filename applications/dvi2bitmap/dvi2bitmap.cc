@@ -243,6 +243,9 @@ int main (int argc, char **argv)
 			PkFont::setMissingFontMode (*argv);
 			break;
 		      case 'g':	// -fg switch off font generation
+			// FIXME: to be consistent with -P, options
+			// -fg and -fG should be the other way
+			// around.  Change in next version.
 			PkFont::setMakeFonts (false);
 			break;
 		      case 'G':	// -fG switch on font generation
@@ -303,6 +306,8 @@ int main (int argc, char **argv)
 		    PkFont::setMakeFonts (false);
 		    break;
 		  case 'f':
+		    // FIXME: remove this option in the next version
+		    // (degenerate with -fg) 
 		    PkFont::setMakeFonts (false);
 		    break;
 		  default:
@@ -1201,20 +1206,32 @@ bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-qV] [-Q[FfGgtbp]] \n\
-        [-b(h|w) size] [-bp a4|a4l|usletter...]\n\
-	[-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
-	[-r resolution] [-P[bBtTcC]] [-s scale-factor] [-o outfile-pattern]\n\
-	[-m magmag ] [-[Cc][lrtb] size] [-n]\n\
-	[-R[fb] int,int,int]\n\
-	[-p num] [-l num] [-pp ranges] [-t xbm"
+    cerr << "Usage: " << progname << " [-b(h|w) size] [-bp a4|a4l|usletter...]\n\
+        [-[Cc][lrtb] size] [-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
+        [-g[dpribmg]] [-l num] [-m magmag ] [-n] [-o outfile-pattern]\n\
+        [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]\n\
+        [-r resolution] [-R[fb] int,int,int] [-s scale-factor]\n\
+        [-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
 #endif
 #if ENABLE_PNG
 	 << "|png"
 #endif
-	 << "]\n\
-	dvifile" << '\n';
+	 << "] [-V]\n\
+	dvifile" << "\n\n\
+  -bh, -bw  page height and width in pixels    -bp  bitmap <-- papersize\n\
+  -c   crop margins left, right, top, bottom   -C   crop absolute\n\
+  -fp  set font-path (DVI2BITMAP_PK_PATH)\n\
+  -fm  Metafont mode (must match -r)           -r   Metafont resolution\n\
+  -m   DVI file magnification                  -s   scale-down of bitmap\n\
+  -fg  switch off (-fG=on) font-generation     -g   debugging of sections\n\
+  -n   only process DVI file preamble          -o   set output file pattern \n\
+  -q   switch off chatter and warnings         -qq  switch off errors, too\n\
+  -R   set foreground/background colour (RGB)  -V   version+features then exit\n\
+  -l num, -p num, -pp ranges  select pages to process (l--p, or ranges pp)\n\
+  -Q   query: f=missing fonts, g=missing font commands (F, G=all fonts)\n\
+       t=supported output types, b=output bitmap names, p=paper sizes in -bp\n\
+  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)\n";
     exit (1);
 }
