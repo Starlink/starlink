@@ -97,10 +97,10 @@
 
 *  Local Constants:
       CHARACTER*10		HPROPN			! Name of property
-        PARAMETER		( HPROPN = 'HEADER_LOC' )
+        PARAMETER		( HPROPN = '.HEADER_LOC' )
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! Object locator
+      CHARACTER*(DAT__SZLOC)	ALOC			! Object locator
 
       LOGICAL			THERE			! Property exists?
 *.
@@ -113,8 +113,8 @@
       IF ( THERE ) THEN
         CALL ADI_CGET0C( ID, HPROPN, HLOC, STATUS )
       ELSE
-        CALL ADI1_GETLOC( ID, LOC, STATUS )
-        CALL ADI1_FIND( LOC, 'MORE.ASTERIX.HEADER', HLOC, STATUS )
+        CALL ADI1_LOCAST( ID, ALOC, STATUS )
+        CALL DAT_FIND( ALOC, 'HEADER', HLOC, STATUS )
         CALL ADI_CPUT0C( ID, HPROPN, HLOC, STATUS )
       END IF
 
