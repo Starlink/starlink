@@ -52,9 +52,21 @@
 #        values which are used to display each NDF.  The list has two
 #        elements {lo hi} where 0 <= lo <= hi <= 100.
 #           - index     -- Index of the ndf whose percentiles are required
-
+#
+#     wcsframe index
+#        This method returns the domain name of the WCS frame currently
+#        selected for the given NDF.
+#           - index     -- Index of the ndf whose frame name is required
 
 #  Public Variables (Configuration Options):
+#
+#     choosepercentiles = boolean
+#        If true, the user will be able to manipulate the percentile 
+#        cutoff used for NDF display.
+#
+#     choosewcsframe = boolean
+#        If true, the user will be able to select the WCS frame chosen
+#        for the displayed NDFs.
 #
 #     percentiles = list
 #        A list containing two numbers between 0 and 100.  This is used 
@@ -312,7 +324,31 @@
 #-----------------------------------------------------------------------
       public method percentiles { index } {
 #-----------------------------------------------------------------------
-         return [ $percentilecontrol($index) cget -value ]
+         set retval ""
+         if { [ catch { $percentilecontrol($index) cget -value } retval ] } {
+            set retval ""
+         }
+         if { $retval == "" } {
+            set retval $percentiles
+         }
+         return $retval
+      }
+
+
+#-----------------------------------------------------------------------
+      public method wcsframe { index } {
+#-----------------------------------------------------------------------
+         set retval ""
+         if { [ catch { $wcsframecontrol($index) cget -value } retval ] } {
+            set retval ""
+         }
+         if { $retval == "" } {
+            if { $index != "A" && $index != "B" } {
+               set ndf [ lindex $ndflist $index ]
+               set retval [ $ndf frameatt Domain CURRENT ]
+            }
+         }
+         return $retval
       }
 
 
@@ -396,10 +432,12 @@
             if { $isndf } {
                set percs [ percentiles $index ]
                set scalevals [ $ndf percentile [ lindex $percs 0 ] \
-                                            [ lindex $percs 1 ] ]
+                                               [ lindex $percs 1 ] ]
+               set wcsframe [ wcsframe $index ]
             } else {
                set scalevals 0
                set style 0
+               set wcsframe 0
             }
 
 #  Check whether the window exists and is out of date.  If so, destroy
@@ -408,6 +446,7 @@
               ( $plotted($index,width) != $width || \
                 $plotted($index,height) != $height || \
                 $plotted($index,scalevals) != $scalevals || \
+                $plotted($index,wcsframe) != $wcsframe || \
                 $plotted($index,displaystyle) != $displaystyle ) } {
             destroy $itk_component(plot$index)
             unset itk_component(plot$index)
@@ -439,19 +478,26 @@
                }
 
 #  Plot the NDF inside the GWM.
-               set devname "xw;$gwmname"
-               taskrun lutable \
-                  "coltab=grey mapping=linear device=$devname reset"
-               taskrun display " \
-                     in=[ $ndf name ] \
-                     device=$devname \
-                     scale=true \
-                     mode=scale \
-                     low=[ lindex $scalevals 0 ] \
-                     high=[ lindex $scalevals 1 ] \
-                     margin=0 \
-                     style=\"drawtitle=0,tickall=1,$displaystyle\" \
-                  "
+               set options {labelling=interior drawaxes=1 border=1 \
+                            colour=3 colour(numlab)=1 colour(border)=4}
+               lappend options $displaystyle
+               $ndf display "$gwmname/GWM" \
+                            [ lindex $scalevals 0 ] [ lindex $scalevals 1 ] \
+                            $wcsframe [ join $options "," ]
+
+             # set devname "xw;$gwmname"
+             # taskrun lutable \
+             #    "coltab=grey mapping=linear device=$devname reset"
+             # taskrun display " \
+             #       in=[ $ndf name ] \
+             #       device=$devname \
+             #       scale=true \
+             #       mode=scale \
+             #       low=[ lindex $scalevals 0 ] \
+             #       high=[ lindex $scalevals 1 ] \
+             #       margin=0 \
+             #       style=\"drawtitle=0,tickall=1,$displaystyle\" \
+             #    "
 
 #  It may be a good idea to unmap the NDF here (although it may not).
                $ndf mapped 0
@@ -488,6 +534,7 @@
             set plotted($index,width) $width
             set plotted($index,height) $height
             set plotted($index,scalevals) $scalevals
+            set plotted($index,wcsframe) $wcsframe
             set plotted($index,displaystyle) $displaystyle
          }
 
@@ -515,19 +562,14 @@
             error "Invalid index argument \"$index\" to ndfinfowindow"
          }
 
-#  Get characteristics of the info window (only values which might change,
-#  so fundamentals of the NDF are not necessary here).
-         if { $isndf } {
-            set domain [ $ndf frameatt domain CURRENT ]
-         } else {
-            set domain ""
-         }
+#  Store current values of the controls in the info window.
+         set percval [ percentiles $index ]
+         set wcsval [ wcsframe $index ]
 
 #  Check whether the window exists and is out of date.  If so, destroy
 #  it preparatory to generating a new one.
          if { [ array names itk_component info$index ] != "" } {
-            if { $noted($index,domain) != $domain || \
-                 $noted($index,showfits) != $showfits } {
+            if { $noted($index,showfits) != $showfits } {
                destroy $itk_component(info$index)
                unset itk_component(info$index)
             }
@@ -558,32 +600,17 @@
 #  Construct a set of labelled widgets containing the information.
             set lws ""
 
-#  Put a percentile selection button in the text region.
-            itk_component add info$index:key_percentile {
-               iwidgets::labeledwidget $itk_component(info$index).wpercentile \
-                  -labeltext "Display cutoff:"
-            }
-            if { $isndf } {
-               itk_component add info$index:val_percentile {
-                  percentilecontrol [ \
-                     $itk_component(info$index:key_percentile) childsite ].val \
-                     -allowcustom 1
-               }
-               set percentilecontrol($index) \
-                  $itk_component(info$index:val_percentile)
-               $percentilecontrol($index) configure \
-                  -value $percentiles \
-                  -command [ code $this refresh $index ]
-               lappend controls $percentilecontrol($index)
-               pack $itk_component(info$index:val_percentile)
-            }
-            lappend lws $itk_component(info$index:key_percentile)
-
 #  Construct a list of key, value pairs to be displayed in the text region.
             set pairs {}
             lappend pairs [ list "Name" $name ]
             lappend pairs [ list "Dimensions" $dims ]
-            lappend pairs [ list "WCS frame" $domain ]
+            if { ! $choosepercentiles } {
+               lappend pairs [ list "Display cutoff" \
+                            "[ lindex $percval 0 ]% - [ lindex $percval 1]%" ]
+            }
+            if { ! $choosewcsframe } {
+               lappend pairs [ list "WCS frame" $wcsval ]
+            }
             foreach fh $showfits {
                set key [ lindex $fh 1 ]
                if { $isndf } {
@@ -612,13 +639,60 @@
                lappend lws $itk_component(info$index:key_$key)
             }
 
+#  Put a percentile selection control in the text region.
+            if { $choosepercentiles } {
+               itk_component add info$index:key_percentile {
+                  iwidgets::labeledwidget \
+                     $itk_component(info$index).wpercentile \
+                     -labeltext "Display cutoff:"
+               }
+               if { $isndf } {
+                  itk_component add info$index:val_percentile {
+                     percentilecontrol [ \
+                        $itk_component(info$index:key_percentile) \
+                        childsite ].val \
+                        -allowcustom 1
+                  }
+                  set percentilecontrol($index) \
+                     $itk_component(info$index:val_percentile)
+                  $percentilecontrol($index) configure \
+                     -value $percval \
+                     -command [ code $this refresh $index ]
+                  lappend controls $percentilecontrol($index)
+                  pack $itk_component(info$index:val_percentile)
+               }
+               lappend lws $itk_component(info$index:key_percentile)
+            }
+
+#  Put a frame selection control in the text section.
+            if { $choosewcsframe } {
+               itk_component add info$index:key_wcsframe {
+                  iwidgets::labeledwidget $itk_component(info$index).wwcsframe \
+                     -labeltext "WCS frame:"
+               }
+               if { $isndf } {
+                  itk_component add info$index:val_wcsframe {
+                     wcsframecontrol [ \
+                        $itk_component(info$index:key_wcsframe) childsite ].val
+                  }
+                  set wcsframecontrol($index) \
+                     $itk_component(info$index:val_wcsframe)
+                  $wcsframecontrol($index) configure \
+                     -ndf $ndf \
+                     -value $wcsval \
+                     -command [ code $this refresh $index ]
+                  lappend controls $wcsframecontrol($index)
+                  pack $itk_component(info$index:val_wcsframe)
+               }
+               lappend lws $itk_component(info$index:key_wcsframe)
+            }
+
 #  Pack and align the labeled widgets.
             eval pack $lws -side top -anchor w
             eval iwidgets::Labeledwidget::alignlabels $lws
 
 #  Store characteristics of this info window so that we know whether 
 #  subsequent info window requests are out of date.
-            set noted($index,domain) $domain
             set noted($index,showfits) $showfits
          }
 
@@ -641,6 +715,10 @@
             } else {
                ndfselect $slot $inview($slot)
             }
+            update
+         #  if { $inview($slot) == $index } {
+         #     ndfselect $slot $index
+         #  }
          }
          wm geometry $itk_interior ""
          update idletasks
@@ -838,6 +916,18 @@
       }
 
 
+#-----------------------------------------------------------------------
+      public variable choosepercentiles { 0 } {
+#-----------------------------------------------------------------------
+      }
+
+
+#-----------------------------------------------------------------------
+      public variable choosewcsframe { 0 } {
+#-----------------------------------------------------------------------
+      }
+
+
 ########################################################################
 #  Private variables.
 ########################################################################
@@ -851,6 +941,7 @@
       private variable percentilecontrol;# Perc control widgets for each NDF
       private variable plotted         ;# Array containing plot characteristics
       private variable showfits {}     ;# FITS headers to display for each NDF 
+      private variable wcsframecontrol ;# Frame control widgets for each NDF
 
    }
 
