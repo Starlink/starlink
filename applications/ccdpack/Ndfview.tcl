@@ -116,14 +116,26 @@
       addcontrol $itk_component(wcsframe) style
       addcontrol $itk_component(dstyle) style
       addcontrol $itk_component(percut) cutoff
-      pack [ groupwin style ] -before [ groupwin action ] -side left -fill y
-      pack [ groupwin cutoff ] -before [ groupwin style ] -side left -fill y
+
+#  Rearrange the control widget groups into two rows.
+      itk_component add row1 { frame [ panel ].row1 }
+      itk_component add row2 { frame [ panel ].row2 }
+      set row1 $itk_component(row1)
+      set row2 $itk_component(row2)
+      lower $row1 
+      lower $row2
+      pack $row1 $row2 -side top -expand 1 -fill x
+      foreach grp { zoom cutoff marknum } {
+         set win [ groupwin $grp ]
+         pack $win -in $row1 -side left -fill x -expand 1
+      }
+      foreach grp { style action } {
+         set win [ groupwin $grp ]
+         pack $win -in $row2 -side left -fill x -expand 1
+      }
 
 #  Do requested configuration.
       eval itk_initialize $args
-
-#  Register initial size of window.
-      geomset
    }
 
 
@@ -227,6 +239,9 @@
 
 #  Ensure that all aspects of the display are updated.
          display
+
+#  Register the geometry.
+         geomset
 
 #  Set key bindings for marking objects.
          $canvas bind gwmitem <Button-1> [ code $this newpoint %x %y ]
