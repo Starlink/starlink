@@ -5,6 +5,7 @@
 
 int main( int argc, char **argv )
 {
-   (void) hlps_standalone( "DEMO", argc, argv );
-   return EXIT_SUCCESS;
+  /* Really need to prompt for a library if -l has not been specified */
+  (void) hlps_standalone( NULL, argc, argv );
+  return EXIT_SUCCESS;
 }

@@ -19,7 +19,9 @@
  *       Name of default help library to open. There must be a corresponding
  *       environment variable named HELPLB_HELP containing the help
  *       file to be opened. Will be ignored if argv contains a -l parameter.
- *       Can be a NULL pointer only if -l is guaranteed.
+ *       Can be a NULL pointer only if -l is guaranteed. _HELP is added
+ *       to the parameter automatically if not present. ".shl" is added
+ *       if not present.
  *    argc = int (Given)
  *       The number of elements in argv.
  *    argv = char ** (Given)
@@ -70,7 +72,7 @@
  *    library.shl:
  *       The name of the Starlink help library. These names usually end in
  *       ".shl". If given, "-l" must be the first and this the second
- *       parameter.
+ *       parameter. ".shl" is added if none is present.
  *    topic, subtopic etc.:
  *       The initial entry point in the hierarchy of topics and subtopics in
  *       the help library.
@@ -97,12 +99,13 @@
  *    main routine without linking, and then link using the fortran compiler:
  *
  *    cc  -I/star/include -c helpm.c
- *    f77 -o helpc helpm.o `hlps_link` `fio_link` `cnf_link`
+ *    f77 -o helpc helpm.o `hlps_link`
  *
  *    gcc or cc cannot be used as linker, since they do not link with the
  *    Fortran libraries that FIO and HLP require. f77 seems to link C code only
  *    if the main routine is compiled by cc, not if it is compiled by gcc.
- *
+ *    Note that if you use autoconf make sure you use @FCLIBS@ and the
+ *    STAR_FC_LIBRARY_LDFLAGS macro.
 
  * Authors:
  *    hme: Horst Meyerdierks (UoE, Starlink)
@@ -116,6 +119,15 @@
  *       Mod to use termios
  *    24 Jul 2004 (timj):
  *       Incorporate into HLPS library. Now standalone.
+ *       Uses one_scrsz. Allows for envvar to have optional _HELP
+ *       in supplied value, and optional .shl
+
+ * Bugs: 
+ *    It's arguably a bug that status is not returned by this *
+ *    function.  on abort (or bad Starlink status) this should return
+ *    some kind of status (either throught inherited status or by return
+ *    value) such that the caller can report the error to the shell.
+
  *-
  */
 
@@ -233,8 +245,15 @@ void hlps_standalone( char * help_library, int argc, char **argv )
  * Set parameter counter (i) such that argv[i] is first topic word.
  */
    if ( argv[1] && !strcmp( "-l", argv[1] ) )      /* library is in argv[2] */
-   {  (void) cnf_expn( argv[2], LENSTR, f77libra, f77libra_length );
-      i = 3;
+   {  
+     *library = '\0'; nleft = LENSTR - 1;
+     strncat(library, argv[2], nleft); nleft -= strlen(argv[2]);
+     /* Append a .shl if one is missing */
+     if (!strstr(library, ".shl")) {
+       strncat(library, ".shl", nleft); nleft -= 4;
+     }
+     (void) cnf_expn( library, LENSTR, f77libra, f77libra_length );
+     i = 3;
    }
    else                               /* library is in environment variable */
    {  
@@ -243,20 +262,31 @@ void hlps_standalone( char * help_library, int argc, char **argv )
        printf( "Error: no default library supplied and no -l option on command line.\n");
        goto abort;
      }
-     /* form the library env var from the supplied base string (add _HELP) */
-     /* make sure we have enough space in buffer */
-     if (strlen(help_library) > (LENSTR - 6) ) {
-       printf ("Base env var name is too long too append _HELP\n");
-       goto abort;
-     }
-     strcpy(envvar, help_library);
-     strcat(envvar, "_HELP");
+     /* Need to generate the environment variable name from the supplied
+	argument. */
+     *(envvar+LENSTR) = '\0'; /* terminate even if input is not */
+     strncpy( envvar, help_library, LENSTR - 1 );
 
-     /* Now try to translate the environment variable and append .shl */
+     /* See if we need to append _HELP to the supplied string */
+     if ( !strstr(envvar, "_HELP") ) {
+
+       /* form the library env var from the supplied base string (add _HELP) */
+       /* make sure we have enough space in buffer */
+       if (strlen(help_library) > (LENSTR - 6) ) {
+	 printf ("Base env var name is too long too append _HELP\n");
+	 goto abort;
+       }
+       strcat(envvar, "_HELP");
+     }
+
+     /* Now try to translate the environment variable and append .shl
+        (but only if .shl is not there already) */
      if ( p = getenv(envvar) )
       {  *library = '\0'; nleft = LENSTR - 1;
          (void) strncat( library, p, nleft ); nleft -= strlen(p);
-         (void) strncat( library, ".shl", nleft ); nleft -= 4;
+	 if (!strstr(library, ".shl")) {
+	   (void) strncat( library, ".shl", nleft ); nleft -= 4;
+	 }
          (void) cnf_expn( library, LENSTR, f77libra, f77libra_length );
       }
       else
