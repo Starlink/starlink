@@ -160,6 +160,8 @@
 #        the "find" function, so that ast_link can be used on Debian Linux.
 #     23-JAN-2004 (DSB):
 #        Added switches to support older grf implementations.
+#     24-AUG-2004 (DSB):
+#        Removed f77='y' from -ems case.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -321,8 +323,7 @@
 
 #  If using EMS, link with the AST EMS interface and the EMS library via the
 #  link script (if found).
-      ems) args="${args} -last_ems `\`find ems_link\``"
-           f77='y';;
+      ems) args="${args} -last_ems `\`find ems_link\``";;
 
 #  If using own error reporting, do not produce any arguments.
       my) :;;
