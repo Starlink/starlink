@@ -1,0 +1,136 @@
+      SUBROUTINE POL1_PRSVR( VERS, M, N, R, STATUS )
+*+
+*  Name:
+*     POL1_PRSVR
+
+*  Purpose:
+*     Extract fields from a version number string.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL POL1_PRSVR( VERS, M, N, R, STATUS )
+
+*  Description:
+*     This routine extracts the fields from a version number string of 
+*     the form "m.n-r" where m, n and r are integers. An error is
+*     reported if the string is not of this form, except that trailing
+*     fields may be omitted if they are zero. The string must not be
+*     totally blank.
+
+*  Arguments:
+*     VERS = CHARACTER*(*) (Given)
+*        The version number string.
+*     M = LOGICAL (Returned)
+*        The major version number.
+*     N = LOGICAL (Returned)
+*        The minor version number.
+*     R = LOGICAL (Returned)
+*        The revision number.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1-APR-1999 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      CHARACTER VERS*(*)
+
+*  Arguments Returned:
+      INTEGER M
+      INTEGER N
+      INTEGER R
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Used length of string
+
+*  Local Variables:
+      INTEGER DOT                ! Index of first dot
+      INTEGER HYP                ! Index of first hyphen
+      INTEGER LM                 ! Length of major version field
+      INTEGER LN                 ! Length of minor version field
+      INTEGER LR                 ! Length of revision field
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      M = -999
+
+*  Find the first dot.
+      DOT = INDEX( VERS, '.' )
+
+*  Find the first hyphen.
+      HYP = INDEX( VERS, '-' )
+
+*  Find the length of each field.
+      LM = DOT - 1 
+      LN = HYP - DOT - 1
+      IF( HYP .GT. 0 ) THEN
+         LR = CHR_LEN( VERS ) - HYP
+      ELSE
+         LR = 0
+      END IF
+
+*  Get the revision field.
+      IF( LR .LE. 0 ) THEN
+         R = -999
+      ELSE
+         CALL CHR_CTOI( VERS( HYP + 1: ), R, STATUS )
+      END IF
+
+*  Get the minor version field.
+      IF( LN .LE. 0 ) THEN
+         N = -999
+      ELSE
+         CALL CHR_CTOI( VERS( DOT + 1 : HYP - 1 ), N, STATUS )
+      END IF
+
+*  Get the major version field.
+      IF( LM .LE. 0 ) THEN
+         M = -999
+      ELSE
+         CALL CHR_CTOI( VERS( : DOT - 1 ), M, STATUS )
+      END IF
+
+*  Check that no leading fields are missing.
+      IF( M .EQ. -999 ) THEN
+         STATUS = SAI__ERROR
+      ELSE IF( N .EQ. -999 .AND. R .NE. -999 ) THEN
+         STATUS = SAI__ERROR
+      END IF    
+
+*  Report an error if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETC( 'V', VERS )
+         CALL ERR_REP( 'POL1_PRSVR_ERR1', 'Illegal POLPACK version '//
+     :                 'number ''^V'' encountered (possible '//
+     :                 'programming error).', STATUS )
+      END IF
+
+      END
