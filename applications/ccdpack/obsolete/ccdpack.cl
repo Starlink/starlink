@@ -4,6 +4,9 @@
 
 package ccdpack
 
+# Get the Starlink setup.
+cl < "starlink$irafstar/zzsetenv.def"
+
 task nagmakemos = "ccdpackdir$ccdpack_nag.e"
 task makebias = "ccdpackdir$ccdpack_red.e"
 task debias = "ccdpackdir$ccdpack_red.e"
@@ -55,5 +58,13 @@ if ( s1 == "NONE") {
 }
 set NDF_IMP_CCDPACK="$CCDPACK_DIR/ccdimp.csh ^ndf"
 set NDF_EXP_CCDPACK="$CCDPACK_DIR/ccdexp.csh ^ndf"
+
+#
+#   Show that the CCDPACK commands are now available.
+#
+print ""
+print "   CCDPACK commands are now available -- (Version PKG_VERS)"
+print ""
+
 
 clbye()
