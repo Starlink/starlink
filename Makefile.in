@@ -159,7 +159,7 @@ Makefile.dependencies:
 	    sed '/^<?/d;/^<!DOCTYPE/d' >&5; \
 	  echo '</componentset>' >&5
 	if test "$(JAVA)" != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
-	  && (cd buildsupport/starconf/java \
+	  (cd buildsupport/starconf/java \
 	      && $(MAKE) GenerateDependencies.class) \
 	  && $(JAVA) -classpath buildsupport/starconf/java \
 	        GenerateDependencies componentset.xml \
