@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 bin_SCRIPTS = starconf
-## data_DATA = starconf.m4 componentlist.dtd install-with-manifest.in
-data_DATA = componentlist.dtd
+data_DATA = componentinfo.dtd
 
 
 # The above files aren't automatically included in clean targets.
@@ -10,11 +9,10 @@ data_DATA = componentlist.dtd
 ## CLEANFILES=starconf starconf.m4
 CLEANFILES=starconf make-starconf
 
-DEFAULT_STARLINK=@DEFAULT_STARLINK@
-starconf: install-with-manifest.in starconf.m4
+starconf: install-with-manifest.in starconf.m4 make-starconf
 	./make-starconf install-with-manifest.in acinclude.m4:starconf.m4
 
-# The edits of replacement variables (@prefix@ and co) in
+# The edits of replacement variables (prefix and co) in
 # starlink.m4.in and starconf.in must be done at `make' time rather
 # than configure time (ie, not using AC_OUTPUT).  Do these by hand.
 # See the `Installation Directory Variables' section of the autoconf
@@ -24,18 +22,13 @@ starconf: install-with-manifest.in starconf.m4
 # done at configure time -- it does not have to be done this late --
 # but that would require us to have more than one substitution step,
 # which would be too confusing and messy.
-#edit = sed \
-#	-e 's,@bindir\@,$(bindir),g' \
-#	-e 's,@datadir\@,$(datadir),g' \
-#	-e 's,@DEFAULT_STARLINK\@,$(DEFAULT_STARLINK),g' \
-#	-e 's,@LN_S\@,$(LN_S),g' \
-#	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g' \
-#	-e 's,\$\(Revision:[^$]*\)\$,\1,g'
-#starconf.m4: starconf.m4.in
-#	rm -f starconf.m4.tmp starconf.m4
-#	$(edit) $(srcdir)/starconf.m4.in >starconf.m4.tmp
-#	mv starconf.m4.tmp starconf.m4
-#starconf: starconf.in
-#	rm -f starconf starconf.tmp
-#	$(edit) $(srcdir)/starconf.in >starconf.tmp
-#	mv starconf.tmp starconf
+edit = sed \
+	-e 's,@bindir\@,$(bindir),g' \
+	-e 's,@datadir\@,$(datadir),g' \
+	-e 's,@LN_S\@,$(LN_S),g' \
+	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g'
+make-starconf: make-starconf.in
+	rm -f make-starconf.tmp make-starconf
+	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp
+	mv make-starconf.tmp make-starconf
+	chmod +x make-starconf

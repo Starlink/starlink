@@ -33,11 +33,10 @@ dnl Find working install and ln programs
 AC_PROG_INSTALL
 AC_PROG_LN_S
 
-dnl   Note that the starconf.in and starlink.m4.in files are _not_ to be
-dnl   substituted by this command -- since they involve the
-dnl   installation directory variables, they should have them replaced
+dnl   Note that the make-starconf.in file is _not_ to be
+dnl   substituted by this command -- since it involves the
+dnl   installation directory variables, it should have them replaced
 dnl   at `make' time, not configure time.  See Makefile.am for details.
 AC_CONFIG_FILES(Makefile starconf.m4)
-AC_CONFIG_FILES(make-starconf, [chmod +x make-starconf])
 
 AC_OUTPUT
