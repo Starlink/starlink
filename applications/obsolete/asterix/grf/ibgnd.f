@@ -1455,20 +1455,19 @@
 *    Loop over whole image
         DO J = 1, NY
           DO I = 1, NX
-            IF ( I_QOK .AND. I_BAD ) THEN
-              GOOD = (BIT_ANDUB(QUAL(I,J),I_MASK).EQ.QUAL__GOOD)
-            ELSE
-              GOOD = .TRUE.
+
+*        Default
+            IDX(I,J) = 1
+            IF ( REGEX ) THEN
+              IF ( IM_INREG(I,J) ) IDX(I,J) = -1
             END IF
-            IF ( GOOD ) THEN
-              IDX(I,J) = 1
-              IF ( REGEX ) THEN
-                IF ( .NOT. IMG_INREG( I, J ) ) THEN
-                  IDX(I,J) = 0
-                END IF
+
+*        Still ok?
+            IF ( IDX(I,J) .EQ. 1 ) THEN
+              IF ( I_QOK .AND. I_BAD ) THEN
+                GOOD = (BIT_ANDUB(QUAL(I,J),I_MASK).EQ.QUAL__GOOD)
+                IF ( .NOT. GOOD ) IDX(I,J) = 0
               END IF
-            ELSE
-              IDX(I,J) = -1
             END IF
 
           END DO
@@ -1494,7 +1493,7 @@
 
 *          If pixel is in circle then ignore this point for sampling purposes
               IF ( IMG_INCIRC(I,J,X,Y,R) ) THEN
-                IDX(I,J) = -1
+                IDX(I,J) = 0
               END IF
 
             END IF
@@ -1630,13 +1629,13 @@
       I_BGM_MEAN = MEAN
 
 *  Decide how many samples
-      IF ( AREA .EQ. 'WHOLE' ) THEN
+      IF ( AREA(1:3) .EQ. 'WHO' ) THEN
 
 *    Trivial case of one sample per image
         I_BGM_NSAMP = 1
         CALL ARR_INIT1I( 1, I_NX*I_NY, %VAL(I_BGM_SAMIDX), STATUS )
 
-      ELSE IF ( AREA .EQ. 'ANNULUS' ) THEN
+      ELSE IF ( AREA(1:3) .EQ. 'ANN' ) THEN
 
 *    Get centre of field
         CALL USI_GET0R( 'X', X0, STATUS )
@@ -1650,21 +1649,22 @@
             CALL IMG_PIXTOWORLD( REAL(I)-0.5, REAL(J)-0.5, XW, YW,
      :                           STATUS )
             R = SQRT( (XW-X0)**2 + (YW-Y0)**2 )
-	    PRINT *,I,J,XW,YW,R
             MAXR = MAX( MAXR, R )
             MINR = MIN( MINR, R )
           END DO
         END DO
+        I_BGM_X0 = X0
+        I_BGM_Y0 = Y0
 
 *    Number of samples is radial range divided by annulus width
-        CALL USI_GET0R( 'RBIN', RBIN, STATUS )
-        I_BGM_NSAMP =  INT((MAXR-MINR) / RBIN) + 1
+        CALL USI_GET0R( 'RBIN', I_BGM_RBIN, STATUS )
+        I_BGM_NSAMP =  INT((MAXR-MINR) / I_BGM_RBIN) + 1
 
 *    Compute sample index
         CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, X0, Y0, RBIN,
      :                           %VAL(I_BGM_SAMIDX), STATUS )
 
-      ELSE IF ( AREA .EQ. 'BOX' ) THEN
+      ELSE IF ( AREA(1:3) .EQ. 'BOX' ) THEN
       END IF
 
 *  Allocate space for information needed per sample
@@ -1806,9 +1806,11 @@
         YW = I_YBASE + (J-1)*I_YSCALE
         Y2 = (YW-Y0)**2
         DO I = 1, I_NX
-          XW = I_XBASE + (I-1)*I_XSCALE
-          R = SQRT( (XW-X0)**2 + Y2 ) / RBIN
-          IDX(I,J) = INT(R) + 1
+          IF ( IDX(I,J) .GT. 0 ) THEN
+            XW = I_XBASE + (I-1)*I_XSCALE
+            R = SQRT( (XW-X0)**2 + Y2 ) / RBIN
+            IDX(I,J) = INT(R) + 1
+          END IF
         END DO
       END DO
 
@@ -2295,7 +2297,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Switch on sample mode
-      IF ( I_BGM_AREA .EQ. 'WHOLE' ) THEN
+      IF ( I_BGM_AREA(1:3) .EQ. 'WHO' ) THEN
 
 *    Loop over image
         DO J = 1, NY
