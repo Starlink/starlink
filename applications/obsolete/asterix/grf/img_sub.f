@@ -4089,11 +4089,10 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           PWIDTH=PHWID*2.0
 *  calc width (world coords)
           D=SQRT((XWID-XCENT)**2 + (YWID-YCENT)**2)
-          ALPHA=ATAN2(ABS(YWID-YCENT),ABS(XWID-XCENT))
-          BETA=ALPHA-ANGLE
-          WIDTH=2.0*ABS(D*SIN(BETA))
+          ALPHA=ASIN(ABS(XWID-XCENT)/D)
+          WIDTH=2.0*ABS(D*COS(ALPHA))
 
-	print *,xwid,ywid,d,alpha/dtor,beta/dtor,width
+	print *,xwid,ywid,d,alpha/dtor,width
 
 *  keyboard mode
         ELSE
