@@ -39,10 +39,12 @@
 *       Statistics for each bin. 1=Median, 2=high, 3=low
 *     BINS(NX, NY, NMAX) = REAL (Given)
 *       The data stored in relation to its position
-*     PNTS(NMAX) = REAL (Given)
-*       Scratch space for copying in the data from each I,J
-*     POS(NMAX) = REAL (Given)
-*       Scratch space for storing the X positions for each marker on the plot
+*     PNTS(NMAX) = DOUBLE PRECISION (Given)
+*       Scratch space for copying in the data from each I,J.
+*       DOUBLE PRECISION since that is what AST uses for plotting.
+*     POS(NMAX) = DOUBLE PRECISION (Given)
+*       Scratch space for storing the X positions for each marker on the plot.
+*       DOUBLE PRECISION since that is what AST uses for plotting.
 *     STATUS = INTEGER (Given & Returned)
 *       Global Status
 
@@ -63,6 +65,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.7  2005/03/18 19:32:45  timj
+*     Replace plotting directly with PGPLOT to plotting using KAPLIBS and AST.
+*
 *     Revision 1.6  2004/09/01 01:02:03  timj
 *     use CNF_PVAL
 *
@@ -96,6 +101,7 @@
       INCLUDE 'PAR_ERR'                          ! For PAR_NULL
       INCLUDE 'MSG_PAR'                          ! For MSG
       INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
+      INCLUDE 'AST_PAR'                          ! AST constants
 
 *  Arguments Given:
       INTEGER UNIT
@@ -104,8 +110,8 @@
       INTEGER NMAX
       REAL    NSIGMA
       REAL    BINS(NX, NY, NMAX)
-      REAL    PNTS(NMAX)
-      REAL    POS (NMAX)
+      DOUBLE PRECISION PNTS(NMAX)
+      DOUBLE PRECISION POS (NMAX)
       INTEGER IPOS(NX * NY)
       INTEGER JPOS(NX * NY)
       REAL    STATS(NX, NY, 3)
@@ -118,7 +124,10 @@
       INTEGER STATUS
 
 *     Local Variables:
-      INTEGER AXIS            ! PGPLOT axis type
+      LOGICAL ALIGN           ! DATA pic. aligned with a previous picture?
+      DOUBLE PRECISION ATTRS( 20 ) ! Saved graphics attributes
+      INTEGER AXMAPS(2)       ! Mapping from data frame to GRAPHICS frame
+      DOUBLE PRECISION BOX(4) ! Data coordinates of the plot corners
       INTEGER COUNT           ! Loop counter
       REAL    DMAX            ! Maximum of data
       REAL    DMIN            ! Minimum of data
@@ -126,14 +135,19 @@
       REAL    HIGH            ! Upper end of Xrange for plot
       INTEGER I               ! Loop variable
       INTEGER IERR            ! For VEC_
+      INTEGER IPICD           ! AGI identifier for the DATA picture
+      INTEGER IPICF           ! AGI identifier for the frame picture
+      INTEGER IPLOT           ! Pointer to AST Plot for DATA picture
       INTEGER J               ! J coordinate
       REAL    LOW             ! Lower end of x for plot
+      REAL    MARGIN(4)       ! Margin around the plot as fraction of plot
       INTEGER MED_X_PTR       ! Position of medians
       INTEGER MED_X_END       ! End of MED_X_PTR
       INTEGER MED_PTR         ! Medians for each bin
       INTEGER MED_END         ! End of MED_PTR
       INTEGER N               ! Z coordinate
       INTEGER NERR            ! For VEC_
+      INTEGER NFRM            ! Frame index increment between IWCS and IPLOT
       INTEGER NGOOD           ! Number of good points
       INTEGER N_MEDIANS       ! Number of medians calculated
       INTEGER N_SIGS          ! Number of standard deviations calculated
@@ -228,15 +242,15 @@
                DMIN = DMIN - (0.05 * RANGE)
 
 *     Get some memory for the line drawing routine
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, MED_X_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, MED_X_PTR, 
      :              MED_X_END, STATUS)
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, MED_PTR, MED_END,
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, MED_PTR, MED_END,
      :              STATUS)
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, STDEVM_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, STDEVM_PTR, 
      :              STDEVM_END, STATUS)
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, STDEVP_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, STDEVP_PTR, 
      :              STDEVP_END, STATUS)
-               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, SIG_X_PTR, 
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBD, SIG_X_PTR, 
      :              SIG_X_END, STATUS)
         
 
@@ -253,16 +267,33 @@
                   LOW = LOW + 0.5
                END IF
 
-*     Perform graphics operations on the device
-*     Setup the axes
+*     Open the device for this plot and setup the margin, axes and labels
+               MARGIN(1) = 0.15
+               MARGIN(2) = 0.15
+               MARGIN(3) = 0.15
+               MARGIN(4) = 0.15
 
-               AXIS = 0
-               CALL PGSCI(1)
+*     Use kaplibs to configure the AST plot device
+               BOX(1) = DBLE(LOW)
+               BOX(2) = DBLE(DMIN)
+               BOX(3) = DBLE(HIGH)
+               BOX(4) = DBLE(DMAX)
+               CALL KPG1_PLOT( AST__NULL, 'NEW','SURF_DESPIKE',
+     :              ' ', MARGIN, 0, ' ', ' ', 0.0, 0,' ',
+     :              BOX, IPICD, IPICF, 0, IPLOT, NFRM, ALIGN,
+     :              STATUS )
 
-               CALL PGENV(LOW, HIGH, DMIN, DMAX, 0, AXIS)
-               
-               CALL PGSCI(3)
-            
+*     Set the plot attributes
+               CALL AST_SETC( IPLOT, 'TITLE',' ', STATUS)
+               CALL AST_SETC( IPLOT, 'LABEL(1)','Bin Number', STATUS)
+               CALL AST_SETC( IPLOT, 'LABEL(2)','Data Value', STATUS)
+
+*     Plot the grid
+               CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
+
+*     Get the mapping from current to BASE GRAPHICS
+               CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
+
 *     Choose a symbol
                SYMBOL = -1
 
@@ -286,8 +317,8 @@
                
                      IF (BINS(I,J,N) .NE. VAL__BADR) THEN
                         NGOOD = NGOOD + 1
-                        PNTS(NGOOD) = BINS(I,J,N)
-                        POS(NGOOD)  = XPOS
+                        PNTS(NGOOD) = DBLE(BINS(I,J,N))
+                        POS(NGOOD)  = DBLE(XPOS)
                      END IF
                   
                   END DO
@@ -295,21 +326,41 @@
             
                   IF (NGOOD .GT. 0) THEN
 
-*     Plot the points using PGPT
-                     CALL PGPT(NGOOD, POS, PNTS, SYMBOL)
+*     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
+                     CALL AST_TRAN2( IPLOT, NGOOD, POS, PNTS, .FALSE.,
+     :                    POS, PNTS, STATUS )
+
+*     Specify a default color
+                     CALL AST_SETI( IPLOT, 'COLOUR(MARK)', 3, STATUS )
+
+*     Set the appearance of marks drawn using PGPLOT so that they mimic
+*     curves produced using astMark.
+                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTRS,
+     :                    STATUS )
+
+*     Plot the points using AST     
+                     CALL KPG1_PLTLN( NGOOD, 1, NGOOD,
+     :                    POS, PNTS,
+     :                    .FALSE., .FALSE.,
+     :                    0.0D0, 0.0D0, 0.0D0, 'STYLE', IPLOT, 3,
+     :                    SYMBOL, 0, 0,'SURF_DESPIKE', STATUS)
+
+*     Reset the previous PGPLOT attributes
+                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .FALSE., ATTRS,
+     :                    STATUS)
 
 *     ...and read the statistics associated with this (I,J)
 *     Have to use pointers again for the scratch space
                   
 *     Store the median and sigma for later plotting
 *     D**M pointers!
-                  
-                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
-     :   %VAL(CNF_PVAL(MED_PTR) + (N_MEDIANS * VAL__NBR)),
+
+                     CALL VEC_RTOD(.TRUE., 1, STATS(I,J,1), 
+     :   %VAL(CNF_PVAL(MED_PTR) + (N_MEDIANS * VAL__NBD)),
      :                    IERR, NERR, STATUS)
                   
-                     CALL VEC_RTOR(.FALSE., 1, XPOS, 
-     :   %VAL(CNF_PVAL(MED_X_PTR) + (N_MEDIANS * VAL__NBR)),
+                     CALL VEC_RTOD(.TRUE., 1, XPOS, 
+     :   %VAL(CNF_PVAL(MED_X_PTR) + (N_MEDIANS * VAL__NBD)),
      :                    IERR, NERR, STATUS)
                   
                   
@@ -317,19 +368,19 @@
                   
                      IF (STATS(I,J,2) .NE. VAL__BADR) THEN
 
-                        CALL VEC_RTOR(.FALSE., 1, STATS(I,J,2), 
-     :   %VAL(CNF_PVAL(STDEVP_PTR) + (N_SIGS * VAL__NBR)),
+                        CALL VEC_RTOD(.TRUE., 1, STATS(I,J,2), 
+     :   %VAL(CNF_PVAL(STDEVP_PTR) + (N_SIGS * VAL__NBD)),
      :                       IERR, NERR, STATUS)
                      
-                        CALL VEC_RTOR(.FALSE., 1, STATS(I,J,3), 
-     :   %VAL(CNF_PVAL(STDEVM_PTR) + (N_SIGS * VAL__NBR)),
+                        CALL VEC_RTOD(.TRUE., 1, STATS(I,J,3), 
+     :   %VAL(CNF_PVAL(STDEVM_PTR) + (N_SIGS * VAL__NBD)),
      :                       IERR, NERR, STATUS)
                      
-                        CALL VEC_RTOR(.FALSE., 1, XPOS, 
-     :   %VAL(CNF_PVAL(SIG_X_PTR) + (N_SIGS * VAL__NBR)),
+                        CALL VEC_RTOD(.TRUE., 1, XPOS, 
+     :   %VAL(CNF_PVAL(SIG_X_PTR) + (N_SIGS * VAL__NBD)),
      :                       IERR, NERR, STATUS)
-                     
-                        N_SIGS = N_SIGS + 1
+                      
+                       N_SIGS = N_SIGS + 1
                      END IF
                   
                   END IF
@@ -337,24 +388,98 @@
                END DO
 
 *     Now draw on the lines corresponding to median and sigma
-*     Have to enclose in an if since PGPLOT can not check status
-            
-               IF (STATUS .EQ. SAI__OK) THEN
-               
-                  CALL PGSCI(1)
-                  CALL PGSLS(1)
-               
-                  CALL PGLINE(N_MEDIANS, %VAL(CNF_PVAL(MED_X_PTR)), 
-     :                        %VAL(CNF_PVAL(MED_PTR)))
-               
+               IF (N_MEDIANS .GT. 0) THEN
+
+*     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
+                  CALL AST_TRAN2( IPLOT, N_MEDIANS, 
+     :                 %VAL(CNF_PVAL(MED_X_PTR)),
+     :                 %VAL(CNF_PVAL(MED_PTR)), .FALSE.,
+     :                 %VAL(CNF_PVAL(MED_X_PTR)),
+     :                 %VAL(CNF_PVAL(MED_PTR)), STATUS )
+
+
+*     Specify a default color
+                  CALL AST_SETI( IPLOT, 'COLOUR(CURVES)', 1, STATUS )
+
+*     Set the appearance of lines drawn using PGPLOT so that they mimic
+*     curves produced using astCurves.
+                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS,
+     :                    STATUS )
+
+*     Draw the lines using AST
+                  CALL KPG1_PLTLN( N_MEDIANS, 1, N_MEDIANS,
+     :                 %VAL(CNF_PVAL(MED_X_PTR)),
+     :                 %VAL(CNF_PVAL(MED_PTR)),
+     :                 .FALSE., .FALSE.,
+     :                 0.0D0, 0.0D0, 0.0D0, 'STYLE', IPLOT, 2,
+     :                 0, 0, 0, 'SURF_DESPIKE', STATUS)
+
+*     Reset the previous PGPLOT attributes
+                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS,
+     :                 STATUS)
+
+*     The error envelope
                   IF (NSIGMA .GT. 0.0) THEN
-                     CALL PGSCI(2)
-                     CALL PGLINE(N_SIGS, %VAL(CNF_PVAL(SIG_X_PTR)),
-     :                    %VAL(CNF_PVAL(STDEVP_PTR)))
-                     CALL PGLINE(N_SIGS, %VAL(CNF_PVAL(SIG_X_PTR)),
-     :                    %VAL(CNF_PVAL(STDEVM_PTR)))
+
+*     The + SIGMA line
+
+*     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
+                     CALL AST_TRAN2( IPLOT, N_SIGS, 
+     :                    %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVP_PTR)), .FALSE.,
+     :                    %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVP_PTR)), STATUS )
+
+*     Specify a default color
+                     CALL AST_SETI( IPLOT, 'COLOUR(CURVES)', 2, STATUS )
+
+*     Set the appearance of lines drawn using PGPLOT so that they mimic
+*     curves produced using astCurves.
+                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS,
+     :                    STATUS )
+
+*     Draw the lines using AST
+                  CALL KPG1_PLTLN( N_SIGS, 1, N_SIGS,
+     :                 %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                 %VAL(CNF_PVAL(STDEVP_PTR)),
+     :                 .FALSE., .FALSE.,
+     :                 0.0D0, 0.0D0, 0.0D0, 'STYLE', IPLOT, 2,
+     :                 0, 0, 0, 'SURF_DESPIKE', STATUS)
+
+*     The - SIGMA line
+
+*     First need to transform the X coordinates back to DATA from the previous
+*     transformation (or allocate more memory)
+                     CALL AST_TRAN2( IPLOT, N_SIGS, 
+     :                    %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVP_PTR)), .TRUE.,
+     :                    %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVP_PTR)), STATUS )
+
+*     Transform the data coordinates to GRAPHICS coordinates required by KPG1_PLTLN
+                     CALL AST_TRAN2( IPLOT, N_SIGS, 
+     :                    %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVM_PTR)), .FALSE.,
+     :                    %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVM_PTR)), STATUS )
+
+
+*     Draw the lines using AST
+                     CALL KPG1_PLTLN( N_SIGS, 1, N_SIGS,
+     :                    %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVM_PTR)),
+     :                    .FALSE., .FALSE.,
+     :                    0.0D0, 0.0D0, 0.0D0, 'STYLE', IPLOT, 2,
+     :                    0, 0, 0, 'SURF_DESPIKE', STATUS)
+
+*     Reset the previous PGPLOT attributes
+                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS,
+     :                    STATUS)
+
                   END IF
+
                END IF
+C               END IF
             
 *     Free the memory
                CALL SCULIB_FREE('MED_PTR', MED_PTR, MED_END, STATUS)
@@ -367,6 +492,8 @@
                CALL SCULIB_FREE('STDEVM', STDEVM_PTR, STDEVM_END, 
      :              STATUS)
 
+*     Close the plot
+               CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
             ELSE
 
@@ -374,7 +501,7 @@
      :              'points in selected range', STATUS)
                
             END IF
-            
+
          END IF
 
       END DO
@@ -382,7 +509,4 @@
 *     Check for null parameter
       IF (STATUS .EQ. PAR__NULL) CALL ERR_ANNUL(STATUS)
          
-*     Release Device
-      CALL PGP_ANNUL( UNIT, STATUS )
-
       END

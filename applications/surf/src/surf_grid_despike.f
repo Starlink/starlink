@@ -123,6 +123,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.7  2005/03/18 19:32:45  timj
+*     Replace plotting directly with PGPLOT to plotting using KAPLIBS and AST.
+*
 *     Revision 1.6  2004/09/08 02:03:33  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -155,6 +158,7 @@
       INCLUDE 'PAR_ERR'                          ! PAR__NULL
       INCLUDE 'MSG_PAR'                          ! MSG__NORM
       INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
+      INCLUDE 'AST_PAR'                          ! AST constants
  
 *  Arguments Given:
       INTEGER N_FILES
@@ -183,21 +187,28 @@
 *  Local Constants:
  
 *  Local Variables:
+      LOGICAL ALIGN                         ! DATA pic. aligned with a previous picture?
       INTEGER BIN_PTR                       ! Binned data
       INTEGER BIN_PTR_END                   ! End of BIN_PTR
       INTEGER BIN_POS_PTR                   ! Position of binned data
       INTEGER BIN_POS_END                   ! End of BIN_POS
+      DOUBLE PRECISION BOX(4)               ! Dummy bounding box for dummy plot
       INTEGER GRID_END                      ! End of scratch array
       INTEGER GRID_PTR                      ! Scratch space
       INTEGER I                             ! Loop counter
       INTEGER IJPOS_PTR                     ! Ptr to array containing I,J's
       INTEGER IJPOS_END                     ! End of IJPOS_PTR
       INTEGER IMAX                          ! I pos of hist max
+      INTEGER IPICD                         ! AGI identifier for the dummy DATA picture
+      INTEGER IPICF                         ! AGI identifier for the dummy frame picture
+      INTEGER IPLOT                         ! Pointer to AST Plot for dummy DATA picture
       INTEGER IPOS_END                      ! End of ipos_ptr
       INTEGER IPOS_PTR                      ! I positions in lookup table
       INTEGER JPOS_END                      ! End of jpos_ptr
       INTEGER JPOS_PTR                      ! J positions in lookup table
       INTEGER JMAX                          ! J pos of hist max
+      REAL    MARGIN(4)                     ! Dummy margin for dummy plot
+      INTEGER NFRM            ! Frame index increment between IWCS and IPLOT
       INTEGER NMAX                          ! Max entries per cell
       REAL    NSIGMA                        ! Despiking level
       INTEGER OFFSET                        ! Offset in data array
@@ -241,6 +252,8 @@
       SCRATCH_PTR = 0
       IJPOS_PTR = 0
       IJPOS_END = 0
+
+      PLOT = .FALSE.
 
 *     Default unpacking mode
       UMODE = 'SPIRAL'
@@ -390,10 +403,13 @@
       CALL SCULIB_FREE ('IJPOS_PTR', IJPOS_PTR, IJPOS_END, STATUS)
 
 *     Some scratch space for storing the numbers (size nmax)
-*     in each bin
+*     in each bin. This scratch space is used in 
+*     SURFLIB_PLOT_GRID as well as SURFLIB_STATS_GRID
+*     We use DOUBLE as that is required by AST in PLOT_GRID and is
+*     fine for scratch space in STATS_GRID
 
-      CALL SCULIB_MALLOC(NMAX * VAL__NBR, PNT_PTR, PNT_END, STATUS)
-      CALL SCULIB_MALLOC(NMAX * VAL__NBR, SCRATCH_PTR, SCRATCH_END, 
+      CALL SCULIB_MALLOC(NMAX * VAL__NBD, PNT_PTR, PNT_END, STATUS)
+      CALL SCULIB_MALLOC(NMAX * VAL__NBD, SCRATCH_PTR, SCRATCH_END, 
      :     STATUS)
 
 
@@ -411,15 +427,30 @@
 
 
 *     Ask for the plotting device
-*     Do it here so that we get more control
-
-*     Obtain Zone on a graphics workstation
 
       IF (STATUS .EQ. SAI__OK) THEN
 
          PLOT = .FALSE.  ! Start by assuming no plot
 
-         CALL PGP_ASSOC( 'DEVICE', 'WRITE', 1, 1, UNIT, STATUS )
+*     This is going to be a call to a bogus plot device so that we can
+*     determine whether the plot is required so that we can decide
+*     which further parameters we need before calculating statistics.
+*     It does not matter what BOX or MARGIN are set to as the device is closed
+*     immediately. The important thing is that the status of the DEVICE parameter
+*     is retained.
+         MARGIN(1) = 0.1
+         MARGIN(2) = 0.1
+         MARGIN(3) = 0.1
+         MARGIN(4) = 0.1
+
+         BOX(1) = 0.0D0
+         BOX(2) = 0.0D0
+         BOX(3) = 1.0D0
+         BOX(4) = 1.0D0
+
+         CALL KPG1_PLOT( AST__NULL, 'NEW', 'SURF_DESPIKE',
+     :        ' ', MARGIN, 0, ' ', ' ', 0.0, 0,' ',
+     :        BOX, IPICD, IPICF, 0, IPLOT, NFRM, ALIGN, STATUS )
 
          IF (STATUS .EQ. PAR__NULL) THEN
 
@@ -427,8 +458,10 @@
 *     want the despike
             CALL ERR_ANNUL(STATUS)
 
-         ELSE
+         ELSE IF (STATUS .EQ. SAI__OK) THEN
 
+*     Close the dummy plot and indicate that a plot is required later
+            CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
             PLOT = .TRUE.
 
          END IF
@@ -442,14 +475,16 @@
 
 *     Find out the display mode if we are smoothing or if we are plotting
 
-      IF ((SMODE .NE. 'NONE') .OR. PLOT) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF ((SMODE .NE. 'NONE') .OR. PLOT) THEN
 
-         CALL PAR_CHOIC('DMODE', 'SPIRAL', 
-     :        'SPIRAL,XLINEAR,YLINEAR,DIAG1,DIAG2',
-     :        .TRUE., UMODE, STATUS)
+            CALL PAR_CHOIC('DMODE', 'SPIRAL', 
+     :           'SPIRAL,XLINEAR,YLINEAR,DIAG1,DIAG2',
+     :           .TRUE., UMODE, STATUS)
 
+         END IF
       END IF
-         
+
 *     Calculate the grid positions related to a given pixel index
 *     Need to do this since some people want complicated spiral unwrapping
 *     and it takes too long to calculate all this on the fly.
@@ -537,8 +572,6 @@
      :        STATUS)
          
 *     Finish the plotting excursion
-*     Close down PGPLOT
-         CALL PGP_DEACT( STATUS )
 
       END IF
 
