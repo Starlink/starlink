@@ -38,7 +38,8 @@
       }{
          Name of the input text Fortran file.  The file will normally
          have variable-length records when there is a header, but
-         always fixed-length records when there is no header.
+         always fixed-length records when there is no header.  The
+         maximum record length allowed is 512 bytes.
       }
       \sstsubsection{
          OUT = NDF (Read and Write)
@@ -166,7 +167,7 @@
             created by this application's sister, NDF2ASCII.  BITPIX is
             ignored for QUALITY data; type \_UBYTE is used.
             \item NAXIS, and NAXIS{\em{n}} define the shape of the NDF.
-            \item The TITLE, LABEL, and BUNITS are copied to the NDF
+            \item The TITLE, LABEL, and BUNIT are copied to the NDF
             TITLE, LABEL, and UNITS NDF components respectively.
             \item The CDELT{\em{n}}, CRVAL{\em{n}}, CTYPE{\em{n}}, and CUNIT{\em{n}} keywords make
             linear axis structures within the NDF.  CUNIT{\em{n}} define the
