@@ -7,9 +7,8 @@
 <body>
 <blockquote>
 <h2 align=center><font color=red>Automatic Object Detection Toolbox</font></h2>
-<h3 align=center>Basic usage</h3>
 
-<h4>Detecting the objects on your image</h4>
+<h3>Detecting the objects on your image</h3>
 <p>Just press the "Detect objects" button. This will by default find
 all the objects, create a catalogue of their positions, intensity and
 shape parameters, display the catalogue and finally get the catalogue
@@ -18,7 +17,7 @@ window to draw some detection ellipses.
 <p>You can now use the catalogue window to investigate the results
 (see the help there for making selections).
 
-<h4>Changing the detection limits, <i>etc. etc. etc.</i></h4>
+<h3>Changing the detection limits, <i>etc. etc. etc.</i></h3>
 <p>The parameters shown in the various "pages" of the toolbox, control
 the values used in the detection and analysis of the objects on your
 image. These are directly related to the parameters used by the
@@ -29,7 +28,7 @@ SUN/226 and MUD/165) should be consulted for their exact meaning.
 help (displayed at the bottom of the window), so you can proceed, at
 least initially, from just these.
 
-<h4>Configuring the default parameters</h4>
+<h3>Configuring the default parameters</h3>
 <p>When the toolbox starts up it configures itself by reading files
 called "default.sex" and "default.param". To locate these files it
 searches the following directories:
@@ -45,7 +44,7 @@ itself will update these two files (unless you've changed the names to
 be used) whenever a detection pass is made, so they always reflect the
 current state of the interface.
 
-<h4>Running SExtractor/EXTRACTOR directly using the values in the toolbox</h4>
+<h3>Running SExtractor/EXTRACTOR directly using the values in the toolbox</h3>
 <p>When it runs the toolbox updates the "default.sex" and
 "default.param" files (unless you've changed in names used). These can
 then be used to run SExtractor or EXTRACTOR. You can also use the File
@@ -54,16 +53,16 @@ files. So you can use the GAIA interface to fine tune the detection
 parameters for an image and then use these to do the detections on
 other images.
 
-<h4>Making detections on one image and measurements on another</h4>
+<h3>Making detections on one image and measurements on another</h3>
 <p>The toolbox always makes its measurements on the displayed
 image. If you want to use another image to do the initial detections
 then just enter its name in the "Detection image:" entry field.
 
-<h4>Stopping the plotting of detection ellipses</h4>
+<h3>Stopping the plotting of detection ellipses</h3>
 <p>If you want to stop plotting detection ellipses, then look under
 the "Options" menu and de-select the currently highlighted option.
 
-<h4>Getting a printout</h4>
+<h3>Getting a printout</h3>
 <p>To get a hardcopy of your image plus detections use the "Print..."
 item under the "File" menu in the main image window. Remember you only
 get a copy of what is visible, so if you have a large image unzoom it
@@ -72,7 +71,7 @@ until it is all visible.
 <p>If you want to draw axes around your image then see the "Overlay
 axes grid..." item under the "Image-Analysis" menu in the main window.
 
-<h4>Using a different version of SExtractor</h4>
+<h3>Using a different version of SExtractor</h3>
 <p>To use your own version of SExtractor you need to define the
 environment variable EXTRACTOR_DIR to point to the directory that
 contains your "sex" program. Note this directory, or a sub-directory
@@ -82,14 +81,14 @@ files.
 <p>The toolbox was developed using a Starlink modified SExtractor 
 version 2.2.1. Later versions may not be supported.
 
-<h4>Using EXTRACTOR on my FITS image</h4>
+<h3>Using EXTRACTOR on my FITS image</h3>
 <p>By default the toolbox will use the native version of SExtractor on
 FITS files. To stop this just open the "Options" menu and de-select
 the "Use Native SExtractor" item. You may need to do this if you have
 an image with a DSS astrometric solution and you want to measure sky
 coordinates.
 
-<h4>Viewing stars and galaxies in different colours</h4>
+<h3>Viewing stars and galaxies in different colours</h3>
 <p>To view your catalogue using a cut in the star/galaxy measurement
 parameter you need to use the catalogue window controls.
 
@@ -101,7 +100,7 @@ then use the catalogue window methods for selecting rows with values
 between given ranges (see the help in the catalogue window for how to
 do this).
 
-<h4>Changing the output catalogue file type</h4>
+<h3>Changing the output catalogue file type</h3>
 <p> The file types output by the toolbox are restricted to the following:
 <dl>
 <dt>.FIT
@@ -112,7 +111,7 @@ do this).
 <dd>for tab-tables, the "native" format.
 </dl>
 
-<h4>Reading back and re-displaying a catalogue</h4>
+<h3>Reading back and re-displaying a catalogue</h3>
 <p>To read back a catalogue and display it as a series of detection
 ellipses you need to use the "Read old catalogue..." item in the
 "File" menu. 
@@ -122,7 +121,7 @@ Catalogues" item on the main window. However it is unlikely that
 you'll get suitable ellipses drawn (this depends on whether your
 "skycat.cfg" file has been updated for this catalogue).
 
-<h4>Changing the colour of the ellipses</h4>
+<h3>Changing the colour of the ellipses</h3>
 <p>The "Options" - "Set Plot Symbols..." item in the catalogue window
 creates a dialog window in which you can define many things about the
 properties of any shapes that are drawn (these are Tcl expressions of

@@ -26,6 +26,14 @@ itcl::class util::HelpWin {
       #  Evaluate any options.
       eval configure $args
 
+      #  Preset helpdir to GAIA default.
+      if { $helpdir == {} } {
+         global env
+         if { [info exists env(GAIA_HELP)] } {
+            set helpdir $env(GAIA_HELP)
+         }
+      }
+
       #  We have an interest in health of widget.
       incr reference_
    }
@@ -58,14 +66,15 @@ itcl::class util::HelpWin {
    # Create the help window.
    private method create_ {} {
       if { ![winfo exists $hyperhelp_] } {
-         set hyperhelp_ [iwidgets::hyperhelp .\#auto \
-                            -title "On-line Help" \
+         set hyperhelp_ [gaia::GaiaHyperHelp .\#auto \
+                            -title "GAIA On-line Help" \
                             -modality none \
                             -topics {index} \
-                            -helpdir $helpdir\
+                            -helpdir $helpdir \
                             -wrap word \
-                            -width 700 \
-                            -height 500 \
+                            -setgrid 1 \
+                            -width 500 \
+                            -height 700 \
                             -fontname helvetica]
       }
    }
@@ -74,12 +83,7 @@ itcl::class util::HelpWin {
    #  ----------------------
 
    #  Name of the directory that contains all help files.
-   public variable helpdir {} {
-      if { $helpdir == {} } {
-         global env
-         set helpdir $env(GAIA_HELP)
-      }
-   }
+   public variable helpdir {}
 
    #  Name of the topic that should be displayed
    public variable file {}

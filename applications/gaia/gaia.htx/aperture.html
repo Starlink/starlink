@@ -7,8 +7,7 @@
 <body>
 <blockquote>
 <h2 align=center><font color=red>Aperture Photometry Toolbox</font></h2>
-<h3 align=center>Basic usage</h3>
-<h4>Making a simple measurement now</h4>
+<h3>Making a simple measurement now</h3>
 <p>In a hurry? Then try the following recipe:
 <ol>
 <li>Press the "Define object aperture" button.</li>
@@ -24,12 +23,12 @@ In this example the sky background is estimated using the region
 between the outer and inner annuli. If this region contains any
 contamination then you will need to create sky apertures.
 
-<h4>Measuring several stars</h4>
+<h3>Measuring several stars</h3>
 <p>You can create as many apertures as you like by repeating the stages
 described above. All apertures are re-measured each time the "Calculate
 results" button is pressed.
 
-<h4>Making measurements without an annulus</h4>
+<h3>Making measurements without an annulus</h3>
 <p>Open the menu "Options" and select the "Use annular sky regions"
 item. This now switches off the creation of the annulus region (note
 this can also toggle the current aperture). Now create an object
@@ -38,7 +37,7 @@ apertures. These sky regions are just associated with this aperture
 (note the colour change in sky aperture associated with an object
 aperture).
 
-<h4>Resizing or moving an aperture</h4>
+<h3>Resizing or moving an aperture</h3>
 <p>To move or resize an aperture you first need to "select"
 it. Selecting is done by placing your mouse cursor over the aperture
 and then pressing button 1. This should change the aperture colour and
@@ -55,7 +54,7 @@ windows ("Semimajor axis:", "Eccentricity:", "Position angle:",
 and entry windows only work on the selected aperture. To activate a
 value you type into a entry window press the &lt;Return&gt; key.
 
-<h4>Making all apertures the same size</h4>
+<h3>Making all apertures the same size</h3>
 <p>To create apertures with a fixed size, or which are constrained to
 be the same size, choose the "Options" menu and select the "Keep
 apertures same size" option. Apertures will now be created with the
@@ -65,7 +64,7 @@ angle:", "Annulus inner scale:" and "Annulus outer scale:" windows.
 <p>If you select one of these apertures and resize (or reorient) it,
 in some way, then all the other apertures will track these changes.
 
-<h4>Resizing more than one aperture at time</h4>
+<h3>Resizing more than one aperture at time</h3>
 <p>To do this you must select all the apertures you want to modify
 together. To do this select an aperture, then hold down the
 &lt;Control&gt; button and select the next aperture etc. You can now
@@ -73,18 +72,18 @@ say change all the apertures to the same radius by typing a value into
 the "Semimajor axis:" entry window and then pressing return. You can
 also get the same effect by moving the slider.
 
-<h4>Using elliptical apertures</h4>
+<h3>Using elliptical apertures</h3>
 <p>Open the "Options" menu and select the "Use circular apertures"
 item. Any new apertures that you now create will be elliptical. Use
 the grips to reorient and resize the aperture.
 
-<h4>Viewing all measurements at once</h4>
+<h3>Viewing all measurements at once</h3>
 <p>Just select the "Results" tab and press "View all
 measurements". This creates a new window that lists all the current
 apertures and their related values. Double click on a line to make
 that aperture current.
 
-<h4>Saving the measurements</h4>
+<h3>Saving the measurements</h3>
 <p>Just press the "Save" button. This will write all the current
 measurements to a file "GaiaPhotomLog.Dat" by default. You can write
 to a different file using the "Results" entry field.
@@ -94,7 +93,7 @@ results file (preceded by the name of the current image in a
 comment). Note the "Save" option overwrites the results file without
 prompting.
 
-<h4>Making the same measurements on other images</h4>
+<h3>Making the same measurements on other images</h3>
 <p>To do this display your new image (either in a clone or by
 superseding the existing image) and then open the "File" menu and
 select the "Read measurements..." item. This allows you to select a
@@ -105,11 +104,11 @@ to a new file.
 <p>You can also use the results files together with the AUTOPHOTOM
 program (see SUN/45) to redo the same measurements non-interactively.
 
-<h4>Changing the frame zero point (magnitudes only)</h4>
+<h3>Changing the frame zero point (magnitudes only)</h3>
 <p>Just type in the frame zero point into the entry window and press
 return. All the existing apertures will now be re-measured.
 
-<h4>Setting the image exposure time</h4>
+<h3>Setting the image exposure time</h3>
 <p>The easiest way to set the exposure time (so you can normalize all
 your observations to unit flux) is to just enter the exposure time in
 seconds in the "Exposure time/qualifier:" entry, (found under the
@@ -124,7 +123,7 @@ intensities, so using seconds is only a convenience.
 "FITS keyword" and enter the header item name in the "Exposure
 time/qualifier" entry.
 
-<h4>Controlling the centroiding, noise characteristics, sky estimators...</h4>
+<h3>Controlling the centroiding, noise characteristics, sky estimators...</h3>
 <p>The aperture photometry is actually performed by the PHOTOM program
 AUTOPHOTOM. This is described in SUN/45. All the additional parameters
 that define the conversion factor from data units to photons, any bias
@@ -137,7 +136,7 @@ documentation) to understand these parameters.
 wrong unless you set the image bias and data units to photons
 conversion factor correctly.
 
-<h4>Understand the results for an aperture</h4>
+<h3>Understand the results for an aperture</h3>
 <p>The results shown for an aperture have the following meanings:
 <dl>
 <dt>Aperture index
