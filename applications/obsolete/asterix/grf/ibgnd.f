@@ -821,9 +821,12 @@
 
 *    Redo the quality
         CALL IBGND_SETQ( STATUS )
-
+	print *,'Done setq'
+	call flush(6)
 *    Recompute the samples and surface
         CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
+	print *,'Done setq'
+	call flush(6)
 
 *    Update noticeboard
         IF ( I_GUI ) THEN
@@ -2698,6 +2701,8 @@
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      STATUS )
       END IF
+	print *,'Done samp comp'
+	call flush(6)
 
 *  Compute the background surface
       IF ( SURF ) THEN
@@ -2708,6 +2713,8 @@
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      %VAL(I_BGM_DPTR),
      :                      STATUS )
+	print *,'Done surf comp'
+	call flush(6)
 
 *    Bgnd derived image is displayed?
         IF ( (I_BGM_DISIM .EQ. 1) .OR. (I_BGM_DISIM.EQ.-1) ) THEN
@@ -2716,6 +2723,8 @@
           CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
 
         END IF
+	print *,'Done surf disp'
+	call flush(6)
 
       END IF
 
