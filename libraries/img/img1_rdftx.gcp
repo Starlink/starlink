@@ -41,6 +41,8 @@
 *        Original version.
 *     1-SEP-1994 (PDRAPER):
 *        Now doesn't report an error when fails to locate keyword.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,6 +59,7 @@
       INCLUDE 'IMG_ERR'          ! IMG_ error codes
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'          ! CNF parameters
 
 *  Global Variables:
       INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
@@ -96,7 +99,8 @@
 *  Pass on the work to the appropriate routine. Note the %VAL(80)
 *  follows the last genuine argument. This is the usual method used by
 *  compilers for passing the lengths of strings on UNIX.
-      CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ), 1,
+      CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), 
+     :                   %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), 1,
      :                   ITEM, NOCCUR, THERE, VALUE, AT, STATUS,
      :                   %VAL( 80 ) )
       IF ( STATUS .NE. SAI__OK ) THEN

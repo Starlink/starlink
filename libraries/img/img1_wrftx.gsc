@@ -46,6 +46,8 @@
 *        Added check for status return from GKEY.
 *     20-SEP-1994 (PDRAPER):
 *        Removed PSX calls.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -62,6 +64,7 @@
       INCLUDE 'IMG_ERR'          ! IMG_ error codes
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'          ! CNF parameters
 
 *  Global Variables:
       INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
@@ -118,7 +121,8 @@
       IF ( LKEY .EQ. 'COMMENT' .OR. LKEY .EQ. 'HISTORY' .OR.
      :     LKEY .EQ. ' ' ) THEN
          CALL ERR_MARK
-         CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+         CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), 
+     :                      %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                      1, 'END', 0, THERE, LVAL, AT, STATUS,
      :                      %VAL( 80 ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
@@ -126,7 +130,8 @@
          THERE = .FALSE.
       ELSE
          CALL ERR_MARK
-         CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+         CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), 
+     :                      %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                      1, LKEY, 0, THERE, LVAL, AT, STATUS,
      :                      %VAL( 80 ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
@@ -142,7 +147,8 @@
 
 *  Now write in the value.
       NEWEND = .NOT. THERE
-      CALL IMG1_WKEY<T>( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+      CALL IMG1_WKEY<T>( ECB_FTSN( SLOT ), 
+     :                   %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                   AT, NEWEND, LKEY, COMMEN, VALUE,
      :                   STATUS, %VAL( 80 ) )
 

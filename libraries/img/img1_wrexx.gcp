@@ -51,6 +51,8 @@
 *        Now always uses "IMG_EXTENSION" as the type for structures and
 *        erases/re-creates objects which exist (provided that this is
 *        possible).
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +69,7 @@
       INCLUDE 'IMG_ERR'          ! IMG_ error codes
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'          ! CNF parameters
 
 *  Global Variables:
       INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
@@ -352,7 +355,7 @@
                      CALL DAT_CLONE( LOC2, TMPLOC, STATUS )
                      CALL IMG1_WCEL( ECB_XNSTK( SLOT, ESLOT ),
      :                               ECB_XNSTK( SLOT, ESLOT ), TMPLOC,
-     :                               %VAL( ECB_XPSTK( SLOT, ESLOT ) ),
+     :                          %VAL(CNF_PVAL( ECB_XPSTK(SLOT,ESLOT) )),
      :                               STATUS )
                   END IF
                END IF
