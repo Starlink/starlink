@@ -20,6 +20,7 @@
      makecal - Produces a dark or pre-flash calibration image.
     makeflat - Produces a flatfield calibration image.
      makemos - Make a mosaic by combining and (optionally) normalising images.
+     outline - Draws aligned outlines of images on a graphics display.
      pairndf - Aligns images graphically by drag and drop.
     plotlist - Draws position markers on a graphics display.
      present - Presents a list of images to CCDPACK.

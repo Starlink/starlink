@@ -27,6 +27,7 @@ makebias        hlp = doc$makebias.hlp, src = makebias.f
 makecal        hlp = doc$makecal.hlp, src = makecal.f
 makeflat        hlp = doc$makeflat.hlp, src = makeflat.f
 makemos        hlp = doc$makemos.hlp, src = makemos.f
+outline        hlp = doc$outline.hlp, src = outline.f
 pairndf        hlp = doc$pairndf.hlp, src = pairndf.f
 plotlist        hlp = doc$plotlist.hlp, src = plotlist.f
 present        hlp = doc$present.hlp, src = present.f
