@@ -647,7 +647,7 @@
 *  Plot the vectors.
       CALL POL1_VECPL( NVEC, %VAL( IPX2 ), %VAL( IPY2 ), %VAL( IPMAG ),
      :                 %VAL( IPANG ), ANGFAC, ANGROT, DSCALE, AHSIZE, 
-     :                 JUST, STATUS )
+     :                 JUST, .FALSE., STATUS )
 
 *  Re-instate the previous PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )
