@@ -44,6 +44,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IPSF Version 1.6-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -58,7 +60,7 @@
           CALL PSF_ASSOCI(I_LOC,I_PSF,STATUS)
         ELSE
 *  or see if different PSF to be loaded
-          CALL PAR_GET0L('NEW',NEW,STATUS)
+          CALL USI_GET0L('NEW',NEW,STATUS)
           IF (NEW) THEN
             CALL PSF_RELEASE(I_PSF,STATUS)
             CALL PSF_ASSOCI(I_LOC,I_PSF,STATUS)
@@ -95,14 +97,14 @@
         CALL DYN_UNMAP( PSF_PTR, STATUS )
 
 *  get background per pixel and correct for oversampling
-        CALL PAR_GET0R( 'BGND', BGND, STATUS )
-        CALL PAR_GET0R( 'BGNDERR', BGNDERR, STATUS )
+        CALL USI_GET0R( 'BGND', BGND, STATUS )
+        CALL USI_GET0R( 'BGNDERR', BGNDERR, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         BGND = BGND / REAL(I_OSAMPLE**2)
         BGNDERR = BGNDERR / REAL(I_OSAMPLE**2)
 
 *  get scale factor
-        CALL PAR_GET0R( 'PMAX', PMAX, STATUS )
+        CALL USI_GET0R( 'PMAX', PMAX, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           FIT = .FALSE.
         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -157,6 +159,8 @@
       ENDIF
 
  99   CONTINUE
+
+      CALL USI_CLOSE()
 
       END
 

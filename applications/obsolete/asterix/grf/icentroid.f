@@ -34,6 +34,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ICENTROID Version 1.7-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -64,11 +66,11 @@
 
 *  keyboard mode
         ELSE
-          CALL PAR_DEF0R('X',I_X,STATUS)
-          CALL PAR_GET0R('X',XC,STATUS)
-          CALL PAR_DEF0R('Y',I_Y,STATUS)
-          CALL PAR_GET0R('Y',YC,STATUS)
-          CALL PAR_GET0R('RAD',RAD,STATUS)
+          CALL USI_DEF0R('X',I_X,STATUS)
+          CALL USI_GET0R('X',XC,STATUS)
+          CALL USI_DEF0R('Y',I_Y,STATUS)
+          CALL USI_GET0R('Y',YC,STATUS)
+          CALL USI_GET0R('RAD',RAD,STATUS)
 
         ENDIF
 
@@ -76,7 +78,7 @@
         CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
 
 *  get number of iterations
-        CALL PAR_GET0I('ITER',ITER,STATUS)
+        CALL USI_GET0I('ITER',ITER,STATUS)
 
         DO I=1,ITER
 
@@ -93,10 +95,12 @@
         CALL IMG_SETPOS(XCENT,YCENT,STATUS)
 
 *  output centoid position
-        CALL PAR_PUT0R('XCENT',XCENT,STATUS)
-        CALL PAR_PUT0R('YCENT',YCENT,STATUS)
+        CALL USI_PUT0R('XCENT',XCENT,STATUS)
+        CALL USI_PUT0R('YCENT',YCENT,STATUS)
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

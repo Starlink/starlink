@@ -30,6 +30,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IHIST Version 1.7-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -38,7 +40,7 @@
       ELSE
 
 *  get number of bins required
-        CALL PAR_GET0I('NBIN',NBIN,STATUS)
+        CALL USI_GET0I('NBIN',NBIN,STATUS)
 
 *  get dynamic storage for plot
         CALL IMG_GET1D(NBIN,STATUS)
@@ -93,6 +95,8 @@
 
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

@@ -26,6 +26,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IDISPLAY Version 1.7-1')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
 
@@ -57,5 +59,7 @@
         I_CLEAR=.FALSE.
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END

@@ -26,6 +26,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IKEY Version 1.7-1')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -39,7 +41,7 @@
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
 
-        CALL PAR_GET0L('OFF',OFF,STATUS)
+        CALL USI_GET0L('OFF',OFF,STATUS)
         IF (OFF) THEN
           CALL GCB_CANL('KEY_FLAG',STATUS)
           CALL GCB_CANC('KEY_OPT',STATUS)
@@ -57,5 +59,7 @@
         ENDIF
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END

@@ -58,6 +58,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IMARK Version 1.7-5')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -67,7 +69,7 @@
       ELSE
 
 *  see if OFF-mode
-        CALL PAR_GET0L('OFF',OFF,STATUS)
+        CALL USI_GET0L('OFF',OFF,STATUS)
 
         IF (OFF.AND.STATUS.EQ.SAI__OK) THEN
           CALL GCB_CANI('MARKER_N',STATUS)
@@ -76,17 +78,17 @@
         ELSE
 
 *  get symbol, colour and size
-          CALL PAR_GET0I('SYMBOL',SYMBOL,STATUS)
-          CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
-          CALL PAR_GET0R('SIZE',SIZE,STATUS)
-          CALL PAR_GET0I('BOLD',BOLD,STATUS)
+          CALL USI_GET0I('SYMBOL',SYMBOL,STATUS)
+          CALL USI_GET0I('COLOUR',COLOUR,STATUS)
+          CALL USI_GET0R('SIZE',SIZE,STATUS)
+          CALL USI_GET0I('BOLD',BOLD,STATUS)
 
 *  see if current position to be marked
-          CALL PAR_GET0L('CURR',CURR,STATUS)
+          CALL USI_GET0L('CURR',CURR,STATUS)
 
 *      Number sources?
           IF ( .NOT. CURR ) THEN
-            CALL PAR_GET0L('NUMBER',NUMBER,STATUS)
+            CALL USI_GET0L('NUMBER',NUMBER,STATUS)
           ELSE
             NUMBER = .FALSE.
           ENDIF
@@ -115,7 +117,7 @@
 *  otherwise get list of positions from file
           ELSE
 
-            CALL PAR_GET0C('LIST',FILENAME,STATUS)
+            CALL USI_GET0C('LIST',FILENAME,STATUS)
             IF (STATUS.EQ.SAI__OK) THEN
 *  see if file exists in form given
               INQUIRE(FILE=FILENAME,EXIST=EXIST)
@@ -176,8 +178,8 @@
 *  look for individual HDS arrays
             ELSEIF (STATUS.EQ.PAR__NULL) THEN
               CALL ERR_ANNUL(STATUS)
-              CALL DAT_ASSOC('RA','READ',RLOC,STATUS)
-              CALL DAT_ASSOC('DEC','READ',DLOC,STATUS)
+              CALL USI_DASSOC('RA','READ',RLOC,STATUS)
+              CALL USI_DASSOC('DEC','READ',DLOC,STATUS)
               CALL DAT_SIZE(RLOC,NPOS,STATUS)
               CALL DYN_MAPD(1,NPOS,RAPTR,STATUS)
               CALL DYN_MAPD(1,NPOS,DECPTR,STATUS)
@@ -198,6 +200,8 @@
         ENDIF
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

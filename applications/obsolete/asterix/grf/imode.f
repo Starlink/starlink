@@ -25,15 +25,17 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IMODE Version 1.2-1')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
 
       ELSE
-        CALL PAR_GET0L('KEY',KEY,STATUS)
+        CALL USI_GET0L('KEY',KEY,STATUS)
         IF (.NOT.KEY) THEN
-          CALL PAR_GET0L('CURS',CURS,STATUS)
+          CALL USI_GET0L('CURS',CURS,STATUS)
         ENDIF
 
 *  toggle mode
@@ -61,4 +63,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

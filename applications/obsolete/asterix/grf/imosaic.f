@@ -330,7 +330,7 @@ c                              ! spacecraft co-ordinates.
 *    Start by getting number of frames to be merged
       JUMPOUT=.FALSE.
       DO WHILE (.NOT. JUMPOUT)
-        CALL PAR_GET0I( 'NUMBER', NUMBER, STATUS )
+        CALL USI_GET0I( 'NUMBER', NUMBER, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *      Test if within acceptable range
@@ -338,14 +338,14 @@ c                              ! spacecraft co-ordinates.
           CALL MSG_SETI('MXFRAM', MXFRAM)
           CALL MSG_PRNT('Number of frames must be between 2 and '/
      :                                                /'^MXFRAM' )
-          CALL PAR_CANCL('NUMBER',STATUS)
+          CALL USI_CANCL('NUMBER',STATUS)
         ELSE
           JUMPOUT=.TRUE.
         END IF
       END DO
 
 *    Ask user if want to average the overlap region or not
-      CALL PAR_GET0L( 'AVERAGE', AVERGE, STATUS )
+      CALL USI_GET0L( 'AVERAGE', AVERGE, STATUS )
 
 *    Check status before continuing
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -456,7 +456,7 @@ c                              ! spacecraft co-ordinates.
           IF ( STATUS .NE. SAI__OK ) THEN
 
 *          Tidy current frame
-            CALL PAR_CANCL( PARM(:LPARM), STATUS )
+            CALL USI_CANCL( PARM(:LPARM), STATUS )
 
             IF ( STATUS .NE. PAR__ABORT ) THEN
 
@@ -676,8 +676,8 @@ c                              ! spacecraft co-ordinates.
               ELSE
 
 *              Ask for offsets
-                CALL PAR_GET0I( 'XOFFSET', XOFSET(I), STATUS )
-                CALL PAR_GET0I( 'YOFFSET', YOFSET(I), STATUS )
+                CALL USI_GET0I( 'XOFFSET', XOFSET(I), STATUS )
+                CALL USI_GET0I( 'YOFFSET', YOFSET(I), STATUS )
 
 *              Check for an error
                 IF ( STATUS .NE. SAI__OK ) THEN
@@ -717,8 +717,8 @@ c                              ! spacecraft co-ordinates.
                 END IF
 
 *              Cancel parameters for next frame
-                CALL PAR_CANCL( 'XOFFSET', STATUS )
-                CALL PAR_CANCL( 'YOFFSET', STATUS )
+                CALL USI_CANCL( 'XOFFSET', STATUS )
+                CALL USI_CANCL( 'YOFFSET', STATUS )
 
               END IF
 

@@ -39,13 +39,15 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ILOAD Version 1.7-5')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
 *  get input image
       CALL BDA_ASSOCI('INP','R',ILOC,STATUS)
 
 *  see if GCB wanted
-      CALL PAR_GET0L('GCB',GCB,STATUS)
+      CALL USI_GET0L('GCB',GCB,STATUS)
 
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -73,7 +75,6 @@
           I_OPEN=.FALSE.
         ELSE
 
-          CALL AST_INIT()
           NEW=.TRUE.
 
         ENDIF
@@ -96,21 +97,21 @@
 *  get graphics device
         CALL GDV_STATUS(ACTIVE,STATUS)
         IF (.NOT.ACTIVE.AND.STATUS.EQ.SAI__OK) THEN
-          CALL PAR_GET0C('DEV',DEV,STATUS)
-          CALL PAR_GET0I('NX',NX,STATUS)
-          CALL PAR_GET0I('NY',NY,STATUS)
+          CALL USI_GET0C('DEV',DEV,STATUS)
+          CALL USI_GET0I('NX',NX,STATUS)
+          CALL USI_GET0I('NY',NY,STATUS)
           CALL MSG_PRNT('Opening device...')
           CALL GDV_OPEN(DEV,NX,NY,STATUS)
         ENDIF
 
 
-        CALL PAR_GET0I('MODE',MODE,STATUS)
+        CALL USI_GET0I('MODE',MODE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           I_MODE=MODE
         ENDIF
-        CALL PAR_GET0L('DISP',DISP,STATUS)
+        CALL USI_GET0L('DISP',DISP,STATUS)
 
         CALL GCB_ATTACH('IMAGE',STATUS)
 
@@ -181,4 +182,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

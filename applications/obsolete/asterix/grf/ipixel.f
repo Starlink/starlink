@@ -30,6 +30,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IPIXEL Version 1.7-3')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
 
@@ -37,12 +39,12 @@
         CALL MSG_PRNT('AST_ERR: image processing system not active')
       ELSE
 
-        CALL PAR_GET0L('OFF',OFF,STATUS)
+        CALL USI_GET0L('OFF',OFF,STATUS)
 
         IF (OFF) THEN
           QUAL=.FALSE.
         ELSE
-          CALL PAR_GET0L('QUAL',QUAL,STATUS)
+          CALL USI_GET0L('QUAL',QUAL,STATUS)
         ENDIF
 
         IF (QUAL.AND..NOT.I_QOK) THEN
@@ -88,4 +90,7 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+

@@ -37,27 +37,29 @@
 *-
       CALL MSG_PRNT(VERSION)
 
+      CALL USI_INIT()
+
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
 
       ELSE
 
 
-        CALL PAR_GET0L('GAUSS',GAUSSIAN,STATUS)
+        CALL USI_GET0L('GAUSS',GAUSSIAN,STATUS)
 
 	IF(GAUSSIAN) THEN
 
-           CALL PAR_PROMT('XWID','Gaussian FWHM in X (pixels)', STATUS)
-           CALL PAR_GET0R('XWID',XFWHM,STATUS)
-           CALL PAR_PROMT('YWID','Gaussian FWHM in Y (pixels)', STATUS)
-           CALL PAR_GET0R('YWID',YFWHM,STATUS)
+           CALL USI_PROMT('XWID','Gaussian FWHM in X (pixels)', STATUS)
+           CALL USI_GET0R('XWID',XFWHM,STATUS)
+           CALL USI_PROMT('YWID','Gaussian FWHM in Y (pixels)', STATUS)
+           CALL USI_GET0R('YWID',YFWHM,STATUS)
 
 	ELSE
 
-           CALL PAR_PROMT('XWID','Box size in X (pixels)', STATUS)
-           CALL PAR_GET0R('XWID',XBOX,STATUS)
-           CALL PAR_PROMT('YWID','Box size in Y (pixels)', STATUS)
-           CALL PAR_GET0R('YWID',YBOX,STATUS)
+           CALL USI_PROMT('XWID','Box size in X (pixels)', STATUS)
+           CALL USI_GET0R('XWID',XBOX,STATUS)
+           CALL USI_PROMT('YWID','Box size in Y (pixels)', STATUS)
+           CALL USI_GET0R('YWID',YBOX,STATUS)
 
 	ENDIF
 
@@ -108,6 +110,8 @@
 
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

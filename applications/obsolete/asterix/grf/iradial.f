@@ -35,6 +35,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IRADIAL Version 1.7-1')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -82,12 +84,12 @@
 
 *  keyboard mode
         ELSE
-          CALL PAR_DEF0R('XCENT',I_X,STATUS)
-          CALL PAR_GET0R('XCENT',XC,STATUS)
-          CALL PAR_DEF0R('YCENT',I_Y,STATUS)
-          CALL PAR_GET0R('YCENT',YC,STATUS)
+          CALL USI_DEF0R('XCENT',I_X,STATUS)
+          CALL USI_GET0R('XCENT',XC,STATUS)
+          CALL USI_DEF0R('YCENT',I_Y,STATUS)
+          CALL USI_GET0R('YCENT',YC,STATUS)
           CALL IMG_WORLDTOPIX(XC,YC,PXC,PYC,STATUS)
-          CALL PAR_GET0R('RAD',RAD,STATUS)
+          CALL USI_GET0R('RAD',RAD,STATUS)
           XR=XC+RAD
           YR=YC
           CALL IMG_WORLDTOPIX(XR,YR,PXR,PYR,STATUS)
@@ -95,7 +97,7 @@
         ENDIF
 
 *  get oversample
-        CALL PAR_GET0I( 'SAMPLE', I_OSAMPLE, STATUS )
+        CALL USI_GET0I( 'SAMPLE', I_OSAMPLE, STATUS )
 
         PRAD=SQRT((PXR-PXC)**2 + (PYR-PYC)**2)
         NBIN=I_OSAMPLE*INT(PRAD+0.5)
@@ -172,6 +174,8 @@
       ENDIF
 
  99   CONTINUE
+
+      CALL USI_CLOSE()
 
       END
 

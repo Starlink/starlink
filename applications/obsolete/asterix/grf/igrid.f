@@ -28,6 +28,8 @@
         LOGICAL OFF
 *
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -39,17 +41,17 @@
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
 
-        CALL PAR_GET0L('OFF',OFF,STATUS)
+        CALL USI_GET0L('OFF',OFF,STATUS)
         IF (OFF) THEN
           CALL GCB_CANI('GRID_FRAME',STATUS)
         ELSE
 
 * get frame
-          CALL PAR_GET0I('FRAME',NFRAME,STATUS)
+          CALL USI_GET0I('FRAME',NFRAME,STATUS)
           CALL GCB_SETI('GRID_FRAME',NFRAME,STATUS)
 
 * get label position
-          CALL PAR_GET0I('POS',POS,STATUS)
+          CALL USI_GET0I('POS',POS,STATUS)
           CALL GCB_SETI('GRID_POS',POS,STATUS)
 
 
@@ -62,4 +64,7 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+

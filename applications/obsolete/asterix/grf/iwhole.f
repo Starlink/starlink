@@ -26,6 +26,8 @@
       PARAMETER (VERSION='IWHOLE Version 1.2-0')
 *-
 
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -40,4 +42,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

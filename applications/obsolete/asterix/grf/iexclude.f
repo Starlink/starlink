@@ -29,6 +29,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IEXCLUDE Version 1.7-4')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -40,7 +42,7 @@
 *  ensure transformations are correct
         CALL GTR_RESTORE(STATUS)
 
-        CALL PAR_GET0C('MODE',MODE,STATUS)
+        CALL USI_GET0C('MODE',MODE,STATUS)
         CALL CHR_UCASE(MODE)
         MODE=MODE(:3)
 
@@ -75,6 +77,8 @@
       ENDIF
 
       CALL AST_ERR(STATUS)
+
+      CALL USI_CLOSE()
 
       END
 
@@ -120,12 +124,12 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get list of positions from file
-        CALL PAR_GET0C('LIST',FILENAME,STATUS)
+        CALL USI_GET0C('LIST',FILENAME,STATUS)
 *  get radius
-        CALL PAR_GET0R('RAD',RAD,STATUS)
+        CALL USI_GET0R('RAD',RAD,STATUS)
 
 *  are data to be altered
-        CALL PAR_GET0R('DVAL',DVAL,STATUS)
+        CALL USI_GET0R('DVAL',DVAL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           DAT=.FALSE.
@@ -192,10 +196,10 @@
 *  look for individual HDS arrays
         ELSEIF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
-          CALL DAT_ASSOC('RA','READ',RLOC,STATUS)
-          CALL DAT_ASSOC('DEC','READ',DLOC,STATUS)
+          CALL USI_DASSOC('RA','READ',RLOC,STATUS)
+          CALL USI_DASSOC('DEC','READ',DLOC,STATUS)
 *  get radius
-          CALL PAR_GET0R('RAD',RAD,STATUS)
+          CALL USI_GET0R('RAD',RAD,STATUS)
           CALL DAT_SIZE(RLOC,NPOS,STATUS)
           CALL DYN_MAPD(1,NPOS,RAPTR,STATUS)
           CALL DYN_MAPD(1,NPOS,DECPTR,STATUS)
@@ -334,7 +338,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  are data to be altered
-        CALL PAR_GET0R('DVAL',DVAL,STATUS)
+        CALL USI_GET0R('DVAL',DVAL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           DAT=.FALSE.
@@ -454,7 +458,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  are data to be altered
-        CALL PAR_GET0R('DVAL',DVAL,STATUS)
+        CALL USI_GET0R('DVAL',DVAL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           DAT=.FALSE.
@@ -463,7 +467,7 @@
         ENDIF
 
 *  set QUALITY inside or outside circle
-        CALL PAR_GET0L('OUTSIDE',OUTSIDE,STATUS)
+        CALL USI_GET0L('OUTSIDE',OUTSIDE,STATUS)
 
 *  cursor mode
         IF (I_MODE.EQ.1) THEN
@@ -497,12 +501,12 @@
 
 *  keyboard mode
         ELSE
-          CALL PAR_DEF0R('XCENT',I_X,STATUS)
-          CALL PAR_GET0R('XCENT',XC,STATUS)
-          CALL PAR_DEF0R('YCENT',I_Y,STATUS)
-          CALL PAR_GET0R('YCENT',YC,STATUS)
-          CALL PAR_DEF0R('RAD',I_R,STATUS)
-          CALL PAR_GET0R('RAD',RAD,STATUS)
+          CALL USI_DEF0R('XCENT',I_X,STATUS)
+          CALL USI_GET0R('XCENT',XC,STATUS)
+          CALL USI_DEF0R('YCENT',I_Y,STATUS)
+          CALL USI_GET0R('YCENT',YC,STATUS)
+          CALL USI_DEF0R('RAD',I_R,STATUS)
+          CALL USI_GET0R('RAD',RAD,STATUS)
         ENDIF
 
 
@@ -700,7 +704,7 @@
         DAT=.FALSE.
 
 *  are data to be altered
-        CALL PAR_GET0R('DVAL',DVAL,STATUS)
+        CALL USI_GET0R('DVAL',DVAL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           DAT=.FALSE.
@@ -710,13 +714,13 @@
 
 
 *      ARD file mode
-        CALL PAR_GET0L('ARD',ARD,STATUS)
+        CALL USI_GET0L('ARD',ARD,STATUS)
         IF (ARD) THEN
-          CALL PAR_GET0C( 'FILE', ARDFILE, STATUS )
+          CALL USI_GET0C( 'FILE', ARDFILE, STATUS )
           INQUIRE(FILE=ARDFILE,EXIST=EXIST)
           IF (EXIST) THEN
 *        Open for APPEND access?
-            CALL PAR_GET0L( 'APPEND', APPEND, STATUS )
+            CALL USI_GET0L( 'APPEND', APPEND, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 99
           ELSE
             APPEND=.FALSE.
@@ -735,13 +739,13 @@
         ENDIF
 
 *      Looping?
-        CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
+        CALL USI_GET0L( 'LOOP', LOOP, STATUS )
 
 *      Work inside or outside polygon
         IF ( LOOP ) THEN
           OUTSIDE = .FALSE.
         ELSE
-          CALL PAR_GET0L( 'OUTSIDE', OUTSIDE, STATUS )
+          CALL USI_GET0L( 'OUTSIDE', OUTSIDE, STATUS )
         END IF
 
         IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -1021,7 +1025,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  are data to be altered
-        CALL PAR_GET0R('DVAL',DVAL,STATUS)
+        CALL USI_GET0R('DVAL',DVAL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           DAT=.FALSE.
@@ -1031,7 +1035,7 @@
 
 
 *  get spatial description (ARD) file
-        CALL PAR_GET0C('FILE',AFILE,STATUS)
+        CALL USI_GET0C('FILE',AFILE,STATUS)
         CALL FIO_OPEN(AFILE,'READ','LIST',0,AUNIT,STATUS)
 
         DIMS(1)=I_NX

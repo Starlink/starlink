@@ -28,6 +28,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IMASK Version 1.7-1')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -37,7 +39,7 @@
 
         IF (I_QOK) THEN
 
-          CALL PAR_GET0L('TOGGLE',TOGGLE,STATUS)
+          CALL USI_GET0L('TOGGLE',TOGGLE,STATUS)
 
           IF (TOGGLE) THEN
 
@@ -57,8 +59,8 @@
             CALL MSG_BLNK()
             CALL STR_BTOC(I_MASK,MSTR,STATUS)
             CALL MSG_PRNT(' Old mask value: '//MSTR)
-            CALL PAR_DEF0C('MASK',MSTR,STATUS)
-            CALL PAR_GET0C('MASK',MSTR,STATUS)
+            CALL USI_DEF0C('MASK',MSTR,STATUS)
+            CALL USI_GET0C('MASK',MSTR,STATUS)
             CALL STR_CTOB(MSTR,I_MASK,STATUS)
             IF (STATUS.EQ.SAI__OK) THEN
               CALL MSG_PRNT(' New mask value: '//MSTR)
@@ -77,4 +79,8 @@
 
       CALL AST_ERR(STATUS)
 
+      CALL USI_CLOSE()
+
       END
+
+

@@ -31,6 +31,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ITEXT Version 1.7-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -62,15 +64,15 @@
           ELSE
             ANGLE=ATAN2(YE-YC,XE-XC)*180.0/3.142
           ENDIF
-          CALL PAR_GET0C('TEXT',TEXT,STATUS)
+          CALL USI_GET0C('TEXT',TEXT,STATUS)
 
 *  keyboard mode
         ELSE
 
-          CALL PAR_GET0C('TEXT',TEXT,STATUS)
-          CALL PAR_GET0R('XPOS',XC,STATUS)
-          CALL PAR_GET0R('YPOS',YC,STATUS)
-          CALL PAR_GET0R('ANGLE',ANGLE,STATUS)
+          CALL USI_GET0C('TEXT',TEXT,STATUS)
+          CALL USI_GET0R('XPOS',XC,STATUS)
+          CALL USI_GET0R('YPOS',YC,STATUS)
+          CALL USI_GET0R('ANGLE',ANGLE,STATUS)
 
         ENDIF
 
@@ -90,4 +92,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

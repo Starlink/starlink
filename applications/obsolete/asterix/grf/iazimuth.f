@@ -11,7 +11,7 @@
 *     12 Feb 92: V1.2-2 Data units now cnts/square axis unit (RDS)
 *     25 Jan 93: V1.7-0 GCB,GFX etc used (RJV)
 *      1 Jul 93: V1.7-1 GTR used (RJV)
-*     16 Aug 93: V1.7-2 Check status after PAR_GETs to stop crash (DJA)
+*     16 Aug 93: V1.7-2 Check status after USI_GETs to stop crash (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -44,6 +44,8 @@
       PARAMETER (VERSION = 'IAZIMUTH Version 1.7-2')
 *-
       CALL MSG_PRNT(VERSION)
+
+      CALL USI_INIT()
 
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
@@ -90,12 +92,12 @@
 
 *  keyboard mode
         ELSE
-          CALL PAR_DEF0R('XCENT',I_X,STATUS)
-          CALL PAR_GET0R('XCENT',XC,STATUS)
-          CALL PAR_DEF0R('YCENT',I_Y,STATUS)
-          CALL PAR_GET0R('YCENT',YC,STATUS)
+          CALL USI_DEF0R('XCENT',I_X,STATUS)
+          CALL USI_GET0R('XCENT',XC,STATUS)
+          CALL USI_DEF0R('YCENT',I_Y,STATUS)
+          CALL USI_GET0R('YCENT',YC,STATUS)
           CALL IMG_WORLDTOPIX(XC,YC,PXC,PYC,STATUS)
-          CALL PAR_GET0R('RAD',RAD,STATUS)
+          CALL USI_GET0R('RAD',RAD,STATUS)
           XR=XC+RAD
           YR=YC
           CALL IMG_WORLDTOPIX(XR,YR,PXR,PYR,STATUS)
@@ -113,7 +115,7 @@
         CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
 
 *  get number of bins from user
-        CALL PAR_GET0I('NBIN',NBIN,STATUS)
+        CALL USI_GET0I('NBIN',NBIN,STATUS)
         IF (STATUS.NE.SAI__OK) GOTO 99
 
 *  get arrays for 1D data
@@ -197,6 +199,8 @@
  99     CONTINUE
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

@@ -34,7 +34,9 @@
       PARAMETER (VERSION = ' Version 1.7-1')
 *-
 
-      CALL PAR_GET0C('OPER',OPER,STATUS)
+      CALL USI_INIT()
+
+      CALL USI_GET0C('OPER',OPER,STATUS)
       IF (OPER.EQ.'ADD') THEN
         CALL MSG_PRNT('IADD'//VERSION)
         CMD='IADD'
@@ -151,6 +153,8 @@
         CALL USI_ANNUL(LOC,STATUS)
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

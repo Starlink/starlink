@@ -32,6 +32,8 @@
         CHARACTER*30 VERSION
         PARAMETER (VERSION = 'INOISE Version 1.2-1')
 *
+      CALL USI_INIT()
+
 * Write version number
       CALL MSG_PRNT(VERSION)
 
@@ -41,7 +43,7 @@
 *
 *
 * Get standard deviation of noise.
-	CALL PAR_GET0R('SDEV', SD, STATUS)
+	CALL USI_GET0R('SDEV', SD, STATUS)
 
 *
         CALL IMG_COPY(STATUS)
@@ -61,6 +63,8 @@
         ENDIF
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

@@ -233,7 +233,7 @@
 
 *    Get central position
 *
-      CALL PAR_GET0R('XCENT',XCENT,STATUS)
+      CALL USI_GET0R('XCENT',XCENT,STATUS)
 *
 *
 *  Test if this is within the image.
@@ -246,7 +246,7 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 *
 *  Get Y centre
-      CALL PAR_GET0R('YCENT',YCENT,STATUS)
+      CALL USI_GET0R('YCENT',YCENT,STATUS)
 *
 *
 *  Test if this is within the image (pixel co-ords only)
@@ -265,11 +265,11 @@
       PYCENT = (YCENT-AMIN(2)) / ASCALE(2) + 0.5
 
 *    Get radial and azimuthal binsizes
-      CALL PAR_GET0R('RADIAL_BINSIZE',RBIN,STATUS)
-      CALL PAR_GET0R('AZIM_BINSIZE',ABIN, STATUS)
+      CALL USI_GET0R('RADIAL_BINSIZE',RBIN,STATUS)
+      CALL USI_GET0R('AZIM_BINSIZE',ABIN, STATUS)
 
 *    Normalise to axis units or /pixel?
-      CALL PAR_GET0L('NORM',NORM,STATUS)
+      CALL USI_GET0L('NORM',NORM,STATUS)
 
       IF (STATUS .NE. SAI__OK) GOTO 99
 
@@ -286,8 +286,8 @@
         RBIN=DIST/NRBIN
       ELSE
 *   See if limit on radial extent
-        CALL PAR_DEF0I('NRAD',NRBIN,STATUS)
-        CALL PAR_GET0I('NRAD',NRAD,STATUS)
+        CALL USI_DEF0I('NRAD',NRBIN,STATUS)
+        CALL USI_GET0I('NRAD',NRAD,STATUS)
         IF (NRAD.LT.NRBIN) THEN
           NRBIN=NRAD
         ELSE
@@ -411,7 +411,7 @@
 *    If an azimuthal axis is wanted get the start position from
 *    the user
       IF ( NABIN .NE. 1 ) THEN
-        CALL PAR_GET0R('AZSTART', AZANG, STATUS)
+        CALL USI_GET0R('AZSTART', AZANG, STATUS)
         IF (STATUS .NE. SAI__OK) GOTO 99
       ELSE
         AZANG = 0.0

@@ -26,6 +26,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IPEAKS Version 1.2-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -43,12 +45,14 @@
       ELSE
 
 * get threshold value
-        CALL PAR_GET0R('THRESH',THRESH, STATUS)
+        CALL USI_GET0R('THRESH',THRESH, STATUS)
 
         CALL IPEAKS_DOIT(%VAL(I_DPTR),THRESH,STATUS)
 
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

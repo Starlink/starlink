@@ -24,6 +24,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ISURFACE Version 1.7-1')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -38,7 +40,7 @@
 
 *  get display angle
 
-        CALL PAR_GET0R('ANGLE', ANGLE, STATUS)
+        CALL USI_GET0R('ANGLE', ANGLE, STATUS)
 
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
@@ -60,5 +62,7 @@
         ENDIF
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END

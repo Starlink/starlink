@@ -24,6 +24,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ISAVE1D Version 1.7-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -49,4 +51,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

@@ -33,6 +33,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ICOLOUR Version 1.7-7')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -43,11 +45,11 @@
 *  get mode
         MODE='HELP'
         DO WHILE (MODE.EQ.'HELP'.AND.STATUS.EQ.SAI__OK)
-          CALL PAR_GET0C('MODE',MODE,STATUS)
+          CALL USI_GET0C('MODE',MODE,STATUS)
           CALL CHR_UCASE(MODE)
           IF (MODE.EQ.'HELP'.AND.STATUS.EQ.SAI__OK) THEN
             CALL ICOLOUR_MODEHELP()
-            CALL PAR_CANCL('MODE',STATUS)
+            CALL USI_CANCL('MODE',STATUS)
           ELSEIF (STATUS.NE.SAI__OK) THEN
             MODE=' '
           ENDIF
@@ -119,6 +121,8 @@
         ENDIF
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 
@@ -207,7 +211,7 @@
 
         NUMBER=.FALSE.
         IF (TAB.EQ.0) THEN
-          CALL DAT_ASSOC('TABLE','READ',LOC,STATUS)
+          CALL USI_DASSOC('TABLE','READ',LOC,STATUS)
           CALL DAT_TYPE(LOC,TYPE,STATUS)
           CALL DAT_SIZE(LOC,NVAL,STATUS)
           OK=.TRUE.
@@ -306,8 +310,8 @@
           ENDDO
           DIMS(1)=3
           DIMS(2)=16
-          CALL DAT_CREAT('TABLE','_REAL',2,DIMS,STATUS)
-          CALL DAT_ASSOC('TABLE','WRITE',LOC,STATUS)
+          CALL USI_DCREAT('TABLE','_REAL',2,DIMS,STATUS)
+          CALL USI_DASSOC('TABLE','WRITE',LOC,STATUS)
           CALL DAT_PUTR(LOC,2,DIMS,COLTAB,STATUS)
           CALL DAT_ANNUL(LOC,STATUS)
         ELSE

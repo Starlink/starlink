@@ -26,6 +26,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IREGION Version 1.7-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -39,16 +41,16 @@
 
         MODE=' '
         DO WHILE (MODE.EQ.' '.AND.STATUS.EQ.SAI__OK)
-          CALL PAR_GET0C('MODE',MODE,STATUS)
+          CALL USI_GET0C('MODE',MODE,STATUS)
           CALL CHR_UCASE(MODE)
           IF (MODE.EQ.'HELP') THEN
             CALL IREGION_HELP()
-            CALL PAR_CANCL('MODE',STATUS)
+            CALL USI_CANCL('MODE',STATUS)
             MODE=' '
           ENDIF
         ENDDO
 
-        CALL PAR_GET0L('EXC',EXCLUDE,STATUS)
+        CALL USI_GET0L('EXC',EXCLUDE,STATUS)
         IF (EXCLUDE.AND.I_REG_TYPE.EQ.'NONE') THEN
           CALL ARR_INIT1B('01'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
           I_REG_TYPE='COMPLEX'
@@ -91,6 +93,8 @@
         ENDIF
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 
@@ -430,7 +434,7 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL PAR_GET0R('LEV',LEV,STATUS)
+        CALL USI_GET0R('LEV',LEV,STATUS)
 
         CALL IREGION_GTE_SUB(LEV,%val(I_DPTR),EXCLUDE,
      :                            %val(I_REG_PTR),STATUS)

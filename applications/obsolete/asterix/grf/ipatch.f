@@ -29,6 +29,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IPATCH Version 1.7-3')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -60,6 +62,8 @@
         ENDIF
 
       ENDIF
+
+      CALL USI_CLOSE()
 
       END
 

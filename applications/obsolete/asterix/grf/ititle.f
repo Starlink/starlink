@@ -28,6 +28,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ITITLE Version 1.7-0')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
       IF (.NOT.I_OPEN) THEN
@@ -49,7 +51,7 @@
           STATUS=SAI__ERROR
         ENDIF
 
-        CALL PAR_GET0C('TITLE',TITLE,STATUS)
+        CALL USI_GET0C('TITLE',TITLE,STATUS)
 
 
         CALL GCB_GET1I('TITLE_COLOUR',1,1,OK,COL,STATUS)
@@ -67,4 +69,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

@@ -26,6 +26,8 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IPLOT Version 1.7-1')
 *-
+      CALL USI_INIT()
+
       CALL MSG_PRNT(VERSION)
 
 
@@ -57,4 +59,7 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+

@@ -33,6 +33,8 @@
 
       CALL MSG_PRNT(VERSION)
 
+      CALL USI_INIT()
+
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
       ELSEIF (.NOT.I_DISP) THEN
@@ -58,4 +60,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

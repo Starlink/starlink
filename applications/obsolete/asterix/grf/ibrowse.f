@@ -51,6 +51,8 @@
 
       CALL MSG_PRNT(VERSION)
 
+      CALL USI_INIT()
+
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
       ELSEIF (.NOT.I_DISP) THEN
@@ -65,7 +67,7 @@
         QUAL=.FALSE.
         ERR=.FALSE.
         SIGNIF=.FALSE.
-        CALL PAR_GET0L('VAR',VAR,STATUS)
+        CALL USI_GET0L('VAR',VAR,STATUS)
         IF (VAR) THEN
           IF (.NOT.I_VOK) THEN
             CALL MSG_PRNT(
@@ -73,7 +75,7 @@
             VAR=.FALSE.
           ENDIF
         ELSE
-          CALL PAR_GET0L('ERR',ERR,STATUS)
+          CALL USI_GET0L('ERR',ERR,STATUS)
           IF (ERR) THEN
             IF (.NOT.I_VOK) THEN
               CALL MSG_PRNT(
@@ -81,7 +83,7 @@
               ERR=.FALSE.
             ENDIF
           ELSE
-            CALL PAR_GET0L('SIGNIF',SIGNIF,STATUS)
+            CALL USI_GET0L('SIGNIF',SIGNIF,STATUS)
             IF (SIGNIF) THEN
               IF (.NOT.I_VOK) THEN
                 CALL MSG_PRNT(
@@ -89,7 +91,7 @@
                 SIGNIF=.FALSE.
               ENDIF
             ELSE
-              CALL PAR_GET0L('QUAL',QUAL,STATUS)
+              CALL USI_GET0L('QUAL',QUAL,STATUS)
               IF (QUAL.AND..NOT.I_QOK) THEN
                 CALL MSG_PRNT(
      :            'AST_ERR: no quality present - defaulting to data')
@@ -100,14 +102,14 @@
         ENDIF
 
 *  see if data to be scaled
-        CALL PAR_GET0I('SCALE',ISCALE,STATUS)
+        CALL USI_GET0I('SCALE',ISCALE,STATUS)
 
 *  keyboard mode
         IF (I_MODE.NE.1) THEN
-          CALL PAR_DEF0R('XPOS',I_X,STATUS)
-          CALL PAR_DEF0R('YPOS',I_Y,STATUS)
-          CALL PAR_GET0R('XPOS',XW,STATUS)
-          CALL PAR_GET0R('YPOS',YW,STATUS)
+          CALL USI_DEF0R('XPOS',I_X,STATUS)
+          CALL USI_DEF0R('YPOS',I_Y,STATUS)
+          CALL USI_GET0R('XPOS',XW,STATUS)
+          CALL USI_GET0R('YPOS',YW,STATUS)
           KEYB=.TRUE.
           FIRST=.TRUE.
           NX=9
@@ -223,14 +225,16 @@
 *  write final value to parameter and reset current position
         CALL IMG_SETPOS(XW,YW,STATUS)
         IF (QUAL) THEN
-          CALL PAR_PUT0I('VAL',Q,STATUS)
+          CALL USI_PUT0I('VAL',Q,STATUS)
         ELSE
-          CALL PAR_PUT0R('VAL',VAL,STATUS)
+          CALL USI_PUT0R('VAL',VAL,STATUS)
         ENDIF
 
       ENDIF
 
   99  CONTINUE
+
+      CALL USI_CLOSE()
 
       END
 
