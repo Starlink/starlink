@@ -1,4 +1,4 @@
-#!perl
+#!perl -w
 
 # starversion - report version number of a Starlink package
 
@@ -8,7 +8,7 @@
 
 use strict;
 
-use Starlink::Versions qw/ starversion starversion_string /;
+use Starlink::Versions qw/ starversion starversion_string starversion_cmp/;
 use Starlink::Config;
 use File::Spec;
 use Getopt::Long;
@@ -22,7 +22,7 @@ $VERSION = '0.05';
 # Parse options
 my %options = ();
 GetOptions(\%options,
-	   'help|?', 'man', 'version',
+	   'help|?', 'man', 'version', 'compare=s',
 	   'major', 'minor', 'patchlevel', 'all',
 	   ) or pod2usage(2);
 
@@ -67,19 +67,31 @@ if (@list) {
     # Print the application name if we have more than one argument
     printf "%-15s", uc($app).':' if @list > 1;
 
-    # First check for major and minor specified
-    # then check for major, minor or patchlevel
-    if ($options{'major'} && $options{'minor'}) {
-      print (defined $major ? "$major.$minor" : 'UNKNOWN');
-    } elsif ($options{'major'}) {
-      print (defined $major ? $major : 'UNKNOWN');
-    } elsif ($options{'minor'}) {
-      print (defined $minor ? $minor : 'UNKNOWN');
-    } elsif ($options{'patchlevel'}) {
-      print (defined $patchlevel ? $patchlevel : 'UNKNOWN');
+    # If we are doing a comparison we do that now
+    if ($options{'compare'}) {
+
+      # This can return undef - add some -w protection
+      my $cmp = starversion_cmp($app, $options{'compare'});
+      print $cmp if defined $cmp;
+
     } else {
-      print (defined $string ? $string : 'UNKNOWN');
+      # simply want the version number reported.
+
+      # First check for major and minor specified
+      # then check for major, minor or patchlevel
+      if ($options{'major'} && $options{'minor'}) {
+	print (defined $major ? "$major.$minor" : 'UNKNOWN');
+      } elsif ($options{'major'}) {
+	print (defined $major ? $major : 'UNKNOWN');
+      } elsif ($options{'minor'}) {
+	print (defined $minor ? $minor : 'UNKNOWN');
+      } elsif ($options{'patchlevel'}) {
+	print (defined $patchlevel ? $patchlevel : 'UNKNOWN');
+      } else {
+	print (defined $string ? $string : 'UNKNOWN');
+      }
     }
+
     # Print the newline
     print "\n";
 
@@ -112,6 +124,8 @@ starversion - report version number of a Starlink package
  starversion kappa
  starversion -major kappa figaro
  starversion -all
+
+ starversion -compare V0.15-5 kappa
 
  starversion
  starversion -h
@@ -156,9 +170,24 @@ If a version number can not be determined, it is returned as C<unknown>
  KAPPA: V0.15-5
  BLAH:  UNKNOWN
 
+Additionally, the program can be used to compare the version of 
+an installed package with a supplied version number via the
+C<-compare> flag.
+
+ % starversion -compare V0.15-2 kappa
+ 1
+
+When comparing, C<starversion> returns 0 if the version numbers match,
+1 if the supplied version number is less than that of the installed
+package and -1 if the supplied version number is greater than the
+installed package.
+
+
 If no application is specified, the program prints the current status
 of the Starlink installation as stored in the C</star/admin/status>.
 This contains the last time the system was updated.
+
+
 
 =head1 ARGUMENTS
 
@@ -188,6 +217,25 @@ B<-major> or B<-minor>.
 List version numbers for all packages listed in C<$STARLINK/dates>.
 This overrides any list of packages supplied on the command-line.
 
+=item B<-compare>
+
+Compare the supplied version string with that of a package.
+
+ % starversion -compare V1.2-3 figaro
+
+When comparing, C<starversion> returns 0 if the version numbers match,
+1 if the supplied version number is less than that of the installed
+package and -1 if the supplied version number is greater than the
+installed package.
+
+The version string format can be one of:
+
+ V1.2-3
+ V1.2.3
+ 1.2-3
+
+The 'V' can be upper or lower case.
+
 =item B<-help>
 
 Print a help message.
@@ -198,7 +246,7 @@ This documentation.
 
 =item B<-version>
 
-Version number.
+Version number of C<starversion>.
 
 =back
 
