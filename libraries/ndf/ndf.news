@@ -1,5 +1,11 @@
 NDF Library
 -----------
+V1.5-10
+   SUN/33 has been updated to include additional information about calling
+   NDF from a C main function when working within the new Starlink Build
+   System.
+
+V1.5-9
    A new release (V1.5-9) of the NDF library is now available.
 
    - This is a maintenance release. The build system has changed.
@@ -8,7 +14,7 @@ V1.5-6
 
    - A bug has been fixed in the C interface for function ndfChunk.
 
-   - Facilities for handling foreign extension specifiers (such as 
-     FITS image extensions) within the "on-the-fly" data conversion 
+   - Facilities for handling foreign extension specifiers (such as
+     FITS image extensions) within the "on-the-fly" data conversion
      scheme have been added. SSN/20 has been updated to include these
      changes.

@@ -6,9 +6,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {33.7}
+\newcommand{\stardocnumber}    {33.8}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith}
-\newcommand{\stardocdate}      {11th January 2000}
+\newcommand{\stardocdate}      {31th January 2005}
 \newcommand{\stardoctitle}     {NDF \\ [1ex]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
@@ -17904,6 +17904,13 @@ standard arguments of the C ``main'' function. If, for any reason,
 this argument information is not accessible, then you should pass an
 argument count of zero (the argument vector is then ignored). This
 tells the NDF\_ library that argument information is not available.
+
+When calling NDF from a C main there may be additional initialisations
+necessary to properly setup the Fortran Runtime, you will need to perform
+these tasks for yourself, unless you are developing within the Starlink Build
+System (see \xref{SSN/78}{ssn78}{}), in which case you should also invoke the 
+\texttt{STAR\_INITIALISE\_FORTRAN} macro within your main function, sometime
+before invoking ndfInit.
 
 \item[{\bf{Input/output.}}]\mbox{}\\
 In general, it is not advisable to mix input/output (I/O) operations
