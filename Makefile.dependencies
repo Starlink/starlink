@@ -154,6 +154,11 @@ $(MANIFEST)/libtool:
 		&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log \
 		&& make>make.log && make install-manifest>>make.log
 
+$(MANIFEST)/m4:
+	cd thirdparty/fsf/m4 \
+		&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log \
+		&& make>make.log && make install-manifest>>make.log
+
 $(MANIFEST)/mers: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
@@ -270,6 +275,10 @@ $(MANIFEST)/sock: \
 	cd libraries/pcs/sock \
 		&& make>make.log && make install-manifest>>make.log
 
+$(MANIFEST)/ssn78:
+	cd docs/ssn78 \
+		&& make>make.log && make install-manifest>>make.log
+
 $(MANIFEST)/sst: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/chr \
@@ -352,6 +361,7 @@ componentset.xml: \
 		./applications/sst/component.xml \
 		./applications/star2html/component.xml \
 		./buildsupport/starconf/component.xml \
+		./docs/ssn78/component.xml \
 		./libraries/chr/component.xml \
 		./libraries/cnf/component.xml \
 		./libraries/ems/component.xml \
@@ -382,4 +392,5 @@ componentset.xml: \
 		./thirdparty/fsf/autoconf/component.xml \
 		./thirdparty/fsf/automake/component.xml \
 		./thirdparty/fsf/libtool/component.xml \
+		./thirdparty/fsf/m4/component.xml \
 		configure.ac
