@@ -174,5 +174,10 @@ MJC: Malcolm J. Currie (STARLINK)
  1993 October 25 (MJC):
     Added FORM parameter to control the NDF's storage form rather
     than use the value of the bad-pixel flag to decide.
+
+ 1993 November 10 (MJC):
+    Allowed the output NDF to be written to an arbitrary structure.
+    Used NDF_ library to access the NDF to enable NDF automatic
+    conversion to work.
 2 Implementation_Status
    -  The maximum number of dimensions is 6.

@@ -183,6 +183,10 @@
 *     1993 October 25 (MJC):
 *        Added FORM parameter to control the NDF's storage form rather
 *        than use the value of the bad-pixel flag to decide.
+*     1993 November 10 (MJC):
+*        Allowed the output NDF to be written to an arbitrary structure.
+*        Used NDF_ library to access the NDF to enable NDF automatic
+*        conversion to work.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -194,6 +198,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'              ! Standard ADAM constants
+      INCLUDE 'DAT_PAR'              ! Data-system constants
 
 *  Status:                  
       INTEGER STATUS                 ! Global status
@@ -202,12 +207,18 @@
       INTEGER CHR_LEN                ! Get effective length of string
 
 *  Local Variables:
+      INTEGER   EL                   ! Number of elements in NDF
+      CHARACTER FIGFIL * ( 80 )      ! Name of input file
       CHARACTER FORM * ( 9 )         ! NDF storage form
-      INTEGER   IMCODE               ! ADAM internal parameter pointer
+      CHARACTER LOC * ( DAT__SZLOC ) ! HDS locator to a transient NDF
       INTEGER   NCF                  ! Length of the Figaro file name
       INTEGER   NCN                  ! Length of the NDF file name
+      INTEGER   NDF                  ! NDF identifier
+      INTEGER   NLEV                 ! Number of levels in NDF
       CHARACTER NDFFIL * ( 80 )      ! Name of output file
-      CHARACTER FIGFIL * ( 80 )      ! Name of input file
+      CHARACTER PATH * ( 132 )       ! Path to the NDF within the
+                                     ! container file
+      INTEGER   PNTR                 ! Pointer to mapped NDF data array
 
 *.
 
@@ -222,15 +233,33 @@
 *   Get the input file name.
       CALL PAR_GET0C( 'IN', FIGFIL, STATUS )
 
-*   Get the output file name.  A simple PAR_GET0C call cannot be made
-*   because this will write a global value of the current NDF in
-*   quotes, rather than @ndfname as required.  Get the ADAM internal
-*   code that refers to the piece of parameter space associated with
-*   the output filename.
-      CALL SUBPAR_FINDPAR( 'OUT', IMCODE, STATUS )
+*   Start an NDF context.
+      CALL NDF_BEGIN
 
-*   Get the file name associated with the ADAM internal pointer.
-      CALL SUBPAR_GETNAME( IMCODE, NDFFIL, STATUS )
+*   Create a dummy output NDF.  This is need to obtain the name of the
+*   NDF using the normal route, and therefore that automatic data
+*   conversion can be performed by the NDF library.  A simple PAR_GET0C
+*   call cannot be made because this will write a global value of the
+*   current NDF in quotes, rather than @ndfname as required.
+      CALL NDF_CREP( 'OUT', '_REAL', 1, 1, NDF, STATUS )
+
+*   Get an HDS locator to the NDF.
+      CALL NDF_LOC( NDF, 'READ', LOC, STATUS )
+
+*   Get the output file name.  
+      CALL HDS_TRACE( LOC, NLEV, PATH, NDFFIL, STATUS )
+
+*   Map the NDF array so that it is defined, and hence can be annulled
+*   with NDF_ complaining.
+      CALL NDF_MAP( NDF, 'Data', '_REAL', 'WRITE/ZERO', PNTR, EL,
+     :              STATUS )
+
+*   End NDF context.
+      CALL NDF_END( STATUS )
+
+*   Delete the temporary NDF... now by removing the last locator.
+      CALL DAT_DELET( 'OUT', STATUS )
+*      CALL HDS_ERASE( LOC, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -238,13 +267,12 @@
          NCF = CHR_LEN( FIGFIL ) 
          CALL CHR_APPND( '.dst', FIGFIL, NCF )
          NCN = CHR_LEN( NDFFIL ) 
-         CALL CHR_APPND( '.sdf', NDFFIL, NCN )
 
 *   Call the conversion subroutine.
-         CALL CON_DST2N( FIGFIL ( :NCF ), NDFFIL ( :NCN ), FORM,
-     :                   STATUS )
+         CALL CON_DST2N( FIGFIL ( :NCF ), NDFFIL ( :NCN ), FORM, NLEV,
+     :                   PATH, STATUS )
 
       END IF
-      
+
       END
 
