@@ -127,22 +127,11 @@
 *  Parameter was found?
       IF ( FOUND ) THEN
 
-*    Opened by ADI compliant application?
-        IF ( DS(N).ADIFPN ) THEN
-          CALL ADI_FCLOSE( DS(N).ADI_ID, STATUS )
-
-*    Otherwise old style HDS applicatiom
-        ELSE IF ( DS(N).LOC .NE. DAT__NOLOC ) THEN
-          CALL DAT_VALID( DS(N).LOC, VALID, STATUS )
-          IF ( VALID ) THEN
-            CALL DAT_ANNUL( DS(N).LOC, STATUS )
-          END IF
-
-        END IF
+*    Close the file
+        CALL ADI_FCLOSE( DS(N).ADI_ID, STATUS )
 
 *    Reset slots for re-use
         DS(N).ADI_ID = ADI__NULLID
-        DS(N).LOC = DAT__NOLOC
         DS(N).USED = .FALSE.
         DS(N).IO = BLANK
 
