@@ -133,7 +133,9 @@ $scb = $self . "?";
 
 $usage = "Usage: $self [-html] [-exact] \\\n"
        . "        " . ' ' x length ($self)
-       . "[[name=]<name>] [[package=]<package>] [[type=]func|file|regex]\n";
+       . "[[name=]<name>] [[package=]<package>] [[type=]func|file|regex]\n"
+       . "        " . ' ' x length ($self)
+       . "[[indexdir=]<indexdir>]\n";
 
 #  Required libraries.
 
