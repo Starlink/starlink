@@ -210,6 +210,8 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MINY','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MEAN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
 
 *  colour table
         CNAME='DATA'

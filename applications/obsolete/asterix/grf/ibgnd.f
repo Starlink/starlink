@@ -220,6 +220,15 @@
 
             CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
 
+*      Change the sample fitting
+          ELSE IF ( CMD .EQ. 'SETFIT' ) THEN
+
+            CALL USI_GET0C( 'SAMPFIT', MODE, STATUS )
+            CALL CHR_UCASE( MODE )
+            I_BGM_FIT = MODE
+
+            CALL IBGND_RECALC( .FALSE., .TRUE., STATUS )
+
 *      Delete a source
           ELSE IF ( CMD .EQ. 'DELSRC' ) THEN
             CALL USI_GET0I( 'ISRC', ISRC, STATUS )
@@ -2350,16 +2359,27 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
+*  Local Constants:
+      INTEGER			F_CONS
+        PARAMETER		( F_CONS = 1 )
+
+      INTEGER			F_NONE
+        PARAMETER		( F_NONE = 2 )
+
 *  Local Variables:
+      REAL			MEAN			! Mean sample value
       REAL			MINFR, MAXFR		! Extreme residuals
       REAL			FR, RMSFR		! RMS frac residual
       REAL			XW1, XW2, YW1, YW2	! Worst positions
+      REAL			XW, YW, R, Y2		! Pixel radius bits
 
       INTEGER			I, J			! Loop over image
       INTEGER			ITEMID			! GUI noticeboard item
       INTEGER			MAXFR_X, MAXFR_Y	! Max position
       INTEGER			MINFR_X, MINFR_Y	! Min position
       INTEGER			NFR			! # residuals
+      INTEGER			NGS			! # good samples
+      INTEGER			S			! Loop over samples
 *.
 
 *  Check inherited global status.
@@ -2382,17 +2402,66 @@
           END DO
         END DO
 
-      ELSE IF ( I_BGM_AREA(1:3) .EQ. 'WHO' ) THEN
+*    Export mean
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_MEAN', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, SAMM(1), STATUS )
+
+*  Annular sampling?
+      ELSE IF ( I_BGM_AREA(1:3) .EQ. 'ANN' ) THEN
+
+*    Fit a function to the radial profile
+        IF ( I_BGM_FIT .EQ. 'CONS' ) THEN
+
+          MEAN = 0.0
+          NGS = 0
+          DO S = 1, NS
+            IF ( SAMNP(S) .GT. 1 ) THEN
+              MEAN = MEAN + SAMM(S)
+              NGS = NGS + 1
+            END IF
+          END DO
+          IF ( NGS .GT. 0 ) THEN
+            MEAN = MEAN / REAL(NGS)
+          ELSE
+            MEAN = 0.0
+          END IF
+          FMODE = F__CONS
+
+*    Simple mode lets the user see the raw model
+        ELSE IF ( I_BGM_FIT .EQ. 'NONE' ) THEN
+          FMODE = F__NONE
+
+        END IF
 
 *    Loop over image
         DO J = 1, NY
+          YW = I_YBASE + (J-1)*I_YSCALE
+          Y2 = (YW - I_BGM_Y0)**2
           DO I = 1, NX
 
 *      Outside area?
             IF ( IDX(I,J) .LT. 0 ) THEN
               BGMOD(I,J) = 0.0
             ELSE
-              BGMOD(I,J) = SAMM(IDX(I,J))
+
+*          Find exact distance to this pixel
+              XW = I_XBASE + (I-1)*I_XSCALE
+              XW = XW - I_BGM_X0
+              R = SQRT( XW*XW + Y2 ) / I_BGM_RBIN
+
+*          Evaluate fitted function at R
+              IF ( FMODE .EQ. F__CONS ) THEN
+                BGMOD(I,J) = MEAN
+
+              ELSE IF ( FMODE .EQ. F__NONE ) THEN
+                IF ( IDX(I,J) .GT. 0 ) THEN
+                  BGMOD(I,J) = SAMM(IDX(I,J))
+                ELSE
+                  BGMOD(I,J) = 0.0
+                END IF
+
+              END IF
+
             END IF
 
           END DO
@@ -2641,7 +2710,7 @@
 *    Function declarations :
 *    Local constants :
       INTEGER MLINE
-      PARAMETER (MLINE=12)
+      PARAMETER (MLINE=14)
 *    Local variables :
       CHARACTER*79 MTEXT(MLINE)
      :/' Source commands:',' ',
@@ -2649,6 +2718,8 @@
      : '  DELSRC  - Delete a source from the source database',
      : '  MARKSRC - Mark source positions on current display',
      : ' ', ' Sampling commands:',' ',
+     : '  SETSAMP - Set sampling mode (WHOLE, ANNULUS or BOX)',
+     : '  SETFIT  - Method of sample interpolation',
      : ' ', ' Plotting commands:',' ',
      : '  DISP    - Display background model image'/
       INTEGER ILINE
