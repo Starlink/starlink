@@ -34,6 +34,8 @@
 *        Original version.
 *     25-AUG-1999 (DSB):
 *        Allow MSG tokens in TEXT.
+*     20-MAR-2000 (DSB):
+*        Normalize first pixel centre before display.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -238,6 +240,9 @@
 *  corresponding coordinates in the Frame. 
                CALL AST_TRANN( FSET, 1, NDIM, 1, GFIRST, .TRUE., FRMNAX,
      :                         1, CFIRST, STATUS )
+
+*  Normalize the positions.
+               CALL AST_NORM( FSET, CFIRST, STATUS )
 
 *  Display the resulting coordinates.
                CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, 1, 

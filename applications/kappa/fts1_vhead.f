@@ -60,6 +60,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +69,10 @@
 *     1996 July 26 (MJC):
 *        Distinguish between mandatory and other keywords for
 *        non-character values.   Add the FIXED argument.
+*     21-MAR-2000 (DSB):
+*        Modified to retain trailing spaces within string values.
+*        Fixed bug which caused random character strings to be used as
+*        comments for string keywords if no comment was supplied in the header.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -444,6 +449,10 @@
 *  The value is defined.
                VALDEF = .TRUE.
 
+*  Make NCFD hold the original length of the FITSDAT string (including
+*  any trailing spaces which were included inside the delimiting quotes).
+               NCFD = NCFD - 2
+
 *  Define the column from which to look for a comment, i.e. one column
 *  after the trailing quote.
                NCOMS = MIN( COMPOS - 2, NCCQ + 1 )
@@ -484,10 +493,11 @@
 
 *  Look for the comment delimiter character---slash.
             NCC = INDEX( BUFFER( NCOMS: ), '/' ) + NCOMS - 1
-            IF ( NCC .EQ. NCOMS - 1 ) NCC = NCOMS
+            IF ( NCC .EQ. NCOMS - 1 ) THEN
+               FITCOM = ' '
 
 *  Deal with the special case of a comment delimiter, but no comment.
-            IF ( CHR_LEN( BUFFER( NCC: ) ) .EQ. 1 ) THEN
+            ELSE IF ( CHR_LEN( BUFFER( NCC: ) ) .EQ. 1 ) THEN
                FITCOM = ' '
 
 *  Extract the comment associated with the keyword.  Watch for a
@@ -514,7 +524,7 @@
 
 *  Any single quotes present in the string must be doubled.
 *  Copy the value to a dummy string for expansion.
-               CDUMMY = FITDAT
+               CDUMMY = FITDAT( : NCFD )
 
 *  Initialise the pointers.
                NCSQ = 1
@@ -534,6 +544,9 @@
 *  Increment the counter to where to append to the value.
                      NCFS = NCFS + NCSQ + 1
 
+*  Increment the length of the FITDAT string including trailing spaces.
+                     NCFD = NCFD + 1
+
 *  Increment the counter in the FITS card, skipping over the single
 *  quote.
                      NCSTQ = NCSTQ + NCSQ
@@ -549,14 +562,16 @@
 
 *  Find the length of the string.  This must have at least the minimum
 *  number of characters, even it is blank.
-               NCCOM = MAX( MINFCV, CHR_LEN( FITDAT ) )
+               NCCOM = MAX( MINFCV, NCFD )
 
 *  Form the output card, enclosing the string in single quotes.  Do no
 *  start the comment before a space after the closing quote or before
 *  the standard position
                CARD = FITNAM//'= '''//FITDAT( :NCCOM )//''''
-               CPOS = MAX( COMPOS - 1, NCCOM + 13 )
-               CALL CHR_APPND( '/ '//FITCOM, CARD, CPOS )
+               IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                  CPOS = MAX( COMPOS - 1, NCCOM + 13 )
+                  CALL CHR_APPND( '/ '//FITCOM, CARD, CPOS )
+               END IF
             ELSE
 
 *  Other types:
@@ -598,7 +613,9 @@
                   ELSE
                      CALL CHR_APPND( FITDAT, CARD, CPOS )
                   END IF
-                  CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
+                  IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                     CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
+                  END IF
                ELSE
 
 *  Check for a floating-point value.
@@ -619,7 +636,9 @@
                      ELSE
                         CALL CHR_APPND( FITDAT, CARD, CPOS )
                      END IF
-                     CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
+                     IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                        CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
+                     END IF
                   ELSE
 
 *  Check for a logical.
@@ -636,7 +655,9 @@
 *  Create the output card by appending the value and as much of the
 *  comment as will fit into the header card.
                         CALL CHR_APPND( CDUMMY, CARD, CPOS )
-                        CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
+                        IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                           CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
+                        END IF
 
 *  Unquoted string:
 *  ----------------
@@ -691,8 +712,10 @@
 *  start the comment before a space after the closing quote or before
 *  the standard position
                         CARD = FITNAM//'= '''//FITDAT( :NCCOM )//''''
-                        CPOS = MAX( COMPOS - 1, NCCOM + 13 )
-                        CALL CHR_APPND( '/ '//FITCOM, CARD, CPOS )
+                        IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                           CPOS = MAX( COMPOS - 1, NCCOM + 13 )
+                           CALL CHR_APPND( '/ '//FITCOM, CARD, CPOS )
+                        END IF
                      END IF
                   END IF
                END IF

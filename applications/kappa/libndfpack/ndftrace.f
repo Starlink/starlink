@@ -222,6 +222,8 @@
 *        Replaced ERR_MARK/RLSE by ERR_BEGIN/END.
 *     17-MAR-2000 (DSB):
 *        Corrected value written to parameter "WCS".
+*     20-MAR-2000 (DSB):
+*        Normalize displayed first pixel centre in current WCS Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1068,9 +1070,12 @@
      :                               .TRUE., FRMNAX, 1, CFIRST,
      :                               STATUS )
 
+*  Normalise the position for display.
+                  CALL AST_NORM( IWCS, CFIRST, STATUS )
+
 *  Display the resulting coordinates.
                   CALL MSG_SETC( 'FIRST', AST_FORMAT( FRM, 1, 
-     :                              CFIRST( 1, 1 ), STATUS ) )
+     :                           CFIRST( 1, 1 ), STATUS ) )
 
                   DO 302 IAXIS = 2, FRMNAX
                      CALL MSG_SETC( 'FIRST', ',' )
