@@ -3001,7 +3001,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         ENDIF
 
 *  set region mask
-        CALL IMG_SETARD_SUB(MASK,I1,I2,J1,J2,%val(I_REG_PTR))
+        CALL IMG_SETARD_SUB(MASK,I1,I2,J1,J2,FLAG,%val(I_REG_PTR))
 
         I_REG_TYPE='COMPLEX'
 
@@ -4270,8 +4270,6 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *  interpret ARD
         CALL ARD_WORK(GRPID,2,LBND,UBND,TR,.FALSE.,REGVAL,RMASK,
      :                           LBNDI,UBNDI,LBNDE,UBNDE,STATUS)
-	print *,lbndi,ubndi
-	print *,lbnde,ubnde
 *  set encompassing box
         I1=LBNDE(1)
         I2=UBNDE(1)
