@@ -81,6 +81,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Global Variables:
+      INCLUDE 'AUI_CMN'                                 ! TCI globals
+*        AUI_INIT = LOGICAL (given and returned)
+*           AUI definitions load attempted?
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -95,9 +98,16 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Check not already initialised?
+      IF ( .NOT. AUI_INIT ) THEN
+
 *  Define methods to write auxilliary data
-      CALL ADI_DEFMTH( 'WriteAux(HDSfile,CHAR,_)', AUI1_WRITE, DID,
-     :                 STATUS )
+        CALL ADI_DEFMTH( 'WriteAux(HDSfile,CHAR,_)', AUI1_WRITE, DID,
+     :                   STATUS )
+
+        AUI_INIT = .TRUE.
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'AUI0_INIT', STATUS )

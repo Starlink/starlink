@@ -89,6 +89,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
 
+*  Global Variables:
+      INCLUDE 'AUI_CMN'                 ! ASTERIX AUI common block
+*       AUI_INIT = LOGICAL (given)
+*         AUI class definitions loaded?
+
 *  Arguments Given:
       INTEGER			ID			! Dataset identifier
       CHARACTER*(*)		NAME			! Attribute name
@@ -104,6 +109,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check initialised
+      IF ( .NOT. AUI_INIT ) CALL AUI0_INIT( STATUS )
 
 *  First method argument is the dataset id
       ARGS(1) = ID
