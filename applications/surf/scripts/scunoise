@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.20  2002/08/14 11:09:01  timj
+#        jcmtdata is vax-like
+#
 #        Revision 1.19  2002/08/02 01:19:54  frossie
 #        Look at /jmctdata at the summit
 #        Also chaned to look at scuba1 rather than scuba2
@@ -784,8 +787,9 @@ sub scandisk {
 	} elsif ($location =~ /ieie/) {
 	  # ieie version of data disk
 	  $location = File::Spec->catdir($location, $obsdate);
-	} elsif ($location =~ /^\/net/) {
+	} elsif ($location =~ /^\/net/ || $location =~ /jcmtdata/) {
 	  # This is deemed to be a vax disk
+          # or a hard-mounted vax disk on the unix system
 	  $location = File::Spec->catdir($location, $obsdate, 'ro');
 	}
 
