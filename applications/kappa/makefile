@@ -1059,17 +1059,12 @@ $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$($(IRM_F_ROUTINES) :
-        $(TAR_OUT) irm_sub.tar $@
-        @ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
-
 $(NDG_F_ROUTINES) $(NDG_C_ROUTINES) :
-        $(TAR_OUT) ndg_sub.tar $@
-        @ if test -f $@; then :;\
+	$(TAR_OUT) ndg_sub.tar $@
+	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-IRM_F_ROUTINES) :
+$(IRM_F_ROUTINES) :
 	$(TAR_OUT) irm_sub.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
