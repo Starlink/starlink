@@ -2627,7 +2627,8 @@ for NDF applications.
       is found. The {\tt "}-{\tt "} signs at the end of each line indicate that the list
       continues on the next line. Note, if specified FITS keyword has a
       numerical value, then it is converted into textual form before doing
-      the comparisons.
+      the comparisons. Leading and trailing spaces in the FITS keyword
+      value are ignored when doing the comparison.
 
       If a control table contains more than one line for an extension
       item, then each line is processed in turn, replacing any value

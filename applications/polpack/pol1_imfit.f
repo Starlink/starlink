@@ -450,6 +450,11 @@
                            NCHAR = CHR_LEN( FITVAL( :80 ) )
                         END IF
 
+*  Remove any leading spaces from the FITS keyword value, and adjust the
+*  used length of the string.
+                        CALL CHR_RMBLK( FITVAL )
+                        NCHAR = CHR_LEN( FITVAL )
+
 *  If necessary test this against the trailing description. Have
 *  several possibilities for the form here;
 *     string1=string2
@@ -543,7 +548,7 @@
                ELSE
 
 *  Put the value into the extension.
-                  LENFIT = LAST - FIRST + 1
+                  LENFIT = CHR_LEN( FITVAL )
                   CALL POL1_STOCC( NDF, EXTNAM, FITVAL( : LENFIT ),
      :                             STATUS )
 
