@@ -31,8 +31,10 @@ U java/source/ant/LICENSE
 U java/source/ant/LICENSE.dom
 U java/source/ant/LICENSE.sax
 U java/source/ant/LICENSE.xerces
+U java/source/ant/NOTICE
 U java/source/ant/README
 U java/source/ant/README.Starlink
+U java/source/ant/TODO
 U java/source/ant/WHATSNEW
 U java/source/ant/bootstrap.bat
 U java/source/ant/bootstrap.sh
@@ -44,13 +46,17 @@ U java/source/ant/welcome.html
 cvs checkout: Updating java/source/ant/bin
 U java/source/ant/bin/ant
 U java/source/ant/bin/ant.bat
+U java/source/ant/bin/ant.cmd
 U java/source/ant/bin/antRun
 U java/source/ant/bin/antRun.bat
 U java/source/ant/bin/antRun.pl
+U java/source/ant/bin/antenv.cmd
 U java/source/ant/bin/complete-ant-cmd.pl
+U java/source/ant/bin/envset.cmd
 U java/source/ant/bin/lcp.bat
 U java/source/ant/bin/runant.pl
 U java/source/ant/bin/runant.py
+U java/source/ant/bin/runrc.cmd
 cvs checkout: Updating java/source/ant/docs
 U java/source/ant/docs/LICENSE
 U java/source/ant/docs/ant_in_anger.html
@@ -63,10 +69,10 @@ U java/source/ant/docs/contributors.html
 U java/source/ant/docs/cvs.html
 U java/source/ant/docs/external.html
 U java/source/ant/docs/faq.html
+U java/source/ant/docs/favicon.ico
 U java/source/ant/docs/index.html
 U java/source/ant/docs/legal.html
 U java/source/ant/docs/license.html
-U java/source/ant/docs/logocontest.html
 U java/source/ant/docs/mail.html
 U java/source/ant/docs/mission.html
 U java/source/ant/docs/page.css
@@ -82,10 +88,12 @@ U java/source/ant/docs/ant2/original-specification.html
 U java/source/ant/docs/ant2/requested-features.html
 U java/source/ant/docs/ant2/requested-features.txt
 cvs checkout: Updating java/source/ant/docs/images
+U java/source/ant/docs/images/JDJEditorsChoiceAward.jpg
 U java/source/ant/docs/images/ant_logo.ico
 U java/source/ant/docs/images/ant_logo_large.gif
 U java/source/ant/docs/images/ant_logo_medium.gif
 U java/source/ant/docs/images/ant_logo_small.gif
+U java/source/ant/docs/images/beta.png
 U java/source/ant/docs/images/current.gif
 U java/source/ant/docs/images/group-logo.gif
 U java/source/ant/docs/images/jp_rcwinner_2003.gif
@@ -133,6 +141,8 @@ U java/source/ant/docs/manual/runninglist.html
 U java/source/ant/docs/manual/sysclasspath.html
 U java/source/ant/docs/manual/tasksoverview.html
 U java/source/ant/docs/manual/toc.html
+U java/source/ant/docs/manual/tutorial-writing-tasks-src.zip
+U java/source/ant/docs/manual/tutorial-writing-tasks.html
 U java/source/ant/docs/manual/using.html
 U java/source/ant/docs/manual/usinglist.html
 cvs checkout: Updating java/source/ant/docs/manual/CoreTasks
@@ -156,6 +166,8 @@ U java/source/ant/docs/manual/CoreTasks/copyfile.html
 U java/source/ant/docs/manual/CoreTasks/cvs.html
 U java/source/ant/docs/manual/CoreTasks/cvspass.html
 U java/source/ant/docs/manual/CoreTasks/cvstagdiff.html
+U java/source/ant/docs/manual/CoreTasks/cvsversion.html
+U java/source/ant/docs/manual/CoreTasks/defaultexcludes.html
 U java/source/ant/docs/manual/CoreTasks/delete.html
 U java/source/ant/docs/manual/CoreTasks/deltree.html
 U java/source/ant/docs/manual/CoreTasks/dependset.html
@@ -170,6 +182,7 @@ U java/source/ant/docs/manual/CoreTasks/genkey.html
 U java/source/ant/docs/manual/CoreTasks/get.html
 U java/source/ant/docs/manual/CoreTasks/gunzip.html
 U java/source/ant/docs/manual/CoreTasks/gzip.html
+U java/source/ant/docs/manual/CoreTasks/import.html
 U java/source/ant/docs/manual/CoreTasks/input.html
 U java/source/ant/docs/manual/CoreTasks/jar.html
 U java/source/ant/docs/manual/CoreTasks/java.html
@@ -177,14 +190,17 @@ U java/source/ant/docs/manual/CoreTasks/javac.html
 U java/source/ant/docs/manual/CoreTasks/javadoc.html
 U java/source/ant/docs/manual/CoreTasks/loadfile.html
 U java/source/ant/docs/manual/CoreTasks/loadproperties.html
+U java/source/ant/docs/manual/CoreTasks/macrodef.html
 U java/source/ant/docs/manual/CoreTasks/mail.html
 U java/source/ant/docs/manual/CoreTasks/manifest.html
 U java/source/ant/docs/manual/CoreTasks/mkdir.html
 U java/source/ant/docs/manual/CoreTasks/move.html
+U java/source/ant/docs/manual/CoreTasks/nice.html
 U java/source/ant/docs/manual/CoreTasks/pack.html
 U java/source/ant/docs/manual/CoreTasks/parallel.html
 U java/source/ant/docs/manual/CoreTasks/patch.html
 U java/source/ant/docs/manual/CoreTasks/pathconvert.html
+U java/source/ant/docs/manual/CoreTasks/presetdef.html
 U java/source/ant/docs/manual/CoreTasks/property.html
 U java/source/ant/docs/manual/CoreTasks/recorder.html
 U java/source/ant/docs/manual/CoreTasks/rename.html
@@ -195,6 +211,8 @@ U java/source/ant/docs/manual/CoreTasks/signjar.html
 U java/source/ant/docs/manual/CoreTasks/sleep.html
 U java/source/ant/docs/manual/CoreTasks/sql.html
 U java/source/ant/docs/manual/CoreTasks/style.html
+U java/source/ant/docs/manual/CoreTasks/subant.html
+U java/source/ant/docs/manual/CoreTasks/sync.html
 U java/source/ant/docs/manual/CoreTasks/tar.html
 U java/source/ant/docs/manual/CoreTasks/taskdef.html
 U java/source/ant/docs/manual/CoreTasks/tempfile.html
@@ -207,9 +225,13 @@ U java/source/ant/docs/manual/CoreTasks/unzip.html
 U java/source/ant/docs/manual/CoreTasks/uptodate.html
 U java/source/ant/docs/manual/CoreTasks/waitfor.html
 U java/source/ant/docs/manual/CoreTasks/war.html
+U java/source/ant/docs/manual/CoreTasks/whichresource.html
 U java/source/ant/docs/manual/CoreTasks/xmlproperty.html
 U java/source/ant/docs/manual/CoreTasks/zip.html
 cvs checkout: Updating java/source/ant/docs/manual/CoreTypes
+U java/source/ant/docs/manual/CoreTypes/antlib.html
+U java/source/ant/docs/manual/CoreTypes/assertions.html
+U java/source/ant/docs/manual/CoreTypes/custom-programming.html
 U java/source/ant/docs/manual/CoreTypes/description.html
 U java/source/ant/docs/manual/CoreTypes/dirset.html
 U java/source/ant/docs/manual/CoreTypes/filelist.html
@@ -217,10 +239,15 @@ U java/source/ant/docs/manual/CoreTypes/fileset.html
 U java/source/ant/docs/manual/CoreTypes/filterchain.html
 U java/source/ant/docs/manual/CoreTypes/filterset.html
 U java/source/ant/docs/manual/CoreTypes/mapper.html
+U java/source/ant/docs/manual/CoreTypes/namespace.html
 U java/source/ant/docs/manual/CoreTypes/patternset.html
+U java/source/ant/docs/manual/CoreTypes/permissions.html
+U java/source/ant/docs/manual/CoreTypes/propertyset.html
+U java/source/ant/docs/manual/CoreTypes/redirector.html
 U java/source/ant/docs/manual/CoreTypes/selectors-program.html
 U java/source/ant/docs/manual/CoreTypes/selectors.html
 U java/source/ant/docs/manual/CoreTypes/xmlcatalog.html
+U java/source/ant/docs/manual/CoreTypes/zipfileset.html
 cvs checkout: Updating java/source/ant/docs/manual/Integration
 U java/source/ant/docs/manual/Integration/Antidote.html
 U java/source/ant/docs/manual/Integration/VAJAntTool.html
@@ -232,15 +259,24 @@ cvs checkout: Updating java/source/ant/docs/manual/OptionalTasks
 U java/source/ant/docs/manual/OptionalTasks/BorlandEJBTasks.html
 U java/source/ant/docs/manual/OptionalTasks/BorlandGenerateClient.html
 U java/source/ant/docs/manual/OptionalTasks/antlr.html
+U java/source/ant/docs/manual/OptionalTasks/attrib.html
 U java/source/ant/docs/manual/OptionalTasks/cab.html
 U java/source/ant/docs/manual/OptionalTasks/ccm.html
+U java/source/ant/docs/manual/OptionalTasks/chgrp.html
+U java/source/ant/docs/manual/OptionalTasks/chown.html
 U java/source/ant/docs/manual/OptionalTasks/clearcase.html
+U java/source/ant/docs/manual/OptionalTasks/csc.html
 U java/source/ant/docs/manual/OptionalTasks/depend.html
 U java/source/ant/docs/manual/OptionalTasks/dotnet.html
 U java/source/ant/docs/manual/OptionalTasks/echoproperties.html
 U java/source/ant/docs/manual/OptionalTasks/ejb.html
 U java/source/ant/docs/manual/OptionalTasks/ftp.html
 U java/source/ant/docs/manual/OptionalTasks/icontract.html
+U java/source/ant/docs/manual/OptionalTasks/ilasm.html
+U java/source/ant/docs/manual/OptionalTasks/ildasm.html
+U java/source/ant/docs/manual/OptionalTasks/image-classdiagram.gif
+U java/source/ant/docs/manual/OptionalTasks/image.html
+U java/source/ant/docs/manual/OptionalTasks/importtypelib.html
 U java/source/ant/docs/manual/OptionalTasks/jarlib-available.html
 U java/source/ant/docs/manual/OptionalTasks/jarlib-display.html
 U java/source/ant/docs/manual/OptionalTasks/jarlib-manifest.html
@@ -248,9 +284,11 @@ U java/source/ant/docs/manual/OptionalTasks/jarlib-resolve.html
 U java/source/ant/docs/manual/OptionalTasks/javacc.html
 U java/source/ant/docs/manual/OptionalTasks/javah.html
 U java/source/ant/docs/manual/OptionalTasks/jdepend.html
+U java/source/ant/docs/manual/OptionalTasks/jjdoc.html
 U java/source/ant/docs/manual/OptionalTasks/jjtree.html
 U java/source/ant/docs/manual/OptionalTasks/jlink.html
 U java/source/ant/docs/manual/OptionalTasks/jpcoverage.html
+U java/source/ant/docs/manual/OptionalTasks/jsharpc.html
 U java/source/ant/docs/manual/OptionalTasks/jspc.html
 U java/source/ant/docs/manual/OptionalTasks/junit.html
 U java/source/ant/docs/manual/OptionalTasks/junitreport.html
@@ -265,20 +303,27 @@ U java/source/ant/docs/manual/OptionalTasks/propertyfile.html
 U java/source/ant/docs/manual/OptionalTasks/pvcstask.html
 U java/source/ant/docs/manual/OptionalTasks/renameextensions.html
 U java/source/ant/docs/manual/OptionalTasks/replaceregexp.html
+U java/source/ant/docs/manual/OptionalTasks/rexec.html
 U java/source/ant/docs/manual/OptionalTasks/rpm.html
+U java/source/ant/docs/manual/OptionalTasks/scp.html
 U java/source/ant/docs/manual/OptionalTasks/script.html
+U java/source/ant/docs/manual/OptionalTasks/scriptdef.html
 U java/source/ant/docs/manual/OptionalTasks/serverdeploy.html
 U java/source/ant/docs/manual/OptionalTasks/setproxy.html
 U java/source/ant/docs/manual/OptionalTasks/sos.html
 U java/source/ant/docs/manual/OptionalTasks/sound.html
 U java/source/ant/docs/manual/OptionalTasks/splash.html
+U java/source/ant/docs/manual/OptionalTasks/sshexec.html
 U java/source/ant/docs/manual/OptionalTasks/starteam.html
 U java/source/ant/docs/manual/OptionalTasks/stylebook.html
+U java/source/ant/docs/manual/OptionalTasks/symlink.html
 U java/source/ant/docs/manual/OptionalTasks/telnet.html
 U java/source/ant/docs/manual/OptionalTasks/test.html
 U java/source/ant/docs/manual/OptionalTasks/translate.html
+U java/source/ant/docs/manual/OptionalTasks/vbc.html
 U java/source/ant/docs/manual/OptionalTasks/vss.html
 U java/source/ant/docs/manual/OptionalTasks/wljspc.html
+U java/source/ant/docs/manual/OptionalTasks/wsdltodotnet.html
 U java/source/ant/docs/manual/OptionalTasks/xmlvalidate.html
 cvs checkout: Updating java/source/ant/docs/manual/OptionalTypes
 U java/source/ant/docs/manual/OptionalTypes/classfileset.html
@@ -304,30 +349,44 @@ cvs checkout: Updating java/source/ant/docs/manual/api/org/apache
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant
 U java/source/ant/docs/manual/api/org/apache/tools/ant/AntClassLoader.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/AntTypeDefinition.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/BuildEvent.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/BuildException.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/BuildListener.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/BuildLogger.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/ComponentHelper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/DefaultLogger.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/DemuxInputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/DemuxOutputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/Diagnostics.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/DirectoryScanner.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/DynamicAttribute.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/DynamicAttributeNS.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/DynamicConfigurator.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/DynamicConfiguratorNS.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/DynamicElement.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/DynamicElementNS.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/ExitException.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/ExitStatusException.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/FileScanner.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/IntrospectionHelper.Creator.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/IntrospectionHelper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/Location.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/MagicNames.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/Main.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/NoBannerLogger.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/PathTokenizer.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/Project.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/ProjectComponent.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/ProjectHelper.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/PropertyHelper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/RuntimeConfigurable.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/SubBuildListener.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/Target.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/Task.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/TaskAdapter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/TaskContainer.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/TypeAdapter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/UnknownElement.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/XmlLogger.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/package-frame.html
@@ -338,6 +397,8 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/BaseFilterReader.
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/BaseParamFilterReader.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/ChainableReader.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/ClassConstants.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/ConcatFilter.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/EscapeUnicode.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/ExpandProperties.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/HeadFilter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/LineContains.Contains.html
@@ -353,6 +414,18 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/StripLineComments
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/StripLineComments.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TabsToSpaces.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TailFilter.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.ChainableReaderFilter.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.ContainsRegex.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.ContainsString.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.DeleteCharacters.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.FileTokenizer.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.Filter.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.IgnoreBlank.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.ReplaceRegex.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.ReplaceString.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.StringTokenizer.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.Trim.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/TokenFilter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/package-tree.html
@@ -363,6 +436,14 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/util/package-fram
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/util/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/filters/util/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/helper
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/AntXMLContext.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelper2.AntHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelper2.ElementHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelper2.MainHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelper2.ProjectHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelper2.RootHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelper2.TargetHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelper2.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/ProjectHelperImpl.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/helper/package-summary.html
@@ -376,6 +457,14 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/input/PropertyFileInputHa
 U java/source/ant/docs/manual/api/org/apache/tools/ant/input/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/input/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/input/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/launch
+U java/source/ant/docs/manual/api/org/apache/tools/ant/launch/AntMain.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/launch/LaunchException.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/launch/Launcher.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/launch/Locator.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/launch/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/launch/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/launch/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/listener
 U java/source/ant/docs/manual/api/org/apache/tools/ant/listener/AnsiColorLogger.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/listener/CommonsLoggingListener.html
@@ -384,11 +473,18 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/listener/MailLogger.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/listener/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/listener/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/listener/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/loader
+U java/source/ant/docs/manual/api/org/apache/tools/ant/loader/AntClassLoader2.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/loader/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/loader/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/loader/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/AbstractCvsTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Ant.Reference.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Ant.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/AntStructure.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Antlib.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/AntlibDefinition.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Available.FileDir.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Available.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/BUnzip2.html
@@ -399,12 +495,17 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/CVSPass.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/CallTarget.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Checksum.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Chmod.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Concat.TextElement.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Concat.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/ConditionTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Copy.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Copydir.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Copyfile.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Cvs.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/DefBase.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/DefaultExcludes.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Definer.Format.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Definer.OnError.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Definer.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Delete.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Deltree.html
@@ -433,6 +534,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/GenerateKey.Dist
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/GenerateKey.DnameParam.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/GenerateKey.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Get.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/ImportTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Input.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/JDBCTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Jar.FilesetManifestConfig.html
@@ -458,6 +560,13 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/LoadFile.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/LoadProperties.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/LogOutputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/LogStreamHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MacroDef.Attribute.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MacroDef.NestedSequential.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MacroDef.TemplateElement.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MacroDef.Text.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MacroDef.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MacroInstance.Element.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MacroInstance.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Manifest.Attribute.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Manifest.Section.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Manifest.html
@@ -467,18 +576,23 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/ManifestTask.htm
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/MatchingTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Mkdir.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Move.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Nice.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Pack.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Parallel.TaskList.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Parallel.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Patch.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/PathConvert.MapEntry.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/PathConvert.TargetOs.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/PathConvert.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/PreSetDef.PreSetDefinition.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/PreSetDef.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Property.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/PumpStreamHandler.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Recorder.ActionChoices.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Recorder.VerbosityLevelChoices.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Recorder.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/RecorderEntry.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Redirector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Rename.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Replace.NestedString.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Replace.Replacefilter.html
@@ -494,6 +608,9 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Sequential.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/SignJar.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Sleep.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/StreamPumper.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/SubAnt.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Sync.MyCopy.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Sync.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Tar.TarCompressionMethod.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Tar.TarFileSet.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Tar.TarLongFileMode.html
@@ -514,9 +631,13 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/UpToDate.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/WaitFor.Unit.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/WaitFor.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/War.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/WhichResource.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTLiaison.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTLiaison2.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTLogger.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTLoggerAware.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.Factory.Attribute.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.Factory.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.OutputProperty.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.Param.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.html
@@ -552,6 +673,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/Equals
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/FilesMatch.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/Http.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/IsFalse.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/IsReference.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/IsSet.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/IsTrue.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/condition/Not.html
@@ -565,6 +687,7 @@ cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/task
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/cvslib/ChangeLogTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/cvslib/CvsTagDiff.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/cvslib/CvsUser.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/cvslib/CvsVersion.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/cvslib/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/cvslib/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/cvslib/package-tree.html
@@ -572,13 +695,16 @@ cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/task
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/EmailAddress.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/EmailTask.Encoding.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/EmailTask.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/Mailer.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/Message.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/MimeMailer.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/email/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ANTLR.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/Cab.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/EchoProperties.FormatAttribute.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/EchoProperties.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/IContract.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/Javah.ClassArgument.html
@@ -600,6 +726,8 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/StyleBo
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/Test.TestletEntry.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/Test.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/TraXLiaison.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/XMLValidateTask.Attribute.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/XMLValidateTask.Property.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/XMLValidateTask.ValidatorErrorHandler.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/XMLValidateTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/XalanLiaison.html
@@ -621,7 +749,16 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ccm/pac
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCCheckin.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCCheckout.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCLock.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkattr.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkbl.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkdir.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkelem.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCMklabel.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCMklbtype.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCRmtype.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCUnCheckout.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCUnlock.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/CCUpdate.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/ClearCase.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/clearcase/package-frame.html
@@ -658,8 +795,20 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/depend/
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/depend/constantpool/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/CSharp.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetBaseMatchingTask.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetCompile.TargetTypes.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetCompile.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetDefine.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetResource.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/Ilasm.TargetTypes.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/Ilasm.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/Ildasm.EncodingTypes.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/Ildasm.VisibilityOptions.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/Ildasm.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/ImportTypelib.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/JSharp.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/NetCommand.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/VisualBasicCompile.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/WsdlToDotnet.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/dotnet/package-summary.html
@@ -671,6 +820,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/DDC
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/DDCreatorHelper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/DescriptorHandler.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/EJBDeploymentTool.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/EjbJar.CMPVersion.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/EjbJar.DTDLocation.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/EjbJar.NamingScheme.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/EjbJar.html
@@ -694,6 +844,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/pac
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ejb/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/extension
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/extension/Compatability.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/extension/Compatibility.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/extension/DeweyDecimal.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/extension/Extension.html
@@ -740,6 +891,11 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ide/VAJ
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ide/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ide/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ide/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/image
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/image/Image.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/image/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/image/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/image/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/j2ee
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/j2ee/AbstractHotDeploymentTool.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/j2ee/GenericHotDeploymentTool.html
@@ -751,6 +907,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/j2ee/pa
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/j2ee/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/j2ee/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/javacc
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/javacc/JJDoc.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/javacc/JJTree.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/javacc/JavaCC.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/javacc/package-frame.html
@@ -800,6 +957,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/E
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/FormatterElement.TypeAttribute.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/FormatterElement.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/JUnitResultFormatter.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.ForkMode.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.SummaryAttribute.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/JUnitTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/junit/JUnitTest.html
@@ -827,9 +985,16 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/metamat
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/metamata/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/FTP.Action.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/FTP.FTPDirectoryScanner.AntFTPFile.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/FTP.FTPDirectoryScanner.AntFTPRootFile.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/FTP.FTPDirectoryScanner.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/FTP.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/MimeMail.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/RExecTask.AntRExecClient.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/RExecTask.RExecRead.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/RExecTask.RExecSubTask.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/RExecTask.RExecWrite.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/RExecTask.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/SetProxy.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/TelnetTask.AntTelnetClient.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/net/TelnetTask.TelnetRead.html
@@ -846,14 +1011,19 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforc
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Counter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Delete.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Edit.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Fstat.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Handler.html
-U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4HandlerAdapter.Reader.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4HandlerAdapter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Have.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Integrate.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Label.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Labelsync.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4OutputHandler.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4OutputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Reopen.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Resolve.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Revert.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Submit.P4SubmitAdapter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Submit.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/P4Sync.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/perforce/SimpleP4OutputHandler.html
@@ -871,7 +1041,16 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/scm/Ant
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/scm/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/scm/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/scm/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script/ScriptDef.Attribute.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script/ScriptDef.NestedElement.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script/ScriptDef.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script/ScriptDefBase.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/script/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/sitraka
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/sitraka/CovBase.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/sitraka/CovMerge.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/sitraka/CovReport.Reference.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/sitraka/CovReport.ReportFormat.html
@@ -933,6 +1112,19 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/splash/
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/splash/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/splash/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/splash/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/AbstractSshMessage.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/Directory.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/LogListener.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/SSHBase.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/SSHExec.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/SSHUserInfo.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/Scp.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/ScpFromMessage.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/ScpToMessage.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/ssh/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/starteam
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/starteam/StarTeamCheckin.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/starteam/StarTeamCheckout.html
@@ -944,13 +1136,24 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/startea
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/starteam/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/starteam/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/starteam/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix/AbstractAccessTask.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix/Chgrp.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix/Chown.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix/Symlink.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/unix/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSS.CurrentModUpdated.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSS.WritableFiles.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSS.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSADD.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCHECKIN.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCHECKOUT.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCP.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCREATE.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSConstants.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSGET.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSHISTORY.BriefCodediffNofile.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSVSSHISTORY.html
@@ -958,6 +1161,11 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/MSV
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/vss/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/windows
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/windows/Attrib.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/windows/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/windows/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/optional/windows/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/rmic
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/rmic/DefaultRmicAdapter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/rmic/KaffeRmic.html
@@ -971,6 +1179,10 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/rmic/package-tre
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/types
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/AbstractFileSet.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/AntFilterReader.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Assertions.BaseAssertion.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Assertions.DisabledAssertion.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Assertions.EnabledAssertion.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Assertions.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Commandline.Argument.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Commandline.Marker.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Commandline.html
@@ -983,6 +1195,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/types/DirSet.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/EnumeratedAttribute.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Environment.Variable.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Environment.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/FileList.FileName.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/FileList.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/FileSet.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/FilterChain.html
@@ -999,10 +1212,17 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Path.PathElement.ht
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Path.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/PatternSet.NameEntry.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/PatternSet.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Permissions.Permission.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Permissions.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/PropertySet.BuiltinPropertySetName.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/PropertySet.PropertyRef.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/PropertySet.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/RedirectorElement.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Reference.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/RegularExpression.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Resource.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/ResourceFactory.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/ResourceLocation.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/Substitution.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/XMLCatalog.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/ZipFileSet.html
@@ -1011,6 +1231,10 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/types/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/ScriptFilter.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/depend
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/depend/ClassfileSet.ClassRoot.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/depend/ClassfileSet.html
@@ -1018,21 +1242,47 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/depend/Dep
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/depend/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/depend/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/depend/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Arc.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/BasicShape.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/ColorMapper.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Draw.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/DrawOperation.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Ellipse.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/ImageOperation.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Rectangle.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Rotate.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Scale.ProportionsAttribute.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Scale.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/Text.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/TransformOperation.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/optional/image/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/types/resolver
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/resolver/ApacheCatalog.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/resolver/ApacheCatalogResolver.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/resolver/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/resolver/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/resolver/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/AndSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/BaseExtendSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/BaseSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/BaseSelectorContainer.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/ContainsRegexpSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/ContainsSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/DateSelector.TimeComparisons.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/DateSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/DependSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/DepthSelector.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/DifferentSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/ExtendFileSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/ExtendSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/FileSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/FilenameSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/MajoritySelector.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/MappingSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/NoneSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/NotSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/OrSelector.html
@@ -1045,11 +1295,34 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/SelectorU
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/SizeSelector.ByteUnits.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/SizeSelector.SizeComparisons.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/SizeSelector.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/TypeSelector.FileType.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/TypeSelector.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/Algorithm.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/Cache.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/DigestAlgorithm.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/EqualComparator.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/HashvalueAlgorithm.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/ModifiedSelector.AlgorithmName.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/ModifiedSelector.CacheName.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/ModifiedSelector.ComparatorName.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/ModifiedSelector.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/PropertiesfileCache.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/package-frame.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/package-summary.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/types/selectors/modifiedselector/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/util
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ChainedMapper.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ClasspathUtils.Delegate.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ClasspathUtils.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/CollectionUtils.EmptyEnumeration.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/CollectionUtils.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/CompositeMapper.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ConcatFileInputStream.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ContainerMapper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/DOMElementWriter.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/DateUtils.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/FileNameMapper.html
@@ -1059,17 +1332,30 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/util/GlobPatternMapper.ht
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/IdentityMapper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/JAXPUtils.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/JavaEnvUtils.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/KeepAliveInputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/KeepAliveOutputStream.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/LazyFileOutputStream.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/LazyHashtable.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/LeadPipeInputStream.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/LineTokenizer.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/LoaderUtils.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/MergingMapper.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/OutputStreamFunneler.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/PackageNameMapper.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ReaderInputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/RegexpPatternMapper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ResourceUtils.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/ScriptRunner.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/SourceFileScanner.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/StringUtils.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/TaskLogger.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/TeeOutputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/TimeoutObserver.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/Tokenizer.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/UnPackageNameMapper.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/Watchdog.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/WeakishReference.HardReference.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/WeakishReference.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/package-tree.html
@@ -1094,6 +1380,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/util/facade/package-summa
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/facade/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/org/apache/tools/ant/util/optional
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/optional/NoExitSecurityManager.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/util/optional/WeakishReference12.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/optional/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/optional/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/util/optional/package-tree.html
@@ -1143,6 +1430,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/zip/UnixStat.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/UnrecognizedExtraField.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/ZipEntry.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/ZipExtraField.html
+U java/source/ant/docs/manual/api/org/apache/tools/zip/ZipFile.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/ZipLong.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/ZipOutputStream.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/ZipShort.html
@@ -1150,7 +1438,8 @@ U java/source/ant/docs/manual/api/org/apache/tools/zip/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/package-tree.html
 cvs checkout: Updating java/source/ant/docs/manual/api/resources
-U java/source/ant/docs/manual/api/resources/inherit.gif
+cvs checkout: Updating java/source/ant/docs/manual/stylesheets
+U java/source/ant/docs/manual/stylesheets/antmanual.css
 cvs checkout: Updating java/source/ant/docs/projects
 U java/source/ant/docs/projects/index.html
 cvs checkout: Updating java/source/ant/docs/projects/antidote
@@ -1159,35 +1448,87 @@ U java/source/ant/docs/projects/antidote/index.html
 U java/source/ant/docs/projects/antidote/module.html
 cvs checkout: Updating java/source/ant/docs/projects/antidote/images
 U java/source/ant/docs/projects/antidote/images/screenshot.jpg
+cvs checkout: Updating java/source/ant/docs/projects/antlib
+U java/source/ant/docs/projects/antlib/antlib_classloaders.html
+U java/source/ant/docs/projects/antlib/antlib_contract.html
+U java/source/ant/docs/projects/antlib/antlib_descriptors.html
+U java/source/ant/docs/projects/antlib/antlib_namespaces.html
+U java/source/ant/docs/projects/antlib/antlib_roadmap.html
+U java/source/ant/docs/projects/antlib/index.html
+U java/source/ant/docs/projects/antlib/roles.html
+cvs checkout: Updating java/source/ant/docs/roxes
+U java/source/ant/docs/roxes/LICENSE.txt
+U java/source/ant/docs/roxes/default.css
+U java/source/ant/docs/roxes/index.html
+U java/source/ant/docs/roxes/index.xml
+U java/source/ant/docs/roxes/roxes.gif
+U java/source/ant/docs/roxes/roxes.ico
+cvs checkout: Updating java/source/ant/docs/roxes/images
+U java/source/ant/docs/roxes/images/tip.gif
 cvs checkout: Updating java/source/ant/etc
+U java/source/ant/etc/ant-bootstrap.jar
 U java/source/ant/etc/changelog.xsl
 U java/source/ant/etc/checkstyle-frames.xsl
 U java/source/ant/etc/coverage-frames.xsl
 U java/source/ant/etc/jdepend-frames.xsl
 U java/source/ant/etc/jdepend.xsl
+U java/source/ant/etc/junit-frames-xalan1.xsl
 U java/source/ant/etc/junit-frames.xsl
 U java/source/ant/etc/junit-noframes.xsl
 U java/source/ant/etc/log.xsl
 U java/source/ant/etc/maudit-frames.xsl
 U java/source/ant/etc/mmetrics-frames.xsl
 U java/source/ant/etc/tagdiff.xsl
+cvs checkout: Updating java/source/ant/etc/checkstyle
+U java/source/ant/etc/checkstyle/checkstyle-frames.xsl
+U java/source/ant/etc/checkstyle/checkstyle-text.xsl
+U java/source/ant/etc/checkstyle/checkstyle-xdoc.xsl
 cvs checkout: Updating java/source/ant/lib
+U java/source/ant/lib/LICENSE.ant
+U java/source/ant/lib/LICENSE.dom
+U java/source/ant/lib/LICENSE.sax
+U java/source/ant/lib/LICENSE.xerces
 U java/source/ant/lib/README
+U java/source/ant/lib/ant-antlr.jar
+U java/source/ant/lib/ant-apache-bcel.jar
+U java/source/ant/lib/ant-apache-bsf.jar
+U java/source/ant/lib/ant-apache-log4j.jar
+U java/source/ant/lib/ant-apache-oro.jar
+U java/source/ant/lib/ant-apache-regexp.jar
+U java/source/ant/lib/ant-apache-resolver.jar
+U java/source/ant/lib/ant-commons-logging.jar
+U java/source/ant/lib/ant-commons-net.jar
+U java/source/ant/lib/ant-icontract.jar
+U java/source/ant/lib/ant-jai.jar
+U java/source/ant/lib/ant-javamail.jar
+U java/source/ant/lib/ant-jdepend.jar
+U java/source/ant/lib/ant-jmf.jar
+U java/source/ant/lib/ant-jsch.jar
+U java/source/ant/lib/ant-junit.jar
+U java/source/ant/lib/ant-launcher.jar
+U java/source/ant/lib/ant-netrexx.jar
+U java/source/ant/lib/ant-nodeps.jar
+U java/source/ant/lib/ant-starteam.jar
+U java/source/ant/lib/ant-stylebook.jar
+U java/source/ant/lib/ant-swing.jar
+U java/source/ant/lib/ant-trax.jar
+U java/source/ant/lib/ant-vaj.jar
+U java/source/ant/lib/ant-weblogic.jar
+U java/source/ant/lib/ant-xalan1.jar
+U java/source/ant/lib/ant-xslp.jar
 U java/source/ant/lib/ant.jar
-U java/source/ant/lib/optional.jar
 U java/source/ant/lib/xercesImpl.jar
 U java/source/ant/lib/xml-apis.jar
 cvs checkout: Updating java/source/ant/src
 cvs checkout: Updating java/source/ant/src/antidote
 U java/source/ant/src/antidote/WHAT-IS-THIS-P
 cvs checkout: Updating java/source/ant/src/etc
-U java/source/ant/src/etc/RequiredHeader.txt
 U java/source/ant/src/etc/ant-update.xsl
 U java/source/ant/src/etc/changelog.xsl
-U java/source/ant/src/etc/checkstyle-frames.xsl
 U java/source/ant/src/etc/coverage-frames.xsl
 U java/source/ant/src/etc/jdepend-frames.xsl
 U java/source/ant/src/etc/jdepend.xsl
+U java/source/ant/src/etc/junit-frames-xalan1.xsl
 U java/source/ant/src/etc/junit-frames.xsl
 U java/source/ant/src/etc/junit-noframes.xsl
 U java/source/ant/src/etc/log.xsl
@@ -1196,11 +1537,23 @@ U java/source/ant/src/etc/maudit-frames.xsl
 U java/source/ant/src/etc/mmetrics-frames.xsl
 U java/source/ant/src/etc/tagdiff.xsl
 U java/source/ant/src/etc/yearcheck.sh
+cvs checkout: Updating java/source/ant/src/etc/checkstyle
+U java/source/ant/src/etc/checkstyle/RequiredHeader.txt
+U java/source/ant/src/etc/checkstyle/checkstyle-config
+U java/source/ant/src/etc/checkstyle/checkstyle-frames.xsl
+U java/source/ant/src/etc/checkstyle/checkstyle-text.xsl
+U java/source/ant/src/etc/checkstyle/checkstyle-xdoc.xsl
 cvs checkout: Updating java/source/ant/src/etc/testcases
 U java/source/ant/src/etc/testcases/asf-logo.gif
+U java/source/ant/src/etc/testcases/testkeystore
 cvs checkout: Updating java/source/ant/src/etc/testcases/core
+U java/source/ant/src/etc/testcases/core/case.xml
+U java/source/ant/src/etc/testcases/core/directoryscanner.xml
 U java/source/ant/src/etc/testcases/core/immutable.xml
 U java/source/ant/src/etc/testcases/core/taskcontainer.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/core/containersrc
+cvs checkout: Updating java/source/ant/src/etc/testcases/core/containersrc/test
+U java/source/ant/src/etc/testcases/core/containersrc/test/SpecialSeq.java
 cvs checkout: Updating java/source/ant/src/etc/testcases/core/include
 cvs checkout: Updating java/source/ant/src/etc/testcases/core/include/basic
 U java/source/ant/src/etc/testcases/core/include/basic/include.inc
@@ -1223,21 +1576,62 @@ U java/source/ant/src/etc/testcases/core/include/including_file_parse_error/incl
 cvs checkout: Updating java/source/ant/src/etc/testcases/core/include/including_file_task_error
 U java/source/ant/src/etc/testcases/core/include/including_file_task_error/build.xml
 U java/source/ant/src/etc/testcases/core/include/including_file_task_error/included_file.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/core/include/with space
+U java/source/ant/src/etc/testcases/core/include/with space/include.inc
+U java/source/ant/src/etc/testcases/core/include/with space/include.xml
+U java/source/ant/src/etc/testcases/core/include/with space/relative.xml
+U java/source/ant/src/etc/testcases/core/include/with space/simple.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/core/loaderref
+U java/source/ant/src/etc/testcases/core/loaderref/loaderref.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/core/loaderref/src
+U java/source/ant/src/etc/testcases/core/loaderref/src/Task1.java
+cvs checkout: Updating java/source/ant/src/etc/testcases/core/topleveltasks
+U java/source/ant/src/etc/testcases/core/topleveltasks/notarget.xml
+U java/source/ant/src/etc/testcases/core/topleveltasks/targetlevelant.xml
+U java/source/ant/src/etc/testcases/core/topleveltasks/toplevelant.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/filters
 U java/source/ant/src/etc/testcases/filters/build.xml
+U java/source/ant/src/etc/testcases/filters/concat.xml
+U java/source/ant/src/etc/testcases/filters/dynamicfilter.xml
+U java/source/ant/src/etc/testcases/filters/head-tail.xml
+U java/source/ant/src/etc/testcases/filters/tokenfilter.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/filters/expected
+U java/source/ant/src/etc/testcases/filters/expected/escapeunicode.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.head.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.headAllSkip.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.headLines.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.headLinesSkip.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.headSkip.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.headtail.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.tail.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.tailAllSkip.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.tailLines.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.tailLinesSkip.test
+U java/source/ant/src/etc/testcases/filters/expected/head-tail.tailSkip.test
 U java/source/ant/src/etc/testcases/filters/expected/linecontains.test
+U java/source/ant/src/etc/testcases/filters/expected/replacetokens.test
+U java/source/ant/src/etc/testcases/filters/expected/stripjavacomments.test
 cvs checkout: Updating java/source/ant/src/etc/testcases/filters/input
+U java/source/ant/src/etc/testcases/filters/input/escapeunicode.test
+U java/source/ant/src/etc/testcases/filters/input/head-tail.small.test
+U java/source/ant/src/etc/testcases/filters/input/head-tail.test
 U java/source/ant/src/etc/testcases/filters/input/linecontains.test
+U java/source/ant/src/etc/testcases/filters/input/replacetokens.test
+U java/source/ant/src/etc/testcases/filters/input/stripjavacomments.test
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs
 U java/source/ant/src/etc/testcases/taskdefs/abstractcvstask.xml
+U java/source/ant/src/etc/testcases/taskdefs/ant.topleveltest.xml
 U java/source/ant/src/etc/testcases/taskdefs/ant.xml
+U java/source/ant/src/etc/testcases/taskdefs/antlib.current-test.xml
+U java/source/ant/src/etc/testcases/taskdefs/antlib.xml
 U java/source/ant/src/etc/testcases/taskdefs/antstructure.xml
 U java/source/ant/src/etc/testcases/taskdefs/available.xml
 U java/source/ant/src/etc/testcases/taskdefs/basename.xml
 U java/source/ant/src/etc/testcases/taskdefs/bunzip2.xml
 U java/source/ant/src/etc/testcases/taskdefs/bzip2.xml
+U java/source/ant/src/etc/testcases/taskdefs/calltarget.xml
 U java/source/ant/src/etc/testcases/taskdefs/checksum.xml
+U java/source/ant/src/etc/testcases/taskdefs/classloader.xml
 U java/source/ant/src/etc/testcases/taskdefs/concat.xml
 U java/source/ant/src/etc/testcases/taskdefs/condition.xml
 U java/source/ant/src/etc/testcases/taskdefs/copy.filterset
@@ -1245,6 +1639,7 @@ U java/source/ant/src/etc/testcases/taskdefs/copy.xml
 U java/source/ant/src/etc/testcases/taskdefs/copydir.xml
 U java/source/ant/src/etc/testcases/taskdefs/copyfile.xml
 U java/source/ant/src/etc/testcases/taskdefs/cvspass.xml
+U java/source/ant/src/etc/testcases/taskdefs/defaultexcludes.xml
 U java/source/ant/src/etc/testcases/taskdefs/delete.xml
 U java/source/ant/src/etc/testcases/taskdefs/deltree.xml
 U java/source/ant/src/etc/testcases/taskdefs/dependset.xml
@@ -1267,33 +1662,77 @@ U java/source/ant/src/etc/testcases/taskdefs/jar.xml
 U java/source/ant/src/etc/testcases/taskdefs/java.xml
 U java/source/ant/src/etc/testcases/taskdefs/loadfile.xml
 U java/source/ant/src/etc/testcases/taskdefs/loadproperties.xml
+U java/source/ant/src/etc/testcases/taskdefs/macrodef.xml
 U java/source/ant/src/etc/testcases/taskdefs/manifest.xml
 U java/source/ant/src/etc/testcases/taskdefs/mkdir.xml
 U java/source/ant/src/etc/testcases/taskdefs/move.xml
+U java/source/ant/src/etc/testcases/taskdefs/multimap.xml
 U java/source/ant/src/etc/testcases/taskdefs/parallel.xml
+U java/source/ant/src/etc/testcases/taskdefs/pathconvert.xml
+U java/source/ant/src/etc/testcases/taskdefs/presetdef.xml
 U java/source/ant/src/etc/testcases/taskdefs/property.xml
 U java/source/ant/src/etc/testcases/taskdefs/property1.properties
 U java/source/ant/src/etc/testcases/taskdefs/property2.properties
 U java/source/ant/src/etc/testcases/taskdefs/property3.properties
+U java/source/ant/src/etc/testcases/taskdefs/property4.properties
+U java/source/ant/src/etc/testcases/taskdefs/property5.properties
 U java/source/ant/src/etc/testcases/taskdefs/rename.xml
 U java/source/ant/src/etc/testcases/taskdefs/replace.xml
+U java/source/ant/src/etc/testcases/taskdefs/signjar.xml
 U java/source/ant/src/etc/testcases/taskdefs/sleep.xml
+U java/source/ant/src/etc/testcases/taskdefs/subant.xml
 U java/source/ant/src/etc/testcases/taskdefs/tar.xml
 U java/source/ant/src/etc/testcases/taskdefs/taskdef.xml
 U java/source/ant/src/etc/testcases/taskdefs/template.xml
+U java/source/ant/src/etc/testcases/taskdefs/test.antlib.xml
+U java/source/ant/src/etc/testcases/taskdefs/test2.antlib.xml
+U java/source/ant/src/etc/testcases/taskdefs/toplevelant.xml
+U java/source/ant/src/etc/testcases/taskdefs/toplevelantcall.xml
+U java/source/ant/src/etc/testcases/taskdefs/toplevelsubant.xml
+U java/source/ant/src/etc/testcases/taskdefs/touch.xml
+U java/source/ant/src/etc/testcases/taskdefs/typeadapter.xml
 U java/source/ant/src/etc/testcases/taskdefs/typedef.xml
 U java/source/ant/src/etc/testcases/taskdefs/untar.xml
 U java/source/ant/src/etc/testcases/taskdefs/unzip.xml
 U java/source/ant/src/etc/testcases/taskdefs/war.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlns.xml
 U java/source/ant/src/etc/testcases/taskdefs/xmlproperty.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty_data.dtd
 U java/source/ant/src/etc/testcases/taskdefs/xmlproperty_data.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty_withdtd.xml
 U java/source/ant/src/etc/testcases/taskdefs/zip.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/ant
 U java/source/ant/src/etc/testcases/taskdefs/ant/ant.xml
 U java/source/ant/src/etc/testcases/taskdefs/ant/references.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/checksum
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/checksum/foo
+U java/source/ant/src/etc/testcases/taskdefs/checksum/foo/Bar
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/checksum/foo/zap
+U java/source/ant/src/etc/testcases/taskdefs/checksum/foo/zap/Eenie
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/concat-input
+U java/source/ant/src/etc/testcases/taskdefs/concat-input/A
+U java/source/ant/src/etc/testcases/taskdefs/concat-input/B
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/conditions
+U java/source/ant/src/etc/testcases/taskdefs/conditions/isreference.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/copy
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/copy/expected
+U java/source/ant/src/etc/testcases/taskdefs/copy/expected/utf-8
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/copy/input
+U java/source/ant/src/etc/testcases/taskdefs/copy/input/iso8859-1
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/email
+U java/source/ant/src/etc/testcases/taskdefs/email/mail.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/exec
+U java/source/ant/src/etc/testcases/taskdefs/exec/apply.xml
+U java/source/ant/src/etc/testcases/taskdefs/exec/exec.xml
+U java/source/ant/src/etc/testcases/taskdefs/exec/parrot.sh
+U java/source/ant/src/etc/testcases/taskdefs/exec/spawn.sh
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/exec/expected
+U java/source/ant/src/etc/testcases/taskdefs/exec/expected/utf-8
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/exec/input
+U java/source/ant/src/etc/testcases/taskdefs/exec/input/iso8859-1
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/expected
-U java/source/ant/src/etc/testcases/taskdefs/expected/asf-logo-huge.tar
 U java/source/ant/src/etc/testcases/taskdefs/expected/asf-logo-huge.tar.bz2
+U java/source/ant/src/etc/testcases/taskdefs/expected/asf-logo-huge.tar.gz
 U java/source/ant/src/etc/testcases/taskdefs/expected/asf-logo.gif.bz2
 U java/source/ant/src/etc/testcases/taskdefs/expected/asf-logo.gif.gz
 U java/source/ant/src/etc/testcases/taskdefs/expected/asf-logo.gif.md5
@@ -1315,6 +1754,11 @@ U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/Junk7.java
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/Junk8.java
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/Junk9.java
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/Mac2Unix
+U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/crcrlf.dos
+U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/crcrlf.mac
+U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/crcrlf.unix
+U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/fixlast.dos
+U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/fixlastfalse.mac
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/input.lf.utf16
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/expected/longlines.lf
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input
@@ -1328,8 +1772,31 @@ U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/Junk7.java
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/Junk8.java
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/Junk9.java
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/Mac2Unix
+U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/crcrlf
+U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/fixlastfalse.lf
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/input.crlf.utf16
 U java/source/ant/src/etc/testcases/taskdefs/fixcrlf/input/longlines.crlf
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/import
+U java/source/ant/src/etc/testcases/taskdefs/import/bad.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/import.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/import_bad_import.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/imported.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/unnamed1.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/unnamed2.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/unnamedImport.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/import/subdir
+U java/source/ant/src/etc/testcases/taskdefs/import/subdir/importinsequential-inner.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/subdir/importinsequential.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/subdir/importintarget-inner.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/subdir/importintarget.xml
+U java/source/ant/src/etc/testcases/taskdefs/import/subdir/serial.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/import/symlinks
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/import/symlinks/d1
+U java/source/ant/src/etc/testcases/taskdefs/import/symlinks/d1/p1.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/import/symlinks/d2
+U java/source/ant/src/etc/testcases/taskdefs/import/symlinks/d2/p2.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/import/symlinks/d3a
+U java/source/ant/src/etc/testcases/taskdefs/import/symlinks/d3a/p3.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/manifests
 U java/source/ant/src/etc/testcases/taskdefs/manifests/test1.mf
 U java/source/ant/src/etc/testcases/taskdefs/manifests/test2.mf
@@ -1340,6 +1807,8 @@ U java/source/ant/src/etc/testcases/taskdefs/manifests/test6.mf
 U java/source/ant/src/etc/testcases/taskdefs/manifests/test7.mf
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional
 U java/source/ant/src/etc/testcases/taskdefs/optional/WsdlToDotnet.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/dotnet.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/echoproperties.properties
 U java/source/ant/src/etc/testcases/taskdefs/optional/echoproperties.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/jspc.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/junit.xml
@@ -1351,6 +1820,7 @@ U java/source/ant/src/etc/testcases/taskdefs/optional/replaceregexp.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/replaceregexp2.properties
 U java/source/ant/src/etc/testcases/taskdefs/optional/replaceregexp2.result.properties
 U java/source/ant/src/etc/testcases/taskdefs/optional/script.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/script_reference.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/xalan-redirect-in.xsl
 U java/source/ant/src/etc/testcases/taskdefs/optional/xmlvalidate.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/xslt.xml
@@ -1373,6 +1843,7 @@ U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src1/A.java
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src1/B.java
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src1/C.java
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src1/D.java
+U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src1/E.java
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/depend/src2
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src2/A.java
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src2/B.java
@@ -1381,10 +1852,35 @@ U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src3/A.java
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src3/B.java
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/depend/src4
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/depend/src4/test
+U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src4/test/ContainsOnlyInner.java
+U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src4/test/MethodParam.java
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src4/test/Outer.java
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/depend/src5
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src5/A.java
 U java/source/ant/src/etc/testcases/taskdefs/optional/depend/src5/B.java
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/dotnet
+U java/source/ant/src/etc/testcases/taskdefs/optional/dotnet/HelloWorld.wsdl
+U java/source/ant/src/etc/testcases/taskdefs/optional/dotnet/example.cs
+U java/source/ant/src/etc/testcases/taskdefs/optional/dotnet/example.il
+U java/source/ant/src/etc/testcases/taskdefs/optional/dotnet/example2.cs
+U java/source/ant/src/etc/testcases/taskdefs/optional/dotnet/example2.il
+U java/source/ant/src/etc/testcases/taskdefs/optional/dotnet/jsharp.java
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/i18n
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate
+U java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate/translate.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate/expected
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate/expected/de
+U java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate/expected/de/template.txt
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate/input
+U java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate/input/resources_ger_DE.properties
+U java/source/ant/src/etc/testcases/taskdefs/optional/i18n/translate/input/template.txt
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/image
+U java/source/ant/src/etc/testcases/taskdefs/optional/image/image.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/image/src
+U java/source/ant/src/etc/testcases/taskdefs/optional/image/src/badimage.jpg
+U java/source/ant/src/etc/testcases/taskdefs/optional/image/src/largeimage.jpg
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/jdepend
+U java/source/ant/src/etc/testcases/taskdefs/optional/jdepend/jdepend.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/jsp
 U java/source/ant/src/etc/testcases/taskdefs/optional/jsp/1nvalid-classname.jsp
 U java/source/ant/src/etc/testcases/taskdefs/optional/jsp/default.jsp
@@ -1397,24 +1893,89 @@ U java/source/ant/src/etc/testcases/taskdefs/optional/jsp/WEB-INF/web.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/junitreport
 U java/source/ant/src/etc/testcases/taskdefs/optional/junitreport/TEST-sampleproject.coins.CoinTest.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/junitreport/TEST-sampleproject.util.UniqueStringTest.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/net
+U java/source/ant/src/etc/testcases/taskdefs/optional/net/ftp.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/perforce
+U java/source/ant/src/etc/testcases/taskdefs/optional/perforce/changerenumbered.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/perforce/needsresolve.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/script
+U java/source/ant/src/etc/testcases/taskdefs/optional/script/scriptdef.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/sitraka
 U java/source/ant/src/etc/testcases/taskdefs/optional/sitraka/covreport-test.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/sos
+U java/source/ant/src/etc/testcases/taskdefs/optional/sos/sos.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/unix
+U java/source/ant/src/etc/testcases/taskdefs/optional/unix/symlink.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/vss
+U java/source/ant/src/etc/testcases/taskdefs/optional/vss/vss.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/wsdl
 U java/source/ant/src/etc/testcases/taskdefs/optional/wsdl/StockQuoteService.wsdl
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/optional/xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/about.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/xml/catalog
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/doc.dtd
+U java/source/ant/src/etc/testcases/taskdefs/optional/xml/doc.xsd
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/doc.xsl
+U java/source/ant/src/etc/testcases/taskdefs/optional/xml/endpiece-noSchema-invalid.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/xml/endpiece-noSchema.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/xml/endpiece.xml
+U java/source/ant/src/etc/testcases/taskdefs/optional/xml/endpiece2.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/iso-2022-jp.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/test.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/test.xsl
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/utf-8.xml
 U java/source/ant/src/etc/testcases/taskdefs/optional/xml/validate.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/replace
+U java/source/ant/src/etc/testcases/taskdefs/replace/result.txt
+U java/source/ant/src/etc/testcases/taskdefs/replace/source.txt
+U java/source/ant/src/etc/testcases/taskdefs/replace/value.txt
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/style
+U java/source/ant/src/etc/testcases/taskdefs/style/build.xml
+U java/source/ant/src/etc/testcases/taskdefs/style/data.xml
+U java/source/ant/src/etc/testcases/taskdefs/style/printParams.xsl
+U java/source/ant/src/etc/testcases/taskdefs/style/testNewerStylesheet.xsl
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/subant
+U java/source/ant/src/etc/testcases/taskdefs/subant/genericsubant.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/subant/subant-test1
+U java/source/ant/src/etc/testcases/taskdefs/subant/subant-test1/mysubant.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/subant/subant-test2
+U java/source/ant/src/etc/testcases/taskdefs/subant/subant-test2/mysubant.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/xmlproperty
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-collapse-input1.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-collapse-original.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-collapse-override.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-nocollapse-input1.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-nocollapse-original.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-semantic-include.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-semantic-input1.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/keeproot-semantic-override.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-collapse-input1.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-collapse-original.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-nocollapse-input1.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-nocollapse-multi.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-nocollapse-original.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-semantic-include-input1.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-semantic-input1.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-semantic-locations.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-semantic-paths.properties
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/goldfiles/nokeeproot-semantic-references.properties
+cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs/input1.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs/locations.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs/multi.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs/original.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs/override.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs/paths.xml
+U java/source/ant/src/etc/testcases/taskdefs/xmlproperty/inputs/references.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/taskdefs/zip
+U java/source/ant/src/etc/testcases/taskdefs/zip/test.exe
 U java/source/ant/src/etc/testcases/taskdefs/zip/zipgroupfileset1.zip
 U java/source/ant/src/etc/testcases/taskdefs/zip/zipgroupfileset2.zip
 U java/source/ant/src/etc/testcases/taskdefs/zip/zipgroupfileset3.zip
 cvs checkout: Updating java/source/ant/src/etc/testcases/types
+U java/source/ant/src/etc/testcases/types/addtype.xml
+U java/source/ant/src/etc/testcases/types/assertions.xml
 U java/source/ant/src/etc/testcases/types/description1.xml
 U java/source/ant/src/etc/testcases/types/description2.xml
 U java/source/ant/src/etc/testcases/types/description3.xml
@@ -1425,13 +1986,17 @@ U java/source/ant/src/etc/testcases/types/filtersetb.txt
 U java/source/ant/src/etc/testcases/types/filtersetc.txt
 U java/source/ant/src/etc/testcases/types/flexinteger.xml
 U java/source/ant/src/etc/testcases/types/mapper.xml
+U java/source/ant/src/etc/testcases/types/poly.xml
 U java/source/ant/src/etc/testcases/types/quote1.xml
 U java/source/ant/src/etc/testcases/types/quote2.xml
+U java/source/ant/src/etc/testcases/types/redirector.xml
 U java/source/ant/src/etc/testcases/types/selectors.xml
 U java/source/ant/src/etc/testcases/types/xmlcatalog.xml
 U java/source/ant/src/etc/testcases/types/xmlcatalog.xsl
 U java/source/ant/src/etc/testcases/types/xmlcatalog1.xml
 U java/source/ant/src/etc/testcases/types/xmlcatalog2.xml
+cvs checkout: Updating java/source/ant/src/etc/testcases/types/assertions
+U java/source/ant/src/etc/testcases/types/assertions/AssertionTest.java
 cvs checkout: Updating java/source/ant/src/etc/testcases/types/gold
 U java/source/ant/src/etc/testcases/types/gold/filterset1.txt
 U java/source/ant/src/etc/testcases/types/gold/filterset2.txt
@@ -1451,30 +2016,43 @@ cvs checkout: Updating java/source/ant/src/main/org/apache
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant
 U java/source/ant/src/main/org/apache/tools/ant/AntClassLoader.java
+U java/source/ant/src/main/org/apache/tools/ant/AntTypeDefinition.java
 U java/source/ant/src/main/org/apache/tools/ant/BuildEvent.java
 U java/source/ant/src/main/org/apache/tools/ant/BuildException.java
 U java/source/ant/src/main/org/apache/tools/ant/BuildListener.java
 U java/source/ant/src/main/org/apache/tools/ant/BuildLogger.java
+U java/source/ant/src/main/org/apache/tools/ant/ComponentHelper.java
 U java/source/ant/src/main/org/apache/tools/ant/DefaultLogger.java
+U java/source/ant/src/main/org/apache/tools/ant/DemuxInputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/DemuxOutputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/Diagnostics.java
 U java/source/ant/src/main/org/apache/tools/ant/DirectoryScanner.java
+U java/source/ant/src/main/org/apache/tools/ant/DynamicAttribute.java
+U java/source/ant/src/main/org/apache/tools/ant/DynamicAttributeNS.java
 U java/source/ant/src/main/org/apache/tools/ant/DynamicConfigurator.java
+U java/source/ant/src/main/org/apache/tools/ant/DynamicConfiguratorNS.java
+U java/source/ant/src/main/org/apache/tools/ant/DynamicElement.java
+U java/source/ant/src/main/org/apache/tools/ant/DynamicElementNS.java
 U java/source/ant/src/main/org/apache/tools/ant/ExitException.java
+U java/source/ant/src/main/org/apache/tools/ant/ExitStatusException.java
 U java/source/ant/src/main/org/apache/tools/ant/FileScanner.java
 U java/source/ant/src/main/org/apache/tools/ant/IntrospectionHelper.java
 U java/source/ant/src/main/org/apache/tools/ant/Location.java
+U java/source/ant/src/main/org/apache/tools/ant/MagicNames.java
 U java/source/ant/src/main/org/apache/tools/ant/Main.java
 U java/source/ant/src/main/org/apache/tools/ant/NoBannerLogger.java
 U java/source/ant/src/main/org/apache/tools/ant/PathTokenizer.java
 U java/source/ant/src/main/org/apache/tools/ant/Project.java
 U java/source/ant/src/main/org/apache/tools/ant/ProjectComponent.java
 U java/source/ant/src/main/org/apache/tools/ant/ProjectHelper.java
+U java/source/ant/src/main/org/apache/tools/ant/PropertyHelper.java
 U java/source/ant/src/main/org/apache/tools/ant/RuntimeConfigurable.java
+U java/source/ant/src/main/org/apache/tools/ant/SubBuildListener.java
 U java/source/ant/src/main/org/apache/tools/ant/Target.java
 U java/source/ant/src/main/org/apache/tools/ant/Task.java
 U java/source/ant/src/main/org/apache/tools/ant/TaskAdapter.java
 U java/source/ant/src/main/org/apache/tools/ant/TaskContainer.java
+U java/source/ant/src/main/org/apache/tools/ant/TypeAdapter.java
 U java/source/ant/src/main/org/apache/tools/ant/UnknownElement.java
 U java/source/ant/src/main/org/apache/tools/ant/XmlLogger.java
 U java/source/ant/src/main/org/apache/tools/ant/defaultManifest.mf
@@ -1484,6 +2062,8 @@ U java/source/ant/src/main/org/apache/tools/ant/filters/BaseFilterReader.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/BaseParamFilterReader.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/ChainableReader.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/ClassConstants.java
+U java/source/ant/src/main/org/apache/tools/ant/filters/ConcatFilter.java
+U java/source/ant/src/main/org/apache/tools/ant/filters/EscapeUnicode.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/ExpandProperties.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/HeadFilter.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/LineContains.java
@@ -1496,10 +2076,13 @@ U java/source/ant/src/main/org/apache/tools/ant/filters/StripLineBreaks.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/StripLineComments.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/TabsToSpaces.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/TailFilter.java
+U java/source/ant/src/main/org/apache/tools/ant/filters/TokenFilter.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/filters/util
 U java/source/ant/src/main/org/apache/tools/ant/filters/util/ChainReaderHelper.java
 U java/source/ant/src/main/org/apache/tools/ant/filters/util/JavaClassHelper.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/helper
+U java/source/ant/src/main/org/apache/tools/ant/helper/AntXMLContext.java
+U java/source/ant/src/main/org/apache/tools/ant/helper/ProjectHelper2.java
 U java/source/ant/src/main/org/apache/tools/ant/helper/ProjectHelperImpl.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/input
 U java/source/ant/src/main/org/apache/tools/ant/input/DefaultInputHandler.java
@@ -1507,16 +2090,25 @@ U java/source/ant/src/main/org/apache/tools/ant/input/InputHandler.java
 U java/source/ant/src/main/org/apache/tools/ant/input/InputRequest.java
 U java/source/ant/src/main/org/apache/tools/ant/input/MultipleChoiceInputRequest.java
 U java/source/ant/src/main/org/apache/tools/ant/input/PropertyFileInputHandler.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/launch
+U java/source/ant/src/main/org/apache/tools/ant/launch/AntMain.java
+U java/source/ant/src/main/org/apache/tools/ant/launch/LaunchException.java
+U java/source/ant/src/main/org/apache/tools/ant/launch/Launcher.java
+U java/source/ant/src/main/org/apache/tools/ant/launch/Locator.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/listener
 U java/source/ant/src/main/org/apache/tools/ant/listener/AnsiColorLogger.java
 U java/source/ant/src/main/org/apache/tools/ant/listener/CommonsLoggingListener.java
 U java/source/ant/src/main/org/apache/tools/ant/listener/Log4jListener.java
 U java/source/ant/src/main/org/apache/tools/ant/listener/MailLogger.java
 U java/source/ant/src/main/org/apache/tools/ant/listener/defaults.properties
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/loader
+U java/source/ant/src/main/org/apache/tools/ant/loader/AntClassLoader2.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/AbstractCvsTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Ant.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/AntStructure.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Antlib.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/AntlibDefinition.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Available.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/BUnzip2.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/BZip2.java
@@ -1532,6 +2124,8 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Copy.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Copydir.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Copyfile.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Cvs.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/DefBase.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/DefaultExcludes.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Definer.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Delete.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Deltree.java
@@ -1554,6 +2148,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/GUnzip.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/GZip.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/GenerateKey.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Get.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/ImportTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Input.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/JDBCTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Jar.java
@@ -1567,21 +2162,26 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/LoadFile.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/LoadProperties.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/LogOutputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/LogStreamHandler.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/MacroDef.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/MacroInstance.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Manifest.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/ManifestException.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/ManifestTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/MatchingTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Mkdir.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Move.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Nice.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Pack.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Parallel.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Patch.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/PathConvert.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/PreSetDef.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/ProcessDestroyer.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Property.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/PumpStreamHandler.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Recorder.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/RecorderEntry.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Redirector.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Rename.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Replace.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Rmic.java
@@ -1591,6 +2191,8 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Sequential.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/SignJar.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Sleep.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/StreamPumper.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/SubAnt.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Sync.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Tar.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/TaskOutputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Taskdef.java
@@ -1604,12 +2206,12 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Untar.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/UpToDate.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/WaitFor.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/War.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/WhichResource.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTLiaison.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTLiaison2.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTLogger.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTLoggerAware.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTProcess.java
-U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTProcess.java.orig
-U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTProcess.java.rej
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XmlProperty.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Zip.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/defaults.properties
@@ -1634,6 +2236,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/Equals.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/FilesMatch.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/Http.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/IsFalse.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/IsReference.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/IsSet.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/IsTrue.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/condition/Not.java
@@ -1648,6 +2251,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/ChangeLogWriter.
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/CvsTagDiff.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/CvsTagEntry.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/CvsUser.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/CvsVersion.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/RCSFile.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/RedirectingOutputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/cvslib/RedirectingStreamHandler.java
@@ -1675,7 +2279,6 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/Script.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/StyleBook.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/Test.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/TraXLiaison.java
-U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/TraXLiaison.java.orig
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/XMLValidateTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/XalanLiaison.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/XslpLiaison.java
@@ -1690,7 +2293,16 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ccm/Continuus.
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCCheckin.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCCheckout.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCLock.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkattr.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkbl.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkdir.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCMkelem.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCMklabel.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCMklbtype.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCRmtype.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCUnCheckout.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCUnlock.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/CCUpdate.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/clearcase/ClearCase.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/depend
@@ -1718,8 +2330,16 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/depend/constan
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/depend/constantpool/Utf8CPInfo.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/CSharp.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetBaseMatchingTask.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetCompile.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetDefine.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/DotnetResource.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/Ilasm.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/Ildasm.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/ImportTypelib.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/JSharp.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/NetCommand.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/VisualBasicCompile.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/dotnet/WsdlToDotnet.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ejb
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ejb/BorlandDeploymentTool.java
@@ -1744,6 +2364,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ejb/WeblogicDe
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ejb/WeblogicTOPLinkDeploymentTool.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ejb/WebsphereDeploymentTool.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/extension
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/extension/Compatability.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/extension/Compatibility.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/extension/DeweyDecimal.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/extension/Extension.java
@@ -1784,6 +2405,8 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ide/VAJToolsSe
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ide/VAJUtil.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ide/VAJWorkspaceScanner.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ide/default.ini
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/image
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/image/Image.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/j2ee
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/j2ee/AbstractHotDeploymentTool.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/j2ee/GenericHotDeploymentTool.java
@@ -1792,6 +2415,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/j2ee/JonasHotD
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/j2ee/ServerDeploy.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/j2ee/WebLogicHotDeploymentTool.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/javacc
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/javacc/JJDoc.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/javacc/JJTree.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/javacc/JavaCC.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/jdepend
@@ -1843,22 +2467,28 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/metamata/MPars
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/net
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/net/FTP.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/net/MimeMail.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/net/RExecTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/net/SetProxy.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/net/TelnetTask.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/FStatP4OutputHandler.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Add.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Base.java
-U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Base.java.orig
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Change.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Counter.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Delete.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Edit.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Fstat.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Handler.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4HandlerAdapter.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Have.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Integrate.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Label.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Labelsync.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4OutputHandler.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4OutputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Reopen.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Resolve.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Revert.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Submit.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Sync.java
@@ -1869,7 +2499,11 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/pvcs/Pvcs.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/pvcs/PvcsProject.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/scm
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/scm/AntStarTeamCheckOut.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/script
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/script/ScriptDef.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/script/ScriptDefBase.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/sitraka
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/sitraka/CovBase.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/sitraka/CovMerge.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/sitraka/CovReport.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/sitraka/Coverage.java
@@ -1900,6 +2534,16 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/sound/SoundTas
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/splash
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/splash/SplashScreen.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/splash/SplashTask.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/AbstractSshMessage.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/Directory.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/LogListener.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/SSHBase.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/SSHExec.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/SSHUserInfo.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/Scp.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/ScpFromMessage.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/ssh/ScpToMessage.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/starteam
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/starteam/StarTeamCheckin.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/starteam/StarTeamCheckout.java
@@ -1907,6 +2551,11 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/starteam/StarT
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/starteam/StarTeamList.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/starteam/StarTeamTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/starteam/TreeBasedTask.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/unix
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/unix/AbstractAccessTask.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/unix/Chgrp.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/unix/Chown.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/unix/Symlink.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSS.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSADD.java
@@ -1914,9 +2563,12 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCHECK
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCHECKOUT.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCP.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSCREATE.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSConstants.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSGET.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSHISTORY.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/vss/MSVSSLABEL.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/windows
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/windows/Attrib.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/rmic
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/rmic/DefaultRmicAdapter.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/rmic/KaffeRmic.java
@@ -1927,6 +2579,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/rmic/WLRmic.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types
 U java/source/ant/src/main/org/apache/tools/ant/types/AbstractFileSet.java
 U java/source/ant/src/main/org/apache/tools/ant/types/AntFilterReader.java
+U java/source/ant/src/main/org/apache/tools/ant/types/Assertions.java
 U java/source/ant/src/main/org/apache/tools/ant/types/Commandline.java
 U java/source/ant/src/main/org/apache/tools/ant/types/CommandlineJava.java
 U java/source/ant/src/main/org/apache/tools/ant/types/DTDLocation.java
@@ -1946,35 +2599,58 @@ U java/source/ant/src/main/org/apache/tools/ant/types/Parameter.java
 U java/source/ant/src/main/org/apache/tools/ant/types/Parameterizable.java
 U java/source/ant/src/main/org/apache/tools/ant/types/Path.java
 U java/source/ant/src/main/org/apache/tools/ant/types/PatternSet.java
+U java/source/ant/src/main/org/apache/tools/ant/types/Permissions.java
+U java/source/ant/src/main/org/apache/tools/ant/types/PropertySet.java
+U java/source/ant/src/main/org/apache/tools/ant/types/RedirectorElement.java
 U java/source/ant/src/main/org/apache/tools/ant/types/Reference.java
 U java/source/ant/src/main/org/apache/tools/ant/types/RegularExpression.java
 U java/source/ant/src/main/org/apache/tools/ant/types/Resource.java
 U java/source/ant/src/main/org/apache/tools/ant/types/ResourceFactory.java
+U java/source/ant/src/main/org/apache/tools/ant/types/ResourceLocation.java
 U java/source/ant/src/main/org/apache/tools/ant/types/Substitution.java
 U java/source/ant/src/main/org/apache/tools/ant/types/XMLCatalog.java
 U java/source/ant/src/main/org/apache/tools/ant/types/ZipFileSet.java
 U java/source/ant/src/main/org/apache/tools/ant/types/ZipScanner.java
 U java/source/ant/src/main/org/apache/tools/ant/types/defaults.properties
-U java/source/ant/src/main/org/apache/tools/ant/types/defaults.properties.orig
-U java/source/ant/src/main/org/apache/tools/ant/types/defaults.properties.rej
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/optional
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/ScriptFilter.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/optional/depend
 U java/source/ant/src/main/org/apache/tools/ant/types/optional/depend/ClassfileSet.java
 U java/source/ant/src/main/org/apache/tools/ant/types/optional/depend/DependScanner.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/optional/image
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/Arc.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/BasicShape.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/ColorMapper.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/Draw.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/DrawOperation.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/Ellipse.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/ImageOperation.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/Rectangle.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/Rotate.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/Scale.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/Text.java
+U java/source/ant/src/main/org/apache/tools/ant/types/optional/image/TransformOperation.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/resolver
+U java/source/ant/src/main/org/apache/tools/ant/types/resolver/ApacheCatalog.java
+U java/source/ant/src/main/org/apache/tools/ant/types/resolver/ApacheCatalogResolver.java
+U java/source/ant/src/main/org/apache/tools/ant/types/resolver/package.html
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/selectors
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/AndSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/BaseExtendSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/BaseSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/BaseSelectorContainer.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/ContainsRegexpSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/ContainsSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/DateSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/DependSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/DepthSelector.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/DifferentSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/ExtendFileSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/ExtendSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/FileSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/FilenameSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/MajoritySelector.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/MappingSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/NoneSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/NotSelector.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/OrSelector.java
@@ -1984,8 +2660,22 @@ U java/source/ant/src/main/org/apache/tools/ant/types/selectors/SelectorContaine
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/SelectorScanner.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/SelectorUtils.java
 U java/source/ant/src/main/org/apache/tools/ant/types/selectors/SizeSelector.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/TypeSelector.java
+cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector/Algorithm.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector/Cache.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector/DigestAlgorithm.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector/EqualComparator.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector/HashvalueAlgorithm.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector/ModifiedSelector.java
+U java/source/ant/src/main/org/apache/tools/ant/types/selectors/modifiedselector/PropertiesfileCache.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/util
+U java/source/ant/src/main/org/apache/tools/ant/util/ChainedMapper.java
+U java/source/ant/src/main/org/apache/tools/ant/util/ClasspathUtils.java
 U java/source/ant/src/main/org/apache/tools/ant/util/CollectionUtils.java
+U java/source/ant/src/main/org/apache/tools/ant/util/CompositeMapper.java
+U java/source/ant/src/main/org/apache/tools/ant/util/ConcatFileInputStream.java
+U java/source/ant/src/main/org/apache/tools/ant/util/ContainerMapper.java
 U java/source/ant/src/main/org/apache/tools/ant/util/DOMElementWriter.java
 U java/source/ant/src/main/org/apache/tools/ant/util/DateUtils.java
 U java/source/ant/src/main/org/apache/tools/ant/util/FileNameMapper.java
@@ -1995,17 +2685,29 @@ U java/source/ant/src/main/org/apache/tools/ant/util/GlobPatternMapper.java
 U java/source/ant/src/main/org/apache/tools/ant/util/IdentityMapper.java
 U java/source/ant/src/main/org/apache/tools/ant/util/JAXPUtils.java
 U java/source/ant/src/main/org/apache/tools/ant/util/JavaEnvUtils.java
+U java/source/ant/src/main/org/apache/tools/ant/util/KeepAliveInputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/util/KeepAliveOutputStream.java
+U java/source/ant/src/main/org/apache/tools/ant/util/LazyFileOutputStream.java
+U java/source/ant/src/main/org/apache/tools/ant/util/LazyHashtable.java
+U java/source/ant/src/main/org/apache/tools/ant/util/LeadPipeInputStream.java
+U java/source/ant/src/main/org/apache/tools/ant/util/LineTokenizer.java
 U java/source/ant/src/main/org/apache/tools/ant/util/LoaderUtils.java
 U java/source/ant/src/main/org/apache/tools/ant/util/MergingMapper.java
+U java/source/ant/src/main/org/apache/tools/ant/util/OutputStreamFunneler.java
 U java/source/ant/src/main/org/apache/tools/ant/util/PackageNameMapper.java
+U java/source/ant/src/main/org/apache/tools/ant/util/ReaderInputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/util/RegexpPatternMapper.java
 U java/source/ant/src/main/org/apache/tools/ant/util/ResourceUtils.java
+U java/source/ant/src/main/org/apache/tools/ant/util/ScriptRunner.java
 U java/source/ant/src/main/org/apache/tools/ant/util/SourceFileScanner.java
 U java/source/ant/src/main/org/apache/tools/ant/util/StringUtils.java
 U java/source/ant/src/main/org/apache/tools/ant/util/TaskLogger.java
+U java/source/ant/src/main/org/apache/tools/ant/util/TeeOutputStream.java
 U java/source/ant/src/main/org/apache/tools/ant/util/TimeoutObserver.java
+U java/source/ant/src/main/org/apache/tools/ant/util/Tokenizer.java
+U java/source/ant/src/main/org/apache/tools/ant/util/UnPackageNameMapper.java
 U java/source/ant/src/main/org/apache/tools/ant/util/Watchdog.java
+U java/source/ant/src/main/org/apache/tools/ant/util/WeakishReference.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/util/depend
 U java/source/ant/src/main/org/apache/tools/ant/util/depend/AbstractAnalyzer.java
 U java/source/ant/src/main/org/apache/tools/ant/util/depend/DependencyAnalyzer.java
@@ -2018,6 +2720,7 @@ U java/source/ant/src/main/org/apache/tools/ant/util/facade/FacadeTaskHelper.jav
 U java/source/ant/src/main/org/apache/tools/ant/util/facade/ImplementationSpecificArgument.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/util/optional
 U java/source/ant/src/main/org/apache/tools/ant/util/optional/NoExitSecurityManager.java
+U java/source/ant/src/main/org/apache/tools/ant/util/optional/WeakishReference12.java
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/util/regexp
 U java/source/ant/src/main/org/apache/tools/ant/util/regexp/JakartaOroMatcher.java
 U java/source/ant/src/main/org/apache/tools/ant/util/regexp/JakartaOroRegexp.java
@@ -2053,6 +2756,7 @@ U java/source/ant/src/main/org/apache/tools/zip/UnixStat.java
 U java/source/ant/src/main/org/apache/tools/zip/UnrecognizedExtraField.java
 U java/source/ant/src/main/org/apache/tools/zip/ZipEntry.java
 U java/source/ant/src/main/org/apache/tools/zip/ZipExtraField.java
+U java/source/ant/src/main/org/apache/tools/zip/ZipFile.java
 U java/source/ant/src/main/org/apache/tools/zip/ZipLong.java
 U java/source/ant/src/main/org/apache/tools/zip/ZipOutputStream.java
 U java/source/ant/src/main/org/apache/tools/zip/ZipShort.java
@@ -2069,13 +2773,17 @@ U java/source/ant/src/main/uk/ac/starlink/ant/types/ExtClasspath.java
 cvs checkout: Updating java/source/ant/src/script
 U java/source/ant/src/script/ant
 U java/source/ant/src/script/ant.bat
+U java/source/ant/src/script/ant.cmd
 U java/source/ant/src/script/antRun
 U java/source/ant/src/script/antRun.bat
 U java/source/ant/src/script/antRun.pl
+U java/source/ant/src/script/antenv.cmd
 U java/source/ant/src/script/complete-ant-cmd.pl
+U java/source/ant/src/script/envset.cmd
 U java/source/ant/src/script/lcp.bat
 U java/source/ant/src/script/runant.pl
 U java/source/ant/src/script/runant.py
+U java/source/ant/src/script/runrc.cmd
 cvs checkout: Updating java/source/ant/src/testcases
 cvs checkout: Updating java/source/ant/src/testcases/org
 cvs checkout: Updating java/source/ant/src/testcases/org/apache
@@ -2083,6 +2791,7 @@ cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant
 U java/source/ant/src/testcases/org/apache/tools/ant/AntClassLoaderTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/BuildFileTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/CaseTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/DirectoryScannerTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/DummyTaskAbstract.java
 U java/source/ant/src/testcases/org/apache/tools/ant/DummyTaskInterface.java
@@ -2096,27 +2805,41 @@ U java/source/ant/src/testcases/org/apache/tools/ant/DummyTaskWithoutPublicConst
 U java/source/ant/src/testcases/org/apache/tools/ant/ImmutableTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/IncludeTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/IntrospectionHelperTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/LoaderRefTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/MockBuildListener.java
 U java/source/ant/src/testcases/org/apache/tools/ant/ProjectTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/PropertyExpansionTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/TaskContainerTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/TopLevelTaskTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/filters
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/ConcatFilterTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/DynamicFilterTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/EscapeUnicodeTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/HeadTailTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/filters/LineContainsTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/NoNewLineTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/ReplaceTokensTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/StripJavaCommentsTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/filters/TokenFilterTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/AbstractCvsTaskTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/AntLikeTasksAtTopLevelTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/AntStructureTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/AntTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/AntlibTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/AvailableTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/BUnzip2Test.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/BZip2Test.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/BasenameTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/CVSPassTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/CallTargetTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ChecksumTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ConcatTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ConditionTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/CopyTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/CopydirTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/CopyfileTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/DefaultExcludesTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/DeleteTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/DeltreeTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/DemuxOutputTask.java
@@ -2125,7 +2848,9 @@ U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/DirnameTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/DynamicTask.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/DynamicTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/EchoTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ExecTaskTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ExecuteJavaTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ExecuteOnTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ExecuteWatchdogTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/FailTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/FilterTest.java
@@ -2133,6 +2858,7 @@ U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/FixCrLfTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/GUnzipTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/GetTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/GzipTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ImportTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/InitializeClassTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/InputTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/JarTest.java
@@ -2140,53 +2866,77 @@ U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/JavaTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/JavacTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/LoadFileTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/LoadPropertiesTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/MacroDefTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ManifestTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/MkdirTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/MoveTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/MultiMapTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ParallelTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/PathConvertTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/PreSetDefTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ProcessDestroyerTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/PropertyTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/RenameTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ReplaceTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/RmicTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/SQLExecTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/SignJarTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/SleepTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/StyleTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/SubAntTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TStampTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TarTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TaskdefTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TaskdefsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TestProcess.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TimeProcess.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TouchTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TypeAdapterTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/TypedefTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/UntarTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/UnzipTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/WarTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/XmlPropertyTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/XmlnsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/ZipTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/condition
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/condition/ContainsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/condition/EqualsTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/condition/IsReferenceTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/dir1
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/dir1/B.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/dir2
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/dir2/A.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/email
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/email/EmailAddressTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/email/EmailTaskTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/ANTLRTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/AbstractXSLTLiaisonTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/BeanShellScriptTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/DotnetTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/EchoPropertiesTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/JspcTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/PropertyFileTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/PvcsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/ReplaceRegExpTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/RhinoReferenceTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/RhinoScriptTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/TraXLiaisonTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/WsdlToDotnetTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/XalanLiaisonTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/XmlValidateCatalogTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/XmlValidateTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/XslpLiaisonTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/XsltTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/depend
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/depend/DependTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/i18n
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/i18n/TranslateTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/image
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/image/ImageTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/jdepend
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/jdepend/JDependTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/junit
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/junit/JUnitClassLoaderTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/junit/JUnitReportTest.java
@@ -2194,8 +2944,13 @@ U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/junit/JUn
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/junit/JUnitVersionHelperTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/metamata
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/metamata/MAuditParserTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/net
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/net/FTPTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/perforce
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/perforce/P4ChangeTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/perforce/p4integrate.xml
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/script
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/script/ScriptDefTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/sitraka
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/sitraka/ClassFileTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/sitraka/ClassPathLoaderTest.java
@@ -2204,8 +2959,16 @@ cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskde
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/sos/SOSTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/splash
 U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/splash/SplashScreenTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/ssh
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/ssh/ScpTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/unix
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/unix/SymlinkTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/vss
+U java/source/ant/src/testcases/org/apache/tools/ant/taskdefs/optional/vss/MSVSSTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/types
 U java/source/ant/src/testcases/org/apache/tools/ant/types/AbstractFileSetTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/AddTypeTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/AssertionsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/CommandlineJavaTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/CommandlineTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/DescriptionTest.java
@@ -2218,20 +2981,28 @@ U java/source/ant/src/testcases/org/apache/tools/ant/types/FlexIntegerTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/MapperTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/PathTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/PatternSetTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/PermissionsTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/PolyTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/RedirectorElementTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/XMLCatalogBuildFileTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/XMLCatalogTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/ZipFileSetTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/types/optional
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/types/optional/depend
 U java/source/ant/src/testcases/org/apache/tools/ant/types/optional/depend/ClassFileSetTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/types/selectors
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/BaseSelectorTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/ContainsRegexpTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/ContainsSelectorTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/DateSelectorTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/DependSelectorTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/DepthSelectorTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/FilenameSelectorTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/ModifiedSelectorTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/PresentSelectorTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/README
 U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/SizeSelectorTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/types/selectors/TypeSelectorTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/util
 U java/source/ant/src/testcases/org/apache/tools/ant/util/CollectionUtilsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/DOMElementWriterTest.java
@@ -2240,8 +3011,13 @@ U java/source/ant/src/testcases/org/apache/tools/ant/util/FileUtilsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/GlobPatternMapperTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/JAXPUtilsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/JavaEnvUtilsTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/util/LazyFileOutputStreamTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/util/LoaderUtilsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/PackageNameMapperTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/util/ReferencesTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/util/ResourceUtilsTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/StringUtilsTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/util/UnPackageNameMapperTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/util/facade
 U java/source/ant/src/testcases/org/apache/tools/ant/util/facade/FacadeTaskHelperTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/facade/ImplementationSpecificArgumentTest.java
@@ -2254,6 +3030,11 @@ U java/source/ant/src/testcases/org/apache/tools/ant/util/regexp/Jdk14RegexpMatc
 U java/source/ant/src/testcases/org/apache/tools/ant/util/regexp/Jdk14RegexpRegexpTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/regexp/RegexpMatcherTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/util/regexp/RegexpTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/mail
+U java/source/ant/src/testcases/org/apache/tools/mail/MailMessageTest.java
+cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/tar
+U java/source/ant/src/testcases/org/apache/tools/tar/TarEntryTest.java
+U java/source/ant/src/testcases/org/apache/tools/tar/TarRoundTripTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/zip
 U java/source/ant/src/testcases/org/apache/tools/zip/AsiExtraFieldTest.java
 U java/source/ant/src/testcases/org/apache/tools/zip/ExtraFieldUtilsTest.java
@@ -8881,6 +9662,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotPannerFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotStyleBox.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotWindowOrganizer.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/PointTypeBox.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PolyFitFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleBinaryMaths.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleDataLimitControls.java

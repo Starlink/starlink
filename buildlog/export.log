@@ -15,8 +15,8 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/src.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/junit/lib/junit/src.jar
 
 webstart:
 
@@ -40,7 +40,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
 
 javadoc_check:
 
@@ -65,14 +65,14 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
 
 webstart:
 
@@ -93,11 +93,11 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.crimson.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/javax.xml.jaxp.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.xml.jaxp.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.crimson.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
 
 webstart:
 
@@ -118,15 +118,15 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-client-lite-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-client-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-filestore-client-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-common-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-common-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-common-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-common-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-client-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-common-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-filestore-client-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-client-lite-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-common-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
 
 webstart:
 
@@ -135,6 +135,9 @@ dist:
 create_archives:
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/aglib/build.xml:319: /apps/cvsbuild/java/source/aglib/docs not found.
+/apps/cvsbuild/java/source/build.xml:485: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/build.xml:132: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/aglib/build.xml:263: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/aglib/build.xml:319: /apps/cvsbuild/java/source/aglib/docs not found.
 
-Total time: 3 minutes 10 seconds
+Total time: 3 minutes 4 seconds

@@ -13,8 +13,8 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/src.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/junit/lib/junit/src.jar
 
 webstart:
 
@@ -33,7 +33,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
 
 javadoc_check:
 
@@ -53,14 +53,14 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
 
 webstart:
 
@@ -76,11 +76,11 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.crimson.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/javax.xml.jaxp.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.xml.jaxp.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.crimson.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
 
 webstart:
 
@@ -96,15 +96,15 @@ prepare:
 build:
 
 jars:
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-client-lite-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-client-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-filestore-client-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-common-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-common-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-common-SNAPSHOT.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-common-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-client-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-common-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-filestore-client-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-client-lite-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-common-SNAPSHOT.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
 
 webstart:
 
@@ -122,7 +122,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/util/lib/util/util.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/util/lib/util/util.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/util/lib/util/util.jar
 
 javadoc_check:
 
@@ -147,7 +147,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/task/lib/task/task.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/task/lib/task/task.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/task/lib/task/task.jar
 
 javadoc_check:
 
@@ -186,11 +186,11 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/jniast/lib/jniast/jniast.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/jniast/jniast.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/i386/jniast_libs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/sparc/jniast_libs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/x86/jniast_libs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/ppc/jniast_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jniast/lib/i386/jniast_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jniast/lib/jniast/jniast.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jniast/lib/ppc/jniast_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jniast/lib/sparc/jniast_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jniast/lib/x86/jniast_libs.jar
 
 javadoc_check:
 
@@ -213,9 +213,9 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/acme.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/aelfred.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/diva/lib/diva/acme.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/diva/lib/diva/aelfred.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
 
 javadoc_check:
 
@@ -239,7 +239,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/help/lib/help/help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/help/lib/help/help.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/help/lib/help/help.jar
 
 javadoc_check:
 
@@ -262,7 +262,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/astgui/lib/astgui/astgui.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/astgui/lib/astgui/astgui.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/astgui/lib/astgui/astgui.jar
 
 javadoc_check:
 
@@ -301,11 +301,11 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/i386/jnihds_libs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/sparc/jnihds_libs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/x86/jnihds_libs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/ppc/jnihds_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jnihds/lib/i386/jnihds_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jnihds/lib/ppc/jnihds_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jnihds/lib/sparc/jnihds_libs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jnihds/lib/x86/jnihds_libs.jar
 
 javadoc_check:
 
@@ -328,7 +328,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/hdx/lib/hdx/hdx.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/hdx/lib/hdx/hdx.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/hdx/lib/hdx/hdx.jar
 
 javadoc_check:
 
@@ -357,7 +357,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/array/lib/array/array.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/array/lib/array/array.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/array/lib/array/array.jar
 
 javadoc_check:
 
@@ -380,7 +380,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/ndx/lib/ndx/ndx.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/ndx/lib/ndx/ndx.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/ndx/lib/ndx/ndx.jar
 
 javadoc_check:
 
@@ -403,7 +403,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/table/lib/table/table.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/table/lib/table/table.jar
 
 javadoc_check:
 
@@ -427,7 +427,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
 
 javadoc_check:
 
@@ -451,7 +451,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
 
 javadoc_check:
 
@@ -474,7 +474,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
 
 javadoc_check:
 
@@ -497,7 +497,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/astrogrid/lib/astrogrid/astrogrid.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/astrogrid/lib/astrogrid/astrogrid.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/astrogrid/lib/astrogrid/astrogrid.jar
 
 javadoc_check:
 
@@ -521,13 +521,13 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jcommon.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/log4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/dom4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/hcompress.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/dom4j.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/hcompress.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jcommon.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/log4j.jar
 
 javadoc_check:
 
@@ -551,7 +551,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
 
 javadoc_check:
 
@@ -574,7 +574,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
 
 javadoc_check:
 
@@ -597,7 +597,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
 
 javadoc_check:
 
@@ -620,7 +620,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
 
 javadoc_check:
 
@@ -696,7 +696,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
 
 javadoc_check:
 
@@ -717,22 +717,232 @@ prepare:
 check_packages:
 
 build:
-    [javac] Compiling 178 source files to /apps/cvsbuild/java/source/splat/build/classes
-    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:83: cannot resolve symbol
-    [javac] symbol  : class PointTypeBox 
-    [javac] location: class uk.ac.starlink.splat.iface.SplatSelectedProperties
-    [javac]     protected PointTypeBox pointType = new PointTypeBox();
-    [javac]               ^
-    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:83: cannot resolve symbol
-    [javac] symbol  : class PointTypeBox 
-    [javac] location: class uk.ac.starlink.splat.iface.SplatSelectedProperties
-    [javac]     protected PointTypeBox pointType = new PointTypeBox();
-    [javac]                                            ^
-    [javac] Note: Some input files use or override a deprecated API.
-    [javac] Note: Recompile with -deprecation for details.
-    [javac] 2 errors
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/splat/build/classes
 
-BUILD FAILED
-file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] make: Nothing to be done for `build'.
 
-Total time: 3 minutes 9 seconds
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jargs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
+
+install:
+[loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 11 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 251 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
+     [echo] Executing Mirage target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing TOPCAT target: install
+
+prepare:
+
+check_packages:
+
+build_demo:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
+
+build:
+
+docs_check:
+
+docs:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/topcat/lib/topcat/ivoafits-notamfits-0.2.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 7 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 230 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 94 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing Treeview target: install
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 132 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
+     [echo] Executing Coco target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing RV target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing FROG target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../frog_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 151 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
+
+export-full-built:
+      [tar] Building tar: /apps/cvsbuild/export/starjava.tar.gz
+      [zip] Building zip: /apps/cvsbuild/export/starjava.zip
+
+BUILD SUCCESSFUL
+Total time: 5 minutes 12 seconds

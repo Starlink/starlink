@@ -332,7 +332,7 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
      [copy] Copying 854 files to /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copied 60 empty directories to 1 empty directory under /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing HELP target: javadoc-sources
 
 javadoc-sources:
@@ -343,7 +343,7 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astgui/build/java
      [copy] Copying 45 files to /apps/cvsbuild/java/source/astgui/build/java
-     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/astgui/build/java
+     [copy] Copied 6 empty directories to 1 empty directory under /apps/cvsbuild/java/source/astgui/build/java
      [echo] Executing JNIHDS target: javadoc-sources
 
 javadoc-sources:
@@ -354,7 +354,7 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/hdx/build/java
      [copy] Copying 18 files to /apps/cvsbuild/java/source/hdx/build/java
-     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/hdx/build/java
+     [copy] Copied 6 empty directories to 2 empty directories under /apps/cvsbuild/java/source/hdx/build/java
      [echo] Executing NDArray target: javadoc-sources
 
 prepare:
@@ -378,7 +378,7 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
      [copy] Copying 124 files to /apps/cvsbuild/java/source/table/build/java
-     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copied 10 empty directories to 1 empty directory under /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -443,7 +443,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 176 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 177 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -459,7 +459,7 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copying 115 files to /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copied 9 empty directories to 3 empty directories under /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Coco target: javadoc-sources
 
 javadoc-sources:
@@ -474,11 +474,8 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2280 files to /apps/cvsbuild/java/source/build/java
-     [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
-      [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
-   [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
-BUILD SUCCESSFUL
-Total time: 34 seconds
+BUILD FAILED
+/apps/cvsbuild/java/source/build.xml:550: No supported regular expression matcher found
+
+Total time: 45 seconds
