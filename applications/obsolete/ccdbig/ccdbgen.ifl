@@ -91,7 +91,7 @@ interface CCDBGEN
    parameter      FLAT            # Do we generate flat fields?
       type        _LOGICAL
       access      READ
-      vpath       'CURRENT,DEFAULT'
+      vpath       'PROMPT,CURRENT,DEFAULT'
       ppath       'CURRENT,DEFAULT'
       prompt      'Generate flatfields'
       default     TRUE
@@ -101,7 +101,7 @@ interface CCDBGEN
    parameter      BIAS            # Do we generate bias frames?
       type        _LOGICAL
       access      READ
-      vpath       'CURRENT,DEFAULT'
+      vpath       'PROMPT,CURRENT,DEFAULT'
       ppath       'CURRENT,DEFAULT'
       prompt      'Generate bias frames'
       default     TRUE
@@ -109,4 +109,4 @@ interface CCDBGEN
    endparameter
 
 endinterface
-# $Id: ccdbgen.ifl,v 1.2 1998/06/15 13:10:09 mbt Exp $
+# $Id: ccdbgen.ifl,v 1.3 1998/06/17 11:12:18 mbt Exp mbt $
