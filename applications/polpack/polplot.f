@@ -623,6 +623,16 @@
 *  Now produce the key if required.
       IF ( KEY .AND. STATUS .EQ. SAI__OK ) THEN
 
+*  Report an error if there is insufficient room within the current
+*  picture for the key.
+            IF( IPICK .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'POLPLOT_3', 'There is insufficient '//
+     :                       'room in the current picture for a key.', 
+     :                       STATUS )
+               GO TO 999
+            END IF
+
 *  If no value was supplied for the vertical position of the KEY using 
 *  parameter KEYPOS, find the value which puts the top of the key level 
 *  with the top of the DATA picture.
