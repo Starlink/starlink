@@ -325,6 +325,7 @@ object.c: version.h
 #  Form a second link to the main object library. This is used when a second
 #  pass through the library is needed during linking.
 install-exec-local: libast.la
+	$(mkdir_p) $(DESTDIR)$(libdir) \
 	cd $(DESTDIR)$(libdir) && \
 		rm -f libast_pass2.a && \
 		$(LN_S) $(DESTDIR)$(libdir)/libast.a libast_pass2.a
