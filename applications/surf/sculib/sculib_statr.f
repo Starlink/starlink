@@ -120,6 +120,7 @@
 
 * Set defaults
       MEDIAN = VAL__BADD
+      MEAN   = VAL__BADD
       CLIPPING = .TRUE.
 
 
@@ -128,7 +129,7 @@
 
 *     Sort good data into ascending order (with PDA routine)
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL PDA_QSAR(N_POS, QSORT)
+            CALL PDA_QSAR(NGOOD, QSORT)
          END IF
 
 *     Median
