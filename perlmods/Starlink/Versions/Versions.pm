@@ -12,6 +12,8 @@ Starlink::Versions - determine version numbers of Starlink applications
 
  $verstring = starversion_string('kappa');
 
+ print "yes" if starversion_gt('kappa', 'V0.15-2';
+
  if (starversion('surf') gt v1.5.2) {
    ...
  }
@@ -36,6 +38,8 @@ specified to import all functions:
 
  use Starlink::Versions qw/ :Funcs /;
 
+Functions are also provided to simplify comparisons.
+
 =cut
 
 use strict;
@@ -49,6 +53,7 @@ use File::Spec;         # For catfile()
 @EXPORT_OK = qw/ 
   starversion starversion_string starversion_minor
   starversion_major starversion_patchlevel
+  starversion_cmp starversion_eq starversion_gt starversion_lt
   /;
 
 %EXPORT_TAGS = (
@@ -237,6 +242,144 @@ sub starversion_patchlevel {
   return $version{ PATCHLEVEL };
 }
 
+=head2 starversion_cmp
+
+Can be used to compare the version number of a package with a supplied
+version number. Returns -1 if the supplied version is greater than
+that of the installed package (the installed package is older), 0 if
+it is the same, and 1 if it is less than that of the package (the installed
+package is newer).
+
+  $cmp = starversion_cmp('prog','V0.15-3');
+
+The version string format should be one of:
+
+  V1.2-3
+  V1.2.3
+  1.2-3
+
+C<undef> is returned if a comparison could not be made due to
+either the application having no version number or if the 
+supplied version string could not be parsed.
+
+In perl 5.6.0 this affect can be achieved directly using
+the C<starversion> command in a scalar context with a string literal
+(but not with a standard Starlink version string):
+
+  $cmp = starversion('prog') cmp v0.15.4;
+
+=cut
+
+sub starversion_cmp ($$) {
+  my %version = _get_version( $_[0] ) or return undef;
+  my ($cmaj, $cmin, $cpatch) = _parse_version_string($_[1]);
+  return undef unless defined $cmaj;
+
+  # Essentially a switch
+  
+  # Compare major version
+  return -1 if $cmaj > $version{MAJOR};
+  return 1 if $cmaj < $version{MAJOR};
+
+  # Compare minor version
+  return -1 if $cmin > $version{MINOR};
+  return 1 if $cmin < $version{MINOR};
+
+  # Compare patch level
+  return -1 if $cpatch > $version{PATCHLEVEL};
+  return 1 if $cpatch < $version{PATCHLEVEL};
+
+  # Must be identical
+  return 0;
+}
+
+=head2 starversion_lt
+
+Test whether the version of the installed package is less than 
+a supplied version number. In other words, whether the installed
+package is older than the requested version.
+
+  if ( starversion_lt('kappa', '0.15-2' ) {
+    ...
+  }
+
+The version string format is described in the description of
+C<starversion_cmp>
+
+In perl 5.6.0 this command can be implemented directly using a 
+string literal:
+
+  if ( starversion('prog') lt v0.15.2 ) {
+    ...
+  }
+
+=cut
+
+sub starversion_lt ($$) {
+  if (starversion_cmp($_[0],$_[1]) == -1) {
+    return 1;
+  }
+  return 0;
+}
+
+=head2 starversion_eq
+
+Test whether the version of the installed package is equal to 
+a supplied version number. In other words, whether the installed
+package is older the same version as that specified.
+
+  if ( starversion_eq('kappa', '0.15-2' ) {
+    ...
+  }
+
+The version string format is described in the description of
+C<starversion_cmp>
+
+In perl 5.6.0 this command can be implemented directly using a 
+string literal:
+
+  if ( starversion('prog') eq v0.15.2 ) {
+    ...
+  }
+
+=cut
+
+sub starversion_eq ($$) {
+  if (starversion_cmp($_[0],$_[1]) == 0) {
+    return 1;
+  }
+  return 0;
+}
+
+=head2 starversion_gt
+
+Test whether the version of the installed package is greater than 
+a supplied version number. In other words, whether the installed
+package is newer than the requested version.
+
+  if ( starversion_gt('kappa', '0.15-2' ) {
+    ...
+  }
+
+The version string format is described in the description of
+C<starversion_cmp>
+
+In perl 5.6.0 this command can be implemented directly using a 
+string literal:
+
+  if ( starversion('prog') gt v0.15.2 ) {
+    ...
+  }
+
+=cut
+
+sub starversion_gt ($$) {
+  if (starversion_cmp($_[0],$_[1]) == 1) {
+    return 1;
+  }
+  return 0;
+}
+
 
 =begin __PRIVATE__
 
@@ -365,9 +508,9 @@ supplied pattern.
 
 sub _parse_version_string ($) {
   print "CHECKING STRING: $_[0]" if $DEBUG;
-  if ($_[0] =~ /V(\d+)\.(\d+)[-\.](\d+)/ ) {
+  if ($_[0] =~ /[Vv](\d+)\.(\d+)[-\.](\d+)/ ) {
     return ($1, $2, $3);
-  } elsif ($_[0] =~ /V(\d+)\.(\d+)/) {
+  } elsif ($_[0] =~ /[Vv](\d+)\.(\d+)/) {
     return ($1, $2, 0);
   } elsif ($_[0] =~ /(\d+)\.(\d+)-(\d+)/ ) {
     return ($1, $2, $3);
