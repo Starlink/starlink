@@ -504,7 +504,7 @@ itcl::class gaia::GaiaArd {
             blt::busy hold $w_
             update idletasks
             $ardstat_ runwiths \
-               "in=$image simple=f oneline=t region=^${tmpfile_}"
+               "in=$image simple=f full=t oneline=t region=^${tmpfile_}"
 
          } else {
             error_dialog "No image is displayed"
