@@ -17,7 +17,7 @@ static const char* const rcsId="@(#) $Id: TcsCatalog.C,v 1.4 1997/09/30 15:54:58
 #include <stdlib.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "TcsLocalCatalog.h"
 #include "TcsCatalog.h"

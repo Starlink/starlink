@@ -26,7 +26,7 @@ static const char* const rcsId="@(#) $Id: HTTP.C,v 1.14 1998/07/20 13:29:44 abri
 #include <string.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -510,7 +510,7 @@ int HTTP::addAuthFileEntry(const char* server, const char* realm)
 	authFile(default_auth_file_);
 
     ifstream is(auth_file_);
-    ostrstream os;
+    std::ostrstream os;
     char newentry[1024];
     sprintf(newentry, "%s:%s:%s", server, realm, auth_info_);
     char buf[1024];
@@ -681,7 +681,7 @@ int HTTP::get(const char* url)
     }
 
     // generate the request
-    ostrstream os(req, sizeof(req));
+    std::ostrstream os(req, sizeof(req));
     os << "GET " << args << " HTTP/1.0" << endl;
 
     // PWD: add the Host: header, this is required by some
@@ -769,7 +769,7 @@ char* HTTP::get(const char* url, int& nlines, int freeFlag)
     }
 	
     // read the data into a buffer
-    ostrstream os;
+    std::ostrstream os;
     char buf[8*1024];
     nlines = 0;
     int n;

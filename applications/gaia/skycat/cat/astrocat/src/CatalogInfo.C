@@ -139,7 +139,7 @@ static const char* const rcsId="@(#) $Id: CatalogInfo.C,v 1.33 1999/03/15 12:30:
 #include <ctype.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "util.h"
 #include "HTTP.h"
@@ -427,7 +427,7 @@ int CatalogInfo::set_entry_value(CatalogInfoEntry* entry,
 int CatalogInfo::cfg_error(const char* filename, int line, const char* msg1, const char* msg2)
 {
     char buf[1024];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << "error in catalog config file: " 
        << filename << ": line " << line << ": " << msg1 << msg2 << ends;
     return error(buf);
@@ -599,7 +599,7 @@ CatalogInfoEntry* CatalogInfo::loadRootConfig()
 
     // if all else fails, use this hard coded config info
     e->url("default");
-    istrstream is(config_info_);
+    std::istrstream is(config_info_);
     e->link(load(is));
     if (! e->link()) {
 	delete e;
@@ -632,7 +632,7 @@ int CatalogInfo::load(CatalogInfoEntry* e) {
 	return http.html_error(s);
     }
 
-    istrstream is(s);
+    std::istrstream is(s);
     e->link(load(is, e->url()));
     if (! e->link()) 
 	return 1;		// input error

@@ -45,7 +45,7 @@
  */
 
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include <assert.h>
 #include "define.h"
 #include "LongImageData.h"   // For definition of FITS_LONG

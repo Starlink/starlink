@@ -17,7 +17,7 @@ static const char* const rcsId="@(#) $Id: TcsCatalogObject.C,v 1.6 1996/11/21 15
 #include <stdlib.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "WorldCoords.h"
 #include "TcsCatalogObject.h"
@@ -264,7 +264,7 @@ int TcsCatalogObject::printTableRow(ostream& os)
  */
 void TcsCatalogObject::print(char* buf, int bufsize) 
 {
-    ostrstream os(buf, bufsize);
+    std::ostrstream os(buf, bufsize);
     os << *this << ends;
 }
 
@@ -289,7 +289,7 @@ void TcsCatalogObject::printHeadings(ostream& os)
  */
 void TcsCatalogObject::printHeadings(char* buf, int bufsize) 
 {
-    ostrstream os(buf, bufsize);
+    std::ostrstream os(buf, bufsize);
     printHeadings(os);
     os << ends;
 }

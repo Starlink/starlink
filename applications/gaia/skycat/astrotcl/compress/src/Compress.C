@@ -17,7 +17,7 @@ static const char* const rcsId="@(#) $Id: Compress.C,v 1.3 1998/03/23 00:45:59 a
 #include <fcntl.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

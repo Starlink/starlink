@@ -15,7 +15,7 @@ static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.7 1999/03/11 21:01:36 ab
 #include <signal.h>
 #include <stdio.h>
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include <sys/types.h>
 #include <new.h>
 #include <unistd.h>

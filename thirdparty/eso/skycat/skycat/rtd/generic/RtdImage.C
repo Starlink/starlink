@@ -73,7 +73,7 @@ static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 
 #include <signal.h>
 #include <stdio.h>
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/sem.h>
@@ -3348,14 +3348,14 @@ int RtdImage::cmapCmd(int argc, char* argv[])
 	int n = colors_->colorCount();
 	unsigned long* p = colors_->pixelval();
 	char buf[MAX_COLOR*10];
-	ostrstream os(buf, sizeof(buf));
+        std::ostrstream os(buf, sizeof(buf));
 	for (int i = 0; i < n; i++)
 	    os << *p++ << " ";
 	os << ends;
 	return set_result(buf);
     }
     if (strcmp(argv[0], "list") == 0) {
-	 ostrstream os;
+         std::ostrstream os;
 	 ColorMapInfo::list(os);
 	 os << ends;
 	 set_result(os.str());
@@ -3420,7 +3420,7 @@ int RtdImage::ittCmd(int argc, char* argv[])
     }
 
     if (strcmp(argv[0], "list") == 0) {
-	 ostrstream os;
+         std::ostrstream os;
 	 ITTInfo::list(os);
 	 os << ends;
 	 set_result(os.str());
@@ -4001,7 +4001,7 @@ int RtdImage::radecboxCmd(int argc, char* argv[])
     pos.box(radius, pos1, pos2);
 
     char buf[255];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << pos1 << ' ' << pos2 << ends;
     return set_result(buf);
 }
@@ -4228,7 +4228,7 @@ int RtdImage::fitsCmd(int argc, char* argv[])
 	    // return a copy of the FITS header, format it in 80 char lines and
 	    // replace any NULL chars with blanks
 
-	    ostrstream os;
+            std::ostrstream os;
 	    image_->getFitsHeader(os);
 	    set_result(os.str());
 	    delete os.str();
@@ -5831,7 +5831,7 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
     }
 
     char buf[1024];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << ix << ' ' << iy << ' ';
 
     if (pos.status() == 0 && ! pos.isNull())

@@ -18,7 +18,7 @@ static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.11 1997/11/12 21:
 #include <stdio.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "WorldCoords.h"
 #include "TcsQueryResult.h"

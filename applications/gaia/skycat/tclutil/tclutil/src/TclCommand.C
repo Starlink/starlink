@@ -22,7 +22,7 @@ static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.4 1998/05/27 20:42:15
 #include <stdlib.h>
 #include <string.h>
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include <errno.h>
 #include "error.h"
 #include "TclCommand.h"
@@ -310,7 +310,7 @@ int TclCommand::error(const char* msg1, const char* msg2)
 {
     // msg1 or msg2 might be the same as interp_->result...
     char buf[1024];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << msg1 << msg2 << ends;
 
     Tcl_ResetResult(interp_);
@@ -325,7 +325,7 @@ int TclCommand::more_error(const char* msg1, const char* msg2)
 {
     // msg1 or msg2 might be the same as interp_->result...
     char buf[1024];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << msg1 << msg2 << ends;
 
     Tcl_AppendResult(interp_, buf, (char *)NULL);

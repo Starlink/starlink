@@ -26,7 +26,7 @@ static const char* const rcsId="@(#) $Id: AstroCatalog.C,v 1.36 1999/03/11 20:59
 #include <unistd.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "Compress.h"
 #include "WorldOrImageCoords.h"
@@ -453,7 +453,7 @@ int AstroCatalog::genHttpQuery(char* buf, int bufsz, const AstroQuery& q, const 
     if (q.pos().status() != 0)
 	return ERROR;
 
-    ostrstream os(buf, bufsz);
+    std::ostrstream os(buf, bufsz);
     int i;
     int url_has_id = 0, 
 	url_has_radec = 0, 

@@ -23,7 +23,7 @@ static const char* const rcsId="@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abri
 #include <stdlib.h>
 #include <string.h>
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include <errno.h>
 #include <stdio.h>
 #include "error.h"
@@ -47,7 +47,7 @@ static void (*msghandler_)(const char*) = NULL;
 int error(const char* msg1, const char* msg2, int code)
 {
     char buf[sizeof(errmsg_)];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << msg1 << msg2 << ends;
     
     if (errhandler_)
@@ -78,7 +78,7 @@ int sys_error(const char* msg1, const char* msg2)
     }
 
     char buf[sizeof(errmsg_)];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << msg1 << msg2 << ": " << s << ends;
 
     if (errhandler_)

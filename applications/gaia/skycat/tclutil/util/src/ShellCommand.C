@@ -23,7 +23,7 @@ static const char* const rcsId="@(#) $Id: ShellCommand.C,v 1.3 1998/06/25 08:30:
 #include <stdio.h>
 #include <signal.h>
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "define.h"
 #include "ShellCommand.h"

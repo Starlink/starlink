@@ -18,7 +18,7 @@ static const char* const rcsId="@(#) $Id: QueryResult.C,v 1.22 1999/03/11 20:59:
 #include <string.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include <unistd.h>
 #include "error.h"
 #include "QueryResult.h"
@@ -131,7 +131,7 @@ int QueryResult::circularSearch(
 	return 0;
 
     // search rows and put matching rows in "os"
-    ostrstream os;
+    std::ostrstream os;
     int n = 0;
     int i = 0;
     
@@ -355,7 +355,7 @@ void QueryResult::entry(CatalogInfoEntry* e, const char* result)
     entry_ = e;
 
     if (result) {
-	istrstream is(result);
+	std::istrstream is(result);
 	CatalogInfo::updateConfigEntry(is, e);
     }
 }

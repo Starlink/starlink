@@ -32,7 +32,7 @@ static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.6 1999/03/19 20:09:56 
 #include <netdb.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <varargs.h>
+#include <stdarg.h>
 #include <errno.h>
 #include "rtdRemote.h"
 
@@ -62,15 +62,12 @@ static rtdRemote info;	/* this struct holds local info */
  * The error message is kept in a local buffer and can be retrieved
  * with rtdRemoteGetError().
  */
-static int error(va_alist)
-va_dcl
+static int error( char *fmt, ... )
 {
     va_list args;
-    char *fmt;
     char buf[sizeof(info.errmsg)];
 
-    va_start(args);
-    fmt = va_arg(args, char *);
+    va_start(args, fmt);
     vsprintf(buf, fmt, args);
     va_end(args);
     
@@ -85,17 +82,14 @@ va_dcl
 /*
  * report the error, including system error code
  */
-static int sys_error(va_alist)
-va_dcl
+static int sys_error( char *fmt, ... )
 {
     va_list args;
-    char *fmt;
     char buf[sizeof(info.errmsg)];
     extern int sys_nerr;
     extern int errno;
 
-    va_start(args);
-    fmt = va_arg(args, char *);
+    va_start(args, fmt);
     vsprintf(buf, fmt, args);
     va_end(args);
     

@@ -15,7 +15,7 @@ static const char* const rcsId="@(#) $Id: astroCatalog.C,v 1.6 1998/09/08 19:42:
 
 
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include <errno.h>
 #include "error.h"
 

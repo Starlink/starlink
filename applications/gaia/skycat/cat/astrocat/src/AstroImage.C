@@ -20,7 +20,7 @@ static const char* const rcsId="@(#) $Id: AstroImage.C,v 1.11 1998/08/21 10:45:3
 #include <sys/stat.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -131,7 +131,7 @@ int AstroImage::getImage(const WorldOrImageCoords& pos, double width, double hei
 
 	// generate the http url command
 	char url[1024];	
-	ostrstream os(url, sizeof(url));
+	std::ostrstream os(url, sizeof(url));
 
 	// expand the variables in the http server command
 	const char* p = urls[i];

@@ -18,7 +18,7 @@ static const char* const rcsId="@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 ab
 #include <signal.h>
 #include <stdio.h>
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include <fstream.h>
 #include <sys/types.h>
 #include <new.h>
@@ -344,7 +344,7 @@ int Skycat::draw_circle(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create oval "
 	   << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
@@ -391,7 +391,7 @@ int Skycat::draw_square(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create rect "
 	   << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
@@ -438,7 +438,7 @@ int Skycat::draw_cross(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
@@ -493,7 +493,7 @@ int Skycat::draw_triangle(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << x0 << ' ' << y1 << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y1
@@ -540,7 +540,7 @@ int Skycat::draw_diamond(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << x0 << ' ' << y << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y << ' ' << x << ' ' << y1
@@ -691,7 +691,7 @@ int Skycat::draw_plus(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << nx << ' ' << ny << ' ' << sx << ' ' << sy
@@ -748,7 +748,7 @@ int Skycat::draw_ellipse(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << nx << ' ' << ny << ' ' << ex << ' ' << ey << ' ' 
@@ -793,7 +793,7 @@ int Skycat::draw_compass(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << cx << ' ' << cy << ' ' << nx << ' ' << ny
@@ -848,7 +848,7 @@ int Skycat::draw_line(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << nx << ' ' << ny << ' ' << sx << ' ' << sy
@@ -889,7 +889,7 @@ int Skycat::draw_arrow(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << cx << ' ' << cy << ' ' << nx << ' ' << ny
@@ -1389,7 +1389,7 @@ int Skycat::hduCmdList(int argc, char** argv, FitsIO* fits)
 
 	// save current HDU, then loop through all HDUs to get info
     int curHDU = fits->getHDUNum();
-    ostrstream os;
+    std::ostrstream os;
     int status = 0;
     int count = 0;
     for (int i = 1; i <= numHDUs; i++) {

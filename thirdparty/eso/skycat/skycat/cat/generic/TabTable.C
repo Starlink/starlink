@@ -20,7 +20,7 @@ static const char* const rcsId="@(#) $Id: TabTable.C,v 1.19 1999/03/22 21:41:12 
 #include <string.h>
 #include <iostream.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include <unistd.h>
 #include "error.h"
 #include "util.h"
@@ -347,7 +347,7 @@ int TabTable::splitList(char* line, char** colValues)
 int TabTable::tab_error(int row, int col, char* expected, char* value) const
 {
     char msg[255];
-    ostrstream os(msg, sizeof(msg));
+    std::ostrstream os(msg, sizeof(msg));
     os << "error in tab table input: row " << (row+1) << ", col "
 	<< (col+1) << ", expected " << expected << ", but found '"
 	<< value << "'" << ends;
@@ -810,7 +810,7 @@ int TabTable::search(istream& is, int numSearchCols, char** searchCols,
 {
     // read and search rows, put matching rows in "os"
     char buf[MAX_ROW_SIZE];
-    ostrstream os;
+    std::ostrstream os;
     int n = 0;
     while (is.getline(buf, sizeof(buf))) {
 	if (compareRow(buf, numSearchCols, searchCols, minValues, maxValues) == 0) {
@@ -850,7 +850,7 @@ int TabTable::search(const TabTable& table, int numSearchCols, char** searchCols
 {
     // read and search rows, put matching rows in "os"
     int trows = table.numRows();
-    ostrstream os;
+    std::ostrstream os;
     int n = 0;
     for(int i = 0; i < trows; i++) {
 	if (compareRow(table, i, numSearchCols, searchCols, minValues, maxValues) == 0) {
@@ -1120,7 +1120,7 @@ int TabTable::head(const char* filename, TabTable& t)
  */
 int TabTable::head(istream& is, TabTable& t)
 {
-    ostrstream os;
+    std::ostrstream os;
     char buf[MAX_HEADER_SIZE];
     while (is.getline(buf, sizeof(buf))) {
 	os << buf << endl;

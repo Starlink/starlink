@@ -19,7 +19,7 @@ static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.12 1998/08/21 10:45
 #include <iostream.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <strstream.h>
+#include <strstream>
 #include <tcl.h>
 #include "error.h"
 #include "AstroCatalog.h"

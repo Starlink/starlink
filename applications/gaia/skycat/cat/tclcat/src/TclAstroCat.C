@@ -22,7 +22,7 @@ static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.48 1999/03/15 12:30:
 #include <stdlib.h>
 #include <unistd.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include "TabTable.h"
 #include "Mem.h"
 #include "error.h"
@@ -747,7 +747,7 @@ int TclAstroCat::getimageCmd(int argc, char* argv[])
 int TclAstroCat::queryposCmd(int argc, char* argv[])
 {
     char buf[126];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
 
     if (! pos1_.isNull()) {
 	pos1_.print(os, equinox_);	// print coords in given equinox
@@ -1183,7 +1183,7 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 	    return error("missing catalog entry argument");
 
 	char buf[10*1024];
-	ostrstream os(buf, sizeof(buf));
+	std::ostrstream os(buf, sizeof(buf));
 
 	// convert tcl list entry to config file format
 	if (tclListToConfigStream(argv[1], os) != TCL_OK)
@@ -1194,7 +1194,7 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 	if (! os)
 	    return error("internal error writing config entry");
 
-	istrstream is(buf);
+	std::istrstream is(buf);
 	
 	if (update || set) {
 	    if (argc == 2) {
@@ -1751,7 +1751,7 @@ int TclAstroCat::authorizeCmd(int argc, char* argv[])
     if (argc == 0) {
 	HTTP& http = cat_->http();
 	char buf[1024];
-	ostrstream os(buf, sizeof(buf));
+	std::ostrstream os(buf, sizeof(buf));
 	os << http.authorizationRequired() 
 	   << " " << http.www_auth_realm()
 	   << " " << http.hostname() << ends;
@@ -1905,7 +1905,7 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
     // if (numCols < 3)
     // return error("error in tcl tab table: expected at least 3 columns: id, ra, dec");
 
-    ostrstream os;
+    std::ostrstream os;
     int numRows = 0;
     char** rows = NULL;
     char raStr[32], decStr[32];

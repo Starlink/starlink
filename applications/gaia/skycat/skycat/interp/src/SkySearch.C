@@ -25,7 +25,7 @@ static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.5 1998/05/28 13:15:10 
 #include <stdlib.h>
 #include <unistd.h>
 #include <fstream.h>
-#include <strstream.h>
+#include <strstream>
 #include "TabTable.h"
 #include "Mem.h"
 #include "error.h"
@@ -188,7 +188,7 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
     // all symbols for this instance by the instance name. The row number
     // is coded as row#$rownum. The general tag "objects" is also included.
     char symbol_tags[1024];
-    ostrstream symbol_os(symbol_tags, sizeof(symbol_tags));
+    std::ostrstream symbol_os(symbol_tags, sizeof(symbol_tags));
     symbol_os << "{cat" << id << "} " 
 	      << this->instname() 
 	      << ' ' << this->instname() << ".objects"
@@ -203,7 +203,7 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
     char label_tags[1024];
     label_tags[0] = '\0';
     if (label && strlen(label)) {
-	ostrstream label_os(label_tags, sizeof(label_tags));
+	std::ostrstream label_os(label_tags, sizeof(label_tags));
 	label_os 
 	    << "{label" << id << "} " 
 	    << this->instname() 

@@ -41,7 +41,7 @@
 #ifdef VMS
 #include <perror.h>
 #endif
-#include <varargs.h>
+#include <stdarg.h>
 #include "gen_types.h"
 #include "gen_str.h"
 #include "gen_msg.h"
