@@ -436,10 +436,8 @@
 *  If successful, print results.
       IF ( STATUS .EQ. SAI__OK ) then
          CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ', '    Transformation coefficients ' 
-     :   //'(mappings between position lists)', STATUS )
-         CALL CCD1_MSG( ' ', '    ----------------------------'
-     :   //'---------------------------------', STATUS )
+         CALL CCD1_MSG( ' ', '    Transformation coefficients', STATUS )
+         CALL CCD1_MSG( ' ', '    ---------------------------', STATUS )
          DO 16 I = 1, NIM
             CALL CCD1_MSG( ' ', ' ', STATUS )
             CALL MSG_SETC( 'ID', LISTID( I ) )
