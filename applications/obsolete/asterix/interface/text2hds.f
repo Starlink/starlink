@@ -26,6 +26,7 @@
 *                        instead of assuming REAL  (RJV)
 *      7 Nov 93 : V1.7-0 Uses FIO to do all i/o (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     30 Jul 95 : V1.8-1 Use new history routines (DJA)
 *
 *    Type definitions :
 *
@@ -71,12 +72,14 @@
       LOGICAL EVENT                            ! Event dataset output format ?
       INTEGER STPOS(MAXCOL)                    ! Start position of each field
       INTEGER LENGTH(MAXCOL)                   ! Length of each field in file
+      INTEGER			OFID			!
+
       REAL RMIN,RMAX
 *    Local data :
       DATA NULL/'                                        '/
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TEXT2HDS - version 1.8-0')
+      PARAMETER (VERSION = 'TEXT2HDS - version 1.8-1')
 *-
 
       CALL AST_INIT(STATUS)
@@ -106,7 +109,8 @@
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Open output file
-      CALL USI_ASSOCO( 'OUTFILE', 'EVENT_FILE', LOCO, STATUS )
+      CALL USI_TASSOCO( 'OUTFILE', 'EventDS', OFID, STATUS )
+      CALL ADI1_GETLOC( OFID, LOCO, STATUS )
 
 *    Get a description of the file either from the user or from the SCAR
 *    descriptor file
@@ -199,9 +203,9 @@
       END IF
 
 *    Produce a history record
-      CALL HIST_ADD( LOCO, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       TEXT = 'Produced from '//INAME
-      CALL HIST_PTXT( LOCO, 1, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, 1, TEXT, STATUS )
 
 *    Unmap all arrays and adjust length if necessary
  999  DO LP = 1, NCOLS
