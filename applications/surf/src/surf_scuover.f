@@ -246,6 +246,7 @@
                                        ! x jiggle offsets (arcsec)
       REAL             JIGGLE_Y (SCUBA__MAX_JIGGLE)
                                        ! y jiggle offsets (arcsec)
+      DOUBLE PRECISION LAT_OBS         ! Latitude of observatory
       INTEGER          LNTYPE          ! Line type to be used
       INTEGER          LNTYPI          ! Initial line type for current SGS pen
       CHARACTER * ( DAT__SZLOC ) LOCI  ! Locator for input data structure
@@ -670,6 +671,10 @@
          END IF
       END IF
 
+*     Read the latitude of the observatory
+      CALL SCULIB_GET_FITS_D (N_FITS, N_FITS, FITS,
+     :     'LAT-OBS', LAT_OBS, STATUS)
+      LAT_OBS = LAT_OBS * PI / 180.0D0
 
 *     the UT of the observation expressed as modified Julian day
 
@@ -751,7 +756,7 @@
 *     The reference centre will always be the map centre and not the
 *     offset map centre.
 
-      CALL SCULIB_CALC_APPARENT (IN_LONG_RAD, IN_LAT_RAD,
+      CALL SCULIB_CALC_APPARENT (LAT_OBS, IN_LONG_RAD, IN_LAT_RAD,
      :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0,
      :     IN_CENTRE_COORDS, %VAL(IN_LST_STRT_PTR), IN_UT1,
      :     IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,
@@ -895,9 +900,9 @@
 
 *     calculate the apparent RA,Dec of the selected output centre
 
-         CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
-     :        0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0, 0.0D0,
-     :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
+         CALL SCULIB_CALC_APPARENT (LAT_OBS, OUT_LONG, OUT_LAT, 0.0D0,
+     :        0.0D0, 0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0,
+     :        0.0D0, OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
 
 
 *     convert the RA,Decs of the observed points to tangent plane offsets

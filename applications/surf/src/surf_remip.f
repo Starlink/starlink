@@ -64,6 +64,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/07/14 20:13:30  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.2  1999/05/15 01:46:30  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *
@@ -170,6 +174,7 @@
                                 ! an aborted observation
       INTEGER LAST_MEAS         ! the last measurement number in
                                 ! an aborted observation
+      DOUBLE PRECISION LAT_OBS          ! Latitude of observatory (radians)
       DOUBLE PRECISION LAT_RAD  ! latitude of telescope centre (radians)
       DOUBLE PRECISION LAT2_RAD ! latitude of telescope centre at MJD2
       INTEGER LBND(2)           ! Lower bounds of an NDF
@@ -385,6 +390,11 @@
          LONG2_RAD = LONG2_RAD * 15.0D0
       END IF
 
+*     Read the latitude of the observatory
+      CALL SCULIB_GET_FITS_D (N_FITS, N_FITS, FITS,
+     :     'LAT-OBS', LAT_OBS, STATUS)
+      LAT_OBS = LAT_OBS * PI / 180.0D0
+
 *     UT at which observation was made expressed as modified Julian day
 
       CALL SCULIB_GET_MJD(N_FITS, FITS, UT1, RTEMP, STATUS)
@@ -531,13 +541,10 @@
 
 *     Read in general info concerning LST and jiggle/scan pattern
 
-
-
-
 *  calculate the apparent RA and Dec of the object for the time of the
 *  observation
 
-      CALL SCULIB_CALC_APPARENT (LONG_RAD, LAT_RAD, LONG2_RAD,
+      CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG_RAD, LAT_RAD, LONG2_RAD,
      :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS, 
      :     %VAL(LST_STRT_PTR), UT1, 
      :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)

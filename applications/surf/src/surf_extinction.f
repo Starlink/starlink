@@ -251,6 +251,7 @@
       INTEGER          LAST_MEAS        ! the number of the measurement
                                         ! being measured when the abort 
                                         ! occurred
+      DOUBLE PRECISION LAT_OBS          ! Latitude of observatory (radians)
       DOUBLE PRECISION LAT_RAD          ! latitude of telescope centre (radians)
       DOUBLE PRECISION LAT2_RAD         ! latitude of telescope centre at MJD2
                                         ! (radians)
@@ -487,6 +488,11 @@
          LONG2_RAD = LONG2_RAD * 15.0D0
       END IF
 
+*     Read the latitude of the observatory
+      CALL SCULIB_GET_FITS_D (N_FITS, N_FITS, FITS,
+     :     'LAT-OBS', LAT_OBS, STATUS)
+      LAT_OBS = LAT_OBS * PI / 180.0D0
+
 *  UT at which observation was made expressed as modified Julian day
 
       CALL SCULIB_GET_MJD(N_FITS, FITS, UT1, RTEMP, STATUS)
@@ -633,10 +639,11 @@
      :        'of measurement ^N_M', STATUS)
       END IF
 
+
 *  calculate the apparent RA and Dec of the object for the time of the
 *  observation
 
-      CALL SCULIB_CALC_APPARENT (LONG_RAD, LAT_RAD, LONG2_RAD,
+      CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG_RAD, LAT_RAD, LONG2_RAD,
      :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS, 
      :     %VAL(IN_LST_STRT_PTR), UT1, 
      :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)

@@ -267,6 +267,10 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.4  1999/07/14 20:13:33  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.3  1999/07/13 20:55:58  timj
 *     Pass ra/dec centre to SCULIB_ADD_CHOP
 *
@@ -778,7 +782,7 @@
      :                    .AND. CENTRE_COORDS .NE. 'PLANET') THEN
 
                         CALL SCULIB_FIX_SCAN_V10(CENTRE_COORDS,
-     :                       RA_CEN, DEC_CEN, IN_UT1,
+     :                       LAT_OBS, RA_CEN, DEC_CEN, IN_UT1,
      :                       DBLE(RA_START), DBLE(DEC_START), 
      :                       DBLE(RA_END), DBLE(DEC_END), 
      :                       NEW_RA_START, NEW_DEC_START,

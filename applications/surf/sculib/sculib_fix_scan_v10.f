@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_FIX_SCAN_V10(CENTRE_COORDS, LONG, LAT,
+      SUBROUTINE SCULIB_FIX_SCAN_V10(CENTRE_COORDS, LAT_OBS, LONG, LAT,
      :     MJD, RA_OFF_START, DEC_OFF_START, RA_OFF_END, 
      :     DEC_OFF_END, RA_NEW_START, DEC_NEW_START, 
      :     RA_NEW_END, DEC_NEW_END, STATUS)
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL SCULIB_FIX_SCAN_V10(CENTRE_COORDS, LONG, LAT,
+*     CALL SCULIB_FIX_SCAN_V10(CENTRE_COORDS, LAT_OBS, LONG, LAT,
 *    :     MJD, RA_OFF_START, DEC_OFF_START, RA_OFF_END, 
 *    :     DEC_OFF_END, RA_NEW_START, DEC_NEW_START, 
 *    :     RA_NEW_END, DEC_NEW_END, STATUS)
@@ -29,6 +29,8 @@
 *  Arguments:
 *     CENTRE_COORDS = CHAR (Given)
 *        The coordinate system of the map centre
+*     LAT_OBS                = DOUBLE PRECISION (Given)
+*        Latitude of observatory (radians)
 *     LONG = DOUBLE (Given)
 *        The longitude (ra) of the map centre (radians)
 *     LAT = DOUBLE (Given)
@@ -62,6 +64,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/07/14 20:13:27  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.1  1998/06/17 07:44:00  timj
 *     Initial revision
 *
@@ -78,6 +84,7 @@
       CHARACTER *(*) CENTRE_COORDS
       DOUBLE PRECISION LONG
       DOUBLE PRECISION LAT
+      DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION MJD
       DOUBLE PRECISION RA_OFF_START
       DOUBLE PRECISION DEC_OFF_START
@@ -152,7 +159,7 @@
  
       ELSE
 
-         CALL SCULIB_CALC_APPARENT(LONG, LAT, 0.0D0, 0.0D0,
+         CALL SCULIB_CALC_APPARENT(LAT_OBS, LONG, LAT, 0.0D0, 0.0D0,
      :        0.0D0, 0.0D0, CENTRE_COORDS, 0.0, MJD, 0.0D0, 0.0D0,
      :        RA_OBJ, DEC_OBJ, OUT_ROTATION, STATUS)
 

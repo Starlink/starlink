@@ -1,5 +1,5 @@
       SUBROUTINE SURF_REQUEST_OUTPUT_COORDS( TASK, PARLONG, PARLAT,
-     :     OUT_COORDS, DEF_RA_CEN, DEF_DEC_CEN, MJD, HOURS,
+     :     OUT_COORDS, LAT_OBS, DEF_RA_CEN, DEF_DEC_CEN, MJD, HOURS,
      :     OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, OUT_LONG, OUT_LAT,
      :     STATUS )
 *+
@@ -15,7 +15,7 @@
  
 *  Invocation:
 *     SUBROUTINE SURF_REQUEST_OUTPUT_COORDS( TASK, PARLONG, PARLAT,
-*    :     OUT_COORDS, DEF_RA_CEN, DEF_DEC_CEN, MJD, HOURS,
+*    :     OUT_COORDS, LAT_OBS, DEF_RA_CEN, DEF_DEC_CEN, MJD, HOURS,
 *    :     OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, OUT_LONG, OUT_LAT,
 *    :     STATUS )
 
@@ -35,6 +35,8 @@
 *        Name of the parameter used to request the LATITUDE
 *     OUT_COORDS = CHARACTER (Given)
 *        Coordinate frame of output coordinates.
+*     LAT_OBS = DOUBLE (Given)
+*        Latitude of observatory (Radians)
 *     DEF_RA_CEN = DOUBLE (Given)
 *        Apparent RA of the default map centre (radians)
 *     DEF_DEC_CEN = DOUBLE (Given)
@@ -67,6 +69,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/07/14 20:13:30  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.1  1999/07/14 04:50:32  timj
 *     New
 *
@@ -83,6 +89,7 @@
       DOUBLE PRECISION DEF_DEC_CEN 
       DOUBLE PRECISION DEF_RA_CEN 
       LOGICAL          HOURS
+      DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION MJD
       CHARACTER *(*)   OUT_COORDS
       CHARACTER *(*)   PARLAT
@@ -209,8 +216,8 @@
 
 *     Convert this centre to apparent ra/dec
  
-         CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
-     :        0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD, 0.0D0, 0.0D0,
+         CALL SCULIB_CALC_APPARENT (LAT_OBS, OUT_LONG, OUT_LAT, 0.0D0,
+     :        0.0D0, 0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD, 0.0D0, 0.0D0,
      :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
 
       ELSE

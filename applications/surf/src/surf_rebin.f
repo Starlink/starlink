@@ -241,6 +241,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.68  1999/07/14 20:13:29  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.67  1999/07/14 19:21:04  timj
 *     Pass TELESCOPE and INSTRUMENT down to WRITE_MAP_INFO
 *
@@ -605,6 +609,7 @@ c
       LOGICAL          JIGGLE          ! Are we rebinning a JIGGLE map
       INTEGER          J_CENTRE        ! J index of central pixel in output
                                        ! map
+      DOUBLE PRECISION LAT_OBS         ! Latitude of observatory
       INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left 
                                        ! corner of output image
       CHARACTER * (5)  MAPNAME         ! Name of each bolometer
@@ -1129,6 +1134,10 @@ c
      :           'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
          END IF
 
+*     Read the latitude of the observatory
+      CALL SCULIB_GET_FITS_D (N_FITS, N_FITS(1), FITS(1,1),
+     :     'LAT-OBS', LAT_OBS, STATUS)
+      LAT_OBS = LAT_OBS * PI / 180.0D0
 
 *     If we are just despiking we don't need to ask about the
 *     coordinates
@@ -1137,7 +1146,7 @@ c
 
 *     Request the new apparent ra/dec centre
             CALL SURF_REQUEST_OUTPUT_COORDS( TSKNAME, 'LONG_OUT',
-     :           'LAT_OUT', OUT_COORDS, OUT_RA_CEN, OUT_DEC_CEN, 
+     :           'LAT_OUT', OUT_COORDS, LAT_OBS, OUT_RA_CEN,OUT_DEC_CEN, 
      :           MJD_STANDARD, HOURS, OUT_RA_CEN, OUT_DEC_CEN, 
      :           OUT_ROTATION, OUT_LONG, OUT_LAT, STATUS)
 
@@ -1151,14 +1160,15 @@ c
 *     Convert the input coordinates to the output coordinates
 *     and use them as the default.
 
-         CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
-     :        MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
+            CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
+     :           MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
 
 *     calculate the apparent RA,Dec of the selected output centre
 
-         CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
-     :        0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0, 0.0D0,
-     :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
+            CALL SCULIB_CALC_APPARENT (LAT_OBS, OUT_LONG, OUT_LAT,0.0D0,
+     :           0.0D0, 0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 
+     :           0.0D0, 0.0D0, OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
+     :           STATUS)
 
          END IF            
 

@@ -148,6 +148,10 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.18  1999/07/14 20:13:29  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.17  1999/05/15 01:50:00  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -338,6 +342,7 @@
                                        ! occurred
       INTEGER          LAST_MEAS       ! measurement during which abort
                                        ! occurred
+      DOUBLE PRECISION LAT_OBS         ! Latitude of observatory
       INTEGER          LBND(MAX_DIM)   ! Lower bounds of NDF section
       CHARACTER*(15)   LOCAL_COORDS    ! Coordinate system of MAP_X and MAP_Y
       REAL             MAP_X           ! x offset of map centre from telescope
@@ -693,6 +698,10 @@
          END IF
       END IF
 
+*     Read the latitude of the observatory
+      CALL SCULIB_GET_FITS_D (N_FITS, N_FITS, FITS,
+     :     'LAT-OBS', LAT_OBS, STATUS)
+      LAT_OBS = LAT_OBS * PI / 180.0D0
 
 *     the UT of the observation expressed as modified Julian day
 
@@ -952,7 +961,7 @@
 *     The reference centre will always be the map centre and not the
 *     offset map centre.
 
-      CALL SCULIB_CALC_APPARENT (IN_LONG_RAD, IN_LAT_RAD,
+      CALL SCULIB_CALC_APPARENT (LAT_OBS, IN_LONG_RAD, IN_LAT_RAD,
      :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0, 
      :     IN_CENTRE_COORDS, %VAL(IN_LST_STRT_PTR), IN_UT1,
      :     IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,

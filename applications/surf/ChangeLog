@@ -1,5 +1,38 @@
 1999-07-14  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* src/surf_rebin.f (SURF_REBIN):  Pass LAT_OBS into
+	SCULIB_CALC_APPARENT. 
+
+	* src/surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Pass LAT_OBS
+	into SCULIB_CALC_APPARENT. 
+
+	* src/surf_scuover.f: Pass LAT_OBS into SCULIB_CALC_APPARENT.
+
+	* src/surf_request_output_coords.f (SURF_REQUEST_OUTPUT_COORDS):
+	Pass LAT_OBS into SCULIB_CALC_APPARENT and take it as an input
+	argument.
+
+	* src/surf_remip.f (SURF_REMIP): Pass LAT_OBS into
+	SCULIB_CALC_APPARENT.
+
+	* src/surf_extinction.f (SURF_EXTINCTION): Pass LAT_OBS into
+	SCULIB_CALC_APPARENT.
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Pass
+	LAT_OBS into SCULIB_FIX_SCAN_V10
+
+	* sculib/sculib_scan_2_rd.f (SCULIB_SCAN_2_RD): Pass LAT_OBS into
+	SCULIB_CALC_APPARENT
+
+	* sculib/sculib_fix_scan_v10.f (SCULIB_FIX_SCAN_V10): Pass LAT_OBS into
+	SCULIB_CALC_APPARENT and take it as an input argument.
+
+	* sculib/sculib_calc_apparent.f (SCULIB_CALC_APPARENT): Take
+	LAT_OBS as an argument.
+
+	* sculib/sculib_add_chop.f (SCULIB_ADD_CHOP): Pass LAT_OBS into
+	SCULIB_CALC_APPARENT
+
 	* src/surf_rebin.f (SURF_REBIN): Pass telescope/instrument info
 	from FITS header to write_map_info
 

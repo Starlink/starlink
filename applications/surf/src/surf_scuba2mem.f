@@ -105,6 +105,10 @@
  
 *  History:
 *     $Log$
+*     Revision 1.9  1999/07/14 20:13:31  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.8  1999/07/14 19:22:11  timj
 *     Write output coordinate information to FITS header.
 *     Tidy up documentation header.
@@ -210,6 +214,7 @@
       INTEGER IN_NDF                    ! NDF identified of input file
       DOUBLE PRECISION IN_UT1           ! MJD of start of observation
       INTEGER ITEMP                     ! scratch integer
+      DOUBLE PRECISION LAT_OBS          ! Latitude of observatory
       INTEGER LBND(NDIM)                ! Lower bounds of output array
       INTEGER LST_PTR(2)                ! Array of pointers to LST (start/end)
       INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
@@ -435,10 +440,15 @@
      :              'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
             END IF
 
+*     Read the latitude of the observatory
+            CALL SCULIB_GET_FITS_D (N_FITS, N_FITS, FITS,
+     :           'LAT-OBS', LAT_OBS, STATUS)
+            LAT_OBS = LAT_OBS * PI / 180.0D0
+
 *     Request the new apparent ra/dec centre
             CALL SURF_REQUEST_OUTPUT_COORDS( TSKNAME, 'LONG', 'LAT',
-     :           OUT_COORDS, IN_RA_CEN, IN_DEC_CEN, IN_UT1, HOURS,
-     :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, OUT_LONG,
+     :           OUT_COORDS, LAT_OBS, IN_RA_CEN, IN_DEC_CEN, IN_UT1, 
+     :           HOURS, OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, OUT_LONG,
      :           OUT_LAT, STATUS)
 
 *     Convert everything to tangent plane offsets from the selected

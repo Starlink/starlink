@@ -1,6 +1,6 @@
-      SUBROUTINE SCULIB_CALC_APPARENT (LONG, LAT, LONG2, LAT2, MAP_X,
-     :  MAP_Y, COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, DEC_APP,
-     :  ROTATION, STATUS)
+      SUBROUTINE SCULIB_CALC_APPARENT (LAT_OBS, LONG, LAT, LONG2, LAT2,
+     :     MAP_X, MAP_Y, COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, 
+     :     DEC_APP, ROTATION, STATUS)
 *+
 *  Name:
 *     SCULIB_CALC_APPARENT
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_CALC_APPARENT (LONG, LAT, LONG2, LAT2, MAP_X, MAP_Y,
+*     CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG, LAT, LONG2, LAT2, MAP_X, MAP_Y,
 *    :  COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, DEC_APP, ROTATION, STATUS)
 
 
@@ -118,6 +118,8 @@
 *
 
 *  Arguments:
+*     LAT_OBS                = DOUBLE PRECISION (Given)
+*           latitude of observatory (radians)
 *     LONG                   = DOUBLE PRECISION (Given)
 *           longitude of centre in input coord system (radians)
 *     LAT                    = DOUBLE PRECISION (Given)
@@ -171,6 +173,10 @@
 *      4-MAR-1993: Added GA, EQ, HA coords
 *     14-AUG-1993: Moved to SCULIB library
 *     $Log$
+*     Revision 1.9  1999/07/14 20:13:26  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.8  1999/07/13 06:27:34  timj
 *     Remove spurious check for Az MAP_X offset.
 *
@@ -198,6 +204,7 @@
       DOUBLE PRECISION LAT 
       DOUBLE PRECISION LONG2 
       DOUBLE PRECISION LAT2 
+      DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION MAP_X 
       DOUBLE PRECISION MAP_Y
       CHARACTER*(*) COORD_TYPE
@@ -222,8 +229,6 @@
       PARAMETER       (DPI = 3.14159265359D0)
       DOUBLE PRECISION DPI2
       PARAMETER       (DPI2 = DPI / 2.0D0)
-      DOUBLE PRECISION LAT_OBS_RAD
-      PARAMETER       (LAT_OBS_RAD = 3.46026051751D-1)
 
 *    Local variables :
       DOUBLE PRECISION COS_HA                 ! cos of hour angle
@@ -336,19 +341,19 @@
          END IF
 
       ELSE IF (COORD_TYPE .EQ. 'AZ') THEN
-         SIN_DEC = SIN(LAT_OBS_RAD) * SIN(MYLAT) +
-     :        COS(LAT_OBS_RAD) * COS(MYLAT) * COS(MYLONG)
+         SIN_DEC = SIN(LAT_OBS) * SIN(MYLAT) +
+     :        COS(LAT_OBS) * COS(MYLAT) * COS(MYLONG)
          DEC_APP = ASIN(SIN_DEC)
 
          SIN_HA = -SIN(MYLONG) * COS(MYLAT)
-         COS_HA = (SIN(MYLAT) - SIN(DEC_APP) * SIN(LAT_OBS_RAD)) /
-     :        COS(LAT_OBS_RAD)
+         COS_HA = (SIN(MYLAT) - SIN(DEC_APP) * SIN(LAT_OBS)) /
+     :        COS(LAT_OBS)
 
          HA = ATAN2( SIN_HA, COS_HA)
          RA_APP = LST - HA
          
-         SIN_ROT = SIN(MYLONG) * COS(LAT_OBS_RAD)
-         COS_ROT = (SIN(LAT_OBS_RAD) - SIN(DEC_APP) * SIN(MYLAT)) /
+         SIN_ROT = SIN(MYLONG) * COS(LAT_OBS)
+         COS_ROT = (SIN(LAT_OBS) - SIN(DEC_APP) * SIN(MYLAT)) /
      :        COS(MYLAT)
          
          ROTATION = ATAN2(SIN_ROT, COS_ROT)

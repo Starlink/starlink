@@ -34,7 +34,7 @@
 *     MJD                    = DOUBLE PRECISION (Given)
 *           Modified Julian date of observation
 *     LAT_OBS                = DOUBLE PRECISION (Given)
-*           Latitude of observatory in radians. West is positive.
+*           Latitude of observatory in radians.
 *           For JCMT this value is 3.46026051751D-1
 *     LONG                   = DOUBLE PRECISION (Returned)
 *           longitude of centre in input coord system (radians)
@@ -49,6 +49,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/07/14 20:13:26  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.3  1999/07/13 06:27:03  timj
 *     Pass LAT_OBS in as a argument
 *

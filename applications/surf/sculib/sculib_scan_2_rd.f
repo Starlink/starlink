@@ -43,7 +43,7 @@
 *       Modified Julian data of observation (should be the MJD of the
 *       time for which lst = LST).
 *     LAT_OBS                = DOUBLE PRECISION (Given)
-*           Latitude of observatory in radians. West is positive.
+*           Latitude of observatory in radians.
 *     RA_APP                 = DOUBLE PRECISION (Returned)
 *           Apparent RA of point at date (radians)
 *     DEC_APP                = DOUBLE PRECISION (Returned)
@@ -71,6 +71,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/07/14 20:13:27  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.3  1999/07/13 06:27:15  timj
 *     Pass LAT_OBS in as a argument
 *
@@ -186,7 +190,7 @@
      :           LST, MJD, LAT_OBS, MYLONG, MYLAT, STATUS)
 
 *     Add on our offsets
-            CALL SCULIB_CALC_APPARENT(MYLONG, MYLAT, 0.0D0,
+            CALL SCULIB_CALC_APPARENT(LAT_OBS, MYLONG, MYLAT, 0.0D0,
      :           0.0D0, XI, ETA, STEMP, LST, MJD, 0.0D0,
      :           0.0D0, RA_APP, DEC_APP, DTEMP, STATUS)
             

@@ -94,6 +94,10 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.4  1999/07/14 20:13:26  timj
+*     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
+*     a parameter.
+*
 *     Revision 1.3  1999/07/13 20:57:10  timj
 *     Correctly calculate SC chop beams by converting scan ends to tangent
 *     plane offsets before calculating angle.
@@ -284,7 +288,7 @@
 
 *     Add on the offset and convert back to apparent RA/Dec
 
-            CALL SCULIB_CALC_APPARENT(MYLONG, MYLAT,
+            CALL SCULIB_CALC_APPARENT(LAT_OBS, MYLONG, MYLAT,
      :           0.0D0, 0.0D0, MAP_X, MAP_Y,
      :           CHOP_CRD, LST, MJD, 0.0D0, 0.0D0,
      :           OUT_RA_CEN, OUT_DEC_CEN,
