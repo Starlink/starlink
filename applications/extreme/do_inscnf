@@ -1,0 +1,173 @@
+#!/bin/sh
+
+#+
+#  Name:
+#     do_inscnf
+#
+#  Purpose:
+#     Apply inscnf filter to all fortran files in a directory.
+#
+#  Description:
+#     This script provides a simple example of applying the do_inscnf
+#     filter to insert CNF_PVAL calls where appropriate in Fortran 
+#     source code.  As well as running the program on all the relevant
+#     files, it does some simple checking to see if the expected files
+#     have been changed, and logs a brief summary.
+#
+#     An input and output directory is given; only files which are 
+#     modified by inscnf are written to the output directory.
+#     A line is written to standard error for any conversion which 
+#     either inscnf, or this script, suspects may have run into 
+#     problems.  Most of these will be false alarms, but it may be
+#     worth checking them out by hand.
+#
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#
+#  History:
+#     17-JAN-2000 (MBT):
+#        Initial version.
+#-
+
+
+###### Change the following assignments to configure the script ######
+
+#  Set up source and destination directories, and logfile.
+      srcdir="."
+      destdir="./changed"
+      logfile=$srcdir/inscnf.log
+
+#  Set up pattern to match files to be processed.
+      ffiles="$srcdir/*.f $srcdir/*.gen"
+
+###### Nothing after this line needs to be changed for normal configuration ###
+
+
+#  Set up location of commands.
+      inscnf=$EXTREME_DIR/inscnf
+      fcmp="perl $EXTREME_DIR/fcmp.pl"
+      if [ -x $inscnf -a -x $fcmp ]
+      then
+         :
+      else
+         echo "EXTREME_DIR must contain inscnf and fcmp.pl commands."
+         exit 1
+      fi
+ 
+#  Initialise files.
+      mkdir -p $destdir
+      rm -f $logfile
+
+#  Initialise counters.
+      nf="0"
+      nc="0"
+
+#  Process each file.
+      for f in $ffiles
+      do
+
+#  Get names of input and output files.
+         infile="$f"
+         outfile="$destdir"/`echo $f | sed "s%^$srcdir/*%%"`
+
+#  Do the processing
+         if errtext=`$inscnf $infile $outfile 2>&1`
+         then
+            :
+         else
+            warn="Non-zero exit status for inscnf."
+            printf 1>&2 "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"  
+         fi
+         if [ "$errtext" ]
+         then
+            printf 1>&2 "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$errtext" "***"
+         else
+            :
+         fi
+
+#  See if the processing made any changes.  Remove the output file if not.
+         changed=`diff $infile $outfile | grep -c "^<"`
+         if [ "$changed" = "0" ]
+         then
+            rm $destdir/$f
+         else
+            nc=`echo $nc 1 + p | dc`
+         fi
+
+#  See if the input file apparently contains %VAL and CNF_PVAL.  This 
+#  is just a crude check to see whether it looks like modifications 
+#  have got done on the right files.
+         if grep -i '%VAL' $infile >/dev/null
+         then
+            isval=1
+         else
+            isval=0
+         fi
+         if grep -i 'CNF_PVAL' $infile >/dev/null
+         then
+            iscnf=1
+         else
+            iscnf=0
+         fi
+         if [ "$isval" = "1" -a "$iscnf" = "0" ]
+         then
+            should=1
+         else
+            should=0
+         fi
+
+#  Write a warning if it looks like the wrong modifications have been made.
+#  Such warnings probably indicate that %VAL crops up in a comment, or
+#  something like that, but should perhaps be checked out (by a manual
+#  diff) to check whether there is anything to worry about.
+         if [ "$changed" = "0" -a "$should" != "0" ]
+         then
+            warn="%VAL without CNF_PVAL present, but no changes"
+         elif [ "$changed" != "0" -a "$should" = "0" ]
+         then
+            if [ "$isval" = "0" ]
+            then
+               warn="No %VAL, but changes were made"
+            else
+               warn="CNF_PVAL present, but changes made"
+            fi
+         else
+            warn=""
+         fi
+         if [ "$warn" ]
+         then
+            printf 1>&2 "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"  
+         else
+            :
+         fi
+
+#  Check that no mistakes have been made while breaking lines etc.
+#  This uses a quick and dirty Perl script - again, an error here 
+#  does not necessarily mean that something has gone wrong, but could
+#  use a check.
+         if [ "$changed" != "0" ]
+         then
+            if $fcmp $infile $outfile >/dev/null
+            then
+               :
+            else
+               warn="Possible error in text insertion?"
+               printf 1>&2 "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+            fi
+         else
+            :
+         fi
+
+#  Write to log file.
+         printf >>$logfile "%-30s  %4d lines changed\n" "$infile" "$changed"
+         nf=`echo $nf 1 + p | dc`
+      done
+
+#  Summarise to standard output.
+      echo " "
+      echo "$nc/$nf modified files written in $destdir"
+      echo "Logfile is $logfile"
+      
+
+
+# $Id$
