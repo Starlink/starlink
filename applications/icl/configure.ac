@@ -23,13 +23,30 @@ AC_PROG_YACC
 AM_PROG_LEX
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
- 
+
+# icl_io.c
+AC_CHECK_FUNCS([atexit on_exit])
+
+# icl_io.c
+AC_CHECK_HEADERS([curses.h cursesX.h])
+
+# unix.c should be tweaked to not use environ
+AC_CHECK_FUNCS([setenv putenv])
+
+# adam.c
+AC_CHECK_FUNCS([strsignal psignal sys_siglist])
+
+# General checks
+AC_CHECK_HEADERS([sys/time.h sys/utsname.h sys/wait.h signal.h])
+
 STAR_CNF_COMPATIBLE_SYMBOLS
  
 dnl    Documentation is in the parent directory
 STAR_LATEX_DOCUMENTATION(sg5)
 
 STAR_MESSGEN(uface_err.msg)
+
+AM_CONFIG_HEADER(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
