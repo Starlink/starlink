@@ -37,7 +37,7 @@ ira_err kpg_ast kpg_par grf.h kappa_style.def tkast.tcl \
 kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
 stardemo_procs.tcl adamMessageRelay adamtask.tcl dialog.tcl kappa.demo \
-v0.14-5.demo v0.15-8.demo
+v0.14-5.demo v0.15-9.demo
 
 # The contents of the aif_sub.tar file:
 AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
