@@ -147,14 +147,14 @@
 *        allocated for display, it can be scrolled around within the
 *        window.  The window can be resized in the normal way using
 *        the window manager while the program is running.
-*        [200]
+*        [450]
 *     WINY = INTEGER (Read and Write)
 *        The height in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
 *        allocated for display, it can be scrolled around within the
 *        window.  The window can be resized in the normal way using
 *        the window manager while the program is running.
-*        [300]
+*        [400]
 *     ZOOM = DOUBLE (Read and Write)
 *        A factor giving the initial level to zoom in to the image
 *        displayed, that is the number of screen pixels to use for one

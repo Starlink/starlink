@@ -100,7 +100,7 @@
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 200
+            default 600
             prompt {Width of display window in pixels}
             helpkey *
          }
@@ -111,7 +111,7 @@
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 300
+            default 600
             prompt {Height of display window in pixels}
             helpkey *
          }
