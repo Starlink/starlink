@@ -6225,6 +6225,36 @@ c        REAL XX,XP,YP
 
       END
 
+*+ IMG_NBGET0D
+      SUBROUTINE IMG_NBGET0D(NAME,VAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+*  Export :
+      DOUBLE PRECISION VAL
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID,NB
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_GET_VALUE(ID,0,VAL__NBD,VAL,NB,STATUS)
+
+
+      ENDIF
+
+      END
+
 
 *+ IMG_NBGET0C
       SUBROUTINE IMG_NBGET0C(NAME,CVAL,STATUS)
@@ -6312,6 +6342,36 @@ c        REAL XX,XP,YP
 
         CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
         CALL NBS_PUT_VALUE(ID,0,VAL__NBI,VAL,STATUS)
+
+
+      ENDIF
+
+      END
+
+*+ IMG_NBPUT0D
+      SUBROUTINE IMG_NBPUT0D(NAME,VAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+      DOUBLE PRECISION VAL
+*  Export :
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBD,VAL,STATUS)
 
 
       ENDIF
