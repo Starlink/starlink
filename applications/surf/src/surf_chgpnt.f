@@ -260,7 +260,10 @@
 
 *     pointing corrections for MAP observations
 
-      IF (OBSERVING_MODE .EQ. 'MAP') THEN
+      IF (OBSERVING_MODE .EQ. 'MAP' 
+     :     .OR. OBSERVING_MODE .EQ. 'ALIGN_X'
+     :     .OR. OBSERVING_MODE .EQ. 'ALIGN_Y'
+     :     .OR. OBSERVING_MODE .EQ. 'POINTING') THEN
 
 *     find and report the start and finish LST of the observation
 
