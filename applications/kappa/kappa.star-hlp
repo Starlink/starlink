@@ -13421,7 +13421,7 @@ AXES = _LOGICAL (Read)
    plot. The width of the margins left for the annotation may be
    controlled using parameter MARGIN. The appearance of the axes
    (colours, fonts, etc) can be controlled using the parameter
-   STYLE. [TRUE]
+   STYLE.  [TRUE]
 3 CLEAR
 CLEAR = _LOGICAL (Read)
    If TRUE the current picture is cleared before the plot is
@@ -13429,7 +13429,7 @@ CLEAR = _LOGICAL (Read)
    but also an attempt is made to align the new picture with the
    existing picture. Thus you can generate a composite plot within
    a single set of axes, say using different colours or modes to
-   distinguish data from different datasets. [TRUE]
+   distinguish data from different datasets.  [TRUE]
 3 COMP
 COMP = LITERAL (Read)
    The name of the NDF array component to have its histogram
@@ -13442,28 +13442,29 @@ COMP = LITERAL (Read)
 3 DEVICE
 DEVICE = DEVICE (Read)
    The graphics workstation on which to produce the plot.  If it
-   is null (!), no plot will be made. [Current graphics device]
+   is null (!), no plot will be made.  [Current graphics device]
 3 IN
 IN = NDF (Read)
    The NDF data structure to be analysed.
 3 LOGFILE
 LOGFILE = FILENAME (Write)
-   A text file into which the results should be logged. If a null
+   A text file into which the results should be logged.  If a null
    value is supplied (the default), then no logging of results
-   will take place. [!]
+   will take place.  [!]
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
-   as fractions of the corresponding dimension of the current picture.
-   Four values may be given, in the order - bottom, right, top, left.
-   If less than four values are given, extra values are used equal to
-   the first supplied value. If these margins are too narrow any axis
-   annotation may be clipped. If a null (!) value is supplied, the
-   value used is 0.15 (for all edges) if either annotated axes or
-   a key are produced, and zero otherwise. [current value]
+   as fractions of the corresponding dimension of the current
+   picture.  Four values may be given, in the order bottom, right,
+   top, left.   If fewer than four values are given, extra values
+   are used equal to the first supplied value.  If these margins
+   are too narrow any axis annotation may be clipped.  If a null
+   (!) value is supplied, the value used is 0.15 (for all edges)
+   if either annotated axes or a key are produced, and zero
+   otherwise.  [current value]
 3 NUMBIN
 NUMBIN = _INTEGER (Read)
-   The number of histogram bins to be used. This must lie in the
+   The number of histogram bins to be used.  This must lie in the
    range 2 to 10000.  The suggested default is the current value.
 3 OUT
 OUT = NDF (Read)
@@ -13471,94 +13472,142 @@ OUT = NDF (Read)
    array.  If null (!) is entered the histogram NDF is not
    created. [!]
 3 RANGE
-RANGE( 2 ) = _DOUBLE (Write)
-   The range of values for which the histogram is to be computed.
-   A null value (!) selects the minimum and maximum array values.
-   If RANGE is specified on the command line, the extreme values
-   are not calculated and reported.  The suggested defaults are
-   the current values, or ! if these do not exist.
+RANGE = LITERAL (Read)
+   RANGE specifies the range of values for which the histogram is
+   to be computed.  The supplied string should consist of up to
+   three sub-strings, separated by commas.  For all but the option
+   where you give explicit numerical limits, the first sub-string
+   must specify the method to use.  If supplied, the other two
+   sub-strings should be numerical values as described below
+   (default values will be used if these sub-strings are not
+   provided).  The following options are available.
+
+   - lower,upper -- You can supply explicit lower and upper
+   limiting values.  For example, "10,200" would set the histogram
+   lower limit to 10 and its upper limit to 200.  No method name
+   prefixes the two values.  If only one value is supplied,
+   the "Range" method is adopted.  The limits must be within the
+   dynamic range for the data type of the NDF array component.
+
+   - "Percentiles" -- The default values for the histogram data
+   range are set to the specified percentiles of the data.  For
+   instance, if the value "Per,10,99" is supplied, then the lowest
+   10% and highest 1% of the data values are excluded from the
+   histogram.  If only one value, p1, is supplied, the second
+   value, p2, defaults to (100 - p1).  If no values are supplied,
+   the values default to "5,95".  Values must be in the range 0 to
+   100.
+
+   - "Range" -- The minimum and maximum array values are used.  No
+   other sub-strings are needed by this option.  Null (!) is a
+   synonym for the "Range" method.
+
+   - "Sigmas" -- The histogram limiting values are set to the
+   specified numbers of standard deviations below and above the
+   mean of the data.  For instance, if the supplied value is
+   "sig,1.5,3.0", then the histogram extends from the mean of the
+   data minus 1.5 standard deviations to the mean plus 3 standard
+   deviations.  If only one value is supplied, the second value
+   defaults to the supplied value.  If no values are supplied,
+   both default to "3.0".
+
+   The "Percentiles" and "Sigmas" methods are useful to generate
+   a first pass at the histogram.  They reduce the likelihood
+   that all but a small number of values lie within a few
+   histogram bins.
+
+   The extreme values are reported unless parameter RANGE is
+   specified on the command line.  In this case extreme values
+   are only calculated where necessary for the chosen method.
+
+   The method name can be abbreviated to a single character, and is
+   case insensitive.  The initial value is "Range".  The suggested
+   defaults are the current values, or ! if these do not exist.
+   [current value]
 3 STYLE
 STYLE = GROUP (Read)
-   A group of attribute settings describing the plotting style to use
-   when drawing the annotated axes and data values.
+   A group of attribute settings describing the plotting style to
+   use when drawing the annotated axes and data values.
 
    A comma-separated list of strings should be given in which each
-   string is either an attribute setting, or the name of a text file
-   preceded by an up-arrow character "^". Such text files should
-   contain further comma-separated lists which will be read and
-   interpreted in the same manner. Attribute settings are applied in
-   the order in which they occur within the list, with later settings
-   over-riding any earlier settings given for the same attribute.
+   string is either an attribute setting, or the name of a text
+   file preceded by an up-arrow character "^".  Such text files
+   should contain further comma-separated lists which will be read
+   and interpreted in the same manner.  Attribute settings are
+   applied in the order in which they occur within the list, with
+   later settings overriding any earlier settings given for the
+   same attribute.
 
    Each individual attribute setting should be of the form:
 
       <name>=<value>
 
-   where <name> is the name of a plotting attribute, and <value> is
-   the value to assign to the attribute. Default values will be
-   used for any unspecified attributes. All attributes will be
-   defaulted if a null value (!) is supplied. See section "Plotting
-   Attributes" in SUN/95 for a description of the available
-   attributes. Any unrecognised attributes are ignored (no error is
-   reported).
+   where <name> is the name of a plotting attribute, and <value>
+   is the value to assign to the attribute. Default values will be
+   used for any unspecified attributes.  All attributes will be
+   defaulted if a null value (!) is supplied.  See section
+   "Plotting Attributes" in SUN/95 for a description of the
+   available attributes.  Any unrecognised attributes are ignored
+   (no error is reported).
 
    The appearance of the histogram curve is controlled by the
-   attributes Colour(Curves), Width(Curves), etc (the synonym Line
-   may be used in place of Curves). [current value]
+   attributes Colour(Curves), Width(Curves), etc. (The synonym
+   Line may be used in place of Curves.)   [current value]
 3 TITLE
 TITLE = LITERAL (Read)
    Title for the histogram NDF.  ["KAPPA - Histogram"]
 3 XLEFT
 XLEFT = _REAL (Read)
    The axis value to place at the left hand end of the horizontal
-   axis of the plot. If a null (!) value is supplied, the minimum data
-   value in the histogram is used. The value supplied may be greater
-   than or less than the value supplied for XRIGHT. [!]
+   axis of the plot. If a null (!) value is supplied, the minimum
+   data value in the histogram is used.  The value supplied may be
+   greater than or less than the value supplied for XRIGHT.  [!]
 3 XLOG
 XLOG = _LOGICAL (Read)
-   TRUE if the plot X axis is to be logarithmic. Any histogram bins
-   which have negative or zero central data values are omitted from
-   the plot. [FALSE]
+   TRUE if the plot X axis is to be logarithmic.  Any histogram
+   bins  which have negative or zero central data values are
+   omitted from the plot.  [FALSE]
 3 XRIGHT
 XRIGHT = _REAL (Read)
    The axis value to place at the right hand end of the horizontal
-   axis of the plot. If a null (!) value is supplied, the maximum data
-   value in the histogram is used. The value supplied may be greater
-   than or less than the value supplied for XLEFT. [!]
+   axis of the plot.  If a null (!) value is supplied, the maximum
+   data value in the histogram is used.  The value supplied may be
+   greater than or less than the value supplied for XLEFT.  [!]
 3 YBOT
 YBOT = _REAL (Read)
-   The axis value to place at the bottom end of the vertical axis of
-   the plot. If a null (!) value is supplied, the lowest count in
-   the histogram is used. The value supplied may be greater than or
-   less than the value supplied for YTOP. [!]
+   The axis value to place at the bottom end of the vertical axis
+   of the plot.  If a null (!) value is supplied, the lowest count
+   the histogram is used.  The value supplied may be greater than
+   or less than the value supplied for YTOP.  [!]
 3 YLOG
 YLOG = _LOGICAL (Read)
-   TRUE if the plot Y axis is to be logarithmic. Empty bins are
-   removed from the plot if the Y axis is logarithmic. [FALSE]
+   TRUE if the plot Y axis is to be logarithmic.  Empty bins are
+   removed from the plot if the Y axis is logarithmic.  [FALSE]
 3 YTOP
 YTOP = _REAL (Read)
    The axis value to place at the top end of the vertical axis of
-   the plot. If a null (!) value is supplied, the largest count in the
-   histogram is used. The value supplied may be greater than or less
-   than the value supplied for YBOT. [!]
+   the plot.  If a null (!) value is supplied, the largest count
+   in the histogram is used.  The value supplied may be greater
+   than or less than the value supplied for YBOT.  [!]
 2 Examples
 histogram image 100 ! device=!
    Computes and reports the histogram for the data array in the
    NDF called image.  The histogram has 100 bins and spans the
    full range of data values.
 
-histogram ndf=spectrum comp=variance range=[100,200] numbin=20
+histogram ndf=spectrum comp=variance range="100,200" numbin=20
    Computes and reports the histogram for the variance array in
    the NDF called spectrum.  The histogram has 20 bins and spans
    the values between 100 and 200.  A plot is made to the current
    graphics device.
 
-histogram cube(3,4,) 10 ! out=c3_4_hist device=!
+histogram cube(3,4,) 10 si out=c3_4_hist device=!
    Computes and reports the histogram for the z-vector at (x,y)
    element (3,4) of the data array in the 3-dimensional NDF called
-   cube.  The histogram has 10 bins and spans the full range of
-   data values.  The histogram is written to a one-dimensional
-   NDF called c3_4_hist.
+   cube.  The histogram has 10 bins and spans a range three
+   standard deviations either side of the mean of the data values.
+   The histogram is written to a one-dimensional NDF called
+   c3_4_hist.
 
 histogram cube numbin=32 ! device=xwindows style="'title=cube'"
    Computes and reports the histogram for the data array in
@@ -13571,12 +13620,13 @@ histogram cube numbin=32 ! device=xwindows ylog style=^style.dat
    in each histogram bin is plotted, and the contents of the text
    file style.dat control the style of the resulting graph.
 
-histogram halley(~200,~300) range=[-1000,1000] logfile=hist.dat \
+histogram halley(~200,~300) "pe,10,90" logfile=hist.dat \
    Computes the histogram for the central 200 by 300 elements of
    the data array in the NDF called halley, and writes the
    results to a logfile called hist.dat.  The histogram uses the
-   current number of bins, and includes data values between -1000
-   and 1000.  A plot appears on the current graphics device.
+   current number of bins, and includes data values between the 10
+   and 90 percentiles.  A plot appears on the current graphics
+   device.
 2 Related_Applications
    KAPPA: HISTAT, MSTATS, NUMB, STATS; Figaro: HIST, ISTAT.
 2 Authors
@@ -13606,6 +13656,16 @@ TDCA: Tim Ash (STARLINK)
  17-SEP-1999 (DSB):
     Tidied up. NDF calls changed to LPG to use auto-looping. Dynamic
     default parameters changed to use null default.
+
+ 26-OCT-1999 (DSB):
+    Made MARGIN a fraction of the current picture, not the DATA
+    picture.
+
+ 2000 February 16 (MJC):
+    Made the RANGE parameter literal and allowed additional methods
+    by which to specify the data-value limits of the histogram.
+    Moved the reporting the data range and obtaining the RANGE
+    parameter to a subroutine.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
    QUALITY, LABEL, TITLE, UNITS, and HISTORY components of the input

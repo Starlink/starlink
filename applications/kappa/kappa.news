@@ -46,6 +46,9 @@
       o The following new parameters have been added: DESCRIBE,
 	EPOCH, FRAME, STYLE.
 
+   - HISTOGRAM: Now supports various methods for specifying the upper and 
+     lower horizontal limits of the plot. See parameter RANGE.
+
    - IDSTATE: The changes made to GDSTATE have also been made to IDSTATE.
 
    - SEGMENT:

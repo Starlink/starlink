@@ -31,17 +31,17 @@
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot. The width of the margins left for the annotation may be 
-*        controlled using parameter MARGIN. The appearance of the axes 
-*        (colours, fonts, etc) can be controlled using the parameter
-*        STYLE. [TRUE]
+*        plot.  The width of the margins left for the annotation may be 
+*        controlled using parameter MARGIN.  The appearance of the axes 
+*        (colours, fonts, etc.) can be controlled using the parameter
+*        STYLE.  [TRUE]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
-*        drawn. If CLEAR is FALSE not only is the existing plot retained, 
-*        but also an attempt is made to align the new picture with the
-*        existing picture. Thus you can generate a composite plot within 
-*        a single set of axes, say using different colours or modes to 
-*        distinguish data from different datasets. [TRUE]
+*        drawn.  If CLEAR is FALSE not only is the existing plot
+*        retained, but also an attempt is made to align the new picture
+*        with the existing picture.  Thus you can generate a composite
+*        plot within a single set of axes, say using different colours
+*        or modes to distinguish data from different datasets.  [TRUE]
 *     COMP = LITERAL (Read)
 *        The name of the NDF array component to have its histogram
 *        computed: "Data", "Error", "Quality" or "Variance" (where
@@ -52,109 +52,158 @@
 *        255).  ["Data"]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If it
-*        is null (!), no plot will be made. [Current graphics device]
+*        is null (!), no plot will be made.  [Current graphics device]
 *     IN = NDF (Read)
 *        The NDF data structure to be analysed.
 *     LOGFILE = FILENAME (Write)
-*        A text file into which the results should be logged. If a null
+*        A text file into which the results should be logged.  If a null
 *        value is supplied (the default), then no logging of results
-*        will take place. [!]
+*        will take place.  [!]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the current picture. 
-*        Four values may be given, in the order - bottom, right, top, left. 
-*        If less than four values are given, extra values are used equal to 
-*        the first supplied value. If these margins are too narrow any axis 
-*        annotation may be clipped. If a null (!) value is supplied, the
-*        value used is 0.15 (for all edges) if either annotated axes or 
-*        a key are produced, and zero otherwise. [current value]
+*        as fractions of the corresponding dimension of the current
+*        picture.  Four values may be given, in the order bottom, right,
+*        top, left.  If fewer than four values are given, extra values
+*        are used equal to the first supplied value.  If these margins
+*        are too narrow any axis annotation may be clipped.  If a null
+*        (!) value is supplied, the value used is 0.15 (for all edges)
+*        if either annotated axes or a key are produced, and zero
+*        otherwise.  [current value]
 *     NUMBIN = _INTEGER (Read)
-*        The number of histogram bins to be used. This must lie in the
+*        The number of histogram bins to be used.  This must lie in the
 *        range 2 to 10000.  The suggested default is the current value.
 *     OUT = NDF (Read)
 *        Name of the NDF structure to save the histogram in its data
 *        array.  If null (!) is entered the histogram NDF is not
 *        created. [!]
-*     RANGE( 2 ) = _DOUBLE (Write)
-*        The range of values for which the histogram is to be computed.
-*        A null value (!) selects the minimum and maximum array values.
-*        If RANGE is specified on the command line, the extreme values
-*        are not calculated and reported.  The suggested defaults are
-*        the current values, or ! if these do not exist.
+*     RANGE = LITERAL (Read)
+*        RANGE specifies the range of values for which the histogram is
+*        to be computed.  The supplied string should consist of up to
+*        three sub-strings, separated by commas.  For all but the option
+*        where you give explicit numerical limits, the first sub-string
+*        must specify the method to use.  If supplied, the other two
+*        sub-strings should be numerical values as described below
+*        (default values will be used if these sub-strings are not
+*        provided).  The following options are available.
+
+*        - lower,upper -- You can supply explicit lower and upper
+*        limiting values.  For example, "10,200" would set the histogram
+*        lower limit to 10 and its upper limit to 200.  No method name
+*        prefixes the two values.  If only one value is supplied,
+*        the "Range" method is adopted.  The limits must be within the
+*        dynamic range for the data type of the NDF array component.
+*
+*        - "Percentiles" -- The default values for the histogram data
+*        range are set to the specified percentiles of the data.  For 
+*        instance, if the value "Per,10,99" is supplied, then the lowest
+*        10% and highest 1% of the data values are excluded from the
+*        histogram.  If only one value, p1, is supplied, the second
+*        value, p2, defaults to (100 - p1).  If no values are supplied,
+*        the values default to "5,95".  Values must be in the range 0 to
+*        100.
+*
+*        - "Range" -- The minimum and maximum array values are used.  No 
+*        other sub-strings are needed by this option.  Null (!) is a
+*        synonym for the "Range" method.
+*
+*        - "Sigmas" -- The histogram limiting values are set to the 
+*        specified numbers of standard deviations below and above the
+*        mean of the data.  For instance, if the supplied value is
+*        "sig,1.5,3.0", then the histogram extends from the mean of the
+*        data minus 1.5 standard deviations to the mean plus 3 standard
+*        deviations.  If only one value is supplied, the second value
+*        defaults to the supplied value.  If no values are supplied,
+*        both default to "3.0".
+*
+*        The "Percentiles" and "Sigmas" methods are useful to generate
+*        a first pass at the histogram.  They reduce the likelihood
+*        that all but a small number of values lie within a few
+*        histogram bins.
+*        
+*        The extreme values are reported unless parameter RANGE is
+*        specified on the command line.  In this case extreme values
+*        are only calculated where necessary for the chosen method.
+
+*        The method name can be abbreviated to a single character, and is
+*        case insensitive.  The initial value is "Range".  The suggested
+*        defaults are the current values, or ! if these do not exist. 
+*        [current value]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use 
-*        when drawing the annotated axes and data values.
+*        A group of attribute settings describing the plotting style to
+*        use when drawing the annotated axes and data values.
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *        
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!) is supplied.  See Section
+*        "Plotting Attributes" in SUN/95 for a description of the
+*        available attributes.  Any unrecognised attributes are ignored
+*        (no error is reported). 
 *
 *        The appearance of the histogram curve is controlled by the
-*        attributes Colour(Curves), Width(Curves), etc (the synonym Line
-*        may be used in place of Curves). [current value] 
+*        attributes Colour(Curves), Width(Curves), etc.  (The synonym
+*        Line may be used in place of Curves.)   [current value] 
 *     TITLE = LITERAL (Read)
 *        Title for the histogram NDF.  ["KAPPA - Histogram"]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis of the plot. If a null (!) value is supplied, the minimum data 
-*        value in the histogram is used. The value supplied may be greater 
-*        than or less than the value supplied for XRIGHT. [!]
+*        axis of the plot.  If a null (!) value is supplied, the minimum
+*        data value in the histogram is used.  The value supplied may be
+*        greater than or less than the value supplied for XRIGHT.  [!]
 *     XLOG = _LOGICAL (Read)
-*        TRUE if the plot X axis is to be logarithmic. Any histogram bins 
-*        which have negative or zero central data values are omitted from
-*        the plot. [FALSE]
+*        TRUE if the plot X axis is to be logarithmic.  Any histogram
+*        bins which have negative or zero central data values are
+*        omitted from the plot.  [FALSE]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis of the plot. If a null (!) value is supplied, the maximum data 
-*        value in the histogram is used. The value supplied may be greater 
-*        than or less than the value supplied for XLEFT. [!]
+*        axis of the plot.  If a null (!) value is supplied, the maximum
+*        data value in the histogram is used.  The value supplied may be
+*        greater than or less than the value supplied for XLEFT.  [!]
 *     YBOT = _REAL (Read)
-*        The axis value to place at the bottom end of the vertical axis of 
-*        the plot. If a null (!) value is supplied, the lowest count in 
-*        the histogram is used. The value supplied may be greater than or 
-*        less than the value supplied for YTOP. [!]
+*        The axis value to place at the bottom end of the vertical axis
+*        of the plot.  If a null (!) value is supplied, the lowest count
+*        the histogram is used.  The value supplied may be greater than
+*        or less than the value supplied for YTOP.  [!]
 *     YLOG = _LOGICAL (Read)
-*        TRUE if the plot Y axis is to be logarithmic. Empty bins are 
-*        removed from the plot if the Y axis is logarithmic. [FALSE]
+*        TRUE if the plot Y axis is to be logarithmic.  Empty bins are 
+*        removed from the plot if the Y axis is logarithmic.  [FALSE]
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis of
-*        the plot. If a null (!) value is supplied, the largest count in the 
-*        histogram is used. The value supplied may be greater than or less 
-*        than the value supplied for YBOT. [!]
+*        the plot.  If a null (!) value is supplied, the largest count
+*        in the histogram is used.  The value supplied may be greater
+*        than or less than the value supplied for YBOT.  [!]
 
 *  Examples:
 *     histogram image 100 ! device=!
 *        Computes and reports the histogram for the data array in the
 *        NDF called image.  The histogram has 100 bins and spans the
 *        full range of data values.
-*     histogram ndf=spectrum comp=variance range=[100,200] numbin=20
+*     histogram ndf=spectrum comp=variance range="100,200" numbin=20
 *        Computes and reports the histogram for the variance array in
 *        the NDF called spectrum.  The histogram has 20 bins and spans
 *        the values between 100 and 200.  A plot is made to the current
 *        graphics device.
-*     histogram cube(3,4,) 10 ! out=c3_4_hist device=!
+*     histogram cube(3,4,) 10 si out=c3_4_hist device=!
 *        Computes and reports the histogram for the z-vector at (x,y)
 *        element (3,4) of the data array in the 3-dimensional NDF called
-*        cube.  The histogram has 10 bins and spans the full range of
-*        data values.  The histogram is written to a one-dimensional
-*        NDF called c3_4_hist.
-*     histogram cube numbin=32 ! device=xwindows style="'title=cube'"
+*        cube.  The histogram has 10 bins and spans a range three
+*        standard deviations either side of the mean of the data values. 
+*        The histogram is written to a one-dimensional NDF called
+*        c3_4_hist.
+*     histogram cube numbin=32 ! device=xwindows style="title=cube"
 *        Computes and reports the histogram for the data array in
 *        the NDF called cube.  The histogram has 32 bins and spans the
 *        full range of data values.  A plot of the histogram is made to
@@ -163,12 +212,13 @@
 *        As in the previous example except the logarithm of the number
 *        in each histogram bin is plotted, and the contents of the text
 *        file style.dat control the style of the resulting graph.
-*     histogram halley(~200,~300) range=[-1000,1000] logfile=hist.dat \
+*     histogram halley(~200,~300) "pe,10,90" logfile=hist.dat \
 *        Computes the histogram for the central 200 by 300 elements of
 *        the data array in the NDF called halley, and writes the
 *        results to a logfile called hist.dat.  The histogram uses the
-*        current number of bins, and includes data values between -1000
-*        and 1000.  A plot appears on the current graphics device.
+*        current number of bins, and includes data values between the 10
+*        and 90 percentiles.  A plot appears on the current graphics
+*        device.
 
 *  Related Applications:
 *     KAPPA: HISTAT, MSTATS, NUMB, STATS; Figaro: HIST, ISTAT.
@@ -208,6 +258,11 @@
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
+*     2000 February 16 (MJC):
+*        Made the RANGE parameter literal and allowed additional methods
+*        by which to specify the data-value limits of the histogram.
+*        Moved the reporting the data range and obtaining the RANGE
+*        parameter to a subroutine.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -224,7 +279,8 @@
       INCLUDE 'PAR_ERR'          ! PAR error codes
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_PAR'          ! AST constants and function
+                                 ! declarations
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -237,29 +293,13 @@
       PARAMETER ( SZBUF = 132 )
 
 *  Local Variables:
-      BYTE BMAXV                 ! Max. value of pixels in array
-      BYTE BMINV                 ! Min. value of pixels in array
-      CHARACTER BUFFER*( SZBUF ) ! Text buffer
-      CHARACTER COMP*8           ! Name of array component to analyse
-      CHARACTER LABEL*256        ! Label of the histogram NDF
-      CHARACTER MCOMP*8          ! Component name for mapping arrays
-      CHARACTER NDFNAM*255       ! Base name of NDF (+ poss. an HDS path)
-      CHARACTER TEXT*255         ! Temporary text variable
-      CHARACTER TYPE*( NDF__SZTYP )! Numeric type for processing
-      CHARACTER UNITS*256        ! Units of the histogram NDF
-      CHARACTER XL*255           ! Default X axis label
-      CHARACTER YL*255           ! Default Y axis label
-      DOUBLE PRECISION DDUMMY    ! Dummy for swapping the data range
-      DOUBLE PRECISION DMAXV     ! Max. value of pixels in array
-      DOUBLE PRECISION DMINV     ! Min. value of pixels in array
-      DOUBLE PRECISION DRANGE( 2 ) ! Data range of the histogram
-      DOUBLE PRECISION DRDEF( 2 )! Defaults for data range
-      DOUBLE PRECISION DRMAX     ! Maximum value for the range
-      DOUBLE PRECISION DRMIN     ! Minimum value for the range
-      INTEGER * 2 WMAXV          ! Max. value of pixels in array
-      INTEGER * 2 WMINV          ! Min. value of pixels in array
-      INTEGER ACTRNG             ! State of the RANGE parameter
       INTEGER AXPNTR( 1 )        ! Pointer to the histogram axis centres
+      LOGICAL BAD                ! There may be bad values in the array
+      REAL BINWID                ! Histogram bin width
+      CHARACTER * ( SZBUF ) BUFFER ! Text buffer
+      CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
+      DOUBLE PRECISION DDUMMY    ! Dummy for swapping the data range
+      DOUBLE PRECISION DRANGE( 2 ) ! Data range of the histogram
       INTEGER EL                 ! Number of array elements mapped
       INTEGER HPNTR              ! Pointer to the histogram
       INTEGER HPPTR1             ! Pointer to the histogram x locus
@@ -267,34 +307,37 @@
       INTEGER IAT                ! Position with TEXT
       INTEGER IERR               ! Position of first conversion error
       INTEGER IFIL               ! File descriptor for logfile
-      INTEGER IMAXV              ! Max. value of pixels in array
-      INTEGER IMINV              ! Min. value of pixels in array
       INTEGER IPLOT              ! AST pointer to plot to use for plotting
+      CHARACTER * ( 256 ) LABEL  ! Label of the histogram NDF
       INTEGER LENXL              ! Used length of XL
       INTEGER LENYL              ! Used length of YL
+      LOGICAL LOGFIL             ! Log file is required
       INTEGER MAXH               ! Maximum number in an histogram bin
+      REAL MAXIM                 ! Maximum value of pixels in array
+                                 ! standardised for locus
       INTEGER MAXPOS             ! Index of maximum-valued pixel
+      CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
       INTEGER MINH               ! Minimum number in an histogram bin
+      REAL MINIM                 ! Minimum value of pixels in array
+                                 ! standardised for locus
       INTEGER MINPOS             ! Index of minimum-valued pixel
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NMLEN              ! Used length of NDFNAM
-      INTEGER INDF1              ! Identifier for input NDF
-      INTEGER INDF2              ! NDF identifier of output histogram
+      INTEGER NDFI               ! Identifier for input NDF
+      CHARACTER * ( 255 ) NDFNAM ! Base name of NDF (+ poss. an HDS path)
+      INTEGER NDFO               ! NDF identifier of output histogram
       INTEGER NERR               ! Number of conversion errors
-      INTEGER NINVAL             ! No. invalid pixels in array
+      INTEGER NINVAL             ! Number of invalid pixels in array
       INTEGER NUMBIN             ! Number of histogram bins
       INTEGER OUTPTR( 1 )        ! Pointer to output NDF histogram
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
-      LOGICAL BAD                ! There may be bad values in the array
-      LOGICAL COMEXT             ! RANGE parameter is not active
-      LOGICAL LOGFIL             ! Log file is required
+      CHARACTER * ( 255 ) TEXT   ! Temporary text variable
+      CHARACTER *( NDF__SZTYP ) TYPE ! Numeric type for processing
+      CHARACTER * ( 256 ) UNITS  ! Units of the histogram NDF
+      CHARACTER * ( 255 ) XL     ! Default X axis label
       LOGICAL XLOG               ! X axis of plot is logarithmic
+      CHARACTER * ( 255 ) YL     ! Default Y axis label
       LOGICAL YLOG               ! Y axis of plot is logarithmic
-      REAL BINWID                ! Histogram bin width
-      REAL MAXIM                 ! Max. value of pixels in array standardised for locus
-      REAL MINIM                 ! Min. value of pixels in array standardised for locus 
-      REAL RMAXV                 ! Max. value of pixels in array
-      REAL RMINV                 ! Min. value of pixels in array
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -303,7 +346,7 @@
 *.
 
 *  Check the inherited global status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
@@ -312,334 +355,85 @@
       LOGFIL = .FALSE.
 
 *  Obtain the NDF to be analysed.
-      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Determine which array component is to be analysed.
 *  Find which components to plot.
-      CALL KPG1_ARCOG( 'COMP', INDF1, MCOMP, COMP, STATUS )
+      CALL KPG1_ARCOG( 'COMP', NDFI, MCOMP, COMP, STATUS )
 
 *  Obtain the numeric type of the NDF array component to be analysed.
-      CALL NDF_TYPE( INDF1, COMP, TYPE, STATUS )
+      CALL NDF_TYPE( NDFI, COMP, TYPE, STATUS )
 
 *  Map the array using this numeric type and see whether there may be
 *  bad pixels present.
-      CALL NDF_MAP( INDF1, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
-      IF( COMP .EQ. 'QUALITY' ) THEN
+      CALL NDF_MAP( NDFI, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
+      IF ( COMP .EQ. 'QUALITY' ) THEN
          BAD = .FALSE.
       ELSE
-         CALL NDF_BAD( INDF1, COMP, .FALSE., BAD, STATUS )
+         CALL NDF_BAD( NDFI, COMP, .FALSE., BAD, STATUS )
       END IF
 
 *  Exit if something has gone wrong.  Good status is required before
 *  obtaining the range.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Obtain the parameters of the histogram.
-*  =======================================
-*
-*  Obtain the range of values first; later get the number of bins.
-*  Only compute the extreme values and report them when parameter RANGE
-*  is not specified on the command line.
-      CALL LPG_STATE( 'RANGE', ACTRNG, STATUS )
-      COMEXT = ACTRNG .NE. PAR__ACTIVE
+*  Obtain the data limits.
+*  =======================
 
-*  We need to find the minimum and maximum to assist the user.  This
-*  requires the mapped array.  Now RANGE parameter is double precision,
-*  so the default and limiting values must be converted from the
-*  implementation type to real.
-*  
-*  Use an appropriate type.  Deal with signed-byte data.
-      IF( TYPE .EQ. '_BYTE' ) THEN
+*  Select appropriate routine for the data type chosen.  Note
+*  the data-value scaling limits are double precision for all
+*  data types.
+      IF ( TYPE .EQ. '_REAL' ) THEN
+         CALL KPG1_DARAR( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+     :                    'Limit,Percentiles,Range,Sigmas', BAD,
+     :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
-         IF( COMEXT ) THEN
+      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPG1_DARAD( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+     :                    'Limit,Percentiles,Range,Sigmas', BAD,
+     :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
-*  Obtain the maximum and minimum values to define the bounds of the
-*  histogram.
-            CALL KPG1_MXMNB( BAD, EL, %VAL( PNTR( 1 ) ), NINVAL,
-     :                       BMAXV, BMINV, MAXPOS, MINPOS, STATUS )
+      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+         CALL KPG1_DARAI( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+     :                    'Limit,Percentiles,Range,Sigmas', BAD,
+     :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
-*  Report the extreme values.
-            NC = 0
-            CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_BTOI( BMINV ), BUFFER, NC )
-            CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_BTOI( BMAXV ), BUFFER, NC )
-            CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
+      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+         CALL KPG1_DARAW( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+     :                    'Limit,Percentiles,Range,Sigmas', BAD,
+     :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
-*  Set the default values.
-            DRDEF( 1 ) = NUM_BTOD( BMINV )
-            DRDEF( 2 ) = NUM_BTOD( BMAXV )
-         ELSE
+      ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
+         CALL KPG1_DARAB( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+     :                    'Limit,Percentiles,Range,Sigmas', BAD,
+     :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
-*  Extreme values have not been calculated, therefore have no suggested
-*  default.
-            DRDEF( 1 ) = NUM_ITOD( VAL__BADI )
-            DRDEF( 2 ) = NUM_ITOD( VAL__BADI )
-         END IF
+      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+         CALL KPG1_DARAUB( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+     :                     'Limit,Percentiles,Range,Sigmas', BAD,
+     :                     DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
-*  Set the extreme values.  Use the full range of numbers when there are
-*  no bad values.
-         IF( BAD ) THEN
-            DRMIN = NUM_BTOD( VAL__MINB )
-            DRMAX = NUM_BTOD( VAL__MAXB )
-         ELSE
-            DRMIN = NUM_BTOD( NUM__MINB )
-            DRMAX = NUM_BTOD( NUM__MAXB )
-         END IF
-
-*  Use an appropriate type.  Deal with double-precision data.
-      ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-
-         IF( COMEXT ) THEN
-
-*  Obtain the maximum and minimum values to define the bounds of the
-*  histogram.
-            CALL KPG1_MXMND( BAD, EL, %VAL( PNTR( 1 ) ), NINVAL,
-     :                       DMAXV, DMINV, MAXPOS, MINPOS, STATUS )
-
-*  Report the extreme values.
-            NC = 0
-            CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
-            CALL CHR_PUTD( DMINV, BUFFER, NC )
-            CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTD( DMAXV, BUFFER, NC )
-            CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
-
-*  Set the default values.
-            DRDEF( 1 ) = DMINV
-            DRDEF( 2 ) = DMAXV
-         ELSE
-
-*  Extreme values have not been calculated, therefore have no suggested
-*  default.
-            DRDEF( 1 ) = VAL__BADD
-            DRDEF( 2 ) = VAL__BADD
-         END IF
-
-*  Set the extreme values.  Use the full range of numbers when there are
-*  no bad values.
-         IF( BAD ) THEN
-            DRMIN = VAL__MIND
-            DRMAX = VAL__MAXD
-         ELSE
-            DRMIN = NUM__MIND
-            DRMAX = NUM__MAXD
-         END IF
-
-*  Use an appropriate type.  Deal with signed integer data.
-      ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-
-         IF( COMEXT ) THEN
-
-*  Obtain the maximum and minimum values to define the bounds of the
-*  histogram.
-            CALL KPG1_MXMNI( BAD, EL, %VAL( PNTR( 1 ) ), NINVAL,
-     :                       IMAXV, IMINV, MAXPOS, MINPOS, STATUS )
-
-*  Report the extreme values.
-            NC = 0
-            CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
-            CALL CHR_PUTI( IMINV, BUFFER, NC )
-            CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTI( IMAXV, BUFFER, NC )
-            CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
-
-*  Set the default values.
-            DRDEF( 1 ) = DBLE( IMINV )
-            DRDEF( 2 ) = DBLE( IMAXV )
-         ELSE
-
-*  Extreme values have not been calculated, therefore have no suggested
-*  default.
-            DRDEF( 1 ) = DBLE( VAL__BADI )
-            DRDEF( 2 ) = DBLE( VAL__BADI )
-         END IF
-
-*  Set the extreme values.  Use the full range of numbers when there are
-*  no bad values.
-         IF( BAD ) THEN
-            DRMIN = NUM_ITOD( VAL__MINI )
-            DRMAX = NUM_ITOD( VAL__MAXI )
-         ELSE
-            DRMIN = NUM_ITOD( NUM__MINI )
-            DRMAX = NUM_ITOD( NUM__MAXI )
-         END IF
-
-*  Use an appropriate type.  Deal with single-precision real data.
-      ELSE IF( TYPE .EQ. '_REAL' ) THEN
-
-         IF( COMEXT ) THEN
-
-*  Obtain the maximum and minimum values to define the bounds of the
-*  histogram.
-            CALL KPG1_MXMNR( BAD, EL, %VAL( PNTR( 1 ) ), NINVAL,
-     :                       RMAXV, RMINV, MAXPOS, MINPOS, STATUS )
-
-*  Report the extreme values.
-            NC = 0
-            CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
-            CALL CHR_PUTR( RMINV, BUFFER, NC )
-            CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTR( RMAXV, BUFFER, NC )
-            CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
-
-*  Set the default values.
-            DRDEF( 1 ) = DBLE( RMINV )
-            DRDEF( 2 ) = DBLE( RMAXV )
-         ELSE
-
-*  Extreme values have not been calculated, therefore have no suggested
-*  default.
-            DRDEF( 1 ) = DBLE( VAL__BADR )
-            DRDEF( 2 ) = DBLE( VAL__BADR )
-         END IF
-
-*  Set the extreme values.  Use the full range of numbers when there are
-*  no bad values.
-         IF( BAD ) THEN
-            DRMIN = DBLE( VAL__MINR )
-            DRMAX = DBLE( VAL__MAXR )
-         ELSE
-            DRMIN = DBLE( NUM__MINR )
-            DRMAX = DBLE( NUM__MAXR )
-         END IF
-
-*  Use an appropriate type.  Deal with unsigned-byte data.
-      ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-
-         IF( COMEXT ) THEN
-
-*  Obtain the maximum and minimum values to define the bounds of the
-*  histogram.
-            CALL KPG1_MXMNUB( BAD, EL, %VAL( PNTR( 1 ) ), NINVAL,
-     :                        BMAXV, BMINV, MAXPOS, MINPOS, STATUS )
-
-*  Report the extreme values.
-            NC = 0
-            CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_UBTOI( BMINV ), BUFFER, NC )
-            CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_UBTOI( BMAXV ), BUFFER, NC )
-            CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
-
-*  Set the default values.
-            DRDEF( 1 ) = NUM_UBTOD( BMINV )
-            DRDEF( 2 ) = NUM_UBTOD( BMAXV )
-         ELSE
-
-*  Extreme values have not been calculated, therefore have no suggested
-*  default.
-            DRDEF( 1 ) = DBLE( VAL__BADI )
-            DRDEF( 2 ) = DBLE( VAL__BADI )
-         END IF
-
-*  Set the extreme values.  Use the full range of numbers when there are
-*  no bad values.
-         IF( BAD ) THEN
-            DRMIN = NUM_UBTOD( VAL__MINUB )
-            DRMAX = NUM_UBTOD( VAL__MAXUB )
-         ELSE
-            DRMIN = NUM_UBTOD( NUM__MINUB )
-            DRMAX = NUM_UBTOD( NUM__MAXUB )
-         END IF
-
-*  Use an appropriate type.  Deal with unsigned-word data.
-      ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-
-         IF( COMEXT ) THEN
-
-*  Obtain the maximum and minimum values to define the bounds of the
-*  histogram.
-            CALL KPG1_MXMNUW( BAD, EL, %VAL( PNTR( 1 ) ), NINVAL,
-     :                        WMAXV, WMINV, MAXPOS, MINPOS, STATUS )
-
-*  Report the extreme values.
-            NC = 0
-            CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_UWTOI( WMINV ), BUFFER, NC )
-            CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_UWTOI( WMAXV ), BUFFER, NC )
-            CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
-
-*  Set the default values.
-            DRDEF( 1 ) = NUM_UWTOD( WMINV )
-            DRDEF( 2 ) = NUM_UWTOD( WMAXV )
-         ELSE
-
-*  Extreme values have not been calculated, therefore have no suggested
-*  default.
-            DRDEF( 1 ) = DBLE( VAL__BADI )
-            DRDEF( 2 ) = DBLE( VAL__BADI )
-         END IF
-
-*  Set the extreme values.  Use the full range of numbers when there are
-*  no bad values.
-         IF( BAD ) THEN
-            DRMIN = NUM_UWTOD( VAL__MINUW )
-            DRMAX = NUM_UWTOD( VAL__MAXUW )
-         ELSE
-            DRMIN = NUM_UWTOD( NUM__MINUW )
-            DRMAX = NUM_UWTOD( NUM__MAXUW )
-         END IF
-
-*  Use an appropriate type.  Deal with signed-word data.
-      ELSE IF( TYPE .EQ. '_WORD' ) THEN
-
-         IF( COMEXT ) THEN
-
-*  Obtain the maximum and minimum values to define the bounds of the
-*  histogram.
-            CALL KPG1_MXMNW( BAD, EL, %VAL( PNTR( 1 ) ), NINVAL,
-     :                       WMAXV, WMINV, MAXPOS, MINPOS, STATUS )
-
-*  Report the extreme values.
-            NC = 0
-            CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_WTOI( WMINV ), BUFFER, NC )
-            CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTI( NUM_WTOI( WMAXV ), BUFFER, NC )
-            CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
-
-*  Set the default values.
-            DRDEF( 1 ) = NUM_WTOD( WMINV )
-            DRDEF( 2 ) = NUM_WTOD( WMAXV )
-         ELSE
-
-*  Extreme values have not been calculated, therefore have no suggested
-*  default.
-            DRDEF( 1 ) = DBLE( VAL__BADI )
-            DRDEF( 2 ) = DBLE( VAL__BADI )
-         END IF
-
-*  Set the extreme values.  Use the full range of numbers when there are
-*  no bad values.
-         IF( BAD ) THEN
-            DRMIN = NUM_WTOD( VAL__MINW )
-            DRMAX = NUM_WTOD( VAL__MAXW )
-         ELSE
-            DRMIN = NUM_WTOD( NUM__MINW )
-            DRMAX = NUM_WTOD( NUM__MAXW )
-         END IF
+      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+         CALL KPG1_DARAUW( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+     :                     'Limit,Percentiles,Range,Sigmas', BAD,
+     :                     DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       END IF
 
-*  Obtain the limits of the histogram, not constrained by the extreme
-*  values though. (This may be needed for histogram bin boundaries
-*  to occur at round values.)
-      CALL PAR_GDR1D( 'RANGE', 2, DRDEF, DRMIN, DRMAX, .TRUE., DRANGE,
-     :                STATUS )
-
 *  Sort if necessary.
-      IF( DRANGE( 1 ) .GT. DRANGE( 2 ) ) THEN
+      IF ( DRANGE( 1 ) .GT. DRANGE( 2 ) ) THEN
          DDUMMY = DRANGE( 1 )
          DRANGE( 1 ) = DRANGE( 2 )
          DRANGE( 2 ) = DDUMMY
       END IF
 
+*  Obtain the other parameters of the histogram.
+*  =============================================
+
 *  Get the number of histogram bins to be used, within a sensible
 *  range.
       CALL PAR_GDR0I( 'NUMBIN', 20, 2, MAXBIN, .TRUE., NUMBIN, STATUS )
-      IF( STATUS .NE. SAI__OK ) GOTO 999
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Obtain an optional file for logging the results.
 *  ================================================
@@ -647,9 +441,9 @@
       LOGFIL = .FALSE.
       CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, IFIL, STATUS )
 
-      IF( STATUS .EQ. PAR__NULL ) THEN
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          LOGFIL = .TRUE.
       END IF
       CALL ERR_RLSE
@@ -659,28 +453,28 @@
 
 *  Display the NDF name, also sending it to the logfile if necessary.
       CALL MSG_BLANK( STATUS )
-      IF( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
-      CALL NDF_MSG( 'NDF', INDF1 )
+      IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
+      CALL NDF_MSG( 'NDF', NDFI )
       CALL MSG_LOAD( 'NDFNAME',
      :               '   Histogram for the NDF structure ^NDF', BUFFER,
      :               NC, STATUS )
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL MSG_SETC( 'MESSAGE', BUFFER( : NC ) )
          CALL MSG_OUT( ' ', '^MESSAGE', STATUS )
-         IF( LOGFIL ) CALL FIO_WRITE( IFIL, BUFFER( : NC ), STATUS )
+         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUFFER( : NC ), STATUS )
       END IF
 
 *  Display (and log) the NDF's title.
       CALL MSG_BLANK( STATUS )
-      IF( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
-      CALL NDF_CMSG( 'TITLE', INDF1, 'Title', STATUS )
+      IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
+      CALL NDF_CMSG( 'TITLE', NDFI, 'Title', STATUS )
       CALL MSG_LOAD( 'NDFTITLE',
      :               '      Title                     : ^TITLE',
      :               BUFFER, NC, STATUS )
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL MSG_SETC( 'MESSAGE', BUFFER( : NC ) )
          CALL MSG_OUT( ' ', '^MESSAGE', STATUS )
-         IF( LOGFIL ) CALL FIO_WRITE( IFIL, BUFFER( : NC ), STATUS )
+         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUFFER( : NC ), STATUS )
       END IF
 
 *  Display (and log) the name of the component being analysed.
@@ -688,14 +482,14 @@
       CALL MSG_LOAD( 'NDFCOMP',
      :               '      NDF array analysed        : ^COMP',
      :               BUFFER, NC, STATUS )
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL MSG_SETC( 'MESSAGE', BUFFER( : NC ) )
          CALL MSG_OUT( ' ', '^MESSAGE', STATUS )
-         IF( LOGFIL ) CALL FIO_WRITE( IFIL, BUFFER( : NC ), STATUS )
+         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUFFER( : NC ), STATUS )
       END IF
 
 *  If a logfile is in use, display its name.
-      IF( LOGFIL ) CALL MSG_OUT( 'LOG',
+      IF ( LOGFIL ) CALL MSG_OUT( 'LOG',
      :              '      Logging to file           : $LOGFILE',
      :                            STATUS )
 
@@ -708,7 +502,7 @@
 *  Call the appropriate routines to compute the histogram and then
 *  report the results.  The double-precision range values must be
 *  converted to the appropriate type for the routines.
-      IF( TYPE .EQ. '_BYTE' ) THEN
+      IF ( TYPE .EQ. '_BYTE' ) THEN
 
 *  Compute the histogram.
          CALL KPG1_GHSTB( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
@@ -721,13 +515,13 @@
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
-         IF( LOGFIL ) THEN
+         IF ( LOGFIL ) THEN
             CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
 
-      ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
+      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
  
 *  Compute the histogram.
          CALL KPG1_GHSTD( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
@@ -739,12 +533,12 @@
      :                    DRANGE( 2 ), STATUS )
 
 *  Write the histogram to the log file.
-         IF( LOGFIL ) THEN
+         IF ( LOGFIL ) THEN
             CALL KPG1_HSFLD( IFIL, NUMBIN, %VAL( HPNTR ), DRANGE( 1 ),
      :                       DRANGE( 2 ), STATUS )
          END IF
 
-      ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
  
 *  Compute the histogram.
          CALL KPG1_GHSTI( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
@@ -757,13 +551,13 @@
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
-         IF( LOGFIL ) THEN
+         IF ( LOGFIL ) THEN
             CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
 
-      ELSE IF( TYPE .EQ. '_REAL' ) THEN
+      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
 
 *  Compute the histogram.
          CALL KPG1_GHSTR( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
@@ -775,13 +569,13 @@
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
-         IF( LOGFIL ) THEN
+         IF ( LOGFIL ) THEN
             CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
 
-      ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
+      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
  
 *  Compute the histogram.
          CALL KPG1_GHSTUB( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
@@ -794,13 +588,13 @@
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
-         IF( LOGFIL ) THEN
+         IF ( LOGFIL ) THEN
             CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
 
-      ELSE IF( TYPE .EQ. '_UWORD' ) THEN
+      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
 
 *  Compute the histogram.
          CALL KPG1_GHSTUW( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
@@ -813,13 +607,13 @@
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
-         IF( LOGFIL ) THEN
+         IF ( LOGFIL ) THEN
             CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
 
-      ELSE IF( TYPE .EQ. '_WORD' ) THEN
+      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
  
 *  Compute the histogram.
          CALL KPG1_GHSTW( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
@@ -832,7 +626,7 @@
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
-         IF( LOGFIL ) THEN
+         IF ( LOGFIL ) THEN
             CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
@@ -843,7 +637,7 @@
 *  Obtain the axis and plot styles.
 *  ================================
 *  Construct the default label for the X axis.
-      CALL KPG1_NDFNM( INDF1, NDFNAM, NMLEN, STATUS )
+      CALL KPG1_NDFNM( NDFI, NDFNAM, NMLEN, STATUS )
       CALL MSG_SETC( 'NDF', NDFNAM )
       CALL MSG_LOAD( ' ', 'Data value in ^NDF', XL, LENXL, 
      :               STATUS )
@@ -857,7 +651,7 @@
 
 *  Allow for case where x-axis is logarithmic, and some data is zero
 *  or negative.
-      IF( XLOG ) THEN    
+      IF ( XLOG ) THEN    
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( 'Log\\d10\\u(', TEXT, IAT )
@@ -866,7 +660,7 @@
          XL = TEXT
       ENDIF
 
-      IF( YLOG ) THEN
+      IF ( YLOG ) THEN
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( 'Log\\d10\\u(', TEXT, IAT )
@@ -896,7 +690,7 @@
       CALL PSX_CALLOC( NUMBIN, '_REAL', HPPTR1, STATUS )
       CALL PSX_CALLOC( NUMBIN, '_REAL', HPPTR2, STATUS )
 
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the x-y points at the centre of each bin in the histogram.
          CALL KPG1_HSTLO( NUMBIN, %VAL( HPNTR ), MINIM, MAXIM, 
@@ -917,7 +711,7 @@
 
 *  If anything was plotted, annul the Plot, and shut down the graphics 
 *  workstation and database.
-         IF( IPLOT .NE. AST__NULL ) THEN
+         IF ( IPLOT .NE. AST__NULL ) THEN
             CALL AST_ANNUL( IPLOT, STATUS )
             CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
          END IF
@@ -940,10 +734,10 @@
       CALL NDF_BEGIN
 
 *  Create a new NDF.
-      CALL LPG_CREAT( 'OUT', '_INTEGER', 1, 1, NUMBIN, INDF2, STATUS )
+      CALL LPG_CREAT( 'OUT', '_INTEGER', 1, 1, NUMBIN, NDFO, STATUS )
 
 *  Map the data array.
-      CALL NDF_MAP( INDF2, 'Data', '_INTEGER', 'WRITE', OUTPTR,
+      CALL NDF_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,
      :              NUMBIN, STATUS )
 
 *  Write the slice to the NDF.
@@ -951,33 +745,33 @@
      :               %VAL( OUTPTR( 1 ) ), IERR, NERR, STATUS )
 
 *  Unmap the histogram.
-      CALL NDF_UNMAP( INDF2, 'Data', STATUS )
+      CALL NDF_UNMAP( NDFO, 'Data', STATUS )
 
 *  There are no bad pixels in the histogram, so record this fact in
 *  the NDF, for greater efficiency.
-      CALL NDF_SBAD( .FALSE., INDF2, 'DATA', STATUS )
+      CALL NDF_SBAD( .FALSE., NDFO, 'DATA', STATUS )
 
 *  Get the title for the NDF.
-      CALL NDF_CINP( 'TITLE', INDF2, 'TITLE', STATUS )
+      CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
 
 *  Write a label for the NDF.  The histogram is unitless.
-      CALL NDF_CPUT( 'Number', INDF2, 'Label', STATUS )
+      CALL NDF_CPUT( 'Number', NDFO, 'Label', STATUS )
 
 *  Obtain the label and units from the input NDF.
       LABEL = ' '
       UNITS = ' '
-      CALL NDF_CGET( INDF1, 'Label', LABEL, STATUS )
-      CALL NDF_CGET( INDF1, 'Units', UNITS, STATUS )
+      CALL NDF_CGET( NDFI, 'Label', LABEL, STATUS )
+      CALL NDF_CGET( NDFI, 'Units', UNITS, STATUS )
 
 *  Put the label and units in the axis structure, which is
 *  also created at this point.  There is only one axis.
-      IF( LABEL .NE. ' ' ) CALL NDF_ACPUT( LABEL, INDF2, 'Label', 1, 
+      IF ( LABEL .NE. ' ' ) CALL NDF_ACPUT( LABEL, NDFO, 'Label', 1, 
      :                                     STATUS )
-      IF( UNITS .NE. ' ' ) CALL NDF_ACPUT( UNITS, INDF2, 'Units', 1, 
+      IF ( UNITS .NE. ' ' ) CALL NDF_ACPUT( UNITS, NDFO, 'Units', 1, 
      :                                     STATUS )
 
 *  Map the axis centres.
-      CALL NDF_AMAP( INDF2, 'CENTRE', 1, '_REAL', 'WRITE', AXPNTR,
+      CALL NDF_AMAP( NDFO, 'CENTRE', 1, '_REAL', 'WRITE', AXPNTR,
      :               NUMBIN, STATUS )
 
 *  Fill the axis array with the centres of the histogram bins by first
@@ -990,7 +784,7 @@
      :                 %VAL( AXPNTR( 1 ) ), STATUS )
 
 *  Handle the null case invisibly.
-      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Tidy work-space structures.
       CALL PSX_FREE( HPNTR, STATUS )
@@ -1008,10 +802,10 @@
       CALL NDF_END( STATUS )
 
 *  Close the logfile, if used.
-      IF( LOGFIL ) CALL FIO_ANNUL( IFIL, STATUS )
+      IF ( LOGFIL ) CALL FIO_ANNUL( IFIL, STATUS )
 
 *  If an error occurred, then report a contextual message.
-      IF( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'HISTOGRAM_ERR', 'HISTOGRAM: Error computing '//
      :                 'or displaying the histogram of an NDF''s '//
      :                 'pixels.', STATUS )
