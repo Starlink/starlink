@@ -450,7 +450,7 @@
 *    Global variables :
 *     <global variables held in named COMMON>
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
 *    Import :
       RECORD /XRT_SCFDEF/ SRT          ! Sort control structure
       INTEGER OBS                      ! Observation number
@@ -528,7 +528,7 @@
 *    Type definitions :
       IMPLICIT NONE
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
 *    Import :
       INTEGER QLEN               ! Length of quality property lists
       REAL TIME(QLEN)            ! Time of quality state
@@ -592,7 +592,7 @@
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       CHARACTER*(DAT__SZLOC) OUTLOC
@@ -1005,7 +1005,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       INCLUDE 'PAR_ERR'
       INCLUDE 'AST_SYS_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 * Import :
 * Import-Export :
@@ -1131,7 +1131,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD                    ! Header from files
@@ -1395,7 +1395,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
 *    Structure definitions :
 *     <specification of FORTRAN structures>
 *    Import :
@@ -1544,7 +1544,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *    Status :
       INTEGER STATUS
 *    Structures :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD                      ! Header values
@@ -3592,7 +3592,7 @@ C      ENDIF
 *    Status :
       INTEGER STATUS
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_SCFDEF/ SRT,BSRT                ! Sort control structures
@@ -3764,7 +3764,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 *    Type definitions :
       IMPLICIT NONE
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD                      ! Header values
@@ -4025,7 +4025,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
 *    Import :
       CHARACTER*(DAT__SZLOC) LOC       ! Locator to file
 *
