@@ -54,11 +54,14 @@
 *     object destroy
 *        Releases all resources associated with the object.
 *
-*     object display device loval hival frame options
+*     object display ?options? device loval hival frame plotstyle
 *        Plots the NDF on the named PGPLOT device, with colour cutoffs
 *        given by the loval and hival arguments, and axes drawn according
-*        to the frame argument.  The options string may contain any 
-*        plotting options desired, in astSet format.
+*        to the frame argument.  The plotstyle string may contain any 
+*        plotting options desired, in astSet format.  If the '-resamp'
+*        option is given, then the image will be resampled into the
+*        indicated frame before plotting; otherwise the frame argument
+*        is just used for plotting axes.
 *
 *        The may be specified either as a numerical frame index, as a 
 *        domain name, or as one of the special strings "BASE" or "CURRENT".
@@ -224,9 +227,11 @@
       int *pixbloc;
       float *gbox;
       double *bbox;
+      double psize;
       double zoom;
       AstFrameSet *wcs;
       int ifrm;
+      int pfrm;
       int xpix;
       int ypix;
    };
@@ -360,6 +365,9 @@
       int i;
       int j;
 
+/* Take care of pending Tcl events now, in case what we are about to do
+   is time-consuming. */
+      tclupdate();
 
 /**********************************************************************/
 /* "bbox" command                                                     */
@@ -446,7 +454,10 @@
          int ifrm;
          int locolour;
          int hicolour;
+         int nflag;
          int ofrm;
+         int pfrm;
+         int resamp;
          int xpix;
          int ypix;
          int *pixbloc;
@@ -461,34 +472,48 @@
          double bbox[ 4 ];
          double loval;
          double hival;
+         double psize;
          double zoom;
          struct ndfdisplay_args args;
          Tcl_Obj argob;
          Tcl_Obj *ov[ 1 ];
 
+/* Process flags. */
+         resamp = 0;
+         nflag = 0;
+         if ( objc > 2 + nflag &&
+              ! strcmp( Tcl_GetString( objv[ 2 ] + nflag ), "-resamp" ) ) {
+            resamp = 1;
+            nflag++;
+         }
+
 /* Check syntax. */
-         if ( objc != 7 ) {
-            Tcl_WrongNumArgs( interp, 2, objv, 
-                              "device loval hival frame options" );
-                            /* 1      2     3     4     5        */
+         if ( objc != 7 + nflag ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "?options? "
+                              "device loval hival frame plotstyle" );
+                            /* 2      3     4     5     6        */
             return TCL_ERROR;
          }
 
 /* Get string arguments. */
-         device = Tcl_GetString( objv[ 2 ] );
-         settings = Tcl_GetString( objv[ 6 ] );
+         device = Tcl_GetString( objv[ 2 + nflag ] );
+         settings = Tcl_GetString( objv[ 6 + nflag ] );
 
 /* Get numeric arguments. */
-         if ( Tcl_GetDoubleFromObj( interp, objv[ 3 ], &loval ) != TCL_OK ||
-              Tcl_GetDoubleFromObj( interp, objv[ 4 ], &hival ) != TCL_OK ) {
+         if ( Tcl_GetDoubleFromObj( interp, objv[ 3 + nflag ], &loval ) != TCL_OK ||
+              Tcl_GetDoubleFromObj( interp, objv[ 4 + nflag ], &hival ) != TCL_OK ) {
             return TCL_ERROR;
          }
            
 /* Get frame argument. */
-         if ( NdfGetIframeFromObj( interp, objv[ 5 ], ndf->wcs, &ifrm ) 
+         if ( NdfGetIframeFromObj( interp, objv[ 5 + nflag ], ndf->wcs, &ifrm ) 
               != TCL_OK ) {
             return TCL_ERROR;
          }
+
+/* Set the frame into which the image will be resampled for plotting to 
+   the GRID frame. */
+         pfrm = resamp ? ifrm : AST__BASE;
 
 /* Open the PGPLOT plotting device. */
          if ( cpgopen( device ) < 0 ) {
@@ -501,10 +526,11 @@
          cpgqcir( &locolour, &hicolour );
 
 /* Set the plotting coordinate limits. */
-         gbox[ 0 ] = bbox[ 0 ] = 0.5;
-         gbox[ 1 ] = bbox[ 1 ] = 0.5;
-         gbox[ 2 ] = bbox[ 2 ] = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 1.5;
-         gbox[ 3 ] = bbox[ 3 ] = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 1.5;
+         STARCALL(
+            psize = getpixelsize( ndf, pfrm, status );
+            getbbox( ndf, pfrm, bbox, bbox + 2, status );
+         )
+         for ( i = 0; i < 5; i++ ) gbox[ i ] = bbox[ i ];
 
 /* Set the viewport to use all of the available surface, within the 
    constraint that the correct aspect ratio is retained. */
@@ -525,20 +551,18 @@
    surface.  However, making it a lot bigger than the plotting surface
    would be a waste of memory. */
          factor = 1.0;
-         zoom = 10.0;
-         while ( zoom > 2.1 ) {
+         zoom = 10.0 / psize;
+         while ( zoom > 2.1 / psize ) {
             zoom = ( xphi - xplo ) / ( bbox[ 2 ] - bbox[ 0 ] ) / factor++;
          }
 
 /* Prepare the image in a PGPLOT-friendly form. */
          STARCALL(
-            pixbloc = getpixbloc( ndf, 1, zoom, loval, hival, locolour,
-                                  hicolour, badcolour, status );
+            pixbloc = getpixbloc( ndf, pfrm, zoom, loval, hival, 
+                                  locolour, hicolour, badcolour, status );
          )
          xpix = ndf->plotarray.xdim;
          ypix = ndf->plotarray.ydim;
-
-/* Get the grid coordinate of the top right pixel. */
 
 /* The rest of the processing can be performed as an independent background
    process, since it may take a significant amount of time and we want 
@@ -552,9 +576,11 @@
          args.pixbloc = pixbloc;
          args.gbox = gbox;
          args.bbox = bbox;
+         args.psize = psize;
          args.zoom = ndf->plotarray.zoom;
          args.wcs = ndf->wcs;
          args.ifrm = ifrm;
+         args.pfrm = pfrm;
          args.xpix = xpix;
          args.ypix = ypix;
 
@@ -828,8 +854,22 @@
          double *fracs;
          double *percs;
          double *vals;
+         int first;
          int nfrac;
          int nperc;
+         int nextra;
+         Tcl_HashSearch hsearch;
+         double initset[] = {  0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,
+                              10., 11., 12., 13., 14., 15., 16., 17., 18., 19.,
+                              20., 21., 22., 23., 24., 25., 26., 27., 28., 29.,
+                              30., 31., 32., 33., 34., 35., 36., 37., 38., 39.,
+                              40., 41., 42., 43., 44., 45., 46., 47., 48., 49.,
+                              50., 51., 52., 53., 54., 55., 56., 57., 58., 59.,
+                              60., 61., 62., 63., 64., 65., 66., 67., 68., 69.,
+                              70., 71., 72., 73., 74., 75., 76., 77., 78., 79.,
+                              80., 81., 82., 83., 84., 85., 86., 87., 88., 89.,
+                              90., 91., 92., 93., 94., 95., 96., 97., 98., 99.,
+                              0.5, 99.5, 0.1, 99.9, 100. };
 
 /* Check syntax. */
          nperc = objc - 2;
@@ -838,10 +878,21 @@
             return TCL_ERROR;
          }
 
+/* If we have not got any percentiles before, then initialise the table
+   with a useful set.  It makes sense to do this because it is nearly as
+   fast to work out many percentiles as just one.  If we can predict 
+   most of the ones which might be likely to be needed, we can probably
+   save time on subsequent calls. */
+         nextra = 0;
+         first = ( Tcl_FirstHashEntry( &ndf->perchash, &hsearch ) == NULL );
+         if ( first ) {
+            nextra = sizeof( initset ) / sizeof( initset[ 0 ] );
+         }
+
 /* Allocate arrays in which to store percentiles and values. */
-         percs = malloc( nperc * sizeof( double ) );
-         fracs = malloc( nperc * sizeof( double ) );
-         vals = malloc( nperc * sizeof( double ) );
+         percs = malloc( ( nperc + nextra ) * sizeof( double ) );
+         fracs = malloc( ( nperc + nextra ) * sizeof( double ) );
+         vals = malloc( ( nperc + nextra ) * sizeof( double ) );
          if ( tclmemok( interp, percs ) != TCL_OK ||
               tclmemok( interp, fracs ) != TCL_OK ||
               tclmemok( interp, vals ) != TCL_OK ) {
@@ -862,12 +913,15 @@
                return TCL_ERROR;
             }
          }
-
+         for ( i = 0; i < nextra; i++ ) {
+            percs[ nperc + i ] = initset[ i ];
+         }
+         
 /* Find out which of these percentiles we already have values for.
    If there are any missing, write these into a new array which we
    can feed to the percentile calculation routine. */
          nfrac = 0;
-         for ( i = 0; i < nperc; i++ ) {
+         for ( i = 0; i < ( nperc + nextra ); i++ ) {
             PercHashKey hkey;
             hkey.data = percs[ i ];
             if ( Tcl_FindHashEntry( &ndf->perchash, hkey.hash ) == NULL ) {
@@ -1198,7 +1252,8 @@
                                "\n    bbox frame",
                                "\n    bounds", 
                                "\n    destroy",
-                               "\n    display device loval hival frame options",
+                               "\n    display ?options? device loval hival "
+                                             "frame plotstyle",
                                "\n    fitshead ?key? ...",
                                "\n    frameatt attname ?frame?",
                                "\n    mapped ?setmap?",
@@ -1277,7 +1332,7 @@
 /**********************************************************************/
 /* Comparison function for qsort. */
       double diff = *( (double *) a ) - *( (double *) b );
-      return diff == 0.0 ? 0 : ( diff < 1 ? -1 : 1 );
+      return diff == 0.0 ? 0 : ( diff < 0.0 ? -1 : 1 );
    }
 
 
@@ -1420,20 +1475,23 @@
    int ndfdisplay( ClientData clientData, Tcl_Interp *interp, int objc,
                    Tcl_Obj *CONST objv[] ) {
 /**********************************************************************/
-      int ofrm;
+      int bfrm;
+      int cfrm;
       Tcl_Obj *result;
       AstPlot *plot;
 
-/* Set values from the structure passed in the arugment list. */
+/* Set values from the structure passed in the argument list. */
       struct ndfdisplay_args *pargs = objv[ 0 ]->internalRep.otherValuePtr;
       char *device = pargs->device;
       char *settings = pargs->settings;
       int *pixbloc = pargs->pixbloc;
       float *gbox = pargs->gbox;
       double *bbox = pargs->bbox;
+      double psize = pargs->psize;
       double zoom = pargs->zoom;
       AstFrameSet *wcs = pargs->wcs;
       int ifrm = pargs->ifrm;
+      int pfrm = pargs->pfrm;
       int xpix = pargs->xpix;
       int ypix = pargs->ypix;
 
@@ -1450,28 +1508,27 @@
       cpgbbuf();
 
 /* Plot the image. */
-
-/* This call is more general, in that it will work regardless of the size
- * of the GWM widget. */
-/*
- *    cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix, 
- *             gbox[ 0 ] + 0.5 / zoom, gbox[ 2 ] - 0.5 / zoom, 
- *             gbox[ 1 ] + 0.5 / zoom, gbox[ 3 ] - 0.5 / zoom );
- */
-
-/* However, this call makes use of the fact that we know the pixel size
-   of the array in memory to get PGPLOT to plot much more efficiently. */
+/* Although it would be more straightforward to use the four elements of
+   gbox to set the plotting limits here, by doing it using the pixel
+   lengths we can ensure that there are just the same number of pixels in
+   the array as on the plotting surface, which makes cpgpixl() much 
+   more efficient. */
       cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix,
-               gbox[ 0 ] + 0.5 / zoom, gbox[ 0 ] + ( xpix - 0.5 ) / zoom,
-               gbox[ 1 ] + 0.5 / zoom, gbox[ 1 ] + ( ypix - 0.5 ) / zoom );
+               gbox[ 0 ] + 0.5 / zoom,
+               gbox[ 0 ] + ( xpix - 0.5 ) / zoom,
+               gbox[ 1 ] + 0.5 / zoom,
+               gbox[ 1 ] + ( ypix - 0.5 ) / zoom );
 
 /* Get AST to plot the axes etc. */
       ASTCALL(
-         ofrm = astGetI( wcs, "Current" );
+         bfrm = astGetI( wcs, "Base" );
+         cfrm = astGetI( wcs, "Current" );
+         astSetI( wcs, "Base", pfrm );
          astSetI( wcs, "Current", ifrm );
          plot = astPlot( wcs, gbox, bbox, settings );
-         astSetI( wcs, "Current", ofrm );
          astGrid( plot );
+         astSetI( wcs, "Base", bfrm );
+         astSetI( wcs, "Current", cfrm );
          astAnnul( plot );
       )
 
@@ -1527,26 +1584,28 @@
          double factor;
          double iparams[ 10 ];
          double lbox[ NDF__MXDIM ];
+         double psize;
          double ubox[ NDF__MXDIM ];
          AstMapping *map;
          DECLARE_CHARACTER( ftype, DAT__SZTYP );
 
+         psize = getpixelsize( ndf, iframe, status );
          xndf = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 1;
          yndf = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 1;
          getbbox( ndf, iframe, lbox, ubox, status );
-         xbase = zoom * lbox[ 0 ] + 0.5 / zoom;
-         ybase = zoom * lbox[ 1 ] + 0.5 / zoom;
-         xdim = zoom * ( ubox[ 0 ] - lbox[ 0 ] ) - 1;
-         ydim = zoom * ( ubox[ 1 ] - lbox[ 1 ] ) - 1;
+         xbase = zoom * lbox[ 0 ];
+         ybase = zoom * lbox[ 1 ];
+         xdim = zoom * ( ubox[ 0 ] - lbox[ 0 ] );
+         ydim = zoom * ( ubox[ 1 ] - lbox[ 1 ] );
 
 /* Set the resampling scheme.  If we are resampling onto a much coarser
    grid, then use a scheme which reblocks the data (averages over all pixels
    of a square), otherwise just use a simple linear interpolation. 
    The reblocking can be quite slow, but if the image is a bit noisy it
    smooths it out quite significantly. */
-         factor = zoom * getpixelsize( ndf, iframe, status );
+         factor = zoom * psize;
          if ( factor > 0.35 ) {
-            ischeme = AST__LINEAR;
+            ischeme = AST__NEAREST;
          }
          else {
             ischeme = AST__UINTERP;
