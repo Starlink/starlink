@@ -44,61 +44,76 @@ stdout, then generates an entity which contains the entire LaTeX file.
 
 <misccode>
 <description>Flow-object constructors for the document head
+<p>See the documentation of <funcname/%latex-document-preamble%/ for the 
+interface with the `style file' defined there.
 <codebody>
 (element docinfo
   (let* ((title (getdocinfo 'title))
-	 (authorlist (children (getdocinfo 'authorlist)))
+	 (authorlist (getdocinfo 'authorlist))
 	 (rel (document-release-info))
-	 (vers (car (cdr (cdr rel))))
+	 (copy (getdocinfo 'copyright))
 	 (date (format-date (car rel)))
 	 (docref (getdocnumber))
 	 (abstract (getdocbody 'abstract)))
-  (make sequence
-    (make empty-command name: "thispagestyle" parameters: '("empty"))
-    (make fi data: "\\noindent CCLRC / {\\sc Rutherford Appleton Laboratory}")
-    (make fi data: (if docref (string-append "\\hfill{\\bf " docref "}") ""))
-    (make fi data: "\\\\{\\large Particle Physics \\& Astronomy Research Council}\\\\{\\large Starlink Project\\\\}")
-    (make fi data: (if docref
-		 (string-append "{\\large "
-				(getdocnumber (current-node) #t)
-				"}")
-		 ""))
-    (make environment name: "flushright"
-	  (let loop ((nl authorlist)
-		     (sep ""))
-	    (if (node-list-empty? nl)
-		(empty-sosofo)
-		(sosofo-append (literal sep)
-			       (process-node-list (node-list-first nl))
-			       (loop (node-list-rest nl)
-				     ", "))))
-	  (make fi data: (string-append "\\\\" date)))
-    (make empty-command name: "vspace" parameters: '("-4mm"))
-    (make empty-command name: "rule" parameters: '("\\textwidth" "0.5mm"))
-    (make empty-command name: "vspace" parameters: '("5mm"))
-    (make environment name: "center"
-	  (make fi data: (string-append "{\\Huge\\bf "
-				  (data title)
-				  "}\\\\[4ex]")))
-    (make empty-command name: "vspace" parameters: '("5mm"))
+  (make environment name: "FrontMatter"
+    (make command name: "setTitle" (process-node-list title))
+    (make command name: "setDate"  (literal date))
+    (make command name: "setAuthorlist"
+	  (with-mode in-docinfo (process-node-list authorlist)))
     (if abstract
-	(make sequence
-	  (make empty-command name: "vspace" parameters: '("10mm"))
-	  (make environment name: "center"
-		(make fi data: "{\\Large\\bf Abstract}"))
-	  (make environment name: "flushleft"
-		(with-mode in-docinfo
-		  (process-node-list abstract))))
+	(make command name: "setAbstract"
+	      (with-mode in-docinfo (process-node-list abstract)))
 	(empty-sosofo))
-    (make empty-command name: "cleardoublepage")
-    (make empty-command name: "renewcommand"
-	  parameters: '("\\thepage" "\\arabic{page}"))
-    (make empty-command name: "setcounter" parameters: '("page" "1")))))
+    (if docref
+	(make sequence
+	  (make empty-command name: "setDocCode" parameters: (list docref))
+	  (make empty-command name: "setDocRef"
+		parameters: (list (getdocnumber (current-node) #t))))
+	(empty-sosofo))
+    (if copy
+	(make command name: "setCopyright" (process-node-list copy))
+	(empty-sosofo))
+    (make empty-command name: "MakeTitle")
+    (make environment name: "VersoTitlepage"
+	  (make environment name: "tabular"
+		parameters: '("rl")
+		(make fi data:
+		      "\\multicolumn{2}{l}{\\emph{Document information}}\\\\")
+		(if (car rel)
+		    (make fi data: (string-append "Document date&"
+						  (format-date (car rel))
+						  "\\\\"))
+		    (empty-sosofo))
+		(if (cadr rel)
+		    (make fi data: (string-append "Last revised&"
+						  (format-date (cadr rel))
+						  "\\\\"))
+		    (empty-sosofo))
+		(if (caddr rel)
+		    (make fi data: (string-append "Version number&"
+						  (caddr rel)
+						  "\\\\"))
+		    (empty-sosofo))
+		(if (cadddr rel)
+		    (make fi data: (string-append "Distribution ID&"
+						  (cadddr rel)
+						  "\\\\"))
+		    (empty-sosofo))
+		))
+    (make empty-command name: "TableOfContents"))))
+
 
 (element abstract			;dealt with in docinfo element above
   (empty-sosofo))
 (mode in-docinfo
   (element abstract
-    (process-children)))
-(element author
-  (process-children))
+    (process-children))
+  (element authorlist
+    (make environment name: "fmtAuthorlist"
+	  (process-children-trim)))
+  (element author
+    (make command name: "fmtAuthor"
+	  (process-children-trim)))
+  (element otherauthors
+    (make environment name: "fmtOtherAuthors"
+	  (process-children-trim))))

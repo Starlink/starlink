@@ -62,7 +62,7 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
 ;;; Phrase markup
 
 (element code
-  (make command name: "texttt"
+  (make command name: "Code"
 	(process-children)))
 
 (element em
@@ -70,17 +70,15 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
     (process-children)))
 
 (element kbd
-  (make command name: "texttt"
+  (make command name: "Kbd"
 	(process-children)))
 
 (element quote
-  (make sequence
-    (literal "`")
-    (process-children)
-    (literal "'")))
+  (make command name: "Quote"
+	(process-children)))
 
 (element strong
-  (make command name: "emph"
+  (make command name: "Strong"
     (process-children)))
 
 ;;; Lists
@@ -91,7 +89,7 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
 
 (element dt
   (make empty-command name: "item"
-	parameters: (string-append "?" (data (current-node)))))
+	parameters: (list (string-append "?" (data (current-node))))))
 
 (element dd
   (process-children))
@@ -120,7 +118,7 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
     (process-children-trim)))
 
 (element cite
-  (make command name: "textit"
+  (make command name: "Cite"
     (process-children-trim)))
 
 (element blockquote
@@ -142,6 +140,6 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
       (literal " ]"))))
 
 (element draftnote
-  (make command name: "emph"
+  (make command name: "textbf"
 	(literal "Draft Note:")
 	(process-children)))

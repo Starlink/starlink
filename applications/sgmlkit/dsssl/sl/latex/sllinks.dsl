@@ -115,14 +115,14 @@ the element content followed by a footnote containing the URL.
 <code/url/ elements have the URL printed.
 <codebody>
 (element url
-  (make command name: "url"
+  (make command name: "Url"
 	(process-children-trim)))
 
 (element webref
   (make sequence
     (process-children-trim)
     (make empty-command
-      name: "urlfootnote"
+      name: "UrlFootnote"
       parameters: (list (attribute-string (normalize "url")
 					  (current-node))))))
 
