@@ -19,7 +19,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *    Import :
       INTEGER			ID			! Dataset identifier
@@ -40,10 +39,10 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
       DO I = 1, NDIM
-        CALL BDI_CHKAXIS( ID, I, OK, STATUS )
+        CALL BDI_AXCHK( ID, I, 'Data', OK, STATUS )
         CALL MSG_SETI ('I', I)
-        IF (OK) THEN
-          CALL BDI_GETAXLABEL( ID, I, LABEL, STATUS )
+        IF ( OK ) THEN
+          CALL BDI_AXGET0C( ID, I, 'Label', LABEL, STATUS )
           CALL MSG_SETC( 'LABEL', LABEL )
           CALL MSG_PRNT( ' ^I ^LABEL' )
         ELSE
