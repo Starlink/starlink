@@ -303,24 +303,24 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/DashedPathRecognizer.java:71: warning - Tag @see: missing #: "DashedPathRecognizer(SceneRecognizer, double, double, double)"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:175: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:52: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:54: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] "The number of digits used to determine gap between major axes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:175: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:52: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:54: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  This is
   [javadoc] our term for complex data structures that evolve with time."
@@ -716,8 +716,27 @@ javadoc-sources:
   [javadoc] "WhiteboardView is responsible for view-specific operations
   [javadoc]  on the document (cut, paste, print, etc.)  "
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/package-summary.html...
+  [javadoc] "AstStrings is a model for all the general text elements shown in
+  [javadoc]  an AST Plot (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "AstStrings is a model for all the general text elements shown in
+  [javadoc]  an AST Plot (i.e. those with element name "strings"). "
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
+  [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
+  [javadoc]  (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
+  [javadoc]  (i.e. floating point and integer) numbers. "
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - The first sentence is interpreted to be:
+  [javadoc] "PlotConfiguration is a repository for all the configuration information
+  [javadoc]  related to a Plot (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "PlotConfiguration is a repository for all the configuration information
+  [javadoc]  related to a Plot (i.e. the AST graphics configuration, plus
+  [javadoc]  addition information such as data limits and antialiasing state,
+  [javadoc]  which may be added).
+  [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: PlotConfigurator
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: PlotConfiguration
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: StoreConfigurator
@@ -735,30 +754,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: SelectCharacters
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawBasicFigure.java:38: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFreehandFigure.java:23: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawPathFigure.java:39: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/package.html: warning - Tag @link: reference not found: DrawGraphicsMenu
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/package-summary.html...
-  [javadoc] "AstStrings is a model for all the general text elements shown in
-  [javadoc]  an AST Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "AstStrings is a model for all the general text elements shown in
-  [javadoc]  an AST Plot (i.e. those with element name "strings"). "
-  [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
-  [javadoc]  (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
-  [javadoc]  (i.e. floating point and integer) numbers. "
-  [javadoc] "PlotConfiguration is a repository for all the configuration information
-  [javadoc]  related to a Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "PlotConfiguration is a repository for all the configuration information
-  [javadoc]  related to a Plot (i.e. the AST graphics configuration, plus
-  [javadoc]  addition information such as data limits and antialiasing state,
-  [javadoc]  which may be added).
-  [javadoc]  "
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/package-summary.html...
   [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
@@ -767,6 +762,7 @@ javadoc-sources:
   [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
   [javadoc]  figures to be made aware of any changes, i.e.<!-- --> composite figure
@@ -775,12 +771,14 @@ javadoc-sources:
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
   [javadoc]  figures to be made aware of any changes, i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFreehandFigure.java:23: warning - The first sentence is interpreted to be:
   [javadoc] "A figure that displays a polyline that can have its vertices moved,
   [javadoc]  intended for use as a freehand (i.e.<!-- --> many vertices) figure, same as
   [javadoc]  Polyline figure but can be identified as needing different treatment."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A figure that displays a polyline that can have its vertices moved,
   [javadoc]  intended for use as a freehand (i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawPathFigure.java:39: warning - The first sentence is interpreted to be:
   [javadoc] "DrawPathFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!-- --> figure creation, removal and transformations."
@@ -788,6 +786,8 @@ javadoc-sources:
   [javadoc] "DrawPathFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/package.html: warning - Tag @link: reference not found: DrawGraphicsMenu
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/jaiutil/package-summary.html...
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -858,11 +858,11 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStyleBox.java:16: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstTitle.html...
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisLabelControls.java:51: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisNumLabControls.java:46: warning - Tag @see: reference not found: AstNumerLabels
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
@@ -965,9 +965,9 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/CompositeElement.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/MultiStrokeRecognizer.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/Scene.java:28: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/recognition/SceneElement.html...
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: Tag @see: Malformed: Scene, StrokeElement, CompositeElement, ChoiceElement
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneRecognizer.java:16: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/StrokeElement.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/StrokeRecognizer.java:19: warning - @rating is an unknown tag.
@@ -1401,13 +1401,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/GraphLogger.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:23: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e. how to render a node if it
-  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Channel.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Delta.java:45: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Generator.java:31: warning - @rating is an unknown tag.
@@ -1417,6 +1410,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/View.java:37: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Protocol.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWEdge.java:18: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e. how to render a node if it
+  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWNode.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWPort.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/BasicLWEdge.java:24: warning - @rating is an unknown tag.
@@ -1688,7 +1688,7 @@ install:
 prepare:
 
 check_packages:
-[available] Feb 5, 2004 6:02:58 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Feb 6, 2004 6:00:43 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -2311,10 +2311,10 @@ dist:
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 136 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 141 files to /apps/cvsbuild/starjava/docs
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 8 minutes 36 seconds
+Total time: 9 minutes 44 seconds

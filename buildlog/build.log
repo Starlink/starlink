@@ -94,7 +94,7 @@ build:
 prepare:
 
 check_packages:
-[available] Feb 5, 2004 5:14:25 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Feb 6, 2004 5:13:54 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -297,7 +297,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 155 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 156 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 65 files to /apps/cvsbuild/java/source/splat/build/classes
@@ -418,10 +418,10 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/build/classes
-    [javac] Compiling 93 source files to /apps/cvsbuild/java/source/frog/build/classes
+    [javac] Compiling 98 source files to /apps/cvsbuild/java/source/frog/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 12 files to /apps/cvsbuild/java/source/frog/build/classes
+     [copy] Copying 13 files to /apps/cvsbuild/java/source/frog/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/lib/frog
      [copy] Copying 1 file to /apps/cvsbuild/java/source/frog/lib/frog
 
@@ -446,4 +446,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 41 seconds
+Total time: 1 minute 59 seconds

@@ -5644,6 +5644,7 @@ U java/source/frog/src/main/uk/ac/starlink/frog/ast/package.html
 cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/data
 U java/source/frog/src/main/uk/ac/starlink/frog/data/AnalyticSeries.java
 U java/source/frog/src/main/uk/ac/starlink/frog/data/DataLimits.java
+U java/source/frog/src/main/uk/ac/starlink/frog/data/DrawSimpleLineOnGramImpl.java
 U java/source/frog/src/main/uk/ac/starlink/frog/data/Ephemeris.java
 U java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java
 U java/source/frog/src/main/uk/ac/starlink/frog/data/FITSTimeSeriesImpl.java
@@ -5750,9 +5751,14 @@ U java/source/frog/src/main/uk/ac/starlink/frog/plot/package.html
 cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/util
 U java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java
 U java/source/frog/src/main/uk/ac/starlink/frog/util/FrogException.java
+U java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServer.java
+U java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServices.java
 U java/source/frog/src/main/uk/ac/starlink/frog/util/JPEGUtility.java
 U java/source/frog/src/main/uk/ac/starlink/frog/util/Percentile.java
+U java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteServer.java
+U java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteUtilities.java
 U java/source/frog/src/main/uk/ac/starlink/frog/util/Utilities.java
+U java/source/frog/src/main/uk/ac/starlink/frog/util/deploy.wsdd
 U java/source/frog/src/main/uk/ac/starlink/frog/util/package.html
 cvs checkout: Updating java/source/frog/src/script
 U java/source/frog/src/script/runFROG
@@ -5786,6 +5792,9 @@ U java/source/frog/test/V405Aur/300397.bjd
 U java/source/frog/test/V405Aur/310397.bjd
 U java/source/frog/test/V405Aur/rband.bjd
 U java/source/frog/test/V405Aur/soft.bjd
+cvs checkout: Updating java/source/frog/test/perl_scripts
+U java/source/frog/test/perl_scripts/display_series.pl
+U java/source/frog/test/perl_scripts/get_version.pl
 cvs checkout: Updating java/source/hds
 U java/source/hds/.properties
 U java/source/hds/build.xml
@@ -8373,6 +8382,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/AbstractFunctionFitter.ja
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AsciiFileParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AvailableLocales.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AverageFilter.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/CmpFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/CompositeFunctionFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/CrossCorrelate.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/ExceptionDialog.java
