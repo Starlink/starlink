@@ -1,0 +1,79 @@
+{+
+{  Name:
+{     RADEC.ICL
+
+{  Purpose:
+{     Plot the PPDOTDIAG example using RA DEC labels
+
+{  Language:
+{     ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/radec.icl
+
+{  Description:
+{     Demonstrate RA and DEC labelling of axis.
+
+{  Authors:
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     30-MAY-1996 (PDRAPER):
+{        Original version.
+
+{  Bugs:
+
+{-
+
+{  Prompt for and read the name of a graphics device.
+INPUT "Graphics device name: " (GDNAME)
+
+{  Begin a PONGO plot.
+BEGPLOT (GDNAME)
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set the columns to read from the data file.
+XCOLUMN RA
+YCOLUMN Declination
+EXCOLUMN 0
+EYCOLUMN 0
+LABCOLUMN 1
+SYMCOLUMN 2
+
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SELCOND='pdot > 0' ~
+      NOALL NOQUICK RESET
+
+{  Convert the X- and Y-axis data to radians.
+DEGTOR X
+DEGTOR Y
+
+{  Set the Y-axis style and the plot limits.
+SETGLOBAL PONGO_XOPT BCNSTZHG
+SETGLOBAL PONGO_YOPT BCNSTZDG
+LIMITS 5.5 4.5 -0.2 0.2
+
+{  Draw the box and plot the points.
+LWEIGHT 2
+CHANGE FONT=3
+BOXFRAME 
+LWEIGHT 1
+CHANGE CHEIGHT=3
+POINTS
+CHANGE CHEIGHT=1
+
+{  Note how the X-axis label is picked up from the data file.
+LWEIGHT 2
+LABEL COLUMNS TITLE='Pulsar Positions'
+
+{  End the PONGO plot.
+ENDPLOT
+{
+{ $Id$

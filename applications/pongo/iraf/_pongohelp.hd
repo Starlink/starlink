@@ -1,0 +1,6 @@
+# Help definitions for the pongohelp package
+pongohelp men = pongohelp.men,
+         hlp = ..,
+         sys = pongohelp.hlp,
+         pkg = pongohelp.hd,
+         src = pongohelp.cl

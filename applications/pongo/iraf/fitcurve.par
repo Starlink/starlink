@@ -1,0 +1,11 @@
+action,s,a,"POLY",,,"Type of curve to be fitted"
+npoly,i,a,2,,,"Order of polynomial or splines"
+weight,b,h,yes,,,"Derive statistical weights from the Y-axis error data?"
+smooth,r,h,0.0,,,"Spline fit smoothing factor (>=0)"
+colour,i,h,2,,,"Colour used for plotting the fitted curve"
+polycoef,struct,h,,,,"Output polynomial coefficients"
+0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+polyfile,s,h,"POLYFILE.dat",,,"File to contain polynomial coefficients"
+splinefile,s,h,"SPLINEFILE.dat",,,"Output file for spline fit parameters"
+xmin,r,a,0.0,,,"Minimum X value used in fit"
+xmax,r,a,10000.0,,,"Maximum X value used in fit"

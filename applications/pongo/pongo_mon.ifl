@@ -1,0 +1,3523 @@
+monolith PONGO
+#+
+#  Name:
+#     ANNOTATE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     28-OCT-1994 (PDRAPER):
+#        Sorted ppaths to correspond with descriptions.
+#     {enter_further_changes_here}
+#
+#-
+
+interface ANNOTATE
+
+   helplib 'PONGO_HELP:'
+
+   parameter XOFF                # The X coordinate offset
+      type     '_REAL'
+      position 1
+      prompt   'X-offset for the labels'
+      default  0.0
+      vpath    'DYNAMIC,DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter YOFF                # The Y coordinate offset
+      type     '_REAL'
+      position 2
+      prompt   'Y-offset for the labels'
+      default  0.0
+      vpath    'DYNAMIC,DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter JUSTIFICATION       # Annotation justification
+      type     '_REAL'
+      position 3
+      prompt   'Justification for the labels'
+      range    0.0,1.0
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION          # Plotting geometry
+      type     '_CHAR'
+      access   'READ'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE            # The RA centre of the geometry
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE           # The Dec centre of the geometry
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)annotate.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     ARC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     28-OCT-1994 (PDRAPER):
+#        Sorted ppaths so that they correspond with descriptions.
+#     {enter_further_changes_here}
+
+#-
+
+interface ARC
+
+   helplib 'PONGO_HELP:'
+
+   parameter A
+      type     '_REAL'
+      position 1
+      prompt   'Semi-major axis'
+      default  1.0
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter B
+      type     '_REAL'
+      position 2
+      prompt   'Semi-minor axis'
+      default  1.0
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter X0
+      type     '_DOUBLE'
+      position 3
+      prompt   'X-coordinate of the centre'
+      default  0.0
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Y0
+      type     '_DOUBLE'
+      position 4
+      prompt   'Y-coordinate of the centre'
+      default  0.0
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PASTART
+      type     '_REAL'
+      position 5
+      prompt   'Position angle start'
+      default  0.0
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PAEND
+      type     '_REAL'
+      position 6
+      prompt   'Position angle end'
+      default  360.0
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ROTATION
+      type     '_REAL'
+      position 7
+      prompt   'Rotation of axes'
+      default  0.0
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter FROMDATA
+      type     '_LOGICAL'
+      access   'READ'
+      prompt   'Get arc values from data'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION
+      type     '_CHAR'
+      access   'READ'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter ERSCALE
+      type     '_REAL'
+      access   'READ'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_ERSCALE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)arc.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     AVEDAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     28-OCT-1994 (PDRAPER):
+#        Changed ppath for XMIN anx XMAX to 'GLOBAL,DEFAULT'. This
+#        changes behaviour when the PROMPT keyword is used.
+#        (Previously using this keyword forced the use of the default
+#        values.)
+#     {enter_further_changes_here}
+#-
+
+interface AVEDAT
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      access   'READ'
+      position 1
+      prompt   'Type of average'
+      default  'X'
+      in       'X', 'N'
+      vpath    'PROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter NBIN
+      type     '_INTEGER'
+      position 2
+      prompt   'Number of bins or number of points per bin'
+      default  10
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XMIN
+      type     '_REAL'
+      access   'READ'
+      prompt   'X minimum'
+      default  0.0
+      vpath    'GLOBAL'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX
+      type     '_REAL'
+      access   'READ'
+      prompt   'X maximum'
+      default  1.0
+      vpath    'GLOBAL'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)avedat.ifl	1.5     07 Nov 1994     1
+#+
+#  Name:
+#     BEGPONGO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     10-AUG-93 (PCTR):
+#        Added ACTION parameter. Removed BASE and OVERLAY parameters.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     17-JUN-1994 (PDRAPER):
+#        Changed label parameter to prompt (default is '' which just
+#        picks any old label).
+#     {enter_further_changes_here}
+
+#-
+
+interface BEGPONGO
+
+   helplib 'PONGO_HELP:'
+
+   parameter DEVICE
+      type     'DEVICE'
+      position 1
+      prompt   'Name of display device'
+      default  xwindows
+      vpath    'GLOBAL,CURRENT,PROMPT'
+      ppath    'GLOBAL,CURRENT'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      helpkey  '*'
+   endparameter
+
+   parameter ACTION
+      type     '_CHAR'
+      position 2
+      default  'C'
+      in       'B', 'C', 'L'
+      prompt   'AGI database action on entry (B,C or L)'
+      ppath    'CURRENT,DEFAULT'
+      vpath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter CLEAR
+      type     '_LOGICAL'
+      position 3
+      default  TRUE
+      prompt   'Clear the display on entry?'
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERLAY
+      type     '_LOGICAL'
+      position 4
+      default  FALSE
+      prompt   'Overlay the AGI picture on entry?'
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LABEL
+      type     '_CHAR'
+      default  ' '
+      prompt   'AGI picture label to search for'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XMIN
+      type     '_REAL'
+      access   'WRITE'
+      default  0.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX
+      type     '_REAL'
+      access   'WRITE'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter YMIN
+      type     '_REAL'
+      access   'WRITE'
+      default  0.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter YMAX
+      type     '_REAL'
+      access   'WRITE'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter CHEIGHT
+      type     '_REAL'
+      access   'WRITE'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_CHEIGHT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)begpongo.ifl	1.6     07 Nov 1994     1
+#+
+#  Name:
+#     BOXFRAME.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     28-OCT-1994 (PDRAPER):
+#        Sorted ppaths to correspond with descriptions.
+#     {enter_further_changes_here}
+
+#-
+
+interface BOXFRAME
+
+   helplib 'PONGO_HELP:'
+
+   parameter XOPT
+      type     '_CHAR'
+      position 1
+      default  'BCNST'
+      prompt   'X-axis options'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XOPT'
+      helpkey  '*'
+   endparameter
+
+   parameter YOPT
+      type     '_CHAR'
+      position 2
+      prompt   'Y-axis options'
+      default  'BCNST'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YOPT'
+      helpkey  '*'
+   endparameter
+
+   parameter XTIC
+      type     '_REAL'
+      position 3
+      prompt   'Major tick mark interval on X-axis'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter YTIC
+      type     '_REAL'
+      position 4
+      prompt   'Major tick mark interval on Y-axis'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter NXSUB
+      type     '_INTEGER'
+      position 5
+      prompt   'Number of sub-ticks on X-axis'
+      default  0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter NYSUB
+      type     '_INTEGER'
+      position 6
+      prompt   'Number of sub-ticks on Y-axis'
+      default  0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)boxframe.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     CCMATH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     {enter_further_changes_here}
+
+#-
+
+interface CCMATH
+
+   helplib 'PONGO_HELP:'
+
+   parameter X
+      type     '_CHAR'
+      default  'X'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Y
+      type     '_CHAR'
+      default  'Y'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Z
+      type     '_CHAR'
+      default  'Z'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter EX
+      type     '_CHAR'
+      default  'EX'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter EY
+      type     '_CHAR'
+      default  'EY'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)ccmath.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     CHANGE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     28-OCT-1994 (PDRAPER):
+#        Sorted out ppaths to correspond to descriptions.
+#     31-MAY-1996 (PDRAPER):
+#        Changed fill style upper limit to 4. Added hatch style options.
+#     {enter_further_changes_here}
+
+#-
+
+interface CHANGE
+
+   helplib 'PONGO_HELP:'
+
+   parameter COLOUR
+      type     '_INTEGER'
+      default  1
+      range    0, 255
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter CHEIGHT
+      type     '_REAL'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_CHEIGHT'
+      helpkey  '*'
+   endparameter
+
+   parameter FONT
+      type     '_INTEGER'
+      default  1
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter FILLSTY
+      type     '_INTEGER'
+      default  2
+      range    1, 4
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LINESTY
+      type     '_INTEGER'
+      default  1
+      range    1, 5
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LINEWID
+      type     '_INTEGER'
+      default  1
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ANGLE
+      type     '_REAL'
+      default  45.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Hatch angle'
+   endparameter
+
+   parameter SEPARATION
+      type     '_REAL'
+      default  1.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Hatch separation'
+   endparameter
+
+   parameter PHASE
+      type     '_REAL'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Hatch phase'
+   endparameter
+
+   parameter TEXTBACK
+      type     '_INTEGER'
+      default  -1
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Colour of text background'
+   endparameter
+
+endinterface
+# @(#)change.ifl	1.6     31 May 1996     1
+#+
+#  Name:
+#     CLEAR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     {enter_further_changes_here}
+
+#-
+
+interface CLEAR
+
+   helplib 'PONGO_HELP:'
+
+   parameter SCREEN
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter DATA
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LIMITS
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LABLST
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter AGI
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ERSCALE
+      type     '_REAL'
+      access   'READ'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_ERSCALE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)clear.ifl	1.5     07 Nov 1994     1
+#+
+#  Name:
+#     CLLOG.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     {enter_further_changes_here}
+
+#-
+
+interface CLLOG
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      position 1
+      prompt   'Column to take the LOG of'
+      default  'X'
+      in       'X', 'Y', 'Z'
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XOPT
+      access   'UPDATE'
+      type     '_CHAR'
+      vpath    'GLOBAL,NOPROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.PONGO_XOPT'
+      helpkey  '*'
+   endparameter
+
+   parameter YOPT
+      access   'UPDATE'
+      type     '_CHAR'
+      vpath    'GLOBAL,NOPROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.PONGO_YOPT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)clog.ifl	1.5     07 Nov 1994     1
+#+
+#  Name:
+#     CURSE.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     PAH: Paul Harrison (Jodrell Bank)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     28-OCT-1994 (PDRAPER):
+#        Sorted ppaths to correspond to descriptions.
+#     {enter_further_changes_here}
+
+#-
+
+interface CURSE
+
+   helplib 'PONGO_HELP:'
+
+   parameter SYMBOL
+      type     '_INTEGER'
+      access   'READ'
+      default  1
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LABEL
+      type    '_CHAR'
+      vpath   'PROMPT'
+      ppath   'CURRENT'
+      prompt  'Enter a label'
+      helpkey  '*'
+    endparameter
+
+   parameter JUSTIFICATION
+      type     '_REAL'
+      access   'READ'
+      default  0.5
+      range    0.0, 1.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XCURSE
+      type     '_REAL'
+      default  0.0
+      vpath    'CURRENT,DEFAULT,NOPROMPT'
+      ppath    'CURRENT,DEFAULT'
+      association '->GLOBAL.PONGO_XCURSE'
+      helpkey  '*'
+   endparameter
+
+   parameter YCURSE
+      type     '_REAL'
+      default  0.0
+      vpath    'CURRENT,DEFAULT,NOPROMPT'
+      ppath    'CURRENT,DEFAULT'
+      association '->GLOBAL.PONGO_YCURSE'
+      helpkey  '*'
+   endparameter
+
+   parameter XMIN
+      type     '_REAL'
+      vpath    'GLOBAL,NOPROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX
+      type     '_REAL'
+      vpath    'GLOBAL,NOPROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter YMIN
+      type     '_REAL'
+      vpath    'GLOBAL,NOPROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.PONGO_YMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter YMAX
+      type     '_REAL'
+      vpath    'GLOBAL,NOPROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.PONGO_YMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION
+      type     '_CHAR'
+      access   'READ'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)curse.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     ELLIPSES.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths that correspond with documentation.
+#     {enter_further_changes_here}
+
+#-
+
+interface ELLIPSES
+
+   helplib 'PONGO_HELP:'
+
+   parameter AXES
+      type     '_LOGICAL'
+      position 1
+      default  FALSE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ERSCALE
+      type     '_REAL'
+      position 2
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '->GLOBAL.PONGO_ERSCALE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)ellipses.ifl	1.5     07 Nov 1994     1
+#+
+#  Name:
+#     ENDPONGO.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths to deal with forced prompt.
+#     {enter_further_changes_here}
+
+#-
+
+interface ENDPONGO
+
+   helplib 'PONGO_HELP:'
+
+   parameter COMMENT   
+      position 1
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Final viewport.'
+      prompt   'Comment for AGI database'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE   
+      type     'DEVICE'
+      position 2
+      prompt   'Name of display device'
+      vpath    'GLOBAL,CURRENT,PROMPT'
+      ppath    'GLOBAL,CURRENT'
+      association '<-GLOBAL.GRAPHICS_DEVICE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)endpongo.ifl	1.5     07 Nov 1994     1
+#+
+#  Name:
+#     ERRORBAR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths to deal with forced prompt.
+#     {enter_further_changes_here}
+
+#-
+
+interface ERRORBAR
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION   
+      type     '_CHAR'
+      position 1
+      prompt   'Direction of error bars'
+      default  'X'
+      in       'X', 'Y'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ERTERM   
+      type     '_REAL'
+      position 2
+      prompt   'Length of error bar terminal'
+      default  1.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SYMERR   
+      type     '_LOGICAL'
+      prompt   'Treat errors as symmetrical about data point?'
+      default  TRUE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)errorbar.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     FITCURVE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     30-AUG-1996 (PDRAPER):
+#        Added SMOOTH, removed Chebyshev references.
+#     {enter_further_changes_here}
+
+#-
+
+interface FITCURVE
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      position 1
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT '
+      default  'POLY'
+      in       'POLY','SPLINE'
+      prompt   'Type of curve to be fitted'
+      helpkey  '*'
+   endparameter
+
+   parameter NPOLY
+      position 2
+      type     '_INTEGER'
+      vpath    'PROMPT,GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  2
+      association '<->GLOBAL.PONGO_NPOLY'
+      prompt   'Order of polynomial or splines'
+      helpkey  '*'
+   endparameter
+
+   parameter WEIGHT
+      position 3
+      type     '_LOGICAL'
+      vpath    'CURRENT,PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Derive statistical weights from the Y-axis error data?'
+      helpkey  '*'
+   endparameter
+
+   parameter SMOOTH 
+      type    '_REAL'
+      vpath   'DYNAMIC,PROMPT,CURRENT,DEFAULT'
+      ppath   'DYNAMIC,CURRENT,DEFAULT'
+      default 0.0
+      prompt  'Spline fit smoothing factor (>=0)'
+      helpkey '*'
+   endparameter
+
+   parameter COLOUR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  2
+      prompt   'Colour used for plotting the fitted curve'
+      helpkey  '*'
+   endparameter
+
+   parameter POLYCOEF
+      type     '_DOUBLE'
+      access   'WRITE'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+      association '->GLOBAL.PONGO_POLYCOEF'
+      helpkey  '*'
+   endparameter
+
+   parameter SPLINEFILE
+      type     '_CHAR'
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  'SPLINEFILE.dat'
+      association '<->GLOBAL.PONGO_SPLINEF'
+      prompt   'File to store spline fit parameters'
+      helpkey  '*'
+   endparameter
+
+   parameter POLYFILE
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'POLYFILE.dat'
+      prompt   'File to store polynomial coefficients'
+      helpkey  '*'
+   endparameter
+
+   parameter XMIN
+      type     '_REAL'
+      access   'READ'
+      prompt   'X minimum'
+      default  0.0
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX
+      type     '_REAL'
+      access   'READ'
+      prompt   'X maximum'
+      default  1.0
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+endinterface
+
+#+
+#  Name:
+#     FITLINE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     1-DEC-1992 (PCTR):
+#     	 Added COLOUR parameter for continuity with FITCURVE.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths. Now uses same values when forced to prompt.
+#     {enter_further_changes_here}
+#-
+
+interface FITLINE
+
+   helplib 'PONGO_HELP:'
+
+   parameter COLOUR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  2
+      position 1
+      helpkey  '*'
+   endparameter
+
+   parameter WEIGHT
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      helpkey  '*'
+   endparameter
+      
+   parameter XMIN   # [parameter_comment]
+      type     '_REAL'
+      access   'READ'
+      default  0.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX   # [parameter_comment]
+      type     '_REAL'
+      access   'READ'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)fitline.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     GETPOINT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JBVAD::PAH: Paul Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     {enter_further_changes_here}
+
+#-
+
+interface GETPOINT
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      access   'READ'
+      position 1
+      prompt   'Way to obtain point'
+      default  'N'
+      in       'N', 'C'
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter VALUE
+      type     '_CHAR'
+      position 2
+      prompt   'Value to use in search for point'
+      default  '1'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter X
+      type     '_REAL'
+      access   'WRITE'
+      default  0.0
+      vpath    'DEFAULT,NOPROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Y
+      type     '_REAL'
+      access   'WRITE'
+      default  0.0
+      vpath    'DEFAULT,NOPROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Z
+      type     '_REAL'
+      access   'WRITE'
+      default  0.0
+      vpath    'DEFAULT,NOPROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter EX
+      type     '_REAL'
+      access   'WRITE'
+      default  0.0
+      vpath    'DEFAULT,NOPROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter EY
+      type     '_REAL'
+      access   'WRITE'
+      default  0.0
+      vpath    'DEFAULT,NOPROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SYMBOL
+      type     '_INTEGER'
+      access   'WRITE'
+      default  0
+      vpath    'DEFAULT,NOPROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LABEL
+      type     '_CHAR'
+      access   'WRITE'
+      default  ' '
+      vpath    'DEFAULT,NOPROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)getpoint.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     GPOINTS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: Paul Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-FEB-1992 (JBVAD::PAH):
+#     	 Original version.
+#     12-FEB-1992 (JBVAD::PAH):
+#     	 Remove the 'M' option from the ACTION - now done in PRIM.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths to deal with forced prompts and accepts in similar
+#        ways.
+#     {enter_further_changes_here}
+#-
+
+interface GPOINTS
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION   # [parameter_comment]
+      type     '_CHAR'
+      position 1
+      default  'P'
+      prompt   'Type of connection to be made between data points'
+      in       'P','S','C'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SYMBOL   # [parameter_comment]
+      type     '_INTEGER'
+      position 2
+      default  1
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SCALE   # [parameter_comment]
+      type     '_REAL'
+      default  1.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION   # [parameter_comment]
+      type     '_CHAR'
+      access   'READ'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE   # [parameter_comment]
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE   # [parameter_comment]
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)gpoints.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     GRID.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#         Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface GRID
+
+   helplib 'PONGO_HELP:'
+
+   parameter PHIMIN
+      type     '_DOUBLE'
+      position 1
+      prompt   'Longitude lower bound'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PHIMAX
+      type     '_DOUBLE'
+      position 2
+      prompt   'Longitude upper bound'
+      default  360.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PHISTEP
+      type     '_DOUBLE'
+      position 3
+      prompt   'Longitude step'
+      default  29.999999999999
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter THEMIN
+      type     '_DOUBLE'
+      position 4
+      prompt   'Latitude lower bound'
+      default  -90.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter THEMAX
+      type     '_DOUBLE'
+      position 5
+      prompt   'Latitude upper bound'
+      default  90.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter THESTEP
+      type     '_DOUBLE'
+      position 6
+      prompt   'Latitude step'
+      default  9.9999999999999
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION
+      type     '_CHAR'
+      access   'READ'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)grid.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     GT_CIRCLE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     20-JUN-1994 (PDRAPER):
+#        Corrected PHIEND description to say "end" not "start".
+#     7-NOV-1994 (PDRAPER):
+#         Added various ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface GT_CIRCLE
+
+   helplib 'PONGO_HELP:'
+
+   parameter PHISTART
+      type     '_DOUBLE'
+      position 1
+      prompt   'Longitude of start of great circle'
+      default  0.0
+      vpath    'CURRENT,PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter THESTART
+      type     '_DOUBLE'
+      position 2
+      prompt   'Latitude of start of great circle'
+      default  0.0
+      vpath    'CURRENT,PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PHIEND
+      type     '_DOUBLE'
+      position 3
+      prompt   'Longitude of end of great circle'
+      default  0.0
+      vpath    'CURRENT,PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter THEEND
+      type     '_DOUBLE'
+      position 4
+      prompt   'Latitude of end of great circle'
+      default  0.0
+      vpath    'CURRENT,PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ACUTE
+      type     '_LOGICAL'
+      prompt   'TRUE if the smaller great circle arc is to be drawn between points'
+      default  TRUE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION
+      type     '_CHAR'
+      access   'READ'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)gt_circle.ifl	1.10     07 Nov 1994     1
+#+
+#  Name:
+#     INQUIRE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     {enter_further_changes_here}
+
+#-
+
+interface INQUIRE
+
+   helplib 'PONGO_HELP:'
+
+   parameter PGPLOT
+      type     '_LOGICAL'
+      access   'READ'
+      prompt   'Display current PGPLOT settings?'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter LIMITS
+      type     '_LOGICAL'
+      access   'READ'
+      prompt   'Display information on limits?'
+      default  FALSE
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter COLUMNS
+      type     '_LOGICAL'
+      access   'READ'
+      prompt   'Display data file column headings?'
+      default  FALSE
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICES
+      type     '_LOGICAL'
+      access   'READ'
+      prompt   'Display graphics devices available?'
+      default  FALSE
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter DATA
+      type     '_LOGICAL'
+      access   'READ'
+      prompt   'Display all of the data?'
+      default  FALSE
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PAGE   # This is the page length of the terminal
+      type     '_INTEGER'
+      prompt   'Page length of terminal'
+      default  24
+      range    1, 100
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter FROM
+      type     '_INTEGER'
+      prompt   'Number of first item to be displayed'
+      default  0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter TO
+      type     '_INTEGER'
+      prompt   'Number of last item to be displayed'
+      default  0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)inquire.ifl	1.5     07 Nov 1994     1
+#+
+#  Name:
+#     LABEL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     {enter_further_changes_here}
+
+#-
+
+interface LABEL
+
+   helplib 'PONGO_HELP:'
+
+   parameter XLABEL
+      type     '_CHAR'
+      position 1
+      default  ' '
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      vpath    'DYNAMIC,GLOBAL,PROMPT,DEFAULT'
+      association '<->GLOBAL.PONGO_XLABEL'
+      helpkey  '*'
+   endparameter
+
+   parameter YLABEL
+      type     '_CHAR'
+      position 2
+      default  ' '
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      vpath    'DYNAMIC,GLOBAL,PROMPT,DEFAULT'
+      association '<->GLOBAL.PONGO_YLABEL'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE
+      type     '_CHAR'
+      position 3
+      default  ' '
+      ppath    'GLOBAL,DEFAULT'
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      association '<->GLOBAL.PONGO_TITLE'
+      helpkey  '*'
+   endparameter
+
+   parameter COLUMNS
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)label.ifl	1.5     07 Nov 1994     1
+#+
+#  Name:
+#     PALETTE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PCTR: P.C.T. Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (PCTR):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface PALETTE
+
+   helplib 'PONGO_HELP:'
+
+   parameter COLOUR              # [parameter_comment]
+      type     '_INTEGER'
+      position 1
+      default  1
+      range    0, 255
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      helpkey  '*'
+   endparameter                     
+
+   parameter RED                 # [parameter_comment]
+      type     '_REAL'
+      position 2
+      default  1.0
+      range    0.0, 1.0
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      helpkey  '*'
+   endparameter
+
+   parameter GREEN                 # [parameter_comment]
+      type     '_REAL'
+      position 3
+      default  1.0
+      range    0.0, 1.0
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      helpkey  '*'
+   endparameter
+
+   parameter BLUE                # [parameter_comment]
+      type     '_REAL'
+      position 4
+      default  1.0
+      range    0.0, 1.0
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)palette.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     PAPER.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     {enter_further_changes_here}
+
+#-
+
+interface PAPER
+
+   helplib 'PONGO_HELP:'
+
+   parameter WIDTH
+      type     '_REAL'
+      position 1
+      prompt   'Width of plotting surface in inches'
+      default  0.0
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ASPECT
+      type     '_REAL'
+      position 2
+      prompt   'Aspect ratio of plotting surface'
+      default  1.0
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)paper.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     PLOTFUN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Removed NOPROMPTS during UNIX port.
+#     {enter_further_changes_here}
+
+#-
+
+interface PLOTFUN
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      access   'READ'
+      position 1
+      prompt   'Type of function to be plotted'
+      default  'FUNC'
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT'
+      in       'FUNC', 'POLY', 'SPLINE'
+      helpkey  '*'
+   endparameter
+
+   parameter EXPRESSION
+      type     '_CHAR'
+      access   'READ'
+      position 2
+      prompt   'Expression to be plotted'
+      default  'X'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XMIN
+      type     '_REAL'
+      access   'READ'
+      position 3
+      prompt   'Smallest X-value to plot function'
+      vpath    'GLOBAL'
+      ppath    'GLOBAL'
+      association '<-GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX
+      type     '_REAL'
+      access   'READ'
+      position 4
+      prompt   'Largest X-value to plot function'
+      vpath    'GLOBAL'
+      ppath    'GLOBAL'
+      association '<-GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter INFILE
+      type     '_CHAR'
+      access   'READ'
+      prompt   'Read polynomial coefficients from file'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+   endparameter
+
+   parameter NPOLY
+      type     '_INTEGER'
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  2
+      association '<->GLOBAL.PONGO_NPOLY'
+      prompt   'Order of polynomial'
+      helpkey  '*'
+   endparameter
+
+   parameter POLYCOEF
+      type     '_DOUBLE'
+      access   'READ'
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  0.0
+      association '<-GLOBAL.PONGO_POLYCOEF'
+      helpkey  '*'
+   endparameter
+
+   parameter SPLINEFILE
+      type     '_CHAR'
+      access   'READ'
+      vpath    'GLOBAL,PROMPT,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  'SPLINEFILE.dat'
+      association '<->GLOBAL.PONGO_SPLINEF'
+      prompt   'File containing spline fit parameters'
+      helpkey  '*'
+   endparameter
+
+   parameter POLYFILE
+      type     '_CHAR'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'POLYFILE.dat'
+      prompt   'File containing polynomial coefficients'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)plotfun.ifl	1.6     07 Nov 1994     1
+#+
+#  Name:
+#     PLOTHIST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added new ppaths.
+#     31-MAY-1996 (PDRAPER):
+#        Added FILL parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface PLOTHIST
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      access   'READ'
+      position 1
+      default  'H'
+      prompt   'Type of histogram function'
+      in       'H', 'B'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter BINMIN
+      type     '_REAL'
+      position 2
+      prompt   'Lower value for binning'
+      default  0.0
+      vpath    'CURRENT,GLOBAL,DEFAULT'
+      ppath    'CURRENT,GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter BINMAX
+      type     '_REAL'
+      position 3
+      prompt   'Upper value for binning'
+      default  1.0
+      vpath    'CURRENT,GLOBAL,DEFAULT'
+      ppath    'CURRENT,GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter NBIN
+      type     '_INTEGER'
+      position 4
+      prompt   'Number of bins'
+      default  10
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter AUTOSCALE
+      type     '_LOGICAL'
+      prompt   'Auto-scale?'
+      default  TRUE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter FILL
+      type     '_LOGICAL'
+      prompt   'Fill histograms?'
+      default  FALSE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)plothist.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     PRIM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added new ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface PRIM
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION   # [parameter_comment]
+      type     '_CHAR'
+      position 1
+      default  'K'
+      prompt   'Type of primitive data function'
+      in       'M','D','K'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter X   # [parameter_comment]
+      type     '_REAL'
+      position 2
+      prompt   'X-coordinate'
+      default  0.0
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Y   # [parameter_comment]
+      type     '_REAL'
+      position 3
+      prompt   'Y-coordinate'
+      default  0.0
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SYMBOL   # [parameter_comment]
+      type     '_INTEGER'
+      position 4
+      default  1
+      prompt   'PGPLOT symbol number for marking'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION   # [parameter_comment]
+      type     '_CHAR'
+      access   'READ'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE   # [parameter_comment]
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE   # [parameter_comment]
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)prim.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     PVECT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface PVECT
+
+   helplib 'PONGO_HELP:'
+
+   parameter ERSCALE
+      type     '_REAL'
+      position 1
+      prompt   'Scale factor for multiplying vectors'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_ERSCALE'
+      helpkey  '*'
+   endparameter
+
+   parameter ZMULT
+      type     '_LOGICAL'
+      access   'READ'
+      prompt   'Are Z-values to be used to multiply the vectors?'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION
+      type     '_CHAR'
+      access   'READ'
+      default  'TAN'
+      in       'TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE
+      type     '_CHAR'
+      access   'READ'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      vpath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)pvect.ifl	1.4     07 Nov 1994     1
+#+                    
+#  Name:
+#     READF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     PAH: Paul Harrison (JBVAD::PAH)
+#     PCTR: Paul Rees (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#      8-FEB-1990 (JBVAD::PAH):
+#	 Original version.
+#     1-AUG-1990 (JBVAD::PAH):
+#        The Quick parameter was added
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     1994 May 4 (MJC):
+#     	 Made ERSCALE write its value to the PONGO_ERSCALE global value
+#	 as described in the documentation for ELLIPSES.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Sorted ppaths to work more consistently.
+#     {enter_further_changes_here}
+
+#-
+
+interface READF
+
+   helplib 'PONGO_HELP:'
+
+   parameter DATA   # [parameter_comment]
+      type     '_CHAR'
+      position  1
+      prompt   'Data file name'
+      vpath    'GLOBAL,CURRENT,PROMPT'
+      ppath    'GLOBAL,CURRENT'
+      association '<->GLOBAL.PONGO_DATA'
+      helpkey  '*'
+   endparameter
+
+   parameter HARDCOM   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Hard comment character'
+      default  '!'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SOFTCOM   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Soft comment character'
+      default  '!'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XCOL   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column for X-axis data'
+      default  '0'
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.PONGO_XCOL'
+      helpkey  '*'
+   endparameter
+
+   parameter YCOL   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column for Y-axis data'
+      default  '0'
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.PONGO_YCOL'
+      helpkey  '*'
+   endparameter
+
+   parameter ZCOL   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column for Z-axis data'
+      default  '0'
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.PONGO_ZCOL'
+      helpkey  '*'
+   endparameter
+
+   parameter EXCOL   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column for X-axis errors'
+      default  '0'
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.PONGO_EXCOL'
+      helpkey  '*'
+   endparameter
+
+   parameter EYCOL   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column for Y-axis errors'
+      default  '0'
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.PONGO_EYCOL'
+      helpkey  '*'
+   endparameter
+
+   parameter LABCOL   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column for labels'
+      default  '0'
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.PONGO_LABCOL'
+      helpkey  '*'
+   endparameter
+
+   parameter SYMCOL   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column for plot symbols'
+      default  '0'
+      vpath    'GLOBAL,CURRENT,DEFAULT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.PONGO_SYMCOL'
+      helpkey  '*'
+   endparameter
+
+   parameter DELIM   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Characters used as column delimiters'
+      default  ' '
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter FROM   # [parameter_comment]
+      type     '_INTEGER'
+      prompt   'First line of the file to be read'
+      default  0
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter TO   # [parameter_comment]
+      type     '_INTEGER'
+      prompt   'Last line of the file to be read'
+      default  0
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SELCOND   # [parameter_comment]
+      type     '_CHAR'
+      prompt   'Column and condition to select on'
+      default  '0'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+  parameter XOPT   # [parameter_comment]
+      type     '_CHAR'
+      default  'BCNST'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XOPT'
+      helpkey  '*'
+   endparameter
+
+   parameter YOPT   # [parameter_comment]
+      type     '_CHAR'
+      default  'BCNST'
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YOPT'
+      helpkey  '*'
+   endparameter
+
+   parameter ERSCALE   # [parameter_comment]
+      type     '_REAL'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_ERSCALE'
+      helpkey  '*'
+   endparameter
+
+   parameter ADD   # [parameter_comment]
+      type     '_LOGICAL'
+      access   'READ'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ALL
+      type     '_LOGICAL'
+      default  TRUE
+      vpath    'CURRENT,PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter   QUICK
+      type     '_LOGICAL'
+      default  FALSE
+      prompt   'Use quick method for reading data?'
+      vpath    'DEFAULT,PROMPT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+  endparameter
+
+   parameter NDATA 
+      type     '_INTEGER'
+      access   'WRITE'
+      default  0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '->GLOBAL.PONGO_NDATA'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)readf.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     VECT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface VECT
+
+   helplib 'PONGO_HELP:'
+
+   parameter ERSCALE
+      type     '_REAL'
+      position 1
+      prompt   'Scale factor for multiplying vectors'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_ERSCALE'
+      helpkey  '*'
+   endparameter
+
+   parameter ZMULT
+      type     '_LOGICAL'
+      access   'READ'
+      position 2
+      prompt   'Are Z-values to be used to multiply the vectors?'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)vect.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     VIEWPORT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JBVAD::PAH: Paul Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface VIEWPORT
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      access   'READ'
+      position 1
+      prompt   'Method used to set viewport'
+      default  'STANDARD'
+      in       'STANDARD', 'ADJUST', 'NDC', 'INCHES'
+      vpath    'PROMPT,DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XVPMIN
+      type     '_REAL'
+      position 2
+      prompt   'Left hand side of the viewport'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XVPMAX
+      type     '_REAL'
+      position 3
+      prompt   'Right hand side of the viewport'
+      default  1.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter YVPMIN
+      type     '_REAL'
+      position 4
+      prompt   'Lower side of the viewport'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter YVPMAX
+      type     '_REAL'
+      position 5
+      prompt   'Upper side of the viewport'
+      default  1.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XMIN
+      type     '_REAL'
+      access   'READ'
+      default  0.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX
+      type     '_REAL'
+      access   'READ'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter YMIN
+      type     '_REAL'
+      access   'READ'
+      default  0.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_YMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter YMAX
+      type     '_REAL'
+      access   'READ'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT,NOPROMPT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_YMAX'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)viewport.ifl	1.4     07 Nov 1994     1
+#+
+#  Name:
+#     WORLD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: P.A. Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-APR-1992 (JBVAD::PAH):
+#     	 Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     1994 May 4 (MJC):
+#     	 Added ERSCALE.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface WORLD
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION   
+      type     '_CHAR'
+      position 1
+      prompt   'Method of obtaining coordinates'
+      default  'GIVEN'
+      in       'GIVEN', 'DATA', 'DATA0', 'RECALL'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XMIN   
+      type     '_REAL'
+      position 2
+      prompt   'X minimum'         
+      default  0.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX   
+      type     '_REAL'
+      position 3
+      prompt   'X maximum'
+      default  1.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter YMIN   
+      type     '_REAL'
+      position 4
+      prompt   'Y minimum'
+      default  0.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter YMAX   
+      type     '_REAL'
+      position 5
+      prompt   'Y maximum'
+      default  1.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter PICLAB
+      type     '_CHAR'
+      prompt   'The AGI picture label of the picture to recall'
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION   
+      type     '_CHAR'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE   
+      type     '_CHAR'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE   
+      type     '_CHAR'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter ERSCALE             # Error scaling factor
+      type     '_REAL'
+      default  1.0
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_ERSCALE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)world.ifl	1.6     20 Mar 1995     1
+#+
+#  Name:
+#     WRITEI.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: Paul Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-NOV-1990 (JBVAD::PAH):
+#        Original version.
+#     28-NOV-1990 (JBVAD::PAH):
+#        Added the AGI save.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX, changed FILENAME to LITERAL for parameter FILE.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface WRITEI
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      position 1
+      default  'LABLST'
+      prompt   'Entity to write'
+      in       'LABLST', 'DATA', 'AGIPIC'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter FILE
+      type     '_CHAR'
+      position 2
+      prompt   'Output file name'
+      default  'pongo.lis'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter FORMAT
+      type     '_CHAR'
+      prompt   'Fortran FORMAT to use'
+      default  'G25.16'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter AGINAME
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'DATA'
+      in       'DATA', 'FRAME'
+      prompt   'The AGI name for the picture'
+      helpkey  '*'
+   endparameter
+
+   parameter AGICOMMENT
+      type     '_CHAR'
+      vpath    'DEFAULT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'User viewport.'
+      prompt   'The AGI comment for the picture'
+      helpkey  '*'
+   endparameter
+
+   parameter AGILABEL
+      type     '_CHAR'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'PONGO'
+      prompt   'The AGI label for the picture'
+      helpkey  '*'
+   endparameter
+
+   parameter X
+      type     '_LOGICAL'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Y
+      type     '_LOGICAL'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter Z
+      type     '_LOGICAL'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter EX
+      type     '_LOGICAL'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter EY
+      type     '_LOGICAL'
+      default  FALSE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)writei.ifl	1.7     07 Nov 1994     1
+#+
+#  Name:
+#     WTEXT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     JBVAD::PAH: Paul Harrison (STARLINK)
+#     PCTR: Paul Rees (STARLINK)
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-JUN-1990 (JBVAD::PAH):
+#        Original version.
+#     2-FEB-1993 (PCTR):
+#     	 Added help library references.
+#     16-JUN-1994 (PDRAPER):
+#        Ported to UNIX.
+#     7-NOV-1994 (PDRAPER):
+#        Added ppaths.
+#     {enter_further_changes_here}
+
+#-
+
+interface WTEXT
+
+   helplib 'PONGO_HELP:'
+
+   parameter ACTION
+      type     '_CHAR'
+      position 1
+      default  'P'
+      in       'P', 'M', 'S'
+      prompt   'Text plotting algorithm'
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter XPOS
+      type     '_REAL'
+      position 2
+      prompt   'X-position of string'
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      helpkey  '*'
+   endparameter
+
+   parameter YPOS
+      type     '_REAL'
+      position 3
+      prompt   'Y-position of string'
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXT
+      type     '_CHAR'
+      position 4
+      prompt   'Text to be plotted'
+      default  ' '
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter SIDE
+      type     '_CHAR'
+      position 5
+      default  'T'
+      in       'T', 'B', 'L', 'R', 'LV', 'RV'
+      prompt   'Side of the plot to plot the text'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter JUSTIFICATION
+      type     '_REAL'
+      position 6
+      prompt   'Justification of the text'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter ANGLE
+      type     '_REAL'
+      position 7
+      prompt   'Angle at which the text is to be plotted'
+      default  0.0
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# @(#)wtext.ifl	1.4     07 Nov 1994     1
+
+#  Interface for SETGLOBAL
+
+interface SETGLOBAL
+   parameter PARAMETER
+      position 1
+      type  '_CHAR'
+      ppath 'CURRENT'
+      vpath 'PROMPT,CURRENT'
+   endparameter
+   parameter VALUE
+      position 2
+      type  '_CHAR'
+      ppath 'CURRENT'
+      vpath 'PROMPT,CURRENT'
+   endparameter
+endinterface
+
+#  Interface for GETGLOBAL
+
+interface GETGLOBAL
+   parameter PARAMETER
+      access 'READ'
+      position 1
+      type  '_CHAR'
+      ppath 'CURRENT'
+      vpath 'PROMPT,CURRENT'
+   endparameter
+   parameter VALUE
+      access 'WRITE'
+      type   '_CHAR'
+      vpath  'DEFAULT'
+      default ' '
+   endparameter
+endinterface
+# $Id$
+
+#  Interface for UNSETGLOBAL
+
+interface UNSETGLOBAL
+   parameter PARAMETER
+      access 'READ'
+      position 1
+      type  '_CHAR'
+      ppath 'CURRENT'
+      vpath 'PROMPT,CURRENT'
+   endparameter
+endinterface
+# $Id$
+
+#+
+#  Name:
+#     LIMITS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-APR-1997 (PDRAPER):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface LIMITS
+
+   helplib 'PONGO_HELP:'
+
+   parameter XMIN   
+      type     '_REAL'
+      position 1
+      prompt   'X minimum'         
+      default  0.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter XMAX   
+      type     '_REAL'
+      position 2
+      prompt   'X maximum'
+      default  1.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_XMAX'
+      helpkey  '*'
+   endparameter
+
+   parameter YMIN   
+      type     '_REAL'
+      position 3
+      prompt   'Y minimum'
+      default  0.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YMIN'
+      helpkey  '*'
+   endparameter
+
+   parameter YMAX   
+      type     '_REAL'
+      position 4
+      prompt   'Y maximum'
+      default  1.0
+      vpath    'DYNAMIC,GLOBAL,DEFAULT'
+      ppath    'DYNAMIC,GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_YMAX'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$
+
+#+
+#  Name:
+#     DRAWPOLY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: P.W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     30-APR-1997 (PDRAPER):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface DRAWPOLY
+
+   helplib 'PONGO_HELP:'
+
+   parameter FILL
+      position 1
+      type     '_LOGICAL'
+      default  TRUE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJECTION   
+      type     '_CHAR'
+      default  'NONE'
+      in       'NONE','TAN','SIN','ARC','GLS','AITOFF','MERCATOR','STG'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<-GLOBAL.PONGO_PROJECTN'
+      helpkey  '*'
+   endparameter
+
+   parameter RACENTRE   
+      type     '_CHAR'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_RACENTRE'
+      helpkey  '*'
+   endparameter
+
+   parameter DECCENTRE   
+      type     '_CHAR'
+      default  '0'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.PONGO_DECCENTRE'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$
+
+
+
+endmonolith

@@ -1,0 +1,8 @@
+pgplot,b,a,no,,,"Display current PGPLOT settings?"
+limits,b,a,no,,,"Display information on limits?"
+columns,b,a,no,,,"Display data file column headings?"
+devices,b,a,no,,,"Display graphics devices available?"
+data,b,a,no,,,"Display all of the data?"
+page,i,h,24,1,100,"Page length of terminal"
+from,i,h,0,,,"Number of first item to be displayed"
+to,i,h,0,,,"Number of last item to be displayed"

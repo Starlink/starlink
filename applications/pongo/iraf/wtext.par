@@ -1,0 +1,7 @@
+action,s,a,"p","|p|m|s|",,"Text plotting algorithm"
+xpos,r,a,0.0,,,"X-position of string"
+ypos,r,a,0.0,,,"Y-position of string"
+text,s,a,"PONGO",,,"Text to be plotted"
+side,s,a,"t",,,"Side of the plot to plot the text"
+justification,r,a,0.0,,,"Justification of the text"
+angle,r,a,0.0,,,"Angle at which the text is to be plotted"

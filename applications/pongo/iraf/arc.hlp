@@ -1,0 +1,74 @@
+.help arc Starlink pongohelp
+.nf
+Draw an arc of an ellipse.
+
+Usage:
+   arc a b x0 y0 pastart paend rotation
+
+Description:
+
+   A specified arc of an ellipse is drawn from the position angles of
+   the start and end of the arc, the semi axes, the position of the
+   centre and the rotation of the axes. If no parameters are
+   specified then whole ellipses can be drawn from the data stored in
+   the following data areas:
+
+      - XCOL -- X centre,
+
+      - YCOL -- Y centre,
+
+      - EXCOL -- semi-major axis,
+
+      - EYCOL -- semi-minor axis.
+
+Parameters:
+
+A = _REAL (Read and Write)
+   The semi-major axis of the ellipse.
+B = _REAL (Read and Write)
+   The semi-minor axis of the ellipse.
+X0 = _DOUBLE (Read and Write)
+   The X coordinate of the centre of the ellipse.
+Y0 = _DOUBLE (Read and Write)
+   The Y coordinate of the centre of the ellipse.
+PASTART = _REAL (Read and Write)
+   The position angle of the start of the arc (degrees).
+PAEND = _REAL (Read and Write)
+   The position angle of the end of the arc (degrees).
+ROTATION = _REAL (Read and Write)
+   The angle that the major axis makes with the horizontal
+   (degrees anti-clockwise).
+FROMDATA = _LOGICAL (Read)
+   If TRUE, the command will use the data already loaded to draw
+   whole ellipses, with positions and sizes specified as above.
+   [FALSE]
+PROJECTION = _CHAR (Read)
+   The geometry that is to be used to plot the arc.  This is
+   explained in detail in the section on projections.  Allowed
+   values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This paramerter is only
+   required for PROJECTION values other than "NONE".
+ERSCALE = _REAL (Read and Write)
+   The factor used to scale values in the EXCOL and EYCOL data
+   areas. This allows the ellipse axes lengths to be scaled,
+   changing the sizes of ellipses produced using the FROMFILE
+   parameter.
+
+Examples:
+
+po> arc 1 1 0 0
+   Draw a circle of radius 1 (world coordinates), assuming the
+   PASTART and PAEND parametes have their default parameters (0.0
+   and 360.0 degrees respectively).
+po> arc fromdata=yes
+   Draws arcs using the information read into the XCOL, YCOL, EXCOL
+   and EYCOL data areas.
+
+.endhelp

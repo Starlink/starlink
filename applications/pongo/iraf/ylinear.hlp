@@ -1,0 +1,14 @@
+.help ylinear Starlink pongohelp
+.nf
+Put 1 ... N into the YCOL data area.
+
+Usage:
+   ylinear
+
+Description:
+
+   Put the row number (i.e. 1 to NDATA) into the YCOL data area.
+
+   This command is a synonym for CCMATH Y=INDEX.
+
+.endhelp

@@ -1,0 +1,125 @@
+{+
+{  Name:
+{     AGI.ICL
+
+{  Purpose:
+{     Plot the AGI example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/agi
+
+{  Description:
+{     A PONGO ICL example file to plot AGI database demonstration.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     24-OCT-1992 (PCTR):
+{        Original version.
+{     1994 May 4 (MJC):
+{        Fixed two bugs (NOQUICK and READF) when reading the data file.
+{     24-JUN-1994 (PDRAPER):
+{        Ported to UNIX. Changed to use correct invocations for 
+{        BEGPLOT (no BASE parameter).
+
+{  Bugs:
+
+{-
+
+{  Define KAPPA.
+KAPPA
+
+{  Prompt for and read the name of an image display device.
+INPUT "Image display name: " (IDNAME)
+   
+{  Set the image display using KAPPA and clear the display.
+IDSET (IDNAME&'') ACCEPT
+IDCLEAR ACCEPT
+LUTGREY
+
+{  Go into PONGO and define a suitable viewport.
+BEGPLOT (IDNAME&'') ACTION=B
+VPORT 0.1 0.5 0.1 0.95
+ENDPLOT
+
+{  Go into KAPPA and display the image in the appropriate VIEWPORT.
+PICDATA
+DISPLAY INSTALL/bin/examples/pongo/dor MODE=PERC PERCENTILES=[3,99.9]
+LUTHEAT
+
+{  Go into PONGO and draw a box around the image.
+BEGPLOT (IDNAME&'') OVERLAY NOCLEAR ACTION=C
+BOX BCNST BCNST
+
+{  Draw a box around the subsection of the image to be displayed later.
+PEN 7
+MOVE 401 101
+DRAW 600 101
+DRAW 600 300
+DRAW 401 300
+DRAW 401 101
+PEN 1
+
+{  Set the viewport for a subsection of the plotted image.
+VPORT 0.6 0.95 0.1 0.5
+PEN 1
+ENDPLOT
+
+{  Use KAPPA to display part of the image in the new viewport.
+PICDATA
+NDF='@INSTALL/bin/examples/pongo/dor(401:600,101:300)'
+DISPLAY (NDF) MODE=PERC PERCENTILES=[3,99.9] ACCEPT
+
+{  Use PONGO to draw a perimeter around the second image.
+BEGPLOT (IDNAME&'') OVERLAY NOCLEAR ACTION=C
+DLIMITS 1.478621998 1.4789335396 -1.2063764659004 -1.2060661463594
+{ Hours & degrees -5.64792 -5.64911 -69.12028 -69.10250
+EXPAND 0.55
+BOX BCNSTZHG BCNSTZDG
+EXPAND 1
+WTEXT M 0.5 0.5 "30 Dor: region of interest" SIDE=T JUSTIFICATION=0.5
+WTEXT M 2 0.5 "Right Ascension" SIDE=B JUSTIFICATION=0.5
+WTEXT M 1 0.5 "Declination" SIDE=L JUSTIFICATION=0.5
+
+{  Define a new viewport and plot an AITOFF projection in it.
+PEN 1
+VP_TR
+EXPAND 0.7
+
+{  Read the postions of pulsars from the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SYMCOL=2 LABCOL=1 ~
+      XCOL=RA YCOL=Dec ZCOL=Dist SELCOND='Dist > 0' NOALL NOQUICK
+
+{  Convert the XCOL and YCOL data areas from degrees to radians.
+DEGTOR X
+DEGTOR Y
+
+{  Get the limits from the data using the AITOFF projection, note that the 
+{  RA centre is specified in the form of hh:mm:ss.sss and that below is 
+{  understood to mean 12 hours.
+DLIMITS PROJECTION=AITOFF RACENTRE=12 DECCENTRE=0
+
+{  Adjust the viewport.
+WNAD
+MTEXT T 1.0 0.5 0.5 'Aitoff centre \ga=12\uh\d \gd=0\(2729)'
+
+{  Draw the coordinate grid.
+GRID 
+
+{  Plot the points with various symbols.
+PEN 6
+POINTS
+ENDPLOT
+
+{ $Id$

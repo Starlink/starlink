@@ -1,0 +1,165 @@
+.help begpongo Starlink pongohelp
+.nf
+Open a plotting device.
+
+Usage:
+   begpongo [device] [action] [clear] [overlay]
+      { label=?
+      action
+
+Description:
+
+   Set up a device for subsequent PONGO plotting commands. This
+   application allows plotting onto an AGI picture created by a
+   different package (e.g. KAPPA), or the creation of a new base
+   picture.
+
+   If a picture created by a run of a previous application is made
+   (using either the "current" picture or selecting using a known
+   picture label see parameter ACTION) then it is possible to
+   overlay new graphics (such as annotations, lines etc.) using the
+   same coordinate system (see the OVERLAY parameter).
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ACTION
+
+ACTION = _CHAR (Read and Write)
+   If 'B', the plotting device will be cleared and the whole of
+   its plotting surface used. If equal to 'C', the current picture
+   will be used and a PGPLOT viewport created inside it. If 'L'
+   then a previously labelled picture (set using KAPPA:PICLABEL)
+   can be selected. Once set, this parameter will retain its value
+   in subsequent invocations of BEGPLOT.
+   ['C']
+
+CHEIGHT
+
+CHEIGHT = _REAL (Write)
+   The character height scaling factor. A value of 1.0 implies a
+   nominal character height of 1/40th the viewport height. The
+   value is set by the application from the height of the chosen
+   picture (unless the picture is the base one). The result is
+   written to the global parameter PONGO_CHEIGHT.
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   If TRUE then the current picture will be cleared of any
+   existing graphics.
+   [TRUE]
+
+DEVICE
+
+DEVICE = DEVICE (Read and Write)
+   The name of the device to be used for plotting.  The names of
+   the currently available devices can be found using the INQUIRE
+   DEVICES command.
+
+   The value of the global parameter GRAPHICS_DEVICE is used
+   unless a value is specified on the command line. If
+   GRAPHICS_DEVICE is not defined and no value is specified on
+   the command line, the value will be prompted for.
+
+LABEL
+
+LABEL = _CHAR (Read)
+   If ACTION=L is selected then the name of the AGI picture to be
+   selected is given by this parameter. AGI pictures can be labelled
+   using the KAPPA application PICLABEL.
+   ['']
+
+OVERLAY
+
+OVERLAY = _LOGICAL (Read)
+   If TRUE, the PGPLOT viewport created will exactly overlay the
+   the last DATA picture. This is useful for drawing axis labels
+   using BOXFRAME on an image or contour map etc. that has been
+   displayed by another package (e.g. KAPPA:DISPLAY).
+   [FALSE]
+
+XMIN
+
+XMIN = _REAL (Write)
+   The left hand edge of the world coordinate limits from the
+   selected picture. This defaults to 0.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_XMIN.
+
+XMAX
+
+XMAX = _REAL (Write)
+   The right hand edge of the world coordinate limits from the
+   selected picture. This defaults to 1.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_XMAX.
+
+YMIN
+
+YMIN = _REAL (Write)
+   The lower edge of the world coordinate limits from the
+   selected picture. This defaults to 0.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_YMIN.
+
+YMAX
+
+YMAX = _REAL (Write)
+   The lower edge of the world coordinate limits from the
+   selected picture. This defaults to 1.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_YMAX.
+
+Authors
+
+JBVAD::PAH: Paul Harrison (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+
+PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+History
+
+ 4-JUL-1990 (PAH):
+    Original version.
+
+ 28-NOV-1990 (JBVAD::PAH):
+    The routine was updated to reflect the changes in AGI and to
+    add ability to either overlay plots on previous DATA pictures,
+    or to use the BASE picture as the plotting surface.
+
+ 4-DEC-1991 (PCTR):
+    Tidy up AGI calls.
+
+ 3-FEB-1992 (PAH):
+    Make the character height the same relative size for non-base
+    frame windows
+
+ 19-OCT-1992 (PCTR):
+    Added contextual error report on exit.
+
+ 10-AUG-1993 (PCTR):
+    Removed the BASE and OVERLAY parameters and replaced them with
+    the ACTION parameter.
+
+ 2-JUN-1994 (PDRAPER):
+    Removed unused variable LSTAT.
+
+ 17-JUN-1994 (PDRAPER):
+    Sorted out mess with help for ACTION parameter. OVERLAY is still
+    used, BASE is not.
+
+ 17-JUN-1994 (PDRAPER):
+    Added help on CLEAR parameter.
+
+ 20-MAR-1995 (PDRAPER):
+    Added traps for STATUS on some PGPLOT calls.
+
+ 1-AUG-1996 (PDRAPER):
+    Added code to tidy up when exiting in error and device is
+    open. Now correctly searches for last DATA picture when OVERLAY
+    is set.
+
+.endhelp

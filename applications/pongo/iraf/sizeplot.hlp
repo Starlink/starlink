@@ -1,0 +1,48 @@
+.help sizeplot Starlink pongohelp
+.nf
+Draw point marks of differing sizes at each of the data points.
+
+Usage:
+   sizeplot
+
+Description:
+
+   Draw symbols of differing sizes at each of the data points.
+   This application uses the values stored in the ZCOL data area to
+   determine the size of each plotted symbol; i.e. the value of each
+   entry in the ZCOL data area is effectively used as an argument to
+   an EXPAND command before each point is plotted. The SCALE
+   parameter can be used to make these values cover a reasonable
+   range by multiplying the Z data values.
+
+Parameters:
+
+SYMBOL = _INTEGER (Read and Write)
+   The PGPLOT symbol number that is used to mark the data points.
+  
+   If a value other than INDEF is given then it will be used for
+   plotting all the symbols. If INDEF is given then the values
+   read into the SYMCOL data area will be used as symbol identifiers
+   for each point.
+
+SCALE = _REAL (Read and Write)
+   The scale factor used to multiply the ZCOL data values to get
+   a reasonable range of symbol sizes.
+
+PROJECTION = _CHAR (Read)
+   Specifies the geometry that is to be used to plot the data.
+   This is explained in more detail in the section on
+   projections.  Allowed values: "NONE", "TAN", "SIN", "ARC",
+   "GLS", "AITOFF", "MERCATOR" and "STG".
+
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+.endhelp

@@ -1,0 +1,27 @@
+.help ltype Starlink pongohelp
+.nf
+Set the line style.
+
+Usage:
+   ltype linesty
+
+Description:
+
+   Change the line style.
+
+Parameters:
+
+LINESTY = _INTEGER (Read and Write)
+   The line style used by PGPLOT.  The line style may be one of
+   the following:
+
+      - 1 -- full line,
+
+      - 2 -- dashed,
+
+      - 3 -- dot-dash-dot-dash,
+
+      - 4 -- dotted,
+
+      - 5 -- dash-dot-dot-dot.
+.endhelp

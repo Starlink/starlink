@@ -1,0 +1,12 @@
+.help xlogarithm Starlink pongohelp
+.nf
+Take the logarithm of the X-axis data.
+
+Usage:
+   xlogarithm
+
+Description:
+
+   Take the base 10 logarithm of the X-axis data.
+
+.endhelp

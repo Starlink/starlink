@@ -1,0 +1,30 @@
+.help label Starlink pongohelp
+.nf
+Draw the axis labels and title on the plot.
+
+Usage:
+   label xlabel ylabel title
+
+Description:
+
+   Draw the axis labels and the title on the plot. If the COLUMNS
+   parameter is set TRUE, the axis labels are obtained from the
+   column labels read from the data file.
+
+Parameters:
+
+XLABEL = _CHAR (Read and Write)
+   The X-axis label. Note that if COLUMNS is TRUE and this value 
+   is set to "INDEF", then the label from the XCOL area will be used.
+YLABEL = _CHAR (Read and Write)
+   The Y-axis label. Note that if COLUMNS is TRUE and this value 
+   is set to "INDEF", then the label from the XCOL area will be used.
+TITLE = _CHAR (Read and Write)
+   The plot title.
+COLUMNS = _LOGICAL (Read)
+   If TRUE, the values of the X and Y labels will be obtained from
+   the column headings in the data file, if XLABEL and/or YLABEL
+   are set to "INDEF".
+   [FALSE]
+
+.endhelp

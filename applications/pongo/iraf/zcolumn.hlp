@@ -1,0 +1,20 @@
+.help zcolumn Starlink pongohelp
+.nf
+Specify the column containing the Z-axis data.
+
+Usage:
+   zcolumn zcol
+
+Description:
+
+   Specify the column in the data file from which the Z-axis data
+   are to be read.
+
+Parameters:
+
+ZCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Z-axis data are read. The value "0"
+   means "do not read these data". []
+
+.endhelp

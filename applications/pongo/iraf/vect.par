@@ -1,0 +1,2 @@
+erscale,r,h,1.0,,,"Scale factor for multiplying vectors"
+zmult,b,h,no,,,"Are Z-values to be used to multiply the vectors?"

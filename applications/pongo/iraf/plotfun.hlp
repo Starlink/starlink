@@ -1,0 +1,63 @@
+.help plotfun Starlink pongohelp
+.nf
+Plot a given function.
+
+Usage:
+   plotfun action expression xmin xmax npoly polycoef
+
+Description:
+
+   Plot a function specified on the command line by a Fortran-like
+   expression, or through the parameters resulting from a previous
+   fit (using a polynomial or spline).
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The type of function to be plotted. This must be one of the
+   following:
+
+      - "FUNC" -- Use a Fortran-like expression to define the
+      function.
+
+      - "POLY" -- Use a set of polynomial coefficients to define
+      the function.
+
+      - "SPLINE" -- Use a set of spline coefficients from the file
+      SPLINEFILE to define the function.
+
+   [The value is prompted for.]
+EXPRESSION = _CHAR (Read)
+   The Fortran-like expression to be plotted, in terms of X.
+
+XMIN = _REAL (Read)
+   The value of X from which the function is plotted.
+
+XMAX = _REAL (Read)
+   The value of X to which the function is plotted.
+
+INFILE = _LOGICAL (Read)
+   Used when ACTION is "POLY". If TRUE then the polynomial
+   coefficients are stored in a file (the first line of which is
+   the order of the polynomial), otherwise the coefficients
+   are given using the POLYCOEF parameter.
+
+NPOLY = _INTEGER (Read)
+   The order of the polynomial: used when ACTION is "POLY" and
+   INFILE is FALSE.
+
+POLYCOEF = _DOUBLE (Read)
+   A list of polynomial coefficients: used when ACTION is "POLY".
+
+POLYFILE = _CHAR (Read)
+   The name of a file containing the polynomial coefficients to 
+   be plotted. Only used when ACTION is "POLY" and INFILE is
+   TRUE.
+   [POLYFILE.dat]
+SPLINEFILE = FILENAME (Read)
+   The name of the file containing the coefficients and knot
+   positions from a previous spline fit -- used when ACTION is
+   "SPLINE".
+   [SPLINEFILE.dat]
+
+.endhelp

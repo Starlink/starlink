@@ -1,0 +1,77 @@
+{+
+{  Name:
+{     SPECTRUM.ICL
+
+{  Purpose:
+{     Plot the SPECTRUM example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/spectrum
+
+{  Description:
+{     Demonstrate plotting simple spectrum data using PONGO.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     15-DEC-1992 (PCTR):
+{        Starlink release.
+{     11-JUN-1994 (PDRAPER):
+{        Ported to UNIX.
+
+{  Bugs:
+
+{-
+
+{  Prompt for and read the name of a graphics device.
+INPUT "Graphics device name: " (GDNAME)
+
+{  Begin a PONGO plot.
+BEGPLOT (GDNAME&'')
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set the columns to read from the data file.
+XCOLUMN Wave
+YCOLUMN Flux
+EXCOLUMN 0
+EYCOLUMN 0
+                              
+{  Read the data file.
+READF INSTALL/bin/examples/pongo/swp3196.lap SELCOND="Flux > 0" NOALL
+
+{  Set the plotting limits.
+WORLD DATA
+
+{  Draw the box and plot the data.
+CHANGE LINEWID=2 COLOUR=1
+BOXFRAME BCNST BCNST 0 0 0 0
+CHANGE LINEWID=1 COLOUR=4
+GPOINTS C
+CHANGE COLOUR=1
+
+{  Draw the labels (use the global values set by READF).
+CHANGE LINEWID=2
+LABEL TITLE="SWP3196, LORES, LAP" COLUMNS
+	
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ $Id$

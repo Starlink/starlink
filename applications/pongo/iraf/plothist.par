@@ -1,0 +1,7 @@
+action,s,a,"H",,,"Type of histogram function"
+binmin,r,a,0.0,,,"Lower value for binning"
+binmax,r,a,1.0,,,"Upper value for binning"
+nbin,i,a,10,,,"Number of bins"
+autoscale,b,h,yes,,,"Auto-scale?"
+fill,b,h,no,,,"Fill histograms?"
+centre,b,h,no,,,"Bins are centered?"

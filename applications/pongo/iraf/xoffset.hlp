@@ -1,0 +1,17 @@
+.help xoffset Starlink pongohelp
+.nf
+Add a constant offset to the X-axis data.
+
+Usage:
+   xoffset offset
+
+Description:
+
+   Add a constant offset to the X-axis data.
+
+Parameters:
+
+OFFSET = _REAL (Read)
+   The value of the X-axis offset. []
+
+.endhelp

@@ -1,0 +1,37 @@
+.help ellipses Starlink pongohelp
+.nf
+Draw error ellipses.
+
+Usage:
+   ellipses
+
+Description:
+
+   Draw error ellipses at each of the data points using values in
+   the EXCOL and EYCOL error data areas, and the ZCOL data values as
+   the normalized covariance. Depending upon the value of the AXES
+   parameter, the major and minor axes of the ellipses will also be
+   drawn.
+
+   The size of the ellipses depends upon the parameter ERSCALE which
+   should be set so that the WORLD application can calculate the 
+   viewing area properly. This allows the ellipse size to be varied 
+   so that it can be drawn for different confidence levels.
+
+      ERSCALE   confidence
+                  level
+       1.00        46%
+       2.30        68.3%
+       4.61        90%
+       9.21        99%
+
+Parameters:
+
+AXES = _LOGICAL (Read and Write)
+   If TRUE, the axes of the ellipses will be drawn.
+ERSCALE = _REAL (Read and Write)
+   Scale the error ellipses as described above. If the command
+   WORLD DATA (which automatically sets the graph limits) is to
+   work properly should also have been invoked with this value.
+
+.endhelp

@@ -1,0 +1,13 @@
+.help resetpongo Starlink pongohelp
+.nf
+Reset the PONGO global parameters.
+
+Usage:
+   resetpongo
+
+Description:
+
+   The PONGO plotting parameters are reset to their defaults
+   (probably).
+
+.endhelp

@@ -1,0 +1,12 @@
+.help advance Starlink pongohelp
+.nf
+Clear the graphics screen.
+
+Usage:
+   advance
+
+Description:
+
+   The plotting surface is cleared.
+
+.endhelp

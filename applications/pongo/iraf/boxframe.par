@@ -1,0 +1,6 @@
+xopt,s,h,"BCNST",,,"X-axis options"
+yopt,s,h,"BCNST",,,"Y-axis options"
+xtic,r,h,0.0,,,"Major tick mark interval on X-axis"
+ytic,r,h,0.0,,,"Major tick mark interval on Y-axis"
+nxsub,i,h,0,,,"Number of sub-ticks on X-axis"
+nysub,i,h,0,,,"Number of sub-ticks on Y-axis"

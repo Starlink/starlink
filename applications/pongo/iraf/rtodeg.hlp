@@ -1,0 +1,18 @@
+.help rtodeg Starlink pongohelp
+.nf
+Convert the specified data area from radians to degrees.
+
+Usage:
+   rtodeg column
+
+Description:
+
+   The values in the specified data area are converted from radians
+   to degrees.
+
+Parameters:
+
+COLUMN = _CHAR (Read)
+   The column to be converted from radians to degrees. []
+
+.endhelp

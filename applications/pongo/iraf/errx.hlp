@@ -1,0 +1,18 @@
+.help errx Starlink pongohelp
+.nf
+Draw symmetric error bars in the X direction.
+
+Usage:
+   errx
+
+Description:
+
+   Draw symmetric error bars in the X direction.
+
+Parameters:
+
+ERTERM = _REAL (Read)
+   The length of the terminals on the error bars: a multiple of
+   the default length.
+
+.endhelp

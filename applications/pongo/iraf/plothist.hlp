@@ -1,0 +1,60 @@
+.help plothist Starlink pongohelp
+.nf
+Plot a histogram of the data.
+
+Usage:
+   plothist action binmin binmax nbin
+
+Description:
+
+   This application has two modes:
+
+   - Bin the data in the XCOL data area and plot the result.
+
+   - Plot data that have already been binned and provided in the XCOL
+   and YCOL data areas.
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The mode of PLOTHIST as described above:
+
+   - "H" -- If the data in the XCOL data area are not binned, they
+   can be binned and then plotted.  It is possible to plot
+   several histograms with different bin sizes from the same data
+   in XCOL because the data are unaffected by PLOTHIST.
+
+   - "B" -- If the data have already been binned, this mode will
+   plot a histogram using the XCOL and YCOL data areas. The XCOL
+   data area should specify the bin edges and the YCOL data area
+   should contain their respective frequencies.
+BINMIN = _REAL (Read and Write)
+   When ACTION is "H", this parameter specifies the lower limit
+   of the binning.
+BINMAX = _REAL (Read and Write)
+   When ACTION is "H", this parameter specifies the upper limit of
+   the binning.
+FILL = _LOGICAL (Read)
+   When ACTION is "H" this parameter controls whether the
+   histogram will be drawn filled with the current fill, colour
+   and hatching styles.
+NBIN = _INTEGER (Read and Write)
+   When ACTION is "H", this parameter specifies the number of
+   equally sized bins to be drawn between the limits of the
+   histogram.
+AUTOSCALE = _LOGICAL (Read and Write)
+   When ACTION is "H" this parameter specifies whether PGPLOT
+   auto-scaling is used to determine the plotting limits. If
+   FALSE, the limits defined by the bins of the histogram
+   determine the plotting limits. Here, the plotting limits must
+   previously have been set using the LIMITS application and the
+   plot frame drawn using BOXFRAME. Setting AUTOSCALE=NO can be
+   used to draw more than one histogram on the same plot.
+
+CENTRE = _LOGICAL (Read)
+   When ACTION is "B", this parameter specifies whether the
+   values in the XCOL data area denote the centre of each bin
+   (when TRUE) or its lower edge (when FALSE).
+   [FALSE]
+
+.endhelp

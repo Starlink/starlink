@@ -1,0 +1,3 @@
+action,s,a,"X",,,"Direction of error bars"
+erterm,r,h,1.0,,,"Length of error bar terminal"
+symerr,b,h,yes,,,"Treat errors as symmetrical about data point?"

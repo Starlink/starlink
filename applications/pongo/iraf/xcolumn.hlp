@@ -1,0 +1,20 @@
+.help xcolumn Starlink pongohelp
+.nf
+Specify the column containing the X-axis data.
+
+Usage:
+   xcolumn xcol
+
+Description:
+
+   Specify the column in the data file from which the X-axis data
+   are to be read.
+
+Parameters:
+
+XCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the X-axis data are read by the READF
+   command. The value "0" means "do not read these data". []
+
+.endhelp

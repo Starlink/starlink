@@ -1,0 +1,14 @@
+.help connect Starlink pongohelp
+.nf
+Draw straight lines between the data points.
+
+Usage:
+   connect
+
+Description:
+
+   Straight line segments are drawn between the data points in the
+   XCOL and YCOL data areas. This may not be used with projections
+   other than "NONE".
+
+.endhelp

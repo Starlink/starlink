@@ -1,0 +1,4 @@
+action,s,a,"X",,,"Type of average"
+nbin,i,a,10,,,"Number of bins or number of points per bin"
+xmin,r,a,0.0,,,"X minimum"
+xmax,r,a,1.0,,,"X maximum"

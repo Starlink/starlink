@@ -1,0 +1,41 @@
+.help pvect Starlink pongohelp
+.nf
+Draw proper motion vectors.
+
+Usage:
+   pvect projection racentre deccentre
+
+Description:
+
+   Draw proper motion vectors on a projection of the celestial
+   sphere. The XCOL and YCOL data areas are assumed to contain
+   positions in radians, the EXCOL and EYCOL data areas are assumed
+   to contain the proper motions in radians per year. It is possible
+   to use the ERSCALE parameter to multiply the the proper motion so
+   that it is correct for a given number of years. (The proper
+   motion in RA is assumed to be $\dot{\alpha}\cos\delta$.)
+Parameters:
+
+ERSCALE = _REAL (Read and Write)
+   The scale factor for multiplying the vectors.
+
+ZMULT = _LOGICAL (Read)
+   If TRUE, the ZCOL values are additionally used to multiply the
+   vectors.
+   [FALSE]
+PROJECTION = _CHAR (Read)
+   The geometry used to plot the data.  This is explained in more
+   detail in the section on projections.  Allowed values: "NONE",
+   "TAN", "SIN", "ARC", "GLS", "AITOFF", "MERCATOR" and "STG".
+
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+.endhelp

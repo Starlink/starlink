@@ -1,0 +1,12 @@
+.help showpongo Starlink pongohelp
+.nf
+Show the PONGO global parameters.
+
+Usage:
+   showpongo
+
+Description:
+
+   The PONGO plotting parameters are listed with their current values.
+
+.endhelp

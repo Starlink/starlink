@@ -1,0 +1,21 @@
+.help move Starlink pongohelp
+.nf
+Set the current pen position.
+
+Usage:
+   move x y
+
+Description:
+
+   The current pen position is set to the given coordinates.
+
+   This command is a synonym for PRIM M.
+
+Parameters:
+
+X = _REAL (Read)
+   The X coordinate of the point.
+Y = _REAL (Read)
+   The Y coordinate of the point.
+
+.endhelp

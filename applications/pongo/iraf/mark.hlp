@@ -1,0 +1,39 @@
+.help mark Starlink pongohelp
+.nf
+Draw a point mark at the specified position.
+
+Usage:
+   mark x y symbol
+
+Description:
+
+   Draw a point mark at a specified position.
+
+Parameters:
+
+X = _REAL (Read and Write)
+   The X coordinate of the point.
+Y = _REAL (Read and Write)
+   The Y coordinate of the point.
+SYMBOL = _INTEGER (Read)
+   The PGPLOT symbol number for drawing the point mark.
+PROJECTION = _CHAR (Read)
+   The geometry that is to be used for plotting. This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+Notes:
+
+   When using non-planar coordinates, the coordinates should be
+   given in degrees.
+
+.endhelp

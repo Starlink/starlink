@@ -1,0 +1,65 @@
+.help writei Starlink pongohelp
+.nf
+Write information to an output file.
+
+Usage:
+   writei action file agilabel x y z ex ey
+
+Description:
+
+   Write specified information concerning the current data-set to an
+   output file.
+
+Parameters:
+
+ACTION = _CHAR (Read and Write)
+   The type of information to be written. This may be one of the
+   following:
+
+      - "LABLST" -- Write the internal list of labels out.
+
+      - "DATA" -- Write out selected data.
+
+      - "AGIPIC" -- Write the label, name and comment for the
+      current AGI picture to the AGI database.
+
+FILE = FILENAME (Read and Write)
+   The name of the output file to be written.
+
+FORMAT = _CHAR (Read and Write)
+   The Fortran FORMAT to be used. The default is "G25.16".
+
+AGINAME = _CHAR (Read and Write)
+   The AGI name for the current picture. This may be one of the
+   following:
+
+      - "DATA" -- Used to indicate that the AGI picture contains
+      the representation of data in some graphical form (i.e. a
+      graph).
+
+      - "FRAME" -- Used to indicate that the AGI picture contains
+      a group of other plots (i.e. several "DATA" pictures).
+
+   ["DATA"]
+AGICOMMENT = _CHAR (Read and Write)
+   The AGI comment for the current picture.
+
+AGILABEL = _CHAR (Read and Write)
+   The AGI label for the current picture.
+
+X = _LOGICAL (Read and Write)
+   If TRUE, the XCOL data area will be output.
+
+Y = _LOGICAL (Read and Write)
+   If TRUE, the YCOL data area will be output.
+
+Z = _LOGICAL (Read and Write)
+   If TRUE, the ZCOL data area will be output.
+
+EX = _LOGICAL (Read and Write)
+   If TRUE, the EXCOL data area will be output.
+
+EY = _LOGICAL (Read and Write)
+   If TRUE, the EYCOL data area will be output.
+
+.endhelp

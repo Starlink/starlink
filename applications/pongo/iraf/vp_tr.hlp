@@ -1,0 +1,21 @@
+.help vp_tr Starlink pongohelp
+.nf
+Set the viewport to the top-right quarter of the plotting surface.
+
+Usage:
+
+   vp_tr
+
+Description:
+
+   Set the viewport to the top right quarter of the plotting surface.
+   If requested space around the viewport will be reserved for
+   any labels.
+
+Parameters:
+
+LABELS = _LOGICAL  (Read)
+    If given as "true" or "yes" then the space around the viewport
+    will be increased to leave room for labels. [FALSE]
+
+.endhelp

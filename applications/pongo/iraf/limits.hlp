@@ -1,0 +1,23 @@
+.help limits Starlink pongohelp
+.nf
+Set the world coordinate limits.
+
+Usage:
+   limits xmin xmax ymin ymax
+
+Description:
+
+   The world coordinate limits are set from the parameters given
+   on the command line.
+
+Parameters:
+
+XMIN = _REAL (Read)
+   The world coordinate of the left-hand edge of the plot.
+XMAX = _REAL (Read)
+   The world coordinate of the right-hand edge of the plot.
+YMIN = _REAL (Read and Write)
+   The world coordinate of the lower edge of the plot.
+YMAX = _REAL (Read)
+   The world coordinate of the upper edge of the plot.
+.endhelp

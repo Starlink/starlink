@@ -1,0 +1,17 @@
+.help zscale Starlink pongohelp
+.nf
+Multiply the values in the ZCOL data area by a constant.
+
+Usage:
+   zscale scale
+
+Description:
+
+   Multiply the values in the ZCOL data area by a constant.
+
+Parameters:
+
+SCALE = _REAL (Read)
+   The constant by which the ZCOL data area is scaled. []
+
+.endhelp

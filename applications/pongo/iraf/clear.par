@@ -1,0 +1,6 @@
+screen,b,a,no,,,"Clear the screen"
+data,b,a,no,,,"Clear the stored data"
+limits,b,h,no,,,"Clear the plotting limits"
+lablst,b,h,no,,,"Clear the label lists"
+agi,b,h,no,,,"Clear the AGI database"
+erscale,r,h,1.0,,,"Clear error scale value"

@@ -1,0 +1,54 @@
+.help pen Starlink pongohelp
+.nf
+Set the current pen.
+
+Usage:
+  pen colour
+
+Description:
+
+   Set the current pen used for plotting.
+
+Parameters:
+
+COLOUR = _INTEGER (Read)
+   The pen number (colour index) PGPLOT uses for plotting. The
+   value should be between 0 and 255. Usually the first 16 pens
+   are predefined to have the following colours:
+
+      - 0 -- background,
+
+      - 1 -- foreground (default),
+
+      - 2 -- red,
+
+      - 3 -- green,
+
+      - 4 -- blue,
+
+      - 5 -- cyan,
+
+      - 6 -- magenta,
+
+      - 7 -- yellow,
+
+      - 8 -- red + yellow (orange),
+
+      - 9 -- green + yellow,
+
+      - 10 -- green + cyan,
+
+      - 11 -- blue + cyan,
+
+      - 12 -- blue + magenta,
+
+      - 13 -- red + magenta,
+
+      - 14 -- dark grey,
+
+      - 15 -- light grey.
+
+   It is possible to change the colour representation of any of
+   the pen colour indices using the PALETTE application. []
+
+.endhelp

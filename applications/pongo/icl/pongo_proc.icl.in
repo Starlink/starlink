@@ -1,0 +1,1414 @@
+{+
+{  Name:
+{     PONGO_PROC.ICL
+
+{  Purpose:
+{     PONGO hidden procedures.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     The PONGO hidden commands are defined.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: Peter W. Draper (STARLINK, Durham University)
+
+{  History:
+{     22-SEP-1992 (PCTR):
+{        Starlink release (based upon original PONGO.ICL code written by
+{        Paul Harrison - JBVAD::PAH).
+{     28-APR-1997 (PDRAPER):
+{        Added vp_xx procedures.
+
+{  Bugs:
+
+{-
+
+HIDDEN PROC BEGPLOT [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10]
+{+
+{  Name:
+{     BEGPLOT
+
+{  Purpose:
+{     Open a plotting device.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Set up a device for subsequent PONGO plotting commands. This
+{     application allows plotting onto an AGI picture created by a
+{     different package (e.g. KAPPA), or the creation of a new base
+{     picture.
+{
+{     If a picture created by a run of a previous application is made
+{     (using either the "current" picture or selecting using a known
+{     picture label see parameter ACTION) then it is possible to
+{     overlay new graphics (such as annotations, lines etc.) using the
+{     same coordinate system (see the OVERLAY parameter).
+{
+{     This command is an ICL hidden procedure which uses the
+{     undocumented PONGO application BEGPONGO.
+
+{  ADAM Parameters:
+{     See BEGPONGO.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     21-SEP-1992 (PCTR):
+{        Original version.
+{     17-JUN-1994 (PDRAPER):
+{        Added correct descriptions of arguments.
+{     1-AUG-1996 (PDRAPER):
+{        Removed description. BEGPONGO is now primary, upped
+{        parameters to 10 and made all optional.
+{     {enter_further_changes_here}
+
+{  Bugs:
+
+{-
+
+   IF UNDEFINED(p1)
+      BEGPONGO
+   ELSE IF UNDEFINED(p2)
+      BEGPONGO (p1&'')
+   ELSE IF UNDEFINED(p3)
+      BEGPONGO (p1&'') (p2&'')
+   ELSE IF UNDEFINED(p4)
+      BEGPONGO (p1&'') (p2&'') (p3&'')
+   ELSE IF UNDEFINED(p5)
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'')
+   ELSE IF UNDEFINED(p6)
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') 
+   ELSE IF UNDEFINED(p7)
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'')
+   ELSE IF UNDEFINED(p8)
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'') (p7&'')
+   ELSE IF UNDEFINED(p9)
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'') ~
+               (p7&'') (p8&'')
+   ELSE IF UNDEFINED(p10)
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'') ~
+               (p7&'') (p8&'') (p9&'')
+   ELSE 
+      BEGPONGO (p1&'') (p2&'') (p3&'') (p4&'') (p5&'') (p6&'') ~
+               (p7&'') (p8&'') (p9&'') (p10&'')
+   END IF
+
+   SET PROMPT "PONGO> "
+END PROC
+
+HIDDEN PROC DEGTOR COLUMN
+{+
+{  Name:
+{     DEGTOR
+
+{  Purpose:
+{     Convert the given column from degrees to radians.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     COLUMN = _CHAR (Read and Write)
+{        The column to be converted from degrees to radians. []
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     The specified column is converted from degrees to radians.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (Starlink - Durham University).
+      
+{  History:
+{     25-NOV-1992 (PCTR):
+{        Starlink release.
+{     28-OCT-1994 (PDRAPER):
+{        Added check for exitence of COLUMN parameter.
+
+{  Bugs:
+
+{-
+   IF UNDEFINED(COLUMN)
+      PRINT "You must supply a column parameter (X,Y,Z, EX rt EZ)."
+   ELSE
+      TRANS=''''&(COLUMN)&'*1.745329251994329E-02'&''''
+      CCMATH (COLUMN&'=')(TRANS&'')
+   END IF
+END PROC
+
+HIDDEN PROC ENDPLOT COMMENT DEVICE
+{+
+{  Name:
+{     ENDPLOT
+
+{  Purpose:
+{     Close down the current plotting device.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     COMMENT = _CHAR (Read and Write)
+{        A comment for the AGI database entry for the plot that has
+{        just been completed. Any comment will be prefixed with the
+{        string "PONGO:".
+{        ["Final viewport"]
+{     DEVICE = DEVICE (Read)
+{        The name of the current plotting device.
+{
+{        The value of the global parameter GRAPHICS_DEVICE. If
+{        GRAPHICS_DEVICE is not defined, the current value is used. If
+{        the current value is not defined, the value will be prompted
+{        for.
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Close down the current plotting device, storing the current
+{     picture description in the AGI database. The position and world
+{     co-ordinate limits of the plot will be stored in the AGI database,
+{     along with any comment text.
+{
+{     ENDPLOT must be executed before using a plotting application from
+{     another package (e.g. KAPPA) -- failure to do so will result in
+{     an AGI error and may corrupt the AGI database.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+   IF UNDEFINED(COMMENT)
+      ENDPONGO
+   ELSE IF UNDEFINED(DEVICE)
+      TEMP=''''&(COMMENT)&''''
+      ENDPONGO (TEMP&'')
+   ELSE
+      TEMP=''''&(COMMENT)&''''
+      ENDPONGO (TEMP&'') (DEVICE&'')
+   END IF
+
+   SET PROMPT "ICL> "
+END PROC
+
+HIDDEN PROC MTEXT SIDE XPOS YPOS JUSTIFICATION TEXT
+{+
+{  Name:
+{     MTEXT
+
+{  Purpose:
+{     Draw a text string relative to the viewport.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     SIDE = _CHAR (Read and Write)
+{        The side of the viewport where the text is to plotted. This
+{        may be one of the following:
+{           - "T" -- The top edge.
+{           - "B" -- The bottom edge.
+{           - "L" -- The left-hand edge.
+{           - "R" -- The right-hand edge.
+{           - "LV" -- The left-hand edge, but with the string written
+{           vertically.
+{           - "RV" -- The right-hand edge, but with the string written
+{           vertically.
+{           
+{        The current value is used. The current value is initially set
+{        to "T".
+{     XPOS = _REAL (Read and Write)
+{        The number of character heights from the viewport where the
+{        text is to be plotted (negative values are allowed).
+{
+{        The value is prompted for.
+{     YPOS = _REAL (Read and Write)
+{        The fraction along the edge where the text is to be plotted.
+{
+{        The value is prompted for.
+{     JUSTIFICATION = _REAL (Read and Write)
+{        The justification about the specified point (in the range 0.0
+{        to 1.0).  Here, 0.0 means left justify the text relative to
+{        the data point, 1.0 means right justify the text relative to
+{        the data point, 0.5 means centre the string on the data point,
+{        other values will give intermediate justifications.
+{
+{        The current value is used. The current value is initially set
+{        to 0.0.
+{     TEXT = _CHAR (Read and Write)
+{        The text string to be plotted. This may include any of the
+{        PGPLOT control sequences for producing special characters.
+{        
+{        The value is prompted for.
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Draw a text string on the plot at a position specified relative
+{     to the viewport. The command uses the PGPLOT routine PGMTEXT.
+{
+{     This command is a an ICL hidden procedure which uses the WTEXT
+{     application.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+   IF UNDEFINED(XPOS) OR UNDEFINED(YPOS) OR UNDEFINED(TEXT) ~
+      OR UNDEFINED(SIDE) OR UNDEFINED(JUSTIFICATION)
+      PRINT "Must supply all parameters:-"
+      PRINT "   SIDE XPOS YPOS JUSTIFICATION TEXT"
+   ELSE
+      TEMP=''''&(TEXT)&''''
+      WTEXT M (XPOS+0.0) (YPOS+0.0) (TEMP&'') (SIDE&'') (JUSTIFICATION+0.0)
+   ENDIF
+END PROC
+
+HIDDEN PROC PTEXT XPOS YPOS ANGLE JUSTIFICATION TEXT
+{+
+{  Name:
+{     PTEXT
+
+{  Purpose:
+{     Draw a text string at the specified position and angle.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     XPOS = _REAL (Read and Write)
+{        The X co-ordinate of the text.
+{
+{        The value is prompted for.
+{     YPOS = _REAL (Read and Write)
+{        The Y co-ordinate of the text.
+{
+{        The value is prompted for.
+{     ANGLE = _REAL (Read and Write)
+{        The angle relative to the horizontal at which the text string
+{        is to be plotted.
+{
+{        The current value is used. The current value is initially set
+{        to 0.0.
+{     JUSTIFICATION = _REAL (Read and Write)
+{        The justification about the specified point (in the range 0.0
+{        to 1.0).  Here, 0.0 means left justify the text relative to
+{        the data point, 1.0 means right justify the text relative to
+{        the data point, 0.5 means centre the string on the data point,
+{        other values will give intermediate justifications.
+{
+{        The current value is used. The current value is initially set
+{        to 0.0
+{     TEXT = _CHAR (Read and Write)
+{        The text string to be plotted. This may include any of the
+{        PGPLOT control sequences for producing special characters.
+{        
+{        The value is prompted for.
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Draw a text string on the plot at the specified position and 
+{     angle. The command uses the PGPLOT routine PGPTEXT.
+{     
+{     This command is a an ICL hidden procedure which uses the WTEXT
+{     application.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+{     21-JUN-1994 (PDRAPER):
+{         Checks for missing parameters and reminder
+
+{  Bugs:
+
+{-
+   IF UNDEFINED(XPOS) OR UNDEFINED(YPOS) OR  UNDEFINED(ANGLE) OR ~
+      UNDEFINED(JUSTIFICATION) OR UNDEFINED(TEXT) 
+      PRINT "Must supply all parameters:-"
+      PRINT "   XPOS YPOS ANGLE JUSTIFICATION TEXT"
+   ELSE 
+      TEMP=''''&(TEXT)&''''
+      WTEXT P (XPOS+0.0) (YPOS+0.0) (TEMP&'') ~
+            JUSTIFICATION=(JUSTIFICATION+0.0) ANGLE=(ANGLE+0.0)
+   ENDIF
+END PROC
+
+HIDDEN PROC PTINFO LABEL
+{+
+{  Name:
+{     PTINFO
+
+{  Purpose:
+{     Get the co-ordinates of a specified data point.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     LABEL = _CHAR (Read)
+{        The label associated with the data point.
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     The value of a label in the LABCOL data area is given and the 
+{     resulting (x,y) co-ordinates associated with the label are 
+{     printed.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+{     9-JUN-1994 (PDRAPER):
+{        Added X='' & Y='' to get round ICL problem.
+{     21-JUN-1994 (PDRAPER):
+{        Change name of parameter to LABEL to match documentation.
+{     11-JUL-1994 (PDRAPER):
+{        Removed X='' & Y='' fix (ICL now works as before).
+
+{  Bugs:
+
+{-
+  IF UNDEFINED( LABEL )
+     PRINT "Must specify a label"
+  ELSE
+     GETPOINT C (LABEL) X=(X) Y=(Y)
+     PRINT "   X = " (X) ", Y = " (Y)
+  ENDIF
+END PROC
+
+HIDDEN PROC RADIATE X Y NP
+{+
+{  Name:
+{     RADIATE
+
+{  Purpose:
+{     Draw a line from the given point to the first NP data points.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure
+
+{  Arguments:
+{     X = _REAL (Read)
+{        The X-axis position of the radiant. []
+{     Y = _REAL (Read)
+{        The Y-axis position of the radiant. []
+{     NP = _INTEGER (Read)
+{        The number of data in the XCOL and YCOL data areas to use, 
+{        starting from the beginning of the data. []
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     A line is drawn from the given radiant, position (x,y), to the 
+{     first NP data points in the XCOL and YCOL data areas.
+{
+{     This command is an ICL hidden procedure which uses successive calls 
+{     to the GETPOINT, MOVE and DRAW applications.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+{     9-JUN-1994 (PDRAPER):
+{        Added XPOINT='' & YPOINT='' to get round ICL problem.
+{     11-JUL-1994 (PDRAPER):
+{        Removed XPOINT='' & YPOINT='' fix (ICL now works as before).
+
+{  Bugs:
+
+{-
+   LOOP FOR I = 1 TO (NP)
+      GETPOINT ACTION=N VALUE=(I) X=(XPOINT) Y=(YPOINT)
+      MOVE (X) (Y)
+      DRAW (XPOINT) (YPOINT)
+   END LOOP
+END PROC
+
+HIDDEN PROC RPGLOBALS
+{+
+{  Name:
+{     RPGLOBALS
+
+{  Purpose:
+{     Reset the PONGO global parameters.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure
+
+{  Arguments:
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     The PONGO global parameters are reset to their ADAM interface 
+{     file defaults using the ICL command SETGLOBAL. Note that file
+{     names and device names are not reset.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+   SETPONGLOB PONGO_CHEIGHT 1.0
+   SETPONGLOB PONGO_DECCENTRE "0"
+   SETPONGLOB PONGO_ERSCALE 1.0
+   SETPONGLOB PONGO_EXCOL "0"
+   SETPONGLOB PONGO_EYCOL "0"
+   SETPONGLOB PONGO_LABCOL "0"
+   SETPONGLOB PONGO_NDATA 0
+   SETPONGLOB PONGO_NPOLY 2
+   SETPONGLOB PONGO_PROJECTN "NONE"
+   SETPONGLOB PONGO_RACENTRE "0"
+   SETPONGLOB PONGO_SYMCOL "0"
+   SETPONGLOB PONGO_TITLE "Title"
+   SETPONGLOB PONGO_XCOL "0"
+   SETPONGLOB PONGO_XCURSE 0.0
+   SETPONGLOB PONGO_XLABEL "X-axis"
+   SETPONGLOB PONGO_XMAX 1.0
+   SETPONGLOB PONGO_XMIN 0.0
+   SETPONGLOB PONGO_XOPT "BCNST"
+   SETPONGLOB PONGO_YCOL "0"
+   SETPONGLOB PONGO_YCURSE 0.0
+   SETPONGLOB PONGO_YLABEL "Y-axis"
+   SETPONGLOB PONGO_YMAX 1.0
+   SETPONGLOB PONGO_YMIN 0.0
+   SETPONGLOB PONGO_YOPT "BCNST"
+   SETPONGLOB PONGO_ZCOL "0"
+
+{  Clear all plotting attributes.
+   CLEAR SCREEN DATA LABLST AGI ERSCALE=1
+   VIEWPORT STANDARD
+   WORLD GIVEN
+   CHANGE RESET
+   CHANGE CHEIGHT=1
+
+{  Inform the user that the action is complete.
+   PRINT
+   PRINT "PONGO reset."
+   PRINT
+END PROC
+
+HIDDEN PROC RTODEG COLUMN
+{+
+{  Name:
+{     RTODEG
+
+{  Purpose:
+{     Convert the given column from radians to degrees.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     COLUMN = _CHAR (Read and Write)
+{        Column to be converted from radians to degrees. []
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     The specified column is converted from radians to degrees.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     25-NOV-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+   IF UNDEFINED(COLUMN)
+      PRINT "Must specify a column"
+   ELSE
+      TRANS=''''&(COLUMN)&'/1.745329251994329E-02'&''''
+      CCMATH (COLUMN&'=')(TRANS&'')
+   ENDIF
+END PROC
+
+HIDDEN PROC SPGLOBALS
+{+
+{  Name:
+{     SPGLOBALS
+
+{  Purpose:
+{     Print the PONGO global parameters.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure
+
+{  Arguments:
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     The current PONGO global parameter values are printed.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     24-SEP-1992 (PCTR):
+{        Starlink release.
+{     22-JUN-1994 (PDRAPER);
+{        Slight correction of indentations.
+
+{  Bugs:
+
+{-
+
+   PRINT
+   PRINT "PONGO global parameter settings:"
+   PRINT
+
+   VALUE = ''
+
+   GETPONGLOB GRAPHICS_DEVICE (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   GRAPHICS_DEVICE:     " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_CHEIGHT (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_CHEIGHT:       " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_DATA (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_DATA:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_DECCENTRE (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_DECCENTRE:     " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_ERSCALE (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_ERSCALE:       " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_EXCOL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_EXCOL:         " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_EYCOL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_EYCOL:         " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_LABCOL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_LABCOL:        " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_NDATA (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_NDATA:         " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_NPOLY (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_NPOLY:         " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_PROJECTN (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_PROJECTN:      " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_RACENTRE (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_RACENTRE:      " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_SYMCOL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_SYMCOL:        " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_TITLE (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_TITLE:         " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_XCOL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_XCOL:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_XCURSE (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_XCURSE:        " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_XLABEL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_XLABEL:        " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_XMAX (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_XMAX:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_XMIN (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_XMIN:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_XOPT (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_XOPT:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_YCOL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_YCOL:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_YCURSE (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_YCURSE:        " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_YLABEL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_YLABEL:        " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_YMAX (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_YMAX:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_YMIN (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_YMIN:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_YOPT (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_YOPT:          " (VALUE)
+   END IF
+
+   GETPONGLOB PONGO_ZCOL (VALUE)
+   IF LEN(VALUE) > 0
+      PRINT "   PONGO_ZCOL:          " (VALUE)
+   END IF
+END PROC
+
+HIDDEN PROC XOFFSET OFFSET
+{+
+{  Name:
+{     XOFFSET
+
+{  Purpose:
+{     Add a constant offset to the X-axis data.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     OFFSET = _REAL (Read)
+{        The value of the X-axis offset.
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Add a constant offset to the X-axis data.  It also applies the
+{     offset to the X limits of the world co-ordinates.
+{     
+{     This command is an ICL hidden procedure which uses the CCMATH
+{     application.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+{     1994 May 4 (MJC):
+{        Adjust the co-ordinate limits and add comments.
+
+{  Bugs:
+
+{-
+
+{   Obtain the Y limits of the world co-ordinates.
+   GETPONGLOB PONGO_XMAX (XMA)
+   GETPONGLOB PONGO_XMIN (XMI)
+
+{   If they are not null, scale them.
+   IF LEN(XMA) > 0
+      XMA = XMA + OFFSET
+      SETPONGLOB PONGO_XMAX (XMA)
+   END IF
+
+   IF LEN(XMI) > 0
+      XMI = XMI + OFFSET
+      SETPONGLOB PONGO_XMIN (XMI)
+   END IF
+
+{   Form the expression in Fortran style.
+   VALUE='X+('&(OFFSET)&')'
+
+{   Offset the YCOL values.
+   CCMATH X=(VALUE)
+END PROC
+
+HIDDEN PROC XSCALE SCALE
+{+
+{  Name:
+{     XSCALE
+
+{  Purpose:
+{     Multiply the values in the XCOL and EXCOL data areas by a
+{     constant.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     SCALE = _REAL (Read)
+{        The constant by which the XCOL and EXCOL data areas are 
+{        scaled. []
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Multiply the values in the XCOL and EXCOL data areas by a
+{     constant.  It also scales the limits of the X world co-ordinates.
+{     
+{     This command is an ICL hidden procedure which uses the CCMATH
+{     application.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+{     1994 May 4 (MJC):
+{        Adjust the co-ordinate limits and add comments.
+
+{  Bugs:
+
+{-
+
+{   Obtain the X limits of the world co-ordinates.
+   GETPONGLOB PONGO_XMAX (XMA)
+   GETPONGLOB PONGO_XMIN (XMI)
+
+{   If they are not null, scale them.
+   IF LEN(XMA) > 0
+      XMA = XMA * SCALE
+      SETPONGLOB PONGO_XMAX (XMA)
+   END IF
+
+   IF LEN(XMI) > 0
+      XMI = XMI * SCALE
+      SETPONGLOB PONGO_XMIN (XMI)
+   END IF
+
+{   Form the expressions in Fortran style.
+   VALUE='X*('&(SCALE)&')'
+   VALUE2='EX*ABS('&(SCALE)&')'
+
+{   Scale the XCOL and EXCOL values.
+   CCMATH X=(VALUE) EX=(VALUE2)
+END PROC
+
+HIDDEN PROC YOFFSET OFFSET
+{+
+{  Name:
+{     YOFFSET
+
+{  Purpose:
+{     Add a constant offset to the Y-axis data.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     OFFSET = _REAL (Read)
+{        The value of the Y-axis offset.
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Add a constant offset to the Y-axis data.  It also offsets the
+{     limits of the Y world co-ordinates.
+{     
+{     This command is an ICL hidden procedure which uses the CCMATH
+{     constant.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+{     1994 May 4 (MJC):
+{        Adjust the co-ordinate limits and add comments.
+
+{  Bugs:
+
+{-
+
+{   Obtain the Y limits of the world co-ordinates.
+   GETPONGLOB PONGO_YMAX (YMA)
+   GETPONGLOB PONGO_YMIN (YMI)
+
+{   If they are not null, scale them.
+   IF LEN(YMA) > 0
+      YMA = YMA + OFFSET
+      SETPONGLOB PONGO_YMAX (YMA)
+   END IF
+
+   IF LEN(YMI) > 0
+      YMI = YMI + OFFSET
+      SETPONGLOB PONGO_YMIN (YMI)
+   END IF
+
+{   Form the expression in Fortran style.
+   VALUE='Y+('&(OFFSET)&')'
+
+{   Offset the YCOL values.
+   CCMATH Y=(VALUE)
+
+END PROC
+
+HIDDEN PROC YSCALE SCALE
+{+
+{  Name:
+{     YSCALE
+
+{  Purpose:
+{     Multiply the values in the YCOL and EYCOL data areas by a
+{     constant.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     SCALE = _REAL (Read)
+{       The constant by which the YCOL and EYCOL data areas are
+{       scaled. []
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Multiply the values in the YCOL and EYCOL data areas by a
+{     constant.  It also scales the limits of the Y world co-ordinates.
+{     
+{     This command is an ICL hidden procedure which uses the CCMATH
+{     application.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+{     PDRAPER: Peter W. Draper (STARLINK - Durham University)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+{     1994 May 4 (MJC):
+{        Adjust the co-ordinate limits and add comments.
+{     28-MAR-1995 (PDRAPER):
+{        Add () to expressions. Allows negative values.
+
+{  Bugs:
+
+{-
+
+{   Obtain the Y limits of the world co-ordinates.
+   GETPONGLOB PONGO_YMAX (YMA)
+   GETPONGLOB PONGO_YMIN (YMI)
+
+{   If they are not null, scale them.
+   IF LEN(YMA) > 0
+      YMA = YMA * SCALE
+      SETPONGLOB PONGO_YMAX (YMA)
+   END IF
+
+   IF LEN(YMI) > 0
+      YMI = YMI * SCALE
+      SETPONGLOB PONGO_YMIN (YMI)
+   END IF
+
+{   Form the expressions in Fortran style.
+   VALUE='Y*('&(SCALE)&')'
+   VALUE2='EY*ABS('&(SCALE)&')'
+
+{   Scale the YCOL and EYCOL values.
+   CCMATH Y=(VALUE) EY=(VALUE2)
+   
+END PROC
+
+HIDDEN PROC ZSCALE SCALE
+{+
+{  Name:
+{     ZSCALE
+
+{  Purpose:
+{     Multiply the values in the ZCOL data area by a constant.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure file
+
+{  Arguments:
+{     SCALE = _REAL (Read)
+{        The constant by which the ZCOL data area is scaled. []
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Multiply the values in the ZCOL data area by a constant.
+{     
+{     This command is an ICL hidden procedure which uses the CCMATH
+{     application.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+   VALUE='Z*('&(SCALE)&')'
+   CCMATH Z=(VALUE)
+END PROC
+
+HIDDEN PROC SETPONGLOB PARAM VALUE
+{+
+{  Name:
+{     SETPONGLOB
+
+{  Purpose:
+{     Set an individual PONGO global parameter, ensuring a silent failure
+{     if the parameter has not yet been created.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure
+
+{  Arguments:
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Set an individual PONGO global parameter, ensuring a silent failure
+{     if the parameter has not yet been created.
+{     The ICL command SETGLOBAL is used.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     24-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+{  Check for undefined procedure parameters.
+   IF UNDEFINED(PARAM)
+
+{     Do nothing.
+   ELSE IF UNDEFINED(VALUE)
+
+{     Do nothing.
+   ELSE
+
+{     Attempt to set the global parameter.
+      SETGLOBAL (PARAM) (VALUE)
+   END IF
+
+{  Define an exception handler for ADAMERR (i.e. the global parameter
+{  has probably not been created).
+   EXCEPTION ADAMERR
+
+{     Do nothing (i.e. fail silently).
+   END EXCEPTION
+END PROC
+
+HIDDEN PROC GETPONGLOB PARAM VALUE
+{+
+{  Name:
+{     GETPONGLOB
+
+{  Purpose:
+{     Print the value of an individual PONGO global parameter, ensuring 
+{     a silent failure if the parameter has not yet been created.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL hidden procedure
+
+{  Arguments:
+
+{  Invocation:
+{     Via ICL DEFPROC command
+
+{  Description:
+{     Print the value of an individual PONGO global parameter, ensuring 
+{     a silent failure if the parameter has not yet been created.
+{     The ICL command GETGLOBAL is used.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     22-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+{  Check for undefined procedure parameters.
+   IF UNDEFINED(PARAM)
+
+{     Do nothing.
+   ELSE
+
+{     Attempt to get the global parameter.
+      GETGLOBAL (PARAM) (VALUE)
+   END IF
+
+{  Define an exception handler for ADAMERR (i.e. the global parameter
+{  has probably not been created).
+   EXCEPTION ADAMERR
+
+{     Assign an empty string to VALUE.
+      VALUE = ''
+   END EXCEPTION
+END PROC
+
+{  Add procedures to enhance the abilities of the vp_xx commands.
+{  These now accept one argument which is set to "yes" or "true", 
+{  "false" or "no". The values of this determines whether or not
+{  space is added around these viewports for showing labels.
+{
+{  The original behaviour of these commands was:
+{     defstring vp_bh   viewport ndc 0.0833 0.917 0.05 0.45
+{     defstring vp_bl   viewport ndc 0.0417 0.459 0.05 0.45
+{     defstring vp_br   viewport ndc 0.5417 0.959 0.05 0.45
+{     defstring vp_th   viewport ndc 0.0833 0.917 0.55 0.95
+{     defstring vp_tl   viewport ndc 0.0417 0.459 0.55 0.95
+{     defstring vp_tr   viewport ndc 0.5417 0.959 0.55 0.95
+
+
+HIDDEN PROC VP_BH LABELS 
+   IF UNDEFINED(LABELS)
+
+{  Original behaviour
+      VIEWPORT NDC 0.0833 0.917 0.05 0.45
+   else 
+
+{  If requested leave space for labels (this is a guess as label 
+{  spacing depends on character size).
+      FIRSTC = SUBSTR(LABELS,1,1)
+      FIRSTC = UPCASE(FIRSTC)
+      IF FIRSTC = "Y" OR FIRSTC = "T"
+         VIEWPORT NDC 0.0833 0.917 0.1 0.4
+      ELSE
+         VIEWPORT NDC 0.0833 0.917 0.05 0.45
+      END IF
+   END IF
+END PROC
+
+HIDDEN PROC VP_BL LABELS 
+   IF UNDEFINED(LABELS)
+
+{  Original behaviour
+     VIEWPORT NDC 0.0417 0.459 0.05 0.45
+   else 
+
+{  If requested leave space for labels (this is a guess as label 
+{  spacing depends on character size).
+      FIRSTC = SUBSTR(LABELS,1,1)
+      FIRSTC = UPCASE(FIRSTC)
+      IF FIRSTC = "Y" OR FIRSTC = "T"
+         VIEWPORT NDC 0.05 0.45 0.1 0.4
+      ELSE
+         VIEWPORT NDC 0.0417 0.459 0.05 0.45
+      END IF
+   END IF
+END PROC
+
+HIDDEN PROC VP_BR LABELS 
+   IF UNDEFINED(LABELS)
+
+{  Original behaviour
+      VIEWPORT NDC 0.5417 0.959 0.05 0.45
+   else 
+
+{  If requested leave space for labels (this is a guess as label 
+{  spacing depends on character size).
+      FIRSTC = SUBSTR(LABELS,1,1)
+      FIRSTC = UPCASE(FIRSTC)
+      IF FIRSTC = "Y" OR FIRSTC = "T"
+         VIEWPORT NDC 0.55 0.90 0.1 0.4
+      ELSE
+         VIEWPORT NDC 0.5417 0.959 0.05 0.45
+      END IF
+   END IF
+END PROC
+
+HIDDEN PROC VP_TH LABELS 
+   IF UNDEFINED(LABELS)
+
+{  Original behaviour
+      VIEWPORT NDC 0.0833 0.917 0.55 0.95
+   else 
+
+{  If requested leave space for labels (this is a guess as label 
+{  spacing depends on character size).
+      FIRSTC = SUBSTR(LABELS,1,1)
+      FIRSTC = UPCASE(FIRSTC)
+      IF FIRSTC = "Y" OR FIRSTC = "T"
+         VIEWPORT NDC 0.1 0.90 0.6 0.9
+      ELSE
+         VIEWPORT NDC 0.0833 0.917 0.55 0.95
+      END IF
+   END IF
+END PROC
+
+HIDDEN PROC VP_TL LABELS 
+   IF UNDEFINED(LABELS)
+
+{  Original behaviour
+      VIEWPORT NDC 0.0417 0.459 0.55 0.95
+   else 
+
+{  If requested leave space for labels (this is a guess as label 
+{  spacing depends on character size).
+      FIRSTC = SUBSTR(LABELS,1,1)
+      FIRSTC = UPCASE(FIRSTC)
+      IF FIRSTC = "Y" OR FIRSTC = "T"
+         VIEWPORT NDC 0.05 0.45 0.6 0.90
+      ELSE
+         VIEWPORT NDC 0.0417 0.459 0.55 0.95
+      END IF
+   END IF
+END PROC
+
+HIDDEN PROC VP_TR LABELS 
+   IF UNDEFINED(LABELS)
+
+{  Original behaviour
+      VIEWPORT NDC 0.5417 0.959 0.55 0.95
+   else 
+
+{  If requested leave space for labels (this is a guess as label 
+{  spacing depends on character size).
+      FIRSTC = SUBSTR(LABELS,1,1)
+      FIRSTC = UPCASE(FIRSTC)
+      IF FIRSTC = "Y" OR FIRSTC = "T"
+         VIEWPORT NDC 0.55 0.95 0.6 0.90
+      ELSE
+         VIEWPORT NDC 0.5417 0.959 0.55 0.95
+      END IF
+   END IF
+END PROC
+
+HIDDEN PROC FILLSTY FILLSTY ANGLE SEPARATION PHASE
+
+{  Set the parameters of the fill.
+
+   IF UNDEFINED(FILLSTY)
+      PRINT "Must give a fill style (1-4)"      
+   ELSE IF UNDEFINED(ANGLE)
+      CHANGE FILLSTY=(FILLSTY&'')
+   ELSE IF UNDEFINED(SEPARATION)
+      CHANGE FILLSTY=(FILLSTY&'') ANGLE=(ANGLE&'')
+   ELSE IF UNDEFINED(PHASE)
+      CHANGE FILLSTY=(FILLSTY&'') ANGLE=(ANGLE&'') SEPARATION=(SEPARATION&'')
+   ELSE 
+      CHANGE FILLSTY=(FILLSTY&'') ANGLE=(ANGLE&'') ~
+             SEPARATION=(SEPARATION&'') PHASE=(PHASE&'')
+   END IF
+
+END PROC
+
+HIDDEN PROC SETPROJ PROJECTION RACENTRE DECCENTRE
+
+{  Set the projection related global variables.
+
+   IF UNDEFINED(PROJECTION)
+      PRINT "You must give a projection as the first parameter"      
+   ELSE IF UNDEFINED(RACENTRE)
+      SETGLOBAL PONGO_PROJECTN (PROJECTION&'')
+   ELSE IF UNDEFINED(DECCENTRE)
+      SETGLOBAL PONGO_PROJECTN (PROJECTION&'')
+      SETGLOBAL PONGO_RACENTRE (RACENTRE&'')
+   ELSE 
+      SETGLOBAL PONGO_PROJECTN (PROJECTION&'')
+      SETGLOBAL PONGO_RACENTRE (RACENTRE&'')
+      SETGLOBAL PONGO_DECENTRE (DECCENTRE&'')
+   END IF
+
+END PROC
+
+
+{ $Id$

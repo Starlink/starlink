@@ -1,0 +1,4 @@
+colour,i,h,2,,,"Colour index for line"
+weight,b,h,yes,,,"Use errors as weights if available"
+xmin,r,a,0.0,,,"Minimum X value to fit"
+xmax,r,a,1000.0,,,"Maximum X value to fit"

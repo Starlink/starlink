@@ -1,0 +1,20 @@
+.help yscale Starlink pongohelp
+.nf
+Multiply the values in the YCOL and EYCOL data areas by a
+constant.
+
+Usage:
+   yscale scale
+
+Description:
+
+   Multiply the values in the YCOL and EYCOL data areas by a
+   constant.
+
+Parameters:
+
+SCALE = _REAL (Read)
+   The constant by which the YCOL and EYCOL data areas are
+   scaled. []
+
+.endhelp

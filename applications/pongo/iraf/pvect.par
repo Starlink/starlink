@@ -1,0 +1,5 @@
+projection,s,a,"TAN",,,"Astrometric projection"
+racentre,s,a,"0",,,"Projection centre (RA)"
+deccentre,s,a,"0",,,"Projection centre (DEC)"
+erscale,r,h,1.0,,,"Scale factor for multiplying vectors"
+zmult,b,h,no,,,"Are Z-values to be used to multiply the vectors?"

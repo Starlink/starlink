@@ -1,0 +1,38 @@
+.help clog Starlink pongohelp
+.nf
+Take the logarithm of a column.
+
+Usage:
+   clog action
+
+Description:
+
+   Take the base 10 logarithm of a data column.  This application
+   should be used to take the logarithm of the data columns in
+   preference to doing it with CCMATH, because it can deal with the
+   associated error values consistently. It automatically adds the
+   "L" option to the PONGO_XOPT or PONGO_YOPT global parameters, as
+   appropriate.
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The data column to transform. It should be one of the
+   following:
+
+      - "X" -- XCOL
+
+      - "Y" -- YCOL
+
+      - "Z" -- ZCOL
+
+XOPT = _CHAR (Write)
+   The PGPLOT X-axis options string.  The global parameter will be
+   updated to include the PGPLOT "L" axis option at the start.
+   This option means that logarithmic style axis labels and tick
+   marks will be plotted by the BOXFRAME command. 
+YOPT = _CHAR (Write)
+   The PGPLOT Y-axis options string. Its action is similar to the
+   XOPT parameter.
+
+.endhelp

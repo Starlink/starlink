@@ -1,0 +1,70 @@
+.help fitcurve Starlink pongohelp
+.nf
+Fit a curve to the data.
+
+Usage:
+
+   fitcurve action npoly xmin xmax
+
+Description:
+
+   This command fits data using either a polynomial or a smooth
+   spline. If weights are available these can be used when
+   determining the fit.
+
+   The resultant fit parameters are displayed and written to a file
+   for use by the PLOTFUN application, which can replot the polynomial
+   or spline with other datasets etc.
+
+Parameters:
+
+ACTION = _CHAR (Read and Write)
+   Type of curve to be fitted. Currently this action must be
+   "POLY" or "SPLINE"
+NPOLY = _INTEGER (Read and Write)
+   The order of the polynomial or spline. For polynomials this can
+   range from 1 to 9 and for splines from 2 to 6.
+COLOUR = _INTEGER (Read and Write)
+   The colour index used when plotting the fitted curve.
+WEIGHT = _LOGICAL (Read and Write)
+   Whether the fit is to use the y-axis error data in the EYCOL
+   data area, if available. If no error data are available, the
+   fit will always be unweighted.
+POLYCOEF[10] = _DOUBLE (Write)
+   If ACTION is "POLY", the polynomial coefficients resulting
+   from the fit are written to this parameter.
+POLYFILE = _CHAR (Read)
+   The name of a file to contain the derived polynomial coefficients.
+   Only used when ACTION is "POLY" and INFILE is TRUE.
+   [POLYFILE.dat]
+SMOOTH = _REAL (Read)
+   Only used if ACTION is "SPLINE". This factor determines the
+   tradeoff between the closeness and smoothness of the spline
+   fit. It should be a real number greater than 0.0. A number
+   about equal to the number of points should be tried first. 
+   If set to 0.0 then an interpolating spline fit is produced.
+SPLINEFILE = _CHAR (Read)
+   The name of a file to contain the coefficients and knot
+   positions from the spline fit -- used when ACTION is
+   "SPLINE". This file can be used by the PLOTFUN command to
+   redraw the fit.
+XMIN = _REAL (Read)
+   The minimum X value to be used in the fit.
+XMAX = _REAL (Read)
+   The maximum X value to be used in the fit.
+
+Notes:
+-   this application fits a general polynomial of the form:
+
+    y = a1 + a2*x + a3*x^2 + a4*x^3 ..... an*x^n
+
+which has order n-1, using a least squares approach.
+
+- The spline fit is characterised by the positions of the knots and
+the spline coefficients (and the order used for the splines) all
+of which are stored in the spline file. The number of knots used
+in the fit can only be influenced by using the SMOOTH
+parameter. Higher values of this give larger smoothing factors. A
+value of 0 gives an interpolating spline fit.
+
+.endhelp

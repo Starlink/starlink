@@ -1,0 +1,23 @@
+.help expand Starlink pongohelp
+.nf
+Set the character height.
+
+Usage:
+   expand cheight
+
+Description:
+
+   Change the character height scaling. This command scales the
+   default character height and also alters the size of the tick
+   marks and symbols that PONGO plots. The default character height
+   is about 1/40 of the viewport height.
+
+Parameters:
+
+CHEIGHT = _REAL (Read and Write)
+   The character height scaling. This parameter scales the
+   default character height and also alters the size of the tick
+   marks and symbols that PGPLOT plots. The default character
+   height in PGPLOT is about 1/40 of the viewport height.
+
+.endhelp

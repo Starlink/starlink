@@ -1,0 +1,93 @@
+{+
+{  Name:
+{     ERRORS.ICL
+
+{  Purpose:
+{     Plot the ERRORS example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/spectrum
+
+{  Description:
+{     Demonstrate the use of error bars and least squares fitting in PONGO.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     15-DEC-1992 (PCTR):
+{        Starlink release.
+{     11-JUN-1994 (PDRAPER): 
+{        Ported to UNIX.
+
+{  Bugs:
+
+{-
+
+{  Prompt for and read the name of a graphics device.
+INPUT "Graphics device name: " (GDNAME)
+
+{  Begin a PONGO plot.
+BEGPLOT (GDNAME)
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set the columns to read from the data file.
+XCOLUMN 1
+EXCOLUMN 2
+YCOLUMN 3
+EYCOLUMN 4
+                              
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/tutorial.dat ALL
+
+{  Set the plotting limits.
+WORLD DATA
+
+{  Draw the box and plot the data.
+CHANGE LINEWID=2
+BOXFRAME BCNST BCNVST
+CHANGE LINEWID=1
+ERRORBAR X 0.0
+ERRORBAR Y 0.0
+
+{  Draw the labels.
+CHANGE LINEWID=2
+CHANGE CHEIGHT=2.0
+WTEXT M 0.5 0.5 "Interstellar data" SIDE=T JUSTIFICATION=0.5
+CHANGE CHEIGHT=1.0
+WTEXT M 3 0.5 "Colour excess E\dB-V\d" SIDE=B JUSTIFICATION=0.5
+WTEXT M 3 0.5 "Equivalent width in m\A" SIDE=L JUSTIFICATION=0.5
+
+{  Perform an unweighted least squares to a straight line.
+LTYPE 2
+FITLINE NOWEIGHT COLOUR=3
+
+{  Perform a weighted least squares fit to a straight line.
+LTYPE 1
+FITLINE WEIGHT COLOUR=2
+
+{  Perform a weighted least squares fit to a Chebyshev polynomial.
+LTYPE 4
+FITCURVE POLY NPOLY=2 WEIGHT COLOUR=4
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ $Id$

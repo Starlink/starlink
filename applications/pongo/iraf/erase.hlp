@@ -1,0 +1,12 @@
+.help erase Starlink pongohelp
+.nf
+Clear the graphics screen.
+
+Usage:
+   erase
+
+Description:
+
+   The plotting surface is cleared.
+
+.endhelp

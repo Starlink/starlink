@@ -1,0 +1,86 @@
+1 Update_to_PONGO
+
+ Recent Changes (Release 2.0-2)
+ --------------
+
+ PONGO now uses native PGPLOT for plotting rather than the deprecated 
+ Starlink GKS PGPLOT. This should fix plotting and interoperability  
+ problems with recent versions of KAPPA.
+
+ Alasdair Allan (aa@astro.ex.ac.uk), 22nd April 2004.
+
+ Older Changes (Release 2.0-1)
+ -------------
+
+ PONGO has been considerably extended to now work from the IRAF/CL
+ command language. To use this load the pongo package. The 
+ commands that are available are the same as when running from ICL.
+ 
+ Other changes of note are:
+
+   o The READF command has been changed so that `@' is no
+     longer needed when using an ICL variable to store the file name. 
+     This is INCOMPATIBLE with previous behaviour and any scripts 
+     using the `@' form will need changing, i.e. lines with statements
+     like:
+
+        READF DATA=('@'&FILE)
+
+     Should be changed to:
+
+        READF DATA=(FILE)
+
+   o An example has been added to the panic section to show how
+     PONGO can be used to plot more than 5000 points at a time (5000 is
+     the current maximum number of points that can be read at the same
+     time).
+
+   o READF has been fixed so that it is possible to once again
+     read data from more than one file.
+
+   o Errors in the documentation that still included descriptions of the
+     previous Chebyshev version of FITLINE have been corrected.
+
+   o A description of how to close the edges of grids has been added to
+     the GRID command section. This command now also attempts to
+     complete latitude lines to their end points (this reduces 
+     the ragged appearance at the ends of latitude lines).
+
+   o The YLINEAR command now works.
+
+   o The VP_xx commands have been modified to accept an argument which
+     indicates that space around the viewport should be reserved for 
+     any labels.
+
+   o FITCURVE now uses the XMIN and XMAX parameters as described
+     (polynomial curves previously used all the data). The YMAX
+     and YMIN parameters are no longer used. It also now writes any
+     polynomial coefficients to a file (this can be read by PLOTFUN).
+
+   o FITCURVE has also had a memory control bug fixed.
+
+   o CURSE now also reports approximate sky coordinates when
+     reading the cursor positions.
+
+   o A new command FILLSTY has been introduced. This conveniently sets
+     the fill-style attributes (for polygons and histograms).
+
+   o A new command DRAWPOLY has been introduced. This draws polygons
+     that can be filled. 
+
+   o A new command SETPROJ has been introduced. This sets the
+     projection geometry related global variables (under CL this sets
+     all the parameters of the projection aware commands).
+
+   o The PRIM command now allows projections for all its actions (this
+     also effects the commands, MOVE and DRAW). Note that the lines
+     drawn are straight-lines on the plot surface, not great
+     circles. The GT\_CIRCLE command already supplies this ability.
+
+   o The commands XSCALE, YSCALE, YOFFSET and XOFFSET now allow
+     negative factors. 
+
+  Peter Draper (P.W.Draper@durham.ac.uk), 12th November 1997.
+
+
+

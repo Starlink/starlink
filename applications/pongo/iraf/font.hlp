@@ -1,0 +1,26 @@
+.help font Starlink pongohelp
+.nf
+Set the text font.
+
+Usage:
+   font font
+
+Description:
+
+   Change the text font.
+
+Parameters:
+
+FONT = _INTEGER (Read)
+   The font used by PGPLOT. The styles for each font are as
+   follows:
+
+      - 1 -- single-stroke font,
+
+      - 2 -- roman font,
+
+      - 3 -- italic font,
+
+      - 4 -- script font.
+
+.endhelp

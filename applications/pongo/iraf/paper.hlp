@@ -1,0 +1,23 @@
+.help paper Starlink pongohelp
+.nf
+Change the size and aspect ratio of the plotting surface.
+
+Usage:
+   paper width aspect
+
+Description:
+
+   The width of the plotting surface and its aspect ratio (i.e.
+   height/width) are modified.
+
+Parameters:
+
+WIDTH = _REAL (Read and Write)
+   The width of the plotting surface in inches. If the specified
+   width is 0.0, the maximum possible width for the device is
+   used.
+
+ASPECT = _REAL (Read and Write)
+   The aspect ratio of the plotting surface: i.e. height/width.
+
+.endhelp

@@ -1,0 +1,10 @@
+action,s,a,"FUNC",,,"Type of function to be plotted"
+expression,s,a,"X",,,"Expression to be plotted"
+xmin,r,a,0,,,"Smallest X-value to plot function"
+xmax,r,a,1000,,,"Largest X-value to plot function"
+infile,b,h,yes,,,"Read polynomials from file"
+npoly,i,a,2,,,"Order of polynomial"
+polycoef,struct,a,,,,"Polynomial coefficients"
+0.0
+polyfile,s,h,"POLYFILE.dat",,,"File containing polynomial parameters"
+splinefile,s,h,"SPLINEFILE.dat",,,"File containing spline fit parameters"

@@ -1,0 +1,119 @@
+{+
+{  Name:
+{     PPDOTDIAG.ICL
+
+{  Purpose:
+{     Plot the PPDOTDIAG example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/ppdotdiag
+
+{  Description:
+{     Demonstrate more complex data management using READF and labelling.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     3-JUL-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+{     11-JUN-1994 (PDRAPER):
+{        Ported to UNIX.
+
+{  Bugs:
+
+{-
+
+{  Prompt for and read the name of a graphics device.
+INPUT "Graphics device name: " (GDNAME)
+
+{  Begin a PONGO plot.
+BEGPLOT (GDNAME)
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set the columns to read from the data file.
+XCOLUMN Perio
+YCOLUMN pdot
+EXCOLUMN 0
+EYCOLUMN 0
+LABCOLUMN 1
+SYMCOLUMN 2
+
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SELCOND='pdot > 0' ~
+      NOALL NOQUICK RESET
+
+{  Convert the X- and Y-axis data to logarithms.
+XLOGARITHM
+YLOGARITHM
+
+{  Set the Y-axis style and the plot limits.
+SETGLOBAL PONGO_YOPT BCNST
+LIMITS -2.95 1.0 -20.5 -11.0
+
+{  Draw the box and plot the points.
+LWEIGHT 2
+BOXFRAME
+LWEIGHT 1
+POINTS
+
+{  Create a title from the number of points that have been read in.
+{  Note the string concatenation.
+GETGLOBAL PONGO_NDATA (NPULSAR)
+TITLESTRING=''''&(NPULSAR)&' Pulsars'&''''
+
+{  The Y-axis label.
+YLABEL='''log[Period Derivative (ss\u-1\d)]'''
+
+{  Note how the X-axis label is picked up from the data file.
+LWEIGHT 2
+LABEL COLUMNS YLABEL=(YLABEL&'') TITLE=(TITLESTRING&'')
+LTYPE 2
+MOVE -1.325 -21.0
+DRAW  1.0   -14.025
+LTYPE 5
+MOVE -3.0   -18.9549
+DRAW  1.0   -13.626
+LWEIGHT 1
+CHANGE LINESTY=1 CHEIGHT=0.7
+PTEXT      -0.7082780     -18.0945511        0 0.0 '0655+64'
+PTEXT      -1.2338796     -17.0440712        0 0.0 '1913+16'
+
+{  Note the use of the command line continuation character "~", used 
+{  gratuitously here for for illustration.
+PTEXT      -0.2164239E+01  -0.1934648E+02    0 0.0 ~
+   '1953+29'
+PTEXT      -0.2336934E+01  -0.1979958E+02    0 1.0 ~
+   '1855+09'
+PTEXT      -1.9114622     -17.9879818        0 0.0 ~
+   '1620-26'
+
+CHANGE CHEIGHT=1.0
+PTEXT      -1.0945635     -20.1498394       37 0.0 'Death Line'
+PTEXT      -1.4808489     -16.7852573       19 0.0 'Spin-up Line'
+
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ $Id$

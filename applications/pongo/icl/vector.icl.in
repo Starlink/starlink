@@ -1,0 +1,119 @@
+{+
+{  Name:
+{     VECTOR.ICL
+
+{  Purpose:
+{     Plot the VECTOR example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/vector
+
+{  Description:
+{     A PONGO example file to illustrate different the use
+{     of the VECT and PVECT commands.
+
+{  Authors:
+{     PDRAPER: Peter W. Draper (STARLINK - Durham University)
+
+{  History:
+{     14-AUG-1996 (PDRAPER):
+{        Original version.
+
+{-
+
+{  Prompt for the name of a graphics device.
+INPUT "Graphics device name: " (GDNAME)
+
+{  Begin a PONGO plot.
+BEGPLOT (GDNAME)
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Read in the data, selecting objects with proper motions 
+{  greater than 0.5 arcseconds in RA per year.
+READF DATA=INSTALL/bin/examples/pongo/highppm.dat XCOL=2 YCOL=3 ~
+      EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
+
+{  Convert the proper motions into radians.
+CCMATH EX='EX/3600.0' EY='EY/3600.0'
+DEGTOR EX
+DEGTOR EY
+
+{  Select top of plot.
+VP_TH
+
+{  Use the AITOFF projection
+PROJ="aitoff"
+
+{  Set the limits of the plot.
+LIMITS -3.3 3.3 -1.5 1.5 PROJECTION=(PROJ) RACENTRE=12
+WNAD
+
+{  Draw the background grid.
+LWEIGHT 1
+PEN 7
+GRID PROJECTION=(PROJ)
+
+{  Add a title.
+PEN 1
+EXPAND 0.75
+MTEXT T 1.0 0.5 0.5 ~
+  'Bright stars with high proper motions (AITOFF projection centre \ga=12\uh\d \gd=0\(2729))'
+
+{  Plot the star positions.
+LWEIGHT 2
+PEN 2
+POINTS SYMBOL=3 PROJECTION=(PROJ)
+
+{  And the proper motion vectors. This gives 100000 years of travel.
+PEN 4
+PVECT PROJECTION=(PROJ) ERSCALE=1.0E5
+
+{  Now read in and plot the ra and dec labels and their positions.
+READF DATA=INSTALL/bin/examples/pongo/gridlabels.dat XCOL=2 YCOL=3 ~
+      LABCOL=1 EXCOL=0 EYCOL=0 ALL
+DEGTOR X
+DEGTOR Y
+PEN 1
+ANNOTATE PROJECTION=(PROJ) YOFF=0.0 XOFF=0.0 JUSTIFICATION=1.0 RACENTRE=12
+
+READF DATA=INSTALL/bin/examples/pongo/gridlabels.dat XCOL=5 YCOL=6 ~
+      LABCOL=4 EXCOL=0 EYCOL=0 TO=9 ALL
+DEGTOR X
+DEGTOR Y
+ANNOTATE PROJECTION=(PROJ) YOFF=0.0 XOFF=0.0 JUSTIFICATION=1.0 
+
+{  Do normal vector plot for bottom half.
+READF DATA=INSTALL/bin/examples/pongo/highppm.dat XCOL=2 YCOL=3 ~
+      EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
+CCMATH EX='EX/3600.0' EY='EY/3600.0'
+DEGTOR EX
+DEGTOR EY
+VP_BH
+DLIMITS  
+WNAD
+
+{  Draw a box with RA and Dec labels.
+LWEIGHT 1
+PEN 7
+BOX BCNSTZHG BCNSTZDG
+
+{  Plot the star positions.
+LWEIGHT 2
+PEN 2
+POINTS SYMBOL=3
+
+{  And the proper motion vectors.
+PEN 4
+VECT ERSCALE=1.0E5
+
+{  Close the plot.
+PEN 1
+ENDPLOT

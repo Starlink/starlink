@@ -1,0 +1,162 @@
+.help readf Starlink pongohelp
+.nf
+Read from a formatted data file.
+
+Usage:
+   readf data xcol ycol zcol excol eycol labcol symcol selcond all
+
+Description:
+
+   Read input data from a formatted data file. READF attempts to
+   read data from columns in an sequential formatted file in the
+   most flexible manner possible. It is possible to specify the
+   following:
+
+      - What comment delimiter characters are used within the data
+      file -- if used, the comment delimiter must be the first
+      character of a line in the data file.
+
+      - What the column delimiters are (more than one character is
+      possible).
+
+      - Symbolic names for each of the data columns.
+
+   The application is intended to be very robust: if a read error
+   occurs within a line, READF will report an error and attempt to
+   continue.
+
+   The application has many parameters for controlling how data are
+   read, but the default values of these parameters are sufficient
+   for reading most data files.
+
+Parameters:
+
+DATA = FILENAME (Read)
+   The name of the formatted data file. This can be predefined using
+   the DATA command.
+HARDCOM = _CHAR (Read)
+   A character used to indicate a comment line in the data file.
+   The character must appear in the first column of a comment.
+   [!]
+SOFTCOM = _CHAR (Read)
+   A character to indicate a comment line in the data file. This
+   parameter allows a second character to be used as a comment
+   delimiter.  The character must appear in the first column of a
+   comment.
+   [#]
+XCOL = _CHAR (Read)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the X-axis data are read. The value "0"
+   means "do not read these data".
+
+   This can be predefined using the XCOLUMN command.
+YCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Y-axis data are read. The value "0"
+   means "do not read these data".
+
+   This can be predefined using the YCOLUMN command.
+ZCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Z-axis data are read. The value "0"
+   means "do not read these data".
+
+   This can be predefined using the ZCOLUMN command.
+
+EXCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the X-axis error data are read. The value
+   "0" means "do not read these data".
+
+   This can be predefined using the EXCOLUMN command.
+EYCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Y-axis error data are read. The value
+   "0" means "do not read these data".
+
+   This can be predefined using the EYCOLUMN command.
+LABCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the symbolic name for each data point is
+   read. The value "0" means "do not read these data".
+
+   This can be predefined using the LABCOLUMN command.
+SYMCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the PGPLOT symbol code for each data point
+   is read. The value "0" means "do not read these data".
+
+   This can be predefined using the SYMCOLUMN command.
+DELIM = _CHAR (Read and Write)
+   The character string interpreted as a column delimitier when
+   reading the data file. For example, this can be used to read
+   LATEX format tables by setting DELIM="&".
+
+FROM = _INTEGER (Read and Write)
+   The first line of data to be read from the data file. The value
+   0 defaults to the beginning of the file.
+   [0]
+TO = _INTEGER (Read and Write)
+   The last line of data to be read from the data file. The value
+   0 defaults to the end of the file.
+   [0]
+SELCOND = _CHAR (Read and Write)
+   A condition (or criterion) upon which to select values from
+   the data file.  This condition has the form
+
+      [SELECT_COL] [COND] [VAL1{,VAL2, ...}]
+
+   where
+
+      - [SELECT_COL] is the data area used for the selection
+      test. This can be specified either by column number
+      (counting from 1) or by the symbolic name of a column.
+      There is no restriction on which column is used for
+      selection, i.e. it does not have to be one of the columns
+      from which data are being read.
+
+      - [COND] is the selection criterion. It may be one of the
+      following:
+
+         o "=" -- equals;
+         o "#" -- not equal;
+         o ">" -- greater than;
+         o "<" -- less than;
+         o "CE" -- equal to string;
+         o "C#" -- not equal to string;
+         o "RA" -- in the range VAL1 to VAL2;
+         o "LI" -- select if in the following list of values;
+         o "EX" -- exclude if in the following list of values;
+         o "IN" -- select if the substring is contained within the
+         value;
+         o "A>" -- absolute value greater than;
+         o "A<" -- absolute value less than.
+
+      - [VAL1{,VAL2, ...}] the value (or values) against which the
+      selection is made.
+
+   Note that there must be white space around the selection
+   criterion. A value of "0" means "read everything".
+
+ADD = _LOGICAL (Read)
+   If FALSE, the data values already held will be cleared before
+   reading new data; if TRUE, the data read will be appended to
+   the existing data.
+   [FALSE]
+ALL = _LOGICAL (Read and Write)
+   If TRUE, the whole data file will be read; if FALSE, a
+   selection condition will be prompted for.
+
+QUICK = _LOGICAL (Read and Write)
+   If TRUE, a "quick mode" read is performed. This mode can only
+   be used on files which exclusively contain numeric data. This
+   parameter can override the action of the LABCOL and SELCOND
+   parameters.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to FALSE.
+NDATA = _INTEGER (Write)
+   The number of data read from the data file. Use this value 
+   after running the application.
+
+.endhelp

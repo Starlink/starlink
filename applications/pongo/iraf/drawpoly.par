@@ -1,0 +1,4 @@
+fill,b,h,"yes",,,"Fill polygon"
+projection,s,h,"NONE",,,"Astrometric projection"
+racentre,s,h,"0",,,"Centre of projection (RA)"
+deccentre,s,h,"0",,,"Centre of projection (DEC)"

@@ -1,0 +1,29 @@
+.help vport Starlink pongohelp
+.nf
+Set the viewport using normalised device coordinates.
+
+Usage:
+   vport xvpmin xvpmax yvpmin yvpmax
+
+Description:
+
+   The viewport is set by specifying its extent in the X and Y
+   directions in terms of normalised device coordinates (i.e.
+   coordinates that run from 0 to 1 along the horizontal and
+   vertical directions).
+
+Parameters:
+
+XVPMIN = _REAL (Read)
+   The left hand side of the viewport.
+
+XVPMAX = _REAL (Read)
+   The right hand side of the viewport.
+
+YVPMIN = _REAL (Read)
+   The lower side of the viewport.
+
+YVPMAX = _REAL (Read)
+   The upper side of the viewport.
+
+.endhelp

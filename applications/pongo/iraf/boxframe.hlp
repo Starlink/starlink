@@ -1,0 +1,116 @@
+.help boxframe Starlink pongohelp
+.nf
+Draw a frame and axes on the plot.
+
+Usage:
+   boxframe [xopt] [yopt] [xtic] [ytic] [nxsub] [nysub]
+
+Description:
+
+   Draw a frame, axes and tick-marks on a plot. The application has
+   great flexibility in the type of axis labelling that can be
+   produced -- it is essentially an interface to the PGPLOT routines
+   PGBOX and PGTBOX.
+
+Parameters:
+
+XOPT = _CHAR (Read)
+   A string that controls the style of the X-axis labelling and
+   tick-marks. It consists of a series of letters, which have the
+   meanings shown below (reproduced from the PGPLOT manual):
+
+      - "A" -- Draw an axis (the X axis is the horizontal line
+      Y=0, the Y axis is the vertical line X=0).
+
+      - "B" -- Draw the bottom (X) or left (Y) edge of the frame.
+
+      - "C" -- Draw the top (X) or right (Y) edge of the frame.
+
+      - "G" -- Draw a grid of vertical (X) or horizontal (Y)
+      lines.
+
+      - "I" -- Invert the tick-marks (i.e. draw them outside the
+      viewport instead of inside).
+
+      - "L" -- Label the axis logarithmically (see below).
+
+      - "N" -- Write numeric labels in the conventional location
+      below the viewport (X) or to the left of the viewport (Y).
+
+      - "P" -- Extend (project) major tick-marks outside the box
+      (ignored if option I is specified).
+
+      - "M" -- Write numeric labels in the unconventional location
+      above the viewport (X) or to the right of the viewport (Y).
+
+      - "T" -- Draw major tick-marks at the major coordinate
+      interval.
+
+      - "S" -- Draw minor tick-marks (sub-ticks).
+
+      - "V" -- Orient numeric labels vertically (this is only
+      applicable to Y -- the default is to write Y-axis labels
+      parallel to the axis).
+
+      - "1" -- Force decimal labelling.
+
+      - "2" -- Force exponential labelling.
+
+   A set of special letters control the plotting of RA and DEC
+   axes.
+
+      - "Z" for (DD) HH MM SS.S time labelling
+
+      - "H" means superscript numbers with d, h, m, & s  symbols
+
+      - "D" means superscript numbers with    o, ', & '' symbols
+
+      - "F" causes the first label (left- or bottom-most) to
+            be omitted. Useful for sub-panels that abut each other.
+            Care is needed because first label carries sign as well.
+
+      - "O" means omit leading zeros in numbers < 10
+            E.g.  3h 3m 1.2s rather than 03h 03m 01.2s  Useful
+            to help save space on X-axes. The day field does not
+            use this facility.
+
+   Note that to use these features your data values should be in
+   radians (PONGO automatically converts HH:MM:SS.SSS strings to
+   radians, and the DEGTOR command from degrees to radians).
+YOPT = _CHAR (Read and Write)
+   A string that controls the style of the Y-axis labelling and
+   tick-marks. It consists of a series of letters, as given for
+   the parameter XOPT.
+XTIC = _REAL (Read and Write)
+   The major tick-mark interval on the X-axis. If XTIC is set to
+   0.0, PGPLOT makes a sensible choice.
+YTIC = _REAL (Read and Write)
+   The major tick-mark interval on the Y-axis. If YTIC is set to
+   0.0, PGPLOT makes a sensible choice.
+NXSUB = _INTEGER (Read and Write)
+   The number of minor tick-marks between each major tick-mark on
+   the X-axis. If NXSUB is set to 0, PGPLOT makes a sensible
+   choice.
+NYSUB = _INTEGER (Read and Write)
+   The number of minor tick-marks between each major tick-mark on
+   the Y-axis. If NYSUB is set to 0, PGPLOT makes a sensible
+   choice.
+
+Notes:
+
+- Right Ascension and Declination axes.
+
+   It is possible to draw RA and DEC axes using this routine. To
+   do this read in your X and Y data in radians (this is the
+   default if your data are stored in the HH:MM:SS.SSS,
+   DD:MM:SS.SSS formats) and then set the "Z" character in the
+   XOPT and YOPT parameters. A good combination of options are:
+
+      XOPT='BCNSTZHG' YOPT='BCNSTZDG'
+
+   For more about this (in particular how the interval options are
+   set) see the PGPLOT documentation about PGTBOX. Note that the
+   "Y" option is always set and that the Y axis values are
+   converted into pseudo arc seconds.
+
+.endhelp

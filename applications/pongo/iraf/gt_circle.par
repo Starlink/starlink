@@ -1,0 +1,8 @@
+phistart,r,a,0.0,,,"Longitude of start of great circle"
+thestart,r,a,0.0,,,"Latitude of start of great circle"
+phiend,r,a,360.0,,,"Longitude of end of great circle"
+theend,r,a,0.0,,,"Latitude of end of great circle"
+acute,b,h,yes,,,"Draw the smaller great circle arc"
+projection,s,a,"aitoff",,,"Astrometric projection"
+racentre,s,a,"0",,,"Projection centre (RA)"
+deccentre,s,a,"0",,,"Projection centre (DEC)"

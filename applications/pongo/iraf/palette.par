@@ -1,0 +1,4 @@
+colour,i,a,1,0,255,"PGPLOT colour index to be modified"
+red,r,a,1.0,0.0,1.0,"Red intensity"
+green,r,a,1.0,0.0,1.0,"Green intensity"
+blue,r,a,1.0,0.0,1.0,"Blue intensity"

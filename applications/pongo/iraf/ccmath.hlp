@@ -1,0 +1,69 @@
+.help ccmath Starlink pongohelp
+.nf
+Perform inter-column maths.
+
+Usage:
+   ccmath
+
+Description:
+
+   Perform inter-column maths (using TRANSFORM, SUN/61). The
+   expressions and functions recognised have Fortran types and
+   syntax.  Any construct that is legal in TRANSFORM is legal in
+   this subroutine, with the additional function INDEX for filling
+   the array with an increasing sequence of integers. See SUN/61 for
+   further details.
+
+   The names used for the data areas are as follows:
+
+      - "X" -- the XCOL data area,
+
+      - "Y" -- the YCOL data area,
+
+      - "Z" -- the ZCOL data area,
+
+      - "EX" -- the EXCOL error area,
+
+      - "EY" -- the EYCOL error area.
+
+Parameters:
+
+X = _CHAR (Read)
+   The transformation to perform on the contents of the XCOL data
+   area.
+   ["X: -- i.e. will cause the contents of the data area to remain
+   unchanged.]
+Y = _CHAR (Read)
+   The transformation to perform on contents of the YCOL data
+   area.
+   ["Y" -- i.e. will cause the contents of the data area to remain
+   unchanged.]
+Z = _CHAR (Read)
+   The transformation to perform on contents of the ZCOL data
+   area.
+   ["Z" -- i.e. will cause the contents of the data area to remain
+   unchanged.]
+EX = _CHAR (Read)
+   The transformation to perform on contents of the EXCOL data
+   area.
+   ["EX" -- i.e. will cause the contents of the data area to
+   remain unchanged.]
+EY = _CHAR (Read)
+   The transformation to perform on contents of the EYCOL data
+   area.
+   ["EY" -- i.e. will cause the contents of the data area to
+   remain unchanged.]
+
+Examples
+
+po> ccmath x="2*y"
+   will fill each element of the X data area with twice the
+   corresponding element of the Y data area.
+
+Notes:
+
+- More than one array may be manipulated with a single command.
+
+- The INDEX function cannot be combined with any other function.
+
+.endhelp

@@ -1,0 +1,6 @@
+action,s,a,"p","|c|p|s|",,"Type of connection"
+symbol,i,h,1,1,,"PGPLOT marker number"
+scale,r,h,1.0,,,"Scale factor for ZCOL values"
+projection,s,h,"NONE",,,"Astrometric projection"
+racentre,s,h,"0",,,"Projection centre (RA)"
+deccentre,s,h,"0",,,"Projection centre (DEC)"

@@ -1,0 +1,33 @@
+.help fitline Starlink pongohelp
+.nf
+Fit a straight line to the data.
+
+Usage:
+   fitline xmin xmax
+
+Description:
+
+   If the y-axis error data are available and the WEIGHT parameter is
+   TRUE, this application will perform a weighted least squares fit
+   to a straight line for the data over the range delimited by the
+   XMIN and XMAX parameters. If the y-axis error data are not
+   available or WEIGHT is FALSE, an unweighted fit is performed. The
+   best fit straight line is plotted. The resultant fit parameters
+   are displayed along with some simple statistics for the data
+   (these statistics are also weighted in the case of a weighted
+   fit).
+
+Parameters:
+
+COLOUR = _INTEGER (Read and Write)
+   The colour index used when plotting the fitted line.
+WEIGHT =_LOGICAL (Read and Write)
+   Whether the fit is to use the y-axis error data in the EYCOL
+   data area, if available. If no error data are available, the
+   fit will always be unweighted.
+XMIN = _REAL (Read)
+   The minimum X value to be used in the fit.
+XMAX = _REAL (Read)
+   The maximum X value to be used in the fit.
+
+.endhelp

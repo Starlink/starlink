@@ -1,0 +1,18 @@
+.help lweight Starlink pongohelp
+.nf
+Set the line width.
+
+Usage:
+   lweight linewid
+
+Description:
+
+   Change the line width scaling (the normal line width is 1.0).
+
+Parameters:
+
+LINEWID = _INTEGER (Read and Write)
+   The line width scaling. This parameter scales the default line
+   width.
+
+.endhelp

@@ -1,0 +1,36 @@
+.help avedat Starlink pongohelp
+.nf
+Average the data in the XCOL and YCOL areas.
+
+Usage:
+   avedat action nbin xmin xmax
+
+Description:
+
+   Rebin the XCOL and YCOL data, averaging the data in each sample,
+   and puts the result back into the XCOL and YCOL areas. The
+   standard deviations of the averages are put into the EXCOL and
+   EYCOL areas.  There are two ways in which the averaging may be
+   done:
+
+     - the data may be split into N equally sized bins over the X
+       range, and the values in each bin averaged;
+
+     - the data may be averaged in groups of N data.
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The type of binning be used for the averaging. If "X", the
+   data are divided into NBIN bins over the X range.  If "N",
+   bins of varying widths with each containing NBIN data points
+   are formed.
+NBIN = _INTEGER (Read)
+   Depending upon the value of ACTION, either the number of bins
+   (ACTION="X"), or the number of points per bin (ACTION="N").
+XMIN = _REAL (Read)
+   The minimum X value to be used in the average.
+XMAX = _REAL (Read)
+   The maximum X value to be used in the average.
+
+.endhelp

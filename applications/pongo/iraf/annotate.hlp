@@ -1,0 +1,48 @@
+.help annotate Starlink pongohelp
+.nf
+Annotate the plotted data.
+
+Usage:
+     annotate xoff yoff
+
+Description:
+
+   Each of the points on the plot is labeled with the appropriate
+   internal label (if it has been read from the data file). If no
+   parameters are specified, the default action is for the label to
+   be written with a zero offset in X and an offset of approximately
+   one character height in Y.
+
+
+Parameters:
+
+XOFF = _REAL (Read and Write)
+   The X coordinate offset of the string relative to each data
+   point. The application will use the value 0.0 (i.e. no offset)
+   unless a value is given on the command line.
+   [0.0]
+YOFF = _REAL (Read and Write)
+   The Y coordinate offset of the string relative to each data
+   point.
+JUSTIFICATION = _REAL (Read and Write)
+   The justification about the point specified by XOFF and YOFF
+   relative to each data point (in the range 0.0 to 1.0).  Here,
+   0.0 means left justify the text relative to the data point,
+   1.0 means right justify the text relative to the data point,
+   0.5 means centre the string on the data point, other values
+   will give intermediate justifications.
+PROJECTION = _CHAR (Read)
+   The projection that has been used to plot the data. This is
+   explained in more detail in the section on projections. Allowed
+   values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR", and "STG".
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This paramerter is only
+   required for PROJECTION values other than "NONE".
+
+.endhelp

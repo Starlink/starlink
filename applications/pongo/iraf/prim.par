@@ -1,0 +1,7 @@
+action,s,a,"K",,,"Type of primitive data function"
+x,r,a,0.0,,,"X-coordinate"
+y,r,a,0.0,,,"Y-coordinate"
+symbol,i,h,1,,,"PGPLOT symbol number for marking"
+projection,s,h,"NONE",,,"Astrometric projection"
+racentre,s,h,"0",,,"Projection centre (RA)"
+deccentre,s,h,"0",,,"Projection centre (DEC)"

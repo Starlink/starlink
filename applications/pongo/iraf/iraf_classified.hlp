@@ -1,0 +1,227 @@
+.help classified Starlink pongohelp
+.nf
+    This topic presents a classified list of the available PONGO
+    commands. The list is classified into several broad categories:
+    commands which begin and end a PONGO session, commands for
+    manipulating data, commands which control plotting, plotting
+    commands, and commands which perform simple statistics on the
+    data. The parts of the command names outside parentheses define
+    the minimum abbreviation for that application.
+
+
+Begin_and_end
+
+    BEGPLOT
+       Open a plotting device.
+    DEVICE
+       Open a plotting device.
+    ENDPLOT
+       Close down the current plotting device.
+
+
+Plotting
+
+    ADVANCE
+       Clear the graphics screen.
+    ANNOTATE
+       Annotate the plotted data.
+    ARC
+       Draw an arc of an ellipse.
+    BIN
+       Plot a histogram using previously binned data.
+    BOXFRAME
+       Draw a frame and axes on the plot.
+    CONNECT
+       Draw straight lines between the data points.
+    CURSE
+       Use the cursor to get interactive input.
+    DRAW
+       Draw a line from the current pen position the specified point.
+    DRAWPOLY
+       Draw a polygon.
+    ELLIPSES
+       Draw error ellipses.
+    ERASE
+       Clear the graphics screen.
+    ERRORBAR
+       Draw error bars on the plotted data.
+    ERRX
+       Draw symmetric error bars in the X direction.
+    ERRY
+       Draw symmetric error bars in the Y direction.
+    GPOINTS
+       Plot points or lines between the data.
+    GRID
+       Draw a coordinate grid at specified intervals.
+    GT_CIRCLE
+       Draw a great circle between two points.
+    HISTOGRAM
+       Bin and plot a histogram of the data.
+    LABEL
+       Draw the axis labels and title on the plot.
+    MARK
+       Draw a point mark at the specified position.
+    MTEXT
+       Draw a text string relative to the viewport.
+    PLOTFUN
+       Plot a given function.
+    PLOTHIST
+       Plot a histogram of the data.
+    POINTS
+       Draw a point mark at each of the data points.
+    PRIM
+       Perform primitive plotting functions.
+    PTEXT
+       Draw a text string at the specified position and angle.
+    PVECT
+       Draw proper motion vectors.
+    RADIATE
+       Draw a line from the given point to the first NP data points.
+    SIZEPLOT
+       Draw point marks of differing sizes at each of the data points.
+    TEXT
+       Draw a text string on the plot at the specified position.
+    VECT
+       Draw vectors from each data point.
+    WTEXT
+       Draw a text string on the plot.
+    XERR
+       Draw symmetric error bars in the X direction.
+    YERR
+       Draw symmetric error bars in the Y direction.
+
+
+Control
+
+    CHANGE
+       Change plotting attributes.
+    CLEAR
+       Clear plotting attributes.
+    DLIMITS
+       Set the world coordinate limits using the data range.
+    EXPAND
+       Set the character height.
+    FILLSTY
+       Set the fill-style attributes.
+    FONT
+       Set the text font.
+    INQUIRE
+       Display PONGO status information.
+    LIMITS
+       Set the world coordinate limits.
+    LTYPE
+       Set the line style.
+    LWEIGHT
+       Set the line width.
+    MOVE
+       Set the current pen position.
+    PALETTE
+       Change the plotting pen colours.
+    PAPER
+       Change the size and aspect ratio of the plotting surface.
+    PEN
+       Set the current pen.
+    RESETPONGO
+       Reset the state of PONGO.
+    SETPROJ
+       Set the projection geometry
+    SHOWPONGO
+       Show the PONGO global parameters.
+    VIEWPORT
+       Set the viewport for the current plotting device.
+    VPORT
+       Set the viewport using normalised device coordinates.
+    VP_BH
+       Set the viewport to the bottom half of the plotting surface.
+    VP_BL
+       Set the viewport to the bottom-left quarter of the plotting
+       surface.
+    VP_BR
+       Set the viewport to the bottom-right quarter of the plotting
+       surface.
+    VP_TH
+       Set the viewport to the top half of the plotting surface.
+    VP_TL
+       Set the viewport to the top-left quarter of the plotting
+       surface.
+    VP_TR
+       Set the viewport to the top-right quarter of the plotting
+       surface.
+    VSIZE
+       Set the viewport using its physical size in inches.
+    VSTAND
+       Set the standard viewport.
+    WNAD
+       Adjust the viewport so that the X and Y scales are the same.
+    WORLD
+       Set the world coordinates for the plot.
+
+
+Data_manipulation
+
+    AVEDAT
+       Average the data in the XCOL and YCOL areas.
+    CCMATH
+       Perform inter-column maths.
+    CLOG
+       Take the logarithm of a column.
+    DATA
+       Specify the data file name.
+    DEGTOR
+       Convert the specified data area from degrees to radians.
+    EXCOLUMN
+       Specify the column containing the X-axis error data.
+    EYCOLUMN
+       Specify the column containing the Y-axis error data.
+    GETPOINT
+       Retrieve information for a plotted data point.
+    LABCOLUMN
+       Specify the column used for data labels.
+    PCOLUMN
+       Specify the column used for symbol codes.
+    PTINFO
+       Get the coordinates of a specified data point.
+    READF
+       Read from a formatted data file.
+    RTODEG
+       Convert the specified data area from radians to degrees.
+    SYMCOLUMN
+       Specify the column used for symbol codes.
+    WRITEI
+       Write information to an output file.
+    XCOLUMN
+       Specify the column containing the X-axis data.
+    XLINEAR
+       Put 1\ldots N into the XCOL data area.
+    XLOGARITHM
+       Take the logarithm of the X-axis data.
+    XOFFSET
+       Add a constant offset to the X-axis data.
+    XSCALE
+       Multiply the values in the XCOL and EXCOL data areas by a
+       constant.
+    YCOLUMN
+       Specify the column containing the Y-axis data.
+    YLINEAR
+       Put 1...N into the YCOL data area.
+    YLOGARITHM
+       Take the logarithm of the Y-axis data.
+    YOFFSET
+       Add a constant offset to the Y-axis data.
+    YSCALE
+       Multiply the values in the YCOL and EYCOL data areas  by a
+       constant.
+    ZCOLUMN
+       Specify the column containing the Z-axis data.
+    ZSCALE
+       Multiply the values in the ZCOL data area by a constant.
+
+
+Statistics
+
+    FITCURVE
+       Fit a curve to the data.
+    FITLINE
+       Fit a straight line to the data.
+
+.endhelp

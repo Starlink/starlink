@@ -1,0 +1,36 @@
+.help errorbar Starlink pongohelp
+.nf
+Draw error bars on the plotted data.
+
+Usage:
+   errorbar action
+
+Description:
+
+   Draw error bars in the X or Y directions, either treating the
+   values in the EXCOL and EYCOL data areas as symmetric errors
+   about the point, or as an upper limit with the XCOL or YCOL data
+   area holding the other limit.
+
+   PONGO will plot error bars correctly even after logarithms of the
+   data have been taken for the symmetric option, as long as the CLOG
+   application has been used to perform the transformation (as
+   opposed to CCMATH). For the non-symmetric case, the CCMATH
+   application should be used to take the logarithms of the data
+   in the EXCOL and EYCOL data areas.
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   "X" or "Y" depending upon which set of error bars is to be drawn.
+ERTERM = _REAL (Read and Write)
+   The length of the terminals on the error bars: a multiple of
+   the default length.
+SYMERR = _LOGICAL (Read and Write)
+   If TRUE, the values in the error data areas represent a
+   symmetric error about the values in the data columns. If
+   FALSE, the data columns represent the lower limits, and the
+   error columns represent the upper limits.
+   [TRUE]
+
+.endhelp

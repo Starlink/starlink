@@ -1,0 +1,54 @@
+.help inquire Starlink pongohelp
+.nf
+Display PONGO status information.
+
+Usage:
+   inquire pgplot limits columns devices data
+
+Description:
+
+    Display information about the status of PONGO and the data which
+    have been read in. The options are:
+
+       - PGPLOT -- Display the current font, character height colour
+       etc.
+
+       - LIMITS -- Display the data limits and the PGPLOT world
+       coordinate limits.
+
+       - COLUMNS -- Display the column names from the data file, if
+       they have been set up appropriately.
+
+       - DEVICES -- Display the available graphics devices.
+
+       - DATA -- Show the data that has been read in.
+
+   More than one of these options can be specified on the command line
+   at any one time.
+
+   The DATA option uses additional parameters to allow scrolling.
+
+Parameters:
+
+PGPLOT = _LOGICAL (Read)
+   Display the current PGPLOT plotting attributes.
+LIMITS = _LOGICAL (Read)
+   Display the data limits and the current PGPLOT viewport and
+   world coordinate limits.
+COLUMNS = _LOGICAL (Read)
+   Display the data file column headings (if available).
+DEVICES = _LOGICAL (Read)
+   Display the plotting devices available.
+DATA = _LOGICAL (Read)
+   Display the contents of all data areas in a formatted form.
+PAGE = _INTEGER (Read)
+   The page length of the terminal (in the range 1 to 100). It is
+   used to stop information scrolling off the top of the screen.
+   The parameter will be prompted for at the end of each screen:
+   a null response to the prompt will terminate the listing.
+FROM = _INTEGER (Read)
+   The number of the first item to be displayed.
+TO = _INTEGER (Read)
+   The number of the last item to be displayed.
+
+.endhelp

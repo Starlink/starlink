@@ -1,0 +1,14 @@
+.help xlinear Starlink pongohelp
+.nf
+Put 1 ... N into the XCOL data area.
+
+Usage:
+   xlinear
+
+Description:
+
+   Put the row number (i.e. 1 to NDATA) into the XCOL data area.
+
+   This command is a synonym for CCMATH X=INDEX.
+
+.endhelp

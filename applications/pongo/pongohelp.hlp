@@ -1,0 +1,5143 @@
+0 HELP
+ This is the PONGO online help system.  It invokes a HELP Facility
+ to display information about a PONGO command or topic.  If you need
+ assistance using this help library, enter "Using_help" in response to
+ the "Topic?" prompt.
+
+ PONGO is a set of applications for interactively plotting data.  These
+ applications are written to behave in a similar way to MONGO,
+ but using PGPLOT (SUN/15) as their plotting package.  PONGO
+ is integrated within the STARLINK ADAM environment, meaning that
+ the benefits of ICL (SUN/35) and the graphics database can be fully
+ exploited.
+
+1 Advantages
+       o Data in PONGO are read from a text file using the READF
+         command. Features of this command are:
+
+            - the ability to read files which contain character
+              strings as well as numeric values;
+
+            - support for comment lines and column headings as an aid
+              to remembering  what the file contains;
+
+            - error trapping during file reading;
+
+            - user specification of column delimiters, allowing LaTeX
+              and TeX format tables to be read;
+
+            - selective reading of the data.
+
+
+       o Complicated mathematical manipulations can be performed on
+         the data using  Fortran-like statements to define the
+         required transformation.
+
+       o Specialized extra data columns are provided, i.e. LABCOL,
+         SYMCOL and ZCOL.
+
+       o Many interactive cursor functions are provided.
+
+       o Error ellipses can be drawn.
+
+       o Vector plots can be drawn.
+
+       o Simple statistical analysis of the data is available.
+
+       o The data can be resampled.
+
+       o User-specified functions defined by Fortran-like statements
+         can be drawn.
+
+       o Plots of astronomical positional data can be made in one of
+         several geometries.
+
+       o The data in the XCOL and YCOL data areas can be read as
+         positions of  Right Ascension and Declination respectively,
+         in the format
+
+            HH:MM:SS.SSS   +DD:MM:SS.SSS
+
+1 Classified
+    This topic presents a classified list of the available PONGO
+    commands. The list is classified into several broad categories:
+    commands which begin and end a PONGO session, commands for
+    manipulating data, commands which control plotting, plotting
+    commands, and commands which perform simple statistics on the
+    data. The parts of the command names outside parentheses define
+    the minimum abbreviation for that application.
+
+2 Begin_and_end
+    BEG(PLOT)
+       Open a plotting device.
+    DEVICE
+       Open a plotting device.
+    END(PLOT)
+       Close down the current plotting device.
+
+2 Plotting
+    ADV(ANCE)
+       Clear the graphics screen.
+    ANN(OTATE)
+       Annotate the plotted data.
+    ARC
+       Draw an arc of an ellipse.
+    BIN
+       Plot a histogram using previously binned data.
+    BOX(FRAME)
+       Draw a frame and axes on the plot.
+    CONN(ECT)
+       Draw straight lines between the data points.
+    CURSE
+       Use the cursor to get interactive input.
+    DRAW
+       Draw a line from the current pen position the specified point.
+    DRAWPOLY
+       Draw a polygon.
+    ELLIPSES
+       Draw error ellipses.
+    ERASE
+       Clear the graphics screen.
+    ERRORBAR
+       Draw error bars on the plotted data.
+    ERRX
+       Draw symmetric error bars in the X direction.
+    ERRY
+       Draw symmetric error bars in the Y direction.
+    GPOINTS
+       Plot points or lines between the data.
+    GRID
+       Draw a coordinate grid at specified intervals.
+    GT_CIRCLE
+       Draw a great circle between two points.
+    HIST(OGRAM)
+       Bin and plot a histogram of the data.
+    LAB(EL)
+       Draw the axis labels and title on the plot.
+    MARK
+       Draw a point mark at the specified position.
+    MTEXT
+       Draw a text string relative to the viewport.
+    PLOTF(UN)
+       Plot a given function.
+    PLOTH(IST)
+       Plot a histogram of the data.
+    POI(NTS)
+       Draw a point mark at each of the data points.
+    PRIM
+       Perform primitive plotting functions.
+    PTEXT
+       Draw a text string at the specified position and angle.
+    PVECT
+       Draw proper motion vectors.
+    RADIATE
+       Draw a line from the given point to the first NP data points.
+    SIZE(PLOT)
+       Draw point marks of differing sizes at each of the data points.
+    TEXT
+       Draw a text string on the plot at the specified position.
+    VECT
+       Draw vectors from each data point.
+    WTEXT
+       Draw a text string on the plot.
+    XERR
+       Draw symmetric error bars in the X direction.
+    YERR
+       Draw symmetric error bars in the Y direction.
+
+2 Control
+    CHANGE
+       Change plotting attributes.
+    CLEAR
+       Clear plotting attributes.
+    DLIM(ITS)
+       Set the world coordinate limits using the data range.
+    EXPA(ND)
+       Set the character height.
+    FILLSTY
+       Set the fill-style attributes.
+    FONT
+       Set the text font.
+    INQ(UIRE)
+       Display PONGO status information.
+    LIM(ITS)
+       Set the world coordinate limits.
+    LT(YPE)
+       Set the line style.
+    LWE(IGHT)
+       Set the line width.
+    MOVE
+       Set the current pen position.
+    PALET(TE)
+       Change the plotting pen colours.
+    PAPER
+       Change the size and aspect ratio of the plotting surface.
+    PEN
+       Set the current pen.
+    RESETP(ONGO)
+       Reset the state of PONGO.
+    SETPROJ
+       Set the projection geometry
+    SHOWP(ONGO)
+       Show the PONGO global parameters.
+    VIEWPORT
+       Set the viewport for the current plotting device.
+    VPORT
+       Set the viewport using normalised device coordinates.
+    VP_BH
+       Set the viewport to the bottom half of the plotting surface.
+    VP_BL
+       Set the viewport to the bottom-left quarter of the plotting
+       surface.
+    VP_BR
+       Set the viewport to the bottom-right quarter of the plotting
+       surface.
+    VP_TH
+       Set the viewport to the top half of the plotting surface.
+    VP_TL
+       Set the viewport to the top-left quarter of the plotting
+       surface.
+    VP_TR
+       Set the viewport to the top-right quarter of the plotting
+       surface.
+    VSIZE
+       Set the viewport using its physical size in inches.
+    VSTAND
+       Set the standard viewport.
+    WNAD
+       Adjust the viewport so that the X and Y scales are the same.
+    WORLD
+       Set the world coordinates for the plot.
+
+2 Data_manipulation
+    AVEDAT
+       Average the data in the XCOL and YCOL areas.
+    CCMATH
+       Perform inter-column maths.
+    CLOG
+       Take the logarithm of a column.
+    DATA
+       Specify the data file name.
+    DEGTOR
+       Convert the specified data area from degrees to radians.
+    EXC(OLUMN)
+       Specify the column containing the X-axis error data.
+    EYC(OLUMN)
+       Specify the column containing the Y-axis error data.
+    GETP(OINT)
+       Retrieve information for a plotted data point.
+    LABC(OLUMN)
+       Specify the column used for data labels.
+    PCOL(UMN)
+       Specify the column used for symbol codes.
+    PTINFO
+       Get the coordinates of a specified data point.
+    READ(F)
+       Read from a formatted data file.
+    RTODEG
+       Convert the specified data area from radians to degrees.
+    SYMC(OLUMN)
+       Specify the column used for symbol codes.
+    WRITE(I)
+       Write information to an output file.
+    XC(OLUMN)
+       Specify the column containing the X-axis data.
+    XLIN(EAR)
+       Put 1\ldots N into the XCOL data area.
+    XLOG(ARITHM)
+       Take the logarithm of the X-axis data.
+    XOFF(SET)
+       Add a constant offset to the X-axis data.
+    XSCALE
+       Multiply the values in the XCOL and EXCOL data areas by a
+       constant.
+    YC(OLUMN)
+       Specify the column containing the Y-axis data.
+    YLIN(EAR)
+       Put 1...N into the YCOL data area.
+    YLOG(ARITHM)
+       Take the logarithm of the Y-axis data.
+    YOFF(SET)
+       Add a constant offset to the Y-axis data.
+    YSCALE
+       Multiply the values in the YCOL and EYCOL data areas  by a
+       constant.
+    ZC(OLUMN)
+       Specify the column containing the Z-axis data.
+    ZSCALE
+       Multiply the values in the ZCOL data area by a constant.
+
+2 Statistics
+    FITC(URVE)
+       Fit a curve to the data.
+    FITL(INE)
+       Fit a straight line to the data.
+
+1 Examples
+    A number of ICL procedures and associated data are provided in the
+    directory $PONGO_EXAMPLES. These example procedures are intended to
+    show some of the features of PONGO. All of the examples can be 
+    run using the ICL command LOAD, e.g.
+
+       PONGO> LOAD $PONGO_EXAMPLES/ppdotdiag
+
+    and their execution can be followed if the ICL command SET TRACE
+    has previously been executed.
+
+2 SPECTRUM.ICL
+    This procedure produces a plot of a  low resolution IUE spectrum
+    extracted by IUEDR (SUN/37) and written using the IUEDR command
+    OUTSPEC SPECTYPE=2. The output file was subsequently edited to
+    make the file label lines PONGO comments and to add a line of
+    PONGO column labels at the beginning of the file. IUEDR indicates
+    bad or missing data in an output spectrum by attributing zero
+    fluxes to the affected wavelength samples. These can be detected
+    and discarded using the SELCOND parameter of the READF command:
+    e.g.
+
+       PONGO> readf $PONGO_EXAMPLES/swp3196.lap selcond="Flux > 0.0" ~
+                 noall
+
+    (where the "~" character just continues the line). In this example
+    PONGO draws a polyline across all missing data flagged by IUEDR.
+
+2 ERRORS.ICL
+    The procedure ERRORS.ICL demonstrates plotting simple error bars
+    using PONGO (the ERRORBAR command) and also performing simple
+    statistics on the data (the FITLINE and FITCURVE commands). Note
+    that a summary of the statistics is reported for each fit to the
+    data.
+
+2 HISTOGRAM.ICL
+    The procedure HISTOGRAM.ICL illustrates the plotting of histograms
+    with PONGO (the PLOTHIST command). This procedure also illustrates
+    how the drawing of the box around the plot can be controlled
+    using the BOXFRAME command.
+
+2 PPDOTDIAG.ICL
+    This procedure produces a period versus period-derivative diagram
+    for pulsars. Note the use of a column within the data file to set
+    the symbol number of each plotted point, and the use of the
+    PONGO_NDATA global parameter for making a title containing the
+    number of points that have been read in.
+
+2 ELLIPSES.ICL
+    The procedure ELLIPSES.ICL illustrates the use of the ELLIPSES
+    command for plotting error ellipses.
+
+2 PROJECTIONS.ICL
+    This procedure illustrates some of the different "geometries"
+    available in PONGO. It plots four different views of the
+    distribution of a selection of the known pulsars in Right
+    Ascension and Declination.
+
+2 RADEC.ICL
+   This procedure shows how the BOXFRAME command can be
+   used to draw labels in "HH MM SS.S" & "DD MM SS.S"
+   format.
+
+2 AGI.ICL
+    This procedure should be invoked from the ICL> prompt NOT from the
+    PONGO> prompt (the example procedure will prompt for the name of
+    an image display device). It illustrates the interaction between
+    the KAPPA package (SUN/95) and PONGO via the AGI graphics
+    database. Here, the image display is done using the KAPPA DISPLAY
+    command and PONGO is used for all the line drawing. The IKONPAINT
+    utility (SUN/71) may be used to obtain a colour hard-copy of this
+    illustration.
+
+2 VECTOR.ICL
+    This procedure shows how to plot proper motion vectors. The
+    sample used is a selection of bright stars with high proper motions.
+
+1 Getting_Started
+    To make the commands of PONGO available, type
+
+       ICL> pongo
+
+    To obtain help on any PONGO command, type
+
+       ICL> help <command>
+
+    To get help on PONGO type
+
+       ICL> help pongo
+
+    A PONGO plotting session may be begun by typing
+
+       ICL> begplot <graphics device>
+
+    and the PONGO session may be ended by
+
+       PONGO> endplot
+
+    Because the parameters PONGO uses for its commands are often
+    similar to the arguments of the equivalent PGPLOT subroutines, it
+    is useful be familiar with the PGPLOT manual when using PONGO.
+    Note that in several cases the full descriptions of PONGO
+    parameters are given only in the PGPLOT manual.
+
+
+1 PONGO
+    PONGO is a set of applications for interactively plotting data.
+    These applications are written to behave in a similar way to MONGO
+    but using PGPLOT (SUN/15) as their plotting package. PONGO
+    is integrated within the STARLINK ADAM environment, meaning that
+    the benefits of ICL (SUN/35) and the graphics database can be
+    fully exploited.
+
+    To make the commands of PONGO available, type
+
+       ICL> pongo
+
+    To obtain help on any PONGO command, type
+
+       ICL> help <command>
+
+    The PONGO "Classified" topic summarises the available commands, and
+    "Advantages" summarises the benefits of PONGO compared with MONGO.
+
+1 Introduction
+    PONGO is a set of applications for interactively plotting data.
+    These applications are written within the STARLINK ADAM environment
+    using PGPLOT (SUN/15) as their plotting package.
+
+    The advantages of using PONGO are:
+
+       o Data in PONGO are read from a text file using the READF
+         command. Features of this command are:
+
+            - the ability to read files which contain character
+              strings as well as numeric values;
+
+            - support for comment lines and column headings as an aid
+              to remembering  what the file contains;
+
+            - error trapping during file reading;
+
+            - user specification of column delimiters, allowing LaTeX
+              and TeX format tables to be read;
+
+            - selective reading of the data.
+
+
+       o Complicated mathematical manipulations can be performed on
+         the data using  Fortran-like statements to define the
+         required transformation.
+
+       o Specialized extra data columns are provided, i.e. LABCOL,
+         SYMCOL and ZCOL.
+
+       o Many interactive cursor functions are provided.
+
+       o Error ellipses can be drawn.
+
+       o Vector plots can be drawn.
+
+       o Simple statistical analysis of the data is available.
+
+       o The data can be resampled.
+
+       o User-specified functions defined by Fortran-like statements
+         can be drawn.
+
+       o Plots of astronomical positional data can be made in one of
+         several geometries.
+
+       o The data in the XCOL and YCOL data areas can be read as
+         positions of  Right Ascension and Declination respectively,
+         in the format
+
+            HH:MM:SS.SSS   +DD:MM:SS.SSS
+
+    Because the parameters PONGO uses for its commands are often
+    similar to the arguments of the equivalent PGPLOT subroutines, it
+    is useful be familiar with the PGPLOT manual when using PONGO.
+    Note that in several cases the full descriptions of PONGO
+    parameters are given only in the PGPLOT manual.
+
+    A PONGO plotting session may be begun by typing
+
+       ICL> begplot <graphics device>
+
+    and the PONGO session is be ended by
+
+       PONGO> endplot
+
+
+
+1 Procedures
+    PONGO procedures are ICL procedures (SG/5) which make use of
+    PONGO commands. ICL is a very powerful, programmable command
+    language which can be used to interact between PONGO and any other
+    ADAM package by means of ICL variables and the ADAM parameter
+    system. To become familiar with using ICL to write PONGO
+    procedures it is useful to examine the contents of the example
+    procedures provided in the directory $PONGO_EXAMPLES. These
+    procedures illustrate many features of PONGO, with comments to
+    explain some of the more complex commands. Any line beginning "{"
+    in these scripts is a comment.
+
+1 Using_Help
+ You are situated in a HELP library which contains help information
+ about PONGO arranged in an hierarchical structure.  The help system
+ enables you to navigate the library by prompting when it has completed
+ displaying the previously requested help.
+
+ To obtain information on a particular topic, respond to the prompt by
+ typing the name of the topic and pressing the RETURN key.  You can
+ abbreviate any topic name, although ambiguous abbreviations result in
+ all matches being displayed.  The information displayed by the help
+ system on a particular topic includes a description of the topic and
+ a list of subtopics that further describe the topic.  To display
+ subtopic information, type one of the subtopic names from the list in
+ response to the "Subtopic?" prompt.
+
+ You can specify percent signs (%) and asterisks (*) in the keyword as
+ wild card (i.e., match all) characters.  Thus to display information
+ on all available topics, type an asterisk (*) in reply to a prompt.
+
+ To display all the information on a topic, type the topic name
+ immediately followed by an ellipsis (...), e.g., BOXFRAME...
+ displays information on the BOXFRAME topic as well as information on
+ all the subtopics under BOXFRAME.
+
+ You can type a question mark (?) in response to any of the prompts to
+ to redisplay the most recently requested text and a list of topic or
+ subtopic names.  For example, if you type ? in response to the
+ "Subtopic?" prompt, a list of subtopics is displayed followed by the
+ "Subtopic?" prompt.
+
+ If you wish to move up a level in hierarchy just press RETURN in
+ response to the "Subtopic?" prompt instead of typing a subtopic name,
+ the "Topic?" prompt reappears,  enabling you to enter another topic
+ name.  If you press RETURN in response to the "Topic?" prompt, you
+ will exit from HELP.
+
+2 Help_Parameters
+
+ keyword ...
+
+  Specifies one or more keywords separated by spaces that refer to the
+  topic  or  subtopic on  which  you want  information  from  the help
+  library.  Information  within  the help  library  is  arranged in an
+  hierarchical  manner.   The levels are:
+
+  1.  None--- If you do not specify a keyword,  HELP introduces the
+      ICL help system  and lists  the top-level topics.  Each item
+      in the list is a keyword in the first level of the hierarchy.
+
+  2.  Topic-name---If you specify  a keyword  by naming  a topic,  the
+      help facility  describes  the  topic.  Keywords  for  additional
+      information available on this topic are listed.
+
+  3.  Topic-name subtopic---If you  specify  a  subtopic  following  a
+      topic, the help facility provides a description of the specified
+      subtopic.
+
+  Note that it is not possible to get help on PONGO without either using
+  the PONGO keyword or one of the known topics (command names etc.).
+
+
+1 ADVANCE
+Clear the graphics screen.
+
+Usage:
+   advance
+
+Description:
+
+   The plotting surface is cleared.
+
+   This command is a synonym for CLEAR SCREEN.
+
+1 ANNOTATE
+Annotate the plotted data.
+
+Usage:
+     annotate [xoff] [yoff] [justification]
+
+Description:
+
+   Each of the points on the plot is labeled with the appropriate
+   internal label (if it has been read from the data file). If no
+   parameters are specified, the default action is for the label to
+   be written with a zero offset in X and an offset of approximately
+   one character height in Y.
+
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XOFF
+XOFF = _REAL (Read and Write)
+   The X coordinate offset of the string relative to each data
+   point. The application will use the value 0.0 (i.e. no offset)
+   unless a value is given on the command line.
+   [0.0]
+3 YOFF
+YOFF = _REAL (Read and Write)
+   The Y coordinate offset of the string relative to each data
+   point.
+
+   The application will prompt with a value of about 1/40th of
+   the height of the viewport unless a value is given on the
+   command line.
+
+   [1/40th of the viewport height.]
+3 JUSTIFICATION
+JUSTIFICATION = _REAL (Read and Write)
+   The justification about the point specified by XOFF and YOFF
+   relative to each data point (in the range 0.0 to 1.0).  Here,
+   0.0 means left justify the text relative to the data point,
+   1.0 means right justify the text relative to the data point,
+   0.5 means centre the string on the data point, other values
+   will give intermediate justifications.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The projection that has been used to plot the data. This is
+   explained in more detail in the section on projections. Allowed
+   values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR", and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This paramerter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+
+1 ARC
+Draw an arc of an ellipse.
+
+Usage:
+   arc [a] [b] [x0] [y0] [pastart] [paend] [rotation]
+
+Description:
+
+   A specified arc of an ellipse is drawn from the position angles of
+   the start and end of the arc, the semi axes, the position of the
+   centre and the rotation of the axes. If no parameters are
+   specified then whole ellipses can be drawn from the data stored in
+   the following data areas:
+
+      - XCOL -- X centre,
+
+      - YCOL -- Y centre,
+
+      - EXCOL -- semi-major axis,
+
+      - EYCOL -- semi-minor axis.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 A
+A = _REAL (Read and Write)
+   The semi-major axis of the ellipse.
+
+   If no value is specified on the command line, the current
+   value is used.  If there is no current value, a default value
+   1.0 is used.
+3 B
+B = _REAL (Read and Write)
+   The semi-minor axis of the ellipse.
+
+   If no value is specified on the command line, the current
+   value is used.  If there is no current value, a default value
+   1.0 is used.
+3 X0
+X0 = _DOUBLE (Read and Write)
+   The X coordinate of the centre of the ellipse.
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, a default value
+   0.0 is used.
+3 Y0
+Y0 = _DOUBLE (Read and Write)
+   The Y coordinate of the centre of the ellipse.
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, a default value
+   0.0 is used.
+3 PASTART
+PASTART = _REAL (Read and Write)
+   The position angle of the start of the arc (degrees).
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, a default value
+   0.0 is used.
+3 PAEND
+PAEND = _REAL (Read and Write)
+   The position angle of the end of the arc (degrees).
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, a default value
+   360.0 is used.
+3 ROTATION
+ROTATION = _REAL (Read and Write)
+   The angle that the major axis makes with the horizontal
+   (degrees anti-clockwise).
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, a default value
+   0.0 is used.
+3 FROMDATA
+FROMDATA = _LOGICAL (Read)
+   If TRUE, the command will use the data already loaded to draw
+   whole ellipses, with positions and sizes specified as above.
+   [FALSE]
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The geometry that is to be used to plot the arc.  This is
+   explained in detail in the section on projections.  Allowed
+   values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. If no
+   value is specified on the command line, the current value is
+   used. If there is no current value, a default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This paramerter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+3 ERSCALE
+ERSCALE = _REAL (Read and Write)
+   The factor used to scale values in the EXCOL and EYCOL data
+   areas. This allows the ellipse axes lengths to be scaled,
+   changing the sizes of ellipses produced using the FROMFILE
+   parameter.
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.
+2 Examples
+PONGO> ARC 1 1 0 0
+   Draw a circle of radius 1 (world coordinates), assuming the
+   PASTART and PAEND parametes have their default parameters (0.0
+   and 360.0 degrees respectively).
+PONGO> ARC FROMDATA
+   Draws arcs using the information read into the XCOL, YCOL, EXCOL
+   and EYCOL data areas.
+
+1 AVEDAT
+Average the data in the XCOL and YCOL areas.
+
+Usage:
+   avedat action [nbin]
+
+Description:
+
+   Rebin the XCOL and YCOL data, averaging the data in each sample,
+   and puts the result back into the XCOL and YCOL areas. The
+   standard deviations of the averages are put into the EXCOL and
+   EYCOL areas.  There are two ways in which the averaging may be
+   done:
+
+     - the data may be split into N equally sized bins over the X
+       range, and the values in each bin averaged;
+
+     - the data may be averaged in groups of N data.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   The type of binning be used for the averaging. If "X", the
+   data are divided into NBIN bins over the X range.  If "N",
+   bins of varying widths with each containing NBIN data points
+   are formed.
+
+   [The value will be prompted for. It has the default "X".]
+3 NBIN
+NBIN = _INTEGER (Read)
+   Depending upon the value of ACTION, either the number of bins
+   (ACTION="X"), or the number of points per bin (ACTION="N").
+
+   [The value will be prompted for. It has the default 10.]
+3 XMIN
+XMIN = _REAL (Read)
+   The minimum X value to be used in the average.
+
+   [The value of the global parameter PONGO_XMIN is used. If
+   PONGO_XMIN is not defined, the default value 0.0 is used.]
+3 XMAX
+XMAX = _REAL (Read)
+   The maximum X value to be used in the average.
+
+   [The value of the global parameter PONGO_XMAX is used. If
+   PONGO_XMAX is not defined, the default value 1.0 is used.]
+
+1 BEGPLOT
+Open a plotting device.
+
+Usage:
+   begplot [device] [action] [clear] [overlay]
+      { label=?
+      action
+
+Description:
+
+   Set up a device for subsequent PONGO plotting commands. This
+   application allows plotting onto an AGI picture created by a
+   different package (e.g. KAPPA), or the creation of a new base
+   picture.
+
+   If a picture created by a run of a previous application is made
+   (using either the "current" picture or selecting using a known
+   picture label see parameter ACTION) then it is possible to
+   overlay new graphics (such as annotations, lines etc.) using the
+   same coordinate system (see the OVERLAY parameter).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read and Write)
+   If 'B', the plotting device will be cleared and the whole of
+   its plotting surface used. If equal to 'C', the current picture
+   will be used and a PGPLOT viewport created inside it. If 'L'
+   then a previously labelled picture (set using KAPPA:PICLABEL)
+   can be selected. Once set, this parameter will retain its value
+   in subsequent invocations of BEGPLOT.
+   ['C']
+3 CHEIGHT
+CHEIGHT = _REAL (Write)
+   The character height scaling factor. A value of 1.0 implies a
+   nominal character height of 1/40th the viewport height. The
+   value is set by the application from the height of the chosen
+   picture (unless the picture is the base one). The result is
+   written to the global parameter PONGO_CHEIGHT.
+3 CLEAR
+CLEAR = _LOGICAL (Read)
+   If TRUE then the current picture will be cleared of any
+   existing graphics.
+   [TRUE]
+3 DEVICE
+DEVICE = DEVICE (Read and Write)
+   The name of the device to be used for plotting.  The names of
+   the currently available devices can be found using the INQUIRE
+   DEVICES command.
+
+   The value of the global parameter GRAPHICS_DEVICE is used
+   unless a value is specified on the command line. If
+   GRAPHICS_DEVICE is not defined and no value is specified on
+   the command line, the value will be prompted for.
+3 LABEL
+LABEL = _CHAR (Read)
+   If ACTION=L is selected then the name of the AGI picture to be
+   selected is given by this parameter. AGI pictures can be labelled
+   using the KAPPA application PICLABEL.
+   ['']
+3 OVERLAY
+OVERLAY = _LOGICAL (Read)
+   If TRUE, the PGPLOT viewport created will exactly overlay the
+   the last DATA picture. This is useful for drawing axis labels
+   using BOXFRAME on an image or contour map etc. that has been
+   displayed by another package (e.g. KAPPA:DISPLAY).
+   [FALSE]
+3 XMIN
+XMIN = _REAL (Write)
+   The left hand edge of the world coordinate limits from the
+   selected picture. This defaults to 0.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_XMIN.
+3 XMAX
+XMAX = _REAL (Write)
+   The right hand edge of the world coordinate limits from the
+   selected picture. This defaults to 1.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_XMAX.
+3 YMIN
+YMIN = _REAL (Write)
+   The lower edge of the world coordinate limits from the
+   selected picture. This defaults to 0.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_YMIN.
+3 YMAX
+YMAX = _REAL (Write)
+   The lower edge of the world coordinate limits from the
+   selected picture. This defaults to 1.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_YMAX.
+
+1 BIN
+Plot a histogram using previously binned data.
+
+Usage:
+   bin
+
+Description:
+
+   The data in the XCOL and YCOL data areas are used to plot a
+   histogram. The data in the XCOL area specify the bin edges, while
+   the data in the YCOL area specify the respective frequency for
+   each bin.
+
+   This command is a synonym for PLOTHIST B.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CENTRE
+CENTRE = _LOGICAL (Read)
+   This parameter specifies whether the values in the XCOL data
+   area denote the centre of each bin (when TRUE) or its lower
+   edge (when FALSE).
+   [FALSE]
+
+1 BOXFRAME
+Draw a frame and axes on the plot.
+
+Usage:
+   boxframe [xopt] [yopt] [xtic] [ytic] [nxsub] [nysub]
+
+Description:
+
+   Draw a frame, axes and tick-marks on a plot. The application has
+   great flexibility in the type of axis labelling that can be
+   produced -- it is essentially an interface to the PGPLOT routines
+   PGBOX and PGTBOX.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XOPT
+XOPT = _CHAR (Read and Write)
+   A string that controls the style of the X-axis labelling and
+   tick-marks. It consists of a series of letters, which have the
+   meanings shown below (reproduced from the PGPLOT manual):
+
+      - "A" -- Draw an axis (the X axis is the horizontal line
+      Y=0, the Y axis is the vertical line X=0).
+
+      - "B" -- Draw the bottom (X) or left (Y) edge of the frame.
+
+      - "C" -- Draw the top (X) or right (Y) edge of the frame.
+
+      - "G" -- Draw a grid of vertical (X) or horizontal (Y)
+      lines.
+
+      - "I" -- Invert the tick-marks (i.e. draw them outside the
+      viewport instead of inside).
+
+      - "L" -- Label the axis logarithmically (see below).
+
+      - "N" -- Write numeric labels in the conventional location
+      below the viewport (X) or to the left of the viewport (Y).
+
+      - "P" -- Extend (project) major tick-marks outside the box
+      (ignored if option I is specified).
+
+      - "M" -- Write numeric labels in the unconventional location
+      above the viewport (X) or to the right of the viewport (Y).
+
+      - "T" -- Draw major tick-marks at the major coordinate
+      interval.
+
+      - "S" -- Draw minor tick-marks (sub-ticks).
+
+      - "V" -- Orient numeric labels vertically (this is only
+      applicable to Y -- the default is to write Y-axis labels
+      parallel to the axis).
+
+      - "1" -- Force decimal labelling.
+
+      - "2" -- Force exponential labelling.
+
+   A set of special letters control the plotting of RA and DEC
+   axes.
+
+      - "Z" for (DD) HH MM SS.S time labelling
+
+      - "H" means superscript numbers with d, h, m, & s  symbols
+
+      - "D" means superscript numbers with    o, ', & '' symbols
+
+      - "F" causes the first label (left- or bottom-most) to
+            be omitted. Useful for sub-panels that abut each other.
+            Care is needed because first label carries sign as well.
+
+      - "O" means omit leading zeros in numbers < 10
+            E.g.  3h 3m 1.2s rather than 03h 03m 01.2s  Useful
+            to help save space on X-axes. The day field does not
+            use this facility.
+
+   Note that to use these features your data values should be in
+   radians (PONGO automatically converts HH:MM:SS.SSS strings to
+   radians, and the DEGTOR command from degrees to radians).
+
+   [The global parameter PONGO_XOPT is used. If PONGO_XOPT is not
+   defined, the default value "BCNST" is used.]
+3 YOPT
+YOPT = _CHAR (Read and Write)
+   A string that controls the style of the Y-axis labelling and
+   tick-marks. It consists of a series of letters, as given for
+   the parameter XOPT.
+
+   [The global parameter PONGO_YOPT is used.  If PONGO_YOPT is not
+   defined, the default value "BCNST" is used.]
+3 XTIC
+XTIC = _REAL (Read and Write)
+   The major tick-mark interval on the X-axis. If XTIC is set to
+   0.0, PGPLOT makes a sensible choice.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 YTIC
+YTIC = _REAL (Read and Write)
+   The major tick-mark interval on the Y-axis. If YTIC is set to
+   0.0, PGPLOT makes a sensible choice.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 NXSUB
+NXSUB = _INTEGER (Read and Write)
+   The number of minor tick-marks between each major tick-mark on
+   the X-axis. If NXSUB is set to 0, PGPLOT makes a sensible
+   choice.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.
+3 NYSUB
+NYSUB = _INTEGER (Read and Write)
+   The number of minor tick-marks between each major tick-mark on
+   the Y-axis. If NYSUB is set to 0, PGPLOT makes a sensible
+   choice.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.
+2 Notes
+- Right Ascension and Declination axes.
+
+   It is possible to draw RA and DEC axes using this routine. To
+   do this read in your X and Y data in radians (this is the
+   default if your data are stored in the HH:MM:SS.SSS,
+   DD:MM:SS.SSS formats) and then set the "Z" character in the
+   XOPT and YOPT parameters. A good combination of options are:
+
+      XOPT='BCNSTZHG' YOPT='BCNSTZDG'
+
+   For more about this (in particular how the interval options are
+   set) see the PGPLOT documentation about PGTBOX. Note that the
+   "Y" option is always set and that the Y axis values are
+   converted into pseudo arc seconds.
+
+1 CCMATH
+Perform inter-column maths.
+
+Usage:
+   ccmath
+
+Description:
+
+   Perform inter-column maths (using TRANSFORM, SUN/61). The
+   expressions and functions recognised have Fortran types and
+   syntax.  Any construct that is legal in TRANSFORM is legal in
+   this subroutine, with the additional function INDEX for filling
+   the array with an increasing sequence of integers. See SUN/61 for
+   further details.
+
+   The names used for the data areas are as follows:
+
+      - "X" -- the XCOL data area,
+
+      - "Y" -- the YCOL data area,
+
+      - "Z" -- the ZCOL data area,
+
+      - "EX" -- the EXCOL error area,
+
+      - "EY" -- the EYCOL error area.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 X
+X = _CHAR (Read)
+   The transformation to perform on the contents of the XCOL data
+   area.
+
+   ["X: -- i.e. will cause the contents of the data area to remain
+   unchanged.]
+3 Y
+Y = _CHAR (Read)
+   The transformation to perform on contents of the YCOL data
+   area.
+
+   ["Y" -- i.e. will cause the contents of the data area to remain
+   unchanged.]
+3 Z
+Z = _CHAR (Read)
+   The transformation to perform on contents of the ZCOL data
+   area.
+
+   ["Z" -- i.e. will cause the contents of the data area to remain
+   unchanged.]
+3 EX
+EX = _CHAR (Read)
+   The transformation to perform on contents of the EXCOL data
+   area.
+
+   ["EX" -- i.e. will cause the contents of the data area to
+   remain unchanged.]
+3 EY
+EY = _CHAR (Read)
+   The transformation to perform on contents of the EYCOL data
+   area.
+
+   ["EY" -- i.e. will cause the contents of the data area to
+   remain unchanged.]
+2 Examples
+PONGO> CCMATH X=2*Y
+   will fill each element of the X data area with twice the
+   corresponding element of the Y data area.
+2 Notes
+- More than one array may be manipulated with a single command.
+
+- The INDEX function cannot be combined with any other function.
+
+1 CHANGE
+Change plotting attributes.
+
+Usage:
+   change
+
+Description:
+
+   Change the PGPLOT plotting attributes: e.g. line style, pen
+   colour etc. Several of the attributes can be changed at the same
+   time. Each of the parameters is remembered from the last
+   invocation of CHANGE: after BEGPLOT has been run, a single
+   invocation of CHANGE can be used to reset the plotting attributes
+   to their values the last time PONGO was used.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ANGLE
+ANGLE = _REAL (Read)
+   The angle hatch lines make with horizontal, in degress.
+   Only used when FILLSTY is 3.
+   [45.0]
+3 COLOUR
+COLOUR = _INTEGER (Read and Write)
+   The pen number (colour index) PGPLOT uses for plotting. The
+   value should be between 0 and 255. Usually the first 16 pens
+   are predefined to have the following colours:
+
+      - 0 -- background,
+
+      - 1 -- foreground (default),
+
+      - 2 -- red,
+
+      - 3 -- green,
+
+      - 4 -- blue,
+
+      - 5 -- cyan,
+
+      - 6 -- magenta,
+
+      - 7 -- yellow,
+
+      - 8 -- red + yellow (orange),
+
+      - 9 -- green + yellow,
+
+      - 10 -- green + cyan,
+
+      - 11 -- blue + cyan,
+
+      - 12 -- blue + magenta,
+
+      - 13 -- red + magenta,
+
+      - 14 -- dark grey,
+
+      - 15 -- light grey.
+
+   It is possible to change the colour representation of any of
+   the pen colour indices using the PALETTE application.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is intially set to 1 (i.e.
+   foreground).
+   [1]
+3 CHEIGHT
+CHEIGHT = _REAL (Read and Write)
+   The character height scaling. This parameter scales the
+   default character height and also alters the size of the tick
+   marks and symbols that PGPLOT plots. The default character
+   height in PGPLOT is about 1/40 of the viewport height.
+
+   [The value of the global parameter PONGO_CHEIGHT is used. If
+   PONGO_CHEIGHT is not defined, the default value 1.0 is used.]
+3 FONT
+FONT = _INTEGER (Read)
+   The font used by PGPLOT. The styles for each font are as
+   follows:
+
+      - 1 -- single-stroke font (default),
+
+      - 2 -- roman font,
+
+      - 3 -- italic font,
+
+      - 4 -- script font.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1 (i.e.
+   single-stroke font).
+   [1]
+3 FILLSTY
+FILLSTY = _INTEGER (Read)
+   The fill style used by PGPLOT. The fill styles are as follows:
+
+      - 1 -- solid fill,
+
+      - 2 -- hollow fill,
+
+      - 3 -- hatched,
+
+      - 4 -- cross-hatched
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 2 (i.e.
+   hollow fill).
+   [2]
+3 LINESTY
+LINESTY = _INTEGER (Read)
+   The line style used by PGPLOT.  The line style may be one of
+   the following:
+
+      - 1 -- full line (default),
+
+      - 2 -- dashed,
+
+      - 3 -- dot-dash-dot-dash,
+
+      - 4 -- dotted,
+
+      - 5 -- dash-dot-dot-dot.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1 (i.e.
+   full line).
+   [1]
+3 LINEWID
+LINEWID = _INTEGER (Read)
+   The line width scaling. This parameter scales the default line
+   width.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.
+   [1]
+3 PHASE
+PHASE = _REAL (Read)
+   The fraction of SEPARATION that hatched lines are displaced.
+   Modifying this between regions makes their separation more
+   obvious. This is only used when FILLSTY is 3.
+   [0]
+3 SEPARATION
+SEPARATION = _REAL (Read)
+   The separation of hatched lines. The unit spacing is 1 percent
+   of the smaller of the height or width of the view surface.
+   Only used when FILLSTY is 3.
+   [1]
+3 TEXTBACK
+TEXTBACK = _INTEGER (Read)
+   The pen number (colour index) of the background used when
+   drawing text. If less than zero then a transparent
+   background is used. Zero erases the plot under the text
+   region.
+   [-1]
+2 Examples
+ICL> CHANGE RESET
+   will reset the plotting attributes to their default values.
+
+1 CLEAR
+Clear plotting attributes.
+
+Usage:
+   clear
+
+Description:
+
+   Clear or reset various PONGO plotting attributes. Several or all
+   of these plotting attributes can be specified on the command line.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SCREEN
+SCREEN = _LOGICAL (Read)
+   If TRUE, the plotting surface will be cleared.
+   [FALSE]
+3 DATA
+DATA = _LOGICAL (Read)
+   If TRUE, the data arrays will be cleared. This can be useful
+   if there is still unwanted data left in some of the data
+   areas: for example, the READF command does not automatically
+   clear columns that it does not read in. Even if the
+   appropriate READF parameters have been set to 0 to inhibit
+   reading error columns from the second file, the values from
+   the first file will remain in the data areas. This behaviour is
+   designed to allow columns to be read from separate files and
+   combined in one plot. However, it can cause the automatic axis
+   limit finding routines to appear to fail because of data left
+   in error columns. This most commonly occurs when a file not
+   containing error values is read immediately after one that
+   does.
+   [FALSE]
+3 LIMITS
+LIMITS = _LOGICAL (Read)
+   If TRUE, the data limits will be cleared and the data
+   re-examined in order to determine the axis limits. This
+   command is often necessary if a complicated function has been
+   performed on the data using the CCMATH command, because the
+   current PONGO parameters may no longer be applicable to the
+   data.
+   [FALSE]
+3 LABLST
+LABLST = _LOGICAL (Read)
+   If TRUE, the internal label list generated by the CURSES
+   command will be cleared.
+   [FALSE]
+3 AGI
+AGI = _LOGICAL (Read)
+   If TRUE, the AGI database is cleared for the current device.
+   [FALSE]
+3 ERSCALE
+ERSCALE = _REAL (Read)
+   The scale factor by which the errors are to be multiplied.
+   (Can only be set when LIMITS are cleared.)
+
+   The value of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.
+
+1 CLOG
+Take the logarithm of a column.
+
+Usage:
+   clog action
+
+Description:
+
+   Take the base 10 logarithm of a data column.  This application
+   should be used to take the logarithm of the data columns in
+   preference to doing it with CCMATH, because it can deal with the
+   associated error values consistently. It automatically adds the
+   "L" option to the PONGO_XOPT or PONGO_YOPT global parameters, as
+   appropriate.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   The data column to transform. It should be one of the
+   following:
+
+      - "X" -- XCOL
+
+      - "Y" -- YCOL
+
+      - "Z" -- ZCOL
+
+   [The value will be prompted for.]
+3 XOPT
+XOPT = _CHAR (Write)
+   The PGPLOT X-axis options string.  The global parameter will be
+   updated to include the PGPLOT "L" axis option at the start.
+   This option means that logarithmic style axis labels and tick
+   marks will be plotted. The READF command will automatically
+   remove any "L" characters at the start of this string since it
+   assumes that they have been put there by CLOG, and fresh data
+   read in will not be logarithmic. If data are naturally
+   logarithmic, the "L" should be placed other than at the start
+   of the string to make an "L" option that will not be modified
+   by PONGO.
+
+   It is not intended that this parameter be set by the user when
+   CLOG is executed.
+
+   The value will be written to the global parameter PONGO_XOPT.
+3 YOPT
+YOPT = _CHAR (Write)
+   The PGPLOT Y-axis options string. Its action is similar to the
+   XOPT parameter.
+   It is not intended that this parameter be set by the user when
+   CLOG is executed.
+
+   The value will be written to the global parameter PONGO_YOPT.
+
+1 CONNECT
+Draw straight lines between the data points.
+
+Usage:
+   connect
+
+Description:
+
+   Straight line segments are drawn between the data points in the
+   XCOL and YCOL data areas. This may not be used with projections
+   other than "NONE"
+
+   This command is a synonym for GPOINTS C.
+
+1 CURSE
+Use the cursor to get interactive input.
+
+Usage:
+   curse [symbol] label=?
+
+Description:
+
+   Display the cursor and perform various interactive tasks. These
+   tasks are as follows:
+
+      - Q -- QUIT
+
+         The application ends.
+
+      - D -- DRAW
+
+         A line is drawn from the PGPLOT "current position" to  the
+         cursor position. This position is also written to the
+         internal label list.
+
+      - E -- EXPAND
+
+         The plotting limits are expanded by a factor of 2
+         about the position of the cursor. No other action is taken.
+         This allows the screen to be cleared and the graph to be
+         re-plotted without having to set the limits explicitly.
+
+      - G -- GRADIENT
+
+         Draw a line between two consecutive cursor hits and report
+         the gradient of the line.
+
+      - L -- LABEL
+
+         Write a label directly onto the plot. The application
+         uses up to two points which define the angle at which the
+         label is to be drawn. Once "L" has been pressed, the user
+         is given the option to add another point in the standard
+         PGPLOT fashion (c.f. the PGPLOT routine PGNCURSE); i.e.
+
+            - A -- add a point
+
+            - D -- delete a point
+
+            - X -- finish
+
+         On pressing the "X" key, a label is prompted for. If only
+         one point is supplied, the label is plotted horizontally.
+
+      - M -- MARK
+
+         Mark the current cursor position with the current symbol
+         type.
+
+      - P -- ANNOTATE
+
+         The label for the nearest data point is written with its
+         left hand end at the position defined by the cursor. If "O"
+         is pressed, the right hand end of the label is placed at
+         that position. The information to create this label is
+         stored in an internal table. This information can be
+         written out into file suitable for including in an ICL
+         command file by using the WRITEI application, e.g.
+
+            PONGO> WRITEI LABLST
+
+      - S -- SHRINK
+
+         The plotting limits are set so as to zoom out by a factor
+         of 2 about the position of the cursor. No other action is
+         taken. This allows the screen to be cleared and the graph
+         to be re-plotted without having to set the limits
+         explicitly.
+
+      - V -- MOVE
+
+         The PGPLOT "current position" will be set to the cursor
+         position. This position is also written to the internal
+         label list.
+
+      - X -- POSITION
+
+         The current position of the cursor in world coordinates is
+         written to the terminal and the XCURSE and YCURSE
+         parameters.
+
+      - Z -- ZOOM
+
+         The limits for a zoomed version of the current plot are
+         set. The application will prompt for two points which
+         define the bottom left corner and the top right corner of
+         the new graph surface.
+
+            - A -- add a point
+
+            - D -- delete a point
+
+            - X -- finish
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SYMBOL
+SYMBOL = _INTEGER (Read)
+   The symbol number used in the MARK option.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.
+3 LABEL
+LABEL = _CHAR (Read)
+   The label to be written to the screen with the LABEL option.
+
+   [The value is prompted for.]
+3 JUSTIFICATION
+JUSTIFICATION = _REAL (Read and Write)
+   The justification about the point (in the range 0.0 to 1.0).
+   Here, 0.0 means left justify the text relative to the data
+   point, 1.0 means right justify the text relative to the data
+   point, 0.5 means centre the string on the data point, other
+   values will give intermediate justifications.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.5 (i.e.
+   centre the text).
+3 XCURSE
+XCURSE = _REAL (Write)
+   The X-axis position of the last graphics cursor hit when using
+   the "X" option.
+
+   The value is written to the PONGO_XCURSE global parameter.
+3 YCURSE
+YCURSE = _REAL (Write)
+   The Y-axis position of the last graphics cursor hit when using
+   the "X" option.
+
+   The value is written to the PONGO_YCURSE global parameter.
+3 XMIN
+XMIN = _REAL (Write)
+   The left hand edge of the world coordinate limits. The value
+   is set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+
+   The value is written to the global parameter PONGO_XMIN.
+3 XMAX
+XMAX = _REAL (Write)
+   The right hand edge of the world coordinate limits. The value
+   is set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+
+   The value is written to the global parameter PONGO_XMAX.
+3 YMIN
+YMIN = _REAL (Write)
+   The lower edge of the world coordinate limits. The value is
+   set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+
+   The value is written to the global parameter PONGO_YMIN.
+3 YMAX
+YMAX = _REAL (Write)
+   The upper edge of the world coordinate limits. The value is
+   set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+
+   The value is written to the global parameter PONGO_YMAX.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The projection that has been used to plot the data.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+
+1 DATA
+Specify the data file name.
+
+Usage:
+   data filename
+
+Description:
+
+   The file name for the input data is set.
+
+   This command is a synonym for SETGLOBAL PONGO_DATA.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DATA
+DATA = FILENAME (Write)
+   The name of the formatted data file. []
+
+1 DEGTOR
+Convert the specified data area from degrees to radians.
+
+Usage:
+   degtor column
+
+Description:
+
+   The values in the specified data area are converted from degrees
+   to radians.
+
+   This command is an ICL hidden procedure which uses the CCMATH
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COLUMN
+COLUMN = _CHAR (Read and Write)
+   The column to be converted from degrees to radians. []
+
+1 DEVICE
+Open a plotting device.
+
+Usage:
+   device [device] [action] [clear] [overlay]
+      { label=?
+      action
+
+Description:
+
+   Set up a device for subsequent PONGO plotting commands. This
+   application allows plotting onto an AGI picture created by a
+   different package (e.g. KAPPA), or the creation of a new base
+   picture.
+
+   If a picture created by a run of a previous application is made
+   (using either the "current" picture or selecting using a known
+   picture label see parameter ACTION) then it is possible to
+   overlay new graphics (such as annotations, lines etc.) using the
+   same coordinate system (see the OVERLAY parameter).
+
+   This command is a synonym for BEGPLOT.
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read and Write)
+   If 'B', the plotting device will be cleared and the whole of
+   its plotting surface used. If equal to 'C', the current picture
+   will be used and a PGPLOT viewport created inside it. If 'L'
+   then a previously labelled picture (set using KAPPA:PICLABEL)
+   can be selected. Once set, this parameter will retain its value
+   in subsequent invocations of BEGPLOT.
+   ['C']
+3 CHEIGHT
+CHEIGHT = _REAL (Write)
+   The character height scaling factor. A value of 1.0 implies a
+   nominal character height of 1/40th the viewport height. The
+   value is set by the application from the height of the chosen
+   picture (unless the picture is the base one). The result is
+   written to the global parameter PONGO_CHEIGHT.
+3 CLEAR
+CLEAR = _LOGICAL (Read)
+   If TRUE then the current picture will be cleared of any
+   existing graphics.
+   [TRUE]
+3 DEVICE
+DEVICE = DEVICE (Read and Write)
+   The name of the device to be used for plotting.  The names of
+   the currently available devices can be found using the INQUIRE
+   DEVICES command.
+
+   The value of the global parameter GRAPHICS_DEVICE is used
+   unless a value is specified on the command line. If
+   GRAPHICS_DEVICE is not defined and no value is specified on
+   the command line, the value will be prompted for.
+3 LABEL
+LABEL = _CHAR (Read)
+   If ACTION=L is selected then the name of the AGI picture to be
+   selected is given by this parameter. AGI pictures can be labelled
+   using the KAPPA application PICLABEL.
+   ['']
+3 OVERLAY
+OVERLAY = _LOGICAL (Read)
+   If TRUE, the PGPLOT viewport created will exactly overlay the
+   the last DATA picture. This is useful for drawing axis labels
+   using BOXFRAME on an image or contour map etc. that has been
+   displayed by another package (e.g. KAPPA:DISPLAY).
+   [FALSE]
+3 XMIN
+XMIN = _REAL (Write)
+   The left hand edge of the world coordinate limits from the
+   selected picture. This defaults to 0.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_XMIN.
+3 XMAX
+XMAX = _REAL (Write)
+   The right hand edge of the world coordinate limits from the
+   selected picture. This defaults to 1.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_XMAX.
+3 YMIN
+YMIN = _REAL (Write)
+   The lower edge of the world coordinate limits from the
+   selected picture. This defaults to 0.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_YMIN.
+3 YMAX
+YMAX = _REAL (Write)
+   The lower edge of the world coordinate limits from the
+   selected picture. This defaults to 1.0 for a new (i.e.  not
+   overlayed) picture.  The result is written to the global
+   parameter PONGO_YMAX.
+
+1 DLIMITS
+Set the world coordinate limits using the data range.
+
+Usage:
+   dlimits
+
+Description:
+
+   The ranges of the data given in the XCOL and YCOL data areas are
+   used to set the world coordinate limits for plotting. A small
+   border is also added to the data limits when calculating the world
+   coordinate limits.
+
+   This command is a synonym for WORLD DATA.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XMIN
+XMIN = _REAL (Read and Write)
+   The world coordinate of the left-hand edge of the plot.
+
+   The application will determine the value.
+3 XMAX
+XMAX = _REAL (Read and Write)
+   The world coordinate of the right-hand edge of the plot.
+
+   The application will determine the value.
+3 YMIN
+YMIN = _REAL (Read and Write)
+   The world coordinate of the lower edge of the plot.
+
+   The application will determine the value.
+3 YMAX
+YMAX = _REAL (Read and Write)
+   The world coordinate of the upper edge of the plot.
+
+   The application will determine the value.
+3 PROJECTION
+PROJECTION = _CHAR (Read and Write)
+   The geometry to be used for plotting the data.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   [The value of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.]
+3 RACENTRE
+RACENTRE = _CHAR (Read and Write)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.]
+3 DECCENTRE
+DECCENTRE = _CHAR (Read and Write)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.]
+3 ERSCALE
+ERSCALE = _REAL (Read)
+   The scale factor to be applied to the EXCOL and EYCOL data when
+   determining the limits of the world co-ordinates.
+   [The value of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.]
+
+1 DRAW
+Draw a line from the current pen position to the specified point.
+
+Usage:
+   draw x y
+
+Description:
+
+   A straight line is drawn from the current pen position to the
+   specified point.
+
+   This command is a synonym for PRIM D.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 X
+X = _REAL (Read and Write)
+   The X coordinate of the point.
+
+   If no value is specified on the command line, the value is
+   prompted for.
+3 Y
+Y = _REAL (Read and Write)
+   The Y coordinate of the point.
+
+   If no value is specified on the command line, the value is
+   prompted for.
+
+1 DRAWPOLY
+Draw a polygon.
+
+Usage:
+
+   drawpoly [fill]
+
+Description:
+
+   This routine draws a polygon using the data in the XCOL and
+   YCOL areas to define the vertices of the region. The polygon
+   is shaded using the current fill-area style attributes (see
+   the FILLSTY command).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FILL
+FILL = _LOGICAL (Read)
+   Whether to fill the polygon or not. If TRUE then the current
+   fill-area style attributes as set by the CHANGE command will
+   be used.
+   [TRUE]
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The geometry to be used for plotting the polygon.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   [The value of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.]
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.]
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.]
+2 Examples
+drawpoly
+   This draws a single polygon on the current graphics display. The
+   polygon is filled or shaded using the current fill-hatch styles.
+
+drawpoly projection=aitoff deccentre="12:00:00"
+   This draws a single polygon on the current graphics display. The
+   polygon is filled or shaded using the current fill-hatch styles
+   and the polygon is drawn using an AITOFF projection. The lines
+   along the edges of the polygon are drawn as suitable arcs.
+2 Notes
+- The XCOL and YCOL positions are assumed to be in radians.
+
+- If a projection is used then expect the polygon to be incorrect
+  if it crosses any discontinuities, or if the edges are severely
+  distorted (the polygon is filled as plotted on the display
+  surface, not the sky).
+
+1 ELLIPSES
+Draw error ellipses.
+
+Usage:
+   ellipses [axes] [erscale]
+
+Description:
+
+   Draw error ellipses at each of the data points using values in
+   the EXCOL and EYCOL error data areas, and the ZCOL data values as
+   the normalized covariance. Depending upon the value of the AXES
+   parameter, the major and minor axes of the ellipses will also be
+   drawn.
+
+   The size of the ellipses depends upon the parameter ERSCALE which
+   should be set before the data are read in so that the WORLD
+   application can calculate the viewing area properly. This allows
+   the ellipse size to be varied so that it can be drawn for
+   different confidence levels.
+
+      ERSCALE   confidence
+                  level
+       1.00        46%
+       2.30        68.3%
+       4.61        90%
+       9.21        99%
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AXES
+AXES = _LOGICAL (Read and Write)
+   If TRUE, the axes of the ellipses will be drawn.
+
+   If the value is not specified on the command line, the current
+   value is used.  The current value is initially set to FALSE.
+3 ERSCALE
+ERSCALE = _REAL (Read and Write)
+   Scale the error ellipses as described above. If the command
+   WORLD DATA (which automatically sets the graph limits) is to
+   work properly, the global parameter PONGO_ERSCALE should have
+   been set by READF. However, if this facility is not required,
+   it is perfectly acceptable to set ERSCALE when invoking
+   ELLIPSES.
+
+   [The value of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.]
+
+1 ENDPLOT
+Close down the current plotting device.
+
+Usage:
+   endplot [comment]
+
+Description:
+
+   Close down the current plotting device, storing the current
+   picture description in the AGI database. The position and world
+   coordinate limits of the plot will be stored in the AGI database,
+   along with any comment text.
+
+   ENDPLOT must be executed before using a plotting application from
+   another package (e.g. KAPPA) -- failure to do so will result in
+   an AGI error and may corrupt the AGI database.
+
+   This command is an ICL hidden procedure which uses the
+   undocumented PONGO application ENDPONGO.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COMMENT
+COMMENT = _CHAR (Read and Write)
+   A comment for the AGI database entry for the plot that has
+   just been completed. Any comment will be prefixed with the
+   string "PONGO:".
+   ["Final viewport"]
+
+1 ERASE
+Clear the graphics screen.
+
+Usage:
+   erase
+
+Description:
+
+   The plotting surface is cleared.
+
+   This command is a synonym for CLEAR SCREEN.
+
+1 ERRORBAR
+Draw error bars on the plotted data.
+
+Usage:
+   errorbar action [erterm]
+
+Description:
+
+   Draw error bars in the X or Y directions, either treating the
+   values in the EXCOL and EYCOL data areas as symmetric errors
+   about the point, or as an upper limit with the XCOL or YCOL data
+   area holding the other limit.
+
+   PONGO will plot error bars correctly even after logarithms of the
+   data have been taken for the symmetric option, as long as the CLOG
+   application has been used to perform the transformation (as
+   opposed to CCMATH). For the non-symmetric case, the CCMATH
+   application should be used to take the logarithms of the data
+   in the EXCOL and EYCOL data areas.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   "X" or "Y" depending upon which set of error bars is to be
+   drawn.
+
+   [The value is prompted for.]
+3 ERTERM
+ERTERM = _REAL (Read and Write)
+   The length of the terminals on the error bars: a multiple of
+   the default length.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 SYMERR
+SYMERR = _LOGICAL (Read and Write)
+   If TRUE, the values in the error data areas represent a
+   symmetric error about the values in the data columns. If
+   FALSE, the data columns represent the lower limits, and the
+   error columns represent the upper limits.
+   [TRUE]
+
+1 ERRX
+Draw symmetric error bars in the X direction.
+
+Usage:
+   errx [erterm]
+
+Description:
+
+   Draw symmetric error bars in the X direction.
+
+   This command is a synonym for ERRORBAR X.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ERTERM
+ERTERM = _REAL (Read and Write)
+   The length of the terminals on the error bars: a multiple of
+   the default length.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+
+1 ERRY
+Draw symmetric error bars in the Y direction.
+
+Usage:
+   erry [erterm]
+
+Description:
+
+   Draw symmetric error bars in the Y direction.
+
+   This command is a synonym for ERRORBAR Y.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ERTERM
+ERTERM = _REAL (Read and Write)
+   The length of the terminals on the error bars: a multiple of
+   the default length.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+
+1 EXCOLUMN
+Specify the column containing the X-axis error data.
+
+Usage:
+   excolumn excol
+
+Description:
+
+   Specify the column in the data file from which the errors on the
+   X-axis data are to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_EXCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 EXCOL
+EXCOL = _CHAR (Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the X-axis error data are read by the READF
+   command. The value "0" means "do not read these data". []
+
+1 EXPAND
+Set the character height.
+
+Usage:
+   expand cheight
+
+Description:
+
+   Change the character height scaling. This command scales the
+   default character height and also alters the size of the tick
+   marks and symbols that PONGO plots. The default character height
+   is about 1/40 of the viewport height.
+
+   This command is a synonym for CHANGE CHEIGHT=.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CHEIGHT
+CHEIGHT = _REAL (Read and Write)
+   The character height scaling. This parameter scales the
+   default character height and also alters the size of the tick
+   marks and symbols that PGPLOT plots. The default character
+   height in PGPLOT is about 1/40 of the viewport height. []
+
+1 EYCOLUMN
+Specify the column containing the Y-axis error data.
+
+Usage:
+   eycolumn eycol
+
+Description:
+
+   Specify the column in the data file from which the errors on the
+   Y-axis data are to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_EYCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 EYCOL
+EYCOL = _CHAR (Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Y-axis error data are read by the READF
+   command. The value "0" means "do not read these data". []
+
+1 FILLSTY
+Change fill-style plotting attributes.
+
+Usage:
+
+   fillsty fillsty [angle] [separation] [phase]
+
+Description:
+
+   Change the PGPLOT fill-style attributes.
+
+   This is an hidden ICL procedure that makes use of the
+   CHANGE command.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ANGLE
+ANGLE = _REAL (Read)
+   The angle hatch lines make with horizontal, in degrees.
+   Only used when FILLSTY is 3.
+3 FILLSTY
+FILLSTY = _INTEGER (Read)
+   The fill style used by PGPLOT. The fill styles are as follows:
+
+      - 1 -- solid fill,
+
+      - 2 -- hollow fill,
+
+      - 3 -- hatched,
+
+      - 4 -- cross-hatched
+
+   The must be specified on the command line.
+3 PHASE
+PHASE = _REAL (Read)
+   The fraction of SEPARATION that hatched lines are displaced.
+   Modifying this between regions makes their separation more
+   obvious. This is only used when FILLSTY is 3.
+3 SEPARATION
+SEPARATION = _REAL (Read)
+   The separation of hatched lines. The unit spacing is 1 percent
+   of the smaller of the height or width of the view surface.
+   Only used when FILLSTY is 3.
+
+
+1 FITCURVE
+Fit a curve to the data.
+
+Usage:
+
+   fitcurve action npoly [weight]
+
+Description:
+
+   This command fits data using either a polynomial or a smooth
+   spline. If weights are available these can be used when
+   determining the fit.
+
+   The resultant fit parameters are displayed and written to the
+   environment for use by the PLOTFUN application, which can replot the
+   polynomial or spline with other datasets etc.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read and Write)
+   Type of curve to be fitted. Currently this action must be
+   "POLY" or "SPLINE"
+
+   If the parameter is not specified on the command line, it will
+   be prompted for.
+3 NPOLY
+NPOLY = _INTEGER (Read and Write)
+   The order of the polynomial or spline. For polynomials this can
+   range from 1 to 9 and for splines from 2 to 6.
+
+   If the parameter is not specified on the command line, it
+   will be prompted for.
+3 COLOUR
+COLOUR = _INTEGER (Read and Write)
+   The colour index used when plotting the fitted curve.
+
+   If no value is specified on the command line, the current value
+   is used. If there is no current value, a default of 2 (i.e.
+   red) will be used.
+3 WEIGHT
+WEIGHT = _LOGICAL (Read and Write)
+   Whether the fit is to use the y-axis error data in the EYCOL
+   data area, if available. If no error data are available, the
+   fit will always be unweighted.
+
+   If the value is not specified on the command line, the current
+   value is used. If there is no current value, a default value of
+   TRUE is used.
+3 POLYCOEF[10]
+POLYCOEF[10] = _DOUBLE (Write)
+   If ACTION is "POLY", the polynomial coefficients resulting
+   from the fit are written to this parameter.
+
+   The value of this parameter is written to the global parameter
+   PONGO_POLYCOEF.
+3 POLYFILE
+POLYFILE = _CHAR (Read)
+   The name of a file to contain the derived polynomial coefficients.
+   Only used when ACTION is "POLY" and INFILE is TRUE.
+
+   [POLYFILE.dat]
+3 SMOOTH
+SMOOTH = _REAL (Read)
+   Only used if ACTION is "SPLINE". This factor determines the
+   tradeoff between the closeness and smoothness of the spline
+   fit. It should be a real number greater than 0.0. Normally this
+   is dynamically defaulted to a number equal to the number of
+   points to be fitted. Decreasing this value to 0.0 produces an
+   interpolating spline fit.
+3 SPLINEFILE
+SPLINEFILE = _CHAR (Read)
+   The name of a file to contain the coefficients and knot
+   positions from the spline fit -- used when ACTION is
+   "SPLINE". This file can be used by the PLOTFUN command to
+   redraw the fit.
+
+   [The value of the global parameter PONGO_SPLINEF is used. If
+   PONGO_SPLINEF is not defined, the value is prompted for.]
+3 XMIN
+XMIN = _REAL (Read)
+   The minimum X value to be used in the fit.
+
+   The value of the global parameter PONGO_XMIN is used. If
+   PONGO_XMIN is not defined, the default value 0.0 is used.
+3 XMAX
+XMAX = _REAL (Read)
+   The maximum X value to be used in the fit.
+
+   The value of the global parameter PONGO_XMAX is used. If
+   PONGO_XMAX is not defined, the default value 1.0 is used.
+3 YMIN
+2 Notes
+- this is the NAG-free version of this application. It fits a
+general polynomial of the form:
+
+    y = a1 + a2*x + a3*x^2 + a4*x^3 ..... an*x^n
+
+which has order n-1, using a least squares approach. The previous
+version of this routine used a Chebyshev polynomial.
+
+- The spline fit is characterised by the positions of the knots and
+the spline coefficients (and the order used for the splines) all
+of which are stored in the spline file. The number of knots used
+in the fit can only be influenced by using the SMOOTH
+parameter. Higher values of this give larger smoothing factors. A
+value of 0 gives an interpolating spline fit.
+
+1 FITLINE
+Fit a straight line to the data.
+
+Usage:
+   fitline [colour]
+
+Description:
+
+   If the y-axis error data are available and the WEIGHT paramter is
+   TRUE, this application will perform a weighted least squares fit
+   to a straight line for the data over the range delimited by the
+   XMIN and XMAX parameters. If the y-axis error data are not
+   available or WEIGHT is FALSE, an unweighted fit is performed. The
+   best fit straight line is plotted. The resultant fit parameters
+   are displayed along with some simple statistics for the data
+   (these statistics are also weighted in the case of a weighted
+   fit).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COLOUR
+COLOUR = _INTEGER (Read and Write)
+   The colour index used when plotting the fitted line.
+
+   If the value is not specified on the command line, the current
+   value is used. If there is no current value, a default value of
+   2 (i.e. red) is used.
+3 WEIGHT
+WEIGHT =_LOGICAL (Read and Write)
+   Whether the fit is to use the y-axis error data in the EYCOL
+   data area, if available. If no error data are available, the
+   fit will always be unweighted.
+
+   If the value is not specified on the command line, the current
+   value is used. If there is no current value, a default value of
+   TRUE is used.
+3 XMIN
+XMIN = _REAL (Read)
+   The minimum X value to be used in the fit.
+
+   The value of the global parameter PONGO_XMIN is used. If
+   PONGO_XMIN is not defined, the default value 0.0 is used.
+3 XMAX
+XMAX = _REAL (Read)
+   The maximum X value to be used in the fit.
+
+   The value of the global parameter PONGO_XMAX is used. If
+   PONGO_XMAX is not defined, the default value 1.0 is used.
+
+1 FONT
+Set the text font.
+
+Usage:
+   font font
+
+Description:
+
+   Change the text font.
+
+   This command is a synonym for CHANGE FONT=.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FONT
+FONT = _INTEGER (Read and Write)
+   The font used by PGPLOT. The styles for each font are as
+   follows:
+
+      - 1 -- single-stroke font,
+
+      - 2 -- roman font,
+
+      - 3 -- italic font,
+
+      - 4 -- script font.
+
+   []
+
+1 GETPOINT
+Retrieve information for a plotted data point.
+
+Usage:
+   getpoint action value
+
+Description:
+
+   Return the attributes of a plotted data point to ICL variables.
+
+   This application has been written to aid the implementation of
+   ICL procedures. Because it is only possible to make enquiries
+   about a single point per invocation, any ICL procedure built
+   around GETPOINT will work slowly if a large number of data are
+   involved. For such cases it may be better to consider writing a
+   customized PONGO application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   The method of specifying the data point in question. If "N",
+   interpret the VALUE parameter as specifying the index number
+   of that point. If "C",  the VALUE parameter is used to try to
+   match the LABCOL entry for a point.
+
+   [The value is prompted for.]
+3 VALUE
+VALUE = _CHAR (Read)
+   The value to be used in the search for the data point.
+   Depending upon the value of the ACTION parameter, this may
+   either be an integer specifying the index number of the point
+   in the data area, or a case-sensitive minimum match string for
+   a label column entry in the data area.
+
+   [The value is prompted for.]
+3 X
+X = _REAL (Write)
+   The returned value of the X coordinate of the selected point.
+3 Y
+Y = _REAL (Write)
+   The returned value of the Y coordinate of the selected point.
+3 Z
+Z = _REAL (Write)
+   The returned value of the Z coordinate of the selected point.
+3 EX
+EX = _REAL (Write)
+   The returned value of the X coordinate error of the selected
+   point.
+3 EY
+EY = _REAL (Write)
+   The returned value of the Y coordinate error of the selected
+   point.
+3 SYMBOL
+SYMBOL = _INTEGER (Write)
+   The returned value of the symbol column of the selected point.
+3 LABEL
+LABEL = _CHAR (Write)
+   The returned value of the label column of the selected point.
+2 Examples
+PONGO> GETPOINT C '3C45' X=(XP) Y=(YP)
+   This will return the X and Y coordinates of the data point
+   that has the label '3C45', if it exists, to the ICL variables
+   XP and YP.
+
+1 GPOINTS
+Plot points or lines between the data.
+
+Usage:
+   gpoints action [symbol]
+
+Description:
+
+   General plotting application. This application can be used simply
+   to plot a symbol at the position of each point, to plot a symbol
+   whose size depends upon the values in the ZCOL data area, or to
+   draw lines connecting the data points.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   The type of plot to produce. This can be "C", "P" or "S",
+   with the following meanings:
+
+   - "C" (connect) -- This action simply draws straight line
+   segments between the data points.
+
+   - "P" (points) -- Draw a symbol at each of the data points. The
+   symbol type that is used to mark each point is determined in
+   one of 3 ways:
+
+      o If no SYMBOL parameter is supplied on the command line,
+      and no symbol numbers have been read into the symbol data
+      area by READF, the point style will be set by the current
+      value of SYMBOL.
+
+      o If no SYMBOL parameter is supplied on the command line,
+      and values have been read into the symbol data area by
+      READF, the symbol number for each point will determine
+      the style of the point plotted.
+
+      o If SYMBOL is specified on the command line, it will
+      override each of the above options. The same specified
+      symbol will be used to mark all points.
+
+   The value of the symbol index should be an integer which
+   refers to the standard PGPLOT symbols.
+
+   - "S" (sizeplot) -- This action uses the values stored in the
+   ZCOL data area to determine the size of the plotted symbol.
+   The value of each entry in the ZCOL data area is effectively
+   used as an argument to a CHANGE CHEIGHT command before each
+   point is plotted. The SCALE parameter can be used to make
+   these values cover a reasonable range by multiplying the Z
+   data values.
+
+   [The value is prompted for.]
+3 SYMBOL
+SYMBOL = _INTEGER (Read and Write)
+   The PGPLOT symbol number that is used to mark the data points.
+
+   If a value is specified on the command line, it will be used
+   for plotting symbols for all the data. If not value is
+   specified on the command line, the application attempts to use
+   the SYMCOL data for its symbols. If no symbol values have been
+   read into the SYMCOL data area, the current value is used for
+   all the data. The current value is initially set to 1.
+3 SCALE
+SCALE = _REAL (Read and Write)
+   The scale factor used to multiply the ZCOL data values to get
+   a reasonable range of symbol sizes when ACTION=SIZEPLOT.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   Specifies the geometry that is to be used to plot the data.
+   This is explained in more detail in the section on
+   projections.  Allowed values: "NONE", "TAN", "SIN", "ARC",
+   "GLS", "AITOFF", "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+
+1 GRID
+Draw a coordinate grid at specified intervals.
+
+Usage:
+   grid [phimin] [phimax] [phistep] [themin] [themax] [thestep]
+
+Description:
+
+   Draw a grid in the current projection at user specified intervals
+   in spherical coordinates. The intervals, start and end values
+   should all be specified in degrees. The defaults for the grid
+   separations normally produce desirable effects for all sky plots.
+   In specifying the grid intervals it is sometimes necessary to
+   take account of rounding errors that might occur, and to bear in
+   mind that in some geometries a single point on the celestial
+   sphere maps onto two points on the projected coordinates -- some
+   care is needed to ensure that the whole grid is drawn.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 PHIMIN
+PHIMIN = _DOUBLE (Read and Write)
+   The start longitude in degrees for the coordinate grid.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 PHIMAX
+PHIMAX = _DOUBLE (Read and Write)
+   The end longitude in degrees for the coordinate grid.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 360.0.
+3 PHISTEP
+PHISTEP = _DOUBLE (Read and Write)
+   The spacing between longitude grid lines in degrees.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 30.0.
+3 THEMIN
+THEMIN = _DOUBLE (Read and Write)
+   The start latitude in degrees for the coordinate grid.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to -90.0.
+3 THEMAX
+THEMAX = _DOUBLE (Read and Write)
+   The end latitude in degrees for the coordinate grid.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 90.0.
+3 THESTEP
+THESTEP = _DOUBLE (Read and Write)
+   The spacing between latitude grid lines in degrees.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 10.0.
+3 PROJECTION
+PROJECTION = _LITERAL (Read)
+   The geometry to be used to plot the grid.  This is explained
+   in more detail in the section on projections.  Allowed values:
+   "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF", "MERCATOR" and
+   "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _LITERAL (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+    This parameter is not specified on the command line. The
+    value of the global parameter PONGO_RACENTRE is used. If
+    PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _LITERAL (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+2 Notes
+- It is sometimes necessary to specify the grid intervals in a
+manner which avoids rounding errors to obtain the last grid line.
+e.g 9.9999 instead of 10. You may also need to sometimes draw
+the grid twice using say 30.00001 as well as 29.99999 to get
+this final line.
+
+1 GT_CIRCLE
+Draw a great circle between two points.
+
+Usage:
+   gt_circle [phistart] [thestart] [phiend] [theend]
+
+Description:
+
+   Draw a great circle between two points in current projection. The
+   great circle is specified by giving the coordinates in degrees of
+   two points on the celestial sphere. Either the small or large
+   great circle may be drawn.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 PHISTART
+PHISTART = _DOUBLE (Read and Write)
+   The longitude of the start of the great circle in degrees.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 THESTART
+THESTART = _DOUBLE (Read and Write)
+   The latitude of the start of the great circle in degrees.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0.0
+3 PHIEND
+PHIEND = _DOUBLE (Read and Write)
+   The longitude of the end of the great circle in degrees.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 THEEND
+THEEND = _DOUBLE (Read and Write)
+   The latitude of the end of the great circle in degrees.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 ACUTE
+ACUTE = _LOGICAL (Read and Write)
+   If TRUE, the smaller great circle arc is drawn between the
+   given points.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to TRUE.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The geometry to be used to plot the great circle.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+
+1 HISTOGRAM
+Bin and plot a histogram of the data.
+
+Usage:
+   histogram [binmin] [binmax] [nbin]
+
+Description:
+
+   The data in the XCOL data area are binned and plotted as a
+   histogram.  It is possible to plot several histograms with
+   different bin sizes from the same data in XCOL because the data
+   are unaffected by HISTOGRAM.
+
+   This command is a synonym for PLOTHIST H.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BINMIN
+BINMIN = _REAL (Read and Write)
+   The lower limit of the binning.
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, the value of the
+   global parameter PONGO_XMIN is used.
+3 BINMAX
+BINMAX = _REAL (Read and Write)
+   The upper limit of the binning.
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, the value of the
+   global parameter PONGO_XMAX.
+3 NBIN
+NBIN = _INTEGER (Read and Write)
+   The number of equally sized bins to be drawn between the
+   limits of the histogram.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 10.
+3 AUTOSCALE
+AUTOSCALE = _LOGICAL (Read and Write)
+   If TRUE, PGPLOT auto-scaling is used to determine the plotting
+   limits. If FALSE, the limits defined by the bins of the
+   histogram determine the plotting limits. Here, the plotting
+   limits must previously have been set using the LIMITS
+   application and the plot frame drawn using BOXFRAME. Setting
+   NOAUTOSCALE can be used to draw more than one histogram on the
+   same plot.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to TRUE.
+
+1 INQUIRE
+Display PONGO status information.
+
+Usage:
+   inquire
+
+Description:
+
+    Display information about the status of PONGO and the data which
+    have been read in. The options are:
+
+       - PGPLOT -- Display the current font, character height colour
+       etc.
+
+       - LIMITS -- Display the data limits and the PGPLOT world
+       coordinate limits.
+
+       - COLUMNS -- Display the column names from the data file, if
+       they have been set up appropriately.
+
+       - DEVICES -- Display the available graphics devices.
+
+       - DATA -- Show the data that has been read in.
+
+   More than one of these options can be specified on the command line
+   at any one time.
+
+   The DATA option uses additional parameters to allow scrolling.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 PGPLOT
+PGPLOT = _LOGICAL (Read)
+   Display the current PGPLOT plotting attributes.
+   [FALSE]
+3 LIMITS
+LIMITS = _LOGICAL (Read)
+   Display the data limits and the current PGPLOT viewport and
+   world coordinate limits.
+   [FALSE]
+3 COLUMNS
+COLUMNS = _LOGICAL (Read)
+   Display the data file column headings (if available).
+   [FALSE]
+3 DEVICES
+DEVICES = _LOGICAL (Read)
+   Display the plotting devices available.
+   [FALSE]
+3 DATA
+DATA = _LOGICAL (Read)
+   Display the contents of all data areas in a formatted form.
+   [FALSE]
+3 PAGE
+PAGE = _INTEGER (Read and Write)
+   The page length of the terminal (in the range 1 to 100). It is
+   used to stop information scrolling off the top of the screen.
+   The parameter will be prompted for at the end of each screen:
+   a null response to the prompt will terminate the listing.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 24.
+3 FROM
+FROM = _INTEGER (Read and Write)
+   The number of the first item to be displayed.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0
+   (implying the start of the list).
+3 TO
+TO = _INTEGER (Read and Write)
+   The number of the last item to be displayed.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 0
+   (implying the end of the list).
+
+1 LABCOLUMN
+Specify the column used for data labels.
+
+Usage:
+   labcolumn labcol
+
+Description:
+
+   Specify the column in the data file from which the data labels are
+   to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_LABCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 LABCOL
+LABCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the symbolic name for each data point is
+   read by the READF command. The value "0" means "do not read
+   these data". []
+
+1 LABEL
+Draw the axis labels and title on the plot.
+
+Usage:
+   label [xlabel] [ylabel] [title]
+
+Description:
+
+   Draw the axis labels and the title on the plot. If the COLUMNS
+   parameter is specified, the axis labels are obtained from the
+   column labels read from the data file.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XLABEL
+XLABEL = _CHAR (Read and Write)
+   The X-axis label.
+
+   If no value is specified on the command line, then if COLUMNS
+   is TRUE the value is taken from the column heading in the
+   data file, otherwise the value of the global parameter
+   PONGO_XLABEL is used. If PONGO_XLABEL is not defined, the
+   value " " is used.
+3 YLABEL
+YLABEL = _CHAR (Read and Write)
+   The Y-axis label.
+
+   If no value is specified on the command line, then if COLUMNS
+   is TRUE the value is taken from the column heading in the
+   data file, otherwise the value of the global parameter
+   PONGO_YLABEL is used. If PONGO_YLABEL is not defined, the
+   value " " is used.
+3 TITLE
+TITLE = _CHAR (Read and Write)
+   The plot title.
+
+   [The value of the global parameter PONGO_TITLE is used. If
+   PONGO_TITLE is not defined, the value " " is used.]
+3 COLUMNS
+COLUMNS = _LOGICAL (Read)
+   If TRUE, the values of the X and Y labels will be obtained from
+   the column headings in the data file.
+   [FALSE]
+
+1 LIMITS
+Set the world coordinate limits.
+
+Usage:
+   limits [xmin] [xmax] [ymin] [ymax]
+
+Description:
+
+   The world coordinate limits are set from the parameters given
+   on the command line.
+
+   This command is a synonym for WORLD GIVEN.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XMIN
+XMIN = _REAL (Read and Write)
+   The world coordinate of the left-hand edge of the plot.
+
+   [The value of the global parameter PONGO_XMIN is used.]
+3 XMAX
+XMAX = _REAL (Read and Write)
+   The world coordinate of the right-hand edge of the plot.
+
+   [The value of the global parameter PONGO_XMAX is used.]
+3 YMIN
+YMIN = _REAL (Read and Write)
+   The world coordinate of the lower edge of the plot.
+
+   [The value of the global parameter PONGO_YMIN is used.]
+3 YMAX
+YMAX = _REAL (Read and Write)
+   The world coordinate of the upper edge of the plot.
+
+   [The value of the global parameter PONGO_YMAX is used.]
+3 PROJECTION
+PROJECTION = _CHAR (Read and Write)
+   The geometry to be used for plotting the data.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   [The value of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.]
+3 RACENTRE
+RACENTRE = _CHAR (Read and Write)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.]
+3 DECCENTRE
+DECCENTRE = _CHAR (Read and Write)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.]
+
+1 LTYPE
+Set the line style.
+
+Usage:
+   ltype linesty
+
+Description:
+
+   Change the line style.
+
+   This command is a synonym for CHANGE LINESTY=.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 LINESTY
+LINESTY = _INTEGER (Read and Write)
+   The line style used by PGPLOT.  The line style may be one of
+   the following:
+
+      - 1 -- full line,
+
+      - 2 -- dashed,
+
+      - 3 -- dot-dash-dot-dash,
+
+      - 4 -- dotted,
+
+      - 5 -- dash-dot-dot-dot.
+
+   []
+
+1 LWEIGHT
+Set the line width.
+
+Usage:
+   lweight linewid
+
+Description:
+
+   Change the line width scaling (the normal line width is 1.0).
+
+   This command is a synonym for CHANGE LINEWID=.
+2 ADAM_Parmeters
+   LINEWID = _INTEGER (Read and Write)
+      The line width scaling. This parameter scales the default line
+      width. []
+
+1 MARK
+Draw a point mark at the specified position.
+
+Usage:
+   mark x y [symbol]
+
+Description:
+
+   Draw a point mark at a specified position.
+
+   This command is a synonym for PRIM K.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 X
+X = _REAL (Read and Write)
+   The X coordinate of the point.
+
+   [The value is prompted for.]
+3 Y
+Y = _REAL (Read and Write)
+   The Y coordinate of the point.
+
+   [The value is prompted for.]
+3 SYMBOL
+SYMBOL = _INTEGER (Read and Write)
+   The PGPLOT symbol number for drawing the point mark.
+
+   If no value is given on the command line, the current value is
+   used. The current value is initially set to 1.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The geometry that is to be used for plotting. This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+2 Notes
+When using non-planar coordinates, the coordinates should be
+given in degrees.
+
+1 MOVE
+Set the current pen position.
+
+Usage:
+   move x y
+
+Description:
+
+   The current pen position is set to the given coordinates.
+
+   This command is a synonym for PRIM M.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 X
+X = _REAL (Read and Write)
+   The X coordinate of the point.
+
+   If no value is specified on the command line, the value is
+   prompted for.
+3 Y
+Y = _REAL (Read and Write)
+   The Y coordinate of the point.
+
+   If no value is specified on the command line, the value is
+   prompted for.
+
+1 MTEXT
+Draw a text string relative to the viewport.
+
+Usage:
+   mtext side xpos ypos justification text
+
+Description:
+
+   Draw a text string on the plot at a position specified relative
+   to the viewport. The command uses the PGPLOT routine PGMTEXT.
+
+   This command is a an ICL hidden procedure which uses the WTEXT
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SIDE
+SIDE = _CHAR (Read and Write)
+   The side of the viewport where the text is to plotted. This
+   may be one of the following:
+
+      - "T" -- The top edge.
+
+      - "B" -- The bottom edge.
+
+      - "L" -- The left-hand edge.
+
+      - "R" -- The right-hand edge.
+
+      - "LV" -- The left-hand edge, but with the string written
+      vertically.
+
+      - "RV" -- The right-hand edge, but with the string written
+      vertically.
+
+   []
+3 XPOS
+XPOS = _REAL (Read and Write)
+   The number of character heights from the viewport where the
+   text is to be plotted (negative values are allowed). []
+3 YPOS
+YPOS = _REAL (Read and Write)
+   The fraction along the edge where the text is to be plotted. []
+3 JUSTIFICATION
+JUSTIFICATION = _REAL (Read and Write)
+   The justification about the specified point (in the range 0.0
+   to 1.0).  Here, 0.0 means left justify the text relative to
+   the data point, 1.0 means right justify the text relative to
+   the data point, 0.5 means centre the string on the data point,
+   other values will give intermediate justifications. []
+3 TEXT
+TEXT = _CHAR (Read and Write)
+   The text string to be plotted. This may include any of the
+   PGPLOT control sequences for producing special characters. []
+
+1 PALETTE
+Change the plotting pen colours.
+
+Usage:
+   palette [colour] [red] [green] [blue]
+
+Description:
+
+   The colour representation for a given colour index is updated.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COLOUR
+COLOUR = _INTEGER (Read and Write)
+   The colour index, i.e. pen, to be updated (in the range 0 to
+   255).
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.
+3 RED
+RED = _REAL (Read and Write)
+   The red intensity (in the range 0.0 to 1.0).
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 GREEN
+GREEN = _REAL (Read and Write)
+   The green intensity (in the range 0.0 to 1.0).
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 BLUE
+BLUE = _REAL (Read and Write)
+   The blue intensity (in the range 0.0 to 1.0).
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+
+1 PAPER
+Change the size and aspect ratio of the plotting surface.
+
+Usage:
+   paper width aspect
+
+Description:
+
+   The width of the plotting surface and its aspect ratio (i.e.
+   height/width) are modified.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 WIDTH
+WIDTH = _REAL (Read and Write)
+   The width of the plotting surface in inches. If the specified
+   width is 0.0, the maximum possible width for the device is
+   used.
+
+   [The value is prompted for.]
+3 ASPECT
+ASPECT = _REAL (Read and Write)
+   The aspect ratio of the plotting surface: i.e. height/width.
+
+   [The value is prompted for.]
+
+1 PCOLUMN
+Specify the column used for symbol codes.
+
+Usage:
+   pcolumn symcol
+
+Description:
+
+   Specify the column in the data file from which the symbol codes
+   are to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_SYMCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SYMCOL
+SYMCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the PGPLOT symbol code for each data point
+   is read by the READF command. The value "0" means "do not read
+   these data". []
+
+1 PEN
+Set the current pen.
+
+Usage:
+  pen colour
+
+Description:
+
+   Set the current pen used for plotting.
+
+   This command is a synonym for CHANGE COLOUR=.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COLOUR
+COLOUR = _INTEGER (Read and Write)
+   The pen number (colour index) PGPLOT uses for plotting. The
+   value should be between 0 and 255. Usually the first 16 pens
+   are predefined to have the following colours:
+
+      - 0 -- background,
+
+      - 1 -- foreground (default),
+
+      - 2 -- red,
+
+      - 3 -- green,
+
+      - 4 -- blue,
+
+      - 5 -- cyan,
+
+      - 6 -- magenta,
+
+      - 7 -- yellow,
+
+      - 8 -- red + yellow (orange),
+
+      - 9 -- green + yellow,
+
+      - 10 -- green + cyan,
+
+      - 11 -- blue + cyan,
+
+      - 12 -- blue + magenta,
+
+      - 13 -- red + magenta,
+
+      - 14 -- dark grey,
+
+      - 15 -- light grey.
+
+   It is possible to change the colour representation of any of
+   the pen colour indices using the PALETTE application. []
+
+1 PLOTFUN
+Plot a given function.
+
+Usage:
+   plotfun action expression [xmin] [xmax]
+
+Description:
+
+   Plot a function specified on the command line by a Fortran-like
+   expression, or through the parameters resulting from a previous
+   fit (using a polynomial or spline).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   The type of function to be plotted. This must be one of the
+   following:
+
+      - "FUNC" -- Use a Fortran-like expression to define the
+      function.
+
+      - "POLY" -- Use a set of polynomial coefficients to define
+      the function.
+
+      - "SPLINE" -- Use a set of spline coefficients from the file
+      SPLINEFILE to define the function.
+
+   [The value is prompted for.]
+3 EXPRESSION
+EXPRESSION = _CHAR (Read)
+   The Fortran-like expression to be plotted, in terms of X.
+
+   [The value is prompted for.]
+3 XMIN
+XMIN = _REAL (Read)
+   The value of X from which the function is plotted.
+
+   [The value of the global parameter PONGO_XMIN is used.]
+3 XMAX
+XMAX = _REAL (Read)
+   The value of X to which the function is plotted.
+
+   [The value of the global parameter PONGO_XMAX is used.]
+3 INFILE
+INFILE = _LOGICAL (Read)
+   Used when ACTION is "POLY". If TRUE then the polynomial
+   coefficients are stored in a file (the first line of which is
+   the order of the polynomial), otherwise the coefficients
+   are given using the POLYCOEF parameter.
+
+   [FALSE]
+3 NPOLY
+NPOLY = _INTEGER (Read and Write)
+   The order of the polynomial: used when ACTION is "POLY".
+
+   [The value of the global parameter PONGO_NPOLY is used.]
+3 POLYCOEF
+POLYCOEF = _DOUBLE (Read)
+   A list of polynomial coefficients: used when ACTION is "POLY".
+
+   [The value of the global parameter PONGO_POLYCOEF is used.]
+3  POLYFILE
+POLYFILE = _CHAR (Read)
+   The name of a file containing the polynomial coefficients to 
+   be plotted. Only used when ACTION is "POLY" and INFILE is
+   TRUE.
+
+   [POLYFILE.dat]
+3 SPLINEFILE
+SPLINEFILE = FILENAME (Read)
+   The name of the file containing the coefficients and knot
+   positions from a previous spline fit -- used when ACTION is
+   "SPLINE".
+
+   [The value of the global parameter PONGO_SPLINEF is used. If
+   PONGO_SPLINEF is not defined, the value is prompted for.]
+
+1 PLOTHIST
+Plot a histogram of the data.
+
+Usage:
+   plothist action [binmin] [binmax] [nbin]
+
+Description:
+
+   This application has two modes:
+
+   - Bin the data in the XCOL data area and plot the result.
+
+   - Plot data that have already been binned and provided in the XCOL
+   and YCOL data areas.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   The mode of PLOTHIST as described above:
+
+   - "H" -- If the data in the XCOL data area are not binned, they
+   can be binned and then plotted.  It is possible to plot
+   several histograms with different bin sizes from the same data
+   in XCOL because the data are unaffected by PLOTHIST.
+
+   - "B" -- If the data have already been binned, this mode will
+   plot a histogram using the XCOL and YCOL data areas. The XCOL
+   data area should specify the bin edges and the YCOL data area
+   should contain their respective frequencies.
+
+   [The value is prompted for.]
+3 BINMIN
+BINMIN = _REAL (Read and Write)
+   When ACTION is "H", this parameter specifies the lower limit
+   of the binning.
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, the value of the
+   global parameter PONGO_XMIN is used.
+3 BINMAX
+BINMAX = _REAL (Read and Write)
+   When ACTION is "H", this parameter specifies the upper limit of
+   the binning.
+
+   If no value is specified on the command line, the current
+   value is used. If there is no current value, the value of the
+   global parameter PONGO_XMAX.
+3 FILL
+FILL = _LOGICAL (Read)
+   When ACTION is "H" this parameter controls whether the
+   histogram will be drawn filled with the current fill, colour
+   and hatching styles.
+   [FALSE]
+3 NBIN
+NBIN = _INTEGER (Read and Write)
+   When ACTION is "H", this parameter specifies the number of
+   equally sized bins to be drawn between the limits of the
+   histogram.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 10.
+3 AUTOSCALE
+AUTOSCALE = _LOGICAL (Read and Write)
+   When ACTION is "H" this parameter specifies whether PGPLOT
+   auto-scaling is used to determine the plotting limits. If
+   FALSE, the limits defined by the bins of the histogram
+   determine the plotting limits. Here, the plotting limits must
+   previously have been set using the LIMITS application and the
+   plot frame drawn using BOXFRAME. Setting NOAUTOSCALE can be
+   used to draw more than one histogram on the same plot.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to TRUE.
+3 CENTRE
+CENTRE = _LOGICAL (Read)
+   When ACTION is "B", this parameter specifies whether the
+   values in the XCOL data area denote the centre of each bin
+   (when TRUE) or its lower edge (when FALSE).
+   [FALSE]
+
+1 POINTS
+Draw a point mark at each of the data points.
+
+Usage:
+   points [symbol]
+
+
+Description:
+
+   Draw a symbol at each of the data points.  The symbol type
+   that is used to mark each point is determined in one of 3 ways:
+
+      - If no SYMBOL parameter is supplied on the command line, and
+      no symbol numbers have been read into the symbol data area by
+      READF, the point style will be set by the current value of
+      SYMBOL.
+
+      - If no SYMBOL parameter is supplied on the command line, and
+      values have been read into the symbol data area by READF, the
+      symbol number for each point will determine the style of the
+      point plotted.
+
+      - If SYMBOL is specified on the command line, it will override
+      each of the above options. The same specified symbol will be
+      used to mark all points.
+
+   The value of the symbol index should be an integer which refers
+   to the standard PGPLOT symbols.
+
+   This command is a synonym for GPOINTS P.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SYMBOL
+SYMBOL = _INTEGER (Read and Write)
+   The PGPLOT symbol number that is used to mark the data points.
+
+   If a value is specified on the command line, it will be used
+   for plotting symbols for all the data. If no value is
+   specified on the command line, the application attempts to use
+   the SYMCOL data for its symbols. If no symbol values have been
+   read into the SYMCOL data area, the current value is used for
+   all the data. The current value is initially set to 1.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   Specifies the geometry that is to be used to plot the data.
+   This is explained in more detail in the section on
+   projections.  Allowed values: "NONE", "TAN", "SIN", "ARC",
+   "GLS", "AITOFF", "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+
+1 PRIM
+Perform primitive plotting functions.
+
+Usage:
+   prim action x y [symbol]
+
+Description:
+
+   Perform the primitive plotting functions: move to, draw line to,
+   and mark.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read and Write)
+   Type of primitive function. This may be one of the following:
+
+   - "M" -- move to,
+
+   - "D" -- draw line to,
+
+   - "K" -- mark.
+
+   [The value is prompted for.]
+3 X
+X = _REAL (Read and Write)
+   X coordinate of point.
+
+   [The value is prompted for.]
+3 Y
+Y = _REAL (Read and Write)
+   Y coordinate of point.
+
+   [The value is prompted for.]
+3 SYMBOL
+SYMBOL = _INTEGER (Read and Write)
+   PGPLOT symbol number for drawing the point mark.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The geometry that is to be used for plotting. This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG". This parameter is only relevant when
+   marking points.
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+2 Notes
+   When using non-planar coordinates, the coordinates should be
+   given in degrees. Lines drawn between points are straight.
+   Use GT_CIRCLE for drawing lines that follow great circles.
+
+1 PTEXT
+Draw a text string at the specified position and angle.
+
+Usage:
+   ptext xpos ypos angle justification text
+
+Description:
+
+   Draw a text string on the plot at the specified position and
+   angle. The command uses the PGPLOT routine PGPTEXT.
+
+   This command is a an ICL hidden procedure which uses the WTEXT
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XPOS
+XPOS = _REAL (Read and Write)
+   The X coordinate of the text. []
+3 YPOS
+YPOS = _REAL (Read and Write)
+   The Y coordinate of the text. []
+3 ANGLE
+ANGLE = _REAL (Read and Write)
+   The angle relative to the horizontal at which the text string
+   is to be plotted. []
+3 JUSTIFICATION
+JUSTIFICATION = _REAL (Read and Write)
+   The justification about the specified point (in the range 0.0
+   to 1.0).  Here, 0.0 means left justify the text relative to
+   the data point, 1.0 means right justify the text relative to
+   the data point, 0.5 means centre the string on the data point,
+   other values will give intermediate justifications. []
+3 TEXT
+TEXT = _CHAR (Read and Write)
+   The text string to be plotted. This may include any of the
+   PGPLOT control sequences for producing special characters. []
+
+1 PTINFO
+Get the coordinates of a specified data point.
+
+Usage:
+   ptinfo label
+
+Description:
+
+   The value of a label in the LABCOL data area is given and the
+   resulting (x,y) coordinates associated with the label are
+   printed.
+
+   This command is an ICL hidden procedure which uses the
+   GETPOINT application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 LABEL
+LABEL = _CHAR (Read)
+   The label associated with the data point. []
+
+1 PVECT
+Draw proper motion vectors.
+
+Usage:
+   pvect [erscale]
+
+Description:
+
+   Draw proper motion vectors on a projection of the celestial
+   sphere. The XCOL and YCOL data areas are assumed to contain
+   positions in radians, the EXCOL and EYCOL data areas are assumed
+   to contain the proper motions in radians per year. It is possible
+   to use the ERSCALE parameter to multiply the the proper motion so
+   that it is correct for a given number of years. (The proper
+   motion in RA is assumed to be $\dot{\alpha}\cos\delta$.)
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ERSCALE
+ERSCALE = _REAL (Read and Write)
+   The scale factor for multiplying the vectors.
+
+   [The value of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.]
+3 ZMULT
+ZMULT = _LOGICAL (Read)
+   If TRUE, the ZCOL values are additionally used to multiply the
+   vectors.
+   [FALSE]
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   The geometry used to plot the data.  This is explained in more
+   detail in the section on projections.  Allowed values: "NONE",
+   "TAN", "SIN", "ARC", "GLS", "AITOFF", "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+
+1 RADIATE
+Draw a line from the given point to the first NP data points.
+
+Usage:
+   radiate x y np
+
+Description:
+
+   A line is drawn from the given radiant, position (X,Y), to the
+   first NP data points in the XCOL and YCOL data areas.
+
+   This command is an ICL hidden procedure which uses successive
+   calls to the GETPOINT, MOVE and DRAW applications.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 X
+X = _REAL (Read)
+   The X-axis position of the radiant. []
+3 Y
+Y = _REAL (Read)
+   The Y-axis position of the radiant. []
+3 NP
+NP = _INTEGER (Read)
+   The number of data in the XCOL and YCOL data areas to use,
+   starting from the beginning of the data. []
+
+1 READF
+Read from a formatted data file.
+
+Usage:
+   readf [data] [all=?]
+      {selcond=?
+      all
+
+Description:
+
+   Read input data from a formatted data file. READF attempts to
+   read data from columns in an sequential formatted file in the
+   most flexible manner possible. It is possible to specify the
+   following:
+
+      - What comment delimiter characters are used within the data
+      file -- if used, the comment delimiter must be the first
+      character of a line in the data file.
+
+      - What the column delimiters are (more than one character is
+      possible).
+
+      - Symbolic names for each of the data columns.
+
+   The application is intended to be very robust: if a read error
+   occurs within a line, READF will report an error and attempt to
+   continue.
+
+   The application has many parameters for controlling how data are
+   read, but the default values of these parameters are sufficient
+   for reading most data files.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DATA
+DATA = FILENAME (Read and Write)
+   The name of the formatted data file.
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_DATA is used. If PONGO_DATA is
+   not defined, the current value is used. If the current value
+   is not defined, the value is prompted for.
+3 HARDCOM
+HARDCOM = _CHAR (Read and Write)
+   A character used to indicate a comment line in the data file.
+   The character must appear in the first column of a comment.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to "!".
+3 SOFTCOM
+SOFTCOM = _CHAR (Read and Write)
+   A character to indicate a comment line in the data file. This
+   parameter allows a second character to be used as a comment
+   delimiter.  The character must appear in the first column of a
+   comment.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to "!".
+3 XCOL
+XCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the X-axis data are read. The value "0"
+   means "do not read these data".
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_XCOL is used. If PONGO_XCOL is
+   not defined, the current value is used. The current value is
+   initially set to "0".
+3 YCOL
+YCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Y-axis data are read. The value "0"
+   means "do not read these data".
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_YCOL is used. If PONGO_YCOL is
+   not defined, the current value is used. The current value is
+   initially set to "0".
+3 ZCOL
+ZCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Z-axis data are read. The value "0"
+   means "do not read these data".
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_ZCOL is used. If PONGO_ZCOL is
+   not defined, the current value is used. The current value is
+   initially set to "0".
+3 EXCOL
+EXCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the X-axis error data are read. The value
+   "0" means "do not read these data".
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_EXCOL isused. If PONGO_EXCOL
+   is not defined, the current value is used. The current value
+   is initially set to "0".
+3 EYCOL
+EYCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Y-axis error data are read. The value
+   "0" means "do not read these data".
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_EYCOL is used.  If PONGO_EYCOL
+   is not defined, the current value is used. The current value
+   is initially set to "0".
+3 LABCOL
+LABCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the symbolic name for each data point is
+   read. The value "0" means "do not read these data".
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_LABCOL is used. If PONGO_LABCOL
+   is not defined, the current value is used. The current value
+   is initially set to "0".
+3 SYMCOL
+SYMCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the PGPLOT symbol code for each data point
+   is read. The value "0" means "do not read these data".
+
+   If the value is not specified on the command line, the value
+   of the global parameter PONGO_SYMCOL is used. If PONGO_SYMCOL
+   is not defined, the current value is used. The current value
+   is initially set to "0".
+3 DELIM
+DELIM = _CHAR (Read and Write)
+   The character string interpreted as a column delimitier when
+   reading the data file. For example, this can be used to read
+   LATEX format tables by setting DELIM="&".
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to " ".
+3 FROM
+FROM = _INTEGER (Read and Write)
+   The first line of data to be read from the data file. The value
+   0 defaults to the beginning of the file.
+   [0]
+3 TO
+TO = _INTEGER (Read and Write)
+   The last line of data to be read from the data file. The value
+   0 defaults to the end of the file.
+   [0]
+3 SELCOND
+SELCOND = _CHAR (Read and Write)
+   A condition (or criterion) upon which to select values from
+   the data file.  This condition has the form
+
+      [SELECT_COL] [COND] [VAL1{,VAL2, ...}]
+
+   where
+
+      - [SELECT_COL] is the data area used for the selection
+      test. This can be specified either by column number
+      (counting from 1) or by the symbolic name of a column.
+      There is no restriction on which column is used for
+      selection, i.e. it does not have to be one of the columns
+      from which data are being read.
+
+      - [COND] is the selection criterion. It may be one of the
+      following:
+
+         o "=" -- equals;
+         o "#" -- not equal;
+         o ">" -- greater than;
+         o "<" -- less than;
+         o "CE" -- equal to string;
+         o "C#" -- not equal to string;
+         o "RA" -- in the range VAL1 to VAL2;
+         o "LI" -- select if in the following list of values;
+         o "EX" -- exclude if in the following list of values;
+         o "IN" -- select if the substring is contained within the
+         value;
+         o "A>" -- absolute value greater than;
+         o "A<" -- absolute value less than.
+
+      - [VAL1{,VAL2, ...}] the value (or values) against which the
+      selection is made.
+
+   Note that there must be white space around the selection
+   criterion. A value of "0" means "read everything".
+
+   [The value is prompted for.]
+3 XOPT
+XOPT = _CHAR (Read and Write)
+   A string that controls the style of the X-axis labelling and
+   tick marks. It consists of a series of letters, which are
+   described fully in the documentation for the BOXFRAME
+   application.
+
+   READF updates the value of the global parameters PONGO_XOPT.
+   The application will automatically remove any "L" characters
+   at the start of the options string, because it is assumed
+   that they have been inserted by the CLOG application -- any
+   new data will not have had logarithms taken.  If data are
+   given in logarithmic form, the "L" character should be
+   inserted into the options strings anywhere except at the
+   start.
+
+   [The value of the global parameter PONGO_XOPT is used. If
+   PONGO_XOPT is not defined, the default value "BCNST" is used.]
+3 YOPT
+YOPT = _CHAR (Read and Write)
+   A string that controls the style of the Y-axis labelling and
+   tick marks. It consists of a series of letters, which are
+   described fully in the documentation for the BOXFRAME
+   application.
+
+   READF updates the value of the global parameters PONGO_YOPT.
+   The application will automatically remove any "L" characters
+   at the start of the options string, because it is assumed
+   that they have been inserted by the CLOG application -- any
+   new data will not have had logarithms taken.  If data are
+   given in logarithmic form, the "L" character should be
+   inserted into the options strings anywhere except at the
+   start.
+
+   [The value of the global parameter PONGO_YOPT is used. If
+   PONGO_XOPT is not defined, the default value "BCNST" is used.]
+3 ERSCALE
+ERSCALE = _REAL (Read)
+   The scale factor to be applied to the EXCOL and EYCOL data.
+
+   [The value of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.]
+3 ADD
+ADD = _LOGICAL (Read)
+   If FALSE, the data values already held will be cleared before
+   reading new data; if TRUE, the data read will be appended to
+   the existing data.
+   [FALSE]
+3 ALL
+ALL = _LOGICAL (Read and Write)
+   If TRUE, the whole data file will be read; if FALSE, a
+   selection condition will be prompted for.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to TRUE.
+3 QUICK
+QUICK = _LOGICAL (Read and Write)
+   If TRUE, a "quick mode" read is performed. This mode can only
+   be used on files which exclusively contain numeric data. This
+   parameter can over-ride the action of the LABCOL and SELCOND
+   parameters.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to FALSE.
+3 NDATA
+NDATA = _INTEGER (Write)
+   The number of data read from the data file.
+   [0]
+
+1 RESETPONGO
+Reset the PONGO global parameters.
+
+Usage:
+   resetpongo
+
+Description:
+
+   The PONGO global parameters are reset to their ADAM interface
+   file defaults using the ICL command SETGLOBAL. The values of
+   the PONGO data file (PONGO_DATA) and the polynomial
+   coefficients (PONGO_POLYCOEF) are not reset.
+
+   This command is an ICL hidden procedure.
+
+1 RTODEG
+Convert the specified data area from radians to degrees.
+
+Usage:
+   rtodeg column
+
+Description:
+
+   The values in the specified data area are converted from radians
+   to degrees.
+
+   This command is an ICL hidden procedure which uses the CCMATH
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COLUMN
+COLUMN = _CHAR (Read and Write)
+   The column to be converted from radians to degrees. []
+
+1 SETPROJ
+Set the projection geometry
+
+Usage:
+
+   setproj projection [racentre] [deccentre]
+
+Description:
+
+   Set the projection related global variables. These are then used
+   by all the relevant applications.
+
+   This is an hidden ICL procedure that makes use of the
+   SETGLOBAL command.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 PROJECTION
+PROJECTION = _CHAR (Write)
+   The geometry that is to be used. This is explained in more
+   detail in the section on projections. Allowed values:
+   "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF", "MERCATOR"
+   and "STG".
+
+   This parameter must be specified on the command line. It
+   sets the value of the global parameter PONGO_PROJECTN.
+3 RACENTRE
+RACENTRE = _CHAR (Write)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter sets the value of the PONGO_RACENTRE global
+   variable.
+3 DECCENTRE
+DECCENTRE = _CHAR (Write)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter sets the value of the PONGO_DECCENTRE global
+   variable.
+
+
+1 SHOWPONGO
+Show the PONGO global parameters.
+
+Usage:
+   showpongo
+
+Description:
+
+   The PONGO global parameters are listed with their current values
+   using the ICL command GETGLOBAL. It does not list the polynomial
+   coefficients, PONGO_POLYCOEF.
+
+   This command is an ICL hidden procedure.
+
+1 SIZEPLOT
+Draw point marks of differing sizes at each of the data points.
+
+Usage:
+   sizeplot [symbol]
+
+Description:
+
+   Draw symbols of differing sizes at each of the data points.
+   This application uses the values stored in the ZCOL data area to
+   determine the size of each plotted symbol; i.e. the value of each
+   entry in the ZCOL data area is effectively used as an argument to
+   a CHANGE CHEIGHT command before each point is plotted. The SCALE
+   parameter can be used to make these values cover a reasonable
+   range by multiplying the Z data values.
+
+   This command is a synonym for GPOINTS S.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SYMBOL
+SYMBOL = _INTEGER (Read and Write)
+   The PGPLOT symbol number that is used to mark the data points.
+
+   If a value is specified on the command line, it will be used
+   for plotting symbols for all the data. If no value is
+   specified on the command line, the application attempts to use
+   the SYMCOL data for its symbols. If no symbol values have been
+   read into the SYMCOL data area, the current value is used for
+   all the data. The current value is initially set to 1.
+3 SCALE
+SCALE = _REAL (Read and Write)
+   The scale factor used to multiply the ZCOL data values to get
+   a reasonable range of symbol sizes.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 PROJECTION
+PROJECTION = _CHAR (Read)
+   Specifies the geometry that is to be used to plot the data.
+   This is explained in more detail in the section on
+   projections.  Allowed values: "NONE", "TAN", "SIN", "ARC",
+   "GLS", "AITOFF", "MERCATOR" and "STG".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.
+3 RACENTRE
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.
+3 DECCENTRE
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   This parameter is not specified on the command line. The value
+   of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.
+
+1 SYMCOLUMN
+Specify the column used for symbol codes.
+
+Usage:
+   symcolumn symcol
+
+Description:
+
+   Specify the column in the data file from which the symbol codes
+   are to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_SYMCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SYMCOL
+SYMCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the PGPLOT symbol code for each data point
+   is read by the READF command. The value "0" means "do not read
+   these data". []
+
+1 TEXT
+Draw a text string on the plot at the specified position.
+
+Usage:
+   text xpos ypos text
+
+Description:
+
+   Draw a text string on the plot at coordinates (x,y), using
+   the PGPLOT routine PGTEXT.
+
+   This command is a synonym for WTEXT S.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XPOS
+XPOS = _REAL (Read and Write)
+   The X coordinate of the text.
+
+   [The value is prompted for.]
+3 YPOS
+YPOS = _REAL (Read and Write)
+   The Y coordinate of the text.
+
+   [The value is prompted for.]
+3 TEXT
+TEXT = _CHAR (Read and Write)
+   The text string to be plotted. This may include any of the
+   PGPLOT control sequences for producing special characters.
+
+   [The value is prompted for.]
+
+1 VECT
+Draw vectors from each data point.
+
+Usage:
+   vect [erscale] [zmult]
+
+Description:
+
+   Use the values in the EXCOL and EYCOL data areas as signed
+   offsets in X and Y to plot vectors from the data points. These
+   vectors are scaled using the error scale parameter ERSCALE.
+   Individual vectors may also be scaled using the contents of the
+   ZCOL data area.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ERSCALE
+ERSCALE = _REAL (Read and Write)
+   Factor for scaling all vectors.
+
+   [The value of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.]
+3 ZMULT
+ZMULT = _LOGICAL (Read)
+   If TRUE, the values of the ZCOL data area are used as
+   multipliers for the vectors. This parameter may only be
+   specified on the command line.
+   [FALSE]
+
+1 VIEWPORT
+Set the viewport for the current plotting device.
+
+Usage:
+   viewport action
+      {[xvpmin] [xvpmax] [yvpmin] [yvpmax]
+      action
+
+Description:
+
+   Control the PGPLOT viewport. The viewport is the region of the
+   plotting surface through which the graph is seen.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read)
+   The method used to set the viewport. It may be one of the
+   following:
+
+      - "STANDARD" -- The viewport is set to the standard PGPLOT
+      viewport.
+
+      - "ADJUST" -- The viewport is adjusted so that the scales
+      along the X and Y axes are the same number of world
+      coordinate units per unit length. The newly created
+      viewport fits within the old viewport.
+
+      - "NDC" -- The viewport is set by specifying its extent in
+      the X and Y directions in terms of normalised device
+      coordinates (i.e. coordinates that run from 0 to 1 along
+      the horizontal and vertical directions).
+
+      - "INCHES" -- The viewport is set by specifying its extent
+      in the X and Y directions in terms of inches.
+
+   [The value is prompted for.]
+3 XVPMIN
+XVPMIN = _REAL (Read and Write)
+   The left hand side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 XVPMAX
+XVPMAX = _REAL (Read and Write)
+   The right hand side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 YVPMIN
+YVPMIN = _REAL (Read and Write)
+   The lower side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 YVPMAX
+YVPMAX = _REAL (Read and Write)
+   The upper side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 XMIN
+XMIN = _REAL (Read)
+   The left hand edge of the world coordinate system.
+
+   [The value of the global parameter PONGO_XMIN is used. If
+   PONGO_XMIN is not defined, the default value 0.0 is used.]
+3 XMAX
+XMAX = _REAL (Read)
+   The right hand edge of the world coordinate system.
+
+   [The value of the global parameter PONGO_XMAX is used. If
+   PONGO_XMAX is not defined, the default value 1.0 is used.]
+3 YMIN
+YMIN = _REAL (Read)
+   The lower edge of the world coordinate system.
+
+   [The value of the global parameter PONGO_YMIN is used. If
+   PONGO_YMIN is not defined, the default value 0.0 is used.]
+3 YMAX
+YMAX = _REAL (Read)
+   The upper edge of the world coordinate system.
+
+   [The value of the global parameter PONGO_YMAX is used. If
+   PONGO_YMIN is not defined, the default value 1.0 is used.]
+
+1 VPORT
+Set the viewport using normalised device coordinates.
+
+Usage:
+   vport [xvpmin] [xvpmax] [yvpmin] [yvpmax]
+
+Description:
+
+   The viewport is set by specifying its extent in the X and Y
+   directions in terms of normalised device coordinates (i.e.
+   coordinates that run from 0 to 1 along the horizontal and
+   vertical directions).
+
+   This command is a synonym for VIEWPORT NDC.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XVPMIN
+XVPMIN = _REAL (Read and Write)
+   The left hand side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 XVPMAX
+XVPMAX = _REAL (Read and Write)
+   The right hand side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 YVPMIN
+YVPMIN = _REAL (Read and Write)
+   The lower side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 YVPMAX
+YVPMAX = _REAL (Read and Write)
+   The upper side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+
+1 VP_BH
+Set the viewport to the bottom half of the plotting surface.
+
+Usage:
+
+   vp_bh [labels]
+
+Description:
+
+   Set the viewport to the bottom half of the plotting surface.
+   If requested space around the viewport will be reserved for
+   any labels.
+
+   This command is a procedure based on "VIEWPORT NDC".
+
+2 Parameters
+For information on individual parameters, select from the list below:
+
+3 LABELS = _LOGICAL (Read)
+   Set the viewport to the bottom-left quarter of the plotting
+   surface.
+
+1 VP_BL
+Usage:
+Set the viewport to the bottom-left quarter of the plotting
+surface.
+
+   vp_bl [labels]
+
+Description:
+
+   Set the viewport to the bottom left quarter of the plotting
+   If requested space around the viewport will be reserved for
+   any labels.
+
+   This command is a procedure based on "VIEWPORT NDC".
+
+2 Parameters
+For information on individual parameters, select from the list below:
+
+3 LABELS = _LOGICAL (Read)
+   Set the viewport to the bottom-left quarter of the plotting
+   surface.
+
+1 VP_BR
+Set the viewport to the bottom-right quarter of the plotting
+surface.
+
+Usage:
+
+   vp_br [labels]
+
+Description:
+
+   Set the viewport to the bottom right quarter of the plotting
+   If requested space around the viewport will be reserved for
+   any labels.
+
+   This command is a procedure based on "VIEWPORT NDC".
+
+2 Parameters
+For information on individual parameters, select from the list below:
+
+3 LABELS = _LOGICAL (Read)
+   Set the viewport to the bottom-left quarter of the plotting
+   surface.
+
+1 VP_TH
+Set the viewport to the top half of the plotting surface.
+
+Usage:
+
+   vp_th [labels]
+
+Description:
+
+   Set the viewport to the top half of the plotting surface.
+   If requested space around the viewport will be reserved for
+   any labels.
+
+   This command is a procedure based on "VIEWPORT NDC".
+
+2 Parameters
+For information on individual parameters, select from the list below:
+
+3 LABELS = _LOGICAL (Read)
+   Set the viewport to the bottom-left quarter of the plotting
+   surface.
+
+1 VP_TL
+Set the viewport to the top-left quarter of the plotting surface.
+
+Usage:
+
+   vp_tl [labels]
+
+Description:
+
+   Set the viewport to the top left quarter of the plotting surface.
+   If requested space around the viewport will be reserved for
+   any labels.
+
+   This command is a procedure based on "VIEWPORT NDC".
+
+2 Parameters
+For information on individual parameters, select from the list below:
+
+3 LABELS = _LOGICAL (Read)
+   Set the viewport to the bottom-left quarter of the plotting
+   surface.
+
+1 VP_TR
+Set the viewport to the top-right quarter of the plotting surface.
+
+Usage:
+
+   vp_tr [labels]
+
+Description:
+
+   Set the viewport to the top right quarter of the plotting surface.
+   If requested space around the viewport will be reserved for
+   any labels.
+
+   This command is a procedure based on "VIEWPORT NDC".
+2 Parameters
+For information on individual parameters, select from the list below:
+
+3 LABELS = _LOGICAL (Read)
+   Set the viewport to the bottom-left quarter of the plotting
+   surface.
+
+1 VSIZE
+Set the viewport using its physical size in inches.
+
+Usage:
+   vsize [xvpmin] [xvpmax] [yvpmin] [yvpmax]
+
+Description:
+
+   The viewport is set by specifying its minimum and maximum extents
+   in the X and Y directions in terms of inches.
+
+   This command is a synonym for VIEWPORT INCHES.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XVPMIN
+XVPMIN = _REAL (Read and Write)
+   The left hand side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 XVPMAX
+XVPMAX = _REAL (Read and Write)
+   The right hand side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+3 YVPMIN
+YVPMIN = _REAL (Read and Write)
+   The lower side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 YVPMAX
+YVPMAX = _REAL (Read and Write)
+   The upper side of the viewport.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+
+1 VSTAND
+Set the standard viewport.
+
+Usage:
+   vstand
+
+Description:
+
+   The viewport is set to the standard PGPLOT viewport.
+
+   This command is a synonym for VIEWPORT STANDARD.
+
+1 WNAD
+Adjust the viewport so that the X and Y scales are the same.
+
+Usage:
+   wnad
+
+Description:
+
+   The viewport is adjusted so that the scales along the X and Y
+   axes are the same number of world coordinate units per unit
+   length. The newly created viewport fits within the old viewport.
+
+   This command is a synonym for VIEWPORT ADJUST.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XMIN
+XMIN = _REAL (Read)
+   The left hand edge of the world coordinate system.
+
+   The value of the global parameter PONGO_XMIN is used. If
+   PONGO_XMIN is not defined, the default value 0.0 is used.
+3 XMAX
+XMAX = _REAL (Read)
+   The right hand edge of the world coordinate system.
+
+   The value of the global parameter PONGO_XMAX is used. If
+   PONGO_XMAX is not defined, the default value 1.0 is used.
+3 YMIN
+YMIN = _REAL (Read)
+   The lower edge of the world coordinate system.
+
+   The value of the global parameter PONGO_YMIN is used. If
+   PONGO_YMIN is not defined, the default value 0.0 is used.
+3 YMAX
+YMAX = _REAL (Read)
+   The upper edge of the world coordinate system.
+
+   The value of the global parameter PONGO_YMAX is used. If
+   PONGO_YMIN is not defined, the default value 1.0 is used.
+
+1 WORLD
+Set the world coordinates for the plot.
+
+Usage:
+   world action
+      { [xmin] [xmax] [ymin] [ymax]
+      { piclab=?
+      action
+
+Description:
+
+   Set up the world coordinate limits for the plot. The world
+   coordinate system is the one in which the data are plotted. It
+   is possible to specify the limits explicitly, or to have them
+   calculated from the range of the data that have been read, or to
+   recall the limits from a previous plot using AGI (SUN/48).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read and Write)
+   The way in which the world coordinate limits are to be
+   determined:
+
+      - "DATA" -- The limits are calculated from the data limits,
+      with a small border added.
+
+      - "DATA0" -- The limits are calculated as for DATA, but the
+      origin is included as one of the data points.
+
+      - "GIVEN" -- The limits specified on the command line are
+      used.
+
+      - "RECALL" -- The coordinates are recalled from a previous
+      plot using the AGI database.
+
+   [The value is prompted for.]
+3 XMIN
+XMIN = _REAL (Read and Write)
+   The world coordinate of the left-hand edge of the plot.
+
+   The application will determine the value if ACTION is one of
+   "DATA", "DATA0" or "RECALL". If ACTION="GIVEN" and no value is
+   specified on the command line, the value of the global
+   parameter PONGO_XMIN is used.
+3 XMAX
+XMAX = _REAL (Read and Write)
+   The world coordinate of the right-hand edge of the plot.
+
+   The application will determine the value if ACTION is one of
+   "DATA", "DATA0" or "RECALL". If ACTION="GIVEN" and no value is
+   specified on the command line, the value of the global
+   parameter PONGO_XMAX is used.
+3 YMIN
+YMIN = _REAL (Read and Write)
+   The world coordinate of the lower edge of the plot.
+
+   The application will determine the value if ACTION is one of
+   "DATA", "DATA0" or "RECALL". If ACTION="GIVEN" and no value is
+   specified on the command line, the value of the global
+   parameter PONGO_YMIN is used.
+3 YMAX
+YMAX = _REAL (Read and Write)
+   The world coordinate of the upper edge of the plot.
+
+   The application will determine the value if ACTION is one of
+   "DATA", "DATA0" or "RECALL". If ACTION="GIVEN" and no value is
+   specified on the command line, the value of the global
+   parameter PONGO_YMAX is used.
+3 PICLAB
+PICLAB = _CHAR (Read and Write)
+   The AGI label of the picture to be recalled.
+
+   [If ACTION="RECALL", the value is prompted for.]
+3 PROJECTION
+PROJECTION = _CHAR (Read and Write)
+   The geometry to be used for plotting the data.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+   [The value of the global parameter PONGO_PROJECTN is used. If
+   PONGO_PROJECTN is not defined, the default value "NONE" is
+   used.]
+3 RACENTRE
+RACENTRE = _CHAR (Read and Write)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_RACENTRE is used. If
+   PONGO_RACENTRE is not defined, the default value "0" is used.]
+3 DECCENTRE
+DECCENTRE = _CHAR (Read and Write)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+   [The value of the global parameter PONGO_DECCENTRE is used. If
+   PONGO_DECCENTRE is not defined, the default value "0" is used.]
+3 ERSCALE
+ERSCALE = _REAL (Read)
+   The scale factor to be applied to the EXCOL and EYCOL data when
+   determining the limits of the world co-ordinates.  ERSCALE is
+   used only when ACTION = "DATA" or "DATA0".
+   [The value of the global parameter PONGO_ERSCALE is used. If
+   PONGO_ERSCALE is not defined, the default value 1.0 is used.]
+
+1 WRITEI
+Write information to an output file.
+
+Usage:
+   writei action file
+
+Description:
+
+   Write specified information concerning the current data-set to an
+   output file.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read and Write)
+   The type of information to be written. This may be one of the
+   following:
+
+      - "LABLST" -- Write the internal list of labels out.
+
+      - "DATA" -- Write out selected data.
+
+      - "AGIPIC" -- Write the label, name and comment for the
+      current AGI picture to the AGI database.
+
+   [The value is prompted for.]
+3 FILE
+FILE = FILENAME (Read and Write)
+   The name of the output file to be written.
+
+   [The value is prompted for.]
+3 FORMAT
+FORMAT = _CHAR (Read and Write)
+   The Fortran FORMAT to be used.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to "G25.16".
+3 AGINAME
+AGINAME = _CHAR (Read and Write)
+   The AGI name for the current picture. This may be one of the
+   following:
+
+      - "DATA" -- Used to indicate that the AGI picture contains
+      the representation of data in some graphical form (i.e. a
+      graph).
+
+      - "FRAME" -- Used to indicate that the AGI picture contains
+      a group of other plots (i.e. several "DATA" pictures).
+
+   ["DATA"]
+3 AGICOMMENT
+AGICOMMENT = _CHAR (Read and Write)
+   The AGI comment for the current picture.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is set to "User viewport".
+3 AGILABEL
+AGILABEL = _CHAR (Read and Write)
+   The AGI label for the current picture.
+
+   [The value is prompted for.]
+3 X
+X = _LOGICAL (Read and Write)
+   If TRUE, the XCOL data area will be output.
+   [FALSE]
+3 Y
+Y = _LOGICAL (Read and Write)
+   If TRUE, the YCOL data area will be output.
+   [FALSE]
+3 Z
+Z = _LOGICAL (Read and Write)
+   If TRUE, the ZCOL data area will be output.
+   [FALSE]
+3 EX
+EX = _LOGICAL (Read and Write)
+   If TRUE, the EXCOL data area will be output.
+   [FALSE]
+3 EY
+EY = _LOGICAL (Read and Write)
+   If TRUE, the EYCOL data area will be output.
+   [FALSE]
+
+1 WTEXT
+Draw a text string on the plot.
+
+Usage:
+   wtext action xpos ypos text [side] [justification] [angle]
+
+Description:
+
+   Draw a text string on the current plot at a given position,
+   justification and orientation.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACTION
+ACTION = _CHAR (Read and Write)
+   The way in which the text string is to be written. It may be
+   one of the following:
+
+      - "P" -- Use PGPTEXT which allows the position,
+      justification and angle of the text to be specified.
+
+      - "M" -- Use PGMTEXT which allows the text to be written
+      relative to the viewport.
+
+      - "S" -- Use PGTEXT which allows only simple (x,y)
+      positioning of the text.
+
+   [The value is prompted for.]
+3 XPOS
+XPOS = _REAL (Read and Write)
+   If ACTION is "P" or "S", the X coordinate of the text.  With
+   the "M" action, this parameter specifies the number of
+   character heights from the viewport where the text is to be
+   plotted (negative values are allowed).
+
+   [The value is prompted for.]
+3 YPOS
+YPOS = _REAL (Read and Write)
+   If ACTION is "P" or "S", the Y coordinate of the text.  With
+   the "M" action, this parameter specifies the fraction along
+   the edge where the text is to be plotted.
+
+   [The value is prompted for.]
+3 TEXT
+TEXT = _CHAR (Read and Write)
+   The text string to be plotted. This may include any of the
+   PGPLOT control sequences for producing special characters.
+
+   [The value is prompted for.]
+3 SIDE
+SIDE = _CHAR (Read and Write)
+   If ACTION="M", the side of the viewport where the text is to
+   plotted. This may be one of the following:
+
+      - "T" -- The top edge.
+
+      - "B" -- The bottom edge.
+
+      - "L" -- The left-hand edge.
+
+      - "R" -- The right-hand edge.
+
+      - "LV" -- The left-hand edge, but with the string written
+      vertically.
+
+      - "RV" -- The right-hand edge, but with the string written
+      vertically.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to "T".
+3 JUSTIFICATION
+JUSTIFICATION = _REAL (Read and Write)
+   The justification about the specified point (in the range 0.0
+   to 1.0).  Here, 0.0 means left justify the text relative to
+   the data point, 1.0 means right justify the text relative to
+   the data point, 0.5 means centre the string on the data point,
+   other values will give intermediate justifications.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+3 ANGLE
+ANGLE = _REAL (Read and Write)
+   If ACTION="P", the angle relative to the horizontal at which
+   the text string is to be plotted.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 0.0.
+
+1 XCOLUMN
+Specify the column containing the X-axis data.
+
+Usage:
+   xcolumn xcol
+
+Description:
+
+   Specify the column in the data file from which the X-axis data
+   are to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_XCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 XCOL
+XCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the X-axis data are read by the READF
+   command. The value "0" means "do not read these data". []
+
+1 XERR
+Draw symmetric error bars in the X direction.
+
+Usage:
+   xerr [erterm]
+
+Description:
+
+   Draw symmetric error bars in the X direction.
+
+   This command is a synonym for ERRORBAR X.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ERTERM
+ERTERM = _REAL (Read and Write)
+   The length of the terminals on the error bars: a multiple of
+   the default length.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+
+1 XLINEAR
+Put 1 ... N into the XCOL data area.
+
+Usage:
+   xlinear
+
+Description:
+
+   Put the row number (i.e. 1 to NDATA) into the XCOL data area.
+
+   This command is a synonym for CCMATH X=INDEX.
+
+1 XLOGARITHM
+Take the logarithm of the X-axis data.
+
+Usage:
+   xlogarithm
+
+Description:
+
+   Take the base 10 logarithm of the X-axis data.
+
+   This command is a synonym for CLOG X.
+
+1 XOFFSET
+Add a constant offset to the X-axis data.
+
+Usage:
+   xoffset offset
+
+Description:
+
+   Add a constant offset to the X-axis data.
+
+   This command is an ICL hidden procedure which uses the CCMATH
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 OFFSET
+OFFSET = _REAL (Read)
+   The value of the X-axis offset. []
+
+1 XSCALE
+Multiply the values in the XCOL and EXCOL data areas by a
+constant.
+
+Usage:
+   xscale scale
+
+Description:
+
+   Multiply the values in the XCOL and EXCOL data areas by a
+   constant.
+
+   This command is an ICL hidden procedure which uses the CCMATH
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SCALE
+SCALE = _REAL (Read)
+   The constant by which the XCOL and EXCOL data areas are
+   scaled. []
+
+1 YCOLUMN
+Specify the column containing the Y-axis data.
+
+Usage:
+   ycolumn ycol
+
+Description:
+
+   Specify the column in the data file from which the Y-axis data
+   are to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_YCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 YCOL
+YCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Y-axis data are read. The value "0"
+   means "do not read these data". []
+
+1 YERR
+Draw symmetric error bars in the Y direction.
+
+Usage:
+   yerr [erterm]
+
+Description:
+
+   Draw symmetric error bars in the Y direction.
+
+   This command is a synonym for ERRORBAR Y.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ERTERM
+ERTERM = _REAL (Read and Write)
+   The length of the terminals on the error bars: a multiple of
+   the default length.
+
+   If no value is specified on the command line, the current
+   value is used. The current value is initially set to 1.0.
+
+1 YLINEAR
+Put 1 ... N into the YCOL data area.
+
+Usage:
+   ylinear
+
+Description:
+
+   Put the row number (i.e. 1 to NDATA) into the YCOL data area.
+
+   This command is a synonym for CCMATH Y=INDEX.
+
+1 YLOGARITHM
+Take the logarithm of the Y-axis data.
+
+Usage:
+   ylogarithm
+
+Description:
+
+   Take the base 10 logarithm of the Y-axis data.
+
+   This command is a synonym for CLOG Y.
+
+1 YOFFSET
+Add a constant offset to the Y-axis data.
+
+Usage:
+   yoffset offset
+
+Description:
+
+   Add a constant offset to the Y-axis data.
+
+   This command is an ICL hidden procedure which uses the CCMATH
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 YOFFSET
+OFFSET = _REAL (Read)
+   The value of the Y-axis offset. []
+
+1 YSCALE
+Multiply the values in the YCOL and EYCOL data areas by a
+constant.
+
+Usage:
+   yscale scale
+
+Description:
+
+   Multiply the values in the YCOL and EYCOL data areas by a
+   constant.
+
+   This command is an ICL hidden procedure which uses the CCMATH
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SCALE
+SCALE = _REAL (Read)
+   The constant by which the YCOL and EYCOL data areas are
+   scaled. []
+
+1 ZCOLUMN
+Specify the column containing the Z-axis data.
+
+Usage:
+   zcolumn zcol
+
+Description:
+
+   Specify the column in the data file from which the Z-axis data
+   are to be read.
+
+   This command is a synonym for SETGLOBAL PONGO_ZCOL.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ZCOL
+ZCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Z-axis data are read. The value "0"
+   means "do not read these data". []
+
+1 ZSCALE
+Multiply the values in the ZCOL data area by a constant.
+
+Usage:
+   zscale scale
+
+Description:
+
+   Multiply the values in the ZCOL data area by a constant.
+
+   This command is an ICL hidden procedure which uses the CCMATH
+   application.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 SCALE
+SCALE = _REAL (Read)
+   The constant by which the ZCOL data area is scaled. []
+
+1 Updates_to_PONGO
+
+ The current release of PONGO is V2.0-2.
+
+2 Changes_this_release
+
+ PONGO now uses native PGPLOT for plotting rather than the deprecated 
+ Starlink GKS PGPLOT. This should fix plotting and interoperability  
+ problems with recent versions of KAPPA.
+ 
+ Alasdair Allan (aa@astro.ex.ac.uk), 22nd April 2004.
+
+2 Changes_in_previous_release 
+
+ PONGO has been considerably extended to now work from the IRAF/CL
+ command language. To use this load the pongo package. The 
+ commands that are available are the same as when running from ICL.
+
+ Other changes of note are:
+
+   o The READF command has been changed so that `@' is no
+     longer needed when using an ICL variable to store the file name. 
+     This is INCOMPATIBLE with previous behaviour and any scripts 
+     using the `@' form will need changing, i.e. lines with statements
+     like:
+
+        READF DATA=('@'&FILE)
+
+     Should be changed to:
+
+        READF DATA=(FILE)
+
+   o An example has been added to the panic section to show how
+     PONGO can be used to plot more than 5000 points at a time (5000 is
+     the current maximum number of points that can be read at the same
+     time).
+
+   o READF has been fixed so that it is possible to once again
+     read data from more than one file.
+
+   o Errors in the documentation that still included descriptions of the
+     previous Chebyshev version of FITLINE have been corrected.
+
+   o A description of how to close the edges of grids has been added to
+     the GRID command section. This command now also attempts to
+     complete latitude lines to their end points (this reduces 
+     the ragged appearance at the ends of latitude lines).
+
+   o The YLINEAR command now works.
+
+   o The VP_xx commands have been modified to accept an argument which
+     indicates that space around the viewport should be reserved for 
+     any labels.
+
+   o FITCURVE now uses the XMIN and XMAX parameters as described
+     (polynomial curves previously used all the data). The YMAX
+     and YMIN parameters are no longer used. It also now writes any
+     polynomial coefficients to a file (this can be read by PLOTFUN).
+
+   o FITCURVE has also had a memory control bug fixed.
+
+   o CURSE now also reports approximate sky coordinates when
+     reading the cursor positions.
+
+   o A new command FILLSTY has been introduced. This conveniently sets
+     the fill-style attributes (for polygons and histograms).
+
+   o A new command DRAWPOLY has been introduced. This draws polygons
+     that can be filled. 
+
+   o A new command SETPROJ has been introduced. This sets the
+     projection geometry related global variables (under CL this sets
+     all the parameters of the projection aware commands).
+
+   o The PRIM command now allows projections for all its actions (this
+     also effects the commands, MOVE and DRAW). Note that the lines
+     drawn are straight-lines on the plot surface, not great
+     circles. The GT\_CIRCLE command already supplies this ability.
+
+   o The commands XSCALE, YSCALE, YOFFSET and XOFFSET now allow
+     negative factors. 
+
+  Peter Draper (P.W.Draper@durham.ac.uk), 12th November 1997.
+
+
+

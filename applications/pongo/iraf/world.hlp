@@ -1,0 +1,69 @@
+.help world Starlink pongohelp
+.nf
+Set the world coordinates for the plot.
+
+Usage:
+   world action
+
+Description:
+
+   Set up the world coordinate limits for the plot. The world
+   coordinate system is the one in which the data are plotted.
+   This command calculates the range of the data that have 
+   been read, or recalls the limits from a previous plot using 
+   AGI (SUN/48). To set explicit limits use the LIMITS command.
+
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The way in which the world coordinate limits are to be
+   determined:
+
+      - "DATA" -- The limits are calculated from the data limits,
+      with a small border added.
+
+      - "DATA0" -- The limits are calculated as for DATA, but the
+      origin is included as one of the data points.
+
+      - "RECALL" -- The coordinates are recalled from a previous
+      plot using the AGI database.
+
+XMIN = _REAL (Write)
+   The world coordinate of the left-hand edge of the plot.
+
+XMAX = _REAL (Write)
+   The world coordinate of the right-hand edge of the plot.
+
+YMIN = _REAL (Write)
+   The world coordinate of the lower edge of the plot.
+
+YMAX = _REAL (Write)
+   The world coordinate of the upper edge of the plot.
+
+PICLAB = _CHAR (Read and Write)
+   The AGI label of the picture to be recalled.
+
+   [If ACTION="RECALL", the value is prompted for.]
+PROJECTION = _CHAR (Read)
+   The geometry to be used for plotting the data.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+ERSCALE = _REAL (Read)
+   The scale factor to be applied to the EXCOL and EYCOL data when
+   determining the limits of the world co-ordinates.  ERSCALE is
+   used only when ACTION = "DATA" or "DATA0".
+
+.endhelp

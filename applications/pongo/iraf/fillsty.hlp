@@ -1,0 +1,38 @@
+.help fillsty Starlink pongohelp
+.nf
+Change fill-style plotting attributes.
+
+Usage:
+
+   fillsty fillsty
+
+Description:
+
+   Change the PGPLOT fill-style attributes.
+
+Parameters:
+
+ANGLE = _REAL (Read)
+   The angle hatch lines make with horizontal, in degrees.
+   Only used when FILLSTY is 3.
+FILLSTY = _INTEGER (Read)
+   The fill style used by PGPLOT. The fill styles are as follows:
+
+      - 1 -- solid fill,
+
+      - 2 -- hollow fill,
+
+      - 3 -- hatched,
+
+      - 4 -- cross-hatched
+
+PHASE = _REAL (Read)
+   The fraction of SEPARATION that hatched lines are displaced.
+   Modifying this between regions makes their separation more
+   obvious. This is only used when FILLSTY is 3.
+SEPARATION = _REAL (Read)
+   The separation of hatched lines. The unit spacing is 1 percent
+   of the smaller of the height or width of the view surface.
+   Only used when FILLSTY is 3.
+
+.endhelp

@@ -1,0 +1,60 @@
+.help endpongo Starlink pongohelp
+.nf
+Close down the current plotting device.
+
+Usage:
+   endpongo [comment] [device]
+
+Description:
+
+   Close down the current plotting device, storing the current
+   picture description in the AGI database. The position and world
+   coordinate limits of the plot will be stored in the AGI database,
+   along with any comment text.
+
+   ENDPONGO must be executed before using a plotting application from
+   another package (e.g. KAPPA) -- failure to do so will result in
+   an AGI error and may corrupt the AGI database.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COMMENT
+
+COMMENT = _CHAR (Read and Write)
+   A comment for the AGI database entry for the plot that has
+   just been completed. Any comment will be prefixed with the
+   string "PONGO:".
+   ["Final viewport"]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The name of the current plotting device.
+
+   The value of the global parameter GRAPHICS_DEVICE. If
+   GRAPHICS_DEVICE is not defined, the current value is used. If
+   the current value is not defined, the value will be prompted
+   for.
+
+Authors
+
+PAH: Paul Harrison (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+
+History
+
+ 4-JUL-1990 (PAH):
+    Original version.
+
+ 28-NOV-1990 (JBVAD::PAH):
+    Made changes to take advantage of new AGI
+
+ 4-DEC-1991 (PCTR):
+    Tidy up AGI calls.
+
+ 19-OCT-1992 (PCTR):
+    Added contextual error report on exit.
+.endhelp

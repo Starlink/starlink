@@ -1,0 +1,20 @@
+.help xscale Starlink pongohelp
+.nf
+Multiply the values in the XCOL and EXCOL data areas by a
+constant.
+
+Usage:
+   xscale scale
+
+Description:
+
+   Multiply the values in the XCOL and EXCOL data areas by a
+   constant.
+
+Parameters:
+
+SCALE = _REAL (Read)
+   The constant by which the XCOL and EXCOL data areas are
+   scaled. []
+
+.endhelp

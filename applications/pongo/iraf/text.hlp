@@ -1,0 +1,25 @@
+.help text Starlink pongohelp
+.nf
+Draw a text string on the plot at the specified position.
+
+Usage:
+   text xpos ypos text
+
+Description:
+
+   Draw a text string on the plot at coordinates (x,y), using
+   the PGPLOT routine PGTEXT.
+
+Parameters:
+
+XPOS = _REAL (Read and Write)
+   The X coordinate of the text.
+
+YPOS = _REAL (Read and Write)
+   The Y coordinate of the text.
+
+TEXT = _CHAR (Read and Write)
+   The text string to be plotted. This may include any of the
+   PGPLOT control sequences for producing special characters.
+
+.endhelp

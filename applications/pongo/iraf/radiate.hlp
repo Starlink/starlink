@@ -1,0 +1,23 @@
+.help radiate Starlink pongohelp
+.nf
+Draw a line from the given point to the first NP data points.
+
+Usage:
+   radiate x y np
+
+Description:
+
+   A line is drawn from the given radiant, position (X,Y), to the
+   first NP data points in the XCOL and YCOL data areas.
+
+Parameters:
+
+X = _REAL (Read)
+   The X-axis position of the radiant.
+Y = _REAL (Read)
+   The Y-axis position of the radiant.
+NP = _INTEGER (Read)
+   The number of data in the XCOL and YCOL data areas to use,
+   starting from the beginning of the data.
+
+.endhelp

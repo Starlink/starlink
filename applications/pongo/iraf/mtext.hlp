@@ -1,0 +1,51 @@
+.help mtext Starlink pongohelp
+.nf
+Draw a text string relative to the viewport.
+
+Usage:
+   mtext side xpos ypos justification text
+
+Description:
+
+   Draw a text string on the plot at a position specified relative
+   to the viewport. The command uses the PGPLOT routine PGMTEXT.
+
+   This command is a an ICL hidden procedure which uses the WTEXT
+   application.
+
+Parameters:
+
+SIDE = _CHAR (Read)
+   The side of the viewport where the text is to plotted. This
+   may be one of the following:
+
+      - "T" -- The top edge.
+
+      - "B" -- The bottom edge.
+
+      - "L" -- The left-hand edge.
+
+      - "R" -- The right-hand edge.
+
+      - "LV" -- The left-hand edge, but with the string written
+      vertically.
+
+      - "RV" -- The right-hand edge, but with the string written
+      vertically.
+
+XPOS = _REAL (Read)
+   The number of character heights from the viewport where the
+   text is to be plotted (negative values are allowed).
+YPOS = _REAL (Read and Write)
+   The fraction along the edge where the text is to be plotted.
+JUSTIFICATION = _REAL (Read)
+   The justification about the specified point (in the range 0.0
+   to 1.0).  Here, 0.0 means left justify the text relative to
+   the data point, 1.0 means right justify the text relative to
+   the data point, 0.5 means centre the string on the data point,
+   other values will give intermediate justifications.
+TEXT = _CHAR (Read)
+   The text string to be plotted. This may include any of the
+   PGPLOT control sequences for producing special characters.
+
+.endhelp

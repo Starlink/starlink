@@ -1,0 +1,17 @@
+.help yoffset Starlink pongohelp
+.nf
+Add a constant offset to the Y-axis data.
+
+Usage:
+   yoffset offset
+
+Description:
+
+   Add a constant offset to the Y-axis data.
+
+Parameters:
+
+OFFSET = _REAL (Read)
+   The value of the Y-axis offset. []
+
+.endhelp

@@ -1,0 +1,25 @@
+.help vect Starlink pongohelp
+.nf
+Draw vectors from each data point.
+
+Usage:
+   vect
+
+Description:
+
+   Use the values in the EXCOL and EYCOL data areas as signed
+   offsets in X and Y to plot vectors from the data points. These
+   vectors are scaled using the error scale parameter ERSCALE.
+   Individual vectors may also be scaled using the contents of the
+   ZCOL data area.
+
+Parameters:
+
+ERSCALE = _REAL (Read)
+   Factor for scaling all vectors.
+
+ZMULT = _LOGICAL (Read)
+   If TRUE, the values of the ZCOL data area are used as multipliers 
+   for the vectors.
+
+.endhelp

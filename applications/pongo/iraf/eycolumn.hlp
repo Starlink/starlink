@@ -1,0 +1,20 @@
+.help eycolumn Starlink pongohelp
+.nf
+Specify the column containing the Y-axis error data.
+
+Usage:
+   eycolumn eycol
+
+Description:
+
+   Specify the column in the data file from which the errors on the
+   Y-axis data are to be read.
+
+Parameters:
+
+EYCOL = _CHAR (Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the Y-axis error data are read by the READF
+   command. The value "0" means "do not read these data". []
+
+.endhelp

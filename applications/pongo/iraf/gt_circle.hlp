@@ -1,0 +1,42 @@
+.help gt_circle Starlink pongohelp
+.nf
+Draw a great circle between two points.
+
+Usage:
+   gt_circle phistart thestart phiend theend projection racentre deccentre
+
+Description:
+
+   Draw a great circle between two points in current projection. The
+   great circle is specified by giving the coordinates in degrees of
+   two points on the celestial sphere. Either the small or large
+   great circle may be drawn.
+
+Parameters:
+
+PHISTART = _DOUBLE (Read and Write)
+   The longitude of the start of the great circle in degrees.
+THESTART = _DOUBLE (Read and Write)
+   The latitude of the start of the great circle in degrees.
+PHIEND = _DOUBLE (Read and Write)
+   The longitude of the end of the great circle in degrees.
+THEEND = _DOUBLE (Read and Write)
+   The latitude of the end of the great circle in degrees.
+ACUTE = _LOGICAL (Read and Write)
+   If TRUE, the smaller great circle arc is drawn between the
+   given points.
+PROJECTION = _CHAR (Read)
+   The geometry to be used to plot the great circle.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+.endhelp

@@ -1,0 +1,33 @@
+.help histogram Starlink pongohelp
+.nf
+Bin and plot a histogram of the data.
+
+Usage:
+   histogram binmin binmax nbin
+
+Description:
+
+   The data in the XCOL data area are binned and plotted as a
+   histogram.  It is possible to plot several histograms with
+   different bin sizes from the same data in XCOL because the data
+   are unaffected by HISTOGRAM.
+
+Parameters:
+
+BINMIN = _REAL (Read and Write)
+   The lower limit of the binning.
+BINMAX = _REAL (Read and Write)
+   The upper limit of the binning.
+NBIN = _INTEGER (Read and Write)
+   The number of equally sized bins to be drawn between the
+   limits of the histogram.
+AUTOSCALE = _LOGICAL (Read and Write)
+   If TRUE, PGPLOT auto-scaling is used to determine the plotting
+   limits. If FALSE, the limits defined by the bins of the
+   histogram determine the plotting limits. Here, the plotting
+   limits must previously have been set using the LIMITS
+   application and the plot frame drawn using BOXFRAME. Setting
+   AUTOSCALE=FALSE can be used to draw more than one histogram on the
+   same plot.
+
+.endhelp

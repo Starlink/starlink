@@ -1,0 +1,94 @@
+*+
+*  Name:
+*     PONGO_CMN
+
+*  Purpose:
+*     PONGO global variables.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global varaibles include file.
+
+*  Description:
+*     The global variables used by PONGO are defined.
+
+*  Authors:
+*     JBVAD::PAH: Paul Harrison (STARLINK)
+*     PCTR: P.C.T. Rees (STARLINK)
+*     PDRAPER: P.W. Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     7-MAY-1992 (JBVAD::PAH):
+*        Original version.
+*     7-MAY-1992 (PCTR):
+*        Added Starlink prologue.
+*     16-DEC-1992 (PCTR):
+*        Expanded the work arrays.
+*     6-JUN-1994 (PDRAPER):
+*        Rearranged common blocks to have quadword entries first.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Main PONGO common block.
+      DOUBLE PRECISION XDATA( NDATMAX ) ! X-axis data array
+      DOUBLE PRECISION YDATA( NDATMAX ) ! Y-axis data array 
+      INTEGER ERXCOL             ! X-axis error column number
+      INTEGER ERYCOL             ! Y-axis error column number
+      INTEGER ILABPTR            ! Pointer to current label
+      INTEGER ISYMBS( NDATMAX )  ! Symbol numbers for each data point
+      INTEGER LABCOL             ! Label column number
+      INTEGER NCOLS              ! Number of columns in the data file
+      INTEGER NDAT               ! Number of data read
+      INTEGER SYMCOL             ! Symbol column number
+      INTEGER XCOL               ! X-axis column number
+      INTEGER YCOL               ! Y-axis column number
+      INTEGER ZCOL               ! Z-axis column number
+      LOGICAL LXLOG              ! Whether X-axis is logarithmic
+      LOGICAL LYLOG              ! Whether Y-axis is logarithmic
+      REAL ERRX( NDATMAX )       ! X-axis error array
+      REAL ERRY( NDATMAX )       ! Y-axis errors array
+      REAL LABANG( MAXLAB )      ! Angles of each of the labels
+      REAL LABJUST( MAXLAB )     ! Justification of each of the labels
+      REAL XLABAN( MAXLAB )      ! X-axis positions of labels
+      REAL XMAX                  ! Data world co-ordinate limit
+      REAL XMIN                  ! Data world co-ordinate limit
+      REAL YLABAN( MAXLAB )      ! Y-axis positions of labels
+      REAL YMAX                  ! Data world co-ordinate limit
+      REAL YMIN                  ! Data world co-ordinate limit
+      REAL ZDATA( NDATMAX )      ! Z-axis data array
+
+      COMMON / PONCM1 / XDATA, YDATA, NDAT, ERRY, ERRX, ISYMBS, ZDATA, 
+     :                  ILABPTR, XLABAN, YLABAN, LABANG, LABJUST,
+     :                  NCOLS, XMIN, XMAX, YMIN, YMAX, LXLOG, LYLOG,
+     :                  XCOL, YCOL, ERXCOL, ERYCOL, ZCOL, SYMCOL, 
+     :                  LABCOL
+
+*  Character variables common block.
+      CHARACTER * ( LENLAB ) CLABELS( NDATMAX ) ! Data labels
+      CHARACTER * ( LENLAB ) LABLST( MAXLAB ) ! List of labels
+      CHARACTER * ( LENLAB ) COLLAB( MAXCOL ) ! Data column headers
+
+      COMMON / PONCM2 / CLABELS, LABLST, COLLAB
+
+*  Work-space common block (equivalence work space variables in order
+*  to save space).
+      DOUBLE PRECISION DWORK( NDWORK )
+      REAL WORK( NDWORK*2 )
+      REAL XDATATEMP( NDWORK )
+      REAL YDATATEMP( NDWORK )
+      
+      EQUIVALENCE ( WORK, DWORK )
+      EQUIVALENCE ( WORK, XDATATEMP )
+      EQUIVALENCE ( WORK( NDWORK + 1 ), YDATATEMP )
+
+      COMMON / PONCM3 / WORK
+
+*.
+* $Id$

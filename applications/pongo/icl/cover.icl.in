@@ -1,0 +1,210 @@
+{+
+{  Name:
+{     COVER.ICL
+
+{  Purpose:
+{     Plot the SUN/137 cover example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/cover
+
+{  Description:
+{     A PONGO example command file to generate the cover of SUN/137.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     7-JAN-1993 (PCTR):
+{        Starlink release.
+{     1994 May 4 (MJC):
+{        Fixed two bugs (NOQUICK and READF) when reading the data file.
+{     22-JUN-1994 (PDRAPER):
+{        Converted to work on UNIX.
+
+{  Bugs:
+
+{-
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+PEN 1
+
+{  Set new paper size.
+PAPER 6 1
+
+{  Set the character size.
+EXPAND 0.7
+
+{  Select a viewport in the top left-hand corner.
+VIEWPORT NDC 0.0 0.6 0.4 1.0
+EXPAND 4
+FONT 4
+LWEIGHT 5
+WTEXT P 0.65 0.35 "PONGO" JUSTIFICATION=0.5 ANGLE=45
+LWEIGHT 2
+EXPAND 2
+WTEXT P 0.81 0.63 "\(2291)" JUSTIFICATION=0.5 ANGLE=45
+EXPAND 18
+WTEXT P 0.62 0.16 "\(0844)" JUSTIFICATION=0.5 ANGLE=0
+FONT 1
+LWEIGHT 1
+EXPAND 0.5
+PRIM K X=0.254 Y=0.808 SYMBOL=17
+PRIM K X=0.551 Y=0.769 SYMBOL=17
+PRIM K X=0.707 Y=0.761 SYMBOL=17
+PRIM K X=0.864 Y=0.232 SYMBOL=17
+PRIM K X=0.938 Y=0.162 SYMBOL=17
+PRIM K X=0.265 Y=0.127 SYMBOL=17
+PRIM K X=0.258 Y=0.260 SYMBOL=17
+PRIM K X=0.903 Y=0.464 SYMBOL=17
+PRIM K X=0.329 Y=0.385 SYMBOL=17
+EXPAND 1.1
+PRIM K X=0.393 Y=0.692 SYMBOL=17
+PRIM K X=0.453 Y=0.692 SYMBOL=17
+PRIM K X=0.445 Y=0.645 SYMBOL=17
+PRIM K X=0.393 Y=0.629 SYMBOL=17
+PRIM K X=0.354 Y=0.575 SYMBOL=17
+EXPAND 0.8
+PRIM K X=0.393 Y=0.711 SYMBOL=17
+EXPAND 0.5
+PRIM K X=0.343 Y=0.716 SYMBOL=17
+PRIM K X=0.370 Y=0.700 SYMBOL=17
+PRIM K X=0.346 Y=0.583 SYMBOL=17
+PRIM K X=0.443 Y=0.700 SYMBOL=17
+EXPAND 0.7
+
+{  Select a viewport in the top right-hand corner.
+VIEWPORT NDC 0.6 0.95 0.6 0.95
+
+{  Read the unbinned data into the XCOL data area, but only if their values
+{  are greater than zero. Note that the XCOL column has been specified by 
+{  its label which is case-sensitive.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat ~
+   XCOL='Age' SELCOND='Age > 0' NOALL NOQUICK
+
+{  Take logarithms of the X-axis data.
+XLOGARITHM
+
+{  Set up the limits "manually".
+LIMITS 2.0 11.0 0.0 100.0
+
+{  Draw a box, but don't draw the right-hand edge. Reset the X-axis options
+{  so that they do not contain an "L" option (which has been automatically 
+{  added by XLOGARITHM).
+BOX BCNST BNST
+
+{  Change the line style.
+CHANGE LINESTY=2
+
+{  Bin the data in the XCOL data area between 2 and 11, with 18 bins.
+{  Draw these data using the world coordinate limits already set up.
+HISTOGRAM 2.0 11.0 18 NOAUTOSCALE
+
+{  Write a label describing the histogram.
+CHANGE LINESTY=1
+LABEL 'Log [Characteristic age (yr)]' 'Number of old pulsars (dashed)' ' '
+MTEXT T 0.5 0.5 0.5 'Pulsar Age Distribution'
+
+{  Read a second data file (the data are already logarithmic).
+READF DATA=INSTALL/bin/examples/pongo/cljon.dat ~
+   XCOL=1 YCOL=0 ZCOL=0 EYCOL=0 EXCOL=0 ALL NOQUICK
+
+{  Set up new limits.
+LIMIT 2.0 11.0 0.0 11.0
+
+{  Draw a box, but this time do not draw the left-hand edge.
+BOX  YOPT='CMST'
+CHANGE LINESTY=4
+HISTOGRAM 2.0 11.0 18 NOAUTOSCALE
+
+{  Write a label describing the second histogram.
+CHANGE LINESTY=1
+MTEXT R 2.5 0.5 0.5 'Number of new pulsars (dotted)' 
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  Select a viewport in the bottom left-hand corner.
+VIEWPORT NDC 0.1 0.45 0.1 0.45
+
+{  Set the columns to read from the data file.
+XCOLUMN 1
+EXCOLUMN 2
+YCOLUMN 3
+EYCOLUMN 4
+SYMCOLUMN 0
+LABCOLUMN 0
+
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/tutorial.dat ALL NOQUICK
+
+{  Set the plotting limits.
+WORLD DATA
+
+{  Draw the box and plot the data.
+BOXFRAME BCNST BCNVST
+ERRORBAR X 0.0
+ERRORBAR Y 0.0
+
+{  Draw the labels.
+WTEXT M 0.5 0.5 "Interstellar data" SIDE=T JUSTIFICATION=0.5
+WTEXT M 3 0.5 "Colour excess E\dB-V\d" SIDE=B JUSTIFICATION=0.5
+WTEXT M 3 0.5 "Equivalent width in m\A" SIDE=L JUSTIFICATION=0.5
+
+{  Perform an unweighted least squares to a straight line.
+LTYPE 1
+FITLINE NOWEIGHT COLOUR=1
+
+{  Perform a weighted least squares fit to a Chebyshev polynomial.
+LTYPE 2
+FITCURVE POLY NPOLY=2 WEIGHT COLOUR=1
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  Select a viewport in the bottom right-hand corner.
+VP_BR
+
+{  Read the postions of pulsars from the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SYMCOL=2 LABCOL=1 ~
+   XCOL=RA YCOL=Dec ZCOL=Dist SELCOND='Dist > 0' NOALL NOQUICK
+
+{  Convert the XCOL and YCOL data areas from degrees to radians.
+DEGTOR X
+DEGTOR Y
+
+{  Plot the data in the bottom right-hand corner in a sine projection.
+LIMITS -1.1 1.1 -1.1 1.1 PROJECTION=SIN RACENTRE=18 DECCENTRE=30
+WNAD
+MTEXT T 1.0 0.5 0.5 'SIN centre \ga=18\uh\d \gd=30\(2729)'
+GRID
+
+{  Draw a circle around the projection to make it look prettier.
+ARC 1.0 1.0 0.0 0.0 0.0 360.0 0.0 PROJECTION='NONE'
+POINTS
+
+{  This line resets the viewport and the plotting pen, font, point fill style,
+{  line style and line width to their defaults.
+VSTAND
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+ENDPLOT
+!mv gks74.ps sun137_cover.ps-tex
+{ $Id$

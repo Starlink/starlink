@@ -1,0 +1,23 @@
+.help bin Starlink pongohelp
+.nf
+Plot a histogram using previously binned data.
+
+Usage:
+   bin
+
+Description:
+
+   The data in the XCOL and YCOL data areas are used to plot a
+   histogram. The data in the XCOL area specify the bin edges, while
+   the data in the YCOL area specify the respective frequency for
+   each bin.
+
+Parameters:
+
+CENTRE = _LOGICAL (Read)
+   This parameter specifies whether the values in the XCOL data
+   area denote the centre of each bin (when TRUE) or its lower
+   edge (when FALSE).
+   [FALSE]
+
+.endhelp

@@ -1,0 +1,51 @@
+.help device Starlink pongohelp
+.nf
+Open a plotting device.
+
+Usage:
+   device [device]
+
+Description:
+
+   Set up a device for subsequent PONGO plotting commands. This
+   application allows plotting onto an AGI picture created by a
+   different package (e.g. KAPPA), or the creation of a new base
+   picture.
+
+   If a picture created by a run of a previous application is made
+   (using either the "current" picture or selecting using a known
+   picture label see parameter ACTION) then it is possible to
+   overlay new graphics (such as annotations, lines etc.) using the
+   same coordinate system (see the OVERLAY parameter).
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   If 'B', the plotting device will be cleared and the whole of
+   its plotting surface used. If equal to 'C', the current picture
+   will be used and a PGPLOT viewport created inside it. If 'L'
+   then a previously labelled picture (set using KAPPA:PICLABEL)
+   can be selected. Once set, this parameter will retain its value
+   in subsequent invocations of BEGPLOT.
+   ['C']
+CLEAR = _LOGICAL (Read)
+   If TRUE then the current picture will be cleared of any
+   existing graphics.
+   [TRUE]
+DEVICE = DEVICE (Read)
+   The name of the device to be used for plotting.  The names of
+   the currently available devices can be found using the INQUIRE
+   DEVICES command.
+LABEL = _CHAR (Read)
+   If ACTION=L is selected then the name of the AGI picture to be
+   selected is given by this parameter. AGI pictures can be labelled
+   using the KAPPA application PICLABEL.
+   ['']
+OVERLAY = _LOGICAL (Read)
+   If TRUE, the PGPLOT viewport created will exactly overlay the
+   the last DATA picture. This is useful for drawing axis labels
+   using BOXFRAME on an image or contour map etc. that has been
+   displayed by another package (e.g. KAPPA:DISPLAY).
+   [FALSE]
+
+.endhelp

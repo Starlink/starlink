@@ -1,0 +1,4 @@
+xlabel,s,a,"X axis",,,"Label for X axis"
+ylabel,s,a,"Y axis",,,"Label for Y axis"
+title,s,a,"PONGO plot",,,"Title for plot"
+columns,b,h,no,,,"Use stored X and Y column headings"

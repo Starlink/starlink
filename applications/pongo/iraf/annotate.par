@@ -1,0 +1,6 @@
+xoff,r,a,0.0,,,"X-offset for the labels"
+yoff,r,a,0.2,,,"Y-offset for the labels"
+justification,r,h,0.0,0.0,1.0,"Justification for the labels"
+projection,s,h,"NONE",,,"Astrometric projection"
+racentre,s,h,"0",,,"Centre of projection"
+deccentre,s,h,"0",,,"Centre of projection"

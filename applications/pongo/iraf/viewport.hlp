@@ -1,0 +1,59 @@
+.help viewport Starlink pongohelp
+.nf
+Set the viewport for the current plotting device.
+
+Usage:
+   viewport action xvpmin xvpmax yvpmin yvpmax
+
+Description:
+
+   Control the PGPLOT viewport. The viewport is the region of the
+   plotting surface through which the graph is seen.
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The method used to set the viewport. It may be one of the
+   following:
+
+      - "STANDARD" -- The viewport is set to the standard PGPLOT
+      viewport.
+
+      - "ADJUST" -- The viewport is adjusted so that the scales
+      along the X and Y axes are the same number of world
+      coordinate units per unit length. The newly created
+      viewport fits within the old viewport.
+
+      - "NDC" -- The viewport is set by specifying its extent in
+      the X and Y directions in terms of normalised device
+      coordinates (i.e. coordinates that run from 0 to 1 along
+      the horizontal and vertical directions).
+
+      - "INCHES" -- The viewport is set by specifying its extent
+      in the X and Y directions in terms of inches.
+
+XVPMIN = _REAL (Read)
+   The left hand side of the viewport.
+
+XVPMAX = _REAL (Read)
+   The right hand side of the viewport.
+
+YVPMIN = _REAL (Read)
+   The lower side of the viewport.
+
+YVPMAX = _REAL (Read)
+   The upper side of the viewport.
+
+XMIN = _REAL (Write)
+   The left hand edge of the world coordinate system.
+
+XMAX = _REAL (Write)
+   The right hand edge of the world coordinate system.
+
+YMIN = _REAL (Write)
+   The lower edge of the world coordinate system.
+
+YMAX = _REAL (Write)
+   The upper edge of the world coordinate system.
+
+.endhelp

@@ -1,0 +1,55 @@
+.help getpoint Starlink pongohelp
+.nf
+Retrieve information for a plotted data point.
+
+Usage:
+   getpoint action value
+
+Description:
+
+   Return the attributes of a plotted data point. When this command
+   completes it updates the values of the X, Y, Z, EX, EY, SYMBOL 
+   and LABEL parameters. These can then be used in any procedures
+   (by referring to the parameter name, e.g. getpoint.x, getpoint.y
+   etc.).
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The method of specifying the data point in question. If "N",
+   interpret the VALUE parameter as specifying the index number
+   of that point. If "C",  the VALUE parameter is used to try to
+   match the LABCOL entry for a point.
+
+VALUE = _CHAR (Read)
+   The value to be used in the search for the data point.
+   Depending upon the value of the ACTION parameter, this may
+   either be an integer specifying the index number of the point
+   in the data area, or a case-sensitive minimum match string for
+   a label column entry in the data area.
+X = _REAL (Write)
+   The returned value of the X coordinate of the selected point.
+Y = _REAL (Write)
+   The returned value of the Y coordinate of the selected point.
+Z = _REAL (Write)
+   The returned value of the Z coordinate of the selected point.
+EX = _REAL (Write)
+   The returned value of the X coordinate error of the selected
+   point.
+EY = _REAL (Write)
+   The returned value of the Y coordinate error of the selected
+   point.
+SYMBOL = _INTEGER (Write)
+   The returned value of the symbol column of the selected point.
+LABEL = _CHAR (Write)
+   The returned value of the label column of the selected point.
+
+Examples:
+
+  po> getpoint c "3c45"
+  po> =getpoint.x
+  po> =getpoint.y
+   This will show the X and Y coordinates of the data point
+   that has the label "3C45", if it exists.
+
+.endhelp

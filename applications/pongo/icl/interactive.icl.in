@@ -1,0 +1,119 @@
+{+
+{  Name:
+{     INTERACTIVE.ICL
+
+{  Purpose:
+{     Plot the INTERACTIVE example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/interactive
+
+{  Description:
+{     Demonstrate interaction with PONGO plots using the CURSE command.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     3-JUL-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+{     11-JUN-1994 (PDRAPER):
+{        Ported to UNIX.
+{     11-JUL-1994 (PDRAPER):
+{        Removed ICL fixes.
+
+{  Bugs:
+
+{-
+
+{  Prompt for and read the name of a graphics device.
+INPUT "Graphics device name: " (GDNAME)
+
+{  Begin a PONGO plot.
+BEGPLOT (GDNAME&'')
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set the columns to read from the data file.
+XCOLUMN Perio
+YCOLUMN pdot
+EXCOLUMN 0
+EYCOLUMN 0
+LABCOLUMN 1
+SYMCOLUMN 2
+ZCOLUMN Dist
+
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SELCOND='pdot > 0' NOALL NOQUICK
+
+{  Convert the X- and Y-axis data to logarithms.
+XLOGARITHM
+YLOGARITHM
+
+{  Set the Y-axis style and the plot limits.
+SETGLOBAL PONGO_YOPT BCNST
+LIMITS -2.95 1.0 -20.5 -11.0
+
+{  Draw the box and plot the points.
+LWEIGHT 2
+BOXFRAME
+LWEIGHT 1
+POINTS
+
+{  Create a title from the number of points that have been read in.
+{  Note the string concatenation.
+GETGLOBAL PONGO_NDATA (NPULSAR)
+TITLESTRING=''''&(NPULSAR)&' Pulsars'&''''
+
+{  The Y-axis label.
+YLABEL='''log[Period Derivative (ss\u-1\d)]'''
+
+{  Note how the X-axis label is picked up from the data file.
+LWEIGHT 2
+LABEL COLUMNS YLABEL=(YLABEL&'') TITLE=(TITLESTRING&'')
+LWEIGHT 1
+
+{  Invoke the CURSE command.
+PRINT "Invoking the CURSE command."
+CURSE
+
+{  Invoke the WRITEI command.
+WRITEI LABLST
+
+{  Redraw the graph using SIZEPLOT.
+PRINT "Invoking the ADVANCE command."
+ADVANCE
+PRINT "Invoking the BOXFRAME command."
+LWEIGHT 2
+BOXFRAME
+PRINT "Invoking the LABEL command."
+LABEL
+LWEIGHT 1
+PRINT "Invoking the command CCMATH Z=1/(Z+0.1)."
+CCMATH Z=1/(Z+0.1)
+PRINT "Invoking the SIZEPLOT command to plot scaled symbols."
+SIZEPLOT
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ $Id$

@@ -1,0 +1,43 @@
+*+
+*  Name:
+*     PROJ_CMN
+
+*  Purpose:
+*     PONGO projections global variables.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     The global variables used by the PONGO projections library (PROJ_).
+
+*  Authors:
+*     JBVAD::PAH: Paul Harrison (STARLINK)
+*     PCTR: P.C.T. Rees (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     7-MAY-1992 (JBVAD::PAH):
+*        Original version.
+*     1-FEB-1993 (PCTR):
+*        Added Starlink prologue.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+      DOUBLE PRECISION XINC   ! X-axis increment in arcseconds per pixel at
+                              ! reference pixel
+      DOUBLE PRECISION YINC   ! Y-axis increment in arcseconds per pixel at
+                              ! reference pixel
+      DOUBLE PRECISION IMROT  ! Rotation of axes (degrees)
+
+      COMMON / PROJCMN / XINC, YINC, IMROT
+
+*.
+* $Id$

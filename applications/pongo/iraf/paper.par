@@ -1,0 +1,2 @@
+width,r,a,0.0,,,"Width of plotting surface in inches"
+aspect,r,a,1.0,,,"Aspect ratio of plotting surface"

@@ -1,0 +1,911 @@
+{+
+{  Name:
+{     FIGURES.ICL
+
+{  Purpose:
+{     Create example figures for SUN/137.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD FIGURES
+
+{  Description:
+{     The plotting device is set to postscript for inclusion in SUN/137.
+{     The size of the viewport is changed to the figure size within SUN/137.
+{     Each of the example diagrams are plotted separately using their 
+{     respective ICL procedures.
+{     The GKS output files are renamed.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     APR-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+{     1994 May 4 (MJC):
+{        Fixed two bugs (NOQUICK and READF) when reading the data file.
+{     22 -JUN-1994 (PDRAPER):
+{        Re-created from UNIX versions of scripts.
+
+{  Bugs:
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set new viewport size.
+PAPER 5.0 1
+
+{+
+{  Name:
+{     SPECTRUM.ICL
+
+{  Purpose:
+{     Plot the SPECTRUM example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD PONGO_EXAMPLES:SPECTRUM
+
+{  Description:
+{     Demonstrate plotting simple spectrum data using PONGO.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     15-DEC-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+{  Set the columns to read from the data file.
+XCOLUMN Wave
+YCOLUMN Flux
+EXCOLUMN 0
+EYCOLUMN 0
+                              
+{  Read the data file.
+READF INSTALL/bin/examples/pongo/swp3196.lap SELCOND="Flux > 0" NOALL
+
+{  Set the plotting limits.
+WORLD DATA
+
+{  Draw the box and plot the data.
+CHANGE LINEWID=2 COLOUR=1
+BOXFRAME BCNST BCNST 0 0 0 0
+CHANGE LINEWID=1 COLOUR=4
+GPOINTS C
+CHANGE COLOUR=1
+
+{  Draw the labels (use the global values set by READF).
+CHANGE LINEWID=2
+LABEL TITLE="SWP3196, LORES, LAP" COLUMNS
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ @(#)spectrum.icl	1.2     6/13/94     1
+
+!mv gks74.ps sun137_fig1.ps-tex
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set new viewport size.
+PAPER 5.0 1
+
+{+
+{  Name:
+{     ERRORS.ICL
+
+{  Purpose:
+{     Plot the ERRORS example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD PONGO_EXAMPLES:SPECTRUM
+
+{  Description:
+{     Demonstrate the use of error bars and least squares fitting in PONGO.
+
+{  Authors:
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     15-DEC-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+{  Set the columns to read from the data file.
+XCOLUMN 1
+EXCOLUMN 2
+YCOLUMN 3
+EYCOLUMN 4
+                              
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/tutorial.dat ALL
+
+{  Set the plotting limits.
+WORLD DATA
+
+{  Draw the box and plot the data.
+CHANGE LINEWID=2
+BOXFRAME BCNST BCNVST
+CHANGE LINEWID=1
+ERRORBAR X 0.0
+ERRORBAR Y 0.0
+
+{  Draw the labels.
+CHANGE LINEWID=2
+CHANGE CHEIGHT=2.0
+WTEXT M 0.5 0.5 "Interstellar data" SIDE=T JUSTIFICATION=0.5
+CHANGE CHEIGHT=1.0
+WTEXT M 3 0.5 "Colour excess E\dB-V\d" SIDE=B JUSTIFICATION=0.5
+WTEXT M 3 0.5 "Equivalent width in m\A" SIDE=L JUSTIFICATION=0.5
+
+{  Perform an unweighted least squares to a straight line.
+LTYPE 2
+FITLINE NOWEIGHT COLOUR=3
+
+{  Perform a weighted least squares fit to a straight line.
+LTYPE 1
+FITLINE WEIGHT COLOUR=2
+
+{  Perform a weighted least squares fit to a Chebyshev polynomial.
+LTYPE 4
+FITCURVE POLY NPOLY=2 WEIGHT COLOUR=4
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ @(#)errors.icl	1.2     6/13/94     1
+
+!mv gks74.ps sun137_fig2.ps-tex 
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set new viewport size.
+PAPER 5.0 1
+
+{+
+{  Name:
+{     HISTOGRAM.ICL
+
+{  Purpose:
+{     Plot the HISTOGRAM example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD PONGO_EXAMPLES:HISTOGRAM
+
+{  Description:
+{     A PONGO example command file to plot histograms.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     3-JUL-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+{  Set the line width to 2.
+CHANGE LINEWID=2
+
+{  Read the unbinned data into the XCOL data area, but only if their values
+{  are greater than zero. Note that the XCOL column has been specified by 
+{  its label which is case-sensitive.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat XCOL='Age' SELCOND='Age > 0' NOALL
+
+{  Take logarithms of the X-axis data.
+XLOGARITHM
+
+{  Set up the limits "manually".
+LIMITS 2.0 11.0 0.0 100.0
+
+{  Draw a box, but don't draw the right-hand edge. Reset the X-axis options
+{  so that they do not contain an "L" option (which has been automatically 
+{  added by XLOGARITHM).
+BOX BCNST BNST
+
+{  Change the line style.
+CHANGE LINESTY=2
+
+{  Bin the data in the XCOL data area between 2 and 11, with 18 bins.
+{  Draw these data using the world coordinate limits already set up.
+HISTOGRAM 2.0 11.0 18 NOAUTOSCALE
+
+{  Write a label describing the histogram.
+CHANGE LINESTY=1
+LABEL 'Log [Characteristic age (yr)]' 'Number of old pulsars (dashed)' ' '
+CHANGE CHEIGHT=2.0
+MTEXT T 1.0 0.5 0.5 'Pulsar Age Distribution'
+CHANGE CHEIGHT=1.0
+
+{  Read a second data file (the data are already logarithmic).
+READF DATA=INSTALL/bin/examples/pongo/cljon.dat XCOL=1 YCOL=0 ZCOL=0 ~
+      EYCOL=0 EXCOL=0 ALL
+
+{  Set up new limits.
+LIMIT 2.0 11.0 0.0 11.0
+
+{  Draw a box, but this time do not draw the left-hand edge.
+BOX  YOPT='CMST'
+CHANGE LINESTY=4
+HISTOGRAM 2.0 11.0 18 NOAUTOSCALE
+
+{  Write a label describing the second histogram.
+CHANGE LINESTY=1
+MTEXT R 2.5 0.5 0.5 'Number of new pulsars (dotted)' 
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ @(#)histogram.icl	1.2     6/13/94     1
+
+!mv gks74.ps sun137_fig3.ps-tex
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set new viewport size.
+PAPER 5.0 1
+
+{+
+{  Name:
+{     PPDOTDIAG.ICL
+
+{  Purpose:
+{     Plot the PPDOTDIAG example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD PONGO_EXAMPLES:PPDOTDIAG
+
+{  Description:
+{     Demonstrate more complex data management using READF and labelling.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     3-JUL-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+{  Set the columns to read from the data file.
+XCOLUMN Perio
+YCOLUMN pdot
+EXCOLUMN 0
+EYCOLUMN 0
+LABCOLUMN 1
+SYMCOLUMN 2
+
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SELCOND='pdot > 0' NOALL NOQUICK
+
+{  Convert the X- and Y-axis data to logarithms.
+XLOGARITHM
+YLOGARITHM
+
+{  Set the Y-axis style and the plot limits.
+SETGLOBAL PONGO_YOPT BCNST
+LIMITS -2.95 1.0 -20.5 -11.0
+
+{  Draw the box and plot the points.
+LWEIGHT 2
+BOXFRAME
+LWEIGHT 1
+POINTS
+
+{  Create a title from the number of points that have been read in.
+{  Note the string concatenation.
+GETGLOBAL PONGO_NDATA (NPULSAR)
+TITLESTRING=''''&(NPULSAR)&' Pulsars'&''''
+
+{  The Y-axis label.
+YLABEL='''log[Period Derivative (ss\u-1\d)]'''
+
+{  Note how the X-axis label is picked up from the data file.
+LWEIGHT 2
+LABEL COLUMNS YLABEL=(YLABEL&'') TITLE=(TITLESTRING&'')
+LTYPE 2
+MOVE -1.325 -21.0
+DRAW  1.0   -14.025
+LTYPE 5
+MOVE -3.0   -18.9549
+DRAW  1.0   -13.626
+LWEIGHT 1
+CHANGE LINESTY=1 CHEIGHT=0.7
+PTEXT      -0.7082780     -18.0945511        0 0.0 '0655+64'
+PTEXT      -1.2338796     -17.0440712        0 0.0 '1913+16'
+
+{  Note the use of the command line continuation character "~", used 
+{  gratuitously here for for illustration.
+PTEXT      -0.2164239E+01  -0.1934648E+02    0 0.0 ~
+   '1953+29'
+PTEXT      -0.2336934E+01  -0.1979958E+02    0 1.0 ~
+   '1855+09'
+PTEXT      -1.9114622     -17.9879818        0 0.0 ~
+   '1620-26'
+
+CHANGE CHEIGHT=1.0
+PTEXT      -1.0945635     -20.1498394       37 0.0 'Death Line'
+PTEXT      -1.4808489     -16.7852573       19 0.0 'Spin-up Line'
+
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ @(#)ppdotdiag.icl	1.2     6/13/94     1
+
+!mv gks74.ps sun137_fig4.ps-tex
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set new viewport size.
+PAPER 5.0 1
+
+{+
+{  Name:
+{     ELLIPSES.ICL
+
+{  Purpose:
+{     Plot the ELLIPSES example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD PONGO_EXAMPLES:ELLIPSES
+
+{  Description:
+{     A PONGO ICL example file to plot error ellipses.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH):
+{     PCTR: P.C.T. Rees (STARLINK)
+
+{  History:
+{     3-JUL-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+
+{  Bugs:
+
+{-
+
+{  Change the character height to half its normal value.
+EXPAND 0.5
+
+{  Set the SCALE global parameter to scale the error ellipses.
+SETGLOBAL PONGO_ERSCALE 2.3
+
+{  Change the axis options global parameters to make the x=0 and y=0 
+{  lines appear.
+SETGLOBAL PONGO_XOPT ABCNST
+SETGLOBAL PONGO_YOPT ABCNST
+
+{  Set up the data columns.
+EXCOLUMN 5
+EYCOLUMN 7
+LABCOLUMN 1
+SYMCOLUMN 2
+XCOLUMN 4
+YCOLUMN 6
+ZCOLUMN 8
+
+{  Alter the viewport to the bottom left corner.
+VP_BL
+
+{  Read the data file, selecting only lines where COLUMN 3 is equal to 11.
+READF DATA=INSTALL/bin/examples/pongo/ellipses.dat NOALL SELCOND='3 = 11'
+
+{  Set up the world coordinate limits from the data including the origin.
+WORLD DATA0
+
+{  Adjust the viewport to make X- and Y-axis scales equal.
+WNAD
+
+{  Draw the box and axes
+BOXFRAME
+
+{  Write some text relative to the viewport.
+MTEXT T 1.0 0.5 0.5 'Defford only'
+
+{  Change the plotting pen.
+PEN 2
+
+{  Plot the points - note that because there is no command-line parameter, 
+{  and values have been read into the symbol column, these values are used 
+{  to determine the symbol type.
+POINTS
+
+{  Change the pen again - note that the full form of the command is being 
+{  used not its alias as above.
+CHANGE COLOUR=4
+
+{  Annotate the graph with labels (these happen to be numbers in this case)
+ANNOTATE
+CHANGE COLOUR=1
+
+{  Draw the error ellipses without their principal axes.
+ELLIPSES NOAXES
+
+{  Find how many data points have been read (this was written out to the
+{  global parameter PONGO_NDATA by the read command.
+GETGLOBAL PONGO_NDATA (NDATA) 
+
+{  Use the radiate command to draw lines from each of the data points to 
+{  the origin.
+RADIATE 0.0 0.0 (NDATA)
+
+{  Draw the axis labels and the plot title.
+LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50 
+
+{  Produce two more similar plots in different areas of the screen...
+VP_BR
+READF SELCOND='3 = 12'
+WORLD DATA0
+WNAD
+BOXFRAME
+MTEXT T 1.0 0.5 0.5 'Knockin only' 
+CHANGE COLOUR=2
+POINTS
+CHANGE COLOUR=4
+ANNOTATE
+CHANGE COLOUR=1
+ELLIPSES NOAXES
+GETGLOBAL PONGO_NDATA (NDATA) 
+RADIATE 0.0 0.0 (NDATA)
+
+{  Note that LABEL remembers the previous axis labels.
+LABEL
+VP_TH
+READF SELCOND='3 = 13'
+WORLD DATA0
+WNAD
+BOXFRAME
+MTEXT T 1.0 0.5 0.5  'Defford and Knockin'
+CHANGE COLOUR=2
+POINTS
+CHANGE COLOUR=4
+ANNOTATE
+CHANGE COLOUR=1
+ELLIPSES NOAXES
+GETGLOBAL PONGO_NDATA (NDATA) 
+RADIATE 0.0 0.0 (NDATA)
+LABEL '\gm\d\ga\u (mas yr\u-1\d)' '\gm\d\gd\u (mas yr\u-1\d)' 1112+50 
+
+{  Change the character height and viewport back to their default sizes.
+CHANGE CHEIGHT=1.0
+VSTAND
+
+{  This line resets the plotting pen, font, point fill style, line style 
+{  and line width to their defaults.
+CHANGE RESET
+
+{  End the PONGO plot.
+ENDPLOT
+{ @(#)ellipses.icl	1.2     6/13/94     1
+
+!mv gks74.ps sun137_fig5.ps-tex
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set new viewport size.
+PAPER 5.0 1
+
+{+
+{  Name:
+{     PROJECTIONS.ICL
+
+{  Purpose:
+{     Plot the PROJECTIONS example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD PONGO_EXAMPLES:PROJECTIONS
+
+{  Description:
+{     A PONGO example command file to illustrate different projections.
+
+{  Authors:
+{     PAH: Paul Harrison (JBVAD::PAH)
+{     PCTR: P.C.T. Rees (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+
+{  History:
+{     3-JUL-1990 (JBVAD::PAH):
+{        Original version.
+{     23-SEP-1992 (PCTR):
+{        Starlink release.
+{     1994 May 4 (MJC):
+{        Fixed two bugs (NOQUICK and READF) when reading the data file.
+
+{  Bugs:
+
+{-
+
+{  Set the character height.
+EXPAND 0.7
+
+{  Read the postions of pulsars from the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SYMCOL=2 LABCOL=1 XCOL=RA YCOL=Dec ~
+   ZCOL=Dist SELCOND='Dist > 0' NOALL NOQUICK
+
+{  Convert the XCOL and YCOL data areas from degrees to radians.
+XSCALE 1.7453292E-2
+YSCALE 1.7453292E-2
+
+{  Select a viewport in the top left-hand corner.
+VP_TL
+
+{  Get the limits from the data using the AITOFF projection, note that the 
+{  RA centre is specified in the form of hh:mm:ss.sss and that below is 
+{  understood to mean 12 hours.
+DLIMITS PROJECTION=AITOFF RACENTRE=12 DECCENTRE=0
+
+{  Adjust the viewport.
+WNAD
+MTEXT T 1.0 0.5 0.5 'Aitoff centre \ga=12\uh\d \gd=0\(2729)'
+
+{  Draw the coordinate grid.
+GRID PROJECTION=AITOFF
+
+{  Plot the points with various symbols.
+PEN 6
+POINTS
+
+{  Plot the same data in the top right-hand corner in a sine projection.
+PEN 1
+VP_TR
+LIMITS -1.1 1.1 -1.1 1.1 PROJECTION=SIN RACENTRE=18 DECCENTRE=30
+WNAD
+MTEXT T 1.0 0.5 0.5 'SIN centre \ga=18\uh\d \gd=30\(2729)'
+GRID
+
+{  Draw a circle around the projection to make it look prettier.
+ARC 1.0 1.0 0.0 0.0 0.0 360.0 0.0 PROJECTION='NONE'
+PEN 6
+POINTS
+
+{  Plot the data in the bottom left-hand corner in a tangent projection.
+PEN 1
+VP_BL
+LIMITS -4.0 4.0 -4.0 4.0 PROJECTION=TAN RACENTRE=0 DECCENTRE=30
+WNAD
+MTEXT T 1.0 0.5 0.5 'TAN centre \ga=0\uh\d \gd=30\(2729)'
+GRID 
+PEN 6
+POINTS
+
+{  Plot the data in the bottom right-hand corner in an arc projection.
+PEN 1
+VP_BR
+LIMITS -3.1 3.1 -3.1 3.1 PROJECTION=ARC RACENTRE=12 
+WNAD
+MTEXT T 1.0 0.5 0.5 'ARC centre \ga=12\uh\d \gd=30\(2729)'
+GRID 
+PEN 6
+POINTS
+
+{  This line resets the viewport and the plotting pen, font, point fill style,
+{  line style and line width to their defaults.
+VSTAND
+CHANGE RESET
+
+{  This line resets the character height to 1.0.
+CHANGE CHEIGHT=1.0
+
+{  End the PONGO plot.
+ENDPLOT
+{ @(#)projections.icl	1.3     6/13/94     1
+
+!mv gks74.ps sun137_fig6.ps-tex
+
+BEGPLOT epsfcol_p
+
+{  Reset PONGO.
+RESETPONGO
+
+{  Set new viewport size.
+PAPER 5.0 1
+
+{+
+{  Name:
+{     RADEC.ICL
+
+{  Purpose:
+{     Plot the PPDOTDIAG example using RA DEC labels
+
+{  Language:
+{     ICL
+
+{  Type of module:
+{     ICL file
+
+{  Arguments:
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/radec.icl
+
+{  Description:
+{     Demonstrate RA and DEC labelling of axis.
+
+{  Authors:
+{     PDRAPER: P.W. Draper (STARLINK - Durham University)
+
+{  History:
+{     30-MAY-1996 (PDRAPER):
+{        Original version.
+
+{  Bugs:
+
+{-
+
+{  Set the columns to read from the data file.
+XCOLUMN RA
+YCOLUMN Declination
+EXCOLUMN 0
+EYCOLUMN 0
+LABCOLUMN 1
+SYMCOLUMN 2
+
+{  Read the data file.
+READF DATA=INSTALL/bin/examples/pongo/ppdot.dat SELCOND='pdot > 0' ~
+      NOALL NOQUICK RESET
+
+{  Convert the X- and Y-axis data to radians.
+DEGTOR X
+DEGTOR Y
+
+{  Set the Y-axis style and the plot limits.
+SETGLOBAL PONGO_XOPT BCNSTZHG
+SETGLOBAL PONGO_YOPT BCNSTZDG
+LIMITS 5.5 4.5 -0.2 0.2
+
+{  Draw the box and plot the points.
+LWEIGHT 2
+CHANGE FONT=4
+BOXFRAME 
+LWEIGHT 1
+CHANGE CHEIGHT=3
+POINTS
+CHANGE CHEIGHT=1
+
+{  Note how the X-axis label is picked up from the data file.
+LWEIGHT 2
+LABEL COLUMNS TITLE='Pulsar Positions'
+
+{  End the PONGO plot.
+ENDPLOT
+{
+
+!mv gks74.ps sun137_fig7.ps-tex
+
+{  Begin a PONGO plot.
+BEGPLOT epsf_p
+
+{  Reset PONGO.
+RESETPONGO
+
+PAPER 5.0 1
+
+{+
+{  Name:
+{     VECTOR.ICL
+
+{  Purpose:
+{     Plot the VECTOR example.
+
+{  Language:
+{     ADAM ICL
+
+{  Type of module:
+{     ICL file
+
+{  Invocation:
+{     LOAD $PONGO_EXAMPLES/vector
+
+{  Description:
+{     A PONGO example file to illustrate different the use
+{     of the VECT and PVECT commands.
+
+{  Authors:
+{     PDRAPER: Peter W. Draper (STARLINK - Durham University)
+
+{  History:
+{     14-AUG-1996 (PDRAPER):
+{        Original version.
+
+{-
+
+{  Read in the data, selecting objects with proper motions 
+{  greater than 0.5 arcseconds in RA per year.
+READF DATA=INSTALL/bin/examples/pongo/highppm.dat XCOL=2 YCOL=3 ~
+      EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
+
+{  Convert the proper motions into radians.
+CCMATH EX='EX/3600.0' EY='EY/3600.0'
+DEGTOR EX
+DEGTOR EY
+
+{  Select top of plot.
+VP_TH
+
+{  Use the AITOFF projection
+PROJ="aitoff"
+
+{  Set the limits of the plot.
+LIMITS -3.3 3.3 -1.5 1.5 PROJECTION=(PROJ) RACENTRE=12
+WNAD
+
+{  Draw the background grid.
+LWEIGHT 1
+GRID PROJECTION=(PROJ)
+
+{  Add a title.
+EXPAND 1.0
+MTEXT T 1.0 0.5 0.5 ~
+  'Bright stars with high proper motions (AITOFF projection centre \ga=12\uh\d \gd=0\(2729))'
+
+{  Plot the star positions.
+LWEIGHT 2
+POINTS SYMBOL=3 PROJECTION=(PROJ)
+
+{  And the proper motion vectors. This gives 100000 years of travel.
+PVECT PROJECTION=(PROJ) ERSCALE=1.0E5
+
+{  Now read in and plot the ra and dec labels and their positions.
+READF DATA=INSTALL/bin/examples/pongo/gridlabels.dat XCOL=2 YCOL=3 ~
+      LABCOL=1 EXCOL=0 EYCOL=0 ALL
+DEGTOR X
+DEGTOR Y
+LWEIGHT 1
+EXPAND 0.5
+ANNOTATE PROJECTION=(PROJ) YOFF=0.02 XOFF=0.0 JUSTIFICATION=1.0 RACENTRE=12
+
+READF DATA=INSTALL/bin/examples/pongo/gridlabels.dat XCOL=5 YCOL=6 ~
+      LABCOL=4 EXCOL=0 EYCOL=0 TO=9 ALL
+DEGTOR X
+DEGTOR Y
+ANNOTATE PROJECTION=(PROJ) YOFF=0.02 XOFF=-0.01 JUSTIFICATION=1.0 
+
+{  Do normal vector plot for bottom half.
+READF DATA=INSTALL/bin/examples/pongo/highppm.dat XCOL=2 YCOL=3 ~
+      EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
+CCMATH EX='EX/3600.0' EY='EY/3600.0'
+DEGTOR EX
+DEGTOR EY
+VP_BH
+DLIMITS  
+WNAD
+
+{  Draw a box with RA and Dec labels.
+LWEIGHT 1
+EXPAND 1.0
+BOX BCNSTZHG BCNSTZDG
+
+{  Plot the star positions.
+LWEIGHT 2
+POINTS SYMBOL=3
+
+{  And the proper motion vectors.
+VECT ERSCALE=1.0E5
+
+{  Close the plot.
+ENDPLOT
+
+!mv gks74.ps sun137_fig9.ps-tex
+
+{ $Id$

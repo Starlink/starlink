@@ -1,0 +1,22 @@
+.help vp_bl Starlink pongohelp
+.nf
+Set the viewport to the bottom-left quarter of the plotting
+surface.
+
+Usage:
+
+   vp_bl [labels]
+
+Description:
+
+   Set the viewport to the bottom left quarter of the plotting
+   If requested space around the viewport will be reserved for
+   any labels.
+
+Parameters:
+
+LABELS = _LOGICAL (Read)
+   If given as "true" or "yes" then the space around the viewport
+   will be increased to leave room for labels. [FALSE]
+
+.endhelp

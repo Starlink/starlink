@@ -1,0 +1,4 @@
+xmin,r,a,0.0,,,"X minimum"
+xmax,r,a,1.0,,,"X maximum"
+ymin,r,a,0.0,,,"Y minimum"
+ymax,r,a,1.0,,,"Y maximum"

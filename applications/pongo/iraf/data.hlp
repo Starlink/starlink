@@ -1,0 +1,17 @@
+.help data Starlink pongohelp
+.nf
+Specify the data file name.
+
+Usage:
+   data filename
+
+Description:
+
+   The file name for the READF input data is set.
+
+Parameters:
+
+DATA = FILENAME (Read)
+   The name of the formatted data file. []
+
+.endhelp

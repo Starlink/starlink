@@ -1,0 +1,100 @@
+
+  introduction - PONGO is a package of commands that interactively plot data.
+    classified - A classified list of commands.
+      examples - Example procedures.
+
+       advance - Clear the graphics screen.
+      annotate - Annotate the plotted data.
+           arc - Draw an arc of an ellipse.
+        avedat - Average the data in the XCOL and YCOL areas.
+       begplot - Open a plotting device.
+           bin - Plot a histogram using previously binned data.
+      boxframe - Draw a frame and axes on the plot.
+        ccmath - Perform inter-column maths.
+        change - Change plotting attributes.
+         clear - Clear plotting attributes.
+          clog - Take the logarithm of a column.
+       connect - Draw straight lines between the data points.
+         curse - Use the cursor to get interactive input.
+          data - Specify the data file name.
+        degtor - Convert the specified data area from degrees to radians.
+        device - Open a plotting device.
+       dlimits - Set the world coordinate limits using the data range.
+          draw - Draw a line from the current position.
+      drawpoly - Draw a polygon.
+      ellipses - Draw error ellipses.
+       endplot - Close down the current plotting device.
+         erase - Clear the graphics screen.
+      errorbar - Draw error bars on the plotted data.
+          errx - Draw symmetric error bars in the X direction.
+          erry - Draw symmetric error bars in the Y direction.
+      excolumn - Specify the column containing the X-axis error data.
+        expand - Set the character height.
+      eycolumn - Specify the column containing the Y-axis error data.
+       fillsty - Change fill-style plotting attributes.
+      fitcurve - Fit a curve to the data.
+       fitline - Fit a straight line to the data.
+          font - Set the text font.
+      getpoint - Retrieve information for a plotted data point.
+       gpoints - Plot points or lines between the data.
+          grid - Draw a coordinate grid at specified intervals.
+     gt_circle - Draw a great circle between two points.
+     histogram - Bin and plot a histogram of the data.
+       inquire - Display PONGO status information.
+     labcolumn - Specify the column used for data labels.
+         label - Draw the axis labels and title on the plot.
+        limits - Set the world coordinate limits.
+         ltype - Set the line style.
+       lweight - Set the line width.
+          mark - Draw a point mark at the specified position.
+          move - Set the current pen position.
+         mtext - Draw a text string relative to the viewport.
+       palette - Change the plotting pen colours.
+         paper - Change the size and aspect ratio of the plotting surface.
+       pcolumn - Specify the column used for symbol codes.
+           pen - Set the current pen.
+       plotfun - Plot a given function.
+      plothist - Plot a histogram of the data.
+        points - Draw a point mark at each of the data points.
+          prim - Perform primitive plotting functions.
+         ptext - Draw a text string at the specified position and angle.
+        ptinfo - Get the coordinates of a specified data point.
+         pvect - Draw proper motion vectors.
+       radiate - Draw a line from the given point to the first NP data points.
+         readf - Read from a formatted data file.
+    resetpongo - Reset PONGO plotting parameters.
+        rtodeg - Convert the specified data area from radians to degrees.
+       setproj - Set the projection geometry
+     showpongo - Show the PONGO plotting parameters.
+      sizeplot - Draw point marks of differing sizes at each of the data points.
+     symcolumn - Specify the column used for symbol codes.
+          text - Draw a text string on the plot at the specified position.
+          vect - Draw vectors from each data point.
+      viewport - Set the viewport for the current plotting device.
+         vport - Set the viewport using normalised device coordinates.
+         vp_bh - Set the viewport to the plot bottom half.
+         vp_bl - Set the viewport to the plot bottom-left.
+         vp_br - Set the viewport to the plot bottom-right.
+         vp_th - Set the viewport to the plot top half.
+         vp_tl - Set the viewport to the plot top-left.
+         vp_tr - Set the viewport to the plot top-right.
+         vsize - Set the viewport using its physical size in inches.
+        vstand - Set the standard viewport.
+          wnad - Adjust the viewport so that the X and Y scales are the same.
+         world - Set the world coordinates for the plot.
+        writei - Write information to an output file.
+         wtext - Draw a text string on the plot.
+       xcolumn - Specify the column containing the X-axis data.
+          xerr - Draw symmetric error bars in the X direction.
+       xlinear - Put 1 ... N into the XCOL data area.
+    xlogarithm - Take the logarithm of the X-axis data.
+       xoffset - Add a constant offset to the X-axis data.
+        xscale - Multiply the values in the XCOL and EXCOL data areas by a
+       ycolumn - Specify the column containing the Y-axis data.
+          yerr - Draw symmetric error bars in the Y direction.
+       ylinear - Put 1 ... N into the YCOL data area.
+    ylogarithm - Take the logarithm of the Y-axis data.
+       yoffset - Add a constant offset to the Y-axis data.
+        yscale - Multiply the values in the YCOL and EYCOL data areas by a
+       zcolumn - Specify the column containing the Z-axis data.
+        zscale - Multiply the values in the ZCOL data area by a constant.

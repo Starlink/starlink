@@ -1,0 +1,70 @@
+.help introduction Starlink pongohelp
+.nf
+    PONGO is a set of applications for interactively plotting data.
+    These applications use PGPLOT (SUN/15) as their plotting package.
+
+    Some highlights of PONGO are:
+
+       o Data in PONGO are read from a text file using the READF
+         command. Features of this command are:
+
+            - the ability to read files which contain character
+              strings as well as numeric values;
+
+            - support for comment lines and column headings as an aid
+              to remembering  what the file contains;
+
+            - error trapping during file reading;
+
+            - user specification of column delimiters, allowing LaTeX
+              and TeX format tables to be read;
+
+            - selective reading of the data.
+
+
+       o Complicated mathematical manipulations can be performed on
+         the data using  Fortran-like statements to define the
+         required transformation.
+
+       o Specialized extra data columns are provided, i.e. LABCOL,
+         SYMCOL and ZCOL.
+
+       o Many interactive cursor functions are provided.
+
+       o Error ellipses can be drawn.
+
+       o Vector plots can be drawn.
+
+       o Simple statistical analysis of the data is available.
+
+       o The data can be resampled.
+
+       o User-specified functions defined by Fortran-like statements
+         can be drawn.
+
+       o Plots of astronomical positional data can be made in one of
+         several geometries.
+
+       o The data in the XCOL and YCOL data areas can be read as
+         positions of  Right Ascension and Declination respectively,
+         in the format
+
+            HH:MM:SS.SSS   +DD:MM:SS.SSS
+
+    Because the parameters PONGO uses for its commands are often
+    similar to the arguments of the equivalent PGPLOT subroutines, it
+    is useful be familiar with the PGPLOT manual when using PONGO.
+    Note that in several cases the full descriptions of PONGO
+    parameters are given only in the PGPLOT manual.
+
+    A PONGO plotting session may be begun by typing
+
+       po> begplot <graphics device>
+
+    and the PONGO session is be ended by
+
+       po> endplot
+
+
+
+.endhelp

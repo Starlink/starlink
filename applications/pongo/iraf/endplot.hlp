@@ -1,0 +1,27 @@
+.help endplot Starlink pongohelp
+.nf
+Close down the current plotting device.
+
+Usage:
+   endplot
+
+Description:
+
+   Close down the current plotting device, storing the current
+   picture description in the AGI database. The position and world
+   coordinate limits of the plot will be stored in the AGI database,
+   along with any comment text.
+
+   ENDPLOT must be executed before using a plotting application from
+   another package (e.g. KAPPA) -- failure to do so will result in
+   an AGI error and may corrupt the AGI database.
+
+Parameters:
+
+COMMENT = _CHAR (Read)
+   A comment for the AGI database entry for the plot that has
+   just been completed. Any comment will be prefixed with the
+   string "PONGO:".
+   ["Final viewport"]
+
+.endhelp

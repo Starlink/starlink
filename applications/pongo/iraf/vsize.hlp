@@ -1,0 +1,27 @@
+.help vsize Starlink pongohelp
+.nf
+Set the viewport using its physical size in inches.
+
+Usage:
+   vsize xvpmin xvpmax yvpmin yvpmax
+
+Description:
+
+   The viewport is set by specifying its minimum and maximum extents
+   in the X and Y directions in terms of inches.
+
+Parameters:
+
+XVPMIN = _REAL (Read)
+   The left hand side of the viewport.
+
+XVPMAX = _REAL (Read)
+   The right hand side of the viewport.
+
+YVPMIN = _REAL (Read)
+   The lower side of the viewport.
+
+YVPMAX = _REAL (Read)
+   The upper side of the viewport.
+
+.endhelp

@@ -1,0 +1,24 @@
+.help palette Starlink pongohelp
+.nf
+Change the plotting pen colours.
+
+Usage:
+   palette colour red green blue
+
+Description:
+
+   The colour representation for a given colour index is updated.
+
+Parameters:
+
+COLOUR = _INTEGER (Read)
+   The colour index, i.e. pen, to be updated (in the range 0 to
+   255).
+RED = _REAL (Read)
+   The red intensity (in the range 0.0 to 1.0).
+GREEN = _REAL (Read)
+   The green intensity (in the range 0.0 to 1.0).
+BLUE = _REAL (Read)
+   The blue intensity (in the range 0.0 to 1.0).
+
+.endhelp

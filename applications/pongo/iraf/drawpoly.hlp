@@ -1,0 +1,58 @@
+.help drawpoly Starlink pongohelp
+.nf
+Draw a polygon.
+
+Usage:
+
+   drawpoly
+
+Description:
+
+   This routine draws a polygon using the data in the XCOL and
+   YCOL areas to define the vertices of the region. The polygon
+   is shaded using the current fill-area style attributes (see
+   the FILLSTY command).
+
+Parameters:
+
+FILL = _LOGICAL (Read)
+   Whether to fill the polygon or not. If TRUE then the current
+   fill-area style attributes as set by the CHANGE command will
+   be used.
+   [TRUE]
+PROJECTION = _CHAR (Read)
+   The geometry to be used for plotting the polygon.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+Examples:
+
+drawpoly
+   This draws a single polygon on the current graphics display. The
+   polygon is filled or shaded using the current fill-hatch styles.
+
+drawpoly projection=aitoff deccentre="12:00:00"
+   This draws a single polygon on the current graphics display. The
+   polygon is filled or shaded using the current fill-hatch styles
+   and the polygon is drawn using an AITOFF projection. The lines
+   along the edges of the polygon are drawn as suitable arcs.
+
+Notes:
+
+- The XCOL and YCOL positions are assumed to be in radians.
+
+- If a projection is used then expect the polygon to be incorrect
+  if it crosses any discontinuities, or if the edges are severely
+  distorted (the polygon is filled as plotted on the display
+  surface, not the sky).
+
+.endhelp

@@ -1,0 +1,21 @@
+.help labcolumn Starlink pongohelp
+.nf
+Specify the column used for data labels.
+
+Usage:
+   labcolumn labcol
+
+Description:
+
+   Specify the column in the data file from which the data labels are
+   to be read.
+
+Parameters:
+
+LABCOL = _CHAR (Read and Write)
+   The column number (counting from 1), or the symbolic name of a
+   column, from which the symbolic name for each data point is
+   read by the READF command. The value "0" means "do not read
+   these data".
+
+.endhelp

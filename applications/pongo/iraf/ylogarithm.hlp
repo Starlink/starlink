@@ -1,0 +1,12 @@
+.help ylogarithm Starlink pongohelp
+.nf
+Take the logarithm of the Y-axis data.
+
+Usage:
+   ylogarithm
+
+Description:
+
+   Take the base 10 logarithm of the Y-axis data.
+
+.endhelp

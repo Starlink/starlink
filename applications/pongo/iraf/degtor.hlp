@@ -1,0 +1,18 @@
+.help degtor Starlink pongohelp
+.nf
+Convert the specified data area from degrees to radians.
+
+Usage:
+   degtor column
+
+Description:
+
+   The values in the specified data area are converted from degrees
+   to radians.
+
+Parameters:
+
+COLUMN = _CHAR (Read)
+   The column to be converted from degrees to radians. []
+
+.endhelp

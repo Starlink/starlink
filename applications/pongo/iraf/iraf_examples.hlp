@@ -1,0 +1,82 @@
+.help examples Starlink pongohelp
+.nf
+    A number of CL procedures and associated data are provided in the
+    directory pongo$. These example procedures are intended to
+    show some of the features of PONGO. All of the examples can be 
+    run using the example name, i.e:
+
+       po> ppdotdiag
+
+
+spectrum.cl
+
+    This procedure produces a plot of a  low resolution IUE spectrum
+    extracted by IUEDR (SUN/37) and written using the IUEDR command
+    OUTSPEC SPECTYPE=2. The output file was subsequently edited to
+    make the file label lines PONGO comments and to add a line of
+    PONGO column labels at the beginning of the file. IUEDR indicates
+    bad or missing data in an output spectrum by attributing zero
+    fluxes to the affected wavelength samples. These can be detected
+    and discarded using the SELCOND parameter of the READF command:
+    e.g.
+
+       po> readf (envget("PONGO_EXAMPLES")//"/swp3196.lap",
+                 selcond="Flux > 0.0", all=no)
+
+    In this example PONGO draws a polyline across all missing data 
+    flagged by IUEDR.
+
+
+errors.cl
+
+    The procedure errors.cl demonstrates plotting simple error bars
+    using PONGO (the ERRORBAR command) and also performing simple
+    statistics on the data (the FITLINE and FITCURVE commands). Note
+    that a summary of the statistics is reported for each fit to the
+    data.
+
+
+histogram.cl
+
+    The procedure histogram.cl illustrates the plotting of histograms
+    with PONGO (the PLOTHIST command). This procedure also illustrates
+    how the drawing of the box around the plot can be controlled
+    using the BOXFRAME command.
+
+
+ppdotdiag.cl
+
+    This procedure produces a period versus period-derivative diagram
+    for pulsars. Note the use of a column within the data file to set
+    the symbol number of each plotted point, and the use of the
+    output parameter readf.ndata for making a title containing the
+    number of points that have been read in.
+
+
+ellipsetest.cl
+
+    The procedure ellipsetest.icl illustrates the use of the ELLIPSES
+    command for plotting error ellipses.
+
+
+projections.cl
+
+    This procedure illustrates some of the different "geometries"
+    available in PONGO. It plots four different views of the
+    distribution of a selection of the known pulsars in Right
+    Ascension and Declination.
+
+
+radec.cl
+
+   This procedure shows how the BOXFRAME command can be
+   used to draw labels in "HH MM SS.S" & "DD MM SS.S"
+   format.
+
+
+vector.cl
+
+    This procedure shows how to plot proper motion vectors. The
+    sample used is a selection of bright stars with high proper motions.
+
+.endhelp

@@ -1,0 +1,157 @@
+.help curse Starlink pongohelp
+.nf
+Use the cursor to get interactive input.
+
+Usage:
+   curse label
+
+Description:
+
+   Display the cursor and perform various interactive tasks. These
+   tasks are as follows:
+
+      - Q -- QUIT
+
+         The application ends.
+
+      - D -- DRAW
+
+         A line is drawn from the PGPLOT "current position" to  the
+         cursor position. This position is also written to the
+         internal label list.
+
+      - E -- EXPAND
+
+         The plotting limits are expanded by a factor of 2
+         about the position of the cursor. No other action is taken.
+         This allows the screen to be cleared and the graph to be
+         re-plotted without having to set the limits explicitly.
+
+      - G -- GRADIENT
+
+         Draw a line between two consecutive cursor hits and report
+         the gradient of the line.
+
+      - L -- LABEL
+
+         Write a label directly onto the plot. The application
+         uses up to two points which define the angle at which the
+         label is to be drawn. Once "L" has been pressed, the user
+         is given the option to add another point in the standard
+         PGPLOT fashion (c.f. the PGPLOT routine PGNCURSE); i.e.
+
+            - A -- add a point
+
+            - D -- delete a point
+
+            - X -- finish
+
+         On pressing the "X" key, a label is prompted for. If only
+         one point is supplied, the label is plotted horizontally.
+
+      - M -- MARK
+
+         Mark the current cursor position with the current symbol
+         type.
+
+      - P -- ANNOTATE
+
+         The label for the nearest data point is written with its
+         left hand end at the position defined by the cursor. If "O"
+         is pressed, the right hand end of the label is placed at
+         that position. The information to create this label is
+         stored in an internal table. This information can be
+         written out into file suitable for including in an ICL
+         command file by using the WRITEI application, e.g.
+
+            PONGO> WRITEI LABLST
+
+      - S -- SHRINK
+
+         The plotting limits are set so as to zoom out by a factor
+         of 2 about the position of the cursor. No other action is
+         taken. This allows the screen to be cleared and the graph
+         to be re-plotted without having to set the limits
+         explicitly.
+
+      - V -- MOVE
+
+         The PGPLOT "current position" will be set to the cursor
+         position. This position is also written to the internal
+         label list.
+
+      - X -- POSITION
+
+         The current position of the cursor in world coordinates is
+         written to the terminal and the XCURSE and YCURSE
+         parameters.
+
+      - Z -- ZOOM
+
+         The limits for a zoomed version of the current plot are
+         set. The application will prompt for two points which
+         define the bottom left corner and the top right corner of
+         the new graph surface.
+
+            - A -- add a point
+
+            - D -- delete a point
+
+            - X -- finish
+Parameters:
+
+SYMBOL = _INTEGER (Read)
+   The symbol number used in the MARK option.
+LABEL = _CHAR (Read)
+   The label to be written to the screen with the LABEL option.
+JUSTIFICATION = _REAL (Read and Write)
+   The justification about the point (in the range 0.0 to 1.0).
+   Here, 0.0 means left justify the text relative to the data
+   point, 1.0 means right justify the text relative to the data
+   point, 0.5 means centre the string on the data point, other
+   values will give intermediate justifications.
+XCURSE = _REAL (Write)
+   The X-axis position of the last graphics cursor hit when using
+   the "X" option.
+YCURSE = _REAL (Write)
+   The Y-axis position of the last graphics cursor hit when using
+   the "X" option.
+XMIN = _REAL (Write)
+   The left hand edge of the world coordinate limits. The value
+   is set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+XMAX = _REAL (Write)
+   The right hand edge of the world coordinate limits. The value
+   is set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+YMIN = _REAL (Write)
+   The lower edge of the world coordinate limits. The value is
+   set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+YMAX = _REAL (Write)
+   The upper edge of the world coordinate limits. The value is
+   set by the application in the zooming options. It is not
+   intended that the value be specified on the command line.
+PROJECTION = _CHAR (Read)
+   The projection that has been used to plot the data.  This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG".
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+Notes:
+
+To use the limits set by the EXPAND, SHRINK and ZOOM options you'll 
+need to invoke LIMITS with a command like:
+
+  po> limits curse.xmin curse.xmax curse.ymin curse.ymax
+   
+
+.endhelp

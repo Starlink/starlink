@@ -1,0 +1,140 @@
+.help change Starlink pongohelp
+.nf
+Change plotting attributes.
+
+Usage:
+   change
+
+Description:
+
+   Change the PGPLOT plotting attributes: e.g. line style, pen
+   colour etc. Several of the attributes can be changed at the same
+   time.
+
+Parameters:
+
+ANGLE = _REAL (Read)
+   The angle hatch lines make with horizontal, in degrees.
+   Only used when FILLSTY is 3.
+   [45.0]
+COLOUR = _INTEGER (Read and Write)
+   The pen number (colour index) PGPLOT uses for plotting. The
+   value should be between 0 and 255. Usually the first 16 pens
+   are predefined to have the following colours:
+
+      - 0 -- background,
+
+      - 1 -- foreground (default),
+
+      - 2 -- red,
+
+      - 3 -- green,
+
+      - 4 -- blue,
+
+      - 5 -- cyan,
+
+      - 6 -- magenta,
+
+      - 7 -- yellow,
+
+      - 8 -- red + yellow (orange),
+
+      - 9 -- green + yellow,
+
+      - 10 -- green + cyan,
+
+      - 11 -- blue + cyan,
+
+      - 12 -- blue + magenta,
+
+      - 13 -- red + magenta,
+
+      - 14 -- dark grey,
+
+      - 15 -- light grey.
+
+   It is possible to change the colour representation of any of
+   the pen colour indices using the PALETTE application.
+   [1]
+CHEIGHT = _REAL (Read and Write)
+   The character height scaling. This parameter scales the
+   default character height and also alters the size of the tick
+   marks and symbols that PGPLOT plots. The default character
+   height in PGPLOT is about 1/40 of the viewport height.
+FONT = _INTEGER (Read)
+   The font used by PGPLOT. The styles for each font are as
+   follows:
+
+      - 1 -- single-stroke font (default),
+
+      - 2 -- roman font,
+
+      - 3 -- italic font,
+
+      - 4 -- script font.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1 (i.e.
+   single-stroke font).
+   [1]
+FILLSTY = _INTEGER (Read)
+   The fill style used by PGPLOT. The fill styles are as follows:
+
+      - 1 -- solid fill,
+
+      - 2 -- hollow fill,
+
+      - 3 -- hatched,
+
+      - 4 -- cross-hatched
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 2 (i.e.
+   hollow fill).
+   [2]
+LINESTY = _INTEGER (Read)
+   The line style used by PGPLOT.  The line style may be one of
+   the following:
+
+      - 1 -- full line (default),
+
+      - 2 -- dashed,
+
+      - 3 -- dot-dash-dot-dash,
+
+      - 4 -- dotted,
+
+      - 5 -- dash-dot-dot-dot.
+
+   If the value is not specified on the command line, the current
+   value is used. The current value is initially set to 1 (i.e.
+   full line).
+   [1]
+LINEWID = _INTEGER (Read)
+   The line width scaling. This parameter scales the default line
+   width.
+   [1]
+PHASE = _REAL (Read)
+   The fraction of SEPARATION that hatched lines are displaced.
+   Modifying this between regions makes their separation more
+   obvious. This is only used when FILLSTY is 3.
+   [0]
+SEPARATION = _REAL (Read)
+   The separation of hatched lines. The unit spacing is 1 percent
+   of the smaller of the height or width of the view surface.
+   Only used when FILLSTY is 3.
+   [1]
+TEXTBACK = _INTEGER (Read)
+   The pen number (colour index) of the background used when
+   drawing text. If less than zero then a transparent
+   background is used. Zero erases the plot under the text
+   region.
+   [-1]
+
+Examples
+
+po> unlearn change; change
+   will reset the plotting attributes to their default values.
+
+.endhelp

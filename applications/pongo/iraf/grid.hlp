@@ -1,0 +1,55 @@
+.help grid Starlink pongohelp
+.nf
+Draw a coordinate grid at specified intervals.
+
+Usage:
+   grid phimin phimax phistep themin themax thestep projection
+        racentre deccentre
+
+Description:
+
+   Draw a grid in the current projection at user specified intervals
+   in spherical coordinates. The intervals, start and end values
+   should all be specified in degrees. The defaults for the grid
+   separations normally produce desirable effects for all sky plots.
+   In specifying the grid intervals it is sometimes necessary to
+   take account of rounding errors that might occur, and to bear in
+   mind that in some geometries a single point on the celestial
+   sphere maps onto two points on the projected coordinates -- some
+   care is needed to ensure that the whole grid is drawn.
+
+Parameters:
+
+PHIMIN = _DOUBLE (Read)
+   The start longitude in degrees for the coordinate grid.
+PHIMAX = _DOUBLE (Read)
+   The end longitude in degrees for the coordinate grid.
+PHISTEP = _DOUBLE (Read)
+   The spacing between longitude grid lines in degrees.
+THEMIN = _DOUBLE (Read)
+   The start latitude in degrees for the coordinate grid.
+THEMAX = _DOUBLE (Read)
+   The end latitude in degrees for the coordinate grid.
+THESTEP = _DOUBLE (Read)
+   The spacing between latitude grid lines in degrees.
+PROJECTION = _LITERAL (Read)
+   The geometry to be used to plot the grid.  This is explained
+   in more detail in the section on projections.  Allowed values:
+   "TAN", "SIN", "ARC", "GLS", "AITOFF", "MERCATOR" and
+   "STG".
+RACENTRE = _LITERAL (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss).
+DECCENTRE = _LITERAL (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss).
+
+Notes:
+
+   It is sometimes necessary to specify the grid intervals in a
+   manner which avoids rounding errors to obtain the last grid line.
+   e.g 9.9999 instead of 10. You may also need to sometimes draw
+   the grid twice using say 30.00001 as well as 29.99999 to get
+   this final line.
+
+.endhelp

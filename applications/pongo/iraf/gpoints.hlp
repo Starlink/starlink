@@ -1,0 +1,65 @@
+.help gpoints Starlink pongohelp
+.nf
+Plot points or lines between the data.
+
+Usage:
+   gpoints action
+
+Description:
+
+   General plotting application. This application can be used simply
+   to plot a symbol at the position of each point, to plot a symbol
+   whose size depends upon the values in the ZCOL data area, or to
+   draw lines connecting the data points.
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   The type of plot to produce. This can be "C", "P" or "S",
+   with the following meanings:
+
+   - "C" (connect) -- This action simply draws straight line
+   segments between the data points.
+
+   - "P" (points) -- Draw a symbol at each of the data points. The
+   symbol type that is used to mark each point is determined in
+   one of 2 ways:
+
+      o By using the given symbol number.
+
+      o By using the numbers read into the symbol data area (this
+        preference is indicated by setting SYMBOL to INDEF).
+
+   The value of the symbol index should be an integer which
+   refers to the standard PGPLOT symbols.
+
+   - "S" (sizeplot) -- This action uses the values stored in the
+   ZCOL data area to determine the size of the plotted symbol.
+   The value of each entry in the ZCOL data area is effectively
+   used as an argument to an EXPAND command before each
+   point is plotted. The SCALE parameter can be used to make
+   these values cover a reasonable range by multiplying the Z
+   data values.
+SYMBOL = _INTEGER (Read and Write)
+   The PGPLOT symbol number that is used to mark the data points.
+   If this is set to INDEF and symbol numbers have been read into
+   the symbol column then each point will be drawn as a symbol
+   according to the symbol value.
+SCALE = _REAL (Read and Write)
+   The scale factor used to multiply the ZCOL data values to get
+   a reasonable range of symbol sizes when ACTION=SIZEPLOT.
+PROJECTION = _CHAR (Read)
+   Specifies the geometry that is to be used to plot the data.
+   This is explained in more detail in the section on
+   projections.  Allowed values: "NONE", "TAN", "SIN", "ARC",
+   "GLS", "AITOFF", "MERCATOR" and "STG".
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+.endhelp

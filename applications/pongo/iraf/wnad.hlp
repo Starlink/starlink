@@ -1,0 +1,14 @@
+.help wnad Starlink pongohelp
+.nf
+Adjust the viewport so that the X and Y scales are the same.
+
+Usage:
+   wnad
+
+Description:
+
+   The viewport is adjusted so that the scales along the X and Y
+   axes are the same number of world coordinate units per unit
+   length. The newly created viewport fits within the old viewport.
+
+.endhelp

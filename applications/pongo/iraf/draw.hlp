@@ -1,0 +1,20 @@
+.help draw Starlink pongohelp
+.nf
+Draw a line from the current pen position to the specified point.
+
+Usage:
+   draw x y
+
+Description:
+
+   A straight line is drawn from the current pen position to the
+   specified point.
+
+Parameters:
+
+X = _REAL (Read and Write)
+   The X coordinate of the point.
+Y = _REAL (Read and Write)
+   The Y coordinate of the point.
+
+.endhelp

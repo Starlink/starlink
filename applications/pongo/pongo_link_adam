@@ -1,0 +1,3 @@
+echo `sla_link` `agi_link_adam` `fio_link_adam` -lpda \
+| awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+# $Id$

@@ -1,0 +1,55 @@
+.help prim Starlink pongohelp
+.nf
+Perform primitive plotting functions.
+
+Usage:
+   prim action x y
+
+Description:
+
+   Perform the primitive plotting functions: "move to", "draw line to",
+   and "mark".
+
+Parameters:
+
+ACTION = _CHAR (Read)
+   Type of primitive function. This may be one of the following:
+
+   - "M" -- move to,
+
+   - "D" -- draw line to,
+
+   - "K" -- mark.
+
+X = _REAL (Read)
+   X coordinate of point.
+
+Y = _REAL (Read)
+   Y coordinate of point.
+
+SYMBOL = _INTEGER (Read)
+   PGPLOT symbol number for drawing the point mark.
+
+PROJECTION = _CHAR (Read)
+   The geometry that is to be used for plotting. This is
+   explained in more detail in the section on projections.
+   Allowed values: "NONE", "TAN", "SIN", "ARC", "GLS", "AITOFF",
+   "MERCATOR" and "STG". This parameter is only relevant when
+   marking points.
+
+RACENTRE = _CHAR (Read)
+   The centre of the projection in RA (i.e. the angle must be
+   specified as hh:mm:ss.sss). This parameter is only required for
+   PROJECTION values other than "NONE".
+
+DECCENTRE = _CHAR (Read)
+   The centre of the projection in declination (i.e. the angle
+   must be specified as dd:mm:ss.sss). This parameter is only
+   required for PROJECTION values other than "NONE".
+
+Notes:
+   When using non-planar coordinates, the coordinates should be
+   given in degrees. Lines drawn between points are straight.
+   Use GT_CIRCLE for drawing lines that follow great circles.
+
+.endhelp

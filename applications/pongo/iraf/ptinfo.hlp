@@ -1,0 +1,19 @@
+.help ptinfo Starlink pongohelp
+.nf
+Get the coordinates of a specified data point.
+
+Usage:
+   ptinfo label
+
+Description:
+
+   The value of a label in the LABCOL data area is given and the
+   resulting (x,y) coordinates associated with the label are
+   printed.
+
+Parameters:
+
+LABEL = _CHAR (Read)
+   The label associated with the data point.
+
+.endhelp
