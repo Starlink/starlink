@@ -35,6 +35,8 @@
 *        Original version.
 *     1992 September 10 (MJC):
 *        Minor tidying and comments added.
+*     1992 September 22 (MJC):
+*        Added ASCII2NDF, NDF2ASCII, NDF2IRAF, NDF2UNF, UNF2NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,29 +66,49 @@
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine.
 
-*  Converts from an INTERIM BDF to an NDF.
-      IF ( ACTION .EQ. 'BDF2NDF' ) THEN
+*  Converts an ASCII file to an NDF.
+      IF ( ACTION .EQ. 'ASCII2NDF' ) THEN
+         CALL ASCII2NDF( STATUS )
+
+*  Converts a Starlink INTERIM BDF file to an NDF.
+      ELSE IF ( ACTION .EQ. 'BDF2NDF' ) THEN
          CALL BDF2NDF( STATUS )
 
-*  Converts from a DIPSO file to an NDF.
+*  Converts a DIPSO file to an NDF.
       ELSE IF ( ACTION .EQ. 'DIPSO2NDF' ) THEN
          CALL DIPSO2NDF( STATUS )
 
-*  Converts from a version 2 Figaro DST file to an NDF.
+*  Converts a Figaro (Version 2) DST file to an NDF.
       ELSE IF ( ACTION .EQ. 'DST2NDF' ) THEN
          CALL DST2NDF( STATUS )
 
-*  Converts from an NDF to an INTERIM BDF.
+*  Converts an NDF to an ASCII file.
+      ELSE IF ( ACTION .EQ. 'NDF2ASCII' ) THEN
+         CALL NDF2ASCII( STATUS )
+
+*  Converts an NDF to a Starlink INTERIM BDF file.
       ELSE IF ( ACTION .EQ. 'NDF2BDF' ) THEN
          CALL NDF2BDF( STATUS )
 
-*  Converts from an NDF to a DIPSO file.
+*  Converts an NDF to a DIPSO-format file.
       ELSE IF ( ACTION .EQ. 'NDF2DIPSO' ) THEN
          CALL NDF2DIPSO ( STATUS )
 
-*  Converts from an NDF to a FIgaro version 2 DST.
+*  Converts an NDF to a Figaro (Version 2) DST file.
       ELSE IF ( ACTION .EQ. 'NDF2DST' ) THEN
          CALL NDF2DST( STATUS )
+
+*  Converts an NDF to an IRAF (OIF) image.
+      ELSE IF ( ACTION .EQ. 'NDF2IRAF' ) THEN
+         CALL NDF2IRAF( STATUS )
+
+*  Converts an NDF to a sequential unformatted file.
+      ELSE IF ( ACTION .EQ. 'NDF2UNF' ) THEN
+         CALL NDF2UNF( STATUS )
+
+*  Converts a sequential unformatted file to an NDF.
+      ELSE IF ( ACTION .EQ. 'UNF2NDF' ) THEN
+         CALL UNF2NDF( STATUS )
 
 *  If the action name is not recognised, then report an error.
       ELSE
