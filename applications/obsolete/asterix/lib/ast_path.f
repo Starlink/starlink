@@ -107,6 +107,7 @@
       IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'
+      INCLUDE 'FIO_ERR'
 
       INTEGER STATUS
 
@@ -115,17 +116,33 @@
 
       CHARACTER*132 BUF
       INTEGER ISTAT,UNIT
+      LOGICAL OPENOK
 
       IF (STATUS.NE.SAI__OK) RETURN
 
+      ISTAT=0
+
       CALL FIO_OPEN(NAME,'READ','LIST',80,UNIT,ISTAT)
-      CALL FIO_READF(UNIT,BUF,ISTAT)
+
       IF (ISTAT.EQ.0) THEN
+
+        CALL FIO_READF(UNIT,BUF,ISTAT)
+
+        IF (ISTAT.EQ.0) THEN
+          ISAFILE=.TRUE.
+        ELSE
+          ISAFILE=.FALSE.
+          CALL ERR_ANNUL(ISTAT)
+        ENDIF
+
         CALL FIO_CLOSE(UNIT,ISTAT)
-        ISAFILE=.TRUE.
+
       ELSE
         ISAFILE=.FALSE.
         CALL ERR_ANNUL(ISTAT)
       ENDIF
 
+
+
       END
+
