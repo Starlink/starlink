@@ -345,7 +345,9 @@ implied in any of them, and you have to give it explicitly.
 .TP
 .I --query=bitmaps
 Prints on stdout a line for each bitmap it generates, giving the
-filename, horizontal size, and vertical size, in pixels.
+filename, horizontal size, and vertical size, in pixels.  This will
+also report the position of any `mark' in the bitmap; see special `mark'
+below.
 .TP
 .I "-Qf, --query=missing-fonts"
 Show missing fonts.
@@ -677,6 +679,36 @@ A useful bit of TeX magic is:
 Once you've done that, the command 
 .I "\eDBstrut"
 will put an appropriate strut in the output.
+.TP
+.I mark
+.IP
+This sets a `mark' in the generated file, which is reported when
+you specify 
+.I "--query=bitmaps."
+Normally, 
+.I "--query=bitmaps"
+writes out the horizontal and vertical size of the generated bitmap.
+If use of this special has placed a `mark' in the bitmap, however,
+then the
+.I "--query"
+option also reports the position of that
+mark, as a position within the bitmap, such that the top-left corner
+of the bitmap has coordinates (0,0).  For example, after
+  \f(CR\enoindent\especial{dvi2bitmap mark}Hello\fP
+.br
+the command line
+  \f(CRdvi2bitmap --query=bitmaps foo\fP
+.br
+might report
+  \f(CRQbitmaps foo-page1.png 80 14 -1 10\fP
+.br
+indicating that the bitmap is 80 pixels wide by 14 high, and that the
+reference point, after cropping, is at position (-1, 10).  The
+`-1' is because the mark appears to the left of the `H' of `Hello' (and
+the `H' probably has some negative offset), and the `10' indicates
+that the baseline of this text is 10 pixels from the top of the
+bitmap;  this latter information might be useful when working out how
+to position this bitmap within a generated HTML file.
 .PP
 As an example, the pair of commands
   \f(CR\especial{dvi2bitmap default outputfile trial-#.gif crop all 5}

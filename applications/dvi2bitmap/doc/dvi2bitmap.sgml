@@ -467,7 +467,9 @@ explicitly.</p></dd>
 
 <dt><code>&ddash;query=bitmaps</code></dt>
 <dd>Prints on stdout a line for each bitmap it generates, giving the
-filename, horizontal size, and vertical size, in pixels.</dd>
+filename, horizontal size, and vertical size, in pixels.  This also
+reports the position of any `mark' in the bitmap -- see <ref
+id="usage.special.mark"/>.</dd>
 
 <dt><code>-Qf, &ddash;query=missing-fonts</code></dt>
 
@@ -737,6 +739,37 @@ position in the file where this special appears, 2pt to the right,
 </verbatim>
 Once you've done that, the command <code/\DBstrut> will put an
 appropriate strut in the output.
+
+<dt id="usage.special.mark"><code>mark</code></dt>
+<dd>
+<p>This sets a `mark' in the generated file, which is reported when
+you specify <code>--query=bitmaps</code> (see <ref
+id="usage.options.q"/>).  Normally, <code>--query=bitmaps</code>
+writes out the horizontal and vertical size of the generated bitmap.
+If use of this special has placed a `mark' in the bitmap, however,
+then the <code>--query</code> option also reports the position of that
+mark, as a position within the bitmap, such that the top-left corner
+of the bitmap has coordinates <em>(0,0)</em>.  For example, after
+<verbatim>
+\noindent\special{dvi2bitmap mark}Hello
+</verbatim>
+the command line
+<verbatim>
+dvi2bitmap --query=bitmaps foo
+</verbatim>
+might report
+<verbatim>
+Qbitmaps foo-page1.png 80 14 -1 10
+</verbatim>
+indicating that the bitmap is 80 pixels wide by 14 high, and that the
+reference point, after cropping, is at position <em>(-1, 10)</em>.  The
+`-1' is because the mark appears to the left of the `H' of `Hello' (and
+the `H' probably has some negative offset), and the `10' indicates
+that the baseline of this text is 10 pixels from the top of the
+bitmap;  this latter information might be useful when working out how
+to position this bitmap within a generated HTML file.
+</p>
+</dd>
 
 </dl>
 

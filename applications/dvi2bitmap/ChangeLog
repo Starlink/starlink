@@ -1,8 +1,16 @@
 2003-09-30  Norman Gray  <norman@astro.gla.ac.uk>
 
+	* Bitmap.cc, Bitmap.h : Added support for marks in bitmaps,
+	settable by Bitmap::mark() and retrievable by getMark()
+
+	* dvi2bitmap.cc: add `mark' special, to use new functionality in
+	Bitmap.cc
+
 	* DviFile.cc, DviFile.h, dvi2bitmap.cc, dvireport.cc: Added
 	DviFileEvent::release method to release events, instead of using
 	`delete'.  Documented that this is correct practice.
+
+	* all: released version 0.12b1
 
 2003-09-07  Norman Gray  <norman@astro.gla.ac.uk>
 

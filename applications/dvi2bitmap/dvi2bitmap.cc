@@ -524,7 +524,7 @@ int main (int argc, char **argv)
 			break;
 
 		      case 8:	// bitmaps
-			Bitmap::logBitmapInfo (true);
+			Bitmap::logBitmapInfo ("Qbitmaps ");
 			break;
 
 		      case 9:	// paper
@@ -1133,8 +1133,8 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 	    // calculate glyph positions, taking into account the
 	    // offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
 	    // = (resolution px,resolution px) offset of the TeX origin.
-	    int x = dvif->currH() + glyph.hoff() + oneInch;
-	    int y = dvif->currV() + glyph.voff() + oneInch;
+	    int x = dvif->currH(DviFile::unit_pixels) + glyph.hoff() + oneInch;
+	    int y = dvif->currV(DviFile::unit_pixels) + glyph.voff() + oneInch;
 	    bitmap->paint (x, y,
 			   glyph.w(), glyph.h(),
 			   glyph.bitmap());
@@ -1193,44 +1193,36 @@ bool process_special (DviFile *dvif, string specialString,
     bool setDefault = false;
     bool absolute = false;
 
-    if (*s == "dvi2bitmap")	// OK
-    {
+    if (*s == "dvi2bitmap") {	// OK
 	stringOK = true;
 	s++;
 
-	while (s != l.end() && stringOK)
-	{
+	while (s != l.end() && stringOK) {
 	    if (*s == "default")
 		setDefault = true;
 	    else if (*s == "absolute")
 		absolute = true;
-	    else if (*s == "outputfile")
-	    {
+	    else if (*s == "outputfile") {
 		s++;
 		if (s == l.end())
 		    stringOK = false;
 		else
-		    if (setDefault)
-		    {
+		    if (setDefault) {
 			bool seenHash = false;
 			b.ofile_pattern = "";
 			for (unsigned int i=0; i<s->length(); i++)
 			{
 			    char c;
-			    if ((c=(*s)[i]) == '#')
-			    {
-				if (! seenHash)
-				{
+			    if ((c=(*s)[i]) == '#') {
+				if (! seenHash) {
 				    b.ofile_pattern += '%';
 				    b.ofile_pattern += 'd';
 				    seenHash = true;
 				}
-			    }
-			    else
+			    } else
 				b.ofile_pattern += c;
 			}
-			if (!seenHash)
-			{
+			if (!seenHash) {
 			    b.ofile_pattern += '%';
 			    b.ofile_pattern += 'd';
 			}
@@ -1240,9 +1232,7 @@ bool process_special (DviFile *dvif, string specialString,
 		    }
 		    else
 			b.ofile_name = *s;
-	    }
-	    else if (*s == "crop")
-	    {
+	    } else if (*s == "crop") {
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
 		string side_s = *s;
@@ -1299,9 +1289,7 @@ bool process_special (DviFile *dvif, string specialString,
 			    Bitmap::cropDefault (side, dimen, absolute);
 			bitmap->crop (side, dimen, absolute);
 		    }
-	    }
-	    else if (*s == "imageformat")
-	    {
+	    } else if (*s == "imageformat") {
 		s++;
 		if (s == l.end())
 		    stringOK = false;
@@ -1320,9 +1308,7 @@ bool process_special (DviFile *dvif, string specialString,
 			cerr << "Warning: imageformat special "
 			     << "should be prefixed with `default'" << endl;
 		}
-	    }
-	    else if (*s == "foreground" || *s == "background")
-	    {
+	    } else if (*s == "foreground" || *s == "background") {
 		bool isfg = (*s == "foreground");
 		//Byte r, g, b;
 		Bitmap::BitmapColour rgb;
@@ -1351,9 +1337,7 @@ bool process_special (DviFile *dvif, string specialString,
 		    else
 			bitmap->setRGB (isfg, &rgb);
 		}
-	    }
-	    else if (*s == "strut")
-	    {
+	    } else if (*s == "strut") {
 		int x = dvif->currH() + oneInch;
 		int y = dvif->currV() + oneInch;
 		int left, right, top, bottom;
@@ -1384,8 +1368,15 @@ bool process_special (DviFile *dvif, string specialString,
 			     << top  << ',' << bottom << ")" << endl;
 		    bitmap->strut (x, y, left, right, top, bottom);
 		}
-	    }
-	    else
+            } else if (*s == "mark") {
+                // Set the mark at the current position.  This must
+                // match the offset calculations we make when setting
+                // characters handling DviFileSetChar event above.
+                bitmap->mark
+                    (dvif->currH(DviFile::unit_pixels) + oneInch,
+                     dvif->currV(DviFile::unit_pixels) + oneInch);
+                
+	    } else
 		stringOK = false;
 
 	    s++;
