@@ -34,7 +34,7 @@
 *        and the other isn't then IMG__BDEXT will be returned.
 
 *  Notes:
-*     - Modified FITS headers associated with the input source
+*     - Modified header items associated with the input source
 *       will copied to the new image.
 *
 *     - This routine may be used to copy the same header source (from a

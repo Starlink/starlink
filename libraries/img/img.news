@@ -10,7 +10,7 @@
   between images has been added.
 
   Previously it was possible that records after the END card could
-  contain NULL characters. These should now always be set BLANK.
+  contain NULL characters. These are now set BLANK.
 
   IMG is fully described in SUN/160, which you can view on-line with
   the "showme sun160" command.

@@ -911,7 +911,7 @@ the ``Flexible Image Transport System'' is the {\em de facto} standard
 for the interchange of astronomical data.}  stores these values at the
 beginning -- head -- of a file). IMG refers to a single piece of such
 information as a ``header item'' and a separate set of subroutines
-exists to read, write and make enquiries about them.
+exists to read, write, copy and make enquiries about them.
 
 \subsection{Reading header items}
 This example (taken from a complete program called
@@ -1479,7 +1479,7 @@ unlikely to be trampled on by other software (that believes it knows
 what the headers mean -- rightly or wrongly) and is typically used for
 information needed only within a particular software
 package.\footnote{The Starlink application packages CCDPACK
-(\xref{SUN/139}{sun139}{}) and SPECDRE (\xref{SUN/140}{sun140}{}) make
+(\xref{SUN/139}{sun139}{}) and POLPACK (\xref{SUN/223}{sun223}{}) make
 extensive use of these facilities.}
 
 Using header items from other sources is achieved simply by replacing
@@ -1763,7 +1763,8 @@ NDF (our ``images'' are really the main NDF data array) such as its
 variance, quality or world coordinate system. It also allows you to
 access NDF extensions (our ``sources'' of header information) in more
 sophisticated ways.  As a very simple example the next program snippet
-shows how to write out the name of an image dataset:
+shows how to write out the name of an image dataset 
+(also see \htmlref{IMG\_NAME}{IMG\_NAME}):
 \begin{code}
 \begin{verbatim}
       CALL IMG_INDF( 'IN', ID, ISTAT )                        [1]
@@ -1843,7 +1844,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
   \newcommand{\noteroutine}[3]{\item {\small\texttt{#1#2}} \nopagebreak \\
                                 \hspace*{3em}\textit{#3} }
   {\small
-  \latexonlysubsection{IMG Fortran Subroutines}
+  \latexonlysubsection{IMG Fortran subroutines}
   \begin{description}
     \noteroutine{IMG\_CANCL} {( PARAM, STATUS )}
        {Cancel an image/parameter association}
@@ -1867,7 +1868,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
        {Create a temporary image}
   \end{description}
 
-  \latexonlysubsection{HDR Fortran Subroutines}
+  \latexonlysubsection{HDR Fortran subroutines}
   \begin{description}
     \noteroutine{HDR\_COPY}{( PARAM1, XNAME1, PARAM2, XNAME2, STATUS )}
        {Copy header information from one image to another}
@@ -1890,7 +1891,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 \newpage
 \section{FULL \label{IMGDESCRIPTIONS} FORTRAN SUBROUTINE DESCRIPTIONS}
 
-\subsection{IMG Fortran Subroutines}
+\subsection{IMG Fortran subroutines}
 
 \sstroutine{IMG\_CANCL}{
    Cancel an image/parameter association
@@ -2507,7 +2508,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 }
 
 \newpage
-\subsection{HDR Fortran Subroutines}
+\subsection{HDR Fortran subroutines}
 
 \sstroutine{
    HDR\_COPY
@@ -2558,7 +2559,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
       \sstitemlist{
 
          \sstitem
-         Modified headers associated with the input source will copied
+         Modified header items associated with the input source will copied
          to the new image. 
 
          \sstitem
@@ -3670,7 +3671,7 @@ A new routine for copying sources of header information
 (\htmlref{HDR\_COPY}{HDR\_COPY}) has been added. 
 
 A bug in the FITS header writer that added NULL characters after the
-END card has been corrected. This should have only effected output
+END card has been corrected. This should have only affected output
 FITS headers that contained some initially empty cards.
 
 \end{document}
