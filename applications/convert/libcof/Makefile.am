@@ -42,7 +42,7 @@ GENERIC=@GENERIC@
 
 .gcdilr.f:
 	$(LN_S) $< $(<:.gcdilr=.gen)
-	$(GENERIC) -t cdirw $(<:.gcdilr=.gen)
+	$(GENERIC) -t cdilr $(<:.gcdilr=.gen)
 	$(RM) $(<:.gcdilr=.gen)
 
 
