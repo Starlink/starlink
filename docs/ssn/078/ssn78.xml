@@ -2414,7 +2414,7 @@ autoconf (GNU Autoconf) 2.59
         GNU-style makefiles generally do nothing at install time,
         other than occasionally adding extra material to the install
         via one of the installation hooks supplied by automake (see section
-        <webref url="&automakeman;/Install.html" >What gets
+        <webref url="&automakehtml;/Install.html" >What gets
           installed</webref> of the automake manual).</p>
 
       <p>In the traditional build system, the master source was
@@ -2724,6 +2724,187 @@ configure.ac: installing `./missing'
           have a skeleton <code>configure.ac</code> which includes a
           <code>AC_CONFIG_SUBDIRS</code> line, to which you should add
           your newly working directory.</p>
+
+      </subsect>
+
+      <subsect id="autodistrib" export="export">
+        <subhead>
+          <title>Distribution of components</title>
+        </subhead>
+
+        <p>The <code>Makefile.in</code> files which automake generates
+          generally handles distribution pretty successfully, and the
+          command <kbd>make dist</kbd> will usually do almost all the
+          work of packing your files into a distribution which can be
+          built portably.  In some cases, however, you have to give it
+          a little help.</p>
+
+        <p>There are two potential problems.  Firstly, automake may
+          not be able to accurately work out the set of files which
+          ought to be distributed.  Consider the following makefile
+          fragment (this, along with the other examples in this
+          section, is from the AST distribution, which presents a
+          variety of distribution problems):
+<verbatim>
+noinst_PROGRAMS = astbad
+astbad_SOURCES = astbad.c pointset.h
+AST_PAR: ast_par.source astbad
+    sed -e 's/&lt;AST__BAD>/'`./astbad | tr 'E' 'D'`'/' ast_par.source >$@
+</verbatim>
+          Automake packages anything mentioned in a
+          <code>_SOURCES</code> variable, so <code>astbad.c</code> and
+          <code>pointset.h</code> are included in the distribution
+          automatically.  However it does not attempt to work out
+          every consequence of the makefile rules, and so fails to
+          spot that <code>ast_par.source</code> is going to be needed
+          on the build host.  In general, a file which is mentioned
+          only in a makefile dependency will not be automatically
+          distributed by automake.  Files such as this should be
+          included by the distribution by listing them in the value of
+          the <code>EXTRA_DIST</code> variable:
+<verbatim>
+EXTRA_DIST = ast_par.source
+</verbatim></p>
+
+        <p>Automake also supports the <code>dist_</code> and
+          <code>nodist_</code> prefixes to automake variables.  These
+          can be used to adjust automake's defaults for certain
+          primaries.  Automake does not distribute
+          <code>_SCRIPTS</code> by default (this is since they are
+          sometimes generated, but I for one find this
+          counter-intuitive), so if you want a script to be
+          distributed, you must use a prefix:
+<verbatim>
+bin_SCRIPTS = ast_link
+dist_bin_SCRIPTS = ast_link_adam
+noinst_SCRIPTS = ast_cpp
+dist_noinst_SCRIPTS = makeh
+</verbatim>
+          We see all four common possibilities here:
+          <code>ast_link_adam</code> and <code>makeh</code> are needed
+          in the distribution but need no configuration, and so should
+          be distributed as they stand; <code>ast_link</code> and
+          <code>ast_cpp</code> are configured, so these files should
+          not be distributed, since the corresponding <code>.in</code>
+          files are (as a result of being mentioned in
+          <code>AC_CONFIG_FILES</code>).  Also <code>ast_cpp</code>
+          and <code>makeh</code> are used only to build the library,
+          and are not installed.  You could get the same effect by
+          listing <code>ast_link_adam</code> and <code>makeh</code> in
+          <code>EXTRA_DIST</code>, but it is probably a little less
+          opaque if all the information about particular files is kept
+          in one place.</p>
+
+        <p>On the other hand, files in <code>_SOURCES</code> variables
+          are distributed by default, so you must turn this off if one
+          of these files is generated at configure time:
+<verbatim>
+libast_la_SOURCES = \
+    $(GRP_C_ROUTINES) \
+    $(GRP_C_INCLUDE_FILES) \
+    $(GRP_F_INCLUDE_FILES) \
+    ast_err.h
+nodist_libast_la_SOURCES = \
+    ast.h \
+    AST_PAR
+</verbatim></p>
+
+        <p>Though the set of included files is deterministic, I find
+          it is not terribly predictable, and the best way to do this
+          sort of tidyup is by making a distribution, trying to build
+          it, and thus discovering which files were left out or
+          included by accident.  There is no harm in listing a file in
+          <code>EXTRA_DIST</code> which would be included
+          automatically.</p>
+
+        <p>For fuller detail on automake's distribution calculations,
+          see section <webref url="&automakehtml;/Dist.html" >What
+          Goes in a Distribution</webref> of the automake manual.</p>
+
+        <p>The second distribution problem is that some Starlink
+          components do quite a lot of work at distribution time,
+          building documentation or generating sources, generally
+          using programs or scripts which are not reasonably available
+          on the eventual build host.  This is in principle out of
+          scope for automake and autoconf, but since it is common and
+          fairly standardised in Starlink applications, Starlink automake
+          and autoconf provide some support for pre-distribution
+          configuration.</p>
+
+        <p>All configuration tests in <code>configure.ac</code> should
+          be done unconditionally, even if they are only meaningful
+          prior to a distribution -- they are redundant afterwards,
+          but cause no problems.  Any files which should be present
+          <em>only</em> prior to the distribution should be listed in
+          <code>configure.ac</code> inside macro <ref
+            id="macro-predist-sources" >STAR_PREDIST_SOURCES</ref>.
+          The <code>./configure</code> script expects to find either
+          all of these files or none of them, and if it finds some
+          other number, it will warn you.  If it finds these files, it
+          concludes that you are in a pre-distribution checkout, and
+          sets the substitution variable <code>@PREDIST@</code> to be
+          empty; if it finds none, it concludes that you are in a
+          distributed package, and defines <code>@PREDIST@</code> to
+          be the comment character <code>#</code>.  This means that
+          makefile fragments which are only usable prior to
+          distribution should all be prefixed with the string
+          <code>@PREDIST@</code>, and they will thus be enabled or
+          disabled as appropriate.  The distribution rules mentioned
+          above mean that any configuration of such undistributed
+          files must be done by hand in the <code>Makefile.am</code>,
+          and not by <code>AC_CONFIG_FILES</code>, since this macro
+          automatically distributes the files implied by its
+          arguments.</p>
+
+        <p>For example, the AST <code>configure.ac</code> has:
+<verbatim>
+STAR_LATEX_DOCUMENTATION([sun210 sun211], [sun210.htx_tar sun211.htx_tar])
+STAR_PREDIST_SOURCES(sun_master.tex)
+STAR_CHECK_PROGS(star2html)
+STAR_CHECK_PROGS(prolat, sst)   # prolat is part of SST
+</verbatim>
+          The <code>sun_master.tex</code> file is used when the
+          SUN/210 and SUN/211 files are being generated, and should
+          not be distributed.  Since the process of generating the
+          documentation uses application <code>star2html</code>, we
+          check for this and for <code>prolat</code> (and thus do this
+          redundantly even after distribution).  Most components can
+          get away with the one-argument version of
+          <code>STAR_LATEX_DOCUMENTATION</code> which avoids these
+          complications, and does the equivalent of the
+          <code>star2html</code> check internally.</p>
+
+        <p>This AST configure script also has
+<verbatim>
+STAR_PREDIST_SOURCES(error.h.in version.h.in)
+</verbatim>
+          and carefully avoids calling <code>AC_CONFIG_FILES(error.h
+          version.h)</code>.  It still has to configure these files
+          prior to distribution, so this has to be done in the
+          <code>Makefile.am</code>:
+<verbatim>
+@PREDIST@predist_subs = sed \
+@PREDIST@    -e 's,@star_facilitycode\@,$(star_facilitycode),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION_MAJOR\@,$(PACKAGE_VERSION_MAJOR),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION_MINOR\@,$(PACKAGE_VERSION_MINOR),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
+@PREDIST@    -e 's,@PERL\@,$(PERL),'
+@PREDIST@error.h: error.h.in
+@PREDIST@	rm -f $@; $(predist_subs) $< >$@
+@PREDIST@version.h: version.h.in
+@PREDIST@	rm -f $@; $(predist_subs) $< >$@
+</verbatim>
+          (this is the same technique that was illustrated in passing
+          in the discussion of `installation locations' in <ref
+            id="automakeoverview"/>).  The leading
+          <code>@PREDIST@</code> strings mean that this stanza causes
+          no problems after distribution, when the
+          <code>error.h.in</code> files are not present.
+        </p>
+
+        <p>This is admittedly a rather crude technique, but it is a
+          lot less fragile than the more elegant alternatives.</p>
 
       </subsect>
 
@@ -4105,12 +4286,22 @@ AC_SUBST(STAR_MANIFEST_DIR)
             messgen package (see <ref
               id="macro-declare-dependencies"/>).</p>
 
-          <p>This macro leaves the discovered facility name and code
-            in the shell variables <code>star_facilityname</code> and
-            <code>star_facilitycode</code> respectively (these
-            correspond to the last message file, if there is more than
-            one), from where they may be scavenged by the calling
-            configure script.</p>
+          <p>This macro also declares that the .msg files are
+            pre-distribution files (it calls <ref
+              id="macro-predist-sources"
+              ><code>STAR_PREDIST_SOURECS</code></ref>) on them, and so
+            the resulting configure script should expect not to find
+            them in an unpacked distribution.</p>
+          
+          <p>This macro leaves the discovered facility code in the
+            shell variable <code>star_facilitycode</code> (this
+            corresponds to the last message file, if there is more
+            than one), from where it may be scavenged by the calling
+            configure script.  No component should <em>need</em> to
+            use this number -- it is present for historical reasons,
+            and is potentially useful if a component needs an integer
+            which is guaranteed unique to that component.</p>
+
         </subsect>
 
         <subsect id='macro-monoliths' export='export'>
@@ -4185,6 +4376,43 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
           <p>Calls <code>AC_LIBSOURCE</code> for each of the implied
             platform-specific files. </p>
+        </subsect>
+
+        <subsect id="macro-predist-sources" export="export">
+          <subhead>
+            <title>STAR_PREDIST_SOURCES</title>
+          </subhead>
+          <p><strong><code>STAR_PREDIST_SOURCES(source-files)</code></strong></p>
+
+          <p>Give a (space-separated) list of files which should exist
+            only in the pre-distribution (ie, repository checkout)
+            state.  If one of these is found, then the substitution
+            variable <code>PREDIST</code> is set to a blank rather
+            than the comment character <code>#</code>.  This means
+            that Makefile rules which are intended to work only in the
+            pre-distribution state -- for example to generate
+            distributed sources -- should appear in
+            <code>Makefile.am</code> with each line prefixed by
+            <code>@PREDIST@</code>.  After configuration, these rules
+            will be enabled or disabled depending on the presence or
+            absence of the marker files listed in this macro.</p>
+
+          <p>We should find either all of the marker files or none of
+            them; if some but not all are found, this is probably an
+            error of some type, so warn about it.  This means, by the
+            way, that it is the presence or absence of the first
+            marker file which determines whether we are in the
+            pre-distribution or post-distribution state, with the rest
+            providing consistency checks.</p>
+
+          <p>The macro may be called more than once.  Multiple calls
+            are equivalent to a single call with all the marker files
+            in the list.  Automake checks that the files listed here
+            are not in the list of distributed files, and issues a
+            warning if they are.</p>
+
+          <p>For examples of use, see <ref id="autodistrib"/></p>
+
         </subsect>
       </sect>
 
