@@ -1489,6 +1489,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Local Variables: */
    AstBox *newbox;               /* Pointer to simpler Box */
+   AstBox *box;                  /* Pointer to Box structure */
    AstFrame *frm;                /* Pointer to current Frame */
    AstMapping *map;              /* Base -> current Mapping */
    AstMapping *result;           /* Result pointer to return */
@@ -1739,19 +1740,19 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          ps1 = astPointSet( 4, 2, "" );
          ptr1 = astGetPoints( ps1 );
          if( astOK ) {
-            newbox = (AstBox *) new;
+            box = (AstBox *) new;
 
-            ptr1[ 0 ][ 0 ] = newbox->centre[ 0 ] + newbox->extent[ 0 ];
-            ptr1[ 1 ][ 0 ] = newbox->centre[ 1 ] + newbox->extent[ 1 ];
+            ptr1[ 0 ][ 0 ] = box->centre[ 0 ] + box->extent[ 0 ];
+            ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
 
-            ptr1[ 0 ][ 1 ] = newbox->centre[ 0 ] + newbox->extent[ 0 ];
-            ptr1[ 1 ][ 1 ] = newbox->centre[ 1 ] - newbox->extent[ 1 ];
+            ptr1[ 0 ][ 1 ] = box->centre[ 0 ] + box->extent[ 0 ];
+            ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
 
-            ptr1[ 0 ][ 2 ] = newbox->centre[ 0 ] - newbox->extent[ 0 ];
-            ptr1[ 1 ][ 2 ] = newbox->centre[ 1 ] - newbox->extent[ 1 ];
+            ptr1[ 0 ][ 2 ] = box->centre[ 0 ] - box->extent[ 0 ];
+            ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
 
-            ptr1[ 0 ][ 3 ] = newbox->centre[ 0 ] - newbox->extent[ 0 ];
-            ptr1[ 1 ][ 3 ] = newbox->centre[ 1 ] + newbox->extent[ 1 ];
+            ptr1[ 0 ][ 3 ] = box->centre[ 0 ] - box->extent[ 0 ];
+            ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
          }
 
 /* Transform the Box corners into the current Frame. */
@@ -1764,7 +1765,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
                corners[ ic ] = ptr2[ 0 ][ ic ];
                corners[ 4 + ic ] = ptr2[ 1 ][ ic ];
             }
-            newpoly = astPolygon( frm, 4, 2, corners, unc, "" );
+            newpoly = astPolygon( frm, 4, 4, corners, unc, "" );
 
 /* See if all points within the Box mesh fall on the boundary of this
    Polygon, to within the uncertainty of the Region. */
