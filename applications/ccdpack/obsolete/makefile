@@ -1007,10 +1007,11 @@ rcsrevs: RCS
 	echo >> rcsrevs \
            "#  Package" `echo $(PKG_NAME) | tr a-z A-Z` "version V$(PKG_VERS)."
 	echo >> rcsrevs "#  "
-	for f in $(RCSFILES); do \
+	@ for f in $(RCSFILES); do \
            echo $$f":" `rlog -r $$f | awk '/^revision [0-9]/ {print $$2}'`; \
         done \
         >> rcsrevs
+	echo "rcsrevs updated"
 
 #  Rules for building release files from RCS repository.
 
@@ -1114,6 +1115,7 @@ $(DATA_FILES):
 
 $(PKG_NAME)_iraf.tar:
 	co $(IRAF_SCRIPTS) $(IRAF_HELP)
+	chmod 644 $(IRAF_SCRIPTS) $(IRAF_HELP)
 	cp $(CCDPACK_HOME)/documents/helpdb.mip ./
 	$(TAR_IN) $(PKG_NAME)_iraf.tar $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
 	@- $(RM) $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
@@ -1317,9 +1319,9 @@ $(IRAF_PAR) $(MONO_TCL) $(IRAF_STARTUP_SCRIPT): $(IFD_FILES)
 	$(STAR_BIN)/ifd2iraf $(PKG_NAME)
 	$(RM) $(PKG_NAME).par
 	for f in $(MONO_TCL); do \
-           echo >>$$f 'global env' \
-           echo >>$$f 'if { ! info exists $env(CCDPACK_GLOBALS) \'
-           echo >>$$f '|| $env(CCDPACK_GLOBALS) != yes } {unset DynParList}'; \
+           echo >>$$f 'global env'; \
+           echo >>$$f 'if { !( [info exists env(CCDPACK_GLOBALS)] && \'; \
+           echo >>$$f '$$env(CCDPACK_GLOBALS) == "yes") } {unset DynParList}'; \
         done
 
 #  Name of the date stamp file.  This is used to record the time of the
