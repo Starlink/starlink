@@ -1,0 +1,32 @@
+*+  SUBPAR_SYS - SUBPAR system parameters
+*
+*    Authors :
+*     AJC: A J Chipperfield (STARLINK)
+*    History :
+*     20-AUG-1993 (AJC): 
+*       Original version separated from SUBPAR_CMN 
+*     21-DEC-1994 (AJC):
+*       Add SUBPAR__STRLEN
+*-
+
+*
+*    Constants :
+*
+      INTEGER SUBPAR__NAMELEN          ! maximum length of parameter and 
+                                       ! action names
+      PARAMETER ( SUBPAR__NAMELEN = 15 )
+
+      INTEGER SUBPAR__MAXPAR           ! maximum number of parameters 
+      PARAMETER ( SUBPAR__MAXPAR = 1500 )
+
+      INTEGER SUBPAR__MAXACT           ! maximum number of actions
+      PARAMETER ( SUBPAR__MAXACT = 300 )
+
+      INTEGER SUBPAR__MAXNEEDS         ! size of NEEDS storage
+      PARAMETER ( SUBPAR__MAXNEEDS = 300 )
+
+      INTEGER SUBPAR__MAXLIMS          ! size of storage for constraints
+      PARAMETER ( SUBPAR__MAXLIMS = 500 )
+
+      INTEGER SUBPAR__STRLEN           ! size of Character values
+      PARAMETER ( SUBPAR__STRLEN = 256 )

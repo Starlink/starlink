@@ -1,0 +1,28 @@
+*   These are status values set by SUBPAR which must correspond with values
+*   defined in PAR_ERR
+*   For convienience the symbolic names are kept the same. This means that
+*   this file can only be included in SUBPAR routines and not together with
+*   PAR_ERR.
+*
+*   Authors:
+*     AJC: A J Chipperfield (Starlink)
+*
+*   History:
+*      8-JUL-1993 (AJC):
+*        Original version
+*
+      INTEGER PAR__NOUSR
+      PARAMETER ( PAR__NOUSR = 146703139 )
+*   No user available for input
+ 
+      INTEGER PAR__NULL
+      PARAMETER ( PAR__NULL = 146703163 )
+*   Null parameter value
+ 
+      INTEGER PAR__ABORT
+      PARAMETER ( PAR__ABORT = 146703171 )
+*   Parameter request aborted
+ 
+      INTEGER PAR__ERROR
+      PARAMETER ( PAR__ERROR = 146703211 )
+*   Error

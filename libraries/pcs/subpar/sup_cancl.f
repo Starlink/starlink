@@ -1,0 +1,143 @@
+      SUBROUTINE SUBPAR_CANCL ( NAMECODE, STATUS )
+*+
+*  Name:
+*     SUBPAR_CANCL
+
+*  Purpose:
+*     cancel association between a parameter and a data object.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL SUBPAR_CANCL ( NAMECODE, STATUS )
+
+*  Description:
+*     An existing association between the parameter and a data
+*     system object is cancelled, and the container file for it closed.
+
+*  Arguments:
+*     NAMECODE=INTEGER (given)
+*        Index number of program parameter
+*     STATUS=INTEGER
+
+*  Algorithm:
+*     The locators associated with the parameter are obtained from
+*     internal storage, and if they are valid, all locators associated
+*     with the parameter name are flushed. Unless the parameter is
+*     associated with the temporary HDS parameter store, the HDS
+*     container file is closed.
+*     The routine operates even if the entry status is not OK.
+
+*  Implementation Deficiencies:
+*     (1) If the parameter does not have a data structure associated with
+*     it, then this is not considered an error condition. This is how
+*     DAT_CANCL operates in SSE 0.75.
+*     (2) The SSE DAT_CANCL does not close HDS container files.
+
+*  Authors:
+*     BDK: B D Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-AUG-1984 (BDK):
+*        Original
+*     16-AUG-1988 (AJC):
+*        Include SUBPAR_PAR - How did it work before
+*     26-FEB-1993 (AJC):
+*        Add INCLUDE DAT_PAR
+*      3-FRB-2000 (AJC):
+*        Use SUBPAR_PARGP to get the HDS group name for the parameter
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'SUBPAR_PAR'
+      INCLUDE 'SUBPAR_ERR'
+
+
+*  Arguments Given:
+      INTEGER NAMECODE               ! pointer to internal parameter
+                                     ! storage
+
+
+*  Status:
+      INTEGER STATUS
+
+
+*  Global Variables:
+      INCLUDE 'SUBPAR_CMN'
+
+
+*  External Functions:
+      CHARACTER*(DAT__SZGRP) SUBPAR_PARGP
+      EXTERNAL SUBPAR_PARGP
+
+
+*  Local Variables:
+      CHARACTER*(DAT__SZLOC) FILOC   ! top-level locator to HDS file
+
+      CHARACTER*(DAT__SZLOC) BOTLOC  ! locator to HDS component
+
+      LOGICAL VALID                  ! .TRUE. => a locator exists for
+                                     ! the named parameter
+
+      INTEGER ISTAT
+
+
+*.
+
+
+*
+*   preserve the entry status
+*
+      ISTAT = STATUS
+      STATUS = SAI__OK
+*
+*   Get the locator to the parameter's associated data.
+*
+      CALL SUBPAR_GETLOC ( NAMECODE, VALID, BOTLOC, STATUS )
+
+      IF ( VALID ) THEN
+*
+*      There is an association to be cancelled
+*      Annul locators associated with this parameter
+*
+         CALL HDS_FLUSH ( SUBPAR_PARGP(NAMECODE), STATUS )
+*
+*      If the parameter is not associated with the temporary
+*      parameter storage data structure, close the container file.
+*
+         IF ( PARTYPE(NAMECODE) .GE. 20 ) THEN
+            CALL SUBPAR_GETFLOC ( NAMECODE, VALID, FILOC, STATUS )
+            CALL HDS_CLOSE ( FILOC, STATUS )
+         ENDIF
+*
+*      Mark locators as not valid
+*
+         CALL SUBPAR_CANLOC ( NAMECODE, STATUS )
+
+      ENDIF
+*
+*   Reset the parameter's state and type
+*
+      PARSTATE(NAMECODE) = SUBPAR__CANCEL
+      PARTYPE(NAMECODE) = MOD ( PARTYPE(NAMECODE), 10 )
+*
+*   Restore the status
+*
+      IF ( ISTAT .NE. SAI__OK ) THEN
+         STATUS = ISTAT
+      ENDIF
+
+      END

@@ -1,0 +1,132 @@
+/*
+      SUBROUTINE SUBPAR_ADMUS( ADMUSR, AULEN, STATUS )
+*+
+*  Name:
+*     SUBPAR_ADMUS
+
+*  Purpose:
+*     To obtain a string defining the ADAM_USER directory
+
+*  Language:
+*     C (Fortran callable)
+
+*  Invocation:
+*     CALL SUBPAR_ADMUS( ADMUSR, STATUS )
+
+*  Description:
+*     This is the UNIX version.
+*     The routine translates environment variable ADAM_USER
+*     If there is no translation, environment variable HOME is translated
+*     and subdirectory /adam of it is used.
+*     If neither of these are successful, a null string is returned.
+
+*  Arguments:
+*     ADMUSR = CHARACTER*(*) (Returned)
+*        String containing the definition of the ADAM_USER directory
+*        (including a terminating /).
+*     AULEN = INTEGER (Returned)
+*        The used length of the string
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     AJC: A J Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-MAY-1995 (AJC):
+*        Original version.
+*     14-DEC-1995 (AJC):
+*        Include stdlib.h for getenv (required by LINUX).
+*     27-FEB-1998 (AJC):
+*        Trap $HOME not defined
+*     {enter_changes_here}
+
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+#include "sae_par.h"
+#include "f77.h"
+#include "cnf.h"
+#include "ems.h"
+#include "ems_par.h"
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+F77_SUBROUTINE(subpar_admus)( CHARACTER(admus), INTEGER(aulen), INTEGER(status)
+                           TRAIL(admus) )
+{
+GENPTR_CHARACTER(admus)
+GENPTR_INTEGER(aulen)
+GENPTR_INTEGER(status)
+
+char buffer[200];
+char *tmp;
+char output[201];
+int *nchars;
+struct stat statb;
+
+/*  Check inherited global status. */
+   if (*status) return;
+
+/*  Attempt the translation of ADAM_USER.
+ *  If it didn't work, use ~/adam
+ */
+   if ( ( tmp = getenv( "ADAM_USER" ) ) != NULL ) {
+      strcpy( buffer, tmp );
+   } else if ( ( tmp = getenv( "HOME" ) ) != NULL ) {
+      strcpy( buffer, tmp );
+      strcat( buffer, "/adam" );
+   }
+
+   if ( tmp != NULL ) {
+      *aulen = strlen( buffer );
+
+/*  Ensure that the directory exists
+ */
+      if ( !stat ( buffer, &statb ) ) {
+/* File exists - check it's a directory */
+         if ( ! ( statb.st_mode & S_IFDIR ) ) {
+/* Not a directory */
+            *status = SAI__ERROR;
+            ems_rep_c("ADMUS1",
+                   "Failed to create ADAM_USER directory", status );
+            ems_setc_c("PATH", buffer, EMS__SZTOK);
+            ems_rep_c("ADMUS2",
+                   "^PATH exists and is not a directory", status );
+         }
+      } else {
+/* Failed to get file info
+ * Maybe because the file doesn't exist
+ * Try to make the directory anyway
+ */
+         if ( subpar_mkdir( buffer ) ) {
+            *status = SAI__ERROR;
+            ems_rep_c("ADMUS3","Failed to create ADAM_USER directory",status);
+            ems_setc_c( "DIR", buffer, EMS__SZTOK );
+            ems_rep_c("ADMUS4", "^DIR", status);
+         }
+      }
+      if( *(buffer + *aulen -1) != '/' ) {
+         *( buffer + (*aulen)++ ) = '/';
+         *(buffer + *aulen ) = '\0';
+      }
+/* Export the name to Fortran
+ */
+      cnf_exprt( buffer, admus, admus_length );
+     
+   } else {
+/* Failed to translate environment variables
+ */
+      buffer[0] = '\0';
+      *status = SAI__ERROR;
+      ems_rep_c("ADMUS3","Failed to create ADAM_USER directory",status);
+      ems_rep_c("ADMUS4", "Neither $ADAM_USER nor $HOME are defined", status);
+   }
+}

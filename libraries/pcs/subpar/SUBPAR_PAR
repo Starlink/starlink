@@ -1,0 +1,64 @@
+*+ SUBPAR_PAR - Constants used by the ADAM parameter system
+*  History:
+*    14-JUL-1992 (AJC):
+*       Add states MIN and MAX
+*    16-MAR-1993 (AJC):
+*       Rename state ACCPR to ACCEPT
+*       Add ACCPR, RESACCPR
+*
+*   Values defining parameter types
+*
+      INTEGER SUBPAR__NOTYPE           ! no type defined
+      INTEGER SUBPAR__CHAR           ! character string
+      INTEGER SUBPAR__REAL           ! real number
+      INTEGER SUBPAR__DOUBLE         ! double precision number
+      INTEGER SUBPAR__INTEGER        ! integer number
+      INTEGER SUBPAR__LOGICAL        ! logical value
+      INTEGER SUBPAR__LITERAL        ! literal string
+      INTEGER SUBPAR__NULLTYPE       ! null for default value
+
+      PARAMETER ( SUBPAR__NOTYPE = 0 )
+      PARAMETER ( SUBPAR__CHAR = 1 )
+      PARAMETER ( SUBPAR__REAL = 2 )
+      PARAMETER ( SUBPAR__DOUBLE = 3 )
+      PARAMETER ( SUBPAR__INTEGER = 4 )
+      PARAMETER ( SUBPAR__LOGICAL = 5 )
+      PARAMETER ( SUBPAR__LITERAL = 6 )
+      PARAMETER ( SUBPAR__NULLTYPE = 7 )
+*
+*   Flags defining whether a constraint list stored in the internal 
+*   parameter store is continous (ie. a range) or discrete (ie. a set of 
+*   possible values)
+      INTEGER SUBPAR__DISCRETE
+      INTEGER SUBPAR__CONTINUOUS
+
+      PARAMETER ( SUBPAR__DISCRETE = 0 )
+      PARAMETER ( SUBPAR__CONTINUOUS = 1 )
+
+*
+*   Maximim number of limits for each ADAM parameter;
+*   This parameter is used by the MACADAM interface routines
+      INTEGER SUBPAR__MACMAXLIMS
+      PARAMETER (SUBPAR__MACMAXLIMS=40)
+*
+*   Codes for parameter state
+*
+      INTEGER SUBPAR__GROUND, SUBPAR__ACTIVE, SUBPAR__CANCEL, 
+     :  SUBPAR__NULL, SUBPAR__EOL, SUBPAR__RESET, SUBPAR__ACCEPT,
+     :  SUBPAR__RESACC, SUBPAR__FPROMPT, SUBPAR__RESPROM,
+     :  SUBPAR__MIN, SUBPAR__MAX, SUBPAR__ACCPR, SUBPAR__RESACCPR
+
+      PARAMETER ( SUBPAR__GROUND  = 0 )
+      PARAMETER ( SUBPAR__ACTIVE  = 1 )
+      PARAMETER ( SUBPAR__CANCEL  = 2 )
+      PARAMETER ( SUBPAR__NULL    = 3 )
+      PARAMETER ( SUBPAR__EOL     = 4 )
+      PARAMETER ( SUBPAR__RESET   = 5 )
+      PARAMETER ( SUBPAR__ACCEPT   = 6 )
+      PARAMETER ( SUBPAR__RESACC  = 7 )
+      PARAMETER ( SUBPAR__FPROMPT  = 8 )
+      PARAMETER ( SUBPAR__RESPROM = 9 )
+      PARAMETER ( SUBPAR__MAX = 10 )
+      PARAMETER ( SUBPAR__MIN = 11 )
+      PARAMETER ( SUBPAR__ACCPR = 12 )
+      PARAMETER ( SUBPAR__RESACCPR = 13 )
