@@ -1,15 +1,115 @@
 *+  USI_CMN - Internal common for USI routines
-      INTEGER USI_NMAX
-      PARAMETER (USI_NMAX=20)
+
+*    Constants constraining system
+      INTEGER			USI__MXCTX		! Max no. contexts
+        PARAMETER		( USI__MXCTX = 5 )
+      INTEGER			USI__MXPSYS		! Max no. par systems
+        PARAMETER		( USI__MXPSYS = 3 )
+      INTEGER			USI__MXPRTN		! Max no. par methods
+        PARAMETER		( USI__MXPRTN = 100 )
+      INTEGER 			USI__NMAX
+        PARAMETER               ( USI__NMAX = 20 )
+
+*    List markers
+      INTEGER			USI__L_UNUSED		! Unused slot
+        PARAMETER		( USI__L_UNUSED = -1 )
+      INTEGER			USI__L_TERM		! List terminator
+        PARAMETER		( USI__L_TERM = 0 )
+
+*    Constants constraining system
+      INTEGER			USI__MXTSK		! Max no. tasks
+        PARAMETER		( USI__MXTSK = 300 )
+      INTEGER			USI__MXPAR		! Max no. parameters
+        PARAMETER		( USI__MXPAR = 2000 )
+      INTEGER			USI__MXACTPAR		! Max no. parameters
+        PARAMETER		( USI__MXACTPAR = 50 )  ! in active applic
+
+*    Parameter storage
+      STRUCTURE /PARAMETER/
+	BYTE			TYPE			! Type code
+        BYTE			POSITION		! Parameter position
+        INTEGER			PRO_PTR, PRO_LEN	! Prompt data
+        INTEGER			DEF_PTR, DEF_LEN	! Default data
+        INTEGER			HLP_PTR, HLP_LEN	! Help data
+        INTEGER			ASS_PTR, ASS_LEN	! Association data
+        INTEGER			KEY_PTR, KEY_LEN	! Keyword data
+        BYTE                    VPATH(5), PPATH(5)
+        CHARACTER*16		NAME			! Parameter name
+      END STRUCTURE
+
+*    Task storage
+      STRUCTURE /TASK/
+        INTEGER			F_PAR			! First parameter name
+        CHARACTER*20		NAME			! Task name
+        INTEGER			NPAR			! Number of parameters
+      END STRUCTURE
+
+*    Parameter system
+      STRUCTURE /PARSYSTEM/
+        CHARACTER*80		NAME
+        INTEGER			NLEN
+	INTEGER			RTN(USI__MXPRTN)
+      END STRUCTURE
+
+*    USI context type
+      STRUCTURE /USI_CONTEXT/
+        INTEGER			TYPE			! Context par system
+        LOGICAL			GOTIFL
+        CHARACTER*512		CSTRING			! Command string
+        INTEGER			CLEN			! Length of CSTRING
+        CHARACTER*512		PSTRING			! Parameters used
+        INTEGER			PLEN			! Length of PSTRING
+        INTEGER                 TASK			! Active task id
+        INTEGER                 PARCODE(USI__MXACTPAR)	! Par code
+        INTEGER                 PARSTATE(USI__MXACTPAR)	! Par states
+        BYTE                    PARVPATH(5,USI__MXACTPAR)
+        BYTE                    PARPPATH(5,USI__MXACTPAR)
+        INTEGER                 PARTYPE(USI__MXACTPAR)	! Par types
+        CHARACTER*(DAT__SZLOC)  PSTORE			! Parameter values
+      END STRUCTURE
+
+*    Master USI initialised switch
+      LOGICAL			USI_SYINIT		! USI initialised?
+
+*    Command logging control
+      CHARACTER*4		USI_LOGMODE		! Logging mode
+      CHARACTER*132      	USI_LOGFILE		! Logging file
+      INTEGER			USI_LOGIMODE		! Logging mode id
+      INTEGER			USI_LOGFID		! Logging FIO id
+      LOGICAL			USI_LOGGING		! Logging enabled?
+
+*    Parameter system storage
+      INTEGER			USI_NPSYS		! Number of par systems
+      RECORD /PARSYSTEM/        USI_PSYS(USI__MXPSYS)	! Par systems
+
+      INTEGER                   USI_N_P, USI_N_T
+
+      RECORD /PARAMETER/        USI_P(USI__MXPAR)
+      RECORD /TASK/        	USI_T(USI__MXTSK)
+
+*    Context storage
+      INTEGER			USI_ICTX		! Current context
+      RECORD /USI_CONTEXT/	USI_CTX(USI__MXCTX)	! Contexts
+
+*    Common block definitions
+      COMMON /USI_CMN_I/        USI_ICTX,USI_NPSYS,USI_SYINIT,
+     :                           USI_LOGGING, USI_LOGIMODE, USI_LOGFID,
+     :                           USI_N_P, USI_N_T
+
+      COMMON /USI_CMN_R1/       USI_CTX,USI_PSYS
+      COMMON /USI_CMN_R2/       USI_P, USI_T
+
+      COMMON /USI_CMN_C/        USI_LOGFILE, USI_LOGMODE
+
 
       STRUCTURE /DATASET/
-        CHARACTER*(DAT__SZLOC) LOC	! locator to dataset
         LOGICAL USED			! whether this slot being used
+        CHARACTER*20 PAR		! Parameter name
+        CHARACTER*(DAT__SZLOC) LOC	! locator to dataset
         CHARACTER*1 IO			! input or output dataset
       ENDSTRUCTURE
 
-      RECORD /DATASET/ DS(USI_NMAX)	! datasets
+      RECORD /DATASET/          DS(USI__NMAX)	! datasets
 
-
-      COMMON /USI_CMN/ DS
+      COMMON /USI_CMN_DS/ DS
 *-
