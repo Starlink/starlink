@@ -155,6 +155,8 @@
 #  History:
 #     28-JUN-1997 (DSB):
 #        Original version.
+#     7-DEC-1998 (DSB):
+#        Corrected TCL linking, and updated libraries to Tcl V7.6 and Tk V4.2.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -308,9 +310,8 @@ KAPPA_SOURCE = $(STARLINK)/sources/kappa
 
 #  Tcl/Tk 
 
-STARTCL_DIR = /star/starlink/tclsys/startcl
-TCL_VERS = 7.4
-TK_VERS = 4.0
+TCL_VERS = 7.6
+TK_VERS = 4.2
 
 # A list of startcl object files only needed on the current platform.
 SYSOBJS = 
@@ -361,9 +362,6 @@ $(DOCUMENTATION)
 PUBLIC_SCRIPTS = Polka.tcl Polka_procs.tcl \
 CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay irg_wild polimp.csh \
 polexp.csh
-
-# List of StarTcl files which must reside in the POLPACK binary directory.
-# These should be in the STARTCL_DIR directory.
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 
