@@ -1614,7 +1614,6 @@
 
 *  Local Variables:
       REAL			MAXR			! Extreme radii
-      REAL			X0, Y0			! Centre of bgnd annuli
       REAL			XW, YW			! World coords
       REAL			R			! Off-axis angle
       REAL			RBIN			! Radial bin size
@@ -1642,8 +1641,8 @@
       ELSE IF ( AREA(1:3) .EQ. 'ANN' ) THEN
 
 *    Get centre of field
-        CALL USI_GET0R( 'X', X0, STATUS )
-        CALL USI_GET0R( 'Y', Y0, STATUS )
+        CALL USI_GET0R( 'X', I_BGM_X0, STATUS )
+        CALL USI_GET0R( 'Y', I_BGM_Y0, STATUS )
 
 *    Find extreme radius
         MAXR = VAL__MINR
@@ -1651,19 +1650,17 @@
           DO I = 1, I_NX, I_NX-1
             CALL IMG_PIXTOWORLD( REAL(I)-0.5, REAL(J)-0.5, XW, YW,
      :                           STATUS )
-            R = SQRT( (XW-X0)**2 + (YW-Y0)**2 )
+            R = SQRT( (XW-I_BGM_X0)**2 + (YW-I_BGM_Y0)**2 )
             MAXR = MAX( MAXR, R )
           END DO
         END DO
-        I_BGM_X0 = X0
-        I_BGM_Y0 = Y0
 
 *    Number of samples is radial range divided by annulus width
         CALL USI_GET0R( 'RBIN', I_BGM_RBIN, STATUS )
         I_BGM_NSAMP =  INT(MAXR / I_BGM_RBIN) + 1
 
 *    Compute sample index
-        CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, X0, Y0, RBIN,
+        CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, I_BGM_X0, I_BGM_Y0, RBIN,
      :                           %VAL(I_BGM_SAMIDX), STATUS )
 
       ELSE IF ( AREA(1:3) .EQ. 'BOX' ) THEN
@@ -1801,10 +1798,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop over image
-      DO J = 1, I_NY
+      DO J = 1, NY
         YW = I_YBASE + (J-1)*I_YSCALE
         Y2 = (YW-Y0)**2
-        DO I = 1, I_NX
+        DO I = 1, NX
           IF ( IDX(I,J) .GT. 0 ) THEN
             XW = I_XBASE + (I-1)*I_XSCALE
             R = SQRT( (XW-X0)**2 + Y2 ) / RBIN
@@ -2470,14 +2467,14 @@
       ELSE
         CALL MSG_SETR( 'R', MAXFR )
         CALL MSG_SETR( 'X', XW1 )
-        CALL MSG_SETR( 'Y', YW2 )
+        CALL MSG_SETR( 'Y', YW1 )
         CALL MSG_PRNT( '  Worst +ve deviation from model is ^R% at '/
-     :               /'pixel (^X,^Y)' )
+     :               /'(^X,^Y)' )
         CALL MSG_SETR( 'R', MINFR )
         CALL MSG_SETR( 'X', XW2 )
         CALL MSG_SETR( 'Y', YW2 )
         CALL MSG_PRNT( '  Worst -ve deviation from model is ^R% at '/
-     :               /'pixel (^X,^Y)' )
+     :               /' (^X,^Y)' )
       END IF
 
       END
