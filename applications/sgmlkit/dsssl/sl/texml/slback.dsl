@@ -2,7 +2,7 @@
   <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
   <!ENTITY lib.dsl		SYSTEM "../lib/sllib-jade-1.2.1.dsl" SUBDOC>
   <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
-  <!ENTITY params.dsl		PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN">
+  <!ENTITY params.dsl		PUBLIC "-//Starlink//TEXT DSSSL TeXML Parameterisation//EN">
 ]>
 <!-- $Id$ -->
 
@@ -86,8 +86,8 @@ Jade pass.
 
 (define (make-bibliography)
   (let* ((bibcontents (and (hasbibliography?)
-			   (read-entity (string-append (root-file-name)
-						       ".latexbib.bbl")))))
+			   (read-entity (string-append (index-file-name)
+						       ".texmlbib.bbl")))))
     (if bibcontents
 	(make sequence
 	  (make-latex-empty-command name: "section"
@@ -216,7 +216,7 @@ by BibTeX.
 
 (root
     (make sequence
-      (make fi data: (string-append (root-file-name) ":"))
+      (make fi data: (string-append (index-file-name) ":"))
       (get-bibliography)))
 
 (define (get-bibliography)
@@ -229,8 +229,8 @@ by BibTeX.
 	 )
     (if (node-list-empty? citations)
 	(empty-sosofo)
-	(make entity system-id: (string-append (root-file-name)
-					       ".latexbib.aux")
+	(make entity system-id: (string-append (index-file-name)
+					       ".texmlbib.aux")
 	      (make fi data: "\\relax
 ")
 	      (process-node-list citations)
