@@ -1,3 +1,4 @@
+#include <config.h>
 *+  PARSECON_OPENIFL - Open interface file and return its channel number
       SUBROUTINE PARSECON_OPENIFL ( IFLNAM, LUCON, STATUS )
 *    Description :
