@@ -344,6 +344,8 @@
 *     1999 May 4 (TDCA):
 *        Fixed bug in the way _DOUBLE variance arrays are copied into
 *        the work arrays: now behaves as for _REAL data. 
+*     24-SEP-2002 (DSB):
+*        Correct "variance supplied" flags passed to KPG1_METHE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -371,6 +373,8 @@
       PARAMETER ( LEXP = 132 )
       INTEGER MXIN               ! Maximum number of input NDFs/params
       PARAMETER ( MXIN = 26 )
+      INTEGER MAXNIN             ! Maximum number of array refs in expression
+      PARAMETER ( MAXNIN = 50 )
       INTEGER MXBAT
       PARAMETER ( MXBAT = 256 )  ! Size of workspace for pixel batches
 
@@ -426,6 +430,7 @@
       LOGICAL UNITS              ! Propagate units component?
       LOGICAL VAR                ! Process variance arrays?
       LOGICAL VARI( MXIN )       ! Variance present or needed in an NDF
+      LOGICAL VFLAG( MAXNIN )    ! Variance available for a referenced array
 
 *  Local Data:
       DATA ALPBET / 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' /
@@ -554,6 +559,17 @@
          END IF
          IF ( STATUS .NE. SAI__OK ) GO TO 999
    40 CONTINUE
+
+*  Abort if too many arrays are references in the expression.
+      IF( NINTOT .GT. MAXNIN .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'MAX', MAXNIN )
+         CALL MSG_SETI( 'N', NINTOT )
+         CALL ERR_REP( 'MATHS_ERR', 'Too many arrays (^N) referenced '//
+     :                 'in the expression. Maximum allowed is ^MAX.', 
+     :                 STATUS )
+         GO TO 999
+      END IF
 
 *  Finally obtain values for the constants (PA-PZ), as these may not
 *  contain any further tokens.
@@ -839,6 +855,7 @@
                   J = J + 1
                   CALL KPG1_PROWR( EL, %VAL( PNTR1( 1 ) ), J,
      :                             %VAL( PNTRW( 1 ) ), STATUS )
+                  VFLAG( J ) = VARI( I )
                END IF
 
 *  Copy the variance array into work space when it is in the expression.
@@ -846,6 +863,7 @@
                   J = J + 1
                   CALL KPG1_PROWR( EL, %VAL( PNTR1( 2 ) ), J,
      :                             %VAL( PNTRW( 1 ) ), STATUS )
+                  VFLAG( J ) = .FALSE.
                END IF
 
 *  If necessary, copy the variance values in the same way into the
@@ -866,6 +884,7 @@
                   J = J + 1
                   CALL KPG1_PROWD( EL, %VAL( PNTR1( 1 ) ), J,
      :                             %VAL( PNTRW( 1 ) ), STATUS )
+                  VFLAG( J ) = VARI( I )
                END IF
 
 *  Copy the variance array into work space when it is in the expression.
@@ -873,6 +892,7 @@
                   J = J + 1
                   CALL KPG1_PROWD( EL, %VAL( PNTR1( 2 ) ), J,
      :                             %VAL( PNTRW( 1 ) ), STATUS )
+                  VFLAG( J ) = .FALSE.
                END IF
 
 *  If necessary, copy the variance values in the same way into the
@@ -1088,13 +1108,13 @@
 *  evaluate output variance estimates, depending on the type of
 *  arithmetic required.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_MTHER( BAD, EL, NINTOT, %VAL( PNTRW( 1 ) ), VARI,
+            CALL KPG1_MTHER( BAD, EL, NINTOT, %VAL( PNTRW( 1 ) ), VFLAG,
      :                       %VAL( PNTRW( 2 ) ), IMAP, QUICK, MXBAT,
      :                       %VAL( PNTRB ), %VAL( PNTR2( 1 ) ),
      :                       %VAL( PNTR2( 2 ) ), BADDR, BADVR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_MTHED( BAD, EL, NINTOT, %VAL( PNTRW( 1 ) ), VARI,
+            CALL KPG1_MTHED( BAD, EL, NINTOT, %VAL( PNTRW( 1 ) ), VFLAG,
      :                       %VAL( PNTRW( 2 ) ), IMAP, QUICK, MXBAT,
      :                       %VAL( PNTRB ), %VAL( PNTR2( 1 ) ),
      :                       %VAL( PNTR2( 2 ) ), BADDR, BADVR, STATUS )
