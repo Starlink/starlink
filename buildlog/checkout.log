@@ -8709,6 +8709,7 @@ U java/source/splat/src/docs/gifs/jpeg.gif
 U java/source/splat/src/docs/gifs/line.gif
 U java/source/splat/src/docs/gifs/linefitplotwindow.gif
 U java/source/splat/src/docs/gifs/linefitwindow.gif
+U java/source/splat/src/docs/gifs/location.gif
 U java/source/splat/src/docs/gifs/mainfigure3.gif
 U java/source/splat/src/docs/gifs/mainfigure4.gif
 U java/source/splat/src/docs/gifs/modify.gif
@@ -8716,7 +8717,6 @@ U java/source/splat/src/docs/gifs/multidisplay.gif
 U java/source/splat/src/docs/gifs/openfile.gif
 U java/source/splat/src/docs/gifs/panner.gif
 U java/source/splat/src/docs/gifs/pannerwindow.gif
-U java/source/splat/src/docs/gifs/plot.gif
 U java/source/splat/src/docs/gifs/plot1.gif
 U java/source/splat/src/docs/gifs/plot2.gif
 U java/source/splat/src/docs/gifs/plot3.gif
@@ -8740,6 +8740,7 @@ U java/source/splat/src/docs/gifs/savestack.gif
 U java/source/splat/src/docs/gifs/select.gif
 U java/source/splat/src/docs/gifs/special.gif
 U java/source/splat/src/docs/gifs/splatmovie.gif
+U java/source/splat/src/docs/gifs/ssap.gif
 U java/source/splat/src/docs/gifs/table.gif
 U java/source/splat/src/docs/gifs/text.gif
 U java/source/splat/src/docs/gifs/treeview.gif
@@ -8748,6 +8749,7 @@ U java/source/splat/src/docs/gifs/unarymathwindow.gif
 U java/source/splat/src/docs/gifs/viewwindow.gif
 U java/source/splat/src/docs/gifs/xrange.gif
 U java/source/splat/src/docs/gifs/xunits.gif
+U java/source/splat/src/docs/gifs/yunits.gif
 cvs checkout: Updating java/source/splat/src/docs/programming.htx
 U java/source/splat/src/docs/programming.htx/WARNINGS
 U java/source/splat/src/docs/programming.htx/blueball.gif
@@ -9119,6 +9121,7 @@ U java/source/splat/src/docs/sun243_figures/jpeg.eps
 U java/source/splat/src/docs/sun243_figures/line.eps
 U java/source/splat/src/docs/sun243_figures/linefitplotwindow.eps
 U java/source/splat/src/docs/sun243_figures/linefitwindow.eps
+U java/source/splat/src/docs/sun243_figures/location.eps
 U java/source/splat/src/docs/sun243_figures/multidisplay.eps
 U java/source/splat/src/docs/sun243_figures/openfile.eps
 U java/source/splat/src/docs/sun243_figures/panner.eps
@@ -9145,6 +9148,7 @@ U java/source/splat/src/docs/sun243_figures/savefile.eps
 U java/source/splat/src/docs/sun243_figures/savestack.eps
 U java/source/splat/src/docs/sun243_figures/select.eps
 U java/source/splat/src/docs/sun243_figures/special.eps
+U java/source/splat/src/docs/sun243_figures/ssap.eps
 U java/source/splat/src/docs/sun243_figures/table.eps
 U java/source/splat/src/docs/sun243_figures/text.eps
 U java/source/splat/src/docs/sun243_figures/treeview.eps
@@ -9153,6 +9157,7 @@ U java/source/splat/src/docs/sun243_figures/unarymathwindow.eps
 U java/source/splat/src/docs/sun243_figures/viewwindow.eps
 U java/source/splat/src/docs/sun243_figures/xrange.eps
 U java/source/splat/src/docs/sun243_figures/xunits.eps
+U java/source/splat/src/docs/sun243_figures/yunits.eps
 cvs checkout: Updating java/source/splat/src/etc
 cvs checkout: Updating java/source/splat/src/etc/ids
 U java/source/splat/src/etc/ids/Arc_Copper_Argon.ids
@@ -9232,6 +9237,7 @@ U java/source/splat/src/lib/jsci_wavelet.jar
 U java/source/splat/src/lib/splat_colt.jar
 U java/source/splat/src/lib/splat_colt_license.txt
 U java/source/splat/src/lib/splat_help.jar
+U java/source/splat/src/lib/toolbar.jar
 cvs checkout: Updating java/source/splat/src/main
 cvs checkout: Updating java/source/splat/src/main/uk
 cvs checkout: Updating java/source/splat/src/main/uk/ac
@@ -9307,6 +9313,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitViewModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineProperties.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineRenderer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LocalLineIDManager.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/LogAxesControl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ModelLine.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ModelLineTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ModelLineView.java
@@ -9327,8 +9334,10 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleDataLimitControls.
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleUnaryMaths.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecChangedEvent.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecCoordinatesFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecCutter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecCutterFrame.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecDataUnitsFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecFilterFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecListModel.java
@@ -9337,7 +9346,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecSubList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTransferHandler.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecViewerFrame.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecXCoordTypeFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectrumIO.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplashWindow.java
@@ -9348,6 +9356,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatName.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatPlotTable.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSplash.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/ToolButtonBar.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/XGraphicsRange.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/XGraphicsRangesModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/XGraphicsRangesView.java
@@ -9385,6 +9394,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/location.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/minus.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/minus24.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/modify.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/more.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/multidisplay.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/multiply.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/openfile.gif
@@ -9421,6 +9431,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/table.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/unarymaths.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/viewer.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/xunits.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/yunits.gif
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/iface/themes
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/themes/AquaTheme.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/themes/BigContrastMetalTheme.java
@@ -10644,6 +10655,7 @@ U java/source/vo/src/testcases/uk/ac/starlink/vo/RegistryTest.java
 U java/source/vo/src/testcases/uk/ac/starlink/vo/UpToDateTest.java
 cvs checkout: Updating java/source/vo/src/wsdl
 U java/source/vo/src/wsdl/registry.wsdl
+U java/source/vo/src/wsdl/sesame.wsdl
 cvs checkout: Updating java/source/votable
 U java/source/votable/.properties
 U java/source/votable/build.xml
@@ -10720,6 +10732,7 @@ cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink/votable
 U java/source/votable/src/testcases/uk/ac/starlink/votable/DOMTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/FitsPlusTest.java
+U java/source/votable/src/testcases/uk/ac/starlink/votable/LinkTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/ParameterTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/ReferenceTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/SerializerTest.java

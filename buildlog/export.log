@@ -137,7 +137,7 @@ create_archives:
 BUILD FAILED
 /apps/cvsbuild/java/source/build.xml:496: The following error occurred while executing this line:
 /apps/cvsbuild/java/source/build.xml:132: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/aglib/build.xml:271: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/aglib/build.xml:327: /apps/cvsbuild/java/source/aglib/docs not found.
+/apps/cvsbuild/java/source/aglib/build.xml:274: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/aglib/build.xml:330: /apps/cvsbuild/java/source/aglib/docs not found.
 
-Total time: 2 minutes 41 seconds
+Total time: 2 minutes 44 seconds
