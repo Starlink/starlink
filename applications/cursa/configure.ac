@@ -36,7 +36,8 @@ AC_CHECK_FUNC(socket,,
   AC_CHECK_LIB(socket, connect,,,-lnsl))
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgp])
+STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgp], [link])
+STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 STAR_LATEX_DOCUMENTATION([sun190 ssn76])
 
