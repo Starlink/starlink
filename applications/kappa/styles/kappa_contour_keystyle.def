@@ -1,0 +1,34 @@
+#+
+#  Name:
+#     kappa_contour_keystyle.def
+
+#  Purpose:
+#     Defines the default style for the key produced by the contour
+#     application.
+
+#  Description:
+#     This file contains default settings for plotting style attributes
+#     to be used when contour draws a key. These defaults can be 
+#     over-ridden by the user by supplying a value for the KEYSTYLE 
+#     parameter when running contour. The defaults in this file over-ride
+#     the defaults in kappa_keystyle.def.
+
+#  Notes:
+#     -  Always include attribute axis qualifiers, etc, explicitly in this
+#     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
+#     just "textlab=1".
+
+#  Authors:
+#     David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-AUG-2001 (DSB):
+#        Original version.
+#-
+
+#  Set the size of the key text.
+      size=1.4
+
+#  Set the format for contour indices.
+      format(1)=%g
