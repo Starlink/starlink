@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <math.h>
-/* #include <malloc.h> */
+
 #include <stdlib.h>
+#if defined(HAVE_MALLOC_H)
+#  include <malloc.h>
+#endif
 
 #include "tcl.h"
 #include "tk.h"
