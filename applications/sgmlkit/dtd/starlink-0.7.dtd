@@ -41,14 +41,16 @@
   <!ENTITY % MOO "">
   <!-- A couple of entities for syntax removed from SGML -->
   <!ENTITY % CONREF "#IMPLIED">
-  <!ENTITY % CURRENT "#REQUIRED">
 ]]>
 <!ENTITY % Full.SGML.Only "INCLUDE">
 <!ENTITY % MXX "- -">
 <!ENTITY % MXO "- O">
 <!ENTITY % MOO "O O">
 <!ENTITY % CONREF "#CONREF">
-<!ENTITY % CURRENT "#CURRENT">
+
+<!-- %CURRENT is also defined, but below, in Feature.Versioning (if it's
+     defined here, and %Feature.Versioning is 'IGNORE', then we get an
+     `unused parameter entity' warning from SP). -->
 
 <!-- XML requires that all external entities have a SYSTEM identifier.
      All public IDs in this file which are not protected by a
@@ -665,6 +667,14 @@
 ]]>	<!-- %Feature.Docnumber; -->
 
 <![ %Feature.Versioning; [
+<!-- One of the elements in this feature (change) uses the CURRENT
+     keyword, which isn't in XML.  Before we do anything else, define
+     this as an entity. -->
+<![ %Full.SGML.Only; [
+  <!ENTITY % CURRENT "#CURRENT">
+]]>
+<!ENTITY % CURRENT "#REQUIRED">
+
 <!-- Versioning is simple.  The history consists of a sequence of
      versions, distributions and changes, regarded as events.  Versions
      are significant releases of the software or manual, distributions
