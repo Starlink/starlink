@@ -36,7 +36,8 @@
 *        'Error' for the array components DATA, QUALITY, VARIANCE, and
 *        ERROR respectively.
 *     LENGTH = INTEGER (Returned)
-*        The effective length of the output list.
+*        The effective length of the output list. Returned equal to 1 if
+*        an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -52,6 +53,8 @@
 *     1994 December 14 (DSB):
 *        Call to NDF_STATE for ERROR component changed to check
 *        for "Variance" instead of "Error".
+*     20-NOV-1998 (DSB):
+*        Return LENGTH equal to 1 if an error occurs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,6 +94,9 @@
       CHARACTER * ( 8 ) WORD     ! A word from the input list
 
 *.
+
+*  Initialise.
+      LENGTH = 1
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -185,5 +191,8 @@
             CEND = CSTART
          END IF
       END DO
+
+*  Check for error.
+      IF( STATUS .NE. SAI__OK ) LENGTH = 1
 
       END
