@@ -561,7 +561,7 @@ if test $tclversint -gt $reqversint; then
     fi
 
     # These envs include $TCL_DBGX -- expand this out.
-    eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
+    eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC $TK_LIB_SPEC $TK_XLIBSW\""
 
     echo "TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\"; TCLSH=\"$tclsh_loc\"; WISH=\"$wish_loc\""
     status=0
