@@ -1,0 +1,48 @@
+
+test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
+test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
+
+export AUTOASTROM_DIR;
+exec $PERLBIN <<'EOD';
+
+use NDF;
+
+use lib '..';
+use aalib;
+
+print "canonicalise_ndfname...\n";
+foreach $n (('ndfname', 'HellO4.there-howd+yedo?',
+	     '/how/do?/you.there/do/HellO4.there-howd+yedo?',
+	     '/home/norman/ndfname')) {
+    print "  $n\n    +--> ", canonicalise_ndfname($n), "\n";
+}
+
+print "\ntwodarray2ndf...\n";
+my @d = ();
+foreach $i (1..10) {
+	my @t = ($i, $i*$i);
+	push (@d, \@t);
+}
+my $tmpndf = twodarray2ndf (@d, 'test_ndf.file');
+print "NDF written to $tmpndf\n";
+
+print "\nndf2twodarray...\n";
+my $d2 = ndf2twodarray ($tmpndf);
+foreach $t (@$d2) {
+	print "row: ", join (' ', @$t), "\n";
+}
+
+print "\nndf2txt...\n";
+$tout = ndf2txt ($tmpndf, 'test_ndf_text.output');
+print "ndf2txt: written output to $tout\n";
+open (TIN, "<$tout") || die "Can't open file $tout to read\n";
+while (defined($line=<TIN>)) {
+    print $line;
+}
+close (TIN);
+
+unlink ("$tmpndf.sdf", 'test_ndf_text.output');
+
+exit 0;
+
+EOD;

@@ -5,8 +5,7 @@
 serv_type: local
 long_name: Local test catalogue
 short_name: dummy@home
-#url: /local1/export/home/norman/s/src/astrom/w/autoastrom/moggy/usno.cat-local
-url: ./usno.catalogue
+url: $PWD/usno.catalogue
 
 serv_type: catalog
 long_name: USNO at ESO

@@ -19,6 +19,7 @@ use strict;
 use FileHandle;
 use Symbol;
 use IPC::Open2;
+use Carp;
 
 my $DefaultCatalogue = 'usno@eso';
 my $MoggyCommand = '$AUTOASTROM_DIR/moggy/moggy';
@@ -26,6 +27,40 @@ my $MoggyCommand = '$AUTOASTROM_DIR/moggy/moggy';
 my $MoggyRCSId = '$Id$ ';
 # %%VERSION%%
 my $VERSION = '0.1';
+
+
+# Declare methods
+sub catname ($);
+sub catconfig ($);
+sub radius ($);
+sub columns ($;$);
+sub maxrow ($;$);
+sub point ($$$;$$$$);
+sub otherpoint ($$$;$$$$);
+sub searchtype ($;$);
+sub astinformation ($;$\@);
+sub astdomain ($);
+sub astconvert ($$$$);
+sub query ($);
+sub result ($);
+sub resultcolumns ($);
+sub resulthascolumn ($$);
+sub resultnrows ($);
+sub resultncols ($);
+sub version ($);
+sub debug ($);
+sub status_ok ($);
+sub status_continue ($);
+sub status_clear ($);
+sub current_status ($);
+sub current_statusmessage ($);
+sub failed_command ($);
+
+# Private methods
+sub start_slave_ ($);
+sub stop_slave_ ($);
+sub send_command_to_slave_ ($;@);
+sub send_input_to_slave_ ($;\@);
 
 #+
 #  <routinename>new
@@ -119,7 +154,7 @@ sub new {
 # <argumentlist none>
 # <returnvalue>Current catalogue name
 #-
-sub catname {
+sub catname ($) {
     my $self = shift;
     return $self->{CATNAME};
 }
@@ -132,7 +167,7 @@ sub catname {
 # <argumentlist none>
 # <returnvalue>Current configuration file
 #-
-sub catconfig {
+sub catconfig ($) {
     my $self = shift;
     return $self->{CATCONFIG};
 }
@@ -148,7 +183,7 @@ sub catconfig {
 #   the value cannot be changed, the radius is set to the undefined value,
 #   and it is this which is returned.
 #-
-sub radius {
+sub radius ($) {
     my $self = shift;
     if (@_) {
 	my $rad = shift;
@@ -171,7 +206,7 @@ sub radius {
 #   the value cannot be changed, the column style is set to the undefined
 #   value, and it is this which is returned.
 #-
-sub columns {
+sub columns ($;$) {
     my $self = shift;
     if (@_) {
 	my $cols = shift;
@@ -192,7 +227,7 @@ sub columns {
 #   the value cannot be changed, the row limit is set to the undefined value,
 #   and it is this which is returned.
 #-
-sub maxrow {
+sub maxrow ($;$) {
     my $self = shift;
     if (@_) {
 	my $maxrow = shift;
@@ -218,7 +253,7 @@ sub maxrow {
 #   an error setting it, then the point is set to the undefined value, and
 #   it is this which is returned.
 #-
-sub point {
+sub point ($$$;$$$$) {
     my $self = shift;
     my @args = @_;
     my $i;
@@ -260,7 +295,7 @@ sub point {
 #   an error setting it, then the point is set to the undefined value, and
 #   it is this which is returned.
 #-
-sub otherpoint {
+sub otherpoint ($$$;$$$$) {
     my $self = shift;
     my @args = @_;
     my $i;
@@ -298,7 +333,7 @@ sub otherpoint {
 #   an error setting it, then the value is set to the undefined value, and
 #   it is this which is returned.
 #-
-sub searchtype {
+sub searchtype ($;$) {
     my $self = shift;
     my $type = (@_ ? uc($_[0]) : undef);
 
@@ -330,16 +365,17 @@ sub searchtype {
 # <returnvalue>The current value, as a reference to an array of strings,
 #  or undef on error.
 #-
-sub astinformation {
-    my $self = shift;
-    my $domain = shift;
-    my @astarray = (@_ ? @_ : undef);
+sub astinformation ($;$\@) {
+    my ($self, $domain, @astarray) = @_;
 
     if (defined($domain)) {
 	if (@astarray) {
 	    $self->send_command_to_slave_ ("AST FRAMESET", $domain);
 
-	    $self->status_continue() || return undef;
+	    unless ($self->status_continue()) {
+		carp "AST FRAMESET failed: ".$self->current_statusmessage();
+		return undef;
+	    }
 
 	    my $i;
 	    print STDERR "astinformation: sending\n";
@@ -352,14 +388,19 @@ sub astinformation {
 	    }
 	    print STDERR "!!!\n";
 
-	    $self->send_input_to_slave_ (\@astarray);
+	    $self->send_input_to_slave_ (@astarray);
 
-	    $self->status_ok() || return undef;
+	    unless ($self->status_ok()) {
+		carp "Can't sent AST information to slave: ".
+		  $self->current_statusmessage();
+		return undef;
+	    }
 
 	    $self->{ASTINFORMATION} = \@astarray;
 	    $self->{ASTDOMAIN} = $domain;
 	} else {
 	    # Must have two arguments or none
+	    carp "Moggy::astinformation: Wrong number of arguments";
 	    return undef;
 	}
     }
@@ -372,7 +413,7 @@ sub astinformation {
 # <description>Returns the current domain, as set by routine astinformation().
 # <returnvalue type=string>Name of current domain
 #-
-sub astdomain {
+sub astdomain ($) {
     my $self = shift;
     return $self->{ASTDOMAIN};
 }
@@ -407,15 +448,22 @@ sub astdomain {
 # <returnvalue type=arrayref>Reference to a 2-element array containing
 # the converted coordinates.  Return undef on error.
 #-
-sub astconvert {
+sub astconvert ($$$$) {
     my $self = shift;
     my ($arg1, $arg2, $tosky) = @_;
 
-    defined($tosky) || return undef; # wrong number of arguments
+    defined($tosky) || do {
+	carp "Moggy::astconvert: wrong number of arguments";
+	return undef; # wrong number of arguments
+    };
     $self->send_command_to_slave_ ("ast convert", $arg1, $arg2,
 				   ($tosky ? "tosky" : "fromsky"));
 
-    $self->status_ok() || return undef;
+    $self->status_ok() || do {
+	carp "Moggy::astconvert: command failed: ".
+	  $self->current_statusmessage();
+	return undef;
+    };
 
     # The response from this is a single further line containing two
     # doubles.  Construct an array containing these two doubles, and
@@ -423,8 +471,12 @@ sub astconvert {
     my $RDR = $self->{SLAVEREADER};
     my $line = <$RDR>;
     my @vals = split (' ', $line);
+    print STDERR "astconvert: vals=<@vals>\n";
     # Check that there are precisely two values in the line.
-    defined($vals[1]) || return undef;
+    defined($vals[1]) || do {
+	carp "Moggy::astconvert: unexpected response from moggy <$line>";
+	return undef;
+    };
     if ($#vals > 1) {
 	# silently truncate
 	$#vals = 1;
@@ -445,7 +497,7 @@ sub astconvert {
 # <argumentlist none>
 # <returnvalue>1 on success, 0 on failure.
 #-
-sub query {
+sub query ($) {
     my $self = shift;
 
     # Don't do any consistency checking here, since moggy can do that more
@@ -516,7 +568,7 @@ sub query {
 #     }
 #   </verbatim>
 #-
-sub result {
+sub result ($) {
     my $self = shift;
     return $self->{RESULT};
 }
@@ -527,7 +579,7 @@ sub result {
 # <argumentlist none>
 # <returnvalue>A reference to an array of strings containing the column names.
 #-
-sub resultcolumns {
+sub resultcolumns ($) {
     my $self = shift;
     return $self->{RESULTCOLUMNS};
 }
@@ -548,7 +600,7 @@ sub resultcolumns {
 #   corresponding to that column.  If the column is not present, or
 #   if no successful query has been made, returns negative.
 #-
-sub resulthascolumn {
+sub resulthascolumn ($$) {
     my $self = shift;
     my $colname = shift;
 
@@ -579,7 +631,7 @@ sub resulthascolumn {
 # <argumentlist none>
 # <returnvalue>An integer, giving the number of rows in the query response.
 #-
-sub resultnrows {
+sub resultnrows ($) {
     my $self = shift;
     return $self->{NROWS};
 }
@@ -590,7 +642,7 @@ sub resultnrows {
 # <argumentlist none>
 # <returnvalue>An integer, giving the number of columns in the query response.
 #-
-sub resultncols {
+sub resultncols ($) {
     my $self = shift;
     return $self->{NCOLS};
 }
@@ -601,7 +653,7 @@ sub resultncols {
 # <argumentlist none>
 # <returnvalue>A string, giving version information
 #-
-sub version {
+sub version ($) {
     my $self = shift;
 
     $self->{MOGGYVERSION} = $self->send_command_to_slave_ ("VERSION")
@@ -611,7 +663,7 @@ sub version {
 }
 
 # Debugging method -- send the debug string to moggy.
-sub debug {
+sub debug ($) {
     my $self = shift;
     my $dbgstring = shift;
 
@@ -639,7 +691,7 @@ sub debug {
 # do nothing.  No return: slave's status can be checked by testing the
 # value of {SLAVEPID}, which is non-zero if the slave is running
 # (cf. stop_slave_). 
-sub start_slave_ {
+sub start_slave_ ($) {
     my $self = shift;
 
     return if ($self->{MOGGYPID});
@@ -655,7 +707,7 @@ sub start_slave_ {
     #print STDERR "start_slave_ : pid = $self->{MOGGYPID}\n";
 }
 
-sub stop_slave_ {
+sub stop_slave_ ($) {
     my $self = shift;
     if ($self->{MOGGYPID}) {
 	$self->send_command_to_slave_ ("quit");
@@ -681,7 +733,7 @@ sub stop_slave_ {
 # operated on or returned by status_ok(), current_status(),
 # current_statusmessage() and failed_command() will be those corresponding
 # to the failed command, and not any subsequent ones.
-sub send_command_to_slave_ {
+sub send_command_to_slave_ ($;@) {
     my $self = shift;
     my $cmd = (@_ ? join(' ',@_) : undef);
 
@@ -736,17 +788,16 @@ sub send_command_to_slave_ {
 # operated on or returned by status_ok(), current_status(),
 # current_statusmessage() and failed_command() will be those corresponding
 # to the failed command, and not any subsequent ones.
-sub send_input_to_slave_ {
-    my $self = shift;
-    my $strings = shift;
+sub send_input_to_slave_ ($;\@) {
+    my ($self, @strings) = @_;
 
-    defined ($strings) || return undef;
+    @strings || return undef;
     $self->status_ok() || $self->status_continue() || return undef;
 
     # Start the slave if it's not already running.
     $self->{MOGGYPID} || $self->start_slave_ ();
 
-    print STDERR "send_input_to_slave_: $#$strings elements...\n";
+    print STDERR "send_input_to_slave_: $#strings elements...\n";
 
     if ($self->{MOGGYPID}) {
 	my $WTR = $self->{SLAVEWRITER};
@@ -755,9 +806,9 @@ sub send_input_to_slave_ {
 
 #open (SL, ">slavelog") || die "Can't open slavelog to write";
 my $i=0;
-	foreach $line (@$strings) {
+	foreach $line (@strings) {
 	    $i++;
-	    if (($i < 4) || ($i >= $#$strings-4)) {
+	    if (($i < 4) || ($i >= $#strings-4)) {
 		print STDERR "slave_: <$line>\n";
 		$i++;
 	    }
@@ -819,7 +870,7 @@ my $i=0;
 # <argumentlist none>
 # <returnvalue>True if the status is good; false if bad
 #-
-sub status_ok {
+sub status_ok ($) {
     # Examine the current {SLAVESTATUS} and return true if the status is
     # OK -- ie, if the {SLAVESTATUS} started with `2'.
     my $self = shift;
@@ -837,7 +888,7 @@ sub status_ok {
 # <argumentlist none>
 # <returnvalue>True if the status is good; false if bad
 #-
-sub status_continue {
+sub status_continue ($) {
     # Examine the current {SLAVESTATUS} and return true if the slave process
     # is expecting more input -- ie, if the {SLAVESTATUS} started with `3'.
     my $self = shift;
@@ -850,7 +901,7 @@ sub status_continue {
 # <argumentlist none>
 # <returnvalue none>
 #-
-sub status_clear {
+sub status_clear ($) {
     my $self = shift;
     $self->{FAILEDCOMMAND} = undef;
     $self->{SLAVEMESSAGE} = "<null>";
@@ -864,7 +915,7 @@ sub status_clear {
 # <returnvalue>The status code returned from the last command which failed,
 #   or the last command, if none have failed.
 #-
-sub current_status {
+sub current_status ($) {
     my $self = shift;
     return $self->{SLAVESTATUS};
 }
@@ -876,7 +927,7 @@ sub current_status {
 # <returnvalue>The message returned from the last command which failed,
 #   or the last command, if none have failed.
 #-
-sub current_statusmessage {
+sub current_statusmessage ($) {
     my $self = shift;
     return $self->{SLAVEMESSAGE};
 }
@@ -889,7 +940,7 @@ sub current_statusmessage {
 # <argumentlist none>
 # <returnvalue>The unsuccessful command sent to moggy.
 #-
-sub failed_command {
+sub failed_command ($) {
     my $self = shift;
     return $self->{FAILEDCOMMAND};
 }

@@ -13,4 +13,4 @@ AC_CONFIG_SUBDIRS(moggy)
 
 
 dnl   That's all, at present
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile t/Makefile)

@@ -29,8 +29,8 @@ astrom.tar: README configure moggy/configure
 	rm -Rf $(PKG_DIR)
 	ln -s $(PKG_DIR).tar $@
 
-README Makefile.in: VERSION
-	misc/propagate-version README Makefile.in
+README Makefile.in moggy/Moggy.pm: VERSION
+	misc/propagate-version README Makefile.in moggy/Moggy.pm
 
 configure: config/configure.in
 	autoconf config/configure.in > configure

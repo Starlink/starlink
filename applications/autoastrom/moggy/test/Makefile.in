@@ -10,7 +10,7 @@ CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
 PERLBIN=@PERL@
 
-test:
+test: local.config
 	PERLBIN=$(PERLBIN) ./runtests
 
 t3.run: t3.C ../util.o
@@ -18,3 +18,6 @@ t3.run: t3.C ../util.o
 
 clean:
 	rm -f *~ *.run *.stderr *.stdout *.tmp
+
+local.config: local.config.in
+	sed s+\$$PWD+$$PWD+ local.config.in >local.config

@@ -1,0 +1,42 @@
+
+test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
+test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
+
+export AUTOASTROM_DIR;
+exec $PERLBIN <<'EOD';
+
+use lib '..';
+use aalib;
+
+print "      chi2         dof     Q(chi2)       ratio\n";
+print "      ----         ---     -------       -----\n";
+testqchi ( 0.1,  2, 0.95123);
+testqchi ( 1.0,  2, 0.60653);
+testqchi ( 1.0,  6, 0.98561);
+testqchi ( 2.0,  2, 0.36788);
+testqchi (10.0,  2, 0.00674);
+testqchi (10.0, 10, 0.44049);
+testqchi (10.0, 20, 0.96817);
+testqchi (20.0, 10, 0.02925);
+testqchi (20.0, 20, 0.45793);
+
+testqchi ( 0.103,  2, 0.95);
+testqchi ( 1.635,  6, 0.95);
+testqchi ( 3.940, 10, 0.95);
+testqchi (10.851, 20, 0.95);
+
+testqchi ( 1.386,  2, 0.50);
+testqchi ( 5.348,  6, 0.50);
+testqchi ( 9.342, 10, 0.50);
+testqchi (19.337, 20, 0.50);
+
+sub testqchi {
+my ($chi2, $dof, $correct) = @_;
+my $t = qchi($chi2,$dof);
+my $ratio = ($t-$correct)/$correct;
+printf "%10.3f  %10.0f  %10.5f  %10.5f  %s\n",
+$chi2, $dof, $t, $ratio, (abs($ratio) < 1e-3 ? "ok" : "too big");
+}
+
+exit 0;
+EOD;

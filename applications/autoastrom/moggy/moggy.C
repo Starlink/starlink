@@ -32,19 +32,20 @@ static const char RCSID[] =
 #endif
 
 
+#include <iostream>
+#include <string>
+#include <fstream>
+
 #if HAVE_CSTD_INCLUDE
-#include <cstdio>
+//#include <cstdio>
 #include <cstdlib>
 #include <ctime>
 //using std::exit;
 #else
-#include <stdio.h>              // for cout,cerr
+//#include <stdio.h>              // for cout,cerr
 #include <stdlib.h>
 #include <time.h>
 #endif
-
-#include <string>
-#include <fstream>
 
 #include <cat/CatalogInfo.h>
 
@@ -111,6 +112,12 @@ int main (int argc, char **argv)
     {
 	string commandline;
 	bool keepGoing = true;
+
+	// Modify the formatting of floating-point numbers on output.
+	// The default output precision is 6, which isn't really
+	// enough.  1arcsec is 2e-4 degrees, so we really need at least 8
+	// significant figures of output, and more does no harm.
+	cout.precision(10);
 
 	// Keep reading a string from stdin until EOF or keepGoing
 	// becomes true.  This will read lines terminated by '\n' (on

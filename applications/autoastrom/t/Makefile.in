@@ -1,0 +1,13 @@
+# Makefile for the test directory
+#
+# $Id$
+
+#CXX=@CXX@
+#CXXFLAGS=-I.. @CXXFLAGS@
+#PERLBIN=@PERL@		# don't need -- use Starlink Perl binary
+
+all: test
+
+
+test:
+	./runtests

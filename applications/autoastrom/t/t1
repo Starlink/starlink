@@ -1,0 +1,22 @@
+
+test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
+test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
+
+export AUTOASTROM_DIR;
+exec $PERLBIN <<'EOD';
+
+use lib '..';
+use aalib;
+
+foreach $v (('0', '360', '261.636', '-12.345', '400')) {
+	printf "ra= %10f  -->  %s\n", $v, dmshms($v,1);
+}
+foreach $v (('0', '90', '45', '12.345', '-12.345')) {
+	printf "dec=%10f  -->  %s\n", $v, dmshms($v,0);
+}
+
+exit 0;
+EOD;
+
+
+
