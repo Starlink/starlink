@@ -21,13 +21,6 @@ if !($?STAR_LOGIN) then
     exit 1
   endif
 
-  if (-e /star/etc/cshrc) then
-    source /star/etc/cshrc
-  else
-    echo 'Error: Starlink system not initialised'
-    exit 1
-  endif
-
 endif
 
 
@@ -37,12 +30,13 @@ alias echo "echo > /dev/null"
 # First start up kappa
 
 #kappa
-# Kluge to use kappa.csh rather than the alias
+# use kappa.csh rather than the alias so that we dont have
+# to source /star/etc/cshrc
 source $KAPPA_DIR/kappa.csh
 
 # Second start up surf
 
-surf
+source $SURF_DIR/surf.csh
 
 # Unalias
 
@@ -225,7 +219,7 @@ exit
 *    {enter_new_authors_here}
 
 *  Copyright:
-*     Copyright (C) 1997,1998 Particle Physics and Astronomy
+*     Copyright (C) 1997,1998,2001 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *
@@ -235,11 +229,13 @@ exit
 *    1997 July 7 (TIMJ):
 *       Make sure that the plot title from the second plot does not get in
 *       in the way.
-*    1997 July 8 (TIMJ)
+*    1997 July 8 (TIMJ):
 *       Add code to create a postscript file as well as using xwindows
-*     {enter_further_changes_here}
-*    1998 Dec 8 (TIMJ)
+*    1998 Dec 8 (TIMJ):
 *       Make compatible with KAPPA V0.13
+*    2001 October 31 (TIMJ):
+*       Remove need for /star/etc/cshrc
+*     {enter_further_changes_here}
 *
 *  Bugs:
 *     {note_any_bugs_here}

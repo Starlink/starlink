@@ -7,10 +7,6 @@
 
 # 1 Argument required: the demodulated data file
 
-# Start up Starlink just in case
-#source /star/etc/login
-#source /star/etc/cshrc
-
 # Check if Starlink was initialised
 if !($?STAR_LOGIN) then
 
@@ -25,23 +21,17 @@ if !($?STAR_LOGIN) then
     exit 1
   endif
 
-  if (-e /star/etc/cshrc) then
-    source /star/etc/cshrc
-  else
-    echo 'Error: Starlink system not initialised'
-    exit 1
-  endif
-
 endif
+
 # Switch off messages
 alias echo "echo > /dev/null"
 
 # First start up kappa
-kappa
+source $KAPPA_DIR/kappa.csh
 
 # Second start up surf
 
-surf
+source $SURF_DIR/surf.csh
 
 # Unalias
 
@@ -163,6 +153,8 @@ exit
 *  History:
 *    1997 June 19 (TIMJ):
 *       Original version
+*    2001 October 31 (TIMJ):
+*       Do not want to bother with /star/etc/cshrc
 *     {enter_further_changes_here}
 *
 *  Bugs:
@@ -170,7 +162,7 @@ exit
 *
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2001 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *-
