@@ -1,4 +1,4 @@
-noinst_LTLIBRARIES = libccdhelp.la
-libccdhelp_la_SOURCES = $(HELPSRC)
+noinst_LTLIBRARIES = libccdpack_help.la
+libccdpack_help_la_SOURCES = $(HELPSRC)
 
 HELPSRC = ccdhelp.f gethlp.f gthlpi.f kpg1_scrsz.f pthlpo.f sread.f
