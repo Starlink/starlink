@@ -89,6 +89,8 @@
       REAL    SUMSQ               ! sum of data squared coadded
 *-
 
+      IF (STATUS .NE. SAI__OK) RETURN
+
       DO I = 1, NPTS
 
 *       Check quality of input data (always assume 0 is good and anything

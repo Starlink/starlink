@@ -2,7 +2,7 @@
       SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
      :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
      :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
-     :   BADBIT, VARIANCE)
+     :   BADBIT, VARIANCE, STATUS)
 *    Description :
 *     This routine coadds the current exposure to the input coadd arrays
 *     and puts the result in the output coadd arrays. The input and output
@@ -17,7 +17,7 @@
 *     SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
 *    :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
 *    :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
-*    :   BADBIT, VARIANCE)
+*    :   BADBIT, VARIANCE, STATUS)
 *    Parameters :
 *     N                       = INTEGER (Given)
 *           Number of elements in arrays.
@@ -47,6 +47,8 @@
 *           Bad bit mask
 *     VARIANCE                = LOGICAL (Given)
 *           T if input data has variance associated with it
+*     STATUS                  = INTEGER (Given & Returned)
+*           Global status
 *    Method :
 *    Deficiencies :
 *    Bugs :
@@ -55,11 +57,17 @@
 *    History :
 *     $Id$
 *     5-JUL-1994: Renamed from SCUDR_COADD (JFL).
-*    endhistory
+*     $Log$
+*     Revision 1.3  1999/05/15 04:21:36  timj
+*     Add status checking
+*
+
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'PRM_PAR'
+      INCLUDE 'SAE_PAR'
+
 *    Import :
       BYTE BADBIT
       INTEGER N
@@ -78,6 +86,8 @@
       BYTE OUTCOADD_QUAL (N)
       INTEGER OUTCOADD_NUMBER (N)
 *    Status :
+      INTEGER STATUS
+
 *    External references :
 *    Global variables :
 *    Local Constants :
@@ -90,6 +100,8 @@
 *    External functions:
       INCLUDE 'NDF_FUNC'
 *-
+
+      IF (STATUS .NE. SAI__OK) RETURN
 
       DO I = 1, N
 
