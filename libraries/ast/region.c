@@ -5909,7 +5909,11 @@ static double *RegCentre( AstRegion *this, double *cen, double **ptr,
 
 *  Notes:
 *    - Some Region sub-classes do not have a centre. Such classes will report 
-*    an AST__INTER error code if this method is called.
+*    an AST__INTER error code if this method is called with either "ptr" or 
+*    "cen" not NULL. If "ptr" and "cen" are both NULL, then no error is
+*    reported if this method is invoked on a Region of an unsuitable class,
+*    but NULL is always returned.
+
 *-
 */
 
@@ -5924,11 +5928,13 @@ static double *RegCentre( AstRegion *this, double *cen, double **ptr,
 
 /* This abstract method must be over-ridden by each concrete sub-class
    which allows the centre to be shifted. Report an error if this null 
-   imlementation is called.*/
-   astError( AST__INTER, "astRegCentre(%s): The %s class does not implement "
-             "the astRegCentre method inherited from the Region class "
-             "(internal AST programming error).", astGetClass( this ), 
-             astGetClass( this ) );
+   imlementation is called to set a new centre. If it is called to
+   enquire the current centre, then return a NULL pointer. */
+   if( ptr || cen ) astError( AST__INTER, "astRegCentre(%s): The %s "
+                       "class does not implement the astRegCentre method "
+                       "inherited from the Region class (internal AST "
+                       "programming error).", astGetClass( this ), 
+                       astGetClass( this ) );
 
    return NULL;
 }
@@ -6370,6 +6376,7 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
 /* Local Variables; */
    AstRegion *unc; 
    AstRegion *newunc; 
+   double *cen0;
 
 /* Check the inherited status. */
    if( !astOK ) return;
@@ -6392,9 +6399,10 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
       unc = astGetUnc( this, AST__BASE );
       newunc = astSimplify( unc );
       if( newunc != unc ) {
-         if( astIsACircle( newunc ) || astIsAEllipse( newunc ) || 
-             astIsABox( newunc ) ) {
-           astSetUnc( this, newunc );
+         cen0 = astRegCentre( newunc, NULL, NULL, 0, 0 );
+         if( cen0 ) {
+            cen0 = astFree( cen0 );
+            astSetUnc( this, newunc );
          }
       }
       unc = astAnnul( unc );
@@ -7021,10 +7029,12 @@ f     THIS = INTEGER (Given)
 *        Pointer to the Region which is to be assigned a new uncertainty.
 c     unc
 f     UNC = INTEGER (Given)
-*        Pointer to the new uncertainty Region. This must be either a Box, 
-*        a Circle or an Ellipse. A deep copy of the supplied Region will be 
-*        taken, so subsequent changes to the uncertainty Region using the 
-*        supplied pointer will have no effect on the Region 
+*        Pointer to the new uncertainty Region. This must be of a class for
+*        which all instances are centro-symetric (e.g. Box, Circle, Ellipse, 
+*        etc.) or be a Prism containing centro-symetric component Regions.
+*        A deep copy of the supplied Region will be taken, so subsequent 
+*        changes to the uncertainty Region using the supplied pointer will 
+*        have no effect on the Region 
 c        "this".
 f        THIS.
 f     STATUS = INTEGER (Given and Returned)
@@ -7040,6 +7050,7 @@ f        The global status.
    AstMapping *map2;        /* Base->current Mapping from FrameSet */
    AstMapping *map;         /* Base->current Mapping from FrameSet */
    AstMapping *smap;        /* Simplified base->current Mapping */
+   double *cen0;            /* Pointer to array holding original centre */
    double **ptr_reg;        /* Pointer to axis values for Region's Pointset */
 
 /* Check the inherited status. */
@@ -7051,9 +7062,11 @@ f        The global status.
    } 
    this->defunc = 1;
 
-/* Check an uncertainty Region was supplied, and is of a usable class. */
-   if( unc && ( astIsABox( unc ) || astIsACircle( unc ) || 
-                astIsAEllipse( unc ) ) ){
+/* Check an uncertainty Region was supplied, and is of a usable class
+   (i.e. a class which can be re-centred). */
+   cen0 = unc ? astRegCentre( unc, NULL, NULL, 0, 0 ) : NULL;
+   if( cen0 ) {
+      cen0 = astFree( cen0 );
 
 /* Map it into the same Frame as that represented by the base Frame in 
    the supplied Region. */
@@ -7068,8 +7081,8 @@ f        The global status.
          this->unc = astMapRegion( unc, map, frm );
 
 /* Ensure the Region is bounded. We know that negating an unbounded
-   Region will make it bounded because we know that the Region is a
-   Circle, Box or Ellipse, all of which have this property. */
+   Region will make it bounded because we know that the Region consists of 
+   Circles, Boxes and/or Ellipses, all of which have this property. */
          if( !astGetBounded( this->unc ) ) astNegate( this->unc );
 
 /* Indicate that the uncertainty is not a default.*/
@@ -7113,7 +7126,9 @@ f        The global status.
    } else if( unc && astOK ){
       astError( AST__BADIN, "astSetUnc(%s): Bad uncertainty shape "
                 "(%s) supplied.", astGetClass( this ), astGetClass(unc) );
-      astError( AST__NCPIN, "The uncertainty must be a Box, Circle or Ellipse." );
+      astError( AST__NCPIN, "The uncertainty Region must be an instance of "
+                "a centro-symetric subclass of Region (e.g. Box, Circle, "
+                "Ellipse, etc)." );
    }
 }
 
@@ -9058,15 +9073,16 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
 *        being initialised are assumed to have the same uncertainty). A NULL 
 *        pointer can be supplied, in which case default uncertainties equal to 
 *        1.0E-6 of the dimensions of the new Region's bounding box are used. 
-*        If an uncertainty Region is supplied, it must be either a Box, a 
-*        Circle or an Ellipse, and its encapsulated Frame must be related
-*        to the Frame supplied for parameter "frame" (i.e. astConvert
-*        should be able to find a Mapping between them). Two positions 
-*        the "frame" Frame are considered to be co-incident if their 
-*        uncertainty Regions overlap. The centre of the supplied
-*        uncertainty Region is immaterial since it will be re-centred on the 
-*        point being tested before use. A deep copy is taken of the supplied 
-*        Region.
+*        If an uncertainty Region is supplied, it must be of a class for
+*        which all instances are centro-symetric (e.g. Box, Circle, Ellipse, 
+*        etc.) or be a Prism containing centro-symetric component Regions.
+*        Its encapsulated Frame must be related to the Frame supplied for 
+*        parameter "frame" (i.e. astConvert should be able to find a Mapping 
+*        between them). Two positions in the "frame" Frame are considered to be
+*        co-incident if their uncertainty Regions overlap. The centre of the 
+*        supplied uncertainty Region is immaterial since it will be re-centred 
+*        on the point being tested before use. A deep copy is taken of the 
+*        supplied Region.
 
 *  Returned Value:
 *     A pointer to the new Region.

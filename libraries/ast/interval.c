@@ -106,6 +106,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_overlap)( AstRegion *, AstRegion * );
+static double *(* parent_regcentre)( AstRegion *this, double *, double **, int, int );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -130,6 +131,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int );
 
 /* Member functions. */
 /* ================= */
@@ -1041,6 +1043,9 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
    parent_overlap = region->Overlap;
    region->Overlap = Overlap;
 
+   parent_regcentre = region->RegCentre;
+   region->RegCentre = RegCentre;
+
    region->GetBounded = GetBounded;
    region->GetDefUnc = GetDefUnc;
    region->RegPins = RegPins;
@@ -1597,6 +1602,95 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
    }
 
 /* Return a pointer to the output PointSet. */
+   return result;
+}
+
+static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
+                          int index, int ifrm ){
+/*
+*  Name:
+*     RegCentre
+
+*  Purpose:
+*     Re-centre a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     double *RegCentre( AstRegion *this, double *cen, double **ptr, 
+*                        int index, int ifrm )
+
+*  Class Membership:
+*     Interval member function (over-rides the astRegCentre protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function shifts the centre of the supplied Region to a
+*     specified position, or returns the current centre of the Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     cen
+*        Pointer to an array of axis values, giving the new centre.
+*        Supply a NULL value for this in order to use "ptr" and "index" to 
+*        specify the new centre.
+*     ptr
+*        Pointer to an array of points, one for each axis in the Region.
+*        Each pointer locates an array of axis values. This is the format
+*        returned by the PointSet method astGetPoints. Only used if "cen"
+*        is NULL.
+*     index
+*        The index of the point within the arrays identified by "ptr" at
+*        which is stored the coords for the new centre position. Only used 
+*        if "cen" is NULL.
+*     ifrm
+*        Should be AST__BASE or AST__CURRENT. Indicates whether the centre 
+*        position is supplied and returned in the base or current Frame of 
+*        the FrameSet encapsulated within "this".
+
+*  Returned Value:
+*     If both "cen" and "ptr" are NULL then a pointer to a newly
+*     allocated dynamic array is returned which contains the centre
+*     coords of the Region. This array should be freed using astFree when
+*     no longer needed. If either of "ptr" or "cen" is not NULL, then a
+*     NULL pointer is returned.
+
+*  Notes:
+*    - Some Region sub-classes do not have a centre. Such classes will report 
+*    an AST__INTER error code if this method is called with either "ptr" or 
+*    "cen" not NULL. If "ptr" and "cen" are both NULL, then no error is
+*    reported if this method is invoked on a Region of an unsuitable class,
+*    but NULL is always returned.
+
+*/
+
+/* Local Variables: */
+   AstBox *box;                  /* The equivalent Box */
+   double *result;               /* Returned pointer */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If the Interval is effectively a Box, invoke the astRegCentre
+   function on the equivalent Box. A pointer to the equivalent Box will
+   be stored in the Interval structure. */
+   box = ((AstInterval *) this_region )->box;
+   if( box ) {
+      result = astRegCentre( box, cen, ptr, index, ifrm );
+
+/* If the Interval is not equivalent to a Box, invoke the astRegCentre
+   function inherited from the parent Region class. */
+   } else {
+      result = (*parent_regcentre)( this_region, cen, ptr, index, ifrm );
+   }
+
+/* Return the result */
    return result;
 }
 
@@ -2718,26 +2812,37 @@ f        An array with one element for each Frame axis
 *        limit.
 c     unc
 f     UNC = INTEGER (Given)
-*        An optional pointer to an existing Region which specifies the uncertainties 
-*        associated with the boundary of the Interval being created. The 
-*        uncertainty in any point on the boundary of the Interval is found by 
+*        An optional pointer to an existing Region which specifies the 
+*        uncertainties associated with the boundary of the Box being created. 
+*        The uncertainty in any point on the boundary of the Box is found by 
 *        shifting the supplied "uncertainty" Region so that it is centred at 
 *        the boundary point being considered. The area covered by the
 *        shifted uncertainty Region then represents the uncertainty in the
 *        boundary position. The uncertainty is assumed to be the same for
 *        all points.
 *
-*        If supplied, the uncertainty Region must be either a Box, a Interval 
-*        or an Interval. A deep copy of the supplied Region will be taken,
-*        so subsequent changes to the uncertainty Region using the supplied 
-*        pointer will have no effect on the created Interval. Alternatively, 
+*        If supplied, the uncertainty Region must be of a class for which 
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
+*        or be a Prism containing centro-symetric component Regions. A deep 
+*        copy of the supplied Region will be taken, so subsequent changes to 
+*        the uncertainty Region using the supplied pointer will have no 
+*        effect on the created Box. Alternatively, 
 f        a null Object pointer (AST__NULL) 
 c        a NULL Object pointer 
 *        may be supplied, in which case a default uncertainty is used 
-*        equivalent to a Box which has zero width on any axes for which
-*        either the upper or lower limit has not been specifed, and which
-*        has a width of 1.0E-6 of the axis interval on any axis for which
-*        both limits have been supplied.
+*        equivalent to a box 1.0E-6 of the size of the Box being created.
+*
+*        The uncertainty Region has two uses: 1) when the 
+c        astOverlap
+f        AST_OVERLAP 
+*        function compares two Regions for equality the uncertainty
+*        Region is used to determine the tolerance on the comparison, and 2)
+*        when a Region is mapped into a different coordinate system and
+*        subsequently simplified (using 
+c        astSimplify),
+f        AST_SIMPLIFY),
+*        the uncertainties are used to determine if the transformed boundary 
+*        can be accurately represented by a specific shape of Region.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional

@@ -1624,10 +1624,12 @@ f     UNC = INTEGER (Given)
 *        then represents the uncertainty in the position. The uncertainty is 
 *        assumed to be the same for all points.
 *
-*        If supplied, the uncertainty Region must be either a Box, a Circle
-*        or an Ellipse. A deep copy of the supplied Region will be taken,
-*        so subsequent changes to the uncertainty Region using the supplied 
-*        pointer will have no effect on the created PointList. Alternatively, 
+*        If supplied, the uncertainty Region must be of a class for which 
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
+*        or be a Prism containing centro-symetric component Regions. A deep 
+*        copy of the supplied Region will be taken, so subsequent changes to 
+*        the uncertainty Region using the supplied pointer will have no 
+*        effect on the created Box. Alternatively, 
 f        a null Object pointer (AST__NULL) 
 c        a NULL Object pointer 
 *        may be supplied, in which case a default uncertainty is used 

@@ -141,6 +141,7 @@ static void SetMeshSize( AstRegion *, int );
 static void ClearClosed( AstRegion * );
 static void ClearMeshSize( AstRegion * );
 static int Overlap( AstRegion *, AstRegion * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int );
 
 
 /* Member functions. */
@@ -856,6 +857,7 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    region->RegBaseMesh = RegBaseMesh;
    region->RegPins = RegPins;
    region->GetBounded = GetBounded;
+   region->RegCentre = RegCentre;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -1432,6 +1434,180 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
    if( !astOK ) result = astAnnul( result );
 
 /* Return a pointer to the output PointSet. */
+   return result;
+}
+
+static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
+                          int index, int ifrm ){
+/*
+*  Name:
+*     RegCentre
+
+*  Purpose:
+*     Re-centre a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "prism.h"
+*     double *RegCentre( AstRegion *this, double *cen, double **ptr, 
+*                        int index, int ifrm )
+
+*  Class Membership:
+*     Prism member function (over-rides the astRegCentre protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function shifts the centre of the supplied Region to a
+*     specified position, or returns the current centre of the Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     cen
+*        Pointer to an array of axis values, giving the new centre.
+*        Supply a NULL value for this in order to use "ptr" and "index" to 
+*        specify the new centre.
+*     ptr
+*        Pointer to an array of points, one for each axis in the Region.
+*        Each pointer locates an array of axis values. This is the format
+*        returned by the PointSet method astGetPoints. Only used if "cen"
+*        is NULL.
+*     index
+*        The index of the point within the arrays identified by "ptr" at
+*        which is stored the coords for the new centre position. Only used 
+*        if "cen" is NULL.
+*     ifrm
+*        Should be AST__BASE or AST__CURRENT. Indicates whether the centre 
+*        position is supplied and returned in the base or current Frame of 
+*        the FrameSet encapsulated within "this".
+
+*  Returned Value:
+*     If both "cen" and "ptr" are NULL then a pointer to a newly
+*     allocated dynamic array is returned which contains the centre
+*     coords of the Region. This array should be freed using astFree when
+*     no longer needed. If either of "ptr" or "cen" is not NULL, then a
+*     NULL pointer is returned.
+
+*  Notes:
+*    - Some Region sub-classes do not have a centre. Such classes will report 
+*    an AST__INTER error code if this method is called with either "ptr" or 
+*    "cen" not NULL. If "ptr" and "cen" are both NULL, then no error is
+*    reported if this method is invoked on a Region of an unsuitable class,
+*    but NULL is always returned.
+*/
+
+/* Local Variables: */
+   AstPrism *this;     /* Pointer to Prism structure */
+   AstRegion *reg1;    /* Pointer to first component Region */
+   AstRegion *reg2;    /* Pointer to second component Region */
+   double *bc;         /* Base Frame centre position */
+   double *cen1;       /* Centre of first component Region */
+   double *cen2;       /* Centre of second component Region */
+   double *result;     /* Returned pointer */
+   double *tmp;        /* Temporary array pointer */
+   double *total;      /* Pointer to total base Frame centre array */
+   int i;              /* Coordinate index */
+   int nax1;           /* Number of axes in first component Region */
+   int nax2;           /* Number of axes in second component Region */
+   int ncb;            /* Number of base frame coordinate values per point */
+   int ncc;            /* Number of current frame coordinate values per point */
+   int neg;            /* Prism negated flag */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the Prism structure. */
+   this = (AstPrism *) this_region;
+
+/* Get the component Regions, and the Negated flag for the Prism. */
+   GetRegions( this, &reg1, &reg2, &neg );
+
+/* Get the number of current Frame axes in each component Region. The sum
+   of these will equal the number of base Frame axes in the parent Region
+   structure. */
+   nax1 = astGetNaxes( reg1 );
+   nax2 = astGetNaxes( reg2 );
+   ncb = nax1 + nax2;
+
+/* If we are getting (not setting) the current centre... */
+   if( !ptr && !cen ) {
+
+/* Get the centre from the two component Regions in their current Frames. */
+      cen1 = astRegCentre( reg1, NULL, NULL, 0, AST__CURRENT );
+      cen2 = astRegCentre( reg2, NULL, NULL, 0, AST__CURRENT );
+
+/* If both component regions are re-centerable, join the two centre
+   arrays together into a single array. */      
+      if( cen1 && cen2 ) {
+         total = astMalloc( sizeof(double)*(size_t)ncb );
+         if( total ) {
+            for( i = 0; i < nax1; i++ ) total[ i ] = cen1[ i ];
+            for( i = 0; i < nax2; i++ ) total[ i + nax1 ] = cen2[ i ];
+
+/* The current Frames of the component Regions correspond to the base
+   Frame of the parent Region structure. If the original centre is
+   required in the current Frame, transform it using the base->current
+   Mapping from the parent Region structure. */
+            if( ifrm == AST__CURRENT ) {
+               result = astRegTranPoint( this_region, total, 1, 1 );
+               total = astFree( total );
+            } else {
+               result = total;
+            }
+         }
+      }
+
+/* Free the individual centre arrays. */
+      cen1 = astFree( cen1 );
+      cen2 = astFree( cen2 );
+
+/* If we are setting a new centre... */
+   } else {
+
+/* If the new centre is supplied in the current Frame of the parent
+   Region structure, transform it into the base Frame (i.e. the Frames
+   represented by the component Regions). */
+      if( ifrm == AST__CURRENT ) {
+         if( cen ) {
+            bc = astRegTranPoint( this_region, cen, 1, 0 );
+         } else {
+            ncc = astGetNaxes( this_region );
+            tmp = astMalloc( sizeof( double)*(size_t)ncc );
+            if( astOK ) {
+               for( i = 0; i < ncc; i++ ) tmp[ i ] = ptr[ i ][ index ];
+            }
+            bc = astRegTranPoint( this_region, tmp, 1, 0 );
+            tmp = astFree( tmp );
+         }
+ 
+      } else {
+         if( cen ) {
+            bc = cen;
+         } else {
+            bc = astMalloc( sizeof( double)*(size_t)ncb );
+            if( astOK ) {
+               for( i = 0; i < ncb; i++ ) bc[ i ] = ptr[ i ][ index ];
+            }
+         }
+      }
+
+/* Set the centre in the two component Regions in their current Frames. */
+      astRegCentre( reg1, bc, NULL, 0, AST__CURRENT );
+      astRegCentre( reg2, bc + nax1, NULL, 0, AST__CURRENT );
+
+/* Free resources. */
+     if( bc != cen ) bc = astFree( bc );       
+   }
+
+   reg1 = astAnnul( reg1 );
+   reg2 = astAnnul( reg2 );
+
+/* Return the result. */
    return result;
 }
 

@@ -1491,7 +1491,11 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 
 *  Notes:
 *    - Some Region sub-classes do not have a centre. Such classes will report 
-*    an AST__INTER error code if this method is called.
+*    an AST__INTER error code if this method is called with either "ptr" or 
+*    "cen" not NULL. If "ptr" and "cen" are both NULL, then no error is
+*    reported if this method is invoked on a Region of an unsuitable class,
+*    but NULL is always returned.
+
 */
 
 /* Local Variables: */
@@ -2861,19 +2865,21 @@ f        An array with one element for each Frame axis
 *        box.
 c     unc
 f     UNC = INTEGER (Given)
-*        An optional pointer to an existing Region which specifies the uncertainties 
-*        associated with the boundary of the Box being created. The 
-*        uncertainty in any point on the boundary of the Box is found by 
+*        An optional pointer to an existing Region which specifies the 
+*        uncertainties associated with the boundary of the Box being created. 
+*        The uncertainty in any point on the boundary of the Box is found by 
 *        shifting the supplied "uncertainty" Region so that it is centred at 
 *        the boundary point being considered. The area covered by the
 *        shifted uncertainty Region then represents the uncertainty in the
 *        boundary position. The uncertainty is assumed to be the same for
 *        all points.
 *
-*        If supplied, the uncertainty Region must be either a Box, a Circle 
-*        or an Ellipse. A deep copy of the supplied Region will be taken,
-*        so subsequent changes to the uncertainty Region using the supplied 
-*        pointer will have no effect on the created Box. Alternatively, 
+*        If supplied, the uncertainty Region must be of a class for which 
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
+*        or be a Prism containing centro-symetric component Regions. A deep 
+*        copy of the supplied Region will be taken, so subsequent changes to 
+*        the uncertainty Region using the supplied pointer will have no 
+*        effect on the created Box. Alternatively, 
 f        a null Object pointer (AST__NULL) 
 c        a NULL Object pointer 
 *        may be supplied, in which case a default uncertainty is used 

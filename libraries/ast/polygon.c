@@ -1382,20 +1382,36 @@ static void Delete( AstObject *obj ) {
 */
 
 /* Local Variables: */
+   AstPointSet *ps;                  /* Pointer to PointSet inside Region */
    AstPolygon *this;                 /* Pointer to Polygon */
    int i;                            /* Index of vertex */
+   int istat;                        /* Original AST error status */
    int nv;                           /* Number of vertices */
+   int rep;                          /* Original error reporting state */
 
 /* Obtain a pointer to the Polygon structure. */
    this = (AstPolygon *) obj;
 
 /* Annul all resources. */
-   if( this->edges ) {
-      nv = astGetNpoint( ((AstRegion *) this)->points );
+   ps = ((AstRegion *) this)->points;
+   if( this->edges && ps ) {
+ 
+/* Ensure we get a value for "nv" even if an error has occurred. */
+      istat = astStatus;
+      astClearStatus;
+      rep = astReporting( 0 );
+
+      nv = astGetNpoint( ps );
+
+      astSetStatus( istat );
+      astReporting( rep );
+
+/* Free the structures holding the edge information. */
       for( i = 0; i < nv; i++ ) {
          this->edges[ i ] = astFree( this->edges[ i ] );
       }
       this->edges = astFree( this->edges );
+
    }
 }
 
@@ -1544,23 +1560,25 @@ f        number COORD for point number PNT is found in element IN(PNT,COORD).
 c     unc
 f     UNC = INTEGER (Given)
 *        An optional pointer to an existing Region which specifies the 
-*        uncertainties associated with each point on the boundary of the 
-*        Polygon being created. The uncertainty at any point on the Polygon
-*        is found by shifting the supplied "uncertainty" Region so that it 
-*        is centred at the point being considered. The area covered by the 
-*        shifted uncertainty Region then represents the uncertainty in the 
-*        position. The uncertainty is assumed to be the same for all points.
+*        uncertainties associated with the boundary of the Box being created. 
+*        The uncertainty in any point on the boundary of the Box is found by 
+*        shifting the supplied "uncertainty" Region so that it is centred at 
+*        the boundary point being considered. The area covered by the
+*        shifted uncertainty Region then represents the uncertainty in the
+*        boundary position. The uncertainty is assumed to be the same for
+*        all points.
 *
-*        If supplied, the uncertainty Region must be either a Box, a Circle
-*        or an Ellipse. A deep copy of the supplied Region will be taken,
-*        so subsequent changes to the uncertainty Region using the supplied 
-*        pointer will have no effect on the created Polygon. Alternatively, 
+*        If supplied, the uncertainty Region must be of a class for which 
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
+*        or be a Prism containing centro-symetric component Regions. A deep 
+*        copy of the supplied Region will be taken, so subsequent changes to 
+*        the uncertainty Region using the supplied pointer will have no 
+*        effect on the created Box. Alternatively, 
 f        a null Object pointer (AST__NULL) 
 c        a NULL Object pointer 
 *        may be supplied, in which case a default uncertainty is used 
-*        equivalent to a box 1.0E-6 of the size of the bounding box of the 
-*        Polygon being created.
-*        
+*        equivalent to a box 1.0E-6 of the size of the Box being created.
+*
 *        The uncertainty Region has two uses: 1) when the 
 c        astOverlap
 f        AST_OVERLAP 
