@@ -6,13 +6,17 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP)
+*                       P.W.DRAPER (STARLINK)
 *
 *	Contents:	parameter list for catalog data.
 *
 *	Last modify:	20/07/99
+*                       12/06/01 PWD: Changed various _WORLD, degree
+*                       units, coordinate outputs to use format "%.8g"
+*                       (from %15e). This gets to 0.01 precision in
+*                       arcsec.
 *
-*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-*/
+*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
 objstruct	outobj;
 obj2struct	outobj2;
@@ -155,9 +159,9 @@ keystruct	objkey[] = {
   {"YPEAK_IMAGE", "y-coordinate of the brightest pixel",
 	&outobj.peaky, H_INT, T_LONG, "%10d", "pixel"},
   {"XPEAK_WORLD", "World-x coordinate of the brightest pixel",
-	&outobj2.peakxw, H_FLOAT, T_DOUBLE, "%15e", "deg"},
+	&outobj2.peakxw, H_FLOAT, T_DOUBLE, "%.8g", "deg"},
   {"YPEAK_WORLD", "World-y coordinate of the brightest pixel",
-	&outobj2.peakyw, H_FLOAT, T_DOUBLE, "%15e", "deg"},
+	&outobj2.peakyw, H_FLOAT, T_DOUBLE, "%.8g", "deg"},
 
   {"ALPHAPEAK_SKY", "Right ascension of brightest pix (native)",
 	&outobj2.peakalphas, H_FLOAT, T_DOUBLE, "%11.7f", "deg"},
@@ -183,9 +187,9 @@ keystruct	objkey[] = {
   {"Y_IMAGE_DBL", "Object position along y (double precision)",
 	&outobj2.posy, H_FLOAT, T_DOUBLE, "%10.3f", "pixel"},
   {"X_WORLD", "Barycenter position along world x axis",
-	&outobj2.mxw, H_FLOAT, T_DOUBLE, "%15e", "deg"},
+	&outobj2.mxw, H_FLOAT, T_DOUBLE, "%.8g", "deg"},
   {"Y_WORLD", "Barycenter position along world y axis",
-	&outobj2.myw, H_FLOAT, T_DOUBLE, "%15e", "deg"},
+	&outobj2.myw, H_FLOAT, T_DOUBLE, "%.8g", "deg"},
   {"X_MAMA", "Barycenter position along MAMA x axis",
 	&outobj2.mamaposx, H_FLOAT, T_DOUBLE, "%8.1f", "m**(-6)"},
   {"Y_MAMA", "Barycenter position along MAMA y axis",
@@ -213,11 +217,11 @@ keystruct	objkey[] = {
   {"XY_IMAGE", "Covariance between x and y",
 	&outobj.mxy, H_EXPO, T_DOUBLE, "%15e", "pixel**2"},
   {"X2_WORLD", "Variance along X-WORLD (alpha)",
-	&outobj2.mx2w, H_EXPO, T_DOUBLE, "%15e", "deg**2"},
+	&outobj2.mx2w, H_EXPO, T_DOUBLE, "%.8g", "deg**2"},
   {"Y2_WORLD", "Variance along Y-WORLD (delta)",
-	&outobj2.my2w, H_EXPO, T_DOUBLE, "%15e", "deg**2"},
+	&outobj2.my2w, H_EXPO, T_DOUBLE, "%.8g", "deg**2"},
   {"XY_WORLD", "Covariance between X-WORLD and Y-WORLD",
-	&outobj2.mxyw, H_EXPO, T_DOUBLE, "%15e", "deg**2"},
+	&outobj2.mxyw, H_EXPO, T_DOUBLE, "%.8g", "deg**2"},
 
   {"CXX_IMAGE", "Cxx object ellipse parameter",
 	&outobj.cxx, H_EXPO, T_FLOAT, "%12e", "pixel**(-2)"},
@@ -409,10 +413,10 @@ keystruct	objkey[] = {
 	&outobj2.y_psf, H_FLOAT, T_FLOAT, "%10.3f", "pixel",
 	1, &prefs.psf_ysize},
   {"XPSF_WORLD", "PSF position along world x axis",
-	&outobj2.xw_psf, H_FLOAT, T_DOUBLE, "%15e", "deg",
+	&outobj2.xw_psf, H_FLOAT, T_DOUBLE, "%.8g", "deg",
 	1, &prefs.psf_xwsize},
   {"YPSF_WORLD", "PSF position along world y axis",
-	&outobj2.yw_psf, H_FLOAT, T_DOUBLE, "%15e", "deg",
+	&outobj2.yw_psf, H_FLOAT, T_DOUBLE, "%.8g", "deg",
 	1, &prefs.psf_ywsize},
 
   {"ALPHAPSF_SKY", "Right ascension of the fitted PSF (native)",
