@@ -8,11 +8,28 @@
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kappa_source  aif_sub fts_sub ira_sub kapgen_sub \
 kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub \
-kappa_iraf 
+kappa_iraf kappa_ccdpack
 
 # The names of all the tar files containing system-specific files:
 TAR_FILES_B = kappa_data_alpha_OSF1 kappa_data_ix86_Linux \
 kappa_data_sun4_Solaris 
+
+# The contents of the kappa_ccdpack.tar file:
+KAPPA_CCDPACK = ccd1_orvar.f ccd1_par ccg1_bmd1d.f ccg1_bmd3d.f \
+ccg1_bmr1r.f ccg1_bmr3r.f ccg1_clipd.f ccg1_clipr.f ccg1_cm1dd.f \
+ccg1_cm1rr.f ccg1_cm3dd.f ccg1_cm3rr.f ccg1_fmd1d.f ccg1_fmd3d.f \
+ccg1_fmr1r.f ccg1_fmr3r.f ccg1_is2d.f ccg1_is2r.f ccg1_is3d.f ccg1_is3r.f \
+ccg1_kthd.f ccg1_kthr.f ccg1_mdd1d.f ccg1_mdd3d.f ccg1_mdr1r.f \
+ccg1_mdr3r.f ccg1_med1d.f ccg1_med3d.f ccg1_mer1r.f ccg1_mer3r.f \
+ccg1_mmd1d.f ccg1_mmd3d.f ccg1_mmr1r.f ccg1_mmr3r.f ccg1_mod1d.f \
+ccg1_mod3d.f ccg1_mor1r.f ccg1_mor3r.f ccg1_scd1d.f ccg1_scd3d.f \
+ccg1_scr1r.f ccg1_scr3r.f ccg1_smd1d.f ccg1_smd3d.f ccg1_smr1r.f \
+ccg1_smr3r.f ccg1_tcd1d.f ccg1_tcd3d.f ccg1_tcr1r.f ccg1_tcr3r.f \
+ccg1_tmd1d.f ccg1_tmd3d.f ccg1_tmn2d.f ccg1_tmn2r.f ccg1_tmn3d.f \
+ccg1_tmn3r.f ccg1_tmr1r.f ccg1_tmr3r.f ccg1_trm2d.f ccg1_trm2r.f \
+ccg1_trm3d.f ccg1_trm3r.f ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f \
+ccg1_wmd3r.f ccg1_wtm2d.f ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f \
+ccg1_wtm4d.f ccg1_wtm4r.f
 
 # The contents of the kappa_source.tar file:
 KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
@@ -466,7 +483,7 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
-$(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
+$(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPPA_CCDPACK) $(KAPVIEW_SUB) \
 $(NDFPACK_SUB) 
 
 #  The contents of kappa.tar.
@@ -475,7 +492,7 @@ sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps sun95_gd5.eps sun95_gd9.eps \
 sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps sun95_ardwork.eps sun95.htx_tar \
 sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps kappa.news \
 aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar kappa_sub.tar \
-lpg_source.tar ctg_source.tar kapsub_sub.tar \
+lpg_source.tar ctg_source.tar kapsub_sub.tar kappa_ccdpack.tar \
 kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
 kappa_data_sun4_Solaris.tar sun221.tex sun221.htx_tar kappa_iraf.tar
