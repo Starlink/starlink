@@ -36,7 +36,9 @@ AC_PROG_AWK
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml my_dipso dipso_link])
+AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([my_dipso], [chmod +x my_dipso])
+AC_CONFIG_FILES([dipso_link], [chmod +x dipso_link])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
