@@ -86,3 +86,6 @@ HISTORY
 v0.01 - First release. Most methods implemented. PGPLOT and PLplot
         interfaces okay. Tk plotting interface requires work.
         **** INTERFACES MAY CHANGE AS API IS TIDIED ****
+
+v0.02 - Same as 0.01 except that now include the PLplot interface
+        which was mistakenly missing from the MANIFEST
