@@ -453,8 +453,11 @@ DeleteWord(canvas, itemPtr, display)
     }
     if (wordPtr->fontPtr != NULL) {
       /* Release font structure? Not sure that this a good idea when
-       * dealing with the xvertext cache -- so don't */
-      /* Tk_FreeFontStruct(wordPtr->fontPtr); */
+       * dealing with the xvertext cache -- so don't, but do for tcl8, 
+       * causes abort() if not done!*/
+#if TK_MAJOR_VERSION >= 8
+      Tk_FreeFont(wordPtr->fontPtr);
+#endif
     }
     if (wordPtr->color != NULL) {
       Tk_FreeColor(wordPtr->color);
