@@ -40,12 +40,20 @@
 *        file, unless there is no extension whereupon a minimal FITS
 *        header is written to the text file. [FALSE]
 *     FIXED = _LOGICAL (Read)
-*        If TRUE, the output file allocates a fixed number of
-*        characters per data value.  The number of characters chosen is
-*        the minimum that prevents any loss of precision, and hence is
-*        dependent on the data type of the NDF array.  When FIXED is
-*        FALSE, data values are packed as efficiently as possible within
-*        each record. [FALSE]
+*        When FIXED is TRUE, the output file allocates a fixed number
+*        of characters per data value.  The number of characters chosen
+*        is the minimum that prevents any loss of precision, and hence
+*        is dependent on the data type of the NDF array.  These widths
+*        in characters for each HDS data type are as follows: _UBYTE, 3;
+*        _BYTE, 4; _UWORD, 5; _WORD, 6; _INTEGER, 11; _REAL, 14; and
+*        _DOUBLE, 22.  The record length is the product of the number
+*        of characters per value plus one (for a delimiting space),
+*        times the number of values per record given by parameter
+*        NOPEREC, up to a maximum of 512.
+
+*        When FIXED is FALSE, data values are packed as efficiently as
+*        possible within each record.  The length of each record is
+*        given by parameter RECLEN.  [FALSE]
 *     IN = NDF (Read)
 *        Input NDF data structure. The suggested default is the current
 *        NDF if one exists, otherwise it is the current value.
@@ -53,41 +61,41 @@
 *        The number of data values per record of the output file, when
 *        FIXED is TRUE.  It should be positive on UNIX platforms.
 *        The suggested default is the current value, or 8 when there
-*        is not one.
+*        is not one.  The upper limit is given by 512 divided by the
+*        number of characters per value plus 1 (see parameter FIXED).
 *     OUT = FILENAME (Write)
 *        Name of the output formatted Fortran file.  The file will
 *        normally have variable-length records when there is a header,
 *        but always fixed-length records when there is no header.
 *     RECLEN = _INTEGER (Read)
-*        The maximum record length in bytes of the output file.  This
-*        must be greater than 31 on UNIX systems.  The lower limit is
-*        further increased to 80 when there is a FITS header to be
-*        copied.  It is only used when FIXED is FALSE and will default
-*        to the current value, or 512 if there is no current value.
-*        When FIXED is TRUE the application creates data records whose
-*        length is the product of the number of bytes per value plus
-*        one (for the space), times the number of values per record.
+*        The maximum record length in bytes (characters) of the output
+*        file.  This has a maximum length of 512 (for efficiency
+*        reasons), and must be greater than 31 on UNIX systems.  The
+*        lower limit is further increased to 80 when there is a FITS
+*        header to be copied.  It is only used when FIXED is FALSE and
+*        will default to the current value, or 132 if there is no
+*        current value.
 *        []
 
 *  Examples:
 *     ndf2ascii cluster cluster.dat
 *        This copies the data array of the NDF called cluster to a text
 *        file called cluster.dat.  The maximum recordlength of
-*        cluster.dat is 512 bytes, and the data values are packed into
+*        cluster.dat is 132 bytes, and the data values are packed into
 *        these records as efficiently as possible.
 *     ndf2ascii cluster cluster.dat v
 *        This copies the variance of the NDF called cluster to a text
 *        file called cluster.dat.  The maximum recordlength of
-*        cluster.dat is 512 bytes, and the variance values are packed
+*        cluster.dat is 132 bytes, and the variance values are packed
 *        into these records as efficiently as possible.
 *     ndf2ascii cluster cluster.dat fixed noperec=12
 *        This copies the data array of the NDF called cluster to a text
 *        file called cluster.dat.  There are twelve data values per
 *        record in cluster.dat.
-*     ndf2ascii out=ndf234.dat fits reclen=128 in=@234
+*     ndf2ascii out=ndf234.dat fits reclen=80 in=@234
 *        This copies the data array of the NDF called 234 to a text
 *        file called ndf234.dat.  The maximum recordlength of
-*        ndf234.dat is 128 bytes, and the data values are packed into
+*        ndf234.dat is 80 bytes, and the data values are packed into
 *        these records as efficiently as possible.  If there is a FITS
 *        extension, it is copied to ndf234.dat with substitution of
 *        certain keywords, otherwise a minimal FITS header is produced.
@@ -120,7 +128,7 @@
 *        Non-linear axis data arrays cannot be represented by CRVALn
 *        and CDELTn, and must be ignored.
 *        -  If the input NDF contains TITLE, LABEL or UNITS components
-*        these are stored with the keywords TITLE, LABEL or BUNITS
+*        these are stored with the keywords TITLE, LABEL or BUNIT
 *        respectively.
 *        -  If the input NDF contains a FITS extension, the FITS items 
 *        may be written to the FITS-like header, with the following 
@@ -130,7 +138,7 @@
 *           o  NAXIS, and NAXISn are derived from the dimensions of the
 *           NDF data array as described above, so these items are not
 *           copied from the NDF FITS extension.
-*           o  The TITLE, LABEL, and BUNITS descriptors are only copied
+*           o  The TITLE, LABEL, and BUNIT descriptors are only copied
 *           if no TITLE, LABEL, and UNITS NDF components respectively
 *           have already been copied into these headers.
 *           o  The CDELTn, CRVALn, CTYPEn, CUNITn, and CRTYPEn
@@ -154,6 +162,7 @@
 *     CONVERT: ASCII2NDF; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
 
 *  Implementation Status:
+*     -  All non-complex numeric data types are supported.
 *     -  The value of bad pixels is not written to a FITS-like header
 *     record with keyword BLANK.
 
@@ -170,6 +179,9 @@
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.  Also writes CRPIXn FITS keyword when the NDF
 *        has linear axis centres.
+*     1997 January 22 (MJC):
+*        Reduced the maximum record length to 512, and the default
+*        RECLEN to 132.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -190,13 +202,19 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
+      INTEGER   MAXLEN           ! Maximum record length in characters
+      PARAMETER( MAXLEN = 512 )
+
       INTEGER   NFLAGS           ! Number of flags to indicate
                                  ! presence special NDF components
       PARAMETER( NFLAGS = 6 )
+
       INTEGER   SZDESC           ! Size of descriptor names
       PARAMETER( SZDESC = 8 )
+
       INTEGER   SZFITS           ! Size of FITS string
       PARAMETER( SZFITS = 80 )
+
       INTEGER   SZVAL            ! Size of descriptor values
       PARAMETER( SZVAL = 70 )
 
@@ -348,7 +366,7 @@
 
 *  Find the maximum number of values that can be accommodated in the
 *  buffer.  This allows one space between each value.
-         RECL = 32766 / ( NCPVAL + 1 )
+         RECL = MAXLEN / ( NCPVAL + 1 )
 
 *  Obtain the number of values per record.
          CALL PAR_GDR0I( 'NOPEREC', 8, 1, RECL, .FALSE., NUMPRE,
@@ -361,7 +379,7 @@
 
 *  Obtain the maximum recordlength in bytes of the output (free-format)
 *  file.
-         CALL PAR_GDR0I( 'RECLEN', 512, RECMIN, 32766, .FALSE.,
+         CALL PAR_GDR0I( 'RECLEN', 132, RECMIN, MAXLEN, .FALSE.,
      :                   RECL, STATUS )
       END IF
 
@@ -383,7 +401,7 @@
 *           structures are present, the values in the NDF FITS
 *           extension are copied.  If any are non-linear all FITS axis
 *           information is lost.
-*         TITLE, LABEL, BUNITS - the values held in NDF TITLE, LABEL,
+*         TITLE, LABEL, BUNIT - the values held in NDF TITLE, LABEL,
 *           and UNITS are used if present, otherwise any values found in
 *           the FITS extension are used.
 
@@ -427,7 +445,7 @@
             END = I .EQ. NCARD .AND. DESCR( 1:3 ) .NE. 'END'
 
 *  Leave out BITPIX, NAXIS, NAXISn, and possibly CDELTn, CRVALn,
-*  CRPIXn, CRTYPEn, CTYPEn, CUNITn, TITLE, LABEL, and BUNITS as
+*  CRPIXn, CRTYPEn, CTYPEn, CUNITn, TITLE, LABEL, and BUNIT as
 *  described above.  Note CROTAn are also excluded.
             IF ( ( INDEX( DESCR, 'NAXIS' ) .EQ. 0 ) .AND.
      :        ( INDEX( DESCR, 'BITPIX' ) .EQ. 0 ) .AND.
@@ -440,7 +458,7 @@
      :        ( INDEX( DESCR, 'CTYPE' ) .EQ. 0 .OR. .NOT. AXLFND ) .AND.
      :        ( INDEX( DESCR, 'CUNIT' ) .EQ. 0 .OR. .NOT. AXUFND ) .AND.
      :        ( INDEX( DESCR, 'LABEL' ) .EQ. 0 .OR. .NOT. LABFND ) .AND.
-     :        ( INDEX( DESCR, 'BUNITS') .EQ. 0 .OR. .NOT. UNTFND ) .AND.
+     :        ( INDEX( DESCR, 'BUNIT') .EQ. 0 .OR. .NOT. UNTFND ) .AND.
      :        ( INDEX( DESCR, 'TITLE') .EQ. 0 .OR. .NOT. TITFND ) ) THEN
 
 
