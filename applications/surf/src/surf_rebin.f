@@ -249,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.76  2003/04/01 01:10:35  timj
+*     Add a comment linking MAX_DIM to SCUBA__MAX_FITS
+*
 *     Revision 1.75  2002/09/18 22:04:01  timj
 *     BOLREBIN had an uninitialised pointer.
 *
@@ -516,10 +519,15 @@ c
       PARAMETER (WTFN_MAXRAD = 10)     ! in scale-lengths
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
-      INTEGER     MAX_FILE             ! max number of input files
-      PARAMETER (MAX_FILE = 256)
       BYTE BADBIT                      ! Bad bit mask
       PARAMETER (BADBIT = 3)
+*  Note that if MAX_FILE is increased you should also increase the
+*  SCUBA__MAX_FITS constant in SURF_PAR such that there is enough
+*  space for all the potential extra FITS headers. This is because
+*  we create a FITS header per input file.      
+      INTEGER     MAX_FILE             ! max number of input files
+      PARAMETER (MAX_FILE = 256)
+
       
 *  Local variables:
       INTEGER          ABOL_DATA_END(MAX_FILE)
