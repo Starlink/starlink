@@ -421,6 +421,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - WcsWithWcs: Corrected to ignore longitude axis returned by
 *        astPrimaryFrame since it does not take into account any axis
 *        permutation.
+*      26-NOV-2002 (DSB):
+*        - SpecTrans: Corrected no. of characters copied from CTYPE to PRJ,
+*        (from 5 to 4), and terminate PRJ correctly. 
 *class--
 */
 
@@ -13500,14 +13503,16 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
              !strncmp( cval + 1, "LON", 3 ) ||
              !strncmp( cval + 2, "LN", 2 ) ) {
             axlon = j;
-            strncpy( prj, cval + 4, 5 );
+            strncpy( prj, cval + 4, 4 );
+            prj[ 4 ] = 0;
             strncpy( lontype, cval, 10 );
 
          } else if( !strncmp( cval, "DEC-", 4 ) ||
              !strncmp( cval + 1, "LAT", 3 ) ||
              !strncmp( cval + 2, "LT", 2 ) ) {
             axlat = j;
-            strncpy( prj, cval + 4, 5 );
+            strncpy( prj, cval + 4, 4 );
+            prj[ 4 ] = 0;
             strncpy( lattype, cval, 10 );
          }
          j++;
