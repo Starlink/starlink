@@ -1099,7 +1099,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 
                           IF((DTOP(IAX)-RBOT(IAX))*DIR(IAX).GE.0.0
      :                                                            .AND.
-     :                       (RTOP(IAX)-DTOP(IAX))*DIR(IAX).GT.0.0)
+     :                       (RTOP(IAX)-DTOP(IAX))*DIR(IAX).GE.0.0)
      :                                                            THEN
                             RIH(IAX)=IBIN
                             HIFOUND=.TRUE.
