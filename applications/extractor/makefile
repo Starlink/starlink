@@ -1367,7 +1367,7 @@ strip:
 adamprint.o: sae_par.h merswrap.h msg_par.h
 
 analyse.o: define.h globals.h fitscat.h back.h check.h assoc.h plist.h flag.h \
-           growth.h photom.h psf.h retina.h types.h
+           growth.h photom.h psf.h retina.h types.h astrom.h astrom.h
 
 assoc.o: define.h globals.h assoc.h types.h
 
