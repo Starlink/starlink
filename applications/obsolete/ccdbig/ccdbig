@@ -52,8 +52,11 @@
       # Do we want to use a bias frame? (else just interpolate)
             set biasframe = TRUE
 
+      # Set data type (_REAL, _WORD, _DOUBLE are sensible)
+            set datatype = _REAL
+
       # Set list of image sizes of frames (pixels along a side)
-            set image_sizes = ( 1000 2000 3000 4000 5000 6000 )
+            set image_sizes = ( 1000 2000 3000 4000 )
 
       # Set list of object densities (objects per million pixels).
       # If this is set to ( 0 ) then min_objects will always be used.
@@ -66,7 +69,7 @@
             set interval = 15
 
       # Set filename for logging resource usage
-            set timelogfile = ccdbig_time.log
+            set reslogfile = ccdbig_res.log
 
 # End of parameter setup.
 ###################################################################
@@ -76,6 +79,8 @@
       set abort = "\!\!"
 
 #  Validation of booleans
+#  (since we test on TRUE and FALSE a value which was neither would
+#  have messy consequences so it's best to check).
       foreach boolean ( variance keepard biasframe )
          set value = `eval echo '$'$boolean`
          if ( "$value" != "TRUE" && "$value" != "FALSE" ) then
@@ -90,6 +95,9 @@
 
 #  Ensure CCDPACK commands are available
       ccdpack
+
+#  Ensure KAPPA commands are available
+      kappa
 
 #  Establish the current directory as ADAM_USER and clear 
 #  any global values already existing 
@@ -110,7 +118,7 @@
 
 #  Copy required files from source directory.
       if ( -e $CCDBIG_DIR/ccdbig_obj.dat )  cp $CCDBIG_DIR/ccdbig_obj.dat .
-      if ( -e $CCDBIG_DIR/ccdtest_ard.dat ) cp $CCDBIG_DIR/ccdtest_ard.dat .
+      if ( -e $CCDBIG_DIR/ccdtest.ard )     cp $CCDBIG_DIR/ccdtest.ard .
       if ( -e $CCDBIG_DIR/reslog )          cp $CCDBIG_DIR/reslog .
       if ( ! -x ./reslog )                  chmod +x reslog
       if ( ! -e ccdbig_obj.dat ) then
@@ -129,9 +137,8 @@
          endif
       endif
 
-#  If we're going to use a device we need KAPPA.
+#  Set up graphics device if necessary
       if ( "$device" != "NONE" ) then
-         kappa
          idset $device \\
          gdset $device \\
          gdclear \\
@@ -141,24 +148,25 @@
 
 #  Write some startup info to the log file
       set labelfile = reslog.label
-      echo                                                >>$timelogfile
-      uname -a                                            >>$timelogfile
-      uptime                                              >>$timelogfile
-      date                                                >>$timelogfile 
-      du -sk $PWD                                         >>$timelogfile
-      echo                                                >>$timelogfile
-      echo "Variance:  $variance"                         >>$timelogfile
-      echo "Keepard:   $keepard "                         >>$timelogfile
-      echo "Biasframe: $biasframe"                        >>$timelogfile
-      echo "Logging interval:   $interval"                >>$timelogfile
-      echo                                                >>$timelogfile
-      printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$timelogfile 
-      echo                                                >>$timelogfile
+      echo                                                >>$reslogfile
+      uname -a                                            >>$reslogfile
+      uptime                                              >>$reslogfile
+      date                                                >>$reslogfile 
+      du -sk $PWD                                         >>$reslogfile
+      echo                                                >>$reslogfile
+      echo "Variance:  $variance"                         >>$reslogfile
+      echo "Keepard:   $keepard "                         >>$reslogfile
+      echo "Biasframe: $biasframe"                        >>$reslogfile
+      echo "Data type: $datatype"                         >>$reslogfile
+      echo "Logging interval:   $interval"                >>$reslogfile
+      echo                                                >>$reslogfile
+      printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$reslogfile 
+      echo                                                >>$reslogfile
 
 #  Set up aliases for logging run times to a file.
       alias log_start \
          'printf "%7d%7d%12s:  " $frame_pixels $objects \!\!:1 >$labelfile'
-      ./reslog -f $timelogfile -i $interval -l $labelfile  &
+      ./reslog -f $reslogfile -i $interval -l $labelfile  &
 
 #  Loop over sizes of images
       foreach frame_pixels ( $image_sizes )
@@ -166,7 +174,8 @@
 
 #  Loop over number of objects in frame
          foreach density ( $object_densities )
-            @ objects = ($field_pixels * $field_pixels * $density) / 1000000
+            @ objects = ((($field_pixels * $field_pixels) / 1000) * $density) \
+                        / 1000
             if ( $objects < $min_objects ) set objects = $min_objects
 
 #  Generate file containing objects for use by ccdgenerate:
@@ -195,7 +204,7 @@
             echo "  Setting the characteristics of the CCD device using the "
             echo "  CCDSETUP routine."
             echo " "
-            if ( -e ccdtest_ard.dat && "$keepard" == "TRUE" ) then
+            if ( -e ccdtest.ard && "$keepard" == "TRUE" ) then
 
 #  Found the ARD file setup CCDPACK appropriately.
 #  We use the same ARD file regardless of size.  This is probably OK.
@@ -210,7 +219,7 @@
                   logfile=ccdtest.log \
                   preserve=true \
                   direction=x \
-                  mask=ccdtest_ard.dat \
+                  mask=ccdtest.ard \
                   reset accept
 #              end ccdsetup
 
@@ -270,6 +279,24 @@
 
 #  Delete bias frames if we don't need them.
             if ($biasframe == "FALSE") rm bias?.sdf
+
+#  Change the data type if required.
+#    Find out the current data type.
+            ndftrace data1 quiet
+            set type = `parget type ndftrace`
+
+#    If it's not what we want then change it for all frames.
+            if ( "$type" != "$datatype" ) then
+               echo " "
+               log_start settype
+               foreach file ( data?.sdf bias?.sdf ff?.sdf )
+                  set ndf = $file:r
+                  echo "  Changing DATA element of NDF $ndf to type $datatype"
+                  settype $ndf $datatype
+               end
+               echo " "
+            endif
+
 
 #  If display capability is enabled then display one DATA frame.
             if ( "$device" != "NONE" ) then
@@ -413,7 +440,7 @@
                ardmask  \
                   in=master_flat \
                   out=masked_flat \
-                  ardfile=ccdtest_ard.dat 
+                  ardfile=ccdtest.ard 
 #              end ardmask
                mv masked_flat.sdf master_flat.sdf
             endif
