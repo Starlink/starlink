@@ -2,6 +2,7 @@
 
 % ? Specify used packages
 \usepackage{graphicx}        %  Use this one for final production.
+\usepackage{amsmath}
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
@@ -255,7 +256,11 @@
                     \item [\rm \rule{\textwidth}{0.15mm}]}
 
 % Frame attributes fount.  Need to find a way for these to stand out.
-% San serif doesn't work by defalt.
+% San serif doesn't work by default.  Also without the \rm the
+% san serif continues after \att hyperlinks.  Not sure why.  Why
+% this was fixed by say having extra braces, the \sstattribute 
+% then used roman fount for itas headings.  The current lash up
+% appears to work, but needs further investigation or a TeX wizard.
 \newcommand{\att}[1]{\sf #1}
 \begin{htmlonly}
 \renewcommand{\att}[1]{\large{\tt #1}}
@@ -360,6 +365,8 @@
 %        Corrected banner width.
 %     2-DEC-1998 (DSB):
 %        Added sstattributetype (copied from sun210.tex).
+%     2004 August 6 (DSB):
+%        Added sstattribute.
 %     {enter_further_changes_here}
 
 %  Bugs:
@@ -579,7 +586,7 @@
       \end{description}
    }
 
-%  sstattribute
+%  sstattribute. Note the further level of subsectioning.
    \renewcommand{\sstattribute}[3]{
       \subsubsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
@@ -8497,7 +8504,7 @@ attribute of the sky Frame, we could say:
       Frame.  This might be used (\emph{e.g.}) in algebraic 
       expressions where
       a full description of the axis would be inappropriate.  Examples
-      include {\tt "RA"} and {\tt "Dec"} (for Right Ascension and Declination).
+      include {\tt "RA"} and {\tt "Dec"} (for right ascension and declination).
 
       If a {\att Symbol} value has not been set for a Frame axis, then a
       suitable default is supplied.
@@ -16889,7 +16896,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          top, left.  If fewer than four values are given, extra values are
          used equal to the first supplied value.  If these margins are too
          narrow any axis annotation may be clipped.  If a null ({\tt{!}}) value is
-         supplied, the value used is 0.15 (for all edges) if annotated axes
+         supplied, the value used is {\tt 0.15} (for all edges) if annotated axes
          are being produced, and zero otherwise.  See also parameter KEYPOS.
          {\tt [}current value{\tt{]}}
       }
@@ -18553,7 +18560,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          given, extra values are used equal to the first supplied value.  If
          these margins are too narrow any axis annotation may be clipped.
          If a null ({\tt{!}}) value is supplied, the value used is (for all edges);
-         0.15 if annotated axes are being produced; 0.04, if a simple border
+         {\tt 0.15} if annotated axes are being produced; 0.04, if a simple border
          is being produced; and 0.0 if neither border nor axes are being
          produced.  {\tt [}current value{\tt{]}}
       }
@@ -25767,7 +25774,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          If less than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
-         value used is 0.15 (for all edges) if either annotated axes or a
+         value used is {\tt 0.15} (for all edges) if either annotated axes or a
          key are produced, and zero otherwise.   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -30600,9 +30607,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
             {\tt "xx,yy,zz"} --- A list of line indices.
 
             \sstitem
-            {\tt "xx:yy"} ---  Line indices between xx and yy inclusively.  When
-            xx is omitted the range begins from the lower bound of the line
-            dimension; when yy is omitted the range ends with the maximum
+            {\tt "xx:yy"} ---  Line indices between \textit{xx} and 
+            \textit{yy} inclusively.  When
+            \textit{xx} is omitted the range begins from the lower bound of the line
+            dimension; when \textit{yy} is omitted the range ends with the maximum
             value it can take, that is the upper bound of the line dimension
             or the maximum number of lines this routine can plot.
 
@@ -32103,7 +32111,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          If less than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
-         value used is 0.15 (for all edges) if annotated axes are produced, 
+         value used is {\tt 0.15} (for all edges) if annotated axes are produced, 
          and zero otherwise. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -32532,7 +32540,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          top, left.  If fewer than four values are given, extra values are
          used equal to the first supplied value.  If these margins are too
          narrow any axis annotation may be clipped.  If a null ({\tt{!}}) value is
-         supplied, the value used is 0.15 (for all edges) if annotated axes
+         supplied, the value used is {\tt 0.15} (for all edges) if annotated axes
          are being produced, and zero otherwise. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -35403,7 +35411,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          If less than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
-         value used is 0.15 (for all edges) if either annotated axes or a
+         value used is {\tt 0.15} (for all edges) if either annotated axes or a
          key are produced, and zero otherwise. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -36836,7 +36844,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
          If less than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
-         value used is 0.15 (for all edges) if annotated axes are produced, 
+         value used is {\tt 0.15} (for all edges) if annotated axes are produced, 
          and zero otherwise. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -38663,10 +38671,11 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       removed from pixels within the NDF.  The pixels operated on
       can either be those selected by the user (as described above),
       or those not selected.  The quality of all other pixels is left
-      unchanged (unless the parameter FUNCTION is given the value NS$+$HU
-      or NU$+$HS).  Thus for instance if pixel (1,~1) already held the
+      unchanged (unless the parameter FUNCTION is given the value 
+      {\tt "NS$+$HU"}  or {\tt "NU$+$HS"}).  Thus for instance if 
+      pixel (1,~1) already held the
       quality specified by QNAME, and the quality was then assigned to
-      pixel (2,2) this would not cause the quality to be removed from
+      pixel (2,~2) this would not cause the quality to be removed from
       pixel (1,~1).
    }
    \sstusage{
@@ -38696,7 +38705,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          definition of the quality name.
       }
       \sstsubsection{
-         FUNCTION = LITERAL (Read)
+         FUNCTION = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          This parameter specifies what function is to be performed on
          the `selected' pixels specified using parameters MASK, LIST or
@@ -38706,36 +38715,36 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          \ssthitemlist{
 
             \sstitem
-            HS:  Ensure that the quality specified by QNAME is held by
+            {\tt "HS"} --- Ensure that the quality specified by QNAME is held by
                  all the selected pixels.  The quality of all other
                  pixels is left un-changed.
 
             \sstitem
-            HU:  Ensure that the quality specified by QNAME is held by all
+            {\tt "HU"} --- Ensure that the quality specified by QNAME is held by all
                  the pixels which have not been selected.  The quality of
                  the selected pixels is left un-changed.
 
             \sstitem
-            NS:  Ensure that the quality specified by QNAME is not held by
+            {\tt "NS"} --- Ensure that the quality specified by QNAME is not held by
                  any of the selected pixels.  The quality of all other
                  pixels is left un-changed.
 
             \sstitem
-            NU:  Ensure that the quality specified by QNAME is not held by
+            {\tt "NU"} --- Ensure that the quality specified by QNAME is not held by
                  any of the pixels which have not been selected.  The
                  quality of the selected pixels is left un-changed.
 
             \sstitem
-            HS$+$NU:  Ensure that the quality specified by QNAME is held by
+            {\tt "HS$+$NU"} --- Ensure that the quality specified by QNAME is held by
                  all the selected pixels and not held by any of the other
                  pixels.
 
             \sstitem
-            HU$+$NS:  Ensure that the quality specified by QNAME is held by
+            {\tt "HU$+$NS"} --- Ensure that the quality specified by QNAME is held by
                  all the pixels which have not been selected and not held
                  by any of the selected pixels.
-                                                                       {\tt ["HS"]}
          }
+         {\tt ["HS"]}
       }
       \sstsubsection{
          LIST = LITERAL (Read)
@@ -38852,10 +38861,11 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
    Stores new  WCS information within an NDF
 }{
    \sstdescription{
-      This application adds \htmlref{WCS}{apndf:wcs} information describing a celestial sky
-      co-ordinate system to a two-dimensional \NDFref{NDF}.  This information can
-      be stored either in the form of a standard NDF WCS component, or
-      in the form of an \emph{IRAS90 astrometry structure} (see parameter
+      This application adds \htmlref{WCS}{se:wcsuse}~ information describing 
+      a celestial sky co-ordinate system to a two-dimensional \NDFref{NDF}.  This
+      information can be stored either in the form of a standard NDF
+      \htmlref{WCS component}{apndf:wcs}, or
+      in the form of an \emph{IRAS90 astrometry structure}~ (see parameter
       IRAS90).
 
       The astrometry is determined either by you supplying explicit
@@ -38864,8 +38874,8 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       (see parameter POSITIONS).  In the latter case, the projection
       parameters are determined automatically by searching through
       parameter space in order to minimise the sum of the squared
-      residuals between the supplied pixel co-ordinates and the
-      transformed sky co-ordinates.  You may force particular
+      residuals between the supplied \htmlref{pixel co-ordinates}{se:pixgrd}~ and 
+      the transformed sky co-ordinates.  You may force particular
       projection parameters to take certain values by assigning an
       explicit value to the corresponding application parameter listed
       below.  The individual residuals at each position can be written
@@ -38921,10 +38931,11 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       }{
          The latitude of the reference point, in the co-ordinate system
          specified by parameter COORDS.  For example, if COORDS is
-         {\tt "Equatorial"}, LAT is the Declination.  See \xref{SUN/163}{sun163}{}, Section
+         {\tt "Equatorial"}, LAT is the declination.  See
+         \xref{SUN/163}{sun163}{SEC:COF}, Section
          4.7.2 for full details of the allowed syntax for specifying
          this position.  For convenience here are some examples how you
-         may specify the Declination -45 degrees, 12 arcminutes: {\tt "-45 12 00"}, 
+         may specify the declination -45 degrees, 12 arcminutes: {\tt "-45 12 00"}, 
          {\tt "-45 12"}, {\tt "-45d 12m"}, {\tt "-45.2d"}, {\tt "-451200"}, {\tt "-0.78888r"}.
          The last of these is a radians value.  A null value causes the
          latitude of the reference point to be estimated automatically
@@ -38943,10 +38954,11 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       }{
          The longitude of the reference point, in the co-ordinate
          system specified by parameter COORDS.  For example, if COORDS
-         is {\tt "Equatorial"}, LON is the Right Ascension.  See \xref{SUN/163}{sun163}{},
+         is {\tt "Equatorial"}, LON is the right ascension.  See
+         \xref{SUN/163}{sun163}{SEC:COF},
          Section 4.7.2 for full details of the allowed syntax for
          specifying this position.  For convenience here are some
-         examples how you may specify the Right Ascension 11 hours, 34
+         examples how you may specify the right ascension 11 hours, 34
          minutes, and 56.2 seconds: {\tt "11 34 56.2"}, {\tt "11h 34m 56.2s"}, {\tt "11
          34.9366"}, {\tt "11.58228"}, {\tt "113456.2"}.  See parameter LAT for
          examples of specifying a non-equatorial longitude.  A null
@@ -38975,7 +38987,8 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       }{
          The pixel co-ordinates of the reference pixel (x then y).
          This parameter is ignored unless REFCODE={\tt "Pixel"}.  Remember
-         that the centre of a pixel at indices i,j is (i-0.5,j-0.5).  A
+         that the centre of a pixel at indices \textit{i},\textit{j} is 
+         $(i-0.5,j-0.5)$.  A
          null value causes the pixel co-ordinates of the reference
          point to be estimated automatically from the data supplied for
          parameter POSITIONS. {\tt [!]}
@@ -39015,7 +39028,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
          preceded by an `up arrow' symbol ($\wedge$).
       }
       \sstsubsection{
-         PROJTYPE = LITERAL (Read)
+         PROJTYPE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The type of projection to use.  The options are:
             {\tt "Aitoff"}         --- Aitoff equal-area,
@@ -39028,7 +39041,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
              {\tt "Cylindrical"}   --- Lambert,
              {\tt "Tangent\_plane"} --- Gnomonic.
 
-         See \xref{SUN/163}{sun163}{} for descriptions of these projections.  A null
+         See \xref{SUN/163}{sun163}{SEC:PROJ} for descriptions of these projections.  A null
          value causes the projection to be determined automatically
          from the data supplied for parameter POSITIONS. {\tt [!]}
       }
@@ -39040,9 +39053,9 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
          be obtained through parameter PIXELREF.  The other options are
          locations specified by two characters, the first corresponding
          to the vertical position and the second the horizontal.  For
-         the vertical, valid positions are T(op), B(ottom), or
-         C(entre); and for the horizontal the options are L(eft),
-         R(ight), or C(entre).  Thus REFCODE={\tt "CC"} means the reference
+         the vertical, valid positions are {\tt T}(op), {\tt B}(ottom), or
+         {\tt C}(entre); and for the horizontal the options are {\tt L}(eft),
+         {\tt R}(ight), or {\tt C}(entre).  Thus REFCODE={\tt "CC"} means the reference
          position is at the centre of the NDF image, and {\tt "BL"} specifies
          that the reference position is at the centre of the
          bottom-left pixel in the image.  A null value causes the pixel
@@ -39100,8 +39113,8 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
          This creates a WCS component within the two-dimensional
          NDF called virgo.  It is a gnomonic projection in the
          equatorial system at Julian epoch 2000.0.  The bottom-left
-         pixel of the image is located at Right Ascension 12 hours 29
-         minutes, Declination $+$12 degrees 30 minutes.  A pixel at that
+         pixel of the image is located at right ascension 12 hours 29
+         minutes, declination $+$12 degrees 30 minutes.  A pixel at that
          position is square and has angular size of 1.1 arcseconds.
          The image was observed at epoch 1989.3.  At the bottom-left of
          the image, north is at the top, parallel to the \textit{y}-axis of the
@@ -39177,8 +39190,8 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
    Set a new title for an NDF data structure
 }{
    \sstdescription{
-      This routine sets a new value for the title component of an
-      existing \NDFref{NDF} data structure.  The NDF is accessed in update mode
+      This routine sets a new value for the \htmlref{TITLE component}{apndf:title}~ of 
+      an existing \NDFref{NDF} data structure.  The NDF is accessed in update mode
       and any pre-existing title is over-written with a new value.
       Alternatively, if a `null' value ({\tt{!}}) is given for the TITLE
       parameter, then the NDF's title will be erased.
@@ -39237,11 +39250,11 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
    an NDF
 }{
    \sstdescription{
-      This application allows the numeric type of the data and variance
-      components of an \NDFref{NDF} to be changed.  The NDF is accessed in update
-      mode and the values stored in these components are converted
-      in situ to the new type.  No other attributes of the NDF are
-      changed.
+      This application allows the \htmlref{numeric type}{ap:HDStypes}~ of
+      the data and variance components of an \NDFref{NDF} to be 
+      changed.  The NDF is accessed in update mode and the values stored 
+      in these components are converted in situ to the new type.  No other
+      attributes of the NDF are changed.
    }
    \sstusage{
       settype ndf type
@@ -39273,7 +39286,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
          their numeric type changed.
       }
       \sstsubsection{
-         TYPE = LITERAL (Read)
+         TYPE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The new numeric type to which the NDF's array components are
          to be converted.  The value given should be one of the
@@ -39281,14 +39294,16 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
          \_UBYTE (note the leading underscore).  Existing pixel values
          stored in the NDF will not be lost, but will be converted to
          the new type.  Any values which cannot be represented using the
-         new type will be replaced with the bad-pixel value.
+         new type will be replaced with the
+         \htmlref{bad-pixel}{se:masking}~ value.
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
       }{
          If a {\tt TRUE} value is given for this parameter, then the numeric
-         type of the NDF's variance array will be changed.  Otherwise,
-         this component's type will remain unchanged. {\tt [TRUE]}
+         type of the NDF's \htmlref{variance}{apndf:variance}~ array will 
+         be changed.  Otherwise, this component's type will remain 
+         unchanged. {\tt [TRUE]}
       }
    }
    \sstexamples{
@@ -39333,7 +39348,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
    Sets a new units value for an NDF data structure
 }{
    \sstdescription{
-      This routine sets a new value for the \htmlref{units component}{apndf:units}~ of an
+      This routine sets a new value for the \htmlref{UNITS component}{apndf:units}~ of an
       existing \NDFref{NDF} data structure.  The NDF is accessed in update mode
       and any pre-existing units component is over-written with a new
       value.  Alternatively, if a `null' value ({\tt{!}}) is given for the
@@ -39408,7 +39423,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
          values will be multiplied by 1.0E11, and the VARIANCE values by
          1.0E22.  However, if the original units component was (say) {\tt "K"}
          (Kelvin) then an error would be reported since there is no
-         direct conversion from Kelvin to MegaJansky.
+         direct conversion from Kelvin to Megajansky.
       }
    }
    \sstdiytopic{
@@ -39426,7 +39441,8 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
    structure
 }{
    \sstdescription{
-      This routine sets new values for the variance component of an \NDFref{NDF}
+      This routine sets new values for the 
+      \htmlref{VARIANCE}{apndf:variance}~ component of an \NDFref{NDF}
       data structure.  The data structure is accessed in `update' mode,
       and new variance values are generated from the NDF's data array
       by means of a Fortran-like arithmetic expression.  Any previous
@@ -39534,7 +39550,8 @@ KAPPA: \htmlref{ERRCLIP}{ERRCLIP};
       \sstsubsection{
          SHIFT( 2 ) = \_INTEGER (Read)
       }{
-         The shift in \textit{x} and \textit{y} pixel indices to be used in the
+         The shift in \textit{x} and \textit{y} \htmlref{pixel
+         indices}{se:pixgrd}~ to be used in the
          enhancement.  If the \textit{x} shift is positive, positive features
          in the original array will appear to be lit from the positive
          \textit{x} direction, \emph{i.e.} from the right.  Similarly, if the \textit{y} shift
@@ -39545,7 +39562,7 @@ KAPPA: \htmlref{ERRCLIP}{ERRCLIP};
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         The title for the output NDF.  A null value will cause
+         The \htmlref{title}{apndf:title}~ for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -39605,7 +39622,8 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
    Display the quality names defined in an NDF
 }{
    \sstdescription{
-      This routine displays a list of all the quality names currently
+      This routine displays a list of all the \htmlref{quality
+      names}{se:qnames}~ currently
       defined within a supplied \NDFref{NDF} (see task SETQUAL).  The descriptive
       comments which were stored with the quality names when they were
       originally defined are also displayed.  An option exists for also
@@ -39686,7 +39704,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          The NDF to be translated.
       }
       \sstsubsection{
-         METHOD = LITERAL (Read)
+         METHOD = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The interpolation method used to perform the translation.
          The following values are permitted:
@@ -39694,7 +39712,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Nearest"}   --- Nearest neighbour sampling.
+            {\tt "Nearest"}   --- Nearest-neighbour sampling.
 
             \sstitem
             {\tt "Linear"}    --- Linear interpolation.
@@ -39773,7 +39791,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       \sstexamplesubsection{
          slide m31 m31\_acc [3.2,2.3] nearest
       }{
-         The same as the previous example except that nearest neighbour
+         The same as the previous example except that nearest-neighbour
          resampling is used.  This will be somewhat faster, but may
          result in features shifted by up to half a pixel.
       }
@@ -39798,18 +39816,19 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       be adequate, but for greater control over the resampling
       process the METHOD and PARAMS parameters can be used.  Detailed
       discussion of the use of these parameters can be found in the
-      \htmlref{``Sub-pixel Interpolation Schemes''}{subpixel:regrid}
+      \htmlref{``Sub-pixel Interpolation Schemes''}{subpixel:regrid}~
       section of the REGRID task documentation.
    }
    \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
-         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all extensions are
-         propagated.  TITLE is controlled by the TITLE parameter.  DATA,
+         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all 
+         \htmlref{extensions}{apndf:extensions}~ are propagated.  
+         \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE parameter.  DATA,
          \htmlref{VARIANCE}{apndf:variance}, \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are propagated after appropriate modification. 
-         The \htmlref{QUALITY}{apndf:quality}~ component is also propagated if Nearest Neighbour
-         interpolation is being used.  
+         The \htmlref{QUALITY}{apndf:quality}~ component is also
+         propagated if nearest-neighbour interpolation is being used.  
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -39872,7 +39891,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
          the input NDF will be used.  Only used if MODE={\tt "Bounds"}.
       }
       \sstsubsection{
-         METHOD = LITERAL (Read)
+         METHOD = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The interpolation method used to perform the one-dimensional
          resampling operations which constitute the squash or stretch.
@@ -39886,7 +39905,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
                               otherwise equivalent to {\tt "Linear"}.
 
             \sstitem
-            {\tt "Nearest"}   --- Nearest neighbour sampling.
+            {\tt "Nearest"}   --- Nearest-neighbour sampling.
 
             \sstitem
             {\tt "Linear"}    --- Linear interpolation.
@@ -39919,7 +39938,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
          {\tt ["Auto"]}
       }
       \sstsubsection{
-         MODE = \htmlref{LITERAL}{se:parmenu} (Read)
+         MODE = LITERAL (Read)
       }{
          Determines how the shape of the output NDF is to be specified.
          If MODE={\tt "Factors"} (the default) then the FACTORS parameter
@@ -39984,8 +40003,8 @@ KAPPA: \htmlref{REGRID}{REGRID},
       }
    }
    \sstnotes{
-      If the input NDF contains a Variance component, a Variance
-      component will be written to the output NDF.  It will be
+      If the input NDF contains a \htmlref{VARIANCE}{apndf:variance}~ component, 
+      a VARIANCE component will be written to the output NDF.  It will be
       calculated on the assumption that errors on the input data
       values are statistically independent and that their variance
       estimates may simply be summed (with appropriate weighting
@@ -40011,18 +40030,19 @@ KAPPA: \htmlref{REGRID}{REGRID},
       control over the resampling process the METHOD and PARAMS
       parameters can be used.  Detailed discussion of the use of these
       parameters can be found in the 
-      \htmlref{``Sub-pixel Interpolation Schemes''}{subpixel:regrid}
+      \htmlref{``Sub-pixel Interpolation Schemes''}{subpixel:regrid}~
       section of the REGRID task documentation.
    }
    \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
-         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all extensions are
-         propagated.  TITLE is controlled by the TITLE parameter.  DATA,
+         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all 
+         \htmlref{extensions}{apndf:extensions}~ are
+         propagated.  \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE parameter.  DATA,
          \htmlref{VARIANCE}{apndf:variance}, \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are propagated after appropriate modification. 
-         The \htmlref{QUALITY}{apndf:quality}~ component is also propagated if Nearest Neighbour
-         interpolation is being used.  
+         The \htmlref{QUALITY}{apndf:quality}~ component is also propagated if 
+         nearest-neighbour interpolation is being used.  
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -40144,7 +40164,8 @@ KAPPA: \htmlref{REGRID}{REGRID},
       \sstsubsection{
          MAXPOS( ) = \_INTEGER (Write)
       }{
-         A one-dimensional array of pixel indices identifying the (first)
+         A one-dimensional array of \htmlref{pixel indices}{se:pixgrd}~
+         identifying the (first)
          maximum-valued pixel found in the NDF array.  The number of
          indices is equal to the number of NDF dimensions.
       }
@@ -40499,7 +40520,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       make the fit more accurate.  Values beyond upper and lower
       thresholds may be excluded from the binning.  Bad pixels are also
       excluded, so prior masking may help to find the background more
-      rapidly.  Kappa-sigma clipping of the fitted bins is available
+      rapidly.  $\kappa$-sigma clipping of the fitted bins is available
       so that the fit is not biased by anomalous bins, such as those
       entirely within an extended object.  If a given bin contains more
       than a prescribed fraction of bad pixels, it is excluded from the
@@ -40538,14 +40559,14 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          presented.  Between 1 and 5 values may be supplied. {\tt [2,3]}
       }
       \sstsubsection{
-         ESTIMATOR = LITERAL (Read)
+         ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The estimator for the bin.  It must be one of the following
          values: {\tt "Mean"} for the mean value, {\tt "Ksigma"} for the mean with
-         kappa-sigma clipping; {\tt "Mode"} for the mode, and {\tt "Median"} for
+         $\kappa$-sigma clipping; {\tt "Mode"} for the mode, and {\tt "Median"} for
          the median.  {\tt "Mode"} is only available when there are at least
          twelve pixels in a bin.  If a null ({\tt{!}}) value is supplied, {\tt "Median"}
-         is used if there are less than 6 values in a bin, and {\tt "Mode"} is
+         is used if there are fewer than 6 values in a bin, and {\tt "Mode"} is
          used otherwise. {\tt [!]}
       }
       \sstsubsection{
@@ -40594,10 +40615,10 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          The number of interior knots used for the bi-cubic-spline fit
          along the \textit{x} and \textit{y} axes.  These knots are equally spaced within
          the image.  Both values must be in the range 0 to 11.  If you
-         supply a single value, it applies to both axes.  Thus 1
+         supply a single value, it applies to both axes.  Thus {\tt 1}
          creates one interior knot, {\tt [5,4]} gives 5 along the \textit{x} axis and
          4 along the \textit{y} direction.  Increasing this parameter values
-         increases the flexibility of the surface.  Normally, 4 is a
+         increases the flexibility of the surface.  Normally, {\tt 4} is a
          reasonable value.  The upper limit of acceptable values will
          be reduced along each axis when its binned array dimension is
          less than 29.  KNOTS is only accessed when FITTYPE={\tt "Spline"}.
@@ -40608,14 +40629,14 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       }{
          The orders of the fits along the \textit{x} and \textit{y} directions.  Both
          values must be in the range 0 to 14.  If you supply a single
-         single value, it applies to both axes.  Thus 0 gives a
+         single value, it applies to both axes.  Thus {\tt 0} gives a
          constant, {\tt [3,1]} gives a cubic along the \textit{x} direction and a
          linear fit along the \textit{y} axis.  Increasing this parameter values
          increases the flexibility of the surface.  The upper limit of
          acceptable values will be reduced along each axis when its
          binned array dimension is less than 29.  ORDER is only
          accessed when FITTYPE={\tt "Polynomial"}.  The default is the current
-         value, which is 4 initially. {\tt []}
+         value, which is {\tt 4} initially. {\tt []}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -40649,7 +40670,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          The minimum fraction of good pixels in a bin that permits the
          bin to be included in the fit.  Here good pixels are ones that
          participated in the calculation of the bin's representative
-         value.  So they exclude both bad pixels and ones rejected
+         value.  So they exclude both \htmlref{bad pixels}{se:masking}~ and ones rejected
          during estimation (\emph{e.g.} ones beyond the thresholds or were
          clipped). {\tt [!]}
       }
@@ -40714,7 +40735,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
          \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF.
-         There is no support for VARIANCE processing.
+         There is no support for \htmlref{VARIANCE}{apndf:variance}~ processing.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -40759,7 +40780,8 @@ right.
       values less than or equal to THRHI.  Any values between THRLO and
       THRHI will be set to the value of parameter NEWLO in the output NDF.
 
-      Each replacement value may be the bad-pixel value for masking.
+      Each replacement value may be the \htmlref{bad-pixel}{se:masking}~ value 
+      for masking.
    }
    \sstusage{
       thresh in out thrlo thrhi newlo newhi [comp]
@@ -40946,7 +40968,7 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
       co-ordinates.  The pixel index of a data value is calculated
       using the expression
 
-      \[   index = {\rm IFIX}( ( x - xmin ) / scale ) + 1 \]
+      \[   {\rm index} = {\rm IFIX}( ( x - xmin ) / {\rm scale} ) + 1 \]
 
       where \textit{x} is the supplied co-ordinate and $xmin$ is the minimum
       supplied co-ordinate along an axis, $scale$ is the value of
@@ -40997,7 +41019,7 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
          BAD = \_LOGICAL (Read)
       }{
          If {\tt TRUE} the output NDF data array is initialised with the
-         bad value, otherwise it is filled with zeroes. {\tt [TRUE]}
+         \htmlref{bad value}{se:masking}, otherwise it is filled with zeroes. {\tt [TRUE]}
       }
       \sstsubsection{
          DTYPE = LITERAL (Read)
@@ -41078,7 +41100,7 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF. {\tt ["KAPPA - Trandat"]}
+         \htmlref{Title}{apndf:title}~ for the output NDF. {\tt ["KAPPA - Trandat"]}
       }
       \sstsubsection{
          VALCOL = \_INTEGER (Read)
@@ -41209,8 +41231,8 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
       \sstsubsection{
          TRIGFUNC = LITERAL (Read)
       }{
-           Trigonometrical function to be applied.  The options are:
-
+           Trigonometrical function to be applied.  The options are as follows.
+ 
          \ssthitemlist{
 
             \sstitem
@@ -41315,7 +41337,7 @@ KAPPA: \htmlref{ADD}{ADD},
       within a pair of two-dimensional \NDFref{NDFs}, the first holding the
       magnitude of the vector quantity at each pixel, and the second
       holding the corresponding vector orientations.  It is assumed that
-      the two NDFs are aligned in pixel co-ordinates.  The number of
+      the two NDFs are aligned in \htmlref{pixel co-ordinates}{se:pixgrd}.  The number of
       vectors in the plot is kept to a manageable value by only
       plotting vectors for pixels on a sparse regular matrix.  The
       increment (in pixels) between plotted vectors is given by
@@ -41326,8 +41348,8 @@ KAPPA: \htmlref{ADD}{ADD},
 
       The plot is produced within the \htmlref{current graphics database picture}{se:agitate},
       and may be aligned with an existing DATA picture if the existing
-      picture contains suitable \htmlref{co-ordinate Frame}{se:domains}~  information (see
-      parameter CLEAR).
+      picture contains suitable \htmlref{co-ordinate Frame}{se:domains}~ information 
+      (see parameter CLEAR).
 
       Annotated axes can be produced (see parameter AXES), and the
       appearance of these can be controlled in detail using parameter
@@ -41377,11 +41399,12 @@ KAPPA: \htmlref{ADD}{ADD},
          contour map will then be drawn in alignment with the displayed
          data.  If possible, alignment occurs within the current co-ordinate
          Frame of the NDF.  If this is not possible, (for instance if
-         suitable WCS information was not stored with the existing DATA
-         picture), then alignment is attempted in PIXEL
+         suitable \htmlref{WCS information}{se:wcsuse}~ was not stored with
+         the existing DATA picture), then alignment is attempted in PIXEL
          co-ordinates.  If this is not possible, then alignment is
-         attempted in GRID co-ordinates.  If this is not possible, then
-         alignment is attempted in the first suitable Frame found in the NDF
+         attempted in \htmlref{GRID co-ordinates}{se:pixgrd}.  If this is 
+         not possible, then alignment is attempted in the first suitable 
+         Frame found in the NDF
          irrespective of its domain.  A message is displayed indicating the
          domain in which alignment occurred.  If there are no suitable Frames
          in the NDF then an error is reported. {\tt [TRUE]}
@@ -41443,9 +41466,9 @@ KAPPA: \htmlref{ADD}{ADD},
       }{
          Two values giving the position of the key.  The first value gives
          the gap between the right hand edge of the contour map and the left
-         hand edge of the key (0.0 for no gap, 1.0 for the largest gap).  The
-         second value gives the vertical position of the top of the key (1.0
-         for the highest position, 0.0 for the lowest).  If the second value
+         hand edge of the key ({\tt 0.0} for no gap, {\tt 1.0} for the largest
+         gap).  The second value gives the vertical position of the top of the key 
+         ({\tt 1.0} for the highest position, {\tt 0.0} for the lowest).  If the second value
          is not given, the top of the key is placed level with the top of the
          vector map.  Both values should be in the range 0.0 to 1.0.  If a
          key is produced, then the right hand margin specified by parameter
@@ -41492,7 +41515,7 @@ KAPPA: \htmlref{ADD}{ADD},
          the example vector is formatted as an axis 2 value (using attribute
          FORMAT(2), \emph{etc}; the synonym VECTOR can be used in place of the
          value 2).  The vertical space between lines in the key can be
-         controlled using attribute TextLabGap.  A value of 1.0 is used if
+         controlled using attribute TextLabGap.  A value of {\tt 1.0} is used if
          no value is set for this attribute, and produces default vertical
          spacing. Values larger than 1.0 increase the vertical space, and
          values less than 1.0 decrease the vertical space. {\tt [}current value{\tt{]}}
@@ -41515,7 +41538,7 @@ KAPPA: \htmlref{ADD}{ADD},
          top, left.  If fewer than four values are given, extra values are
          used equal to the first supplied value.  If these margins are too
          narrow any axis annotation may be clipped.  If a null ({\tt{!}}) value
-         is supplied, the value used is 0.15 (for all edges) if annotated
+         is supplied, the value used is {\tt 0.15} (for all edges) if annotated
          axes are being produced, and zero otherwise.  See also parameter
          KEYPOS. {\tt [}current value{\tt{]}}
       }
@@ -41532,8 +41555,8 @@ KAPPA: \htmlref{ADD}{ADD},
          vector orientations.  The values are considered to be in units
          of degrees unless the \htmlref{UNITS}{apndf:units}~ component of the NDF has the value
          {\tt "Radians"} (case insensitive).  The positive \textit{y} pixel axis defines
-         zero orientation, and rotation from the \textit{x} pixel axis to the y
-         pixel is considered positive.
+         zero orientation, and rotation from the \textit{x} pixel axis to the 
+         \textit{y} pixel is considered positive. 
       }
       \sstsubsection{
          STEP = \_INTEGER (Read)
@@ -41631,15 +41654,17 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstitemlist{
 
          \sstitem
-         The Title component in NDF1 is used as the default title for
-         the annotated axes.  If the NDF does not have a Title component, then
-         the default title is taken from current co-ordinate Frame stored in the
-         \htmlref{WCS}{apndf:wcs} component of the NDF.  This default may be overridden by specifying
+         The \htmlref{Title}{apndf:title}~ component in NDF1 is used as the
+         default title for the annotated axes.  If the NDF does not have a
+         Title component, then the default title is taken from current 
+         co-ordinate Frame stored in the \htmlref{WCS}{apndf:wcs} component 
+         of the NDF.  This default may be overridden by specifying
          a value for the Title attribute using the STYLE parameter.
 
          \sstitem
-         The application stores a number of pictures in the graphics
-         database in the following order: a FRAME picture containing the
+         The application stores a number of pictures in the 
+         \htmlref{graphics database}{se:agitate}~ in the following order: a 
+         FRAME picture containing the
          annotated axes, vectors, and key; a KEY picture to store
          the key if present; and a DATA picture containing just the vectors.
          Note, the FRAME picture is only created if annotated axes or a key
@@ -41681,13 +41706,14 @@ plot (7k).
    WCS component of an NDF
 }{
    \sstdescription{
-      This application can be used to create a new AST Mapping and
-      optionally use the Mapping to add a new \htmlref{co-ordinate Frame}{se:domains}~  into
-      the \htmlref{WCS}{apndf:wcs} component of an \NDFref{NDF} (see parameter NDF).  An output text file
-      may also be created holding a textual representation of the
-      Mapping for future use by other applications such as REGRID (see
-      parameter MAPOUT).  A number of different types of Mapping can be
-      used (see parameter MAPTYPE).
+      This application can be used to create a new 
+      \htmlref{AST Mapping}{se:curframe}~ and optionally use the Mapping to
+      add a new \htmlref{co-ordinate Frame}{se:domains}~ into the 
+      \htmlref{WCS}{apndf:wcs}~ component of an \NDFref{NDF} (see parameter 
+      NDF).  An output text file may also be created holding a textual 
+      representation of the Mapping for future use by other applications 
+      such as REGRID (see parameter MAPOUT).  A number of different types 
+      of Mapping can be used (see parameter MAPTYPE).
 
       When adding a new Frame to a WCS component, the Mapping is used to
       connect the new Frame to an existing one (called the \emph{basis} Frame:
@@ -41695,7 +41721,7 @@ plot (7k).
       using parameter FRMTYPE (the default is to simply copy the basis Frame).
       Attributes which have been assigned an explicit value in the basis Frame
       are transfered to the new Frame (but only if they are relevant to the
-      type of the new Frame).  The value of the Domain attribute for the new
+      type of the new Frame).  The value of the {\att Domain} attribute for the new
       Frame can be specified using parameter DOMAIN.  Other attribute values
       for the new Frame may be specified using parameters ATTRS.  The new
       Frame becomes the current co-ordinate Frame in the NDF.
@@ -41772,7 +41798,8 @@ plot (7k).
          The value for the Domain attribute for the new Frame.  Care should be
          taken to ensure that domain names are used consistently.  This
          will usually mean avoiding any domain names which are already in
-         use within the WCS component, particularly the standard domain names
+         use within the WCS component, particularly the 
+         \htmlref{standard domain names}{se:domains}~
          such as GRID, PIXEL, AXIS and GRAPHICS.  The supplied value is
          stripped of spaces, and converted to upper case before being used.
       }
@@ -41867,7 +41894,7 @@ plot (7k).
          The  name of a file containing an AST Mapping with which to
          connect the basis Frame to the new one.  The file may be a text
          file which contains the textual representation of an AST Mapping,
-         or a FITS file which contains the Mapping as an AST object
+         or a {\FITSref}~ file which contains the Mapping as an AST object
          encoded in its headers, or an NDF.  If it is an NDF, the
          Mapping from its base (GRID-domain) to current Frame will be
          used.  Only used when MAPTYPE={\tt "FILE"}.
@@ -41881,7 +41908,7 @@ plot (7k).
          created. {\tt [!]}
       }
       \sstsubsection{
-         MAPTYPE = LITERAL (Read)
+         MAPTYPE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The type of Mapping to be used to connect the new Frame to the
          basis Frame.  It must be one of the following strings, each
@@ -42006,7 +42033,7 @@ plot (7k).
    }
    \sstexamples{
       \sstexamplesubsection{
-         wcsadd speca axis frmtype=specframe maptype=unit \linebreak
+         wcsadd speca axis frmtype=specframe maptype=unit \latexonly{\linebreak}
          attrs="'system=wave,unit=Angstrom'"
       }{
          This example assumes the NDF called speca has an Axis
@@ -42015,7 +42042,7 @@ plot (7k).
 	 WCS component of the NDF.  The SpecFrame is connected to the
 	 Frame describing the NDF Axis structure using a unit Mapping.
 	 Subsequently, \htmlref{WCSATTRIB}{WCSATTRIB} can be used to
-	 modify the SpecFrame so that it describes the spectral axis
+	 modify the SpecFrame so that it describes the spectral-axis
 	 value in some other system (frequency, velocities of various
 	 forms, energy, wave number, \emph{etc.}).
       }
@@ -42029,7 +42056,7 @@ plot (7k).
          record of the original pixel co-ordinate Frame.
       }
       \sstexamplesubsection{
-         wcsadd my\_data dist-lum dist(au)-lum linear tr=[0,2.0628E5,0,0,0,1]
+         wcsadd my\_data dist-lum dist(au)-lum linear tr=[0,2.0626E5,0,0,0,1]
       }{
          This adds a new co-ordinate Frame into the WCS component of the
          NDF called my\_data.  The new Frame is given the domain DIST(AU)-LUM
@@ -42037,12 +42064,12 @@ plot (7k).
          axis in the new Frame is derived from the first axis in the basis
          Frame but is in different units (AU instead of parsecs).  This
          change of units is achieved by multiplying the old Frame axis 1
-         values by 2.0628E5.  The values on the second axis are copied
+         values by 2.0626E5.  The values on the second axis are copied
          without change.  You could then use application WCSATTRIB to set
          the {\tt "Unit"} attribute for axis 1 of the new Frame to {\tt "AU"}.
       }
       \sstexamplesubsection{
-         wcsadd my\_data dist-lum dist(au)-lum diag diag=[2.0628E5,1]
+         wcsadd my\_data dist-lum dist(au)-lum diag diag=[2.0626E5,1]
       }{
          This does exactly the same as the previous example.
       }
@@ -42061,8 +42088,8 @@ plot (7k).
          axes, but is translated by 1024 pixels on the third axis.
       }
       \sstexamplesubsection{
-         wcsadd plane pixel polar math simpif simpfi \linebreak
-            forexp="'r=sqrt(x$*$x+y$*$y),theta=atan2(y,x)'" \linebreak
+         wcsadd plane pixel polar math simpif simpfi \latexonly{\linebreak}
+            forexp="'r=sqrt(x$*$x+y$*$y),theta=atan2(y,x)'" \latexonly{\linebreak}
             invexp="'x=r$*$cos(theta),y=r$*$sin(theta)'"
       }{
          A new Frame is added which gives pixel positions in polar
@@ -42146,7 +42173,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       default values are generated separately for each output NDF so
       that the output NDF just encloses the entire area covered by the
       corresponding input NDF. Using the first method will ensure that
-      all output NDFs have the same pixel origin, and so the resulting
+      all output NDFs have the same pixel
+      \htmlref{origin}{apndf:origin}~, and so the resulting
       NDFs can be directly compared.  However, this may result in the
       output NDFs being larger than necessary.  In general, the second
       method results in smaller NDFs being produced, in less time.
@@ -42163,10 +42191,10 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          The positional accuracy required, as a a number of pixels.  For
          highly non-linear projections, a recursive algorithm is used in
          which successively smaller regions of the projection are fitted
-         with a least squares linear transformation.  If such a transformation
+         with a least-squares linear transformation.  If such a transformation
          results in a maximum positional error greater than the value
-         supplied for ACC (in pixels), then a smaller region is used.  High
-         accuracy is paid for by larger run times. {\tt [0.5]}
+         supplied for ACC (in pixels), then a smaller region is used.  
+         Higher accuracy is paid for by larger run times. {\tt [0.5]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -42210,7 +42238,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          MAXPIX = \_INTEGER (Read)
       }{
          A value which specifies an initial scale size in pixels for the
-         adaptive algorithm which approximates non-linear Mappings with
+         adaptive algorithm which approximates non-linear 
+         \htmlref{Mappings}{se:curframe}~ with
          piece-wise linear transformations.  If MAXPIX is larger than any
          dimension of the region of the output grid being used, a first
          attempt will be made to approximate the Mapping by a linear
@@ -42235,7 +42264,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             {\tt "Bilinear"} --- the output pixel values are calculated by
             bi-linear interpolation among the four nearest pixels values
             in the input NDF.  Produces smoother output NDFs than
-            the nearest neighbour scheme, but is marginally slower.
+            the nearest-neighbour scheme, but is marginally slower.
 
             \sstitem
             {\tt "Nearest"} --- the output pixel values are assigned the value
@@ -42250,7 +42279,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             {\tt "SincSinc"} --- uses the sinc(pi$*$x)sinc(k$*$pi$*$x) kernel.  A
             valuable general-purpose interpolation scheme, intermediate
             in its visual effect on NDFs between the bilinear and
-            nearest neighbour schemes.
+            nearest-neighbour schemes.
 
             \sstitem
             {\tt "SincCos"} --- uses the sinc(pi$*$x)cos(k$*$pi$*$x) kernal.  Gives
@@ -42273,11 +42302,11 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          neighbouring pixels, whereas a sample taken at the corner of a
          pixel will have equal contributions from all four neighbouring
          pixels, resulting in greater smoothing and lower noise.  This
-         effect can produce complex Moire patterns in the output
+         effect can produce complex Moir\'{e} patterns in the output
          variance estimates, resulting from the interference of the
          spatial frequencies in the sample positions and in the pixel
          centre positions.  For these reasons, if you want to use the
-         output variances, you are generally safer using nearest neighbour
+         output variances, you are generally safer using nearest-neighbour
          interpolation.   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -42325,21 +42354,21 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          PARAMS( 1 ) is required by all the above interpolation schemes.
          It is used to specify how many pixels are to contribute to the
          interpolated result on either side of the interpolation point
-         in each dimension.  Typically, a value of 2 is appropriate and the
+         in each dimension.  Typically, a value of {\tt 2 } is appropriate and the
          minimum allowed value is 1 ( \emph{i.e.} one pixel on each side ).  A value
-         of zero or less indicates that a suitable number of pixels should be
+         of zero or fewer indicates that a suitable number of pixels should be
          calculated automatically. {\tt [0]}
 
          PARAMS( 2 ) is required only by the SincSinc, SincCos, and
          SincGauss interpolation schemes.  For the SincSinc and SincCos
          schemes, it specifies the number of pixels at which the envelope
          of the function goes to zero.  The minimum value is 1.0, and the
-         run-time default value is 2.0.  For the SincGauss scheme, it
+         run-time default value is {\tt 2.0}.  For the SincGauss scheme, it
          specifies the full-width at half-maximum (FWHM) of the Gaussian
-         envelope.  The minimum value is 0.1, and the run-time default is
-         1.0.  On astronomical NDFs and spectra, good results are often
+         envelope.  The minimum value is {\tt 0.1}, and the run-time default is
+         {\tt 1.0}.  On astronomical NDFs and spectra, good results are often
          obtained by approximately matching the FWHM of the envelope
-         function, given by PARAMS(2), to the point spread function of the
+         function, given by PARAMS(2), to the point-spread function of the
          input data. {\tt []}
       }
       \sstsubsection{
@@ -42398,7 +42427,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          propagated from the reference NDF to all output NDFs.
 
          \sstitem
-         QUALITY is propagated from input to output only if parameter
+         \htmlref{QUALITY}{apndf:quality} is propagated from input to output only if parameter
          METHOD is set to {\tt "Nearest"}.
       }
    }
@@ -42406,7 +42435,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       Related Applications
    }{
 KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
-\htmlref{RESAMPLE}{RESAMPLE};
+\htmlref{REGRID}{REGRID};
 \xref{CCDPACK}{sun139}{}: \xref{TRANNDF}{sun139}{TRANNDF}.
    }
    \sstimplementationstatus{
@@ -42497,6 +42526,10 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          \ssthitemlist{
 
             \sstitem
+            {\tt "Clear"} --- Clears the current attribute value, causing it to
+            revert to its default value.
+
+            \sstitem
             {\tt "Get"} --- The current value of the attribute is displayed on the
             screen and written to output parameter VALUE.  If the attribute
             has not yet been assigned a value (or has been cleared), then the
@@ -42512,9 +42545,6 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
             adopt its default value).  This flag is written to the output
             parameter STATE.
 
-            \sstitem
-            {\tt "Clear"} --- Clears the current attribute value, causing it to
-            revert to its default value.
          }
       }
       \sstsubsection{
@@ -42527,7 +42557,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       }{
          Only accessed if MODE is {\tt "Set"}.  If REMAP is {\tt TRUE}, then the
          Mappings which connect the current Frame to the other Frames
-         within the WCS FrameSet will be modified (if necessary) to
+         within the \htmlref{WCS FrameSet}{se:curframe}~ will be modified (if necessary) to
          maintain the FrameSet integrity.  For instance, if the current
          Frame of the NDF represents FK5 RA and DEC, and you change
          System from {\tt "FK5"} to {\tt "Galactic"}, then the Mappings which connect
@@ -42582,7 +42612,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          This sets the Format attribute for axis 1 in the current co-ordinate
          Frame in the NDF called my\_data, so that axis values are
          formated as floating point values using a minimum field width of
-         10 characters, and displaying 5 significant figures.  An exponent is
+         ten characters, and displaying five significant figures.  An exponent is
          used if necessary.
       }
       \sstexamplesubsection{
@@ -42591,7 +42621,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          This sets the Format attribute for axis 2 in the current co-ordinate
          Frame in the NDF called ngc5128, so that axis values are formated as
          separate degrees, minutes and seconds field, separated by blanks.
-         The seconds field has 2 decimal places.  This assumes the current
+         The seconds field has two decimal places.  This assumes the current
          co-ordinate Frame in the NDF is a celestial co-ordinate Frame.
       }
       \sstexamplesubsection{
@@ -42662,10 +42692,10 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
    Copies WCS information from one NDF to another
 }{
    \sstdescription{
-      This application copies the \htmlref{WCS}{apndf:wcs} component from one 
+      This application copies the \htmlref{WCS}{apndf:wcs}~ component from one 
       \NDFref{NDF} to another, optionally modifying it to take account of a linear
-      mapping between the pixel co-ordinates in the two NDFs.  It can be
-      used, for instance, to rectify the loss of WCS information produced
+      mapping between the \htmlref{pixel co-ordinates}{se:pixgrd}~ in the two 
+      NDFs.  It can be used, for instance, to rectify the loss of WCS information produced
       by older applications which do not propagate the WCS component.
    }
    \sstusage{
@@ -42705,8 +42735,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          transformation from pixel co-ordinates in the reference NDF given
          for parameter LIKE, to pixel co-ordinates in the input NDF given
          for parameter NDF.  For instance, if a feature has pixel co-ordinates
-         (X,Y,Z,...) in the reference NDF, and pixel co-ordinates
-         (U,V,W,...) in the input NDF, then the following transformations
+         ($X$,$Y$,$Z$,\dots) in the reference NDF, and pixel co-ordinates
+         ($U$,$V$,$W$,\dots) in the input NDF, then the following transformations
          would be used, depending on how many axes each NDF has:
 
          \begin{itemize}
@@ -44968,7 +44998,8 @@ rather than the structure shown above.
 each axis, defaulting to 1.  See \hyperref{Pixel Indices, Pixel
 Co-ordinates, and Grid Co-ordinates}{Section~}{}{se:pixgrd}~ for further
 information and a graphic.  ORIGIN may be set with task
-\htmlref{SETORIGIN}{SETORIGIN}.
+\htmlref{SETORIGIN}{SETORIGIN}, or after processing an \htmlref{NDF
+section}{se:ndfsect}.
 
 \label{apndf:bpflag}
 \item[{\bf BAD\_PIXEL}] -- the bad-pixel flag indicating whether there
