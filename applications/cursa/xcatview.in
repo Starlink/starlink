@@ -1,4 +1,4 @@
-#!@AWISH@
+#! @AWISH@
 #
 #  Explicit paths for executables etc.  These are edited at install time
 #  and the flag indicating whether xcatview is running on a networked
