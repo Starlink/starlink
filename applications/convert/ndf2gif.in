@@ -13,14 +13,6 @@
 #  Usage:
 #     ndf2gif in [out]
 
-#  Parameters:
-#     IN = NDF (Read)
-#        The name of the input NDF (without the .sdf extension).
-#     OUT = FILENAME (Write)
-#        The name of the GIF file to be generated (without the .gif 
-#        extension which is appended).  If this is omitted, the value of
-#        the IN parameter is used.
- 
 #  Description:
 #     This Bourne shell script converts an NDF into a 256 grey-level
 #     Graphics Interchange Format (GIF) file.  One- or two-dimensional
@@ -29,6 +21,14 @@
 #     to convert the TIFF file into a GIF file.
 #
 #     Error messages are converted into Starlink style (preceded by !).
+ 
+#  Parameters:
+#     IN = NDF (Read)
+#        The name of the input NDF (without the .sdf extension).
+#     OUT = FILENAME (Write)
+#        The name of the GIF file to be generated (without the .gif 
+#        extension which is appended).  If this is omitted, the value of
+#        the IN parameter is used.
  
 #  Examples:
 #     ndf2gif old new
@@ -43,7 +43,7 @@
 #     levels and does not use the image colour lookup table so
 #     absolute data values may be lost.
 #
-#     The PBMPLUS utilities tifftopnm} and ppmtogif must be available
+#     The PBMPLUS utilities tifftopnm and ppmtogif must be available
 #     on your PATH.
 
 #  Related Applications:
