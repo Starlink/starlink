@@ -43,7 +43,7 @@
         IF ( L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT)) .NE. 0 ) THEN
 
           CALL PSF_REL_EXEC( %VAL(L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT))),
-     :                       SLOT, STATUS )
+     :                       P_PSID(SLOT), STATUS )
         END IF
 
 *    Mark slot as free
@@ -62,7 +62,7 @@
 
 
 *+  PSF_REL_EXEC - Invoke a psf closure routine
-      SUBROUTINE PSF_REL_EXEC( ROUTINE, SLOT, STATUS )
+      SUBROUTINE PSF_REL_EXEC( ROUTINE, PSID, STATUS )
 *
 *    Deficiencies :
 *    Bugs :
@@ -84,7 +84,7 @@
 *
 *    Import :
 *
-      INTEGER                  SLOT                    ! The PSF to use
+      INTEGER                  PSID                    ! The PSF to use
       EXTERNAL                 ROUTINE                 ! The _CLOSE routine
 *
 *    Status :
@@ -92,6 +92,6 @@
       INTEGER                  STATUS
 *-
 
-      CALL ROUTINE( SLOT, STATUS )
+      CALL ROUTINE( PSID, STATUS )
 
       END
