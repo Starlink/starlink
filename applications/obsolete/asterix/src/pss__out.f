@@ -47,7 +47,6 @@
         END IF
       ELSE
         CALL USI_ANNUL( 'OUT', STATUS )
-	call hds_show( 'LOCATORS', STATUS )
       END IF
 
       END
