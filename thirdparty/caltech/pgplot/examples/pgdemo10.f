@@ -49,8 +49,8 @@ C
       CALL PGSLW(3)
       CALL PGSCF(2)
       CALL PGBOX('BCNST', 0.0, 0, 'BCNSTV', 0.0, 0)
-      CALL PGLAB('\fix', ' ', 
-     :           '\frPGPLOT Graph: \fi y = x\u\fr2\de\u-\fix\d')
+      CALL PGLAB('\\fix', ' ', 
+     :           '\\frPGPLOT Graph: \\fi y = x\\u\\fr2\\de\\u-\\fix\\d')
 C
 C Plot the graph.
 C

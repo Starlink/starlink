@@ -1,10 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
-TESTS = pgdemo1 pgdemo2 pgdemo3 pgdemo4 pgdemo5 pgdemo6 pgdemo7 pgdemo8  pgdemo9\
-pgdemo10 pgdemo11 pgdemo12 pgdemo13 pgdemo14 pgdemo15 pgdemo16 pgdemo17
+TESTS = pgdemo1 pgdemo2 pgdemo3 pgdemo4 pgdemo5 pgdemo6 pgdemo7	      \
+pgdemo8 pgdemo9 pgdemo10 pgdemo11 pgdemo12 pgdemo13 pgdemo14 pgdemo15 \
+pgdemo16 pgdemo17
 
-check_PROGRAMS = pgdemo1 pgdemo2 pgdemo3 pgdemo4 pgdemo5 pgdemo6 pgdemo7 pgdemo8 pgdemo9 \
-pgdemo10 pgdemo11 pgdemo12 pgdemo13 pgdemo14 pgdemo15 pgdemo16 pgdemo17
+check_PROGRAMS = pgdemo1 pgdemo2 pgdemo3 pgdemo4 pgdemo5 pgdemo6     \
+pgdemo7 pgdemo8 pgdemo9 pgdemo10 pgdemo11 pgdemo12 pgdemo13 pgdemo14 \
+pgdemo15 pgdemo16 pgdemo17
 
 PGXLIBS = $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
 PGPNGLIBS = -lpng -lz

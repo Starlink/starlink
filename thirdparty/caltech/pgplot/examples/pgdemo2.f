@@ -150,7 +150,7 @@ C
             CALL PGVSIZ(XOFF, XOFF+NX*DX, YOFF, YOFF+NY*DY)
             CALL PGSLW(LW)
             CALL PGMTXT('T', 1.0, 0.5, 0.5,
-     1                   '\fiPGPLOT \frMarker Symbols')
+     1                   '\\fiPGPLOT \\frMarker Symbols')
           END IF
           CALL PGVSIZ(XOFF+(IX-1)*DX, XOFF+IX*DX,
      1                 YOFF+(JY-1)*DY, YOFF+JY*DY)
@@ -184,21 +184,21 @@ C-----------------------------------------------------------------------
       REAL X1, Y1
       CHARACTER*80 SAMPLE(N)
       DATA SAMPLE/
-     1 'Normal:  \fnABCDQ efgh 1234 \ga\gb\gg\gd \gL\gH\gD\gW',
-     2 'Roman:  \frABCDQ efgh 1234 \ga\gb\gg\gd \gL\gH\gD\gW',
-     3 'Italic:  \fiABCDQ efgh 1234 \ga\gb\gg\gd \gL\gH\gD\gW',
-     4 'Script:  \fsABCDQ efgh 1234 \ga\gb\gg\gd \gL\gH\gD\gW',
-     5 '\fif\fr(\fix\fr) = \fix\fr\u2\dcos(2\gp\fix\fr)e\u\fix\fr\u2',
-     6 '\fiH\d0\u \fr= 75 \(2233) 25 km s\u-1\d Mpc\u-1\d',
-     7 '\fsL/L\d\(2281)\u\fr = 5\.6 \x 10\u6\d (\gl1216\A)',
-     8 'Markers: 3=\m3, 8=\m8, 12=\m12, 28=\m28.',
-     9 'Cyrillic: \(2830)\(2912)\(2906)\(2911)\(2919)\(2917)\(2915).'/
+     1 'Normal:  \\fnABCDQ efgh 1234 \\ga\\gb\\gg\\gd \\gL\\gH\\gD\\gW',
+     2 'Roman:  \\frABCDQ efgh 1234 \\ga\\gb\\gg\\gd \\gL\\gH\\gD\\gW',
+     3 'Italic:  \\fiABCDQ efgh 1234 \\ga\\gb\\gg\\gd \\gL\\gH\\gD\\gW',
+     4 'Script:  \\fsABCDQ efgh 1234 \\ga\\gb\\gg\\gd \\gL\\gH\\gD\\gW',
+     5 '\\fif\\fr(\\fix\\fr) = \\fix\\fr\\u2\\dcos(2\\gp\\fix\\fr)e\\u',
+     6 '\\fiH\\d0\\u \\fr= 75 \\(2233) 25 km s\\u-1\\d Mpc\\u-1\\d',
+     7 '\\fsL/L\\d\\(2281)\\u\\fr = 5\\.6 \\x 10\\u6\\d (\\gl1216\\A)',
+     8 'Markers: 3=\\m3, 8=\\m8, 12=\\m12, 28=\\m28.',
+     9 'Cyrillic: \\(2830)\\(2912)\\(2906)\\(2911)\\(2919)\\(2917).'/
 C
 C Call PGENV to initialize the viewport and window.
 C Call PGLAB to label the graph.
 C
       CALL PGENV(0.,20.,REAL(N),0.,0,-2)
-      CALL PGLAB(' ',' ','\fiPGPLOT \frFonts')
+      CALL PGLAB(' ',' ','\\fiPGPLOT \\frFonts')
 C
 C Use PGTEXT to write the sample character strings.
 C
@@ -228,7 +228,7 @@ C
 C
 C Call PGLAB to label the graph.
 C
-      CALL PGLAB('Line Width',' ','\fiPGPLOT \frLine Widths')
+      CALL PGLAB('Line Width',' ','\\fiPGPLOT \\frLine Widths')
 C
 C Draw 14 oblique lines in different thicknesses.
 C

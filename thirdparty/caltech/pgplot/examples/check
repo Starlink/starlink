@@ -1,0 +1,140 @@
+#!/bin/sh
+#
+# Procedure to find which demo programs use each PGPLOT routine
+#
+#-----------------------------------------------------------------------
+PG_ROUTINES="\
+ pgarro\
+ pgask \
+ pgaxis\
+ pgaxlg\
+ pgband\
+ pgbbuf\
+ pgbeg \
+ pgbin \
+ pgbox \
+ pgbox1\
+ pgcirc\
+ pgcl  \
+ pgclos\
+ pgcn01\
+ pgcnsc\
+ pgconb\
+ pgconf\
+ pgconl\
+ pgcons\
+ pgcont\
+ pgconx\
+ pgcp  \
+ pgctab\
+ pgcurs\
+ pgdraw\
+ pgebuf\
+ pgend \
+ pgenv \
+ pgeras\
+ pgerrb\
+ pgerrx\
+ pgerry\
+ pgetxt\
+ pgfunt\
+ pgfunx\
+ pgfuny\
+ pggray\
+ pghi2d\
+ pghis1\
+ pghist\
+ pghtch\
+ pgiden\
+ pgimag\
+ pginit\
+ pglab \
+ pglcur\
+ pgldev\
+ pglen \
+ pgline\
+ pgmove\
+ pgmtxt\
+ pgncur\
+ pgnoto\
+ pgnpl \
+ pgnumb\
+ pgolin\
+ pgopen\
+ pgpage\
+ pgpanl\
+ pgpap \
+ pgpixl\
+ pgpnts\
+ pgpoly\
+ pgpt  \
+ pgpt1 \
+ pgptxt\
+ pgqah \
+ pgqcf \
+ pgqch \
+ pgqci \
+ pgqcir\
+ pgqclp\
+ pgqcol\
+ pgqcr \
+ pgqcs \
+ pgqdt \
+ pgqfs \
+ pgqhs \
+ pgqid \
+ pgqinf\
+ pgqitf\
+ pgqls \
+ pgqlw \
+ pgqndt\
+ pgqpos\
+ pgqtbg\
+ pgqtxt\
+ pgqvp \
+ pgqvsz\
+ pgqwin\
+ pgrect\
+ pgrnd \
+ pgrnge\
+ pgsah \
+ pgsave\
+ pgscf \
+ pgsch \
+ pgsci \
+ pgscir\
+ pgsclp\
+ pgscr \
+ pgscrl\
+ pgscrn\
+ pgsfs \
+ pgshls\
+ pgshs \
+ pgsitf\
+ pgslct\
+ pgsls \
+ pgslw \
+ pgstbg\
+ pgsubp\
+ pgsvp \
+ pgswin\
+ pgtbox\
+ pgtext\
+ pgtick\
+ pgupdt\
+ pgvect\
+ pgvsiz\
+ pgvstd\
+ pgvw  \
+ pgwedg\
+ pgwnad\
+"
+for file in $PG_ROUTINES; do
+  string="${file}	:"
+  for demo in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17; do
+    if grep -i -w ${file} pgdemo${demo}.f >/dev/null; then
+      string="$string $demo"
+    fi
+  done
+  echo ${string}
+done 
