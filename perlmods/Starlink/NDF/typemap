@@ -1,10 +1,13 @@
 TYPEMAP
-int *	T_INTP
-float	T_NV
-float *	T_FLOATP
-Logical	T_IV
-locator * T_LOCP
-double * T_DOUBLEP
+ndfint *	T_INTP
+ndffloat	T_NV
+ndffloat *	T_FLOATP
+Logical	        T_IV
+locator *       T_LOCP
+ndfdouble *     T_DOUBLEP
+ndfint          T_IV
+ndfdouble       T_DOUBLE
+int *           T_INTP
 
 INPUT 
 
