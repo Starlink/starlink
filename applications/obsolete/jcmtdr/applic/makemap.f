@@ -26,6 +26,9 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)
+*     REVAD::JFL: John Lightfoot (RoE)
+*     REVAD::HME: Horst Myerdierks (RoE)
+*     JACH::TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,6 +83,7 @@
 *                               and might not be true on a VAX.
 *     12-JAN-1995 (hme@roe)     On failure to open GSD file, abort
 *                               _with_ an error message.
+*     27-MAR-2003 (timj@jach)   Must initialize FAULT variable on Linux
 *     {enter_changes_here}
 
 *  Bugs:
@@ -230,6 +234,8 @@
 
 *     Initialise variables
       STATUS = SAI__OK
+
+      FAULT = .FALSE.
 
 *  Start DSA, find bad values for various type of data
 
