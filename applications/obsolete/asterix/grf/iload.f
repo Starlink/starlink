@@ -121,8 +121,8 @@
           CALL MSG_OUT(' ','Loading image....',STATUS)
           CALL IMG_LOAD(IFID,STATUS)
           CALL IMG_SETWHOLE(STATUS)
-          CALL IMG_SETPOS(0.0,0.0,STATUS)
-          CALL IMG_MINMAX(STATUS)
+c          CALL IMG_SETPOS(0.0,0.0,STATUS)
+c          CALL IMG_MINMAX(STATUS)
         ENDIF
 
 *  check compatibility with image incache
