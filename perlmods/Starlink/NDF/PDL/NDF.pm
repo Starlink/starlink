@@ -1096,7 +1096,7 @@ sub whdr {
   # Write FITS header from {Hdr}
  
   # Retrieve and check header from PDL
-  my $hdr = $pdl->gethdr;
+  $hdr = $pdl->gethdr;
   if (ref($hdr) eq 'HASH') {
     %header = %$hdr;
   } else {
