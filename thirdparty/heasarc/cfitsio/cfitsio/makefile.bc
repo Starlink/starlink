@@ -71,6 +71,7 @@ Dep_cfitsioddll = \
    putcole.obj\
    putcold.obj\
    putcolb.obj\
+   putcolsb.obj\
    putcol.obj\
    modkey.obj\
    swapproc.obj\
@@ -88,6 +89,7 @@ Dep_cfitsioddll = \
    getcole.obj\
    getcold.obj\
    getcolb.obj\
+   getcolsb.obj\
    grparser.obj\
    fitscore.obj\
    f77_wrap1.obj\
@@ -134,6 +136,7 @@ putcoli.obj+
 putcole.obj+
 putcold.obj+
 putcolb.obj+
+putcolsb.obj+
 putcol.obj+
 modkey.obj+
 swapproc.obj+
@@ -151,6 +154,7 @@ getcoli.obj+
 getcole.obj+
 getcold.obj+
 getcolb.obj+
+getcolsb.obj+
 grparser.obj+
 fitscore.obj+
 f77_wrap1.obj+
@@ -263,6 +267,11 @@ putcolb.obj :  putcolb.c
  $(CompOptsAt_cfitsiodlib) $(CompInheritOptsAt_cfitsiodlib) -o$@ putcolb.c
 |
 
+putcolsb.obj :  putcolsb.c
+  $(BCC32) -P- -c @&&|
+ $(CompOptsAt_cfitsiodlib) $(CompInheritOptsAt_cfitsiodlib) -o$@ putcolsb.c
+|
+
 putcol.obj :  putcol.c
   $(BCC32) -P- -c @&&|
  $(CompOptsAt_cfitsiodlib) $(CompInheritOptsAt_cfitsiodlib) -o$@ putcol.c
@@ -346,6 +355,10 @@ getcold.obj :  getcold.c
 getcolb.obj :  getcolb.c
   $(BCC32) -P- -c @&&|
  $(CompOptsAt_cfitsiodlib) $(CompInheritOptsAt_cfitsiodlib) -o$@ getcolb.c
+|
+getcolsb.obj :  getcolsb.c
+  $(BCC32) -P- -c @&&|
+ $(CompOptsAt_cfitsiodlib) $(CompInheritOptsAt_cfitsiodlib) -o$@ getcolsb.c
 |
 
 grparser.obj :  grparser.c

@@ -181,6 +181,10 @@ int ffpky( fitsfile *fptr,     /* I - FITS file pointer        */
     {
         ffpkyj(fptr, keyname, (long) *(unsigned char *) value, comm, status);
     }
+    else if (datatype == TSBYTE)
+    {
+        ffpkyj(fptr, keyname, (long) *(signed char *) value, comm, status);
+    }
     else if (datatype == TUSHORT)
     {
         ffpkyj(fptr, keyname, (long) *(unsigned short *) value, comm, status);
@@ -2317,7 +2321,27 @@ int ffphbn(fitsfile *fptr,  /* I - FITS file pointer                        */
         else if (datatype < 0)
            strcat(comm, ": variable length array");
 
-        if (abs(datatype) == TUSHORT) 
+        if (abs(datatype) == TSBYTE) /* signed bytes */
+        {
+           /* Replace the 'S' with an 'B' in the TFORMn code */
+           cptr = tfmt;
+           while (*cptr != 'S') 
+              cptr++;
+
+           *cptr = 'B';
+           ffpkys(fptr, name, tfmt, comm, status);
+
+           /* write the TZEROn and TSCALn keywords */
+           ffkeyn("TZERO", ii + 1, name, status);
+           strcpy(comm, "offset for signed bytes");
+
+           ffpkyg(fptr, name, -128., 0, comm, status);
+
+           ffkeyn("TSCAL", ii + 1, name, status);
+           strcpy(comm, "data are not scaled");
+           ffpkyg(fptr, name, 1., 0, comm, status);
+        }
+        else if (abs(datatype) == TUSHORT) 
         {
            /* Replace the 'U' with an 'I' in the TFORMn code */
            cptr = tfmt;

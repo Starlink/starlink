@@ -1421,19 +1421,21 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 	for this is rather complicated
       */
 
-      if(tmpfptr->Fptr == gfptr->Fptr)
-	{
+      /* SPR 3463, don't do this 
+	 if(tmpfptr->Fptr == gfptr->Fptr)
+	 {  */
 	  /*
 	    member HDU and grouping table reside in the same file, no need
-	    to use the location information
-	  */
-
-	  useLocation     = 0;
-	  memberIOstate   = 1;
-	  *memberFileName = 0;
+	    to use the location information */
+	  
+      /* printf ("same file\n");
+	   
+	   useLocation     = 0;
+	   memberIOstate   = 1;
+	   *memberFileName = 0;
 	}
       else
-	{
+      { */ 
 	  /*
 	     the member HDU and grouping table FITS file location information 
 	     must be used.
@@ -1587,7 +1589,9 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 		  strcpy(groupFileName,groupLocation);		  
 		}
 	    }
-	}
+	  /* beo done */
+	  /* }  */
+      
 
       /* retrieve the grouping table's EXTVER value */
 
@@ -1597,8 +1601,8 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 	 if useLocation is true then make the group EXTVER value negative
 	 for the subsequent GRPIDn/GRPLCn matching
       */
-
-      if(useLocation) groupExtver = -1*groupExtver;
+      /* SPR 3463 change test */
+      if(tmpfptr->Fptr != gfptr->Fptr) groupExtver = -1*groupExtver;
 
       /* retrieve the number of group members */
 
@@ -1668,7 +1672,8 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 
       if(locationCol != 0)
 	{
-	  if(useLocation != 0)
+	  /* Change the test for SPR 3463 */
+	  if(tmpfptr->Fptr != gfptr->Fptr)
 	    fits_write_col_str(gfptr,locationCol,nmembers,1,1,tmpPtr,status);
 	  else
 	    /* WILL THIS WORK FOR VAR LENTH CHAR COLS??????*/
@@ -1679,7 +1684,10 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 
       if(uriCol      != 0)
 	{
-	  if(useLocation != 0)
+
+	  /* Change the test for SPR 3463 */
+
+	  if(tmpfptr->Fptr != gfptr->Fptr)
 	    fits_write_col_str(gfptr,uriCol,nmembers,1,1,tmpPtr,status);
 	  else
 	    /* WILL THIS WORK FOR VAR LENTH CHAR COLS??????*/
@@ -1850,8 +1858,8 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 	 if the member HDU and grouping table reside in the same FITS file
 	 then there is no need to add a GRPLCn keyword
       */
-
-      if(useLocation == 0)
+      /* SPR 3463 change test */
+      if(tmpfptr->Fptr == gfptr->Fptr)
 	{
 	  /* add the GRPIDn keyword only */
 
@@ -5799,7 +5807,7 @@ static grp_stack* new_grp_stack(void);
 static grp_stack_data pop_grp_stack(grp_stack* mystack);
 static void push_grp_stack(grp_stack* mystack, grp_stack_data data);
 static grp_stack_data shift_grp_stack(grp_stack* mystack);
-static void unshift_grp_stack(grp_stack* mystack, grp_stack_data data);
+/* static void unshift_grp_stack(grp_stack* mystack, grp_stack_data data); */
 
 int fits_clean_url(char *inURL,  /* I input URL string                      */
 		   char *outURL, /* O output URL string                     */
@@ -5962,13 +5970,13 @@ static grp_stack_data shift_grp_stack(grp_stack* mystack) {
 
 /* add to the stack after the top element. "top" is unaffected, except
  * in the special case of an initially empty stack */
-static void unshift_grp_stack(grp_stack* mystack, grp_stack_data data) {
-  if(!mystack) return;
-  if(mystack->top) grp_stack_append(mystack->top, data);
-  else mystack->top = grp_stack_append(NULL, data);
-  ++mystack->stack_size;
-  return;
-}
+/* static void unshift_grp_stack(grp_stack* mystack, grp_stack_data data) {
+   if(!mystack) return;
+   if(mystack->top) grp_stack_append(mystack->top, data);
+   else mystack->top = grp_stack_append(NULL, data);
+   ++mystack->stack_size;
+   return;
+   } */
 
 /*--------------------------------------------------------------------------*/
 int fits_url2relurl(char     *refURL, /* I reference URL string             */

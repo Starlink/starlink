@@ -242,6 +242,9 @@ int ffpcks(fitsfile *fptr,      /* I - FITS file pointer                  */
     if (ffrdef(fptr, status) > 0)
         return(*status);
 
+    if ((fptr->Fptr)->heapsize > 0)
+         ffuptf(fptr, status);  /* update the variable length TFORM values */
+
     /* write the correct data fill values, if they are not already correct */
     if (ffpdfl(fptr, status) > 0)
         return(*status);

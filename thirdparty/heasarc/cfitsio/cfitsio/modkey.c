@@ -34,6 +34,10 @@ int ffuky( fitsfile *fptr,     /* I - FITS file pointer        */
     {
         ffukyj(fptr, keyname, (long) *(unsigned char *) value, comm, status);
     }
+    else if (datatype == TSBYTE)
+    {
+        ffukyj(fptr, keyname, (long) *(signed char *) value, comm, status);
+    }
     else if (datatype == TUSHORT)
     {
         ffukyj(fptr, keyname, (long) *(unsigned short *) value, comm, status);

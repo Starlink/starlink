@@ -19,7 +19,6 @@
  *           compiler other than Visual C++.
  *----------------------------------------------------------------------
  *
- * RCS: @(#) $Id: windumpexts.c,v 1.1 1999/11/26 20:18:56 elwin Exp $
  */
 
 #include <windows.h>

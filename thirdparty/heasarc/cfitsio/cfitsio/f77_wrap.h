@@ -2,9 +2,9 @@
 #include "cfortran.h"
 
 /************************************************************************
-   DEC C creates longs as 8-byte integers.  On most other machines, ints
+   Some platforms creates longs as 8-byte integers.  On other machines, ints
    and longs are both 4-bytes, so both are compatible with Fortrans
-   default integer which is 4-bytes.  To support DECs, we must redefine
+   default integer which is 4-bytes.  To support 8-byte longs, we must redefine
    LONGs and convert them to 8-bytes when going to C, and restore them
    to 4-bytes when returning to Fortran.  Ugh!!!
 *************************************************************************/
@@ -13,7 +13,11 @@
     || (defined(mipsFortran)  && _MIPS_SZLONG==64) \
     || (defined(IBMR2Fortran) && defined(__64BIT__)) \
     || (defined (g77Fortran)  && defined(__ia64__)) \
-    ||  defined (__sparcv9)
+    ||  defined (__sparcv9) \
+    ||  defined (__x86_64__)
+
+#define   LONG8BYTES_INT4BYTES
+
 #undef LONGV_cfSTR
 #undef PLONG_cfSTR
 #undef LONGVVVVVVV_cfTYPE

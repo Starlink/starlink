@@ -750,6 +750,11 @@ static int http_open_network(char *url, FILE **httpfile, char *contentencoding,
   int port;
   float version;
 
+  char pproto[SHORTLEN];
+  char phost[SHORTLEN]; /* address of the proxy server */
+  int  pport;  /* port number of the proxy server */
+  char pfn[MAXLEN];
+  char *proxy; /* URL of the proxy server */
 
   /* Parse the URL apart again */
   strcpy(turl,"http://");
@@ -760,10 +765,32 @@ static int http_open_network(char *url, FILE **httpfile, char *contentencoding,
     return (FILE_NOT_OPENED);
   }
 
+  /* Ph. Prugniel 2003/04/03
+     Are we using a proxy?
+     
+     We use a proxy if the environment variable "http_proxy" is set to an
+     address, eg. http://wwwcache.nottingham.ac.uk:3128
+     ("http_proxy" is also used by wget)
+  */
+  proxy = getenv("http_proxy");
+
   /* Connect to the remote host */
-  sock = NET_TcpConnect(host,port);
+  if (proxy) {
+    if (NET_ParseUrl(proxy,pproto,phost,&pport,pfn)) {
+      sprintf(errorstr,"URL Parse Error (http_open) %s",proxy);
+      ffpmsg(errorstr);
+      return (FILE_NOT_OPENED);
+    }
+    sock = NET_TcpConnect(phost,pport);
+  }
+  else
+    sock = NET_TcpConnect(host,port); 
+
   if (sock < 0) {
-    ffpmsg("Couldn't connect to host (http_open_network)");
+    if (proxy) {
+      ffpmsg("Couldn't connect to host via proxy server (http_open_network)");
+      ffpmsg(proxy);
+    }
     return (FILE_NOT_OPENED);
   }
 
@@ -775,11 +802,22 @@ static int http_open_network(char *url, FILE **httpfile, char *contentencoding,
   }
 
   /* Send the GET request to the remote server */
-  strcpy(tmpstr,"GET ");
-  strcat(tmpstr,fn);
-  strcat(tmpstr," HTTP/1.0\n");
-  sprintf(tmpstr1,"User-Agent: HEASARC/CFITSIO/%-8.3f\n\n",ffvers(&version));
+  /* Ph. Prugniel 2003/04/03 
+     One must add the Host: command because of HTTP 1.1 servers (ie. virtual
+     hosts) */
+
+  if (proxy)
+    sprintf(tmpstr,"GET http://%s:%-d%s HTTP/1.0\n",host,port,fn);
+  else
+    sprintf(tmpstr,"GET %s HTTP/1.0\n",fn);
+
+  sprintf(tmpstr1,"User-Agent: HEASARC/CFITSIO/%-8.3f\n",ffvers(&version));
   strcat(tmpstr,tmpstr1);
+
+  /* HTTP 1.1 servers require the following 'Host: ' string */
+  sprintf(tmpstr1,"Host: %s:%-d\n\n",host,port);
+  strcat(tmpstr,tmpstr1);
+
   status = NET_SendRaw(sock,tmpstr,strlen(tmpstr),NET_DEFAULT);
 
   /* read the header */
@@ -822,10 +860,11 @@ static int http_open_network(char *url, FILE **httpfile, char *contentencoding,
       /* if we get here then we couldnt' decide the redirect */
       ffpmsg("but we were unable to find the redirected url in the servers response");
     }
-    sprintf(errorstr, 
+/*    sprintf(errorstr, 
 	    "(http_open_network) Status not 200, was %d\nLine was %s\n",
-	    status,recbuf);
+	    status,recbuf); 
     ffpmsg(errorstr);
+*/
     fclose(*httpfile);
     return (FILE_NOT_OPENED);
   }
@@ -1226,6 +1265,7 @@ int ftp_compress_open(char *url, int rwmode, int *handle)
   /* Open the network connection to url, ftpfile is connected to the file 
      port, command is connected to port 21.  sock is for writing to port 21 */
   alarm(NETTIMEOUT);
+
   if ((status = ftp_open_network(url,&ftpfile,&command,&sock))) {
     alarm(0);
     ffpmsg("Unable to open ftp file (ftp_compress_open)");
@@ -1479,22 +1519,17 @@ int ftp_open_network(char *filename, FILE **ftpfile, FILE **command, int *sock)
     return (FILE_NOT_OPENED);
   }
   
-  /* Send the retrieve command to see if the file exists*/
-  sprintf(tmpstr,"RETR %s\n",newfn);
-#ifdef DEBUG
-  printf ("Checking to see if %s, exists %d\n",tmpstr,strlen(newfn));
-#endif
+ 
+  /* Always use binary mode */
+  sprintf(tmpstr,"TYPE I\n");
   status = NET_SendRaw(*sock,tmpstr,strlen(tmpstr),NET_DEFAULT);
-  /* We better get a 425 here, we haven't sent a PORT or PASV command
-     yet.  If we don't get a 425 then we're hosed and the file
-     doesn't exist */
-  if (ftp_status(*command,"425 ")) {
-    ffpmsg("File doesn't exist on remote server (ftp_open)");
+  
+  if (ftp_status(*command,"200 ")) {
+    ffpmsg ("TYPE I error, 200 not seen (ftp_open)");
     fclose(*command);
     return (FILE_NOT_OPENED);
   }
-  /* we're going to use passive mode here */
-  
+ 
   status = NET_SendRaw(*sock,"PASV\n",5,NET_DEFAULT);
   if (!(fgets(recbuf,MAXLEN,*command))) {
     ffpmsg ("PASV error (ftp_open)");
@@ -1567,15 +1602,6 @@ int ftp_open_network(char *filename, FILE **ftpfile, FILE **command, int *sock)
     sscanf(tstr,"%d",&tmpint);
     port += tmpint;
     
-    /* Always use binary mode */
-    sprintf(tmpstr,"TYPE I\n");
-    status = NET_SendRaw(*sock,tmpstr,strlen(tmpstr),NET_DEFAULT);
-    
-    if (ftp_status(*command,"200 ")) {
-      ffpmsg ("TYPE I error, 200 not seen (ftp_open)");
-      fclose(*command);
-      return (FILE_NOT_OPENED);
-    }
     
     if (!strlen(newfn)) {
       ffpmsg("Null file name (ftp_open)");
@@ -1583,10 +1609,10 @@ int ftp_open_network(char *filename, FILE **ftpfile, FILE **command, int *sock)
       return (FILE_NOT_OPENED);
     }
     
-    /* Send the retrieve command */
-    sprintf(tmpstr,"RETR %s\n",newfn);
-    status = NET_SendRaw(*sock,tmpstr,strlen(tmpstr),NET_DEFAULT);
 
+#ifdef DEBUG
+    puts("connection to passive port");
+#endif
     /* COnnect to the data port */
     sock1 = NET_TcpConnect(ip,port);
     if (NULL == (*ftpfile = fdopen(sock1,"r"))) {
@@ -1597,6 +1623,21 @@ int ftp_open_network(char *filename, FILE **ftpfile, FILE **command, int *sock)
 
     /* now we return */
 
+    /* Send the retrieve command */
+    sprintf(tmpstr,"RETR %s\n",newfn);
+    status = NET_SendRaw(*sock,tmpstr,strlen(tmpstr),NET_DEFAULT);
+
+#ifdef DEBUG
+    puts("Sent RETR command");
+#endif
+    if (ftp_status(*command,"150 ")) {
+      ffpmsg ("RETR error, most likely file is not there (ftp_open)");
+      fclose(*command);
+#ifdef DEBUG
+      puts("File not there");
+#endif
+      return (FILE_NOT_OPENED);
+    }
     return 0;
   }
   
@@ -1629,8 +1670,10 @@ static int NET_TcpConnect(char *hostname, int port)
 		       sizeof(sockaddr))) 
        < 0) {
      close(sock);
+/*
      perror("NET_Tcpconnect - Connection error");
      ffpmsg("Can't connect to host, connection error");
+*/
      return CONNECTION_ERROR;
    }
    setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val));
@@ -2004,8 +2047,15 @@ static int ftp_status(FILE *ftp, char *statusstr)
   len = strlen(statusstr);
   while (1) {
     if (!(fgets(recbuf,MAXLEN,ftp))) {
+#ifdef DEBUG
+      puts("error reading response in ftp_status");
+#endif
       return 1; /* error reading */
     }
+    
+#ifdef DEBUG
+    printf("ftp_status, return string was %s\n",recbuf);
+#endif
 
     recbuf[len] = '\0'; /* make it short */
     if (!strcmp(recbuf,statusstr)) {
@@ -2017,6 +2067,7 @@ static int ftp_status(FILE *ftp, char *statusstr)
     }
   }
 }
+
 
 /*
  *----------------------------------------------------------------------

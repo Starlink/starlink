@@ -89,12 +89,12 @@ int ffrsim(fitsfile *fptr,      /* I - FITS file pointer           */
         oldsize = 1;
         for (ii = 0; ii < onaxis; ii++)
             oldsize *= onaxes[ii];  
-        oldsize = (oldsize + pcount) * gcount * abs(obitpix) / 8;
+        oldsize = (oldsize + pcount) * gcount * (abs(obitpix) / 8);
     }
 
     oldsize = (oldsize + 2879) / 2880; /* old size, in blocks */
 
-    newsize = (newsize + pcount) * gcount * abs(bitpix) / 8;
+    newsize = (newsize + pcount) * gcount * (abs(bitpix) / 8);
     newsize = (newsize + 2879) / 2880; /* new size, in blocks */
 
     if (newsize > oldsize)   /* have to insert new blocks for image */
@@ -877,7 +877,27 @@ int fficls(fitsfile *fptr,  /* I - FITS file pointer                        */
         ffupch(tfm);         /* make sure format is in upper case */
         ffkeyn("TFORM", colnum, keyname, status);
 
-        if (abs(datacode) == TUSHORT) 
+        if (abs(datacode) == TSBYTE) 
+        {
+           /* Replace the 'S' with an 'B' in the TFORMn code */
+           cptr = tfm;
+           while (*cptr != 'S') 
+              cptr++;
+
+           *cptr = 'B';
+           ffpkys(fptr, keyname, tfm, comm, status);
+
+           /* write the TZEROn and TSCALn keywords */
+           ffkeyn("TZERO", colnum, keyname, status);
+           strcpy(comm, "offset for signed bytes");
+
+           ffpkyg(fptr, keyname, -128., 0, comm, status);
+
+           ffkeyn("TSCAL", colnum, keyname, status);
+           strcpy(comm, "data are not scaled");
+           ffpkyg(fptr, keyname, 1., 0, comm, status);
+        }
+        else if (abs(datacode) == TUSHORT) 
         {
            /* Replace the 'U' with an 'I' in the TFORMn code */
            cptr = tfm;

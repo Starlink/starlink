@@ -127,7 +127,7 @@ can be rapidly evaluated for each row.  Peter Wilson (RSTX, NASA/GSFC)
 then wrote the parsing routines used by CFITSIO based on Lammers'
 design, combined with other techniques such as the CFITSIO iterator
 routine to further enhance the data processing throughput.  This effort
-also benefitted from a much earlier lexical parsing routine that was
+also benefited from a much earlier lexical parsing routine that was
 developed by Kent Blackburn (NASA/GSFC).
 
 The CFITSIO iterator function is loosely based on similar ideas
@@ -160,17 +160,17 @@ have inadvertently been omitted):
 
 Steve Allen, Carl Akerlof, Keith Arnaud, Morten Krabbe Barfoed, Kent
 Blackburn, G Bodammer, Romke Bontekoe, Lucio Chiappetti, Keith Costorf,
-Robin Corbet, John Davis,  Richard Fink, Ning Gan, Emily Greene,
-Gretchen Green, Joe Harrington, Cheng Ho, Phil Hodge, Jim Ingham,
-Yoshitaka Ishisaki, Diab Jerius, Mark Levine, Todd Karakaskian, Edward
-King, Scott Koch,  Claire Larkin, Rob Managan, Eric Mandel, Richard
-Mathar, John Mattox, Carsten Meyer, Emi Miyata, Stefan Mochnacki, Mike
-Noble, Oliver Oberdorf, Clive Page, Arvind Parmar, Jeff Pedelty, Tim
-Pearson, Maren Purves, Scott Randall, Chris Rogers, Arnold Rots, Barry
-Schlesinger, Robin Stebbins, Andrew Szymkowiak, Allyn Tennant, Peter
-Teuben, James Theiler, Doug Tody, Shiro Ueno, Steve Walton, Archie
-Warnock, Alan Watson, Dan Whipple, Wim Wimmers, Peter Young, Jianjun
-Xu, and Nelson Zarate.
+Robin Corbet, John Davis,  Richard Fink, Ning Gan, Emily Greene, Gretchen
+Green, Joe Harrington, Cheng Ho, Phil Hodge, Jim Ingham, Yoshitaka
+Ishisaki, Diab Jerius, Mark Levine, Todd Karakaskian, Edward King,
+Scott Koch,  Claire Larkin, Rob Managan, Eric Mandel, Richard Mathar,
+John Mattox, Carsten Meyer, Emi Miyata, Stefan Mochnacki, Mike Noble,
+Oliver Oberdorf, Clive Page, Arvind Parmar, Jeff Pedelty, Tim Pearson,
+Philippe Prugniel, Maren Purves, Scott Randall, Chris Rogers, Arnold Rots,
+Barry Schlesinger, Robin Stebbins, Andrew Szymkowiak, Allyn Tennant,
+Peter Teuben, James Theiler, Doug Tody, Shiro Ueno, Steve Walton, Archie
+Warnock, Alan Watson, Dan Whipple, Wim Wimmers, Peter Young, Jianjun Xu,
+and Nelson Zarate.
 
 **D.  Legal Stuff
 
@@ -205,10 +205,10 @@ SERVICES PROVIDED HEREUNDER."
 The file compress.c contains (slightly modified) source code that
 originally came from gzip-1.2.4, copyright (C) 1992-1993 by Jean-loup
 Gailly.  This gzip code is distributed under the GNU General Public
-Licence and thus requires that any software that uses the CFITSIO
+License and thus requires that any software that uses the CFITSIO
 library (which in turn uses the gzip code) must conform to the
 provisions in the GNU General Public License.  A copy of the GNU
-licence is included at the beginning of compress.c file.
+license is included at the beginning of compress.c file.
 
 An alternate version of the compress.c file (called
 compress\_alternate.c) is provided for users who want to use the CFITSIO
@@ -245,7 +245,7 @@ CFITSIO has currently been tested on the following platforms:
    Linux                      gcc
    MkLinux                    DR3
    Windows 95/98/NT           Borland C++ V4.5
-   Windows 95/98/NT           Microsoft/Compaq Visual C++ v5.0, v6.0
+   Windows 95/98/NT/ME/XP     Microsoft/Compaq Visual C++ v5.0, v6.0
    Windows 95/98/NT           Cygwin gcc
    MacOS 7.1 or greater       Metrowerks 10.+
    MacOS-X 10.1 or greater    cc (gcc)
@@ -444,7 +444,7 @@ program\_name' where `program\_name' is the actual name of the program:
     fitscopy - copies any FITS file (especially useful in conjunction
                  with the CFITSIO's extended input filename syntax).
 
-    cookbook - a sample program that peforms common read and
+    cookbook - a sample program that performs common read and
                  write operations on a FITS file.
 
     iter_a, iter_b, iter_c - examples of the CFITSIO iterator routine
@@ -558,7 +558,7 @@ A FITS file consists of one or more Header + Data Units (HDUs), where
 the first HDU is called the `Primary HDU', or `Primary Array'.  The
 primary array contains an N-dimensional array of pixels, such as a 1-D
 spectrum, a 2-D image, or a 3-D data cube.  Five different primary
-datatypes are supported: Unsigned 8-bit bytes, 16 and 32-bit signed
+data types are supported: Unsigned 8-bit bytes, 16 and 32-bit signed
 integers, and 32 and 64-bit floating point reals.  FITS also has a
 convention for storing 16 and 32-bit unsigned integers (see the later
 section entitled `Unsigned Integers' for more details). The primary HDU
@@ -624,7 +624,7 @@ previous Data Unit (or Header Unit if there is no Data Unit).
 The main required keywords in FITS primary arrays or image extensions are:
 \begin{itemize}
 \item
-BITPIX -- defines the datatype of the array: 8, 16, 32, -32, -64 for
+BITPIX -- defines the data type of the array: 8, 16, 32, -32, -64 for
 unsigned 8--bit byte, 16--bit signed integer, 32--bit signed integer,
 32--bit IEEE floating point, and 64--bit IEEE double precision floating
 point, respectively.
@@ -646,7 +646,7 @@ NAXIS2 -- number of rows in the table
 TTYPEn -- for each column (n ranges from 1 to TFIELDS) gives the
 name of the column
 \item
-TFORMn -- the datatype of the column
+TFORMn -- the data type of the column
 \item
 TUNITn -- the physical units of the column (optional)
 \end{itemize}
@@ -709,15 +709,17 @@ BITPIX data type code values for FITS images:
   #define FLOAT_IMG   -32  /* 32-bit single precision floating point */
   #define DOUBLE_IMG  -64  /* 64-bit double precision floating point */
 
-  The following 3 data type codes are also supported by CFITSIO:
+  The following 4 data type codes are also supported by CFITSIO:
   #define LONGLONG_IMG 64 /* 64-bit long signed integers */
+  #define SBYTE_IMG  10   /*  8-bit signed integers, equivalent to */
+                          /*  BITPIX = 8, BSCALE = 1, BZERO = -128 */
   #define USHORT_IMG  20  /* 16-bit unsigned integers, equivalent to */
                           /*  BITPIX = 16, BSCALE = 1, BZERO = 32768 */
   #define ULONG_IMG   40  /* 32-bit unsigned integers, equivalent to */
                           /*  BITPIX = 32, BSCALE = 1, BZERO = 2147483648 */
 
-Codes for the datatype of binary table columns and/or for the
-datatype of variables when reading or writing keywords or data:
+Codes for the data type of binary table columns and/or for the
+data type of variables when reading or writing keywords or data:
 
                               DATATYPE               TFORM CODE
   #define TBIT          1  /*                            'X' */
@@ -735,8 +737,9 @@ datatype of variables when reading or writing keywords or data:
 
   The following data type codes are also supported by CFITSIO:
   #define TINT         31  /* int                            */
-  #define TUINT        30  /* unsigned int                   */
-  #define TUSHORT      20  /* unsigned short                 */
+  #define TSBYTE       12  /* 8-bit signed byte,         'S' */
+  #define TUINT        30  /* unsigned int               'V' */
+  #define TUSHORT      20  /* unsigned short             'U'  */
   #define TULONG       40  /* unsigned long                  */
   #define TLONGLONG    81  /* 64-bit long signed integer 'K' */
 
@@ -775,7 +778,7 @@ The concept of the Current Header and Data Unit, or CHDU, is
 fundamental to the use of the CFITSIO library.  A simple FITS image may
 only contain a single Header and Data unit (HDU), but in general FITS
 files can contain multiple Header Data Units (also known as
-`extensions'), concatinated one after the other in the file.  The user
+`extensions'), concatenated one after the other in the file.  The user
 can specify which HDU should be initially opened at run time by giving
 the HDU name or number after the root file name.  For example,
 'myfile.fits[4]' opens the 5th HDU in the file (note that the numbering
@@ -797,7 +800,7 @@ it be used instead of the short name to more clearly document the
 source code.
 
 Many of the CFITSIO routines come in families which differ only in the
-datatype of the associated parameter(s).  The datatype of these
+data type of the associated parameter(s).  The data type of these
 routines is indicated by the suffix of the routine name.  The short
 routine names have a 1 or 2 character suffix (e.g., 'j' in 'ffpkyj')
 while the long routine names have a 4 character or longer suffix
@@ -808,6 +811,7 @@ as shown in the following table:
     -----     -----  ----
     _bit        x    bit
     _byt        b    unsigned byte
+    _sbyt       sb   signed byte
     _sht        i    short integer
     _lng        j    long integer
     _lnglng     jj   8-byte LONGLONG integer (see note below)
@@ -827,7 +831,7 @@ as shown in the following table:
     _str        s    character string
 -
 
-The logical datatype corresponds to `int' for logical keyword values,
+The logical data type corresponds to `int' for logical keyword values,
 and `byte' for logical binary table columns.  In other words, the value
 when writing a logical keyword must be stored in an `int' variable, and
 must be stored in a `char' array when reading or writing to `L' columns
@@ -836,26 +840,26 @@ logical table columns, but is for keywords, so a logical keyword may be
 read and cast to any numerical data type; a returned value = 0
 indicates false, and any other value = true.
 
-The `int' datatype may be 2 bytes long on some IBM PC compatible
+The `int' data type may be 2 bytes long on some IBM PC compatible
 systems and is usually 4 bytes long on most other systems.  Some 64-bit
 machines, however, like the Dec Alpha/OSF, define the `short', `int',
-and `long' integer datatypes to be 2, 4, and 8 bytes long,
+and `long' integer data types to be 2, 4, and 8 bytes long,
 respectively.  The FITS standard only supports 2 and 4 byte integer
 data types, so CFITSIO internally converts between 4 and 8 bytes when
 reading or writing `long' integers on Alpha/OSF systems.
 
-The 8-byte 'LONGLONG' integer datatype is supported on most platforms.
-CFITSIO defines the LONGLONG datatype to be equivalent to 'long long'
+The 8-byte 'LONGLONG' integer data type is supported on most platforms.
+CFITSIO defines the LONGLONG data type to be equivalent to 'long long'
 on most Unix platforms and on Mac OS-X.  Since most Windows compilers don't
-support the 'long long' datatype, LONGLONG is defined instead to be
+support the 'long long' data type, LONGLONG is defined instead to be
 equivalent to '\_\_int64'.  If the compiler does not support a 8-byte
-integer datatype then LONGLONG is defined to be equivalent to 'long'.
+integer data type then LONGLONG is defined to be equivalent to 'long'.
 Note that the C format specifier to print out these long integer values
 is "\%lld" on most unix machines, except on OSF platforms where "\%ld"
 must be used.  On Windows platform which have the \_\_int64 data type,
 the format specifier is "\%INT64d".
 
-When dealing with the FITS byte datatype it is important to remember
+When dealing with the FITS byte data type it is important to remember
 that the raw values (before any scaling by the BSCALE and BZERO, or
 TSCALn and TZEROn keyword values) in byte arrays (BITPIX = 8) or byte
 columns (TFORMn = 'B') are interpreted as unsigned bytes with values
@@ -865,20 +869,20 @@ variable as 'unsigned char' to avoid any ambiguity
 
 One feature of the CFITSIO routines is that they can operate on a `X'
 (bit) column in a binary table as though it were a `B' (byte) column.
-For example a `11X' datatype column can be interpreted the same as a
+For example a `11X' data type column can be interpreted the same as a
 `2B' column (i.e., 2 unsigned 8-bit bytes).  In some instances, it can
 be more efficient to read and write whole bytes at a time, rather than
 reading or writing each individual bit.
 
-The complex and double precision complex datatypes are not directly
-supported in ANSI C so these datatypes should be interpreted as pairs
+The complex and double precision complex data types are not directly
+supported in ANSI C so these data types should be interpreted as pairs
 of float or double values, respectively, where the first  value in each
 pair is the real part, and the second is the imaginary part.
 
-**D.  Support for Unsigned Integers
+**D.  Support for Unsigned Integers and Signed Bytes
 
 Although FITS does not directly support unsigned integers as one of its
-fundamental datatypes, FITS can still be used to efficiently store
+fundamental data types, FITS can still be used to efficiently store
 unsigned integer data values in images and binary tables.  The
 convention used in FITS files is to store the unsigned integers as
 signed integers with an associated offset (specified by the BZERO or
@@ -927,15 +931,16 @@ in fits\_create\_img equal to `ULONG\_IMG' and by calling the
 fits\_write\_img routine with the second parameter = TULONG to write
 the array of unsigned long image pixel values.
 
-An analogous set of routines are available for reading or writing
-unsigned integer values in a FITS binary table extension.  When
-specifying the TFORMn keyword value which defines the format of a
-column, CFITSIO recognized 2 additional datatype codes besides those
+An analogous set of routines are available for reading or writing unsigned
+integer values and signed byte values in a FITS binary table extension.
+When specifying the TFORMn keyword value which defines the format of a
+column, CFITSIO recognized 3 additional data type codes besides those
 already defined in the FITS standard: `U' meaning a 16-bit unsigned
-integer column, and `V' for a 32-bit unsigned integer column.  These
-non-standard datatype codes are not actually written into the FITS file
-but instead are just used internally within CFITSIO.  The following
-code fragment illustrates how to use these features:
+integer column, `V' for a 32-bit unsigned integer column, and 'S'
+for a signed byte column.  These non-standard data type codes are not
+actually written into the FITS file but instead are just used internally
+within CFITSIO.  The following code fragment illustrates how to use
+these features:
 -
       unsigned short uarray[100];
       unsigned int  varray[100];
@@ -945,16 +950,16 @@ code fragment illustrates how to use these features:
 
       char extname[] = "Test_table";           /* extension name */
 
-      /* define the name, datatype, and physical units for the 2 columns */
-      char *ttype[] = { "Col_1", "Col_2" };
-      char *tform[] = { "1U",      "1V"   };  /* special CFITSIO codes */
-      char *tunit[] = { " ",        " "   };
+      /* define the name, data type, and physical units for the 2 columns */
+      char *ttype[] = { "Col_1", "Col_2", "Col_3" };
+      char *tform[] = { "1U",      "1V",    "1S"};  /* special CFITSIO codes */
+      char *tunit[] = { " ",        " ",    " " };
        ...
 
            /* write the header keywords */
       status  = 0;
       nrows   = 1;
-      tfields = 2
+      tfields = 3
       pcount  = 0;
       fits_create_tbl(fptr, BINARY_TBL, nrows, tfields, ttype, tform,
                 tunit, extname, &status);
@@ -973,13 +978,14 @@ code fragment illustrates how to use these features:
               nelements, varray, &status);
        ...
 -
-Note that the non-standard TFORM values for the 2 columns, `U' and `V',
+Note that the non-standard TFORM values for the 3 columns, `U' and `V',
 tell CFITSIO to write the keywords appropriate for unsigned 16-bit and
 unsigned 32-bit integers, respectively (i.e., TFORMn = '1I' and TZEROn
 = 32678 for unsigned 16-bit integers, and TFORMn = '1J' and TZEROn =
-2147483648 for unsigned 32-bit integers).  The calls to
-fits\_write\_col then write the arrays of unsigned integer values to
-the columns.
+2147483648 for unsigned 32-bit integers).  The 'S' TFORMn value tells
+CFITSIO to write the keywords appropriate for a signed 8-bit byte column
+with TFORMn = '1B' and TZEROn = -128.  The calls to fits\_write\_col
+then write the arrays of unsigned integer values to the columns.
 
 **E.  Dealing with Character Strings
 
@@ -992,7 +998,7 @@ null-terminated string value containing only the significant
 characters.  Leading spaces in a FITS string are considered
 significant.  If the string contains all blanks, then CFITSIO will
 return a single blank character, i.e, the first blank is considered to
-be significant, since it distinquishes the string from a null or
+be significant, since it distinguishes the string from a null or
 undefined string, but the remaining trailing spaces are not
 significant.
 
@@ -1044,7 +1050,7 @@ within binary tables for string, logical, complex, or double complex
 data types.
 
 In addition, any table column may be read as if it contained string values.
-In the case of numeric columns the returned string will be formated
+In the case of numeric columns the returned string will be formatted
 using the TDISPn display format if it exists.
 
 **G.  Data Scaling
@@ -1082,7 +1088,7 @@ have
 -
 (a corresponding formula using TSCALn and TZEROn is used when
 writing to table columns).  Rounding to the nearest integer, rather
-than truncation, is performed when writing integer datatypes to the
+than truncation, is performed when writing integer data types to the
 FITS file.
  
 **H.  Support for IEEE Special Values
@@ -1155,7 +1161,7 @@ error messages one at a time.
 CFITSIO provides easy-to-use support for reading and writing data in
 variable length fields of a binary table. The variable length columns
 have TFORMn keyword values of the form `1Pt(len)' where `t' is the
-datatype code (e.g., I, J, E, D, etc.) and `len' is an integer
+data type code (e.g., I, J, E, D, etc.) and `len' is an integer
 specifying the maximum length of the vector in the table.  If the value
 of `len' is not specified when the table is created (e.g., if the TFORM
 keyword value is simply specified as '1PE' instead of '1PE(400) ), then
@@ -1329,7 +1335,7 @@ larger files, CFITSIO must be compiled with the
 the CFITSIO library must also be compiled with this flag or must
 include this preprocessor definition at the start of the source code
 file.  This causes the compiler to allocate 8-bytes instead of 4-bytes
-for the `off\_t' datatype which is used to store file offset
+for the `off\_t' data type which is used to store file offset
 positions.
 
 If CFITSIO is compiled with the -D\_FILE\_OFFSET\_BITS=64 flag on a
@@ -1465,7 +1471,7 @@ IRAF images (.imh format files) and raw binary data arrays may also be
 opened with READONLY access.  CFITSIO will automatically test if the
 input file is an IRAF image, and if, so will convert it on the fly into
 a virtual FITS image before it is opened by the application program.
-If the input file is a raw binary data array of numbers, then the datatype
+If the input file is a raw binary data array of numbers, then the data type
 and dimensions of the array must be specified in square brackets
 following the name of the file (e.g.  'rawfile.dat[i512,512]' opens a
 512 x 512 short integer image).  See the `Extended File Name Syntax'
@@ -1702,20 +1708,20 @@ header.
       (fitsfile *fptr, > int *keysexist, int *morekeys, int *status)
 -
 >2  Return the specified keyword.  In the first routine, 
-    the datatype parameter specifies the desired returned datatype of the
+    the datatype parameter specifies the desired returned data type of the
     keyword value and can have one of the following symbolic constant
     values:  TSTRING, TLOGICAL (== int), TBYTE, TSHORT, TUSHORT, TINT,
     TUINT, TLONG, TULONG, TFLOAT, TDOUBLE, TCOMPLEX, and TDBLCOMPLEX.
     Within the context of this routine, TSTRING corresponds to a
-    'char*' datatype, i.e., a pointer to a character array.  Data type
+    'char*' data type, i.e., a pointer to a character array.  Data type
     conversion will be performed for numeric values if the keyword
-    value does not have the same datatype.  If the value of the keyword
+    value does not have the same data type.  If the value of the keyword
     is undefined (i.e., the value field is blank) then an error status
     = VALUE\_UNDEFINED will be returned.
 
     The second routine returns the keyword value as a character string
     (a literal copy of what is in the value field) regardless of the
-    intrinsic datatype of the keyword.  The third routine returns
+    intrinsic data type of the keyword.  The third routine returns
     the entire 80-character header record of the keyword.
 
     If a NULL comment pointer is supplied then the comment string
@@ -1778,19 +1784,44 @@ header.
   int fits_read_key_unit / ffgunt
       (fitsfile *fptr, char *keyname, > char *unit, int *status)
 -
+>6  Concatenate the header keywords in the CHDU into a single long
+    string of characters.  This provides a convenient way of passing
+    all the header information in a FITS HDU to other subroutines.
+    Each 80-character fixed-length keyword record is appended to the
+    output character string, in order, with no intervening separator or
+    terminating characters. The last header record is terminated with
+    a NULL character.  This routine allocates memory for the returned
+    character array, so the calling program must free the memory when
+    finished.
+
+    Selected keywords may be excluded from the returned character string.
+    If the second parameter (nocomments) is TRUE (nonzero) then any
+    COMMENT, HISTORY, or blank keywords in the header will not be copied
+    to the output string.
+
+    The 'exclist' parameter may be used to supply a list of keywords
+    that are to be excluded from the output character string. Wild card
+    characters (*, ?, and \#) may be used in the excluded keyword names.
+    If no additional keywords are to be excluded, then set nexc = 0 and
+>   specify NULL for the the **header  parameter.  \label{ffhdr2str}
+-
+  int fits_hdr2str
+      (fitsfile *fptr, int nocomments, char **exclist, int nexc, 
+      > char **header, int *nkeys, int *status)
+-
 
 ***2.  Keyword Writing Routines
 
->1  Write a keyword of the appropriate datatype into the
+>1  Write a keyword of the appropriate data type into the
     CHU.  The first routine simply appends a new keyword whereas the
     second routine will update the value and comment fields of the
     keyword if it already exists, otherwise it appends a new
     keyword.  Note that the address to the value, and not the value
     itself, must be entered.    The datatype parameter specifies the
-    datatype of the keyword value with one of the following values:
+    data type of the keyword value with one of the following values:
     TSTRING, TLOGICAL (== int), TBYTE, TSHORT, TUSHORT, TINT, TUINT,
     TLONG, TULONG, TFLOAT, TDOUBLE.  Within the context of this
-    routine, TSTRING corresponds to a 'char*' datatype, i.e., a pointer
+    routine, TSTRING corresponds to a 'char*' data type, i.e., a pointer
     to a character array.  A null pointer may be entered for the
     comment parameter in which case the  keyword comment
 >   field will be unmodified or left blank.  \label{ffpky} \label{ffuky}
@@ -1893,45 +1924,56 @@ header.
 -
 **E.  Primary Array or IMAGE Extension I/O Routines 
  
-These routines read or write data values in the primary data array
-(i.e., the first HDU in a FITS file) or an IMAGE extension.   There are
-also routines to get information about the data type and size of the
-image.  Users should also read the following chapter on the CFITSIO iterator
-function which provides a more `object oriented' method of reading
-and writing images.  The iterator function is a little more complicated
-to use, but the advantages are that it usually takes less code
-to perform the same operation, and the resulting program oftens runs 
-faster because the FITS files are read and written using the most
-efficient block size.
+These routines read or write data values in the primary data array (i.e.,
+the first HDU in a FITS file) or an IMAGE extension.   There are also
+routines to get information about the data type and size of the image.
+Users should also read the following chapter on the CFITSIO iterator
+function which provides a more `object oriented' method of reading and
+writing images.  The iterator function is a little more complicated to
+use, but the advantages are that it usually takes less code to perform
+the same operation, and the resulting program oftens runs faster because
+the FITS files are read and written using the most efficient block size.
 
-C programmers should note that the ordering of arrays in FITS files,
-and hence in all the CFITSIO calls, is more similar to the
-dimensionality of arrays in Fortran rather than C.  For instance if a
-FITS image has NAXIS1 = 100 and NAXIS2 = 50, then a 2-D array just
-large enough to hold the image should be declared as array[50][100] and
-not as array[100][50].
+C programmers should note that the ordering of arrays in FITS files, and
+hence in all the CFITSIO calls, is more similar to the dimensionality
+of arrays in Fortran rather than C.  For instance if a FITS image has
+NAXIS1 = 100 and NAXIS2 = 50, then a 2-D array just large enough to hold
+the image should be declared as array[50][100] and not as array[100][50].
 
-The `datatype'  parameter specifies the datatype of the `nulval'  and
+The `datatype'  parameter specifies the data type of the `nulval'  and
 `array' pointers and can have one of the following  values:  TBYTE,
-TSHORT, TUSHORT, TINT, TUINT, TLONG, TLONGLONG, TULONG, TFLOAT, TDOUBLE.
-Automatic data type conversion is performed if the data type of the
-FITS array (as defined by the BITPIX keyword) differs from that
+TSBYTE, TSHORT, TUSHORT, TINT, TUINT, TLONG, TLONGLONG, TULONG, TFLOAT,
+TDOUBLE.  Automatic data type conversion is performed if the data type
+of the FITS array (as defined by the BITPIX keyword) differs from that
 specified by 'datatype'.  The data values are also automatically scaled
-by the BSCALE and BZERO keyword values as they are being read or
-written in the FITS array.
+by the BSCALE and BZERO keyword values as they are being read or written
+in the FITS array.
 
->1  Get the data type, number of dimensions, and/or the size of
-    each dimension in the image .  The datatype is determined by the
-    bitpix parameter which has allowed values of BYTE\_IMG (8),
+>1  Get the data type or equivalent data type of the image.  The 
+    first routine returns the physical data type of the FITS image, as
+    given by the BITPIX keyword, with allowed values of BYTE\_IMG (8),
     SHORT\_IMG (16), LONG\_IMG (32), FLOAT\_IMG (-32), and DOUBLE\_IMG
-    (-64).  The number of axes in the image is given by naxis, and the
-    size of each dimension is given by the naxes array (a maximum of
-    maxdim dimensions will be returned).  \label{ffgidt} \label{ffgidm}
->   \label{ffgisz} \label{ffgipr}
+    (-64).  The second routine is similar, except that if the image pixel
+    values are scaled, with non-default values for the BZERO and BSCALE
+    keywords, then the routine will return the 'equivalent' data type
+    that is needed to store the scaled values.  For example, if BITPIX
+    = 16 and BSCALE = 0.1 then the equivalent data type is FLOAT\_IMG.
+    Similarly if BITPIX = 16, BSCALE = 1, and BZERO = 32768, then the
+    the pixel values span the range of an unsigned short integer and
+>   the returned data type will be USHORT\_IMG. \label{ffgidt}
 -
   int fits_get_img_type / ffgidt
       (fitsfile *fptr, > int *bitpix, int *status)
 
+  int fits_get_img_equivtype / ffgiet
+      (fitsfile *fptr, > int *bitpix, int *status)
+-
+>2  Get the number of dimensions, and/or the size of
+    each dimension in the image .  The number of axes in the image is
+    given by naxis, and the size of each dimension is given by the
+    naxes array (a maximum of maxdim dimensions will be returned).
+>   \label{ffgidm} \label{ffgisz} \label{ffgipr}
+-
   int fits_get_img_dim / ffgidm
       (fitsfile *fptr, > int *naxis, int *status)
 
@@ -1942,15 +1984,15 @@ written in the FITS array.
       (fitsfile *fptr, int maxdim, > int *bitpix, int *naxis, long *naxes, 
        int *status)
 -
->2 Create a new primary array or IMAGE extension with a specified
-   datatype and size.  If the FITS file is currently empty then a
+>3 Create a new primary array or IMAGE extension with a specified
+   data type and size.  If the FITS file is currently empty then a
    primary array is created, otherwise a new IMAGE extension is
 >  appended to the file. \label{ffcrim}
 -
   int fits_create_img / ffcrim
       ( fitsfile *fptr, int bitpix, int naxis, long *naxes, > int *status)
 -
->3  Write a rectangular subimage (or the whole image) to the FITS data
+>4  Write a rectangular subimage (or the whole image) to the FITS data
     array.  The fpixel and lpixel arrays give the coordinates of the
     first (lower left corner) and last (upper right corner) pixels in
 >   FITS image to be written to.  \label{ffpss}
@@ -1959,11 +2001,11 @@ written in the FITS array.
       (fitsfile *fptr, int datatype, long *fpixel, long *lpixel,
        DTYPE *array, > int *status)
 -
->4  Write pixels into the FITS data array.  'fpixel' is an array of
+>5  Write pixels into the FITS data array.  'fpixel' is an array of
    length NAXIS which gives the coordinate of the starting pixel to be
    written to, such that fpixel[0] is in the range 1 to NAXIS1,
    fpixel[1] is in the range 1 to NAXIS2, etc.  The first routine
-   simply writes the array of pixels to the FITS file (doing datatype
+   simply writes the array of pixels to the FITS file (doing data type
    conversion if necessary) whereas the second routine will substitute
    the  appropriate FITS null value for any elements which are equal to
    the input value of nulval (note that this parameter gives the
@@ -1983,7 +2025,7 @@ written in the FITS array.
       (fitsfile *fptr, int datatype, long *fpixel, long nelements,
        DTYPE *array, DTYPE *nulval, > int *status);
 -
->5  Set FITS data array elements equal to the appropriate null pixel
+>6  Set FITS data array elements equal to the appropriate null pixel
     value. For integer FITS arrays, the FITS null value is defined by
     the BLANK keyword  (an error is returned if the BLANK keyword
     doesn't exist). For floating point FITS arrays the special IEEE NaN
@@ -1994,7 +2036,7 @@ written in the FITS array.
   int fits_write_null_img / ffpprn
       (fitsfile *fptr, long firstelem, long nelements, > int *status)
 -
->6  Read a rectangular subimage (or the whole image) from the FITS 
+>7  Read a rectangular subimage (or the whole image) from the FITS 
     data array.  The fpixel and lpixel arrays give the coordinates of
     the first (lower left corner) and last (upper right corner) pixels
     to be read from the FITS image. Undefined FITS array elements will
@@ -2007,7 +2049,7 @@ written in the FITS array.
       (fitsfile *fptr, int  datatype, long *fpixel, long *lpixel, long *inc,
        DTYPE *nulval, > DTYPE *array, int *anynul, int *status)
 -
->7  Read pixels from the FITS data array.  'fpixel' is the starting
+>8  Read pixels from the FITS data array.  'fpixel' is the starting
     pixel location and is an array of length NAXIS such that fpixel[0]
     is in the range 1 to NAXIS1, fpixel[1] is in the range 1 to NAXIS2,
     etc. The nelements parameter specifies the number of pixels to
@@ -2023,7 +2065,7 @@ written in the FITS array.
     = 0 or *nulval = 0, in which case no checks for undefined pixels
     will be performed.  The second routine is similar except that any
     undefined pixels will have the corresponding nullarray element set
->   equal to TRUE.  \label{ffgpxv}  \label{ffgpxf}
+>   equal to TRUE (= 1).  \label{ffgpxv}  \label{ffgpxf}
 -
   int fits_read_pix / ffgpxv
       (fitsfile *fptr, int  datatype, long *fpixel, long nelements,
@@ -2152,7 +2194,7 @@ return the current values of the parameters:
   int fits_get_tile_dim(fitsfile *fptr, int ndim, long *tilesize, int *status)
   int fits_get_noise_bits(fitsfile *fptr, int *noisebits, int *status)
 -
-3 symbollic constants are defined for use as the value of the
+3 symbolic constants are defined for use as the value of the
 `comptype' parameter:  GZIP\_1, RICE\_1, or PLIO\_1.  Entering NULL for
 comptype will turn off the tile-compression and cause normal FITS
 images to be written.
@@ -2299,34 +2341,53 @@ the first 8 characters, and strongly recommended that the names be
       (fitsfile *fptr, int casesen, char *templt, > char *colname,
        int *colnum, int *status)
 -
->3  Return the datatype, vector repeat value, and the width in bytes
+>3  Return the data type, vector repeat value, and the width in bytes
     of a column in an ASCII or binary table.  Allowed values for the
-    datatype in ASCII tables are:  TSTRING, TSHORT, TLONG, TFLOAT, and
+    data type in ASCII tables are:  TSTRING, TSHORT, TLONG, TFLOAT, and
     TDOUBLE.  Binary tables also support these types: TLOGICAL, TBIT,
-    TBYTE, TCOMPLEX and TDBLCOMPLEX.  The negative of the datatype code
+    TBYTE, TCOMPLEX and TDBLCOMPLEX.  The negative of the data type code
     value is returned if it is a variable length array column.  Note
     that in the case of a 'J' 32-bit integer binary table column, this
-    routine will return datatype = TINT32BIT (which in fact is
+    routine will return data type = TINT32BIT (which in fact is
     equivalent to TLONG).  With most current C compilers, a value in a
     'J' column has the same size as an 'int' variable, and may not be
     equivalent to a 'long' variable, which is 64-bits long on an
     increasing number of compilers.
 
     The 'repeat' parameter returns the vector repeat count on the binary
-    table TFORMn keyword value; ASCII table columns always have repeat
-    = 1.  The 'width' parameter returns the width in bytes of a single
-    column value (e.g., a '10D' binary table column will have width =
-    8; an ASCII table 'F12.2' column will have width = 12);  Note that
+    table TFORMn keyword value. (ASCII table columns always have repeat
+    = 1).  The 'width' parameter returns the width in bytes of a single
+    column element (e.g., a '10D' binary table column will have width =
+    8, an ASCII table 'F12.2' column will have width = 12, and a binary
+    table'60A' character string  column will have width = 60);  Note that
     this routine supports the local convention for specifying arrays of
     fixed length strings within a binary table character column using
-    the syntax TFORM = 'rAw' where 'r' is the total number of
-    characters (= the width of the column) and 'w' is the width of a
-    unit string within the column.  Thus if the column has TFORM =
-    '60A12' then this routine will return typecode = TSTRING, repeat =
-    60, and width = 12.  A null pointer may be given for any of
->   the output parameters that are not needed. \label{ffgtcl}
+    the syntax TFORM = 'rAw' where 'r' is the total number of characters
+    (= the width of the column) and 'w' is the width of a unit string
+    within the column.  Thus if the column has TFORM = '60A12' then this
+    means that each row of the table contains 5 12-character substrings
+    within the 60-character field, and thus in this case this routine will
+    return typecode = TSTRING, repeat = 60, and width = 12.  The number
+    of substings in any binary table character string field can be
+    calculated by (repeat/width).  A null pointer may be given for any of
+    the output parameters that are not needed.
+
+   The second routine, fit\_get\_eqcoltype is similar except that in
+   the case of scaled integer columns it returns the 'equivalent' data
+   type that is needed to store the scaled values, and not necessarily
+   the physical data type of the unscaled values as stored in the FITS
+   table.  For example if a '1I' column in a binary table has TSCALn =
+   1 and TZEROn = 32768, then this column effectively contains unsigned
+   short integer values, and thus the returned value of typecode will
+   be TUSHORT, not TSHORT.  Similarly, if a column has TTYPEn = '1I'
+   and TSCALn = 0.12, then the returned typecode
+>  will be TFLOAT. \label{ffgtcl}
 -
   int fits_get_coltype / ffgtcl
+      (fitsfile *fptr, int colnum, > int *typecode, long *repeat,
+       long *width, int *status)
+
+  int fits_get_eqcoltype / ffeqty
       (fitsfile *fptr, int colnum, > int *typecode, long *repeat,
        long *width, int *status)
 -
@@ -2419,7 +2480,7 @@ the first 8 characters, and strongly recommended that the names be
 >3  Copy a column from one HDU to another (or to the same HDU).  If
     create\_col = TRUE, then a new column will be inserted in the output
     table, at position `outcolumn', otherwise the existing output column will
-    be overwritten (in which case it must have a compatible datatype).
+    be overwritten (in which case it must have a compatible data type).
     If outcolnum is greater than the number of column in the table, then
     the new column will be appended to the end of the table.  
     Note that the first column in a table is at colnum = 1. 
@@ -2449,16 +2510,16 @@ an error.
 Automatic data type conversion is performed for numerical data types
 (only) if the data type of the column (defined by the TFORMn keyword)
 differs from the data type of the calling routine.  ASCII and binary
-tables support the following datatype values:  TSTRING, TBYTE, TSHORT,
+tables support the following data type values:  TSTRING, TBYTE, TSBYTE, TSHORT,
 TUSHORT, TINT, TUINT, TLONG, TLONGLONG, TULONG, TFLOAT, or TDOUBLE.
 Binary tables also support TLOGICAL (internally mapped to the `char'
-datatype), TCOMPLEX, and TDBLCOMPLEX.
+data type), TCOMPLEX, and TDBLCOMPLEX.
 
-Note that within the context of these routines, the TSTRING datatype
-corresponds to a C 'char**' datatype, i.e., a pointer to an array of
+Note that within the context of these routines, the TSTRING data type
+corresponds to a C 'char**' data type, i.e., a pointer to an array of
 pointers to an array of characters.  This is different from the keyword
 reading and writing routines where TSTRING corresponds to a C 'char*'
-datatype, i.e., a single pointer to an array of characters.  When
+data type, i.e., a single pointer to an array of characters.  When
 reading strings from a table, the char arrays obviously must have been
 allocated long enough to hold the whole FITS table string.
 
@@ -2476,7 +2537,7 @@ rows if required) and not the number of table cells.
 
 >>1  Write elements into an ASCII or binary table column.
    The first routine simply writes the array of values to the FITS file
-   (doing datatype conversion if necessary) whereas the second routine
+   (doing data type conversion if necessary) whereas the second routine
    will substitute the  appropriate FITS null value for all elements
    which are equal to the input value of nulval (note that this
    parameter gives the address of nulval, not the null value
@@ -2503,22 +2564,22 @@ rows if required) and not the number of table cells.
        (fitsfile *fptr, int colnum, long firstrow, long firstelem,
         long nelements, > int *status)
 -
->2  Read elements from an ASCII or binary table column.  The datatype
-    parameter specifies the datatype of the `nulval' and `array'  pointers;
+>2  Read elements from an ASCII or binary table column.  The data type
+    parameter specifies the data type of the `nulval' and `array'  pointers;
     Undefined array elements will be returned with a value = *nullval,
     (note that this parameter gives the address of the null value, not the
     null value itself) unless nulval = 0 or *nulval = 0, in which case
     no checking for undefined pixels will be performed.  The second
     routine is similar except that any undefined pixels will have the
-    corresponding nullarray element set equal to TRUE.
+    corresponding nullarray element set equal to TRUE (= 1).
 
-    Any column, regardless of it's intrinsic datatype, may be read as a
+    Any column, regardless of it's intrinsic data type, may be read as a
     string.  It should be noted however that reading a numeric column
     as a string is 10 - 100 times slower than reading the same column
     as a number due to the large overhead in constructing the formatted
     strings.  The display format of the returned strings will be
     determined by the TDISPn keyword, if it exists, otherwise by the
-    datatype of the column.  The length of the returned strings (not
+    data type of the column.  The length of the returned strings (not
     including the null terminating character) can be determined with
     the fits\_get\_col\_display\_width routine.  The following TDISPn
     display formats are currently supported:
@@ -2816,7 +2877,32 @@ The following utility routines may be useful for certain applications.
   void fits_compare_str / ffcmps
        (char *templt, char *string, int casesen, > int *match, int *exact)
 -
->5  Test that the keyword name contains only legal characters (A-Z,0-9,
+>5 Split a string containing a list of names (typically file names or column 
+   names) into individual name tokens by a sequence of calls to
+   fits\_split\_names.  The names in the list must be delimited by a comma
+   and/or spaces.  This routine ignores spaces and commas that occur
+   within parentheses, brackets, or curly brackets.  It also strips any
+   leading and trailing blanks from the returned name.
+
+   This routine is similar to the ANSI C 'strtok' function:
+
+   The first call to fits\_split\_names has a non-null input string.
+   It finds the first name in the string and terminates it by overwriting
+   the next character of the string with a null terminator and returns a
+   pointer to the name.  Each subsequent call, indicated by a NULL value
+   of the input string, returns the next name, searching from just past
+   the end of the previous name.  It returns NULL when no further names
+>  are found.  \label{splitnames}
+-
+   char *fits_split_names(char *namelist) 
+-
+   The following example shows how a string would be split into 3 names:
+-
+    myfile[1][bin (x,y)=4], file2.fits  file3.fits
+    ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^
+        1st name             2nd name    3rd name
+-
+>6  Test that the keyword name contains only legal characters (A-Z,0-9,
     hyphen, and underscore) or that the keyword record contains only legal
 >   printable ASCII characters  \label{fftkey} \label{fftrec}
 -
@@ -2824,7 +2910,7 @@ The following utility routines may be useful for certain applications.
 
   int fits_test_record / fftrec (char *card, > int *status)
 -
->6  Test whether the current header contains any NULL (ASCII 0) characters.
+>7  Test whether the current header contains any NULL (ASCII 0) characters.
     These characters are illegal in the header, but they will go undetected
     by most of the CFITSIO keyword header routines, because the null is 
     interpreted as the normal end-of-string terminator.  This routine returns
@@ -2838,7 +2924,7 @@ The following utility routines may be useful for certain applications.
 -
   int fits_null_check / ffnchk (char *card, > int *status)
 -
->7  Parse a header keyword record and return the name of the keyword,
+>8  Parse a header keyword record and return the name of the keyword,
     and the length of the name.
     The keyword name normally occupies the first 8 characters of the
     record, except under the HIERARCH convention where the name can
@@ -2847,7 +2933,7 @@ The following utility routines may be useful for certain applications.
   int fits_get_keyname / ffgknm
       (char *card, > char *keyname, int *keylength, int *status)
 -
->8  Parse a header keyword record, returning the value (as
+>9  Parse a header keyword record, returning the value (as
     a literal character string) and comment strings.  If the keyword has no
     value (columns 9-10 not equal to '= '), then a null value string is 
     returned and the comment string is set equal to column 9 - 80 of the
@@ -2856,29 +2942,29 @@ The following utility routines may be useful for certain applications.
   int fits_parse_value / ffpsvc
       (char *card, > char *value, char *comment, int *status)
 -
->9  Construct an array indexed keyword name (ROOT + nnn).
+>10 Construct an array indexed keyword name (ROOT + nnn).
     This routine appends the sequence number to the root string to create
 >   a keyword name (e.g., 'NAXIS' + 2 = 'NAXIS2') \label{ffkeyn}
 -
   int fits_make_keyn / ffkeyn
       (char *keyroot, int value, > char *keyname, int *status)
 -
->10  Construct a sequence keyword name (n + ROOT).
+>11  Construct a sequence keyword name (n + ROOT).
     This routine concatenates the sequence number to the front of the
 >   root string to create a keyword name (e.g., 1 + 'CTYP' = '1CTYP') \label{ffnkey}
 -
   int fits_make_nkey / ffnkey
       (int value, char *keyroot, > char *keyname, int *status)
 -
->11 Determine the datatype of a keyword value string. This routine
-    parses the keyword value string  to determine its datatype. 
+>12 Determine the data type of a keyword value string. This routine
+    parses the keyword value string  to determine its data type. 
     Returns 'C', 'L', 'I', 'F' or 'X', for character string, logical,
 >   integer, floating point, or complex, respectively. \label{ffdtyp}
 -
   int fits_get_keytype / ffdtyp
       (char *value, > char *dtype, int *status)
 -
->12 Return the class of an input header record.  The record is classified
+>13 Return the class of an input header record.  The record is classified
     into one of the following categories (the class values are
     defined in fitsio.h).  Note that this is one of the few CFITSIO
 >   routines that does not return a status value. \label{ffgkcl}
@@ -2914,9 +3000,9 @@ The following utility routines may be useful for certain applications.
 
   int fits_get_keyclass / ffgkcl (char *card)
 -
->13 Parse the 'TFORM' binary table column format string.
+>14 Parse the 'TFORM' binary table column format string.
     This routine parses the input TFORM character string and returns the
-    integer datatype code, the repeat count of the field, and, in the case
+    integer data type code, the repeat count of the field, and, in the case
     of character string fields, the length of the unit string.  See Appendix
     B for the allowed values for the returned typecode parameter.  A
 >   null pointer may be given for any output parameters that are not needed. \label{ffbnfm}
@@ -2925,11 +3011,11 @@ The following utility routines may be useful for certain applications.
        (char *tform, > int *typecode, long *repeat, long *width, 
         int *status)
 -
->14 Parse the 'TFORM' keyword value that defines the column format in
+>15 Parse the 'TFORM' keyword value that defines the column format in
     an ASCII table.  This routine parses the input TFORM character
-    string and returns the datatype code, the width of the column,
+    string and returns the data type code, the width of the column,
     and (if it is a floating point column) the number of decimal places
-    to the right of the decimal point.  The returned datatype codes are
+    to the right of the decimal point.  The returned data type codes are
     the same as for the binary table, with the following
     additional rules:  integer columns that are between 1 and 4 characters
     wide are defined to be short integers (code = TSHORT).  Wider integer
@@ -2945,7 +3031,7 @@ The following utility routines may be useful for certain applications.
       (char *tform, > int *typecode, long *width, int *decimals, 
        int *status)
 -
->15 Calculate the starting column positions and total ASCII table width
+>16 Calculate the starting column positions and total ASCII table width
     based on the input array of ASCII table TFORM values.  The SPACE input
     parameter defines how many blank spaces to leave between each column
     (it is recommended to have one space between columns for better human
@@ -2955,7 +3041,7 @@ The following utility routines may be useful for certain applications.
       (int tfields, char **tform, int space, > long *rowlen, 
        long *tbcol, int *status)
 -
->16 Parse a template header record and return a formatted 80-character string
+>17 Parse a template header record and return a formatted 80-character string
     suitable for appending to (or deleting from) a FITS header file.
     This routine is useful for parsing lines from an ASCII template file
     and reformatting them into legal FITS header records.  The formatted
@@ -2980,7 +3066,7 @@ The following utility routines may be useful for certain applications.
 >       (with a blank keyword name).  
  
 >-      The VALUE token must be separated from the KEYNAME token by one or more
-        spaces and/or an '=' character.  The datatype of the VALUE token
+        spaces and/or an '=' character.  The data type of the VALUE token
         (numeric, logical, or character string) is automatically determined
         and  the output CARD string is formatted accordingly.  The value
         token may be forced to be interpreted as a string (e.g. if it is a
@@ -3040,7 +3126,7 @@ The following utility routines may be useful for certain applications.
       # the following template line modifies the NAME keyword to OBJECT
       - NAME OBJECT
 -
->17  Parse the input string containing a list of rows or row ranges, and
+>18  Parse the input string containing a list of rows or row ranges, and
      return integer arrays containing the first and last row in each
      range.  For example, if rowlist = "3-5, 6, 8-9" then it will
      return numranges = 3, rangemin = 3, 6, 8 and rangemax = 5, 6, 9.
@@ -3056,14 +3142,14 @@ The following utility routines may be useful for certain applications.
     int fits_parse_range / ffrwrg(char *rowlist, long maxrows, int maxranges, >  
        int *numranges, long *rangemin, long *rangemax, int *status)
 -
->18  Check that the Header fill bytes (if any) are all blank.  These are the bytes
+>19  Check that the Header fill bytes (if any) are all blank.  These are the bytes
      that may follow END keyword and before the beginning of data unit,
      or the end of the HDU if there is no data unit.
 >   \label{ffchfl}
 -
     int ffchfl(fitsfile *fptr, > int *status)
 -
->19  Check that the Data fill bytes (if any) are all zero (for IMAGE or 
+>20  Check that the Data fill bytes (if any) are all zero (for IMAGE or 
      BINARY Table HDU) or all blanks (for ASCII table HDU).  These file
      bytes may be located after the last valid data byte in the HDU and
      before the physical end of the HDU.
@@ -3225,7 +3311,7 @@ typedef struct  /* structure for the iterator function column information */
   fitsfile *fptr;       /* pointer to the HDU containing the column or image */
   int      colnum;      /* column number in the table; ignored for images    */
   char     colname[70]; /* name (TTYPEn) of the column; null for images      */
-  int      datatype;    /* output datatype (converted if necessary) */
+  int      datatype;    /* output data type (converted if necessary) */
   int      iotype;      /* type: InputCol, InputOutputCol, or OutputCol */
 
   /* output structure elements that may be useful for the work function: */
@@ -3258,7 +3344,7 @@ it must be cast to the correct data type before it is used.  The
 `repeat' structure element give the number of data values in each row
 of the table, so that the total number of data values in the array is
 given by repeat * nvalues.  In the case of image arrays and ASCII
-tables, repeat will always be equal to 1.  When the datatype is a
+tables, repeat will always be equal to 1.  When the data type is a
 character string, the array pointer is actually a pointer to an array
 of string pointers (i.e., char **array).  The other output structure
 elements are provided for convenience in case that information is
@@ -3298,14 +3384,14 @@ colnum -- the number of the column in the table.  This value is ignored
 colname -- the name (TTYPEn keyword) of the column.  This is
            only required if colnum = 0 and is ignored for images.
 \item
-datatype -- The desired datatype of the array to be passed to the
-            work function.  For numerical data the datatype does
-            not need to be the same as the actual datatype in the
+datatype -- The desired data type of the array to be passed to the
+            work function.  For numerical data the data type does
+            not need to be the same as the actual data type in the
             FITS file, in which case CFITSIO will do the conversion.
-            Allowed values are: TSTRING, TLOGICAL, TBYTE, TSHORT, TUSHORT, 
+            Allowed values are: TSTRING, TLOGICAL, TBYTE, TSBYTE, TSHORT, TUSHORT, 
             TINT, TLONG, TULONG, TFLOAT, TDOUBLE.  If the input
-            value of datatype equals 0, then the  existing
-            datatype of the column or image will be used without
+            value of data type equals 0, then the  existing
+            data type of the column or image will be used without
             any conversion.
 
 \item
@@ -3390,7 +3476,7 @@ last time.  The work function can also force an early termination of
 the iterations by returning a status value = -1.
 
 The narrays and iteratorCol.datatype arguments allow the work function
-to double check that the number of input arrays and their datatypes
+to double check that the number of input arrays and their data types
 have the expected values.  The iteratorCol.fptr and iteratorCol.colnum
 structure elements can be used if the work function needs to read or
 write the values of other keywords in the FITS file associated with
@@ -3415,8 +3501,8 @@ set the first array element to the desired null value if necessary,
 otherwise the first element should be set to zero to indicate that
 there are no null values in the output array.  CFITSIO defines 2
 values, FLOATNULLVALUE and DOUBLENULLVALUE, that can be used as default
-null values for float and double datatypes, respectively.  In the case
-of character string datatypes, a null string is always used to
+null values for float and double data types, respectively.  In the case
+of character string data types, a null string is always used to
 represent undefined strings.
 
 In some applications it may be necessary to recursively call the iterator
@@ -3506,49 +3592,82 @@ do not have a corresponding short function name.
 
 *IX.  Celestial Coordinate System Routines
 
-Two complimentary sets of routines are provided for calculating the
-transformation between pixel location in an image and the the
-corresponding celestial coordinates on the sky.  These routines rely on
-a set of standard World Coordinate System (WCS) keywords in the header
-of the HDU which define the parameters to be used when calculating the
-coordinate transformation.
+The FITS community has adopted a set of keyword conventions that are
+used to  specify the transformation that is needed to convert between
+pixel locations in an image and the corresponding celestial coordinates
+on the sky.  or more generally, to specify world coordinates that
+are to be associated with any pixel location in an n-dimensional FITS
+array. CFITSIO is distributed with a simple set of World Coordinate
+System routines that support a limited set of celestial projections.
+These routines were derived from functions in the Classic AIPS software
+package developed in the 1980s.  These routines DO NOT support all the
+new conventions in the WCS papers that have recently been approved as
+part of the official FITS standard.
 
-Both sets of routines require that a 2 step procedure be followed:
-first an initialization routine must be called to read the relevant WCS
-keywords in the header.  These parameters are then passed to a pair of
-routines that convert from pixel to sky coordinates, or from sky to
-pixel coordinates.  See Appendix B for the definition of the
-parameters used in these routines.
+Rather than using the WCS routines distributed with CFITSIO, it is
+STRONGLY RECOMMENDED that software developers use a more sophisticated
+external WCS library.  Several recommended libraries are:
 
-The first set of routines described below have the advantage that they
-are completely self-contained within the CFITSIO library and thus are
-guaranteed to be available on the system.  These routines  only support
-the most common types of map projections and WCS keyword conventions
-however.
+-
+  WCSLIB -  supported by Mark Calabretta
+  WCSTools - supported by Doug Mink
+  AST library - developed by the U.K. Starlink project
+-
 
-The second set of routines are available in a WCS library written by
-Doug Mink at SAO.  These routines are more powerful than the ones
-contained in CFITSIO itself because they support all the defined WCS
-map projections and they  support a number of non-standard keyword
-conventions that have been adopted over the years by various different
-observatories.  To use these routines, however, requires that a
-separate WCS library be built and installed on the system in addition
-to CFITSIO.        
+More information about the WCS keyword conventions and links
+to all of these libraries can be found on the FITS Support Office
+web site at http://fits.gsfc.nasa.gov under the WCS link.
+
+Each of these libraries has a routine that will ingest a list of header
+keywords from which the transformations between pixel coordinates and
+world coordinates can be derived.  The following CFITSIO routine may
+be used to copy the keywords in any FITS header into a long character
+string that can then be passed to the WCS library routine:
+  
+>1  Concatenate the header keywords in the CHDU into a single long
+    string of characters. Each 80-character fixed-length keyword
+    record is appended to the output character string, in order, with
+    no intervening separator or terminating characters. The last header
+    record is terminated with a NULL character.  This routine allocates
+    memory for the returned character array, so the calling program must
+    free the memory when finished.
+
+    Selected keywords may be excluded from the returned character string.
+    If the second parameter (nocomments) is TRUE (nonzero) then any
+    COMMENT, HISTORY, or blank keywords in the header will not be copied
+    to the output string.
+
+    The 'exclist' parameter may be used to supply a list of keywords
+    that are to be excluded from the output character string. Wild card
+    characters (*, ?, and \#) may be used in the excluded keyword names.
+    If no additional keywords are to be excluded, then set nexc = 0 and
+>   specify NULL for the the **header  parameter.  \label{hdr2str}
+-
+  int fits_hdr2str
+      (fitsfile *fptr, int nocomments, char **exclist, int nexc, 
+      > char **header, int *nkeys, int *status)
+-
 
 **A.   Self-contained WCS Routines
 
-The following routines are included in the CFITSIO library to help
-calculate the transformation between pixel location in an image and the
-corresponding celestial coordinates on the sky.  These support the
-following standard map projections:  -SIN, -TAN, -ARC, -NCP, -GLS,
-  -MER, and -AIT (these are the legal values for the coordtype
-parameter).  These routines are based on similar functions in Classic
-AIPS.  All the angular quantities are given in units of degrees.
+The following routines DO NOT support the more recent WCS conventions
+that have been approved as part of the FITS standard.  Consequently,
+the following routines ARE NOW DEPRECATED.  It is STRONGLY RECOMMENDED
+that software developers not use these routines, and instead use an
+external WCS library, as described in the previous section.
 
->1  Get the values of all the standard FITS celestial coordinate system
-    keywords from the header of a FITS image (i.e., the primary array or
-    an image extension).  These values may then be passed to the routines
-    that perform the coordinate transformations.  If any or all of the WCS 
+These routines are included only for backward compatibility with
+existing software.  They support the following standard map 
+projections: -SIN, -TAN, -ARC, -NCP, -GLS, -MER, and -AIT (these are the
+legal values for the coordtype parameter).  These routines are based
+on similar functions in Classic AIPS.  All the angular quantities are
+given in units of degrees.
+
+>1  Get the values of the basic set of standard FITS celestial coordinate
+    system keywords from the header of a FITS image (i.e., the primary
+    array or an IMAGE extension).  These values may then be passed to
+    the fits\_pix\_to\_world and fits\_world\_to\_pix routines that
+    perform the coordinate transformations.  If any or all of the WCS
     keywords are not present, then default values will be returned. If
     the first coordinate axis is the declination-like coordinate, then
     this routine will swap them so that the longitudinal-like coordinate
@@ -3573,11 +3692,13 @@ AIPS.  All the angular quantities are given in units of degrees.
        double *xrefpix, double *yrefpix, double *xinc, double *yinc,
        double *rot, char *coordtype, int *status)
 -
->2  Get the values of all the standard FITS celestial coordinate system
-    keywords from the header of a FITS table where the X and Y (or RA and
-    DEC) coordinates are stored in 2 separate columns of the table.
-    These values may then be passed to the routines that perform the
->   coordinate transformations. \label{ffgtcs}
+>2  Get the values of the standard FITS celestial coordinate system
+    keywords from the header of a FITS table where the X and Y (or RA
+    and DEC) coordinates are stored in 2 separate columns of the table
+    (as in the Event List table format that is often used by high energy
+    astrophysics missions).  These values may then be passed to the
+    fits\_pix\_to\_world and fits\_world\_to\_pix routines that perform
+>   the coordinate transformations. \label{ffgtcs}
 -
   int fits_read_tbl_coord / ffgtcs
       (fitsfile *fptr, int xcol, int ycol, > double *xrefval,
@@ -3603,120 +3724,6 @@ AIPS.  All the angular quantities are given in units of degrees.
        int *status)
 -
 
-**B.  WCS Routines that require the WCS library
-
-The routines described in this section use the WCS library written
-by Doug Mink at SAO.  This library is available at
-
--
-http://tdc-www.harvard.edu/software/wcstools/    and
-http://tdc-www.harvard.edu/software/wcstools/wcs.html
--
-
-You do not need the entire WCSTools package to use the routines
-described here.  Instead, you only need to install the World Coordinate
-System Subroutine library.  It is available from the
-ftp site as a gzipped .tar file (e.g., wcssubs-2.5.tar.gz) or as a
-zipped file (e.g., wcssub25.zip).  Any questions about using this
-library should be sent to the author at dmink@cfa.harvard.edu.
-
-The advantage of using the WCS library instead of the self-contained WCS
-routines described in the previous section is that they provide support
-for all currently defined projection geometries, and they also support
-most standard as well as many non-standard WCS keyword conventions that
-have been used by different observatories in the past.  This library is
-also actively maintained so it is likely that it will support
-any new FITS WCS keyword conventions that are adopted in the
-future. 
-
-The first 3 routines described below are CFITSIO routines that create a
-character string array containing all the WCS keywords that are needed
-as input to the WCS library 'wcsinit' routine.  These 3 routines
-provide a convenient interface for calling the WCS library routines
-from CFITSIO, but do not actually call any routines in the WCS library
-themselves.
-
->1   Copy all the WCS-related keywords from the header of the primary
-array or an image extension into a single long character string array.  The
-80-char header keywords are simply concatenated one after the other in
-the returned string.  The character array is dynamically allocated and must be
-freed by the calling program when it is no longer needed.  In the current
->implementation, all the header keywords are copied into the array.
-
--
-  int fits_get_image_wcs_keys / ffgiwcs
-      (fitsfile *fptr, char **header, int *status)
--
-
->2    Copy all the WCS-related keywords for a given pair of columns in
-a table extension into a single long character string array. The pair
-of columns must contain a list of the X and Y coordinates of each event
-in the image (i.e., this is an image in pixel-list or event-list
-format).  The names of the WCS keywords in the table header are
-translated into the keywords that would correspond to an image HDU
-(e.g., TCRPXn for the X column becomes the CRPIX1 keyword).  The
-80-char header keywords are simply concatenated one after the other in
-the string. The character array is dynamically allocated and must be
-> freed by the calling program when it is no longer needed.
-
-- 
-  int fits_get_table_wcs_keys / ffgtwcs
-      (fitsfile *fptr, int xcol, int ycol, char **header, int *status) 
--
-
->3    Copy all the WCS-related keywords for an image that is contained
-in a single vector cell of a binary table extension into a single long
-character string array. In this type of image format, the table column
-is a 2-dimensional vector and each row of the table contains an image.
-The names of the WCS keywords in the table header are translated into
-the keywords corresponding to an image (e.g., 1CRPn becomes the CRPIX1
-keyword).  The 80-char header keywords are simply concatenated one
-after the other in the string. The character array is dynamically
-allocated and must be freed by the calling program when it is no longer
-> needed.
-
--
-  int fits_get_imagecell_wcs_keys / ffgicwcs
-      (fitsfile *fptr, int column, long row, char **header, int *status)
--
-
->4   This WCS library routine returns a pointer to a structure that
-contains all the WCS parameters extracted from the input header
-keywords.  The input  header keyword string can be produced by any of
-the 3 previous routines.  The returned WorldCoor structure is used as
-input to the next 2 WCS library routines that convert between sky
-coordinates and pixel coordinates.  This routine dynamically allocates
-the WorldCoor structure, so it must be freed by calling the wcsfree
-> routine when it is no longer needed.
-
--
-  struct WorldCoor *wcsinit (char *header)
--
-
->5   Calculate the sky coordinate corresponding to the input pixel
-coordinate using the conversion parameters defined in the wcs
->structure.  This is a WCS library routine.
-
--
-  void pix2wcs (struct WorldCoor *wcs, double xpix, double ypix, 
-        > double *xpos, double *ypos)
--
-
->6  Calculate the pixel coordinate corresponding to the input sky coordinate
-using the conversion parameters defined in the wcs structure.  The returned
-offscale parameter equals 0 if the coordinate is within bounds of the image.
-> This is a WCS library routine.
-
--
-  void wcs2pix (struct WorldCoor *wcs, double xpos, double ypos, 
-       > double *xpix, double *ypix, int *offscale)
--
-
->7   Free the WCS structure that was created by wcsinit.  This is a WCS 
->    library routine.
--
-  void wcsfree(struct WorldCoor *wcs)
--
 
 *VIII  Hierarchical Grouping Routines
 
@@ -4075,8 +4082,7 @@ name of the output file that the input file is to be copied to prior
 to opening, the HDU or extension specification, the filtering
 specifier, the binning specifier, and the column specifier.  Null
 strings will be returned for any components that are not present
-in the input file name.
-> \label{ffiurl}
+> in the input file name. \label{ffiurl}
 -
   int fits_parse_input_url / ffiurl
       (char *filename, > char *filetype, char *infile, char *outfile, char
@@ -4162,7 +4168,7 @@ specifications.
     of the address parameters if their values are not needed.  The
     fits\_get\_hduaddr routine is obsolete and should no longer be
     used.  The newer fits\_get\_hduoff routine uses the 'off\_t'
-    datatype which can support offsets in large files greater than 
+    data type which can support offsets in large files greater than 
 >   2.1GB in size. \label{ffghad}
 -
   int fits_get_hduoff / ffghof
@@ -4223,7 +4229,7 @@ specifications.
       (fitsfile *fptr, long nrows, int tfields, char **ttype,
       char **tform, char **tunit, char *extname, long pcount, > int *status)
 -
->5  Modify the size, dimensions, and/or datatype of the current
+>5  Modify the size, dimensions, and/or data type of the current
     primary array or image extension. If the new image, as specified
     by the input arguments, is larger than the current existing image
     in the FITS file then zero fill data will be inserted at the end
@@ -4371,7 +4377,7 @@ Appendix B for the definition of the parameters used in these
 routines.
 
 
->1   Write (append) a new keyword of the appropriate datatype into the CHU.
+>1   Write (append) a new keyword of the appropriate data type into the CHU.
      A null pointer may be entered for the comment parameter, which
      will cause the comment field of the keyword to be left blank.  The
      flt, dbl, cmp, and dblcmp versions of this routine have the added
@@ -4533,7 +4539,7 @@ routines.
 Wild card characters may be used when specifying the name of the
 keyword to be read.
 
->1  Read a keyword value (with the appropriate datatype) and comment from
+>1  Read a keyword value (with the appropriate data type) and comment from
     the CHU.  If a NULL comment pointer is given on input, then the comment
     string will not be returned.  If the value of the keyword is not defined
     (i.e., the value field is blank) then an error status = VALUE\_UNDEFINED
@@ -4557,12 +4563,15 @@ keyword to be read.
        int *status)
 
 -
->2  Read a sequence of indexed keyword values.   The starting index number
-    (nstart) must be greater than 0.   If the value of any of
-    the keywords is not defined (i.e., the value field is blank) then an
-    error status = VALUE\_UNDEFINED will be returned and the input 
-    value for the undefined keyword(s) will not be changed.  These
->   routines do not support wild card characters in the root name.\label{ffgknx}
+>2  Read a sequence of indexed keyword values (e.g., NAXIS1, NAXIS2, ...).
+    The input starting index number (nstart) must be greater than 0.
+    If the value of any of the keywords is not defined (i.e., the value
+    field is blank) then an error status = VALUE\_UNDEFINED will be
+    returned and the input value for the undefined keyword(s) will not
+    be changed.  These routines do not support wild card characters in
+    the root name.  If there are no indexed keywords in the header with
+    the input root name then these routines do not return a non-zero
+>   status value and instead simply return nfound = 0. \label{ffgknx}
 -
   int fits_read_keys_str / ffgkns
       (fitsfile *fptr, char *keyname, int nstart, int nkeys,
@@ -4648,7 +4657,7 @@ routines.
 >1  These update routines modify the value, and optionally the comment field,
     of the keyword if it already exists, otherwise the new keyword is
     appended to the header.  A separate routine is provided for each
-    keyword datatype.  The `longstr' version has the same functionality
+    keyword data type.  The `longstr' version has the same functionality
     as the `str' version except that it also supports the local long
     string keyword convention for strings longer than 68 characters.  A
     null pointer may be entered for the comment parameter which will
@@ -4789,7 +4798,7 @@ which specify the starting and ending pixel coordinate in each dimension
 written.  It is important to note that these are the starting and
 ending pixels in the FITS image, not in the declared array in the
 program. The array parameter in these routines is treated simply as a
-large one-dimensional array of the appropriate datatype containing the
+large one-dimensional array of the appropriate data type containing the
 pixel values; The pixel values in the FITS array are read/written
 from/to this program array in strict sequence without any gaps;  it is
 up to the calling routine to correctly interpret the dimensionality of
@@ -4800,19 +4809,19 @@ inc[1]=3 when reading a 2-dimensional FITS image, then only every other
 pixel in the first dimension and every 3rd pixel in the second
 dimension will be returned to the 'array' parameter.
 
-Two types of routines are provided to read the data array which differ
-in the way undefined pixels are handled.  The first type of routines
-(e.g., ffgpv\_) simply return an array of data elements in which
-undefined pixels are set equal to a value specified by the user in the
-`nulval' parameter.  An additional feature of these routines is that if
-the user sets nulval = 0, then no checks for undefined pixels will be
-performed, thus reducing the amount of CPU processing.  The second type
-of routines (e.g., ffgpf\_) returns the data element array and, in
-addition, a char array which defines whether the corresponding data
-pixel is defined (= 1) or not (= 0).  The latter type of routines may
+Two types of routines are provided to read the data array which differ in
+the way undefined pixels are handled.  The first type of routines (e.g.,
+ffgpv\_) simply return an array of data elements in which undefined
+pixels are set equal to a value specified by the user in the `nulval'
+parameter.  An additional feature of these routines is that if the user
+sets nulval = 0, then no checks for undefined pixels will be performed,
+thus reducing the amount of CPU processing.  The second type of routines
+(e.g., ffgpf\_) returns the data element array and, in addition, a char
+array that indicates whether the value of the corresponding data pixel
+is undefined (= 1) or defined (= 0).  The latter type of routines may
 be more convenient to use in some circumstances, however, it requires
-an additional array of logical values which can be unwieldy when
-working with large data arrays.
+an additional array of logical values which can be unwieldy when working
+with large data arrays.
 
 >1  Write elements into the FITS data array.  
 > \label{ffppr} \label{ffpprx} \label{ffppn} \label{ffppnx}
@@ -4889,7 +4898,7 @@ working with large data arrays.
   int  fits_read_imgnull_[byt, sht, usht, int, uint, lng, ulng, flt, dbl] /
        ffgpf[b,i,ui,k,uk,j,uj,jj,e,d]
        (fitsfile *fptr, long group, long firstelem, long nelements,
-       > DTYPE *array, char *nularray, int *anynul, int *status)
+       > DTYPE *array, char *nullarray, int *anynul, int *status)
 -
 >7  Read values from group parameters.  This routine only applies
     to the `Random Grouped' FITS format which has been used for
@@ -4930,7 +4939,7 @@ working with large data arrays.
        ffgsf[b,i,ui,k,uk,j,uj,jj,e,d]
        (fitsfile *fptr, int group, int naxis, long *naxes, 
        long *fpixel, long *lpixel, long *inc, > DTYPE *array, 
-       char *nularray, int *anynul, int *status)
+       char *nullarray, int *anynul, int *status)
 -
 
 **F.  Specialized FITS ASCII and Binary Table Routines
@@ -4939,7 +4948,7 @@ working with large data arrays.
 
 >1  Get information about an existing ASCII or binary table column.   A null
     pointer may be given for any of the output parameters that are not
-    needed.  DATATYPE is a character string which returns the datatype
+    needed.  DATATYPE is a character string which returns the data type
     of the column as defined by the TFORMn keyword (e.g., 'I', 'J','E',
     'D', etc.).  In the case of an ASCII character column, typecode
     will have a value of the form 'An' where 'n' is an integer
@@ -4974,8 +4983,8 @@ working with large data arrays.
     TFORMn = 'Pt').  This routine also automatically writes
     the value of theap to a keyword in the extension header.  This
     routine must be called after the required keywords have been
-    written (with ffphbn) and after the table structure has been defined
->   (with ffbdef) but before any data is written to the table. \label{ffpthp}
+    written (with ffphbn) 
+>   but before any data is written to the table. \label{ffpthp}
 -
   int fits_write_theap / ffpthp
       (fitsfile *fptr, long theap, > int *status)
@@ -5031,7 +5040,7 @@ parameters used in these routines.
 ***3.  Write Column Data Routines
 
 >1  Write elements into an ASCII or binary table column (in the CDU).
-    The datatype of the array is implied by the suffix of the
+    The data type of the array is implied by the suffix of the
 >   routine name. \label{ffpcls}
 -
   int fits_write_col_str / ffpcls
@@ -5063,22 +5072,28 @@ parameters used in these routines.
        long nelements, char **array, char *nulstr, > int *status)
 -
 >4  Write bit values into a binary byte ('B') or bit ('X') table column (in
-    the CDU).  Larray is an array of logical values corresponding to the
-    sequence of bits to be written.  If larray is true then the
-    corresponding bit is set to 1, otherwise the bit is set to 0.  Note
-    that in the case of 'X' columns, CFITSIO can write to all 8 bits of
-    each byte whether they are formally valid or not.  Thus if the
-    column is defined as '4X', and one calls ffpclx with  firstbit=1
-    and nbits=8, then all 8 bits will be written into the first byte
-    (as opposed to writing the first 4 bits into the first row and then
-    the next 4 bits into the next row), even though the last 4 bits of
-    each byte are formally not defined.  It should also be noted that
+    the CDU).  Larray is an array of characters corresponding to the
+    sequence of bits to be written.  If an element of larray is true
+    (not equal to zero) then the corresponding bit in the FITS table is
+    set to 1, otherwise the bit is set to 0.  The 'X' column in a FITS
+    table is always padded out to a multiple of 8 bits where the bit
+    array starts with the most significant bit of the byte and works
+    down towards the 1's bit.  For example, a '4X' array, with the
+    first bit = 1 and the remaining 3 bits = 0 is equivalent to the 8-bit
+    unsigned byte decimal value of 128  ('1000 0000B').  In the case of
+    'X' columns, CFITSIO can write to all 8 bits of each byte whether
+    they are formally valid or not.  Thus if the column is defined as
+    '4X', and one calls ffpclx with firstbit=1 and nbits=8, then all
+    8 bits will be written into the first byte (as opposed to writing
+    the first 4 bits into the first row and then the next 4 bits into
+    the next row), even though the last 4 bits of each byte are formally
+    not defined and should all be set = 0.  It should also be noted that
     it is more efficient to write 'X' columns an entire byte at a time,
     instead of bit by bit.  Any of the CFITSIO routines that write to
-    columns (e.g. fits\_write\_col\_byt) may be used for this
-    purpose.  These routines will interpret 'X' columns as though they
-    were 'B' columns (e.g.,  '8X' is equivalent to '1B', and '16X' is
->   equivalent to '2B'). \label{ffpclx}
+    columns (e.g. fits\_write\_col\_byt) may be used for this purpose.
+    These routines will interpret 'X' columns as though they were 'B'
+    columns (e.g.,  '1X' through '8X' is equivalent
+>   to '1B', and '9X' through '16X' is equivalent to '2B').  \label{ffpclx}
 -
   int fits_write_col_bit / ffpclx
       (fitsfile *fptr, int colnum, long firstrow, long firstbit, 
@@ -5106,13 +5121,13 @@ logical array of flags which defines whether the corresponding data
 pixel is undefined.  See Appendix B for the definition of the
 parameters used in these routines.
 
-    Any column, regardless of it's intrinsic datatype, may be read as a
+    Any column, regardless of it's intrinsic data type, may be read as a
     string.  It should be noted however that reading a numeric column as
     a string is 10 - 100 times slower than reading the same column as a number
     due to the large overhead in constructing the formatted strings.
     The display format of the returned strings will be
     determined by the TDISPn keyword, if it exists, otherwise by the
-    datatype of the column.  The length of the returned strings (not
+    data type of the column.  The length of the returned strings (not
     including the null terminating character) can be determined with
     the fits\_get\_col\_display\_width routine.  The following TDISPn
     display formats are currently supported:
@@ -5149,20 +5164,20 @@ parameters used in these routines.
 -
 >2  Read elements and null flags from an ASCII or binary table column (in the
     CHDU).  These routines return the values of the table column array elements.
-    Any undefined array elements will have the corresponding nularray element
+    Any undefined array elements will have the corresponding nullarray element
     set equal to TRUE.  The anynul parameter is set to true if any of the
 >   returned elements are undefined. \label{ffgcfx}
 -
   int fits_read_colnull_str / ffgcfs
       (fitsfile *fptr, int colnum, long firstrow, long firstelem,
-       long nelements, > char **array, char *nularray, int *anynul,
+       long nelements, > char **array, char *nullarray, int *anynul,
        int *status)
 
   int fits_read_colnull_[log,byt,sht,usht,int,uint,lng,ulng,lnglng,flt,dbl,cmp,dblcmp] /
       ffgcf[l,b,i,ui,k,uk,j,uj,jj,e,d,c,m]
       (fitsfile *fptr, int colnum, long firstrow, 
        long firstelem, long nelements, > DTYPE *array,
-       char *nularray, int *anynul, int *status)
+       char *nullarray, int *anynul, int *status)
 -
 >3  Read an arbitrary data subsection from an N-dimensional array
     in a binary table vector column.  Undefined pixels
@@ -5182,7 +5197,7 @@ parameters used in these routines.
 -
 >4  Read an arbitrary data subsection from an N-dimensional array
     in a binary table vector column.  Any Undefined
-    pixels in the array will have the corresponding 'nularray'
+    pixels in the array will have the corresponding 'nullarray'
     element set equal to TRUE.  The first and last rows in the table
     to be read are specified by fpixel(naxis+1) and lpixel(naxis+1),
     and hence are treated as the next higher dimension of the FITS
@@ -5194,12 +5209,17 @@ parameters used in these routines.
       ffgsf[b,i,ui,k,uk,j,uj,jj,e,d]
       (fitsfile *fptr, int colnum, int naxis, long *naxes, 
        long *fpixel, long *lpixel, long *inc, > DTYPE *array, 
-       char *nularray, int *anynul, int *status)
+       char *nullarray, int *anynul, int *status)
 -
 >5  Read bit values from a byte ('B') or bit (`X`) table column (in the
     CDU).  Larray is an array of logical values corresponding to the
     sequence of bits to be read.  If larray is true then the
     corresponding bit was set to 1, otherwise the bit was set to 0.
+    The 'X' column in a FITS table is always padded out to a multiple
+    of 8 bits where the bit array starts with the most significant bit
+    of the byte and works down towards the 1's bit.  For example, a
+    '4X' array, with the first bit = 1 and the remaining 3 bits = 0 is
+    equivalent to the 8-bit unsigned byte value of 128. 
     Note that in the case of 'X' columns, CFITSIO can read  all 8 bits
     of each byte whether they are formally valid or not.  Thus if the
     column is defined as '4X', and one calls ffgcx with  firstbit=1 and
@@ -5394,7 +5414,7 @@ extension called 'Rad' whose value is computed using the indicated
 expression which is a function of the values in the X and Y columns.
 
 \item
-{\tt myfile.fits[EVENTS][PHA > 5]}:  creates and opens a virtural FITS
+{\tt myfile.fits[EVENTS][PHA > 5]}:  creates and opens a virtual FITS
 files that is identical to 'myfile.fits' except that the EVENTS table
 will only contain the rows that have values of the PHA column greater
 than 5.  In general, any arbitrary boolean expression using a C or
@@ -5459,6 +5479,8 @@ CFITSIO to read and/or write the file.  Currently supported types are
                    for accessing password-protected ftp sites.
         http://  - a readonly file accessed with the HTTP protocol.  It
                    does not  support username:password like the ftp driver.
+                   Proxy HTTP survers are supported using the http_proxy
+                   environment variable.
         root://  - uses the CERN root protocol for writing as well as
                    reading files over the network.
         shmem:// - opens or creates a file which persists in the computer's
@@ -5471,7 +5493,18 @@ CFITSIO to read and/or write the file.  Currently supported types are
 If the filetype is not specified, then type file:// is assumed.
 The double slashes '//' are optional and may be omitted in most cases.
 
-***1.  Notes about the root filetype
+***1.  Notes about HTTP proxy servers
+
+A proxy HTTP server may be used by defining the address (URL) and port 
+number of the proxy server with the http\_proxy environment variable.
+For example
+-
+    setenv http_proxy http://heasarc.gsfc.nasa.gov:3128
+-
+will cause CFITSIO to use port 3128 on the heasarc proxy server whenever
+reading a FITS file with HTTP.
+
+***2.  Notes about the root filetype
 
 The original rootd server can be obtained from: 
 \verb-ftp://root.cern.ch/root/rootd.tar.gz-
@@ -5550,7 +5583,7 @@ home directory, therefore only files below the home directory can be
 accessed.  Anonymous mode only works when the server is started via
 inetd.
                                                         
-***2.  Notes about the shmem filetype:
+***3.  Notes about the shmem filetype:
 
 Shared memory files are currently supported on most Unix platforms,
 where the shared memory segments are managed by the operating system
@@ -5575,7 +5608,7 @@ the usual CFITSIO routine:
 -
 The file mode can be READWRITE or READONLY just as with disk files.
 More than one process can operate on READONLY mode files at the same
-time.  CFITSIO supports proper filelocking (both in READONLY and
+time.  CFITSIO supports proper file locking (both in READONLY and
 READWRITE modes), so calls to fits\_open\_file may be locked out until
 another other process closes the file.
 
@@ -5652,7 +5685,7 @@ of required header keywords before it is opened by the application
 program (with READONLY access).  In this case the data type and
 dimensions of the image must be specified in square brackets following
 the filename (e.g. rawfile.dat[ib512,512]). The first character (case
-insensitive) defines the datatype of the array:
+insensitive) defines the data type of the array:
 -
      b         8-bit unsigned byte
      i        16-bit signed integer
@@ -5666,14 +5699,14 @@ values: b or B indicates big endian (as in FITS files and the native
 format of SUN UNIX workstations and Mac PCs) and l or L indicates
 little endian (native format of DEC OSF workstations and IBM PCs).  If
 this character is omitted then the array is assumed to have the native
-byte order of the local machine.  These datatype characters are then
+byte order of the local machine.  These data type characters are then
 followed by a series of one or more integer values separated by commas
 which define the size of each dimension of the raw array.  Arrays with
 up to 5 dimensions are currently supported.  Finally, a byte offset to
 the position of the first pixel in the data file may be specified by
 separating it with a ':' from the last dimension value.  If omitted, it
 is assumed that the offset = 0.  This parameter may be used to skip
-over any header information in the file that preceeds the binary data.
+over any header information in the file that precedes the binary data.
 Further examples:
 -
   raw.dat[b10000]           1-dimensional 10000 pixel byte array
@@ -5989,14 +6022,14 @@ this name exists.
 
 \item
 Append a new column or keyword to the table.  To create a column,
-give the new name, optionally followed by the datatype in parentheses,
+give the new name, optionally followed by the data type in parentheses,
 followed by a single equals sign and an  expression to be used to
 compute the value (e.g., 'newcol(1J) = 0' will create a new 32-bit
-integer column called 'newcol' filled with zeros).  The datatype is
+integer column called 'newcol' filled with zeros).  The data type is
 specified using the same syntax that is allowed for the value of the
 FITS TFORMn keyword (e.g., 'I', 'J', 'E', 'D', etc. for binary tables,
-and 'I8', F12.3', 'E20.12', etc. for ASCII tables).  If the datatype is
-not specified then an appropriate datatype will be chosen depending on
+and 'I8', F12.3', 'E20.12', etc. for ASCII tables).  If the data type is
+not specified then an appropriate data type will be chosen depending on
 the form of the expression (may be a character string, logical, bit, long
 integer, or double column). An appropriate vector count (in the case
 of binary tables) will also be added if not explicitly specified.
@@ -6005,7 +6038,7 @@ When creating a new keyword, the keyword name must be preceded by a
 pound sign '\#', and the expression must evaluate to a scalar
 (i.e., cannot have a column name in the expression).  The comment
 string for the keyword may be specified in parentheses immediately
-following the keyword name (instead of supplying a datatype as in
+following the keyword name (instead of supplying a data type as in
 the case of creating a new column).
 
 \item
@@ -6328,7 +6361,7 @@ by a backslash to force the UNIX shell to ignore it.
     For example, '\{1,3,6,1\}' is a 4-element vector containing the values
     1, 3, 6, and 1.  The  vector can contain  only boolean, integer, and
     real values (or expressions).  The elements will  be promoted to the
-    highest  datatype   present.  Any   elements   which  are themselves
+    highest  data type   present.  Any   elements   which  are themselves
     vectors, will be expanded out with  each of its elements becoming an
     element in the constructed vector.
 
@@ -6558,7 +6591,7 @@ The data type of the FITS histogram image may be specified by appending
 'b' (for 8-bit byte), 'i' (for 16-bit integers), 'j' (for 32-bit
 integer), 'r' (for 32-bit floating points), or 'd' (for 64-bit double
 precision floating point)  to the 'bin' keyword (e.g. '[binr X]'
-creates a real floating point image).  If the datatype is not
+creates a real floating point image).  If the data type is not
 explicitly specified then a 32-bit integer image will be created by
 default, unless the weighting option is also specified in which case
 the image will have a 32-bit floating point data type by default.
@@ -6903,30 +6936,31 @@ other software systems which do not use the CFITSIO interface.
 
 CFITSIO can read and write FITS images or table columns containing
 64-bit integer data values.  This data type is not recognized in the
-offical FITS Standard definition document, but it is likely that FITS
-will eventually support this data type, expecially as computers that
-run 64-bit operating systems become more common.  To enable support for
-64-bit integers in CFITSIO the \#define statement at the beginning of
-the fitsio2.h file must set SUPPORT\_64BIT\_INTEGERS to 1.  Currently
-it is set to 0 by default.
+official FITS Standard definition document, but it is likely that FITS
+will eventually support this data type, especially as computers that
+run 64-bit operating systems become more common.  Support for reading
+and writing 64-bit integers in CFITSIO can be controlled with the
+\#define statement at the beginning of the fitsio2.h file by setting
+SUPPORT\_64BIT\_INTEGERS to 1 (enable) or 0 (disable).
 
-The FITS 64-bit images have BITPIX = 64, and the 64-bit binary table
-columns have TFORMn = 'K'.  The use of these datatypes on platforms
-where the size of a 'long' integer = 8 is rather intuitive.  CFITSIO
-will write 'long' variable values to the FITS file and read them back
-into 'long' variables just as one would expect.  CFITSIO also supports
-implicit data type conversion between 64-bit integer images and columns
-and any other supported data type, although some loss of numerical
-precision or numerical overflow is likely in this case.
+Under the convention used by CFITSIO, FITS 64-bit images have BITPIX =
+64, and the 64-bit binary table columns have TFORMn = 'K'.  The use of
+these data types on platforms where the size of a 'long' (or 'longlong')
+integer = 8 bytes is rather intuitive.  CFITSIO will write 64-bit
+'long' variable values to the FITS file and read them back into 'long'
+variables just as one would expect.  CFITSIO also supports implicit
+data type conversion between 64-bit integer images and columns and any
+other supported data type, although some loss of numerical precision or
+numerical overflow is likely in this case.
 
-The situation is more difficult on 32-bit computing platforms where the
-size of a 'long' variable = 32.  In this case there is no obvious way
-to return the full 64 precision of the FITS data values when reading
-the FITS file.  CFITSIO will convert the 64-bit integer values into any
-other supported data type;  the 64-bit double data type is probably
-the most useful in this case.  It only provides about 52-bits of
-precision in the mantissa, however, so some lose of precision is
-possible.
+The situation is more difficult on 32-bit computing platforms that do
+not support an intrinsic 64-bit integer data type.  In this case it is
+not possible to return the full 64 precision of the FITS data values when
+reading the values into a program variable.  CFITSIO will still
+convert the 64-bit integer values into any other supported data type;
+the 64-bit double data type is probably the most useful in this case.
+It only provides about 52-bits of precision in the mantissa, however,
+so some lose of precision is possible.
 
 **B.  Long String Keyword Values.
  
@@ -7005,7 +7039,7 @@ an individual unit string within the vector.  For example, TFORM1 =
 wide and consists of 12 10-character length strings.  This convention
 is recognized by the CFITSIO routines that read or write strings in
 binary tables.   The Binary Table definition document specifies that
-other optional characters may follow the datatype code in the TFORM
+other optional characters may follow the data type code in the TFORM
 keyword, so this local convention is in compliance with the
 FITS standard although other FITS readers may not
 recognize this convention.
@@ -7296,11 +7330,11 @@ be more efficient to temporarily turn off the scaling (using fits\_set\_bscale o
 fits\_set\_tscale) and then read or write the raw unscaled values in the FITS
 file.
 
-7. Avoid using the `implicit datatype conversion' capability in
+7. Avoid using the `implicit data type conversion' capability in
 CFITSIO.  For instance, when reading a FITS image with BITPIX = -32
 (32-bit floating point pixels), read the data into a single precision
 floating point data array in the program.  Forcing CFITSIO to convert
-the data to a different datatype can slow the program.
+the data to a different data type can slow the program.
 
 8. Where feasible, design FITS binary tables using vector column
 elements so that the data are written as a contiguous set of bytes,
@@ -7419,6 +7453,7 @@ fits\_get\_colname    & \pageref{ffgcnn} \\
 fits\_get\_colnum     & \pageref{ffgcno} \\
 fits\_get\_coltype    & \pageref{ffgtcl} \\
 fits\_get\_compression\_type & \pageref{ffgetcomp} \\
+fits\_get\_eqcoltype    & \pageref{ffgtcl} \\
 fits\_get\_errstatus  & \pageref{ffgerr} \\
 fits\_get\_hdrpos        & \pageref{ffghps} \\
 fits\_get\_hdrspace      & \pageref{ffghsp} \\
@@ -7427,9 +7462,10 @@ fits\_get\_hdu\_type   & \pageref{ffghdt} \\
 fits\_get\_hduaddr    & \pageref{ffghad} \\
 fits\_get\_hduoff    & \pageref{ffghad} \\
 fits\_get\_img\_dim & \pageref{ffgidm} \\
-fits\_get\_img\_param & \pageref{ffgipr} \\
 \end{tabular}
 \begin{tabular}{lr}
+fits\_get\_img\_equivtype & \pageref{ffgidt} \\
+fits\_get\_img\_param & \pageref{ffgipr} \\
 fits\_get\_img\_size & \pageref{ffgisz} \\
 fits\_get\_img\_type & \pageref{ffgidt} \\
 fits\_get\_keyclass    & \pageref{ffgkcl} \\
@@ -7446,6 +7482,7 @@ fits\_get\_system\_time  & \pageref{ffdt2s} \\
 fits\_get\_tile\_dim     & \pageref{ffgetcomp} \\
 fits\_get\_tbcol      & \pageref{ffgabc} \\
 fits\_get\_version    & \pageref{ffvers} \\
+fits\_hdr2str         & \pageref{ffhdr2str}, \pageref{hdr2str} \\
 fits\_insert\_atbl    & \pageref{ffitab} \\
 fits\_insert\_btbl    & \pageref{ffibin} \\
 fits\_insert\_col   & \pageref{fficol} \\
@@ -7459,12 +7496,12 @@ fits\_insert\_rows  & \pageref{ffirow} \\
 fits\_iterate\_data   & \pageref{ffiter} \\
 fits\_make\_keyn      & \pageref{ffkeyn} \\
 fits\_make\_nkey      & \pageref{ffnkey} \\
-fits\_merge\_groups  & \pageref{ffgtmg} \\
-fits\_modify\_card       & \pageref{ffmcrd} \\
-fits\_modify\_comment    & \pageref{ffmcom} \\
 \end{tabular}
 \newpage
 \begin{tabular}{lr}
+fits\_merge\_groups  & \pageref{ffgtmg} \\
+fits\_modify\_card       & \pageref{ffmcrd} \\
+fits\_modify\_comment    & \pageref{ffmcom} \\
 fits\_modify\_key\_null   & \pageref{ffmkyu} \\
 fits\_modify\_key\_TYP    & \pageref{ffmkyx} \\
 fits\_modify\_name       & \pageref{ffmnam} \\
@@ -7509,10 +7546,10 @@ fits\_read\_imghdr       & \pageref{ffghpr} \\
 fits\_read\_imgnull & \pageref{ffgpf} \\
 fits\_read\_imgnull\_TYP & \pageref{ffgpfx} \\
 fits\_read\_key          & \pageref{ffgky} \\
-fits\_read\_key\_longstr  & \pageref{ffgkls} \\
-fits\_read\_key\_triple   & \pageref{ffgkyt} \\
 \end{tabular}
 \begin{tabular}{lr}
+fits\_read\_key\_longstr  & \pageref{ffgkls} \\
+fits\_read\_key\_triple   & \pageref{ffgkyt} \\
 fits\_read\_key\_unit     & \pageref{ffgunt} \\
 fits\_read\_key\_TYP      & \pageref{ffgkyx} \\
 fits\_read\_keyn         & \pageref{ffgkyn} \\
@@ -7542,6 +7579,7 @@ fits\_set\_imgnull    & \pageref{ffpnul} \\
 fits\_set\_noise\_bits  & \pageref{ffsetcomp} \\
 fits\_set\_tile\_dim  & \pageref{ffsetcomp} \\
 fits\_set\_tscale     & \pageref{fftscl} \\
+fits\_split\_names    & \pageref{splitnames} \\
 fits\_str2date        & \pageref{ffdt2s} \\
 fits\_str2time        & \pageref{ffdt2s} \\
 fits\_test\_expr      & \pageref{fftexp} \\
@@ -7557,10 +7595,10 @@ fits\_update\_key\_null   & \pageref{ffukyu} \\
 fits\_update\_key\_TYP    & \pageref{ffukyx} \\
 fits\_uppercase      & \pageref{ffupch} \\
 fits\_url\_type      & \pageref{ffurlt} \\
-fits\_verify\_chksum  & \pageref{ffvcks} \\
-fits\_verify\_group  & \pageref{ffgtvf} \\
 \end{tabular}
 \begin{tabular}{lr}
+fits\_verify\_chksum  & \pageref{ffvcks} \\
+fits\_verify\_group  & \pageref{ffgtvf} \\
 fits\_world\_to\_pix & \pageref{ffxypx} \\
 fits\_write\_2d\_TYP   & \pageref{ffp2dx} \\
 fits\_write\_3d\_TYP   & \pageref{ffp3dx} \\
@@ -7641,6 +7679,7 @@ ffdsum  & \pageref{ffdsum} \\
 ffdt2s  & \pageref{ffdt2s} \\
 ffdtdm   & \pageref{ffdtdm} \\
 ffdtyp    & \pageref{ffdtyp} \\
+ffeqty    & \pageref{ffgtcl} \\
 ffesum  & \pageref{ffesum} \\
 ffextn   & \pageref{ffextn} \\
 ffffrw    & \pageref{ffffrw} \\
@@ -7682,6 +7721,7 @@ ffghtb      & \pageref{ffghtb} \\
 ffgics & \pageref{ffgics} \\
 ffgidm & \pageref{ffgidm} \\
 ffgidt & \pageref{ffgidt} \\
+ffgiet & \pageref{ffgidt} \\
 ffgipr & \pageref{ffgipr} \\
 ffgisz & \pageref{ffgisz} \\
 ffgkcl      & \pageref{ffgkcl} \\
@@ -7751,9 +7791,9 @@ ffiter   & \pageref{ffiter} \\
 ffiurl & \pageref{ffiurl} \\
 ffkeyn      & \pageref{ffkeyn} \\
 ffmahd     & \pageref{ffmahd} \\
+ffmcom    & \pageref{ffmcom} \\
 \end{tabular}
 \begin{tabular}{lr}
-ffmcom    & \pageref{ffmcom} \\
 ffmcrd       & \pageref{ffmcrd} \\
 ffmkls    & \pageref{ffmkyx} \\
 ffmkyu   & \pageref{ffmkyu} \\
@@ -7799,10 +7839,10 @@ ffpnul    & \pageref{ffpnul} \\
 ffppn     & \pageref{ffppn} \\
 ffppn\_ & \pageref{ffppnx} \\
 ffppr        & \pageref{ffppr} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffpprn & \pageref{ffpprn} \\
 ffppru & \pageref{ffppru} \\
+\end{tabular}
+\begin{tabular}{lr}
 ffppr\_    & \pageref{ffpprx} \\
 ffppx & \pageref{ffppx} \\
 ffppxn & \pageref{ffppxn} \\
@@ -7895,8 +7935,8 @@ dataok   - was the data unit verification successful (=1) or
 datasum  - 32-bit 1's complement checksum for the data unit
 dataend  - address (in bytes) of the end of the HDU
 datastart- address (in bytes) of the start of the data unit
-datatype - specifies the datatype of the value.  Allowed value are:
-           TSTRING, TLOGICAL, TBYTE, TSHORT, TUSHORT, TINT, TUINT, TLONG, TULONG,
+datatype - specifies the data type of the value.  Allowed value are:  TSTRING,
+           TLOGICAL, TBYTE, TSBYTE, TSHORT, TUSHORT, TINT, TUINT, TLONG, TULONG,
            TFLOAT, TDOUBLE, TCOMPLEX, and TDBLCOMPLEX
 datestr  - FITS date/time string: 'YYYY-MM-DDThh:mm:ss.ddd', 'YYYY-MM-dd',
            or 'dd/mm/yy'
@@ -7906,7 +7946,7 @@ deltasize - increment for allocating more memory
 dim1     - declared size of the first dimension of the image or cube array
 dim2     - declared size of the second dimension of the data cube array
 dispwidth - display width of a column = length of string that will be read
-dtype    - datatype of the keyword ('C', 'L', 'I', 'F' or 'X')
+dtype    - data type of the keyword ('C', 'L', 'I', 'F' or 'X')
                 C = character string
                 L = logical
                 I = integer
@@ -7950,6 +7990,7 @@ hduok    - was the HDU verification successful (=1) or
            not (= -1).  Equals zero if the CHECKSUM keyword is not present.
 hdusum   - 32 bit 1's complement checksum for the entire CHDU
 hdutype  - type of HDU: IMAGE_HDU (=0), ASCII_TBL (=1), or BINARY_TBL (=2)
+header   - returned character string containing all the keyword records
 headstart- starting address (in bytes) of the CHDU
 heapsize - size of the binary table heap, in bytes
 history  - the HISTORY keyword comment string (70 char max, null-terminated)
@@ -7985,6 +8026,7 @@ minute   - minute within hour (UTC) (0 - 59)
 month    - calendar month (UTC) (1 - 12)
 morekeys - space in the header for this many more keywords
 n_good_rows - number of rows evaluating to TRUE
+namelist - string containing a comma or space delimited list of names
 naxes    - size of each dimension in the FITS array
 naxis    - number of dimensions in the FITS array
 naxis1   - length of the X/first axis of the FITS array
@@ -8000,13 +8042,14 @@ nkeys    - number of keywords in the sequence
 ninc     - number of names in the inclusion list
 nmembers - Number of grouping table members (NAXIS2 value).
 nmove    - number of HDUs to move (+ or -), relative to current position
+nocomments - if equal to TRUE, then no commentary keywords will be copied
 noisebits- number of bits to ignore when compressing floating point images
 nrows    - number of rows in the table
 nstart   - first integer value
-nularray - set to TRUE (=1) if corresponding data element is undefined
+nullarray- set to TRUE (=1) if corresponding data element is undefined
 nulval   - numerical value to represent undefined pixels
 nulstr   - character string used to represent undefined values in ASCII table
-numval   - numerical data value, of the appropriate datatype
+numval   - numerical data value, of the appropriate data type
 offset   -  byte offset in the heap to the first element of the vector
 openfptr - pointer to a currently open FITS file
 overlap  - number of bytes in the binary table heap pointed to by more than 1
@@ -8028,7 +8071,7 @@ rownum   - number of the row (first row = 1)
 rowrange - list of rows or row ranges: '3,6-8,12,56-80' or '500-'
 row_status - array of True/False results for each row that was evaluated
 scale    - linear scaling factor; true value = (FITS value) * scale + zero
-second   - second within minute (0 - 60.9999999999) (leapsecond!)
+second   - second within minute (0 - 60.9999999999) (leap second!)
 simple   - TRUE (=1) if FITS file conforms to the Standard, else FALSE (=0)
 space    - number of blank spaces to leave between ASCII table columns
 status   - returned error status code (0 = OK)
@@ -8044,9 +8087,9 @@ tform    - format of the column (null-terminated); allowed values are:
            ASCII tables:  Iw, Aw, Fww.dd, Eww.dd, or Dww.dd
            Binary tables: rL, rX, rB, rI, rJ, rA, rAw, rE, rD, rC, rM
            where 'w'=width of the field, 'd'=no. of decimals, 'r'=repeat count.
-           Variable length array columns are denoted by a '1P' before the datatype
+           Variable length array columns are denoted by a '1P' before the data type
            character (e.g., '1PJ').  When creating a binary table, 2 addition tform
-           datatype codes are recognized by CFITSIO: 'rU' and 'rV' for unsigned
+           data type codes are recognized by CFITSIO: 'rU' and 'rV' for unsigned
            16-bit and unsigned 32-bit integer, respectively.
 
 theap    - zero indexed byte offset of starting address of the heap
@@ -8055,8 +8098,8 @@ tilesize - array of length NAXIS that specifies the dimensions of
            the image compression tiles
 ttype    - label or name for table column (null-terminated)
 tunit    - physical unit for table column (null-terminated)
-typechar - symbolic code of the table column datatype
-typecode - datatype code of the table column.  The negative of
+typechar - symbolic code of the table column data type
+typecode - data type code of the table column.  The negative of
            the value indicates a variable length array column.
                 Datatype             typecode    Mnemonic
                 bit, X                   1        TBIT
@@ -8181,7 +8224,7 @@ improve the readability of their code.
  BAD_HEADER_FILL   254    Header fill area contains non-blank chars
  BAD_DATA_FILL     255    Illegal data fill bytes (not zero or blank)
  BAD_TFORM         261    illegal TFORM format code
- BAD_TFORM_DTYPE   262    unrecognizable TFORM datatype code
+ BAD_TFORM_DTYPE   262    unrecognizable TFORM data type code
  BAD_TDIM          263    illegal TDIMn keyword value
  BAD_HEAP_PTR      264    invalid BINTABLE heap pointer is out of range
 
@@ -8192,7 +8235,7 @@ improve the readability of their code.
  BAD_ROW_NUM       307    illegal starting row number in table
  BAD_ELEM_NUM      308    illegal starting element number in vector
  NOT_ASCII_COL     309    this is not an ASCII string column
- NOT_LOGICAL_COL   310    this is not a logical datatype column
+ NOT_LOGICAL_COL   310    this is not a logical data type column
  BAD_ATABLE_FORMAT 311    ASCII table column has wrong format
  BAD_BTABLE_FORMAT 312    Binary table column has wrong format
  NO_NULL           314    null value has not been defined
@@ -8242,7 +8285,7 @@ improve the readability of their code.
  BAD_C2D           409    bad formatted string to double conversion
  BAD_DATATYPE      410    illegal datatype code value
  BAD_DECIM         411    bad number of decimal places specified
- NUM_OVERFLOW      412    overflow during datatype conversion
+ NUM_OVERFLOW      412    overflow during data type conversion
  DATA_COMPRESSION_ERR   413  error compressing image 
  DATA_DECOMPRESSION_ERR 414  error uncompressing image 
 

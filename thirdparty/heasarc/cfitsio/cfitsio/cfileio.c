@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stddef.h>  /* apparently needed to define size_t */
 #include "fitsio2.h"
 #include "group.h"
@@ -1301,7 +1302,7 @@ int ffedit_columns(
 {
     fitsfile *newptr;
     int ii, hdunum, slen, colnum, deletecol = 0, savecol = 0;
-    int numcols, *colindex = 0;
+    int numcols = 0, *colindex = 0, tstatus = 0;
     char *cptr, *cptr2, *cptr3, clause[FLEN_FILENAME], keyname[FLEN_KEYWORD];
     char colname[FLEN_VALUE], oldname[FLEN_VALUE], colformat[FLEN_VALUE];
     char *file_expr = NULL;
@@ -1366,7 +1367,8 @@ int ffedit_columns(
           cptr++;         /* skip leading white space... again */
     }
 
-    ffgncl(*fptr, &numcols, status);  /* get initial # of cols */
+    tstatus = 0;
+    ffgncl(*fptr, &numcols, &tstatus);  /* get initial # of cols */
 
     /* parse expression and get first clause, if more than 1 */
 
@@ -1377,7 +1379,9 @@ int ffedit_columns(
 
         if (clause[0] == '!' || clause[0] == '-')
         {
-            /* delete this column or keyword */
+            /* ===================================== */
+            /* Case I. delete this column or keyword */
+            /* ===================================== */
 
             if (ffgcno(*fptr, CASEINSEN, &clause[1], &colnum, status) <= 0)
             {
@@ -1409,16 +1413,19 @@ int ffedit_columns(
         }
         else
         {
-            /*
-	       this is either a column name, or a column
-	       or keyword name followed by a single "=" and a
-	       calculation expression, or a column name followed by
-	       double = ("==") followed by the new name to which it
-	       should be renamed.
-            */
+            /* ===================================================== */
+            /* Case II:
+	       this is either a column name, (case 1) 
 
+               or a new column name followed by double = ("==") followed
+               by the old name which is to be renamed. (case 2A)
+
+               or a column or keyword name followed by a single "=" and a
+	       calculation expression (case 2B) */
+            /* ===================================================== */
             cptr2 = clause;
-            slen = fits_get_token(&cptr2, " =", colname, NULL);
+            slen = fits_get_token(&cptr2, "( =", colname, NULL);
+
 
             if (slen == 0)
             {
@@ -1429,11 +1436,27 @@ int ffedit_columns(
                 return(*status= URL_PARSE_ERROR);
             }
 
+            /* if we encountered an opening parenthesis, then we need to */
+            /* find the closing parenthesis, and concatinate the 2 strings */
+            /* This supports expressions like:
+                [col #EXTNAME(Extension name)="GTI"]
+            */
+            if (*cptr2  == '(')
+            {
+                fits_get_token(&cptr2, ")", oldname, NULL);
+                strcat(colname, oldname);
+                strcat(colname, ")");
+                cptr2++;
+            }
+
             while (*cptr2 == ' ')
                  cptr2++;         /* skip white space */
 
             if (*cptr2 != '=')
             {
+              /* ------------------------------------ */
+              /* case 1 - simply the name of a column */
+              /* ------------------------------------ */
 
               /* look for matching column */
               ffgcno(*fptr, CASEINSEN, colname, &colnum, status);
@@ -1484,15 +1507,18 @@ int ffedit_columns(
             }
             else
             {
+              /* ----------------------------------------------- */
+              /* case 2 where the token ends with an equals sign */
+              /* ----------------------------------------------- */
 
               cptr2++;   /* skip over the first '=' */
 
               if (*cptr2 == '=')
               {
-                /*
-                    Case 1:  rename a column or keyword;  syntax is
-                    "new_name == old_name"
-                */
+                /*................................................. */
+                /*  Case A:  rename a column or keyword;  syntax is
+                    "new_name == old_name"  */
+                /*................................................. */
 
                 cptr2++;  /* skip the 2nd '=' */
                 while (*cptr2 == ' ')
@@ -1540,8 +1566,11 @@ int ffedit_columns(
               }  
               else
               {
+                /*...................................................... */
+                /* Case B: */
                 /* this must be a general column/keyword calc expression */
                 /* "name = expression" or "colname(TFORM) = expression" */
+                /*...................................................... */
 
                 /* parse the name and TFORM values, if present */
                 colformat[0] = '\0';
@@ -1554,18 +1583,30 @@ int ffedit_columns(
                    cptr3++;  /* skip the '(' */
                    fits_get_token(&cptr3, ")", colformat, NULL);
                 }
-                /* calculate values for the column or keyword */ 
+
+                /* calculate values for the column or keyword */
+                /*   cptr2 = the expression to be calculated */
+                /*   oldname = name of the column or keyword */
+                /*   colformat = column format, or keyword comment string */
+
+
                 fits_calculator(*fptr, cptr2, *fptr, oldname, colformat,
        	                        status);
 
-                /* keep this column in the output file */
-                savecol = 1;
+                /* test if this is a column and not a keyword */
+                tstatus = 0;
+                ffgcno(*fptr, CASEINSEN, oldname, &colnum, &tstatus);
+                if (tstatus == 0)
+                {
+                    /* keep this column in the output file */
+                    savecol = 1;
 
-                if (!colindex)
-                    colindex = calloc(999, sizeof(int));
+                    if (!colindex)
+                      colindex = calloc(999, sizeof(int));
 
-                colindex[numcols] = 1;
-                numcols++;
+                    colindex[colnum - 1] = 1;
+                    if (colnum > numcols)numcols++;
+                }
               }
             }
         }
@@ -1589,6 +1630,7 @@ int ffedit_columns(
          }
        }
     }
+
     if( colindex ) free( colindex );
     if( file_expr ) free( file_expr );
     return(*status);
@@ -2716,6 +2758,7 @@ int ffinit(fitsfile **fptr,      /* O - FITS file pointer                   */
     fits_store_Fptr( (*fptr)->Fptr, status);  /* store Fptr address */
 
     /* if template file was given, use it to define structure of new file */
+
     if (tmplfile[0])
         ffoptplt(*fptr, tmplfile, status);
 
@@ -4591,7 +4634,8 @@ int ffexts(char *extspec,
 */
     char *ptr1, *ptr2;
     int slen, nvals;
-    char tmpname[FLEN_VALUE];
+    int notint = 1; /* initially assume specified extname is not an integer */
+    char tmpname[FLEN_VALUE], *loc;
 
     *extnum = 0;
     *extname = '\0';
@@ -4610,8 +4654,20 @@ int ffexts(char *extspec,
 
     if (isdigit((int) *ptr1))  /* is the extension specification a number? */
     {
-        sscanf(ptr1, "%d", extnum);
-        if (*extnum < 0 || *extnum > 9999)
+        notint = 0;  /* looks like extname may actually be the ext. number */
+        *extnum = strtol(ptr1, &loc, 10);  /* read the string as an integer */
+
+        while (*loc == ' ')  /* skip over trailing blanks */
+           loc++;
+
+        /* check for read error, or junk following the integer */
+        if ((*loc != '\0'  ) || (errno == ERANGE) )
+        {
+           *extnum = 0;
+           notint = 1;  /* no, extname was not a simple integer after all */
+        }
+
+        if ( *extnum < 0 || *extnum > 99999)
         {
             *extnum = 0;   /* this is not a reasonable extension number */
             ffpmsg("specified extension number is out of range:");
@@ -4619,7 +4675,25 @@ int ffexts(char *extspec,
             return(*status = URL_PARSE_ERROR); 
         }
     }
-    else
+
+
+/*  This logic was too simple, and failed on extnames like '1000TEMP' 
+    where it would try to move to the 1000th extension
+
+    if (isdigit((int) *ptr1))  
+    {
+        sscanf(ptr1, "%d", extnum);
+        if (*extnum < 0 || *extnum > 9999)
+        {
+            *extnum = 0;   
+            ffpmsg("specified extension number is out of range:");
+            ffpmsg(extspec);
+            return(*status = URL_PARSE_ERROR); 
+        }
+    }
+*/
+
+    if (notint)
     {
            /* not a number, so EXTNAME must be specified, followed by */
            /* optional EXTVERS and XTENSION  values */
@@ -4873,7 +4947,7 @@ int ffimport_file( char *filename,   /* Text file to read                   */
    reallocating memory.
 */
 {
-   int allocLen, totalLen, llen;
+   int allocLen, totalLen, llen, eoline;
    char *lines,line[256];
    FILE *aFile;
 
@@ -4899,10 +4973,13 @@ int ffimport_file( char *filename,   /* Text file to read                   */
       llen = strlen(line);
       if ((llen > 1) && (line[0] == '/' && line[1] == '/'))
           continue;       /* skip comment lines begging with // */
-      
+
+      eoline = 0;
+
       /* replace CR and newline chars at end of line with nulls */
       if ((llen > 0) && (line[llen-1]=='\n' || line[llen-1] == '\r')) {
           line[--llen] = '\0';
+          eoline = 1;   /* found an end of line character */
 
           if ((llen > 0) && (line[llen-1]=='\n' || line[llen-1] == '\r')) {
                  line[--llen] = '\0';
@@ -4920,8 +4997,11 @@ int ffimport_file( char *filename,   /* Text file to read                   */
       }
       strcpy( lines+totalLen, line );
       totalLen += llen;
-      strcpy( lines+totalLen, " "); /* add a space between lines */
-      totalLen += 1;
+
+      if (eoline) {
+         strcpy( lines+totalLen, " "); /* add a space between lines */
+         totalLen += 1;
+      }
    }
    fclose(aFile);
 
@@ -4973,6 +5053,60 @@ int fits_get_token(char **ptr,
 
     return(slen);
 }
+/*---------------------------------------------------------------------------*/
+char *fits_split_names(
+   char *list)   /* I   - input list of names */
+{
+/*  
+   A sequence of calls to fits_split_names will split the input string
+   into name tokens.  The string typically contains a list of file or
+   column names.  The names must be delimited by a comma and/or spaces.
+   This routine ignores spaces and commas that occur within parentheses,
+   brackets, or curly brackets.  It also strips any leading and trailing
+   blanks from the returned name.
+
+   This routine is similar to the ANSI C 'strtok' function:
+
+   The first call to fits_split_names has a non-null input string.
+   It finds the first name in the string and terminates it by
+   overwriting the next character of the string with a '\0' and returns
+   a pointer to the name.  Each subsequent call, indicated by a NULL
+   value of the input string, returns the next name, searching from
+   just past the end of the previous name.  It returns NULL when no
+   further names are found.
+
+   The following line illustrates how a string would be split into 3 names:
+    myfile[1][bin (x,y)=4], file2.fits  file3.fits
+    ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^
+      1st name               2nd name    3rd name
+
+*/
+    int depth = 0;
+    char *start;
+    static char *ptr;
+
+    if (list)  /* reset ptr if a string is given */
+        ptr = list;
+
+    while (*ptr == ' ')ptr++;  /* skip leading white space */
+
+    if (*ptr == '\0')return(0);  /* no remaining file names */
+
+    start = ptr;
+
+    while (*ptr != '\0') {
+       if ((*ptr == '[') || (*ptr == '(') || (*ptr == '{')) depth ++;
+       else if ((*ptr == '}') || (*ptr == ')') || (*ptr == ']')) depth --;
+       else if ((depth == 0) && (*ptr == ','  || *ptr == ' ')) {
+          *ptr = '\0';  /* terminate the filename here */
+          ptr++;  /* save pointer to start of next filename */
+          break;  
+       }
+       ptr++;
+    }
+    
+    return(start);
+}
 /*--------------------------------------------------------------------------*/
 int urltype2driver(char *urltype, int *driver)
 /*
@@ -5004,7 +5138,7 @@ int ffclos(fitsfile *fptr,      /* I - FITS file pointer */
   then calling the system dependent routine to physically close the FITS file
 */   
 {
-    int tstatus = NO_CLOSE_ERROR;
+    int tstatus = NO_CLOSE_ERROR, zerostatus = 0;
 
     if (!fptr)
         return(*status = NULL_INPUT_PTR);
@@ -5046,7 +5180,17 @@ int ffclos(fitsfile *fptr,      /* I - FITS file pointer */
     }
     else
     {
-        ffflsh(fptr, FALSE, status); /* flush but don't disassociate buffers */
+        /*
+           to minimize the fallout from any previous error (e.g., trying to 
+           open a non-existent extension in a already opened file), 
+           always call ffflsh with status = 0.
+        */
+        /* just flush the buffers, don't disassociate them */
+        if (*status > 0)
+            ffflsh(fptr, FALSE, &zerostatus); 
+        else
+            ffflsh(fptr, FALSE, status); 
+
         free(fptr);               /* free memory for the FITS file structure */
     }
 
@@ -5234,8 +5378,7 @@ int ffoptplt(fitsfile *fptr,      /* O - FITS file pointer                   */
 
     if (tstatus)  /* not a FITS file, so treat it as an ASCII template */
     {
-        ffxmsg(-2, card);  /* clear the  error message */
-
+        ffxmsg(2, card);  /* clear the  error message */
         fits_execute_template(fptr, (char *) tempname, status);
 
         ffmahd(fptr, 1, 0, status);   /* move back to the primary array */

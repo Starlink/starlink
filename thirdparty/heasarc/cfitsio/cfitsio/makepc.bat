@@ -15,6 +15,7 @@ bcc32 -c eval_f.c
 bcc32 -c fitscore.c
 bcc32 -c getcol.c
 bcc32 -c getcolb.c
+bcc32 -c getcolsb.c
 bcc32 -c getcoli.c
 bcc32 -c getcolj.c
 bcc32 -c getcolui.c
@@ -33,6 +34,7 @@ bcc32 -c iraffits.c
 bcc32 -c modkey.c
 bcc32 -c putcol.c
 bcc32 -c putcolb.c
+bcc32 -c putcolsb.c
 bcc32 -c putcoli.c
 bcc32 -c putcolj.c
 bcc32 -c putcolui.c
@@ -57,12 +59,12 @@ bcc32 -c pliocomp.c
 del cfitsio.lib
 tlib cfitsio +buffers +cfileio +checksum +compress +drvrfile +drvrmem 
 tlib cfitsio +editcol +edithdu +eval_l +eval_y +eval_f +fitscore
-tlib cfitsio +getcol  +getcolb +getcoli +getcolj +getcolk +getcoluk 
+tlib cfitsio +getcol +getcolb +getcolsb +getcoli +getcolj +getcolk +getcoluk 
 tlib cfitsio +getcolui +getcoluj +getcole +getcold +getcoll +getcols
 tlib cfitsio +getkey +group +grparser +histo +iraffits +modkey +putkey 
 tlib cfitsio +putcol  +putcolb +putcoli +putcolj +putcolk +putcole +putcold
 tlib cfitsio +putcoll +putcols +putcolu +putcolui +putcoluj +putcoluk
-tlib cfitsio +region +scalnull +swapproc +wcsutil +wcssub
+tlib cfitsio +region +scalnull +swapproc +wcsutil +wcssub +putcolsb
 tlib cfitsio +imcompress +quantize +ricecomp +pliocomp
 bcc32 -f testprog.c cfitsio.lib
 bcc32 -f cookbook.c cfitsio.lib

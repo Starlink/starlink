@@ -60,11 +60,17 @@ float ffvers(float *version)  /* IO - version number */
   return the current version number of the FITSIO software
 */
 {
-      *version = 2.440;
+      *version = 2.49;
 
-/*     8 Jan 2003
+/*     11 Feb 2004
+
 
    Previous releases:
+      *version = 2.48    28 Jan 2004
+      *version = 2.470   18 Aug 2003
+      *version = 2.460   20 May 2003
+      *version = 2.450   30 Apr 2003  (internal release only)
+      *version = 2.440    8 Jan 2003
       *version = 2.430;   4 Nov 2002
       *version = 2.420;  19 Jul 2002
       *version = 2.410;  22 Apr 2002 used in ftools v5.2
@@ -865,7 +871,7 @@ int fftkey(char *keyword,    /* I -  keyword name */
           {
             /* don't print error message if status < 0  */
             sprintf(msg, "Character %d in this keyword is illegal: %.8s",
-                    ii+1, keyword);
+                    (int) (ii+1), keyword);
             ffpmsg(msg);
 
             /* explicitly flag the 2 most common cases */
@@ -1937,6 +1943,11 @@ int ffbnfm(char *tform,     /* I - format code from the TFORMn keyword */
         datacode = TBYTE;
         width = 1;
     }
+    else if (form[0] == 'S') /* internal code to signify signed byte */
+    {
+        datacode = TSBYTE;
+        width = 1;
+    }
     else if (form[0] == 'C')
     {
         datacode = TCOMPLEX;
@@ -2422,6 +2433,161 @@ int ffgtcl( fitsfile *fptr,  /* I - FITS file pointer                       */
       if (repeat)
           *repeat = (long) colptr->trepeat;
     }
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffeqty( fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  colnum,     /* I - column number                           */
+            int *typecode,   /* O - datatype code (21 = short, etc)         */
+            long *repeat,    /* O - repeat count of field                   */
+            long *width,     /* O - if ASCII, width of field or unit string */
+            int  *status)    /* IO - error status                           */
+/*
+  Get the 'equivalent' table column type. 
+
+  This routine is similar to the ffgtcl routine (which returns the physical
+  datatype of the column, as stored in the FITS file) except that if the
+  TSCALn and TZEROn keywords are defined for the column, then it returns
+  the 'equivalent' datatype.  Thus, if the column is defined as '1I'  (short
+  integer) this routine may return the type as 'TUSHORT' or as 'TFLOAT'
+  depending on the TSCALn and TZEROn values.
+  
+  Returns the datatype code of the column, as well as the vector
+  repeat count and (if it is an ASCII character column) the
+  width of the field or a unit string within the field.  This supports the
+  TFORMn = 'rAw' syntax for specifying arrays of substrings, so
+  if TFORMn = '60A12' then repeat = 60 and width = 12.
+*/
+{
+    tcolumn *colptr;
+    int hdutype, decims, tcode, effcode;
+    double tscale, tzero, min_val, max_val;
+    long lngscale = 1, lngzero = 0;
+
+    if (*status > 0)
+        return(*status);
+
+    /* reset position to the correct HDU if necessary */
+    if (fptr->HDUposition != (fptr->Fptr)->curhdu)
+        ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
+    else if ((fptr->Fptr)->datastart == DATA_UNDEFINED)
+        if ( ffrdef(fptr, status) > 0)               /* rescan header */
+            return(*status);
+
+    if (colnum < 1 || colnum > (fptr->Fptr)->tfield)
+        return(*status = BAD_COL_NUM);
+
+    colptr = (fptr->Fptr)->tableptr;   /* pointer to first column */
+    colptr += (colnum - 1);    /* offset to correct column */
+
+    if (ffghdt(fptr, &hdutype, status) > 0)
+        return(*status);
+
+    if (hdutype == ASCII_TBL)
+    {
+      ffasfm(colptr->tform, typecode, width, &decims, status);
+
+      if (repeat)
+           *repeat = 1;
+    }
+    else
+    {
+      if (typecode)
+          *typecode = colptr->tdatatype;
+
+      if (width)
+          *width = colptr->twidth;
+
+      if (repeat)
+          *repeat = (long) colptr->trepeat;
+    }
+
+    /* return if caller is not interested in the typecode value */
+    if (!typecode)
+        return(*status);
+
+    /* check if the tscale and tzero keywords are defined, which might
+       change the effective datatype of the column  */
+
+    tscale = colptr->tscale;
+    tzero = colptr->tzero;
+
+    if (tscale == 1.0 && tzero == 0.0)  /* no scaling */
+        return(*status);
+ 
+    tcode = abs(*typecode);
+
+    switch (tcode)
+    {
+      case TBYTE:   /* binary table 'rB' column */
+        min_val = 0.;
+        max_val = 255.0;
+        break;
+
+      case TSHORT:
+        min_val = -32768.0;
+        max_val =  32767.0;
+        break;
+        
+      case TLONG:
+
+        min_val = -2147483648.0;
+        max_val =  2147483647.0;
+        break;
+        
+      default:  /* don't have to deal with other data types */
+        return(*status);
+    }
+
+    if (tscale >= 0.) {
+        min_val = tzero + tscale * min_val;
+        max_val = tzero + tscale * max_val;
+    } else {
+        max_val = tzero + tscale * min_val;
+        min_val = tzero + tscale * max_val;
+    }
+    if (tzero < 2147483648.)  /* don't exceed range of 32-bit integer */
+       lngzero = tzero;
+    lngscale = tscale;
+
+    if ((tzero != 2147483648.) && /* special value that exceeds integer range */
+       (lngzero != tzero || lngscale != tscale)) { /* not integers? */
+       /* floating point scaled values; just decide on required precision */
+       if (tcode == TBYTE || tcode == TSHORT)
+          effcode = TFLOAT;
+       else
+          effcode = TDOUBLE;
+
+    /*
+       In all the remaining cases, TSCALn and TZEROn are integers,
+       and not equal to 1 and 0, respectively.  
+    */
+
+    } else if ((min_val == -128.) && (max_val == 127.)) {
+        effcode = TSBYTE;
+ 
+    } else if ((min_val >= -32768.0) && (max_val <= 32767.0)) {
+        effcode = TSHORT;
+
+    } else if ((min_val >= 0.0) && (max_val <= 65535.0)) {
+        effcode = TUSHORT;
+
+    } else if ((min_val >= -2147483648.0) && (max_val <= 2147483647.0)) {
+        effcode = TLONG;
+
+    } else if ((min_val >= 0.0) && (max_val < 4294967296.0)) {
+        effcode = TULONG;
+
+    } else {  /* exceeds the range of a 32-bit integer */
+        effcode = TDOUBLE;
+    }   
+
+    /* return the effective datatype code (negative if variable length col.) */
+    if (*typecode < 0)  /* variable length array column */
+        *typecode = -effcode;
+    else
+        *typecode = effcode;
 
     return(*status);
 }
@@ -3908,7 +4074,16 @@ int ffgcpr( fitsfile *fptr, /* I - FITS file pointer                        */
     else if (abs(*tcode) == TDOUBLE)
        *maxelem = DBUFFSIZE / sizeof(double);
     else if (abs(*tcode) == TSTRING)
+    {
        *maxelem = (DBUFFSIZE - 1)/ *twidth; /* leave room for final \0 */
+       if (*maxelem == 0) {
+            sprintf(message,
+        "ASCII string column is too wide: %ld; max supported width is %d",
+                   *twidth,  DBUFFSIZE - 1);
+            ffpmsg(message);
+            return(*status = COL_TOO_WIDE);
+        }
+    }
     else
        *maxelem = DBUFFSIZE / *twidth; 
 
@@ -3932,18 +4107,18 @@ int ffgcpr( fitsfile *fptr, /* I - FITS file pointer                        */
         {
             sprintf(message,
         "First element to write is too large: %ld; max allowed value is %ld",
-                   (long) firstelem, (long) *repeat);
+                   (long) ((*elemnum) + 1), (long) *repeat);
             ffpmsg(message);
             return(*status = BAD_ELEM_NUM);
         }
 
         /* last row number to be read or written */
-        endrow = ((firstelem + nelem - 2) / *repeat) + firstrow;
+        endrow = ((*elemnum + nelem - 1) / *repeat) + firstrow;
 
         if (writemode)
         {
             /* check if we are writing beyond the current end of table */
-            if (endrow > (fptr->Fptr)->numrows)
+            if ((endrow > (fptr->Fptr)->numrows) && (nelem > 0) )
             {
                 /* if there are more HDUs following the current one, or */
                 /* if there is a data heap, then we must insert space */
@@ -4011,7 +4186,7 @@ int ffgcpr( fitsfile *fptr, /* I - FITS file pointer                        */
 
               sprintf(message, 
               "  Tried to read %ld elements starting at row %ld, element %ld.",
-              nelem, firstrow, (long) firstelem);
+              nelem, firstrow, (long) ((*elemnum) + 1));
               ffpmsg(message);
 
             }
@@ -5064,7 +5239,7 @@ int ffcdfl( fitsfile *fptr, int *status)
    if( nfill == 0 ) return( *status );
 
    /*   move to the beginning of the fill bytes   */
-   ffmbyt(fptr, filpos, TRUE, status);
+   ffmbyt(fptr, filpos, FALSE, status);
 
    if( ffgbyt(fptr, nfill, chbuff, status) > 0)
    {
@@ -5344,6 +5519,137 @@ int ffgidt( fitsfile *fptr,  /* I - FITS file pointer                       */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffgiet( fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  *imgtype,   /* O - image data type                         */
+            int  *status)    /* IO - error status                           */
+/*
+  Get the effective datatype of the image (= BITPIX keyword for normal image,
+  or ZBITPIX for a compressed image)
+*/
+{
+    int tstatus;
+    long lngscale = 1, lngzero = 0;
+    double bscale, bzero, min_val, max_val;
+
+    if (*status > 0)
+        return(*status);
+
+    /* reset position to the correct HDU if necessary */
+    if (fptr->HDUposition != (fptr->Fptr)->curhdu)
+        ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
+    else if ((fptr->Fptr)->datastart == DATA_UNDEFINED)
+        if ( ffrdef(fptr, status) > 0)               /* rescan header */
+            return(*status);
+
+    if ((fptr->Fptr)->hdutype == IMAGE_HDU)
+    {
+        ffgky(fptr, TINT, "BITPIX", imgtype, NULL, status);
+        tstatus = 0;
+        ffgky(fptr, TDOUBLE, "BSCALE", &bscale, NULL, &tstatus);
+        if (tstatus)
+           bscale = 1.0;
+
+        tstatus = 0;
+        ffgky(fptr, TDOUBLE, "BZERO", &bzero, NULL, &tstatus);
+        if (tstatus)
+           bzero = 0.0;
+
+    }
+    else if ((fptr->Fptr)->compressimg)
+    {
+        /* this is a binary table containing a compressed image */
+        ffgky(fptr, TINT, "ZBITPIX", imgtype, NULL, status);
+    }
+    else
+    {
+        *status = NOT_IMAGE;
+        return(*status);
+
+    }
+
+    /* check if the BSCALE and BZERO keywords are defined, which might
+       change the effective datatype of the image  */
+        tstatus = 0;
+        ffgky(fptr, TDOUBLE, "BSCALE", &bscale, NULL, &tstatus);
+        if (tstatus)
+           bscale = 1.0;
+
+        tstatus = 0;
+        ffgky(fptr, TDOUBLE, "BZERO", &bzero, NULL, &tstatus);
+        if (tstatus)
+           bzero = 0.0;
+
+    if (bscale == 1.0 && bzero == 0.0)  /* no scaling */
+        return(*status);
+
+    switch (*imgtype)
+    {
+      case BYTE_IMG:   /* 8-bit image */
+        min_val = 0.;
+        max_val = 255.0;
+        break;
+
+      case SHORT_IMG:
+        min_val = -32768.0;
+        max_val =  32767.0;
+        break;
+        
+      case LONG_IMG:
+
+        min_val = -2147483648.0;
+        max_val =  2147483647.0;
+        break;
+        
+      default:  /* don't have to deal with other data types */
+        return(*status);
+    }
+
+    if (bscale >= 0.) {
+        min_val = bzero + bscale * min_val;
+        max_val = bzero + bscale * max_val;
+    } else {
+        max_val = bzero + bscale * min_val;
+        min_val = bzero + bscale * max_val;
+    }
+    if (bzero < 2147483648.)  /* don't exceed range of 32-bit integer */
+       lngzero = bzero;
+    lngscale = bscale;
+
+    if ((bzero != 2147483648.) && /* special value that exceeds integer range */
+       (lngzero != bzero || lngscale != bscale)) { /* not integers? */
+       /* floating point scaled values; just decide on required precision */
+       if (*imgtype == BYTE_IMG || *imgtype == SHORT_IMG)
+          *imgtype = FLOAT_IMG;
+       else
+         *imgtype = DOUBLE_IMG;
+
+    /*
+       In all the remaining cases, BSCALE and BZERO are integers,
+       and not equal to 1 and 0, respectively.  
+    */
+
+    } else if ((min_val == -128.) && (max_val == 127.)) {
+       *imgtype = SBYTE_IMG;
+
+    } else if ((min_val >= -32768.0) && (max_val <= 32767.0)) {
+       *imgtype = SHORT_IMG;
+
+    } else if ((min_val >= 0.0) && (max_val <= 65535.0)) {
+       *imgtype = USHORT_IMG;
+
+    } else if ((min_val >= -2147483648.0) && (max_val <= 2147483647.0)) {
+       *imgtype = LONG_IMG;
+
+    } else if ((min_val >= 0.0) && (max_val < 4294967296.0)) {
+       *imgtype = ULONG_IMG;
+
+    } else {  /* exceeds the range of a 32-bit integer */
+       *imgtype = DOUBLE_IMG;
+    }   
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffgidm( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  *naxis  ,   /* O - image dimension (NAXIS value)           */
             int  *status)    /* IO - error status                           */
@@ -5536,17 +5842,18 @@ int ffmrhd(fitsfile *fptr,      /* I - FITS file pointer                    */
 int ffmnhd(fitsfile *fptr,      /* I - FITS file pointer                    */
            int exttype,         /* I - desired extension type               */
            char *hduname,       /* I - desired EXTNAME value for the HDU    */
-           int hduver,         /* I - desired EXTVERS value for the HDU    */
+           int hduver,          /* I - desired EXTVERS value for the HDU    */
            int *status)         /* IO - error status                        */
 /*
-  Move to the HDU with a given EXTNAME (or HDUNAME) and EXTVERS keyword 
-  values.  If hduvers = 0, then move to the first HDU with the given
-  name regardless of EXTVERS value.  If no matching HDU is found in the
-  file, then the current open HDU will remain unchanged.
+  Move to the next HDU with a given extension type (IMAGE_HDU, ASCII_TBL,
+  BINARY_TBL, or ANY_HDU), extension name (EXTNAME or HDUNAME keyword),
+  and EXTVERS keyword values.  If hduvers = 0, then move to the first HDU
+  with the given type and name regardless of EXTVERS value.  If no matching
+  HDU is found in the file, then the current open HDU will remain unchanged.
 */
 {
     char extname[FLEN_VALUE];
-    int ii, hdutype, extnum, tstatus, match, exact;
+    int ii, hdutype, alttype, extnum, tstatus, match, exact;
     long extver;
 
     if (*status > 0)
@@ -5562,8 +5869,13 @@ int ffmnhd(fitsfile *fptr,      /* I - FITS file pointer                    */
            ffmahd(fptr, extnum, 0, status); /* restore file position */
            return(*status = BAD_HDU_NUM);   /* couldn't find desired HDU */
         }
+
+        alttype = -1; 
+        if (fits_is_compressed_image(fptr, status))
+            alttype = BINARY_TBL;
         
-        if (exttype == ANY_HDU || hdutype == exttype)  /* matching type? */
+        /* matching type? */
+        if (exttype == ANY_HDU || hdutype == exttype || hdutype == alttype)
         {
           if (ffgkys(fptr, "EXTNAME", extname, 0, &tstatus) > 0) /* name */
           {
@@ -5677,7 +5989,7 @@ int ffgext(fitsfile *fptr,      /* I - FITS file pointer                */
 /*--------------------------------------------------------------------------*/
 int ffiblk(fitsfile *fptr,      /* I - FITS file pointer               */
            long nblock,         /* I - no. of blocks to insert         */ 
-           int headdata,        /* O - insert where? 0=header, 1=data  */
+           int headdata,        /* I - insert where? 0=header, 1=data  */
                                 /*     -1=beginning of file            */
            int *status)         /* IO - error status                   */
 /*
@@ -6249,16 +6561,18 @@ int ffdtyp(char *cval,  /* I - formatted string representation of the value */
 
     if (cval[0] == '\0')
         return(*status = VALUE_UNDEFINED);
-    if (cval[0] == '\'')
+    else if (cval[0] == '\'')
         *dtype = 'C';          /* character string starts with a quote */
     else if (cval[0] == 'T' || cval[0] == 'F')
         *dtype = 'L';          /* logical = T or F character */
     else if (cval[0] == '(')
         *dtype = 'X';          /* complex datatype "(1.2, -3.4)" */
     else if (strchr(cval,'.'))
-        *dtype = 'F';          /* float contains a decimal point */
+        *dtype = 'F';          /* float usualy contains a decimal point */
+    else if (strchr(cval,'E') || strchr(cval,'D') )
+        *dtype = 'F';          /* exponential contains a E or D */
     else
-        *dtype = 'I';          /* if none of the above must be an integer */
+        *dtype = 'I';          /* if none of the above assume it is integer */
 
     return(*status);
 }

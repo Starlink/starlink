@@ -14,7 +14,7 @@ is provided as part of the CFITSIO library (which is written in ANSI
 C).  This is a companion document to the CFITSIO User's Guide which
 should be consulted for further information about the underlying
 CFITSIO library.  In the remainder of this document, the terms FITSIO
-and CFITSIO are interchangable and refer to the same library.
+and CFITSIO are interchangeable and refer to the same library.
 
 FITSIO/CFITSIO is a machine-independent library of routines for reading
 and writing data files in the FITS (Flexible Image Transport System)
@@ -214,7 +214,7 @@ CFITSIO has currently been tested on the following platforms:
    Linux                      gcc
    MkLinux                    DR3
    Windows 95/98/NT           Borland C++ V4.5
-   Windows 95/98/NT           Microsoft/Compaq Visual C++ v5.0, v6.0
+   Windows 95/98/NT/ME/XP     Microsoft/Compaq Visual C++ v5.0, v6.0
    Windows 95/98/NT           Cygwin gcc
    OS/2                       gcc + EMX
    MacOS 7.1 or greater       Metrowerks 10.+
@@ -246,22 +246,25 @@ release.  The diagnostic messages (which were piped to the file
 testprog.lis in the Unix example) should be identical to the listing
 contained in the file testprog.out.  The 'diff' and 'cmp' commands
 shown above should not report any differences in the files.  (There
-may be some minor formating differences, such as the presence or
+may be some minor formatting differences, such as the presence or
 absence of leading zeros, or 3 digit exponents in numbers,
 which can be ignored).
 
 The Fortran wrappers in CFITSIO may be tested with the testf77
-program on Unix systems with:
+program.  On Unix systems the fortran compilation and link command
+may be called 'f77' or 'g77', depending on the system.
 -
-    % f77 -o testf77 testf77.f -L. -lcfitsio -lnsl -lsocket  
-  or
-    % f77 -f -o testf77 testf77.f -L. -lcfitsio    (under SUN O/S)
-  or
-    % f77 -o testf77 testf77.f -Wl,-L. -lcfitsio -lm -lnsl -lsocket (HP/UX)
+   % f77 -o testf77 testf77.f -L. -lcfitsio -lnsl -lsocket  
+ or
+   % f77 -f -o testf77 testf77.f -L. -lcfitsio    (under SUN O/S)
+ or
+   % f77 -o testf77 testf77.f -Wl,-L. -lcfitsio -lm -lnsl -lsocket (HP/UX)
+ or
+   % g77 -o testf77 -s testf77.f -lcfitsio -lcc_dynamic -lncurses (Mac OS-X)
 
-    % testf77 > testf77.lis
-    % diff testf77.lis testf77.out
-    % cmp testf77.fit testf77.std
+   % testf77 > testf77.lis
+   % diff testf77.lis testf77.out
+   % cmp testf77.fit testf77.std
 -
 On machines running SUN O/S, Fortran programs must be compiled with the
 '-f' option to force double precision variables to be aligned on 8-byte
@@ -427,10 +430,10 @@ SERVICES PROVIDED HEREUNDER."
 The file compress.c contains (slightly modified) source code that
 originally came from gzip-1.2.4, copyright (C) 1992-1993 by Jean-loup
 Gailly.  This gzip code is distributed under the GNU General Public
-Licence and thus requires that any software that uses the CFITSIO
+License and thus requires that any software that uses the CFITSIO
 library (which in turn uses the gzip code) must conform to the
 provisions in the GNU General Public License.  A copy of the GNU
-licence is included at the beginning of compress.c file.
+license is included at the beginning of compress.c file.
 
 An alternate version of the compress.c file (called
 compress\_alternate.c) is provided for users who want to use the CFITSIO
@@ -473,7 +476,7 @@ can be rapidly evaluated for each row.  Peter Wilson (RSTX, NASA/GSFC)
 then wrote the parsing routines used by CFITSIO based on Lammers'
 design, combined with other techniques such as the CFITSIO iterator
 routine to further enhance the data processing throughput.  This effort
-also benefitted from a much earlier lexical parsing routine that was
+also benefited from a much earlier lexical parsing routine that was
 developed by Kent Blackburn (NASA/GSFC).
 
 The CFITSIO iterator function is loosely based on similar ideas
@@ -555,7 +558,7 @@ exact multiple of 2880 8-bit bytes long.  Any unused space is padded
 with fill characters (ASCII blanks or zeros).
 
 Each Header Unit consists of any number of 80-character keyword records
-or `card images' which have thegeneral form:
+or `card images' which have the general form:
 -
   KEYNAME = value / comment string
   NULLKEY =       / comment: This keyword has no value
@@ -838,6 +841,8 @@ CFITSIO to read and/or write the file.  Currently supported types are
                    for accessing password-protected ftp sites.
         http://  - a readonly file accessed with the HTTP protocol.  It
                    does not  support username:password like the ftp driver.
+                   Proxy HTTP servers are supported using the http_proxy
+                   environment variable.
         root://  - uses the CERN root protocol for writing as well as
                    reading files over the network.
         shmem:// - opens or creates a file which persists in the computer's
@@ -850,7 +855,18 @@ CFITSIO to read and/or write the file.  Currently supported types are
 If the filetype is not specified, then type file:// is assumed.
 The double slashes '//' are optional and may be omitted in most cases.
 
-***1.  Notes about the root filetype
+***1.  Notes about HTTP proxy servers
+
+A proxy HTTP server may be used by defining the address (URL) and port 
+number of the proxy server with the http\_proxy environment variable.
+For example
+-
+    setenv http_proxy http://heasarc.gsfc.nasa.gov:3128
+-
+will cause CFITSIO to use port 3128 on the heasarc proxy server whenever
+reading a FITS file with HTTP.
+
+***2.  Notes about the root filetype
 
 The original rootd server can be obtained from:
 \verb-ftp://root.cern.ch/root/rootd.tar.gz-
@@ -877,7 +893,7 @@ and to /etc/inetd.conf, add the following line:
 -                                                                    
 Force inetd to reread its conf file with "kill -HUP <pid inetd>".    
 You can also start rootd by hand running directly under your private 
-account (no root system priviliges needed). For example to start     
+account (no root system privileges needed). For example to start     
 rootd listening on port 5151 just type:   \verb+rootd -p 5151+  
 Notice: no \& is needed. Rootd will go into background by itself.       
 -
@@ -929,7 +945,7 @@ home directory, therefore only files below the home directory can be
 accessed.  Anonymous mode only works when the server is started via
 inetd.
 
-***2.  Notes about the shmem filetype:
+***3.  Notes about the shmem filetype:
 
 Shared memory files are currently supported on most Unix platforms,
 where the shared memory segments are managed by the operating system
@@ -954,7 +970,7 @@ the usual CFITSIO routine:
 -
 The file mode can be READWRITE or READONLY just as with disk files.
 More than one process can operate on READONLY mode files at the same
-time.  CFITSIO supports proper filelocking (both in READONLY and
+time.  CFITSIO supports proper file locking (both in READONLY and
 READWRITE modes), so calls to fits\_open\_file may be locked out until
 another other process closes the file.
 
@@ -1052,7 +1068,7 @@ up to 5 dimensions are currently supported.  Finally, a byte offset to
 the position of the first pixel in the data file may be specified by
 separating it with a ':' from the last dimension value.  If omitted, it
 is assumed that the offset = 0.  This parameter may be used to skip
-over any header information in the file that preceeds the binary data.
+over any header information in the file that precedes the binary data.
 Further examples:
 -
   raw.dat[b10000]           1-dimensional 10000 pixel byte array
@@ -1330,7 +1346,7 @@ table (i.e., there is no need to explicitly list the columns to
 be included if any columns are being deleted).
 
 \item
-Delete a column or keyword by listing the name preceeded by a minus
+Delete a column or keyword by listing the name preceded by a minus
 sign or an exclamation mark (!), e.g., '-TIME' will delete the TIME
 column if it exists, otherwise the TIME keyword.  An error is returned
 if neither a column nor keyword with this name exists.  Note  that the
@@ -1357,7 +1373,7 @@ the form of the expression (may be a character string, logical, bit, long
 integer, or double column). An appropriate vector count (in the case
 of binary tables) will also be added if not explicitly specified.
 
-When creating a new keyword, the keyword name must be preceeded by a 
+When creating a new keyword, the keyword name must be preceded by a 
 pound sign '\#', and the expression must evaluate to a scalar
 (i.e., cannot have a column name in the expression).  The comment
 string for the keyword may be specified in parentheses immediately
@@ -1370,7 +1386,7 @@ giving the name followed by an equals sign and an arithmetic
 expression.
 \end{itemize}
 
-The expression that is used when appending or recomuting columns or
+The expression that is used when appending or recomputing columns or
 keywords can be arbitrarily complex and may be a function of other
 header keyword values and other columns (in the same row).  The full
 syntax and available functions for the expression are described below
@@ -1902,7 +1918,7 @@ by a backslash to force the UNIX shell to ignore it.
 The optional binning specifier is enclosed in square brackets and can
 be distinguished from a general row filter specification by the fact
 that it begins with the keyword 'bin'  not immediately followed by an
-equals sign.  When binning is specfied, a temporary N-dimensional FITS
+equals sign.  When binning is specified, a temporary N-dimensional FITS
 primary array is created by computing the histogram of the values in
 the specified columns of a FITS table extension.  After the histogram
 is computed the input FITS file containing the table is then closed and
@@ -2418,7 +2434,7 @@ within binary tables for string, logical, complex, or double complex
 data types.
 
 In addition, any table column may be read as if it contained string values.
-In the case of numeric columns the returned string will be formated
+In the case of numeric columns the returned string will be formatted
 using the TDISPn display format if it exists.
 
 **G.  Data Scaling
@@ -2523,7 +2539,7 @@ get overwritten.
 By default the heap data area starts immediately after the last row of
 the fixed-length table.  This default starting location may be
 overridden by the THEAP keyword, but this is not recommended.  
-If addtional rows of data are added to the table, CFITSIO will
+If additional rows of data are added to the table, CFITSIO will
 automatically shift the the heap down to make room for the new
 rows, but it is obviously be more efficient to initially
 create the table with the necessary number of blank rows, so that
@@ -2611,7 +2627,7 @@ when the table is created, then let CFITSIO keep track of the number of
 rows that are actually written.  The application program should not
 manually update the number of rows in the table (as given by the NAXIS2
 keyword) since CFITSIO does this automatically.  If a table is
-initially created with more than zero rows, then this will ususally be
+initially created with more than zero rows, then this will usually be
 considered as the minimum size of the table, even if fewer rows are
 actually written to the table.  Thus, if a table is initially created
 with NAXIS2 = 20, and CFITSIO only writes 10 rows of data before
@@ -2917,7 +2933,7 @@ routine is available that will return the optimal number of rows for a
 given table:  call ftgrsz(unit, nrows, status).  It is not critical to
 use exactly the value of nrows returned by this routine, as long as one
 does not exceed it.  Using a very small value however can also lead to
-poor preformance because of the overhead from the larger number of
+poor performance because of the overhead from the larger number of
 subroutine calls.
 
 The optimal number of rows returned by ftgrsz is valid only as long as
@@ -2929,7 +2945,7 @@ and should be avoided during the critical period while the table is
 being read or written.
 
 Occasionally it is necessary to simultaneously access more than one
-FITS table, for example when transfering values from an input table to
+FITS table, for example when transferring values from an input table to
 an output table.  In cases like this, one should call ftgrsz to get the
 optimal number of rows for each table separately, than reduce the
 number of rows proportionally.  For example, if the optimal number of
@@ -3019,7 +3035,7 @@ controller (SCSI or IDE), the size of the disk cache, the average seek
 speed of the disk, the amount of disk fragmentation, and the amount of
 RAM available on the system can all have a significant impact on
 overall I/O efficiency.  For critical applications, a system
-adminstrator should review the proposed system hardware to identify any
+administrator should review the proposed system hardware to identify any
 potential I/O bottlenecks.
 
 
@@ -3198,7 +3214,7 @@ used by these interface routines.
         FTIOPN(unit,filename,rwmode, > status)
 -
 >4 Open and initialize a new empty FITS file.   A template file may also be
->   specified to define the structure of the new file (see secion 4.2.4).
+>   specified to define the structure of the new file (see section 4.2.4).
 -
         FTINIT(unit,filename,blocksize, > status)
 -
@@ -3488,7 +3504,7 @@ strings will be returned for any components that are not present
 >16 Parse the input file name and return the root file name.  The root
 name includes the file type if specified, (e.g.  'ftp://' or 'http://')
 and the full path name, to the extent that it is specified in the input
-filename.  It does not enclude the HDU name or number, or any filtering
+filename.  It does not include the HDU name or number, or any filtering
 >specifications.
 -
        FTRTNM(filename, > rootname, status)
@@ -4222,9 +4238,24 @@ been provided, as well as a set of subroutines to read or write any
 contiguous rectangular subset of pixels within the n-dimensional array.
 
 >1  Get the data type of the image (= BITPIX value).  Possible returned 
->   values are: 8, 16, 32, -32, or -64. 
+    values are: 8, 16, 32, -32, or -64 corresponding to unsigned byte,
+    signed 2-byte integer, signed 4-byte integer, real, and double.
+
+    The second subroutine is similar to FTGIDT, except that if the image
+    pixel values are scaled, with non-default values for the BZERO and
+    BSCALE keywords, then this routine will return the 'equivalent'
+    data type that is needed to store the scaled values.  For example,
+    if BITPIX = 16 and BSCALE = 0.1 then the equivalent data type is
+    floating point, and -32 will be returned.  There are 2 special cases:
+    if the image contains unsigned 2-byte integer values, with BITPIX =
+    16, BSCALE = 1, and BZERO = 32768, then this routine will return
+    a non-standard value of 20 for the bitpix value.  Similarly if the
+    image contains unsigned 4-byte integers, then bitpix will
+>   be returned with a value of 40. 
+
 -
         FTGIDT(unit, > bitpix,status)
+        FTGIET(unit, > bitpix,status)
 -
 >>2  Get the dimension (number of axes = NAXIS) of the image 
 -
@@ -4420,9 +4451,22 @@ It is recommended that the column names in a given table be unique
     TFORM = 'rAw' where 'r' is the total number of characters (= the width 
     of the column) and 'w' is the width of a unit string within the column.  
     Thus if the column has TFORM = '60A12' then this routine will return 
->   datacode = 16, repeat = 60, and width = 12.
+    datacode = 16, repeat = 60, and width = 12.
+
+   The second routine, FTEQTY is similar except that in
+   the case of scaled integer columns it returns the 'equivalent' data
+   type that is needed to store the scaled values, and not necessarily
+   the physical data type of the unscaled values as stored in the FITS
+   table.  For example if a '1I' column in a binary table has TSCALn =
+   1 and TZEROn = 32768, then this column effectively contains unsigned
+   short integer values, and thus the returned value of typecode will
+   be the code for an unsigned short integer, not a signed short integer.
+   Similarly, if a column has TTYPEn = '1I'
+   and TSCALn = 0.12, then the returned typecode
+>  will be the code for a 'real' column.
 -
         FTGTCL(unit,colnum, > datacode,repeat,width,status)
+        FTEQTY(unit,colnum, > datacode,repeat,width,status)
 -
 >4  Return the display width of a column.  This is the length
     of the string that will be returned  
@@ -4833,11 +4877,11 @@ parName parameter is the name of the column (which may or may not already
 exist) into which to write the results, and parInfo contains an
 optional TFORM keyword value if a new column is being created.  If a
 TFORM value is not specified then a default format will be used,
-depending on the expression.  If the expression evalutes to a constant,
+depending on the expression.  If the expression evaluates to a constant,
 then the result will be written to the keyword name given by the
 parName parameter, and the parInfo parameter may be used to supply an
 optional comment for the keyword.  If the keyword does not already
-exist, then the name of the keyword must be preceeded with a '\#' character,
+exist, then the name of the keyword must be preceded with a '\#' character,
 >otherwise the result will be written to a column with that name.
         
 -
@@ -4859,13 +4903,51 @@ row ranges.  nranges specifies the number of row ranges, and firstrow
 
 **J.  Celestial Coordinate System Subroutines \label{FTGICS}
 
-The following subroutines are provided to help calculate the
-transformation between pixel location in an image and the corresponding
-celestial coordinates on the sky.  These support the following standard
-map projections:  -SIN, -TAN, -ARC, -NCP, -GLS, -MER, and -AIT (these
-are the legal values for the coordtype parameter).  These routines are
-based on similar functions in Classic AIPS.  All the angular quantities
-are given in units of degrees.  
+The FITS community has adopted a set of keyword conventions that are
+used to  specify the transformation that is needed to convert between
+pixel locations in an image and the corresponding celestial coordinates
+on the sky.  or more generally, to specify world coordinates that
+are to be associated with any pixel location in an n-dimensional FITS
+array. CFITSIO is distributed with a simple set of World Coordinate
+System routines that support a limited set of celestial projections.
+These routines were derived from functions in the Classic AIPS software
+package developed in the 1980s.  These routines DO NOT support all the
+new conventions in the WCS papers that have recently been approved as
+part of the official FITS standard.
+
+Rather than using the WCS routines distributed with FITSIO, it is
+STRONGLY RECOMMENDED that software developers use a more sophisticated
+external WCS library.  Several recommended libraries are:
+
+-
+  WCSLIB -  supported by Mark Calabretta
+  WCSTools - supported by Doug Mink
+  AST library - developed by the U.K. Starlink project
+-
+
+More information about the WCS keyword conventions and links
+to all of these libraries can be found on the FITS Support Office
+web site at http://fits.gsfc.nasa.gov under the WCS link.
+
+Each of these libraries has a routine that will ingest a list of header
+keywords from which the transformations between pixel coordinates and
+world coordinates can be derived.  Programmers may use FITSIO to read
+the header keywords and construct a long character array containing
+all the keywords.  This character array can then be passed to the
+WCS library routine.
+
+The following routines DO NOT support the more recent WCS conventions
+that have been approved as part of the FITS standard.  Consequently,
+the following routines ARE NOW DEPRECATED.  It is STRONGLY RECOMMENDED
+that software developers not use these routines, and instead use an
+external WCS library, as described in the previous section.
+
+These routines are included only for backward compatibility with
+existing software.  They support the following standard map 
+projections: -SIN, -TAN, -ARC, -NCP, -GLS, -MER, and -AIT (these are the
+legal values for the coordtype parameter).  These routines are based
+on similar functions in Classic AIPS.  All the angular quantities are
+given in units of degrees.
 
 >1  Get the values of all the standard FITS celestial coordinate system
     keywords from the header of a FITS image (i.e., the primary array or
@@ -5127,7 +5209,7 @@ The following utility subroutines may be useful for certain applications:
         FTDTYP(value, > dtype,status)
 -
 >11 Return the class of input header record.  The record is classified
-    into one of the following catagories (the class values are
+    into one of the following categories (the class values are
     defined in fitsio.h).  Note that this is one of the few FITSIO
 >   routines that does not return a status value. 
 -
@@ -5474,6 +5556,7 @@ The following utility subroutines may be useful for certain applications:
  FITS Primary Array or IMAGE Extension I/O Subroutines: page~\pageref{FTPPR}
 -
         FTGIDT(unit, > bitpix,status)
+        FTGIET(unit, > bitpix,status)
         FTGIDM(unit, > naxis,status)
         FTGISZ(unit, maxdim, > naxes,status)
         FTGIPR(unit, maxdim, > bitpix,naxis,naxes,status)
@@ -5502,6 +5585,7 @@ The following utility subroutines may be useful for certain applications:
         FTGCNO(unit,casesen,coltemplate, > colnum,status)
         FTGCNN(unit,casesen,coltemplate, > colnam,colnum,status)
         FTGTCL(unit,colnum, > datacode,repeat,width,status)
+        FTEQTY(unit,colnum, > datacode,repeat,width,status)
         FTGCDW(unit,colnum, > dispwidth,status)
         FTGACL(unit,colnum, >
                ttype,tbcol,tunit,tform,tscal,tzero,snull,tdisp,status)
@@ -5681,7 +5765,7 @@ hdtype - (integer) header record type: -1=delete;  0=append or replace;
                    1=append; 2=this is the END keyword
 hduok - (integer) was the HDU verification successful (=1) or 
          not (= -1).  Equals zero if the CHECKSUM keyword is not present.      
-hdusum - (double precsion) 32 bit 1's complement checksum for the entire CHDU
+hdusum - (double precision) 32 bit 1's complement checksum for the entire CHDU
 hdutype - (integer) type of HDU: 0 = primary array or IMAGE, 1 = ASCII table,
                    2 = binary table, -1 = unknown
 history - (character) the HISTORY keyword comment string
@@ -5738,7 +5822,7 @@ rowlist - (integer array) list of row numbers to be deleted in increasing order
 rownum - (integer) number of the row (first row = 1)
 rowrange- (string) list of rows or row ranges to be deleted
 rwmode - (integer) file access mode: 0 = readonly, 1 = readwrite 
-second   (double)- second within minute (0 - 60.9999999999) (leapsecond!)
+second   (double)- second within minute (0 - 60.9999999999) (leap second!)
 seq_no - (integer) the sequence number to append to the keyword root name
 simple - (logical) does the FITS file conform to all the FITS standards
 snull - (character) value used to represent undefined values in ASCII table

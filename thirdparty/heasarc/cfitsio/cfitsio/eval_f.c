@@ -656,6 +656,9 @@ int ffcalc_rng( fitsfile *infptr,   /* I - Input FITS file                  */
 
       int anyNull = 0;
       int nPerLp, i;
+      long totaln;
+
+      ffgkyj(infptr, "NAXIS2", &totaln, 0, status);
 
       /*************************************/
       /* Create new iterator Output Column */
@@ -674,10 +677,20 @@ int ffcalc_rng( fitsfile *infptr,   /* I - Input FITS file                  */
       for( i=0; i<nRngs; i++ ) {
          Info.dataPtr = NULL;
          Info.maxRows = end[i]-start[i]+1;
-         if( Info.maxRows < 10 )
-            nPerLp = Info.maxRows;
+
+          /*
+            If there is only 1 range, and it includes all the rows,
+            and there are 10 or more rows, then set nPerLp = 0 so
+            that the iterator function will dynamically choose the
+            most efficient number of rows to process in each loop.
+            Otherwise, set nPerLp to the number of rows in this range.
+         */
+
+         if( (Info.maxRows >= 10) && (nRngs == 1) &&
+             (start[0] == 1) && (end[0] == totaln))
+              nPerLp = 0;
          else
-            nPerLp = 0;
+              nPerLp = Info.maxRows;
 
          if( ffiter( gParse.nCols, gParse.colData, start[i]-1,
                      nPerLp, parse_data, (void*)&Info, status ) == -1 )

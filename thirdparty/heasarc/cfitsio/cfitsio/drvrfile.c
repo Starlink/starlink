@@ -10,6 +10,12 @@
 
 #if defined(unix) || defined(__unix__)  || defined(__unix)
 #include <pwd.h>         /* needed in file_openfile */
+
+#ifdef REPLACE_LINKS
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
 #endif
 
 #ifdef HAVE_FTRUNCATE
@@ -152,6 +158,15 @@ int file_openfile(char *filename, int rwmode, FILE **diskfile)
     char tempname[512], *cptr, user[80];
     struct passwd *pwd;
     int ii = 0;
+
+#if defined(REPLACE_LINKS)
+    struct stat stbuf;
+    int success = 0;
+    size_t n;
+    FILE *f1, *f2;
+    char buf[BUFSIZ];
+#endif
+
 #endif
 
     if (rwmode == READWRITE)
@@ -213,6 +228,54 @@ int file_openfile(char *filename, int rwmode, FILE **diskfile)
     {
         /* don't need to expand the input file name */
         *diskfile = fopen(filename, mode); 
+
+#if defined(REPLACE_LINKS)
+
+        if (!(*diskfile) && (rwmode == READWRITE))  
+        {
+           /* failed to open file with READWRITE privilege.  Test if  */
+           /* the file we are trying to open is a soft link to a file that */
+           /* doesn't have write privilege.  */
+
+           lstat(filename, &stbuf);
+           if ((stbuf.st_mode & S_IFMT) == S_IFLNK) /* is this a soft link? */
+           {
+              if ((f1 = fopen(filename, "rb")) != 0) /* try opening READONLY */
+              {
+                 strcpy(tempname, filename);
+                 strcat(tempname, ".TmxFil");
+                 if ((f2 = fopen(tempname, "wb")) != 0) /* create temp file */
+                 {
+                    success = 1;
+                    while ((n = fread(buf, 1, BUFSIZ, f1)) > 0)
+                    {
+                       /* copy linked file to local temporary file */
+                       if (fwrite(buf, 1, n, f2) != n) 
+                       {
+                          success = 0;
+                          break;
+                       } 
+                    }
+                    fclose(f2);
+                 }
+                 fclose(f1);
+  
+                 if (success)
+                 {
+                    /* delete link and rename temp file to previous link name */
+                    remove(filename);
+                    rename(tempname, filename);
+
+                    /* try once again to open the file with write access */
+                    *diskfile = fopen(filename, mode); 
+                 }
+                 else
+                    remove(tempname);  /* clean up the failed copy */
+              }
+           }
+        }
+#endif
+
     }
 
 #else
@@ -247,7 +310,7 @@ int file_create(char *filename, int *handle)
     if (*handle == -1)
        return(TOO_MANY_FILES);    /* too many files opened */
 
-    strcpy(mode, "w+b");    /* open existing file with read-write */
+    strcpy(mode, "w+b");    /* create new file with read-write */
 
     diskfile = fopen(filename, "r"); /* does file already exist? */
 

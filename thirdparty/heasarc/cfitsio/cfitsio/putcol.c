@@ -57,6 +57,10 @@ int ffppx(  fitsfile *fptr,  /* I - FITS file pointer                       */
     {
       ffpprb(fptr, group, firstelem, nelem, (unsigned char *) array, status);
     }
+    else if (datatype == TSBYTE)
+    {
+      ffpprsb(fptr, group, firstelem, nelem, (signed char *) array, status);
+    }
     else if (datatype == TUSHORT)
     {
       ffpprui(fptr, group, firstelem, nelem, (unsigned short *) array,
@@ -150,6 +154,11 @@ int ffppxn(  fitsfile *fptr,  /* I - FITS file pointer                       */
       ffppnb(fptr, group, firstelem, nelem, (unsigned char *) array, 
              *(unsigned char *) nulval, status);
     }
+    else if (datatype == TSBYTE)
+    {
+      ffppnsb(fptr, group, firstelem, nelem, (signed char *) array, 
+             *(signed char *) nulval, status);
+    }
     else if (datatype == TUSHORT)
     {
       ffppnui(fptr, group, firstelem, nelem, (unsigned short *) array,
@@ -223,6 +232,10 @@ int ffppr(  fitsfile *fptr,  /* I - FITS file pointer                       */
     {
       ffpprb(fptr, group, firstelem, nelem, (unsigned char *) array, status);
     }
+    else if (datatype == TSBYTE)
+    {
+      ffpprsb(fptr, group, firstelem, nelem, (signed char *) array, status);
+    }
     else if (datatype == TUSHORT)
     {
       ffpprui(fptr, group, firstelem, nelem, (unsigned short *) array,
@@ -295,6 +308,11 @@ int ffppn(  fitsfile *fptr,  /* I - FITS file pointer                       */
     {
       ffppnb(fptr, group, firstelem, nelem, (unsigned char *) array, 
              *(unsigned char *) nulval, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffppnsb(fptr, group, firstelem, nelem, (signed char *) array, 
+             *(signed char *) nulval, status);
     }
     else if (datatype == TUSHORT)
     {
@@ -375,6 +393,11 @@ int ffpss(  fitsfile *fptr,   /* I - FITS file pointer                       */
         ffpssb(fptr, 1, naxis, naxes, blc, trc,
                (unsigned char *) array, status);
     }
+    else if (datatype == TSBYTE)
+    {
+        ffpsssb(fptr, 1, naxis, naxes, blc, trc,
+               (signed char *) array, status);
+    }
     else if (datatype == TUSHORT)
     {
         ffpssui(fptr, 1, naxis, naxes, blc, trc,
@@ -451,6 +474,11 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
     else if (datatype == TBYTE)
     {
       ffpclb(fptr, colnum, firstrow, firstelem, nelem, (unsigned char *) array,
+             status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpclsb(fptr, colnum, firstrow, firstelem, nelem, (signed char *) array,
              status);
     }
     else if (datatype == TUSHORT)
@@ -554,6 +582,11 @@ int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
     {
       ffpcnb(fptr, colnum, firstrow, firstelem, nelem, (unsigned char *) array,
             *(unsigned char *) nulval, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpcnsb(fptr, colnum, firstrow, firstelem, nelem, (signed char *) array,
+            *(signed char *) nulval, status);
     }
     else if (datatype == TUSHORT)
     {
@@ -816,6 +849,7 @@ int ffiter(int n_cols,
         union {   /*  default null value for the column */
             char   *stringnull;
             unsigned char   charnull;
+            signed char scharnull;
             int    intnull;
             short  shortnull;
             long   longnull;
@@ -860,8 +894,8 @@ int ffiter(int n_cols,
     {
         /* check that output datatype code value is legal */
         type = cols[jj].datatype;  
-        if (type != 0 &&
-            type != TBYTE  && type != TLOGICAL && type != TSTRING &&
+        if (type != 0      && type != TBYTE  &&
+            type != TSBYTE && type != TLOGICAL && type != TSTRING &&
             type != TSHORT && type != TINT     && type != TLONG && 
             type != TFLOAT && type != TDOUBLE  && type != TCOMPLEX &&
             type != TULONG && type != TUSHORT  && type != TDBLCOMPLEX)
@@ -1187,6 +1221,22 @@ int ffiter(int n_cols,
           else
           {
               col[jj].null.charnull = (unsigned char) 255; /* use 255 as null */
+          }
+          break;
+
+         case TSBYTE:
+          cols[jj].array = calloc(ntodo + 1, sizeof(char));
+          col[jj].nullsize  = sizeof(char);  /* number of bytes per value */
+
+          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          {
+              tnull = minvalue(tnull, 127);
+              tnull = maxvalue(tnull, -128);
+              col[jj].null.scharnull = (signed char) tnull;
+          }
+          else
+          {
+              col[jj].null.scharnull = (signed char) -128; /* use -128  null */
           }
           break;
 

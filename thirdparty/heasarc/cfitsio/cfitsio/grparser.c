@@ -57,6 +57,13 @@
                 which keyword names can effectively be longer than 8 characters.
                 Example:
                 HIERARCH  LongKeywordName = 'value' / comment
+30-Jan-2003 Wm Pence, bugfix: ngp_read_xtension was testing for "ASCIITABLE" 
+                instead of "TABLE" as the XTENSION value of an ASCII table,
+                and it did not allow for optional trailing spaces in the
+                "IMAGE" or "TABLE" string. 
+16-Dec-2003 James Peachey: ngp_keyword_all_write was modified to apply
+                comments from the template file to the output file in
+                the case of reserved keywords (e.g. tform#, ttype# etcetera).
 */
 
 
@@ -217,6 +224,27 @@ int	ngp_strcasecmp(char *p1, char *p2)
       p1++;
       p2++;
     }
+ }
+
+int	ngp_strcasencmp(char *p1, char *p2, int n)
+ { char c1, c2;
+   int ii;
+
+   for (ii=0;ii<n;ii++)
+    {
+      c1 = *p1;
+      if ((c1 >= 'a') && (c1 <= 'z')) c1 += ('A' - 'a');
+
+      c2 = *p2;
+      if ((c2 >= 'a') && (c2 <= 'z')) c2 += ('A' - 'a');
+
+      if (c1 < c2) return(-1);
+      if (c1 > c2) return(1);
+      if (0 == c1) return(0);
+      p1++;
+      p2++;
+    }
+    return(0);
  }
 
 	/* read one line from file */
@@ -718,7 +746,8 @@ int	ngp_read_line(int ignore_blank_lines)
       ngp_linkey.name[NGP_MAX_NAME - 1] = 0;
 
       if (strlen(ngp_linkey.name) > FLEN_KEYWORD)  /* WDP: 20-Jun-2002:  mod to support HIERARCH */
-        { return(NGP_BAD_ARG);		/* cfitsio does not allow names > 8 chars */
+        { 
+           return(NGP_BAD_ARG);		/* cfitsio does not allow names > 8 chars */
         }
       
       return(NGP_OK);			/* we have valid non empty line, so return success */
@@ -781,7 +810,8 @@ int     ngp_keyword_all_write(NGP_HDU *ngph, fitsfile *ffp, int mode)
    r = NGP_OK;
    
    for (i=0; i<ngph->tokcnt; i++)
-    { if ((NGP_REALLY_ALL & mode) || (NGP_OK == ngp_keyword_is_write(&(ngph->tok[i]))))
+    { r = ngp_keyword_is_write(&(ngph->tok[i]));
+      if ((NGP_REALLY_ALL & mode) || (NGP_OK == r))
         { switch (ngph->tok[i].type)
            { case NGP_TTYPE_BOOL:
 			ib = ngph->tok[i].value.b;
@@ -816,8 +846,17 @@ int     ngp_keyword_all_write(NGP_HDU *ngph, fitsfile *ffp, int mode)
 			fits_write_record(ffp, buf, &r);
                         break;
            }
-          if (r) return(r);
         }
+      else if (NGP_BAD_ARG == r) /* enhancement 10 dec 2003, James Peachey: template comments replace defaults */
+        { r = NGP_OK;						/* update comments of special keywords like TFORM */
+          if (ngph->tok[i].comment && *ngph->tok[i].comment)	/* do not update with a blank comment */
+            { fits_modify_comment(ffp, ngph->tok[i].name, ngph->tok[i].comment, &r);
+            }
+        }
+      else /* other problem, typically a blank token */
+        { r = NGP_OK;						/* skip this token, but continue */
+        }
+      if (r) return(r);
     }
      
    fits_set_hdustruc(ffp, &r);				/* resync cfitsio */
@@ -1007,9 +1046,9 @@ int	ngp_read_xtension(fitsfile *ff, int parent_hn, int simple_mode)
        for (i=0; i<ngph.tokcnt; i++)
         { if (!strcmp("XTENSION", ngph.tok[i].name))
             { if (NGP_TTYPE_STRING == ngph.tok[i].type)
-                { if (!ngp_strcasecmp("BINTABLE", ngph.tok[i].value.s)) ngph_node_type = NGP_NODE_BTABLE;
-                  if (!ngp_strcasecmp("ASCIITABLE", ngph.tok[i].value.s)) ngph_node_type = NGP_NODE_ATABLE;
-                  if (!ngp_strcasecmp("IMAGE", ngph.tok[i].value.s)) ngph_node_type = NGP_NODE_IMAGE;
+                { if (!ngp_strcasencmp("BINTABLE", ngph.tok[i].value.s,8)) ngph_node_type = NGP_NODE_BTABLE;
+                  if (!ngp_strcasencmp("TABLE", ngph.tok[i].value.s,5)) ngph_node_type = NGP_NODE_ATABLE;
+                  if (!ngp_strcasencmp("IMAGE", ngph.tok[i].value.s,5)) ngph_node_type = NGP_NODE_IMAGE;
                 }
             }
           else if (!strcmp("SIMPLE", ngph.tok[i].name))

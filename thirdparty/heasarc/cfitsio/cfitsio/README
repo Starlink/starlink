@@ -131,11 +131,11 @@ CFITSIO has currently been tested on the following platforms:
    Linux                      gcc
    MkLinux                    DR3
    Windows 95/98/NT           Borland C++ V4.5
-   Windows 95/98/NT           Microsoft/Compaq Visual C++ v5.0, v6.0
+   Windows 95/98/NT/ME/XP     Microsoft/Compaq Visual C++ v5.0, v6.0
    Windows 95/98/NT           Cygwin gcc
    OS/2                       gcc + EMX
-   MacOS 7.1 or greater       Metrowerks 10.+
-   MacOS-X 10.1 or greater    cc (gcc)
+   Mac OS 7.1 or greater      Metrowerks 10.+
+   Mac OS-X 10.1 or greater   cc (gcc)
 
 CFITSIO will probably run on most other Unix platforms without
 modification.  Cray supercomputers and IBM mainframe computers are

@@ -438,13 +438,10 @@ CFARGT14(NCF,DCF,ABSOFT_cf2(VOID),FITSUNIT,INT,PLONG,PINT,PSTRINGV,PSTRINGV,PSTR
     /*   problem if ttype, tform, and tunit are declared with fewer          */
     /*   elements than the actual number of columns.                         */
 
-#if defined(DECFortran) || (defined(__alpha) && defined(g77Fortran)) \
-    || (defined(mipsFortran) && _MIPS_SZLONG==64) \
-    || (defined(IBMR2Fortran) && defined(__64BIT__)) \
-    || (defined (g77Fortran) && defined(__ia64__)) \
-    ||  defined (__sparcv9)
-    /*   If running under DECFortran, we also need to worry about the length */
-    /*   of the long naxes array.  So read NAXIS manually. :(                */
+#if defined(LONG8BYTES_INT4BYTES)
+
+    /*  On platforms with 8-byte longs, we also need to worry about the */
+    /*  length of the long naxes array.  So read NAXIS manually. :(     */
 
 void Cffgprh( fitsfile *fptr, int *simple, int *bitpix, int *naxis, int naxes[],
              long *pcount, long *gcount, int *extend, int *status );
@@ -637,6 +634,7 @@ FCALLSCSUB3(ffghdt,FTGHDT,ftghdt,FITSUNIT,PINT,PINT)
 FCALLSCSUB5(ffghad,FTGHAD,ftghad,FITSUNIT,PLONG,PLONG,PLONG,PINT)
 
 FCALLSCSUB3(ffgidt,FTGIDT,ftgidt,FITSUNIT,PINT,PINT)
+FCALLSCSUB3(ffgiet,FTGIET,ftgiet,FITSUNIT,PINT,PINT)
 FCALLSCSUB3(ffgidm,FTGIDM,ftgidm,FITSUNIT,PINT,PINT)
 
 #define ftgisz_LONGV_A3 A2
@@ -752,6 +750,7 @@ FCALLSCSUB3(ffgncl,FTGNCL,ftgncl,FITSUNIT,PINT,PINT)
 FCALLSCSUB4(ffgcdw,FTGCDW,ftgcdw,FITSUNIT,INT,PINT,PINT)
 
 FCALLSCSUB6(ffgtcl,FTGTCL,ftgtcl,FITSUNIT,INT,PINT,PLONG,PLONG,PINT)
+FCALLSCSUB6(ffeqty,FTEQTY,fteqty,FITSUNIT,INT,PINT,PLONG,PLONG,PINT)
 FCALLSCSUB11(ffgacl,FTGACL,ftgacl,FITSUNIT,INT,PSTRING,PLONG,PSTRING,PSTRING,PDOUBLE,PDOUBLE,PSTRING,PSTRING,PINT)
 FCALLSCSUB11(ffgbcl,FTGBCL,ftgbcl,FITSUNIT,INT,PSTRING,PSTRING,PSTRING,PLONG,PDOUBLE,PDOUBLE,PLONG,PSTRING,PINT)
 FCALLSCSUB3(ffgrsz,FTGRSZ,ftgrsz,FITSUNIT,PLONG,PINT)

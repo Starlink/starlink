@@ -656,6 +656,11 @@ int imcomp_compress_tile (fitsfile *outfptr,
           for (ii = 0; ii < tilelen; ii++)
             idata[ii] = ((unsigned char *)tiledata)[ii];
         }
+        else if (datatype == TSBYTE)
+        {
+          for (ii = 0; ii < tilelen; ii++)
+            idata[ii] = ((signed char *)tiledata)[ii];
+        }
         else if (datatype == TFLOAT)
         {
           /* if the tile-compressed table contains zscale and zzero columns */
@@ -885,7 +890,7 @@ int fits_write_compressed_img(fitsfile *fptr,   /* I - FITS file pointer     */
        buffer =  calloc ((fptr->Fptr)->maxtilelen, sizeof (unsigned long));
        pixlen = sizeof(long);
     }
-    else if (datatype == TBYTE)
+    else if (datatype == TBYTE || datatype == TSBYTE)
     {
        buffer =  calloc ((fptr->Fptr)->maxtilelen, sizeof (char));
        pixlen = 1;
@@ -1481,7 +1486,7 @@ int fits_read_compressed_img(fitsfile *fptr,   /* I - FITS file pointer      */
        buffer =  calloc ((fptr->Fptr)->maxtilelen, sizeof (unsigned long));
        pixlen = sizeof(long);
     }
-    else if (datatype == TBYTE)
+    else if (datatype == TBYTE || datatype == TSBYTE)
     {
        buffer =  calloc ((fptr->Fptr)->maxtilelen, sizeof (char));
        pixlen = 1;
@@ -2490,6 +2495,12 @@ int imcomp_decompress_tile (fitsfile *infptr,
         fffi4i1(idata, tilelen, bscale, bzero, nullcheck, tnull,
          *(unsigned char *) nulval, bnullarray, anynul,
           (unsigned char *) buffer, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+        fffi4s1(idata, tilelen, bscale, bzero, nullcheck, tnull,
+         *(signed char *) nulval, bnullarray, anynul,
+          (signed char *) buffer, status);
     }
     else if (datatype == TUSHORT)
     {

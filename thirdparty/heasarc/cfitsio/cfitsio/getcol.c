@@ -63,6 +63,15 @@ int ffgpxv( fitsfile *fptr,   /* I - FITS file pointer                       */
         ffgpvb(fptr, 1, firstelem, nelem, *(unsigned char *) nulval,
                (unsigned char *) array, anynul, status);
     }
+    else if (datatype == TSBYTE)
+    {
+      if (nulval == 0)
+        ffgpvsb(fptr, 1, firstelem, nelem, 0,
+               (signed char *) array, anynul, status);
+      else
+        ffgpvsb(fptr, 1, firstelem, nelem, *(signed char *) nulval,
+               (signed char *) array, anynul, status);
+    }
     else if (datatype == TUSHORT)
     {
       if (nulval == 0)
@@ -201,6 +210,11 @@ int ffgpxf( fitsfile *fptr,   /* I - FITS file pointer                       */
         ffgpfb(fptr, 1, firstelem, nelem, 
                (unsigned char *) array, nullarray, anynul, status);
     }
+    else if (datatype == TSBYTE)
+    {
+        ffgpfsb(fptr, 1, firstelem, nelem, 
+               (signed char *) array, nullarray, anynul, status);
+    }
     else if (datatype == TUSHORT)
     {
         ffgpfui(fptr, 1, firstelem, nelem, 
@@ -289,6 +303,15 @@ int ffgsv(  fitsfile *fptr,   /* I - FITS file pointer                       */
       else
         ffgsvb(fptr, 1, naxis, naxes, blc, trc, inc, *(unsigned char *) nulval,
                (unsigned char *) array, anynul, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      if (nulval == 0)
+        ffgsvsb(fptr, 1, naxis, naxes, blc, trc, inc, 0,
+               (signed char *) array, anynul, status);
+      else
+        ffgsvsb(fptr, 1, naxis, naxes, blc, trc, inc, *(signed char *) nulval,
+               (signed char *) array, anynul, status);
     }
     else if (datatype == TUSHORT)
     {
@@ -415,6 +438,15 @@ int ffgpv(  fitsfile *fptr,   /* I - FITS file pointer                       */
         ffgpvb(fptr, 1, firstelem, nelem, *(unsigned char *) nulval,
                (unsigned char *) array, anynul, status);
     }
+    else if (datatype == TSBYTE)
+    {
+      if (nulval == 0)
+        ffgpvsb(fptr, 1, firstelem, nelem, 0,
+               (signed char *) array, anynul, status);
+      else
+        ffgpvsb(fptr, 1, firstelem, nelem, *(signed char *) nulval,
+               (signed char *) array, anynul, status);
+    }
     else if (datatype == TUSHORT)
     {
       if (nulval == 0)
@@ -537,6 +569,11 @@ int ffgpf(  fitsfile *fptr,   /* I - FITS file pointer                       */
         ffgpfb(fptr, 1, firstelem, nelem, 
                (unsigned char *) array, nullarray, anynul, status);
     }
+    else if (datatype == TSBYTE)
+    {
+        ffgpfsb(fptr, 1, firstelem, nelem, 
+               (signed char *) array, nullarray, anynul, status);
+    }
     else if (datatype == TUSHORT)
     {
         ffgpfui(fptr, 1, firstelem, nelem, 
@@ -625,6 +662,15 @@ int ffgcv(  fitsfile *fptr,   /* I - FITS file pointer                       */
       else
        ffgclb(fptr, colnum, firstrow, firstelem, nelem, 1, 1, *(unsigned char *)
               nulval, (unsigned char *) array, cdummy, anynul, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      if (nulval == 0)
+        ffgclsb(fptr, colnum, firstrow, firstelem, nelem, 1, 1, 0,
+              (signed char *) array, cdummy, anynul, status);
+      else
+       ffgclsb(fptr, colnum, firstrow, firstelem, nelem, 1, 1, *(signed char *)
+              nulval, (signed char *) array, cdummy, anynul, status);
     }
     else if (datatype == TUSHORT)
     {
@@ -790,6 +836,11 @@ int ffgcf(  fitsfile *fptr,   /* I - FITS file pointer                       */
     {
        ffgclb(fptr, colnum, firstrow, firstelem, nelem, 1, 2, *(unsigned char *)
               nulval, (unsigned char *) array, nullarray, anynul, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+       ffgclsb(fptr, colnum, firstrow, firstelem, nelem, 1, 2, *(signed char *)
+              nulval, (signed char *) array, nullarray, anynul, status);
     }
     else if (datatype == TUSHORT)
     {

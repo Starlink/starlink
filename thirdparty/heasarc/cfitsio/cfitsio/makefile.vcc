@@ -59,6 +59,7 @@ CLEAN :
 	-@erase "$(INTDIR)\f77_wrap4.obj"
 	-@erase "$(INTDIR)\getcol.obj"
 	-@erase "$(INTDIR)\getcolb.obj"
+	-@erase "$(INTDIR)\getcolsb.obj"
 	-@erase "$(INTDIR)\getcold.obj"
 	-@erase "$(INTDIR)\getcole.obj"
 	-@erase "$(INTDIR)\getcoli.obj"
@@ -74,10 +75,10 @@ CLEAN :
 	-@erase "$(INTDIR)\grparser.obj"
 	-@erase "$(INTDIR)\histo.obj"
 	-@erase "$(INTDIR)\iraffits.obj"
-	-@erase "$(INTDIR)\listhead.obj"
 	-@erase "$(INTDIR)\modkey.obj"
 	-@erase "$(INTDIR)\putcol.obj"
 	-@erase "$(INTDIR)\putcolb.obj"
+	-@erase "$(INTDIR)\putcolsb.obj"
 	-@erase "$(INTDIR)\putcold.obj"
 	-@erase "$(INTDIR)\putcole.obj"
 	-@erase "$(INTDIR)\putcoli.obj"
@@ -98,6 +99,7 @@ CLEAN :
 	-@erase "$(INTDIR)\quantize.obj"
 	-@erase "$(INTDIR)\pliocomp.obj"
 	-@erase "$(INTDIR)\vc60.idb"
+	-@erase "$(INTDIR)\wcssub.obj"
 	-@erase "$(INTDIR)\wcsutil.obj"
 	-@erase "$(OUTDIR)\cfitsio.dll"
 	-@erase "$(OUTDIR)\cfitsio.exp"
@@ -137,6 +139,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\f77_wrap4.obj" \
 	"$(INTDIR)\getcol.obj" \
 	"$(INTDIR)\getcolb.obj" \
+	"$(INTDIR)\getcolsb.obj" \
 	"$(INTDIR)\getcold.obj" \
 	"$(INTDIR)\getcole.obj" \
 	"$(INTDIR)\getcoli.obj" \
@@ -152,10 +155,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\grparser.obj" \
 	"$(INTDIR)\histo.obj" \
 	"$(INTDIR)\iraffits.obj" \
-	"$(INTDIR)\listhead.obj" \
 	"$(INTDIR)\modkey.obj" \
 	"$(INTDIR)\putcol.obj" \
 	"$(INTDIR)\putcolb.obj" \
+	"$(INTDIR)\putcolsb.obj" \
 	"$(INTDIR)\putcold.obj" \
 	"$(INTDIR)\putcole.obj" \
 	"$(INTDIR)\putcoli.obj" \
@@ -175,6 +178,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ricecomp.obj" \
 	"$(INTDIR)\quantize.obj" \
 	"$(INTDIR)\pliocomp.obj" \
+	"$(INTDIR)\wcssub.obj"  \
 	"$(INTDIR)\wcsutil.obj" 
 
 "$(OUTDIR)\cfitsio.dll" : $(LINK32_OBJS) WINDUMP
@@ -213,6 +217,7 @@ CLEAN :
 	-@erase "$(INTDIR)\f77_wrap4.obj"
 	-@erase "$(INTDIR)\getcol.obj"
 	-@erase "$(INTDIR)\getcolb.obj"
+	-@erase "$(INTDIR)\getcolsb.obj"
 	-@erase "$(INTDIR)\getcold.obj"
 	-@erase "$(INTDIR)\getcole.obj"
 	-@erase "$(INTDIR)\getcoli.obj"
@@ -228,10 +233,10 @@ CLEAN :
 	-@erase "$(INTDIR)\grparser.obj"
 	-@erase "$(INTDIR)\histo.obj"
 	-@erase "$(INTDIR)\iraffits.obj"
-	-@erase "$(INTDIR)\listhead.obj"
 	-@erase "$(INTDIR)\modkey.obj"
 	-@erase "$(INTDIR)\putcol.obj"
 	-@erase "$(INTDIR)\putcolb.obj"
+	-@erase "$(INTDIR)\putcolsb.obj"
 	-@erase "$(INTDIR)\putcold.obj"
 	-@erase "$(INTDIR)\putcole.obj"
 	-@erase "$(INTDIR)\putcoli.obj"
@@ -249,6 +254,7 @@ CLEAN :
 	-@erase "$(INTDIR)\swapproc.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
+	-@erase "$(INTDIR)\wcssub.obj"
 	-@erase "$(INTDIR)\wcsutil.obj"
 	-@erase "$(INTDIR)\imcompress.obj"
 	-@erase "$(INTDIR)\ricecomp.obj"
@@ -294,6 +300,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\f77_wrap4.obj" \
 	"$(INTDIR)\getcol.obj" \
 	"$(INTDIR)\getcolb.obj" \
+	"$(INTDIR)\getcolsb.obj" \
 	"$(INTDIR)\getcold.obj" \
 	"$(INTDIR)\getcole.obj" \
 	"$(INTDIR)\getcoli.obj" \
@@ -309,10 +316,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\grparser.obj" \
 	"$(INTDIR)\histo.obj" \
 	"$(INTDIR)\iraffits.obj" \
-	"$(INTDIR)\listhead.obj" \
 	"$(INTDIR)\modkey.obj" \
 	"$(INTDIR)\putcol.obj" \
 	"$(INTDIR)\putcolb.obj" \
+	"$(INTDIR)\putcolsb.obj" \
 	"$(INTDIR)\putcold.obj" \
 	"$(INTDIR)\putcole.obj" \
 	"$(INTDIR)\putcoli.obj" \
@@ -328,6 +335,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\region.obj" \
 	"$(INTDIR)\scalnull.obj" \
 	"$(INTDIR)\swapproc.obj" \
+	"$(INTDIR)\wcssub.obj" \
 	"$(INTDIR)\wcsutil.obj" \
 	"$(INTDIR)\imcompress.obj" \
 	"$(INTDIR)\ricecomp.obj" \
@@ -474,6 +482,11 @@ SOURCE=.\getcolb.c
 "$(INTDIR)\getcolb.obj" : $(SOURCE) "$(INTDIR)"
 
 
+SOURCE=.\getcolsb.c
+
+"$(INTDIR)\getcolsb.obj" : $(SOURCE) "$(INTDIR)"
+
+
 SOURCE=.\getcold.c
 
 "$(INTDIR)\getcold.obj" : $(SOURCE) "$(INTDIR)"
@@ -549,11 +562,6 @@ SOURCE=.\iraffits.c
 "$(INTDIR)\iraffits.obj" : $(SOURCE) "$(INTDIR)"
 
 
-SOURCE=.\listhead.c
-
-"$(INTDIR)\listhead.obj" : $(SOURCE) "$(INTDIR)"
-
-
 SOURCE=.\modkey.c
 
 "$(INTDIR)\modkey.obj" : $(SOURCE) "$(INTDIR)"
@@ -567,6 +575,11 @@ SOURCE=.\putcol.c
 SOURCE=.\putcolb.c
 
 "$(INTDIR)\putcolb.obj" : $(SOURCE) "$(INTDIR)"
+
+
+SOURCE=.\putcolsb.c
+
+"$(INTDIR)\putcolsb.obj" : $(SOURCE) "$(INTDIR)"
 
 
 SOURCE=.\putcold.c
@@ -643,6 +656,10 @@ SOURCE=.\swapproc.c
 
 "$(INTDIR)\swapproc.obj" : $(SOURCE) "$(INTDIR)"
 
+
+SOURCE=.\wcssub.c
+
+"$(INTDIR)\wcssub.obj" : $(SOURCE) "$(INTDIR)"
 
 SOURCE=.\wcsutil.c
 

@@ -69,14 +69,21 @@ int ffcpfl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
 
     if (following && (*status <= 0) ) { /* copy any remaining HDUs */
         ii = hdunum + 1;
-        while ( !ffmahd(infptr, ii, NULL, status) ) {
-            ffcopy(infptr, outfptr, 0, status);
+        while (1)
+        { 
+            if (ffmahd(infptr, ii, NULL, status) ) {
+                 /* reset expected end of file status */
+                 if (*status == END_OF_FILE)
+                    *status = 0;
+                 break;
+            }
+
+            if (ffcopy(infptr, outfptr, 0, status))
+                 break;  /* quit on unexpected error */
+
             ii++;
         }
     }
-
-    if (*status == END_OF_FILE)
-        *status = 0;  /* reset expected end of file status */
 
     ffmahd(infptr, hdunum, NULL, status);  /* restore initial position */
     return(*status);

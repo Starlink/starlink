@@ -409,7 +409,7 @@ int main()
     printf("The 1st, and every 4th pixel should be undefined:\n");
 
     anynull = 0;
-    ffgpvb(fptr, 1,  1, 10, 99, binarray, &anynull, &status);
+    ffgpvb(fptr, 1,  1, 10, 99, binarray, &anynull, &status); 
 
     ffgpvb(fptr, 1, 11, 10, 99, &binarray[10], &anynull, &status);
 

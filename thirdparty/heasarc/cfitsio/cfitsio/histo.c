@@ -667,7 +667,10 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
         return(*status = BAD_DATATYPE);
       }
 
-      datatype = colptr->tdatatype;
+      /* get the datatype of the column */
+      fits_get_coltype(*fptr, histData.hcolnum[ii], &datatype,
+         NULL, NULL, status);
+
       if (datatype < 0 || datatype == TSTRING)
       {
         strcpy(errmsg, "Inappropriate datatype; can't bin this column: ");

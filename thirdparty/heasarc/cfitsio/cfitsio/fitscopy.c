@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
     fitsfile *infptr, *outfptr;   /* FITS file pointers defined in fitsio.h */
-    int status = 0, ii = 1;       /* status must always be initialized = 0  */
+    int status = 0;       /* status must always be initialized = 0  */
 
     if (argc != 3)
     {
@@ -46,12 +46,9 @@ int main(int argc, char *argv[])
       /* Create the output file */
       if ( !fits_create_file(&outfptr, argv[2], &status) )
       {
-        /* Copy every HDU until we get an error */
-        while( !fits_movabs_hdu(infptr, ii++, NULL, &status) )
-          fits_copy_hdu(infptr, outfptr, 0, &status);
  
-        /* Reset status after normal error */
-        if (status == END_OF_FILE) status = 0;
+        /* copy the previous, current, and following HDUs */
+        fits_copy_file(infptr, outfptr, 1, 1, 1, &status);
 
         fits_close_file(outfptr,  &status);
       }

@@ -1,6 +1,222 @@
 
                    Log of Changes Made to CFITSIO
 
+Version 2.490 -  11 February 2004
+
+  Bug fixes:
+
+  - fixed a bug that was introduced in the previous release, which caused
+    the CFITSIO parser to no longer move to a named extension when opening
+    a FITS file, e.g., when opening myfile.fit[events] CFITSIO would just
+    open the primary array instead of moving to the EVENTS extension.
+
+  - new group.c file from the INTEGRAL Science Data Center.  It fixes
+    a problem when you attach a child to a parent and they are both
+    is the same file, but, that parent contains groups in other files.
+    In certain cases the attach would not happen because it seemed that
+    the new child was already in the parent group.
+
+  - fixed bug in fits_calculator_rng when performing a calculation
+    on a range of rows in a table, so that it does not reset the
+    value in all the other rows that are not in the range = 0.
+
+  - modified fits_write_chksum so that it updates the TFORMn 
+    keywords for any variable length vector table columns BEFORE 
+    calculating the CHECKSUM values.  Otherwise the CHECKSUM
+    value is invalidated when the HDU is subsequently closed.
+
+Version 2.480 - 28 January 2004
+
+  New Routines:
+
+  - fits_get_img_equivtype - just like fits_get_img_type, except in
+    the case of scaled integer images, it returns the 'equivalent' 
+    data type that is necessary to store the scaled data values.  
+
+  - fits_hdr2str copies all the header keywords in the current HDU
+    into a single long character string.  This is a convenient method
+    of passing the header information to other subroutines.
+    The user may exclude any specified keywords from the list.
+
+  Enhancements:
+
+  - modified the filename parser so that it accepts extension
+    names that begin with digits, as in 'myfile.fits[123TEST]'.
+    In this case CFITSIO will try to open the extension with
+    EXTNAME = '123TEST' instead of trying to move to the 123rd
+    extension in the file.
+
+  - the template keyword parser now preserves the comments on the
+    the mandatory FITS keywords if present, otherwise a standard
+    default comment is provided.
+
+  - modified the ftp driver file (drvrnet.c) to overcome a timeout
+    or hangup problem caused by some firewall software at the user's
+    end (Thanks to Bruce O'Neel for this fix).
+
+  - modified iraffits.c to incorporate Doug Mink's latest changes to
+    his wcstools library routines.  The biggest change is that now
+    the actual image dimensions, rather than the physically stored
+    dimensions, are used when converting an IRAF file to FITS.
+
+  Bug fixes:
+
+  - when writing to ASCII FITS tables, the 'elemnum' parameter was
+    supposed to be ignored if it did not have the default value of 1.
+    In some cases however setting elemnum to a value other than 1 
+    could cause the wrong number of rows to be produced in the output
+    table.
+
+  - If a cfitsio calculator expression was imported from a text file
+    (e.g. using the extended filename syntax 'file.fits[col @file.calc]')
+    and if any individual lines in that text file were greater than 
+    255 characters long, then a space character would be inserted
+    after the 255th character.  This could corrupt the line if the space
+    was inserted within a column name or keyword name token.
+
+Version 2.480beta  (used in the FTOOLS 5.3 release, 1 Nov 2003)
+
+  New Routines:
+
+  - fits_get_eqcoltype - just like fits_get_coltype, except in the
+    case of scaled integer columns, it returns the 'equivalent' 
+    data type that is necessary to store the scaled data values.  
+
+  - fits_split_names - splits an input string containing a comma or
+    space delimited list of names (typically file names or column
+    names) into individual name tokens.
+
+  Enhancements:
+
+  - changed fhist in histo.c so that it can make histograms of ASCII
+    table columns as well as binary table columns (as long as they
+    contain numeric data).
+
+  Bug fixes:
+
+  - removed an erroneous reference to listhead.c in makefile.vcc, that is
+    used to build the cfitsio dll under Windows.  This caused a 'main'
+    routine to be added to the library, which causes problems when linking
+    fortran programs to cfitsio under windows.
+
+  - if an error occurs when opening for a 2nd time (with ffopen) a file that
+    is already open (e.g., the specified extension doesn't exist), and
+    if the file had been modified before attempting to reopen it, then
+    the modified buffers may not get written to disk and the internal
+    state of the file may become corrupted.  ffclos was modified to
+    always set status=0 before calling ffflsh if the file has been 
+    concurrently opened more than once.
+
+Version 2.470 - 18 August 2003
+
+  Enhancements:
+
+  - defined 'TSBYTE' to represent the 'signed char' datatype (similar to
+    'TBYTE' that represents the 'unsigned char' datatype) and added
+    support for this datatype to all the routines that read or write
+    data to a FITS image or table.   This was implemented by adding 2
+    new C source code files to the package: getcolsb.c and putcolsb.c.
+
+  - Defined a new '1S' shorthand data code for a signed byted column in
+    a binary table.  CFITSIO will write TFORMn = '1B' and
+    TZEROn = -128 in this case, which is the convention used to
+    store signed byte values in a 'B' type column.
+
+  - in fitsio2.h, added test of whether  `__x86_64__` is defined, to 
+    support the new AMD Opteron 64-bit processor
+
+  - modified configure to not use the -fast compiler flag on Solaris
+    platforms when using the proprietary Solaris cc compilar.  This
+    flag causes compilation problems in eval_y.c (compiler just
+    hangs forever).
+
+  Bug fixes:
+
+  - In the special case of writing 0 elements to a vector table colum
+    that contains 0 rows, ffgcpr no longer adds a blank row to the table.
+    
+  - added error checking code for cases where a ASCII string column
+    in a binary table is greater than 28800 characters wide, to avoid
+    going into an infinite loop.
+
+  - the fits_get_col_display_width routine was incorrectly returning
+    width = 0 for a 'A' binary table column that did not have an 
+    explicit vector length character.
+
+Version 2.460 - 20 May 2003
+
+  Enhancements:
+
+  - modified the HTTP driver in drvrnet.c so that CFITSIO can read
+    FITS files via a proxy HTTP server.  (This code was contributed by
+    Philippe Prugniel, Obs. de Lyon).  To use this feature, the 
+    'http_proxy' environment variable must be defined with the
+    address (URL) and port number of the proxy server, i.e.,
+      > setenv http_proxy http://heasarc.gsfc.nasa.gov:3128
+    will use port 3128 on heasarc.gsfc.nasa.gov
+
+  - suppressed some compiler warnings by casting a variable of 
+    type 'size_t' to type 'int' in fftkey (in fitscore.c) and
+    iraftofits and irafrdimge (in iraffits.c).
+
+Version 2.450 - 30 April 2003
+
+  Enhancements:
+
+  - modified the WCS keyword reading routine (ffgics) to support cases
+    where some of the CDi_j keywords are omitted (with an assumed 
+    value = 0).
+
+  - Made a change to http_open_network in drvrnet.c to add a 'Host: '
+    string to the open request.  This is required by newer HTTP 1.1
+    servers (so-called virtual servers).
+
+  - modified ffgcll (read logical table column) to return the illegal
+    character value itself if the FITS file contains a logical value that is
+    not equal to T, F or zero.  Previously it treated this case the
+    same as if the FITS file value was = 0.
+
+  - modified fits_movnam_hdu (ffmnhd) so that it will move to a tile-
+    compressed image (that is stored in a binary table) if the input
+    desired HDU type is BINARY_TBL as well as if the HDU type = IMAGE_HDU.
+
+  Bug fixes:
+
+  - in the routine that checks the data fill bytes (ffcdfl), the call
+    to ffmbyt should not ignore an EOF error when trying to read the bytes.
+    This is a little-used routine that is not called by any other CFITSIO
+    routine.
+
+  - fits_copy_file was not reporting an error if it hit the End Of File
+    while copying the last extension in the input file to the output file.
+
+  - fixed inconsistencies in the virtual file column filter parser
+    (ffedit_columns) to properly support expressions which create or
+    modify a keyword, instead of a column.  Previously it was only possible
+    to modify keywords in a table extension (not an image), and the 
+    keyword filtering could cause some of the table columns to not
+    get propogated into the virtual file.  Also, spaces are now
+    allowed within the specified keyword comment field.
+
+  - ffdtyp was incorrectly returning the data type of FITS keyword
+    values of the form '1E-09' (i.e., an exponential value without
+    a decimal point) as integer rather than floating point.
+
+  - The enhancement in the previous 2.440 release to allow more files to be
+    opened at one time introduced a bug: if ffclos is called with
+    a non-zero status value, then any subsequent call to ffopen will likely
+    cause a segmentation fault.  The fits_clear_Fptr routine was modified
+    to fix this.
+
+  - rearranged the order of some computations in fits_resize_img so as
+    to not exceed the range of a 32-bit integer when dealing with 
+    large images.
+
+  - the template parser routine, ngp_read_xtension, was testing for
+    "ASCIITABLE" instead of "TABLE" as the XTENSION value of an ASCII
+    table, and it did not allow for optional trailing spaces in the IMAGE"
+    or "TABLE" string value.
+
 Version 2.440 - 8 January 2003
 
   Enhancements:
@@ -121,7 +337,7 @@ Version 2.420 - 19 July 2002
 
   - several small changes to group.c to suppress compiler warnings.
 
-Version 2.410 - 22 April 2002
+Version 2.410 - 22 April 2002 (used in the FTOOLS 5.2 release)
 
   New Routines:
 
@@ -1245,7 +1461,7 @@ Version 2.031 - 31 Mar 1999
      keyword (number of rows in the table) to not be updated.
 
    - fixed bug (introduced in version 2.030) when writing null values
-     to a primary array or image extention.  If trying to set more
+     to a primary array or image extension.  If trying to set more
      than 1 pixel to null at a time, then typically only 1 null would
      be written.  Also fixed related bug when writing null values to
      rows in a table that are beyond the currently defined size of the
@@ -2145,7 +2361,7 @@ Version 1.04 - 17 Sept 1996
      to support the Mac platforms.
 
    - fixed bug in ffpdfl that caused an EOF error (107) when a program
-     creates a new extention that is an exact multiple of 2880 bytes long,
+     creates a new extension that is an exact multiple of 2880 bytes long,
      AND the program does not write a value to the last element
      in the table or image.
 

@@ -21,6 +21,7 @@ $ cc f77_wrap3.c
 $ cc f77_wrap4.c
 $ cc getcol.c
 $ cc getcolb.c
+$ cc getcolsb.c
 $ cc getcoli.c
 $ cc getcolj.c
 $ cc getcolui.c
@@ -39,6 +40,7 @@ $ cc iraffits.c
 $ cc modkey.c
 $ cc putcol.c
 $ cc putcolb.c
+$ cc putcolsb.c
 $ cc putcoli.c
 $ cc putcolj.c
 $ cc putcolk.c
@@ -64,9 +66,9 @@ $ lib/create cfitsio buffers,cfileio,checksum,compress,drvrfile,drvrmem
 $ lib/insert cfitsio editcol,edithdu,eval_f,eval_l,eval_y
 $ lib/insert cfitsio f77_wrap1,f77_wrap2,f77_wrap3,f77_wrap4
 $ lib/insert cfitsio fitscore,getcol,getcolb,getcoli,getcolj,getcolk,getcole
-$ lib/insert cfitsio getcold,getcoll,getcols,getcolui,getcoluj,getcoluk
+$ lib/insert cfitsio getcold,getcoll,getcols,getcolui,getcoluj,getcoluk,getcolsb
 $ lib/insert cfitsio getkey,group,grparser,histo,iraffits,modkey,putcol,putcolb
-$ lib/insert cfitsio putcoli,putcolj,putcolk,putcole,putcold,putcolui
+$ lib/insert cfitsio putcoli,putcolj,putcolk,putcole,putcold,putcolui,putcolsb
 $ lib/insert cfitsio putcoluj,putcoluk,putcols,putcoll,putcolu,putkey,region
 $ lib/insert cfitsio scalnull,swapproc,wcsutil,wcssub
 $ lib/insert cfitsio imcompress,quantize,ricecomp,pliocomp

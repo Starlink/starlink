@@ -101,7 +101,7 @@ int ffgcll( fitsfile *fptr,   /* I - FITS file pointer                       */
     char tform[20];
     char message[FLEN_ERRMSG];
     char snull[20];   /*  the FITS null value  */
-    unsigned char buffer[DBUFFSIZE];
+    unsigned char buffer[DBUFFSIZE], *buffptr;
 
     if (*status > 0 || nelem == 0)  /* inherit input status value if > 0 */
         return(*status);
@@ -153,13 +153,15 @@ int ffgcll( fitsfile *fptr,   /* I - FITS file pointer                       */
 
       ffgi1b(fptr, readptr, ntodo, incre, buffer, status);
 
-      for (ii = 0; ii < ntodo; ii++, next++) /* convert from T or F to 1 or 0 */
+      /* convert from T or F to 1 or 0 */
+      buffptr = buffer;
+      for (ii = 0; ii < ntodo; ii++, next++, buffptr++)
       {
-        if (buffer[ii] == 'T')
+        if (*buffptr == 'T')
           array[next] = 1;
-        else if (buffer[ii] =='F') 
+        else if (*buffptr =='F') 
           array[next] = 0;
-        else
+        else if (*buffptr == 0)
         {
           array[next] = nulval;  /* set null values to input nulval */
           if (anynul)
@@ -167,8 +169,12 @@ int ffgcll( fitsfile *fptr,   /* I - FITS file pointer                       */
 
           if (nulcheck == 2)
           {
-            nularray[next] = 1;    /* set flags */
+            nularray[next] = 1;  /* set null flags */
           }
+        }
+        else  /* some other illegal character; return the char value */
+        {
+          array[next] = (char) *buffptr;
         }
       }
 

@@ -10,6 +10,19 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(fitscore.c)
 
 #--------------------------------------------------------------------
+# Command options
+#--------------------------------------------------------------------
+
+AC_ARG_ENABLE(
+  hera,
+  [ --enable-hera Build for HERA project (for LHEA use only) ],
+  [ if test $enableval = yes; then BUILD_HERA=yes; fi ]
+)
+if test "x$BUILD_HERA" = xyes; then
+  AC_DEFINE(BUILD_HERA)
+fi
+
+#--------------------------------------------------------------------
 # Check for install location prefix
 #--------------------------------------------------------------------
 
@@ -173,6 +186,13 @@ case $CC in
 		CFLAGS=`echo $CFLAGS | sed -e "s/-g/-O/"`
 		case $system in
 		    SunOS-5*)
+			changequote(,)
+			if test `echo $CFLAGS | grep -c fast` -gt 0
+			then
+			   echo "cfitsio: Replacing -fast with -O3"
+			   CFLAGS=`echo $CFLAGS | sed 's:-fast:-O3:'`
+			fi
+			changequote([,])
          		CFLAGS="$CFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS"
 			;;
 		    *)
@@ -192,6 +212,10 @@ SHLIB_LD=:
 SHLIB_SUFFIX=".so"
 lhea_shlib_cflags=
 case $EXT in
+  cygwin)
+    SHLIB_LD="$CC -shared"
+    SHLIB_SUFFIX=".dll"
+    ;;
   darwin)
     SHLIB_LD="cc -dynamiclib"
     SHLIB_SUFFIX=".dylib"
@@ -201,7 +225,7 @@ case $EXT in
     SHLIB_LD="ld -b" 
     SHLIB_SUFFIX=".sl"
     ;;
-  lnx|cygwin)
+  lnx)
     SHLIB_LD=":"
     ;;
   osf)
@@ -221,7 +245,7 @@ case $EXT in
 esac
 # Darwin uses gcc (=cc), but needs different flags (see above)
 # if test "x$GCC" = xyes; then
-if test "x$GCC" = xyes && test "x$EXT" != xdarwin; then
+if test "x$GCC" = xyes && test "x$EXT" != xdarwin && test "x$EXT" != xcygwin; then
   SHLIB_LD="$CC -shared"
   lhea_shlib_cflags='-fPIC'
 fi

@@ -1,5 +1,5 @@
 /*  This file, getcolb.c, contains routines that read data elements from   */
-/*  a FITS image or table, with char (byte) data type.                     */
+/*  a FITS image or table, with unsigned char (unsigned byte) data type.   */
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
