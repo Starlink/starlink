@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.16}
 \newcommand{\stardocnumber}    {95.16}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {10 August 2000}
+\newcommand{\stardocdate}      {5 September 2000}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.15-4}
+\newcommand{\stardocversion}   {0.15-5}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -11174,6 +11174,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Multiplies an NDF by a scalar.}
 \menuitem{COLCOMP}{
  Produce a colour composite image from 1, 2 or 3 individual NDFs.}
+\menuitem{COLLAPSE}{
+ Reduce the number of axes in an NDF by collapsing it along a nominated axis.}
 \menuitem{COMPADD}{
  Reduces the size of an NDF by adding values in rectangular boxes.}
 \menuitem{COMPAVE}{
@@ -11843,6 +11845,8 @@ functions as follows.
 \label{cl:compexp}
 \item {\large\bf Compression and expansion}
 \begin{description}
+\classitem{COLLAPSE}
+ Reduce the number of axes in an NDF by collapsing it along a nominated axis.
 \classitem{COMPADD}
  Reduces the size of an NDF by adding values in rectangular boxes.
 \classitem{COMPAVE}
@@ -14740,6 +14744,207 @@ default value.
          \sstitem
          Only data of type \_REAL can be processed directly. Data of other
          types will be converted to \_REAL before being processed.
+      }
+   }
+}
+\sstroutine{
+   COLLAPSE
+}{
+   Reduce the number of axes in an N-dimensional NDF by compressing it
+   along a nominated axis
+}{
+   \sstdescription{
+      This application collapses a nominated axis of an N-dimensional NDF,
+      producing an output NDF with one fewer axes than the input NDF. A
+      specified range of axis values can be used instead of the whole axis
+      (see parameters LOW and HIGH).
+
+      For each output pixel, all corresponding input pixel values between
+      the specified bounds of the the nominated axis to be collapsed are
+      combined together using either a mean or median estimator to
+      produce the output pixel value.
+
+      Possible uses include such things as collapsing a range of
+      wavelength planes in a 3-D RA/DEC/Wavelength cube to produce a
+      single 2-D RA/DEC image, or collapsing a range of slit positions in
+      a 2-D slit position/wavelength image to produce a 1-D wavelength
+      array
+   }
+   \sstusage{
+      collapse in out axis [low] [high] [estimator] [wlim]
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXIS = LITERAL (Read)
+      }{
+         The axis along which to collapse the NDF. This can be specified
+         by its integer index within the current Frame of the input
+         NDF (in the range 1 to the number of axes in the current Frame),
+         or by its symbol string. A list of acceptable values is displayed
+         if an illegal value is supplied. If the axes of the current Frame
+         are not parallel to the NDF pixel axes, then the pixel axis which
+         is most nearly parallel to the specified current Frame axis will
+         be used.
+      }
+      \sstsubsection{
+         ESTIMATOR = LITERAL (Read)
+      }{
+         The method to use for estimating the output pixel values.  It
+         can be either {\tt "}Mean{\tt "} or {\tt "}Median{\tt "}. {\tt [{\tt "}Mean{\tt "}]}
+      }
+      \sstsubsection{
+         HIGH = LITERAL (Read)
+      }{
+         A value for the axis specified by parameter AXIS. For example,
+         if AXIS is 3 and the current Frame of the input NDF has axes
+         RA/DEC/Wavelength, then a wavelength value should be supplied.
+         If, on the other hand, the current Frame in the NDF was the PIXEL
+         Frame, then a pixel co-ordinate value would be required for the
+         third axis (note, the pixel with index I covers a range of pixel
+         co-ordinates from (I-1) to I). Together with parameter LOW, this
+         parameter gives the range of axis values to be compressed. Note,
+         HIGH and LOW should not be equal since. If a null value (!) is
+         supplied for either HIGH or LOW, the entire range of the axis
+         is collapsed. {\tt [!]}
+      }
+      \sstsubsection{
+         IN  = NDF (Read)
+      }{
+         The input NDF.
+      }
+      \sstsubsection{
+         LOW = LITERAL (Read)
+      }{
+         A value for the axis specified by parameter AXIS. For example,
+         if AXIS is 3 and the current Frame of the input NDF has axes
+         RA/DEC/Wavelength, then a wavelength value should be supplied.
+         If, on the other hand, the current Frame in the NDF was the PIXEL
+         Frame, then a pixel co-ordinate value would be required for the
+         third axis (note, the pixel with index I covers a range of pixel
+         co-ordinates from (I-1) to I). Together with parameter HIGH, this
+         parameter gives the range of axis values to be compressed. Note,
+         LOW and HIGH should not be equal since. If a null value (!) is
+         supplied for either LOW or HIGH, the entire range of the axis
+         is collapsed. {\tt [!]}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF structure.  A null value (!)
+         propagates the title from the input NDF to the output NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         WLIM = \_REAL (Read)
+      }{
+         If the input NDF contains bad pixels, then this parameter
+         may be used to determine the number of good pixels which must
+         be present within the range of collapsed input pixels before a
+         valid output pixel is generated. It can be used, for example, to
+         prevent output pixels from being generated in regions where there
+         are relatively few good pixels to contribute to the collapsed
+         result.
+
+         WLIM specifies the minimum fraction of good pixels which must
+         be present in order to generate a good output pixel. If this
+         specified minimum fraction of good input pixels is not present,
+         then a bad output pixel will result, otherwise an good output
+         value will be calculated. The value of this parameter should lie
+         between 0.0 and 1.0 (the actual number used will be rounded up if
+         necessary to correspond to at least 1 pixel). {\tt [0.3]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         collapse cube slab lambda 4500 4550
+      }{
+         The current Frame in the input 3-dimensional NDF called cube has
+         axes with labels {\tt "}RA{\tt "}, {\tt "}DEC{\tt "} and {\tt "}Lambda{\tt "}, with the lambda axis
+         being parallel to the third pixel axis. The above command
+         extracts a slab of the input cube between wavelengths 4500 and
+         4550 Angstroms, and collapses this slab into a single
+         2-dimensional output NDF called slab with RA and DEC axes. Each
+         pixel in the output NDF is the mean of the corresponding input
+         pixels with wavelengths between 4500 and 4550 Angstroms.
+      }
+      \sstexamplesubsection{
+         collapse cube slab 3 4500 4550
+      }{
+         The same as above except the axis to collapse along is specified
+         by index (3) rather than label (lambda).
+      }
+      \sstexamplesubsection{
+         collapse cube slab 3 101.0 134.0
+      }{
+         This is the same as the above examples, except that the current
+         Frame in the input NDF has been set to the PIXEL Frame (using
+         WCSFRAME), and so the high and low axis values are specified in
+         pixel co-ordinates instead of Angstroms. Note the difference
+         between floating point pixel co-ordinates, and integer pixel
+         indices (for instance the pixel with index 10 extends from pixel
+         co-ordinate 9.0 to pixel co-ordinate 10.0).
+      }
+      \sstexamplesubsection{
+         collapse cube slab 3 low=99.0 high=100.0
+      }{
+         This is the same as the above examples, except that a single
+         pixel plane in the cube (pixel 100) is used to create the output
+         NDF. Following the usual definition of pixel co-ordinates, pixel
+         100 extends from pixel co-ordinate 99.0 to pixel co-ordinate
+         100.0. So the given HIGH and LOW values encompass the single
+         pixel plane at pixel 100.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The collapse is always performed along one of the pixel axes,
+         even if the current Frame in the input NDF is not the PIXEL Frame.
+         Special care should be taken if the current Frame axes are not
+         parallel to the pixel axes. The algorithm used to choose the pixel axis
+         and the range of values to collapse along this pixel axis proceeds as
+         follows:
+
+      }
+      The current Frame co-ordinates of the central pixel in the input
+      NDF are determined (or some other point if the co-ordinates of the
+      central pixel are undefined). Two current Frame positions are then
+      generated by substituting in turn into this central position each
+      of the HIGH and LOW values for the current Frame axis specified by
+      parameter AXIS. These two current Frame positions are transformed
+      into pixel co-ordinates, and the projections of the vector joining
+      these two pixel positions onto the pixel axes are found. The pixel
+      axis with the largest projection is selected as the collapse axis,
+      and the two end points of the projection define the range of axis
+      values to collapse.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: WCSFRAME, COMPAVE, COMPICK, COMPADD.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the AXIS, DATA, VARIANCE,
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
+         propagates all extensions.  QUALITY is not propagated.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+
+         \sstitem
+         Any number of NDF dimensions is supported.
       }
    }
 }
@@ -45330,7 +45535,7 @@ name is defined.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V0.15-4\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V0.15-5\label{se:changes}}
 
 More applications have been changed to enable them to make use
 of the NDF WCS component, which stores descriptions of world
@@ -45347,6 +45552,12 @@ will fail when run with KAPPA V0.15-4. Such scripts will need to be changed
 to take account of the new features introduced in this release. Check the
 lists below for details.}
 \end{quote}
+
+\subsection{New applications}
+A new application called \htmlref{COLLAPSE}{COLLAPSE} has been added.
+This allows (for instance) a selected range of planes in a 3-D cube to be
+collapsed into a single 2-D image, or a range of rows in a 2-D image to
+be collapsed into a single 1-D array.
 
 \subsection{Modified applications}
 The following applications have been modified:
@@ -45916,6 +46127,8 @@ functions as follows.
 %
 \item {\large\bf Compression and expansion}
 \begin{description}
+\classitem{COLLAPSE}
+ Reduce the number of axes in an NDF by collapsing it along a nominated axis.
 \classitem{COMPADD}
  Reduces the size of an NDF by adding values in rectangular boxes.
 \classitem{COMPAVE}

@@ -1,6 +1,6 @@
-1 KAPPA_Version_0.15-4
+1 KAPPA_Version_0.15-5
 
-   A new release of KAPPA (V0.15-4) has been made. The changes are
+   A new release of KAPPA (V0.15-5) has been made. The changes are
    described fully in sun95.16.
 
    The majority of the changes are again in the field of graphics and WCS
@@ -10,9 +10,14 @@
 
 *      Scripts which make use of any of the removed or
 *      modified parameters will fail when run with KAPPA
-*      V0.15-4. Such scripts will need to be changed to
+*      V0.15-5. Such scripts will need to be changed to
 *      take account of the new features introduced in this
 *      release. Check the lists below for details.}
+
+   A new application called COLLAPSE has been added. This
+   allows (for instance) a selected range of planes in a 3-D
+   cube to be collapsed into a single 2-D image, or a range of
+   rows in a 2-D image to be collapsed into a single 1-D array.
 
    The updated applications include: 
 
