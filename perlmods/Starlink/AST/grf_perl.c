@@ -749,7 +749,7 @@ int astGCap( int cap, int value ) {
     return 0;
   }
 
-  cb = Perl_getPlotAttr( "_gtext" );
+  cb = Perl_getPlotAttr( "_gcap" );
  
   if (astOK) {
     if ( cb != NULL ) {
