@@ -18,6 +18,8 @@
 #     	 Added KEEPIN parameter.
 #     29-JUL-1996 (PDRAPER):
 #        Added CLEAN parameter.
+#     27-JAN-1999 (PDRAPER):
+#        Added GENVAR and USEVAR parameters.
 #     {enter_further_changes_here}
 
 #-
@@ -209,6 +211,26 @@ interface MAKEFLAT
       default  15,15
       prompt   'Sizes of box filter sides'
       helpkey  '*'
+   endparameter
+
+   parameter GENVAR              # Generate output variance information?
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  FALSE
+      prompt   'Generate output variance information?'
+      helpkey  *
+   endparameter
+
+   parameter USEVAR              # Use variance during data combination?
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Use variance during data combination?'
+      helpkey  *
    endparameter
 
 endinterface

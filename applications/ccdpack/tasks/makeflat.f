@@ -69,6 +69,16 @@
 *        be in error. Aberrant pixels are removed from the data before
 *        the next "cleaning" iteration is performed.
 *        [3.0]
+*     GENVAR = _LOGICAL (Read)
+*        If TRUE and USEVAR is also FALSE, then "variances" for the
+*        output image will be generated using the natural variation in
+*        the input images. These values can be used to estimate the
+*        reliability of the output flatfield.
+*
+*        Note that for this option to work well you should have many
+*        images and that a minimum of 2 contributing values for an
+*        output pixel are required (MINPIX will have a minimum of 2).
+*        [FALSE]
 *     IN = LITERAL (Read)
 *        A list NDF names. These contain the flatfield data.  The NDF
 *        names should be separated by commas and may include wildcards.
@@ -145,7 +155,7 @@
 *        The minimum number of good (ie. not BAD) pixels required which
 *        are required to contribute to the value of an output pixel.
 *        Output pixels not meeting this requirement are set BAD.
-*        [1]
+*        [1|2]
 *     NITER = _INTEGER (Read)
 *        The number of refining iterations performed if METHOD = "MODE".
 *        [7]
@@ -160,6 +170,11 @@
 *        For METHOD = "SIGMA" this value is the pixel variance if one
 *        exists, otherwise one is estimated from the population of values.
 *        [4.0]
+*     USEVAR = _LOGICAL (Read)
+*        If TRUE and all the input images contain error information
+*        (variances), then these will be used as weights during image
+*        combination and will be propagated to the output image.
+*        [TRUE]
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF.
 *        [Output from MAKEFLAT]
@@ -194,9 +209,9 @@
 *  Implementation Status:
 *     - The routine supports BAD pixels and all data types except
 *       COMPLEX.  All combinational arithmetic is performed using
-*       floating point.  The AXIS and TITLE components are correctly 
+*       floating point.  The AXIS and TITLE components are correctly
 *       propagated. The output is a ratio so the units are set to
-*       blank. The variances are propagated through the combination 
+*       blank. The variances are propagated through the combination
 *       processing, assuming that the input data have a normal
 *       distribution.
 
@@ -228,7 +243,7 @@
 *     - The input images are normalised to have a mean of one
 *       before being combined. This makes sure that all input images
 *       contribute to the final result (even though, for instance,
-*       they were taken on a source of varying brightness, e.g. the 
+*       they were taken on a source of varying brightness, e.g. the
 *       twilight sky).
 
 *  Copyright:
@@ -259,6 +274,9 @@
 *        padded to match bounds (regions of BAD quality are introduced).
 *     18-NOV-1998 (PDRAPER):
 *        Added fastmed combination method.
+*     27-JAN-1999 (PDRAPER):
+*        Added the GENVAR and USEVAR parameters. GENVAR controls the
+*        generation of output variances from the spread in the data stack.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -347,7 +365,7 @@
       LOGICAL BAD               ! Set if BAD pixels are present
       LOGICAL CLEAN             ! Clean the input NDFs of defects
       LOGICAL DELETE            ! Delete input NDFs when processed
-
+      LOGICAL GENVAR            ! Whether to generate output variances
       LOGICAL HAVVAR            ! Set if all variances components are present.
       LOGICAL THSVAR            ! This variance - used for testing variance presence.
       LOGICAL USED( CCD1__MXNDF ) ! Workspace for flagging image usage
@@ -411,31 +429,40 @@
 
 *  Find out which input NDFs have variances. Will require all inputs to
 *  have variances, otherwise the exposure values will be used as
-*  weights. If we do not have all variances then none will be accessed.
+*  weights. If we do not have all variances or if USEVAR is FALSE, then
+*  none will be accessed.
       NVAR = 0
-      DO 4  I = 1, NNDF
-         CALL NDF_STATE( STACK( I ), 'Variance', THSVAR, STATUS )
-         IF ( THSVAR ) THEN
-            NVAR = NVAR + 1
-         END IF
- 4    CONTINUE
+      CALL PAR_GET0L( 'USEVAR', HAVVAR, STATUS )
+      IF ( HAVVAR ) THEN
+         DO 4  I = 1, NNDF
+            CALL NDF_STATE( STACK( I ), 'Variance', THSVAR, STATUS )
+            IF ( THSVAR ) THEN
+               NVAR = NVAR + 1
+            END IF
+ 4       CONTINUE
 
 *  Set HAVVAR flag to show if all variances are present. If not all
 *  variances are present and NVAR is greater than zero issue a warning.
-      IF ( NVAR .GT. 0 ) THEN
-         IF ( NVAR .EQ. NNDF ) THEN
-             HAVVAR = .TRUE.
-         ELSE
-             HAVVAR = .FALSE.
-             CALL MSG_OUT( 'MAKECAL_NVAR',
+         IF ( NVAR .GT. 0 ) THEN
+            IF ( NVAR .NE. NNDF ) THEN
+               HAVVAR = .FALSE.
+               CALL MSG_OUT( 'MAKECAL_NVAR',
      :       ' Warning - only some input NDFs have a variance'//
      :       ' component, variance analysis not performed.',
-     :       STATUS )
-         END IF
-      ELSE
+     :                     STATUS )
+            END IF
+         ELSE
 
 *  No variances.
-         HAVVAR = .FALSE.
+            HAVVAR = .FALSE.
+         END IF
+      END IF
+
+*  See if we want to generate variances. Only allowed if not using input
+*  variances.
+      GENVAR = .FALSE.
+      IF ( .NOT. HAVVAR ) THEN
+         CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
       END IF
 
 *  Find out the stacking mode.
@@ -488,8 +515,10 @@
 *  precision. They will remain at this precision.
       CALL NDF_STYPE( PTYPE, NDFOUT, 'Data,Variance', STATUS )
 
-*  Get the minimum number of contributing pixels per output pixel
+*  Get the minimum number of contributing pixels per output pixel.
+*  Note has a minimum of 2, if generating variances.
       CALL PAR_GET0I( 'MINPIX', MINPIX, STATUS )
+      IF ( GENVAR ) MINPIX = MAX( 2, MINPIX )
 
 *  If we have variances then will process covariances - get the
 *  required workspace.
@@ -631,8 +660,9 @@
          CALL NDF_CHUNK( NDFOUT, MXPIX, ICHUNK, NDFCUR, STATUS)
          CALL NDF_MAP( NDFCUR, 'Data', PTYPE, 'WRITE', IPOINT, EL,
      :                 STATUS )
-         IF ( HAVVAR ) CALL NDF_MAP( NDFCUR, 'Variance', PTYPE,
-     :                               'WRITE', IPVAR, EL, STATUS )
+         IF ( HAVVAR .OR. GENVAR ) CALL NDF_MAP( NDFCUR, 'Variance',
+     :                                           PTYPE, 'WRITE', IPVAR,
+     :                                           EL, STATUS )
 
 *  Get the size of the stack chunk.
          CALL NDF_BOUND( NDFCUR, 2, LBND, UBND, NDIM, STATUS )
@@ -683,6 +713,17 @@
      :                          IMETH, MINPIX, NITER, NSIGMA, ALPHA,
      :                          RMIN, RMAX, %VAL( IPOINT ),
      :                          WRK1, WRK2, NCON, POINT, USED, STATUS )
+            END IF
+
+*  Generate estimated variances, if required.
+            IF ( GENVAR ) THEN
+               IF ( PTYPE .EQ. '_REAL' ) THEN
+                  CALL CCG1_EVARR( %VAL( IPOINT ),%VAL( IPSTK ),
+     :                             EL, NNDF, %VAL( IPVAR ), STATUS )
+               ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
+                  CALL CCG1_EVARD( %VAL( IPOINT ),%VAL( IPSTK ),
+     :                             EL, NNDF, %VAL( IPVAR ), STATUS )
+               END IF
             END IF
          END IF
 
