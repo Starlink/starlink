@@ -8,7 +8,7 @@
 *     Language:
 *        Starlink FORTRAN 77
  
-      SUBROUTINE SCULIB_LINEAR_WTINIT (WTFN, STATUS)
+      SUBROUTINE SCULIB_LINEAR_WTINIT (WTFN, RES, STATUS)
 
 *    Description:
 *     This is a FORTRAN version of the C transputer code. 
@@ -30,13 +30,13 @@
  
 *    External constants:
       INCLUDE 'SAE_PAR'
-      INCLUDE 'REDS_SYS'
  
 *    Import:
       INTEGER STATUS
+      INTEGER RES                        ! Resolution of lookup
  
 *    Import-Export:
-      REAL WTFN(SCUIP__RES1 * SCUIP__RES1)
+      REAL WTFN(RES * RES)
  
 *    Local variables:
  
@@ -46,9 +46,9 @@
  
       IF (STATUS .NE. SAI__OK) RETURN
  
-      DO I = 1, SCUIP__RES1 * SCUIP__RES1
+      DO I = 1, RES * RES
  
-         WTFN(I) = 1.0 - SQRT(REAL(I-1)) / SCUIP__RES1
+         WTFN(I) = 1.0 - SQRT(REAL(I-1)) / REAL(RES)
  
       END DO
  
