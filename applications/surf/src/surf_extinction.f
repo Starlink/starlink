@@ -145,7 +145,7 @@
       DOUBLE PRECISION DEC_CENTRE       ! apparent declination of map centre
                                         ! (radians)
       REAL             DEC_START        ! Dec offset of scan start (arcsec)
-      REAL             DEC_VEL          ! Dec velocity of scan (arcsec/sec)
+      REAL             DEC_END          ! Dec offset of scan end (arcsec)
       INTEGER          DIM (MAXDIM)     ! the dimensions of an array
       INTEGER          DIMX (MAXDIM)    ! expected dimensions of an array
       DOUBLE PRECISION DTEMP            ! scratch double
@@ -176,10 +176,10 @@
                                         ! channel numbers of bolometers
                                         ! measured in input file
       INTEGER          IN_DATA_PTR      ! pointer to data array of input file
-      INTEGER          IN_DEC_STRT_ARY  ! array identifier to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_STRT_PTR  ! pointer to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_VEL_ARY   ! array identifier to .SCUCD.DEC_VEL
-      INTEGER          IN_DEC_VEL_PTR   ! pointer to .SCUCD.DEC_VEL
+      INTEGER          IN_DEC1_ARY      ! array identifier to .SCUCD.DEC1
+      INTEGER          IN_DEC1_PTR      ! pointer to .SCUCD.DEC1
+      INTEGER          IN_DEC2_ARY      ! array identifier to .SCUCD.DEC2
+      INTEGER          IN_DEC2_PTR      ! pointer to .SCUCD.DEC2
       INTEGER          IN_DEM_PNTR_ARY  ! array identifer to .SCUBA.DEM_PNTR
       INTEGER          IN_DEM_PNTR_PTR  ! pointer to input .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
@@ -197,10 +197,10 @@
                                         ! positions to input data array
       INTEGER          IN_QUALITY_PTR   ! pointer to quality array in input
                                         ! file
-      INTEGER          IN_RA_STRT_ARY   ! array identifier to .SCUCD.RA_STRT
-      INTEGER          IN_RA_STRT_PTR   ! pointer to .SCUCD.RA_STRT
-      INTEGER          IN_RA_VEL_ARY    ! array identifier to .SCUCD.RA_VEL
-      INTEGER          IN_RA_VEL_PTR    ! pointer to .SCUCD.RA_VEL
+      INTEGER          IN_RA1_ARY       ! array identifier to .SCUCD.RA1
+      INTEGER          IN_RA1_PTR       ! pointer to .SCUCD.RA1
+      INTEGER          IN_RA2_ARY       ! array identifier to .SCUCD.RA2
+      INTEGER          IN_RA2_PTR       ! pointer to .SCUCD.RA2
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC
                                         ! locator to SCUBA extension in input
                                         ! file
@@ -298,7 +298,7 @@
       INTEGER          POSITION         ! Position in array
       DOUBLE PRECISION RA_CENTRE        ! apparent RA of map centre (radians)
       REAL             RA_START         ! RA offset of scan start (arcsec)
-      REAL             RA_VEL           ! RA velocity of scan (arcsec/sec)
+      REAL             RA_END           ! RA offset of scan end (arcsec)
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
       DOUBLE PRECISION ROTATION         ! angle between apparent north and 
                                         ! north of input coord system (radians,
@@ -553,7 +553,8 @@
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
 
-* Map QUALITY first to stop automatic masking
+*  Map QUALITY first to stop automatic masking
+
       CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
      :  IN_QUALITY_PTR, ITEMP, STATUS)
 
@@ -570,15 +571,6 @@
      :          (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('NDIM', NDIM)
-* Get the start LST
-      CALL ARY_FIND (IN_SCUCDX_LOC, 'LST_STRT', IN_LST_STRT_ARY,
-     :     STATUS)
-      CALL ARY_DIM (IN_LST_STRT_ARY, MAXDIM, DIM, NDIM, STATUS)
-      CALL ARY_MAP (IN_LST_STRT_ARY, '_DOUBLE', 'READ', 
-     :     IN_LST_STRT_PTR, ITEMP, STATUS)
-
-
-      CALL ARY_ANNUL (IN_LST_STRT_ARY, STATUS)
                CALL MSG_SETI ('DIM1', DIM(1))
                CALL MSG_SETI ('DIM2', DIM(2))
                CALL MSG_SETI ('DIM3', DIM(3))
@@ -605,8 +597,6 @@
 
 *  map the DEM_PNTR array and check its dimensions
 
-*      CALL NDF_XIARY (INDF, 'SCUBA', 'DEM_PNTR', 'READ', 
-*    :  IN_DEM_PNTR_ARY, STATUS)
       CALL ARY_FIND (IN_SCUBAX_LOC, 'DEM_PNTR', IN_DEM_PNTR_ARY, STATUS)
       CALL ARY_DIM (IN_DEM_PNTR_ARY, MAXDIM, DIM, NDIM, STATUS)
       CALL ARY_MAP (IN_DEM_PNTR_ARY, '_INTEGER', 'READ', 
@@ -649,8 +639,6 @@
 
 *  map the .SCUCD.LST_STRT array and check its dimensions
 
-*      CALL NDF_XIARY (INDF, 'SCUCD', 'LST_STRT', 'READ', 
-*    :  IN_LST_STRT_ARY, STATUS)
       CALL ARY_FIND (IN_SCUCDX_LOC, 'LST_STRT', IN_LST_STRT_ARY,
      :  STATUS)
       CALL ARY_DIM (IN_LST_STRT_ARY, MAXDIM, DIM, NDIM, STATUS)
@@ -763,19 +751,17 @@
 *  likewise for RASTER
 
       ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-*         CALL NDF_XIARY (INDF, 'SCUBA', 'RA_STRT', 'READ',
-*    :     IN_RA_STRT_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'RA_STRT', IN_RA_STRT_ARY,
+
+         CALL ARY_FIND (IN_SCUCDX_LOC, 'RA1', IN_RA1_ARY, STATUS)
+         CALL ARY_DIM (IN_RA1_ARY, MAXDIM, DIM, NDIM, STATUS)
+         CALL ARY_MAP (IN_RA1_ARY, '_REAL', 'READ', IN_RA1_PTR, ITEMP,
      :     STATUS)
-         CALL ARY_DIM (IN_RA_STRT_ARY, MAXDIM, DIM, NDIM, STATUS)
-         CALL ARY_MAP (IN_RA_STRT_ARY, '_REAL', 'READ',
-     :     IN_RA_STRT_PTR, ITEMP, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             IF (NDIM .NE. 4) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.RA_STRT '//
+               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.RA1 '//
      :           'array has bad number of dimensions - ^NDIM', 
      :           STATUS)
             ELSE
@@ -786,7 +772,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'switches in SCUCD.DEM_PNTR (^NS and in '//
-     :              'SCUCD.RA_STRT (^DIM2)', STATUS)
+     :              'SCUCD.RA1 (^DIM2)', STATUS)
                END IF
                IF (DIM(2) .NE. N_EXPOSURES) THEN
                   STATUS = SAI__ERROR
@@ -795,7 +781,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'exposures in SCUBA.DEM_PNTR (^NEXP) and in '//
-     :              'SCUCD.RA_STRT (^DIM2)', STATUS)
+     :              'SCUCD.RA1 (^DIM2)', STATUS)
                END IF
                IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                   STATUS = SAI__ERROR
@@ -804,7 +790,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in SCUBA.DEM_PNTR (^NINT) and in '//
-     :              'SCUCD.RA_STRT (^DIM3)', STATUS)
+     :              'SCUCD.RA1 (^DIM3)', STATUS)
                END IF
                IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                   STATUS = SAI__ERROR
@@ -813,25 +799,22 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in .SCUBA.DEM_PNTR (^NMEAS) and '//
-     :              'in SCUCD.RA_STRT (^DIM4)', STATUS)
+     :              'in SCUCD.RA1 (^DIM4)', STATUS)
                END IF
             END IF
          END IF
 
-*        CALL NDF_XIARY (INDF, 'SCUBA', 'RA_VEL', 'READ',
-*    :     IN_RA_VEL_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'RA_VEL', IN_RA_VEL_ARY,
-     :     STATUS)
+         CALL ARY_FIND (IN_SCUCDX_LOC, 'RA2', IN_RA2_ARY, STATUS)
 
-         CALL ARY_DIM (IN_RA_VEL_ARY, MAXDIM, DIM, NDIM, STATUS)
-         CALL ARY_MAP (IN_RA_VEL_ARY, '_REAL', 'READ', IN_RA_VEL_PTR,
-     :     ITEMP, STATUS)
+         CALL ARY_DIM (IN_RA2_ARY, MAXDIM, DIM, NDIM, STATUS)
+         CALL ARY_MAP (IN_RA2_ARY, '_REAL', 'READ', IN_RA2_PTR, ITEMP,
+     :     STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             IF (NDIM .NE. 4) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.RA_VEL '//
+               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.RA2 '//
      :           'array has bad number of dimensions - ^NDIM', 
      :           STATUS)
             ELSE
@@ -842,7 +825,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'switches in SCUCD.DEM_PNTR (^NS and in '//
-     :              'SCUCD.RA_VEL (^DIM2)', STATUS)
+     :              'SCUCD.RA2 (^DIM2)', STATUS)
                END IF
                IF (DIM(2) .NE. N_EXPOSURES) THEN
                   STATUS = SAI__ERROR
@@ -851,7 +834,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'exposures in SCUBA.DEM_PNTR (^NEXP) and in '//
-     :              'SCUCD.RA_VEL (^DIM2)', STATUS)
+     :              'SCUCD.RA2 (^DIM2)', STATUS)
                END IF
                IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                   STATUS = SAI__ERROR
@@ -860,7 +843,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in SCUBA.DEM_PNTR (^NINT) and in '//
-     :              'SCUCD.RA_VEL (^DIM3)', STATUS)
+     :              'SCUCD.RA2 (^DIM3)', STATUS)
                END IF
                IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                   STATUS = SAI__ERROR
@@ -869,25 +852,22 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in .SCUBA.DEM_PNTR (^NMEAS) and '//
-     :              'in SCUCD.RA_VEL (^DIM4)', STATUS)
+     :              'in SCUCD.RA2 (^DIM4)', STATUS)
                END IF
             END IF
          END IF
 
-*        CALL NDF_XIARY (INDF, 'SCUBA', 'DEC_STRT', 'READ',
-*    :     IN_DEC_STRT_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC_STRT', IN_DEC_STRT_ARY,
-     :     STATUS)
+         CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC1', IN_DEC1_ARY, STATUS)
 
-         CALL ARY_DIM (IN_DEC_STRT_ARY, MAXDIM, DIM, NDIM, STATUS)
-         CALL ARY_MAP (IN_DEC_STRT_ARY, '_REAL', 'READ', 
-     :     IN_DEC_STRT_PTR, ITEMP, STATUS)
+         CALL ARY_DIM (IN_DEC1_ARY, MAXDIM, DIM, NDIM, STATUS)
+         CALL ARY_MAP (IN_DEC1_ARY, '_REAL', 'READ', IN_DEC1_PTR, ITEMP,
+     :     STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             IF (NDIM .NE. 4) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.DEC_STRT '//
+               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.DEC1 '//
      :           'array has bad number of dimensions - ^NDIM', 
      :           STATUS)
             ELSE
@@ -898,7 +878,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'switches in SCUCD.DEM_PNTR (^NS and in '//
-     :              'SCUCD.DEC_STRT (^DIM2)', STATUS)
+     :              'SCUCD.DEC1 (^DIM2)', STATUS)
                END IF
                IF (DIM(2) .NE. N_EXPOSURES) THEN
                   STATUS = SAI__ERROR
@@ -907,7 +887,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'exposures in SCUBA.DEM_PNTR (^NEXP) and in '//
-     :              'SCUCD.DEC_STRT (^DIM2)', STATUS)
+     :              'SCUCD.DEC1 (^DIM2)', STATUS)
                END IF
                IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                   STATUS = SAI__ERROR
@@ -916,7 +896,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in SCUBA.DEM_PNTR (^NINT) and in '//
-     :              'SCUCD.DEC_STRT (^DIM3)', STATUS)
+     :              'SCUCD.DEC1 (^DIM3)', STATUS)
                END IF
                IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                   STATUS = SAI__ERROR
@@ -925,25 +905,22 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in .SCUBA.DEM_PNTR (^NMEAS) and '//
-     :              'in SCUCD.DEC_STRT (^DIM4)', STATUS)
+     :              'in SCUCD.DEC1 (^DIM4)', STATUS)
                END IF
             END IF
          END IF
 
-*        CALL NDF_XIARY (INDF, 'SCUBA', 'DEC_VEL', 'READ',
-*    :     IN_DEC_VEL_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC_VEL', IN_DEC_VEL_ARY,
-     :     STATUS)
+         CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC2', IN_DEC2_ARY, STATUS)
 
-         CALL ARY_DIM (IN_DEC_VEL_ARY, MAXDIM, DIM, NDIM, STATUS)
-         CALL ARY_MAP (IN_DEC_VEL_ARY, '_REAL', 'READ', 
-     :     IN_DEC_VEL_PTR, ITEMP, STATUS)
+         CALL ARY_DIM (IN_DEC2_ARY, MAXDIM, DIM, NDIM, STATUS)
+         CALL ARY_MAP (IN_DEC2_ARY, '_REAL', 'READ', IN_DEC2_PTR, ITEMP,
+     :     STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             IF (NDIM .NE. 4) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.DEC_VEL '//
+               CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUCD.DEC2 '//
      :           'array has bad number of dimensions - ^NDIM', 
      :           STATUS)
             ELSE
@@ -954,7 +931,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'switches in SCUCD.DEM_PNTR (^NS and in '//
-     :              'SCUCD.DEC_VEL (^DIM2)', STATUS)
+     :              'SCUCD.DEC2 (^DIM2)', STATUS)
                END IF
                IF (DIM(2) .NE. N_EXPOSURES) THEN
                   STATUS = SAI__ERROR
@@ -963,7 +940,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'exposures in SCUBA.DEM_PNTR (^NEXP) and in '//
-     :              'SCUCD.DEC_VEL (^DIM2)', STATUS)
+     :              'SCUCD.DEC2 (^DIM2)', STATUS)
                END IF
                IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                   STATUS = SAI__ERROR
@@ -972,7 +949,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in SCUBA.DEM_PNTR (^NINT) and in '//
-     :              'SCUCD.DEC_VEL (^DIM3)', STATUS)
+     :              'SCUCD.DEC2 (^DIM3)', STATUS)
                END IF
                IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                   STATUS = SAI__ERROR
@@ -981,7 +958,7 @@
                   CALL ERR_REP (' ', 'REDS_EXTINCTION: '//
      :              'there is a mismatch between the number of '//
      :              'integrations in .SCUBA.DEM_PNTR (^NMEAS) and '//
-     :              'in SCUCD.DEC_VEL (^DIM4)', STATUS)
+     :              'in SCUCD.DEC2 (^DIM4)', STATUS)
                END IF
             END IF
          END IF
@@ -1071,13 +1048,16 @@
 *  get the sub-instrument of interest and check it's OK
 
       IF (N_SUB .EQ. 1) THEN
-*     If we only have one wavelength we dont need to ask
+
+*  If we only have one wavelength we dont need to ask
+
          SUB_POINTER = 1
          SUB_REQUIRED = SUB_INSTRUMENT(SUB_POINTER)
       ELSE
          SUB_POINTER = VAL__BADI
 
-*     Put all possible answers in a string
+*  Put all possible answers in a string
+
          IF (N_SUB .GT. 0) THEN
             SUBLIST = ''
             IPOSN = 0
@@ -1086,7 +1066,9 @@
                CALL CHR_APPND(',',SUBLIST,IPOSN)
                CALL CHR_APPND(SUB_INSTRUMENT(I), SUBLIST, IPOSN)
             END DO
-*     Ask for the sub array
+
+*  Ask for the sub array
+
             CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
      :           .TRUE., SUB_REQUIRED, STATUS)
             CALL CHR_UCASE (SUB_REQUIRED)
@@ -1275,7 +1257,8 @@
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
 
-* Bad bit mask
+*  set the bad bit mask
+
       CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
 
 *  extract data for the required bolometers into the output data arrays
@@ -1368,14 +1351,14 @@
 *  get the scan parameters for a raster map
 
                   IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                     CALL SCULIB_COPYR (1, %val(IN_RA_STRT_PTR +
+                     CALL SCULIB_COPYR (1, %val(IN_RA1_PTR +
      :                 DATA_OFFSET * VAL__NBR), RA_START)
-                     CALL SCULIB_COPYR (1, %val(IN_RA_VEL_PTR +
-     :                 DATA_OFFSET * VAL__NBR), RA_VEL)
-                     CALL SCULIB_COPYR (1, %val(IN_DEC_STRT_PTR +
+                     CALL SCULIB_COPYR (1, %val(IN_RA2_PTR +
+     :                 DATA_OFFSET * VAL__NBR), RA_END)
+                     CALL SCULIB_COPYR (1, %val(IN_DEC1_PTR +
      :                 DATA_OFFSET * VAL__NBR), DEC_START)
-                     CALL SCULIB_COPYR (1, %val(IN_DEC_VEL_PTR +
-     :                 DATA_OFFSET * VAL__NBR), DEC_VEL)
+                     CALL SCULIB_COPYR (1, %val(IN_DEC2_PTR +
+     :                 DATA_OFFSET * VAL__NBR), DEC_END)
                   END IF
 
 *  find where the exposure starts and finishes in the data array
@@ -1408,9 +1391,10 @@
      :                    (SECOND_LST_RAD - FIRST_LST_RAD)
                      END IF
 
-*  work out the offset at which the measurement was made
+*  work out the offset at which the measurement was made in arcsec
 
                      IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+
                         IF (JIGGLE_REPEAT .EQ. 1) THEN
                            JIGGLE = (EXPOSURE - 1) *
      :                       JIGGLE_P_SWITCH +
@@ -1422,11 +1406,13 @@
                         OFFSET_X = JIGGLE_X (JIGGLE)
                         OFFSET_Y = JIGGLE_Y (JIGGLE)
                         OFFSET_COORDS = SAMPLE_COORDS
+
                      ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                        OFFSET_X = RA_START + RA_VEL * 
-     :                    (REAL (I - EXP_START) + 0.5) * EXP_TIME
-                        OFFSET_Y = DEC_START + DEC_VEL *
-     :                    (REAL (I - EXP_START) + 0.5) * EXP_TIME
+
+*                        OFFSET_X = RA_START + RA_VEL * 
+*     :                    (REAL (I - EXP_START) + 0.5) * EXP_TIME
+*                        OFFSET_Y = DEC_START + DEC_VEL *
+*     :                    (REAL (I - EXP_START) + 0.5) * EXP_TIME
                         OFFSET_COORDS = 'RD'
                      END IF
 
