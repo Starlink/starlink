@@ -1,0 +1,16 @@
+
+This is an import of Earl Hood's perlSGML of 1997 September 18, as
+obtained from http://search.cpan.org/~ehood/perlSGML.1997Sep18/
+
+It's imported because building the SGML-kit documentation requires
+perlSGML's DTD parser.  Since we want components to build unattended,
+it's not reasonable to ask the builder to download this, even if we
+give very direct instructions.  ../../configure.ac expects to find
+this unpacked in this current location.
+
+perlSGML is GPLed, so this is presumably OK.
+
+This isn't in the thirdparty/ tree at the top level, because it's
+only this component that would ever use this (if this becomes false,
+then move it, as long as the automatic configuration still works), and
+because the fact that this component uses is it is `private' to it.
