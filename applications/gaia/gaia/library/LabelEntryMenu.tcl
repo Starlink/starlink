@@ -103,9 +103,11 @@ itcl::class gaia::LabelEntryMenu {
          switch -exact [string range $opt 1 end] {
             label {
                lappend cmd -label $arg
+               set name $arg
             }
             bitmap {
                lappend cmd -bitmap $arg
+               set name $arg
             }
             command {
                lappend cmd -command $arg
@@ -130,6 +132,13 @@ itcl::class gaia::LabelEntryMenu {
       if { ! [info exists value] } { 
          set value [incr unique_]
       }
+
+      if { ! [info exists name] } { 
+         set name $value
+      }
+
+      set values_($name) $value
+
       lappend cmd -variable $w_.var -value $value 
       eval $cmd
 	
@@ -170,10 +179,16 @@ itcl::class gaia::LabelEntryMenu {
 
    #  Set the selected value (referenced by label or bitmap)
    #  note: this.var is the trace variable and values_ holds the
-   #  valid values.
+   #  valid values. If an unknown label or bitmap is supplied,
+   #  all radiobuttons are unselected.
    itk_option define -value value Value {} {
       global ::$w_.var
-      catch {set $w_.var $values_($itk_option(-value))}
+      if { [info exists values_($itk_option(-value))] } {
+         set v $values_($itk_option(-value))
+      } else {
+         set v ""
+      }
+      catch {set $w_.var $v}
    }
 
    #  Global variable linked to menu.
