@@ -1,9 +1,9 @@
 <!--
-	Starlink SSN DTD for XML
+	Starlink SSN DTD - Starlink System Note - XML version
 
 	Use with doctype declaration:
 
-	<!doctype ssn public '-//Starlink//DTD Starlink SUN 0.7 (XML)//EN'>
+	<!DOCTYPE ssn PUBLIC '-//Starlink//DTD Starlink SSN 0.7 (XML)//EN'>
 
 	$Id$
 -->

@@ -59,6 +59,60 @@
      -->
 
 
+<!--========== Notations ==========-->
+<!-- Read in the set of defined data notations.
+
+     These are kept in a separate file so that they can be used in
+     common with the programcode DTD.
+
+     A further reason is that one of the notations (at
+     present) defines data attributes (see 8879, Sect. 11.4).  If we want
+     to define, in the DTD subset, entities which use any of these
+     attributes, the notation declaration must come first (see
+     Sect. 11.4.1.2, whereas notation definitions can be used before they
+     are defined (Sect. 11.4.1.1)).  We can arrange this by explicitly
+     reading in the notation declarations in the DTD subset using the
+     formula below.  This is certainly a bit clunky, but clear.
+
+     The subset defines the entity %notations-read to be IGNORE, so that
+     the subset can't be read twice.
+     -->
+<!ENTITY % notations-read "INCLUDE">
+<![ %notations-read; [
+
+<![ %Full.SGML.Only; [
+<!ENTITY % notations-subset 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
+	>
+]]>
+<!ENTITY % notations-subset 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
+	"notations.text"
+	>
+%notations-subset;
+
+<!-- %text.figure.notations: Figure notations which use only SGML
+     characters (terminology? see 8879, 9.2), which can therefore be
+     included directly within figurecontent element
+     -->
+<!ENTITY % text.figure.notations 'linespecific | latexgraphics | metapost'>
+
+
+]]>
+
+<![ %Full.SGML.Only; [
+<!-- First declare the DSSSL notation, so we can refer to SDQL queries.
+     (this comes from dsssl/style-sheet.dtd).
+     This doesn't live with the notations above, because it's used
+     within this DTD, rather than being a notation for user data.
+     -->
+<!NOTATION DSSSL
+	PUBLIC "ISO/IEC 10179:1996//NOTATION DSSSL Architecture Definition Document//EN" 
+	>
+<!-- A document architecture conforming to the
+     Architectural Form Definition Requirements of ISO/IEC 10744. -->
+]]>
+
 <!--========== Architectures ==========-->
 <!-- Bracket all the HyTime stuff within a %Full.SGML.Only marked section.
      I imagine it's possible to declare architectures within XML
@@ -134,12 +188,14 @@
      this DTD, the automatic mapping takes care of all of it.  See HyTime
      A.3.6.2, `Architectural markup minimisation'.
      -->
+<!--  This notation is first declared (in an XML-compliant way) in notations.text
 <!NOTATION 
 	documentsummary
-	 	-- A base architecture used in conformance with the
-		   Architectural Form Definition Requirements of
-		   International Standard ISO/IEC 10744. --
 	SYSTEM ''>
+-->
+	<!-- A base architecture used in conformance with the
+	     Architectural Form Definition Requirements of
+	     International Standard ISO/IEC 10744. -->
 <!ENTITY documentsummary.dtd
 	PUBLIC "-//Starlink//DTD Document Summary 0.2//EN"
 	CDATA AFDRMeta
@@ -155,60 +211,6 @@
 		CDATA
 		#FIXED "docsumma"
 	>
-]]>
-
-<!--========== Notations ==========-->
-<!-- Read in the set of defined data notations.
-
-     These are kept in a separate file so that they can be used in
-     common with the programcode DTD.
-
-     A further reason is that one of the notations (at
-     present) defines data attributes (see 8879, Sect. 11.4).  If we want
-     to define, in the DTD subset, entities which use any of these
-     attributes, the notation declaration must come first (see
-     Sect. 11.4.1.2, whereas notation definitions can be used before they
-     are defined (Sect. 11.4.1.1)).  We can arrange this by explicitly
-     reading in the notation declarations in the DTD subset using the
-     formula below.  This is certainly a bit clunky, but clear.
-
-     The subset defines the entity %notations-read to be IGNORE, so that
-     the subset can't be read twice.
-     -->
-<!ENTITY % notations-read "INCLUDE">
-<![ %notations-read; [
-
-<![ %Full.SGML.Only; [
-<!ENTITY % notations-subset 
-	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
-	>
-]]>
-<!ENTITY % notations-subset 
-	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
-	"notations.text"
-	>
-%notations-subset;
-
-<!-- %text.figure.notations: Figure notations which use only SGML
-     characters (terminology? see 8879, 9.2), which can therefore be
-     included directly within figurecontent element
-     -->
-<!ENTITY % text.figure.notations 'linespecific | latexgraphics | metapost'>
-
-
-]]>
-
-<![ %Full.SGML.Only; [
-<!-- First declare the DSSSL notation, so we can refer to SDQL queries.
-     (this comes from dsssl/style-sheet.dtd).
-     This doesn't live with the notations above, because it's used
-     within this DTD, rather than being a notation for user data.
-     -->
-<!NOTATION DSSSL
-	PUBLIC "ISO/IEC 10179:1996//NOTATION DSSSL Architecture Definition Document//EN" 
-	>
-<!-- A document architecture conforming to the
-     Architectural Form Definition Requirements of ISO/IEC 10744. -->
 ]]>
 
 <!--========== Parameter entities for configuration ==========-->
@@ -426,7 +428,7 @@
 	%version.attr;
 	urllinkpolicy
 		CDATA
-		#FIXED automatic
+		#FIXED "automatic"
 	>
 	<!-- attributes:
 		urllinkpolicy	Declare the URL policy for the
@@ -514,7 +516,7 @@
      codecollection element.  The model should be modified to match
      whatever happens to the REF element.
      -->
-<!ELEMENT coderef %MXX (#PCDATA)>
+<!ELEMENT coderef %MXX; (#PCDATA)>
 <!ATTLIST coderef
 	collection	IDREF	#IMPLIED
 	id		CDATA	#REQUIRED
@@ -630,12 +632,12 @@
      to by newid, possibly also warning or issuing an error about a
      deprecation.
      -->
-<!ELEMENT mapidlist	%MOO (mapid+)>
-<!ELEMENT mapid		%MXO EMPTY>
+<!ELEMENT mapidlist	%MOO; (mapid+)>
+<!ELEMENT mapid		%MXO; EMPTY>
 <!ATTLIST mapid
 	from		ID	#REQUIRED
 	to		IDREF	#REQUIRED
-	export		(export) #FIXED export
+	export		(export) #FIXED "export"
 	>
 	<!-- attributes
 		from		the now-obsolete id
@@ -650,7 +652,7 @@
 			<!-- document number in series -->
     <!ATTLIST docnumber
 	unassigned	(unassigned)	#IMPLIED
-	documenttype	CDATA		#FIXED %DocClass;
+	documenttype	CDATA		#FIXED "%DocClass;"
 	>
 	<!-- attributes:
 		unassigned	indicates that no number has (yet?)
@@ -696,6 +698,7 @@
 	number		CDATA		#REQUIRED
 	date		CDATA		#REQUIRED
 	author		IDREF		#REQUIRED
+	versionid	ID		#IMPLIED
 	>
 	<!-- attributes:
 		number		Identifies the version.  This will
@@ -717,6 +720,12 @@
 				dd-MMM-yyyy
 
 		author		Who approved the release of this version?
+
+		versionid	An id to allow UPDATE elements to
+				refer to a specific version.  It can
+				be anything, but a sensible format is
+				v10-5, for example (it can't start
+				with a number)
 		-->
 <!ATTLIST distribution
 	string		CDATA		#REQUIRED
@@ -950,7 +959,7 @@
 <!ELEMENT mdefs			%MXX; (#PCDATA)>
 <!ATTLIST mdefs
 	notation
-	NOTATION(latexmaths) #FIXED latexmaths
+	NOTATION(latexmaths) #FIXED "latexmaths"
 	>
 
 <!--========== Routine list ==========-->

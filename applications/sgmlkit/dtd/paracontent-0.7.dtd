@@ -158,9 +158,9 @@
      be recognised.
      -->
 <!ENTITY % media.types "CDATA">
-<!ELEMENT span		%MXX (%p.model;)*>
+<!ELEMENT span		%MXX; %p.model;>
 <!ATTLIST span
-	media	%media.types	#IMPLIED
+	media	%media.types;	#IMPLIED
 	>
 	<!-- attributes:
 		media		If present, this indicates that the
@@ -266,9 +266,9 @@
 		-->
 
 <!ELEMENT m		%MXX; (#PCDATA)>
-<!ATTLIST m		notation	NOTATION(latexmaths) #FIXED latexmaths>
-<!ATTLIST mline		notation	NOTATION(latexmaths) #FIXED latexmaths>
-<!ATTLIST mequation	notation	NOTATION(latexmaths) #FIXED latexmaths>
+<!ATTLIST m		notation  NOTATION(latexmaths) #FIXED "latexmaths">
+<!ATTLIST mline		notation  NOTATION(latexmaths) #FIXED "latexmaths">
+<!ATTLIST mequation	notation  NOTATION(latexmaths) #FIXED "latexmaths">
 	<!-- attributes:
 		notation	the notation: fixed as LaTeX
 		-->
@@ -461,7 +461,7 @@
 <!ATTLIST webref
 	url		CDATA	#REQUIRED
 
-	HyTime		CDATA	#FIXED clink
+	HyTime		CDATA	#FIXED "clink"
 	HyNames		CDATA	#FIXED "linkend url"
 	anchcstr	CDATA	#FIXED "self required"
 	linktrav	CDATA	#FIXED "A D"
@@ -553,10 +553,10 @@
 <!ATTLIST dt	id	ID	#IMPLIED>
 
 <!--========== Astronomical angles ==========-->
-<!ELEMENT angle %MXO EMPTY>
+<!ELEMENT angle %MXO; EMPTY>
 <!ATTLIST angle
 	unit
-		(hours | degrees)	degrees
+		(hours | degrees)	"degrees"
 	angle
 		CDATA			#IMPLIED
 	minutes

@@ -7,6 +7,42 @@
   $Id$
 -->
 
+<!--
+  The entity sets which are used when parsing XML ought to be
+  specified in terms of Unicode character points.  The HTML output
+  appears not to cause problems, but it does causes problems for
+  LaTeX, which reacts badly when it encounters \char65440 or the like.
+  This problem is, I'm positive, superable in LaTeX, but messy.  This
+  should probably be deferred until after the rewrite of the
+  processing system.  At present, it's been `fixed' by defining the
+  `unicode' entities as ordinary characters, commenting out the
+  definitions of &amp &gt and &lt, and declaring percent to be &#37.
+-->
+
+<!ENTITY copy   	"(c)"	><!-- copyright sign	-->
+<!--ENTITY amp    	"&#38;#38;"	--><!-- ampersand		-->
+<!--ENTITY gt     	"&#62;"	--><!-- greater than	-->
+<!--ENTITY lt     	"&#38;#60;"	--><!-- less than		-->
+<!ENTITY quot   	'"'	><!-- double quote	-->
+<!ENTITY nbsp   	" "	><!-- non breaking space-->
+<!ENTITY hash		"#"	><!-- hash sign		-->
+<!ENTITY pounds		"GBP"	><!-- pound sign	-->
+<!ENTITY dollar 	"$"	><!-- dollar sign	-->
+<!ENTITY ellip  	"..."	><!-- ellipses		-->
+<!ENTITY emdash 	"---"	><!-- em dash 		-->
+<!ENTITY endash 	"--"	><!-- en dash		-->
+<!ENTITY percent	"&#37;"	><!-- percent sign	-->
+<!ENTITY deg    	"^o"	><!-- degree		-->
+<!ENTITY dot		"."	><!-- non-sentence-ending period -->
+<!ENTITY tilde		"~"	><!-- tilde		-->
+<!ENTITY underscore	"_"	><!-- underscore	-->
+<!ENTITY backslash	"\"	><!-- backslash		-->
+<!ENTITY verticalbar	"|"	><!-- vertical bar	-->
+<!ENTITY latex  	"LaTeX"	><!-- might as well...	-->
+<!ENTITY tex		"TeX"	><!-- might as well...	-->
+
+
+<![IGNORE[
 <!ENTITY gt		"&#x003E;"> <!-- GREATER-THAN SIGN -->
 <!ENTITY pounds		"&#x00A3;"> <!-- POUND SIGN -->
 <!ENTITY dollar		"&#x0024;"> <!-- DOLLAR SIGN -->
@@ -26,3 +62,4 @@
 
 <!ENTITY latex  "LaTeX"	> <!-- might as well...	-->
 <!ENTITY tex	"TeX"	> <!-- might as well...	-->
+]]>

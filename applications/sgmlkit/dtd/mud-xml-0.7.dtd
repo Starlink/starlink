@@ -1,9 +1,7 @@
 <!--
-	Starlink MUD DTD - miscellaneous user document
+	Starlink MUD DTD - miscellaneous user document - XML version
 
-	Use with DOCTYPE declaration:
-
-	<!DOCTYPE mud PUBLIC '-//Starlink//DTD Starlink MUD 0.7//EN'>
+	<!DOCTYPE mud PUBLIC '-//Starlink//DTD Starlink MUD 0.7 (XML)//EN'>
 
 	$Id$
 -->
@@ -29,7 +27,9 @@
 <!ENTITY % Feature.EnforceLinkpolicy 'IGNORE'>
 		<!-- Don't enforce the link policy: let sections omit ID -->
 
+<!ENTITY % XML.Variant 'INCLUDE'>
 <!ENTITY % Starlink.general
 	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN"
+	"starlink-0.7.dtd"
 	>
 %Starlink.general;

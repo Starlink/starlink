@@ -1,9 +1,9 @@
 <!--
-	Starlink SSN DTD
+	Starlink SSN DTD - Starlink System Note
 
 	Use with doctype declaration:
 
-	<!doctype ssn public '-//Starlink//DTD Starlink SUN 0.7//EN'>
+	<!DOCTYPE ssn PUBLIC '-//Starlink//DTD Starlink SSN 0.7//EN'>
 
 	$Id$
 -->
@@ -16,15 +16,16 @@
   Features: require support for versioning, but forbid a list of
   routine descriptions amongst the backmatter.
 -->
-<!ENTITY % Feature.Abstract	'INCLUDE'
-		-- Require an abstract -->
-<!ENTITY % Feature.Versioning	'INCLUDE'
-		-- Require version tracking in document -->
-<!ENTITY % Feature.Routinelist	'IGNORE'
-		-- Don't support routine descriptions -->
-<!ENTITY % Feature.Docnumber	'INCLUDE'
-		-- require DOCNUMBER in head -->
+<!ENTITY % Feature.Abstract	'INCLUDE'>
+		<!-- Require an abstract -->
+<!ENTITY % Feature.Versioning	'INCLUDE'>
+		<!-- Require version tracking in document -->
+<!ENTITY % Feature.Routinelist	'IGNORE'>
+		<!-- Don't support routine descriptions -->
+<!ENTITY % Feature.Docnumber	'INCLUDE'>
+		<!-- require DOCNUMBER in head -->
 
 <!ENTITY % Starlink.general
-	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN">
+	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN"
+	>
 %Starlink.general;

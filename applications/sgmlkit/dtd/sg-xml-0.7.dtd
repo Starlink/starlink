@@ -1,9 +1,9 @@
 <!--
-	Starlink SG DTD - Starlink Guide
+	Starlink SG DTD - Starlink Guide - XML version
 
 	Use with DOCTYPE declaration:
 
-	<!DOCTYPE sg PUBLIC '-//Starlink//DTD Starlink SG 0.7//EN'>
+	<!DOCTYPE sg PUBLIC '-//Starlink//DTD Starlink SG 0.7 (XML)//EN'>
 
 	$Id$
 -->
@@ -25,7 +25,9 @@
 <!ENTITY % Feature.Docnumber	'INCLUDE'>
 		<!-- require DOCNUMBER in head -->
 
+<!ENTITY % XML.Variant 'INCLUDE'>
 <!ENTITY % Starlink.general
 	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN"
+	"starlink-0.7.dtd"
 	>
 %Starlink.general;

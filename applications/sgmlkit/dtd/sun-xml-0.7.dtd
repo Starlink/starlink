@@ -1,16 +1,16 @@
 <!--
-	Starlink SG DTD - Starlink Guide
+	Starlink SUN DTD - Starlink User Note - XML version
 
 	Use with DOCTYPE declaration:
 
-	<!DOCTYPE sg PUBLIC '-//Starlink//DTD Starlink SG 0.7//EN'>
+	<!DOCTYPE sun PUBLIC '-//Starlink//DTD Starlink SUN 0.7 (XML)//EN'>
 
 	$Id$
 -->
 
-<!ENTITY % DTD.Version		"DTD Starlink SG 0.7">
+<!ENTITY % DTD.Version		"DTD Starlink SUN 0.7">
 
-<!ENTITY % DocClass "sg">
+<!ENTITY % DocClass "sun">
 
 <!-- 
   Features: require support for versioning, and allow a list of
@@ -20,12 +20,14 @@
 		<!-- Require an abstract -->
 <!ENTITY % Feature.Versioning	'INCLUDE'>
 		<!-- Require version tracking in document -->
-<!ENTITY % Feature.Routinelist	'IGNORE'>
-		<!-- No support for routine descriptions -->
+<!ENTITY % Feature.Routinelist	'INCLUDE'>
+		<!-- Support routine descriptions -->
 <!ENTITY % Feature.Docnumber	'INCLUDE'>
 		<!-- require DOCNUMBER in head -->
 
+<!ENTITY % XML.Variant 'INCLUDE'>
 <!ENTITY % Starlink.general
 	PUBLIC "-//Starlink//DTD Starlink General 0.7//EN"
+	"starlink-0.7.dtd"
 	>
 %Starlink.general;

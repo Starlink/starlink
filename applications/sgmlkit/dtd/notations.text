@@ -66,6 +66,21 @@
 <!NOTATION linespecific SYSTEM
   "line ends and leading white space must be preserved in output">
 
+<!-- The documentsummary notation is used in two ways.  (a) It is ``A
+     base architecture used in conformance with the Architectural Form
+     Definition Requirements of International Standard ISO/IEC
+     10744.''  (b) It is one way of indicating to the stylesheets that
+     the corresponding entity is parseable as a document summary.
+     This is unnecessary for full SGML documents, because they can use
+     SUBDOC, but for XML documents, we have to use a SYSTEM entity
+     with a NDATA declaration; we can't use XML, because that just
+     indicates that the target entity is an XML document, not that it
+     is parseable in this particular way.  This notation is given
+     attributes, and further specified as a base architecture, in
+     starlink-x.x.dtd. -->
+<!NOTATION documentsummary
+           PUBLIC '-//Starlink//NOTATION Document Summary//EN'>
+
 <!-- Declare an attribute for the latexgraphics notation.  If there is
      indeed a need for this (and it's not implemented at present),
      then it can be used as follows.  In the DTD subset, declare an

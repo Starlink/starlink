@@ -101,6 +101,7 @@ PUBLIC "-//Starlink//DTD Starlink General 0.1//EN"	starlink-0.1.dtd
 
 PUBLIC "-//Starlink//DTD Starlink SUG//EN"		sug-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.7//EN"		sug-0.7.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.7 (XML)//EN"	sug-xml-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.6//EN"		sug-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.5//EN"		sug-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.4//EN"		sug-0.4.dtd
@@ -109,6 +110,7 @@ PUBLIC "-//Starlink//DTD Starlink SUG 0.2//EN"		sug-0.2.dtd
 
 PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.7//EN"		sun-0.7.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.7 (XML)//EN"	sun-xml-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.6//EN"		sun-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.5//EN"		sun-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.4//EN"		sun-0.4.dtd
@@ -129,6 +131,7 @@ PUBLIC "-//Starlink//DTD Starlink SSN 0.1//EN"		ssn-0.1.dtd
 
 PUBLIC "-//Starlink//DTD Starlink SGP//EN"		sgp-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.7//EN"		sgp-0.7.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.7 (XML)//EN"	sgp-xml-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.6//EN"		sgp-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.5//EN"		sgp-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.4//EN"		sgp-0.4.dtd
@@ -137,6 +140,7 @@ PUBLIC "-//Starlink//DTD Starlink SGP 0.2//EN"		sgp-0.2.dtd
 
 PUBLIC "-//Starlink//DTD Starlink SC//EN"		sc-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.7//EN"		sc-0.7.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.7 (XML)//EN"	sc-xml-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.6//EN"		sc-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.5//EN"		sc-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.4//EN"		sc-0.4.dtd
@@ -145,6 +149,7 @@ PUBLIC "-//Starlink//DTD Starlink SC 0.2//EN"		sc-0.2.dtd
 
 PUBLIC "-//Starlink//DTD Starlink SG//EN"		sg-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.7//EN"		sg-0.7.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.7 (XML)//EN"	sg-xml-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.6//EN"		sg-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.5//EN"		sg-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.4//EN"		sg-0.4.dtd
@@ -153,6 +158,7 @@ PUBLIC "-//Starlink//DTD Starlink SG 0.2//EN"		sg-0.2.dtd
 
 PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.7//EN"		mud-0.7.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.7 (XML)//EN"	mud-xml-0.7.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.6//EN"		mud-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.5//EN"		mud-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.4//EN"		mud-0.4.dtd
