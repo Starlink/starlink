@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.10}
+\newcommand{\stardocnumber}    {214.11}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {4th September 2002}
+\newcommand{\stardocdate}      {4th December 2002}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.6}
+\newcommand{\stardocversion}   {2.7}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -806,7 +806,12 @@ Alternatively you can set these in your \mytt{.Xdefaults} file:
 If you'd like the toolboxes to remain on top of the display window
 they are associated with then set the \mytt{transient\_tools} option
 to 1 (the precise behaviour you get depends on your window
-manager). Two useful options that can only be set as X preferences
+manager\footnote{Even if you don't have \mytt{transient\_tools} set,
+window managers can still cause many perceived problems dealing with
+toolboxes. Make sure that you have `autoraise' and `autoraise on first
+focus' type options switched off, if you feel that toolboxes and
+dialogs unnecessarily take charge of things like the focus.}).
+Two useful options that can only be set as X preferences
 are:
 \begin{quote}
 \begin{verbatim}
