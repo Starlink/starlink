@@ -25,6 +25,9 @@
 #     	 Original version.
 #     2-MAR-1994 (PDRAPER):
 #     	 Now named CCDIssueInfo.
+#     13-MAY-1999 (PDRAPER):
+#        Modified to use a window that is a child of .topwin (needed
+#        to control transient behaviour).
 #     {enter_further_changes_here}
 
 #-
@@ -42,10 +45,10 @@
 
 #  Check that informational window doesn't already exist, if it does
 #  wait for it to go away before proceeding.
-      if { [winfo exists .ccdissueinfo] } { 
-         tkwait window .ccdissueinfo
+      if { [winfo exists .topwin.ccdissueinfo] } { 
+         tkwait window .topwin.ccdissueinfo
       }
-      CCDDialog .ccdissueinfo "Information" "$message" info
+      CCDDialog .topwin.ccdissueinfo "Information" "$message" info
    } else {
       puts "Error. $dialogmess"
    }

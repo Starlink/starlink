@@ -37,6 +37,8 @@
 #  History:
 #     14-SEP-1995 (PDRAPER):
 #     	 Original version.
+#     13-MAY-1999 (PDRAPER):
+#        Modified width of toplevel window.
 #     {enter_further_changes_here}
 
 #-
@@ -54,6 +56,7 @@
 
 #  Top-level widget.
       Ccd_toplevel $Top -title "Choose known detector setup"
+      wm geometry $Top 50x10
 
 #  Menubar
       set Menu [Ccd_helpmenubar $Top.menubar]

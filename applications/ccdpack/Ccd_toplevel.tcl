@@ -111,6 +111,10 @@
 #        Added -width and -height configuration parameters.
 #     11-APR-1997 (PDRAPER)
 #        Converted to itcl2.2. blt_busy now called blt::busy.
+#     13-MAY-1999 (PDRAPER):
+#        Changed stacking behaviour to more WM friendly "wm
+#        transient". Explicit raises cause problems with some window
+#        managers performance.
 #     {enter_changes_here}
 
 #-
@@ -188,9 +192,7 @@
          if { $tcount > 0 } {
             for { set i [expr $tcount -1]} { $i > -1 } { incr i -1 } {
                set widget $twidgets($i)
-               if { [winfo exists $widget] && "$widget" != "$oldthis" } {
-                  ::bind Ccd_restack <Expose> "$widget _restack;break"
-               } elseif { "$widget" == "$oldthis" } {
+               if { "$widget" == "$oldthis" } {
                   set twidgets($i) ""
                   if { $i != [expr $tcount -1] } {
                      set newcount 0
@@ -268,11 +270,6 @@
          }
       }
 
-#  Change/establish the stacking order.
-      method _restack {} {
-         raise $twidgets([expr $tcount -1])
-      }
-
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -315,10 +312,13 @@
          }
       }
 
+#  If the window is "stacked" then it is a transient of its parent.
+#  Do not make the main window (.topwin) a transient.
       public stacked 1 { 
-         if { $exists && $stacked } { 
-            ::bindtags $oldthis "Ccd_restack Ccd_toplevel $oldthis all"
-            ::bind Ccd_restack <Expose> "$oldthis _restack;break"
+         if { $exists && $stacked } {
+            if { $oldthis != ".topwin" } {
+               wm transient $oldthis [winfo parent $oldthis]
+            }
          }
       }
 

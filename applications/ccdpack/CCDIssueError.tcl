@@ -23,6 +23,9 @@
 #     	 Original version.
 #     31-AUG-1995 (PDRAPER):
 #        Removed cluttering message about calling routine.
+#     13-MAY-1999 (PDRAPER):
+#        Modified to use a window that is a child of .topwin (needed
+#        to control transient behaviour).
 #     {enter_changes_here}
 
 #-
@@ -40,10 +43,10 @@
 
 #  Check that error window doesn't already exist, if it does wait for
 #  it to go away before proceeding.
-      if { [winfo exists .ccdissueerror] } { 
-         tkwait window .ccdissueinfo
+      if { [winfo exists .topwin.ccdissueerror] } { 
+         tkwait window .topwin.ccdissueerror
       }
-      CCDDialog .ccdissueerror "Error..." "$message" error
+      CCDDialog .topwin.ccdissueerror "Error..." "$message" error
    } else {
       puts "Error. $message"
    }

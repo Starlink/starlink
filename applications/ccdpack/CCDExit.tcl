@@ -26,6 +26,9 @@ proc CCDExit {} {
 #  History:
 #     7-NOV-1995 (PDRAPER):
 #        Original version.
+#     13-MAY-1999 (PDRAPER):
+#        Changed window control policy to just transient (explicit
+#        raising causes problems with some WMs).
 #     {enter_changes_here}
 
 #-
@@ -68,8 +71,7 @@ proc CCDExit {} {
       wm deiconify $Top
 
 #  Try to make sure this window stays on Top.
-      raise $Top
-      bind $Top <Visibility> "raise $Top"
+      wm transient $Top .topwin
 
 #  Yes is default.
       $Choice focus Yes

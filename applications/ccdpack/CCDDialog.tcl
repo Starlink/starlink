@@ -34,6 +34,9 @@
 #     	 Original version.
 #     23-AUG-1995 (PDRAPER):
 #        Added code to centre in parent top-level or screen.
+#     13-MAY-1999 (PDRAPER):
+#        Changed window control policy to just transient (explicit
+#        raising causes problems with some WMs).
 #     {enter_further_changes_here}
 
 #-
@@ -45,7 +48,7 @@
 #  Widget creation.
       Ccd_toplevel $Top -title "$title"
       set Frame [frame $Top.f]
-      if { $bitmap != "" } { 
+      if { $bitmap != "" } {
          set Bitmap [label $Frame.label -bitmap $bitmap]
       }
       set Message [message $Frame.message \
@@ -57,13 +60,13 @@
 
 #  Pack widgets.
       pack $Button -side bottom -fill x
-      pack $Frame -side top -fill both -expand true      
-      if { $bitmap != "" } { 
+      pack $Frame -side top -fill both -expand true
+      if { $bitmap != "" } {
          pack $Bitmap -side left -fill y -padx 0.5c -pady 0.5c
       }
       pack $Message -side right -fill both -expand true
 
-#  Make sure this window is on top and reasonable prominent 
+#  Make sure this window is on top and reasonable prominent
 #  (centre of screen of parent top-level).
       wm withdraw $Top
       update idletasks
@@ -81,8 +84,7 @@
       wm deiconify $Top
 
 #  Try to make sure this window stays on Top.
-      raise $Top
-      bind $Top <Visibility> "raise $Top"
+      wm transient $Top [winfo parent $Top]
 
 #  Make OK the focus
       $Button focus OK
