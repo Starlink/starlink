@@ -502,15 +502,18 @@
       INTEGER IAT               ! Position in CHR_ string
       INTEGER IDIN              ! NDF identifier
       INTEGER IPBEEN            ! Pointer to workspace
-      INTEGER IPDAT             ! Pointer to input data
+      INTEGER IPDAT( CCD1__MXLIS ) ! Pointer to input data
       INTEGER IPGRA             ! Pointer to graph
       INTEGER IPID( CCD1__MXLIS ) ! Pointer to Output X positions
       INTEGER IPIND             ! Pointer to input indices in file 1
       INTEGER IPQUE             ! Pointer to workspace
-      INTEGER IPRAN1            ! Pointer to sort ranks (w/s)
-      INTEGER IPRAN2            ! Pointer to sort ranks (w/s)
+      INTEGER IPRAN( CCD1__MXLIS ) ! Pointer to sort ranks
+      INTEGER IPRAN1            ! Pointer to sort ranks
+      INTEGER IPRAN2            ! Pointer to sort ranks
       INTEGER IPRBN1            ! Intermediate pointer to sort ranks
       INTEGER IPRBN2            ! Intermediate pointer to sort ranks
+      INTEGER IPRCN1( CCD1__MXLIC ) ! Pointer to sort ranks per edge
+      INTEGER IPRCN2( CCD1__MXLIC ) ! Pointer to sort ranks per edge
       INTEGER IPSPAN            ! Pointer to graph (spanning)
       INTEGER IPSUB             ! Pointer to sub-graph (spanning)
       INTEGER IPWRK1            ! Workspace pointers
@@ -553,7 +556,7 @@
       INTEGER NOUT( CCD1__MXLIS ) ! Number of output positions
       INTEGER NPOSS             ! Number of possible point pairs
       INTEGER NREC( CCD1__MXLIS ) ! Number of records
-      INTEGER NRECN             ! Current number of records 
+      INTEGER NRECN( CCD1__MXLIS ) ! Current number of records 
       INTEGER NRET              ! Dummy variable
       INTEGER NUMI1             ! Number of list 1 points in list 2 box
       INTEGER NUMI2             ! Number of list 2 points in list 1 box
@@ -882,12 +885,12 @@
          IF ( NVAL( I ) .EQ. 2 ) THEN 
 
 *  Map in X and Y positions only (non-standard file)
-            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC( I ), 
-     :                       NVAL( I ), STATUS )
+            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT( I ), 
+     :                       NREC( I ), NVAL( I ), STATUS )
          ELSE
 
 *  Standard file format map these in.
-            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT, 
+            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT( I ),
      :                      NREC( I ), NVAL( I ), STATUS )
             CALL CCD1_MFREE( IPIND, STATUS )            
          END IF
@@ -902,7 +905,6 @@
             CALL ERR_REP( 'TOOFEW','  The file ''^FNAME'' '//
      :'only contains ^NREC positions. At least ^MINMAT are required '//
      :'per file.',STATUS )
-            CALL CCD1_MFREE( IPDAT, STATUS )
             GO TO 99
          END IF
 
@@ -911,45 +913,42 @@
          CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYP, STATUS )
 
 *  Extract the values from the mapped data array.
-         CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL( I ), 1,
+         CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ), 1,
      :                   %VAL( IPXP ), STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL( I ), 2,
+         CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ), 2,
      :                   %VAL( IPYP ), STATUS )
 
 *  Ok. Now select which of these point will be considered for matching.
 *  Remove points which are too close.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CALL CCD1_MALL( NREC( I ), '_INTEGER', IPRAN1, STATUS )
+         CALL CCD1_MALL( NREC( I ), '_INTEGER', IPRAN( I ), STATUS )
          CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXN, STATUS )
          CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYN, STATUS )
          CALL CCD1_PRMIN( %VAL( IPXP ), %VAL( IPYP ),  NREC( I ), 
      :                    MINSEP, %VAL( IPXN ), %VAL( IPYN ),
-     :                    %VAL( IPRAN1 ), NRECN, STATUS )
+     :                    %VAL( IPRAN( I ) ), NRECN( I ), STATUS )
          CALL CCD1_MFREE( IPXP, STATUS )
          CALL CCD1_MFREE( IPYP, STATUS )
 
 *  If any points have been reject, report this and set ALLOK false
 *  to indicate that at least some input positions have been rejected.
-         IF ( NREC( I ) .NE. NRECN ) THEN
+         IF ( NREC( I ) .NE. NRECN( I ) ) THEN
             ALLOK = .FALSE.
-            CALL MSG_SETI( 'NREJ', NREC( I ) - NRECN )
+            CALL MSG_SETI( 'NREJ', NREC( I ) - NRECN( I ) )
             CALL MSG_SETI( 'N', I )
             CALL CCD1_MSG( ' ',
      :'  ^NREJ positions too close in list ^N); positions removed',
      : STATUS )
          END IF
 
-*  Set number of usable points to correct value.
-         NREC( I ) = NRECN
-
 *  Store the current coordinates.
          IF ( USEWCS ) THEN
 
 *  Either map pixel coordinates to current coordinates and free old 
 *  storage.
-            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPX( I ), STATUS )
-            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPY( I ), STATUS )
-            CALL AST_TRAN2( MAPS( I ), NREC( I ), %VAL( IPXN ), 
+            CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPX( I ), STATUS )
+            CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPY( I ), STATUS )
+            CALL AST_TRAN2( MAPS( I ), NRECN( I ), %VAL( IPXN ), 
      :                      %VAL( IPYN ), .TRUE., %VAL( IPX( I ) ), 
      :                      %VAL( IPY( I ) ), STATUS )
             CALL CCD1_MFREE( IPXN, STATUS )
@@ -960,10 +959,6 @@
             IPX( I ) = IPXN
             IPY( I ) = IPYN
          END IF
-
-*  Release memory no longer in use.
-         CALL CCD1_MFREE( IPRAN1, STATUS )
-         CALL CCD1_MFREE( IPDAT, STATUS )
 
 *  And close the file.
          CALL FIO_CLOSE( FDIN, STATUS )
@@ -1024,48 +1019,50 @@
 
 *  Now get workspace arrays for matching routines (plus 2 for CCD1_SOFF
 *  sorting routines).
-            NPOSS = NREC( I ) * ( NREC( J ) + 2 )
+            NPOSS = NRECN( I ) * ( NRECN( J ) + 2 )
             CALL CCD1_MALL( NPOSS, '_DOUBLE', IPWRK1, STATUS )
 
 *  Workspace for the output X and Y values.
-            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXO1( COUNT ),
+            CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPXO1( COUNT ),
      :                      STATUS )
-            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYO1( COUNT ),
+            CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPYO1( COUNT ),
      :                      STATUS )
-            CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPXO2( COUNT ),
+            CALL CCD1_MALL( NRECN( J ), '_DOUBLE', IPXO2( COUNT ),
      :                      STATUS )
-            CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPYO2( COUNT ),
+            CALL CCD1_MALL( NRECN( J ), '_DOUBLE', IPYO2( COUNT ),
      :                      STATUS )
 
 *  And for remembering the original positions in input data sets.
-            CALL CCD1_MALL( NREC( I ), '_INTEGER', IPRAN1, STATUS )
-            CALL CCD1_MALL( NREC( J ), '_INTEGER', IPRAN2, STATUS )
-            CALL CCD1_MALL( NREC( I ), '_INTEGER', IPRBN1, STATUS )
-            CALL CCD1_MALL( NREC( J ), '_INTEGER', IPRBN2, STATUS )
+            CALL CCD1_MALL( NRECN( I ), '_INTEGER', IPRAN1, STATUS )
+            CALL CCD1_MALL( NRECN( J ), '_INTEGER', IPRAN2, STATUS )
+            CALL CCD1_MALL( NRECN( I ), '_INTEGER', IPRBN1, STATUS )
+            CALL CCD1_MALL( NRECN( J ), '_INTEGER', IPRBN2, STATUS )
 
 *  Prepare the lists of points we will actually use (these may omit
 *  ones which do not appear in the overlap).
             IF ( RSTRCT ) THEN
                
 *  Allocate space for points in the overlap between NDFs.
-               CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXI1, STATUS )
-               CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYI1, STATUS )
-               CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPXI2, STATUS )
-               CALL CCD1_MALL( NREC( J ), '_DOUBLE', IPYI2, STATUS )
+               CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPXI1, STATUS )
+               CALL CCD1_MALL( NRECN( I ), '_DOUBLE', IPYI1, STATUS )
+               CALL CCD1_MALL( NRECN( J ), '_DOUBLE', IPXI2, STATUS )
+               CALL CCD1_MALL( NRECN( J ), '_DOUBLE', IPYI2, STATUS )
 
 *  Select only points in list I which fall inside bounding box of 
 *  list J.
                CALL CCD1_INPLY( BNDX( 1, J ), BNDY( 1, J ), 4,
      :                          %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                          NREC( I ), %VAL( IPXI1 ), %VAL( IPYI1 ),
-     :                          %VAL( IPRBN1 ), NUMI1, STATUS )
+     :                          NRECN( I ), %VAL( IPXI1 ), 
+     :                          %VAL( IPYI1 ), %VAL( IPRBN1 ), NUMI1,
+     :                          STATUS )
 
 *  Select only points in list J which fall inside bounding box of
 *  list I.
                CALL CCD1_INPLY( BNDX( 1, I ), BNDY( 1, I ), 4,
      :                          %VAL( IPX( J ) ), %VAL( IPY( J ) ),
-     :                          NREC( J ), %VAL( IPXI2 ), %VAL( IPYI2 ),
-     :                          %VAL( IPRBN2 ), NUMI2, STATUS )
+     :                          NRECN( J ), %VAL( IPXI2 ), 
+     :                          %VAL( IPYI2 ), %VAL( IPRBN2 ), NUMI2,
+     :                          STATUS )
             ELSE
 
 *  No restrictions on which points to consider - copy all to the 
@@ -1074,8 +1071,8 @@
                IPYI1 = IPY( I )
                IPXI2 = IPX( J )
                IPYI2 = IPY( J )
-               NUMI1 = NREC( I )
-               NUMI2 = NREC( J )
+               NUMI1 = NRECN( I )
+               NUMI2 = NRECN( J )
                CALL CCD1_GISEQ( 1, 1, NUMI1, %VAL( IPRBN1 ), STATUS )
                CALL CCD1_GISEQ( 1, 1, NUMI2, %VAL( IPRBN2 ), STATUS )
             END IF
@@ -1148,9 +1145,9 @@
 
 *  Now do the test.
                      CALL CCD1_OVCOM( %VAL( IPX( I ) ),
-     :                                %VAL( IPY( I ) ), NREC( I ),
+     :                                %VAL( IPY( I ) ), NRECN( I ),
      :                                %VAL( IPX( J ) ),
-     :                                %VAL( IPY( J ) ), NREC( J ),
+     :                                %VAL( IPY( J ) ), NRECN( J ),
      :                                NMAT( COUNT ), XOFF( COUNT ),
      :                                YOFF( COUNT ), ERROR * PSIZE( I ), 
      :                                COMFAC, STATUS )
@@ -1174,9 +1171,9 @@
                METHOD = 'SLOW'
                CALL CCD1_MALL( NPOSS, '_DOUBLE', IPWRK2, STATUS )
                CALL CCD1_MALL( NPOSS, '_INTEGER', IPWRK3, STATUS )
-               CALL CCD1_MALL( NREC( J ) + 2, '_INTEGER', IPWRK4, 
+               CALL CCD1_MALL( NRECN( J ) + 2, '_INTEGER', IPWRK4, 
      :                         STATUS )
-               CALL CCD1_MALL( NREC( J ) + 2, '_INTEGER', IPWRK5, 
+               CALL CCD1_MALL( NRECN( J ) + 2, '_INTEGER', IPWRK5, 
      :                         STATUS )
                CALL CCD1_SOFF( ERROR * PSIZE( I ), MAXDIS * PSIZE( I ), 
      :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
@@ -1212,8 +1209,8 @@
 
 *  Now do the test.
                CALL CCD1_OVCOM( %VAL( IPX( I ) ), %VAL( IPY( I ) ), 
-     :                          NREC( I ), %VAL( IPX( J ) ), 
-     :                          %VAL( IPY( J ) ), NREC( J ), 
+     :                          NRECN( I ), %VAL( IPX( J ) ), 
+     :                          %VAL( IPY( J ) ), NRECN( J ), 
      :                          NMAT( COUNT ), XOFF( COUNT ), 
      :                          YOFF( COUNT ), ERROR * PSIZE( I ), 
      :                          COMFAC, STATUS )
@@ -1254,6 +1251,18 @@
                CALL CCD1_MFREE( IPYO2( COUNT ), STATUS )
             ELSE 
 
+*  Keep track of the permutation of the points.
+               CALL CCD1_MALL( NMAT( COUNT ), '_INTEGER', 
+     :                         IPRCN1( COUNT ), STATUS )
+               CALL CCD1_MALL( NMAT( COUNT ), '_INTEGER',
+     :                         IPRCN2( COUNT ), STATUS )
+               CALL CCG1_PRMTI( %VAL( IPRAN( I ) ), %VAL( IPRAN1 ),
+     :                          1, NMAT( COUNT ),
+     :                          %VAL( IPRCN1( COUNT ) ), STATUS )
+               CALL CCG1_PRMTI( %VAL( IPRAN( J ) ), %VAL( IPRAN2 ),
+     :                          1, NMAT( COUNT ),
+     :                          %VAL( IPRCN2( COUNT ) ), STATUS )
+
 *  If we have previously transformed from Pixel to Current coordinates,
 *  transform the output lists back again now.
                IF ( USEWCS ) THEN
@@ -1284,9 +1293,7 @@
                END IF
 
 *  Generate the weight; it is the number of matches, perhaps multiplied
-*  by the completeness.  This ought really to be a floating point number,
-*  but for convenience (so it can go in the graph) it is stored as an
-*  integer.
+*  by the completeness.
                WEIGHT( COUNT ) = DBLE( NMAT( COUNT ) )
                IF ( USECOM ) WEIGHT( COUNT ) = WEIGHT( COUNT ) * COMFAC
             END IF
@@ -1307,6 +1314,11 @@
             CALL CCD1_MFREE( IPRBN2, STATUS )
  4       CONTINUE 
  3    CONTINUE    
+
+*  Free rank pointer workspace.
+      DO I = 1, NOPEN
+         CALL CCD1_MFREE( IPRAN( I ), STATUS )
+      END DO
 
 *  End NDF context.
       CALL NDF_END( STATUS )
@@ -1441,8 +1453,8 @@
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and final merging all positions for each node.
          CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NNODE, IPXO1, IPYO1,
-     :                   IPXO2, IPYO2, NMAT, OFFS, IPX, IPY, IPID, NOUT,
-     :                   STATUS )
+     :                   IPRCN1, IPXO2, IPYO2, IPRCN2, NMAT, OFFS, IPX,
+     :                   IPY, IPRAN, IPID, NOUT, STATUS )
 
       ELSE
 
@@ -1464,6 +1476,8 @@
             CALL CCD1_MFREE( IPYO1( I ), STATUS )
             CALL CCD1_MFREE( IPXO2( I ), STATUS )
             CALL CCD1_MFREE( IPYO2( I ), STATUS )
+            CALL CCD1_MFREE( IPRCN1( I ), STATUS )
+            CALL CCD1_MFREE( IPRCN2( I ), STATUS )
          END IF
  1    CONTINUE
       CALL CCD1_MFREE( IPGRA, STATUS )
@@ -1502,9 +1516,11 @@
             CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT,
      :                       STATUS )
             CALL CCD1_FIOHD( FDOUT, 'Output from FINDOFF', STATUS )
-            CALL CCD1_WRIXY( FDOUT, %VAL( IPID( I ) ),
-     :                       %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                       NOUT( I ), LINE, CCD1__BLEN, STATUS )
+            CALL CCD1_WRIDI( FDOUT, %VAL( IPID( I ) ),
+     :                       %VAL( IPRAN( I ) ), NOUT( I ), 
+     :                       %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ),
+     :                       LINE, CCD1__BLEN, STATUS, 
+     :                       %val(ipx(i)),%val(ipy(i)) )
             CALL FIO_CLOSE( FDOUT, STATUS )
 
 *  Output name.
@@ -1526,6 +1542,8 @@
          CALL CCD1_MFREE( IPID( I ), STATUS )
          CALL CCD1_MFREE( IPX( I ), STATUS )
          CALL CCD1_MFREE( IPY( I ), STATUS )
+         CALL CCD1_MFREE( IPDAT( I ), STATUS )
+         CALL CCD1_MFREE( IPRAN( I ), STATUS )
       END DO 
 
 *  If the filenames were supplied directly then write an output list of
