@@ -241,8 +241,79 @@ int astGQch( float *chv, float *chh ){
 }
 
 int astGMark( int n, const float *x, const float *y, int type ){
-   Report( "astGMark" );
-   return 0;
+  dSP;
+  SV * cb;
+  AV * XX;
+  AV * YY;
+  SV * external;
+  int retval;
+
+  printf("Calling astGMark with %d points\n", n);
+  if (n == 0 ) return 1;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
+
+  cb = Perl_getHashAttr( "_gmark" );
+ 
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      ENTER;
+      SAVETMPS;
+
+      PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. */
+      external = Perl_getHashAttr( "_gexternal" );
+      if ( external != NULL ) {
+	XPUSHs( external );
+      }
+    
+      /* unpack is now reverse to XS norm */
+      XX = newAV();
+      unpack1D( newRV_noinc((SV*) XX), (float *)x, 'f', n);
+      YY = newAV();
+      unpack1D( newRV_noinc((SV*) YY), (float *)y, 'f', n);
+    
+      XPUSHs( sv_2mortal(newRV_noinc((SV*) XX )));
+      XPUSHs( sv_2mortal(newRV_noinc((SV*) YY )));
+      XPUSHs( sv_2mortal(newSViv(type) ) );
+    
+      PUTBACK;
+
+      count = perl_call_sv( SvRV(cb), G_SCALAR );
+
+      SPAGAIN;
+
+      if (astOK) {
+	if (count != 1) {
+	  astError( AST__GRFER, 
+		    "Returned more than 1 arg from GMark callback");
+	  retval = 0;
+	} else {
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
+
+      PUTBACK;
+
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGMark");
+    }
+  } else {
+    retval = 0;
+  }
+  return retval;
 }
 
 int astGText( const char *text, float x, float y, const char *just,
