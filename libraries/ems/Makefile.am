@@ -6,10 +6,12 @@ lib_LTLIBRARIES = libems.la libemsf.la
 
 libems_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(PRIVATE_INCLUDES) \
 	$(C_ROUTINES)
 
 libemsf_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(PRIVATE_INCLUDES) \
 	$(CF_ROUTINES) \
 	$(PLATFORM_CF)
 
@@ -18,6 +20,8 @@ include_HEADERS = $(PUBLIC_INCLUDES)
 PUBLIC_INCLUDES = \
 	ems.h ems_err.h ems_par.h \
 	EMS_ERR EMS_PAR
+
+PRIVATE_INCLUDES = ems_sys.h ems1.h ems_msgtb.h ems_toktb.h
 
 C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c emsExpnd.c \
              emsFacer.c \
@@ -43,7 +47,6 @@ CF_ROUTINES = ems_annul.c ems_begin.c ems_eload.c ems_end.c ems_expnd.c \
 PLATFORM_CF = ems_fioer.c
 
 BUILT_SOURCES = $(PLATFORM_CF) EMS_ERR ems_err.h
-
 
 #  Testing
 #  -------
