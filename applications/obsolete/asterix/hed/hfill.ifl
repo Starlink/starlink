@@ -1,6 +1,6 @@
 interface HFILL
   parameter INP
-     type 'LITERAL'
+     type 'UNIV'
      position 1
      ppath 'GLOBAL'
      prompt 'Object name'
@@ -8,7 +8,7 @@ interface HFILL
      association '<->GLOBAL.HDSOBJ'
   endparameter
   parameter VALUE
-    type 'LITERAL'
+    type 'UNIV'
     position 2
     prompt 'Value'
     help 'Value with which object is to be filled'

@@ -22,6 +22,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     17 Jan 1996 V2.0-0 (DJA):
 *        Updated use of USI
+*     22 Mar 99 : V2.2-1 Get rid of ADI
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -41,7 +42,6 @@
 
       DOUBLE PRECISION NUMVAL            ! numeric value
 
-      INTEGER			OBJID, VALID		! File identifiers
       INTEGER INTVAL                     ! integer values in object
       INTEGER NVAL                       ! number of values in object
       INTEGER OPTR                       ! pointer to mapped object
@@ -54,7 +54,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HFILL Version 2.2-0')
+        PARAMETER (VERSION='HFILL Version 2.2-1')
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -62,8 +62,7 @@
       CALL AST_INIT()
 
 *    get locator to object if it exists
-      CALL USI_ASSOC( 'INP', '*', 'UPDATE', OBJID, STATUS )
-      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'UPDATE', OBJLOC, STATUS )
       CALL DAT_PRIM( OBJLOC, PRIM, STATUS )
       IF ( PRIM ) THEN
 
@@ -71,8 +70,7 @@
         CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get value from console or other data object
-        CALL USI_ASSOC( 'VALUE', '*', 'READ', VALID, STATUS )
-        CALL ADI1_GETLOC( VALID, VALOC, STATUS )
+        CALL USI_DASSOC( 'VALUE', 'READ', VALOC, STATUS )
 
 *        check value is simple scalar
         CALL DAT_SHAPE(VALOC,DAT__MXDIM,DIMS,NDIM,STATUS)

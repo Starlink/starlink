@@ -1,7 +1,7 @@
  INTERFACE HMODIFY
-   parameter INP  
-      type 'LITERAL'
-      position 1  
+   parameter INP
+      type 'UNIV'
+      position 1
       PPATH 'GLOBAL'
       prompt 'Object name'
       help 'Full path name of object to be modified'

@@ -14,6 +14,7 @@
 *     02 Jun 87: original (BHVAD::RCF)
 *     12 Apr 89: modified for ASTERIX88 (BHVAD::RJV)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     22 Mar 99 : V2.2-1 Get rid of ADI
 *    type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -24,7 +25,7 @@
       INTEGER status
 *    local Constants :
 	CHARACTER*30 VERSION		! Version number
-        PARAMETER ( VERSION='HREAD Version 2.2-0')
+        PARAMETER ( VERSION='HREAD Version 2.2-1')
 *    local variables :
 	CHARACTER*80 FILNAM		! name of FORTRAN file
 	CHARACTER*(DAT__SZTYP) type	! type descriptor
@@ -34,7 +35,6 @@
 	INTEGER IERR			! I/O error code
         INTEGER PTR
         INTEGER NVAL
-        INTEGER ID
 
         LOGICAL PRIM
         LOGICAL BINARY
@@ -51,8 +51,7 @@
       CALL USI_GET0L('BINARY',BINARY,STATUS)
 
 * Obtain object name
-      CALL USI_ASSOC('OUT','*','UPDATE',ID,STATUS)
-      CALL ADI1_GETLOC(ID,LOC,STATUS)
+      CALL USI_DASSOC('OUT','UPDATE',LOC,STATUS)
 
 * Open file
       CALL FIO_GUNIT(LUN,STATUS)

@@ -17,7 +17,7 @@ INTERFACE HREAD
 
    parameter OUT
       position 2
-      type 'LITERAL'
+      type 'UNIV'
       ppath 'GLOBAL'
       association '<->GLOBAL.HDSOBJ'
       prompt 'Object name'

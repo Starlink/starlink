@@ -1,6 +1,6 @@
 interface HRENAME
   parameter INP
-    type 'LITERAL'
+    type 'UNIV'
     position 1
     prompt 'Old name'
     help 'Full path name of object to be renamed e.g. TOP.NEXT.BOTTOM'

@@ -14,6 +14,7 @@
 *             (BHVAD::RJV)
 *    History :
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     22 Mar 99 : V2.2-1 Get rid of ADI (rjv)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -26,19 +27,17 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRENAME Version 2.2-0')
+      PARAMETER (VERSION='HRENAME Version 2.2-1')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*(DAT__SZNAM) NEW
 
-      INTEGER ID
 *-
       CALL MSG_PRNT(VERSION)
 
       CALL AST_INIT()
 
-      CALL USI_ASSOC('INP','*','UPDATE',ID,STATUS)
-      CALL ADI1_GETLOC(ID,LOC,STATUS)
+      CALL USI_DASSOC('INP','UPDATE',LOC,STATUS)
 
       CALL USI_GET0C('TO',NEW,STATUS)
 

@@ -25,6 +25,7 @@
 *     14 Jan 94 : V1.7-2  Use COP1B for character strings as ARR_COP1C
 *                         doesn't work this way on UNIX (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     22 Mar 99 : V2.2-1 Get rid of ADI (rjv)
 *
 *    Type Definitions :
 *
@@ -44,7 +45,6 @@
       INTEGER NVAL                       ! number of values in object
       INTEGER OPTR                       ! pointer to mapped object
       INTEGER VPTR                       ! pointer to mapped values
-      INTEGER OBJID
       LOGICAL PRIM                       ! whether object primitive
 *    Internal References :
       LOGICAL HDX_SAMESHAPE,HDX_SAMETYPE,HDX_NUMERIC
@@ -52,7 +52,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HMODIFY Version 2.2-0')
+        PARAMETER (VERSION='HMODIFY Version 2.2-1')
 *-
 
 *    write out version number to terminal
@@ -62,8 +62,7 @@
       CALL AST_INIT()
 
 *    get locator to object if it exists
-      CALL USI_ASSOC('INP','*','UPDATE',OBJID,STATUS)
-      CALL ADI1_GETLOC(OBJID,OBJLOC,STATUS)
+      CALL USI_DASSOC('INP','UPDATE',OBJLOC,STATUS)
       IF (STATUS.EQ.SAI__OK) THEN
 
 *      check that object is primitive
