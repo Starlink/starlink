@@ -52,11 +52,9 @@
 *        The global status.
 
 *  Notes:
-*     -  There is a routine for integer and floating-point data types:
-*     replace "x" in the routine name by I, D, or R as appropriate.  The
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
 *     array supplied to the routine must have the data type specified.
-*     The limitation on other integer types is because there are no
-*     conversion routines between them and character in the CHR library.
 
 *  Prior Requirements:
 *     The ASCII file must be open for write access.
@@ -115,12 +113,16 @@
       CHARACTER * ( 9 ) FORMAT   ! Format to initialise buffer by
                                  ! writing
       INTEGER I                  ! Loop counter for file records
+      LOGICAL INTCON             ! True if the array has an integer data
+                                 ! type
       INTEGER J                  ! Loop counter for values per record
       INTEGER K                  ! Index of the array element
       INTEGER NC                 ! Number of characters in value
       INTEGER NCV                ! Number of characters in value
                                  ! excluding blanks
       INTEGER NREC               ! Number of records
+      LOGICAL SINGLE             ! True if the array has real data
+                                 ! type
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -130,6 +132,11 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find type flags for efficiency.
+      INTCON = '<T>' .EQ. 'B' .OR. '<T>' .EQ. 'I' .OR. '<T>' .EQ. 'UB'
+     :         .OR. '<T>' .EQ. 'UW' .OR. '<T>' .EQ. 'W'
+      SINGLE = '<T>' .EQ. 'R'
 
 *  Initialise buffer.  Since the buffer is large, just reset the 
 *  required number of characters to be blank.
@@ -162,8 +169,17 @@
 *  more efficiently with a DO WHILE.
                IF ( K .LE. EL ) THEN
 
-*  Convert the value to a character string.
-                  CALL CHR_<T>TOC( A( K ), CVAL( :NCPVAL ), NC )
+*  Convert the value to a character string.  Note that all the integer
+*  types use a single conversion routine, and hence a token cannot be
+*  used. Allow room for a space.
+                  IF ( INTCON ) THEN
+                     CALL CHR_ITOC( NUM_<T>TOI( A( K ) ),
+     :                              CVAL( :NCPVAL ), NC )
+                  ELSE IF ( SINGLE ) THEN
+                     CALL CHR_RTOC( A( K ), CVAL( :NCPVAL ), NC )
+                  ELSE
+                     CALL CHR_DTOC( A( K ), CVAL( :NCPVAL ), NC )
+                  END IF
 
 *  Remember the last offset, since the spacing is required.
                   COLD = COFF
@@ -197,8 +213,16 @@
 *  Loop for each data value.
          DO  I = 1, EL
 
-*  Convert the value to a character string.
-            CALL CHR_<T>TOC( A( I ), CVAL, NC )
+*  Convert the value to a character string.  Note that all the integer
+*  types use a single conversion routine, and hence a token cannot be
+*  used.
+            IF ( INTCON ) THEN
+               CALL CHR_ITOC( NUM_<T>TOI( A( I ) ), CVAL, NC )
+            ELSE IF ( SINGLE ) THEN
+               CALL CHR_RTOC( A( I ), CVAL, NC )
+            ELSE
+               CALL CHR_DTOC( A( I ), CVAL, NC )
+            END IF
 
 *  Remove leading spaces.
             CALL CHR_LDBLK( CVAL )
