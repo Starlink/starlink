@@ -22,7 +22,7 @@ dnl AC_PROG_FC
 dnl AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 
-AC_CONFIG_SUBDIRS( emf fonts wdts )
+AC_CONFIG_SUBDIRS( fonts wdts emf )
 
 AC_CONFIG_FILES(Makefile)
 
