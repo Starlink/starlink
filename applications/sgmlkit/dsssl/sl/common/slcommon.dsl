@@ -95,7 +95,7 @@ abstract.
 <description>
 Return the current node's document number as a string.  If the second optional
 argument is true, then return the document number as a longer description
-rather than a code.  That is, as `Starlink Cookbook n.m' rather than `SC/n.m'
+rather than a code.  That is, as `Starlink Cookbook n' rather than `SC/n'
 <returnvalue type=string>The document number as a string, or <code/#f/ 
 if <code/docnumber/ isn't defined.
 <argumentlist>
@@ -128,6 +128,50 @@ if <code/docnumber/ isn't defined.
 			   (trim-string (data dn))))
 	#f	
 	)))
+
+<routine>
+<routinename>getdocdate
+<description>Return the docment's release date as a string.
+<argumentlist>
+<parameter optional default='(current-node)'>
+  <name>nd
+  <type>node-list
+  <description>
+  <p>If present, this indicates which grove is to be used to find the
+  document element.
+<codebody>
+(define (getdocdate #!optional (nd (current-node)))
+   (let ((rel (document-release-info)))
+       (if (car rel)
+           (format-date (car rel))
+           "not released")))
+
+<routine>
+<routinename>getdocauthors
+<description>Return a list of the author names as a sosofo.
+<argumentlist>
+<parameter optional default='(current-node)'>
+  <name>nd
+  <type>node-list
+  <description>
+  <p>If present, this indicates which grove is to be used to find the
+  document element.
+<codebody>
+(define (getdocauthors #!optional (nd (current-node)))
+   (let ((authors (children (getdocinfo 'authorlist))))
+         (let loop ((to (empty-sosofo))
+                    (from authors))
+            (if (node-list-empty? from)
+                to
+                (loop
+                   (sosofo-append
+                      to
+                      (process-node-list (node-list-first from))
+                      (if (node-list-empty? (node-list-rest from))
+                          (empty-sosofo)
+                          (literal ", ")))
+                   (node-list-rest from))))))
+
 
 <routine>
 <routinename>code-to-string
