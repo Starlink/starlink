@@ -128,6 +128,20 @@
 *       This parameter does nothing in CALCSKY. It must be present
 *       when using text file input. Any value is allowed.
 
+*  Usage:
+*     calcsky ref
+
+*  Examples:
+*     calcsky test_rlb model=! \\
+*       Calculate sky for test_rlb.sdf. Only read in one file and 
+*       don't use an external source model.
+*     calcsky list.inp model=m82 noloop\\
+*       Read in the files specified in list.inp and use m82.sdf
+*       as a model of the source.
+*     calcsky file nosrc=nosrc boxsz=10.0 \\
+*       Calculate sky for file.sdf. Store the source subtracted image
+*       in nosrc.sdf. Use a smoothing size of 10 seconds.
+
 *  Notes:
 *     - The model itself is only an approximation
 *       to the data (since the data points can fall anywhere within
@@ -149,6 +163,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.3  1998/06/16 04:51:57  timj
+*     Add examples.
+*
 *     Revision 1.2  1998/06/16 04:41:29  timj
 *     Add documentation
 *
