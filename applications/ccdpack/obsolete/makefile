@@ -1689,7 +1689,7 @@ install:
 	      $(CP) $$f $(INSTALL_DOCS);\
 	      chmod 644 $(INSTALL_DOCS)/$$f;\
               $(RM) $$f;\
-              $(LINK) $(INSTALL_DOCS)/$$f $$f;
+              $(LINK) $(INSTALL_DOCS)/$$f $$f;\
 	   else :; fi;\
 	done
 #
