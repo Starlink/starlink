@@ -42,11 +42,15 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-NOV-1992 (PDRAPER):
 *        Original version.
+*     17-AUG-2000 (MBT):
+*        Fixed a bug which prevented any result being generated when
+*        PERCEN = 1.0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,7 +109,7 @@
 *  bin fraction which corresponds to the required percentile.
       DO 2 I = 1, NBIN
          SUM = SUM + DBLE( HIST( I ) )
-         IF ( SUM .GT. NEED ) THEN
+         IF ( SUM .GE. NEED ) THEN
 
 *  Located the position. Interpolate value from the last position
 *  to this position, to get fractional bin offset.
