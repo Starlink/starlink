@@ -12903,6 +12903,355 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   astGrfFun\sstlabel{astGrfFun}
+}{
+   Register a graphics function for use by the Plot class
+}{
+   \sstdescription{
+      This function can be used to select the underlying graphics
+      functions to be used when the \htmlref{Plot}{Plot} class produces graphical output.
+      If this function is not called prior to producing graphical
+      output, then the underlying graphics functions selected at
+      link-time (using the \htmlref{ast\_link}{ast_link} command) will be used. To use
+      alternative graphics functions, call this function before
+      the graphical output is created, specifying the graphics
+      functions to be used. This will register the function for future
+      use, but the function will not actually be used until the \htmlref{Grf}{Grf}
+      attribute is given a non-zero value.
+   }
+   \sstsynopsis{
+      void astGrfFun( AstPlot $*$this, const char $*$name, void ($*$ fun)() )
+   }
+   \sstparameters{
+      \sstsubsection{
+         this
+      }{
+         Pointer to the Plot.
+      }
+      \sstsubsection{
+         name
+      }{
+         A name indicating the graphics function to be replaced.
+         Eight graphics functions are used in total by the
+         Plot class, and any combination of them may be supplied by calling
+         this function once for each function to be replaced. If any of the
+         eight graphics functions are not replaced in this way, the
+         corresponding functions in the graphics interface selected at
+         link-time (using the ast\_link command) are used. The allowed
+         names are:
+
+         \sstitemlist{
+
+            \sstitem
+            Attr -  Enquire or set a graphics attribute value
+
+            \sstitem
+            AxScale - Get the axis scales
+
+            \sstitem
+            Flush - Flush all pending graphics to the output device
+
+            \sstitem
+            Line - Draw a polyline (i.e. a set of connected lines)
+
+            \sstitem
+            Mark -  Draw a set of markers
+
+            \sstitem
+            Qch - Get the character height in world coordinates
+
+            \sstitem
+            Text - Draw a character string
+
+            \sstitem
+            TxExt -  Get the extent of a character string
+
+         }
+         The string is case insensitive. For details of the interface
+         required for each, see the sections below.
+      }
+      \sstsubsection{
+         fun
+      }{
+      }
+      \sstsubsection{
+         FUN = INTEGER FUNCTION (Given)
+      }{
+         A Pointer to the function to be used to provide the
+         functionality indicated by parameter name.
+
+         Once a function has been provided, a null pointer can be supplied
+         in a subsequent call to astGrfFun to reset the function to the
+         corresponding function in the graphics interface selected at
+         link-time.
+      }
+   }
+   \sstdiytopic{
+      Function Interfaces
+   }{
+      All the functions listed below should return an integer value of
+      0 if an error occurs, and 1 otherwise. All x and y values refer
+      to {\tt{"}}graphics cordinates{\tt{"}} as defined by the graphbox parameter of
+      the \htmlref{astPlot}{astPlot} call which created the Plot.
+   }
+   \sstdiytopic{
+      Attr
+   }{
+      The {\tt{"}}Attr{\tt{"}} function returns the current value of a specified graphics
+      attribute, and optionally establishes a new value. The supplied
+      value is converted to an integer value if necessary before use.
+      It requires the following interface:
+
+      int Attr( int attr, double value, double $*$old\_value, int prim )
+
+      \sstitemlist{
+
+         \sstitem
+         attr - An integer value identifying the required attribute.
+           The following symbolic values are defined in grf.h:
+
+         \sstitem
+           GRF\_\_STYLE  - Line style.
+
+         \sstitem
+           GRF\_\_WIDTH  - Line width.
+
+         \sstitem
+           GRF\_\_SIZE   - Character and marker size scale factor.
+
+         \sstitem
+           GRF\_\_FONT   - Character font.
+
+         \sstitem
+           GRF\_\_COLOUR - Colour index.
+
+         \sstitem
+         value -
+           A new value to store for the attribute. If this is AST\_\_BAD
+           no value is stored.
+
+         \sstitem
+         old\_value - A pointer to a double in which to return
+           the attribute value.
+           If this is NULL, no value is returned.
+
+         \sstitem
+         prim -
+            The sort of graphics primitive to be drawn with the new attribute.
+            Identified by the following values defined in grf.h:
+
+         \sstitem
+            GRF\_\_LINE
+
+         \sstitem
+            GRF\_\_MARK
+
+         \sstitem
+            GRF\_\_TEXT
+      }
+   }
+   \sstdiytopic{
+      AxScale
+   }{
+      The {\tt{"}}AxScale{\tt{"}} function returns two values (one for each axis) which
+      scale increments on the corresponding axis into a {\tt{"}}normal{\tt{"}} coordinate
+      system in which:
+      \sstitemlist{
+
+         \sstitem
+         The axes have equal scale in terms of (for instance) millimetres
+           per unit distance.
+
+         \sstitem
+         X values increase from left to right.
+
+         \sstitem
+         Y values increase from bottom to top.
+         It requires the following interface:
+
+      }
+      int AxScale( float $*$alpha, float $*$beta )
+      INTEGER FUNCTION AXSCALE( ALPHA, BETA )
+
+      \sstitemlist{
+
+         \sstitem
+         alpha - A pointer to the location at which to return the scale for the
+            X axis (i.e. Xnorm = alpha$*$Xworld).
+
+         \sstitem
+         beta - A pointer to the location at which to return the scale for the
+            Y axis (i.e. Ynorm = beta$*$Yworld).
+      }
+   }
+   \sstdiytopic{
+      Flush
+   }{
+      The {\tt{"}}Flush{\tt{"}} function ensures that the display device is up-to-date,
+      by flushing any pending graphics to the output device. It
+      requires the following interface:
+
+      int Flush()
+   }
+   \sstdiytopic{
+      Line
+   }{
+      The {\tt{"}}Line{\tt{"}} function displays lines joining the given positions and
+      requires the following interface:
+
+      int Line( int n, const float $*$x, const float $*$y )
+
+      \sstitemlist{
+
+         \sstitem
+         n - The number of positions to be joined together.
+
+         \sstitem
+         x - A pointer to an array holding the {\tt{"}}n{\tt{"}} x values.
+
+         \sstitem
+         y - A pointer to an array holding the {\tt{"}}n{\tt{"}} y values.
+      }
+   }
+   \sstdiytopic{
+      Mark
+   }{
+      The {\tt{"}}Mark{\tt{"}} function displays markers at the given positions. It
+      requires the following interface:
+
+      int Mark( int n, const float $*$x, const float $*$y, int type )
+
+      \sstitemlist{
+
+         \sstitem
+         n - The number of positions to be marked.
+
+         \sstitem
+         x - A pointer to an array holding the {\tt{"}}n{\tt{"}} x values.
+
+         \sstitem
+         y - A pointer to an array holding the {\tt{"}}n{\tt{"}} y values.
+
+         \sstitem
+         type - An integer which can be used to indicate the type of marker
+           symbol required.
+      }
+   }
+   \sstdiytopic{
+      Qch
+   }{
+      The {\tt{"}}Qch{\tt{"}} function returns the heights of characters drawn vertically
+      and horizontally. It requires the following interface:
+
+      int Qch( float $*$chv, float $*$chh )
+      int QCH( CHV, CHH )
+
+      \sstitemlist{
+
+         \sstitem
+         chv- A pointer to the double which is to receive the height of
+            characters drawn with a vertical baseline. This will be an
+            increment along the X axis, in X axis units.
+
+         \sstitem
+         chh - A pointer to the double which is to receive the height of
+            characters drawn with a horizontal baseline. This will be an
+            increment along the Y axis, in Y axis units.
+      }
+   }
+   \sstdiytopic{
+      Text
+   }{
+      The {\tt{"}}Text{\tt{"}} function displays a character string at a given
+      position using a specified justification and up-vector. It
+      requires the following interface:
+
+      int Text( const char $*$text, float x, float y, const char $*$just,
+                float upx, float upy )
+
+      \sstitemlist{
+
+         \sstitem
+         text - Pointer to a null-terminated character string to be displayed.
+
+         \sstitem
+         x - The reference x coordinate.
+
+         \sstitem
+         y - The reference y coordinate.
+
+         \sstitem
+         just - A character string which specifies the location within the
+            text string which is to be placed at the reference position
+            given by x and y. The first character may be 'T' for {\tt{"}}top{\tt{"}},
+            'C' for {\tt{"}}centre{\tt{"}}, or 'B' for {\tt{"}}bottom{\tt{"}}, and specifies the
+            vertical location of the reference position. Note, {\tt{"}}bottom{\tt{"}}
+            corresponds to the base-line of normal text. Some characters
+            (eg {\tt{"}}y{\tt{"}}, {\tt{"}}g{\tt{"}}, {\tt{"}}p{\tt{"}}, etc) descend below the base-line. The second
+            character may be 'L' for {\tt{"}}left{\tt{"}}, 'C' for {\tt{"}}centre{\tt{"}}, or 'R'
+            for {\tt{"}}right{\tt{"}}, and specifies the horizontal location of the
+            reference position. If the string has less than 2 characters
+            then 'C' is used for the missing characters.
+
+         \sstitem
+         upx - The x component of the up-vector for the text.
+            If necessary the supplied value should be negated
+            to ensure that positive values always refer to displacements from
+            left to right on the screen.
+
+         \sstitem
+         upy - The y component of the up-vector for the text.
+            If necessary the supplied value should be negated
+            to ensure that positive values always refer to displacements from
+            bottom to top on the screen.
+      }
+   }
+   \sstdiytopic{
+      TxExt
+   }{
+      The {\tt{"}}TxExt{\tt{"}} function returns the corners of a box which would enclose
+      the supplied character string if it were displayed using the
+      Text function described above. The returned box includes any leading
+      or trailing spaces. It requires the following interface:
+
+      int TxExt( const char $*$text, float x, float y, const char $*$just,
+                 float upx, float upy, float $*$xb, float $*$yb )
+
+      \sstitemlist{
+
+         \sstitem
+         text - Pointer to a null-terminated character string to be displayed.
+
+         \sstitem
+         x - The reference x coordinate.
+
+         \sstitem
+         y - The reference y coordinate.
+
+         \sstitem
+         just - A character string which specifies the location within the
+            text string which is to be placed at the reference position
+            given by x and y. See {\tt{"}}Text{\tt{"}} above.
+
+         \sstitem
+         upx - The x component of the up-vector for the text.
+            See {\tt{"}}Text{\tt{"}} above.
+
+         \sstitem
+         upy - The y component of the up-vector for the text.
+            See {\tt{"}}Text{\tt{"}} above.
+
+         \sstitem
+         xb - An array of 4 elements in which to return the x coordinate of
+            each corner of the bounding box.
+
+         \sstitem
+         yb - An array of 4 elements in which to return the y coordinate of
+            each corner of the bounding box.
+      }
+   }
+}
+\sstroutine{
    astGrid\sstlabel{astGrid}
 }{
    Draw a set of labelled coordinate axes
@@ -20248,6 +20597,43 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   Grf\sstlabel{Grf}
+}{
+   Use Grf functions registered through astGrfFun?
+}{
+   \sstdescription{
+      This attribute selects the functions which are used to draw graphics by
+      the \htmlref{Plot}{Plot} class. If it is zero, then the functions in the graphics
+      interface selected at link-time are used (see the \htmlref{ast\_link}{ast_link} script).
+      Otherwise, functions registered using \htmlref{astGrfFun}{astGrfFun} are used. In this
+      case, if a function is needed which has not been registered,
+      then the function in the graphics interface selected at link-time is
+      used.
+
+      The default is to use the graphics interface
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The value of this attribute is not saved when the Plot is written
+         out through a \htmlref{Channel}{Channel} to an external data store. On re-loading such
+         a Plot using \htmlref{astRead}{astRead}, the attribute will be cleared, resulting in the
+         graphics interface selected at link-time being used.
+      }
+   }
+}
+\sstroutine{
    Grid\sstlabel{Grid}
 }{
    Draw grid lines for a Plot?
@@ -23854,6 +24240,9 @@ Object            - Base class for all AST Objects
 
          \sstitem
          \htmlref{Gap(axis)}{Gapaxis}: Interval between major axis values of a Plot
+
+         \sstitem
+         \htmlref{Grf}{Grf}: Select the graphics interface to use.
 
          \sstitem
          \htmlref{Grid}{Grid}: Draw grid lines for a Plot?

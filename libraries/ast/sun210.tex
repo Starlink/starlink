@@ -12558,6 +12558,360 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   AST\_GRFFUN\sstlabel{AST_GRFFUN}
+}{
+   Register a graphics routine for use by the Plot class
+}{
+   \sstdescription{
+      This routine can be used to select the underlying graphics
+      routines to be used when the \htmlref{Plot}{Plot} class produces graphical output.
+      If this routine is not called prior to producing graphical
+      output, then the underlying graphics routines selected at
+      link-time (using the \htmlref{ast\_link}{ast_link} command) will be used. To use
+      alternative graphics routines, call this routine before
+      the graphical output is created, specifying the graphics
+      routines to be used. This will register the routine for future
+      use, but the routine will not actually be used until the \htmlref{Grf}{Grf}
+      attribute is given a non-zero value.
+   }
+   \sstinvocation{
+      CALL AST\_GRFFUN( THIS, NAME, FUN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the Plot.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A name indicating the graphics routine to be replaced.
+         Eight graphics routines are used in total by the
+         Plot class, and any combination of them may be supplied by calling
+         this routine once for each routine to be replaced. If any of the
+         eight graphics routines are not replaced in this way, the
+         corresponding routines in the graphics interface selected at
+         link-time (using the ast\_link command) are used. The allowed
+         names are:
+
+         \sstitemlist{
+
+            \sstitem
+            Attr -  Enquire or set a graphics attribute value
+
+            \sstitem
+            AxScale - Get the axis scales
+
+            \sstitem
+            Flush - Flush all pending graphics to the output device
+
+            \sstitem
+            Line - Draw a polyline (i.e. a set of connected lines)
+
+            \sstitem
+            Mark -  Draw a set of markers
+
+            \sstitem
+            Qch - Get the character height in world coordinates
+
+            \sstitem
+            Text - Draw a character string
+
+            \sstitem
+            TxExt -  Get the extent of a character string
+
+         }
+         The string is case insensitive. For details of the interface
+         required for each, see the sections below.
+      }
+      \sstsubsection{
+         fun
+      }{
+      }
+      \sstsubsection{
+         FUN = INTEGER FUNCTION (Given)
+      }{
+         The name of the routine to be used to provide the
+         functionality indicated by parameter name (the name
+         should also appear in a Fortran EXTERNAL statement in the
+         routine which invokes AST\_GRFFUN).
+
+         Once a routine has been provided, the {\tt{"}}null{\tt{"}} routine AST\_NULL can
+         be supplied in a subsequent call to astGrfFun to reset the routine
+         to the corresponding routine in the graphics interface selected at
+         link-time. AST\_NULL is defined in the AST\_PAR include file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Function Interfaces
+   }{
+      All the functions listed below should return an integer value of
+      0 if an error occurs, and 1 otherwise. All x and y values refer
+      to {\tt{"}}graphics cordinates{\tt{"}} as defined by the GRAPHBOX parameter of
+      the \htmlref{AST\_PLOT}{AST_PLOT} call which created the Plot.
+   }
+   \sstdiytopic{
+      Attr
+   }{
+      The {\tt{"}}Attr{\tt{"}} function returns the current value of a specified graphics
+      attribute, and optionally establishes a new value. The supplied
+      value is converted to an integer value if necessary before use.
+      It requires the following interface:
+
+      INTEGER FUNCTION ATTR( ATT, VAL, OLDVAL, PRIM )
+
+      \sstitemlist{
+
+         \sstitem
+         ATT = INTEGER (Given) - An integer identifying the required attribute.
+           The following symbolic values are defined in GRF\_PAR:
+
+         \sstitem
+           GRF\_\_STYLE  - Line style.
+
+         \sstitem
+           GRF\_\_WIDTH  - Line width.
+
+         \sstitem
+           GRF\_\_SIZE   - Character and marker size scale factor.
+
+         \sstitem
+           GRF\_\_FONT   - Character font.
+
+         \sstitem
+           GRF\_\_COLOUR - Colour index.
+
+         \sstitem
+         VAL = DOUBLE PRECISION (Given) -
+           no value is stored.
+
+         \sstitem
+         OLDVAL = DOUBLE PRECISION (Returned) - Returned holding
+           the attribute value.
+
+         \sstitem
+         PRIM = INTEGER (Given) -
+            The sort of graphics primitive to be drawn with the new attribute.
+            Identified by the following values defined in GRF\_PAR:
+
+         \sstitem
+            GRF\_\_LINE
+
+         \sstitem
+            GRF\_\_MARK
+
+         \sstitem
+            GRF\_\_TEXT
+      }
+   }
+   \sstdiytopic{
+      AxScale
+   }{
+      The {\tt{"}}AxScale{\tt{"}} function returns two values (one for each axis) which
+      scale increments on the corresponding axis into a {\tt{"}}normal{\tt{"}} coordinate
+      system in which:
+      \sstitemlist{
+
+         \sstitem
+         The axes have equal scale in terms of (for instance) millimetres
+           per unit distance.
+
+         \sstitem
+         X values increase from left to right.
+
+         \sstitem
+         Y values increase from bottom to top.
+         It requires the following interface:
+
+      }
+      int AxScale( float $*$alpha, float $*$beta )
+      INTEGER FUNCTION AXSCALE( ALPHA, BETA )
+
+      \sstitemlist{
+
+         \sstitem
+         ALPHA = REAL (Returned) - Returned holding the scale for the
+            X axis (i.e. Xnorm = alpha$*$Xworld).
+
+         \sstitem
+         BETA = REAL (Returned) - Returned holding the scale for the
+            Y axis (i.e. Ynorm = beta$*$Yworld).
+      }
+   }
+   \sstdiytopic{
+      Flush
+   }{
+      The {\tt{"}}Flush{\tt{"}} function ensures that the display device is up-to-date,
+      by flushing any pending graphics to the output device. It
+      requires the following interface:
+
+      INTEGER FUNCTION FLUSH()
+   }
+   \sstdiytopic{
+      Line
+   }{
+      The {\tt{"}}Line{\tt{"}} function displays lines joining the given positions and
+      requires the following interface:
+
+      INTEGER FUNCTION LINE( N, X, Y )
+
+      \sstitemlist{
+
+         \sstitem
+         N = INTEGER (Given) - The number of positions to be joined together.
+
+         \sstitem
+         X( N ) = REAL (Given) - An array holding the {\tt{"}}n{\tt{"}} x values.
+
+         \sstitem
+         Y( N ) = REAL (Given) - An array holding the {\tt{"}}n{\tt{"}} y values.
+      }
+   }
+   \sstdiytopic{
+      Mark
+   }{
+      The {\tt{"}}Mark{\tt{"}} function displays markers at the given positions. It
+      requires the following interface:
+
+      INTEGER FUNCTION MARK( N, X, Y, TYPE )
+
+      \sstitemlist{
+
+         \sstitem
+         N = INTEGER (Given) - The number of positions to be marked.
+
+         \sstitem
+         X( N ) = REAL (Given) - An array holding the {\tt{"}}n{\tt{"}} x values.
+
+         \sstitem
+         Y( N ) = REAL (Given) - An array holding the {\tt{"}}n{\tt{"}} y values.
+
+         \sstitem
+         TYPE = INTEGER (Given) - An integer which can be used to indicate
+           the type of marker symbol required.
+      }
+   }
+   \sstdiytopic{
+      Qch
+   }{
+      The {\tt{"}}Qch{\tt{"}} function returns the heights of characters drawn vertically
+      and horizontally. It requires the following interface:
+
+      int Qch( float $*$chv, float $*$chh )
+      int QCH( CHV, CHH )
+
+      \sstitemlist{
+
+         \sstitem
+         CHV = REAL (Returned) - Returned holding the height of
+            characters drawn with a vertical baseline. This will be an
+            increment along the X axis, in X axis units.
+
+         \sstitem
+         CHH = REAL (Returned) - Returned holding the height of
+            characters drawn with a horizontal baseline. This will be an
+            increment along the Y axis, in Y axis units.
+      }
+   }
+   \sstdiytopic{
+      Text
+   }{
+      The {\tt{"}}Text{\tt{"}} function displays a character string at a given
+      position using a specified justification and up-vector. It
+      requires the following interface:
+
+      INTEGER FUNCTION TEXT( TEXT, X, Y, JUST, UPX, UPY )
+
+      \sstitemlist{
+
+         \sstitem
+         TEXT = CHARACTER $*$ ( $*$ ) (Given) - The string to be displayed.
+
+         \sstitem
+         X = REAL (Given) - The reference x coordinate.
+
+         \sstitem
+         Y = REAL (Given) - The reference y coordinate.
+
+         \sstitem
+         JUST = CHARACTER $*$ ( $*$ ) (Given ) - A string which specifies the
+            location within the
+            text string which is to be placed at the reference position
+            given by x and y. The first character may be 'T' for {\tt{"}}top{\tt{"}},
+            'C' for {\tt{"}}centre{\tt{"}}, or 'B' for {\tt{"}}bottom{\tt{"}}, and specifies the
+            vertical location of the reference position. Note, {\tt{"}}bottom{\tt{"}}
+            corresponds to the base-line of normal text. Some characters
+            (eg {\tt{"}}y{\tt{"}}, {\tt{"}}g{\tt{"}}, {\tt{"}}p{\tt{"}}, etc) descend below the base-line. The second
+            character may be 'L' for {\tt{"}}left{\tt{"}}, 'C' for {\tt{"}}centre{\tt{"}}, or 'R'
+            for {\tt{"}}right{\tt{"}}, and specifies the horizontal location of the
+            reference position. If the string has less than 2 characters
+            then 'C' is used for the missing characters.
+
+         \sstitem
+         UPX = REAL (Given) - The x component of the up-vector for the text.
+            If necessary the supplied value should be negated
+            to ensure that positive values always refer to displacements from
+            left to right on the screen.
+
+         \sstitem
+         UPX = REAL (Given) - The y component of the up-vector for the text.
+            If necessary the supplied value should be negated
+            to ensure that positive values always refer to displacements from
+            bottom to top on the screen.
+      }
+   }
+   \sstdiytopic{
+      TxExt
+   }{
+      The {\tt{"}}TxExt{\tt{"}} function returns the corners of a box which would enclose
+      the supplied character string if it were displayed using the
+      Text function described above. The returned box includes any leading
+      or trailing spaces. It requires the following interface:
+
+      INTEGER FUNCTION TXEXT( TEXT, X, Y, JUST, UPX, UPY, XB, YB )
+
+      \sstitemlist{
+
+         \sstitem
+         TEXT = CHARACTER $*$ ( $*$ ) (Given) - The string to be displayed.
+
+         \sstitem
+         X = REAL (Given) - The reference x coordinate.
+
+         \sstitem
+         Y = REAL (Given) - The reference y coordinate.
+
+         \sstitem
+         JUST = CHARACTER $*$ ( $*$ ) (Given ) - A string which specifies the
+            location within the
+            text string which is to be placed at the reference position
+            given by x and y. See {\tt{"}}Text{\tt{"}} above.
+
+         \sstitem
+         UPX = REAL (Given) - The x component of the up-vector for the text.
+            See {\tt{"}}Text{\tt{"}} above.
+
+         \sstitem
+         UPX = REAL (Given) - The y component of the up-vector for the text.
+            See {\tt{"}}Text{\tt{"}} above.
+
+         \sstitem
+         XB( 4 ) = REAL (Returned) - Returned holding the x coordinate of
+            each corner of the bounding box.
+
+         \sstitem
+         YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
+            each corner of the bounding box.
+      }
+   }
+}
+\sstroutine{
    AST\_GRID\sstlabel{AST_GRID}
 }{
    Draw a set of labelled coordinate axes
@@ -19680,6 +20034,43 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   Grf\sstlabel{Grf}
+}{
+   Use Grf routines registered through AST\_GRFFUN?
+}{
+   \sstdescription{
+      This attribute selects the routines which are used to draw graphics by
+      the \htmlref{Plot}{Plot} class. If it is zero, then the routines in the graphics
+      interface selected at link-time are used (see the \htmlref{ast\_link}{ast_link} script).
+      Otherwise, routines registered using \htmlref{AST\_GRFFUN}{AST_GRFFUN} are used. In this
+      case, if a routine is needed which has not been registered,
+      then the routine in the graphics interface selected at link-time is
+      used.
+
+      The default is to use the graphics interface
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         Plot
+      }{
+         All Plots have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The value of this attribute is not saved when the Plot is written
+         out through a \htmlref{Channel}{Channel} to an external data store. On re-loading such
+         a Plot using \htmlref{AST\_READ}{AST_READ}, the attribute will be cleared, resulting in the
+         graphics interface selected at link-time being used.
+      }
+   }
+}
+\sstroutine{
    Grid\sstlabel{Grid}
 }{
    Draw grid lines for a Plot?
@@ -23283,6 +23674,9 @@ Object            - Base class for all AST Objects
 
          \sstitem
          \htmlref{Gap(axis)}{Gapaxis}: Interval between major axis values of a Plot
+
+         \sstitem
+         \htmlref{Grf}{Grf}: Select the graphics interface to use.
 
          \sstitem
          \htmlref{Grid}{Grid}: Draw grid lines for a Plot?
