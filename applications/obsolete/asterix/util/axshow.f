@@ -20,6 +20,7 @@
 *      8 May 91 : V1.4-0  Original (DJA)
 *      4 May 94 : V1.7-0  Use AIO_ for output (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     28 Mar 95 : V1.8-1  Use new data interface (DJA)
 *
 *    Type definitions :
 *
@@ -28,7 +29,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -41,8 +41,6 @@
       CHARACTER*30              RSTR              	! Axis range description
       CHARACTER*20              WSTR              	! Axis width description
 
-      CHARACTER*(DAT__SZLOC)    ILOC              	! Input dataset
-
       REAL                      LO, HI            	! Axis range
       REAL                      BASE, SCALE       	! Regular axis parameters
       REAL                      WIDTH             	! Axis width
@@ -50,6 +48,7 @@
       INTEGER                   DEVWID            	! Device width
       INTEGER                   FSTAT             	! i/o status code
       INTEGER                   I                 	! Loop over dimensions
+      INTEGER			IFID			! Input dataset id
       INTEGER                   OCH               	! Output channel
       INTEGER                   NAX               	! Number of axes
       INTEGER                   NVAL              	! Number of axis values
@@ -70,7 +69,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'AXSHOW Version 1.8-0' )
+        PARAMETER 		( VERSION = 'AXSHOW Version 1.8-1' )
 *-
 
 *    Check status
@@ -83,7 +82,8 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get input object
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, INPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
       IF ( INPRIM ) THEN
         CALL MSG_PRNT( 'Primitive input object - no axes present' )
         STATUS = SAI__OK
@@ -93,7 +93,7 @@
         CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEVWID, STATUS )
 
 *      Get number of axes
-        CALL BDA_CHKAXES( ILOC, NAX, STATUS )
+        CALL BDI_CHKAXES( IFID, NAX, STATUS )
 
 *      Heading
         WRITE( OBUF, '(1X,A,T67,A)' ) 'Axis Label                '/
@@ -105,22 +105,22 @@
         DO I = 1, NAX
 
 *        Get label and units
-          CALL BDA_GETAXLABEL( ILOC, I, LABEL, STATUS )
-          CALL BDA_GETAXUNITS( ILOC, I, UNITS, STATUS )
+          CALL BDI_GETAXLABEL( IFID, I, LABEL, STATUS )
+          CALL BDI_GETAXUNITS( IFID, I, UNITS, STATUS )
 
 *        Get dimension
-          CALL BDA_CHKAXVAL( ILOC, I, OK, REG, NVAL, STATUS )
+          CALL BDI_CHKAXVAL( IFID, I, OK, REG, NVAL, STATUS )
 
 *        Construct range string
           IF ( REG ) THEN
-            CALL BDA_GETAXVAL( ILOC, I, BASE, SCALE, NVAL, STATUS )
+            CALL BDI_GETAXVAL( IFID, I, BASE, SCALE, NVAL, STATUS )
             LO = BASE
             HI = BASE + FLOAT(NVAL-1)*SCALE
           ELSE
-            CALL BDA_MAPAXVAL( ILOC, 'READ', I, PTR, STATUS )
+            CALL BDI_MAPAXVAL( IFID, 'READ', I, PTR, STATUS )
             CALL ARR_ELEM1R( PTR, NVAL, 1, LO, STATUS )
             CALL ARR_ELEM1R( PTR, NVAL, NVAL, HI, STATUS )
-            CALL BDA_UNMAPAXVAL( ILOC, I, STATUS )
+            CALL BDI_UNMAPAXVAL( IFID, I, STATUS )
           END IF
           CALL MSG_SETR( 'LO', LO )
           CALL MSG_SETR( 'HI', HI )
@@ -128,10 +128,10 @@
           CALL MSG_MAKE( '^LO to ^HI ^UNITS', RSTR, TLEN )
 
 *        Widths present
-          CALL BDA_CHKAXWID( ILOC, I, WOK, UNIF, NWID, STATUS )
+          CALL BDI_CHKAXWID( IFID, I, WOK, UNIF, NWID, STATUS )
           IF ( WOK ) THEN
             IF ( UNIF ) THEN
-              CALL BDA_GETAXWID( ILOC, I, WIDTH, STATUS )
+              CALL BDI_GETAXWID( IFID, I, WIDTH, STATUS )
               CALL MSG_SETR( 'WID', WIDTH )
             ELSE
               CALL MSG_SETC( 'WID', 'Non-uniform' )
@@ -154,7 +154,7 @@
       END IF
 
 *    Release dataset
-      CALL BDA_RELEASE( ILOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
