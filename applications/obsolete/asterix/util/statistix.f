@@ -561,7 +561,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Display results
-      CALL STATISTIX_DISPLAY( GRP, NDIM, DIMS, N, USEWEIGHT, VAROK,
+      CALL STATISTIX_DISPLAY( OBJ, NDIM, DIMS, N, USEWEIGHT, VAROK,
      :                        MEAN, SUM,
      :                        STDDEV, SKEWNESS, KURTOSIS, MINVALUE,
      :                        MAXVALUE, MINP, MAXP, MEANERR, NVALID,
@@ -672,7 +672,7 @@
      :                 WTSUM, NVALID, CHISQUARE, ENZ, STATUS )
 
 *        ...and display
-      CALL STATISTIX_DISPLAY( GRP, NDIM, DIMS, N, USEWEIGHT, VAROK,
+      CALL STATISTIX_DISPLAY( OBJ, NDIM, DIMS, N, USEWEIGHT, VAROK,
      :                        MEAN, SUM,
      :                  STDDEV, SKEWNESS, KURTOSIS, MINVALUE, MAXVALUE,
      :                   MINP, MAXP, MEANERR, NVALID, CHISQUARE, ENZ,
