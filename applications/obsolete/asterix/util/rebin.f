@@ -459,6 +459,8 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         END IF
 
 * output axis bounds
+	print *,'Map bounds'
+	call flush(6)
         CALL BDI_AXMAPR( OFID, I, 'Bounds', 'READ', AXBPO(I), STATUS )
 
       END DO
@@ -466,7 +468,8 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
       IF (STATUS.EQ.SAI__OK) THEN
         CALL MSG_PRNT('Rebinning...')
       ENDIF
-
+	print *,'Doing it..'
+	call flush(6)
 *  Perform rebinning
       IF (OPT.EQ.1) THEN
         CALL REBIN_DOIT_BYRATIO(
