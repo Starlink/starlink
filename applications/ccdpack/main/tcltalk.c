@@ -330,7 +330,8 @@
 *
 *  Description:
 *     This routine causes the script file named by the filename argument
-*     to be executed within the running Tcl interpreter.
+*     to be executed within the running Tcl interpreter.  It will look
+*     for the script in the CCDPACK_DIR directory.
 *
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
@@ -340,12 +341,19 @@
 *     status = int *
 *        The global status.
 *-
+      char *ccddir;
 
 /* Check the inherited status. */
       if ( *status != SAI__OK ) return;
 
 /* Construct a command to source the file. */
-      sprintf( buffer, "source %s", filename );
+      ccddir = getenv( "CCDPACK_DIR" );
+      if ( ccddir != NULL && index( filename, '/' ) != NULL ) {
+         sprintf( buffer, "source %s/%s", ccddir, filename );
+      }
+      else {
+         sprintf( buffer, "source %s", filename );
+      }
 
 /* Execute the constructed command. */
       (void) ccdTclEval( cinterp, buffer, status );
