@@ -112,6 +112,8 @@
 *        Don't write AREASCAL keyword. Handle spectra with bins more than
 *        one channel wide properly. Removed ignoring channels 1..7 for
 *        XRT data.
+*     14 Aug 95 V1.8-3 (DJA):
+*        Reinstated AREASCAL and normalise response to take the factor out.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -142,7 +144,7 @@
         PARAMETER		( MAXIG = 2 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AST2XSP Version 1.8-1' )
+        PARAMETER		( VERSION = 'AST2XSP Version 1.8-3' )
 
       INTEGER			XSP_OK
         PARAMETER		( XSP_OK = 0 )
