@@ -92,4 +92,20 @@ int Et_AppInit( Tcl_Interp *interp )
   return TCL_OK;
 }
 
+extern "C" void initFortran(int,char**);
 
+/*
+ * Main function. 
+ * 
+ * Patterned after the unskipped parts of the main function generated
+ * in gaia_swish.c (q.v.), but with the addition of the initFortran()
+ * call, to initialise the Fortran runtime.
+ */
+int
+main(int argc, char** argv)
+{
+    /* Do any work to initialise the Fortran runtime */
+    initFortran(argc, argv);
+
+    return Et_Init(argc,argv)!=TCL_OK;
+}

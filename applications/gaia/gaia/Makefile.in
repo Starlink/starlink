@@ -157,10 +157,10 @@ LN           = ln -s
 all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON)
 
 #  Link wish. 
-$(DEMO_WISH): normallib tkAppInit.o FORCE
+$(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
 	@echo "linking \"$(DEMO_WISH)\"..."
 	- @RANLIB@ $(LIBDIR)/libskycat.a
-	$(LTLINK) $(CC_SWITCHES) tkAppInit.o -o $(DEMO_WISH)  \
+	$(LTLINK) $(CC_SWITCHES) tkAppInit.o initFortran.o -o $(DEMO_WISH)  \
 	       $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	       $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
 	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
@@ -195,6 +195,10 @@ $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	     $(LN) gaiaMon $$f;\
 	    );\
 	done
+
+# initFortran.c includes ../config.h
+initFortran.o: initFortran.c
+	$(CC) -c $(CC_SWITCHES) -I.. initFortran.c
 
 #  Rule to create the monolith interface file from the source.
 gaiaMon.ifc: $(IFL_FILES)

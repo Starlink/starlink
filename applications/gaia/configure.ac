@@ -26,6 +26,11 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+dnl    We have a C++ main function, but we call Fortran.  This defines
+dnl    the cpp macro of the same name, which will do any 
+dnl    initialisation which is necessary with this platform/compiler.
+STAR_INITIALISE_FORTRAN
+
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
                           [ard ast cat fio ndf pcs pda sae], link)
@@ -38,6 +43,8 @@ STAR_DECLARE_DEPENDENCIES(use, [convert esp extractor kappa photom polpack])
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun214)
+
+AC_CONFIG_HEADERS(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

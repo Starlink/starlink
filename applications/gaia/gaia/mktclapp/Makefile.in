@@ -142,14 +142,25 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 	$(MKTCLAPP) -f gaia_stcl.mta > gaia_stcl.c
 
 #  Link wish. 
-$(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
+$(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o ../initFortran.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
 	- @RANLIB@ $(LIBDIR)/libskycat.a
-	$(LTLINK) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
+	$(LTLINK) $(CC_SWITCHES) tkAppInit.o gaia_swish.o ../initFortran.o \
+	   -o $(TKPROG)  \
 	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	   $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
 	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
-	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
+	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS) \
+  -L/Volumes/Boltzmann/local-star/lib \
+  -L/Volumes/Boltzmann/opt/local/bin/../lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3 \
+  -L/Volumes/Boltzmann/opt/local/bin/../lib/gcc-lib \
+  -L/opt/local/lib \
+  -L/opt/local/lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3 \
+  -L/Volumes/Boltzmann/opt/local/bin/../lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3/../../.. \
+  -L/opt/local/lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3/../../.. \
+  -lfrtbegin \
+  -lg2c \
+  -lSystem
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
@@ -157,6 +168,10 @@ $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) \
 	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(LDFLAG2) $(EXTRA_LIBS)
+
+# initFortran lives in the parent directory
+../initFortran.o:
+	cd ..; $(MAKE) initFortran.o
 
 install: install-top install-bin
 

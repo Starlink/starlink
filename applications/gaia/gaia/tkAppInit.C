@@ -21,6 +21,8 @@
 /* static char sccsid[] = "@(#) tkAppInit.c 1.12 94/12/17 16:30:56"; */
 #endif /* not lint */
 
+/* #include <config.h> */
+
 #include <stdlib.h>
 
 /* declare command procedures here */
@@ -68,11 +70,17 @@ int *tclDummyMathPtr = (int *) matherr;
 extern "C" {
 #include "ndf.h"                 /* Define NDF interface */
 #include "sae_par.h"             /* Define SAI__OK */
+
+void initFortran(int,char**);    /* Initialise the Fortran runtime */
 }
+
 
 int
 main(int argc, char** argv)
 {
+    /*  Initialise the Fortran runtime, if necessary */
+    initFortran(argc, argv);
+
     /*  Initialise the NDF library, needed to make sure history works,
      *	must do this here to access argc and argv */
     int status = SAI__OK;
