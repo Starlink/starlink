@@ -205,8 +205,8 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
         L=L+1
         I_UNITS_1D(L:)='/'//I_XYUNITS
         L=CHR_LEN(I_UNITS_1D)
-        IF (I_UNITS_1D(L:L).EQ.'S'.OR.I_UNITS_1D(L:L).EQ.'s') THEN
-          L=L-1
+        IF (I_UNITS_1D(L:L).NE.'S'.AND.I_UNITS_1D(L:L).NE.'s') THEN
+          L=L+1
         ENDIF
         I_UNITS_1D(L:)='\u2\d'
         I_TITLE_1D='Projected slice'
