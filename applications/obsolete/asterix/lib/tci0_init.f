@@ -96,6 +96,7 @@
       EXTERNAL			ADI_REQPKG
       EXTERNAL			TCI1_READ
       EXTERNAL			TCI1_WRITE
+      EXTERNAL			TCI2_WRITE
 
 *  Local Variables:
       INTEGER			DID			! Dummy variable
@@ -113,6 +114,8 @@
 *    Define methods
         CALL ADI_DEFMTH( 'ReadTiming(HDSfile)', TCI1_READ, DID, STATUS )
         CALL ADI_DEFMTH( 'WriteTiming(HDSfile,TimingInfo)', TCI1_WRITE,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteTiming(FITSfile,TimingInfo)', TCI2_WRITE,
      :                   DID, STATUS )
 
 *    Now initialised

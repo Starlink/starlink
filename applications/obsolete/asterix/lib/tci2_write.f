@@ -239,6 +239,8 @@
 *  Local Variables:
       CHARACTER*8		DSTR, TSTR		! Date and time strings
 
+      DOUBLE PRECISION		MJD			!
+
       INTEGER			FID, TIMID		! Extracted arguments
 
       LOGICAL			MOK			! Things present?
@@ -254,7 +256,7 @@
 *  Start date/time of observation
       CALL ADI_THERE( TIMID, 'MJDObs', MOK, STATUS )
       IF ( MOK ) THEN
-        CALL ADI_CGET0D( DETID, 'MJDObs', MJD, STATUS )
+        CALL ADI_CGET0D( TIMID, 'MJDObs', MJD, STATUS )
         CALL TCI_MJD2DT( MJD, DSTR, TSTR, STATUS )
         CALL ADI2_PKEY0D( FID, HDUNAM, 'MJD-OBS', MJD,
      :                    'MJD of the data start', STATUS )
@@ -267,7 +269,7 @@
 *  Clock reference date/time
       CALL ADI_THERE( TIMID, 'MJDRef', MOK, STATUS )
       IF ( MOK ) THEN
-        CALL ADI_CGET0D( DETID, 'MJDRef', MJD, STATUS )
+        CALL ADI_CGET0D( TIMID, 'MJDRef', MJD, STATUS )
         CALL TCI_MJD2DT( MJD, DSTR, TSTR, STATUS )
         CALL ADI2_PKEY0D( FID, HDUNAM, 'MJDREF', MJD,
      :                    'MJD SC clock start', STATUS )
