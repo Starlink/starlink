@@ -32,7 +32,7 @@ AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init)
 # itcl uses the same ones).
 STAR_DECLARE_DEPENDENCIES([build], 
                           [chr agi ard ast chr fio ndf pgplot prm \
-                           psx trn pda ndg tcl tk itcl startcl ifd])
+                           psx trn pda ndg tcl tk itcl startcl ifd generic])
 STAR_LATEX_DOCUMENTATION(sun139)
 AC_CONFIG_SUBDIRS([tasks gen help main])
 AC_CONFIG_FILES([Makefile component.xml ccdpack.ifd CCD1_PAR])
