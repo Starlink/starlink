@@ -27,7 +27,7 @@
 *     (see parameter REPORT). An outline may be drawn around the current
 *     picture if required (see parameter OUTLINE).
 *
-*     A list of the colours in the current pallette is also produced.
+*     A list of the colours in the current palette is also produced.
 
 *  ADAM Parameters:
 *     COMMENT = LITERAL (Write)
@@ -214,7 +214,7 @@
 *        Modify plotting of outline to use bounds of picture rather than
 *        bounds of Plot.
 *     10-DEC-2002 (DSB):
-*        Added display of colour pallette.
+*        Added display of colour palette.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -236,7 +236,7 @@
 
 *  Local Variables:
       CHARACTER ATTR*10          ! Buffer for attribute name
-      CHARACTER CNAME*18         ! Name of nearest colour
+      CHARACTER CNAME*20         ! Name of nearest colour
       CHARACTER COM*80           ! Picture comment
       CHARACTER DOM*30           ! Frame Domain
       CHARACTER DOM0*30          ! Original Current Frame Domain
@@ -587,9 +587,9 @@
 
       END IF
 
-*  If required, display a list of the pallette colours. 
+*  If required, display a list of the palette colours. 
       IF( REPORT .AND. STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_OUT( ' ', '   The pallette contains the following '//
+         CALL MSG_OUT( ' ', '   The palette contains the following '//
      :                 'colours:', STATUS )
          CALL MSG_BLANK( STATUS )         
          CALL MSG_OUT( ' ', '      Entry:  Red:    Green:  Blue:   '//
@@ -598,9 +598,9 @@
          DO  J = 0, CTM__RSVPN - 1
             CALL PGQCR( J, R, G, B )
             CALL KPG1_COLNM( R, G, B, CNAME, STATUS )
-            WRITE( TEXT, '(7x,I2,5x,3(F5.3,3x),x,A18)' ) J, R, G, B, 
+            WRITE( TEXT, '(7x,I2,5x,3(F5.3,3x),x,A20)' ) J, R, G, B, 
      :                                                   CNAME
-            CALL MSG_OUT( ' ', TEXT( : 50 ), STATUS )
+            CALL MSG_OUT( ' ', TEXT( : 79 ), STATUS )
          END DO
 
          CALL MSG_BLANK( STATUS )         
