@@ -1,0 +1,15 @@
+starconf.status
+libtool
+Makefile.in
+Makefile
+configure
+.deps
+.libs
+*.m4
+*.cache
+config.*
+*.lo
+*.la
+*.a
+*.pro
+
