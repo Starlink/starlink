@@ -14,8 +14,9 @@ import java.lang.reflect.*;
  * the file is opened.
  *
  * Objects are created for each item in a GSD file by the GSDObject
- * constructor. In general, GSDItem objects are usually not instantiated
- * from user code. Once instantiated, GSDItem objects are immutable
+ * constructor. In general, GSDItem objects are usually not
+ * instantiated from user code (and in fact the constructor is
+ * package-private). Once instantiated, GSDItem objects are immutable
  * since GSD files are readonly [at least that is the goal - currently
  * they are modified after instantiation by the GSDObject during read
  * but they will be immutable after that].
@@ -24,11 +25,11 @@ import java.lang.reflect.*;
  * @version $Id$
  */
 
-public class GSDItem {
+public final class GSDItem {
 
     // Only the Item needs to know how many bytes are used
     // to represent a string in the data segment of a GSD file.
-    private static final int GSD__SZCHAR    = 16;
+    private static final int GSD__SZCHAR = 16;
 
     // Instance variables that contain information useful
     // for public consumption.
@@ -56,10 +57,13 @@ public class GSDItem {
     private ByteBuffer contents;
 
     // This is the offset into the ByteBuffer, relative to the
-    // start of the buffer and not the start of the GSD file
+    // start of the buffer and not the start of the GSD file. This corresponds
+    // to the first byte in the ByteBuffer that is of interest for this
+    // item.
     private final int start_byte;
 
-    // The number of byte representing the data in the GSD data segment
+    // The number of byte representing the data in the GSD data segment.
+    // Assumes start counting at start_byte.
     private final int nbytes;
 
     // The actual number of dimensions associated with the data.
@@ -106,19 +110,13 @@ public class GSDItem {
 
     /**
      * Store the actual data associated with this item. Should only
-     * be allowed from within the package.
+     * be allowed from within the package. This is not part of the constructor
+     * since currently the data segement is read from a GSD file after the
+     * indivudal Items have been instantiated.
      */
     private void setData( Object thedata ) { this.data = thedata; };
 
     // Accessor methods
-
-    // Extra accessors that must be documented but are not part of the
-    // public interface.  Returns the start position of the byte
-    // stream. For internal use only. This avoids confusion.
-    private int start_byte() { return this.start_byte; }
-
-    // Number of bytes representing the data in the byte buffer
-    private int nbytes() { return this.nbytes; }
 
     /**
      * The number of dimensions in the data. Zero for scalar items.
@@ -177,6 +175,7 @@ public class GSDItem {
 
     /**
      * Indicates whether the item is scalar or an array of values.
+     * 
      */
     public boolean isArray() { 
 	boolean result = true;
@@ -188,27 +187,20 @@ public class GSDItem {
 
     /**
      * If an array, this is the dimensionality of the data array.
-     *
-     * @throws IllegalStateException if the data associated with the
-     * item can not be read due to some problem in the sub-item.
      */
     public int[] dimensions()  { 
 	int[] dims = new int[ ndims ];
 	for (int i = 0; i < ndims; i++ ) {
-	    // put try block inside for loop so that we can raise
-	    // an error specific to the item.
-	    try {
-		Integer val = (Integer)dimitems[i].getData();
-		dims[i] = val.intValue();
-	    } catch ( IOException e ) {
-		throw new IllegalStateException("Error extracting data value for dimension "+ i + " from underlying item #" + dimitems[i].number() );
-	    }
+	    Integer val = (Integer)dimitems[i].getData();
+	    dims[i] = val.intValue();
 	}
 	return dims;
     }
 
     /**
      * If an array, this is the name of each axis.
+     *
+     * @return ndims strings.
      */
     public String[] dimnames() {
 	String[] names = new String[ ndims ];
@@ -220,6 +212,8 @@ public class GSDItem {
 
     /**
      * If an array, this is the units associated with each axis.
+     *
+     * @return ndims strings.
      */
     public String[] dimunits() {
 	String[] units = new String[ ndims ];
@@ -231,7 +225,10 @@ public class GSDItem {
 
     /**
      * If an array, this is the item numbers associated with each axis.
-     * Use the dimitems() method to return the actual items.
+     * Use the dimitems() method to return the actual items. The item
+     * numbers refer to the original GSD file.
+     *
+     * @return ndims numbers
      */
     public int[] dimnumbers() {
 	int[] nums = new int[ ndims ];
@@ -246,11 +243,12 @@ public class GSDItem {
      * yet been read from file, a read is forced if the GSD file is
      * still open. Returns null if the data can not be read. Scalar
      * data are stored as java.lang.Number objects. Array data
-     * are stored in int[], float[], String[] etc but stored in this
-     * object as objects.
-     
+     * are stored in int[], float[], String[] etc but stored 
+     * as a single object.
+     *
+     * @return A single object that must be cast into the correct type.
      */
-    public Object getData() throws IOException  { 
+    public Object getData() { 
 	if (this.data == null) {
 	    // try to read
 	    this.attachItemData();
@@ -261,8 +259,10 @@ public class GSDItem {
     /**
      * Return the number of data elements associated with the item.
      * Calculated from the dimensions and so does not force a read
-     * of the item data.
+     * of the item data (although it may force a read of the associated
+     * dimensional items).
      *
+     * @return the number of elements.
      */
     public int size() {
 	int nelm = 1;
@@ -289,21 +289,19 @@ public class GSDItem {
                 "Array size=" + size;
         } else {
             header = header + " [Scalar]" + " ";
-	    try {
-		Object data = this.getData();
-		header = header + data;
-	    } catch (IOException e) {
-		header = header + "<undefined>";
-	    }
+	    Object data = this.getData();
+	    header = header + data;
         }
 	return header;
     }
 
     /**
      * Print the contents of the Item to standard output regardless
-     * of the size of the item.
+     * of the size of the item. This will force a conversion of the data
+     * from bytes into a Java data object if required.
+     *
      */
-    public void dumpIt() throws IOException  {
+    public void dumpIt() {
 	// Simply call dumpIt with a negative value
 	dumpIt( -1 );
     }
@@ -312,13 +310,16 @@ public class GSDItem {
      * Print the contents of the Item to standard output. If the item
      * represents an array item the data values will only be printed
      * if the number of items is less than or equal to the specified maximum.
+     * This will force a conversion of the data bytes into a native Java
+     * object only if the number of elements in the object is smaller than
+     * the limit.
      *
      * @param maxsize  Only print data arrays if they are smaller than this
      *                 value. A negative value indicates that the length is
      *                 dumped regardless of size.
      */
 
-    public void dumpIt( long maxsize ) throws IOException  {
+    public void dumpIt( long maxsize ) {
 
 	String header = this.name() + "      " + this.unit() +
 	    "     " + this.type();
@@ -377,13 +378,15 @@ public class GSDItem {
 
     }
 
+    // ------------------- INTERNAL METHODS -------------------------------
+
     /**
      * Given a GSDItem, attempt to attach data to it. Nothing is
      * returned, the Item is modified in place. This method is called
      * automatically when the GSDItem.getData() method is invoked if
-     * the data has not previously been read from file. 
+     * the data have not previously been read from file.
      */
-    private void attachItemData() throws IOException {
+    private void attachItemData() {
 	// First we need to read the bytes from the file
 	// This may not be the most memory efficient approach
 	// for really large buffers
@@ -405,33 +408,33 @@ public class GSDItem {
 
 	    if (type == 'B') {
 		this.setData( GSDVAXBytes.tobyteArrayNB( contents,
-							 this.start_byte(),
-							 this.nbytes() ) );
+							 this.start_byte,
+							 this.nbytes ) );
 	    } else if (type == 'L') {
 		this.setData( GSDVAXBytes.toboolArrayNB( contents,
-							 this.start_byte(),
-							 this.nbytes() ) );
+							 this.start_byte,
+							 this.nbytes ) );
 	    } else if (type == 'W') {
 		this.setData( GSDVAXBytes.toshortArrayNB( contents,
-							  this.start_byte(),
-							  this.nbytes() ) );
+							  this.start_byte,
+							  this.nbytes ) );
 	    } else if (type == 'I') {
 		this.setData( GSDVAXBytes.tointArrayNB( contents,
-							this.start_byte(),
-							this.nbytes() ) );
+							this.start_byte,
+							this.nbytes ) );
 	    } else if (type == 'R') {
 		this.setData( GSDVAXBytes.tofloatArrayNB( contents,
-							  this.start_byte(),
-							  this.nbytes() ) );
+							  this.start_byte,
+							  this.nbytes ) );
 
 	    } else if (type == 'D') {
 		this.setData( GSDVAXBytes.todoubleArrayNB( contents,
-							   this.start_byte(),
-							   this.nbytes() ) );
+							   this.start_byte,
+							   this.nbytes ) );
 	    } else if (type == 'C') {
 		this.setData( GSDVAXBytes.tostringArrayNB( contents,
-							   this.start_byte(),
-							   this.nbytes(),
+							   this.start_byte,
+							   this.nbytes,
 							   GSD__SZCHAR) );
 	    }
 	    
@@ -439,12 +442,12 @@ public class GSDItem {
 	} else {
 
 	    // Then position the buffer offset
-	    this.contents.position( this.start_byte() );
+	    this.contents.position( this.start_byte );
 
 	    // a byte array to receive the scalar data
 	    // We know this is going to be a small array
 	    // so do not need to worry about memory consumption
-	    byte[] byteArray = new byte[ this.nbytes() ];
+	    byte[] byteArray = new byte[ this.nbytes ];
 
 	    // and read in the data
 	    contents.get( byteArray );

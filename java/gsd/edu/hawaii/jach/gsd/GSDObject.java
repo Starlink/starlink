@@ -64,8 +64,13 @@ public class GSDObject {
      * @param filename Name of the GSD file on disk.
      * @throws FileNotFoundException if the specified file can not be found 
      *         or opened.
+     * @throws IOException if there is an error reading the file contents.
+     * @throws NullPointerException if an item describing an array
+     * dimension has not been read before the array item itself. This
+     * suggests and internal error in the organisation of the file.
      */
-    public GSDObject( String filename ) throws FileNotFoundException, IOException {
+    public GSDObject( String filename ) throws FileNotFoundException,
+	IOException {
 
 	// Need to open the file
 	RandomAccessFile fptr = new RandomAccessFile( filename, "r" );
@@ -93,13 +98,16 @@ public class GSDObject {
     }
 
     /**
-     * Read a ByteBuffer as if it were the contents of a GSD file.
+     * Process a ByteBuffer as if it were the contents of a GSD file.
      * Assumes that the beginning of the buffer corresponds to the
-     * beginning of the GSD contents.
+     * beginning of the GSD file. The buffer is rewound prior to use.
      *
      * @param contents ByteBuffer representing the GSD file.
+     * @throws NullPointerException if an item describing an array
+     * dimension has not been read before the array item itself. This
+     * suggests and internal error in the organisation of the buffer.
      */
-    public GSDObject( ByteBuffer contents ) throws IOException {
+    public GSDObject( ByteBuffer contents )  {
 	// Reset the position of the buffer
 	contents.rewind();
 
@@ -123,14 +131,15 @@ public class GSDObject {
     }
 
     /**
-     * The version number of this GSD file
+     * The version number of this GSD file.
      */
-    public float getFileVersion() {
+    public float getGsdVersion() {
         return this.version;
     }
 
     /**
-     * The name of the GSD file
+     * The name of the GSD file. If this object was constructed
+     * from a ByteBuffer the filename will be set to "<none>".
      */
     public String getFilename() {
         return this.filename;
@@ -213,13 +222,13 @@ public class GSDObject {
      * without special formatting. Equivalent to the gsdprint
      * command.
      */
-    public void print() throws IOException {
+    public void print() {
         System.out.println("-----------------------------------------------------");
 	System.out.println(" G S D   P R I N T");
 	System.out.println("-----------------------------------------------------");
         System.out.println("");
         System.out.println(" Filename       : "+ getFilename() );
-        System.out.println(" GSD version    : "+ getFileVersion() );
+        System.out.println(" GSD version    : "+ getGsdVersion() );
         System.out.println(" Label          : "+ getLabel() );
         System.out.println(" Number of item : "+ getNumItems() );
         System.out.println("");
@@ -250,7 +259,7 @@ public class GSDObject {
 
     /* I N T E R N A L   I O   R O U T I N E S */
 
-    private void parseBuffer( ByteBuffer buf ) throws IOException {
+    private void parseBuffer( ByteBuffer buf ) {
 
 	// First read the file header
 	this.readFileDesc( buf );
@@ -267,8 +276,9 @@ public class GSDObject {
     }
 
 
-    private void readFileDesc ( ByteBuffer buf ) throws IOException {
+    private void readFileDesc ( ByteBuffer buf ) {
 	// Read the first few bytes for the general file description
+	// Assumes the buffer is at the start of the GSD contents.
 
 	/**
 	   The GSD file descriptor is defined as follows:
@@ -345,14 +355,19 @@ public class GSDObject {
 
     };
 
+    /**
+     * For each of the no_items items in the file the next
+     * block of the buffer contains the information associated
+     * with each item but not the data itself
+     * [which is to be extracted later]. Assumes the buffer is at
+     * the correct position.
+     * 
+     * @throws NullPointerException if an item describing an array
+     * dimension has not been read before the array item itself.
+     */
+    private void readItemDesc (ByteBuffer buf) {
 
-    private void readItemDesc (ByteBuffer buf) throws IOException {
 
-	// For each of the no_items items in the file the next
-	// block of the file contains the information associated
-	// with each item but not the data itself
-	// [which is to be mapped later]
-	//
 	/* The struct is implemented as follows:
 	   char  array;
 	   char  name[15];
@@ -517,7 +532,7 @@ public class GSDObject {
     }
 
     // Attach the actual data to each of the individual items
-    private void attachData( ByteBuffer buf ) throws IOException {
+    private void attachData( ByteBuffer buf ) {
 
 	// Set the buffer offset
 	buf.position( start_data );
