@@ -788,7 +788,7 @@
 		-- sequence of lines which should have line-breaks
 		   recognised (the name comes from the similarly-named
 		   notation in the DocBook DTD -->
-<!element LINE - o (#pcdata)>
+<!element LINE - o (%phrase | %special)>
 
 <!element DRAFTNOTE - - (#pcdata)	-- Notes during drafting -->
 
@@ -1183,7 +1183,7 @@
 	%export.id.optional;
 	>
 
-<!entity % tbl.table.name 'tabular'>
+<!entity % tbl.table.name 'TABULAR'>
 <!entity % tbl.table-titles.mdl ''>
 <!entity % tbl.entry.mdl '(%phrase)*'>
 <!entity % calstbls public "-//OASIS//DTD Exchange Table Model 19960430//EN">
