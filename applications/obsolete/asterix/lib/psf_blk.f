@@ -30,6 +30,7 @@
       IMPLICIT NONE              	! No implicit typing
 
 *  Global constants:
+      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'                 ! Psf system constants
 
 *  Global Variables:

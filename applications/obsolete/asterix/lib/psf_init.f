@@ -3,7 +3,7 @@
 *
 *    Description :
 *
-*     Sets up ASTLIB(PSF_CMN)
+*     Sets up PSF_CMN
 *
 *    Authors :
 *
@@ -25,7 +25,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Status :
 *
@@ -95,7 +95,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Status :
 *

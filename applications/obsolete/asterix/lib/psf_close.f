@@ -29,7 +29,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Status :
 *
