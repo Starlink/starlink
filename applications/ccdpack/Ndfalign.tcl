@@ -190,7 +190,7 @@
             }
          } elseif { ! [ catch { $ndfob validndf } valid ] } {
             if { $valid } {
-               set ndfsetob [ ndfset $ndfob ]
+               set ndfsetob [ ndfset "" [ $ndfob name ] ]
             } else {
                error "ndfview loadndf: \"$ndfob\" is an invalid ndfset."
             }
