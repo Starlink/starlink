@@ -245,6 +245,7 @@
 #include "mers.h"
 #include "cnf.h"
 #include "tclndf.h"
+#include "ccdaux.h"
 #include "ast.h"
 #include "cpgplot.h"
 

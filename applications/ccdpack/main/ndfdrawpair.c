@@ -110,6 +110,7 @@
 #include "cpgplot.h"
 #include "tcl.h"
 #include "tclndf.h"
+#include "ccdaux.h"
 
 
 /* Declare object function to be executed in the background. */

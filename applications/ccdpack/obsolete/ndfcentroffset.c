@@ -93,6 +93,7 @@
 #include <stdlib.h>
 #include "tcl.h"
 #include "tclndf.h"
+#include "ccdaux.h"
 #include "cnf.h"
 #include "dat_par.h"
 #include "ast.h"
