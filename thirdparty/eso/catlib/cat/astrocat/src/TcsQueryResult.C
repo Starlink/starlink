@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsQueryResult.C,v 1.14 2001/08/27 10:10:33 abrighto Exp $
+ * $Id: TcsQueryResult.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $
  *
  * TcsQueryResult.C - method definitions for class TcsQueryResult
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.14 2001/08/27 10:10:33 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $";
 
 
 #include <stdlib.h>
@@ -63,6 +63,8 @@ int TcsQueryResult::clear()
 	delete [] objects_;
 	objects_ = NULL;
     }
+
+    return 0;			// Is this the non-ERROR return value?
 }
 
 
