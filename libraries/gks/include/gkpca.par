@@ -1,0 +1,15 @@
+*  -------------
+*  BEGIN INCLUDE     GKPCA.PAR     Version  1    Author MGC
+*  -------------
+
+*  CHANGE LOG
+
+*
+* Pick echoplay status
+*
+      INTEGER    KPECHO,   KPUNEC,   KPSCAN,   KPSTOP
+      PARAMETER (KPECHO=1, KPUNEC=2, KPSCAN=3, KPSTOP=4)
+
+*  -----------
+*  END INCLUDE
+*  -----------

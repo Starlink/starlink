@@ -1,0 +1,23 @@
+* -------------
+* BEGIN INCLUDE    GKIO.CMN     Version 1        Author AS
+* -------------
+
+* CHANGE LOG        104
+
+      INTEGER    KBUF,     KEND
+      PARAMETER (KBUF=150, KEND=10)
+
+      INTEGER KB(1:KWK),KBB(1:KWK),KEB(1:KWK)
+
+      COMMON/GKYIO/KB,KBB,KEB
+
+
+      CHARACTER*(KBUF+KEND) CMBUFF(KWK)
+
+      CHARACTER*(KEND) CEBUFF(KWK)
+
+      COMMON/GKZIO/CMBUFF,CEBUFF
+
+* -----------
+* END INCLUDE
+* -----------

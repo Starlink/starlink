@@ -1,0 +1,15 @@
+*  -------------
+*  BEGIN INCLUDE    GKSSL.PAR     Version  1    Author JRG
+*  -------------
+
+*  CHANGE LOG        180
+
+       INTEGER    KSGVIS,   KSGHLT,   KSGDTE,   KSGNWS,   KSGISZ
+       PARAMETER (KSGVIS=1, KSGHLT=2, KSGDTE=3, KSGNWS=4, KSGISZ=4)
+
+       INTEGER    KSGTRN,   KSGPRI,   KSGRSZ,   KSGSLN
+       PARAMETER (KSGTRN=1, KSGPRI=7, KSGRSZ=7, KSGSLN=50)
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,36 @@
+*  -------------
+*  BEGIN INCLUDE    GKSL.CMN     Version  10    Author CJW
+*  -------------
+
+*  CHANGE LOG        39,70,99,101,120,130,183,201,210
+*     19/01/87  DCS   IS conversion. Add current character width,
+*                     character base vector and clipping rectangle.
+*                     Replace current pattern size by current pattern
+*                     width and height vectors.
+
+      INTEGER KCNTN,KTNOVP(0:KT),KCLIN,KCPLI,KCPMI,KCTXI,KCCHP,KCHZCH,
+     :        KCVTCH,KCFAI,KCLNTY,KCPLCI,KCMKTY,KCPMCI,KCTXFN,KCTXPR,
+     :        KCTXCI,KCFAIS,KCFASI,KCFACI,KCPLAF(1:3),KCPMAF(1:3),
+     :        KCTXAF(1:4),KCFAAF(1:3),KCPCID,KOPSG,KCEPT,KSTRWK,
+     :        KSPLWK,KSPMWK,KSTXWK,KSFAWK,KSGLST,KNUMSG
+
+      REAL QCCHH,QCCHUX,QCCHUY,QCCHW,QCCHBX,QCCHBY,QCPAWX,QCPAWY,QCPAHX,
+     :     QCPAHY,QCPAX,QCPAY,QCLNWD,QCMKSZ,QCCHXP,QCCHSP,QCCLXL,QCCLXR,
+     :     QCCLYB,QCCLYT,QLWXL(0:KT),QLWXR(0:KT),QLWYT(0:KT),
+     :     QLWYB(0:KT),QLVPXL(0:KT),QLVPXR(0:KT),QLVPYT(0:KT),
+     :     QLVPYB(0:KT)
+
+      COMMON /GKYSL/QCCHH,QCCHUX,QCCHUY,QCCHW,QCCHBX,QCCHBY,QCPAWX,
+     :                 QCPAWY,QCPAHX,QCPAHY,QCPAX,QCPAY,QCLNWD,QCMKSZ,
+     :                 QCCHXP,QCCHSP,QCCLXL,QCCLXR,QCCLYB,QCCLYT,
+     :                 QLWXL,QLWXR,QLWYB,
+     :                 QLWYT,QLVPXL,QLVPXR,QLVPYB,QLVPYT,KCNTN,KTNOVP,
+     :                 KCLIN,KCPLI,KCPMI,KCTXI,KCCHP,KCHZCH,KCVTCH,
+     :                 KCFAI,KCLNTY,KCPLCI,KCMKTY,KCPMCI,KCTXFN,KCTXPR,
+     :                 KCTXCI,KCFAIS,KCFASI,KCFACI,KCPCID,KOPSG,KCPLAF,
+     :                 KCPMAF,KCTXAF,KCFAAF,KCEPT,KSTRWK,KSPLWK,
+     :                 KSPMWK,KSTXWK,KSFAWK,KSGLST,KNUMSG
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,28 @@
+*  -------------
+*  BEGIN INCLUDE      GKXER.CMN    
+*  -------------
+* INCLUDED COMMON FOR XEROX 4050
+*
+*  CHANGE LOG
+*    23/09/88  DSG  Variable ROT90 introduced for future landscape
+*                   form codes.
+*    25/07/90  PLP  Installed under MS.
+*
+         INTEGER MAXPAT,MSBIT,MSK16,MXPXLX,MXLINE,
+     :           NUMVEC,IWORD,XNSCAN,VECBUF,BUFSIZ,
+     :           IXPXLS,IYPXLS,IMGDSP,IDRAW0
+         REAL UNITS,RESOL
+         LOGICAL ROT90
+         COMMON /P1PARS/ VECBUF(1536),BUFSIZ,MAXPAT,MSBIT,MSK16,UNITS,
+     :                   MXPXLX,MXLINE,IXPXLS,IYPXLS,RESOL,
+     :                   NUMVEC,IWORD,XNSCAN,IMGDSP,IDRAW0,ROT90
+         INTEGER IOVUN,OUTREC,RECSIZ,IOVRBC,IOVURP,IOIRBC,IOIRMX,IOTRBC
+
+* IOVUN - Logical unit number for vector file
+* OUTREC - Current record number to write
+
+         COMMON /IOCOM/ IOVUN,OUTREC,RECSIZ,IOVRBC,IOVURP,IOIRBC,
+     :                  IOIRMX,IOTRBC
+*  -------------
+*  END INCLUDE
+*  -------------

@@ -1,0 +1,21 @@
+*  -------------
+*  BEGIN INCLUDE   GASPCT.PAR     Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+      INTEGER    KLNTYA,   KLNWDA,   KPLCIA
+      PARAMETER (KLNTYA=1, KLNWDA=2, KPLCIA=3)
+
+      INTEGER    KMKTYA,   KMKSZA,   KPMCIA
+      PARAMETER (KMKTYA=1, KMKSZA=2, KPMCIA=3)
+
+      INTEGER    KTXFNA,   KCHXPA,   KCHSPA,   KTXCIA
+      PARAMETER (KTXFNA=1, KCHXPA=2, KCHSPA=3, KTXCIA=4)
+
+      INTEGER    KFAISA,   KFASIA,   KFACIA
+      PARAMETER (KFAISA=1, KFASIA=2, KFACIA=3)
+
+*  -----------
+*  END INCLUDE
+*  -----------

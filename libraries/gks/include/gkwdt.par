@@ -1,0 +1,29 @@
+*  -------------
+*  BEGIN INCLUDE    GKWDT.PAR     Version  5    Author CJW
+*  -------------
+
+*  CHANGE LOG        50,108,148,163
+*     02/06/86  RMK   Increased sizes of bundle tables from 20 to 40
+*                     (KMXPLB, KMXPMB, KMXTXB, KMXFAB).
+
+      INTEGER     KWDTRL
+      PARAMETER ( KWDTRL=512)
+
+      INTEGER    KNONE,    KWKLST,   KWDT,   KPPLB,   KPPMB,   KPTXB
+      PARAMETER (KNONE=-1, KWKLST=0, KWDT=1, KPPLB=2, KPPMB=3, KPTXB=4)
+
+      INTEGER    KPFAB,   KPPASZ,   KPCTB,   KLC,   KSK,   KVL
+      PARAMETER (KPFAB=5, KPPASZ=6, KPCTB=7, KLC=8, KSK=9, KVL=10)
+
+      INTEGER    KCH,    KPC,    KST,    KPPAB,    KLCDR,    KSKDR
+      PARAMETER (KCH=11, KPC=12, KST=13, KPPAB=14, KLCDR=15, KSKDR=16)
+
+      INTEGER    KVLDR,    KCHDR,    KPCDR,    KSTDR
+      PARAMETER (KVLDR=17, KCHDR=18, KPCDR=19, KSTDR=20)
+
+      INTEGER    KMXPLB,    KMXPMB,    KMXTXB,    KMXFAB
+      PARAMETER (KMXPLB=40, KMXPMB=40, KMXTXB=40, KMXFAB=40)
+
+*  -----------
+*  END INCLUDE
+*  -----------

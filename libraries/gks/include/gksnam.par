@@ -1,0 +1,43 @@
+*  -------------
+*  BEGIN INCLUDE    GKSNAM.PAR     Version  2    Author CJW
+*  -------------
+
+*  CHANGE LOG        173
+*     27/06/86  RMK   Removed temp arrays ANM1/ANM2 and equivalencing of
+*                     these to ANAMES. Instead, used implied DO-loops to
+*                     initialise ANAMES in the 2 DATA statements (S94).
+*     08/06/87  RMK   Added declaration of DO-loop parameter (S202).
+
+      INTEGER KNAMES
+      CHARACTER*5 ANAMES(0:108)
+      DATA (ANAMES(KNAMES),KNAMES=0,54)/
+     : 'OPKS ', 'CLKS ', 'OPWK ', 'CLWK ', 'ACWK ',
+     : 'DAWK ', 'CLRWK', 'RSGWK', 'UWK  ', 'SDS  ',
+     : 'MSG  ', 'ESC  ', 'PL   ', 'PM   ', 'TX   ',
+     : 'FA   ', 'CA   ', 'GDP  ', 'SPLI ', 'SLN  ',
+     : 'SLWSC', 'SPLCI', 'SPMI ', 'SMK  ', 'SMKSC',
+     : 'SPMCI', 'STXI ', 'STXFP', 'SCHXP', 'SCHSP',
+     : 'STXCI', 'SCHH ', 'SCHUP', 'STXP ', 'STXAL',
+     : 'SFAI ', 'SFAIS', 'SFASI', 'SFACI', 'SPA  ',
+     : 'SPARF', 'SASF ', 'SPKID', 'SPLR ', 'SPMR ',
+     : 'STXR ', 'SFAR ', 'SPAR ', 'SCR  ', 'SWN  ',
+     : 'SVP  ', 'SVPIP', 'SELNT', 'SCLIP', 'SWKWN'
+     : /
+
+      DATA (ANAMES(KNAMES),KNAMES=55,108)/
+     : 'SWKVP', 'CRSG ', 'CLSG ', 'RENSG', 'DSG  ',
+     : 'DSGWK', 'ASGWK', 'CSGWK', 'INSG ', 'SSGT ',
+     : 'SVIS ', 'SHLIT', 'SSGP ', 'SDTEC', 'INLC ',
+     : 'INSK ', 'INVL ', 'INCH ', 'INPK ', 'INST ',
+     : 'SLCM ', 'SSKM ', 'SVLM ', 'SCHM ', 'SPKM ',
+     : 'SSTM ', 'RQLC ', 'RQSK ', 'RQVL ', 'RQCH ',
+     : 'RQPK ', 'RQST ', 'SMLC ', 'SMSK ', 'SMVL ',
+     : 'SMCH ', 'SMPK ', 'SMST ', 'WAIT ', 'FLUSH',
+     : 'GTLC ', 'GTSK ', 'GTVL ', 'GTCH ', 'GTPK ',
+     : 'GTST ', 'WITM ', 'GTITM', 'RDITM', 'IITM ',
+     : 'EVTM ', 'ACTM ', 'PREC ', 'UREC '
+     : /
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,17 @@
+*  -------------
+*  BEGIN INCLUDE     GKPCA.CMN     Version  1    Author MGC
+*  -------------
+
+*  CHANGE LOG
+
+*
+* Pick data used in frontend and in workstation;
+*  perhaps KPKECO should be in WCA ... ?
+*
+      INTEGER KPKECO
+
+      COMMON /GKYPCA/ KPKECO
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,12 @@
+*  -------------
+*  BEGIN INCLUDE    GKHP.PAR     Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG        133
+
+      INTEGER    KREALS,   KINTGS,   KCHARS
+      PARAMETER (KREALS=0, KINTGS=1, KCHARS=2)
+
+*  -----------
+*  END INCLUDE
+*  -----------

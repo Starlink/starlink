@@ -1,0 +1,17 @@
+*  -------------
+*  BEGIN INCLUDE    GKDD.CMN     Version  7    Author CJW
+*  -------------
+
+*  CHANGE LOG        58,64,69,71,81,103
+*     19/01/87  DCS   IS conversion. Transfer current clipping rectangle
+*                     to GKS State List. Remove unused current work-
+*                     station independent transformation (QCWKIT).
+
+
+      LOGICAL KSSG,KAIPR
+
+      COMMON /GKYDD/KSSG,KAIPR
+
+*  -----------
+*  END INCLUDE
+*  -----------

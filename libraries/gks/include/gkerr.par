@@ -1,0 +1,12 @@
+*  -------------
+*  BEGIN INCLUDE    GKERR.PAR     Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+      INTEGER    KOFF,   KON
+      PARAMETER (KOFF=0, KON=1)
+
+*  -----------
+*  END INCLUDE
+*  -----------

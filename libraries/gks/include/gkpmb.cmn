@@ -1,0 +1,16 @@
+*  -------------
+*  BEGIN INCLUDE    GKPMB.CMN     Version  3    Author CJW
+*  -------------
+
+*  CHANGE LOG        23,53
+
+      INTEGER KPMI(1:KMXPMB,1:KWK),KMKTY(1:KMXPMB,1:KWK),
+     :        KPMCI(1:KMXPMB,1:KWK)
+
+      REAL QMKSZ(1:KMXPMB,1:KWK)
+
+      COMMON /GKYPMB/QMKSZ,KPMI,KMKTY,KPMCI
+
+*  -----------
+*  END INCLUDE
+*  -----------

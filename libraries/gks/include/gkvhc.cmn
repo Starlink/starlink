@@ -1,0 +1,32 @@
+*  -------------
+*  BEGIN INCLUDE      GKVHC.CMN  Author: RTP 1988 VERSION 3
+*  -------------
+*
+* INCLUDED COMMON FOR VERSATEC HARDCOPY DRIVER
+*  CHANGE LOG
+*    25/07/90  PLP  Installed under MS.
+*
+*
+         REAL XINC, YINC, XWIDTH, YDEPTH, XMAX, YMAX, RANGE, RAD
+         REAL ARCPTX (500), ARCPTY (500), XBORDR, YBORDR
+         INTEGER IFRAME, IFROW, IFCOL, MFWID, MFDEP, ENTRYP,
+     :           IDIMX, IDIMY, IDX, ROTFIL, PREWTH, PREDEP
+         INTEGER CCOLR, COLIDX, COLMAP (0 : 256)
+         INTEGER LISPAT (40, 4, 16)
+         INTEGER PATIDX, PATLEN (40), PATDEF (40)
+         INTEGER PAT (16, 16)
+         LOGICAL COLSET, FSTPAS, ROT, BOXED
+         CHARACTER*4 PRVFRM
+
+         COMMON /GKYVHC/XINC, YINC, XWIDTH, YDEPTH, XMAX, YMAX, RANGE,
+     :                  IFRAME, IFROW, IFCOL, MFWID, MFDEP, ENTRYP,
+     :                  IDIMX, IDIMY,
+     :                  PAT, LISPAT, PATIDX, PATLEN, PATDEF,
+     :                  ARCPTX, ARCPTY, IDX, RAD,
+     :                  CCOLR, COLIDX, COLMAP, COLSET,
+     :                  PREWTH, PREDEP, FSTPAS
+         COMMON /GKZVHC/ PRVFRM
+         COMMON /GKBORD/ XBORDR, YBORDR, ROT, BOXED
+*  -------------
+*  END INCLUDE
+*  -------------

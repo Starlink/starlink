@@ -1,0 +1,13 @@
+*  -------------
+*  BEGIN INCLUDE    GKERR.CMN     Version  6    Author CJW
+*  -------------
+
+*  CHANGE LOG        15,165,174,218
+
+      INTEGER KERRS,KERRFL,KERROR,KRTNM
+
+      COMMON /GKYERR/KERRS,KERRFL,KERROR,KRTNM
+
+*  -----------
+*  END INCLUDE
+*  -----------

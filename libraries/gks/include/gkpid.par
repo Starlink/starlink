@@ -1,0 +1,38 @@
+*  -------------
+*  BEGIN INCLUDE    GKPID.PAR     Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG        185
+*   01/02/90  RTP  Unicos version needs 64-bit reals 
+*   06/04/95  BKM  Add Linux ifdef
+*   15/06/04  TIMJ Autoconf version
+
+      INTEGER    KPDSZ,   KPDUSE,   KPDNAM
+      PARAMETER (KPDSZ=1, KPDUSE=2, KPDNAM=2)
+
+      INTEGER    KPDTYP,   KPDPTR
+      PARAMETER (KPDTYP=3, KPDPTR=3)
+
+      INTEGER    KPDNIL,   KPDDHL,   KPDPHL
+      PARAMETER (KPDNIL=0, KPDDHL=3, KPDPHL=3)
+
+      INTEGER    KPDRSZ,   KPDISZ,   KPDCSZ
+      PARAMETER (KPDRSZ=5, KPDISZ=5, KPDCSZ=1)
+
+* In original non-autoconf version the Cray system
+* required the following parameters:
+*      PARAMETER (KPDRSZ=10, KPDISZ=8, KPDCSZ=1)
+* Ignore this until we need to back port autoconf GKS to Cray!
+
+      INTEGER    KPDSSZ,   KPDMXI
+      PARAMETER (KPDSSZ=2, KPDMXI=128)
+
+      INTEGER    KPDFIR,    KPDNXT
+      PARAMETER (KPDFIR=-2, KPDNXT=-3)
+
+      INTEGER    KPDDHS,               KPDPHS
+      PARAMETER (KPDDHS=KPDSSZ*KPDDHL, KPDPHS=KPDSSZ*KPDPHL)
+
+*  -----------
+*  END INCLUDE
+*  -----------

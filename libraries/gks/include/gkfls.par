@@ -1,0 +1,21 @@
+*  -------------
+*  BEGIN INCLUDE    GKFLS.PAR     Version  4    Author CJW
+*  -------------
+
+*  CHANGE LOG        14,46,111
+*  03/02/86  DRJF  Added KFWKFR - read from a file
+*                  Added KFWKFW - write to a file
+*                  Added KFWKT  - workstation connection
+
+      INTEGER    KFLNA,   KFLOP,   KFLCL,   KFWDT,    KFEMES
+      PARAMETER (KFLNA=0, KFLOP=1, KFLCL=2, KFWDT=-1, KFEMES=-2)
+
+      INTEGER    KFERR,    KFDATA,    KFCSS
+      PARAMETER (KFERR=-3, KFDATA=-4, KFCSS=-5)
+
+      INTEGER    KFWKFR,    KFWKFW,    KFWKT
+      PARAMETER (KFWKFR=-6, KFWKFW=-7, KFWKT=-8)
+
+*  -----------
+*  END INCLUDE
+*  -----------

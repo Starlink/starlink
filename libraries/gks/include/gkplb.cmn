@@ -1,0 +1,16 @@
+*  -------------
+*  BEGIN INCLUDE    GKPLB.CMN     Version  3    Author CJW
+*  -------------
+
+*  CHANGE LOG        20,52
+
+      INTEGER KPLI(1:KMXPLB,1:KWK),KLNTY(1:KMXPLB,1:KWK),
+     :        KPLCI(1:KMXPLB,1:KWK)
+
+      REAL QLNWD(1:KMXPLB,1:KWK)
+
+      COMMON /GKYPLB/QLNWD,KPLI,KLNTY,KPLCI
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,16 @@
+*  -------------
+*  BEGIN INCLUDE    GKTXB.CMN     Version  3    Author CJW
+*  -------------
+
+*  CHANGE LOG        22,54
+
+      INTEGER KTXI(1:KMXTXB,1:KWK),KTXFN(1:KMXTXB,1:KWK),
+     :        KTXPR(1:KMXTXB,1:KWK),KTXCI(1:KMXTXB,1:KWK)
+
+      REAL QCHXP(1:KMXTXB,1:KWK),QCHSP(1:KMXTXB,1:KWK)
+
+      COMMON /GKYTXB/QCHXP,QCHSP,KTXI,KTXFN,KTXPR,KTXCI
+
+*  -----------
+*  END INCLUDE
+*  -----------

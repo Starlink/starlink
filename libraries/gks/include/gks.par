@@ -1,0 +1,139 @@
+*  -------------
+*  BEGIN INCLUDE    GKS.PAR     Version  10    Author CJW
+*  -------------
+
+*  CHANGE LOG        84,87,172,188,192,209,225,227
+*     01/07/86  DCS   Swapped values for BNIG and BNIL (S154).
+*     22/01/87  PKY   IS conversion. Add GNCHOI. Swap GSUPP for GPOSTP.
+*                     Make GARC, GCHORD, GPIE, GCIRCL all negative.
+*                     N.B. Temporary fix. Add GPLATT etc.
+*     05/06/87  RMK   Removed parameter values at the end of this file
+*                     which are not in the Fortran binding.
+*     29/06/87  RMK   IS Fortran binding has removed GPLBND, etc.
+
+      INTEGER    GBUNDL,   GINDIV
+      PARAMETER (GBUNDL=0, GINDIV=1)
+
+      INTEGER    GCONDI,   GALWAY
+      PARAMETER (GCONDI=0, GALWAY=1)
+
+      INTEGER    GNCLIP,   GCLIP
+      PARAMETER (GNCLIP=0, GCLIP =1)
+
+      INTEGER    GMONOC,   GCOLOR
+      PARAMETER (GMONOC=0, GCOLOR=1)
+
+      INTEGER    GWC   ,   GNDC
+      PARAMETER (GWC   =0, GNDC  =1)
+
+      INTEGER    GASAP ,   GBNIG ,   GBNIL ,   GASTI
+      PARAMETER (GASAP =0, GBNIG =1, GBNIL=2 , GASTI =3)
+
+      INTEGER    GUNDET,   GDETEC
+      PARAMETER (GUNDET=0, GDETEC=1)
+
+      INTEGER    GMETRE,   GOTHU
+      PARAMETER (GMETRE=0, GOTHU =1)
+
+      INTEGER    GNEMPT,   GEMPTY
+      PARAMETER (GNEMPT=0, GEMPTY=1)
+
+      INTEGER    GIRG  ,   GIMM
+      PARAMETER (GIRG  =0, GIMM  =1)
+
+      INTEGER    GNECHO,   GECHO
+      PARAMETER (GNECHO=0, GECHO =1)
+
+      INTEGER    GHOLLO,   GSOLID,   GPATTR,   GHATCH
+      PARAMETER (GHOLLO=0, GSOLID=1, GPATTR=2, GHATCH=3)
+
+      INTEGER    GNORML,   GHILIT
+      PARAMETER (GNORML=0, GHILIT=1)
+
+      INTEGER     GNONE ,    GOK   ,    GNPICK,    GNCHOI
+      PARAMETER  (GNONE =0,  GOK   =1,  GNPICK=2,  GNCHOI=2)
+
+      INTEGER    GNCLAS,   GLOCAT,   GSTROK,   GVALUA
+      PARAMETER (GNCLAS=0, GLOCAT=1, GSTROK=2, GVALUA=3)
+
+      INTEGER    GCHOIC,   GPICK ,   GSTRIN
+      PARAMETER (GCHOIC=4, GPICK =5, GSTRIN=6)
+
+      INTEGER    GSUPPD,   GALLOW
+      PARAMETER (GSUPPD=0, GALLOW=1)
+
+      INTEGER    GL0A  ,   GL0B  ,   GL0C  ,   GL1A  ,   GL1B
+      PARAMETER (GL0A  =0, GL0B  =1, GL0C  =2, GL1A  =3, GL1B  =4)
+
+      INTEGER    GL1C  ,   GL2A  ,   GL2B  ,   GL2C
+      PARAMETER (GL1C  =5, GL2A  =6, GL2B  =7, GL2C  =8)
+
+      INTEGER    GNO   ,   GYES
+      PARAMETER (GNO   =0, GYES  =1)
+
+      INTEGER    GREQU ,   GSAMPL,   GEVENT
+      PARAMETER (GREQU =0, GSAMPL=1, GEVENT=2)
+
+      INTEGER    GGKCL ,   GGKOP ,   GWSOP ,   GWSAC ,   GSGOP
+      PARAMETER (GGKCL =0, GGKOP =1, GWSOP =2, GWSAC =3, GSGOP =4)
+
+      INTEGER    GABSNT,   GPRSNT
+      PARAMETER (GABSNT=0, GPRSNT=1)
+
+      INTEGER     GPOSTP,    GPERFO
+      PARAMETER  (GPOSTP=0,  GPERFO=1)
+
+      INTEGER    GHIGHR,   GLOWER
+      PARAMETER (GHIGHR=0, GLOWER=1)
+
+      INTEGER    GNMORE,   GMORE
+      PARAMETER (GNMORE=0, GMORE= 1)
+
+      INTEGER    GAHNOR,   GALEFT,   GACENT,   GARITE
+      PARAMETER (GAHNOR=0, GALEFT=1, GACENT=2, GARITE=3)
+
+      INTEGER    GAVNOR,   GATOP ,   GACAP ,   GAHALF,   GABASE
+      PARAMETER (GAVNOR=0, GATOP =1, GACAP =2, GAHALF=3, GABASE=4)
+
+      INTEGER    GABOTT
+      PARAMETER (GABOTT=5)
+
+      INTEGER    GRIGHT,   GLEFT ,   GUP   ,   GDOWN
+      PARAMETER (GRIGHT=0, GLEFT =1, GUP   =2, GDOWN=3)
+
+      INTEGER    GSTRP ,   GCHARP,   GSTRKP
+      PARAMETER (GSTRP =0, GCHARP=1, GSTRKP=2)
+
+      INTEGER    GSET  ,   GREALI
+      PARAMETER (GSET  =0, GREALI=1)
+
+      INTEGER    GNPEND,   GPEND
+      PARAMETER (GNPEND=0, GPEND =1)
+
+      INTEGER    GVECTR,   GRASTR,   GOTHWK
+      PARAMETER (GVECTR=0, GRASTR=1, GOTHWK=2)
+
+      INTEGER    GINVIS,   GVISI
+      PARAMETER (GINVIS=0, GVISI =1)
+
+      INTEGER    GOUTPT,   GINPUT,   GOUTIN,   GWISS ,   GMO
+      PARAMETER (GOUTPT=0, GINPUT=1, GOUTIN=2, GWISS =3, GMO=   4)
+
+      INTEGER    GMI
+      PARAMETER (GMI   =5)
+
+      INTEGER    GINACT,   GACTIV
+      PARAMETER (GINACT=0, GACTIV=1)
+
+      INTEGER     GPLATT,    GPMATT,    GTXATT,    GFAATT
+      PARAMETER  (GPLATT=0,  GPMATT=1,  GTXATT=2,  GFAATT=3)
+
+      INTEGER    GLSOLI,   GLDASH,   GLDOT ,   GLDASD
+      PARAMETER (GLSOLI=1, GLDASH=2, GLDOT =3, GLDASD=4)
+
+      INTEGER    GPOINT,   GPLUS ,   GAST  ,   GOMARK,   GXMARK
+      PARAMETER (GPOINT=1, GPLUS =2, GAST  =3, GOMARK=4, GXMARK=5)
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,52 @@
+*  -------------
+*  BEGIN INCLUDE      GKCGN.CMN    Author CIA
+*  -------------
+
+*  CHANGE LOG
+*     05/09/89  PLP    Removed unnecessary Begin Include/End Include
+*                      sections. Changed heading to GKCGN.CGM and
+*                      adjusted the lay-out. Installed under Master
+*                      Source.
+*     07/06/90  PLP    Introduced RTP's latest changes.
+*     17/06/90  PLP    Introduced RTP's latest changes.
+
+      INTEGER KCHANI(1:KWK), KCDPTR(1:KWK), KCDREC(1:KWK),
+     +   KINTPR(1:KWK), KMXRPR(1:KWK), KDFREC(1:KWK), KDFPTR(1:KWK),
+     +   KMNRPR(1:KWK), KDEFEX(1:KWK), KEXPAL(1:KWK), KIXPR(1:KWK),
+     +   KCOLPR(1:KWK), KCIXPR(1:KWK), KMXCIX(1:KWK), KVDCTY(1:KWK),
+     +   KSCAMD(1:KWK), KCSLMD(1:KWK), KLWSMD(1:KWK), KMSSMD(1:KWK),
+     +   KEWSMD(1:KWK), KVDCIP(1:KWK), KVMXRP(1:KWK), KVMNRP(1:KWK),
+     +   KVDEFX(1:KWK), KVXALL(1:KWK), KAUXCL(1:KWK), KTRANS(1:KWK),
+     +   KSETAS(13,1:KWK),KNSUBS(1:KWK),KSUBAR(1:35,1:KWK),
+     +   KHTPAT(1:KWK),KHTCHI(1:KWK),KPATTI(1:KWK),
+     +   KXEXP(1:KWK), KYEXP(1:KWK),
+     +   KXCHA, KXNUM, KNOPTS, KLENRC
+      REAL QBACOL(3), QMNCOL(3), QMXCOL(3), QVDCSC(1:KWK),
+     +   QVDCSX(1:KWK), QVDCSY(1:KWK), QVDCOX(1:KWK), QVDCOY(1:KWK)
+      LOGICAL FIRSTP(1:KWK),
+     +   METDEF(1:KWK),DOREP(1:KWK),HATCH(1:KWK),BEGMET(1:KWK),
+     +   DEFVDC(1:KWK),DEFPAT(1:KWK),DEFCLP(1:KWK),DEFREF(1:KWK),
+     +   DEFCHH(1:KWK)
+
+      COMMON/GKYCGN/KCHANI, KCDPTR, KCDREC,
+     +   KINTPR, KMXRPR, KDFREC, KDFPTR,
+     +   KMNRPR, KDEFEX, KEXPAL, KIXPR,
+     +   KCOLPR, KCIXPR, KMXCIX, KVDCTY,
+     +   KSCAMD, KCSLMD, KLWSMD, KMSSMD,
+     +   KEWSMD, KVDCIP, KVMXRP, KVMNRP,
+     +   KVDEFX, KVXALL, KAUXCL, KTRANS,
+     +   KSETAS, KNSUBS, KSUBAR,
+     +   KHTPAT, KHTCHI, KPATTI, KXEXP,  KYEXP,
+     +   KXCHA,  KXNUM,  KNOPTS, KLENRC,
+     +   QBACOL, QMNCOL, QMXCOL,
+     +   QVDCSC, QVDCSX, QVDCSY, QVDCOX, QVDCOY,
+     +   FIRSTP, METDEF, DOREP,  HATCH,  BEGMET,
+     +   DEFVDC, DEFPAT, DEFCLP, DEFREF, DEFCHH
+
+      CHARACTER *80 CMFDR (2250)
+      CHARACTER *80 CMFDEF (10)
+
+      COMMON/GKZCGN/CMFDR,CMFDEF
+*  -------------
+*  END INCLUDE
+*  -------------

@@ -1,0 +1,15 @@
+*  -------------
+*  BEGIN INCLUDE    GKFLS.CMN     Version  4    Author CJW
+*  -------------
+
+*  CHANGE LOG        10,47,110
+
+      INTEGER KEMFLS,KWDFLS,KDBFLS,KCSFLS,
+     :        KWDFLU,KEMFLU,KDBFLU,KCSFLU
+
+      COMMON /GKYFLS/ KEMFLS,KWDFLS,KDBFLS,KCSFLS,
+     :                   KWDFLU,KEMFLU,KDBFLU,KCSFLU
+
+*  -----------
+*  END INCLUDE
+*  -----------

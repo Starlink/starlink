@@ -1,0 +1,22 @@
+*  -------------
+*  BEGIN INCLUDE    GKSTK.CMN     Version  4    Author CJW
+*  -------------
+
+*  CHANGE LOG         41,62,119
+*     06/07/87  PJWR  Changed KSTK 64 Kwords for UNIX.
+
+      INTEGER    KSTK
+      PARAMETER (KSTK=65536)
+
+      INTEGER KSTACK(KSTK),KRUSED,KIUSED
+
+      REAL QSTACK(KSTK)
+
+      COMMON /GKYSTK/QSTACK,KRUSED
+
+      EQUIVALENCE (QSTACK(1), KSTACK(1))
+      EQUIVALENCE (KRUSED, KIUSED)
+
+*  -----------
+*  END INCLUDE
+*  -----------

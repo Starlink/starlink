@@ -1,0 +1,13 @@
+*  -------------
+*  BEGIN INCLUDE    GKOPS.CMN     Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+      INTEGER KOPS
+
+      COMMON /GKYOPS/KOPS
+
+*  -----------
+*  END INCLUDE
+*  -----------

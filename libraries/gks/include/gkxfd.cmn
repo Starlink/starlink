@@ -1,0 +1,36 @@
+*  -------------
+*  BEGIN INCLUDE   GKXFD.CMN     Version 3   Author CJW
+*  -------------
+
+*  CHANGE LOG      217,228
+*     09/05/86  RMK   Added another 3 fonts to system - increased
+*                     KFNTMX from 7 to 10, and KMXCIN from 561 to 653.
+*     13/02/87  PKY   Changed definitions of CLWDTH, CRWDTH and CINDEX
+*                     from "CHARACTER*length name" to
+*                     "CHARACTER*1 name(length)".
+*     11/06/87  RMK   Merged GKS-UK and RAL versions of this file.
+
+      INTEGER    KFNTMX,   KMXICN,     KFRCSZ,     KCHTOT
+      PARAMETER (KFNTMX=10, KMXICN=653, KFRCSZ=512, KCHTOT=95)
+
+      INTEGER    KFMARK,     KBEGIN,    KMXSTK,     KCXISZ
+      PARAMETER (KFMARK=-64, KBEGIN=31, KMXSTK=200, KCXISZ=2*KMXICN)
+
+      INTEGER KFRECS(KFNTMX),KFNAMS(KFNTMX),KCHNAM(KMXICN),KURFON,
+     :        KFONT(KCHTOT),KFHGT,KHFONT(1:KFNTMX)
+
+      REAL QFWIDS(KCHTOT),QFWDMX,QFBASE,QFCAP,QFYADJ,QFHT
+
+      COMMON /GKYXFD/KFRECS,KFNAMS,KCHNAM,KURFON,KFONT,KFHGT,
+     :                  KHFONT,QFWIDS,QFWDMX,QFBASE,QFCAP,QFYADJ,
+     :                  QFHT
+
+      CHARACTER*1 CLWDTH(KMXICN),CRWDTH(KMXICN)
+      CHARACTER*1 CINDEX(KCXISZ)
+      CHARACTER*(KFRCSZ) CHARBF
+
+      COMMON /GKZXFD/CLWDTH,CRWDTH,CINDEX,CHARBF
+
+*  -----------
+*  END INCLUDE
+*  -----------

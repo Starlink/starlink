@@ -1,0 +1,34 @@
+*  -------------
+*  BEGIN INCLUDE     GKWPC.PAR     Version  1           Author MGC
+*  -------------
+
+*  CHANGE LOG
+
+* The following (KPCNI,NPCNR) ought to be in GKDT.PAR
+
+      INTEGER    KPCNI,    KPCNR
+      PARAMETER (KPCNI=9,  KPCNR=4)
+
+*
+      INTEGER    KPTFIN,    KPTPRV,    KPTBRK
+      PARAMETER (KPTFIN=0,  KPTPRV=1,  KPTBRK=2)
+
+      INTEGER    KPCNWI,    KPCNWR
+      PARAMETER (KPCNWI=12, KPCNWR=7)
+
+      INTEGER    KPWSTA,    KPWPET,    KPWTRG,    KPWESW
+      PARAMETER (KPWSTA=1,  KPWPET=2,  KPWTRG=3,  KPWESW=4)
+
+      INTEGER    KPWSG,     KPWID,     KPWPI,     KPWPT
+      PARAMETER (KPWSG=5,   KPWID=6,   KPWPI=7,   KPWPT=8)
+
+      INTEGER    KPWESG,    KPWEID,    KPWEPI,    KPWEPT
+      PARAMETER (KPWESG=9,  KPWEID=10, KPWEPI=11, KPWEPT=12)
+
+      INTEGER    KPWDCX,    KPWDCY,    KPWBOX,    KPWD
+      PARAMETER (KPWDCX=1,  KPWDCY=2,  KPWBOX=3,  KPWD=7)
+
+
+*  -----------
+*  END INCLUDE
+*  -----------

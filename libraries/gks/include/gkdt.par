@@ -1,0 +1,34 @@
+*  -------------
+*  BEGIN INCLUDE    GKDT.PAR     Version  12    Author CJW
+*  -------------
+
+*   CHANGE LOG        11,38,65,82,96,107,117,176,203,208,
+*                     220,223
+*     04/02/86  RMK   Increased max number of workstation types
+*                     KMXWKT from 60 to 200 (S156).
+*                     Corrected KLVGKS (S178).
+*     02/06/86  RMK   Increased KWK (max no of simultaneously open wkstns)
+*                     from 2 to 4.
+*     19/01/87  DCS   IS conversion. Remove KMIWK (max no of open MI
+*                     wkstns).
+*     19/01/87  RMK   IS conversion. Changed KNIL from -1 to avoid
+*                     problems when using negative numbers for implemen-
+*                     tation dependent values. Added REAL undefined
+*                     value (QNIL).
+*     06/07/87  PJWR  Added conditional code for UNIX systems.
+*     20/02/89  PLP   Removed conditional code for UNIX systems.
+
+      INTEGER    KLVKS,   KMXWKT,    KWK,   KT
+
+      PARAMETER (KLVKS=7, KMXWKT=200, KWK=4, KT=11)
+
+
+      INTEGER    KNIL
+      PARAMETER (KNIL=-9999)
+
+      REAL       QNIL
+      PARAMETER (QNIL=-9999.0)
+
+*  -----------
+*  END INCLUDE
+*  -----------

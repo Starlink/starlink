@@ -1,0 +1,22 @@
+*  -------------
+*  BEGIN INCLUDE    GKWCB.CMN     Version  9    Author CJW
+*  -------------
+
+*  CHANGE LOG        16,28,36,48,95,145,147,151,196
+*     19/01/87  DCS   IS conversion. Remove KMIIX (Metafile Input
+*                     Workstation Index).
+
+      INTEGER    KWKINV
+      PARAMETER (KWKINV=KNIL)
+
+      INTEGER    KCSWIX
+      PARAMETER (KCSWIX=0)
+
+      INTEGER KWKID(1:KWK),KWKC(1:KWK),KNOPWK,KOPPT(1:KWK),KNACWK,
+     :        KACPT(1:KWK+1),KWTYIX(0:KWK)
+
+      COMMON /GKYWCB/KWKID,KWKC,KNOPWK,KOPPT,KNACWK,KACPT,KWTYIX
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,16 @@
+*  -------------
+*  BEGIN INCLUDE     GKWCA.PAR     Version  1           Author JRG
+*  -------------
+
+*  CHANGE LOG        194
+
+
+      INTEGER    KRPNO,    KRPYES,   KRPVIS,   KRPINV
+      PARAMETER (KRPNO=0,  KRPYES=1, KRPVIS=2, KRPINV=3)
+
+      INTEGER    KRPDRW,   KRPERA,
+      PARAMETER (KRPDRW=1, KRPERA=2)
+
+*  -----------
+*  END INCLUDE
+*  -----------

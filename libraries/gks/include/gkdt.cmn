@@ -1,0 +1,13 @@
+*  -------------
+*  BEGIN INCLUDE    GKDT.CMN     Version  4    Author CJW
+*  -------------
+
+*  CHANGE LOG        116,118,197
+
+      INTEGER KLAWKT(0:KMXWKT),KAWKT
+
+      COMMON /GKYDT/KLAWKT,KAWKT
+
+*  -----------
+*  END INCLUDE
+*  -----------

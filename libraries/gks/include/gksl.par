@@ -1,0 +1,14 @@
+*  -------------
+*  BEGIN INCLUDE    GKSL.PAR     Version  1    Author DCS
+*  -------------
+
+*  CHANGE LOG        91
+*     19/01/87  DCS   IS conversion. Add KMI (Metafile Input Work-
+*                     station). Remove KWISS as no longer used.
+
+      INTEGER    KMI,   KGKSFN,   KHANGE
+      PARAMETER (KMI=1, KGKSFN=0, KHANGE=-1)
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,21 @@
+*  -------------
+*  BEGIN INCLUDE    GKIO.PAR     Version  2    Author AS
+*  -------------
+
+*  CHANGE LOG        123,215
+*  18/09/84  RMK  Added KIOQS for inquiring space left in buffer
+*  19/12/85  RMK  Added KIOER to end record for spooled device, and KIOSO
+*                 to send buffer without appending end bytes.
+*  15/01/90  RTP  Added KIORB for reading bytes from a file (CGM)
+
+      INTEGER    KIOIT,   KIOBB,   KIOEB,   KIOPB,   KIOSN
+      PARAMETER (KIOIT=1, KIOBB=2, KIOEB=3, KIOPB=4, KIOSN=5)
+      INTEGER    KIOQS,   KIOER,   KIOSO
+      PARAMETER (KIOQS=6, KIOER=7, KIOSO=8)
+
+      INTEGER    KIOEN,   KIOEP,   KIONN,   KIONP, KIORB
+      PARAMETER (KIOEN=1, KIOEP=2, KIONN=3, KIONP=4, KIORB=5)
+
+*  -----------
+*  END INCLUDE
+*  -----------

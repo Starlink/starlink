@@ -1,0 +1,13 @@
+*  -------------
+*  BEGIN INCLUDE     GKCON.CMN     Version  2    Author CJW
+*  -------------
+
+*  CHANGE LOG        114,124
+
+      INTEGER KMKASC(1:5)
+
+      COMMON /GKYCON/KMKASC
+
+*  -----------
+*  END INCLUDE
+*  -----------

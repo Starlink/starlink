@@ -1,0 +1,14 @@
+*  -------------
+*  BEGIN INCLUDE    GKFAB.CMN     Version  3    Author CJW
+*  -------------
+
+*  CHANGE LOG        21,55
+
+      INTEGER KFAI(1:KMXFAB,1:KWK),KIS(1:KMXFAB,1:KWK),
+     :        KSI(1:KMXFAB,1:KWK),KFACI(1:KMXFAB,1:KWK)
+
+      COMMON /GKYFAB/KFAI,KIS,KSI,KFACI
+
+*  -----------
+*  END INCLUDE
+*  -----------

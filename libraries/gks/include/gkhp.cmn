@@ -1,0 +1,68 @@
+*  -------------
+*  BEGIN INCLUDE    GKHP.CMN     Version  3    Author CJW
+*  -------------
+
+*  CHANGE LOG         134,143,211
+*     02/06/86  RMK     Increased heap size (KHPSZ) from 2K to 4K.
+*     13/02/87  RMK/PLP Increased heap size KPHSZ. Removed old character
+*                       heap and added new one which is equivalenced to
+*                       existing integer/real heap.
+*     01/07/87  PLP     Introduced definition of KHPSZ as a ratio of
+*                       number of bytes in the Heap and the number of
+*                       bytes per long Integer (KNIBYT fom GKMC.PAR).
+*                       This is necessary for machine independance.
+*                       NOTE: Number of bytes in the Heap is chosen
+*                             to be a multiple of 2,4 and 8. Observe
+*                             this if changing the Heap size.
+*     06/07/87  PJWR    Added conditional code for UNIX. Reformatted
+*                       comments to keep within 72 character lines.
+*     20/02/89  PLP     Removed conditional code for UNIX.
+*
+*
+
+      INTEGER    KHPXSZ,     KHPSZ
+      PARAMETER (KHPXSZ=200, KHPSZ=144000/KNIBYT)
+
+      INTEGER    KHPXSI,        KHPXSR,        KHPXSC
+      PARAMETER (KHPXSI=KHPXSZ, KHPXSR=KHPXSZ, KHPXSC=KHPXSZ)
+
+      INTEGER    KHPSZI,          KHPSZR,          KHPSZC
+      PARAMETER (KHPSZI=KHPSZ,  KHPSZR=KHPSZ,  KHPSZC=KHPSZ*KNIBYT)
+
+      INTEGER KHPXI(1:KHPXSI),  KHPXR(1:KHPXSR),  KHPXC(1:KHPXSC),
+     :        KHPESI(1:KHPXSI), KHPESR(1:KHPXSR),
+     :        KHPXPI(1:KHPXSI), KHPXPR(1:KHPXSR),
+     :        KHPLXI(1:KHPXSI), KHPLXR(1:KHPXSR),
+     :        KHPNXI,           KHPNXR,
+     :        KHPAVI,           KHPAVR,
+     :        KHPLMI,           KHPLMR
+
+      INTEGER KHP(1:KHPSZI)
+
+      REAL    QHP(1:KHPSZR)
+
+      EQUIVALENCE ( KHPXI(1),  KHPXR(1)  ),
+     :            ( KHPESI(1), KHPESR(1) ),
+     :            ( KHPXPI(1), KHPXPR(1) ),
+     :            ( KHPLXI(1), KHPLXR(1) ),
+     :            ( KHPNXI,    KHPNXR    ),
+     :            ( KHPAVI,    KHPAVR    ),
+     :            ( KHPLMI,    KHPLMR    ),
+     :            ( KHP(1),    QHP(1)    ),
+     :            ( CHP(1),    KHP(1)    )
+
+      CHARACTER  CHP(1:KHPSZC)
+
+      COMMON /GKYHP/ KHPXI,  KHPXC,
+     :                  KHPESI,
+     :                  KHPXPI,
+     :                  KHPLXI,
+     :                  KHPNXI,
+     :                  KHPAVI,
+     :                  KHPLMI,
+     :                  KHP
+
+
+*  -----------
+*  END INCLUDE
+*  -----------

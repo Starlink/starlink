@@ -1,0 +1,13 @@
+*  -------------
+*  BEGIN INCLUDE    GKPID.CMN     Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG        186
+
+      INTEGER KPDDH(1:KPDDHL),KPDPH(1:KPDPHL)
+
+      COMMON /GKPID/KPDDH,KPDPH
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,38 @@
+*  -------------
+*  BEGIN INCLUDE      GKCGM.CMN    Author CIA
+*  -------------
+*  CHANGE LOG
+*     05/09/89  PLP    Removed unnecessary Begin Include/End Include
+*                      sections. Changed heading to GKCGM.CGM and
+*                      adjusted the lay-out. Installed under Master
+*                      Source.
+*     07/06/90  PLP    Introduced RTP's latest changes.
+*     17/07/90  PLP    Introduced RTP's latest changes.
+
+      INTEGER KCHANO(1:KWK), KINTPR(1:KWK), KMXRPR(1:KWK),
+     +   KMNRPR(1:KWK), KDEFEX(1:KWK), KEXPAL(1:KWK), KIXPR(1:KWK),
+     +   KCOLPR(1:KWK), KCIXPR(1:KWK), KMXCIX(1:KWK), KVDCTY(1:KWK),
+     +   KSCAMD(1:KWK), KCSLMD(1:KWK), KLWSMD(1:KWK), KMSSMD(1:KWK),
+     +   KEWSMD(1:KWK), KVDCIP(1:KWK), KVMXRP(1:KWK), KFABI(1:KWK),
+     +   KVMNRP(1:KWK), KVDEFX(1:KWK), KVXALL(1:KWK), KAUXCL(1:KWK),
+     +   KTRANS(1:KWK), KCLPIN(1:KWK), KXEXP(1:KWK), KYEXP(1:KWK),
+     +   KSTLST(KMXPLB+2,16,1:KWK), KSETAS(KMXPLB+1:KMXPLB+2,13,1:KWK)
+      REAL QSTLST(KMXPLB+2,22,1:KWK), QCLREP(0:256,3,1:KWK)
+      LOGICAL CLRWKN(1:KWK),
+     ;   LIXSET(KMXPLB,1:KWK), MIXSET(KMXPMB,1:KWK),
+     +   FASET(KMXFAB,1:KWK), TIXSET(KMXTXB,1:KWK), ISGDP(1:KWK),
+     +   KCLEAR, NEWFR
+
+      COMMON/GKYCGM/KCHANO, KINTPR, KMXRPR,
+     +   KMNRPR, KDEFEX, KEXPAL, KIXPR, KCOLPR, KCIXPR, KMXCIX, KVDCTY,
+     +   KSCAMD, KCSLMD, KLWSMD, KMSSMD, KEWSMD, KVDCIP, KVMXRP,KFABI,
+     +   KVMNRP, KVDEFX, KVXALL, KAUXCL, KTRANS, KCLPIN, KXEXP, KYEXP,
+     +   KSTLST, KSETAS, QSTLST, QCLREP,
+     +   CLRWKN, LIXSET, MIXSET, FASET, TIXSET,ISGDP, KCLEAR, NEWFR
+
+      CHARACTER*80 COUTCH(1:KWK)
+
+      COMMON/GKZCGM/COUTCH
+*  -------------
+*  END INCLUDE
+*  -------------

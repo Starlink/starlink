@@ -1,0 +1,18 @@
+*  -------------
+*  BEGIN INCLUDE     GKPC.CMN     Version  1    Author MGC
+*  -------------
+
+*  CHANGE LOG
+
+      INTEGER    KPP,   KPID,   KPSG
+      PARAMETER (KPP=1, KPID=2, KPSG=3 )
+
+      INTEGER KPCPET,KPCRQ,KPCSG,KPCID,KPCPI,KPCPT
+      INTEGER KPCMOR,KPCNID,KPCNP
+
+      COMMON /GKYPC/ KPCPET,KPCRQ,KPCSG,KPCID,KPCPI,KPCPT,
+     :               KPCMOR,KPCNID,KPCNP
+
+*  -----------
+*  END INCLUDE
+*  -----------

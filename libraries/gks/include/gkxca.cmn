@@ -1,0 +1,25 @@
+*  -------------
+*  BEGIN INCLUDE    GKXCA.CMN     Version 1   Author CJW
+*  -------------
+
+*  CHANGE LOG
+*     02/06/86  RMK   Decreased size of cache from 20K to 10K (KMXTXZ).
+*     13/02/87  PKY   Changed CACHE from CHARACTER*KMXTXZ CACHE to
+*                     CHARACTER*1 CACHE(KMXTXZ).
+*     11/06/87  RMK   Merged GKS-UK and RAL versions of this file.
+
+      INTEGER    KMXTXZ
+      PARAMETER (KMXTXZ=10000)
+
+      INTEGER KFREE
+
+      COMMON/GKYXCA/KFREE
+
+
+      CHARACTER*1 CACHE(KMXTXZ)
+
+      COMMON /GKZXCA/CACHE
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,15 @@
+*  -------------
+*  BEGIN INCLUDE    GKDIR.PAR     Version  2    Author CJW
+*  -------------
+
+*  CHANGE LOG        179
+
+      INTEGER    KDRITM,   KDRINC,   KDRREA,   KDRINT,   KDRNXT
+      PARAMETER (KDRITM=0, KDRINC=1, KDRREA=2, KDRINT=3, KDRNXT=4)
+
+      INTEGER    KDRRPT,   KDRX
+      PARAMETER (KDRRPT=5, KDRX=6)
+
+*  -----------
+*  END INCLUDE
+*  -----------

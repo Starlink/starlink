@@ -1,0 +1,29 @@
+*  -------------
+*  BEGIN INCLUDE    GKCSS.PAR     Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+      INTEGER     KCSFRE,   KCSULK,   KCSLOK
+      PARAMETER ( KCSFRE=0, KCSULK=1, KCSLOK=2)
+
+      INTEGER     KCSSZ,    KCSRF,   KCSRC,   KCSDRE
+      PARAMETER ( KCSSZ=50, KCSRF=1, KCSRC=2, KCSDRE=KCSRC)
+
+      INTEGER     KCSPAG,   KCSRSZ
+      PARAMETER ( KCSPAG=7, KCSRSZ=512)
+
+      INTEGER     KCSSZP
+      PARAMETER ( KCSSZP = KCSRSZ / KNIBYT)
+
+      INTEGER     KCSMXD
+      PARAMETER ( KCSMXD=(KCSRSZ-KNIBYT)/KNIBYT)
+
+      INTEGER     KCSIWK,    KCSBSZ,   KCSRWK
+      PARAMETER ( KCSIWK=11, KCSBSZ=6, KCSRWK=16)
+
+
+*  -----------
+*  END INCLUDE
+*  -----------
+
