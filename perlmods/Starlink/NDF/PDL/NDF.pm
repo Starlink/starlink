@@ -1,5 +1,5 @@
 package PDL::IO::NDF;
-
+ 
 =head1 NAME
 
 PDL::IO::NDF - PDL Module for reading and writing Starlink
@@ -31,8 +31,6 @@ files as N-dimensional PDLs.
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 @ISA    = qw( PDL::Exporter );
-
-
 
 use PDL::Core;
 use PDL::Types;
@@ -239,8 +237,6 @@ PDLs).
 # Allows the command to be called in OO form or as a function
 sub PDL::wndf {  # Write a PDL to an NDF format file
 
-  use strict;
-
   barf 'Usage: wndf($pdl,$file)' if $#_!=1;
 
   my ($indf, $place, $status, $outndf);
@@ -322,8 +318,6 @@ This command has been superseded by wndf().
 
 sub PDL::propndfx {  # Write a PDL to a NDF format file
 
-  use strict;
-
   barf 'Usage: propndfx($pdl, $infile, $outfile)' if $#_!=2;
 
   my ($indf, $in_place, $status, $outplace, $outndf);
@@ -384,16 +378,23 @@ sub PDL::propndfx {  # Write a PDL to a NDF format file
 
 =head1 NOTES
 
-The perl NDF module must be available.
+The perl NDF module must be available. This is available from the 
+author or from Starlink (http://www.starlink.rl.ac.uk).
+
+If an NDF is read which contains AST World Coordinate information
+(a .WCS component) this information is currently ignored. Currently
+WCS information can only be written and stored using standard FITS headers.
+See http://rlspc5.bnsc.rl.ac.uk/star/docs/sun211.htx/sun211.html#xref_
+for more information on AST.
 
 =head1 AUTHOR
 
-This module was written by Tim Jenness <t.jenness@jach.hawaii.edu>.
-Copyright (C) Tim Jenness 1997-1999. All Rights Reserved.
+This module was written by Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>.
+Copyright (C) Tim Jenness 1997-2000. All Rights Reserved.
 
 =head1 SEE ALSO
 
-L<PDL> for general information on the Perl Data language,
+L<PDL::FAQ> for general information on the Perl Data language,
 L<NDF> for information on the NDF module.
 
 =cut
@@ -408,7 +409,6 @@ L<NDF> for information on the NDF module.
 #    Read Data, Quality and Variance
 
 sub rdata {
-  use strict;
   my ($indf, $pdl, $nomask, $header, $class, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
@@ -512,7 +512,6 @@ sub rdata {
 #  Header of this PDL contains label and errors and units etc.
 
 sub raxes {
-  use strict;
   my ($indf, $pdl, $header, $class, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
@@ -631,7 +630,6 @@ sub raxes {
   ####################################################################
 
 sub rhdr {
-  use strict;
   my ($indf, $pdl, $header, $class, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
@@ -688,7 +686,6 @@ sub rhdr {
   ####################################################################
 
 sub rhist {
-  use strict;
   my ($indf, $pdl, $header, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
@@ -700,7 +697,7 @@ sub rhist {
   ndf_hnrec($indf,$nrec,$status);
 
   if ($status == &NDF::SAI__OK && ($nrec > 0)) {
-    print "Reading  history information into 'Hist'...\n" if $PDL::verbose;
+    print "Reading history information into 'Hist'...\n" if $PDL::verbose;
 
     $$header{Hist}{'Nrecords'} = $nrec;
 
@@ -731,8 +728,6 @@ sub rhist {
 # NDF extensions stored in NDF
 
 sub find_prim {
-
-  use strict;
 
   my ($loc, $href, $class, $status) = @_;
   my ($prim, $type, $size, @dim, $ndims, $struct, $name, $nloc, $el);
@@ -865,8 +860,6 @@ sub find_prim {
 ###### Routines for WRITING data ######################################
 
 sub wdata {
-
-  use strict;
 
   my ($outndf, $pdl, $status) = @_;
   my (@bounds, $ndims, @lower, @comps, $dcomp, $temppdl, $type);
@@ -1098,8 +1091,6 @@ sub wdata {
 
 sub whdr {
 
-  use strict;
-
   my ($outndf, $pdl, $status) = @_;
 
   my (%header, @fitsdim, $fitsloc, $value);
@@ -1187,7 +1178,7 @@ sub whash {
   if (defined $hash) {
     %header = %$hash;
   } else {
-    %header = {};
+    %header = ();
   }
 
 
