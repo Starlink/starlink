@@ -91,6 +91,7 @@
       INCLUDE 'ADI_PAR'					! ADI constants
       INCLUDE 'DAT_PAR'					! HDS constants
       INCLUDE 'WCI_PAR'					! WCI constants
+      INCLUDE 'MATH_PAR'
 
 *  Arguments Given:
       INTEGER			NARG, ARGS(*)
@@ -126,6 +127,7 @@
       INTEGER			DIMS(2)			! Axis dimensions
       INTEGER			IMJD			! Value of BASE_MJD
       INTEGER			IPSF			! Psf system handle
+      INTEGER			NDIM			! Dimensionality
       INTEGER			PIXID			! Pixellation object
       INTEGER			PRJID			! Projection object
       INTEGER			PTR(2)			! Axis data pointers
@@ -153,12 +155,10 @@
       PRJOK = .FALSE.
       SYSOK = .FALSE.
 
-*  Introduce the locator to the PSF system
-      IF ( ARGS(1) .EQ. ADI__NULLID ) THEN
-        CALL PSF_INTRO( ARGS(2), IPSF, STATUS )
-      ELSE
-        CALL PSF_INTRO( ARGS(1), IPSF, STATUS )
-      END IF
+*  Introduce the dataset to the PSF system
+      FARG = ARGS(1)
+      IF ( FARGS .EQ. ADI__NULLID ) FARG = ARGS(2)
+      CALL PSF_INTRO( FARG, IPSF, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         HASPIX = .TRUE.
       ELSE
@@ -170,17 +170,35 @@
       IF ( HASPIX ) THEN
         CALL PSF_QAXES( IPSF, X_AX, Y_AX, E_AX, T_AX, STATUS )
         IF ( (X_AX .LT. 1) .OR. (Y_AX.LT.1) ) THEN
-          HASPIX = .FALSE.
+          CALL ADI_DERVD( FARG, 'Array', ISPRIM, STATUS )
+          IF ( ISPRIM ) THEN
+            CALL BDI_GETSHP( FARG, 2, DIMS, NDIM, STATUS )
+            REG(1) = .TRUE.
+            REG(2) = .TRUE.
+            UNITS(1) = 'arcmin'
+            UNITS(2) = 'arcmin'
+            LABEL(1) = 'X offset'
+            LABEL(1) = 'Y offset'
+            TOR = MATH__DTOR/60.0
+            BASE(1) = REAL(DIMS(1)-1)/2.0
+            SCALE(1) = -1.0
+            BASE(2) = - REAL(DIMS(2)-1)/2.0
+            SCALE(2) = 1.0
+          ELSE
+            HASPIX = .FALSE.
+          END IF
         ELSE
           CALL PSF_QAXIS( IPSF, X_AX, DIMS(1), REG(1), PTR(1), BASE(1),
      :                SCALE(1), LABEL, UNITS(1), TOR, STATUS )
-          BASE(1) = BASE(1) / TOR
-          SCALE(1) = SCALE(1) / TOR
           CALL PSF_QAXIS( IPSF, Y_AX, DIMS(2), REG(2), PTR(2), BASE(2),
      :                SCALE(2), LABEL, UNITS(2), TOR, STATUS )
-          BASE(2) = BASE(2) / TOR
-          SCALE(2) = SCALE(2) / TOR
         END IF
+      END IF
+      IF ( HASPIX ) THEN
+        BASE(1) = BASE(1) / TOR
+        SCALE(1) = SCALE(1) / TOR
+        BASE(2) = BASE(2) / TOR
+        SCALE(2) = SCALE(2) / TOR
       END IF
 
 *  Look for ASTERIX header data
