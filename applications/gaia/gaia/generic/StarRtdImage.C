@@ -617,7 +617,7 @@ int StarRtdImage::loadFile()
         image_->saveParams(p);
         delete image_;
         image_ = (ImageData *) NULL;
-        updateViews();
+        updateViews(); 
     }
 
     //  Check that the image exists and parse it.
@@ -650,7 +650,7 @@ int StarRtdImage::loadFile()
     image_ = image;
 
     //  Restore transformations.
-    image_->restoreParams(p, !autoSetCutLevels_);
+    image_->restoreParams( p, !autoSetCutLevels_ );
 
     //  Initialise the new image.
     return initNewImage();
@@ -1860,7 +1860,7 @@ int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
     wcsp->astWCSReplace( newset_ );
 
     //  Update any views to use this information.
-    if (updateViews(2) != TCL_OK) {
+    if ( updateViews( 2 ) != TCL_OK ) {
         return TCL_ERROR;
     } else {
         return TCL_OK;
@@ -1897,7 +1897,7 @@ int StarRtdImage::astrestoreCmd( int argc, char *argv[] )
                 wcsp->astWCSReplace( origset_ );
 
                 //  Update any views to use this information.
-                if (updateViews(2) != TCL_OK) {
+                if ( updateViews( 2 ) != TCL_OK ) {
                     return TCL_ERROR;
                 } else {
                     return TCL_OK;
@@ -1920,8 +1920,9 @@ int StarRtdImage::astrestoreCmd( int argc, char *argv[] )
             oldset_ = (AstFrameSet *) astAnnul( oldset_ );
 
             //  Update any views to use this information.
-            if (updateViews(2) != TCL_OK)
+            if ( updateViews( 2 ) != TCL_OK ) {
                 return TCL_ERROR;
+            }
         }
     }
     return TCL_OK;
@@ -5166,12 +5167,12 @@ int StarRtdImage::readonlyCmd( int argc, char *argv[] )
 //-
 int StarRtdImage::remoteTclCmd( int argc, char* argv[] )
 {
-    if ( Tcl_Eval( interp_, argv[0] ) == TCL_OK ) {
-        return set_result( interp_->result );
-    } else {
-        set_result( interp_->result );
-        return TCL_ERROR;
-    }
+     if ( Tcl_Eval( interp_, argv[0] ) == TCL_OK ) {
+         return set_result( interp_->result );
+     } else {
+         set_result( interp_->result );
+         return TCL_ERROR;
+     }
 }
 
 //+

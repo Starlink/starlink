@@ -10,7 +10,7 @@
 *     Starlink Fortran-77
 
 *  Invocation:
-*     CALL RTD1_ARDST( NDFID, GRAB, IPQUAL, HVQUAL )
+*     CALL RTD1_AQUAL( NDFID, GRAB, IPQUAL, HVQUAL )
 
 *  Description:
 *     This routines returns a pointer to a byte array with a copy of the

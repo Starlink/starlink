@@ -380,7 +380,7 @@ int gaiaFreeNDF( int ndfid )
    /* Free the NDF */
    ndfAnnul( &ndfid, &status );
    if ( status != SAI__OK ) {
-      emsAnnul( &status );
+       emsAnnul( &status );
    }
    emsRlse();
    return 1;
@@ -396,7 +396,7 @@ int gaiaFreeNDF( int ndfid )
  *      the total memory footprint.
  */
 int gaiaCopyComponent( int ndfid, void **data, const char* component,
-                 char **error_mess )
+                       char **error_mess )
 {
    char dtype[NDF__SZTYP+1];
    int chunkid;
@@ -564,19 +564,18 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
  */
 int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
 {
-   int status = SAI__OK;
-   emsMark();
-
-   ndfUnmap( ndfid, component, &status );
-   if ( status != SAI__OK ) {
-      *error_mess = errMessage( &status );
-      ndfEnd( &status );
-      emsRlse();
-      return 0;
-   }
-   ndfEnd( &status );
-   emsRlse();
-   return 1;
+    int status = SAI__OK;
+    emsMark();
+    ndfUnmap( ndfid, component, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = errMessage( &status );
+        ndfEnd( &status );
+        emsRlse();
+        return 0;
+    }
+    ndfEnd( &status );
+    emsRlse();
+    return 1;
 }
 
 /*  ===================================== */
@@ -931,7 +930,6 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     /*  No error messages should get past here! */
     if ( emess ) {
         free( emess );
-        fprintf( stderr, "leaked error message" );
     }
     return 1;
 }
@@ -1068,15 +1066,15 @@ int gaiaGetMNDF( const void *handle, int index, const char *component,
 
       /*  Either copy the data or obtained a mapped pointer according
        *  to the readonly status */
-      if ( current->readonly ) {
-         return gaiaMapComponent( current->ndfid, data, component,
-                            error_mess );
-      } else {
-         return gaiaCopyComponent( current->ndfid, data, component,
-                             error_mess );
-      }
+       if ( current->readonly ) {
+           return gaiaMapComponent( current->ndfid, data, component,
+                                    error_mess );
+       } else {
+           return gaiaCopyComponent( current->ndfid, data, component,
+                                     error_mess );
+       }
    }
-
+   
    /*  Arrive here only when NDF isn't available */
    *error_mess = strdup( "No such NDF is available" );
    return 0;

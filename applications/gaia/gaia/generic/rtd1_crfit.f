@@ -15,7 +15,7 @@
 *  Description:
 *     This routine creates the header section of the primary array or
 *     IMAGE extension of an output FITS file based upon information in
-*     an NDF.  
+*     an NDF.
 
 *     There are two stages:
 *     a) Inquire of the NDF its shape, type, character components,
@@ -101,7 +101,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
@@ -131,19 +131,19 @@
       INTEGER   NFLAGS          ! Number of flags to indicate
                                 ! presence special NDF components
       PARAMETER( NFLAGS = 3 )
-      
+
       INTEGER   SZKEY           ! Length of keyword names
       PARAMETER( SZKEY = 8 )    ! Columns 1 to 8
-      
+
       INTEGER   SZFITS          ! Length of FITS string
       PARAMETER( SZFITS = 80 )
-      
+
       INTEGER   SZNVAL          ! Character length of numeric values
       PARAMETER( SZNVAL = 20 )  ! Columns 11 to 30
-      
+
       INTEGER   SZVAL           ! Length of keyword string values
       PARAMETER( SZVAL = 70 )   ! Columns 11 to 80
-      
+
 *  Local Variables:
       CHARACTER * ( 1 ) C       ! Accommodates character string
       CHARACTER * ( SZKEY ) CDELT ! Keyword name of CDELTn
@@ -181,7 +181,7 @@
       NHEAD = 0
       NCOMP = 0
       CALL PSX_MALLOC( AVAIL * SZFITS, IPHEAD, STATUS )
-      CALL RTD1_WRFTC( 'END', ' ', ' ', IPHEAD, NHEAD, AVAIL, 
+      CALL RTD1_WRFTC( 'END', ' ', ' ', IPHEAD, NHEAD, AVAIL,
      :     STATUS )
 
 *  Write special header cards.
@@ -198,13 +198,13 @@
 *    DATE --- is created automatically.
 *    BLANK --- is created from the bad value (includes floating point!).
 *
-      CALL RTD1_WNDFH( NDF, IPHEAD, NHEAD, AVAIL, BITPIX, CMPFND, 
+      CALL RTD1_WNDFH( NDF, IPHEAD, NHEAD, AVAIL, BITPIX, CMPFND,
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Write the NDF identifier into the header (this is only a temporary
 *  FITS structure so this shouldn't have any other effects).
-      CALL RTD1_WRFTI( 'NDFID', NDF, 'NDF identifier (volatile)', 
+      CALL RTD1_WRFTI( 'NDFID', NDF, 'NDF identifier (volatile)',
      :                 IPHEAD, NHEAD, AVAIL, STATUS )
 
 *  If available encode any NDF WCS components into the headers. This
@@ -212,7 +212,7 @@
 *  that this is always used in preference to any native encodings
 *  already in the header.
       CALL NDF_STATE( NDF, 'WCS', EXISTS, STATUS )
-      IF ( EXISTS ) THEN 
+      IF ( EXISTS ) THEN
          CALL NDF_GTWCS( NDF, IWCS, STATUS )
          CALL RTD1_ENWCS( IWCS, IPHEAD, NHEAD, AVAIL, STATUS )
          CALL AST_ANNUL( IWCS, STATUS )
@@ -230,7 +230,7 @@
 *  FITS-file header.  Some items should be ignored including those
 *  already set above except:
 *    Any existing ORIGIN cards are kept (the Starlink one is added
-*    otherwise). 
+*    otherwise).
 *  In addition:
 *    XTENSION, BLANK and END --- are not propagated from the extension.
 *      The first will be set for any extension.  The second may be
@@ -269,7 +269,7 @@
 *  NAXISn and possibly, OBJECT, LABEL, BUNIT, DATE, BLANK, and
 *  END as described above. To avoid duplicate FITSIO banners these are
 *  also omitted, as they are written when FITSIO creates the primary
-*  headers.  * Use an intermediate variable to reduce the number of
+*  headers.  Use an intermediate variable to reduce the number of
 *  continuation lines in the test.  This combines tests for the
 *  mandatory headers.
             MANDAT = ( KEYWRD .NE. 'SIMPLE' ) .AND.
@@ -312,7 +312,7 @@
 *  Write the header card, replacing any non-printing characters
 *  with blanks (yes people do this).
                CALL CHR_CLEAN( FITSTR )
-               CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL, 
+               CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL,
      :                          STATUS )
             END IF
             CALL DAT_ANNUL( FTLOCI, STATUS )
@@ -322,10 +322,10 @@
 
 *  Add the default NDF WCS (GRID, PIXEL and AXIS) if no WCS component
 *  exists in the NDF or FITS headers.
-      IF ( .NOT. EXISTS ) THEN 
-         CALL RTD1_DEWCS( %VAL( IPHEAD ), NHEAD, .FALSE., IWCS, 
+      IF ( .NOT. EXISTS ) THEN
+         CALL RTD1_DEWCS( %VAL( IPHEAD ), NHEAD, .FALSE., IWCS,
      :                    STATUS, %VAL(80) )
-         IF ( IWCS .EQ. AST__NULL ) THEN 
+         IF ( IWCS .EQ. AST__NULL ) THEN
             CALL NDF_GTWCS( NDF, IWCS, STATUS )
             CALL RTD1_ENWCS( IWCS, IPHEAD, NHEAD, AVAIL, STATUS )
          END IF
@@ -333,8 +333,8 @@
       END IF
 
 *  If no FITS headers or no existing ORIGIN card then add the Starlink
-*  ORIGIN card. 
-      IF ( .NOT. ORIGIN ) THEN 
+*  ORIGIN card.
+      IF ( .NOT. ORIGIN ) THEN
          CALL RTD1_WRFTC( 'ORIGIN', 'Starlink Project, U.K.',
      :               'Origin of this FITS file', IPHEAD, NHEAD,
      :               AVAIL, STATUS )
