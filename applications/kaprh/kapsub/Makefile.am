@@ -24,4 +24,4 @@ SUFFIXES = .gen .f
 
 #  Run generic to get numeric types.
 .gen.f:
-	$(GENERIC)  -t n $<
+	$(GENERIC)  -t rdiwb $<
