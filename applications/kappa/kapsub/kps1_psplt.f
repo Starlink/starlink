@@ -195,8 +195,8 @@
          WORK( BIN, 2 ) = AMP * EXP( - 0.5 * ( ( RADIUS /
      :                          MAX( 0.001, AXSIG ) ) *  * GAMMA ) )
 
-         DMAX = MAX( DMAX, WORK( BIN, 2 ) )
-         DMIN = MIN( DMIN, WORK( BIN, 2 ) )
+         DMAX = MAX( DMAX, REAL( WORK( BIN, 2 ) ) )
+         DMIN = MIN( DMIN, REAL( WORK( BIN, 2 ) ) )
 
       END DO
 
