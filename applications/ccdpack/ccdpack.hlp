@@ -149,16 +149,13 @@
 
 1 Changes_this_release
 
- This is a minor update to CCDPACK (v2.2-1).
+ This is a minor update to CCDPACK (v2.2-3).
 
- The applications FINDOFF and REGISTER have been modified to open up
- to 100 input and 100 output files. Previously these programs where
- limited to 40 files in total.
+ The CCDALIGN application has been changed so that images of different
+ sizes are displayed at different scales. 
 
- The propagation of QUALITY in the MAKEBIAS, MAKECAL, MAKEFLAT and
- MAKEMOS applications has been suppressed. A bug in TRANNDF when
- propagating QUALITY has been corrected.
-
+ The FLATCOR application has been changed to trap divide by zero
+ on Linux and OSF/1.
 
 1 CALCOR
 Subtracts a scaled dark or flash calibration image from a series of
