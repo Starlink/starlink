@@ -29,18 +29,24 @@ C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
 f77.h: cnf.h
 	$(LN_S) cnf.h f77.h
 
-# CNF_PAR.fpp requires defintions from config.h
-CNF_PAR.f: CNF_PAR.fpp
-	$(FPP) -I. $(FPPFLAGS) $(CPPFLAGS) CNF_PAR.fpp $(FPP_OUTPUT)
-CNF_PAR: CNF_PAR.f
+# CNF_PAR.F requires defintions from config.h.
+# The following deals with case-insensitive filesystems, on which
+# CNF_PAR.f and CNF_PAR.F would be the same file.  FPP_OUTPUT is
+# either "" (in which case the preprocessor writes to CNF_PAR.f, and
+# the filesystem is presumably case-sensitive) or ">$@".
+CNF_PAR.processed: CNF_PAR.F
+	rm -f CNF_PAR.processed
+	$(FPP) -I. $(FPPFLAGS) $(CPPFLAGS) CNF_PAR.F $(FPP_OUTPUT)
+	test -f CNF_PAR.processed || mv CNF_PAR.f CNF_PAR.processed
+CNF_PAR: CNF_PAR.processed
 	rm -f CNF_PAR CNF_PAR.tmp
-	echo "* Generated from CNF_PAR.fpp by Makefile.am" >CNF_PAR.tmp
-	grep '^      ' CNF_PAR.f >>CNF_PAR.tmp \
+	echo "* Generated from CNF_PAR.F by Makefile.am" >CNF_PAR.tmp
+	grep '^ .*[^ ]' CNF_PAR.processed >>CNF_PAR.tmp \
 	    && mv CNF_PAR.tmp CNF_PAR
 
 BUILT_SOURCES = f77.h
 
-CLEANFILES = f77.h CNF_PAR CNF_PAR.f CNF_PAR.tmp
+CLEANFILES = f77.h CNF_PAR CNF_PAR.processed CNF_PAR.tmp
 
 # Testing
 
