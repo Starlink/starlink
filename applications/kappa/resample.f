@@ -112,7 +112,7 @@
 *        require additional parameters to be supplied via the PARAMS 
 *        parameter.  A more detailed discussion of these schemes is
 *        given in the "Sub-Pixel Interpolation Schemes" section below.
-*        ["Nearest"]
+*        [current value]
 *     OUT = NDF (Write)
 *        The transformed NDF.
 *     PARAMS( ) = _DOUBLE (Read)
@@ -595,29 +595,39 @@
       CALL PAR_CHOIC( 'METHOD', 'NEAREST', 'NEAREST,LINEAR,SINC,'//
      :                'SINCSINC,SINCCOS,SINCGAUSS,BLOCKAVE', .FALSE.,
      :                METHOD, STATUS )
+
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       IF ( METHOD .EQ. 'NEAREST' ) THEN
+         CALL MSG_SETC( 'M', 'Nearest Neighbour' )
          INTERP = AST__NEAREST
          NPARAM = 0
       ELSE IF ( METHOD .EQ. 'LINEAR' ) THEN
+         CALL MSG_SETC( 'M', 'Bilinear' )
          INTERP = AST__LINEAR
          NPARAM = 0
       ELSE IF ( METHOD .EQ. 'SINC' ) THEN
+         CALL MSG_SETC( 'M', 'Sinc' )
          INTERP = AST__SINC
          NPARAM = 1
       ELSE IF ( METHOD .EQ. 'SINCSINC' ) THEN
+         CALL MSG_SETC( 'M', 'SincSinc' )
          INTERP = AST__SINCSINC
          NPARAM = 2
       ELSE IF ( METHOD .EQ. 'SINCCOS' ) THEN
+         CALL MSG_SETC( 'M', 'SincCos' )
          INTERP = AST__SINCCOS
          NPARAM = 2
       ELSE IF ( METHOD .EQ. 'SINCGAUSS' ) THEN
+         CALL MSG_SETC( 'M', 'SincGauss' )
          INTERP = AST__SINCGAUSS
          NPARAM = 2
       ELSE IF ( METHOD .EQ. 'BLOCKAVE' ) THEN
+         CALL MSG_SETC( 'M', 'BlockAve' )
          INTERP = AST__BLOCKAVE
          NPARAM = 1
       END IF
+      CALL MSG_OUT( 'RESAMPLE_MSG1', '  Using ^M interpolation.', 
+     :              STATUS )
 
 *  Get an additional parameter vector if required.
       IF ( NPARAM .GT. 0 ) THEN
@@ -733,9 +743,9 @@
 
          IF( SCEQU ) THEN 
             CALL MSG_SETR( 'S', REAL( SCVAL ) )
-            CALL MSG_OUT( ' ', '  The supplied Mapping is being '//
-     :                    'modified by a scale factor of ^S on '//
-     :                    'each axis.', STATUS )      
+            CALL MSG_OUT( 'RESAMPLE_MSG2 ', '  The supplied Mapping '//
+     :                    'is being modified by a scale factor of ^S '//
+     :                    'on each axis.', STATUS )      
            MAPJ = AST_ZOOMMAP( NDIMO, SCVAL, ' ', STATUS )
 
          ELSE
@@ -743,8 +753,8 @@
                CALL MSG_SETR( 'S', REAL( SCALE( I ) ) )
                IF( I .NE. NDIMO ) CALL MSG_SETC( 'S', ',' )
             END DO
-            CALL MSG_OUT( ' ', '  The supplied Mapping is being '//
-     :                    'modified by scale factors of (^S).',
+            CALL MSG_OUT( 'RESAMPLE_MSG3', '  The supplied Mapping is'//
+     :                    '  being modified by scale factors of (^S).',
      :                    STATUS )      
             MAPJ = AST_MATRIXMAP( NDIMI, NDIMO, 1, SCALE, ' ', STATUS )
          END IF 

@@ -12676,7 +12676,7 @@ iraf! {
          parameter method {
             position 3
             type LITERAL
-            vpath DEFAULT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             prompt {Re-sampling method}
             helpkey *
