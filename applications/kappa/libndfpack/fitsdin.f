@@ -310,6 +310,9 @@
 *        Added support for WCS component.
 *     9-DEC-1998 (DSB):
 *        Added FITS-IRAF encoding.
+*     9-JUN-1999 (DSB):
+*        Remove use of non-standard RECORDTYPE option in INQUIRE
+*        statements, and READONLY in OPEN statements.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -517,7 +520,6 @@
      :  PTYPE( MXPARM ) * ( 8 ), ! Parameter names for groups format
      :  PREFIX * ( 80 ),       ! Prefix for automatic generation of NDF
                                ! file names
-     :  RECTYP * ( 9 ),        ! Record type of the disc-FITS file
      :  RELEAS * ( 10 ),       ! Release of operating system
      :  SYSNAM * ( 10 ),       ! Operating system
      :  VERSIO * ( 10 )        ! Sub-version of operating system
@@ -808,26 +810,15 @@
             GOTO 960
          END IF
 
-*       Inquire the characteristics of the file.
-
-         INQUIRE ( FILE = INFILE, RECORDTYPE = RECTYP, RECL = ACTSIZ )
-
 *       For non-VMS, i.e. UNIX, we must have 2880-byte FITS records.
          IF ( .NOT. VMS ) THEN
             ACTSIZ = 2880
 
-*       Only fixed-length records are supported on a Vax.  Note if
-*       there are further files to process, flush the error so that
-*       subsequent files may be processed.
-
-         ELSE IF ( RECTYP .NE. 'FIXED    ' ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'FITSDIN_NFIXED',
-     :        'FITSDIN: Only fixed-length blocks are supported.',
-     :        STATUS )
-            IF ( FS .NE. NFILE ) CALL ERR_FLUSH( STATUS )
-            CALL ERR_RLSE
-            GOTO 960
+*       On a VAX, inquire the record length (Only fixed-length records are
+*       supported on a VAX - we do not check for this since it involves
+*       using the non-standard RECORDTYPE option).  
+         ELSE 
+            INQUIRE ( FILE = INFILE, RECL = ACTSIZ )
          END IF
 
 *       Blocking factor should be an integer factor from one to ten
@@ -855,7 +846,7 @@
 
          IF ( VMS ) THEN
             OPEN( UNIT = UDFITS, FILE = INFILE, STATUS = 'OLD', 
-     :            READONLY, FORM = 'UNFORMATTED', IOSTAT = IOERR )
+     :            FORM = 'UNFORMATTED', IOSTAT = IOERR )
 
 *       Otherwise open it as a random-access file.  DEC Fortran uses
 *       longwords (4 bytes).
