@@ -149,8 +149,13 @@ versionid='v0-7-11'>
 
 <distribution string="DR-0.7-12" date="15-Mar-2001" author="ng"
 	versionid='v0-7-12'>
-<px>RCS $Id$</px>
+<px>RCS Id: ssn70.sgml,v 1.61 2001/03/15 15:45:44 norman Exp </px>
 <px>Mentioned the various jadeflags.</px>
+</distribution>
+
+<distribution string="DR-0.7-13" date="16-Mar-2001" author="ng"
+	versionid='v0-7-13'>
+<px>Small documentation changes.</px>
 </distribution>
 
 
@@ -2777,13 +2782,18 @@ rearrangement).</p>
 <update versionid="v0-7-12">
 <px>Added Jade flags section.  The information was present, before,
 but rather well hidden.</px></update>
+<update versionid="v0-7-13">
+<px>The --javaflags option now takes its argument with an equals sign.</px>
+</update>
 
 <p>There are a few flags which you can pass to the stylesheet via the
 <code>--jadeflags</code> option.  For example, to turn on the
 <code>show-element-ids</code> and <code>suppress-idindex</code>
 options, you would give the <code>sgml2docs</code> option
-<code>--jadeflags '-Vshow-element-ids -Vsuppress-idindex'</code>.
-These stylesheet options include the following.</p>
+<code>'--jadeflags=-Vshow-element-ids -Vsuppress-idindex'</code>.
+These stylesheet options include the following.  Note that these are
+on-switches rather than toggles: due to the way that Jade is
+implemented, it's not possible to turn these options off explicitly.</p>
 
 <p>All-format parameterisation:
 <dl>
@@ -2821,8 +2831,11 @@ output file.</p></dd>
 <dd><p>Prevents the Starlink banner from being output.</p></dd>
 
 <dt>suppress-idindex</dt>
-<dd><p>Suppress the generation of the ID Index page.  Though this is
-useful, it can take a <em>long</em> time to generate.</p></dd>
+<dd><p><update versionid="v0-7-13">
+<px>The idindex generation is much speeded up now, making the warning
+in the previous version redundant.</px>
+</update>
+Suppress the generation of the ID Index page.</p></dd>
 
 <dt>suppress-printable</dt>
 <dd><p>Suppress the legend `Retrieve hardcopy' on the front page.</p></dd>
@@ -4527,7 +4540,7 @@ stylesheets' parameters are designed to be settable this way.  You can
 either give this option explicitly on a Jade command line, or pass it
 to Jade via the <code/sgml2docs> command line (see <ref id=proc.sgml2docs/>):
 <verbatim>
-sgml2docs --jadeflags '-V show-element-ids' ...
+sgml2docs '--jadeflags=-Vshow-element-ids' ...
 </verbatim>
 
 <p>If this type of customising is insufficient, then you may take a
