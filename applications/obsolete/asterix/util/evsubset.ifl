@@ -1,7 +1,7 @@
 INTERFACE EVSUBSET
 
   PARAMETER INP
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     POSITION    1
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.EVDS'
@@ -26,7 +26,7 @@ INTERFACE EVSUBSET
   ENDPARAMETER
 
   PARAMETER OUT
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     POSITION    2
     ASSOCIATION '->GLOBAL.EVDS'
     PROMPT      'Enter name of output dataset'
