@@ -25997,9 +25997,7 @@ ISIZE = _INTEGER (Read)
    The side of the square area to be used when forming the marginal
    profiles for a star image, given as a number of pixels.  It should
    be sufficiently large to contain the entire star image.  It should
-   be an odd number and must lie in the range from 3 to 101.  If an
-   even value is given, the next largest odd number is used instead.
-   [15]
+   be an odd number and must lie in the range from 3 to 101.  [15]
 3 LOGFILE
 LOGFILE = FILENAME (Read)
    Text file to contain the table of parameters for each star.  A
@@ -26043,216 +26041,246 @@ OUT = NDF (Write)
    at each pixel. If null, !, is entered no output NDF will be
    created. The dimensions of the array are controlled by parameter
    CUT. The pixel origin is chosen to align the model PSF with the
-2 first_fitted_star_in_pixel_co-ordinates,_thus_allowing_the_NDF
-      holding the model PSF to be compared directly with the input NDF.
-      A WCS component is stored in the output NDF holding a copy of the
-      input WCS component. An additional Frame with Domain name OFFSET
-      is added, and is made the current Frame. This Frame measures the
-      distance from the PSF centre in the units in which the FWHM is
-      reported. [!]
-   POSCOLS = _INTEGER (Read)
-      Column positions of the co-ordinates (x then y) in an input record
-      of the file specified by parameter COFILE.  The columns must be
-      different amongst themselves. If there is duplication new values
-      will be requested.  Only accessed if INCAT is given a null (!)
-      value. If a null (!) value is supplied for POSCOLS, the values
-      [1,2] will be used. [!]
-   RANGE = _REAL (Read)
-      The number of image profile widths out to which the radial
-      star profile is to be fitted.  (There is an upper limit of 100
-      pixels to the radius at which data are actually used.) [4.0]
-   STYLE = GROUP (Read)
-      A group of attribute settings describing the plotting style to use
-      when drawing the annotated axes, data values, and the model profile.
+   fitted star in pixel co-ordinates, thus allowing the NDF
+   holding the model PSF to be compared directly with the input NDF.
+   A WCS component is stored in the output NDF holding a copy of the
+   input WCS component. An additional Frame with Domain name OFFSET
+   is added, and is made the current Frame. This Frame measures the
+   distance from the PSF centre in the units in which the FWHM is
+   reported. [!]
+3 POSCOLS
+POSCOLS = _INTEGER (Read)
+   Column positions of the co-ordinates (x then y) in an input record
+   of the file specified by parameter COFILE.  The columns must be
+   different amongst themselves. If there is duplication new values
+   will be requested.  Only accessed if INCAT is given a null (!)
+   value. If a null (!) value is supplied for POSCOLS, the values
+   [1,2] will be used. [!]
+3 RANGE
+RANGE = _REAL (Read)
+   The number of image profile widths out to which the radial
+   star profile is to be fitted.  (There is an upper limit of 100
+   pixels to the radius at which data are actually used.) [4.0]
+3 STYLE
+STYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   when drawing the annotated axes, data values, and the model profile.
 
-      A comma-separated list of strings should be given in which each
-      string is either an attribute setting, or the name of a text file
-      preceded by an up-arrow character "^". Such text files should
-      contain further comma-separated lists which will be read and
-      interpreted in the same manner. Attribute settings are applied in
-      the order in which they occur within the list, with later settings
-      over-riding any earlier settings given for the same attribute.
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
 
-      Each individual attribute setting should be of the form:
-2 *__________<name>=<value>
-         where <name> is the name of a plotting attribute, and <value> is
-         the value to assign to the attribute. Default values will be
-         used for any unspecified attributes. All attributes will be
-         defaulted if a null value (!) is supplied. See section "Plotting
-         Attributes" in SUN/95 for a description of the available
-         attributes. Any unrecognised attributes are ignored (no error is
-         reported).
+   Each individual attribute setting should be of the form:
 
-         The appearance of the model curve is controlled by the attributes
-         Colour(Curves), Width(Curves), etc (the synonym Line may be used
-         in place of Curves). The appearance of the markers representing
-         the real data is controlled by Colour(Markers), Width(Markers),
-         etc. (the synonym Symbols may be used in place of Markers).
-         [current value]
-      TITLE = LITERAL (Read)
-         The title for the NDF to contain the fitted point-spread
-         function.  If null (!) is entered the NDF will not contain a
-         title.  ["KAPPA - PSF"]
-      USEAXIS = GROUP (Read)
-         USEAXIS is only accessed if the current co-ordinate Frame of the
-         NDF has more than 2 axes. A group of two strings should be
-         supplied specifying the 2 axes which are to be used when
-         determining distances, reporting positions, etc. Each axis can be
-         specified either by its integer index within the current Frame (in
-         the range 1 to the number of axes in the current Frame), or by its
-         Symbol attribute. A list of acceptable values is displayed if an
-         illegal value is supplied. If a null (!) value is supplied, the
-         axes with the same indices as the 2 significant NDF pixel axes are
-         used. [!]
-      XLEFT = _REAL (Read)
-         The axis value to place at the left hand end of the horizontal
-         axis of the plot. If a null (!) value is supplied, a suitable
-         default value will be found and used. The value supplied may be
-         greater than or less than the value supplied for XRIGHT. [!]
-      XRIGHT = _REAL (Read)
-         The axis value to place at the right hand end of the horizontal
-         axis of the plot. If a null (!) value is supplied, a suitable
-         default value will be found and used. The value supplied may be
-         greater than or less than the value supplied for XLEFT. [!]
-      YBOT = _REAL (Read)
-         The axis value to place at the bottom end of the vertical axis of
-         the plot. If a null (!) value is supplied, a suitable default
-         value will be found and used. The value supplied may be greater
-         than or less than the value supplied for YTOP. [!]
-      YTOP = _REAL (Read)
-         The axis value to place at the top end of the vertical axis of
-         the plot. If a null (!) value is supplied, a suitable default
-         value will be found and used. The value supplied may be greater
-         than or less than the value supplied for YBOT. [!]
+      <name>=<value>
 
-   Examples:
-      psf ngc6405i starlist.FIT \
-         Derives the mean point-spread function for the stars images
-         in the NDF called ngc6405i that are situated near the
-         co-ordinates given in the positions list starlist.FIT. A
-         plot of the profile is drawn on the current graphics device.
-      psf ngc6405i starlist device=!
-         As above but there is no graphical output, and the file type of
-         the input positions list is defaulted.
-      psf ngc6405i cofile=starlist.dat gauss \
-         As the first example, except the psf is fitted to a
-         two-dimensional Gaussian,and the positions are given in a simple
-         text file instead of a positions list.
-      psf incat=starlist.FIT in=ngc6405i logfile=fit.log fwhm=(seeing) \
-         As the first example, but the results, including the fits to
-         each star, are written to the text file fit.log.  The
-         full-width half-maximum is written to the ICL variable SEEING
-         rather than the parameter file.
-      psf ngc6405i starlist isize=31 style="'title=Point spread function'"
-         As the first example, but the area including a star image is
-         31 pixels square, say because the seeing is poor or the pixels
-         are smaller than normal. The graph is titled "Point spread
-         function".
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
 
-   Notes:
+   The appearance of the model curve is controlled by the attributes
+   Colour(Curves), Width(Curves), etc (the synonym Line may be used
+   in place of Curves). The appearance of the markers representing
+   the real data is controlled by Colour(Markers), Width(Markers),
+   etc. (the synonym Symbols may be used in place of Markers).
+   [current value]
+3 TITLE
+TITLE = LITERAL (Read)
+   The title for the NDF to contain the fitted point-spread
+   function.  If null (!) is entered the NDF will not contain a
+   title.  ["KAPPA - PSF"]
+3 USEAXIS
+USEAXIS = GROUP (Read)
+   USEAXIS is only accessed if the current co-ordinate Frame of the
+   NDF has more than 2 axes. A group of two strings should be
+   supplied specifying the 2 axes which are to be used when
+   determining distances, reporting positions, etc. Each axis can be
+   specified either by its integer index within the current Frame (in
+   the range 1 to the number of axes in the current Frame), or by its
+   Symbol attribute. A list of acceptable values is displayed if an
+   illegal value is supplied. If a null (!) value is supplied, the
+   axes with the same indices as the 2 significant NDF pixel axes are
+   used. [!]
+3 XLEFT
+XLEFT = _REAL (Read)
+   The axis value to place at the left hand end of the horizontal
+   axis of the plot. If a null (!) value is supplied, a suitable
+   default value will be found and used. The value supplied may be
+   greater than or less than the value supplied for XRIGHT. [!]
+3 XRIGHT
+XRIGHT = _REAL (Read)
+   The axis value to place at the right hand end of the horizontal
+   axis of the plot. If a null (!) value is supplied, a suitable
+   default value will be found and used. The value supplied may be
+   greater than or less than the value supplied for XLEFT. [!]
+3 YBOT
+YBOT = _REAL (Read)
+   The axis value to place at the bottom end of the vertical axis of
+   the plot. If a null (!) value is supplied, a suitable default
+   value will be found and used. The value supplied may be greater
+   than or less than the value supplied for YTOP. [!]
+3 YTOP
+YTOP = _REAL (Read)
+   The axis value to place at the top end of the vertical axis of
+   the plot. If a null (!) value is supplied, a suitable default
+   value will be found and used. The value supplied may be greater
+   than or less than the value supplied for YBOT. [!]
+2 Examples
+psf ngc6405i starlist.FIT \
+   Derives the mean point-spread function for the stars images
+   in the NDF called ngc6405i that are situated near the
+   co-ordinates given in the positions list starlist.FIT. A
+   plot of the profile is drawn on the current graphics device.
 
-      -  Values for the FWHM seeing are given in arc-seconds if the
-      Current co-ordinate Frame of the NDF is a SKY Frame.
+psf ngc6405i starlist device=!
+   As above but there is no graphical output, and the file type of
+   the input positions list is defaulted.
 
-      -  The stars used to determine the mean image parameters should
-      be chosen to represent those whose magnitudes are to be found
-      using a stellar photometry application, and to be sufficiently
-      bright, uncrowded, and noise-free to allow an accurate fit to be
-      made.
+psf ngc6405i cofile=starlist.dat gauss \
+   As the first example, except the psf is fitted to a
+   two-dimensional Gaussian,and the positions are given in a simple
+   text file instead of a positions list.
 
-      -  It is assumed that the image scale does not vary significantly
-      across the image.
+psf incat=starlist.FIT in=ngc6405i logfile=fit.log fwhm=(seeing) \
+   As the first example, but the results, including the fits to
+   each star, are written to the text file fit.log.  The
+   full-width half-maximum is written to the ICL variable SEEING
+   rather than the parameter file.
 
-      -  The method to calculate the fit is as follows:
+psf ngc6405i starlist isize=31 style="'title=Point spread function'"
+   As the first example, but the area including a star image is
+   31 pixels square, say because the seeing is poor or the pixels
+   are smaller than normal. The graph is titled "Point spread
+   function".
+2 Notes
+-  Values for the FWHM seeing are given in arc-seconds if the
+Current co-ordinate Frame of the NDF is a SKY Frame.
 
-         -  Marginal profiles of each star image are formed in four
-         directions, inclined at 45-degree intervals.  A Gaussian curve
-         and background is fitted to each profile.  Using the resulting
-         four Gaussian centres, a mean centre is found for each star.
+-  The stars used to determine the mean image parameters should
+be chosen to represent those whose magnitudes are to be found
+using a stellar photometry application, and to be sufficiently
+bright, uncrowded, and noise-free to allow an accurate fit to be
+made.
 
-         - The four Gaussian widths of all the stars are combined,
-         using a weighted average with rejection of erroneous data, and
-         from the four average widths the seeing-disc size, axis ratio
-         and axis inclination are calculated.
+-  It is assumed that the image scale does not vary significantly
+across the image.
 
-         - The data surrounding each star is then binned into
-         isophotal zones which are elliptical annuli centred on the
-         star---the ellipse parameters being those just calculated.
-         The data in each zone is processed to remove erroneous points
-         and to find an average value.  A Gaussian profile is fitted to
-         these average values and the derived amplitude is used to
-         normalise the values to an amplitude of unity.  The normalised
-         values are put into bins together with the corresponding data
-         from all other stars and this binned data represents a
-         weighted average radial profile for the set of stars, with the
-         image ellipticity removed.  Finally a radial profile is fitted
-         to these data, giving the radial profile parameter gamma and a
-         final re-estimate of the seeing-disc size.
+-  The method to calculate the fit is as follows:
 
-   Related Applications:
-      PHOTOM; Starman.
+   -  Marginal profiles of each star image are formed in four
+   directions, inclined at 45-degree intervals.  A Gaussian curve
+   and background is fitted to each profile.  Using the resulting
+   four Gaussian centres, a mean centre is found for each star.
 
-   Implementation Status:
+   - The four Gaussian widths of all the stars are combined,
+   using a weighted average with rejection of erroneous data, and
+   from the four average widths the seeing-disc size, axis ratio
+   and axis inclination are calculated.
 
-      -  This routine correctly processes the AXIS, DATA, QUALITY,
-      LABEL, WCS and TITLE components of an NDF data structure.
+   - The data surrounding each star is then binned into
+   isophotal zones which are elliptical annuli centred on the
+   star---the ellipse parameters being those just calculated.
+   The data in each zone is processed to remove erroneous points
+   and to find an average value.  A Gaussian profile is fitted to
+   these average values and the derived amplitude is used to
+   normalise the values to an amplitude of unity.  The normalised
+   values are put into bins together with the corresponding data
+   from all other stars and this binned data represents a
+   weighted average radial profile for the set of stars, with the
+   image ellipticity removed.  Finally a radial profile is fitted
+   to these data, giving the radial profile parameter gamma and a
+   final re-estimate of the seeing-disc size.
+2 Related_Applications
+   PHOTOM; Starman.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
 
-      -  Processing of bad pixels and automatic quality masking are
-      supported.
+TDCA: Tim Ash (STARLINK)
 
-      -  All non-complex numeric data types can be handled.  The output
-      point-spread-function NDF has the same type as the input NDF.
+DSB: David S. Berry (STARLINK)
+2 History
+ 1990 Sep 25 (MJC):
+    Original version with commentary from Rodney Warren-Smith's
+    EDRS documentation.
 
-   Authors:
-      MJC: Malcolm J. Currie (STARLINK)
-      TDCA: Tim Ash (STARLINK)
-      DSB: David S. Berry (STARLINK)
+ 1991 July 6 (MJC):
+    Added Usage, Notes on graphics pictures stored in the database,
+    and more on the Implementation Status in the documentation.
 
-   History:
-      1990 Sep 25 (MJC):
-         Original version with commentary from Rodney Warren-Smith's
-         EDRS documentation.
-      1991 July 6 (MJC):
-         Added Usage, Notes on graphics pictures stored in the database,
-         and more on the Implementation Status in the documentation.
-      1991 July 9 (MJC):
-         An output NDF containing the PSF may now be created.  There are
-         three new parameters: CUT, OUT and TITLE.
-      1991 July 12 (MJC):
-         Support for data co-ordinates added via new parameter COSYS.
-      1991 August 20 (MJC):
-         Added FONT parameter.
-      1992 March 3 (MJC):
-         Replaced AIF parameter-system calls by the extended PAR
-         library.
-      1992 April 21 (MJC):
-         Made to handle significant dimensions for user-defined
-         sections.
-      1992 November 30 (MJC):
-         Does not use non-monotonic axis centres.
-      1993 August 27 (MJC):
-         Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
-         parameters for adjustment of the plotting style, for scaling
-         from pixels to physical units, and for minor-axis profiles.
-      1998 May 26 (MJC):
-         Added GAUSS parameter.  A failure to meet the tolerance test
-         is no longer fatal.  Warning messages showing the requested
-         and used tolerances replace the error message.
-      16-JUL-1999 (TDCA):
-         Converted to use AST/PGPLOT for graphics. Blank lines in
-         co-ordinate file are now ignored, rather than causing a
-         fatal error.
-      20-SEP-1999 (DSB):
-         Modified to expect input positions in the current WCS Frame of
-         the NDF. Removed parameter COSYS, RADUNITS, SCALE. Added INCAT.
-         USEAXIS.
-      26-OCT-1999 (DSB):
-         Made MARGIN a fraction of the current picture, not the DATA
-         picture.
-      2-MAY-2000 (DSB):
-         Added parameters AMP1 and NORM.
+ 1991 July 9 (MJC):
+    An output NDF containing the PSF may now be created.  There are
+    three new parameters: CUT, OUT and TITLE.
 
-   Bugs:
+ 1991 July 12 (MJC):
+    Support for data co-ordinates added via new parameter COSYS.
+
+ 1991 August 20 (MJC):
+    Added FONT parameter.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 21 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+
+ 1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1993 August 27 (MJC):
+    Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
+    parameters for adjustment of the plotting style, for scaling
+    from pixels to physical units, and for minor-axis profiles.
+
+ 1998 May 26 (MJC):
+    Added GAUSS parameter.  A failure to meet the tolerance test
+    is no longer fatal.  Warning messages showing the requested
+    and used tolerances replace the error message.
+
+ 16-JUL-1999 (TDCA):
+    Converted to use AST/PGPLOT for graphics. Blank lines in
+    co-ordinate file are now ignored, rather than causing a
+    fatal error.
+
+ 20-SEP-1999 (DSB):
+    Modified to expect input positions in the current WCS Frame of
+    the NDF. Removed parameter COSYS, RADUNITS, SCALE. Added INCAT.
+    USEAXIS.
+
+ 26-OCT-1999 (DSB):
+    Made MARGIN a fraction of the current picture, not the DATA
+    picture.
+
+ 2-MAY-2000 (DSB):
+    Added parameters AMP1 and NORM.
+
+ 17-MAY-2000 (DSB):
+    Added data units to Y axis label of the plot if NORM is FALSE.
+
+ 22-MAY-2000 (DSB):
+    Use an inverted copy of MAP1 when creating MAP3 instead of just
+    temporarily inverting MAP1 itself. This is because the call to
+    AST_SIMPLIFY could otherwise sometimes return a pointer to MAP1
+    (eg if MAP2 was a UnitMap), and so subsequently re-inverting
+    MAP1 would also invert MAP3.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, WCS and TITLE components of an NDF data structure.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  The output
+   point-spread-function NDF has the same type as the input NDF.
 1 QUILT
     Generates a mosaic from equally sized 2-d data arrays,
     optionally specified from an ASCII file

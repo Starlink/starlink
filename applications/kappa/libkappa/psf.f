@@ -159,7 +159,7 @@
 *        at each pixel. If null, !, is entered no output NDF will be 
 *        created. The dimensions of the array are controlled by parameter 
 *        CUT. The pixel origin is chosen to align the model PSF with the 
-*	 first fitted star in pixel co-ordinates, thus allowing the NDF 
+*        fitted star in pixel co-ordinates, thus allowing the NDF 
 *        holding the model PSF to be compared directly with the input NDF. 
 *        A WCS component is stored in the output NDF holding a copy of the 
 *        input WCS component. An additional Frame with Domain name OFFSET 
