@@ -7,7 +7,7 @@ AC_INIT(par, 2.3, ussc@star.rl.ac.uk)
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl   Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl   Sanity-check: name a file in the source directory
 AC_CONFIG_SRCDIR([PAR_PAR])
@@ -24,7 +24,7 @@ STAR_DECLARE_USE_DEPENDENCIES(chr)
 
 STAR_LATEX_DOCUMENTATION(sun114)
 
-STAR_MESSGEN
+STAR_MESSGEN(par_err.msg)
 
 AC_CONFIG_FILES(Makefile component.xml)
 

@@ -1,33 +1,96 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.0, rnum=1000000
+
+use_autoheader=false
+use_libtool=false
+for feature in `sed -n -e 's/^ *\(A[CM]_[A-Z_]*\).*/\1/p' configure.ac`
+do
+    case $feature in
+    AC_CONFIG_HEADER*)
+        use_autoheader=true
+        ;;
+    AM_CONFIG_HEADER*)
+        use_autoheader=true
+        ;;
+    AC_PROG_LIBTOOL)
+        use_libtool=true
+        ;;
+    esac
+done
+
+echo "use_autoheader=$use_autoheader"
+echo "use_libtool=$use_libtool"
+
+sed -e '1,/^ENDCONFIG/d' \
+    -e "s,!run_libtool!,$use_libtool," \
+    -e "s,!run_autoheader!,$use_autoheader," \
+    $0 >$0.tmp
+mv $0.tmp $0
+chmod +x $0
+exec $0
+
+ENDCONFIG
+#! /bin/sh -
+# original bootstrap file, installed by starconf 1.0-1, rnum=1000001
 # If you _need_ to change this file, delete or replace `original' above
 # or else starconf may overwrite it with an updated version
 
+# Bootstrap a checked-out component of the Starlink software tree.
 # Run this script in a freshly checked-out directory to bring the
 # system to the point where you can just type ./configure;make
+#
+# Usage:
+#     ./bootstrap
+#
+# Important environment variables:
+#
+#     STARCONF_BUILDSUPPORT: this bootstrap script executes the
+#     configuration script $STARCONF_BUILDSUPPORT/bin/starconf, and
+#     objects if it can't find it.  This script adds required files,
+#     and establishes installation directories.
 #
 # The configuration script here works with automake versions 1.6.3 and
 # 1.7.5, and autoconf 2.57, and probably not much that's significantly
 # older than those.
 
-run_libtool=true
-run_autoheader=true
+run_libtool=!run_libtool!
+run_autoheader=!run_autoheader!
 
-# Echo a command then run it.
+# Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }
 
-# Execute ./starconf.status if it exists, to bring the configuration
-# up-to-date.  This test is possibly temporary, and we may decide to
-# mandate a working starconf in future.
-if test -x $STARLINK/buildsupport/bin/starconf; then
-    echorun $STARLINK/buildsupport/bin/starconf
+if test -z "$STARCONF_BUILDSUPPORT"; then
+    # Use a default.  We don't normally refer to the STARLINK
+    # variable, but we've little choice here.  Try it, but don't fail
+    # if it's not there -- that simply means we won't default
+    # STARCONF_BUILDSUPPORT and we'll take other actions below.
+    if test -n "$STARLINK"; then
+        STARCONF_BUILDSUPPORT=$STARLINK/buildsupport
+        echo "Defaulting STARCONF_BUILDSUPPORT to $STARCONF_BUILDSUPPORT"
+    fi
+fi
+if test -z "$STARCONF_BUILDSUPPORT"; then
+    echo "STARCONF_BUILDSUPPORT is empty -- hope that's OK"
+fi
+
+# Run starconf, by running the starconf script installed in
+# $STARCONF_BUILDSUPPORT.
+#
+# It is possible to recreate the current starconf configuration by
+# running the ./starconf.status script in the current directory.  At
+# present, we _do_ this as a fallback, but we might not in future.
+if test -x $STARCONF_BUILDSUPPORT/bin/starconf; then
+    echorun $STARCONF_BUILDSUPPORT/bin/starconf
 elif test -x ./starconf.status; then
+    # When starconf is run, it finishes by execing ./starconf.status
+    # with arguments which do final configuration (indicating
+    # installation location).  These arguments can be defaulted from
+    # the environment, and we rely on this here -- the script exits if
+    # the required variables are not findable.
     echorun ./starconf.status
 else
-    echo "No starconf found anywhere"
+    echo "No starconf found in $STARCONF_BUILDSUPPORT, and no ./starconf.status.  Exiting"
     exit 1
 fi
-#echorun $STARLINK/buildsupport/bin/starconf
 
 echorun aclocal
 
@@ -39,7 +102,8 @@ $run_autoheader && echorun autoheader
 # We need to explicitly run libtoolize only if ltmain.sh is not present
 # (it won't be, in the case when we really are bootstrapping, but it might
 # be if we're running bootstrap redundantly, which ought to be OK).
-# Generally, it's (re)run implicitly by automake.
+# Generally, it's (re)run implicitly by automake, which does it with
+# some extra options we probably shouldn't interfere with.
 if $run_libtool; then
     if test ! -e ltmain.sh; then
         echorun libtoolize

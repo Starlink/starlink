@@ -7,7 +7,7 @@ AC_INIT(hlp, 3.3-2, ussc@star.rl.ac.uk)
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -18,11 +18,10 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
-STAR_FPP_SOURCES(fopr)
 STAR_HAVE_F77_OPEN_READONLY
 
 AC_CONFIG_HEADERS([config.h])

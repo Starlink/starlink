@@ -7,6 +7,11 @@
   <path>libraries/pcs/misc</path>
   <description>Miscellaneous routines required for the Unix build of
     ADAM/HDS</description>
+  <abstract><p>Miscellaneous routines which do not fit into other
+      libraries.  Two handle terminal I/O for programs running
+      directly from a Unix shell and others provide a Fortran
+      interface into the C library for platforms (notably Linux) which
+      do not include them as part of the system.</p></abstract>
   <dependencies>
     <build>@STAR_BUILD_DEPENDENCIES@</build>
     <use>@STAR_USE_DEPENDENCIES@</use>

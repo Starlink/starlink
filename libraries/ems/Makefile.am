@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = ems_link ems_link_adam
 
 lib_LTLIBRARIES = libems.la libemsf.la
@@ -46,4 +44,4 @@ PLATFORM_CF = ems_fioer.c
 #  A list of files required for the test target
 TEST_FILES = $(PKG_NAME)_test.c
 
-BUILT_SOURCES = $(PLATFORM_CF) EMS_ERR ems_err.h @BUILT_SOURCES@
+BUILT_SOURCES = $(PLATFORM_CF) EMS_ERR ems_err.h

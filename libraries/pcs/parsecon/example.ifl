@@ -1,0 +1,25 @@
+INTERFACE EXAMPLE
+
+   PARAMETER PAR1
+      POSITION 1
+      TYPE '_CHAR'
+      MENU 'BASE'
+      MENUCOORDS 3,5
+      VPATH 'PROMPT'
+      HELP 'first parameter'
+      KEYWORD 'NUMBER1'
+   ENDPARAMETER
+
+   ACTION DOIT
+      MENU 'BASE'
+      MENUCOORDS 12,5
+      HELP 'first action'
+      KEYWORD 'doit'
+      OBEY
+         NEEDS PAR1
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+
+ENDINTERFACE

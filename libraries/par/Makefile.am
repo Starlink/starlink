@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
-lib_LTLIBRARIES = libpar_adam_la
+lib_LTLIBRARIES = libpar_adam.la
 libpar_adam_la_SOURCES = $(F_ROUTINES)
+
+include_HEADERS = $(PUBLIC_INCLUDES)
 
 F_ROUTINES = \
          par1_menu.f \
@@ -46,3 +46,4 @@ PUBLIC_INCLUDES = \
 	par_err.h \
 	par_par.h
 
+BUILT_SOURCES = PAR_ERR par_err.h

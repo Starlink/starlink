@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = hlib hlp_link hlp_link_adam
 
 bin_PROGRAMS = lsthlp crehlp
@@ -21,7 +19,6 @@ libhlp_la_SOURCES = \
 
 FPP_ROUTINES = \
 	fopr.fpp
-.fpp.f:
 
 F_ROUTINES = \
 	comstr.f \

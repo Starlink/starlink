@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = alink ilink dtask_link_adam
 
 lib_LTLIBRARIES = libdtask_adam.la
@@ -53,4 +51,4 @@ C_ROUTINES = \
 	dts_chdlr.c \
 	dts_setsig.c
 
-BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h @BUILT_SOURCES@
+BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h

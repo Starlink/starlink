@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = hds_link hds_link_adam
 
 lib_LTLIBRARIES = libhds.la
@@ -84,4 +82,4 @@ C_ROUTINES = \
 dat_par.h: dat_par_h
 	./dat_par_h >dat_par.h
 
-BUILT_SOURCES = DAT_ERR dat_err.h dat_par.h CMP_ERR @BUILT_SOURCES@
+BUILT_SOURCES = DAT_ERR dat_err.h dat_par.h CMP_ERR

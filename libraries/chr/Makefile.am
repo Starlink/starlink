@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = chr_link chr_link_adam
 include_HEADERS = CHR_ERR
 
@@ -49,4 +47,4 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_swap.f  test_term.f  test_tochr.f test_trchr.f test_trunc.f \
         test_ucase.f test_upper.f test_wild.f 
 
-BUILT_SOURCES = CHR_ERR @BUILT_SOURCES@
+BUILT_SOURCES = CHR_ERR

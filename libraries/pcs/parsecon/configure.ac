@@ -1,0 +1,38 @@
+dnl    Process this file with autoconf to produce a configure script
+AC_REVISION($Revision$)
+
+dnl    Initialisation: package name and version number
+AC_INIT(parsecon, 1.3, ussc@star.rl.ac.uk)
+
+dnl    Require autoconf-2.50 at least
+AC_PREREQ(2.50)
+dnl    Require automake-1.6 at least
+AM_INIT_AUTOMAKE(1.8.2-starlink)
+
+dnl    Sanity-check: name a file in the source directory -- if this
+dnl    isn't found then configure will complain
+AC_CONFIG_SRCDIR([parsecon_link_adam])
+
+dnl    Include defaults for Starlink configurations
+STAR_DEFAULTS
+
+dnl    Find required versions of the programs we need for configuration
+AC_PROG_F77
+AC_PROG_FPP
+AC_PROG_LIBTOOL
+
+STAR_FPP_SOURCES(pcn_openifl)
+STAR_HAVE_F77_OPEN_READONLY
+
+dnl    Declare the build and use dependencies for this package
+STAR_DECLARE_BUILD_DEPENDENCIES(sae hds hlp subpar ems chr string)
+STAR_DECLARE_USE_DEPENDENCIES(chr ems string subpar)
+
+dnl    Described (if not documented) in SSN/29
+
+dnl    Err file has non-default name
+STAR_MESSGEN(parse_err.msg)
+
+AC_CONFIG_FILES(Makefile component.xml)
+
+AC_OUTPUT

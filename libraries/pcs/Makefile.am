@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 # Makefile for the PCS system.  This is just a shell for the various
 # subsystems, so this makefile is atypical
 #
@@ -29,4 +27,4 @@ SUBPACKAGES = \
 ## install-exec-local:
 
 ## What will this do?
-SUBDIRS = subpar
+SUBDIRS = $(SUBPACKAGES)

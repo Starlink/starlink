@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="parsecon">
+  <version>1.3</version>
+  <path>libraries/pcs/parsecon</path>
+  <description>Parsing of the interface files associated with
+    SUBPAR</description>
+  <abstract><p>Parsing of the interface files associated with SUBPAR.
+      The package also includes the interface file compiler,
+      COMPIFL.</p></abstract>
+  <dependencies>
+    <build> sae hds hlp subpar ems chr string messgen</build>
+    <use> chr ems string subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly (ROE)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Documented in passing in SSN/29</p></notes>
+</component>

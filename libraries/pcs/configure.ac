@@ -13,7 +13,7 @@ AC_INIT(pcs, 4.1-1, ussc@star.rl.ac.uk)
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -31,6 +31,10 @@ dnl STAR_DECLARE_USE_DEPENDENCIES()
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(ssn29 ssn77 sun115 sun134 sun144 sun224 sun241)
+
+dnl    List the set of active subdirectories.
+dnl    This must be kept up-to-date by hand.
+AC_CONFIG_SUBDIRS(adam adamnet ams dtask hdspar lex messys misc msp parsecon sock string subpar task)
 
 AC_CONFIG_FILES(Makefile component.xml)
 

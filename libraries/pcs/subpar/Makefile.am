@@ -1,26 +1,33 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
-## List the scripts which are to be installed in the `bin' directory,
-## wherever it ends up.  bin_PROGRAMS is similar, but the variable
-## lists programs which are to be built first.  In automake
-## terminology, this is the `bin' prefix to the `SCRIPTS' primary.
 bin_SCRIPTS = subpar_link_adam
 
 ## List headers which are to be installed -- these are built first if necessary
-include_HEADERS = SUBPAR_PAR SUBPAR_ERR subpar_err.h
+##
+# Note that we are also installing the PRIVATE_INCLUDES (so they're
+# not really private after all).  This is because other library
+# components in the PCS group need to refer to these files, in order to
+# coordinate their definitions with SUBPAR.  In the previous build
+# system this was done by copying or linking files between different
+# parts of the build tree, but this seems fragile.  Instead, have this
+# file install these `private' includes along with the `public' ones,
+# and add prominent notes to the `private' ones to warn users away
+# from including them directly.
+#
+# An alternative is to install them somewhere special, but that's
+# significant added complication to deal with a problem that's
+# unlikely to be severe anyway.
+include_HEADERS = $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES)
 
 lib_LTLIBRARIES = libsubpar_adam.la
 libsubpar_adam_la_SOURCES =	\
 	$(F_ROUTINES)		\
 	$(FPP_ROUTINES)		\
 	$(C_ROUTINES)		\
-	$(PRIVATE_INCLUDES)	\
-	SUBPAR_PAR
+	$(PUBLIC_INCLUDES)	\
+	$(PRIVATE_INCLUDES)
 
 FPP_ROUTINES = sup_openifc.fpp
-.fpp.f:
 F_ROUTINES = sup_accpt.f \
              sup_accpt1.f \
              sup_actdcl.f \
@@ -205,9 +212,6 @@ C_ROUTINES = sup_admus.c \
              sup_mkdir.c \
              sup_trmsz.c
 
+PUBLIC_INCLUDES = SUBPAR_PAR SUBPAR_ERR subpar_err.h
+
 PRIVATE_INCLUDES = SUBPAR_CMN SUBPAR_SYS SUBPAR_PARERR
-
-# EXTERNAL_INCLUDES = SAE_PAR MESSYS_PAR MESSYS_ERR LEX_PAR LEX_ERR \
-#                   DAT_PAR DAT_ERR CHR_ERR ADAM_DEFNS EMS_PAR \
-#                   sae_par.h f77.h cnf.h ems.h ems_par.h
-

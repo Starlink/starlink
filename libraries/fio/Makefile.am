@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 lib_LTLIBRARIES = libfio.la libfio_adam.la
 
 libfio_la_SOURCES = $(BLOCK_DATA_STANDALONE) $(F_ROUTINES) $(PLATFORM_F)

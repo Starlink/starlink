@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = msp_link msp_link_adam
 
 lib_LTLIBRARIES = libmsp.la
@@ -20,4 +18,4 @@ PUBLIC_INCLUDES = msp.h msp_par.h msp_err.h
 
 PRIVATE_INCLUDES = msp_static.h 
 
-BUILT_SOURCES = msp_err.h @BUILT_SOURCES@
+BUILT_SOURCES = msp_err.h

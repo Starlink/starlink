@@ -19,7 +19,7 @@
       <person><name>Alan Chipperfield (AJC)</name></person>
       <person><name>David Terrett (DLT)</name></person>
   </developers>
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

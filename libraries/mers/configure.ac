@@ -7,7 +7,7 @@ AC_INIT(mers, 1.8, ussc@star.rl.ac.uk)
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl   Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl   Sanity-check: name a file in the source directory
 AC_CONFIG_SRCDIR([mers.h])
@@ -27,7 +27,7 @@ dnl   There are two distinct sets of error codes for this package
 STAR_MESSGEN(err_err.msg)
 STAR_MESSGEN(msg_err.msg)
 
-STAR_LATEX_DOCUMENTATION(sun209)
+STAR_LATEX_DOCUMENTATION(sun104)
 
 dnl   Header checks.  There are no such explicit checks at present,
 dnl   only the implicit ones.  Also config.h is not at present

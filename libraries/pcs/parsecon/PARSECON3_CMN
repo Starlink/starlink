@@ -1,0 +1,20 @@
+*   Input buffer for record read from interface file
+*   Held in common so that error reports can quote it.
+
+      INTEGER PARSE__BUFSIZ     ! size of input buffer
+      PARAMETER ( PARSE__BUFSIZ = 132 )
+
+      CHARACTER*(PARSE__BUFSIZ) BUFFER      ! line from interface file
+      INTEGER BUFFLEN                       ! length of BUFFER
+
+      COMMON /PARSEBUFFER/ BUFFER
+      COMMON /PARSEBUFLEN/ BUFFLEN
+      SAVE /PARSEBUFFER/
+      SAVE /PARSEBUFLEN/
+
+*   Names of current Action/Interface and Parameter
+*   Held in common so error reports can quote them
+      CHARACTER*(SUBPAR__NAMELEN) ACNAME    ! current action name
+      CHARACTER*(SUBPAR__NAMELEN) PRNAME    ! current parameter name
+      COMMON /PARSEEPOS/ ACNAME, PRNAME
+      SAVE /PARSEEPOS/

@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = psx_link psx_link_adam
 
 lib_LTLIBRARIES = libpsx.la
@@ -56,4 +54,4 @@ TEST_ROUTINES = psx_test.f \
 	test_time.f \
 	test_uname.f
 
-BUILT_SOURCES = psx_err.h @BUILT_SOURCES@
+BUILT_SOURCES = psx_err.h

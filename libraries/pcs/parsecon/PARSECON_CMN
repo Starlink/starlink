@@ -1,0 +1,208 @@
+*+  PARSECON_CMN - Common blocks for parsing interface file
+*   History :
+*    23.08.1985:  add features for MONOLITHS (REVAD::BDK)
+*    13.05.1986:  add features for menus (REVAD::BDK)
+*    05.05.1987:  add prompt search path (REVAD::BDK)
+*    26.05.1987:  add ACTEND (REVAD::BDK)
+*    15.05.1990:  add PARHKEY (RLVAD::AJC)
+*    03.07.1990:  add HELPLIB states, token, action and common (RLVAD::AJC)
+*    04.07.1990:  put buffer in common for better error reports (RLVAD::AJC)
+*    16.08.1990:  add actions PAREND and FACEND for error system (RLVAD::AJC)
+*    25.02.1992:  add action STFACE to check missing endinterface (RLVAD::AJC)
+*-
+*
+*
+*   Parse state-table. The combination of parse-state and new token 
+*   input is used to look-up the conditions controlling the new 
+*   parse-state. This new state is defined by two values - newstate
+*   and action-code. These are looked-up in two byte arrays.
+*
+*   List of possible parse-states.
+*
+      INTEGER START, FACESTART, FACEGOT, PARSTART, PARGOT
+      INTEGER FHLPLB, MHLPLB
+      INTEGER PARANGE, PARIN, PARDEF, ACTSTART, ACTGOT
+      INTEGER OGOT, CGOT, ONEEDST, ONEED, CNEEDST
+      INTEGER CNEED, ORANGE, CRANGE, OBIN, CANCIN
+      INTEGER PARTYPE, PARKEY, PARPOS, PARACC, PARVP
+      INTEGER PARHEL, PARHKY, PARPTY, PARASS, PROGSTART
+      INTEGER EPSTART, MESTART, MESGOT, TEXTGOT, PARPROM
+      INTEGER MONGOT
+      INTEGER PARMENU, PARCOORDS, ACTHEL, ACTKEY, ACTMENU, ACTCOORDS
+      INTEGER PARPP
+      INTEGER FINISHED
+
+      PARAMETER ( START      = 1 )
+      PARAMETER ( FACESTART  = 2 )
+      PARAMETER ( FACEGOT    = 3 )
+      PARAMETER ( PARSTART   = 4 )
+      PARAMETER ( PARGOT     = 5 )
+      PARAMETER ( PARANGE    = 6 )
+      PARAMETER ( PARIN      = 7 )
+      PARAMETER ( PARDEF     = 8 )
+      PARAMETER ( ACTSTART   = 9 )
+      PARAMETER ( ACTGOT     = 10 )
+      PARAMETER ( OGOT       = 11 )
+      PARAMETER ( CGOT       = 12 )
+      PARAMETER ( ONEEDST    = 13 )
+      PARAMETER ( ONEED      = 14 )
+      PARAMETER ( CNEEDST    = 15 )
+      PARAMETER ( CNEED      = 16 )
+      PARAMETER ( ORANGE     = 17 )
+      PARAMETER ( CRANGE     = 18 )
+      PARAMETER ( OBIN       = 19 )
+      PARAMETER ( CANCIN     = 20 )
+      PARAMETER ( PARTYPE    = 21 )
+      PARAMETER ( PARKEY     = 22 )
+      PARAMETER ( PARPOS     = 23 )
+      PARAMETER ( PARACC     = 24 )
+      PARAMETER ( PARVP      = 25 )
+      PARAMETER ( PARHEL     = 26 )
+      PARAMETER ( PARPTY     = 27 )
+      PARAMETER ( PARASS     = 28 )
+      PARAMETER ( PROGSTART  = 29 )
+      PARAMETER ( EPSTART    = 30 )
+      PARAMETER ( MESTART    = 31 )
+      PARAMETER ( MESGOT     = 32 )
+      PARAMETER ( TEXTGOT    = 33 )
+      PARAMETER ( PARPROM    = 34 )
+      PARAMETER ( MONGOT     = 35 )
+      PARAMETER ( PARMENU    = 36 )
+      PARAMETER ( PARCOORDS  = 37 )
+      PARAMETER ( ACTHEL     = 38 )
+      PARAMETER ( ACTKEY     = 39 )
+      PARAMETER ( ACTMENU    = 40 )
+      PARAMETER ( ACTCOORDS  = 41 )
+      PARAMETER ( PARPP      = 42 )
+      PARAMETER ( PARHKY     = 43 )
+      PARAMETER ( MHLPLB     = 44 )
+      PARAMETER ( FHLPLB     = 45 )
+      PARAMETER ( FINISHED   = 64 )
+*
+*   List of possible token-types
+*
+      INTEGER IFACE, EFACE, PARAM, EPARAM, ACTION
+      INTEGER ENDACT, OBEY, ENDOBEY, CANCEL, ENDCANC
+      INTEGER RANGE, IN, DEFAULT, TYPE, NEEDS
+      INTEGER NAME, CONST, OTHER, KEYWORD, POSITION
+      INTEGER ACCESS, VPATH, HELP, HELPKEY, HELPLIB
+      INTEGER PTYPE, ASSOC
+      INTEGER PROGRAM
+      INTEGER EPATH, MESSAGE, TEXT, EMESS, PROMPT
+      INTEGER MONOL, EMONOL
+      INTEGER MENU, COORDS, PPATH
+
+
+      PARAMETER ( IFACE        = 1 )
+      PARAMETER ( EFACE        = 2 )
+      PARAMETER ( PARAM        = 3 )
+      PARAMETER ( EPARAM       = 4 )
+      PARAMETER ( ACTION       = 5 )
+      PARAMETER ( ENDACT       = 6 )
+      PARAMETER ( OBEY         = 7 )
+      PARAMETER ( ENDOBEY      = 8 )
+      PARAMETER ( CANCEL       = 9 )
+      PARAMETER ( ENDCANC      = 10 )
+      PARAMETER ( RANGE        = 11 )
+      PARAMETER ( IN           = 12 )
+      PARAMETER ( DEFAULT      = 13 )
+      PARAMETER ( TYPE         = 14 )
+      PARAMETER ( NEEDS        = 15 )
+      PARAMETER ( NAME         = 16 )
+      PARAMETER ( CONST        = 17 )
+      PARAMETER ( OTHER        = 18 )
+      PARAMETER ( KEYWORD      = 19 )
+      PARAMETER ( POSITION     = 20 )
+      PARAMETER ( ACCESS       = 21 )
+      PARAMETER ( VPATH        = 22 )
+      PARAMETER ( HELP         = 23 )
+      PARAMETER ( PTYPE        = 24 )
+      PARAMETER ( ASSOC        = 25 )
+      PARAMETER ( PROGRAM      = 26 )
+      PARAMETER ( EPATH        = 27 )
+      PARAMETER ( MESSAGE      = 28 )
+      PARAMETER ( TEXT         = 29 )
+      PARAMETER ( EMESS        = 30 )
+      PARAMETER ( PROMPT       = 31 )
+      PARAMETER ( MONOL        = 32 )
+      PARAMETER ( EMONOL       = 33 )
+      PARAMETER ( MENU         = 34 )
+      PARAMETER ( COORDS       = 35 )
+      PARAMETER ( PPATH        = 36 )
+      PARAMETER ( HELPKEY      = 37 )
+      PARAMETER ( HELPLIB      = 38 )
+*
+*   List of possible actions
+*
+      INTEGER NONE, NEWPAR, NEWRANGE, NEWIN
+      INTEGER PARLIST, SETVAL, NEWACT, NEWOB, NEWCAN
+      INTEGER OREQ, CONTVALS, DISCVALS, CREQ, ACTLIST
+      INTEGER SETTYP, SETKEY, SETPOS, SETACC, SETVP
+      INTEGER SETHEL, SETHKEY, SETPTY, SETASS, PROG
+      INTEGER INAME, EPDEC, MESTEXT, SETPROM
+      INTEGER SETMON, ENDMON
+      INTEGER ERROR
+      INTEGER NEWPCOORDS, SETPCOORDS, SETPMENU, NEWACOORDS, SETACOORDS
+      INTEGER SETAKEY, SETAHEL, SETAMENU, SETPP, ACTEND
+      INTEGER SETHLIB
+      INTEGER FACEND, PAREND, STFACE
+
+      PARAMETER ( NONE       = 1 )
+      PARAMETER ( NEWPAR     = 2 )
+      PARAMETER ( NEWRANGE   = 3 )
+      PARAMETER ( NEWIN      = 4 )
+      PARAMETER ( PARLIST    = 5 )
+      PARAMETER ( SETVAL     = 6 )
+      PARAMETER ( NEWACT     = 7 )
+      PARAMETER ( NEWOB      = 8 )
+      PARAMETER ( NEWCAN     = 9 )
+      PARAMETER ( OREQ       = 10 )
+      PARAMETER ( CONTVALS   = 11 )
+      PARAMETER ( DISCVALS   = 12 )
+      PARAMETER ( CREQ       = 13 )
+      PARAMETER ( ACTLIST    = 14 )
+      PARAMETER ( SETTYP     = 15 )
+      PARAMETER ( SETKEY     = 16 )
+      PARAMETER ( SETPOS     = 17 )
+      PARAMETER ( SETACC     = 18 )
+      PARAMETER ( SETVP      = 19 )
+      PARAMETER ( SETHEL     = 20 )
+      PARAMETER ( SETPTY     = 21 )
+      PARAMETER ( SETASS     = 22 )
+      PARAMETER ( PROG       = 23 )
+      PARAMETER ( INAME      = 24 )
+      PARAMETER ( EPDEC      = 25 )
+      PARAMETER ( MESTEXT    = 26 )
+      PARAMETER ( SETPROM    = 27 )
+      PARAMETER ( SETMON     = 28 )
+      PARAMETER ( ENDMON     = 29 )
+      PARAMETER ( NEWPCOORDS = 30 )
+      PARAMETER ( SETPCOORDS = 31 )
+      PARAMETER ( SETPMENU   = 32 )
+      PARAMETER ( NEWACOORDS = 33 )
+      PARAMETER ( SETACOORDS = 34 )
+      PARAMETER ( SETAKEY    = 35 )
+      PARAMETER ( SETAHEL    = 36 )
+      PARAMETER ( SETAMENU   = 37 )
+      PARAMETER ( SETPP      = 38 )
+      PARAMETER ( ACTEND     = 39 )
+      PARAMETER ( SETHKEY    = 40 )
+      PARAMETER ( SETHLIB    = 41 )
+      PARAMETER ( FACEND     = 42 )
+      PARAMETER ( PAREND     = 43 )
+      PARAMETER ( STFACE     = 44 )
+      PARAMETER ( ERROR      = 64 )
+
+
+      INTEGER PARSE__NUMSTATE   ! number of possible states
+      PARAMETER ( PARSE__NUMSTATE = 45 )
+
+      INTEGER PARSE__NUMTOK     ! number of token-types
+      PARAMETER ( PARSE__NUMTOK = 38 )
+
+      BYTE ACTTAB(PARSE__NUMSTATE,PARSE__NUMTOK)   ! action-code
+      BYTE STATETAB(PARSE__NUMSTATE,PARSE__NUMTOK) ! newstate
+
+      COMMON /PARSESYMTAB/ ACTTAB, STATETAB
+
+      SAVE / PARSESYMTAB /

@@ -7,7 +7,7 @@ AC_INIT(subpar, 2.1, ussc@star.rl.ac.uk)
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -18,12 +18,12 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
-STAR_FPP_SOURCES(sup_openifc)
 STAR_HAVE_F77_OPEN_READONLY
+STAR_F77_C_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_BUILD_DEPENDENCIES(sae messys chr adam lex ems hds)
@@ -33,7 +33,7 @@ STAR_DECLARE_USE_DEPENDENCIES(chr dat ems ams hds hlp icl lex parsecon psx)
 dnl    There is a .msg file in this directory, and this adds Makefile
 dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
 dnl    which correspond to it.
-STAR_MESSGEN
+STAR_MESSGEN(subpar_err.msg)
 
 AC_CONFIG_HEADERS(config.h)
 

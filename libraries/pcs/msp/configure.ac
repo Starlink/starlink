@@ -7,7 +7,7 @@ AC_INIT(msp, 2.3, ussc@star.rl.ac.uk)
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -26,7 +26,7 @@ dnl    No use dependencies
 
 dnl    Documented in SUN/241 in parent directory
 
-STAR_MESSGEN
+STAR_MESSGEN(msp_err.msg)
 
 AC_CONFIG_FILES(Makefile component.xml)
 

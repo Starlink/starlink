@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = cnf_link cnf_link_adam
 include_HEADERS = CNF_PAR f77.h cnf.h
 
@@ -28,4 +26,4 @@ TEST_FILES = cnf_test.c \
 f77.h: cnf.h
 	$(LN_S) cnf.h f77.h
 
-BUILT_SOURCES = f77.h @BUILT_SOURCES@
+BUILT_SOURCES = f77.h

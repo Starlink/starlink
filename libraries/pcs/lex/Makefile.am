@@ -1,12 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = lex_link_adam
 
-lib_LTLIBRARIES = liblex.la
+lib_LTLIBRARIES = liblex_adam.la
 
-liblex_la_SOURCES = \
+liblex_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(F_ROUTINES)
 
@@ -21,4 +19,4 @@ F_ROUTINES = \
 	lex_parse.f \
 	lex_set.f
 
-BUILT_SOURCES = LEX_ERR @BUILT_SOURCES@
+BUILT_SOURCES = LEX_ERR

@@ -7,7 +7,7 @@ AC_INIT(psx, 0.4, ussc@star.rl.ac.uk)
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -26,7 +26,7 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun121)
 
-STAR_MESSGEN
+STAR_MESSGEN(psx_err.msg)
 
 AC_CONFIG_FILES(Makefile component.xml)
 

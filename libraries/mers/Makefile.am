@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = err_link err_link_adam
 include_HEADERS = \
 	ERR_ERR ERR_PAR \
@@ -75,4 +73,4 @@ PRIVATE_INCLUDES = \
         MSG_ERR MSG_PAR \
 	MSG_CMN MSG_SYS
 
-BUILT_SOURCES = ERR_ERR err_err.h MSG_ERR msg_err.h @BUILT_SOURCES@
+BUILT_SOURCES = ERR_ERR err_err.h MSG_ERR msg_err.h

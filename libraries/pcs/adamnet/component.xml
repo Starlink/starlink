@@ -17,6 +17,11 @@
     <person>
       <name>B.D.Kelly (REVAD::BDK)</name>
     </person>
+    <person>
+      <name>Brian K McIlwrath</name>
+      <uname>bkm</uname>
+      <email>b.k.mcilwrath@rl.ac.uk</email>
+    </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>

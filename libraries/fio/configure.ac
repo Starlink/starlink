@@ -7,7 +7,7 @@ AC_INIT(fio, 1.5-3, ussc@star.rl.ac.uk)
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl   Require automake-1.6 at least
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl   Sanity-check: name a file in the source directory
 AC_CONFIG_SRCDIR([fio1_open.f])
@@ -39,9 +39,9 @@ STAR_PLATFORM_SOURCES([rio1_open.f],
                       [_dec_osf _pc_linux _sun_solaris _sun mips vax])
 dnl   The sun options require a sun_iosdef file, but if neither of these
 dnl   two matches, that's OK -- presumably we're not on a Sun.
-STAR_PLATFORM_SOURCES([sun_iosdef], [_sun_solaris, _sun NONE])
+STAR_PLATFORM_SOURCES([sun_iosdef], [_sun_solaris _sun NONE])
 
-STAR_MESSGEN
+STAR_MESSGEN(fio_err.msg)
 
 dnl   Header checks.  There are no such explicit checks at present,
 dnl   only the implicit ones.  Also config.h is not at present

@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = adam_link_adam
 
 lib_LTLIBRARIES = libadam_adam.la

@@ -1,0 +1,8 @@
+*   Holds the highest specified position number for a task in common so 
+*   it can be checked at the end.
+
+      INTEGER HIPOS
+
+      COMMON /PARSEHLD/ HIPOS
+
+      SAVE /PARSEHLD/

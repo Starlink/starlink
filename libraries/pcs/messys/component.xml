@@ -19,7 +19,7 @@
       <name>Alan J Chipperfield (RLVAD::AJC)</name>
     </person>
   </developers>
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Part of the PCS system</p></notes>
 </component>

@@ -1,0 +1,10 @@
+
+*   Help library specifier
+      CHARACTER*132 HLBSTR      ! the current helplib string
+      INTEGER HLBLEN            ! used length of HLBSTR
+
+      COMMON /PARSEHELPLIB/ HLBSTR
+      COMMON /PARSEHELPLEN/ HLBLEN
+      
+      SAVE /PARSEHELPLIB/
+      SAVE /PARSEHELPLEN/

@@ -1,0 +1,21 @@
+*+  PARSECON_PAR - Parameters during parsing of interface module 
+*
+*   types deduced from the syntax of a character string being parsed
+*
+*   27.02.1985:  PARSE__NONE added (REVAD::BDK)
+*
+      INTEGER PARSE__NONE                ! no recognised type
+      INTEGER PARSE__CHAR                ! character string
+      INTEGER PARSE__NUMBER              ! integer or real number
+      INTEGER PARSE__STRUC               ! data structure name
+      INTEGER PARSE__HEX                 ! hexadecimal number
+      INTEGER PARSE__LOGTRUE             ! logical true
+      INTEGER PARSE__LOGFALSE            ! logical false
+
+      PARAMETER ( PARSE__NONE = 0 )
+      PARAMETER ( PARSE__CHAR = 1 )
+      PARAMETER ( PARSE__NUMBER = 2 )
+      PARAMETER ( PARSE__STRUC = 3 )
+      PARAMETER ( PARSE__HEX = 4 )
+      PARAMETER ( PARSE__LOGTRUE = 5 )
+      PARAMETER ( PARSE__LOGFALSE = 6 )

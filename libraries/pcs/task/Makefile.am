@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = task_link_adam
 
 lib_LTLIBRARIES = libtask_adam.la
@@ -97,4 +95,4 @@ PUBLIC_INCLUDES = TASK_PAR TASK_ERR
 
 PRIVATE_INCLUDES = TASK_CMN
 
-BUILT_SOURCES = TASK_ERR @BUILT_SOURCES@
+BUILT_SOURCES = TASK_ERR

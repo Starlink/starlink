@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = sla_link sla_link_adam
 
 lib_LTLIBRARIES = libsla.la
@@ -14,7 +12,6 @@ libsla_la_LIBADD = $(LTLIBOBJS)
 FPP_ROUTINES = \
 	random.fpp \
 	gresid.fpp
-.fpp.f:
 
 F_ROUTINES = \
         addet.f  \

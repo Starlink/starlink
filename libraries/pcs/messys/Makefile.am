@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = messys_link_adam
 lib_LTLIBRARIES = libmessys_adam.la
 
@@ -19,4 +17,4 @@ PUBLIC_INCLUDES = \
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-BUILT_SOURCES = messys_err.h MESSYS_ERR @BUILT_SOURCES@
+BUILT_SOURCES = messys_err.h MESSYS_ERR
