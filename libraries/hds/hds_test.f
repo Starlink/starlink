@@ -40,6 +40,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'DAT_ERR'          ! DAT_ error codes
       INCLUDE 'CMP_ERR'          ! CMP_ error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -71,7 +72,7 @@
       CALL DAT_MAPV( LOC2, '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *  Initialise the array.
-      CALL SETUP( EL, %VAL( PNTR ), STATUS )
+      CALL SETUP( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
 
 *  Clean up and close the file.
       CALL DAT_UNMAP( LOC2, STATUS )
@@ -86,7 +87,7 @@
       CALL DAT_MAPV( LOC2, '_INTEGER', 'READ', PNTR, EL, STATUS )
 
 *  Sum the data elements.
-      CALL SUM( EL, %VAL( PNTR ), ISUM, STATUS )
+      CALL SUM( EL, %VAL( CNF_PVAL( PNTR ) ), ISUM, STATUS )
 
 *  Clean up and erase the container file.
       CALL DAT_UNMAP( LOC2, STATUS )
