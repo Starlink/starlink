@@ -6,6 +6,8 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
+set auto_index(gwm_printDialog) "source $dir/printDialog.tcl"
+set auto_index(gwm_printComplete) "source $dir/printDialog.tcl"
 set auto_index(bindCred4Widgets) "source $dir/bindCred4Widgets.tcl"
 set auto_index(bindP4Widgets) "source $dir/bindP4Widgets.tcl"
 set auto_index(newP4Port) "source $dir/bindP4Widgets.tcl"

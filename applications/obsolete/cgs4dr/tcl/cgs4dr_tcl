@@ -14,7 +14,8 @@
     set cgs4drHtml    STAR_DOCS/sun27.htx
 
 # Set up library search path
-    lappend auto_path $tclAdamLib [exec /usr/bin/pwd] $cgs4drTclLib 
+    #lappend auto_path $tclAdamLib [exec /usr/bin/pwd] $cgs4drTclLib 
+    lappend auto_path [exec /usr/bin/pwd] $cgs4drTclLib $tclAdamLib 
 
 # Create default directories
     if {[file exists $env(HOME)/cgs4dr_configs]==0} {exec /usr/bin/mkdir $env(HOME)/cgs4dr_configs}
