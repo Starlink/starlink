@@ -7,8 +7,8 @@
 #include <X11/StringDefs.h>
 #include <X11/keysym.h>
 #include <X11/IntrinsicP.h>
-#include <X11/Xaw/SimpleP.h>
-#include <X11/Shell.h>
+#include <X11/Xaw3d/SimpleP.h>   /* Modified to use Xaw3d rather than   */
+#include <X11/Shell.h>           /* Xaw -- Alasdair Allan (30-JUN-2004) */
 
 #include <stdio.h>
 #include <stdlib.h>
