@@ -561,6 +561,7 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/bin/jsky
@@ -813,7 +814,6 @@ dist:
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 513 files to /apps/cvsbuild/java/source/splat/docs/splat
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -885,7 +885,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Nov 27, 2004 5:17:50 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Nov 28, 2004 5:17:42 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1082,4 +1082,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 13 seconds
+Total time: 5 minutes 14 seconds
