@@ -17,6 +17,20 @@
       call ast_MapPut0A( map, 'Freda', ast_skyframe( ' ', status ), 
      :                   ' ', status )
 
+      if( ast_maplenc( map, 'Fredi', status ) .ne. 4 ) then
+         write(*,*) ast_maplenc( map, 'Fredi', status )
+         call stopit( status, 'Error -11' )
+      end if
+
+      if( ast_maplenc( map, 'Freda', status ) .ne. 0 ) then
+         write(*,*) ast_maplenc( map, 'Freda', status )
+         call stopit( status, 'Error -10' )
+      end if
+
+      if( ast_maplenc( map, 'Fredc', status ) .ne. 5 ) then
+         write(*,*) ast_maplenc( map, 'Fredc', status )
+         call stopit( status, 'Error -9' )
+      end if
 
       if( ast_maptype( map, 'freda', status ) .ne. AST__BADTYPE) then
          call stopit( status, 'Error -8' )
@@ -205,6 +219,7 @@
       if( ast_maplength( map, 'Fredi', status ) .ne. 2 ) then
          write(*,*) ast_maplength( map, 'Fredi', status )
          call stopit( status, 'Error 29b' )
+
       end if  
 
       dvec(1)=1999.9D0
@@ -215,6 +230,11 @@
       cvec(2)=' '
       cvec(3)='  Hello'
       call ast_mapput1c( map, 'Fredc', 3, cvec, ' ', STATUS )
+
+      if( ast_maplenc( map, 'Fredc', status ) .ne. len(cvec(3)) ) then
+         write(*,*) ast_maplenc( map, 'Fredc', status )
+         call stopit( status, 'Error 29c' )
+      end if
 
       avec(1) = ast_skyframe( ' ', status )
       avec(2) = AST__NULL
