@@ -83,9 +83,18 @@
       CHARACTER * 11   TSKNAME                   ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_FLAT')
 *    Local variables :
+      INTEGER          B                         ! DO loop index
       BYTE             BADBIT                    ! NDF badbit mask
+      INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                                 ! ADC numbers of bolometers
+                                                 ! used in the observation
       REAL             BOL_CALB (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                                  ! bolometer flatfield factors
+
+      INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                                 ! channel numbers of
+                                                 ! bolometers used in the 
+                                                 ! observation
       DOUBLE PRECISION BOL_DAY (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                                  ! time and day number on which
                                                  ! the bolometer flatfield was
@@ -120,6 +129,7 @@
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC        ! HDS locator of .FITS
                                                  ! extension
       INTEGER          IN_NDF                    ! NDF index of input file
+      INTEGER          IN_QUALITY_PTR            ! pointer to QUALITY array
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC       ! HDS locator of .SCUBA
                                                  ! extension
       CHARACTER*(DAT__SZLOC) IN_SCUCDX_LOC       ! HDS locator of .SCUCD
@@ -131,13 +141,23 @@
                                                  ! containing the new flatfield
       INTEGER          NREC                      ! number of history records
                                                  ! in input file
+      INTEGER          N_BEAM                    ! the 'beam' dimension of the
+                                                 ! data array
+      INTEGER          N_BOLS                    ! number of bolometers
+                                                 ! measured in observation
       INTEGER          N_FITS                    ! number of items in FITS
                                                  ! array
+      INTEGER          N_POS                     ! number of positions measured
+                                                 ! in observation
       CHARACTER*40     OBJECT                    ! name of observed object
       CHARACTER*40     OBSERVING_MODE            ! observing mode of file
       LOGICAL          PHOTOM                    ! .TRUE. if the PHOTOM
                                                  ! application has been run
                                                  ! on the input file
+      INTEGER          QUALITY_BIT               ! the value to which the 3rd
+                                                 ! quality bit is to be set
+      LOGICAL          QUALITY_MAPPED            ! .TRUE. if the QUALITY array
+                                                 ! has been mapped
       LOGICAL          REBIN                     ! .TRUE. if the REBIN
                                                  ! application has been run on
                                                  ! the input file
@@ -155,6 +175,7 @@
 * initialise some flags and locators
 
       FITS_CHANGED = .FALSE.
+      QUALITY_MAPPED = .FALSE.
 
       IN_FITSX_LOC = DAT__NOLOC
       IN_SCUBAX_LOC = DAT__NOLOC
@@ -278,7 +299,7 @@
 
 *     get the name of the new flat-field file and read in the contents
 
-         CALL PAR_GET0C ('NEW_FLAT', NEW_FLAT, STATUS)
+      CALL PAR_GET0C ('NEW_FLAT', NEW_FLAT, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -317,7 +338,89 @@
      :     'FLAT', NEW_FLAT, STATUS)
       FITS_CHANGED = .TRUE.
 
-
+*  read the number and A/D,channel of the bolometers used
+ 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'N_BOLS', N_BOLS, STATUS)
+ 
+      CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_CHAN', 
+     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_CHAN, ITEMP, STATUS)
+      
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (ITEMP .NE. N_BOLS) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC ('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: dimension of '//
+     :           '.SCUBA.BOL_CHAN does not match main data array',
+     :           STATUS)
+         END IF
+      END IF
+ 
+      CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_ADC', 
+     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP, STATUS)
+      
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (ITEMP .NE. N_BOLS) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC ('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: dimension of '//
+     :           '.SCUBA.BOL_ADC does not match main data array',
+     :           STATUS)
+         END IF
+      END IF
+      
+*  map the quality array and check its dimensions
+ 
+      CALL NDF_DIM (IN_NDF, MAX__DIM, DIM, NDIM, STATUS)
+      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'UPDATE', 
+     :     IN_QUALITY_PTR, ITEMP, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         QUALITY_MAPPED = .TRUE.
+      END IF
+ 
+      N_POS = DIM (2)
+ 
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+            N_BEAM = DIM (3)
+            IF ((NDIM .NE. 3)                  .OR.
+     :           (DIM(1) .NE. N_BOLS)           .OR.
+     :           (DIM(2) .LT. 1)                .OR.
+     :           (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI ('NDIM', NDIM)
+               CALL MSG_SETI ('DIM1', DIM(1))
+               CALL MSG_SETI ('DIM2', DIM(2))
+               CALL MSG_SETI ('DIM3', DIM(3))
+               CALL MSG_SETC ('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: main data array '//
+     :              'has bad dimensions - (^NDIM) ^DIM1 ^DIM2 ^DIM3',
+     :              STATUS)
+            END IF
+         ELSE
+            N_BEAM = 1
+            IF ((NDIM .NE. 2)        .OR.
+     :           (DIM(1) .NE. N_BOLS) .OR.
+     :           (DIM(2) .LT. 1))     THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI ('NDIM', NDIM)
+               CALL MSG_SETI ('DIM1', DIM(1))
+               CALL MSG_SETI ('DIM2', DIM(2))
+               CALL MSG_SETC ('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: main data array '//
+     :              'has bad dimensions - (^NDIM) ^DIM1 ^DIM2', STATUS)
+            END IF
+         END IF
+      
+*  reset the flatfield quality bit according to the new flatfield file
+ 
+         DO B = 1, N_BOLS
+            QUALITY_BIT = BOL_QUAL (BOL_CHAN(B), BOL_ADC(B))
+            CALL SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, 
+     :           %val (IN_QUALITY_PTR), B, B, 1, N_POS, 1, N_BEAM, 1, 
+     :           QUALITY_BIT, STATUS)
+         END DO
+      END IF
 
 *     close file and tidy up
 
@@ -333,6 +436,8 @@
       IF (IN_SCUCDX_LOC .NE. DAT__NOLOC) THEN
          CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
       END IF
+
+      CALL NDF_ANNUL(IN_NDF, STATUS)
 
       CALL NDF_END (STATUS)
 
