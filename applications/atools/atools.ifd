@@ -1051,7 +1051,7 @@ iraf! {
           }
 
          parameter options {
-            position 6
+            position 3
             type LITERAL
             prompt {Options for the ShiftMap}
             ppath CURRENT DEFAULT
@@ -1060,7 +1060,7 @@ iraf! {
           }
 
          parameter result {
-            position 7
+            position 4
             type LITERAL
             prompt {Name of file in which to store the ShiftMap}
             ppath DYNAMIC CURRENT
