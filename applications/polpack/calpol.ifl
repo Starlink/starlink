@@ -23,11 +23,12 @@ interface CALPOL
    parameter IN
       position 1
       keyword  IN
-      type     LITERAL
+      type     NDF
       access   READ
-      vpath    'CURRENT'
-      ppath    'CURRENT'
-      prompt   'Input polarisation image'
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'Input polarisation images'
       helpkey  '*'
    endparameter
 
