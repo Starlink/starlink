@@ -1,0 +1,391 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     mk
+
+#  Purpose:
+#     Invokes make to build and install the CONVERT package.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should normally be used to invoke the make utility to
+#     build and install the CONVERT package and to perform other
+#     housekeeping tasks.  It invokes the make utility after first
+#     defining appropriate environment variables and macros for the
+#     computer system in use.  This file also serves to document the
+#     systems on which CONVERT is implemented.
+
+#  Invocation:
+#     The user of this script should normally first define the SYSTEM
+#     environment variable to identify the host computer system (see
+#     the "Supported Systems" section).  This script should then be used
+#     in the same way as the make utility would be used.  For instance,
+#     to build, install and test CONVERT, you might use the following
+#     commands:
+#
+#        ./mk build
+#	 ./mk install
+#	 ./mk test
+#	 ./mk clean
+
+#  Supported Systems:
+#     The following systems are currently supported and may be
+#     identified by defining the SYSTEM environment variable
+#     appropriately before invoking this script:
+#        alpha_OSF1
+#           DEC Alpha machines running OSF1
+#        mips
+#           DECstations running Ultrix
+#        mips_OSF1
+#	    DECstations running OSF1
+#        sun4
+#           SUN Sparcstations running SunOS 4.x
+#        sun4_Solaris
+#           SUN Sparcstations running SunOS 5.x (Solaris)
+#
+#     This script will exit without action if the SYSTEM environment
+#     variable is not defined.  A warning will be issued if it is
+#     defined but is not set to one of the values above.  In this case,
+#     no additional environment variables will be defined by this
+#     script (any that are pre-defined will be passed on to make
+#     unaltered).
+
+#  External Dependencies:
+#     The CONVERT package depends on the following other Starlink packages
+#     which must previously have been installed into the appropriate
+#     sub-directories of the $STARLINK directory (/star is used if the
+#     environment variable STARLINK is not defined).
+#
+#        chr
+#           Character-handling routines.
+#        dta
+#           Figaro old data system and Figaro include files.
+#        err/msg
+#           Message and error reporting systems.
+#        fio
+#           Fortran input-output routines.
+#        hds
+#           Hierarchical data system.
+#        help
+#           Portable Help System.
+#        iraf
+#           IRAF Fortran libraries.
+#        ndf
+#           N-dimensional-data-format routines.
+#        par
+#           Parameter-system routines.
+#        posix
+#           POSIX routines.
+#        primdat
+#           Primitive data facilities.
+#        sae_par
+#           Global include file in /star/include.
+
+#  Targets:
+#     The following targets are provided in the associated makefile for
+#     use via this script:
+#     
+#        [help]
+#	    This is the default target.  It outputs a message describing
+#	    this script and lists the targets provided.
+#        archive
+#           Creates the source-file library.  It is not part of the 
+#           standard set of Starlink targets, and it is provided for
+#           use during code development and the convenience for the
+#           programmer.
+#        check
+#	    Performs a simple check that all necessary source files are
+#	    present, and displays the version number and current state
+#	    of the package (built/installed/tested, etc.).
+#        build
+#	    Compiles the source files and creates all files needed
+#	    prior to installing the package for use.
+#        install
+#	    Installs the package for use by putting the necessary files
+#	    into sub-directories of the $INSTALL directory (the $HOME
+#	    directory is used if the environment variable INSTALL is
+#	    not defined).  Links to the installed files are left in the
+#	    source directory.
+#        deinstall
+#	    Reverses the action of the install target, removing files
+#	    from sub-directories of the $INSTALL directory and
+#	    restoring them to the source directory (the $HOME directory
+#	    is used by default if the environment variable INSTALL is
+#	    not defined).
+#        test
+#	    Builds and runs a simple test program to check for correct
+#	    installation of the package.
+#        export
+#	    Produces an export copy of the built package suitable for
+#	    passing to another user.  A compressed tar file is created
+#	    in the $EXPORT directory containing copies of the source
+#	    files and built files for the package (the current
+#	    directory is used by default if the environment variable
+#	    EXPORT is not defined).  The package should normally be
+#	    built, installed and tested before using this target.  After
+#	    unpacking the exported file on a similar machine, the
+#	    recipient may simply install it for use.
+#        export_source
+#	    Produces an export copy of the source for the package
+#	    suitable for passing to another user to build (possibly on
+#	    a different type of machine).  A compressed tar file is
+#	    created in the $EXPORT directory containing copies of just
+#	    the source files for the packge (the current directory is
+#	    used by default if the environment variable EXPORT is not
+#	    defined).  After unpacking the exported file, the recipient
+#	    must build the package before installing it for use.
+#        clean
+#	    Cleans up after building the package, removing all
+#	    intermediate files created during the building process, but
+#	    leaving the built files themselves.
+#        unbuild
+#	    Reverses the building process, removing all intermediate
+#	    files along with all the built files.
+
+#  Notes on Porting:
+#     If your machine or system setup does not appear in this script,
+#     then it should be possible to build and install CONVERT by adding a
+#     new case to this script with appropriate definitions (probably
+#     based on one of the existing implementations).
+
+#  make Macros:
+#     The following "global" make macros are used in the associated
+#     makefile and may be changed by means of appropriate environment
+#     variable definitions (in each case the default is shown in
+#     parentheses).  Note that these macros are provided to allow
+#     external control over the directories in which software is
+#     installed, etc., so they should not normally be re-defined within
+#     this script.
+#     
+#        STARLINK (/star)
+#	    Pathname of the root directory beneath which Starlink
+#	    software is currently installed.  This indicates to CONVERT
+#	    where to find other Starlink software (include files,
+#	    libraries, etc.) which it uses.
+#        INSTALL ($HOME)
+#	    Pathname of the root directory beneath which CONVERT will be
+#	    installed for use.  Your home directory will be used by
+#	    default.  This macro is provided to allow CONVERT to be
+#	    installed locally for personal use (e.g. during development
+#	    or testing).  It should be set to the $STARLINK directory if
+#	    you want to add CONVERT into an already installed set of
+#	    Starlink software.  You should ensure that the appropriate
+#	    sub-directories appear on any relevant search paths which
+#	    your system uses for locating software (e.g. binaries and
+#	    libraries).
+#        EXPORT (.)
+#	    Pathname of the directory into which compressed tar files
+#	    will be written if the "export" or "export_source" make
+#	    targets are used to produce an exportable copy of CONVERT or
+#	    its source files.  The current working directory (i.e. the
+#	    CONVERT source directory) will be used by default.
+#
+#     The following "local" make macros are used in the associated
+#     makefile and should normally be over-ridden (when appropriate) by
+#     environment variable definitions within this script.  In each case
+#     the default is shown in parentheses.
+#
+#        AR_IN (ar -r)
+#	    The command to use to insert an object (.o) file into an
+#	    archive (.a) library.  On some systems the variation 'ar r'
+#	    may be required instead.
+#        BLD_SHR (echo >/dev/null)
+#	    Command to build a shareable library when given three
+#	    arguments specifying (1) the name of the library file to be
+#	    built (2) a list of the object files to be used in the
+#	    library and (3) a list of any additional libraries against
+#	    which to link.  By default, it is assumed that shareable
+#	    libraries are not available, and the default acts as a null
+#	    command.
+#        CC (c89)
+#	    The C compiler command to use.  CONVERT does not currently
+#	    require a C compiler.
+#        CFLAGS (-O)
+#	    The C compiler options to use.
+#        FC (fort77)
+#	    The Fortran compiler command to use.  CONVERT requires a Fortran
+#	    77 compiler that supports the common "permitted" Starlink
+#	    extensions, as documented in Starlink General Paper SGP/16.
+#	    (These include only the most common extensions, such as
+#	    long subroutine names, end of line comments, include files, 
+#           etc.)
+#        FFLAGS (-O)
+#	    The Fortran compiler options to be used.
+#        LINK (ln)
+#	    The command required to establish a link to a file.  The
+#	    default assumes POSIX.2 behavior, which only provides a
+#	    "hard" link operating within a single file system.  If the
+#	    host operating system allows "symbolic" links, then this
+#	    macro might be re-defined as 'ln -s'.  Alternatively, if the
+#	    use of multiple file systems is essential but not supported
+#	    by any form of link, then a copy command could be
+#	    substituted (e.g. 'cp -p'), at some cost in file space.
+#        RANLIB (echo >/dev/null)
+#	    The command required to "randomise" an object library.  By
+#	    default, this operation is not performed (the default acts
+#	    as a null command).  On systems which require it, this
+#	    should typically be set to 'ranlib'.
+#        SHARE (.so)
+#	    The file type suffix to be applied to produce the name of a
+#	    shareable library file.  By default, the ".so" suffix is
+#	    applied without a library version number.  For systems which
+#	    support version numbers on shareable libraries, the macro
+#	    LIB_VERS is defined within the associated makefile and may
+#	    be used as part of a definition such as '.so.$(LIB_VERS)'.
+#	 TAR_IN (pax -w -v -x ustar -f)
+#	    Command to use to insert a file into a .tar archive file.
+#	    The default uses the POSIX.2 pax command, which is not
+#	    available on traditional UNIX systems.  These typically use
+#	    a tar command such as 'tar -cvhf' instead (if symbolic
+#	    links are supported, then an option to follow these must be
+#	    included in this command).
+#	 TAR_OUT (pax -r -f)
+#	    Command to use to extract a file from a .tar archive file.
+#	    The default uses the POSIX.2 pax command, which is not
+#	    available on traditional UNIX systems.  These typically use
+#	    a tar command such as 'tar -xf' instead.
+
+#  Implementation Deficiencies:
+#     -  This package will build, but cannot currently be used or
+#     tested on the mips_OSF1 system due to the lack of other Starlink
+#     software.  Shareable libraries are not used on this system.
+#     -  The implementation of shareable libraries on the alpha_OSF1
+#     system is still preliminary.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-JAN-1993 (RFWS):
+#     	 Original version.
+#     15-MAR-1993 (RFWS):
+#     	 Adapted for use on sun4_Solaris and alpha_OSF1.
+#     1993 August 21 (MJC):
+#        Revised for CONVERT.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  Export "local" definitions to the environment for use by make.
+      export AR_IN
+      export BLD_SHR
+      export CC
+      export CFLAGS
+      export FC
+      export FFLAGS
+      export MACHINE_TYPE
+      export LINK
+      export RANLIB
+      export SHARE
+      export TAR_IN
+      export TAR_OUT
+
+#  Check that the SYSTEM environment variable is defined.
+      if test "$SYSTEM" = ""; then
+         echo "mk: Please define the environment variable SYSTEM to identify"
+         echo "    your computer system (the prologue in the mk script file"
+         echo "    contains more information if you require it)."
+
+#  If OK, test for each recognised system.
+      else
+         case "$SYSTEM" in
+
+#  DEC Alpha:
+#  =========
+#  DEC Alpha machines running OSF1.
+#  -------------------------------
+            alpha_OSF1)
+               BLD_SHR=\
+'f() ld -shared -update_registry $(INSTALL)/lib/so_locations -o $$1 $$2 $$3 \
+-lfor -lFutil -lUfor -lm -lots -lc; f'
+               FC='f77'
+               LINK='ln -s'
+               MACHINE_TYPE=$SYSTEM
+               RANLIB='ranlib'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+	       ;;
+
+#  DECstations:
+#  ===========
+#  DECstations running Ultrix.
+#  --------------------------
+            mips)
+               FC='f77'
+               LINK='ln -s'
+               MACHINE_TYPE=$SYSTEM
+               RANLIB='ranlib'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+	       ;;
+
+#  DECstations running OSF1.
+#  ------------------------
+            mips_OSF1)
+               FC='f77'
+               LINK='ln -s'
+               MACHINE_TYPE=$SYSTEM
+               RANLIB='ranlib'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+	       ;;
+
+#  SUN4 systems:
+#  ============
+#  SUN Sparcstations running SunOS 4.x.
+#  -----------------------------------
+            sun4)
+               AR_IN='ar r'
+               BLD_SHR='f() ld -assert pure-text -o $$1 $$2; f'
+               FC='f77'
+               FFLAGS='-O -PIC'
+               LINK='ln -s'
+               MACHINE_TYPE=$SYSTEM
+               RANLIB='ranlib'
+               SHARE='.so.$(LIB_VERS)'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  SUN Sparcstations running SunOS 5.x (Solaris).
+#  ---------------------------------------------
+            sun4_Solaris)
+               BLD_SHR='f() ld -G -z text -o $$1 $$2; f'
+               FC='f77'
+               FFLAGS='-O -PIC'
+               LINK='ln -s'
+               MACHINE_TYPE=$SYSTEM
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  Issue a warning if SYSTEM is not recognised.
+	    *)
+               echo "mk: WARNING: value of SYSTEM = $SYSTEM not recognised..."
+               echo "             ...assuming default system characteristics"
+               ;;
+         esac
+
+#  Invoke make with the appropriate environment variables set to over-ride
+#  default macros defined in the makefile.
+         echo make -e $*
+         make -e $*
+      fi
+
+#  End of script.
