@@ -12,7 +12,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
  
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([helpc.c])
+AC_CONFIG_SRCDIR([helpm.c])
  
 dnl    Include defaults for Starlink configurations
 dnl    Need to find out whether we need this
@@ -22,6 +22,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_FC_LIBRARY_LDFLAGS
 
 dnl dependances on starlink packages
 dnl STAR_DECLARE_DEPENDENCIES(build, [hlp fio cnf])

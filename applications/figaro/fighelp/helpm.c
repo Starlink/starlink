@@ -1,7 +1,7 @@
-void main( argc, argv )
-   int    argc;
-   char **argv;
+#include "shl.h"
+#include <stdlib.h>
+
+int main( int argc, char ** argv )
 {
-   void helpc();
-   (void) helpc( argc, argv );
+   return shl_standalone("FIG", 1, argc, argv );
 }
