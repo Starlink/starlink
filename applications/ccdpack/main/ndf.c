@@ -2614,7 +2614,7 @@
 
 /* Call the routine which does the calculations. */
          F77_CALL(ccd1_fra)( CHARACTER_ARG(type), INTEGER_ARG(&ndf1->nel),
-                             (F77_POINTER_TYPE) &ndf1->data,
+                             (F77_POINTER_TYPE) cnfFptr( &ndf1->data ),
                              INTEGER_ARG(&nfrac), DOUBLE_ARG(afracs),
                              LOGICAL_ARG(&bad), DOUBLE_ARG(work),
                              DOUBLE_ARG(avals), INTEGER_ARG(status)
