@@ -1,0 +1,42 @@
+INTERFACE COVERAGE
+
+ PARAMETER   INP
+  TYPE        'UNIV'
+  VPATH       'PROMPT'
+  PPATH       'GLOBAL'
+  POSITION    1
+  ASSOCIATION '<-GLOBAL.BINDS'
+  PROMPT      'Input dataset'
+ ENDPARAMETER
+
+ PARAMETER   MIN
+  TYPE        '_REAL'
+  VPATH       'PROMPT'
+  PPATH       'DYNAMIC'
+  PROMPT      'Minimum data value for coverage function'
+ ENDPARAMETER
+
+ PARAMETER   MAX
+  TYPE        '_REAL'
+  VPATH       'PROMPT'
+  PPATH       'DYNAMIC'
+  PROMPT      'Maximum data value for coverage function'
+ ENDPARAMETER
+
+ PARAMETER   NBIN
+  TYPE        '_INTEGER'
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  DEFAULT     100
+  PROMPT      'Number of coverage bins'
+ ENDPARAMETER
+
+ PARAMETER   OUT
+  TYPE        'UNIV'
+  VPATH       'PROMPT'
+  POSITION    2
+  ASSOCIATION '->GLOBAL.BINDS'
+  PROMPT      'Output dataset'
+ ENDPARAMETER
+
+ENDINTERFACE

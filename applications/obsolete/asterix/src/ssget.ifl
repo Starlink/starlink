@@ -1,0 +1,45 @@
+INTERFACE SSGET
+
+   PARAMETER INP
+     TYPE    'UNIV'
+     POSITION 1
+     KEYWORD 'INP'
+     PPATH   'GLOBAL'
+     PROMPT  'Source dataset'
+     HELP    'Filename containing source search results'
+     ASSOCIATION '<-GLOBAL.SSDS'
+   ENDPARAMETER
+
+   PARAMETER ITEM
+     POSITION 2
+     type '_CHAR'
+     DEFAULT 'NSRC'
+     VPATH 'PROMPT'
+     PPATH 'DEFAULT'
+     PROMPT 'Attribute'
+   ENDPARAMETER
+
+   PARAMETER ATTR
+     TYPE '_CHAR'
+     POSITION 3
+     VPATH 'INTERNAL,NOPROMPT'
+   ENDPARAMETER
+
+   PARAMETER ISRC
+     TYPE '_INTEGER'
+     POSITION 4
+     PROMPT 'Source number'
+     VPATH 'PROMPT'
+     HELP 'The source for which the named attribute is to be retrieved'
+   ENDPARAMETER
+
+   PARAMETER ECHO
+     TYPE '_LOGICAL'
+     DEFAULT Y
+     VPATH 'DEFAULT,PROMPT'
+     PPATH 'DEFAULT'
+     PROMPT 'Echo attribute value to console'
+     HELP 'Useful in UNIX scripts'
+   ENDPARAMETER
+
+ENDINTERFACE

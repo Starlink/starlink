@@ -1,0 +1,239 @@
+INTERFACE IMSIM
+
+  PARAMETER OUT
+    TYPE 'LITERAL'
+    POSITION 1
+    VPATH 'PROMPT'
+    ASSOCIATION '->GLOBAL.BINDS'
+    PROMPT 'Name of output image dataset(s)'
+  ENDPARAMETER
+
+  PARAMETER PIXSIZE
+    TYPE '_REAL'
+    DEFAULT 1
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Instrument pixel size in arcminutes'
+    HELP   'Defines the finest binning possible'
+  ENDPARAMETER
+
+  PARAMETER NFILE
+    TYPE '_INTEGER'
+    DEFAULT 1
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Number of files to create'
+  ENDPARAMETER
+
+  PARAMETER LOGNS
+    TYPE '_LOGICAL'
+    PROMPT 'Choose source counts using Log NS'
+    DEFAULT N
+    HELP 'The alternative is to supply x,y and flux manually'
+  ENDPARAMETER
+
+  PARAMETER SMIN
+   TYPE '_DOUBLE'
+   VPATH 'PROMPT'
+   PROMPT 'Lowest source flux'
+   HELP 'Only source fluxes > SMIN contribute to the source flux spectrum generated'
+  ENDPARAMETER
+
+  PARAMETER SMAX
+   TYPE '_DOUBLE'
+   VPATH 'PROMPT'
+   PROMPT 'Highest source flux'
+   HELP 'Only source fluxes < SMAX contribute to the source flux spectrum generated'
+  ENDPARAMETER
+
+  PARAMETER SB
+   TYPE '_DOUBLE'
+   VPATH 'PROMPT'
+   PROMPT 'Flux at which break in Log NS occurs'
+   HELP 'If no break needed enter any flux SMIN < flux < SMAX'
+  ENDPARAMETER
+
+  PARAMETER EU
+   TYPE '_DOUBLE'
+   VPATH 'PROMPT'
+   PROMPT 'Index of Log NS for flux>SB'
+  ENDPARAMETER
+
+  PARAMETER ED
+   TYPE '_DOUBLE'
+   VPATH 'PROMPT'
+   PROMPT 'Index of Log NS for flux<SB'
+  ENDPARAMETER
+
+  PARAMETER SNORM
+   TYPE '_DOUBLE'
+   VPATH 'PROMPT'
+   PROMPT 'Normalisation flux'
+   HELP 'N(S>snorm) will be normalised at this source flux'
+  ENDPARAMETER
+
+  PARAMETER NSNORM
+   TYPE '_REAL'
+   VPATH 'PROMPT'
+   PROMPT 'Number of sources with flux >= SNORM/degree**2'
+   HELP 'Determines source density normalisation'
+  ENDPARAMETER
+
+  PARAMETER FFILE
+    TYPE '_INTEGER'
+    DEFAULT 1
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Index of first file'
+  ENDPARAMETER
+
+  PARAMETER FIELDSIZE
+    TYPE '_REAL'
+    DEFAULT 60.0
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Width of field in arcminutes'
+  ENDPARAMETER
+
+  PARAMETER SRADIUS
+    TYPE   '_INTEGER'
+    PROMPT 'Half width of psf in pixels'
+    DEFAULT 15
+    VPATH  'PROMPT'
+    PPATH  'DEFAULT'
+    HELP   'The psf is truncated and renormalised at this radius'
+  ENDPARAMETER
+
+  PARAMETER SEED
+    TYPE 'LITERAL'
+    DEFAULT !
+    VPATH 'DEFAULT'
+    PROMPT 'Seed for random number generator'
+    HELP 'If supplied, background and source counts are not Poisson deviated'
+  ENDPARAMETER
+
+  PARAMETER MODEL
+    TYPE 'LITERAL'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    DEFAULT !
+    PROMPT 'A model file'
+    HELP 'Filename of a model dataset'
+  ENDPARAMETER
+
+  PARAMETER BACK
+    TYPE '_INTEGER'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    DEFAULT !
+    PROMPT 'Background counts'
+    HELP 'A number of counts - will be Poisson deviated'
+  ENDPARAMETER
+
+  PARAMETER SOURCEC
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    DEFAULT !
+    PPATH 'DEFAULT'
+    PROMPT 'Number of counts per source'
+    HELP 'Separate by commas for more than one source'
+  ENDPARAMETER
+
+  PARAMETER WIDTHS
+    TYPE '_REAL'
+    DEFAULT 0
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC,DEFAULT'
+    PROMPT 'Width of gaussian for psf convolution'
+    HELP 'Separate by commas for more than one source'
+  ENDPARAMETER
+
+  PARAMETER SOURCEP
+    TYPE '_REAL'
+    DEFAULT 0,0
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Source positions'
+    HELP 'Enter positions in pairs, eg. 0.5,0.5,4.5,4.5'
+  ENDPARAMETER
+
+   PARAMETER PSF
+      TYPE '_CHAR'
+      KEYWORD 'PSF'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,DEFAULT'
+      PROMPT 'Choose PSF for simulated sources'
+      HELP 'Enter one of the capitalised names above'
+   ENDPARAMETER
+
+   PARAMETER MASK
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Name of profile to use (select from above)'
+   ENDPARAMETER
+
+   PARAMETER AUX
+      TYPE 'LITERAL'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,DEFAULT'
+      PROMPT 'This should never appear!'
+   ENDPARAMETER
+
+   PARAMETER X_BLUR
+      TYPE '_REAL'
+      PROMPT 'Telescope motion blurring FWHM in X (arcmin) '
+      DEFAULT 1.5
+      HELP 'Will be modelled as a Gaussian with specfied FWHM'
+   ENDPARAMETER
+
+   PARAMETER Y_BLUR
+      TYPE '_REAL'
+      PROMPT 'Telescope motion blurring FWHM in Y (arcmin) '
+      DEFAULT 1.5
+      HELP 'Will be modelled as a Gaussian with specfied FWHM'
+   ENDPARAMETER
+
+   PARAMETER DO_DET_BLUR
+      TYPE '_LOGICAL'
+      PROMPT 'Allow for Detector blurring ?'
+      DEFAULT N
+      HELP 'Put in energy dependent spatial blurring function ?'
+   ENDPARAMETER
+
+   PARAMETER DET_BLUR_FIL
+      TYPE '_CHAR'
+      PROMPT 'Detector blurring dataset'
+      DEFAULT 'DET_BLUR_NOM'
+      HELP 'Contains data on effect of finite spatial resolution'
+   ENDPARAMETER
+
+   PARAMETER DO_PEN_DEPTH
+      TYPE '_LOGICAL'
+      PROMPT 'Allow for penetration depth effects ?'
+      DEFAULT N
+      HELP 'Compute position and energy dependent asymmetric PSF; Slow'
+   ENDPARAMETER
+
+   PARAMETER PEN_DEPTH_FIL
+      TYPE '_CHAR'
+      PROMPT 'Penetration depth dataset'
+      DEFAULT 'PEN_DEPTH_NOM'
+      HELP 'Contains probability of various penetration depths occurring'
+   ENDPARAMETER
+
+   PARAMETER TEL_LEN_COR
+      TYPE '_REAL'
+      PROMPT 'Correction to Telescope length in mm'
+      DEFAULT -1.1
+      HELP 'Amount to be added to nominal value'
+   ENDPARAMETER
+
+   PARAMETER DO_CW_COR
+      TYPE '_LOGICAL'
+      PROMPT 'Correct for bar screening bias to pen depth? '
+      DEFAULT Y
+      HELP 'Reduce weights of large pen. depths to allow for events lost behind bars'
+   ENDPARAMETER
+
+ENDINTERFACE

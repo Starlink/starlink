@@ -1,0 +1,88 @@
+*+  PSS_PAR - Constant definitions for PSS
+*-
+
+*    Mode numbers
+      INTEGER         PSS__M_SEARCH
+        PARAMETER     ( PSS__M_SEARCH = 1 )
+      INTEGER         PSS__M_PARAM
+        PARAMETER     ( PSS__M_PARAM = 2 )
+      INTEGER         PSS__M_UPLIM
+        PARAMETER     ( PSS__M_UPLIM = 3 )
+      INTEGER         PSS__M_UPMAP
+        PARAMETER     ( PSS__M_UPMAP = 4 )
+      INTEGER         PSS__M_SENMAP
+        PARAMETER     ( PSS__M_SENMAP = 5 )
+      INTEGER         PSS__M_SIGVAR
+        PARAMETER     ( PSS__M_SIGVAR = 6 )
+
+*    Fit parameter codes
+      INTEGER         P__F, P__X, P__Y, P__B, P__E
+        PARAMETER     ( P__F=1, P__X=2, P__Y=3, P__B=4, P__E=5 )
+
+*    Fitting control
+      INTEGER                   PSS__FITNPAR
+        PARAMETER               ( PSS__FITNPAR = 4 )
+      INTEGER                   PSS__FITMXIT
+        PARAMETER               ( PSS__FITMXIT = 20 )
+      REAL                      PSS__FITMINSLO
+        PARAMETER               ( PSS__FITMINSLO = 1.0E-4 )
+
+*    Highest dimensionality to cope with
+      INTEGER         PSS__MXDIM
+        PARAMETER     ( PSS__MXDIM = 4 )
+
+      CHARACTER*30    PSS__VERSION
+        PARAMETER     ( PSS__VERSION = 'PSS Version 1.7-5' )
+
+      INTEGER         PSS__MXEL                        ! Max # error levels
+        PARAMETER     ( PSS__MXEL = 3)
+
+      INTEGER         PSS__MXSRC
+        PARAMETER     ( PSS__MXSRC = 1000 )
+
+      INTEGER         PSS__MXHWID                      ! Max box half-width
+        PARAMETER     ( PSS__MXHWID = 30 )
+
+      INTEGER         PSS__CACHELEN                    ! Length of cache
+        PARAMETER     ( PSS__CACHELEN = ((PSS__MXHWID*2+1)**2) )
+
+      INTEGER         DC_F_IMD,                        ! Cache controls
+     :                DC_F_IMD_SUM,
+     :                DC_F_BGND,
+     :                DC_F_BGND_SUM,
+     :                DC_F_PSF,
+     :                DC_F_PSF_SUM,
+     :                DC_F_LBGND,
+     :                DC_F_IMBV,
+     :                DC_F_BGDV
+      PARAMETER     ( DC_F_IMD       = '0000001'X,     !
+     :                DC_F_IMD_SUM   = '0000002'X,
+     :                DC_F_BGND      = '0000010'X,
+     :                DC_F_BGND_SUM  = '0000020'X,
+     :                DC_F_PSF       = '0000100'X,
+     :                DC_F_PSF_SUM   = '0000200'X,
+     :                DC_F_LBGND     = '0001000'X,
+     :                DC_F_IMBV      = '0010000'X,
+     :                DC_F_BGDV      = '0100000'X )
+
+      REAL            BADERR
+        PARAMETER     ( BADERR = -1.0 )
+
+*    Radian conversion constants to ridiculous numbers of places
+      DOUBLE PRECISION         PI, RTOD, DTOR
+        PARAMETER              ( PI = 3.141592653589793238462643D0,
+     :                           RTOD = 57.295779513082320876798D0,
+     :                           DTOR = 1.7453292519943295769D-02 )
+
+*    PSF access for PSS
+      INTEGER                  NPSFLEV
+         PARAMETER             ( NPSFLEV = 4 )
+
+*    Psf access codes
+      INTEGER                  PER_FILE, PER_BOX, PER_PIXEL
+        PARAMETER              ( PER_FILE=1, PER_BOX=2, PER_PIXEL=3)
+
+*    Convergence testing
+      INTEGER                  PSS__RELATIVE, PSS__ABSOLUTE
+        PARAMETER              ( PSS__RELATIVE = 1,
+     :                           PSS__ABSOLUTE = 2 )

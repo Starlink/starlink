@@ -1,0 +1,398 @@
+INTERFACE PSS
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    ASSOCIATION '<->GLOBAL.BINDS'
+    VPATH       'PROMPT'
+    PPATH       'GLOBAL'
+    PROMPT      'Dataset to be searched/tested for sources'
+    HELP        'Must be 2D - can be primitive'
+  ENDPARAMETER
+
+  PARAMETER BGND
+    TYPE 'UNIV'
+    DEFAULT !
+    POSITION 2
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC,GLOBAL,DEFAULT'
+    ASSOCIATION '<->GLOBAL.MODEL'
+    PROMPT 'Background model'
+    HELP 'A filename, a real value, or ! for none'
+  ENDPARAMETER
+
+  PARAMETER RESULTS
+    TYPE 'FILENAME'
+    KEYWORD 'OUT'
+    ASSOCIATION '->GLOBAL.SSDS'
+    POSITION 3
+    VPATH 'PROMPT'
+    DEFAULT srclist
+    PPATH 'DEFAULT'
+    PROMPT 'Source search results file (! for none)'
+    HELP 'ASTERIX source search results filename'
+  ENDPARAMETER
+
+  PARAMETER MULTI
+    TYPE    '_LOGICAL'
+    DEFAULT N
+    VPATH   'DEFAULT,NOPROMPT'
+  ENDPARAMETER
+
+  PARAMETER MLIST
+    TYPE    'LITERAL'
+    VPATH   'PROMPT'
+    PROMPT  'Image list file'
+    HELP    'Filename containing list of images & backgrounds'
+  ENDPARAMETER
+
+  PARAMETER MODE
+    TYPE '_CHAR'
+    DEFAULT 'SEARCH'
+    PROMPT 'Select processing mode (SEARCH,PARAM,UPLIM,UPMAP)'
+    VPATH 'DEFAULT,PROMPT'
+    PPATH 'DEFAULT'
+    HELP 'SEARCH image, PARAM at points, UPLIM at points, UPMAP image'
+  ENDPARAMETER
+
+  PARAMETER SOPT
+    TYPE 'LITERAL'
+    DEFAULT 'CASH'
+    PPATH 'DEFAULT'
+    PROMPT 'Statistic option (CASH,GAUSSIAN)'
+    HELP 'GAUSSIAN is faster, but CASH is required for Poissonian data'
+  ENDPARAMETER
+
+  PARAMETER SENSIG
+    TYPE '_REAL'
+    DEFAULT 5.0
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Sensitivity level (sigma)'
+    HELP 'PSS will map the flux sensitivity at this sensitivity level'
+  ENDPARAMETER
+
+  PARAMETER SLICE
+    TYPE '_CHAR'
+    DEFAULT '*:*,*:*'
+    VPATH 'DYNAMIC,PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    PROMPT 'Section of dataset to search'
+    HELP 'Separate bounds on a dimension by colons, and dimensions by commas'
+  ENDPARAMETER
+
+# --------------------- PSS mode control parameters ------------------------
+
+  PARAMETER QBAD
+    TYPE '_LOGICAL'
+    DEFAULT Y
+    VPATH 'DEFAULT'
+    PROMPT 'Bad quality pixel prevents source at that position'
+  ENDPARAMETER
+
+  PARAMETER EXPERT
+    TYPE '_LOGICAL'
+    DEFAULT N
+    PPATH 'CURRENT,DEFAULT'
+    VPATH 'PROMPT'
+    PROMPT 'Expert mode'
+    HELP 'Use this mode to control confidence levels, special options, etc'
+  ENDPARAMETER
+
+  PARAMETER NOVAR
+    TYPE '_CHAR'
+    DEFAULT 'IGNORE'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'IGNORE lack of variance, or invent POISSON errors'
+  ENDPARAMETER
+
+  PARAMETER PLIST
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'GLOBAL'
+    PROMPT 'Source of RA and DECs '
+    HELP 'TERMINAL for terminal input, ascii file name, or SSDS file name'
+  ENDPARAMETER
+
+  PARAMETER USEFLUX
+    TYPE '_LOGICAL'
+    DEFAULT N
+    PPATH 'DEFAULT'
+    VPATH 'PROMPT'
+    PROMPT 'Use fluxes present in source list (rather than fit)'
+    HELP 'Specify true if you want to peg the source flux'
+  ENDPARAMETER
+
+  PARAMETER RA
+    TYPE '_CHAR'
+    DEFAULT !
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Right ascension'
+    HELP 'eg. 301.675, 2.3445r, 23h05m34s, 18:23:33.0'
+  ENDPARAMETER
+
+  PARAMETER DEC
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PROMPT 'Declination'
+    HELP 'eg. -23.455, -1.112r, -23d45m13s, -23:43:34'
+  ENDPARAMETER
+
+  PARAMETER MAP
+    TYPE 'FILENAME'
+    DEFAULT !
+    ASSOCIATION '->GLOBAL.GRAFDS'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Significance map dataset'
+  ENDPARAMETER
+
+  PARAMETER SSUB
+    TYPE 'FILENAME'
+    DEFAULT !
+    ASSOCIATION '->GLOBAL.BINDS'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Source subtracted dataset'
+    HELP   'Input image with final source list subtracted out, ! for none'
+  ENDPARAMETER
+
+  PARAMETER SIGMIN
+    TYPE    '_REAL'
+    DEFAULT 5.0
+    PROMPT  'Significance threshold'
+    HELP    'Sources above this threshold will be output, those below rejected'
+  ENDPARAMETER
+
+  PARAMETER PSF_CON
+    TYPE '_LOGICAL'
+    KEYWORD 'PSFCON'
+    DEFAULT Y
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC,DEFAULT'
+    PROMPT 'Assume constant PSF across field'
+    HELP   'Beware, specifying FALSE is much slower'
+  ENDPARAMETER
+
+  PARAMETER RESTART
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT,PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Restart search mode using significance map'
+  ENDPARAMETER
+
+  PARAMETER TRY_AGAIN
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    DEFAULT Y
+    PROMPT 'Try again with a lower significance threshold'
+  ENDPARAMETER
+
+  PARAMETER SAMPLE
+    TYPE '_INTEGER'
+    DEFAULT 1
+    PPATH 'DEFAULT'
+    PROMPT 'Oversampling factor for first pass'
+    HELP   'Beware, specifying values other than 1 is very slow'
+  ENDPARAMETER
+
+# --------------------- PSS diagnostic mode parameters ------------------------
+
+  PARAMETER DIAG
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Enable diagnostic mode'
+  ENDPARAMETER
+
+  PARAMETER DIAGOPT
+    TYPE 'LITERAL'
+    KEYWORD 'DOPT'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Diagnostic mode options'
+    HELP 'Specify using index characters, eg. AB or ABV'
+  ENDPARAMETER
+
+  PARAMETER DDAT
+    TYPE 'LITERAL'
+    KEYWORD 'DOPT'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Diagnostic mode data'
+  ENDPARAMETER
+
+  PARAMETER VALIDATE
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Validate input data files'
+    HELP 'Use for diagnostic purposes, but slows program'
+  ENDPARAMETER
+
+# --------------------- EXPERT mode parameters ------------------------
+
+  PARAMETER RESCALE
+    TYPE '_LOGICAL'
+    DEFAULT N
+    PPATH 'DEFAULT'
+    PROMPT 'Re-scale background estimate'
+    HELP 'Use if background is estimated, or for fine tuning'
+  ENDPARAMETER
+
+  PARAMETER ISCALE
+    TYPE '_REAL'
+    DEFAULT 1.0
+    PPATH 'DEFAULT'
+    PROMPT 'Initial guess for background scale parameter'
+  ENDPARAMETER
+
+  PARAMETER PSFPIX
+    TYPE '_INTEGER'
+    VPATH 'PROMPT'
+    PROMPT 'Radius of PSF box in pixels'
+    PPATH 'DYNAMIC'
+    HELP  'Determines fraction of psf to be used. Larger -> slower but more accurate'
+  ENDPARAMETER
+
+  PARAMETER EXTEN
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DYNAMIC,PROMPT'
+    PPATH 'DYNAMIC,DEFAULT'
+    PROMPT 'Fit for extension measure'
+    HELP 'PSS will find the best gaussian FWHM to convolve with the psf to match the data'
+  ENDPARAMETER
+
+  PARAMETER DEV
+    TYPE '_CHAR'
+    VPATH 'DEFAULT'
+    PPATH 'default'
+    DEFAULT 'TERMINAL'
+    PROMPT 'Text output to'
+    HELP 'Valid responses : TERMINAL,PRINTER,OLDFILE,NEWFILE,filename'
+  ENDPARAMETER
+
+  PARAMETER ASYMMETRIC
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    DEFAULT N
+    PROMPT 'Asymmetric source parameter errors'
+    HELP 'Both lower and upper bounds. Default is to average'
+  ENDPARAMETER
+
+  PARAMETER FERL
+    TYPE 'LITERAL'
+    DEFAULT '1 sigma'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Should not appear'
+    HELP 'Percentages, or sigmas, eg. 68.0%, 2 sigma'
+  ENDPARAMETER
+
+  PARAMETER PERL
+    TYPE 'LITERAL'
+    DEFAULT '90%'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Positional error confidence levels'
+    HELP 'Separate by commas. Percentages, or sigmas, eg. 68.0%, 2 sigma, 2.5 si, 99.9'
+  ENDPARAMETER
+
+  PARAMETER MULREJ
+    TYPE '_REAL'
+    DEFAULT 1
+    VPATH 'DEFAULT,PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Source confusion sensitivity'
+    HELP 'Higher values through out more sources - see manual'
+  ENDPARAMETER
+
+# ------------------------- PSF parameters ----------------------------
+
+  PARAMETER PSF
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC,DEFAULT'
+    PROMPT 'Choose PSF to use for source model'
+    HELP 'Enter one of the capitalised names above'
+  ENDPARAMETER
+
+  PARAMETER MASK
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC'
+    PROMPT 'Name of profile to use (select from above)'
+  ENDPARAMETER
+
+  PARAMETER AUX
+    TYPE 'LITERAL'
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC,DEFAULT'
+    PROMPT 'This should never appear!'
+  ENDPARAMETER
+
+  PARAMETER X_BLUR
+    TYPE '_REAL'
+    PROMPT 'Telescope motion blurring FWHM in X (arcmin) '
+    DEFAULT 1.5
+    HELP 'Will be modelled as a Gaussian with specfied FWHM'
+  ENDPARAMETER
+
+  PARAMETER Y_BLUR
+    TYPE '_REAL'
+    PROMPT 'Telescope motion blurring FWHM in Y (arcmin) '
+    DEFAULT 1.5
+    HELP 'Will be modelled as a Gaussian with specfied FWHM'
+  ENDPARAMETER
+
+  PARAMETER DO_DET_BLUR
+    TYPE '_LOGICAL'
+    PROMPT 'Allow for Detector blurring ?'
+    DEFAULT N
+    HELP 'Put in energy dependent spatial blurring function ?'
+  ENDPARAMETER
+
+  PARAMETER DET_BLUR_FIL
+    TYPE '_CHAR'
+    PROMPT 'Detector blurring dataset'
+    DEFAULT 'DET_BLUR_NOM'
+    HELP 'Contains data on effect of finite spatial resolution'
+  ENDPARAMETER
+
+  PARAMETER DO_PEN_DEPTH
+    TYPE '_LOGICAL'
+    PROMPT 'Allow for penetration depth effects ?'
+    DEFAULT N
+    HELP 'Compute position and energy dependent asymmetric PSF; Slow'
+  ENDPARAMETER
+
+  PARAMETER PEN_DEPTH_FIL
+    TYPE '_CHAR'
+    PROMPT 'Penetration depth dataset'
+    DEFAULT 'PEN_DEPTH_NOM'
+    HELP 'Contains probability of various penetration depths occurring'
+  ENDPARAMETER
+
+   PARAMETER TEL_LEN_COR
+      TYPE '_REAL'
+      PROMPT 'Correction to Telescope length in mm'
+      DEFAULT -1.1
+      HELP 'Amount to be added to nominal value'
+   ENDPARAMETER
+
+   PARAMETER DO_CW_COR
+      TYPE '_LOGICAL'
+      PROMPT 'Correct for bar screening bias to pen depth? '
+      DEFAULT Y
+      HELP 'Reduce weights of large pen. depths to allow for events lost behind bars'
+   ENDPARAMETER
+
+ENDINTERFACE

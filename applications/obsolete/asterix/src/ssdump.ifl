@@ -1,0 +1,55 @@
+INTERFACE SSDUMP
+
+   PARAMETER INP
+     TYPE    'UNIV'
+     POSITION 1
+     KEYWORD 'INP'
+     PPATH   'GLOBAL'
+     PROMPT  'Source dataset'
+     HELP    'Filename of source search results'
+     ASSOCIATION '<-GLOBAL.SSDS'
+   ENDPARAMETER
+
+   PARAMETER DEVICE
+     POSITION 2
+     KEYWORD 'DEV'
+     TYPE '_CHAR'
+     VPATH 'PROMPT'
+     PPATH 'DEFAULT'
+     DEFAULT 'TERMINAL'
+     PROMPT 'Output to'
+     HELP 'Valid responses :TERMINAL,PRINTER,OLDFILE,NEWFILE,filename'
+   ENDPARAMETER
+
+  PARAMETER HEADER
+    TYPE    '_LOGICAL'
+    VPATH   'DEFAULT'
+    DEFAULT Y
+    PROMPT  'Output field identifications'
+  ENDPARAMETER
+
+  PARAMETER FLDS
+    TYPE    '_CHAR'
+    DEFAULT '*'
+    VPATH   'DYNAMIC,DEFAULT'
+    PPATH   'DYNAMIC,DEFAULT'
+    PROMPT  'Field list to display'
+    HELP    'Enter field names separated by commas, or * for them all'
+  ENDPARAMETER
+
+  PARAMETER ERRORS
+    TYPE    '_LOGICAL'
+    VPATH   'default'
+    DEFAULT Y
+    PROMPT  'Output field errors'
+  ENDPARAMETER
+
+  PARAMETER HMS
+    TYPE '_LOGICAL'
+    VPATH 'default'
+    DEFAULT Y
+    PROMPT 'Output RA/DEC in hours, minutes and seconds'
+    HELP 'The alternative is decimal degrees'
+  ENDPARAMETER
+
+ENDINTERFACE

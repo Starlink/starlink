@@ -1,0 +1,14 @@
+*+  PSS_STAT_BIT2 - Standard end of statistic loop
+*-
+*    Set good pixel done
+      DONE_PIX_YET = ( GR_NELM .EQ. (DC_HI-DC_LO+1) )
+*    Next pixel
+ 50   END DO
+      END DO
+*    Single point?
+      IF ( GR_NELM .EQ. 1 ) THEN
+*      Store background
+        CALL PSS_GET_BVAL( GR_XC, GR_YC, S_BACK(BOX), STATUS )
+*      Store significance
+        S_SIG(BOX) = SMAP(GR_GXC,GR_GYC)
+      END IF

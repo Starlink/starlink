@@ -1,0 +1,145 @@
+INTERFACE SPRESP
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    ASSOCIATION '<->GLOBAL.BINDS'
+    VPATH       'PROMPT'
+    PPATH       'GLOBAL'
+    PROMPT      'Dataset to which response will be attached'
+    HELP        'Can be 2D, 3D or an event dataset'
+  ENDPARAMETER
+
+  PARAMETER RADIAL
+    TYPE        '_LOGICAL'
+    DEFAULT     Y
+    VPATH       'PROMPT'
+    PPATH       'DYNAMIC,DEFAULT'
+    PROMPT      'Assume radial symmetry'
+    HELP        'Construct radially symmetric response about field centre'
+  ENDPARAMETER
+
+  PARAMETER PSFCON
+    TYPE        '_LOGICAL'
+    DEFAULT     N
+    VPATH       'PROMPT'
+    PPATH       'DEFAULT'
+    PROMPT      'Assume psf constant over field'
+    HELP        'Only one psf is evaluated if true, at position of your choice'
+  ENDPARAMETER
+
+  PARAMETER PIXCENT
+    TYPE        '_LOGICAL'
+    DEFAULT     Y
+    VPATH       'PROMPT'
+    PPATH       'DEFAULT'
+    PROMPT      'Response centre on pixel centre'
+    HELP        'Alternative is to have centre on the vertex of 4 pixels'
+  ENDPARAMETER
+
+  PARAMETER SRES
+    TYPE        '_REAL'
+    VPATH       'PROMPT'
+    PROMPT      'Spatial resolution'
+    HELP        'Controls granularity of psf access in spatial axes'
+  ENDPARAMETER
+
+  PARAMETER CUTOFF
+    TYPE        '_REAL'
+    VPATH       'PROMPT'
+    DEFAULT     0.001
+    PPATH       'DEFAULT'
+    PROMPT      'Cutoff amplitude relative to centre of psf'
+    HELP        'Use this option to limit the size of the psf'
+  ENDPARAMETER
+
+  PARAMETER RLIMIT
+    TYPE        '_INTEGER'
+    VPATH       'PROMPT'
+    DEFAULT     50
+    PPATH       'DEFAULT'
+    PROMPT      'Maximum radius of the psf in pixels'
+    HELP        'Use this option to limit the size of the psf'
+  ENDPARAMETER
+
+# ------------------------- PSF parameters ----------------------------
+
+  PARAMETER PSF
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC,DEFAULT'
+    PROMPT 'Choose PSF to use for source model'
+    HELP 'Enter one of the capitalised names above'
+  ENDPARAMETER
+
+  PARAMETER MASK
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC'
+    PROMPT 'Name of profile to use (select from above)'
+  ENDPARAMETER
+
+  PARAMETER AUX
+    TYPE 'LITERAL'
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC,DEFAULT'
+    PROMPT 'This should never appear!'
+  ENDPARAMETER
+
+  PARAMETER X_BLUR
+    TYPE '_REAL'
+    PROMPT 'Telescope motion blurring FWHM in X (arcmin) '
+    DEFAULT 1.5
+    HELP 'Will be modelled as a Gaussian with specfied FWHM'
+  ENDPARAMETER
+
+  PARAMETER Y_BLUR
+    TYPE '_REAL'
+    PROMPT 'Telescope motion blurring FWHM in Y (arcmin) '
+    DEFAULT 1.5
+    HELP 'Will be modelled as a Gaussian with specfied FWHM'
+  ENDPARAMETER
+
+  PARAMETER DO_DET_BLUR
+    TYPE '_LOGICAL'
+    PROMPT 'Allow for Detector blurring ?'
+    DEFAULT N
+    HELP 'Put in energy dependent spatial blurring function ?'
+  ENDPARAMETER
+
+  PARAMETER DET_BLUR_FIL
+    TYPE '_CHAR'
+    PROMPT 'Detector blurring dataset'
+    DEFAULT 'DET_BLUR_NOM'
+    HELP 'Contains data on effect of finite spatial resolution'
+  ENDPARAMETER
+
+  PARAMETER DO_PEN_DEPTH
+    TYPE '_LOGICAL'
+    PROMPT 'Allow for penetration depth effects ?'
+    DEFAULT N
+    HELP 'Compute position and energy dependent asymmetric PSF; Slow'
+  ENDPARAMETER
+
+  PARAMETER PEN_DEPTH_FIL
+    TYPE '_CHAR'
+    PROMPT 'Penetration depth dataset'
+    DEFAULT 'PEN_DEPTH_NOM'
+    HELP 'Contains probability of various penetration depths occurring'
+  ENDPARAMETER
+
+   PARAMETER TEL_LEN_COR
+      TYPE '_REAL'
+      PROMPT 'Correction to Telescope length in mm'
+      DEFAULT -1.1
+      HELP 'Amount to be added to nominal value'
+   ENDPARAMETER
+
+   PARAMETER DO_CW_COR
+      TYPE '_LOGICAL'
+      PROMPT 'Correct for bar screening bias to pen depth? '
+      DEFAULT Y
+      HELP 'Reduce weights of large pen. depths to allow for events lost behind bars'
+   ENDPARAMETER
+
+ENDINTERFACE

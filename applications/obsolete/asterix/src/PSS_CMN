@@ -1,0 +1,251 @@
+*+  PSS_CMN - PSS global data
+*-
+
+*    Source description object
+      DOUBLE PRECISION        	S_RA(PSS__MXSRC)	! Celestial coordinates
+      DOUBLE PRECISION          S_DEC(PSS__MXSRC)	! Celestial coordinates
+      REAL                    	S_CP(2,PSS__MXSRC)      ! Box interest point
+      REAL                    	S_FLUX(PSS__MXSRC)      ! Flux
+      REAL                    	S_SIG(PSS__MXSRC)       ! Significance
+      REAL 			S_SIGERR(PSS__MXSRC)    ! Significance error
+      REAL                    	S_DSTAT(PSS__MXSRC)     ! Direct measure of fit
+      REAL                    	S_FERR(2,PSS__MXEL,     ! Flux errors
+     :                                 PSS__MXSRC)
+      REAL                    	S_XERR(2,PSS__MXEL,     ! X errors
+     :                                 PSS__MXSRC)
+      REAL                    	S_YERR(2,PSS__MXEL,     ! Y errors
+     :                                 PSS__MXSRC)
+      REAL                    	S_BERR(2,PSS__MXEL,     ! Bgnd errors
+     :                                 PSS__MXSRC)
+      REAL                    	S_PERR(PSS__MXEL,       ! Positional errors
+     :                                 PSS__MXSRC)
+      REAL                    	S_BACK(PSS__MXSRC)      ! Bgnd value
+      REAL                      S_BSCALE(PSS__MXSRC)    ! Bgnd scaling factor
+      REAL                    	S_EXTEN(PSS__MXSRC)
+      REAL			S_EXTENERR(2,PSS__MXSRC)! Extension & error
+      REAL                    	S_EXTENSIG(PSS__MXSRC)  ! Extension significance
+      REAL                    	S_EPSF(PSS__MXSRC)      ! Enclosed psf energy
+      DOUBLE PRECISION          S_PPROB(PSS__MXSRC)     ! Poisson probability
+      LOGICAL                 	S_FLAG(PSS__MXSRC)	!
+
+*    Source list description object
+      INTEGER                 	LI_NSRC
+      INTEGER                   LI_ID(PSS__MXSRC)
+      LOGICAL                   LI_ACTIVE(PSS__MXSRC)
+      REAL                    	LI_NNBR_R(PSS__MXSRC)
+      INTEGER                 	LI_NNBR_ID(PSS__MXSRC)
+
+      INTEGER                   N_FREE_SRC,FREE_SRC(PSS__MXSRC)
+
+*    Psf handling
+      INTEGER                   PSF_HAN             	! Handle to psf system
+      INTEGER                   PSF_STORE		! Ptr to stored data
+      INTEGER			PSF_DATA     		! Ptr to current data
+      INTEGER                   PSF_DIMS(2)         	! Size of mapped data
+      INTEGER                   PSF_UDIMS(2)        	! Size of used section
+      INTEGER                   PSF_PPLO, PSF_PPHI      ! Psf box radii
+      REAL                      PSF_PPR(3)          	! Psf box radii
+      INTEGER                   PSF_PPS(3)          	! Psf box sizes
+      INTEGER                   PSF_BORDER          	! Border for evaluation
+      INTEGER                   PSF_NIPOS           	! # psf posn's specified
+      REAL                      PSF_PIXL(NPSFLEV,3) 	! Energy radii
+      LOGICAL                   PSF_CONSTANT		! Psf constant on field?
+      LOGICAL                   PSF_RESAM		! Resample the psf?
+      INTEGER                   PSF_ACCESS		! Access mode
+      INTEGER                   PSF_LASTBOX 		! Last box id
+      INTEGER                   PSF_UPNR            	! Current box size
+      INTEGER                   PSF_CONPTR          	! PSF convol ptr
+      INTEGER                   PSF_CONWPTR         	! PSF convol work ptr
+      INTEGER                   PSF_RESWPTR         	! Resample workspace
+
+*    External map handling
+      INTEGER                 	MP_BDA                  ! BDA identifier
+      INTEGER                 	MP_DPTR                 ! Ptr to data array
+      INTEGER                 	MP_QPTR                 ! Ptr to data quality
+      LOGICAL                 	MP_ENVIR                ! Created by environment?
+      LOGICAL                 	MP_OK                   !
+      CHARACTER*10            	MP_PAR                  ! Par used if ENVIR true
+      CHARACTER*(DAT__SZLOC)  	MP_LOC                	! Top level locator
+      CHARACTER*1             	MP_MODE                 ! File access mode
+
+*    The data cache
+      INTEGER                   DC_LO, DC_HI, DC_CP_C
+      REAL                      DC_IMD_S, DC_PSF_S, DC_BGND_S
+      INTEGER                   DC_PC(2), DC_VOLATILE
+      REAL                      DC_IMD(PSS__CACHELEN)
+      REAL                      DC_PSF(PSS__CACHELEN)
+      REAL                      DC_IMBV(PSS__CACHELEN)
+      REAL                      DC_BGND(PSS__CACHELEN)
+      REAL                      DC_BGDV(PSS__CACHELEN)
+      REAL                      DC_LBGND(PSS__CACHELEN)
+      REAL                      DC_MOD(PSS__CACHELEN)
+      LOGICAL                   DC_Q(PSS__CACHELEN)
+
+*    Grid control
+      INTEGER                  	GR_DIMS(2)        	! Grid dimensions
+      INTEGER                  	GR_NELM           	! Number of elements
+      INTEGER                   GR_RNG_CEN(2)
+      INTEGER                   GR_RNG_LO(2)
+      INTEGER                   GR_RNG_HI(2)
+      INTEGER                   GR_RNG_LLO(2)
+      INTEGER                   GR_RNG_LHI(2)
+      REAL                   	GR_A0(2)		! Grid origin
+      REAL                   	GR_X0, GR_Y0
+        EQUIVALENCE		(GR_A0(1),GR_X0)
+        EQUIVALENCE		(GR_A0(2),GR_Y0)
+      REAL                   	GR_DA(2)		! Grid step sizes
+      REAL                   	GR_DX, GR_DY
+        EQUIVALENCE		(GR_DA(1),GR_DX)
+        EQUIVALENCE		(GR_DA(2),GR_DY)
+      INTEGER                   GR_AC(2)    	! Grid centre in img pix
+      INTEGER                   GR_XC, GR_YC
+        EQUIVALENCE		(GR_AC(1),GR_XC)
+        EQUIVALENCE		(GR_AC(2),GR_YC)
+      INTEGER                   GR_GAC(2)		! Grid centre in map pix
+      INTEGER                   GR_GXC, GR_GYC
+        EQUIVALENCE		(GR_GAC(1),GR_GXC)
+        EQUIVALENCE		(GR_GAC(2),GR_GYC)
+      REAL                      GR_CC(2)		! Centre in radians
+      REAL                      GR_CX, GR_CY		!
+        EQUIVALENCE		(GR_CC(1),GR_CX)
+        EQUIVALENCE		(GR_CC(2),GR_CY)
+      INTEGER                  	GR_PASS           	! Pass number
+      INTEGER                  	GR_ROUTINE        	! Grid routine
+
+*    General stuff with application to both binned and event searching
+      INTEGER                   GE_EXEC_ISRC            ! Source counter
+      INTEGER                   GE_EXEC_NSRC            ! Source counter
+      INTEGER                   GE_CONVERGE_METHOD      ! Relative or absolute
+      REAL                      GE_CONVERGE_TOL		! Tolerance
+
+*    Control parameters
+      LOGICAL           	CP_NOBADQSRC            ! Bad qual sig points ok?
+      LOGICAL           	CP_CASH                 ! Cash statistic
+      LOGICAL           	CP_FITWIDTH             ! Fit source width?
+      LOGICAL           	CP_EXPERT               ! EXPERT mode
+      LOGICAL           	CP_OPT                  ! Optimise or uplim?
+      LOGICAL           	CP_SPOT                 ! Spot mode?
+      INTEGER           	CP_MODE                 ! PSS mode code
+      LOGICAL           	CP_USECON               ! Use convolved psf
+      LOGICAL           	CP_RESCALE              ! Rescale background?
+      REAL              	CP_IBSCALE              ! Bgnd rescale factor
+      LOGICAL           	CP_FREEZE               ! Freeze something
+      LOGICAL           	CP_MULTI		! MULTI mode?
+
+*    Multiple file handling
+      INTEGER           	MU_FD                   ! File list descriptor
+      CHARACTER*132             MU_IMG, MU_BCK, MU_SSDS ! File names
+      LOGICAL           	MU_SAME_BCK		! Same bgnd each time?
+
+*    Dataset storage
+      LOGICAL 			BDS_LBGND_OK		! Log(bgnd) array ok?
+      INTEGER 			BDS_LBGND_PTR		! Log(bgnd) array
+      LOGICAL                   BDS_QUAL_OK		! Quality present
+      LOGICAL                   BDS_QUAL_DYNAMIC	! Dynamic quality?
+      INTEGER                   BDS_QUAL_PTR		! Ptr to quality data
+      INTEGER                   BDS_NDIM                ! Dimensionality
+      INTEGER                   BDS_NELM              	! Product of dimensions
+      INTEGER                   BDS_DIMS(PSS__MXDIM)    ! Dataset dimensions
+      INTEGER                   BDS_SPOF(2,PSS__MXDIM)  ! Bounds of slice
+      INTEGER                   BDS_EXTREMA(2,PSS__MXDIM)! Bounds of slice +- psf
+      REAL                      BDS_SCEN(PSS__MXDIM)    ! Slice centre
+
+*    Axis description
+      LOGICAL                   AX_OK(PSS__MXDIM)       ! Valid data in file?
+      LOGICAL                   AX_REG(PSS__MXDIM)      ! Regularly spaced?
+      REAL                      AX_PTR(PSS__MXDIM)      ! Pointer if irregular
+      REAL                      AX_DR(PSS__MXDIM)       ! Scale in radians
+      REAL                      AX_BR(PSS__MXDIM)       ! Base in radians
+      REAL                      AX_TOR(PSS__MXDIM)      ! Radian factor
+      CHARACTER*40              AX_LABEL(PSS__MXDIM)    ! Axis label
+      CHARACTER*40              AX_UNITS(PSS__MXDIM)    ! Axis units
+
+*   File descriptions
+*    Input image
+      LOGICAL                   IM_OK                   ! Slot in use?
+      LOGICAL                   IM_DYNAMIC              ! Dynamic?
+      INTEGER                   IM_BDA                  ! BDA identifier
+      LOGICAL                   IM_PRIM                	! Primitive?
+      LOGICAL			IM_DATA_OK
+      LOGICAL  			IM_DATA_DYNAMIC
+      INTEGER                   IM_DATA_PTR
+      LOGICAL			IM_VAR_OK
+      LOGICAL  			IM_VAR_DYNAMIC
+      INTEGER                   IM_VAR_PTR
+      LOGICAL                   IM_BGND_SUBTRACTED      ! Bgnd subtracted
+      CHARACTER*40              IM_LABEL, IM_UNITS	! Primitive input
+      CHARACTER*200             IM_FILE                	! Trace data
+      CHARACTER*(DAT__SZLOC)    IM_LOC                 	! Locator to input
+
+*    Input background
+      LOGICAL                   BG_OK                   ! Slot in use?
+      LOGICAL                   BG_DYNAMIC              ! Dynamic?
+      INTEGER                   BG_BDA                  ! BDA identifier
+      LOGICAL			BG_DATA_OK
+      LOGICAL  			BG_DATA_DYNAMIC
+      INTEGER                   BG_DATA_PTR
+      LOGICAL			BG_VAR_OK
+      LOGICAL  			BG_VAR_DYNAMIC
+      INTEGER                   BG_VAR_PTR
+      CHARACTER*200             BG_FILE                	! Trace data
+      CHARACTER*(DAT__SZLOC)    BG_LOC                 	! Locator to input
+
+*    Objects of _DOUBLE size
+      COMMON /PSS_CMN_D/
+     :                  S_RA, S_DEC, S_PPROB
+
+*    Objects of _INTEGER size
+      COMMON /PSS_CMN_I_1/
+     :                  DC_LO, DC_HI, DC_CP_C, DC_IMD_S, DC_PSF_S,
+     :                    DC_BGND_S, DC_PC, DC_VOLATILE, DC_IMD,
+     :                    DC_PSF, DC_IMBV,
+     :                    DC_BGND,DC_BGDV,DC_LBGND,DC_MOD,DC_Q,
+     :			MP_BDA, MP_DPTR, MP_QPTR, MP_ENVIR, MP_OK,
+     :                  PSF_HAN, PSF_STORE, PSF_DATA, PSF_DIMS,
+     :                    PSF_UDIMS, PSF_PPLO, PSF_PPHI, PSF_PPR,
+     :                    PSF_PPS, PSF_BORDER, PSF_NIPOS, PSF_PIXL,
+     :                    PSF_CONSTANT, PSF_RESAM, PSF_ACCESS,
+     :                    PSF_LASTBOX, PSF_UPNR, PSF_CONPTR,
+     :                    PSF_CONWPTR, PSF_RESWPTR,
+     :                  AX_OK, AX_REG, AX_PTR, AX_DR, AX_BR, AX_TOR,
+     :                  IM_OK, IM_DYNAMIC, IM_BDA, IM_PRIM, IM_DATA_OK,
+     :                    IM_DATA_DYNAMIC, IM_DATA_PTR, IM_VAR_OK,
+     :                    IM_VAR_DYNAMIC, IM_VAR_PTR,IM_BGND_SUBTRACTED
+
+*    Objects of _INTEGER size
+      COMMON /PSS_CMN_I_2/
+     :                  BG_OK, BG_DYNAMIC, BG_BDA, BG_DATA_OK,
+     :                    BG_DATA_DYNAMIC, BG_DATA_PTR, BG_VAR_OK,
+     :                    BG_VAR_DYNAMIC, BG_VAR_PTR,
+     :                  S_CP, S_FLUX, S_SIG, S_SIGERR, S_DSTAT, S_FERR,
+     :                    S_XERR, S_YERR, S_BERR, S_PERR, S_BACK,
+     :                    S_BSCALE, S_EXTEN, S_EXTENERR, S_EXTENSIG,
+     :                    S_EPSF, S_FLAG,
+     :                  LI_NSRC, LI_ID, LI_ACTIVE, LI_NNBR_R,
+     :                    LI_NNBR_ID
+
+*    Objects of _INTEGER size
+      COMMON /PSS_CMN_I_3/
+     :                  GR_DIMS, GR_NELM, GR_RNG_CEN, GR_RNG_LO,
+     :                    GR_RNG_HI, GR_RNG_LLO, GR_RNG_LHI, GR_A0,
+     :                    GR_DA, GR_AC, GR_GAC, GR_CC,
+     :                    GR_PASS, GR_ROUTINE,
+     :                  GE_EXEC_ISRC, GE_EXEC_NSRC, GE_CONVERGE_METHOD,
+     :                    GE_CONVERGE_TOL,
+     :                  MU_FD, MU_SAME_BCK,
+     :                  CP_NOBADQSRC, CP_CASH, CP_FITWIDTH, CP_EXPERT,
+     :                    CP_OPT, CP_SPOT, CP_MODE, CP_USECON,
+     :                    CP_RESCALE, CP_IBSCALE, CP_FREEZE, CP_MULTI,
+     :                  N_FREE_SRC, FREE_SRC,
+     :                  BDS_LBGND_OK, BDS_LBGND_PTR, BDS_QUAL_OK,
+     :                    BDS_QUAL_DYNAMIC, BDS_QUAL_PTR, BDS_NDIM,
+     :                    BDS_NELM, BDS_DIMS, BDS_SPOF, BDS_EXTREMA,
+     :                    BDS_SCEN
+
+*    Character common block
+      COMMON /PSS_CMN_C/
+     :			MP_LOC, MP_PAR, MP_MODE,
+     :                  MU_IMG, MU_BCK, MU_SSDS,
+     :                  AX_LABEL, AX_UNITS,
+     :                  IM_FILE, IM_LOC, IM_LABEL, IM_UNITS,
+     :                  BG_FILE, BG_LOC

@@ -1,0 +1,11 @@
+*+  PSS_IO_CMN - PSS text i/o global data
+*-
+
+*    Text i/o control variables
+      INTEGER                   GE_OP_LUN               ! Unit number
+      INTEGER                   GE_OP_WIDTH             ! Width in characters
+      INTEGER                   GE_OP_CHAT              ! Chat level
+
+*    Common block definition
+      COMMON /PSS_IO_CMN_I/
+     :                  GE_OP_LUN, GE_OP_WIDTH, GE_OP_CHAT

@@ -1,0 +1,5 @@
+*+  PSS_ASTROM_CMN - PSS astrometry global variables
+
+      RECORD /POINT_STR/        GE_POINT		! Celestial data
+
+      COMMON /PSS_ASTROM_CMN/   GE_POINT

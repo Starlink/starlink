@@ -1,0 +1,47 @@
+INTERFACE SSANOT
+   parameter INP
+     position 1
+     type 'UNIV'
+     ppath 'GLOBAL'
+     keyword 'INP'
+     prompt 'Dataset'
+     association '<->GLOBAL.BINDS'
+   endparameter
+   parameter LIST
+     position 2
+     type 'UNIV'
+     association '<-GLOBAL.SSDS'
+     PPATH 'GLOBAL'
+     HELP 'The sources contained in this dataset will be marked on the graphics dataset'
+     prompt 'Source list'
+   endparameter
+   parameter SYMBOL
+     position 3
+     type '_INTEGER'
+     vpath 'DEFAULT'
+     default 2
+     prompt 'Symbol'
+     help 'PGPLOT symbol number to use to mark position - default is a cross'
+   endparameter
+   parameter BOLD
+     position 4
+     type '_INTEGER'
+     default !
+     vpath 'DEFAULT'
+     prompt 'Boldness'
+     help 'Multiple of default line thickness'
+   endparameter
+   parameter ERROR
+     type '_LOGICAL'
+     default Y
+     vpath 'DEFAULT'
+     ppath 'DEFAULT'
+     prompt 'Use positional errors'
+   endparameter
+   parameter NDF
+     type '_CHAR'
+     default '1'
+     prompt 'NDF number'
+     help 'List or range of components of multiple dataset'
+   endparameter
+endinterface

@@ -1,0 +1,34 @@
+*+  SSDUMP_STR - SSDUMP field structure definition
+*
+*    History :
+*
+*     20 Aug 91 : Original (BHVAD::DJA)
+*
+*-
+
+      INTEGER                         SZHEAD
+        PARAMETER                     ( SZHEAD = 20 )
+
+      STRUCTURE /FIELD/
+        CHARACTER*(DAT__SZNAM)        FLD             ! The name of the field
+        CHARACTER*(SZHEAD)            HEAD            ! Heading
+        CHARACTER*(DAT__SZTYP)        TYPE            ! Field data type
+        INTEGER                       COL             ! First column for display
+        INTEGER                       PTR             ! Pointer to data
+        INTEGER                       WID             ! Width of field in char
+        INTEGER                       SIZE            ! Bytes to transfer
+        CHARACTER*10                  DFMT            ! Data format
+        INTEGER                       NDIM            ! Dimensionality
+        INTEGER                       DIMS(DAT__MXDIM)! Dimensions
+        INTEGER                       NELM            ! Elements per source
+        LOGICAL                       HMS             ! Sexigessimal output?
+        LOGICAL                       ETHERE          ! Errors present
+        INTEGER                       EWID            ! Width of error in char
+        INTEGER                       EPTR            ! Pointer to error data
+        INTEGER                       ECOL            ! Column for errors
+        INTEGER                       ENDIM           ! Dimensionality
+        INTEGER                       EDIMS(DAT__MXDIM)! Dimensions
+        INTEGER                       ENELM           ! Elements per source
+        CHARACTER*10                  EFMT            ! Error format
+        CHARACTER*40                  UNITS           ! Field units
+      END STRUCTURE

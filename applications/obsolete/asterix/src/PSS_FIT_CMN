@@ -1,0 +1,11 @@
+*+  PSS_FIT_CMN - PSS fitting common block
+*-
+
+      STRUCTURE /PSS_FIT_DATA/
+       RECORD /DATASET/         DS                    ! Dataset structure
+       RECORD /PREDICTION/      PRED                  ! Model structure
+      END STRUCTURE
+
+      RECORD /PSS_FIT_DATA/     FIT
+
+      COMMON /PSS_FIT_CMN/      FIT

@@ -1,0 +1,32 @@
+*+  PSS_DIAG_CMN - PSS diagnostic mode global data
+*-
+
+*    Diagnostic mode parameters
+      LOGICAL           	DI_ON         		! Diagnostics on?
+      LOGICAL           	DI_CHI_V_FLUX 		! Chi2 vs. flux graph?
+      LOGICAL           	DI_CHI_V_F_B  		! Chi2 vs. flux,bgnd
+      LOGICAL           	DI_SIG_V_CRAD 		! Chi2 vs. convol r?
+      LOGICAL           	DI_SRC_HIST   		! Full source history
+      LOGICAL           	DI_VALIDATE   		! Validate input files?
+      LOGICAL           	DI_RESC_MAP   		! Rescale map?
+      LOGICAL           	DI_P_XYS_CUBE 		! Prob (x,y,s) cube?
+      LOGICAL           	DI_P_S_PROFILE		! Prob (s) profile?
+      LOGICAL           	DI_FREE_FIT   		! Allow -ve src flux
+      LOGICAL           	DI_LIST_EDIT  		! Edit source list?
+      LOGICAL           	DI_MAX_FILTER 		! Filter max flux
+      LOGICAL           	DI_CHI_V_XY   		! Chi2 vs. x and y
+      LOGICAL           	DI_FLUX_V_XY  		! Flux vs. x and y
+      LOGICAL           	DI_CHI_V_X    		! Chi2 vs. x
+      LOGICAL           	DI_FLUX_V_X   		! Flux vs. x
+      LOGICAL           	DI_LIMIT_BOX  		! Constrain source box?
+      LOGICAL           	DI_POISS_PROB 		! Poisson prob per source?
+
+
+*    Objects of _INTEGER size
+      COMMON /PSS_DIAG_CMN_I/
+     :                  DI_ON, DI_CHI_V_FLUX, DI_CHI_V_F_B,
+     :                    DI_SIG_V_CRAD, DI_SRC_HIST, DI_VALIDATE,
+     :                    DI_RESC_MAP, DI_P_XYS_CUBE, DI_P_S_PROFILE,
+     :                    DI_FREE_FIT, DI_LIST_EDIT, DI_MAX_FILTER,
+     :                    DI_CHI_V_XY, DI_FLUX_V_XY, DI_CHI_V_X,
+     :                    DI_FLUX_V_X, DI_LIMIT_BOX, DI_POISS_PROB

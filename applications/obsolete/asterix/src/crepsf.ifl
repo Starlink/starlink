@@ -1,0 +1,99 @@
+INTERFACE CREPSF
+  parameter OUT
+    keyword 'OUT'
+    position 1
+    TYPE 'UNIV'
+    association '->global.binds'
+    prompt 'PSF data image'
+  endparameter
+  parameter UNITS
+    type 'LITERAL'
+    default 'arcmin'
+    ppath 'default'
+    vpath 'prompt'
+    prompt 'Axis units to use'
+    help 'Can be anyone of arcsec, arcmin, degree or radian'
+  endparameter
+  parameter RADIUS
+    type '_INTEGER'
+    prompt 'Radius of image in pixels'
+  endparameter
+  parameter PIXSIZE
+    type '_REAL'
+    prompt 'Pixel size in blobs'
+  endparameter
+  parameter MJD
+    type '_DOUBLE'
+    default !
+    prompt 'MJD at which to evaluate psf'
+    vpath 'default'
+    ppath 'default'
+  endparameter
+  parameter X0
+    type '_real'
+    vpath 'default,prompt'
+    ppath 'default'
+    default 0.0
+    prompt 'Image X position for psf centre'
+    help   'Enter in units you selected earlier'
+  endparameter
+  parameter Y0
+    type '_real'
+    vpath 'default,prompt'
+    ppath 'default'
+    default 0.0
+    prompt 'Image Y position for psf centre'
+    help   'Enter in units you selected earlier'
+  endparameter
+  parameter DX
+    type '_real'
+    vpath 'default,prompt'
+    ppath 'default'
+    default 0.0
+    prompt 'X offset from table centre to psf centre'
+    help   'Enter in units you selected earlier'
+  endparameter
+  parameter DY
+    type '_real'
+    vpath 'default,prompt'
+    ppath 'default'
+    default 0.0
+    prompt 'Y offset from table centre to psf centre'
+    help   'Enter in units you selected earlier'
+  endparameter
+  parameter PSF
+    type '_char'
+    keyword 'psf'
+    vpath 'prompt'
+    ppath 'dynamic,default'
+    prompt 'Choose PSF to use for search'
+    help 'Enter one of the capitalised names above'
+  endparameter
+  parameter MASK
+    type '_char'
+    vpath 'prompt'
+    ppath 'dynamic'
+    prompt 'Name of profile to use (select from above)'
+  endparameter
+  parameter AUX
+    type 'LITERAL'
+    vpath 'prompt'
+    ppath 'dynamic,default'
+    prompt 'This should never appear!'
+  endparameter
+   PARAMETER TEL_LEN_COR
+      TYPE '_REAL'
+      PROMPT 'Correction to Telescope length in mm'
+      DEFAULT -1.1
+      HELP 'Amount to be added to nominal value'
+   ENDPARAMETER
+
+   PARAMETER DO_CW_COR
+      TYPE '_LOGICAL'
+      PROMPT 'Correct for bar screening bias to pen depth? '
+      DEFAULT Y
+      HELP 'Reduce weights of large pen. depths to allow for events lost behind bars'
+   ENDPARAMETER
+
+
+endinterface

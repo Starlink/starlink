@@ -1,0 +1,21 @@
+INTERFACE SPCONVOL
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    ASSOCIATION '<->GLOBAL.BINDS'
+    VPATH       'PROMPT'
+    PPATH       'GLOBAL'
+    PROMPT      'Dataset whose response will be convolved'
+    HELP        'Can be 2D, 3D or an event dataset'
+  ENDPARAMETER
+
+  PARAMETER SOURCE
+    POSITION    2
+    TYPE        'UNIV'
+    VPATH       'PROMPT'
+    PROMPT      'Source model dataset'
+    HELP        'Can be an image or cube - must be pixel centred'
+  ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,102 @@
+INTERFACE BSUB
+  parameter INP
+    keyword 'INP'
+    position 1
+    TYPE 'UNIV'
+    vpath 'prompt'
+    ppath 'global'
+    association '<-global.binds'
+    prompt 'Input file'
+  endparameter
+  parameter OUT
+    keyword 'OUT'
+    position 2
+    TYPE 'UNIV'
+    association '->global.binds'
+    prompt 'Background subtracted image'
+  endparameter
+  parameter BGND
+    TYPE 'UNIV'
+    association '->global.model'
+    default !
+    ppath 'default'
+    prompt 'Output background model dataset'
+  endparameter
+  parameter SOURCE_THRESH
+    type '_REAL'
+    prompt 'Source detection threshold'
+    default 5
+    ppath 'current,default'
+    help 'Sources above this detection threshold will be removed'
+  endparameter
+  parameter OUT_MESSAGES
+    type '_LOGICAL'
+    prompt 'Are messages to be output to the user'
+    default Y
+    vpath 'default'
+    ppath 'default'
+    help 'Messages as to problems, goodness of fit etc. will be output if true'
+  endparameter
+  parameter SMOOTH_BORDER
+    type '_LOGICAL'
+    prompt 'Use weighted border around smoothing box ? '
+    default N
+    ppath 'default'
+    help 'Employs a 2 pixel wide sloping border around smoothing box '
+  endparameter
+  parameter SLOPING_EDGES
+    type '_LOGICAL'
+    prompt 'Identify sloping edges in data'
+    default N
+    ppath 'default'
+    help 'Algorithm not robust on extremely sparse data'
+  endparameter
+  parameter BOX_DIM
+    type '_INTEGER'
+    prompt 'Trial small box size'
+    default 21
+    ppath 'current,default'
+    help 'The initial box size - may be changed to fit the boxes to the image'
+  endparameter
+  parameter SMOOTH_SIZE
+    type '_INTEGER'
+    prompt 'Enter the smoothing box size'
+    default 25
+    ppath 'current,default'
+    help 'The dimension of the smoothing box. '
+  endparameter
+  parameter PSF
+    type '_char'
+    keyword 'psf'
+    vpath 'prompt'
+    ppath 'dynamic,default'
+    prompt 'Choose PSF to use for search'
+    help 'Enter one of the capitalised names above'
+  endparameter
+  parameter MASK
+    type '_char'
+    vpath 'prompt'
+    ppath 'dynamic'
+    prompt 'Name of profile to use (select from above)'
+  endparameter
+  parameter AUX
+    type 'literal'
+    vpath 'prompt'
+    ppath 'dynamic,default'
+    prompt 'This should never appear!'
+  endparameter
+  parameter SM_FILT
+    type '_char'
+    vpath 'prompt'
+    default 'H'
+    prompt 'Choose Gaussian (G) or top hat (H) smoothing function '
+    help 'Enter G or H '
+  endparameter
+  parameter SM_FWHM
+    type '_REAL'
+    prompt 'Enter FWHM (pixels) for smoothing function '
+    default 15
+    ppath 'current,default'
+    help 'FWHM of gaussian smoothing profile '
+  endparameter
+endinterface

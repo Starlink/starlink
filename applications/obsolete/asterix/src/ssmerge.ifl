@@ -1,0 +1,97 @@
+INTERFACE SSMERGE
+  PARAMETER INP1
+   TYPE 'LITERAL'
+   POSITION 1
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER OUT
+   TYPE 'UNIV'
+   POSITION 2
+   ASSOCIATION '->GLOBAL.SSDS'
+   PROMPT 'Merged file'
+  ENDPARAMETER
+
+  PARAMETER INP2
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP3
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP4
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP5
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP6
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP7
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP8
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP9
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+  PARAMETER INP10
+   TYPE 'LITERAL'
+   DEFAULT !
+   VPATH 'PROMPT'
+   PPATH 'DEFAULT'
+   PROMPT 'Input files to merge'
+   HELP 'File specification, may include wildcards'
+  ENDPARAMETER
+
+ENDINTERFACE
