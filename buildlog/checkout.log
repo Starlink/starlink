@@ -2234,6 +2234,7 @@ U java/source/ant/src/testcases/org/example/tasks/TaskdefTestSimpleTask.java
 cvs checkout: Updating java/source/ant/src/testcases/org/example/types
 U java/source/ant/src/testcases/org/example/types/TypedefTestType.java
 cvs checkout: Updating java/source/array
+U java/source/array/.properties
 U java/source/array/build.xml
 cvs checkout: Updating java/source/array/src
 cvs checkout: Updating java/source/array/src/main
@@ -2308,6 +2309,7 @@ U java/source/array/src/testcases/uk/ac/starlink/array/ShapeTest.java
 U java/source/array/src/testcases/uk/ac/starlink/array/TypeConverterTest.java
 U java/source/array/src/testcases/uk/ac/starlink/array/TypeTest.java
 cvs checkout: Updating java/source/astgui
+U java/source/astgui/.properties
 U java/source/astgui/build.xml
 cvs checkout: Updating java/source/astgui/src
 cvs checkout: Updating java/source/astgui/src/docs
@@ -2380,6 +2382,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/special.gif
 cvs checkout: Updating java/source/astgui/src/testcases
 U java/source/astgui/src/testcases/TestPlotConfigFrame.java
 cvs checkout: Updating java/source/axis
+U java/source/axis/.properties
 U java/source/axis/README
 U java/source/axis/build.xml
 U java/source/axis/do_import
@@ -4262,6 +4265,7 @@ U java/source/axis/webapps/lib/saaj.jar
 U java/source/axis/webapps/lib/wsdl4j.jar
 cvs checkout: Updating java/source/axis/webapps/root
 cvs checkout: Updating java/source/coco
+U java/source/coco/.properties
 U java/source/coco/build.xml
 cvs checkout: Updating java/source/coco/src
 cvs checkout: Updating java/source/coco/src/main
@@ -4273,6 +4277,7 @@ U java/source/coco/src/main/uk/ac/starlink/coco/Coco.java
 U java/source/coco/src/main/uk/ac/starlink/coco/CocoPanel.java
 U java/source/coco/src/main/uk/ac/starlink/coco/CoordinateConversion.java
 cvs checkout: Updating java/source/diva
+U java/source/diva/.properties
 U java/source/diva/build.xml
 U java/source/diva/do_import
 cvs checkout: Updating java/source/diva/src
@@ -5514,6 +5519,7 @@ cvs checkout: Updating java/source/dom4j/docs/dom4j/style/images
 cvs checkout: Updating java/source/dom4j/lib
 cvs checkout: Updating java/source/dom4j/lib/dom4j
 cvs checkout: Updating java/source/fits
+U java/source/fits/.properties
 U java/source/fits/build.xml
 cvs checkout: Updating java/source/fits/src
 cvs checkout: Updating java/source/fits/src/main
@@ -5541,6 +5547,7 @@ U java/source/fits/src/testcases/uk/ac/starlink/fits/FitsNDArrayTest.java
 U java/source/fits/src/testcases/uk/ac/starlink/fits/FitsNdxTest.java
 U java/source/fits/src/testcases/uk/ac/starlink/fits/FitsURLTest.java
 cvs checkout: Updating java/source/frog
+U java/source/frog/.properties
 U java/source/frog/build.xml
 cvs checkout: Updating java/source/frog/src
 cvs checkout: Updating java/source/frog/src/docs
@@ -5708,6 +5715,7 @@ U java/source/frog/test/V405Aur/310397.bjd
 U java/source/frog/test/V405Aur/rband.bjd
 U java/source/frog/test/V405Aur/soft.bjd
 cvs checkout: Updating java/source/hds
+U java/source/hds/.properties
 U java/source/hds/build.xml
 cvs checkout: Updating java/source/hds/src
 cvs checkout: Updating java/source/hds/src/main
@@ -5737,6 +5745,7 @@ U java/source/hds/src/testcases/uk/ac/starlink/hds/NdfMakerTest.java
 U java/source/hds/src/testcases/uk/ac/starlink/hds/no-ns.xml
 U java/source/hds/src/testcases/uk/ac/starlink/hds/reduced_data1.sdf
 cvs checkout: Updating java/source/hdx
+U java/source/hdx/.properties
 U java/source/hdx/build.xml
 cvs checkout: Updating java/source/hdx/src
 cvs checkout: Updating java/source/hdx/src/docs
@@ -5807,6 +5816,7 @@ cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink/hdx/extensio
 U java/source/hdx/src/testcases/uk/ac/starlink/hdx/extension/SimpleWeather.java
 cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink/hdx/jai
 cvs checkout: Updating java/source/jaiutil
+U java/source/jaiutil/.properties
 U java/source/jaiutil/build.xml
 cvs checkout: Updating java/source/jaiutil/src
 cvs checkout: Updating java/source/jaiutil/src/lib
@@ -5842,6 +5852,7 @@ U java/source/jaiutil/src/testcases/uk/ac/starlink/jaiutil/JUnitJAIHelloWorld.ja
 U java/source/jaiutil/src/testcases/uk/ac/starlink/jaiutil/temp.fits
 U java/source/jaiutil/src/testcases/uk/ac/starlink/jaiutil/temp.xml
 cvs checkout: Updating java/source/jetty
+U java/source/jetty/.properties
 U java/source/jetty/README
 U java/source/jetty/build.xml
 U java/source/jetty/do_import
@@ -6279,6 +6290,7 @@ U java/source/jetty/lib/jetty/org.apache.crimson.jar
 U java/source/jetty/lib/jetty/org.apache.jasper.jar
 U java/source/jetty/lib/jetty/org.mortbay.jetty.jar
 cvs checkout: Updating java/source/jniast
+U java/source/jniast/.properties
 U java/source/jniast/README
 U java/source/jniast/build.xml
 cvs checkout: Updating java/source/jniast/docs
@@ -6386,6 +6398,7 @@ U java/source/jniast/src/testcases/uk/ac/starlink/ast/alcyone.ast
 cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink/ast/xml
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/xml/XAstTest.java
 cvs checkout: Updating java/source/jnihds
+U java/source/jnihds/.properties
 U java/source/jnihds/build.xml
 cvs checkout: Updating java/source/jnihds/docs
 cvs checkout: Updating java/source/jnihds/lib
@@ -6412,6 +6425,7 @@ cvs checkout: Updating java/source/jnihds/src/testcases/uk/ac/starlink/hds
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/HDSObjectTest.java
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/reduced_data1.sdf
 cvs checkout: Updating java/source/jsky
+U java/source/jsky/.properties
 U java/source/jsky/build.xml
 cvs checkout: Updating java/source/jsky/bin
 cvs checkout: Updating java/source/jsky/bin/jsky
@@ -7187,6 +7201,7 @@ U java/source/junit/src/testcases/tests/TextRunnerTest.java
 U java/source/junit/src/testcases/tests/WasRun.java
 U java/source/junit/src/testcases/tests/test.jar
 cvs checkout: Updating java/source/mirage
+U java/source/mirage/.properties
 U java/source/mirage/build.xml
 cvs checkout: Updating java/source/mirage/src
 cvs checkout: Updating java/source/mirage/src/docs
@@ -7202,6 +7217,7 @@ U java/source/mirage/src/main/uk/ac/starlink/mirage/MirageTableWriter.java
 cvs checkout: Updating java/source/mirage/src/script
 U java/source/mirage/src/script/starmirage
 cvs checkout: Updating java/source/ndtools
+U java/source/ndtools/.properties
 U java/source/ndtools/build.xml
 cvs checkout: Updating java/source/ndtools/src
 cvs checkout: Updating java/source/ndtools/src/main
@@ -7228,6 +7244,7 @@ U java/source/ndtools/src/main/uk/ac/starlink/ndtools/Window.java
 cvs checkout: Updating java/source/ndtools/src/script
 U java/source/ndtools/src/script/ndtools
 cvs checkout: Updating java/source/ndx
+U java/source/ndx/.properties
 U java/source/ndx/build.xml
 cvs checkout: Updating java/source/ndx/src
 cvs checkout: Updating java/source/ndx/src/etc
@@ -7292,6 +7309,7 @@ U java/source/pal/src/main/uk/ac/starlink/pal/palError.java
 U java/source/pal/src/main/uk/ac/starlink/pal/palString.java
 U java/source/pal/src/main/uk/ac/starlink/pal/palTime.java
 cvs checkout: Updating java/source/rv
+U java/source/rv/.properties
 U java/source/rv/build.xml
 cvs checkout: Updating java/source/rv/src
 cvs checkout: Updating java/source/rv/src/main
@@ -7302,7 +7320,12 @@ cvs checkout: Updating java/source/rv/src/main/uk/ac/starlink/rv
 U java/source/rv/src/main/uk/ac/starlink/rv/RV.java
 U java/source/rv/src/main/uk/ac/starlink/rv/RVPanel.java
 U java/source/rv/src/main/uk/ac/starlink/rv/RadialVelocity.java
+cvs checkout: Updating java/source/scripts
+U java/source/scripts/echodeps
+U java/source/scripts/packagedeps
+U java/source/scripts/targetdeps
 cvs checkout: Updating java/source/soapserver
+U java/source/soapserver/.properties
 U java/source/soapserver/README
 U java/source/soapserver/build.xml
 cvs checkout: Updating java/source/soapserver/src
@@ -7331,6 +7354,7 @@ U java/source/soapserver/src/testcases/deploy.wsdd
 U java/source/soapserver/src/testcases/runEchoClient.sh
 U java/source/soapserver/src/testcases/runEchoServer.sh
 cvs checkout: Updating java/source/sog
+U java/source/sog/.properties
 U java/source/sog/build.xml
 U java/source/sog/runLocal
 cvs checkout: Updating java/source/sog/src
@@ -7392,6 +7416,7 @@ U java/source/sog/src/testcases/RemoteClientNDX.java
 U java/source/sog/src/testcases/SimpleTest.java
 U java/source/sog/src/testcases/TestWCS.java
 cvs checkout: Updating java/source/splat
+U java/source/splat/.properties
 U java/source/splat/build.xml
 cvs checkout: Updating java/source/splat/src
 cvs checkout: Updating java/source/splat/src/docs
@@ -8252,6 +8277,7 @@ U java/source/src/etc/LICENCE.txt
 U java/source/src/etc/README
 U java/source/src/etc/tags
 cvs checkout: Updating java/source/table
+U java/source/table/.properties
 U java/source/table/build.xml
 cvs checkout: Updating java/source/table/src
 cvs checkout: Updating java/source/table/src/docs
@@ -8466,12 +8492,16 @@ U java/source/task/src/testcases/uk/ac/starlink/task/Arithmetic.java
 cvs checkout: Updating java/source/templates
 U java/source/templates/README
 cvs checkout: Updating java/source/templates/application
+U java/source/templates/application/.properties
 U java/source/templates/application/build.xml
 cvs checkout: Updating java/source/templates/classlibrary
+U java/source/templates/classlibrary/.properties
 U java/source/templates/classlibrary/build.xml
 cvs checkout: Updating java/source/templates/thirdparty
+U java/source/templates/thirdparty/.properties
 U java/source/templates/thirdparty/build.xml
 cvs checkout: Updating java/source/topcat
+U java/source/topcat/.properties
 U java/source/topcat/build.xml
 cvs checkout: Updating java/source/topcat/src
 cvs checkout: Updating java/source/topcat/src/docs
@@ -8642,6 +8672,7 @@ cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/HelpTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/ResourceTest.java
 cvs checkout: Updating java/source/treeview
+U java/source/treeview/.properties
 U java/source/treeview/build.xml
 cvs checkout: Updating java/source/treeview/src
 cvs checkout: Updating java/source/treeview/src/etc
@@ -8887,6 +8918,7 @@ U java/source/treeview/src/testcases/uk/ac/starlink/treeview/TreeviewTest.java
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demopath.cmp
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demotxt.cmp
 cvs checkout: Updating java/source/util
+U java/source/util/.properties
 U java/source/util/build.xml
 cvs checkout: Updating java/source/util/src
 cvs checkout: Updating java/source/util/src/etc
@@ -8952,6 +8984,7 @@ U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/TestCaseTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/XMLUtilTest.java
 cvs checkout: Updating java/source/votable
+U java/source/votable/.properties
 U java/source/votable/build.xml
 cvs checkout: Updating java/source/votable/src
 cvs checkout: Updating java/source/votable/src/main
