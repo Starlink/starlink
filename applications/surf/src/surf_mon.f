@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.23  1997/10/22 02:41:18  timj
+*     Add SCUCLIP and new DESPIKE. Move old despike to despike2.
+*
 *     Revision 1.22  1997/10/14 18:55:26  jfl
 *     added despike
 *
@@ -123,10 +126,6 @@ c
 
       CALL TASK_GET_NAME (NAME, STATUS)
 
-*      IF (NAME .EQ. 'CROSSTALK') THEN
-
-*         CALL SURF_CROSSTALK (STATUS)
-
       IF (NAME .EQ. 'BOLREBIN') THEN
 
          CALL SURF_REBIN (NAME, STATUS)
@@ -148,6 +147,10 @@ c
          CALL SURF_CHGQUAL (STATUS)
 
       ELSE IF (NAME .EQ. 'DESPIKE') THEN
+
+         CALL SURF_REBIN(NAME, STATUS)
+
+      ELSE IF (NAME .EQ. 'DESPIKE2') THEN
 
          CALL SURF_DESPIKE (STATUS)
 
@@ -214,6 +217,10 @@ c
       ELSE IF (NAME .EQ. 'SCUHELP') THEN
 
          CALL SURF_SCUHELP (STATUS)
+
+      ELSE IF (NAME .EQ. 'SCUCLIP') THEN
+         
+         CALL SURF_SCUCLIP (STATUS)
 
       ELSE
          CALL MSG_SETC('TAS', NAME)
