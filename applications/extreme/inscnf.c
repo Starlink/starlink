@@ -359,21 +359,23 @@
 */
 #define MAXTOK 1000                          /* Maximum tokens in a line     */
 #define LINELENG 160
-#define MAXLEVEL 100
 
       int tokid[ MAXTOK ];
       int tokpos[ MAXTOK ];
       char c;
       char *tokstr[ MAXTOK ];
+      int calltok[ MAXNEST ];
       int col;
       int incpos = 0;
       int i;
+      int ilev;
       int j;
+      int k;
       int leng;
       int level;
       int ntok;
       int nval = 0;
-      int stcol[ MAXLEVEL ];
+      int stcol[ MAXNEST ];
       int tok;
       int yleng;
       int bufsiz = 0;
@@ -381,6 +383,8 @@
       char *cpo[ 4 ];
       char *cpc[ 4 ];
       char *pc;
+      char callname[ LINELENG ];
+      char *namestart;
       int scase;
       int sspace;
 
@@ -483,29 +487,90 @@
 /* Otherwise, it is potentially an executable line. */
             else {
 
-/* Check if it contains a %VAL invocation. */
+/* Work through tokens in the line looking for interesting things. */
                for ( i = 0; i < ntok; i++ ) {
+
+/* Keep track of bracket nesting. */
+                  if ( tokid[ i ] == '(' ) {
+                     if ( level < MAXNEST + 1 ) level++;
+                     if ( i && tokid[ i - 1 ] == TOKEN )
+                        calltok[ level ] = i - 1;
+                     else
+                        calltok[ level ] = 0;
+                  }
+                  if ( tokid[ i ] == ')' ) {
+                     if ( level ) level--;
+                  }
+
+/* Do we have a %VAL invocation? */
                   if ( tokmatch( tokid + i, (int) '%', VAL, (int) '(', 0 )
                      && tokid[ i + 3 ] != CNF_PVAL ) {
+
+/* Get name of subroutine being called. */
+                     j = tokpos[ calltok[ level ] + 1 ];
+                     k = LINELENG - 1;
+                     callname[ k-- ] = '\0';
+                     for ( j = tokpos[ calltok[ level ] + 1 ] - 1; 
+                             j > tokpos[ calltok[ level ] ] && k > 0
+                                && ! ( isspace( c = buf[ j ].chr ) );  
+                             j-- )
+                        callname[ k-- ] = c;
+                     namestart = callname + k + 1;
+
+/* Warn if the content of the %VAL looks like an integer. */
+                     if ( tokid[ i + 3 ] == INTEGER_CONSTANT ) {
+                        fprintf( stderr, "%s: Integer %%VAL arg in %s?\n",
+                                 name, namestart );
+                     }
+
+/* Warn if the content of the %VAL looks like it contains a symbolic 
+   constant (i.e. something with two consecutive underscores in its name. */
+                     if ( tokid[ i + 3 ] == TOKEN ) {
+                        for ( j = tokpos[ i + 3 ]; j < tokpos[ i + 4 ] - 1; 
+                              j++ ) {
+                           if ( buf[ j ].chr == '_' && 
+                                buf[ j + 1 ].chr == '_' ) {
+                              fprintf( stderr, 
+                                       "%s: Constant %%VAL arg in %s?\n",
+                                       name, namestart );
+                              break;
+                           }
+                        }
+                     }
+
+/* Infer stylistic conventions used by the source code. */
                      scase = islower( buf[ tokpos[ i + 1 ] ].chr )
                                 ? CASE_LOWER : CASE_UPPER;
                      sspace = buf[ tokpos[ i + 2 ] + 1 ].chr == ' '
                                 ? SPACE_YES : SPACE_NO;
-                     level = 1;
+
+/* Look for the matching bracket. */
+                     ilev = level++;
                      for ( j = i + 3; j < ntok; j++ ) {
                         if ( tokid[ j ] == '(' ) {
                            level++;
                         }
                         else if ( tokid[ j ] == ')' ) {
                            level--;
-                           if ( level == 0 ) {
+
+/* Found the matching bracket.  We can now note the interpolations. */
+                           if ( level == ilev ) {
                               buf[ tokpos[ i + 3 ] ].interp = 
                                  cpo[ scase | sspace ];
                               buf[ tokpos[ j ] ].interp = cpc[ scase | sspace ];
+                              if ( tokid[ j + 1 ] == (int) ')' ) {
+                                 fprintf( stderr, 
+                                          "%s: Last arg %%VAL in %s\n",
+                                          name, namestart );
+                              }
                               nval++;
                               break;
                            }
                         }
+                     }
+                     if ( level != ilev ) {
+                        fprintf( stderr, "%s: Lost track of brackets!\n", 
+                                 name );
                      }
                   }
                }
@@ -543,7 +608,7 @@
       }
       else {
          if ( ! incpos ) 
-            fprintf( stderr, "%s: Failed to include CNF_PAR.\n", name );
+            fprintf( stderr, "%s: Failed to place INCLUDE 'CNF_PAR'\n", name );
       }
 
 /* Pass control to the output routine. */
