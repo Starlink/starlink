@@ -311,7 +311,7 @@
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xmf'
+               TAR_OUT='tar -xf'
                SHARE='.so'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
@@ -332,7 +332,7 @@
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xmf'
+               TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -353,7 +353,7 @@
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xmf'
+               TAR_OUT='tar -xf'
                SHARE='.so.$(LIB_VERS)'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
@@ -374,7 +374,7 @@
                FFLAGS='-O -PIC'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xmf'
+               TAR_OUT='tar -xf'
 	       # Additional libraries needed to link against cfitsio
 	       # (cfitsio_link apparently can't include these on Suns for
 	       # complicated reasons which Martin will explain to you if
@@ -402,7 +402,7 @@
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xmf'
+               TAR_OUT='tar -xf'
                SHARE='.so'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
