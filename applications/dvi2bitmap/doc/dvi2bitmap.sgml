@@ -104,10 +104,14 @@ appropriate.</px></distribution>
 fonts.</px>
 </distribution>
 
+<distribution string="0.10" date="18-May-2003" author=ng versionid='v0-10-0'>
+<px>Enhancement of internal documentation.  Added &ddash;help option.</px>
+</distribution>
+
 </history>
 
 <copyright>
-Copyright 1999, 2000, Council for the Central Laboratories of the
+Copyright 1999--2003, Council for the Central Laboratories of the
 Research Councils.
 </copyright>
 
@@ -1307,7 +1311,7 @@ successfully on (at least):
 </row>
                     <row>
                       <entry>powerpc-apple-darwin6.4 (MacOSX 10.2)</entry>
-                      <entry>0.10b1</entry>
+                      <entry>0.10</entry>
                       <entry>g++ 3.1 20020420 (prerelease)</entry>
                     </row>
 <row>
