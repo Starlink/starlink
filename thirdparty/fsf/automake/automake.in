@@ -2483,10 +2483,10 @@ sub handle_monoliths
               my @ifls = map { $_.'.ifl' } @task_names;
               &pretty_print_rule ($monoifl . ':', "\t\t", @ifls);
               $output_rules .= "\trm -f \$\@\n";
-              $output_rules .= "\techo 'begin monolith' >\$\@\n";
+              $output_rules .= "\techo 'monolith' >\$\@\n";
               $output_rules .= makefile_wrap ("\t", "\t\t",
                                               ('cat', @ifls, '>>$@'));
-              $output_rules .= "\techo 'end monolith' >>\$\@\n";
+              $output_rules .= "\techo 'endmonolith' >>\$\@\n";
               $output_rules .= "\n";
             }
           else
