@@ -1,3 +1,6 @@
+c_calls_f
+cnf_test
+f_calls_c
 config.h
 sun209.ps
 *.lo
