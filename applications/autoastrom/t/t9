@@ -57,7 +57,7 @@ grep -v '\(autoastrom, v\|HTTP proxy\)' ${PREFIX}testndf2.STDOUT
 if test -f ${PREFIX}testndf2.final-fits.fits; then
     ./fitsdump ${PREFIX}testndf2.final-fits.fits
 else
-    echo "Can't find file ${PREFIX}testndf2.final-fits.fits
+    echo "Can't find file ${PREFIX}testndf2.final-fits.fits"
 fi
 
 rm -f ${PREFIX}*
