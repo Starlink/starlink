@@ -29,6 +29,11 @@
       INTEGER   ISTAT
       CHARACTER TITLE*80
 
+*  Gildas not supported. Need to write autoconf test
+      IERR = 68
+      print *,'Gildas support not compiled into specx'
+      RETURN
+
 *  Ok? go...
 
       IF (.NOT. CUBE_IN_MEMORY) THEN
@@ -59,8 +64,8 @@ C       Z       R*4(*)  Data array
 C       ERROR   L       Logical error flag
 C----------------------------------------------------------------------
 
-      CALL GDF_IMAGE (TITLE//'.GDF', NPTS(1), MSTEP, NSTEP, 1,
-     &                 %VAL(CURRENT_CUBE_ADDRESS), GDF_ERROR)
+C      CALL GDF_IMAGE (TITLE//'.GDF', NPTS(1), MSTEP, NSTEP, 1,
+C     &                 %VAL(CURRENT_CUBE_ADDRESS), GDF_ERROR)
 
       RETURN
       END
