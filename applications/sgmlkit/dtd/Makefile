@@ -12,15 +12,11 @@ manifest: CATALOG-override manifest-omit
 	    sed 's,^,dtd/,' >manifest
 
 # CATALOG-override is identical to CATALOG, except that it has 
-# `OVERRIDE YES' at the beginning of it.  This means that public IDs
-# within the catalog override system IDs, which makes it more usable for
-# XML documents, which require a system ID for (for example) DTDs, even when
-# a public ID would be more useful and portable.
-# See <http://www.oasis-open.org/specs/a401.htm> for full discussion.
-CATALOG-override: CATALOG
+# `OVERRIDE YES' at the beginning of it.  See CATALOG-override.header
+# for discussion.
+CATALOG-override: CATALOG CATALOG-override.header
 	rm -f CATALOG-override
-	echo 'OVERRIDE YES' >CATALOG-override
-	cat CATALOG >>CATALOG-override
+	cat CATALOG-override.header CATALOG >CATALOG-override
 
 clean:
 	rm -f CATALOG-override manifest
