@@ -66,11 +66,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *      4 Jan 1996 (DJA):
 *        Original version.
+*     26 Feb 1997 (RB):
+*        Switch on I/O MODE variable for text
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,7 +112,9 @@
       CHARACTER*1		IO			! Access mode
       CHARACTER*1		LMODE			! Local copy of MODE
       CHARACTER*255		NAME, PATH		! Trace info
+      CHARACTER*20		IOSTR
 
+      INTEGER			IOLEN
       INTEGER			CID			! Array cell identifier
       INTEGER			FNDIG			! # digits used in FSTR
       INTEGER			I			! Loop over USI slots
@@ -129,6 +134,16 @@
 *  Make local capitalised copy of mode
       LMODE = MODE(1:1)
       CALL CHR_UCASE( LMODE )
+      IF ( LMODE(1:1) .EQ. 'I' ) THEN
+        IOSTR = 'Input'
+        IOLEN = 5
+      ELSE IF ( LMODE(1:1) .EQ. 'O' ) THEN
+        IOSTR = 'Output'
+        IOLEN = 6
+      ELSE
+        IOSTR = '<unknown mode>'
+        IOLEN = 14
+      END IF
 
 *  Count the number of files matching the mode
       NLINE = 0
@@ -167,8 +182,9 @@
             CALL ADI_CGET0L( PSID, 'TEMP', ISTEMP, STATUS )
             IF ( ISTEMP ) THEN
               CALL ADI_CGET0C( PSID, 'VALUE', NAME, STATUS )
-              CALL ADI_PUT0C( CID, 'Input datset '//FSTR(:FNDIG)//':'//
-     :                      NUL//NAME(:CHR_LEN(NAME))//NUL, STATUS )
+              CALL ADI_PUT0C( CID, IOSTR(:IOLEN)//' datset '//
+     :                        FSTR(:FNDIG)//':'//NUL//
+     :                        NAME(:CHR_LEN(NAME))//NUL, STATUS )
 
             ELSE
 
@@ -181,13 +197,15 @@
 
 *          Construct string separating bits with nulls
               IF ( LEVELS .GT. 1 ) THEN
-              CALL ADI_PUT0C( CID, 'Input dataset '//FSTR(:FNDIG)//':'//
-     :                      NUL//NAME(:CHR_LEN(NAME))//NUL//
-     :                      'Input object '//FSTR(:FNDIG)//':'//NUL//
-     :                      PATH(:CHR_LEN(PATH)), STATUS )
+              CALL ADI_PUT0C( CID, IOSTR(:IOLEN)//' dataset '//
+     :                        FSTR(:FNDIG)//':'//NUL//
+     :                        NAME(:CHR_LEN(NAME))//NUL//
+     :                        IOSTR(:IOLEN)//' object '//FSTR(:FNDIG)//
+     :                        ':'//NUL//PATH(:CHR_LEN(PATH)), STATUS )
               ELSE
-              CALL ADI_PUT0C( CID, 'Input dataset '//FSTR(:FNDIG)//':'//
-     :                        NUL//NAME(:CHR_LEN(NAME)), STATUS )
+              CALL ADI_PUT0C( CID, IOSTR(:IOLEN)//' dataset '//
+     :                        FSTR(:FNDIG)//':'//NUL//
+     :                        NAME(:CHR_LEN(NAME)), STATUS )
               END IF
 
             END IF
