@@ -113,6 +113,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     2-MAR-1999 (RFWS);
 *        Fixed missing STATUS arguments in examples for AST_FINDFRAME
 *        prologue.
+*     18-JUL-1999 (RFWS):
+*        Fixed memory leak in ConvertX.
 *class--
 */
 
@@ -1711,8 +1713,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
    describe the conversion between the "from" and "to" Frames. Then
    simplify the result. */
                   astInvert( to_map );
-                  tmp = (AstMapping *)
-                        astCmpMap( from_map, to_map, 1, "" );
+                  tmp = (AstMapping *) astCmpMap( from_map, to_map, 1, "" );
                   map = astSimplify( tmp );
                   tmp = astAnnul( tmp );
 
@@ -1741,12 +1742,14 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 
 /* Annul pointers to all the intermediate Objects. */
                   map = astAnnul( map );
-                  *map2_address = astAnnul( *map2_address );
                   common2 = astAnnul( common2 );
+                  *map2_address = astAnnul( *map2_address );
                }
-               *map1_address = astAnnul( *map1_address );
+               frame2 = astAnnul( frame2 );
                common1 = astAnnul( common1 );
+               *map1_address = astAnnul( *map1_address );
             }
+            frame1 = astAnnul( frame1 );
             common0 = astAnnul( common0 );
          }
 
