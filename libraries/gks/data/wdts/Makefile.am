@@ -1,0 +1,32 @@
+
+#  To install a new workstation in the WDT, you should add the name of
+# it's WDT file to the variable WDTS below. Check that you have the
+# right range of workstation handlers being made in the drivers
+# makefile.
+
+WDTS = wdt0003 wdt0010 wdt0050 wdt0012 wdt0052 wdt2700 wdt2701 wdt2702	\
+wdt2703 wdt2720 wdt2721 wdt2722 wdt2723 wdt0201 wdt0203 wdt0800		\
+wdt0801 wdt0820 wdt0821 wdt0825 wdt0845 wdt3800 wdt3801 wdt3802		\
+wdt3803 wdt3805 wdt3806 wdt3807 wdt3808 wdt2600 wdt2601 wdt2610		\
+wdt2611 wdt1720 wdt1721
+
+# Need simple version number
+RLSE = $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR)
+
+## Makefile simply needs to build the font database file
+noinst_PROGRAMS = gkswdt
+
+# The create_wdt script could be removed if we simply edited gkswdt
+# such that it didn't asak any questions.
+noinst_SCRIPTS = create_wdt
+
+gkswdt_SOURCES = gkswdt.f
+gkswdt_LDADD = ../../base/libgks_base.la
+
+# Create the font database from the ascii font files
+
+gks.wdt-$(RLSE): gkswdt create_wdt
+	cat $(WDTS) > gkswdt.dat
+	./create_wdt
+	mv gks.wdt gks.wdt-$(RLSE)
+
