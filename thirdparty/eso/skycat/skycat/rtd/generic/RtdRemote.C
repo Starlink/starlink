@@ -45,6 +45,10 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49
 #endif
 #include "RtdRemote.h"
 
+// Fudge socklen_t if not defined.
+#ifndef HAVE_SOCKLEN_T
+typedef socklen_t int;
+#endif
 
 // this call changed in tcl8
 #if (TCL_MAJOR_VERSION >= 8)
@@ -185,11 +189,8 @@ RtdRemote::RtdRemote(Tcl_Interp* interp, int port, int verbose)
 
     // clear out address structures 
     sockaddr_in addr;	// for local socket address    
-#ifdef __alpha
-    int addrSize = (size_t) sizeof(addr);
-#else
-    size_t addrSize = (size_t) sizeof(addr);
-#endif
+    socklen_t addrSize = (socklen_t) sizeof(addr);
+
     memset ((char *)&addr, 0, addrSize);
 
     addr.sin_family = AF_INET;
@@ -250,12 +251,8 @@ RtdRemote::~RtdRemote()
  */
 int RtdRemote::makeStatusFile(sockaddr_in& addr)
 {
-#if defined( __alpha ) || ( defined(__APPLE__) && defined(__MACH__) )
+    socklen_t addrSize = (socklen_t) sizeof(sockaddr_in);
 
-    int addrSize = sizeof(sockaddr_in);
-#else
-    size_t addrSize = sizeof(sockaddr_in);
-#endif
     if (getsockname(socket_, (struct sockaddr *)&addr, &addrSize) == -1) 
 	return sys_error("getsockname");
     
@@ -336,11 +333,7 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-#ifdef __alpha
-        int addrSize = (size_t) sizeof(addr);
-#else
-        socklen_t addrSize = (size_t) sizeof(addr);
-#endif
+        socklen_t addrSize = (socklen_t) sizeof(addr);
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");
