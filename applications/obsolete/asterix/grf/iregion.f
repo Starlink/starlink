@@ -459,7 +459,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL GFX_QCONTOUR(I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
-     :                   %val(I_XPTR),%val(I-YPTR),%val(I_REGPTR),
+     :                   %val(I_XPTR),%val(I_YPTR),%val(I_REGPTR),
      :                                           QUAL_MASK,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
