@@ -171,7 +171,6 @@
       INTEGER			DETID			! Detector configuration
       INTEGER			E_AX			! Energy axis number
       INTEGER			EAPTR			! Energy axis data
-      INTEGER			EDIM			! Size of energy axis
       INTEGER			ERRCOL			! Error column number
       INTEGER			I,J			! Loop variables
       INTEGER			IDPTR			! I/p data
