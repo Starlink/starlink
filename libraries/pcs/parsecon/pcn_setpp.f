@@ -28,6 +28,8 @@
 *     25.02.1991:  Report errors (RLVAD::AJC)
 *     26.02.1992:  _ARRCHAR no longer capitalizes (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
+*     01.02.2004:  Added to CVS repository cvs.starlink.ac.uk.  See there
+*                  for further changes.
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -62,6 +64,16 @@
 *-
 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF ( PARPTR .GT. SUBPAR__MAXPAR ) THEN
+*      We've bust the array bounds
+         STATUS = PARSE__NOMEM
+         CALL EMS_SETI ( 'MAXVP', SUBPAR__MAXPAR )
+         CALL EMS_REP ( 'PCN_SETPP2',
+     :        'PARSECON: Too many ppaths: maximum ^MAXVP',
+     :        STATUS )
+         RETURN                 ! JUMP OUT
+      ENDIF
 
 *   Remove the quotes from ENTRY and force to uppercase.
       CALL STRING_STRIPQUOT ( ENTRY, VALUE, STATUS )

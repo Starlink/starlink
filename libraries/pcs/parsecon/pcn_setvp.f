@@ -33,6 +33,8 @@
 *                  improve error report (RLVAD::AJC)
 *      9.09.1992:  make precedence dynamic, default to match FETCH (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
+*     01.02.2004:  Added to CVS repository cvs.starlink.ac.uk.  See there
+*                  for further changes.
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -67,6 +69,16 @@
 *-
 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF ( PARPTR .GT. SUBPAR__MAXPAR ) THEN
+*      We've bust the array bounds
+         STATUS = PARSE__NOMEM
+         CALL EMS_SETI ( 'MAXVP', SUBPAR__MAXPAR )
+         CALL EMS_REP ( 'PCN_SETVP2',
+     :        'PARSECON: Too many vpaths: maximum ^MAXVP',
+     :        STATUS )
+         RETURN                 ! JUMP OUT
+      ENDIF
 
 *   Remove the quotes from ENTRY and force to uppercase.
       CALL STRING_STRIPQUOT ( ENTRY, VALUE, STATUS )
