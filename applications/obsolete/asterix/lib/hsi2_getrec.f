@@ -179,7 +179,8 @@
               NAME = ADI2_MKIDX( 'HIST', ILINE )
               CALL ADI2_HGKYC( HDUID, NAME, TXT, CMNT, STATUS )
               CALL ADI_CCELL( OARG, 'Text', 1, ILINE, CID, STATUS )
-              CALL ADI_PUT0C( CID, TXT(:MAX(1,CHR_LEN(TXT)))//' ', STATUS )
+              CALL ADI_PUT0C( CID, TXT(:MAX(1,CHR_LEN(TXT)))//' ',
+     :                        STATUS )
               CALL ADI_ERASE( CID, STATUS )
             END DO
           END IF
