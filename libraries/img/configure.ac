@@ -18,7 +18,7 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_FC([], 77)
+AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
