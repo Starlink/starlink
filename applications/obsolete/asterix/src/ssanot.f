@@ -182,7 +182,7 @@
 
 *    Locate NDF to mark
         IF ( MULTI ) THEN
-          CALL GMI_LOCNDF( IFID, NDFS(INDF), GID, STATUS )
+          CALL GMI_LOCNDF( IFID, NDFS(INDF), 'BinDS', GID, STATUS )
         ELSE
           CALL ADI_CLONE( IFID, GID, STATUS )
         END IF

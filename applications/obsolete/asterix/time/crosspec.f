@@ -359,8 +359,8 @@
 *    Create output Multi graph dataset. Need 2 graphs - one for Coherency
 *    the other for Phase information.
       CALL GMI_CREMULT( OFID, 2, STATUS )
-      CALL GMI_LOCNDF( OFID, 1, COFID, STATUS )
-      CALL GMI_LOCNDF( OFID, 2, PHFID, STATUS )
+      CALL GMI_LOCNDF( OFID, 1, '*', COFID, STATUS )
+      CALL GMI_LOCNDF( OFID, 2, '*', PHFID, STATUS )
 
       CALL BDI_PUTTITLE   (COFID, 'Cross Spectrum',     STATUS )
       CALL BDI_PUTLABEL   (COFID, 'Squared Coherency',  STATUS )
