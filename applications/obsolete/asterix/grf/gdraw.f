@@ -950,6 +950,10 @@
         CALL BDI_CHK( ID, 'Axis_1_Data', XOK, STATUS )
 	IF ( .NOT. XOK ) THEN
 	  XREG=.TRUE.
+          XBASE=1.0
+          XSCALE=1.0
+          CALL DYN_MAPR( 1, XDIM, XPTR, STATUS )
+          CALL ARR_REG1R( XBASE, XSCALE, XDIM, %VAL(XPTR), STATUS )
 	ELSE
 	  CALL BDI_MAPR( ID, 'Axis_1_Data', 'READ', XPTR, STATUS )
 	  CALL ARR_CHKREG(%val(XPTR),XDIM,XREG,XBASE,XSCALE,STATUS)
@@ -959,6 +963,10 @@
         CALL BDI_CHK( ID, 'Axis_2_Data', YOK, STATUS )
 	IF ( .NOT. YOK ) THEN
 	  YREG=.TRUE.
+          YBASE=1.0
+          YSCALE=1.0
+          CALL DYN_MAPR( 1, YDIM, YPTR, STATUS )
+          CALL ARR_REG1R( YBASE, YSCALE, YDIM, %VAL(YPTR), STATUS )
 	ELSE IF ( .NOT. YREG ) THEN
 	  CALL BDI_MAPR( ID, 'Axis_2_Data', 'READ', YPTR, STATUS )
 	  CALL ARR_CHKREG(%val(YPTR),YDIM,YREG,YBASE,YSCALE,STATUS)
@@ -1117,6 +1125,14 @@
 	  CALL GFX_SURFACE(XDIM,YDIM,IX1,IX2,IY1,IY2,%val(DPTR),
      :                                                   STATUS)
 	ENDIF
+
+*    Release dynamic axes
+        IF ( .NOT. XOK ) THEN
+          CALL DYN_UNMAP(XPTR,STATUS)
+        END IF
+        IF ( .NOT. YOK ) THEN
+          CALL DYN_UNMAP(YPTR,STATUS)
+        END IF
 
 	IF (STATUS.NE.SAI__OK) THEN
 	  CALL AST_REXIT('GDRAW_2DGRAF_INT',STATUS)
