@@ -8,10 +8,10 @@
 # This makefile can be best run from the mk script in the parent
 # directory, which handles platform-specific setting of the following
 # variables.
-FC=f77
-CC=gcc
-FFLAGS=
-ADDNETLIBS=
+FC=@F77@
+CC=@CC@
+FFLAGS=@FFLAGS@
+ADDNETLIBS=@LIBS@
 
 all: test
 
