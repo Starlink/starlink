@@ -54,6 +54,14 @@
       global CCDsetindices
       global CCDsetindicesvalid
 
+#  Check that there is some data.
+      set exists 0
+      if { ! [info exists CCDallndfs] || [llength $CCDallndfs] == 0 } {
+         CCDIssueInfo \
+            "No frames have been selected,\nimport some into the system"
+         return
+      }
+
 #------------------------------------------------------------------------------
 #  Widget creation.
 #------------------------------------------------------------------------------
@@ -106,8 +114,35 @@
 #  Widget configuration.
 #------------------------------------------------------------------------------
 
+#  Menu configuration.
+      $Menu addcommand File {Close Window} "$Control invoke Cancel"
+      $Menu addcommand File {Accept Window} "$Control invoke OK"
+      $Menu addcommand File {Exit} CCDExit
+      $Menu addcommand Options {Configure Set size...} \
+         "CCDGetSetIndices $Top.getsize 1"
+      $Menu addcheckbutton Options {Write CCD_SET alignment coordinate frame} \
+         -variable CCDaddwcs
+
+#  Add buttons to choice widgets.
+      set newsetbutton "New Set\n  ->  "
+      set appendbutton "Append\n  ->  "
+      set unsetbutton "De-Set\n  <-  "
+      $Transfer addbutton $newsetbutton
+      $Transfer addbutton $appendbutton
+      $Transfer addbutton $unsetbutton
+      $Autoset addbutton "By Container"
+      $Autoset addbutton "By Order"
+      $Autoset addbutton "Reset"
+      $Control addbutton "Cancel"
+      $Control addbutton "OK"
+
+#  We must post the widget now so that the waiting notification window
+#  posted by the SHOWSET invocation can position itself properly.
+      wm deiconify $top
+
 #  Run SHOWSET to determine the Set header content of all the NDFs which
-#  we know about.
+#  we know about.  This has to be done before the button bindings since
+#  we need to know how many NDFs there are.
       set tmpfile1 SHOWSET.NDFS
       set tmpfile2 SHOWSET.OUT
       CCDNameListFile $tmpfile1 $CCDallndfs
@@ -165,7 +200,7 @@
 
 #  Now go through the NDFs we read in from the file, and write into
 #  the setted listbox any which already have Set headers.
-      foreach sname [array names setname] {
+      foreach sname [lsort -dictionary [array names setname]] {
          $Setbox insert end ""
          CCDItemSetIndex $Setbox end SET
          foreach ndf $setname($sname) {
@@ -174,47 +209,48 @@
          }
       }
 
-#  Menu configuration.
-      $Menu addcommand File {Close Window} "$Control invoke Cancel"
-      $Menu addcommand File {Accept Window} "$Control invoke OK"
-      $Menu addcommand File {Exit} CCDExit
-      $Menu addcheckbutton Options {Write CCD_SET alignment coordinate frame} \
-         -variable CCDaddwcs
-
 #  Bind button for moving NDFs into Setted list.
-      $Transfer addbutton "New Set\n  ->  " \
+      $Transfer addcommand $newsetbutton \
          "CCDNewSet $Unsetbox $Setbox \[$Unsetbox curselection\]
          "
 
-#  Bind button for moving NDFs out of Setted list; this erases all the
-#  elements in the current selection of the box, then goes through the
-#  list removing any Set heading lines which now have no members. 
-      $Transfer addbutton "De-Set\n  <-  " \
-         "foreach sel \[lsort -integer -decreasing \[$Setbox curselection\]\] {
-            set setted \[$Setbox get \$sel\]
-            for {set i 0} {\$i < $nndfs} {incr i} {
-               set unsetted \[$Unsetbox get \$i\]
-               if {\$setted == \$unsetted} {
-                  CCDItemSetIndex $Unsetbox \$i {}
-               }
-            }
-            $Setbox clear \$sel
-          }
-          set pos 0
-          while {\$pos < \[$Setbox size\]} {
-             if {\[lindex \[CCDItemSetIndex $Setbox \$pos\] 0\] == \"SET\" &&
-                  ( \[lindex \[CCDItemSetIndex $Setbox \[expr \$pos+1\]\] 0\] \
-                                                               == \"SET\" ||
-                   \$pos == \[expr \[$Setbox size\] - 1\] )} {
-                $Setbox clear \$pos
-             } else {
-                incr pos
-             }
-          }
+#  Bind button for moving a single NDF into Setted list.
+      $Transfer addcommand $appendbutton \
+         "CCDAddSetItems $Unsetbox $Setbox \[$Unsetbox curselection\]
          "
 
+#  Bind button for moving NDFs out of Setted list; this erases all the
+#  elements in the current selection of the box except for Sett headling
+#  lines, then goes through the list removing any Set heading lines 
+#  which now have no members. 
+      $Transfer addcommand $unsetbutton \
+         "foreach sel \[lsort -integer -decreasing \[$Setbox curselection\]\] {
+             if {\[lindex \[CCDItemSetIndex $Setbox \$sel\] 0\] != \"SET\"} {
+                set setted \[$Setbox get \$sel\]
+                for {set i 0} {\$i < $nndfs} {incr i} {
+                set unsetted \[$Unsetbox get \$i\]
+                   if {\$setted == \$unsetted} {
+                      CCDItemSetIndex $Unsetbox \$i {}
+                   }
+                }
+                $Setbox clear \$sel
+             }
+          }
+          CCDPurgeEmptySets $Setbox
+         "
+
+#  Bind a double-click on the setted list to de-set the selected item.
+      $Setbox bind list <Double-Button-1> "+ 
+         $Transfer invoke \"$unsetbutton\"
+      "
+
+#  Bind a double-click on the unsetted list to append the selected item.
+      $Unsetbox bind list <Double-Button-1> "+
+         $Transfer invoke \"$appendbutton\"
+      "
+
 #  Bind HDS container grouping button.
-      $Autoset addbutton "By Container" \
+      $Autoset addcommand "By Container" \
          "$Autoset invoke Reset
           catch {unset container}
           set conts {}
@@ -234,7 +270,7 @@
          "
 
 #  Bind ordered grouping button.
-      $Autoset addbutton "By Order" \
+      $Autoset addcommand "By Order" \
          "CCDGetSetIndices $Top.getsize
           set size \[llength \$CCDsetindices\]
           if { \$size > 0 && \$CCDsetindicesvalid } {
@@ -251,7 +287,7 @@
 
 #  Bind Reset button; empties the setted list and ensures all the entries
 #  in the unsetted list have no Set Index annotations.
-      $Autoset addbutton "Reset" \
+      $Autoset addcommand "Reset" \
          "$Setbox clear 0 end
           for {set i 0} {\$i < $nndfs} {incr i} {
              CCDItemSetIndex $Unsetbox \$i {}
@@ -259,22 +295,23 @@
          "
 
 #  Bind Cancel button.
-      $Control addbutton "Cancel" "$Top kill $Top"
+      $Control addcommand "Cancel" "$Top kill $Top"
 
 #  Bind Accept button.
-      $Control addbutton "OK" \
+      $Control addcommand "OK" \
          "CCDDoAddSetHeaders $Top $Unsetbox $Setbox $args"
 
 #------------------------------------------------------------------------------
 #  Define any help for this window.
 #------------------------------------------------------------------------------
-
+      $Top sethelp ccdpack CCDAddSetHeadersWindow
+      $Menu sethelpitem {On Window} ccdpack CCDAddSetHeadersWindow
+      $Menu sethelp all ccdpack CCDAddSetHeadersMenu
 
 #------------------------------------------------------------------------------
 #  Use widgets.
 #------------------------------------------------------------------------------
 #  Cause a wait for this window.
-      wm deiconify $top
       CCDWindowWait $Top
 
 #  End of procedure.
