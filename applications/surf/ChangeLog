@@ -1,5 +1,18 @@
+2002-03-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Fix the
+	problem with SCUBA2MEM and SC (finally).
+
+2001-09-25  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_skydip_temperatures.F
+	(SCULIB_SKYDIP_TEMPERATURES): Calculate the variance on an
+	individual measurement [not tested]
+
 2001-10-29  Tim Jenness  <timj@jach.hawaii.edu>
 
+	********** V1.6-8 ******************
+	
 	* src/surf_scan_rlb.f (SURF_SCAN_RLB): We now have POLMAP
 
 	* src/surf_despike.f (SURF_DESPIKE): We now have POLMAP
@@ -7,6 +20,8 @@
 	* starlink/surf.news: Update for 1.6-8
 
 	* scripts/remdbm.pl: Support ARDMASK from kappa 0.18
+
+	* makefile: Now link against KAPLIBS
 
 2001-04-09  Tim Jenness  <timj@jach.hawaii.edu>
 

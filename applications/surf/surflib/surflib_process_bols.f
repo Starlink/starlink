@@ -281,6 +281,10 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.13  2002/03/11 21:18:48  timj
+*     - finally fix the problem with SC chopping and SCUBA2MEM [the IF clause was
+*     wrong]
+*
 *     Revision 1.12  2001/02/22 03:12:27  timj
 *     Trap AZ centre coords for clock error correction
 *
@@ -1343,7 +1347,7 @@
 *     If this is SCUBA2MEM and we are requesting multiple beams
 *     then we do not want to fiddle with the data
                   IF (SCAN_REVERSAL .AND. CHOP_CRD .EQ. 'SC'
-     :                 .AND. N_POS_BEAMS .GT. 1) THEN
+     :                 .AND. N_POS_BEAMS .EQ. 1) THEN
                      IF (FLIP) THEN
                         IF (STATUS .EQ. SAI__OK) THEN
                            ITEMP = N_BOL * (EXP_END - EXP_START + 1)
