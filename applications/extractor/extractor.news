@@ -1,16 +1,24 @@
 1 Update to EXTRACTOR
 
- EXTRACTOR has been updated to work with SExtractor 2.3.2.
+ Changes in release 2.3-1.
 
- This updates the native SExtractor command to include Large File Support
- and support for MEFs. The MEF support differs to that previously available
- in that it now scans a complete MEF file in a single pass.
+    EXTRACTOR will now work with images that have Dec,RA coordinate systems
+    (previously it would only work with RA,Dec systems, but these could have
+    any orientation and could therefore appear as Dec,RA).
+ 
+ Changes in release 2.3.
+ 
+    EXTRACTOR has been updated to work with SExtractor 2.3.2.
 
- An error previously limited EXTRACTOR input file names to 20 characters,
- this has now been corrected.
+    This updates the native SExtractor command to include Large File Support
+    and support for MEFs. The MEF support differs to that previously available
+    in that it now scans a complete MEF file in a single pass.
 
- The EXTRACTOR major version number has been changed to reflect that of the
- version of SExtractor that it is based on.
+    An error previously limited EXTRACTOR input file names to 20 characters,
+    this has now been corrected.
+
+    The EXTRACTOR major version number has been changed to reflect that of the
+    version of SExtractor that it is based on.
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
