@@ -99,7 +99,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract locator
-      CALL ADI_CGET0C( ID, 'Locator', STATUS )
+      CALL ADI_CGET0C( ID, 'Locator', LOC, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_GETLOC', STATUS )

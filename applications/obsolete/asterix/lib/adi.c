@@ -4798,7 +4798,7 @@ ADIobj adix_exemth( ADIobj generic, ADIobj method,
     if ( _valid_q(disp) )               /* Generic has defined Fortran dispatch? */
       res = ((ADIfGenericDispatchCB) _eprc_prc(disp) )( &_eprc_prc(mth->exec), &narg, args, status );
     else                                /* Use default arg passing */
-      res = ((ADIfMethodCB) _eprc_prc(mth->exec) )( &narg, args, status );
+      ((ADIfMethodCB) _eprc_prc(mth->exec) )( &narg, args, res, status );
     }
 
   return res;                           /* Return the result */
