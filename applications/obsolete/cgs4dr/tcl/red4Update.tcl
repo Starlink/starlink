@@ -244,6 +244,7 @@ proc red4Update {item value} {
       selection clear $Red4Widgets(FC_ENT02) 
       $Red4Widgets(FC_ENT02) delete 0 end
       $Red4Widgets(FC_ENT02) insert end 0.0
+      set Red4Widgets(FC_IN) 0.0
       set Red4Widgets(FC_FIN) "J"
       set Red4Widgets(FC_FOUT) "W/m2/um"
     } elseif {[string trim ${value}] == "FC_ENT01"} {
@@ -254,6 +255,7 @@ proc red4Update {item value} {
       selection clear $Red4Widgets(FC_ENT02) 
       $Red4Widgets(FC_ENT02) delete 0 end
       $Red4Widgets(FC_ENT02) insert end 0.0
+      set Red4Widgets(FC_IN) 0.0
     } elseif {[string trim ${value}] == "FC_FIN"} {
       set Red4Widgets(FC_FIN) "J"
     } elseif {[string trim ${value}] == "FC_FOUT"} {

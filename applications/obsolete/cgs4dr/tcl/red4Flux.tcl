@@ -97,7 +97,7 @@ proc red4Flux {taskname} {
         cgs4drInform $taskname "red4Flux error : A dataset has not been specified properly!"
       } else {
         set out $Red4Widgets(SP)_fc
-        set flux [string trim [$Red4Widgets(FC_ENT02) get]]
+        set Red4Widgets(FC_IN) [string trim [$Red4Widgets(FC_ENT02) get]]
         set band $Red4Widgets(FC_FIN)
         set iun $Red4Widgets(FC_FIN)
         if {$band=="J" || $band=="H" || $band=="K" || $band=="L" || $band=="L'" || $band=="M" || $band=="N"} {
@@ -108,7 +108,7 @@ proc red4Flux {taskname} {
         set uout $Red4Widgets(FC_FOUT)
         set message "Flux calibrating $Red4Widgets(SP) into $out"
         cgs4drInform $taskname $message
-        set param "input=$Red4Widgets(SP) output=$out flux=$flux band=$band input_units=$iun output_units=$uout"
+        set param "input=$Red4Widgets(SP) output=$out flux=$Red4Widgets(FC_IN) band=$band input_units=$iun output_units=$uout"
         $taskname obey flux_calibrate "$param" -inform "cgs4drInform $taskname %V"
       }
     }
