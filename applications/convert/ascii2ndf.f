@@ -112,7 +112,9 @@
 *     The details of the conversion are as follows:
 *        -  the text-file array is written to the NDF array as
 *        selected by COMP.  When the NDF is being modified, the shape
-*        of the new component must match that of the NDF.
+*        of the new component must match that of the NDF.  Up to 32766
+*        bytes per record can be input (this is set by the size of the
+*        input buffer).
 *        -  If the input file contains a FITS-like header, and a new
 *        NDF is created, i.e. COMP = "Data", the header records are
 *        placed within the NDF's FITS extension.  This enables more
