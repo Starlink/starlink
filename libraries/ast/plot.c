@@ -372,6 +372,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *       "GetUse<attr>" function returning the NO<attr> constant if not set.
 *       - Modified Axplot so that SkyFrames positions which are out of
 *       their normal ranges are not rejected by Map1.
+*       - Only use tick marks which are within the axis range given by the
+*       Bottom and Top Axis attributes.
 *class--
 */
 
@@ -9931,6 +9933,8 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
    double centre;     /* The axis value at the first tick mark */
    double f;          /* The nearest acceptable tick mark index */
    double val[ 2 ];   /* Axis values to be normalised */
+   double bot;        /* Lowest axis value to be displayed */
+   double top;        /* Highest axis value to be displayed */
    int k;             /* Tick mark index */
    int lnfill;        /* Last used value for nfill */
    int nfill;         /* No of tick marks to extend by at edges of coverage */
@@ -9967,20 +9971,13 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
       nfill = (int) (0.1*(double) nticks );
    }
 
-/* Check latitude values for SkyFrames. */
-   if( astIsASkyFrame( frame ) ){
-      if( axis == astGetLatAxis( frame ) ) {
-         r = ticks;
-         for( k = 0; k < nticks; k++ ){
-            if( *r != AST__BAD ) {
-               val[ axis ] = *r;
-               val[ 1 - axis ] = refval;
-               astNorm( frame, val );
-               if( !EQUAL( val[ axis ], *r ) ) *r = AST__BAD;
-            }
-            r++;
-         }
-      }
+/* Remove ticks which are not within the axis ranges to be displayed. */
+   bot = astGetBottom( frame, axis );
+   top = astGetTop( frame, axis );
+   r = ticks;
+   for( k = 0; k < nticks; k++ ){
+      if( *r != AST__BAD && ( *r < bot || *r > top ) ) *r = AST__BAD;
+      r++;
    }
 
 /* Use the Mapping to place each tick mark value in its primary domain.
@@ -13813,10 +13810,12 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    double *lengths;       /* Pointer to lengths of each curve section */
    double *starts;        /* Pointer to start of each curve section */
    double *ticks;         /* Pointer to tick mark values */
+   double bot;            /* Lowest axis value to display */
+   double end;            /* Axis value at end of curve section */
+   double top;            /* Highest axis value to display */
    int i;                 /* Tick mark index */
    int j;                 /* Axis index */
    int k;                 /* Section index */
-   int lonax;             /* Index of longitude axis, or -1 */
    int nticks;            /* Number of tick marks */
 
 /* Check the global status. */
@@ -13858,15 +13857,16 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    next tick mark (23:59:59 in the RA example) and extends upto the next
    missing tick mark, or the last tick mark if none are missing. */
 
-/* If the current Frame is a SkyFrame, note the index of the longitude
-   axis. */
+/* Get the current frame. */
       fr = astGetFrame( this, AST__CURRENT );
-      lonax = astIsASkyFrame( fr ) ? astGetLonAxis( fr ) : -1;
-      fr = astAnnul( fr );
 
 /* Find the start and length of each section of the curve for each tick
    mark on axis "j". */
       for( j = 0; j < 2 && astOK; j++ ){
+
+/* Find the axis range to display on the other axis. */
+         bot = astGetBottom( fr, 1 - j );
+         top = astGetTop( fr, 1 - j );
 
 /* Get a pointer to the major tick mark values on the other axis ("1-j"), 
    together with the number of them. */
@@ -13903,16 +13903,14 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
                lengths[ k ] = ticks[ i - 1 ] - starts[ k ];   
 
 /* The section is extended at start and end by one gap in order to "cover
-   up the joins". This is only done for the latitude axes of SkyFrames. */
-               if( j != lonax ) {
-                  starts[ k ] -= gap[ 1 - j];
-                  lengths[ k ] += 2.0*gap[ 1 - j ]; 
-               }
-
-/* The section is extended at start and end by one gap in order to "cover
-   up the joins". */
+   up the joins". Limit this to the displayed range of the axis. */
                starts[ k ] -= gap[ 1 - j];
-               lengths[ k ] += 2.0*gap[ 1 - j ];
+               lengths[ k ] += 2.0*gap[ 1 - j ]; 
+
+/* Limit the start and end to the displayed range of the axis. */
+               end = starts[ k ] + lengths[ k ];
+               starts[ k ] = MIN( top, MAX( bot, starts[ k ] ) );
+               lengths[ k ] = MIN( top, MAX( bot, end ) ) - starts[ k ];
 
 /* Increment the number of sections. */
                k++;
@@ -13923,6 +13921,9 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
       
          }
       }   
+
+/* Annull the current frame. */
+      fr = astAnnul( fr );
 
    }
 
