@@ -1,19 +1,13 @@
 *+  DYN_CMN - internal common blocks for DYN_ system
 
-      INTEGER DYN_NMAX
-      PARAMETER (DYN_NMAX=500)
+      INTEGER 			DYN_NMAX
+        PARAMETER 		( DYN_NMAX = 500 )
 
       LOGICAL			DYN_ISINIT		! Sub-system initialised?
 
-      STRUCTURE /DYN_LIST/
-        INTEGER PTR			! pointer to start of dynamic memory
-        INTEGER NITEM                   ! number of items
-        INTEGER NPAGE			! number of pages allocated
-        INTEGER NBYTE			! number of bytes actually used
-        LOGICAL SECTION			! whether disk-file section used
-        CHARACTER*(DAT__SZLOC) LOC	! locator to disk-file
-      ENDSTRUCTURE
+      INTEGER			DYS_PTR(DYN_NMAX)	! Section pointers
+      INTEGER			DYS_NBYTE(DYN_NMAX)	! Section total bytes
+      INTEGER			DYS_FID(DYN_NMAX)	! Section file handle
 
-      RECORD /DYN_LIST/ LIST(DYN_NMAX)
-      INTEGER NPTR
-      COMMON /DYN_CMN/ NPTR,DYN_ISINIT,LIST
+*  Word aligned items
+      COMMON /DYN_CMN_1/	DYN_ISINIT, DYS_PTR, DYS_NBYTE, DYS_FID
