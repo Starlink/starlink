@@ -5,7 +5,7 @@ INTERFACE HGET
     POSITION 1
     PPATH 'GLOBAL'
     PROMPT 'Object name'
-    help 'Full path name of object to be displayed'
+    HELP 'Full path name of object to be displayed'
     ASSOCIATION '<->GLOBAL.HDSOBJ'
    ENDPARAMETER
 
@@ -16,6 +16,7 @@ INTERFACE HGET
      VPATH 'PROMPT'
      PPATH 'DEFAULT'
      PROMPT 'Attribute'
+     HELP 'Enter one of PRIM, STRUC, NDIM, DIMS, NELM, TYP, VAL, MIN or MAX'
    ENDPARAMETER
 
    PARAMETER ATTR
@@ -37,6 +38,12 @@ INTERFACE HGET
      PPATH 'DEFAULT'
      PROMPT 'Echo attribute value to console'
      HELP 'Useful in UNIX scripts'
+   ENDPARAMETER
+
+   PARAMETER VERSION
+     TYPE '_LOGICAL'
+     DEFAULT N
+     VPATH 'INTERNAL,NOPROMPT'
    ENDPARAMETER
 
 ENDINTERFACE
