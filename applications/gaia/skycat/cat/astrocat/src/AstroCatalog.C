@@ -11,6 +11,10 @@
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 01 May 03  Added "ws" and "hs" to get width and
  *                            height in arcsecs (2MASS image servers)
+ * Peter W. Draper 10 Dec 03  Moved "delete cat" in nameToWorldCoords
+ *                            so that it is performed after the last
+ *                            reference to "cat" (->equinox()). 
+ *                            Started crashing query subprocess.
  */
 static const char* const rcsId="@(#) $Id: AstroCatalog.C,v 1.36 1999/03/11 20:59:14 abrighto Exp $";
 
@@ -257,8 +261,8 @@ int AstroCatalog::nameToWorldCoords(
 	return ERROR;
     }
 
-    delete cat;
     pos = WorldCoords(ra, dec, cat->equinox());
+    delete cat;
     return 0;
 }
 
