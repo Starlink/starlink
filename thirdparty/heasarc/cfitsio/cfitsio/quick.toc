@@ -1,0 +1,25 @@
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {section}{\numberline {2}Installing and Using CFITSIO}{3}
+\contentsline {section}{\numberline {3}Example Programs}{4}
+\contentsline {section}{\numberline {4}CFITSIO Routines}{6}
+\contentsline {subsection}{\numberline {4.1}Error Reporting}{6}
+\contentsline {subsection}{\numberline {4.2}File Open/Close Routines}{6}
+\contentsline {subsection}{\numberline {4.3}HDU-level Routines}{7}
+\contentsline {subsection}{\numberline {4.4}Image I/O Routines}{9}
+\contentsline {subsection}{\numberline {4.5}Table I/O Routines}{12}
+\contentsline {subsection}{\numberline {4.6}Header Keyword I/O Routines}{18}
+\contentsline {subsection}{\numberline {4.7}Utility Routines}{21}
+\contentsline {section}{\numberline {5}CFITSIO File Names and Filters}{22}
+\contentsline {subsection}{\numberline {5.1}Creating New Files}{22}
+\contentsline {subsection}{\numberline {5.2}Opening Existing Files}{23}
+\contentsline {subsection}{\numberline {5.3}Image Filtering}{25}
+\contentsline {subsubsection}{\numberline {5.3.1}Extracting a subsection of an image}{25}
+\contentsline {subsubsection}{\numberline {5.3.2}Create an Image by Binning Table Columns}{25}
+\contentsline {subsection}{\numberline {5.4}Table Filtering}{27}
+\contentsline {subsubsection}{\numberline {5.4.1}Column and Keyword Filtering}{27}
+\contentsline {subsubsection}{\numberline {5.4.2}Row Filtering}{28}
+\contentsline {subsubsection}{\numberline {5.4.3}Good Time Interval Filtering}{31}
+\contentsline {subsubsection}{\numberline {5.4.4}Spatial Region Filtering}{31}
+\contentsline {subsubsection}{\numberline {5.4.5}Example Row Filters}{33}
+\contentsline {subsection}{\numberline {5.5}Combined Filtering Examples}{35}
+\contentsline {section}{\numberline {6}CFITSIO Error Status Codes}{37}
