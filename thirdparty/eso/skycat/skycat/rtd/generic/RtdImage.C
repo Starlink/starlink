@@ -55,6 +55,8 @@
  *                           requested one and would not otherwise be
  *                           installed. 
  *                 30/05/01  Added "double" as a valid data type.
+ * Allan Brighton  30/07/01  Fixed problem with X shared memory, ssh and X11 forwarding:
+ *                           (X shm areas are not freed, so don't use them in this case)
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $";
 
@@ -622,9 +624,13 @@ RtdImage::RtdImage(Tcl_Interp* interp, const char* instname, int argc, char** ar
     gethostname(hostname, sizeof(hostname));
     int n = strlen(hostname);
     char* display = DisplayString(display_);
-    if (display[0] == ':' ||
-	(strncmp(hostname, display, n) == 0 && display[n] == ':')) {
-	haveXShm_ = XShmQueryExtension(display_);
+
+    // allan: 7/01: check for screen number "0", since when using X11 forwarding with ssh,
+    // the display is set to something like "host:10:0" - a proxy server, and the X shared
+    // memory is never freed.
+    if (display[0] == ':' || 
+        (strncmp(hostname, display, n) == 0 && display[n] == ':' && display[n+1] == '0')) {
+        haveXShm_ = XShmQueryExtension(display_);
     }
 
 #ifdef DEBUG
