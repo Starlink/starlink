@@ -111,9 +111,9 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
-      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/ADI_PAR'
-      INCLUDE '/star/include/prm_par'
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+      INCLUDE 'PRM_PAR'
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -466,7 +466,7 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Import:
       INTEGER			OID, N
