@@ -2,7 +2,7 @@
      :     BOL_RA, BOL_DEC, STATUS)
 *+
 *  Name:
-*     EXTRACT_DATA
+*     SURF_WRITE_DATA
 
 *  Purpose:
 *     Write bolometer positions and values to text file
@@ -19,10 +19,12 @@
  
 *  Description:
 *     This routine writes the value, variance and position of each
-*     data point to a ASCII file.
+*     data point to a ASCII file. It is called as part of the EXTRACT_DATA
+*     task.
 *     The interface is the same as that used in the REBIN task.
 *     The data and variance are in volts. The positions are in radians.
-*     The data are written out as columns: RA DEC DATA VAR
+*     The data are written out as columns (RA DEC DATA VAR) and subsets 
+*     can be extracted by using SCUBA sections.
  
 *  Arguments:
 *     FD = INTEGER (Given)

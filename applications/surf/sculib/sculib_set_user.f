@@ -15,14 +15,13 @@
 *     matrix (see NAG manual for further info). That routine obtains the
 *     data needed for its calculations via the USER array passed into it,
 *     and this routine fills USER with the necessary numbers:-
-*
-*      USER (1) = J_TEL
-*      USER (2) = J_ATM
-*      USER (3) = not used
-*      USER (4:M+3)      = the measured airmasses 
-*      USER (M+4:2M+3)   = the measured sky temperatures 
-*      USER (2M+4:3M+3)  = the errors on the measured sky temperatures
-*
+*      - USER (1) = J_TEL
+*      - USER (2) = J_ATM
+*      - USER (3) = not used
+*      - USER (4:M+3)      = the measured airmasses 
+*      - USER (M+4:2M+3)   = the measured sky temperatures 
+*      - USER (2M+4:3M+3)  = the errors on the measured sky temperatures
+
 
 *  Invocation:
 *     CALL SCULIB_SET_USER (J_TEL, J_ATM, N_MEASUREMENTS,
@@ -41,15 +40,8 @@
 *             the brightness temperature of the atmosphere at each airmass
 *     J_MEAS_V (N_MEASUREMENTS) = REAL (Given)
 *             the variance on J_MEAS_D
-*     USER (3 * N_MEASUREMENTS + 3)
-*                               = DOUBLE PRECISION (Returned)
+*     USER (3 * N_MEASUREMENTS + 3) = DOUBLE PRECISION (Returned)
 *             the USER array required
-
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -57,6 +49,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

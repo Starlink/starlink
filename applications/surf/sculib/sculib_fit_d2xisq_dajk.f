@@ -16,9 +16,9 @@
 *     [A(J)+DELTA_AJ,A(K)-DELTA_AK] and [A(J)-DELTA_AJ,A(K)-DELTA_AK]. The
 *     result is then calculated using the formula:-
 *
-*  D2XISQ_DAJK = XISQ (AJ+DELTA_AJ,AK+DELTA_AK) - XISQ (AJ-DELTA_AJ,AK+DELTA_AK)
-*               -XISQ (AJ-DELTA_AJ,AK+DELTA_AK) + XISQ (AJ-DELTA_AJ,AK-DELTA_AK)
-*                ---------------------------------------------------------------
+*      D2XISQ_DAJK = XISQ (AJ+DELTA_AJ,AK+DELTA_AK) - XISQ (AJ-DELTA_AJ,AK+DELTA_AK)
+*          _    -XISQ (AJ-DELTA_AJ,AK+DELTA_AK) + XISQ (AJ-DELTA_AJ,AK-DELTA_AK)
+*                .---------------------------------------------------------------
 *                                    4 * DELTA_AJ * DELTA_AK
 *
 *     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is 
@@ -29,8 +29,7 @@
 *    :  D2XISQ_DAJK, STATUS)
 
 *  Arguments:
-*     XISQ_ROUTINE (XISQ, N, A, STATUS)
-*                             = EXTERNAL ROUTINE (Given)
+*     XISQ_ROUTINE (XISQ, N, A, STATUS) = EXTERNAL ROUTINE (Given)
 *           name of routine that will calculate xi-squared
 *     N                       = INTEGER (Given)
 *           the number of parameters in the fit
@@ -45,18 +44,18 @@
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

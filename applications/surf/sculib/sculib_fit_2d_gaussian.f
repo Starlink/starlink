@@ -15,13 +15,17 @@
 *     0th and 1st order moments of the image on the map. Map pixels with
 *     bad quality are ignored. 
 *
-*         0th order = sum [f(i,j)], where i,j are the pixel indices
+*         0th order = sum [f(i,j)], 
 *
-*         1st order in x = sum [x * f(i,j)], where x is the x position of pixel
-*                                            i,j
+*     where i,j are the pixel indices
 *
-*         1st order in y = sum [y * f(i,j)], where y is the y position of pixel
-*                                            i,j
+*         1st order in x = sum [x * f(i,j)], 
+*
+*     where x is the x position of pixel i,j
+*
+*         1st order in y = sum [y * f(i,j)], 
+*
+*     where y is the y position of pixel i,j
 *
 *     If the 0th order moment of the image was 0, i.e. there is no image on
 *     the map, then a warning message will be output and all image parameters 
@@ -29,7 +33,7 @@
 *     calculated from:-
 *
 *         X_CENTRE = 1st order in x
-*                    --------------
+*                   .--------------
 *                      0th order
 *
 *     Similarly for Y_CENTRE.
@@ -37,11 +41,15 @@
 *     With this information the 2nd order moments can be calculated about the
 *     centre of the image:-
 *
-*         2nd order in x = sum [x^2 x f(i,j)], where x is now the distance of 
-*                                              pixel i,j from X_CENTRE
+*         2nd order in x = sum [x^2 x f(i,j)], 
+
+*     where x is now the distance of 
+*     pixel i,j from X_CENTRE
 *
-*         2nd order in y = sum [y^2 x f(i,j)], where y is now the distance of 
-*                                              pixel i,j from Y_CENTRE
+*         2nd order in y = sum [y^2 x f(i,j)], 
+*
+*     where y is now the distance of 
+*     pixel i,j from Y_CENTRE
 *
 *     If the image had a 2D Gaussian profile, f = A exp -ax^2*x^2 exp -ay^2*y^2
 *     then it can be shown that for x:-
@@ -99,19 +107,20 @@
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1994,1995,1996,1997 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 *  History:
 *     $Id$

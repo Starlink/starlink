@@ -14,10 +14,10 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     SUBROUTINE SURF_REQUEST_OUTPUT_COORDS( TASK, PARLONG, PARLAT,
+*     CALL SURF_REQUEST_OUTPUT_COORDS( TASK, PARLONG, PARLAT,
 *    :     OUT_COORDS, LAT_OBS, DEF_RA_CEN, DEF_DEC_CEN, MJD, HOURS,
 *    :     OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, OUT_LONG, OUT_LAT,
-*    :     STATUS )
+*    :     STATUS)
 
 
 *  Description:
@@ -74,6 +74,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/19 03:37:44  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.3  1999/08/03 20:01:39  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.

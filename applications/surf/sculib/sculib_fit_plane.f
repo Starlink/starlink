@@ -51,17 +51,17 @@
 *        MX = nv.sum(y^2).sum(xz) - sum(y^2).sum(x).sum(z) -
 *               sum(y).sum(y).sum(xz) - nv.sum(xy).sum(yz) + 
 *               sum(xy).sum(y).sum(z) + sum(x).sum(y).sum(yz)
-*             -------------------------------------------------
+*            .-------------------------------------------------
 *             sum(xy).sum(x).sum(y) - nv.sum(xy).sum(xy) +
 *               sum(x).sum(y).sum(xy) - sum(x).sum(x).sum(y^2) +
 *               nv.sum(x^2).sum(y^2) + sum(x^2).sum(y).sum(y)
 *
 *        MY = nv.sum(yz) - sum(y).sum(z) + MX.[sum(x).sum(y) - nv.sum(xy)]
-*             ------------------------------------------------------------
+*            .------------------------------------------------------------
 *                         nv.sum(y^2) - sum(y).sum(y)
 *           
 *         C = sum(z) - MX.sum(x) - MY.sum(y)
-*             ------------------------------
+*            .------------------------------
 *                       nv
 *
 *        where nv is the number of valid data points. If the denominator of the

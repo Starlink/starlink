@@ -54,15 +54,17 @@
 *     date (given by MJD_STANDARD).
 *
 *     There is some complication for moving sources (use PL output coords):
+*
 *      For JIGGLE:
-*       1) Calculate map RA/Dec at new MJD
-*       2) Convert to tangent plane offsets for this map centre
+*       -[1] Calculate map RA/Dec at new MJD
+*       -[2] Convert to tangent plane offsets for this map centre
 *
 *      For SCAN:
-*       1) Calculate array centre for reference MJD
-*       2) Calculate tangent offsets of array centre relative to map centre
-*       3) Calculate map centre at the interpolated MJD
-*       4) Work out array centre given new map centre
+*       -[1] Calculate array centre for reference MJD
+*       -[2] Calculate tangent offsets of array centre relative to map centre
+*       -[3] Calculate map centre at the interpolated MJD
+*       -[4] Work out array centre given new map centre
+*
 *      This is all because the file stores RA start and end relative
 *      to the fixed centre at the start of the observation.
 
@@ -241,15 +243,17 @@
 *     This routine tries to deal with  the different versions of
 *     SCUCD (only affects SCAN/MAP data).
 *     For version 0:
+*
 *       RA/Decs of the scan were incorrectly stored as RJ. They
 *       are converted to RD before further processing.
 *       The coordinate frame of RA1, RA2, DEC1 and DEC2 fro SCAN/MAP
 *       depends on the CENTRE_COORDS of the observation. For CENTRE=RD
-*       the * scan positions are in RD; for CENTRE=RB,RJ,GA the scans
-*       are in RJ * and for centre=AZ the scans are in AZ.
+*       the scan positions are in RD; for CENTRE=RB,RJ,GA the scans
+*       are in RJ and for centre=AZ the scans are in AZ.
 *       (SCULIB_SCAN_2_RD)
 
 *     For version 1.0:
+*
 *       A bug was introduced concerning the calculation of the
 *       ends of the scans. The bug is recreated and inverted in order
 *       to compensate. (SCULIB_FIX_SCAN_V10)
@@ -272,6 +276,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.8  1999/08/19 03:37:49  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.7  1999/08/06 02:29:06  timj
 *     Tweak headers for use with PROLAT.
 *

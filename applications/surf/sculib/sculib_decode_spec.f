@@ -23,12 +23,12 @@
 *     will be of the form {<component>;<component>;...}, where components
 *     are one of the following:-
 *     
-*     B<index_spec>   - specifying bolometer indices
-*     P<index_spec>   -            position indices
-*     S<index_spec>   -            switch indices
-*     E<index_spec>   -            exposure indices
-*     I<index_spec>   -            integration indices
-*     M<index_spec>   -            measurement indices
+*     - B<index_spec>   - specifying bolometer indices
+*     - P<index_spec>   -            position indices
+*     - S<index_spec>   -            switch indices
+*     - E<index_spec>   -            exposure indices
+*     - I<index_spec>   -            integration indices
+*     - M<index_spec>   -            measurement indices
 *     
 *     and the <index_spec> is a list like, for example, 2,5:7,17 to select
 *     indices 2, 5 through 7 and 17. Alternatively, <index_spec> can be *
@@ -39,27 +39,25 @@
 *     empty data-spec {} will return all components selected. Example
 *     data-specs are:-
 *     
-*       {}                        select all data
-*       {B7,12;P57}               select data for bolometers 7 and 12 at
+*      - "{}               -         select all data
+*      - "{B7,12;P57}"     -          select data for bolometers 7 and 12 at
 *                                 measurement position 57
-*       {S2;E1;I3:M2}             select data for all bolometers in
+*      - "{S2;E1;I3:M2}"   -          select data for all bolometers in
 *                                 switch 2 of exposure 1 of integration 3
 *                                 in measurement 2 of the observation
-*       {B29}                     select all data for bolometer 29
-*       {B29;E1}                  select data for bolometer 29 in the
+*      - "{B29}"           -          select all data for bolometer 29
+*      - "{B29;E1}"        -          select data for bolometer 29 in the
 *                                 first exposure of each integration
 *     
 *     The data-spec is case-insensitive and blanks are ignored.
 *     
 *     Errors will occur:-
 *     
-*       If you attempt to select indices outside the dimensions input to
+*      - If you attempt to select indices outside the dimensions input to
 *       the routine. 
-*     
-*       If you attempt to select data both by position Pxxx and by switch
+*      - If you attempt to select data both by position Pxxx and by switch
 *       Sxxx, exposure Exxx, integration Ixxx or measurement Mxxx.
-*     
-*       If you attempt to select by switch Sxxx when the SWITCH_EXPECTED
+*      - If you attempt to select by switch Sxxx when the SWITCH_EXPECTED
 *       flag is input .FALSE.
 *     
 *     Output consists of a flag POS_SELECTED, to say whether or not the
@@ -115,6 +113,7 @@
 
 *  Authors:
 *     John Lightfoot (jfl@roe.ac.uk)
+*     Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 *  Copyright:
@@ -124,6 +123,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.7  1999/08/19 03:37:07  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.6  1999/08/03 19:34:55  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

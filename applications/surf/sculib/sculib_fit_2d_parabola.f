@@ -14,11 +14,13 @@
 *     z = A0 + A1 * (x - X0)**2 + A1 * (y - Y0)**2
 *
 *     The apex of the parabola is at X0,Y0 and its value there is A0.
+*
 *        If status is good on entry the routine will work through the data
 *     calculating the various sums required for the least-squares method.
 *     Data with bad quality or zero variance are ignored. If no `good' data
 *     are found then an error will be reported and the routine will return
 *     with bad status. 
+*
 *        A matrix equation of the form M * B = Z is constructed, where:-
 *
 *           M =
@@ -29,7 +31,7 @@
 *
 *     S[y/var]         S[xy/var]         S[y^2/var]       S[(x^2y+y^3)/var]
 * 
-*     S[(x^2+y^2)/var] S[(x^3+xy^2)/var] S[(x^y+y^3)/var] S[(x^2+y^2)^2/var]
+*     S[(x^2+y^2)/var] S[(x^3+xy^2)/var] S[(x^2y+y^3)/var] S[(x^2+y^2)^2/var]
 *
 *
 *           B = A0 + A1 * X0^2 + A1 * Y0^2
@@ -52,11 +54,10 @@
 *     where x, y, z and var are the x,y coords, value and variance of the 
 *     measured points and S[...] denotes the sum of the expression over all
 *     valid points.
+*
 *        SCULIB_INVERT_MATRIX is called to invert the matrix and
 *     SCULIB_FIT_MULT to multiply Z by the inverse. This yields the fitted
 *     value for B from which the other fit parameters are derived.
-*        NOTE that if the variances are not a true reflection of the errors
-*     on the data then very strange numbers can result.
 
 *  Invocation:
 *     CALL SCULIB_FIT_2D_PARABOLA (N, DATA, VARIANCE, QUALITY,
@@ -92,11 +93,10 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 
-*  Method:
 
-*  Deficiencies:
-
-*  Bugs:
+*  Notes:
+*     If the variances are not a true reflection of the errors
+*     on the data then very strange numbers can result.
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -104,6 +104,13 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

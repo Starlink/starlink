@@ -43,7 +43,7 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           Global status
 
-*    Authors :
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T.Jenness (timj@jach.hawaii.edu)
 
@@ -54,6 +54,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.6  1999/08/19 03:36:59  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.5  1999/08/03 19:34:43  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

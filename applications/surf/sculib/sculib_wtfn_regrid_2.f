@@ -25,12 +25,11 @@
 *     The weighting function is stored in a lookup table indexed
 *     by the square of the distance and is parametrized by RES,
 *     WEIGHTSIZE, SCLSZ and WTFN.
-*     Here is a description:
+*
 *     This is an image space implementation of fourier techniques.
 *     In Fourier terms the technique could be described
 *     as follows:-
-*
-*     1. Do a 2-d discrete Fourier transform of the data points. The result
+*     -[1] Do a 2-d discrete Fourier transform of the data points. The result
 *     is a repeating pattern made up of copies of the transform of
 *     the map as a continuous function, each copied displaced from its
 *     neighbours by 1/dx, where dx is the sample spacing of the input points
@@ -40,32 +39,29 @@
 *     aliased spectra and this constraint leads to the Nyquist sampling
 *     criterion.
 *
-*     2. We want to derive the 'continuous map' so that map values on the new
+*     -[2] We want to derive the 'continuous map' so that map values on the new
 *     grid mesh can be derived. Do this by multiplying the transform of the
 *     data by a function that has zero value beyond a radius of 0.5/dx from the
 *     origin. This will get rid of all the repeats in the pattern and leave
 *     just the transform of the 'continuous map'.
 *
-*     3. Do an inverse FT on the remaining transform for the points where you
+*     -[3] Do an inverse FT on the remaining transform for the points where you
 *     wish the resampled points to be (note: FFTs implicitly assume that the
 *     data being transformed DO repeat ad infinitum so we'd have to be careful
 *     when using them to do this).
 *
 *     The analogue of these process steps in image space is as follows:
-*
-*     1. Nothing.
-*     2. Convolve the input data with the FT of the function used to isolate
-*     the 'continuous map' transform.
-*     3. Nothing.
+*     -[1] Nothing.
+*     -[2] Convolve the input data with the FT of the function used to isolate
+*     the `continuous map' transform.
+*     -[3] Nothing.
 
 *     If the method is done properly, the rebinned map is in fact the map on
 *     the new sample mesh that has the same FT as the continuous function
 *     going through the original sample points.
 *
-*     Convolution Functions
-*     ---------------------
-*
-*     Bessel 
+*     Convolution Functions:-
+*     -[Bessel]
 *     For good data and with no time constraint on reduction the best
 *     convolution function would be one whose FT is a flat-topped cylinder in
 *     frequency space, centred on the origin and of a radius such that
@@ -77,7 +73,6 @@
 *     a large map, except near the edges. Edge effects can be removed by
 *     pretending that the map extends further - of course, this only works if
 *     you know what data the pretend map area should contain, i.e. zeros. 
-*     
 *     Another problem with a Bessel function arises from the fact that it does
 *     truncate the FT of the map sharply. If the data are good then there 
 *     should be nothing but noise power at the truncation radius and the 
@@ -85,8 +80,7 @@
 *     has spikes (power at all frequencies in the FT) or suffers from seeing 
 *     effects such that the data as measured DO have power beyond the 
 *     truncation radius, then this will cause ringing in the rebinned map.
-*     
-*     Gaussian 
+*     -[Gaussian]
 *     In fact, any function that is finite in frequency space will have
 *     infinite extent in image space (I think). As such they will all
 *     drag in some power from the aliased versions of the map transform
@@ -158,6 +152,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.14  1999/08/19 03:37:33  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.13  1999/08/06 02:24:52  timj
 *     Tweak headers for use with PROLAT.
 *

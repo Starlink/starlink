@@ -13,11 +13,10 @@
 *     truncated at the used length.
 *
 *     The tidying involves:-
-*
-*       calling CHR_CLEAN to remove non-printable characters.
-*       replacing all HT (tab) characters by spaces.
-*       truncating the string at the character before a COMCHAR character, if 
-*       present (the characters after COMCHAR are assumed to be comments).
+*      - calling CHR_CLEAN to remove non-printable characters.
+*      - replacing all HT (tab) characters by spaces.
+*      - truncating the string at the character before a COMCHAR character, if 
+*        present (the characters after COMCHAR are assumed to be comments).
 *
 
 *  Invocation:
@@ -31,11 +30,6 @@
 *     LENGTH     = INTEGER (Returned)
 *           the length of the string, ignoring trailing blanks
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -43,6 +37,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

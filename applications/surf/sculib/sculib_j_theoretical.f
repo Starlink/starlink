@@ -20,7 +20,7 @@
 *       Jatm = Jamb * Xg 
 *
 *       Xg   = 1 + hscale * Tlapse * exp (-tauz * airmass / Xgconst)
-*                  ---------------
+*                 .---------------
 *                      Tamb
 *
 *        hscale = 2km
@@ -34,12 +34,12 @@
 *   
 *     The routine will return immediately if entered with bad status.
 *     Errors will be reported and bad status returned if:-
-*       TAUZ is less than 0
-*       AIRMASS is less than 0
-*       WAVELENGTH is less than or equal to 0
-*       T_AMB is less than or equal to 0
-*       ETA_TEL is outside the range 0 to 1
-*       B is outside the range 0 to 1
+*       - TAUZ is less than 0
+*       - AIRMASS is less than 0
+*       - WAVELENGTH is less than or equal to 0
+*       - T_AMB is less than or equal to 0
+*       - ETA_TEL is outside the range 0 to 1
+*       - B is outside the range 0 to 1
 *
 
 *  Invocation:
@@ -66,11 +66,6 @@
 *     STATUS              = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (JFL@ROE)
@@ -79,12 +74,21 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *  History:
 *     $Id$
 *     6-JAN-1995: Original version
 *    24-JUL-1996: modified to use correct function (JFL).
 *    $Log$
+*    Revision 1.3  1999/08/19 03:37:16  timj
+*    Header tweaks to ease production of SSN72 documentation.
+*
 *    Revision 1.2  1999/08/03 19:35:11  timj
 *    Add copyright message to header.
 *    Convert old header style to new.

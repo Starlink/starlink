@@ -26,12 +26,6 @@
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL), adapted from transputer routine by IAS.
 
@@ -43,6 +37,13 @@
 *  History:
 *     $Id$
 *    endhistory
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *-
 

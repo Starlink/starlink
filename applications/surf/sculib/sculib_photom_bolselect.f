@@ -17,13 +17,15 @@
 *     the arrays describing which bolometers have been selected. Then it will
 *     call SCULIB_BOLSELECT to get the chan/ADC numbers of the bolometers
 *     directly specified in BOLOMETERS.
+*
 *       The observer can specify between 1 and 3 bolometers by name. Otherwise
 *     an error will be reported and the routine will return with bad status. 
 *     Likewise, if any of these directly selected bolometers have bad quality
 *     or have identical Nasmyth offsets.
-*       Now the routine branches on the number of directly selected bolometers:-
 *
-*      3 bolometers specified. In this case the observer must want to chop 
+*     Now the routine branches on the number of directly selected bolometers:-
+*
+*      - 3 bolometers specified. In this case the observer must want to chop 
 *      between 3 bolometers on an array.
 *        All 3 bolometers should belong to a single array, if not the routine
 *      will error and return with bad status. The routine will arbitrarily 
@@ -45,8 +47,7 @@
 *        Lastly, the routine will set the bolometers to actually be measured
 *      to all those belonging to the array(s) containing the bolometers
 *      already selected.
-*
-*      2 bolometers specified. In this case the observer must want to observe 
+*      - 2 bolometers specified. In this case the observer must want to observe 
 *      a source by chopping between the 2 named bolometers. 
 *        The routine will arbitrarily call the first of the 2 bolometers
 *      the `middle' projected bolometer, the second `right'. Then it will
@@ -59,8 +60,7 @@
 *      Nasmyth, the bolometer spacing to the distance between the 
 *      directly selected bolometers, the chopper position angle is set, and 
 *      the instrument `centre' to the Nasmyth coords of the middle bolometer.
-*
-*      1 bolometer specified. In this case the observer must want to observe 
+*      - 1 bolometer specified. In this case the observer must want to observe 
 *      a source without chopping between different bolometers.
 *        The routine will arbitrarily call the primary selected bolometer
 *      the `middle' projected bolometer. `Left' and `right' bolometers will
@@ -157,18 +157,18 @@
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -4,7 +4,7 @@
      :     DATA_PTR, QUALITY_PTR, SKY_PTR, SKY_ERR, BADBIT, STATUS )
 *+
 *  Name:
-*     CALCSKY
+*     SURF_GRID_CALCSKY
 
 *  Purpose:
 *     Calculate sky contribution from median image
@@ -38,11 +38,13 @@
 *     Since the sky signal is expected to vary on timesales of the
 *     order of one second, an option is included for smoothing the
 *     sky signal. This is especially useful for scan map data where
-*     samples are taken at 7.8~Hz. 
+*     samples are taken at 7.8 Hz. 
 *     
 
 
 *  Arguments:
+*     TSKNAME = CHARACTER (Given)
+*       Name of task to be used in output messages
 *     N_FILES = INTEGER (Given)
 *       Number of data sets (ie files)
 *     N_PTS ( N_FILES ) = INTEGER (Given)
@@ -185,6 +187,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.8  1999/08/19 03:37:42  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.7  1999/08/03 20:36:42  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.

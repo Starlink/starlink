@@ -66,12 +66,6 @@
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 
@@ -84,6 +78,13 @@
 *     $Id$
 *     7-OCT-1995: original version
 *    endhistory
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *-
 

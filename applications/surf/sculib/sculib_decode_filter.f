@@ -11,9 +11,11 @@
 *  Description:
 *     This routine decodes the filter name to give the name and central 
 *     wavelength of the filter in front of each sub-instrument being used.
+*
 *        The filter name should be in format <short>:<long> where these
 *     are the names of the filters in front of the short and long-wave
 *     focal planes. 
+*
 *        <short > can be:-  '350'     short wavelength = 350.0  name = '350'
 *                           '450'                        450.0         '450'
 *                           '600'                        600.0         '600'
@@ -60,11 +62,10 @@
 *     STATUS                   = INTEGER (Given and returned)
 *           global status
 
-*  Method:
+*  Notes:
+*     The wavelength values are probably out of step with those currently 
+*     in use by the real-time system.
 
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -72,6 +73,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

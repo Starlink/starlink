@@ -22,11 +22,15 @@
 *     This routine will get the value of a specified FITS character keyword
 *     held in the FITS extension of an NDF file. The FITS extension must
 *     have been read into the input array FITS before this routine is called.
+*
 *        The routine assumes that each line in the FITS array will contain
 *     a string with format:-
-*      KEYWORD= 'VALUE'           / this is a comment
-*     The string is extracted from between the quotes and the '/ is not
+*
+*      "KEYWORD= 'VALUE'           / this is a comment"
+*
+*     The string is extracted from between the quotes and the '/' is not
 *     required.
+*
 *     It will search the input array for a line containing the required
 *     keyword and return VALUE. If the keyword is not found and error will
 *     be reported and bad status returned. If the keyword is found but the
@@ -62,6 +66,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.5  1999/08/19 03:37:13  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.4  1999/08/06 02:24:44  timj
 *     Tweak headers for use with PROLAT.
 *

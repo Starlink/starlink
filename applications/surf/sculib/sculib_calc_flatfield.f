@@ -12,13 +12,16 @@
 *     This routine calculates the image parameters from data taken as a 
 *     flat-field measurement of a SCUBA bolometer. It takes as input data a 
 *     map made of a point source with pixels on a square grid.
+*
 *        If status is good on entry, the routine will set default return values
 *     to VAL__BADR except QUALITY set to 0. As progress is made through the
 *     routine the various image quantities will be set to their derived values,
 *     and QUALITY will be set to 1 if any problem is encountered.
+*
 *        An attempt will then be made to estimate the 0 level of the image by 
 *     averaging valid data points in the corners of the map area. If there are 
 *     any such points then the 0 level will be subtracted from the map.
+*
 *        Next the routine will calculate the 0th and 1st order moments of the 
 *     image on the map. Map pixels with bad quality are ignored. 
 *
@@ -36,7 +39,7 @@
 *     of the image is calculated from:-
 *
 *         X_CENTRE = 1st order in x        Y_CENTRE = 1st order in y
-*                    --------------                   --------------
+*                   .--------------                  .--------------
 *                      0th order                        0th order
 *
 *     With this information the image can be analysed further by one of
@@ -66,8 +69,9 @@
 *     fit to the data. An error will be reported and QUALITY set to 1
 *     if there are any problems with the fit process. The fitted function
 *     is :-
+*
 *              P * exp (-(x-X_CENTRE)**2 - (y-Y_CENTRE)**2)
-*                       ----------------------------------
+*                      -----------------------------------
 *                                  SIGMA**2
 *
 *     where SIGMA is an ellipse with semi-axis lengths A and B, with THETA
@@ -123,18 +127,18 @@
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -46,29 +46,31 @@
 * 
 *     Errors will be reported and bad status returned if -
 *
-*       there are too many words in BOLOMETERS
+*      - there are too many words in BOLOMETERS
 *
-*       BOLOMETERS is empty
+*      - BOLOMETERS is empty
 *
-*       if when bolometers are selected by type -
+*      - if when bolometers are selected by type
 *          no detectors of the desired type are found in the database
 *
-*       if the type selected refers to a single bolometer (P1100, P1300, 
-*       P2000, SHORT_DC, LONG_DC, P1100_DC, P1300_DC, P2000_DC) -
+*      - if the type selected refers to a single bolometer (P1100, P1300, 
+*       P2000, SHORT_DC, LONG_DC, P1100_DC, P1300_DC, P2000_DC)
 *          more than bolometer of the required type is found in the database
 *
-*       if bolometers are selected by ID, e.g. a15 -
+*      - if bolometers are selected by ID, e.g. a15,
 *          the ID or range of IDs is bad
 *
 *          
 *     Warnings will be reported but good status returned if -
 *        
-*       any selected bolometer has undefined attributes (type, calib, dU3, or 
+*      - any selected bolometer has undefined attributes (type, calib, dU3, or 
 *       dU4)
 *
-*       CENTRE_DU3, CENTRE_DU4 are set to 'bad' values (they will be reset
+*      - CENTRE_DU3, CENTRE_DU4 are set to 'bad' values (they will be reset
 *       to 0 too)
 *
+
+*  Notes:
 *     The routine will not work properly if the input BOLOMETERS string 
 *     is more than 400 characters long.
 *
@@ -128,18 +130,18 @@
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL), adapted from transputer routine by IAS.
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

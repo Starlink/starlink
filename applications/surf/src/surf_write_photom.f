@@ -59,22 +59,17 @@
 *           the number of measurements in the observation
 *     N_INTEGRATIONS         = INTEGER (Given)
 *           the number of integrations in the observation
-*     PEAK_D (MAX_INT, MAX_BEAM)
-*                            = REAL (Given)
+*     PEAK_D (MAX_INT, MAX_BEAM) = REAL (Given)
 *           the fitted peak value for each integration with each 
 *           bolometer
-*     PEAK_V (MAX_INT, MAX_BEAM)
-*                            = REAL (Given)
+*     PEAK_V (MAX_INT, MAX_BEAM) = REAL (Given)
 *           the variance on PEAK
-*     PEAK_X (MAX_INT, MAX_BEAM)
-*                            = REAL (Given)
+*     PEAK_X (MAX_INT, MAX_BEAM) = REAL (Given)
 *           the x offset of the fitted peak for each integration with
 *           each bolometer
-*     PEAK_Y (MAX_INT, MAX_BEAM)
-*                            = REAL (Given)
+*     PEAK_Y (MAX_INT, MAX_BEAM) = REAL (Given)
 *           the y offset of the fitted peak
-*     PEAK_Q (MAX_INT, MAX_BEAM)
-*                            = BYTE (Given)
+*     PEAK_Q (MAX_INT, MAX_BEAM) = BYTE (Given)
 *           the quality of each fitted peak (0 is good)
 *     BEAM_WEIGHT (MAX_BEAM) = REAL (Given)
 *           the weights assigned to the measurements with each bolometer
@@ -98,10 +93,6 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-*  Deficiencies:
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     Tim Jenness (JACH)
@@ -113,12 +104,18 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.10  1999/08/19 03:37:45  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.9  1999/08/03 20:01:45  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
 *
 *     13-MAR-1996: original version
 *    endhistory
+
+*  Bugs:
+
 
 *-
 

@@ -9,15 +9,15 @@
 *  Description:
 *     This routine returns a string containing the names of the bolometers
 *     to be measured in a SKYDIP observation.
+*
 *        Only those sub-instruments that are looking out through a suitable
 *     filter will be measured. Thus, if the filter in front of the SHORT
 *     array is '350' or '450' the returned string will contain the word
 *     SHORT_DC. Other filter/sub/bolometer combinations are as follows:-
-*
-*       600 or 750 or 850 in front of the LONG array gives LONG_DC
-*       1100 in front of the P1100 photometer gives        P1100_DC
-*       1300 in front of the P1300 photometer gives        P1300_DC
-*       2000 in front of the P2000 photometer gives        P2000_DC
+*       - 600 or 750 or 850 in front of the LONG array gives LONG_DC
+*       - 1100 in front of the P1100 photometer gives        P1100_DC
+*       - 1300 in front of the P1300 photometer gives        P1300_DC
+*       - 2000 in front of the P2000 photometer gives        P2000_DC
 *
 *     The returned BOLOMETERS string will contain the words for each
 *     sub-instrument to be measured separated by commas.
@@ -34,11 +34,6 @@
 *     STATUS                    = INTEGER (Given and returned)
 *                global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -46,6 +41,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

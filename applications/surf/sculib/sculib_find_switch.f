@@ -26,8 +26,7 @@
 *    :  S_START, S_END, STATUS)
 
 *  Arguments:
-*     DEMOD_POINTER (N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS)
-*                           = INTEGER (Given)
+*     DEMOD_POINTER (N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS) = INTEGER (Given)
 *           an array of pointers to the start of each switch
 *     N_SWITCHES            = INTEGER (Given)
 *           the number of switches per exposure
@@ -54,12 +53,6 @@
 *     STATUS                = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 
@@ -67,9 +60,19 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *  History:
 *     $Id$
+*     $Log$
+*     Revision 1.6  1999/08/19 03:37:08  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     25-JUL-1995: original version.
 *    endhistory
 

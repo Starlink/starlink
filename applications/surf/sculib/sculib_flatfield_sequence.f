@@ -19,6 +19,7 @@
 *     bolometers to be measured and `ref' the reference bolometer on the array.
 *     If the sub-instrument is one of the photometry pixels then only that
 *     bolometer will be measured.
+*
 *        Whatever bolometer is the target of the measurement, data will be 
 *     taken from all A/D channels. 
 *
@@ -26,6 +27,7 @@
 *     the bolometers to be measured and the sub-instruments involved. If
 *     the bolometers belong to more than one sub-instrument an error will
 *     be reported and bad status returned. 
+*
 *        If the sub-instrument is one of the arrays then the name of the
 *     reference bolometer will be read from parameters LONGREF_BOL or
 *     SHORTREF_BOL as appropriate. The number of measurements and their 
@@ -33,11 +35,13 @@
 *     FLAT_ADC. If the sub-instrument is not one of the arrays then the 
 *     reference bolometer will not be used and the bolometers(s) will be 
 *     measured in sequence.
+*
 *        For each measurement of a target bolometer data will be taken from
 *     all data channels; BOLS_MEASURED is set to `ALL' and SCULIB_BOLSELECT
 *     called to decode this to channel and ADC numbers. A check is made
 *     that the reference bolometer, if used, is among those being measured.
 *     If not, an error message will be output and bad status returned.
+*
 *        Lastly, the FLAT_INDEX array is set so that it points to the
 *     position in the datablock of data from the target bolometer at each 
 *     measurement.
@@ -69,19 +73,16 @@
 *           the dU4 coord of each bolometer
 *     BOL_QUAL (NUM_CHAN,NUM_ADC) = INTEGER (Given)
 *           the quality of each bolometer
-*     BOL_ENABLED (NUM_CHAN,NUM_ADC)
-*                                 = LOGICAL (Returned)
+*     BOL_ENABLED (NUM_CHAN,NUM_ADC) = LOGICAL (Returned)
 *           .TRUE. if a bolometer is to be measured
 *     BOLS_MEASURED               = CHARACTER*(*) (Returned)
 *           the bolometers to be measured for each FLATFIELD measurement
 *     N_BOLS                      = INTEGER (Returned)
 *           the number of bolometers to be measured at each measurement
-*     BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC)
-*                                 = INTEGER (Returned)
+*     BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC) = INTEGER (Returned)
 *           the channel numbers of the bolometers to be measured at each
 *           measurement
-*     BOL_SELECT_ADC (NUM_CHAN * NUM_ADC)
-*                                 = INTEGER (Returned)
+*     BOL_SELECT_ADC (NUM_CHAN * NUM_ADC) = INTEGER (Returned)
 *           the A/D numbers of the bolometers to be measured at each measurement
 *     N_SUBS                      = INTEGER (Returned)
 *           the number of sub-instruments being used
@@ -93,24 +94,15 @@
 *           A/D number of reference bolometer
 *     N_MEASUREMENTS              = INTEGER (Returned)
 *           the number of measurements in this FLATFIELD observation
-*     FLAT_CHAN (2 * NUM_CHAN * NUM_ADC)
-*                                 = INTEGER (Returned)
+*     FLAT_CHAN (2 * NUM_CHAN * NUM_ADC) = INTEGER (Returned)
 *           the channel number of the target bolometer in each measurement
-*     FLAT_ADC (2 * NUM_CHAN * NUM_ADC)
-*                                 = INTEGER (Returned)
+*     FLAT_ADC (2 * NUM_CHAN * NUM_ADC) = INTEGER (Returned)
 *           the A/D number of the target bolometer in each measurement
-*     FLAT_INDEX (2 * NUM_CHAN * NUM_ADC)
-*                                 = INTEGER (Returned)
+*     FLAT_INDEX (2 * NUM_CHAN * NUM_ADC) = INTEGER (Returned)
 *           the index in the datablock of the target bolometer in each
 *           measurement
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
-
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (JFL/ROE).
@@ -118,6 +110,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

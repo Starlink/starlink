@@ -13,14 +13,13 @@
 *     or the inverse of the mask. This is used to mask scuba sections.
 
 *  Invocation:
-*     CALL SCULIB_SET_QUAL (QUALITY, N_BOLS, N_POS, N_BEAM, 
+*     CALL SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS, N_BEAM, 
 *    :  BOL_S, POS_S, BIT_POS, BIT_SWITCH, STATUS)
 
 *  Arguments:
 *     USE_SECT                = LOGICAL (Given)
 *           am I changing SECTION or .NOT. SECTION
-*     QUALITY (N_BOLS, N_POS, N_BEAM)
-*                             = BYTE (Given and returned)
+*     QUALITY (N_BOLS, N_POS, N_BEAM) = BYTE (Given and returned)
 *           the quality array
 *     N_BOLS                  = INTEGER (Given)
 *           number of bolometers measured
@@ -42,11 +41,6 @@
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -55,9 +49,19 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *  History:
-*    endhistory
+*     $Log$
+*     Revision 1.6  1999/08/19 03:37:25  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
+
 
 *-
 

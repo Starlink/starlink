@@ -12,18 +12,18 @@
 *     from an ASCII file named in FILE. The format of each line in the file 
 *     that contains sky information is assumed to be:-
 *
-*        FIT1 <qual> <sub_inst> <filter> <eta_tel> <b> <tauz> <date> <day> <run>
+*      FIT1 <qual> <sub_inst> <filter> <eta_tel> <b> <tauz> <date> <day> <run>
 *       
 *     Errors will be reported and bad status returned if;
 *
-*       there is an error opening or reading the file
-*       <qual> is not an integer
-*       <sub-inst> is not one of SHORT, LONG, P1100, P1300, P2000
-*       <eta_tel> does not convert to a real
-*       <b> does not convert to a real
-*       <tauz> does not convert to a real
-*       <day> does not convert to a double
-*       <run> does not convert to an integer
+*       - there is an error opening or reading the file
+*       - <qual> is not an integer
+*       - <sub-inst> is not one of SHORT, LONG, P1100, P1300, P2000
+*       - <eta_tel> does not convert to a real
+*       - <b> does not convert to a real
+*       - <tauz> does not convert to a real
+*       - <day> does not convert to a double
+*       - <run> does not convert to an integer
 *
 *     The value of tauz returned for a given filter will be the good
 *     quality entry (<qual> = 0) with the highest associated <day> number
@@ -62,18 +62,18 @@
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -90,12 +90,12 @@
 *     This routine calculates the apparent RA and dec of a specified set
 *     of bolometers. It does this by:-
 *
-*          calculating the offsets that must be added to the bolometer
+*        - calculating the offsets that must be added to the bolometer
 *          positions to cater for the fact that the origin of the bolometer
 *          coordinate system may be offset from the `centre' specified by
 *          RA_CENTRE , DEC_CENTRE. 
 *
-*          Three types of offsets may be added; Nasmyth offsets which are 
+*        - Three types of offsets may be added; Nasmyth offsets which are 
 *          simply subtracted from the bolometer coordinates, azimuth offsets
 *          which are subtracted from the bolometer positions in az and el, 
 *          or offsets in a coordinate system fixed relative to the sky, 
@@ -103,16 +103,16 @@
 *          latter are added to the bolometer coordinates when they are in
 *          the form of tangent plane coords in apparent RA,Dec.
 *
-*          working out the elevation and parallactic angle for the sidereal
+*        - working out the elevation and parallactic angle for the sidereal
 *          time and apparent RA, dec of the `centre'.
 *
-*          calculating the Nasmyth offset of each bolometer, then rotating
+*        - calculating the Nasmyth offset of each bolometer, then rotating
 *          them into tangent plane offsets in azimuth and elevation.
 *
-*          adding pointing corrections in azimuth and elevation, then
+*        - adding pointing corrections in azimuth and elevation, then
 *          rotating the coords into the apparent RA,Dec tangent plane.
 *
-*          calling SLA_DTP2S to work out the apparent RA, dec of the offset
+*        - calling SLA_DTP2S to work out the apparent RA, dec of the offset
 *          positions.
 *
 

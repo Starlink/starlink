@@ -70,12 +70,6 @@
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
@@ -89,6 +83,13 @@
 *     10-AUG-1993: Original version.
 *      8-JUN-1995: Checked.
 *    endhistory
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *-
 

@@ -117,20 +117,20 @@
 *     STATUS                                = INTEGER (Given and returned)
 *           global status
 
+
+*  Authors:
+*     J.Lightfoot (REVAD::JFL)
+*     TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  Method:
 
 *  Deficiencies:
 
 *  Bugs:
-
-*  Authors:
-*     J.Lightfoot (REVAD::JFL)
-
-*  TIMJ:
-
-*  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
 
 
 *  History:
@@ -138,6 +138,9 @@
 *     5-AUG-1993: Original version.
 *     18-NOV-1994: Data arrays made 1-d (JFL).
 *     $Log$
+*     Revision 1.5  1999/08/19 03:37:21  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.4  1999/08/03 19:35:23  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

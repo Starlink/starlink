@@ -22,8 +22,7 @@
 *     reason, put this knowledge in one place.
 
 *  Arguments:
-*     DEMOD_POINTER (N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS)
-*                           = INTEGER (Given)
+*     DEMOD_POINTER ( N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS ) = INTEGER (Given)
 *           an array of pointers to the start of each switch
 *     N_SWITCHES            = INTEGER (Given)
 *           the number of switches per exposure
@@ -51,11 +50,14 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/08/19 03:37:08  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.2  1999/08/03 19:34:56  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

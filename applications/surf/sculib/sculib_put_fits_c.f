@@ -34,11 +34,6 @@
 *     STATUS                         = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -48,11 +43,20 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *  History:
 *     $Id$
 *     15-AUG-1995: original version
 *     $Log$
+*     Revision 1.4  1999/08/19 03:37:18  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.3  1999/08/03 19:35:19  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

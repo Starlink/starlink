@@ -45,11 +45,6 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (JFL/ROE)
@@ -57,6 +52,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -23,24 +23,16 @@
 *     N                      = INTEGER (Given)
 *           the number of parameters being fit, should be 6
 *     FIT(N)                 = DOUBLE PRECISION (Given)
-*           the fit parameters:- FIT(1) = peak height
-*                                FIT(2) = length of the `a' axis of the sigma
-*                                         ellipse
-*                                FIT(3) = length of the `b' axis of the sigma 
-*                                         ellipse
-*                                FIT(4) = the angle between the `a' axis and 
-*                                         the x axis (+ve anticlockwise, 
-*                                         radians)
-*                                FIT(5) = the x coord of the centre 
-*                                FIT(6) = the y coord of the centre 
+*           the fit parameters:- 
+*              - FIT(1) = peak height
+*              - FIT(2) = length of the `a' axis of the sigma ellipse
+*              - FIT(3) = length of the `b' axis of the sigma ellipse
+*              - FIT(4) = the angle between the `a' axis and 
+*                         the x axis (+ve anticlockwise, radians)
+*              - FIT(5) = the x coord of the centre 
+*              - FIT(6) = the y coord of the centre 
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
@@ -48,6 +40,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

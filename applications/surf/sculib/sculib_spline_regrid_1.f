@@ -3,7 +3,7 @@
      :     PIXSPACE, NI, NJ, ICEN, JCEN, QUALITY, STATUS)
 *+
 *  Name:
-*     SCULIB_WTFN_REGRID_1
+*     SCULIB_SPLINE_REGRID_1
 
 *  Purpose:
 *     Calculate the areas of the output map that contain good data points

@@ -9,7 +9,7 @@
 *     set quality bits in a subset of a quality array
 
 *  Description:
-*     copies one integer array into another
+*     set quality bits in a subset of a quality array
 
 *  Invocation:
 *      CALL  SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, QUALITY, 
@@ -23,8 +23,7 @@
 *           number of positions measured
 *     N_BEAM                  = INTEGER (Given)
 *           number of beams used
-*     QUALITY (N_BOLS, N_POS, N_BEAM)
-*                             = BYTE (Given and returned)
+*     QUALITY (N_BOLS, N_POS, N_BEAM) = BYTE (Given and returned)
 *           the quality array
 *     START_BOL               = INTEGER (Given)
 *           index of first bolometer to be set bad
@@ -45,11 +44,6 @@
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -59,9 +53,18 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *  History:
-*    endhistory
+*     $Log$
+*     Revision 1.3  1999/08/19 03:37:25  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 
 *-
 

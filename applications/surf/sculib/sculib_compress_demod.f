@@ -17,8 +17,6 @@
 *     to the variance on the input data if only one jiggle contributes to the
 *     average, otherwise calculated from the spread of the input points about 
 *     the mean.
-*     ONLY WORKS FOR DATA WHERE SWITCH_PER_EXP=1, EXP_PER_INT=1,
-*     N_MEASUREMENTS=1.
 
 *  Invocation:
 *     CALL SCULIB_COMPRESS_DEMOD (N_BOLS, N_JIGS, N_INTS, 
@@ -54,11 +52,9 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
+*  Notes:
+*     Only works for data where SWITCH_PER_EXP=1, EXP_PER_INT=1 and
+*     N_MEASUREMENTS=1.
 
 *  Authors:
 *     J.Lightfoot (JFL/ROE)
@@ -66,6 +62,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

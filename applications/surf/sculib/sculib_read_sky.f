@@ -21,15 +21,14 @@
 *
 *     Errors will be reported and bad status returned if;
 *
-*       there is an error opening or reading from the file
-*       <qual> does not convert to an integer 
-*       <sub> is not one of SHORT, LONG, P1100, P1300, P2000
-*       <eta_tel> does not convert to a real
-*       <b> does not convert to a real
-*       <tauz> does not convert to a real
-*       <run> does not convert to an integer
-*
-*       More than MAX_SKY combinations are read.
+*       - there is an error opening or reading from the file
+*       - <qual> does not convert to an integer 
+*       - <sub> is not one of SHORT, LONG, P1100, P1300, P2000
+*       - <eta_tel> does not convert to a real
+*       - <b> does not convert to a real
+*       - <tauz> does not convert to a real
+*       - <run> does not convert to an integer
+*       - More than MAX_SKY combinations are read.
 *
 *     Blank lines are ignored as are those parts of lines following
 *     a ! character (comments) and lines not beginning with the word FIT1.
@@ -72,9 +71,6 @@
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -82,6 +78,10 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Bugs:
 
 
 *  History:

@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_MULCAD (N, IN, DVAL, OUT, STATUS)
 *+  
 *  Name:
-*     SCULIB_MULCAR
+*     SCULIB_MULCAD
 
 *  Purpose:
 *     multiply double precision array by a constant double
@@ -29,11 +29,6 @@
 *     STATUS         = INTEGER (Given & Returned)
 *           Global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     T.Jenness   (JACH)
@@ -43,8 +38,18 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+
 *  History:
 *     $Log$
+*     Revision 1.3  1999/08/19 03:37:17  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.2  1999/08/03 19:35:14  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

@@ -17,15 +17,14 @@
 *     matrix. See the NAG manual if you need to know more about E04UPF.
 *
 *     The solution vector is composed as follows:-
-*
-*            x(1) = ETA_TEL
-*            x(2) = B
-*            x(3) = TAU
+*           - x(1) = ETA_TEL
+*           - x(2) = B
+*           - x(3) = TAU
 *
 *     For each of the M measured airmasses the subfunction f(x) is:-
 *
 *            f(x) = Jtheory (Airmass(i)) - Jmeas (Airmass(i))
-*                   -----------------------------------
+*            .      -----------------------------------
 *                         Jnoise (Airmass(i))
 *
 *     where:-
@@ -37,29 +36,29 @@
 *           J_ATM = J_AMB * X_G 
 *
 *             X_G = 1 + h1 * h2 * EXP (-TAU * Airmass(i) / X_Gconst)
-*                       -------
+*                 .      -------
 *                        J_AMB
 *
 *
 *     The corresponding Jacobian has component (i,j):-
 *
 *            df(x)   d Jtheory (Airmass(i))         1.0
-*            -     = -                      *    ----------
+*     .      -     = -                      *    ----------
 *            dx(j)   dx(j)                       Jnoise (i)
 *
 *     =>
 *            df(i)
-*            -     = - J_TEL + J_ATM - B * J_ATM * EXP (-TAU * Airmass(i))
+*     .      -     = - J_TEL + J_ATM - B * J_ATM * EXP (-TAU * Airmass(i))
 *            dx(1)     ---------------------------------------------------
 *                                        Jnoise (i)
 *
 *            df(i)
-*            -     = - ETA_TEL * J_ATM * EXP (-TAU * Airmass(i))
+*     .      -     = - ETA_TEL * J_ATM * EXP (-TAU * Airmass(i))
 *            dx(2)     -----------------------------------------
 *                                        Jnoise (i)
 *
 *            df(i)             dJ_ATM
-*            -     = (ETA_TEL * ------  -
+*     .      -     = (ETA_TEL * ------  -
 *            dx(3)              dTAU
 *                             
 *               ETA_TEL * B * EXP (-TAU * Airmass(i)) *
@@ -71,36 +70,30 @@
 *     where:-
 *
 *           dJ_ATM           dX_G
-*           ------ = J_AMB * ---- 
+*     .     ------ = J_AMB * ---- 
 *            dTAU            dTAU
 *
 *            dX_G      H1 * H2 * Airmass(i)        
-*            ----  = - -------------------- * EXP (-TAU * Airmass(i)/ X_Gconst)
+*     .      ----  = - -------------------- * EXP (-TAU * Airmass(i)/ X_Gconst)
 *            dTAU        J_AMB * X_Gconst
 *
-*  The array USER is used to get the necessary ancillary information into the
-*  routine:-
-*
-*      USER (1) = J_TEL
-*      USER (2) = J_AMB
-*      USER (3) = not used
-*      USER (4:M+3)      = the measured airmasses 
-*      USER (M+4:2M+3)   = the measured sky temperatures 
-*      USER (2M+4:3M+3)  = the errors on the measured sky temperatures
+*     The array USER is used to get the necessary ancillary information into
+*     the routine:-
+*      - USER (1) = J_TEL
+*      - USER (2) = J_AMB
+*      - USER (3) = not used
+*      - USER (4:M+3)      = the measured airmasses 
+*      - USER (M+4:2M+3)   = the measured sky temperatures 
+*      - USER (2M+4:3M+3)  = the errors on the measured sky temperatures
 *
 
 *  Invocation:
 *     CALL SCULIB_SKYFUNC_1 (MODE, M, N, LDFJ, X, F, FJAC, NSTATE, 
-*    :  IUSER, USER)
+*    :    IUSER, USER)
 
 *  Arguments:
 *     See NAG manual description of OBJFUN parameter in E04UPF.
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -109,9 +102,19 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *  History:
 *     $Id$
+*     $Log$
+*     Revision 1.3  1999/08/19 03:37:28  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     15-SEP-1993: Original version.
 *      8-FEB-1996: modified to use J_ATM to J_AMB relation.
 *     23-JUL-1996: modified to fit the correct function (JFL).

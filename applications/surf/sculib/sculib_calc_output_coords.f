@@ -14,7 +14,7 @@
 *     addition, the angle between the north direction in the output 
 *     coordinate frame and that in the apparent frame is calculated
 *     (measured anticlockwise from output north, in radians).
-*        SLA routines are used to perform the coordinate conversions.
+
 
 *  Invocation:
 *     CALL SCULIB_CALC_OUTPUT_COORDS (RA_APP, DEC_APP, MJD,
@@ -36,11 +36,9 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 
-*  Method:
+*  Notes:
+*     SLA routines are used to perform the coordinate conversions.
 
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -49,6 +47,11 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 *  History:
 *     $Id$

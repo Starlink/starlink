@@ -17,26 +17,26 @@
 *     This routine decodes the value of a single component in a SCUBA
 *     data-spec. It is called by SCULIB_DECODE_SPEC. The component can be:-
 *
-*     1   *                     select all data
-*     2   <index>               select data at position <index>
-*     3   <index1>,<index2>     select data at positions <index1> and
+*     -[1]   "*"                     select all data
+*     -[2]   "<index>"               select data at position <index>
+*     -[3]   "<index1>,<index2>"     select data at positions <index1> and
 *                               <index2>
-*     4   <index1>:<index2>     select all data in the range <index1> to
+*     -[4]   "<index1>:<index2>"     select all data in the range <index1> to
 *                               <index2>
 *
 *     or any combination of 2, 3 and 4 separated by commas. Example 
 *     component values are:-
 *
-*       *                     select all data
-*       1,5                   select data at indices 1 and 5
-*       5:10,16               select data at indices 5 through 10 and 16 
+*      - "*"                     select all data
+*      - "1,5"                   select data at indices 1 and 5
+*      - "5:10,16"               select data at indices 5 through 10 and 16 
 *     
 *     Errors will occur if:-
 *      
-*       You mix the * format with selection by index.
-*       Any index selected lies outside the range 1 to N.
-*       In a selection range <index2> is less than <index1>.
-*       The component does not conform to the design syntax.
+*       - You mix the * format with selection by index.
+*       - Any index selected lies outside the range 1 to N.
+*       - In a selection range <index2> is less than <index1>.
+*       - The component does not conform to the design syntax.
 *
 *     Output from the routine is in the form of a mask array SELECT. 
 *     Data indices selected will be marked as 1 in SELECT, while indices
@@ -51,6 +51,7 @@
 *        the items selected; 1 for selected, 0 for not selected
 *     STATUS                           = INTEGER (Given and Returned)
 *        The global status.
+
 *  Authors:
 *     John Lightfoot (jfl@roe.ac.uk)
 
@@ -62,6 +63,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.4  1999/08/19 03:37:06  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.3  1999/08/03 19:34:54  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

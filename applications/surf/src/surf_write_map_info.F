@@ -8,6 +8,9 @@
 *  Name:
 *     SURF_WRITE_MAP_INFO
 
+*  Purpose:
+*     Calculate FITS and WCS information for rebinned image
+
 *  Language:
 *     Starlink Fortran 77
  
@@ -95,6 +98,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.15  1999/08/19 03:37:45  timj
+* Header tweaks to ease production of SSN72 documentation.
+*
 * Revision 1.14  1999/08/03 20:01:44  timj
 * Add copyright message to header.
 * Minor fixes to header style.

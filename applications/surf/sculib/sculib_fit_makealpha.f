@@ -12,6 +12,7 @@
 *     fitting as described in `Data Reduction and Error Analysis for the
 *     Physical Sciences' by Bevington and Robinson, section 8.6 `the Marquardt
 *     Method'.
+*
 *        The routine does this by calling routines SCULIB_FIT_D2XISQ_DAJ2
 *     and SCULIB_FIT_D2XISQ_DAJK for each element required. The routine will 
 *     only execute if entered with good status.
@@ -20,8 +21,7 @@
 *     CALL SCULIB_FIT_MAKEALPHA (XISQ_ROUTINE, N, A, ALPHA, STATUS)
 
 *  Arguments:
-*     XISQ_ROUTINE (XISQ, N, A, STATUS)
-*                               = EXTERNAL ROUTINE (Given)
+*     XISQ_ROUTINE (XISQ, N, A, STATUS) = EXTERNAL ROUTINE (Given)
 *           routine to calculate chi-squared of current fit
 *     N                         = INTEGER (Given)
 *           the number of fit parameters
@@ -32,18 +32,18 @@
 *     STATUS                    = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -35,7 +35,7 @@
 *     is retained if it coincide with the middle beam position.
 
 *  Arguments:
-*     NBEAM = INTEGER (Given)
+*     NBEAMS = INTEGER (Given)
 *        Number of beams to add. (2 or 3)
 *     CHOP_THR = REAL (Given)
 *        Chop throw in pixels
@@ -69,6 +69,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/19 03:37:48  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.3  1999/08/03 19:32:47  timj
 *     Add copyright message to header.
 *

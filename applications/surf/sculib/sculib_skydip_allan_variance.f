@@ -14,6 +14,7 @@
 *  Description:
 *     This routine incorporates a data slice into a run of data and updates 
 *     the Allan variance of the run.
+*
 *        The Allan variance is calculated for a range of simulated integration
 *     times for which artificial samples are calculated from the input data.
 *     The Allan variance for a particular integration time is calculated from:-
@@ -24,6 +25,66 @@
 *
 *     where n is the number of artificial samples available.
 *
+
+
+*  Invocation:
+*     CALL SCULIB_SKYDIP_ALLAN_VARIANCE (SUB_INSTRUMENT, NUM_CHAN, 
+*    :  NUM_ADC, BOL_TYPE, N_BOLS, BOL_CHAN, BOL_ADC, N_SAMPLES, 
+*    :  SAMPLE, SAMPLE_QUALITY, KMAX, SUM, N_SUM, ARTIFICIAL, 
+*    :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
+
+*  Arguments:
+*     SUB_INSTRUMENT                  = CHARACTER*(*) (Given)
+*           the name of the sub-instrument for which the Allan variance
+*           is to be calculated
+*     NUM_CHAN                        = INTEGER (Given)
+*           number of channels per A/D card
+*     NUM_ADC                         = INTEGER (Given)
+*           number of A/D cards
+*     BOL_TYPE (NUM_CHAN, NUM_ADC)    = CHARACTER*(*) (Given)
+*           the types of the bolometers
+*     N_BOLS                          = INTEGER (Given)
+*           the number of bolometers making measurements
+*     BOL_CHAN (N_BOLS)               = INTEGER (Given)
+*           channel numbers of selected bolometers
+*     BOL_ADC (N_BOLS)                = INTEGER (Given)
+*           ADC numbers of selected bolometers
+*     N_SAMPLES                       = INTEGER (Given)
+*           the number of samples
+*     SAMPLE (N_BOLS, N_SAMPLES)      = REAL (Given)
+*           the samples
+*     SAMPLE_QUALITY (N_BOLS, N_SAMPLES) = INTEGER (Given)
+*           quality on the samples
+*     KMAX                            = INTEGER (Given)
+*           the size of the Allan variance array
+*     SUM (KMAX)                      = REAL (Given and returned)
+*           the accumulator for current artificial sample of length K real 
+*           samples
+*     N_SUM (KMAX)                    = INTEGER (Given and returned)
+*           the number of samples currently in the artificial sample
+*           accumulator
+*     ARTIFICIAL (KMAX)               = REAL (Given and returned)
+*           the last artificial sample of length K samples that was
+*           calculated
+*     N_ARTIFICIAL (KMAX)             = INTEGER (Given and returned) 
+*           the number of artificial samples of length K samples that
+*           have been calculated
+*     ALLAN_VARIANCE (KMAX)           = REAL (Given and returned)
+*           the Allan variance
+*     ALLAN_QUALITY (KMAX)            = INTEGER (Returned)
+*           quality on the Allan variance
+*     STATUS                          = INTEGER (Given and returned)
+*           global status
+
+
+*  Authors:
+*     J.Lightfoot (REVAD::JFL)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Method:
 *     If status on entry is good the routine will:-
 *
 *     loop through the data samples to be incorporated -
@@ -53,19 +114,17 @@
 *                 can be calculated from -
 *
 *                    variance = (artifical_2 - artifical_1) ** 2
-*                               --------------------------------
+*            .                  --------------------------------
 *                                       2 * 2
 *
 *                 if there are more than 2 artificial samples 
 *
-*                    the sum of the squares of the differences between the 
+*                    - the sum of the squares of the differences between the 
 *                    previous samples is recovered from the current value of the
 *                    Allan variance
-*
-*                    the square of the difference between the current artificial
+*                    - the square of the difference between the current artificial
 *                    sample and the previous one is added to the sum
-*
-*                    the Allan variance is re-calculated 
+*                    - the Allan variance is re-calculated 
 *
 *                 end if
 *
@@ -84,68 +143,8 @@
 *     end of loop through samples in this dataslice
 *
 
-*  Invocation:
-*     CALL SCULIB_SKYDIP_ALLAN_VARIANCE (SUB_INSTRUMENT, NUM_CHAN, 
-*    :  NUM_ADC, BOL_TYPE, N_BOLS, BOL_CHAN, BOL_ADC, N_SAMPLES, 
-*    :  SAMPLE, SAMPLE_QUALITY, KMAX, SUM, N_SUM, ARTIFICIAL, 
-*    :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
-
-*  Arguments:
-*     SUB_INSTRUMENT                  = CHARACTER*(*) (Given)
-*           the name of the sub-instrument for which the Allan variance
-*           is to be calculated
-*     NUM_CHAN                        = INTEGER (Given)
-*           number of channels per A/D card
-*     NUM_ADC                         = INTEGER (Given)
-*           number of A/D cards
-*     BOL_TYPE (NUM_CHAN, NUM_ADC)    = CHARACTER*(*) (Given)
-*           the types of the bolometers
-*     N_BOLS                          = INTEGER (Given)
-*           the number of bolometers making measurements
-*     BOL_CHAN (N_BOLS)               = INTEGER (Given)
-*           channel numbers of selected bolometers
-*     BOL_ADC (N_BOLS)                = INTEGER (Given)
-*           ADC numbers of selected bolometers
-*     N_SAMPLES                       = INTEGER (Given)
-*           the number of samples
-*     SAMPLE (N_BOLS, N_SAMPLES)      = REAL (Given)
-*           the samples
-*     SAMPLE_QUALITY (N_BOLS, N_SAMPLES)
-*                                     = INTEGER (Given)
-*           quality on the samples
-*     KMAX                            = INTEGER (Given)
-*           the size of the Allan variance array
-*     SUM (KMAX)                      = REAL (Given and returned)
-*           the accumulator for current artificial sample of length K real 
-*           samples
-*     N_SUM (KMAX)                    = INTEGER (Given and returned)
-*           the number of samples currently in the artificial sample
-*           accumulator
-*     ARTIFICIAL (KMAX)               = REAL (Given and returned)
-*           the last artificial sample of length K samples that was
-*           calculated
-*     N_ARTIFICIAL (KMAX)             = INTEGER (Given and returned) 
-*           the number of artificial samples of length K samples that
-*           have been calculated
-*     ALLAN_VARIANCE (KMAX)           = REAL (Given and returned)
-*           the Allan variance
-*     ALLAN_QUALITY (KMAX)            = INTEGER (Returned)
-*           quality on the Allan variance
-*     STATUS                          = INTEGER (Given and returned)
-*           global status
-
-*  Method:
-
-*  Deficiencies:
-
 *  Bugs:
 
-*  Authors:
-*     J.Lightfoot (REVAD::JFL)
-
-*  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
 
 
 *  History:

@@ -57,13 +57,15 @@
 
 *  Notes:
 *     Before November 1997 the situation is a bit tricky:
-*       1. Scan ends were assumed to be RD by the transputers
-*       2. The telescope assumed RJ offsets
+*       -[1] Scan ends were assumed to be RD by the transputers
+*       -[2] The telescope assumed RJ offsets
+
 *     Therefore I need to do the following to recreate what actually
 *     happened:
-*       1. Calculate tangent plane offsets from the RD centre
-*       2. Add these offsets onto the actual RJ tracking centre
-*       3. Convert back into RD
+*       -[1] Calculate tangent plane offsets from the RD centre
+*       -[2] Add these offsets onto the actual RJ tracking centre
+*       -[3] Convert back into RD
+*
 *     Post November 1997 the offsets really are RD even when the telescope
 *     goes to RJ so this routine should not be called. Version 1.0 data
 *     will not be modified.
@@ -76,6 +78,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.6  1999/08/19 03:37:23  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.5  1999/08/03 19:35:27  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

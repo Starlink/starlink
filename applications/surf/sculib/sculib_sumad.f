@@ -21,11 +21,6 @@
 *     SUM                = DOUBLE PRECISION (Returned)
 *            the sum
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -33,6 +28,15 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Implementation Status:
+*     No status checking
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

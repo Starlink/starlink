@@ -22,14 +22,10 @@
 *     OUT (N)        = REAL (Returned)
 *           output array (may be same as input)
 
-*  Method:
-
 *  Notes:
 *     - No range checks are performed
 *     - No status checking
 *     - No checks for bad values
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -38,6 +34,7 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Bugs:
 
 *  History:
 *     $Id$

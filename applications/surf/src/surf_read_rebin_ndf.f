@@ -13,6 +13,9 @@
 *  Name:
 *     SURF_READ_REBIN_NDF
 
+*  Purpose:
+*     Read an NDF into memory prior to regridding
+
 *  Language:
 *     Starlink Fortran 77
  
@@ -153,6 +156,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.20  1999/08/19 03:37:43  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.19  1999/08/03 20:01:36  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.

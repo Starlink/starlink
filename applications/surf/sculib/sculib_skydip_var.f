@@ -21,10 +21,9 @@
 *     in via common.
 *
 *     The FIT vector is composed as follows:-
-*
-*            x(1) = ETA_TEL
-*            x(2) = B
-*            x(3) = TAU
+*           - x(1) = ETA_TEL
+*           - x(2) = B
+*           - x(3) = TAU
 *
 *     For a given airmass:-
 *
@@ -35,7 +34,7 @@
 *           J_ATM = J_AMB * X_G 
 *
 *             X_G = 1 + h1 * h2 * EXP (-TAU * Airmass(i) / X_Gconst)
-*                       -------
+*                .      -------
 *                        J_AMB
 *
 
@@ -45,19 +44,15 @@
 *     N                        = INTEGER (Given)
 *            the number of parameters being fit, should be 3
 *     FIT (N)                  = DOUBLE PRECISION (Given)
-*            the fit parameters:- FIT (1) = ETA_TEL
-*                                 FIT (2) = B
-*                                 FIT (3) = TAUZ
+*            the fit parameters:- 
+*                                - FIT (1) = ETA_TEL
+*                                - FIT (2) = B
+*                                - FIT (3) = TAUZ
 *     NDEG                     = INTEGER (Given)
 *            the number of degrees of freedom 
 *     STATUS                   = INTEGER (Given and returned)
 *            global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -68,8 +63,18 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+
 *  History:
 *     $Log$
+*     Revision 1.5  1999/08/19 03:37:27  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.4  1999/08/03 19:35:30  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

@@ -18,9 +18,9 @@
 
 *  Description:
 *     This routine performs two tasks:
-*     1. Determine which output pixels contain data (effectively
+*     -[1] Determine which output pixels contain data (effectively
 *        detecting the edge of the useful area of the output image.
-*     2. For each output pixel containing data the weight of the
+*     -[2] For each output pixel containing data the weight of the
 *        map is added to the total weight. This TOTAL_WEIGHT is then
 *        used to modify the behaviour when two images overlap (the
 *        TOTAL_WEIGHT will be 2.0 (say) in the overlap region and
@@ -68,6 +68,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.7  1999/08/19 03:37:32  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.6  1999/08/06 02:24:52  timj
 *     Tweak headers for use with PROLAT.
 *

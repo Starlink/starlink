@@ -7,10 +7,7 @@
 *     Set application name for NDF history
 
 *  Language:
-*     Starlink Fortran 77
- 
-*  Type of Module:
-*     PRE-PROCESSED SUBROUTINE
+*     Starlink Fortran 77 + Pre-processor
 
 *  Invocation:
 *     CALL SURF_SET_APP_NAME( TSKNAME, STATUS )
@@ -40,6 +37,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/08/19 03:37:44  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.2  1999/08/03 20:01:43  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.

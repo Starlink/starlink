@@ -71,9 +71,9 @@
 *     STATUS = INTEGER (Given and returned)
 *        Global status
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)
+*     JFL: John Lightfoot (RoE)
 *     {enter_new_authors_here}
 
 

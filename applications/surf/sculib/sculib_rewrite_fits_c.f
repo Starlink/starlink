@@ -19,9 +19,12 @@
 *     keyword held in the FITS extension of an NDF file. The FITS extension
 *     must have been read into the input array FITS before this routine is 
 *     called and be written out again afterwards for the change to take effect.
+*
 *        The routine assumes that each line in the FITS array will contain
 *     a string with format:-
-*      KEYWORD='VALUE'           / this is a comment
+*
+*      "KEYWORD='VALUE'           / this is a comment"
+*
 *     It will search the input array for a line containing the required
 *     keyword and replace VALUE. If the keyword is not found an error will
 *     be reported and bad status returned. If the keyword is found but the

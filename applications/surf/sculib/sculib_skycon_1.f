@@ -17,10 +17,9 @@
 *     X. See the NAG manual if you need to know more about E04UPF.
 *
 *     The solution vector is composed as follows:-
-*
-*          x(1) = ETA_TEL
-*          x(2) = B
-*          x(3) = TAU
+*          - x(1) = ETA_TEL
+*          - x(2) = B
+*          - x(3) = TAU
 *
 *     The non-linear constraint limits ETA_TEL * B. So, evaluation
 *     of the constraint gives:-
@@ -30,15 +29,15 @@
 *     and its Jacobian has components :-
 *
 *          dC     B
-*          -    =
+*     .    -    =
 *          dx(1)
 *
 *          dC     ETA_TEL
-*          -    =
+*     .    -    =
 *          dx(2)
 *
 *          dC     0.0
-*          -    =
+*     .    -    =
 *          dx(3)
 *
 
@@ -49,18 +48,19 @@
 *  Arguments:
 *     See NAG manual description of CONFUN parameter in E04UPF.
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1993-1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -12,20 +12,21 @@
 *     If status is bad on entry the routine will return immediately.
 *
 *     If START_PTR is not equal to 0 then
-*        It's possible that VM may have already been allocated to 
+*       - It's possible that VM may have already been allocated to 
 *        START_PTR so issue an error message and set status bad.
+*
 *     else
-*        Call PSX_MALLOC to allocate the required memory plus space for
+*
+*      -  Call PSX_MALLOC to allocate the required memory plus space for
 *        2 integers at either end. 
 *
-*        If status is good then
+*      -  If status is good then
 *           Set START_PTR and END_PTR to point to the first and last
-*           bytes in the section of memory to be used.
-*
-*           Call SCULIB_CFILLI to set the sentinel integers at either
+*           bytes in the section of memory to be used and
+*           call SCULIB_CFILLI to set the sentinel integers at either
 *           end of the block to 37. SCULIB_FREE will check these for
 *           corruption when the time comes to free the VM.
-*        end if
+*
 *     end if
 
 *  Invocation:
@@ -41,11 +42,6 @@
 *     STATUS              = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (ROE::JFL)
@@ -54,9 +50,19 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *  History:
 *     $Id$
+*     $Log$
+*     Revision 1.6  1999/08/19 03:37:16  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     18-OCT-1994: Original version.
 *    endhistory
 

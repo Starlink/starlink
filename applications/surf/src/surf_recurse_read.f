@@ -12,11 +12,14 @@
 *  Name:
 *     SURF_RECURSE_READ
 
+*  Purpose:
+*     Allow the recursive read of REBIN text files and NDFs
+
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*      SUBROUTINE SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
+*      CALL SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
 *     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
 *     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
 *     :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
@@ -517,8 +520,19 @@
 *  Language:
 *     Starlink Fortran 77 (+ recursion)
 
+*  Invocation:
+*     CALL SURF_PSEUDO_RECURSE( RLEV, SNAME, MAX_FILE,
+*    :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS, N_MEAS,
+*    :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
+*    :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
+*    :     BOL_ADC, BOL_CHAN, BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+*    :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
+*    :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
+*    :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
+*    :     NPARS, PARS, STATUS)
+
 *  Description:
-*     This routine is called from SURF_RECURSE_READ and immeidiately
+*     This routine is called from SURF_RECURSE_READ and immediately
 *     calls SURF_RECURESE_READ. Recursion via an intermediary.
 
 *  Author:

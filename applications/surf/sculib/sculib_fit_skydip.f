@@ -112,19 +112,16 @@
 *     STATUS                    = INTEGER (Given and returned)
 *              Global status
 
+*  Authors:
+*     T.Jenness (timj@jach.hawaii.edu)
+*     J.Lightfoot (REVAD::JFL)
+*     Nick Tothill (N.F.H.Tothill@qmw.ac.uk)
+
 *  Method:
 
 *  Deficiencies:
 
 *  Bugs:
-
-*  Notes:
-*     Uses the Mean input VARIANCE as the VARIANCE for every point.
-
-*  Authors:
-*     T.Jenness (timj@jach.hawaii.edu)
-*     J.Lightfoot (REVAD::JFL)
-*     Nick Tothill (N.F.H.Tothill@qmw.ac.uk)
 
 
 *  Copyright:
@@ -134,6 +131,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.18  1999/08/19 03:37:11  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.17  1999/08/03 19:35:00  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

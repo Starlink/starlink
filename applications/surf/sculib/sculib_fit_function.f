@@ -20,52 +20,23 @@
 *     recommended that the routine be entered for the first iteration with 
 *     LAMBDA set to 0.001. Thereafter, the routine will return the value
 *     of LAMBDA to be used in the next iteration.
+*
 *       The search method used is that due to Marquardt as described in
 *     chapter 8 of `Data Reduction and Error Analysis' by Bevington and
 *     Robinson. The code is an adaptation of the Pascal routine Marquardt
 *     listed in that book.
+*
 *       If the routine is entered with LAMBDA = 0 then it will return the
 *     `error' matrix for the given fit parameters.
-*       If status is good on entry the routine will enter a loop
 *
-*          SCULIB_FIT_MAKEBETA is called to calculate the `beta' matrix
-*          SCULIB_FIT_MAKEALPHA is called to calculate the `alpha' matrix
-*
-*          The diagonal elements of the `alpha' matrix are multiplied by
-*          1 + LAMBDA following the method due to Marquardt
-*
-*          SCULIB_INVERT_MATRIX is called to invert the modified `alpha'
-*          matrix
-*
-*          If LAMBDA = 0 this is all that's required because this input
-*          is given if the routine is required to calculate the `error' 
-*          matrix
-*
-*          Otherwise, SCULIB_FIT_MULT is called to multiply the inverted
-*          `alpha' matrix by the `beta' to give the next iteration of the
-*          fit for this LAMBDA
-*
-*          Chi-squared is calculated for the new fit and compared with 
-*          that for the previous fit. If the chi-squared is greater than
-*          the previous value plus CHICUT then things have got worse.
-*          In this case the routine will increase LAMBDA by a factor of
-*          10, return the fit to the previous value and return to the
-*          start of the loop. If LAMBDA exceeds 1000 status is set bad,
-*          an error is reported and the loop is exited
-*
-*          However, if the chi-squared is an improvement then LAMBDA is
-*          decreased by a factor of 10 and the loop is exited
-*
-*       end of loop
-*
+
 
 *  Invocation:
 *     CALL SCULIB_FIT_FUNCTION (XISQ_ROUTINE, CHICUT, N, A, 
 *    :  LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
 
 *  Arguments:
-*     XISQ_ROUTINE (XISQ, N, A, STATUS)
-*                             = EXTERNAL ROUTINE (Given)
+*     XISQ_ROUTINE (XISQ, N, A, STATUS) = EXTERNAL ROUTINE (Given)
 *           routine to calculate chi-squared of fit
 *     CHICUT                  = DOUBLE PRECISION (Given)
 *           increase in chi-squared that will make routine search with
@@ -89,18 +60,43 @@
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+*     If status is good on entry the routine will enter a loop
+*
+*       -   SCULIB_FIT_MAKEBETA is called to calculate the `beta' matrix
+*       -   SCULIB_FIT_MAKEALPHA is called to calculate the `alpha' matrix
+*       -   The diagonal elements of the `alpha' matrix are multiplied by
+*          1 + LAMBDA following the method due to Marquardt
+*       -   SCULIB_INVERT_MATRIX is called to invert the modified `alpha'
+*          matrix
+*       -   If LAMBDA = 0 this is all that's required because this input
+*          is given if the routine is required to calculate the `error' 
+*          matrix
+*       -   Otherwise, SCULIB_FIT_MULT is called to multiply the inverted
+*          `alpha' matrix by the `beta' to give the next iteration of the
+*          fit for this LAMBDA
+*       -   Chi-squared is calculated for the new fit and compared with 
+*          that for the previous fit. If the chi-squared is greater than
+*          the previous value plus CHICUT then things have got worse.
+*          In this case the routine will increase LAMBDA by a factor of
+*          10, return the fit to the previous value and return to the
+*          start of the loop. If LAMBDA exceeds 1000 status is set bad,
+*          an error is reported and the loop is exited
+*       -   However, if the chi-squared is an improvement then LAMBDA is
+*          decreased by a factor of 10 and the loop is exited
+*
+*     End of loop
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -11,7 +11,7 @@
 *     temperature of radiation at frequency NU and temperature T.
 *
 *     JNU =    X * T           where  X = h * NU
-*           ----------                    ------
+*          .----------                    ------
 *           exp(X) - 1                    k * T
 *
 *     If the absolute value of X is less than 1e-4 JNU = T, or if the absolute

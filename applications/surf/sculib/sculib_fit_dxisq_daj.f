@@ -15,7 +15,7 @@
 *     using the equation:-
 *
 *       DXISQ_DAJ = XISQ (A(J)+DELTA_AJ) - XISQ (A(J)-DELTA_AJ)
-*                   -------------------------------------------
+*                   .-------------------------------------------
 *                                2.0 * DELTA_AJ
 *
 *     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is
@@ -26,8 +26,7 @@
 *    :  STATUS)
 
 *  Arguments:
-*     XISQ_ROUTINE (XISQ, N, A, STATUS)
-*                             = EXTERNAL ROUTINE (Given)
+*     XISQ_ROUTINE (XISQ, N, A, STATUS) = EXTERNAL ROUTINE (Given)
 *           name of routine that will calculate xi-squared
 *     N                       = INTEGER (Given)
 *           the number of parameters in the fit
@@ -40,11 +39,6 @@
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
@@ -52,6 +46,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -26,17 +26,17 @@
 *     0393.
 *
 *
-*     AZ coords -
+*     - AZ coords:
 *        Calculate the apparent RA and DEC at the LST when the routine is
 *        called by:-
 *          sin(dec_app) = sin(lat_obs) * sin(el) + cos(lat_obs) * cos(el) * cos(az)
 *
 *          sin(H_A) = - sin(az) * cos(el)
-*                       -----------------
+*                      .-----------------
 *                           cos(dec_app)
 *
 *          cos(H_A) = sin(el) - sin(dec_app) * sin(lat_obs)
-*                     -------------------------------------
+*                    .-------------------------------------
 *                        cos(dec_app) * cos(lat_obs)
 *
 *         Cos(dec_app) is present in the denominator of both the sin(H_A)
@@ -46,18 +46,18 @@
 *          RA_app = LST - H_A
 *
 *          sin(rotation) =   sin(az) * cos(lat_obs)
-*                            ----------------------
+*                           .----------------------
 *                               cos(dec_app)
 *
 *          cos(rotation) = sin(lat_obs) - sin(dec_app) * sin(el)
-*                     -------------------------------------
-*                        cos(dec_app) * cos(el)
+*                         .-------------------------------------
+*                                 cos(dec_app) * cos(el)
 *
 *        Again, cos(dec_app) appears in the denominator of both sin and cos
 *        expressions and is left out of the calculation because on ly the ratio
 *        is important.
 
-*     RB coords - 
+*     - RB coords:
 *        Use SLA_FK54Z to convert to RJ.
 *        Use SLA_MAP to convert to apparent, giving ra_app, dec_app.
 *        Use same method to calculate apparent position of RB N pole, giving
@@ -67,11 +67,11 @@
 *        dRA =  ra_app - ra_N_app
 *
 *        sin (rotation) =   sin(dRA) * cos (dec_N_app)
-*                           --------------------------
+*                          .--------------------------
 *                                  cos (lat)
 * 
 *        cos (rotation) = sin (dec_N_app) - sin (dec_app) * sin (lat)
-*                         -------------------------------------------
+*                        .-------------------------------------------
 *                                  cos (dec_app) * cos (lat)
 *   
 *        Since cos (lat) is in the denominator for both sin and cos terms,
@@ -82,34 +82,34 @@
 *        If dec_app = pi/2 (i.e. at N pole of apparent system) then
 *           rotation = pi - (ra_N_app - ra_app)
 *
-*     RJ coords -
+*     - RJ coords:
 *        Use SLA_MAP to convert to apparent.
 *        Use same method to calculate apparent position of RB N pole.
 *        Derive rotation angle in the same way as for RB.
 *
-*     GA coords -
+*     - GA coords:
 *        Use SLA_GALEQ to convert to RJ.
 *        Use SLA_MAP to convert to apparent, giving ra_app, dec_app.
 *        Use same method to calculate apparent position of GA N pole, giving
 *        ra_N_app, dec_N_app.
 *        Derive rotation angle in the same way as for RB.
 *
-*     EQ coords -
+*     - EQ coords:
 *        Use SLA_ECLEQ to convert to RJ.
 *        Use SLA_MAP to convert to apparent, giving ra_app, dec_app.
 *        Use same method to calculate apparent position of EQ N pole, giving
 *        ra_N_app, dec_N_app.
 *        Derive rotation angle in the same way as for RB.
 *
-*     HA coords -
+*     - HA coords:
 *        Apparent RA = LST - LONG
 *        Apparent Dec = LAT
 *        Rotation = 0.0D0
 *
-*     RD coords -
+*     - RD coords:
 *        Apparent RA, Dec set to input values. Rotation = 0.0.
 *
-*     PLANET coords -
+*     - PLANET coords:
 *        If MJD1 = MJD2 then apparent RA, Dec set to input LONG, LAT.
 *           Rotation = 0.0.
 *        Otherwise apparent RA, Dec interpolated (or extrapolated) between
@@ -174,6 +174,9 @@
 *      4-MAR-1993: Added GA, EQ, HA coords
 *     14-AUG-1993: Moved to SCULIB library
 *     $Log$
+*     Revision 1.12  1999/08/19 03:37:01  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.11  1999/08/06 02:24:39  timj
 *     Tweak headers for use with PROLAT.
 *

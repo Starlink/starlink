@@ -18,14 +18,13 @@
 *     E04UPF.
 *
 *     The solution vector is composed as follows:-
-*
-*            x(1) = B
-*            x(2) = TAU
+*          -  x(1) = B
+*          -  x(2) = TAU
 *
 *     For each of the M measured airmasses the subfunction f(x) is:-
 *
 *            f(x) = Jtheory (Airmass(i)) - Jmeas (Airmass(i))
-*                   -----------------------------------
+*            .      -----------------------------------
 *                         Jnoise (Airmass(i))
 *
 *     where:-
@@ -37,28 +36,27 @@
 *     The corresponding Jacobian has component (i,j):-
 *
 *            df(x)   d Jtheory (Airmass(i))         1.0
-*            -     = -                      *    ----------
+*     .      -     = -                      *    ----------
 *            dx(j)   dx(j)                       Jnoise (i)
 *
 *     ->
 *
 *            df(i)
-*            -     = - ETA_TEL * J_ATM * EXP (-TAU * Airmass(i))
+*     .      -     = - ETA_TEL * J_ATM * EXP (-TAU * Airmass(i))
 *            dx(1)
 *
 *            df(i)
-*            -     = Airmass(i) * B * ETA_TEL * J_ATM * EXP (-TAU * Airmass(i))
+*     .      -     = Airmass(i) * B * ETA_TEL * J_ATM * EXP (-TAU * Airmass(i))
 *            dx(2)
 *
-*  The array USER is used to get the necessary ancillary information into the
-*  routine:-
-*
-*      USER (1) = J_TEL
-*      USER (2) = J_ATM
-*      USER (3) = ETA_TEL 
-*      USER (4:M+3)     = the measured airmasses 
-*      USER (M+4:2M+3)  = the measured sky temperatures 
-*      USER (2M+4:3M+3) = the errors on the measured sky temperatures
+*     The array USER is used to get the necessary ancillary information into
+*     the routine:-
+*      - USER (1) = J_TEL
+*      - USER (2) = J_ATM
+*      - USER (3) = ETA_TEL 
+*      - USER (4:M+3)     = the measured airmasses 
+*      - USER (M+4:2M+3)  = the measured sky temperatures 
+*      - USER (2M+4:3M+3) = the errors on the measured sky temperatures
 *
 
 *  Invocation:
@@ -68,11 +66,6 @@
 *  Arguments:
 *     See NAG manual description of OBJFUN parameter in E04UPF.
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -80,6 +73,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -11,20 +11,16 @@
 *
 *     If status is bad on entry the routine will return immediately.
 *
-*     If START_PTR is not equal to 0 then
+*     If START_PTR is not equal to 0 then:
 *
-*        The sentinel integers above and below the used piece of memory
+*      - The sentinel integers above and below the used piece of memory
 *        will be checked against the values they were set to by 
 *        SCULIB_MALLOC.
-*
-*        PSX_FREE will be called to free the virtual memory. If 
+*      - PSX_FREE will be called to free the virtual memory. If 
 *        that's successful START_PTR and END_PTR will be set to
 *        the bad value.
-*
-*        If either of the sentinel integers was corrupted then an
+*      - If either of the sentinel integers was corrupted then an
 *        error will be reported and bad status returned.
-*
-*     end if
 
 *  Invocation:
 *     CALL SCULIB_FREE (NAME, START_PTR, END_PTR, STATUS)
@@ -39,18 +35,19 @@
 *     STATUS              = INTEGER (Given and returned)
 *           global status
 
+*  Authors:
+*     J.Lightfoot (ROE::JFL)
+*     T.Jenness (t.jenness@jach.hawaii.edu)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  Method:
 
 *  Deficiencies:
 
 *  Bugs:
-
-*  Authors:
-*     J.Lightfoot (ROE::JFL)
-
-*  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
 
 
 *  History:

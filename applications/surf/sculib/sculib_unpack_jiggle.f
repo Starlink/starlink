@@ -11,11 +11,13 @@
 *  Description:
 *     This routine unpacks the demodulated data from a switch onto a
 *     rectangular 2-d map. 
+*
 *        If status is good on entry the data and variance of the output map 
 *     will be initialised to `bad' values, the quality to 1. If there are 
 *     any data to unpack the routine will then attempt to do so. The method 
-*     used depends on whether the switch covered part/all of the entire 
-*     jiggle pattern or contains data for several repeats of the jiggle pattern.
+*     used depends on whether the switch covered part/all of the entire jiggle
+*     pattern or contains data for several repeats of the jiggle pattern.
+*
 *        In the first case, the routine will check that the indices of the
 *     section of jiggle pattern covered by this switch lie within the bounds
 *     of the full jiggle pattern. If not, an error will be reported and bad
@@ -23,6 +25,7 @@
 *     map as specified by the I_JIGGLE, J_JIGGLE arrays. Each map point
 *     just has its data, variance and quality copied from the demodulated
 *     data. 
+*
 *        When the data covers several repeats of the jiggle pattern, the
 *     routine will check that the jiggle index of the first point in the 
 *     datablock is 1 and that the number of data points is an integer multiple
@@ -70,18 +73,18 @@
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
 
+*  Authors:
+*     J.Lightfoot (REVAD::JFL)
+
+*  Copyright:
+*     Copyright (C) 1993-1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  Method:
 
 *  Deficiencies:
 
 *  Bugs:
-
-*  Authors:
-*     J.Lightfoot (REVAD::JFL)
-
-*  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
 
 
 *  History:

@@ -24,12 +24,12 @@
 *     The position in the input data array is stored.
 *     This is done in two stages:
 *
-*     1) Find the size of the output grid from the maximum extent of
+*     - Find the size of the output grid from the maximum extent of
 *        the input data.
-*     2) Loop through data. Find I,J coordinate of each point in the 
+*     - Loop through data. Find I,J coordinate of each point in the 
 *        output grid.
-*     3) Find out maximum number of points for an I,J position.
-*     4) Put data onto grid in array (I,J,N) [REALS]. 
+*     - Find out maximum number of points for an I,J position.
+*     - Put data onto grid in array (I,J,N) [REALS]. 
 *        We also need to store positions of these data.
 *        We can either do it by storing the file number, bolometer and
 *        position (time) index OR we can just store some index in a merged
@@ -123,6 +123,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.5  1999/08/19 03:37:42  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     Revision 1.4  1999/08/03 20:36:42  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.

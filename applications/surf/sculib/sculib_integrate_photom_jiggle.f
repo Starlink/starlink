@@ -11,6 +11,7 @@
 *  Description:
 *     This routine just sums the data for the specified bolometer over the
 *     jiggle pattern.
+*
 *       After checking status on entry the routine checks that the bolometer
 *     to be integrated is among those that were measured. All being well it 
 *     then loops through the jiggle pattern summing the valid data and variance
@@ -43,18 +44,18 @@
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -14,10 +14,12 @@
 *     with it; the number of jiggles in the pattern, the number of jiggles to
 *     be measured in each exposure, the number of times the pattern will be
 *     repeated in each exposure, the maximum offsets in the pattern.
+*
 *        After checking status on entry, SCULIB_READ_NUMBERS is called to read 
 *     in the jiggle offsets from the file named in JIGGLE_NAME, an error will
 *     be reported and bad status returned if no offsets are read. The maximum
 *     and minimum x and y offsets in the pattern are calculated.
+*
 *        Next, the variables governing the way the jiggle pattern will be 
 *     divided among the exposures making up each integration is worked out.
 *     An error will be reported and bad status returned if JIGGLE_P_SWITCH
@@ -65,11 +67,6 @@
 *     STATUS =       INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -77,6 +74,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -105,7 +105,7 @@
 *                 can be calculated from -
 *
 *                    variance = (artifical_2 - artifical_1) ** 2
-*                               --------------------------------
+*                              .--------------------------------
 *                                       2 * 2
 *
 *                 if there are more than 2 artificial samples 

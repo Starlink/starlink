@@ -11,9 +11,12 @@
 *     This routine will get the value of a specified FITS integer keyword
 *     held in the FITS extension of an NDF file. The FITS extension must
 *     have been read into the input array FITS before this routine is called.
+*
 *        The routine assumes that each line in the FITS array will contain
 *     a string with format:-
-*      KEYWORD=INTEGER_VALUE           / this is a comment
+*
+*      "KEYWORD=INTEGER_VALUE           / this is a comment"
+*
 *     It will search the input array for a line containing the required
 *     keyword and return VALUE. If the keyword is not found an error will
 *     be reported and bad status returned. If the keyword is found but the
@@ -38,11 +41,6 @@
 *     STATUS               = INTEGER (Given and returned)
 *           global status 
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -50,6 +48,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

@@ -52,11 +52,11 @@
 *
 *     Errors will be reported and bad status returned if:-
 *
-*       <name> is not a valid bolometer name
-*       <du3>, <du4>, <calib>, <theta>, <a>, <b> do not convert to reals
-*       <qual>, <run> do not convert to integers
-*       <day> does not convert to double
-*       An attempt is made to set values for a bolometer twice
+*      - <name> is not a valid bolometer name
+*      - <du3>, <du4>, <calib>, <theta>, <a>, <b> do not convert to reals
+*      - <qual>, <run> do not convert to integers
+*      - <day> does not convert to double
+*      - An attempt is made to set values for a bolometer twice
 *
 *     Each line in the file will be converted to upper case. Characters to the
 *     right of a { character in a line will be treated as comments and ignored.
@@ -98,11 +98,6 @@
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -110,6 +105,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

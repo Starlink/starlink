@@ -15,11 +15,12 @@
 *  Description:
 *     This routine returns the value of the skydip function.
 *     The parameters are passed as follows:
-*           P(1) = ETA_TEL
-*           P(2) = B
-*           P(3) = TAU
-*           P(4) = J_AMB
-*           P(5) = J_TEL
+*          - P(1) = ETA_TEL
+*          - P(2) = B
+*          - P(3) = TAU
+*          - P(4) = J_AMB
+*          - P(5) = J_TEL
+*
 *     The  theoretical value of the skydip
 *     for the given input parameters is given by:
 *     
@@ -30,10 +31,11 @@
 *           J_ATM = J_AMB * X_G 
 *
 *             X_G = 1 + h1 * h2 * EXP (-TAU * Airmass(i) / X_Gconst)
-*                       -------
+*             .         -------
 *                        J_AMB
 *
 *     The partial derivatives are:
+*
 *         d(F)/d(ETA_TEL) = DR (1) = (- J_TEL + J_ATM - B * J_ATM * 
 *     :                               EXP (-TAU * AIRMASS_IN))
 *
@@ -59,7 +61,6 @@
 *     DR = REAL (Returned)
 *        The values of the partial derivatives
 
-
 *  Authors:
 *     TIMJ: Tim Jenness (JAC: timj@jach.hawaii.edu)
 *     JFL:  John Lightfoot (ROE/JAC: jfl@roe.ac.uk)
@@ -71,6 +72,10 @@
 *     Research Council. All Rights Reserved.
 
 *  History:
+*     $Log$
+*     Revision 1.4  1999/08/19 03:37:28  timj
+*     Header tweaks to ease production of SSN72 documentation.
+*
 *     1996 (JFL):
 *        Original version.
 *     1997 February (TIMJ):

@@ -30,8 +30,7 @@
 *           number of integrations in the observation
 *     N_MEASUREMENTS              = INTEGER (Given)
 *           number of measurements in the observation
-*     DEMOD_POINTER (N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS)
-*                                 = INTEGER (Given)
+*     DEMOD_POINTER (N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS) = INTEGER (Given)
 *           array pointing to start and finish of scans in IN_DATA
 *     N_BOL                       = INTEGER (Given)
 *           the number of bolometers for which data was taken

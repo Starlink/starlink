@@ -77,17 +77,12 @@
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
+*     T.Jenness (t.jenness@jach.hawaii.edu)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1993-1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 
@@ -97,6 +92,13 @@
 *    17-JUL-1996: Modified to multiply by flat-field rather than divide (JFL).
 *    18-JUL-1996: Modified to use PHOTOM_ANALYSIS (JFL).
 *    endhistory
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *-
 

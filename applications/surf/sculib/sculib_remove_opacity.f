@@ -14,6 +14,7 @@
 *     All data is corrected assuming the same airmass of observation, but
 *     the zenith sky opacity used will depend which SCUBA sub-instrument each
 *     bolometer belongs to.
+*
 *       After checking status on entry, the routine will loop through the
 *     bolometers measured. For each bolometer it will then ascertain the
 *     appropriate zenith sky opacity from the parent sub-instrument and
@@ -63,11 +64,6 @@
 *     STATUS                        = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -75,6 +71,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:
