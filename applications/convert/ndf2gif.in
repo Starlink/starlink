@@ -63,21 +63,23 @@
 #     1995 November 13 (AJC):
 #        Added default output file, and error reporting and exit at each
 #        stage.
+#     1997 July 15 (MJC):
+#        Used a special tifftopnm for alpha_OSF1.
  
-#  Bugs:
-#     At the time of writing, this utility does not work on alpha OSF/1
-#     due to a problem with tifftopnm in the standard release of 
-#     PBMPLUS.  OSF/1 users should use a copy of tifftopnm obtained from 
-#     Netpbm which is based on PBMPLUS but contains many improvements and
-#     additions.  A suitable version may be obtained via WWW at
-#     http://www.astro.cf.ac.uk/pub/Grant.Privett/.  Alternatively,
-#     contact Grant Privett, gjp@astronomy.cardiff.ac.uk.
-#     {note_further_bugs_here}
+#  Notes:
+#     At the time of writing, this utility uses a special Netpbm version
+#     of tifftopnm on alpha OSF/1 to a problem with tifftopnm in the
+#     standard release of PBMPLUS.  Netpbm is based on PBMPLUS but
+#     contains many improvements and additions.
 #-
  
 # Set required output file name
 out=${2:-$1}
 name=`basename $2`
+
+# Determine whether the operating system is alpha_OSF1 or not.
+machine=`uname -m`
+opsys=`uname`
 
 # Use NDF2TIFF to create a TIFF file.  Only the DATA component is 
 # propagated.
@@ -95,12 +97,25 @@ END{if(err==1){exit 1}}' || \
    exit 1
   ) || exit 1
 
-# Use PBMPLUS tools to convert the TIFF file to a GIF image. 
-tifftopnm convert_temp_$name.tif 2> convert_err1_$name.lis | \
-ppmtogif 2> convert_err2_$name.lis > $out.gif || \
-  { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
-    rm -f convert_err?_$name.lis convert_temp_$name.tif
-    exit 1
-  }
+# Use PBMPLUS tools to convert the TIFF file to a GIF image (except
+# use the Netpbm version of tifftopnm on alpha_OSF1 because of a bug
+# in the released PBMPLUS version).
+if test "$machine" = "alpha" -a  "$opsys" = "OSF1"
+then
+   $CONVERT_DIR/tifftopnm_alpha_OSF1 convert_temp_$name.tif 2> convert_err1_$name.lis | \
+     ppmtogif 2> convert_err2_$name.lis > $out.gif || \
+     { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
+       rm -f convert_err?_$name.lis convert_temp_$name.tif
+       exit 1
+     }
+
+else
+   tifftopnm convert_temp_$name.tif 2> convert_err1_$name.lis | \
+     ppmtogif 2> convert_err2_$name.lis > $out.gif || \
+     { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
+       rm -f convert_err?_$name.lis convert_temp_$name.tif
+       exit 1
+     }
+fi
   rm -f convert_err?_$name.lis 
   rm -f convert_temp_$name.tif
