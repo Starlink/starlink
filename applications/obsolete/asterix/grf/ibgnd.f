@@ -710,17 +710,25 @@
       CALL ARR_INIT1I( 0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(3)), STATUS )
 
 *  Compute the samples
-      CALL IBGND_SAMP_COMP( AREA, MEAN, I_NX, I_NY, %VAL(I_DPTR),
+      CALL IBGND_SAMP_COMP( I_NX, I_NY, %VAL(I_DPTR),
      :                      %VAL(I_BGM_QPTR),
      :                      I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(1)),
      :                      %VAL(I_BGM_SAMPTR(2)),
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      STATUS )
 
+*  Compute the background surface
+      CALL IBGND_SURF_COMP( I_BGM_NSAMP, I_NX, I_NY, %VAL(I_DPTR),
+     :                      %VAL(I_BGM_QPTR), %VAL(I_BGM_SAMPTR(1)),
+     :                      %VAL(I_BGM_SAMPTR(2)),
+     :                      %VAL(I_BGM_SAMPTR(3)),
+     :                      %VAL(I_BGM_DPTR),
+     :                      STATUS )
+
       END
 
 
-      SUBROUTINE IBGND_SAMP_COMP( AREA, MEANM, NX, NY, DATA, BQ,
+      SUBROUTINE IBGND_SAMP_COMP( NX, NY, DATA, BQ,
      :                      NSAMP, SAMM, SAMEM, SAMNP, STATUS )
 *+
 *  Name:
@@ -736,16 +744,12 @@
 *     Task subroutine
 
 *  Invocation:
-*     CALL IBGND_SETSAMP( AREA, MEANM, NX, NY, DATA, BQ, STATUS )
+*     CALL IBGND_SETSAMP( NX, NY, DATA, BQ, NSAMP, SAMM, SAMEM, SAMNP, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
-*     AREA = CHARACTER*(*) (given)
-*        Method of setting up samples
-*     MEAN = CHARACTER*(*) (given)
-*        Method of estimating means in areas
 *     NX = INTEGER (given)
 *        Number of pixels in X axis
 *     NY = INTEGER (given)
@@ -834,7 +838,6 @@
       INCLUDE 'IMG_CMN'
 
 *  Arguments Given:
-      CHARACTER*(*)		AREA, MEANM
       INTEGER			NX, NY, NSAMP
       REAL			DATA(NX,NY)
       BYTE			BQ(NX,NY)
@@ -861,7 +864,7 @@
 
 *  Decide how many samples
       ISAMP = 1
-      IF ( AREA .EQ. 'WHOLE' ) THEN
+      IF ( I_BGM_AREA .EQ. 'WHOLE' ) THEN
 
 *    Assumed mean from existing sample value
         AMEAN = SAMM(ISAMP)
@@ -880,32 +883,245 @@
         WTSUM = REAL(N)
         WTSUM2 = WTSUM
 
-*      Find values from sums
+*    Find values from sums
         MEAN = MEAN / WTSUM
         D = WTSUM - WTSUM2/WTSUM
 
-        SAMNP(ISAMP) = N
-
 *    Correct standard deviation for assumed mean
-        DMEAN = AMEAN - MEAN
         IF ( N .GT. 1 ) THEN
+          DMEAN = AMEAN - MEAN
           STDDEV = STDDEV - WTSUM*DMEAN**2
           STDDEV = SQRT(STDDEV/D)
         ELSE
           STDDEV = -1.0
         END IF
-        SAMM(ISAMP) = DMEAN
+
+*    Store sample data
+        SAMNP(ISAMP) = N
+        SAMM(ISAMP) = MEAN
         SAMEM(ISAMP) = STDDEV / SQRT(REAL(N))
 
 *    Simply report mean
         CALL MSG_SETR( 'MEAN', SAMM(1) )
         CALL MSG_SETR( 'EMEAN', SAMEM(1) )
-        CALL MSG_SETR( 'N', SAMNP(1) )
+        CALL MSG_SETI( 'N', SAMNP(1) )
         CALL MSG_PRNT( '  Mean value in image is ^MEAN +- '/
      :                               /'^EMEAN (^N points)' )
 
-      ELSE IF ( AREA .EQ. 'ANNULUS' ) THEN
-      ELSE IF ( AREA .EQ. 'BOX' ) THEN
+      ELSE IF ( I_BGM_AREA .EQ. 'ANNULUS' ) THEN
+      ELSE IF ( I_BGM_AREA .EQ. 'BOX' ) THEN
+      END IF
+
+      END
+
+
+      SUBROUTINE IBGND_SURF_COMP( NX, NY, DATA, BQ, NSAMP, SAMM, SAMEM,
+     :                            SAMNP, BGMOD, STATUS )
+*+
+*  Name:
+*     IBGND_SURF_COMP
+
+*  Purpose:
+*     Compute background surface given samples
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_SURF_COMP( )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     NX = INTEGER (given)
+*        Number of pixels in X axis
+*     NY = INTEGER (given)
+*        Number of pixels in Y axis
+*     DATA[NX,NY] = REAL (given)
+*        The image data
+*     BQ[NX,NY] = BYTE (given)
+*        QUAL__GOOD inside, QUAL__MISSING outside
+*     NSAMP = INTEGER (given)
+*        Number of samples
+*     SAMM[NSAMP] = REAL (given)
+*        Sample means
+*     SAMEM[NSAMP] = REAL (given)
+*        Sample mean errors
+*     SAMNP[NSAMP] = INTEGER (given)
+*        Sample pixel counts
+*     BGMOD[NX,NY] = REAL (returned)
+*        The background model
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'
+      INCLUDE 'QUAL_PAR'
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      INTEGER			NX, NY, NSAMP
+      REAL			SAMM(*), SAMEM(*), DATA(NX,NY)
+      INTEGER			SAMNP(*)
+      BYTE			BQ(NX,NY)
+
+*  Arguments Returned:
+      REAL			BGMOD(NX,NY)
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      REAL			MINFR, MAXFR		! Extreme residuals
+      REAL			RMSFR			! RMS frac residual
+
+      INTEGER			I, J			! Loop over image
+      INTEGER			MAXFR_X, MAXFR_Y	! Max position
+      INTEGER			MINFR_X, MINFR_Y	! Min position
+      INTEGER			NFR			! # residuals
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Switch on sample mode
+      IF ( I_BGM_AREA .EQ. 'WHOLE' ) THEN
+
+*    Loop over image
+        DO J = 1, NY
+          DO I = 1, NX
+
+*      Outside area?
+            IF ( BQ(I,J) .EQ. QUAL__MISSING ) THEN
+              BGMOD(I,J) = 0.0
+            ELSE
+              BGMOD(I,J) = SAMM(1)
+            END IF
+
+          END DO
+        END DO
+
+      END IF
+
+*  Accumulate max and RMS fractional residual
+      MINFR = VAL__MAXR
+      MAXFR = VAL__MINR
+      RMSFR = 0.0
+      DO J = 1, NY
+        DO I = 1, NX
+
+*      Outside area?
+          IF ( BQ(I,J) .NE. QUAL__MISSING ) THEN
+
+            FR = (DATA(I,J) - BGMOD(I,J)
+            IF ( (BGMOD(I,J) .NE. 0.0) .AND.
+     :            (BQ(I,J) .EQ. QUAL__GOOD) ) THEN
+              NFR = NFR + 1
+              FR = FR / BGMOD(I,J)
+              RMSFR = RMSFR + FR**2
+              IF ( FR .GT. MAXFR ) THEN
+                MAXFR = FR
+                MAXFR_X = I
+                MAXFR_Y = J
+              END IF
+              IF ( FR .LT. MINFR ) THEN
+                MINFR = FR
+                MINFR_X = I
+                MINFR_Y = J
+              END IF
+            END IF
+          END IF
+
+        END DO
+      END DO
+
+*  Compute RMS fractional residual
+      IF ( NFR .GT. 1 ) THEN
+        RMSFR = SQRT( RMSFR  / REAL(NFR))
+        IF ( .NOT. I_GUI ) THEN
+          CALL MSG_SETR( 'FR' , RMSFR )
+          CALL MSG_PRNT( '  RMS fractional residual ^FR' )
+        END IF
+      END IF
+      IF ( .NOT. I_GUI ) THEN
+        CALL MSG_SETR( 'R', MAXFR*100.0 )
+        CALL MSG_SETI( 'X', MAXFR_X )
+        CALL MSG_SETI( 'Y', MAXFR_Y )
+        CALL MSG_PRNT( '  Worst +ve deviation from model is ^R% at '/
+     :               /'pixel (^X,^Y)' )
+        CALL MSG_SETR( 'MAXFR', MAXFR*100.0 )
+        CALL MSG_SETI( 'X', MINFR_X )
+        CALL MSG_SETI( 'Y', MINFR_Y )
+        CALL MSG_PRNT( '  Worst -ve deviation from model is ^R% at '/
+     :               /'pixel (^X,^Y)' )
       END IF
 
       END
@@ -1101,9 +1317,5 @@
       DO ILINE=1,PLINE
         CALL MSG_PRNT(PTEXT(ILINE))
       ENDDO
-
-      CALL MSG_BLNK()
-      CALL MSG_PRNT('*** WARNING - ellipse doesn''t work yet!!')
-      CALL MSG_BLNK()
 
       END
