@@ -25,10 +25,10 @@
  It is expected that EXTRACTOR will eventually replace the PISA
  package, so existing users of PISA are encouraged to use EXTRACTOR.
 
- EXTRACTOR is described in SUN/225, which can be viewed on-line by the
+ EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
-    % showme sun225
+    % showme sun226
 
 
  Peter W. Draper & Alan Chipperfield      1st December 1998.
