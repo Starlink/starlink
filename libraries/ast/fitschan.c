@@ -571,6 +571,12 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Added FITS-AIPS++ encoding.
 *     12-AUG-2004 (DSB):
 *        - Convert GLS projection codes to equivalent SFL in SpecTrans.
+*        - Added FITS-CLASS encoding.
+*     16-AUG-2004 (DSB):
+*        - Removed support for paper III keyword VSOURCE, and added
+*        support for SSYSSRC keyword.
+*        - In FitOK: Changed tolerance for detecting constant values
+*        from 1.0E-10 to 1.0E-8.
 
 *class--
 */
@@ -632,7 +638,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 #define FITSIRAF_ENCODING  4
 #define FITSAIPS_ENCODING  5
 #define FITSAIPSPP_ENCODING 6
-#define MAX_ENCODING       6
+#define FITSCLASS_ENCODING 7
+#define MAX_ENCODING       7
 #define UNKNOWN_STRING     "UNKNOWN"
 #define NATIVE_STRING      "NATIVE"
 #define FITSPC_STRING      "FITS-PC"
@@ -646,6 +653,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 #define FITSAIPS_STRING2   "FITS_AIPS"
 #define FITSAIPSPP_STRING  "FITS-AIPS++"
 #define FITSAIPSPP_STRING2 "FITS_AIPS++"
+#define FITSCLASS_STRING  "FITS-CLASS"
+#define FITSCLASS_STRING2 "FITS_CLASS"
 #define INDENT_INC         3
 #define PREVIOUS           0
 #define NEXT               1
@@ -802,6 +811,7 @@ typedef struct FitsStore {
    char ***radesys;
    char ***wcsname;
    char ***specsys;
+   char ***ssyssrc;
    double ***pc;
    double ***cdelt;
    double ***crpix;
@@ -818,7 +828,6 @@ typedef struct FitsStore {
    double ***obsgeoz;
    double ***restfrq;
    double ***restwav;
-   double ***vsource;
    double ***zsource;
    double ***asip;
    double ***bsip;
@@ -863,10 +872,10 @@ static int write_nest = -1;
 static int current_indent;
 
 /* Text values used to represent Encoding values externally. */
-static const char *xencod[7] = { NATIVE_STRING, FITSPC_STRING,
+static const char *xencod[8] = { NATIVE_STRING, FITSPC_STRING,
                                  DSS_STRING, FITSWCS_STRING, 
                                  FITSIRAF_STRING, FITSAIPS_STRING,
-                                 FITSAIPSPP_STRING };
+                                 FITSAIPSPP_STRING, FITSCLASS_STRING };
 
 /* IgnoreUsed: If 2, then cards which have been marked as either "definitely 
    used" or "provisionally used" (see the USED flag above) will be ignored 
@@ -982,7 +991,7 @@ static char *SourceWrap( const char *(*)( void ) );
 static char *UnPreQuote( const char * );
 static char GetMaxS( double ****item );
 static const char *GetAttrib( AstObject *, const char * );
-static int IsAIPSSpectral( const char *, char **, char **);
+static const char *GetFitsSor( const char * );
 static const char *IsSpectral( const char *, char[5], char[5] );
 static double **OrthVectorSet( int, int, double ** );
 static double *FitLine( AstMapping *, double *, double *, double *, double );
@@ -995,6 +1004,7 @@ static int *CardFlags( AstFitsChan * );
 static int AIPSFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int AIPSPPFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, const char *, const char * );
+static int CLASSFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int CardType( AstFitsChan * );
 static int CheckFitsName( const char *, const char *, const char * );
 static int ChrLen( const char * );
@@ -1006,12 +1016,11 @@ static int DSSFromStore( AstFitsChan *, FitsStore *, const char *, const char * 
 static int EncodeFloat( char *, int, int, int, double );
 static int EncodeValue( AstFitsChan *, char *, int, int, const char * );
 static int FindBasisVectors( AstMapping *, int, int, double *, AstPointSet *, AstPointSet * );
-static int MakeBasisVectors( AstMapping *, int, int, double *, AstPointSet *, AstPointSet *);
 static int FindKeyCard( AstFitsChan *, const char *, const char *, const char * );
 static int FindLonLatSpecAxes( FitsStore *, char, int *, int *, int *, const char *, const char * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
-static int FitsEof( AstFitsChan * );
 static int FitOK( int, double *, double * );
+static int FitsEof( AstFitsChan * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, const char *, const char * );
 static int FitsGetCF( AstFitsChan *, const char *, double * );
 static int FitsGetCI( AstFitsChan *, const char *, int * );
@@ -1025,16 +1034,19 @@ static int FitsSet( AstFitsChan *, const char *, void *, int, const char *, int 
 static int FullForm( const char *, const char *, int );
 static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double * );
 static int GetFull( AstChannel * );
-static int GetMaxJM( double ****item, char );
 static int GetMaxI( double ****item, char );
+static int GetMaxJM( double ****item, char );
 static int GetSkip( AstChannel * );
 static int GetValue( AstFitsChan *, char *, int, void *, int, int, const char *, const char * );
 static int GetValue2( AstFitsChan *, AstFitsChan *, char *, int, void *, int, const char *, const char * );
 static int GoodWarns( const char * );
 static int HasAIPSSpecAxis( AstFitsChan *, const char *, const char * );
 static int IRAFFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
+static int IsAIPSSpectral( const char *, char **, char **);
 static int IsMapLinear( AstMapping *, const double [], const double [], int );
 static int KeyFields( AstFitsChan *, const char *, int, int *, int * );
+static int LooksLikeClass( AstFitsChan *, const char *, const char * );
+static int MakeBasisVectors( AstMapping *, int, int, double *, AstPointSet *, AstPointSet *);
 static int MakeIntWorld( AstMapping *, AstFrame *, int *, char, FitsStore *, double *, const char *, const char * );
 static int Match( const char *, const char *, int, int *, int *, const char *, const char * );
 static int MatchChar( char, char, const char *, const char *, const char * );
@@ -1061,11 +1073,11 @@ static void CheckZero( char *, double, int );
 static void ClearAttrib( AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void CreateKeyword( AstFitsChan *, const char *, char [ FITSNAMLEN + 1 ] );
-static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, AstMapping **, AstMapping **, AstMapping **, const char *, const char * );
 static void DSSToStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static void DelFits( AstFitsChan * );
 static void Delete( AstObject * );
 static void DeleteCard( AstFitsChan *, const char *, const char * );
+static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, AstMapping **, AstMapping **, AstMapping **, const char *, const char * );
 static void Dump( AstObject *, AstChannel * );
 static void Empty( AstFitsChan * );
 static void FindWcs( AstFitsChan *, int, const char *, const char * );
@@ -3644,6 +3656,402 @@ static int ChrLen( const char *string ){
 /* Return the answer. */
    return ret;
 
+}
+
+static int CLASSFromStore( AstFitsChan *this, FitsStore *store, 
+                           const char *method, const char *class ){
+/*
+*  Name:
+*     CLASSFromStore
+
+*  Purpose:
+*     Store WCS keywords in a FitsChan using FITS-CLASS encoding.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     int CLASSFromStore( AstFitsChan *this, FitsStore *store, 
+*                         const char *method, const char *class )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     A FitsStore is a structure containing a generalised represention of
+*     a FITS WCS FrameSet. Functions exist to convert a FitsStore to and
+*     from a set of FITS header cards (using a specified encoding), or
+*     an AST FrameSet. In other words, a FitsStore is an encoding-
+*     independant intermediary staging post between a FITS header and 
+*     an AST FrameSet.
+*
+*     This function copies the WCS information stored in the supplied 
+*     FitsStore into the supplied FitsChan, using FITS-CLASS encoding.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     store
+*        Pointer to the FitsStore.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     A value of 1 is returned if succesfull, and zero is returned
+*     otherwise.
+
+*/
+
+/* Local Variables: */
+   char *comm;         /* Pointer to comment string */
+   char *cval;         /* Pointer to string keyword value */
+   char *specunit;     /* Pointer to corrected spectral units string */
+   char combuf[80];    /* Buffer for FITS card comment */
+   char lattype[MXCTYPELEN];/* Latitude axis CTYPE */
+   char lontype[MXCTYPELEN];/* Longitude axis CTYPE */
+   char s;             /* Co-ordinate version character */
+   char sign[2];       /* Fraction's sign character */
+   char spectype[MXCTYPELEN];/* Spectral axis CTYPE */
+   double *cdelt;      /* Pointer to CDELT array */
+   double cdl;         /* CDELT term */
+   double cdlat_lon;   /* Off-diagonal CD element */
+   double cdlon_lat;   /* Off-diagonal CD element */
+   double epoch;       /* Epoch of reference equinox */
+   double fd;          /* Fraction of a day */
+   double latval;      /* CRVAL for latitude axis */
+   double lonval;      /* CRVAL for longitude axis */
+   double mjd99;       /* MJD at start of 1999 */
+   double rf;          /* Rest freq (Hz) */
+   double specfactor;  /* Factor for converting internal spectral units */
+   double val;         /* General purpose value */
+   int axlat;          /* Index of latitude FITS WCS axis */
+   int axlon;          /* Index of longitude FITS WCS axis */
+   int axspec;         /* Index of spectral FITS WCS axis */
+   int i;              /* Axis index */
+   int ihmsf[ 4 ];     /* Hour, minute, second, fractional second */
+   int iymdf[ 4 ];     /* Year, month, date, fractional day */
+   int j;              /* Axis index */
+   int jj;             /* SlaLib status */
+   int naxis;          /* No. of axes */
+   int ok;             /* Is FitsSTore OK for IRAF encoding? */
+   int prj;            /* Projection type */
+
+/* Check the inherited status. */
+   if( !astOK ) return 0;
+
+/* First check that the values in the FitsStore conform to the
+   requirements of the CLASS encoding. Assume they do not to begin with. */
+   ok = 0;
+
+/* Just do primary axes. */
+   s = ' '; 
+
+/* Look for the primary celestial axes. */
+   FindLonLatSpecAxes( store, s, &axlon, &axlat, &axspec, method, class );
+
+/* Axes 1, 2 and 3 must be spectral, longitude and latitude axes. */
+   if( axspec == 0 && axlon == 1 && axlat == 2 ) {
+      ok = 1;
+
+/* Get the CRVAL values for both axes. */
+      latval = GetItem( &( store->crval ), axlat, 0, s, NULL, method, class );
+      if( latval == AST__BAD ) ok = 0;
+      
+      lonval = GetItem( &( store->crval ), axlon, 0, s, NULL, method, class );
+      if( lonval == AST__BAD ) ok = 0;
+      
+/* Get the CTYPE values for both axes. Extract the projection type as 
+   specified by the last 4 characters in the latitude CTYPE keyword value. */
+      cval = GetItemC( &(store->ctype), axlon, s, NULL, method, class );
+      if( !cval ) {
+         ok = 0;
+      } else {
+         strcpy( lontype, cval );
+      }
+
+      cval = GetItemC( &(store->ctype), axlat, s, NULL, method, class );
+      if( !cval ) {
+         ok = 0;
+         prj = AST__WCSBAD;
+      } else {
+         strcpy( lattype, cval );
+         prj = astWcsPrjType( cval + 4 );
+      }
+
+/* Check the projection type is SFL (which is equivalent to the old GLS). */
+      if( prj == AST__SFL ){
+
+/* Check that the reference point is the origin of the celestial co-ordinate system. */
+         if( latval != 0.0 || lonval != 0.0 ){
+            ok = 0;     
+
+/* Remove the SFL projection code. */
+         } else if( prj == AST__SFL ){
+            (void) strcpy( lontype + 4, "    " );
+            (void) strcpy( lattype + 4, "    " );
+         }
+
+      } else {
+         ok = 0;
+      }
+   
+/* Identify the celestial coordinate system from the first 4 characters of the
+   longitude CTYPE value. Only RA or galactic longitude can be stored using 
+   FITS-CLASS. */
+      if( ok && strncmp( lontype, "RA--", 4 ) &&
+                strncmp( lontype, "GLON", 4 ) ) ok = 0;
+
+/* If the physical Frame requires a LONPOLE or LATPOLE keyword, it cannot
+   be encoded using FITS-CLASS. */
+      if( GetItem( &(store->latpole), 0, 0, s, NULL, method, class )
+          != AST__BAD || 
+          GetItem( &(store->lonpole), 0, 0, s, NULL, method, class )
+          != AST__BAD ) ok = 0;
+
+/* Only linear frequency spectral axes are allowed. */
+      cval = GetItemC( &(store->ctype), axspec, s, NULL, method, class );
+      if( !cval ) {
+         ok = 0;
+      } else {
+         if( strncmp( cval, "FREQ", astChrLen( cval ) ) ) ok = 0;
+      }
+
+/* If OK, check the SPECSYS value ...*/
+      printf("This needs re-writing for CLASS\n");
+      cval = GetItemC( &(store->specsys), 0, s, NULL, method, class );
+      if( !cval ) {
+         ok = 0;
+      } else if( ok ) {
+         if( !strncmp( cval, "LSRK", astChrLen( cval ) ) ) {
+            strcpy( spectype+4, "-LSR" );
+         } else if( !strncmp( cval, "LSRD", astChrLen( cval ) ) ) {
+            strcpy( spectype+4, "-LSD" );
+         } else if( !strncmp( cval, "BARYCENT", astChrLen( cval ) ) ) {
+            strcpy( spectype+4, "-HEL" );
+         } else if( !strncmp( cval, "GEOCENTR", astChrLen( cval ) ) ) {
+            strcpy( spectype+4, "-GEO" );
+         } else {
+            ok = 0;
+         }
+      }
+
+/* If still OK, ensure the spectral axis units are Hz. */
+      cval = GetItemC( &(store->cunit), axspec, s, NULL, method, class );
+      if( !cval ) {
+         ok = 0;
+      } else if( ok ) {
+         if( !strcmp( cval, "Hz" ) ) {
+            specunit = "HZ";
+            specfactor = 1.0;
+         } else if( !strcmp( cval, "kHz" ) ) {
+            specunit = "HZ";
+            specfactor = 1.0E3;
+         } else if( !strcmp( cval, "MHz" ) ) {
+            specunit = "HZ";
+            specfactor = 1.0E6;
+         } else if( !strcmp( cval, "GHz" ) ) {
+            specunit = "HZ";
+            specfactor = 1.0E9;
+         } else if( !strcmp( cval, "m/s" ) ) {
+            specunit = "m/s";
+            specfactor = 1.0;
+         } else if( !strcmp( cval, "km/s" ) ) {
+            specunit = "m/s";
+            specfactor = 1.0E3;
+         } else {
+            ok = 0;
+         }
+      }
+   }
+
+/* Save the number of axes */
+   naxis = GetMaxJM( &(store->crpix), ' ' ) + 1;
+
+/* If this is different to the value of NAXIS abort since this encoding
+   does not support WCSAXES keyword. */
+   if( naxis != store->naxis ) ok = 0;
+
+/* Allocate memory to store the CDELT values */
+   if( ok ) {
+      cdelt = (double *) astMalloc( sizeof(double)*naxis );
+      if( !cdelt ) ok = 0;
+   } else {
+      cdelt = NULL;
+   }
+
+/* Check that there is no rotation, and extract the CDELT (diagonal) terms, 
+   etc. */
+   cdlat_lon = 0.0;
+   cdlon_lat = 0.0;
+   for( i = 0; i < naxis && ok; i++ ){
+      cdl = GetItem( &(store->cdelt), i, 0, s, NULL, method, class );
+      if( cdl == AST__BAD ) cdl = 1.0;
+
+      for( j = 0; j < naxis && ok; j++ ){
+          val = GetItem( &(store->pc), i, j, s, NULL, method, class );
+          if( val == AST__BAD ) val = ( i == j ) ? 1.0 : 0.0;
+          val *= cdl;
+
+          if( i == j ){
+             cdelt[ i ] = val;
+
+          } else if( val != 0.0 ){
+             ok = 0;
+          }
+      }
+   }
+
+/* Get RADECSYS and the reference equinox (called EPOCH in FITS-CLASS). */
+   cval = GetItemC( &(store->radesys), 0, s, NULL, method, class );
+   epoch = GetItem( &(store->equinox), 0, 0, s, NULL, method, class );
+
+/* If RADECSYS was available... */
+   if( cval ){
+
+/* Only FK4 and FK5 are supported in this encoding. */
+      if( strcmp( "FK4", cval ) && strcmp( "FK5", cval ) ) ok = 0;
+      
+/* If epoch was not available, set a default epoch. */
+      if( epoch == AST__BAD ){
+
+         if( !strcmp( "FK4", cval ) ){
+            epoch = 1950.0;
+         } else if( !strcmp( "FK5", cval ) ){
+            epoch = 2000.0;
+         } else {
+            ok = 0;
+         }
+
+/* If an epoch was supplied, check it is consistent with the IAU 1984
+   rule. */
+      } else {
+         if( !strcmp( "FK4", cval ) ){
+            if( epoch >= 1984.0 ) ok = 0;
+         } else if( !strcmp( "FK5", cval ) ){
+            if( epoch < 1984.0 ) ok = 0;
+         } else {
+            ok = 0;
+         }
+      }
+
+/* Check we have a rest frequency */
+      rf = GetItem( &(store->restfrq), 0, 0, s, NULL, method, class );
+      if( rf == AST__BAD ) ok = 0;
+
+   }
+
+/* Only create the keywords if the FitsStore conforms to the requirements
+   of the FITS-CLASS encoding. */
+   if( ok ) {
+
+/* Get and save CRPIX for all pixel axes. These are required, so break
+   if they are not available. */
+      for( j = 0; j < naxis && ok; j++ ){
+         val = GetItem( &(store->crpix), 0, j, s, NULL, method, class );
+         if( val == AST__BAD ) {
+            ok = 0;
+         } else {
+            sprintf( combuf, "Reference pixel on axis %d", j + 1 );
+            SetValue( this, FormatKey( "CRPIX", j + 1, -1, s ), &val, 
+                      AST__FLOAT, combuf );
+         }
+      }
+
+/* Get and save CRVAL for all intermediate axes. These are required, so 
+   break if they are not available. Note, the frequency axis CRVAL is
+   redefined by FITS-CLASS by reducing it by the RESTFREQ value. */
+      for( i = 0; i < naxis && ok; i++ ){
+         val = GetItem( &(store->crval), i, 0, s, NULL, method, class );
+         if( val == AST__BAD ) {
+            ok = 0;
+         } else {
+            if( i == axspec ) {
+               val *= specfactor;
+               val -= rf;
+            }
+            sprintf( combuf, "Value at ref. pixel on axis %d", i + 1 );
+            SetValue( this, FormatKey( "CRVAL", i + 1, -1, s ), &val, 
+                      AST__FLOAT, combuf );
+         }
+      }
+
+/* Get and save CTYPE for all intermediate axes. These are required, so 
+   break if they are not available. Use the potentially modified versions 
+   saved above for the celestial axes. */
+      for( i = 0; i < naxis && ok; i++ ){
+         if( i == axlat ) {
+            cval = lattype;
+         } else if( i == axlon ) {
+            cval = lontype;
+         } else if( i == axspec ) {
+            cval = spectype;
+         } else {
+            cval = GetItemC( &(store->ctype), i, s, NULL, method, class );
+         }
+         if( cval ){
+            comm = GetItemC( &(store->ctype_com), i, s, NULL, method, class );
+            if( !comm ) {            
+               sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
+               comm = combuf;
+            }
+            SetValue( this, FormatKey( "CTYPE", i + 1, -1, s ), &cval, 
+                      AST__STRING, comm );
+         } else {
+            ok = 0;
+         }
+      }
+
+/* CDELT values */
+      if( axspec != -1 ) cdelt[ axspec ] *= specfactor;
+      for( i = 0; i < naxis; i++ ){
+         SetValue( this, FormatKey( "CDELT", i + 1, -1, s ), cdelt + i, 
+                   AST__FLOAT, "Pixel size" );
+      }
+
+/* Reference equinox */
+      if( epoch != AST__BAD ) SetValue( this, "EPOCH", &epoch, AST__FLOAT, 
+                                        "Epoch of reference equinox" );
+
+/* Date of observation. */
+      val = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+      if( val != AST__BAD ) {
+
+/* The format used for the DATE-OBS keyword depends on the value of the
+   keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
+   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
+         slaCaldj( 99, 1, 1, &mjd99, &jj );
+         if( val < mjd99 ) {
+            slaDjcal( 0, val, iymdf, &jj );
+            sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
+                     iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
+         } else {
+            slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+            slaDd2tf( 3, fd, sign, ihmsf );
+            sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
+                     iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
+                     ihmsf[2], ihmsf[3] ); 
+         }
+
+/* Now store the formatted string in the FitsChan. */
+         cval = combuf;
+         SetValue( this, "DATE-OBS", (void *) &cval, AST__STRING,
+                   "Date of observation" );
+      }
+
+/* Rest frequency */
+      SetValue( this, "RESTFREQ", &rf, AST__FLOAT, "[Hz] Rest frequency" );
+
+   }
+
+/* Release CDELT workspace */
+   if( cdelt ) cdelt = (double *) astFree( (void *) cdelt );
+
+/* Return zero or ret depending on whether an error has occurred. */
+   return astOK ? ok : 0;
 }
 
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
@@ -6956,7 +7364,7 @@ static void FindWcs( AstFitsChan *this, int last, const char *method, const char
              Match( keyname, "PPO5", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "WCSNAME%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "SPECSYS%0c", 0, NULL, &nfld, method, class ) ||
-             Match( keyname, "VSOURCE%0c", 0, NULL, &nfld, method, class ) ||
+             Match( keyname, "SSYSSRC%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "ZSOURCE%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "RESTFRQ%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "MJD_AVG%0c", 0, NULL, &nfld, method, class ) ||
@@ -7155,7 +7563,8 @@ static int FitOK( int n, double *act, double *est ) {
       den1 = ( s4 - s1*s1 );
       den2 = ( s5 - s2*s2 );
       denom = den1*den2;
-      if( den1 <= 1.0E-10*fabs( s1 ) && den2 <= 1.0E-10*fabs( s2 ) ) {
+      if( fabs( den1 ) <= 1.0E-8*fabs( s1 ) && 
+          fabs( den2 ) <= 1.0E-8*fabs( s2 ) ) {
          ret = 1;
 
 /* Otherwise, check the correlation coefficient between the actual and
@@ -7251,6 +7660,9 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
 
    } else if( encoding == FITSAIPSPP_ENCODING ){
       ret = AIPSPPFromStore( this, store, method, class );
+
+   } else if( encoding == FITSCLASS_ENCODING ){
+      ret = CLASSFromStore( this, store, method, class );
 
 /* Standard FITS-WCS encoding */
    } else {
@@ -7350,12 +7762,12 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->mjdavg = NULL;
       ret->pv = NULL;
       ret->specsys = NULL;
+      ret->ssyssrc = NULL;
       ret->obsgeox = NULL;
       ret->obsgeoy = NULL;
       ret->obsgeoz = NULL;
       ret->restfrq = NULL;
       ret->restwav = NULL;
-      ret->vsource = NULL;
       ret->zsource = NULL;
       ret->asip = NULL;
       ret->bsip = NULL;
@@ -7586,6 +7998,7 @@ static FitsStore *FreeStore( FitsStore *store ){
    FreeItemC( &(store->radesys) );
    FreeItemC( &(store->wcsname) );
    FreeItemC( &(store->specsys) );
+   FreeItemC( &(store->ssyssrc) );
 
    FreeItem( &(store->pc) );
    FreeItem( &(store->cdelt) );
@@ -7603,7 +8016,6 @@ static FitsStore *FreeStore( FitsStore *store ){
    FreeItem( &(store->obsgeoz) );
    FreeItem( &(store->restfrq) );
    FreeItem( &(store->restwav) );
-   FreeItem( &(store->vsource) );
    FreeItem( &(store->zsource) );
    FreeItem( &(store->asip) );
    FreeItem( &(store->bsip) );
@@ -7977,12 +8389,12 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
       ret->mjdavg = NULL;
       ret->pv = NULL;
       ret->specsys = NULL;
+      ret->ssyssrc = NULL;
       ret->obsgeox = NULL;
       ret->obsgeoy = NULL;
       ret->obsgeoz = NULL;
       ret->restfrq = NULL;
       ret->restwav = NULL;
-      ret->vsource = NULL;
       ret->zsource = NULL;
       ret->asip = NULL;
       ret->bsip = NULL;
@@ -8296,18 +8708,20 @@ static int GetEncoding( AstFitsChan *this ){
 *     i, j and m are integers and s is a single upper case character):
 *
 *     1) Any keywords starting with "BEGAST" = Native encoding 
-*     2) Any AIPS spectral CTYPE values:
+*     2) FITS-CLASS: CTYPE1='FREQ' .and. (CTYPE2='RA' or 'GLON' )
+*        .and. (CTYPE3='DEC' or 'GLAT') 
+*     3) Any AIPS spectral CTYPE values:
 *         Any of CDi_j, PROJP, LONPOLE, LATPOLE = FITS-AIPS++ encoding:
 *         None of the above = FITS-AIPS encoding.
-*     3) Any keywords matching PCiiijjj = FITS-PC encoding
-*     4) Any keywords matching CDiiijjj = FITS-IRAF encoding
-*     5) Any keywords matching CDi_j, AND at least one of RADECSYS, PROJPi
+*     4) Any keywords matching PCiiijjj = FITS-PC encoding
+*     5) Any keywords matching CDiiijjj = FITS-IRAF encoding
+*     6) Any keywords matching CDi_j, AND at least one of RADECSYS, PROJPi
 *        or CmVALi = FITS-IRAF encoding
-*     6) Any keywords RADECSYS, PROJPi or CmVALi = FITS-PC encoding
-*     7) Any keywords matching CROTAi = FITS-AIPS encoding
-*     8) Keywords matching CRVALi = FITS-WCS encoding
-*     9) The PLTRAH keyword = DSS encoding
-*     10) If none of the above keywords are found, Native encoding is assumed.
+*     7) Any keywords RADECSYS, PROJPi or CmVALi = FITS-PC encoding
+*     8) Any keywords matching CROTAi = FITS-AIPS encoding
+*     9) Keywords matching CRVALi = FITS-WCS encoding
+*     10) The PLTRAH keyword = DSS encoding
+*     11) If none of the above keywords are found, Native encoding is assumed.
 
 *  Parameters:
 *     this
@@ -8343,6 +8757,10 @@ static int GetEncoding( AstFitsChan *this ){
    "Native" encoding. */
       if( astKeyFields( this, "BEGAST%2f", 0, NULL, NULL ) ){
          ret = NATIVE_ENCODING;
+
+/* Otherwise, look for a FITS-CLASS signature... */
+      } else if( LooksLikeClass( this, "astGetEncoding", "AstFitsChan" ) ){
+         ret = FITSCLASS_ENCODING;
 
 /* Otherwise, if the FitsChan contains any CTYPE keywords which have the
    peculiar form used by AIPS, then use "FITS-AIPS" or "FITS-AIPS++" encoding. */
@@ -8702,6 +9120,79 @@ static int GetFiducialWCS( AstWcsMap *wcsmap, AstMapping *map2, int colon,
 
 /* Return the result. */
    return ret;
+
+}
+
+static const char *GetFitsSor( const char *string ) {
+/*
+*  Name:
+*     GetFitsSor
+
+*  Purpose:
+*     Get the string used to represent an AST spectral standard of rest.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     const char *GetFitsSor( const char *string )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function returns a pointer to a static string which is the
+*     FITS equivalent to a given SpecFrame StdOfRest value.
+
+*  Parameters:
+*     string
+*        Pointer to a constant null-terminated string containing the
+*        SpecFrame StdOfRest value.
+
+*  Returned Value:
+*     Pointer to a static null-terminated string containing the FITS
+*     equivalent to the supplied string. NULL is returned if the supplied
+*     string has no FITS equivalent.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked wth the global error status set, or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   const char *result;           /* Pointer value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Compare the supplied string with SpecFrame value for which there is a 
+   known FITS equivalent. */
+   if( !strcmp( string, "Topocentric" ) ){
+      result = "TOPOCENT";
+   } else if( !strcmp( string, "Geocentric" )){
+      result = "GEOCENTR";
+   } else if( !strcmp( string, "Barycentric" )){
+      result = "BARYCENT";
+   } else if( !strcmp( string, "Heliocentric" )){
+      result = "HELIOCEN";
+   } else if( !strcmp( string, "LSRK" )){
+      result = "LSRK";
+   } else if( !strcmp( string, "LSRD" )){
+      result = "LSRD";
+   } else if( !strcmp( string, "Galactic" )){
+      result = "GALACTOC";
+   } else if( !strcmp( string, "Local_group" )){
+      result = "LOCALGRP";
+   } else if( !strcmp( string, "Source" )){
+      result = "SOURCE";
+   } else {
+      result = NULL;
+   }
+
+/* Return the answer. */
+   return result; 
 
 }
 
@@ -11661,6 +12152,9 @@ const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          } else if( ival == FITSAIPSPP_ENCODING ){
             result = FITSAIPSPP_STRING;
 
+         } else if( ival == FITSCLASS_ENCODING ){
+            result = FITSCLASS_STRING;
+
          } else if( ival == FITSWCS_ENCODING ){
             result = FITSWCS_STRING;
 
@@ -14090,6 +14584,89 @@ static AstMapping *LogWcs( FitsStore *store, int i, char s,
    }
 
 /* Return the result */
+   return ret;
+}
+
+static int LooksLikeClass( AstFitsChan *this, const char *method, 
+                           const char *class ){
+/*
+*  Name:
+*     LooksLikeClass
+
+*  Purpose:
+*     Does the FitsChan seem to use FITS-CLASS encoding?
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*      int LooksLikeClass( AstFitsChan *this, const char *method, 
+*                          const char *class )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     Returns non-zero if the supplied FitssChan probably uses FITS-CLASS
+*     encoding. This is the case if:
+*
+*     1)  CTYPE1 is "FREQ" 
+*     2)  CTYPE2 is "RA" or "GLON" 
+*     3)  CTYPE3 is "DEC" or "GLAT"
+* 
+*     None of these CTYPE values have algorithm codes.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     Non-zero if the encoding in use lookslike FITS-CLASS.
+
+*/
+
+/* Local Variables... */
+   const char *cval;   /* Pointer to text string */
+   int ret;            /* Returned value */
+
+/* Check the global status. */
+   if( !astOK ) return 0;
+
+/*  Initialise */
+   ret = 1;
+
+/* Check CTYPE1 */
+   if( GetValue( this, "CTYPE1", AST__STRING, (void *) &cval, 0, 0, method, 
+                 class ) ) {
+      if( strcmp( cval, "RA" ) && strcmp( cval, "GLON" ) ) ret = 0;
+   } else {
+      ret = 0;
+   }
+
+/* Check CTYPE2 */
+   if( ret && GetValue( this, "CTYPE2", AST__STRING, (void *) &cval, 0, 0, 
+                        method, class ) ) {
+      if( strcmp( cval, "DEC" ) && strcmp( cval, "GLAT" ) ) ret = 0;
+   } else {
+      ret = 0;
+   }
+
+/* Check CTYPE3 */
+   if( ret && GetValue( this, "CTYPE3", AST__STRING, (void *) &cval, 0, 0, 
+                        method, class ) ) {
+      if( strcmp( cval, "FREQ" ) ) ret = 0;
+   } else {
+      ret = 0;
+   }
+
+/* Return  the result. */
    return ret;
 }
 
@@ -18793,6 +19370,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
       } else if( !Ustrncmp( setting + ival, FITSAIPSPP_STRING2, nc ) ){
          astSetEncoding( this, FITSAIPSPP_ENCODING );
 
+      } else if( !Ustrncmp( setting + ival, FITSCLASS_STRING, nc ) ){
+         astSetEncoding( this, FITSCLASS_ENCODING );
+
+      } else if( !Ustrncmp( setting + ival, FITSCLASS_STRING2, nc ) ){
+         astSetEncoding( this, FITSCLASS_ENCODING );
+
       } else if( !Ustrncmp( setting + ival, DSS_STRING, nc ) ){
          astSetEncoding( this, DSS_ENCODING );
 
@@ -20391,16 +20974,16 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    double r;               /* Distance (in AU) from earth axis */
    double restfreq;        /* Rest frequency (Hz) */
    double ubnd_s;          /* Upper bound on spectral axis */
-   double vsource;         /* Source velocity (km/s) */
+   double vsource;         /* Rel.vel. of source (m/s) */
    double xval;            /* Value of "X" system at reference point  */
    double z;               /* Distance (in AU) above earth equator */
+   double zsource;         /* Redshift of source */
    int fits_i;             /* FITS WCS axis index for current WCS axis */
    int iax;                /* Axis index */
    int ix;                 /* System index */
    int npix;               /* Number of pixel axes */
    int nwcs;               /* Number of WCS axes */
    int paxis;              /* Axis index within primary Frame */
-   int vrf;                /* Rest frame in which SourceVel is accessed */
 
 /* Initialise */
    ret = NULL;
@@ -20867,38 +21450,19 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
                   }
                }
 
-               cval = astGetC( specfrm, "StdOfRest" );
-               if( !strcmp( cval, "Topocentric" ) ){
-                  cval = "TOPOCENT";
-               } else if( !strcmp( cval, "Geocentric" )){
-                  cval = "GEOCENTR";
-               } else if( !strcmp( cval, "Barycentric" )){
-                  cval = "BARYCENT";
-               } else if( !strcmp( cval, "Heliocentric" )){
-                  cval = "HELIOCEN";
-               } else if( !strcmp( cval, "LSRK" )){
-                  cval = "LSRK";
-               } else if( !strcmp( cval, "LSRD" )){
-                  cval = "LSRD";
-               } else if( !strcmp( cval, "Galactic" )){
-                  cval = "GALACTOC";
-               } else if( !strcmp( cval, "Local_group" )){
-                  cval = "LOCALGRP";
-               } else if( !strcmp( cval, "Source" )){
-                  cval = "SOURCE";
-               } else {
-                  cval = NULL;
-               }
+               cval = GetFitsSor( astGetC( specfrm, "StdOfRest" ) );
                if( cval ) SetItemC( &(store->specsys), 0, s, cval );
 
                if( astTestSourceVel( specfrm ) ) {
-                  vrf = astGetSourceVRF( specfrm );
-                  astSetSourceVRF( specfrm, AST__TPSOR );
                   vsource = astGetSourceVel( specfrm );
-                  if( vsource != AST__BAD ) {
-                     SetItem( &(store->vsource), 0, 0, s, vsource*1000.0 );
+                  if( vsource != AST__BAD && vsource >= 0.0 &&
+                      vsource < AST__C ) {
+                     zsource = sqrt( (AST__C + vsource)/
+                                     (AST__C - vsource) ) - 1.0;
+                     SetItem( &(store->zsource), 0, 0, s, zsource );
+                     cval = GetFitsSor( astGetC( specfrm, "SourceVRF" ) );
+                     if( cval ) SetItemC( &(store->ssyssrc), 0, s, cval );
                   }
-                  astSetSourceVRF( specfrm, vrf );
                }
 
 /* Indicate that this axis has been described. */
@@ -21050,6 +21614,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *     20) Common case insensitive CUNIT values: "Hz", "Angstrom", "km/s",
 *     "M/S"
 
+*     21) FITS-CLASS CRVAL1 value is changed to CRVAL1 + RESTFREQ.
+
 *  Parameters:
 *     this
 *        Pointer to the FitsChan.
@@ -21097,6 +21663,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    double dval;                   /* General floating value */
    double lambda;                 /* Ratio of CDELTs */
    double projp;                  /* Projection parameter value */
+   double restfreq;               /* Rest frequency (Hz) */
    double sinrota;                /* Sin( CROTA ) */
    int *mp;                       /* Pointer to next projection parameter index */
    int axlat;                     /* Index of latitude axis */
@@ -21777,9 +22344,15 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
             GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s ),
                        AST__FLOAT, (void *) &crpix, 1, method, class );
    
+/* Store the original CRVAL value as RFVAL since it may be used for
+   other purposes (e.g. to hold the spectral source position). */
+            SetValue( ret, FormatKey( "RFVAL", axlon + 1, 1, s ),
+                      (void *) &crval, AST__FLOAT, NULL );
+
 /* Calculate and store a new CRPIX value which corresponds to a longitude 
    value of zero. Also store zero for CRVAL. */
             crpix -= crval/cdelt;
+            crval = 0.0;
             SetValue( ret, FormatKey( "CRPIX", axlon + 1, 1, s ),
                       (void *) &crpix, AST__FLOAT, NULL );
             SetValue( ret, FormatKey( "CRVAL", axlon + 1, 1, s ),
@@ -21794,14 +22367,19 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
             GetValue2( ret, this, FormatKey( "CRPIX", axlat + 1, -1, s ),
                        AST__FLOAT, (void *) &crpix, 1, method, class );
    
+/* Store the original CRVAL value as RFVAL since it may be used for
+   other purposes (e.g. to hold the spectral source position). */
+            SetValue( ret, FormatKey( "RFVAL", axlat + 1, 1, s ),
+                      (void *) &crval, AST__FLOAT, NULL );
+
 /* Calculate and store a new CRPIX value which corresponds to a longitude 
    value of zero. Also store zero for CRVAL. */
             crpix -= crval/cdelt;
+            crval = 0.0;
             SetValue( ret, FormatKey( "CRPIX", axlat + 1, 1, s ),
                       (void *) &crpix, AST__FLOAT, NULL );
             SetValue( ret, FormatKey( "CRVAL", axlat + 1, 1, s ),
                       (void *) &crval, AST__FLOAT, NULL );
-
          }
       }
 
@@ -22082,6 +22660,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Replace RESTFREQ by RESTFRQ. 
    ---------------------------- */
 /* Get any RESTFREQ card, marking it as read. */
+      restfreq = AST__BAD;
       if( s != ' ' ) {
          sprintf( keyname, "RESTFREQ%c", s );
       } else {
@@ -22111,6 +22690,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          if( !GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, 
                          method, class ) ){
             SetValue( ret, keyname, (void *) &dval, AST__FLOAT, comm );
+            restfreq = dval;
          }
       }
 
@@ -22130,15 +22710,6 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
             }
          }
       }
-
-/* Use AIPS spectral keywords OBSRA and OBSDEC to create a pair of celestial 
-   axes with reference point at the specified (OBSRA,OBSDEC) position. This 
-   is only done if the header does not already contain a pair of celestial 
-   axes. */
-
-/* Not yet implemented!!! */
-
-
 
 /* Common case insensitive CUNIT values: "Hz", "Angstrom", "km/s", "M/S" */
       if( s != ' ' ) {
@@ -22170,6 +22741,15 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                }
                if( cval ) SetValue( ret, keynam, (void *) &cval, AST__STRING, NULL );
             }
+         }
+      }
+
+/* FITS-CLASS CRVAL1 values need to be incremented by RESTFREQ. */
+      if( encoding == FITSCLASS_ENCODING && restfreq != AST__BAD ) {
+         if( GetValue2( ret, this, "CRVAL1", AST__FLOAT, (void *) &crval, 
+                        1, method, class ) ) {
+            crval += restfreq;      
+            SetValue( ret, "CRVAL1", (void *) &crval, AST__FLOAT, NULL );
          }
       }
 
@@ -24526,6 +25106,25 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 /* Return a clone of this SkyFrame as the reference Frame. */
          *reffrm = astClone( sfrm );
 
+/* The values currently stored in *reflat and *reflon are the CRVAL
+   values. In some circumstances, these may not be the original values in
+   the supplied header but may have been translated within the SpecTrans
+   function as part of the process of translating an old unsupported
+   projection (e.g. GLS) into a new supported projection (e.g. SFL).
+   Since the returned RefLat and RefLon values may be used to set the
+   reference position for a SpecFrame, we should return the original
+   values rather than the translated values. The original values will
+   have been stored (within SpecTrans) in the FitsChan as keywords
+   RFVALi. If such keywords can be found, use their values in preference
+   to the currently stored CRVAL values.*/
+         if( GetValue( this, FormatKey( "RFVAL", axlon + 1, -1, s ), 
+                       AST__FLOAT, (void *) &lonval, 0, 0, method, class ) &&
+             GetValue( this, FormatKey( "RFVAL", axlat + 1, -1, s ), 
+                       AST__FLOAT, (void *) &latval, 0, 0, method, class ) ) {
+            *reflon = lonval*AST__DD2R;
+            *reflat = latval*AST__DD2R;
+         }         
+
 /* Create a Frame by picking all the other (non-celestial) axes from the 
    supplied Frame. */
          axes = astMalloc( naxes*sizeof( int ) );
@@ -24911,18 +25510,18 @@ static void WcsFcRead( AstFitsChan *fc, FitsStore *store, const char *method,
          jm = 0;
          s = keynam[ strlen( keynam ) - 1 ];
 
-/* Is this a primary VSOURCE keyword? */
-      } else if( Match( keynam, "VSOURCE", 0, fld, &nfld, method, class ) ){
-         item = &(store->vsource);
-         type = AST__FLOAT;
+/* Is this a primary SSYSSRC keyword? */
+      } else if( Match( keynam, "SSYSSRC", 0, fld, &nfld, method, class ) ){
+         item = &(store->ssyssrc);
+         type = AST__STRING;
          i = 0;
          jm = 0;
          s = ' ';
 
-/* Is this a secondary VSOURCE keyword? */
-      } else if( Match( keynam, "VSOURCE%1c", 0, fld, &nfld, method, class ) ){
-         item = &(store->vsource);
-         type = AST__FLOAT;
+/* Is this a secondary SSYSSRC keyword? */
+      } else if( Match( keynam, "SSYSSRC%1c", 0, fld, &nfld, method, class ) ){
+         item = &(store->ssyssrc);
+         type = AST__STRING;
          i = 0;
          jm = 0;
          s = keynam[ strlen( keynam ) - 1 ];
@@ -25481,15 +26080,15 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
       if( cval ) SetValue( this, FormatKey( "SPECSYS", -1, -1, s ), &cval, 
                            AST__STRING, "Standard of rest for spectral axis" );
 
-/* VSOURCE - topocentric physical velocity of source */
-      val = GetItem( &(store->vsource), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, FormatKey( "VSOURCE", -1, -1, s ),
-                                      &val, AST__FLOAT, "[m/s] Topocentric velocity of source" );
+/* SSYSSRC - the standard of rest in which ZSOURCE is stored. */
+      cval = GetItemC( &(store->ssyssrc), 0, s, NULL, method, class );
+      if( cval ) SetValue( this, FormatKey( "SSYSSRC", -1, -1, s ), &cval, 
+                           AST__STRING, "Standard of rest for source redshift" );
 
 /* ZSOURCE - topocentric optical velocity of source */
       val = GetItem( &(store->zsource), 0, 0, s, NULL, method, class );
       if( val != AST__BAD ) SetValue( this, FormatKey( "ZSOURCE", -1, -1, s ),
-                                      &val, AST__FLOAT, "[] Topocentric velocity of source" );
+                                      &val, AST__FLOAT, "[] Redshift of source" );
 
 /* RESTFRQ - rest frequency */
       val = GetItem( &(store->restfrq), 0, 0, s, NULL, method, class );
@@ -27421,6 +28020,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
    const char *cunit;     /* Pointer to CUNIT value */
    const char *defunit;   /* Default unit string */
    const char *specsys;   /* Pointer to SPECSYS value */
+   const char *ssyssrc;   /* Pointer to SSYSSRC value */
    double geolat;         /* Observers geodetic latitude */
    double geolon;         /* Observers geodetic longitude */
    double h;              /* Observers geodetic height */
@@ -27513,22 +28113,18 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
                astSetGeoLon( specfrm, geolon );
             }         
 
-/* Source velocity. If the VSOURCE keyword is set, use it (it is assumed
-   to be a topocentric velocity). If not present, use the ZSOURCE keyword
-   and convert from redshift to velocity. SourceVel is stored in km/s,
-   not m/s. */
-            vsource = GetItem( &(store->vsource), 0, 0, s, NULL, method, class );
-            if( vsource == AST__BAD ) {
-               vsource = GetItem( &(store->zsource), 0, 0, s, NULL, method, class );
-               if( vsource != AST__BAD ) {
-                  vsource += 1.0;
-                  vsource *= vsource;
-                  vsource = AST__C*( vsource - 1.0  )/( vsource + 1.0 );
-               }
-            }
+/* Source velocity rest frame */
+            ssyssrc = GetItemC( &(store->ssyssrc), 0, s, NULL, method, class );
+            if( ssyssrc ) astSetC( specfrm, "SourceVRF", ssyssrc );
+
+/* Source velocity. Use the ZSOURCE keyword and convert from redshift to 
+   velocity. */
+            vsource = GetItem( &(store->zsource), 0, 0, s, NULL, method, class );
             if( vsource != AST__BAD ) {
-               astSetSourceVRF( specfrm, AST__TPSOR );
-               astSetSourceVel( specfrm, vsource*0.001 );
+               vsource += 1.0;
+               vsource *= vsource;
+               vsource = AST__C*( vsource - 1.0  )/( vsource + 1.0 );
+               astSetSourceVel( specfrm, vsource );
             }
 
 /* Reference frame. If the SPECSYS keyword is set, use it (the FITS codes
@@ -29302,6 +29898,12 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     This is an extension of FITS-AIPS which includes some of the
 *     features of FITS-IRAF and FITS-PC.
 *
+*     - "FITS-CLASS": Encodes coordinate system information in FITS
+*     header cards using the conventions used by the CLASS project.
+*     CLASS is a software package for reducing single-dish radio and
+*     sub-mm spectroscopic data. See 
+*     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
+*
 *     - "NATIVE": Encodes AST Objects in FITS header cards using a
 *     convention which is private to the AST library (but adheres to
 *     the general FITS standard) and which uses FITS keywords that
@@ -29322,6 +29924,10 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *
 *     - If the FitsChan contains any keywords beginning with the
 *     string "BEGAST", then NATIVE encoding is used,
+*     - Otherwise, FITS-CLASS is used if the FitsChan contains CTYPE
+*     values as follows: CTYPE1 equal to "FREQ", CTYPE2 equal to "RA" or 
+*     "GLON", and CTYPE3 equal to "DEC" or "GLAT". Note that no algorithm
+*     code is included in any of these CTYPE values.
 *     - Otherwise, if the FitsChan contains a CTYPE keyword which
 *     represents a spectral axis using the conventions of the AIPS and
 *     AIPS++ projects (e.g. "FELO-LSR", etc), then one of FITS-AIPS or 
@@ -29584,6 +30190,24 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     writing a FITS header, rotation will be specified using CROTA/CDELT
 *     keywords if possible, otherwise CDi_j keywords will be used instead.
 
+*  The FITS-CLASS Encoding:
+*     The FITS-CLASS encoding uses the conventions of the CLASS project.
+*     These are described at:
+*     
+*     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/node47.html
+*
+*     This encoding is imilar to FITS-AIPS with the following restrictions:
+*
+*     - Axis 1 must be a linear frequency axis.
+*     - Axis 2 must be a RA or GLON axis
+*     - Axis 3 must be a DEC or GLAT axis
+*     - No algorithm code is used to specify the celestial projection,
+*     which must be SFL (Sanson-Flamsteed, equivalent to the old
+*     AIPS GLS projection).
+*     - No rotation of the celestial axes is allowed.
+*     - The FITS-WCS CRVAL1 value is obtained by adding the values of the
+*     CRVAL1 and RESTFREQ keywords.
+
 *  The NATIVE Encoding:
 *     The NATIVE encoding may be used to store a description of any
 *     class of AST Object in the form of FITS header cards, and (for
@@ -29648,6 +30272,7 @@ astMAKE_SET(FitsChan,Encoding,int,encoding,(
    value == FITSIRAF_ENCODING ||
    value == FITSAIPS_ENCODING ||
    value == FITSAIPSPP_ENCODING ||
+   value == FITSCLASS_ENCODING ||
    value == DSS_ENCODING ? value : 
    (astError( AST__BADAT, "astSetEncoding: Unknown encoding system %d "
               "supplied.", value ), UNKNOWN_ENCODING )))
@@ -31727,4 +32352,5 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
    this->card = cardo;
 }
 */
+
 
