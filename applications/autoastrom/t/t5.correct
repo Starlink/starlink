@@ -70,6 +70,8 @@ ast: ref to ARRAY
 >> Frm4 = 	# Frame number 4
 >> Begin SkyFrame 	# Description of celestial coordinate system
 >> Naxes = 2 	# Number of coordinate axes
+>> Epoch = 2000 	# Julian epoch of observation
+>> System = "FK5" 	# Coordinate system type
 >> Ax1 = 	# Axis number 1
 >> Begin SkyAxis 	# Celestial coordinate axis
 >> Digits = 8 	# Default formatting precision
@@ -81,9 +83,7 @@ ast: ref to ARRAY
 >> IsA Axis 	# Coordinate axis
 >> End SkyAxis
 >> IsA Frame 	# Coordinate system description
->> System = "FK5" 	# Celestial coordinate system type
 >> Proj = "gnomonic" 	# Description of sky projection
->> Epoch = 2000 	# Julian epoch of observation
 >> Eqnox = 2000 	# Julian epoch of mean equinox
 >> End SkyFrame
 >> Map2 = 	# Mapping between nodes 1 and 2
