@@ -31,7 +31,7 @@
 
 #include    <stdio.h>
 #include    <string.h>
-#if HAVE_UNIXLIB_H
+#ifdef VAXC
 #include    <unixlib.h>
 #else
 #include    <stdlib.h>
