@@ -169,7 +169,7 @@ NDFPACK_TASKS = $(NDFPACK_F_ROUTINES:.f=)
 
 PUBLICSCRIPTS = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
-unsharpmask.icl irg_wild nfi.awk tkast.tcl dialog.tcl adamtask.tcl \
+unsharpmask.icl nfi.awk tkast.tcl dialog.tcl adamtask.tcl \
 adamMessageRelay stardemo.tcl stardemo_procs.tcl pazo.csh lutedit.tcl \
 s2p
 
