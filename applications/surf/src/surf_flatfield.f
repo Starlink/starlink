@@ -1,10 +1,10 @@
-      SUBROUTINE REDS_FLATFIELD (STATUS)
+      SUBROUTINE SURF_FLATFIELD (STATUS)
 *+
 *  Name:
 *     FLATFIELD
 
 *  Purpose:
-*     Routine to flatfield demodulated SCUBA data 
+*     Flatfield demodulated SCUBA data 
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_FLATFIELD( STATUS )
+*     CALL SURF_FLATFIELD( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -29,14 +29,20 @@
 
 *  ADAM parameters:
 *     IN = NDF (Read)
-*        The name of the NDF containing the demodulated data to be flatfielded.
-*        This should already have been run through the REDUCE_SWITCH application.
+*        The name of the NDF containing the demodulated data to be 
+*        flatfielded. This file should already have been run through the 
+*        REDUCE_SWITCH application.
+*     MSG_FILTER = CHAR (Read)
+*         Message filter level. Default is NORM.
 *     OUT = NDF (Write)
 *        The name of the NDF to which the flatfielded data are to be written.
 
 *  Examples:
 *     flatfield redsw flat
 *        This will flatfield the data from redsw.sdf and write it to flat.sdf
+
+*  Related Applications:
+*     SURF: CHANGE_FLAT, SCUQUICK
 
 *  Algorithm:
 *        The data array of the IN file should have dimensions (N_BOLS,N_POS) 
@@ -63,6 +69,10 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.10  1997/06/12 23:49:12  timj
+*     Doc updates
+*     Use SURF_PAR and change name
+*
 *     Revision 1.9  1997/04/30 02:31:08  timj
 *     Rationalise calling.
 *     Add MSG_OUTIF, PKG and TSKNAME.
@@ -92,7 +102,7 @@ c
 *    Global constants :
       INCLUDE 'SAE_PAR'                ! SSE global definitions
       INCLUDE 'DAT_PAR'                ! Data-system constants
-      INCLUDE 'REDS_SYS'               ! REDS constants
+      INCLUDE 'SURF_PAR'               ! SURF constants
       INCLUDE 'MSG_PAR'                ! MSG__ constants
 
 *    Status :
