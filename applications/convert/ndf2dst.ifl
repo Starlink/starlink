@@ -26,7 +26,7 @@
 
 interface NDF2DST
 
-   helplib        'CONVERT_DIR:CONVERT'
+   helplib        'CONVERT_HELP:'
 
    parameter	  IN             # Name of input NDF
       position    1

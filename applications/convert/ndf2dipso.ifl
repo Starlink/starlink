@@ -26,7 +26,7 @@
 
 interface NDF2DIPSO
 
-   helplib        'CONVERT_DIR:CONVERT'
+   helplib        'CONVERT_HELP:'
 
    parameter      IN                # Input NDF
       position    1

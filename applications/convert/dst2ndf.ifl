@@ -29,7 +29,7 @@
 
 interface DST2NDF
 
-   helplib        'CONVERT_DIR:CONVERT'
+   helplib        'CONVERT_HELP:'
 
    parameter      IN             # Name of Figaro file
       position    1

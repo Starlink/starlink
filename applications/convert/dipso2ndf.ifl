@@ -26,7 +26,7 @@
 
 interface         DIPSO2NDF
 
-   helplib        'CONVERT_DIR:CONVERT'
+   helplib        'CONVERT_HELP:'
 
    parameter      IN               # Input Dipso file
       position    1

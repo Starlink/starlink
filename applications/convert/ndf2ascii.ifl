@@ -23,7 +23,7 @@
 
 interface NDF2ASCII
 
-   helplib        'CONVERT_DIR:CONVERT'
+   helplib        'CONVERT_HELP:'
 
    parameter      COMP           # Data, quality or variance?
       position    3

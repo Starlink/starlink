@@ -20,7 +20,7 @@
 
 interface UNF2NDF
 
-   helplib        'CONVERT_DIR:CONVERT'
+   helplib        'CONVERT_HELP:'
 
    parameter      COMP           # Data, quality or variance?
       position    3
