@@ -520,7 +520,7 @@
                   IF ( SRTKEY .EQ. 'NONE' ) THEN
                      LINE( 2: ) = SINDEX
                   END IF
-                  LINE( 10:38 ) = NAME
+                  LINE( 12:38 ) = NAME
                   LINE( 40:66 ) = NDFNAM
                   IF ( JSET .GT. 0 ) THEN
                      LINE( 70: ) = 'yes'
@@ -536,6 +536,12 @@
             CALL NDF_ANNUL( INDF, STATUS )
          END DO
       END DO
+
+*  If there were none selected at all, write a message to this effect.
+      IF ( NOK .EQ. 0 ) THEN
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL CCD1_MSG( ' ', '  No NDFs were selected', STATUS )
+      END IF
 
 *  Write selected NDF names to the output list.
       CALL CCD1_MSG( ' ', ' ', STATUS )
