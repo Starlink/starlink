@@ -86,7 +86,7 @@ package ccdpack {
 #     {enter_changes_here}
 #-
 
-   version PKG_VERS
+   version @PACKAGE_VERSION@
    prefix ccd
 
 #  The following definition allows the flagging text "[G]" to appear 
@@ -161,7 +161,7 @@ package ccdpack {
 
 #  Display informational message.
    display { 
-   CCDPACK commands are now available -- (Version PKG_VERS)
+   CCDPACK commands are now available -- (Version @PACKAGE_VERSION@)
    }
 
 #  Specific additions for the package.csh file.
@@ -286,7 +286,7 @@ package ccdpack {
    cl {
 #  Say we're here.
       print ""
-      print "   CCDPACK commands are now available -- (Version PKG_VERS)"
+      print "   CCDPACK commands are now available -- (Version @PACKAGE_VERSION@)"
       print ""
 
 #  IRAF specific tasks
