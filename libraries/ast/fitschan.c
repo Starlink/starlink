@@ -88,10 +88,6 @@ f     encodings), then write operations using AST_WRITE will
 *     encoding. Otherwise (e.g. the NATIVE encoding), multiple Object
 *     descriptions are written sequentially and may later be read
 *     back in the same sequence.
-*
-*     Note, currently the FitsChan class does not recognise spectral axes. 
-*     They are treated as an ``unknown'' axis type, and are represented by
-*     simple a 1-dimensional Frame (not a SpecFrame).
 
 *  Inheritance:
 *     The FitsChan class inherits from the Channel class.
@@ -27380,16 +27376,14 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     The FITS-WCS convention uses FITS header cards to describe the
 *     relationship between pixels in an image (not necessarily
 *     2-dimensional) and one or more related "world coordinate systems".
-*     Often, although not necessarily, one of these systems will be a 
-*     celestial coordinate system, in which case the sequence of 
-*     transformations which convert between the various intermediate 
-*     coordinate systems will include a "sky projection" (e.g. as
-*     implemented by a WcsMap).  The FITS-WCS encoding may only be
-*     used to store a single AST Object in any set of FITS header
-*     cards, and that Object must be a FrameSet which conforms to the
-*     FITS-WCS model (the FrameSet may, however, contain multiple Frames
-*     which will be result in multiple FITS "alternate axis descriptions").
-*     The projections supported include all those in the fits-wcs standard.
+*     The FITS-WCS encoding may only be used to store a single AST Object 
+*     in any set of FITS header cards, and that Object must be a FrameSet 
+*     which conforms to the FITS-WCS model (the FrameSet may, however, 
+*     contain multiple Frames which will be result in multiple FITS 
+*     "alternate axis descriptions"). Details of the use made by this 
+*     Encoding of the conventions described in the FITS-WCS papers are 
+*     given in the appendix "FITS-WCS Coverage" of this document. A few
+*     main points are  described below.
 *
 *     The rotation and scaling of the intermediate world coordinate system
 *     can be specified using either "CDi_j" keywords, or "PCi_j" together
@@ -27397,9 +27391,9 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     the value of the CDMatrix attribute of the FitsChan determines
 *     which system is used.
 *
-*     In addition, it supports the "TAN with polynomial correction terms"
-*     projection which was included in a draft of the FITS-WCS paper, but
-*     was not present in the final version. A "TAN with polynomial 
+*     In addition, this encoding supports the "TAN with polynomial correction 
+*     terms" projection which was included in a draft of the FITS-WCS paper, 
+*     but was not present in the final version. A "TAN with polynomial 
 *     correction terms" projection is represented using a WcsMap with type 
 *     AST__TPN (rather than AST__TAN which is used to represent simple
 *     TAN projections). When reading a FITS header, a CTYPE keyword value 
