@@ -643,7 +643,7 @@ itcl::class gaia::GaiaImageCtrl {
    public method about {} {
       global ::about_skycat
       DialogWidget $w_.about \
-         -messagewidth 6i \
+         -messagewidth 6.5i \
          -justify center \
          -text $about_skycat
       $w_.about activate
