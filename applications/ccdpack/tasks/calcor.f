@@ -318,7 +318,6 @@
 
 *  Local Variables:
       CHARACTER * ( CCD1__NMLEN ) FTYPE ! Expected frame type
-      CHARACTER * ( GRP__SZNAM ) CVAL  ! String to hold the EXPOSURE factors expressed as a string
       CHARACTER * ( NDF__SZTYP ) CTYPE ! Calibration data type
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Current data type
       DOUBLE PRECISION EFACIN( CCD1__MXNDF ) ! Exposure factors for all NDFs
@@ -715,8 +714,7 @@
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ', '  *** Deleting input NDFs.', STATUS )
          DO I = 1, NTOT
-            CALL NDG_NDFAS( INGRP, I, 'UPDATE', IDIN, STATUS )
-            CALL NDF_DELET( IDIN, STATUS )
+            CALL CCD1_NGDEL( INGRP, I, .TRUE., STATUS )
          END DO
       END IF
 

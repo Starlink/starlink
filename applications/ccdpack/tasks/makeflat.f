@@ -337,7 +337,6 @@
       CHARACTER * ( CCD1__NMLEN ) FILTER ! The filter type of the input NDFs
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Lowest common precision type of input NDFs
       CHARACTER * ( NDF__SZTYP ) PTYPE ! Actual processing precision
-      CHARACTER * ( GRP__SZNAM ) KEYVAL ! Value of Set split key attribute
       CHARACTER * ( GRP__SZNAM ) NAME ! Set Name attribute
       CHARACTER * ( GRP__SZNAM ) OUTNAM ! Filename used for output
       DOUBLE PRECISION AVEACC( CCD1__MXNDF ) ! Mean values
@@ -360,7 +359,6 @@
       INTEGER IDWRK4            ! Covariances workspace identifier
       INTEGER IMETH             ! The combination method
       INTEGER INDEX             ! Set Index attribute
-      INTEGER INDF              ! NDF identifier
       INTEGER INGRP             ! NDG identifier for input file group
       INTEGER INWORK            ! NDF identifier for workspace
       INTEGER IPIECE            ! Identifier for stack chunk
@@ -883,8 +881,7 @@
 *  If requested delete all the input NDFs.
       IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
          DO 10 I = 1, NTOT
-            CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF, STATUS )
-            CALL NDF_DELET( INDF, STATUS )
+            CALL CCD1_NGDEL( INGRP, I, .TRUE., STATUS )
  10      CONTINUE
       END IF
 

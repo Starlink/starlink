@@ -346,7 +346,6 @@
       INTEGER IDWRK4             ! Workspace identifier
       INTEGER IMETH              ! The combination method
       INTEGER INDEX              ! Set Index attribute value
-      INTEGER INDF               ! NDF identifier
       INTEGER INGRP              ! NDG identifier for group of input NDFs
       INTEGER INSTA              ! Number of pixels in accessible workspace stack.
       INTEGER INWORK             ! NDF identifier for workspace
@@ -759,8 +758,7 @@
 *  If requested delete all the input NDFs.
       IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
          DO 10 I = 1, NTOT
-            CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF, STATUS )
-            CALL NDF_DELET( INDF, STATUS )
+            CALL CCD1_NGDEL( INGRP, I, .TRUE., STATUS )
  10      CONTINUE
       END IF
 

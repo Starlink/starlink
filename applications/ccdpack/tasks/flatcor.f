@@ -651,8 +651,7 @@
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ', '  *** Deleting input NDFs.', STATUS )
          DO I = 1, NTOT
-            CALL NDG_NDFAS( INGRP, I, 'UPDATE', IDIN, STATUS )
-            CALL NDF_DELET( IDIN, STATUS )
+            CALL CCD1_NGDEL( INGRP, I, .TRUE., STATUS )
          END DO
       END IF
 
