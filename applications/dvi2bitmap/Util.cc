@@ -205,7 +205,9 @@ string Util::runCommandPipe (string cmd, string envs, int *statusp)
             cerr << "Error executing " << argv[0]
                  << ": " << strerror(errno) << endl;
 
-	exit(EXIT_FAILURE);
+        // Children should exit with _exit rather than exit.  See, eg.,
+        // <http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC6> 
+	_exit(EXIT_FAILURE);
 
     } else {
 
