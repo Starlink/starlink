@@ -103,7 +103,7 @@
 <![ IGNORE [
 <!ENTITY % list "UL | OL |  DIR | MENU">
 ]]>
-<!ENTITY % list "UL | OL |  DIR | MENU">
+<!ENTITY % list "UL | OL">
 
 <![ %HTML.Deprecated [
     <!ENTITY % preformatted "PRE | XMP | LISTING">
@@ -138,7 +138,7 @@
 <!ENTITY % text "#PCDATA | %font | %phrase | %special | %form">
 ]]>
 <!-- Starlink: -->
-<!ENTITY % moved.down "%list | DL | BLOCKQUOTE">
+<!ENTITY % moved.down "%preformatted | %list | DL | BLOCKQUOTE">
 <!ENTITY % text "#PCDATA | %font | %phrase | %special | %form | %moved.down">
 
 <!ELEMENT (%font|%phrase) - - (%text)*>
@@ -185,7 +185,7 @@
 ]]>
 <!-- Starlink: -->
 <!ENTITY % block
-     "P | %preformatted | DIV | CENTER |
+     "P | DIV | CENTER |
       FORM | ISINDEX | HR | TABLE">
 
 <!-- %flow is used for DD and LI -->
