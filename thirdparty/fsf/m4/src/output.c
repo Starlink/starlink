@@ -467,12 +467,12 @@ insert_file (FILE *file)
 
   /* Insert output by big chunks.  */
 
-  while (length = read (fileno (file), buffer, COPY_BUFFER_SIZE),
+  errno = 0;
+  while (length = fread (buffer, 1, COPY_BUFFER_SIZE, file),
 	 length != 0)
-    if (length == (size_t) -1)
-      M4ERROR ((EXIT_FAILURE, errno, "ERROR: Reading inserted file"));
-    else
-      output_text (buffer, length);
+    output_text (buffer, length);
+  if (errno)
+    M4ERROR ((EXIT_FAILURE, errno, "ERROR: Reading inserted file"));
 }
 
 /*-------------------------------------------------------------------------.

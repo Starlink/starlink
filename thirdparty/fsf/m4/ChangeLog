@@ -1,3 +1,54 @@
+2004-06-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Release 1.4.1.
+
+	* configure.in (VERSION): Bump to 1.4.1.
+	* NEWS: Describe 1.4.1's changes.
+
+	* aclocal.m4 (fp_PROG_CC_STDC): Use AC_DEFUN, not define, to
+	pacify Autoconf 2.59.
+
+	* doc/m4.texinfo: Insert commas after @xref's that lack them,
+	to pacify Texinfo 4.7.
+	* doc/Makefile.in (info): Remove info-1, info-2, info-3.
+
+	* src/m4.h, src/debug.c: Use #ifdef __STDC__, not #if __STDC__, to
+	pacify Sun C compilers.
+
+2003-09-28  Akim Demaille  <akim@epita.fr>
+
+	* src/symtab.c (lookup_symbol): Fix an uninitialized-variable
+	botch.
+
+2003-09-03  Santiago Vila  <sanvila@debian.org>
+
+	* examples/stackovf.sh: Use tempfile if available.
+
+2001-04-02  Robert Bihlmeyer  <robbe@orcus.priv.at>
+
+	http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=92629
+	* src/output.c (m4_insert_file): Do not mix buffered and
+	unbuffered I/O, as this breaks on the Hurd.  (trivial change)
+
+2001-02-01  Santiago Vila  <sanvila@debian.org>
+
+	http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=84451
+	* src/m4.c (main): Fix format vulnerabilities.  (trivial change)
+
+2001-02-01  Matt Kraai  <kraai@debian.org>
+
+	http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=84416
+	* doc/m4.texinfo (Maketemp): Change maketemp to refer to a new,
+	empty file rather than to a nonexistent file.  This closes a common
+	security hole.
+	* src/builtin.c (m4_maketemp): Implement the above, by using
+	mkstemp rather than mktemp.  (trivial change)
+
+2000-01-09  Akim Demaille  <demaille@inf.enst.fr>
+
+	* src/builtin.c (expand_ranges): Added break after trailing dash.
+	This caused misbehaviors on some systems.
+
 Sat Nov  5 15:52:47 1994  Francois Pinard  (pinard@icule)
 
 	* Release 1.4.
