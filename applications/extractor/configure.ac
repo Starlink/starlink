@@ -14,7 +14,9 @@ dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([extractor.news])
 
 dnl    Include defaults for Starlink configurations
-STAR_DEFAULTS
+dnl    Option `per-package-dirs' means that executables and help files
+dnl    are installed in package-specific directories.
+STAR_DEFAULTS(per-package-dirs)
 
 dnl    Need to build an atask, depends on much the same as a full monolith.
 STAR_MONOLITHS
@@ -43,9 +45,9 @@ STAR_DECLARE_DEPENDENCIES(link,  ndf)
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun226, [sun226.tex sun226.ps sun226.htx_tar])
-STAR_CHECK_PROGS( star2html )
+STAR_CHECK_PROGS(star2html)
 
-STAR_DOC_FILES([mud165.ps extractor.news sun226fig.ps])
+STAR_DOC_FILES([mud165.ps sun226fig.ps])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
