@@ -1,0 +1,128 @@
+      SUBROUTINE KPS1_PRMX<T>( NDIM, DIM, DIMO, PERM, IN, OUT, STATUS )
+*+
+*  Name:
+*     KPS1_PRMX<T>
+ 
+*  Purpose:
+*     Copy an array, permuting the axes.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPS1_PRMX<T>( NDIM, DIM, DIMO, PERM, IN, OUT, STATUS )
+ 
+*  Description:
+*     This routine copies an n-dimensional array, permuting its axes in
+*     the process.
+ 
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        Number of array dimensions.
+*     DIM( NDIM ) = INTEGER (Given)
+*        Input array dimensions.
+*     DIMO( NDIM ) = INTEGER (Given)
+*        Output array dimensions.
+*     PERM( NDIM ) = INTEGER (Given)
+*        The first element is the index of the pixel axis within the input 
+*        which is to become axis 1 in the output. The second element is the 
+*        index of the pixel axis within the input which is to become axis 2 
+*        in the output, etc. Axes are numbered from 1.
+*     IN( * ) = <TYPE> (Given)
+*        The input array.
+*     OUT( * ) = <TYPE> (Given)
+*        The output array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Authors:
+*     DSB: David S. Berry (DSB)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     6-FEB-2001 (DSB):
+*        Original version.
+*     {enter_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF__ constants
+ 
+*  Arguments Given:
+      INTEGER NDIM
+      INTEGER DIM( NDIM )
+      INTEGER DIMO( NDIM )
+      INTEGER PERM( NDIM )
+      <TYPE> IN( * )
+ 
+*  Arguments Returned:
+      <TYPE> OUT( * )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      INTEGER EL                 ! No. of pixels in array
+      INTEGER I                  ! Axis index
+      INTEGER J                  ! Index of output pixel
+      INTEGER K                  ! Index of input pixel
+      INTEGER IOUT( NDF__MXDIM + 1 ) ! Output pixel indices
+      INTEGER IIN( NDF__MXDIM + 1 )  ! Input pixel indices
+      INTEGER STEPI( NDF__MXDIM + 1 )! Input steps indexed by input axis
+      INTEGER STEP( NDF__MXDIM + 1 ) ! Input steps indexed by output axis
+
+*.
+ 
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find the vector steps within the input array for unit increment along
+*  each input axis, find the total number of pixels in the array, and 
+*  initialise the indices of the current output pixel.
+      EL = 1
+      DO I = 1, NDIM
+         STEPI( I ) = EL
+         EL = EL*DIM( I )
+         IOUT( I ) = 1
+      END DO
+
+*  Permute the step array so that it is indexed by output axis instead of
+*  input axis.
+      DO I = 1, NDIM
+         STEP( I ) = STEPI( PERM( I ) )
+      END DO
+
+*  Initialise the vector index within the input array of the current output
+*  pixel.
+      K = 1
+
+*  Do each output value.
+      DO J = 1, EL
+
+*  Copy the data value.
+         OUT( J ) = IN( K )
+
+*  Increment the indices of the current output pixel, and update the
+*  vector index of the corresponding input pixel.
+         I = 1
+         IOUT( 1 ) = IOUT( 1 ) + 1
+         K = K + STEP( 1 )
+         DO WHILE( IOUT( I ) .GT. DIMO( I ) )
+            IOUT( I ) = 1
+            K = K - DIMO( I )*STEP( I )
+            I = I + 1
+            IOUT( I ) = IOUT( I ) + 1
+            K = K + STEP( I )
+         END DO
+
+      END DO
+
+      END
