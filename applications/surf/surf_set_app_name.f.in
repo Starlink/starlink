@@ -37,6 +37,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.1  2004/07/14 19:24:48  timj
+*     after substitution file should be .f not .fpp
+*
 *     Revision 1.1  2004/07/14 18:40:37  timj
 *     move to parent directory so that we guarantee the correct version and now substitute version using configure
 *
