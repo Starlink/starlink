@@ -24,6 +24,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       REAL X
 *    Import-Export :
