@@ -82,7 +82,7 @@ INCLUDES	= -I../include  \
 
 DEFINES         = \
                 -DGAIA_VERSION=\"@GAIA_VERSION@\" \
-                -DGAIA_LIBRARY=\"@GAIA_LIBRARY@\" \
+                -DGAIA_LIBRARY=\"@GAIA_BUILD_LIBRARY@\" \
                 -DIWIDGETS_VERSION=\"@IWIDGETS_VERSION@\" \
                 -DIWIDGETS_LIBRARY=\"@IWIDGETS_LIBRARY@\"
 

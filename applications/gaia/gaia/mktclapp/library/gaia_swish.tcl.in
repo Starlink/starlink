@@ -25,8 +25,7 @@ proc main {} {
    set cat_library      @CAT_LIBRARY@
    set rtd_library      @RTD_LIBRARY@
    set skycat_library   @SKYCAT_LIBRARY@
-   set gaia_library     @GAIA_LIBRARY@
-   set tcladam_library  @TCLADAM_LIBRARY@
+   set gaia_library     @GAIA_BUILD_LIBRARY@
    set iwidgets_library @IWIDGETS_LIBRARY@
    set iscripts_library @IWIDGETS_LIBRARY@/scripts
    set tclx_library     @TCLX_LIBRARY@
@@ -44,7 +43,6 @@ proc main {} {
                    $rtd_library \
                    $cat_library \
                    $skycat_library \
-                   $tcladam_library \
                    $gaia_library]
    
    #  Set location of startup script.
@@ -58,7 +56,7 @@ proc main {} {
    puts $fd "-tk-library \"$tk_library\""
    
    #  Name of the Et_AppInit file.
-   puts $fd "EtAppInit.C"
+   puts $fd "tkAppInit.C"
    
    #  Now add all the Tcl file from everywhere.
    foreach dir $srcdirs {

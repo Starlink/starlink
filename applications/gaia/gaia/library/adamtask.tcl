@@ -80,13 +80,16 @@ proc adamtask.init {} {
 # more than one X display.
     adam_start [winfo name .]
 
-# Get the name of the message relay script. This is either the value of
-# the environment variable ADAM_MESSAGE_RELAY or the file "adamMessageRelay"
-# stored in the same directory as this file (adamtask.tcl).
+# # Get the name of the message relay script. This is either the value of
+# # the environment variable ADAM_MESSAGE_RELAY or the file "adamMessageRelay"
+# # stored in the same directory as this file (adamtask.tcl).
+#     global env
+#     if {[catch {set env(ADAM_MESSAGE_RELAY)} relayName] != 0} {
+# 	set relayName [file dirname [info script]]/adamMessageRelay
+#     }
+#  PWD: Locate adamMessageRelay script in GAIA_DIR.
     global env
-    if {[catch {set env(ADAM_MESSAGE_RELAY)} relayName] != 0} {
-	set relayName [file dirname [info script]]/adamMessageRelay
-    }
+    set relayName $env(GAIA_DIR)/adamMessageRelay
 
 # Create the message relay process. 
     set adamtask_priv(PIPE) [open "|$relayName \"[winfo name .]\"" r]

@@ -37,9 +37,9 @@ FILES        = \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
  StarAstSystem.hlp StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
  skycat.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
- gaia_logo.xpm
+ gaia_logo.xpm adamtask.tcl
 
-PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh
+PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessage
 srcdir	     = @srcdir@
 
 all:
