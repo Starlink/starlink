@@ -940,6 +940,38 @@ iraf! {
 
       }
 
+      action astpermaxes {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter perm {
+            position 2
+            type _INTEGER 
+            prompt {The new axis order}
+            ppath CURRENT 
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {The modified Frame or FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Frame or FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
    }
 
    command astshow {
