@@ -90,7 +90,6 @@
       PARAMETER ( NCP = 5 )                      ! by spline fit for gradients
 
 *  Local Variables:
-      INTEGER DATA_OFFSET                        ! Loop counter
       INTEGER ISTAT                              ! Spline fit status
       INTEGER ITEMP                              ! Scratch int
       INTEGER IWK_END                            ! Pointer to end of IWK
@@ -145,7 +144,6 @@
 *     for the output grid using MODE 2.
 
             MODE = 2
-            DATA_OFFSET = 1
 
             CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NX_OUT,
      :           NY_OUT, X_OUT, Y_OUT, DATA_OUT, 
