@@ -25,16 +25,17 @@
 *    Local variables :
       CHARACTER*132 BUFF
 *-
-      IF (STATUS.NE.SAI__OK) THEN
+      IF (STATUS.EQ.SAI__OK) THEN
 
         CALL PSX_GETENV(ALT,BUFF,STATUS)
-        IF (CHR_LEN(BUFF).EQ.0) THEN
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_ANNUL(STATUS)
           CALL PSX_GETENV(DEF,BUFF,STATUS)
-          IF (CHR_LEN(BUFF).EQ.0) THEN
+          IF (STATUS.NE.SAI__OK) THEN
+            CALL ERR_ANNUL(STATUS)
             CALL PSX_GETENV('AST_ETC',BUFF,STATUS)
-            IF (CHR_LEN(BUFF).EQ.0) THEN
+            IF (STATUS.NE.SAI__OK) THEN
               CALL MSG_PRNT('! Unable to resolve data path')
-              STATUS=SAI__ERROR
             ENDIF
           ENDIF
         ENDIF
@@ -42,7 +43,14 @@
         IF (STATUS.EQ.SAI__OK) THEN
 
           L=CHR_LEN(BUFF)
-          PATH=BUFF(1:L)//REL
+          IF (CHR_LEN(REL).GT.0) THEN
+            IF (BUFF(L:L).NE.'/'.AND.REL(1:1).NE.'/') THEN
+              BUFF=BUFF(1:L)//'/'
+              L=L+1
+            ENDIF
+            PATH=BUFF(1:L)//REL
+          ENDIF
+          L=CHR_LEN(PATH)
 
         ENDIF
 
