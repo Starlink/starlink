@@ -50,6 +50,8 @@
 #        Add CALCSKY, REMDBM and CHANGE_NACENTRE. SCUNOISE and SETBOLWT
 #     20-Nov-1998 (TIMJ)
 #        Add REDUCE_NOISE
+#     January 1999 (TIMJ)
+#        Add ADD_DBM and SCUSETENV
 #     {enter_changes_here}
 #
 #-
@@ -184,7 +186,7 @@ alias dspbol      ${SURF_DIR}/dspbol
 alias pltbol      ${SURF_DIR}/pltbol
 alias rlinplot    ${SURF_DIR}/rlinplot
 alias scuplot     ${SURF_DIR}/scuplot.csh
-
+alias scusetenv   'source ${SURF_DIR}/scusetenv.csh'
 
 alias surf_scupa       ${SURF_DIR}/scupa.csh
 alias surf_sdip        ${SURF_DIR}/sdip.csh
@@ -192,6 +194,7 @@ alias surf_dspbol      ${SURF_DIR}/dspbol
 alias surf_pltbol      ${SURF_DIR}/pltbol
 alias surf_rlinplot    ${SURF_DIR}/rlinplot
 alias surf_scuplot     ${SURF_DIR}/scuplot.csh
+alias surf_scusetenv   'source ${SURF_DIR}/scusetenv.csh'
 
 # Straight perl scripts
 alias scunoise         'perl -s ${SURF_DIR}/scunoise'
