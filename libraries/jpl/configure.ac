@@ -30,8 +30,8 @@ dnl  What unit does OPEN's recl specifier assume?
 AC_FC_RECL_UNIT
 
 dnl  No dependencies
-STAR_DECLARE_DEPENDENCIES([build], [ ])
-STAR_DECLARE_DEPENDENCIES([link],  [ ])
+dnl STAR_DECLARE_DEPENDENCIES([build], [ ])
+dnl STAR_DECLARE_DEPENDENCIES([link],  [ ])
 
 dnl  Documentation is uncomplicated
 STAR_LATEX_DOCUMENTATION(sun87)
