@@ -34,7 +34,9 @@
 *     This routine calls a Tcl script which displays an NDF in a window
 *     and allows the user to select points on it using an intuitive
 *     graphical interface.  It returns a list of the selected points
-*     to the calling routine.
+*     to the calling routine.  If the list of selected points is not
+*     empty on entry (if NPOS is not zero) then the list passed in to
+*     the routine will be used as a starting point.
 *
 *     If the user attempts to select more positions than MAXPOS, the
 *     GUI part of the application will not allow it, and will force an
@@ -58,13 +60,13 @@
 *        is to be displayed (if zero there is no limit).
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
-*     ID( MAXPOS ) = INTEGER (Returned)
+*     ID( MAXPOS ) = INTEGER (Given and Returned)
 *        The index idenfiers for the positions selected.
-*     XPOS( MAXPOS ) = DOUBLE PRECISION (Returned)
+*     XPOS( MAXPOS ) = DOUBLE PRECISION (Given and Returned)
 *        X coordinates of the positions selected.
-*     YPOS( MAXPOS ) = DOUBLE PRECISION (Returned)
+*     YPOS( MAXPOS ) = DOUBLE PRECISION (Given and Returned)
 *        Y coordinates of the positions selected.
-*     NPOS = INTEGER (Returned)
+*     NPOS = INTEGER (Given and Returned)
 *        The number of X,Y positions selected.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -124,6 +126,11 @@
       ccdTclSetI( cinterp, "MAXCANV", *maxcanv, status );
       ccdTclSetI( cinterp, "WINX", windim[ 0 ], status );
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
+      for ( i = 0; i < *npos; i++ ) {
+         sprintf( buffer, "lappend POINTS [ list %d %lf %lf ]", 
+                          id[ i ], xpos[ i ], ypos[ i ] );
+         ccdTclEval( cinterp, buffer, status );
+      }
 
 /* Execute the Tcl script. */
       ccdTclRun( cinterp, "idicurs.tcl", status );
