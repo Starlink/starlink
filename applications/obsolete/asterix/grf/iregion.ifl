@@ -79,4 +79,10 @@ interface IREGION
     prompt 'ARD input'
     help '^filename or direct text input'
   endparameter
+  parameter OUT
+    type 'UNIV'
+    prompt 'Output filename'
+    help 'Name of object to hold region mask'
+  endparameter
 endinterface
+
