@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 require_ok("Starlink::AST");
 
@@ -15,7 +15,6 @@ while (<DATA>) {
 $fchan->Clear( "Card" );
 is( $fchan->GetC( "Encoding" ), "FITS-WCS", 
     "Encoding type of the FitsChan object" );
-
 
 my $wcsinfo = $fchan->Read();
 isa_ok( $wcsinfo, "AstFrameSetPtr" );
@@ -50,6 +49,11 @@ is( $$yworld[0], 0, "Reverse mapping of lower bound Y co-ordinate" );
 is( $$xworld[1], 114, "Reverse mapping of upper bound X co-ordinate" ); 
 is( $$yworld[1], 128, "Reverse mapping of upper bound Y co-ordinate" );
 
+# change encoding type
+$fchan->Set( "Encoding=NATIVE" );
+is( $fchan->GetC( "Encoding" ), "NATIVE", 
+    "Changing type of the FitsChan object" );
+    
 # Done!
 
 __DATA__
