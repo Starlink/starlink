@@ -650,7 +650,9 @@
 
 # Add items to the "Sky" sub-menu.
    set skymenu [menu $OPTSMENU.sky]
-   for {set i 1} {$i < 12} {incr i} {
+   $skymenu add radiobutton -label "1 knot" -variable SKY_KNOTS \
+           -selectcolor $RB_COL -value 1
+   for {set i 2} {$i < 12} {incr i} {
       $skymenu add radiobutton -label "$i knots" -variable SKY_KNOTS \
               -selectcolor $RB_COL -value $i 
    }
