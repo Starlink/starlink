@@ -9,6 +9,7 @@
 *       22 Jan 93: V1.7-0 original
 *       13 Sep 94: V1.7-1 updates data min/max (RJV)
 *       19 Oct 95: V2.0-0 ADI port (DJA)
+*       16 Apr 96: V2.0-1 option to use cache image (RJV)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -28,9 +29,10 @@
       LOGICAL MATCH
       LOGICAL DATASET,SCALAR
       LOGICAL VOK,QOK
+      LOGICAL CACHE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = ' Version 2.0-0')
+      PARAMETER (VERSION = ' Version 2.0-1')
 *-
 
       CALL USI_INIT()
@@ -54,38 +56,96 @@
         CALL MSG_PRNT('AST_ERR: image processing system not active')
       ELSE
 
-*  get image or whatever to add/sub etc
-        CALL USI_ASSOC( 'INP', 'BinDS|Array|Scalar', 'READ',
-     :                  FID, STATUS )
-        SCALAR = .FALSE.
-        CALL BDI_GETSHP( FID, 2, DIMS, NDIM, STATUS )
-        CALL ADI_DERVD( FID, 'BinDS', DATASET, STATUS )
+*  is cache image to be used
+        CALL USI_GET0L('CACHE',CACHE,STATUS)
 
-        IF ( .NOT. DATASET ) THEN
-*  scalar input
-          IF (NDIM.EQ.0) THEN
-            CALL BDI_GET0R(FID,'Data',VAL,STATUS)
-            SCALAR=.TRUE.
-            MATCH=.TRUE.
-            QOK=.FALSE.
-            VOK=.FALSE.
-*  primitive array - check dimensions match
-          ELSEIF (NDIM.EQ.2.AND.DIMS(1).EQ.I_NX.AND.DIMS(2).EQ.I_NY)
-     :                                                           THEN
+*  check there is actually something in cache
+        IF (CACHE) THEN
+          IF (I_CACHE) THEN
             MATCH=.TRUE.
           ELSE
-            CALL MSG_PRNT(
-     :            'AST_ERR: array size does not match loaded image')
+            CALL MSG_PRNT('AST_ERR: no image currently in cache')
             MATCH=.FALSE.
           ENDIF
+
         ELSE
+*  if not using cache then get image or whatever to add/sub etc
+          CALL USI_ASSOC( 'INP', 'BinDS|Array|Scalar', 'READ',
+     :                                           FID, STATUS )
+          SCALAR = .FALSE.
+          CALL BDI_GETSHP( FID, 2, DIMS, NDIM, STATUS )
+          CALL ADI_DERVD( FID, 'BinDS', DATASET, STATUS )
+
+          IF ( .NOT. DATASET ) THEN
+*  scalar input
+            IF (NDIM.EQ.0) THEN
+              CALL BDI_GET0R(FID,'Data',VAL,STATUS)
+              SCALAR=.TRUE.
+              MATCH=.TRUE.
+              QOK=.FALSE.
+              VOK=.FALSE.
+*  primitive array - check dimensions match
+            ELSEIF (NDIM.EQ.2.AND.DIMS(1).EQ.I_NX.AND.DIMS(2).EQ.I_NY)
+     :                                                           THEN
+              MATCH=.TRUE.
+            ELSE
+              CALL MSG_PRNT(
+     :            'AST_ERR: array size does not match loaded image')
+              MATCH=.FALSE.
+            ENDIF
+          ELSE
 *  dataset - do fuller check
-          CALL IMG_MATCH( FID, MATCH, STATUS )
+            CALL IMG_MATCH( FID, MATCH, STATUS )
+          ENDIF
+
         ENDIF
 
         IF (MATCH) THEN
 
-          IF (SCALAR) THEN
+          IF (CACHE) THEN
+
+            DPTR=I_DPTR_M
+            IF (I_VOK) THEN
+              IF (I_VOK_M) THEN
+                VPTR=I_VPTR_M
+              ELSE
+                VPTR=I_DPTR_M
+              ENDIF
+            ENDIF
+
+            QOK= (I_QOK_M.OR.OPER.EQ.'DIV')
+            IF (QOK) THEN
+              IF (I_QOK_M) THEN
+                QPTR=I_QPTR_M
+              ELSE
+                QPTR=I_QPTR
+              ENDIF
+            ENDIF
+
+*  copy existing data to work area, creating quality if necessary
+            CALL IMG_COPY(.FALSE.,QOK,STATUS)
+            I_CAN_UNDO=.FALSE.
+
+            IF (OPER.EQ.'ADD') THEN
+              CALL IARITH_ADD(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),
+     :                  %VAL(I_DPTR_W),%VAL(I_VPTR_W),%VAL(I_QPTR_W),
+     :                                                        STATUS)
+            ELSEIF (OPER.EQ.'SUB') THEN
+              CALL IARITH_SUB(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),
+     :                  %VAL(I_DPTR_W),%VAL(I_VPTR_W),%VAL(I_QPTR_W),
+     :                                                        STATUS)
+            ELSEIF (OPER.EQ.'MULT') THEN
+              CALL IARITH_MULT(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),
+     :                  %VAL(I_DPTR_W),%VAL(I_VPTR_W),%VAL(I_QPTR_W),
+     :                                                        STATUS)
+            ELSEIF (OPER.EQ.'DIV') THEN
+              CALL IARITH_DIV(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),
+     :                  %VAL(I_DPTR_W),%VAL(I_VPTR_W),%VAL(I_QPTR_W),
+     :                                                        STATUS)
+            ENDIF
+
+
+          ELSEIF (SCALAR) THEN
 
 *  copy existing data to work area
             CALL IMG_COPY(.FALSE.,.FALSE.,STATUS)
