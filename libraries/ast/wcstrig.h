@@ -10,19 +10,22 @@
 *        (D.S. Berry (19th June 1996).
 *     -  Changed the name of the WCSTRIG macro to WCSTRIG_INCLUDED
 *        (R.F. Warren-Smith (13th November 1996).
+*     -  Changed names of degrees trig functions to avoid clashes with 
+*        wcslib.
+*        (D.S. Berry (26th September 2001).
 *
 *=============================================================================
 */
 
 #include <math.h>
 
-   double cosd(double);
-   double sind(double);
-   double tand(double);
-   double acosd(double);
-   double asind(double);
-   double atand(double);
-   double atan2d(double, double);
+   double astCosd(double);
+   double astSind(double);
+   double astTand(double);
+   double astAastCosd(double);
+   double astAastSind(double);
+   double astAastTand(double);
+   double astAtan2d(double, double);
 
 /* Domain tolerance for asin and acos functions. */
 #define WCSTRIG_TOL 1e-10

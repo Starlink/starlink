@@ -61,8 +61,10 @@
 *     Extended TAN projection to include polynomial corrections. Changed
 *     ZPN projection to handle up to 100 co-efficients. GLS projection
 *     re-named as SFL.
+*
 *  D.S. Berry (26th September 2001)
-*     - Changed names of all function to avoid name clashes with wcslib.
+*     - Changed names of projection functions and degrees trig functions
+*     to avoid clashes with wcslib.
 *
 *=============================================================================
 *
@@ -329,7 +331,7 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   sinth = sind(theta);
+   sinth = astSind(theta);
    mu = prj->w[3];
    s = mu + sinth;
 
@@ -344,9 +346,9 @@ struct prjprm *prj;
 
    }
 
-   r =  prj->w[0]*cosd(theta)/s;
-   *x =  r*sind(phi);
-   *y = -r*cosd(phi);
+   r =  prj->w[0]*astCosd(theta)/s;
+   *x =  r*astSind(phi);
+   *y = -r*astCosd(phi);
 
    return 0;
 }
@@ -372,7 +374,7 @@ struct prjprm *prj;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(x, -y);
+      *phi = astAtan2d(x, -y);
    }
 
    rho = r*prj->w[1];
@@ -381,9 +383,9 @@ struct prjprm *prj;
       if (fabs(s) > 1.0+tol) {
          return 2;
       }
-      *theta = atan2d(1.0,rho) - copysign(90.0,s);
+      *theta = astAtan2d(1.0,rho) - copysign(90.0,s);
    } else {
-      *theta = atan2d(1.0,rho) - asind(s);
+      *theta = astAtan2d(1.0,rho) - astAastSind(s);
    }
 
    return 0;
@@ -490,12 +492,12 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   s = sind(theta);
+   s = astSind(theta);
    if (s <= 0.0) return 2;
 
-   r =  prj->r0*cosd(theta)/s;
-   xi =  r*sind(phi);
-   eta = -r*cosd(phi);
+   r =  prj->r0*astCosd(theta)/s;
+   xi =  r*astSind(phi);
+   eta = -r*astCosd(phi);
 
    /* Simple tan */
    if( !prj->n ){
@@ -774,9 +776,9 @@ struct prjprm *prj;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(xi, -eta);
+      *phi = astAtan2d(xi, -eta);
    }
-   *theta = atan2d(prj->r0, r);
+   *theta = astAtan2d(prj->r0, r);
 
    return 0;
 }
@@ -859,14 +861,14 @@ struct prjprm *prj;
       }
       cthe = t;
    } else {
-      sinth =  sind(theta);
+      sinth =  astSind(theta);
       if( sinth < -1.0e-5 ) return 2;
       z =  sinth - 1.0;
-      cthe = cosd(theta);
+      cthe = astCosd(theta);
    }
 
-   *x =  prj->r0*(cthe*sind(phi) + prj->w[5]*z);
-   *y = -prj->r0*(cthe*cosd(phi) + prj->w[6]*z);
+   *x =  prj->r0*(cthe*astSind(phi) + prj->w[5]*z);
+   *y = -prj->r0*(cthe*astCosd(phi) + prj->w[6]*z);
 
    return 0;
 }
@@ -895,15 +897,15 @@ struct prjprm *prj;
 
    if (prj->w[1] == 0.0) {
       if (r2 != 0.0) {
-         *phi = atan2d(x0, -y0);
+         *phi = astAtan2d(x0, -y0);
       } else {
          *phi = 0.0;
       }
 
       if (r2 < 0.5) {
-         *theta = acosd(sqrt(r2));
+         *theta = astAastCosd(sqrt(r2));
       } else if( r2 <= 1.0 ){
-         *theta = asind(sqrt(1.0 - r2));
+         *theta = astAastSind(sqrt(1.0 - r2));
       } else {
          return 2;
       }
@@ -943,7 +945,7 @@ struct prjprm *prj;
             return 2;
          }
 
-         *theta = asind(sth);
+         *theta = astAastSind(sth);
          z = sth - 1.0;
       }
 
@@ -953,7 +955,7 @@ struct prjprm *prj;
       if (xp == 0.0 && yp == 0.0) {
          *phi = 0.0;
       } else {
-         *phi   = atan2d(yp,xp);
+         *phi   = astAtan2d(yp,xp);
       }
 
    }
@@ -1004,14 +1006,14 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   s = 1.0 + sind(theta);
+   s = 1.0 + astSind(theta);
    if (s == 0.0) {
       return 2;
    }
 
-   r =  prj->w[0]*cosd(theta)/s;
-   *x =  r*sind(phi);
-   *y = -r*cosd(phi);
+   r =  prj->w[0]*astCosd(theta)/s;
+   *x =  r*astSind(phi);
+   *y = -r*astCosd(phi);
 
    return 0;
 }
@@ -1036,9 +1038,9 @@ struct prjprm *prj;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(x, -y);
+      *phi = astAtan2d(x, -y);
    }
-   *theta = 90.0 - 2.0*atand(r*prj->w[1]);
+   *theta = 90.0 - 2.0*astAastTand(r*prj->w[1]);
 
    return 0;
 }
@@ -1087,8 +1089,8 @@ struct prjprm *prj;
    }
 
    r =  prj->w[0]*(90.0 - theta);
-   *x =  r*sind(phi);
-   *y = -r*cosd(phi);
+   *x =  r*astSind(phi);
+   *y = -r*astCosd(phi);
 
    return 0;
 }
@@ -1113,7 +1115,7 @@ struct prjprm *prj;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(x, -y);
+      *phi = astAtan2d(x, -y);
    }
    *theta = 90.0 - r*prj->w[1];
 
@@ -1251,8 +1253,8 @@ struct prjprm *prj;
    }
    r = prj->r0*r;
 
-   *x =  r*sind(phi);
-   *y = -r*cosd(phi);
+   *x =  r*astSind(phi);
+   *y = -r*astCosd(phi);
 
    return 0;
 }
@@ -1365,7 +1367,7 @@ struct prjprm *prj;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(x, -y);
+      *phi = astAtan2d(x, -y);
    }
    *theta = 90.0 - zd*R2D;
 
@@ -1415,9 +1417,9 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   r =  prj->w[0]*sind((90.0 - theta)/2.0);
-   *x =  r*sind(phi);
-   *y = -r*cosd(phi);
+   r =  prj->w[0]*astSind((90.0 - theta)/2.0);
+   *x =  r*astSind(phi);
+   *y = -r*astCosd(phi);
 
    return 0;
 }
@@ -1443,7 +1445,7 @@ struct prjprm *prj;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(x, -y);
+      *phi = astAtan2d(x, -y);
    }
 
    
@@ -1452,7 +1454,7 @@ struct prjprm *prj;
    } else {
       r *= prj->w[1];
       if( fabs( r ) > 1.0 ) return 2;
-      *theta = 90.0 - 2.0*asind(r);
+      *theta = 90.0 - 2.0*astAastSind(r);
    }
 
    return 0;
@@ -1501,7 +1503,7 @@ struct prjprm *prj;
       prj->w[0] = -0.5;
       prj->w[1] =  1.0;
    } else if (prj->w[6] > -90.0) {
-      cxi = cosd((90.0 - prj->w[6])/2.0);
+      cxi = astCosd((90.0 - prj->w[6])/2.0);
       prj->w[0] = log(cxi)*(cxi*cxi)/(1.0-cxi*cxi);
       prj->w[1] = 0.5 - prj->w[0];
    } else {
@@ -1540,7 +1542,7 @@ struct prjprm *prj;
       if (xi < prj->w[3]) {
          r = xi*prj->w[2];
       } else {
-         cxi = cosd((90.0 - theta)/2.0);
+         cxi = astCosd((90.0 - theta)/2.0);
          txi = sqrt(1.0-cxi*cxi)/cxi;
          r = -prj->r0*(log(cxi)/txi + prj->w[0]*txi);
       }
@@ -1548,8 +1550,8 @@ struct prjprm *prj;
       return 2;
    }
 
-   *x =  r*sind(phi);
-   *y = -r*cosd(phi);
+   *x =  r*astSind(phi);
+   *y = -r*astCosd(phi);
 
    return 0;
 }
@@ -1618,13 +1620,13 @@ struct prjprm *prj;
       }
       if (j == 100) return 2;
 
-      xi = acosd(cxi);
+      xi = astAastCosd(cxi);
    }
 
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(x, -y);
+      *phi = astAtan2d(x, -y);
    }
    *theta = 90.0 - 2.0*xi;
 
@@ -1727,13 +1729,13 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   s = prj->w[4] + cosd(theta);
+   s = prj->w[4] + astCosd(theta);
    if (s == 0.0) {
          return 2;
       }
 
    *x = prj->w[0]*phi;
-   *y = prj->w[2]*sind(theta)/s;
+   *y = prj->w[2]*astSind(theta)/s;
 
    return 0;
 }
@@ -1760,13 +1762,13 @@ struct prjprm *prj;
    a = eta*prj->w[4]/sqrt(eta*eta+1.0);
 
    if( fabs( a ) < 1.0 ) {
-      *theta = atan2d(eta,1.0) + asind( a );
+      *theta = astAtan2d(eta,1.0) + astAastSind( a );
    
    } else if( fabs( a ) < 1.0 + tol ) {
       if( a > 0.0 ){
-         *theta = atan2d(eta,1.0) + 90.0;
+         *theta = astAtan2d(eta,1.0) + 90.0;
       } else {
-         *theta = atan2d(eta,1.0) - 90.0;
+         *theta = astAtan2d(eta,1.0) - 90.0;
       }
 
    } else {
@@ -1893,7 +1895,7 @@ struct prjprm *prj;
    }
 
    *x = prj->w[0]*phi;
-   *y = prj->r0*log(tand((90.0+theta)/2.0));
+   *y = prj->r0*log(astTand((90.0+theta)/2.0));
 
    return 0;
 }
@@ -1914,7 +1916,7 @@ struct prjprm *prj;
    }
 
    *phi   = x*prj->w[1];
-   *theta = 2.0*atand(exp(y/prj->r0)) - 90.0;
+   *theta = 2.0*astAastTand(exp(y/prj->r0)) - 90.0;
 
    return 0;
 }
@@ -1990,7 +1992,7 @@ struct prjprm *prj;
    }
 
    *x = prj->w[0]*phi;
-   *y = prj->w[2]*sind(theta);
+   *y = prj->w[2]*astSind(theta);
 
    return 0;
 }
@@ -2017,7 +2019,7 @@ struct prjprm *prj;
    }
 
    *phi   = x*prj->w[1];
-   *theta = asind(s);
+   *theta = astAastSind(s);
 
    return 0;
 }
@@ -2068,20 +2070,20 @@ struct prjprm *prj;
 
    if (prj->r0 == 0.0) prj->r0 = R2D;
 
-   prj->w[0] = sind(prj->w[6]);
+   prj->w[0] = astSind(prj->w[6]);
    if (prj->w[0] == 0.0) {
       return 1;
    }
 
    prj->w[1] = 1.0/prj->w[0];
 
-   prj->w[3] = prj->r0*cosd(prj->w[7]);
+   prj->w[3] = prj->r0*astCosd(prj->w[7]);
    if (prj->w[3] == 0.0) {
       return 1;
    }
 
    prj->w[4] = 1.0/prj->w[3];
-   prj->w[5] = 1.0/tand(prj->w[6]);
+   prj->w[5] = 1.0/astTand(prj->w[6]);
 
    prj->w[2] = prj->w[3]*prj->w[5];
 
@@ -2106,10 +2108,10 @@ struct prjprm *prj;
    }
 
    a = prj->w[0]*phi;
-   r = prj->w[2] - prj->w[3]*tand(theta-prj->w[6]);
+   r = prj->w[2] - prj->w[3]*astTand(theta-prj->w[6]);
 
-   *x =             r*sind(a);
-   *y = prj->w[2] - r*cosd(a);
+   *x =             r*astSind(a);
+   *y = prj->w[2] - r*astCosd(a);
 
    return 0;
 }
@@ -2137,11 +2139,11 @@ struct prjprm *prj;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2d(x/r, dy/r);
+      a = astAtan2d(x/r, dy/r);
    }
 
    *phi   = a*prj->w[1];
-   *theta = prj->w[6] + atand(prj->w[5] - r*prj->w[4]);
+   *theta = prj->w[6] + astAastTand(prj->w[5] - r*prj->w[4]);
 
    return 0;
 }
@@ -2190,9 +2192,9 @@ struct prjprm *prj;
    if (prj->r0 == 0.0) prj->r0 = R2D;
 
    if (prj->w[5] == 0.0) {
-      prj->w[0] = prj->r0*sind(prj->w[4])*D2R;
+      prj->w[0] = prj->r0*astSind(prj->w[4])*D2R;
    } else {
-      prj->w[0] = prj->r0*sind(prj->w[4])*sind(prj->w[5])/prj->w[5];
+      prj->w[0] = prj->r0*astSind(prj->w[4])*astSind(prj->w[5])/prj->w[5];
    }
 
    if (prj->w[0] == 0.0) {
@@ -2200,7 +2202,7 @@ struct prjprm *prj;
    }
 
    prj->w[1] = 1.0/prj->w[0];
-   prj->w[2] = prj->r0*cosd(prj->w[5])*cosd(prj->w[4])/prj->w[0];
+   prj->w[2] = prj->r0*astCosd(prj->w[5])*astCosd(prj->w[4])/prj->w[0];
    prj->w[3] = prj->w[2] + prj->w[4];
 
    prj->flag = PRJSET;
@@ -2226,8 +2228,8 @@ struct prjprm *prj;
    a = prj->w[0]*phi;
    r = prj->w[3] - theta;
 
-   *x =             r*sind(a);
-   *y = prj->w[2] - r*cosd(a);
+   *x =             r*astSind(a);
+   *y = prj->w[2] - r*astCosd(a);
 
    return 0;
 }
@@ -2255,7 +2257,7 @@ struct prjprm *prj;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2d(x/r, dy/r);
+      a = astAtan2d(x/r, dy/r);
    }
 
    *phi   = a*prj->w[1];
@@ -2280,7 +2282,7 @@ struct prjprm *prj;
 *      prj->r0     r0; reset to 180/pi if 0.
 *      prj->w[0]   C = (sin(theta1) + sin(theta2))/2
 *      prj->w[1]   1/C
-*      prj->w[2]   Y0 = chi*sqrt(psi - 2C*sind(sigma))
+*      prj->w[2]   Y0 = chi*sqrt(psi - 2C*astSind(sigma))
 *      prj->w[3]   chi = r0/C
 *      prj->w[4]   psi = 1 + sin(theta1)*sin(theta2)
 *      prj->w[5]   2C
@@ -2317,7 +2319,7 @@ struct prjprm *prj;
    theta1 = prj->w[9] - prj->w[10];
    theta2 = prj->w[9] + prj->w[10];
 
-   prj->w[0] = (sind(theta1) + sind(theta2))/2.0;
+   prj->w[0] = (astSind(theta1) + astSind(theta2))/2.0;
    if (prj->w[0] == 0.0) {
       return 1;
    }
@@ -2325,13 +2327,13 @@ struct prjprm *prj;
    prj->w[1] = 1.0/prj->w[0];
 
    prj->w[3] = prj->r0/prj->w[0];
-   prj->w[4] = 1.0 + sind(theta1)*sind(theta2);
+   prj->w[4] = 1.0 + astSind(theta1)*astSind(theta2);
    prj->w[5] = 2.0*prj->w[0];
    prj->w[6] = prj->w[3]*prj->w[3]*prj->w[4];
    prj->w[7] = 1.0/(2.0*prj->r0*prj->w[3]);
    prj->w[8] = prj->w[3]*sqrt(prj->w[4] + prj->w[5]);
 
-   prj->w[2] = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*sind(prj->w[9]));
+   prj->w[2] = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*astSind(prj->w[9]));
 
    prj->flag = PRJSET;
    return 0;
@@ -2357,11 +2359,11 @@ struct prjprm *prj;
    if (theta == -90.0) {
       r = prj->w[8];
    } else {
-      r = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*sind(theta));
+      r = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*astSind(theta));
    }
 
-   *x =             r*sind(a);
-   *y = prj->w[2] - r*cosd(a);
+   *x =             r*astSind(a);
+   *y = prj->w[2] - r*astCosd(a);
 
    return 0;
 }
@@ -2390,7 +2392,7 @@ struct prjprm *prj;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2d(x/r, dy/r);
+      a = astAtan2d(x/r, dy/r);
    }
 
    *phi = a*prj->w[1];
@@ -2407,7 +2409,7 @@ struct prjprm *prj;
             return 2;
          }
       } else {
-         *theta = asind(w);
+         *theta = astAastSind(w);
       }
    }
 
@@ -2465,14 +2467,14 @@ struct prjprm *prj;
    theta1 = prj->w[5] - prj->w[6];
    theta2 = prj->w[5] + prj->w[6];
 
-   tan1 = tand((90.0 - theta1)/2.0);
-   cos1 = cosd(theta1);
+   tan1 = astTand((90.0 - theta1)/2.0);
+   cos1 = astCosd(theta1);
 
    if (theta1 == theta2) {
-      prj->w[0] = sind(theta1);
+      prj->w[0] = astSind(theta1);
    } else {
-      tan2 = tand((90.0 - theta2)/2.0);
-      cos2 = cosd(theta2);
+      tan2 = astTand((90.0 - theta2)/2.0);
+      cos2 = astCosd(theta2);
       prj->w[0] = log(cos2/cos1)/log(tan2/tan1);
    }
    if (prj->w[0] == 0.0) {
@@ -2485,7 +2487,7 @@ struct prjprm *prj;
    if (prj->w[3] == 0.0) {
       return 1;
    }
-   prj->w[2] = prj->w[3]*pow(tand((90.0 - prj->w[5])/2.0),prj->w[0]);
+   prj->w[2] = prj->w[3]*pow(astTand((90.0 - prj->w[5])/2.0),prj->w[0]);
    prj->w[4] = 1.0/prj->w[3];
 
    prj->flag = PRJSET;
@@ -2516,11 +2518,11 @@ struct prjprm *prj;
          return 2;
       }
    } else {
-      r = prj->w[3]*pow(tand((90.0 - theta)/2.0),prj->w[0]);
+      r = prj->w[3]*pow(astTand((90.0 - theta)/2.0),prj->w[0]);
    }
 
-   *x =             r*sind(a);
-   *y = prj->w[2] - r*cosd(a);
+   *x =             r*astSind(a);
+   *y = prj->w[2] - r*astCosd(a);
 
    return 0;
 }
@@ -2548,7 +2550,7 @@ struct prjprm *prj;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2d(x/r, dy/r);
+      a = astAtan2d(x/r, dy/r);
    }
 
    *phi = a*prj->w[1];
@@ -2559,7 +2561,7 @@ struct prjprm *prj;
          return 2;
       }
    } else {
-      *theta = 90.0 - 2.0*atand(pow(r*prj->w[4],prj->w[1]));
+      *theta = 90.0 - 2.0*astAastTand(pow(r*prj->w[4],prj->w[1]));
    }
 
    return 0;
@@ -2597,10 +2599,10 @@ struct prjprm *prj;
    if (prj->r0 == 0.0) {
       prj->r0 = R2D;
       prj->w[1] = 1.0;
-      prj->w[2] = prj->r0*cosd(prj->w[3])/sind(prj->w[3]) + prj->w[3];
+      prj->w[2] = prj->r0*astCosd(prj->w[3])/astSind(prj->w[3]) + prj->w[3];
    } else {
       prj->w[1] = prj->r0*D2R;
-      prj->w[2] = prj->r0*(cosd(prj->w[3])/sind(prj->w[3]) + prj->w[3]*D2R);
+      prj->w[2] = prj->r0*(astCosd(prj->w[3])/astSind(prj->w[3]) + prj->w[3]*D2R);
    }
 
    prj->flag = PRJSET;
@@ -2629,10 +2631,10 @@ struct prjprm *prj;
    }
 
    r = prj->w[2] - theta*prj->w[1];
-   a = prj->r0*phi*cosd(theta)/r;
+   a = prj->r0*phi*astCosd(theta)/r;
 
-   *x =             r*sind(a);
-   *y = prj->w[2] - r*cosd(a);
+   *x =             r*astSind(a);
+   *y = prj->w[2] - r*astCosd(a);
 
    return 0;
 }
@@ -2665,15 +2667,15 @@ struct prjprm *prj;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2d(x/r, dy/r);
+      a = astAtan2d(x/r, dy/r);
    }
 
    *theta = (prj->w[2] - r)/prj->w[1];
-   costhe = cosd(*theta);
+   costhe = astCosd(*theta);
    if (costhe == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = a*(r/prj->r0)/cosd(*theta);
+      *phi = a*(r/prj->r0)/astCosd(*theta);
    }
 
    return 0;
@@ -2725,8 +2727,8 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   costhe = cosd(theta);
-   sinthe = sind(theta);
+   costhe = astCosd(theta);
+   sinthe = astSind(theta);
    a = phi*sinthe;
 
    if (sinthe == 0.0) {
@@ -2734,8 +2736,8 @@ struct prjprm *prj;
       *y = 0.0;
    } else {
       cotthe = costhe/sinthe;
-      *x = prj->r0*cotthe*sind(a);
-      *y = prj->r0*(cotthe*(1.0 - cosd(a)) + theta*D2R);
+      *x = prj->r0*cotthe*astSind(a);
+      *y = prj->r0*(cotthe*(1.0 - astCosd(a)) + theta*D2R);
    }
 
    return 0;
@@ -2797,7 +2799,7 @@ struct prjprm *prj;
 
          /* Compute the residue. */
          ymthe = y - prj->w[0]*(*theta);
-         tanthe = tand(*theta);
+         tanthe = astTand(*theta);
          f = xx + ymthe*(ymthe - prj->w[2]/tanthe);
 
          /* Check for convergence. */
@@ -2819,7 +2821,7 @@ struct prjprm *prj;
       if (xp == 0.0 && yp == 0.0) {
          *phi = 0.0;
       } else {
-         *phi = atan2d(yp, xp)/sind(*theta);
+         *phi = astAtan2d(yp, xp)/astSind(*theta);
       }
    }
 
@@ -2868,7 +2870,7 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   *x = prj->w[0]*phi*cosd(theta);
+   *x = prj->w[0]*phi*astCosd(theta);
    *y = prj->w[0]*theta;
 
    return 0;
@@ -2950,7 +2952,7 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   s = sind(theta/3.0);
+   s = astSind(theta/3.0);
    *x = prj->w[0]*phi*(1.0 - 4.0*s*s);
    *y = prj->w[2]*s;
 
@@ -2989,7 +2991,7 @@ struct prjprm *prj;
       *phi = prj->w[1]*x/t;
    }
 
-   *theta = 3.0*asind(s);
+   *theta = 3.0*astAastSind(s);
 
    return 0;
 }
@@ -3037,10 +3039,10 @@ struct prjprm *prj;
       if( seterr ) return seterr;
    }
 
-   costhe = cosd(theta);
-   w = sqrt(prj->w[0]/(1.0 + costhe*cosd(phi/2.0)));
-   *x = 2.0*w*costhe*sind(phi/2.0);
-   *y = w*sind(theta);
+   costhe = astCosd(theta);
+   w = sqrt(prj->w[0]/(1.0 + costhe*astCosd(phi/2.0)));
+   *x = 2.0*w*costhe*astSind(phi/2.0);
+   *y = w*astSind(theta);
 
    return 0;
 }
@@ -3076,9 +3078,9 @@ struct prjprm *prj;
    if (xp == 0.0 && yp == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = 2.0*atan2d(yp, xp);
+      *phi = 2.0*astAtan2d(yp, xp);
    }
-   *theta = asind(s);
+   *theta = astAastSind(s);
 
    return 0;
 }
@@ -3136,7 +3138,7 @@ struct prjprm *prj;
       *x = prj->w[1]*phi;
       *y = 0.0;
    } else {
-      u  = PI*sind(theta);
+      u  = PI*astSind(theta);
       v0 = -PI;
       v1 =  PI;
       v  = u;
@@ -3211,7 +3213,7 @@ struct prjprm *prj;
       z = copysign(1.0,z);
    }
 
-   *theta = asind(z);
+   *theta = astAastSind(z);
 
    return 0;
 }
@@ -3278,10 +3280,10 @@ double *x, *y;
       if( seterr ) return seterr;
    }
 
-   costhe = cosd(theta);
-   l = costhe*cosd(phi);
-   m = costhe*sind(phi);
-   n = sind(theta);
+   costhe = astCosd(theta);
+   l = costhe*astCosd(phi);
+   m = costhe*astSind(phi);
+   n = astSind(theta);
 
    face = 0;
    rho  = n;
@@ -3512,9 +3514,9 @@ double *phi, *theta;
    if (l == 0.0 && m == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(m, l);
+      *phi = astAtan2d(m, l);
    }
-   *theta = asind(n);
+   *theta = astAastSind(n);
 
    return 0;
 }
@@ -3571,10 +3573,10 @@ double *x, *y;
       return 0;
    }
 
-   costhe = cosd(theta);
-   l = costhe*cosd(phi);
-   m = costhe*sind(phi);
-   n = sind(theta);
+   costhe = astCosd(theta);
+   l = costhe*astCosd(phi);
+   m = costhe*astSind(phi);
+   n = astSind(theta);
 
    face = 0;
    rho  = n;
@@ -3683,22 +3685,22 @@ double *x, *y;
       psi = eta/xi;
       chi = 1.0 + psi*psi;
       xf  = -sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      yf  = (xf/15.0)*(atand(psi) - asind(psi/sqrt(chi+chi)));
+      yf  = (xf/15.0)*(astAastTand(psi) - astAastSind(psi/sqrt(chi+chi)));
    } else if (xi >= fabs(eta)) {
       psi = eta/xi;
       chi = 1.0 + psi*psi;
       xf  =  sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      yf  = (xf/15.0)*(atand(psi) - asind(psi/sqrt(chi+chi)));
+      yf  = (xf/15.0)*(astAastTand(psi) - astAastSind(psi/sqrt(chi+chi)));
    } else if (-eta > fabs(xi)) {
       psi = xi/eta;
       chi = 1.0 + psi*psi;
       yf  = -sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      xf  = (yf/15.0)*(atand(psi) - asind(psi/sqrt(chi+chi)));
+      xf  = (yf/15.0)*(astAastTand(psi) - astAastSind(psi/sqrt(chi+chi)));
    } else if (eta > fabs(xi)) {
       psi = xi/eta;
       chi = 1.0 + psi*psi;
       yf  =  sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      xf  = (yf/15.0)*(atand(psi) - asind(psi/sqrt(chi+chi)));
+      xf  = (yf/15.0)*(astAastTand(psi) - astAastSind(psi/sqrt(chi+chi)));
    }
 
    if (fabs(xf) > 1.0) {
@@ -3781,7 +3783,7 @@ double *phi, *theta;
          rhu = 0.0;
       } else {
          w = 15.0*yf/xf;
-         psi = sind(w)/(cosd(w) - SQRT2INV);
+         psi = astSind(w)/(astCosd(w) - SQRT2INV);
          chi = 1.0 + psi*psi;
          rhu = xf*xf*(1.0 - 1.0/sqrt(1.0 + chi));
          rho = 1.0 - rhu;
@@ -3794,7 +3796,7 @@ double *phi, *theta;
          rhu = 0.0;
       } else {
          w = 15.0*xf/yf;
-         psi = sind(w)/(cosd(w) - SQRT2INV);
+         psi = astSind(w)/(astCosd(w) - SQRT2INV);
          chi = 1.0 + psi*psi;
          rhu = yf*yf*(1.0 - 1.0/sqrt(1.0 + chi));
          rho = 1.0 - rhu;
@@ -3884,9 +3886,9 @@ double *phi, *theta;
    if (l == 0.0 && m == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(m, l);
+      *phi = astAtan2d(m, l);
    }
-   *theta = asind(n);
+   *theta = astAastSind(n);
 
    return 0;
 }
@@ -3937,10 +3939,10 @@ double *x, *y;
       if( seterr ) return seterr;
    }
 
-   costhe = cosd(theta);
-   l = costhe*cosd(phi);
-   m = costhe*sind(phi);
-   n = sind(theta);
+   costhe = astCosd(theta);
+   l = costhe*astCosd(phi);
+   m = costhe*astSind(phi);
+   n = astSind(theta);
 
    face = 0;
    rho  = n;
@@ -4086,9 +4088,9 @@ double *phi, *theta;
    if (l == 0.0 && m == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2d(m, l);
+      *phi = astAtan2d(m, l);
    }
-   *theta = asind(n);
+   *theta = astAastSind(n);
 
    return 0;
 }

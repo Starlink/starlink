@@ -34,6 +34,9 @@
 *        (D.S. Berry, 19th June 1996).
 *     -  Undefine PI, if previously defined
 *        (R.F. Warren-Smith, 15th November 1996).
+*     -  Changed names of projection functions and degrees trig functions
+*        to avoid clashes with wcslib. 
+*        (D.S. Berry 26th September 2001)
 *
 *=============================================================================
 *
@@ -50,7 +53,7 @@
 const double d2r = PI / 180.0;
 const double r2d = 180.0 / PI;
 
-double cosd(angle)
+double astCosd(angle)
 
 double angle;
 
@@ -73,7 +76,7 @@ double angle;
 
 /*--------------------------------------------------------------------------*/
 
-double sind(angle)
+double astSind(angle)
 
 double angle;
 
@@ -96,7 +99,7 @@ double angle;
 
 /*--------------------------------------------------------------------------*/
 
-double tand(angle)
+double astTand(angle)
 
 double angle;
 
@@ -117,7 +120,7 @@ double angle;
 
 /*--------------------------------------------------------------------------*/
 
-double acosd(v)
+double astAastCosd(v)
 
 double v;
 
@@ -135,7 +138,7 @@ double v;
 
 /*--------------------------------------------------------------------------*/
 
-double asind(v)
+double astAastSind(v)
 
 double v;
 
@@ -153,7 +156,7 @@ double v;
 
 /*--------------------------------------------------------------------------*/
 
-double atand(v)
+double astAastTand(v)
 
 double v;
 
@@ -171,7 +174,7 @@ double v;
 
 /*--------------------------------------------------------------------------*/
 
-double atan2d(y, x)
+double astAtan2d(y, x)
 
 double x, y;
 
