@@ -504,6 +504,8 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     27-JAN-2004 (DSB):
 *        - Modify FitLine to use correlation between actual and estimated
 *        axis value as the test for linearity.
+*        - Modify RoundFString to avoid writing beyond the end of the
+*        supplied buffer if the supplied string contains a long list of 9's.
 *class--
 */
 
@@ -17046,8 +17048,10 @@ static void RoundFString( char *text, int width ){
    char *c;
    char *dot;
    char *exp;   
+   char *last;
    char *start;
    char *end;
+   int i;
    int neg;
    int nnine;
    int nonzero;
@@ -17161,6 +17165,7 @@ static void RoundFString( char *text, int width ){
 
 /* We have not yet found a non-blank character */
    start = NULL;
+   last = NULL;
 
 /* Number is assumed positive. */
    neg = 0;
@@ -17197,12 +17202,16 @@ static void RoundFString( char *text, int width ){
          }
       }
 
+/* Note the address of the last non-blank character. */
+      if( *c != ' ' ) last = c;
+
 /* Move on to the next character. */
       c++;
    }
 
 /* If a long string of adjacent nines was found... */
    if( nnine >= NSEQ ) {
+      c = NULL;
 
 /* If we found at least one non-nine digit. */
       if( a ) {
@@ -17225,34 +17234,47 @@ static void RoundFString( char *text, int width ){
             c++;
          }       
 
-/* If all digits were nines... */
-      } else {
+/* If all digits were nines, the rounded number will occupy one more
+   character than the supplied number. We can only do the rounding if there
+   is a spare character (i.e.a space) in the supplied string. */
+      } else if( last - start + 1 < len ) {
 
-/* Skip any initial minus sign. */
-         if( neg ) start++;
+/* Put the modified text at the left of the available space. */
+         c = text;
 
-/* The first digit in the returned string will be a "1". */
-         c = start;
+/* Start with a munus sing if needed, followed by the leading "1" (caused
+   by the overflow from the long string of 9's). */
+         if( neg ) *(c++) = '-';
          *(c++) = '1';
 
-/* Append zeros up to the decimal point. */
-         while( dot && c <= dot ) *(c++) = '0';
+/* Now put in the correct number of zeros. */
+         if( dot ) {
+            nzero = dot - start;
+         } else if( exp ) {
+            nzero = exp - start;
+         } else {
+            nzero = last - start;
+         }            
+         for( i = 0; i < dot-start; i++ ) *(c++) = '0';
 
-/* If there is a decimal point, append ".0". */
+/* If the original string containsed a decimal point, make sure the
+   returned string also contains one. */
          if( dot ) {
             *(c++) = '.';
-            *(c++) = '0';
-         }
+            if( *c ) *(c++) = '0';
+         } 
+
       }
 
 /* We put a terminator folling the last non-zero character. The
    terminator is the exponent, if there was one, or a null character. */
-      if( exp ) {
-         while( ( *(c++) = *(exp++) ) );
-      } else {
-         *c = 0;
+      if( c ) {
+         if( exp ) {
+            while( ( *(c++) = *(exp++) ) );
+         } else {
+            *c = 0;
+         }
       }
-
    }
 
 /* Right justify the returned string in the original field width. */
