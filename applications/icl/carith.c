@@ -19,6 +19,11 @@
  *
  ******************************************************************************
  */
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <string.h>
 #include <limits.h>
 #include <setjmp.h>
@@ -739,10 +744,12 @@ func_nint(value arg)
 
 /* Ultrix and Linux do not have a nint() function, so we use (int)rint() */
 
-#if defined(mips) || defined(__linux)
+#if HAVE_NINT
+    ival = nint(rval);
+#elif HAVE_RINT
     ival = (int) rint(rval);
 #else
-    ival = nint(rval);
+# error "Can not take nearest int"
 #endif
 
     if (fabs((double) ival - rval) < 1.0)

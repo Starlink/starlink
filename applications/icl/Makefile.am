@@ -3,7 +3,7 @@
 bin_PROGRAMS = icl icl_io
 
 icl_SOURCES = parse.y lex.l $(F_ROUTINES) $(C_ROUTINES)
-icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs_link_adam`
+icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs_link_adam` @FCLIBS@
 
 # May not be portable. We need the y.tab.h file to be created
 # By default YACC does not create one. Note that we expect parse.h

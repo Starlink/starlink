@@ -45,7 +45,15 @@ AC_CHECK_FUNCS([isexception finite sys_nerr])
 # We expect finite to be defined in math.h
 AC_CHECK_DECLS([finite],,,[#include <math.h>])
 
+# carith.c - first add libm to search path with easy function
+AC_CHECK_LIB([m],[sin])
+AC_CHECK_FUNCS([nint rint])
+
 STAR_CNF_COMPATIBLE_SYMBOLS
+
+# Link against fortran libraries
+STAR_FC_LIBRARY_LDFLAGS
+
  
 dnl    Documentation is in the parent directory
 STAR_LATEX_DOCUMENTATION(sg5)
