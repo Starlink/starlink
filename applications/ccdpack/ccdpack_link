@@ -66,7 +66,7 @@
 
       native)
          graphargs="`agp_link` `ast_link -mygrf` grf_ccdpack.o \
-                    -lcpgplot `pgplot_link`"
+                    -lcpgplot `pgplot_link -star`"
          ;;
 
       esac
@@ -78,7 +78,6 @@
             `ard_link` `ndg_link` `grp_link` \
             `ams_link_adam` \
             $graphargs -lpda" \
-          | sed 's/-lpgplot /-lpgplot_adam /g' \
           | awk 'BEGIN{RS=" ";FS="\n"}
                         {f[i++]=$1}
                         END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
