@@ -30,6 +30,7 @@
 *      4 May 94 : V1.7-0  Use AIO for proper UNIX output (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *     28 Feb 97 : V2.1-0  Make seperator line correct length (RJV)
+*     22 Mar 99 : V2.2-1  Get rid of ADI (rjv)
 *
 *    Type Definitions :
 *
@@ -49,12 +50,11 @@
       CHARACTER*(DAT__SZLOC) 	OBJLOC            	! Data object locator
       INTEGER			OCH			! Output channel id
       INTEGER 			OUTWIDTH                ! Output page width
-      INTEGER                   OBJID
 *
 *    Version id :
 *
       CHARACTER*30 		VERSION
-        PARAMETER 		( VERSION = 'HDIR Version 2.2-0' )
+        PARAMETER 		( VERSION = 'HDIR Version 2.2-1' )
 *-
 
 *    Version number
@@ -64,8 +64,7 @@
       CALL AST_INIT()
 
 *    Get parameter values
-      CALL USI_ASSOC( 'INP', '*', 'READ', OBJID, STATUS )
-      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
+      CALL DAT_ASSOC('INP','READ',OBJLOC,STATUS)
 
 *    Connect output device
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )

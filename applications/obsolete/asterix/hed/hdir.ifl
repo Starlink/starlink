@@ -1,7 +1,7 @@
- INTERFACE HDIR      
-    PARAMETER INP    
-       TYPE 'LITERAL'
-       POSITION 1    
+ INTERFACE HDIR
+    PARAMETER INP
+       TYPE 'UNIV'
+       POSITION 1
        PPATH 'GLOBAL'
        PROMPT 'Object name'
        help 'Full name of object whose components are to be listed'
