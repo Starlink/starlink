@@ -384,7 +384,7 @@ C_ROUTINES = $(BASIC_C_ROUTINES)
 
 #  Fortran routines required for both the standalone and ADAM libraries.
 
-BASIC_F_ROUTINES = ndg1_appen.f ndg1_asexp.f ndg1_chscn.f ndg1_crexp.f \
+BASIC_F_ROUTINES = ndg1_appen.f ndg_asexp.f ndg1_chscn.f ndg1_crexp.f \
 ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \
 ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_ndfch.f \
 ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
@@ -1190,13 +1190,12 @@ unbuild: clean
 #  files.
 
 ndg1_appen.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR
-ndg1_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
 ndg1_chscn.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_crexp.o:	 SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
 ndg1_crpth.o:    SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDG_CONST
 ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg1_fpars.o:	 SAE_PAR
 ndg1_forxt.o:	 SAE_PAR
+ndg1_fpars.o:	 SAE_PAR
 ndg1_gtyps.o:	 SAE_PAR
 ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
@@ -1210,6 +1209,7 @@ ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
 ndg1_sort.o:	 SAE_PAR GRP_PAR PRM_PAR NDG_CONST
 ndg1_subst.o:	 SAE_PAR
+ndg_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
 ndg_asso1.o:	 SAE_PAR GRP_PAR NDF_PAR
 ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
 ndg_crea1.o:	 SAE_PAR GRP_PAR NDF_PAR

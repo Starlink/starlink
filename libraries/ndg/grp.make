@@ -14,7 +14,7 @@ INCLUDES = ndg_err ndg_const
 #  Fortran source files 
 FORTRAN_FILES = \
 ndg1_appen.f  ndg1_gtyps.f  ndg1_ndfdl.f  ndg_assoc.f   ndg_ndfcr.f \
-ndg1_asexp.f  ndg1_hcut.f   ndg1_pshdb.f  ndg_crea1.f   ndg_ndfpr.f \
+ndg_asexp.f  ndg1_hcut.f   ndg1_pshdb.f  ndg_crea1.f   ndg_ndfpr.f \
 ndg1_chscn.f  ndg1_hfind.f  ndg1_pshde.f  ndg_creat.f   ndg_prop1.f \
 ndg1_crexp.f  ndg1_hsplt.f  ndg1_pshdf.f  ndg_crep1.f   ndg_ptsup.f \
 ndg1_expan.f  ndg1_lasto.f  ndg1_sdfex.f  ndg_gtsup.f   ndg_setsz.f \
