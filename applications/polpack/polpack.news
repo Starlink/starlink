@@ -1,53 +1,22 @@
 1 POLPACK
 
- Version 2.0 of POLPACK (an applications package for processing imaging 
+ Version 2.0-13 of POLPACK (an applications package for processing imaging 
  polarimetry data) is now available. It is fully documented in SUN/223.
- The main changes are:
- 
-   o  Full support for single-beam data.
+ The main changes since V2.0 are:
 
-   o  POLPACK can now be run from the ICL and IRAF cl command languages.
+   o  A new command called VERSION has been added to check the version 
+      number of the installed package.
 
-   o  A new command POLIMAGE for creating a 1 or 2-dimensional NDF from
-   the values in a column of a catalogue.
+   o  The names of catalogues provided in response to parameter prompts 
+      can now contain shell meta-characters (e.g. $HOME/mycat, ~/mycat, 
+      etc).
 
-   o  A new command POLSIM for creating simulated intensity images from
-   a cube of Stokes vectorsd and a set of template intensity images.
+   o  The output cube created by POLCAL in dual-beam mode now covers the
+      union of the input frames, rather than the intersection.
 
-   o  POLKA now has a REFIN parameter which may be used to specify a 
-   reference image to which the other images should be aligned. A 
-   reference image specified in this way will not be processed to create
-   any output files.
+   o  A bug has been fixed which could cause the masks displayed by POLKA 
+      in dual-beam mode to jump around as different images were selected.
 
-   o  The reference direction for Stokes parameters created by POLCAL,
-   POLBIN and POLVEC has been changed. Prior to V2.0 the reference
-   direction was the WPLATE=0 position (i.e. the direction of the fixed
-   analyser). As of V2.0, the reference direction will be north if there
-   is WCS information available to define north, or the positive Y axis 
-   {i.e. the second pixel axis) otherwise. POLVEC and POLBIN can still
-   read data sets created by earlier versions of POLPACK which use the
-   previous convention, but will write data sets using the new
-   convention.
+   o  The POLSTACK command is now included in the latex and hypertext 
+      documentation, as well as the on-line help library.
 
-   o  The angles produced by POLBIN and POLVEC which give the orientation
-   of the polarization vectors are now referred to the same reference
-   direction as the Stokes parameters. Previously, these angles were
-   measured anti-clockwise form the positive X axis (i.e. the first pixel
-   axis). They are now measured anti-clockwise from the same reference
-   direction as the Stokes parameters. POLPLOT will automatically
-   determine the correct convention to use, based on the POLPACK version
-   number stored in the supplied catalogue.
-
-   o  The way in which the reference direction is recorded within a
-   POLPACK data file has been changed. Prior to V2.0, the POLPACK
-   extension item named ANGROT was used. The reference direction is now
-   specified by the POLANAL co-ordinate Frame added to the WCS component
-   when POLIMP or POLEXT is run. V2.0 will read ANGROT values in existing
-   data sets, but will no longer write them.
-
-   o  Multiple NDFs within a single HDS container file can now be processed
-   without needing to first extract them into separate files.
-
-   o  POLKA nows uses a private colour map automatically when necessary.
-   The NEWCOLMAP parameter which was previously used to request a private
-   colour map, has been withdrawn.
