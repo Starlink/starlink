@@ -198,7 +198,7 @@
           CALL ERR_ANNUL( STATUS )
           RCLO = 0.0
           IF ( INS .EQ. 'SIS' ) THEN
-            RCHI = 4095.0
+            RCHI = 511.0
           ELSE
             RCHI = 1023.0
           END IF

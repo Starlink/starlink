@@ -2296,6 +2296,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INTEGER                 CHR_LEN
       EXTERNAL			PSF_TABULAR
+      EXTERNAL			PSF_TABULAR_PFL
 *
 *    Local variables :
 *
@@ -2399,6 +2400,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Set methods
       CALL PSF0_SETRTN( PSID, 'Data', PSF_TABULAR, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Eprofile', PSF_TABULAR_PFL, STATUS )
 
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
