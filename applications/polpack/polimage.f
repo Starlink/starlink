@@ -159,6 +159,10 @@
 *        Added parameter SHAPE.
 *     7-FEB-2001 (DSB):
 *        Updated to handle 3D data.
+*     7-OCT-2002 (DSB):
+*        Modified to handle cases where input catalogue contains only 2
+*        positions and the box size is an exact integral part of the 
+*        axis range.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -507,12 +511,24 @@
          END IF
 
 *  Find the number of bins along each axis.
-         NXBIN = KPG1_CEIL( ( SXHI - SXLO ) / BOX( 1 ) ) 
-         NYBIN = KPG1_CEIL( ( SYHI - SYLO ) / BOX( 2 ) )
-         NZBIN = KPG1_CEIL( ( SZHI - SZLO ) / BOX( 3 ) )
+         NXBIN = MAX( 1, KPG1_CEIL( ( SXHI - SXLO ) / BOX( 1 ) ) )
+         NYBIN = MAX( 1, KPG1_CEIL( ( SYHI - SYLO ) / BOX( 2 ) ) )
+         NZBIN = MAX( 1, KPG1_CEIL( ( SZHI - SZLO ) / BOX( 3 ) ) )
 
 *  Find the total number of bins.
          NBIN = NXBIN*NYBIN*NZBIN
+
+*  If the total data range on an axis is a integer multiple of the box 
+*  size on that axis, the point with the highest axis value will be on the 
+*  higher edge of the highest bin and so will not be counted as being in
+*  the bin. To avoid this, increase the box size slightly so that the 
+*  highest axis value is inside the highest bin.
+         IF( SXHI - SXLO .EQ. NXBIN*BOX( 1 ) ) BOX( 1 ) = 
+     :                                               BOX( 1 )*1.00001
+         IF( SYHI - SYLO .EQ. NYBIN*BOX( 2 ) ) BOX( 2 ) = 
+     :                                               BOX( 2 )*1.00001
+         IF( SZHI - SZLO .EQ. NZBIN*BOX( 3 ) ) BOX( 3 ) = 
+     :                                               BOX( 3 )*1.00001
 
 *  Find the X, Y and Z values corresponding to the bottom left corner of the 
 *  bottom left bin.
