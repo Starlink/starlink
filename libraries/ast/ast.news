@@ -19,6 +19,11 @@ Main Changes in this Version
   o The Frame class has a new method which returns the angle subtended 
   by two points at a third point within a 2 or 3 dimensional Frame.
 
+  o The Frame class has a new method which calculates a position which is
+  offset away from a given starting point by a specified distance along a
+  geodesic curve which passes through the starting point at a given
+  position angle. It can only be used with 2-dimensional Frames.
+
   o It is now possible to specify the primitive graphics functions used
   by the Plot class at run-time as well as at link-time. The Plot class
   produces graphics by calling a set of wrapper functions which in turn

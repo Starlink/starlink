@@ -7080,22 +7080,25 @@ longitude axis and two latitude axes. Which latitude axis should be
 associated with the longitude axis?}
 f-
 
-\subsection{\label{ss:distanceandoffset}Calculating Distances and Offsets}
-
+\subsection{\label{ss:distanceandoffset}Calculating Distances, angles and Offsets}
+Some complementary 
 c+
-Two complementary functions are provided for use with Frames to allow
-you to find the distance between two points and to offset a specified
-distance along a line joining two points. In essence, these functions
-define the metric of the coordinate space which the Frame
-represents. In the case of a basic Frame, this is a Cartesian metric.
+functions 
 c-
 f+
-Two complementary routines are provided for use with Frames to allow
-you to find the distance between two points and to offset a specified
-distance along a line joining two points.  In essence, these routines
-define the metric of the coordinate space which the Frame
-represents. In the case of a basic Frame, this is a Cartesian metric.
+routines 
 f-
+are provided for use with Frames to allow you to find the distance
+between two points, to offset a specified distance along a line joining
+two points, {\em{etc.}} In essence, these 
+c+
+functions 
+c-
+f+
+routines 
+f-
+define the metric of the coordinate space which the Frame represents. In
+the case of a basic Frame, this is a Cartesian metric.
 
 c+
 The first of these functions, astDistance, returns a double distance
@@ -7214,6 +7217,60 @@ as varying the offset will trace out a straight line. On the celestial
 sphere, however ({\em{e.g.}}\ using a SkyFrame), it would trace out a
 great circle.
 f-
+
+c+
+The astOffset2 function is similar to astOffset, but instead of using the
+c-
+f+
+The AST\_OFFSET2 routine is similar to AST\_OFFSET, but instead of using the
+f-
+geodesic which passes through two positions, it uses the geodesic which
+passes at a given position angle\footnote{The angle from the positive
+direction of the second Frame axis to the geodesic, positive values being
+in the same sense as rotation from the positive direction of the second
+axis to the positive direction of the first Frame axis.}through a given
+starting position. The method is restricted to 2-dimensional Frames, and
+may not be used with CmpFrames.
+
+Within a Cartesian coordinate system, the position angle of a geodesic
+({\em{i.e.}}\ a straight line) is constant along its entire length, but
+this is not necessarily true of other coordinate systems. Within a
+spherical coordinate system, for instance, the position angle of a geodesic
+will vary along its length (except for the special cases of a meridian and
+the equator). In addition to returning the required offset position, the 
+c+
+astOffset2 function 
+c-
+f+
+AST\_OFFSET2 routine
+f-
+returns the position angle of the geodesic at the
+offset position. This is useful if you want to trace out a path which
+involves turning through specified angles. For instance, tracing out a
+rectangle in which each side is a geodesic involves turning through 90 
+c+
+degrees at the corners. To do this, use astOffset2 to calculate the
+position of each corner, and then add (or subtract) 90 degrees from the 
+position angle returned by astOffset2.
+c-
+f+
+degrees at the corners. To do this, use AST\_OFFSET2 to calculate the
+position of each corner, and then add (or subtract) 90 degrees from the 
+position angle returned by AST\_OFFSET2.
+f-
+
+c+
+The astAngle function 
+c-
+f+
+The AST\_ANGLE routine 
+f-
+calculates the angle subtended by two points, at a third point.
+It can only be used with 2 or 3 dimensional Frames, and may not be used
+with a CmpFrame. If used with a 2-dimensional Frame the returned angle
+is signed to indicate the sense of rotation (clockwise or anticlockwise)
+in taking the ``shortest route'' from the first point to the second.
+If used with a 3-dimensional Frame the result is un-signed.
 
 \subsection{\label{ss:framedomains}The Domain Attribute}
 
@@ -17336,6 +17393,18 @@ astAngle
 c-
 which returns the angle subtended by two points at a third point within a
 2 or 3 dimensional Frame.
+
+\item The Frame class has a new method called 
+f+
+AST\_OFFSET2
+f-
+c+
+astOffset2
+c-
+which calculates a position which is offset away from a given starting
+point by a specified distance along a geodesic curve which passes
+through the starting point at a given position angle. It can only be used
+with 2-dimensional Frames.
 
 \item The Plot class has a new method called 
 f+

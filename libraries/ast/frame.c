@@ -848,6 +848,8 @@ f     AST_ANGLE = DOUBLE PRECISION
 *  Notes:
 *     - An error will be reported if the supplied Frame is
 *     not 2 or 3 dimensional.
+*     - An error will be reported if an attempt is made to use this
+*     method with a CmpFrame.
 *     - This function will return a "bad" result value (AST__BAD) if
 *     any of the input coordinates has this value.
 *     - A "bad" value will also be returned if points A and B are
@@ -3963,6 +3965,8 @@ f     - The geodesic curve used by this routine is the path of
 c     astDistance function.
 f     AST_DISTANCE function.
 *     - An error will be reported if the Frame is not 2-dimensional.
+*     - An error will be reported if an attempt is made to use this
+*     method with a CmpFrame.
 *     - This function will return "bad" coordinate values (AST__BAD)
 *     if any of the input coordinates has this value.
 *--
