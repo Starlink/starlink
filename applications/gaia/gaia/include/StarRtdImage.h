@@ -224,7 +224,10 @@ class StarRtdImage : public Skycat {
    //  Get global statistics for a list of objects.
    int globalstatsCmd( int argc, char *argv[] );
 
-  protected:
+   //  Get any AST warning issued when image WCS was read.
+   int astwarningsCmd( int argc, char *argv[] );
+
+ protected:
 
    //  Pointer to structure that holds the image configuration options.
    StarRtdImageOptions *staroptionsPtr_;

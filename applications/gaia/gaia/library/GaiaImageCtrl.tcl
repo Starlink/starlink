@@ -407,6 +407,13 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Record this name, until another new image is set.
       set last_file_ $itk_option(-file)
+
+      #  Issue any warnings about the WCS.
+      set warn [$image_ astwarnings]
+      if { $warn != {} && $itk_option(-wcs_warnings) } {
+         warning_dialog \
+            "Your WCS calibration has the following deficiency:\n$warn"
+      }
    }
 
    #  Open and load a new image file via file name dialog. Added the
@@ -860,6 +867,9 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Component of the NDF that is displayed.
    itk_option define -component component Component data
+
+   #  Whether to show warnings about WCS issues or not.
+   itk_option define -wcs_warnings wcs_warnings Wcs_warnings 1
 
    #  Protected variables:
    #  ====================

@@ -139,6 +139,9 @@
 //        Modified astsystem command to transform between current
 //        frame and new celestial coordinates. Also added asttran2
 //        command to transform coordinates between such frames.
+//     23-MAY-2000 (PWD):
+//        Added astwarnings command. These return the content of any
+//        ASTWARN cards produced when the WCS is set up.
 //-
 
 #include <string.h>
@@ -206,6 +209,7 @@ public:
    { "asttran2",      &StarRtdImage::asttran2Cmd,     2, 2 },
    { "aststore",      &StarRtdImage::aststoreCmd,     2, 4 },
    { "astsystem",     &StarRtdImage::astsystemCmd,    2, 3 },
+   { "astwarnings",   &StarRtdImage::astwarningsCmd,  0, 0 },
    { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
    { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
    { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
@@ -5056,7 +5060,7 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
 //     The second argument is a list consisting of pairs of
 //     coordinates to be transformed.
 //
-//     The result of this command is the new set of coordinate, if
+//     The result of this command is the new set of coordinates, if
 //     successful.
 //-
 int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
@@ -5179,5 +5183,33 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
    delete [] olddec;
    delete [] newra;
    delete [] newdec;
+   return TCL_OK;
+}
+
+//+
+//   StarRtdImage::astwarningsCmd
+//
+//   Purpose:
+//      Return the contents of any ASTWARN cards 
+//
+//   Arguments:
+//      None.
+//
+//   Result:
+//      Either a formatted string containing the ASTWARN cards or
+//      a blank string.
+//-
+int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+   cout << "Called StarRtdImage::astwarningsCmd" << endl;
+#endif
+   if ( image_ ) {
+      StarWCS *wcs = getStarWCSPtr( image_ );
+      const char *warnings = wcs->getWarning();
+      if ( warnings ) {
+         set_result( warnings );
+      }
+   }
    return TCL_OK;
 }

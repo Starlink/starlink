@@ -84,6 +84,13 @@ protected:
 
   //  Is WCS celestial?
   int issky_;
+
+  //  Construct a single warning from all warning cards.
+  void constructWarning( AstFitsChan *fitschan );
+
+  //  Pointer to warnings string.
+  char *warnings_;
+
 public:
 
   //  Constructor (derived classes call this)
@@ -190,6 +197,10 @@ public:
 
   // Return the value of an AST attribute of the main AstFrameSet.
   const char *astGet( char *attrib );
+
+  //  Return copy ofwarnings string.
+  const char *getWarning();
+
 };
 
 
