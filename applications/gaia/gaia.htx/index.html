@@ -1,153 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-  <head>
-    <title>The main window</title>
-  </head>
-    <p align="center">
-      <img src="gaialogo.gif">
-    </p>
-    <h2 align="center">GAIA -- Graphical Astronomy and Image Analysis Tool</h2>
-Welcome to the on-line help system. For help on any of the topics
-shown below, click on the associated hyperlink. Descriptions and
-pointers to other sources are available in the main GAIA
-documentation, Starlink User Note 214. This can be view on-line either
-by using the command:
-    <pre>
+<head>
+<title>The main window</title>
+</head>
+<body>
+<blockquote>
+<br>
+<p align=center><img src="gaialogo.gif">
+<br>
+
+<h2 align=center><font color=red>
+GAIA -- Graphical Astronomy and Image Analysis Tool
+</font></h2>
+<p>Welcome to the on-line help system. For help on any of
+the topics shown below, click on the associated
+hyperlink. Descriptions and pointers to other sources are available in
+the main GAIA documentation, Starlink User Note 214 (SUN/214). This
+can be view on-line either by using the command:
+<pre>
    % showme sun214
-    </pre>
+</pre>
 Any unresolved questions or requests for enhancements should be forward to:
-    <pre>
+<pre>
    gaia@star.rl.ac.uk
-    </pre>
-    <dl>
-      <dd><a href="display.html">Displaying images</a>
-      <dd><a href="view.html">Controlling the view</a>
-      <dd><a href="inspect.html">Inspecting image values</a>
-      <dd><a href="graphics.html">Add/Control overlay graphics</a>
-    </dl>
-
-    <h3>Do aperture photometry:</h3>
-    <p>Just open the "Image-Analysis" menu and select one of the "Aperture
-      Photometry" options (one toolbox works in magnitudes the other in
-      straight counts/flux).
-      <a href="GaiaApPhotom.html">You can get more help.</a>
-    <p>
-
-    <h3>Automatically detect all the objects:</h3>
-    <p>Just select the "Detect objects..." item in the "Image-Analysis"
-      menu. This creates a new toolbox with many options for controlling how
-      your objects are detected and what measurements are made of them. The
-      results are displayed in a catalogue window.</p>
-
-
-    <h3>Define regions for use in other programs:</h3>
-    <p>Just open the "Image-Analysis" menu and select "Image regions". The
-      image regions created can be saved in a text file and are used by some
-      KAPPA (SUN/95), CCDPACK (SUN/139) and ESP (SUN/180) applications.</p>
-
-
-    <h3>Get statistics for a region:</h3>
-    <p>Open the "Image-Analysis" menu and select "Image regions". Statistics
-      for arbitrary regions can be obtained here. </p>
-
-    <h3>Get statistics for an object:</h3>
-    <p>Open the "View" menu and select the "Pick Object..." item. This
-      creates a new toolbox that allows you to pick an object. Various
-      statistics of the object are then displayed, such as its centre and
-      FWHM (these are all estimated from a two dimensional gaussian fit).</p>
-
-
-    <h3>Extract/remove part of the image.</h3>
-    <p>Open the "Image-Analysis" menu and select "Image regions". Arbitrary
-      shaped regions can be extracted or removed from images using this
-      toolbox.</p>
-
-
-
-    <h3>Use the RA and Dec stuff:</h3>
-    <p>To do this you'll need an image with an appropriate set of FITS
-    headers (from the Digital Sky Survey, or other on-lines sources of
-    images for instance) or an NDF with a WCS component. Now when you
-    move the cursor around on the image the approximate RA and Dec are
-    shown.</p>
-
-    <p>RA and Dec offsets can also be shown. Just place your cursor
-    over an object and then press and hold down button 3. Now move the
-    mouse to another point on the image and the offsets between then
-    will be shown.</p>
-
-    <p>No promises on how accurate any of these values are is given!
-    You should also take care that the FITS headers are not
-    invalidated by any manipulations you perform on the image (such as
-    resizing).</p>
-
-
-    <h3>Plot a grid overlay:</h3>
-    <p>If your image is displaying RA and Dec values then you can also
-    plot a grid overlaid on it. Just open the "Image-Analysis" menu
-    and select the "Overlay axes..." item. This creates a new toolbox
-    with many options for controlling the appearance of the grid.</p>
-
-
-    <h3>Astrometrically calibrate my image:</h3>
-    <p>
-      Check out the various toolboxes under the "Astrometry
-      calibration" item in the "Image-Analysis" menu. These all have
-      an overview of the ways in which you can attempt this.</p>
-
-
-    <h3>Change the celestial coordinate system of my image:</h3>
-    <p>
-      Select the "Celestial coordinates..." item in the
-      "Image-Analysis" menu. This will allow you to select between
-      many familiar systems.</p>
-
-
-    <h3>Blink compare images:</h3>
-    <p>
-      To use the blink toolbox you need to display more than one
-      image. To display more than one image just pull down the "File"
-      menu and select the "New Window" option. A clone of the main
-      window will now appear in which you can display a new image. Now
-      open the "Toolboxes" menu and select the "Blink images..."
-      option.</p>
-
-
-    <h3>Query an on-line catalog about my image:</h3>
-    <p>
-      Just open the "Data-Servers" menu and select the "Catalogs..."
-      item. This will create a toolbox that will allow you to select a
-      catalog and then make a query about a region on the sky. If your
-      image has accurate WCS information then this can be used to
-      define the region, otherwise you'll need to do this yourself
-      (you also need the WCS information if you want to see the
-      objects returned from the catalog plotted over the image).</p>
-
-
-    <h3>Display an image from the DSS:</h3>
-    <p>
-      Select the "Image Servers..." item from the "Data-Servers..."
-      menu and either give the name of an object, or a region of the
-      sky. When returned the image will be immediately displayed in
-      the main window. Note that if you want to save this or perform
-      analyses of the image then you must save it to a disk file and
-      reload the image.</p>
-
-
-    <h3>Contour an image:</h3>
-    <p>
-      Select the "Image-Analysis" menu and choose the "Contouring..."
-      item. This will reveal a toolbox for contouring the displayed
-      image and/or another image that is aligned to the displayed
-      image.</p>
-
-
-    <h3>Get some help, give some feedback, send a bug report:</h3>
-    <p>
-      Well you're reading the main help, you might also take a look at
-      SUN/214 (try "showme sun214" from the command-line).  Specific
-      help is given with the image processing toolboxes. Bug reports
-      etc., should be sent to:
-      <a href="gaia@star.rl.ac.uk">gaia@star.rl.ac.uk</a>
-      </p>
+</pre>
+<br>
+<h2>Help topics</h2>
+<dir>
+<li><h3>
+<a href="display.html">Displaying images</a>
+</h3></li>
+<li><h3>
+<a href="view.html">Controlling the view</a>
+</h3></li>
+<li><h3>
+<a href="inspect.html">Inspecting image values</a>
+</h3></li>
+<li><h3>
+<a href="graphics.html">Adding and controlling overlay graphics</a>
+</h3></li>
+<li><h3>
+<a href="regions.html">Getting the properties of regions</a>
+</h3></li>
+<li><h3>
+<a href="photom.html">Performing aperture or optimal photometry</a>
+</h3></li>
+<li><h3>
+<a href="extract.html">Automatically detecting and measuring objects</a>
+</h3></li>
+<li><h3>
+<a href="statistics.html">Getting statistics for (an) objects</a>
+</h3></li>
+<li><h3>
+<a href="astrometry.html">Using astrometry information in GAIA</a>
+</h3></li>
+<li><h3>
+<a href="compare.html">Comparing images</a>
+</h3></li>
+<li><h3>
+<a href="catalogues.html">On-line catalogues and image stores</a>
+</h3></li>
+</dir>
+</blockquote>
+</body>
 </html>
-

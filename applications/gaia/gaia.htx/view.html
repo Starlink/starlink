@@ -1,87 +1,88 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-  <head>
-    <title>Controlling the view</title>
-  </head>
+<head>
+  <title>Controlling the view</title>
+  <meta http-equiv="Content-Type" content="text/html">
+</head>
 
-  <body>
-    <h2 align="center">Controlling the view</h2>
+<body>
+<blockquote>
+<h2>Controlling the view</h2>
 
-    <h3>Zoom:</h3>
-    You can zoom the main image by one of several methods:
-    <dl>
-      <dd> 1) Press the button with a large "Z" on it.</dd>
-      <dd> 2) Press the "Scale:" button and choose from one of the numbered
-        zooms.</dd>
-      <dd> 3) Place your mouse cursor into the "Pan" window (the small one on
-        the upper left) and press buttons 1 and 2.</dd>
-      <dd> 4) Drag out a region in the main window using shift-drag mouse
-        button 1.</dd>
-    </dl>
-    Unzooming uses the button with a small "z", or you can pick a
-    smaller number from the "Scale:" options, or finally you can press
-    button 3 in the pan window. Unzooming using option 4) uses shift
-    mouse button 2.
-    <p>
-    The zoom can only be changed by integer amounts.
+<h3>Zoom:</h3>
+You can zoom the main image by one of several methods:
+<ol>
+    <li>Press the button with a large "Z" on it.</li>
+    <li>Press the "Scale:" button and choose from one of the numbered
+      zooms.</li>
+    <li>Place your mouse cursor into the "Pan" window (the small one on the
+      upper left) and press buttons 1 and 2.</li>
+    <li>Drag out a region in the main window using shift-drag mouse button
+      1.</li>
+</ol>
+Unzooming uses the button with a small "z", or you can pick a smaller number
+from the "Scale:" options, or finally you can press button 3 in the pan
+window. Unzooming using option 4) uses shift mouse button 2.
 
-    <h3>Position:</h3>
-    The part of the image that you see (assuming that you cannot
-    see the whole image) can be controlled by several methods:
-    <dl>
-      <dd>1) By dragging the scrollbars, left to right and top to bottom.</dd> 
+<p>The zoom can only be changed by integer amounts.</p>
 
-      <dd>2) By moving the box displayed in the pan window (the small
-        window on the upper left). To move this place your cursor over
-        the box and then press and keep down button one -- now move the
-        mouse around and finally release the button.</dd>
+<h3>Position:</h3>
+The part of the image that you see (assuming that you cannot see the whole
+image) can be controlled by several methods:
+<ol>
+    <li>By dragging the scrollbars, left to right and top to bottom.</li>
+    <li>By moving the box displayed in the pan window (the small window on
+      the upper left). To move this place your cursor over the box and then
+      press and keep down button one -- now move the mouse around and finally
+      release the button.</li>
+    <li>By dragging-scrolling the main image. To do this press button 2
+      down and keep it down over the main image. Moving the mouse now pans the
+      image in the same direction as the cursor.</li>
+</ol>
+On slow machines 2) is probably the best option.
 
-      <dd>3) By dragging-scrolling the main image. To do this press
-        button 2 down and keep it down over the main image. Moving the
-        mouse now pans the image in the same direction as the
-        cursor.</dd>
-    </dl>
-    On slow machines 2) is probably the best option.
+<h3>Changing the image detail</h3>
+Setting the display range (also known as the cut levels) changes the limits of
+the data that correspond to the brightest and faintest parts of your image.
+You can change the display range in many different ways.
+<ol>
+    <li>Press one of the "Auto Cut" buttons (try this first).</li>
+    <li>Open the "View" menu and select the "Cut Levels ..." option. This
+      show a histogram of the values in the image and allows some preset cuts
+      to be applied.</li>
+    <li>Type in the limits in to the "Low:" and "High:" boxes on the front
+      panel. Just press <return>to activate them.</li>
+</ol>
 
-    <h3>Changing the image detail</h3> 
-    Setting the display range (also known as the cut levels) changes
-    the limits of the data that correspond to the brightest and
-    faintest parts of your image. You can change the display range in
-    many different ways.
-    <dl>
-      <dd>1) Press one of the "Auto Cut" buttons (try this first).</dd>
-      <dd>2) Open the "View" menu and select the "Cut Levels ..." option.
-        This show a histogram of the values in the image and allows
-        some preset cuts to be applied.</dd>
-      <dd>3) Type in the limits in to the "Low:" and "High:" boxes on the
-        front panel. Just press <return> to activate them.</dd>
-    </dl>
+<h3>Manipulate the image colours:</h3>
+You can manipulate the displayed colours by actions in the colourmap display
+(the bar of colours in the lower part of the main screen). These actions are.
+<ol>
+    <li>Press and hold down button 1, then move the mouse side to side.
+      This shifts the colourmap.</li>
+    <li>Press and hold down button 2, then move the mouse side to side.
+      This stretches the colourmap.</li>
+    <li>Press the shift key and button 1 together and hold down, then move
+      the mouse side to side. This rotates the colourmap.</li>
+    <li>Pressing button 3 resets the colourmap to the default.</li>
+</ol>
 
-    <h3>Manipulate the image colours:</h3>
-    You can manipulate the displayed colours by actions in the
-    colourmap display (the bar of colours in the lower part of the
-    main screen). These actions are.
-    <dl>
-      <dd>1) Press and hold down button 1, then move the mouse side to
-        side. This shifts the colourmap.</dd>
-      <dd>2) Press and hold down button 2, then move the mouse side to
-        side. This stretches the colourmap.</dd>
-      <dd>3) Press the shift key and button 1 together and hold down,
-        then move the mouse side to side. This rotates the colourmap.</dd>
-      <dd>4) Pressing button 3 resets the colourmap to the
-        default.</dd>
-    </dl>
-    
-    <h3>Change the image colours:</h3>
-    You change the image colourmap by opening the "View" menu and
-    selecting "Colors...". This creates a new window in which you can
-    select from a large set of preset colourmaps. You can also select
-    an intensity transfer function, and a colour scale algorithm.
-    
-    <h3>Change the number of colours used:</h3>
-    You can increase and reduce the number of colours used to display
-    the image by opening the "View" menu and selecting "Colors...". A
-    new window is created by allows you to change the number of
-    "Allocated Colors".
-  </body>
+<h3>Change the image colours:</h3>
+You change the image colourmap by opening the "View" menu and selecting
+"Colors...". This creates a new window in which you can select from a large
+set of preset colourmaps. You can also select an intensity transfer function,
+and a colour scale algorithm.
+
+<h3>Change the number of colours used:</h3>
+You can increase and reduce the number of colours used to display the image by
+opening the "View" menu and selecting "Colors...". A new window is created by
+allows you to change the number of "Allocated Colors". This control has no
+effect
+
+<p>when working with more than 8 bits (the number of colours is automatically
+set to 256 in this case).</p>
+
+</blockquote>
+</body>
 </html>

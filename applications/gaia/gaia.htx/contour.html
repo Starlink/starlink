@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Contouring</title>
+</head>
+
+<body>
+<blockquote>
+<h2 align=center><font color=red>Contouring</font></h2>
+
+<h3>Contouring the displayed image</h3>
+<img src="contourui.gif">
+<ol>
+<li>Press the "Generate" tab.</li>
+<li>Press the "Generate" button.</li>
+<li>Press the "Draw Contours" button.</li>
+</ol>
+This generates some automatic levels and performs the contouring. The
+levels actually used are shown in the "Level" entries. To change these
+values just edit the entries and press &lt;Return&gt; or the "Draw
+Contours" button (pressing &lt;Return&gt; in the entry field just redraws
+that contour).
+
+<h3>Contouring another image over the displayed image.</h3>
+<img src="contour.gif"><br>
+<p>Either display the other image in another window and select it from
+the "Displayed image:" menu, or enter the name of the image file into
+the "Other image:" field. Now enter some appropriate contour levels
+and press "Draw Contours".
+
+<p><b>NOTE:</b> images entered in the "Other image:" field always
+override displayed images. Clear this field to use a displayed image.
+
+<p>If the images both have sky coordinates then this system will be
+used for alignment, otherwise the images will be assumed to have the
+same pixel coordinates. If you are using sky coordinates which cover
+large areas of sky or your images are not axes aligned then you may
+need to choose the "Options" menu and select the "Draw contours using
+geodesics" item, you may also need to select the "Region" tab and
+choose "Whole of image" for the contour region.
+
+<h3>Printing the image plus contours</h3>
+<p>Choose the "File" menu in the main window and select
+"Print...". This should create a new dialog window. Just choose the
+appropriate options.
+
+<h3>Saving and restoring the contour levels etc. </h3>
+<p>Choose the "File" menu and select the "Save configuration..."
+item. When the file selection dialog appears choose a filename.
+
+<p>To reload a configuration choose the "Read configuration..." item.
+
+<h3>Setting the line thickness or colour.</h3>
+<p>Each contour has its own thickness and colour. The menu associated
+with each level show the possible values, just select the one you
+want. Note these options are applied immediately, there is no need to
+redraw the contours.
+
+<h3>Generating contours at magnitude-like intervals.</h3>
+<p>Press the "Generate" tab, select the "Algorithm" menu and choose
+the "magnitude" item. Now enter the value of a reference point on your
+image and an increment in magnitudes. Finally press the "Generate"
+button.
+
+<p>I use this option by entering a value somewhat above the sky
+background and then setting the interval to say -0.5 (negative to get
+increasing data values). The formulae used is:
+<pre>
+                                     (-0.4 * i * step_value)
+   contour_level_i = start_value * 10
+</pre>
+For i = 0 up to number of contours required.
+
+<h3>Contouring the region right to the edge of the display.</h3>
+<p>Select the "Region" tab and press the "Whole of image:" button, or
+alternatively increase the X and Y display fractions.
+
+<p><b>NOTE:</b> it is much quicker to contour part of an image, this
+also uses less memory.
+
+<h3>Adding units to the contour key.</h3>
+<p>Press the "Key" tab. This provides a range of options for changing
+the key title, key position, colour etc. Note that the key setup is
+saved as part of the configuration, so can be restored.
+
+<h3>Moving or removing the key.</h3>
+<p>To move the key just place your pointer over it, press mouse button 1
+and hold it down, now move the pointer and the key will follow. 
+
+<p>To remove the key select the "Key" tab and toggle the "Display key:"
+button.
+
+<h3>Adding contours from more than one other image. </h3>
+<p>To do this you need to create a new contour toolbox. Just select
+the "File" menu and choose the "New window" item.
+
+<h3>Drawing axes around the contours.</h3>
+<p>To do this you use the axis grid toolbox. Just select the
+"Image-Analysis" menu in the main window and choose the "Overlay axes
+grid" item. To match the regions drawn choose the "Scaling" tab and
+select the "Whole of image:" button, now make the display fractions
+the same size as used in the contour toolbox.
+
+<blockquote>
+</body>
+</html>

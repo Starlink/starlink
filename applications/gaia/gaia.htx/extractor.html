@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Automatic Object Detection Toolbox</title>
+</head>
+
+<body>
+<blockquote>
+<h2 align=center><font color=red>Automatic Object Detection Toolbox</font></h2>
+<h3 align=center>Basic usage</h3>
+
+<h4>Detecting the objects on your image</h4>
+<p>Just press the "Detect objects" button. This will by default find
+all the objects, create a catalogue of their positions, intensity and
+shape parameters, display the catalogue and finally get the catalogue
+window to draw some detection ellipses.
+
+<p>You can now use the catalogue window to investigate the results
+(see the help there for making selections).
+
+<h4>Changing the detection limits, <i>etc. etc. etc.</i></h4>
+<p>The parameters shown in the various "pages" of the toolbox, control
+the values used in the detection and analysis of the objects on your
+image. These are directly related to the parameters used by the
+SExtractor program, the main and associated documentation (principally
+SUN/226 and MUD/165) should be consulted for their exact meaning.
+
+<p>Usually the meaning is obvious from the description in the short
+help (displayed at the bottom of the window), so you can proceed, at
+least initially, from just these.
+
+<h4>Configuring the default parameters</h4>
+<p>When the toolbox starts up it configures itself by reading files
+called "default.sex" and "default.param". To locate these files it
+searches the following directories:
+<ol>
+   <li>The current directory.</li>
+   <li>The config/ directory of the SExtractor program installation.</li>
+   <li>The directory of the SExtractor program.</li>
+</ol>
+If they are not found then built-in defaults are used. So you may
+configure the default setup by changing these two files and placing
+them in the current directory. Note, however, that the interface
+itself will update these two files (unless you've changed the names to
+be used) whenever a detection pass is made, so they always reflect the
+current state of the interface.
+
+<h4>Running SExtractor/EXTRACTOR directly using the values in the toolbox</h4>
+<p>When it runs the toolbox updates the "default.sex" and
+"default.param" files (unless you've changed in names used). These can
+then be used to run SExtractor or EXTRACTOR. You can also use the File
+menu items to save the program and catalogue parameters to other
+files. So you can use the GAIA interface to fine tune the detection
+parameters for an image and then use these to do the detections on
+other images.
+
+<h4>Making detections on one image and measurements on another</h4>
+<p>The toolbox always makes its measurements on the displayed
+image. If you want to use another image to do the initial detections
+then just enter its name in the "Detection image:" entry field.
+
+<h4>Stopping the plotting of detection ellipses</h4>
+<p>If you want to stop plotting detection ellipses, then look under
+the "Options" menu and de-select the currently highlighted option.
+
+<h4>Getting a printout</h4>
+<p>To get a hardcopy of your image plus detections use the "Print..."
+item under the "File" menu in the main image window. Remember you only
+get a copy of what is visible, so if you have a large image unzoom it
+until it is all visible.
+
+<p>If you want to draw axes around your image then see the "Overlay
+axes grid..." item under the "Image-Analysis" menu in the main window.
+
+<h4>Using a different version of SExtractor</h4>
+<p>To use your own version of SExtractor you need to define the
+environment variable EXTRACTOR_DIR to point to the directory that
+contains your "sex" program. Note this directory, or a sub-directory
+of it called "config" should contain the default SExtractor configuration
+files.
+
+<p>The toolbox was developed using a Starlink modified SExtractor 
+version 2.2.1. Later versions may not be supported.
+
+<h4>Using EXTRACTOR on my FITS image</h4>
+<p>By default the toolbox will use the native version of SExtractor on
+FITS files. To stop this just open the "Options" menu and de-select
+the "Use Native SExtractor" item. You may need to do this if you have
+an image with a DSS astrometric solution and you want to measure sky
+coordinates.
+
+<h4>Viewing stars and galaxies in different colours</h4>
+<p>To view your catalogue using a cut in the star/galaxy measurement
+parameter you need to use the catalogue window controls.
+
+<p>One way to do this is to sort by the "CLASS_STAR" column and just
+drag out all the objects you want to see (these will then be
+highlighted in the main window). The other way to do this is to copy
+the catalogue and open it twice in local catalogue windows. You can
+then use the catalogue window methods for selecting rows with values
+between given ranges (see the help in the catalogue window for how to
+do this).
+
+<h4>Changing the output catalogue file type</h4>
+<p> The file types output by the toolbox are restricted to the following:
+<dl>
+<dt>.FIT
+<dd>for FITS-tables (SExtractor FITS_1.0)
+<dt>.ASC
+<dd>for plain ASCII tables (SExtractor ASCII_HEAD)
+<dt>.TAB
+<dd>for tab-tables, the "native" format.
+</dl>
+
+<h4>Reading back and re-displaying a catalogue</h4>
+<p>To read back a catalogue and display it as a series of detection
+ellipses you need to use the "Read old catalogue..." item in the
+"File" menu. 
+
+<p>You can also read back catalogues as using the "Data-Servers" - "Local
+Catalogues" item on the main window. However it is unlikely that
+you'll get suitable ellipses drawn (this depends on whether your
+"skycat.cfg" file has been updated for this catalogue).
+
+<h4>Changing the colour of the ellipses</h4>
+<p>The "Options" - "Set Plot Symbols..." item in the catalogue window
+creates a dialog window in which you can define many things about the
+properties of any shapes that are drawn (these are Tcl expressions of
+the column names). To change the colour just choose a new one and
+apply it.
+
+</blockquote>
+</body>
+</html>
