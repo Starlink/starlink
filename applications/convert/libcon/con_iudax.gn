@@ -1,0 +1,126 @@
+      SUBROUTINE CON_IUDA<T>( FD, EL, NOVPRE, SKIP, A, STATUS )
+*+
+*  Name:
+*     CON_IUDAx
+
+*  Purpose:
+*     Reads a numeric array from an unformatted direct-access file.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CON_IUDAx( FD, EL, NOVPRE, SKIP, A, STATUS )
+
+*  Description:
+*     This routine reads a numeric array in character form from a
+*     direct-access unformatted file, and converts it to numbers.  File
+*     records may be skipped before transfer of the array occurs.
+
+*  Arguments:
+*     FD = INTEGER (Given)
+*        File descriptor of the output unformatted file.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     NOVPRE = INTEGER (Given)
+*        The number of data values per record of the input file.
+*     SKIP = INTEGER (Given)
+*        Number of records to be skipped before reading the array.
+*     A( EL ) = ? (Returned)
+*        Output numeric array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     array returned from the routine must have the data type specified.
+
+*  Prior Requirements:
+*     The unformatted file must be open for read access with RIO.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1996 October 20 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Data-storage constants
+
+*  Arguments Given:
+      INTEGER FD
+      INTEGER EL
+      INTEGER NOVPRE
+      INTEGER SKIP
+
+*  Arguments Returned:
+      <TYPE> A( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER * ( 1 ) BUFFER   ! Buffer for skipping over records
+      INTEGER FIOSTA             ! Fortran I/O status
+      INTEGER I                  ! Loop counter for file records
+      INTEGER J                  ! Loop counter for values per record
+      INTEGER K                  ! Index of the array element
+      INTEGER LUN                ! Logical unit number
+      INTEGER NREC               ! Number of records
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the logical unit number of the file.
+      CALL FIO_UNIT( FD, LUN, STATUS )
+
+*  Copy the values.
+*  ================
+
+*  Find the number of records to read.
+      NREC = ( EL - 1 ) / NOVPRE + 1
+
+*  Loop for each record.
+      K = 0
+      DO I = SKIP + 1, SKIP + NREC
+
+*  Read a record of the values.
+         READ( LUN, REC=I, IOSTAT=FIOSTA ) ( A( J ), J = K + 1,
+     :     MIN( EL, K + NOVPRE ) )
+
+*  Watch for an error.  Make an informative report, setting status to
+*  bad, and exit.
+         IF ( FIOSTA .NE. 0 ) THEN
+            CALL MSG_SETI( 'I', I )
+            CALL FIO_REP( LUN, ' ', FIOSTA,
+     :        'Error reading data record number ^I from file ^FNAME.  '/
+     :        /'Reason was ^IOSTAT.', STATUS )
+            GOTO 999
+         END IF
+
+*  Increment the array index. 
+         K = K + NOVPRE
+      END DO
+
+  999 CONTINUE
+
+      END
