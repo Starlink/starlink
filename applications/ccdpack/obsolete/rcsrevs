@@ -1,9 +1,9 @@
 #  Names and current revision numbers of files under RCS control.
-#  Package CCDPACK version V4.0-0b.
+#  Package CCDPACK version V4.0-1b.
 #  
 makefile: 1.75
 mk: 1.3
-sun139.tex: 1.82
+sun139.tex: 1.83
 sun139geo.eps: 1.1
 sun139reg.eps: 1.4
 sun139red.eps: 1.1
@@ -43,7 +43,7 @@ ccdpack_red.f: 1.1
 ccdpack_reg.f: 1.8
 ccdpack_res.f: 1.2
 ccdpack_scr.f: 1.2
-ccdpack.hlp: 1.64
+ccdpack.hlp: 1.65
 ccdwish.c: 1.11
 grf_ccdpack.c: 1.1
 ccdpack.ifd: 1.15
@@ -60,7 +60,7 @@ register.ifd: 1.10
 tranlist.ifd: 1.5
 plotlist.ifd: 1.3
 findoff.ifd: 1.9
-pairndf.ifd: 1.13
+pairndf.ifd: 1.14
 ccdedit.ifd: 1.4
 makemos.ifd: 1.5
 tranndf.ifd: 1.5
@@ -233,18 +233,18 @@ CCDCcdWidget.tcl: 1.1
 CCDNameTail.tcl: 1.1
 CCDPathOf.tcl: 1.1
 CCDCmdOf.tcl: 1.1
-Buttoncontrol.tcl: 1.2
+Buttoncontrol.tcl: 1.3
 Ccdtop.tcl: 1.10
 Control.tcl: 1.6
 Gwmview.tcl: 1.15
 Helpcontrol.tcl: 1.2
 Marknumcontrol.tcl: 1.4
 Markstylecontrol.tcl: 1.5
-Ndfalign.tcl: 1.20
-Ndfchoose.tcl: 1.29
-Ndfview.tcl: 1.21
+Ndfalign.tcl: 1.21
+Ndfchoose.tcl: 1.30
+Ndfview.tcl: 1.22
 Percentilecontrol.tcl: 1.8
-Stylecontrol.tcl: 1.6
+Stylecontrol.tcl: 1.7
 Vectordialog.tcl: 1.3
 Waiter.tcl: 1.7
 Wcsframecontrol.tcl: 1.3
@@ -252,9 +252,9 @@ Zoomcontrol.tcl: 1.7
 raisehack.tcl: 1.4
 taskrun.tcl: 1.6
 tasksetup.tcl: 1.6
-ccdalign.tcl: 1.12
-pairndf.tcl: 1.30
-idicurs.tcl: 1.14
+ccdalign.tcl: 1.13
+pairndf.tcl: 1.31
+idicurs.tcl: 1.15
 ccdwishrc: 1.1
 ccdpack_link_adam: 1.4
 dgeneric: 1.3
@@ -484,7 +484,7 @@ ccd1_wridi.f: 1.2
 ccd1_wrixy.f: 1.1
 ccd1_wrxyp.f: 1.1
 ccd1_xadd.f: 1.1
-ccd1_xyfmt.f: 1.1
+ccd1_xyfmt.f: 1.2
 fio1_cllog.f: 1.2
 fio1_errep.f: 1.1
 fio1_msg.f: 1.1
@@ -550,15 +550,15 @@ slv.c: 1.5
 find_file.c: 1.1
 tcltalk.c: 1.10
 tclbg.c: 1.2
-ndf.c: 1.24
+ndf.c: 1.25
 ndfdrawpair.c: 1.9
 ndfcentroffset.c: 1.3
 ccdputs.c: 1.5
 ccdAppInit.c: 1.9
 ccdaux.c: 1.1
-ccd1_tcurs.c: 1.6
-ccd1_algn.c: 1.3
-ccd1_pndf.c: 1.6
+ccd1_tcurs.c: 1.7
+ccd1_algn.c: 1.4
+ccd1_pndf.c: 1.7
 ccg1_xcly.dgen: 1.1
 ccg1_xcsy.dgen: 1.1
 ccg1_xffy.dgen: 1.2
@@ -722,13 +722,13 @@ calcor.f: 1.8
 makeflat.f: 1.12
 flatcor.f: 1.10
 findcent.f: 1.9
-idicurs.f: 1.21
+idicurs.f: 1.22
 findobj.f: 1.13
 register.f: 1.33
 tranlist.f: 1.9
 plotlist.f: 1.13
 findoff.f: 1.31
-pairndf.f: 1.25
+pairndf.f: 1.26
 ccdedit.f: 1.6
 makemos.f: 1.17
 tranndf.f: 1.15
@@ -788,7 +788,7 @@ makeflat.hlp: 1.4
 ccdedit.hlp: 1.4
 makemos.hlp: 1.7
 ccdfork.hlp: 1.3
-pairndf.hlp: 1.7
+pairndf.hlp: 1.8
 ccdndfac.hlp: 1.3
 plotlist.hlp: 1.7
 ccdnote.hlp: 1.2
