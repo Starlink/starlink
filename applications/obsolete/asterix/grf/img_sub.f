@@ -575,7 +575,7 @@
         LECL(2) = LAT * MATH__DDTOR
 
 *    Convert to file system
-        CALL WCI_CNS2S( I_SYSID, LECL, I_ECLSYS, FILESYS, STATUS )
+        CALL WCI_CNS2S( I_ECLSYS, LECL, I_SYSID, FILESYS, STATUS )
 
 *    Perform conversion to world
         CALL WCI_CNS2A( FILESYS, I_PIXID, I_PRJID, LWORLD, STATUS )
@@ -664,7 +664,7 @@
         LECL(2) = B * MATH__DDTOR
 
 *    Convert to file system
-        CALL WCI_CNS2S( I_SYSID, LECL, I_GALSYS, FILESYS, STATUS )
+        CALL WCI_CNS2S( I_GALSYS, LECL, I_SYSID, FILESYS, STATUS )
 
 *    Perform conversion to world
         CALL WCI_CNS2A( FILESYS, I_PIXID, I_PRJID, LWORLD, STATUS )
