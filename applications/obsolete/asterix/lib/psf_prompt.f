@@ -73,6 +73,12 @@
 *    Just take default
         UPSF = DEFAULT
 
+*    Locate interesting bit of string
+        CALL CHR_FANDL( UPSF, BEG, END )
+
+*    Parse model
+	CALL PSF_MODEL_PARSE( UPSF(BEG:END), SLOT, STATUS )
+
       ELSE
 
 *      Set the default if required
@@ -95,21 +101,21 @@
         CALL USI_CANCL( PAR, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      END IF
+*    Locate interesting bit of string
+        CALL CHR_FANDL( UPSF, BEG, END )
 
-*  Locate interesting bit of string
-      CALL CHR_FANDL( UPSF, BEG, END )
+*    Did use try one of the special options?
+        IF ( CHR_SIMLR( UPSF(BEG:END), 'LIST') ) THEN
+	  CALL PSF_DISPLAY( STATUS )
+	  GOTO 59
 
-*  Did use try one of the special options?
-      IF ( CHR_SIMLR( UPSF(BEG:END), 'LIST') ) THEN
-	CALL PSF_DISPLAY( STATUS )
-	GOTO 59
+*    Parse the psf specification
+        ELSE
 
-*  Parse the psf specification
-      ELSE
+*      Parse model
+	  CALL PSF_MODEL_PARSE( UPSF(BEG:END), SLOT, STATUS )
 
-*    Parse model
-	CALL PSF_MODEL_PARSE( UPSF(BEG:END), SLOT, STATUS )
+        END IF
 
       END IF
 
