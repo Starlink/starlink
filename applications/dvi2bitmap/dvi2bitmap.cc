@@ -23,6 +23,14 @@ static const char RCSID[] =
 using std::exit;
 #endif
 
+#ifdef HAVE_SSTREAM
+#include <sstream>
+#define SSTREAM ostringstream
+#else
+#include <strstream>
+#define SSTREAM ostrstream
+#endif
+
 #include "DviFile.h"
 #include "PkFont.h"
 #include "Bitmap.h"
@@ -440,23 +448,20 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 		    for (last=9; last>=0; last--)
 			if (page->count[last] != 0)
 			    break;
-		    if (outcount + 4 + 2*(last-1) > 80)
+
+		    SSTREAM pageind;
+		    pageind << '[' << page->count[0];
+		    for (i=1; i<=last; i++)
+			pageind << '.' << page->count[i];
+		    pageind << '\0';
+		    string ostr = pageind.str();
+		    if (outcount + ostr.length() > 78)
 		    {
 			cout << '\n';
 			outcount = 0;
 		    }
-		    else
-		    {
-			cout << ' ';
-			outcount++;
-		    }
-		    cout << '[' << page->count[0];
-		    outcount += 2;
-		    for (i=1; i<=last; i++)
-		    {
-			cout << '.' << page->count[i];
-			outcount += 2;
-		    }
+		    cout << ostr;
+		    outcount += ostr.length();
 		}
 	    }
 	    else
@@ -507,8 +512,8 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 
 		if (verbosity > quiet)
 		{
-		    cout << ']';
-		    outcount++;
+		    cout << "] ";
+		    outcount += 2;
 		}
 	    }
 	else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
