@@ -92,9 +92,11 @@
 void strx_exit( ADIstatus status );
 
 #define CHAR_BIT 8
-/* #define MEMORY_TRACING  1 */
+#define MEMORY_TRACING  1
 
 #ifdef MEMORY_TRACING
+#include "f77.h"
+
 #define ADI__MXMTR      1024
 static
   char          *allocs[ADI__MXMTR];
@@ -102,6 +104,17 @@ static
   short         ainuse[ADI__MXMTR];
 static
   int           nafree = ADI__MXMTR;
+
+int dmp_on = 0;
+
+void adi_memdbg() {
+  dmp_on = dmp_on ? 0 : 1;
+  }
+
+F77_SUBROUTINE(adi_memdbg)( )
+  {
+  adi_memdbg();
+  }
 #endif
 
 ADIblock        *ADI_G_blks[ADI__MXBLK]; /* Block address array */
@@ -109,6 +122,9 @@ static
   long          ADI_G_nbyte = 0;        /* Global ADI memory count */
 static
   long          ADI_G_nalloc = 0;       /* Number of allocations */
+
+
+
 
 
 void ADImemFree( void *ptr, size_t nb, ADIstatus status )
@@ -154,10 +170,8 @@ char *ADImemAlloc( size_t nb, ADIstatus status )
       ADI_G_nalloc++;
       newm = (char *) malloc( nb );
 #ifdef MEMORY_TRACING
-if ( newm )
-  {
-  if ( nafree )
-    {
+if ( newm ) {
+  if ( nafree ) {
     allocs[ainuse[nafree-1]] = newm; nafree--;
     }
   else
@@ -174,6 +188,58 @@ if ( newm )
 
   return newm;
   }
+
+
+void ADImemDump( ADIclassDef *cdef, ADIstatus status )
+  {
+  ADIblock	*bptr;
+  ADIidIndex    iblk = cdef->alloc.f_block;
+  int		nblk = 0;
+  ADIinteger    nalloc = 0;
+  ADIinteger    nfree = 0;
+  char          *descrip;
+  char          *alform;
+
+  printf( "Dump of class %s\n\n", cdef->name );
+  printf( "  Basic unit is %d bytes, default cluster size is %d\n\n",
+          cdef->alloc.size, cdef->alloc.nunit );
+
+  while ( iblk != ADI__nullid ) {
+
+    bptr = *(ADI_G_blks + iblk);
+
+    if ( bptr->master == iblk ) {
+      descrip = "master";
+      nalloc += bptr->vdat.mas.ntotal;
+      alform = "fixed";
+      }
+    else if ( bptr->master != -1 ) {
+      descrip = "slave";
+      nalloc += bptr->nunit;
+      nfree += bptr->nfree;
+      alform = bptr->vdat.std.used ? "bit-array" : "linked list";
+      }
+    else {
+      descrip = "standard";
+      nalloc += bptr->nunit;
+      nfree += bptr->nfree;
+      alform = bptr->vdat.std.used ? "bit-array" : "linked list";
+      }
+
+    printf(
+"    Block %3d, type <%s>, method <%s>, master = %d, free = %d\n",
+iblk, descrip, alform, bptr->master, bptr->nfree );
+
+    nblk++;
+
+    iblk = bptr->next;
+    }
+
+  printf( "\n  Total of %d blocks containing %d basic items, %d free\n\n",
+         nblk, nalloc, nfree );
+
+  }
+
 
 
 /*
@@ -331,6 +397,11 @@ ADIidIndex ADImemNewBlock( ADIclassDef *cdef, ADIinteger nunit,
 
 /* Ensure that at least the minimum allocation for this type is used */
     anval = _MAX( nunit, cdef->alloc.nunit );
+#ifdef MEMORY_TRACING
+    if (dmp_on) {
+      printf( "allocating %d units to block %d\n", anval, iblk);
+      }
+#endif
 
 /* Size of data area */
     bbytes = newb->size*anval;
@@ -388,6 +459,7 @@ ADIidIndex ADImemNewBlock( ADIclassDef *cdef, ADIinteger nunit,
       ADIblock		*sbptr;
       ADIidIndex	oldnext = newb->next;
       ADIidIndex	*inblock = &newb->next;
+      ADIinteger	subunit;
 
 /* Set block up as a master */
       newb->master = iblk;
@@ -411,7 +483,14 @@ ADIidIndex ADImemNewBlock( ADIclassDef *cdef, ADIinteger nunit,
           inblock = &sbptr->next;
 	  sbptr->master = iblk;
           sbptr->data = cdata;
-	  sbptr->nunit = (ADIidIndex) _MIN(nleft,ADI_MAX_IDINDEX);
+
+          subunit = _MIN(nleft,ADI_MAX_IDINDEX);
+#ifdef MEMORY_TRACING
+    if (dmp_on) {
+      printf( "    allocating %d units to slave block %d\n", subunit, sblk);
+      }
+#endif
+	  sbptr->nunit = subunit;
 	  }
 
 /* Next batch of data */
@@ -472,6 +551,10 @@ ADIobj ADImemAllocObj( ADIclassDef *cdef, int nval, ADIstatus status )
 
   static short bit_mask[] =
     {1,2,4,8,16,32,64,128,256,512,1024};
+
+#ifdef MEMORY_TRACING
+if (dmp_on) ADImemDump( cdef, status );
+#endif
 
   iblk = cdef->alloc.f_block;           /* Most recent allocation block */
 
@@ -639,6 +722,7 @@ void ADImemFreeBlock( int iblk, ADIstatus status )
   ADIblock	*bptr = ADI_G_blks[iblk];
   ADIidIndex	onext = bptr->next;
   ADIlogical	slave = ADI__false;
+  ADIidIndex	*iaddr;
 
 /* Standard block? */
   if ( bptr->master == ADI__nullid ) {
@@ -659,6 +743,7 @@ void ADImemFreeBlock( int iblk, ADIstatus status )
 /* Loop over slaves, freeing 'em */
     while ( nslave-- ) {
       ADIblock	*sbptr = ADI_G_blks[next];
+      printf( "Deleting slave block %d\n",next);fflush(stdout);
 
 /* Reset block store */
       ADI_G_blks[next] = NULL;
@@ -678,6 +763,14 @@ void ADImemFreeBlock( int iblk, ADIstatus status )
   else
     slave = ADI__true;
 
+/* Update the chain of blocks */
+  iaddr = &bptr->cdef->alloc.f_block;
+  while ( (*iaddr != iblk) && (*iaddr != ADI__nullid) )
+    iaddr = &(ADI_G_blks[*iaddr]->next);
+  if ( *iaddr == iblk ) {
+    *iaddr = onext;
+    }
+
 /* Free the block data */
   if ( ! slave ) {
     ADImemFree( bptr, sizeof(ADIblock), status );
@@ -696,6 +789,10 @@ void ADImemFreeObj( ADIobj *id, int nval, ADIstatus status )
   ADIblock 	*bptr = _ID_BLOCK(*id);
   ADIidIndex	iblk = _ID_IBLK(*id);
   ADIidIndex	iobj = _ID_SLOT(*id);
+
+#ifdef MEMORY_TRACING
+if (dmp_on) ADImemDump( bptr->cdef, status );
+#endif
 
 /* Standard block? */
   if ( bptr->master == ADI__nullid ) {
@@ -807,4 +904,3 @@ for( ; j<ADI__MXMTR; j++ )
     printf( "ADI left %ld bytes in %ld allocations...\n",
 	    ADI_G_nbyte, ADI_G_nalloc );
   }
-
