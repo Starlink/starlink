@@ -9,7 +9,7 @@
 *    History :
 *      3 May 90 : Original (RJV)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-
+*     27 Mar 95 : V1.8-0 uses BIT_ (RJV)
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
@@ -19,7 +19,7 @@
 *    Local Constants :
 
       CHARACTER*(30) VERSION		! version ID
-         PARAMETER (VERSION='PROJECT Version 1.8-0')
+         PARAMETER (VERSION='PROJECT Version 1.8-1')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) ILOC       ! input dataset locator
       CHARACTER*(DAT__SZLOC) OLOC       ! output dataset locator
@@ -232,6 +232,8 @@
 *    Status :
       INTEGER STATUS
 *    Local Constants :
+*    Functions :
+      BYTE BIT_ANDUB,BIT_ORUB
 *    Local variables :
       INTEGER I(7),I1,I2,I3,I4,I5,I6,I7
       EQUIVALENCE (I(1),I1),(I(2),I2),(I(3),I3),(I(4),I4),(I(5),I5),
@@ -278,10 +280,10 @@
                       I(PAX)=IPAX
 
                       IF (QOK) THEN
-                        GOOD=((QIN(I1,I2,I3,I4,I5,I6,I7)
-     :                         .AND.MASK).EQ.QUAL__GOOD)
-                        QUAL=QUAL.OR.
-     :                         QIN(I1,I2,I3,I4,I5,I6,I7)
+                        GOOD=(BIT_ANDUB(QIN(I1,I2,I3,I4,I5,I6,I7),
+     :                                         MASK).EQ.QUAL__GOOD)
+                        QUAL=BIT_ORUB(QUAL,
+     :                         QIN(I1,I2,I3,I4,I5,I6,I7))
                       ELSE
                         GOOD=.TRUE.
                       ENDIF

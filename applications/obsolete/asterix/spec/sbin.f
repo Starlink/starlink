@@ -39,7 +39,7 @@
       LOGICAL PRIM
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'SBIN Version 1.8-0')
+      PARAMETER (VERSION = 'SBIN Version 1.8-1')
 *-
 
 *    Version id
