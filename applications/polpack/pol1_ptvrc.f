@@ -73,11 +73,11 @@
       VLEN = CHR_LEN( VERS )
 
 *  Create the catalogue parameter.
-      CALL CAT_PPTSR( CI, 'VERSION', VERS( : VLEN ), 'POLPACK version',
+      CALL CAT_PPTSC( CI, 'VERSION', VERS( : VLEN ), 'POLPACK version',
      :                QI, STATUS )
 
 *  Truncate the string to the correct length.
-      CALL CAT_TATTC( QI, 'CSIZE', VLEN, STATUS )
+      CALL CAT_TATTI( QI, 'CSIZE', VLEN, STATUS )
 
 *  Release the parameter identifier.
       CALL CAT_TRLSE( QI, STATUS )
