@@ -3,7 +3,6 @@ INTERFACE HGET
    PARAMETER INP
     TYPE 'UNIV'
     POSITION 1
-    KEYWORD 'INP'
     PPATH 'GLOBAL'
     PROMPT 'Object name'
     help 'Full path name of object to be displayed'
@@ -12,7 +11,7 @@ INTERFACE HGET
 
    PARAMETER ITEM
      POSITION 2
-     type '_CHAR'
+     TYPE '_CHAR'
      DEFAULT 'VALUE'
      VPATH 'PROMPT'
      PPATH 'DEFAULT'
