@@ -170,6 +170,21 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Check that the requested values are in the required form.
+      DO I = 1, NFRAC
+         IF ( FRAC( I ) .LT. 0D0 .OR. FRAC( I ) .GT. 1D0 ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'CCG1_FRAC_BADDAT', 
+     :'  CCG1_FRAC: FRAC values out of range (programming error)',
+     :   STATUS )
+         ELSE IF ( I .GT. 1 .AND. FRAC( I ) .LT. FRAC( I - 1 ) ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'CCG1_FRAC_BADDAT',
+     :'  CCG1_FRAC: FRAC values out of order (programming error)',
+     :   STATUS )
+         END IF
+      END DO
+
 *  Obtain the initial limiting values.
 *  ===================================
 
