@@ -168,7 +168,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the component information and write it out.  Do not write it
-*  for the first object.  This is done by TRACE itself.
+*  for the first object.  This is done by HDSTRACE itself.
          IF ( LSTART( STK ) .NE. LOC ) THEN
             CALL TRA1_CMINF( LSTART( STK ), SINDEN, CMNTYP, CMNVAL,
      :                       NEWLIN, NLINES, ONEPLN, LOGEXM, FD, LINE,
