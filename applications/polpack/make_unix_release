@@ -84,10 +84,6 @@
 
       foreach file (pol1_ptvrs.f)
          sed -e "s#PKG_VERS#$vers[3]#g" $file > temp
-
-    echo "In $PWD ($vers[3])"
-    set aa = $<
-
          mv -f temp $file
       end
 
