@@ -56,13 +56,6 @@ int main(int argc, char** argv)
         nerrs++;                                                        \
     }
 
-    /* temp debugging/check printout */
-    {
-        int t=1;
-        char *s = "f";
-        printf("1=%s\n", tohex(s, &t));
-    }
-
     /* 
      * Compare values in prm_par.h against the values in the struct
      * NDR, as initialised by dat1_init_ndr.c.  Excerpts:
