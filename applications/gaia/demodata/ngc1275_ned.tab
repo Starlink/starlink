@@ -1,0 +1,43 @@
+QueryResult
+
+# Config entry for original catalog server:
+serv_type: catalog
+long_name: NED
+short_name: ned@eso
+url: http://archive.eso.org/skycat/servers/ned-server?%ra%dec&r=%r2&n=%n
+symbol: Obj-Type square 2
+# End config entry
+
+Id	ra	dec	Obj-Type	MORE
+--	--	---	--------	----
+NGC 1275	03:19:48.16	+41:30:42.10	G (cD;pec         Sy2)	M=http://archive.eso.org/skycat/servers/ned-server?o=NGC%201275/mime-type=full-rec
+ABELL 0426:[SDG94] A	03:19:48.70	+41:30:27.00	XRayS	M=http://archive.eso.org/skycat/servers/ned-server?o=ABELL%200426:[SDG94]%20A/mime-type=full-rec
+SN 1968A	03:19:49.18	+41:30:14.21	SN	M=http://archive.eso.org/skycat/servers/ned-server?o=SN%201968A/mime-type=full-rec
+B3 0316+413A	03:19:42.86	+41:30:11.56	RadioS ()	M=http://archive.eso.org/skycat/servers/ned-server?o=B3%200316+413A/mime-type=full-rec
+B3 0316+413E	03:19:54.71	+41:30:29.90	RadioS ()	M=http://archive.eso.org/skycat/servers/ned-server?o=B3%200316+413E/mime-type=full-rec
+PGC 012414	03:19:42.26	+41:30:0.59	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=PGC%20012414/mime-type=full-rec
+BGP 063	03:19:55.63	+41:31:19.85	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=BGP%20063/mime-type=full-rec
+B3 0316+413C	03:19:48.95	+41:29:6.22	RadioS ()	M=http://archive.eso.org/skycat/servers/ned-server?o=B3%200316+413C/mime-type=full-rec
+ABELL 0426:[SDG94] B	03:19:40.70	+41:29:57.00	XRayS	M=http://archive.eso.org/skycat/servers/ned-server?o=ABELL%200426:[SDG94]%20B/mime-type=full-rec
+ABELL 0426:[SDG94] C	03:19:44.70	+41:32:27.00	XRayS	M=http://archive.eso.org/skycat/servers/ned-server?o=ABELL%200426:[SDG94]%20C/mime-type=full-rec
+V Zw 338	03:20:0.63	+41:30:49.57	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=V%20Zw%20338/mime-type=full-rec
+BGP 110	03:19:52.67	+41:33:2.02	G (E:)	M=http://archive.eso.org/skycat/servers/ned-server?o=BGP%20110/mime-type=full-rec
+BGP 083	03:19:37.52	+41:29:8.85	G (E:)	M=http://archive.eso.org/skycat/servers/ned-server?o=BGP%20083/mime-type=full-rec
+NGC 1274	03:19:40.53	+41:32:55.69	G (E3)	M=http://archive.eso.org/skycat/servers/ned-server?o=NGC%201274/mime-type=full-rec
+[CR71] 41	03:20:0.58	+41:28:49.57	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=[CR71]%2041/mime-type=full-rec
+B3 0316+413B	03:19:45.06	+41:33:44.44	RadioS ()	M=http://archive.eso.org/skycat/servers/ned-server?o=B3%200316+413B/mime-type=full-rec
+NGC 1278	03:19:54.15	+41:33:47.93	G (E pec:)	M=http://archive.eso.org/skycat/servers/ned-server?o=NGC%201278/mime-type=full-rec
+PER 152	03:19:41.49	+41:27:32.63	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=PER%20152/mime-type=full-rec
+RSCG 21	03:19:36.64	+41:33:38.90	GGroup	M=http://archive.eso.org/skycat/servers/ned-server?o=RSCG%2021/mime-type=full-rec
+NGC 1277	03:19:51.48	+41:34:25.18	G (S0+: pec)	M=http://archive.eso.org/skycat/servers/ned-server?o=NGC%201277/mime-type=full-rec
+BGP 111	03:19:44.48	+41:26:50.46	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=BGP%20111/mime-type=full-rec
+V Zw 339	03:20:0.71	+41:33:49.57	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=V%20Zw%20339/mime-type=full-rec
+PER 153	03:19:41.47	+41:26:44.63	G ()	M=http://archive.eso.org/skycat/servers/ned-server?o=PER%20153/mime-type=full-rec
+B3 0316+413F	03:20:10.66	+41:30:52.02	RadioS ()	M=http://archive.eso.org/skycat/servers/ned-server?o=B3%200316+413F/mime-type=full-rec
+B3 0316+412	03:19:32.87	+41:27:33.11	RadioS ()	M=http://archive.eso.org/skycat/servers/ned-server?o=B3%200316+412/mime-type=full-rec
+NGC 1273	03:19:26.79	+41:32:25.45	G (SA(r)0^0^?)	M=http://archive.eso.org/skycat/servers/ned-server?o=NGC%201273/mime-type=full-rec
+IC 1907	03:19:34.23	+41:34:49.04	G (E?)	M=http://archive.eso.org/skycat/servers/ned-server?o=IC%201907/mime-type=full-rec
+B3 0316+413G	03:20:14.94	+41:29:44.78	RadioS ()	M=http://archive.eso.org/skycat/servers/ned-server?o=B3%200316+413G/mime-type=full-rec
+NPM1G +41.0110	03:19:47.80	+41:35:46.83	G (E:)	M=http://archive.eso.org/skycat/servers/ned-server?o=NPM1G%20+41.0110/mime-type=full-rec
+NGC 1272	03:19:21.30	+41:29:26.75	G (E+)	M=http://archive.eso.org/skycat/servers/ned-server?o=NGC%201272/mime-type=full-rec
+BGP 055	03:19:22.39	+41:25:45.69	G (S0:)	M=http://archive.eso.org/skycat/servers/ned-server?o=BGP%20055/mime-type=full-rec

@@ -1,0 +1,31 @@
+# GAIA Contours configuration file.
+#
+# level                      colour     width     
+  2500                       0          1         
+  3000                       2          1         
+  3500                       3          1         
+  4000                       4          1         
+  4500                       5          1         
+  5000                       6          1         
+  5500                       7          1         
+  6000                       8          1         
+  6500                       9          1         
+  7000                       10         1         
+#  Image name
+image = ./frame.sdf
+#  Contouring speed
+careful = 0
+smooth = 1
+#  Image region
+whole = 0
+xfrac = 0.7
+yfrac = 0.7
+#  Key parameters
+drawkey = 1
+keytitle = {Contour levels}
+xkeypos = -661
+ykeypos = -55
+keyfont = -adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*
+keycolour = 0
+keylength = 20
+keywidth = 1
