@@ -18,6 +18,7 @@
 *                               for PH channel array (RDS)
 *      24 Apr 1994  (v1.7-0) for new asterix release
 *       7 Mar 95        V1.8-0  HRI response (RJV)
+*      30 Aug 95        V1.8-1  fixed bug that crashed ICL (RJV)
 * Type Definitions :
       IMPLICIT NONE
 * Global constants :
@@ -73,7 +74,7 @@
 * Local data :
 * Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTRESP Version 1.8-0')
+      PARAMETER (VERSION = 'XRTRESP Version 1.8-1')
 *-
       IF (STATUS.NE.SAI__OK) RETURN
 *
@@ -113,10 +114,8 @@
       L=CHR_LEN(CALDIR)
       CALL USI_DEF0C('RESPFILE', CALDIR(:L), STATUS)
 *
-	print *,'getting response file...'
 *   Get detector response matrix name
       CALL USI_GET0C('RESPFILE', RFILE, STATUS)
-	print *,'got it!'
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
