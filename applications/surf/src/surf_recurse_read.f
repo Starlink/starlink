@@ -5,7 +5,7 @@
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END,
+     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
      :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS, STATUS)
 *+
@@ -23,7 +23,7 @@
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-*     :     QMF, QUALITY_PTR, QUALITY_END,
+*     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
 *     :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
 *     :     NPARS, PARS, STATUS)
  
@@ -95,10 +95,12 @@
 *     QMF = LOGICAL (Given)
 *        Flag to decide whether quality is being stored (.FALSE.) or
 *        being folded into the data array (.true.). See NDF_SQMF
-*     QUALITY_PTR = INTEGER (Returned)
+*     QUALITY_PTR(MAX_FILE) = INTEGER (Returned)
 *        Pointer to quality array
-*     QUALITY_END = INTEGER (Returned)
+*     QUALITY_END(MAX_FILE) = INTEGER (Returned)
 *        Pointer to end of quality array
+*     QBITS(MAX_FILE) = BYTE (Returned)
+*        Bad bits mask for each file
 *     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
 *        Position of integrations in each data file
 *     WEIGHT( MAX_FILE ) = REAL (Returned)
@@ -194,6 +196,7 @@
       CHARACTER*(*)    OBJECT(MAX_FILE)
       INTEGER          QUALITY_END(MAX_FILE)
       INTEGER          QUALITY_PTR(MAX_FILE)
+      BYTE             QBITS(MAX_FILE)
       INTEGER          RLEV    ! Recursion level
       REAL             SHIFT_DX(MAX_FILE)
       REAL             SHIFT_DY(MAX_FILE)
@@ -311,7 +314,7 @@
      :           BOL_DEC_END(N_FILE), DATA_PTR(N_FILE), 
      :           DATA_END(N_FILE), VARIANCE_PTR(N_FILE),
      :           VARIANCE_END(N_FILE), QMF, QUALITY_PTR(N_FILE),
-     :           QUALITY_END(N_FILE), INT_LIST, STATUS)
+     :           QUALITY_END(N_FILE), QBITS, INT_LIST, STATUS)
 
             CALL MSG_BLANK(STATUS)
 
@@ -427,7 +430,7 @@
      :                    BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :                    BOL_DEC_END, DATA_PTR, DATA_END, 
      :                    VARIANCE_PTR, VARIANCE_END,
-     :                    QMF, QUALITY_PTR, QUALITY_END,
+     :                    QMF, QUALITY_PTR, QUALITY_END, QBITS,
      :                    INT_LIST, WEIGHT, SHIFT_DX, 
      :                    SHIFT_DY,  NPARS, PARS, 
      :                    STATUS)
@@ -465,7 +468,7 @@
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END,
+     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
      :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS,
      :     STATUS)
@@ -530,6 +533,7 @@
       CHARACTER*(*)    OBJECT(MAX_FILE)
       INTEGER          QUALITY_END(MAX_FILE)
       INTEGER          QUALITY_PTR(MAX_FILE)
+      BYTE             QBITS (MAX_FILE)
       INTEGER          RLEV    ! Recursion level
       REAL             SHIFT_DX(MAX_FILE)
       REAL             SHIFT_DY(MAX_FILE)
@@ -554,7 +558,7 @@
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, 
      :     VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END,
+     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
      :     INT_LIST, WEIGHT, SHIFT_DX, 
      :     SHIFT_DY,  NPARS, PARS, 
      :     STATUS)
