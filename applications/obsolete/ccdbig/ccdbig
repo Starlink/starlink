@@ -38,13 +38,42 @@
 #-
 #
       onintr EXIT
+###################################################################
+# Set up the parameters of the reduction sequences.
+# These can be changed to test behaviour of the programs under
+# different circumstances.
 
-# Do we want variance information calculated and propagated?
-set variance = TRUE
+      # Do we want variances calculated and propagated (TRUE or FALSE)?
+            set variance = TRUE
 
-# Do we need to treat ARD mask separately?
-set keepard = TRUE
+      # Do we want to treat ARD mask within CCDPACK (TRUE or FALSE)?  
+      # (else explicitly impose mask on data using ARDMASK).
+            set keepard = TRUE
 
+      # Set list of image sizes of frames (pixels along a side)
+            set image_sizes = ( 1000 2000 3000 4000 5000 6000 )
+
+      # Set list of object densities (objects per million pixels)
+            set object_densities = ( 50 )
+
+      # Set logging interval (seconds)
+            set interval = 15
+
+      # Set filename for logging resource usage
+            set timelogfile = ccdbig_time.log
+
+# End of parameter setup.
+###################################################################
+
+#  Validation
+      if ("$variance" != "TRUE" && "$variance" != "FALSE") then
+         echo "Variable variance must be set TRUE or FALSE."
+         goto EXIT
+      endif
+      if ("$keepard"  != "TRUE" && "$keepard"  != "FALSE") then
+         echo "Variable keepard must be set TRUE or FALSE."
+         goto EXIT
+      endif
 
 #  Initialize starlink environment
       source /star/etc/cshrc
@@ -58,6 +87,13 @@ set keepard = TRUE
       setenv ADAM_USER $cwd
       if ( -e ${ADAM_USER}/GLOBAL.sdf ) then
 	 ccdclear accept 
+      endif
+
+#  Check CCDBIG_DIR is defined
+      if ( ! $?CCDBIG_DIR ) then
+         echo "Please define CCDBIG_DIR as the directory containing the"
+         echo "ccdbig files."
+         goto EXIT
       endif
 
 #  Copy required files from source directory.
@@ -92,9 +128,8 @@ set keepard = TRUE
       endif
 
 #  Write some startup info to the log file
-      set timelogfile = ccdbig_time.log
-      set labelfile = current_label
-      printf '\n\n\n\n'                                   >>$timelogfile
+      set labelfile = reslog.label
+      echo                                                >>$timelogfile
       uname -a                                            >>$timelogfile
       uptime                                              >>$timelogfile
       date                                                >>$timelogfile 
@@ -102,22 +137,24 @@ set keepard = TRUE
       echo                                                >>$timelogfile
       echo "Variance:  $variance"                         >>$timelogfile
       echo "Keepard:   $keepard "                         >>$timelogfile
+      echo "Logging interval:   $interval"                >>$timelogfile
       echo                                                >>$timelogfile
       printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$timelogfile 
+      echo                                                >>$timelogfile
 
 #  Set up aliases for logging run times to a file.
       alias log_start \
          'printf "%7d%7d%12s:  " $frame_pixels $objects \!\!:1 >$labelfile'
-      ./reslog $timelogfile &
+      ./reslog -f $timelogfile -i $interval -l $labelfile  &
 
 #  Loop over sizes of images
-      foreach frame_pixels (1000 1500 2000 2500)
+      foreach frame_pixels ( $image_sizes )
          @ field_pixels = ($frame_pixels * 15) / 10
 
 #  Loop over number of objects in frame
-         foreach density (5)
-            @ objects = ($field_pixels * $field_pixels * $density) / 100000
-            if ($objects < 25) set objects = 25 
+         foreach density ( $object_densities )
+            @ objects = ($field_pixels * $field_pixels * $density) / 1000000
+            if ($objects < 50) set objects = 50 
 
 #  Generate file containing objects for use by ccdgenerate:
 #  First strip comments and blank lines,
@@ -139,7 +176,8 @@ set keepard = TRUE
             @   hiframe = $hibias - 1
 
 #  Try to locate the ARD file which goes with the test. If this is 
-#  not found then proceed without it.
+#  not found, or if we're treating the mask external to CCDPACK,
+#  then proceed without it.
             echo " "
             echo "  Setting the characteristics of the CCD device using the "
             echo "  CCDSETUP routine."
@@ -164,7 +202,6 @@ set keepard = TRUE
 #              end ccdsetup
 
             else
-               echo "Cannot locate ARD file; mask not applied"
 
 #  Do the "device" setup without an ARD file.
                ccdsetup \
@@ -189,7 +226,7 @@ set keepard = TRUE
             endif
 
 #  Create the test frames.
-#  They are displaced a bit from each other in a reasonably random way.
+#  They are displaced from each other to give an overlap of about one quarter.
             echo " "
             echo "  Creating the test data. "
             echo " "
@@ -258,6 +295,7 @@ set keepard = TRUE
                in='bias*' \
                out=master_bias \
                preserve=true \
+               genvar=$variance \
                accept
 #           end makebias
 
@@ -282,16 +320,17 @@ set keepard = TRUE
                in='"data?,ff?"' \
                out='debias_*' \
                getmask=$keepard \
+               genvar=$variance \
                accept
 #           end debias
 
 #  Display all the debiassed frames.
            if ( "$device" != "NONE" ) then
               echo " "
-              echo "  Displaying debiassed target frame. Note the absence of the"
-              echo "  bias strips (which were along the Y edges) and the removal"
-              echo "  of defective regions. The flatfields have also been debiassed"
-              echo "  but are not displayed."
+              echo "  Displaying debiassed target frame. Note the absence of"
+              echo "  the bias strips (which were along the Y edges) and the"
+              echo "  removal of defective regions. The flatfields have also"
+              echo "  been debiassed but are not displayed."
               echo " "
               gdclear \\
               log_start display
@@ -305,11 +344,12 @@ set keepard = TRUE
 
 #  Create a flat field master
            echo " "
-           echo "   Producing a master flatfield. This frame will be used to correct"
-           echo "   for the sensitivity variations in the detector response and"
-           echo "   any variations in the optical throughput (vignetting)."
-           echo "   As in the creation of the master bias frame median stacking is"
-           echo "   used to combine a series of flatfields."
+           echo "   Producing a master flatfield. This frame will be used to"
+           echo "   correct for the sensitivity variations in the detector"
+           echo "   response and any variations in the optical throughput" 
+           echo "   (vignetting).  As in the creation of the master bias"
+           echo "   frame median stacking is used to combine a series of"
+           echo "   flatfields."
            echo " "
            log_start makeflat
            makeflat \
@@ -321,8 +361,8 @@ set keepard = TRUE
 #  Display the master flatfield.
            if ( "$device" != "NONE" ) then 
               echo " "
-              echo "  Displaying master flatfield (the flatfield used in this case"
-              echo "  is a ramp, normal flatfields are not like this). "
+              echo "  Displaying master flatfield (the flatfield used in this"
+              echo "  case is a ramp, normal flatfields are not like this). "
               echo " "
               gdclear \\
               log_start display
@@ -430,8 +470,8 @@ set keepard = TRUE
            echo "  Now that the object-object correspondence is known it is"
            echo "  possible to work out the inter-NDF transformations."
            echo "  The next routine does this for a range of different"
-           echo "  transformation types. It also writes the information into the"
-           echo "  NDFs so that other routines may use it."
+           echo "  transformation types. It also writes the information into"
+           echo "  the NDFs so that other routines may use it."
            echo " "
            log_start register
            register \
@@ -469,8 +509,7 @@ set keepard = TRUE
               out=\! \
               accept
 
-
-#  Normalise it.
+#  Combine to produce a mosaic.
            echo " "
            echo "  Combining the aligned datasets."
            echo " "
