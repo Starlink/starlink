@@ -680,6 +680,60 @@
          IF( .NOT. CURR ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR, 
      :                                   STATUS )
 
+
+*  ------------------------------------------------------------------
+*  The following code should replace the "Text" section above when
+*  TextLabGap is used to specify an offset from the supplied position
+*  to the text reference position. Note, for this to work, PLOTSTYLE
+*  parameters should be used instead of STYLE.
+
+c*  If the supplied position is a Current Frame position, map it into a
+c*  (2D GRAPHICS) Base Frame position. Otherwise, just use the 2D GRAPHICS
+c*  position supplied.
+c         IF( CURR ) THEN
+c            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1, RPOS, 
+c     :                      STATUS )
+c         ELSE
+c            DO I = 1, 2
+c               RPOS( I ) = POS( I )
+c            END DO
+c         END IF
+c
+c*  Get the minimum dimension of the the PGPLOT window. This will be in
+c*  millimetres from the bottom left corner (i.e. GRAPHICS co-ordinates).
+c         CALL PGQWIN( X1, X2, Y1, Y2 )
+c         MINDIM = MIN( ABS( X2 - X1 ), ABS( Y2 - Y1 ) )
+c
+c*  If TextLabGap values have been set in the Plot, use them as the offset
+c*  between the supplied position and the reference position for the text.
+c         IF( AST_TEST( IPLOT, 'TEXTLABGAP(1)', STATUS ) ) THEN
+c            RPOS( 1 ) = RPOS( 1 ) - MINDIM*
+c     :                  AST_GETD( IPLOT, 'TEXTLABGAP(1)', STATUS ) 
+c         END IF
+c
+c         IF( AST_TEST( IPLOT, 'TEXTLABGAP(2)', STATUS ) ) THEN
+c            RPOS( 2 ) = RPOS( 2 ) - MINDIM*
+c     :                  AST_GETD( IPLOT, 'TEXTLABGAP(2)', STATUS ) 
+c         END IF
+c
+c*  Make the GRAPHICS (Base) Frame the Current Frame. 
+c         CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
+c     :                                              STATUS ),
+c     :                  STATUS )
+c
+c*  Set the up vector for horizontal text.
+c         UP( 1 ) = 0.0D0
+c         UP( 2 ) = 1.0D0
+c
+c*  Draw the text.
+c         CALL AST_TEXT( IPLOT, TEXT, RPOS, UP, JUST, STATUS )
+c
+c*  Re-instate the original Current Frame 
+c         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
+c
+*  ------------------------------------------------------------
+
+
 *  Blank (i.e. draw nothing).
 *  ==========================
       ELSE IF( MODE .EQ. 'BLANK' ) THEN
