@@ -4191,10 +4191,10 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 *              Value of gaussian
                 R = SQRT(YPS**2 + XPS**2)
 *              Testing for area rather than origin
-                IF (R) THEN
+                IF (R .GT. 0.0) THEN
                    TEMP = R**2/CNST1
                    SUM = SUM + (CNST * MATH_EXPR(TEMP))
-                END IF
+                ENDIF
 
 *            Next sub-pixel
               XPS = XPS + SDX
