@@ -57,15 +57,16 @@
 #        flashes depending on which type of correction the value
 #        applies to. The filter type may not be used (if no filters are
 #        available or the exposures are for dark or pre-flash masters).
-#      CCDallndfs = list (write)
+#     CCDallndfs = list (write)
 #        On exit this array contains all the names of the NDFs which
 #        have been imported. It's contents on entry are completely erased.
-#      TASK = array (read and write)
-#         Task control block. Use TASK(present,error) to check status
-#         of task on exit.
+#     TASK = array (read and write)
+#        Task control block. Use TASK(present,error) to check status
+#        of task on exit.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -73,6 +74,8 @@
 #        Original version.
 #     13-NOV-1995 (PDRAPER):
 #        Added support for masters and IR flats (from targets).
+#     19-JUN-2001 (MBT):
+#        Added missing global declaration of TASK.
 #     {enter_changes_here}
 
 #-
@@ -85,6 +88,7 @@
       global CCDfilternames
       global CCDfactors
       global CCDglobalpars
+      global TASK
 #.
 
 #  Split filtername up.
