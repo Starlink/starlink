@@ -1,5 +1,6 @@
 package Starlink::NBS;
 
+use 5.004;
 use strict;
 use Carp;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD %EXPORT_TAGS);
@@ -12,9 +13,9 @@ require AutoLoader;
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = qw(
-	
-);
+
+
+# VERSION number
 $VERSION = '0.5';
 
 
@@ -48,6 +49,14 @@ $VERSION = '0.5';
 			     nbs_put_value_l
 			     nbs_tune
 			     nbs_tune_noticeboard
+			     nbs_begin_definition
+			     nbs_define_structure
+			     nbs_define_primitive
+			     nbs_define_shape
+			     nbs_end_definition
+			     nbs_restore_definition
+			     nbs_restore_noticeboard
+			     nbs_save_noticeboard
 			     /
 			   ]
 	       );
@@ -63,7 +72,11 @@ sub AUTOLOAD {
 
     my $constname;
     ($constname = $AUTOLOAD) =~ s/.*:://;
-    my $val = constant($constname, @_ ? $_[0] : 0);
+#    my $val = constant($constname, @_ ? $_[0] : 0);
+    # Note that the default autoloader expects integer argument
+    # if @_ contains something (this can be @_ from the calling routine!)
+    # Since these routines only expect a single argument just pass a 0.
+    my $val = constant($constname, 0);
     if ($! != 0) {
 	if ($! =~ /Invalid/) {
 	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
@@ -133,6 +146,8 @@ sub new {
   $nbs->{Top}  = undef;  # Is this a top level structure
   $nbs->{Status} = &SAI__OK; # The status of this object
   $nbs->{RootID} = undef; # ID of the actual noticeboard
+  $nbs->{Nchilds} = undef;    # Number of children
+  $nbs->{Pos}   = 0;      # Position in structure
    
   # Bless task into class
   bless($nbs, $class);
@@ -149,7 +164,7 @@ sub new {
 =item General access methods
 
   These methods are for accessing the "instance" data:
-    name, path, id, top, status
+    name, path, id, top, status, nchilds
 
   With args they set the values.
   Without args they retrieve the values
@@ -168,6 +183,12 @@ sub id {
   my $self = shift;
   if (@_) { $self->{ID} = shift; }
   return $self->{ID};
+}
+
+sub pos {
+  my $self = shift;
+  if (@_) { $self->{Pos} = shift; }
+  return $self->{Pos};
 }
 
 sub rootid {
@@ -195,10 +216,31 @@ sub status {
   return $self->{Status};
 }
 
+sub nchilds {
+  # This routine calculates the number of children
+  # associated with an object
+  # The value can not be set externally.
+  # If undef the value is recalculated
+
+  my $self = shift;
+
+  unless (defined $self->{Nchilds}) {
+    my $status = $self->status;
+    my $num;
+    nbs_get_children($self->id, $num, $status);
+    if ($status == &SAI__OK) {
+      $self->{Nchilds} = $num;
+    }
+  } 
+
+  return $self->{Nchilds};
+}
+
+
 =item isokay
 
-  Method that simply returns whether status is acceptable (SAI__OK)
-  or not. If everything is okay return 1, else return 2.
+Method that simply returns whether status is acceptable (SAI__OK)
+or not. If everything is okay return 1, else return 0.
 
 =cut
 
@@ -237,6 +279,9 @@ sub loadnbs {
     $self->path($self->name);
     $self->top(1);
     $self->rootid($id);
+
+    # Work out the number of children
+    $self->nchilds;
   }
 }
 
@@ -266,7 +311,8 @@ sub type {
 
   Arguments: None (but uses the current status of the object)
   Returns:  ($prim, $status)
-  $prim is 1 if it is a primitive, 0 otherwise.
+  $prim is 1 if it is a primitive, 0 otherwise (including if status
+  is bad).
 
 =cut
 
@@ -279,8 +325,9 @@ sub primitive {
 
   nbs_get_primitive($self->id, $primitive, $status);
 
-  return ($primitive, $status);
+  $primitive = 0 if ($status != &SAI__OK);
 
+  return ($primitive, $status);
 }
 
 =item name
@@ -353,7 +400,7 @@ sub size {
     } else {
       $size = $bsize;
       $maxsize = $bmaxsize;
-      print "Error determining size of primitive type\n";
+      print STDERR "Error determining size of primitive type\n";
     }
 
 
@@ -368,6 +415,40 @@ sub size {
 }
 
 
+=item nth_name(num)
+
+Return the name of the nth component in the objects structure.
+Arguments: number
+Return:    name
+
+=cut
+
+
+sub nth_name {
+
+   my $self = shift;
+   my $num = shift;
+
+   my $id = $self->id;
+   my ($child, $name);
+   my $status = $self->status;
+   
+   # Check num
+   return undef if ($num < 0 || $num > $self->nchilds);
+
+   nbs_find_nth_item($id, $num, $child, $status);
+
+   if ($status == &SAI__OK) {
+     # Retrieve the child name
+     nbs_get_name($child, $name, $status);
+     if ($status == &SAI__OK) {
+       return $name;
+     }
+
+   }
+   return undef;
+
+}
 
 =item find
 
@@ -418,9 +499,10 @@ sub find {
   $parent_id = $start_id;  # This is the first parent
 
   foreach $lump (@bits) {
-#    print "Searching for $lump...\n";
-
+    
     nbs_find_item($parent_id, $lump, $child_id, $status);
+
+    last if $status != &SAI__OK;
 
     # Child is now the parent next time round
     $parent_id = $child_id;
@@ -594,6 +676,362 @@ sub put {
 
 }
 
+=item poke(item, val)
+
+Set the value of item to 'val'.
+This is the equivalent of a find() followed by a put().
+
+  $nbs->poke(".port_0.display_data", 'IMAGE');
+
+Status of the put() is returned.
+
+=cut
+
+sub poke {
+  my $self = shift;
+  my $item = shift;
+  my $value = shift;
+
+  my $new = $self->find($item);
+  $new->put($value);
+
+}
+
+=item peek(item)
+
+Return the value stored in item. This is the equivalent of a find()
+followed by a get()
+
+  ($value) = $nbs->peek(".port_0.display_data");
+
+undef is returned if bad status is encountered.
+The values are returned in an array context.
+
+=cut
+
+sub peek {
+  my $self = shift;
+  my $item = shift;
+
+  my $new = $self->find($item);
+  my ($status, @values) = $new->get;
+
+  if ($status == &SAI__OK) {
+    return @values
+  } else {
+    return undef;
+  }
+}
+
+
+=back
+
+=head1 TIE
+
+Scalar values in the noticeboard can be tied to scalar perl variables
+using the perl tie() function.
+
+   $what = $Nbs->find("primitive.object");
+   tie ($object, ref($what), $what);
+
+Now $object will automatically reflect the value in the notice board
+associated with primitive.object. Note that this only works for
+primitives (not structures).
+
+Noticeboard structures can be tied to perl hashes also:
+
+   $what = $Nbs->find("structure");
+   tie (%hash, ref($what), $what);
+
+Now %hash can be used to update the entire noticeboard structure.
+Note that keys are always assumed to be relative to the 
+tied object -- in effect this means that a '.' is automatically
+prepended to all keys if one is not found. (see find()
+for more information on relative addressing).
+
+Note that ties can be broken by using simple copies.
+For example, for
+
+     %new = %hash
+
+%new will not be tied even though %hash was.
+
+A method is supplied for tieing NBS objects to variables:
+
+=over 4
+
+=item tienbs
+
+Tie a Starlink::NBS object to a perl variable. No arguments.  If the
+object points to a structure a reference to a perl hash is returned.
+If the object points to a primitive a reference to a perl scalar is
+returned.
+
+=cut 
+
+sub tienbs {
+  my $self = shift;
+  my ($tie, %tie); 
+ 
+  # Check if it is a primitive
+  my ($prim,$status) = $self->primitive;
+  if ($status == &SAI__OK) {
+
+    if ($prim) {
+      # Tie to a scalar
+      tie($tie, ref($self), $self);
+      return \$tie;
+    } else {
+      # Tie to a hash;
+      tie(%tie, ref($self), $self);
+      return \%tie;
+    }
+  }
+  return undef;
+}
+
+
+
+# Method to tie a scalar to a notice board item
+# Expects a  Starlink::NBS object that is pointing to 
+# a primitive noticeboard entry
+
+sub TIESCALAR {
+  my $class = shift;
+  my $obj = shift;
+  
+  # Check that we have been supplied an object
+  unless (UNIVERSAL::isa($obj, "Starlink::NBS")) {
+    carp "NBS:Tiescalar can not tie a non-NBS object";
+    return undef;
+  }
+
+  # Check that we are pointing to a primitive
+  my ($prim, $status) = $obj->primitive;
+  unless ($prim) {
+    carp "NBS::Tiescalar given non-primitive noticeboard item";
+    return undef;
+  }
+
+  return $obj;
+}
+
+# Method to tie hash to notice board.
+# Almost identical to TIESCALAR.
+
+sub TIEHASH {
+  my $class = shift;
+  my $obj = shift;
+  
+  # Check that we have been supplied an object
+  unless (UNIVERSAL::isa($obj, "Starlink::NBS")) {
+    carp "NBS:Tiehash can not tie a non-NBS object";
+    return undef;
+  }
+
+  # Check that we are pointing to a non primitive item
+  my ($prim, $status) = $obj->primitive;
+  if ($prim) {
+    carp "NBS::Tiehash given primitive noticeboard item";
+    return undef;
+  }
+
+  # Return undef if bad status
+  if ($status != &SAI__OK) {
+    carp "NBS::Tiehash: Error checking whether object is primitive";
+    return undef;
+  }
+
+  return $obj;
+}
+
+
+
+# Method to retrieve the value of the tied object
+# Now we need to distinguish between a tied scalar and a 
+# tied hash (since we are allowing both to be tied in this
+# module)
+
+# Do it by counting arguments. If there is only one argument
+# to fetch, then assume it is
+
+sub FETCH {
+  my $self = shift;
+  my ($obj, $status, $value, %newtie, $prim);
+
+  if (@_) {
+    print "TIED hash\n" if $self->debug;
+    # Must be a hash since we are being asked to retrieve a key
+    my $key = shift;
+
+    $key = "." . $key unless $key =~ /^\./;
+
+    $obj = $self->find($key);
+
+    # Now need to check if we have a primitive or
+    # a structure
+    ($prim, $status) = $obj->primitive;
+    if ($status == &SAI__OK) {
+      if ($prim) {
+	($status, $value) = $obj->get;
+	if ($status == &SAI__OK) {
+	  return $value;
+	} else {
+	  return undef;
+	}
+
+      } else {
+	# We have been given a strucuture
+	# So open try tieing a hash to it!
+	tie(%newtie, ref($obj), $obj);
+	return \%newtie;
+      }
+    } else {
+      return undef;
+    }
+
+
+  } else {
+    # We are a tied scalar
+    # We know we are a primitive
+    print "TIED scalar\n" if $self->debug;
+    
+    ($status, $value) = $self->get;
+    if ($status == &SAI__OK) {
+      return $value;
+    } else {
+      return undef;
+    }
+
+  }
+
+}
+
+sub STORE {
+  my $self = shift;
+  my ($value,$status,$prim);
+
+  # If we have two args left then we are tieing a hash
+  if (scalar(@_) == 2) {
+    my $key = shift;
+    $value = shift;
+
+    $key = "." . $key unless $key =~ /^\./;
+
+    # Need to get reference to key structure
+    my $obj = $self->find($key);
+
+    # Check whether a primitive
+    ($prim, $status) = $obj->primitive;
+
+    if ($status == &SAI__OK) {
+      if ($prim) {
+	
+	# If we have been given a scalar
+	if (not ref($value)) {
+	  $status = $obj->put($value);
+	} else {
+	  # Trying to write a reference to a primitive
+	  $status = &NBS__PRIMITIVE;
+	}
+
+      } else {
+	# Not a primitive so check to see whether we have been given
+	# a hash
+
+	if (ref($value) eq 'HASH') {
+
+	  # Need to loop over the keys and put each object into
+	  # shared memory (note this does not mean that we create
+	  # the shared memory portion)
+	  
+	  foreach my $nkey (keys %$value) {
+	    # Recursion
+	    $obj->STORE($nkey, $$value{$nkey});
+	  }
+
+	}
+
+      }
+    } 
+
+  } else {
+    # Tied scalar
+    $value = shift;
+    $status = $self->put($value);
+
+  }
+
+  if ($status != &SAI__OK) {
+    my $name = ($self->name)[1];
+    carp "NBS::STORE: Error storing $value in ".$name."\n";
+  }
+
+
+}
+
+
+# Delete entries from a hash
+# This method does nothing (since I don't want to delete
+# shared memory
+
+sub DELETE {
+  my $self = shift;
+
+}
+
+# Method to see whether a key exists
+# Returns 1 if it does and 0 otherwise.
+# Note that the find() method prints an error message to the
+# screen - very annoying - cant stop nbs_find_item from doing this.
+
+sub EXISTS {
+  my $self = shift;
+  my $key = shift;
+
+  $key = "." . $key unless $key =~ /^\./;
+
+  # Get the new object
+  my $obj = $self->find($key);
+
+  if ($obj->isokay) {
+    return 1;
+  } else {
+    return 0;
+  }
+
+}
+
+
+# Method to return the keys
+
+# First key
+
+
+sub FIRSTKEY {
+
+   my $self = shift;
+
+   $self->pos(1);
+   return $self->nth_name(1);
+
+}
+
+# Generate the next key
+
+sub NEXTKEY {
+  my $self = shift;
+
+  my $lastkey = shift;
+  my $curr = $self->pos;
+  
+  # Increment counter
+  $curr++;
+  $self->pos($curr);
+
+  return $self->nth_name($curr);
+}
+
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 1;
@@ -601,8 +1039,6 @@ __END__
 
 
 
-
-=back
 
 =head1 EXAMPLES
 
@@ -654,17 +1090,32 @@ __END__
     nbs_put_value_l(id, nvals, \@values, status)
     nbs_tune(name, value, oldvalue, status)
     nbs_tune_noticeboard(id, name, value, oldvalue, status)
+    nbs_begin_definition(id, status)
+    nbs_define_structure(envsid, name, type, sid, status)
+    nbs_define_primitive(envsid, name, type, maxdims, maxbytes, sid, status)
+    nbs_define_shape(sid, ndims, dims, status)
+    nbs_end_definition(name, option, status)
+    nbs_restore_definition(name, save_name, status)
+    nbs_restore_noticeboard(name, save_name, status)
+    nbs_save_noticeboard(id, status)
 
   Note that nbs_get_ and nbs_put_ require a separate routine for each
   type. Additionally, the get and set routines expect array arguments.
 
 
+=head1 MORE INFORMATION
+
+More information on NBS systems can be found in Starlink User
+Note 77 (D.J. Allan, 1995).
+Starlink can be contacted at http://star-www.rl.ac.uk/
+
 =head1 AUTHOR
 
-T. Jenness (timj@jach.hawaii.edu)
+T. Jenness (t.jenness@jach.hawaii.edu). Copyright T. Jenness and 
+PPARC 1997/1998.
 
 =head1 SEE ALSO
 
-perl(1). Starlink::EMS(3)
+perl(1). L<perltie>, L<Starlink::EMS>
 
 =cut
