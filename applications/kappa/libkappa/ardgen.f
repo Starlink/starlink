@@ -22,9 +22,9 @@
 *  Description:
 *     This is an interactive tool for selecting regions of a displayed
 *     image using a cursor, and then storing a description of the
-*     selected regions in a text file in the form of an `ARD
-*     Description' (see SUN/183).  This text file may subsequently be
-*     used in conjunction with packages such as CCDPACK or ESP.
+*     selected regions in a text file in the form of an 
+*     `ARD Description' (see SUN/183).  This text file may subsequently
+*     be used in conjunction with packages such as CCDPACK or ESP.
 *
 *     The application initially obtains a value for the SHAPE parameter
 *     and then allows you to identify either one or many regions of the

@@ -20,7 +20,7 @@
 *     a 2D NDF. The listing may be displayed on the screen and logged in
 *     a text file (see parameters QUIET and LOGFILE). The region 
 *     to be listed can be specified either by giving its centre and size or
-*     its corners, or by giving an ARD description for the region (see
+*     its corners, or by giving an `ARD Description' for the region (see
 *     parameter MODE). The top-right pixel value is also written to an output 
 *     parameter (VALUE). The listing may be produced in several different
 *     formats (see parameter FORMAT), and the format of each individual
@@ -34,7 +34,7 @@
 *        If TRUE, the user is prompted for further regions to list until
 *        a FALSE value is obtained. [FALSE]
 *     ARDDESC = LITERAL (Read)
-*        An ARD description for the parts of the image to be listed. 
+*        An `ARD Description' for the parts of the image to be listed. 
 *        Multiple lines can be supplied by ending each line with a minus
 *        sign, in which case further prompts for ARDDESC are made until
 *        a value is supplied which does not end with a minus sign. All
@@ -44,7 +44,7 @@
 *        current co-ordinate Frame of the NDF unless there are COFRAME or 
 *        WCS statements which indicate a different system. See "Notes" below.
 *     ARDFILE = FILENAME (Read)
-*        The name of an existing text file containing an ARD description
+*        The name of an existing text file containing an `ARD Description'
 *        for the parts of the image to be listed. Only acessed if MODE is 
 *        "ARDFile". Positions in the ARD description are assumed to be in
 *        pixel co-ordinates unless there are COFRAME or WCS statements 
@@ -117,7 +117,7 @@
 *        - "Bounds" -- The bounds of the region are specified using 
 *        parameters LBOUND and UBOUND.
 *
-*        - "ARDFile" -- The region is given by an ARD description 
+*        - "ARDFile" -- The region is given by an `ARD Description' 
 *        supplied within a text file specified using parameter ARDFILE.
 *        Pixels outside the ARD region are represented by the string "OUT". 
 *

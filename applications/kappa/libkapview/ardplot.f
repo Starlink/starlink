@@ -21,16 +21,17 @@
 
 *  Description:
 *     This application draws the outlines of regions described in 
-*     a supplied 2-dimensional ARD file. The outlines are drawn over 
-*     the top of a previously displayed picture, aligned (if possible)
-*     in the current coordinate Frame of the previously drawn picture.
+*     a supplied 2-dimensional ARD file (an `ARD Description' - see 
+*     SUN/183). The outlines are drawn over the top of a previously 
+*     displayed picture, aligned (if possible) in the current coordinate 
+*     Frame of the previously drawn picture.
 
 *  Usage:
 *     ardplot ardfile [device] [regval]
 
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
-*        The name of the ARD file containing a description of the regions
+*        The name of a file containing an `ARD Description' of the regions
 *        to be outlined. The co-ordinate system in which positions within 
 *        this file are given should be indicated by including suitable 
 *        COFRAME or WCS statements within the file (see SUN/183), but will 
