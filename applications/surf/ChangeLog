@@ -1,3 +1,11 @@
+2000-07-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_calc_polpack_angrot.f
+	(SURFLIB_CALC_POLPACK_ANGROT): Check SCULIB_FIND_INT return values
+
+	* surflib/surflib_fill_wplate.f (SURFLIB_FILL_WPLATE): Check
+	SCULIB_FIND_INT return values
+
 2000-06-27  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_scuphot.f: Clear MEAS_Q so that the coadd works
