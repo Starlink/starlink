@@ -100,13 +100,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Loader.java:99: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/SourceReader.java:121: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:49: warning - @param argument "test" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:72: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:203: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:279: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:406: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:474: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:497: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:57: warning - @param argument "test" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:80: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:211: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:287: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:414: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:482: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:505: warning - @param argument "messsage" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
@@ -609,9 +609,10 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/fits/src/main/uk/ac/starlink/fits/FitsConstants.java:227: warning - @param argument "dis" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/fits/src/main/uk/ac/starlink/fits/FitsConstants.java:232: warning - @param argument "dis" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/fits/src/main/uk/ac/starlink/fits/FitsTableSerializer.java:179: warning - @param argument "destination" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/fits/docs/fits/javadocs/stylesheet.css...
-  [javadoc] 1 warning
+  [javadoc] 2 warnings
      [echo] Executing DIVA target: javadocs
 
 prepare:
@@ -739,13 +740,6 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/AbstractGraphModel.java:52: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphModel.java:54: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:175: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/package.html: Close body tag missing from HTML file
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/demo/package.html: Close body tag missing from HTML file
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/event/package.html: Close body tag missing from HTML file
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/interactor/package.html: Close body tag missing from HTML file
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/graph/package.html: Close body tag missing from HTML file
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/graph/layout/package.html: Close body tag missing from HTML file
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/gui/package.html: Close body tag missing from HTML file
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  This is
   [javadoc] our term for complex data structures that evolve with time."
@@ -765,7 +759,6 @@ javadocs:
   [javadoc] <li>stroke filtering utilities</li>
   [javadoc] <li>out-of-the-box recognizers</li>
   [javadoc] <li>etc</li> </ol> </P>"
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/util/xml/package.html: Close body tag missing from HTML file
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:239: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Scene.java:83: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
@@ -1609,7 +1602,6 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/whiteboard/WhiteboardView.java:73: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/whiteboard/WhiteboardView.java:235: warning - @returns is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/stylesheet.css...
-  [javadoc] 8 errors
   [javadoc] 469 warnings
      [echo] Executing JSky target: javadocs
 
@@ -1781,9 +1773,11 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOElement.java:95: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java:142: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java:157: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:183: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:262: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:282: warning - @param argument "bulk" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:420: warning - Tag @link: reference not found: VOSerializer
   [javadoc] Generating /apps/cvsbuild/java/source/votable/docs/votable/javadocs/stylesheet.css...
-  [javadoc] 7 warnings
+  [javadoc] 9 warnings
      [echo] Executing JAIUtil target: javadocs
 
 prepare:
@@ -2921,4 +2915,4 @@ javadocs:
   [javadoc] 272 warnings
 
 BUILD SUCCESSFUL
-Total time: 2 minutes 48 seconds
+Total time: 2 minutes 33 seconds

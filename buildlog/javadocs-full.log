@@ -89,7 +89,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
-     [copy] Copying 12 files to /apps/cvsbuild/java/source/fits/build/java
+     [copy] Copying 13 files to /apps/cvsbuild/java/source/fits/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
@@ -110,7 +110,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/java
-     [copy] Copying 25 files to /apps/cvsbuild/java/source/votable/build/java
+     [copy] Copying 26 files to /apps/cvsbuild/java/source/votable/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -372,13 +372,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Loader.java:99: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/SourceReader.java:121: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:49: warning - @param argument "test" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:72: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:203: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:279: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:406: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:474: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:497: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:57: warning - @param argument "test" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:80: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:211: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:287: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:414: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:482: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:505: warning - @param argument "messsage" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
   [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/Task.java:41: warning - @param argument "args" is not a parameter name.
@@ -510,14 +510,17 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/WrapperStarTable.java:107: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:106: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableColumn.java:54: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/fits/build/java/uk/ac/starlink/fits/FitsConstants.java:227: warning - @param argument "dis" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/fits/build/java/uk/ac/starlink/fits/FitsConstants.java:232: warning - @param argument "dis" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/fits/build/java/uk/ac/starlink/fits/FitsTableSerializer.java:179: warning - @param argument "destination" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/Param.java:24: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "el" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "systemId" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOElement.java:95: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTable.java:142: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTable.java:157: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:183: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:262: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:282: warning - @param argument "bulk" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:420: warning - Tag @link: reference not found: VOSerializer
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -653,7 +656,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 281 warnings
+  [javadoc] 284 warnings
 
 BUILD SUCCESSFUL
-Total time: 49 seconds
+Total time: 38 seconds

@@ -167,25 +167,21 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Coco target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/coco/.coco.install
      [echo] Executing RV target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/rv/.rv.install
      [echo] Executing FROG target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/frog/.frog.install
 
 clean:
 
@@ -356,30 +352,17 @@ clean:
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/etc
      [echo] Executing Coco target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/coco/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/coco/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/coco/docs
      [echo] Executing RV target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/rv/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/rv/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/rv/docs
      [echo] Executing FROG target: clean
 
 clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 export-full-source:
       [zip] Building zip: /apps/cvsbuild/export/starjava-sources.zip
@@ -473,7 +456,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
-     [copy] Copying 12 files to /apps/cvsbuild/java/source/fits/build/java
+     [copy] Copying 13 files to /apps/cvsbuild/java/source/fits/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
@@ -494,7 +477,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/java
-     [copy] Copying 25 files to /apps/cvsbuild/java/source/votable/build/java
+     [copy] Copying 26 files to /apps/cvsbuild/java/source/votable/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -543,11 +526,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1592 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1596 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 41 seconds
+Total time: 31 seconds

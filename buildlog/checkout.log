@@ -5546,6 +5546,7 @@ U java/source/fits/src/main/uk/ac/starlink/fits/FitsConstants.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsNdxHandler.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsStarTable.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsTableBuilder.java
+U java/source/fits/src/main/uk/ac/starlink/fits/FitsTableSerializer.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsTableWriter.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsURL.java
 U java/source/fits/src/main/uk/ac/starlink/fits/MappedFile.java
@@ -9059,10 +9060,11 @@ cvs checkout: Updating java/source/votable/src/main/uk/ac
 cvs checkout: Updating java/source/votable/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/votable/src/main/uk/ac/starlink/votable
 U java/source/votable/src/main/uk/ac/starlink/votable/Base64InputStream.java
+U java/source/votable/src/main/uk/ac/starlink/votable/Base64OutputStream.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BinaryTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BitDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BooleanDecoder.java
-U java/source/votable/src/main/uk/ac/starlink/votable/CharDecoder.java
+U java/source/votable/src/main/uk/ac/starlink/votable/CharDecoders.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Decoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Encoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Field.java
@@ -9075,8 +9077,8 @@ U java/source/votable/src/main/uk/ac/starlink/votable/Stream.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Table.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TabledataTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOElement.java
+U java/source/votable/src/main/uk/ac/starlink/votable/VOSerializer.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOStarTable.java
-U java/source/votable/src/main/uk/ac/starlink/votable/VOStarValueAdapter.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableFormatException.java
