@@ -82,7 +82,12 @@ sub AUTOLOAD {
 
     my $constname;
     ($constname = $AUTOLOAD) =~ s/.*:://;
-    my $val = constant($constname, @_ ? $_[0] : 0);
+#    my $val = constant($constname, @_ ? $_[0] : 0);
+    # Note that the default autoloader expects integer argument
+    # if @_ contains something (this can be @_ from the calling routine!)
+    # Since these routines only expect a single argument just pass a 0.
+    my $val = constant($constname, 0);
+
     if ($! != 0) {
 	if ($! =~ /Invalid/) {
 	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
