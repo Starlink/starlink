@@ -214,13 +214,14 @@
 	PARAMETER 		( OPCHAN = 6 )		! messages ( <1 for no messages)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SFIT Version 2.2-0' )
+        PARAMETER		( VERSION = 'SFIT Version 2.2-1' )
 
 *  Local Variables:
-      RECORD /DATASET/    	OBDAT(NDSMAX)		! Observed datasets
-      RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
-      RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /DATASET/    	OBDAT(NDSMAX)		! Observed datasets
+c     RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
+c     RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+      INTEGER			IMOD
 
       DOUBLE PRECISION 		STAT			! Fit statistic
       DOUBLE PRECISION 		FPROB			! Fit probability
@@ -240,8 +241,8 @@
       INTEGER 			NDS			! No of datasets
       INTEGER 			NGOOD			! No. good data elements
       INTEGER 			SSCALE			! Factor for scaling fitstat
-      INTEGER NDOF			! No of degrees of freedom - should be
-					!  no of data - no of unfrozen params
+      INTEGER			NDOF			! No of degrees of freedom - should be
+							!  no of data - no of unfrozen params
       INTEGER 			NITMAX			! Max # iterations
       INTEGER 			NPAR			! No of parameters
       INTEGER 			FITERR			! Fitting error encountered
@@ -269,7 +270,11 @@
       CALL SPEC_INIT( STATUS )
 
 *  Set up model genus
-      MODEL.GENUS = 'SPEC'
+      IMOD = 1
+      MODEL_SPEC_GENUS(IMOD) = 'SPEC'
+
+*  Initialize variables
+      NOFREE = .FALSE.
 
 *  Chi-squared or likelihood fitting?
       CALL USI_GET0L( 'LIK', LIKSTAT, STATUS )
@@ -280,22 +285,26 @@
       END IF
 
 *  Get observed data (setting up data weights) and response
-      CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'FileSet', 'READ', IFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+      END IF
       WORKSPACE = .TRUE.
       CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', FSTAT, WORKSPACE,
      :                 (.NOT. LIKSTAT), NDS,
-     :                 OBDAT, NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
+     :                 NGOOD, SSCALE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Look for redshift
       CALL SFIT_GETZ( Z, STATUS )
 
 *  Apply red-shift and check data structures
-      CALL SFIT_PRECHK( NDS, Z, PREDDAT, STATUS )
+      CALL SFIT_PRECHK( NDS, Z, STATUS )
 
 *  Get model specification
       CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', MFID, STATUS )
-      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+      CALL FIT_MODGET( MFID, IMOD, NPAR, PARAM, LB, UB, LE, UE,
      :                 FROZEN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -303,7 +312,7 @@
       IF ( .NOT. LIKSTAT ) THEN
 
 *    Finds NDOF from frozen array and constraints
-        CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
+        CALL FIT1_NDOF( NGOOD, IMOD, FROZEN, NDOF, STATUS )
 
 *    NDOF to be used for scaling chisq statistic
 	SSCALE = NDOF
@@ -314,7 +323,7 @@
       CALL FCI_GETMC( MCTRL, STATUS )
 
 *  Set up workspace for model stack
-      CALL SFIT_MAPMODSTK( NDS, PREDDAT, MODEL.STACKPTR, STATUS )
+      CALL SFIT_MAPMODSTK( NDS, MODEL_SPEC_STACKPTR(IMOD), STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Zero iterations means just print the statistic
@@ -322,15 +331,15 @@
       IF ( NITMAX .EQ. 0 ) THEN
 
 *    Evaluate the statistic
-        CALL FIT_APPTIE( MODEL, .FALSE., PARAM, LB, UB, STATUS )
-        CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARAM, FSTAT,
-     :                    FIT_PREDDAT, PREDDAT, STAT, STATUS )
+        CALL FIT_APPTIE( IMOD, .FALSE., PARAM, LB, UB, STATUS )
+        CALL FIT_STAT( NDS, IMOD, PARAM, FSTAT,
+     :                    FIT_PREDDAT, STAT, STATUS )
 
 *    Report value of statistic
-        CALL SFIT_OPSTAT( FSTAT, STAT, SSCALE, NGOOD, 0, STATUS )
+        CALL SFIT_OPSTAT( FSTAT, STAT, SSCALE, NGOOD, OCI, STATUS )
 
 *    Goodness of fit
-        CALL FIT_MPROB( NDS, OBDAT, FSTAT, SSCALE, PREDDAT, STAT,
+        CALL FIT_MPROB( NDS, FSTAT, SSCALE, STAT,
      :                  FPROB, STATUS )
         CALL MSG_SETD( 'FPROB', FPROB )
         CALL MSG_PRNT( 'Prob = ^FPROB' )
@@ -340,9 +349,9 @@
       END IF
 
 *  Perform fit iteration
-      CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN, .TRUE.,
+      CALL FIT_MIN( NDS, IMOD, MCTRL, OPCHAN, .TRUE.,
      :              NPAR, LB, UB, FROZEN, SSCALE, FSTAT,
-     :              FIT_PREDDAT, PREDDAT, PARAM, DPAR, PEGGED,
+     :              FIT_PREDDAT, PARAM, DPAR, PEGGED,
      :              STAT, FINISHED, FITERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -369,8 +378,8 @@
       IF ( ER ) THEN
 	CALL MSG_BLNK()
 	CALL MSG_PRNT( 'Calculating approximate parameter errors' )
-	CALL FIT_PARERR(NDS,OBDAT,INSTR,MODEL,NPAR,PARAM,LB,UB,DPAR,
-     :    FROZEN,PEGGED,SSCALE,FSTAT,FIT_PREDDAT,PREDDAT,PARSIG,STATUS)
+	CALL FIT_PARERR(NDS,IMOD,NPAR,PARAM,LB,UB,DPAR,
+     :    FROZEN,PEGGED,SSCALE,FSTAT,FIT_PREDDAT,PARSIG,STATUS)
         CALL ARR_COP1R( NPAR, PARSIG, LE, STATUS )
         CALL ARR_COP1R( NPAR, PARSIG, UE, STATUS )
 
@@ -382,11 +391,11 @@
       END IF
 
 *  Report parameter values
-      CALL SFIT_OPTABLE( NPAR, PARAM, FROZEN, PEGGED, PARSIG, MODEL,
-     :                                                   0, STATUS )
+      CALL SFIT_OPTABLE( NPAR, PARAM, FROZEN, PEGGED, PARSIG,
+     :                   IMOD, OCI, STATUS )
 
 *  Report value of statistic
-      CALL SFIT_OPSTAT( FSTAT, STAT, NDOF, NGOOD, 0, STATUS )
+      CALL SFIT_OPSTAT( FSTAT, STAT, NDOF, NGOOD, OCI, STATUS )
 
 *  Report red-shift
       IF ( Z .NE. 0.0 ) THEN
@@ -398,7 +407,8 @@
 
 *  Update model_spec errors
       IF ( ER ) THEN
-	CALL FIT_MODUP(MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,1.0,STATUS)
+	CALL FIT_MODUP(MFID,MODEL_SPEC_NCOMP(IMOD),NPAR,PARAM,LE,UE,
+     :                                                     1.0,STATUS)
 	CALL MSG_PRNT( '** Error estimates entered in model spec. **' )
 	CALL MSG_BLNK()
       END IF
@@ -413,7 +423,7 @@
         CALL AIO_TITLE( OCI, VERSION, STATUS )
 
 *      File list
-        CALL SFIT_OPFILES( FSTAT, NDS, OBDAT, MODEL, OCI, STATUS )
+        CALL SFIT_OPFILES( FSTAT, NDS, IMOD, OCI, STATUS )
 
 *    Red-shift
 	IF ( Z .NE. 0.0 ) THEN
@@ -432,7 +442,7 @@
 
 *    Report parameter values
         CALL SFIT_OPTABLE( NPAR, PARAM, FROZEN, PEGGED, PARSIG,
-     :                                     MODEL, OCI, STATUS )
+     :                                     IMOD, OCI, STATUS )
 
 *    Value of statistic
         CALL SFIT_OPSTAT( FSTAT, STAT, NDOF, NGOOD, OCI, STATUS )
