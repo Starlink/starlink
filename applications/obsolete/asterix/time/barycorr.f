@@ -94,7 +94,7 @@
 *        INTEGER KEY              ! Key for indexed read
         INTEGER I
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
-*        REAL*8 BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
+*        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *        INTEGER BARY_MJD2HK ! integer function MJD to HK 1/2 secs
 * END INCLUDE SECTION
 *    Function declarations :
@@ -1157,7 +1157,7 @@
 
       RECORD /POS_REC/ POS
       REAL BARY                         ! Barycentric  correction in Secs
-      REAL*8 ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
+      DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
         INTEGER UT
         REAL SATGEO(3)           ! GEOGRAPHIC XYZ
@@ -1169,7 +1169,7 @@
         INTEGER*2 LVAL_MILLERAD
         INTEGER KEY              ! Key for indexed read
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
-        REAL*8 BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
+        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *     <specification of FORTRAN structures>
 *    Import :
       INTEGER              N_EVENTS              ! No events in list
@@ -1303,7 +1303,7 @@
       RECORD /POS_REC/ POS
 
       REAL BARY                         ! Barycentric  correction in Secs
-      REAL*8 ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
+      DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
         INTEGER UT
         REAL SATGEO(3)           ! GEOGRAPHIC XYZ
@@ -1315,7 +1315,7 @@
         INTEGER*2 LVAL_MILLERAD
         INTEGER KEY              ! Key for indexed read
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
-        REAL*8 BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
+        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *     <specification of FORTRAN structures>
 *    Import :
       INTEGER              BASE_MJD              ! whole part MJD only
@@ -1506,16 +1506,15 @@
 
 *-
 * IMPORTS
-      REAL*8 S2_REF_MJD
+      DOUBLE PRECISION S2_REF_MJD
       PARAMETER(S2_REF_MJD=47892.0D0)
       REAL BARY                         ! Barycentric  correction in Secs
-      REAL*8 ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
+      DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
-        INTEGER UT
-        REAL SATGEO(3)           ! GEOGRAPHIC XYZ
-        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
-        REAL*8 BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
-*     <specification of FORTRAN structures>
+c        INTEGER UT
+c        REAL SATGEO(3)           ! GEOGRAPHIC XYZ
+c        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
+        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *    Import :
       INTEGER              BASE_MJD              ! whole part MJD only
 
@@ -1700,7 +1699,6 @@
 	SUBROUTINE BARY_ROSAT(MJD,XRA,XDEC,BARY,GKROS,EQUINOX)
 	DOUBLE PRECISION MJD,EQUINOX
 	REAL XRA, XDEC, BARY
-	INTEGER ISTAT
 *MJD	input	Modified Julian Date (IAU definition) of observation.
 *XRA	input	Source Right Ascension, epoch 1950.0, degrees.
 *XDEC	input	Source Declination, epoch 1950.0, degrees.
@@ -1780,15 +1778,15 @@
 *+  BARY_MJD2HK - Convert MJD to HK UT 1/2 seconds
 	INTEGER	FUNCTION BARY_MJD2HK (MJD)
 * Parameters
-        REAL*8 S2_REF_MJD
+        DOUBLE PRECISION S2_REF_MJD
         PARAMETER(S2_REF_MJD=47892.0D0)
 * Input
-	REAL*8		MJD
+	DOUBLE PRECISION		MJD
 * M. Denby Nov 89	Modified MJR 25/4/90
 *-
 * Local
 *
-	REAL*8		SECS2
+	DOUBLE PRECISION		SECS2
 	PARAMETER      (SECS2 = 86400.D0*2.D0)
 *
 	BARY_MJD2HK = INT((MJD - S2_REF_MJD)*SECS2)
@@ -1803,7 +1801,7 @@
 
 *  Calling Arguments
 *     Input
-      REAL*8 DMJD		! Date, MJD
+      DOUBLE PRECISION DMJD		! Date, MJD
       REAL VGEO(3)		! Vector, Geog.
 
 *     Output
