@@ -942,8 +942,6 @@
         CALL PGDRAW(XSP(1),YSP(1))
 
         ANGLE=THETA*180.0/PI-90.0
-        CALL IMG_SETSLICE(XC,YC,ANGLE,SLENGTH,SWIDTH,.FALSE.,STATUS)
-
 
 *  Write  out the spoke description
         TEXT=' .OR. ROTBOX( '
@@ -962,6 +960,11 @@
         IF (LP.LT.8) THEN
           CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
         ENDIF
+
+*  add to mask
+        ANGLE=ANGLE*3.142/180.0
+        CALL IMG_SETSLICE(XSC,YSC,ANGLE,SLENGTH,SWIDTH,.FALSE.,STATUS)
+
 
 *  Calculate the angle of the next spoke to south
         THETA = THETA + PI/4.
