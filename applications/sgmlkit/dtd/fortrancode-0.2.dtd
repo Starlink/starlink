@@ -56,15 +56,16 @@
   First, arrange that ^*+ and ^*- begin and end the prologue, and that
   ^* is ignored while within the prologue.
 -->
-<!entity startprologue.ref	starttag "codeprologue">
-<!entity endprologue.ref	endtag "codeprologue">
+<!entity startprologue.ref	starttag "func">
+<!entity endprologue.ref	starttag "codebody">
 <!entity nullentity.ref		cdata "">
 <!entity partype.ref		starttag "type"	>
 <!entity pardesc.ref		starttag "description">
 
 <!shortref	generalmap	"&#RS;*+"	startprologue.ref
 						>
-<!shortref	prologuemap	"&#RS;*-"	endprologue.ref
+<!shortref	prologuemap	"&#RS;*+"	startprologue.ref
+				"&#RS;*-"	endprologue.ref
 				"&#RS;*"	nullentity.ref
 						>
 
@@ -103,7 +104,7 @@
 				":"		pardesc.ref
 						>
 <!usemap	generalmap	programcode	>
-<!usemap	prologuemap	codeprologue	>
+<!usemap	prologuemap	func		>
 <!usemap	parametermap	parameter	>
 <!usemap	descriptionmap	description	>
 <!usemap	partypemap	type		>
