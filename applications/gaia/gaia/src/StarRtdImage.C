@@ -1317,11 +1317,12 @@ int StarRtdImage::aststoreCmd( int argc, char *argv[] )
 //      Creates and stores a FITS card in a FITS channel given the
 //      keyword name, value and comment.
 //-
-void StarRtdImage::storeCard( AstFitsChan *channel, char *keyword,
-                              char *value, char *comment, int overwrite )
+void StarRtdImage::storeCard( AstFitsChan *channel, const char *keyword,
+                              const char *value, const char *comment, 
+                              int overwrite )
 {
   char card[80];
-  char *dummy = "No comment";
+  const char *dummy = "No comment";
   if ( comment == NULL ) comment = dummy;
   if ( strlen(value) > 21 ) {
     sprintf( card, "%-8.8s=%s /%s", keyword, value, comment );
@@ -1960,9 +1961,11 @@ int StarRtdImage::astassignCmd( int argc, char *argv[] )
 //   Arguments:
 //      Either 'image' or 'local' possibly followed by an encoding.
 //-
-static void write_out( const char *card )
-{
-  cout << card << endl;
+extern "C" {
+  static void write_out( const char *card )
+  {
+    cout << card << endl;
+  }
 }
 
 int StarRtdImage::astwriteCmd( int argc, char *argv[] )
@@ -2679,7 +2682,7 @@ int StarRtdImage::draw_symbol(const char *shape,
 #endif
   static struct SymbolTab {
     // symbol name
-    char* name;
+    const char* name;
     // ptr to method to draw the symbol
     int (StarRtdImage::*fptr)(double x, double y, const char *xy_units,
                               double radius, const char *radius_units,

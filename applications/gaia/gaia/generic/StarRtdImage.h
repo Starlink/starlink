@@ -253,8 +253,8 @@ protected:
   int addLinear( int iframe, AstFrameSet *fset, double *tr, int fittype=5 );
 
   //  Create and store a FITS card in a FITS channel.
-  void storeCard( AstFitsChan *channel, char *keyword, char *value,
-                  char *comment, int overwrite = 1 );
+  void storeCard( AstFitsChan *channel, const char *keyword, const char *value,
+                  const char *comment, int overwrite = 1 );
 
   //  Create and initialise a new FITS channel.
   void initChannel( int slot );

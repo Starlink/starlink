@@ -51,10 +51,10 @@
 //
 static class GaiaSkySearchSubCmds {
 public:
-    char* name;      // method name
+    const char* name;      // method name
     int (GaiaSkySearch::*fptr)(int argc, char* argv[]);
-    int min_args;    // minimum number of args
-    int max_args;    // maximum number of args
+    int min_args;          // minimum number of args
+    int max_args;          // maximum number of args
 } subcmds_[] = {
   {"check",  &GaiaSkySearch::checkCmd,        1,  1},
   {"csize",  &GaiaSkySearch::csizeCmd,        1,  1},

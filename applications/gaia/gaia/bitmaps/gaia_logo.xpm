@@ -1,5 +1,5 @@
 /* XPM */
-static char *gaia_logo_xpm[] = {
+static const char *gaia_logo_xpm[] = {
 /* width height num_colors chars_per_pixel */
 "   422    72      253            2",
 /* colors */
