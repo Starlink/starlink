@@ -2959,6 +2959,9 @@
         I_XBASE_1D = I_BGM_RBIN / 2.0
         I_XSCALE_1D = I_BGM_RBIN
         I_XWID_1D = I_BGM_RBIN
+        CALL ARR_REG1R(I_XBASE_1D,I_XSCALE_1D,I_N_1D,%VAL(I_APTR_1D),
+     :                                                        STATUS)
+        CALL ARR_INIT1R( I_XWID_1D, I_N_1D, %VAL(I_WPTR_1D), STATUS )
 
 *    Copy sample data to 1-D data, errors to variance
         CALL ARR_COP1R( I_BGM_NSAMP, SAMM, %VAL(I_DPTR_1D), STATUS )
@@ -3276,7 +3279,11 @@ c            PFAIL = 0
 c            CALL PDA_DPLINT( NGS, PFX, PFY, WRKC, PFAIL )
 
 *        Choose degree
-            DEG = 4
+            IF ( NGS .GT. 10 ) THEN
+              DEG = 6
+            ELSE
+              DEG = 4
+            END IF
 
 *        Compute coefficients
             CALL MATH_POLY( .TRUE., NGS*2, PFX(1-NGS), .FALSE., 0,
