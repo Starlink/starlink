@@ -210,6 +210,21 @@ DTD which documents routines, specialised to Fortran and DSSSL code.
 actually <em/using/ the headers by (partially) documenting the DSSSL
 stylesheet code this way.
 
+<p>Weaknesses: the section numbering of the
+<code>&lt;codecollection></code> elements is wrong -- this will
+probably need some substantial rewriting of the
+<code>(make-section-reference)</code> function to fix.
+
+<subsubsect id=maths>Incorporating maths
+
+<p>Here is some maths.  Inline: <m/E=mc^2/ and displayed:
+<meqnarray>
+I(s(t),\phi(t)) &=&amp \int_0^\infty I(r)\tilde A_I(r;s,\phi)\ddd r,\qquad
+	\qquad\tilde A_I=r\int_0^{2\pi} A(r,\chi;s,\phi)\ddd \chi \\
+Q(s(t),\phi(t)) &=& \int_0^\infty P(r)\tilde A_Q(r;s,\phi)\ddd r,\qquad
+	\qquad\tilde A_Q=-r\int_0^{2\pi} \cos2\chi A(r,\chi;s,\phi)\ddd\chi
+</meqnarray>.
+
 
 <subsect id=nextver>For the future
 
