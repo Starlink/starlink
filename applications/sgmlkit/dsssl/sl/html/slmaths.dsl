@@ -1,9 +1,9 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
+  <!entity slparams.dsl		system "slparams.dsl">
   <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
-  <!entity slnavig.dsl		system "slnavig.dsl" subdoc>
   <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
 ]>
-<![ ignore [ $Id$ ]]>
+<!-- $Id$ -->
 
 <docblock>
 <title>Maths in the Starlink DTD
@@ -402,18 +402,12 @@ the file doesn't exist) then signal an error.
 <title>Library code
 <description>Required for various functions
 
-<codereference doc="slnavig.dsl" id=code.navig>
-<title>Navigation code
-<description>
-Code to support the generation of HTML filenames, and the
-links which navigate between documents
-
 <codereference doc="common.dsl" id="code.common">
 <title>Common code
 <description>
 <p>Code which is common to both the HTML and print stylesheets.
 
-<codegroup use="code.maths.img code.lib code.common code.navig" id=maths.main>
+<codegroup use="code.maths.img code.lib code.common" id=maths.main>
 <title>Extract document maths
 <description>This codegroup is used as a standalone stylesheet, to extract
 the maths from a document without doing any further processing.
@@ -424,10 +418,14 @@ Declare the Jade Transform extensions.
 <codebody>
 (declare-flow-object-class element
   "UNREGISTERED::James Clark//Flow Object Class::element")
+(declare-flow-object-class empty-element
+  "UNREGISTERED::James Clark//Flow Object Class::empty-element")
 (declare-flow-object-class entity
   "UNREGISTERED::James Clark//Flow Object Class::entity")
 (declare-flow-object-class formatting-instruction
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
+
+&slparams.dsl;
 
 <misccode>
 <description>

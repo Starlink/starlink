@@ -1,5 +1,7 @@
+<![ ignore [
+
 <!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<![ ignore [ $Id$]]>
+<!-- $Id$ -->
 
 <docblock>
 <title>HTML-specific support
@@ -20,6 +22,8 @@ Council.
 
 <codegroup id=code.html>
 <title>HTML-specific support
+
+]]>
 
 <func>
 <routinename>html-document

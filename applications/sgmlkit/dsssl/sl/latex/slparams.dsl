@@ -1,25 +1,26 @@
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
+<!-- 
+  $Id$
 
-<![ ignore [ $Id$ ]]>
 
-<docblock>
-<title>LaTeX stylesheet configuration parameters
+  This file collects together parameters which control various
+  aspects of the generation of LaTeX.  All the things documented as
+  `functions' below are really parameters.
 
-<codegroup id=code.params>
-<title>LaTeX stylesheet parameters
-<description>
-This collects together parameters which control various aspects of the 
-generation of LaTeX.  All the things documented as
-`functions' below are really parameters.
+  Note that a feature of Jade is that if the argument <code/-V
+  variable/ is given on the command line, then that variable is set to
+  <code/#t/, overriding any setting within the stylesheet.  The
+  parameters which are described as `boolean' below can be set in this
+  way.
 
-<p>Note that a feature of Jade is that if the argument <code/-V
-variable/ is given on the command line, then that variable is set to
-<code/#t/, overriding any setting within the stylesheet.
+  If you want to change any other parameters, then make a copy of this
+  file called, say, params-mod.dsl, modify it to suit your needs, and
+  create a catalogue file in the same directory which has an line like:
 
-<authorlist>
-<author id=ng affiliation='Glasgow'>Norman Gray
+    system "sl-latex-parameters" "params-mod.dsl"
 
-<copyright>Copyright 1999, Particle Physics and Astronomy Research Council
+  Then adjust your $SGML_CATALOG_FILES environment variable to put
+  this catalogue file early in the path.
+-->
 
 <func>
 <routinename>%latex-document-class%
@@ -29,6 +30,17 @@ variable/ is given on the command line, then that variable is set to
 <codebody>
 (define %latex-document-class%
   (list "?twoside,11pt,a4paper" "article"))
+
+<func>
+<routinename>show-element-ids
+<description>
+If true, then display exported IDs in section (etc) titles.  This is
+useful for preparing a version of a document which you refer to while
+working on it, or another which refers to it often.
+<returnvalue type=boolean>
+<argumentlist none>
+<codebody>
+(define show-element-ids #f)
 
 <func>
 <routinename>%latex-document-preamble%
@@ -196,5 +208,23 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
        \\@input{\\jobname.lot}}%
     \\clearpage  % flush pages
     }}
+% replace \\caption, and hence table/figure counter and assoc mechanisms
+\\def\\Caption#1#2{\\expandafter\\def\\csname fnum@\\@captype\\endcsname{#1}%
+  \\expandafter\\def\\csname the\\@captype\\endcsname{#2}%
+  \\@dblarg{\\@caption\\@captype}}
+%\\catcode`\\^^M=10 % make end-of-line a space
 \\makeatother
 ")
+
+<func>
+<routinename>%latex-manifest%
+<description>
+If not '#f' then the list of LaTeX files created by the
+stylesheet will be written to the file named by '%latex-manifest%'.
+<returnvalue type=string>Manifest filename
+<argumentlist none>
+<codebody>
+(define %latex-manifest%
+	"LaTeX.manifest"
+	)
+

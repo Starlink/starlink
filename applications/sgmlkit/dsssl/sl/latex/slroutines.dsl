@@ -17,10 +17,13 @@ $Id$
 <description>Constructors for the ROUTINELIST element (LaTeX)
 <codebody>
 (mode section-reference
+  ;;(element routinelist
+  ;;  (make-section-reference title: (literal "Routine list")))
   (element routinelist
-    (make-section-reference title: (literal "Routine list")))
+    (literal "Routine list"))
   (element codecollection
     (make-section-reference
+     set-prefix: (literal (number->string (child-number)) " ")
      title: (with-mode routine-ref-get-reference
 	      (process-codecollection (attribute-string (normalize "doc")))))))
 

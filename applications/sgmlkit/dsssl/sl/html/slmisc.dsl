@@ -15,23 +15,11 @@ $Id$
 
 <misccode>
 <description>
-Miscellaneous constructors
-
-This file contains constructors which don't really fit in anywhere
-else.  They're not necessarily unimportant, just simple enough not
-to need explanation or elaboration.
-
-This file forms the effective body of sl.dsl, the main DSSSL stylesheet.
-
+Support figures and figurecontent
 <codebody>
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Figures and tables
-;;;
 (element figure
   (let* ((caption-details (get-caption-details (current-node)))
-	 (caption-id (cadr caption-details)))
+	 (caption-id (caddr caption-details)))
     (make element gi: "table"
 	  attributes: '(("align" "center") ("border" "1"))
       (make element gi: "tr"
@@ -48,27 +36,19 @@ This file forms the effective body of sl.dsl, the main DSSSL stylesheet.
 					  (string-append "xref_" caption-id)))
 			      (literal (car caption-details)))
 			(literal (car caption-details)))
+		    (if show-element-ids
+			(literal (display-element-ids (current-node)))
+			(empty-sosofo))
 		    (literal ": ")
 		    (process-matching-children 'caption)))))))
-; (element figure
-;   (let* ((caption-details (get-caption-details (current-node)))
-; 	 (caption-id (cadr caption-details)))
-;     (make sequence
-;       (make element gi: "div"
-; 	    attributes: '(("align" "center"))
-; 	    (process-matching-children 'figurecontent))
-;       (make element gi: "blockquote"
-; 	    (make element gi: "p"
-; 		  (if caption-id
-; 		      (make element gi: "a"
-; 			    attributes: (list (list "name" caption-id))
-; 			    (literal (car caption-details)))
-; 		      (literal (car caption-details))))
-; 	    (process-matching-children 'caption)))))
 
 (element caption
   (process-children))
 
+;; If the `image' attribute is not present, then the figure content is
+;; given as the element content.
+;; Changes here might need matching changes in 
+;; mode make-manifest-mode in sl.dsl.
 (element figurecontent
   (let* ((alt-text (attribute-string (normalize "alt")
 				     (current-node)))
@@ -85,11 +65,14 @@ This file forms the effective body of sl.dsl, the main DSSSL stylesheet.
 	    (error "No suitable entity in figurecontent"))
 	(process-children))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; The rest of this file consists of the constructors for miscellaneous 
-;;; elements which don't need much in the way of fancy processing.
 
+<misccode>
+<description>
+Miscellaneous constructors.  These are constructors which don't really fit
+in anywhere else.  They're not necessarily unimportant, just simple enough not
+to need explanation or elaboration.
+
+<codebody>
 ;;; Phrase markup
 
 (element code

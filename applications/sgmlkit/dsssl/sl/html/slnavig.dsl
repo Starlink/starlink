@@ -1,3 +1,4 @@
+<![ ignore [
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
 <!-- $Id$ -->
 
@@ -20,6 +21,7 @@ DocBook stylesheet.
 
 <codegroup>
 <title>HTML navigation
+]]>
 
 <misccode>
 <description>

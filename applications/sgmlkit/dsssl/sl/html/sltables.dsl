@@ -1,5 +1,6 @@
+<![ ignore [
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<![ ignore [ $Id$ ]]>
+<!-- $Id$ -->
 
 <docblock>
 <title>HTML Tables
@@ -24,13 +25,14 @@ a required CAPTION; add implied ID and EXPORT attributes to the TABLE.
 <description>I've aimed to support all of the <em/structure/ of this table
 model below, but not necessarily to support all of the attributes at
 first.
+]]>
 
 <misccode>
 <description>All the flow-object constructors
 <codebody>
 (element table
   (let* ((caption-details (get-caption-details (current-node)))
-	 (caption-id (cadr caption-details)))
+	 (caption-id (caddr caption-details)))
     (make sequence
       (make element gi: "table"
 	    attributes: '(("border" "1"))
@@ -43,11 +45,11 @@ first.
 			    (list (list "name"
 					(string-append "xref_" caption-id)))
 			    (literal (car caption-details)))
-		      (literal (car caption-details))))
+		      (literal (car caption-details)))
+		  (if show-element-ids
+		      (literal (display-element-ids (current-node)))
+		      (empty-sosofo)))
 	    (process-matching-children 'caption)))))
-
-(element caption
-  (process-children))
 
 (element tgroup
   (make sequence

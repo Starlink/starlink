@@ -19,7 +19,13 @@ then generates an HTML file
   (make sequence
     (if stream-output			; no info if output to stdout
 	(empty-sosofo)
-	(literal (string-append (root-file-name) ":")))
+	(let ((extlist (if %link-extension-list%
+			   (apply string-append
+				  (map (lambda (l)
+					 (string-append (car l) " "))
+				       %link-extension-list%))
+			   "")))
+	  (literal (string-append (root-file-name) ":" extlist ":"))))
     (html-document
      (process-node-list (getdocinfo 'title))
      (process-matching-children 'docbody))))
@@ -99,6 +105,8 @@ are shown at the top of the document.
 	 (vers (car (cdr (cdr (cdr rel)))))
 	 (date (format-date (car (cdr rel))))
 	 (docref (getdocnumber))
+	 (copyright (getdocinfo 'copyright))
+	 (coverimage (getdocinfo 'coverimage))
 	 )
     (make sequence
       (make element gi: "TABLE"
@@ -160,7 +168,54 @@ are shown at the top of the document.
 			      (make element gi: "SMALL"
 				    %starlink-banner%)))
 		  (empty-sosofo))))
-      (process-children))))
+      (if coverimage
+	  (make element gi: "table"
+		attributes: '(("width" "100%"))
+		(make element gi: "tr"
+		      (make element gi: "td"
+			    attributes: '(("align" "center"))
+			    (process-node-list (children coverimage)))))
+	  (empty-sosofo))
+      (process-children)
+      (if copyright
+	  (make element gi: "p"
+		(process-node-list copyright))
+	  (empty-sosofo))
+      (if %link-extension-list%
+	  (make element gi: "p"
+		(literal "Printable version: ")
+		(apply sosofo-append
+		       (map (lambda (l)
+			      (make sequence
+				(make element gi: "a"
+				      attributes: (list (list "href"
+							      (string-append
+							       (root-file-name)
+							       "." (car l)))
+							(list "title"
+							      (cdr l)))
+				      (literal (cdr l)))
+				(literal " ")))
+			    %link-extension-list%))
+;		(let loop ((l %link-extension-list%)
+;			   (res (empty-sosofo))
+;			   (conn (empty-sosofo)))
+;		  (if (null? l)
+;		      res
+;		      (loop (cdr l)
+;			    (sosofo-append res
+;					   conn
+;					   (make element gi: "a" attributes:
+;						 (list (list "href"
+;							     (string-append
+;							      (file-name-root)
+;							      "." (caar l)))
+;						       (list "title"
+;							     (cdar l)))
+;						 (literal (cdar l))))
+;			    (literal ", "))))
+)
+	  (empty-sosofo)))))
 
 (element abstract
   (make sequence

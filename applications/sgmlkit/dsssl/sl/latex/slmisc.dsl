@@ -16,19 +16,10 @@ $Id$
 
 <misccode>
 <description>
-This file contains constructors which don't really fit in anywhere
-else.  They're not necessarily unimportant, just simple enough not
-to need explanation or elaboration.
-
-This file forms much of the effective body of sl.dsl, 
-the main DSSSL stylesheet for the LaTeX stylesheet.
-
+Support figures and figurecontent.
+Changes here might need matching changes in
+mode make-manifest-mode in sl.dsl.
 <codebody>
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Figures and tables
-;;;
 (element figure
   (make environment name: "figure"
 	(process-matching-children 'figurecontent)
@@ -39,9 +30,13 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
 	;; optional argument of caption command mustn't be more than
 	;; a para.
 	(firstpara (node-list-first (children (current-node)))))
-    (make command name: "caption"
-	  parameters: (list (string-append "?" (data firstpara)))
-	  (literal (string-append (car caption-details) ": "))
+    (make command name: "Caption"
+	  parameters: (list (string-append (car caption-details)
+					   (if show-element-ids
+					       (display-element-ids)
+					       ""))
+			    (cadr caption-details)
+			    (string-append "?" (data firstpara)))
 	  (process-children))))
 
 (element figurecontent
@@ -57,11 +52,13 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
 	    (error "No suitable entity in figurecontent"))
 	(process-children))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; The rest of this file consists of the constructors for miscellaneous 
-;;; elements which don't need much in the way of fancy processing.
+<misccode>
+<description>
+Miscellaneous constructors.  These are constructors which don't really fit
+in anywhere else.  They're not necessarily unimportant, just simple enough not
+to need explanation or elaboration.
 
+<codebody>
 ;;; Phrase markup
 
 (element code

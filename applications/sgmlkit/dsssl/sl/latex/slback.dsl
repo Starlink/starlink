@@ -1,6 +1,7 @@
 <!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
   <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
   <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
+  <!entity params.dsl		system "sl-html-parameters">
 ]>
 <!-- $Id$ -->
 
@@ -29,20 +30,29 @@ in a separate Jade pass.
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
 
 <misccode>
-<description>Support backmatter elements
+<description>
+Support backmatter elements.
 <codebody>
+
+(element backmatter
+  (make sequence
+    ;;(make command name: "section"
+    ;;  (literal "Notes, etc"))
+    (make-bibliography)
+    (make-updatelist)))
 
 (mode section-reference
   (element backmatter
     (make-section-reference title: (literal "Notes, etc..."))))
 
+<misccode>
+<description>
+Support notes very simply as footnotes.  Don't put them in the backmatter
+in fact
+<codebody>
 (element note
   (make command name: "footnote"
 	(process-children)))
-;; do nothing with the notecontents element -- the NOTE element produces
-;; footnotes rather than endnotes
-(element notecontents
-  (empty-sosofo))
 
 <misccode>
 <description>
@@ -57,20 +67,93 @@ Jade pass.
     (process-children)
     (literal "]")))
 
-(element bibliography
-  (let ((bibcontents (read-entity (string-append (root-file-name)
-						 ".latexbib.bbl"))))
+(define (make-bibliography)
+  (let* ((hasbib? (attribute-string (normalize "bibliography")
+				    (getdocbody 'backmatter)))
+	 (bibcontents (and hasbib?
+			   (read-entity (string-append (root-file-name)
+						       ".latexbib.bbl")))))
     (if bibcontents
 	(make sequence
-	  ($latex-section$ "section"
-			   children: #f	;no children to process
-			   )
+	  (make empty-command name: "section"
+		parameters: '("Bibliography"))
 	  (make fi data: bibcontents))
-	(literal "No bibliography found"))))
+	(empty-sosofo))))
 
-(mode section-reference
-  (element bibliography
-    (make-section-reference title: (literal "Bibliography"))))
+<misccode>
+<description>
+Process the history element in the docbody.  Present it in reverse order
+(ie, newest first), including in the distribution and change elements any
+update elements which refer to them.
+<codebody>
+(define (make-updatelist)
+  (make sequence
+    (make empty-command name: "section"
+	  parameters: '("Change history"))
+    (with-mode extract-updatelist
+      (process-node-list (getdocinfo 'history)))))
+
+
+(mode extract-updatelist
+  (element history
+      (node-list-reduce (children (current-node))
+			(lambda (last el)
+			  (sosofo-append (process-node-list el)
+					 last))
+			(empty-sosofo)))
+  (element version
+    (make sequence
+      (make command name: "subsection*"
+	    (literal "Version " (attribute-string (normalize "number"))))
+      (make paragraph
+	    (process-node-list (element-with-id
+				(attribute-string (normalize "author"))))
+	    (literal ", "
+		     (format-date (attribute-string (normalize "date")))))))
+  (element distribution
+    (collect-updates (literal "Distribution "
+			      (attribute-string (normalize "string")))))
+  (element change
+    (collect-updates (literal
+		      "Change "
+		      (format-date (attribute-string (normalize "date"))))))
+  (element update
+    (make sequence
+      (make empty-command name: "item")
+      (make environment brackets: '("[" "]")
+	    (let ((linktarget (ancestor-member (current-node)
+					       (target-element-list))))
+	      (with-mode section-reference
+		(process-node-list linktarget))))
+      (process-children)))
+  )
+
+(define (collect-updates title)
+  (let* ((allupdates (get-updates))
+	 (myvid (attribute-string (normalize "versionid")))
+	 (selupdates (and myvid
+			  (node-list-or-false
+			   (select-elements
+			    allupdates
+			    (list (normalize "update")
+				  (list (normalize "versionid")
+					myvid)))))))
+    (make sequence
+      (make command name: "subsection*"
+	    title)
+      (make paragraph
+	    (process-node-list (element-with-id
+				(attribute-string (normalize "author"))))
+	    (literal ", "
+		     (format-date (attribute-string (normalize "date")))))
+      (process-children)
+      (if selupdates
+	  (make environment name: "description"
+		(process-node-list selupdates))
+	  (empty-sosofo)))))
+
+(element update				; ignore in default mode
+  (empty-sosofo))
 
 
 <codereference doc="lib.dsl" id="code.lib">
@@ -99,9 +182,12 @@ by BibTeX.
   "UNREGISTERED::James Clark//Flow Object Class::entity")
 (declare-flow-object-class fi
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
-(define debug
-  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
+;;(define debug
+;;  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
 
+
+;; Read in the parameter file
+&params.dsl;
 
 (root
     (make sequence
@@ -111,7 +197,10 @@ by BibTeX.
 (define (get-bibliography)
   (let* ((kids (select-by-class (descendants (document-element)) 'element))
 	 (citations (select-elements kids (normalize "citation")))
-	 (bibelement (select-elements kids (normalize "bibliography"))))
+	 ;;(bibelement (select-elements kids (normalize "bibliography")))
+	 (bibname (attribute-string (normalize "bibliography")
+				    (getdocbody 'backmatter)))
+	 )
     (if (node-list-empty? citations)
 	(empty-sosofo)
 	(make entity system-id: (string-append (root-file-name)
@@ -119,24 +208,17 @@ by BibTeX.
 	      (make fi data: "\\relax
 ")
 	      (process-node-list citations)
-	      (if (node-list-empty? bibelement)
-		  (error "Citations but no BIBLIOGRAPHY in document")
-		  (process-node-list bibelement))))))
+	      (if bibname
+		  (make fi data: (string-append "\\bibdata{" bibname "}
+\\bibstyle{plainlatex}
+"))
+		  (error "Citations but no BIBLIOGRAPHY in document"))
+	      ;;(if (node-list-empty? bibelement)
+	      ;;  (error "Citations but no BIBLIOGRAPHY in document")
+	      ;;  (process-node-list bibelement))
+	      ))))
 
 (element citation
   (make fi data: (string-append "\\citation{" (trim-data (current-node)) "}
 ")))
 
-(element bibliography
-  (let ((citeall (attribute-string "ALL" (current-node))))
-  (make sequence
-    (if citeall
-	(make fi data: "\\citation{*}
-")
-	(empty-sosofo))
-    (make fi data: (string-append "\\bibdata{"
-				  (attribute-string "BIB" (current-node))
-				  "}
-"))
-    (make fi data: "\\bibstyle{plainlatex}
-"))))

@@ -1,53 +1,54 @@
-<!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
+<!-- 
+  $Id$
 
-<![ ignore [ $Id$ ]]>
 
-<docblock>
-<title>HTML stylesheet parameters
+  This file collects together parameters which control various
+  aspects of the generation of HTML.  All the things documented as
+  `functions' below are really parameters.
 
-<codegroup id=code.params>
-<title>HTML stylesheet parameters
-<description>
-<p>This file collects together parameters which control various
-aspects of the generation of HTML.  All the things documented as
-`functions' below are really parameters.
+  Note that a feature of Jade is that if the argument <code/-V
+  variable/ is given on the command line, then that variable is set to
+  <code/#t/, overriding any setting within the stylesheet.  The
+  parameters which are described as `boolean' below can be set in this
+  way.
 
-<p>Note that a feature of Jade is that if the argument <code/-V
-variable/ is given on the command line, then that variable is set to
-<code/#t/, overriding any setting within the stylesheet.
+  If you want to change any other parameters, then make a copy of this
+  file called, say, params-mod.dsl, modify it to suit your needs, and
+  create a catalogue file in the same directory which has an line like:
 
-<authorlist>
-<author id=ng affiliation='Glasgow'>Norman Gray
+    system "sl-html-parameters" "params-mod.dsl"
 
-<copyright>Copyright 1999, Particle Physics and Astronomy Research Council
+  Then adjust your $SGML_CATALOG_FILES environment variable to put
+  this catalogue file early in the path.
+-->
 
 
 <func>
 <routinename>%html-pubid%
 <description>
-<p>The public ID of the HTML this output is claimed to be conformant with</p>
+The public ID of the HTML this output is claimed to be conformant with
 <returnvalue type=string>
 <argumentlist none>
 <codebody>
-(define %html-pubid%
-  "-//W3C//DTD HTML 3.2 Final//EN")
+(define %html-pubid% "-//W3C//DTD HTML 3.2 Final//EN")
 
 
 <func>
 <routinename>%body-attr%
-<description><P>The attributes added to the HTML body, controlling
-text colour, and the like.
+<description>
+The attributes added to the HTML body, controlling text colour, and the like.
 <returnvalue type=list>
 <argumentlist none>
 <codebody>
 (define %body-attr%
-  (list (list "bgcolor" "#FFFFFF")
-	(list "text" "#000000")))
+  '(("bgcolor" "#FFFFFF")
+    ("text"    "#000000")))
 
 
 <func>
 <routinename>%html-manifest%
-<description><p>If not '#f' then the list of HTML files created by the
+<description>
+If not '#f' then the list of HTML files created by the
 stylesheet will be written to the file named by '%html-manifest%'.
 <returnvalue type=string>Manifest filename
 <argumentlist none>
@@ -58,7 +59,7 @@ stylesheet will be written to the file named by '%html-manifest%'.
 
 <func>
 <routinename>nochunks
-<description><p>
+<description>
 If true, the entire source document is formatted as a single HTML
 document.
 (This option can conveniently be set with <code/-V nochunks/ on the 
@@ -91,105 +92,56 @@ HyTime A.6.1, for example, or
 (define stream-output #f)
 
 <func>
+<routinename>%html-ext%
+<description>
+Extension for HTML files
+<returnvalue type=string>
+<argumentlist none>
+<codebody>
+(define %html-ext% ".html")
+
+<func>
+<routinename>%nav-header-table-attr%
+<description>
+The attributes added to the navigation header table
+<returnvalue type='list of lists of strings'>
+<argumentlist none>
+<codebody>
+(define %nav-header-table-attr%
+  '(("BGCOLOR" "#FFFF99")
+    ("WIDTH" "100%")
+    ("BORDER" "0")))
+
+<func>
+<routinename>%nav-footer-table-attr%
+<description>
+The attributes added to the navigation footer table
+<returnvalue type='list of lists of strings'>
+<argumentlist none>
+<codebody>
+(define %nav-footer-table-attr%
+  '(("BGCOLOR" "#FFFF99")
+    ("WIDTH" "100%")
+    ("BORDER" "0")))
+
+<func>
 <routinename>suppress-banner
 <description>If true, then suppress the production of the banner, even when
   <code/%starlink-banner%/ is true.  Can be conveniently set using Jade, with
   the option <code/-V suppress-banner/.
-<returnvalue>True if the banner is <em/not/ to be printed.
+<returnvalue type=boolean>True if the banner is <em/not/ to be printed.
 <argumentlist none>
 <codebody>
 (define suppress-banner #f)
 
-<misccode>
-<description><p>The rest of the parameters in this group are
-miscellaneous tweaking parameters, which don't need much extra
-documentation
+<func>
+<routinename>%starlink-banner%
+<description>
+Return a sosofo which produces the Starlink/CCLRC/RAL/PPARC banner,
+or false if none is to be produced.  See also (suppress-banner).
+<returnvalue type=sosofo>
+<argumentlist none>
 <codebody>
-(define %html-ext%
-  ;; extension for HTML files
-  ".html")
-
-(define %use-id-as-filename%
-  #f)
-
-(define %nav-header-table-attr%
-  ;; The attributes added to the navigation header table
-  (list ;(list "BGCOLOR" "#CCCCFF")
-        (list "BGCOLOR" "#FFFF99")
-	(list "WIDTH" "100%")
-	(list "BORDER" "0")))
-
-(define %nav-footer-table-attr%
-  ;; The attributes added to the navigation footer table
-  (list ;(list "BGCOLOR" "#CCCCFF")
-	(list "BGCOLOR" "#FFFF99")
-	(list "WIDTH" "100%")
-	(list "BORDER" "0")))
-
-
-
-(define %link-mailto-url%
-  ;; REFENTRY htp-link-mailto-url
-  ;; PURP Mailto URL for LINK REL=made
-  ;; DESC
-  ;; If not '#f', the '%link-mailto-url%' address will be used in a 
-  ;; LINK REL=made element in the HTML HEAD.
-  ;; /DESC
-  ;; AUTHOR N/A
-  ;; /REFENTRY
-  #f)
-
-(define %html-header-tags% 
-  ;; REFENTRY htp-html-header-tags
-  ;; PURP What additional HEAD tags should be generated?
-  ;; DESC
-  ;; A list of the the HTML HEAD tags that should be generated.
-  ;; The format is a list of lists, each interior list consists
-  ;; of a tag name and a set of attribute/value pairs:
-  ;; '(("META" ("NAME" "name") ("CONTENT" "content")))
-  ;; /DESC
-  ;; AUTHOR N/A
-  ;; /REFENTRY
-  '())
-
-(define %stylesheet%
-  ;; REFENTRY htp-stylesheet
-  ;; PURP Name of the stylesheet to use
-  ;; DESC
-  ;; The name of the stylesheet to place in the HTML LINK TAG, or '#f' to
-  ;; suppress the stylesheet LINK.
-  ;; /DESC
-  ;; AUTHOR N/A
-  ;; /REFENTRY
-  #f)
-
-;;; Effectively always true!
-;(define %gentext-nav-use-tables%
-;  ;; REFENTRY htp-gentext-nav-use-tables
-;  ;; PURP Use tables to build the navigation headers and footers?
-;  ;; DESC
-;  ;; If true, HTML TABLEs will be used to format the header and footer
-;  ;; navigation information.
-;  ;; /DESC
-;  ;; AUTHOR N/A
-;  ;; /REFENTRY
-;  #t)
-
-;; If so, how wide do you want them to be?
-(define %gentext-nav-tblwidth% 
-  ;; REFENTRY htp-gentext-nav-tblwidth
-  ;; PURP If using tables for navigation, how wide should the tables be?
-  ;; DESC
-  ;; If tables are used for navigation (see '%gentext-nav-use-tables%'),
-  ;; how wide should the tables be?
-  ;; /DESC
-  ;; AUTHOR N/A
-  ;; /REFENTRY
-  "100%")
-
-
-;; Return a sosofo which produces the Starlink/CCLRC/RAL/PPARC banner,
-;; or false if none is to be produced.  See also (suppress-banner).
 (define %starlink-banner%
   (make sequence
     (make element gi: "A"
@@ -209,13 +161,45 @@ documentation
 	  (literal "PPARC"))
     ))
 
-;; Return a string which locates the remote document server.  This is
-;; prefixed to URLs generated by (href-to)
-;(define %starlink-document-server%
-;  "file:///star/docs/")
-;(define %starlink-document-server%
-;  "http://www.astro.gla.ac.uk/users/norman/star/testdocs/")
+<func>
+<routinename>%starlink-document-server%
+<description>
+Return a string which locates the remote document server.  This is
+prefixed to URLs generated by (href-to)
+<p>An alternative might be <code>"file:///star/docs/"</code>
+<returnvalue type=string>
+<argumentlist none>
+<codebody>
 (define %starlink-document-server%
   "http://star-www.rl.ac.uk/star/docs/")
-</codebody>
-</misccode>
+
+<func>
+<routinename>show-element-ids
+<description>
+If true, then display exported IDs in section (etc) titles.  This is
+useful for preparing a version of a document which you refer to while
+working on it, or another which refers to it often.
+<returnvalue type=boolean>
+<argumentlist none>
+<codebody>
+(define show-element-ids #f)
+
+<misccode>
+<description>
+The following attributes are not supported, and may disappear without
+  warning.
+<codebody>
+(define %use-id-as-filename%
+  #f)
+
+<func>
+<routinename>%link-extension-list%
+<description>
+If not false, this specifies which output files are to have links generated
+for them.
+<returnvalue type='list of pairs of strings'>Each pair consists of a 
+  file extension and a legend.  If <code/#f/, nothing is to be produced.
+<argumentlist none>
+<codebody>
+(define %link-extension-list%
+  '(("tex" . "LaTeX") ("ps.gz" . "Compressed postscript")))

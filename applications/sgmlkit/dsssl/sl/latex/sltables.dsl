@@ -1,6 +1,6 @@
-<!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<![ ignore [ $Id$ ]]>
+<!-- $Id$ -->
 
+<!--
 <docblock>
 <title>LaTeX Tables
 <description>The Starlink General DTD uses the OASIS Exchange Table
@@ -25,6 +25,7 @@ extend the table entry model to include phrase markup.
 <description>I've aimed to support all of the <em/structure/ of this table
 model below, but not necessarily to support all of the attributes at
 first.
+-->
 
 <misccode>
 <description>All the flow-object constructors
@@ -34,12 +35,13 @@ first.
 	(process-matching-children 'tgroup)
 	(process-matching-children 'caption)))
 
-(element caption
-  (let* ((caption-details (get-caption-details (parent (current-node)))))
-    (make command name: "caption"
-	  parameters: '("?")		; empty [] to suppress LOF entry
-	  (literal (string-append (car caption-details) ": "))
-	  (process-children))))
+;; caption dealt with in slmisc.dsl
+;;(element caption
+;;  (let* ((caption-details (get-caption-details (parent (current-node)))))
+;;    (make command name: "caption"
+;;	  parameters: '("?")		; empty [] to suppress LOF entry
+;;	  (literal (string-append (car caption-details) ": "))
+;;	  (process-children))))
 
 (element tgroup
   (let* ((colno (table-colno))

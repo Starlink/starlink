@@ -1,3 +1,4 @@
+<![ ignore [
 <!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
 <!-- $Id$ -->
 
@@ -18,6 +19,8 @@ ignore the HyTime attributes!
 <codegroup id='code.links'>
 <title>Support cross references
 
+]]>
+
 <misccode>
 <description>
 <p>REF is a simple reference to another element in the same document.
@@ -28,10 +31,11 @@ calling <funcname/make-section-reference/; otherwise, process the
 target in mode <code/section-reference/.
 <codebody>
 (element ref
-  (let ((target (element-with-id (attribute-string (normalize "id")
-						   (current-node))))
-	(linktext (attribute-string (normalize "text")
-				    (current-node))))
+  (let* ((target-id (attribute-string (normalize "id")
+				      (current-node)))
+	 (target (element-with-id target-id))
+	 (linktext (attribute-string (normalize "text")
+				     (current-node))))
     (if (member (gi target) (target-element-list))
 	(make element
 	  gi: "A"
@@ -46,8 +50,8 @@ target in mode <code/section-reference/.
 		    (process-node-list target))))
 	  )
 	(error (string-append
-	     "The stylesheet is presently unable to link to elements of type "
-	          (gi target))))))
+		"stylesheet can't link to ID " target-id " of type "
+		(gi target))))))
 
 <misccode>
 <description>The <code/docxref/ element has a required attribute
@@ -79,7 +83,7 @@ it produces an <funcname/error/.
 	 ;; attribute LOC is implied or the document doesn't have such
 	 ;; an ID
 	 (xreftarget (and xrefid
-			  (non-empty-nl (element-with-id xrefid docelem))))
+			  (node-list-or-false (element-with-id xrefid docelem))))
 	 (xrefurl (and xreftarget
 		       (get-link-policy-target xreftarget))))
     (if (string=? (gi docelem)
@@ -111,12 +115,6 @@ it produces an <funcname/error/.
 	(error (string-append "DOCXREF target " xrefent
 			      " has document type " (gi docelem)
 			      ": expected DOCUMENTSUMMARY")))))
-
-;; Return nl if it is a non-empty node-list, otherwise #f
-(define (non-empty-nl nl)
-  (if (node-list-empty? nl)
-      #f
-      nl))
 
 (mode mk-docxref
   (element documentsummary

@@ -1,6 +1,6 @@
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
 <!-- $Id$ -->
 
+<!--
 <docblock>
 <title>Inter- and Intra-document cross references for LaTeX
 <description>
@@ -17,6 +17,7 @@ ignore the HyTime attributes!
 
 <codegroup id='code.links'>
 <title>Support cross references
+-->
 
 <misccode>
 <description>REF is a simple reference to another element in the same document.
@@ -76,7 +77,7 @@ it produces an <funcname/error/.
 	 ;; attribute LOC is implied or the document doesn't have such
 	 ;; an ID
 	 (xreftarget (and xrefid
-			  (non-empty-nl (element-with-id xrefid
+			  (node-list-or-false (element-with-id xrefid
 							 docelem))))
 	 (xrefurl (and xreftarget
 		       (get-link-policy-target xreftarget no-urls: #t))))
@@ -104,12 +105,6 @@ it produces an <funcname/error/.
 ;; of %starlink-document-server% and the function href-to
 (define %starlink-document-server% #t)
 (define href-to (lambda (#!rest x) #t))
-
-;; Return nl if it is a non-empty node-list, otherwise #f
-(define (non-empty-nl nl)
-  (if (node-list-empty? nl)
-      #f
-      nl))
 
 (mode mk-docxref
   (element documentsummary
