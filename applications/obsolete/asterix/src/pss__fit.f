@@ -1241,7 +1241,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       END
 
 *+  PSS_FIT_GENMODEL - Produce predicted data given model parameters
-      SUBROUTINE PSS_FIT_GENMODEL( FSTAT, NDS, IPRED, IMOD,
+      SUBROUTINE PSS_FIT_GENMODEL( FSTAT, NDS, IMOD,
      :                             PARAM, N, PRED, STATUS )
 *
 *    Description :
@@ -1282,7 +1282,7 @@ c     RECORD /DATASET/        OBDAT(NDS)                    ! Supplied by
 c     RECORD /INSTR_RESP/     INSTR(NDS)                    ! fitting. Not
 c     RECORD /MODEL_SPEC/     MODEL                         ! used here...
 c     RECORD /PREDICTION/     PREDDAT                       ! Data predicted
-      INTEGER		      IMOD, IPRED
+      INTEGER		      IMOD
       REAL                    PARAM(*)                      ! Fit parameters
       INTEGER                 N                             ! Dataset number
 *
