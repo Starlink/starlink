@@ -32,11 +32,17 @@ Council for the Central Laboratory of the Research Councils
 (define debug
   (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
 
-;; language objects available only in OpenJade
+;; Language objects are available only in OpenJade.
 ;; See http://sources.redhat.com/ml/dssslist/2002-03/msg00007.html
+;; Uses POSIX locales, but there's no apparent way of getting the default
+;; or, say, POSIX locale.
+;; See http://openjade.sourceforge.net/jadedoc-1.3/index.htm#extensions
+;; Using (define-language ...) would presumably be useful, but the
+;; documentation makes it sound very hard.....
 (define language
   (external-procedure "UNREGISTERED::OpenJade//Procedure::language"))
-(declare-default-language (language 'en 'us))
+(declare-default-language (or (language 'en 'gb)
+                              (language 'en 'us)))
 
 
 
