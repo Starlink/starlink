@@ -1,0 +1,9 @@
+1 Star2HTML_update
+
+ Star2HTML, the Starlink internal document hypertext support package,
+ has been updated so that all document cross references now point at
+ the RAL central service. You will need to run the hypertext linker
+ hlink to restore the old behaviour of pointing at local documents
+ (if any are available).
+
+ Peter W. Draper 15-OCT-2004

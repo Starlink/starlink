@@ -761,13 +761,22 @@ sub create_stylefile{
 print( STYLE <<'_EOF_' );
 package main;
 
+#  The base name for all document cross reference roots.
+#  For local documents this would be:
+#     $DOCBASE = '/star/docs/';
+#  And for remote documents at RAL:
+$DOCBASE = 'http://star-www.rl.ac.uk/cgi-bin/htxserver/';
+
 sub do_cmd_xref{
    local($_) = @_;
    local($text, $docname, $label);
    s/$next_pair_pr_rx/$text = $2; ''/eo;
    s/$next_pair_pr_rx/$docname = $2; ''/eo;
    s/$next_pair_pr_rx/$label = $2; ''/eo;
-   join('','<A HREF="/star/docs/',$docname,'.htx/',$docname,'.html#xref_',$label,'">',$text,'</A>',$_);
+   # Default for local documents would be:
+   #join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html#xref_',$label,'">',$text,'</A>',$_);
+   # And for remote ones (notice?).
+   join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html?xref_',$label,'">',$text,'</A>',$_);
 }
 
 sub do_cmd_xlabel{

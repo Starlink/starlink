@@ -14,17 +14,17 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+{Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {199.7}
+\newcommand{\stardocnumber}    {199.8}
 \newcommand{\stardocauthors}   {P W Draper\\
                                 A J Chipperfield\\
                                 M D Lawden}
-\newcommand{\stardocdate}      {2 February 2000}
+\newcommand{\stardocdate}      {15 October 2004}
 \newcommand{\stardoctitle}     {Star2HTML\\[1ex]
                                 Converting Starlink Documents to Hypertext}
-\newcommand{\stardocversion}   {Version 1.4}
+\newcommand{\stardocversion}   {Version 1.5}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}{
 Star2HTML lets you write (or convert) a
@@ -794,12 +794,14 @@ Not all Starlink documents are available in hypertext form but the link will
 even work in that case \dash\  browsers will usually just display the paper
 version.
 
-There is one further step required to create a link to another Starlink
-document \dash\ you must run the hypertext linker \texttt{hlink}, after
-running \texttt{star2html} on your source file, so that the links between the
-two documents can be resolved.
+There is one further step required to create a link to another local 
+Starlink document \dash\ you must run the hypertext linker \texttt{hlink},
+after running \texttt{star2html} on your source file, so that the links
+between the two documents can be resolved. If you do not do this then all the
+cross references will be passed to the Starlink central document server for
+resolution. 
 Thus, if your document contains links to other Starlink documents, you
-should convert, link, and view it by:
+can convert, link it locally, and view it by:
 
 \begin{quote}
 \begin{verbatim}
@@ -823,7 +825,7 @@ section (as with normal \verb#\ref# and \verb#\label#).
 So that others can easily link to sections of your document,
 we recommend that you \verb+\xlabel+ all sections and subsections
 with the section title in lower case, non-alphanumeric characters removed and
-words separated by underscore
+words separated by underscore.
 
 For example, the subsection you are now reading has been labelled as follows:
 
