@@ -166,7 +166,7 @@ PRIVATE_INCLUDES = PRM_CONST prm_err.h
 
 
 # PRM_PAR and prm_par.h are generated from information in float.h and limits.h
-PRM_PAR prm_par.h: make-prm-par
+PRM_PAR prm_par.h: make-prm-par$(EXEEXT)
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
 BUILT_SOURCES = PRM_ERR prm_err.h PRM_PAR prm_par.h $(PLATFORM_INCLUDES)
