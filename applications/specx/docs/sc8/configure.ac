@@ -20,7 +20,7 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_MAKE_SET
 STAR_LATEX_DOCUMENTATION(sc8)
-STAR_DOC_FILES(sc8_badbaseline.ps sc8_dm_dirty.ps sc8_fsw_reduction.ps sc8_rlb.ps sc8_cgm.ps sc8_dm_drop.ps sc8_gray.ps sc8_s-l-r-f.ps sc8_chann.ps sc8_dm_orig.ps sc8_gr_sp.ps sc8_smooth.ps sc8_concat.ps sc8_duffy.ps sc8_hdo_freq.ps sc8_spectrum.ps sc8_cont.ps sc8_fgm.ps sc8_hdo-lsb.ps sc8_spiked.ps sc8_dasmerge_yn.ps sc8_fpb.ps sc8_hdo-orig.ps sc8_despiked.ps sc8_fpb-result.ps sc8_hdo-usb.ps sc8_dm_dasmerge.ps sc8_fsw-fig.ps sc8_merge_diffs.ps)
+STAR_DOCS_FILES(sc8_badbaseline.ps sc8_dm_dirty.ps sc8_fsw_reduction.ps sc8_rlb.ps sc8_cgm.ps sc8_dm_drop.ps sc8_gray.ps sc8_s-l-r-f.ps sc8_chann.ps sc8_dm_orig.ps sc8_gr_sp.ps sc8_smooth.ps sc8_concat.ps sc8_duffy.ps sc8_hdo_freq.ps sc8_spectrum.ps sc8_cont.ps sc8_fgm.ps sc8_hdo-lsb.ps sc8_spiked.ps sc8_dasmerge_yn.ps sc8_fpb.ps sc8_hdo-orig.ps sc8_despiked.ps sc8_fpb-result.ps sc8_hdo-usb.ps sc8_dm_dasmerge.ps sc8_fsw-fig.ps sc8_merge_diffs.ps)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

@@ -10,10 +10,10 @@ specx_help_SOURCES = helpm.c helpc.c
 specx_help_LDADD = `$(srcdir)/specx_help_link`
 
 FIG_LIBS = \
-/home/timj/dev/star/applications/figaro/ich/libich.la \
-/home/timj/dev/star/applications/figaro/tio/libtio.la \
-/home/timj/dev/star/applications/figaro/fit/libfit.la \
-/home/timj/dev/star/applications/figaro/gen/libgen.la
+/home/timj/data/tmp/star/cvs/applications/figaro/fit/libfit.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/tio/libtio.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/ich/libich.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/gen/libgen.la
 
 
 specx_LDADD = \

@@ -25,7 +25,7 @@ dnl    Build dependencies
 STAR_DECLARE_DEPENDENCIES([build], [hlps gsd pgplot fio psx chr ndf])
 
 dnl    Need to traverse sub directories
-AC_CONFIG_SUBDIRS([astro command exprt external fitting fv4 gen getaline graph mapdis4 misc mv4 plots reduce scl tek term util vms src docs])
+AC_CONFIG_SUBDIRS([astro command exprt external fitting fv4 gen getaline graph mapdis4 mv4 plots reduce scl tek term util vms src docs])
 
 AC_CONFIG_FILES([Makefile component.xml])
 

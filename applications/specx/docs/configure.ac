@@ -24,6 +24,6 @@ AC_PROG_MAKE_SET
 dnl    Need to traverse sub directories
 AC_CONFIG_SUBDIRS([help sun17 sc8 ])
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
