@@ -44,6 +44,7 @@ extern "C" {
     void astTk_Tag( const char * );
     void astTk_AddColour( const int, const char * );
     void astTk_LineType( int, int );
+    void astTk_ResizeFonts( int );
 #ifdef __cplusplus
 }
 #endif

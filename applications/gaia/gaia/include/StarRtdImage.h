@@ -114,6 +114,9 @@ class StarRtdImage : public Skycat {
    //  Add a colour to extend the default set.
    int astaddcolourCmd( int argc, char *argv[] );
 
+   //  Set whether fonts should be resized with canvas.
+   int astfontresizeCmd( int argc, char *argv[] );
+
    //  Return the value of an AST attribute of the main AstFrameSet.
    int astgetCmd( int argc, char *argv[] );
 

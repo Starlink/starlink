@@ -214,12 +214,20 @@ itcl::class gaia::GaiaAstGrid {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
-      #  Only option is auto-redraw.
+      #  Add auto-redraw option.
       set auto_redraw_($this) 0
       $Options add checkbutton  -label {Auto-redraw} \
          -variable [scope auto_redraw_($this)] \
          -onvalue 1 \
          -offvalue 0
+
+      #  Add resize fonts option.
+      set font_resize_($this) 0
+      $Options add checkbutton  -label {Resize-fonts} \
+         -variable [scope font_resize_($this)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this set_font_resize_]
 
       #  Create the tab notebook for containing each page of options.
       itk_component add TabNoteBook {
@@ -445,6 +453,12 @@ itcl::class gaia::GaiaAstGrid {
       }
    }
 
+   #  Set the font resizing option. Re-draw on change.
+   protected method set_font_resize_ {args} {
+      $itk_option(-rtdimage) astfontresize $font_resize_($this)
+      draw_grid_
+   }
+
    #  Convert state into an AST options list.
    protected method gen_options_ {} {
       set options ""
@@ -481,9 +495,13 @@ itcl::class gaia::GaiaAstGrid {
          }
       }
       
-      #  Add scaling options.
+      #  Add scaling options, which may be scaled to image zoom...
+      set xs 1.0
+      if { $font_resize_($this) } {
+         lassign [$itk_option(-rtdimage) scale] xs ys
+      }
       foreach {sname lname deffont defsize} $fontattrib_ {
-         lappend options "size($sname)=$size_($sname)"
+         lappend options "size($sname)=[expr $size_($sname)*$xs]"
       }
       foreach {sname lname default} $widthattrib_ {
          lappend options "width($sname)=[expr $width_($sname)/200.0]"
@@ -506,7 +524,7 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname deffont defsize} $fontattrib_ {
          lappend options "font($sname)=$font_($sname)"
       }
-      
+
       #  Add the astrometric system that we want to plot in.
       if { $system_(system) != "default" } {
          lappend options "system=$system_(system)"
@@ -1912,6 +1930,9 @@ itcl::class gaia::GaiaAstGrid {
 
    #  True for auto redraw of grid when elements are changed.
    common auto_redraw_
+
+   #  True for font resizing with canvas.
+   common font_resize_
 
    #  Number of grids on display.
    common grid_count_ 0
