@@ -1,0 +1,93 @@
+C+
+C                    D S A Z _ I N Q _ N A M E _ V A X
+C
+C  Routine name:
+C     DSAZ_INQ_NAME
+C
+C  Function:
+C     Gets the full path name of a specified file.
+C
+C  Description:
+C     This routine returns the full name of a file. The intention is that
+C     this full name can be used either to produce a message to a user
+C     showing exactly which file is being used, or can be used to provide
+C     an unambiguous way to identify the file - a call to this routine,
+C     no matter how the file has been specified, will always return the
+C     same name string for the same file, and this can be used to see,
+C     for example, if a specified file is already known to the program,
+C     even though its name may have been given in some different form
+C     when it was previously accessed.
+C
+C  Language:
+C     FORTRAN
+C
+C  Call:
+C     CALL DSAZ_INQ_NAME (FILENAME,LU,FULLNAME,STATUS)
+C
+C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+C
+C     (>) FILENAME (Character*(*)) The name of the file in question.
+C                  This should be such that it could be specified in a
+C                  Fortran OPEN statement - ie anything that will work
+C                  for an OPEN statement will work here.  Can be blank,
+C                  in which case the file is assumed to be already open
+C                  on the logical unit given by LU.
+C     (>) LU       (Integer) A Fortran logical unit number on which
+C                  the file is already open.  Only used if FILENAME is
+C                  blank.
+C     (<) FULLNAME (Character*(*)) The full name of the file in question.
+C     (!) STATUS   (Integer) Status value.  If this is passed as non
+C                  zero, this routine returns immediately. If an error
+C                  occurs this will be set to some non-zero code, the
+C                  value of which will be system-specific.
+C
+C  External variables used: None.
+C
+C  Prior requirements: None.
+C
+C  Support: Keith Shortridge, AAO
+C
+C  Version date: 29th August 1992
+C-
+C  System:
+C     This is the VAX/VMS version of this routine.
+C
+C  External subroutines / functions used:
+C     ICH_LEN
+C
+C  Subroutine / function details:
+C     ICH_LEN    Position of last non-blank character in string.
+C
+C  History:
+C     26th Aug  1992  Original version.  KS / AAO.
+C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
+C+
+      SUBROUTINE DSAZ_INQ_NAME (FILENAME,LU,FULLNAME,STATUS)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER LU, STATUS
+      CHARACTER*(*) FILENAME, FULLNAME
+C
+C     Functions used
+C
+      INTEGER ICH_LEN
+C
+C     Local variables
+C
+      INTEGER   FLEN                ! Number of characters in FILENAME
+C
+      IF (STATUS.NE.0) RETURN
+C
+C     Under VMS, a simple Fortran INQUIRE statement does the whole job.
+C
+      FLEN=ICH_LEN(FILENAME)
+      IF (FLEN.EQ.0) THEN
+         INQUIRE (UNIT=LU,NAME=FULLNAME,IOSTAT=STATUS)
+      ELSE
+         INQUIRE (FILE=FILENAME,NAME=FULLNAME,IOSTAT=STATUS)
+      END IF
+C
+      END
