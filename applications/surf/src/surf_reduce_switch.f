@@ -29,7 +29,7 @@
 *     from the input data.
 
 *  Usage:
-*     reduce_switch IN USE_CALIBRATOR SPIKE_LEVEL OUT
+*     reduce_switch IN OUT
 
 
 *  ADAM Parameters:
@@ -41,24 +41,25 @@
 *        The name of the file to contain the output data.
 *     SPIKE_LEVEL = INTEGER (Read)
 *        Number of spikes tolerated before marking data point bad.
-*        The default is that the sample should be marked bad if the transputers
-*        detected any spikes during a 1 second sample.
+*        The default is that the sample should be marked bad if the 
+*        transputers detected more than 5 spikes during a 1 second
+*        sample.
 *     SWITCH = INTEGER (Read)
 *        Parameter to indicate which switch to extract. A value of 0 means
 *        that all switches should be reduced. Default is 0.
 *     USE_CALIBRATOR = LOGICAL (Read)
 *        Yes, if you want the data for each bolometer measurement
 *        divided by the corresponding internal calibrator signal.
-*        The default is yes.
+*        The default is not to use the calibrator.
 
 *  Examples:
 *     reduce_switch
 *        All parameters will be requested.
-*     reduce_switch test OUT=nosw \
+*     reduce_switch test nosw 
 *        This will reduce the switch from input file test.sdf without dividing
-*        by the calibrator signal and no toleration of spikes detected by
-*        the transputers. The output data will be written to nosw.sdf.
-*     reduce_switch test OUT=nosw SWITCH=2 \
+*        by the calibrator signal and tolerating up to 5 spikes in a 1 second
+*        sample. The output data will be written to nosw.sdf.
+*     reduce_switch test nosw SWITCH=2
 *        This will select switch 2 from test.sdf and write it to nosw.sdf
 
 *  Notes:
@@ -120,6 +121,10 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.20  1997/06/20 21:23:49  timj
+*     Update header to reflect the fact that SPIKE_LEVEL now has a default
+*     of 5 and is no longer asked by default. Same for USE_CALIBRATOR.
+*
 *     Revision 1.19  1997/06/13 00:01:14  timj
 *     Change name to SURF
 *     Minor doc changes
