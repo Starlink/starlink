@@ -1,4 +1,4 @@
-      SUBROUTINE BDI1_ARYWB( BDID, PSID, STATUS )
+      SUBROUTINE BDI1_ARYWB( BDID, HFID, PSID, STATUS )
 *+
 *  Name:
 *     BDI1_ARYWB
@@ -22,6 +22,8 @@
 *  Arguments:
 *     BDID = INTEGER (given)
 *        ADI identifier to top level BDI object
+*     HFID = INTEGER (given)
+*        The ADI identifier of the HDS file object
 *     PSID = INTEGER (given)
 *        ADI identifier to private storage
 *     STATUS = INTEGER (given and returned)
@@ -89,11 +91,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER                   BDID,PSID
+      INTEGER                   BDID,HFID,PSID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
