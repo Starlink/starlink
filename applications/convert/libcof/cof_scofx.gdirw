@@ -1,0 +1,153 @@
+      SUBROUTINE COF_SCOF<T>( EL, ARRIN, SCALE, OFFSET, BADREP, ARROUT,
+     :                         NBAD, STATUS )
+*+
+*  Name:
+*     COF_SCOFx
+
+*  Purpose:
+*     Applies block-floating-point scaling to an array, and substitutes
+*     bad pixels.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COF_SCOFx( EL, ARRIN, SCALE, OFFSET, BADREP, ARROUT, NBAD,
+*                      STATUS )
+
+*  Description:
+*     This routine applies a scale and offset to an array and replaces
+*     bad values with a new value (normally the bad value of the
+*     generic type), in a new array.  It counts the number of numerical
+*     errors during the conversion; for the bad value of the generic
+*     type is substituted in the output array.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The number of elements in the array.
+*     ARRIN( EL ) = ? (Given)
+*        The array to which the scale and offset are to be applied.
+*     SCALE = DOUBLE PRECISION (Given)
+*        The scale needed to convert values in the input array to the
+*        output array.
+*     OFFSET = DOUBLE PRECISION (Given)
+*        The offset needed to convert values in the input array to the
+*        output array.
+*     BADREP = DOUBLE PRECISION (Given)
+*        The value to replace bad values in the input array.  This will
+*        usually be the bad value for scaled data type.  It is double
+*        precision here to avoid n*(n-1) routines.
+*     ARROUT( EL ) = ? (Given)
+*        The converted array, i.e. after the scale and offset have been
+*        applied.
+*     NBAD= INTEGER (Given)
+*        The number of elements in the array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for _WORD, _INTEGER, _REAL, and _DOUBLE
+*     numeric data types: replace "x" in the routine name by W, I, R, D
+*     as appropriate.  The array supplied to the routine must have the
+*     data type specified.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1994 June 2 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Primitive data constants
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> ARRIN( EL )
+      DOUBLE PRECISION SCALE
+      DOUBLE PRECISION OFFSET
+      DOUBLE PRECISION BADREP
+
+*  Arguments Returned:
+      <TYPE> ARROUT( EL )
+      INTEGER NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+      <LTYPE> BADVAL             ! Bad value
+
+*  Internal References:
+      <LTYPE> VAL_DTO<T>         ! Conversion from double precision
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the number of numerical errors.
+      NBAD = 0
+
+*  Check that the bad value is within range.  Try to convert it to the
+*  generic type.  The bad flag is true as the value is most likely
+*  to be the bad value so we should a bad result.
+      BADVAL = VAL_DTO<T>( .TRUE., BADREP, STATUS )
+
+*  If a numerical error occurred, report the context of the error.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'COF_SCOFX_ERR1',
+     :     'COF_SCOFX: Bad-pixel replacement value is out of range. '/
+     :     /'(Probable programming error.)', STATUS )
+         GOTO 999
+      END IF
+
+*  Loop for each element of the array.
+      DO I = 1, EL
+
+*  Test for the bad value.  Substitute the converted replacement value.
+         IF ( ARRIN( I ) .EQ. VAL__BAD<T> ) THEN
+            ARROUT( I ) = BADVAL
+
+*  Apply the scale and offset.  Perform the calculation in double
+*  precision to reduce the chance of overflows.  Expanding the input
+*  to double precision will not overflow so it is safe to call the
+*  more-efficient NUM funcction.  Converting back tthere might be an
+*  error.  Count the number of errors.
+         ELSE
+            ARROUT( I ) = VAL_DTO<T>( .TRUE., OFFSET + SCALE *
+     :                    NUM_<T>TOD( ARRIN( I ) ), STATUS )
+
+*  Do not report the numerical error, but annul the error and count the
+*  number of bad values.  The output pixel value has already been
+*  assigned the bad value of the generic type.
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               NBAD = NBAD + 1
+            END IF
+         END IF
+      END DO
+
+*  Come here if there has been an error.
+  999 CONTINUE
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'COF_SCOFX_ERR',
+     :     'COF_SCOFX: Unable to apply a scale and offset the array.',
+     :     STATUS )
+      END IF
+
+      END
