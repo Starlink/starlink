@@ -22,7 +22,7 @@ atl1_prnt2.f atl1_ptobj.f atl1_rm.c atl1_setop.f atl1_notif.f atlhelp.f atlhelp.
 atools.hlp atools.icl atools_link_adam atools_mon.f atools_mon.ifl \
 atl1_rdgrp.f atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f \
 astlutmap.ifl astpcdmap.f astpcdmap.ifl astwinmap.f astshiftmap.f \
-astshiftmap.ifl astwinmap.ifl \
+astshiftmap.ifl astwinmap.ifl asttranmap.f asttranmap.ifl \
 astfindframe.f astfindframe.ifl astpermaxes.f astpermaxes.ifl \
 astpickaxes.f astpickaxes.ifl astsimplify.f astsimplify.ifl asttrann.ifl \
 asttrann.f atl1_cpcol.f gethlp.f astinvert.f astinvert.ifl astmapbox.f \
@@ -40,7 +40,7 @@ astconvert.par astlutmap.par astpcdmap.par astwinmap.par astfindframe.par \
 astpermaxes.par astpickaxes.par astsimplify.par asttrann.par astinvert.par \
 astmapbox.par astgetrefpos.par astsetrefpos.par astspecframe.par \
 astshiftmap.par astformat.par asttran2.par astmathmap.par astpolymap.par \
-astsetactunit.par astgetactunit.par
+astsetactunit.par astgetactunit.par asttranmap.par
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
@@ -51,7 +51,7 @@ astremapframe.f astmatrixmap.f astconvert.f astlutmap.f astpcdmap.f \
 astwinmap.f astshiftmap.f astfindframe.f astpermaxes.f astpickaxes.f astsimplify.f \
 asttrann.f astinvert.f astmapbox.f astgetrefpos.f astsetrefpos.f \
 astspecframe.f astformat.f asttran2.f astmathmap.f astsetactunit.f \
-astgetactunit.f astpolymap.f 
+astgetactunit.f astpolymap.f asttranmap.f
 
 #  Contents of the doc/ directory in atools_iraf.tar
 IRAF_DOCS = astcopy.hlp astaddframe.hlp astclear.hlp astget.hlp astset.hlp \
@@ -62,7 +62,7 @@ astconvert.hlp astlutmap.hlp astpcdmap.hlp astwinmap.hlp astshiftmap.hlp astfind
 astpermaxes.hlp astpickaxes.hlp astsimplify.hlp asttrann.hlp astinvert.hlp \
 astmapbox.hlp astgetrefpos.hlp astsetrefpos.hlp astspecframe.hlp \
 astformat.hlp asttran2.hlp astmathmap.hlp astsetactunit.hlp \
-astgetactunit.hlp astpolymap.hlp
+astgetactunit.hlp astpolymap.hlp asttranmap.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.

@@ -1460,6 +1460,46 @@ iraf! {
           }
       }
 
+      action asttranmap {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter map1 {
+            position 1
+            type LITERAL
+            prompt {The first component Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter map2 {
+            position 2
+            type LITERAL
+            prompt {The second component Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 3
+            type LITERAL
+            prompt {Options for the TranMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the TranMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
       action astmathmap {
          helplib {$ATOOLS_HELP}
 

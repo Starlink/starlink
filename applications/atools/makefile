@@ -465,7 +465,7 @@ atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
 astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f astmapbox.f astinvert.f \
 astspecframe.f astsetrefpos.f astgetrefpos.f astshiftmap.f atl1_notif.f \
 astformat.f asttran2.f astmathmap.f atl1_prnt2.f astsetactunit.f \
-astgetactunit.f astpolymap.f
+astgetactunit.f astpolymap.f asttranmap.f
 
 F_SUB2 = 
 
@@ -505,7 +505,7 @@ astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
 astlutmap astpcdmap astwinmap astshiftmap astfindframe astpermaxes astpickaxes \
 astsimplify asttrann astmapbox astinvert astspecframe astsetrefpos \
 astgetrefpos astformat asttran2 astmathmap astsetactunit astgetactunit \
-astpolymap
+astpolymap asttranmap
 
 
 #  Monolith routine source name.
@@ -1362,6 +1362,7 @@ astaddframe.o  : SAE_PAR AST_PAR
 astclear.o     : SAE_PAR AST_PAR
 astcmpframe.o  : SAE_PAR AST_PAR
 astcmpmap.o    : SAE_PAR AST_PAR
+asttranmap.o   : SAE_PAR AST_PAR
 astconvert.o   : SAE_PAR AST_PAR PAR_ERR
 astcopy.o      : SAE_PAR AST_PAR
 astfindframe.o : SAE_PAR AST_PAR PAR_ERR
