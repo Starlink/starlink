@@ -167,7 +167,7 @@
       INTEGER			NBAD			! New bad points
       INTEGER                   NELM                  ! # input data values
       INTEGER			OFID		      ! Output dataset id
-      INTEGER                	QPTR                  ! Output quality
+      INTEGER                	OQPTR, QPTR                  ! Output quality
       INTEGER                   SLEN                  ! Length of STRING
       INTEGER                	VPTR                  ! Output variance
 
@@ -326,8 +326,8 @@
 
 *  Write quality if new bad points, and it didn't exist in input
       IF ( (NBAD.GT.0) .AND. .NOT. QOK ) THEN
-        CALL BDI_PUT( OFID, 'Quality', 'UBYTE', 1, NELM, %VAL(QPTR),
-     :                STATUS )
+        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
+        CALL ARR_COP1B( NELM, %VAL(QPTR), %VAL(OQPTR), STATUS )
         CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, MASK, STATUS )
       END IF
 
