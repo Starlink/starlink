@@ -646,11 +646,11 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		    // on which we `print' below.  hSize and vSize are the
 		    // width and height of the widest and tallest pages,
 		    // as reported by the DVI file; however, the file doesn't
-		    // report the offsets of these pages.  Add an inch to
-		    // both and hope for the best.
+		    // report the offsets of these pages.  Add a
+		    // couple of inches to both and hope for the best.
 		    bitmap = new Bitmap
-			((bitmapW > 0 ? bitmapW : dvif->hSize()+oneInch),
-			 (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch));
+			((bitmapW > 0 ? bitmapW : dvif->hSize()+2*oneInch),
+			 (bitmapH > 0 ? bitmapH : dvif->vSize()+2*oneInch));
 		    if (verbosity > quiet)
 		    {
 			int last, i;
