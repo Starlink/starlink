@@ -27,7 +27,7 @@ hds_test_SOURCES = hds_test.f
 hds_test_LDADD = libhds.la `ems_link` `chr_link`
 
 hds_test_prm_SOURCES = hds_test_prm.c
-hds_test_prm_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
+hds_test_prm_LDADD = libhds.la `ems_link` `chr_link` `cnf_link` @FCLIBS@
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = CMP_ERR DAT_ERR
