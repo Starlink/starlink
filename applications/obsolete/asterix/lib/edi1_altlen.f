@@ -133,6 +133,7 @@
         CALL EDI_IDX( ARGS(1), I, LID, STATUS )
 
 *    Get its name
+	call adi_print(lid,status)
         CALL ADI_CGET0C( LID, 'Name', NAME, STATUS )
 
 *    Is it mapped?
