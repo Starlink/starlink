@@ -259,8 +259,11 @@
       CHARACTER NAME2*40         ! 2nd level object
       CHARACTER NAMOUT*80        ! Name in output structure
       INTEGER   NAXIS            ! Axis number
-      INTEGER   NBAD             ! No. of numerical errorsfrom CNV
       INTEGER   NBYTES           ! No. of BYTES
+      INTEGER   NC               ! Number of characters
+      INTEGER   NCC              ! Column from where the comment
+                                 ! appears in the FITS card image
+      INTEGER   NCOM             ! Length of FITS comment
       INTEGER   NDATA            ! No. of data values
       INTEGER   NDIM             ! No of dimensions
       LOGICAL   NEEDAX           ! True if axis data present
@@ -274,10 +277,6 @@
                                  ! .MORE
       INTEGER   NSTR             ! Length of string
       INTEGER   NF               ! Length of string
-      INTEGER   NVALS            ! No of data values 
-      INTEGER   NCC              ! Column from where the comment
-                                 ! appears in the FITS card image
-      INTEGER   NCOM             ! Length of FITS comment
       LOGICAL   OBOPEN           ! Flags output file as opened
       LOGICAL   OUOPEN           ! Flags output file as opened
       INTEGER   OTQPTR           ! Pointer to output quality array
@@ -290,6 +289,10 @@
       LOGICAL   STRUCT           ! True if item is a structure
       CHARACTER TYPE*16          ! Data object type
 
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+ 
 *.
 
 *   Return immediately on bad status
@@ -1349,12 +1352,11 @@
 *         types are right justified to 20 characters.  Character
 *         values may be longer, and are left justified.
             NDATA = 1
-            NVALS = 1
             IF ( TYPE .EQ. 'BYTE' ) THEN    
                CALL DTA_RDVARB( NAME, NDATA, BARRAY, DSTAT )
                IF ( DSTAT .NE. 0 ) GOTO 450
-               CALL CNV_FMTCNV( TYPE, 'CHAR', BARRAY, FITVAL( :20 ),
-     :                          NVALS, NBAD ) 
+               IARRAY( 1 ) = NUM_BTOI( BARRAY( 1 ) )
+               CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
 
             ELSE IF ( TYPE .EQ. 'CHAR' ) THEN    
                CALL DTA_RDVARC( NAME, FDIMS( 1 ), FITVAL, DSTAT )
@@ -1363,26 +1365,23 @@
             ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN    
                CALL DTA_RDVARD( NAME, NDATA, DARRAY, DSTAT )
                IF ( DSTAT .NE. 0 ) GOTO 450
-               CALL CNV_FMTCNV( TYPE, 'CHAR', DARRAY, FITVAL( :20 ),
-     :                          NVALS, NBAD )
+               CALL CHR_DTOC( DARRAY( 1 ), FITVAL( :20 ), NC )
 
             ELSE IF ( TYPE .EQ. 'FLOAT' ) THEN    
                CALL DTA_RDVARF( NAME, NDATA, FARRAY, DSTAT )
                IF ( DSTAT .NE. 0 ) GOTO 450
-               CALL CNV_FMTCNV( TYPE, 'CHAR', FARRAY, FITVAL( :20 ),
-     :                          NVALS, NBAD )
+               CALL CHR_RTOC( FARRAY( 1 ), FITVAL( :20 ), NC )
 
             ELSE IF ( TYPE .EQ. 'INT' ) THEN    
                CALL DTA_RDVARI( NAME, NDATA, IARRAY, DSTAT )
                IF ( DSTAT .NE. 0 ) GOTO 450
-               CALL CNV_FMTCNV( TYPE, 'CHAR', IARRAY, FITVAL( :20 ),
-     :                          NVALS, NBAD )
+               CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
 
             ELSE IF ( TYPE .EQ. 'SHORT' ) THEN    
-                CALL DTA_RDVARS( NAME, NDATA, SARRAY, DSTAT )
-                IF ( DSTAT .NE. 0 ) GOTO 450
-                CALL CNV_FMTCNV( TYPE, 'CHAR', SARRAY, FITVAL( :20 ),
-     :                           NVALS, NBAD )
+               CALL DTA_RDVARS( NAME, NDATA, SARRAY, DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 450
+               IARRAY( 1 ) = NUM_BTOI( SARRAY( 1 ) )
+               CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
             END IF
 
 *         Initialise the FITS card-image character string.
