@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun2.1}
-\newcommand{\stardocnumber}    {2.1}
-\newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {10th September 1999}
+\newcommand{\stardocsource}    {sun2.2}
+\newcommand{\stardocnumber}    {2.2}
+\newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
+\newcommand{\stardocdate}      {7th July 2000}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 4.0 (DRAFT)}
+\newcommand{\stardocversion}   {Version 4.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -243,7 +243,7 @@ library for accessing groups of NDF data objects.
 \section {Introduction}
 
 If an application prompts the user for an NDF using the facilities of the NDF\_ 
-system (see SUN/33), the user may only reply with the name of a single NDF. Some
+system (see \xref{SUN/33}{sun33}{}), the user may only reply with the name of a single NDF. Some
 applications allow many input NDFs to be specified and the need to
 type in every NDF name explicitly each time the program is run can become time
 consuming. The NDG package provides a means of giving the user the
@@ -252,23 +252,23 @@ for an parameter.
 
 The current version of NDG can process NDFs which are stored as
 components within an HDS container file, and can also process foreign
-data formats using the system described in SSN/20.
+data formats using the system described in \xref{SSN/20}{ssn20}{}.
 
 
 \section {Interaction Between NDG and GRP}
 NDG uses the facilities of the GRP package and users of NDG should be familiar
-with the content of SUN/150 which describes the GRP package. Groups
-created by NDG routines shoudl be deleted when no longer needed using
-GRP\_DELET.
+with the content of \xref{SUN/150}{sun150}{} which describes the GRP package. Groups
+created by NDG routines should be deleted when no longer needed using
+\xref{GRP\_DELET}{sun150}{GRP\_DELET}.
 
 \section {General overview of the NDG\_ system}
 As a broad outline, applications use the NDG\_ package as follows:
 
 \begin{enumerate}
 
-\item A call is made to NDG\_ASSOC which causes the user to be prompted for a
+\item A call is made to \htmlref{NDG\_ASSOC}{NDG\_ASSOC} which causes the user to be prompted for a
 single parameter. This parameter can be of any type. The
-user replies with a ``group expression'' (see SUN/150), which contains
+user replies with a ``group expression'' (see \xref{SUN/150}{sun150}{}), which contains
 the names of a group of {\em existing} NDFs to be used as inputs by
 the application. For instance, the group expression may be 
 
@@ -281,38 +281,38 @@ practice, but it highlights the facilities of the GRP and NDG packages, e.g.
 wild cards (``?'' or ``$*$''), lists of files, or indirection through 
 a text file (``\verb+^+''). 
 
-The NDG\_ASSOC routine produces a list of explicit NDF names, which are stored
+The \htmlref{NDG\_ASSOC}{NDG\_ASSOC} routine produces a list of explicit NDF names, which are stored
 internally within the GRP system. 
 
 \item What happens next depends on the application, but a common example may be
 the initiation of a DO loop to loop through the input NDFs (NDG\_ASSOC returns
 the total number of NDF names in the group). 
 
-\item To access a particular NDF, the application calls routine NDG\_NDFAS
+\item To access a particular NDF, the application calls routine \htmlref{NDG\_NDFAS}{NDG\_NDFAS}
 supplying an index, $n$, within the group (i.e $n$ is an integer in the range 1
 to the group size returned by NDG\_ASSOC). NDG\_NDFAS returns an NDF identifier
 to the $n$th NDF in the group. This identifier can then be used to access the
-NDF in the normal manner using the NDF\_ routines (SUN 33). The identifier
-should be annulled when it is no longer needed using NDF\_ANNUL in the
+NDF in the normal manner using the NDF\_ routines (\xref{SUN/33}{sun33}{}). The identifier
+should be annulled when it is no longer needed using \xref{NDF\_ANNUL}{sun33}{NDF\_ANNUL} in the
 normal way.
 
 \item Once the application has finished processing the group of NDFs, it calls 
-GRP\_DELET which deletes the group, releasing all resources reserved by the group.
+\xref{GRP\_DELET}{sun150}{GRP\_DELET} which deletes the group, releasing all resources reserved by the group.
 
 \item Routine NDG\_ASSOC can also be used to append a list of NDF names 
 obtained from the environment, to a previously defined group.
 
-The routine NDG\_CREAT produces a group containing the names of 
-NDFs which are to be created by the application. The routine NDG\_NDFCR will 
+The routine \htmlref{NDG\_CREAT}{NDG\_CREAT} produces a group containing the names of 
+NDFs which are to be created by the application. The routine \htmlref{NDG\_NDFCR}{NDG\_NDFCR} will 
 create a new NDF with a name given by a group member, and returns an NDF 
-identifier to it. Routine NDG\_NDFPR creates a new NDF by propagation from a 
-previously existing NDF, in a similar manner to the NDF routine NDF\_PROP (see 
-SUN/33).
+identifier to it. Routine \htmlref{NDG\_NDFPR}{NDG\_NDFPR} creates a new NDF by propagation from a 
+previously existing NDF, in a similar manner to the NDF routine \xref{NDF\_PROP}{sun33}{NDF\_PROP} (see 
+\xref{SUN/33}{sun33}{}).
 
 The names of output NDFs given by users usually relate to the input NDF names.
 When NDG\_CREAT is called, it creates a group of NDF names either by modifying
 all the names in a specified input group using a ``modification element'' (see
-SUN/150), or by getting a list of new names from the user. 
+\xref{SUN/150}{sun150}{}), or by getting a list of new names from the user. 
 
 \item Applications which produce a group of output NDFs could also produce a
 text file holding the names of the output NDFs. Such a file can be used
@@ -322,8 +322,103 @@ GRP\_LIST (or GRP\_LISTF).
 
 \end{enumerate}
 
-See the detailed descriptions of NDG\_ASSOC and NDG\_CREAT below for details 
+See the detailed descriptions of \htmlref{NDG\_ASSOC}{NDG\_ASSOC} and \htmlref{NDG\_CREAT}{NDG\_CREAT} below for details 
 of the processing of existing and new NDF names.
+
+\section{An example NDG application}
+
+The following gives a short example of how NDG routines might be 
+used within an ADAM task.
+\begin{quote}
+\latexonly{\small}
+\begin{verbatim}
+      SUBROUTINE COPY( STATUS )
+
+*  Global Constants:
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
+
+*  Local Variables:
+      INTEGER GIDIN              ! GRP identifier for group of input NDFs
+      INTEGER GIDOUT             ! GRP identifer for group of output NDFs
+      INTEGER I                  ! Loop counter
+      INTEGER NDFIN              ! NDF identifier for input NDF
+      INTEGER NDFOUT             ! NDF identifier for output NDF
+      INTEGER NUMIN              ! Number of input NDFs
+      INTEGER NUMOUT             ! Number of output NDFs
+      INTEGER STATUS             ! The global status
+      LOGICAL FLAG               ! Has group ended with flag character?
+*.
+
+*  Inialise the group identifiers to indicate that groups do not have
+*  any initial members.
+      GIDIN = GRP__NOID
+      GIDOUT = GRP__NOID
+
+*  Create group of input NDFs using the parameter IN.
+      CALL NDG_ASSOC( 'IN', .TRUE., GIDIN, NUMIN, FLAG, STATUS )
+
+*  Create group of output NDFs using the parameter OUT, which possibly
+*  works by modifying the values in the input group.
+      CALL NDG_CREAT( 'OUT', GIDIN, GIDOUT, NUMOUT, FLAG, STATUS )
+
+*  Loop over group members.
+      DO I = 1, NUMIN
+
+*  Get the identifier for an existing NDF from the input group.
+         CALL NDG_NDFAS( GIDIN, I, 'READ', NDFIN, STATUS )
+
+*  Create a new NDF by propagation using the name in the output group.
+         CALL NDG_NDFPR( NDFIN, 'Data,Variance,Quality,WCS', GIDOUT, I,
+     :                   NDFOUT, STATUS )
+
+*  Relase NDF resources.
+         CALL NDF_ANNUL( NDFIN, STATUS )
+         CALL NDF_ANNUL( NDFOUT, STATUS )
+      END DO
+
+*  Release GRP resources.
+      CALL GRP_DELET( GIDIN, STATUS )
+      CALL GRP_DELET( GIDOUT, STATUS )
+
+      END
+\end{verbatim}
+\end{quote}
+When this program is compiled and run, the user is asked for 
+two ADAM parameters, IN and OUT.  Each NDF in the list specified
+by the IN parameter is simply copied to the corresponding naem in the 
+list specified by the OUT parameter.  For instance, running
+\begin{quote}
+\latexonly{\small}
+\begin{verbatim}
+copy in=data[12] out=*-new
+\end{verbatim}
+\end{quote}
+would write new NDFs {\tt data1-new.sdf} and {\tt data2-new.sdf}
+which were copies of the existing files {\tt data1.sdf} and {\tt data2.sdf}.
+If {\tt data1} and {\tt data2} do not represent NDF structures,
+an error will be signalled and the user will be prompted to enter
+a different value for IN.
+If any of the elements of the IN list represents an HDS container file
+which holds multiple NDF structures directly within it, each of these
+will be added to the list of NDFs to be processed, and the
+output list will be constructed with a corresponding structure.
+For instance, if the HDS file {\tt obs.sdf} contains three NDFs at
+its top level called O1, O2 and O3, then invoking
+\begin{quote}
+\latexonly{\small}
+\begin{verbatim}
+copy in=obs out=obs-copy
+\end{verbatim}
+\end{quote}
+will result in a new container file {\tt obs-copy.sdf} being written, 
+which contains three NDF structures called O1, O2 and O3.
+
+Note that a few corners have been cut in the above code,
+in particular checking that the input and output groups have the
+same size and STATUS testing.  Additionally, no action is taken
+when the FLAG character is given at the end of a group specification --
+conventionally this would indicate that the user should be allowed
+to add further members.
 
 \appendix
 % Command for displaying routines in routine lists:
@@ -333,49 +428,95 @@ of the processing of existing and new NDF names.
                               \hspace*{3em} {\em #2} \\[1.5ex]}
 
 \begin{htmlonly}
-\renewcommand{\noteroutine}[3]{
+\renewcommand{\noteroutine}[2]{
 \begin{description}
-\item [{\small \bf {#1}{#2}}] 
-{\em #3}
+\item [{\bf {#1}}] 
+{\em #2}
 \end{description}
 }
 
+
 \end{htmlonly}
 
-\section {Routine descriptions}
+\appendix 
 
-\subsection {Routine list}
+\section{List of Routines}
 
-\noteroutine{NDG\_ASSO1( PARAM, MODE, INDF, FIELDS, STATUS )}{
-      Obtain an identifier for a single existing NDF using a specified
-      parameter.}
-\noteroutine{NDG\_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )}{
-      Store names of existing NDFs specified through the environment.}
-\noteroutine{NDG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, NAME, STATUS )}{
-      Create a single new simple NDF using a specified parameter.}
-\noteroutine{NDG\_CREAT( PARAM, IGRP0, IGRP, SIZE, FLAG, STATUS )}{
-      Obtain the names of a group of NDF to be created from the
-      environment.}
-\noteroutine{NDG\_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME, STATUS )}{
-      Create a single new primitive NDF using a specified parameter.}
-\noteroutine{NDG\_GTSUP( IGRP, I, FIELDS, STATUS )}{
-      Get supplemental information for an NDF.}
-\noteroutine{NDG\_NDFAS( IGRP, INDEX, MODE, INDF, STATUS )}{
-      Obtain an NDF identifier for an existing NDF.}
-\noteroutine{NDG\_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF, STATUS )}{
-      Obtain an NDF identifier for a new primitive NDF.}
-\noteroutine{NDG\_NDFCR( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF, STATUS )}{
-      Obtain an NDF identifier for a new simple NDF.}
-\noteroutine{NDG\_NDFPR( INDF1, CLIST, IGRP, INDEX, INDF2, STATUS )}{
-      Obtain an NDF identifier for a new NDF created by propagation from 
-      an existing NDF.}
-\noteroutine{NDG\_PROP1( INDF1, CLIST, PARAM, INDF2, NAME, STATUS )}{
-      Create a single new NDF by propagation using a specified parameter.}
-\noteroutine{NDG\_PTSUP( IGRP, I, FIELDS, STATUS )}{
-      Store suplemental information for an NDF.}
-\noteroutine{NDG\_SETSZ( IGRP, SIZE, STATUS )}{
-      Reduces the size of an NDG group.}
-\subsection {Full Routine Specifications}
+\noteroutine{
+      CALL NDG\_ASSO1( PARAM, VERB, MODE, INDF, FIELDS, STATUS )
+}{
+   Obtain an identifier for a single existing NDF using a specified
+   parameter
+}
+\noteroutine{
+      CALL NDG\_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
+}{
+   Store names of existing NDFs specified through the environment
+}
+\noteroutine{
+      CALL NDG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, NAME,
+                      STATUS )
+}{
+   Create a single new simple NDF using a specified parameter
+}
+\noteroutine{
+      CALL NDG\_CREAT( PARAM, IGRP0, IGRP, SIZE, FLAG, STATUS )
+}{
+   Obtain the names of a group of NDF to be created from the
+   environment
+}
+\noteroutine{
+      CALL NDG\_CREP1( PARAM, FTYPE, NDIM, UBND, INDF, NAME, STATUS )
+}{
+   Create a single new primitive NDF using a specified parameter
+}
+\noteroutine{
+      CALL NDG\_GTSUP( IGRP, I, FIELDS, STATUS )
+}{
+   Get supplemental information for an NDF
+}
+\noteroutine{
+      CALL NDG\_NDFAS( IGRP, INDEX, MODE, INDF, STATUS )
+}{
+   Obtain an NDF identifier for an existing NDF
+}
+\noteroutine{
+      CALL NDG\_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF, STATUS )
+}{
+   Obtain an NDF identifier for a new primitive NDF
+}
+\noteroutine{
+      CALL NDG\_NDFCR( IGRP, INDEX, FTYPE, NDIM, LBND, UBND, INDF,
+                      STATUS )
+}{
+   Obtain an NDF identifier for a new simple NDF
+}
+\noteroutine{
+      CALL NDG\_NDFPR( INDF1, CLIST, IGRP, INDEX, INDF2, STATUS )
+}{
+   Obtain an NDF identifier for a new NDF created by propagation from
+   an existing NDF
+}
+\noteroutine{
+      CALL NDG\_PROP1( INDF1, CLIST, PARAM, INDF2, NAME, STATUS )
+}{
+   Create a single new NDF by propagation using a specified parameter
+}
+\noteroutine{
+      CALL NDG\_PTSUP( IGRP, I, FIELDS, STATUS )
+}{
+   Store suplemental information for an NDF
+}
+\noteroutine{
+      CALL NDG\_SETSZ( IGRP, SIZE, STATUS )
+}{
+   Reduces the size of an NDG group
+}
+
+
+
+
+\section{Full Routine Specifications}
 \label {SEC:FULLSPEC}
 
 % +
@@ -645,6 +786,7 @@ of the processing of existing and new NDF names.
 % =====================
 \small
 
+
 \newpage
 \sstroutine{
    NDG\_ASSO1
@@ -661,13 +803,22 @@ of the processing of existing and new NDF names.
       separate fields in the NDF specification are also returned.
    }
    \sstinvocation{
-      CALL NDG\_ASSO1( PARAM, MODE, INDF, FIELDS, STATUS )
+      CALL NDG\_ASSO1( PARAM, VERB, MODE, INDF, FIELDS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
          PARAM = CHARACTER $*$ ( $*$ ) (Given)
       }{
          Name of the ADAM parameter.
+      }
+      \sstsubsection{
+         VERB = LOGICAL (Given)
+      }{
+         If TRUE then errors which occur whilst accessing supplied NDFs
+         are flushed so that the user can see them before re-prompting for
+         a new NDF ({\tt "}verbose{\tt "} mode). Otherwise, they are annulled and
+         a general {\tt "}Cannot access file xyz{\tt "} message is displayed before
+         re-prompting.
       }
       \sstsubsection{
          MODE = CHARACTER $*$ ( $*$ ) (Given)
@@ -683,13 +834,14 @@ of the processing of existing and new NDF names.
          FIELDS( 6 ) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          Each element contains the following on exit:
-
-         1) NDF slice specifications
-         2) HDS paths
-         3) File types
-         4) Base file names
-         5) Directory paths
-         6) Full NDF specification (this is the returned group - IGRP)
+         \begin{enumerate}
+         \item NDF slice specifications
+         \item HDS paths
+         \item File types
+         \item Base file names
+         \item Directory paths
+         \item Full NDF specification (this is the returned group - IGRP)
+         \end{enumerate}
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -707,7 +859,7 @@ of the processing of existing and new NDF names.
    \sstdescription{
       A group expression is obtained from the environment using the
       supplied parameter. The expression is parsed (using the
-      facilities of the GRP routine GRP\_GROUP, see SUN/150) to produce
+      facilities of the GRP routine GRP\_GROUP, see \xref{SUN/150}{sun150}{}) to produce
       a list of explicit names for existing NDFs which are appended to the
       end of the supplied group (a new group is created if none is
       supplied). If an error occurs while parsing the group expression, the
@@ -715,13 +867,22 @@ of the processing of existing and new NDF names.
       particular members of the group can be obtained using NDG\_NDFAS.
    }
    \sstinvocation{
-      CALL NDG\_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+      CALL NDG\_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
    }
    \sstarguments{
       \sstsubsection{
          PARAM = CHARACTER$*$($*$) (Given)
       }{
          The parameter with which to associate the group expression.
+      }
+      \sstsubsection{
+         VERB = LOGICAL (Given)
+      }{
+         If TRUE then errors which occur whilst accessing supplied NDFs
+         are flushed so that the user can see them before re-prompting for
+         a new NDF ({\tt "}verbose{\tt "} mode). Otherwise, they are annulled and
+         a general {\tt "}Cannot access file xyz{\tt "} message is displayed before
+         re-prompting.
       }
       \sstsubsection{
          IGRP = INTEGER (Given and Returned)
@@ -783,15 +944,14 @@ of the processing of existing and new NDF names.
 
          \sstitem
          If the environment variable NDF\_FORMATS\_IN is defined (see
-         SSN/20) then only the highest priority file with any give file
-         name is included in the returned group. The priority of a file
-         is determined by its file type. Native NDFs (``.sdf'') have
-         highest priority. After that, priority decreases along the list
-         of file types specified in NDF\_FORMATS\_OUT. If no file type is
-         given by the user, the highest priority available file type is
-         used. If an explicit file type is given, then that file type is
-         used.
- 
+         \xref{SSN/20}{ssn20}{}) then only the highest priority file with any give file name
+         is included in the returned group. The priority of a file is
+         determined by its file type. Native NDFs (.sdf) have highest
+         priority. After that, priority decreases along the list of file
+         types specified in NDF\_FORMATS\_OUT. If no file type is given by
+         the user, the highest priority available file type is used. If an
+         explicit file type is given, then that file type is used.
+
          \sstitem
          NDFs contained within HDS files are opened in order to ensure
          that they are valid NDFs. The user is notified if there are no
@@ -867,7 +1027,8 @@ of the processing of existing and new NDF names.
       group expression will be treated literally.
    }
    \sstinvocation{
-      CALL NDG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, NAME, STATUS )
+      CALL NDG\_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, NAME,
+                      STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -904,7 +1065,7 @@ of the processing of existing and new NDF names.
       \sstsubsection{
          NAME = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         File specification for the NDF.
+         The full file specification for the NDF.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -923,7 +1084,7 @@ of the processing of existing and new NDF names.
    \sstdescription{
       A group expression is obtained from the environment using the
       supplied parameter. The expression is parsed (using the
-      facilities of the GRP routine GRP\_GROUP, see SUN/150) to produce
+      facilities of the GRP routine GRP\_GROUP, see \xref{SUN/150}{sun150}{}) to produce
       a list of explicit NDF names. These names are appended
       to the group identified by IGRP. The user is re-prompted if an
       error occurs while parsing the group expression. If IGRP has the
@@ -1030,7 +1191,7 @@ of the processing of existing and new NDF names.
          POLPACK:POLKA) which may change the value of NDF\_FORMATS\_OUT before
          using the NDF name. If no file type is supplied in the group
          expression, then the first file type listed in the current value of
-         the NDF\_FORMATS\_OUT environment variable (see SSN/20) is used. If
+         the NDF\_FORMATS\_OUT environment variable (see \xref{SSN/20}{ssn20}{}) is used. If
          this is {\tt "}$*${\tt "} then the file type is copied from the corresponding input
          file if a modification element was used to specify the output file
          name (if the NDF was not specified by a modification element, the
@@ -1097,7 +1258,7 @@ of the processing of existing and new NDF names.
       \sstsubsection{
          NAME = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         File specification for the NDF.
+         The full file specification for the NDF.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1136,13 +1297,14 @@ of the processing of existing and new NDF names.
       }{
          The supplemental information associated with the entry specified
          by I. Each element of the returned array contains the following:
-
-            1 - NDF slice specification (if any)
-            2 - HDS path (if any)
-            3 - File type
-            4 - Base file name
-            5 - Directory path
-            6 - Full NDF specification
+         \begin{enumerate}
+            \item NDF slice specification (if any)
+            \item HDS path (if any)
+            \item File type
+            \item Base file name
+            \item Directory path
+            \item Full NDF specification
+         \end{enumerate}
 
          This information is obtained from a set of groups associated with
          the supplied group IGRP by means of a chain of GRP {\tt "}owner-slave{\tt "}
@@ -1363,7 +1525,6 @@ of the processing of existing and new NDF names.
          A comma-separated list of the NDF components which are to be
          propagated to the new data structure. By default, the HISTORY,
          LABEL and TITLE components and all extensions are propagated.
-         See below for further details.
       }
       \sstsubsection{
          IGRP = INTEGER (Given)
@@ -1432,7 +1593,6 @@ of the processing of existing and new NDF names.
          A comma-separated list of the NDF components which are to be
          propagated to the new data structure. By default, the HISTORY,
          LABEL and TITLE components and all extensions are propagated.
-         See the {\tt "}Component Propagation{\tt "} section for further details.
       }
       \sstsubsection{
          PARAM = CHARACTER $*$ ( $*$ ) (Given)
@@ -1447,7 +1607,7 @@ of the processing of existing and new NDF names.
       \sstsubsection{
          NAME = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         File specification for the NDF.
+         The full file specification for the NDF.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1491,12 +1651,14 @@ of the processing of existing and new NDF names.
          The supplemental information to be stored with the entry specified
          by I. Each element of the supplied array should contain the
          following:
-            1 - NDF slice specification (if any)
-            2 - HDS path (if any)
-            3 - File type
-            4 - Base file name
-            5 - Directory path
-            6 - Full NDF specification
+            \begin{enumerate}
+            \item NDF slice specification (if any)
+            \item HDS path (if any)
+            \item File type
+            \item Base file name
+            \item Directory path
+            \item Full NDF specification
+            \end{enumerate}
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1540,4 +1702,5 @@ of the processing of existing and new NDF names.
       }
    }
 }
+
 \end{document}

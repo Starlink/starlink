@@ -1,5 +1,10 @@
 1 NDG_library
-                                             Expires: ???
 
-NDG is a library of subroutines for processing groups of NDFs within.
+NDG is a library of subroutines for processing groups of NDFs within
+Starlink applications. Groups of existing NDFs may be specified using 
+lists, wild-cards or by reading text file. Groups of output NDFs may be
+specified by editing each name in a corresponding group of input NDFs.
+NDFs within HDS container files, and within foreign format files may be
+accessed.
+
 
