@@ -58,6 +58,10 @@
 *
       INTEGER 			STATUS
 *
+*    Functions :
+*
+      BYTE			BIT_ANDUB
+*
 *    Local constants :
 *
       REAL 			TWOPI
@@ -116,7 +120,7 @@
         DO K = NXL, NXH
 
 *        Quality test per pixel if present
-          IF ( QOK ) OK = (QUAL(K,J).AND.BADBITS) .EQ. QUAL_GOOD
+          IF ( QOK ) OK = BIT_ANDUB(QUAL(K,J),BADBITS) .EQ. QUAL__GOOD
 
 *        Is this pixel ok ?
           IF ( OK ) THEN
@@ -174,7 +178,7 @@
 	  IF ( COUNT(K,J) .LE. 0 ) THEN
 	    PVAR(K,J) = 0.0
 	    POL(K,J) = 0.0
-            PQUAL(K,J) = QUAL_BAD
+            PQUAL(K,J) = QUAL__BAD
 
 	  ELSE
 
@@ -193,7 +197,7 @@
 	    POL(K,J) = POL(K,J) * RNN
 
 *          Set pixel good
-	    PQUAL(K,J) = QUAL_GOOD
+	    PQUAL(K,J) = QUAL__GOOD
 
 	  END IF
 
