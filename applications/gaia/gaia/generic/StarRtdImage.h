@@ -264,6 +264,9 @@ class StarRtdImage : public Skycat {
 
    //  Access to some SLALIB routines.
    int slalibCmd( int argc, char *argv[] );
+   
+   //  Set the CarLin attribute of FITS channels.
+   int astcarlinCmd( int argc, char *argv[] );
 
  protected:
 

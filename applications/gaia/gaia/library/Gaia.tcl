@@ -139,6 +139,7 @@ Options:
  -file <file>             - image file to load.
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0)
+ -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1)
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
@@ -417,6 +418,7 @@ itcl::class gaia::Gaia {
             -ukirt_ql $itk_option(-ukirt_ql) \
             -appname $appname_ \
             -extended_precision $itk_option(-extended_precision) \
+            -linear_cartesian $itk_option(-linear_cartesian) \
             -show_hdu_chooser $itk_option(-show_hdu_chooser) \
             -default_cut $itk_option(-default_cut)
       }
@@ -1760,6 +1762,9 @@ window gives you access to this."
    #  displays at milli arc-second resolution.
    itk_option define -extended_precision extended_precision \
       Extended_Precision 0
+
+   #  Whether CAR projections should be interpreted as a linear mapping.
+   itk_option define -linear_cartesian linear_cartesian Linear_Cartesian 1
 
    #  Whether to attempt to show and control the HDU chooser. If 0
    #  then control is only attempted when the HDU already exists.

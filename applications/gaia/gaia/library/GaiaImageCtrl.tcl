@@ -423,6 +423,9 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Set the default precision used for coordinate readouts.
       set_readout_precision_
+
+      #  Set the default for CAR projections.
+      set_linear_cartesian_
    }
 
    #  Set the precision used to display RA/Dec coordinates. By default
@@ -432,6 +435,16 @@ itcl::class gaia::GaiaImageCtrl {
       if { $image_ != {} } {
          catch {
             $image_ astmilli $itk_option(-extended_precision)
+         }
+      }
+   }
+
+   #  Set the default for reading CAR projections. Do this each time
+   #  so that it's always up to date.
+   protected method set_linear_cartesian_ {} {
+      if { $image_ != {} } {
+         catch {
+            $image_ astcarlin $itk_option(-linear_cartesian)
          }
       }
    }
@@ -990,6 +1003,12 @@ itcl::class gaia::GaiaImageCtrl {
    itk_option define -extended_precision extended_precision \
       Extended_Precision 0 {
          set_readout_precision_
+      }
+
+   #  Whether CAR projections should be interpreted as a linear mapping.
+   itk_option define -linear_cartesian linear_cartesian \
+      Linear_Cartesian 1 {
+         set_linear_cartesian_
       }
 
    #  Default percentage cut applied when displaying images for the

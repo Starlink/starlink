@@ -30,6 +30,8 @@
 //       (needed for plotting some symbols based on world coordinates).
 //    22-JAN-2003 (PWD):
 //       Added milli-arcsec resolution option.
+//    19-DEC-2003 (PWD):
+//       Added CarLin static member and control method.
 //-
 
 extern "C" {
@@ -44,6 +46,7 @@ extern "C" {
 //  The public interface is through the WCS class.
 //
 class StarWCS : public WCSRep {
+
 protected:
   //  Frameset with frames for image and world coordinates and
   //  mappings between them.
@@ -103,6 +106,9 @@ protected:
 
   //  Show extra precision for milli-arcsec resolution.
   int extraPrecision_;
+
+  //  Whether CAR projections are broken linear. Applies to all instances.
+  static int carlin_;
 
 public:
 
@@ -232,6 +238,10 @@ public:
 
   //  Set display of extra precision.
   void extraPrecision( int value );
+
+  //  Set whether CAR projections are linear.
+  static void setCarLin( int value ) { StarWCS::carlin_ = value; }
+
 };
 
 

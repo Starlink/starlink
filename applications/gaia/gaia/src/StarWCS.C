@@ -74,6 +74,9 @@ static const double pi_ = 3.14159265358979323846;
 static const double r2d_ = 180.0/pi_;
 static const double d2r_ = pi_/180.0;
 
+//  Initialize static members.
+int StarWCS::carlin_ = 1;
+
 //
 //  Define a function to wrap the AST TranN function using a
 //  C-binding. This function doesn't like being called from C++ using
@@ -197,19 +200,10 @@ StarWCS::StarWCS( const char *header, const int lheader )
                 }
             }
 
-
-//  If AST is version 1.8-7 or greater then...
-#if ( AST_MAJOR_VERS > 1 ) || \
-    ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS == 8 && AST_RELEASE >= 7 ) || \
-    ( AST_MAJOR_VERS == 1 && AST_MINOR_VERS > 8 )
-
             //  CAR projections are sometimes incorrect and what is
-            //  required in a linear transformation. Make this the
-            //  default until someone complains that they want the
-            //  proper behaviour (will need to be parameterised at
-            //  that time).
-	    astSet( fitschan, "CarLin=1" );
-#endif
+            //  required in a linear transformation. This is
+            //  controlled by the static member carlin_.
+	    astSetI( fitschan, "CarLin", carlin_ );
 
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when

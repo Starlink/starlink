@@ -195,6 +195,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,default_cut) 100.0
       set values_($this,default_cmap) real
       set values_($this,default_itt) ramp
+      set values_($this,linear_cartesian) 1
    }
 
    #  Update the properties object to the local values and cause a
@@ -204,7 +205,8 @@ itcl::class gaia::GaiaStartup {
                    with_zoom_window with_pan_window with_colorramp \
                    focus_follows_mouse scrollbars transient_tools \
                    quiet_exit min_scale max_scale zoom_factor \
-                   default_cut default_cmap default_itt" {
+                   default_cut default_cmap default_itt \
+                   linear_cartesian" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -220,6 +222,8 @@ itcl::class gaia::GaiaStartup {
             $values_($this,show_hdu_chooser)
          $itk_option(-image) configure -default_cut \
             $values_($this,default_cut)
+         $itk_option(-image) configure -linear_cartesian \
+            $values_($this,linear_cartesian)
       }
       if { $itk_option(-gaia) != {} } {
          $itk_option(-gaia) configure -transient_tools \
@@ -347,6 +351,18 @@ itcl::class gaia::GaiaStartup {
          {Display milli-arcsecond resolution in readouts}
       pack $itk_component(precision) -side top -fill x
 
+      #  Linear cartesian projection.
+      itk_component add cartesian {
+         StarLabelCheck $w_.cartesian \
+            -text "Linear CAR projections:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,linear_cartesian)]
+      }
+      add_short_help $itk_component(cartesian) \
+         {Assume any FITS CAR projections are simple linear mapping}
+      pack $itk_component(cartesian) -side top -fill x
+
       #  Show HDU chooser by default
       itk_component add hduchooser {
          StarLabelCheck $w_.hduchooser \
@@ -470,19 +486,18 @@ itcl::class gaia::GaiaStartup {
       #  Make defaults show
       set values_($this,default_cmap) $values_($this,default_cmap)
       set values_($this,default_itt) $values_($this,default_itt)
-
    }
-   
+
    #  Configuration options: (public variables)
    #  ----------------------
-   
+
    #  Name of GaiaImageCtrl widget that some options may be applied to
    #  directly.
    itk_option define -image image Image {} {}
-   
+
    #  Name of Gaia widget that is our parent.
    itk_option define -gaia gaia Gaia {} {}
-   
+
    #  Directory for colormap and ITT files
    itk_option define -cmap_dir cmap_dir Cmap_dir "" {
       if {"$itk_option(-cmap_dir)" == ""} {

@@ -160,6 +160,9 @@
 //        implementation would see this command refactored to a
 //        standalone Tcl command and more SLALIB facilities offered,
 //        but time presses.
+//     19-DEC-2003 (PWD):
+//        Added astcarlin command. Controls the CarLin attribute
+//        used when reading a FITS channel.
 //-
 
 #include <string.h>
@@ -226,6 +229,7 @@ public:
     { "astassign",     &StarRtdImage::astassignCmd,    7, 7 },
     { "astaddcolour",  &StarRtdImage::astaddcolourCmd, 2, 2 },
     { "astbootstats",  &StarRtdImage::astbootstatsCmd, 4, 4 },
+    { "astcarlin",     &StarRtdImage::astcarlinCmd,    1, 1 },
     { "astcelestial",  &StarRtdImage::astcelestialCmd, 0, 0 },
     { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
     { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
@@ -5928,6 +5932,27 @@ int StarRtdImage::astmilliCmd( int argc, char *argv[] )
     }
     else {
         wcsp->extraPrecision( 1 );
+    }
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::astcarlinCmd
+//
+//   Purpose:
+//      Set the value used for the CarLin attribute when reading 
+//      the WCS from a FITS channel. The value should be 0 or 1.
+//-
+int StarRtdImage::astcarlinCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astcarlinCmd" << endl;
+#endif
+    if ( *argv[0] == '0' ) {
+        StarWCS::setCarLin( 0 );
+    }
+    else {
+        StarWCS::setCarLin( 1 );
     }
     return TCL_OK;
 }
