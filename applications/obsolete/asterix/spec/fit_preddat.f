@@ -41,6 +41,8 @@
 *                 passed down (DJA)
 *      9 Feb 94 : Now pass MODEL spec directly rather than splitting it up (DJA)
 *      1 Aug 95 : Apply vignetting correction if available (DJA)
+*     11 Mar 1996 (DJA):
+*        Removed old style convolution.
 *
 *    Type definitions :
 *
@@ -50,7 +52,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -99,17 +100,9 @@
      :                  %VAL(PREDDAT(N).MPTR),STATUS)
 
 *    Fold through instrument response. Test for new style response
-        IF ( INSTR(N).R_ID .NE. ADI__NULLID ) THEN
-          CALL ERI_FOLD( PREDDAT(N).NMDAT, %VAL(PREDDAT(N).MPTR),
-     :                   OBDAT(N).NDAT, INSTR(N).R_ID, INSTR(N).A_ID,
-     :                   PRED, STATUS )
-
-        ELSE
-	  CALL FIT_FOLD(PREDDAT(N).NMDAT,OBDAT(N).NDAT,INSTR(N).NRESP,
-     :    %VAL(PREDDAT(N).MPTR),%VAL(INSTR(N).MIPTR),
-     :    %VAL(INSTR(N).DIPTR),%VAL(INSTR(N).RESPTR),PRED,STATUS)
-
-        END IF
+        CALL ERI_FOLD( PREDDAT(N).NMDAT, %VAL(PREDDAT(N).MPTR),
+     :                 OBDAT(N).NDAT, INSTR(N).R_ID, INSTR(N).A_ID,
+     :                 PRED, STATUS )
 
       ELSE
 
