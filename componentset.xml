@@ -174,6 +174,81 @@ high-level interface to the AST library.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="convert">
+  <version>1.5-5</version>
+  <path>applications/convert</path>
+  <description>CONVERT -- format-conversion package</description>
+  <abstract><p>
+The CONVERT package contains utilities for converting data files between
+Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
+Starlink applications, and a number of other common data formats.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>sae</build><build>chr</build><build>hds</build><build>fio</build><build>cnf</build><build>grp</build><build>mers</build><build>prm</build><build>ndf</build><build>ndg</build><build>par</build><build>psx</build><build>subpar</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+    <person>
+      <name>G.J.Privett</name>
+    </person>
+    <person>
+      <name>A.J.Chipperfield</name>
+    </person>
+    <person>
+      <name>D.S.Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>A.C.Davenhall</name>
+      <uname>acd</uname>
+    </person>
+  </developers>
+  <documentation> sun55</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="cursa">
+  <version>6.4-1</version>
+  <path>applications/cursa</path>
+  <description>CURSA - Catalogue and Table Manipulation Applications</description>
+  <abstract><p>
+CURSA is a package of Starlink applications for manipulating astronomical
+catalogues and similar tabular datasets. It provides facilities for:
+browsing or examining catalogues, selecting subsets from a catalogue,
+sorting catalogues, copying catalogues, pairing two catalogues, converting
+catalogue coordinates between some celestial coordinate systems, plotting
+finding charts and photometric calibration.  Also, subsets can be extracted
+from a catalogue in a format suitable for plotting using other Starlink
+packages, such as PONGO.  CURSA can access catalogues held in the popular
+FITS table format, the Tab-Separated Table (TST) format or the Small Text
+List (STL) format.  Catalogues in the STL and TST formats are simple ASCII
+text files.  CURSA also includes some facilities for accessing remote
+on-line catalogues via the Internet.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>cat</build><build>fio</build><build>par</build><build>pda</build><build>ndf</build><build>pgp</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Clive Davenhall</name>
+      <uname>acd</uname>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+    </person>
+  </developers>
+  <documentation> sun190 ssn76</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="daophot">
   <version>1.3-2</version>
   <path>applications/daophot</path>
@@ -203,7 +278,7 @@ high-level interface to the AST library.
 
 <component id="dipso">
   <version>3.6-4</version>
-  <path>applications/pisa</path>
+  <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>
   <abstract><p>
       
@@ -252,7 +327,7 @@ variety of formats.
 
 <component id="gaia">
   <version>2.7-4</version>
-  <path>applications/extractor</path>
+  <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
 GAIA is an image display and analysis tool for astronomy. It provides the
@@ -445,7 +520,7 @@ Traces an HDS file
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kappa">
-  <version>1.3-1</version>
+  <version>1.3-2</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -537,8 +612,34 @@ them.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="photom">
+  <version>1.9-0</version>
+  <path>applications/photom</path>
+  <description>PHOTOM - A Photometry Package</description>
+  <abstract><p>PHOTOM is a package for measuring the sky corrected
+    magnitudes and fluxes of astronomical objects, within circular and
+    elliptical apertures, using either the aperture or optimal extraction
+    algorithms.</p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>ard</build><build>fio</build><build>grp</build><build>ndf</build><build>agi</build><build>sgs</build><build>pgp</build><build>gns</build><build>gks</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun45</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="pisa">
-  <version>2.4-5</version>
+  <version>2.4-6</version>
   <path>applications/pisa</path>
   <description>PISA - Position Intensity and Shape Analysis</description>
   <abstract><p>
@@ -933,7 +1034,7 @@ display of vector maps.
 </component>
 
 <component id="ast">
-  <version>3.3-1</version>
+  <version>3.3-3</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -1270,7 +1371,7 @@ No longer under active control.
 
 <component id="pgppar">
   <version>1.1-5</version>
-  <path>libraries/graphpar/gkspar</path>
+  <path>libraries/graphpar/pgppar</path>
   <description>ADAM Graphics Programming with PGPLOT</description>
   <abstract><p>
   Libraries for incorporating GKS PGPLOT graphics into ADAM applications. The
@@ -1562,6 +1663,31 @@ understand.
     </person>
   </developers>
   <documentation> sun160</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="jpl">
+  <version>2.0-2</version>
+  <path>libraries/jpl</path>
+  <description>JPL Ephemeris access routines</description>
+  <abstract>The JPL library and data sets provide high-accuracy
+  predictions for the positions and velocities of the Sun and planets.
+  </abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Pat Wallace</name>
+      <uname>ptw</uname>
+    </person>
+    <person>
+      <name>A. J. J. Broderick</name>
+      <uname>ajjb</uname>
+    </person>
+  </developers>
+  <documentation> sun87</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -2580,93 +2706,6 @@ Ultrix and for SunOS and may still work for them.
   <dependencies>
     <!-- hard-code these, rather than requiring us to put
          STAR_DEFAULTS in configure.ac -->
-    <build>starlink-autoconf</build>
-    <build>libtool</build>
-  </dependencies>
-  <developers>
-    <!-- Cast of thousands, but locally to Starlink... -->
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>This version of automake has been patched to include
-      Fortran preprocessor support, and a variety of Starlink-specific
-      targets.  The Fortran patches were submitted
-      to automake-patches@gnu.org in January 2004, and were being
-      examined after that.</p></notes>
-</component>
-
-<component id="libtool" buildsupport="yes">
-  <version>1.5</version>
-  <path>thirdparty/fsf/libtool</path>
-  <description>GNU libtool</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies/>
-  <developers>
-    <!-- Cast of thousands, but locally to Starlink... -->
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>This version of libtool is unpatched -- just the standard
-      version.</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="m4" buildsupport="noauto">
-  <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
-       add the buildsupport="yes" attribute.  If we did, then this would
-       ALWAYS be built at the beginning of the bootstrap process.
-       Instead, we want to build it only if the system m4 is not GNU m4.
-       Thus set the attribute to be "noauto", which causes the correct
-       build rule to be generated (by GenerateDependencies.java), but does
-       not include it in the list of buildsupport dependencies, so that it
-       is not build automatically. -->
-  <version>1.4</version>
-  <path>thirdparty/fsf/m4</path>
-  <description>GNU m4</description>
-  <dependencies/>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
-    on 2004-03-07</p></notes>
-</component>
-
-<component id="autoconf" buildsupport="yes">
-  <version>2.59</version>
-  <path>thirdparty/fsf/autoconf</path>
-  <description>Starlink autoconf</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies/>
-  <developers>
-    <!-- Cast of thousands, but locally to Starlink... -->
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <bugreports>@PACKAGE_BUGREPORT</bugreports>
-  <notes><p>This version of autoconf has been patched to include
-      Fortran preprocessor support.  Those patches were submitted
-      to autoconf-patches@gnu.org in January 2004, and were being
-      examined after that.</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="automake" buildsupport="yes">
-  <version>1.8.2-starlink</version>
-  <path>thirdparty/fsf/automake</path>
-  <description>GNU automake, patched</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <!-- hard-code these, rather than requiring us to put
-         STAR_DEFAULTS in configure.ac -->
     <build>autoconf</build>
     <build>libtool</build>
   </dependencies>
@@ -2795,7 +2834,7 @@ GKS (SUN/83) should be used.</p></abstract>
   <description>[incr Tcl]</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    
+    <build>tcl</build><build>tk</build>
   </dependencies>
   <!--
   <developers>
