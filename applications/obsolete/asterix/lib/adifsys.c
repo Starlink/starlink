@@ -190,9 +190,12 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
   ADIboolean	there;
 
   _chk_stat;
+printf("FCLOSE input is - ");adic_print(id,status);
 
 /* Get file object */
   adic_getfile( id, &fid, status );
+
+printf("getfile output is %d - ",fid);adic_print(fid,status);
 
 /* Extract representation id from file object */
   adic_cget0i( fid, "REP", &repid, status );
