@@ -73,8 +73,8 @@
 #        as a default percentile cutoff limit for NDF display, but the
 #        user can select different values for different NDFs.
 #
-#     state = string
-#        A value which gives the state of the object.  It may have the
+#     status = string
+#        A value which gives the status of the object.  It may have the
 #        following values:
 #           active:
 #              The viewer will attempt to reflect changes in its
@@ -82,7 +82,7 @@
 #           inactive:
 #              The viewer may not attempt to reflect changes in its
 #              configuration on the display.  The viewer will only enter
-#              this from the active state if a subsequent call of the 
+#              this from the active status if a subsequent call of the 
 #              getpair method will return a valid pair.
 #           done:
 #              The viewer's work is done (e.g. the exit button has
@@ -91,7 +91,7 @@
 #        Only the values 'active' and 'inactive' may be written into this
 #        variable from outside.  This variable may be tracked from
 #        outside the class (for instance if a trace is to be run on it)
-#        using the 'watchstate' public variable.
+#        using the 'watchstatus' public variable.
 #
 #     validpair = string
 #        This gives an expression which indicates whether a pair is 
@@ -99,7 +99,7 @@
 #        and "%B" are replaced by the indices of the first and second
 #        members of the pair respectively.  The string is then evaluated
 #        to give a boolean result determining whether the pair is valid
-#        or not.  The state variable will only change from "active" to
+#        or not.  The status variable will only change from "active" to
 #        "inactive" if the getpair method will return a pair which 
 #        satisfies this criterion.
 #
@@ -165,23 +165,23 @@
                -valuevar displaystyle
          }
          itk_component add showfits {
-            button $panel.showfits \
+            buttoncontrol $panel.showfits \
                -text "FITS" \
-               -command [ code $this fitsselect ]
+               -comm [ code $this fitsselect ] \
+               -balloonstr "FITS headers in panel"
          }
          itk_component add gotpair {
-            button $panel.gotpair \
+            buttoncontrol $panel.gotpair \
                -text "Use this pair" \
-               -command [ code $this configure -state inactive ] \
-               -state disabled
-         } {
-            usual
-            ignore -state
+               -comm [ code $this configure -status inactive ] \
+               -state disabled \
+               -balloonstr "Do alignment on this pair"
          }
          itk_component add done {
-            button $panel.done \
+            buttoncontrol $panel.done \
                -text "Exit" \
-               -command [ code $this configure -state done ]
+               -comm [ code $this configure -status done ] \
+               -balloonstr "Abort the application"
          }
 
 #  Add control widgets to the control groups.
@@ -311,7 +311,7 @@
          if { $state ==  "" } {
             return $highlight($index)
          } else {
-            set hightlight($index) $state
+            set highlight($index) $state
             if { $state > 0 } {
                setstate highlighted $index
             } else {
@@ -877,7 +877,7 @@
                $itk_component(image$i) configure \
                    -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
             }
-            if { $state == "active" } {
+            if { $status == "active" } {
                refresh all
             }
          }
@@ -886,7 +886,7 @@
 
 
 #-----------------------------------------------------------------------
-      public variable state { } {
+      public variable status { } {
 #-----------------------------------------------------------------------
          if { ! [ isvalid ] } {
             $itk_component(gotpair) configure -state disabled

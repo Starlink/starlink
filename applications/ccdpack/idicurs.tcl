@@ -60,7 +60,7 @@
       ndfview .viewer \
                       -title "IDICURS: %n" \
                       -percentiles [ list $PERCLO $PERCHI ] \
-                      -watchstate viewstate \
+                      -watchstatus viewstatus \
                       -zoom $ZOOM \
                       -uselabels $SHOWIND \
                       -maxpoints $MAXPOS \
@@ -81,7 +81,7 @@
       .viewer activate
 
 #  Wait for the user to indicate that he has finished.
-      tkwait variable viewstate
+      tkwait variable viewstatus
 
 #  Retrieve configuration variables which the user may have changed 
 #  interactively.

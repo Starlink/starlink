@@ -19,7 +19,7 @@
 #
 #     activate
 #        Following a call to this method, the object gets put in the
-#        "active" state, and it will allow markers to be put on the
+#        "active" status, and it will allow markers to be put on the
 #        image, update the display with respect to user actions, etc.
 #        Prior to this call, the visual state of the object will
 #        probably be inconsistent with the configuration options which
@@ -285,12 +285,12 @@
 #-----------------------------------------------------------------------
       private method display {} {
 #-----------------------------------------------------------------------
-#  This method ensures, if we are in the active state, that the display
+#  This method ensures, if we are in the active status, that the display
 #  is up to date with respect to the various configuration variables etc.
 
-#  Only attempt any display if we are in the active state and have
+#  Only attempt any display if we are in the active status and have
 #  something to display.
-         if { $state != "active" || $ndfname == "" } { return }
+         if { $status != "active" || $ndfname == "" } { return }
 
 #  Only attempt display if characteristics have changed from the last
 #  time they were displayed.  This is important for efficiency reasons
@@ -386,7 +386,7 @@
 #-----------------------------------------------------------------------
       private method trackpos { x y } {
 #-----------------------------------------------------------------------
-         if { $state == "active" } {
+         if { $status == "active" } {
             if { $x == "" || $y == "" } {
                $itk_component(tracker) configure -text ""
             } else {
@@ -428,7 +428,7 @@
 #-----------------------------------------------------------------------
       public variable title "Ndfview" {
 #-----------------------------------------------------------------------
-         if { $state == "active" && $title != "" } {
+         if { $status == "active" && $title != "" } {
             wm title $itk_interior [ infostring $title ]
          }
       }
@@ -451,7 +451,7 @@
 #-----------------------------------------------------------------------
       public variable info "%n (%w x %h)" {
 #-----------------------------------------------------------------------
-         if { $state == "active" && $info != "" } {
+         if { $status == "active" && $info != "" } {
             $itk_component(info) configure -text [ infostring $info ]
          }
       }

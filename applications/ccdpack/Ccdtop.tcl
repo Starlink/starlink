@@ -71,8 +71,8 @@ class Ccdtop {
 #     geometry = string
 #        This gives the geometry in the normal X11 format.
 #
-#     state = string
-#        A value which gives the state of the object.  It may have the
+#     status = string
+#        A value which gives the status of the object.  It may have the
 #        following values:
 #           inactive:  
 #              The viewer will not attempt to reflect changes in its 
@@ -87,14 +87,14 @@ class Ccdtop {
 #        Only the values 'active' and 'inactive' may be written into this 
 #        variable from outside.  This variable may be tracked from 
 #        outside the class (for instance if a trace is to be run on it) 
-#        using the 'watchstate' public variable.
+#        using the 'watchstatus' public variable.
 #
-#     watchstate = string
+#     watchstatus = string
 #        This gives a name of a variable in the caller's context which 
-#        will be kept up to date with the state of this object, i.e.
-#        it will have the same value as the object's $state public 
+#        will be kept up to date with the status of this object, i.e.
+#        it will have the same value as the object's $status public 
 #        variable.  It is useful to configure this so that the variable
-#        can be traced to watch for changes in state.
+#        can be traced to watch for changes in status.
 #
 #     Ccdtop also inherits all the public variables of itk::Toplevel
  
@@ -128,7 +128,7 @@ class Ccdtop {
 ########################################################################
       constructor { args } {
 
-#  Hide the window until its state becomes active.
+#  Hide the window until its status becomes active.
          wm withdraw $itk_interior
 
 #  Consider whether we need to do something funny with the colormap here.
@@ -371,31 +371,31 @@ class Ccdtop {
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public variable watchstate "" {
+      public variable watchstatus "" {
 #-----------------------------------------------------------------------
          set watchlevel [expr [info level] - 1]
-         upvar #$watchlevel $watchstate wstate
-         set wstate $state
+         upvar #$watchlevel $watchstatus wstatus
+         set wstatus $status
       }
 
 
 #-----------------------------------------------------------------------
-      public variable state inactive {
+      public variable status inactive {
 #-----------------------------------------------------------------------
-         if { $state == "inactive" || $state == "active" || $state == "done" } {
-            if { $watchstate != "" } {
-               upvar #$watchlevel $watchstate wstate
-               set wstate $state
+         if { $status == "inactive" || $status == "active" || $status == "done" } {
+            if { $watchstatus != "" } {
+               upvar #$watchlevel $watchstatus wstatus
+               set wstatus $status
             }
          } else {
-            error "Invalid value \"$state\" for state"
+            error "Invalid value \"$status\" for status"
          }
-         if { $state == "active" } {
+         if { $status == "active" } {
             wm deiconify $itk_interior
             foreach c $controls {
                $c configure -state normal
             }
-         } elseif { $state == "inactive" || $state == "done" } {
+         } elseif { $status == "inactive" || $status == "done" } {
             foreach c $controls {
                $c configure -state disabled
             }

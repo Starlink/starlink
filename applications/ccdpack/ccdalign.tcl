@@ -96,7 +96,7 @@
       set refndf [ ndf $refndfname ]
       Ndfview .vref \
                   -title "$title: %n (reference)" \
-                  -watchstate state$ref \
+                  -watchstatus status$ref \
                   -percentiles [ list $PERCLO $PERCHI ] \
                   -zoom $ZOOM \
                   -maxpoints $MAXPOS \
@@ -104,7 +104,7 @@
       .vref loadndf $refndf $MAXCANV
       ccdputs -log "   Mark points on the reference image, [ $refndf name ]:"
       .vref activate
-      tkwait variable state$ref
+      tkwait variable status$ref
       ccdputs -log "   [ llength [ .vref points ] ] points initially marked."
       ccdputs -log " "
 
@@ -118,11 +118,11 @@
 
 #  Allow the user to muck about with the list for the reference NDF 
 #  while the later ones are being modified.
-      .vref configure -state active
+      .vref configure -status active
 
 #  Allow selection of points for the other NDFs.
       ndfview .v \
-                 -watchstate state \
+                 -watchstatus status \
                  -percentiles [ list $PERCLO $PERCHI ] \
                  -zoom $ZOOM \
                  -maxpoints $MAXPOS \
@@ -140,7 +140,7 @@
             ccdputs -log \
             "   Mark points on image #$done/$nother, [ $ndf name ]:"
             .v activate
-            tkwait variable state
+            tkwait variable status
             ccdputs -log "   [ llength [ .v points ] ] points marked."
             ccdputs -log " "
             set pts($i) [ .v points ]
@@ -161,7 +161,7 @@
       }
 
 #  Destroy remaining windows.
-      .vref configure -state done
+      .vref configure -status done
       destroy .vref
     
 # $Id$

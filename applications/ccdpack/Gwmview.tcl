@@ -43,13 +43,13 @@ class Gwmview {
 #  Public methods:
 #
 #     activate
-#        Sets the state so that the widget is ready to be used.  This 
+#        Sets the status so that the widget is ready to be used.  This 
 #        method should be called after sufficient configuration has been
 #        done that the widget can usefully be displayed and the user
 #        can begin to interact with it.  Before calling this method
 #        the widget is likely to be in a non-interacting state; many 
 #        of the other methods will not take any effect until the 
-#        widget has been put into an active state.
+#        widget has been put into an active status.
 #
 #     addpoint vx vy ?ipoint?
 #        Adds a point at the given view coordinates to the list of 
@@ -88,7 +88,7 @@ class Gwmview {
 #        on each point individually.
 #
 #     deactivate
-#        Put the widget into the 'inactive' state.  After this call many
+#        Put the widget into the 'inactive' status.  After this call many
 #        of the other methods may not reflect their activity in the 
 #        visible state of the widget.  Inquiring the state of the widget,
 #        for instance using the points method, should continue to work
@@ -266,9 +266,10 @@ class Gwmview {
             marknumcontrol $panel.marknum
          }
          itk_component add exit {
-            button $panel.exit \
+            buttoncontrol $panel.exit \
                -text "Done" \
-               -command [ code $this deactivate ]
+               -comm [ code $this deactivate ] \
+               -balloonstr "Finish with this window"
          }
       #  itk_component add colour {
       #     button $itk_component(panel).colour \
@@ -583,14 +584,14 @@ class Gwmview {
 #-----------------------------------------------------------------------
       public method activate {} {
 #-----------------------------------------------------------------------
-         configure -state "active"
+         configure -status "active"
       }
 
 
 #-----------------------------------------------------------------------
       public method deactivate {} {
 #-----------------------------------------------------------------------
-         configure -state "inactive"
+         configure -status "inactive"
       }
 
 
@@ -705,9 +706,9 @@ class Gwmview {
 
 
 #-----------------------------------------------------------------------
-      public variable state inactive {
+      public variable status inactive {
 #-----------------------------------------------------------------------
-         if { $state == "active" } {
+         if { $status == "active" } {
             display
          }
       }
@@ -723,7 +724,7 @@ class Gwmview {
             set maptype "linear"
          }
          set device [ devname ]
-         if { $state == "active" } {
+         if { $status == "active" } {
             # taskrun lutable \
             #    "coltab=$table mapping=$maptype device=$device reset"
          }

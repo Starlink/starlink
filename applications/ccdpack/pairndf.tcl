@@ -97,14 +97,14 @@
       $aligner configure \
                          -title "PAIRNDF: %An -- %Bn" \
                          -info "%n" \
-                         -watchstate alignstate \
+                         -watchstatus alignstatus \
                          -zoom $ZOOM \
                          -uselabels 0 \
                          -maxpoints $MAXPOS \
                          -geometry ${WINX}x${WINY} \
 
 #  Set the pair selection criterion.
-      set choosestate ""
+      set choosestatus ""
       proc pairok { a b } {
          global Done
          if { ( $a != "" && $b != "" ) && ( [ array size Done ] == 0 || \
@@ -135,7 +135,7 @@
       set chooser [ eval ndfchoose $base.c $ndflist ]
       $chooser configure \
                          -title "PAIRNDF chooser" \
-                         -watchstate choosestate \
+                         -watchstatus choosestatus \
                          -choosepercentiles 1 \
                          -choosewcsframe 0 \
                          -validpair [ code pairok %A %B ] \
@@ -186,14 +186,14 @@
          raise $chooser
          set pair ""
          while { [ llength $pair ] != 2 } {
-            $chooser configure -state active
-            tkwait variable choosestate
+            $chooser configure -status active
+            tkwait variable choosestatus
   
             set pair [ $chooser getpair ]
             set iA [ lindex $pair 0 ]
             set iB [ lindex $pair 1 ]
  
-            if { [ $chooser cget -state ] == "done" } {
+            if { [ $chooser cget -status ] == "done" } {
                $quitdialog center $chooser
                set response [ $quitdialog activate ]
                if { $response } {
@@ -205,7 +205,7 @@
          }
 
 #  Exit the loop if the user has indicated that the session is at an end.
-         if { $choosestate == "done" } break
+         if { $choosestatus == "done" } break
 
 #  Log to the user.
          ccdputs -log "  "
@@ -226,7 +226,7 @@
          while { $tryagain } {
             set tryagain 0
             $aligner activate
-            tkwait variable alignstate
+            tkwait variable alignstatus
             set MAXCANV [ $aligner maxcanvas ]
             set ZOOM [ $aligner cget -zoom ]
 
