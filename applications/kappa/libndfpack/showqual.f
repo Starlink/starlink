@@ -153,7 +153,7 @@
 
 *  If no quality names are defined give a message.
       IF( NAMES .EQ. 0 ) THEN
-         CALL MSG_OUT( 'SHOWQUAL_MSG2', '  No quality name '//
+         CALL MSG_OUT( 'SHOWQUAL_MSG1', '  No quality name '//
      :                 'definitions found', STATUS )
 
 *  Otherwise...
@@ -204,14 +204,27 @@
 *  Display the quality name, comment, and count.
                CALL MSG_SETI( 'CNT', QCOUNT )
                CALL MSG_SETC( 'COM', COMMNT )
-               CALL MSG_OUT( 'SHOWQUAL_MSG3', '  '//QNAME//
-     :                       ' - "^COM" (^CNT)', STATUS )
+               
+               IF( .NOT. FIXED ) THEN 
+                  CALL MSG_SETI( 'B', BIT )   
+                  CALL MSG_OUT( 'SHOWQUAL_MSG2', '  '//QNAME//
+     :                          ' (bit ^B) - "^COM" (^CNT)', STATUS )
+               ELSE
+                  CALL MSG_OUT( 'SHOWQUAL_MSG3', '  '//QNAME//
+     :                          ' - "^COM" (^CNT)', STATUS )
+               END IF
 
 *  If no count is required, just display the quality name and comment.
             ELSE
                CALL MSG_SETC( 'COM', COMMNT )
-               CALL MSG_OUT( 'SHOWQUAL_MSG4', '  '//QNAME//' - "^COM"',
-     :                       STATUS )
+               IF( .NOT. FIXED ) THEN 
+                  CALL MSG_SETI( 'B', BIT )   
+                  CALL MSG_OUT( 'SHOWQUAL_MSG4', '  '//QNAME//
+     :                          ' (bit ^B) - "^COM"', STATUS )
+               ELSE
+                  CALL MSG_OUT( 'SHOWQUAL_MSG5', '  '//QNAME//
+     :                          ' - "^COM"', STATUS )
+               END IF
             END IF
 
 *  Get the next defined quality name and related information.
