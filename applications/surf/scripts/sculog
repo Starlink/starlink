@@ -35,7 +35,6 @@ my $result = GetOptions("help"     => \$h,
 			"demod!"   => \$demod,
 			"reduced!" => \$reduced,
 			"nodatadir"=> \$nodatadir,
-			"mode=s"   => \$whichmode
 		       );
 
 $h = 1 unless $result == 1;  # Print help info if unknown option
@@ -1031,7 +1030,7 @@ format SKYSUM_TOP =
 
 format SKYSUM =
 @<<< @<<<<  @<<<<   @>/@<<@   @<<<<<<<<   @<<<<    @#.###        @<<<< @<<<<
-$fitsitem{'RUN'}, $lst, $hst,$fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $sdip_rmode, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
+$fitsitem{'RUN'}, $lst, $hst,$fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $sdip_smode, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
 ~                                        @<<<<    @<<<<<<
 $fitsitem{'SUB_2'}, $tauz[1]
 ~                                        @<<<<    @<<<<<<

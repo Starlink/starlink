@@ -1,3 +1,8 @@
+2001-03-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/sculog: Was an errror with skysum because we are not
+	using strict...
+
 2001-03-01  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* scripts/sculog: Add support for raster skydips
