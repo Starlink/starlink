@@ -675,7 +675,7 @@ rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
 transformer.f trantrace.f trig.f wiener.f zaplin.f \
-listmake.f listshow.f profile.f wcsalign.f
+listmake.f listshow.f profile.f wcsalign.f wcstran.f
 
 KAPSUB_F_ROUTINES = \
 apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f ftsize.f ftsizt.f \
@@ -760,7 +760,7 @@ setext.f setlabel.f setnorm.f setorigin.f \
 setsky.f settitle.f settype.f \
 setunits.f setvar.f \
 wcsadd.f wcsattrib.f wcscopy.f wcsframe.f wcsremove.f wcsshow.f \
-chain.f reshape.f wcstran.f
+chain.f reshape.f 
 
 MONO_SOURCE = $(KAPPA_MONO_SOURCE) $(KAPVIEW_MONO_SOURCE) \
               $(NDFPACK_MONO_SOURCE)
