@@ -2500,9 +2500,33 @@ sub handle_monoliths
           else
             {
               # monolith _TASKS variable has no entries -- we must have a
-              # file $monoifl present.
-              err_am ("Variable " . $xname . "_TASKS is null, but no $monoifl file exists")
-                unless -f $monoifl;
+              # file $monoifl present, or else the $monoifl must be
+              # listed explicitly in BUILT_SOURCES.  It is not enough
+              # for a rule to be present, since we have no access to
+              # the content or targets of user rules.
+              my $iflok;
+              $iflok = -f $monoifl;
+              if (! $iflok)
+                {
+                  my $builtsources = var('BUILT_SOURCES');
+                  if ($builtsources)
+                    {
+                      foreach my $s ($builtsources->value_as_list_recursive)
+                        {
+                          if ($s eq $monoifl)
+                            {
+                              $iflok = 1;
+                              last;
+                            }
+                        }
+                    }
+                }
+              unless ($iflok)
+                {
+                  err_am ("Variable " . $xname . "_TASKS is null: "
+                          . "file $monoifl should either exist, or be "
+                          . "mentioned explicitly in BUILT_SOURCES");
+                }
             }
 
           # Append the <monolith>.ifc file to this $xname_IFC (since
