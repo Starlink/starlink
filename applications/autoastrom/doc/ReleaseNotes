@@ -1,8 +1,23 @@
 <!-- $Id$ -->
 
+<subsect id="release-0.5.3" export="export">
+<subhead><title>Version 0.5-3</title></subhead>
+
+<p>This is release 0.5-3, 2003 May 2</p>
+
+<p>Changes since version 0.5-2:
+<ul>
+  <li><p>Better behaved in the case where an input file has no date or
+    time information.</li>
+  <li><p>Uses version 3.7 of ASTROM</p></li>
+</ul>
+</p>
+</subsect>
 
 <subsect id="release-0.5-2" export="export">
 <subhead><title>Version 0.5-2</title></subhead>
+
+<p>This is release 0.5-2, 2003 April 8</p>
 
 <p>Changes since version 0.5-1:
 <ul>
@@ -17,6 +32,8 @@
 
 <subsect id="release-0.5-1" export="export">
 <subhead><title>Version 0.5-1</title></subhead>
+
+<p>This is release 0.5-1, 2003 February 20</p>
 
 <p>Changes since version 0.5:
 <ul>
