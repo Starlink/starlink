@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.16}
 \newcommand{\stardocnumber}    {95.16}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {15 February 2000}
+\newcommand{\stardocdate}      {3 May 2000}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.15-0}
+\newcommand{\stardocversion}   {0.15-1}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -34519,6 +34519,12 @@ plot (9k).
    }
    \sstparameters{
       \sstsubsection{
+         AMP1 = \_REAL (Write)
+      }{
+         The fitted peak amplitude of the first usable star, in the data
+         units of the input NDF.
+      }
+      \sstsubsection{
          AXES = \_LOGICAL (Read)
       }{
          TRUE if labelled and annotated axes are to be drawn around the
@@ -34638,7 +34644,7 @@ plot (9k).
          Four values may be given, in the order - bottom, right, top, left.
          If less than four values are given, extra values are used equal to
          the first supplied value. If these margins are too narrow any axis
-         annotation may be clipped. If a null ({\tt !}) value is upplied, the
+         annotation may be clipped. If a null ({\tt !}) value is supplied, the
          value used is 0.15 (for all edges) if either annotated axes or a
          key are produced, and zero otherwise. {\tt [current value]}
       }
@@ -34654,6 +34660,14 @@ plot (9k).
          If MINOR is TRUE the horizontal axis of the plot is annotated
          with distance along the minor axis from the centre of the PSF. If
          MINOR is FALSE, the distance along the major axis is used.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         NORM = \_LOGICAL (Read)
+      }{
+         If TRUE, the model PSF is normalized so that it has a peak value
+         of unity. Otherwise, its peak value is equal to the peak
+         value of the first usable star, in the data units of the input
+         NDF. {\tt [TRUE]}
       }
       \sstsubsection{
          ORIENT = \_REAL (Write)
@@ -45438,6 +45452,22 @@ The following applications have been modified:
          and create a genuinely 2 dimensional output image (previously,
          the third pixel axis was retain with bounds spanning a single
          pixel). 
+      \end{itemize}
+
+   \item [\htmlref{PSF}{PSF}] \mbox{}
+      \begin{itemize}
+         \item The default normalization of the model PSF is now chosen
+               to give a peak value of exactly 1.0. Previously, the peak
+               value could be higher or lower than 1.0 depending on whether
+               the PSF was narrower or wider than a Gaussian.
+         \item New parameters NORM and AMP1 have been added. NORM allows
+               the peak value of the model PSF to be set equal to the
+               fitted peak value of the first usable star, instead of
+               the default value of 1.0. AMP1 is an output parameter
+               which receives the fitted peak value of the first usable
+               star, in the data units of the input NDF.
+         \item A bug has been fixed which could cause PSF to fail if the
+               search box contains any bad pixels.
       \end{itemize}
 
    \item [\htmlref{SEGMENT}{SEGMENT}] \mbox{}
