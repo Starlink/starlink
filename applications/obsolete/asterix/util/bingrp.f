@@ -161,6 +161,7 @@
       INTEGER			AXPTR(ADI__MXDIM)	! Mapped axis data
       INTEGER       		DIMS(ADI__MXDIM)    	! Input dimensions
       INTEGER			GPTR			! Grouping array
+      INTEGER			I			! Loop over radial bounds
       INTEGER			IGRP			! Group number
       INTEGER       		IGPTR               	! Input data
       INTEGER			IFID			! Input dataset id
@@ -210,9 +211,12 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. (CANCEL.OR.POLAR.OR.ARD) ) THEN
-        CALL MSG_PRNT( 'Defaulting to axis grouping mode' )
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Only POLAR and ARD modes are supported '/
+     :                                     /'at the moment', STATUS )
         AXMODE = .TRUE.
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Does grouping already exist?
       CALL BDI_CHK( IFID, 'Grouping', OK, STATUS )
@@ -409,7 +413,14 @@
 *        Get ranges
             CALL PRS_GETRANGES( 'RBNDS', MXRNG*2, 1, 0.0, DIST,
      :                          RBNDS, NRBIN, STATUS )
-            NRBIN = NRBIN + 1
+
+*        Convert axis values to pixels
+            DO I = 1, NRBIN*2
+              RBNDS(I) = RBNDS(I) / ABS(ASCALE(1))
+            END DO
+
+*        Add implicit bounds
+            NRBIN = NRBIN + 2
 
           END IF
           IF (STATUS .NE. SAI__OK) GOTO 99
