@@ -41,6 +41,8 @@
 *        Replaced AST_BEAR by AST_AXANGLE.
 *     28-JAN-2003 (DSB):
 *        Added AST_GETACTIVEUNIT.
+*     14-FEB-2003 (DSB):
+*        Added new values for WcsMap projections.
 *-
 
 *  Length of character string returned by a character function.
@@ -232,58 +234,66 @@ c      PARAMETER ( AST__UKERNN = 2 )
       LOGICAL AST_ISAUNITMAP
 
 *  WcsMap class.
+      INTEGER AST__AIR
+      PARAMETER ( AST__AIR = 9 )
+      INTEGER AST__AIT
+      PARAMETER ( AST__AIT = 17 )
+      INTEGER AST__ARC
+      PARAMETER ( AST__ARC = 6 )
       INTEGER AST__AZP
       PARAMETER ( AST__AZP = 1 )
-      INTEGER AST__TAN
-      PARAMETER ( AST__TAN = 2 )
+      INTEGER AST__BON
+      PARAMETER ( AST__BON = 22 )
+      INTEGER AST__CAR
+      PARAMETER ( AST__CAR = 12 )
+      INTEGER AST__CEA
+      PARAMETER ( AST__CEA = 11 )
+      INTEGER AST__COD
+      PARAMETER ( AST__COD = 20 )
+      INTEGER AST__COE
+      PARAMETER ( AST__COE = 19 )
+      INTEGER AST__COO
+      PARAMETER ( AST__COO = 21 )
+      INTEGER AST__COP
+      PARAMETER ( AST__COP = 18 )
+      INTEGER AST__CSC
+      PARAMETER ( AST__CSC = 25 )
+      INTEGER AST__CYP
+      PARAMETER ( AST__CYP = 10 )
+      INTEGER AST__GLS
+      PARAMETER ( AST__GLS = 28 )
+      INTEGER AST__MER
+      PARAMETER ( AST__MER = 13 )
+      INTEGER AST__MOL
+      PARAMETER ( AST__MOL = 16 )
+      INTEGER AST__NCP
+      PARAMETER ( AST__NCP = 27 )
+      INTEGER AST__PAR
+      PARAMETER ( AST__PAR = 15 )
+      INTEGER AST__PCO
+      PARAMETER ( AST__PCO = 23 )
+      INTEGER AST__QSC
+      PARAMETER ( AST__QSC = 26 )
+      INTEGER AST__SFL
+      PARAMETER ( AST__SFL = 14 )
       INTEGER AST__SIN
-      PARAMETER ( AST__SIN = 3 )
+      PARAMETER ( AST__SIN = 5 )
       INTEGER AST__STG
       PARAMETER ( AST__STG = 4 )
-      INTEGER AST__ARC
-      PARAMETER ( AST__ARC = 5 )
-      INTEGER AST__ZPN
-      PARAMETER ( AST__ZPN = 6 )
-      INTEGER AST__ZEA
-      PARAMETER ( AST__ZEA = 7 )
-      INTEGER AST__AIR
-      PARAMETER ( AST__AIR = 8 )
-      INTEGER AST__CYP
-      PARAMETER ( AST__CYP = 9 )
-      INTEGER AST__CAR
-      PARAMETER ( AST__CAR = 10 )
-      INTEGER AST__MER
-      PARAMETER ( AST__MER = 11 )
-      INTEGER AST__CEA
-      PARAMETER ( AST__CEA = 12 )
-      INTEGER AST__COP
-      PARAMETER ( AST__COP = 13 )
-      INTEGER AST__COD
-      PARAMETER ( AST__COD = 14 )
-      INTEGER AST__COE
-      PARAMETER ( AST__COE = 15 )
-      INTEGER AST__COO
-      PARAMETER ( AST__COO = 16 )
-      INTEGER AST__BON
-      PARAMETER ( AST__BON = 17 )
-      INTEGER AST__PCO
-      PARAMETER ( AST__PCO = 18 )
-      INTEGER AST__GLS
-      PARAMETER ( AST__GLS = 19 )
-      INTEGER AST__PAR
-      PARAMETER ( AST__PAR = 20 )
-      INTEGER AST__AIT
-      PARAMETER ( AST__AIT = 21 )
-      INTEGER AST__MOL
-      PARAMETER ( AST__MOL = 22 )
-      INTEGER AST__CSC
-      PARAMETER ( AST__CSC = 23 )
-      INTEGER AST__QSC
-      PARAMETER ( AST__QSC = 24 )
-      INTEGER AST__NCP
-      PARAMETER ( AST__NCP = 25 )
+      INTEGER AST__SZP
+      PARAMETER ( AST__SZP = 2 )
+      INTEGER AST__TAN
+      PARAMETER ( AST__TAN = 3 )
+      INTEGER AST__TPN
+      PARAMETER ( AST__TPN = 29 )
       INTEGER AST__TSC
-      PARAMETER ( AST__TSC = 26 )
+      PARAMETER ( AST__TSC = 24 )
+      INTEGER AST__ZEA
+      PARAMETER ( AST__ZEA = 8 )
+      INTEGER AST__ZPN
+      PARAMETER ( AST__ZPN = 7 )
+      INTEGER AST__WCSBAD 
+      PARAMETER ( AST__WCSBAD = 30 )
 
       INTEGER AST_WCSMAP
       LOGICAL AST_ISAWCSMAP
