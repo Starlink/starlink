@@ -113,11 +113,11 @@ dnl FFLAGS=$safe_FFLAGS
 
 dnl  So do it by hand.
 cat >conftest.f <<EOF
-      PROGRAM SILLY
+      PROGRAM CONFTEST
       I=1
       END
 EOF
-$F77 $FFLAGS $PROFILINGOPTION $NOUNDERSCORES -o conftest.o conftest.f
+$F77 $FFLAGS $PROFILINGOPTION $NOUNDERSCORES -c conftest.f
 if test $? = 0; then
     echo "Fortran flags $FFLAGS $PROFILINGOPTION $NOUNDERSCORES work"
 else
@@ -125,7 +125,7 @@ else
     Oooh-err.  Based on your platform, 
         $host
     I thought that the Fortran compiler options 
-        $FFLAGS $PROFILINGOPTION $NOUNDERSCORES
+        $F77 $FFLAGS $PROFILINGOPTION $NOUNDERSCORES -c conftest.f
     would work, but they don't appear to.  Perhaps the Fortran
     compiler you've selected, $F77, isn't the default one for this
     platform.  You can force the profiling options and no-underscores
