@@ -350,7 +350,7 @@ f     - Title: The Plot title drawn using AST_GRID
 *       possible.
 *     13-JUN-2002 (DSB):
 *       Modified Norm1 to prevent major tick value from being removed if
-*       the supplied reference value is out of bounds, resulting int he
+*       the supplied reference value is out of bounds, resulting in the
 *       Mapping producing bad values
 *     14-JUN-2002 (DSB):
 *       Re-wrote PlotLabels to improve abbreviation of labels and the
@@ -9872,10 +9872,10 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 *     12h). For this reason, tick marks are removed if there are no axis
 *     values inbetween the tick mark and either of its neighbours. However,
 *     small "holes" in the axis coverage are allowed, and ticks marks are 
-*     returned covering such small
-*     holes. Extra tick marks are also placed at each end of the range to
-*     guard against the supplied array of axis values not entirely covering
-*     the range of axis values in the plotting area.
+*     returned covering such small holes. Extra tick marks are also placed 
+*     at each end of the range to guard against the supplied array of axis 
+*     values not entirely covering the range of axis values in the plotting 
+*     area.
 *
 *     For SkyFrames, positions which have latitude values outside the
 *     normal ranges are ignored. Longitude ranges are not checked to
@@ -9884,10 +9884,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 *     The returned tick mark values are placed into their primary domain
 *     using the Norm1 method, but are NOT normalised using the astNorm
 *     method for the supplied Frame. Duplicate tick marks values are
-*     removed from the returned list, as are tick marks which are outside 
-*     their primary domain (as indicated by the fact that they change
-*     significantly when mapped into the GRAPHICS frame and then back into
-*     the current Frame).
+*     removed from the returned list.
 
 *  Parameters:
 *     map 
@@ -9934,6 +9931,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
    double f;          /* The nearest acceptable tick mark index */
    double val[ 2 ];   /* Axis values to be normalised */
    double bot;        /* Lowest axis value to be displayed */
+   double tmp;        /* Temporary storage */
    double top;        /* Highest axis value to be displayed */
    int k;             /* Tick mark index */
    int lnfill;        /* Last used value for nfill */
@@ -9974,6 +9972,11 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 /* Remove ticks which are not within the axis ranges to be displayed. */
    bot = astGetBottom( frame, axis );
    top = astGetTop( frame, axis );
+   if( bot > top ) {
+      tmp = top;
+      top = bot;
+      bot = tmp;
+   }      
    r = ticks;
    for( k = 0; k < nticks; k++ ){
       if( *r != AST__BAD && ( *r < bot || *r > top ) ) *r = AST__BAD;
@@ -13812,6 +13815,7 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    double *ticks;         /* Pointer to tick mark values */
    double bot;            /* Lowest axis value to display */
    double end;            /* Axis value at end of curve section */
+   double tmp;            /* Temp storage */
    double top;            /* Highest axis value to display */
    int i;                 /* Tick mark index */
    int j;                 /* Axis index */
@@ -13867,6 +13871,11 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 /* Find the axis range to display on the other axis. */
          bot = astGetBottom( fr, 1 - j );
          top = astGetTop( fr, 1 - j );
+         if( bot > top ) {
+            tmp = top;
+            top = bot;
+            bot = tmp;
+         }      
 
 /* Get a pointer to the major tick mark values on the other axis ("1-j"), 
    together with the number of them. */
@@ -16533,7 +16542,7 @@ static void Map1( int n, double *dist, double *x, double *y,
 /* If points not in their normal ranges are to be set bad... */
       if( Map1_norm ) { 
 
-/* The following code siply normalizes the physical position, and if this
+/* The following code simply normalizes the physical position, and if this
    produces any change, the graphics positions are set bad. */
          for( i = 0; i < n; i++){
             for( j = 0; j < Map1_ncoord; j++) work1[j] = ptr1[j][i];
@@ -16548,7 +16557,7 @@ static void Map1( int n, double *dist, double *x, double *y,
          }
 
 /* The above code is not fool-proof since it only checks for redundancy 
-   produced by the Frame geometry, and ignroed the possiblity of
+   produced by the Frame geometry, and ignored the possiblity of
    redundancy being introduced by the base->current Mapping. For instance
    if the current Frame is a simple Frame and the Mapping is a
    Cartesian->Polar mapping, then each graphics position will correspond
