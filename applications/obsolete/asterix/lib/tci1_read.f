@@ -113,11 +113,15 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate HEADER structure
-      CALL ADI1_LOCHEAD( ARGS(1), .FALSE., HLOC, STATUS )
-
 *  The new object
       CALL ADI_NEW0( 'TimingInfo', OARG, STATUS )
+
+*  Locate HEADER structure
+      CALL ADI1_LOCHEAD( ARGS(1), .FALSE., HLOC, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        GOTO 99
+      END IF
 
 *  Simple conditional copies
       CALL ADI1_CCH2AR( HLOC, 'EXPOSURE_TIME', OARG, 'Exposure',
@@ -151,6 +155,6 @@
       END IF
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'TCI1_READ', STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'TCI1_READ', STATUS )
 
       END
