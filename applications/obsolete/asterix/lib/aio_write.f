@@ -14,10 +14,12 @@
 *    Authors :
 *
 *     David J. Allan (JET-X, University of Birmingham)
+*     Richard Beard (University of Birmingham)
 *
 *    History :
 *
 *      4 May 94 : Original. Derived from old UTIL_SELOUT routine (DJA)
+*      3 Apr 98 : Try to get 132 width screens (RB)
 *
 *    Type definitions :
 *
@@ -47,7 +49,7 @@
 *
 *    Local variables :
 *
-      CHARACTER*200		BUF			! Output buffer
+      CHARACTER*256		BUF			! Output buffer
 
       INTEGER			BLEN			! Buffer length
       INTEGER                   LID                     ! Local channel id
@@ -60,30 +62,20 @@
 *    If AIO isn't up and running, write to terminal
       IF ( .NOT. AIO_DEF ) THEN
         LID = AIO__M_CONSOLE
-        LWID = 79
+        LWID = 132
       ELSE
         LID = ID
         LWID = AIO_WIDTH
       END IF
 
-*    Switch on mode
+*    Translate any tokens
+      CALL MSG_LOAD( ' ', TEXT, BUF, BLEN, STATUS )
+
+*    Switch on mode to write the text
       IF ( LID .EQ. AIO__M_CONSOLE ) THEN
-
-        IF ( (LEN(TEXT) .GT. LWID) .AND. AIO_WRAP ) THEN
-          CALL MSG_OUT( ' ', TEXT(:LWID), STATUS )
-          CALL MSG_OUT( ' ', TEXT(LWID+1:), STATUS )
-        ELSE
-          CALL MSG_OUT( ' ', TEXT(:MIN(LEN(TEXT),LWID)), STATUS )
-        END IF
-
+        CALL FIO_WRITE( 6, BUF(:BLEN), STATUS )
       ELSE
-
-*      Translate any tokens
-        CALL MSG_LOAD( ' ', TEXT, BUF, BLEN, STATUS )
-
-*      Write the text
         CALL FIO_WRITE( AIO_FID, BUF(:BLEN), STATUS )
-
       END IF
 
 *    Tidy up
