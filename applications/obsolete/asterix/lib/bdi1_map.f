@@ -163,8 +163,40 @@
 *    Release the object
         CALL DAT_ANNUL( CLOC, STATUS )
 
-*  Objects doesn't exist?
+*  Object doesn't exist?
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+
+*     Axis widths?
+        IF ( (ITEM(1:5).EQ.'Axis_') .AND. (ITEM(8:).EQ.'Width') ) THEN
+
+*       Use axis data to invent widths
+          CALL ERR_ANNUL( STATUS )
+
+*       Locate the data
+          CALL BDI1_CFIND( ARGS(1), ARGS(2), 'Data', .FALSE.,
+     :                     CLOC, STATUS )
+
+*       Map it
+          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', .FALSE., PSID, PTR,
+     :                      NELM, STATUS )
+
+*       Create dynamic array
+          CALL DYN_MAPR( 1, NELM, WPTR, STATUS )
+
+*       Convert to widths
+          CALL BDI1_MAP_V2W( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+
+*       Free mapped data
+          CALL BDI1_UNMAP_INT( PSID, STATUS )
+
+*       Return widths
+          PTR = WPTR
+
+*       Store dynamic mapped widths
+          CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR, 'REAL',
+     :                      'READ', STATUS )
+
+        END IF
 
 *     Report error
         STATUS = SAI__ERROR
@@ -173,7 +205,142 @@
 
       END IF
 
+*  Everything went ok?
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*    Release storage
+        CALL ADI_ERASE( PSID, STATUS )
+
+*    If mapping went ok, store the pointer in the return argument
+        CALL ADI_NEWV0I( PTR, OARG, STATUS )
+
+*    Release the object
+        CALL DAT_ANNUL( CLOC, STATUS )
+
+      END IF
+
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_MAP', STATUS )
+
+      END
+
+
+
+      SUBROUTINE BDI1_MAP_V2W( NVAL, AXVAL, WIDTH, STATUS )
+*+
+*  Name:
+*     BDI1_MAP_V2W
+
+*  Purpose:
+*     Invent axis widths from axis values
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_MAP_V2W( NVAL, AXVAL, WIDTH, STATUS )
+
+*  Description:
+
+*  Arguments:
+*     NVAL = INTEGER (given)
+*        Number of axis widths to invent
+*     AXVAL(*) = REAL (given)
+*        Axis values
+*     WIDTH(*) = REAL (returned)
+*        Axis widths
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   NVAL
+      REAL			AXVAL(*)
+
+*  Arguments Given and Returned:
+      REAL			WIDTH(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check for single axis value
+      IF ( NVAL .EQ. 1 ) THEN
+        WIDTH = 0.0
+
+      ELSE
+        DO I = 2, NVAL - 1
+          WIDTH(I) = ABS((AXVAL(I+1) - AXVAL(I-1))/2.0)
+        END DO
+        WIDTH(1) = ABS(AXVAL(2) - AXVAL(1))
+        WIDTH(NVAL) = ABS(AXVAL(NVAL) - AXVAL(NVAL-1))
+
+      END IF
 
       END
