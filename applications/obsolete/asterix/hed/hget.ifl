@@ -1,0 +1,43 @@
+INTERFACE HGET
+
+   PARAMETER INP
+    TYPE 'UNIV'
+    POSITION 1
+    KEYWORD 'INP'
+    PPATH 'GLOBAL'
+    PROMPT 'Object name'
+    help 'Full path name of object to be displayed'
+    ASSOCIATION '<->GLOBAL.HDSOBJ'
+   ENDPARAMETER
+
+   PARAMETER ITEM
+     POSITION 2
+     type '_CHAR'
+     DEFAULT 'VALUE'
+     VPATH 'PROMPT'
+     PPATH 'DEFAULT'
+     PROMPT 'Attribute'
+   ENDPARAMETER
+
+   PARAMETER ATTR
+     TYPE '_CHAR'
+     POSITION 3
+     VPATH 'INTERNAL,NOPROMPT'
+   ENDPARAMETER
+
+   PARAMETER INDEX
+     TYPE '_INTEGER'
+     POSITION 4
+     VPATH 'INTERNAL,NOPROMPT'
+   ENDPARAMETER
+
+   PARAMETER ECHO 
+     TYPE '_LOGICAL'
+     DEFAULT Y
+     VPATH 'DEFAULT,PROMPT'
+     PPATH 'DEFAULT'
+     PROMPT 'Echo attribute value to console'
+     HELP 'Useful in UNIX scripts'
+   ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,17 @@
+ INTERFACE HCOPY
+    PARAMETER INP
+       TYPE 'UNIV'
+       position 1
+       prompt 'Object to copy'
+       help 'Full specification of input object eg.  FILE.NEXT.OBJECT'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       TYPE '_CHAR'
+       position 2
+       prompt 'Object to copy to'
+       help 'Full name of output object'
+    ENDPARAMETER
+
+ ENDINTERFACE
+

@@ -1,0 +1,42 @@
+ INTERFACE HDISPLAY              
+    PARAMETER INP                
+       TYPE 'UNIV'               
+       POSITION 1                
+       KEYWORD 'INP'             
+       PPATH 'GLOBAL'       
+       PROMPT 'Object name'
+       help 'Full path name of object to be displayed'
+       ASSOCIATION '<->GLOBAL.HDSOBJ'
+    ENDPARAMETER
+   parameter DEVICE
+     position 2
+     keyword 'DEV'                                                            
+     type '_CHAR'
+     vpath 'default'
+     default 'TERMINAL'
+     prompt 'Output to'
+     help 'Valid responses are :TERMINAL(default),PRINTER,OLDFILE,NEWFILE or filename'
+   endparameter
+   parameter WIDTH
+     type '_INTEGER'
+     vpath 'DEFAULT'
+     default !
+     prompt 'Output width'
+     help 'Allows you to overide default width of 80 for a terminal'
+   endparameter
+   parameter SLICE                                                               
+     type '_CHAR'                                                                
+     vpath 'DEFAULT'
+     default '*'                                                               
+     prompt 'Slice'                                                         
+     help 'Should have format: i1:i2,j1:j2'                                      
+   endparameter                                                                  
+   parameter FORMAT                                                              
+     type '_CHAR'
+     keyword 'FMT'                                         
+     vpath 'default'                                                      
+     default !
+     prompt 'Output format'                                                      
+     help 'FORTRAN format code eg F10.5'
+   endparameter                                                                  
+ endinterface                                                                    

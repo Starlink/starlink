@@ -1,0 +1,19 @@
+ INTERFACE HDIR      
+    PARAMETER INP    
+       TYPE 'UNIV'   
+       POSITION 1    
+       PPATH 'GLOBAL'
+       PROMPT 'Object name'
+       help 'Full name of object whose components are to be listed'
+       ASSOCIATION '<->GLOBAL.HDSOBJ'                                           
+    ENDPARAMETER                                                                
+   parameter DEVICE                                                             
+     position 2                                                                 
+     keyword 'DEV'                                                           
+     type '_CHAR'                                                               
+     vpath 'default'                                                            
+     default 'TERMINAL'                                                         
+     prompt 'Output to'                                                         
+     help 'Valid responses : TERMINAL(default),PRINTER,OLDFILE,NEWFILE or filename'
+   endparameter
+ endinterface  

@@ -1,0 +1,28 @@
+INTERFACE HREAD
+
+
+   parameter FILE
+      position 1
+      type '_CHAR'
+      prompt 'Filename'
+      help 'The name of the ASCII file that the data values are to be read from'
+   endparameter 
+
+   parameter BINARY
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      default N
+      prompt 'Is file a binary file'
+      help 'Is it a FORTRAN unformatted file'
+   endparameter
+
+   parameter OUT
+      position 2
+      type 'UNIV'
+      ppath 'GLOBAL'
+      association '<->GLOBAL.HDSOBJ'
+      prompt 'Object name'
+      help 'Full name of data object for data to be read into.'
+   endparameter
+
+ENDINTERFACE

@@ -1,0 +1,37 @@
+INTERFACE HWRITE
+
+   parameter INP
+      position 1
+      type 'UNIV'
+      ppath 'GLOBAL'
+      association '<->GLOBAL.HDSOBJ'
+      prompt 'Object name'
+      help 'Full name of data object for data to be written from'
+   endparameter
+
+   parameter FILNAM
+      position 2
+      type '_CHAR'
+      keyword 'FILE'
+      prompt 'Filename'
+      help 'The name of the ASCII file that the data values are to be read from'
+   endparameter
+
+   parameter BINARY
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      default N
+      prompt 'Is output file to be binary'
+      help 'ie. is it to be a FORTRAN unformatted file - default is formatted'
+  endparameter
+
+  parameter FMT
+      type '_CHAR'
+      vpath 'DEFAULT'
+      default !
+      prompt 'Output format'
+      help 'FORTRAN format string eg F10.5'
+  endparameter
+
+ENDINTERFACE
+

@@ -1,0 +1,72 @@
+interface HTAB
+  parameter INP1
+    type 'UNIV'
+    position 1
+    vpath 'PROMPT'
+    ppath 'GLOBAL'
+    association '<->GLOBAL.HDSOBJ'
+    prompt 'Object 1'
+    help 'Full name of vector object to be included in table'
+  endparameter
+  parameter INP2
+    type 'UNIV'
+    position 2
+    vpath 'DEFAULT'
+    default !
+    prompt 'Object 2'
+    help 'Full name of vector object to be included in table'
+  endparameter
+  parameter INP3
+    type 'UNIV'
+    position 3
+    vpath 'DEFAULT'
+    default !
+    prompt 'Object 3'
+    help 'Full name of vector object to be included in table'
+  endparameter
+  parameter INP4
+    type 'UNIV'
+    position 4
+    vpath 'DEFAULT'
+    default !
+    prompt 'Object 4'
+    help 'Full name of vector object to be included in table'
+  endparameter
+  parameter INP5
+    type 'UNIV'
+    position 5
+    vpath 'DEFAULT'
+    default !
+    prompt 'Object 5'
+    help 'Full name of vector object to be included in table'
+  endparameter
+  parameter INP6
+    type 'UNIV'
+    position 6
+    vpath 'DEFAULT'
+    default !
+    prompt 'Object 6'
+    help 'Full name of vector object to be included in table'
+  endparameter
+  parameter DEV
+    type '_CHAR'
+    vpath 'DEFAULT'
+    default 'TERMINAL'
+    prompt 'Output to'
+    help 'T)erminal P)rinter O)ldfile N)ewfile or filename'
+  endparameter
+  parameter WIDTH
+    type '_INTEGER'
+    vpath 'DEFAULT'
+    default !
+    prompt 'Output page width'
+    help 'Overides default of 80 for terminal or 132 for everything else'
+  endparameter
+  parameter SLICE
+    type '_CHAR'
+    vpath 'DEFAULT'
+    default '*'
+    prompt 'Slice'
+    help 'Specification of slice of vectors to be output eg 10:20 '
+  endparameter
+endinterface

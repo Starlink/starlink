@@ -1,0 +1,75 @@
+INTERFACE HTRACE
+
+  PARAMETER INP
+    TYPE 'UNIV'
+    POSITION 1
+    PPATH 'GLOBAL'
+    PROMPT 'Object name'
+    HELP 'Full name of object whose components are to be listed'
+    ASSOCIATION '<->GLOBAL.HDSOBJ'
+  ENDPARAMETER
+
+  PARAMETER DEV
+    POSITION 2
+    TYPE '_CHAR'
+    VPATH 'DEFAULT'
+    DEFAULT 'TERMINAL'
+    PROMPT 'Output to'
+    HELP 'Valid responses : TERMINAL(default),PRINTER,OLDFILE,NEWFILE or filename'
+  ENDPARAMETER
+
+  PARAMETER FULL 
+    TYPE    '_LOGICAL'
+    VPATH   'DEFAULT'
+    PPATH   'DEFAULT'
+    DEFAULT NO
+    PROMPT 'Display full details of structure arrays'
+    HELP   'The default is display only the first element'
+  ENDPARAMETER
+
+  PARAMETER NEWLINE
+    TYPE    '_LOGICAL'
+    VPATH   'DEFAULT'
+    PPATH   'DEFAULT'
+    DEFAULT NO
+    PROMPT 'Display object values on a newline'
+    HELP   'The default is to print them on the same line as name and type'
+  ENDPARAMETER
+
+  PARAMETER EACHLINE
+    TYPE    '_LOGICAL'
+    VPATH   'DEFAULT'
+    PPATH   'DEFAULT'
+    DEFAULT NO
+    PROMPT 'Display elements of arrays of char strings on new lines'
+    HELP   'Helpful if strings are long'
+  ENDPARAMETER
+
+  PARAMETER TYPIND
+    TYPE    '_INTEGER'
+    VPATH   'DEFAULT'
+    PPATH   'DEFAULT'
+    DEFAULT 17
+    PROMPT 'Indentation from object name to type'
+    HELP   'A larger value will insert more white space between name and type'
+  ENDPARAMETER
+
+  PARAMETER VALIND
+    TYPE    '_INTEGER'
+    VPATH   'DEFAULT'
+    PPATH   'DEFAULT'
+    DEFAULT 15
+    PROMPT 'Indentation from object type to value'
+    HELP   'A larger value will insert more white space between type and value'
+  ENDPARAMETER
+
+  PARAMETER NLINES
+    TYPE    '_INTEGER'
+    VPATH   'DEFAULT'
+    PPATH   'DEFAULT'
+    DEFAULT 1
+    PROMPT 'Number of lines for data values'
+    HELP   'Number of lines in addition to the line containing name and type'
+  ENDPARAMETER
+
+ENDINTERFACE
