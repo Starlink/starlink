@@ -153,11 +153,16 @@
 //        FITS headers (actually turned out to be an AST bug).
 //-
 
+// For the cxx on the alphas
+#ifndef __USE_STD_IOSTREAM 
+#define __USE_STD_IOSTREAM 
+#endif 
+
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <iostream.h>
 #include <strstream.h>
+#include <iostream.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <float.h>
@@ -946,7 +951,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             }
             message << ends;
             set_result( message.str() );
-            message.freeze( 0 );
+            message.freeze( false );
         }
         return result;
     } else {
@@ -3037,7 +3042,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
 
     os << ends;
     int result = eval( os.str() );
-    os.freeze( 0 );
+    os.freeze( false );
     return result;
 }
 
@@ -3089,7 +3094,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
 
     os << ends;
     int result = eval( os.str() );
-    os.freeze( 0 );
+    os.freeze( false );
     return result;
 }
 
@@ -4309,7 +4314,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     }
     os << ends;
     set_result( os.str() );
-    os.freeze( 0 );
+    os.freeze( false );
     return TCL_OK;
 }
 
