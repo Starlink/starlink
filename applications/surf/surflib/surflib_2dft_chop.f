@@ -52,9 +52,14 @@
 *    Bugs:
  
 *    Authors:
+*     Tim Jenness (JACH)
+*     John Lightfoot (RoE)
  
 *    History:
 *     $Log$
+*     Revision 1.2  1998/06/05 03:03:16  timj
+*     Fix problem with half pixel shift.
+*
 *     Revision 1.1  1998/04/28 00:30:53  timj
 *     Initial revision
 *
@@ -120,8 +125,8 @@
       HALF_CHOP = CHOP_THROW / (2.0 * PIXSIZE)
  
 *     Centre of image
-      XCEN = REAL(IDIMS(1) + 1 ) / 2.0
-      YCEN = REAL(IDIMS(2) + 1 ) / 2.0
+      XCEN = REAL(IDIMS(1) ) / 2.0
+      YCEN = REAL(IDIMS(2) ) / 2.0
 
 *     Convert CHOP_PA to radians and precaclulate SIN and COS
       RPA = CHOP_PA * PI / 180.0
