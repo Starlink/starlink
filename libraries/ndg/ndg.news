@@ -17,3 +17,5 @@ would be interpreted as the twelth image extension in fred.fit only if
 files cannot be found with basenames "fred1" or "fred2". Specify
 "fred.fit[12]" instead of "fred[12]" if there is any danger of this.
 
+A bug is also fixed in V5.0 which could cause erroneous attempts to 
+access non-NDF objects as if they were NDFs.

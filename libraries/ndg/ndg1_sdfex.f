@@ -18,9 +18,10 @@
 *     The supplied HDS object is searched for NDFs, and the paths to any 
 *     NDFs found within it are appended to the end of group IGRP.
 *     Here, an NDF is defined as an HDS structure containing a component 
-*     called DATA_ARRAY. Note, only NDFs stored explicitly within the
-*     supplied object are included in the returned group (i.e. NDFs
-*     within sub-components are ignored).
+*     called DATA_ARRAY which can be accessed by the ARY library.
+*     Note, only NDFs stored explicitly within the supplied object are 
+*     included in the returned group (i.e. NDFs within sub-components are 
+*     ignored).
 *
 *     The supplied fields are stored in the other groups for each found
 *     NDF.
@@ -73,6 +74,10 @@
 *        Changed to remove recursive searching through components of the
 *        supplied object. Only NDFs stored directly within the supplied
 *        object are now returned.
+*     2-APR-2001 (DSB):
+*        Changed definition of an NDF to "an HDS structure containing
+*        a component called DATA_ARRAY which can be accessed by the ARY
+*        library".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,6 +123,7 @@
       CHARACTER SEC2*1           ! NDF section (should always be blank)
       CHARACTER SUF2*(GRP__SZFNM)! Suffix (eg HDS comp. path)
       INTEGER DIM( DAT__MXDIM )  ! Dimensions of array component
+      INTEGER IARY               ! ARY identifier for array structure
       INTEGER ICELL              ! Cell index
       INTEGER ICOMP              ! Component index
       INTEGER IGRP2              ! Group holding locators to be checked
@@ -168,11 +174,18 @@
 
 *  Only check structures (not primitive values).
          CALL DAT_STRUC( XLOC, STRUCT, STATUS )
-         IF( STRUCT ) THEN
+         IF( STRUCT .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  If this object contains a component called DATA_ARRAY it is assumed
-*  to be an NDF. Append its path to the group.
-            CALL DAT_THERE( XLOC, 'DATA_ARRAY', ISANDF, STATUS ) 
+*  See if this object contains a component called DATA_ARRAY which can be
+*  accessed by the ARY library. If so, the object is assumed to be an NDF.
+            CALL ARY_FIND( XLOC, 'DATA_ARRAY', IARY, STATUS ) 
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL ARY_ANNUL( IARY, STATUS )
+               ISANDF = .TRUE.
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+               ISANDF = .FALSE.
+            END IF
 
 *  If so, just add the full object path to the end of the supplied group.
             IF( ISANDF ) THEN

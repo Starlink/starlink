@@ -15,7 +15,8 @@
 *  Description:
 *     The supplied HDS object is searched for NDFs, and any NDFs which
 *     are found are deleted. Here, an NDF is defined as an HDS structure 
-*     containing a component called DATA_ARRAY. 
+*     containing a component called DATA_ARRAY which can be accessed by the
+*     ARY library.
 
 *  Arguments:
 *     LOC = CHARACTER * ( * ) (Given)
@@ -30,6 +31,10 @@
 *  History:
 *     15-FEB-1999 (DSB):
 *        Original version.
+*     2-APR-2001 (DSB):
+*        Changed definition of an NDF to "an HDS structure containing
+*        a component called DATA_ARRAY which can be accessed by the ARY
+*        library".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,6 +63,7 @@
       CHARACTER VLOC*(DAT__SZLOC)! Locator to vectorised array
       CHARACTER XLOC*(DAT__SZLOC)! Locator to next object to be checked
       INTEGER DIM( DAT__MXDIM )  ! Dimensions of array component
+      INTEGER IARY               ! ARY identifier for array structure
       INTEGER ICELL              ! Cell index
       INTEGER ICOMP              ! Component index
       INTEGER IGRP2              ! Group holding locators to be checked
@@ -99,11 +105,18 @@
 
 *  Only check structures.
          CALL DAT_STRUC( XLOC, STRUCT, STATUS )
-         IF( STRUCT ) THEN
+         IF( STRUCT .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  If this object contains a component called DATA_ARRAY it is assumed
-*  to be an NDF. 
-            CALL DAT_THERE( XLOC, 'DATA_ARRAY', ISANDF, STATUS ) 
+*  See if this object contains a component called DATA_ARRAY which can be
+*  accessed by the ARY library. If so, the object is assumed to be an NDF.
+            CALL ARY_FIND( XLOC, 'DATA_ARRAY', IARY, STATUS ) 
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL ARY_ANNUL( IARY, STATUS )
+               ISANDF = .TRUE.
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+               ISANDF = .FALSE.
+            END IF
 
 *  If so, we delete the current component.
             IF( ISANDF ) THEN
