@@ -40,7 +40,7 @@ STAR_MONOLITHS
 STAR_CNF_COMPATIBLE_SYMBOLS
  
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae cnf ems gns gwm par])
+STAR_DECLARE_DEPENDENCIES([build], [sae cnf ems gns gwm par starx])
 STAR_DECLARE_DEPENDENCIES([link],  [cnf ems gwm gns starx])
  
 dnl    List the sun/ssn/... numbers which document this package and
