@@ -29,6 +29,7 @@
     </person>
   </developers>
   <!-- <documentation> sun225</documentation> -->
+  <tests status="yes"/>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year></year>

@@ -35,6 +35,7 @@
     </person>
   </developers>
   <!-- <documentation> ssn73</documentation> -->
+  <tests status="yes"/>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year></year>

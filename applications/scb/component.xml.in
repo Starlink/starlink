@@ -29,6 +29,7 @@
     </person>
   </developers>
   <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <tests status="yes"/>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <copyright>
     <year></year>
