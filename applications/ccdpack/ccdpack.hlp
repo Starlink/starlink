@@ -171,6 +171,10 @@
 
  - DRIZZLE has been substantially speeded up and some bugs removed.
 
+ - The percentile location algorithm in FINDOBJ has been improved to 
+   deal better with images containing a few rougue pixels with far 
+   outlying values.
+
  - The behaviour of IDICURS, PAIRNDF and CCDALIGN on TrueColor visuals 
    (typically newer Linux X displays) has been improved; they now signal 
    an error rather than just crashing.  In a future release these 
@@ -179,7 +183,7 @@
 
  - An improved version of the AST file INT-WFC.ast, for astrometry of
    frames from the WFC mosaic camera on the Isaac Newton Telescope, 
-   has been included.
+   has been included in the distribution.
 
 1 ASTEXP
 Exports coordinate system information from images to an AST file

@@ -16052,6 +16052,10 @@ This is a major update to CCDPACK.
 \item
   \xroutine{DRIZZLE} has been substantially speeded up and some bugs removed.
 \item
+  The percentile location algorithm in \xroutine{FINDOBJ} has been improved to 
+  deal better with images containing a few rougue pixels with far 
+  outlying values.
+\item
   The behaviour of \xroutine{IDICURS}, \xroutine{PAIRNDF} and 
   \xroutine{CCDALIGN} on TrueColor visuals (typically newer Linux X displays)
   has been improved; they now signal an error rather than just crashing.
@@ -16060,7 +16064,7 @@ This is a major update to CCDPACK.
 \item
   An improved version of the AST file INT-WFC.ast, for astrometry of 
   frames from the WFC mosaic camera on the Isaac Newton Telescope,
-  has been included.
+  has been included in the distribution.
 \end{itemize}
 
 

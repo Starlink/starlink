@@ -5,14 +5,18 @@
 
   - As of this release, the handling of group parameters is done using
     the GRP and NDG libraries as in some other Starlink packages, notably
-    KAPPA.  For most purposes behaviour will be unchanged,
-    but now when specifying a list of images, the name of an HDS container
-    file holding several NDFs may be given, and each of the contained NDFs
-    will be processed as a separate image.  This affects almost all the
-    CCDPACK tasks.
+    KAPPA.  For most purposes behaviour will be unchanged, but now when 
+    specifying a list of images, the name of an HDS container file holding
+    several NDFs may be given, and each of the contained NDFs will be 
+    processed as a separate image.  This affects almost all the CCDPACK
+    tasks.
 
   - DRIZZLE has been substantially speeded up and some bugs removed.
 
+  - The percentile location algorithm in FINDOBJ has been improved to 
+    deal better with images containing a few rougue pixels with far 
+    outlying values.
+    
   - The behaviour of IDICURS, PAIRNDF and CCDALIGN on TrueColor visuals 
     (typically newer Linux X displays) has been improved; they now signal 
     an error rather than just crashing.  In a future release these 
@@ -21,5 +25,5 @@
 
   - An improved version of the AST file INT-WFC.ast, for astrometry of
     frames from the WFC mosaic camera on the Isaac Newton Telescope,
-    has been included.
+    has been included in the distribution.
 
