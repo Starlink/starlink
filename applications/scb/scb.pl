@@ -390,9 +390,9 @@ sub get_module {
 #  Interpret the first element of the location as a package or symbolic
 #  directory name.  Either way, change it for a logical path name.
 
-   my ($file, $tarfile, $dir);
-   if ($dir = $locate{"$head#"}) {
-      $file = "$dir/$tail";
+   my ($file, $tarfile, $dir, $loc);
+   if ($loc = $locate{"$head#"}) {
+      $file = ($loc =~ m%\.tar[^/>#]*$%) ? "$loc>$tail" : "$loc/$tail";
    }
    elsif (-d "$srcdir/$head") {
       $file = "$srcdir/$head/$tail";
