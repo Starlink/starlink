@@ -57,8 +57,8 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_tidy_line.f sculib_unpack.f sculib_unpack_chopscan.f \
 	sculib_unpack_jiggle.f sculib_unpack_jiggle_separates.f sculib_ut1.f \
 	sculib_copyb.f sculib_cfillb.f sculib_bits.f\
-	sculib_bessel_wtinit.f sculib_linear_wtinit.f sculib_set_quality.f\
-	sculib_calc_azna_offset.f
+	sculib_bessel_wtinit.f sculib_linear_wtinit.f sculib_set_quality.f
+
 
 OBJS = ${FSOURCES:.f=.o}
 
