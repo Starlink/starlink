@@ -194,7 +194,7 @@
      &          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
      &          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
 *
-	print *,2
+	print *,11
 *
          CALL DYN_UNMAP(SMPTR,STATUS)
          IF (SRT.BCKGND) THEN
@@ -3300,12 +3300,14 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
           IF (SOK) THEN
 
+	print *,4
 *
 *  Calculate position of data in array
 *  The first two dimensions of the array can be either
 *  X and Y pixel or RADIAL and AZIMUTHAL bin, depending on
 *  the user selection.
             IF (SRT.IMAGE) THEN
+	print *,5
 *
 *  X,Y bins:
               EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
@@ -3354,7 +3356,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
             EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
 *
-
+	print *,EL1,EL2,EL3,EL4,EL5,EL6,EL7
             SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
 *
