@@ -897,7 +897,8 @@ TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf iras.sdf
 #  Define the plotting style files.
 
 STYLE_FILES = kappa_style.def kappa_lutview_style.def \
-kappa_keystyle.def kappa_linplot_keystyle.def kappa_vecplot_keystyle.def
+kappa_keystyle.def kappa_linplot_keystyle.def kappa_vecplot_keystyle.def \
+kappa_display_keystyle.def
 
 #  List of TK/TCL object libraries.
 
@@ -1975,7 +1976,7 @@ do_deinstall:
         done
 #
 #  Remove the package version file in the installation directory.
-	- if test -n "version"; then \
+	- if test -n "version.dat"; then \
              rm -f $(INSTALL_BIN)/version.dat ;\
            else :; 
 #
