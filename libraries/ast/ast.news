@@ -19,11 +19,16 @@ Main Changes in this Version
    longitude values to be displayed in the range -pi to +pi, instead of the
    usual range  of zero to 2.pi.
 
-   o  Several new methods have been added to the Frame class to allow
-   more generalized geometric operations to be performed without needing
-   to know the class of the Frame. These operations include finding
-   position angles, resolving vectors, moving along geodesic curves at
-   specified position angles, etc.
+   o Several new methods have been added to the Frame class to allow
+   navigation of the coordinate space to be performed without needing to
+   know the underlying geometry of the co-ordinate system (for instance,
+   whether it is Cartesian or spherical).
+
+   NOTE, version 1.8-1 contained many of these facilities, but some have
+   been changed in version 1.8-2. Particularly, positions angles are now
+   referred to the second Frame axis for all classes of Frames
+   (including SkyFrames), and the astBear method has been replaced
+   by astAxAngle. 
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
@@ -41,4 +46,4 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-14/6/2001
+21/9/2001

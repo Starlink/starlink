@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_AGNST( NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2, 
-     :                       X, Y, STATUS )
+      SUBROUTINE KPS1_AGNST( IPLOT, NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2, 
+     :                       X, Y, NREG, STATUS )
 
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_AGNST( NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2, X, Y, 
-*                      STATUS )
+*     CALL KPS1_AGNST( IPLOT, NPTS, ARDDEF, IGRP, X1, X2, Y1, Y2, X, Y, 
+*                      NREG, STATUS )
 
 *  Description:
 *     Given the current region shape and the co-ordinates/dimensions
@@ -28,6 +28,8 @@
 *     which are not rounded.
 
 *  Arguments:
+*     IPLOT = INTEGER (Given)
+*        An AST pointer to the Plot.
 *     NPTS = INTEGER (Given)
 *        Number of points defined.
 *     ARDDEF = CHARACTER * ( * ) (Given)
@@ -42,12 +44,14 @@
 *        World y co-ordinate of the bottom left-hand corner of image.
 *     Y2 = REAL (Given)
 *        World y co-ordinate of the top right-hand corner of image.
-*     X( NPTS ) = REAL (Given)
+*     X( NPTS ) = DOUBLE PRECISION (Given)
 *        The x co-ordinate of the points and other region defining 
-*        information.
-*     Y( NPTS ) = REAL (Given)
+*        information. Given in the current Frame of IPLOT.
+*     Y( NPTS ) = DOUBLE PRECISION (Given)
 *        The y co-ordinate of the points and other region-defining
-*        information.
+*        information. Given in the current Frame of IPLOT.
+*     NREG = INTEGER (Given and Returned)
+*        The number of regions currently in the group.
 *     STATUS = INTEGER(Given and Returned)
 *        The global status.
 
@@ -73,6 +77,8 @@
 *        consistency within KAPPA.
 *     1996 March 4 (MJC):
 *        Fixed bug where x co-ordinate was 10 times too big for a box.
+*     18-SEP-2001 (DSB):
+*        Modified for ARD V2/AST/PGPLOT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,8 +91,12 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'NDF_PAR'          ! NDF constants 
 
 *  Arguments Given:
+      INTEGER IPLOT
       INTEGER NPTS
       CHARACTER * ( * ) ARDDEF
       INTEGER IGRP
@@ -94,46 +104,74 @@
       REAL X2
       REAL Y1
       REAL Y2
-      REAL X( NPTS )
-      REAL Y( NPTS )
+      DOUBLE PRECISION X( NPTS )
+      DOUBLE PRECISION Y( NPTS )
+
+*  Arguments Given and Returned:
+      INTEGER NREG
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      REAL RTOD                  ! Factor for converting radians to
-      PARAMETER ( RTOD = 57.29578 ) ! degrees
+      DOUBLE PRECISION PI        
+      PARAMETER ( PI = 3.1415926535898D0 )
+
+      DOUBLE PRECISION PIBY2
+      PARAMETER ( PIBY2 = PI/2 )
+
+      DOUBLE PRECISION RTOD      
+      PARAMETER ( RTOD = 180/PI ) 
 
 *  Local Variables:
-      REAL DIRECT                ! Position angle of ellipse
+      CHARACTER LINE*(GRP__SZNAM)! Buffer for writing ARD output file
+      DOUBLE PRECISION P1( NDF__MXDIM ) ! Position 1
+      DOUBLE PRECISION P2( NDF__MXDIM ) ! Position 2
+      DOUBLE PRECISION P3( NDF__MXDIM ) ! Position 3
+      DOUBLE PRECISION P4( NDF__MXDIM ) ! Position 4
+      DOUBLE PRECISION P5( NDF__MXDIM ) ! Position 5
+      DOUBLE PRECISION PA1       ! Position angle 
+      DOUBLE PRECISION PA2       ! Position angle 
+      DOUBLE PRECISION PA3       ! Position angle 
+      DOUBLE PRECISION MD        ! Min distance to edge
+      DOUBLE PRECISION D1        ! A distance
+      DOUBLE PRECISION D2        ! A distance
+      DOUBLE PRECISION DANG      ! Angle to turn by
+      DOUBLE PRECISION RADIUS    ! Radius of the circle required
+      DOUBLE PRECISION SMA       ! Semi-major axis value
+      DOUBLE PRECISION SMI       ! Semi-minor axis value
+      DOUBLE PRECISION T         ! Intermediate value
+      DOUBLE PRECISION XC        ! Box centre
+      DOUBLE PRECISION LN        ! Length of box side
+      DOUBLE PRECISION YC        ! Box centre
+      DOUBLE PRECISION WD        ! Length of box side
+      INTEGER AXIS               ! Index of axis used to measure distances
       INTEGER I                  ! Loop variable
-      CHARACTER * ( 80 ) LINE    ! Buffer for writing ARD output file
-      REAL MD                    ! Minimum distance to the edge
-      INTEGER NC                 ! Number of bytes of the 
-                                 ! output string occupied
-      REAL RADIUS                ! Radius of the circle required
-      REAL SMA                   ! Semi-major axis value
-      REAL SMI                   ! Semi-minor axis value
-      REAL XC                    ! Box centre
-      REAL XL                    ! Length of box side
-      REAL YC                    ! Box centre
-      REAL YL                    ! Length of box side
-   
-*  Statement Functions:
-      REAL ROUND, XX
-      ROUND( XX ) = 0.1 * REAL( NINT( XX * 10.0 ) ) ! Round to 1
-                                 ! decimal place
+      INTEGER CFRM               ! Pointer to current Frame
+      INTEGER NC                 ! Number of bytes of the output string occupied
 
 *.
 
 *  Check the inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Set THE initial value for output string.
+*  Set the initial value for output string.
       LINE = ' ' 
 
-*  Set the characters used counter to zero.
+*  Set the "characters used" counter to zero.
       NC = 0
+
+*  Get a pointer to the Frame in which positions are supplied (the current 
+*  Frame of IPLOT).
+      CFRM = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
+
+*  Determine the axis whch should be used for formatting geodesic
+*  distances.
+      IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
+         AXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
+      ELSE
+         AXIS = 1
+      END IF
 
 *  Box.
       IF ( ARDDEF .EQ. 'BOX' ) THEN
@@ -141,139 +179,273 @@
 *  Find the centre and side lengths.
          XC = X( 1 )
          YC = Y( 1 )
-         XL = ABS( X( 3 ) - X( 2 ) )
-         YL = ABS( Y( 3 ) - Y( 2 ) )
+         LN = ABS( X( 3 ) - X( 2 ) )
+         WD = ABS( Y( 3 ) - Y( 2 ) )
 
-*  Create the string, rounding the co-ordinate values to 1 decimal
-*  place.
-         CALL CHR_PUTC( 'BOX( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( XC ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( YC ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( XL ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( YL ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+*  Create the string.
+         CALL CHR_PUTC( 'BOX(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, XC, STATUS ), LINE, NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, YC, STATUS ), LINE, NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, LN, STATUS ), LINE, NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, WD, STATUS ), LINE, NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
  
 *  Frame.
       ELSE IF ( ARDDEF .EQ. 'FRAME' ) THEN
 
-*  Find the sminimum distance to an edge.  X axis.
-         MD = X( 1 )
+*  Transform the given position back to graphics coords.
+         CALL AST_TRAN2( IPLOT, 1, X, Y, .FALSE., XC, YC, STATUS )
+
+*  Find the closest position on an edge of the plot.
+         IF( MIN( ABS( X2 - XC ), ABS( XC - X1 ) ) .LT.
+     :       MIN( ABS( Y2 - YC ), ABS( YC - Y1 ) ) ) THEN
+            IF( ABS( X2 - XC ) .LT. ABS( XC - X1 ) ) THEN
+               XC = X2
+            ELSE           
+               XC = X1
+            END IF
+         ELSE
+            IF( ABS( Y2 - YC ) .LT. ABS( YC - Y1 ) ) THEN
+               YC = Y2
+            ELSE           
+               YC = Y1
+            END IF
+         END IF
+
+*  Transform this position back to the current Frame.
+         CALL AST_TRAN2( IPLOT, 1, XC, YC, .TRUE., XC, YC, STATUS )
+
+*  Find the geodesic distance from the supplied position to the nearest
+*  edge position.
+         P1( 1 ) = X( 1 )
+         P1( 2 ) = Y( 1 )
+         P2( 1 ) = XC
+         P2( 2 ) = YC
+         MD = AST_DISTANCE( CFRM, P1, P2, STATUS )
 
 *  Create the string.
-         CALL CHR_PUTC( 'FRAME( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( MD ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+         CALL CHR_APPND( 'FRAME(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, MD, STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Point.
       ELSE IF ( ARDDEF .EQ. 'POINT' ) THEN
 
 *  Create the string.
-         CALL CHR_PUTC( 'POINT( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+         CALL CHR_APPND( 'POINT(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Row.
       ELSE IF ( ARDDEF( 1:3 ) .EQ. 'ROW' ) THEN
 
 *  Create the string.
-         CALL CHR_PUTC( 'ROW( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+         CALL CHR_APPND( 'ROW(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Rectangle.
       ELSE IF ( ARDDEF .EQ. 'RECTANGLE' ) THEN
 
 *  Create the string.
-         CALL CHR_PUTC( 'RECT( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 2 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 2 ) ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
-
+         CALL CHR_APPND( 'RECT(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 2 ), STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 2 ), STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Rotated box.
       ELSE IF ( ARDDEF .EQ. 'ROTBOX' ) THEN
 
-*  Create the string.
-         CALL CHR_PUTC( 'ROTBOX( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 5 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 5 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 6 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 6 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( X( 7 ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+*  Find the width of the box.
+         P1( 1 ) = X( 1 )
+         P1( 2 ) = Y( 1 )
+         P2( 1 ) = X( 2 )
+         P2( 2 ) = Y( 2 )
+         P3( 1 ) = X( 3 )
+         P3( 2 ) = Y( 3 )
+         CALL AST_RESOLVE( CFRM, P1, P2, P3, P4, D1, WD, STATUS )
 
+*  Find the length of the box.
+         LN = AST_DISTANCE( CFRM, P1, P2, STATUS )
+
+*  Find the position angle of the supplied edge at point 1.
+         PA1 = AST_BEAR( CFRM, P1, P2, STATUS )
+
+*  Find the mid point of the supplied edge, and the position angle of the
+*  edge at the mid point.
+         PA2 = AST_OFFSET2( CFRM, P1, PA1, 0.5*LN, P4, STATUS )
+
+*  Turn through 90 degrees, towards the third point.
+         IF( AST_ANGLE( CFRM, P2, P1, P3, STATUS ) .GT. 0.0 ) THEN
+            DANG = PIBY2
+         ELSE
+            DANG = - PIBY2
+         END IF
+         PA2 = PA2 + DANG
+
+*  Offset in this direction for half the box width to arrive at the box
+*  centre. Turn through 90 degrees to get the position angle parallel to 
+*  the first side at the centre.
+         PA3 = AST_OFFSET2( CFRM, P4, PA2, 0.5*WD, P5, STATUS )
+         PA3 = PA3 - DANG
+
+*  Create the string.
+         CALL CHR_APPND( 'ROTBOX(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, P5( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, P5( 2 ), STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, LN, STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, WD, STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_PUTR( REAL( PA3*RTOD ), LINE, NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Column.
       ELSE IF ( ARDDEF .EQ. 'COLUMN' ) THEN
 
 *  Create the string.
-         CALL CHR_PUTC( 'COLUMN( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+         CALL CHR_APPND( 'COLUMN(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Ellipse.
       ELSE IF ( ARDDEF .EQ. 'ELLIPSE' ) THEN
 
-*  Use the stored values.            
-         SMA = X( 4 )
-         SMI = Y( 4 )
-         DIRECT = X( 5 ) * RTOD
+*  Find the length of the semi-major axis.
+         P1( 1 ) = X( 1 )
+         P1( 2 ) = Y( 1 )
+         P2( 1 ) = X( 2 )
+         P2( 2 ) = Y( 2 )
+         SMA = AST_DISTANCE( CFRM, P1, P2, STATUS )
+
+*  Find the position angle of the semi-major axis.
+         PA1 = AST_BEAR( CFRM, P1, P2, STATUS )
+
+*  Resolve the line from the centre to the the third point into two
+*  components parallel and perpendicular to the major axis.
+         P3( 1 ) = X( 3 )
+         P3( 2 ) = Y( 3 )
+         CALL AST_RESOLVE( CFRM, P1, P2, P3, P4, D1, D2, STATUS )
+
+*  Calculate the length of the semi-minor axis.
+         T = SMA**2 - D1**2
+         IF( T > 0.0 ) THEN
+            SMI = D2*SQRT( T )/SMA
+         ELSE
+            SMI = SMA
+         END IF
 
 *  Create the string.
-         CALL CHR_PUTC( 'ELLIPSE( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( SMA ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( SMI ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( DIRECT, LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+         CALL CHR_APPND( 'ELLIPSE(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, SMA, STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, SMI, STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_PUTR( REAL( PA1*RTOD ), LINE, NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
  
 *  Circle. 
       ELSE IF ( ARDDEF .EQ. 'CIRCLE' ) THEN
 
 *  Find the circle radius. 
-         RADIUS = X( 3 )
+         P1( 1 ) = X( 1 )
+         P1( 2 ) = Y( 1 )
+         P2( 1 ) = X( 2 )
+         P2( 2 ) = Y( 2 )
+         RADIUS = AST_DISTANCE( CFRM, P1, P2, STATUS )
 
 *  Create the string.
-         CALL CHR_PUTC( 'CIRCLE( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( RADIUS ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+         CALL CHR_APPND( 'CIRCLE(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, AXIS, RADIUS, STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Line.
       ELSE IF ( ARDDEF .EQ. 'LINE' ) THEN
 
 *  Create the string.
-         CALL CHR_PUTC( 'LINE( ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( X( 2 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 2 ) ), LINE, NC )
-         CALL CHR_PUTC( ' ) ', LINE, NC )
+         CALL CHR_APPND( 'LINE(', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 2 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 2 ), STATUS ), LINE, 
+     :                   NC )
+         CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Polygon.
       ELSE IF ( ARDDEF .EQ. 'POLYGON' ) THEN
@@ -281,19 +453,24 @@
 *  Issue a warning and return without further action if there are two
 *  or less vertices in the polygon.
          IF ( NPTS .LE. 2 ) THEN
-            CALL MSG_OUT( 'KPS1_AGNST_MSG1', 'Too few positions '/
-     :                    /'supplied to define a polygon.', STATUS )
+            CALL MSG_OUT( 'KPS1_AGNST_MSG1', 'Too few positions '//
+     :                    'supplied to define a polygon.', STATUS )
             GO TO 999
          END IF
 
 *  Create opening string.
-         CALL CHR_PUTC( 'POLYGON( ', LINE, NC )
+         CALL CHR_APPND( 'POLYGON(', LINE, NC )
+         NC = NC + 1
 
 *  Add the first pair of co-ordinates to the string.
-         CALL CHR_PUTR( ROUND( X( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
-         CALL CHR_PUTR( ROUND( Y( 1 ) ), LINE, NC )
-         CALL CHR_PUTC( ', ', LINE, NC )
+         CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( 1 ), STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
+         CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( 1 ), STATUS ), LINE,
+     :                   NC )
+         CALL CHR_APPND( ',', LINE, NC )
+         NC = NC + 1
 
 *  Loop round the remaining pairs of co-ordinates.
          DO I = 2, NPTS
@@ -306,14 +483,18 @@
             NC = 9
             LINE = ' '
 
-            CALL CHR_PUTR( ROUND( X( I ) ), LINE, NC )
-            CALL CHR_PUTC( ', ', LINE, NC )
-            CALL CHR_PUTR( ROUND( Y( I ) ), LINE, NC )
+            CALL CHR_APPND( AST_FORMAT( CFRM, 1, X( I ), STATUS ), LINE,
+     :                   NC )
+            CALL CHR_APPND( ',', LINE, NC )
+            NC = NC + 1
+            CALL CHR_APPND( AST_FORMAT( CFRM, 2, Y( I ), STATUS ), LINE,
+     :                   NC )
 
             IF ( I .NE. NPTS) THEN
-               CALL CHR_PUTC( ', ', LINE, NC )
+               CALL CHR_APPND( ',', LINE, NC )
+               NC = NC + 1
             ELSE
-               CALL CHR_PUTC( ' )', LINE, NC )
+               CALL CHR_APPND( ' )', LINE, NC )
             END IF
 
          END DO
@@ -322,7 +503,7 @@
       ELSE IF ( ARDDEF .EQ. 'WHOLE' ) THEN
 
 *  Create the string.
-         CALL CHR_PUTC( 'WHOLE', LINE, NC )
+         CALL CHR_APPND( 'WHOLE', LINE, NC )
 
 *  Report an error for any other shape.
       ELSE
@@ -335,6 +516,9 @@
 
 *  Store the line in the group.
       CALL GRP_PUT( IGRP, 1, LINE( : NC ), 0, STATUS )
+
+*  Increment the number of regions i the group if all went well.
+      IF( STATUS .EQ. SAI__OK ) NREG = NREG + 1
 
  999  CONTINUE
 

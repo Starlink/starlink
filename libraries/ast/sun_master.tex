@@ -17540,10 +17540,10 @@ if the reference point is at either the north or the south pole.
 
 
 \subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8}
+Introduced in V1.8-2}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V1.7 and V1.8 (the
+occurred in the AST library between versions V1.7 and V1.8-2 (the
 current version):
 
 \begin{enumerate}
@@ -17551,6 +17551,31 @@ current version):
 \item The SkyFrame class has a new attribute called NegLon which allows
    longitude values to be displayed in the range $-\pi$ to $+\pi$, instead 
    of the usual range zero to $2.\pi$.
+
+\item Some new 
+c+
+functions (astAngle, astAxAngle, astResolve, astOffset2, astAxOffset, 
+astAxDistance) 
+c-
+f+
+routines (AST_ANGLE, AST_AXANGLE, AST_RESOLVE, AST_OFFSET2, AST_AXOFFSET, 
+AST_AXDISTANCE) 
+f-
+have been added to the Frame class to allow navigation of the coordinate space 
+to be performed without needing to know the underlying geometry
+of the co-ordinate system (for instance, whether it is Cartesian or
+spherical). 
+
+Note, version 1.8-1 contained many of these facilities, but 
+some have been changed in version 1.8-2. Particularly, positions angles
+are now referred to the second Frame axis for {\em all} classes of Frames
+(including SkyFrames), and the 
+c+
+astBear function has been replaced by astAxAngle.
+c-
+f+
+AST_BEAR routine has been replaced by AST_AXANGLE.
+f-
 
 \end{enumerate}
 
