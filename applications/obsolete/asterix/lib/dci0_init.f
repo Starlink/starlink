@@ -97,6 +97,7 @@
 *  External References:
       EXTERNAL			ADI_REQPKG
       EXTERNAL                  DCI1_READ
+      EXTERNAL                  DCI1_WRITE
       EXTERNAL                  DCI2_WRITE
 
 *  Local variables:
@@ -114,6 +115,8 @@
 
 *    Define the methods
         CALL ADI_DEFMTH( 'ReadDC(HDSfile)', DCI1_READ, DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteDC(HDSfile,MissionStrings)',
+     :                        DCI1_WRITE, DID, STATUS )
         CALL ADI_DEFMTH( 'WriteDC(FITSfile,MissionStrings)',
      :                        DCI2_WRITE, DID, STATUS )
 
