@@ -382,7 +382,7 @@
 
 *  Get the random number generator seed and initialise the generator.
       CALL PAR_GET0I( 'SEED', ISEED, STATUS )
-      CALL PDA_RNSED( ISEED )
+      CALL PDA_DRANS( ISEED )
 
 *  Get base names for NDFs.
       CALL PAR_GET0C( 'DATANAME', BASDAT, STATUS )
