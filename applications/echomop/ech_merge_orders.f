@@ -80,6 +80,8 @@
 *       Initial release.
 *     26-JUN-1996 (MJC):
 *       Separate file for this subroutine.  New prologue.
+*     20-AUG-2004 (norman@astro.gla.ac.uk): replace Figaro routine
+*       GEN_MEDFLT with kaplibs routine KPG1_BMEDR.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,11 +115,16 @@
 
 *  Local Variables:
       REAL WORK( MAXBOX )
+      INTEGER WORKI( MAXBOX )
       REAL IWEIGHT
       REAL OWEIGHT
 
       INTEGER I
       INTEGER J
+
+      LOGICAL BADOUT            ! For call to KPG1_BMEDR (but unused)
+
+      INCLUDE 'SAE_PAR'
 *.
 
 *  Loop through all the orders in the input image. For each, calculate
@@ -132,9 +139,22 @@
          OFILT( I ) = 0.0
       END DO
 
+      STATUS = SAI__OK
       DO I = 1, NY
-         CALL GEN_MEDFLT( IMAGE( 1, I ), NX, 1, BOX, 1, WORK, IFILT )
-         CALL GEN_MEDFLT( OUTPUT, NX, 1, BOX, 1, WORK, OFILT )
+*     This used to call Figaro's GEN_MEDFLT routine, with arguments
+*         CALL GEN_MEDFLT( IMAGE( 1, I ), NX, 1, BOX, 1, WORK, IFILT )
+*         CALL GEN_MEDFLT( OUTPUT, NX, 1, BOX, 1, WORK, OFILT )
+*     The kaplibs routine has a slightly different way of specifying the
+*     size of the box, but since gen_medflt actually used a box with a
+*     width rounded down to the next odd number, the result is the same
+*     whether BOX is even or odd.
+         CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
+     :        NX, 1, IMAGE(1,I), BOX/2, 0, 1, 
+     :        IFILT, BADOUT, WORK, WORKI, STATUS )
+         CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
+     :        NX, 1, OUTPUT, BOX/2, 0, 1,
+     :        OFILT, BADOUT, WORK, WORKI, STATUS )
+
          DO J = 1, NX
             IWEIGHT = MAX( IFILT( J ), 0.0 )
             OWEIGHT = MAX( OFILT( J ), 0.0 )
