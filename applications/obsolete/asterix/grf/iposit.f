@@ -23,7 +23,7 @@
 *    Functions :
 *    Local Constants :
 *    Local variables :
-      LOGICAL LOAD,SEL,SHOW
+      LOGICAL ENTER,SEL,SHOW
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *    Version :
@@ -41,10 +41,10 @@
       ELSE
 
 *  see if dealing with multiple positions
-        CALL USI_GET0L('LOAD',LOAD,STATUS)
-        IF (LOAD) THEN
+        CALL USI_GET0L('ENTER',ENTER,STATUS)
+        IF (ENTER) THEN
 
-          CALL IPOSIT_LOAD(STATUS)
+          CALL IPOSIT_ENTER(STATUS)
 
         ELSEIF (I_NPOS.GT.0) THEN
           CALL USI_GET0L('SHOW',SHOW,STATUS)
@@ -63,7 +63,7 @@
         ENDIF
 
 *  single position mode
-        IF (.NOT.(LOAD.OR.SHOW.OR.SEL)) THEN
+        IF (.NOT.(ENTER.OR.SHOW.OR.SEL)) THEN
 
           CALL IPOSIT_SINGLE(STATUS)
 
@@ -162,8 +162,8 @@
 
 
 
-*+  IPOSIT_LOAD - load a list of positions
-      SUBROUTINE IPOSIT_LOAD(STATUS)
+*+  IPOSIT_ENTER - enter a list of positions
+      SUBROUTINE IPOSIT_ENTER(STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -181,115 +181,169 @@
 *    Status :
       INTEGER STATUS
 *    Functions :
+      INTEGER CHR_LEN
 *    Local Constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC) SLOC
-      CHARACTER*132 FILENAME
+      CHARACTER*132 TEXT
       CHARACTER*80 REC
       CHARACTER*20 RAS,DECS
+      CHARACTER*1 LC
       DOUBLE PRECISION RA,DEC
       REAL X,Y
       INTEGER IFD
       INTEGER RAPTR,DECPTR
       INTEGER ISRC,NSRC
+      INTEGER L
       LOGICAL EXIST
       LOGICAL POK
+      LOGICAL RADEC
+      LOGICAL APPEND
+      LOGICAL REPEAT
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+
+
 *  get group id for storing positions
         IF (I_NPOS.EQ.0) THEN
           CALL GRP_NEW('Source list',I_POS_ID,STATUS)
-*  or empty existing one
+*  or append to or reset  existing one
         ELSE
-          CALL GRP_SETSZ(I_POS_ID,0,STATUS)
-          I_NPOS=0
+          CALL USI_GET0L('APPEND',APPEND,STATUS)
+          IF (.NOT.APPEND) THEN
+            CALL GRP_SETSZ(I_POS_ID,0,STATUS)
+            I_NPOS=0
+          ENDIF
         ENDIF
 
-*  get filename
-        CALL USI_GET0C('LIST',FILENAME,STATUS)
+*  get input
+        CALL USI_GET0C('LIST',TEXT,STATUS)
 
         IF (STATUS.EQ.SAI__OK) THEN
+
+*  see if direct RA/DEC entry
+          CALL IPOSIT_PARSE(TEXT,RADEC,STATUS)
+
+          IF (RADEC) THEN
+
+            REPEAT=.TRUE.
+            DO WHILE (REPEAT.AND.STATUS.EQ.SAI_OK)
+
+*  check for continuation character
+              L=CHR_LEN(TEXT)
+              LC=TEXT(L:L)
+              IF (LC.EQ.'~'.OR.LC.EQ.'-'.OR.LC.EQ.'\') THEN
+                REPEAT=.TRUE.
+                L=CHR_LEN(TEXT(:L-1))
+              ELSE
+                REPEAT=.FALSE.
+              ENDIF
+
+*  split text into ra and dec
+              CALL CONV_SPLIT(TEXT(:L),RAS,DECS,STATUS)
+*  parse
+              CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
+*  then convert back to a uniform format
+              CALL CONV_DEGHMS(REAL(RA),RAS)
+              CALL CONV_DEGDMS(REAL(DEC),DECS)
+*  and store
+              CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,STATUS)
+              I_NPOS=I_NPOS+1
+
+              IF (REPEAT) THEN
+                CALL USI_CANCL('LIST',STATUS)
+                CALL USI_GET0L('LIST',TEXT,STATUS)
+              ENDIF
+
+            ENDDO
+
+*  otherwise should be a file
+          ELSE
+
 *  see if file exists in form given
-          INQUIRE(FILE=FILENAME,EXIST=EXIST)
+            INQUIRE(FILE=TEXT,EXIST=EXIST)
 *  if it does - assume it to be text file
-          IF (EXIST) THEN
-            CALL FIO_OPEN(FILENAME,'READ','NONE',0,IFD,STATUS)
-            DO WHILE ( STATUS .EQ. SAI__OK )
-              CALL FIO_READF(IFD,REC,STATUS)
-              IF (STATUS.EQ.SAI__OK) THEN
+            IF (EXIST) THEN
+              CALL FIO_OPEN(TEXT,'READ','NONE',0,IFD,STATUS)
+              DO WHILE ( STATUS .EQ. SAI__OK )
+                CALL FIO_READF(IFD,REC,STATUS)
+                IF (STATUS.EQ.SAI__OK) THEN
 *  ignore blank lines
-                IF (REC.GT.' ') THEN
+                  IF (REC.GT.' ') THEN
 *  remove leading blanks
-                  CALL CHR_LDBLK( REC )
+                    CALL CHR_LDBLK( REC )
 
 *  split record into ra and dec
-                  CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
+                    CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
 *  parse
-                  CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
+                    CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
 *  then convert back to a uniform format
-                  CALL CONV_DEGHMS(REAL(RA),RAS)
-                  CALL CONV_DEGDMS(REAL(DEC),DECS)
+                    CALL CONV_DEGHMS(REAL(RA),RAS)
+                    CALL CONV_DEGDMS(REAL(DEC),DECS)
 *  and store
-                  CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,STATUS)
-                  I_NPOS=I_NPOS+1
+                    CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,STATUS)
+                    I_NPOS=I_NPOS+1
 
 *  make the first one the current position
-                  IF (I_NPOS.EQ.1) THEN
-                    CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
-                    CALL IMG_SETPOS(X,Y,STATUS)
-                  ENDIF
+                    IF (I_NPOS.EQ.1) THEN
+                      CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
+                      CALL IMG_SETPOS(X,Y,STATUS)
+                    ENDIF
 
+                  ENDIF
                 ENDIF
-              ENDIF
-            ENDDO
-            IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
-            CALL FIO_CLOSE(IFD,STATUS)
+              ENDDO
+              IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+              CALL FIO_CLOSE(IFD,STATUS)
 
 *  otherwise assume HDS file in PSS format
-          ELSE
-            CALL HDS_OPEN( FILENAME,'READ',SLOC,STATUS )
-            IF (STATUS.EQ.SAI__OK) THEN
+            ELSE
+              CALL HDS_OPEN( TEXT,'READ',SLOC,STATUS )
+              IF (STATUS.EQ.SAI__OK) THEN
 
 *  check if sources
-              CALL SSO_INIT( STATUS )
-              CALL SSO_VALID( SLOC, POK, STATUS )
-              CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
-              IF (.NOT. POK .OR.NSRC.EQ.0 ) THEN
-                CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
-              ELSE
+                CALL SSO_INIT( STATUS )
+                CALL SSO_VALID( SLOC, POK, STATUS )
+                CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
+                IF (.NOT. POK .OR.NSRC.EQ.0 ) THEN
+                  CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
+                ELSE
 *  get RA DEC of sources
-                CALL SSO_MAPFLD( SLOC, 'RA', '_DOUBLE', 'READ',
-     :                                        RAPTR, STATUS )
-                CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ',
-     :                                        DECPTR, STATUS )
-                DO ISRC=1,NSRC
+                  CALL SSO_MAPFLD( SLOC, 'RA', '_DOUBLE', 'READ',
+     :                                            RAPTR, STATUS )
+                  CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ',
+     :                                           DECPTR, STATUS )
+                  DO ISRC=1,NSRC
 *  get each position
-                  CALL ARR_ELEM1D(RAPTR,NSRC,ISRC,RA,STATUS)
-                  CALL ARR_ELEM1D(DECPTR,NSRC,ISRC,DEC,STATUS)
+                    CALL ARR_ELEM1D(RAPTR,NSRC,ISRC,RA,STATUS)
+                    CALL ARR_ELEM1D(DECPTR,NSRC,ISRC,DEC,STATUS)
 
 *  convert to a uniform format
-                  CALL CONV_DEGHMS(REAL(RA),RAS)
-                  CALL CONV_DEGDMS(REAL(DEC),DECS)
+                    CALL CONV_DEGHMS(REAL(RA),RAS)
+                    CALL CONV_DEGDMS(REAL(DEC),DECS)
 
 *  and store
-                  CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,STATUS)
-                  I_NPOS=I_NPOS+1
+                    CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,
+     :                                                      STATUS)
+                    I_NPOS=I_NPOS+1
 
 *  make the first one the current position
-                  IF (I_NPOS.EQ.1) THEN
-                    CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
-                    CALL IMG_SETPOS(X,Y,STATUS)
-                  ENDIF
+                    IF (I_NPOS.EQ.1) THEN
+                      CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
+                      CALL IMG_SETPOS(X,Y,STATUS)
+                    ENDIF
 
-                ENDDO
+                  ENDDO
+
+                ENDIF
+
+                CALL SSO_RELEASE(SLOC,STATUS)
+                CALL HDS_CLOSE(SLOC,STATUS)
 
               ENDIF
-
-              CALL SSO_RELEASE(SLOC,STATUS)
-              CALL HDS_CLOSE(SLOC,STATUS)
 
             ENDIF
 
@@ -400,3 +454,73 @@
 
       END
 
+
+
+
+
+*+  IPOSIT_PARSE - decide whether string is likely candidate for RA/DEC
+      SUBROUTINE IPOSIT_PARSE(TEXT,RADEC,STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Import :
+      CHARACTER*(*) TEXT
+*    Import-Export :
+*    Export :
+      LOGICAL RADEC
+*    Status :
+      INTEGER STATUS
+*    Functions :
+      INTEGER CHR_LEN
+*    Local Constants :
+*    Local variables :
+      CHARACTER*1 C
+      INTEGER L
+      INTEGER NDIGIT,NDELIM,NDOT,NMINUS,NPLUS
+      INTEGER I
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        L=CHR_LEN(TEXT)
+        C=TEXT(L:L)
+*  ignore continuation character
+        IF (C.EQ.'~'.OR.C.EQ.'-'.OR.C.EQ.'\') THEN
+          L=L-1
+        ENDIF
+
+        NDIGIT=0
+        NDELIM=0
+        NDOT=0
+        NMINUS=0
+        NPLUS=0
+        DO I=1,L
+          C=TEXT(I:I)
+          IF (C.GE.'0'.AND.C.LE.'9') THEN
+            NDIGIT=NDIGIT+1
+          ELSEIF (C.EQ.'.') THEN
+            NDOT=NDOT+1
+          ELSEIF (C.EQ.'-') THEN
+            NMINUS=NMINUS+1
+          ELSEIF (C.EQ.'+') THEN
+            NPLUS=NPLUS+1
+          ELSE
+            IF (C.EQ.' '.OR.C.EQ.':'.OR.C.EQ.'h'.OR.C.EQ.'d'.OR.
+     :                                  C.EQ.'m'.OR.C.EQ.'s') THEN
+              DELIM=DELIM+1
+            ENDIF
+          ENDIF
+        ENDDO
+
+        RADEC=(NDIGIT.GE.4.AND.NDOT.LE.2.AND.NMINUS.LE.1.AND.
+     :                       (NDIGIT+NDOT+NMINUS+NDELIM).EQ.L)
+
+      ENDIF
+
+      END
