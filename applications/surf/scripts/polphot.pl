@@ -36,6 +36,7 @@ extract polarimetry information from photometry file
    -out: output filename (default is obsNN.dat)
    file|number: The filename to be processed or the observation number
        If a number is provided the filename is assumed to be oNN_SUB_pht.sdf
+   int/wplate - number of integrations per waveplate move (default is 1)
 
 };
 exit;
@@ -80,11 +81,13 @@ if ($file =~ /^\d+/) {
   unless (defined $opt_sub) {
     $sub = "lon";
     print "using default sub-instrument: lon\n";
+  } else {
+    $sub = $opt_sub;
   }
 
   $run_no = $file; # This is the run number
 
-  $file = "o${file}_${opt_sub}_pht";
+  $file = "o${file}_${sub}_pht";
 }
 
 print "Reading from file $file\n";
@@ -95,7 +98,6 @@ $int_per_wp = shift;
 
 unless (defined $int_per_wp) {
   $int_per_wp = 4;
-
 }
 print "Using $int_per_wp integrations per waveplate\n";
 
@@ -154,7 +156,7 @@ foreach $name (@names) {
   # Use the bolometer name as well
   # and open the file. Treat $out as a root name.
   
-  $output_file = $root . "_$bol"  . ".dat";
+  $output_file = $root . "$bol"  . ".dat";
 
   print "Output filename is $output_file\n";
 
