@@ -33,21 +33,24 @@
 #include <iostream>
 
 #ifdef HAVE_CSTD_INCLUDE
-#include <cstdio>
-#include <cctype>
-#include <cerrno>
+#  include <cstdio>
+#  include <cctype>
+#  include <cerrno>
+#  ifdef HAVE_SIGNAL
+#    include <csignal>
+#  endif
 #else
-#include <stdio.h>
-#include <ctype.h>
-#include <errno.h>
+#  include <stdio.h>
+#  include <ctype.h>
+#  include <errno.h>
+#  ifdef HAVE_SIGNAL_H
+#    include <signal.h>
+#  endif
 #endif
 #include <unistd.h>		// this is standard according to single-unix, 
 				// how POSIXy is that?  How C++?
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#endif
-#ifdef HAVE_SIGNAL_H
-#include <signal.h>
 #endif
 #include <map>
 
@@ -62,6 +65,8 @@ using std::cerr;
 #endif
 
 #include <stringstream.h>
+
+	
 
 
 /**
@@ -107,6 +112,17 @@ PipeStream::PipeStream (string cmd, string envs)
      * Implementation here follows useful example in
      * <http://www.erack.de/download/pipe-fork.c> 
      */
+    if (procs == 0) {
+	// first time
+	procs = new struct process_status[nprocs];
+	for (int i=0; i<nprocs; i++) {
+	    procs[i].pid = 0;
+	    procs[i].status = -1; // sentinel value
+	}
+	signal(SIGCHLD, &PipeStream::childcatcher_);
+	signal(SIGALRM, &PipeStream::childcatcher_); // for pause()
+    }
+
     int fd[2];
 
     if (pipe(fd))
@@ -203,6 +219,9 @@ PipeStream::PipeStream (string cmd, string envs)
 	::close(fd[1]);
 
 	bindToFileDescriptor(fd[0]);
+
+	if (getVerbosity() > normal)
+	    cerr << "PipeStream: pid=" << pid_ << endl;
     }
 #else  /* HAVE_PIPE */
     throw new InputByteStreamError("Have no pipe() function");
@@ -219,82 +238,70 @@ PipeStream::~PipeStream()
  * Closes the stream, and reaps the process status.  
  *
  * <p>If the process has not already terminated, this method attempts
- * to kill it, by sending first HUP.  If the process appears reluctant to
- * die, we abandon it, and do not reap its status.  If there is some
- * reason why we can't reap the status -- because it has not died or
- * for, say, some permissions reason -- we set the returned status to
- * -1.
+ * to kill it, by sending first HUP then KILL.  If
+ * there is some reason why we can't reap the status -- because it has
+ * not died or for, say, some permissions reason -- we set the
+ * returned status to -1.  Any data not read from the pipe is discarded.
  */
 void PipeStream::close(void)
 {
     InputByteStream::close();
 
-    if (getVerbosity() > normal)
-        cerr << "PipeStream::close" << endl;
     if (pid_ > 0) {
-	errno = 0;
-	if (kill(pid_, SIGHUP)) {
-	    // didn't work
-	    if (errno == ESRCH) {
-		// no such process -- already dead -- just reap
-		waitpid(pid_, &pipe_status_, 0);
-	    } else {
-		// something odd happened
-		if (getVerbosity() >= normal) {
-		    cerr << "PipeStream::close couldn't signal subprocess "
-			 << pid_ << " -- not reaping status" << endl;
+	bool keep_waiting = true;
+	int status = -1;
+	for (int i=0; keep_waiting; i++) {
+	    keep_waiting = !got_status_(pid_, &status);
+	    
+	    int sigtosend;
+	    if (keep_waiting) {
+		switch (i) {
+		  case 0:
+		    sigtosend = 0;	// checking
+		    break;
+		  case 1:
+		    sigtosend = SIGHUP;
+		    break;
+		  case 2:
+		    sigtosend = SIGKILL;
+		    break;
+		  default:
+		    keep_waiting = false;
+		    break;
 		}
-		pipe_status_ = -1;
-		// don't wait any more
 	    }
-	} else {
-	    // It worked; thus there was a process to signal to; wait
-	    // to check it's gone
-	    sleep(1);
-	    errno = 0;
-	    if (kill(pid_, SIGHUP)) {
-		if (errno == ESRCH) {
-		    // good -- no such process
-		    waitpid(pid_, &pipe_status_, 0);
+	    if (keep_waiting) {
+		if (kill(pid_, sigtosend) == 0) {
+#ifdef HAVE_ALARM
+		    alarm(1);
+#else
+#error "Don't have alarm() -- fix this"
+#endif
+		    pause();	// wait for alarm or signal
+		    if (getVerbosity() > normal)
+			cerr << "Sent " << sigtosend
+			     << " and waited for child" << endl;
 		} else {
-		    // ooops
-		    if (getVerbosity() >= normal)
-			cerr << "PipeStream::close: can't signal to process "
-			     << pid_
-			     << " -- not reaping status"
-			     << endl;
-		    pipe_status_ = -1;
+		    keep_waiting = false; // process wasn't there
 		}
-	    } else {
-		// Oh dear, we were able to signal to the process, so
-		// it's still there.  Abandon it, to avoid getting
-		// trapped waiting for it.  Could we try sending KILL
-		// to it?  Dangerous if it's ended up in
-		// uninterruptable sleep.
-		if (getVerbosity() >= normal)
-		    cerr << "PipeStream::close: process "
-			 << pid_
-			 << " hasn't died (quickly) -- not reaping status"
-			 << endl;
-		pipe_status_ = -1;
 	    }
 	}
+	pipe_status_ = status;
 	pid_ = 0;
     }
 }
 
 /**
  * Returns the status of the command at the end of the pipe.  Since
- * this is only available after the command has run to completion,
- * this invokes {@link #close} on the stream, and waits until the command has
- * finished.  Thus, you should <em>not</em> call this until
- * <em>after</em> you have extracted all of the command's output that
- * you want.  Note that the status could be inaccurate if
- * <code>close</code> was unable to terminate the process.
+ * this is only available after the process has completed, this 
+ * invokes {@link #close} on the stream first.  Thus you should not
+ * invoke this method until after you have extracted all of the
+ * command's output that you want.  If <code>close</code> is unable
+ * to terminate the process for some reason, this returns -1.
  *
  * @return the exit status of the process.
  */
-int PipeStream::getStatus(void)
+int PipeStream::getTerminationStatus(void)
 {
     close();
     return pipe_status_;
@@ -342,7 +349,7 @@ int PipeStream::getStatus(void)
              << ">" << endl;
 
     string response;
-    int status = getStatus();
+    int status = getTerminationStatus();
     if (WIFEXITED(status)) {
 	if (getVerbosity() > normal)
 	    cerr << "exit status=" << WEXITSTATUS(status) << endl;
@@ -371,3 +378,65 @@ int PipeStream::getStatus(void)
 
     return response;
 }
+
+/*
+ * All this is a rather simple-minded version of the pattern described in 
+ * <http://www.cs.wustl.edu/~schmidt/signal-patterns.html>
+ */
+struct PipeStream::process_status *PipeStream::procs = 0;
+const int PipeStream::nprocs = 8; // max no of children we can wait for
+
+/**
+ * Checks to see if the given process has exited.  If there's an entry
+ * for this PID in the list, then put the corresponding status in the
+ * <code>status</code> parameter, and return true.
+ *
+ * @param pid the PID to check
+ * @param status a pointer to the status to be returned
+ * @return true if the status was in fact available, and is now in
+ * <code>*status</code>; false otherwise
+ */
+bool PipeStream::got_status_(pid_t pid, int* status)
+{
+    assert(status != 0);
+    for (int i=0; i<nprocs; i++) {
+	if (procs[i].pid == pid) {
+	    // found a slot with the required PID in it
+	    *status = procs[i].status;
+	    procs[i].pid = 0;	// clear the slot
+	    return true;
+	}
+    }
+    return false;
+}
+
+void PipeStream::childcatcher_(int signum)
+{
+    switch (signum) {
+      case SIGCHLD:
+	{
+	    int i;
+	    int status;
+	    pid_t caughtpid = waitpid(0, &status, 0);
+	    for (i=0; i<nprocs; i++) {
+		if (procs[i].pid == 0) { // free slot
+		    procs[i].pid = caughtpid;
+		    procs[i].status = status;
+		}
+	    }
+	    // If i=nprocs, then there's no space to store this signal.
+	    // Nothing much we can do -- but at least it isn't a zombie.
+	}
+	break;
+
+      case SIGALRM:
+	// nothing to do
+	break;
+
+      default:
+	assert(false);
+	break;
+    }
+}
+
+

@@ -179,7 +179,7 @@ PkFont::PkFont(double fontmag,
 
 		PipeStream *PS = new PipeStream(cmd);
 		string fontpath = PS->getResult();
-		if (PS->getStatus() != 0)
+		if (PS->getTerminationStatus() != 0)
 		    throw InputByteStreamError ("unable to generate font");
 		delete PS;
 		// Try searching again, rather than relying on the
@@ -368,7 +368,7 @@ bool PkFont::find_font (string& path)
 
 	PipeStream *PS = new PipeStream(cmd);
 	string font_found = PS->getResult();
-	int status = PS->getStatus();
+	int status = PS->getTerminationStatus();
 	delete PS;
 
 	if (verbosity_ > normal)

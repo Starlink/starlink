@@ -135,7 +135,7 @@ class InputByteStream {
     /**
      * Returns the verbosity setting of this class
      */
-    verbosities getVerbosity(void) const { return verbosity_; };
+    static verbosities getVerbosity(void) { return verbosity_; };
 
  private:
     int fd_;

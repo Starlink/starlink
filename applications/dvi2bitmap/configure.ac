@@ -61,7 +61,7 @@ AC_CHECK_HEADERS(assert.h fcntl.h sys/stat.h sys/wait.h signal.h)
 AC_HEADER_STAT
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(pipe snprintf setenv putenv)
+AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm)
 dnl   getopt_long.c uses (and provides a replacement for)
 dnl   this glibc utility function
 AC_CHECK_FUNCS(__strchrnul)
@@ -86,7 +86,7 @@ AC_REPLACE_FUNCS(getopt_long getsubopt)
 dnl   Now switch to doing header checks with C++, for those headers
 dnl   which are specific to C++
 AC_LANG([C++])
-AC_CHECK_HEADERS(sstream strstream)
+AC_CHECK_HEADERS(sstream strstream csignal)
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 

@@ -251,7 +251,7 @@ int do_stream_tests()
 	{
 	    // Test 1 -- reading without preloading
 	    if (verbosity > normal)
-		cerr << "===== Test 1" << endl;
+		cerr << "===== Stream test 1" << endl;
 	    InputByteStream IBS("<osfile>" + fn);
 	    nfails += exercise_IBS(IBS);
 	}
@@ -259,7 +259,7 @@ int do_stream_tests()
 	{
 	    // Test 2 -- FileByteStream, no preloading
 	    if (verbosity > normal)
-		cerr << "===== Test 2" << endl;
+		cerr << "===== Stream test 2" << endl;
 	    FileByteStream FBS(fn);
 	    nfails += exercise_IBS(FBS);
 	    nfails += exercise_FBS(FBS);
@@ -268,7 +268,7 @@ int do_stream_tests()
 	{
 	    // Test 3 -- FileByteStream, with preloading
 	    if (verbosity > normal)
-		cerr << "===== Test 3" << endl;
+		cerr << "===== Stream test 3" << endl;
 	    FileByteStream FBS(fn, "", true);
 	    nfails += exercise_IBS(FBS);
 	    nfails += exercise_FBS(FBS);
@@ -277,15 +277,31 @@ int do_stream_tests()
 	{
 	    // Test 4 -- with PipeStream
 	    if (verbosity > normal)
-		cerr << "===== Test 4" << endl;
+		cerr << "===== Stream test 4" << endl;
 	    PipeStream PBS("./t6.test -g 500");
 	    nfails += exercise_IBS(PBS);
-	    int status = PBS.getStatus();
+	    int status = PBS.getTerminationStatus();
 	    if (status != 0) {
 		cerr << "Pipe status non zero, was " << status << endl;
 		nfails++;
 	    }
 	}
+
+	{
+	    // Test 5 -- with PipeStream, but not reading all of stream
+	    if (verbosity > normal)
+		cerr << "===== Stream test 5" << endl;
+	    PipeStream PBS("./t6.test -g 500");	// more than a bufferful
+	    Byte b;
+	    for (int i=0; i<10; i++)
+		b = PBS.getByte();
+	    int status = PBS.getTerminationStatus(); // `prematurely' closes stream
+	    if (status != 0) {
+		cerr << "Pipe status non zero, was " << status << endl;
+		nfails++;
+	    }
+	}
+
     } catch (DviError& e) {
 	cerr << "DviError: " << e.problem() << endl;
 	nfails++;
@@ -309,8 +325,8 @@ int do_pipe_tests()
 	  "+ HOME=/root LOGNAME=",
 	  "HOME=/root!LOGNAME=!"
 	},
-	{ "/bin/ls t1.cc", "", "t1.cc", },
-	{ "ls t1.cc", "", "", },	// no path
+	{ "/bin/ls t6.cc", "", "t6.cc", },
+	{ "ls t6.cc", "", "", },	// no path
 	{ "squorrocks", "", "" },
     };
     int npipetests = sizeof(pipetests)/sizeof(pipetests[0]);
@@ -323,13 +339,13 @@ int do_pipe_tests()
 	    string ret;
 	    PipeStream *PS;
 	    if (verbosity > normal)
-		cerr << "===== Test " << i << endl;
+		cerr << "===== Pipe test " << i << endl;
 	    if (pipetests[i].envlist.length() == 0)
 		PS = new PipeStream(pipetests[i].testcase);
 	    else
 		PS = new PipeStream(pipetests[i].testcase, pipetests[i].envlist);
 	    ret = PS->getResult();
-	    int stat = PS->getStatus();
+	    int stat = PS->getTerminationStatus();
 	    if (pipetests[i].expected.length() == 0) {
 		// this command was expected to fail
 		//if (ret.length() != 0) {
@@ -379,7 +395,7 @@ int do_pipe_tests()
 	expected += "!T=t!TT=test!";
 	PipeStream *PS = new PipeStream(cmd, envs);
 	string res = PS->getResult();
-	int status = PS->getStatus();
+	int status = PS->getTerminationStatus();
 	if (status != 0) {
 	    nfails++;
 	    if (verbosity > normal)

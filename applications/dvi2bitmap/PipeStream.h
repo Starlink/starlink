@@ -47,7 +47,7 @@ class PipeStream : public InputByteStream {
     string getResult(bool allOfFile=false, bool gobbleRest=true)
 	    throw (InputByteStreamError);
     virtual void close(void);
-    int getStatus(void);
+    int getTerminationStatus(void);
     /**
      * Returns the PID of the running process.  After the process has
      * finished, this will return zero.
@@ -59,6 +59,16 @@ class PipeStream : public InputByteStream {
     int pipe_status_;
     pid_t pid_;
     const string orig_command_;
+
+    /* Handle SIGCHLDs by maintaining a set of pid/caught-status pairs. */
+    struct process_status {
+	pid_t pid;
+	int status;
+    };
+    static struct process_status *procs;
+    static const int nprocs;
+    static bool got_status_(pid_t pid, int* status);
+    static void childcatcher_(int);
 };
 
 

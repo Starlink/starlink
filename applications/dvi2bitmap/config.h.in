@@ -59,8 +59,14 @@
 /* Define filesystem path separator: '/' for unix, and '\' for DOS */
 #undef FSPATH_SEP
 
+/* Define to 1 if you have the `alarm' function. */
+#undef HAVE_ALARM
+
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
+
+/* Define to 1 if you have the <csignal> header file. */
+#undef HAVE_CSIGNAL
 
 /* Define as 1 if you DO have <cstdio> headers. Otherwise, we use <stdio.h>
    rather than standard <cstdio> */

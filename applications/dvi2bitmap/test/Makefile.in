@@ -61,7 +61,7 @@ $(TESTS): ../libdvi2bitmap.la
 
 # t6.test must be linked statically -- it invokes itself in a pipe
 t6.test: t6.cc
-	$(LIBTOOL) --mode=compile $(CXX) -c $(CXXFLAGS) -o $(<:.cc=.lo) $<
+	$(LIBTOOL) --mode=compile $(CXX) -static -c $(CXXFLAGS) -o $(<:.cc=.lo) $<
 	$(LIBTOOL) --mode=link $(CXX) -static -o $@ $(<:.cc=.lo) ../libdvi2bitmap.la $(LIBS) -lm
 
 pathtest: hello.dvi
