@@ -77,15 +77,12 @@
 /*    28-JUN-1991 (RFWS):						    */
 /*       Added function prototype for VMS system call.			    */
 /*    08-MAR-2005 (PWD):                                                    */
-/*       Added workaround for Linux NFS file mapping problems.              */
+/*       Added fsync() call to make sure unmapped data is written to disk.  */
+/*       This change seems to be required by the single UNIX standard       */
+/*       version 3.                                                         */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
-/*    - A call to fsync is made to workaround an issues with files mapped   */
-/*      over NFS for kernels 2.6.9 through 2.6.11. These are not updated    */
-/*      otherwise. Asynchronous calls to msync do not work, so the sync is  */
-/*      performed when the file is closed, rather than when each section is */
-/*      unmapped.                                                           */
 /*    {@note_any_bugs_here@}						    */
 
 /*-									    */
@@ -97,6 +94,7 @@
 
 #else				 /* Portable version local variables:	    */
       FILE *iochan;		 /* File I/O stream			    */
+      int fd;                    /* File identifier                         */
 #endif
 
 /* External References:							    */
@@ -141,13 +139,17 @@
 /* ================							    */
 #else
 
-#if HAVE_FSYNC
-         if ( mode != 'R' ) 
+#if defined( HAVE_FSYNC ) && ( defined( _mmap ) || defined( HAVE_MMAP ) )
+/* To make sure that a mapped file is correctly written to disk we need to  */
+/* perform an fsync, this should have also been preceded by calls to        */
+/* msync(MS_ASYNC) when the data was unmapped. Ignore any errors.           */
+         if ( mode != 'R' )
          {
-/* Make sure the date is synchronized to resolve a possible bug in Linux    */
-/* 2.6.9,10,11 that leaves NFS mapped files in a corrupted state.           */
-/* Ignore any errors.                                                        */
-             fsync( fileno( iochan ) );
+             fd = fileno( iochan );
+             if ( fd != -1 )
+             {
+                 fsync( fd );
+             }
          }
 #endif
 

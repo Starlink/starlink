@@ -13,7 +13,7 @@
 
 /* Include files for version using mmap:				    */
 /* ====================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || defined( HAVE_MMAP )
 #include <sys/types.h>           /* OS X requires this */
 #include <sys/mman.h>		 /* Definitions for memory management	    */
 #endif
@@ -91,6 +91,7 @@
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    PWD: Peter W. Draper (STARLINK, Durham University)                    */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -121,6 +122,12 @@
 /*       Extended memory mapping for use on all suitable machines.	    */
 /*    16-FEB-1999 (RFWS):                                                   */
 /*       Deallocate exportable memory.                                      */
+/*    08-MAR-2005 (PWD):                                                    */
+/*       Call msync(MS_ASYNC) before unmapping memory. This should ensure   */
+/*       that it is marked as dirty and requires commit to disk. To be sure */
+/*       that data is returned to disk we also need to fsync() when closing */
+/*       the file. These changes seem to be needed by the clarifications of */
+/*       the single UNIX standard (version 3).                              */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -143,7 +150,7 @@
       unsigned int systat;	 /* System status code			    */
 #else
 
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || defined( HAVE_MMAP )
                          	 /* Local variables for version using mmap: */
       size_t len;		 /* Length of data to unmap		    */
       unsigned long int ipntr;	 /* Pointer value cast to an integer	    */
@@ -239,7 +246,7 @@
 /* entire contents have not been mapped).				    */
 	       brf = ( offset != 0 );
 	       brl = ( tail != 0 );
-	    
+
 /* If a subset of only a single block has been mapped, then read that block */
 /* and insert the modified region before writing it back to the file.	    */
 	       if ( ( nbloc == 1 ) && brf && brl )
@@ -295,7 +302,7 @@
 
 /* Version using file mapping (mmap).					    */
 /* =================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || defined( HAVE_MMAP )
 	 if ( hds_gl_map )
 	 {
 
@@ -309,9 +316,16 @@
 	    addr = (void *) ( *pntr - ( ipntr % pagesize ) );
 	    len = (size_t) length + (size_t) ( ipntr % pagesize );
 
-/* Unmap the file, reporting any errors.				    */
-	    if ( munmap( addr, len ) )
-	    {
+/* Unmap the address, reporting any errors.                                  */
+/* Also msync the region asynchonously to make sure that the associated      */
+/* pages are marked dirty and queued for writing to disk. This write may or  */
+/* not actually start after this call (but it will not block, which is why   */
+/* we use it in preference to a synchronous call), that seems to depend on   */
+/* the operating system. To be sure of writing we must call fsync() when the */
+/* file is closed.                                                           */
+            if ( ( msync( addr, len, MS_ASYNC ) != 0 ) ||
+                 ( munmap( addr, len ) != 0 ) )
+            {
 	       hds_gl_status = DAT__FILMP;
 	       ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
 	       rec1_fmsg( "FILE", slot );
