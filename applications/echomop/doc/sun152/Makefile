@@ -3,7 +3,10 @@
 # $Id$
 
 
-# Following might be overridden on the command line (by the parent makefile)
+# Following might potentially be overridden on the command line, by
+# the parent makefile.  However we have to hope that it isn't, since
+# would cause problems -- this Makefile isn't clever enough to make
+# anything else.
 PKG_NAME=echomop
 LATEX_DOCS=sun152.latex_tar
 HYPERTEXT_DOCS=sun152.htx_tar
@@ -25,7 +28,7 @@ sun152.ind: sun152.tex
 $(HYPERTEXT_DOCS): sun152.htx/sun152.html
 	tar cf $@ sun152.htx
 
-# The LaTeX2html commands needs some preprocessing.  The .tex file has
+# The LaTeX2html commands needs some postprocessing.  The .tex file has
 # the magic within it.
 sun152.htx/sun152.html: sun152.tex
 	sed -n 's/^%%S2HPOST//p' sun152.tex | sh
