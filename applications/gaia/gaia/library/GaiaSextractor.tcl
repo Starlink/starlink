@@ -1108,6 +1108,7 @@ itcl::class gaia::GaiaSextractor {
             -textvariable [scope values_($this,photapps)] \
             -command [code $this set_values_ photapps]
       }
+      update idletasks ;#  Needed to stop problem with -borderwidth values.
       eval $itk_component(photapps) setvals $values_($this,photapps)
       pack $itk_component(photapps) -side top -fill x -ipadx 1m -ipady 1m
       #add_short_help $itk_component(photapps) \
@@ -1178,7 +1179,6 @@ itcl::class gaia::GaiaSextractor {
             -command [code $this set_values_ photmask $shortname]
       }
       set values_($this,photmask) $values_($this,photmask)
-
    }
 
    #  Set the number of entry fields for apertures.
@@ -1756,6 +1756,9 @@ itcl::class gaia::GaiaSextractor {
                       -font $itk_option(-labelfont)]
          pack $butt -side top -fill x -ipadx 1m -ipady 1m
          add_short_help $butt "$desc"
+         #  Need to make geometries up to date, otherwise a user define
+         #  BorderWidth property seems to leave all widgets size 1.
+         update idletasks 
       }
 
       #  Toggle ellipse drawing parameters.

@@ -112,7 +112,7 @@ itcl::class gaia::GaiaTabStops {
                        -height $entheight_ -window $label_]
 
       #  Dragging tab-stop off visible canvas region autoscrolls.
-      bind $canvas_ <B1-Leave> [code $this view_region_ %x]
+      #bind $canvas_ <B1-Leave> [code $this view_region_ %x]
    }
 
    #  Destructor:

@@ -533,8 +533,7 @@ itcl::class gaia::GaiaContour {
       }
 
       grid $itk_component(athead1) $itk_component(athead2) \
-           $itk_component(athead3)
-
+         $itk_component(athead3)
 
       #  Set up the colour index arrays and default values.
       foreach {index xname} $colourmap_ {
@@ -591,13 +590,15 @@ itcl::class gaia::GaiaContour {
          }
          $itk_component(width$i) configure -value 1
 
+         #  Need to make geometries up to date, otherwise a user define
+         #  BorderWidth property seems to leave all widgets size 1.
+         update idletasks 
+
          #  Add these to the grid.
          grid $itk_component(value$i) $itk_component(colour$i) \
               $itk_component(width$i)
       }
-      pack $itk_component(atframe) -fill both -expand 1
    }
-
 
    #  Update (or initialise) the possible target images.
    protected method update_targets_ {} {
@@ -619,7 +620,7 @@ itcl::class gaia::GaiaContour {
       #  And add to the menu.
       foreach w $images {
          if { $w != $itk_option(-image) } {
-            if { [winfo exists $w] } { 
+            if { [winfo exists $w] } {
                set name [[$w get_image] fullname]
                set clone [[winfo toplevel $w] cget -number]
                $itk_component(targets) add \
@@ -1030,7 +1031,7 @@ itcl::class gaia::GaiaContour {
       }
       $itk_component(start) configure -state $state
       $itk_component(incre) configure -state $state
-      if { $method == "percentiles" } { 
+      if { $method == "percentiles" } {
 	 $itk_component(percent) configure -state normal
 	 $itk_component(ncont) configure -state disabled
       } else {
@@ -1047,7 +1048,7 @@ itcl::class gaia::GaiaContour {
       set start [$itk_component(start) get]
       set incre [$itk_component(incre) get]
       set percent [$itk_component(percent) get]
-      if { $method != "automatic" && $method != "percentiles" && 
+      if { $method != "automatic" && $method != "percentiles" &&
            ( $start == {} || $incre == {} ) } {
          info_dialog "Please enter values for start and increment"
          return
@@ -1069,12 +1070,12 @@ itcl::class gaia::GaiaContour {
       } else {
 
 	 #  Automatic, or percentiles. Need to use the data of the
-	 #  image to be contoured. 
+	 #  image to be contoured.
 	 set rtdimage [get_rtdimage_]
 	 if { $rtdimage == {} || $rtdimage == 0 } {
 	    set rtdimage $itk_option(-rtdimage)
 	 }
-	 if { $method == "automatic" } { 
+	 if { $method == "automatic" } {
 	    set min [$rtdimage min]
 	    set max [$rtdimage max]
 	    set incre [expr double($max-$min)/double($ncont)]
@@ -1087,10 +1088,10 @@ itcl::class gaia::GaiaContour {
 
 	    #  Percentiles.
 	    set i 1
-	    foreach level [$rtdimage percentiles $percent] { 
+	    foreach level [$rtdimage percentiles $percent] {
 	       $itk_component(value$i) configure -value $level
 	       incr i
-	       if { $i >= $itk_option(-maxcnt) } { 
+	       if { $i >= $itk_option(-maxcnt) } {
 		  break
 	       }
 	    }
