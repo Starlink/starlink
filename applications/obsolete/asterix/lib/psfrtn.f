@@ -1416,6 +1416,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ASCA_CMN'
@@ -1445,6 +1446,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       REAL			RCLO,RCHI,CLO,CHI
       REAL 			ENERGY			! Mean photon energy
 
+      INTEGER			ABPTR			! Axis bounds array
+      INTEGER			DIMS(ADI__MXDIM), NDIM	! Dataset dimensions
       INTEGER			SLOT			! Psf slot number
       INTEGER			X_AX,Y_AX,E_AX,T_AX
 
@@ -1514,7 +1517,12 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         CALL ADI_CGET0I( PSID, 'Slot', SLOT, STATUS )
         CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
         IF ( E_AX .GT. 0 ) THEN
-          CALL PSF_QAXEXT( SLOT, E_AX, CLO, CHI, STATUS )
+          CALL BDI_GETSHP( FID, ADI__MXDIM, DIMS, NDIM, STATUS )
+          CALL BDI_AXMAPR( FID, E_AX, 'Bounds', ABPTR, STATUS )
+          CALL ARR_ELEM1R( ABPTR, 2*DIMS(E_AX), 1, CLO, STATUS )
+          CALL ARR_ELEM1R( ABPTR, 2*DIMS(E_AX), 2*DIMS(E_AX),
+     :                     CHI, STATUS )
+          CALL BDI_AXUNMAP( FID, E_AX, ABPTR, STATUS )
           CSCALE = REAL(RCHI-RCLO)/REAL(CHI-CLO)
           CALL MSG_SETR( 'SC', CSCALE )
 	  CALL MSG_PRNT( 'User to RAW channel scaling = ^SC' )
