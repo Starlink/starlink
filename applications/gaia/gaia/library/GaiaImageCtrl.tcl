@@ -503,7 +503,6 @@ itcl::class gaia::GaiaImageCtrl {
          set old_height [$image_ height]
          busy {
             set center_ok_ 0
-            puts "Opening: $itk_option(-file)"
             if {[catch {$image_ config -file $itk_option(-file) \
                            -component $itk_option(-component)} msg]} {
                error_dialog $msg $w_

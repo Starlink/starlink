@@ -942,7 +942,8 @@ itcl::class gaia::GaiaContour {
       foreach type {automatic linear magnitude} {
          $itk_component(ctype) add \
             -label $type \
-            -value $type
+            -value $type \
+            -command [code $this ctype_changed_]
       }
       $itk_component(ctype) configure -value automatic
 
@@ -952,7 +953,7 @@ itcl::class gaia::GaiaContour {
             -validate real \
             -text "Start:" \
             -labelwidth 14 \
-            -valuewidth 20 \
+            -valuewidth 20
       }
       pack $itk_component(start) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(start) \
@@ -965,11 +966,15 @@ itcl::class gaia::GaiaContour {
             -text "Increment:" \
             -labelwidth 14 \
             -valuewidth 20 \
+            -command [code $this generate_contours_]
       }
       pack $itk_component(incre) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(incre) \
          {Increment between generated levels}
 
+      #  Set initial state.
+      $itk_component(ctype) configure -value automatic
+      ctype_changed_
 
       #  Button to generate contours.
       itk_component add generate {
@@ -982,8 +987,20 @@ itcl::class gaia::GaiaContour {
          {Generate contours}
    }
 
+   #  Configure entry fields when the generation type changes.
+   protected method ctype_changed_ {} {
+      set method [$itk_component(ctype) get]
+      if { $method == "automatic" } { 
+         set state disabled
+      } else {
+         set state normal
+      }
+      $itk_component(start) configure -state $state
+      $itk_component(incre) configure -state $state
+   }
+
    #  Generate contours levels.
-   protected method generate_contours_ {} {
+   protected method generate_contours_ {args} {
       set ncont [$itk_component(ncont) get]
       set method [$itk_component(ctype) get]
       set start [$itk_component(start) get]
