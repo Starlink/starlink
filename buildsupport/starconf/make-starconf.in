@@ -105,10 +105,12 @@ cat >&3 <<\_STARCONF3_EOD
 # from the environment.
 
 # Configuration
-bindir=@bindir@
-datadir=@datadir@
+buildsupport=@prefix@
+buildsupportbin=@bindir@
+buildsupportdata=@datadir@
 ln_s="@LN_S@"
-curr_starconf_version="@PACKAGE_VERSIONINT@"
+versionint="@PACKAGE_VERSIONINT@"
+version="@PACKAGE_VERSION"
 
 # Default all the variables which are to be substituted into !!variable!!  It would
 # probably be desirable to grep the input files for !!...!! variables, but that
@@ -119,17 +121,42 @@ allconfsubs=" STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX "
 STARCONF_DEFAULT_STARLINK=@STARCONF_DEFAULT_STARLINK@
 STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@
 
+showvars="$allconfsubs buildsupport buildsupportbin buildsupportdata version versionint "
+
 if test $# -gt 0; then
     case $1 in
     --show)
         shift
         while test $# -gt 0
         do
-            expr "x$allconfsubs" : "x.* $1 " >/dev/null ||
-                { echo "Unrecognised variable $1" >&2; exit 1; }
-            eval echo '${'$1'}'
+            if test "$1" = "--all"; then
+                for v in $showvars
+                do
+                    eval echo "$v="'${'$v'}'
+                done
+            else
+                expr "x$showvars" : "x.* $1 " >/dev/null ||
+                    { echo "Unrecognised variable $1" >&2; exit 1; }
+                eval echo '${'$1'}'
+            fi
             shift
         done
+        exit 0
+        ;;
+    --version)
+        echo "starconf @PACKAGE_VERSION@: configure Starlink build directories"
+        exit 0
+        ;;
+    --help)
+        echo "starconf @PACKAGE_VERSION@: configure Starlink build directories"
+        echo "Usage:"
+        echo "    $0"
+        echo "        Configure directory"
+        echo "    $0 --show [--all | variable ...]"
+        echo "        List configuration information:"
+        echo "        [$showvars]"
+        echo "    $0 [--help | --version]"
+        echo "        Show help/version"
         exit 0
         ;;
     *)  echo "Usage: $0 [--show variable...]"
@@ -151,7 +178,7 @@ if test -r configure.ac -a Makefile.am; then
     : OK
 else
     echo "$0: can't find readable configure.ac and Makefile.am"
-    echo "    ...see $datadir for templates"
+    echo "    ...see $buildsupportdata for templates"
     exit 1
 fi
 
@@ -161,8 +188,8 @@ fi
 # with the --force option, so that this will succeed, albeit with
 # warnings, the very first time that starconf is run in a directory,
 # before the user has had the chance to check in Makefile.in and friends.
-if test -x $bindir/starconf-validate; then
-    if $bindir/starconf-validate --force .; then
+if test -x $buildsupportbin/starconf-validate; then
+    if $buildsupportbin/starconf-validate --force .; then
         : OK
     else
         echo "$0: Configuration not valid -- fix above errors first"
@@ -175,10 +202,10 @@ if test -e bootstrap; then
     # is `original'.  If it is, then unpack the bootstrap file, overwriting
     # any bootstrap file that's already there.
     eval `sed -e '1d' -e '2{s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\)/original=\1; bootstrap_version=\2;/;q;}' bootstrap`
-    # echo "XXX original=$original  rnum=$bootstrap_version curr=$curr_starconf_version"
+    # echo "XXX original=$original  rnum=$bootstrap_version curr=$versionint"
     if test "X$original" != Xoriginal; then
         : do nothing -- file has been modified
-    elif test $bootstrap_version -lt $curr_starconf_version; then
+    elif test $bootstrap_version -lt $versionint; then
         extrachunks="$extrachunks !*bootstrap"
     else
         : do nothing -- file is up to date
@@ -236,7 +263,7 @@ filelist=" $defaultchunks $extrachunks "
 # echo "XXX filelist=$filelist"
 
 # Make sure there's a link to the installed componentinfo.dtd
-test -e componentinfo.dtd || $ln_s $datadir/componentinfo.dtd componentinfo.dtd
+test -e componentinfo.dtd || $ln_s $buildsupportdata/componentinfo.dtd componentinfo.dtd
 
 # Start writing the starconf.status file; send output to FD 4
 exec 4>starconf.status
