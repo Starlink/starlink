@@ -71,21 +71,31 @@ AC_PREFIX_DEFAULT(!!STARCONF_DEFAULT_PREFIX!!)dnl
 
 test -n "$STARLINK" || STARLINK=!!STARCONF_DEFAULT_STARLINK!!
 
-# Handle the --with-starlink option.  Do nothing in the option-not-present
-# case, except continue to use the STARLINK value defaulted above.
+# Handle the --with-starlink option.  If --with-starlink is present
+# with no argument (the default), we do nothing as this simply
+# indicates that this is part of a Starlink tree.  If it has an
+# argument, then this overrides the location of the Starlink tree.
+# Option --without-starlink or --with-starlink=no indicates that this
+# is being built _not_ as part of a Starlink build (that is, it's
+# being distributed as something other than a Starlink package).  In
+# this case, the variable STARLINK is unset.
 AC_ARG_WITH(starlink,
             AS_HELP_STRING([--with-starlink],
                            [Starlink tree to use (default ${STARLINK:=!!STARCONF_DEFAULT_STARLINK!!})]),
-            [if test -z "$withval"; then
-                 AC_MSG_WARN([no argument to --with-starlink; using default $STARLINK])
+            [if test -z "$withval" -o "$withval" = yes; then
+                 : nothing needs to be done
              elif test "X$withval" = Xno; then
-                 AC_MSG_WARN([--without-starlink makes no sense; using default $STARLINK instead])
+                 unset STARLINK
              elif test -d "$withval"; then
                  STARLINK="$withval"
-                 AC_MSG_NOTICE([STARLINK set to $STARLINK])
              else
                  AC_MSG_WARN([--with-starlink given nonexistent directory; ignored: using default $STARLINK instead])
              fi])
+if test -n "$STARLINK"; then
+    AC_MSG_NOTICE([Starlink tree located at $STARLINK])
+else
+    AC_MSG_NOTICE([Not being built as part of the Starlink tree])
+fi
 
 # Handle --without-stardocs.  Don't build and install documentation.
 # Default is --with-stardocs.
@@ -121,18 +131,19 @@ AC_SUBST(STARLINK)
 # Starlink tree.  Note that we are using FCFLAGS rather than FFLAGS --
 # we prefer the FC macros to the F77 ones, and have modified automake
 # to generate these.  However, we maintain FFLAGS also, so that we
-# allow both.
-if test "$STARLINK" != "!!STARCONF_DEFAULT_PREFIX!!"; then
-    FCFLAGS="$FCFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
-    FFLAGS="$FFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
-    CFLAGS="$CFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
-    LDFLAGS="$LDFLAGS -L!!STARCONF_DEFAULT_PREFIX!!/lib"
+# allow both.  Avoid doing anything if $STARLINK was unset above.
+if test -n "$STARLINK"; then
+    if test "$STARLINK" != "!!STARCONF_DEFAULT_PREFIX!!"; then
+        FCFLAGS="$FCFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
+        FFLAGS="$FFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
+        CFLAGS="$CFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
+        LDFLAGS="$LDFLAGS -L!!STARCONF_DEFAULT_PREFIX!!/lib"
+    fi
+    FCFLAGS="$FCFLAGS -I$STARLINK/include"
+    FFLAGS="$FFLAGS -I$STARLINK/include"
+    CFLAGS="$CFLAGS -I$STARLINK/include"
+    LDFLAGS="$LDFLAGS -L$STARLINK/lib"
 fi
-FCFLAGS="$FCFLAGS -I$STARLINK/include"
-FFLAGS="$FFLAGS -I$STARLINK/include"
-CFLAGS="$CFLAGS -I$STARLINK/include"
-LDFLAGS="$LDFLAGS -L$STARLINK/lib"
-
 
 # Installation directory options.  This must match the variables handled
 # by _STAR_EXTRADIR_COMMON
