@@ -412,29 +412,33 @@
       CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
 
 *  Get a group holding the name of the output cube to hold Stokes parameters.
-      CALL WRNDF( 'OUT_S', GRP__NOID, 1, 1, ' ', IGRP4, SIZEO,
+      CALL WRNDF( 'OUT_S', GRP__NOID, 0, 1, ' ', IGRP4, SIZEO,
      :             STATUS )
 
 * If we are producing Stokes parameters, check that all of the input
 * object frames hasve POLPACK extensions containing WPLATE values. 
       IF( IGRP4 .NE. GRP__NOID ) THEN
-         DO I = 1, SIZE
-            CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
-            WPLATE = VAL__BADR
-            CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPLATE,
-     :                      STATUS )            
-            IF( STATUS .EQ. SAI__OK .AND. 
-     :          WPLATE .NE. 0.0 .AND. WPLATE .NE. 22.5 .AND.
-     :          WPLATE .NE. 45.0 .AND. WPLATE .NE. 67.5 ) THEN
-               STATUS = SAI__ERROR
-               CALL NDF_MSG( 'NDF', INDF )
-               CALL ERR_REP( 'POLREG_ERR3', 'POLREG: Unable to ' //
-     :                       'obtain a valid WPLATE value ' //
-     :                       'from the POLPACK extension of ' //
-     :                       '''^NDF''.', STATUS )
-            END IF
-            CALL NDF_ANNUL( INDF, STATUS )
-         END DO
+         IF(  SIZE0 .GT. 0 ) THEN
+            DO I = 1, SIZE
+               CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
+               WPLATE = VAL__BADR
+               CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPLATE,
+     :                         STATUS )            
+               IF( STATUS .EQ. SAI__OK .AND. 
+     :             WPLATE .NE. 0.0 .AND. WPLATE .NE. 22.5 .AND.
+     :             WPLATE .NE. 45.0 .AND. WPLATE .NE. 67.5 ) THEN
+                  STATUS = SAI__ERROR
+                  CALL NDF_MSG( 'NDF', INDF )
+                  CALL ERR_REP( 'POLREG_ERR3', 'POLREG: Unable to ' //
+     :                          'obtain a valid WPLATE value ' //
+     :                          'from the POLPACK extension of ' //
+     :                          '''^NDF''.', STATUS )
+               END IF
+               CALL NDF_ANNUL( INDF, STATUS )
+            END DO
+         ELSE
+            CALL GRP_DELET( IGRP4 )
+         END IF
       END IF
 
 * Now deal with cases where we are creating aligned intensity images from

@@ -237,10 +237,18 @@
 
       END DO
 
+*  Arrive here if an error occurs.
+ 999  CONTINUE
+
+*  If a null value was supplied, then annul the error if the group
+*  is allowed to be empty.
+      IF( STATUS .EQ. PAR__NULL .AND. MINSIZ .LE. 0 ) THEN
+         CALL ERR_ANNUL( STATUS )
+      END IF
+	
 *  If an error has occured, return SIZE with the value 1 to avoid
 *  potential access violations if SIZE is used as the dimension of a
 *  passed array.
- 999  CONTINUE
       IF( STATUS .NE. SAI__OK ) SIZE = 1
 
       END

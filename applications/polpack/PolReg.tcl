@@ -583,7 +583,7 @@
    $EDITMENU add command -label "Copy"          -command Copy -state disabled -accelerator "Ctrl-o"
    $EDITMENU add command -label "Delete"        -command Delete -state disabled -accelerator "Del"
    $EDITMENU add cascade -label "Mappings"      -menu $EDITMENU.mappings
-   $EDITMENU add command -label "Paste"         -command Paste -state disabled -accelerator "Ctrl-o"
+   $EDITMENU add command -label "Paste"         -command Paste -state disabled -accelerator "Ctrl-p"
 
    MenuHelp $EDITMENU "Clear All"       ".  Clear all mappings, image features and masks for all images."
    MenuHelp $EDITMENU "Clear Current"   ".  Clear the current objects (as selected using the buttons under the \"Current:\" label) for the displayed image."
