@@ -17,13 +17,15 @@
 *        The global status.
 
 *  Description:
-*     This task allows regions of a NDF's data array to be masked, so
-*     that they can be excluded from subsequent data processing.  ARD
-*     (ASCII Region Definition) descriptions stored in a text
-*     file define which pixels of the data array are masked.  An
+*     This task allows regions of an NDF's to be masked, so
+*     that they can (for instance) be excluded from subsequent data 
+*     processing.  ARD (ASCII Region Definition) descriptions stored in 
+*     a text file define which pixels of the data array are masked.  An
 *     output NDF is created which is the same as the input file except
-*     that all pixels specified by the ARD file have been assigned the
-*     bad value.
+*     that all pixels specified by the ARD file have been assigned either
+*     the bad value or a specified constant value. This value can be
+*     assigned to either the inside or the outside of the specified 
+*     ARD region.
 
 *  Usage:
 *     ardmask in ardfile out
@@ -40,8 +42,19 @@
 *        indicate that positions are specified in RA/DEC (FK5,J2000). The
 *        statement "COFRAME(PIXEL)" indicates explicitly that positions are 
 *        specified in pixel co-ordinates. 
+*     COMP = LITERAL (Read)
+*        The NDF array component to be masked.  It may be "Data", or
+*        "Variance", or "Error" (where "Error" is equivalent to 
+*        "Variance"). ["Data"]
+*     CONST = LITERAL (Given)
+*        The constant numerical value to assign to the region, or the string 
+*        "bad". ["bad"]
 *     IN = NDF (Read)
 *        The name of the source NDF.
+*     INSIDE = _LOGICAL (Read)
+*        If a TRUE value is supplied, the constant value is assigned to the 
+*        inside of the region specified by the ARD file. Otherwise, it is
+*        assigned to the outside. [TRUE]
 *     OUT = NDF (Write)
 *        The name of the masked NDF.
 *     TITLE = LITERAL (Read)
@@ -111,6 +124,8 @@
 *     25-OCT-2001 (DSB):
 *        Modified to make pixel coords the default coord system for ard
 *        files.
+*     30-NOV-2001 (DSB):
+*        Added parameters COMP, CONST and INSIDE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -131,16 +146,15 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:      
-      CHARACTER ATYPE*( NDF__SZTYP ) ! Numeric type for mapping AXIS centres
-      CHARACTER FILNAM*132 ! Name of ARD file
+      CHARACTER COMP*8           ! Name of array component to mask
+      CHARACTER CONTXT*40        ! Text version of constant value
+      CHARACTER FILNAM*132       ! Name of ARD file
       CHARACTER TYPE*( NDF__SZTYP )  ! Numeric type for processing
-      INTEGER AXES( NDF__MXDIM ) ! Indices of axes
+      DOUBLE PRECISION CONST     ! The constant to assign
       INTEGER EL                 ! Total number of pixels in the image
       INTEGER FD                 ! File descriptor
-      INTEGER I                  ! Loop counter
       INTEGER IGRP               ! Group identifier
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
-      INTEGER J                  ! Loop counter
       INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index  
       INTEGER LBNDE( NDF__MXDIM )! Lower bounds of a box encompassing all external array elements
       INTEGER LBNDI( NDF__MXDIM )! Lower bounds of a box encompassing all internal array elements
@@ -148,19 +162,17 @@
       INTEGER INDF2              ! Identifier for the output NDF
       INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER NDIM               ! Number of dimensions in the image
-      INTEGER NDP1               ! Numberof dimensions plus one.
-      INTEGER IPIN               ! Pointer to the data component of for the output NDF
+      INTEGER IPOUT               ! Pointer to the data component of for the output NDF
       INTEGER IPMASK             ! Pointer to the ARD logical mask
       INTEGER REGVAL             ! Value assignied to the first ARD region
       INTEGER UBND( NDF__MXDIM ) ! Upper limit for image index
       INTEGER UBNDE( NDF__MXDIM )! Upper bounds of a box encompassing all external array elements
       INTEGER UBNDI( NDF__MXDIM )! Upper bounds of a box encompassing all internal array elements
+      LOGICAL BAD                ! Assign bad values to the region?
       LOGICAL CONT               ! ARD description to continue?
-      LOGICAL DATAVL             ! Are data co-ordinates available?
-      REAL OFFSET( NDF__MXDIM )  ! Axis co-ords at pixel co-ords (0,0)
-      REAL SCALE( NDF__MXDIM )   ! Dimensions of a pixel in axis units
+      LOGICAL INSIDE             ! Assign value to inside of region?
+      LOGICAL THERE              ! Does the requested NDF component exist?
       REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world co-ordinate conversions
-                                                          
 *.
 
 *  Check the inherited global status.
@@ -175,8 +187,25 @@
 *  Obtain an identifier for the NDF structure to be examined.       
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
-*  Obtain the numeric type of the NDF array component to be analysed.
-      CALL NDF_TYPE( INDF1, 'Data', TYPE, STATUS )
+*  Determine which array component is to be masked, converting 'ERROR' into 
+*  'VARIANCE'.
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE., 
+     :                COMP, STATUS )
+      IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
+
+*  Check that the required component exists and report an error if it
+*  does not.
+      CALL NDF_STATE( INDF1, COMP, THERE, STATUS )
+      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( .NOT. THERE ) ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'COMP', COMP )
+         CALL NDF_MSG( 'NDF', INDF1 )
+         CALL ERR_REP( 'ARDMASK_ERR1', 'The ^COMP component is '//
+     :                 'undefined in the NDF structure ^NDF', STATUS )
+      END IF
+      
+*  Obtain the numeric type of the NDF array component to be masked.
+      CALL NDF_TYPE( INDF1, COMP, TYPE, STATUS )
 
 *  Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -224,36 +253,55 @@
       CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
 
 *  Map the output NDF data array for updating.
-      CALL NDF_MAP( INDF2, 'Data', TYPE, 'UPDATE', IPIN, EL,
+      CALL NDF_MAP( INDF2, COMP, TYPE, 'UPDATE', IPOUT, EL,
      :              STATUS )
+
+*  Get the string representing the constant value to assign.
+      CALL PAR_MIX0D( 'CONST', 'Bad', VAL__MIND, VAL__MAXD, 'Bad',
+     :                 .FALSE., CONTXT, STATUS )
+
+*  Get the appropriate numerical value from the string.
+      BAD = ( CONTXT .EQ. 'BAD' )
+      IF( .NOT. BAD ) CALL CHR_CTOD( CONTXT, CONST, STATUS )
+
+*  See if the value is to be assigned to the inside or the outside of the 
+*  region.
+      CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
 
 *  Correct the output image to have bad pixels where indicated on the
 *  mask.  Call the appropriate routine for the data type.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_ARDMR( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
+         CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_ARDMB( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
+         CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_ARDMD( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
+         CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_ARDMI( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
+         CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_ARDMUB( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
+         CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_ARDMUW( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
+         CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       ELSE IF( TYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_ARDMW( EL, %VAL( IPMASK ), %VAL( IPIN ), STATUS )
+         CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       END IF
 
 *  Set the bad-pixel flag.
-      CALL NDF_SBAD( .TRUE., INDF2, 'Data', STATUS )
+      IF( BAD ) CALL NDF_SBAD( .TRUE., INDF2, COMP, STATUS )
 
 *  Free the dynamic array space of the logical mask.
       CALL PSX_FREE( IPMASK, STATUS )
