@@ -15,6 +15,7 @@ arrays/arrays.h
 arrays/makefile
 t/err.t
 t/fits.t
+t/fitshdr.t
 t/hds.t
 t/hist.t
 t/msg.t
