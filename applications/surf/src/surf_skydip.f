@@ -52,9 +52,12 @@
 *    History :
 *     $Id$
 *     $Log$
-*     Revision 1.4  1996/08/26 19:36:40  timj
-*     Quality array was being mapped as REAL instead of UBYTE.
+*     Revision 1.5  1996/08/27 03:42:44  timj
+*     Fix UBYTES for QUALITY
 *
+c Revision 1.4  1996/08/26  19:36:40  timj
+c Quality array was being mapped as REAL instead of UBYTE.
+c
 c Revision 1.3  1996/08/26  19:31:53  timj
 c Remove LTEMP variable (left over from BAD_PIXEL experiment)
 c
@@ -139,13 +142,13 @@ c
                                         ! brightness temperature of sky
       REAL    J_SKY_VARIANCE (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! variance of j_sky
-      INTEGER J_SKY_QUALITY (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+      BYTE    J_SKY_QUALITY (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! quality of j_sky
       REAL    J_SKY_AV (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! average brightness temperature of sky
       REAL    J_SKY_AV_VARIANCE (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! variance of j_sky average
-      INTEGER J_SKY_AV_QUALITY (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+      BYTE J_SKY_AV_QUALITY (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! quality of j_sky average
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
       INTEGER LBND (MAXDIM)             ! lower bounds of array
@@ -702,6 +705,9 @@ c
 * Set new bounds of data array
       CALL NDF_SBND (NDIM, LBND, UBND, OUT_NDF, STATUS)
 
+* Turn off automatic quality masking (just to make sure)
+      CALL NDF_SQMF(.FALSE., OUT_NDF, STATUS)
+
 *  Map the data
       CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
      : OUT_DATA_PTR, ITEMP, STATUS)
@@ -721,7 +727,7 @@ c
       CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      : OUT_QUAL_PTR, ITEMP, STATUS)
 
-      CALL SCULIB_COPYI(UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR))
+      CALL SCULIB_COPYB(UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR))
 
 * Create the AXES
 
