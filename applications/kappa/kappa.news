@@ -1,60 +1,37 @@
-1 KAPPA_Version_0.13
+1 KAPPA_Version_0.13-6
 
- A major new update to KAPPA (V0.13) is now available...
+ A minor update to KAPPA (V0.13-6) is now available. It contains 
+ fixes for the following bugs:
 
-    SOME IMPORTANT APPLICATIONS (DISPLAY, CONTOUR, CURSOR, ETC) 
-    HAVE HAD PARAMETERS ADDED, REMOVED AND CHANGED. SCRIPTS WHICH 
-    USE ANY OF THESE MODIFIED APPLICATIONS MAY NEED TO BE CHANGED 
-    TO TAKE ACCOUNT OF THE NEW PARAMETER LISTS. 
+ -  ARDMASK now sets the bad pixel flag in the output NDF so that 
+    other applications interpret the selected pixels as bad.
 
- See SUN/95 ("Release Notes - V0.13") for a complete list of the changes. 
- The main changes are in the areas of co-ordinate handling and graphics:
+ -  COMPAVE now traps zero variance values, preventing a divide by 
+    zero error.
 
- o   Co-ordinate handling has been improved by using the facilities
- of the AST library to allow a wide range of co-ordinate Frames to
- be stored within NDFs, displayed and manipulated. For instance,
- celestial co-ordinates stored within the WCS component of an NDF
- can be displayed by DISPLAY, CONTOUR, LINPLOT and CURSOR. Images
- can also be aligned on the basis of the WCS information stored
- within them using a new application called WCSALIGN.
+ -  History information written to NDFs now contain the up-to-date
+    KAPPA package version number.
 
- o   The graphics have been improved by allowing much greater
- control of the appearance of the graphics. A wide range of
- plotting "attributes" can be specified for graphics produced
- using DISPLAY, CONTOUR, LINPLOT and CURSOR. These attributes can
- be specified within text files, allowing you to create your own
- plotting "styles". These changes have also involved the
- conversion from SGS/NCAR to PGPLOT as the underlying graphics
- system.
+ -  DISPLAY now uses independant compression factors for both axes.
+    Previously, an inappropriate compression factor could be used for 
+    one of the axes if the lengths of the two axes were very different.
 
- This release includes the new facilities in a limited number of
- applications. The remaining applications will be converted and
- made available in subsequent releases. The GKS version of PGPLOT
- is used in this release in order to enable SGS/NCAR and PGPLOT
- applications to co-exist. When all graphical applications have
- been converted, native PGPLOT will be used in place of GKS
- PGPLOT.
+ -  Trailing spaces are now stripped from the Title attribute of the 
+    current WCS Frame.
 
- Other changes include:
+ -  A bug in MATHS which could cause zero variances to be produced sometimes
+    when using double precision data has been fixed.
 
-    -  NATIVE now converts any floating point NaN or Inf values in 
-    the supplied HDS object are now converted to the appropriate
-    Starlink bad value. 
+ -  NOMAGIC and FILLBAD now set the bad bits flag in the output NDF to
+    zero. Previously, NDFs containing QUALITY arrays could still seems
+    to contain bad pixels after running NOMAGIC or FILLBAD. This no
+    longer happens.
 
-    -  The radial fitting function used by PSF can now be 
-    constrained to be a Gaussian.
+ -  WCSREMOVE now issues a warning instead of aborting if an attempt is 
+    made to remove the Base Frame of the WCS FrameSet.
 
-    -  A new application PROFILE which creates a 1-dimensional NDF
-    containing a cross-section of the data values in an N-dimensional
-    NDF, taken along a specified curve or straight line.
+ -  NATIVE now correctly replaces IEE NaN and Inf values by Starlink bad
+    values on Solaris systems.
 
-    -  A new application COPYBAD which copies the bad pixel mask
-    from one NDF to another.
-
-    -  A new application CHAIN which enables several NDFs to be
-    concatenated together.
-
-    -  A new application RESHAPE which enables the shape of an NDF
-    to be changed. The pixel values in the input NDF are treated as 
-    a 1-dimensional vector which is then "chopped up" into lines of
-    a specified length to form the output NDF.
+ -  The global parameter POSITIONS_LIST has been replaced by CATALOGUE.
+ 
