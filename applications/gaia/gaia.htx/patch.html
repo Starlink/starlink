@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Image Patching</title>
+</head>
+
+<body>
+<blockquote>
+<h2 align=center><font color=red>Image Patching</font></h2>
+<p>Image patching provides the ability to select arbitrary shaped
+regions on an image and replace them with a surface fit to other
+arbitrary shaped regions, together with an artificial noise component.
+This is an ideal way to remove unwanted defects from an image for
+cosmetic reasons. Using it for other purpose should be done very
+carefully.
+
+<p><b>Note:</b> a patched image is only retained in memory, the
+associated disk file is <b>not updated</b>. One consequence of this is
+that toolboxes that use external programs (like photometry and object
+detection) will not see the changes until after you save (and
+re-display) the image. The changes to the image could also be lost
+when exiting GAIA.
+
+<p>The toolbox has some usage hints:
+<ul>
+<li><a href="patchusage.html">Patching toolbox usage hints</a></li>
+</ul>
+<br>
+<img src="patch.gif">
+<br>
+</blockquote>
+</body>
+</html>
