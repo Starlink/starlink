@@ -16,7 +16,7 @@ require AutoLoader;
 
 # Version derived from CVS repository:  '$Revision$ '
 
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -513,7 +513,7 @@ sub fits_read_header ($) {
 
 	for ($i = 0; $i < $nfits; $i++) {
 	  my ($item, $value, $comment) = fits_get_nth_item(\@fits,$i);
-	  $fitsitem{$item} = $value;
+	  $fitsitem{$item} = $value if defined $value;
 	}
 
       } else {

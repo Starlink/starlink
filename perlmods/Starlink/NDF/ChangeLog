@@ -1,3 +1,8 @@
+2000-01-25  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm: Check for defined value for $value from
+	fits_get_nth_item to fix -w warning.
+
 1999-05-20  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Makefile.PL: Use Starlink::Config
