@@ -847,6 +847,7 @@ docs:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs/sun253
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
+Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
      [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/help
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253.fo
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toFo.xslt
@@ -937,9 +938,11 @@ docs:
      [java] [INFO] Parsing of document complete, stopping renderer
      [java] Parsing document /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
      [java] Transforming with stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML.xslt
+     [java] Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
      [java] Writing 87 files to /apps/cvsbuild/java/source/topcat/build/docs/sun253
      [java] Parsing document /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
      [java] Transforming with stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHelp.xslt
+     [java] Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
      [java] Writing 90 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/help
 
 jars:
@@ -1118,4 +1121,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 56 seconds
+Total time: 4 minutes 10 seconds
