@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_PSPLT( NBIN, SIGMA, AXISR, AMP, GAMMA, BACK,
-     :                       SCALE, RUNITS, PNMIN, PROFIL, 
+     :                       SCALE, YSCALE, RUNITS, PNMIN, PROFIL, 
      :                       PROFR, PROFWT, WORK, STATUS )
 *+
 *  Name:
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL KPS1_PSPLT( NBIN, SIGMA, AXISR, AMP, GAMMA, BACK, SCALE,
-*                      RUNITS, PNMIN, PROFIL, PROFR, PROFWT, WORK,
-*                      STATUS )
+*                      YSCALE, RUNITS, PNMIN, PROFIL, PROFR, PROFWT, 
+*                      WORK, STATUS )
 
 *  Description:
 *     This routine plots the mean point-spread-function profile along
@@ -38,6 +38,9 @@
 *        The scale factor to convert pixels to the physical units given
 *        by argument RUNITS.  This factor is applied to the radial
 *        distances in the plotted profile.
+*     YSCALE = REAL (Given)
+*        The scale factor to convert profile values into displayed Y axis
+*        values.
 *     RUNITS = CHARACTER * ( * ) (Given)
 *        The units of the radial profile after applying argument SCALE
 *        to the pixel steps.  It gets used to make the default X axis
@@ -47,7 +50,7 @@
 *        whether to plot the profile along the minor or major axis.
 *     PROFIL( NBIN ) = REAL (Given and Returned)
 *        On input these are the mean-profile values in each bin.  On
-*        exit they become the fitted profile values.
+*        exit they become the scaled, fitted profile values.
 *     PROFR( NBIN ) = REAL (Given and Returned)
 *        On input these are the mean-profile radii in each bin.  On
 *        exit they become the radii of the fitted profile.
@@ -84,6 +87,8 @@
 *        Converted graphics to AST/PGPLOT.
 *     17-SEP-1999 (DSB):
 *        Re-formated and generally tidied up.
+*     2-MAY-2000 (DSB):
+*        Added argument YSCALE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,6 +112,7 @@
       REAL GAMMA
       REAL BACK
       REAL SCALE
+      REAL YSCALE
       CHARACTER RUNITS * ( * )
       CHARACTER PNMIN * ( * )
 
@@ -174,7 +180,7 @@
 *  Compress the data arrays to remove empty bins. Scale the data to the units.
          IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
             NDATA = NDATA + 1
-            PROFIL( NDATA ) = PROFIL( BIN ) - BACK
+            PROFIL( NDATA ) = YSCALE*( PROFIL( BIN ) - BACK )
             PROFR( NDATA ) = PROFR( BIN ) * SCALE * RAXIS
             PROFWT( NDATA ) = 0.0
 
@@ -192,7 +198,7 @@
       DO BIN = 0, NBIN - 1
          RADIUS = ( RMAX * BIN ) / REAL( NBIN - 1 )
          WORK( BIN, 1 ) = RADIUS * SCALE
-         WORK( BIN, 2 ) = AMP * EXP( - 0.5 * ( ( RADIUS /
+         WORK( BIN, 2 ) = YSCALE*AMP * EXP( - 0.5 * ( ( RADIUS /
      :                          MAX( 0.001, AXSIG ) ) *  * GAMMA ) )
 
          DMAX = MAX( DMAX, REAL( WORK( BIN, 2 ) ) )
