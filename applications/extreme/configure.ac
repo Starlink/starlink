@@ -57,13 +57,16 @@ AC_MSG_RESULT($big_int)
 AC_SUBST(big_int)
 
 dnl   Work out the name of a pointer-sized FORTRAN 77 integer type.
-dnl   This is by no means a watertight way of doing it - the right thing
-dnl   would be to write a new test using compiled fortran.
-if test "$big_int" == "int"
+if test "$ac_cv_sizeof_int_p" == "8"
 then
    integer8="INTEGER * 8"
 else
-   integer8="INTEGER    "
+   if test "$ac_cv_sizeof_int_p" == "4"
+   then
+       integer8="INTEGER    "
+   else
+       AC_MSG_ERROR(cannot determine fortran pointer type)
+   fi
 fi
 AC_MSG_CHECKING([f77 type for pointer])
 AC_MSG_RESULT($integer8)
