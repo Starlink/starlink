@@ -14731,6 +14731,21 @@ other AST Mapping. This allows you to create Mappings that perform any
 conceivable coordinate transformation.
 f-
 
+c+
+\item A new function astMapBox has been introduced. This allows you to
+find the extent of a ``bounding box'' which just encloses another box
+after it has been transformed by a Mapping. A typical use might be to
+calculate the size which an image would have if it were transformed by
+the Mapping.
+c-
+f+
+\item A new routine AST_MAPBOX has been introduced. This allows you to
+find the extent of a ``bounding box'' which just encloses another box
+after it has been transformed by a Mapping. A typical use might be to
+calculate the size which an image would have if it were transformed by
+the Mapping.
+f-
+
 f+
 \item A bug has been fixed which could cause the AST\_\_BAD parameter
 to have an incorrect value on some platforms.
