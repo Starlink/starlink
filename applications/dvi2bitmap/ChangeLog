@@ -1,3 +1,21 @@
+2004-11-04  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* all: Merged changes from branch dvi2bitmap-0-12-patches,
+	including various bugfixes.
+
+	* configure.ac, Makefile.am: repository moved to
+	cvs.starlink.ac.uk, and the configuration system heavily reworked
+	to match that required for the other Starlink applications.
+
+	* This will become 0.13.
+
+2004-01-16  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* InputByteStream.cc (bindToFileDescriptor): add check that
+	MAP_FAILED is defined and cope when it's not; this is required by
+	POSIX, but apparently not always present even when sys/mman.h is
+	there.  Released 0.12-1.
+
 2003-12-21  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* all: released 0.12 -- no changes required from 0.12b2
