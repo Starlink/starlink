@@ -384,7 +384,13 @@ $Id$
 				   ;; section-element-list, be
 				   ;; consistent with the other
 				   ;; elements in that.
-				   title))
+                                   (make sequence
+                                      title
+                                      (if (node-list-empty? purp)
+                                          (empty-sosofo)
+                                          (literal (string-append 
+                                                       " - "
+                                                       (data purp)))))))
 		       (make element gi: "dl"
 			     (process-node-list rp)))))))
 
@@ -486,14 +492,17 @@ $Id$
 	(make element gi: "dt"
 	      (make element gi: "strong"
 		    (process-node-list name)
-		    (literal (string-append " (" (data type) ") "
+		    (literal (string-append " = " 
+                                            (data type)
+                                            " ("
 					    (cond
 					     ((and given-att returned-att)
-					      "given and returned")
-					     (given-att "given")
-					     (returned-att "returned")
+					      "Given and Returned")
+					     (given-att "Given")
+					     (returned-att "Returned")
 					     (else ;default is given
-					      "given"))
+					      "Given"))
+                                            ")"
 					    (if opt-att
 						(string-append ", " opt-att)
 						"")))))
