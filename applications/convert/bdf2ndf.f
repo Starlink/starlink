@@ -4,7 +4,7 @@
 *     BDF2NDF
 
 *  Purpose:
-*     Converts a Starlink Interim BDF file into an NDF.
+*     Converts a Starlink Interim BDF file to an NDF.
 
 *  Language:
 *     Starlink Fortran 77

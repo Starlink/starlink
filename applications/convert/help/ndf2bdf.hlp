@@ -1,5 +1,5 @@
 1 NDF2BDF
-Converts an NDF into a Starlink Interim BDF file.
+Converts an NDF to a Starlink Interim BDF file.
 
 Usage:
 
