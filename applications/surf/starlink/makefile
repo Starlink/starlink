@@ -298,6 +298,8 @@
 #        Add -DPKG_VERS to automatically write version number to
 #        monolith application name for history writing
 #        Version 1.4
+#      25-JUN-1999 (BLY):
+#        Version 1.4-1: patched surf_rebin.f added to surf_sub.tar.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -474,7 +476,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.4-0
+PKG_VERS = 1.4-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
