@@ -52,26 +52,3 @@ done
 rm -f tmp1*
 
 exit 0
-
-
-
-testfailed=false
-
-# Strip DATE records from fits files (contains today's date)
-for f in *fits; do ./fitsdump $f > $f-ascii;done
-
-for f in t1.rep t1.sum t1-fits*fits-ascii t1.log
-do
-	echo "Testing $f... "
-	diff $f $f.correct >$f.diff
-	if [ $? = 0 ]; then
-		echo "ok"
-	else
-		echo "failed"
-		testfailed=true
-	fi
-	mv $f $f.delete
-done
-
-exit 0
-
