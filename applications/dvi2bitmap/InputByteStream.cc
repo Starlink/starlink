@@ -43,6 +43,7 @@
 #include <assert.h>
 #include <errno.h>
 #endif
+#include <unistd.h>
 
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
@@ -205,9 +206,9 @@ int InputByteStream::openSourceSpec(string srcspec)
 {
     int fd = -1;
     string srcfn;
-    if (srcspec.compare(0, 8, "<osfile>") == 0) {
-	srcfn = srcspec.substr(8);
-    } else if (srcspec.compare(0, 6, "<osfd>") == 0) {
+    if (srcspec.substr(0,8).compare("<osfile>") == 0) {
+        srcfn = srcspec.substr(8);
+    } else if (srcspec.substr(0,6).compare("<osfd>") == 0) {
 	string fdstr = srcspec.substr(6);
 	errno = 0;
 	fd = strtol(fdstr.c_str(), 0, 10);
@@ -490,7 +491,7 @@ void InputByteStream::close_fd_(void)
     if (fd_ >= 0)
 	close (fd_);
     fd_ = -1;
-    closedFD();
+    this->closedFD();
 //     if (close_callback_ != 0)
 // 	(*close_callback_)();
 }
