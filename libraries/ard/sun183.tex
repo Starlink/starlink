@@ -1902,10 +1902,13 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
             {Obtain an ARD description from the environment}
 \noteroutine{ARD\_GRPEX}{( DESC, IGRP1, IGRP2, FLAG, STATUS )}
             {Store an explicitly supplied ARD description in a GRP group}
+\noteroutine{ARD\_WCS}{( IWCS, STATUS )}
+            {Specify WCS information to be used in future calls to ARD\_WORK}
+\noteroutine{ARD\_PTWCS}{( IWCS, IGRP, STATUS )}
+            {Construct an ARD WCS statement and append it to a GRP group}
 \noteroutine{ARD\_WORK}{( IGRP, NDIM, LBND, UBND, TRCOEF, CONCAT, REGVAL, 
              MASK, LBNDI, UBNDI, LBNDE, UBNDE, STATUS )}
             {Create a pixel mask from an ARD description}
-
 
 \newpage
 \section{\label{APP:SPEC}Routine Descriptions}
@@ -2309,6 +2312,82 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
    }
 }
 \sstroutine{
+   ARD\_PTWCS
+}{
+   Construct an ARD WCS statement and append it to a GRP group
+}{
+   \sstdescription{
+      This routine creates a WCS statement describing the supplied
+      FrameSet, and appends the statement to the end of the supplied GRP
+      group.
+   }
+   \sstinvocation{
+      CALL ARD\_PTWCS( IWCS, IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         An AST pointer to a FrameSet.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         A GRP group identifier. If GRP\_\_NOID is supplied, a new group is
+         created and its identifier returned.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARD\_WCS
+}{
+   Specify WCS information to be used in future calls to ARD\_WORK
+}{
+   \sstdescription{
+      This routine can be used to specify the cooordinate systems
+      which can be used in subsequent calls to ARD\_WORK. The supplied
+      FrameSet must include a Frame with Domain {\tt "}PIXEL{\tt "}. ARD expressions
+      passed to subsequent calls to ARD\_WORK can include positions in any
+      of the Frames included in the supplied FrameSet (the ARD expression
+      should include suitable COFRAME or WCS statements to indicate which
+      coordinate system is being used).
+
+      If this routine is not called prior to ARD\_WORK (or if it is
+      called with IWCS set AST\_\_NULL), then the ARD expression must
+      provide (either directly or through a WCS statement) positions in
+      pixel coordinates.
+
+      The FrameSet pointer supplied is simply stored by this routine.
+      If any changes are subsequently made to the FrameSet by the calling
+      routine, then these changes will be visible within ARD\_WORK. In
+      particular, if the calling routine annulls the FrameSet pointer,
+      then ARD\_WORK will fail.
+
+      The supplied FrameSet will be used by all subsequent calls to ARD\_WORK
+      until a new FrameSet is specified by calling ARD\_WCS again.
+   }
+   \sstinvocation{
+      CALL ARD\_WCS( IWCS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         An AST pointer to a FrameSet, or AST\_\_NULL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    ARD\_WORK
 }{
    Convert an ARD description into a pixel mask
@@ -2352,22 +2431,22 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       \sstsubsection{
          CONCAT = LOGICAL (Given)
       }{
-         If .TRUE., then an \htmlref{INPUT}{KEY:INP} keyword is inserted at the start of
+         If .TRUE., then an INPUT keyword is inserted at the start of
          the ARD description so long as the ARD description does not
-         already contain any \htmlref{INPUT}{KEY:INP} keywords. If .FALSE., the ARD
+         already contain any INPUT keywords. If .FALSE., the ARD
          description is left as supplied.
       }
       \sstsubsection{
          REGVAL = INTEGER (Given and Returned)
       }{
-         A positive integer to use to represent the first keyword in the ARD
-         description (excluding \htmlref{INPUT}{KEY:INP} keywords). An error is reported
-         if the value 1 is supplied. If the supplied value is negative
-         or zero, then the value used is one greater than the maximum
-         pixel value supplied in MASK (except that 2 is used if the
-         maximum mask value is 1 or less). On return, REGVAL holds one
-         more than the largest value used to represent any of the
-         \htmlref{keywords}{SEC:KEYW} in the ARD description.
+         A positive integer to use to represent the first keyword in
+         the ARD description (excluding INPUT keywords). An error is
+         reported if the value 1 is supplied. If the supplied value is
+         negative or zero, then the value used is one greater than the
+         maximum pixel value supplied in MASK (except that 2 is used if
+         the maximum mask value is 1 or less). On return, REGVAL holds
+         one more than the largest value used to represent any of the
+         keywords in the ARD description.
       }
       \sstsubsection{
          MASK( $*$ ) = INTEGER (Given and Returned)
@@ -2378,7 +2457,7 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       \sstsubsection{
          LBNDI( NDIM ) = INTEGER (Returned)
       }{
-         The lower pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all internal
+         The lower pixel bounds of a box which encompasses all internal
          pixels. If there are no internal pixels in the returned mask,
          each lower bound is returned greater than the corresponding
          upper bound.
@@ -2386,13 +2465,13 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       \sstsubsection{
          UBNDI( NDIM ) = INTEGER (Returned)
       }{
-         The upper pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all internal
+         The upper pixel bounds of a box which encompasses all internal
          pixels.
       }
       \sstsubsection{
          LBNDE( NDIM ) = INTEGER (Returned)
       }{
-         The lower pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all external
+         The lower pixel bounds of a box which encompasses all external
          pixels. If there are no external pixels in the returned mask,
          each lower bound is returned greater than the corresponding
          upper bound.
@@ -2400,7 +2479,7 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       \sstsubsection{
          UBNDE( NDIM ) = INTEGER (Returned)
       }{
-         The upper pixel bounds of a \htmlref{box}{SEC:BBOX} which encompasses all external
+         The upper pixel bounds of a box which encompasses all external
          pixels.
       }
       \sstsubsection{
@@ -2424,8 +2503,13 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
          as pixel co-ordinates).
 
          \sstitem
+         Knowledge of how to convert other coordinate systems (RA/DEC for
+         instance) into pixel positions within the mask can be specified
+         using routine ARD\_WCS.
+
+         \sstitem
          VAL\_\_BADR is defined in the PRIMDAT include file PRM\_PAR
-         (see \xref{SUN/39}{sun39}{}).
+         (see SUN/39).
       }
    }
 }
@@ -2444,5 +2528,6 @@ The WCS and COFRAME statements, and the ARD\_WCS routine have been introduced.
 The COEFFS, STRETCH, OFFSET, SCALE and TWIST statements have been
 depracted in favour of the new WCS adn COFRAME statements.
 
+Routines ARD\_WCS and ARD\_PTWCS have been added.
 
 \end{document}
