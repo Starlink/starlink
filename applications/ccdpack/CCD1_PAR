@@ -87,6 +87,6 @@
 
 *  Package version.
       CHARACTER * ( 32 ) VERS
-      PARAMETER ( VERS = '(CCDPACK version 2.2-0)' )
+      PARAMETER ( VERS = '(CCDPACK version 3.0-0b)' )
 
 * $Id$
