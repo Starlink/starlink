@@ -69,6 +69,9 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.12  1997/09/03 23:58:31  timj
+*     Automatically supply the output filename.
+*
 *     Revision 1.11  1997/07/03 19:05:40  timj
 *     Propogate axes to output
 *
@@ -137,6 +140,7 @@ c
                                        ! the flatfield
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input data
+      CHARACTER*132    FNAME           ! Name of input file
       INTEGER          I               ! DO loop index
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                        ! locator to FITS extension in input
@@ -159,6 +163,7 @@ c
                                        ! file
       CHARACTER*40     OBJECT          ! name of object
       CHARACTER*40     OBSERVING_MODE  ! observing mode of input file
+      CHARACTER*132    OUTFILE         ! Default name for output file
       INTEGER          OUT_D_PTR       ! pointer to data array in OUT file
       INTEGER          OUT_NDF         ! NDF index of output file
       INTEGER          OUT_Q_PTR       ! pointer to quality array in OUT file
@@ -167,6 +172,11 @@ c
                                        ! has been run on input file
       INTEGER          RUN_NUMBER      ! run number of input file
       CHARACTER*80     STEMP           ! scratch string
+      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
+
+*  Local Data:
+      DATA SUFFIX_STRINGS /'_flat','f'/
+
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -180,6 +190,10 @@ c
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
+
+*     Get the name of the filename associated with 'IN'
+
+      CALL SCULIB_GET_FILENAME('IN', FNAME, STATUS)
 
 * Read in badbit mask
       CALL NDF_BB(IN_NDF, BADBIT, STATUS)
@@ -382,6 +396,14 @@ c
      :        STATUS)
          END IF
       END IF
+
+*     Generate a default name for the output file
+      CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
+     :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
+
+*     set the default
+      CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
+      
 
 *  OK, propagate the input ndf to the output
 
