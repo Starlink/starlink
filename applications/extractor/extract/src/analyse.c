@@ -6,10 +6,12 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	analyse(), endobject()...: measurements on detections.
 *
 *	Last modify:	13/01/98
+*                       11/03/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -281,9 +283,10 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
       }
     for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
       for (i=0,iso=obj->iso,thresht=threshs;
-		PLIST(pixt,value)>*(thresht++) && (i++)<NISO;)
+           (i++)<NISO && PLIST(pixt,value)>*(thresht++);) /* PWD: change here, compare i & NISO before *thresht*/
         (*(iso++))++;
     }
+  /* PWD: was 		PLIST(pixt,value)>*(thresht++) && (i++)<NISO;)*/
 
 /* Put objects in "segmentation check-image" */
 
