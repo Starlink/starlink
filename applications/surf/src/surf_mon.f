@@ -31,10 +31,13 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.7  1996/11/01 21:18:13  timj
-*     Add SCUHELP
-*     Update header.
+*     Revision 1.8  1996/11/01 22:15:46  timj
+*     Change PHOTOM to SCUPHOT
 *
+c Revision 1.7  1996/11/01  21:18:13  timj
+c Add SCUHELP
+c Update header.
+c
 c Revision 1.6  1996/10/15  01:44:29  timj
 c Add DRAWSIG
 c
@@ -101,7 +104,7 @@ c
 
       ELSE IF (NAME .EQ. 'SCUPHOT') THEN
 
-         CALL REDS_PHOTOM (STATUS)
+         CALL REDS_SCUPHOT (STATUS)
 
       ELSE IF (NAME .EQ. 'REBIN') THEN
 
