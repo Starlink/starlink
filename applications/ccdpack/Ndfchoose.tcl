@@ -142,6 +142,18 @@
 #        Fixed size of info windows (i.e. prevented geometry propagation)
 #        which prevents some resizing problems.  Also set a minimum
 #        resizable size for the window.
+
+#  Bugs:
+#     The resizing of this widget is somewhat fragile; it will not cope
+#     with a window resize (WINCH) request while it is already handling
+#     one (attempting to do so results in a Tcl/Tk coredump for reasons
+#     I don't understand).  The widget therefore informs the window 
+#     manager that the window should not be resized during the time
+#     it is dealing with resize requests.  Unfortunately, a few WMs
+#     (the only one I've seen is sawmill) do not respect this - sawmill
+#     does resizing by passing a cascade of WINCH events one for each
+#     point the mouse goes through during the user interactive window
+#     resize.  This leads to a core dump.
 #-
 
 #  Inheritance.
