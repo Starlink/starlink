@@ -4796,7 +4796,7 @@
  CLASS       3   CHARACTER Class of output dataset
 
 3 Examples
-<exam>
+ <exam>
    > astcopy img.fits img2.sdf         -  convert FITS image to HDS
 
    > astcopy "5.6 7.8 4.5..." file1    -  create NDF from set of
@@ -4809,7 +4809,7 @@
    > astcopy file1.fits file2.fits     -  copy  FITS file,
                                           filtering out
                                           unknown components
-</exam>
+ </exam>
 
 2 AST2QDP
  AST2QDP converts 1 dimensional binned datasets to QDP format. It
