@@ -36,12 +36,15 @@
 *  Authors:
 *     DJM: Dave Mills (University College London)
 *     BLY: Martin Bly (Starlink, RAL)
+*     NG: Norman Gray (Starlink, Glasgow)
 
 *  History:
 *     23 Apr 1991 (DJM )
 *        Created
 *     02-MAR-1998 (BLY):
 *        Corrected internal READ to use I4 not I.
+*     05-JUL-1999 (NG)
+*        Removed READONLY control from OPEN (unsupported in g77)
 
 *-
 
@@ -72,7 +75,7 @@
          XLATE = 'AAA_CATEGORIES:'
          CALL ECH_PARSE_ENV( XLATE, XLEN )
          OPEN ( UNIT = LUN, FILE = XLATE( :XLEN ), STATUS = 'OLD',
-     :           READONLY, IOSTAT = ISTAT )
+     :           IOSTAT = ISTAT )
 
 *     Initialise counters for indicies.
          AAA_NCREFS = 0

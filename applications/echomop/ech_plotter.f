@@ -33,6 +33,7 @@
 *     DMILLS: Dave Mills (UCL, Starlink)
 *     MJC: Martin Clayton (Starlink, UCL)
 *     BLY: Martin Bly (Starlink, RAL)
+*     NG: Norman Gray (Starlink, Glasgow)
 *     {enter_new_authors_here}
 
 *  History:
@@ -42,6 +43,8 @@
 *       Complete reworking.
 *     02-MAR-1998 (BLY):
 *       Correction of READ ( ... '( F )' ...) statements to '( F14.4 )'.
+*     05-JUL-1999 (NG):
+*       Removed READONLY control from OPEN (unsupported in g77)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -485,7 +488,7 @@
          STATUS = 0
          CALL FIO_GUNIT( UNIT, STATUS )
          OPEN ( UNIT=UNIT, FILE=PLOT_COMMANDS, IOSTAT=ISTAT,
-     :          STATUS='OLD', READONLY )
+     :          STATUS='OLD')
          IF ( ISTAT .EQ. 0 ) THEN
             FROM_FILE = .TRUE.
             REPORT_STRING = ' Reading commands from ' // PLOT_COMMANDS
