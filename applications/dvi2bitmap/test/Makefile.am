@@ -28,12 +28,7 @@ DVI2BITMAP = ../dvi2bitmap
 	dt2dv $< $@ >$@.log 2>&1
 
 check_PROGRAMS = $(TESTS)
-# t6.test forks and execs itself, so the libtool trick of creating a shell
-# script with the same name, which resolves the shared library dependencies,
-# won't work.  Instead link it statically.  Note that this fails on Tru64
-# because of some as-yet unintelligible linking problem [FIXME: why doesn't
-# it work on Tru64 -- I can't see the problem in the ld messages]
-t6_test_LDFLAGS = -all-static
+
 t5_test_LDFLAGS = -lm
 t7_test_LDFLAGS = -lm
 LDADD = ../libdvi2bitmap.la
@@ -55,6 +50,19 @@ t8.test: t8.pl
 
 # Test 5 depends on its DVI file; test 7 uses it, too
 t5.test$(EXEEXT) t7.test$(EXEEXT): t5.dvi
+
+# t6.test forks and execs itself, so the libtool trick of creating a shell
+# script with the same name, which resolves the shared library dependencies,
+# won't work.  Instead link it statically.  Note that this fails on Tru64
+# because of some as-yet unintelligible linking problem [FIXME: why doesn't
+# it work on Tru64 -- I can't see the problem in the ld messages]
+# We should, I suppose, use t6_test_LDFLAGS=-all-static here, but that doesn't
+# seem to work on OSX, though the libtool manual says that this is what it's
+# for.  Give up, and just do the link by hand [XXX rather bogus, this might
+# possibly fail on other platforms].
+t6.test$(EXEEXT): t6.o
+	$(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+	  -o t6.test$(EXEEXT) t6.o ../.libs/libdvi2bitmap.a
 
 pathtest: hello.dvi
 	sh ./test-font-gen.sh $(DVI2BITMAP) hello.dvi temp-hello-output
