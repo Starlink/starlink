@@ -3167,7 +3167,7 @@ be used as the new primary copies of the source code.
 included in a <ref id=el.sun.codecollection>codecollection</ref> element
 in an SGML SUN.
 The individual routines can then be referenced from the main document
-using the <ref id=el.sun.codecollection>coderef</ref> element;
+using the <ref id=el.sun.coderef>coderef</ref> element;
 a document (in directory <code>converted</code>)
 in which this was done might contain the following
 excerpts:
@@ -3185,7 +3185,7 @@ See description of <coderef id=x collection=xyz>routine x</coderef> ...
 for comment formatting, conversion is usually quite good
 and the output may not need much further attention to make it 
 into final SGML for document production.
-However, it is may not be possible to infer the logical structure
+However, it may not be possible to infer the logical structure
 of the text by looking at its physical form, so it is always
 a good idea to look at the SGML output of the program.
 If there are consistent usages in the original which are not being
@@ -3202,8 +3202,8 @@ comment syntax, header titles, list format, and so on.
 <subsect id=upconvert.recipe export>Example: SUN upconversion step by step
 
 <p>The following gives an example of the steps which might be
-followed to generate an SGML SUN from existing source in a
-&latex; document and prologues of associated source files.
+followed to generate an SGML SUN from existing source in a &latex; 
+document and prologues of associated source files.
 An actual conversion might skip some of the steps below or 
 use some more, 
 but this should provide a useful reference for how to proceed.
@@ -3263,10 +3263,16 @@ then either fix up the resulting SGML by hand, or
 modify the original source files and repeat the conversion.
 If there appear to be consistent differences in usage between 
 the existing source prologues and what <code>code2sgml</code> is expecting,
-it may be worth tailoring the configuration file before attempting the
-conversion again:
+it may be worth tailoring the configuration 
+file before attempting the
+conversion again;
+use one of the default files 
+<code>c2s.fortran</code> or <code>c2s.script</code> 
+which live in the same directory as 
+<coderef id=code2sgml collection=upconvprogs>code2sgml</coderef>
+as a template:
 <verbatim>
-cp $STARLINK_SGML_DIR/c2s.fortran ./c2sconfig
+cp /star/bin/sgml/c2s.fortran ./c2sconfig
 vi c2sconfig
 code2sgml -c c2sconfig -D this.f that.f other.f > routines.sgml
 </verbatim>
@@ -3283,9 +3289,19 @@ the new prologues can be altered.
 If they will be used for generating HLP files (viewed on a character
 terminal) as well as the SUN descriptions, then alternative 
 forms of such parts should be retained using the 
-<ref id=el.sun.span>span</ref>
-element with a `media' attribute of `tty' for ASCII
-output and `screen,print' for &latex; output.
+<ref id=el.sun.span>span</ref> element, e.g.
+<verbatim><![ CDATA [
+<span media='tty'>
+<verbatim>
+   x**n + y**n = z**n
+</verbatim>
+</span>
+<span media='print,screen'>
+<mequation>
+   x^n + y^n = z^n
+</mequation>
+</span>
+]]></verbatim>
 
 <li>If the conversion is satisfactory, you may wish to 
 check that the converted copies of the source files still compile
@@ -3302,7 +3318,7 @@ on the success of the various stages.
 descriptions from the &latex; file.
 
 <li>Make preparatory adjustments to the &latex; as advised in 
-<ref id=upconvert.latex>:
+<ref id=upconvert.latex></ref>:
 <ul>
 <li>Remove low level HTML and &latex; formatting commands where possible,
 especially in user macros
