@@ -215,6 +215,8 @@
       LOGICAL END                ! True if there is no END card
                                  ! terminating the FITS extension
       INTEGER FD                 ! File descriptor
+      LOGICAL FIRST              ! True if the FITS mandatory headers
+                                 ! have yet to be written
       CHARACTER * ( DAT__SZLOC ) FLOC ! Locator to FITS extension
       CHARACTER FITSTR *( SZFITS ) ! A FITS-header card
       LOGICAL FIXED              ! If true the output data are in fixed
@@ -396,6 +398,10 @@
 *  be added to the header.
          END = .FALSE.
 
+*  Initialise the flag to indicate whether or not the mandatory headers
+*  have been written.
+         FIRST = .TRUE.
+
 *  Loop for each card.
          DO  I = 1, NCARD
 
@@ -428,19 +434,32 @@
      :        ( INDEX( DESCR, 'BUNITS') .EQ. 0 .OR. .NOT. UNTFND ) .AND.
      :        ( INDEX( DESCR, 'TITLE') .EQ. 0 .OR. .NOT. TITFND ) ) THEN
 
-*  Write the FITS card to the text file.
-               CALL FIO_WRITE( FD, FITSTR, STATUS )
 
 *  This code assumes that the FITS header will begin with the mandatory
 *  headers in the mandatory order.  It is not worth the great effort to
-*  validate the FITS descriptors of a defunct format.  Thus keyword one
-*  is SIMPLE.  Want to write after this.
-               IF ( I .EQ. 1 ) THEN
+*  validate the FITS descriptors of a defunct format.  However, since
+*  some applications validate the headers, insure the first header is
+*  SIMPLE.  Want to write after this.
+               IF ( FIRST ) THEN
+                  IF ( INDEX( DESCR, 'SIMPLE' ) .EQ. 0 ) THEN
+
+*  Create the SIMPLE card.
+                     FITSTR = ' '
+                     FITSTR( 1:9 ) = 'SIMPLE  ='
+                     FITSTR( 30: ) = 'T / File is simple'
+                  END IF
+
+*  Write the SIMPLE card header to the unformatted file.
+                  CALL FIO_WRITE( FD, FITSTR, STATUS )
 
 *  Insert NAXIS, AXISn, and optional keywords to the header if the
 *  appropriate special objects are present in the NDF.
                   CALL CON_SPHEA( NDF, FD, TYPE, 'FORMATTED', NFLAGS,
      :                            CMPFND, STATUS )
+
+*  Record that the mandatory headers have been written to the output
+*  file.
+                  FIRST = .FALSE.
 
 *  Use more obvious flags to indicate the certain items have been
 *  written to the descriptors already.
@@ -450,6 +469,22 @@
                   TITFND = CMPFND( 4 )
                   LABFND = CMPFND( 5 )
                   UNTFND = CMPFND( 6 )
+
+*  Write the original first non-standard header.
+                  IF ( INDEX( DESCR, 'SIMPLE' ) .EQ. 0 ) THEN
+
+*  Obtain its value which was overwritten by the SIMPLE card.
+                     CALL DAT_GET0C( CLOC, FITSTR, STATUS )
+
+*  Write the original first header, now it appears after the mandatory
+*  headers.
+                     CALL FIO_WRITE( FD, FITSTR, STATUS )
+                  END IF
+
+               ELSE
+
+*  Write the ordinary FITS card to the unformatted file.
+                  CALL FIO_WRITE( FD, FITSTR, STATUS )
                END IF
             END IF
 
