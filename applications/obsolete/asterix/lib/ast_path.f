@@ -27,7 +27,7 @@
 *    Local Constants :
 *    Local variables :
       CHARACTER*132 BUFF
-      LOGICAL ISAFILE
+      LOGICAL ISAFILE,ISADIR
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -62,6 +62,7 @@
             IF (.NOT.ISAFILE) THEN
               CALL AST_PATH_TRY(BUFF(1:L)//'.sdf',ISAFILE,STATUS)
             ENDIF
+       print *,isafile
 *  could be case that default expects filename to be added
             IF (ISAFILE) THEN
 *  but alternate doesn't
@@ -113,19 +114,19 @@
       CHARACTER*(*) NAME
       LOGICAL ISAFILE
 
+      CHARACTER*132 BUF
       INTEGER ISTAT,UNIT
 
       IF (STATUS.NE.SAI__OK) RETURN
 
-      CALL FIO_GUNIT(UNIT,STATUS)
-      OPEN(UNIT,FILE=NAME,IOSTAT=ISTAT)
-
+      CALL FIO_OPEN(NAME,'READ','LIST',80,UNIT,ISTAT)
+      CALL FIO_READF(UNIT,BUF,ISTAT)
       IF (ISTAT.EQ.0) THEN
-        CLOSE(UNIT)
-        CALL FIO_PUNIT(UNIT,STATUS)
+        CALL FIO_CLOSE(UNIT,ISTAT)
         ISAFILE=.TRUE.
       ELSE
         ISAFILE=.FALSE.
+        CALL ERR_ANNUL(ISTAT)
       ENDIF
 
       END
