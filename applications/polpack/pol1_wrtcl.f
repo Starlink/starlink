@@ -371,7 +371,7 @@
                      IF( J + K + 4 .EQ. IDCOL ) THEN
                         IF( CHARID ) THEN 
                            WRITE( UNIT, '(A1,A,A1,$)' ) '"',WORK4( I ),
-     :                                                  '"'
+     :                                                  '" '
                         ELSE
                            WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
                         END IF
@@ -444,7 +444,7 @@
                      IF( J + K + 2 .EQ. IDCOL ) THEN
                         IF( CHARID ) THEN 
                            WRITE( UNIT, '(A1,A,A1,$)' ) '"',WORK4( I ),
-     :                                                  '"'
+     :                                                  '" '
                         ELSE
                            WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
                         END IF
