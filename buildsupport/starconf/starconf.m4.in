@@ -64,7 +64,7 @@ AC_PREFIX_DEFAULT(!!STARCONF_DEFAULT_PREFIX!!)dnl
 
 if $_star_per_package_dirs; then
     bindir="$bindir/$PACKAGE_NAME"
-    AC_MSG_NOTICE([STAR_DEFAULTS has per-package-dirs option: bindir=$bindir])
+    AC_MSG_NOTICE([[STAR_DEFAULTS] has per-package-dirs option: bindir=$bindir])
 fi
 
 # Everything depends on where /star is.  Declare STARLINK as a
@@ -170,6 +170,10 @@ AC_SUBST(PACKAGE_VERSION)
 # package also implicitly declares a `sourceset' dependency on the
 # messgen package.
 #
+# This macro leaves the discovered facility name and code in the shell
+# variables star_facilityname and star_facilitycode respectively
+# (these correspond to the last message file, if there is more than
+# one), from where they may be scavenged by the calling configure script.
 AC_DEFUN([STAR_MESSGEN],
          [#
           m4_ifval([$1], [], [AC_FATAL([$0: called with no message file])])dnl
@@ -187,11 +191,11 @@ AC_DEFUN([STAR_MESSGEN],
               # Extract the facility name and code from the .msg file
               # Format is `.FACILITY name,code/PREFIX=xxx'
               AC_MSG_CHECKING([facility and code in $infile])
-              eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $infile`]
-              _s_facname=[`echo $_s_facname | tr '[A-Z]' '[a-z]'`]
-              AC_MSG_RESULT([$_s_facname/$_s_faccode])
-              STAR_HELP_FILES(fac_${_s_faccode}_err)
-              _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
+              eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/star_facilityname=\1; star_facilitycode=\2;/p;q;}' $infile`]
+              star_facilityname=[`echo $star_facilityname | tr '[A-Z]' '[a-z]'`]
+              AC_MSG_RESULT([$star_facilityname/$star_facilitycode])
+              STAR_HELP_FILES(fac_${star_facilitycode}_err)
+              _STAR_EXTRA_DIST(fac_${star_facilitycode}_err)
           done
           STAR_DECLARE_DEPENDENCIES([sourceset], [messgen])
           STAR_CHECK_PROGS(messgen)
@@ -310,6 +314,11 @@ func_two_();
 # distribution, and no extra Makefile rules are added.  Thus if users need
 # anything complicated done, they should use this second argument and
 # provide rules for satisfying the given targets.
+#
+# In the latter case, the .tex -> htx_tar rule is still emitted, so
+# you can use it, but it requires the substitution variable
+# @STAR2HTML@, and so if you _do_ use it, you will have to make that
+# available, either through [STAR_CHECK_PROGS(star2html)] or otherwise.
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
          [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
           STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
@@ -363,7 +372,20 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 #
 # The current value of the PATH variable is augmented by the location
 # of the binary installation directory, using the current default
-# value of the prefix, and by the $STARLINK/bin directory.
+# value of the prefix (not ideal, since this may in principle change
+# when the component being configured is installed, but it's the best
+# we can do at configure time); and by the $STARLINK/bin directory.
+#
+# The default, if the program isn't in the augmented path, is the path
+# to the starconf-finder program.  Is this the best default?  Would just
+# <program-name> be better?  The program may not be in the augmented
+# path for two reasons: (1) we are doing the global configuration done
+# during bootstrapping, and noting has been installed yet; or (2) the
+# program is one of those installed in a subdirectory of the
+# `bindir'.  In case (2), there's not a lot we can do, short of
+# grubbing round manifest files at some point, but the
+# appfinder-general, which is the eventual default, knows about this
+# case, and can take care of it.
 AC_DEFUN([STAR_CHECK_PROGS],
          [eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
           AC_FOREACH([ProgramName], [$1],
@@ -371,7 +393,7 @@ AC_DEFUN([STAR_CHECK_PROGS],
                                                              [[^0-9a-zA-Z_]], 
                                                              [_])),
                                    ProgramName,
-                                   [\$(bindir)/ProgramName],
+                                   [$STARLINK/bin/starconf-finder ProgramName],
                                    [$default_bindir:$STARLINK/bin:$PATH])
                       AC_ARG_VAR(_STAR_UPCASE(m4_bpatsubst(ProgramName,
                                                            [[^0-9a-zA-Z_]], 
@@ -656,15 +678,7 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
 #
 # Declare a space-separated list of files which should be included in
 # the distribution.  This has the same function as automake's
-# EXTRA_DIST rule, and the way it should be used is as follows
-#
-# #If there is no EXTRA_DIST variable set in the Makefile.am, then a
-# #variable is created in Makefile.in, of the form `EXTRA_DIST =
-# #@EXTRA_DIST@', and it is the accumulated value of EXTRA_DIST which
-# #is substituted in.  If you use EXTRA_DIST in the Makefile.am, you
-# #should use it as `EXTRA_DIST = xxx @EXTRA_DIST@', so that the values
-# #here will be appended to it
-#
+# EXTRA_DIST rule.
 AC_DEFUN([_STAR_EXTRA_DIST],
 	 [m4_ifval([$1], [], 
                          [AC_FATAL([$0: called with empty filelist])])dnl
