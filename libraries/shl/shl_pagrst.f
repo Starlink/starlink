@@ -60,9 +60,6 @@
       
 *.
 
-*  Arguments Given:
-      CHARACTER * ( * ) TEXT
-
 *  Status:
       INTEGER STATUS             ! Inherited global status
 
