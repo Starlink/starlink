@@ -24,6 +24,8 @@ PDL::IO::NDF - PDL Module for reading and writing Starlink
 This module adds the ability to read and write Starlink N-dimensional data
 files as N-dimensional PDLs.
 
+=head1 FUNCTIONS
+
 =cut
 
 
@@ -69,7 +71,11 @@ $EXTNAME = 'NDF_EXT';
 
 =head2 rndf()
 
+=for ref
+
 Reads a piddle from a NDF format data file.
+
+=for example
 
      $pdl = rndf('file.sdf');
      $pdl = rndf('file.sdf',1);
@@ -78,12 +84,12 @@ The '.sdf' suffix is optional. The optional second argument turns off
 automatic quality masking and returns a quality array as well.
 
 Header information and NDF Extensions are stored in the piddle as a hash
-which can be retreived with the $pdl->gethdr command.
+which can be retreived with the C<$pdl-E<gt>gethdr> command.
 Array extensions are stored in the header as follows:
 
      $a - the base DATA_ARRAY
 
-If $hdr = $a->gethdr;
+If C<$hdr = $a-E<gt>gethdr>;
 
 then:
 
@@ -104,8 +110,6 @@ $$hdr{NDF_EXT}{IRAS}{ASTROMETRY}{'PROJ_PARS'}. All array structures are
 stored as arrays in the Hdr: numeric arrays are stored as PDLs,
 logical and character arrays are stored as plain Perl arrays. FITS
 arrays are a special case and are expanded as scalars into the header.
-
-
 
 =cut
 
@@ -200,12 +204,17 @@ sub PDL::rndf {  # Read a piddle from a NDF file
 
 =head2 wndf()
 
+=for ref
+
 Writes a piddle to a NDF format file:
+
+=for example
 
    $pdl->wndf($file);
    wndf($pdl,$file);
 
-wndf can be used for writing PDLs to NDF files. All the extensions
+wndf can be used for writing PDLs to NDF files. 
+The '.sdf' suffix is optional. All the extensions
 created by rndf are supported by wndf.  This means that error, axis
 and quality arrays will be written if they exist. Extensions are also
 reconstructed by using their name (ie FIGARO.TEST would be expanded as
@@ -310,7 +319,7 @@ from a PDL (if they exist).
 Extensions, labels and history are propogated from the old NDF.
 No new extension information is written.
 
-This command has been superseded by wndf().
+This command has been superseded by L<wndf()|/wndf()>.
 
 =cut
 
