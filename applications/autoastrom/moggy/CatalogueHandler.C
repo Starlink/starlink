@@ -75,8 +75,6 @@ int CatalogueHandler::doSearch ()
 	    if (isValid_(POS2))
 	    {
 		radius_ = pos_[0].dist(pos_[1]);
-		cerr << "Pos1=" << pos_[0] << ", Pos2=" << pos_[1]
-		     << " : radius=" << radius_ << endl;
 		q.radius(0,radius_);
 	    }
 	    else
