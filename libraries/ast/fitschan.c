@@ -20403,7 +20403,7 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *     Warnings
 
 *  Purpose:
-*     Controls the use issuing of warnings about various conditions.
+*     Controls the issuing of warnings about various conditions.
 
 *  Type:
 *     Public attribute.
