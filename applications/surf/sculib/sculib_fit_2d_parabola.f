@@ -228,7 +228,13 @@
 
 *  invert the matrix
 
-         CALL SCULIB_INVERT_MATRIX (4, MATRIX, DET, IK, JK, STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SCULIB_INVERT_MATRIX (4, MATRIX, DET, IK, JK, STATUS)
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL ERR_REP(' ','FIT_2D_PARABOLA: Error inverting '//
+     :              'matrix', STATUS)
+            END IF
+         END IF
 
 *  set up the RHS vector
 
@@ -244,29 +250,31 @@
 *  finally derive the fitted parameters from the matrix solution - NOTE
 *  Z_PEAK is the same as A0
 
-         A1 = REAL (B(4))
-         IF (A1 .NE. 0.0) THEN
-            X0 = REAL (-B(2)) / (2.0 * A1)
-            Y0 = REAL (-B(3)) / (2.0 * A1)
-            A0 = REAL (B(1)) - A1 * (X0*X0 + Y0*Y0)
-
-            Z_PEAK = REAL(B(1)) + REAL(B(2))*X0 + REAL(B(3))*Y0 + 
-     :        REAL(B(4))*(X0**2 + Y0**2)
-            Z_PEAK_VAR = REAL(MATRIX(1,1)) + 
-     :        X0**2 * REAL(MATRIX(2,2)) +
-     :        Y0**2 * REAL(MATRIX(3,3)) + 
-     :        (X0**2+Y0**2)**2 * REAL(MATRIX(4,4)) +
-     :        2.0 * X0 * REAL(MATRIX(1,2)) + 
-     :        2.0 * Y0 * REAL(MATRIX(1,3)) +
-     :        2.0 * (X0**2+Y0**2) * REAL(MATRIX(1,4)) +
-     :        2.0 * X0 * Y0 * REAL(MATRIX(2,3)) +
-     :        2.0 * X0 * (X0**2+Y0**2) * REAL(MATRIX(2,4)) +
-     :        2.0 * Y0 * (X0**2+Y0**2) * REAL(MATRIX(3,4))
-         ELSE
-            IF (STATUS .EQ. SAI__OK) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'SCULIB_FIT_2D_PARABOLA: failed '//
-     :           'to fit - A1 = 0', STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            A1 = REAL (B(4))
+            IF (A1 .NE. 0.0) THEN
+               X0 = REAL (-B(2)) / (2.0 * A1)
+               Y0 = REAL (-B(3)) / (2.0 * A1)
+               A0 = REAL (B(1)) - A1 * (X0*X0 + Y0*Y0)
+               
+               Z_PEAK = REAL(B(1)) + REAL(B(2))*X0 + REAL(B(3))*Y0 + 
+     :              REAL(B(4))*(X0**2 + Y0**2)
+               Z_PEAK_VAR = REAL(MATRIX(1,1)) + 
+     :              X0**2 * REAL(MATRIX(2,2)) +
+     :              Y0**2 * REAL(MATRIX(3,3)) + 
+     :              (X0**2+Y0**2)**2 * REAL(MATRIX(4,4)) +
+     :              2.0 * X0 * REAL(MATRIX(1,2)) + 
+     :              2.0 * Y0 * REAL(MATRIX(1,3)) +
+     :              2.0 * (X0**2+Y0**2) * REAL(MATRIX(1,4)) +
+     :              2.0 * X0 * Y0 * REAL(MATRIX(2,3)) +
+     :              2.0 * X0 * (X0**2+Y0**2) * REAL(MATRIX(2,4)) +
+     :              2.0 * Y0 * (X0**2+Y0**2) * REAL(MATRIX(3,4))
+            ELSE
+               IF (STATUS .EQ. SAI__OK) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP (' ', 'SCULIB_FIT_2D_PARABOLA: failed '//
+     :                 'to fit - A1 = 0', STATUS)
+               END IF
             END IF
          END IF
       END IF
