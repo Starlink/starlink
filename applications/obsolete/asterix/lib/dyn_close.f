@@ -4,7 +4,7 @@
 *     DYN_CLOSE
 
 *  Purpose:
-*     {routine_purpose}
+*     Shutdown DYN and free and remaining memory allocations
 
 *  Language:
 *     Starlink Fortran
@@ -13,7 +13,8 @@
 *     CALL DYN_CLOSE( )
 
 *  Description:
-*     {routine_description}
+*     Shutdown DYN and free and remaining memory allocations. It is not
+*     an error to call this routine if the DYN system is uninitialised.
 
 *  Examples:
 *     {routine_example_text}
