@@ -9,9 +9,7 @@ dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([KPG_PAR])
 
 dnl    Include defaults for Starlink configurations
-# STAR_DEFAULTS starts
 STAR_DEFAULTS
-# ...STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
