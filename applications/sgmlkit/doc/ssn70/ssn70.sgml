@@ -3017,7 +3017,8 @@ conversion is not perfect, since they may be of use for debugging
 and so on.
 You may wish to delete them by hand if you're not going to use them.
 
-<p>Unfortunately, there are all sorts of things which can go
+<p id=upconvert.latex.prepare>Unfortunately, there are all 
+sorts of things which can go
 wrong with the conversion process.
 Preparing the &latex; document before starting the conversion
 can defend you against some of them; here is a checklist of 
@@ -3083,6 +3084,23 @@ it will make appropriate
 references to the converted prologues and routine references 
 in the final main SGML document.
 
+<dt>Mathematics macros
+<dd>
+Maths is embedded in &latex notation in the final document within
+<ref id=el.sun.m>m</ref>, <ref id=el.sun.mequation>mequation</ref> or
+<ref id=el.sun.meqnarray>meqnarray</ref> elements,
+and under normal circumstances any user-defined macros are expanded
+to produce the &latex content of these elements.
+However, if the purpose of the user macros was to make the maths 
+clearer or easier to modify, this can be a bad thing.
+In order to keep macros from being expanded, you can
+remove the relevant macro definition commands 
+(<code>\newcommand</code>s and <code>\newenvironment</code>s) from 
+the &latex document before 
+running <coderef id=latex2sgml collection=upconvprogs>latex2sgml</coderef>
+on it, and later replace them in the resulting SGML document
+within one or more <ref id=el.sun.mdefs>mdefs</ref> elements. 
+
 </dl>
 
 <p>Even after the best efforts of <code>latex2sgml</code> 
@@ -3105,7 +3123,7 @@ the upconverter provides an <code>\sgml{}</code> command and
 a <code>\begin{rawsgml} ... \end{rawsgml}</code> environment.
 These do what you would expect: their contents,
 after normal expansion of any &latex; macros, 
-appear verbatim in the output SGML document.
+appear in the output SGML document.
 You may find these useful for redefining user macros in the 
 &latex; original.
 
@@ -3344,13 +3362,16 @@ on the success of the various stages.
 descriptions from the &latex; file.
 
 <li>Make preparatory adjustments to the &latex; as advised in 
-<ref id=upconvert.latex></ref>:
+<ref id=upconvert.latex.prepare></ref>:
 <ul>
 <li>Remove low level HTML and &latex; formatting commands where possible,
 especially in user macros
 <li>Ensure that figures, including 
 <code>\includegraphics</code>-type commands, 
 are contained within &latex; <code>figure</code> environments
+<li>Remove (and make a note of) any &latex; macro definitions which 
+you want to remain as user macros instead of being expanded 
+in the final document
 </ul>
 
 <li>Perform the conversion, specifying the location of the SGML
@@ -3382,6 +3403,10 @@ In fact some combination of these techniques
 combined with repeating various parts of the
 checking and conversion process will probably be required --
 some trial and error may be necessary.
+
+<li>If you removed any &latex; macro definitions to protect them
+from expansion in maths elements, replace them now within 
+one or more <ref id=el.sun.mdefs>mdefs</ref> elements in the SGML.
 
 <li>The <ref id=el.sun.routinelist>routinelist</ref> 
 element will have been inserted in
