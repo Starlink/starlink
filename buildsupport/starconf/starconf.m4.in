@@ -571,6 +571,9 @@ dnl  and Fink on OSX
                            break
                        fi
                        rm -f conftest.results
+                       # Run in a subshell, to isolate settings in tclConfig.sh
+                       # Send output to conftest.results, and return
+                       # 0 if all is ok
                        (
     . $tcldir/lib/tclConfig.sh
     if $search_tk; then
@@ -639,7 +642,6 @@ dnl  and Fink on OSX
                        if test $teststat = 0; then
                            star_cv_settcldir=`cat conftest.results`
                        fi
-                       test -f conftest.results && cp conftest.results safe-conftest.results
                        if test "$star_cv_settcldir" != unknown; then
                            break
                        fi
