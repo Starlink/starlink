@@ -139,7 +139,7 @@ static char *sourceWrap( const char *(*source)() ) {
   char * line;
 
   /* Return directly if ast status is set. */
-  if ( !astOK ) return;
+  if ( !astOK ) return NULL;
 
   /* Need to cast the source argument to a SV*  */
   cb = (SV*) source;
