@@ -1,7 +1,7 @@
 INTERFACE SSDUMP
 
    PARAMETER INP
-     TYPE    'UNIV'
+     TYPE    'LITERAL'
      POSITION 1
      PPATH   'GLOBAL'
      PROMPT  'Source dataset'
