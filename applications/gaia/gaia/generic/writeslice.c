@@ -159,6 +159,9 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
   case  FLOAT_IMAGE:
     cnf_exprt( "_REAL", (char *)type, 10 );
     break;
+  case  DOUBLE_IMAGE:
+    cnf_exprt( "_DOUBLE", (char *)type, 10 );
+    break;
   }
 
   /*  Set up the image information. */

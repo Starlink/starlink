@@ -4,7 +4,8 @@
 *     GAI1_SWAPD
 
 *  Purpose:
-*     Byte swap a double precision data value (assumes wrong endianness of data).
+*     Byte swap a double precision data value (assumes wrong endianness
+*     of data). 
 
 *  Language:
 *     Starlink Fortran 77

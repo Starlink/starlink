@@ -87,6 +87,7 @@ public:
   GENERATE_ARRAYVAL(unsigned short);
   GENERATE_ARRAYVAL(FITS_LONG);
   GENERATE_ARRAYVAL(float);
+  GENERATE_ARRAYVAL(double);
 
   //  Get byte swapped pixel value from 2D array, "span" is second
   //  dimension. Cannot use a macro as need to be aware of the data
@@ -134,6 +135,19 @@ public:
         return ret.typed;
      }
 
+  inline double swapArrayVal( const double *arrayPtr, const int& span,
+                              const int &ix, const int& iy )
+     {
+         FITS_LONG tmp;
+         union { unsigned FITS_LONG raw[2]; double typed; } ret;
+         ret.typed = arrayPtr[iy*span + ix];
+         tmp = ret.raw[0];
+         ret.raw[0] = ntohl( ret.raw[1] );
+         ret.raw[1] = ntohl( tmp );
+         return ret.typed;
+     }
+
+
   //  Test for a BAD pixel. XXX Note NDF specific doesn't check BLANK or NaN.
 #define GENERATE_BADPIXA( T, BADVAL ) \
    inline int badpix( const T *image, const int& span, \
@@ -145,6 +159,7 @@ public:
   GENERATE_BADPIXA(unsigned short, VAL__BADUS);
   GENERATE_BADPIXA(FITS_LONG, VAL__BADI);
   GENERATE_BADPIXA(float, VAL__BADF);
+  GENERATE_BADPIXA(double, VAL__BADD);
 
   //  Test for a BAD pixel, swapped version.
 #define GENERATE_SWAPBADPIXA( T, BADVAL ) \
@@ -157,6 +172,7 @@ public:
   GENERATE_SWAPBADPIXA(unsigned short, VAL__BADUS);
   GENERATE_SWAPBADPIXA(FITS_LONG, VAL__BADI);
   GENERATE_SWAPBADPIXA(float, VAL__BADF);
+  GENERATE_SWAPBADPIXA(double, VAL__BADD);
 
   //  Data type dependent definitions, use overloaded members.
 #define DATA_TYPE char
@@ -180,6 +196,10 @@ public:
 #undef DATA_TYPE
 
 #define DATA_TYPE float
+#include "XYProfileTemplates.h"
+#undef DATA_TYPE
+
+#define DATA_TYPE double
 #include "XYProfileTemplates.h"
 #undef DATA_TYPE
 

@@ -55,6 +55,8 @@
  *        Original version.
  *     20-JAN-2000 (PWD):
  *        Added byte swap changes.
+ *     30-MAY-2001 (PWD):
+ *        Added double precision image support.
  */
 
 #include <stdio.h>
@@ -228,6 +230,9 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
          break;
       case  FLOAT_IMAGE:
          cnf_exprt( "_REAL", (char *) type, 10 );
+         break;
+      case  DOUBLE_IMAGE:
+         cnf_exprt( "_DOUBLE", (char *) type, 10 );
          break;
    }
 

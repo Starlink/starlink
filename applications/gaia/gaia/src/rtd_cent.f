@@ -77,6 +77,8 @@
 *        Converted for use in GAIA (was CCDPACK CCD1_CENT).
 *     20-JAN-2000 (PWD):
 *        Added byte swap changes.
+*     30-MAY-2001 (PWD):
+*        Added double precision support.
 *     {enter_changes_here}
 
 *  Bugs:

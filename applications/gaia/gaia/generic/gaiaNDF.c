@@ -32,6 +32,8 @@
  *         (and old code changed as time permits).
  *      12-JAN-2000
  *         Added changes for "HDU" support.
+ *      30-MAY-2001
+ *         Now supports double precision data type correctly.
  *      31-MAY-2001
  *         Made NDF name handling more robust to very long names 
  *         (>MAXNDFNAME).
@@ -371,23 +373,14 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
     *  data.
     */
    if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
-
-      /*  Double type not available, so use float, check for values that
-          cannot be represented and set bad */
       double *fromPtr;
-      float *toPtr = *data;
-      double hi = FLT_MAX;
-      double lo = -FLT_MAX;
+      double *toPtr = *data;
       for ( i = 1; i <= nchunk; i++ ) {
          ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
          ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (double *) ptr[0];
+         fromPtr = (double *)ptr[0];
          for( j = 0; j < el; j++ ) {
-            if ( *fromPtr <= hi && *fromPtr > lo ) {
-               *toPtr++ = (float)*fromPtr++;
-            } else {
-               *toPtr++ = -FLT_MAX;
-            }
+             *toPtr++ = *fromPtr++;
          }
       }
    } else if ( strncmp( dtype, "_REAL", 5 ) == 0 ) {
@@ -396,7 +389,7 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
       for ( i = 1; i <= nchunk; i++ ) {
          ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
          ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = ptr[0];
+         fromPtr = (float *)ptr[0];
          for( j = 0; j < el; j++ ) {
             *toPtr++ = *fromPtr++;
          }
@@ -407,7 +400,7 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
       for ( i = 1; i <= nchunk; i++ ) {
          ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
          ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = ptr[0];
+         fromPtr = (int *)ptr[0];
          for( j = 0; j < el; j++ ) {
             *toPtr++ = *fromPtr++;
          }
@@ -489,10 +482,6 @@ int gaiaMapNDF( int ndfid, void **data, const char* component,
    ndfBegin();
    ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
 
-   /*  Trap _DOUBLE and really map _REAL */
-   if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
-      strcpy( dtype, "_REAL" );
-   }
    /*  Trap _UBYTE and map _WORD */
    if ( strncmp( dtype, "_UBYTE", 7 ) == 0 ) {
       strcpy( dtype, "_WORD" );

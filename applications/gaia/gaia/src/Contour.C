@@ -446,6 +446,17 @@ int Contour::drawContours()
                                          ysize, done ); 
             }
             break;
+         case DOUBLE_IMAGE:
+            if ( swap_ ) {
+               ndrawn = scanSwapImage( (double *) image, nx, ny, lplot,
+                                       cval, xlower, ylower, xsize,
+                                       ysize, done ); 
+            } else {
+               ndrawn = scanNativeImage( (double *) image, nx, ny, lplot,
+                                         cval, xlower, ylower, xsize,
+                                         ysize, done ); 
+            }
+            break;
          default:
             ndrawn = 0;
       }
@@ -549,5 +560,9 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
 #undef DATA_TYPE
 
 #define DATA_TYPE float
+#include "ContourTemplates.C"
+#undef DATA_TYPE
+
+#define DATA_TYPE double
 #include "ContourTemplates.C"
 #undef DATA_TYPE

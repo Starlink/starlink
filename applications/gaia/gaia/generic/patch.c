@@ -286,6 +286,9 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
       case  FLOAT_IMAGE:
         cnf_exprt( "_REAL", type, 10 );
         break;
+      case  DOUBLE_IMAGE:
+        cnf_exprt( "_DOUBLE", type, 10 );
+        break;
     }
 
     /*  Access the quality information associated with this NDF (this
@@ -556,6 +559,34 @@ void *copyImagetoWork( enum ImageDataType type,
            }
         }
         break;
+     case DOUBLE_IMAGE:
+     {
+         double *iArr = (double *) imagePtr;
+         double *iPtr;
+         union { unsigned int halves[2]; double value; } joined;
+         unsigned int tmp;
+         sectPtr = (void *) malloc( size * sizeof(double) );
+         iPtr = (double *) sectPtr;
+         if ( swap ) {
+             for( j=y1; j < y2; j++ ) {
+                 for( i=x1; i < x2; i++ ) {
+                     //  Need to swap two sets of four bytes.
+                     joined.value = iArr[nx*j+i];
+                     tmp = joined.halves[0];
+                     joined.halves[0] = ntohl( joined.halves[1] );
+                     joined.halves[1] = ntohl( tmp );
+                     *iPtr++ = joined.value;
+                 }
+             }
+         } else {
+             for( j=y1; j < y2; j++ ) {
+                 for( i=x1; i < x2; i++ ) {
+                     *iPtr++ = iArr[nx*j+i];
+                 }
+             }
+         }
+     }
+     break;
   }
   return sectPtr;
 }
@@ -624,6 +655,33 @@ void copyWorktoImage( enum ImageDataType type,
             }
          }
          break;
+      case DOUBLE_IMAGE:
+      {
+         double *iArr = (double *) imagePtr;
+         double *iPtr = (double *) workPtr;
+         union { unsigned int halves[2]; double value; } joined;
+         unsigned int tmp;
+         if ( swap ) {
+            for( j=y1; j < y2; j++ ) {
+               for( i=x1; i < x2; i++ ) {
+                   //  Need to swap two sets of four bytes.
+                   joined.value = *iPtr;
+                   tmp = joined.halves[0];
+                   joined.halves[0] = ntohl( joined.halves[1] );
+                   joined.halves[1] = ntohl( tmp );
+                   iArr[nx*j+i] = joined.value;
+                   iPtr++;
+               }
+            }
+         } else {
+            for( j=y1; j < y2; j++ ) {
+               for( i=x1; i < x2; i++ ) {
+                  iArr[nx*j+i] = *iPtr++;
+               }
+            }
+         }
+      }
+      break;
    }
    
    /*  Finally free the workspace. */

@@ -38,10 +38,11 @@
 *          -16 = unsiged word
 *           32 = integer
 *          -32 = floating point
+*          -64 = double precision
 *        Obviously these types limit those that an NDF can have. Note
 *        that type -8, which RTD interprets as X image data (mapped to
 *        unsigned byte) is returned as _WORD (16) data to avoid display
-*        problems and _DOUBLE is returned as _REAL (-32) (if possible).
+*        problems.
 *     ID = INTEGER (Returned)
 *        The NDF identifier. Use this to access the data and annul
 *        access when required.
@@ -58,34 +59,36 @@
 *        The global status on exit.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     15-JAN-1996 (PDRAPER):
+*     15-JAN-1996 (PWD):
 *        Original version.
-*     7-MAR-1996 (PDRAPER):
+*     7-MAR-1996 (PWD):
 *        Added FITS header code.
-*     28-JUN-1996 (PDRAPER):
+*     28-JUN-1996 (PWD):
 *        Changed to return pointer to image, rather then a copy. RTD now
 *        makes a copy of its own. Will need to deal with BAD pixels in
 *        this code now.
-*     22-NOV-1996 (PDRAPER):
+*     22-NOV-1996 (PWD):
 *        Converted to return a pointer to the FITS information. Also
 *        more sophisticated FITS headers.
-*     16-JAN-1997 (PDRAPER):
+*     16-JAN-1997 (PWD):
 *        Removed the ability to return a pointer to the image data. Now
 *        returns the NDF identifier instead. This is now used to copy the
 *        image data by chunking at a later time.
-*     16-SEP-1997 (PDRAPER):
+*     16-SEP-1997 (PWD):
 *        Added code to deal with NDF slice information.
-*     15-NOV-1997 (PDRAPER):
+*     15-NOV-1997 (PWD):
 *        Added changes to support AST WCS systems.
-*     18-DEC-1997 (PDRAPER):
+*     18-DEC-1997 (PWD):
 *        Converted to return _UBYTE data as _WORD.
+*     30-MAY-2001 (PWD):
+*        Now supports _DOUBLE directly.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -191,8 +194,7 @@
             IF ( DTYPE .EQ. '_REAL' ) THEN
                TYPE = -32
             ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
-               TYPE = -32
-               DTYPE = '_REAL'
+               TYPE = -64
             ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
                TYPE = 32
             ELSE IF ( DTYPE .EQ. '_WORD' ) THEN

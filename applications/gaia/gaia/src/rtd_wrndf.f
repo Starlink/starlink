@@ -31,6 +31,7 @@
 *          -16 = unsiged word
 *           32 = integer
 *          -32 = floating point
+*          -64 = double precision
 *        Obviously these types limit those that an NDF can have.
 *     ID = INTEGER (Given)
 *        An NDF identifier. If 0 then a new NDF is created.
@@ -67,10 +68,13 @@
 *     28-JUL-1999 (PDRAPER):
 *        Added control of the NDF history component. This is because the
 *        command-line args may not exist (compiler dependent). 
-*     04-AUG-1999 Followup to above.
-*        There is now a call ndfInit(argc,argv,status), that will do
-*        this job correctly. Left new code in place as more informative
-*        than default.
+*     04-AUG-1999 (PDRAPER):
+*        Followup to above. There is now a call 
+*        ndfInit(argc,argv,status), that will do this job
+*        correctly. Left new code in place as more informative than
+*        default.
+*     30-MAY-2001 (PDRAPER):
+*        Now supports _DOUBLE data directly rather than presuming _REAL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -158,6 +162,8 @@
 *  Define the NDF data type.
          IF ( TYPE .EQ. -32 ) THEN
             DTYPE = '_REAL'
+         ELSE IF ( TYPE .EQ. -64 ) THEN
+            DTYPE = '_DOUBLE'
          ELSE IF ( TYPE .EQ. 32 ) THEN
             DTYPE = '_INTEGER'
          ELSE IF ( TYPE .EQ. 16 ) THEN
@@ -189,6 +195,9 @@
 *  And copy the data into it.
          IF ( DTYPE .EQ. '_REAL' ) THEN
             CALL VEC_RTOR( .FALSE., EL, %VAL( IP ),
+     :                     %VAL( IPDAT ), IERR, NERR, STATUS )
+         ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
+            CALL VEC_DTOD( .FALSE., EL, %VAL( IP ),
      :                     %VAL( IPDAT ), IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ITOI( .FALSE., EL, %VAL( IP ),

@@ -117,10 +117,13 @@
 
 *  Add the BLANK keyword if required (note using a BLANK for floating
 *  point is wrong, should use NaNs..., but we'll go along with things
-*  for now.
+*  for now).
       IF ( BAD ) THEN
          IF ( BITPIX .EQ. -32 ) THEN
             WRITE( VALUE, '(G24.17)') VAL__BADR
+         ELSE IF ( BITPIX .EQ. -64 ) THEN
+C            WRITE( VALUE, '(G24.17)') VAL__BADD ! Broken in g77 2.91.66 missing E in exponent
+            CALL DENCODE( VAL__BADD, VALUE )
          ELSE IF ( BITPIX .EQ. 32 ) THEN
             WRITE( VALUE, '(I16)') VAL__BADI
          ELSE IF ( BITPIX .EQ. 16 ) THEN

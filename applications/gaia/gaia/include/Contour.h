@@ -130,7 +130,7 @@ public:
   //  a contour (note this just limits the length of an individual segment).
   enum {MAXPTS = 10000};
 
-  //  Get pixel value from 2D array, "span" is second dimension. Use a
+  //  Get pixel value from 2D array, "span" is first dimension. Use a
   //  macro to define this and expand for all possible data types.
 #define GENERATE_ARRAYVAL( T ) \
   inline T arrayVal( const T *arrayPtr, const int& span, \
@@ -142,8 +142,9 @@ public:
   GENERATE_ARRAYVAL(unsigned short);
   GENERATE_ARRAYVAL(FITS_LONG);
   GENERATE_ARRAYVAL(float);
+  GENERATE_ARRAYVAL(double);
 
-  //  Get byte swapped pixel value from 2D array, "span" is second
+  //  Get byte swapped pixel value from 2D array, "span" is first
   //  dimension. Cannot use a macro as need to be aware of the data
   //  size in bytes.
   inline char swapArrayVal( const char *arrayPtr, const int& span,
@@ -189,6 +190,18 @@ public:
         return ret.typed;
      }
 
+  inline double swapArrayVal( const double *arrayPtr, const int& span,
+                              const int &ix, const int& iy )
+     {
+         FITS_LONG tmp;
+         union { unsigned FITS_LONG raw[2]; double typed; } ret;
+         ret.typed = arrayPtr[iy*span + ix];
+         tmp = ret.raw[0];
+         ret.raw[0] = ntohl( ret.raw[1] );
+         ret.raw[1] = ntohl( tmp );
+         return ret.typed;
+     }
+
   //  Set an element of an array.
 #define GENERATE_SETARRAYVAL( T ) \
   inline void setArrayVal( T *arrayPtr, const int& span, \
@@ -200,6 +213,7 @@ public:
   GENERATE_SETARRAYVAL(unsigned short);
   GENERATE_SETARRAYVAL(FITS_LONG);
   GENERATE_SETARRAYVAL(float);
+  GENERATE_SETARRAYVAL(double);
 
   // Maximum of two values of the same type.
 #define GENERATE_MAX( T ) \
@@ -239,6 +253,7 @@ public:
   GENERATE_BADPIX(unsigned short, VAL__BADUS);
   GENERATE_BADPIX(FITS_LONG, VAL__BADI);
   GENERATE_BADPIX(float, VAL__BADF);
+  GENERATE_BADPIX(double, VAL__BADD);
 
   //  Test for a BAD pixel within the current cell, swapped version.
 #define GENERATE_SWAPBADPIX( T, BADVAL ) \
@@ -254,6 +269,7 @@ public:
   GENERATE_SWAPBADPIX(unsigned short, VAL__BADUS);
   GENERATE_SWAPBADPIX(FITS_LONG, VAL__BADI);
   GENERATE_SWAPBADPIX(float, VAL__BADF);
+  GENERATE_SWAPBADPIX(double, VAL__BADD);
 
   //  Distance between two points, double and int versions.
   inline double rdist( const double x[], const double y[], 
@@ -296,6 +312,10 @@ public:
 #undef DATA_TYPE
 
 #define DATA_TYPE float
+#include "ContourTemplates.h"
+#undef DATA_TYPE
+
+#define DATA_TYPE double
 #include "ContourTemplates.h"
 #undef DATA_TYPE
 

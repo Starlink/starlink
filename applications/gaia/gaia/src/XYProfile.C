@@ -26,6 +26,8 @@
 //  History:
 //     10-JUL-2000 (PWD):
 //        Original version.
+//     30-MAY-2001 (PWD):
+//        Added double precision support.
 //     {enter_changes_here}
 //-
 
@@ -185,6 +187,17 @@ void XYProfile::extractProfiles( double *xCoords, double *xVector,
                                 yCoords, yVector, numValues ); 
         }
         break;
+    case DOUBLE_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (double *) image, nx, ny, bscale, bzero, 
+                              x0, y0, x1, y1, xCoords, xVector,
+                              yCoords, yVector, numValues );
+        } else {
+            extractNativeImage( (double *) image, nx, ny, bscale,
+                                bzero, x0, y0, x1, y1, xCoords, xVector,
+                                yCoords, yVector, numValues ); 
+        }
+        break;
     default:
         numValues[0] = numValues[1] = 0;
     }
@@ -214,5 +227,9 @@ void XYProfile::extractProfiles( double *xCoords, double *xVector,
 #undef DATA_TYPE
 
 #define DATA_TYPE float
+#include "XYProfileTemplates.C"
+#undef DATA_TYPE
+
+#define DATA_TYPE double
 #include "XYProfileTemplates.C"
 #undef DATA_TYPE

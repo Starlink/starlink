@@ -91,7 +91,6 @@
 
 *  Get the size and type of the NDF.
          CALL NDF_TYPE( ID, COMP, DTYPE, STATUS )
-         IF ( DTYPE .EQ. '_DOUBLE' ) DTYPE = '_REAL'
          IF ( DTYPE .EQ. '_UBYTE' ) DTYPE = '_WORD'
 
 *  Determine the number of chunks to needed to copy the data.
@@ -109,6 +108,10 @@
 *  And copy the data.
             IF ( DTYPE .EQ. '_REAL' ) THEN
                CALL VEC_RTOR( .FALSE., NPIX, %VAL( IPDAT ),
+     :                        %VAL( IPNOW ), IERR, NERR, STATUS )
+               IPNOW = IPNOW + VAL__NBR * NPIX
+            ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
+               CALL VEC_DTOD( .FALSE., NPIX, %VAL( IPDAT ),
      :                        %VAL( IPNOW ), IERR, NERR, STATUS )
                IPNOW = IPNOW + VAL__NBR * NPIX
             ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
