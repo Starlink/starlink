@@ -52,7 +52,9 @@
 
 #if !defined(NTOH) && \
     (defined(i386) || defined(__i386__) || defined(__alpha) || \
-     defined(vax) || defined(__vax__) || (defined(mips) && defined(MIPSEL)))
+     defined(__x86_64) || \
+     defined(vax) || defined(__vax__) || \
+    (defined(mips) && defined(MIPSEL)))
   /*
    * If DATA_TYPE might require byte swapping, and if we are on a
    * PC or DEC machine, then declare NTOH() as an inline function.
