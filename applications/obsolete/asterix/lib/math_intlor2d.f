@@ -68,6 +68,8 @@
 *
       INTEGER                   SPIX
         PARAMETER               ( SPIX = 5 )
+      REAL			CNORM			! Norm out to RLIM2
+        PARAMETER		( CNORM = 0.216680 )
       REAL			RLIM2			! Square of limit
         PARAMETER		( RLIM2 = 100.0 )
 *
@@ -141,7 +143,7 @@
 
 *        X contribution to normalisation - hence total normalisation
           XNOR = SDX / XWID
-          NORM = ABS( WID2*XNOR*YNOR/MATH__PI )
+          NORM = ABS( CNORM*WID2*XNOR*YNOR/MATH__PI )
 
 *        Y position of first sub-pixel centre
           YPS = YP0 + DY*(J-1) + 0.5*SDY
