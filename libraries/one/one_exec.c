@@ -46,19 +46,29 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 *      28-AUG-2004 (TIMJ):
 *         Remove leftover CCD-ism.
 *         Include failed command in error message.
+*      29-SEP-2004 (TIMJ):
+*         Free C string after use
 *
 */
 {
    GENPTR_CHARACTER(command)
    GENPTR_INTEGER(status)
 
-   char *cmd;
+   char *cmd = NULL;
    int ret;
   
    if ( *status != SAI__OK ) return;
   
    cmd = cnfCreim( command, command_length ); /* Import the FORTRAN string. */
+   if (cmd == NULL) {
+     *status = ONE__MALLOCERR;
+      emsSetc( "COMND", cmd );
+      (void) emsRep( "ONE_EXECERR", 
+		     "Error allocating memory whilst executing command '^COMND'", 
+		     status );
+   }
    ret = system( cmd );
+   free( cmd );
    if ( ret != 0 ) {
       *status = ONE__EXECERROR;
       emsSetc( "COMND", cmd );
