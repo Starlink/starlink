@@ -91,9 +91,15 @@ dvi2bitmap-%.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
 	mv distrib/$@ .
 	rm -Rf distrib
 
+# In the included make command here, specify Makefile.in explicitly.
+# This is because this target is usually run at packaging time, on a
+# freshly-exported, and hence unconfigured, copy of the source set, so 
+# that the file Makefile will probably not exist and this command will 
+# fail (since -f is one of the options which is not passed down to
+# sub-makes in $(MAKE)).
 dvi2bitmap.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
 	FN=dvi2bitmap-`cat VERSION`.tar; \
-		$(MAKE) $$FN; \
+		$(MAKE) -f Makefile.in $$FN; \
 		rm -f $@; \
 		ln -s $$FN $@
 
