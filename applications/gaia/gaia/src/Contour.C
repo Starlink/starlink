@@ -271,7 +271,8 @@ char *Contour::getPrefs( const int ipref )
 }
 
 //
-//   Set the limits of the region to be contoured.
+//   Set the limits of the region to be contoured. Note this may be
+//   modified to fit the image.
 //
 void Contour::setRegion( const int xlower, const int ylower,
                          const int xsize, const int ysize )
@@ -312,7 +313,7 @@ int Contour::drawContours()
    double bscale = imageio_.bscale();
    double bzero = imageio_.bzero();
 
-   //  Make sure the part of the image to draw is sane.
+   //  Make sure the part of the image to be drawn fits onto the image.
    int xsize = xsize_;
    int ysize = ysize_;
    int xlower = xlower_;
@@ -321,6 +322,8 @@ int Contour::drawContours()
    if ( ysize <= 0 || ysize > ny ) ysize = ny;
    if ( xlower <= 0 || xlower > nx ) xlower = 1;
    if ( ylower <= 0 || ylower > ny ) ylower = 1;
+   if ( xsize + xlower > nx ) xsize = nx - xlower;
+   if ( ysize + ylower > ny ) ysize = ny - ylower;
 
    //  Get some workspace for locating pixels that have already been
    //  "done".

@@ -283,7 +283,7 @@ itcl::class gaia::GaiaContour {
       #  Release all ColourMenu objects.
       if { [info exists colour_menu_] } {
          for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
-            delete $colour_menu_($i)
+            delete object $colour_menu_($i)
          }
       }
    }
