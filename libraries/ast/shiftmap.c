@@ -726,7 +726,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Report an error if the ShiftMap does not contain any shifts. */
    if( !map->shift && astOK ){
       class = astGetClass( this );
-      astError( AST__BADWM, "astTransform(%s): The supplied %s does not "
+      astError( AST__BADSM, "astTransform(%s): The supplied %s does not "
                 "contain any shift information.", class, class );
    }
 
