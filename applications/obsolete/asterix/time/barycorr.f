@@ -1049,7 +1049,6 @@
 	END
 
 
-
 *+ BARY_CORR - Does the barycentric corrections according to user spec
       SUBROUTINE BARY_CORR(INTIMES,OUTTIMES,WIDTHS,NEVENT,RA,DEC,
      :    BINNED,LUN_POS,
@@ -1075,20 +1074,16 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
-      STRUCTURE /POS_REC/
-         INTEGER UT				! hk clock (1/2s) time
-         REAL SATGEO(3)		! Sat vector in geo frame
-         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
-         INTEGER*2 IBGLONG                      ! long and lat
-         INTEGER*2 IBGLAT                       !
-      END STRUCTURE
-
+c      STRUCTURE /POS_REC/
+c         INTEGER UT				! hk clock (1/2s) time
+c         REAL SATGEO(3)		! Sat vector in geo frame
+c         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
+c         INTEGER*2 IBGLONG                      ! long and lat
+c         INTEGER*2 IBGLAT                       !
+c      END STRUCTURE
 *
 *    Local constants :
 *
-      DOUBLE PRECISION		S2_REF_MJD
-        PARAMETER               ( S2_REF_MJD = 47892.0D0 )
-*-
 
       RECORD /POS_REC/ POS
       REAL BARY                         ! Barycentric  correction in Secs
@@ -1123,45 +1118,48 @@
       LOGICAL              IGNORE_POS            ! pos_sat info to be ignored
       LOGICAL              BINNED                ! AXIS is binned
       LOGICAL              AX_WID_OK             ! AXIS widths OK
-*     <declarations and descriptions for imported arguments>
 *    Import-Export :
       DOUBLE PRECISION     INTIMES(NEVENT)     ! timelist
       DOUBLE PRECISI0N     OUTTIMES(NEVENT)    ! timelist
       DOUBLE PRECISION     WIDTHS(NEVENT)      ! timelist binwidths
-      REAL                 LB,UB                 ! lower and upper bounds
-*     <declarations and descriptions for imported/exported arguments>
 *    Export :
 *     <declarations and descriptions for exported arguments>
-*    Status :
+
+*  Status :
       INTEGER STATUS
-*    Function declarations :
-*     <declarations for function references>
-      INTEGER BARY_MJD2HK
-*    Local constants :
-*     <local constants defined by PARAMETER>
-*    Local variables :
-      DOUBLE PRECISION     MJD_CURRENT           ! MJD for current event
-      DOUBLE PRECISION     MJD_START,MJD_END     ! MJD for start/stop
 
-      REAL                 TRIGGER               !current trigger time
+*  External References:
+      EXTERNAL			BARY_MJD2HK
+        INTEGER 		BARY_MJD2HK
 
-      INTEGER              I,J,K                 ! DO loop variables
-      INTEGER              CURRENT_KEY           ! for KEYed access to POS file
-*     <declarations for local variables>
-*    Local data :
-*     <any DATA initialisations for local variables>
+*  Local constants :
+      DOUBLE PRECISION		S2_REF_MJD
+        PARAMETER               ( S2_REF_MJD = 47892.0D0 )
+
+*  Local variables :
+      DOUBLE PRECISION		LB, UB			! Lower/upper bounds
+      DOUBLE PRECISION     	MJD_CURRENT           	! MJD for current event
+      DOUBLE PRECISION     	MJD_START,MJD_END     	! MJD for start/stop
+
+      REAL                 	TRIGGER               !current trigger time
+
+      INTEGER              	I,J,K                 ! DO loop variables
+      INTEGER              	CURRENT_KEY           ! for KEYed access to POS file
 *-
 
-*if binned and axis width present, then do not use trigger times as gaps will
-* appear in the time series due to differential barycentric correections
-* during thee observation
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If binned and axis width present, then do not use trigger times as gaps
+*  will appear in the time series due to differential barycentric corrections
+*  during the observation
       IF(BINNED .AND. AX_WID_OK)THEN
 *       BOUNDS(NEVENT+1) = INTIMES(NEVENT)+0.5*WIDTHS(NEVENT)
-         LB = INTIMES(1) - 0.5*WIDTHS(1)
+         LB = INTIMES(1) - WIDTHS(1) / 2
          CALL BARY_CORR_INT(LB,RA,DEC,LUN_POS,
      :   POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
          LB = LB + BARY
-         UB = INTIMES(1) + 0.5*WIDTHS(1)
+         UB = INTIMES(1) + WIDTHS(1) / 2
          CALL BARY_CORR_INT(UB,RA,DEC,LUN_POS,
      : POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
        UB = UB + BARY
