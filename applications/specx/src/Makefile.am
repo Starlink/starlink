@@ -17,24 +17,24 @@ FIG_LIBS = \
 
 
 specx_LDADD = \
-../astro/libastro.la \
 ../command/libcommand.la \
 ../exprt/libexprt.la \
 ../external/libexternal.la \
 ../fitting/libfitting.la \
 ../fv4/libfv4.la \
-../gen/libgen.la \
-../getaline/libgetaline.la \
+../reduce/libreduce.la \
+../scl/libscl.la \
+../term/libterm.la \
 ../graph/libgraph.la \
+../tek/libtek.la \
 ../mapdis4/libmapdis4.la \
 ../mv4/libmv4.la \
 ../plots/libplots.la \
-../reduce/libreduce.la \
-../scl/libscl.la \
-../tek/libtek.la \
-../term/libterm.la \
 ../util/libutil.la \
 ../vms/libvms.la \
+../astro/libastro.la \
+../gen/libgen.la \
+../getaline/libgetaline.la \
 $(FIG_LIBS) \
 `$(srcdir)/specx_link`
 
