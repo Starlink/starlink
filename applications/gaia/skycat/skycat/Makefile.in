@@ -96,7 +96,7 @@ bin: FORCE
 # generate master library
 master_lib: FORCE
 	test -d tmp || mkdir tmp
-	@cd tmp ;\
+	- cd tmp ;\
 	 rm -f *.o ;\
 	 for i in $(DEP_LIB_SUBDIRS); do \
 	   cp `cat $$i/src/.objs` . ; \
