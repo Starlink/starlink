@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.2}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {9th June 1998}
+\newcommand{\stardocdate}      {11th June 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1013,7 +1013,7 @@ details of how to access the AST\_PAR include file, see
 \secref{ss:accessingheaderfile} and the description of the
 ``\htmlref{ast\_dev}{ast_dev}'' command in \appref{ss:commanddescriptions}.
 
-\subsection{\ldots Build an AST Program}
+\subsection{\label{ss:howtobuild}\ldots Build an AST Program}
 
 Before building any AST program, you may want to issue the UNIX command:
 
@@ -1191,7 +1191,7 @@ Once you have converted pixel coordinates into world coordinates, you
 may want to format them as text before displaying them. Typically,
 this would convert from (say) radians into something more
 comprehensible. Using the \htmlref{FrameSet}{FrameSet} pointer WCSINFO obtained in
-\secref{ss:howtoreadwcs} and a pair of world coordonates XW and YW
+\secref{ss:howtoreadwcs} and a pair of world coordinates XW and YW
 ({\em{e.g.}}\ see \secref{ss:howtotransform}), you could proceed as
 follows:
 
@@ -1264,7 +1264,7 @@ output stream, appropriately formatted, for example:
 \end{verbatim}
 \end{quote}
 
-For a complete discription of the Report attribute, see its entry in
+For a complete description of the Report attribute, see its entry in
 \appref{ss:attributedescriptions}.  For further details of how to set
 and enquire attribute values, see \secref{ss:settingattributes} and
 \secref{ss:gettingattributes}.
@@ -1356,10 +1356,253 @@ coordinate values may be separated by white space and/or any
 non-ambiguous separator character, such as a comma.
 
 For more information on reading coordinate values using the
-\htmlref{AST\_UNFORMAT}{AST_UNFORMAT} routine, see \secref{ss:unformattingaxisvalues}. For
+\htmlref{AST\_UNFORMAT}{AST_UNFORMAT} function, see \secref{ss:unformattingaxisvalues}. For
 details of how sexagesimal formats are handled, and the forms of input
 that may be used for for celestial coordinates, see
 \secref{ss:unformattingskyaxisvalues}.
+
+\subsection{\ldots Modify a WCS Calibration}
+
+The usual reason for wishing to modify the WCS calibration associated
+with a dataset is that the data have been geometrically transformed in
+some way (here, we will assume a 2-dimensional image dataset). This
+causes the image features (stars, galaxies, {\em{etc.}}) to move with
+respect to the grid of pixels which they occupy, so that any
+coordinate systems previously associated with the image become
+invalid.
+
+To correct for this, it is necessary to set up a \htmlref{Mapping}{Mapping} which
+expresses the positions of image features in the new data grid in
+terms of their positions in the old grid. In both cases, the grid
+coordinates we use will have the first pixel centred at (1,1) with
+each pixel being a unit square.
+
+AST allows you to correct for any type of geometrical transformation
+in this way, so long as a suitable Mapping to describe it can be
+constructed. For purposes of illustration, we will assume here that
+the new image coordinates XNEW and YNEW can be expressed in terms of
+the old coordinates XOLD and YOLD as follows:
+
+\small
+\begin{verbatim}
+      DOUBLE PRECISION XNEW, XOLD, YNEW, YOLD
+      DOUBLE PRECISION M( 4 ), Z( 2 )
+
+      ...
+
+      XNEW = XOLD * M( 1 ) + YOLD * M( 2 ) + Z( 1 )
+      YNEW = XOLD * M( 3 ) + YOLD * M( 4 ) + Z( 2 )
+\end{verbatim}
+\normalsize
+
+where M is a 2$\times$2 transformation matrix and Z represents a shift
+of origin. This is therefore a general linear coordinate
+transformation which can represent displacement, rotation,
+magnification and shear.
+
+In AST, it can be represented by concatenating two Mappings. The first
+is a \htmlref{MatrixMap}{MatrixMap}, which implements the matrix multiplication. The second
+is a \htmlref{WinMap}{WinMap}, which linearly transforms one coordinate window on to
+another, but will be used here simply to implement the shift of
+origin. These Mappings may be constructed and concatenated as follows:
+
+\small
+\begin{verbatim}
+      DOUBLE PRECISION INA( 2 ), INB( 2 ), OUTA( 2 ), OUTB( 2 )
+      INTEGER MATRIXMAP, WINMAP
+
+      ...
+
+*  Set up the corners of a unit square.
+      DATA INA / 2 * 0.0D0 /
+      DATA INB / 2 * 1.0D0 /
+
+*  The MatrixMap may be constructed directly from the matrix M.
+      MATRIXMAP = AST_MATRIXMAP( 2, 2, 0, M, ' ', STATUS )
+
+*  For the WinMap, we take the coordinates of the corners of a unit
+*  square (window) and then shift them by the required amounts.
+      OUTA( 1 ) = INA( 1 ) + Z( 1 )
+      OUTA( 2 ) = INA( 2 ) + Z( 2 )
+      OUTB( 1 ) = INB( 1 ) + Z( 1 )
+      OUTB( 2 ) = INB( 2 ) + Z( 2 )
+
+*  The WinMap will then implement this shift.
+      WINMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+
+*  Join the two Mappings together, so that they are applied one after
+*  the other.
+      NEWMAP = AST_CMPMAP( MATRIXMAP, WINMAP, 1, ' ', STATUS )
+\end{verbatim}
+\normalsize
+
+You might, of course, create any other form of Mapping depending on
+the type of geometrical transformation involved. For an overview of
+the Mappings provided by AST, see \secref{ss:mappingselection}, and
+for a description of the capabilities of each class of Mapping, see
+its entry in \appref{ss:classdescriptions}. For an overview of how
+individual Mappings may be combined, see \secref{ss:cmpmapoverview}
+(\secref{ss:cmpmaps} gives more details).
+
+Assuming you have obtained a WCS calibration for your original image
+in the form of a pointer to a \htmlref{FrameSet}{FrameSet}, WCSINFO1
+(\secref{ss:howtoreadwcs}), the Mapping created above may be used to
+produce a calibration for the new image as follows:
+
+\small
+\begin{verbatim}
+      INTEGER WCSINFO1, WCSINFO2
+
+      ...
+
+*  If necessary, make a copy of the WCS calibration, since we are
+*  about to alter it.
+      WCSINFO2 = AST_COPY( WCSINFO1, STATUS )
+
+*  Re-map the base Frame so that it refers to the new data grid
+*  instead of the old one.
+      CALL AST_REMAPFRAME( WCSINFO2, AST__BASE, NEWMAP, STATUS )
+\end{verbatim}
+\normalsize
+
+This will produce a pointer, WCSINFO2, to a new FrameSet in which all
+the coordinate systems associated with the original image are modified
+so that they are correctly registered with your new image instead.
+
+For more information about re-mapping the Frames within a FrameSet,
+see \secref{ss:remapframe} and \secref{ss:wcsprocessingexample}.
+
+\subsection{\ldots Display a Graphical Coordinate Grid}
+
+A common requirement when displaying image data is to plot an
+associated coordinate grid ({\em{e.g.}}\ Figure~\ref{fig:gridplot})
+over the displayed image. The use of AST in such circumstances is
+independent of the underlying graphics system, so starting up the
+graphics system, setting up a coordinate system, displaying the image,
+and closing down afterwards can all be done using the graphics
+routines you would normally use.
+
+However, displaying an image at a precise location can be a little
+fiddly with some graphics systems, and obviously the grid drawn by AST
+will not be accurately registered with the image unless this is done
+correctly. In the following template, we therefore illustrate both
+steps, basing the image display on the PGPLOT graphics
+package.\footnote{An interface is provided with AST that allows it to
+use PGPLOT (\xref{SUN/15}{sun15}{}) for its graphics, although
+interfaces to other graphics systems may also be written.}  Plotting a
+coordinate grid with AST then becomes a relatively minor part of what
+is almost a complete graphics program.
+
+Once again, we assume that a pointer, WCSINFO, to a suitable \htmlref{FrameSet}{FrameSet}
+associated with the image has already been obtained
+(\secref{ss:howtoreadwcs}).
+
+\small
+\begin{verbatim}
+      DOUBLE PRECISION BBOX( 4 )
+      INTEGER NX, NY, PGBEG, PLOT
+      REAL DATA( NX, NY ), GBOX( 4 ), HI, LO, SCALE, TR( 6 )
+      REAL X1, X2, XLEFT, XRIGHT, Y1, Y2, YBOTTOM, YTOP
+
+      ...
+
+*  Access the image data, which we assume will be stored in the real
+*  2-dimensional array DATA with dimension sizes NX and NY. Also
+*  derive limits for scaling it, which we assign to the variables HI
+*  and LO.
+      <this stage depends on your data system, so is not shown>
+
+*  Open PGPLOT using the device given by environment variable
+*  PGPLOT_DEV and check for success.
+      IF ( PGBEG( 0, ' ', 1, 1 ) .EQ. 1 ) THEN
+
+*  Clear the screen and ensure equal scales on both axes.
+         CALL PGPAGE
+         CALL PGWNAD( 0.0, 1.0, 0.0, 1.0 )
+
+*  Obtain the extent of the plotting area (not strictly necessary for
+*  PGPLOT, but possibly for other graphics systems). From this, derive
+*  the display scale in graphics units per pixel so that the image
+*  will fit within the display area.
+         CALL PGQWIN( X1, X2, Y1, Y2 )
+         SCALE = MIN( ( X2 - X1 ) / NX, ( Y2 - Y1 ) / NY )
+
+*  Calculate the extent of the area in graphics units that the image
+*  will occupy, so as to centre it within the display area.
+         XLEFT   = 0.5 * ( X1 + X2 - NX * SCALE )
+         XRIGHT  = 0.5 * ( X1 + X2 + NX * SCALE )
+         YBOTTOM = 0.5 * ( Y1 + Y2 - NY * SCALE )
+         YTOP    = 0.5 * ( Y1 + Y2 + NY * SCALE )
+ 
+*  Set up a PGPLOT coordinate transformation matrix and display the
+*  image data as a grey scale map (these details are specific to
+*  PGPLOT).
+         TR( 1 ) = XLEFT - 0.5 * SCALE
+         TR( 2 ) = SCALE
+         TR( 3 ) = 0.0
+         TR( 4 ) = YBOTTOM - 0.5 * SCALE
+         TR( 5 ) = 0.0
+         TR( 6 ) = SCALE
+         CALL PGGRAY( DATA, NX, NY, 1, NX, 1, NY, HI, LO, TR )
+
+*  BEGINNING OF AST BIT
+*  ====================
+*  Store the locations of the bottom left and top right corners of the
+*  region used to display the image, in graphics coordinates.
+         GBOX( 1 ) = XLEFT
+         GBOX( 2 ) = YBOTTOM
+         GBOX( 3 ) = XRIGHT
+         GBOX( 4 ) = YTOP
+
+*  Similarly, store the locations of the image's bottom left and top
+*  right corners, in pixel coordinates -- with the first pixel centred
+*  at (1,1).
+         BBOX( 1 ) = 0.5D0
+         BBOX( 2 ) = 0.5D0
+         BBOX( 3 ) = NX + 0.5D0
+         BBOX( 4 ) = NY + 0.5D0
+
+*  Create a Plot, based on the FrameSet associated with the
+*  image. This attaches the Plot to the graphics surface so that it
+*  matches the displayed image. Specify that a complete set of grid
+*  lines should be drawn (rather than just coordinate axes).
+         PLOT = AST_PLOT( WCSINFO, GBOX, BBOX, 'Grid=1', STATUS )
+
+*  Optionally, we can now set other Plot attributes to control the
+*  appearance of the grid. The values assigned here use the
+*  colour/font indices defined by the underlying graphics system.
+         CALL AST_SET( PLOT, 'Colour(grid)=2,Font(textlab)=3', STATUS )
+
+*  Use the Plot to draw the coordinate grid.
+         CALL AST_GRID( PLOT, STATUS )
+
+         <maybe some more AST graphics here>
+
+*  Annul the Plot when finished (or use the AST_BEGIN/AST_END
+*  technique shown earlier).
+         CALL AST_ANNUL( PLOT, STATUS )
+
+*  END OF AST BIT
+*  ==============
+
+*  Close down the graphics system.
+         CALL PGEND
+      END IF
+\end{verbatim}
+\normalsize
+
+Note that once you have set up a \htmlref{Plot}{Plot} which is aligned with a
+displayed image, you may also use it to generate further graphical
+output of your own, specified in the image's world coordinate system
+(such as markers to represent astronomical objects, annotation,
+{\em{etc.}}). There is also a range of Plot attributes which gives
+control over most aspects of the output's appearance.  For details of
+the facilities available, see \secref{ss:plots} and the description of
+the Plot class in \appref{ss:classdescriptions}.
+
+For details of how to build a graphics program which uses PGPLOT, see
+\secref{ss:howtobuild} and the description of the \htmlref{ast\_link}{ast_link} command in
+\appref{ss:commanddescriptions}.
 
 \cleardoublepage
 %\include{primer}
@@ -20628,6 +20871,9 @@ a compound Mapping which is being simplified using AST\_SIMPLIFY.
 \item A bug has been fixed which could cause the AST\_\_BAD parameter
 to have an incorrect value on some platforms.
 
+\item A problem has been fixed which could prevent tick marks being
+drawn on a coordinate axis close to a singularity in the coordinate
+system.
 \end{enumerate}
 
 Applications which are statically linked will need to be re-linked in

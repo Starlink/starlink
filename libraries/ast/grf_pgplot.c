@@ -145,7 +145,7 @@ int astGFlush( void ){
 *     None.
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *-
@@ -180,7 +180,7 @@ int astGLine( int n, const float *x, const float *y ){
 *        A pointer to an array holding the "n" y values.
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *  Notes:
@@ -222,7 +222,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
 *        required.
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *  Notes:
@@ -286,7 +286,7 @@ int astGText( const char *text, float x, float y, const char *just,
 *        bottom to top on the screen.
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *  Notes:
@@ -294,7 +294,6 @@ int astGText( const char *text, float x, float y, const char *just,
 *     -  A NULL value for "just" causes a value of "CC" to be used.
 *     -  Both "upx" and "upy" being zero causes an error.
 *     -  Any unrecognised character in "just" causes an error.
-
 *-
 */
 
@@ -435,7 +434,7 @@ int astGAxScale( float *alpha, float *beta ){
 *        Y axis (i.e. Ynorm = beta*Yworld).
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *-
@@ -522,7 +521,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *        each corner of the bounding box.
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *  Notes:
@@ -730,7 +729,7 @@ int astGQch( float *chv, float *chh ){
 *     astGQch
 
 *  Purpose:
-*     Return the character height in world cooridnates.
+*     Return the character height in world coordinates.
 
 *  Synopsis:
 *     #include "grf.h"
@@ -751,7 +750,7 @@ int astGQch( float *chv, float *chh ){
 *        axis.
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *-
@@ -832,14 +831,14 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 *        A pointer to a double in which to return the attribute value.
 *        If this is NULL, no value is returned.
 *     prim
-*        The sort of graphics primative to be drawn with the new attribute.
+*        The sort of graphics primitive to be drawn with the new attribute.
 *        Identified by the following values defined in grf.h:
 *           GRF__LINE
 *           GRF__MARK
 *           GRF__TEXT
 
 *  Returned Value:
-*     A value of 0 is returned if an error occurrs, and 1 is returned
+*     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
 
 *  Notes:
