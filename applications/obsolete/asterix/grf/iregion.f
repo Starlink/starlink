@@ -1620,9 +1620,6 @@ c        ENDIF
         ELSEIF (INDEX(CMD,'IMP').NE.0) THEN
           MODE='IMP'
           MERGE=.FALSE.
-        ELSEIF (INDEX(CMD,'CON').NE.0) THEN
-          MODE='IMP'
-          MERGE=.FALSE.
         ELSEIF (INDEX(CMD,'INV').NE.0) THEN
           MODE='INV'
           MERGE=.FALSE.
@@ -1653,6 +1650,10 @@ c        ENDIF
           ELSE
             SUBMODE='NEW'
           ENDIF
+
+        ELSEIF (MODE.EQ.'IMP') THEN
+
+          SUBMODE='NEW'
 
         ELSE
 
