@@ -68,7 +68,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_ckdeb.f ccd1_ckccl.f ccd1_ckflc.f ccd1_resta.f \
  ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f \
  ccd1_fcov.f ccd1_c2ca.f ccd1_ca2c.f \
- ccd1_casrc.f ccd1_casnk.f ccd1_calcj.f pda_dsvdc.f pda_drnor.f \
+ ccd1_casrc.f ccd1_casnk.f ccd1_calcj.f pda_dsvdc.f  \
  ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f ccd1_setex.f \
  ccd1_sethd.f ccd1_setrd.f ccd1_setsp.f ccd1_setsw.f ccd1_setwr.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f \

@@ -35,6 +35,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +45,8 @@
 *        Now uses PDA routine instead of NAG routine.
 *     15-MAR-2001 (MBT):
 *        Removed call to PDA_DSTART.
+*     14-JUL-2004 (TIMJ):
+*        PDA_DRNOR now PDA_DRANN
 *     {enter_changes_here}
 
 *  Bugs:
@@ -62,8 +65,8 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL PDA_DRNOR
-      DOUBLE PRECISION PDA_DRNOR ! Pseudo random normal number generator
+      EXTERNAL PDA_DRANN
+      DOUBLE PRECISION PDA_DRANN ! Pseudo random normal number generator
 
 *  Local Variables:
       DOUBLE PRECISION AA        ! buffer for A
@@ -73,7 +76,7 @@
 
       AA = DBLE( A )
       BB = DBLE( B )
-      CCD1_RNORM = REAL( PDA_DRNOR() ) * BB + AA
+      CCD1_RNORM = REAL( PDA_DRANN() ) * BB + AA
 
       END
 * $Id$
