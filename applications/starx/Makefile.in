@@ -57,7 +57,6 @@ mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES = component.xml starX_link
 am_starx_test_OBJECTS = starx_test.$(OBJEXT)
 starx_test_OBJECTS = $(am_starx_test_OBJECTS)
-starx_test_DEPENDENCIES = `$(srcdir)/starX_link`
 am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
@@ -210,7 +209,6 @@ starhelpdir = @starhelpdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 bin_SCRIPTS = starX_link
-starX_link_SOURCES = 
 
 # Testing. Just build a simple X11 application
 # and make sure it runs
@@ -218,6 +216,7 @@ TESTS = starx_test
 
 # Because we invoke starX_link
 starx_test_SOURCES = starx_test.c
+starx_test_DEPENDENCIES = starX_link
 starx_test_LDADD = `$(srcdir)/starX_link`
 all: all-am
 
