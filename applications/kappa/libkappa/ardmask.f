@@ -111,6 +111,9 @@
 *        Made ARDFILE have type FILENAME for IRAF usage.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -303,7 +306,7 @@
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
 
 *  Map the output NDF data array as _REAL values for updating.
-      CALL NDF_MAP( NDFO, 'Data', TYPE, 'UPDATE', POINT1( 1 ), EL,
+      CALL KPG1_MAP( NDFO, 'Data', TYPE, 'UPDATE', POINT1( 1 ), EL,
      :              STATUS )
 
 *  Allocate the memory needed for the logical mask array.

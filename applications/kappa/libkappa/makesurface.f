@@ -155,6 +155,9 @@
 *        workspace by PSX for efficiency.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -616,10 +619,10 @@
 *  Map the data array (and possibly the variance) of the new NDF for
 *  write access.
                   IF ( CREVAR ) THEN
-                     CALL NDF_MAP( NDFO, 'Data,Variance', ITYPE,
+                     CALL KPG1_MAP( NDFO, 'Data,Variance', ITYPE,
      :                             'WRITE/BAD', DPTR, EL, STATUS )
                   ELSE
-                     CALL NDF_MAP( NDFO, 'Data', ITYPE,
+                     CALL KPG1_MAP( NDFO, 'Data', ITYPE,
      :                             'WRITE/BAD', DPTR, EL, STATUS )
                   END IF
 

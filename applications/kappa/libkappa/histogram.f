@@ -183,6 +183,9 @@
 *     27-FEB-1998 (DSB):
 *        Corrected the reporting of the upper limit of _DOUBLE data by
 *        replacing call to CHR_PUTI by CHR_PUTD.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -362,7 +365,7 @@
 
 *  Map the array using this numeric type and see whether there may be
 *  bad pixels present.
-      CALL NDF_MAP( NDF, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
+      CALL KPG1_MAP( NDF, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
       IF ( COMP .EQ. 'QUALITY' ) THEN
          BAD = .FALSE.
       ELSE
@@ -1084,7 +1087,7 @@
       CALL NDF_CREAT( 'OUT', '_INTEGER', 1, 1, NUMBIN, NDFO, STATUS )
 
 *  Map the data array.
-      CALL NDF_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,
+      CALL KPG1_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,
      :              NUMBIN, STATUS )
       
 *  Write the slice to the NDF.

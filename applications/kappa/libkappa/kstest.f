@@ -171,6 +171,9 @@
 *        parameter and renaming NDF to IN.  Better propagation of NDF
 *        components.  Improved the table formatting.  Made efficiency
 *        improvements.  Replaced SUBSAMPLE parameter with NSAMPLE.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -383,7 +386,7 @@
 
 *  Map the data and variance arrays (as REAL arrays regardless of
 *  actual type).
-               CALL NDF_MAP( NDFI, 'Data,Variance', '_REAL', 'READ', 
+               CALL KPG1_MAP( NDFI, 'Data,Variance', '_REAL', 'READ', 
      :                       INPTR, EL, STATUS )
                USEVAR = .TRUE.
 
@@ -393,7 +396,7 @@
             ELSE
 
 * Map the data array (as a REAL array regardless of actual type).
-               CALL NDF_MAP( NDFI, MCOMP, '_REAL', 'READ', 
+               CALL KPG1_MAP( NDFI, MCOMP, '_REAL', 'READ', 
      :                       INPTR, EL, STATUS )
             END IF
 
@@ -587,7 +590,7 @@
 
 *  Map the output data array.  Copy the processed data to the output
 *  file.
-            CALL NDF_MAP( NDFO, 'DATA', '_REAL', 'WRITE', 
+            CALL KPG1_MAP( NDFO, 'DATA', '_REAL', 'WRITE', 
      :                    OUTPTR( 1 ), ITEMP, STATUS )
 
             CALL VEC_RTOR( .FALSE., NKEPT, %VAL( KSDPTR ), 
@@ -596,7 +599,7 @@
 *  Map the variance array.  Copy the processed variance to the output
 *  file.
             IF ( USEVAR ) THEN
-               CALL NDF_MAP( NDFO, 'VARIANCE', '_REAL', 'WRITE',
+               CALL KPG1_MAP( NDFO, 'VARIANCE', '_REAL', 'WRITE',
      :                       OUTPTR( 2 ), ITEMP, STATUS )
 
                CALL VEC_RTOR( .FALSE., NKEPT, %VAL( KSVPTR ), 

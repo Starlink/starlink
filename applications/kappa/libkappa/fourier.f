@@ -302,6 +302,9 @@
 *     27-FEB-1998 (DSB):
 *        Mistaken calls to KPS1_FOPPx to perform filling and padding
 *        corrected so that they call KPS1_FOPRx.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -684,17 +687,17 @@
      :                         ITYPE, DTYPE, STATUS )
 
 *  Map the input and output data arrays.
-               CALL NDF_MAP( NDFRS, 'Data', ITYPE, 'READ', IPIN, EL,
+               CALL KPG1_MAP( NDFRS, 'Data', ITYPE, 'READ', IPIN, EL,
      :                       STATUS )
-               IF ( HERMO ) CALL NDF_MAP( NDFHO, 'Data', ITYPE,
+               IF ( HERMO ) CALL KPG1_MAP( NDFHO, 'Data', ITYPE,
      :                                    'WRITE', IPHO, EL, STATUS )
-               IF ( REALO ) CALL NDF_MAP( NDFRO, 'Data', ITYPE,
+               IF ( REALO ) CALL KPG1_MAP( NDFRO, 'Data', ITYPE,
      :                                    'WRITE', IPRO, EL, STATUS )
-               IF ( IMAGO ) CALL NDF_MAP( NDFIO, 'Data', ITYPE,
+               IF ( IMAGO ) CALL KPG1_MAP( NDFIO, 'Data', ITYPE,
      :                                    'WRITE', IPIO, EL, STATUS )
-               IF ( POWERO ) CALL NDF_MAP( NDFPO, 'Data', ITYPE,
+               IF ( POWERO ) CALL KPG1_MAP( NDFPO, 'Data', ITYPE,
      :                                    'WRITE', IPPO, EL, STATUS )
-               IF ( PHASEO ) CALL NDF_MAP( NDFZO, 'Data', ITYPE,
+               IF ( PHASEO ) CALL KPG1_MAP( NDFZO, 'Data', ITYPE,
      :                                    'WRITE', IPZO, EL, STATUS )
 
 *  Get the required work space.
@@ -1311,15 +1314,15 @@
      :                      DTYPE, STATUS )
 
 *  Map the NDFs using the implementation data type.
-            IF ( HERMI ) CALL NDF_MAP( NDFR, 'Data', ITYPE,
+            IF ( HERMI ) CALL KPG1_MAP( NDFR, 'Data', ITYPE,
      :                                 'READ', IPINH, EL, STATUS )
-            IF ( REALI ) CALL NDF_MAP( NDFR, 'Data', ITYPE,
+            IF ( REALI ) CALL KPG1_MAP( NDFR, 'Data', ITYPE,
      :                                 'READ', IPINR, EL, STATUS )
-            IF ( IMAGI ) CALL NDF_MAP( NDFI, 'Data', ITYPE,
+            IF ( IMAGI ) CALL KPG1_MAP( NDFI, 'Data', ITYPE,
      :                                 'READ', IPINI, EL, STATUS )
-            IF ( POWERI ) CALL NDF_MAP( NDFR, 'Data', ITYPE,
+            IF ( POWERI ) CALL KPG1_MAP( NDFR, 'Data', ITYPE,
      :                                  'READ', IPINR, EL, STATUS )
-            IF ( PHASEI ) CALL NDF_MAP( NDFI, 'Data', ITYPE,
+            IF ( PHASEI ) CALL KPG1_MAP( NDFI, 'Data', ITYPE,
      :                                  'READ', IPINI, EL, STATUS )
 
 *  Get the required work space.
@@ -1601,7 +1604,7 @@
                   IF ( STATUS .NE. SAI__OK ) GO TO 980
 
 *  Map the output space-domain data array.
-                  CALL NDF_MAP( NDFRS, 'Data', ITYPE, 'WRITE', IPO,
+                  CALL KPG1_MAP( NDFRS, 'Data', ITYPE, 'WRITE', IPO,
      :                          EL, STATUS )
 
 *  Swap the quadrants.

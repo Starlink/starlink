@@ -46,6 +46,9 @@
 *     1995 April 12 (MJC):
 *        Used modern-style variable declaration.  Transposed the LBND
 *        and UBND arguments.  Minor stylistic changes.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,7 +125,7 @@
       CALL NDF_SECT( INDF, NDF__MXDIM, SLBND, SUBND, INDFS, STATUS )
 
 *  Map the data array of the NDF section.
-      CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL KPG1_MAP( INDFS, 'DATA', '_REAL', 'READ', PNTR, EL, STATUS )
 
 *  See if the section may contain bad values.
       CALL NDF_BAD( INDFS, 'DATA', .FALSE., BAD, STATUS )

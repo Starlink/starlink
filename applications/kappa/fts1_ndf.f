@@ -210,6 +210,9 @@
 *        where byte-swapping is required.
 *     9-JUN-1998 (DSB):
 *        Added support for NDF WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -515,7 +518,7 @@
 
 *          Map the data array.
 
-            CALL NDF_MAP( NDF, 'Data', FMTOUT, 'WRITE', DAPNTR, EL,
+            CALL KPG1_MAP( NDF, 'Data', FMTOUT, 'WRITE', DAPNTR, EL,
      :                    STATUS )
 
 *          Clear up after an error.
@@ -679,7 +682,7 @@
 
 *          Map the data array, filling the array with bad values.
 
-            CALL NDF_MAP( NDF, 'Data', FMTOUT, 'WRITE/BAD', DAPNTR, EL,
+            CALL KPG1_MAP( NDF, 'Data', FMTOUT, 'WRITE/BAD', DAPNTR, EL,
      :                    STATUS )
 
 *          Clear up after an error.

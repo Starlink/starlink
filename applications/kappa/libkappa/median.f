@@ -293,6 +293,9 @@
 *        messages conditional.  Removed a couple of unnecessary calls.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -506,7 +509,7 @@
 *  ====================
 
 *  Map the data-array component in the output NDF
-      CALL NDF_MAP( NDFO, 'DATA', TYPE, 'UPDATE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFO, 'DATA', TYPE, 'UPDATE', PNTRO, EL, STATUS )
 
 *  Calculate dimensions of workspace array required, from the largest
 *  step size to be used.  This is needed for the padding.
@@ -519,7 +522,7 @@
 *  Create and map the workspace array.
       CALL NDF_TEMP( WPLACE, STATUS )
       CALL NDF_NEW( TYPE, NDIM, LBND, WDIMS, WPLACE, WNDF, STATUS )
-      CALL NDF_MAP( WNDF, 'DATA', TYPE, 'WRITE', WPNTR, EL, STATUS )
+      CALL KPG1_MAP( WNDF, 'DATA', TYPE, 'WRITE', WPNTR, EL, STATUS )
 
 *  Check for errors.
       IF ( STATUS .EQ. SAI__OK ) THEN

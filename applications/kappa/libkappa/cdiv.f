@@ -74,6 +74,9 @@
 *        Added Related Applications.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,13 +167,13 @@
 *  If all the output pixels are to be set bad, then map them, specifying
 *  this option.
       IF ( ALLBAD ) THEN
-         CALL NDF_MAP( NDF2, COMP, ITYPE, 'WRITE/BAD', PNTR2, EL,
+         CALL KPG1_MAP( NDF2, COMP, ITYPE, 'WRITE/BAD', PNTR2, EL,
      :                 STATUS )
 
 *  Otherwise, map the input and output arrays for normal processing.
       ELSE
-         CALL NDF_MAP( NDF1, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
-         CALL NDF_MAP( NDF2, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
+         CALL KPG1_MAP( NDF1, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
+         CALL KPG1_MAP( NDF2, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
 
 *  See if checks for bad pixels are needed when processing the NDF's
 *  data array.

@@ -389,6 +389,9 @@
 *        Applications section.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -605,7 +608,7 @@
 *  matching the input NDF. Map the data array of the section.
          CALL NDF_ASSOC( 'MASK', 'READ', MNDF, STATUS )
          CALL NDF_SECT( MNDF, NDIMS, LBNDIN, UBNDIN, MSNDF, STATUS )
-         CALL NDF_MAP( MSNDF, 'DATA', '_REAL', 'READ', IPMASK, NEL, 
+         CALL KPG1_MAP( MSNDF, 'DATA', '_REAL', 'READ', IPMASK, NEL, 
      :                 STATUS )
 
          IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -683,7 +686,7 @@
       C1_DIM( 2 ) = SUBNDI( 2 ) - SLBNDI( 2 ) + 1
 
 *  Map the data array.
-      CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPIN, NEL, STATUS )
+      CALL KPG1_MAP( INDF, 'DATA', '_REAL', 'READ', IPIN, NEL, STATUS )
 
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -738,7 +741,7 @@
          END IF
       
 *  Map the PSF.
-         CALL NDF_MAP( PSFNDF, 'DATA', '_REAL', 'READ', IPPSF, NELPSF,
+         CALL KPG1_MAP( PSFNDF, 'DATA', '_REAL', 'READ', IPPSF, NELPSF,
      :                 STATUS )
 
 *  Get work space for use in routine for finding PSF size.
@@ -898,7 +901,7 @@
       CALL NDF_STATE( INDF, 'VARIANCE', VAR, STATUS )      
 
       IF ( VAR ) THEN
-         CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVAR, NEL,
+         CALL KPG1_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVAR, NEL,
      :                 STATUS)
       ELSE
          IPVAR = IPIN
@@ -946,7 +949,7 @@
 *  the input image, and map the data array.
       ELSE
          CALL NDF_SECT( MODNDF, NDIMS, LBNDIN, UBNDIN, MODSEC, STATUS )
-         CALL NDF_MAP( MODSEC, 'DATA', '_REAL', 'READ', IPMOD, NEL, 
+         CALL KPG1_MAP( MODSEC, 'DATA', '_REAL', 'READ', IPMOD, NEL, 
      :                 STATUS )
 
 *  Store the model in internal file <20>, replacing bad pixels with the
@@ -985,7 +988,7 @@
          CALL ERR_ANNUL( STATUS )
 
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL NDF_MAP( NMDNDF, 'DATA', '_REAL', 'WRITE/BAD', IPNMOD,
+         CALL KPG1_MAP( NMDNDF, 'DATA', '_REAL', 'WRITE/BAD', IPNMOD,
      :                 NEL, STATUS )
 
          CALL KPS1_MEMNM( DEF, C1_DIM( 1 ), C1_DIM( 2 ), %VAL( IPNMOD ),

@@ -168,6 +168,9 @@
 *        representations, and do not re-instate original representations
 *        at end. This prevents the screen being cleared when the
 *        workstation is closed.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -350,7 +353,7 @@
       CALL NDF_TYPE( NDF, COMP, TYPE, STATUS )
 
 *  Map the input array.
-      CALL NDF_MAP( NDF, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
+      CALL KPG1_MAP( NDF, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
 
 *  Find whether there may be bad pixels present.  There is no explicit
 *  check.  It just relies on the current value.

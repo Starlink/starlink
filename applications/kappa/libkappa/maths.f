@@ -336,6 +336,9 @@
 *        expression.  Examples changed to lowercase.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -807,7 +810,7 @@
       J = 0
       IF ( NIN .GE. 1 ) THEN
          DO 70 I = 1, NIN
-            CALL NDF_MAP( NDF( I ), COMPI( I ), ITYPE, 'READ', PNTR1,
+            CALL KPG1_MAP( NDF( I ), COMPI( I ), ITYPE, 'READ', PNTR1,
      :                    EL, STATUS )
 
 *  Check to see whether any of the input arrays may contain bad pixels.
@@ -1036,7 +1039,7 @@
       END IF 
 
 *  Map the output arrays for writing.
-      CALL NDF_MAP( NDFOUT, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
+      CALL KPG1_MAP( NDFOUT, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Evaluate the expression.

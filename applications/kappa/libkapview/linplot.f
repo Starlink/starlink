@@ -461,6 +461,9 @@
 *        representations, and do not re-instate original representations
 *        at end. This prevents the screen being cleared when the
 *        workstation is closed.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -898,10 +901,10 @@
 *  Map the array with read access.  For error bars the data and error
 *  arrays are required.
       IF ( ERRBAR ) THEN
-         CALL NDF_MAP( NDFS, 'Data,Error', ITYPE, 'READ', PNTRI, EL,
+         CALL KPG1_MAP( NDFS, 'Data,Error', ITYPE, 'READ', PNTRI, EL,
      :                 STATUS )
       ELSE
-         CALL NDF_MAP( NDFS, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+         CALL KPG1_MAP( NDFS, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
       END IF
 
 *  Obtain the spacing between points showing the error bars no that the

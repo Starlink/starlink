@@ -529,6 +529,9 @@
 *        Inserted the "Save" option into the description of OPTION.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -973,7 +976,7 @@
 
 *    Map the input data array.
 
-      CALL NDF_MAP( NDF, COMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDF, COMP, ITYPE, 'READ', PNTRI, EL, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 980
 
@@ -1597,7 +1600,7 @@
 
 *          Map the component in that section.
 
-            CALL NDF_MAP( NDFR, COMP, '_REAL', 'READ', REPNTR, REL,
+            CALL KPG1_MAP( NDFR, COMP, '_REAL', 'READ', REPNTR, REL,
      :                    STATUS )
 
 *          Compute the statistics of the current region.
@@ -1662,7 +1665,7 @@
 
 *       Map the component in that section.
 
-         CALL NDF_MAP( NDFR, COMP, '_REAL', 'READ', REPNTR, REL,
+         CALL KPG1_MAP( NDFR, COMP, '_REAL', 'READ', REPNTR, REL,
      :                 STATUS )
 
 *       Compute the histogram and plot it.

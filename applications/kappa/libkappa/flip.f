@@ -92,6 +92,9 @@
 *        library.
 *     11-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,10 +184,10 @@
 *  arrays for access using this type.
          IF ( THERE ) THEN      
             CALL NDF_TYPE( NDF1, COMP( ICOMP ), TYPE, STATUS )
-            CALL NDF_MAP( NDF1, COMP( ICOMP ), TYPE, 'READ', PNTR1, EL,
-     :                    STATUS )
-            CALL NDF_MAP( NDF2, COMP( ICOMP ), TYPE, 'WRITE', PNTR2, EL,
-     :                    STATUS )
+            CALL KPG1_MAP( NDF1, COMP( ICOMP ), TYPE, 'READ', PNTR1, 
+     :                     EL, STATUS )
+            CALL KPG1_MAP( NDF2, COMP( ICOMP ), TYPE, 'WRITE', PNTR2, 
+     :                     EL, STATUS )
 
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.

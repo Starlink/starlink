@@ -93,6 +93,9 @@
 *        Used modern-style variable declarations.  Minor stylistic
 *        changes and documentation improved.  Renamed variable INDEX to
 *        avoid name clash with intrinsic function.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,11 +161,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Map the required arrays.
-      IF ( USE1 ) CALL NDF_MAP( INDF1, COMP, ITYPE, 'READ', IPIN1, NEL,
+      IF ( USE1 ) CALL KPG1_MAP( INDF1, COMP, ITYPE, 'READ', IPIN1, NEL,
      :                          STATUS )
-      IF ( USE2 ) CALL NDF_MAP( INDF2, COMP, ITYPE, 'READ', IPIN2, NEL,
+      IF ( USE2 ) CALL KPG1_MAP( INDF2, COMP, ITYPE, 'READ', IPIN2, NEL,
      :                          STATUS )
-      CALL NDF_MAP( INDF3, COMP, ITYPE, 'WRITE', IPOUT, NEL, STATUS )
+      CALL KPG1_MAP( INDF3, COMP, ITYPE, 'WRITE', IPOUT, NEL, STATUS )
 
 *  Get the bounds of the output NDF. 
       CALL NDF_BOUND( INDF3, NDF__MXDIM, LBND, UBND, NDIM, STATUS )

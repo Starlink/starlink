@@ -133,6 +133,9 @@
 *        example, and a list of related applications.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -209,10 +212,10 @@
 
 *  Map the required components of the input array.
       IF ( VAR ) THEN
-         CALL NDF_MAP( INDF1, 'DATA,VAR', '_DOUBLE', 'READ', IP1, EL,
+         CALL KPG1_MAP( INDF1, 'DATA,VAR', '_DOUBLE', 'READ', IP1, EL,
      :                 STATUS )
       ELSE
-         CALL NDF_MAP( INDF1, 'DATA', '_DOUBLE', 'READ', IP1, EL, 
+         CALL KPG1_MAP( INDF1, 'DATA', '_DOUBLE', 'READ', IP1, EL, 
      :                 STATUS )
       END IF         
       
@@ -237,7 +240,7 @@
       END IF
          
 *  Map the PSF 'DATA' array.
-      CALL NDF_MAP( INDF2, 'DATA', '_DOUBLE', 'READ', IP2, EL, STATUS )
+      CALL KPG1_MAP( INDF2, 'DATA', '_DOUBLE', 'READ', IP2, EL, STATUS )
 
 *  Get workspace for use by the routine which finds the PSF size.
       W1DIM( 1 ) = MAX( DIM2( 1 ), DIM2( 2 ) )
@@ -267,10 +270,10 @@
       
 *  Map the required components of the output array.
       IF ( VAR ) THEN
-         CALL NDF_MAP( INDF3, 'DATA,VAR', '_DOUBLE', 'WRITE', IP3, EL,
+         CALL KPG1_MAP( INDF3, 'DATA,VAR', '_DOUBLE', 'WRITE', IP3, EL,
      :                 STATUS )
       ELSE
-         CALL NDF_MAP( INDF3, 'DATA', '_DOUBLE', 'WRITE', IP3, EL, 
+         CALL KPG1_MAP( INDF3, 'DATA', '_DOUBLE', 'WRITE', IP3, EL, 
      :                 STATUS )
       END IF         
       

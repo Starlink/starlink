@@ -519,7 +519,7 @@
 
 *    Map the data array.
 
-      CALL NDF_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,
+      CALL KPG1_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,
      :              DUMMY, STATUS )
       
 *    Get the title for the NDF.

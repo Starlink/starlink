@@ -189,6 +189,9 @@
 *        modern variable-declaration style and other stylish changes,
 *        removed long lines, mapped the input arrays together for
 *        efficiency.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -282,12 +285,13 @@
 *  DATA array.
       CALL NDF_STATE( INDF1, 'VARIANCE', VAR, STATUS )
       IF ( VAR ) THEN
-         CALL NDF_MAP( INDF1, 'Data,Variance', '_REAL', 'READ', IPI,
+         CALL KPG1_MAP( INDF1, 'Data,Variance', '_REAL', 'READ', IPI,
      :                        EL, STATUS )
       ELSE
 
 *  Map the only DATA array of the input NDF.
-         CALL NDF_MAP( INDF1, 'Data', '_REAL', 'READ', IPI, EL, STATUS )
+         CALL KPG1_MAP( INDF1, 'Data', '_REAL', 'READ', IPI, EL, 
+     :                  STATUS )
       END IF
          
 *  Get the number of bins required. Use a minimum of one.
@@ -301,9 +305,9 @@
      :               NBIN, STATUS )      
 
 *  Map its DATA array, and, if needed, its VARIANCE array.
-      CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPDO, NBIN,
+      CALL KPG1_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPDO, NBIN,
      :              STATUS )
-      IF ( VAR ) CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE',
+      IF ( VAR ) CALL KPG1_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE',
      :                         IPVO, NBIN, STATUS )      
 
 *  See if radial or tangential binning is to be used.
@@ -563,7 +567,7 @@
 
 *  Otherwise, map the DATA array.
       ELSE
-         CALL NDF_MAP( INDF3, 'DATA', '_REAL', 'WRITE', IPMOUT, EL,
+         CALL KPG1_MAP( INDF3, 'DATA', '_REAL', 'WRITE', IPMOUT, EL,
      :                 STATUS )
 
 *  Copy the mask to the output NDF, transforming the mask values from

@@ -59,6 +59,9 @@
 *  History:
 *     1991 June 28 (MJC):
 *        Original version.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -115,7 +118,7 @@
 *    Map the data array.  Wrap to prevent line overflow when the token
 *    is expanded.
  
-      CALL NDF_MAP( NDFO, 'Data', '_REAL', 'WRITE', OPNTR, EL,
+      CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', OPNTR, EL,
      :              STATUS )
  
 *    Get the title for the NDF.

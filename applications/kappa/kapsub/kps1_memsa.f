@@ -97,6 +97,9 @@
 *        Minor stylistic changes.  Stripped trailing blanks.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -345,7 +348,7 @@
       END IF
 
 *  Map the output data array.
-      CALL NDF_MAP( ONDF, 'DATA', '_REAL', MODE, IPOUT, NEL, STATUS )
+      CALL KPG1_MAP( ONDF, 'DATA', '_REAL', MODE, IPOUT, NEL, STATUS )
 
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999

@@ -183,6 +183,9 @@
 *     10-JUN-1998 (DSB):
 *        Propagate WCS component. Ensure each output dimension is at least
 *        one pixel long. 
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -448,8 +451,8 @@
       CALL PSX_CALLOC( ELWS2, CTYPE, WPNTR2, STATUS )
 
 *  Map the full input, and output data arrays.
-      CALL NDF_MAP( NDFI, COMP, ITYPE, 'READ', PNTRI, EL, STATUS )
-      CALL NDF_MAP( NDFO, COMP, ITYPE, 'WRITE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFI, COMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDFO, COMP, ITYPE, 'WRITE', PNTRO, EL, STATUS )
 
 *  Compress the input array to make the output array by averaging in
 *  non-overlapping boxes.  Call the appropriate routine depending on

@@ -165,6 +165,9 @@
 *        parameter names consistent.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -286,9 +289,9 @@
 *  Map the data arrays of each NDF section, and if all NDFs have
 *  VARIANCE components, also map the VARIANCE components.
       DO I = 1, 4
-         CALL NDF_MAP( NDFIN( I ), 'DATA', '_REAL', 'READ', IPDIN( I ),
+         CALL KPG1_MAP( NDFIN( I ), 'DATA', '_REAL', 'READ', IPDIN( I ),
      :                 EL, STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFIN( I ), 'VARIANCE', '_REAL',
+         IF ( VAR ) CALL KPG1_MAP( NDFIN( I ), 'VARIANCE', '_REAL',
      :                            'READ', IPVIN( I ), EL, STATUS )
       END DO
 
@@ -311,8 +314,9 @@
          CALL NDF_CPUT( 'Total Intensity', NDFI, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFI, 'DATA', '_REAL', 'WRITE', IPI, EL, STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFI, 'VARIANCE', '_REAL', 'WRITE',
+         CALL KPG1_MAP( NDFI, 'DATA', '_REAL', 'WRITE', IPI, EL, 
+     :                  STATUS )
+         IF ( VAR ) CALL KPG1_MAP( NDFI, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPIV, EL, STATUS )
 
 *  If no total-intensity NDF was obtained, annul the error and set a
@@ -341,8 +345,9 @@
          CALL NDF_CPUT( 'Stokes Q', NDFQ, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFQ, 'DATA', '_REAL', 'WRITE', IPQ, EL, STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFQ, 'VARIANCE', '_REAL', 'WRITE',
+         CALL KPG1_MAP( NDFQ, 'DATA', '_REAL', 'WRITE', IPQ, EL, 
+     :                  STATUS )
+         IF ( VAR ) CALL KPG1_MAP( NDFQ, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPQV, EL, STATUS )
 
 *  If no Q NDF was obtained, annul the error and set a flag to indicate
@@ -370,8 +375,9 @@
          CALL NDF_CPUT( 'Stokes U', NDFU, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFU, 'DATA', '_REAL', 'WRITE', IPU, EL, STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFU, 'VARIANCE', '_REAL', 'WRITE',
+         CALL KPG1_MAP( NDFU, 'DATA', '_REAL', 'WRITE', IPU, EL, 
+     :                  STATUS )
+         IF ( VAR ) CALL KPG1_MAP( NDFU, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPUV, EL, STATUS )
 
 *  If no U NDF was obtained, annul the error and set a flag to indicate
@@ -403,8 +409,9 @@
          CALL NDF_CPUT( '%', NDFP, 'UNITS', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFP, 'DATA', '_REAL', 'WRITE', IPP, EL, STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFP, 'VARIANCE', '_REAL', 'WRITE',
+         CALL KPG1_MAP( NDFP, 'DATA', '_REAL', 'WRITE', IPP, EL, 
+     :                  STATUS )
+         IF ( VAR ) CALL KPG1_MAP( NDFP, 'VARIANCE', '_REAL', 'WRITE',
      :                           IPPV, EL, STATUS )
 
 *  If no percent-polarisation NDF was obtained, annul the error and set
@@ -437,8 +444,9 @@
          CALL NDF_CPUT( 'Degrees', NDFT, 'UNITS', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFT, 'DATA', '_REAL', 'WRITE', IPT, EL, STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFT, 'VARIANCE', '_REAL', 'WRITE',
+         CALL KPG1_MAP( NDFT, 'DATA', '_REAL', 'WRITE', IPT, EL, 
+     :                  STATUS )
+         IF ( VAR ) CALL KPG1_MAP( NDFT, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPTV, EL, STATUS )
 
 *  If no angle NDF was obtained, annul the error and set a flag to
@@ -467,9 +475,9 @@
          CALL NDF_CPUT( 'Polarised Intensity', NDFIP, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFIP, 'DATA', '_REAL', 'WRITE', IPIP, EL,
+         CALL KPG1_MAP( NDFIP, 'DATA', '_REAL', 'WRITE', IPIP, EL,
      :                 STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFIP, 'VARIANCE', '_REAL', 'WRITE',
+         IF ( VAR ) CALL KPG1_MAP( NDFIP, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPIPV, EL, STATUS )
 
 *  If no polarised-intensity NDF was obtained, annul the error and set a
@@ -499,9 +507,9 @@
          CALL NDF_CPUT( 'Total Intensity', NDFIA, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFIA, 'DATA', '_REAL', 'WRITE', IPIA, EL,
+         CALL KPG1_MAP( NDFIA, 'DATA', '_REAL', 'WRITE', IPIA, EL,
      :                 STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFIA, 'VARIANCE', '_REAL', 'WRITE',
+         IF ( VAR ) CALL KPG1_MAP( NDFIA, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPIAV, EL, STATUS )
 
 *  If no total intensity NDF was obtained, annul the error and set a
@@ -531,9 +539,9 @@
          CALL NDF_CPUT( 'Total Intensity', NDFIB, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
-         CALL NDF_MAP( NDFIB, 'DATA', '_REAL', 'WRITE', IPIB, EL,
+         CALL KPG1_MAP( NDFIB, 'DATA', '_REAL', 'WRITE', IPIB, EL,
      :                 STATUS )
-         IF ( VAR ) CALL NDF_MAP( NDFIB, 'VARIANCE', '_REAL', 'WRITE',
+         IF ( VAR ) CALL KPG1_MAP( NDFIB, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPIBV, EL, STATUS )
 
 *  If no total intensity NDF was obtained, annul the error and set a

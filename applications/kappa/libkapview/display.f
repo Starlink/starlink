@@ -519,6 +519,9 @@
 *        QUALITY and HISTORY no longer propagated to the OUT NDF.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1994,7 +1997,7 @@
 
 *       Map the input image.
 
-         CALL NDF_MAP( NDFS, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+         CALL KPG1_MAP( NDFS, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 960
 
 *       Find the size of the output array.  For the moment don't
@@ -2074,7 +2077,7 @@
 
 *       Map the image with the original implementation type.
 
-         CALL NDF_MAP( NDFS, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+         CALL KPG1_MAP( NDFS, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 960
       END IF
 
@@ -3046,7 +3049,7 @@
 
 *          Map the NDF's data component for WRITE access.
 
-            CALL NDF_MAP( NDFO, 'Data', OTYPE, 'WRITE', OPNTR, EL,
+            CALL KPG1_MAP( NDFO, 'Data', OTYPE, 'WRITE', OPNTR, EL,
      :                    STATUS )
 
 *          There are no bad values by definition.

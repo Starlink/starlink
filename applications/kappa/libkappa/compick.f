@@ -121,6 +121,9 @@
 *     10-JUN-1998 (DSB):
 *        Propagate WCS component. Ensure each output dimension is at least
 *        one pixel long. 
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -308,8 +311,8 @@
       CALL NDF_TYPE( NDFI, 'Data', TYPE, STATUS )
 
 *  Map the full input, and output data arrays.
-      CALL NDF_MAP( NDFI, 'Data', TYPE, 'READ', PNTRI, EL, STATUS )
-      CALL NDF_MAP( NDFO, 'Data', TYPE, 'WRITE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFI, 'Data', TYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDFO, 'Data', TYPE, 'WRITE', PNTRO, EL, STATUS )
 
 *  Compress the input array to make the output array by selecting
 *  elements at equal intervals.
@@ -358,9 +361,9 @@
          CALL NDF_TYPE( NDFI, 'Variance', TYPE, STATUS )
 
 *  Map the full input, and output variance arrays.
-         CALL NDF_MAP( NDFI, 'Variance', TYPE, 'READ', PNTRI, EL,
+         CALL KPG1_MAP( NDFI, 'Variance', TYPE, 'READ', PNTRI, EL,
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'Variance', TYPE, 'WRITE', PNTRO, EL,
+         CALL KPG1_MAP( NDFO, 'Variance', TYPE, 'WRITE', PNTRO, EL,
      :                 STATUS )
 
 *  Compress the input array to make the output array by selecting
@@ -408,9 +411,9 @@
       IF ( QUAL ) THEN
 
 *  Map the full input, and output quality arrays.
-         CALL NDF_MAP( NDFI, 'Quality', '_UBYTE', 'READ', PNTRI, EL,
+         CALL KPG1_MAP( NDFI, 'Quality', '_UBYTE', 'READ', PNTRI, EL,
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'Quality', '_UBYTE', 'WRITE', PNTRO, EL,
+         CALL KPG1_MAP( NDFO, 'Quality', '_UBYTE', 'WRITE', PNTRO, EL,
      :                 STATUS )
 
 *  Compress the input array to make the output array by selecting

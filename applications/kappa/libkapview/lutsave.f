@@ -109,6 +109,9 @@
 *        Used new capability 18 to obtain the true number of
 *        colour-table entries, which may not be a power of 2, as
 *        returned by capability 14.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -386,7 +389,7 @@
 
 *    Map the NDF's data component for WRITE access.
 
-      CALL NDF_MAP( NDF, 'DATA', '_REAL', 'WRITE', PNTR, EL, STATUS )
+      CALL KPG1_MAP( NDF, 'DATA', '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *    Move the contents of the LUT to the NDF data component.
 

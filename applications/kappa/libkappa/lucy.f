@@ -265,7 +265,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
-*  HISTORY:
+*  History:
 *     6-MAR-1995 (DSB):
 *        Original version, based on MEM2D and Rhys Morris's LUCY.
 *     1995 April 6 (MJC):
@@ -274,6 +274,9 @@
 *        and made stylistic changes.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -390,7 +393,7 @@
      :                 SLBND2, SUBND2, STATUS )
 
 *  Map the PSF DATA array.
-      CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'READ', IPN2, NEL2,
+      CALL KPG1_MAP( INDF2, 'DATA', '_REAL', 'READ', IPN2, NEL2,
      :              STATUS )
 
 *  See if the PSF contains any bad pixels.  If it does then abort.
@@ -487,7 +490,7 @@
       CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
 
 *  Map the DATA array of the input NDF.
-      CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPN1, NEL1,
+      CALL KPG1_MAP( INDF1, 'DATA', '_REAL', 'READ', IPN1, NEL1,
      :              STATUS )
 
 *  Get space to hold the internal version of the data array and copy
@@ -544,7 +547,7 @@
      :                   /'input NDF.', STATUS )
 
 *  Map the VARIANCE component of the input NDF.
-         CALL NDF_MAP( INDF1, 'VARIANCE', '_REAL', 'READ', IPN1, NEL1,
+         CALL KPG1_MAP( INDF1, 'VARIANCE', '_REAL', 'READ', IPN1, NEL1,
      :                 STATUS )
 
 *  Copy the input variance array to the centre of the internal file,
@@ -618,7 +621,7 @@
          UBND( SDIM3( 2 ) ) = SUBND1( 2 )
 
          CALL NDF_SECT( INDF3, NDIM, LBND, UBND, INDF3S, STATUS )
-         CALL NDF_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S, 
+         CALL KPG1_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S, 
      :                 STATUS )
 
 *  Copy it to the centre of internal file 6.  The margins are filled by
@@ -671,7 +674,7 @@
          UBND( SDIM4( 2 ) ) = SUBND1( 2 )
 
          CALL NDF_SECT( INDF4, NDIM, LBND, UBND, INDF4S, STATUS )
-         CALL NDF_MAP( INDF4S, 'DATA', '_REAL', 'READ', IPN4S, NEL4S, 
+         CALL KPG1_MAP( INDF4S, 'DATA', '_REAL', 'READ', IPN4S, NEL4S, 
      :                 STATUS )
 
 *  Copy it to the centre of internal file 1.  The margins are filled by
@@ -726,7 +729,7 @@
 *  Create the output NDF, and map the DATA array.
       CALL NDF_PROP( INDF1, 'WCS,AXIS,QUALITY,UNITS', 'OUT', INDF5,
      :               STATUS )
-      CALL NDF_MAP( INDF5, 'DATA', '_REAL', 'WRITE', IPN5, NEL5,
+      CALL KPG1_MAP( INDF5, 'DATA', '_REAL', 'WRITE', IPN5, NEL5,
      :              STATUS )
 
 *  Copy the reconstructed array to the output DATA array.

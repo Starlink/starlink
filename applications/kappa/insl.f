@@ -1085,7 +1085,7 @@
 
 *       Map the data array.
 
-         CALL NDF_MAP( NDFO, 'Data', '_REAL', 'WRITE', SLCPTR, NPTS,
+         CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', SLCPTR, NPTS,
      :                 STATUS )
       
 *       Get the title for the NDF.

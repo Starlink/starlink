@@ -190,6 +190,9 @@
 *     1997 May 10 (MJC):
 *        Computes (via SVD) and records the variances of the polynomial
 *        coefficients.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -410,13 +413,13 @@
      :                   ITYPE, DTYPE, STATUS )
 
 *  Map the data array of the NDF.
-         CALL NDF_MAP( NDFI, 'Data', ITYPE, 'READ', DPTR, DSIZE,
+         CALL KPG1_MAP( NDFI, 'Data', ITYPE, 'READ', DPTR, DSIZE,
      :                 STATUS )
 
 *  Map the variance array if it exists.  An access mode of 'READ/ZERO'
 *  ensures that a pointer to a zeroed array is provided if there is no
 *  variance array in the NDF.
-         CALL NDF_MAP( NDFI, 'Variance', ITYPE, 'READ/ZERO', VPTR,
+         CALL KPG1_MAP( NDFI, 'Variance', ITYPE, 'READ/ZERO', VPTR,
      :                 VSIZE, STATUS )
 
 *  Map the x and y axes of the NDF (assuming these correspond to the

@@ -158,6 +158,9 @@
 *        usage.  Added Related Applications and additional commentary.
 *        Changed the default of TITLE to null.  Used PSX to obtain
 *        workspace.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -299,8 +302,8 @@
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
 *  Map the input and output data arrays.
-      CALL NDF_MAP( NDFI, COMP, ITYPE, 'READ', PNTIN, NEL, STATUS )
-      CALL NDF_MAP( NDFO, COMP, ITYPE, 'WRITE', PNTOUT, NEL, STATUS )
+      CALL KPG1_MAP( NDFI, COMP, ITYPE, 'READ', PNTIN, NEL, STATUS )
+      CALL KPG1_MAP( NDFO, COMP, ITYPE, 'WRITE', PNTOUT, NEL, STATUS )
 
 *  Exit if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999

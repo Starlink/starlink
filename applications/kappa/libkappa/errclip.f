@@ -94,6 +94,9 @@
 *        declaration and other minor stylistic changes.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -183,11 +186,11 @@
      :                 LIMIT, STATUS )
 
 *  Map the DATA and VARIANCE components of the input NDF.
-      CALL NDF_MAP( INDF1, 'DATA,VARIANCE', '_DOUBLE', 'READ', IPIN,
+      CALL KPG1_MAP( INDF1, 'DATA,VARIANCE', '_DOUBLE', 'READ', IPIN,
      :              EL, STATUS )
 
 *  Map the DATA and VARIANCE components of the output NDF.
-      CALL NDF_MAP( INDF2, 'DATA,VARIANCE', '_DOUBLE', 'WRITE', IPOUT,
+      CALL KPG1_MAP( INDF2, 'DATA,VARIANCE', '_DOUBLE', 'WRITE', IPOUT,
      :              EL, STATUS )
 
 *  Store values in the output arrays.
