@@ -25,8 +25,28 @@ AC_PROG_LIBTOOL
 
 AC_HEADER_STDC
 AC_PATH_XTRA
-AC_CHECK_LIB(tk, Tk_DisplayName)
 
+AC_ARG_WITH([tk], 
+             AC_HELP_STRING([--with-tk[=path]],
+             [use Tk (default location /usr)]),
+  [if test "$withval" = "yes"; then
+    # Default place, installed by Fink in /usr
+    LIBS="$LIBS -L/usr/lib"
+    CPPFLAGS="$CPPFLAGS -I/usr/include"
+  elif test "$withval" = "no"; then
+    : # We do nothing
+  else
+    TKLIBDIR=$withval/lib
+    TKINCDIR=$withval/include
+    LIBS="$LIBS -L$TKLIBDIR"
+    CPPFLAGS="$CPPFLAGS -I$TKINCDIR"
+  fi])
+
+AC_CHECK_HEADER([tk.h], set have_tkheader = "yes" ) 
+AC_CHECK_LIB(tk, Tk_DisplayName, set have_tklib = "yes" )
+AM_CONDITIONAL( HAVE_TK, \
+   [test "$have_tkheader" = "yes" && test "$test_tklib" = "yes"] )
+     
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS

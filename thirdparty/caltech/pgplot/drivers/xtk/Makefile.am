@@ -1,18 +1,17 @@
-## Process this file with automake to produce Makefile.in
+## Process this file with automake to produce Makefile.
 
-lib_LTLIBRARIES = libtkpgplot.la
-libtkpgplot_la_SOURCES = $(C_ROUTINES)
+if !HAVE_TK
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+  lib_LTLIBRARIES = libtkpgplot.la
+  libtkpgplot_la_SOURCES = $(C_ROUTINES)
 
-C_ROUTINES = tkpgplot.c
+  include_HEADERS = $(PUBLIC_INCLUDES)
 
-PUBLIC_INCLUDES = tkpgplot.h
-PRIVATE_INCLUDES =
+  C_ROUTINES = tkpgplot.c
 
-AM_CFLAGS = -DPG_PPU -I../
+  PUBLIC_INCLUDES = tkpgplot.h
+  PRIVATE_INCLUDES =
 
-# Rivet (rvpgplot) is the same as tkpgplot but with a different
-# compile switch to tkpgplot.c
+  AM_CFLAGS = -DPG_PPU -I../
 
-# testing
+endif
