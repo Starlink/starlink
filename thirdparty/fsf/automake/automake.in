@@ -4889,15 +4889,24 @@ sub handle_starlink
                 $fac =~ tr[A-Z][a-z]; # force lowercase
                 my $ufac;
                 ($ufac = $fac) =~ tr[a-z][A-Z]; # make uppercase version
+                my $facfile = 'fac_' . $code . '_err';
                 $output_rules .= &file_contents ('starlink_messgen',
                                                  new Automake::Location,
                                                  MSG => $msg,
                                                  LFAC => $fac,
                                                  UFAC => $ufac,
-                                                 CODE => $code,
+                                                 FACERRFILE => $facfile,
                                                 );
+                $clean_files{$facfile} = MAINTAINER_CLEAN;
             }
-      }          
+      }
+
+    # Enhance the list of maintainer-clean files to include the following,
+    # either installed by starconf or by the 'make world' process.
+    foreach my $fn ( qw( starconf.status make.log configure.log ))
+      {
+        $clean_files{$fn} = MAINTAINER_CLEAN;
+      }
 
     # Do we need to compile .ifl files?
     # $starlink_seen_features{compifl} was possibly set in
