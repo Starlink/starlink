@@ -1006,7 +1006,7 @@ There are also many applications for data visualisation:
 \item use of the \htmlref{graphics database}{se:agitate}, AGI, to pass
 information about pictures between tasks; tools for the creation, labelling,
 selection of pictures, and obtaining co-ordinate information from them;
-\item \htmlref{image}{DISPLAY} and \htmlref{greyscale}{GREYPLOT} plots with
+\item \htmlref{image}{DISPLAY} plots with
 a selection of scaling modes and many options such as axes;
 \item creation, selection, saving and manipulation of \htmlref{colour
 tables and palettes}{se:coltab} (for axes, annotation, coloured markers
@@ -1558,9 +1558,9 @@ the first procedure we've invoked there is a short pause while all the
 \normalsize
 
 Next we decide to make a hard copy of the bas-relief image. 
-\htmlref{GREYPLOT}{GREYPLOT} does this and adds a key of grey levels
+\htmlref{DISPLAY}{DISPLAY} does this and adds a key of grey levels
 and their corresponding values.  The chosen device is {\tt ps\_l};
-this overrides the {\tt xwindows} device for the duration of GREYPLOT.
+this overrides the {\tt xwindows} device for the duration of DISPLAY. 
 If this name isn't recognised at your site, issue the
 \htmlref{GDNAMES}{GDNAMES} command for a list of your local device
 names.  Select the landscape PostScript device.  We scale between
@@ -1568,16 +1568,15 @@ wider limits to reduce the glare.
 
 \small
 \begin{verbatim}
-     ICL> greyplot device=ps_l
+     ICL> display key=yes device=ps_l
      IN - NDF to be displayed /@comwest_bas/ >
-     KEY - Do you want a key of the grey levels and a title ? /YES/ >
      MODE - Method to define the scaling limits /'SCALE'/ >
-     BLACK - Value to be black in the plot? /187.5625/ > 11
-     WHITE - Value to be white in the plot? /-183.453125/ > -8.33
+     LOW - Low value for display /187.5625/ > 11
+     HIGH - High value for display /-183.453125/ > -8.33
 \end{verbatim}
 \normalsize
 
-GREYPLOT does not send your plot to the printer, since this is hardware
+DISPLAY does not send your plot to the printer, since this is hardware
 and node dependent.  Therefore, you must issue a shell command
 from {\footnotesize ICL} to perform this action.  That's not difficult---just
 insert a {\tt !} before the UNIX command, and in most cases just issue
@@ -2347,9 +2346,9 @@ From the shell you must escape the brackets.
 
 \small
 \begin{verbatim}
-     % greyplot mode=pe percentiles=\[95,5\]
-     % greyplot mode=pe percentiles='[95,5]'
-     % greyplot mode=pe percentiles="[95,5]"
+     % display key=yes mode=pe percentiles=\[95,5\]
+     % display key=yes mode=pe percentiles='[95,5]'
+     % display key=yes mode=pe percentiles="[95,5]"
 \end{verbatim}
 \normalsize
 All the above do this.  Single quotes have the advantage
@@ -11266,8 +11265,6 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Replaces bad pixels in a 2-d data array with  the local median.}
 \menuitem{GLOBALS}{
  Displays the values of the KAPPA global parameters.}
-\menuitem{GREYPLOT}{
- Produces a greyscale plot of a 1-d or 2-d NDF.}
 \menuitem{HISCOM}{
  Adds commentary to the history of an NDF.}
 \menuitem{HISLIST}{
@@ -11744,8 +11741,6 @@ functions as follows.
  Draws ${\pm}n$ standard-deviation lines on a line plot.
 \classitem{ELPROF}
  Creates a radial or azimuthal profile of a 2-dimensional image.
-\classitem{GREYPLOT}
- Produces a greyscale plot of a 1-d or 2-d NDF.
 \classitem{INSPECT}
  Inspects a 2-d NDF in a variety of ways.
 \classitem{LINPLOT}
@@ -17552,7 +17547,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: GREYPLOT, WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+      KAPPA: WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -22054,6 +22049,16 @@ plot (101k).
    Produces a greyscale plot of a 1-d or 2-d NDF
 }{
    \sstdescription{
+
+\vspace{5mm}
+\begin{quote}
+\begin{center}
+\emph{ Note, this application will be withdrawn at the next release of
+KAPPA. Use ``DISPLAY KEY=YES'' instead.} 
+\end{center}
+\end{quote}
+\vspace{5mm}
+
       This application produce a greyscale plot of a 1- or
       2-dimensional NDF, especially for a hardcopy device.  The image
       is usually the data array, but may also be the variance or
@@ -37214,7 +37219,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
    \sstdiytopic{
        Related Applications
    }{
-       KAPPA: DISPLAY, GREYPLOT.
+       KAPPA: DISPLAY.
    }
    \sstimplementationstatus{
       No origin information is passed to the output NDF.
@@ -43949,6 +43954,13 @@ The following applications have been modified:
          A new output parameter EXISTS has been added to store the result
          of the final "Exist" operation.
 
+      \item [\htmlref{GREYPLOT}{GREYPLOT}] \mbox{}
+         GREYPLOT has been scheduled for withdrawl at the next release of
+         KAPPA, and a warning message is now displayed every time
+         GREYPLOT is run. DISPLAY can now produce a key to the colour
+         table using the new KEY parameter, so there is no longer any
+         real need for GREYPLOT.
+
       \item [\htmlref{HISTOGRAM}{HISTOGRAM}] \mbox{}
          \begin{itemize}
             \item There is now much greater control over the appearance
@@ -44640,8 +44652,6 @@ functions as follows.
  Draws ${\pm}n$ standard-deviation lines on a line plot.
 \classitem{ELPROF}
  Creates a radial or azimuthal profile of a 2-dimensional image.
-\classitem{GREYPLOT}
- Produces a greyscale plot of a 1-d or 2-d NDF.
 \classitem{INSPECT}
  Inspects a 2-d NDF in a variety of ways.
 \classitem{LINPLOT}
