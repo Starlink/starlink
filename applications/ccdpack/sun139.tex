@@ -12850,90 +12850,17 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       transform only two lists may be registered at any time.
 
       The results from \routine{REGISTER} are reported via the logging system
-      and then coded either as new coordinate systems or as TRANSFORM
-      structures containing the final algebraic solutions for each
-      input list.  The new coordinate systems will be a copy of the
-      pixel coordinate system of the reference image, and are stored in
-      the WCS components of the associated images. Transform structures
-      may be stored in the CCDPACK exensions of the associated images or
-      within a named HDS container file if no associated images exist.
-      Whether TRANSFORM structures or frames within the WCS components
-      are chosen, they can be used by the applications \xroutine{TRANNDF} and
-      \xroutine{TRANLIST} to resample the datasets or transform position lists
-      respectively.
+      and then coded as new coordinate systems attached to images.
+      Normally, the new coordinate systems will be attached to the
+      images with which the lists are associated, but if the lists are
+      not associated with images then they can be attached to a named
+      list of images, or a single named one.  The \xroutine{TRANNDF} program can
+      use the attached coordinate systems to resample images.
    }
    \sstusage{
       register inlist fittype refpos
    }
    \sstparameters{
-      \sstsubsection{
-         CLASS( ) = LITERAL (Read)
-      } {
-         If CLASSIFY is TRUE then a list of classifications that
-         describe the properties of the transformation (parameters
-         XFOR, YFOR, XINV and YINV) should be given. This is
-         optional, but the information can be used to make other
-
-         For AST Mappings the following can be used:
-         \sstitemlist{
-
-            \sstitem
-               SIMPFI        -- Forward followed by inverse transformation
-                                  can be simplified to a unit mapping.
-
-            \sstitem
-               SIMPIF        -- Inverse followed by forward transformation
-                                  can be simplified to a unit mapping.
-
-         }
-         and for TRANSFORM structures the following can be used:
-         \sstitemlist{
-
-            \sstitem
-               LINEAR        -- Linear and preserves straight lines.
-
-            \sstitem
-               INDEPENDENT   -- Preserves the independence of the axes.
-
-            \sstitem
-               DIAGONAL      -- Preserves the axes themselves.
-
-            \sstitem
-               ISOTROPIC     -- Preserves angles and shapes.
-
-            \sstitem
-               POSITIVE\_DET  -- A component of reflection is absent.
-
-            \sstitem
-               NEGATIVE\_DET  -- A component of reflection is present.
-
-            \sstitem
-               CONSTANT\_DET  -- The scale factor is constant.
-
-            \sstitem
-               UNIT\_DET      -- Areas (or volumes etc.) are preserved.
-
-         }
-         See \xref{SUN/61}{sun61}{} Appendix B for details of transformation
-         classification and a table of classifications of common
-         mappings.
-
-         This parameter is only used when IFIT=6.
-      }
-      \sstsubsection{
-         CLASSIFY = \_LOGICAL (Read)
-      } {
-         If TRUE then this indicates that you want to classify the
-         transform. Classifying a transformation can help in later
-         processing and allows applications to reject transformations
-         that they cannot use. The topic of classification is discussed
-         in SUN/61 which should be consulted before using this option.
-         Linear transformations are classified by this routine directly
-         and do not use this parameter.
-
-         This parameter is only used when IFIT=6.
-         [FALSE]
-      }
       \sstsubsection{
          FA-FZ = LITERAL (Read)
       } {
@@ -13001,16 +12928,15 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       \sstsubsection{
          IN = LITERAL (Read)
       } {
-         If NDFNAMES is FALSE and PLACEIN is \qt{NDF} then a list of image
-         names in which to store the WCS frames or transformation
-         structures is required. This list of names must correspond
-         exactly to the order of the associated input lists. A listing
-         of the order of inputs is shown before this parameter is
-         accessed.
+         If NDFNAMES is FALSE and PLACEIN is \qt{EACH} then a list of image
+         names in which to store the WCS frames is required.  This
+         list of names must correspond  exactly to the order of the
+         associated input lists. A listing of the order of inputs is
+         shown before this parameter is accessed.
 
          The image names may (although this is probably not advisable)
          be specified using wildcards, or may be specified using an
-         indirection file (the indirection character is \qt{$^\wedge$}).
+         indirection file (the indirection character is {\tt "}$\wedge${\tt "}).
       }
       \sstsubsection{
          INLIST = LITERAL (Read)
@@ -13081,9 +13007,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          then INLIST just accesses the position list names directly.
 
          If the names of the lists are stored in the CCDPACK NDF
-         extension then the final WCS frame information or
-         transformation structure is also written to the NDF
-         extension.
+         extension then the new coordinate system is attached to
+         the associated image.
 
          If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
@@ -13091,41 +13016,19 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstsubsection{
          OUTDOMAIN = LITERAL (Read)
-      } {
-         If OUTFORMAT is \qt{WCS}, the transformation information is
-         written as a new frame to the WCS component of the NDF.
-         The frame normally has a Domain name of \qt{CCD\_REG}, but
-         that can be overridden with this parameter.  When this
-         frame is added, any previously existing frame which has
-         the same Domain is removed.
+      }{
+         The transformation information is written as a new coordinate
+         system attached to the image.  This parameter gives the label
+         (domain) of the new coordinate system.  When the new
+         coordinate system is added, any previously existing one with
+         the same Domain will be removed.
+
+         If PLACEIN is {\tt "}FILE{\tt "}, then the new coordinate systems are all
+         attached to a single image.  In this case the  domains are
+         OUTDOMAIN\_1, OUTDOMAIN\_2, ....
 
          The name is converted to upper case, and whitespace is removed.
          [CCD\_REG]
-      }
-      \sstsubsection{
-         OUTFORMAT = LITERAL (Read)
-      } {
-         If NDFNAMES is TRUE, or PLACEIN is \qt{NDF}, then this parameter
-         specifies how the transformation is to be written into the
-         images.  There are two possible values:
-            \sstitemlist{
-               \sstitem
-                  WCS       -- written into WCS component of the NDF
-               \sstitem
-                  TRANSFORM -- written as a TRANSFORM structure into the
-                           .MORE.CCDPACK extension of the NDF
-            }
-         If WCS is chosen, then a new coordinate system, with a Domain
-         (name) value given by OUTDOMAIN, is added to the WCS
-         component of the NDF (a new WCS component is created if none
-         previously existed).  A mapping between these coordinates and
-         pixel coordinates is defined, which is the unit mapping in
-         the case that the NDF in question is the reference set.  If
-         any frame in the domain OUTDOMAIN already exists in the WCS
-         component, it will be erased, so that after successful
-         processing by REGISTER it will contain only one frame so
-         named.
-         [WCS]
       }
       \sstsubsection{
          PA-PZ = LITERAL (Read)
@@ -13147,17 +13050,17 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          \sstitemlist{
 
             \sstitem
-               NDF  -- store them in NDF extensions
+               EACH    -- attach them one per image in a set of images
 
             \sstitem
-               FILE -- store them in a container file.
+               SINGLE  -- attach them all to a single image
 
          }
-         If the NDF option is chosen then you will have the option of
-         supplying the image names via the parameter IN. If the FILE
-         option is chosen then the name of an HDS container file should
-         be given in response to the TRFILE parameter.
-         [NDF]
+         If the EACH option is chosen then you will have the option of
+         supplying the image names via the parameter IN. If the EACH
+         option is chosen then the name of an existing image should be
+         given in response to the WCSFILE parameter.
+         [EACH]
       }
       \sstsubsection{
          REFPOS = \_INTEGER (Read)
@@ -13167,6 +13070,24 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [1]
       }
       \sstsubsection{
+         SIMPFI = \_LOGICAL (Read)
+      }{
+         If FITTYPE=6 and FULL=TRUE, this gives the value of the
+         mapping{\tt '}s SimpFI attribute (whether it is legitimate to simplify
+         the forward followed by the inverse transformation to a unit
+         transformation).
+         [TRUE]
+      }
+      \sstsubsection{
+         SIMPIF = \_LOGICAL (Read)
+      }{
+         If FITTYPE=6 and FULL=TRUE this gives the value of the
+         mapping{\tt '}s SimpIF attribute (whether it is legitimate to simplify
+         the inverse followed by the forward transformation to a unit
+         transformation).
+         [TRUE]
+      }
+      \sstsubsection{
          TOLER = \_DOUBLE (Read)
       } {
         The RMS tolerance in positions which is used to determine the
@@ -13174,13 +13095,6 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
         specified in coordinates with a higher accuracy or smaller
         units.
         [0.001]
-      }
-      \sstsubsection{
-         TRFILE = TRFILE (Read)
-      } {
-         If PLACEIN is given as \qt{FILE} then the value of this parameter
-         specifies the name of the container file to be used to store
-         the resultant transformation structures.
       }
       \sstsubsection{
          USEWCS = \_LOGICAL (Read)
@@ -13196,6 +13110,15 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
          This parameter is ignored if NDFNAMES is not TRUE.
          [TRUE]
+      }
+      \sstsubsection{
+         WCSFILE = NDF (Read)
+      }{
+         If PLACEIN is {\tt "}SINGLE{\tt "} then the value of this parameter gives the
+         the name of an image which will have the new coordinate systems
+         attached to it.  They will be added with domains given by the
+         OUTDOMAIN parameter with {\tt '}\_1{\tt '}, {\tt '}\_2{\tt '}, \ldots\ appended.  The image
+         named by this parameter must already exist.
       }
       \sstsubsection{
          XFOR = LITERAL (Read)
@@ -13285,7 +13208,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          This example works as above but this time the global
          transformations are derived for a full 6-parameter linear fit
          (which allows offset, rotation, magnification and shear).
-         The results are coded as coordinate frames with the Domain
+         The results are coded as attached coordinate systems labelled
+         {\tt '}RESULT-SET1{\tt '}.
       }
       \sstexamplesubsection{
          register inlist=\qs{\qt{myimage1,myimage2}} fittype=4 refpos=2
@@ -13326,16 +13250,16 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       \sstexamplesubsection{
          register ndfnames=false inlist={\tt '}{\tt "}list1.acc,list2.acc,list3.acc{\tt "}{\tt '}
       }{
-               fittype=3 placein=ndf outformat=transform
-               in={\tt '}{\tt "}image1,image2,image3{\tt "}{\tt '}
+               fittype=3 placein=each in={\tt '}{\tt "}image1,image2,image3{\tt "}{\tt '}
          In this example the input position lists are not associated
          with images (ndfnames=false) and have to be specified by name
          (no wildcards allowed). Since the position lists are not
          associated with images there is no natural home for the
-         transform structures. In this example it has been decided to
-         place the transforms in images anyway. PLACEIN could also be
-         given as {\tt "}file{\tt "} in which case the transform structures are
-         written to a container file, under the items TRN\_1, TRN\_2 ...
+         new coordinate systems. In this example it has been decided to
+         attach the coordinate systems to a set of images anyway.
+         PLACEIN could also be given as {\tt "}SINGLE{\tt "} in which case the
+         coordinate systems would be attached to a single image with
+         Domain names CCD\_REG\_1, CCD\_REG\_2, ...
       }
    }
    \sstnotes{
@@ -13402,17 +13326,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
         .MORE.CCDPACK structure of the input NDFs will be located
         and assumed to contain the names of the lists whose positions
         are to be used for registration.
-
-        On exit, if OUTFORMAT is \qt{WCS} then a new coordinate system 
-        with a label as given by the OUTDOMAIN parameter will be 
-        attached to the input NDFs.  Taken together these contain the
-        registration information and can be inspected using WCSEDIT.    
-      
-        If OUTFORMAT is \qt{TRANSFORM} then an item \qt{TRANSFORM} will be
-        added to the .MORE.CCDPACK structure of the input NDFs.
-        This contains the registration information as a TRANSFORM
-        structure and may be inspected using the ADAM utility 
-        HDSTRACE (\xref{SUN/102}{sun102}{}).
+ 
+        On exit, a new coordinate frame with a Domain as given by the
+        OUTDOMAIN parameter will be inserted in the WCS component of 
+        the input NDFs.  Taken together these contain the registration
+        information and can be inspected using WCSEDIT.
    }
    \sstdiytopic{
       Behaviour of parameters
@@ -16012,11 +15930,11 @@ This is a major update to CCDPACK.
        \end{itemize}
 
     \item
-    The default way of handling coordinate mappings is now using 
+    Coordinate transformations are now stored using AST coordinate
     frames in the WCS components of NDFs, rather than using 
     TRANSFORM structures stored in the .MORE.CCDPACK extension.
-    All applications retain the option of using the previous
-    functionality for backwards compatibility however.
+    For backward compatibility however all applications retain their 
+    old ability to read TRANFORM structures.
 
     The position list coordinates dealt with by FINDOFF and 
     REGISTER are now by default converted from pixel coordinates to

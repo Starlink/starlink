@@ -39,78 +39,16 @@ Description:
    transform only two lists may be registered at any time.
 
    The results from REGISTER are reported via the logging system
-   and then coded either as new coordinate systems or as TRANSFORM
-   structures containing the final algebraic solutions for each
-   input list.  The new coordinate systems will be a copy of the
-   pixel coordinate system of the reference image, and are stored in
-   the WCS components of the associated images. Transform structures
-   may be stored in the CCDPACK exensions of the associated images or
-   within a named HDS container file if no associated images exist.
-   Whether TRANSFORM structures or frames within the WCS components
-   are chosen, they can be used by the applications TRANNDF and
-   TRANLIST to resample the datasets or transform position lists
-   respectively.
+   and then coded as new coordinate systems attached to images.
+   Normally, the new coordinate systems will be attached to the
+   images with which the lists are associated, but if the lists are
+   not associated with images then they can be attached to a named
+   list of images, or a single named one.  The TRANNDF program can
+   use the attached coordinate systems to resample images.
 
 Parameters
 
 For information on individual parameters, select from the list below:
-
-CLASS
-
-CLASS( ) = LITERAL (Read)
-   If CLASSIFY is TRUE then a list of classifications that
-   describe the properties of the transformation (parameters
-   XFOR, YFOR, XINV and YINV) should be given. This is
-   optional, but the information can be used to make other
-   applications run more efficiently.  What values are valid
-   depends on whether the transformations are being stored as
-   TRANSFORM structures or as AST Mappings.
-
-   For AST Mappings the following can be used:
-
-      - SIMPFI        -- Forward followed by inverse transformation
-                         can be simplified to a unit mapping.
-
-      - SIMPIF        -- Inverse followed by forward transformation
-                         can be simplified to a unit mapping.
-
-   and for TRANSFORM structures the following can be used:
-
-      - LINEAR        -- Linear and preserves straight lines.
-
-      - INDEPENDENT   -- Preserves the independence of the axes.
-
-      - DIAGONAL      -- Preserves the axes themselves.
-
-      - ISOTROPIC     -- Preserves angles and shapes.
-
-      - POSITIVE_DET  -- A component of reflection is absent.
-
-      - NEGATIVE_DET  -- A component of reflection is present.
-
-      - CONSTANT_DET  -- The scale factor is constant.
-
-      - UNIT_DET      -- Areas (or volumes etc.) are preserved.
-
-   See SUN/61 Appendix B for details of transformation
-   classification and a table of classifications of common
-   mappings.
-
-   This parameter is only used when IFIT=6.
-
-CLASSIFY
-
-CLASSIFY = _LOGICAL (Read)
-   If TRUE then this indicates that you want to classify the
-   transform. Classifying a transformation can help in later
-   processing and allows applications to reject transformations
-   that they cannot use. The topic of classification is discussed
-   in SUN/61 which should be consulted before using this option.
-   Linear transformations are classified by this routine directly
-   and do not use this parameter.
-
-   This parameter is only used when IFIT=6.
-   [FALSE]
 
 FA-FZ
 
@@ -148,6 +86,7 @@ FITTYPE = _INTEGER (Read)
       - 5 -- a full six parameter fit
 
       - 6 -- self defined function
+
    [5]
 
 FULL
@@ -169,12 +108,11 @@ FULL = _LOGICAL (Read)
 IN
 
 IN = LITERAL (Read)
-   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of image
-   names in which to store the WCS frames or transformation
-   structures is required. This list of names must correspond
-   exactly to the order of the associated input lists. A listing
-   of the order of inputs is shown before this parameter is
-   accessed.
+   If NDFNAMES is FALSE and PLACEIN is "EACH" then a list of image
+   names in which to store the WCS frames is required.  This
+   list of names must correspond  exactly to the order of the
+   associated input lists. A listing of the order of inputs is
+   shown before this parameter is accessed.
 
    The image names may (although this is probably not advisable)
    be specified using wildcards, or may be specified using an
@@ -237,15 +175,14 @@ NDFNAMES
 
 NDFNAMES = _LOGICAL (Read)
    This parameter specifies whether the names of the input
-   positions lists are stored in the CCDPACK extensions of images.
+   positions lists are stored in the CCDPACK extensions of NDFs.
    If TRUE then the INLIST parameter accesses a list of images
    which are used to get the associated positions lists. If FALSE
    then INLIST just accesses the position list names directly.
 
    If the names of the lists are stored in the CCDPACK NDF
-   extension then the final WCS frame information or
-   transformation structure is also written to the image
-   extension.
+   extension then the new coordinate system is attached to
+   the associated image.
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
@@ -254,47 +191,23 @@ NDFNAMES = _LOGICAL (Read)
 OUTDOMAIN
 
 OUTDOMAIN = LITERAL (Read)
-   If OUTFORMAT is 'WCS', the transformation information is
-   written as a new coordinate frame to the WCS component of the
-   image.  The frame normally has a Domain name of 'CCD_REG', but
-   that can be overridden with this parameter.  When this frame
-   is added, any previously existing frame which has the same
-   Domain is removed.
+   The transformation information is written as a new coordinate
+   system attached to the image.  This parameter gives the label
+   (domain) of the new coordinate system.  When the new
+   coordinate system is added, any previously existing one with
+   the same Domain will be removed.
+
+   If PLACEIN is "FILE", then the new coordinate systems are all
+   attached to a single image.  In this case the  domains are
+   OUTDOMAIN_1, OUTDOMAIN_2, ....
 
    The name is converted to upper case, and whitespace is removed.
    [CCD_REG]
 
-OUTFORMAT
-
-OUTFORMAT = LITERAL (Read)
-   If NDFNAMES is TRUE, or PLACEIN is 'NDF', then this parameter
-   specifies how the transformation is to be written into the
-   images.  There are two possible values:
-
-      - WCS       -- written into WCS component of the NDF
-
-      - TRANSFORM -- written as a TRANSFORM structure into the
-                     .MORE.CCDPACK extension of the NDF
-
-   If WCS is chosen, then a new coordinate frame, with a Domain
-   (name) value given by OUTDOMAIN, is added to the WCS
-   component of the image (a new WCS component is created if none
-   previously existed).  A mapping between these coordinates and
-   pixel coordinates is defined, which is the unit mapping in
-   the case that the image in question is the reference set.  If
-   any frame in the domain OUTDOMAIN already exists in the WCS
-   component, it will be erased, so that after successful
-   processing by REGISTER it will contain only one frame so
-   named.
-
-   OUTFORMAT=WCS is currently only possible for linear
-   transformations (FITTYPE values between 1 and 5).
-   [WCS]
-
 PA-PZ
 
 PA-PZ = LITERAL (Read)
-   When FITTYPE=6 these parameters are used for supplying initial
+   When FITTYPE is 6 these parameters are used for supplying initial
    guesses at the values of the fit parameters. Normally the
    values of these parameters are not critical, but occasionally
    the minimization routine fails due to numeric problems (these
@@ -309,15 +222,15 @@ PLACEIN = LITERAL (Read)
    you would like to store the final transformation structures.
    The options are:
 
-      - NDF  -- store them in NDF extensions
+      - EACH    -- attach them one per image in a set of images
 
-      - FILE -- store them in a container file.
+      - SINGLE  -- attach them all to a single image
 
-   If the NDF option is chosen then you will have the option of
-   supplying the NDF names via the parameter IN. If the FILE
-   option is chosen then the name of an HDS container file should
-   be given in response to the TRFILE parameter.
-   [NDF]
+   If the EACH option is chosen then you will have the option of
+   supplying the image names via the parameter IN. If the EACH
+   option is chosen then the name of an existing image should be
+   given in response to the WCSFILE parameter.
+   [EACH]
 
 REFPOS
 
@@ -325,6 +238,24 @@ REFPOS = _INTEGER (Read)
    The position within the list of inputs which corresponds to
    the list to be used as the reference set.
    [1]
+
+SIMPFI
+
+SIMPFI = _LOGICAL (Read)
+   If FITTYPE=6 and FULL=TRUE, this gives the value of the
+   mapping's SimpFI attribute (whether it is legitimate to simplify
+   the forward followed by the inverse transformation to a unit
+   transformation).
+   [TRUE]
+
+SIMPIF
+
+SIMPIF = _LOGICAL (Read)
+   If FITTYPE=6 and FULL=TRUE this gives the value of the
+   mapping's SimpIF attribute (whether it is legitimate to simplify
+   the inverse followed by the forward transformation to a unit
+   transformation).
+   [TRUE]
 
 TOLER
 
@@ -335,13 +266,6 @@ TOLER = _DOUBLE (Read)
    units.
    [0.001]
 
-TRFILE
-
-TRFILE = TRFILE (Read)
-   If PLACEIN is given as "FILE" then the value of this parameter
-   specifies the name of the container file to be used to store
-   the resultant transformation structures.
-
 USEWCS
 
 USEWCS = _LOGICAL (Read)
@@ -350,12 +274,21 @@ USEWCS = _LOGICAL (Read)
    into the Current coordinate system of the associated image
    before use.  It should normally be set TRUE, in which case
    the transformation type set by the FITTYPE parameter is the
-   type which will be fit between the Current coordinate frames
-   of the image.  Otherwise the fit will be between the positions
+   type which will be fit between the Current coordinate systems
+   of the images.  Otherwise the fit will be between the positions
    in pixel coordinates.
 
    This parameter is ignored if NDFNAMES is not TRUE.
    [TRUE]
+
+WCSFILE
+
+WCSFILE = NDF (Read)
+   If PLACEIN is "SINGLE" then the value of this parameter gives the
+   the name of an image which will have the new coordinate systems
+   attached to it.  They will be added with domains given by the
+   OUTDOMAIN parameter with '_1', '_2', ... appended.  The image
+   named by this parameter must already exist.
 
 XFOR
 
@@ -433,18 +366,18 @@ register inlist='*' fittype=1
    images  can then be achieved by aligning all the images in the
    CCD_REG domain using TRANNDF.
 
-register inlist='*' trtype=5 outdomain=result-set1
+register inlist='*' fittype=5 outdomain=result-set1
    This example works as above but this time the global
    transformations are derived for a full 6-parameter linear fit
    (which allows offset, rotation, magnification and shear).
-   The results are coded as coordinate frames with the Domain
+   The results are coded as attached coordinate systems labelled
    'RESULT-SET1'.
 
 register inlist='"myimage1,myimage2"' fittype=4 refpos=2
    In this example a solid body fit is performed between the
    position lists associated with the images myimage1 and myimage2.
    The reference positions are chosen to be those associated with
-   myimage2, so that the CCD_REG frame coordinates will be the
+   myimage2, so that the CCD_REG coordinates will be the
    same as the pixel coordinates of image myimage2.
 
 register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
@@ -471,16 +404,16 @@ register inlist='"image1,image2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
    only the forward transformation).
 
 register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
-         fittype=3 placein=ndf outformat=transform
-         in='"image1,image2,image3"'
+         fittype=3 placein=each in='"image1,image2,image3"'
    In this example the input position lists are not associated
    with images (ndfnames=false) and have to be specified by name
    (no wildcards allowed). Since the position lists are not
    associated with images there is no natural home for the
-   transform structures. In this example it has been decided to
-   place the transforms in images anyway. PLACEIN could also be
-   given as "file" in which case the transform structures are
-   written to a container file, under the items TRN_1, TRN_2 ...
+   new coordinate systems. In this example it has been decided to
+   attach the coordinate systems to a set of images anyway.
+   PLACEIN could also be given as "SINGLE" in which case the
+   coordinate systems would be attached to a single image with
+   Domain names CCD_REG_1, CCD_REG_2, ...
 
 Notes
 
@@ -528,17 +461,10 @@ Notes
   and assumed to contain the names of the lists whose positions
   are to be used for registration.
 
-  On exit, if OUTFORMAT is "WCS" then a new frame with domain
-  name given by the OUTDOMAIN parameter will be added to the
-  .WCS component of input NDFs.  Taken together these contain the
-  registration information and can be inspected using NDFTRACE
-  or WCSSHOW (SUN/95).
-
-  If OUTFORMAT is "TRANSFORM" then an item "TRANSFORM" will be
-  added to the .MORE.CCDPACK structure of the input NDFs.
-  This contains the registration information as a TRANSFORM
-  structure and may be inspected using the utility HDSTRACE
-  (SUN/102).
+  On exit, a new coordinate frame with a Domain as given by the
+  OUTDOMAIN parameter will be inserted in the WCS component of 
+  the input NDFs.  Taken together these contain the registration
+  information and can be inspected using WCSEDIT.
 
 Behaviour_of_parameters
 
@@ -602,4 +528,7 @@ History
  12-NOV-1999 (MBT):
     Modified so that general transformations can be output into
     WCS components as MathMaps.
+
+ 15-NOV-1999 (MBT):
+    Removed the possibility to write results as TRANSFORM structures.
 .endhelp

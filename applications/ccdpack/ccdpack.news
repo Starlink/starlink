@@ -15,11 +15,11 @@
           New script:
              WCSEXERCISE - test WCS-related functionality (not IRAF)
 
-     - The default way of handling coordinate mappings is now using 
+     - Coordinate transformations are now stored using AST coordinate
        frames in the WCS components of NDFs, rather than using 
        TRANSFORM structures stored in the .MORE.CCDPACK extension.
-       All applications retain the option of using the previous
-       functionality for backwards compatibility however.
+       For backward compatibility however all applications retain their 
+       old ability to read TRANFORM structures.
 
        The position list coordinates dealt with by FINDOFF and 
        REGISTER are now by default converted from pixel coordinates to
