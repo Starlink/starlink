@@ -73,6 +73,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     27-MAY-1997 (RFWS):
 *        Improved the astSimplify method to use astMapMerge to
 *        simplify a single Mapping where possible.
+*     29-MAY-1998 (RFWS):
+*        Added the MapBox method.
 *class--
 */
 
@@ -152,7 +154,6 @@ static int GetInvert( AstMapping * );
 static int GetNin( AstMapping * );
 static int GetNout( AstMapping * );
 static int GetReport( AstMapping * );
-static int GetTranDef( AstMapping *, int );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -512,64 +513,6 @@ static int GetNout( AstMapping *this ) {
    return result;
 }
 
-static int GetTranDef( AstMapping *this, int forward ) {
-/*
-*+
-*  Name:
-*     astGetTranDef
-
-*  Purpose:
-*     Determine if a Mapping defines a coordinate transformation.
-
-*  Type:
-*     Protected virtual function.
-
-*  Synopsis:
-*     #include "mapping.h"
-*     int astGetTranDef( AstMapping *this, int forward )
-
-*  Class Membership:
-*     Mapping method.
-
-*  Description:
-*     This function returns a value indicating whether a Mapping is
-*     able to perform a coordinate transformation in a specified
-*     direction (i.e.  whether the forward or the inverse
-*     transformation is defined).
-
-*  Parameters:
-*     this
-*        Pointer to the Mapping.
-*     forward
-*        A non-zero value indicates that information is required about
-*        the forward coordinate transformation, while a zero value
-*        requests information about the inverse transformation.
-
-*  Returned Value:
-*     Zero if the coordinate transformation is not defined, or 1 if it is.
-
-*  Notes:
-*     - Use of this function is deprecated - use astGetTranForward
-*     and/or astGetTranInverse instead.
-*     - A value of zero will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
-*-
-*/
-
-/* Local Variables: */
-   int result;                      /* Transformation defined? */
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Obtain the required information. */
-   result = forward ? astGetTranForward( this ) : astGetTranInverse( this );
-
-/* Return the result. */
-   return result;
-}
-
 static int GetTranForward( AstMapping *this ) {
 /*
 *+
@@ -834,7 +777,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
          active_lo[ coord ] = DBL_MAX;;
          active_hi[ coord ] = -DBL_MAX;
 
-/* Initialise the nominal widths of the sampled region to be twice the
+/* Initialise the nominal widths of the sampled region to be the
    actual widths of the search region times the over-size factor. */
          sample_width[ coord ] = ( mapdata->ubnd[ coord ] -
                                    mapdata->lbnd[ coord ] ) * oversize;
@@ -1102,7 +1045,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    its position. */
                } else if ( new_min < *lbnd ) {
                   nsame_min = ( ( *lbnd - new_min ) > acc ) ? 1 :
-                  nsame_min + 1;
+                                                              nsame_min + 1;
                   *lbnd = new_min;
                   for ( coord = 0; coord < ncoord; coord++ ) {
                      xl[ coord ] = x[ coord ];
@@ -1151,20 +1094,22 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    bad. */
          } else {
             if ( batch >= nbatch ) FILL_POSITION_BUFFER;
-            for ( coord = 0; coord < mapdata->nout; coord++ ) {
-                bad = ( ptr_out[ coord ][ batch ] == AST__BAD );
-                if ( bad ) break;
-            }
-            if ( !bad ) {
-               for ( coord = 0; coord < ncoord; coord++ ) {
-                  x[ coord ] = ptr_in[ coord ][ batch ];
+            if ( astOK ) {
+               for ( coord = 0; coord < mapdata->nout; coord++ ) {
+                  bad = ( ptr_out[ coord ][ batch ] == AST__BAD );
+                  if ( bad ) break;
                }
+               if ( !bad ) {
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     x[ coord ] = ptr_in[ coord ][ batch ];
+                  }
+               }
+               batch++;
             }
-            batch++;
          }
 
 /* If the coordinates are OK, update the active region limits. */
-         if ( !bad ) {
+         if ( astOK && !bad ) {
             for ( coord = 0; coord < ncoord; coord++ ) {
                if ( x[ coord ] < active_lo[ coord ] ) {
                   active_lo[ coord ] = x[ coord ];
@@ -1202,7 +1147,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 
                } else if ( new_max > *ubnd ) {
                   nsame_max = ( ( new_max - *ubnd ) > acc ) ? 1 :
-                  nsame_max + 1;
+                                                              nsame_max + 1;
                   *ubnd = new_max;
                   for ( coord = 0; coord < ncoord; coord++ ) {
                      xu[ coord ] = x[ coord ];
@@ -1227,12 +1172,12 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    }
 
 /* Free workspace. */
-   x = astFree( x );
    active_hi = astFree( active_hi );
    active_lo = astFree( active_lo );
    sample_hi = astFree( sample_hi );
    sample_lo = astFree( sample_lo );
    sample_width = astFree( sample_width );
+   x = astFree( x );
 
 /* Annul temporary PointSets. */
    pset_in = astAnnul( pset_in );
@@ -1328,7 +1273,6 @@ static void InitVtab( AstMappingVtab *vtab ) {
    vtab->GetNin = GetNin;
    vtab->GetNout = GetNout;
    vtab->GetReport = GetReport;
-   vtab->GetTranDef = GetTranDef;
    vtab->GetTranForward = GetTranForward;
    vtab->GetTranInverse = GetTranInverse;
    vtab->Invert = Invert;
@@ -1688,6 +1632,8 @@ static void MapBox( AstMapping *this,
    MapData mapdata;              /* Structure to describe Mapping function */
    double *x_l;                  /* Pointer to coordinate workspace */
    double *x_u;                  /* Pointer to coordinate workspace */
+   double lbnd;                  /* Required lower bound */
+   double ubnd;                  /* Required upper bound */
    int coord;                    /* Loop counter for coordinates. */
    int nin;                      /* Effective number of input coordinates */
    int nout;                     /* Effective number of output coordinates */
@@ -1713,11 +1659,9 @@ static void MapBox( AstMapping *this,
    }
 
 /* Initialise a MapData structure to describe the Mapping function
-   whose limits are to be found... */
+   whose limits are to be found.  Since it may be evaluated many
+   times, we attempt to simplify the Mapping supplied. */
    if ( astOK ) {
-
-/* Since it may be evaluated many times. we attempt to simplify the
-   Mapping supplied. */
       mapdata.mapping = astSimplify( this );
 
 /* Store the number of input/output coordinates and the index of the
@@ -1729,7 +1673,8 @@ static void MapBox( AstMapping *this,
 /* Note which Mapping transformation is being used. */
       mapdata.forward = forward;
 
-/* Store pointers to the arrays of input coordinate bounds. */
+/* Store pointers to arrays which will contain the input coordinate
+   bounds. */
       mapdata.lbnd = astMalloc( sizeof( double ) * (size_t) nin );
       mapdata.ubnd = astMalloc( sizeof( double ) * (size_t) nin );
 
@@ -1749,9 +1694,11 @@ static void MapBox( AstMapping *this,
 
 /* Initialise the output bounds and corresponding input coordinates to
    "unknown". */
-         *lbnd_out = *ubnd_out = AST__BAD;
+         lbnd = AST__BAD;
+         ubnd = AST__BAD;
          for ( coord = 0; coord < nin; coord++ ) {
-            x_l[ coord ] = x_u[ coord ] = AST__BAD;
+            x_l[ coord ] = AST__BAD;
+            x_u[ coord ] = AST__BAD;
 
 /* Initialise the input bounds, ensuring they are the correct way
    around (if not already supplied this way). */
@@ -1763,11 +1710,11 @@ static void MapBox( AstMapping *this,
 
 /* First examine a set of special input points to obtain an initial
    estimate of the required output bounds. */
-         SpecialBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
+         SpecialBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
 
 /* Then attempt to refine this estimate using a global search
    algorithm. */
-         GlobalBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
+         GlobalBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
 
 /* If an error occurred, generate a contextual error message. */
          if ( !astOK ) {
@@ -1776,20 +1723,24 @@ static void MapBox( AstMapping *this,
          }
       }
 
-/* If required, return the input coordinate values which correspond
-   with the output bounds found. */
-      for ( coord = 0; astOK && ( coord < nin ); coord++ ) {
-         if ( xl ) xl[ coord ] = x_l[ coord ];
-         if ( xu ) xu[ coord ] = x_u[ coord ];
+/* Return the output bounds and, if required, the input coordinate
+   values which correspond with them. */
+      if ( astOK ) {
+         *lbnd_out = lbnd;
+         *ubnd_out = ubnd;
+         for ( coord = 0; coord < nin; coord++ ) {
+            if ( xl ) xl[ coord ] = x_l[ coord ];
+            if ( xu ) xu[ coord ] = x_u[ coord ];
+         }
       }
 
 /* Annul the simplified Mapping pointer and the temporary
    PointSets. Also free the workspace. */
       mapdata.mapping = astAnnul( mapdata.mapping );
-      mapdata.pset_in = astAnnul( mapdata.pset_in );
-      mapdata.pset_out = astAnnul( mapdata.pset_out );
       mapdata.lbnd = astFree( mapdata.lbnd );
       mapdata.ubnd = astFree( mapdata.ubnd );
+      mapdata.pset_in = astAnnul( mapdata.pset_in );
+      mapdata.pset_out = astAnnul( mapdata.pset_out );
       x_l = astFree( x_l );
       x_u = astFree( x_u );
    }
@@ -2244,8 +2195,8 @@ static double NewVertex( const MapData *mapdata, int lo, double scale,
 *        Pointer to a MapData structure which describes the Mapping
 *        function to be used.
 *     lo
-*        The index of the simplex vertex which initially has the worst
-*        (lowest) value.
+*        The (zero-based) index of the simplex vertex which initially
+*        has the worst (lowest) value.
 *     scale
 *        The scale factor to be used to generate the new vertex. The
 *        distance of the worst vertex from the centre of the face
@@ -2383,7 +2334,7 @@ static double Random( long int *seed ) {
 /* Local Variables: */
    long int i;                   /* Temporary storage */
 
-/* This a basic random number generator using the constants given in
+/* This a basic random number generator using constants given in
    Numerical Recipes (Press et al.). */
    i = *seed / 127773;
    *seed = ( *seed - i * 127773 ) * 16807 - i * 2836;
@@ -2873,7 +2824,7 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    corner coordinates. */
    pset_in = astPointSet( npoint, ncoord, "" );
    ptr_in = astGetPoints( pset_in );
-   limit = astMalloc( ncoord * sizeof( int ) );
+   limit = astMalloc( sizeof( int ) * (size_t) ncoord );
    if ( astOK ) {
    
 /* Initialise the workspace. */
@@ -3894,12 +3845,14 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
    int vertex;                   /* Loop counter for vertices */
 
 /* Initialise. */
-   *err = DBL_MAX;
-   *ncall = 0;
    result = AST__BAD;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Further initialisation. */
+   *err = DBL_MAX;
+   *ncall = 0;
 
 /* Obtain the number of input coordinates for the Mapping function and
    calculate the number of simplex vertices. */
@@ -3968,7 +3921,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
    which function values have been requested reaches three times this
    limit (this latter number will typically be larger because points
    lying outside the coordinate constraints do not result in the
-   Mapping function being evaluated. */
+   Mapping function being evaluated). */
          if ( range <= fabs( acc ) ||
               ( *ncall >= maxcall ) || ( ncalla >= ( 3 * maxcall ) ) ) {
 
@@ -4004,28 +3957,24 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
    boundary once it has become small enough. */
             if ( fnew == AST__BAD ) {
 
-/* To overcome this, we instead contract the worst simplex vertex by a
-   factor of two towards the best vertex (this has the cumulative
-   effect of contracting the simplex without changing its
-   shape). First find the offset in each coordinate between these two
-   vertices. */
+/* To overcome this, we instead contract the worst simplex vertex
+   towards the best vertex (this has the cumulative effect of
+   contracting the simplex without changing its shape). First find the
+   offset in each coordinate between these two vertices. */
                for ( coord = 0; coord < ncoord; coord++ ) {
                   offset = x[ lo * ncoord + coord ] - x[ hi * ncoord + coord ];
 
-/* Ensure the offset will underflow to zero when divided by two, so
-   that the two points will eventually coalesce (as opposed to
-   remaining separated by one bit). This ensures that the error
-   estimate will eventually reach zero. */
-                  if ( ( fabs( offset ) <= ( DBL_EPSILON *
-                         fabs( x[ lo * ncoord + coord ] ) ) ) ||
-                       ( fabs( offset ) <= ( DBL_EPSILON *
-                         fabs( x[ hi * ncoord + coord ] ) ) ) ) {
-                     offset = 0.0;
-                  }
-
-/* Calculate the new coordinate. */
+/* Scale the offset to obtain the new coordinate. */
                   x[ lo * ncoord + coord ] = x[ hi * ncoord + coord ] +
                                              offset / factor;
+
+/* If the distance between the two vertices has not decreased, we are
+   in a region where rounding errors prevent them approaching each
+   other any more closely, so simply set them equal. */
+                  if ( fabs( x[ lo * ncoord + coord ] -
+                             x[ hi * ncoord + coord ] ) >= fabs( offset ) ) {
+                     x[ lo * ncoord + coord ] = x[ hi * ncoord + coord ];
+                  }
                }
 
 /* Evaluate the Mapping function at the new vertex. */
@@ -4035,39 +3984,37 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 
 /* We now return to the standard simplex algorithm. If the new vertex
    is a new maximum, then see if more of the same is even better by
-   trying to expand the best vertex by a factor of two away from the
-   opposite face. */
+   trying to expand the best vertex away from the opposite face. */
             } else if ( fnew >= f[ hi ] ) {
                fnew = NewVertex( mapdata, lo, factor, x, f, ncall, xnew );
                ncalla++;
 
 /* Otherwise, if the new vertex was no improvement on the second
-   worst, then try contracting the worst vertex by a factor of two
-   towards the opposite face. */
+   worst, then try contracting the worst vertex towards the opposite
+   face. */
             } else if ( fnew <= f[ nextlo ] ) {
                fsave = f[ lo ];
                fnew = NewVertex( mapdata, lo, 1.0 / factor, x, f, ncall, xnew );
                ncalla++;
 
 /* If this didn't result in any improvement, then contract the entire
-   simplex by a factor of two towards the best vertex. Use the same
-   approach as earlier to protect against rounding so that all the
-   simplex vertices will eventually coalesce if this process is
-   repeated enough times. */
+   simplex towards the best vertex. Use the same approach as earlier
+   to protect against rounding so that all the simplex vertices will
+   eventually coalesce if this process is repeated enough times. */
                if ( astOK && ( fnew <= fsave ) ) {
                   for ( vertex = 0; vertex < nvertex; vertex++ ) {
                      if ( vertex != hi ) {
                         for ( coord = 0; coord < ncoord; coord++ ) {
                            offset = x[ vertex * ncoord + coord ] -
                                     x[ hi * ncoord + coord ];
-                           if ( ( fabs( offset ) <= ( DBL_EPSILON *
-                                  fabs( x[ lo * ncoord + coord ] ) ) ) ||
-                                ( fabs( offset ) <= ( DBL_EPSILON *
-                                  fabs( x[ hi * ncoord + coord ] ) ) ) ) {
-                              offset = 0.0;
-                           }
                            x[ vertex * ncoord + coord ] =
                                x[ hi * ncoord + coord ] + offset / factor;
+                           if ( fabs( x[ vertex * ncoord + coord ] -
+                                      x[ hi * ncoord + coord ] ) >=
+                                fabs( offset ) ) {
+                              x[ vertex * ncoord + coord ] =
+                                 x[ hi * ncoord + coord ];
+                           }
                         }
 
 /* Evaluate the Mapping function at each new vertex. */
@@ -4085,8 +4032,8 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
    }
 
 /* Free workspace. */
-   x = astFree( x );
    f = astFree( f );
+   x = astFree( x );
    xnew = astFree( xnew );
 
 /* If an error occurred, clear the returned result. */
@@ -5050,10 +4997,6 @@ int astGetNin_( AstMapping *this ) {
 int astGetNout_( AstMapping *this ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Mapping,GetNout))( this );
-}
-int astGetTranDef_( AstMapping *this, int forward ) {
-   if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,GetTranDef))( this, forward );
 }
 int astGetTranForward_( AstMapping *this ) {
    if ( !astOK ) return 0;
