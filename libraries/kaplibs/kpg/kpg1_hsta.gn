@@ -89,6 +89,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -102,6 +103,8 @@
 *        histogram itself.  Does not call KPG1_HSSTP and KPG1_HSTFD,
 *        but uses KPG1_STATx and KPG1_FRACx to find the statistics,
 *        apart from the mode, which is now derived by this routine.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +118,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+      INCLUDE 'CNF_PAR'          ! CNF_PVAL
 
 *  Arguments Given:
       LOGICAL BAD
@@ -241,7 +245,8 @@
 *  Obtain the percentiles using a fine histogram, iterating the
 *  histogram limits if there are extreme outliers.
             CALL KPG1_FRAC<T>( EL, DATA, NUMPER, PERCNT, BAD, 
-     :                         %VAL( FPNTR ), PERVAL, STATUS )
+     :                         %VAL( CNF_PVAL( FPNTR ) ), PERVAL, 
+     :                         STATUS )
 
 *  Release the workspace.
             CALL PSX_FREE( FPNTR, STATUS )
