@@ -57,6 +57,7 @@
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
 *    Local variables :
+      BYTE             BADBIT          ! Bad bit mask
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
                                        ! input file
@@ -117,6 +118,9 @@
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
+
+* Get the bad bit mask
+      CALL NDF_BB(IN_NDF, BADBIT, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -317,14 +321,16 @@
       CALL NDF_PROP (IN_NDF, 'DATA,QUALITY,VARIANCE', 'OUT',
      :  OUT_NDF, STATUS)
 
-*  map the output data arrays
+*  map the output data arrays (map QUALITY first so that it doesnt
+*  automatically mask DATA and VARIANCE)
 
+      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'UPDATE',
+     :  OUT_Q_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'UPDATE', OUT_D_PTR,
      :  ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'UPDATE', OUT_V_PTR,
      :  ITEMP, STATUS)
-      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_INTEGER', 'UPDATE',
-     :  OUT_Q_PTR, ITEMP, STATUS)
+ 
 
 *  flatfield the data 
 
@@ -333,9 +339,9 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
-     :     %val(OUT_D_PTR), %val(OUT_V_PTR), %val(OUT_Q_PTR), 
+     :     %val(OUT_D_PTR), %val(OUT_V_PTR), %val(OUT_Q_PTR),
      :     BOL_CHAN, BOL_ADC, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :     BOL_CALB, BOL_QUAL, STATUS)
+     :     BOL_CALB, BOL_QUAL, BADBIT, STATUS)
       END IF
 
 *  annul locators and array identifiers and close the file
