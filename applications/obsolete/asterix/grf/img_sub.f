@@ -2202,31 +2202,45 @@ c        ENDIF
 
 *  create or adjust space for data
         NVAL=I_N_1D
+	print *,1
+        call flush(6)
         CALL IMG_GET1D(NVAL,STATUS)
+	print *,2
+        call flush(6)
 
 *  map data and  axis values
         CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
         CALL ARR_COP1R(NVAL,%VAL(DPTR),%VAL(I_DPTR_1D),STATUS)
         CALL BDI_UNMAP(IFID,'Data',DPTR,STATUS)
+	print *,3
+        call flush(6)
 
 *  axis values
         CALL BDI_AXMAPR(IFID,1,'READ',XPTR,STATUS)
         CALL ARR_COP1R(NVAL,%VAL(XPTR),%VAL(I_APTR_1D),STATUS)
         CALL BDI_AXUNMAP(IFID,1,XPTR,STATUS)
+	print *,4
+        call flush(6)
 
 *  get variance and quality
         CALL BDI_MAPR(IFID,'Variance','READ',VPTR,STATUS)
         CALL ARR_COP1R(NVAL,%VAL(VPTR),%VAL(I_VPTR_1D),STATUS)
         CALL BDI_UNMAP(IFID,'Variance',VPTR,STATUS)
+	print *,5
+        call flush(6)
 
         CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
         CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR_1D),STATUS)
         CALL BDI_UNMAP(IFID,'Quality',QPTR,STATUS)
+	print *,6
+        call flush(6)
 
 *  get top level text
         CALL BDI_GET0C( IFID, 'Title', I_TITLE_1D, STATUS )
         CALL BDI_GET0C( IFID, 'Label', I_LABEL_1D, STATUS )
         CALL BDI_GET0C( IFID, 'Units', I_UNITS_1D, STATUS )
+	print *,7
+        call flush(6)
 
         CALL BDI_AXGET0C( IFID, 1, 'Units', I_XUNITS_1D, STATUS )
         CALL BDI_AXGET0C( IFID, 1, 'Label', I_XLABEL_1D, STATUS )
