@@ -65,6 +65,14 @@
 #    You will need to edit the paths and the definition of
 #    SGML_CATALOG_FILES at the top of the script.  
 #
+#    Note that this script requires the `ospcat' application, which is
+#    present in the OpenSP-1.4 distribution, but not in openjade-1.3.
+#    The current jade distribution included in the Starlink SGML Kit
+#    is based on the latter, so the ospcat application will not be
+#    present in the Kit, and this script will not work.  That is,
+#    this script is currently designed to work only on selected
+#    servers, and not as an integral part of the Starlink SGML Kit.
+#
 #  Copyright:
 #    Copyright 2000, Central Laboratory of the Research Councils
 #
@@ -79,9 +87,9 @@
 #    $Id$
 #-
 
-# Catalog path, and paths to binaries, are hard-coded
-OSPCAT=/home/norman/s/star/bin/sgml-goedel/OpenSP-1.4/bin/ospcat
-OSPENT=/home/norman/s/star/bin/sgml-goedel/OpenSP-1.4/bin/ospent
+# Catalog path, and paths to binaries, are hard-coded, but may be overridden.
+test -n "$OSPCAT" || OSPCAT=/home/norman/s/star/bin/sgml-goedel/OpenSP-1.4/bin/ospcat
+test -n "$OSPENT" || OSPENT=/home/norman/s/star/bin/sgml-goedel/OpenSP-1.4/bin/ospent
 
 SGML_CATALOG_FILES=/home/norman/s/src/sgml/w/sgml/dtd/CATALOG:/usr/local/lib/sgml/CATALOG
 export SGML_CATALOG_FILES
