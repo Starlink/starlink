@@ -43,12 +43,14 @@
 *     IB801 Orders to switch Cifer T5 lines to black
 *     IW82X Orders to switch Standard/RAL mods Pericom lines to white
 *     IB82X Orders to switch Pericom lines to black
+*     IW845 Orders to switch GraphOn 235 lines to white
+*     IB845 Orders to switch GraphOn 235 lines to black
 *
       INTEGER IESC
       PARAMETER (IESC=27)
       INTEGER NLEFT
       INTEGER IB800(2), IW800(2), IB801(2), IW801(2),
-     :        IB82X(2), IW82X(2)
+     :        IB82X(2), IW82X(2), IB845(2), IW845(2)
 *
 *  Cifers
       DATA IB800/IESC,16/
@@ -58,6 +60,9 @@
 *  Pericoms (Standard and Ral mods)
       DATA IB82X/IESC,120/
       DATA IW82X/IESC,96/
+*  GraphOn 235
+      DATA IB845/IESC,16/
+      DATA IW845/IESC,1/
 *
 *-----------------------------------------------------------------------
 
@@ -78,13 +83,20 @@
         ENDIF
 
 *   Pericoms (Standard and RAL mods)
-      ELSEIF( KWKTYP.EQ.820.OR.KWKTYP.EQ.821 ) THEN
+      ELSEIF( KWKTYP.EQ.820.OR.KWKTYP.EQ.821.OR.KWKTYP.EQ.825 ) THEN
         IF( IMODE .EQ. 1) THEN
           CALL GKIOBO(KIOPB,2,IW82X,NLEFT)
         ELSE
           CALL GKIOBO(KIOPB,2,IB82X,NLEFT)
         ENDIF
 
+*   GraphOn
+      ELSEIF( KWKTYP.EQ.845 ) THEN
+        IF( IMODE .EQ. 1) THEN
+          CALL GKIOBO(KIOPB,2,IW845,NLEFT)
+        ELSE
+          CALL GKIOBO(KIOPB,2,IB845,NLEFT)
+        ENDIF
       ENDIF
 
       END

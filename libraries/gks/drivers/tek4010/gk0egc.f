@@ -1,8 +1,3 @@
-
-*-----------------------------------------------------------------------
-
-
-
       SUBROUTINE GK0EGC(RIN,GIN,BIN,ROUT,GOUT,BOUT)
 *
 *-----------------------------------------------------------------------
@@ -52,9 +47,10 @@
         GOUT = ROUT
         BOUT = ROUT
 
-*   Standard Pericom, RAL mods Pericom & Cifer T5
+*   Standard Pericom, RAL mods Pericom, Pericom 7800, GraphOn 235 & Cifer T5
       ELSEIF( KWKTYP.EQ.801 .OR. KWKTYP.EQ.820 .OR.
-     :        KWKTYP.EQ.821 ) THEN
+     :        KWKTYP.EQ.821 .OR. KWKTYP.EQ.835 .OR.
+     :        KWKTYP.EQ.845) THEN
         ROUT = 0.0
         GOUT = ANINT((MIN(RIN,GIN,BIN)+MAX(RIN,GIN,BIN))*0.5)
         BOUT = 0.0

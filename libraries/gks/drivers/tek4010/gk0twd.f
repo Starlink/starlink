@@ -188,6 +188,8 @@
 *     11/03/91  KEVP  Scaled up pick aperture for high resolution workstation.
 *     01/08/91  KEVP  Moved Stack allocation for Polyline to after the
 *                     colour index check for correct stack usage (C89).
+*     16/07/92  DLT   Add Starlink no clear open escape and rectangular
+*                     fill optimization.
 *
 *  ARGUMENTS
 *  ---------
@@ -290,8 +292,9 @@
 *              - receiving WDT info for Inq Text Facil (size 12 max)
 *    XDC,YDC 2-element arrays for use in several entrypoints to
 *            hold location in DC.
-*     HARD   .TRUE. iff char size being altered by hardware
+*     HARD   .TRUE.  if char size being altered by hardware
 *     SOFT   .TRUE.  if linetype being done by software
+*     DONE   .TRUE. if rectangular fill done by hardware
 *     VALSTR String of characters representing valuator input
 *     PROMPT The prompt preceding input implemented by keyboard
 *     FORMT  Character variable to hold format in Request Valuator
@@ -319,8 +322,11 @@
       INTEGER INTA(19),IPREC(KFNTMX),IUS(1),IPRMST(8)
       REAL PATPD
       REAL REALA(12), XDC(2),YDC(2)
-      LOGICAL HARD, SOFT
+      LOGICAL HARD, SOFT, DONE
       CHARACTER VALSTR*12, PROMPT*50, FORMT*7
+      INTEGER INOCLR
+      SAVE INOCLR
+      DATA INOCLR/GNO/
       DATA IUS(1)/31/
       DATA IPRMST /83,116,114,105,110,103,63,58/
 *
@@ -369,6 +375,8 @@
 *        VT100 with Selanar 4010 board
 *        Standard Pericom Monterey
 *        Pericom Monterey with RAL mods
+*        Pericom 7800
+*        GraphOn 235
 *      Note that a pure emulator can always be run by regarding it
 *      as a T4010 (or possibly a T4014). It is only necessary to make
 *      special provision where additional codes are supported and there
@@ -492,6 +500,16 @@
          KWKDAT(ICHSIZ,KWKIX) = GHIGHR
          KWKDAT(ILTS,  KWKIX) = GHIGHR
          KWKDAT(ICLAS, KWKIX) = IEMUL
+      ELSEIF( KWKTYP.EQ.825 ) THEN
+*        Pericom 7800
+         KWKDAT(ICHSIZ,KWKIX) = GHIGHR
+         KWKDAT(ILTS,  KWKIX) = GLOWER
+         KWKDAT(ICLAS, KWKIX) = IEMUL
+      ELSEIF( KWKTYP.EQ.845 ) THEN
+*        GraphOn 235
+         KWKDAT(ICHSIZ,KWKIX) = GHIGHR
+         KWKDAT(ILTS,  KWKIX) = GHIGHR
+         KWKDAT(ICLAS, KWKIX) = IEMUL
       ELSE
 *        Have error here
          KERROR = -2010
@@ -527,7 +545,7 @@
      :          CALL GK0TSL(GLSOLI, SOFT, PATPD)
 
 * Erase screen
-          CALL GK0TCL
+          IF (INOCLR.EQ.GNO) CALL GK0TCL
         ENDIF
       ENDIF
       KWI1 = GOUTIN
@@ -651,6 +669,12 @@
 
 * Escape  (KESC)
   110 CONTINUE
+* Starlink no screen clear escape
+      IF (KWI1.EQ.-3) THEN
+         INOCLR = KWI2
+         GOTO 9999
+      END IF
+
       CALL GKESC
       GOTO 9999
 
@@ -784,6 +808,15 @@
             GOTO 9999
          ENDIF
       ENDIF
+*   If this is an emulator and it supports rectangular fill and we ve
+*   got a 4 point solid fill area then call routine to test for a ght
+*   rectangle
+      IF ( KWKDAT(ICLAS,KWKIX).EQ.IEMUL .AND.
+     :      KWFAIS(KWKIX).EQ.GSOLID .AND.
+     :            NRD.EQ.4 ) THEN
+        CALL GK0ERF(RX,RY,DONE)
+        IF (DONE) GOTO 152
+      END IF
 *   Set fill area scale factor
       IF (KDSRX(KWKIX).EQ.4096) THEN
         IFILSC = 4
@@ -791,6 +824,7 @@
         IFILSC = 1
       ENDIF
       CALL GKFILS(NRD,RX,RY,IFILSC,GK0TLN,GK0TLN)
+  152 CONTINUE
 *   Restore to drawing mode if necessary
       IF (   (KWKDAT(ICLAS,KWKIX).EQ.IEMUL)   .AND.
      :       (KWFACI(KWKIX).EQ.0)         )    THEN

@@ -1,7 +1,3 @@
-*---------------------------------------------------------------------
-
-
-
       SUBROUTINE GK0ECL
 *
 *-----------------------------------------------------------------------
@@ -55,6 +51,8 @@
 *            make both screens visible.
 *     IC821A Orders to switch RAL mods Pericom to alpha and
 *            make both screens visible.
+*     IC825A Orders to switch Pericom 7800 to VDU mode
+*     IC845A Orders to make both GraphOn 235 screens visible
 *
 *     .... Start of offsets and constants in KWKDAT & QWKDAT workspace ....
       INTEGER IBAUD
@@ -63,7 +61,8 @@
       INTEGER IESC,IUPARO,ISOH,ICTRLC,ICTRLX
       PARAMETER (IESC=27,IUPARO=94,ISOH=1,ICTRLC=3,ICTRLX=24)
       INTEGER NLEFT
-      INTEGER IC800A(3), IC801A(7), IC820A(4), IC821A(5)
+      INTEGER IC800A(3), IC801A(7), IC820A(4), IC821A(5),
+     :        IC825A(1),IC845A(5)
 *
 *  Cifer 2634 ...send on Close Workstation
 *     select alpha screen       (ESC,Uparrow,T)
@@ -80,6 +79,11 @@
 *     make both screens visible (ESC,\,5)
 *     select alpha screen       (ESC,SOH)
       DATA IC821A/IESC,92,53,IESC,ISOH/
+*  Pericom 7800...send on Close Workstation
+*     Exist graphics mode (CAN)
+      DATA IC825A/ICTRLX/
+*  Graphon 235...send on Close Workstation
+      DATA IC845A/IESC,91,50,35,122/
 *
 *-----------------------------------------------------------------------
 
@@ -102,6 +106,15 @@
 *   Pericom Monterey with RAL mods
       ELSEIF( KWKTYP.EQ.821) THEN
         CALL GKIOBO(KIOPB, 5,IC821A, NLEFT)
+
+*   Pericom 7800
+      ELSEIF( KWKTYP.EQ.825) THEN
+        CALL GKIOBO(KIOPB, 1,IC825A, NLEFT)
+
+*   GraphOn 235
+      ELSEIF( KWKTYP.EQ.845) THEN
+        CALL GKIOBO(KIOPB, 5,IC845A, NLEFT)
+
 
       ENDIF
 

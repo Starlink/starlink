@@ -1,7 +1,3 @@
-*-----------------------------------------------------------------------
-
-
-
       SUBROUTINE GK0EGI(INTA, REALA, PROMPT, STR, NOUT)
 *
 *-----------------------------------------------------------------------
@@ -81,6 +77,11 @@
 *     IB821B  Orders to switch Pericom Monterey to graphics:
 *             - enter graphics mode         (gs)
 *             - select graphics screen only (esc,\,4)
+*     IB825A  Orders to switch Pericom 7800 to alpha
+*     IB825B  Orders to switch Pericom 7800 to graphics
+*     IB845A  Orders to switch GraphOn 235 to alpha
+*     IB845B  Orders to switch GraphOn to graphics
+
 *
 *     .... Start of offsets and constants in KWKDAT & QWKDAT workspace...
       INTEGER IBAUD
@@ -90,7 +91,9 @@
       INTEGER IB800A(3), IB800B(3),
      :        IB801A(7), IB801B(13),
      :        IB820A(4), IB820B(4),
-     :        IB821A(5), IB821B(4)
+     :        IB821A(5), IB821B(4),
+     :        IB825A(1), IB825B(1),
+     :        IB845A(6), IB845B(6)
       INTEGER    IESC,    IGS,    ISOH,   ICTRLC, ICTRLX
       PARAMETER (IESC=27, IGS=29, ISOH=1, ICTRLC=3, ICTRLX=24)
 *  Cifer 2634
@@ -106,6 +109,12 @@
 *  Pericom Monterey with RAL mods
       DATA IB821A/IESC,92,53,IESC,ISOH/
       DATA IB821B/IGS,IESC,92,52/
+*  Pericom 7800
+      DATA IB825A/24/
+      DATA IB825B/29/
+*  GraphOn 235
+      DATA IB845A/24,27,91,48,35,122/
+      DATA IB845B/29,27,91,50,35,122/
 *
 *  ALGORITHM
 *  ---------
@@ -143,6 +152,15 @@
 *   Pericom Monterey with RAL mods
          CALL GKIOBO(KIOPB,5,IB821A,NLEFT)
 
+      ELSEIF (KWKTYP.EQ.825) THEN
+*    Pericom 7800. Select alpha screen
+         CALL GKIOBO(KIOPB,1,IB825A,NLEFT)
+
+      ELSEIF (KWKTYP.EQ.845) THEN
+*    GraphOn 235, Ensure that buffer has room for
+*    codes + prompt, display alpha screen and select alpha
+         CALL GKIOBO(KIOPB,6,IB845A,NLEFT)
+
       ENDIF
 
 
@@ -173,6 +191,14 @@
       ELSEIF (KWKTYP.EQ.821) THEN
 *   Pericom Monterey with RAL mods
          CALL GKIOBO(KIOPB,4,IB821B,NLEFT)
+
+      ELSEIF (KWKTYP.EQ.825) THEN
+*   Pericom 7800. Select graphics
+         CALL GKIOBO(KIOPB,1,IB825B,NLEFT)
+
+      ELSEIF (KWKTYP.EQ.845) THEN
+*   GraphOn 235. Display Graphics screen
+         CALL GKIOBO(KIOPB,6,IB845B,NLEFT)
 
       ENDIF
 

@@ -49,10 +49,12 @@
 *            This would be to switch back out of Tek mode.
 *    NLEFT   Returned by GKIOBO (and ignored)
 *
-      INTEGER IESC, IUPARO, IGS, ICTRLC
-      PARAMETER (IESC=27, IUPARO=94, IGS=29, ICTRLC=3)
+      INTEGER IESC, IUPARO, IGS, ICTRLC, ICAN
+      PARAMETER (IESC=27, IUPARO=94, IGS=29, ICTRLC=3, ICAN=24)
       INTEGER ITK800(6),ITK801(21),ITK82X(4)
       INTEGER IA810(4),IB810(2)
+      INTEGER ITK825(1)
+      INTEGER ITK845(7),IA845(1),IB845(1)
       INTEGER NLEFT
 *
 *  Cifer 2634 .... send on Open Workstation
@@ -84,6 +86,21 @@
 *    Switch to graphics mode     (GS)
 *    Select graphics screen only (ESC,\,4)
       DATA ITK82X/IGS,IESC,92,52/
+*
+*  Pericom 7800
+*  On open workstation, switch to graphics mode (gs)
+      DATA ITK825/IGS/
+*
+*  GraphOn 235
+*  On open workstation, select graphics mode (gs)
+*                       display both screens (esc[2#z)
+*                       select alpha mode (can)
+      DATA ITK845/IGS,IESC,91,50,35,122,ICAN/
+*  In the begin buffer, switch to graphics state (gs)
+*  in the end buffer, switch to VDU state (can)
+      DATA IA845/IGS/
+      DATA IB845/ICAN/
+
 *  -----------------------------------------------------------
 *
 
@@ -106,6 +123,18 @@
       ELSEIF(KWKTYP.EQ.820.OR.KWKTYP.EQ.821) THEN
         CALL GKIOBO(KIOPB, 4,ITK82X, NLEFT)
         CALL GKIOBO(KIOSN, 1,ITK82X, NLEFT)
+
+*   Pericom 7800
+      ELSEIF(KWKTYP.EQ.825) THEN
+        CALL GKIOBO(KIOPB, 1,ITK825, NLEFT)
+        CALL GKIOBO(KIOSN, 1,ITK825, NLEFT)
+
+*   GraphOn 235
+      ELSEIF(KWKTYP.EQ.845) THEN
+        CALL GKIOBO(KIOPB, 7,ITK845, NLEFT)
+        CALL GKIOBO(KIOSN, 1,ITK845, NLEFT)
+        CALL GKIOBO(KIOBB,1,IA845,NLEFT)
+        CALL GKIOBO(KIOEB,1,IB845,NLEFT)
 
       END IF
 *

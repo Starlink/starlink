@@ -1,7 +1,3 @@
-*-----------------------------------------------------------------------
-
-
-
       SUBROUTINE GK0EUW
 
 *  -----------------------------------------------------------
@@ -53,9 +49,11 @@
      :           IESC=27, IUPARO=94, IGS=29, ISOH=1, ICTRLC=3,
      :           ICTRLX=24)
       INTEGER IA800(3),IG800(3),
-     :        IA801(7),IG801(13),
-     :        IA820(4),IG820(4),
-     :        IA821(5),IG821(4)
+     :        IA801(2),IG801(13),
+     :        IA820(1),IG820(4),
+     :        IA821(2),IG821(4),
+     :        IA825(1),IG825(1),
+     :        IA845(1),IG845(1)
       INTEGER NLEFT
 *
 *  Cifer 2634 .... send on Update Workstation
@@ -69,9 +67,7 @@
 *
 *  Cifer T5 .... send on Update Workstation
 *  Select  alpha mode        (ESC,\)
-*  Unblank alpha screen      (<CTRL>+C,[,5,/,b)
-      DATA IA801/IESC,92,
-     :           ICTRLC,91,53,47,98/
+      DATA IA801/IESC,92/
 *  Switch  to Tek mode     (ESC,P,t)
 *  blank   alpha    screen (<CTRL>+C,[,0,/,b)
 *  unblank graphics screen (<CTRL>+C,[,6,/,b)
@@ -81,9 +77,7 @@
 *
 *  Standard Pericom Monterey MG200...send on Update Workstation
 *  Switch to alpha mode      (<CTRL>+X)
-*  make both screens visible (ESC,\,5)
-      DATA IA820/ICTRLX,
-     :           IESC,92,53/
+      DATA IA820/ICTRLX/
 *  switch to graphics   (GS)
 *  select graphics only (ESC,\,4)
       DATA IG820/IGS,
@@ -91,13 +85,23 @@
 *
 *  Pericom Monterey MG200 with RAL mods...send on Update Workstation
 *  Switch to alpha mode      (ESC,SOH)
-*  make both screens visible (ESC,\,5)
-      DATA IA821/IESC,ISOH,
-     :           IESC,92,53/
+      DATA IA821/IESC,ISOH/
 *  switch to graphics   (GS)
 *  select graphics only (ESC,\,4)
       DATA IG821/IGS,
      :           IESC,92,52/
+*
+*  Pericom 7800...send on Update workstation
+*  Switch to alpha mode
+      DATA IA825/ICTRLX/
+*  Switch to graphics
+      DATA IG825/IGS/
+*
+*  Graphon 235...send on update workstation
+*  Switch to alpha mode
+      DATA IA845/ICTRLX/
+*  Switch to graphics mode
+      DATA IG845/IGS/
 *  -----------------------------------------------------------
 *
 
@@ -111,7 +115,7 @@
 
 *   Cifer T5
       ELSEIF( KWKTYP.EQ.801) THEN
-        CALL GKIOBO(KIOPB, 7,IA801,NLEFT)
+        CALL GKIOBO(KIOPB, 2,IA801,NLEFT)
         CALL GKIOBO(KIOSN, 1,IA801,NLEFT)
         CALL GKIOBO(KIOPB,13,IG801,NLEFT)
 
@@ -122,15 +126,27 @@
 
 *   Standard Pericom Monterey
       ELSEIF(KWKTYP.EQ.820) THEN
-        CALL GKIOBO(KIOPB, 4,IA820,NLEFT)
+        CALL GKIOBO(KIOPB, 1,IA820,NLEFT)
         CALL GKIOBO(KIOSN, 1,IA820,NLEFT)
         CALL GKIOBO(KIOPB, 4,IG820,NLEFT)
 
 *   Pericom Monterey with RAL mods
       ELSEIF(KWKTYP.EQ.821) THEN
-        CALL GKIOBO(KIOPB, 5,IA821,NLEFT)
+        CALL GKIOBO(KIOPB, 2,IA821,NLEFT)
         CALL GKIOBO(KIOSN, 1,IA821,NLEFT)
         CALL GKIOBO(KIOPB, 4,IG821,NLEFT)
+
+*   Pericom 7800 with RAL mods
+      ELSEIF(KWKTYP.EQ.825) THEN
+        CALL GKIOBO(KIOPB, 1,IA825,NLEFT)
+        CALL GKIOBO(KIOSN, 1,IA825,NLEFT)
+        CALL GKIOBO(KIOPB, 1,IG825,NLEFT)
+
+*   GraphOn 235
+      ELSEIF(KWKTYP.EQ.845) THEN
+        CALL GKIOBO(KIOPB, 1,IA845,NLEFT)
+        CALL GKIOBO(KIOSN, 1,IA845,NLEFT)
+        CALL GKIOBO(KIOPB, 1,IG845,NLEFT)
 
       END IF
 *
