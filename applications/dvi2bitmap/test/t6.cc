@@ -24,6 +24,7 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::ends;
 #endif
 
 #include <string>
