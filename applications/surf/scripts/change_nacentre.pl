@@ -1,5 +1,6 @@
 #!/star/bin/ndfperl
 
+# Starlink prolog at end.
 # Perl program to add an offset to the bolometer positions
 # stored in a file.
 
@@ -128,3 +129,53 @@ ndf_annul($indf, $status);
 # Shut down ndf
 ndf_end($status);
 
+__END__
+
+*+
+*  Name:
+*    CHANGE_NACENTRE
+
+*  Purpose:
+*    Shift the Nasmyth centre of the array
+
+*  Language:
+*    Perl 5
+
+*  Description:
+*    This routine shifts the position of the Nasmyth centre of a
+*    SCUBA array. It can be used to take out the small difference
+*    between the centres of the LONG and SHORT wave arrays.
+*    Should be run after EXTINCTION.
+
+*  Usage:
+     change_nacentre [-h | -v ] infile dx dy
+
+*  ADAM Parameter:
+*    -h
+*      Return a help message only.
+*    -v
+*      Return the version number of scunoise
+*    infile
+*      Input file name. The file is modified in place.
+*    dx
+*      Shift in Nasmyth X (du3) direction
+*    dy
+*      Shift in Nasmyth Y (du4) direction
+
+*  Examples:
+*    change_nacentre
+*      Will prompt for input file name and shift
+*    change_nacentre file 5 -3
+*      Will move the array centre of file.sdf by (5,-3) arcsec.
+
+*  Notes:
+*    This command can only be reversed by running change_nacentre
+*    with minus the previous X,Y shift.
+*    EXTINCTION must have been run on the input file (otherwise the
+*    file will contain more than 1 array) -- this is not checked
+*    for explicitly.
+
+*  Related Applications:
+*    SURF: REBIN
+
+*-
