@@ -125,16 +125,24 @@
 *      7 Jul 89 : DCLOC not annulled (TJP)
 *     18 May 90 : Use of SPEC_SETSEARCH to establish SPECTRAL_SET type (TJP)
 *     10 Jun 92 : Error handling corrected. Obj.name replaced by filename (TJP)
-*     18 Jun 92 : Likelihood fitting catered for (TJP)
-*     19 Jun 92 : Handle case of b/g subtracted data for LIK fitting (TJP)
-*     24 Jun 92 : Both NGOOD and SSCALE passed back (TJP)
-*      1 Jul 92 : Bug fix when handling SPECTRAL_SET directly (TJP)
-*      8 Jul 92 : Don't get instrument response when GENUS is 'CLUS' (DJA)
-*     26 Nov 92 : Use quality when finding SSCALE (DJA)
-*     15 Nov 93 : Use PRO_GET routine to read PROCESSING flags (DJA)
-*     21 Jul 94 : Store background locator in dataset structure (DJA)
+*     18 Jun 1992 (TJP):
+*        Likelihood fitting catered for
+*     19 Jun 1992 (TJP):
+*        Handle case of b/g subtracted data for LIK fitting
+*     24 Jun 1992 (TJP):
+*        Both NGOOD and SSCALE passed back
+*      1 Jul 1992 (TJP):
+*        Bug fix when handling SPECTRAL_SET directly
+*      8 Jul 1992 (DJA):
+*        Don't get instrument response when GENUS is 'CLUS'
+*     26 Nov 1992 (DJA):
+*        Use quality when finding SSCALE
+*     15 Nov 1993 (DJA):
+*        Use PRO_GET routine to read PROCESSING flags
+*     21 Jul 1994 (DJA):
+*        Store background locator in dataset structure
 *     10 Mar 1995 (DJA):
-*        Adapted from old FIT_DATINGET.
+*        Adapted from old FIT_DATINGET. PRO_ -> PRF_ etc
 *     {enter_changes_here}
 
 *  Bugs:
@@ -211,6 +219,8 @@
 	LOGICAL BG			! B/g data file found?
 	LOGICAL BGSUB			! B/g subtracted flag set in data?
 	LOGICAL BGCOR			! Has b/g data been exposure corrected?
+
+      REAL			RSUM			! Real SSCALE
 
       INTEGER			BFID(NDSMAX)		! Bgnd datasets
       INTEGER			DCFID(NDSMAX)		! Source datasets
@@ -615,12 +625,12 @@ D	    print *,'ldim,udim :',ldim,udim
 *          Accumulate counts for data in likelihood case
             IF ( LIKSTAT ) THEN
               IF ( OBDAT(NDS).QFLAG ) THEN
-	        CALL FIT_DATINGET_COUNTSQ(OBDAT(NDS).NDAT,
+	        CALL FIT_GETDAT_COUNTSQ(OBDAT(NDS).NDAT,
      :                      %VAL(OBDAT(NDS).DPTR),
      :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
               ELSE
-	        CALL FIT_DATINGET_COUNTS(OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).DPTR),SSCALE)
+	        CALL ARR_SUM1R( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
+     :                          SSCALE, STATUS )
               END IF
             END IF
 
@@ -633,7 +643,7 @@ D	    print *,'ldim,udim :',ldim,udim
 	    ENDIF
 
 *          Enter weights (=inverse variances)
-	    CALL FIT_DATINGET_WTS(WEIGHTS,OBDAT(NDS).NDAT,
+	    CALL FIT_GETDAT_WTS(WEIGHTS,OBDAT(NDS).NDAT,
      :      %VAL(OBDAT(NDS).VPTR),QUAL,%VAL(OBDAT(NDS).QPTR),
      :      %VAL(OBDAT(NDS).WPTR),NGDAT)
 	    IF(NGDAT.EQ.0)THEN
@@ -696,12 +706,12 @@ D	    print *,'ldim,udim :',ldim,udim
 *            Accumulate counts for data in likelihood case. Use quality if
 *            present in input data (rather than bgnd)
                 IF ( OBDAT(NDS).QFLAG ) THEN
-	          CALL FIT_DATINGET_COUNTSQ(OBDAT(NDS).NDAT,
+	          CALL FIT_GETDAT_COUNTSQ(OBDAT(NDS).NDAT,
      :                      %VAL(OBDAT(NDS).BPTR),
      :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
                 ELSE
-	          CALL FIT_DATINGET_COUNTS(OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).BPTR),SSCALE)
+	          CALL ARR_SUM1R( OBDAT(NDS).NDAT,
+     :                      %VAL(OBDAT(NDS).BPTR), SSCALE, STATUS )
                 END IF
 
 *         No background data - set up array of zeros
@@ -749,3 +759,98 @@ D	    print *,'ldim,udim :',ldim,udim
       END IF
 
       END
+
+
+*+  FIT_GETDAT_COUNTSQ - Sums raw counts in dataset
+      SUBROUTINE FIT_GETDAT_COUNTSQ(NDAT,DATA,QUAL,COUNTS)
+*    Description :
+*     Counts from the (REAL) DATA array are accumulated in COUNTS
+*    History :
+*     15 Jun 92: Original (TJP)
+*    Type definitions :
+	IMPLICIT NONE
+*    Import :
+	INTEGER NDAT		! No of data values
+	REAL DATA(*)		! Data array
+        LOGICAL QUAL(*)         ! Quality array
+*    Import-Export :
+	INTEGER COUNTS		! Counts accumulator
+*    Export :
+*    Local constants :
+*    Local variables :
+	INTEGER I
+*-
+
+	DO I=1,NDAT
+          IF ( QUAL(I) ) COUNTS=COUNTS+NINT(DATA(I))
+	ENDDO
+	END
+
+
+*+  FIT_GETDAT_WTS - Sets up array of data weights
+      SUBROUTINE FIT_GETDAT_WTS(WEIGHTS,NDAT,VARR,QUAL,QARR,WTARR,
+     :                            NGOOD)
+*    Description :
+*     Array of data weights equal to inverse variance for good data and
+*     zero for bad, is set up.
+*     Data with errors less than or equal to zero are treated as bad.
+*     If WEIGHTS=false then routine only counts the number of good values.
+*    History :
+*     30 Mar 87: Original (TJP)
+*     16 Aug 88: WEIGHTS argument added (TJP)
+*     14 Feb 89: ASTERIX88 version, variance and logical quality passed in (TJP)
+*    Type Definitions :
+	IMPLICIT NONE
+*    Import :
+	LOGICAL WEIGHTS		! Set up weights?
+	INTEGER NDAT		! No of data values
+	REAL VARR(*)		! Array of data variances
+	LOGICAL QUAL		! Quality info present?
+	LOGICAL QARR(*)		! Quality array
+*    Import-Export :
+*    Export :
+	REAL WTARR(*)		! Data weights
+	INTEGER NGOOD		! No of good data
+*    Local constants :
+*    Local variables :
+	INTEGER I
+*-
+
+	NGOOD=0
+
+* Set up weights
+	IF(WEIGHTS)THEN
+	  IF(QUAL)THEN
+	    DO I=1,NDAT
+	      IF(QARR(I).AND.VARR(I).GT.0.0)THEN
+	        WTARR(I)=1.0/VARR(I)
+	        NGOOD=NGOOD+1
+	      ELSE
+	        WTARR(I)=0.0
+	      ENDIF
+	    ENDDO
+	  ELSE
+	    DO I=1,NDAT
+	      IF(VARR(I).GT.0.0)THEN
+	        WTARR(I)=1.0/VARR(I)
+	        NGOOD=NGOOD+1
+	      ELSE
+	        WTARR(I)=0.0
+	      ENDIF
+	    ENDDO
+	  ENDIF
+
+* No weights to be set up
+	ELSE
+	  IF(QUAL)THEN
+	    DO I=1,NDAT
+	      IF(QARR(I))THEN
+	        NGOOD=NGOOD+1
+	      ENDIF
+	    ENDDO
+	  ELSE
+	    NGOOD=NGOOD+NDAT
+	  ENDIF
+	ENDIF
+
+	END
