@@ -520,6 +520,22 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        considered significant.
 *        - Corrected bug in SpecTrans which caused QV keywords to be
 *        ignored.
+*     15-APR-2004 (DSB):
+*        - SpecTrans modified to include translation of old "-WAV", "-FRQ"
+*        and "-VEL" spectral algorithm codes to modern "-X2P" form.
+*        - WcsFromStore modified to supress creation of WCSAXES keywords
+*        for un-used axis versions.
+*        - IsMapLinear modified to improve fit by doing a second least
+*        squares fit to the residualleft by the first least squares fit.
+*     16-APR-2004 (DSB):
+*        - NonLinSpecWcs: Issue a warning if an illegal non-linear
+*        spectral code is encountered.
+*        - Add a BadCTYPE warning condition.
+*        - Corrected default value for Clean so that it is zero (as
+*        documented).
+*     21-APR-2004 (DSB):
+*        - FindWcs: Corrected to use correct OBSGEO template. This bug
+*        caused OBSGEO keywords to be misplaced in written headers.
 *class--
 */
 
@@ -619,7 +635,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval "
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype"
 #define NPFIT             10
 
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
@@ -893,7 +909,7 @@ static AstMapping *GrismSpecWcs( char *, FitsStore *, int, char, AstSpecFrame *,
 static AstMapping *LinearWcs( FitsStore *, int, char, const char *, const char * );
 static AstMapping *LogAxis( AstMapping *, int, int, double *, double *, double );
 static AstMapping *LogWcs( FitsStore *, int, char, const char *, const char * );
-static AstMapping *NonLinSpecWcs( char *, FitsStore *, int, char, AstSpecFrame *, const char *, const char * );
+static AstMapping *NonLinSpecWcs( AstFitsChan *, char *, FitsStore *, int, char, AstSpecFrame *, const char *, const char * );
 static AstMapping *OtherAxes( AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char * );
 static AstMapping *SIPMapping( FitsStore *, char, int, const char *, const char * );
 static AstMapping *SpectralAxes( AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char * );
@@ -6204,7 +6220,7 @@ static void FindWcs( AstFitsChan *this, int last, const char *method, const char
              Match( keyname, "ZSOURCE%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "RESTFRQ%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "MJD_AVG%0c", 0, NULL, &nfld, method, class ) ||
-             Match( keyname, "OBSGEO-%1c", 0, NULL, &nfld, method, class ) ) {
+             Match( keyname, "OBSGEO%1c", 0, NULL, &nfld, method, class ) ) {
 
             if( last ) MoveCard( this, 1, method, class );
             break;
@@ -12666,6 +12682,32 @@ static int IsMapLinear( AstMapping *map, const double lbnd_in[],
                   m = ( sp*ss - sps*sn )/d;
                   c = ( sps*ss - sp*ss2 )/d;
 
+/* Subtract off the fit value form the "p" values to get the residuals of
+   the fit. */
+                  for( j = 0; j < NP; j++ ) p[ j ] -= m*s[ j ] + c;
+
+/* We now do a least squares fit to the residuals. This second fit is done
+   because the first least squares fit sometimes leaves the residuals with a
+   distinct non-zero gradient. We do not need to worry about bad values
+   here since we have checked above that there are no bad values. Also we
+   do not need to recalculate sums which only depend on the "s" values since
+   they have not changed. */
+                  sp = 0.0;
+                  sps = 0.0;
+                  for( j = 0; j < NP; j++ ) {
+                     pv = p[ j ];
+                     sp += pv;
+                     sps += pv*s[ j ];
+                  }
+
+/* Find the constants in "input residual = m*output coord + c" equation. */
+                  m = ( sp*ss - sps*sn )/d;
+                  c = ( sps*ss - sp*ss2 )/d;
+
+/* Subtract off the fit value form the "p residuals" values to get the 
+   residual redisuals of the fit. */
+                  for( j = 0; j < NP; j++ ) p[ j ] -= m*s[ j ] + c;
+
 /* The requirement for a linear relationship is that the absolute residual 
    between the input coord produced by the above linear fit and the input 
    coord produced by the actual Mapping should be less than some small
@@ -12673,8 +12715,7 @@ static int IsMapLinear( AstMapping *map, const double lbnd_in[],
    this. */
                   tol = 1.0E-8*( in_ubnd - in_lbnd );
                   for( j = 0; j < NP; j++ ) {
-                     sv = m*s[ j ] + c;
-                     if( fabs( sv - p[ j ] ) > tol ) {
+                     if( fabs( p[ j ] ) > tol ) {
                         ret = 0;
                         break;
                      }
@@ -15071,9 +15112,10 @@ static void NewCard( AstFitsChan *this, const char *name, int type,
 
 }
 
-static AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i, 
-                                  char s, AstSpecFrame *specfrm, 
-                                  const char *method, const char *class   ) {
+static AstMapping *NonLinSpecWcs( AstFitsChan *this, char *algcode, 
+                                  FitsStore *store, int i, char s, 
+                                  AstSpecFrame *specfrm, const char *method, 
+                                  const char *class   ) {
 /*
 *  Name:
 *     NonLinSpecWcs
@@ -15086,7 +15128,8 @@ static AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i, char s, 
+*     AstMapping *NonLinSpecWcs( AstFitsChan *this, char *algcode, 
+*                                FitsStore *store, int i, char s, 
 *                                AstSpecFrame *specfrm, const char *method, 
 *                                const char *class )
 
@@ -15105,6 +15148,8 @@ static AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i,
 *     supplied SpecFrame).
 
 *  Parameters:
+*     this
+*        Pointer to the FitsChan.
 *     algcode
 *        Pointer to a string holding the non-linear "-X2P" code for the
 *        required algorithm. This includes aleading "-" character.
@@ -15138,6 +15183,8 @@ static AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i,
    AstMapping *ret;
    AstSpecFrame *xfrm;
    AstMapping *map2;
+   char buf[ 100 ];
+   char pc;
    double crv;
    double ds;
    double in_a;
@@ -15145,6 +15192,7 @@ static AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i,
    double out_a;
    double out_b;
    int ok;           
+   int s_sys;
 
 /* Check the global status. */
    ret = NULL;
@@ -15187,6 +15235,39 @@ static AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i,
          map1 = astGetMapping( fs, AST__BASE, AST__CURRENT );
          fs = astAnnul( fs );
          ok = 1;
+      }
+
+
+/* Issue a warning if the "P" system is not the correct one for the given 
+   "S" system. We can however continue, sine AST interprets illegal "P" 
+   systems correctly. */
+      s_sys = astGetSystem( specfrm );
+      if( s_sys == AST__FREQ || s_sys == AST__ENERGY || 
+          s_sys == AST__WAVENUM ||  s_sys == AST__VRADIO ) {
+         pc = 'F';
+
+      } else if( s_sys == AST__WAVELEN || s_sys == AST__VOPTICAL ||
+                 s_sys == AST__REDSHIFT ){
+         pc = 'W';
+
+      } else if( s_sys == AST__AIRWAVE ) {
+         pc = 'A';
+
+      } else if( s_sys == AST__BETA || s_sys == AST__VREL ) {
+         pc = 'V';
+
+      } else if( astOK ) {
+         pc = algcode[ 3 ];
+         astError( AST__INTER, "%s: Function NonLinSpecWcs does not yet "
+                   "support spectral axes of type %s (internal AST "
+                   "programming error).", method, astGetC( specfrm, "System" ) );
+      }
+
+      if( algcode[ 3 ] != pc ) {
+         sprintf( buf, "The spectral CTYPE value %s%s is not legal - "
+                 "using %s%.3s%c instead.", astGetC( specfrm, "System" ),
+                 algcode,  astGetC( specfrm, "System" ), algcode, pc );
+         Warn( this, "badctype", buf, method, class );
       }
    }
 
@@ -19451,7 +19532,6 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
       
                      axmap = AddUnitMaps( tmap1, iax, nwcs );
                      tmap1 = astAnnul( tmap1 );
-
                   }
                   tmap3 = astAnnul( tmap3 );
 
@@ -19820,6 +19900,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *       renamed to "PV".
 *
 *     16) RESTFREQ is converted to RESTFRQ.
+*
+*     17) the "-WAV", "-FRQ" and "-VEL" CTYPE algorithms included in an
+*       early draft of FITS-WCS paper III are translated to the
+*       corresponding modern "-X2P" form.
 
 *  Parameters:
 *     this
@@ -19852,6 +19936,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char template[ FITSNAMLEN + 1 ];/* General keyword name template */
    char lattype[MXCTYPELEN];      /* CTYPE value for latitude axis */
    char lontype[MXCTYPELEN];      /* CTYPE value for longitude axis */
+   char spectype[MXCTYPELEN];     /* CTYPE value for spectral axis */
    char prj[6];                   /* Projection string */
    char s;                        /* Co-ordinate version character */
    char ss;                       /* Co-ordinate version character */
@@ -19949,8 +20034,58 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                strncpy( prj, cval + 4, 4 );
                strncpy( lattype, cval, 10 );
                prj[ 4 ] = 0;
+
+/* Check for spectral algorithms from early drafts of paper III */
+            } else {
+               prj[ 0 ] = '-';
+               if( !strncmp( cval + 4, "-WAV", 4 ) ) {
+                  prj[ 1 ] = 'W';
+               } else if( !strncmp( cval + 4, "-FRQ", 4 ) ) {
+                  prj[ 1 ] = 'F';
+               } else if( !strncmp( cval + 4, "-VEL", 4 ) ) {
+                  prj[ 1 ] = 'V';
+               } else {
+                  prj[ 0 ] = 0;
+               }
+               if( *prj ) {
+                  prj[ 2 ] = '2';
+                  if( !strncmp( cval, "WAVE", 4 ) ) {
+                     prj[ 3 ] = 'W';
+                  } else if( !strncmp( cval, "FREQ", 4 ) ) {
+                     prj[ 3 ] = 'F';
+                  } else if( !strncmp( cval, "VELO", 4 ) ) {
+                     prj[ 3 ] = 'V';
+                  } else if( !strncmp( cval, "VRAD", 4 ) ) {
+                     prj[ 3 ] = 'F';
+                  } else if( !strncmp( cval, "VOPT", 4 ) ) {
+                     prj[ 3 ] = 'W';
+                  } else if( !strncmp( cval, "ZOPT", 4 ) ) {
+                     prj[ 3 ] = 'W';
+                  } else if( !strncmp( cval, "ENER", 4 ) ) {
+                     prj[ 3 ] = 'F';
+                  } else if( !strncmp( cval, "WAVN", 4 ) ) {
+                     prj[ 3 ] = 'F';
+                  } else if( !strncmp( cval, "BETA", 4 ) ) {
+                     prj[ 3 ] = 'V';
+                  } else {
+                     prj[ 0 ] = 0;
+                  }
+               }
+               if( *prj ) {
+                  strcpy( spectype, cval );
+                  if( prj[ 1 ] == prj[ 3 ] ) {
+                     strcpy( prj, strlen( cval ) > 8 ? "----" : "    " );
+                  } else {
+                     prj[ 4 ] = 0;
+                  }
+                  strncpy( spectype + 4, prj, 4 );
+                  cval = spectype;
+                  SetValue( ret, FormatKey( "CTYPE", j + 1, -1, s ),
+                           (void *) &cval, AST__STRING, NULL );
+               }
             }
-           j++;
+            j++;
+
          } else {
             break;
          }
@@ -23641,7 +23776,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
          nwcs = (int) ( val + 0.5 );
       } else {
          nwcs = GetMaxJM( &(store->crpix), s ) + 1;
-         if( nwcs != naxis ) val = 1.0;
+         if( nwcs != 0 && nwcs != naxis ) val = (double) nwcs;
       }
 
       if( val != AST__BAD ) {
@@ -25966,7 +26101,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 
 /* Non-Linear */
             } else if( algcode[ 0 ] == '-' && algcode[ 2 ] == '2' ) {
-               map1 = NonLinSpecWcs( algcode, store, i, s, specfrm, method, class );
+               map1 = NonLinSpecWcs( this, algcode, store, i, s, specfrm, method, class );
 
 /* Grism */
             } else if( !strcmp( "-GRI", algcode ) ||
@@ -28220,7 +28355,7 @@ f     AST_READ.
 *att--
 */
 astMAKE_CLEAR(FitsChan,Clean,clean,-1)
-astMAKE_GET(FitsChan,Clean,int,1,(this->clean == -1 ? 1 : this->clean))
+astMAKE_GET(FitsChan,Clean,int,1,(this->clean == -1 ? 0 : this->clean))
 astMAKE_SET(FitsChan,Clean,int,clean,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,Clean,( this->clean != -1 ))
 
@@ -28328,7 +28463,7 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *     space separated list of condition names (see the AllWarnings
 *     attribute for a list of the currently defined names). Each name 
 *     indicates a condition which should be reported. The default 
-*     value for Warnings is the string "Tnx Zpx BadCel BadMat".
+*     value for Warnings is the string "Tnx Zpx BadCel BadMat BadCTYPE".
 *
 *     The text of any warning will be stored within the FitsChan in the
 *     form of one or more new header cards with keyword ASTWARN. If
@@ -28350,9 +28485,9 @@ f     deleted from the FitsChan using astDelFits.
 astMAKE_CLEAR(FitsChan,Warnings,warnings,astFree( this->warnings ))
 
 /* If the Warnings value is not set, supply a default in the form of a
-   pointer to the constant string "Tnx Zpx BadCel". */
+   pointer to the constant string "Tnx Zpx BadCel BadMat BadCTYPE". */
 astMAKE_GET(FitsChan,Warnings,const char *,NULL,( this->warnings ? this->warnings :
-                                                            "Tnx Zpx BadCel BadMat" ))
+                                                            "Tnx Zpx BadCel BadMat BadCTYPE" ))
 
 /* Set a Warnings value by freeing any previously allocated memory, allocating
    new memory, storing the string and saving the pointer to the copy.
@@ -28394,6 +28529,11 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 *     - "BadCel": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if an unknown celestial co-ordinate 
 *     system is specified by the CTYPE keywords.
+*
+*     - "BadCTYPE": This condition arises when reading a FrameSet from a
+*     non-Native encoded FitsChan if an illegal algorithm code is specified 
+*     by a CTYPE keyword, and the illegal code can be converted to an
+*     equivalent legal code.
 *
 *     - "BadLat": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if the latitude of the reference point
