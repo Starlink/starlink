@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+
+<component id="automake" buildsupport="yes">
+  <version>1.8.2-starlink</version>
+  <path>thirdparty/fsf/automake</path>
+  <description>GNU automake, patched</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build>autoconf libtool</build>
+  </dependencies>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>This version of automake has been patched to include
+      Fortran preprocessor support, and a variety of Starlink-specific
+      targets.  The Fortran patches were submitted
+      to automake-patches@gnu.org in January 2004, and were being
+      examined after that.</p></notes>
+</component>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+
+<component id="libtool" buildsupport="yes">
+  <version>1.5</version>
+  <path>thirdparty/fsf/libtool</path>
+  <description>GNU libtool</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>This version of libtool is unpatched -- just the standard
+      version.</p></notes>
+</component>
