@@ -52,6 +52,12 @@
 *        written by other applications or doctored by hand, if this
 *        is done with care, and with knowledge of AST objects (SUN/210).
 *        The format of the file is explained in the Notes section.
+*     FITSROT = LITERAL (Read)
+*        The name of a FITS header whose value is an angle through 
+*        which all the imported frames should be rotated.  This 
+*        rotation is done after the mappings given in the AST file 
+*        itself have been applied.
+*        [!]
 *     IN = LITERAL (Read)
 *        A list of NDF names whose WCS components are to be modified 
 *        according to ASTFILE.  The NDF names may be specified using 
@@ -100,6 +106,11 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
+*     ROT = _DOUBLE (Read)
+*        An angle through which all the imported frames should be
+*        rotated.  This rotation is done after the mappings in the AST
+*        file itself have been applied.
+*        [0]
 
 *  Examples:
 *     astimp data* camera.ast obs1
@@ -203,6 +214,7 @@
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
       INCLUDE 'PAR_ERR'          ! PAR system error codes
+      INCLUDE 'DAT_PAR'          ! Data system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -223,7 +235,16 @@
       CHARACTER * ( AST__SZCHR ) DMBAS1 ! Reference domain of Current frame
       CHARACTER * ( AST__SZCHR ) DMCUR1 ! Reference domain of Current frame
       CHARACTER * ( CCD1__BLEN ) ID ! ID value of frameset
+      CHARACTER * ( CCD1__BLEN ) FITROT ! FITS keyword for rotation angle
       CHARACTER * ( AST__SZCHR ) INDOM ! Name to use for Current import frame
+      CHARACTER * ( DAT__SZLOC ) LOC ! HDS locator for FITS extension
+      DOUBLE PRECISION ANGLR     ! Rotation angle in radians
+      DOUBLE PRECISION DEGRA     ! Degrees - Radians conversion factor
+      DOUBLE PRECISION FROT      ! Additional angle to rotate frames from FITS
+      DOUBLE PRECISION MATRIX( 4 ) ! Matrix for MatrixMap
+      DOUBLE PRECISION PI        ! Pi
+      DOUBLE PRECISION ROT       ! Additional fixed angle to rotate frames
+      DOUBLE PRECISION ROTATE    ! Total additional angle to rotate frames
       INTEGER FCHAN              ! AST pointer to frameset file channel
       INTEGER FDAST              ! FIO file descriptor for frameset file
       INTEGER FRCUR              ! AST pointer to Current frame of WCS frameset
@@ -233,10 +254,12 @@
       INTEGER FSMAT              ! AST pointer to matched frameset
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! Position in string
+      INTEGER ICARD              ! Index of found FITS header card
       INTEGER IFGRP              ! GRP identifier for frameset group
       INTEGER INDF               ! NDF identifier
       INTEGER INDXS( MXFSET )    ! Index values for ID type of INDEX
       INTEGER INGRP              ! IRG identifier for NDF group
+      INTEGER IPFITS             ! Pointer to FITS card array
       INTEGER IWCS               ! AST pointer to WCS component of NDF
       INTEGER IX                 ! Index into frameset group
       INTEGER J                  ! Loop variable
@@ -244,18 +267,26 @@
       INTEGER JFCUR              ! Index of current frame of import frameset
       INTEGER JMBAS              ! Index of base frame of import frameset
       INTEGER JWBAS              ! Index of base frame of WCS component
+      INTEGER LENGTH             ! Length of FITS header cards
       INTEGER MAP                ! AST pointer to mapping frameset
+      INTEGER MAPROT             ! AST pointer to rotational mapping
+      INTEGER NCARD              ! Number of FITS header cards
       INTEGER NFSET              ! Number of framesets in group
       INTEGER NNDF               ! Number of NDFs
       LOGICAL DIFBAS             ! Base domains don't all match
       LOGICAL DIFCUR             ! Current domains don't all match
       LOGICAL DUPID              ! Duplicate ID value was generated
       LOGICAL MATCH              ! Whether NDF matches frameset ID
+      LOGICAL THERE              ! Presence of requested item
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set up some useful constants
+      PI = 4D0 * ATAN( 1D0 )
+      DEGRA = PI / 180D0
 
 *  Start up the CCDPACK logging system.
       CALL CCD1_START( 'ASTIMP', STATUS )
@@ -400,9 +431,20 @@
       CALL PAR_DEF1I( 'INDICES', NNDF, INDXS, STATUS )
       CALL PAR_EXACI( 'INDICES', NNDF, INDXS, STATUS )
 
+*  Get angle for additional rotations.
+      CALL PAR_GET0D( 'ROT', ROT, STATUS )
+
 *  Exit if anything is wrong.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
+*  Get FITS header for additional rotations.
+      CALL PAR_GET0C( 'FITSROT', FITROT, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         FITROT = ' '
+         CALL ERR_ANNUL( STATUS )
+      END IF
+      CALL CHR_UCASE( FITROT )
+      
 *  Loop over NDFs
       DO 12 I = 1, NNDF
          CALL IRG_NDFEX( INGRP, I, INDF, STATUS )
@@ -478,12 +520,57 @@
             CALL AST_SETI( IWCS, 'Base', JWBAS, STATUS )
             CALL AST_SETI( FSMAT, 'Base', JMBAS, STATUS )
 
+*  Find additional rotation from FITS header if required.
+            FROT = 0D0
+            IF ( FITROT .NE. ' ' ) THEN
+
+*  Map FITS extension if it can be found.
+               CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
+               IF ( .NOT. THERE ) THEN
+                  STATUS = SAI__ERROR
+                  CALL NDF_MSG( 'NDF', INDF )
+                  CALL ERR_REP( 'ASTIMP_NOFITS', 
+     :                          '  No FITS exension in ^NDF', STATUS )
+                  GO TO 99
+               END IF
+               CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
+               CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', IPFITS, NCARD,
+     :                        STATUS )
+               LENGTH = 80
+
+*  Get FITSROT key value.
+               CALL FTS1_GKEYD( NCARD, %VAL( IPFITS ), 1, FITROT, THERE,
+     :                          FROT, ICARD, STATUS, %VAL( LENGTH ) )
+
+*  Unmap array and release locator for FITS extension.
+               CALL DAT_UNMAP( LOC, STATUS )
+               CALL DAT_ANNUL( LOC, STATUS )
+            END IF
+
+*  Add additional fixed rotation.
+            ROTATE = ROT + FROT
+
+*  Incorporate additional rotation into mapping if required.
+            IF ( ROTATE .NE. 0D0 ) THEN
+               ANGLR = ROTATE * DEGRA
+               MATRIX( 1 ) = COS( ANGLR )
+               MATRIX( 2 ) = -SIN( ANGLR )
+               MATRIX( 3 ) = SIN( ANGLR )
+               MATRIX( 4 ) = COS( ANGLR )
+               MAPROT = AST_MATRIXMAP( 2, 2, 0, MATRIX, ' ', STATUS )
+               MAP = AST_CMPMAP( MAP, MAPROT, .TRUE., ' ', STATUS )
+               MAP = AST_SIMPLIFY( MAP, STATUS )
+               CALL MSG_SETR( 'ANGLE', REAL( ROTATE ) )
+               CALL CCD1_MSG( ' ', 
+     :'    Rotating additional ^ANGLE degrees', STATUS )
+            END IF
+
 *  Error occurred - abort.
             IF ( STATUS .NE. SAI__OK ) THEN
                GO TO 99
 
 *  Mapping failed - inform user.
-            ELSE IF ( MAP .EQ. AST__NULL ) THEN
+            ELSE IF ( .NOT. AST_ISAMAPPING( MAP ) ) THEN
                CALL MSG_SETC( 'DOM1', 
      :                        AST_GETC( IWCS, 'Domain', STATUS ) )
                CALL MSG_SETC( 'DOM2',

@@ -66,6 +66,26 @@
             helpkey *
           }
 
+         parameter FITSROT {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {FITS keyword for additional rotation angle}
+            default !
+            helpkey *
+         }
+
+         parameter ROT {
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Additional rotation angle}
+            default 0
+            helpkey *
+         }
+
          parameter logto {
                           # Logging system interaction level
             type LITERAL
