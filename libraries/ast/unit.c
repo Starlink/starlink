@@ -77,6 +77,10 @@
    exceptions, so bad values are dealt with explicitly. */
 #define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
+/* Macro identifying a character as lower or upper case letter, digit or
++ or -. */
+#define ISWORD(c) (isalnum(c)||((c)=='+')||((c)=='-'))
+
 /* The number of basic dimension quantities used for dimensional analysis. 
    In addition to the usual M, L and T, this includes pseudo-dimensions 
    describing strictly dimensionless quantities such as plane angle, 
@@ -291,15 +295,16 @@ static const char *CleanExp( const char *exp ) {
 
 /* Split the supplied string up into tokens. Each block of contiguous
    alphanumeric characters is a token. Each contiguous block of 
-   non-alphanumerical characters is also a token. */
+   non-alphanumerical characters is also a token. The + and - signs are
+   counted as alphanumeric. */
    start = exp;
    p = (char *) exp;
-   word = isalnum( *p );
+   word = ISWORD( *p );
    ntok = 0;
    tok = NULL;
    while( *(++p) ){
       if( word ) {
-         if( !isalnum( *p ) ) {
+         if( !ISWORD( *p ) ) {
             l = p - start;
             t = astStore( NULL, start, l + 1 );
             if( t ) t[ l ] = 0;            
@@ -309,7 +314,7 @@ static const char *CleanExp( const char *exp ) {
             word = 0;
          }
       } else {
-         if( isalnum( *p ) ) {
+         if( ISWORD( *p ) ) {
             l = p - start;
             t = astStore( NULL, start, l + 1 );
             if( t ) t[ l ] = 0;            
@@ -338,31 +343,21 @@ static const char *CleanExp( const char *exp ) {
       l = strlen( t );
       tt = astStore( tt, t, l + 1 );
 
-/* Any word followed by a digit is taken as <word>^<digit> */
-      if( l > 1 && isdigit( t[ l - 1 ] ) && 
-                 isalpha( t[ l - 2 ] ) ) {
+/* Any alphabetical word followed by a digit is taken as <word>^<digit>. 
+   Any alphabetical word followed by a sign and a digit is taken as 
+   <word>^<sign><digit>. */
+      if( l > 1 && strcspn( t, "0123456789" ) == l - 1 ) {
          tok[ i ] = astMalloc( l + 2 );
          if( tok[ i ] ) {
             strcpy( tok[ i ], t );
-            tok[ i ][ l + 1 ] = 0;
-            tok[ i ][ l ] = t[ l - 1 ];
-            tok[ i ][ l - 1 ] = '^';
-            t = astFree( t );
-         }
-         l++;
-
-/* Any word followed by a minus or plus followed by a digit is taken as 
-   <word>^+/-<digit> */
-      } else if( l > 2 && isdigit( t[ l - 1 ] ) && 
-                 ( t[ l - 2 ] == '+' || t[ l - 2 ] == '-' ) &&
-                 isalpha( t[ l - 3 ] ) ) {
-         tok[ i ] = astMalloc( l + 2 );
-         if( tok[ i ] ) {
-            strcpy( tok[ i ], t );
-            tok[ i ][ l + 1 ] = 0;
-            tok[ i ][ l ] = t[ l - 1 ];
-            tok[ i ][ l - 1 ] = t[ l - 2 ];
-            tok[ i ][ l - 2 ] = '^';
+            w = t + l - 2;
+            if( *w != '+' && *w != '-' ) {
+               tok[ i ][ l - 1 ] = '^';
+               strcpy( tok[ i ] + l, t + l - 1 );
+            } else {
+               tok[ i ][ l - 2 ] = '^';
+               strcpy( tok[ i ] + l - 1, t + l - 2 );
+            }
             t = astFree( t );
          }
          l++;
