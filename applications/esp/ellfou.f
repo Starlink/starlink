@@ -48,7 +48,7 @@
 *        Allows the user to elect to repeat the profiling operation
 *        on the current input image. Profiling is repeated if 
 *        AGAIN=TRUE.
-*     ANGCON=_TRUE (Read)
+*     ANGCON=_LOGICAL (Read)
 *        Position angle convention. TRUE=clockwise positive
 *     ANGOFF=_REAL (Read)
 *        Positive angle offset. Units degrees.
@@ -2450,7 +2450,7 @@
             X(POINT)=XIN
             Y(POINT)=YIN
 *         Display the cursor results if necessary.
-            IF (POINT.LT.6.AND.(HITVAL.EQ.1.OR.HITVAL.EQ.3)) THEN
+            IF (POINT.LT.6) THEN
                CALL ESP1_CRPT(IWCS,XIN-X1,YIN-Y1,STATUS)
             END IF
          END IF
@@ -7138,7 +7138,7 @@
 
 *      Output a heading.
          NCHAR=0
-         CALL CHR_PUTC('## ESP ELLFOU V1.0 OUTPUT FILE',LINE,NCHAR)
+         CALL CHR_PUTC('## ESP ELLFOU V1.1 OUTPUT FILE',LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
          NCHAR=0
          CALL CHR_PUTC('##',LINE,NCHAR)

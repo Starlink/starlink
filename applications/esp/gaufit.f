@@ -2406,7 +2406,7 @@
          END IF
 
 *      Display the cursor results if necessary.
-         IF (HITVAL.EQ.0) THEN
+         IF (HITVAL.EQ.0.OR.HITVAL.EQ.3) THEN
             CALL MSG_BLANK(STATUS)
             CALL ESP1_CRPT(IWCS,XIN-X1,YIN-Y1,STATUS)
             CALL MSG_BLANK(STATUS)

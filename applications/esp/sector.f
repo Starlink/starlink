@@ -2475,7 +2475,7 @@
             X(POINT)=XIN
             Y(POINT)=YIN
 *         Display the cursor results if necessary.
-            IF (POINT.LT.5.AND.(HITVAL.EQ.1.OR.HITVAL.EQ.3)) THEN
+            IF (POINT.LT.5) THEN
                CALL ESP1_CRPT(IWCS,XIN-X1+1.0,YIN-Y1+1.0,STATUS)
             END IF
          END IF
@@ -4526,7 +4526,7 @@
 
 *      Output a heading.
          NCHAR=0
-         CALL CHR_PUTC('## ESP SECTOR V1.0 OUTPUT FILE ',LINE,NCHAR)
+         CALL CHR_PUTC('## ESP SECTOR V1.1 OUTPUT FILE ',LINE,NCHAR)
          CALL FIO_WRITE(FIOD2,LINE(:NCHAR),STATUS)
          NCHAR=0
          CALL CHR_PUTC('##',LINE,NCHAR)

@@ -4494,7 +4494,7 @@
 
 *      Output a heading.
          NCHAR=0
-         CALL CHR_PUTC('## ESP GRAPHS V1.0 OUTPUT FILE ',LINE,NCHAR)
+         CALL CHR_PUTC('## ESP GRAPHS V1.1 OUTPUT FILE ',LINE,NCHAR)
          CALL FIO_WRITE(FIOD2,LINE(:NCHAR),STATUS)
          NCHAR=0
          CALL CHR_PUTC('##',LINE,NCHAR)
@@ -4510,8 +4510,8 @@
 
 *      Output a data description.
          NCHAR=0
-         CALL CHR_PUTC('##  X         Y         X         Y'//
-     :   '        SLenS      SLenE    SCSB  ECSB   LCCS  LCCE',
+         CALL CHR_PUTC('##  X         Y         Xc        Yc'//
+     :   '       SLenS      SLenE    SCSB  ECSB   LCCS  LCCE',
      :   LINE,NCHAR)
          CALL FIO_WRITE(FIOD2,LINE(1:NCHAR),STATUS)
 

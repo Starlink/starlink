@@ -2749,7 +2749,7 @@
 
 *         Output a heading.
             NCHAR=0
-            CALL CHR_PUTC('## ESP LOBACK V1.0 OUTPUT FILE',LINE,NCHAR)
+            CALL CHR_PUTC('## ESP LOBACK V1.1 OUTPUT FILE',LINE,NCHAR)
             CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
             NCHAR=0
             CALL CHR_PUTC('##',LINE,NCHAR)
@@ -2792,11 +2792,8 @@
 *      Create an appropriately formatted output string.
 
 *      Co-ordinates.
-         CALL ESP1_PR2S(NDF1,XCO,YCO,XSTR,YSTR,XLEN,YLEN,STATUS)
-         FTEXT='A8'
-         IF (XLEN.GT.8.OR.YLEN.GT.8) FTEXT='A14'
-         CALL MSG_FMTC('X',FTEXT,XSTR(1:XLEN))
-         CALL MSG_FMTC('Y',FTEXT,YSTR(1:YLEN))
+         CALL MSG_FMTR('X','F8.1',XCO)
+         CALL MSG_FMTR('Y','F8.1',YCO)
 
 *      Mode values.
          FTEXT='F8.1'
