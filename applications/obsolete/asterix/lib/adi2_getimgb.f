@@ -89,7 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE '{global_constants_file}' ! [global_constants_description]
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			FID
