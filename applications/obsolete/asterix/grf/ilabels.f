@@ -66,7 +66,7 @@
 
       ENDIF
 
-      CALL INIT_CLOSE()
+      CALL USI_CLOSE()
 
       END
 

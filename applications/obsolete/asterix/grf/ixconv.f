@@ -114,6 +114,7 @@
         PARAMETER 		( VERSION = 'IXCONV Version 1.8-0' )
 *-
 
+
 *    Version announcement
       CALL MSG_PRNT( VERSION )
 
@@ -173,7 +174,7 @@
         CALL MSG_SETI( 'NX', DIMS1(1) )
         CALL MSG_SETI( 'NY', DIMS1(2) )
         CALL MSG_PRNT( 'The dimensions of both inputs are ^NX by ^NY' )
-        CALL PAR_GET0L( 'CYCLIC', CYCLIC, STATUS )
+        CALL USI_GET0L( 'CYCLIC', CYCLIC, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -340,7 +341,7 @@
 
 *    Copy result to output, adding back in mean if required. At same time
 *    rotate the array being copied so that zero shift is at centre.
-      CALL PAR_GET0L( 'DC_RESTORE', DC_RESTORE, STATUS )
+      CALL USI_GET0L( 'DC_RESTORE', DC_RESTORE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( DC_RESTORE ) THEN
         RESTORE = AVX*AVY*M3*N3
