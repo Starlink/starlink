@@ -2,18 +2,18 @@
   Additional SDATA entities, for LaTeX use.
 -->
 
-<!entity copy   CDATA "\copyright{}"	-- copyright sign	-->
-<!entity amp    CDATA "\&"		-- ampersand		-->
-<!entity gt     CDATA ">"		-- greater than		-->
-<!entity lt     CDATA "<"		-- less than		-->
-<!entity quot   CDATA '\dquote{}'	-- double quote		-->
-<!entity nbsp   CDATA "~"		-- non breaking space	-->
-<!entity hash	CDATA "\#"		-- hash sign		-->
-<!entity pounds	CDATA "{\normalfont\pounds{}}" -- pound sign	-->
-<!entity dollar CDATA "\$"		-- dollar sign		-->
-<!entity ellip  CDATA "\dots{}"		-- ellipses		-->
-<!entity emdash CDATA "---"		-- em dash 		-->
-<!entity endash CDATA "--"		-- en dash		-->
-<!entity percent CDATA "\%"		-- percent sign		-->
-<!entity deg    CDATA "\ensuremath{{}^\circ}"	-- degree	-->
-<!entity latex  CDATA "\LaTeX{}"	-- might as well...	-->
+<!entity copy   SDATA "\copyright{}"	-- copyright sign	-->
+<!entity amp    SDATA "\&"		-- ampersand		-->
+<!entity gt     SDATA ">"		-- greater than		-->
+<!entity lt     SDATA "<"		-- less than		-->
+<!entity quot   SDATA '\dquote{}'	-- double quote		-->
+<!entity nbsp   SDATA "~"		-- non breaking space	-->
+<!entity hash	SDATA "\#"		-- hash sign		-->
+<!entity pounds	SDATA "{\normalfont\pounds{}}" -- pound sign	-->
+<!entity dollar SDATA "\$"		-- dollar sign		-->
+<!entity ellip  SDATA "\dots{}"		-- ellipses		-->
+<!entity emdash SDATA "---"		-- em dash 		-->
+<!entity endash SDATA "--"		-- en dash		-->
+<!entity percent SDATA "\%"		-- percent sign		-->
+<!entity deg    SDATA "\ensuremath{{}^\circ}"	-- degree	-->
+<!entity latex  SDATA "\LaTeX{}"	-- might as well...	-->
