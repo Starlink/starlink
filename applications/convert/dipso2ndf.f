@@ -21,16 +21,16 @@
 *        The global status.
 
 *  Description:
-*     This application routine reads a DIPSO format file as produced by the DIPSO 
-*     `WRITE' command.  The DIPSO TITLE is written to the NDF TITLE. 
-*     DIPSO records bad values by means of breaks in the data array. 
-*     The number and positions of these breaks are stored in the DIPSO 
-*     file.  This program inserts bad pixels at these break positions. 
-*     The number of bad pixels inserted is based on the size of the 
-*     gap in the wavelength scale.  At least one bad pixel is inserted 
-*     at every break point.
+*     This application routine reads a DIPSO format file as produced by
+*     the DIPSO `WRITE' command.  The DIPSO TITLE is written to the NDF
+*     TITLE.  DIPSO records bad values by means of breaks in the data
+*     array.  The number and positions of these breaks are stored in
+*     the DIPSO file.  This program inserts bad pixels at these break
+*     positions.  The number of bad pixels inserted is based on the
+*     size of the gap in the wavelength scale.  At least one bad pixel
+*     is inserted at every break point.
 
-*   Usage:
+*  Usage:
 *      DIPSO2NDF IN OUT
 
 *  ADAM Parameters:
