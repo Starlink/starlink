@@ -114,30 +114,22 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise
-      OARG = ADI__NULLID
-
 *  Locate HEADER structure
       CALL ADI1_LOCHEAD( ARGS(1), .FALSE., HLOC, STATUS )
+
+*  The new object
+      CALL ADI_NEW0( 'TimingInfo', OARG, STATUS )
 
 *  Look for the various header components
       CALL ADI1_CGET0C( HLOC, 'EXPOSURE', EXPOK, EXPO, STATUS )
       CALL ADI1_CGET0C( HLOC, 'EFF_EXPOSURE', EFFOK, EFEXPO, STATUS )
 
-*  Construct returned object
-      IF ( (STATUS .EQ. SAI__OK) .AND. (EXPOK.OR.EFFOK) ) THEN
-
-*    The new object
-        CALL ADI_NEW0( 'TimingInfo', OARG, STATUS )
-
-*    Write its member values
-        IF ( EXPOK ) THEN
-          CALL ADI_CPUT0R( OARG, 'Exposure', EXPO, STATUS )
-        END IF
-        IF ( EFFOK ) THEN
-          CALL ADI_CPUT0R( OARG, 'EffExposure', EFEXPO, STATUS )
-        END IF
-
+*  Write its member values
+      IF ( EXPOK ) THEN
+        CALL ADI_CPUT0R( OARG, 'Exposure', EXPO, STATUS )
+      END IF
+      IF ( EFFOK ) THEN
+        CALL ADI_CPUT0R( OARG, 'EffExposure', EFEXPO, STATUS )
       END IF
 
 *  Report any errors
