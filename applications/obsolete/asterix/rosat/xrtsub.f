@@ -3321,6 +3321,9 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       INCLUDE 'SAE_PAR'
 * Global variables :
       INCLUDE 'XRTHEAD_CMN'
+* Functions
+      INTEGER CHR_LEN
+        EXTERNAL CHR_LEN
 * Import :
       CHARACTER*(*) FILENAME                    ! Filename of datafiles
 * Import-Export :
@@ -3336,16 +3339,34 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       INTEGER                 BLOCK
       INTEGER                 IUNIT             ! Logical I/O unit
       INTEGER                 LP
+      INTEGER                 MAXRAW
+        PARAMETER (MAXRAW = 500)
+      INTEGER                 NFILES            ! Number of files
+
+      CHARACTER*100           FILES(MAXRAW)     ! List of FITS files
+      CHARACTER*500           FITSDIR           ! FITS directory
       CHARACTER*5             ORIGIN            ! Origin of FITS file
+      CHARACTER*500           SRT_ROOTNAME      ! Dir and file name
 *-
 * Check status :
       IF (STATUS .NE. SAI__OK) RETURN
-*
+
+      SRT_ROOTNAME = FILENAME
+
+*  Does file exist?
+      CALL UTIL_FINDFILE('.', FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+      IF (NFILES .LE. 0) THEN
+         CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS )
+         SRT_ROOTNAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/' //FILENAME
+      END IF
+
 *  Open the FITS file
       CALL FIO_GUNIT(IUNIT, STATUS)
-      CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
+      CALL FTOPEN(IUNIT, SRT_ROOTNAME, 0, BLOCK, STATUS)
       IF ( STATUS .NE. SAI__OK ) THEN
-	 CALL MSG_SETC('FNAM',FILENAME)
+	 CALL MSG_SETC('FNAM',SRT_ROOTNAME)
          CALL MSG_PRNT('XRTSUB : Error - opening file ^FNAM **')
          GOTO 999
       ENDIF
@@ -3424,8 +3445,6 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       INTEGER                 MAXRAW            ! Max value
         PARAMETER (MAXRAW = 500)
 *
-      CHARACTER*132           FILENAME
-
       INTEGER ANYF               ! Notes undefined array elements
       INTEGER COLNO                                ! Fits table, column no
       INTEGER FEOF               ! Marks end of FITS file
@@ -3433,32 +3452,44 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       INTEGER EVNHDU             ! Position of eventrate in FITS file
       INTEGER FBEG                                 ! Fits table, start
       INTEGER HTYPE                                ! Fits header, style
-      INTEGER LP
+      INTEGER LP                                   ! Loop variable
       INTEGER MXCOL                                ! Max number of columns
         PARAMETER (MXCOL = 512)
       INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NFILES                               ! No of FITS files in dir
       INTEGER NHDU                                 ! Fits header, unit
       INTEGER VARIDAT                              ! Fitsio variable
       INTEGER TFIELDS            ! Fits header, no fields per rows
       INTEGER BLOCK
 
       CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*100 FILES(MAXRAW)                   ! Listof files in dir
+      CHARACTER*500 FITSDIR                         ! Location of FITS files
+      CHARACTER*500 SRT_ROOTNAME                    ! Dir and filename
       CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
       CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
       CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
 
-*    Local data :
-*     <any DATA initialisations for local variables>
 *-
-*
-*  The EVRATE tables are in _ANC.FITS
-      FILENAME = FROOT(1:CHR_LEN(FROOT))//'_anc.fits'
-*
+* Check status :
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      SRT_ROOTNAME =  FROOT(1:CHR_LEN(FROOT))//'_anc.fits'
+*  Does file exist?
+      CALL UTIL_FINDFILE('.', SRT_ROOTNAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+*  If file not in current directory prompt for path
+      IF (NFILES .LE. 0) THEN
+        CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS )
+        SRT_ROOTNAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//SRT_ROOTNAME
+      END IF
+
 *  Open the FITS file
       CALL FIO_GUNIT(IUNIT,STATUS)
-      CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
+      CALL FTOPEN(IUNIT,SRT_ROOTNAME,0,BLOCK,STATUS)
       IF (STATUS .NE. SAI__OK) THEN
-	 CALL MSG_SETC('FNAM',FILENAME)
+	 CALL MSG_SETC('FNAM',SRT_ROOTNAME)
          CALL MSG_PRNT('XRTSUB : Error - opening file ^FNAM **')
          GOTO 999
       ENDIF
