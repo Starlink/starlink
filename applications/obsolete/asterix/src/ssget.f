@@ -87,6 +87,7 @@
       INTEGER                	NSRC             	! # of sources
 
       INTEGER                	PTR              	! Ptr to mapped data
+      INTEGER			SFID			! Input file identifier
       INTEGER                	TSTAT            	! Temporary status
 
       LOGICAL                	ECHO             	! Echo to standard output?
