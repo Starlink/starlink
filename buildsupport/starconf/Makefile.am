@@ -44,12 +44,15 @@ starconf: make-starconf \
 # could legitimately be done at configure time -- it does not have to
 # be done this late -- but that would require us to have more than one
 # substitution step, which would be too confusing and messy.
+#
+# The set of !!...!!-substituted variables should be consistent with those in 
+# make-starconf.in
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@datadir\@,$(datadir),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
-	-e 's,@DEFAULT_STARLINK\@,@DEFAULT_STARLINK@,g' \
-	-e 's,@DEFAULT_PREFIX\@,@DEFAULT_PREFIX@,g' \
+	-e 's,@STARCONF_DEFAULT_STARLINK\@,@STARCONF_DEFAULT_STARLINK@,g' \
+	-e 's,@STARCONF_DEFAULT_PREFIX\@,@STARCONF_DEFAULT_PREFIX@,g' \
 	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g' \
 	-e 's,@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g'
 make-starconf: make-starconf.in

@@ -9,10 +9,11 @@
 # Defaults for Starlink configure.ac files
 AC_DEFUN([STAR_DEFAULTS],
 [#
-# Ensure that STARLINK has a value, defaulting to !!DEFAULT_STARLINK!!.
-# Note that this directory may be different from /star, and reflects the
-# value of DEFAULT_STARLINK that the `starconf' package was configured with
-# before its installation.
+# Ensure that STARLINK has a value, defaulting to
+# !!STARCONF_DEFAULT_STARLINK!!.  Note that this directory may be
+# different from /star, and reflects the value of
+# STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
+# with before its installation. 
 #
 # We use $STARLINK as the location of any other Starlink tools we need
 # to use during the building of our packages, and for the location of
@@ -23,22 +24,23 @@ AC_DEFUN([STAR_DEFAULTS],
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in !!DEFAULT_PREFIX!! by default.  This is so
-# even if $STARLINK and DEFAULT_STARLINK are different, because in
-# this case we are planning to use a previous installation in
-# $STARLINK or $DEFAULT_STARLINK, but install the newly built tool
-# elsewhere.
+# However, we install software in !!STARCONF_DEFAULT_PREFIX!! by
+# default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
+# are different, because in this case we are planning to use a
+# previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
+# but install the newly built tool elsewhere. 
 #
 # In most cases, including the most important case where we are
 # building the tree from scratch, in a checked out directory,
-# STARLINK, DEFAULT_STARLINK and DEFAULT_PREFIX will all be the same.
-# That's OK because a separate aspect of the build process, respecting
-# the various dependencies expresses in source directories, ensures that
-# we don't use (and install) any Starlink tools in one component before that
-# component has been build and installed.
+# STARLINK, STARCONF_DEFAULT_STARLINK and STARCONF_DEFAULT_PREFIX will
+# all be the same.  That's OK because a separate aspect of the build
+# process, respecting the various dependencies expresses in source
+# directories, ensures that we don't use (and install) any Starlink
+# tools in one component before that component has been build and
+# installed. 
 
-test -n "$STARLINK" || STARLINK=!!DEFAULT_STARLINK!!
-AC_PREFIX_DEFAULT(!!DEFAULT_PREFIX!!)dnl
+test -n "$STARLINK" || STARLINK=!!STARCONF_DEFAULT_STARLINK!!
+AC_PREFIX_DEFAULT(!!STARCONF_DEFAULT_PREFIX!!)dnl
 
 # Everything depends on where /star is.  Declare STARLINK as a
 # `precious variable'.  Amongst other things, this will make
