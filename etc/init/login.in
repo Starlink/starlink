@@ -148,7 +148,7 @@ endif
 #
 #  TCLSYS
 if ( -e @exec_prefix@/manifests/tcl ) then
-   set tclsh_names=`grep 'bin/tclsh' /star/manifests/tcl`
+   set tclsh_names=`grep 'bin/tclsh' @exec_prefix@/manifests/tcl`
    set tclsys_install=`echo $tclsh_names[1]:h:h`
    if ( "@exec_prefix@" != ${tclsys_install} ) then
       setenv TCL_LIBRARY @libdir@
@@ -418,7 +418,7 @@ endif
 #
 #  PERL -- note this isn't a third party package at present.
 if ( -e @exec_prefix@/manifests/perl ) then
-   set perl_names=`grep 'bin/perl' /star/manifests/perl`
+   set perl_names=`grep 'bin/perl' @exec_prefix@/manifests/perl`
    set perl_install=`echo $perl_names[1]:h:h`
    if ( "@exec_prefix@" != ${perl_install} ) then
       set perl_version = 5.8.0
