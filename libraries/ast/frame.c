@@ -9159,9 +9159,11 @@ f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 *     will accept any of the values which may be assigned to the System
 *     attribute.
 *
-*     The Mapping returned by AST_FINDFRAME or AST_CONVERT will use the
-*     coordinate system specified by the AlignSystem attribute as an
-*     intermediate coordinate system. The total returned Mapping will first
+*     The Mapping returned by 
+f     AST_FINDFRAME or AST_CONVERT 
+c     astFindFrame or astConvert
+*     will use the coordinate system specified by the AlignSystem attribute as 
+*     an intermediate coordinate system. The total returned Mapping will first
 *     map positions from the first Frame into this intermediate coordinate
 *     system, using the attributes of the first Frame. It will then map
 *     these positions from the intermediate coordinate system into the
