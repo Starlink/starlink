@@ -35,14 +35,6 @@ INTERFACE STATISTIX
       HELP      'If yes, then all points with non-zero quality will be ignored.'
    ENDPARAMETER
 
-   PARAMETER SIMPLE
-      TYPE      '_LOGICAL'
-      VPATH     'DEFAULT'
-      DEFAULT   Y
-      PROMPT    'Work in simple mode'
-      HELP      'If false, then skewness and kurtosis are calculated'
-   ENDPARAMETER
-
    PARAMETER SIGMA
       TYPE      '_DOUBLE'
       PROMPT    'Enter cutoff sigma N (or ! to exit program) '
