@@ -157,7 +157,7 @@ c      END IF
      :                           CHR_LEN(IM_FILE)), STATUS )
 
 *    History entry
-      CALL HSI_ADD( SID, PSS_VERSION, STATUS )
+      CALL HSI_ADD( SID, PSS__VERSION, STATUS )
 
       END
 *+  PSS_OUT_SSUB -  Create source subtracted image
