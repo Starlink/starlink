@@ -128,6 +128,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        direction of the fit (the original astLinearApprox fitted the
 *        inverse transformation, but the public version now fits the forwrd
 *        transformation).
+*     4-OCT-2004 (DSB):
+*        Modify astMapList to return flag indicating presence of inverted
+*        CmpMaps in supplied Mapping.
 *class--
 */
 
@@ -322,7 +325,7 @@ static void InterpolateBlockAverageUL( int, const int[], const int[], const unsi
 static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * ); 
 static void Invert( AstMapping * );
 static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
-static void MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
 static void SetAttrib( AstObject *, const char * );
 static void SetInvert( AstMapping *, int );
@@ -6426,7 +6429,7 @@ static double MapFunction( const MapData *mapdata, const double in[],
    return result;
 }
 
-static void MapList( AstMapping *this, int series, int invert, int *nmap,
+static int MapList( AstMapping *this, int series, int invert, int *nmap,
                      AstMapping ***map_list, int **invert_list ) {
 /*
 *+
@@ -6441,7 +6444,7 @@ static void MapList( AstMapping *this, int series, int invert, int *nmap,
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void astMapList( AstMapping *this, int series, int invert, int *nmap,
+*     int astMapList( AstMapping *this, int series, int invert, int *nmap,
 *                      AstMapping ***map_list, int **invert_list )
 
 *  Class Membership:
@@ -6539,6 +6542,10 @@ static void MapList( AstMapping *this, int series, int invert, int *nmap,
 *        The dynamic array holding these values should be freed by the
 *        caller, using astFree, when no longer required.
 
+*  Returned Value:
+*     A non-zero value is returned if the supplied Mapping contained any
+*     inverted CmpMaps.
+
 *  Notes:
 *     - It is unspecified to what extent the original Mapping and the
 *     individual (decomposed) Mappings are
@@ -6552,7 +6559,7 @@ static void MapList( AstMapping *this, int series, int invert, int *nmap,
 */
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return 0;
 
 /* Since we are dealing with a basic Mapping, only one new Mapping
    pointer will be returned. Extend the dynamic arrays to accommodate
@@ -6569,6 +6576,8 @@ static void MapList( AstMapping *this, int series, int invert, int *nmap,
 /* If OK, return the new Mapping count. */
       if ( astOK ) ( *nmap )++;
    }
+
+   return 0;
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
@@ -13409,10 +13418,10 @@ void astMapBox_( AstMapping *this,
    (**astMEMBER(this,Mapping,MapBox))( this, lbnd_in, ubnd_in, forward,
                                        coord_out, lbnd_out, ubnd_out, xl, xu );
 }
-void astMapList_( AstMapping *this, int series, int invert, int *nmap,
+int astMapList_( AstMapping *this, int series, int invert, int *nmap,
                   AstMapping ***map_list, int **invert_list ) {
-   if ( !astOK ) return;
-   (**astMEMBER(this,Mapping,MapList))( this, series, invert,
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Mapping,MapList))( this, series, invert,
                                         nmap, map_list, invert_list );
 }
 int astMapMerge_( AstMapping *this, int where, int series, int *nmap,

@@ -75,6 +75,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     27-APR-2004 (DSB):
 *        - Correction to MapMerge to prevent segvio if CmpMap and PermMap
 *        cannot be swapped.
+*     4-OCT-2004 (DSB):
+*        Modify astMapList to return flag indicating presence of inverted
+*        CmpMaps in supplied Mapping.
 *class--
 */
 
@@ -118,7 +121,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static void (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int ** );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -139,7 +142,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 
 /* Member functions. */
 /* ================= */
@@ -485,7 +488,7 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
    astSetDump( vtab, Dump, "CmpMap", "Compound Mapping" );
 }
 
-static void MapList( AstMapping *this_mapping, int series, int invert,
+static int MapList( AstMapping *this_mapping, int series, int invert,
                      int *nmap, AstMapping ***map_list, int **invert_list ) {
 /*
 *  Name:
@@ -499,8 +502,8 @@ static void MapList( AstMapping *this_mapping, int series, int invert,
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void MapList( AstMapping *this, int series, int invert, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*     int MapList( AstMapping *this, int series, int invert, int *nmap,
+*                  AstMapping ***map_list, int **invert_list )
 
 *  Class Membership:
 *     CmpMap member function (over-rides the protected astMapList
@@ -597,6 +600,10 @@ static void MapList( AstMapping *this_mapping, int series, int invert,
 *        The dynamic array holding these values should be freed by the
 *        caller, using astFree, when no longer required.
 
+*  Returned Value:
+*     A non-zero value is returned if the supplied Mapping contained any
+*     inverted CmpMaps.
+
 *  Notes:
 *     - It is unspecified to what extent the original CmpMap and the
 *     individual (decomposed) Mappings are
@@ -612,9 +619,12 @@ static void MapList( AstMapping *this_mapping, int series, int invert,
    AstCmpMap *this;              /* Pointer to CmpMap structure */
    int invert1;                  /* Invert flag for first component Mapping */
    int invert2;                  /* Invert flag for second component Mapping */
+   int r1;                       /* Value returned from first map list */
+   int r2;                       /* Value returned from second map list */
+   int result;                   /* Returned value */
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return 0;
 
 /* Obtain a pointer to the CmpMap structure. */
    this = (AstCmpMap *) this_mapping;
@@ -641,15 +651,15 @@ static void MapList( AstMapping *this_mapping, int series, int invert,
    applied first in this case. */
       if ( series ) {
          if ( !invert ) {
-            astMapList( this->map1, series, invert1,
-                        nmap, map_list, invert_list );
-            astMapList( this->map2, series, invert2,
-                        nmap, map_list, invert_list );
+            r1 = astMapList( this->map1, series, invert1,
+                             nmap, map_list, invert_list );
+            r2 = astMapList( this->map2, series, invert2,
+                             nmap, map_list, invert_list );
          } else {
-            astMapList( this->map2, series, invert2,
-                        nmap, map_list, invert_list );
-            astMapList( this->map1, series, invert1,
-                        nmap, map_list, invert_list );
+            r1 = astMapList( this->map2, series, invert2,
+                             nmap, map_list, invert_list );
+            r2 = astMapList( this->map1, series, invert1,
+                             nmap, map_list, invert_list );
          }
 
 /* If the component Mappings are applied in parallel, then concatenate
@@ -657,20 +667,25 @@ static void MapList( AstMapping *this_mapping, int series, int invert,
    inverting the CmpMap has no effect on the order in which they are
    applied. */
       } else {
-         astMapList( this->map1, series, invert1,
-                     nmap, map_list, invert_list );
-         astMapList( this->map2, series, invert2,
-                     nmap, map_list, invert_list );
+         r1 = astMapList( this->map1, series, invert1,
+                          nmap, map_list, invert_list );
+         r2 = astMapList( this->map2, series, invert2,
+                          nmap, map_list, invert_list );
       }
+
+/* Did we find any inverted CmpMaps? */
+      result = invert || r1 || r2;
 
 /* If the CmpMap does not combine its components in the way required
    by the decomposition (series or parallel), then we cannot decompose
    it. In this case it must be appended to the Mapping list as a
    single entity. We can use the parent class method to do this. */
    } else {
-      ( *parent_maplist )( this_mapping, series, invert, nmap,
-                           map_list, invert_list );
+      result = ( *parent_maplist )( this_mapping, series, invert, nmap,
+                                    map_list, invert_list );
    }
+
+   return result;
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
@@ -1473,9 +1488,11 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Decompose the CmpMap into a sequence of Mappings to be applied in
    series or parallel, as appropriate, and an associated list of
-   Invert flags. */
-      astMapList( this_mapping, this->series, astGetInvert( this ), &nmap,
-                  &map_list, &invert_list );
+   Invert flags. If any inverted CmpMaps are found in the Mapping, then
+   we can at least simplify the returned Mapping by swapping and
+   inverting the components. Set "simpler" to indicate this. */
+      simpler = astMapList( this_mapping, this->series, astGetInvert( this ), &nmap,
+                            &map_list, &invert_list );
 
 /* Initialise pointers to memory used to hold lists of the modified
    Mapping index and the number of mappings after each call of
@@ -1485,7 +1502,6 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Loop to simplify the sequence until a complete pass through it has
    been made without producing any improvement. */
-      simpler = 0;
       improved = 1;
       while ( astOK && improved ) {
          improved = 0;

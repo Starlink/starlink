@@ -20,7 +20,7 @@ f     only within textual output (e.g. from AST_WRITE).
 *     The Axis class inherits from the Object class.
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)

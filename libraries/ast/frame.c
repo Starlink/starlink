@@ -102,7 +102,7 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     both equal to the number of Frame axes.
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
