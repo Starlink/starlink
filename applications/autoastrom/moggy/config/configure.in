@@ -152,9 +152,29 @@ while test $# -gt 0; do
   shift
 done
 
-dnl   We can't actually make the following checks, since there doesn't
-dnl   seem to be a way of using the LIBS and CPPFLAGS settings which
-dnl   we've produced above.
+
+AC_CHECK_HEADER(ast.h)
+AC_MSG_CHECKING(whether your AST library is new enough)
+AC_TRY_RUN(#include <ast.h>
+int main()
+{
+#ifdef AST_MAJOR_VERS
+if (AST_MAJOR_VERS >= 1 && AST_MINOR_VERS >= 8) return 0; else return 1;
+#else
+return 1
+#endif
+}, 
+  AC_MSG_RESULT(ok),
+  AC_MSG_RESULT(no)
+  AC_MSG_WARN([Your AST library APPEARS to be too old.
+I'll keep going but if there's a problem building the software this
+might be the cause]),
+  AC_MSG_WARN([I can't tell if your AST library is new enough.
+I'll guess it is and hope for the best]))
+
+dnl   The following would be neater (it doesn't require a
+dnl   compilation), but I can't work out how to make it use the LIBS
+dnl   and CPPFLAGS settings which we've produced above.
 dnl dnl   Now that we've found the /star directories, check that ast.h is
 dnl dnl   there.  There was a problem with ast.h which meant it caused the
 dnl dnl   Tru64 C++ compiler to object.  This is certainly fixed by AST
