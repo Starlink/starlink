@@ -809,7 +809,7 @@
 
 
 *+ IMG_CLEAR - clear current image
-	SUBROUTINE IMG_CLEAR(STATUS)
+	SUBROUTINE IMG_CLEAR(HALF,STATUS)
 
         IMPLICIT NONE
 
@@ -817,47 +817,37 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *  Import :
+      INTEGER HALF
 *  Export :
 *  Status :
         INTEGER STATUS
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Local constants :
+      INTEGER N
+      PARAMETER (N=5)
 *  Local variables :
-      REAL X1,X2,Y1,Y2
-      REAL TR(6)
-      REAL BLANK(1,1)/0.0/
+      REAL X(N)/0.0,1.0,1.0,0.0,0.0/
+      REAL Y(N)/0.0,0.0,1.0,1.0,0.0/
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
+*  select appropriate half of display
+        IF (HALF.EQ.1) THEN
+          CALL PGVPORT(0.0,0.5,0.0,1.0)
+        ELSE
+          CALL PGVPORT(0.5,1.0,0.0,1.0)
+        ENDIF
+        CALL PGWINDOW(0.0,1.0,0.0,1.0)
 
 *  set plotting colour to background
         CALL PGSCI(0)
 
-*  remove labels
-        IF (I_DISP) THEN
-          CALL PGLABEL(I_XYUNITS,I_XYUNITS,I_TITLE)
-        ELSEIF (I_DISP_1D) THEN
-          CALL PGLABEL(I_XUNITS_1D,I_UNITS_1D,I_TITLE_1D)
-        ENDIF
+*  plot blank filled rectangle
+        CALL PGPOLY(N,X,Y)
 
-*  remove axes
-        CALL PGBOX('BCNT',0.0,0,'BCNT',0.0,0)
-
-        CALL PGSCI(1)
-
-*  get current window boundaries
-        CALL PGQWIN(X1,X2,Y1,Y2)
-
-*  set transformation matrix so blank image fills window
-        TR(1)=X1-(X2-X1)/2.0
-        TR(2)=(X2-X1)
-        TR(3)=0.0
-        TR(4)=Y1-(Y2-Y1)/2.0
-        TR(5)=0.0
-        TR(6)=(Y2-Y1)
-
-*  plot blank image
-        CALL PGGRAY(BLANK,1,1,1,1,1,1,2.0,1.0,TR)
+*  restore plotting defaults
+        CALL GCB_SETDEF(STATUS)
 
       ENDIF
 
@@ -1221,11 +1211,19 @@
         ABS=.FALSE.
         SCALED=.TRUE.
 
-*  set window and transformations
-        X1=0.0
-        X2=1.0
-        Y1=0.0
-        Y2=1.0
+*  set viewport to half display surface after clearing it
+        IF (I_SPLIT_DISP) THEN
+          X1=0.0
+          X2=0.5
+          Y1=0.0
+          Y2=1.0
+*  or whole surface
+        ELSE
+          X1=0.0
+          X2=1.0
+          Y1=0.0
+          Y2=1.0
+        ENDIF
         CALL GFX_VPORT(X1,X2,Y1,Y2,ABS,STATUS)
 
         CALL GFX_WINDOW(XW1,XW2,YW1,YW2,SCALED,STATUS)
@@ -1381,19 +1379,27 @@
 
         CALL GCB_SETDEF(STATUS)
 
-*  set window and transformations
-        X1=0.0
-        X2=1.0
-        Y1=0.0
-        Y2=1.0
+*  set viewport to half display surface
+        IF (I_SPLIT_DISP) THEN
+          X1=0.5
+          X2=1.0
+          Y1=0.0
+          Y2=1.0
+*  or full display
+        ELSE
+          X1=0.0
+          X2=1.0
+          Y1=0.0
+          Y2=1.0
+        ENDIF
         ABS=.FALSE.
         SCALED=.FALSE.
         CALL GFX_VPORT(X1,X2,Y1,Y2,ABS,STATUS)
         CALL GFX_WINDOW(I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  store transformation
-        CALL GTR_SAVE(.FALSE.,X1,X2,Y1,Y2,ABS,
-     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
+c        CALL GTR_SAVE(.FALSE.,X1,X2,Y1,Y2,ABS,
+c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 *  draw axes
         CALL GFX_AXES(STATUS)

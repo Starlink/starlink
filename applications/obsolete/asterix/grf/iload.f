@@ -13,6 +13,7 @@
 *      1 Jul 94 : V1.7-4 screen clearing more intelligent (RJV)
 *     20 Sep 94 : V1.7-5 region mask incorporated (RJV)
 *      6 Jan 95 : V1.8-0 ARD for regions (RJV)
+*     27 Apr 95 : V1.8-1 SPLIT option added (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -38,7 +39,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ILOAD Version 1.8-0')
+      PARAMETER (VERSION = 'ILOAD Version 1.8-1')
 *-
 *  first invocation do global initialisation
       IF (.NOT.I_OPEN) THEN
@@ -110,6 +111,8 @@
           CALL GDV_OPEN(DEV,NX,NY,STATUS)
         ENDIF
 
+*  is each zone to be split into 2D and 1D
+        CALL USI_GET0L('SPLIT',I_SPLIT_DISP,STATUS)
 
         CALL USI_GET0I('MODE',MODE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN

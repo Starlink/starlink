@@ -35,10 +35,14 @@
         CALL MSG_PRNT('AST_ERR: image processing system not active')
       ELSE
 
-*  advance to next window unless freshly opened device
+*  clear display unless freshly opened device
         CALL GDV_FRESH(FRESH,STATUS)
         IF (.NOT.FRESH) THEN
-          CALL GDV_CLEAR(STATUS)
+          IF (I_SPLIT_DISP) THEN
+            CALL IMG_CLEAR(1,STATUS)
+          ELSE
+            CALL GDV_CLEAR(STATUS)
+          ENDIF
         ENDIF
 
 *  reset transformation database
@@ -56,7 +60,6 @@
         CALL GCB_SETL('SURF_FLAG',.FALSE.,STATUS)
         I_DISP=.TRUE.
         I_DISP_1D=.FALSE.
-        I_CLEAR=.FALSE.
 
       ENDIF
 
