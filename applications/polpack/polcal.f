@@ -281,8 +281,9 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  continue looking for other valid images.
             ELSE
                CALL NDF_MSG( 'NDF', NDFIN( I ) )
-               CALL MSG_OUT( ' ', 'POLCAL: Input NDF ^NDF has invalid'//
-     :                            ' polarimetry descriptors', STATUS )
+               CALL MSG_OUT( ' ', 'POLCAL: The POLPACK extension in '//
+     :                       '''^NDF'' contains invalid values.', 
+     :                       STATUS )
             ENDIF
 
 *  If an error occured whilst obtaining the descriptors, then notify the
@@ -290,8 +291,8 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
          ELSE
             CALL ERR_FLUSH( STATUS )
             CALL NDF_MSG( 'NDF', NDFIN( I ) )
-            CALL MSG_OUT( ' ', 'POLCAL: Cannot access polarimetry '//
-     :                         'extension for image ^NDF', STATUS )
+            CALL MSG_OUT( ' ', 'POLCAL: Cannot access the POLPACK '//
+     :                         'extension in ''^NDF''.', STATUS )
          ENDIF
       ENDDO
 
@@ -301,7 +302,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       IF ( NVAL .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_NOVALID', 'POLCAL: None of the input ' //
-     :        'NDFs have valid POLPACK extensions' , STATUS )
+     :        'NDFs have valid POLPACK extensions.' , STATUS )
          GO TO 99
       ENDIF
 
@@ -323,7 +324,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
             CALL MSG_OUT( ' ', 'POLCAL: VARIANCE information was ' //
      :           'requested in the output. However, not all of the ' //
      :           'input images have VARIANCES so NO output VARIANCE ' //
-     :           'can be calculated', STATUS )
+     :           'can be calculated.', STATUS )
          ENDIF
       ENDIF
 
@@ -343,9 +344,9 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       IF ( ILEVEL .GT. 0 ) THEN
          CALL MSG_BLANK( STATUS )
          CALL MSG_SETI( 'NIM', NIM )
-         CALL MSG_OUT( ' ', 'POLCAL: ^NIM Input NDFs accessed', STATUS )
+         CALL MSG_OUT( ' ', '   ^NIM input NDFs accessed.', STATUS )
          CALL MSG_SETI( 'NVAL', NVAL )
-         CALL MSG_OUT( ' ', 'POLCAL: ^NVAL Input NDFs validated',
+         CALL MSG_OUT( ' ', '   ^NVAL input NDFs validated.',
      :                 STATUS )
       ENDIF
             
@@ -379,9 +380,9 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  If an image does not have a pair give a warning and flag it as 'used'
 *  so that it will not take part in the processing.
          CALL NDF_MSG( 'NDF', NDFVAL( IVAL ) )
-         CALL MSG_OUT( ' ', ' POLCAL: WARNING! Input NDF ^NDF does '//
-     :                 'not have a polarimetric pair and will not '//
-     :                 'be used.', STATUS )
+         CALL MSG_OUT( ' ', ' POLCAL: ''^NDF'' does not have a '//
+     :                 'polarimetric pair and will not be used.', 
+     :                 STATUS )
          USED( IVAL ) = .TRUE.
  1       CONTINUE
       ENDDO
@@ -391,7 +392,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       IF ( NPAIR .EQ. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_NOPAIRS', 'POLCAL: There are no ' //
-     :        'usable images. Cannot continue.', STATUS )
+     :                 'usable images. Cannot continue.', STATUS )
          GO TO 99
       ENDIF
          
@@ -462,22 +463,22 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       IF ( NQ .EQ. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADLIN', 'POLCAL: There is not ' //
-     :        'enough information to calculate the ' //
-     :        'polarisation. Cannot continue', STATUS )
+     :                 'enough information to calculate the ' //
+     :                 'polarisation. Cannot continue.', STATUS )
          GO TO 99
 
       ELSE IF ( MODE .EQ. 'LINEAR' .AND. NU .EQ. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADLIN', 'POLCAL: There is not ' //
-     :        'enough information to calculate the linear ' //
-     :        'polarisation. Cannot continue', STATUS )
+     :                 'enough information to calculate the linear ' //
+     :                 'polarisation. Cannot continue.', STATUS )
          GO TO 99
 
       ELSE IF ( MODE .EQ. 'CIRCULAR' .AND. NU .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADCIR', 'POLCAL: The detected ' //
-     :        'images are compatible with linear polarimetry ' //
-     :        'but MODE=CIRCULAR is selected. Cannot continue', STATUS )
+     :        'images are compatible with linear polarimetry but ' //
+     :        'MODE=CIRCULAR is selected. Cannot continue.', STATUS )
          GO TO 99
 
       ENDIF
