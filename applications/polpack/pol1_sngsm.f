@@ -134,7 +134,9 @@
       DOUBLE PRECISION SY2       ! Sum over the box
       DOUBLE PRECISION SY3       ! Sum over the box
       DOUBLE PRECISION SY4       ! Sum over the box
+      DOUBLE PRECISION VLIM      ! Smallest usable variance
       DOUBLE PRECISION W         ! Pixel weight
+      DOUBLE PRECISION WLIM      ! Largest usable weight
       DOUBLE PRECISION X         ! Co-ordinate data
       DOUBLE PRECISION X2        ! Co-ordinate data
       DOUBLE PRECISION XY        ! Co-ordinate data
@@ -160,6 +162,12 @@
 *  Check the inherited global status. Also return immediately if no
 *  smoothing is required.
       IF ( STATUS .NE. SAI__OK .OR. HW .EQ. 0 ) RETURN
+
+*  Store the largest usable weight.
+      WLIM = SQRT( DBLE( VAL__MAXR ) )
+
+*  Store the smallest variance which can be used.
+      VLIM = 1.0D0/SQRT( WLIM )
 
 *  Create the arrays holding the high (3 and 4) powers of X and Y at the 
 *  centre of each pixel in a fitting box. 
@@ -199,9 +207,14 @@
          DO IY = 1, NROW     
             DO IX = 1, NPIX
                IF( DATA( IX, IY, IZ ) .NE. VAL__BADR .AND.
-     :             VAR( IX, IY, IZ ) .NE. VAL__BADR .AND.
-     :             VAR( IX, IY, IZ ) .GT. 0.0 ) THEN
-                  WGT( IX, IY ) = 1.0/( VAR( IX, IY, IZ )**2 )
+     :             VAR( IX, IY, IZ ) .NE. VAL__BADR ) THEN
+               
+                  IF( VAR( IX, IY, IZ ) .GT. VLIM ) THEN
+                     WGT( IX, IY ) = 1.0/( VAR( IX, IY, IZ )**2 )
+                  ELSE
+                     WGT( IX, IY ) = WLIM
+                  END IF
+
                ELSE
                   WGT( IX, IY ) = 0.0
                END IF
