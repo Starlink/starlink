@@ -808,7 +808,11 @@ void PkFont::read_font (InputByteStream& pkf)
 
 /**
  * Obtain the magnification of this font.  This includes both font scaling
- * and overall DVI file magnification.
+ * and overall DVI file magnification: this number is <em>mag/1000 .
+ * s/d</em>, where <em>s</em> and <em>d</em> are taken from the font
+ * definition in the DVI file, and <em>mag</em> is the total
+ * magnification taking into account DVI preamble magnification and
+ * any command-line overriding.
  *
  * @return the font magnification
  */

@@ -151,38 +151,129 @@ class PkFont {
     static void setFontSearchCommand(char* cmd);
     static void setFontSearchCommand(bool yesno);
     static void setFontSearchKpse(bool yesno);
+    /**
+     * Sets the base font resolution.  This must be consistent with
+     * the the Metafont mode set by {@link #setMissingFontMode}, if
+     * font-generation is to work.
+     * @param res the new font resolution
+     * @see #dpiBase
+     */
     static void setResolution(int res) { resolution_ = res; }
+    /**
+     * Sets the Metafont mode to be used when generating fonts.  This
+     * must be consistent with any base font resolution set in {@link
+     * #setResolution}.
+     * @param mode a Metafont mode
+     */
     static void setMissingFontMode(string mode) { missingFontMode_ = mode; }
+    /**
+     * Enable or disable font generation.
+     * @param doit if true, font generation is enabled
+     */
     static void setMakeFonts(bool doit) { makeMissingFonts_ = doit; }
+    /**
+     * Identifies the current font
+     * @return the font's name
+     */
     string name() const { return name_; }
+    /**
+     * Locates the current font's bitmap file
+     * @return theh path to the PK file which defines this font
+     */
     string fontFilename() const { return path_; }
     string fontgenCommand() const;
     double magnification() const;
+    /**
+     * Obtains the base font resolution, in dots-per-inch.  This is
+     * the base resolution corresponding to the Metafont mode set by
+     * {@link #setMissingFontMode}, and the two must be consistent if
+     * font-generation is to work.
+     * @return the font resolution, in dots-per-inch
+     * @see #setResolution
+     */
     static int dpiBase() { return resolution_; }
+    /**
+     * Obtains the resolution of the current font, taking
+     * magnification into account
+     * @return the font's resolution, in dots-per-inch
+     */
     int dpiScaled() const {
 	return static_cast<int>(resolution_
 				* magnification()
 				+ 0.5);
     }
+    /**
+     * Obtains the font's scale.  This is the factor <em>s/d</em>,
+     * where <em>s</em> and <em>d</em> are the font scale and font
+     * design size as specified when the font was declared in the DVI
+     * file.  Together, they specify that the font is to be used at
+     * <em>magnification/1000 . s/d</em> times its design size.  This
+     * is distinct from the return value of {@link #magnification},
+     * which takes DVI file magnification into account, and which is
+     * therefore more useful in general.
+     *
+     * @return the font scale, s/d
+     */
     double scale() const {
 	return (double)font_header_.s / (double)font_header_.d;
     }
+    /**
+     * Has the current font been declared in the document so far, or
+     * just in the DVI file postamble.
+     * @return true if we have seen a fnt_def declaration for this
+     * font, in the DVI file body
+     */
     bool seenInDoc(void) const { return seen_in_doc_; }
     void setSeenInDoc(void) { seen_in_doc_ = true; }
     // wordSpace(), backSpace() and quad() return those values in DVI units
+    /**
+     * Obtains the size of the <code>word_space</code> parameter for this font.
+     * @return <code>word_space</code> in DVI units
+     */
     double wordSpace() const { return word_space_; }
+    /**
+     * Obtains the size of the <code>back_space</code> parameter for this font.
+     * @return <code>back_space</code> in DVI units
+     */
     double backSpace() const { return back_space_; }
+    /**
+     * Obtains the size of the <code>quad</code> parameter for this font.
+     * @return <code>quad</code> in DVI units
+     */
     double quad() const { return quad_; }
+    // No need to check font_loaded_ in these next three, since these
+    // are never called between the font being created and preamble_
+    // being filled in.
+    /**
+     * Obtains the design size of this font, as obtained from the PK
+     * file preamble.
+     * @return the design size in points.
+     */
     // design size, and horiz/vert pixels-per-point, in points.
-    // No need to check font_loaded_, since these are never called
-    // between the font being created and preamble_ being filled in
-    double designSize() const {
-	return preamble_.designSize;
-    }
+    double designSize() const {	return preamble_.designSize; }
+    /**
+     * Obtains the number of horizontal pixels per point for this
+     * font, as obtained from the PK file preamble.
+     * @return the hppp parameter in points.
+     */
     double hppp() const { return preamble_.hppp; }
+    /**
+     * Obtains the number of vertical pixels per point for this
+     * font, as obtained from the PK file preamble.
+     * @return the vppp parameter in points.
+     */
     double vppp() const { return preamble_.vppp; }
-    // return checksum obtained from PK file
+    /**
+     * Obtains the font checksum, as obtained from the PK file preamble.
+     * @return checksum
+     */
     unsigned int checksum() const { return preamble_.cs; }
+    /**
+     * Check if the font has actually been loaded.  This is false
+     * if the font was declared in the DVI file, but its bitmaps were
+     * not or cound not be loaded from disk for some reason.
+     * @return true if the font was successfully read from disk
+     */
     bool loaded() const { return font_loaded_; }
 
     static string& substitute_font_string (const string fmt,
@@ -237,7 +328,7 @@ class PkFont {
     static const unsigned int fontSearchStrategyKpse_ = 2;
     static const unsigned int fontSearchStrategyCommand_ = 4;
 
-    static int resolution_;
+    static int resolution_;	// base resolution for MF mode
     static bool makeMissingFonts_;	// automatically make fonts
     static string missingFontMode_;
 };
