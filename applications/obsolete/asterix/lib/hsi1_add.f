@@ -109,8 +109,6 @@
 *  Local Constants:
       CHARACTER*8		UMODE
         PARAMETER		( UMODE = 'NORMAL' )
-      INTEGER			ESIZE
-        PARAMETER		( ESIZE = 10 )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CRLOC			! Current record
