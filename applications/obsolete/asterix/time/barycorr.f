@@ -1093,6 +1093,7 @@ c      END STRUCTURE
 *
 
 c      RECORD /POS_REC/ POS
+c      RECORD /POS_REC/ POS
       REAL BARY                         ! Barycentric  correction in Secs
       DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
@@ -1178,7 +1179,7 @@ c      RECORD /POS_REC/ POS
 *  If binned and axis width present, then do not use trigger times as gaps
 *  will appear in the time series due to differential barycentric corrections
 *  during the observation
-*  Check inherited global status.
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If binned and axis width present, then do not use trigger times as gaps
@@ -1188,9 +1189,11 @@ c      RECORD /POS_REC/ POS
 *       BOUNDS(NEVENT+1) = INTIMES(NEVENT)+0.5*WIDTHS(NEVENT)
          LB = INTIMES(1) - WIDTHS(1) / 2
          LB = INTIMES(1) - WIDTHS(1) / 2
+         LB = INTIMES(1) - WIDTHS(1) / 2
          CALL BARY_CORR_INT(LB,RA,DEC,LUN_POS,
      :   POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
          LB = LB + BARY
+         UB = INTIMES(1) + WIDTHS(1) / 2
          UB = INTIMES(1) + WIDTHS(1) / 2
          UB = INTIMES(1) + WIDTHS(1) / 2
          CALL BARY_CORR_INT(UB,RA,DEC,LUN_POS,
@@ -1227,6 +1230,7 @@ c      RECORD /POS_REC/ POS
       END
 
 
+*+  BARY_CORR_INT - Does the barycentric corrections according to user spec
 *+  BARY_CORR_INT - Does the barycentric corrections according to user spec
       SUBROUTINE BARY_CORR_INT(TIME,RA,DEC,LUN_POS,POS_FILE_OK,
      : BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
