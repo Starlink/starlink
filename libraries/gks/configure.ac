@@ -92,7 +92,7 @@ dnl    We recurse into subdirectories -- see SUBDIRS in Makefile.am
 AC_CONFIG_FILES([Makefile component.xml
     base/Makefile base/gkioop.f call/Makefile
     data/Makefile data/emf/Makefile data/fonts/Makefile data/wdts/Makefile
-    include/Makefile include/gkmc.par.fpp])
+    include/Makefile include/gkmc.par.F])
 
 dnl    Not all the driver subdirectories are autoconfed, only...
 dnl    (using m4 regexps and substitutions is somewhat safer than being
