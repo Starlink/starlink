@@ -337,7 +337,7 @@ numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
 tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \
-listmake.f listshow.f profile.f wcsalign.f copybad.f
+listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f
 
 # The contents of the kapsub_sub.tar file:
 KAPSUB_SUB = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
@@ -430,7 +430,7 @@ fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f hislist.f \
 hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f setbb.f \
 setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f settitle.f \
 settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f wcsframe.f \
-wcsremove.f wcsshow.f chain.f reshape.f wcstran.f
+wcsremove.f wcsshow.f chain.f reshape.f 
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kappa.tar.
