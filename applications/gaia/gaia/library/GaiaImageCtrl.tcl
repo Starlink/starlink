@@ -54,6 +54,10 @@
 #     28-JAN-2000 (PWD):
 #        Override focus_ method to control default CDE window manager
 #        behaviour somewhat better.
+#     10-APR-2001 (PWD):
+#        Added selected_area method as SkyCatCtrl version assumed
+#        images could have no dimension greater than width (tall
+#        2000x4000 break with this arrangement).
 #     {enter_changes_here}
 
 #-
@@ -529,7 +533,7 @@ itcl::class gaia::GaiaImageCtrl {
          return [$fileselect_ get]
       }
    }
-   
+
    #  Set the cut levels.
    public method set_cut_levels {} {
       if {[$image_ isclear]} {
@@ -609,7 +613,7 @@ itcl::class gaia::GaiaImageCtrl {
          #  File cannot be open for display in GAIA. This could be
          #  because of a bad name (such as too many periods), so check
          #  for file existence to qualify the error message.
-         if { [file exists [$namer_ ndfname]] } { 
+         if { [file exists [$namer_ ndfname]] } {
             error_dialog \
                "Cannot open the file [$namer_ ndfname] (bad filename format)" $w_
          } else {
@@ -829,6 +833,31 @@ itcl::class gaia::GaiaImageCtrl {
             }
          }
       }
+   }
+
+   #  Override of SkyCatCtrl method as it trims all dimensions to w,
+   #  which doesn't work for long images.
+   #  This method is called when the user has selected an area of the
+   #  image.  The results are in canvas coordinates, clipped to the
+   #  area of the image.
+   public method selected_area {id x0 y0 x1 y1} {
+      global ::$w_.select_area
+
+      # PWD: Make sure the coordinates don't go off the image
+      if { "$x0" != "" } {
+         $image_ convert coords $x0 $y0 canvas x0 y0 image
+         $image_ convert coords $x1 $y1 canvas x1 y1 image
+         set w [$image_ width]
+         set x0 [expr min($w,max(1,$x0))]
+         set x1 [expr min($w,max(1,$x1))]
+         set h [$image_ height]
+         set y0 [expr min($h,max(1,$y0))]
+         set y1 [expr min($h,max(1,$y1))]
+         $image_ convert coords $x0 $y0 image x0 y0 canvas
+         $image_ convert coords $x1 $y1 image x1 y1 canvas
+      }
+      set $w_.select_area "$x0 $y0 $x1 $y1"
+      after 0 [code $w_.draw delete_object $id]
    }
 
    #  Configuration options.
