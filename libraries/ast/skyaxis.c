@@ -52,6 +52,9 @@ f     only within textual output (e.g. from AST_WRITE).
 *     6-MAR-1998 (RFWS):
 *        Add formatting options to omit degrees/hours field and change
 *        all affected functions.
+*     10-AUG-2000 (DSB):
+*        Fixed bug in DHmsFormat which could cause (for instance) a formatted 
+*        galactic longitude value of zero to be formated as "-0.-0".
 *class--
 */
 
@@ -820,6 +823,13 @@ static const char *DHmsFormat( const char *fmt, double value ) {
    likely to overflow. */
       if ( astOK ) {
          if ( ( ndp + 11 ) > BUFF_LEN ) ndp = BUFF_LEN - 11;
+
+/* Some operating systems have a "minus zero" value (for instance 
+   "-1.2*0" would give "-0"). This value is numerically equivalent to
+   zero, but is formated as "-0" instead of "0". The leading minus sign
+   confuses the following code, and so ensure now that all zero values
+   are the usual  "+0". */
+         if ( value == 0.0 ) value = 0.0;
 
 /* Determine if the value to be formatted is positive and obtain its
    absolute value in radians. */

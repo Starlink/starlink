@@ -116,6 +116,10 @@ f     The WcsMap class does not define any new routines beyond those
 *        Added PVj_m attributes. Attributes ProjP(0) to ProjP(9) are now
 *        aliases for PV(axlat)_0 to PV(axlat)_9. Renamed GLS projection
 *        as SFL (GLS retained as alias for SFL).
+*     10-AUG-2000 (DSB):
+*        MapMerge no longer simplifies a CAR projection. Previously they
+*        were replaced by a UnitMap, but this removed the cylic nature of
+*        the mapping (i.e. 2.PI == 0 ).
 *class--
 */
 
@@ -2014,10 +2018,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* First of all, see if the WcsMap can be replaced by a simpler Mapping,
    without reference to the neighbouring Mappings in the list.           */
 /* ======================================================================*/
-/* WcsMaps with map types of AST__WCSBAD or AST__CAR are equivalent to 
-   UnitMap. */
+/* WcsMaps with map type of AST__WCSBAD are equivalent to a UnitMap. */
    type = astGetWcsType( this );
-   if( type == AST__WCSBAD || type == AST__CAR ){
+   if( type == AST__WCSBAD ){
 
 /* Annul the WcsMap pointer in the list and replace it with a UnitMap
    pointer, and indicate that the forward transformation of the returned
