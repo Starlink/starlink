@@ -959,6 +959,109 @@ KAPRH.
 
 \newpage
 \section{\xlabel{ap_full}Specifications of KAPRH applications\label{ap:full}}
+\subsection{Explanatory Notes}
+For historical reasons, in this Appendix there are two formats---the
+first, exemplified by \htmlref{TURBOCONT}{TURBOCONT}, is the layout indicating
+that this is one of the applications which uses the NDF structure. An
+example of the old style is \htmlref{QUILT}{QUILT}.  Applications
+in this format use the moribund \htmlref{IMAGE format}{ap:IMAGEformat}.
+
+\begin{description}
+\item [NDF layout]
+In this layout the specification of parameters has the following
+format. 
+
+\begin{verbatim}
+     name  =  type (access)
+        description
+\end{verbatim}
+This format also includes a {\em Usage\/} entry.  \label{ap:usage}
+This shows how the application is invoked from the command line.  It
+lists the positional parameters in order followed by any prompted
+keyword parameters using a \mbox{``KEYWORD=?''} syntax.  Defaulted
+keyword parameters do not appear.  Positional parameters that are
+normally defaulted are indicated by being enclosed in square brackets.
+Keyword ({\it{i.e.}}\ not positional) parameters are needed where the
+number of parameters are large, and usually occur because they depend
+on the value of another parameter.  These are denoted by a curly
+brace; the parameters on each line are related, and each line is
+mutually exclusive.  An example should clarify.
+\bigskip
+
+{\ssttt \hspace*{1.0em}
+        contour ndf [comp] mode ncont [key] [device] 
+        \newline\hspace*{2.5em}
+        $\left\{ {\begin{tabular}{l}
+                    FIRSTCNT=? STEPCNT=? \\
+                    HEIGHTS=?
+                   \end{tabular} }
+        \right.$
+        \newline\hspace*{2.9em}
+        \makebox[0mm][c]{\footnotesize mode}
+}
+\bigskip
+
+NDF, COMP, MODE, NCONT, KEY, DEVICE, and SMOOTHING are all positional
+parameters.  Only NDF, MODE, and NCONT would be prompted if not given
+on the command line.  The remaining parameters depend on the value of
+MODE.  If the mode is to nominate a list of contour heights, HEIGHTS
+will be needed (MODE~=~{\tt "Free"}); alternatively, if the mode requires a
+start height and spacing between contours FIRSTCNT and STEPCNT should be
+specified (MODE~=~{\tt "Linear"} or {\tt "Magnitude"}).  Note that there
+are other modes which do not require additional information, and hence no
+more parameters. 
+
+There is also an {\em Examples\/} section. \label{ap:example}  This
+shows how to run the application from the command line.  More often
+you'll enter the command name and just some of the parameters, and be
+prompted for the rest. {\em Note that from the C-shell you must escape
+any special characters that appear in these examples.} For instance,
+the fourth example of COMPAVE would be written like this
+
+\begin{verbatim}
+     compave cosmos galaxy '[4,3]' weight title='"COSMOS compressed"'
+\end{verbatim}
+
+from the C-shell.
+
+\item [IMAGE layout]
+In this layout the specification of parameters has the following format
+\begin{verbatim}
+    name    type    access    description
+\end{verbatim}
+\end{description}
+\medskip
+
+The following notes apply to both layouts.
+
+Some parameters will only be used when another parameter has a certain
+value or mode. These are indicated by the name of the mode in
+parentheses at the end of the parameter description, but before any
+default, {\it{e.g.}}\ parameter DEVICE in \htmlref{CENTROID}{CENTROID}
+is only relevant when parameter MODE is {\tt "Cursor"}.
+
+{\tt \%name} means the value of parameter {\it name}.
+
+The description entry has a notation scheme to indicate 
+normally defaulted parameters, {\it{i.e.}}\ those for which there will
+be no prompt.
+For such parameters a matching pair of square brackets ({\tt{[]}})
+terminates the description.  The content between the brackets mean
+\begin{description}
+\item[{\tt{[]}}]
+Empty brackets means that the default is created dynamically
+by the application, and may depend on the values of other parameters.
+Therefore, the default cannot be given explicitly.
+\item[{\tt [,]}]
+As above, but there are two default values that are created dynamically.
+\item[{\tt [}{\rm default}{\tt{]}}]
+Occasionally, a description of the default is given in normal type,
+{\it{e.g.}}\ the size of the plotting region in a graphics application,
+where the exact default values depend on the device chosen. 
+\item[{\tt [default]}]
+If the brackets contain a value in teletype-fount, this is the explicit
+default value.
+\end{description}
 
 \sstroutine{
    CONTOVER
@@ -3642,6 +3745,7 @@ KAPRH.
       KAPPA: LUTFLIP, LUTHILITE, LUTROT.
    }
 }
+\xlabel{MOSAIC}
 \manroutine {{\manheadstyle{MOSAIC}}}{ Merges several non-congruent
   2-d data arrays into one output data array.}
 \begin{manroutinedescription}
@@ -3696,6 +3800,7 @@ KAPRH.
   Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
 \end{manroutinedescription}
 
+\xlabel{QUILT}
 \manroutine {{\manheadstyle{QUILT}}}{ Generates a mosaic from equally sized
   2-d data arrays, optionally specified from an ASCII file.}
 \begin{manroutinedescription}
