@@ -5,6 +5,12 @@ interface IEXCLUDE
     prompt 'Mode switch'
     help 'SOUrce/PIXel/CIRcle/POLygon/REGion'
   endparameter
+  parameter CURR
+    type '_LOGICAL'
+    default Y
+    prompt 'Use current region'
+    help 'Use region which has been defined by IREGION or N to use file'
+  endparameter
   parameter RAD
     type '_REAL'
     prompt 'Radius'
