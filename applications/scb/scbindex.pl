@@ -1165,13 +1165,17 @@ sub error {
 
 #-
 
+#  Print error text.
+
+   print STDERR @_;
+
 #  Do things which have to be done before exiting.
 
    tidyup;
 
 #  Print error text and exit.
 
-   die @_;
+   die "\n";
 }
 
 # $Id$
