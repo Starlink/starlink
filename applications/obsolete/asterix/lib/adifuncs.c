@@ -2074,8 +2074,7 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "Or(__INTEGER)",			ADIintOr_i,	FA_L ),
     FUNC_TENTRY( "Plus(__INTEGER)",			ADIintPlus_i,	FA_L ),
     FUNC_TENTRY( "Power(_INTEGER,_INTEGER)", 		ADIintPower_i,	FA_L ),
-    /* deleting to try and work around linux funny */
-    /*    FUNC_TENTRY( "Power(_INTEGER,2)", 			ADIintPow2_i,	FA_L ),*/
+    FUNC_TENTRY( "Power(_INTEGER,2)", 			ADIintPow2_i,	FA_L ),
     FUNC_TENTRY( "Shift(_INTEGER,_INTEGER)",		ADIintShift_i,	FA_L ),
     FUNC_TENTRY( "Sign(_INTEGER,_INTEGER)",		ADIintSign_i,	FA_L ),
     FUNC_TENTRY( "Subtract(_INTEGER,_INTEGER)", 	ADIintSub_i,	FA_L ),
