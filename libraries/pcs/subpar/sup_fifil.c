@@ -77,7 +77,7 @@
 #include <unistd.h>
 
 /* Global Constants: */
-#define SUBPAR__IFNF 145392523
+#include "subpar_err.h"
 
 /* Function Definition: */
 F77_SUBROUTINE(subpar_fifil)(CHARACTER(path), CHARACTER(name), CHARACTER(ext),
