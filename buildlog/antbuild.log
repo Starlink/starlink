@@ -13,7 +13,7 @@ build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build
     [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build/lib
-    [javac] Compiling 450 source files to /apps/cvsbuild/java/source/ant/build/classes
+    [javac] Compiling 469 source files to /apps/cvsbuild/java/source/ant/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 3 files to /apps/cvsbuild/java/source/ant/build/classes
@@ -36,4 +36,4 @@ install:
      [copy] Copying 1031 files to /apps/cvsbuild/star/docs/ant
 
 BUILD SUCCESSFUL
-Total time: 19 seconds
+Total time: 20 seconds
