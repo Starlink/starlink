@@ -23,8 +23,10 @@
 	system "../../dsssl/sl/common/slcommon.dsl" subdoc>
   <!entity dsssl.params
 	system "../../dsssl/sl/common/slparams.sgml" subdoc>
-  <!entity release.notes-0.4
+  <!entity release.notes-0.5
 	system "../../ReleaseNotes">
+  <!entity release.notes-0.4
+	system "ReleaseNotes-0.4">
   <!entity release.notes-0.3
 	system "ReleaseNotes-0.3">
   <!entity release.notes-0.2
@@ -68,6 +70,12 @@ discussion with Mark Taylor.
 <change date='13-SEP-1999' versionid="post-v0-4">
 Assorted tidyups and clarifications from user comments
 </change>
+
+<distribution string="DR-0.5" date="19-SEP-1999" author="ng">
+Rather rushed distribution, containing implementations of changes to
+Programcode DTD and implementations of those in the down-converters.
+Time for few documentation updates.
+</distribution>
 
 </history>
 
@@ -3693,6 +3701,8 @@ See <ref id=doccode.languages> for details.
 &programcodedtddoc;
 
 <sect id=appx.releasenotes export>Release Notes
+
+&release.notes-0.5;
 
 &release.notes-0.4;
 
