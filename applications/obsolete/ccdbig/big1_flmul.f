@@ -12,6 +12,11 @@
 *  Invocation:
 *     CALL CCD1_FLMUL( IMAGE, NCOLS, NLINES, STATUS )
 
+*  Notes:
+*     Assumes there are no bad pixels.  Since multiplication is by a 
+*     value between 0 and 1, this means that no bad pixels will result
+*     in the output either.
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
@@ -60,4 +65,4 @@
       END DO
 
       END
-* $Id: ccd1_cff.f,v 1.1 1997/06/27 09:01:41 pwd Exp $
+* $Id: ccd1_flmul.f,v 1.1 1998/06/15 15:16:41 mbt Exp mbt $
