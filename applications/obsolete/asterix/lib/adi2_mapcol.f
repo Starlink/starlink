@@ -82,11 +82,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     11 Sep 1995 (DJA):
 *        Original version.
+*      1 Jan 1997 (RB):
+*        Use new version of STOMAP.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -163,7 +166,6 @@
       END IF
 
 *  Store the pointer and the column number in the private storage
-c     CALL ADI2_STOMAP( PSID, HDUID, 'BC', PTR, TYPE, MODE, STATUS )
       CALL ADI2_STOMAP( PSID, HDUID, 'inv', FID, PTR, 1, DIMS,
      :                  FROW, NVAL, WBPTR, TYPE, MODE, STATUS )
 
