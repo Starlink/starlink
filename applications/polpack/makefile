@@ -419,16 +419,16 @@ ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f ndg_ndfcr.f \
 ndg1_sdfex.f ndg1_ndfdl.f
 
 F_SUB2 =  \
-ccd1_asfio.f ccd1_cfgrp.f ccd1_cmprr.f ccd1_ftgrp.f ccd1_hvcon.f \
-ccd1_iscom.f ccd1_mall.f ccd1_mfree.f ccd1_nxwrd.f ccd1_orvar.f \
-ccd1_qntlr.f ccd1_qsrtr.f ccd1_rdlin.f ccd1_repc.f ccd1_rmcom.f \
+ccd1_asfio.f ccd1_cmprr.f ccd1_hvcon.f \
+ccd1_iscom.f ccd1_mfree.f ccd1_orvar.f \
+ccd1_qntlr.f ccd1_qsrtr.f ccd1_rdlin.f ccd1_rmcom.f \
 ccd1_skysr.f ccg1_cenr.f ccg1_clipr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_is4d.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_mer1r.f \
 ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f ccg1_wtm2r.f ccg1_wtm3r.f \
 datapic.f gethlp.f gthlpi.f pol1_chkex.f pol1_clcat.f pol1_angrt.f \
 pol1_clcnt.f pol1_cm1rr.f pol1_cm3rr.f pol1_cpctd.f pol1_cpctr.f \
-pol1_ctclm.f pol1_deftb.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
-pol1_gtwcs.f pol1_imfit.f pol1_knext.f pol1_lnam.f pol1_mkcat.f \
+pol1_ctclm.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
+pol1_gtwcs.f pol1_knext.f pol1_lnam.f pol1_mkcat.f \
 pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
 pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_vecky.f pol1_vecpl.f \
 pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
@@ -439,10 +439,10 @@ pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f \
 pol1_sngsm.f pol1_blocr.f pol1_sngvn.f pol1_sngva.f pol1_sngct.f\
 polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f \
 pol1_ptvrc.f pol1_gtvrc.f pol1_ptang.f pol1_gtang.f pol1_stftr.f \
-polimage.f pol1_axset.f
+polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f 
 
 #  Routines which may be logical,real,double,integer or character (storage)
-GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
+GENLRDICSRC = 
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -458,7 +458,7 @@ C_ROUTINES = $(C_SUB1) $(C_SUB2)
 
 C_SUB1 = ndg1_wild.c
 
-C_SUB2 = polpack.c 
+C_SUB2 = polpack.c pol1_ceval.c
 
 #  List of platform specific C routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -1408,19 +1408,14 @@ strip:
 #  files).  These are normally generated automatically from the source
 #  files.
 ccd1_asfio.o:	 SAE_PAR PAR_ERR FIO_PAR
-ccd1_cfgrp.o:	 SAE_PAR CCD1_PAR
 ccd1_cmprr.o:	 SAE_PAR PRM_PAR
-ccd1_ftgrp.o:	 SAE_PAR GRP_PAR TRN_ERR
 ccd1_hvcon.o:	 SAE_PAR
 ccd1_iscom.o:	 SAE_PAR
-ccd1_mall.o:	 SAE_PAR PRM_PAR CCD1_PAR CCD1_MEMCM
 ccd1_mfree.o:	 CCD1_PAR CCD1_MEMCM
-ccd1_nxwrd.o:	 SAE_PAR CHR_ERR
 ccd1_orvar.o:	 SAE_PAR CCD1_PAR
 ccd1_qntlr.o:	 SAE_PAR
 ccd1_qsrtr.o:	 SAE_PAR
 ccd1_rdlin.o:	 SAE_PAR FIO_ERR
-ccd1_repc.o:	 SAE_PAR
 ccd1_rmcom.o:	 SAE_PAR
 ccd1_skysr.o:	 SAE_PAR PRM_PAR
 ccg1_cenr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
@@ -1472,7 +1467,6 @@ pol1_cpctd.o:	 SAE_PAR PRM_PAR
 pol1_cpctr.o:	 SAE_PAR PRM_PAR
 pol1_ctclm.o:	 SAE_PAR PRM_PAR
 pol1_dbeam.o:	 SAE_PAR DAT_PAR
-pol1_deftb.o:	 SAE_PAR GRP_PAR
 pol1_dulbm.o:	 SAE_PAR PRM_PAR NDF_PAR DAT_PAR PAR_ERR
 pol1_fillr.o:	 SAE_PAR
 pol1_gtcta.o:	 SAE_PAR AST_PAR CAT_PAR
@@ -1481,7 +1475,6 @@ pol1_gtctw.o:	 SAE_PAR AST_PAR CAT_PAR
 pol1_gtwcs.o:	 SAE_PAR AST_PAR
 pol1_hist.o:	 SAE_PAR PRM_PAR
 pol1_hist2.o:	 SAE_PAR PRM_PAR
-pol1_imfit.o:	 SAE_PAR GRP_PAR DAT_PAR MSG_PAR TRN_ERR
 pol1_knext.o:	 SAE_PAR
 pol1_lnam.o:	 SAE_PAR GRP_PAR FIO_PAR
 pol1_mkcat.o:	 SAE_PAR AST_PAR CAT_PAR
@@ -1502,6 +1495,7 @@ pol1_stk2.o:	 SAE_PAR PRM_PAR
 pol1_vecky.o:	 SAE_PAR AST_PAR
 pol1_vecpl.o:	 SAE_PAR PRM_PAR MSG_PAR
 pol1_vect.o:	 SAE_PAR
+pol1_xeval.o:	 SAE_PAR DAT_PAR GRP_PAR TRN_ERR
 pol_cale.o:	 SAE_PAR PRM_PAR
 pol_calf.o:	 SAE_PAR PRM_PAR
 pol_calp.o:	 SAE_PAR

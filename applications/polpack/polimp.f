@@ -138,8 +138,6 @@
 *     (which is usually one of the POLPACK special names). The
 *     concatenation form looks like:
 *
-*        _INTEGER      OBSNUM
-*        _INTEGER      IDATE
 *        IMGID        OBSNUM//IDATE
 *
 *     Which results in the IMGID extension item being set to the
@@ -158,15 +156,41 @@
 *        WPLATE  POLPLATE        48.0=0.0 -
 *                                138.0=45.0
 *
-*     This does a case insensitive comparison between the value of the FITS 
-*     keyword POLPLATE and the strings on the left hand sides of the equals 
-*     signs ("48.0" and "138.0"), If a match is found (ignoring leading
-*     and trailing blanks), it assigns the value from the right hand side 
-*     of the equals sign ("0.0" or "45.0") to the WPLATE component in the 
-*     POLPACK extension. An error is reported if no match is found. The "-" 
-*     sign at the end of the first line indicates that the list continues 
-*     on the next line. Note, the FITS keyword value and the supplied test 
-*     values are converted to character strings before doing the comparisons. 
+*     This compares the value of the FITS keyword POLPLATE with the
+*     strings on the left hand sides of the equals signs ("48.0" and
+*     "138.0"). If a match is found, it assigns the value from the right
+*     hand side of the equals sign ("0.0" or "45.0") to the WPLATE
+*     component in the POLPACK extension. An error is reported if no
+*     match is found. The "-" sign at the end of the first line indicates
+*     that the list continues on the next line. If the strings being
+*     compared both represent numerical values, the comparison will be
+*     performed between their numerical values. This means, for instance,
+*     that all the following strings will be considered equal "45.0",
+*     "45", "45D0", "+45.0E0". If either of the strings are not
+*     numerical, then the comparison is performed between their textual
+*     values (case insensitive).
+*
+*     Here is a more complicated example:
+*
+*        FILTER  NAME //" - "//MYFILT "U band"=U "V band"=V "B band"=B
+*
+*     This concatenates the value of the FITS keyword NAME, the string
+*     " - ", and the value of the sub-expression:
+*
+*        MYFILT "U band"=U "V band"=V "B band"=B
+*
+*     and assigns the resulting string to the FILTER extension item.
+*     Note, parentheses may be used to indicate a different order of
+*     precedence. For instance, this example:
+*
+*        FILTER  (NAME //" - "//MYFILT) "U band"=U "V band"=V "B band"=B
+*
+*     performs the checks for "U band", etc, on the total concatenated
+*     string, rather than on the value of keyword MYFITS. The two 
+*     strings included in a replacement specification may themselves be 
+*     enclosed within parentheses in which case they may be any complex
+*     character expression involing literal strings, concatentation
+*     operators and nested replacement specifications.
 *
 *     If a control table contains more than one line for an extension
 *     item, then each line is processed in turn, replacing any value
@@ -197,8 +221,8 @@
 *     must be "YES", "TRUE", "T", "Y" for TRUE or "NO", "FALSE", "N",
 *     "F".
 *
-*     Fields in the table may be separated by commas if desired, any
-*     amount of white space and tabs are also allowed. Comments may be
+*     Fields in the table may be separated by commas if desired, instead
+*     of spaces. Comments may be
 *     placed anywhere and should start with the characters "#" or "!".
 *     Continuation onto a new line is indicated by use of "-". 
 
@@ -265,32 +289,19 @@
       CHARACTER * ( DAT__SZLOC ) FITLOC ! Locator to FITS block
       CHARACTER * ( FIO__SZFNM ) FNAME  ! FITS control table name
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of the NDF being processed
-      INTEGER DESGRP( 3 )        ! Destination extension item information
       INTEGER FDIN               ! FIO identifier to input table
-      INTEGER FITGRP( 2 )        ! FITS items to be extracted
       INTEGER FITLEN             ! Number of cards in FITS block
       INTEGER IGRP1              ! Input NDF group identifier
       INTEGER IGRP2              ! Id for group of names of NDF's processed OK 
       INTEGER IGRP3              ! Id for group of used IMGID values
       INTEGER INDF               ! NDF identifier
       INTEGER INDEX              ! Loop variable
-      INTEGER IPCHR              ! Pointer to integer storage
-      INTEGER IPDBLE             ! Pointer to double precision storage
       INTEGER IPFIT              ! Pointer to FITS block
-      INTEGER IPINT              ! Pointer to integer storage
-      INTEGER IPGOT              ! Pointer to existence flag workspace
-      INTEGER IPLOG              ! Pointer to logical workspace
-      INTEGER IPREAL             ! Pointer to real storage
-      INTEGER LINGRP             ! GRP identifier for line nos in table
-      INTEGER NAMLEN             ! Length of name string
       INTEGER NGOOD              ! No. of NDF's processed successfully
-      INTEGER NLINES             ! Number of "lines" read from table
       INTEGER NNDF               ! Number of input NDFs
-      INTEGER WRDGRP( 3 )        ! GRP identifiers for table "words"
       LOGICAL QUIET              ! Run silently?
       LOGICAL THERE              ! Object exists
       LOGICAL TOPEN              ! Translation table is open
-      LOGICAL OK                 ! Obtained value ok
 *.
 
 *  Check inherited global status.
@@ -311,59 +322,13 @@
       CALL CCD1_ASFIO( 'TABLE', 'READ', 'LIST', 0, FDIN, TOPEN, STATUS )
 
 *  If successful, get the file name.
-      FNAME = '<unknown>'
       IF ( TOPEN ) THEN
          CALL FIO_FNAME( FDIN, FNAME, STATUS )
 
-*  Transform the input table into word separated GRP groups (dynamic
-*  string allocation is performed using this method).
-         CALL CCD1_CFGRP( FDIN, 3, 2, .FALSE., WRDGRP, LINGRP, STATUS )
-
-*  Translate these groups into groups which contain the keyword and
-*  type of any FITS items which should be extracted from the NDFs
-*  FITS blocks. Also create groups which describe the destination item
-*  its type and the function of fits keywords which result in the value
-*  to be stored at this location.
-         CALL GRP_GRPSZ( LINGRP, NLINES, STATUS )
-         CALL CCD1_MALL( NLINES, '_LOGICAL', IPLOG, STATUS )
-         CALL CCD1_FTGRP( WRDGRP, LINGRP, %VAL( IPLOG ), FITGRP,
-     :                    DESGRP, STATUS )
-         CALL CCD1_MFREE( IPLOG, STATUS )
-
-*  Free table groups.
-         CALL GRP_DELET( WRDGRP( 1 ), STATUS )
-         CALL GRP_DELET( WRDGRP( 2 ), STATUS )
-         CALL GRP_DELET( WRDGRP( 3 ), STATUS )
-         CALL GRP_DELET( LINGRP, STATUS )
-
-*  If this section has a bad status, must be to do with the contents of
-*  the table. Issue the name of this file.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL MSG_SETC( 'FNAME', FNAME )
-            CALL ERR_REP( 'POLIMP_BADTAB',
-     :      '  Error processing FITS control table: ^FNAME', STATUS )
-         END IF
-
-*  If no control table was opened, set up groups representing the default 
-*  table.
+*  If no control table was opened, a default table will be used.
       ELSE 
-         CALL POL1_DEFTB( FITGRP, DESGRP, STATUS )
+         FNAME = ' '
       END IF
-
-*  Get the number of entries in the FITS groups. Need this to allocate
-*  memory for FITS values. Ensure that wqe do not try to allocate zero
-*  memory.
-      CALL GRP_GRPSZ( FITGRP( 1 ), NLINES, STATUS )
-      IF( NLINES .EQ. 0 ) NLINES = 1
-
-*  Allocate memory for _INTEGER, _REAL, _DOUBLE and _LOGICAL types,
-*  plus pointers for CHARACTER memory.
-      CALL CCD1_MALL( NLINES, '_INTEGER', IPINT, STATUS )
-      CALL CCD1_MALL( NLINES, '_REAL', IPREAL, STATUS )
-      CALL CCD1_MALL( NLINES, '_DOUBLE', IPDBLE, STATUS )
-      CALL CCD1_MALL( NLINES, '_LOGICAL', IPLOG, STATUS )
-      CALL CCD1_MALL( NLINES, '_LOGICAL', IPGOT, STATUS )
-      CALL CCD1_MALL( NLINES, '_INTEGER', IPCHR, STATUS )
 
 *  Create a group to hold the names of the NDFs which were processed
 *  successfully.
@@ -385,7 +350,7 @@
       END IF
 
 *  Check that everything is ok so far.
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Initialise the identifier for the group holding used IMGID values.
       IGRP3 = GRP__NOID
@@ -435,11 +400,8 @@
 *  systems (normally implemented by the compiler), on VMS this makes
 *  no difference.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL POL1_IMFIT( FITGRP, DESGRP, INDF, %VAL( IPFIT ),
-     :                       FITLEN, %VAL( IPINT ), %VAL( IPREAL ),
-     :                       %VAL( IPDBLE ), %VAL( IPLOG ),
-     :                       %VAL( IPCHR), %VAL( IPGOT), QUIET, STATUS, 
-     :                       %VAL( 80 ) )
+            CALL POL1_IMPRT(  FITLEN, %VAL( IPFIT), FDIN, FNAME, 
+     :                        POLLOC, QUIET, STATUS, %VAL( 80 ) )
          END IF
 
 *  Check the values in the POLPACK extension are usable.
@@ -469,6 +431,9 @@
 *  Flush any error.
          IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
+*  Rewind the conrol table (if supplied).
+         IF( TOPEN ) CALL FIO_RWIND( FDIN, STATUS )
+
 *  Space the screen output.
          IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
 
@@ -495,17 +460,9 @@
       END IF
 
 *  Break out here if status set BAD.
- 99   CONTINUE
-
-*  Release the memory allocations.
-      CALL CCD1_MFREE( -1, STATUS )
+ 999   CONTINUE
 
 *  Free GRP groups.
-      CALL GRP_DELET( FITGRP( 1 ), STATUS )
-      CALL GRP_DELET( FITGRP( 2 ), STATUS )
-      CALL GRP_DELET( DESGRP( 1 ), STATUS )
-      CALL GRP_DELET( DESGRP( 2 ), STATUS )
-      CALL GRP_DELET( DESGRP( 3 ), STATUS )
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )
       IF( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )

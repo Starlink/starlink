@@ -10784,6 +10784,7 @@ proc Save {} {
 
          foreach image $IMAGES {
             regsub -all {\.} $image "" ni
+            set ni [string tolower $ni]
             set fr [frame $imlist.$ni -background $back]
             pack $fr -side top -fill x
 
