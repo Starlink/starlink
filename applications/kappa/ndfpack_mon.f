@@ -44,6 +44,9 @@
 *     7-OCT-1998 (DSB):
 *        Added WCSADD, WCSATTRIB, WCSCOPY, WCSFRAME, WCSSHOW, WCSREMOVE,
 *        CHAIN, RESHAPE for V0.13.
+*     13-MAY-1999 (DSB):
+*        Changed history application name to incorporate the current version
+*        of KAPPA.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,8 +82,10 @@
 *  Identify and execute the task.
 *  ==============================
 *
-*  Define the current application name for history.
-      CALL NDF_HAPPN( NAME // ' (NDFPACK V1.1)', STATUS )
+*  Define the current application name for history. The package version
+*  number gets substituted in here when the KAPPA release source tar file 
+*  is contructed.
+      CALL NDF_HAPPN( NAME // ' (NDFPACK "PKG_VERS")', STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task

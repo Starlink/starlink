@@ -33,6 +33,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,9 @@
 *     1997 May 31 (MJC):
 *        Added DRAWSIG.  Removed BLINK, IDUNZOOM, IDVISIBLE.  V1.1.
 *        Temporarily removed COLUMNAR and HIDE.
+*     13-MAY-1999 (DSB):
+*        Changed history application name to incorporate the current version
+*        of KAPPA.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,8 +78,10 @@
 *  Identify and execute the task.
 *  ==============================
 *
-*  Define the current application name for history.
-      CALL NDF_HAPPN( NAME // ' (KAPVIEW V1.1)', STATUS )
+*  Define the current application name for history. The package version
+*  number gets substituted in here when the KAPPA release source tar file 
+*  is contructed.
+      CALL NDF_HAPPN( NAME // ' (KAPVIEW "PKG_VERS")', STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task

@@ -52,6 +52,18 @@
 #  Ensure all files are accessable.
       chmod 777 *
 
+#  Edit in the current package version number into any required source files.
+      set vers = `grep "PKG_VERS = " makefile`
+      if ( "$vers" == "" ) then
+         echo "Can't get package version number from makefile."
+         exit
+      endif
+
+      foreach file (kappa_mon.f kapview_mon.f ndfpack_mon.f)
+         sed -e "s#PKG_VERS#$vers[3]#g" $file > temp
+         mv -f temp $file
+      end
+
 #  Create the doc directory for inclusion in kappa_iraf.tar and move all the 
 #  iraf help files into it.
       mkdir doc
