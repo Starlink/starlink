@@ -157,6 +157,7 @@ attributes with ENTITY declared values.  Should I worry about those?
   (if (and %html-manifest% (not suppress-manifest))
       (let ((element-list (append (chunk-element-list)
 				  (list (normalize "figure")
+					(normalize "coverimage")
 					(normalize "backmatter")
 					(normalize "m")
 					(normalize "mequation")
@@ -206,11 +207,32 @@ attributes with ENTITY declared values.  Should I worry about those?
       (if content
 	  (process-node-list content)
 	  (empty-sosofo))))
+  (element coverimage
+    (let* ((kids (children (current-node)))
+	   (content (get-best-figurecontent
+		     (select-elements kids (normalize "figurecontent"))
+		     '("GIF89A" "JPEG"))))
+      (if content
+	  (process-node-list content)
+	  (empty-sosofo))))
+  ;; the figurecontent element writes out TWO fields in the manifest:
+  ;; the first is the sysid of the figure as referred to by the
+  ;; generated HTML, which will have no path, and the second is the sysid as
+  ;; declared in the entity, which may well have a path.  Locations may
+  ;; need some post-processing.
   (element figurecontent
     (let* ((image-ent (attribute-string (normalize "image")
-					(current-node))))
+					(current-node)))
+	   (full-sysid (and image-ent
+			    (entity-system-id image-ent)))
+	   (base-sysid (and image-ent
+			    (car (reverse
+				  (tokenise-string
+				   (entity-system-id image-ent)
+				   boundary-char?: (lambda (c)
+						     (char=? c #\/))))))))
       (if image-ent
-	  (make fi data: (string-append (entity-system-id image-ent) "
+	  (make fi data: (string-append base-sysid " " full-sysid "
 "))
 	  (empty-sosofo))))
   (element m
