@@ -57,12 +57,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     DCI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/dci.html
 
@@ -92,20 +86,24 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-
-*  Global Variables:
-      INCLUDE 'DCI_CMN'                 ! ASTERIX DCI common block
-*       DCI_INIT = LOGICAL (given)
-*         DCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER                   ID                      ! Dataset id
+      INTEGER                   ID
 
 *  Arguments Returned:
-      INTEGER                   DETID                   ! Detector info
+      INTEGER                   DETID
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
+
+*  Local Constants:
+      CHARACTER*4		DCI_PROP
+        PARAMETER		(DCI_PROP = '.DCI')
 
 *  Local Variables:
       INTEGER			FILID			! Base file object
@@ -115,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. DCI_INIT ) CALL DCI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( DCI__PKG ) ) CALL DCI0_INIT( STATUS )
 
 *  Initialise return values
       DETID = ADI__NULLID

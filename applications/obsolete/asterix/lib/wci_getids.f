@@ -96,22 +96,20 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'                 ! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER			ID			! Dataset id
+      INTEGER			ID
 
 *  Arguments Returned:
-      INTEGER			PIXID			! Pixellation id
-      INTEGER			PRJID			! Projection id
-      INTEGER			SYSID			! Coord system id
+      INTEGER			PIXID,PRJID,SYSID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local Variables:
       INTEGER			FILID			! Base file identifier
@@ -124,7 +122,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) CALL WCI1_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI0_INIT( STATUS )
 
 *  Initialise return values
       PIXID = ADI__NULLID

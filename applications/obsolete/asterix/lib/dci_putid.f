@@ -84,19 +84,17 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'ADI_PAR'
-
-*  Global Variables:
-      INCLUDE 'DCI_CMN'                 ! ASTERIX DCI common block
-*       DCI_INIT = LOGICAL (given)
-*         DCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER                   ID                      ! Dataset id
-      INTEGER                   DETID                   ! Detector info
+      INTEGER                   ID, DETID
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local Variables:
       INTEGER			ARGS(2)			! Method arguments
@@ -107,7 +105,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. DCI_INIT ) CALL DCI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( DCI__PKG ) ) CALL DCI0_INIT( STATUS )
 
 *  Construct argument list
       CALL ADI_GETFILE( ID, ARGS(1), STATUS )

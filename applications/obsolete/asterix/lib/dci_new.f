@@ -96,12 +96,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'ADI_PAR'
-
-*  Global Variables:
-      INCLUDE 'DCI_CMN'                 ! ASTERIX DCI common block
-*       DCI_INIT = LOGICAL (given)
-*         DCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       CHARACTER*(*)		MISSION, INSTR, DET, FILTER
@@ -112,13 +107,17 @@
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. DCI_INIT ) CALL DCI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( DCI__PKG ) ) CALL DCI0_INIT( STATUS )
 
 *  Create nnew object
       CALL ADI_NEW0( 'MissionStrings', DETID, STATUS )

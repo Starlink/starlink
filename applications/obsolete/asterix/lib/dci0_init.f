@@ -85,16 +85,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'DCI_CMN'					! DCI globals
-*        DCI_INIT = LOGICAL (given and returned)
-*           DCI definitions load attempted?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
       EXTERNAL			ADI_REQPKG
       EXTERNAL                  DCI1_READ
       EXTERNAL                  DCI1_WRITE
@@ -109,7 +107,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check not already initialised?
-      IF ( .NOT. DCI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( DCI__PKG ) ) THEN
 
 *    Load the ADI classes
         CALL ADI_REQPKG( 'detcnfg', STATUS )
@@ -123,7 +121,7 @@
      :                        DCI2_WRITE, DID, STATUS )
 
 *    Now initialised
-	DCI_INIT = .TRUE.
+        CALL AST_SPKGI( DCI__PKG )
 
       END IF
 
