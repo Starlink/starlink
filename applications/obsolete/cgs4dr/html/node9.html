@@ -19,18 +19,18 @@ system, it writes it to an integration file whose name is of the form
 iyymmdd_oooo_iiii where `yymmdd' is the UT date, `oooo' the observation
 number and `iiii' the integration number. Integration files are,
 therefore, frames taken at a single detector position and are written to
-the directory $idir/. If a single integration is reduced, the
+the directory $IDIR/. If a single integration is reduced, the
 result is written to a reduced integration file whose name is of the form
-riyymmdd_oooo_iiii, written to the directory $ridir/.
+riyymmdd_oooo_iiii, written to the directory $RIDIR/.
 <P>
 In CGS4, however, the spectrum may be oversampled by combining several
 integrations at different detector positions. A description of the
 instrument configuration during an observation is held in an observation
-file whose name is of the form oyymmdd_oooo in the directory $odir/.  This information is combined with the data in the integration
+file whose name is of the form oyymmdd_oooo in the directory $ODIR/.  This information is combined with the data in the integration
 files to produce a reduced observation of size x * y * <em>n</em> elements
 where <em>n</em> is the oversampling factor and x * y is the readout
 area.  This reduced observation, whose name is of the form royymmdd_oooo,
-is held in the directory $rodir/.  The reduced observation file
+is held in the directory $RODIR/.  The reduced observation file
 contains the reduced data for a single observation.
 <P>
 When observing astronomical objects, individual observations may be of
@@ -39,7 +39,7 @@ observations relating to one particular astronomical object may be
 combined together into a reduced group whose name is of the form
 rgyymmdd_gggg, where `gggg' is a unique group number, which is the first
 observation in the group as defined by the data acquisition system, held
-in the directory $rgdir/. These reduced group files contain
+in the directory $RGDIR/. These reduced group files contain
 sky-subtracted data. These files may be manipulated further by the
 automatic data reduction sequence to provide enhanced sky-subtraction for
 point sources and to ratio by a standard star.  Depending upon the options
@@ -57,12 +57,12 @@ system does not.
 <P>
 The data reduction system uses two other types of file. Wavelength
 calibrated CALIBR frames are held in files of type cayymmdd_oooo in
-the $rodir/ directory. Standard star observations are held in files
-whose names are of the form styymmdd_gggg, held in the $rgdir/
+the $RODIR/ directory. Standard star observations are held in files
+whose names are of the form styymmdd_gggg, held in the $RGDIR/
 directory.
 <P>
-Note that the files contained in $idir/ and $odir/ are never
-over-written whereas the files in $ridir/, $rodir/ and $rgdir/ may be over-written by re-reducing the data.
+Note that the files contained in $IDIR/ and $ODIR/ are never
+over-written whereas the files in $RIDIR/, $RODIR/ and $RGDIR/ may be over-written by re-reducing the data.
 <P>
 <HR><P>
 <A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>

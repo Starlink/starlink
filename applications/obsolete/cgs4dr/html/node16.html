@@ -15,12 +15,12 @@
 <H1>Reducing a Flat</H1>
 <P>
 To reduce a FLAT, Portable-CGS4DR reads the raw data from store in
-$idir/ and FITS header information from store in $odir/, applies a 
+$IDIR/ and FITS header information from store in $ODIR/, applies a 
 bad pixel mask, optionally subtracts a reduced BIAS frame, linearises 
 the data (if required), optionally subtracts a
 reduced DARK (with the same on-chip exposure time), normalises the
 data (if required) and writes the reduced data parameters into the index
-file and stores the reduced FLAT in $rodir/ as shown in figure 2.2.
+file and stores the reduced FLAT in $RODIR/ as shown in figure 2.2.
 <P>
 For normalisation a 1-D spectrum is extracted from within the window
 defined by the bad pixel mask and a polynomial is fitted to that spectrum.

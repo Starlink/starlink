@@ -15,13 +15,13 @@
 <H1>Reducing an Object, Sky or Arc</H1>
 <P>
 To reduce an OBJECT, SKY or ARC, Portable-CGS4DR reads
-the raw data from store in $idir/ and FITS header information
-from store in $odir/, applies a bad pixel mask, optionally
+the raw data from store in $IDIR/ and FITS header information
+from store in $ODIR/, applies a bad pixel mask, optionally
 subtracts a reduced BIAS frame, linearises the data (if required),
 optionally subtracts a reduced DARK, optionally divides by a flat
 field and wavelength calibrates the data (if required), and writes the
 reduced data parameters into the index file and stores the reduced OBJECT, 
-SKY or ARC in $rodir/ as shown in figure 3.0.
+SKY or ARC in $RODIR/ as shown in figure 3.0.
 <P>
 Note that if the bad pixel mask is changed between the calibration frame
 and the astronomical data, the resultant quality array will contain the
