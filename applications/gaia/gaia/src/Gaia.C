@@ -23,6 +23,7 @@ extern "C" {
     int Word_Init();
     int Mark_Init();
     int Segment_Init();
+    int Polyline_Init();
     int RotBox_Init();
     int Tcladam_Init(Tcl_Interp *interp);
     int GaiaCat_Init(Tcl_Interp *interp);
@@ -81,6 +82,11 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     /*  Add rtd_segment for drawing many lines as segments */
     if (Segment_Init() != TCL_OK) {
+	return TCL_ERROR;
+    }
+        
+    /*  Add rtd_polyline for drawing many polyline at speed */
+    if (Polyline_Init() != TCL_OK) {
 	return TCL_ERROR;
     }
         

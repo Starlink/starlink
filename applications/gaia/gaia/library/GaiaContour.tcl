@@ -243,14 +243,17 @@ itcl::class gaia::GaiaContour {
       }
    }
 
-   #  Close this window, kill it if needed, otherwise withdraw.
+   #  Close this window, kill it if needed, otherwise withdraw. Also
+   #  remove the contours.
    public method close {} {
+
+      #  Remove the contours.
+      catch {remove_contours_}
+
       if { $itk_option(-really_die) } {
          delete object $this
       } else {
          wm withdraw $w_
-         #  Remove the contours.
-         catch {remove_contours_}
       }
    }
 
@@ -272,17 +275,64 @@ itcl::class gaia::GaiaContour {
       destroy $w
    }
 
-   #  Write the current configuration to a named file.
+   #  Write the current configuration to a named file. This is written 
+   #  in a the format:
+   #
+   #     level  colour width
+   #     level  colour width
+   #     ...
+   #
+   #     parameter = value
+   #
+   #  We avoid a sourceable format as the widgets themselves tend to
+   #  have the current values (rather than a list of variables), which
+   #  would expose the internal formatting (and may cause
+   #  incompatibilities with future rewrites).
    public method save_config {filename} {
       if { $filename != {} } {
          busy {
             #  Open the output file.
             set fid [::open $filename w]
             puts $fid "\# GAIA Contours configuration file."
+            puts $fid "\#"
 
-            # XXX fill in details
+            #  Get the level attributes.
+            set levatts [get_levels_and_atts_]
+            
+            puts $fid [format "\# %-26s %-10s %-10s" level colour width]
+            foreach line $levatts {
+               lassign $line level colour width
+               puts $fid [format "  %-26s %-10s %-10s" $level $colour $width]
+            }
 
-            # And add all the known values.
+            #  Add the contour image name (use the disk file, not the
+            #  rtdimage). 
+            set image [get_diskimage_]
+            if { $image != {} } { 
+               puts $fid "\#  Image name"
+               puts $fid "image = $image"
+            }
+
+            #  Add the contouring speed.
+            puts $fid "\#  Contouring speed"
+            puts $fid "careful = $careful_"
+            
+            #  Add the parameters describing the image region.
+            puts $fid "\#  Image region"
+            puts $fid "whole = $whole_"
+            puts $fid "xfrac = [$itk_component(xfrac) get]"
+            puts $fid "yfrac = [$itk_component(yfrac) get]"
+
+            #  Add the parameters describing the level key.
+            puts $fid "\#  Key parameters"
+            puts $fid "drawkey = $itk_option(-drawkey)"
+            puts $fid "xkeypos = [$itk_component(xkeypos) get]"
+            puts $fid "ykeypos = [$itk_component(ykeypos) get]"
+            puts $fid "keyfont = [$itk_component(keyfont) get]"
+            set colour $colindex_([$itk_component(keycolour) get])
+            puts $fid "keycolour = $colour"
+            puts $fid "keylength = [$itk_component(keylength) get]"
+            puts $fid "keywidth = [$itk_component(keywidth) get]"
             ::close $fid
          }
       }
@@ -295,23 +345,92 @@ itcl::class gaia::GaiaContour {
             #  Open the file.
             set fid [open $filename r]
 
+            #  Clear existing contours.
+            catch {clear_contours}
+
             #  Loop over the file skipping comments and blank
             #  lines.
             set ok 1
+            set count 0
             while { $ok  } {
                set llen [gets $fid line]
                if { $llen > 0 } {
-                  if { ! [string match {\#*} $line] } {
-                     # XXX fill in details...
-
+                  switch -glob $line {
+                     *=* {
+                        eval set_parameter_ $line
+                     }
+                     \#* {
+                        #  Comment do nothing.
+                     }
+                     default {
+                        if { [llength $line] == 3 } { 
+                           eval add_contour_ [incr count] $line
+                        } else {
+                           warning_dialog \
+                              "unrecognised line in configuration file: $line"
+                        }
+                     }
                   }
                } elseif { $llen < 0 } {
-
+                  
                   # End of file.
                   set ok 0
                }
             }
             ::close $fid
+
+            #  Toggle disabled widgets to correct state.
+            set_whole_
+            toggle_drawkey_
+         }
+      }
+   }
+
+   #  Add a new contour at a given index.
+   protected method add_contour_ {index value colour width} {
+      $itk_component(value$index) configure -value $value
+      $itk_component(width$index) configure -value $width
+      $itk_component(colour$index) configure -value $indexcol_($colour)
+   }
+
+   #  Assign a parameter value read back from a configuration file.
+   #  The equals parameter is ignored.
+   protected method set_parameter_ {param equals value} {
+      switch -exact $param {
+         image {
+            $itk_component(conimg) configure -value $value
+         }
+         careful {
+            set careful_ $value
+         }
+         whole {
+            set whole_ $value
+         }
+         drawkey {
+            configure -drawkey $value
+         }
+         xfrac - 
+         yfrac {
+            $itk_component($param) configure -value $value
+         }
+         keycolour {
+            set orig $itk_option(-drawkey)
+            set itk_option(-drawkey) 0
+            $itk_component($param) configure -value $indexcol_($value)
+            set itk_option(-drawkey) $orig
+         }
+         xkeypos -
+         ykeypos -
+         keyfont -
+         keylength -
+         keywidth {
+            set orig $itk_option(-drawkey)
+            set itk_option(-drawkey) 0
+            $itk_component($param) configure -value $value
+            set itk_option(-drawkey) $orig
+         }
+         default {
+            warning_dialog "unrecognised configuration parameter: $param"
          }
       }
    }
@@ -370,7 +489,7 @@ itcl::class gaia::GaiaContour {
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add atframe {
-         scrolledframe $w.atframe -width 75 -height 320
+         scrolledframe $w.atframe -width 75 -height 250
       }
       pack $itk_component(atframe) -fill both -expand 1
       set parent [$itk_component(atframe) childsite]
@@ -393,6 +512,7 @@ itcl::class gaia::GaiaContour {
       #  Set up the colour index arrays and default values.
       foreach {index xname} $colourmap_ {
          set colindex_($xname) $index
+         set indexcol_($index) $xname
       }
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
          set index [expr int(fmod($i-1,16)*2)+1]
@@ -442,7 +562,7 @@ itcl::class gaia::GaiaContour {
                -value $j \
                -command [code $this set_width_ $i]
          }
-         $itk_component(colour$i) configure -value 1
+         $itk_component(width$i) configure -value 1
 
          #  Add these to the grid.
          grid $itk_component(value$i) $itk_component(colour$i) \
@@ -541,10 +661,11 @@ itcl::class gaia::GaiaContour {
                   "$itk_option(-contour_tag) $leveltags_($ncont)"
 
                #  Draw the contour (return value is number of points).
+               puts "time = [time {
                set drawn_($ncont) \
                   [$itk_option(-rtdimage) contour \
                       $value $rtdimage $careful_ \
-                      $att $bounds]
+                      $att $bounds] }]"
 
                #  Add/update the key.
                draw_key_
@@ -566,7 +687,6 @@ itcl::class gaia::GaiaContour {
             draw_key_
             update idletasks
          }
-
       }
    }
 
@@ -626,6 +746,21 @@ itcl::class gaia::GaiaContour {
          set colour [$itk_component(colour$index) get]
          set width [$itk_component(width$index) get]
          set atts "$colour $width"
+      }
+      return $atts
+   }
+      
+   #  Get the levels and attributes as a single string.
+   protected method get_levels_and_atts_ {} {
+      set atts {}
+      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+         set value [$itk_component(value$i) get]
+         if { $value != {} } {
+            set colour [$itk_component(colour$i) get]
+            set colour $colindex_($colour)
+            set width [$itk_component(width$i) get]
+            lappend atts "$value $colour $width"
+         }
       }
       return $atts
    }
@@ -691,6 +826,26 @@ itcl::class gaia::GaiaContour {
       }
       return $rtdimage
    }
+
+   #  Get the name of the disk file that has the image we're
+   #  contouring.
+   protected method get_diskimage_ {} {
+      set image {}
+      if { $imagefile_ != {} } {
+
+         #  Have disk file name already, just return this.
+         set image $imagefile_
+      } else {
+
+         #  Name of an rtdimage, if this is the current image return
+         #  blank. 
+         if { [catch {$target_ get_image} rtdimage] == 0 }  {
+            set image [$rtdimage cget -file]
+         }
+      }
+      return $image
+   }
+
 
    #  Remove all contours. Do it one-by-one so we don't interfere with
    #  other contour objects.
@@ -855,6 +1010,20 @@ itcl::class gaia::GaiaContour {
          LabelRule $w.keyrule -text "Key configuration:"
       }
       pack $itk_component(keyrule) -side top -fill x
+ 
+      #  Whether to draw key or not.
+      itk_component add drawkey {
+         StarLabelCheck $w.drawkey \
+            -text "Display key:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth 15 \
+	    -variable [scope itk_option(-drawkey)] \
+            -command [code $this toggle_drawkey_]
+      }
+      pack $itk_component(drawkey) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(drawkey) \
+	  {Toggle if a contour level key is to be displayed}
 
       #  Position of key relative to top right hand corner.
       itk_component add xkeypos {
@@ -972,12 +1141,33 @@ itcl::class gaia::GaiaContour {
          {Width of box around key}
    }
 
+   #  Set whether key is to be drawn or not.
+   protected method toggle_drawkey_ {} {
+       if { $itk_option(-drawkey) } {
+	   set state normal
+       } else {
+	   set state disabled
+       }
+       $itk_component(xkeypos) configure -state $state
+       $itk_component(ykeypos) configure -state $state
+       $itk_component(keycolour) configure -state $state
+       $itk_component(keyfont) configure -state $state
+       $itk_component(keylength) configure -state $state
+       $itk_component(keywidth) configure -state $state
+       draw_key_
+   }
+
    #  Add a level key to the image. The key consists of the level and
    #  a coloured line. Any args are ignored.
    protected method draw_key_ {args} {
 
       #  Delete the current key.
       $itk_option(-canvas) delete $keytag_
+
+      #  Stop now if not drawing.
+      if { ! $itk_option(-drawkey) } {
+	  return
+      }
 
       #  Get current levels.
       set levels [get_levels_ 1]
@@ -1030,7 +1220,6 @@ itcl::class gaia::GaiaContour {
             set y [expr $y+$dy]
          }
       }
-      update
 
       #  Finally add the surround box (also used as control for
       #  repositioning whole of key).
@@ -1076,14 +1265,15 @@ itcl::class gaia::GaiaContour {
    #  Update key position when move is complete.
    protected method update_key_ {} {
       lassign [$itk_option(-canvas) bbox $keytag_] bx0 by0 bx1 by1
-      puts "$bx0 $by0 $bx1 $by1"
       lassign [calc_bounds_] ix0 iy0 ix1 iy1
-      puts "$ix0 $iy0 $ix1 $iy1"
-      set newx [expr $bx0+$ix1]
-      set newy [expr $by0+$iy0]
-      puts "$newx, $newy"
-      #$itk_component(xkeypos) configure -value $newx
+      set newx [expr $bx0-$ix1+0.5]
+      set newy [expr $by0-$iy0+1.0]
+      set orig $itk_option(-drawkey)
+      set itk_option(-drawkey) 0
+      $itk_component(xkeypos) configure -value $newx
       $itk_component(ykeypos) configure -value $newy
+      set itk_option(-drawkey) $orig
+      draw_key_
    }
 
    #  Add controls for choosing which part of the image to contour.
@@ -1111,7 +1301,7 @@ itcl::class gaia::GaiaContour {
 
       #  Control the fraction of the display that the contouringh
       #  covers.
-      set xfrac_ 0.8
+      set xfrac_ 0.7
       itk_component add xfrac {
          LabelEntryScale $w.xfrac \
             -text "X display fraction:" \
@@ -1130,7 +1320,7 @@ itcl::class gaia::GaiaContour {
       add_short_help $itk_component(xfrac) \
          {X fraction of visible region to contour}
 
-      set yfrac_ 0.8
+      set yfrac_ 0.7
       itk_component add yfrac {
          LabelEntryScale $w.yfrac \
             -text "Y display fraction:" \
@@ -1214,7 +1404,10 @@ itcl::class gaia::GaiaContour {
    itk_option define -maxcnt maxcnt Maxcnt 30
 
    #  Maximum width of contour line (as multiple of 0.005).
-   itk_option define -maxwidth maxwidth Maxwidth 4
+   itk_option define -maxwidth maxwidth Maxwidth 10
+
+   #  Whether to draw the key or not.
+   itk_option define -drawkey drawkey Drawkey 1
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -1237,6 +1430,7 @@ itcl::class gaia::GaiaContour {
 
    #  Colours-v-indices (set up from colourmap_) and default colours.
    protected variable colindex_
+   protected variable indexcol_
    protected variable coldefault_
 
    #  Tags used for configuring each contour levels.
@@ -1253,8 +1447,8 @@ itcl::class gaia::GaiaContour {
 
    #  Which part of image is to be contoured.
    protected variable whole_ 0
-   protected variable xfrac_ 0.8
-   protected variable yfrac_ 0.8
+   protected variable xfrac_ 0.7
+   protected variable yfrac_ 0.7
 
    #  Window names of the tab notebook childsites.
    protected variable child_
@@ -1277,7 +1471,6 @@ itcl::class gaia::GaiaContour {
       "-adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
       "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
       "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
-      "-adobe-symbol-medium-r-normal-*-*-120-*-*-*-*-*-*"   "symbol"
       "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
    }
 

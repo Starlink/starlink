@@ -358,7 +358,7 @@ itcl::class gaia::Gaia {
       foreach colour $colours_ {
          $m.blank add radiobutton \
             -background $colour \
-            -variable $w_.colour \
+            -variable $w_.blank \
             -value $colour \
             -label {    } \
             -command [code $this set_blankcolour_ $colour]
@@ -370,7 +370,7 @@ itcl::class gaia::Gaia {
       foreach colour $colours_ {
          $m.back add radiobutton \
             -background $colour \
-            -variable $w_.colour \
+            -variable $w_.back \
             -value $colour \
             -label {    } \
             -command [code $this set_background_ $colour]
