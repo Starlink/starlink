@@ -22,6 +22,15 @@ libndf_adam_la_SOURCES = \
 	$(ADAM_C_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+libndf_la_CFLAGS = -prefer-pic
+libndf_la_FCFLAGS = -prefer-pic
+libndf_adam_la_CFLAGS = -prefer-pic
+libndf_adam_la_FCFLAGS = -prefer-pic
+endif
+
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = ndf_err.h NDF_ERR
 

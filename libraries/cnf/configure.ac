@@ -21,6 +21,9 @@ AC_PROG_FPP(substitute)
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
+dnl   If --with-pic=no is set we should honour that.
+AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl   We need this for the tests

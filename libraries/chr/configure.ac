@@ -18,6 +18,9 @@ STAR_DEFAULTS
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+dnl   If --with-pic=no is set we should honour that.
+AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 STAR_DECLARE_DEPENDENCIES([build], [sae cnf])

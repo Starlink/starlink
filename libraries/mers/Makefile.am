@@ -10,6 +10,17 @@ include_MESSAGES = ERR_ERR err_err.h MSG_ERR msg_err.h
 lib_LTLIBRARIES = liberr_standalone.la liberr_adam.la
 noinst_LTLIBRARIES = liberr.la
 
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+liberr_standalone_la_CFLAGS = -prefer-pic
+liberr_standalone_la_FCFLAGS = -prefer-pic
+liberr_adam_la_CFLAGS = -prefer-pic
+liberr_adam_la_FCFLAGS = -prefer-pic
+liberr_la_CFLAGS = -prefer-pic
+liberr_la_FCFLAGS = -prefer-pic
+endif
+
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 liberr_la_SOURCES = \

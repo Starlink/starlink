@@ -17,6 +17,13 @@ libhds_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(BLOCK_DATA_FILES)
 
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+libhds_la_CFLAGS = -prefer-pic
+libhds_la_FCFLAGS = -prefer-pic
+endif
+
 hds_machine_SOURCES = hds_machine.f
 hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
 

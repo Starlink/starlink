@@ -257,6 +257,19 @@ lib_LTLIBRARIES = \
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+# Make all library code position independent by default. This is handy for
+# creating shareable libraries from the static ones (Java JNI libraries). 
+# Note we do not use AM_CFLAGS as this would also apply to local programs.
+if !NOPIC
+libast_la_CFLAGS = -prefer-pic
+libast_err_la_CFLAGS = -prefer-pic
+libast_ems_la_CFLAGS = -prefer-pic
+libast_grf_2.0_la_CFLAGS = -prefer-pic
+libast_grf_3.2_la_CFLAGS = -prefer-pic
+libast_pgplot_la_CFLAGS = -prefer-pic
+libast_slalib_la_CFLAGS = -prefer-pic
+libast_wcslib_la_CFLAGS = -prefer-pic
+endif
 
 libast_la_SOURCES = \
     $(GRP_C_ROUTINES) \

@@ -22,6 +22,9 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
+#   If --with-pic=no is set we should honour that.
+AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CHECK_HEADERS([fenv.h limits.h float.h stdint.h time.h assert.h])

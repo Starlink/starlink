@@ -17,6 +17,13 @@ libprm_la_SOURCES = \
 libprm_a_la_SOURCES = \
 	$(PLATFORM_C)
 
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+libprm_la_CFLAGS = -prefer-pic
+libprm_la_FCFLAGS = -prefer-pic
+endif
+
 make_prm_par_SOURCES = make-prm-par.c
 make_prm_par_LDADD = -lm
 

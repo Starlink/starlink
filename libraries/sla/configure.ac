@@ -21,6 +21,9 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
+dnl    If --with-pic=no is set we should honour that.
+AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
 dnl    Platform-dependent/preprocessed sources.  This is slightly
 dnl    subtle: file random.fpp is a preprocessable file.  However,
 dnl    there are also versions available for VAX/VMS

@@ -24,6 +24,9 @@ AC_CHECK_FUNCS([strcmp vsnprintf vsprintf])
 AC_CHECK_DECLS([strcmp])
 AC_PROG_LIBTOOL
 
+dnl    If --with-pic=no is set we should honour that.
+AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
 dnl    The function ems_fioer.c provides a mapping from Fortran IOSTAT
 dnl    codes to error messages.  The only way we can do this is by
 dnl    determining a Fortran compiler now, and hoping that is the same

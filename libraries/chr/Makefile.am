@@ -10,6 +10,13 @@ libchr_la_SOURCES = \
 	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+libchr_la_CFLAGS = -prefer-pic
+libchr_la_FCFLAGS = -prefer-pic
+endif
+
 include_MESSAGES = CHR_ERR
 PRIVATE_INCLUDES = CHR_SYS
 
