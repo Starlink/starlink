@@ -448,8 +448,8 @@ void StarWCS::setEquinox()
     //  requested. The HMS class has a print that effects much of the
     //  catalogues outputs, so we toggle that too for consistency.
     if ( extraPrecision_ ) {
-        astSet( wcs_, "digits(%d) = 10", raIndex_ );
-        astSet( wcs_, "digits(%d) = 10", decIndex_ );
+        astSet( wcs_, "digits(%d) = 11", raIndex_ );
+        astSet( wcs_, "digits(%d) = 11", decIndex_ );
         HMS::extra_precision = 1;
     }
     else {

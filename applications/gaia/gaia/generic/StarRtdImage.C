@@ -151,6 +151,9 @@
 //     08-AUG-2001 (PWD):
 //        Fixed problem with native objects being written at start of
 //        FITS headers (actually turned out to be an AST bug).
+//     27-JAN-2003 (PWD):
+//        Added facilities to support the display of coordinates at
+//        milli-arcsecond resolution.
 //-
 
 #include <string.h>
