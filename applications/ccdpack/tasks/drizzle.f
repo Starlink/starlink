@@ -285,10 +285,9 @@
 *     {enter_further_examples_here}
 
 *  Implementation Status:
-*     -  All non-complex numeric data types are supported, however the
-*        output mosaic will be of data type _REAL
+*     -  All non-complex numeric data types are supported.
 *     -  Bad pixels are supported.
-*     -  The algorithm is restricted to handling 2D NDFs only
+*     -  The algorithm is restricted to handling 2D NDFs only.
 
 *  Algorithms Used:
 *     Taken from Fruchter et al., "A package for the reduction of dithered
@@ -392,6 +391,8 @@
 *     26-OCT-1999 (AA):
 *        Added preserve keyword and associated changes
 *        Changed to use CCD1_MKTMP to create temporary workspace
+*     05-NOV-1999 (AA):
+*        Minor cosmetic changes to output
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -598,8 +599,7 @@
      :               STATUS )
       CALL MSG_SETL( 'REP_PREVD', PREVD )
       CALL CCD1_MSG( ' ', '    Preserve input data type: ^REP_PREVD',
-     :               STATUS )
-     
+     :               STATUS )     
 
 *  Loop to obtain an identifier for each NDF and get the bounds for
 *  the mosaiced image + determine presence of variance component
@@ -615,37 +615,11 @@
 *  Get group identifier         
          CALL IRG_NDFEX( INGRP, I, NDF( I ), STATUS )
 
-*  Write out name of this NDF. And which loop this is.
-         CALL CCD1_MSG( ' ',  ' ', STATUS )
-         CALL NDF_MSG( 'CURRENT_NDF', NDF(I) )
-         CALL CCD1_MSG( ' ', '    +++ Processing NDF: ^CURRENT_NDF',
-     :                  STATUS )
-         CALL MSG_SETI( 'CURRENT_NUM', I )
-         CALL MSG_SETI( 'MAX_NUM', NIN )
-         CALL CCD1_MSG( ' ', '    (Number ^CURRENT_NUM of ^MAX_NUM)',
-     :                  STATUS )
-         CALL CCD1_MSG( ' ',  ' ', STATUS ) 
-             
 *  Test to see whether the NDF contains variance information and count
 *  the number which do.
          CALL NDF_STATE( NDF( I ), 'Variance', VAR, STATUS )
          IF ( VAR ) THEN
             NVAR = NVAR + 1
-            CALL CCD1_MSG( ' ', 
-     :                     '    NDF variance component: present', 
-     :                     STATUS )
-            CALL CCD1_MSG( ' ', 
-     :                     '    Propagating variances: TRUE', 
-     :                     STATUS )     
-            IF( GETV ) THEN
-               CALL MSG_SETL( 'REP_USEVAR', GETV )
-               CALL CCD1_MSG( ' ', '    Using variances as '//
-     :'weights: ^REP_USEVAR', STATUS )
-            ENDIF
-         ELSE
-            CALL CCD1_MSG( ' ', 
-     :                     '    NDF variance component: absent', 
-     :                     STATUS )  
          ENDIF   
          
 *  Map the current NDF to find its actual LBND() and UBND()
@@ -655,7 +629,7 @@
          CALL NDF_STATE( NDF( I ), 'WCS', SWCS, STATUS )
          IF( .NOT. SWCS ) THEN
              STATUS = SAI__ERROR
-             CALL NDF_MSG( 'NDFNAME', NDF(I) )
+             CALL NDF_MSG( 'NDFNAME', NDF( I ) )
              CALL ERR_REP( 'DRIZZLE_NOAST', '  NDF ^NDFNAME '//
      :'does not have a WCS extension.',
      :                       STATUS ) 
@@ -714,17 +688,6 @@
      :                   NDIMI, STATUS )
                      
          IF ( STATUS .NE. SAI__OK ) GO TO 940         
-
-*  Report the extent of the input NDF
-         DO IDIM = 1, NVIN
-            IF ( IDIM .NE. 1 ) CALL MSG_SETC( 'INBOUND', ',' )
-         
-            CALL MSG_SETI( 'INBOUND', ILBND( IDIM ) )
-            CALL MSG_SETC( 'INBOUND', ':' )
-            CALL MSG_SETI( 'INBOUND', IUBND( IDIM ) )
-         ENDDO
-         CALL CCD1_MSG( ' ',
-     :   '    Pixel bounds of input image:      (^INBOUND)', STATUS )
 
 *  Find the coordinate bounds of the output NDF.
 *  ==============================================         
@@ -830,9 +793,6 @@
 
 *  Calculate weight from mean variance.
             WEIGHT( I ) = 1.0D0 / MEANV 
-            CALL MSG_SETD( 'MEANVAR', 1.0D0 / WEIGHT( I ) )
-            CALL CCD1_MSG( ' ',
-     :'    Mean variance for input image: ^MEANVAR', STATUS )   
             CALL NDF_UNMAP( NDF( I ), 'Variance', STATUS ) 
          ELSE
             WEIGHT( I ) = 1.0D0
@@ -860,7 +820,6 @@
 *  normalise the corrections.
       IF ( GETS .OR. GETZ .OR. GETV ) THEN
          CALL ERR_MARK
-         CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_NDFAC( 'REF', 'READ', 1, 1, IDUM, NDFREF, STATUS )
 
 *  If a null reference NDF is specified, then annul the error and set
@@ -1248,7 +1207,36 @@
 *  Test to see whether the NDF contains variance information and count
 *  the number which do.
          CALL NDF_STATE( NDF( I ), 'Variance', VAR, STATUS ) 
-              
+
+         IF ( VAR ) THEN
+            CALL CCD1_MSG( ' ', 
+     :                     '    NDF variance component: present', 
+     :                     STATUS )
+            CALL CCD1_MSG( ' ', 
+     :                     '    Propagating variances: TRUE', 
+     :                     STATUS )     
+            IF( GETV ) THEN
+               CALL MSG_SETL( 'REP_USEVAR', GETV )
+               CALL CCD1_MSG( ' ', '    Using variances as '//
+     :'weights: ^REP_USEVAR', STATUS )
+            ENDIF         
+         ELSE
+            CALL CCD1_MSG( ' ', 
+     :                     '    NDF variance component: absent', 
+     :                     STATUS )           
+         ENDIF   
+
+*  Report the extent of the input NDF
+         DO IDIM = 1, NVIN
+            IF ( IDIM .NE. 1 ) CALL MSG_SETC( 'INBOUND', ',' )
+         
+            CALL MSG_SETI( 'INBOUND', ILBND( IDIM ) )
+            CALL MSG_SETC( 'INBOUND', ':' )
+            CALL MSG_SETI( 'INBOUND', IUBND( IDIM ) )
+         ENDDO
+         CALL CCD1_MSG( ' ',
+     :   '    Pixel bounds of input image: (^INBOUND)', STATUS )  
+                   
 *  The subroutine will drop the input images onto OUTNDF directly
 *  one at a time, weights are accumulated in the WEIGHT array
 *  located in the CCDPACK_EXT NDF extension
