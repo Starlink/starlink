@@ -160,7 +160,7 @@
          PARAMETER (MXBIN=500)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'REBIN Version V2.0-1' )
+        PARAMETER		( VERSION = 'REBIN Version V2.0-2' )
 
 *  Local Variables:
       CHARACTER*80           AXLABEL(7) ! AXIS labels
