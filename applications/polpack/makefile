@@ -358,7 +358,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar ndg_source.tar makefile mk $(DOCUMENTATION
 #  set.
 
 PUBLIC_SCRIPTS = PolMap.tcl PolMap_procs.tcl Polka.tcl Polka_procs.tcl \
-CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay ndg_wild polimp.csh \
+CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay irg_wild polimp.csh \
 polexp.csh
 
 # List of StarTcl files which must reside in the POLPACK binary directory.

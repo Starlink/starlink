@@ -28,7 +28,7 @@ pol1_stoc.glrdic ccd1_asfio.f ccd1_cfgrp.f ccd1_ftgrp.f ccd1_hvcon.f \
 ccd1_iscom.f ccd1_mall.f ccd1_mfree.f ccd1_nxwrd.f ccd1_rdlin.f \
 ccd1_rmcom.f pol1_chkex.f pol1_imfit.f pol1_knext.f pol1_deftb.f \
 pol1_lnam.f polimp.ifl polimp.f ccd1_par ccd1_memcm polexp.f polexp.ifl \
-pol1_setft.f polimp.tab ndg_wild polimp.csh polexp.csh polvec.f polvec.ifl \
+pol1_setft.f polimp.tab irg_wild polimp.csh polexp.csh polvec.f polvec.ifl \
 pol1_plvec.f pol1_prwcs.f ccd1_orvar.f pol1_stats.f ccg1_clipr.f \
 ccg1_mer1r.f ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f pol1_clcat.f \
 pol1_cm1rr.f pol1_cm3rr.f pol1_gtwcs.f pol1_mkcat.f pol1_stbin.f \
