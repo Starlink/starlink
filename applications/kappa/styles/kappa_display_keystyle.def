@@ -33,8 +33,8 @@
 #  Do not display the title by default.
       drawtitle=0
 
-#  Include a textual label only on axis 1.
-      textlab(1)=1
+#  Include no textual labels.
+      textlab(1)=0
       textlab(2)=0
 
 #  Include numerical labels only on axis 1.
