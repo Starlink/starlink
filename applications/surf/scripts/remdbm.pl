@@ -107,6 +107,9 @@ if ($use_ams) {
   print "Perl/ADAM messaging not available. Using system() instead\n";
 }
 
+# Decide whether we are using the new KAPPA (>0.13) or the old
+# This governs whether we can use the WCSCOPY command
+$newkappa = ( -e "$ENV{KAPPA_DIR}/style.def" ? 1 : 0);
 
 
 # Setup default output filename
@@ -131,15 +134,14 @@ if ($use_ams) {
   $adam = new ORAC::Msg::ADAM::Control;
   $status = $adam->init;
   check_status($status);
-  $adam->timeout(120);     # task timeout
+  $adam->timeout(600);     # task timeout of 10 minutes
 
   
 } else {
 
- $Mon{surf_mon} = new ORAC::Msg::ADAM::Shell("surf_mon_$$", $ENV{SURF_DIR}."/surf_mon");
- $Mon{kappa_mon} = new ORAC::Msg::ADAM::Shell("kappa_mon_$$",$ENV{KAPPA_DIR}."/kappa_mon");
+  $Mon{surf_mon} = new ORAC::Msg::ADAM::Shell("surf_mon_$$", $ENV{SURF_DIR}."/surf_mon");
+  $Mon{kappa_mon} = new ORAC::Msg::ADAM::Shell("kappa_mon_$$",$ENV{KAPPA_DIR}."/kappa_mon");
 
-  
 }
 
 
@@ -334,11 +336,36 @@ unlink "s$wt$ext", "$re$ext", "$im$ext";
 
 print "Running inverse FFT...\n";
 # Inverse fourier
-$status = $Mon{kappa_mon}->obeyw("fourier","inverse realin=rediv imagin=imdiv out=$output reset");
+$status = $Mon{kappa_mon}->obeyw("fourier","inverse realin=rediv imagin=imdiv out=invfft$output reset");
 check_status($status);
 
 # Remove the final junk files
 unlink "rediv$ext", "imdiv$ext";
+
+# Now copy the astrometry from one of the input images to the
+# output of the FFT. We need to do this since the inverse FFT image
+# has lost pixel origin, axis information and WCS (but has retained
+# the extensions)
+
+# Since the WCSCOPY command (currently) only copies WCS information and not
+# AXIS and origin information we can not use this. We do a kluge instead
+# where we use the MATHS command and multiply the input image by 0
+# and the output by 1. MATHS propogates WCS and AXIS correctly since
+# the input images are identical before and after the FFT
+
+# This does assume that the bounds of the two input images match.
+# Since we dont explcitly check for this I have to assume that the
+# pixel origin is 1,1 (since that is what the origin for the output
+# of FOURIER is).
+
+# Select first map as reference
+$file = $Grp->frame(0)->file;
+
+$status = $Mon{kappa_mon}->obeyw("maths","exp='IA*0+IB' ia=$file ib=invfft$output out=$output title='SURF:remdbm' reset");
+check_status($status);
+
+# Now remove the intermediate file
+unlink "invfft$output$ext";
 
 print "Result stored in $output\n";
 
