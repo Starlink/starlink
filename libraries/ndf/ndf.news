@@ -1,0 +1,10 @@
+NDF Library
+-----------
+   A new release (V1.5-6) of the NDF library is now available.
+
+   - A bug has been fixed in the C interface for function ndfChunk.
+
+   - Facilities for handling foreign extension specifiers (such as 
+     FITS image extensions) within the "on-the-fly" data conversion 
+     scheme have been added. SSN/20 has been updated to include these
+     changes.

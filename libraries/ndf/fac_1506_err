@@ -1,0 +1,89 @@
+FACILITY NDF
+300,ACCIN,access type invalid
+301,ACDEN,access denied
+302,BADNS,bad pixel values not supported
+303,BMOIN,bounds matching option invalid
+304,CNMIN,component name invalid
+305,DIMIN,dimensions invalid
+306,DUDEF,data component undefined
+307,EXSLT,exceeded number of allocated slots
+308,FATIN,fatal internal error
+309,FTPIN,full data type invalid
+310,ICHIN,chunk index invalid
+311,IDINV,NDF identifier invalid
+312,ISMAP,component is mapped
+313,MMDIN,mapping mode invalid
+314,MODIN,access mode invalid
+315,MSBEG,missing call to NDF_BEGIN
+316,MXPIN,maximum number of pixels invalid
+317,NDMIN,number of dimensions invalid
+318,NGSTD,negative standard deviation value(s) encountered
+319,NGVAR,negative variance values(s) encountered
+320,NOCMP,no component name
+321,NODAT,data array not present
+322,NOEXT,extension not present
+323,NOTRM,bounds do not intersect
+324,NOQLY,quality array not present
+325,NOTSP,facility not yet supported
+326,NOTYP,no data types
+327,NSHNM,non-standard HDS component name
+328,NSXNM,non-standard extension name
+329,NTMAP,component not mapped
+330,PLINV,NDF placeholder invalid
+331,QMPIN,quality mapping invalid
+332,QUDEF,quality component undefined
+333,SFTIN,pixel-shift specification invalid
+334,TRUNC,character string truncated
+335,TYPIN,type invalid
+336,TYPNI,processing of data type not implemented
+337,VARIN,variant value invalid
+338,VUDEF,variance component undefined
+339,XISTS,extension already exists
+340,XNOIN,extension number invalid
+341,XSDIM,too many dimensions
+342,XSEXT,too many extension names
+343,AXNIN,axis number invalid
+344,AXOVF,axis value overflow
+345,BNDIN,bounds invalid
+346,INUSE,structure already in use
+347,NOAXD,no axis data present
+348,XTNIN,extension invalid
+349,AXVIN,axis values invalid
+350,IBLIN,block index invalid
+351,NAMIN,name invalid
+352,TPNIN,tuning parameter name invalid
+353,TPVIN,tuning parameter value invalid
+354,CVTER,foreign format conversion error
+355,DELER,foreign file deletion error
+356,DTMIN,date/time specification invalid
+357,EXCER,error executing external command
+358,FILIN,file name invalid
+359,FILNF,file not found
+360,FILPR,file protected
+361,FMTIN,foreign data format invalid
+362,HEXIN,history extend size invalid
+363,HISTL,history text lines too long
+364,HITIN,history information item name invalid
+365,HRCIN,history current record count invalid
+366,HRNIN,history record number invalid
+367,HRORD,history record date/time order invalid
+368,HUMIN,history update mode component invalid
+369,INQER,file enquiry error
+370,NOCVT,no foreign format conversion command defined
+371,NOFIO,no free Fortran I/O units
+372,NOHCD,missing history creation date component
+373,NOHCM,missing command component in history record
+374,NOHDT,missing date component in history record
+375,NOHIS,history component not present
+376,NOHRA,missing history records array component
+377,NOHRC,missing history current record component
+378,NOHTX,missing text component in history record
+379,NOMEM,unable to allocate memory
+380,STAIN,state string invalid
+381,XSFMT,too many foreign data formats
+382,NAXIN,number of axes invalid
+383,NOWDT,missing world coordinate system data component
+384,WCDTS,world coordinate system data too short
+385,WCSIN,world coordinate system information invalid
+386,ARCIN,command line argument count invalid
+387,ARGIN,command line argument invalid

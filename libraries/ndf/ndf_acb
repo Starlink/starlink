@@ -1,0 +1,272 @@
+*+
+*  Name:
+*     NDF_ACB
+
+*  Purpose:
+*     Define NDF_ system Access Control Block (ACB).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which describe the "virtual"
+*     objects used by the NDF_ system to provide user access to actual
+*     data objects which are described in the Data Control Block (DCB).
+*     Each of the active entries in the ACB refers to an associated DCB
+*     entry and several ACB entries may refer to the same DCB entry. A
+*     one-to-one correspondence is maintained between active ACB
+*     entries and the array identifier values issued to users.
+
+*  Prior Requirements:
+*     The SAE_PAR, NDF_PAR and NDF_CONST include files should be
+*     included before this file, in order to define constants used
+*     here.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-DEC-1990 (RFWS):
+*        Original version.
+*     14-JUL-1992 (RFWS):
+*        Added SAVE statements for common blocks.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Which slots have been used.
+*  ==========================
+*  This array is initialised to .FALSE. by the NDF1_INIT block data
+*  routine. Its entries are then selectively set to .TRUE. to indicate
+*  which slots in the ACB are in use (i.e. have NDF identifiers issued
+*  for them).
+      LOGICAL ACB_USED( NDF__MXACB )
+      
+*  Access control flags.
+*  ====================
+*  If a slot is in use, then the ACB_ACC entry contains a series of
+*  logical access control flags which control the types of access
+*  permitted to the virtual object described by the ACB slot. The flag
+*  values are identified by symbolic constants defined in the NDF_CONST
+*  file. Access is permitted if the ACB_ACC value is .TRUE., otherwise
+*  it is denied. Access control flags are propagated to new virtual
+*  objects when they are derived from existing ones.
+      LOGICAL ACB_ACC( NDF__MXACC, NDF__MXACB )
+
+*  Whether access is to a section.
+*  ==============================
+*  If a slot is in use and the ACB_CUT entry is .TRUE., then the object
+*  it describes is a "section", which allows virtual access to a subset
+*  or superset of the data. If this entry is .FALSE, then the NDF is a
+*  "base NDF" which gives direct access to the actual data object.
+      LOGICAL ACB_CUT( NDF__MXACB )
+
+*  Index to data object entry in the DCB.
+*  =====================================
+*  If a slot is in use, then the ACB_IDCB entry contains the index of
+*  the entry in the Data Control Block (DCB) which describes the actual
+*  data object to which the virtual (ACB) object refers.
+      INTEGER ACB_IDCB( NDF__MXACB )
+
+*  Record of identifiers issued.
+*  ============================
+*  The value of ACB_IDCNT is initialised by the NDF1_INIT block data
+*  routine and is incremented each time an array identifier is issued.
+*  The next identifier value is generated using the new value of
+*  ACB_IDCNT and this ensures that identifier values are not re-used.
+*  When an identifier is issued for a slot, its value is stored in the
+*  ACB_CHK entry and an identifier is only considered valid if it
+*  matches the ACB_CHK entry in the slot to which it refers. This
+*  allows identifiers to be rendered invalid either by the user (by
+*  assigning the NDF__NOID value to them), or by the NDF_ system (by
+*  marking the slot as not used, or by re-using it with a new
+*  identifier value).
+      INTEGER ACB_CHK( NDF__MXACB )
+      INTEGER ACB_IDCNT
+
+*  Data array.
+*  ==========
+*  If a slot is in use, then the ACB_DID entry contains an ARY_ system
+*  identifier for the data array of the virtual NDF object which the
+*  ACB entry describes. This may be a base array, or an array section,
+*  as appropriate, and is derived from the corresponding DCB entry.
+*  This identifier should always be valid (although the array it
+*  describes may temporarily be in an undefined state) and serves to
+*  define the shape of the virtual NDF.
+      INTEGER ACB_DID( NDF__MXACB )
+
+*  If a slot is in use and the data array of the NDF is mapped for
+*  access, then ACB_DMAP will be set .TRUE. to indicate this (ACB_DMAP
+*  is initially set to .FALSE when a new ACB slot is issued by the
+*  routine NDF1_FFS). If a temporary copy of the data array values has
+*  to be created for the purposes of mapping, then these will be held
+*  in a temporary array, whose ARY_ system identifier is stored in the
+*  ACB_DMTID entry. Otherwise, this identifier will be invalid.
+      LOGICAL ACB_DMAP( NDF__MXACB )
+      INTEGER ACB_DMTID( NDF__MXACB )
+
+*  If a slot is in use and its data array is mapped for access, then
+*  the ACB_DMCPX entry will contain a logical value indicating whether
+*  the mapped values are complex (.TRUE.) or not (.FALSE.). If complex
+*  values are mapped, then the ACB_DMDPT and DCB_DMIPT entries will
+*  contain pointers to the non-imaginary and imaginary parts of the
+*  mapped array, respectively. If non-complex values are mapped
+*  (ACB_DMCPX is .FALSE.), then only the ACB_DMDPT value is
+*  significant.
+      LOGICAL ACB_DMCPX( NDF__MXACB )
+      INTEGER ACB_DMDPT( NDF__MXACB )
+      INTEGER ACB_DMIPT( NDF__MXACB )
+
+*  If a slot is in use and its data array is mapped for access, then the
+*  ACB_DMTYP entry contains an upper-case numeric type string (e.g.
+*  '_REAL') indicating the numeric type of the mapped values.
+      CHARACTER * ( NDF__SZTYP ) ACB_DMTYP( NDF__MXACB )
+
+*  If a slot is in use and its data array is mapped for access, then
+*  the ACB_DMBAD entry contains a logical value indicating whether the
+*  mapped array may contain "bad" values. The associated ACB_DMBMD
+*  value contains a logical flag to indicate whether the value of
+*  ACB_DMBAD has been explicitly modified by the user (e.g. by a call
+*  to NDF_SBAD) while the array was mapped. This allows the NDF system
+*  to determine whether or not it should update the bad pixel flag of
+*  the data array via the ARY_ system when it is unmapped.
+      LOGICAL ACB_DMBAD( NDF__MXACB )
+      LOGICAL ACB_DMBMD( NDF__MXACB )
+
+*  Variance array.
+*  ==============
+*  If a slot is in use, then the ACB_VID entry contains an ARY_ system
+*  identifier for the variance array of the virtual NDF object which
+*  the ACB entry describes. This may be a base array, or an array
+*  section, as appropriate, and is derived from the corresponding DCB
+*  entry.  If the NDF does have a variance component, then this
+*  identifier should be valid; conversely, if the NDF does not have a
+*  variance component, then the identifier will be invalid.  Before the
+*  identifier can be used, the routine NDF1_VIMP must be called to
+*  ensure that NDF variance array information is available in all the
+*  ACB entries which refer to the NDF (this routine ensures that all
+*  ACB entries which refer to the same DCB entry are kept in step).
+*  Note that the validity of the ACB_VID identifier must be checked
+*  with the ARY_VALID routine, since the NDF's variance array may be
+*  deleted without updating the ACB_VID value.
+      INTEGER ACB_VID( NDF__MXACB )
+
+*  If a slot is in use and the variance array of the NDF is mapped for
+*  access, then ACB_VMAP will be set .TRUE. to indicate this (ACB_VMAP
+*  is initially set to .FALSE when a new ACB slot is issued by the
+*  routine NDF1_FFS). If a temporary copy of the variance array values
+*  has to be created for the purposes of mapping, then these will be
+*  held in a temporary array, whose ARY_ system identifier is stored in
+*  the ACB_VMTID entry. Otherwise, this identifier will be invalid.
+      LOGICAL ACB_VMAP( NDF__MXACB )
+      INTEGER ACB_VMTID( NDF__MXACB )
+
+
+*  If a slot is in use and its variance array is mapped for access, then
+*  the ACB_VMCPX entry will contain a logical value indicating whether
+*  the mapped values are complex (.TRUE.) or not (.FALSE.). If complex
+*  values are mapped, then the ACB_VMDPT and DCB_VMIPT entries will
+*  contain pointers to the non-imaginary and imaginary parts of the
+*  mapped array, respectively. If non-complex values are mapped
+*  (ACB_VMCPX is .FALSE.), then only the ACB_VMDPT value is
+*  significant.
+      LOGICAL ACB_VMCPX( NDF__MXACB )
+      INTEGER ACB_VMDPT( NDF__MXACB )
+      INTEGER ACB_VMIPT( NDF__MXACB )
+
+*  If a slot is in use and its variance array is mapped for access,
+*  then the ACB_VMTYP entry contains an upper-case numeric type string
+*  (e.g.  '_REAL') indicating the numeric type of the mapped values.
+*  The ACB_VMMOD entry similarly contains an upper-case string
+*  describing the access mode used for mapping the values (e.g.
+*  'UPDATE'). The ACB_VMSTD entry contains a logical value indicating
+*  whether the NDF's variance values have been converted to standard
+*  deviations (i.e. error values) by taking the square root and
+*  (equivalently) whether they must be squared before being written
+*  back to the variance array.
+      CHARACTER * ( NDF__SZTYP ) ACB_VMTYP( NDF__MXACB )
+      CHARACTER * ( NDF__SZMOD ) ACB_VMMOD( NDF__MXACB )
+      LOGICAL ACB_VMSTD( NDF__MXACB )
+
+*  If a slot is in use and its variance array is mapped for access,
+*  then the ACB_VMBAD entry contains a logical value indicating whether
+*  the mapped array may contain "bad" values. The associated ACB_VMBMD
+*  value contains a logical flag to indicate whether the value of
+*  ACB_VMBAD has been explicitly modified by the user (e.g. by a call
+*  to NDF_SBAD) while the array was mapped. This allows the NDF system
+*  to determine whether or not it should update the bad pixel flag of
+*  the variance array via the ARY_ system when it is unmapped.
+      LOGICAL ACB_VMBAD( NDF__MXACB )
+      LOGICAL ACB_VMBMD( NDF__MXACB )
+
+*  Quality array identifiers.
+      INTEGER ACB_QID( NDF__MXACB )
+      LOGICAL ACB_QMAP( NDF__MXACB )
+      INTEGER ACB_QMTID( NDF__MXACB )
+      CHARACTER * ( NDF__SZTYP ) ACB_QMTYP( NDF__MXACB )
+      CHARACTER * ( NDF__SZMOD ) ACB_QMMOD( NDF__MXACB ) !Check length!!
+      INTEGER ACB_QMPTR( NDF__MXACB )
+      BYTE ACB_QBB( NDF__MXACB )
+      LOGICAL ACB_ISQBB( NDF__MXACB )
+      CHARACTER * ( DAT__SZLOC ) ACB_QMTLC( NDF__MXACB )
+      LOGICAL ACB_QMF( NDF__MXACB )
+
+*  Record of identifiers issued (for checking purposes) and count of
+*  total number of identifiers issued.
+
+*  Identifier context for each ACB entry and "current" context level.
+      INTEGER ACB_CTX( NDF__MXACB )
+      INTEGER ACB_IDCTX
+
+*  Axis data array mapping items: whether mapped, mapped array ID,
+*  mapped value pointer, mapped value type.
+      LOGICAL ACB_ADMAP( NDF__MXDIM, NDF__MXACB )
+      INTEGER ACB_ADMID( NDF__MXDIM, NDF__MXACB )
+      INTEGER ACB_ADMPT( NDF__MXDIM, NDF__MXACB )
+      CHARACTER * ( NDF__SZTYP ) ACB_ADMTP( NDF__MXDIM, NDF__MXACB )
+
+*  Axis variance array mapping items: whether mapped, mapped array ID,
+*  mapped value pointer, mapped value type.
+      LOGICAL ACB_AVMAP( NDF__MXDIM, NDF__MXACB )
+      INTEGER ACB_AVMID( NDF__MXDIM, NDF__MXACB )
+      INTEGER ACB_AVMPT( NDF__MXDIM, NDF__MXACB )
+      CHARACTER * ( NDF__SZTYP ) ACB_AVMTP( NDF__MXDIM, NDF__MXACB )
+      CHARACTER * ( NDF__SZMOD ) ACB_AVMMD( NDF__MXDIM, NDF__MXACB )
+      LOGICAL ACB_AVMST( NDF__MXDIM, NDF__MXACB )
+
+*  Axis width array mapping items: whether mapped, mapped array ID,
+*  mapped value pointer, mapped value type.
+      LOGICAL ACB_AWMAP( NDF__MXDIM, NDF__MXACB )
+      INTEGER ACB_AWMID( NDF__MXDIM, NDF__MXACB )
+      INTEGER ACB_AWMPT( NDF__MXDIM, NDF__MXACB )
+      CHARACTER * ( NDF__SZTYP ) ACB_AWMTP( NDF__MXDIM, NDF__MXACB )
+
+*  Word-aligned values.
+      COMMON /NDF1_ACB1/ ACB_ACC, ACB_ADMAP, ACB_ADMID, ACB_ADMPT,
+     : ACB_AVMAP, ACB_AVMID, ACB_AVMPT, ACB_AVMST, ACB_AWMAP, ACB_AWMID,
+     : ACB_AWMPT, ACB_CHK, ACB_CTX, ACB_CUT, ACB_DID, ACB_DMAP,
+     : ACB_DMBAD, ACB_DMBMD, ACB_DMCPX, ACB_DMDPT, ACB_DMIPT, ACB_DMTID,
+     : ACB_IDCB, ACB_IDCNT, ACB_IDCTX, ACB_ISQBB, ACB_QID, ACB_QMAP,
+     : ACB_QMF, ACB_QMPTR, ACB_QMTID, ACB_USED, ACB_VID, ACB_VMAP,
+     : ACB_VMBAD, ACB_VMBMD, ACB_VMCPX, ACB_VMDPT, ACB_VMIPT, ACB_VMSTD,
+     : ACB_VMTID
+
+*  Character values.
+      COMMON /NDF1_ACB2/ ACB_ADMTP, ACB_AVMMD, ACB_AVMTP, ACB_AWMTP,
+     : ACB_DMTYP, ACB_QMMOD, ACB_QMTLC, ACB_QMTYP, ACB_VMMOD, ACB_VMTYP
+
+*  Byte aligned values.
+      COMMON /NDF1_ACB3/ ACB_QBB
+
+*  Save common block contents.
+      SAVE /NDF1_ACB1/
+      SAVE /NDF1_ACB2/
+      SAVE /NDF1_ACB3/
+
+*.

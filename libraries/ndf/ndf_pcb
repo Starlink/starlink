@@ -1,0 +1,141 @@
+*+
+*  Name:
+*     NDF_PCB
+
+*  Purpose:
+*     Define NDF_ system Placeholder Control Block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which hold information about
+*     placeholders used by the NDF_ system. Entries in this block are
+*     kept in one-to-one correspondence with placeholder identifiers
+*     issued to users.
+
+*  Prior Requirements:
+*     The SAE_PAR, NDF_PAR and NDF_CONST include files should be
+*     included prior to this file, in order to define constants used
+*     here.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     6-OCT-1989 (RFWS):
+*        Original, derived from the equivalent ARY_ system file.
+*     17-OCT-1989 (RFWS):
+*        Added PCB_TMP array to support temporary placeholders.
+*     18-OCT-1989 (RFWS):
+*        Added PCB_CTX to the common block, it having been omitted.
+*     14-JUL-1992 (RFWS):
+*        Added SAVE statements for common blocks.
+*     3-NOV-1993 (RFWS):
+*        Added new variables to handle conversion of foreign files.
+*     9-MAR-1994 (RFWS):
+*        Added PCB_NEW new placeholder object flag.
+*     25-MAY-1994 (RFWS):
+*        Added PCB_FORID array.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Which slots have been used.
+*  ==========================
+*  This array is initialised to .FALSE. by the NDF1_INIT block data
+*  routine. Its entries are then selectively set to .TRUE. to indicate
+*  which slots in the PCB are in use (i.e. have identifiers issued for
+*  them).
+      LOGICAL PCB_USED( NDF__MXPCB )
+      
+*  Placeholder locator.
+*  ===================
+*  If a slot is in use, then the PCB_LOC entry holds an HDS locator to
+*  an NDF_ placeholder object, which reserves a position in the data
+*  system.
+      CHARACTER * ( DAT__SZLOC ) PCB_LOC( NDF__MXPCB )
+
+*  Temporary placeholder flag.
+*  ==========================
+*  If a slot is in use, then the PCB_TMP entry indicates whether the
+*  object which will replace the placeholder is to be temporary.
+      LOGICAL PCB_TMP( NDF__MXPCB )
+
+*  New placeholder object flag.
+*  ===========================
+*  If a slot is in use, then the PCB_NEW entry contains a logical value
+*  indicating whether a new placeholder object was created by the NDF_
+*  system (as opposed to a pre-existing object being passed by the
+*  caller). This flag is used to decide whether to delete the
+*  placeholder object when cleaning up after any error.
+      LOGICAL PCB_NEW( NDF__MXPCB )
+      
+*  Foreign format code, propagation flag, file name, ID, etc.
+*  =========================================================
+*  If a slot is in use, and a foreign file may be associated with the
+*  new NDF described by a PCB entry, then the PCB_IFMT entry holds an
+*  FCB format code identifying the format of the foreign file, PCB_FORFL
+*  holds the file's name and PCB_FORID holds a unique identification
+*  code for the file (if it already exists). If "wild carding" of the
+*  output format is enabled and no foreign format information has yet
+*  been propagated to the PCB entry, then PCB_PRFMT will be set .TRUE.,
+*  indicating that uncertainty still exists about the actual format of
+*  any foreign file. In this case, the PCB_IFMT value will be the
+*  default, which may be over-ridden by subsequent propagation of this
+*  information, and the PCB_FORFL value will hold the full name of the
+*  NDF as originally supplied (it may later require re-interpretation
+*  in the light of the propagated format information, so PCB_FORID will
+*  be blank).
+      INTEGER PCB_IFMT( NDF__MXPCB )
+      LOGICAL PCB_PRFMT( NDF__MXPCB )
+      CHARACTER * ( NDF__SZFIL ) PCB_FORFL( NDF__MXPCB )
+      CHARACTER * ( NDF__SZFID ) PCB_FORID( NDF__MXPCB )
+
+*  If a slot is in use and there is a foreign format file associated
+*  with it (see above), then the PCB_FORKP entry indicates whether the
+*  native NDF copy of the foreign data is to be kept (as opposed to
+*  being held in a temporary object which is deleted when the NDF is
+*  released from the NDF_ system).
+      LOGICAL PCB_FORKP( NDF__MXPCB )
+
+*  Record of identifiers issued.
+*  ============================
+*  The value of PCB_PLCNT is initialised by the NDF1_INIT block data
+*  routine and is incremented each time a placeholder identifier is
+*  issued.  The next identifier value is generated using the new value
+*  of PCB_PLCNT and this ensures that identifier values are not
+*  re-used.  When an identifier is issued for a slot, its value is
+*  stored in the PCB_CHK entry and an identifier is only considered
+*  valid if it matches the PCB_CHK entry in the slot to which it
+*  refers. This allows identifiers to be rendered invalid either by the
+*  user (by assigning the NDF__NOPL value to them), or by the NDF_
+*  system (by marking the slot as not used, or by re-using it with a
+*  new identifier value).
+      INTEGER PCB_CHK( NDF__MXPCB )
+      INTEGER PCB_PLCNT
+
+*  If a slot is in use, then the PCB_CTX entry contains the identifier
+*  context level at which the placeholder identifier for the slot was
+*  issued. This allows the appropriate placeholders to be annulled when
+*  each NDF_ context is closed.
+      INTEGER PCB_CTX( NDF__MXPCB )
+
+*  Non-character data.
+      COMMON /NDF1_PCB1/ PCB_CHK, PCB_CTX, PCB_FORKP, PCB_IFMT, PCB_NEW,
+     :                   PCB_PLCNT, PCB_PRFMT, PCB_TMP, PCB_USED
+
+*  Character data.
+      COMMON /NDF1_PCB2/ PCB_FORFL, PCB_FORID, PCB_LOC
+
+*  Save common block contents.
+      SAVE /NDF1_PCB1/
+      SAVE /NDF1_PCB2/
+
+*.

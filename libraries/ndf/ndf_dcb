@@ -1,0 +1,310 @@
+*+
+*  Name:
+*     NDF_DCB
+
+*  Purpose:
+*     Define the NDF_ system Data Control Block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file contains definitions of global variables used internally
+*     by the NDF_ system to hold information about the state and values
+*     of external data objects. There is a one-to-one correspondence
+*     between entries in this Data Control Block (DCB) and the data
+*     objects (NDFs) in use by the system. Note that each DCB entry may
+*     be referenced by more than one Access Control Block (ACB) entry.
+
+*  Prior Requirements:
+*     The SAE_PAR, DAT_PAR, NDF_CONST and NDF_PAR include files should
+*     be included prior to this file, in order to define constants
+*     which are needed here.
+
+*  Copyright:
+*     Copyright (C) 2000 Central Laboratories of the Research Councils
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-MAY-1993 (RFWS):
+*        Added prologue.
+*     4-AUG-1993 (RFWS):
+*        Added DCB entries for NDF history structure information.
+*     2-NOV-1993 (RFWS):
+*        Added entries for foreign format file conversions.
+*     16-MAR-1994 (RFWS):
+*        Added DCB_FORID array.
+*     25-MAY-1994 (RFWS):
+*        Updated documentation of the DCB_FOREX array.
+*     14-JUL-1997 (RFWS):
+*        Added variables to support WCS routines.
+*     17-JUL-2000 (DSB):
+*        Changed length of DCB_FORFL from NDF__SZFIL to NDF__SZFXS.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+*  ================
+
+*  General.
+*  =======
+
+*  Which slots have been used.
+      LOGICAL DCB_USED( NDF__MXDCB )
+
+*  Reference count.
+      INTEGER DCB_REFCT( NDF__MXDCB )
+
+*  Mapping count.
+      INTEGER DCB_NMAP( NDF__MXDCB )
+
+*  Data object locators.
+      CHARACTER * ( DAT__SZLOC ) DCB_LOC( NDF__MXDCB )
+
+*  Access mode.
+      CHARACTER * ( NDF__SZMOD ) DCB_MOD( NDF__MXDCB )
+
+*  Disposal mode.
+      CHARACTER * ( NDF__SZDSP ) DCB_DSP( NDF__MXDCB )
+
+*  Data object container file and HDS path names.
+      CHARACTER * ( NDF__SZFIL ) DCB_FILE( NDF__MXDCB )
+      CHARACTER * ( NDF__SZPTH ) DCB_PATH( NDF__MXDCB )
+
+*  Extensions.
+*  ==========
+
+*  Locator to extension (MORE) component and whether this information is
+*  available.
+      CHARACTER * ( DAT__SZLOC ) DCB_XLOC( NDF__MXDCB )
+      LOGICAL DCB_KX( NDF__MXDCB )
+
+*  Character components.
+*  ====================
+
+*  Locators to NDF character components, names of these components and
+*  whether information is available about each.
+      CHARACTER * ( DAT__SZLOC ) DCB_CLOC( NDF__MXCCN, NDF__MXDCB )
+      CHARACTER * ( DAT__SZNAM ) DCB_CCN( NDF__MXCCN )
+      LOGICAL DCB_KC( NDF__MXCCN, NDF__MXDCB )
+
+*  Data array.
+*  ==========
+
+*  Data array identifier and whether this information is up to date.
+*  Number of current data array mappings.
+      INTEGER DCB_DID( NDF__MXDCB )
+      LOGICAL DCB_KD( NDF__MXDCB )
+      INTEGER DCB_NDMAP( NDF__MXDCB )
+
+*  Default.
+*  =======
+
+*  Derived from the data array, used to set the initial attributes of
+*  other components.
+      CHARACTER * ( NDF__SZTYP ) DCB_DETYP( NDF__MXDCB )
+      LOGICAL DCB_DECPX( NDF__MXDCB )
+      CHARACTER * ( NDF__SZFRM ) DCB_DEFRM( NDF__MXDCB )
+
+*  Variance.
+*  ========
+
+*  Variance component ARY_ system identifier, numeric data type,
+*  complexity, storage form and whether this information is up to date.
+      INTEGER DCB_VID( NDF__MXDCB )
+      CHARACTER * ( NDF__SZTYP ) DCB_VTYP( NDF__MXDCB )
+      LOGICAL DCB_VCPX( NDF__MXDCB )
+      CHARACTER * ( NDF__SZFRM ) DCB_VFRM( NDF__MXDCB )
+      INTEGER DCB_NVMAP( NDF__MXDCB )
+      LOGICAL DCB_KV( NDF__MXDCB )
+
+*  Quality.
+*  =======
+
+*  Whether quality information is available, the quality array
+*  identifier, the array's storage form and the bad bits value.
+      LOGICAL DCB_KQ( NDF__MXDCB )
+      INTEGER DCB_NQMAP( NDF__MXDCB )
+      CHARACTER * ( DAT__SZLOC ) DCB_QLOC( NDF__MXDCB )
+      INTEGER DCB_QID( NDF__MXDCB )
+      CHARACTER * ( NDF__SZFRM ) DCB_QFRM( NDF__MXDCB )
+      BYTE DCB_QBB( NDF__MXDCB )
+      LOGICAL DCB_ISQBB( NDF__MXDCB )
+      BYTE DCB_OVQBB( NDF__MXDCB )
+
+*  Axes (general).
+*  ==============
+
+*  Whether information about the axis component is available, and the
+*  axis locator.
+      LOGICAL DCB_KA( NDF__MXDCB )
+      CHARACTER * ( DAT__SZLOC ) DCB_ALOC( NDF__MXDIM, NDF__MXDCB )
+      
+*  Axes (individual).
+*  =================
+
+*  Whether axis extension information is available, and the axis
+*  extension locators.
+      LOGICAL DCB_KAX( NDF__MXDIM, NDF__MXDCB )
+      CHARACTER * ( DAT__SZLOC ) DCB_AXLOC( NDF__MXDIM, NDF__MXDCB )
+      
+*  Whether character axis component name information is available,
+*  names of the character axis components, and character component
+*  locators.
+      LOGICAL DCB_KAC( NDF__MXDIM, NDF__MXACN, NDF__MXDCB )
+      CHARACTER * ( DAT__SZNAM ) DCB_ACCN( NDF__MXACN )
+      CHARACTER * ( DAT__SZLOC ) DCB_ACLOC( NDF__MXDIM, NDF__MXACN,
+     :                                      NDF__MXDCB )
+
+*  Whether axis data array information is available, the ARY_ system
+*  identifier for the data array, and the array's storage form and
+*  type. Also the number of current axis data array mappings.
+      LOGICAL DCB_KAD( NDF__MXDIM, NDF__MXDCB )
+      INTEGER DCB_ADID( NDF__MXDIM, NDF__MXDCB )
+      CHARACTER * ( NDF__SZTYP ) DCB_ADTYP( NDF__MXDIM, NDF__MXDCB )
+      CHARACTER * ( NDF__SZFRM ) DCB_ADFRM( NDF__MXDIM, NDF__MXDCB )
+      INTEGER DCB_NADMP( NDF__MXDIM, NDF__MXDCB )
+
+*  Whether axis variance information is available, the ARY_ system
+*  identifier for the variance array, and the array's storage form and
+*  type.
+      LOGICAL DCB_KAV( NDF__MXDIM, NDF__MXDCB )
+      INTEGER DCB_AVID( NDF__MXDIM, NDF__MXDCB )
+      CHARACTER * ( NDF__SZTYP ) DCB_AVTYP( NDF__MXDIM, NDF__MXDCB )
+      CHARACTER * ( NDF__SZFRM ) DCB_AVFRM( NDF__MXDIM, NDF__MXDCB )
+      INTEGER DCB_NAVMP( NDF__MXDIM, NDF__MXDCB )
+
+*  Whether axis width information is available, the ARY_ system
+*  identifier for the width array, and the array's storage form and
+*  type.
+      LOGICAL DCB_KAW( NDF__MXDIM, NDF__MXDCB )
+      INTEGER DCB_AWID( NDF__MXDIM, NDF__MXDCB )
+      CHARACTER * ( NDF__SZTYP ) DCB_AWTYP( NDF__MXDIM, NDF__MXDCB )
+      CHARACTER * ( NDF__SZFRM ) DCB_AWFRM( NDF__MXDIM, NDF__MXDCB )
+      INTEGER DCB_NAWMP( NDF__MXDIM, NDF__MXDCB )
+      
+*  Whether axis normalisation information is available and the
+*  normalisation value.
+      LOGICAL DCB_KAN( NDF__MXDIM, NDF__MXDCB )
+      LOGICAL DCB_ANRM( NDF__MXDIM, NDF__MXDCB )
+
+*  History.
+*  =======
+
+*  Name of the currently-executing application.
+      CHARACTER * ( NDF__SZAPP ) DCB_HAPPN
+
+*  Whether history component information is available in the DCB.
+      LOGICAL DCB_KH( NDF__MXDCB )
+
+*  History structure locator.
+      CHARACTER * ( DAT__SZLOC ) DCB_HLOC( NDF__MXDCB )
+
+*  Locator for array of history records.
+      CHARACTER * ( DAT__SZLOC ) DCB_HRLOC( NDF__MXDCB )
+
+*  Number of history records present.
+      INTEGER DCB_HNREC( NDF__MXDCB )
+
+*  History record array extend size.
+      INTEGER DCB_HEXT( NDF__MXDCB )
+
+*  Whether default history information is to be written.
+      LOGICAL DCB_HDEF( NDF__MXDCB )
+
+*  Text length of the current history record. This also acts as a
+*  modification flag; it is set to zero if history has not been modified
+*  by the current application, so that no current record exists.
+      INTEGER DCB_HTLEN( NDF__MXDCB )
+
+*  History recording update mode.
+      INTEGER DCB_HUMOD( NDF__MXDCB )
+
+*  Data Conversion.
+*  ===============
+
+*  Pointer into the FCB list of foreign file formats (or zero if there
+*  is no associated foreign format file).
+      INTEGER DCB_IFMT( NDF__MXDCB )
+
+*  Name of associated foreign format file (if it exists).
+      CHARACTER * ( NDF__SZFXS ) DCB_FORFL( NDF__MXDCB )
+
+*  Unique file identification code for foreign format files.
+      CHARACTER * ( NDF__SZFID ) DCB_FORID( NDF__MXDCB )
+
+*  Whether to keep NDFs associated with foreign format files.
+      LOGICAL DCB_FORKP( NDF__MXDCB )
+
+*  Whether the associated foreign file existed prior to being accessed
+*  by the NDF library, so that it already contains data. A foreign file
+*  name may also be associated with an NDF even if the real foreign file
+*  has yet to be created by conversion of the data from a native format
+*  copy - in such cases DCB_FOREX will be set to .FALSE. and the foreign
+*  file will simply be a dummy (empty) file used as a placeholder in the
+*  host file system.
+      LOGICAL DCB_FOREX( NDF__MXDCB )
+
+*  World Coordinate Systems (WCS).
+*  ===============================
+
+*  AST_ pointer to FrameSet containing WCS information.
+      INTEGER DCB_IWCS( NDF__MXDCB )
+
+*  Whether WCS component information is available in the DCB.
+      LOGICAL DCB_KW( NDF__MXDCB )
+
+*  The following variables are used for local communication between the
+*  NDF_ library and the "source" and "sink" routines used to read and
+*  write AST_ data from/to HDS objects...
+
+*  HDS object locator.
+      CHARACTER * ( DAT__SZLOC ) DCB_ASTLC
+
+*  Line number of text being read/written.
+      INTEGER DCB_ASTLN
+
+*  Pointer to mapped HDS _CHAR array data.
+      INTEGER DCB_ASTPT
+
+*  Common Blocks:
+*  =============
+
+*  Non-character data.
+      COMMON /NDF1_DCB1/
+     :   DCB_ADID, DCB_ANRM, DCB_ASTLN, DCB_ASTPT, DCB_AVID,
+     :   DCB_AWID, DCB_DECPX, DCB_DID, DCB_FOREX, DCB_FORKP,
+     :   DCB_HDEF, DCB_HEXT, DCB_HNREC, DCB_HTLEN, DCB_HUMOD,
+     :   DCB_IFMT, DCB_ISQBB, DCB_IWCS, DCB_KA, DCB_KAC,
+     :   DCB_KAD, DCB_KAN, DCB_KAV, DCB_KAW, DCB_KAX,
+     :   DCB_KC, DCB_KD, DCB_KH, DCB_KQ, DCB_KV,
+     :   DCB_KW, DCB_KX, DCB_NADMP, DCB_NAVMP, DCB_NAWMP,
+     :   DCB_NDMAP, DCB_NMAP, DCB_NQMAP, DCB_NVMAP, DCB_QID,
+     :   DCB_REFCT, DCB_USED, DCB_VCPX, DCB_VID
+
+*  Character data.
+      COMMON /NDF1_DCB2/
+     :   DCB_ACCN, DCB_ACLOC, DCB_ADFRM, DCB_ADTYP, DCB_ALOC,
+     :   DCB_ASTLC, DCB_AVFRM, DCB_AVTYP, DCB_AWFRM, DCB_AWTYP,
+     :   DCB_AXLOC, DCB_CCN, DCB_CLOC, DCB_DEFRM, DCB_DETYP,
+     :   DCB_DSP, DCB_FILE, DCB_FORFL, DCB_FORID, DCB_HAPPN,
+     :   DCB_HLOC, DCB_HRLOC, DCB_LOC, DCB_MOD, DCB_PATH,
+     :   DCB_QFRM, DCB_QLOC, DCB_VFRM, DCB_VTYP, DCB_XLOC
+
+*  Byte-aligned data.
+      COMMON /NDF1_DCB3/ DCB_OVQBB, DCB_QBB
+
+*  Save common block contents.
+      SAVE /NDF1_DCB1/
+      SAVE /NDF1_DCB2/
+      SAVE /NDF1_DCB3/
+
+*.

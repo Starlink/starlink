@@ -1,0 +1,75 @@
+*+
+*  Name:
+*     NDF_FUNC_DEF
+
+*  Purpose:
+*     Define statement functions for the NDF_ system.
+
+*  Language:
+*     Unix Fortran
+
+*  Type of Module:
+*     Function definition include file.
+
+*  Description:
+*     This file defines statement functions which are used internally by
+*     the NDF_ system and which may also be used by other software which
+*     calls NDF_ routines.
+
+*  Notes:
+*     -  This file exists to encapsulate functions which require
+*     non-portable Fortran and which may therefore need to be
+*     implemented differently on different machines. It should be
+*     preceded by the include file NDF_DEC which declares the functions
+*     defined here together with their arguments.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     BKM:  B.K. McIlwrath (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-MAR-1990 (RFWS):
+*        Original version.
+*     2-APR-1990 (RFWS):
+*        Changed NDF_DEF to NDF_FUNC_DEF.
+*     29-NOV-1995: (BKM)
+*        Linux version using FORTRAN extension AND().
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Internal References:
+
+*     Name:
+*        NDF_QMASK
+
+*     Purpose:
+*        Determine if an NDF quality value and a "bad-bits" mask
+*        dictate that an NDF pixel be included in processing.
+
+*     Invocation:
+*        (LOGICAL) RESULT = NDF_QMASK( QUAL, BADBIT )
+
+*     Arguments:
+*        QUAL = BYTE (Given)
+*           The unsigned byte quality value.
+*        BADBIT = BYTE (Given)
+*           The unsigned byte "bad-bits" mask.
+
+*     Result:
+*        NDF_QMASK = LOGICAL (Returned)
+*           A .TRUE. value is returned if the bit-wise "AND" of the
+*           quality and bad-bits values is zero, indicating that the NDF
+*           pixel is not excluded by its quality value and should be
+*           included in processing. Otherwise, a .FALSE. value is
+*           returned, indicating that the pixel should be excluded from
+*           processing.
+
+      NDF_QMASK( NDF_ARGB1, NDF_ARGB2 ) =
+     :   AND( NDF_ARGB1, NDF_ARGB2 ) .EQ. 0
+
+*.

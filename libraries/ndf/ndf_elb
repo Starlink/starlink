@@ -1,0 +1,66 @@
+*+
+*  Name:
+*     NDF_ELB
+
+*  Purpose:
+*     Define the NDF_ system Error Logging Block (ELB).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which are used to log error
+*     messages for subsequent recording in NDF history records.
+
+*  Notes:
+*     In use, a snapshot of the current EMS error stack is recorded in
+*     this block by the routine NDF1_HLERR and subsequently appended to
+*     an NDF's current history record by the routine NDF1_HDERR.
+
+*  Prior Requirements:
+*     The NDF_CONST and EMS__PAR include files should be included
+*     before this file, in order to define constants used here.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-JUN-1993 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  List of pending error messages (most recently reported first).
+      CHARACTER * ( EMS__SZMSG ) ELB_MSG( NDF__MXERR )
+
+*  Number of pending EMS error messages (zero indicates no error).
+      INTEGER ELB_NERR
+
+*  Current EMS error status value (associated with the most recently
+*  reported error message).
+      INTEGER ELB_STAT
+
+*  Common blocks.
+*  =============
+
+*  Non-character values.
+      COMMON /NDF1_ELB1/ ELB_NERR, ELB_STAT
+
+*  Character values.
+      COMMON /NDF1_ELB2/ ELB_MSG
+
+*  Save common block contents.
+      SAVE /NDF1_ELB1/
+      SAVE /NDF1_ELB2/
+
+*.

@@ -1,0 +1,79 @@
+*+
+*  Name:
+*     NDF_FCB
+
+*  Purpose:
+*     Define the NDF_ system Format Conversion Block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file contains definitions of global variables used
+*     internally by the NDF_ system to hold information about the
+*     foreign file formats to be recognised.
+
+*  Prior Requirements:
+*     The NDF_CONST include file should be included prior to this file,
+*     in order to define constants which are needed here.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2-NOV-1993 (RFWS):
+*        Original version.
+*     15-APR-1994 (RFWS):
+*        Added FCB_ANON array.
+*     31-OCT-1994 (RFWS):
+*        Removed extension name list items from the FCB (now handled
+*        locally).
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+*  ================
+
+*  List specifying foreign data formats which are to be recognised.
+*  Note that input formats occupy the first half of this list and
+*  output formats the second half (the same pattern is also followed by
+*  the arrays declared below).
+      CHARACTER * ( 2 * NDF__SZFMT ) FCB_FMT
+
+*  First and last character positions of foreign format names (in
+*  FCB_FMT).
+      INTEGER FCB_FMT1( 2 * NDF__MXFMT )
+      INTEGER FCB_FMT2( 2 * NDF__MXFMT )
+
+*  First and last character positions of foreign file name extensions
+*  (in FCB_FMT).
+      INTEGER FCB_FEX1( 2 * NDF__MXFMT )
+      INTEGER FCB_FEX2( 2 * NDF__MXFMT )
+
+*  Number of input and output data formats.
+      INTEGER FCB_NIN
+      INTEGER FCB_NOUT
+
+*  Common blocks:
+*  =============
+
+*  Character values.
+      COMMON /NDF1_FCB1/ FCB_FMT
+
+*  Other values:
+      COMMON /NDF1_FCB2/ FCB_FEX1, FCB_FEX2, FCB_FMT1, FCB_FMT2,
+     :                   FCB_NIN, FCB_NOUT
+
+*  Save common block contents.
+      SAVE /NDF1_FCB1/
+      SAVE /NDF1_FCB2/
+
+*.

@@ -1,0 +1,71 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ndf_dev
+
+#  Purpose:
+#     Create links to NDF include files.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script sets up (or removes) symbolic links in the current
+#     working directory which refer to NDF public include files. It
+#     exists to allow source code which contains references to the
+#     standard public NDF include files to be compiled without having
+#     to know where these files actually reside.
+
+#  Invocation:
+#     ndf_dev
+#        Sets up links for all ths NDF public include files.
+#     ndf_dev remove
+#        Removes the links previously set up.
+
+#  Notes:
+#     The pathname of the installation include directory (INSTALL_INC)
+#     must be edited into this script when it is installed.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-FEB-1993 (RFWS):
+#     	 Original version.
+#     30-SEP-1998 (RFWS):
+#        Added ndf.h file.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  If no parameters were given, then create the required links.
+      if test "$*" = ""; then
+         ln -s INSTALL_INC/ndf.h ndf.h
+         ln -s INSTALL_INC/ndf_err NDF_ERR
+         ln -s INSTALL_INC/ndf_func NDF_FUNC
+         ln -s INSTALL_INC/ndf_func_dec NDF_FUNC_DEC
+         ln -s INSTALL_INC/ndf_func_def NDF_FUNC_DEF
+         ln -s INSTALL_INC/ndf_par NDF_PAR
+
+#  If "remove" was the only parameter, then remove the links.
+      elif test "$*" = "remove"; then
+         rm -f ndf.h NDF_ERR NDF_FUNC NDF_FUNC_DEC NDF_FUNC_DEF NDF_PAR
+
+#  If the parameters were not recognised, then report an error.
+      else
+         echo "ndf_dev: invalid option \"$*\"" >&2
+         exit 1
+      fi
+
+#  End of script.
+      exit 0
