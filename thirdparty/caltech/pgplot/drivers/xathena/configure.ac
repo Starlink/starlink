@@ -28,8 +28,34 @@ AC_PROG_LIBTOOL
 AC_C_BIGENDIAN
 AC_HEADER_STDC
 AC_PATH_XTRA
-AC_CHECK_LIB(tk, Tk_DisplayName)
 
+AC_ARG_WITH([athena], 
+             AC_HELP_STRING([--with-athena[=path]],
+             [use Xaw (or Xaw3d) (default location /usr/X11R6/)]),
+  [if test "$withval" = "yes"; then
+    # Default place
+    LIBS="$LIBS -L/usr/X11R6/lib"
+    CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include/X11"
+  elif test "$withval" = "no"; then
+    : # We do nothing
+  else
+    XALIBDIR=$withval/lib
+    XAINCDIR=$withval/include
+    LIBS="$LIBS -L$XALIBDIR"
+    CPPFLAGS="$CPPFLAGS -I$XAINCDIR"
+  fi])
+
+dnl    Hack and slash for the Mac. This should only add goodness to 
+dnl    non-Mac builds in the case where whoever did their filesystem 
+dnl    have done something as wierd as Apple.
+LIBS="$LIBS -L/usr/X11R6/lib"
+CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
+
+AC_CHECK_HEADER([X11/Xaw3d/SimpleP.h], set have_xaheader = "yes" ) 
+AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, set have_xalib = "yes" )
+AM_CONDITIONAL( HAVE_XATHENA, \
+   [test "$have_xaheader" = "yes" && test "$test_xalib" = "yes"] )
+     
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
