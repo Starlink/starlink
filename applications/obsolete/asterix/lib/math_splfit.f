@@ -8,13 +8,15 @@
 *           and produce the corresponding Y array.
 *    Parameters :
 *    Method :
-*            The NAG routine E02BAF is used.
+*            The PDA routine PDA_DEFC is used.
 *    Deficiencies :
 *    Bugs :
 *    Authors :
 *     Richard Saxton (LTVAD::RDS)
+*     Richard Beard (Birmingham)
 *    History :
 *     4 May 1988 Original (LTVAD::RDS)
+*     9 Jun 1997 COnvert to PDA (RB)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -37,10 +39,13 @@
       INTEGER N7                     ! Number of intervals of the spline +7
       DOUBLE PRECISION KNOT(MAXKNOT) ! Array of knot positions (fn of X)
       DOUBLE PRECISION COEFF(MAXKNOT)! Array of spline coefficients
+      DOUBLE PRECISION SD(1024)      ! Reciprocal of weights
       INTEGER SS                     ! Sum of the residues (ie error)
 *    Global variables :
 *    Local variables :
-      DOUBLE PRECISION WORK2(4,MAXKNOT)    ! Work space for E02BAF
+      INTEGER L
+      PARAMETER (L = (500+6)*5 + (500+8)*5 + 2*(1024+500) + 500+7 + 16)
+      DOUBLE PRECISION WORK2(L)  	   ! Work space for PDA_DEFC
       INTEGER NSECT                        ! Number of sections of the spline
       REAL DRANGE                          ! Range of X
       INTEGER N3                           ! Number of sections + 3
@@ -51,6 +56,11 @@
 *    Local data :
 *-
       IF (STATUS .NE. SAI__OK) RETURN
+      IF (NPTS .GT. 1024) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP('NPTS > 1024, SORRY...','from MATH_SPLFIT',STATUS)
+         RETURN
+      ENDIF
 *
 * Convert input real arrays to double precision
 *
@@ -71,6 +81,12 @@
 * Set up knots
 * Knots must be inside the data points
 *
+*   Set up the end point knots for PDA
+      DO J=1,4
+         KNOT(J) = XWORK(1)
+         KNOT(N3+J) = XWORK(NPTS)
+      END DO
+
 *   Set extreme knots just inside the data set.
       KNOT(5)=XWORK(2)
       KNOT(N3)=XWORK(NPTS-1)
@@ -82,37 +98,24 @@
          K = J-5
 	 KNOT(J) = XWORK(2) + DBLE(K*KINC)
       ENDDO
+
+      DO J=1,NPTS
+         IF (WEIGHT(J) .NE. 0.0D0) THEN
+            SD(J) = 1.0D0 / WEIGHT(J)
+         ELSE
+            SD(J) = 9.99D99
+         END IF
+      END DO
 *
 * Do spline fit. Status should be set to zero anyway, but just make sure.
 *
       STATUS = 0
-      CALL E02BAF(NPTS,N7,XWORK,YWORK,WEIGHT,KNOT,WORK1,WORK2,
-     &                                            COEFF,SS,STATUS)
+      CALL PDA_DEFC(NPTS,XWORK,YWORK,SD,4,N7,KNOT,1,J,COEFF,L,WORK2,
+     &                                                        STATUS)
+      SS = 0
 *
-* Check status and output appropriate messages.
-*  This sadly doesn't work because NAG errors cause a Fortran STOP.
-      IF (STATUS .EQ. 1) THEN
-           CALL ERR_REP(' ',
-     &     'MATH_SPLFIT: Knots are in wrong order or outside data',
-     &      STATUS)
-      ELSE IF (STATUS .EQ. 2) THEN
-           CALL ERR_REP(' ',
-     &     'MATH_SPLFIT: All the weights are not strictly positive',
-     &      STATUS)
-      ELSE IF (STATUS .EQ. 3) THEN
-           CALL ERR_REP(' ',
-     &     'MATH_SPLFIT: The X values are not in increasing order',
-     &      STATUS)
-      ELSE IF (STATUS .EQ. 4) THEN
-           CALL ERR_REP(' ',
-     &     'MATH_SPLFIT: Number of interior knots is negative',
-     &      STATUS)
-      ELSE IF (STATUS .EQ. 5) THEN
-           CALL ERR_REP(' ',
-     &     'MATH_SPLFIT: No unique solution',STATUS)
-      ENDIF
-*
-      IF (STATUS .NE. SAI__OK) THEN
+      IF (STATUS .NE. SAI__OK .OR. J .NE. 1) THEN
+           STATUS = SAI__ERROR
            CALL ERR_REP(' ','from MATH_SPLFIT',STATUS)
       ENDIF
 *
