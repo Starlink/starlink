@@ -887,9 +887,9 @@ void ADImemStop( ADIstatus status )
   int           i;
 
 strx_exit( status );
-  for( i=0; i<ADI__MXBLK; i++ )
+/*  for( i=0; i<ADI__MXBLK; i++ )
     if ( ADI_G_blks[i] )
-      ADImemFreeBlock( i, status );
+      ADImemFreeBlock( i, status ); */
 
 #ifdef MEMORY_TRACING
 {
