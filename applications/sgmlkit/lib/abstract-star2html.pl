@@ -228,9 +228,6 @@ while (defined($line = <TF>))
 	my ($cmd,$arg) = ($line =~ /\\newcommand\s*{(.*?)}(.*)$/);
 	$arg =~ s/(^\s+|\s+$|{|})//g;
 
-	#print STDERR "Warning: markup in $cmd $arg\n"
-	#	if ($arg =~ /(\\|~)/ && $cmd !~ /\\stardoc(authors|abstract)/);
-
 	$cmd eq '\stardocinitials' && do {
 	    check_markup ('\stardocinitials', $arg);
 	    $documenttype = $arg;
@@ -259,7 +256,7 @@ while (defined($line = <TF>))
 
     $line =~ /\\begin\{document\}/ &&
 	do {
-	    print OUTFILE "<!doctype documentsummary public '-//Starlink//DTD Document Summary 0.1//EN'>
+	    print OUTFILE "<!doctype documentsummary public '-//Starlink//DTD Document Summary 0.2//EN'>
 <documentsummary urlpath='$urlprefix$labels{TOP}' urllinkpolicy='explicit'>
 <docinfo>
 ";
