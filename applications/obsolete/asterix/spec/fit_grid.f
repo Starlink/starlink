@@ -390,7 +390,6 @@
 
       LOGICAL 		  FINISHED		! Minimum found?
       LOGICAL		  LOCFRO(NPAMAX)	! Local parameter freezing
-      LOGICAL             ONGRID                ! Parameter on the grid?
       LOGICAL 		  PEGGED(NPAMAX)	! Parameter pegged on bound
 *
 *    Map grid indices to array :
@@ -492,17 +491,18 @@
 
       ELSE
 
-*      Minimise with respect to parameters not on the grid
+*    Minimise with respect to parameters not on the grid
+        CALL ADI_CPUT0I( MCTRL, 'Niter', 0, STATUS )
         CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0, .FALSE.,
      :                NPAR, LB, UB, LOCFRO, SSCALE,
      :                FSTAT, PREDICTOR, PREDDAT, LOCPAR, DPAR, PEGGED,
      :                STAT, FINISHED, FITERR, STATUS )
 
-*      Severe fitting error?
+*    Severe fitting error?
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
 
-*      Minimised ok?
+*    Minimised ok?
         ELSE IF ( (FITERR .EQ. 0) .AND. FINISHED ) THEN
           LQUAL = QUAL__GOOD
 
