@@ -140,6 +140,8 @@ if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.rl.ac.uk/
 #
 #  HTX browser.  If HTX_BROWSER is not defined, set it to netscape.
 if ( ! ${?HTX_BROWSER} ) setenv HTX_BROWSER netscape
+set uname_os = `uname -s`
+if( ${uname_os} == 'Darwin' ) setenv HTX_BROWSER safari
 
 #
 #  MAN pages.  If none defined, create a default, then add to it.
