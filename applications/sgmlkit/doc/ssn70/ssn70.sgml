@@ -1,4 +1,4 @@
-<!doctype ssn public "-//Starlink//DTD Starlink SSN 0.4//EN" [
+<!doctype ssn public "-//Starlink//DTD Starlink SSN 0.5//EN" [
   <!entity sgp28
 	public "-//Starlink//DOCUMENT Summary SGP/28//EN" subdoc
 	-- How to write good documents for Starlink -->
@@ -528,7 +528,8 @@ given in <ref id=table.entities>.
 <row><entry><code>&amp;endash;</code><entry>&endash<entry>en dash
 <row><entry><code>&amp;percent;</code><entry>&percent<entry>percent sign
 <row><entry><code>&amp;deg;</code><entry>&deg<entry>degrees symbol
-<row><entry><code>&emp;underscore;</code><entry>&underscore<entry>underscore
+<row><entry><code>&amp;tilde;</code><entry>&tilde<entry>tilde
+<row><entry><code>&amp;underscore;</code><entry>&underscore<entry>underscore
 <row><entry><code>&amp;latex;</code><entry>&latex<entry>&latex logo
 <row><entry><code>&amp;tex;</code><entry>&tex<entry>&tex logo
 </row>
@@ -536,6 +537,15 @@ given in <ref id=table.entities>.
 </tgroup>
 </tabular>
 </table>
+
+<p>Certain of these entities are used sufficiently often that there
+are `short references' declared for them: you can type `<code/_/'
+instead of <code/&amp;underscore;/ (unsurprisingly), `<code/&ddash/' for
+a punctuation dash (this is currently set to <code/&amp;endash;/, but
+could conceivably change to <code/&amp;emdash;/ if we make a
+typographic decision on that score), and `<code/&tilde/' instead of
+<code/&amp;nbsp;/.  These short references work within paragraphs, but
+not within maths or verbatim elements within them.
 
 <p>For more details on entities, see <ref id=sgml.entities>.
 
@@ -1504,6 +1514,14 @@ element px is a restricted paragraph used in the abstract, for
 example.  The restricted paragraph is just like the normal one except
 that there are a few elements (index, note and draftnote) which may
 not appear.
+
+<p>The paragraph elements have an `id' attribute, which allows you to
+refer to them using a REF element (see <ref id=el.sun.ref>).  This
+reference will, however, typically be a reference to the section which
+contains the paragraph rather than to the paragraph specifically.
+This is an instance of the more general warning that you should 
+make few assumptions about how elements are rendered, when you are
+authoring a document.
 
 <p>Text style
 (<ref id='el.sun.em' text='em'>,
