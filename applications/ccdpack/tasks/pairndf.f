@@ -398,8 +398,6 @@
       CHARACTER * ( 80 ) FNAME  ! Filename
       CHARACTER * ( 132 ) MSTYLE ! Marker style string
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for writing output lines
-      CHARACTER * ( DAT__SZLOC ) LOCEXT ! HDS locator for .MORE.CCDPACK ext
-      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       DOUBLE PRECISION PERCNT( 2 ) ! Percentile values for display
       DOUBLE PRECISION XLO      ! Lower acceptable bound for X coordinate
       DOUBLE PRECISION XHI      ! Upper acceptable bound for X coordinate
@@ -415,6 +413,8 @@
       INTEGER FRM( CCD1__MXNDF ) ! AST pointers to current frames
       INTEGER I                 ! Loop variable
       INTEGER IMAP              ! AST pointer to mapping
+      INTEGER IMEM( CCD1__MXNDF ) ! Array of member indices in Set order
+      INTEGER IMEMOF( CCD1__MXNDF + 1 ) ! Offsets into IMEM for each Set
       INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers for each NDF
       INTEGER IPBEEN            ! Pointer to workspace
       INTEGER IPGRA             ! Pointer to graph
@@ -440,7 +440,7 @@
       INTEGER IWCS( CCD1__MXNDF ) ! AST pointers to WCS frameset for each NDF
       INTEGER JPIX              ! Frame index of pixel frame
       INTEGER LBND( 2 )         ! Lower bounds of NDF
-      INTEGER MAPSET( CCD1__MXNDF ) ! CCD_SET->pixel coordinate mapping
+      INTEGER MAPSET( CCD1__MXNDF ) ! Workspace
       INTEGER MAXCNV            ! Initial maximum dimension of display region
       INTEGER NCOUT             ! Number of chosen points
       INTEGER NDFGR             ! Input NDF group identifier
@@ -503,12 +503,12 @@
       CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
 
 *  Group the NDFs into Sets.
-      CALL CCD1_SETSW( NDFGR, NNDF, USESET, ISET, NSET, SNAMGR, MAPSET,
-     :                 STATUS )
+      CALL CCD1_SETSW( NDFGR, NNDF, USESET, ISET, NSET, IMEM, IMEMOF,
+     :                 SNAMGR, MAPSET, STATUS )
 
 *  Call the routine which does all the user interaction and obtains a
 *  list of pairings with associated offsets.
-      CALL CCD1_PNDF( NDFGR, NNDF, ISET, NSET, SNAMGR, PERCNT, ZOOM,
+      CALL CCD1_PNDF( NDFGR, NSET, IMEM, IMEMOF, SNAMGR, PERCNT, ZOOM,
      :                MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
      :                NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
 
@@ -710,24 +710,7 @@
 *  applications may give the impression that the original position
 *  lists are matched ones.
          ELSE
-            IF ( STATUS .NE. SAI__OK ) GO TO 99
-            CALL ERR_MARK
-            CALL CCD1_CEXT( INDF( I ), .FALSE., 'UPDATE', LOCEXT,
-     :                      STATUS )
-            CALL DAT_ERASE( LOCEXT, 'CURRENT_LIST', STATUS )
-
-*  If we succeeded, tell the user that the old list has been removed.
-*  If we failed, it is presumably because there was no old list, which
-*  is fine.
-            IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL GRP_GET( NDFGR, I, 1, NDFNAM, STATUS )
-               CALL MSG_SETC( 'NDF', NDFNAM )
-               CALL CCD1_MSG( ' ', 
-     :'  Removing associated list for unpaired NDF ^NDF', STATUS )
-            ELSE
-               CALL ERR_ANNUL( STATUS )
-            END IF
-            CALL ERR_RLSE
+            CALL CCD1_RMIT( INDF( I ), 'CURRENT_LIST', .TRUE., STATUS )
          END IF
 
 *  Release some resources.
