@@ -399,7 +399,7 @@ int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
 // of the default implementation (SAOWCS).
 //
 // The arguments are the filename and an optional slice string for NDFIO.
-// (17.03.98, ALLAN), note all image with slices, must be processed by 
+// (17.03.98, ALLAN), note all image with slices, must be processed by
 // the NDF library.
 //-
 ImageData* StarRtdImage::getStarImage(const char* filename, const char* slice)
@@ -3145,7 +3145,7 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //       The third parameter is a boolean indicating whether to use
 //       the careful drawing scheme (using geodesics, essential for
 //       complex astrometries) or not.
-//      
+//
 //       The fourth parameter is a boolean indicating whether to use
 //       smooth polylines (note this is completementary to parameter
 //       three) or not.
@@ -3242,7 +3242,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
       inerror = 1;
     }
   }
-  
+
   //  Get the preferences, if given
   char **prefs;
   int nprefs = 0;
@@ -3255,7 +3255,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
   }
 
   //  Get the region coordinates. Note just use Contour native
-  //  facilities for this, not the plot (this potentially much
+  //  facilities for this, not the plot (this is potentially much
   //  more efficient). These may be given as "" in which case they are
   //  ignored.
   char **coordArgv;
@@ -3283,9 +3283,19 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
           }
 
           //  Transform these positions into image coordinates.
-          swap( region[1], region[3] );
           canvasToImageCoords( region[0], region[1], 0 );
           canvasToImageCoords( region[2], region[3], 0 );
+
+          //  Correct for any flips etc. by re-picking the bounds.
+          double temp[4];
+          temp[0] = region[0];
+          temp[1] = region[1];
+          temp[2] = region[2];
+          temp[3] = region[3];
+          region[0] = min( temp[0], temp[2] );
+          region[2] = max( temp[0], temp[2] );
+          region[1] = min( temp[1], temp[3] );
+          region[3] = max( temp[1], temp[3] );
         }
       }
     }
@@ -3357,7 +3367,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
       //  Create a contour object, setting the contour levels, and
       //  line attributes.
-      Contour contour( imageIO, plot, levels, nlevels, 
+      Contour contour( imageIO, plot, levels, nlevels,
                        (const char **)prefs, nprefs );
 
       //  Establish if plotting is careful or fast.
