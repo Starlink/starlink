@@ -31,6 +31,7 @@ starconf: make-starconf \
 		install-with-manifest.in \
 		starconf.m4 \
 		Makefile.starconf \
+		bootstrap.installed \
 		extra-fortran.m4
 	./make-starconf \
 		!install-with-manifest.in \
@@ -53,6 +54,7 @@ edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@datadir\@,$(datadir),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
+	-e 's,@DEFAULT_STARLINK\@,@DEFAULT_STARLINK@,g' \
 	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g' \
 	-e 's,@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g'
 make-starconf: make-starconf.in
