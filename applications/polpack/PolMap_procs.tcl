@@ -3081,8 +3081,6 @@ proc GwmCreate {frmname size colours gwmname} {
       Obey kapview paldef "device=$GWM_DEVICE" 1
       Obey kapview palentry "device=$GWM_DEVICE palnum=0 colour=$GWM_BADCOL" 1
       Obey kapview palentry "device=$GWM_DEVICE palnum=1 colour=$GWM_CONCOL" 1
-      Obey kapview palentry "device=$GWM_DEVICE palnum=2 colour=$GWM_VECCOL" 1
-puts "Setting pen 2 to $GWM_VECCOL"
       Obey kapview gdclear "device=$GWM_DEVICE" 1
 
    }
@@ -5870,11 +5868,9 @@ proc SetColours {var} {
    } elseif { $var == "GWM_CONCOL" } {
       Obey kapview palentry "device=$GWM_DEVICE palnum=1 colour=$GWM_CONCOL" 1
 
-# Change the colour of entry 2 in the KAPPA pallette. This is used
-# to draw the vectors.
+# Re-draw the vector map if the vector colour changes.
    } elseif { $var == "GWM_VECCOL" } {
-puts "Setting pen 2 to $GWM_VECCOL"
-      Obey kapview palentry "device=$GWM_DEVICE palnum=2 colour=$GWM_VECCOL" 1
+      VectorMap
 
 # Re-draw the polygons if their colour has changed.
    } elseif { $var == "GWM_POLCOL" } {
@@ -7631,7 +7627,7 @@ proc VectorMap {} {
    set told [SetInfo "Displaying the vector map. Please wait... " 0]
 
 # Initialise the parameter string for POLPLOT...
-   set pars "cat=$VEC_CAT colmag=p colang=theta colx=x coly=y noclear noaxes nokey style=\"colour(vect)=2\""
+   set pars "cat=$VEC_CAT colmag=p colang=theta colx=x coly=y noclear noaxes nokey style=\"colour(vect)=$GWM_VECCOL\""
 
 #  If there is a background image the vectors are displayed in alignment
 #  with the backgrounmd image. In this case the background image defines
