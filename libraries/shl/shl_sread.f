@@ -1,6 +1,6 @@
-*+ SREAD - Read, condition, paraphrase and classify a string.
+*+ HLPS_SREAD - Read, condition, paraphrase and classify a string.
 
-      SUBROUTINE SREAD (LU, V1, V2, V3, JSTAT)
+      SUBROUTINE HLPS_SREAD (LU, V1, V2, V3, JSTAT)
 
 *
 *  - - - - - -

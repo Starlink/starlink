@@ -1,7 +1,7 @@
-      SUBROUTINE GETHLP( HELPLB, KEYWRD, STATUS )
+      SUBROUTINE HLPS_GETHLP( HELPLB, KEYWRD, STATUS )
 *+
 *  Name:
-*     GETHLP
+*     HLPS_GETHLP
 
 *  Purpose:
 *     Prints help text from a library of help information.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GETHLP( HELPLB, KEYWRD, STATUS )
+*     CALL HLPS_GETHLP( HELPLB, KEYWRD, STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -22,6 +22,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -37,6 +38,8 @@
 *        documented global parameters.
 *     1992 August 4 (MJC):
 *        Incorporate revisions to the portable help system.
+*     15 July 2004 (TIMJ):
+*        Import into shared HLPS library
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -50,7 +53,7 @@
       INCLUDE 'SAE_PAR'          ! SSE global definitions
 
 *  Global Variables:
-      INCLUDE 'HLPCMD'           ! KAPPA help I/O
+      INCLUDE 'HLPS_HLPCMD'           ! KAPPA help I/O
 *        CMD = CHARACTER * ( 80 ) (Write)
 *           The command line.
 *        LHELP = INTEGER (Write)
@@ -80,12 +83,12 @@
       INTEGER
      :  CHR_LEN,                 ! Character string length ignoring
                                  ! trailing blanks
-     :  GTHLPI,                  ! Routine for reading help command
+     :  HLPS_GTHLPI,             ! Routine for reading help command
      :  HLP_HELP,                ! Interactive help
-     :  PTHLPO                   ! Routine for outputting help 
+     :  HLPS_PTHLPO              ! Routine for outputting help 
 
       EXTERNAL
-     :  GTHLPI,                  ! Gets the help information
+     :  HLPS_GTHLPI,             ! Gets the help information
      :  HLP_NAMETR,              ! Interactive help library-name
                                  ! translation
      :  PTHLPO                   ! Outputs the help information
@@ -128,7 +131,7 @@
 *  Find the height and width of the screen.  Use the full screen area.
 *  A zero or negative LBOT (which occurs when there is an error) will
 *  suppress paging.
-      CALL KPG1_SCRSZ( WIDTH, LBOT, STATUS )
+      CALL ONE_SCRSZ( WIDTH, LBOT, STATUS )
       LTOP = 1
 
 *  Get help.
@@ -141,8 +144,9 @@
       HFLAGS = 1
 
 *  Initiate interactive help session.
-      ISTAT = HLP_HELP( PTHLPO, WIDTH, KEYWRD( 1:KWRDLN ), LUHLP,
-     :                  HELPLB( 1:HLPLEN ), HFLAGS, GTHLPI, HLP_NAMETR )
+      ISTAT = HLP_HELP( HLPS_PTHLPO, WIDTH, KEYWRD( 1:KWRDLN ), LUHLP,
+     :                  HELPLB( 1:HLPLEN ), HFLAGS, HLPS_GTHLPI,
+     :                  HLP_NAMETR )
 
 *  Watch for an error status.
       IF ( ISTAT .NE. 1 ) THEN
@@ -151,7 +155,7 @@
          CALL MSG_SETC( 'TOPIC', KEYWRD )
          CALL MSG_SETC( 'LIB', HELPLB )
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'GETHLP_ERR',
+         CALL ERR_REP( 'HLPS_GETHLP_ERR',
      :     'Error accessing help on topic ^TOPIC in library ^LIB. '/
      :     /'Reason was "^ERR". ', STATUS )
       END IF

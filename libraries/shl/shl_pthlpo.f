@@ -1,7 +1,7 @@
-      INTEGER FUNCTION PTHLPO( STRING )
+      INTEGER FUNCTION HLPS_PTHLPO( STRING )
 *+
 *  Name:
-*     PTHLPO
+*     HLPS_PTHLPO
 
 *  Purpose:
 *     Outputs one line of HELP, waiting at end of each screenful.
@@ -25,13 +25,14 @@
 *        The global status.
 
 *  Returned Value:
-*     PTHLPO = INTEGER
+*     HLPS_PTHLPO = INTEGER
 *        The status.  If the line was output correctly a value of 1 is
 *        returned.
 
 *  Authors:
 *     (PTW) P.T.Wallace (STARLINK)
 *     (MJC) Malcolm J. Currie (STARLINK)
+*     (TIMJ) Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *        Added a constraint to output with paging when the screen height
 *        and width could not be determined.  Converted to SST prologue
 *        and documented global parameters.
+*     2004 July 15 (TIMJ):
+*        Relocate to HLPS library
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,7 +60,7 @@
       INCLUDE 'SAE_PAR'        ! SSE global definitions
 
 *  Global Variables:
-      INCLUDE 'HLPCMD'           ! KAPPA help I/O
+      INCLUDE 'HLPS_HLPCMD'    ! HLPS help I/O
 *        CMD = CHARACTER * ( 80 ) (Write)
 *           The command line.
 *        LHELP = INTEGER (Read and Write)
@@ -111,7 +114,7 @@
      :        '(/1X,''Press RETURN to continue ...'',$)' )
 
 *  Get a line of uppercase input.
-            CALL SREAD ( LUCMD, BUFA, BUFB, CMD, J )
+            CALL HLPS_SREAD ( LUCMD, BUFA, BUFB, CMD, J )
 
 *  Treat a comment or EOF as blank input.
             IF ( J .NE. 0 ) CMD = ' '
@@ -177,6 +180,6 @@
 *    Set the status and exit.
 
  9900 CONTINUE
-      PTHLPO = 1
+      HLPS_PTHLPO = 1
 
       END

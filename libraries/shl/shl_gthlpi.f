@@ -1,7 +1,7 @@
-      INTEGER FUNCTION GTHLPI( STRING, PROMPT, LINCH )
+      INTEGER FUNCTION HLPS_GTHLPI( STRING, PROMPT, LINCH )
 *+
 *  Name:
-*     GTHLPI
+*     HLPS_GTHLPI
 
 *  Purpose:
 *     Gets one line input during an help session.
@@ -30,13 +30,14 @@
 *        The global status.
 
 *  Returned Value:
-*     GTHLPI = INTEGER
+*     HLPS_GTHLPI = INTEGER
 *        The status.  If the line was inpput correctly a value of 1 is
 *        returned.
 
 *  Authors:
 *     (PTW) P.T.Wallace (STARLINK)
 *     (MJC) Malcolm J. Currie (STARLINK)
+*     (TIMJ) Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,8 @@
 *        Modified to work under ADAM in KAPPA.
 *     1992 June 22 (MJC):
 *        Converted to SST prologue and documented global parameters.
+*     2004 July 15 (TIMJ):
+*        Move to HLPS library
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,7 +63,7 @@
       INCLUDE 'SAE_PAR'        ! SSE global definitions
 
 *  Global Variables:
-      INCLUDE 'HLPCMD'           ! KAPPA help I/O
+      INCLUDE 'HLPS_HLPCMD'    ! HLPS help I/O
 *        CMD = CHARACTER * ( 80 ) (Write)
 *           The command line.
 *        HELPN = LOGICAL (Read)
@@ -111,7 +114,7 @@
      :        WRITE ( LUTERM, '(1X,A,$)' ) PROMPT
 
 *  Get a line of uppercase input.
-            CALL SREAD ( LUCMD, BUFA, BUFB, STRING, J )
+            CALL HLPS_SREAD ( LUCMD, BUFA, BUFB, STRING, J )
 
 *  Treat comment or EOF as blank input.
             IF ( J .GT. 0 ) STRING = ' '
@@ -145,6 +148,6 @@
 
 *  Set the status and exit.
  9900 CONTINUE
-      GTHLPI = 1
+      HLPS_GTHLPI = 1
 
       END
