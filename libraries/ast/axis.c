@@ -59,6 +59,9 @@ f     only within textual output (e.g. from AST_WRITE).
 *        - Avoid using astStore to allocate more storage than is supplied
 *        in the "data" pointer. This can cause access violations since 
 *        astStore will then read beyond the end of the "data" area.
+*     15-MAR-2005 (DSB):
+*        - Avoid exponents in log format labels which are close to zero but 
+*        not quite zero.
 *class--
 */
 
@@ -674,9 +677,12 @@ static const char *AxisFormat( AstAxis *this, double value ) {
                buff[ 0 ] ='-';
                nc = 1;
             }
-   
+
             nc += sprintf( buff + nc, "%s", 
                            astEscapes( -1 ) ? log_esc : log_txt );
+
+/* Round small exponents to zero. */
+            if( fabs( x ) < 1.0E-10 ) x = 0.0;
          }
       }
 
