@@ -148,48 +148,47 @@
         PARAMETER               ( DTA__MXRANG = 20 )
       INTEGER                   MX__HTEXT
         PARAMETER               ( MX__HTEXT = ADI__MXDIM )
-
+      INTEGER			NOBJ			!
+        PARAMETER		( NOBJ = 5 )
       CHARACTER*30		VERSION
         PARAMETER		( VERSION = 'BINSUBSET Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80           TEXTI(4)           ! Input file spec
-      CHARACTER*132          HTEXT(MX__HTEXT)   ! History text
-      CHARACTER*80           AXUNT(ADI__MXDIM)  ! Units for each axis
-      CHARACTER*6            PARNAM
-      CHARACTER*40           TEM                ! Dummy string
-      CHARACTER*7 AXID
+      CHARACTER*7 		AXID
+      CHARACTER*80           	AXUNT(ADI__MXDIM)  	! Units for each axis
+      CHARACTER*132          	HTEXT(MX__HTEXT)   	! History text
+      CHARACTER*6		MTYPE			! Object mapping type
+      CHARACTER*6            	PARNAM
+      CHARACTER*40           	TEM                	! Dummy string
+      CHARACTER*80           	TEXTI(4)           	! Input file spec
 
-      REAL                   AXLO(ADI__MXDIM)   ! axis low
-      REAL                   AXHI(ADI__MXDIM)   ! axis high
-      REAL                   DIR(ADI__MXDIM)	! axis direction indicator
-      REAL                   RANGES(2,DTA__MXRANG,ADI__MXDIM)  ! item ranges
+      REAL                   	AXLO(ADI__MXDIM)   	! Axis low
+      REAL                   	AXHI(ADI__MXDIM)   	! Axis high
+      REAL                   	DIR(ADI__MXDIM)		! axis direction indicator
+      REAL                   	RANGES(2,DTA__MXRANG,ADI__MXDIM)  ! item ranges
 
       INTEGER                DIMS(ADI__MXDIM)   ! Input DATA_ARRAY dimensions
       INTEGER                HU                 ! History lines used
-      INTEGER                IDPTR              ! Pointer to input data
+      INTEGER                	IDPTR              	! Pointer to input data
       INTEGER			IFID			! Input dataset id
-      INTEGER                IVPTR              ! Pointer to input VARIANCE
+      INTEGER			IOBJ			! Loop over subset objs
       INTEGER                IWPTR(ADI__MXDIM)  ! Pointer to input axis widths
       INTEGER                NDIM               ! Number of input dimensions
       INTEGER                NRANGE(ADI__MXDIM) ! # item ranges
       INTEGER                ODIMS(ADI__MXDIM)  ! Output DATA_ARRAY dimensions
-      INTEGER                ODPTR              ! Pointer to output data
-      INTEGER                OVPTR              ! Pointer to output VARIANCE
+      INTEGER                	ODPTR              	! Pointer to output data
       INTEGER                OWPTR(ADI__MXDIM)  ! Pointer to output axis widths
       INTEGER                ONDIM              ! Number of output dimensions
       INTEGER                PARENT(ADI__MXDIM) ! parent axis of output
-      INTEGER                TPTR               ! pointer to temp mapped array of logicals
-      INTEGER                I, J, K            ! Loop counters
-      INTEGER                NELM               ! Total length of input data
-      INTEGER                IQPTR              ! Pointer to input QUALITY
+      INTEGER                	TPTR               	! pointer to temp mapped array of logicals
+      INTEGER                	I, J, K            	! Loop counters
+      INTEGER                	NELM               	! Total length of input data
       INTEGER			OFID			! Output dataset id
-      INTEGER                OQPTR              ! Pointer to output QUALITY
-      INTEGER                INLINES            ! Number of TEXTI lines
+      INTEGER                	INLINES            	! Number of TEXTI lines
       INTEGER                AXRANGE(2,DTA__MXRANG,ADI__MXDIM)
 						! Pixel equivalent of RANGES
       INTEGER                IAXPTR(ADI__MXDIM) ! Pointers to input axes
-      INTEGER                NAX                ! Number of dataset axes
+      INTEGER                	NAX                	! Number of dataset axes
       INTEGER                NSEL,ISEL
       INTEGER                OAXPTR(ADI__MXDIM) ! Pointers to output axes
       INTEGER                SELAX(ADI__MXDIM)
@@ -206,6 +205,11 @@
       LOGICAL                QUALOK             ! Input QUALITY OK?
       LOGICAL                VAROK              ! Input VARIANCE OK?
       LOGICAL                SEL(ADI__MXDIM)    ! Has axis been selected on?
+
+*  Local Data:
+      CHARACTER*10		OBJ(NOBJ)
+      DATA			OBJ/'Data,'Variance','Quality',
+     :                              'LoError','HiError'/
 *.
 
 *  Check inherited global status.
@@ -438,34 +442,44 @@
 *  Create output file
       CALL BDI_LINK( 'BinDS', ONDIM, ODIMS, 'REAL', OFID, STATUS )
 
-*  Create output dataset
-      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
 *  Copy other stuff
       CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )
 
-*  Variance
-      CALL BDI_CHK( IFID, 'Variance', VAROK, STATUS )
-      IF ( VAROK ) THEN
-        CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
-        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
-      END IF
+*  Loop over objects which require subsetting
+      DO IOBJ = 1, NOBJ
 
-*  Quality
-      CALL BDI_CHK( IFID, 'Quality', QUALOK, STATUS )
-      IF ( QUALOK ) THEN
-        CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
-        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
-        CALL BDI_COPY( IFID, 'QualityMask', OFID, ' ', STATUS )
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+*    Does object exist
+        CALL BDI_CHK( IFID, OBJ(I), OK, STATUS )
+        IF ( OK ) THEN
 
-*  Write output DATA, VARIANCE, & QUALITY
-      CALL BINSUBSET_SEL (NELM, %VAL(IDPTR),%VAL(IVPTR),%VAL(IQPTR),
-     :              %VAL(TPTR),VAROK,QUALOK,%VAL(ODPTR),%VAL(OVPTR),
-     :                                          %VAL(OQPTR),STATUS )
+*      Choose mapping type
+          IF ( OBJ(I) .EQ. 'Quality' ) THEN
+            MTYPE = 'UBYTE'
+            CALL BDI_COPY( IFID, 'QualityMask', OFID, ' ', STATUS )
+          ELSE
+            MTYPE = 'REAL'
+          END IF
+
+*      Map the object
+          CALL BDI_MAP( IFID, OBJ(I), MTYPE, 'READ', IDPTR, STATUS )
+          CALL BDI_MAP( OFID, OBJ(I), MTYPE, 'WRITE', ODPTR, STATUS )
+
+*      Copy from input to output
+          IF ( MTYPE .EQ. 'REAL' ) THEN
+            CALL ARR_CCOP1R( NELM, %VAL(IDPTR), %VAL(TPTR), %VAL(ODPTR),
+     :                       STATUS )
+          ELSE
+            CALL ARR_CCOP1B( NELM, %VAL(IDPTR), %VAL(TPTR), %VAL(ODPTR),
+     :                       STATUS )
+          END IF
+
+*      Unmap object
+          CALL BDI_UNMAP( IFID, OBJ(I), IDPTR, STATUS )
+          CALL BDI_UNMAP( OFID, OBJ(I), ODPTR, STATUS )
+
+        END IF
+
+      END DO
 
 *  Finished with logical array
       CALL DYN_UNMAP( TPTR, STATUS )
@@ -845,79 +859,6 @@ c        END IF
 
       END IF
       END
-
-
-
-
-*+  BINSUBSET_SEL - Write output DATA, QUALITY & VARIANCE
-      SUBROUTINE BINSUBSET_SEL(LEN,IDATA,IVAR,IQUAL,COPY,VAROK,QUALOK,
-     :                                          ODATA,OVAR,OQUAL,STATUS)
-*    Description :
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-      INCLUDE 'SAE_PAR'
-      INTEGER                DTA__MXRANG        ! max no. permissible ranges
-        PARAMETER           (DTA__MXRANG = 20)
-
-*    Import :
-      INTEGER                LEN                ! Length of input dataset
-      REAL                   IDATA(*)           ! Input data array
-      REAL                   IVAR(*)            ! Input variance
-      BYTE                   IQUAL(*)           ! Input quality
-
-      LOGICAL                COPY(*)            ! Elements to copy to output
-
-      LOGICAL                VAROK              ! Variance OK
-      LOGICAL                QUALOK             ! Quality OK
-
-*    Export :
-      REAL                   ODATA(*)           ! Output data
-      REAL                   OVAR(*)            ! Output variance
-      BYTE                   OQUAL(*)           ! Output quality
-*    Status :
-      INTEGER STATUS
-*    Local variables :
-      INTEGER                I, J            	! Counters
-*-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-* copy data
-        J=0
-        DO I=1,LEN
-          IF (COPY(I)) THEN
-            J=J+1
-            ODATA(J)=IDATA(I)
-          END IF
-        END DO
-
-* copy variance if present
-        IF (VAROK) THEN
-          J=0
-          DO I=1,LEN
-            IF (COPY(I)) THEN
-              J=J+1
-              OVAR(J)=IVAR(I)
-            END IF
-          END DO
-        END IF
-
-* copy QUALITY if present
-        IF (QUALOK) THEN
-          J=0
-          DO I=1,LEN
-            IF (COPY(I)) THEN
-              J=J+1
-              OQUAL(J)=IQUAL(I)
-            END IF
-          END DO
-        END IF
-
-      END IF
-
-      END
-
-
 
 
 
