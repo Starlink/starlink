@@ -10,7 +10,7 @@
 *  GKS Function name:  Error Logging
 *  Author:             CJW
 *
-      INCLUDE 'source/include/check.inc'
+      INCLUDE '../include/check.inc'
 *
 *  PURPOSE OF THE ROUTINE
 *  ----------------------
@@ -42,8 +42,8 @@
 *  ------------------
 *     Read   /GKOPS/  KOPS
 *
-      INCLUDE 'source/include/gks.par'
-      INCLUDE 'source/include/gkops.cmn'
+      INCLUDE '..//include/gks.par'
+      INCLUDE '../include/gkops.cmn'
 *
 *  LOCALS
 *  ------
@@ -59,8 +59,8 @@
       PARAMETER (AINVAL = 'Invalid')
       CHARACTER * (IEMX) CEMESS
       CHARACTER * 9 BNAME
-      INCLUDE 'gks_err'
-      INCLUDE 'source/include/gksnam.par'
+      INCLUDE 'GKS_ERR'
+      INCLUDE '../include/gksnam.par'
 *
 *
 *  ALGORITHM
