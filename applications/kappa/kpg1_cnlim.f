@@ -62,6 +62,7 @@
 *  Authors:
 *      DP: Dave Pearce (STARLINK)
 *      MJC: Malcolm J. Currie (STARLINK)
+*      DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,8 @@
 *        Tidied to KAPPA style, adding comments and error reports.
 *      1990 Nov 25 (MJC):
 *        Renamed from CFILIM and added wildcards.
+*      2-OCT-1998 (DSB):
+*        Made error reporting more secure.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,8 +108,8 @@
 
 *  External References:
       INTEGER
-     :  CHR_INDEX              ! Index of substring in string
-
+     :  CHR_INDEX,             ! Index of substring in string
+     :  CHR_LEN                ! Used length of a string
 
 *  Local Variables:
       INTEGER
@@ -129,12 +132,18 @@
 
       WILD = CHR_INDEX( NOS, '*' )
 
-*    Check if the delimiter is the first character.
+*    Check if the delimiter is the first or last character.
 
       IF ( NSEP .EQ. 1 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'ERR_KPG1_CNLIM_INPINV',
      :     'KPG1_CNLIM: First character is a delimiter', STATUS )
+
+      ELSE IF( NSEP .EQ. CHR_LEN( NOS ) ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'ERR_KPG1_CNLIM_INPINV',
+     :     'KPG1_CNLIM: Last character is a delimiter', STATUS )
+
       ELSE
 
 *       If there is no separator, then only one number specified unless
@@ -207,6 +216,13 @@
 
          END IF
 
+      END IF
+
+*  Report a context message if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETC( 'NOS', NOS )
+         CALL ERR_REP( 'KPG1_CNLIM_ERR', 'Cannot interpret range of '//
+     :                 'integers ''^NOS''.', STATUS )
       END IF
 
       END
