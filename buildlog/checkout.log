@@ -5322,6 +5322,8 @@ cvs checkout: Updating java/source/hdx
 U java/source/hdx/build.xml
 cvs checkout: Updating java/source/hdx/src
 cvs checkout: Updating java/source/hdx/src/docs
+U java/source/hdx/src/docs/hdx-overview.html
+U java/source/hdx/src/docs/metadata.png
 cvs checkout: Updating java/source/hdx/src/etc
 cvs checkout: Updating java/source/hdx/src/etc/testcases
 U java/source/hdx/src/etc/testcases/Hdx.properties
