@@ -46,19 +46,45 @@ interface ASTEXP
       access      READ
       vpath       'PROMPT'
       ppath       'CURRENT,DEFAULT'
-      prompt      'Registration domain name in AST file (e.g. instrument name)'
+      prompt      'Registration domain name in AST file'
       default     'CCD_EXPORT'
       helpkey     '*'
    endparameter
 
-   parameter BASEDOMAIN
+   parameter BASEFRAME
       position 4
       type        LITERAL
       access      READ
       vpath       'CURRENT,PROMPT'
       ppath       'CURRENT,DEFAULT'
-      prompt      'Base domain name in NDFs and AST file'
+      prompt      'Frame in NDFs to use as Base frame in AST file'
       default     'AXIS'
+      helpkey     '*'
+   endparameter
+
+   parameter BASEEPOCH
+      type        _DOUBLE
+      ppath       'DYNAMIC,CURRENT'
+      prompt      'Base frame epoch of observation'
+      helpkey     '*'
+   endparameter
+
+   parameter IDTYPE
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Type of frameset identifier'
+      default     'INDEX'
+      helpkey     '*'
+   endparameter
+
+   parameter INDICES
+      type        _INTEGER
+      access      READ
+      vpath       'DYNAMIC,PROMPT'
+      ppath       'DYNAMIC'
+      prompt      'List of sequence values for INDEX frameset identifiers'
       helpkey     '*'
    endparameter
 
@@ -67,7 +93,7 @@ interface ASTEXP
       access      READ
       vpath       'PROMPT'
       ppath       'CURRENT'
-      prompt      'FITS header keyword to identify frameset in ASTFILE file'
+      prompt      'FITS header keyword to identify frameset'
       helpkey     '*'
    endparameter
 
