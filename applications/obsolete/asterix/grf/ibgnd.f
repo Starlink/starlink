@@ -3162,7 +3162,7 @@
       REAL	       		PFY(-MAXPT:MAXPT)
       REAL			WRKC((MAXDEG*2)+1)
       REAL			WRKA(MAXDEG+2,MAXDEG+2)
-      REAL			SUMSQ, YFIT
+      REAL			SUMSQ, YFIT, NR
       REAL			COEFFS(MAXDEG+2)
 
       REAL			MEAN			! Mean sample value
@@ -3280,7 +3280,7 @@ c            CALL PDA_DPLINT( NGS, PFX, PFY, WRKC, PFAIL )
 
 *        Compute coefficients
             CALL MATH_POLY( .TRUE., NGS*2, PFX(1-NGS), .FALSE., 0,
-     :                      DEG, WRKA, WRKB, PFY(1-NGS), COEFFS,
+     :                      DEG, WRKA, WRKC, PFY(1-NGS), COEFFS,
      :                      PFXN, SUMSQ, XMAX, XMIN )
 
           END IF
