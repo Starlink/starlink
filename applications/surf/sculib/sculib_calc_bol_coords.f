@@ -1,10 +1,88 @@
-*+  SCULIB_CALC_BOL_COORDS - calculate apparent RA, Dec of bolometers
-      SUBROUTINE SCULIB_CALC_BOL_COORDS (RA_CENTRE, DEC_CENTRE, LST,
-     :  LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION, 
-     :  N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
+      SUBROUTINE SCULIB_CALC_BOL_COORDS (OUT_COORDS, RA_CENTRE,
+     :  DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y,
+     :  ROTATION, N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
-     :  U4_CENTRE, RA_BOL, DEC_BOL, STATUS)
-*    Description :
+     :  U4_CENTRE, X_BOL, Y_BOL, STATUS)
+*+
+*  Name:
+*     SCULIB_CALC_BOL_COORDS
+
+*  Purpose:
+*     Calculate the bolometer offsets in (apparent RA,DEC), AzEl or NA
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     SCULIB subroutine
+ 
+*  Invocation:
+*     CALL SCULIB_CALC_BOL_COORS (OUT_COORDS, RA_CENTRE, DEC_CENTRE, LST,
+*    :  LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION, 
+*    :  N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
+*    :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
+*    :  U4_CENTRE, X_BOL, Y_BOL, STATUS)
+
+*  Arguments:
+*     OUT_COORDS = CHARACTER * (*) (Given)
+*          Output coordinate system (NA, AZ, RA)
+*     RA_CENTRE              = DOUBLE PRECISION (Given)
+*        the apparent RA of the `centre' (radians)
+*     DEC_CENTRE             = DOUBLE PRECISION (Given)
+*        the apparent dec of the `centre' (radians)
+*     LST                    = DOUBLE PRECISION (Given)
+*        the local sidereal time (radians)
+*     LAT_OBS                = DOUBLE PRECISION (Given)
+*        the latitude of the observatory (radians)
+*     OFFSET_COORDS          = CHARACTER*(*) (Given)
+*        the coordinate system of the offset of the array origin from
+*        the `centre'; NA or RD or AZ
+*     OFFSET_X               = REAL (Given)
+*        the x offset of the array origin from the `centre'
+*        (arcseconds)
+*     OFFSET_Y               = REAL (Given)
+*        the y offset of the array origin from the `centre'
+*        (arcseconds)
+*     ROTATION               = DOUBLE PRECISION (Given)
+*         for OFFSET_COORDS other than NA, this gives the angle
+*        from N in the offset coordinate system to N in apparent
+*        RA,Dec (radians, increasing clockwise)
+*     N_POINT                = INTEGER (Given)
+*        number of elements used in pointing correction arrays
+*     MAX_POINT              = INTEGER (Given)
+*        dimension of pointing correction arrays
+*     POINT_LST (MAX_POINT)  = DOUBLE PRECISION (Given)
+*        LST of measured corrections (radians)
+*     POINT_DAZ (MAX_POINT)  = REAL (Given)
+*        correction to be added in azimuth (arcsec)
+*     POINT_DEL (MAX_POINT)  = REAL (Given)
+*        correction to be added in elevation (arcsec)
+*     NUM_CHAN               = INTEGER (Given)
+*        the number of channels per A/D card
+*     NUM_ADC                = INTEGER (Given)
+*        the number of A/D cards
+*     N_BOL                  = INTEGER (Given)
+*        the actual number of bolometers
+*     BOL_CHAN (N_BOL)       = INTEGER (Given)
+*        channel numbers of bolometers
+*     BOL_ADC (N_BOL)        = INTEGER (Given)
+*        ADC numbers of bolometers
+*     U3 (NUM_ADC,NUM_CHAN)  = REAL (Given)
+*        the U3 offsets of the bolometers (arcsec)
+*     U4 (NUM_ADC,NUM_CHAN)  = REAL (Given)
+*        the U4 offsets of the bolometers (arcsec)
+*     U3_CENTRE              = REAL (Given)
+*        the U3 offset of the tracking `centre' on the array (arcsec)
+*     U4_CENTRE              = REAL (Given)
+*        the U4 offset of the tracking `centre' on the array (arcsec)
+*     X_BOL (N_BOL)         = DOUBLE PRECISION (Returned)
+*        the X offset (apparent RA or X) of the bolometer (radians)
+*     Y_BOL (N_BOL)        = DOUBLE PRECISION (Returned)
+*        the Y offset (apparent dec or Y) of the bolometer (radians)
+*     STATUS                 = INTEGER (Given and returned)
+*        The global status
+
+*  Description :
 *     This routine calculates the apparent RA and dec of a specified set
 *     of bolometers. It does this by:-
 *
@@ -33,118 +111,72 @@
 *          calling SLA_DTP2S to work out the apparent RA, dec of the offset
 *          positions.
 *
-*    Invocation :
-*     CALL SCULIB_CALC_BOL_COORDS (RA_CENTRE, DEC_CENTRE, LST,
-*    :  LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION, 
-*    :  N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
-*    :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
-*    :  U4_CENTRE, RA_BOL, DEC_BOL, STATUS)
-*    Parameters :
-*     RA_CENTRE              = DOUBLE PRECISION (Given)
-*           the apparent RA of the `centre' (radians)
-*     DEC_CENTRE             = DOUBLE PRECISION (Given)
-*           the apparent dec of the `centre' (radians)
-*     LST                    = DOUBLE PRECISION (Given)
-*           the local sidereal time (radians)
-*     LAT_OBS                = DOUBLE PRECISION (Given)
-*           the latitude of the observatory (radians)
-*     OFFSET_COORDS          = CHARACTER*(*) (Given)
-*           the coordinate system of the offset of the array origin from
-*           the `centre'; NA or RD 
-*     OFFSET_X               = REAL (Given)
-*           the x offset of the array origin from the `centre'
-*           (arcseconds)
-*     OFFSET_Y               = REAL (Given)
-*           the y offset of the array origin from the `centre'
-*           (arcseconds)
-*     ROTATION               = DOUBLE PRECISION (Given)
-*           for OFFSET_COORDS other than NA, this gives the angle
-*           from N in the offset coordinate system to N in apparent
-*           RA,Dec (radians, increasing clockwise)
-*     N_POINT                = INTEGER (Given)
-*           number of elements used in pointing correction arrays
-*     MAX_POINT              = INTEGER (Given)
-*           dimension of pointing correction arrays
-*     POINT_LST (MAX_POINT)  = DOUBLE PRECISION (Given)
-*           LST of measured corrections (radians)
-*     POINT_DAZ (MAX_POINT)  = REAL (Given)
-*           correction to be added in azimuth (arcsec)
-*     POINT_DEL (MAX_POINT)  = REAL (Given)
-*           correction to be added in elevation (arcsec)
-*     NUM_CHAN               = INTEGER (Given)
-*           the number of channels per A/D card
-*     NUM_ADC                = INTEGER (Given)
-*           the number of A/D cards
-*     N_BOL                  = INTEGER (Given)
-*           the actual number of bolometers
-*     BOL_CHAN (N_BOL)       = INTEGER (Given)
-*           channel numbers of bolometers
-*     BOL_ADC (N_BOL)        = INTEGER (Given)
-*           ADC numbers of bolometers
-*     U3 (NUM_ADC,NUM_CHAN)  = REAL (Given)
-*           the U3 offsets of the bolometers (arcsec)
-*     U4 (NUM_ADC,NUM_CHAN)  = REAL (Given)
-*           the U4 offsets of the bolometers (arcsec)
-*     U3_CENTRE              = REAL (Given)
-*           the U3 offset of the tracking `centre' on the array (arcsec)
-*     U4_CENTRE              = REAL (Given)
-*           the U4 offset of the tracking `centre' on the array (arcsec)
-*     RA_BOL (N_BOL)         = DOUBLE PRECISION (Returned)
-*           the apparent RA of the bolometer (radians)
-*     DEC_BOL (N_BOL)        = DOUBLE PRECISION (Returned)
-*           the apparent dec of the bolometer (radians)
-*     STATUS                 = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Authors :
+*     JFL: J.Lightfoot (jfl@roe.ac.uk)
+*     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+*  History :
 *     $Id$
-*     1-AUG-1995: Original version.
-*    15-JUL-1996: Jiggle offsets subtracted rather than added (JFL).
-*    endhistory
+*     1-AUG-1995 (JFL)
+*        Original version
+*     15-JUL-1996 (JFL)
+*        Jiggle offsets subtracted rather than added (JFL).
+*     11-DEC-1996 (TIMJ)
+*        Added NA and AZ output coordinates
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+
 *    Type Definitions :
-      IMPLICIT NONE
+      IMPLICIT NONE                            ! No implicit typing
+
 *    Global constants :
       INCLUDE 'SAE_PAR'
+
 *    Import :
-      DOUBLE PRECISION RA_CENTRE
-      DOUBLE PRECISION DEC_CENTRE
-      DOUBLE PRECISION LST
-      DOUBLE PRECISION LAT_OBS
-      CHARACTER*(*)    OFFSET_COORDS
-      REAL             OFFSET_X
-      REAL             OFFSET_Y
-      DOUBLE PRECISION ROTATION
-      INTEGER          N_POINT
       INTEGER          MAX_POINT
-      DOUBLE PRECISION POINT_LST (MAX_POINT)
-      REAL             POINT_DAZ (MAX_POINT)
-      REAL             POINT_DEL (MAX_POINT)
       INTEGER          NUM_CHAN
       INTEGER          NUM_ADC
       INTEGER          N_BOL
+
       INTEGER          BOL_CHAN (N_BOL)
       INTEGER          BOL_ADC (N_BOL)
+      DOUBLE PRECISION DEC_CENTRE
+      DOUBLE PRECISION LAT_OBS
+      DOUBLE PRECISION LST
+      INTEGER          N_POINT
+      CHARACTER*(*)    OFFSET_COORDS
+      REAL             OFFSET_X
+      REAL             OFFSET_Y
+      CHARACTER * (*)  OUT_COORDS
+      DOUBLE PRECISION POINT_LST (MAX_POINT)
+      REAL             POINT_DAZ (MAX_POINT)
+      REAL             POINT_DEL (MAX_POINT)
+      DOUBLE PRECISION RA_CENTRE
+      DOUBLE PRECISION ROTATION
       REAL             U3 (NUM_CHAN,NUM_ADC)
-      REAL             U4 (NUM_CHAN,NUM_ADC)
       REAL             U3_CENTRE
+      REAL             U4 (NUM_CHAN,NUM_ADC)
       REAL             U4_CENTRE
+
 *    Import-Export :
 *    Export :
-      DOUBLE PRECISION RA_BOL (N_BOL)
-      DOUBLE PRECISION DEC_BOL (N_BOL)
+      DOUBLE PRECISION X_BOL (N_BOL)
+      DOUBLE PRECISION Y_BOL (N_BOL)
 *    Status :
       INTEGER          STATUS
 *    External references :
+
 *    Global variables :
+
 *    Local Constants :
       DOUBLE PRECISION ARCSEC2RAD         ! arcsec 2 radians conversion
       PARAMETER (ARCSEC2RAD = 4.84813681110D-6)
       DOUBLE PRECISION PI                 !
       PARAMETER (PI = 3.14159265359)
+
 *    Local variables :
       INTEGER          ADC                ! ADC number of bolometer
       DOUBLE PRECISION AZ_OFFSET          ! offset in az (arcsec)
@@ -186,9 +218,8 @@
                                           ! (radians)
       DOUBLE PRECISION U4_OFF             ! bolometer offset from `centre'
                                           ! (radians)
-*    Internal References :
-*    Local data :
-*-
+*.
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *  calculate the extra offsets to be added due to jiggling or scanning
@@ -222,6 +253,18 @@
          CALL ERR_REP (' ', 'SCULIB_CALC_BOL_COORDS: bad value for '//
      :     'OFFSET_COORDS - ^COORDS', STATUS)
       END IF
+
+* Check the OUT_COORDS
+ 
+      IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ'
+     :     .AND. OUT_COORDS.NE.'RA') THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC ('COORDS', OUT_COORDS)
+         CALL ERR_REP (' ', 'SCULIB_CALC_BOL_COORDS: bad value for '//
+     :     'OUT_COORDS - ^COORDS', STATUS)
+      END IF
+
+
 
 *  calculate the pointing offset for the time of the measurement
 
@@ -316,20 +359,36 @@
                   DEL = DEL + (P_DEL - EL_OFFSET) * ARCSEC2RAD
                END IF
 
-*  now rotate the offset to apparent RA,dec
 
-               BOL_XOFF = -DAZ * COS_Q + DEL * SIN_Q
-               BOL_YOFF = DAZ * SIN_Q + DEL * COS_Q
+               IF (OUT_COORDS .EQ. 'RA') THEN
+*     now rotate the offset to apparent RA,dec
 
-*  add in any extra offset in RD tangent plane coords
+                  BOL_XOFF = -DAZ * COS_Q + DEL * SIN_Q
+                  BOL_YOFF = DAZ * SIN_Q + DEL * COS_Q
 
-               BOL_XOFF = BOL_XOFF + RD_X_OFFSET * ARCSEC2RAD
-               BOL_YOFF = BOL_YOFF + RD_Y_OFFSET * ARCSEC2RAD
+*     add in any extra offset in RD tangent plane coords
 
-*  and calculate the apparent RA,Dec of the offset position
+                  BOL_XOFF = BOL_XOFF + RD_X_OFFSET * ARCSEC2RAD
+                  BOL_YOFF = BOL_YOFF + RD_Y_OFFSET * ARCSEC2RAD
 
-               CALL SLA_DTP2S (BOL_XOFF, BOL_YOFF, RA_CENTRE,
-     :           DEC_CENTRE, RA_BOL(BOL), DEC_BOL(BOL))
+*     and calculate the apparent RA,Dec of the offset position
+
+                  CALL SLA_DTP2S (BOL_XOFF, BOL_YOFF, RA_CENTRE,
+     :                 DEC_CENTRE, X_BOL(BOL), Y_BOL(BOL))
+
+*     NAsmyth
+               ELSE IF (OUT_COORDS .EQ. 'NA') THEN
+                  X_BOL(BOL) = U3_OFF
+                  Y_BOL(BOL) = U4_OFF
+
+*     AZimuth
+               ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
+                  X_BOL(BOL) = DAZ
+                  Y_BOL(BOL) = DEL
+
+               END IF
+
+
             END DO
 
          END IF
