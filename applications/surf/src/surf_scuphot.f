@@ -24,6 +24,9 @@
 *     IN                      The name of the input file containing 
 *                             demodulated SCUBA data.
 *
+*     ANALYSIS                Method used to determine peak
+*                             Either average or parabola
+*
 *     OUT                     The name of the HDS output file to contain
 *                             the ndfs described above. This file will have
 *                             the extension .sdf but this should not be
@@ -117,7 +120,11 @@
 *    Local Constants :
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
+      BYTE        OUTBAD               ! Output bad pixel mask
+      PARAMETER (OUTBAD = 1)
 *    Local variables :
+      CHARACTER*10     ANALYSIS        ! analysis mode
+      BYTE             BADBIT          ! bad bit mask
       INTEGER          BEAM            ! beam index in DO loop
       REAL             BEAM_WEIGHT (SCUBA__MAX_BEAM)
                                        ! the weight assigned to the measurement
@@ -150,12 +157,6 @@
                                        ! data
       INTEGER          INT_OFFSET      ! offset of the start of an integration
                                        ! in the data array
-      INTEGER          INT_QUALITY_END ! end of space holding array that
-                                       ! specifies which integrations from the
-                                       ! input file are to be used
-      INTEGER          INT_QUALITY_PTR ! start of space holding array that
-                                       ! specifies which integrations from the
-                                       ! input file are to be used
       INTEGER          INT_Q_END (SCUBA__MAX_BEAM)
                                        ! end of space holding integration
                                        ! quality
@@ -192,6 +193,7 @@
       INTEGER          IPOS (SCUBA__MAX_JIGGLE)
 				       ! i index of jiggle measurement in
 				       ! 2d map
+      LOGICAL          ISBAD           ! Are there bad output pixels
       INTEGER          ITEMP           ! scratch integer
       INTEGER          JIGGLE_COUNT    ! number of jiggles in pattern
       INTEGER          JIGGLE_P_SWITCH ! number of jiggles per switch
@@ -218,6 +220,8 @@
                                        ! centre for a PLANET coord system
       INTEGER          MAP_D_PTR       ! pointer to output map data array
       INTEGER          MAP_Q_PTR       ! pointer to output map quality array
+      INTEGER          MAP_N_PTR       ! pointer to output map scratch array
+      INTEGER          MAP_N_PTR_END   ! pointer to end of scratch array
       INTEGER          MAP_V_PTR       ! pointer to output map variance array
       REAL             MAP_X           ! x offset of map centre from telescope
                                        ! centre (radians)
@@ -228,7 +232,7 @@
       INTEGER          MEAS_N (SCUBA__MAX_JIGGLE, SCUBA__MAX_BEAM)
                                        ! number of coadded integrations in
                                        ! MEAS_D
-      INTEGER          MEAS_Q (SCUBA__MAX_JIGGLE, SCUBA__MAX_BEAM)
+      BYTE             MEAS_Q (SCUBA__MAX_JIGGLE, SCUBA__MAX_BEAM)
 				       ! the quality on MEAS_D
       REAL             MEAS_V (SCUBA__MAX_JIGGLE, SCUBA__MAX_BEAM)
 				       ! the variance on MEAS_D
@@ -291,7 +295,7 @@
                                        ! NDFs
       REAL             PEAK_D (SCUBA__MAX_INT, SCUBA__MAX_BEAM)
                                        ! fitted peaks
-      INTEGER          PEAK_Q (SCUBA__MAX_INT, SCUBA__MAX_BEAM)
+      BYTE             PEAK_Q (SCUBA__MAX_INT, SCUBA__MAX_BEAM)
                                        ! quality on fitted peaks
       REAL             PEAK_V (SCUBA__MAX_INT, SCUBA__MAX_BEAM)
                                        ! variance on fitted peaks
@@ -348,6 +352,9 @@
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
+
+* Get bad bit mask
+      CALL NDF_BB(IN_NDF, BADBIT, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -516,11 +523,12 @@
 *  dimensions
 
       CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
+
+      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'READ', IN_Q_PTR,
+     :  NELM, STATUS)
       CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', IN_D_PTR,
      :  NELM, STATUS)
       CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ', IN_V_PTR,
-     :  NELM, STATUS)
-      CALL NDF_MAP (IN_NDF, 'QUALITY', '_INTEGER', 'READ', IN_Q_PTR,
      :  NELM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -603,23 +611,6 @@
       CALL CMP_GETVR (IN_REDSX_LOC, 'BEAM_WT', SCUBA__MAX_BEAM,
      :  BEAM_WEIGHT, NELM, STATUS)
 
-*  search for an integration quality array in the REDS extension, if present
-*  map it otherwise get some space and fill it with good quality
-
-      CALL SCULIB_MALLOC (N_INTEGRATIONS * SCUBA__MAX_BEAM * VAL__NBI,
-     :  INT_QUALITY_PTR, INT_QUALITY_END, STATUS)
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL DAT_FIND (IN_REDSX_LOC, 'INT_QUALITY', IN_LOC, STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL ERR_ANNUL (STATUS)
-	    CALL SCULIB_CFILLI (N_INTEGRATIONS * SCUBA__MAX_BEAM,
-     :        0, %val(INT_QUALITY_PTR))
-         ELSE
-            CALL DAT_GETVI (IN_LOC, N_INTEGRATIONS * SCUBA__MAX_BEAM,
-     :        %val(INT_QUALITY_PTR), NELM, STATUS)
-            CALL DAT_ANNUL (IN_LOC, STATUS)
-         END IF
-      END IF
 
 *  get the channel and ADC numbers of the bolometers used
 
@@ -743,7 +734,7 @@
      :        INT_D_END(BEAM), STATUS)
             CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_V_PTR(BEAM),
      :        INT_V_END(BEAM), STATUS)
-            CALL SCULIB_MALLOC (N_POS * VAL__NBI, INT_Q_PTR(BEAM),
+            CALL SCULIB_MALLOC (N_POS * VAL__NBUB, INT_Q_PTR(BEAM),
      :        INT_Q_END(BEAM), STATUS)
 
 *  copy the integration data from the relevant bolometer into the 
@@ -761,13 +752,17 @@
                    CALL SCULIB_COPYR (1, %val(IN_V_PTR + IN_OFFSET *
      :               VAL__NBR), %val(INT_V_PTR(BEAM) + OUT_OFFSET *
      :               VAL__NBR))
-		   CALL SCULIB_COPYI (1, %val(IN_Q_PTR + IN_OFFSET *
-     :               VAL__NBI), %val(INT_Q_PTR(BEAM) + OUT_OFFSET *
-     :               VAL__NBI))
+		   CALL SCULIB_COPYB (1, %val(IN_Q_PTR + IN_OFFSET *
+     :               VAL__NBUB), %val(INT_Q_PTR(BEAM) + OUT_OFFSET *
+     :               VAL__NBUB))
                 END DO
              END IF
          END IF
       END DO
+
+*  Ask for the reduction method
+
+      CALL PAR_GET0C ('ANALYSIS', ANALYSIS, STATUS)
 
 *  create the output file that will contain the reduced data in NDFs
 
@@ -805,17 +800,18 @@
      :           IBEAM, STATUS)
                CALL NDF_SBND (N_OBSDIM, LBND, UBND, IBEAM, STATUS)
 
+	       CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
+     :           MAP_Q_PTR, NELM, STATUS)
 	       CALL NDF_MAP (IBEAM, 'DATA', '_REAL', 'WRITE/ZERO',
      :           MAP_D_PTR, NELM, STATUS)
 	       CALL NDF_MAP (IBEAM, 'VARIANCE', '_REAL', 'WRITE/ZERO',
      :           MAP_V_PTR, NELM, STATUS)
-	       CALL NDF_MAP (IBEAM, 'QUALITY', '_INTEGER', 'WRITE',
-     :           MAP_Q_PTR, NELM, STATUS)
+
 
 *  initialise quality to bad
 
 	       IF (STATUS .EQ. SAI__OK) THEN
-		  CALL SCULIB_CFILLI (NELM, 1, %val(MAP_Q_PTR))
+		  CALL SCULIB_CFILLB (NELM, 1, %val(MAP_Q_PTR))
                END IF
 
 *  construct axes
@@ -874,17 +870,17 @@
      :           IPEAK, STATUS)
                CALL NDF_SBND (1, 1, N_INTEGRATIONS, IPEAK, STATUS)
 
+               CALL NDF_MAP (IPEAK, 'QUALITY', '_UBYTE', 'WRITE',
+     :           PEAK_Q_PTR, NELM, STATUS)
                CALL NDF_MAP (IPEAK, 'DATA', '_REAL', 'WRITE/ZERO',
      :           PEAK_D_PTR, NELM, STATUS)
                CALL NDF_MAP (IPEAK, 'VARIANCE', '_REAL', 'WRITE/ZERO',
      :           PEAK_V_PTR, NELM, STATUS)
-               CALL NDF_MAP (IPEAK, 'QUALITY', '_INTEGER', 'WRITE',
-     :           PEAK_Q_PTR, NELM, STATUS)
 
 *  initialise quality to bad
 
 	       IF (STATUS .EQ. SAI__OK) THEN
-		  CALL SCULIB_CFILLI (NELM, 1, %val(PEAK_Q_PTR))
+		  CALL SCULIB_CFILLB (NELM, 1, %val(PEAK_Q_PTR))
                END IF
 
 *  construct axis
@@ -913,76 +909,82 @@
                   CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
                END IF
 
+* Put on some axis information and labels
+
+               CALL NDF_ACPUT('Integration',IPEAK,'LABEL',1,STATUS)
+               CALL NDF_CPUT('Volts',IPEAK,'UNITS',STATUS)
+               CALL NDF_CPUT(OBJECT, IPEAK, 'Title', STATUS)
+               CALL NDF_CPUT('Fitted peak',IPEAK, 'LAB', STATUS)
+
+
+               CALL NDF_ACPUT('X-offset',IBEAM,'LABEL',1,STATUS)
+               CALL NDF_ACPUT('Y-offset',IBEAM,'LABEL',2,STATUS)
+               CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
+               CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
+               CALL NDF_CPUT(OBJECT, IBEAM, 'Title', STATUS)
+               CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', STATUS)
+
 *  cycle through the integrations coadding them as required
 
                DO INT = 1, N_INTEGRATIONS
-                  INT_OFFSET = (INT - 1) * SCUBA__MAX_BEAM + BEAM - 1
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_COPYI (1, %val(INT_QUALITY_PTR +
-     :                 INT_OFFSET * VAL__NBI), ITEMP)
-                  END IF
 
-                  IF (ITEMP .EQ. 0) THEN
-		     INT_OFFSET = (INT - 1) * JIGGLE_COUNT
+                  INT_OFFSET = (INT - 1) * JIGGLE_COUNT
 
 *  coadd the jiggle data for the integration into that for the measurement
 
-		     IF (STATUS .EQ. SAI__OK) THEN
-                        CALL SCULIB_COADD (JIGGLE_COUNT,
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_COADD (JIGGLE_COUNT,
      :                    %val(INT_D_PTR(BEAM) + INT_OFFSET * VAL__NBR),
      :                    %val(INT_V_PTR(BEAM) + INT_OFFSET * VAL__NBR),
-     :                    %val(INT_Q_PTR(BEAM) + INT_OFFSET * VAL__NBI),
+     :                    %val(INT_Q_PTR(BEAM) + INT_OFFSET *VAL__NBUB),
      :                    MEAS_D(1,BEAM), MEAS_V(1,BEAM),
      :                    MEAS_Q(1,BEAM), MEAS_N(1,BEAM),
      :                    MEAS_D(1,BEAM), MEAS_V(1,BEAM),
-     :                    MEAS_Q(1,BEAM), MEAS_N(1,BEAM),
+     :                    MEAS_Q(1,BEAM), MEAS_N(1,BEAM), BADBIT,
      :                    .TRUE.)
              
 *  derive the measured signal for this integration
 
-                        CALL SCULIB_FIT_2D_PARABOLA (JIGGLE_COUNT,
+                     CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (ANALYSIS,
+     :                    1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
      :                    %val(INT_D_PTR(BEAM) + INT_OFFSET * VAL__NBR),
      :                    %val(INT_V_PTR(BEAM) + INT_OFFSET * VAL__NBR),
-     :                    %val(INT_Q_PTR(BEAM) + INT_OFFSET * VAL__NBR),
-     :                    JIGGLE_X, JIGGLE_Y,
-     :                    RTEMP, RTEMP,
-     :                    PEAK_X(INT,BEAM), PEAK_Y(INT,BEAM),
+     :                    %val(INT_Q_PTR(BEAM) + INT_OFFSET *VAL__NBUB),
      :                    PEAK_D(INT,BEAM), PEAK_V(INT,BEAM),
-     :                    STATUS)
-
-                        IF (STATUS .EQ. SAI__OK) THEN
-                           PEAK_Q(INT,BEAM) = 0
-                        END IF
+     :                    PEAK_Q(INT,BEAM), RTEMP, RTEMP,
+     :                    PEAK_X(INT,BEAM), PEAK_Y(INT,BEAM),
+     :                    BADBIT, STATUS)
 
 *  coadd the fitted peak into the running mean
 
-                        CALL SCULIB_COADD (1, 
+                     CALL SCULIB_COADD (1, 
      :                    PEAK_D(INT,BEAM), PEAK_V(INT,BEAM),
      :                    PEAK_Q(INT,BEAM),
      :                    MEAS_2_D(BEAM), MEAS_2_V(BEAM), 
      :                    MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
      :                    MEAS_2_D(BEAM), MEAS_2_V(BEAM),
      :                    MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
-     :                    .TRUE.)
-		     END IF
+     :                    BADBIT, .TRUE.)
+
                   END IF
                END DO
 
 *  derive the measured signal from the coadded measurement
 
-               IF (STATUS .EQ. SAI__OK) THEN
-                  CALL SCULIB_FIT_2D_PARABOLA (JIGGLE_COUNT,
+               CALL SCULIB_ANALYSE_PHOTOM_JIGGLE ('PARABOLA',
+     :              1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
      :              MEAS_D(1,BEAM), MEAS_V(1,BEAM), MEAS_Q(1,BEAM),
-     :              JIGGLE_X, JIGGLE_Y,
+     :              MEAS_1_D(BEAM), MEAS_1_V(BEAM), MEAS_1_Q(BEAM),
      :              MEAS_1_A0(BEAM), MEAS_1_A1(BEAM),
      :              MEAS_1_X(BEAM), MEAS_1_Y(BEAM),
-     :              MEAS_1_D(BEAM), MEAS_1_V(BEAM),
-     :              STATUS)
+     :              BADBIT, STATUS)
 
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     MEAS_1_Q(BEAM) = 0
-                  END IF
-               END IF
+
+* Initialise the scratch array for UNPACK_JIGGLE_SEPARATES
+
+               CALL SCULIB_MALLOC(UBND(1)*UBND(2) * VAL__NBI, MAP_N_PTR,
+     :              MAP_N_PTR_END, STATUS)
+
 
 *  store the coadded measurement to the output map
 
@@ -990,9 +992,13 @@
 		  CALL SCULIB_UNPACK_JIGGLE_SEPARATES (JIGGLE_COUNT,
      :              1, MEAS_D(1,BEAM), MEAS_V(1,BEAM),
      :              MEAS_Q(1,BEAM), 1, JIGGLE_COUNT, IPOS, JPOS,
-     :              UBND(1), UBND(2), %val(MAP_D_PTR),
-     :              %val(MAP_V_PTR), %val(MAP_Q_PTR), ITEMP, STATUS)
+     :              UBND(1), UBND(2), %val(MAP_D_PTR), %VAL(MAP_V_PTR),
+     :              %val(MAP_Q_PTR), %val(MAP_N_PTR), ITEMP, BADBIT, 
+     :                 STATUS)
 	       END IF
+
+               CALL SCULIB_FREE ('MAP_N', MAP_N_PTR, MAP_N_PTR_END,
+     :              STATUS)
 
 *  store the fitted peak values to the output ndf
 
@@ -1001,9 +1007,20 @@
      :              %val(PEAK_D_PTR))
                   CALL SCULIB_COPYR (N_INTEGRATIONS, PEAK_V(1,BEAM),
      :              %val(PEAK_V_PTR))
-                  CALL SCULIB_COPYI (N_INTEGRATIONS, PEAK_Q(1,BEAM),
+                  CALL SCULIB_COPYB (N_INTEGRATIONS, PEAK_Q(1,BEAM),
      :              %val(PEAK_Q_PTR))
                END IF
+
+*     Write BIT MASK
+               CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
+               CALL NDF_SBB(OUTBAD, IBEAM, STATUS) 
+
+               ISBAD = .FALSE.
+               DO I = 1, N_INTEGRATIONS
+                  IF (PEAK_Q(I, BEAM).NE.0) ISBAD = .TRUE.
+               END DO
+
+               CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
 
 *  close the ndfs opened in this ndf context
 
@@ -1012,9 +1029,10 @@
          END DO
       END IF
 
+
 *  write the results out to an ASCII file
 
-      CALL REDS_WRITE_PHOTOM (ODF_NAME, UTDATE, UTSTART,
+      CALL REDS_WRITE_PHOTOM (ODF_NAME, UTDATE, UTSTART, ANALYSIS,
      :  RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, CENTRE_COORDS,
      :  LAT, LONG, LAT2, LONG2, MJD1, MJD2, OFFSET_COORDS, MAP_X,
      :  MAP_Y, SAMPLE_COORDS, SAMPLE_PA, SKY_ERROR, SCUBA__MAX_BEAM,   
@@ -1028,8 +1046,6 @@
 
 *  free memory
 
-      CALL SCULIB_FREE ('INT_QUALITY', INT_QUALITY_PTR, 
-     :  INT_QUALITY_END, STATUS)
       DO BEAM = 1, SCUBA__MAX_BEAM
          CALL SCULIB_FREE ('INT_D', INT_D_PTR(BEAM), INT_D_END(BEAM),
      :     STATUS)
@@ -1054,5 +1070,20 @@
 *  and close down NDF
 
       CALL NDF_END (STATUS)
+
+      END
+
+
+      SUBROUTINE SHOW_ARRAY(N, DAT, QUAL)
+      IMPLICIT NONE
+
+      INTEGER N
+      REAL DAT(N)
+      BYTE QUAL(N)
+      INTEGER I
+
+      DO I = 1, N
+         PRINT *, I, DAT(I), QUAL(I)
+      END DO
 
       END
