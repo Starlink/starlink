@@ -253,7 +253,7 @@
 
 *          Width descriptor?
             IF ( AWOK(IAX) .AND. .NOT. AWUNIF(IAX) ) THEN
-              CALL EXPORT_WRITE( OFD, 'AXWIDTH', STATUS )
+              CALL EXPORT_WRITE( OFD, 'WIDTH', STATUS )
             END IF
 
 *        Otherwsie write dummy axis
