@@ -3,6 +3,9 @@
 
     NDF.xs v1.2
 
+       Copyright (C) 1996-2000 Tim Jenness, Frossie Economou and the UK
+                               Particle Physics and Astronomy Research
+                               Council. All Rights Reserved.
 
     perl-NDF glue 
 
@@ -38,6 +41,13 @@ extern "C" {
 #include "dat_par.h"
 #include "sae_par.h"
 
+#include "mers.h"
+#include "err_err.h"
+#include "ems_err.h"
+#include "msg_par.h"
+#include "ndf.h"
+
+
 /* Include BAD values */
 #include "img.h"
 
@@ -62,16 +72,16 @@ extern "C" {
  * extension but may not be in a standard Starlink distribution 
  */
 
-/*
-#include "err_err.h"
-#include "ems_err.h"
-#include "msg_par.h"
-*/
 
 /* These come from ndf_par which should have a .h file...*/
+#ifndef NDF__SZHMX
 #ifdef MSG__SZMSG
 #define NDF__SZHMX   MSG__SZMSG
+#else
+#define NDF__SZHMX   200
 #endif
+#endif
+
 #define NDF__SZHIS   72
 
 
@@ -128,12 +138,8 @@ static locator datroot[DAT__SZLOC]  = DAT__ROOT;
 
 
 
-/* Create some static workspace for strings */
+/* max size of our strings */
 #define FCHAR 512       /* Size of Fortran character string */
-static char str1[FCHAR];
-static char str2[FCHAR];
-static locator floc[DAT__SZLOC];
-
 
 /* This stuff is from h2xs */
 
@@ -334,6 +340,7 @@ not_there:
    and size (i.e. number of bytes allocated to it in storage)  */
 
 /* Internally convert an f77 string to C - must be at least 1 byte long */
+/* Could use cnf here */
  
 stringf77toC (char*c, int len) {
    int i;
@@ -361,6 +368,7 @@ stringf77toC (char*c, int len) {
 }
  
 /* Internally convert an C string to f77 - must be at least 1 byte long */
+/* Could use cnf here */
  
 stringCtof77 (char*c, int len) {
  
@@ -484,6 +492,8 @@ ndf_acget(indf, comp, iaxis, value, status)
   char * value
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
    strncpy(str1, value, sizeof(str1));/* Copy value to temp */
    value = str1;
@@ -551,6 +561,8 @@ ndf_aform(indf, comp, iaxis, form, status)
   char * form = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
    form = str1;
    ndf_aform_(&indf, comp, &iaxis, form, strlen(comp), sizeof(str1));
@@ -662,6 +674,8 @@ ndf_atype(indf, comp, iaxis, type, status)
   char * type = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
    type = str1;
    ndf_atype_(&indf, comp, &iaxis, type, &status, strlen(comp), sizeof(str1));
@@ -754,6 +768,8 @@ ndf_cget(indf, comp, value, status)
   char * value
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
    strncpy(str1, value, sizeof(str1));
    value = str1;
@@ -922,6 +938,8 @@ ndf_form(indf, comp, form, status)
   char * form = NO_INIT
   ndfint &status 
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
    form = str1;
    ndf_form_(&indf, comp, form, &status, strlen(comp), sizeof(str1));
@@ -937,6 +955,8 @@ ndf_ftype(indf, comp, ftype, status)
   char * ftype = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
    ftype = str1;
    ndf_ftype_(&indf, comp, ftype, &status, strlen(comp), sizeof(str1));
@@ -989,6 +1009,8 @@ ndf_loc(indf, mode, loc, status)
   locator * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc = floc;
   ndf_loc_(&indf, mode, loc, &status, strlen(mode), DAT__SZLOC); 
@@ -1100,6 +1122,9 @@ ndf_mtype(typlst, indf1, indf2, comp, itype, dtype, status)
   char * dtype = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$$
+ PREINIT:
+   char str1[FCHAR];
+   char str2[FCHAR];
  CODE:
   itype = str1;
   dtype = str2;
@@ -1121,6 +1146,9 @@ ndf_mtypn(typlst, n, ndfs, comp, itype, dtype, status)
   char * dtype = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$$$
+ PREINIT:
+   char str1[FCHAR];
+   char str2[FCHAR];
  CODE:
   itype = str1;
   dtype = str2;
@@ -1388,6 +1416,8 @@ ndf_type(indf, comp, type, status)
   char * type = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   type = str1;
   ndf_type_(&indf, comp, type, &status, strlen(comp), sizeof(str1));
@@ -1614,6 +1644,8 @@ ndf_xgt0c(indf, xname, cmpt, value, status)
   char * value
   ndfint &status
  PROTOTYPE:  $$$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   /* Copy string across so that it can be returned unchanged if error */
   strncpy(str1, value, sizeof(str1));
@@ -1708,6 +1740,8 @@ ndf_xloc(indf, xname, mode, xloc, status)
   locator * xloc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   xloc = floc;
   ndf_xloc_(&indf, xname, mode, xloc, &status, strlen(xname), strlen(mode),DAT__SZLOC);
@@ -1722,6 +1756,8 @@ ndf_xname(indf, n, xname, status)
   char * xname = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   xname = str1;
   ndf_xname_(&indf, &n, xname, &status, sizeof(str1));
@@ -1740,6 +1776,8 @@ ndf_xnew(indf, xname, type, ndim, dim, loc, status)
   locator * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$\@$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc = floc;
   ndf_xnew_(&indf, xname, type, &ndim, dim, loc, &status, strlen(xname), strlen(type), DAT__SZLOC);
@@ -1906,6 +1944,8 @@ ndf_hinfo(indf, item, irec, value, status)
   char * value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   value = str1;
   ndf_hinfo_(&indf, item, &irec, value, &status, strlen(item), sizeof(str1));
@@ -2055,6 +2095,8 @@ dat_ccopy(loc1, loc2, name, loc3, status)
   locator * loc3 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc3 = floc;
   dat_ccopy_(loc1, loc2, name, loc3, &status, DAT__SZLOC, DAT__SZLOC, strlen(name), DAT__SZLOC);
@@ -2067,6 +2109,8 @@ dat_cctyp(size, type)
   ndfint &size
   char * type = NO_INIT
  PROTOTYPE: $$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   type = str1;
   dat_cctyp_(&size, type, sizeof(str1));
@@ -2082,6 +2126,8 @@ dat_cell(loc1, ndim, sub, loc2, status)
   locator * loc2
   ndfint &status
  PROTOTYPE: $$\@$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
   dat_cell_(loc1, &ndim, sub, loc2, &status, DAT__SZLOC, DAT__SZLOC);
@@ -2107,6 +2153,8 @@ dat_clone(loc1, loc2, status)
   locator * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
   dat_clone_(loc1, loc2, &status, DAT__SZLOC, DAT__SZLOC); 
@@ -2121,6 +2169,8 @@ dat_coerc(loc1, ndim, loc2, status)
   locator * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
   dat_coerc_(loc1, &ndim, loc2, &status, DAT__SZLOC, DAT__SZLOC); 
@@ -2147,6 +2197,9 @@ dat_drep(loc, format, order, status)
   char * order = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
+   char str2[FCHAR];
  CODE:
   format = str1;
   order = str2;
@@ -2176,6 +2229,8 @@ dat_ermsg(status, length, msg)
   ndfint &length = NO_INIT
   char * msg = NO_INIT
  PROTOTYPE: $$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   msg = str1;
   dat_ermsg_(&status, &length, msg, sizeof(str1));
@@ -2191,6 +2246,8 @@ dat_find(inloc, name, outloc, status)
   locator * outloc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   outloc = floc;
   dat_find_(inloc, name, outloc, &status, DAT__SZLOC, strlen(name), DAT__SZLOC);
@@ -2204,6 +2261,8 @@ dat_get0c(loc, value, status)
   char * value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   value = str1;
   dat_get0c_(loc, value, &status, DAT__SZLOC, sizeof(str1));
@@ -2436,6 +2495,8 @@ dat_index(loc, index, nloc, status)
   locator * nloc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   nloc = floc;
   dat_index_(loc, &index, nloc, &status, DAT__SZLOC, DAT__SZLOC);
@@ -2600,6 +2661,8 @@ dat_name(loc, name, status)
   char * name = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   name = str1;
   dat_name_(loc, name, &status, DAT__SZLOC, sizeof(str1));
@@ -2772,6 +2835,8 @@ dat_paren(loc1, loc2, status)
   locator * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
   dat_paren_(loc1, loc2, &status, DAT__SZLOC, DAT__SZLOC);
@@ -3030,6 +3095,8 @@ dat_ref(loc, ref, lref, status)
   ndfint &lref = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   ref = str1;
   dat_ref_(loc, ref, &lref, &status, DAT__SZLOC, sizeof(str1));
@@ -3123,6 +3190,8 @@ dat_slice(loc1, ndim, diml, dimu, loc2, status)
   locator * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@\@$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
   dat_slice_(loc1, &ndim, diml, dimu, loc2, &status, DAT__SZLOC, DAT__SZLOC);
@@ -3162,6 +3231,8 @@ dat_temp(type, ndim, dim, loc, status)
   locator * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc = floc;
   dat_temp_(type, &ndim, dim, loc, &status, strlen(type), DAT__SZLOC);
@@ -3188,6 +3259,8 @@ dat_type(loc, type, status)
   char * type = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   type = str1;
   dat_type_(loc, type, &status, DAT__SZLOC, sizeof(str1));
@@ -3225,6 +3298,8 @@ dat_vec(loc1, loc2, status)
   locator * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc2 = floc;
   dat_vec_(loc1, loc2, &status, DAT__SZLOC, DAT__SZLOC);
@@ -3256,6 +3331,8 @@ cmp_get0c(loc, name, value, status)
   char * value = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   value = str1;
   cmp_get0c_(loc, name, value, &status, DAT__SZLOC, strlen(name), sizeof(str1));
@@ -3802,6 +3879,8 @@ cmp_type(loc, name, type, status)
   char * type = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   type = str1;
   cmp_type_(loc, name, type, &status, DAT__SZLOC, strlen(name), sizeof(str1));
@@ -3882,6 +3961,8 @@ hds_group(loc, group, status)
   char * group = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   group = str1;
   hds_group_(loc, group, &status, DAT__SZLOC, sizeof(str1));
@@ -3933,7 +4014,9 @@ hds_new(file, name, type, ndim, dim, loc, status)
   ndfint * dim
   locator * loc = NO_INIT
   ndfint &status
-  PROTOTYPE: $$$$\@$$
+ PROTOTYPE: $$$$\@$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc = floc;
   hds_new_(file, name, type, &ndim, dim, loc, &status, strlen(file), strlen(name), strlen(type), DAT__SZLOC);
@@ -3949,6 +4032,8 @@ hds_open(file, mode, loc, status)
   locator * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc = floc;
   hds_open_(file, mode, loc, &status, strlen(file), strlen(mode), DAT__SZLOC);
@@ -3993,6 +4078,9 @@ hds_trace(loc, nlev, path, file, status)
   char * file = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$
+ PREINIT:
+   char str1[FCHAR];
+   char str2[FCHAR];
  CODE:
   path = str1;
   file = str2;
@@ -4024,6 +4112,8 @@ hds_wild(fspec, mode, iwld, loc, status)
   locator * loc = NO_INIT
   ndfint &status
  PROTOTYPE: $$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
  CODE:
   loc = floc;
   hds_wild_(fspec, mode, &iwld, loc, &status, strlen(fspec), strlen(mode), DAT__SZLOC);
@@ -4129,260 +4219,341 @@ ary_unmap(iary, status)
 ############  ERR #############
 
 void
-msg_bell(status)
+msgBell(status)
   ndfint &status
+ ALIAS:
+  NDF::msg_bell= 2
  PROTOTYPE: $
  CODE:
-  msg_bell_(&status);
+  msgBell(&status);
  OUTPUT:
   status
 
 void
-msg_blank(status)
+msgBlank(status)
   ndfint &status
+ ALIAS:
+  NDF::msg_blank = 2
  PROTOTYPE: $
  CODE:
-  msg_blank_(&status);
+  msgBlank(&status);
 OUTPUT:
   status
 
 void
-msg_fmtc(token, format, value)
+msgFmtc(token, format, value)
   char * token
   char * format
   char * value
+ ALIAS:
+  NDF::msg_fmtc = 2
  PROTOTYPE: $$$
  CODE:
-  msg_fmtc_(token, format, value, strlen(token), strlen(format), strlen(value));
+  msgFmtc(token, format, value);
 
 void
-msg_fmtd(token, format, value)
+msgFmtd(token, format, value)
   char * token
   char * format
-  ndfdouble  &value
+  ndfdouble  value
+ ALIAS:
+  NDF::msg_fmtd = 2
  PROTOTYPE: $$$
  CODE:
-  msg_fmtd_(token, format, &value, strlen(token), strlen(format));
+  msgFmtd(token, format, value);
 
 void
-msg_fmti(token, format, value)
+msgFmti(token, format, value)
   char * token
   char * format
-  ndfint  &value
+  ndfint  value
+ ALIAS:
+  NDF::msg_fmti = 2
  PROTOTYPE: $$$
  CODE:
-  msg_fmti_(token, format, &value, strlen(token), strlen(format));
+  msgFmti(token, format, value);
 
 void
-msg_fmtl(token, format, value)
+msgFmtl(token, format, value)
   char * token
   char * format
-  Logical  &value
+  Logical  value
+ ALIAS:
+  NDF::msg_fmtl = 2
  PROTOTYPE: $$$
  CODE:
-  msg_fmtl_(token, format, &value, strlen(token), strlen(format));
+  msgFmtl(token, format, value);
 
 void
-msg_fmtr(token, format, value)
+msgFmtr(token, format, value)
   char * token
   char * format
-  ndffloat  &value
+  ndffloat  value
+ ALIAS:
+  NDF::msg_fmtr = 2
  PROTOTYPE: $$$
  CODE:
-  msg_fmtr_(token, format, &value, strlen(token), strlen(format));
+  msgFmtr(token, format, value);
 
 void
-msg_iflev(filter)
+msgIflev(filter)
   ndfint &filter = NO_INIT
+ ALIAS:
+  NDF::msg_iflev = 2
  PROTOTYPE: $
  CODE:
-  msg_iflev_(&filter);
+  msgIflev(&filter);
  OUTPUT:
   filter
 
 void
-msg_ifset(filter, status)
+msgIfset(filter, status)
   ndfint &filter
   ndfint &status
+ ALIAS:
+  NDF::msg_ifset = 2
  PROTOTYPE: $$
  CODE:
-  msg_ifset_(&filter, &status);
+  msgIfset(filter, &status);
 
 void
-msg_load(param, text, opstr, oplen, status)
+msgLoad(param, text, opstr, oplen, status)
   char * param
   char * text
   char * opstr = NO_INIT
   ndfint &oplen   = NO_INIT
   ndfint &status
+ ALIAS:
+  NDF::msg_load = 2
  PROTOTYPE: $$$$$
+ PREINIT:
+   char str1[FCHAR];
  CODE:
   opstr = str1;
-  msg_load_(param, text, opstr, &oplen, &status, strlen(param), strlen(text), sizeof(str1));
-  stringf77toC(opstr, sizeof(str1));
+  msgLoad(param, text, opstr, FCHAR, &oplen, &status);
  OUTPUT:
   opstr
   oplen
   status
 
 void
-msg_out(param, text, status)
+msgOut(param, text, status)
   char * param
   char * text
   ndfint &status
+ ALIAS:
+  NDF::msg_out = 2
  PROTOTYPE: $$$
  CODE:
-  msg_out_(param, text, &status, strlen(param), strlen(text));
+  msgOut(param, text, &status);
  OUTPUT:
   status
 
 void
-msg_outif(prior, param, text, status)
-  ndfint &prior
+msgOutif(prior, param, text, status)
+  ndfint prior
   char * param
   char * text
   ndfint &status
+ ALIAS:
+  NDF::msg_outif = 2
  PROTOTYPE: $$$$
  CODE:
-  msg_outif_(&prior, param, text, &status, strlen(param), strlen(text));
+  msgOutif(prior, param, text, &status);
  OUTPUT:
   status
 
 void
-msg_renew()
+msgRenew()
  PROTOTYPE:
+ ALIAS:
+  NDF::msg_renew = 2
  CODE:
-  msg_renew_();
+  msgRenew();
 
 void
-msg_setc(token, value)
+msgSetc(token, value)
   char * token
   char * value
+ ALIAS:
+  NDF::msg_setc = 2
  PROTOTYPE: $$
  CODE:
-  msg_setc_(token, value, strlen(token), strlen(value));
+  msgSetc(token, value);
 
 void
-msg_setd(token, value)
+msgSetd(token, value)
   char * token
-  ndfdouble &value
+  ndfdouble value
+ ALIAS:
+  NDF::msg_setd = 2
  PROTOTYPE: $$
  CODE:
-  msg_setd_(token, &value, strlen(token));
+  msgSetd(token, value);
 
 void
-msg_seti(token, value)
+msgSeti(token, value)
   char * token
-  ndfint &value
+  ndfint value
+ ALIAS:
+  NDF::msg_seti = 2
  PROTOTYPE: $$
  CODE:
-  msg_seti_(token, &value, strlen(token));
+  msgSeti(token, value);
 
 void
-msg_setl(token, value)
+msgSetl(token, value)
   char * token
-  Logical &value
+  Logical value
+ ALIAS:
+  NDF::msg_setl = 2
  PROTOTYPE: $$
  CODE:
-  msg_setl_(token, &value, strlen(token));
+  msgSetl(token, value);
 
 void
-msg_setr(token, value)
+msgSetr(token, value)
   char * token
-  ndffloat &value
+  ndffloat value
+ ALIAS:
+  NDF::msg_setr = 2
  PROTOTYPE: $$
  CODE:
-  msg_setr_(token, &value, strlen(token));
+  msgSetr(token, value);
 
 
+void
+msgTune(param, value, status)
+  char * param
+  ndfint value
+  ndfint &status
+ ALIAS:
+  NDF::msg_tune = 2
+ PROTOTYPE: $$$
+ CODE:
+  msgTune(param, value, &status);
+ OUTPUT:
+  status
 
 
 ############  ERR #############
 
 void
-err_annul(status)
+errAnnul(status)
   ndfint &status = NO_INIT
+ ALIAS:
+  NDF::err_annul = 2
  PROTOTYPE: $
  CODE:
-  err_annul_(&status);
+  errAnnul(&status);
  OUTPUT:
   status
 
 void
-err_begin(status)
+errBegin(status)
   ndfint &status
+ ALIAS:
+  NDF::err_begin = 2
  PROTOTYPE: $
  CODE:
-  err_begin_(&status);
+  errBegin(&status);
  OUTPUT:
   status
 
+# Defined in the ADAM interface only
+#void
+#errClear(status)
+#  ndfint &status = NO_INIT
+# ALIAS:
+#  NDF::err_clear = 2
+# PROTOTYPE: $
+# CODE:
+#  errClear(&status);
+# OUTPUT:
+#  status
+
 void
-err_end(status)
+errEnd(status)
   ndfint &status = NO_INIT
+ ALIAS:
+  NDF::err_end = 2
  PROTOTYPE: $
  CODE:
-  err_end_(&status);
+  errEnd(&status);
  OUTPUT:
   status
 
 void
-err_facer(token, status)
+errFacer(token, status)
   char * token
   ndfint &status
+ ALIAS:
+  NDF::err_facer = 2
  PROTOTYPE: $$
  CODE:
-  err_facer_(token, &status, strlen(token));
+  errFacer(token, &status );
 
 void
-err_fioer(token, iostat)
+errFioer(token, iostat)
   char * token
-  ndfint &iostat
+  ndfint iostat
+ ALIAS:
+  NDF::err_fioer = 2 
  PROTOTYPE: $$
  CODE:
-  err_fioer_(token, &iostat, strlen(token));
+  errFioer(token, iostat);
 
 void
-err_flbel(status)
+errFlbel(status)
   ndfint &status = NO_INIT
+ ALIAS:
+  NDF::err_flbel = 2 
  PROTOTYPE: $
  CODE:
-  err_flbel_(&status);
+  errFlbel(&status);
  OUTPUT:
   status
 
 void
-err_flush(status)
+errFlush(status)
   ndfint &status = NO_INIT
+ ALIAS:
+  NDF::err_flush = 2 
  PROTOTYPE: $
  CODE:
-  err_flush_(&status);
+  errFlush(&status);
  OUTPUT:
   status
 
 void
-err_level(level)
+errLevel(level)
   ndfint &level = NO_INIT
+ ALIAS:
+  NDF::err_level = 2 
  PROTOTYPE: $
  CODE:
-  err_level_(&level);
+  errLevel(&level);
  OUTPUT:
   level
 
 void
-err_load(param, parlen, opstr, oplen, status)
+errLoad(param, parlen, opstr, oplen, status)
   char * param = NO_INIT
   ndfint  &parlen = NO_INIT
   char * opstr = NO_INIT
   ndfint &oplen   = NO_INIT
   ndfint &status  = NO_INIT
+ ALIAS:
+  NDF::err_load = 2 
  PROTOTYPE: $$$$$
+ PREINIT:
+   char str1[FCHAR];
+   char str2[FCHAR];
  CODE:
   param = str1;
   opstr = str2;
-  err_load_(param, &parlen, opstr, &oplen, sizeof(str1), sizeof(str2));
-  stringf77toC(param, sizeof(str1));
-  stringf77toC(opstr, sizeof(str2));
+errLoad(param, FCHAR, &parlen, opstr, FCHAR, &oplen,
+          &status);
  OUTPUT:
   param
   parlen
@@ -4391,46 +4562,92 @@ err_load(param, parlen, opstr, oplen, status)
   status
 
 void
-err_mark()
+errMark()
+ ALIAS:
+  NDF::err_mark = 2
  PROTOTYPE:
  CODE:
-  err_mark_();
-
+  errMark();
 
 void
-err_rep(param, text, status)
+errRep(param, text, status)
   char * param 
   char * text
   ndfint &status
+ ALIAS:
+  NDF::err_rep = 2
  PROTOTYPE: $$$
  CODE:
-  err_rep_(param, text, &status, strlen(param), strlen(text));
+  errRep(param, text, &status);
  OUTPUT:
   status
 
 
 void
-err_rlse()
+errRlse()
  PROTOTYPE:
+ ALIAS:
+  NDF::err_rlse = 2
  CODE:
-  err_rlse_();
+  errRlse();
+
+# Defined in the ADAM interface only
+#void
+#errStart()
+# PROTOTYPE:
+# ALIAS:
+#  NDF::err_start = 2
+# CODE:
+#  errStart();
 
 void
-err_stat(status)
+errStat(status)
   ndfint &status = NO_INIT
+ ALIAS:
+  NDF::err_stat = 2
  PROTOTYPE: $
  CODE:
-  err_stat_(&status);
+  errStat(&status);
  OUTPUT:
   status
 
+# Defined in the ADAM interface only
+#void
+#errStop( status )
+#  ndfint &status
+# ALIAS:
+#  NDF::err_stop = 2
+# PROTOTYPE: $
+# CODE:
+#  errStop(&status);
+# OUTPUT:
+#  status
+
+
+
 void
-err_syser(token, status)
+errSyser(token, status)
   char * token
-  ndfint &status
+  ndfint status
+ ALIAS:
+  NDF::err_syser = 2
  PROTOTYPE: $$
  CODE:
-  err_syser_(token, &status, strlen(token));
+  errSyser(token, status );
+
+void
+errTune(param, value, status)
+  char * param
+  ndfint value
+  ndfint &status
+ ALIAS:
+  NDF::err_tune = 2
+ PROTOTYPE: $$$
+ CODE:
+  errTune(param, value, &status);
+ OUTPUT:
+  status
+
 
 
 ########################################
