@@ -96,15 +96,18 @@
 *            .OBS.SECZ       ->   .MORE.FIGARO.SECZ
 *            .OBS.TIME       ->   .MORE.FIGARO.TIME
 *            .OBS.xxxx       ->   .MORE.FIGARO.OBS.xxxx
-*
-*            .FITS.xxxx      ->   .MORE.FITS.xxxx  (into value part of
-*                                                   the string)
-*            .COMMENTS.xxxx  ->   .MORE.FITS.xxxx  (into comment part of
-*                                                   the string)
-*            .FITS.xxxx.DATA ->   .MORE.FITS.xxxx  (into value part of
-*                                                   the string)
-*            .FITS.xxxx.DESCRIPTION -> .MORE.FITS.xxxx (into comment
-*                                                   part of the string)
+
+*            .FITS.xxxx      ->   .MORE.FITS(n)  (into value part of
+*                                                 the string)
+*            .COMMENTS.xxxx  ->   .MORE.FITS(n)  (into comment part of
+*                                                 the string)
+*            .FITS.xxxx.DATA ->   .MORE.FITS(n)  (into value part of
+*                                                 the string)
+*            .FITS.xxxx.DESCRIPTION -> .MORE.FITS(n) (into comment part
+*                                                 of the string)
+*            .FITS.xxxx.yyyy ->   .MORE.FITS(n)  (into blank-keyword
+*                                                 comment containing
+*                                                 yyyy=value)
 
 *            .MORE.xxxx      ->   .MORE.xxxx
 
@@ -122,6 +125,12 @@
 *            .X.ERRORS       ->   .AXIS(1).MORE.FIGARO.VARIANCE (after
 *                                 processing)
 *            .X.WIDTH        ->   .AXIS(1).MORE.FIGARO.WIDTH
+*
+*     -  In addition to creating a blank-keyword NDF FITS-extension
+*     header for each component of a non-standard DST FITS structure
+*     (.FITS.xxxx.yyyy where yyyy is not DATA or DESCRIPTION), this set
+*     of related headers are bracketed by blank lines and a comment
+*     containing the name of the structure (i.e. xxxx).
 
 *  Bad-pixel handling:
 *     The QUALITY array is only copied if the bad-pixel flag
@@ -197,6 +206,9 @@
 *        Allowed for scalar width in DST.  Fixed bug which prevented a
 *        missing axis being created whenever there was no FITS extension
 *        to write.
+*     1996 September 21 (MJC):
+*        ING-style hierarchical keywords may be written when the DST's
+*        FITS structure contains non-standard structures.
 *     {enter_further_changes_here}
 
 *  Bugs:

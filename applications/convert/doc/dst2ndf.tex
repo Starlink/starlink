@@ -85,7 +85,7 @@
       \end{center}
 
       \begin{center}
-      \begin{tabular}{|lcl|p{43mm}|}
+      \begin{tabular}{|lcl|p{43.7mm}|}
       \hline 
       \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
       \multicolumn{1}{|c|}{Comments} \\ \hline
@@ -106,12 +106,14 @@
       & & & \\
       .FITS.xxxx& $\Rightarrow$ & .MORE.FITS.xxxx & into value part of
          the string \\
-      .COMMENTS.xxxx  & $\Rightarrow$ & .MORE.FITS.xxxx & into comment part of
+      .COMMENTS.xxxx  & $\Rightarrow$ & .MORE.FITS($n$) & into comment part of
          the string \\
-      .FITS.xxxx.DATA & $\Rightarrow$ & .MORE.FITS.xxxx & into value part of
+      .FITS.xxxx.DATA & $\Rightarrow$ & .MORE.FITS($n$) & into value part of
          the string \\
-      .FITS.xxxx.DESCRIPTION & $\Rightarrow$ & .MORE.FITS.xxxx & into comment
+      .FITS.xxxx.DESCRIPTION & $\Rightarrow$ & .MORE.FITS($n$) & into comment
          part of the string \\
+      .FITS.xxxx.yyyy & $\Rightarrow$ & .MORE.FITS($n$) & into blank-keyword
+         comment containing {\tt yyyy=value} \\
       & & & \\
       .MORE.xxxx& $\Rightarrow$ & .MORE.xxxx & \\
       & & & \\
@@ -136,6 +138,12 @@
       .X.WIDTH  & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.WIDTH & \\ \hline
       \end{tabular}
       \end{center}
+
+      In addition to creating a blank-keyword NDF FITS-extension
+      header for each component of a non-standard DST FITS structure
+      (.FITS.xxxx.yyyy where yyyy is not DATA or DESCRIPTION), this set
+      of related headers are bracketed by blank lines and a comment
+      containing the name of the structure ({\it i.e.}\ xxxx).
    }
    \sstdiytopic{
       Related Applications
