@@ -1,6 +1,6 @@
       SUBROUTINE SST_NWEXT( EXT, FNAME, STATUS )
 *+
-* Name:
+*  Name:
 *    SST_NWEXT
 
 *  Purpose:
@@ -33,11 +33,14 @@
       
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-DEC-1994 (PDRAPER):
 *        Original version.
+*     28-AUG-2004 (TIMJ):
+*        Force initialisation of STRLEN
 *     {enter_changes_here}
 
 *  Bugs:
@@ -69,6 +72,7 @@
       LOGICAL ALLBLK             ! If all characters so far are blank
       
 *.
+      STRLEN = 0
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
