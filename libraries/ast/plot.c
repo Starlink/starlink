@@ -13647,9 +13647,9 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
          alpha = 1.0;
          beta = 1.0;
          ux = 0.0;
-         uy = 0.0
+         uy = 0.0;
          vx = 0.0;
-         vy = 0.0
+         vy = 0.0;
 
 /*
       GAxScale( this, &alpha, &beta, method, class );
