@@ -4607,8 +4607,10 @@ sub handle_minor_options
 
 sub handle_starlink
 {
+    # Get definition of STAR_MANIFEST_DIR.  If this is non-zero, then
+    # this variable was defined, and we do want to include install-manifest
+    # in the generated Makefile.in.
     my $manifestdir = var ('STAR_MANIFEST_DIR');
-    my $want_manifest = defined($manifestdir);
     my $havelatex =
       defined($starlink_seen_features{latexdocs})
         && $starlink_seen_features{latexdocs};
@@ -4666,7 +4668,7 @@ sub handle_starlink
 
     $output_rules .= &file_contents ('starlink',
                                      new Automake::Location,
-                                     INSTALLMANIFEST => $want_manifest,
+                                     INSTALLMANIFEST => $manifestdir,
                                      LATEXDOCS => $havelatex,
                                      COMPIFL => $want_compifl
                                     );
