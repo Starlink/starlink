@@ -40,7 +40,7 @@ use NDF;
 sub extract_objects ($$$$);
 sub ndf_info ($$$$);
 sub get_catalogue ($\%$$);
-sub match_positions ($$$$$);
+sub match_positions ($\@\@$$);
 sub match_positions_findoff ($$$$$);
 sub generate_astrom ($);
 sub run_astrom ($$);
@@ -86,21 +86,26 @@ my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
 #
 # Return a (reference to) hash containing: {filename}, filename of the
 # resulting catalogue; {numobj}, the number of objects matched;
-# {poserr}, std.dev. of the positions, in pixels; and {objsize},
-# the size scale of the objects, in pixels.
+# {poserr}, std.dev. of the positions, in pixels; {objsize}, the size
+# scale of the objects, in pixels; and {catalogue} an array containing
+# the catalogue.
 #
-# The file which is returned should have the format
+# The catalogue is (a reference to) an array containing (references
+# to) hashes with fields {id}, {x}, {y}, {flux}, {mag} and {area}.
+# The `magnitude' column isn't actually magnitude (which Extractor
+# can't return); however, we wish to be able to use the `match'
+# plug-in easily, which needs a flux column which is ordered like
+# magnitudes: 1/flux would do, but 25-log10(flux) is more
+# `magnitudish', so probably safer in the long term.
 #
-#    int-id, X, Y, int-id, flux, `magnitude'.
-#
-# This is general, but specifically it's in a format which is
-# acceptable to FINDOFF (though that's not the only application
-# which can be used to process it).  The `magnitude' column isn't
-# actually magnitude (which Extractor can't return); however, we
-# wish to be able to use the `match' plug-in easily, which needs a
-# flux column which is ordered like magnitudes: 1/flux would do,
-# but 25-log10(flux) is more `magnitudish', so probably safer in
-# the long term.
+# This way of storing the catalogues may appear unwieldy, but (a) it
+# avoids having to worry about (and remember!) the different by-column
+# file formats required by the various components used below, and deal
+# with the fact that different catalogues have different content (for
+# example, (x,y) rather than (ra,dec)); and (b) it makes it easier to use
+# alternative plugin matching routines.  It would be possible to pass
+# all this information around in files (earlier versions of this code
+# did this), but way too messy and confusing.
 #
 # On error, return undef.
 sub extract_objects ($$$$) {
@@ -112,10 +117,61 @@ sub extract_objects ($$$$) {
 
     my %rethash = ();
 
-    my $extractor = $helpers->{extractor};
-    my $catname = "$tempdir/ccdcat.munged";
+    if (defined($opts->{fromdump})) {
+	# Retrieve CCD catalogue information from a dump deposited by
+	# an earlier invocation of this routine.  This is purely for
+	# debugging or unit-testing (the extraction is one of the
+	# slower parts of the run).
 
-    push (@tempfiles, $catname);
+	wmessage ('info', sprintf ("Using pre-existing CCD catalogue %s",
+				   $opts->{fromdump}));
+	print STDERR "Reusing ", $opts->{fromdump}, "...\n" if $verbose;
+
+	# The specified file is a re-used output of this subroutine.
+	# It starts with a log of the keywords which are to be
+	# returned in the hash.  Extract these, fill the hash, and
+	# return. 
+	my $openok = open (OLDCAT, '<'.$opts->{fromdump});
+	my $line;
+	my @l;
+	my %anonhash = ();
+	if ($openok) {
+	    while (defined($line = <OLDCAT>)) {
+		last if ($line !~ /^\#/);
+		if ($line =~ /^\#\#\s*(\S*)\s*(\S*)/) {
+		    $anonhash{$1} = $2;
+		}
+	    }
+	    # $line now has first non-comment line in it
+	    my @catarr;
+	    while (defined($line)) {
+		@l = split (' ', $line);
+		my %t;
+		$t{id}   = $l[0];
+		$t{x}    = $l[1];
+		$t{y}    = $l[2];
+		$t{flux} = $l[3];
+		$t{mag}  = $l[4];
+		$t{area} = $l[5];
+		push (@catarr, \%t);
+
+		$line = <OLDCAT>; # next line
+	    }
+	    close (OLDCAT);
+	    $anonhash{catalogue} = \@catarr;
+
+	    # return this hash
+	    return \%anonhash;	# JUMP OUT
+	} else {
+	    wmessage ('warning',
+		      sprintf ("Ooops, can't open %s.  Regenerating...",
+			       $opts->{fromdump}));
+	    printf STDERR ("Ooops, can't open %s.  Regenerating...\n",
+			   $opts->{fromdump});
+	}
+    }
+
+    my $extractor = $helpers->{extractor};
 
     # We need to tell SExtractor where to put the catalogue output.
     # The custom configuration file we use sets CATALOG_NAME to have
@@ -132,9 +188,9 @@ sub extract_objects ($$$$) {
     my $status = $extractor->obeyw ("extractor", $parlist);
 
     $status == &Starlink::ADAM::DTASK__ACTCOMPLETE
-      || confess "Error running extractor";
+      || wmessage ('fatal', "Error running extractor");
 
-    # Sort these by column 8, FLUX_MAX, and output at most $maxobj objects.
+    # Sort these by column 8 (FLUX_MAX), and output at most $maxobj objects.
     open (CAT, $tcat) || return undef;
     my %cathash = ( );
     my $line;
@@ -176,11 +232,6 @@ sub extract_objects ($$$$) {
 	# be unique, and in any case hash keys are supposed to be strings.
 	my $catkey = sprintf ("%015.3fi%04d", $l[$FLUXcol], $nobj);
 	$cathash{$catkey} = \@l;
-#	$cathash{$l[$FLUXcol]} =
-#	  sprintf ("%5d %12.3f %12.3f %5d %12.1f %12.5g",
-#		   $l[$NUMBERcol], $l[$Xcol], $l[$Ycol],
-#		   $l[$NUMBERcol], $l[$FLUXcol],
-#		   25.0-log($l[$FLUXcol])/2.30);
 	$nobj++;
 	# Calculate some statistics for the detected objects.  We
 	# don't have to worry too much about the details here -- the
@@ -202,14 +253,8 @@ sub extract_objects ($$$$) {
     while (defined($line = <CAT>));
     close (CAT);
 
-    open (NEWCAT, ">$catname") || return undef;
-    print NEWCAT "# Extractor catalogue, munged by $0\n";
-    print NEWCAT "# Input NDF: $ndfname\n";
-    print NEWCAT "# Extractor temp output: $tcat\n";
-
     # Sort in reverse alphabetic order (ie, descending order of flux)
     my @sortcat = sort {$b cmp $a} keys(%cathash);
-    #my @sortcat = sort {$b <=> $a} keys(%cathash);
 
     my $cutoffarea = 0;		# zero: no cutoff by default
     my $cutoffellip = 1000;	# large number: no cutoff by default
@@ -232,38 +277,65 @@ sub extract_objects ($$$$) {
 	# pixels in area, whereas the largest objects are thousands.
 	$cutoffarea = 100;
 	$cutoffellip = 3.5;
-	printf NEWCAT ("# Filtered at area %f, ellipticity %f\n",
-		       $cutoffarea, $cutoffellip);
     }
 
-    $rethash{filename} = $catname;
     $rethash{numobj} = $nobj;
     $rethash{poserr} = $objposerr/$nobj;
     $rethash{objsize} = $objrad/$nobj;
 
-    print NEWCAT "# Columns are id, x, y, id, flux, pseudo-mag\n";
-    foreach my $k (keys (%rethash)) {
-	print NEWCAT "## $k ", $rethash{$k}, "\n";
-    }
+
+    # Construct an array holding references to temporary hashes each
+    # containing one `row' of the catalogue of extracted objects.
+    my @catarr;
     while ($maxobj > 0 && $#sortcat >= 0) {
 	my $l = $cathash{$sortcat[0]};
-	if ($l->[$AREAcol] >= $cutoffarea
-	    && ($l->[$Acol]/$l->[$Bcol] < $cutoffellip)) {
-	    printf NEWCAT ("%5d %12.3f %12.3f %5d %12.1f %12.5g %12.5g\n",
-			   $l->[$NUMBERcol], $l->[$Xcol], $l->[$Ycol],
-			   $l->[$NUMBERcol], $l->[$FLUXcol],
-			   25.0-log($l->[$FLUXcol])/2.30,
-			   $l->[$AREAcol]);
+ 	if ($l->[$AREAcol] >= $cutoffarea
+ 	    && ($l->[$Acol]/$l->[$Bcol] < $cutoffellip)) {
+
+	    my %t;
+	    $t{id} = $l->[$NUMBERcol];
+	    $t{x} = $l->[$Xcol];
+	    $t{y} = $l->[$Ycol];
+	    $t{flux} = $l->[$FLUXcol];
+	    $t{mag} = 25.0-log($l->[$FLUXcol])/2.30;
+	    $t{area} = $l->[$AREAcol];
+
 	    $maxobj--;
-	} else {
-	    printf NEWCAT ("# Deleted object %d, area %f (min %f), ellipticity %f (max %f)\n",
-			   $l->[$NUMBERcol],
-			   $l->[$AREAcol], $cutoffarea,
-			   $l->[$Acol]/$l->[$Bcol], $cutoffellip);
-	}
-	shift (@sortcat);
+	    push (@catarr, \%t);
+ 	} else {
+ 	    printf STDERR ("extract_objects: deleted object %d, area %f (min %f), ellipticity %f (max %f)\n",
+ 			   $l->[$NUMBERcol],
+ 			   $l->[$AREAcol], $cutoffarea,
+ 			   $l->[$Acol]/$l->[$Bcol], $cutoffellip)
+	      if $verbose;
+ 	}
+ 	shift (@sortcat);
     }
-    close (NEWCAT);
+
+    if (defined($opts->{todump})) {
+	# Dump the catalogue to the sppecified file, for later reuse
+	# by {fromdump}.
+	open (DUMPCAT, '>'.$opts->{todump}) || return undef;
+	print DUMPCAT "# Extractor catalogue, munged by $0\n";
+	print DUMPCAT "# Input NDF: $ndfname\n";
+	print DUMPCAT "# Extractor temp output: $tcat\n";
+	print DUMPCAT "# Columns are id, x, y, flux, pseudo-mag, area\n";
+	foreach my $k (keys (%rethash)) {
+	    print DUMPCAT "## $k ", $rethash{$k}, "\n";
+	}
+	foreach my $row (@catarr) {
+	    printf DUMPCAT ("%5d %12.3f %12.3f %12.1f %12.5g %12.5g\n",
+			    $row->{id},
+			    $row->{x},
+			    $row->{y},
+			    $row->{flux},
+			    $row->{mag},
+			    $row->{area});
+	}
+	close (DUMPCAT);
+    }
+    
+    $rethash{catalogue} = \@catarr;
 
     return \%rethash;
 }
@@ -687,12 +759,10 @@ sub get_dates ($$$) {
 
 
 # Invoke the moggy server to obtain a catalogue corresponding to the
-# proffered bounds of the NDF.  Return the name of a file which is
-# suitable for input into FINDOFF. 
+# proffered bounds of the NDF.
 #
-# The generated file has the columns
-#
-#     int-id, X, Y, ra/deg, dec/deg, int-id, mag
+# Return a reference to an array of (references to)
+# hashes, containing {id}, {x}, {y}, {ra}, {dec} and possibly {mag}.
 #    
 sub get_catalogue ($\%$$) {
     my ($cat, $NDFinforef, $maxobj, $tempdir) = @_;
@@ -759,36 +829,39 @@ sub get_catalogue ($\%$$) {
     my $deccol = $cat->resulthascolumn('dec');
     my $magcol = $cat->resulthascolumn('/mag/');
     ($xcol>=0 && $ycol>=0 && $racol>=0 && $deccol>=0)
-      || confess "Can't find expected column ($xcol,$ycol,$racol,$deccol) in catalogue results\n";
-    open (PIXCAT, ">$mytempfile")
-      || confess "Can't open PIXCAT $mytempfile to write\n";
-    push (@tempfiles, $mytempfile);
-    print PIXCAT "# Catalogue generated from autoastrom.pl\n";
-    my $i;
-    for ($i=0; $i<$nrows; $i++) {
-	printf PIXCAT "%5d %12.5f %12.5f %12.5f %12.5f %5d %12.5f\n",
-	    $i,
-	    $resref->[$i]->[$xcol], $resref->[$i]->[$ycol],
-	    $resref->[$i]->[$racol], $resref->[$i]->[$deccol],
-	    $i, ($magcol >= 0 ? $resref->[$i]->[$magcol] : 0);
-    }
-    close PIXCAT;
+      || wmessage ('fatal',
+		   "Can't find expected column ($xcol,$ycol,$racol,$deccol) in catalogue results\n");
 
-    return $mytempfile;
+    # Return an array of pointers to hashes
+    my @ret;
+    my $i = 0;
+    foreach my $row (@$resref) {
+	my %t = ();
+	$t{id} = $i++;
+	$t{x}   = $row->[$xcol];
+	$t{y}   = $row->[$ycol];
+	$t{ra}  = $row->[$racol]; # RA and Dec in decimal degrees
+	$t{dec} = $row->[$deccol];
+	$t{mag} = $row->[$magcol] if $magcol >= 0;
+	push (@ret, \%t);
+    }
+    return \@ret;
 }
 
 
 # Invoke one of several routines to match the positions of the objects
-# in the two input catalogues.
+# in the two input catalogues.  The catalogues are arrays of hashes
+# with fields {id}, {x} and {y} at least.
 #
-# Return an array containing the two files which are the match result
-# catalogues (in the same form as the input catalogues), in the same order
-# as the corresponding input files, plus a flag (1=ok, 0=error)
-# indicating whether the match succeeded or not.
-sub match_positions ($$$$$) {
+# Return an array containing the two catalogues, in the same order as
+# the corresponding input files, plus a flag (1=ok, 0=error)
+# indicating whether the match succeeded or not.  The returned
+# catalogues much have the same fields as the corresponding input
+# catalogues.
+sub match_positions ($\@\@$$) {
     my $helpers = shift;	# Reference to hash of helper programs.
-    my $cat1 = shift;		# First position list
-    my $cat2 = shift;		# Second position list
+    my $cat1 = shift;		# First position catalogue
+    my $cat2 = shift;		# Second position catalogue
     my $matchopts = shift;	# Reference to hash of options
                                 # (may include {poserr}, {objsize},
                                 # {area}).  Crucially may also contain
@@ -802,7 +875,7 @@ sub match_positions ($$$$$) {
 		       : 'findoff');
     my $handlersub = $helpers->{'plugin-match-'.$matchmethod};
     defined($handlersub)
-      || wmessage ('error', "Plugin plugin-match-$matchmethod unknown");
+      || wmessage ('fatal', "Plugin plugin-match-$matchmethod unknown");
 
     return &$handlersub ($helpers, $cat1, $cat2, $matchopts, $tempfn);
 }
@@ -810,11 +883,9 @@ sub match_positions ($$$$$) {
 
 # Invoke FINDOFF to match the positions of the objects in the two
 # input catalogues.  $tempfn is a filename prefix, to make temporary
-# filenames out of, not a directory.
+# filenames out of, not a directory.  This is invoked from
+# match_positions(), and has the same interface.
 #
-# Return an array containing the two files containing the FINDOFF
-# results, in the same order as the corresponding input files, plus a
-# flag (1=ok, 0=error) indicating whether the match succeeded or not.
 sub match_positions_findoff ($$$$$) {
     my $helpers = shift;	# References to hash of helper programs.
     my $cat1 = shift;		# First position list
@@ -825,38 +896,71 @@ sub match_positions_findoff ($$$$$) {
 
 
     my $ccdpack = $helpers->{ccdpack};
+    my $myname = 'match_positions_findoff';
+    # Filenames used to communicate the contents of input arrays to
+    # FINDOFF, and read back the results.
     my $cat1out = "$tempfn-cat1.out";
     my $cat2out = "$tempfn-cat2.out";
-    my $myname = 'match_positions_findoff';
-    if ($noregenerate && -e $cat1out && -e $cat2out) {
-	printf STDERR ("%s: Reusing %s and %s...\n",
-		       $myname, $cat1out, $cat2out)
-	  if $verbose;
-	return ($cat1out, $cat2out);
-    }
+    my $cat1in = "$tempfn-findoff-in-1";
+    my $cat2in = "$tempfn-findoff-in-2";
 
-    # Check that the input files exist
-    (-r $cat1 && -r $cat2)
-      || confess "Can't find FINDOFF input files $cat1 and $cat2\n";
+    # Create two input files for FINDOFF.  FINDOFF requires that the
+    # first three columns be id, x, y, but propagates any extra
+    # columns from the input to the output.  Put all the information
+    # in the input hashes into these extra columns (ie, redundantly
+    # including id, x and y), and read them back at the end.  Thus we
+    # propagate the input information into the output.  Save, in
+    # cat1keys and cat2keys, the list of keys in the two input hashes,
+    # so we can read the columns back in the correct order at the end.
+    my @cat1keys;
+    foreach my $t (keys(%{$cat1->[0]})) {
+	push (@cat1keys, $t);
+    }
+    open (FOFF, ">$cat1in")
+      || wmessage ('fatal', "Can't open file $cat1in to write");
+    my $line;
+    foreach my $t (@$cat1) {
+	$line = sprintf ("%5d %10.2f %10.2f", $t->{id}, $t->{x}, $t->{y});
+	foreach my $w (@cat1keys) {
+	    $line .= sprintf (" %12.4f", $t->{$w});
+	}
+	print FOFF "$line\n";
+    }
+    close (FOFF);
+    printf STDERR "match_positions_findoff input $cat1in: keys @cat1keys\n"
+      if $verbose;
+
+    my @cat2keys;
+    foreach my $t (keys(%{$cat2->[0]})) {
+	push (@cat2keys, $t);
+    }
+    open (FOFF, ">$cat2in")
+      || wmessage ('fatal', "Can't open file $cat2in to write");
+    foreach my $t (@$cat2) {
+	$line = sprintf ("%5d %10.2f %10.2f", $t->{id}, $t->{x}, $t->{y});
+	foreach my $w (@cat2keys) {
+	    $line .= sprintf (" %12.4f", $t->{$w});
+	}
+	print FOFF "$line\n";
+    }
+    close (FOFF);
+    printf STDERR "match_positions_findoff input $cat2in: keys @cat2keys\n"
+      if $verbose;
 
     # Write these two file names to an input file for FINDOFF
-    my $findoffinfile = "$tempfn-findoffin";
+    my $findoffinfile = "$tempfn-findoff-in";
     open (FOFF, ">$findoffinfile")
-      || confess "Can't open file $findoffinfile to write\n";
-    print FOFF "$cat1\n$cat2\n";
+      || wmessage ('fatal', "Can't open file $findoffinfile to write\n");
+    print FOFF "$cat1in\n$cat2in\n";
     close (FOFF);
-    push (@tempfiles, $findoffinfile);
 
-    # ... and a file containing the names of the output file
-    my $findoffoutfile = "$tempfn-findoffout";
+    # ... and a file containing the names of the output files
+    my $findoffoutfile = "$tempfn-findoff-out";
     open (FOFF, ">$findoffoutfile")
-      || confess "Can't open file $findoffoutfile to write\n";
+      || wmessage ('fatal', "Can't open file $findoffoutfile to write\n");
     print FOFF "$cat1out\n$cat2out\n";
     close (FOFF);
-    push (@tempfiles, $findoffoutfile);
 
-    push (@tempfiles, $cat1out);
-    push (@tempfiles, $cat2out);
 
 
     # Construct FINDOFF argument list
@@ -886,7 +990,7 @@ sub match_positions_findoff ($$$$$) {
     }
     # The default value of error is 1, but this is generally too
     # small.  It's best to specify minsep explicitly, rather than
-    # relying on the dynamic default (5*errro), since that can be
+    # relying on the dynamic default (5*error), since that can be
     # affected by the contents of the ADAM graphics database, which
     # might have been set by some intermediate by-hand run of FINDOFF.
     $findoffarg .= " error=$fofferr minsep=$foffminsep";
@@ -928,38 +1032,74 @@ sub match_positions_findoff ($$$$$) {
 
     my $matchworked = ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE);
     if (! $matchworked && ! $ccdpack->contact()) {
-	confess "Oh dear, it looks like the CCDPACK monolith has just died!\n(did I do that...?)";
+	wmessage ('fatal', "Oh dear, it looks like the CCDPACK monolith has just died!\n(did I do that...?)");
     }
 
-    push (@tempfiles, "$tempfn-findofflog");
+    # Now read the output files back into new hashes
+    open (FOFF, "<$cat1out")
+      || wmessage ('fatal',
+		  "match_positions_findoff: Can't open file $cat1out to read");
+    my @cat1resultslines = <FOFF>;
+    close (FOFF);
+    my @cat1results;
+    my @l;
+    foreach my $textline (@cat1resultslines) {
+	next if ($textline =~ /^ *\#/);
+	my %t;
+	@l = split (' ', $textline);
+	($#l == $#cat1keys + 3)
+	  || wmessage ('fatal',
+	       sprintf ("match_positions_findoff: assertion failed (l=%s)!=(cat1keys=%d)+3",
+			$#l, $#cat1keys));
+	for (my $i=0; $i<=$#cat1keys; $i++) {
+	    $t{$cat1keys[$i]} = $l[$i+3];
+	}
+	push (@cat1results, \%t);
+    }
+    open (FOFF, "<$cat2out")
+      || wmessage ('fatal',
+		  "match_positions_findoff: Can't open file $cat2out to read");
+    my @cat2resultslines = <FOFF>;
+    close (FOFF);
+    my @cat2results;
+    foreach my $textline (@cat2resultslines) {
+	next if ($textline =~ /^ *\#/);
+	my %t;
+	@l = split (' ', $textline);
+	($#l == $#cat2keys + 3)
+	  || wmessage ('fatal',
+	       sprintf ("match_positions_findoff: assertion failed (l=%s)!=(cat2keys=%d)+3",
+			$#l, $#cat2keys));
+	for (my $i=0; $i<=$#cat2keys; $i++) {
+	    $t{$cat2keys[$i]} = $l[$i+3];
+	}
+	push (@cat2results, \%t);
+    }
 
-    return ($cat1out, $cat2out, $matchworked);
+    return (\@cat1results, \@cat2results, $matchworked);
 }
 
 
-# Given two FINDOFF output files and a tempfilename, generate an
-# ASTROM input file.  
+# Given two catalogues, generate an ASTROM input file.  
+#
+# The input catalogues are arrays of hashes, containing at least keys
+# {id}, {x} and {y} in the case of CCDin, and {id}, {ra} and {dec} in
+# the case of catalogue.
+#
+# We want to assemble entries consisting of
+#
+#    ASTROM:        ra      dec  0.0 0.0 J2000  * id1/id2
+#                   x-pos1  y-pos1  
+#
+# for each of the pairs for which the {id} fields match.
 #
 # Return a (reference to an) anonymous hash containing keys {filename}
 # (the name of the generated ASTROM input file), {nmatches} (the
 # number of matches found) and {samplesd} (s.d. of residuals from the
 # matching).
 #
-# The input files are the FINDOFF output files corresponding to the
-# SExtractor and catalogue-query input files.  These have the formats:
-#
-#    SExtractor:    lineid1 x-pos1  y-pos1  ident1  mag
-#    Catalogue:     lineid2 x-pos2  y-pos2  ra      dec  ident2  mag
-#
-# We want to assemble entries consisting of
-#
-#    ASTROM:        ra      dec  0.0 0.0 J2000  * ident1/ident2
-#                   x-pos1  y-pos1  
-#
-# for each of the pairs for which lineid1=lineid2.
-#
 # Single argument is a reference to a hash, containing keys:
-#    CCDin          : SExtractor output file -- CCD positions
+#    CCDin          : SExtractor output catlogue -- CCD positions
 #    catalogue      : The catalogue of known positions
 #    helpers        : Helper applications (ref to hash)
 #    NDFinfo        : NDF information (ref to hash)
@@ -975,7 +1115,7 @@ sub generate_astrom ($) {
 
     foreach my $k ('CCDin', 'catalogue', 'helpers', 'NDFinfo', 'tempfn') {
 	defined($par->{$k})
-	  || wmessage ('error',
+	  || wmessage ('fatal',
 		       "bad call to generate_astrom: parameter $k not specified\n");
     }
 
@@ -987,41 +1127,10 @@ sub generate_astrom ($) {
 			  ? $par->{astrom}->{wcs}
 			  : undef);
 
-    # First, read the two files in.  CCDin first.  The first columns
-    # should be identical, being a continuous sequence of integers,
-    # starting with 1, so check this on input.
-    open (IN, "<$par->{CCDin}")
-      || wmessage ('error', "Can't open file $par-{CCDin} to read\n");
-    my $lineno = 0;
-    my $line;
-    my @CCDarray = ();
-    while (defined($line = <IN>)) {
-	next if ($line =~ /^ *\#/);
-	$lineno++;
-	my @tmparr = split (' ', $line);
-	#$tmparr[0] == $lineno
-	#  || confess "File $par->{CCDin} has wrong format ($tmparr[0]!=$lineno)\n";
-	push (@CCDarray, \@tmparr);
-    }
-    close (IN);
-
-    my @CATarray = ();
-    open (IN, "<$par->{catalogue}")
-      || confess "Can't open file $par->{catalogue} to read\n";
-    $lineno = 0;
-    while (defined($line = <IN>)) {
-	next if ($line =~ /^ *\#/);
-	$lineno++;
-	my @tmparr = split (' ', $line);
-	#$tmparr[0] == $lineno
-	#  || confess "File $par->{catalogue} has wrong format\n";
-	push (@CATarray, \@tmparr);
-    }
-    close (IN);
-
+    my @CCDarray = @{$par->{CCDin}};
+    my @CATarray = @{$par->{catalogue}};
     ($#CCDarray == $#CATarray)
-      || confess "generate_astrom: input files have different number of matches\n";
-
+      || wmessage ('fatal', "generate_astrom: CCDarray != CATarray");
 
     # {maxnterms} is the maximum number of fit terms to try, and
     # $nterms is the number we will try in fact.  Unless we have more
@@ -1068,10 +1177,12 @@ sub generate_astrom ($) {
     my ($i,$tmp);
     my $nmatches = $#CCDarray + 1;
     for ($i=0; $i<$nmatches; $i++) {
-	$tmp += ($CCDarray[$i]->[1] - $CATarray[$i]->[1]);
+	$tmp += ($CCDarray[$i]->{x} - $CATarray[$i]->{x});
+	#$tmp += ($CCDarray[$i]->[1] - $CATarray[$i]->[1]);
 	$sumx += $tmp;
 	$sumsq += $tmp*$tmp;
-	$tmp = ($CCDarray[$i]->[2] - $CATarray[$i]->[2]);
+	$tmp = ($CCDarray[$i]->{y} - $CATarray[$i]->{y});
+	#$tmp = ($CCDarray[$i]->[2] - $CATarray[$i]->[2]);
 	$sumy += $tmp;
 	$sumsq += $tmp*$tmp;
     }
@@ -1219,12 +1330,20 @@ sub generate_astrom ($) {
       if (defined($par->{NDFinfo}->{astromcol}));
 
     for ($i=0; $i<=$#CATarray; $i++) {
-	printf ASTROMOUT "%s   %s  0.0  0.0  J2000\t* %d/%d\n",
-	    deg2sex($CATarray[$i]->[3], 1),
-	    deg2sex($CATarray[$i]->[4], 0),
-	    $CCDarray[$i]->[4], $CATarray[$i]->[5];
-	printf ASTROMOUT "%12f   %12f\n", $CCDarray[$i]->[1],
-	    $CCDarray[$i]->[2];
+	printf ASTROMOUT ("%s   %s  0.0  0.0  J2000\t* %d/%d\n",
+			  deg2sex($CATarray[$i]->{ra}, 1),
+			  deg2sex($CATarray[$i]->{dec}, 0),
+			  $CCDarray[$i]->{id},
+			  $CATarray[$i]->{id});
+	printf ASTROMOUT ("%12f   %12f\n",
+			  $CCDarray[$i]->{x},
+			  $CCDarray[$i]->{y});
+#	printf ASTROMOUT "%s   %s  0.0  0.0  J2000\t* %d/%d\n",
+#	    deg2sex($CATarray[$i]->[3], 1),
+#	    deg2sex($CATarray[$i]->[4], 0),
+#	    $CCDarray[$i]->[4], $CATarray[$i]->[5];
+#	printf ASTROMOUT "%12f   %12f\n", $CCDarray[$i]->[1],
+#	    $CCDarray[$i]->[2];
     }
 
     print ASTROMOUT "END\n";
@@ -1954,7 +2073,7 @@ sub wmessage ($$) {
 	$prefix = $prefixes[2];
 	$croak = 1;
     } else {
-	$prefix = "$prefixes[2] XXXX WHAT TYPE OF MESSAGE?    ";
+	$prefix = "$prefixes[2] XXXX WHAT is msg ($type)?    ";
 	$croak = 1;
     }
 

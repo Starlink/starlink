@@ -56,10 +56,18 @@ my $retainwcs = undef;		# If this is defined, it gives the
                                 # (rather than letting it be amongst
                                 # the temporary files to be deleted).
 
-my $CCDcat = undef;		# If defined, a catalogue of objects
-                                # on the CCD, as obtained from
-                                # SExtractor.  Set only by the
-                                # debugging/testing option xxxccdcat
+my $CCDcat = undef;		# The catalogue of objects obtained
+                                # by SExtractor from the CCD.  It's a
+                                # reference to an array of references
+                                # to hashes, with some or all of fields
+                                # {id}, {x}, {y}, {ra}, {dec} and others.
+
+my $CCDcatname = undef;		# If defined, a dump of the catalogue
+                                # of objects on the CCD, as obtained
+                                # from SExtractor.  Set only by the
+                                # debugging/testing option xxxccdcat,
+                                # and used only via the {fromdump} and
+                                # {todump} options to extract_objects.
 
 my $NDFoverrides = undef;	# Overrides for NDFinfo.  Set only by
                                 # the debugging/testing option xxxndfinfo.
@@ -93,10 +101,7 @@ my $cmdlineobsdata = undef;	# Source for WCS information.  Can be
                                 # NDF), or ... explicit coordinates.
 
 # Global variables
-#XXX delete TEMPFILES
-#my @TEMPFILES = ( );		# List of the temporary files which
-                                # are created.
-
+# None!
 
 # Check that all the required environment variables have values.
 $ENV{STARLINK} = '/star'
@@ -176,7 +181,7 @@ my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
 # Log who we are.
 wmessage ('info', "$progname, v$VERSION");
 
-# Copy the argument list XXX permanent?
+# Copy the argument list, for logging
 my @arglist2 = ($0);
 foreach (@ARGV) { push (@arglist2, $_); }
 
@@ -244,7 +249,7 @@ $tempDir = $optionset{temp}		if defined ($optionset{temp});
 $monolithTimeout = $optionset{timeout}	if defined ($optionset{timeout});
 $verbose = $optionset{verbose}		if defined ($optionset{verbose});
 $dumpstatefile = $optionset{dump}	if defined ($optionset{dump});#-=stdout
-$CCDcat = $optionset{xxxccdcat}		if defined ($optionset{xxxccdcat});
+$CCDcatname = $optionset{xxxccdcat}	if defined ($optionset{xxxccdcat});
 $NDFoverrides = $optionset{xxxndfinfo}	if defined ($optionset{xxxndfinfo});
 
 # Do some processing, defaulting, and checking of options.
@@ -533,8 +538,8 @@ if ($dumpstatefile) {
 	      (defined($insertwcs) ? $insertwcs : "<UNDEF>"));
     printf D ("retainwcs=%s\n",
 	      (defined($retainwcs) ? $retainwcs : "<UNDEF>"));
-    printf D ("CCDcat=%s\n",
-	      (defined($CCDcat) ? $CCDcat : "<UNDEF>"));
+    printf D ("CCDcatname=%s\n",
+	      (defined($CCDcatname) ? $CCDcatname : "<UNDEF>"));
     printf D ("monolithTimeout=%s\n",
 	      (defined($monolithTimeout) ? $monolithTimeout : "<UNDEF>"));
     printf D ("monolithMessages=%s\n",
@@ -587,78 +592,66 @@ $helpers{moggy} = $moggy;
 # don't have to assume here that the projection pole is in the centre
 # of the image, since ASTROM isn't fazed if it's elsewhere.
 #
-# get_catalogue returns columns int-id, X, Y, ra/deg, dec/deg, int-id, mag.
+# get_catalogue returns a reference to an array of (references to)
+# hashes, containing {id}, {x}, {y}, {ra}, {dec} and possibly {mag}.
 wmessage ('info', "Obtaining catalogue from $esocatname...");
 my $CAT = get_catalogue ($moggy, %$NDFinfo, $maxobj, $tempDir);
 
-# ...and write an NDF which has the columns (number, ra/rad, dec/rad, ra/deg,
-# dec/deg).  That is, copy the $CAT file, duplicating columns (3,4)
-# into columns (1,2) and converting them to radians (required for asttrann).
-my @catdata = txt2arr ($CAT);
-($#catdata >= 0)
-  || wmessage ('fatal',
-	       "Catalogue search: I can't find any objects corresponding to that image!");
-my $r;
-foreach $r (@catdata) {
-    $r->[1] = $r->[3]/$d2r;
-    $r->[2] = $r->[4]/$d2r;
+
+# write an NDF which has the columns (number, ra/rad, dec/rad, ra/deg,
+# dec/deg.  That is, copy the id, ra and dec entries in each element
+# in the $CAT array file, duplicating ra and dec into
+# columns (1,2) and converting them to radians (required for
+# asttrann).
+my @catdata;
+foreach my $row (@$CAT) {
+    my @t = ($row->{id}, $row->{ra}, $row->{dec}, $row->{ra}, $row->{dec});
+    $t[1] /= $d2r;
+    $t[2] /= $d2r;
+    push (@catdata, \@t);
 }
-my $CATNDF = twodarray2ndf (@catdata, $CAT)
-  || wmessage ('fatal', "Can't create NDF $CAT");
-#push (@TEMPFILES, "$CATNDF.sdf");
-print STDERR "CAT=$CAT  CATNDF=$CATNDF\n" if $verbose;
+my $CATNDF = twodarray2ndf (@catdata, "$tempDir/catalogue")
+  || wmessage ('fatal', "Can't create NDF $tempDir/catalogue");
+print STDERR "CATNDF=$CATNDF\n" if $verbose;
+
 
 wmessage ('info', sprintf ("Obtained catalogue, %d entries, from %s",
 			   $#catdata+1, $esocatname));
 
 
 my $CCDcathash = undef;
-# Extract a catalogue of objects from the NDF (unless this was
-# previously set by a command-line argument).
-if (defined($CCDcat)) {
-    # This is primarily a testing/debugging feature.
-    wmessage ('info', "Using pre-existing CCD catalogue $CCDcat");
-
-    print STDERR "Reusing $CCDcat...\n" if $verbose;
-    # The specified file is a re-used output of this subroutine.
-    # It starts with a log of the keywords which are to be
-    # returned in the hash.  Extract these, fill the hash, and
-    # return. 
-    my $openok = open (OLDCAT, "$CCDcat");
-    my $line;
-    my %anonhash = ();
-    if ($openok) {
-	while (defined($line = <OLDCAT>)) {
-	    last if ($line !~ /^\#/);
-	    if ($line =~ /^\#\#\s*(\S*)\s*(\S*)/) {
-		$anonhash{$1} = $2;
-	    }
-	}
-	close (OLDCAT);
-	# Override the filename, in case it's different (usually true)
-	$anonhash{filename} = $CCDcat;
-	$CCDcathash = \%anonhash;
+my %paramhash = ( maxobj => $maxobj, filterdefects => 1 );
+if (defined ($CCDcatname)) {
+    # Read extraction catalogue from a file -- a testing/debugging
+    # feature If CCDcatname is not defined (normal situation)
+    # extract_objects extracts the catalogue from the CCD.
+    if (-r $CCDcatname) {
+	# There exists such a file -- read it in
+	$paramhash{fromdump} = $CCDcatname;
     } else {
-	print STDERR "Ooops, can't open $CCDcat.  Regenerating...\n";
+	# No such file -- interpret this option as requesting we dump
+	# to this file
+	$paramhash{todump} = $CCDcatname;
     }
 }
-unless (defined($CCDcathash)) {
-    $CCDcathash = extract_objects (\%helpers,
-				   $NDF,
-				   {maxobj => $maxobj,
-				    filterdefects => 1},
-				   $tempDir);
-    defined ($CCDcathash)
-      || wmessage ('fatal', "Failed to extract objects from NDF <$NDF>");
-    if ($verbose) {
-	print STDERR "EXTRACTOR returned:\n";
-	foreach my $k (keys (%$CCDcathash)) {
-	    print STDERR "\t$k = ", $CCDcathash->{$k}, "\n";
-	}
+
+$CCDcathash = extract_objects (\%helpers,
+			       $NDF,
+			       \%paramhash,
+			       $tempDir);
+defined ($CCDcathash)
+  || wmessage ('fatal', "Failed to extract objects from NDF <$NDF>");
+if ($verbose) {
+    print STDERR "EXTRACTOR returned:\n";
+    foreach my $k (keys (%$CCDcathash)) {
+	print STDERR "\t$k = ", $CCDcathash->{$k}, "\n";
     }
-    $CCDcat = $CCDcathash->{filename};
-    wmessage ('info', "Object extraction successful");
 }
+$CCDcat = $CCDcathash->{catalogue};
+wmessage ('info', "Object extraction successful");
+
+# $CCDcat is now an array containing hashes of x, y, etc,
+# for the objects detected on the CCD.
 
 
 # We run ASTROM $iterationsleft times.  We may stop the loop from
@@ -672,13 +665,14 @@ my $iterationsleft = 7;
 
 # The following hold the state between iterations.
 #
-# $refstarndf and $astromfits have dummy initial values.  $matchinfil
-# has a valid initial value, $CAT, obtained from get_catalogue()
+# $refstarndf and $astromfits have dummy initial values.  @matchincat
+# has a valid initial value, @$CAT, obtained from get_catalogue()
 # above, but this is changed below to a new reference star
 # catalogue, by converting $refstarndf, below.
-my $refstarndf =      'X';	# Ref. star pixel coordinates...
-my $matchinfile =   $CAT;	# ...as a text file, input to match_positions.
-my $astromfits =     'X';	# WCS information obtained by ASTROM.
+my $refstarndf = 'X';		# Ref. star pixel coordinates...
+my @matchincat = @$CAT;		# ...as a catalogue array, input to
+                                # match_positions.
+my $astromfits = 'X';		# WCS information obtained by ASTROM.
 
 
 
@@ -722,14 +716,15 @@ while ($iterno < $iterationsleft) {
 
     # Get matches, returning the names of the two output files.
     wmessage ('info', "Matching position lists...");
+    %paramhash = ( poserr => $CCDcathash->{poserr},
+		   objsize => $CCDcathash->{objsize},
+		   area => ($NDFinfo->{dim1} * $NDFinfo->{dim2})
+		 );
     my ($ccdlist, $catlist, $matchworked)
       = match_positions (\%helpers,
-			 $CCDcat,
-			 $matchinfile,
-			 { poserr => $CCDcathash->{poserr},
-			   objsize => $CCDcathash->{objsize},
-			   area => ($NDFinfo->{dim1} * $NDFinfo->{dim2})
-			 },
+			 @$CCDcat,
+			 @matchincat,
+			 \%paramhash,
 			 $tfile);
 
      if (! $matchworked) {
@@ -741,14 +736,12 @@ while ($iterno < $iterationsleft) {
  	print STDERR
 	  "--- That match didn't work.  Trying again, with a larger error\n"
 	    if $verbose;
+	$paramhash{poserr} *= 2.0; # double the position-error
  	($ccdlist, $catlist, $matchworked)
  	  = match_positions ($CCDPack,
- 			     $CCDcat,
-			     $matchinfile,
-			     { poserr => 2.0 * $CCDcathash->{poserr},
-			       objsize => $CCDcathash->{objsize},
-			       area => ($NDFinfo->{dim1} * $NDFinfo->{dim2})
-			     },
+ 			     @$CCDcat,
+			     @matchincat,
+			     \%paramhash,
  			     $tfile);
      }
 
@@ -760,8 +753,22 @@ while ($iterno < $iterationsleft) {
 	last;			# JUMP OUT of the loop
     }
 
-    print STDERR "match_positions returned...\n\t$ccdlist\n\t$catlist\n"
-      if $verbose;
+#    open (FOFFOUT, ">$tempDir/foffdump") || die "Can't create foffdump";
+#    print FOFFOUT "ccdlist...\n";
+#    foreach my $t (@$ccdlist) {
+#	foreach my $l (keys(%$t)) {
+#	    printf FOFFOUT ("%s=%s ", $l, $t->{$l});
+#	}
+#	print FOFFOUT "\n";
+#    }
+#    print FOFFOUT "catlist...\n";
+#    foreach my $t (@$catlist) {
+#	foreach my $l (keys(%$t)) {
+#	    printf FOFFOUT ("%s=%s ", $l, $t->{$l});
+#	}
+#	print FOFFOUT "\n";
+#    }
+#    close (FOFFOUT);
 
 
     # Generate the ASTROM input file.  Returns hash with keys
@@ -807,8 +814,8 @@ while ($iterno < $iterationsleft) {
 			       (defined($fitdetails[$k]->{q})
 				? $fitdetails[$k]->{q}
 				: "--"),
-			       (length($fitdetails[$k]->{wcs}) > 32)
-			       ? "...".substr($fitdetails[$k]->{wcs},-29)
+			       (length($fitdetails[$k]->{wcs}) > 31)
+			       ? "...".substr($fitdetails[$k]->{wcs},-28)
 			       : $fitdetails[$k]);
 	    } else {
 		printf STDERR "\t%d    NO FIT\n", $k;
@@ -853,8 +860,6 @@ while ($iterno < $iterationsleft) {
     $lastastrom{STATUS} || wmessage ('fatal',
 				     "ASTROM failed to make any fits at all!");
 
-    #$astromnmatches = $astromparams->{nmatches};
-
     # Store the (best of the) WCS information obtained by ASTROM.
     $astromfits = $lastastrom{wcs};
     wmessage ('info', "ASTROM found a ".$lastastrom{nterms}."-parameter fit");
@@ -883,11 +888,20 @@ while ($iterno < $iterationsleft) {
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
       || wmessage ('fatal', "Error getting atools/asttrann");
 
-    #push (@TEMPFILES, "$refstarndf.sdf");
 
     # Now turn $refstarndf (the best-so-far pixel coordinates
     # of the reference stars) into a text input file for match_positions.
-    $matchinfile = ndf2txt ($refstarndf);
+    my $refstararr = ndf2twodarray ($refstarndf);
+    @matchincat = ();		# erase previous values
+    foreach my $r (@$refstararr) {
+	my %t;
+	$t{id} = $r->[0];
+	$t{x} = $r->[1];
+	$t{y} = $r->[2];
+	$t{ra} = $r->[3];
+	$t{dec} = $r->[4];
+	push (@matchincat, \%t);
+    }
 
     # What sort of ASTROM fit do we want to try next time?
     if ($bestfitfailed) {
@@ -944,9 +958,6 @@ if ($keeptemps) {
     print STDERR "Retaining temporary files in directory $tempDir\n"
       if $verbose;
 } else {
-    #push (@TEMPFILES, get_temp_files());
-    #print STDERR "Deleting temporary files... @TEMPFILES\n" if ($verbose);
-    #unlink (@TEMPFILES);
     print STDERR "Deleting temporary directory $tempDir\n" if $verbose;
     system "rm -Rf $tempDir";
 }
