@@ -105,23 +105,19 @@
         PARAMETER		( VERSION = 'MAGIC Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC) ILOC
-      CHARACTER*(DAT__SZLOC) OLOC
-      CHARACTER*(DAT__SZTYP) TYPE
-      CHARACTER*8               MSTR
+      CHARACTER*8               MSTR			! Mask string
 
-      REAL                      MAGVAL
+      REAL                      MAGVAL			! Magic value
 
       INTEGER                   IFID                    ! Input dataset id
       INTEGER                   OFID                    ! Output dataset id
-      INTEGER NDIM,DIMS(DAT__MXDIM),LEN
-      INTEGER DPTR,QPTR
+      INTEGER 			LEN			! # data elements
+      INTEGER 			DPTR,QPTR		! Mapped iinput data
 
-      BYTE MASK
+      BYTE 			MASK			! Quality mask value
 
       LOGICAL                   OVER                    ! Overwrite mode?
-      LOGICAL PRIM
-      LOGICAL DOK,QOK
+      LOGICAL 			DOK,QOK			! Data/quality ok?
 *.
 
 *  Check inherited global status.
@@ -137,21 +133,15 @@
       CALL USI_GET0L( 'OVER' OVER, STATUS )
 
 *  Overwrite case - input becomes output
-      IF (OVER) THEN
-        CALL USI_ASSOCI('INP','UPDATE',OLOC,PRIM,STATUS)
+      IF ( OVER ) THEN
+        CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', OFID, STATUS )
+
       ELSE
-*  otherwise provided not primitive
-        CALL USI_ASSOCI('INP','READ',ILOC,PRIM,STATUS)
-        IF (.NOT.PRIM) THEN
-*  make copy of input - then release it
-          CALL DAT_TYPE(ILOC,TYPE,STATUS)
-          CALL USI_ASSOCO('OUT',TYPE,OLOC,STATUS)
-          CALL HDX_COPY(ILOC,OLOC,STATUS)
-          CALL BDA_RELEASE(ILOC,STATUS)
-        ELSE
-          STATUS=SAI__ERROR
-          CALL ERR_REP( ' ', 'Input is primitive', STATUS )
-        ENDIF
+
+*    Otherwise clone from input
+        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
+
       ENDIF
 
 *  Check data and quality
