@@ -19,7 +19,8 @@
 *     27-May-1994  Opens output textfile with STATUS="UNKNOWN"
 *      6-Apr-1998  V 2.2-1 Structures removed (rjv)
 *      9-Feb-1999  V 2.3-0 FITS file input (DGED)
-*     30 Mar 99    V 2.3-1 Display parameters (rjv)
+*     30-Mar-1999  V 2.3-1 Display parameters (rjv)
+*     08-Feb-2000  V 2.3-2 Bug fix
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -112,7 +113,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTHK Version 2.3-1')
+      PARAMETER (VERSION = 'XRTHK Version 2.3-2')
 *-
       CALL AST_INIT(STATUS)
       CALL MSG_PRNT(VERSION)
@@ -144,6 +145,7 @@
       CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append extension of FITS extension containing header
       FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+
 *  Does file exist?
       CALL UTIL_FINDFILE(FITSDIR, FILENAME, MAXRAW, FILES, NFILES,
      :                                                       STATUS)
@@ -153,6 +155,7 @@
          GOTO 999
       END IF
 *
+      FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
       CALL MSG_PRNT('XRTHK : Using RDF/FITS file : '// FILENAME)
 *
 *  Open a FITS file
@@ -179,7 +182,8 @@
 *  Open housekeeping files
 *  Both the EVRATE and ASPECT tables are in _ANC.FITS
       FILENAME = FROOT(1:CHR_LEN(FROOT))//'_anc.fits'
-
+      FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
+*
 *  Open the FITS file
       CALL FIO_GUNIT(IUNIT,STATUS)
       CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
@@ -343,7 +347,7 @@
         BUFFER=' '
         DO IFIELD=1,TFIELDS
           JFIELD=JFIELD+1
-          KFIELD=(JFIELD-1)*12
+          KFIELD=(JFIELD-1)*12+1
           BUFFER(KFIELD:)=TTYPE(IFIELD)
           IF (JFIELD.EQ.6) THEN
             CALL MSG_PRNT(BUFFER)
@@ -362,7 +366,7 @@
         BUFFER=' '
         DO IFIELD=1,TFIELDS
           JFIELD=JFIELD+1
-          KFIELD=(JFIELD-1)*12
+          KFIELD=(JFIELD-1)*12+1
           BUFFER(KFIELD:)=TTYPE(IFIELD)
           IF (JFIELD.EQ.6) THEN
             CALL MSG_PRNT(BUFFER)
