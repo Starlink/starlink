@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = psx_link psx_link_adam
+dist_bin_SCRIPTS = psx_link psx_link_adam
 
 lib_LTLIBRARIES = libpsx.la
 ## libpsx_la_CFLAGS = -Wall   # -Wall is gcc
