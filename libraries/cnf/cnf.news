@@ -1,10 +1,16 @@
 1 CNF_update
 
- CNF Version 4.1 is release.
+ CNF Version 4.1 is released.
 
  A new Fortran routine is available, CNF_PREG, that can be used
  to register with CNF a pointer obtained using %LOC, such that
  it can be retrieved later using CNF_PVAL.
+
+ A new fortran routine CNF_UNREGP is available to unregister a
+ pointer previously registered using CNF_PREG.
+
+ C pointer masking is now only performed on systems where the
+ pointer size is not equal to a Fortran integer.
 
  CNF Version 4.0-2 is released.
 
