@@ -199,8 +199,6 @@
       TRYING = .TRUE.
       DO WHILE (TRYING)
 
-         CALL PAR_CANCL('IN', STATUS)
-
          CALL NDF_EXIST('IN', 'READ', IN_NDF, STATUS)
 
 *  The file could be in DATADIR
@@ -220,13 +218,15 @@
          ELSE
             TRYING = .FALSE.
          END IF
-         
-         IF (TRYING) THEN
+
+        IF (TRYING) THEN
             CALL ERR_ANNUL(STATUS)
             CALL MSG_OUT(' ','REDS_REDUCE_SWITCH: Failed to'//
      :           ' find requested file in CWD and DATADIR',
      :           STATUS)
+            CALL PAR_CANCL('IN', STATUS)
          END IF
+         
       END DO
 
 *  does the user want to divide the data by the internal calibrator
