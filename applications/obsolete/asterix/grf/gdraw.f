@@ -392,7 +392,6 @@
      :                     STATUS )
 	  ELSE
 	    CALL BDI_AXMAPR( ID, 1, 'Width', 'READ', WPTR, STATUS )
-c           CALL BDI2_INVNT_V2W( NVAL, %VAL(APTR), %VAL(WPTR), STATUS )
 	  ENDIF
 	ENDIF
 
