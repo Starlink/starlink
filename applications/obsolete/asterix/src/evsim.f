@@ -397,7 +397,7 @@
           CALL DYN_MAPR( 1, (PIN+1)*NSRC, PIPTR, STATUS )
         END IF
         CALL DYN_MAPR( 1, PIN, PTPTR, STATUS )
-        CALL DYN_MAPR( 1, PIN, PT\KPTR, STATUS )
+        CALL DYN_MAPR( 1, PIN, PKPTR, STATUS )
 
 *    Prevent problems declaring psf arrays in EVSIM_INT
       ELSE
@@ -604,7 +604,7 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
       REAL             PSUM                             ! Psf normalisation
       REAL             RPW                              ! real(PW)-1.0
       REAL             PTW                              !
-     REAL		SIGP
+      REAL		SIGP
       REAL             SDX, SDY                         ! Signed radian pix size
 
       INTEGER          ISRC                     	! Loop indices
