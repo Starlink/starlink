@@ -358,6 +358,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Modified FixUsed so that it it does not set the current card
 *        back to the start of file if the last card in the FitsChan is 
 *        deleted.
+*     16-AUG-2001 (DSB):
+*        Modified WcsNative to limit reference point latitude to range
+*        +/-90 degs (previously values outside this range were wrapped
+*        round onto the opposite meridian). Also added new warning
+*        condition "badlat".
 *class--
 */
 
@@ -462,7 +467,7 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype "
+#define ALLWARNINGS       " noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat "
 
 /* Each card in the fitschan has a set of flags associated with it,
    stored in different bits of the "flags" item within each FitsCard
@@ -17111,6 +17116,7 @@ static AstCmpMap *WcsNative( AstFitsChan *this, FitsStore *store, char s,
    AstPermMap *permmap;       /* A PermMap */
    AstWinMap *winmap;         /* A WinMap */
    AstSphMap *sphmap;         /* A SphMap */
+   char buf[150];             /* Message buffer */
    double alpha0;             /* Long. of ref. point in standard system */
    double alphap;             /* Long. of native nth pole in standard system */
    double axis[3];            /* Vector giving the axis of rotation */
@@ -17193,18 +17199,22 @@ static AstCmpMap *WcsNative( AstFitsChan *this, FitsStore *store, char s,
       alpha0 = AST__DD2R*GetItem( &(store->crval), axlon, 0, s, 
                            FormatKey( "CRVAL", axlon + 1, -1, s ), method, class );
 
-/* If the latitude is outside the range +/- PI/2, convert them to the 
-   latitude and longitude on the opposite meridian. */
+/* Limit the latitude to the range +/- PI/2, issuing a warning if the
+   supplied CRVAL value is outside this range. */
       alphap = slaDrange( delta0 );  
       delta0 = alphap;
       if ( delta0 > AST__DPIBY2 ){
-         delta0 = AST__DPI - delta0;
-         alpha0 = slaDrange( AST__DPI + alpha0 );
+         delta0 = AST__DPIBY2;
       } else if ( delta0 < -AST__DPIBY2 ){
-         delta0 = -AST__DPI - delta0;
-         alpha0 = slaDrange( AST__DPI + alpha0 );
+         delta0 = -AST__DPIBY2;
       }
-   
+      if( alphap != delta0 ) {
+         sprintf( buf, "The original FITS header specified a reference "
+                  "point with latitude %.8g. A value of %.8g is being used "
+                  "instead. ", alphap, delta0 );
+         Warn( this, "badlat", buf, method, class );
+      }
+
 /* Store the radian values of the FITS keywords LONPOLE and LATPOLE. Defaults
    will be used if either of these items was not supplied. */
       phip = GetItem( &(store->lonpole), 0, 0, s, NULL, method, class );
@@ -20172,6 +20182,11 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 *     - "BadCel": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if an unknown celestial co-ordinate 
 *     system is specified by the CTYPE keywords.
+*
+*     - "BadLat": This condition arises when reading a FrameSet from a
+*     non-Native encoded FitsChan if the latitude of the reference point
+*     has an absolute value greater than 90 degrees. The actual absolute
+*     value used is set to exactly 90 degrees in these cases.
 *
 *     - "NoCTYPE": This condition arises if a default CTYPE value is used 
 c     within astRead, due to no value being present in the supplied FitsChan.
