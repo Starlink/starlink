@@ -99,6 +99,7 @@
 *  External References:
       EXTERNAL			ADI_REQPKG
       EXTERNAL                  WCI1_READHDS
+      EXTERNAL			WCI2_WRITFIT
 
 *  Local variables:
       INTEGER			DID			! Ignored identifier
@@ -115,6 +116,8 @@
 
 *    Define the methods
         CALL ADI_DEFMTH( 'ReadWCS(HDSfile)', WCI1_READHDS, DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteWCS(HDSfile,Pixellation,Projection,'/
+     :                   /'CoordSystem)', WCI2_WRITFIT, DID, STATUS )
 
 *    Now initialised
 	WCI_INIT = .TRUE.
