@@ -1,3 +1,15 @@
+2000-07-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm: Remove @EXPORT. Add msg_tune and err_tune 
+
+	* t/msg.t: Improve test suite
+	
+	* t/err.t: Improve test suite
+	
+	* NDF.xs: Use PREINIT blocks and include missing Starlink include
+	files. Add msg_tune and err_tune.
+	Begin changing some routines to use the C wrappers
+
 2000-05-19  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm (calls): Only use a single arg to constant
