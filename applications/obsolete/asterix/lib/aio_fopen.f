@@ -231,7 +231,7 @@
 
 *        Try and open file with extension
           LFILE = PATH(D_S:D_E)//'/'
-          LFILE(D_S-D_E+3:) = FILE
+          LFILE(D_E-D_S+3:) = FILE
           CALL FIO_OPEN( LFILE, ACCESS, MODE, RECSZ, FD, STATUS )
 
 *        Ok?
@@ -241,8 +241,8 @@
 *          Try and open file with extension if defined
             IF ( ELEN .GT. 0 ) THEN
               LFILE = PATH(D_S:D_E)//'/'
-              LFILE(D_S-D_E+3:) = FILE(:FLEN)
-              LFILE(D_S-D_E+3+FLEN:) = AIO_DEFEXT(:ELEN)
+              LFILE(D_E-D_S+3:) = FILE(:FLEN)
+              LFILE(D_E-D_S+3+FLEN:) = AIO_DEFEXT(:ELEN)
               CALL FIO_OPEN( LFILE, ACCESS, MODE, RECSZ, FD, STATUS )
               IF ( STATUS .NE. SAI__OK ) THEN
                 CALL ERR_ANNUL( STATUS )
