@@ -18,3 +18,4 @@ CD2_2   =         -5.555555E-4 / Transformation matrix element
 CD3_3   =                  1.0 / Transformation matrix element                  
 PV2_3   =                120.0 / Projection parameter                           
 RADESYS = 'ICRS    '           / Reference frame for RA/DEC values              
+SPECSYS = 'HELIOCEN'           / Standard of rest for spectral axis             

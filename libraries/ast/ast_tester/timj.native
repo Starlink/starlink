@@ -1,5 +1,7 @@
                                                                                 
 COMMENT AST ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ AST
+COMMENT AST                  WCS information in AST format                   AST
+COMMENT AST                See http://www.starlink.ac.uk/ast/                AST
 COMMENT AST            Beginning of AST data for FrameSet object             AST
 COMMENT AST ................................................................ AST
 BEGAST_A= 'FrameSet'           / Set of inter-related coordinate systems        

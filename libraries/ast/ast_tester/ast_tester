@@ -47,6 +47,15 @@ endif
 
 setenv PATH $AST/bin\:$STARLINK/bin\:$PATH
 
+# Ensure include files are accessable
+if( -e $STARLINK/include/sae_par ) then
+   ln -sf $STARLINK/include/sae_par $PWD/SAE_PAR
+endif
+if( -e $AST/include/ast_par ) then
+   ln -sf $AST/include/ast_par $PWD/AST_PAR
+   ln -sf $AST/include/grf_par $PWD/GRF_PAR
+endif
+
 # Build the progs
 
 g77 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
