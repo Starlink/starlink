@@ -290,7 +290,7 @@ endif
 #  IRAS90
 if ( -e @bindir@/iras90/iras90.csh ) then
    setenv IRAS90_DIR @bindir@/iras90
-   setenv IRAS90_HELP @starhelpdir@/iras90
+   setenv IRAS90_HELP @starhelpdir@/iras90_help
 endif  
 if ( -e @exec_prefix@/iras90/iras90 ) then
    setenv IRAS90_SOURCE @exec_prefix@/iras90
