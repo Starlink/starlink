@@ -125,7 +125,7 @@ kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f \
 kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f normal.f \
 nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f kpg1_nbadd.f \
 kpg1_trmsz.c ctm_xcols.f kpg1_gtcol.f kpg1_asprp.f kpg1_ieeer.c \
-kpg1_ieeed.c kpg1_map.f kpg1_wgndf.f kpg1_rgndf.f grf_kappa.c \
+kpg1_ieeed.c kpg1_map.f kpg1_wgndf.f kpg1_rgndf.f \
 kpg1_arcog.f kpg1_asagd.f kpg1_ascrv.f kpg1_asdis.f kpg1_asdsv.f \
 kpg1_asffr.f kpg1_asfgt.f kpg1_asfil.f kpg1_asfrm.f kpg1_asget.f \
 kpg1_asgfr.f kpg1_asgfw.f kpg1_asgrd.f kpg1_asgrp.f kpg1_asira.f \

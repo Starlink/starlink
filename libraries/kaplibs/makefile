@@ -659,7 +659,7 @@ IRA_C_ROUTINES =
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
 FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
-KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c \
+KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c 
 GRF_C_ROUTINES = grf_kaplibs.c
 C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES) \
              $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) $(GRF_C_ROUTINES) 
@@ -810,8 +810,7 @@ $(AIF_F_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in aif_source.tar; exit 1; fi
 
-$(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS) $(GRF_C_ROUTINES) \
-$(GRF_PRIVATE_INCLUDES):
+$(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS) $(GRF_C_ROUTINES) $(GRF_PRIVATE_INCLUDES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in $(PKG_NAME)_source.tar; exit 1; fi
