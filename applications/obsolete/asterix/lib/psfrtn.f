@@ -944,50 +944,44 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
 *    Functionss :
 *
-      REAL                     PSF_ASCA_GIS
-      REAL                     PSF_ASCA_SIS
+      REAL                     PSF_ASCA_CINT
 *
 *    Local constants :
 *
-      REAL                     FW2SIG
-        PARAMETER              ( FW2SIG = 2.354820 )
-      REAL			GIS_GAIN		! SIS PI gain
+      REAL			GIS_GAIN		! GIS PI gain
         PARAMETER		( GIS_GAIN = 1.07E-2 )	! keV per PI channel
       REAL                     RTOM                    ! Radian to arcmin
         PARAMETER              ( RTOM = MATH__RTOD*60.0 )
       REAL			SIS_GAIN		! SIS PI gain
         PARAMETER		( SIS_GAIN = 3.65E-3 )	! keV per PI channel
+      INTEGER			NRAD			!
+        PARAMETER		( NRAD = 6 )
 *
 *    Local variables :
 *
-      REAL			BIT1, BIT2
+      CHARACTER*132		FNAME
+
       REAL                     ENERGY                  ! Mean photon energy
-      REAL                     LNORM                   ! Normalisation constant
-      REAL                     OFFAXIS                 ! Off-axis angle (arcmin)
+      REAL                     	NORM                   ! Normalisation constant
       REAL                     P_SCALE                 ! Scale size of psf
       REAL                     ROFF                    ! Off-axis angle
-      REAL                     SDX, SDY                ! Sub-pixel bin sizes
+      REAL			ROTA			! Rotation angle
       REAL                     SUM                     ! Cumulative value
       REAL                     XP0, YP0                ! Major pixel centre
       REAL                     XPS, YPS                ! Sub-pixel pixel centre
-      REAL                     YPS2                    ! Sub-pixel distance
 
-      INTEGER			EGIS(2)			!
       INTEGER                  I, J                    ! Major pixel loops
-      INTEGER                  II, JJ                  ! Sub-pixel loops
-      INTEGER                  MNX, MNY                ! Local calc bounds
-      INTEGER			NGEVAL
-      INTEGER                  XSUB, YSUB              ! Sub-pixel factors
+      INTEGER			IENER, IRAD		! Indexing values
 
       LOGICAL			SIS			! SIS detector?
       LOGICAL                  	SYMMETRIC               ! Symmetric about X0,Y0?
 *
-*    Inline functions :
+*    Local data :
 *
-      REAL                     DEL,PIX
-      INTEGER                  SPIX
-      SPIX(DEL,PIX) = MAX(1,NINT(abs(10.0*PIX)/P_SCALE/MAX(1.0,
-     :                                SQRT(ABS(DEL/P_SCALE)))))
+      REAL			RADS(NRAD)		! Radial bnds (arcmin)
+        DATA                	RADS/2.0,4.0,6.0,8.0,13.0,17.0/
+      INTEGER			AZIM(NRAD)
+        DATA			AZIM/5,10,9,35,0,0/
 *-
 
 *    Check status
@@ -1001,7 +995,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       SYMMETRIC = ( ( X0 .EQ. 0.0 ) .AND. ( Y0 .EQ. 0.0 )
      :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
 
-*    Defined energy band?
+*    Find energy in keV, and then energy bin number 1->2, 2->3 etc, and
+*    coerce into the range 0 to 10
       IF ( AS_PHA_DEF(SLOT) ) THEN
         IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
           ENERGY = (REAL(AS_PHALO(SLOT)) + REAL(AS_PHAHI(SLOT)))*
@@ -1013,487 +1008,100 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       ELSE
         ENERGY = AS_ENERGY(SLOT)
       END IF
+      IENER = INT(ENERGY)
+      IENER = MAX( IENER, 1 )
+      IENER = MIN( IENER, AS_NE )
 
-*    SIS detector?
-      IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
+*    Find radial bin number
+      ROFF = SQRT( X0*X0 + Y0*Y0 ) * MATH__RTOD * 60.0
+      IRAD = 1
+      DO WHILE ( (IRAD.LE.NRAD) .AND. (ROFF.GT.RADS(IRAD)) )
+        IRAD = IRAD + 1
+      END DO
+      IF ( IRAD .GT. NRAD ) IRAD = NRAD
 
-        SIS = .TRUE.
+*    Rotation of requested psf position from calibration position
+      ROTA = ATAN2D(Y0,-X0)
+      IF ( ROTA .LT. 0.0 ) ROTA = ROTA + 360.0
+      ROTA = (ROTA - REAL(AZIM(IRAD))) * MATH__DTOR
 
-      ELSE
+*    SIS or GIS?
+      SIS = ( AS_INSTR(SLOT) .EQ. 'SIS' )
 
-        SIS = .FALSE.
-
-*      Use energy value to choose number of GIS evaluations.
-        IF ( ENERGY .LE. 2.0 ) THEN
-          NGEVAL = 1
-          EGIS(1) = 1
-        ELSE IF ( ENERGY .GE. 9.0 ) THEN
-          NGEVAL = 1
-          EGIS(1) = 3
-        ELSE
-          NGEVAL = 2
-          IF ( ENERGY .LT. 5.9 ) THEN
-            EGIS(1) = 1
-            EGIS(1) = 2
-          ELSE
-            EGIS(1) = 2
-            EGIS(1) = 3
-          END IF
+*    Load the telescope and detector psfs
+ 10   FORMAT( A, I2.2, '_', I2.2, '.fits' )
+      IF ( SIS ) THEN
+        IF ( AS_SPTR(IENER,IRAD) .EQ. 0 ) THEN
+          WRITE( FNAME, 10 ) 'psf_', NINT(RADS(IRAD)), AZIM(IRAD)
+          CALL PSF_ASCA_FLOAD( 'sis', FNAME, AS_SPTR(1,IRAD),
+     :                         AS_SPIX, STATUS )
         END IF
-
+      ELSE
+        IF ( AS_GPTR(IENER,IRAD) .EQ. 0 ) THEN
+          WRITE( FNAME, 10 ) 'psf_', NINT(RADS(IRAD)), AZIM(IRAD)
+          CALL PSF_ASCA_FLOAD( 'gis', FNAME, AS_GPTR(1,IRAD),
+     :                         AS_GPIX, STATUS )
+        END IF
       END IF
 
 *    Scale size of psf
       P_SCALE = (0.3/60.0) * MATH__DTOR
 
-*    Bounds for calculation
-      IF ( SYMMETRIC ) THEN
-
-*      The "lower left corner" of the array. The +1 guarantees that the
-*      centre pixel gets done for odd values of NX/Y
-        MNX = (NX+1)/2
-        MNY = (NY+1)/2
-
-      ELSE
-
-*      The whole array
-        MNX = NX
-        MNY = NY
-
-      END IF
-
-*    Off-axis angle for centre of psf in arcmin
-      OFFAXIS = SQRT(X0**2+Y0**2)*MATH__RTOD*60.0
+*    Normalisation factor to account for difference in input pixel size
+*    to calibration pixel size
+      NORM = ABS((DX*DY*RTOM*RTOM) / AS_GPIX**2)
 
 *    For each point requiring calculation
-      DO J = 1, MNY
+      DO J = 1, NY
 
-*      Find Y sub-pixelling
-        YSUB = SPIX( YP0 + DY*REAL(J-1), DY )
-        SDY = DY / YSUB
+*      Y coordinate of this pixel in arcmin
+        YPS = (YP0 + (REAL(J)-0.5)*DY) * RTOM
 
-        DO I = 1, MNX
+        DO I = 1, NX
 
-*        Zero
-          SUM = 0.0
+*        X position of this pixel in arcmin
+          XPS = (XP0 + (REAL(I)-0.5)*DX) * RTOM
 
-*        Find X sub-pixelling
-          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
-          SDX = DX / XSUB
+*        Enquire value of calibration array at this point
+          IF ( SIS ) THEN
+            SUM = PSF_ASCA_CINT( AS_NXY, %VAL(AS_SPTR(IENER,IRAD)),
+     :                           ROTA, (XPS-X0*RTOM)/AS_SPIX,
+     :                           (YPS-Y0*RTOM)/AS_SPIX )
+          ELSE
+            SUM = PSF_ASCA_CINT( AS_NXY, %VAL(AS_GPTR(IENER,IRAD)),
+     :                           ROTA, (XPS-X0*RTOM)/AS_GPIX,
+     :                           (YPS-Y0*RTOM)/AS_GPIX )
+          END IF
 
-*        Correct normalisation for sub-pixel and pixel size
-          LNORM = ABS(SDX*SDY*RTOM*RTOM)
-
-*        Y position of first sub-pixel centre
-          YPS = YP0 + DY*(J-1) + 0.5*SDY
-
-*        For each sub-pixel row
-          DO JJ = 0, YSUB-1
-
-*          Y distance from psf centre
-            YPS2 = (YPS-Y0)**2
-
-*          X position of first sub-pixel centre
-            XPS = XP0 + DX*(I-1) + 0.5*SDX
-
-*          For each sub-pixel
-            IF ( SIS ) THEN
-
-              DO II = 0, XSUB-1
-
-*              Radius of sub-pixel in arcmin
-                ROFF = SQRT((XPS-X0)**2 + YPS2)*MATH__RTOD*60.0
-
-*              Value of function
-                SUM = SUM + PSF_ASCA_SIS( OFFAXIS, ROFF, STATUS )
-
-*              Next sub-pixel
-                XPS = XPS + SDX
-
-              END DO
-
-            ELSE
-
-              DO II = 0, XSUB-1
-
-*              Radius of sub-pixel in arcmin
-                ROFF = SQRT((XPS-X0)**2 + YPS2)*MATH__RTOD*60.0
-
-*              Value of function
-                IF ( NGEVAL .EQ. 1 ) THEN
-                  SUM = SUM + PSF_ASCA_GIS( EGIS(1), OFFAXIS, ROFF,
-     :                                      STATUS )
-                ELSE
-                  BIT1 = PSF_ASCA_GIS( EGIS(1), OFFAXIS, ROFF, STATUS )
-                  BIT2 = PSF_ASCA_GIS( EGIS(2), OFFAXIS, ROFF, STATUS )
-                  IF ( EGIS(1) .EQ. 1 ) THEN
-                    SUM = SUM + BIT1+(ENERGY-2.0)*(BIT2-BIT1)/(5.9-2.0)
-                  ELSE
-                    SUM = SUM + BIT1+(ENERGY-5.9)*(BIT2-BIT1)/(9.0-5.9)
-                  END IF
-                END IF
-
-*              Next sub-pixel
-                XPS = XPS + SDX
-
-              END DO
-
-            END IF
-
-*          Next row of sub-pixels
-            YPS = YPS + SDY
-
-          END DO
-
-*        Set ARRAY value
-          ARRAY(I,J) = SUM*LNORM
+*        Correct for differing pixel sizes
+          ARRAY(I,J) = SUM * NORM
 
         END DO
 
       END DO
 
-*    Copy array around if symmetrical
-      IF ( SYMMETRIC ) THEN
-
-*      Transfer data to other 3 quadrants
-        JJ = NY
-        DO J = 1, MNY
-          II = NX
-          DO I = 1, MNX
-            ARRAY(II,J) = ARRAY(I,J)
-            ARRAY(II,JJ) = ARRAY(I,J)
-            ARRAY(I,JJ) = ARRAY(I,J)
-            II = II - 1
-          END DO
-          JJ = JJ - 1
-        END DO
-
-      END IF
-
       END
 
 
-*+  PSF_ASCA_SIS - Get SIS surface brightness as function of off-axis angle
-      REAL FUNCTION PSF_ASCA_SIS( OFFAX, R, STATUS )
+*+  PSF_ASCA_FLOAD - Load a file of psfs at different energies
+      SUBROUTINE PSF_ASCA_FLOAD( FORM, FILE, PARRAY, PIX, STATUS )
 *
 *    Description :
-*
-*     Returns surface brightness of the psf in units of integrated probability
-*     per square arcminute for given distance R from the psf centre.
 *
 *    Method :
 *
-*     Inside OFFAX < 1' the on-axis psf is used. Outside 19' the 20 arcmin
-*     psf is used. Inbetween we interpolate. These are MODEs 1,2,3.
+*     Loads AS_NE psfs stored in a FITS file and normalises those psfs
+*     to unity.
 *
 *    Deficiencies :
-*     <description of any deficiencies>
 *    Bugs :
-*     <description of any "bugs" which have not been fixed>
 *    Authors :
 *
-*     David J. Allan (BHVAD)
+*     David J. Allan (BHVAD::DJA)
 *
 *    History :
 *
-*     14 Oct 92 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Import :
-*
-      REAL			OFFAX			! Offaxis angle (arcmin)
-      REAL                      R                       ! Radius from psf centre
-                                                        ! in arcmin
-*
-*    Status :
-*
-      INTEGER                  	STATUS                  ! Run-time error
-*
-*    Local constants :
-*
-      INTEGER			N_0, N_20		! Points in profiles
-        PARAMETER		( N_0 = 20, N_20 = 30 )
-      REAL			FUDGE_0			! On-axis fudge factor
-        PARAMETER		( FUDGE_0 = 0.73021520 )
-      REAL			FUDGE_20		! 20' fudge factor
-        PARAMETER		( FUDGE_20 = 0.70984818 )
-*
-*    Function definitions :
-*
-      REAL			PSF_ASCA_INTERP
-*
-*    Local variables :
-*
-      REAL                     	RVAL                    ! Function return value
-      REAL                     	RVAL_0, RVAL_20         ! Function return value
-
-      INTEGER			MODE			! Operation mode
-*
-*    Local data :
-*
-      REAL                     	SIS_XP_0(2,N_0)
-      DATA                     	SIS_XP_0/
-     :                          0.00000, 0.63230, 0.10182, 0.59353,
-     :                          0.12364, 0.56123, 0.14546, 0.51692,
-     :                          0.16727, 0.48000, 0.19636, 0.42738,
-     :                          0.21091, 0.36554, 0.23273, 0.32031,
-     :                          0.26182, 0.26769, 0.30546, 0.22431,
-     :                          0.37091, 0.17077, 0.47273, 0.12277,
-     :                          0.69091, 0.07108, 0.96000, 0.04431,
-     :                          1.27273, 0.02585, 1.60000, 0.01385,
-     :                          1.92727, 0.00831, 2.32727, 0.00462,
-     :                          3.63636, 0.00231, 7.27273, 0.00115/
-      REAL                      SIS_XP_20(2,N_20)
-      DATA                      SIS_XP_20/
-     :                          0.00000, 0.55000, 0.04363, 0.54272,
-     :                          0.05818, 0.53000, 0.08000, 0.51636,
-     :                          0.10181, 0.49090, 0.12363, 0.46636,
-     :                          0.14545, 0.44272, 0.16000, 0.41545,
-     :                          0.17454, 0.37818, 0.18909, 0.35454,
-     :                          0.19636, 0.32363, 0.20363, 0.30000,
-     :                          0.21818, 0.27272, 0.23272, 0.24727,
-     :                          0.24727, 0.22090, 0.27636, 0.19363,
-     :                          0.31272, 0.16818, 0.34181, 0.14363,
-     :                          0.40727, 0.12000, 0.49455, 0.09636,
-     :                          0.61091, 0.07455, 0.74909, 0.05636,
-     :                          0.91636, 0.04364, 1.09091, 0.03455,
-     :                          1.28727, 0.02545, 1.56364, 0.01818,
-     :                          1.96364, 0.01364, 2.40000, 0.00909,
-     :                          3.27273, 0.00455, 4.36364, 0.00000/
-*-
-
-*    Which mode?
-      IF ( OFFAX .LT. 1.0 ) THEN
-        MODE = 1
-      ELSE IF ( OFFAX .GT. 19.0 ) THEN
-        MODE = 2
-      ELSE
-        MODE = 3
-      END IF
-
-*    Quick test for large radii
-      IF ( R .GT. 10.0 ) THEN
-        RVAL = 0.0
-        GOTO 99
-      END IF
-
-*    Use on axis psf?
-      IF ( (MODE.EQ.1) .OR. (MODE.EQ.3) ) THEN
-        RVAL_0 = PSF_ASCA_INTERP( N_0, SIS_XP_0, R, STATUS ) / FUDGE_0
-      ELSE
-        RVAL_0 = 0.0
-      END IF
-
-*    Use 20 arcmin offaxis psf?
-      IF ( (MODE.EQ.2) .OR. (MODE.EQ.3) ) THEN
-        RVAL_20 = PSF_ASCA_INTERP( N_20, SIS_XP_20, R, STATUS )/FUDGE_20
-      ELSE
-        RVAL_20 = 0.0
-      END IF
-
-*    Set return value
-      IF ( MODE .EQ. 1 ) THEN
-        RVAL = RVAL_0
-
-      ELSE IF ( MODE .EQ. 2 ) THEN
-        RVAL = RVAL_20
-
-      ELSE
-        RVAL = RVAL_0 + (OFFAX/20.0)*(RVAL_20-RVAL_0)
-
-      END IF
-
-*    Set return value
- 99   PSF_ASCA_SIS = RVAL
-
-      END
-
-
-
-*+  PSF_ASCA_GIS - Get GIS surface brightness as function of off-axis angle
-      REAL FUNCTION PSF_ASCA_GIS( IENERGY, OFFAX, R, STATUS )
-*
-*    Description :
-*
-*     Returns surface brightness of the psf in units of integrated probability
-*     per square arcminute for given distance R from the psf centre.
-*
-*    Method :
-*
-*     Inside OFFAX < 1' the on-axis psf is used. Outside 19' the 20 arcmin
-*     psf is used. Inbetween we interpolate. These are MODEs 1,2,3.
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*
-*     David J. Allan (BHVAD)
-*
-*    History :
-*
-*     14 Oct 92 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Import :
-*
-      INTEGER			IENERGY			! Energy band to use
-      REAL			OFFAX			! Offaxis angle (arcmin)
-      REAL                      R                       ! Radius from psf centre
-                                                        ! in arcmin
-*
-*    Status :
-*
-      INTEGER                  	STATUS                  ! Run-time error
-*
-*    Local constants :
-*
-      INTEGER			NSP			! Number of spots
-        PARAMETER		( NSP = 15 )
-      REAL			FUDGE_LO_0		! Low energy
-        PARAMETER		( FUDGE_LO_0 = 0.6701705 )
-      REAL			FUDGE_ME_0		! Medium energy
-        PARAMETER		( FUDGE_ME_0 = 0.6503103 )
-      REAL			FUDGE_HI_0		! High energy
-        PARAMETER		( FUDGE_HI_0 = 0.6458237 )
-      REAL			FUDGE_LO_20		! Low energy
-        PARAMETER		( FUDGE_LO_20 = 0.7753197 )
-      REAL			FUDGE_ME_20		! Medium energy
-        PARAMETER		( FUDGE_ME_20 = 0.7090034 )
-      REAL			FUDGE_HI_20		! High energy
-        PARAMETER		( FUDGE_HI_20 = 0.7032154 )
-*
-*    Function definitions :
-*
-      REAL			PSF_ASCA_INTERP
-*
-*    Local variables :
-*
-      REAL			RVAL_0, RVAL_20
-*
-*    Local data :
-*
-      REAL                     	GIS_LO_0(2,NSP)
-      DATA                     	GIS_LO_0/
-     :                          0.00000, 0.20000, 0.14545, 0.19600,
-     :                          0.25455, 0.18000, 0.40000, 0.15000,
-     :                          0.50909, 0.13000, 0.59636, 0.10500,
-     :                          0.83636, 0.07500, 0.94545, 0.06000,
-     :                          1.01818, 0.05000, 1.16364, 0.03300,
-     :                          1.38182, 0.03000, 1.56363, 0.02000,
-     :                          1.81818, 0.01000, 2.61818, 0.00500,
-     :                          4.00000, 0.00000/
-      REAL                     	GIS_ME_0(2,NSP)
-      DATA                     	GIS_ME_0/
-     :                          0.00000, 0.31500, 0.08727, 0.30434,
-     :                          0.14545, 0.28786, 0.18182, 0.26848,
-     :                          0.21818, 0.24812, 0.29091, 0.23068,
-     :                          0.36364, 0.18900, 0.55273, 0.11437,
-     :                          0.72727, 0.07366, 0.94545, 0.04362,
-     :                          1.09091, 0.03586, 1.45454, 0.01939,
-     :                          1.81818, 0.01000, 2.61818, 0.00500,
-     :                          4.00000, 0.00000/
-      REAL                     	GIS_HI_0(2,NSP)
-      DATA                     	GIS_HI_0/
-     :                          0.00000, 0.37000, 0.07273, 0.35558,
-     :                          0.10909, 0.33636, 0.18182, 0.30273,
-     :                          0.25455, 0.24026, 0.29091, 0.21816,
-     :                          0.36364, 0.17779, 0.47273, 0.13935,
-     :                          0.62545, 0.08938, 0.82182, 0.06055,
-     :                          1.04000, 0.03652, 1.30909, 0.02114,
-     :                          1.81818, 0.01000, 2.61818, 0.00500,
-     :                          4.00000, 0.00000/
-      REAL                     	GIS_LO_20(2,NSP)
-      DATA                     	GIS_LO_20/
-     :                          0.00000, 0.18000, 0.18182, 0.17500,
-     :                          0.29091, 0.16500, 0.36364, 0.15500,
-     :                          0.43636, 0.14000, 0.50909, 0.13000,
-     :                          0.58182, 0.11000, 0.72727, 0.08500,
-     :                          0.98182, 0.06000, 1.16364, 0.04000,
-     :                          1.45454, 0.02500, 1.81818, 0.01500,
-     :                          2.54545, 0.00700, 3.27272, 0.00500,
-     :                          4.00000, 0.00000/
-      REAL                     	GIS_ME_20(2,NSP)
-      DATA                     	GIS_ME_20/
-     :                          0.00000, 0.29500, 0.14545, 0.28000,
-     :                          0.23273, 0.25000, 0.26909, 0.23000,
-     :                          0.32727, 0.20600, 0.43636, 0.17700,
-     :                          0.50909, 0.14000, 0.58182, 0.11500,
-     :                          0.65455, 0.09000, 0.81455, 0.06200,
-     :                          1.01818, 0.04000, 1.30909, 0.02500,
-     :                          1.81818, 0.01000, 2.54545, 0.00700,
-     :                          4.00000, 0.00000/
-      REAL                     	GIS_HI_20(2,NSP)
-      DATA                     	GIS_HI_20/
-     :                          0.00000, 0.34500, 0.12364, 0.33000,
-     :                          0.16000, 0.32000, 0.25455, 0.26500,
-     :                          0.36364, 0.20000, 0.43636, 0.15500,
-     :                          0.58182, 0.10500, 0.76364, 0.07800,
-     :                          0.90909, 0.05500, 0.98182, 0.04500,
-     :                          1.41818, 0.02000, 1.96363, 0.01000,
-     :                          2.25454, 0.00700, 2.90909, 0.00500,
-     :                          4.00000, 0.00000/
-*-
-
-*    Low energy
-      IF ( IENERGY .EQ. 1 ) THEN
-
-*      Interpolate
-        RVAL_0 = PSF_ASCA_INTERP( NSP, GIS_LO_0, R, STATUS )
-     :                          / FUDGE_LO_0
-        RVAL_20 = PSF_ASCA_INTERP( NSP, GIS_LO_20, R, STATUS )
-     :                          / FUDGE_LO_20
-
-*    Medium energy
-      ELSE IF ( IENERGY .EQ. 2 ) THEN
-
-*      Interpolate
-        RVAL_0 = PSF_ASCA_INTERP( NSP, GIS_ME_0, R, STATUS )
-     :                          / FUDGE_ME_0
-        RVAL_20 = PSF_ASCA_INTERP( NSP, GIS_ME_20, R, STATUS )
-     :                          / FUDGE_ME_20
-
-*    High energy
-      ELSE IF ( IENERGY .EQ. 3 ) THEN
-
-*      Interpolate
-        RVAL_0 = PSF_ASCA_INTERP( NSP, GIS_HI_0, R, STATUS )
-     :                          / FUDGE_HI_0
-        RVAL_20 = PSF_ASCA_INTERP( NSP, GIS_HI_20, R, STATUS )
-     :                          / FUDGE_HI_20
-
-      END IF
-
-*    Set return value
- 99   PSF_ASCA_GIS = RVAL_0 + OFFAX/20.0*(RVAL_20-RVAL_0)
-
-      END
-
-
-
-*+  PSF_ASCA_INTERP - Psf interpolation
-      REAL FUNCTION PSF_ASCA_INTERP( NSPOT, SPOTS, R, STATUS )
-*
-*    Description :
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*
-*     David J. Allan (BHVAD)
-*
-*    History :
-*
-*     14 Oct 92 : Original (DJA)
+*     12 Jan 94 : Original (DJA)
 *
 *    Type definitions :
 *
@@ -1502,71 +1110,160 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+      INCLUDE 'PSF_PAR'
+      INCLUDE 'MATH_PAR'
+      INCLUDE 'PSF_ASCA_CMN'
 *
 *    Import :
 *
-      INTEGER			NSPOT			! Number of spots
-      REAL			SPOTS(2,NSPOT)		! Spot values
-      REAL                      R                       ! Radius from psf centre
-                                                        ! in arcmin
+      CHARACTER*(*)		FORM			! xrt,sis or gis
+      CHARACTER*(*)		FILE			! File to load
+*
+*    Export :
+*
+      INTEGER			PARRAY(*)		! Pointer array
+      REAL			PIX			! Pixel size (arcmin)
 *
 *    Status :
 *
-      INTEGER                  	STATUS                  ! Run-time error
+      INTEGER                   STATUS                  ! Run-time error
+*
+*    Functionss :
+*
+      INTEGER			CHR_LEN
 *
 *    Local variables :
 *
-      REAL                     	INR(5)                  ! Interp radii
-      REAL                     	INP(5)                  ! Interp psf values
-      REAL                     	RVAL                    ! Function return value
+      CHARACTER*20		HDUTYPE			! HDU type
 
-      INTEGER                  	I, II, IR               ! Loop variables
-      INTEGER                  	NIN                     ! # interpolates
+      REAL			SUM			! Normalisation
+
+      INTEGER			BSIZE			! FITS block factor
+      INTEGER			CPTR			! Cursor over data
+      INTEGER			FSTAT			! FITSIO status
+      INTEGER			IE			! Loop over energy
+      INTEGER			LUN			! Logical unit
+
+      LOGICAL			ANYNULL			! Any nulls read?
 *-
 
 *    Check status
-      IF ( (STATUS .NE. SAI__OK) .OR. (R.GT.10.0) ) THEN
-        RVAL = 0.0
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Get logical unit from system
+      CALL FIO_GUNIT( LUN, STATUS )
+
+*    Open file
+      FSTAT = 0
+      CALL FTOPEN( LUN, AS_CALDB(:AS_CALDBL)//'/data/asca/'//FORM/
+     : /'/bcf/psf/'//FILE(:CHR_LEN(FILE)), 0, BSIZE, FSTAT )
+      CALL MSG_SETC( 'FILE', AS_CALDB(:AS_CALDBL)//'/data/asca/'//FORM/
+     :               /'/bcf/psf/'//FILE )
+      IF ( FSTAT .NE. 0 ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Unable to open calibration file ^FILE',
+     :                STATUS )
         GOTO 99
-      END IF
-
-*    Find bin of SPOTS containing our radius
-      IF ( R .GT. SPOTS(1,NSPOT) ) THEN
-        IR = NSPOT
       ELSE
-        IR = 1
-        DO WHILE ( (IR.LE.NSPOT) .AND. (R.GT.SPOTS(1,IR)) )
-          IR = IR + 1
-        END DO
-        IF ( IR .GT. NSPOT ) IR = NSPOT
+        CALL MSG_PRNT( 'Loading psfs from ^FILE' )
       END IF
 
-*    Set up for interpolation
-      NIN = 0
-      DO I = IR-2, MIN(NSPOT,IR+2)
-        NIN = NIN + 1
-        IF ( I .LT. 1 ) THEN
-          II = 1 - I
-        ELSE
-          II = I
+*    Map sufficient memory for 10 energy bands at 63x63 resolution
+      CALL DYN_MAPR( 1, AS_NXY*AS_NXY*AS_NE*VAL__NBR, CPTR, STATUS )
+
+*    Read in different energies
+      DO IE = 1, AS_NE
+
+*      Store pointer
+        PARRAY(IE) = CPTR
+
+*      Load data from this image
+        CALL FTGPVE( LUN, 1, 1, AS_NXY*AS_NXY, -999.0, %VAL(CPTR),
+     :               ANYNULL, FSTAT )
+
+*      Normalise
+        CALL ARR_SUM1R( AS_NXY*AS_NXY, %VAL(CPTR), SUM, STATUS )
+        CALL ARR_MULTR( 1.0/SUM, AS_NXY*AS_NXY, %VAL(CPTR) )
+
+*      Move to next HDU
+        IF ( IE .LT. 10 ) THEN
+          CALL FTMRHD( LUN, 1, HDUTYPE, FSTAT )
+          CPTR = CPTR + AS_NXY*AS_NXY*VAL__NBR
         END IF
-        INR(NIN) = SPOTS(1,II)
-        INP(NIN) = SPOTS(2,II)
+
       END DO
 
-*    Interpolate
-      CALL MATH_INTERP( NIN, INR, INP, 1, R, 2, RVAL, STATUS )
+*    Close file
+      CALL FTCLOS( LUN, FSTAT )
 
-*    Check positive
-      IF ( RVAL .LT. 0.0 ) THEN
-        CALL MATH_INTERP( NIN, INR, INP, 1, R, 1, RVAL, STATUS )
-        RVAL = MAX(0.0,RVAL)
-      END IF
+*    Pixel size
+      PIX = 4.0 * 0.2456
 
-*    Set return value
- 99   PSF_ASCA_INTERP = RVAL
+*    Return unit to system
+ 99   CALL FIO_PUNIT( LUN, STATUS )
 
       END
+
+
+*+  PSF_ASCA_CINT - Get interpolated psf value
+      REAL FUNCTION PSF_ASCA_CINT( NXY, PVALS, ROTA, XP, YP )
+*
+*    Description :
+*
+*     Returns surface brightness of the psf in units of integrated probability
+*     per square arcminute for given distance R from the psf centre.
+*
+*    Method :
+*
+*     Inside OFFAX < 1' the on-axis psf is used. Outside 19' the 20 arcmin
+*     psf is used. Inbetween we interpolate. These are MODEs 1,2,3.
+*
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*
+*     David J. Allan (BHVAD)
+*
+*    History :
+*
+*     14 Oct 92 : Original (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Import :
+*
+      INTEGER			NXY			! Size of array
+      REAL			PVALS(-NXY/2:NXY/2,	! Psf values
+     :                                -NXY/2:NXY/2)
+      REAL			ROTA			! Rotation required
+      REAL			XP, YP			! Position of interest
+*
+*    Local variables :
+*
+      REAL			RXP, RYP
+
+      INTEGER			IX,IY			! Pixel numbers
+*-
+
+*    Apply rotation to XP,YP
+      CALL MATH_R2DR( -XP, YP, -ROTA, RXP, RYP )
+      RXP = - RXP
+
+      IX = INT(RXP+SIGN(0.5,RXP))
+      IY = INT(RYP+SIGN(0.5,RYP))
+      IF ( (ABS(IX) .GT. NXY) .OR. (ABS(IY) .GT. NXY) ) THEN
+        PSF_ASCA_CINT = 0.0
+      ELSE
+        PSF_ASCA_CINT = PVALS(IX,IY)
+      END IF
+
+      END
+
 
 *+  PSF_ASCA_DEF - ASCA PSF time/energy definition
       SUBROUTINE PSF_ASCA_DEF( SLOT, TLO, THI, ELO, EHI, UIN, UOUT,
@@ -1668,8 +1365,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Radial symmetry?
       IF ( HINT .EQ. PSF_H_RADSYM ) THEN
 
-*      All our models are radially symmetric about on-axis direction
-        CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
+*      None of our models are radially symmetric about on-axis direction
+        CALL ARR_COP1L( 1, .FALSE., DATA, STATUS )
 
 *    Vary with detector position?
       ELSE IF ( HINT .EQ. PSF_H_POSDEP ) THEN
@@ -1680,8 +1377,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Energy dependent
       ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
 
-*      Only the GIS psf is energy dependent
-        CALL ARR_COP1L( 1, (AS_INSTR(SLOT).EQ.'GIS'), DATA, STATUS )
+*      They are energy dependent
+        CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
 
       ELSE
         STATUS = SAI__ERROR
@@ -1735,7 +1432,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
 *    Function declarations :
 *
-      LOGICAL                 CHR_SIMLR
+      INTEGER			CHR_LEN
+      LOGICAL                   CHR_SIMLR
 *
 *    Local variables :
 *
@@ -1744,6 +1442,17 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Get directory containing FTOOLS calibrations
+      CALL PSX_GETENV( 'AST_FTOOLS_CALDB', AS_CALDB, STATUS )
+      IF ( AS_CALDB(1:7) .EQ. 'unknown' ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FTOOLS calibrations directory has not '/
+     :   /'been set up; see "asthelp 5 6 FTOOLS" for more', STATUS )
+        GOTO 99
+      ELSE
+        AS_CALDBL = CHR_LEN( AS_CALDB )
+      END IF
 
 *    Get mask name
       CALL USI_PROMT( 'MASK', 'ASCA detector (GIS or SIS)', STATUS )
@@ -1769,8 +1478,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get a mean photon energy
-      IF ( (AS_INSTR(SLOT).EQ.'GIS') .AND. .NOT. AS_PHA_DEF(SLOT) ) THEN
-        CALL USI_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
+      IF ( .NOT. AS_PHA_DEF(SLOT) ) THEN
+        CALL USI_PROMT( 'AUX', 'Mean photon energy in keV', STATUS )
         CALL USI_GET0R( 'AUX', AS_ENERGY(SLOT), STATUS )
       END IF
 
@@ -3453,7 +3162,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Local variables :
 *
-      INTEGER                  I                       ! Loop over models
+      INTEGER                  I, J                    ! Loop over models
 *
 *    Local data :
 *
@@ -3483,6 +3192,14 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       WF_CALOK = .FALSE.
       RX_INIT = .TRUE.
       RX_CB_OPEN = .FALSE.
+
+*    Clear pointer arrays for ASCA psfs
+      DO I = 1, AS_NSP
+        DO J = 1,  AS_NE
+          AS_GPTR(J,I) = 0
+          AS_SPTR(J,I) = 0
+        END DO
+      END DO
 
 *    Clear channel bounds set flag in XRT_PSPC psfs
       DO I = 1, PSF_NMAX
