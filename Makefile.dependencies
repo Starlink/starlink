@@ -530,6 +530,7 @@ $(MANIFEST)/esp: \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
 		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/ref \
@@ -1364,6 +1365,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
 		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/ref \
