@@ -1,0 +1,31 @@
+
+##testing command-line processing
+
+TDIR=/tmp/t7-temp
+test -d $TDIR || mkdir $TDIR
+TTDIR=$TDIR/test-install
+test -d $TTDIR || mkdir $TTDIR
+
+AUTOASTROM_DIR=$TTDIR	# IGNORE ANY PREVIOUS SETTING -- DELETED AT END
+test -n "$KAPPA_DIR"		|| KAPPA_DIR=/star/bin/kappa
+# Need CCDPACK 4.0-1 and ATOOLS 1.3, so the following might need predefining
+test -n "$CCDPACK_DIR"		|| CCDPACK_DIR=/star/bin/ccdpack
+test -n "$ATOOLS_DIR"		|| ATOOLS_DIR=/star/bin/atools
+
+export AUTOASTROM_DIR KAPPA_DIR CCDPACK_DIR ATOOLS_DIR
+
+(cd ..; ./mk test-install) >&2
+
+$AUTOASTROM_DIR/autoastrom --dump=$TDIR/t7-temp.dump1 --temp=$TDIR/t1 t5
+$AUTOASTROM_DIR/autoastrom --dump=$TDIR/t7-temp.dump2 --temp=$TDIR/t2 --obsdata=source=FITS t5
+$AUTOASTROM_DIR/autoastrom --dump=$TDIR/t7-temp.dump3 --temp=$TDIR/t3 --obsdata=ra=+210,dec=-12:34:56,pa=-30 t5
+
+for f in $TDIR/t7-temp.dump?; do
+    echo "====================" $f
+    cat $f
+    echo "--------------------"
+done
+
+rm -Rf $TDIR
+
+exit 0

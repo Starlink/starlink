@@ -1,0 +1,1559 @@
+-- autoastrom, v0.0
+-- Starting monoliths...
+-- Monoliths OK
+-- Processing NDF <t5>
+-- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
+-- NDF <t5> examined OK
+-- WCS information from AST
+-- Dumping state, and exiting...
+-- autoastrom, v0.0
+-- Starting monoliths...
+-- Monoliths OK
+-- Processing NDF <t5>
+-- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
+-- NDF <t5> examined OK
+-- WCS information from FITS
+-- Dumping state, and exiting...
+-- autoastrom, v0.0
+-- Starting monoliths...
+-- Monoliths OK
+-- Processing NDF <t5>
+-- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
+-- NDF <t5> examined OK
+-- WCS information from command line
+-- Dumping state, and exiting...
+==================== /tmp/t7-temp/t7-temp.dump1
+NDF=t5
+keeptemps=1
+tempDir=/tmp/t7-temp/t1
+insertwcs=1
+retainwcs=<UNDEF>
+CCDcat=<UNDEF>
+monolithTimeout=180
+monolithMessages=1
+maxobj=500
+esocatname=usno@eso
+skycatconfig=<UNDEF>
+verbose=0
+dumpstatefile=/tmp/t7-temp/t7-temp.dump1
+obsdata:
+    source=USER:AST:FITS
+NDFinfo hash:
+$NDFinfo->{ast}: ref to ARRAY:
+    Begin FrameSet 	# Set of inter-related coordinate systems
+    Nframe = 4 	# Number of Frames in FrameSet
+    Currnt = 4 	# Index of current Frame
+    Nnode = 5 	# Number of nodes in FrameSet
+    Nod1 = 3 	# Frame 1 is associated with node 3
+    Nod2 = 4 	# Frame 2 is associated with node 4
+    Nod3 = 5 	# Frame 3 is associated with node 5
+    Nod4 = 2 	# Frame 4 is associated with node 2
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Lnk3 = 1 	# Node 3 is derived from node 1
+    Lnk4 = 1 	# Node 4 is derived from node 1
+    Lnk5 = 1 	# Node 5 is derived from node 1
+    Frm1 = 	# Frame number 1
+    Begin Frame 	# Coordinate system description
+    Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "GRID" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 1" 	# Axis Label
+    Symbol = "g1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 2" 	# Axis Label
+    Symbol = "g2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm2 = 	# Frame number 2
+    Begin Frame 	# Coordinate system description
+    Title = "Pixel coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "PIXEL" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 1" 	# Axis Label
+    Symbol = "p1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 2" 	# Axis Label
+    Symbol = "p2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm3 = 	# Frame number 3
+    Begin Frame 	# Coordinate system description
+    Title = "Axis coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "AXIS" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 1" 	# Axis Label
+    Symbol = "a1" 	# Axis symbol
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 2" 	# Axis Label
+    Symbol = "a2" 	# Axis symbol
+    End Axis
+    End Frame
+    Frm4 = 	# Frame number 4
+    Begin SkyFrame 	# Description of celestial coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Ax1 = 	# Axis number 1
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    Ax2 = 	# Axis number 2
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    IsA Frame 	# Coordinate system description
+    System = "FK5" 	# Celestial coordinate system type
+    Proj = "gnomonic" 	# Description of sky projection
+    Epoch = 2000 	# Julian epoch of observation
+    Eqnox = 2000 	# Julian epoch of mean equinox
+    End SkyFrame
+    Map2 = 	# Mapping between nodes 1 and 2
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = -176.37325851825 	# Shift for axis 1
+    Sft2 = -52.63545018587 	# Shift for axis 2
+    End WinMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -14965.1708991093 	# Forward matrix value
+    M1 = -627841.869573187 	# Forward matrix value
+    M2 = -622488.695744898 	# Forward matrix value
+    M3 = 14074.0978167975 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin WcsMap 	# FITS-WCS sky projection
+    Nin = 2 	# Number of input coordinates
+    Invert = 1 	# Mapping inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Type = "TAN" 	# Gnomonic projection
+    End WcsMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 3 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -0.137556088705708 	# Forward matrix value
+    M1 = 0.989781208993785 	# Forward matrix value
+    M2 = -0.0375696790349366 	# Forward matrix value
+    M3 = -0.954809215130768 	# Forward matrix value
+    M4 = -0.142594383910449 	# Forward matrix value
+    M5 = -0.260779992289605 	# Forward matrix value
+    M6 = -0.263472361285496 	# Forward matrix value
+    M7 = 0 	# Forward matrix value
+    M8 = 0.96466694503266 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    Map3 = 	# Mapping between nodes 1 and 3
+    Begin UnitMap 	# Unit (null) Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    End UnitMap
+    Map4 = 	# Mapping between nodes 1 and 4
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    Map5 = 	# Mapping between nodes 1 and 5
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    End FrameSet
+$NDFinfo->{astromcol}=575
+$NDFinfo->{astromcolcomment}=FITS WFFBAND
+$NDFinfo->{astrommet}=283.701544
+$NDFinfo->{astrommetcomment}=FITS TEMPTUBE
+$NDFinfo->{astromobs}=LPO2.5
+$NDFinfo->{astromobscomment}=FITS SLATEL
+$NDFinfo->{astromtime}=19 26.133333
+$NDFinfo->{astromtimecomment}=FITS ST
+$NDFinfo->{date}=1998.4684933755
+$NDFinfo->{dim1}=20
+$NDFinfo->{dim2}=35
+$NDFinfo->{fits}: ref to ARRAY:
+    SIMPLE  =                    T
+    BITPIX  =                  -32
+    NAXIS   =                    2
+    NAXIS1  =                   20
+    NAXIS2  =                   35
+    BLANK   = '-0.34028234663852886E+39'
+    CRVAL1  =                857.5 / Co-ordinate value of axis 1
+    CDELT1  =                    1 / Co-ordinate increment along axis 1
+    CRPIX1  =                   10 / Reference pixel along axis 1
+    CRVAL2  =               2011.5 / Co-ordinate value of axis 2
+    CDELT2  =                    1 / Co-ordinate increment along axis 2
+    CRPIX2  =                   17 / Reference pixel along axis 2
+    LBOUND1 =                  849 / Pixel origin along axis 1
+    LBOUND2 =                 1996 / Pixel origin along axis 2
+    OBJECT  = 'r220a V 900s      ' / Title of the dataset
+    BUNIT   = 'ADU               ' / Units of the primary array
+    ORIGIN  = 'Starlink Project, U.K.' / Origin of this FITS file
+    BSCALE  =                    1 / True_value = BSCALE * FITS_value + BZERO
+    BZERO   =                    0 / True_value = BSCALE * FITS_value + BZERO
+    HDUCLAS1= 'NDF               ' / Starlink NDF (hierarchical n-dim format)
+    HDUCLAS2= 'DATA              ' / Array component subclass
+    RUN     =               106282 / Run number
+    SYSVER  = 's6-1              ' / Version of observing system
+    OBSERVAT= 'LAPALMA           ' / Name of observatory (IRAF style)
+    OBSTYPE = 'TARGET            ' / Type of observation, eg. ARC
+    IMAGETYP= 'TARGET            ' / Type of observation, eg. ARC
+    CTYPE1  = 'RA---TAN'           / Quantity represented by axis 1
+    CTYPE2  = 'DEC--TAN'           / Quantity represented by axis 2
+    CD1_1   = -2.06218426557144E-6
+    CD2_2   =  2.19274729802512E-6 / Transformation matrix element
+    LATITUDE=               28.762 / Telescope latitude  (degrees), +28:45:43.2
+    LONGITUD=            17.877639 / Telescope longitude (degrees), +17:52:39.5
+    HEIGHT  =                 2348 / [m] Height above sea level.
+    SLATEL  = 'LPO2.5  '           / Telescope name known to SLALIB
+    TELESCOP= 'INT     '           / 2.5m Isaac Newton Telescope
+    TELSTAT = 'GUIDING '           / Telescope status: TRACKING or GUIDING normally.
+    RA      = '17:27:10.94'        / RA  (261.7955934398498200 degrees)
+    DEC     = '74:31:58.00'        / DEC ( 74.5327767760827700 degrees)
+    EQUINOX =               2000.0 / Epoch of reference equinox
+    XAPNOM  =        -0.0697222242 / nominal aperture in x (-251.00 arcsec)
+    YAPNOM  =         0.0905555552 / nominal aperture in y (326.00 arcsec)
+    XAPOFF  =        -0.0697222242 / total aperture offset in x (-251.00 arcsec)
+    YAPOFF  =         0.0905555552 / total aperture offset in y (326.00 arcsec)
+    JD      =      2450985.6172054 / Julian Date of midtime of observation
+    STSTART = ' 19:26:08.7'        / Local sidereal time at start of observation
+    ST      = '19:26:08.70'        / Local sidereal time at start of observation
+    AZIMUTH =           349.123111 / Mean azimuth of observation (degrees)
+    ZD      =            48.512724 / Mean zenith-distance of observation (degrees)
+    FSTATION= 'PRIME   '           / Focal station of observation
+    PLATESCA=             6.856013 / [d/m] Platescale ( 24.68arcsec/mm)
+    TELFOCUS=             0.045998 / Telescope focus (metres)
+    ROTTRACK=                    T / Rotator always tracks sky on equatorial mount
+    ROTSKYPA=           180.000005 / Turntable position angle (degrees)
+    PARANGLE=           142.136558 / Parallactic angle at observation midpoint
+    VIGNETTE=                    F / Can we see out?
+    DOMEAZ  =           352.927786 / Mean dome azimuth during observation
+    AIRMASS =             1.506845 / Effective mean airmass
+    TEMPTUBE=            10.551544 / Truss Temperature (degrees Celsius)
+    CAT-NAME= 'R220A   '           / Target input-catalogue name
+    CAT-RA  = ' 17:27:10.940'      / Target Right Ascension
+    CAT-DEC = '+74:31:58.00'       / Target Declination
+    CAT-EQUI= 'J2000.00'           / Equinox of target coordinates
+    CAT-EPOC=               2000.0 / Target epoch of proper motions
+    PM-RA   =                  0.0 / Target proper-motion RA (sec time/year)
+    PM-DEC  =                  0.0 / Target proper-motion (sec arc/year)
+    PARALLAX=                  0.0 / Target Parallax (arcsec)
+    RADVEL  =                  0.0 / Target radial velocity (km/s)
+    RATRACK =                  0.0 / Differential-tracking rate RA (arcsec/sec)
+    DECTRACK=                  0.0 / Differential-tracking rate Dec (arcsec/sec)
+    INSTRUME= 'WFC               ' / INT wide-field camera is in use.
+    WFFPOS  =                    2 / Position-number of deployed filter
+    WFFBAND = 'V       '           / Waveband of filter
+    WFFPSYS = 'Unknown           ' / Photometric system of filter
+    WFFID   = 'Unknown           ' / Unique identifier of filter
+    SECPPIX =                0.333 / Arcseconds per pixel
+    UTSTART = '02:41:16.7        ' / UTC of start of observation
+    ELAPSED =               899.02 / Length of observation including pauses
+    DARKTIME=               899.02 / Length of observation including pauses
+    EXPOSED =               899.02 / Length of observation excluding pauses
+    EXPTIME =               899.02 / Length of observation excluding pauses
+    CD1_2   = -9.19935076163658E-5
+    CD2_1   =   -9.120914253783E-5 / Transformation matrix element
+    RADESYS = 'FK5     '           / Reference frame for RA/DEC values
+    DETECTOR= 'MOS1              ' / Name of the detector
+    PREFLASH=                  0.0 / Length of Preflash in seconds
+    GAIN    =                  2.9 / Electrons per ADU
+    READNOIS=                 12.0 / Readout noise in electrons per pix
+    CCDSPEED= 'NONASTRO          ' / Readout speed of the CCD
+    CCDNCHIP=                    1 / Number of CCDs in this head
+    CCDCHIP =                    1 / Head number of this CCD
+    CCDTYPE = 'EEV42             ' / Type of CCD used in this detector
+    CCDXSIZE=                 2148 / X Size in pixels of digitised frame
+    CCDYSIZE=                 4128 / Y Size in pixels of digitised frame
+    CCDXIMSI=                 2048 / X Size of useful imaging area
+    CCDYIMSI=                 4100 / Y Size of useful imaging area
+    CCDXIMST=                   50 / X Start pixel of useful imaging area
+    CCDYIMST=                    0 / Y Start pixel of useful imaging area
+    CCDWMODE=                    F / True is windows are enabled
+    CCDWXO1 =                    0 / Offset of window 1 in X
+    CCDWYO1 =                    0 / Offset of window 1 in Y
+    CCDWXS1 =                    0 / Size of window 1 in X
+    CCDWYS1 =                    0 / Size of window 1 in Y
+    CCDWXO2 =                    0 / Offset of window 2 in X
+    CCDWYO2 =                    0 / Offset of window 2 in Y
+    CCDWXS2 =                    0 / Size of window 2 in X
+    CCDWYS2 =                    0 / Size of window 2 in Y
+    CCDWXO3 =                    0 / Offset of window 3 in X
+    CCDWYO3 =                    0 / Offset of window 3 in Y
+    CCDWXS3 =                    0 / Size of window 3 in X
+    CCDWYS3 =                    0 / Size of window 3 in Y
+    CCDWXO4 =                    0 / Offset of window 4 in X
+    CCDWYO4 =                    0 / Offset of window 4 in Y
+    CCDWXS4 =                    0 / Size of window 4 in X
+    CCDWYS4 =                    0 / Size of window 4 in Y
+    CCDXPIXE=              1.35E-5 / Size in meters of the pixels, in X
+    CCDYPIXE=              1.35E-5 / Size in meters of the pixels, in Y
+    CCDXBIN =                    1 / Binning factor, in X
+    CCDYBIN =                    1 / Binning factor, in Y
+    CCDSTEMP=                  153 / Required temperature of CCD, in Kevlin
+    CCDATEMP=                  154 / Actual temperature of CCD, in Kevlin
+    CHIPNAME= 'A5530-3           ' / Name of CCD chip
+    DASCHAN =                    3 / DAS channel
+    WINSEC1 = '[0:0,0:0]         ' / Readout window 1
+    WINSEC2 = '[0:0,0:0]         ' / Readout window 2
+    WINSEC3 = '[0:0,0:0]         ' / Readout window 3
+    WINSEC4 = '[0:0,0:0]         ' / Readout window 4
+    HISTORY This is the end of the header written by the ING observing-system.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    TRIM    = 'Dec  7 16:33 Trim data section is [51:2098,2:4098]'
+    OVERSCAN= 'Dec  7 16:33 Overscan section is [5:45,20:4090] with mean=1520.532'
+    ZEROCOR = '        '           / bias.3.imh'
+    CCDSEC  = '[51:2098,2:4098]'
+    CCDMEAN =             1543.035
+    CCDMEANT=            629055311
+    CCDPROC = 'Dec  7 17:35 CCD processing done'
+    FLATCOR = 'Dec  7 17:35 Flat field image is flat.v3.imh with scale=1764.3'
+    HISTORY '1999-09-07T17:29:59' / Date FITS file was generated
+    HISTORY '17:05:44 (06/09/1999)' / Time of last modification
+    HISTORY 'ING La Palma      ' / Name of observatory
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY Image converted using STARLINK utility IRAF2NDF from the IRAF image
+    HISTORY r106282.imh on Mon Feb  7 15:09:53 2000
+    END
+$NDFinfo->{hassky}=1
+$NDFinfo->{wcs}: ref to ARRAY:
+    Begin FrameSet 	# Set of inter-related coordinate systems
+    Nframe = 4 	# Number of Frames in FrameSet
+    Currnt = 4 	# Index of current Frame
+    Nnode = 5 	# Number of nodes in FrameSet
+    Nod1 = 3 	# Frame 1 is associated with node 3
+    Nod2 = 4 	# Frame 2 is associated with node 4
+    Nod3 = 5 	# Frame 3 is associated with node 5
+    Nod4 = 2 	# Frame 4 is associated with node 2
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Lnk3 = 1 	# Node 3 is derived from node 1
+    Lnk4 = 1 	# Node 4 is derived from node 1
+    Lnk5 = 1 	# Node 5 is derived from node 1
+    Frm1 = 	# Frame number 1
+    Begin Frame 	# Coordinate system description
+    Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "GRID" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 1" 	# Axis Label
+    Symbol = "g1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 2" 	# Axis Label
+    Symbol = "g2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm2 = 	# Frame number 2
+    Begin Frame 	# Coordinate system description
+    Title = "Pixel coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "PIXEL" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 1" 	# Axis Label
+    Symbol = "p1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 2" 	# Axis Label
+    Symbol = "p2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm3 = 	# Frame number 3
+    Begin Frame 	# Coordinate system description
+    Title = "Axis coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "AXIS" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 1" 	# Axis Label
+    Symbol = "a1" 	# Axis symbol
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 2" 	# Axis Label
+    Symbol = "a2" 	# Axis symbol
+    End Axis
+    End Frame
+    Frm4 = 	# Frame number 4
+    Begin SkyFrame 	# Description of celestial coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Ax1 = 	# Axis number 1
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    Ax2 = 	# Axis number 2
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    IsA Frame 	# Coordinate system description
+    System = "FK5" 	# Celestial coordinate system type
+    Proj = "gnomonic" 	# Description of sky projection
+    Epoch = 2000 	# Julian epoch of observation
+    Eqnox = 2000 	# Julian epoch of mean equinox
+    End SkyFrame
+    Map2 = 	# Mapping between nodes 1 and 2
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = -176.37325851825 	# Shift for axis 1
+    Sft2 = -52.63545018587 	# Shift for axis 2
+    End WinMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -14965.1708991093 	# Forward matrix value
+    M1 = -627841.869573187 	# Forward matrix value
+    M2 = -622488.695744898 	# Forward matrix value
+    M3 = 14074.0978167975 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin WcsMap 	# FITS-WCS sky projection
+    Nin = 2 	# Number of input coordinates
+    Invert = 1 	# Mapping inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Type = "TAN" 	# Gnomonic projection
+    End WcsMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 3 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -0.137556088705708 	# Forward matrix value
+    M1 = 0.989781208993785 	# Forward matrix value
+    M2 = -0.0375696790349366 	# Forward matrix value
+    M3 = -0.954809215130768 	# Forward matrix value
+    M4 = -0.142594383910449 	# Forward matrix value
+    M5 = -0.260779992289605 	# Forward matrix value
+    M6 = -0.263472361285496 	# Forward matrix value
+    M7 = 0 	# Forward matrix value
+    M8 = 0.96466694503266 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    Map3 = 	# Mapping between nodes 1 and 3
+    Begin UnitMap 	# Unit (null) Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    End UnitMap
+    Map4 = 	# Mapping between nodes 1 and 4
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    Map5 = 	# Mapping between nodes 1 and 5
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    End FrameSet
+--------------------
+==================== /tmp/t7-temp/t7-temp.dump2
+NDF=t5
+keeptemps=1
+tempDir=/tmp/t7-temp/t2
+insertwcs=1
+retainwcs=<UNDEF>
+CCDcat=<UNDEF>
+monolithTimeout=180
+monolithMessages=1
+maxobj=500
+esocatname=usno@eso
+skycatconfig=<UNDEF>
+verbose=0
+dumpstatefile=/tmp/t7-temp/t7-temp.dump2
+obsdata:
+    source=FITS
+NDFinfo hash:
+$NDFinfo->{ast}: ref to ARRAY:
+    Begin FrameSet 	# Set of inter-related coordinate systems
+    Nframe = 4 	# Number of Frames in FrameSet
+    Currnt = 4 	# Index of current Frame
+    Nnode = 5 	# Number of nodes in FrameSet
+    Nod1 = 3 	# Frame 1 is associated with node 3
+    Nod2 = 4 	# Frame 2 is associated with node 4
+    Nod3 = 5 	# Frame 3 is associated with node 5
+    Nod4 = 2 	# Frame 4 is associated with node 2
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Lnk3 = 1 	# Node 3 is derived from node 1
+    Lnk4 = 1 	# Node 4 is derived from node 1
+    Lnk5 = 1 	# Node 5 is derived from node 1
+    Frm1 = 	# Frame number 1
+    Begin Frame 	# Coordinate system description
+    Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "GRID" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 1" 	# Axis Label
+    Symbol = "g1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 2" 	# Axis Label
+    Symbol = "g2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm2 = 	# Frame number 2
+    Begin Frame 	# Coordinate system description
+    Title = "Pixel coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "PIXEL" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 1" 	# Axis Label
+    Symbol = "p1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 2" 	# Axis Label
+    Symbol = "p2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm3 = 	# Frame number 3
+    Begin Frame 	# Coordinate system description
+    Title = "Axis coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "AXIS" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 1" 	# Axis Label
+    Symbol = "a1" 	# Axis symbol
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 2" 	# Axis Label
+    Symbol = "a2" 	# Axis symbol
+    End Axis
+    End Frame
+    Frm4 = 	# Frame number 4
+    Begin SkyFrame 	# Description of celestial coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Ax1 = 	# Axis number 1
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    Ax2 = 	# Axis number 2
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    IsA Frame 	# Coordinate system description
+    System = "FK5" 	# Celestial coordinate system type
+    Proj = "gnomonic" 	# Description of sky projection
+    Epoch = 2000 	# Julian epoch of observation
+    Eqnox = 2000 	# Julian epoch of mean equinox
+    End SkyFrame
+    Map2 = 	# Mapping between nodes 1 and 2
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = -176.37325851825 	# Shift for axis 1
+    Sft2 = -52.63545018587 	# Shift for axis 2
+    End WinMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -14965.1708991093 	# Forward matrix value
+    M1 = -627841.869573187 	# Forward matrix value
+    M2 = -622488.695744898 	# Forward matrix value
+    M3 = 14074.0978167975 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin WcsMap 	# FITS-WCS sky projection
+    Nin = 2 	# Number of input coordinates
+    Invert = 1 	# Mapping inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Type = "TAN" 	# Gnomonic projection
+    End WcsMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 3 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -0.137556088705708 	# Forward matrix value
+    M1 = 0.989781208993785 	# Forward matrix value
+    M2 = -0.0375696790349366 	# Forward matrix value
+    M3 = -0.954809215130768 	# Forward matrix value
+    M4 = -0.142594383910449 	# Forward matrix value
+    M5 = -0.260779992289605 	# Forward matrix value
+    M6 = -0.263472361285496 	# Forward matrix value
+    M7 = 0 	# Forward matrix value
+    M8 = 0.96466694503266 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    Map3 = 	# Mapping between nodes 1 and 3
+    Begin UnitMap 	# Unit (null) Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    End UnitMap
+    Map4 = 	# Mapping between nodes 1 and 4
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    Map5 = 	# Mapping between nodes 1 and 5
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    End FrameSet
+$NDFinfo->{astromcol}=575
+$NDFinfo->{astromcolcomment}=FITS WFFBAND
+$NDFinfo->{astrommet}=283.701544
+$NDFinfo->{astrommetcomment}=FITS TEMPTUBE
+$NDFinfo->{astromobs}=LPO2.5
+$NDFinfo->{astromobscomment}=FITS SLATEL
+$NDFinfo->{astromtime}=19 26.133333
+$NDFinfo->{astromtimecomment}=FITS ST
+$NDFinfo->{date}=1998.4684933755
+$NDFinfo->{dim1}=20
+$NDFinfo->{dim2}=35
+$NDFinfo->{fits}: ref to ARRAY:
+    SIMPLE  =                    T
+    BITPIX  =                  -32
+    NAXIS   =                    2
+    NAXIS1  =                   20
+    NAXIS2  =                   35
+    BLANK   = '-0.34028234663852886E+39'
+    CRVAL1  =                857.5 / Co-ordinate value of axis 1
+    CDELT1  =                    1 / Co-ordinate increment along axis 1
+    CRPIX1  =                   10 / Reference pixel along axis 1
+    CRVAL2  =               2011.5 / Co-ordinate value of axis 2
+    CDELT2  =                    1 / Co-ordinate increment along axis 2
+    CRPIX2  =                   17 / Reference pixel along axis 2
+    LBOUND1 =                  849 / Pixel origin along axis 1
+    LBOUND2 =                 1996 / Pixel origin along axis 2
+    OBJECT  = 'r220a V 900s      ' / Title of the dataset
+    BUNIT   = 'ADU               ' / Units of the primary array
+    ORIGIN  = 'Starlink Project, U.K.' / Origin of this FITS file
+    BSCALE  =                    1 / True_value = BSCALE * FITS_value + BZERO
+    BZERO   =                    0 / True_value = BSCALE * FITS_value + BZERO
+    HDUCLAS1= 'NDF               ' / Starlink NDF (hierarchical n-dim format)
+    HDUCLAS2= 'DATA              ' / Array component subclass
+    RUN     =               106282 / Run number
+    SYSVER  = 's6-1              ' / Version of observing system
+    OBSERVAT= 'LAPALMA           ' / Name of observatory (IRAF style)
+    OBSTYPE = 'TARGET            ' / Type of observation, eg. ARC
+    IMAGETYP= 'TARGET            ' / Type of observation, eg. ARC
+    CTYPE1  = 'RA---TAN'           / Quantity represented by axis 1
+    CTYPE2  = 'DEC--TAN'           / Quantity represented by axis 2
+    CD1_1   = -2.06218426557144E-6
+    CD2_2   =  2.19274729802512E-6 / Transformation matrix element
+    LATITUDE=               28.762 / Telescope latitude  (degrees), +28:45:43.2
+    LONGITUD=            17.877639 / Telescope longitude (degrees), +17:52:39.5
+    HEIGHT  =                 2348 / [m] Height above sea level.
+    SLATEL  = 'LPO2.5  '           / Telescope name known to SLALIB
+    TELESCOP= 'INT     '           / 2.5m Isaac Newton Telescope
+    TELSTAT = 'GUIDING '           / Telescope status: TRACKING or GUIDING normally.
+    RA      = '17:27:10.94'        / RA  (261.7955934398498200 degrees)
+    DEC     = '74:31:58.00'        / DEC ( 74.5327767760827700 degrees)
+    EQUINOX =               2000.0 / Epoch of reference equinox
+    XAPNOM  =        -0.0697222242 / nominal aperture in x (-251.00 arcsec)
+    YAPNOM  =         0.0905555552 / nominal aperture in y (326.00 arcsec)
+    XAPOFF  =        -0.0697222242 / total aperture offset in x (-251.00 arcsec)
+    YAPOFF  =         0.0905555552 / total aperture offset in y (326.00 arcsec)
+    JD      =      2450985.6172054 / Julian Date of midtime of observation
+    STSTART = ' 19:26:08.7'        / Local sidereal time at start of observation
+    ST      = '19:26:08.70'        / Local sidereal time at start of observation
+    AZIMUTH =           349.123111 / Mean azimuth of observation (degrees)
+    ZD      =            48.512724 / Mean zenith-distance of observation (degrees)
+    FSTATION= 'PRIME   '           / Focal station of observation
+    PLATESCA=             6.856013 / [d/m] Platescale ( 24.68arcsec/mm)
+    TELFOCUS=             0.045998 / Telescope focus (metres)
+    ROTTRACK=                    T / Rotator always tracks sky on equatorial mount
+    ROTSKYPA=           180.000005 / Turntable position angle (degrees)
+    PARANGLE=           142.136558 / Parallactic angle at observation midpoint
+    VIGNETTE=                    F / Can we see out?
+    DOMEAZ  =           352.927786 / Mean dome azimuth during observation
+    AIRMASS =             1.506845 / Effective mean airmass
+    TEMPTUBE=            10.551544 / Truss Temperature (degrees Celsius)
+    CAT-NAME= 'R220A   '           / Target input-catalogue name
+    CAT-RA  = ' 17:27:10.940'      / Target Right Ascension
+    CAT-DEC = '+74:31:58.00'       / Target Declination
+    CAT-EQUI= 'J2000.00'           / Equinox of target coordinates
+    CAT-EPOC=               2000.0 / Target epoch of proper motions
+    PM-RA   =                  0.0 / Target proper-motion RA (sec time/year)
+    PM-DEC  =                  0.0 / Target proper-motion (sec arc/year)
+    PARALLAX=                  0.0 / Target Parallax (arcsec)
+    RADVEL  =                  0.0 / Target radial velocity (km/s)
+    RATRACK =                  0.0 / Differential-tracking rate RA (arcsec/sec)
+    DECTRACK=                  0.0 / Differential-tracking rate Dec (arcsec/sec)
+    INSTRUME= 'WFC               ' / INT wide-field camera is in use.
+    WFFPOS  =                    2 / Position-number of deployed filter
+    WFFBAND = 'V       '           / Waveband of filter
+    WFFPSYS = 'Unknown           ' / Photometric system of filter
+    WFFID   = 'Unknown           ' / Unique identifier of filter
+    SECPPIX =                0.333 / Arcseconds per pixel
+    UTSTART = '02:41:16.7        ' / UTC of start of observation
+    ELAPSED =               899.02 / Length of observation including pauses
+    DARKTIME=               899.02 / Length of observation including pauses
+    EXPOSED =               899.02 / Length of observation excluding pauses
+    EXPTIME =               899.02 / Length of observation excluding pauses
+    CD1_2   = -9.19935076163658E-5
+    CD2_1   =   -9.120914253783E-5 / Transformation matrix element
+    RADESYS = 'FK5     '           / Reference frame for RA/DEC values
+    DETECTOR= 'MOS1              ' / Name of the detector
+    PREFLASH=                  0.0 / Length of Preflash in seconds
+    GAIN    =                  2.9 / Electrons per ADU
+    READNOIS=                 12.0 / Readout noise in electrons per pix
+    CCDSPEED= 'NONASTRO          ' / Readout speed of the CCD
+    CCDNCHIP=                    1 / Number of CCDs in this head
+    CCDCHIP =                    1 / Head number of this CCD
+    CCDTYPE = 'EEV42             ' / Type of CCD used in this detector
+    CCDXSIZE=                 2148 / X Size in pixels of digitised frame
+    CCDYSIZE=                 4128 / Y Size in pixels of digitised frame
+    CCDXIMSI=                 2048 / X Size of useful imaging area
+    CCDYIMSI=                 4100 / Y Size of useful imaging area
+    CCDXIMST=                   50 / X Start pixel of useful imaging area
+    CCDYIMST=                    0 / Y Start pixel of useful imaging area
+    CCDWMODE=                    F / True is windows are enabled
+    CCDWXO1 =                    0 / Offset of window 1 in X
+    CCDWYO1 =                    0 / Offset of window 1 in Y
+    CCDWXS1 =                    0 / Size of window 1 in X
+    CCDWYS1 =                    0 / Size of window 1 in Y
+    CCDWXO2 =                    0 / Offset of window 2 in X
+    CCDWYO2 =                    0 / Offset of window 2 in Y
+    CCDWXS2 =                    0 / Size of window 2 in X
+    CCDWYS2 =                    0 / Size of window 2 in Y
+    CCDWXO3 =                    0 / Offset of window 3 in X
+    CCDWYO3 =                    0 / Offset of window 3 in Y
+    CCDWXS3 =                    0 / Size of window 3 in X
+    CCDWYS3 =                    0 / Size of window 3 in Y
+    CCDWXO4 =                    0 / Offset of window 4 in X
+    CCDWYO4 =                    0 / Offset of window 4 in Y
+    CCDWXS4 =                    0 / Size of window 4 in X
+    CCDWYS4 =                    0 / Size of window 4 in Y
+    CCDXPIXE=              1.35E-5 / Size in meters of the pixels, in X
+    CCDYPIXE=              1.35E-5 / Size in meters of the pixels, in Y
+    CCDXBIN =                    1 / Binning factor, in X
+    CCDYBIN =                    1 / Binning factor, in Y
+    CCDSTEMP=                  153 / Required temperature of CCD, in Kevlin
+    CCDATEMP=                  154 / Actual temperature of CCD, in Kevlin
+    CHIPNAME= 'A5530-3           ' / Name of CCD chip
+    DASCHAN =                    3 / DAS channel
+    WINSEC1 = '[0:0,0:0]         ' / Readout window 1
+    WINSEC2 = '[0:0,0:0]         ' / Readout window 2
+    WINSEC3 = '[0:0,0:0]         ' / Readout window 3
+    WINSEC4 = '[0:0,0:0]         ' / Readout window 4
+    HISTORY This is the end of the header written by the ING observing-system.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    TRIM    = 'Dec  7 16:33 Trim data section is [51:2098,2:4098]'
+    OVERSCAN= 'Dec  7 16:33 Overscan section is [5:45,20:4090] with mean=1520.532'
+    ZEROCOR = '        '           / bias.3.imh'
+    CCDSEC  = '[51:2098,2:4098]'
+    CCDMEAN =             1543.035
+    CCDMEANT=            629055311
+    CCDPROC = 'Dec  7 17:35 CCD processing done'
+    FLATCOR = 'Dec  7 17:35 Flat field image is flat.v3.imh with scale=1764.3'
+    HISTORY '1999-09-07T17:29:59' / Date FITS file was generated
+    HISTORY '17:05:44 (06/09/1999)' / Time of last modification
+    HISTORY 'ING La Palma      ' / Name of observatory
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY Image converted using STARLINK utility IRAF2NDF from the IRAF image
+    HISTORY r106282.imh on Mon Feb  7 15:09:53 2000
+    END
+$NDFinfo->{hassky}=1
+$NDFinfo->{wcs}: ref to ARRAY:
+    SIMPLE  =                    T
+    BITPIX  =                  -32
+    NAXIS   =                    2
+    NAXIS1  =                   20
+    NAXIS2  =                   35
+    BLANK   = '-0.34028234663852886E+39'
+    CRVAL1  =                857.5 / Co-ordinate value of axis 1
+    CDELT1  =                    1 / Co-ordinate increment along axis 1
+    CRPIX1  =                   10 / Reference pixel along axis 1
+    CRVAL2  =               2011.5 / Co-ordinate value of axis 2
+    CDELT2  =                    1 / Co-ordinate increment along axis 2
+    CRPIX2  =                   17 / Reference pixel along axis 2
+    LBOUND1 =                  849 / Pixel origin along axis 1
+    LBOUND2 =                 1996 / Pixel origin along axis 2
+    OBJECT  = 'r220a V 900s      ' / Title of the dataset
+    BUNIT   = 'ADU               ' / Units of the primary array
+    ORIGIN  = 'Starlink Project, U.K.' / Origin of this FITS file
+    BSCALE  =                    1 / True_value = BSCALE * FITS_value + BZERO
+    BZERO   =                    0 / True_value = BSCALE * FITS_value + BZERO
+    HDUCLAS1= 'NDF               ' / Starlink NDF (hierarchical n-dim format)
+    HDUCLAS2= 'DATA              ' / Array component subclass
+    RUN     =               106282 / Run number
+    SYSVER  = 's6-1              ' / Version of observing system
+    OBSERVAT= 'LAPALMA           ' / Name of observatory (IRAF style)
+    OBSTYPE = 'TARGET            ' / Type of observation, eg. ARC
+    IMAGETYP= 'TARGET            ' / Type of observation, eg. ARC
+    CTYPE1  = 'RA---TAN'           / Quantity represented by axis 1
+    CTYPE2  = 'DEC--TAN'           / Quantity represented by axis 2
+    CD1_1   = -2.06218426557144E-6
+    CD2_2   =  2.19274729802512E-6 / Transformation matrix element
+    LATITUDE=               28.762 / Telescope latitude  (degrees), +28:45:43.2
+    LONGITUD=            17.877639 / Telescope longitude (degrees), +17:52:39.5
+    HEIGHT  =                 2348 / [m] Height above sea level.
+    SLATEL  = 'LPO2.5  '           / Telescope name known to SLALIB
+    TELESCOP= 'INT     '           / 2.5m Isaac Newton Telescope
+    TELSTAT = 'GUIDING '           / Telescope status: TRACKING or GUIDING normally.
+    RA      = '17:27:10.94'        / RA  (261.7955934398498200 degrees)
+    DEC     = '74:31:58.00'        / DEC ( 74.5327767760827700 degrees)
+    EQUINOX =               2000.0 / Epoch of reference equinox
+    XAPNOM  =        -0.0697222242 / nominal aperture in x (-251.00 arcsec)
+    YAPNOM  =         0.0905555552 / nominal aperture in y (326.00 arcsec)
+    XAPOFF  =        -0.0697222242 / total aperture offset in x (-251.00 arcsec)
+    YAPOFF  =         0.0905555552 / total aperture offset in y (326.00 arcsec)
+    JD      =      2450985.6172054 / Julian Date of midtime of observation
+    STSTART = ' 19:26:08.7'        / Local sidereal time at start of observation
+    ST      = '19:26:08.70'        / Local sidereal time at start of observation
+    AZIMUTH =           349.123111 / Mean azimuth of observation (degrees)
+    ZD      =            48.512724 / Mean zenith-distance of observation (degrees)
+    FSTATION= 'PRIME   '           / Focal station of observation
+    PLATESCA=             6.856013 / [d/m] Platescale ( 24.68arcsec/mm)
+    TELFOCUS=             0.045998 / Telescope focus (metres)
+    ROTTRACK=                    T / Rotator always tracks sky on equatorial mount
+    ROTSKYPA=           180.000005 / Turntable position angle (degrees)
+    PARANGLE=           142.136558 / Parallactic angle at observation midpoint
+    VIGNETTE=                    F / Can we see out?
+    DOMEAZ  =           352.927786 / Mean dome azimuth during observation
+    AIRMASS =             1.506845 / Effective mean airmass
+    TEMPTUBE=            10.551544 / Truss Temperature (degrees Celsius)
+    CAT-NAME= 'R220A   '           / Target input-catalogue name
+    CAT-RA  = ' 17:27:10.940'      / Target Right Ascension
+    CAT-DEC = '+74:31:58.00'       / Target Declination
+    CAT-EQUI= 'J2000.00'           / Equinox of target coordinates
+    CAT-EPOC=               2000.0 / Target epoch of proper motions
+    PM-RA   =                  0.0 / Target proper-motion RA (sec time/year)
+    PM-DEC  =                  0.0 / Target proper-motion (sec arc/year)
+    PARALLAX=                  0.0 / Target Parallax (arcsec)
+    RADVEL  =                  0.0 / Target radial velocity (km/s)
+    RATRACK =                  0.0 / Differential-tracking rate RA (arcsec/sec)
+    DECTRACK=                  0.0 / Differential-tracking rate Dec (arcsec/sec)
+    INSTRUME= 'WFC               ' / INT wide-field camera is in use.
+    WFFPOS  =                    2 / Position-number of deployed filter
+    WFFBAND = 'V       '           / Waveband of filter
+    WFFPSYS = 'Unknown           ' / Photometric system of filter
+    WFFID   = 'Unknown           ' / Unique identifier of filter
+    SECPPIX =                0.333 / Arcseconds per pixel
+    UTSTART = '02:41:16.7        ' / UTC of start of observation
+    ELAPSED =               899.02 / Length of observation including pauses
+    DARKTIME=               899.02 / Length of observation including pauses
+    EXPOSED =               899.02 / Length of observation excluding pauses
+    EXPTIME =               899.02 / Length of observation excluding pauses
+    CD1_2   = -9.19935076163658E-5
+    CD2_1   =   -9.120914253783E-5 / Transformation matrix element
+    RADESYS = 'FK5     '           / Reference frame for RA/DEC values
+    DETECTOR= 'MOS1              ' / Name of the detector
+    PREFLASH=                  0.0 / Length of Preflash in seconds
+    GAIN    =                  2.9 / Electrons per ADU
+    READNOIS=                 12.0 / Readout noise in electrons per pix
+    CCDSPEED= 'NONASTRO          ' / Readout speed of the CCD
+    CCDNCHIP=                    1 / Number of CCDs in this head
+    CCDCHIP =                    1 / Head number of this CCD
+    CCDTYPE = 'EEV42             ' / Type of CCD used in this detector
+    CCDXSIZE=                 2148 / X Size in pixels of digitised frame
+    CCDYSIZE=                 4128 / Y Size in pixels of digitised frame
+    CCDXIMSI=                 2048 / X Size of useful imaging area
+    CCDYIMSI=                 4100 / Y Size of useful imaging area
+    CCDXIMST=                   50 / X Start pixel of useful imaging area
+    CCDYIMST=                    0 / Y Start pixel of useful imaging area
+    CCDWMODE=                    F / True is windows are enabled
+    CCDWXO1 =                    0 / Offset of window 1 in X
+    CCDWYO1 =                    0 / Offset of window 1 in Y
+    CCDWXS1 =                    0 / Size of window 1 in X
+    CCDWYS1 =                    0 / Size of window 1 in Y
+    CCDWXO2 =                    0 / Offset of window 2 in X
+    CCDWYO2 =                    0 / Offset of window 2 in Y
+    CCDWXS2 =                    0 / Size of window 2 in X
+    CCDWYS2 =                    0 / Size of window 2 in Y
+    CCDWXO3 =                    0 / Offset of window 3 in X
+    CCDWYO3 =                    0 / Offset of window 3 in Y
+    CCDWXS3 =                    0 / Size of window 3 in X
+    CCDWYS3 =                    0 / Size of window 3 in Y
+    CCDWXO4 =                    0 / Offset of window 4 in X
+    CCDWYO4 =                    0 / Offset of window 4 in Y
+    CCDWXS4 =                    0 / Size of window 4 in X
+    CCDWYS4 =                    0 / Size of window 4 in Y
+    CCDXPIXE=              1.35E-5 / Size in meters of the pixels, in X
+    CCDYPIXE=              1.35E-5 / Size in meters of the pixels, in Y
+    CCDXBIN =                    1 / Binning factor, in X
+    CCDYBIN =                    1 / Binning factor, in Y
+    CCDSTEMP=                  153 / Required temperature of CCD, in Kevlin
+    CCDATEMP=                  154 / Actual temperature of CCD, in Kevlin
+    CHIPNAME= 'A5530-3           ' / Name of CCD chip
+    DASCHAN =                    3 / DAS channel
+    WINSEC1 = '[0:0,0:0]         ' / Readout window 1
+    WINSEC2 = '[0:0,0:0]         ' / Readout window 2
+    WINSEC3 = '[0:0,0:0]         ' / Readout window 3
+    WINSEC4 = '[0:0,0:0]         ' / Readout window 4
+    HISTORY This is the end of the header written by the ING observing-system.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    TRIM    = 'Dec  7 16:33 Trim data section is [51:2098,2:4098]'
+    OVERSCAN= 'Dec  7 16:33 Overscan section is [5:45,20:4090] with mean=1520.532'
+    ZEROCOR = '        '           / bias.3.imh'
+    CCDSEC  = '[51:2098,2:4098]'
+    CCDMEAN =             1543.035
+    CCDMEANT=            629055311
+    CCDPROC = 'Dec  7 17:35 CCD processing done'
+    FLATCOR = 'Dec  7 17:35 Flat field image is flat.v3.imh with scale=1764.3'
+    HISTORY '1999-09-07T17:29:59' / Date FITS file was generated
+    HISTORY '17:05:44 (06/09/1999)' / Time of last modification
+    HISTORY 'ING La Palma      ' / Name of observatory
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY Image converted using STARLINK utility IRAF2NDF from the IRAF image
+    HISTORY r106282.imh on Mon Feb  7 15:09:53 2000
+    END
+--------------------
+==================== /tmp/t7-temp/t7-temp.dump3
+NDF=t5
+keeptemps=1
+tempDir=/tmp/t7-temp/t3
+insertwcs=1
+retainwcs=<UNDEF>
+CCDcat=<UNDEF>
+monolithTimeout=180
+monolithMessages=1
+maxobj=500
+esocatname=usno@eso
+skycatconfig=<UNDEF>
+verbose=0
+dumpstatefile=/tmp/t7-temp/t7-temp.dump3
+obsdata:
+    dec=-12:34:56
+    pa=-30
+    ra=+210
+    source=USER:AST:FITS
+NDFinfo hash:
+$NDFinfo->{ast}: ref to ARRAY:
+    Begin FrameSet 	# Set of inter-related coordinate systems
+    Nframe = 4 	# Number of Frames in FrameSet
+    Currnt = 4 	# Index of current Frame
+    Nnode = 5 	# Number of nodes in FrameSet
+    Nod1 = 3 	# Frame 1 is associated with node 3
+    Nod2 = 4 	# Frame 2 is associated with node 4
+    Nod3 = 5 	# Frame 3 is associated with node 5
+    Nod4 = 2 	# Frame 4 is associated with node 2
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Lnk3 = 1 	# Node 3 is derived from node 1
+    Lnk4 = 1 	# Node 4 is derived from node 1
+    Lnk5 = 1 	# Node 5 is derived from node 1
+    Frm1 = 	# Frame number 1
+    Begin Frame 	# Coordinate system description
+    Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "GRID" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 1" 	# Axis Label
+    Symbol = "g1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Data grid index 2" 	# Axis Label
+    Symbol = "g2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm2 = 	# Frame number 2
+    Begin Frame 	# Coordinate system description
+    Title = "Pixel coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "PIXEL" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 1" 	# Axis Label
+    Symbol = "p1" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Pixel coordinate 2" 	# Axis Label
+    Symbol = "p2" 	# Axis symbol
+    Unit = "pixel" 	# Axis units
+    Format = "%3.1f" 	# Format specifier
+    End Axis
+    End Frame
+    Frm3 = 	# Frame number 3
+    Begin Frame 	# Coordinate system description
+    Title = "Axis coordinates; first pixel at (848.5,1995.5)" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Domain = "AXIS" 	# Coordinate system domain
+    Ax1 = 	# Axis number 1
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 1" 	# Axis Label
+    Symbol = "a1" 	# Axis symbol
+    End Axis
+    Ax2 = 	# Axis number 2
+    Begin Axis 	# Coordinate axis
+    Label = "Axis 2" 	# Axis Label
+    Symbol = "a2" 	# Axis symbol
+    End Axis
+    End Frame
+    Frm4 = 	# Frame number 4
+    Begin SkyFrame 	# Description of celestial coordinate system
+    Naxes = 2 	# Number of coordinate axes
+    Ax1 = 	# Axis number 1
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    Ax2 = 	# Axis number 2
+    Begin SkyAxis 	# Celestial coordinate axis
+    Digits = 8 	# Default formatting precision
+    IsA Axis 	# Coordinate axis
+    End SkyAxis
+    IsA Frame 	# Coordinate system description
+    System = "FK5" 	# Celestial coordinate system type
+    Proj = "gnomonic" 	# Description of sky projection
+    Epoch = 2000 	# Julian epoch of observation
+    Eqnox = 2000 	# Julian epoch of mean equinox
+    End SkyFrame
+    Map2 = 	# Mapping between nodes 1 and 2
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = -176.37325851825 	# Shift for axis 1
+    Sft2 = -52.63545018587 	# Shift for axis 2
+    End WinMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 2 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -14965.1708991093 	# Forward matrix value
+    M1 = -627841.869573187 	# Forward matrix value
+    M2 = -622488.695744898 	# Forward matrix value
+    M3 = 14074.0978167975 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin WcsMap 	# FITS-WCS sky projection
+    Nin = 2 	# Number of input coordinates
+    Invert = 1 	# Mapping inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    Type = "TAN" 	# Gnomonic projection
+    End WcsMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    InvA = 1 	# First Mapping used in inverse direction
+    MapA = 	# First component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    MapB = 	# Second component Mapping
+    Begin CmpMap 	# Compound Mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    MapA = 	# First component Mapping
+    Begin MatrixMap 	# Matrix transformation
+    Nin = 3 	# Number of input coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    M0 = -0.137556088705708 	# Forward matrix value
+    M1 = 0.989781208993785 	# Forward matrix value
+    M2 = -0.0375696790349366 	# Forward matrix value
+    M3 = -0.954809215130768 	# Forward matrix value
+    M4 = -0.142594383910449 	# Forward matrix value
+    M5 = -0.260779992289605 	# Forward matrix value
+    M6 = -0.263472361285496 	# Forward matrix value
+    M7 = 0 	# Forward matrix value
+    M8 = 0.96466694503266 	# Forward matrix value
+    Form = "Full" 	# Matrix storage form
+    End MatrixMap
+    MapB = 	# Second component Mapping
+    Begin SphMap 	# Cartesian to Spherical mapping
+    Nin = 3 	# Number of input coordinates
+    Nout = 2 	# Number of output coordinates
+    Invert = 0 	# Mapping not inverted
+    IsA Mapping 	# Mapping between coordinate systems
+    UntRd = 1 	# All input vectors have unit length
+    End SphMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    Map3 = 	# Mapping between nodes 1 and 3
+    Begin UnitMap 	# Unit (null) Mapping
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    End UnitMap
+    Map4 = 	# Mapping between nodes 1 and 4
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    Map5 = 	# Mapping between nodes 1 and 5
+    Begin WinMap 	# Map one window on to another
+    Nin = 2 	# Number of input coordinates
+    IsA Mapping 	# Mapping between coordinate systems
+    Sft1 = 847.5 	# Shift for axis 1
+    Sft2 = 1994.5 	# Shift for axis 2
+    End WinMap
+    End FrameSet
+$NDFinfo->{astromcol}=575
+$NDFinfo->{astromcolcomment}=FITS WFFBAND
+$NDFinfo->{astrommet}=283.701544
+$NDFinfo->{astrommetcomment}=FITS TEMPTUBE
+$NDFinfo->{astromobs}=LPO2.5
+$NDFinfo->{astromobscomment}=FITS SLATEL
+$NDFinfo->{astromtime}=19 26.133333
+$NDFinfo->{astromtimecomment}=FITS ST
+$NDFinfo->{date}=1998.4684933755
+$NDFinfo->{dim1}=20
+$NDFinfo->{dim2}=35
+$NDFinfo->{fits}: ref to ARRAY:
+    SIMPLE  =                    T
+    BITPIX  =                  -32
+    NAXIS   =                    2
+    NAXIS1  =                   20
+    NAXIS2  =                   35
+    BLANK   = '-0.34028234663852886E+39'
+    CRVAL1  =                857.5 / Co-ordinate value of axis 1
+    CDELT1  =                    1 / Co-ordinate increment along axis 1
+    CRPIX1  =                   10 / Reference pixel along axis 1
+    CRVAL2  =               2011.5 / Co-ordinate value of axis 2
+    CDELT2  =                    1 / Co-ordinate increment along axis 2
+    CRPIX2  =                   17 / Reference pixel along axis 2
+    LBOUND1 =                  849 / Pixel origin along axis 1
+    LBOUND2 =                 1996 / Pixel origin along axis 2
+    OBJECT  = 'r220a V 900s      ' / Title of the dataset
+    BUNIT   = 'ADU               ' / Units of the primary array
+    ORIGIN  = 'Starlink Project, U.K.' / Origin of this FITS file
+    BSCALE  =                    1 / True_value = BSCALE * FITS_value + BZERO
+    BZERO   =                    0 / True_value = BSCALE * FITS_value + BZERO
+    HDUCLAS1= 'NDF               ' / Starlink NDF (hierarchical n-dim format)
+    HDUCLAS2= 'DATA              ' / Array component subclass
+    RUN     =               106282 / Run number
+    SYSVER  = 's6-1              ' / Version of observing system
+    OBSERVAT= 'LAPALMA           ' / Name of observatory (IRAF style)
+    OBSTYPE = 'TARGET            ' / Type of observation, eg. ARC
+    IMAGETYP= 'TARGET            ' / Type of observation, eg. ARC
+    CTYPE1  = 'RA---TAN'           / Quantity represented by axis 1
+    CTYPE2  = 'DEC--TAN'           / Quantity represented by axis 2
+    CD1_1   = -2.06218426557144E-6
+    CD2_2   =  2.19274729802512E-6 / Transformation matrix element
+    LATITUDE=               28.762 / Telescope latitude  (degrees), +28:45:43.2
+    LONGITUD=            17.877639 / Telescope longitude (degrees), +17:52:39.5
+    HEIGHT  =                 2348 / [m] Height above sea level.
+    SLATEL  = 'LPO2.5  '           / Telescope name known to SLALIB
+    TELESCOP= 'INT     '           / 2.5m Isaac Newton Telescope
+    TELSTAT = 'GUIDING '           / Telescope status: TRACKING or GUIDING normally.
+    RA      = '17:27:10.94'        / RA  (261.7955934398498200 degrees)
+    DEC     = '74:31:58.00'        / DEC ( 74.5327767760827700 degrees)
+    EQUINOX =               2000.0 / Epoch of reference equinox
+    XAPNOM  =        -0.0697222242 / nominal aperture in x (-251.00 arcsec)
+    YAPNOM  =         0.0905555552 / nominal aperture in y (326.00 arcsec)
+    XAPOFF  =        -0.0697222242 / total aperture offset in x (-251.00 arcsec)
+    YAPOFF  =         0.0905555552 / total aperture offset in y (326.00 arcsec)
+    JD      =      2450985.6172054 / Julian Date of midtime of observation
+    STSTART = ' 19:26:08.7'        / Local sidereal time at start of observation
+    ST      = '19:26:08.70'        / Local sidereal time at start of observation
+    AZIMUTH =           349.123111 / Mean azimuth of observation (degrees)
+    ZD      =            48.512724 / Mean zenith-distance of observation (degrees)
+    FSTATION= 'PRIME   '           / Focal station of observation
+    PLATESCA=             6.856013 / [d/m] Platescale ( 24.68arcsec/mm)
+    TELFOCUS=             0.045998 / Telescope focus (metres)
+    ROTTRACK=                    T / Rotator always tracks sky on equatorial mount
+    ROTSKYPA=           180.000005 / Turntable position angle (degrees)
+    PARANGLE=           142.136558 / Parallactic angle at observation midpoint
+    VIGNETTE=                    F / Can we see out?
+    DOMEAZ  =           352.927786 / Mean dome azimuth during observation
+    AIRMASS =             1.506845 / Effective mean airmass
+    TEMPTUBE=            10.551544 / Truss Temperature (degrees Celsius)
+    CAT-NAME= 'R220A   '           / Target input-catalogue name
+    CAT-RA  = ' 17:27:10.940'      / Target Right Ascension
+    CAT-DEC = '+74:31:58.00'       / Target Declination
+    CAT-EQUI= 'J2000.00'           / Equinox of target coordinates
+    CAT-EPOC=               2000.0 / Target epoch of proper motions
+    PM-RA   =                  0.0 / Target proper-motion RA (sec time/year)
+    PM-DEC  =                  0.0 / Target proper-motion (sec arc/year)
+    PARALLAX=                  0.0 / Target Parallax (arcsec)
+    RADVEL  =                  0.0 / Target radial velocity (km/s)
+    RATRACK =                  0.0 / Differential-tracking rate RA (arcsec/sec)
+    DECTRACK=                  0.0 / Differential-tracking rate Dec (arcsec/sec)
+    INSTRUME= 'WFC               ' / INT wide-field camera is in use.
+    WFFPOS  =                    2 / Position-number of deployed filter
+    WFFBAND = 'V       '           / Waveband of filter
+    WFFPSYS = 'Unknown           ' / Photometric system of filter
+    WFFID   = 'Unknown           ' / Unique identifier of filter
+    SECPPIX =                0.333 / Arcseconds per pixel
+    UTSTART = '02:41:16.7        ' / UTC of start of observation
+    ELAPSED =               899.02 / Length of observation including pauses
+    DARKTIME=               899.02 / Length of observation including pauses
+    EXPOSED =               899.02 / Length of observation excluding pauses
+    EXPTIME =               899.02 / Length of observation excluding pauses
+    CD1_2   = -9.19935076163658E-5
+    CD2_1   =   -9.120914253783E-5 / Transformation matrix element
+    RADESYS = 'FK5     '           / Reference frame for RA/DEC values
+    DETECTOR= 'MOS1              ' / Name of the detector
+    PREFLASH=                  0.0 / Length of Preflash in seconds
+    GAIN    =                  2.9 / Electrons per ADU
+    READNOIS=                 12.0 / Readout noise in electrons per pix
+    CCDSPEED= 'NONASTRO          ' / Readout speed of the CCD
+    CCDNCHIP=                    1 / Number of CCDs in this head
+    CCDCHIP =                    1 / Head number of this CCD
+    CCDTYPE = 'EEV42             ' / Type of CCD used in this detector
+    CCDXSIZE=                 2148 / X Size in pixels of digitised frame
+    CCDYSIZE=                 4128 / Y Size in pixels of digitised frame
+    CCDXIMSI=                 2048 / X Size of useful imaging area
+    CCDYIMSI=                 4100 / Y Size of useful imaging area
+    CCDXIMST=                   50 / X Start pixel of useful imaging area
+    CCDYIMST=                    0 / Y Start pixel of useful imaging area
+    CCDWMODE=                    F / True is windows are enabled
+    CCDWXO1 =                    0 / Offset of window 1 in X
+    CCDWYO1 =                    0 / Offset of window 1 in Y
+    CCDWXS1 =                    0 / Size of window 1 in X
+    CCDWYS1 =                    0 / Size of window 1 in Y
+    CCDWXO2 =                    0 / Offset of window 2 in X
+    CCDWYO2 =                    0 / Offset of window 2 in Y
+    CCDWXS2 =                    0 / Size of window 2 in X
+    CCDWYS2 =                    0 / Size of window 2 in Y
+    CCDWXO3 =                    0 / Offset of window 3 in X
+    CCDWYO3 =                    0 / Offset of window 3 in Y
+    CCDWXS3 =                    0 / Size of window 3 in X
+    CCDWYS3 =                    0 / Size of window 3 in Y
+    CCDWXO4 =                    0 / Offset of window 4 in X
+    CCDWYO4 =                    0 / Offset of window 4 in Y
+    CCDWXS4 =                    0 / Size of window 4 in X
+    CCDWYS4 =                    0 / Size of window 4 in Y
+    CCDXPIXE=              1.35E-5 / Size in meters of the pixels, in X
+    CCDYPIXE=              1.35E-5 / Size in meters of the pixels, in Y
+    CCDXBIN =                    1 / Binning factor, in X
+    CCDYBIN =                    1 / Binning factor, in Y
+    CCDSTEMP=                  153 / Required temperature of CCD, in Kevlin
+    CCDATEMP=                  154 / Actual temperature of CCD, in Kevlin
+    CHIPNAME= 'A5530-3           ' / Name of CCD chip
+    DASCHAN =                    3 / DAS channel
+    WINSEC1 = '[0:0,0:0]         ' / Readout window 1
+    WINSEC2 = '[0:0,0:0]         ' / Readout window 2
+    WINSEC3 = '[0:0,0:0]         ' / Readout window 3
+    WINSEC4 = '[0:0,0:0]         ' / Readout window 4
+    HISTORY This is the end of the header written by the ING observing-system.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    TRIM    = 'Dec  7 16:33 Trim data section is [51:2098,2:4098]'
+    OVERSCAN= 'Dec  7 16:33 Overscan section is [5:45,20:4090] with mean=1520.532'
+    ZEROCOR = '        '           / bias.3.imh'
+    CCDSEC  = '[51:2098,2:4098]'
+    CCDMEAN =             1543.035
+    CCDMEANT=            629055311
+    CCDPROC = 'Dec  7 17:35 CCD processing done'
+    FLATCOR = 'Dec  7 17:35 Flat field image is flat.v3.imh with scale=1764.3'
+    HISTORY '1999-09-07T17:29:59' / Date FITS file was generated
+    HISTORY '17:05:44 (06/09/1999)' / Time of last modification
+    HISTORY 'ING La Palma      ' / Name of observatory
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY New copy of r106282
+    HISTORY Image converted using STARLINK utility IRAF2NDF from the IRAF image
+    HISTORY r106282.imh on Mon Feb  7 15:09:53 2000
+    END
+$NDFinfo->{hassky}=1
+$NDFinfo->{wcs}: ref to ARRAY:
+    SIMPLE  =                    T
+    BITPIX  =                    8
+    NAXIS   =                    0
+    CTYPE1  = 'RA---AZP  '
+    CTYPE2  = 'DEC--AZP  '
+    PV2_1   =             0.000000
+    LONPOLE =           180.000000
+    COMMENT   dec=-12:34:56 ra=+210 source=USER:AST:FITS pa=-30
+    CRVAL1  =           210.000000 / RA    14 00 00.000
+    CRVAL2  =           -11.417778 / Dec   -11 25 04.000
+    CUNIT1  = 'deg       '
+    CUNIT2  = 'deg       '
+    CRPIX1  =            10.500000
+    CRPIX2  =            18.000000
+    CD1_1   =          0.000240563
+    CD1_2   =         -0.000138889
+    CD2_1   =          0.000138889
+    CD2_2   =          0.000240563
+    RADESYS = 'FK5'
+    EQUINOX = '2000.0'
+    END     
+--------------------
