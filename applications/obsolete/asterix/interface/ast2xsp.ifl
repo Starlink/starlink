@@ -1,0 +1,14 @@
+interface AST2XSP
+  parameter INPUT
+    keyword 'INP'
+    type 'UNIV'
+    position 1
+    prompt 'Input dataset'
+    help 'Dataset to be converted - without the .SDF extension'
+  endparameter
+  parameter SLICE
+    type '_INTEGER'
+    prompt 'Number of spectra to use'
+    help 'e.g. spectra number 4'
+  endparameter
+endinterface
