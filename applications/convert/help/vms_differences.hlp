@@ -1,0 +1,13 @@
+1 VMS_differences
+The VMS release of CONVERT has been frozen at Version 0.5. It is still 
+available on the Starlink residual VMS service machine (STADAT).
+
+The following applications are available on VMS but not on UNIX:
+
+  o BDF2NDF   - Converts a Starlink Interim BDF file to an NDF.
+  o DIPSO2NDF - Converts a DIPSO-format file to an NDF.
+  o NDF2BDF   - Converts an NDF to a Starlink Interim BDF file.
+  o NDF2DIPSO - Converts an NDF to a DIPSO-format file.
+
+SUN/55.5 in the VMS documentation set describes how to run CONVERT on
+VMS.
