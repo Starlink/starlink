@@ -3,6 +3,8 @@
  * that number as a float, hex and binary.  Without argument, it reads numbers
  * from stdin.  The argument is either a float or an integer (hex, with
  * leading '0x', eg 0x3f800000) as argument.
+ *
+ * $Id$
  */
 
 #include <stdio.h>
@@ -10,8 +12,10 @@
 
 /* Intel and Alpha chips are little-endian. */
 /* Sparc, Motorola 68k and PowerPC chips are big-endian. */
-/* Compile with -DBIGENDIAN on the latter */
-#define BIGENDIAN
+/* Compile with -DBIGENDIAN=1 on the latter */
+#ifndef BIGENDIAN
+#define BIGENDIAN 0
+#endif
 
 /*
  * pbits: given an integer i (assumed 32 bits),
@@ -34,7 +38,7 @@ void reprint_number (char *s)
         float f;
         unsigned int i;
         struct {
-#ifdef BIGENDIAN
+#if BIGENDIAN
             unsigned int s : 1;
             unsigned int e : 8;
             unsigned int m : 23;

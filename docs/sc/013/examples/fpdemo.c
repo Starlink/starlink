@@ -3,7 +3,9 @@
 /* Intel and Alpha chips are little-endian. */
 /* Sparc, Motorola 68k and PowerPC chips are big-endian. */
 /* Compile with -DBIGENDIAN on the latter */
-/* #define BIGENDIAN */
+#ifndef BIGENDIAN
+#define BIGENDIAN 0
+#endif
 
 /*
  * pbits: given an integer i, put the rightmost n bits of the integer 
@@ -24,7 +26,7 @@ char *print_float (float f)
     union {
         float f;
         struct {
-#ifdef BIGENDIAN
+#if BIGENDIAN
             unsigned int s : 1;
             unsigned int e : 8;
             unsigned int m : 23;
