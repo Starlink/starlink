@@ -256,22 +256,10 @@
 
       CALL ERR_MARK
 
-*    Obtain a scalar...  There is no the general routine for scalars,
-*    therefore obtain byte and word, signed and unsigned types as
-*    integers. This necessitates checks for the data type and separate
-*    calls.
+*    Obtain a scalar.
 
       IF ( NDIM .EQ. 0 ) THEN
-         IF ( BWTYPE .OR. '<T>' .EQ. 'I' ) THEN
-            CALL DAT_GET0I( LOC, VALUES, STATUS )
-
-         ELSE IF ( '<T>' .EQ. 'R' ) THEN
-            CALL DAT_GET0R( LOC, VALUES, STATUS )
-
-         ELSE IF ( '<T>' .EQ. 'D' ) THEN
-            CALL DAT_GET0D( LOC, VALUES, STATUS )
-
-         END IF
+         CALL DAT_GET( LOC, '<HTYPE>', NDIM, DIMS, VALUES, STATUS )
 
 *    or a vector.
 
