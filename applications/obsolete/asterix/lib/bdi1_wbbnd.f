@@ -131,10 +131,10 @@
 
 *  Convert bounds to centres and widths
       IF ( TYPE .EQ. 'REAL' ) THEN
-        CALL BDI1_WBBND_R( N, %VAL(PTR), %VAL(DPTR), %VAL(WPTR),
+        CALL BDI1_WBBND_R( DIMS(1), %VAL(PTR), %VAL(DPTR), %VAL(WPTR),
      :                           STATUS )
       ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
-        CALL BDI1_WBBND_D( N, %VAL(PTR), %VAL(DPTR), %VAL(WPTR),
+        CALL BDI1_WBBND_D( DIMS(1), %VAL(PTR), %VAL(DPTR), %VAL(WPTR),
      :                           STATUS )
       END IF
 
@@ -167,8 +167,8 @@
 
 *  Arguments:
 *     NBND = INTEGER (given)
-*        The number of axis bounds
-*     BNDS[] = REAL (given)
+*        The number of axis bounds pairs
+*     BNDS[2,N] = REAL (given)
 *        The axis bounds
 *     CEN[] = REAL (returned)
 *        The axis centres
@@ -212,7 +212,7 @@
 
 *  Arguments Given:
       INTEGER                   NBND
-      REAL			BNDS(*)
+      REAL			BNDS(2,*)
 
 *  Arguments Given:
       REAL			CEN(*), WID(*)
@@ -228,13 +228,13 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  For each bound pair
-      DO I = 1, NBND - 1
+      DO I = 1, NBND
 
 *    Bin centre
-        CEN(I) = (BNDS(I+1) + BNDS(I))/2.0
+        CEN(I) = (BNDS(1,I) + BNDS(2,I))/2.0
 
 *    Bin width
-        WID(I) = BNDS(I+1) - BNDS(I)
+        WID(I) = BNDS(2,I) - BNDS(1,I)
 
       END DO
 
@@ -262,7 +262,7 @@
 *  Arguments:
 *     NBND = INTEGER (given)
 *        The number of axis bounds
-*     BNDS[] = DOUBLE PRECISION (given)
+*     BNDS[2,NBND] = DOUBLE PRECISION (given)
 *        The axis bounds
 *     CEN[] = DOUBLE PRECISION (returned)
 *        The axis centres
@@ -306,7 +306,7 @@
 
 *  Arguments Given:
       INTEGER                   NBND
-      DOUBLE PRECISION		BNDS(*)
+      DOUBLE PRECISION		BNDS(2,*)
 
 *  Arguments Given:
       DOUBLE PRECISION		CEN(*), WID(*)
@@ -322,13 +322,13 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  For each bound pair
-      DO I = 1, NBND - 1
+      DO I = 1, NBND
 
 *    Bin centre
-        CEN(I) = (BNDS(I+1) + BNDS(I))/2.0
+        CEN(I) = (BNDS(1,I) + BNDS(2,I))/2.0
 
 *    Bin width
-        WID(I) = BNDS(I+1) - BNDS(I)
+        WID(I) = BNDS(2,I) - BNDS(1,I)
 
       END DO
 
