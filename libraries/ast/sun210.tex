@@ -4211,7 +4211,7 @@ in taking the ``shortest route'' from the first point to the second.
 If the Frame has more than 2 axes, the result is un-signed and is always
 in the range zero to $\pi$. 
 
-The \htmlref{AST\_AXANGLE}{AST_AXANGLE} routine is similar to AST_AXANGLE,
+The \htmlref{AST\_AXANGLE}{AST_AXANGLE} routine is similar to AST\_AXANGLE,
 but the ``reference direction'', from which angles are measured, is 
 a specified axis. 
 
@@ -25775,8 +25775,8 @@ current version):
    of the usual range zero to $2.\pi$.
 
 \item Some new 
-routines (AST_ANGLE, AST_AXANGLE, AST_RESOLVE, AST_OFFSET2, AST_AXOFFSET, 
-AST_AXDISTANCE) 
+routines (\htmlref{AST\_ANGLE}{AST_ANGLE}, \htmlref{AST\_AXANGLE}{AST_AXANGLE}, \htmlref{AST\_RESOLVE}{AST_RESOLVE}, \htmlref{AST\_OFFSET2}{AST_OFFSET2}, \htmlref{AST\_AXOFFSET}{AST_AXOFFSET}, 
+\htmlref{AST\_AXDISTANCE}{AST_AXDISTANCE}) 
 have been added to the \htmlref{Frame}{Frame} class to allow navigation of the coordinate space 
 to be performed without needing to know the underlying geometry
 of the co-ordinate system (for instance, whether it is Cartesian or
@@ -25786,7 +25786,7 @@ Note, version 1.8-1 contained many of these facilities, but
 some have been changed in version 1.8-2. Particularly, positions angles
 are now referred to the second Frame axis for {\em all} classes of Frames
 (including SkyFrames), and the 
-AST_BEAR routine has been replaced by AST_AXANGLE.
+AST\_BEAR routine has been replaced by AST\_AXANGLE.
 
 \end{enumerate}
 
