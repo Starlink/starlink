@@ -310,10 +310,12 @@
 *    Author  :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
 *     12 May 89 : Original
+*     21 Oct 97 : Replace READ with CHR_CTOI (RB)
 *
 *    Type declarations :
 *
@@ -342,7 +344,6 @@
 *    Local variables :
 *
       INTEGER          BEG,END                ! Character pointers
-      INTEGER          FSTAT                  ! I/O status code
 *-
 
 *    Check status
@@ -413,9 +414,8 @@
         END IF
 
 *      Get width
-        READ( FORM(BEG:END), '(I)', IOSTAT=FSTAT ) WID
-        IF ( FSTAT .NE. 0 ) THEN
-          CALL FIO_SERR( FSTAT, STATUS )
+        CALL CHR_CTOI( FORM(BEG:END), WID, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_SETC( 'FMT', FORM )
           CALL ERR_REP( ' ', 'Cannot find display width from format '/
      :                                               /'^FMT', STATUS )
