@@ -133,6 +133,8 @@
          RETURN
       ENDIF
 
+      MAXVAL = 0.0
+      MINVAL = 0.0
 
 *    work out pixel value checking limits according to input value of power
       IF ( POWER .LT. 0.0 ) THEN

@@ -21,6 +21,7 @@
 
 * test which colour chosen
 
+	PEN_COLOUR = 0
 	IF( COL_CHAR. EQ. 'W' .OR. COL_CHAR. EQ. 'w') PEN_COLOUR = 1
 	IF( COL_CHAR. EQ. 'R' .OR. COL_CHAR. EQ. 'r') PEN_COLOUR = 2
 	IF( COL_CHAR. EQ. 'G' .OR. COL_CHAR. EQ. 'g') PEN_COLOUR = 3

@@ -33,6 +33,7 @@
 
 *      initialize the number of bad pixels found
 	NUMPIX = 0
+	VARIANCE = 0.0
 
 *      define limits of maximum, minimum values
 	XMAXIMUM = -1.0E20

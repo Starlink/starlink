@@ -10,6 +10,9 @@
 	REAL X1, Y1, X2, Y2, F, G, VAL1, VAL2, VAL3, VAL4
 	REAL THETA, CT, ST, SEP, LINDAT( 10000, 2)
 
+	CT = 0.0
+	ST = 0.0
+
 	IF( ( ABS( Y2-Y1) .LT. 1.0E-19) .AND. 
      :	    ( ABS( X2-X1) .LT. 1.0E-19)) THEN
 
