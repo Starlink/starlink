@@ -224,7 +224,13 @@
 
 *  Copy data array
       CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
-      IF ( VOK ) CALL BDI_MAPR( IFID, 'Error', 'READ', EPTR, STATUS )
+      IF ( VOK ) THEN
+        CALL BDI_MAPR( IFID, 'Error', 'READ', EPTR, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          VOK = .FALSE.
+        END IF
+      END IF
 
 *  Write a command telling QDP how to read the errors
       IF ( AWOK .AND. VOK ) THEN
