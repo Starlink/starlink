@@ -79,9 +79,9 @@ GEN_F_ROUTINES = $(KPG_N_GEN:.gen=.f) $(KPG_DR_GEN:.gdr=.f) \
 ## Generic
 
 KPG_N_GEN = kps1_apad.gen kps1_lapl.gen kps1_prmx.gen kps1_spar.gen \
-	kps1_ardm.gen kps1_stpa.gen kps1_thgt.gen
+	kps1_ardm.gen kps1_stpa.gen kps1_thgt.gen kps1_rs1.gen
 
-KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_rs1.gdr kps1_clps.gdr
+KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
