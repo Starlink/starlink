@@ -2984,8 +2984,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       REAL			R_BASE, R_SCALE		! Reponse axis attrs
       REAL			D_SCALE			! Dataset scale
       REAL			MAJOR			! Creator version id
+      REAL			SPARR(2)
       REAL			TOR			! Dataset radian factor
 
+      INTEGER			BDID
       INTEGER			DAX			! Dataset axis no.
       INTEGER		      	DIM			! Size of response axis
       INTEGER			FSTAT			! i/o status code
@@ -3010,17 +3012,17 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .EQ. SAI__OK ) THEN
         CALL MSG_PRNT( 'Found spatial response in dataset...' )
         IN_DATASET = .TRUE.
-        CALL ADI1_PUTLOC( SLOC, SID, STATUS )
+        CALL ADI1_MKFILE( SLOC, 'READ', SID, STATUS )
 
       ELSE
 
 *      Annul error
         CALL ERR_ANNUL( STATUS )
 
-*      Get response name by prompting
+*    Get response name by prompting
         CALL USI_PROMT( 'MASK', 'Name of Asterix spatial response file',
      :                  STATUS )
-        CALL USI_ASSOC( 'MASK', '*', 'READ', SID, STATUS )
+        CALL USI_ASSOC( 'MASK', 'BinDS', 'READ', SID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         CALL USI_CANCL( 'MASK', STATUS )
         CALL ADI1_GETLOC( SID, SLOC, STATUS )
@@ -3028,44 +3030,49 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END IF
 
-*    Get expanded response dimensions
+*  Get expanded response dimensions
       CALL CMP_GET1I( SLOC, 'DIMS', 5, RF_DIMS(1,SLOT), RF_NDIM(SLOT),
      :                STATUS )
 
-*    Map the index
+*  Link the response object to a BinDS so we can access its axis info
+      CALL BDI_NEW( 'BinDS', 1, 1, 'REAL', BDID, STATUS )
+      CALL ADI_SETLNK( BDID, SID, STATUS )
+      CALL BDI_SETSHP( BDID, RF_NDIM(SLOT), RF_DIMS(1,SLOT), STATUS )
+
+*  Map the index
       CALL CMP_MAPV( SLOC, 'INDEX', '_INTEGER', 'READ',
      :               RF_IPTR(SLOT), NELM, STATUS )
 
-*    Map the data
+*  Map the data
       CALL CMP_MAPV( SLOC, 'DATA_ARRAY', '_REAL', 'READ',
      :               RF_DPTR(SLOT), NELM, STATUS )
 
-*    Is it compressed?
+*  Is it compressed?
       CALL CMP_GET0L( SLOC, 'COMPRESSED', RF_PIXCENT(SLOT), STATUS )
 
-*    Is it pixel centred?
+*  Is it pixel centred?
       CALL CMP_GET0L( SLOC, 'PIXCENT', RF_PIXCENT(SLOT), STATUS )
 
-*    Is it a radial response?
+*  Is it a radial response?
       CALL CMP_GET0L( SLOC, 'RADIAL', RF_RADIAL(SLOT), STATUS )
 
-*    Get creator version id
+*  Get creator version id
       CALL CMP_GET0C( SLOC, 'VERSION', VERSION, STATUS )
 
-*    Extract version number
+*  Extract version number
       READ( VERSION, '(15X,F3.1,1X,I1)', IOSTAT=FSTAT ) MAJOR, REVISION
       MAJOR = MAJOR + REVISION / 100.0
 
-*    Axis attributes only written correctly from 1.7-3 onwards
+*  Axis attributes only written correctly from 1.7-3 onwards
       IF ( MAJOR .GE. 1.73 ) THEN
 
-*      Identify spatial axes
+*    Identify spatial axes
         CALL PSF1_GETAXID( INST, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
-*      Get X and Y axis parameters, and compare with dataset
+*    Get X and Y axis parameters, and compare with dataset
         DO IAX = 1, 2
 
-*        Choose dataset axis
+*      Choose dataset axis
           IF ( IAX .EQ. 1 ) THEN
             DAX = X_AX
             DAXC = 'X'
@@ -3074,10 +3081,13 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
             DAXC = 'Y'
           END IF
 
-*        Get response axis attributes
-          CALL BDI_GETAXVAL( SID, IAX, R_BASE, R_SCALE, DIM, STATUS )
+*      Get response axis attributes
+          CALL BDI_AXGET1R( BDID, IAX, 'SpacedData', 2, SPARR, DIM,
+     :                      STATUS )
+          R_BASE = SPARR(1)
+          R_SCALE = SPARR(2)
 
-*        Get dataset axis attributes
+*      Get dataset axis attributes
           D_SCALE = PSF1_GETAXDR( INST, X_AX, STATUS )
           TOR = PSF1_GETAXTOR( INST, X_AX, STATUS )
 
@@ -3100,13 +3110,17 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Get axis info
       IF ( RF_RADIAL(SLOT) ) THEN
         DO IAX = 3, 4
-          CALL BDI_GETAXVAL( SID, IAX, RF_BASE(IAX,SLOT),
-     :                       RF_SCALE(IAX,SLOT), DIM, STATUS )
+          CALL BDI_AXGET1R( BDID, IAX, 'SpacedData', 2, SPARR, DIM,
+     :                      STATUS )
+          RF_BASE(IAX,SLOT) = SPARR(1)
+          RF_SCALE(IAX,SLOT) = SPARR(2)
         END DO
       ELSE
         DO IAX = 3, 5
-          CALL BDI_GETAXVAL( SID, IAX, RF_BASE(IAX,SLOT),
-     :                       RF_SCALE(IAX,SLOT), DIM, STATUS )
+          CALL BDI_AXGET1R( BDID, IAX, 'SpacedData', 2, SPARR, DIM,
+     :                      STATUS )
+          RF_BASE(IAX,SLOT) = SPARR(1)
+          RF_SCALE(IAX,SLOT) = SPARR(2)
         END DO
       END IF
 
@@ -3117,7 +3131,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                     .NOT. RF_PHA_DEF(SLOT) ) THEN
 
 *      Construct prompt
-        CALL BDI_GETAXUNITS( SID, RF_NDIM(SLOT), EUNITS, STATUS )
+        CALL BDI_AXGET0C( BDID, RF_NDIM(SLOT), 'Units', EUNITS, STATUS )
         CALL MSG_SETC( 'UNITS', EUNITS )
         CALL MSG_MAKE( 'Mean photon energy in ^UNITS', TEXT, TLEN )
         CALL USI_PROMT( 'AUX', TEXT(:TLEN), STATUS )
