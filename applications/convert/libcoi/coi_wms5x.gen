@@ -1,0 +1,235 @@
+      SUBROUTINE COI_WMS5<T>( IMDESC, AP, BEAM, DTYPE, WSTART, INCREM,
+     :                        Z, APLOW, APHIGH, WEIGHT, WOFSET, EL,
+     :                        AXIS, NUMBER, STATUS )
+*+
+*  Name:
+*     COI_WMS5x
+
+*  Purpose:
+*     Creates a string in the MULTISPEC spec1 format 5 (explicit array).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COI_WMS5x( IMDESC, AP, BEAM, DTYPE, WSTART, INCREM, Z, APLOW,
+*                     APHIGH, WEIGHT, WOFSET, EL, AXIS, NUMBER, STATUS )
+
+*  Description:
+*     This writes a string containing an IRAF MULTISPEC spec1 value.
+*     This comprises a space separated list.
+*
+*         AP BEAM DTYPE START INCREM EL Z APLOW APHIGH function
+*
+*     where the function specification comprises parameters and the
+*     axis co-ordinates (function type 5).
+*
+*         WEIGHT WOFSET 5 EL AXIS(1) AXIS(2) ... AXIS(EL)
+
+*  Arguments:
+*     IMDESC = INTEGER (Given)
+*        The IRAF IMFORT image descriptor.
+*     AP = INTEGER (Given)
+*        Aperture number.  Should be 1 unless there really are multiple
+*        spectra in the same file.
+*     BEAM = INTEGER (Given)
+*        Beam number.  Normally this will be set to 1.
+*     DTYPE = INTEGER (Given)
+*        Data type where -1 means the co-ordinates are not dispersion
+*        co-ordinates, 0 indicates a linear dispersion, 1 indicates a
+*        log-linear dispersion, and 2 indicates a non-linear dispersion.
+*     WSTART = ? (Given)
+*        Start wavelength.
+*     INCREM = ? (Given)
+*        Average dispersion interval between AXIS-array elements.
+*     Z = REAL (Given)
+*        Doppler factor.
+*     APLOW = REAL (Given)
+*        Aperture lower limit.  If unknown, set this to VAL__BADR.
+*     APHIGH = REAL (Given)
+*        Aperture upper limit.  If unknown, set this to VAL__BADR.
+*     WEIGHT = REAL (Given)
+*        Weight.  If unknown, set this to 1.0
+*     WOFSET = REAL (Given)
+*        Wavelength offset.  If unknown, set this to 0.0.
+*     EL = INTEGER (Given)
+*        Number of elements in the axis co-ordinates.
+*     AXIS( EL ) = ? (Given)
+*        The axis centre co-ordinates.
+*     NUMBER = INTEGER (Given and Returned)
+*        The number of the first WAT2_nnn header record.  On entry it
+*        must be at least 2.  On exit it is the number of the last
+*        header created after the spec1 attribute is written.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - There is a routine for real and double precision data types:
+*     replace "x" in the routine name by R or D as appropriate.
+*     The AXIS, WSTART, and INCREM arguments must have this data type.
+
+*  [optional_subroutine_items]...
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1997 March 25 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+
+*  Arguments Given:
+      INTEGER IMDESC
+      INTEGER AP
+      INTEGER BEAM
+      INTEGER DTYPE
+      <TYPE> WSTART
+      <TYPE> INCREM
+      REAL Z
+      REAL APLOW
+      REAL APHIGH
+      REAL WEIGHT
+      REAL WOFSET
+      INTEGER EL
+      <TYPE> AXIS( EL )
+
+*  Arguments Given and Returned:
+      INTEGER NUMBER
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER * ( 4 ) CN       ! 1000 plus line number
+      INTEGER CPOS               ! Character position in HEADER
+      CHARACTER * ( VAL__SZD ) DVAL ! Double-precision value
+      CHARACTER * ( 80 ) HEADER  ! Header record
+      INTEGER I                  ! Loop counter
+      CHARACTER * ( VAL__SZI ) IVAL ! Integer value
+      INTEGER NC                 ! Number of characters in a value
+      CHARACTER * ( VAL__SZR ) RVAL ! Real value
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the returned string and column pointer.
+*  Create the keyword.
+      CALL CHR_ITOC( 1000 + NUMBER, CN, NC )
+      HEADER = 'WAT2_'
+      CPOS = 5
+      CALL CHR_APPND( CN( 2:4 ), HEADER, CPOS )
+      CALL CHR_APPND( '= ''spec1 = "', HEADER, CPOS )
+
+*  Append the aperture having converted the value to a string.
+      CALL CHR_ITOC( AP, IVAL, NC )
+      CALL COI_SPECN( IMDESC, IVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the beam having converted the value to a string. 
+      CALL CHR_ITOC( BEAM, IVAL, NC )
+      CALL COI_SPECN( IMDESC, IVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the dispersion type having converted the value to a string.
+      CALL CHR_ITOC( DTYPE, IVAL, NC )
+      CALL COI_SPECN( IMDESC, IVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the start wavelength having converted the value to a string.
+      CALL CHR_<T>TOC( WSTART, <T>VAL, NC )
+      CALL COI_SPECN( IMDESC, <T>VAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the average wavelength increment having converted the value
+*  to a string.
+      CALL CHR_<T>TOC( INCREM, <T>VAL, NC )
+      CALL COI_SPECN( IMDESC, <T>VAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the number of wavelengths having converted the value to a
+*  string.
+      CALL CHR_ITOC( EL, IVAL, NC )
+      CALL COI_SPECN( IMDESC, IVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the Doppler factor having converted the value to a string.
+      CALL CHR_RTOC( Z, RVAL, NC )
+      CALL COI_SPECN( IMDESC, RVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the aperture lower limit having converted the value to a
+*  string.  Allow the value to be undefined.
+      IF ( APLOW .EQ. VAL__BADR ) THEN
+         CALL COI_SPECN( IMDESC, 'INDEF', .FALSE., NUMBER, HEADER, CPOS,
+     :                   STATUS )
+
+      ELSE 
+         CALL CHR_RTOC( APLOW, RVAL, NC )
+         CALL COI_SPECN( IMDESC, RVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                   CPOS, STATUS )
+      END IF
+
+*  Append the aperture upper limit having converted the value to a
+*  string.  Allow the value to be undefined.
+      IF ( APHIGH .EQ. VAL__BADR ) THEN
+         CALL COI_SPECN( IMDESC, 'INDEF', .FALSE., NUMBER, HEADER, CPOS,
+     :                   STATUS )
+
+      ELSE 
+         CALL CHR_RTOC( APHIGH, RVAL, NC )
+         CALL COI_SPECN( IMDESC, RVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                   CPOS, STATUS )
+      END IF
+
+*  Append the weight having converted the value to a string.
+      CALL CHR_RTOC( WEIGHT, RVAL, NC )
+      CALL COI_SPECN( IMDESC, RVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the wavelength offset having converted the value to a string.
+      CALL CHR_RTOC( WOFSET, RVAL, NC )
+      CALL COI_SPECN( IMDESC, RVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append the function-type code.
+      CALL COI_SPECN( IMDESC, '5', .FALSE., NUMBER, HEADER, CPOS,
+     :                STATUS )
+
+*  Append the number of wavelengths having converted the value to a
+*  string.
+      CALL CHR_ITOC( EL, IVAL, NC )
+      CALL COI_SPECN( IMDESC, IVAL( :NC ), .FALSE., NUMBER, HEADER,
+     :                CPOS, STATUS )
+
+*  Append each axis-centre co-ordinate.
+      DO I = 1, EL
+
+*  Test for bad values.  Use the IRAF string INDEF for these.
+         IF ( AXIS( I ) .EQ. VAL__BAD<T> ) THEN
+            CALL COI_SPECN( IMDESC, 'INDEF', I .EQ. EL, NUMBER,
+     :                      HEADER, CPOS, STATUS )
+
+*  Convert the co-ordinate to a string and append it.
+         ELSE 
+            CALL CHR_<T>TOC( AXIS( I ), <T>VAL, NC )
+            CALL COI_SPECN( IMDESC, <T>VAL( :NC ), I .EQ. EL, NUMBER,
+     :                      HEADER, CPOS, STATUS )
+         END IF
+
+      END DO
+
+      END
