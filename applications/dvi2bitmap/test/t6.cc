@@ -301,13 +301,11 @@ int do_pipe_tests()
 	string envlist;
 	string expected;
     } pipetests[] = {
-	{ //"./t1.sh HOME LOGNAME BOINK ANOTHER",
-	    "./t6.test -e HOME LOGNAME BOINK ANOTHER",
+	{ "./t6.test -e HOME LOGNAME BOINK ANOTHER",
 	  "PATH=.  LOGNAME=blarfl TERM=nothing LOGNAME=norman BOINK=whee",
 	  "HOME=!LOGNAME=norman!BOINK=whee!ANOTHER=!"
 	},
-	{ //"./t1.sh HOME LOGNAME",
-	    "./t6.test -e HOME LOGNAME",
+	{ "./t6.test -e HOME LOGNAME",
 	  "+ HOME=/root LOGNAME=",
 	  "HOME=/root!LOGNAME=!"
 	},
@@ -360,7 +358,7 @@ int do_pipe_tests()
     }
 
     try {
-	string cmd = "./t1.sh LOGNAME HOME T TT";
+	string cmd = "./t6.test -e LOGNAME HOME T TT";
 #if defined(HAVE_SETENV) && HAVE_DECL_SETENV
         setenv("TT", "test", 1);
 #elif defined(HAVE_PUTENV) && HAVE_DECL_PUTENV
