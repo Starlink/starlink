@@ -3277,8 +3277,6 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
       }
    }
 
-printf( "Add astOffset2 and astAngle to cmpframe.c !!!!!!\n" );
-
 /* Return the result. */
    return result;
 
