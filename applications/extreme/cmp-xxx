@@ -57,6 +57,11 @@
 #        Initial version.
 #-
 
+#  Check environment.
+      unless ( $ENV{ 'EXTREME_DIR' } ) {
+         die( "Environment variable EXTREME_DIR must be set.\n" );
+      }
+
 #  Get filename.
       my( $name ) = $0;
       $name =~ s%^.*/%%;
@@ -75,7 +80,7 @@
          open( F2, "<$f2" ) or die( "Failed to open $f2\n" );
       }
       else {
-         my( $cmd ) = "$filter $f1";
+         my( $cmd ) = $ENV{ 'EXTREME_DIR' } . "/$filter $f1";
          open( F2, "$cmd 2>/dev/null |" ) 
             or die( "Failed to pipe from '$cmd'\n" );
       }

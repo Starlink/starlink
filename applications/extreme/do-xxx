@@ -65,7 +65,6 @@
 #  Set up destination directory, logfile and comparison script.
       destdir="./$filter.changed"
       logfile="./$filter.log"
-      cmp_scr="cmp-$filter"
 
 #  Set up temporary file for buffering warnings.
       warnfile="$destdir/.tmp.warnings"
@@ -79,22 +78,14 @@
          :
       fi
 
-#  Add EXTREME_DIR to path if it is defined.
-      if [ "$EXTREME_DIR" ]
-      then
-         PATH=${PATH}:$EXTREME_DIR
-         export PATH
-      else
-         :
-      fi
-
 #  Set up location of commands.
-      compare="`which $cmp_scr`"
-      if [ `which $filter | wc -w` = "1" -a `which $cmp_scr | wc -w` = "1" ]
+      compare_cmd="$EXTREME_DIR/cmp-$filter"
+      filter_cmd="$EXTREME_DIR/$filter"
+      if [ -x "$filter_cmd" -a -x "$compare_cmd" ]
       then
          :
       else
-         echo "$driver: The $filter and $cmp_scr commands must be in the path."
+         echo "$driver: No '$filter' or 'cmp-$filter' executable in EXTREME_DIR"
          exit 1
       fi
  
@@ -119,7 +110,7 @@
 
 #  Do the processing
          rm -f $warnfile
-         if $filter $infile $outfile > $warnfile 2>&1 
+         if $filter_cmd $infile $outfile > $warnfile 2>&1 
          then
             :
          else
@@ -194,7 +185,7 @@
 #  use a check.
          if [ "$changed" != "0" ]
          then
-            if $compare $infile $outfile >/dev/null
+            if $compare_cmd $infile $outfile >/dev/null
             then
                :
             else
