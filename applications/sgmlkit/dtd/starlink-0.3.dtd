@@ -1,0 +1,1176 @@
+<![ ignore [
+  This is the Starlink General DTD.  It should not be used
+  independently, but invoked from another DTD via:
+
+    <!entity % Starlink.general
+	public "-//Starlink//DTD Starlink General 0.2//EN">
+    %Starlink.general;
+
+  The DTD should define the following parameter entities:
+
+    DocClass       : as SUN, SGP, etc
+    req.abstract   : see below
+    DTD.Version    : version of the calling DTD
+
+  Defaults for these (except DTD.Version) are given below.
+
+  Author:
+    NG: Norman Gray (Glasgow)
+
+  History: March 1999 (NG):
+    Original version
+
+  Copyright 1999, Particle Physics and Astronomy Research Council.
+]]>
+
+<!entity % DTD.General.Version "DTD Starlink General 0.2">
+
+
+<!--========== Architectures ==========-->
+<!--
+  The HyTime standard is ISO 10744:1997, referred to as simply
+  `HyTime' below.
+-->
+
+<!--
+  See Hytime A.3 for AFDR definition.
+
+  The PI here is that described in HyTime A.3.3.  In, examples posted
+  to comp.text.sgml by, eg, Kimber, I've seen the PI as simply
+  <?ArcBase blah>, but that might simply be a hangover from an earlier
+  version - it doesn't appear to be blessed by the standard.  It seems
+  to be the form of the PI which SP once recognised - no longer true.
+-->
+<?IS10744 ArcBase HyTime documentsummary>
+
+<!-- Define the AFDRMeta and HyTime notations -->
+<!NOTATION AFDRMeta PUBLIC 
+	"ISO/IEC 10744:1997//NOTATION AFDR Meta-DTD Notation//EN">
+
+<!NOTATION
+	HyTime	-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744. --
+
+	PUBLIC 'ISO/IEC 10744:1997//NOTATION
+                Hypermedia/Time-based Structuring Language (HyTime)//EN'
+	>
+
+<!--
+  I'm slightly confused about _precisely_ how to declare this.  HyTime
+  A.3.4.3 gives several templates; I'm not completely sure which one
+  is correct, because I don't deeply follow the distinctions, but this
+  one appears to work!  One Kimber example (also on c.t.s) declares
+  this as <!...ndata afdrmeta>, but that is plausibly a mistyping, as
+  NDATA is specifically for data the parser isn't supposed to examine.
+-->
+<!ENTITY HyTime.DTD 
+	public 'ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+                Hypermedia/Time-based Structuring Language (HyTime)//EN'
+	CDATA AFDRMeta
+>
+
+
+<!ATTLIST #NOTATION HyTime	
+	-- cf. 10744:1997 11.1.1, Basic hyperlinking HyTime document --
+	ArcFormA	NAME	HyTime
+	ArcNamrA	NAME	HyNames
+	ArcSuprA	NAME	sHyTime
+	ArcIgnDA	NAME	HyIgnD
+	ArcDocF		NAME	#fixed	HyDoc
+	ArcDTD		CDATA	"HyTime.DTD"
+	ArcQuant	CDATA	#fixed	"NAMELEN 9"
+	ArcDataF	NAME	#fixed	HyBridN
+	ArcBridF	name	#fixed	HyBrid
+	ArcAuto		(ArcAuto|nArcAuto)	nArcAuto
+	ArcOptSA	NAMES	"GenArc base links locs rend sched"
+
+	-- Support attributes for HyTime only --
+	hyqcnt		NUMBER	32
+	GenArc		CDATA	"altreps included superdcn"
+	base		CDATA	"bos"
+	locs		CDATA	
+			"nmsploc multloc refctl referatt refloc queryloc"
+	links		CDATA	#fixed	"hylink clink agglink traverse"
+	exrefs		NAME	exrefs
+	manyanch	NUMBER	2
+>
+
+<!--
+    The declaration for the DocumentSummary architecture is simple.
+    Since all the elements in the architecture have matching names in this DTD,
+    the automatic mapping takes care of all of it.  See HyTime
+    A.3.6.2, `Architectural markup minimisation'.
+-->
+<!NOTATION documentsummary SYSTEM ''>
+<!ENTITY documentsummary.dtd
+	public "-//Starlink//DTD Document Summary 0.1//EN"
+	cdata AFDRMeta
+	>
+<!ATTLIST #NOTATION documentsummary
+	ArcFormA
+		name
+		documentsummary
+	ArcDTD
+		cdata
+		"documentsummary.dtd"
+	ArcNamrA
+		cdata
+		#fixed "docsumma"
+	>
+
+<!--========== Notations ==========
+
+  TeX and LaTeX notations defined using the ISBN prefix, as defined in
+  ISO/IEC 9070:1991, `Information Technology - SGML support facilities
+  - Registration procedures for public text owner identifiers'
+
+  JPEG notation from the recommendations in ISO/IEC JTC1/WG4 N1958:
+  `Information Processing - Text and office systems - Using SGML
+  Public Identifiers for Specifying Data Notations'.  GIF, EPS and
+  linespecific notations from DocBook's dbnotn.mod module.
+-->
+<!notation tex   public 
+  "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
+<!notation latex public 
+  "+//ISBN 0-201-52983//NOTATION LaTeX: A document preparation system//EN">
+<!NOTATION JPEG     PUBLIC 
+  "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of
+    Continuous-tone Still Images (JPEG)//EN">
+<!NOTATION EPS      PUBLIC
+  "+//ISBN 0-201-18127-4::Adobe//NOTATION PostScript Language Ref. Manual//EN">
+<!NOTATION GIF87a   PUBLIC
+  "-//CompuServe//NOTATION Graphics Interchange Format 87a//EN">
+<!notation linespecific system
+  "line ends and leading white space must be preserved in output">
+
+<!--========== Parameter entities for configuration ==========-->
+<!entity % DocClass "SUN">
+
+<!--=========== Feature Switches ==========-->
+
+<!--
+  Use %Only.paper and %Only.web in source documents to distinguish
+  variant texts for paper and hypertext versions.  More
+  meta-information than the ones below, which concern themselves with
+  the features of the DTD, and which are intended to be used only within
+  this DTD.  Note that it is possible for some document instances to
+  be invalid unless one of these is defined.
+-->
+<!entity % Only.paper	"IGNORE">
+<!entity % Only.web	"IGNORE">
+
+<!--
+  Use %Feature.Everything to switch on _all_ the features.  Note that
+  this is here purely for documentation purposes, and should not be
+  used for any user-visible document type.  Since it defines both
+  %Feature.versioning and %Internal.Feature.dateonly, it isn't even
+  fully consistent.
+-->
+<!entity % Feature.Everything		'ignore'>
+<![ %Feature.Everything [
+  <!entity % Feature.Abstract		'include'>
+  <!entity % Feature.Versioning		'include'>
+  <!entity % Internal.Feature.Dateonly	'include'>
+  <!entity % Feature.Docnumber		'include'>
+  <!entity % Feature.Routinelist	'include'>
+  <!entity % Feature.EnforceLinkpolicy	'include'>
+]]>
+
+<!--
+  If %Feature.Abstract is 'include', then an abstract is required.  If
+  it is 'ignore' then the abstract is optional.  It would be possible
+  to forbid an abstract by predefining %req.abstract to "", but that
+  is discouraged.
+
+  Default: required.
+-->
+<!entity % Feature.Abstract 'include'>
+
+<!--
+  The entity %Feature.Versioning controls whether the HISTORY and UPDATE
+  elements are permitted in the document.  It may be turned off by
+  declaring it as 'ignore' in the including DTD or possibly by the
+  document instance in a declaration subset (though the latter should
+  probably be discouraged other than for MUDs).
+
+  Default: absent
+-->
+<!entity % Feature.Versioning	'ignore'>
+
+<!--
+  The entity %Internal.Feature.Dateonly controls whether we have a
+  simple DATE element in place of the HISTORY one.  It is NOT intended
+  to be set outside this DTD - if you want this, then set
+  %Feature.Versioning to be 'ignore'.  
+
+  ONE OR THE OTHER, BUT NOT BOTH, of %Feature.Versioning and
+  %Internal.Feature.Dateonly must be set to include.  If both are set, chaos
+  will probably ensue, but I can't work out how to report such an
+  error from the DTD.
+-->
+<![ %Feature.Versioning [
+  <!entity % Internal.Feature.Dateonly 'ignore'>
+]]>
+<!entity % Internal.Feature.Dateonly	'include'>
+
+<!--
+  The entity %Feature.Docnumber controls whether the DOCNUMBER element
+  is required in the head, or forbidden
+
+  Default: absent
+-->
+<!entity % Feature.Docnumber	'ignore'>
+
+<!--
+  The entity %Feature.Routinelist controls whether the ROUTINELIST
+  element is permitted in the backmatter.
+
+  Default: absent
+-->
+<!entity % Feature.Routinelist 'ignore'>
+
+<!--
+  The entity %Feature.EnforceLinkpolicy controls whether the link
+  policy described below is enforced by the DTD.  Set this to IGNORE
+  to relax the policy.
+
+  Default: enforced
+-->
+<!entity % Feature.EnforceLinkpolicy 'include'>
+
+
+<!--========== Entities for special symbols ==========
+
+  There's a feature here I don't understand.  I had thought that the
+  appropriate way to switch between entity sets (for LaTeX or HTML
+  output) was to use SDATA entities.  However, when I do that - doing
+  something like <!entity copy SDATA "(c)">, what emerges from the
+  Jade Transform back-end is what looks like a multibyte character
+  reference &#65533, independently of what I have in the actual SDATA
+  entity declaration.  The LaTeX-Transform back-end I wrote emits
+  SDATA entity content verbatim.  I can't find any enlightenment in
+  Goldfarb, either; the HTML entities are therefore currently defined
+  using CDATA character entities.  
+-->
+
+<!entity % LaTeX.entities 'IGNORE'>
+<!entity % HTML.entities 'IGNORE'>
+
+<![ %LaTeX.entities [
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//LATEX">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX">
+]]>
+<![ %HTML.entities [
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//HTML">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML">
+]]>
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//PLAIN">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN">
+
+%Additional.Char.Ents;
+%ISOents;
+
+
+<!--======== Shortrefs ==========-->
+<![ ignore [
+<!-- The quote shortref achieves little, and leads to puzzling errors --
+  -- when you use a quote character in <verbatim> for example. -->
+<!entity openQ starttag "quote">
+<!entity closeQ endtag "quote">
+
+<!shortref textabbrevsmap	"--"	endash
+				"~"	nbsp
+				'"'	openQ>
+<!shortref Qmap 		'"'	closeQ>
+
+<!usemap textabbrevsmap (p | px)>
+<!usemap Qmap           quote>
+]]>
+<!shortref textabbrevsmap	"--"	endash
+				"~"	nbsp>
+<!usemap textabbrevsmap (p | px)>
+
+<!--========== Abbreviations ==========-->
+
+<!-- none? -->
+
+
+<!--========== Overall document structure ==========-->
+
+<!entity % DTD.Version 'Unknown' -- Include so that this DTD is valid
+				    on its own (for the benefit of
+				    DTD-documenting tools) -->
+<!entity % gversion.attr "generalversion cdata #fixed '%DTD.General.Version;'">
+<!entity % version.attr "version cdata #fixed '%DTD.Version;'">
+
+<!element %DocClass o o (docinfo, docbody)>
+<!attlist %DocClass
+	%gversion.attr;
+	%version.attr;
+	urllinkpolicy		-- Declare the URL policy for the
+				   DocumentSummary architecture.  The
+				   architectural instance has the same
+				   structure as this document, so that
+				   URLs for link targets may be
+				   generated automatically.  See the
+				   DocumentSummary architecture DTD
+				   for discussion.  --
+		cdata
+		#fixed automatic
+	>
+
+<!--========== Document head ==========-->
+<![ %Feature.Everything [
+    <!entity % history ',history,docdate'>
+]]>
+<![ %Feature.Versioning [
+    <!entity % history ',history'>
+    <!entity % update 'update*,'>
+]]>
+<!entity % history ',docdate'>
+<!entity % update ''>
+<!-- either HISTORY or DOCDATE elements will be present in DTD -->
+
+<![ %Feature.Docnumber [
+    <!entity % docnumber ',docnumber'>
+]]>
+<!entity % docnumber ''>
+
+
+<!--
+  Fix the order of the elements in docinfo.model.  There's no real
+  reason why we need the order to be arbitrary (and it can always be
+  loosened up later on), and using the `,' connector rather than `&'
+  makes the DTD more nearly conformant with XML.  Also, 
+  having the order fixed means that the AUTHORLIST start tag can be
+  made omissable.
+
+  There's also a requirement for the specification of a `cover
+  picture'.  Add this somewhere here.
+-->
+<!entity % docinfo.model 
+	'title , authorlist , keyword* %docnumber %history , copyright?'>
+<!element DOCINFO o o (%docinfo.model)>
+
+<!element TITLE		o o (#pcdata)	
+			-- contains document title.  This is marked as
+			   omissable: it typically won't be, in the
+			   document head, but the same element is used
+			   as the first subelement of SUBHEAD, and
+			   both have to be omissable if we're to be
+			   able to write section headings as
+			   `<sect>title...' -->
+<!element AUTHORLIST	o o (author+, otherauthors?, editors?)
+					-- contains author names -->
+<!element (OTHERAUTHORS | EDITORS)
+			- o (author+)	-- other contributors -->
+<!element AUTHOR	- o (#pcdata)	-- contains author's name -->
+<!element KEYWORD	- o (#pcdata)	-- contains a keyword for document -->
+
+<!attlist author
+	email		-- author's email address	--
+		cdata	#implied
+	webpage		-- author's home page		--
+		cdata	#implied
+	affiliation	-- author's physical address/affiliation, etc --
+		cdata	#implied
+	role		-- editor, maintainer, etc	--
+		cdata	#implied	
+	id		-- eg, initials, referred to in element UPDATE --
+		id	#required
+--
+	status
+		(current|past)	current
+		Remove this: this information is better in the
+		OTHERAUTHORS element.
+--
+	>
+
+<![ %Feature.Docnumber [
+    <!element DOCNUMBER - o (#pcdata)	-- document number in series -->
+    <!attlist docnumber
+	unassigned	-- indicates that no number has (yet?) been assigned
+			   to this document, and so that any content should be
+			   ignored --
+		(unassigned)
+		#implied
+	documenttype	-- Declare the type of the document element.
+			   This is redundant for processing of _this_
+			   DTD (but might make it more convenient),
+			   but is needed for the DocumentSummary 
+			   DTD, which doesn't otherwise know what the
+			   original document type was. --
+		cdata
+		#fixed %DocClass
+	-- Remap the DOCUMENTTYPE attribute to the
+			   TYPE element of the DocumentSummary's
+			   DOCNUMBER element --
+	-- Not necessary, since now the General DTD has an attribute
+	   of the same name on its DOCNUMBER element --
+--
+	docsumma
+		cdata
+		#fixed "type documenttype"
+--
+	>
+]]>
+
+<![ %Feature.Versioning [
+<!--
+	FIXME FIXME
+
+  The documentation below refers to an earlier version of the history
+  structure.  It should be fixed when the structure is finalised.
+
+  The date format should be finalised.  Should it be yyyymmdd or dd-mmm-yyyy?
+
+================
+
+  The history consists of a series of versions, each of which contains
+  a series of distributions.  There must be at least one distribution, so the
+  first will typically have no `release number'.  The versions and
+  distributions must be in chronological order, with the latest last.
+
+  A `version' is a significant release of a document; a `distribution'
+  is an intermediate/bugfixing/developers' release.  Typically,
+  distributions will have minor but significant differences.  The
+  distinction is a little artificial, and is more concerned with
+  Starlink distribution cycles than than any terrifically clear
+  distinction between the two ideas.  As an example, SUN/123.4-5 is
+  document number 123, version 4, release 5, which will typically be
+  quoted as simply SUN/123.4.
+
+  A distribution must contain free-text notes on the distribution, and
+  additionally provides an ID for UPDATE elements elsewhere in
+  the document to point to.  Updates, which may appear at various
+  points in the document (at the beginning of paragraphs, for
+  example), log edits made to the file by a particular author or
+  editor.  An adjustment to a paragraph should go in an update element
+  at the beginning of the paragraph, a global edit or a note about
+  general tidying (for example) would go in an update element at the
+  beginning of the document body.  Note that this model requires that,
+  in order for there to be a `distribution' element for `update's to
+  link to, there must be a `distribution' element present for the
+  distribution you will make next.
+
+  In this model, updates are not individually dated (but we could add a
+  required or optional date attribute to it, if we think we care that
+  much about a precise date for a change), but acquire a date by
+  reference to the distribution in which they were made public.  Note
+  that this seems slightly counterintuitive from the author's point of
+  view, in that when you're working on a document, the `distribution'
+  you'll attach your changes to is the one `yet to come'.  However, this
+  makes more sense than alternatives, because when you look at a
+  document, the thing you want to know is `in which distribution of a
+  document did this change appear?', so that updates are in this sense
+  attached to distributions (and specifically the distribution
+  temporally following the change), rather than merely having a date
+  attached to them.
+-->
+<!element HISTORY	- o (version, (version | distribution | change)*)>
+<![ ignore [
+<!element VERSION	- o (distribution+)>
+<!element DISTRIBUTION	- o (px+)	
+			-- Contains free-text notes on the distribution. -->
+]]>
+<!element (VERSION | DISTRIBUTION | CHANGE)
+			- o (px+)
+			-- contain free-text notes on the release or change -->
+
+<!attlist version
+	number		-- Identifies the version.  This will
+			   typically be something like '1' or '2'.
+			   These numbers are not generated
+			   automatically, to allow the numbering to
+			   start other than on one, or omitting some
+			   numbers, but the expectation is that
+			   successive version elements will increment
+			   this number. --
+		number
+		#required
+	date		-- Date the version was made/released.  If this is
+			   omitted, then the date proffered on the
+			   output will be taken from the last
+			   distribution or change after this.  I've
+			   made this required, since I don't know what
+			   to do if this is omitted but there's _no_
+			   later distribution or change.  Format:
+			   dd-MMM-yyyy --
+		cdata
+		#required
+	author		-- Who approved the release of this version? --
+		idref
+		#required
+	>
+<!attlist distribution
+	string		-- Identifies the distribution.  This will
+			   typically be something like '1' or '2', but
+			   could be 'draft' or something
+			   descriptive. Perhaps I should make this a
+			   NAME declared value, to forbid spaces. --
+		cdata
+		#required
+	date		-- The date this distribution was
+			   made. Format: dd-MMM-yyyy --
+		cdata
+		#required	
+	author		-- Whom the release is attributable to.  This
+			   links to one of the author elements. --
+		idref
+		#current
+	versionid	-- An id to allow UPDATE elements to refer to a
+			   specific version.  It can be anything, but a
+			   sensible format is v10-5, for example (it can't
+			   start with a number) --
+		id
+		#implied
+	>
+<!attlist change
+	date		-- Date the change was made. Format: dd-MMM-yyyy --
+		cdata
+		#required
+	author		-- Who made the change.  This links to one of
+			   the author elements. --
+		idref
+		#current
+	versionid	-- An id to allow UPDATE elements to refer to a
+			   specific version.  See the `distribution'
+			   element --
+		id
+		#implied
+	>
+	
+<!-- end of %Feature.Versioning -->
+]]>
+
+<![ %Internal.Feature.Dateonly [
+<!-- Instead of the elaborate history mechanism, we can have just a
+  plain document date -->
+<!element DOCDATE - o (#pcdata)>
+]]>
+
+<!element COPYRIGHT - - (p+)
+			-- Replace the copyright boilerplate with this
+			   text. -->
+
+<!--========== Document body ==========-->
+<![ %Feature.Routinelist [
+  <!entity % body.content '(routinelist | (p | table | figure)*)'>
+]]>
+<!entity % body.content '(p | table | figure)*'>
+
+<!--
+  I'm don't think we need to have the bibliography, indexcontents
+  and notecontents as elements.  Their existence should instead be
+  inferred whenever there are references to material in the body of
+  the document.
+-->
+<!--
+<![ %Feature.Routinelist [
+  <!entity % appendix.content "routinelist?, sect*">
+]]>
+-->
+<!entity % appendix.content "sect+">
+
+<!--
+  Express a link policy on certain elements.  Those elements which
+  have %export.id.required have both the ID element and the EXPORT as
+  required attributes.  ID is, of course, a unique ID for this
+  section, figure, or whatever.  If EXPORT is present, then the
+  document commits itself to maintaining this ID in future: that is,
+  it can safely be linked to from outside.
+
+  If an element has %export.id.optional in its attribute list, then it
+  may specify an ID, and it may export it, but neither is required.
+-->
+<![ %Feature.EnforceLinkpolicy [
+  <!entity % export.id.required "
+	id id #required
+	export (export) #required">
+]]>
+<!-- 
+  If %Feature.EnforceLinkpolicy is IGNORE, then make all the
+  attributes implied
+ -->
+<!entity % export.id.required "
+	id id #implied
+	export (export) #implied">
+<!entity % export.id.optional "
+	id id #implied
+	export (export) #implied">
+
+<!-- Is the abstract required or optional? -->
+<![ %Feature.Abstract [
+<!entity % req.abstract "abstract,"	-- required abstract -->
+]]>
+<!entity % req.abstract "abstract?,"	-- optional abstract -->
+
+<!-- 
+  Content model for element DOCBODY.  Presence or absence of abstract
+  is controlled by definition of %req.abstract.  Instead of the sect*
+  clause of the content model, we could have `(sect+ | part+)?', and
+  include either a sequence of SECTs or a sequence of PARTs, but I
+  don't see the need for this extra complication right now.
+
+  As for appendices, I considered <!element appendix - o (...)> with
+  the same content model as for SECT, but this way (with <!element
+  appendices - o (sect+)> ) we have the same structure within
+  appendices as outside, and it seems simply neater.  The only
+  drawback is that we no longer have `<appendix>appendix title'
+  reminding us we're in an appendix, and searching for something in an
+  appendix's title (within an SGML aware search engine, for example)
+  will need a further level of qualification.  But these both seem
+  disposable.
+-->
+<!entity % docbody.model 
+	       '%update
+		%req.abstract 
+		%body.content,
+		sect*,
+		appendices?,
+		backmatter?'>
+
+<!element DOCBODY o o (%docbody.model)>
+
+<!--========== Sectioning ==========-->
+
+<!--
+<!element PART          - o (subhead, %update %body.content, sect*)>
+...and add `part|' to the %section list
+-->
+<!element SECT          - o (subhead, %update %body.content, subsect*)>
+<!element SUBSECT       - o (subhead, %update %body.content, subsubsect*)>
+<!element SUBSUBSECT    - o (subhead, %update %body.content, subsubsubsect*)>
+<!element SUBSUBSUBSECT - o (subhead, %update %body.content)>
+
+<!element APPENDICES	- o (%appendix.content;)>
+
+<!element BACKMATTER	o o (bibliography? & indexcontents? & notecontents?)>
+
+<!attlist (sect | subsect)
+	%export.id.required;
+	indexkey 		-- contains the text of an index entry
+				   which points to this section -- 
+		cdata
+		#implied
+	>
+<!attlist (subsubsect | subsubsubsect)	
+	%export.id.optional;
+	indexkey 		-- contains the text of an index entry
+				   which points to this section -- 
+		cdata
+		#implied
+	>
+
+<!-- Subhead and title are the header and title for (sub*)sections -->
+<!element SUBHEAD o o (title)>
+
+<!--
+  UPDATE elements can appear in several places.  They are intended to
+  tie in closely with the releases appearing in the HISTORY element,
+  and the authors listed at the top.
+-->
+
+<![ %Feature.Versioning [
+<!element UPDATE - o (px+)>
+
+<!--
+  It might be worth including a modification-type attribute, such
+  as `added', `deleted' or `changed'.  Or is that becoming unduly
+  cumbersome?
+-->
+<!attlist update
+	versionid
+		idref	#required
+		-- version/release when the alteration was made --
+		-- id matches one DISTRIBUTION or CHANGE element --
+	author
+		idref	#required
+		-- author of modification.  id matches author element --
+  	>
+<!-- end of %Feature.Versioning -->
+]]>
+
+<!element ABSTRACT - - (px)+>
+
+<!--========== Paragraphs, and the flow of text ==========-->
+
+<!-- see %body.content above -->
+<!entity % simplephrase	"em | strong | quote | code | kbd | cite">
+<!entity % references	"ref | docxref | webref | url | citation">
+<!entity % special	"index | note | draftnote">
+<!entity % structuring	"blockquote | dl | ul | ol | verbatim">
+<!entity % maths	"m | mequation | meqnarray">
+<!entity % simpletext	"(#pcdata | %simplephrase | %maths )*">
+<!entity % phrase	"%simpletext | %references">
+
+<!--
+  %phrase: different types of phrase display within text.
+  distinction between %simplephrase and %otherphrase is that
+  %otherphrase couldn't sensibly be included within %phrase elements.
+
+  %structuring: larger things, which can appear within a paragraph, but which
+  contain more text, or more complication, than the phrase markup.
+  Includes the three different types of lists.
+
+  %special: miscellanea.  The main distinction is that %special aren't
+  allowed in PX
+-->
+
+<!--
+  Make the paragraph start tag omissable.  It won't often be possible
+  to omit it, but if we make it omissable, then we can have (p+)
+  content for things like the abstract and  list items, writable in a
+  natural way, without requiring the author to put in the P start tag
+  by hand.
+
+  The id attribute is a bit of a pain to implement, but useful.
+-->
+<!entity % p.model 
+    '%update (%phrase | %structuring | %special )*'>
+<!element P o o (%p.model)>
+<!attlist p
+	id	id	#implied	-- id for this paragraph --
+	>
+
+<!--
+  The PX element is identical to the P paragraph (and should probably
+  be treated the same by the application), but is more restrictive,
+  and so can be used within NOTEs, for example, without clumsy
+  exclusions.  It'll also help find `missing end tag' errors.
+-->
+<!entity % px.model '%update (%phrase | %structuring)*'>
+<!element PX o o (%px.model)>
+
+<!element (EM | STRONG | CITE) - - (#pcdata|%simplephrase)*>
+
+<!--
+  CODE is part of %phrase markup, and is for inline text such as
+  pathnames which needs to be shown in a distinctive font.  KBD is
+  much the same, except that it is for text a user should type.  That
+  is, these are identical at the DTD level.
+-->
+<!element (CODE|KBD) - - (#pcdata)	-- literal text -->
+
+<!--
+  VERBATIM is part of %structuring, and is for extended blocks of verbatim
+  text.  It should be set in a fixed-width font, and preserve line
+  ends.  The contents of VERBATIM will possibly need to be enclosed in
+  <![ cdata [...]]>.
+
+  Allow %references within verbatim text, allowing us to include
+  <webref> and <ref id=... text=...> within verbatim examples, making
+  the corresponding text `live' in online versions of documents.
+-->
+<!element VERBATIM - - ((#pcdata | %references)*)	-- verbatim text -->
+<![ ignore [
+<!element VERBATIM - - (#pcdata)	-- verbatim text -->
+]]>
+
+<!element BLOCKQUOTE - - (attribution?, px+)	-- extended quotation -->
+<!element QUOTE - - (attribution?, (%phrase)+)	
+					-- simple quotation  -->
+<!element ATTRIBUTION - - ((%phrase)+)	-- source of quotation -->
+
+<!element DRAFTNOTE - - (#pcdata)	-- Notes during drafting -->
+
+<!--========== Maths ==========
+  The maths elements in %maths all have the same declaration.  The M
+  element corresponds to the $ in TeX, and the MEQUATION and
+  MEQNARRAY elements correspond to the equation and eqnarray
+  environments respectively.  The content should be raw LaTeX,
+  appropriate for the LaTeX environment the element corresponds to.
+  In principle there are no restrictions on what goes in here, other
+  than that it be valid LaTeX, but in practice, I expect that teh
+  author might need some little awareness of any restrictions of the
+  actual implementation.
+
+  At present, I'm using tth as a translator from TeX to HTML (see
+  http://hutchinson.belmont.ma.us/tth/) - this will deal with Plain as
+  well as LaTeX, but that shouldn't be used in fact.  There's
+  obviously no problem when I'm generating LaTeX.
+
+  Note that I'm declaring this as PCDATA content, accepting the force
+  of the overwhelmingly negative discussion of CDATA/RCDATA at
+  http://www.oasis-open.org/cover/topics.html#CDATA.  Note also that
+  this means that & _is_ interpreted as an entity reference - there's
+  a list of ways to get round that in one of the postings at that URL,
+  but the simplest seem to be either AT&amp;T or <![cdata[ AT&T ]]>.
+-->
+<!element (%maths) - - (#pcdata)>
+<!attlist (%maths)
+	notation	-- the notation - fixed as LaTeX --
+		notation(latex) #fixed latex
+	>
+
+<!--========== Cross references, bibliography, indexing and notes ==========-->
+
+<!element CITATION - - (#pcdata)	-- bibliography reference -->
+<!attlist citation
+	noref	(noref)	#implied
+		-- noref means don't make any reference in the text: --
+		-- just include an entry in the bibliography --
+	>
+
+<!element BIBLIOGRAPHY - o empty	-- bib contents, in
+					   back-matter only -->
+<!attlist bibliography
+	bib	cdata	#required	-- name of bibliography --
+	all	(all)	#implied	-- list all of bib, not just citns --
+	>
+<!--
+  How about an alternative bibliography, with elements in place?  Or
+  make bibliography non-empty, and have its contents supplement those
+  in the database.
+-->
+
+<!element NOTE - - (px)+		-- foot/endnotes -->
+<!element NOTECONTENTS - o empty	-- body of footnotes, in
+					   back-matter only --> 
+
+<!--
+  We perhaps need to think carefully about how INDEX interrelates with
+  the A element.  It's tricky, because index might be given the source
+  or target of a link in a down-converted document
+-->
+<!element INDEX - - (#pcdata)>
+<!element INDEXCONTENTS - o empty	-- the index, in back-matter only -->
+
+<!attlist index
+	key	cdata	#implied	-- key, if not element contents --
+	>
+
+<!--========== Routine list ==========-->
+<![ %Feature.Routinelist [
+
+<!element ROUTINELIST		- o (p*, codecollection+)>
+<!element CODECOLLECTION	- o EMPTY>
+<!attlist CODECOLLECTION
+	doc		-- document with source marked up in one of
+			   the clients of the programcode architecture --
+		entity
+		#required
+	ids		-- if this attribute is present, then only the
+			   elements with these ids should be processed --
+		cdata
+		#implied
+	>
+]]>
+<![ ignore [ 
+<!-- old routinelist structure -->
+<!element ROUTINELIST - - (p*,routine+) 
+	-- routines optionally prefaced by text-->
+<!element ROUTINE - o (routinename, summary, description, usage,
+  parameterlist, examples, routinenotes?)>
+<!element ROUTINENAME	- o (#pcdata)>
+<!element SUMMARY 	- o (#pcdata)>
+<!element DESCRIPTION	- o (p+)>
+<!element USAGE		- o (#pcdata)>
+<!element PARAMETERLIST	- o (parameter,paramdesc)+>
+<!element EXAMPLES	- o (p+)>
+<!element ROUTINENOTES	- o (p+)>
+
+<!element PARAMETER	- o (#pcdata)>
+<!element PARAMDESC	- o (#pcdata)>
+
+<!attlist parameter
+	type	(real,integer,char,logical,ndf)	#required
+	access	(r,w,rw)	#required
+	>
+]]>
+
+<!--========== Links and cross references ==========-->
+<!--
+  There are several distinct types of links:
+
+  * Internal to the document
+    Element REF: empty.  Can refer to sections, tables, and possibly
+    to paragraphs.
+
+  * To other Starlink documents
+    Element DOCXREF: empty.
+
+  * To URLs
+    Element WEBREF: contains self anchor, just like HTML A element.
+    Also element URL, containing URL.
+
+  * To graphics, and other transclusion targets>
+    Element GRAPHIC: empty.
+-->
+
+<!--
+  First declare the DSSSL notation, so we can refer to SDQL queries.
+  (this comes from dsssl/style-sheet.dtd
+-->
+<!NOTATION DSSSL   PUBLIC "ISO/IEC 10179:1996//NOTATION
+                   DSSSL Architecture Definition Document//EN"
+                -- A document architecture conforming to the
+                   Architectural Form Definition Requirements of
+                   ISO/IEC 10744.     --
+>
+
+<![ ignore [
+<!-- Also define the XPointer notation -->
+<!NOTATION XPointer SYSTEM "http://www.w3.org/TR/WD-xptr" >
+]]>
+
+
+<!--
+  REF element is for internal cross-references.  It's empty.
+  For a detailed discussion of how to implement this, see Eliot
+  Kimber's 9 March 1998 posting to comp.text.sgml.  The implementation
+  here has only a dummy SDQL query at present.  In future, I want this
+  to use SDQL to include an element 
+  title if present, but otherwise simply construct the link from the
+  referent's section number, or construct some other self-link text.  The
+  element's syntax will not change when I make this improvement.
+-->
+<!element REF - o empty 
+				-- Internal cross reference, with
+				   effective content to be title of
+				   target -- 
+> 
+<!attlist REF
+	id			-- internal target of link --
+		idref
+		#required
+
+	text			-- optional overriding link text --
+		cdata
+		#implied
+
+	-- following are HyTime attributes --
+	ref-title		-- pointer to title of reference target --
+		cdata
+		#fixed "SDQL query..."
+	loctype			-- declare addressing method --
+		cdata
+		#fixed "ref-title queryloc DSSSL"
+	rflocsrc		-- bind the ref-title attribute to the
+				   ID attribute, which specifies the
+				   source of the ref-title query --
+		cdata
+		#fixed "ref-title id"
+	valueref		-- make the effective content of this
+				   element the resource pointed to by
+				   ref-title --
+		cdata
+		#fixed "#CONTENT ref-title"
+	HyTime			-- bind to HyTime clink form --
+		name
+		#fixed "clink"
+	HyNames			-- bind id attribute to clink's linkend --
+		cdata
+		#fixed "linkend id"
+	>
+
+
+<!--
+  DOCXREF cross-references elements and data within other Starlink documents,
+  ie ones which have a number of the format SUN/123, or whatever.  Refer to
+  the document using a rflocsrc of this format, and further discriminate using
+  an (`exported') ID within that document.  I considered using XPointers to
+  refer to IDs or other content within that document, but confined it, for the
+  moment, just to IDs.  This can be extended in the future to full XPointer
+  queries, without invalidating anything which is valid under this more
+  restrictive declaration (a bare ID is a valid XPointer (check!)).  XLL isn't
+  a solution here, because we don't want to be confined to referring to the
+  other document through a URI.  XPointers should be more generally
+  implemented in future, so this notation will fit naturally into a future
+  development of this format, into XML, for example.
+
+  This is all more intricate than it might at first appear: see HyTime clause
+  7.8.
+
+  The following is very closely related to the example in HyTime note
+  176, except that the equivalent of LOC there has an incorrect value
+  prescription of IDREFS, which is corrected in the first TC.  In an
+  earlier version of this (never implemented), the DOC attribute had a
+  value prescription of CDATA, and was interpreted as a queryloc for a
+  Starlink document.  This might seem more straightforward, but I
+  think it's probably less good.  The current scheme, with the DOC
+  declared as an entity, means that we have to predeclare all the
+  entities we might want to refer to.  That doesn't seem like a good
+  thing, but it means that they can all be declared in one catalogue,
+  specific to a site, and that intelligence about where documents are
+  (local or through a URL?) can be encoded there, specific to each
+  site where the documents are used.
+
+  The link's effective content should be whatever corresponds to the title of
+  the object addressed by LOC.  I'm not sure quite how to make this more
+  precise or, equivalently, how to express this within HyTime
+  declarations (Xpointers?).
+-->
+<!element DOCXREF - O empty
+				-- References to elements and data within other
+				   Starlink documents -- 
+	>
+<!attlist DOCXREF
+	doc			-- Starlink document which holds the target --
+		entity
+		#required
+	loc			-- location within document, or whole document
+				   if this is missing --
+		cdata
+		#implied
+
+	-- Hmm, I don't think a text attribute is a great idea - too hackable...
+	text
+		cdata
+		#implied
+	--
+
+	-- following are the HyTime attributes --
+	loctype			-- declare addressing method --
+		cdata
+		#fixed "loc idloc"
+	rflocsrc		-- declare that the LOC is a reference
+				   relative to the document addressed by
+				   DOC --
+		cdata
+		#fixed "loc doc"
+	HyTime			-- bind to HyTime clink form --
+		name
+		#fixed "clink"
+	HyNames			-- bind id attribute to clink's linkend --
+		cdata
+		#fixed "linkend loc"
+	>
+
+<!--
+  WEBREFs.  The WEBREF is just like the HTML A element, and
+  its declaration here is lifted more-or-less directly from HyTime
+  note 177.  Note, however, that there's no NAME defined here, and the
+  URL is required.
+-->
+
+<!notation URL 
+	public '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'
+	-- see also RFC1808, Relative URLs --
+	>
+
+<!element WEBREF - - (%simpletext)*>
+<!attlist WEBREF
+	url		-- URL --
+		cdata	#required
+
+	-- following are HyTime declarations --
+	HyTime
+		name	#fixed clink
+	HyNames		-- make the clink linkend the url --
+		cdata	#fixed "linkend url"
+	anchcstr	-- this element is a source anchor, and the
+			   target anchor URL must be specified --
+		names	#fixed "self required"
+	linktrav	-- link traversal options: we can do anything at the
+			   current anchor, but traversal is one-way (as far as
+			   this declarations is concerned; browsers, of
+			   course, can and do support other behaviour) --
+		names	#fixed "A D"
+	loctype		-- declare that URL is a URL query --
+		cdata	#fixed "url QUERYLOC URL"
+	>
+
+
+<!--
+  URL provides a way of embedding URLs in the document.  The element
+  is made a link anchor, with its content acting as the address.
+
+  There's a case for giving this element a HREF attribute, to provide a usable
+  URL, if the one specified is abbreviated for some reason. However, this is
+  probably a bad idea, as one would expect that an element named URL would
+  contain something you could just type into a web browser.
+-->
+<!element URL - - (#pcdata)>
+<!attlist URL
+	nolink		-- suppress actually making the URL `live': if this
+			   attribute is present, the URL is presented, but not
+			   made active as a link --
+		(nolink)	#implied
+
+	-- following are HyTime attributes --
+	HyTime
+		name
+		#fixed "clink"
+	HyNames		-- the linkend attribute is given as the content of
+			   the element (see HyTime A.3.5.2) --
+		cdata
+		#fixed "linkend #content"
+	anchcstr
+		names
+		#fixed "self required"
+	linktrav
+		names
+		#fixed "A D"
+	loctype
+		cdata
+		#fixed "#content QUERYLOC URL"
+	>
+
+<!--========== Lists ==========-->
+<!entity % dl.model '%update (dt,dd)+'>
+<!element DL - - (%dl.model)>
+<!element DT - o (%phrase)+>
+<!element DD - o (p)+>
+
+<!entity % oul.model '%update (li)+'>
+<!element (OL|UL) - - (%oul.model)>
+<!element LI - o (p)+>
+
+<!-- 
+  Use the OASIS Exchange Table Model subset of the CALS table model.
+  See http://www.oasis-open.org/html/a503.htm for discussion, and
+  http://www.oasis-open.org/html/publtext.htm for public texts.
+
+  The Exchange Table Model can be customised.  Replace the optional
+  TITLE element with a required CAPTION, and add an ID attribute to
+  the TABLE.
+-->
+<!entity % titles '%update caption'>
+<!entity % tbl.entry.mdl '(%phrase)*'>
+<!entity % tbl.table.att 
+	'pgwide number	#implied
+	float (float|nofloat) #implied
+	%export.id.optional; '>
+<!entity % calstbls public "-//OASIS//DTD Exchange Table Model 19960430//EN">
+%calstbls;
+
+
+<!--
+  The FIGURECONTENT element will either contain text of some sort (perhaps
+  verbatim text - amplify the %figurecontent.model), or, perhaps more
+  typically, will contain a list of entities, with associated notations.
+  The down-converter should scan this list, and incorporate that image format
+  which is most suitable.
+
+  The entities will be declared using a declaration such as:
+  <!entity figure.test system "file.eps" ndata eps>
+-->
+<!entity % figure.model '%update caption, figurecontent'>
+<!entity % figurecontent.model 'px+'>
+<!element FIGURE - - (%figure.model)>
+<!element FIGURECONTENT - o (%figurecontent.model)>
+<!attlist FIGURE
+	float		-- may it be unanchored from its position? --
+		(float|nofloat)
+		nofloat
+	%export.id.optional;
+	>
+<!attlist FIGURECONTENT	
+	image		-- entity list for figure content --
+		entities
+		#conref
+	alt		-- descriptive alternative text --
+		cdata
+		#required
+	>
+
+<!-- CAPTION element is common to table and figure -->
+<!element CAPTION - o (px+)>
