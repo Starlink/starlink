@@ -22,6 +22,7 @@
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 *  Global Constants:
+      INCLUDE 'CNF_PAR'          ! CNF_PVAL
       INCLUDE 'IDI_ERR'          ! IDI error codes
       INCLUDE 'IDI_PAR'          ! IDI global constants
 *  Status:
@@ -84,7 +85,7 @@
       PACK = 1
       XSTART = 0
       YSTART = 0
-      CALL IIMWMY( ID, MEMID, %VAL( IPIN ), NDATA, DEPTH, PACK,
+      CALL IIMWMY( ID, MEMID, %VAL( CNF_PVAL(IPIN) ), NDATA, DEPTH,PACK,
      :             XSTART, YSTART, STATUS )
 
 *   Abort if an error has occured
