@@ -55,7 +55,8 @@
       # Set list of image sizes of frames (pixels along a side)
             set image_sizes = ( 1000 2000 3000 4000 5000 6000 )
 
-      # Set list of object densities (objects per million pixels)
+      # Set list of object densities (objects per million pixels).
+      # If this is set to ( 0 ) then min_objects will always be used.
             set object_densities = ( 50 )
 
       # Set minimum number of objects per frame (can override object_densities)
@@ -148,6 +149,7 @@
       echo                                                >>$timelogfile
       echo "Variance:  $variance"                         >>$timelogfile
       echo "Keepard:   $keepard "                         >>$timelogfile
+      echo "Biasframe: $biasframe"                        >>$timelogfile
       echo "Logging interval:   $interval"                >>$timelogfile
       echo                                                >>$timelogfile
       printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$timelogfile 
