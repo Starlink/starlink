@@ -103,7 +103,9 @@ SUBDIRS = @subdirs@
 @SET_MAKE@
 LN_S=@LN_S@
 
-# Java support: need a java runtime
+# Java support: need a java runtime.  The Java programs below use the
+# jar in `starconf --show buildsupportjar`, which is installed
+# as part of the starconf component.
 JAVA=@JAVA@
 
 # The RECURSIVE_TARGETS support here is based on the similar support
@@ -121,10 +123,6 @@ world: $(ALL_TARGETS)
 	rm -f world-stamp
 	date >world-stamp
 
-# The Makefile dependencies are built using a Java program.  This
-# isn't installed (it should be -- see the comments in
-# buildsupport/starconf/Makefile.am) so we have to hack it.  Ugly: FIXME.
-#
 # Avoid doing anything if the variable JAVA is NOJAVA -- this is true if
 # we're using this file unconfigured during bootstrap (see ./bootstrap
 # for the relevant gymnastics).
@@ -139,19 +137,27 @@ world: $(ALL_TARGETS)
 # componentset.xml is missing.  This is also why individual
 # component.xml files are checked in to the repository, since this
 # allows compenentset.xml to be built without the component.xml files
-# being configured.
+# being configured.  This, finally, is why we do not declare that
+# Makefile.dependencies depends on componentset.xml, and have a
+# separate rule for the latter: we can't express any componentset.xml
+# dependencies, so once it exists, it wouldn't be updated.
+#
+# We make the componentset.xml by concatenating all the component.xml
+# files we can find.  Sort the list of files to make the order
+# deterministic.  The removal of the DOCTYPE lines and PIs is
+# admittedly lame, but good enough for the moment.
+#
+# componentset.xml `really' depends on all the component.xml files
+# below it, but don't state this, for the reason explained above.
+# If you add a component or changes a component's dependencies,
+# then delete Makefile.dependencies here and remake it.
 #
 # The test of whether $(JAVA) is NOJAVA is important.  An edited
 # version of this file is used by the ./bootstrap script, in which the
 # JAVA variable is set to NOJAVA (since the directory may not have been
-# configured yet); we must not fail in this case, nor may we attempt
-# to make GenerateDependencies.class.  In this case simply do nothing,
-# because the Makefile.dependencies file can be assumed to be up-to-date.
-#
-# We must also test whether the java/Makefile exists.  If not, it's
-# because buildsupport/starconf hasn't been configured (yet), so there
-# isn't yet a Makefile which would make GenerateDependencies.class for
-# us.
+# configured yet); we must not fail in this case.  In this case simply
+# do nothing, because the Makefile.dependencies file can be assumed to
+# be up-to-date.
 #
 # If $(JAVA) is NOJAVA and Makefile.dependencies does not exist,
 # then what is happening is that the user has deleted
@@ -166,23 +172,13 @@ world: $(ALL_TARGETS)
 # happening again, and hope this turns into someone else's problem.
 #
 # The hole in the logic below is where we have an unconfigured tree
-# (ie, no buildsupport/starconf/java/Makefile) _and_ no
+# (ie, buildsupport/starconf has not been installed) _and_ no
 # Makefile.dependencies.  Since the latter is checked into the
 # repository, this can only mean that someone is playing
 # silly-buggers, and we're stuck.  The error message should cover
 # that case, too.
 #
-# We make the componentset.xml by concatenating all the component.xml
-# files we can find.  Sort the list of files to make the order
-# deterministic.  The removal of the DOCTYPE lines and PIs is
-# admittedly lame, but good enough for the moment.
-#
-# componentset.xml `really' depends on all the component.xml files
-# below it, but don't state this, for the reason explained above.
-# If you add a component or changes a component's dependencies,
-# then delete Makefile.dependencies here and remake it.
-#
-Makefile.dependencies:
+Makefile.dependencies componentset-extrainfo.xml:
 	rm -f componentset.xml Makefile.dependencies Makefile.dependencies.tmp
 	exec 5>componentset.xml; \
 	  echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >&5; \
@@ -191,20 +187,19 @@ Makefile.dependencies:
 	    { while read c; do cat $$c; done } | \
 	    sed '/^<?/d;/^<!DOCTYPE/d;/^ *<!--.*--> *$$/d' >&5; \
 	  echo '</componentset>' >&5
-	if test "$(JAVA)" != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
-	  (cd buildsupport/starconf/java \
-	      && $(MAKE) GenerateDependencies.class) \
-	  && $(JAVA) -classpath buildsupport/starconf/java \
+	if test "$(JAVA)" != NOJAVA; then \
+	  $(JAVA) -classpath `starconf --show buildsupportjar` \
 	        GenerateDependencies \
 	        --makefile=Makefile.dependencies.tmp \
+		--flatdeps=componentset-extrainfo.xml \
 		componentset.xml \
-	  && mv Makefile.dependencies.tmp $@; \
+	  && mv Makefile.dependencies.tmp Makefile.dependencies; \
 	elif test -f $@; then \
 	  touch $@; \
 	else \
 	  echo "You are remaking Makefile.dependencies (yes?)."; \
 	  echo "To do this, you must have java in your path."; \
-	  echo "(and buildsupport/starconf must be configured, as the"; \
+	  echo "(and the starconf component must be installed, as the"; \
 	  echo "result of a tree-wide bootstrap).  Either call:"; \
 	  echo "  make JAVA=/path/to/java Makefile.dependencies"; \
 	  echo "or edit PATH appropriately, run"; \
@@ -218,8 +213,7 @@ Makefile.dependencies:
 # Probably only used by USSC maintainer, so limited error recovery.
 componentset.html: Makefile.dependencies
 	test $(JAVA) != NOJAVA -a -f componentset.xml
-	(cd buildsupport/starconf/java && $(MAKE) Transformer.class)
-	$(JAVA) -classpath buildsupport/starconf/java \
+	$(JAVA) -classpath `starconf --show buildsupportjar` \
 	  Transformer componentset.xml \
 	    buildsupport/misc/summarise-components.xslt $@
 
