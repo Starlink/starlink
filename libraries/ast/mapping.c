@@ -141,7 +141,6 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
-static double AvoidWt( int, const double [], const double [], const double [], int, const double [], const double [] );
 static double LocalMaximum( const MapData *, double, double, double [] );
 static double MapFunction( const MapData *, const double [], int * );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
@@ -183,10 +182,9 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
 static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
                           double *xl, double *xu ) {
 
-   const int maxiter = 10000;
+   const int maxiter = 50000;
    const int miniter = 5;
-   double *x_l;
-   double *x_u;
+   double *x;
    double acc;
    double new_max;
    double new_min;
@@ -206,56 +204,103 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    nsame_l = nsame_u = 0;
    nfound_l = nfound_u = 0;
    done_l = done_u = 0;
-   x_l = astMalloc( mapdata->nin * sizeof( double ) );
-   x_u = astMalloc( mapdata->nin * sizeof( double ) );
+   x = astMalloc( mapdata->nin * sizeof( double ) );
    for ( iter = 0; iter < maxiter; iter++ ) {
 
+      acc = DBL_EPSILON;
       if ( ( *lbnd != AST__BAD ) && ( *ubnd != AST__BAD ) ) {
-         acc = fabs( *ubnd - *lbnd );
-      } else if ( *lbnd != AST__BAD ) {
-         acc = fabs( *lbnd );
-      } else if ( *ubnd != AST__BAD ) {
-         acc = fabs( *ubnd );
-      } else {
-         acc = 1.0;
+         acc = fabs( *ubnd - *lbnd ) * DBL_EPSILON;
       }
-      acc *= DBL_EPSILON;
 
       if ( !done_l ) {
          for ( coord = 0; coord < mapdata->nin; coord++ ) {
+
+/* On the first iteration, start searching for a local minimum at the
+   position where the best estimate of the lower bound (if any) has
+   previously been found. */
             if ( !iter && ( *lbnd != AST__BAD ) ) {
-               x_l[ coord ] = xl[ coord ];
+               x[ coord ] = xl[ coord ];
+
+/* Otherwise, if no estimate of the lower bound has been found, then
+   start searching at the position where the best estimate of the
+   upper bound (if any) has been found. This may be a long way from a
+   local minimum, but at least it will yield a non-bad value for the
+   Mapping function, so some sort of estimate of the lower bound will
+   be obtained. This is important in cases where finding the "active"
+   (i.e. non-bad) region of the function is the main problem. Note
+   that this condition can only occur once, since the lower bound will
+   have an estimate on the next iteration. */
+            } else if ( ( *lbnd == AST__BAD ) && ( *ubnd != AST__BAD ) ) {
+               x[ coord ] = xu[ coord ];
+
+/* Having exhausted the above possibilities for finding a new local
+   minimum, generate pseudo-random starting positions which are
+   uniformly distributed throughout the search volume. */
             } else {
                random = Random( &seed );
-               x_l[ coord ] = mapdata->ubnd[ coord ] * random +
+               x[ coord ] = mapdata->ubnd[ coord ] * random +
                               mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
          }
-         new_min = MapFunction( mapdata, x_l, &ncall );
+
+/* Evaluate the Mapping function at the new starting position. Do not
+   search for a minimum unless the returned value is non-bad, but loop
+   until a non-bad value is found. This allows us to search rapidly
+   for the active regions of the function, even if there are
+   relatively few of these. */
+         new_min = MapFunction( mapdata, x, &ncall );
          if ( new_min != AST__BAD ) {
             printf( "X minimising (iter=%d) starting at:\n", iter );
             for ( coord = 0; coord < mapdata->nin; coord ++ ) {
-               printf( "%g ", x_l[ coord ] );
+               printf( "%g ", x[ coord ] );
             }
             printf( "\n" );
+
+/* Indicate that the Mapping function should be negated (because we
+   want a minimum) and then search for a local maximum in this negated
+   function. If the result is non-bad (as it should always be, barring
+   an error), then negate it to obtain the value of the local minimum
+   found. */
             mapdata->negate = 1;
-            new_min = LocalMaximum( mapdata, acc, 0.01, x_l );
+            new_min = LocalMaximum( mapdata, acc, 0.01, x );
             if ( new_min != AST__BAD ) {
                new_min = -new_min;
                printf( "minimum %.20g found at ", new_min );
                for ( coord = 0; coord < mapdata->nin; coord++ ) {
-                  printf( "%.20g ", x_l[ coord ] );
+                  printf( "%.20g ", x[ coord ] );
                }
                printf( "\n\n" );
+
+/* Count the number of times we successfully locate a local minimum
+   (ignoring the fact they might all be the same). */
                nfound_l++;
+
+/* If this is the first estimate of the minimum, then set the count of
+   identical minima to one. Store the minimum value and its position. */
                if ( *lbnd == AST__BAD ) {
                   nsame_l = 1;
                   *lbnd = new_min;
-                  for ( coord = 0; coord < ncoord; coord++ ) xl[ coord ] = x_l[ coord ];
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xl[ coord ] = x[ coord ];
+                  }
+
+/* Otherwise, if this minimum is lower than the previous estimate,
+   then re-initialise the count of identical minima to one if the
+   difference exceeds the accuracy with which minima are found
+   (i.e. we have found a significantly different minimum). Otherwise,
+   increment this coune (i.e. if we have found the same minimum but
+   with slightly improved accuracy). Store the new minimum and its
+   position. */
                } else if ( new_min < *lbnd ) {
                   nsame_l = ( ( *lbnd - new_min ) > acc ) ? 1 : nsame_l + 1;
                   *lbnd = new_min;
-                  for ( coord = 0; coord < ncoord; coord++ ) xl[ coord ] = x_l[ coord ];
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xl[ coord ] = x[ coord ];
+                  }
+
+/* If the latest minimum is no improvement on previous estimates, then
+   increment the count of identical minima but do not save the new
+   one. */
                } else {
                   nsame_l++;
                }
@@ -263,40 +308,45 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
             }
          }
       }
+
+/* Now repeat all of the above to find a new local maximum which estimates
+   the upper bound. */
       if ( !done_u ) {
          for ( coord = 0; coord < mapdata->nin; coord++ ) {
             if ( !iter && ( *ubnd != AST__BAD ) ) {
-               x_u[ coord ] = xu[ coord ];
+               x[ coord ] = xu[ coord ];
+            } else if ( ( *ubnd == AST__BAD ) && ( *lbnd != AST__BAD ) ) {
+               x[ coord ] = xl[ coord ];
             } else {
                random = Random( &seed );
-               x_u[ coord ] = mapdata->ubnd[ coord ] * random +
+               x[ coord ] = mapdata->ubnd[ coord ] * random +
                               mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
          }
-         new_max = MapFunction( mapdata, x_u, &ncall );
+         new_max = MapFunction( mapdata, x, &ncall );
          if ( new_max != AST__BAD ) {
             printf( "X maximising (iter=%d) starting at:\n", iter );
             for ( coord = 0; coord < mapdata->nin; coord ++ ) {
-               printf( "%g ", x_u[ coord ] );
+               printf( "%g ", x[ coord ] );
             }
             printf( "\n" );
             mapdata->negate = 0;
-            new_max = LocalMaximum( mapdata, acc, 0.01, x_u );
+            new_max = LocalMaximum( mapdata, acc, 0.01, x );
             if ( new_max != AST__BAD ) {
                printf( "maximum %.20g found at ", new_max );
                for ( coord = 0; coord < mapdata->nin; coord++ ) {
-                  printf( "%.20g ", x_u[ coord ] );
+                  printf( "%.20g ", x[ coord ] );
                }
                printf( "\n\n" );
                nfound_u++;
                if ( *ubnd == AST__BAD ) {
                   nsame_u = 1;
                   *ubnd = new_max;
-                  for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = x_u[ coord ];
+                  for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = x[ coord ];
                } else if ( new_max > *ubnd ) {
                   nsame_u = ( ( new_max - *ubnd ) > acc ) ? 1 : nsame_u + 1;
                   *ubnd = new_max;
-                  for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = x_u[ coord ];
+                  for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = x[ coord ];
                } else {
                   nsame_u++;
                }
@@ -311,7 +361,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
            ( nsame_u >= ( 0.3 * nfound_u + 0.5 ) ) ) done_u = 1;
       if ( done_l && done_u ) break;
    }
-#if 0
+#if 1
    mapdata->negate = 1;
    *lbnd = LocalMaximum( mapdata, 0.0, DBL_EPSILON * 10.0, xl );
    if ( *lbnd != AST__BAD ) *lbnd = - *lbnd;
@@ -320,8 +370,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 #endif
    printf( "best limit(l) = %g at %.20g %.20g\n", *lbnd, xl[0], xl[1] );
    printf( "best limit(u) = %g at %.20g %.20g\n", *ubnd, xu[0], xu[1] );
-   x_l = astFree( x_l );
-   x_l = astFree( x_l );
+   x = astFree( x );
 }
 void astBoxBound( AstMapping *this,
                   const double lbnd_in[], const double ubnd_in[],
@@ -344,7 +393,9 @@ void astBoxBound( AstMapping *this,
    mapdata.ptr_out = astGetPoints( mapdata.pset_out );
 
    *lbnd_out = *ubnd_out = AST__BAD;
+#if 1
    SpecialBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
+#endif
 #if 1
    GlobalBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
 #endif
@@ -352,171 +403,6 @@ void astBoxBound( AstMapping *this,
 
 
 /*************************************/
-static double AvoidWt( int ncoord, const double x[],
-                       const double lbnd[], const double ubnd[], int npoint,
-                       const double xstart[], const double xend[] ) {
-/*
-*  Name:
-*     AvoidWt
-
-*  Purpose:
-*     Generate a weighting function that avoids previously-used points.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "mapping.h"
-*     double AvoidWt( int ncoord, const double x[],
-*                     const double lbnd[], const double ubnd[], int npoint,
-*                     const double xstart[], const double xend[] );
-
-*  Class Membership:
-*     Mapping member function.
-
-*  Description:
-*     This function accepts the coordinates of a test point in an
-*     n-dimensional space and returns a corresponding weight factor
-*     between zero and one. The function also accepts two lists (of
-*     equal length) containing the coordinates of two sets of points
-*     which are to be avoided. The weight factor is set to zero if the
-*     test point corresponds with any point in these lists and
-*     increases towards one as the distance between the test point and
-*     the nearest point in either of these lists increases.
-*
-*     The purpose of this is to provide a weighting function which may
-*     be used as the basis for a probability distribution
-*     function. Pseudo-random points may be generated using this in
-*     such a way that they tend to avoid occurring near points which
-*     appear in either of the two lists.
-*
-*     The intended application is to global opimisation. Here, one of
-*     the sets of points to be avoided will contain the starting
-*     positions used for previous local opimisation searches. The
-*     other set will contain the positions of the end-points of these
-*     searches (the location of each local optimum found). In choosing
-*     a point at which to start a new search (the test point), it is
-*     advantageous to avoid the regions around any of these
-*     previously-visited points, so as to improve the likelihood of
-*     visiting a new basin of convergence and hence a new optimum. The
-*     weight factor returned by this function serves as a basis for
-*     generating new pseudo-random starting positions in this way.
-
-*  Parameters:
-*     ncoord
-*        The dimensionality of the coordinate space.
-*     x
-*        Pointer to an array of double containing the coordinates of
-*        the test point.
-*     lbnd
-*        Pointer to an array of double containing the lower bounds of
-*        the region of coordinate space to be used in each dimension.
-*     ubnd
-*        Pointer to an array of double containing the upper bounds of
-*        the region of coordinate space to be used in each
-*        dimension. These values should not be less than the
-*        corresponding lower bounds (but may equal them).
-*     npoint
-*        The number of points in each of the lists given below.
-*     xstart
-*        Pointer to an array of double containing a list of the
-*        starting positions of previous searches for local optima.
-*        The coordinates of the first point should be given first in
-*        this array, then the second point, etc. These positions
-*        should not lie outside the bounds given above.
-*     xend
-*        Pointer to an array of double containing a list of the ending
-*        positions of previous searches for local optima (i.e. the
-*        locations of the local optima found). The coordinates should
-*        be stored in the same order as for "xstart" and should
-*        similarly not lie outside the bounds given above.
-
-*  Returned Value:
-*     The weight factor.
-
-*  Notes:
-*     - The weight factor returned is not normalised to serve directly
-*     as a probability distribution function. Neither will its maximum
-*     value, in general, be equal to unity. Hence, further external
-*     normalisation must be applied before using it to generate
-*     pseudo-random samples.
-*     - A weight factor of unity will be returned if this function is
-*     invoked with the global error status set, or if it should fail
-*     for any reason.
-*/
-
-/* Local Variables: */
-   double dx;                    /* Distance from more distant bound */
-   double dxl;                   /* Distance from lower bound */
-   double dxu;                   /* Distance from upper bound */
-   double weight;                /* Weight factor to return */
-   double wt;                    /* Local weight factor */
-   double wtend;                 /* Weight factor for start position */
-   double wtstart;               /* Weight factor for end position (optimum) */
-   int coord;                    /* Loop counter for coordinates */
-   int point;                    /* Loop counter for points */
-  
-/* Initialise. */
-   weight = 1.0;
-
-/* Check the global error status. */
-   if ( !astOK ) return weight;
-
-/* Loop through the list of points to be avoided, initialising a
-   weight factor for each set of points (start position and end
-   position). */
-   for ( point = 0; point < npoint; point++ ) {
-      wtstart = wtend = 0.0;
-
-/* Use each coordinate in turn. */
-      for ( coord = 0; coord < ncoord; coord++ ) {
-
-/* Considering the start position first, calculate its absolute
-   distance from each coordinate bound. */
-         dxl = fabs( xstart[ point * ncoord + coord ] - lbnd[ coord ] );
-         dxu = fabs( ubnd[ coord ] - xstart[ point * ncoord + coord ] );
-
-/* Select the larger of these distances. */
-         dx = ( dxl > dxu ) ? dxl : dxu;
-
-/* Calculate a weight factor which is zero if the coordinate of the
-   test point is coincident with the point to be avoided and increases
-   linearly towards unity at the more distant coordinate bound. This
-   ensures it does not exceed unity within the bounded region. Protect
-   against division by zero. */
-         wt = 1.0;
-         if ( dx != 0.0 ) wt = fabs( x[ coord ] -
-                                     xstart[ point * ncoord + coord ] ) / dx;
-
-/* Form the maximum weight over all coordinate axes. This results in a
-   weighting function whose "contours" (at least, in 2-dimensions) are
-   rectangular. This is better than a weighting factor based on
-   Cartesian distances (circular contours) because it avoids excess
-   weight being given to the corners if the number of dimensions is
-   large. */
-         wtstart = ( wt > wtstart ) ? wt : wtstart;
-
-/* Repeat this process to generate a second weight factor which causes
-   the end position (of the local optimum) to be avoided in the same
-   way. */
-         dxl = fabs( xend[ point * ncoord + coord ] - lbnd[ coord ] );
-         dxu = fabs( ubnd[ coord ] - xend[ point * ncoord + coord ] );
-         dx = ( dxl > dxu ) ? dxl : dxu;
-         wt = 1.0;
-         if ( dx != 0.0 ) wt = fabs( x[ coord ] -
-                                     xend[ point * ncoord + coord ] ) / dx;
-         wtend = ( wt > wtend ) ? wt : wtend;
-      }
-
-/* Sum all the weighting factors to generate an overall weight which
-   causes all the required points to be avoided. */
-      weight += wtstart + wtend;
-   }
-
-/* Return the result. */
-   return weight;
-}
-
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -1223,7 +1109,7 @@ static double LocalMaximum( const MapData *mapdata, double acc, double fract,
 */
 
 /* Local Constants: */
-   const int maxcall = 5000;     /* Maximum number of function evaluations */
+   const int maxcall = 2500;     /* Maximum number of function evaluations */
    const int maxiter = 10;       /* Maximum number of iterations */
 
 /* Local Variables: */
@@ -2283,7 +2169,8 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *     bounds of a Mapping function over a constrained region of its
 *     input coordinate space by transforming a set of special test
 *     points. The points used lie at the corners of the constrained
-*     region, at the centre of each of its faces, and at its centroid.
+*     region, at the centre of each of its faces, at its centroid, and
+*     (if within the coordinate constraints) the origin.
 *
 *     In many practical cases, the true extrema may actually lie at
 *     one or other of these points, in which case the true bounds will
@@ -2336,6 +2223,7 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    int face;                     /* Loop counter for faces */
    int ncoord;                   /* Number of input coordinates */
    int npoint;                   /* Number of points */
+   int origin;                   /* Origin lies within bounds? */
    int point;                    /* Loop counter for points */
    
 /* Obtain the number of coordinate axes and calculate the number of
@@ -2348,6 +2236,18 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    centroid of the constrained coordinate space. */
    npoint += 2 * ncoord + 1;
    
+/* Determine if the origin lies within the bounds. If so, include it
+   as a further point. */
+   origin = 1;
+   for ( coord = 0; coord < ncoord; coord++ ) {
+      if ( ( mapdata->lbnd[ coord ] > 0.0 ) ||
+           ( mapdata->ubnd[ coord ] < 0.0 ) ) {
+         origin = 0;
+         break;
+      }
+   }
+   if ( origin ) npoint++;
+
 /* Create a PointSet to hold the coordinates and obtain a pointer to
    its coordinate values. Also allocate workspace for calculating the
    corner coordinates. */
@@ -2415,11 +2315,19 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
          point++;
       }
 
-/* Finally, place a point at the centroid of the constrained
-   coordinate space. */
+/* Place a point at the centroid of the constrained coordinate
+   space. */
       for ( coord = 0; coord < ncoord; coord++ ) {
          ptr_in[ coord ][ point ] = 0.5 * ( mapdata->lbnd[ coord ] +
                                             mapdata->ubnd[ coord ] );
+      }
+      point++;
+
+/* Finally, add the origin, if it lies within the constraints. */
+      if ( origin ) {
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            ptr_in[ coord ][ point ] = 0.0;
+         }
       }
 
 /* Once all the input coordinates have been calculated, transform them
@@ -3415,15 +3323,19 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
          nextlo = 1 - lo;
          hi = 0;
 
-/* Loop to inspect each vertex and update these values. */
+/* Loop to inspect each vertex and update these values. Ensure that in
+   the case of equal vertices, the first one is taken to be the
+   highest. This makes the maximisation stable (so that if no better
+   maximum can be found, the original position is returned rather than
+   a nearby position that yields the same function value). */
          for ( vertex = 0; vertex < nvertex; vertex++ ) {
-            if ( f[ vertex ] < f[ lo ] ) {
+            if ( f[ vertex ] <= f[ lo ] ) {
                nextlo = lo;
                lo = vertex;
-            } else if ( ( f[ vertex ] < f[ nextlo ] ) && ( vertex != lo ) ) {
+            } else if ( ( f[ vertex ] <= f[ nextlo ] ) && ( vertex != lo ) ) {
                nextlo = vertex;
             }
-            if ( f[ vertex ] >= f[ hi ] ) hi = vertex;
+            if ( f[ vertex ] > f[ hi ] ) hi = vertex;
          }
 
 /* Estimate the error on the result as the difference between the
