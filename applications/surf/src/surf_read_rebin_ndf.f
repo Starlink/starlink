@@ -1,7 +1,7 @@
       SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
      :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-     :     N_BOL, N_POS, N_INTS,
-     :     MJD_STANDARD, OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
+     :     N_BOL, N_POS, N_INTS, MJD_STANDARD, IN_UT1,
+     :     OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
      :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -18,8 +18,8 @@
 *  Invocation:
 *      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
 *     :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-*     :     N_BOL, N_POS, N_INTS,
-*     :     MJD_STANDARD, OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
+*     :     N_BOL, N_POS, N_INTS, MJD_STANDARD, IN_UT1,
+*     :     OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
 *     :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -53,8 +53,11 @@
 *        Number of samples in observation
 *     N_INTS = INTEGER (Returned)
 *        Number of integrations in observation
-*     MJD_STANDARD = DOUBLE (Returned)
-*        Modified Julian data of observation
+*     MJD_STANDARD = DOUBLE (Given & Returned)
+*        Modified Julian data of observation. Returned if N_FILE=1.
+*     IN_UT1 = DOUBLE (Returned)
+*        Modified Julian data of observation UT1 at start of an input 
+*        observation, expressed as modified Julian day
 *     IN_RA_CEN = DOUBLE (Returned)
 *        RA of centre
 *     IN_DEC_CEN = DOUBLE (Returned)
@@ -132,6 +135,7 @@
       LOGICAL          USE_SECTION
 
 *  Arguments Given & Returned:
+      DOUBLE PRECISION MJD_STANDARD
       CHARACTER*(*)    SUB_INSTRUMENT
       REAL             WAVELENGTH
 
@@ -145,7 +149,7 @@
       INTEGER          DATA_END
       INTEGER          DATA_PTR
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
-      DOUBLE PRECISION MJD_STANDARD
+      DOUBLE PRECISION IN_UT1
       INTEGER          N_BOL
       INTEGER          N_FILE
       INTEGER          N_INTS
@@ -230,8 +234,6 @@
       CHARACTER*(DAT__SZLOC) IN_SCUCDX_LOC
                                        ! locator to SCUCD extension in input
                                        ! file
-      DOUBLE PRECISION IN_UT1          ! UT1 at start of an input observation,
-                                       ! expressed as modified Julian day
       INTEGER          ITEMP           ! scratch integer
       INTEGER          JIGGLE_COUNT    ! number of jiggles in pattern
       INTEGER          JIGGLE_P_SWITCH ! number of jiggles per switch
@@ -583,7 +585,8 @@
 *     This routine returns this information for all files and relies on
 *     higher routines to select the correct one
 
-      MJD_STANDARD = IN_UT1 
+      IF (N_FILE .EQ. 1) MJD_STANDARD = IN_UT1 
+
       SOBJECT = OBJECT          ! Store first object name
 
 *     These are only needed to inform user of UT for RD rebinning
