@@ -41,6 +41,9 @@
 *     will match any single character.  Note that only those parameter
 *     names previously used to access images via IMG routines are
 *     considered as potential matches.
+*
+*     - Identifiers obtained using IMG_INDF are not released by this
+*     routine. 
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
