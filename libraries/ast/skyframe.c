@@ -54,7 +54,7 @@ f     The SkyFrame class does not define any new routines beyond those
 *     which are applicable to all Frames.
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)

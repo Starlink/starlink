@@ -59,7 +59,7 @@ c     - astSpecAdd: Add a celestial coordinate conversion to an SpecMap
 f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David S. Berry (Starlink)

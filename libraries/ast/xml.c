@@ -10,7 +10,7 @@
 *     reading and writing functions for the XmlChan class.
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David S. Berry (Starlink)

@@ -16,7 +16,7 @@
 *     astUnitLabel: Returns a label for a given unit symbol.
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)

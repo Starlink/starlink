@@ -20,7 +20,7 @@ f     only within textual output (e.g. from AST_WRITE).
 *     The SkyAxis class inherits from the Axis class.
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
