@@ -5047,7 +5047,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( (OPT .NE. 'ON2') .AND. .NOT. PHADEF ) THEN
         CALL USI_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
         CALL USI_GET0R( 'AUX', ENERGY, STATUS )
-        CALL ADI_CPUT0R( PSID, 'Energy', ENERGY, STATUS )
+        CALL PSF0_SETID0R( PSID, 'Energy', ENERGY, STATUS )
       END IF
 
 *  Store option
