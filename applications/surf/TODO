@@ -1,9 +1,54 @@
-TO DO List
-==========
+
+SURF TODO list
+--------------
+
+ - Fix problem with SCUBA2MEM output writing FITS headers after the
+   END flag.
+                          [DONE 22 MAY 2000]
+
+ - Fix skydips so that they 'know' the correct T_COLD and T_HOT
+                          [DONE]
+
+ - Fix skydips so that they know correct ETA_TEL
+       [DONE 22-MAY-2000]
+
+ - Check that FIRST_LST is less than SECOND_LST in EXTINCTION.
+   If not, add 24h
+	[DONE 22 MAY 2000]
+
+ - Fix SCUBA2MEM for NA chops
+
+ - Add 'OUTER' to REMSKY so that I dont need to know how
+   many 
+           [ DONE with negative ring numbers 22 MAY 2000]
+
+
+ - Add some of Dave Hughes' BOLOCAM patches
+
+- Remove CHOP FITS keywords from REMDBM output
+    [DONE MAY 23 2000]
+
+- Remove sculib_linux.c
+    [DONE]
+
+- Add copyright messages to all files.
+    [DONE]
+
+- Possiblly squeeze in JFL's CALCSKY patch
+    [DONE]
+
+- Fix division-by-zero when calculating variances of
+  the IP correction
+    [DONE]
+
+- SCULIB_CALC_APPARENT assumes LAT_OBS
+    [DONE]
 
 - Add SFACTOR parameter to documentation of *REBIN
-  Add SFACTOR parameter to IFL files for INT/BOLREBIN
+   [DONE - 11-May-00]
 
+  Add SFACTOR parameter to IFL files for INT/BOLREBIN
+   [DONE]
 
 - Add note to docs to explciitly state that REMSKY averages over
   1 second for JIGGLE and 0.125 for SCAN -- after confusion over
@@ -13,6 +58,7 @@ TO DO List
   Should die gracefully in REDUCE_SWITCH rather than complaining
   that the bounds are less than 1 for the second dim. (since EXP_POINTER
   is one and EXP_POINTER-1 is 0)
+    [DONE]
 
 - Add note to documentation to point out that zero level in scan maps
   is suspect.
@@ -20,6 +66,7 @@ TO DO List
 - Fix Units propogation in REBIN - always uses volts. Simply want to
   read the units from the input files and store them in the FITS
   header or something.
+    [DONE]
 
 -2. Make sure that VEC_?TO+ have the BAD flag set to TRUE
     so that bad values are converted correctly when changing
@@ -43,6 +90,8 @@ TO DO List
        Essentially the colour index code is the problem.
        Other than that SGS could be removed from surf_scuover.f
        without too much trouble.
+     [DONE - June 2, 2000]
+
 
 7. SCUPA does not support numeric input (SCUBA_PREFIX)
 
