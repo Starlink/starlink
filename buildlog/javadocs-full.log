@@ -1477,6 +1477,7 @@ javadoc-sources:
   [javadoc]  are the 'name' attribute of the nodes and edges:
 
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureListener.java:35: warning - The first sentence is interpreted to be:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A test case containing the following test graph, where the labels
   [javadoc]  are the 'name' attribute of the nodes and edges:
@@ -1488,7 +1489,6 @@ javadoc-sources:
   [javadoc]  b --q---+  \      V   |
   [javadoc]              +-s-> e --+
   [javadoc]  </pre>"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureListener.java:35: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/FigureListener.html...
   [javadoc] "Send when a figure is changed (i.e.&nbsp;moved or transformed)."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1529,4 +1529,4 @@ javadoc-sources:
   [javadoc] 575 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 28 seconds
+Total time: 1 minute 35 seconds
