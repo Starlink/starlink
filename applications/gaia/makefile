@@ -519,7 +519,8 @@ GAIA_LIB_FILES =  \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
  StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
- StarAstSystem.hlp StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
+ StarAstSystem.hlp StarBlink.hlp StarPatch.hlp GaiaApPhotom.hlp \
+ GaiaOptPhotom.hlp \
  skycat.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
  adamMessageRelay 
 

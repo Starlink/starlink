@@ -256,7 +256,8 @@ install-bitmaps:
 install: install-top install-library install-bin install-colormaps install-bitmaps
 
 clean:
-	$(RM) $(OBJECTS) $(demo_wish) $(ardstat) ardstat.o $(ardstat).ifc \
+	$(RM) $(OBJECTS) $(demo_wish) $(demo_tcl) $(ardstat) \
+	      ardstat.o $(ardstat).ifc \
 	      $(autocrop) autocrop.o $(autocrop).ifc $(cat2tab) \
 	      cat2tab.o $(cat2tab).ifc $(tab2cat) $(tab2cat).ifc \
 	      tab2cat.o $(asc2tab) asc2tab.o $(asc2tab).ifc \
@@ -284,7 +285,7 @@ f.o:
 	$(FC) -c $(FFLAGS) $<
 
 # Starlink include file dependencies
-FINCLUDES = GRP_PAR NDF_PAR SAE_PAR
+FINCLUDES = GRP_PAR NDF_PAR SAE_PAR CAT_PAR CAT_ERR
 ardstat.o: GRP_PAR NDF_PAR SAE_PAR
 autocrop.o: NDF_PAR SAE_PAR
 cat2tab.o: SAE_PAR CAT_PAR PAR_ERR
