@@ -23,9 +23,6 @@
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
 #        NDF is to be displayed.  If zero, there is no limit.
-#     MAXPOS = integer (Given)
-#        The maximum number of points which may be selected on any of
-#        the NDFs.
 #     NDFSETS = list of lists (Given)
 #        Each element of this list represents a set of NDFs which is
 #        to be presented to the user for aligning using this script.
@@ -116,7 +113,6 @@
                   -watchstatus status$ref \
                   -percentiles [ list $PERCLO $PERCHI ] \
                   -zoom $ZOOM \
-                  -maxpoints $MAXPOS \
                   -markstyle $MARKSTYLE \
                   -geometry ${WINX}x${WINY}
       [ .vref component exit ] configure \
@@ -203,7 +199,6 @@
                     -watchstatus status \
                     -percentiles [ list $PERCLO $PERCHI ] \
                     -zoom $ZOOM \
-                    -maxpoints $MAXPOS \
                     -geometry $geometry \
                     -markstyle $MARKSTYLE
          [ .v component exit ] configure -balloonstr "Finish marking this image"
