@@ -10,6 +10,9 @@
 {     - JSG, 19990120
 {  Added some modified 850 data
 {     - JSG, 19990423
+{  Included the blanked off pixels (F12,F13) so that REMIP can
+{  be run before running EXTINCTION
+{     - TJ, 19990512
 {
 {  File contains data the following data:
 {
@@ -168,5 +171,9 @@ G12 1.68  0.06 0.0  0.0   166  1  0   0
 
 { P2000 bolometer                      
 G6  1.00  0.0  0.0  0.0   180  0  0   0
+
+{ Blanked pixels
+F12 1.00  0.0  0.0  0.0   180  0  0   0
+F13 1.00  0.0  0.0  0.0   180  0  0   0
 
 
