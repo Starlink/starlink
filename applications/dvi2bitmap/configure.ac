@@ -44,6 +44,16 @@ if test -z "$DOXYGEN"; then
     AC_MSG_NOTICE([Couldn't find Doxygen -- I'll just create a stub library document.  Doxygen's good though: you can get it from www.doxygen.org])
 fi
 
+AC_PATH_PROGS(JADE, [openjade jade], jade)
+
+AC_ARG_WITH(sgmldir,
+            AS_HELP_STRING([--with-sgmldir],
+                           [location of the SGML Kit tools]),
+            STARLINK_SGML_DIR=$withval,
+            STARLINK_SGML_DIR=$STARLINK/lib)
+AC_CHECK_FILE([$STARLINK_SGML_DIR/dtd/CATALOG],,[STARLINK_SGML_DIR=/UNKNOWN])
+AC_SUBST(STARLINK_SGML_DIR)
+
 dnl   Checks for header files (note unistd.h and stdlib are
 dnl   automatically checked for, and the corresponding HAVE_ macros
 dnl   defined).
@@ -96,7 +106,7 @@ dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with
 dnl   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
 dnl   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
 dnl   This is defined by default when the compiler is invoked with
-dnl   `-std strict_ansi', but that's a little harder to arrange in here.
+dnl   '-std strict_ansi', but that is a little harder to arrange in here.
 dnl
 dnl   I don't quite know how, but AC_CANONICAL_HOST appears to be
 dnl   invoked implicitly somewhere above this: if I include it here I
@@ -127,40 +137,42 @@ dnl   use C++ to compile the remaining test programs
 AC_LANG([C++])
 
 dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
-AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
-AC_TRY_COMPILE([#include <cstdio>],,
-  AC_DEFINE(HAVE_CSTD_INCLUDE,
-	    1,
-	    [Define as 1 if you DO have <cstdio> headers.  Otherwise,
-	    we use <stdio.h> rather than standard <cstdio>])
-  AC_MSG_RESULT(yes),
-  AC_MSG_RESULT(no))
+AC_CACHE_CHECK([whether compiler has <cname> instead of just <name.h>],
+               [ac_cv_compiler_has_cname],
+               [AC_TRY_COMPILE([#include <cstdio>],,
+                               ac_cv_compiler_has_cname=yes,
+                               ac_cv_compiler_has_cname=no)])
+if test $ac_cv_compiler_has_cname = yes; then
+    AC_DEFINE(HAVE_CSTD_INCLUDE, 1,
+	      [Define as 1 if you DO have <cstdio> headers.  Otherwise,
+	      we use <stdio.h> rather than standard <cstdio>])
+fi
 
 dnl   Are the standard functions in the std namespace?
 dnl   We only need to check <ostream> here, but <iostream> is on more
 dnl   machines (specifically, and irritatingly, <ostream> appears to
 dnl   be missing from egcs-2.91.66)
 AC_CACHE_CHECK([whether standard functions are in namespace std],
-  [my_cv_stdprefix],
-  [my_cv_stdprefix=
-   AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
-     AC_MSG_RESULT(no),
-     AC_TRY_COMPILE([#include <iostream>], [std::cout<<"Hello\n";],
-       my_cv_stdprefix=std
-       AC_MSG_RESULT(yes),
-       AC_MSG_RESULT(ARGHH -- error compiling)))])
-if test -n "$my_cv_stdprefix"; then
-    AC_DEFINE(HAVE_STD_NAMESPACE,
-	      1,
-	      [Related to HAVE_CSTD_INCLUDE: define as 1 if you have
-	      standard functions in the 'std' namespace; that is, if
-	      you need `using namespace std' in order to get to them.
-	      At present, we use this flag to decide if we need to
-	      dump everything into the global namespace; this is not
-	      as elegant as I'd like, but it'll do for now.])
-fi
+   [my_cv_stdnamespace],
+   [my_cv_stdnamespace=
+    AC_TRY_COMPILE([#include <iostream>], [std::cout << "Hello\n";],
+        my_cv_stdnamespace=yes,
+       [AC_TRY_COMPILE([#include <iostream>], [cout<<"Hello\n";],
+           my_cv_stdnamespace=no,
+           my_cv_stdnamespace=error)])])
+case $my_cv_stdnamespace in
+  yes)
+    stdprefix=std
+    ;;
+  no)
+    stdprefix=
+    ;;
+  *)
+    AC_MSG_ERROR([cannot compile C++])
+    ;;
+esac
 AC_DEFINE_UNQUOTED(STD,
-	 	   $my_cv_stdprefix,
+	 	   $stdprefix,
                    [Define as `std' (no quotes) if standard functions are in 
                     the std namespace; define as empty otherwise])
 
