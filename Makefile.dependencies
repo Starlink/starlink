@@ -1473,6 +1473,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
+		$(MANIFEST)/tcl \
 		$(MANIFEST)/trn
 	cd applications/polpack \
 	  && $(MAKE_CPT)

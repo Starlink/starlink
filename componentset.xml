@@ -526,6 +526,7 @@ variety of formats.
       <role>owner</role>
     </person>
   </developers>
+  <tests status="yes"/>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year></year>
@@ -1159,7 +1160,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1299,6 +1300,7 @@ package.
       <role>owner</role>
     </person>
   </developers>
+  <tests status="yes"/>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year></year>
@@ -2127,7 +2129,7 @@ No longer under active control.
 </component>
 
 <component id="hds" support="S">
-  <version>4.3-4</version>
+  <version>4.3-5</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
   <abstract>
@@ -2793,8 +2795,9 @@ Ultrix and for SunOS and may still work for them.
 <component id="prm" support="S">
   <version>1.4-1</version>
   <path>libraries/prm</path>
-  <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
-  <abstract><p>This document describes the PRIMDAT package, which
+  <description>PRM --- Processing of Primitive Numerical Data</description>
+  <abstract><p>This document describes the PRM package (once called
+      PRIMDAT), which 
       is a collection of Fortran functions and subroutines providing
       support for ``primitive data processing''.  Routines from this
       package may be used to perform arithmetic, mathematical
@@ -2822,7 +2825,7 @@ Ultrix and for SunOS and may still work for them.
   <documentation> sun39</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>1987, 1988, 1991, 1992, 1995, 2004</year>
+    <year>1987, 1988, 1991, 1992, 1995, 2004, 2005</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
   </copyright>
 </component>
