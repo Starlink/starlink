@@ -22,10 +22,13 @@
 
 *  Authors:
 *     timj: Tim Jenness (JAC, Hilo)
+*     rpt:  Remo Tilanus (JAC, Hilo)
 
 *  History:
-*     03 Mar 2003
+*     03 Mar 2003 (timj)
 *        First version
+*     18 Mar 2003 (rpt)
+*        Modified to use UTRNLOG and UPUTLOG
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -67,10 +70,7 @@
       CALL ERR_BEGIN( STATUS )
 
 *     Get the current DATADIR to show the default
-*     Do not use UTRNLOG because we do not want a distracting
-*     error message to be printed if the environment variable
-*     is not set.
-      CALL PSX_GETENV( ENVVAR, CURDIR, STATUS )
+      CALL UTRNLOG( ENVVAR, CURDIR, STATUS )
 
 *     Only proceed if we got the value okay
       IF ( STATUS .EQ. SAI__OK .OR. STATUS .EQ. PSX__NOENV) THEN
@@ -105,32 +105,9 @@
 
 *     Set the new value (if JDEF is zero)
          IF (JDEF .EQ. 0) THEN
-            CALL PSX_PUTENV( ENVVAR, DATADIR, STATUS )
-         END IF
-
-*     Now check that it worked
-
-         IF (STATUS .EQ. SAI__OK .AND. IFAIL .EQ. 0) THEN
-
-*     Depends on whether we actually had a value and whether
-*     we tried to use it
-            IF (JDEF .NE. 0) THEN
-               print *,'Value not modified'
-            ELSE
-*     We stored something
-               CALL PSX_GETENV( ENVVAR, CURDIR, STATUS )
-
-               IF (STATUS .EQ. SAI__OK) THEN
-                  print *,'Data directory now set to: ', 
-     &                 CURDIR(:GEN_ILEN(CURDIR))
-               ELSE
-                  print *,'Error reading back environment variable'
-                  IFAIL = 18
-                  CALL ERR_ANNUL( STATUS )
-               END IF
-
-            END IF
-
+            CALL UPUTLOG( ENVVAR, DATADIR, STATUS )
+         ELSE
+            PRINT *,'Value not modified'
          END IF
 
       END IF
