@@ -84,6 +84,12 @@
 *        Modified to use AST instead of coeff lists.
 *     18-JUL-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     6-DEC-2004 (DSB):
+*        Previously, CC was assigned a literal question mark if
+*        I was supplied equal to L. Not sure why this was done, but it
+*        results in the last non blank character being ignored in the 
+*        supplied ELEM. The question mark has been replaced so that that
+*        CC is assigned ELEM( I : I ) if I == L on entry.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -183,7 +189,7 @@
                CC = ELEM( I : I )
             END DO
          ELSE
-            CC = '?'
+            CC = ELEM( I : I ) 
          END IF
 
 *  Increment the index of the next character to be checked so that it
