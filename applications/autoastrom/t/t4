@@ -8,10 +8,25 @@ exec $PERLBIN <<'EOD';
 use lib '..';
 use autoastrom;
 
-print "ymd2dec (2000,  1,  1) = ", ymd2dec(2000,  1,  1), "\n";
-print "ymd2dec (2000,  7,  1) = ", ymd2dec(2000,  7,  1), "\n";
-print "ymd2dec (2000, 12, 31) = ", ymd2dec(2000, 12, 31), "\n";
-print "ymd2dec (2000,  6, 30) = ", ymd2dec(2000,  6, 30), "\n";
+# The correct values in brackets are obtained from SLALIB's sla_cldj
+
+printf ("2000,  1,  1 --> %d   (2451545)\n", ymd2jd(2000,  1,  1));
+printf ("2000,  1,  2 --> %d   (2451546)\n", ymd2jd(2000,  1,  2));
+printf ("1999, 12, 31 --> %d   (2451544)\n", ymd2jd(1999, 12, 31));
+printf ("1996,  1,  1 --> %d   (2450084)\n", ymd2jd(1996,  1,  1));
+printf ("1996,  3,  1 --> %d   (2450144)\n", ymd2jd(1996,  3,  1));
+printf ("1995,  1,  1 --> %d   (2449719)\n", ymd2jd(1995,  1,  1));
+printf ("2004,  2, 28 --> %d   (2453064)\n", ymd2jd(2004,  2, 28));
+printf ("2004,  3,  1 --> %d   (2453066)\n", ymd2jd(2004,  3,  1));
+printf ("2005,  1,  1 --> %d   (2453372)\n", ymd2jd(2005,  1,  1));
+printf ("2101,  1,  1 --> %d   (2488435)\n", ymd2jd(2101,  1,  1));
+printf ("1901,  1,  1 --> %d   (2415386)\n", ymd2jd(1901,  1,  1));
+printf ("1899,  1,  1 --> %d   (2414656)\n", ymd2jd(1899,  1,  1));
+
+printf ("ymd2je (2000,  1,  1) = %.7f\n", ymd2je(2000,  1,  1));
+printf ("ymd2je (2000,  7,  1) = %.7f\n", ymd2je(2000,  7,  1));
+printf ("ymd2je (2000, 12, 31) = %.7f\n", ymd2je(2000, 12, 31));
+printf ("ymd2je (2000,  6, 30) = %.7f\n", ymd2je(2000,  6, 30));
 
 
 exit 0;
