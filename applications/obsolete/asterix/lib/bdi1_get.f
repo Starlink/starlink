@@ -93,11 +93,10 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER                   NARG                    ! # arguments
-      INTEGER                   ARGS(*)                 ! Method arguments
+      INTEGER                   NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER                   OARG                    ! Returned data
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -108,6 +107,7 @@
       CHARACTER*20		ITEM
 
       LOGICAL			OK			! Data is valid?
+      LOGICAL			STRUC			! Object is structure
 *.
 
 *  Check inherited global status.
@@ -145,7 +145,12 @@
         ELSE
 
 *      Is its data valid?
-          CALL DAT_STATE( CLOC, OK, STATUS )
+          CALL DAT_STRUC( CLOC, STRUC, STATUS )
+          IF ( STRUC ) THEN
+            OK = .TRUE.
+          ELSE
+            CALL DAT_STATE( CLOC, OK, STATUS )
+          END IF
           IF ( OK ) THEN
 
 *        Copy from HDS to ADI
