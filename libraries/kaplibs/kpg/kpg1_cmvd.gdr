@@ -60,7 +60,8 @@
 *        This should have size at least equal to DIMS( 1 ) * 2.
 *     NUM( * ) = INTEGER (Returned)
 *        Workspace used to count the number of good elements in the
-*        input box. This should have size at least equal to DIMS( 1 ).
+*        input box. This should have size at least equal to DIMS( 1 )
+*        * 2.
 *     STATUS  =  INTEGER (Given and Returned).
 *        Global status value
 
@@ -140,7 +141,11 @@
 *     11-JUN-1998 (DSB):
 *        Corrected the initialisation of the edges of the first
 *        summation box so that it works for cases where NDIM > 2.
-*     {enter_changes_here}
+*     1998 October 20 (MJC):
+*        Fixed indexing bug when evaluating the output variance.
+*        Protect against accessing COMPRS elements with index > 2, when
+*        NDIM is <3.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_bugs_here}
@@ -267,10 +272,12 @@
       START( 2 ) = 1 - COMPRS( 2 )
       FINISH( 2 ) = 0
 
-      DO  I = 2, NDIM
-         START( I ) = 1 - COMPRS( I )
-         FINISH( I ) = 0
-      END DO
+      IF ( NDIM .GT. 2 ) THEN
+         DO I = 3, NDIM
+            START( I ) = 1
+            FINISH( I ) = COMPRS( I )
+         END DO
+      END IF
 
 *  Compute the strides.
 *  ====================
@@ -476,7 +483,7 @@
 *  If there were too few elements in the summation, set the output
 *  elements to be bad.  Otherwise normalise the sum to the number of
 *  elements in the box.
-            M = M + ODIMS( 1 )
+            M = J + ODIMS( 1 )
             IF ( NUM( M ) .LT. NVAL ) THEN
                OUTVAR( K ) = VAL__BAD<T>
             ELSE
