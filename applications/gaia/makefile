@@ -521,7 +521,7 @@ GAIA_LIB_FILES =  \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
  StarAstSystem.hlp StarBlink.hlp StarPatch.hlp GaiaApPhotom.hlp \
  GaiaOptPhotom.hlp GaiaContour.hlp GaiaAstTransfer.hlp \
- skycat.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
+ skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
  adamMessageRelay 
 
 GAIA_BIN_FILES = \

@@ -67,7 +67,7 @@ if test -x $GAIA_DIR/gaia_swish; then
 #  version.
   if test -z "$SKYCAT_CONFIG" -o \
    "$SKYCAT_CONFIG" = "http://ledas-www.star.le.ac.uk/arnieV4/SkyCatConfig.pl"; then
-    SKYCAT_CONFIG=file:${GAIA_DIR}/skycat.cfg
+    SKYCAT_CONFIG=file:${GAIA_DIR}/skycat2.0.cfg
     export SKYCAT_CONFIG
   fi
 

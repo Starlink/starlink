@@ -66,7 +66,7 @@ if test -r $GAIA_DIR/gaiaMain.tcl ; then
 #  Add the local catalogue configuration file.
     if test -z "$SKYCAT_CONFIG" -o \
    "$SKYCAT_CONFIG" = "http://ledas-www.star.le.ac.uk/arnieV4/SkyCatConfig.pl"; then
-      SKYCAT_CONFIG=file:${GAIA_DIR}/skycat.cfg
+      SKYCAT_CONFIG=file:${GAIA_DIR}/skycat2.0.cfg
       export SKYCAT_CONFIG
     fi
 
