@@ -4,10 +4,11 @@
 
 # Location of libsculib.a
 SCULIB = /jcmt_sw/sun4_Solaris/lib
+SURF_SUB = ../surflib
 
 # Libraries
 
-LIBS = -L$(SCULIB) -lsculib
+LIBS = -L$(SCULIB) -lsculib -L$(SURF_SUB) -lsurf_sub 
 IRAS = -L/star/iras90 -lira -L/jcmt_sw/scuba/surf_kap -lsurf_kap
 # -L/star/kappa -lkapsub -lkapgen
 IRAS = -L/jcmt_sw/scuba/surf_kap -lsurf_kap
@@ -73,9 +74,9 @@ IFC  = ${IFL:.ifl=.ifc}
 
 all:	surf ifc
 
-# objects: ${OBJS} ${FCPPOBJ}
+objects: ${OBJS} ${FCPPOBJ}
 
-surf:	${OBJS} ${FCPPOBJ} ${SCULIB}/libsculib.a
+surf:	${OBJS} ${FCPPOBJ} ${SCULIB}/libsculib.a ${SURF_SUB}/libsurf_sub.a
 	${LINK} ${OBJS} ${FCPPOBJ} ${LDFLAGS} ${LIBS} ${ADAMLIBS}
 
 ifc:	${IFC}
