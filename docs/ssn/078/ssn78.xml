@@ -308,13 +308,10 @@
             <p>The autoconf program which is used is not itself
               customised for Starlink use.  Instead, the macros are
               installed using the standard autoconf
-              extension mechanism, which uses the standard file
-              <code>acinclude.m4</code> and the application
+              extension mechanism, which uses the application
               <em>aclocal</em>.  This is discussed in passing in <ref
-                id="tooloverview"/>, and we mention it here only to explain
-              the presence of this important file.  The
-              <code>acinclude.m4</code> file is managed by the
-              starconf application.</p>
+                id="tooloverview"/>, and we mention it only in passing
+              here.</p>
           </dd>
 
           <dt>starconf<index>starconf</index></dt>
@@ -1353,14 +1350,15 @@ hds_machine.txt: hds_machine
             see the full list of options with the command
             <kbd>./configure --help</kbd>.</p>
 
-          <p>You set the place where the configured component will be
-            installed with the <code>--prefix</code> option.  This
-            names a directory which will end up with the standard directories
-            <code>bin</code>, <code>manifests</code> and so on.  The
-            default is reported by <kbd>./configure --help</kbd>, and
-            is ultimately controlled by <em>starconf</em> (see <ref
-              id="bootstrappingonly"/> and <ref
-              id="tool-state"/>).</p>
+<p>You set the place where the configured component will be installed
+with the <code>--prefix</code> option.  This names a directory which
+will end up with the standard directories <code>bin</code>,
+<code>manifests</code> and so on.  The default is reported by
+<kbd>./configure --help</kbd>, and is ultimately controlled by
+<em>starconf</em> (see <ref id="bootstrappingonly"/> and <ref
+id="tool-state"/>; or <ref id="starconf-default-variables"/> for a
+means of setting it to a per-directory default, which can be useful in
+certain circumstances).</p>
 
 <p>Because configure's tests potentially take quite a long time to
 run, it is possible to cache the results between runs.  If you add an
@@ -1710,20 +1708,26 @@ value of <code>STARCONF_DEFAULT_STARLINK</code>.</p>
 <p>Specifying <code>--prefix</code> or <code>STARLINK</code> each time you run
 <code>./configure</code> might be troublesome when you are working on
 a component's configuration script, especially as doing this
-inconsistently would produce very confusing results.  You might want
+inconsistently would produce very confusing
+results.<index>installation!setting prefix</index>  You might want
 to do this if you are working on a repository branch, and so want
 built material from the current directory to be installed in one
 branch-specific place, while using a Starlink tree based on the trunk.
-You can default this on a per-directory basis by using a m4
-back-door.  Create a file <code>acinclude.m4</code> in the
-directory in question, and include in it a line like:
+You can default this on a per-directory basis by using a m4 back-door.
+Create a file <code>acinclude.m4</code><index>acinclude.m4</index> in
+the directory in question, and include in it a line like:
 <verbatim>
 m4_define([OVERRIDE_PREFIX],[/my-branch/star])
 </verbatim>
 (or <code>OVERRIDE_STARLINK</code> to override that variable).  Then
 run <code>./bootstrap</code>, which invokes `autoreconf' in turn, and
 the generated <code>./configure</code> file will have the named directory
-as its default prefix.</p>
+as its default prefix.  This method is in principle
+fragile, and uses a partly-deprecated autoconf interface,
+and so is not guaranteed to work for all time.  It is at present adequately
+robust in practice, however, and so is a respectable technique as long
+as you are aware that it is to some extent a rather special effect.
+</p>
 
 <p>In general, however, we recommend that you do not adjust
 <code>--prefix</code>, and that you leave the
@@ -3052,7 +3056,7 @@ bin_MONOLITHS = foo
           <code>.../buildsupport/bin</code> directory in your path,
           and start work.</p>
 
-        <p>See also <ref id="rolldistribution"/> for how to make a
+        <p>See also <ref id="starconf-default-variables"/> for how to make a
           version of the buildsupport tools which has a default
           installation prefix different from the buildsupport
           installation location.</p>
@@ -3787,21 +3791,13 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
             show you the default prefix for this
             <code>./configure</code> script.</p>
 
-          <p>An alternative way is to create a file
-            <code>acinclude.m4</code> in the checkout directory, and
-            put in it the single line
-<verbatim>
-m4_define([OVERRIDE_PREFIX],[/star])
-</verbatim>
-            When you run <code>./bootstrap</code> after that, the
-            given prefix will be used instead of the prefix baked into
-            the installed buildsupport tools.  This method is in principle
-            fragile, and uses a partly-deprecated autoconf interface,
-            and so is not guaranteed to work for all time.  Unless you
-            plan to delete this directory as soon as you have rolled
-            your distribution, it would probably be wise to delete
-            this file and re-bootstrap the directory, to avoid
-            confusion.</p>
+<p>An alternative way is to use the
+<code>acinclude.m4</code><index>acinclude.m4</index> method described
+in <ref id='starconf-default-variables'/>, setting
+<code>OVERRIDE_PREFIX</code> to <code>/star</code> (for example).
+When you run <code>./bootstrap</code> after that, the given prefix
+will be used instead of the prefix baked into the installed
+buildsupport tools.</p>
 
           <p>That is, to create a distribution of component
             <code>foo</code>, located in <code>libraries/foo</code> in
@@ -4886,12 +4882,17 @@ M Makefile.dependencies
                 tarballs, see the next question.</p>
             </dd>
 
-            <dt>I want to make distribution tarballs install into
-              <code>/star</code>.  How?<index>distribution!setting
-              prefix</index></dt>
+            <dt>I want to make distribution tarballs (for example) install into
+              <code>/star</code>.  How?<index
+              seealso="installation!setting prefix">distribution!setting
+              prefix</index><index>installation!setting prefix</index></dt>
             <dd>
-              <p>See the description of <code>./bootstrap</code> in
-                <ref id="rolldistribution"/>.</p>
+              <p>This is a general question about forcing the
+                <code>$prefix</code> for a directory.  See the
+                description of <code>./bootstrap</code> in
+                <ref id="rolldistribution"/>, which uses a general
+                mechanism described in <ref
+                id='starconf-default-variables'/>.</p>
             </dd>
 
             <dt id="nobase-faq">Automake flattens paths when it
