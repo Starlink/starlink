@@ -371,7 +371,7 @@ PKG_NAME = dvi2bitmap
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.9-3
+PKG_VERS = 0.9-3-devel
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -791,6 +791,9 @@ $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 	    echo;\
 	    echo '*** Warning: the $(PACK_NAME) package has not been tested';\
 	    echo
+	echo "*** Warning: Note that the headache of post-build configuration"
+	echo "    has not been fully confronted yet.  I do NOT recommend"
+	echo "    export_run distribution at present"
 #	#  Remove any pre-existing tar files before creating new ones.
 	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z || \
 		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
@@ -902,18 +905,24 @@ dvi2bitmap: version.h
 		echo "*** Warning: faking dvi2bitmap program name" ; \
 	echo "Configuring dvi2bitmap..."; \
 	CXX=$(CXX) ./configure --enable-gif --enable-png --with-kpathsea $$TEXMFCNFTEST
+	echo "Building dvi2bitmap..."
 	$(MAKE) -f Makefile dvi2bitmap
 
-# Don't have this depending dvi2bitmap_source.tar - the latter will usually
+# Don't have this depending on dvi2bitmap_source.tar - the latter will usually
 # be newer, but that's _not_ what we're testing here.
 version.h:
 	$(TAR_OUT) dvi2bitmap_source.tar
-#	mv dvi2bitmap/* .
-#	rmdir dvi2bitmap
 
 #  This target should need to be built only in the distribuTION directory
-$(NEWS):
-	$(LINK) doc/ReleaseNotes $@
+$(NEWS): doc/ReleaseNotes
+	echo								> $@
+	echo "This is Starlink dvi2bitmap, release $(PKG_VERS)"		>>$@
+	echo "packaged `date`"						>>$@
+	echo								>>$@
+	echo								>>$@
+	echo "Release Notes, up to this version:"			>>$@
+	echo								>>$@
+	cat doc/ReleaseNotes						>>$@
 
 #--------------------------------------------------------------------------
 
