@@ -122,6 +122,9 @@ int yydebug;
 
 /* Some initialisation. */
       unew();
+      preleng = 0;
+      prealloc = 0;
+      preval = "";
          
 /* Call the parser. */
       retval = yyparse();
@@ -257,6 +260,91 @@ int yydebug;
 
 /* Return the concatenated string. */
       return( text );
+   }
+
+
+   void sappend( char *s ) {
+/*
+*+
+*  Name:
+*     sappend
+*
+*  Purpose:
+*     Append a string to the preval string.
+*
+*  Description:
+*     This routine appends a string to the preval string.  If the preval
+*     string is not long enough to hold the new one, then more space
+*     is allocated for it.
+*-
+*/
+
+/* Local variables. */
+      int leng;
+
+/* See how many extra characters are to be added to preval. */
+      leng = strlen( s );
+
+/* Extend the allocated space if necessary. */
+      while ( preleng + leng > prealloc ) {
+         if ( prealloc == 0 ) {
+            preval = (char *) malloc( BUFINC + 1 );
+            *preval = '\0';
+         }
+         else {
+            preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
+         }
+         prealloc += BUFINC;
+      }
+
+/* Append the string to preval. */
+      strcat( preval, s );
+      preleng += leng;
+   }
+
+   void cappend( char c ) {
+/*
+*+
+*  Name:
+*     cappend
+*
+*  Purpose:
+*     Append a character to the preval string.
+*
+*  Description:
+*     This routine appends a single character to the preval string.
+*     If the character is '<', '>' or '&', then it is replaced in the
+*     preval string by the appropriate HTML entity reference.
+*-
+*/
+
+/* Switch on the value of the character. */
+      switch( c ) {
+
+/* If it needs to be replaced by an entity reference, do so via sappend. */
+         case '<':
+            sappend( "&lt;" );
+            break;
+         case '>':
+            sappend( "&gt;" );
+            break;
+         case '&':
+            sappend( "&amp;" );
+            break;
+
+/* Otherwise it's just a single character: extend allocation if necessary
+   and add the new character. */
+         default:
+            if ( preleng + 1 > prealloc ) {
+               if ( prealloc == 0 )
+                  preval = (char *) malloc( BUFINC + 1 );
+               else
+                  preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
+               prealloc++;
+            }
+            preval[ preleng ] = c;
+            preval[ ++preleng ] = '\0';
+      }
    }
 
 
