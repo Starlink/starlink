@@ -333,7 +333,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                         _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
                         STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
                     done
-                    dnl STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
+                    STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
                     STAR_CHECK_PROGS([star2html])
                    ])dnl
 ])# STAR_LATEX_DOCUMENTATION
