@@ -17,11 +17,13 @@
 *     SCULIB subroutine
  
 *  Invocation:
-
+*     CALL SCULIB_ADD_CHOP(BEAM, RA_CENTRE,
+*    :     DEC_CENTRE, CHOP_CRD, CHOP_PA, CHOP_FUN, CHOP_THROW,
+*    :     LST, MJD, LAT_OBS, RA_START, RA_END, DEC_START, 
+*    :     DEC_END, OUT_RA_CEN, OUT_DEC_CEN,
+*    :     STATUS)
 
 *  Arguments:
-*     SAMPLE_MODE = CHARACTER * (*) (Given)
-*          Sample mode (RASTER or JIGGLE) of observation
 *     BEAM        = CHARACTER * (*) (Given)
 *          Beam name ('M','L' or 'R')
 *     RA_CENTRE              = DOUBLE PRECISION (Given)
@@ -33,7 +35,7 @@
 *     CHOP_PA                = REAL (Given)
 *        Position angle of chop (in radians)
 *     CHOP_FUN               = CHARACTER * (*) (Given)
-*        Chop function (CENTER, SQUARE)
+*        Chop function (CENTER, SQUARE, TRIPOS)
 *     CHOP_THROW             = REAL (Given)
 *        Chop throw in radians
 *     LST                    = DOUBLE PRECISION (Given)
@@ -58,12 +60,35 @@
 *        The global status
 
 *  Description :
+*     This routine takes a chop throw and adds it on the 
+*     supplied apparent RA/Dec centre position returning a new
+*     apparent RA/Dec. Works with scan map and jiggle map
+*     but does not actually know the difference itself (unless
+*     using SC chop). 
+
+*  Notes:
+*     It is assumed that the chop throw is divided by two
+*     prior to calling this routine for scan map mode since the
+*     chop is effectively half a chop either side of the middle.
+*     For jiggle modes the chop is effectively a full chop throw
+*     from the centre since the 3-beam chopping is done by a combination
+*     of chopping and nodding. 
+*     - This routine does not yet support TRIPOS chopping (I think)
+*     - AZ, LO and SC chopping are supported
+*     - The negative beam is always the 'left' beam, the +ve beam is the
+*       'right'.
+*     - This routine does not 'yet' correct for the droopy beam problem
+*       in early jiggle data that used RA/Dec chopping
+*     
 
 *  Authors :
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.2  1999/07/13 06:30:40  timj
+*     Major overhaul - should actually work now!
+*
 *     Revision 1.1  1998/04/27 20:58:11  timj
 *     Initial revision
 *
@@ -104,24 +129,21 @@
 *    Status :
       INTEGER          STATUS
 *    External references :
+*      REAL SLA_BEAR
 
 *    Global variables :
 
 *    Local Constants :
-      DOUBLE PRECISION ARCSEC2RAD         ! arcsec 2 radians conversion
-      PARAMETER (ARCSEC2RAD = 4.84813681110D-6)
-      DOUBLE PRECISION PI                 !
-      PARAMETER (PI = 3.14159265359)
 
 *    Local variables :
-      REAL   COS_ANG                      ! Cosine of scan angle
+      REAL   ANG                          ! scan angle (-PI to PI)
       DOUBLE PRECISION DTEMP              ! Scratch double
+      REAL   DX                           ! X scan length
+      REAL   DY                           ! Y scan length
       DOUBLE PRECISION MAP_X              ! Cartesian offset of chop
       DOUBLE PRECISION MAP_Y              ! Cartesian offset of chop
       DOUBLE PRECISION MYLAT              ! Intermediate Y coord
       DOUBLE PRECISION MYLONG             ! Intermediate X coord
-      REAL   TAN_ANG                      ! Tangent of scan angle
-      REAL   SIN_ANG                      ! Sine of scan angle
       
 *.
 
@@ -143,40 +165,72 @@
 
          IF (CHOP_CRD .EQ. 'SC') THEN
 
-            TAN_ANG = (RA_END - RA_START) / (DEC_END - DEC_START)
+*     Angles are from the end of the scan to the start so that
+*     so that the sense of the positive scan direction can be calculated
 
-            COS_ANG = 1 / SQRT(1 + TAN_ANG**2)
-            SIN_ANG = TAN_ANG / SQRT(1 + TAN_ANG**2)
+            DY = DEC_END - DEC_START
+            DX = RA_END - RA_START
 
-            IF (BEAM .EQ. 'L') THEN
+*     Angles are relative to the X-axis and go anti-clockwise
+*     We are not using the standard 'position angle' definition
+*     since there is no real point in doing that
+
+            IF ( ABS(DY) .LT. 1E-10 .AND. ABS(DX) .LT. 1E-10) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ','SCULIB_ADD_CHOP: Start and '//
+     :              'end positions of scan were the same so can '//
+     :              'not define scan angle', STATUS)
+
+            ELSE
                
-               OUT_RA_CEN = RA_CENTRE - (CHOP_THROW * COS_ANG)
-               OUT_DEC_CEN = DEC_CENTRE - (CHOP_THROW * SIN_ANG)
+*     Calculate the angle using ATAN2 since we want to know
+*     which quadrant the angle is in when we come to add it on
+*     This assumes cartesian geometry.
+*     Use SLA_BEAR to get the bearing along the great circle
+*     -- not sure whether this is correct though, need to find 
+*     out what the telescope actually does!
+               ANG = ATAN2(DY, DX)
 
-            ELSE     
-
-               OUT_RA_CEN = RA_CENTRE + (CHOP_THROW * COS_ANG)
-               OUT_DEC_CEN = DEC_CENTRE + (CHOP_THROW * SIN_ANG)
+*     Calculate the arcsec offset in X and Y
+*     This also assumes cartesian geometry but note that
+*     SCULIB_PROCESS_BOLS calculates the current RA/Dec centre
+*     by assuming cartesian geometry so we will stick with this...
+               MAP_X = DBLE( CHOP_THROW * COS(ANG) )
+               MAP_Y = DBLE( CHOP_THROW * SIN(ANG) )
+               
+*     The left beam is always behind the right so have to invert the offset
+               IF (BEAM .EQ. 'L') THEN
+                  MAP_X = MAP_X * -1.0D0
+                  MAP_Y = MAP_Y * -1.0D0
+               END IF
+               
+*     Add on the tangent plane offset (can not simply ADD the 
+*     offset assuming cartesian geometry)
+               CALL SLA_DTP2S(MAP_X, MAP_Y, RA_CENTRE, DEC_CENTRE,
+     :              OUT_RA_CEN, OUT_DEC_CEN)
 
             END IF
 
          ELSE
 
 *     Convert to the LOcal coordinates
-*     Should pass in LAT_OBS - otherwise if JCMT moves we will be
-*     in trouble :-)
 
             CALL SCULIB_APPARENT_2_MP(RA_CENTRE,
      :           DEC_CENTRE, CHOP_CRD,
-     :           LST, MJD, MYLONG, MYLAT, STATUS)
+     :           LST, MJD, LAT_OBS, MYLONG, MYLAT, STATUS)
             
 *     Calculate the offsets in the non-rotated frame
-*     (since SCULIB_CALC_APPARENT does not take angles
+*     (since SCULIB_CALC_APPARENT does not take angles)
+*     The left (negative) beam is the beam that is aligned
+*     with the position angle (and is therefore ahead of the
+*     positive beam - this is the opposite way round to a
+*     SC chop where the positive beam leads the negative)
+*     Also note that the CHOP_PA is a position angle (from north)
+*     and not a standard angle from X.
             
-
-            MAP_X = -1.0D0 * DBLE(CHOP_THROW * SIN(CHOP_PA))
+            MAP_X = DBLE(CHOP_THROW * SIN(CHOP_PA))
             MAP_Y = DBLE(CHOP_THROW * COS(CHOP_PA))
-
+            
 *     Invert the offset if we are in the right beam
             IF (BEAM .EQ. 'R') THEN
                MAP_X = MAP_X * -1.0D0
