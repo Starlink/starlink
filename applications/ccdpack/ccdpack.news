@@ -20,6 +20,9 @@
 
     o  The IMPORT application now works on Linux.
 
+    o  The IMPORT application has been extended to allow the
+       concatenation of FITS character strings.
+
     o  The SCHEDULE application now uses the correct comment  
        delimeter on Linux.
 

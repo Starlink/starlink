@@ -4,7 +4,7 @@
 *     IMPORT
 
 *  Purpose:
-*     Imports FITS information into NDFs
+*     Imports FITS information into CCDPACK image extensions.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,7 +21,7 @@
 
 *  Description:
 *     This routine imports FITS information into the CCDPACK extension
-*     of a list of NDFs. FITS information (probably provided by the
+*     of a list of images. FITS information (probably provided by the
 *     instrument/telescope control systems) can be used to specify
 *     certain parameters which are required by CCDPACK to perform
 *     "automated" reductions. These might cover such items as the type
@@ -39,8 +39,8 @@
 
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
-*        A list of NDF names which contain the raw bias frame data.
-*        The NDF names should be separated by commas and may include wildcards.
+*        A list of image names which contain the raw bias frame data.
+*        The image names should be separated by commas and may include wildcards.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -68,7 +68,7 @@
 *        [BOTH]
 *     NAMELIST = LITERAL (Read)
 *        The name of a file to contain a listing of the name of the
-*        input NDFs. This is intended to be of use when using these
+*        input images. This is intended to be of use when using these
 *        same names with other applications (such as SCHEDULE).
 *        [!]
 *     TABLE = LITERAL (Read)
@@ -81,7 +81,7 @@
 *  Table Format:
 *     The import control (translation) table is an ordinary text file
 *     which contains instructions on how to transfer FITS information
-*     from the FITS extension to the CCDPACK extension of an NDF.
+*     from the FITS extension to the CCDPACK extension of an image.
 *     "Translation" is required since no standard interpretation of
 *     FITS keywords can be made and because the items which may be
 *     required can be compounds of single FITS keyword values.
@@ -184,7 +184,7 @@
 *     Continuation onto a new line is indicated by use of "-".
 
 *  CCDPACK extension items:
-*     The CCDPACK extension of an NDF may contain the following items.
+*     The CCDPACK extension of an image may contain the following items.
 *     The names and types of the extension items are those as used in
 *     import tables. More complete descriptions of the items can be
 *     found with the applications that use these values.  
@@ -221,7 +221,7 @@
 
 *  Examples:
 *     import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
-*        This example shows all the NDFs in the current directory being
+*        This example shows all the images in the current directory being
 *        processed using the import control table $CCDPACK_DIR/WHTSKY.DAT.
 
 *  Authors:
