@@ -89,6 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
       INTEGER			ID
