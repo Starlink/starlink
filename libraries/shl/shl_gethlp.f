@@ -91,7 +91,7 @@
      :  HLPS_GTHLPI,             ! Gets the help information
      :  HLP_NAMETR,              ! Interactive help library-name
                                  ! translation
-     :  PTHLPO                   ! Outputs the help information
+     :  HLPS_PTHLPO              ! Outputs the help information
 
 *  Local Variables:
       CHARACTER * ( 80 )
