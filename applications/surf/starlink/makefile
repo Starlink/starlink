@@ -916,7 +916,7 @@ libsurf_kap.a: $(KAP_OBJECT_FILES)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            $(ADDLIBS) `./$(LINK_SCRIPT)`
+            $(ADDLIBS) -L$(STAR_LIB) `./$(LINK_SCRIPT)`
 
 #  Rules for building the help libraries.
 
