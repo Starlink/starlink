@@ -446,6 +446,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     12-FEB-2003 (DSB)
 *        - Modified FitsSet so that the existing card comment is retained
 *        if the new data value equals the existing data value.
+*     30-APR-2003 (DSB):
+*        - Revert to standard "TAN" code for distorted tan projections,
+*        rather than using the "TPN" code. Also recognise QVi_m (produced
+*        by AUTOASTROM) as an alternative to PVi_m when reading distorted 
+*        TAN headers. 
 *class--
 */
 
@@ -3525,7 +3530,6 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
    double ypixelsz;    /* YPIXELSZ keyword value */
    int i;              /* Loop count */
    int m;              /* Parameter index */
-   int gottan;         /* Is a simple TAN projection being used? */
    int ret;            /* Returned value. */
 
 /* Initialise */
@@ -3537,17 +3541,13 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
 /* Check the image is 2 dimensional. */
    if( GetMaxJM( &(store->crpix) ) != 1 ) return ret;
 
-/* Check the first axis is RA with a TAN or TPN projection. Note if a
-   simple TAN projection is being used. */
+/* Check the first axis is RA with a TAN. */
    cval = GetItemC( &(store->ctype), 0, ' ', NULL, method, class );
-   gottan = ( cval && !strcmp( "RA---TAN", cval ));
-   if( !cval || ( strcmp( "RA---TAN", cval ) && 
-                  strcmp( "RA---TPN", cval ) ) ) return ret;
+   if( !cval || strcmp( "RA---TAN", cval ) ) return ret;
 
-/* Check the second axis is DEC with a TAN or TPN projection. */
+/* Check the second axis is DEC with a TAN projection. */
    cval = GetItemC( &(store->ctype), 1, ' ', NULL, method, class );
-   if( !cval || ( strcmp( "DEC--TAN", cval ) && 
-                  strcmp( "DEC--TPN", cval ) ) ) return ret;
+   if( !cval || strcmp( "DEC--TAN", cval ) ) return ret;
 
 /* Check that LONPOLE is undefined or is 180 degrees. */
    val = GetItem( &(store->lonpole), 0, 0, ' ', NULL, method, class );
@@ -3580,10 +3580,10 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
 /* Get the required projection parameter values from the store, supplying
    appropriate values if a simple TAN projection is being used. */
    for( m = 0; m < 22; m++ ){
-      pvx[ m ] = gottan ? AST__BAD : GetItem( &(store->pv), 0, m, ' ', NULL, method, class );
+      pvx[ m ] = GetItem( &(store->pv), 0, m, ' ', NULL, method, class );
       if( pvx[ m ] == AST__BAD ) pvx[ m ] = ( m == 1 ) ? 1.0 : 0.0;
 
-      pvy[ m ] = gottan ? AST__BAD : GetItem( &(store->pv), 1, m, ' ', NULL, method, class );
+      pvy[ m ] = GetItem( &(store->pv), 1, m, ' ', NULL, method, class );
       if( pvy[ m ] == AST__BAD ) pvy[ m ] = ( m == 1 ) ? 1.0 : 0.0;
    }
 
@@ -3997,11 +3997,8 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
       SetItemC( &(store->radesys), 0, ' ', "FK5" );
       SetItem( &(store->wcsaxes), 0, 0, ' ', 2.0 );
       store->naxis = 2;
-
-/* The WcMap class uses the projection code "TPN" to represent a "TAN with 
-   polynomial corrections" projection. */
-      SetItemC( &(store->ctype), 0, ' ', "RA---TPN" );
-      SetItemC( &(store->ctype), 1, ' ', "DEC--TPN" );
+      SetItemC( &(store->ctype), 0, ' ', "RA---TAN" );
+      SetItemC( &(store->ctype), 1, ' ', "DEC--TAN" );
    }
 }
 
@@ -12628,7 +12625,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
                val = GetItem( &(store->pv), i, m, s, NULL, method, class );
                if( s == ' ' ){
                   if( val != AST__BAD ) {
-                     if( i != axlat || prj == AST__TPN || m >= 10 ){
+                     if( i != axlat || prj == AST__TAN || m >= 10 ){
                         ok = 0;
                         goto next;
                      } else {
@@ -14160,8 +14157,13 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
          }
       }                  
 
-/* Store the projection strings. */
-      prj_name = astWcsPrjName( wcstype );
+/* Store the projection strings. Convert the non-standard TPN projection
+   to the standard TAN. */
+      if( wcstype == AST__TPN ) {
+         prj_name = "-TAN";
+      } else {
+         prj_name = astWcsPrjName( wcstype );
+      }
       if( astOK ) {
          strcpy( lontype + 4, prj_name );
          strcpy( lattype + 4, prj_name );
@@ -14335,13 +14337,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *
 *     13) The IRAF "TNX" projection. If the last 4 chacaters of CTYPEi 
 *       (i = 1, naxis) are "-TNX", then:
-*	- "TNX" is replaced by "TPN" within the CTYPEi value (a AST-specific
-*       projection code representing the "TAN with polynomial corrections" 
-*       which was included in an early draft of the FITS-WCS paper).
+*	- "TNX" is replaced by "TAN" within the CTYPEi value (the distorted
+*       TAN projection included in a pre-final version of FITS-WCS is still 
+*       supported by AST using the WcsMap AST__TPN projection).
 *       - If the FitsChan contains no PROJP keywords, then projection
 *       parameter valus are read from any WATi_nnn keywords, and
 *       corresponding PV keywords are added to the FitsChan.
-*       - If the TNX projection cannot be converted exactly into a TPN 
+*       - If the TNX projection cannot be converted exactly into a TAN 
 *       projection, ASTWARN keywords are added to the FitsChan 
 *       containing a warning message. The calling application can (if it
 *       wants to) check for this keyword, and report its contents to the
@@ -14352,8 +14354,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *       keywords are removed in order to avoid confusion arising between
 *       potentially inconsistent encodings.
 *
-*     15) TAN projections are converted to "TPN" projections if they have
-*       any polynomial correction terms.
+*     15) "QV" parameters for TAN projections (as produced by AUTOASTROM) are
+*       renamed to "PV".
 *
 *     16) RESTFREQ is converted to RESTFRQ.
 
@@ -14413,7 +14415,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    size_t size;                   /* Length of string value */
 
 /* Arrays needed to convert the index of a TNX co-efficient into an index
-   of a TPN projection parameter. */
+   of a TAN projection parameter. */
    static int abskip[] = {0,1,4,10,20,35,56,84};
    static int nab[] = {1,3,6,10,15,21,28,36};
    static int a[] = { 
@@ -14938,27 +14940,33 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
       }
    }
 
-/* "TAN with polynomial correction" projections 
+/* Rename "QV" TAN projection parameters as "PV"
    -------------------------------------------- */
+   if( !Ustrcmp( prj, "-TAN" ) ){
 
-/* Compare the projection type with "-TAN" */
-   if( !Ustrcmp( prj, "-TAN" ) ) {
+/* Rewind the FitsChan. */
+      astClearCard( this );
 
-/* If there are any latitude projection parameters, change the projection
-   code to "TPN". */
-      if( astKeyFields( this, "PV%d_%d", 2, ubnd, lbnd ) ){
-         if( lbnd[ 0 ] <= axlat + 1 && axlat + 1 <= ubnd[ 0 ] ) {
-            strcpy( lontype + 4, "-TPN" );
-            cval = lontype;
-            SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
-                      (void *) &cval, AST__STRING, NULL );
-            strcpy( lattype + 4, "-TPN" );
-            cval = lattype;
-            SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
-                      (void *) &cval, AST__STRING, NULL );
-         }
+/* Search the FitsChan for QV cards. */
+      while( FindKeyCard( this, "QV%d_%d%0c", method, class ) && astOK ) {
+
+/* Indicate that the QV card has been consumed. */
+         MarkCard( this );
+
+/* Get the keyword name and change it from QV to PV. */
+         strcpy( keyname, CardName( this ) );
+         keyname[ 0 ] ='P';
+
+/* Store the new PV card. */
+         SetValue( ret, keyname, CardData( this, &size ), AST__FLOAT, 
+                   CardComm( this ) );
+
+/* Move on to the next card. */
+         MoveCard( this, 1, method, class );
+
       }
-   }     
+   }
+
 
 /* IRAF "ZPX" projections 
    --------------------- */
@@ -15040,13 +15048,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    --------------------- */
    } else if( !Ustrcmp( prj, "-TNX" ) ) {
 
-/* Replace TNX with TPN in the CTYPE values. */
-      strcpy( lontype + 4, "-TPN" );
+/* Replace TNX with TAN in the CTYPE values. */
+      strcpy( lontype + 4, "-TAN" );
       cval = lontype;
       SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
                 (void *) &cval, AST__STRING, NULL );
 
-      strcpy( lattype + 4, "-TPN" );
+      strcpy( lattype + 4, "-TAN" );
       cval = lattype;
       SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
                 (void *) &cval, AST__STRING, NULL );
@@ -15104,7 +15112,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* The second and third numbers gives the orders of the polynomial in X
    and Y. We can only handle cases in which the orders are the same on
    both axes, and greater than 0 and less than 9. Store a pointer to the
-   first TPN projection parameter index to use. */
+   first TAN projection parameter index to use. */
                   } else if( j == 1 ){
                      porder = dval - 1;
                   } else if( j == 2 ){
@@ -15135,7 +15143,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Store the PV value */
                      SetValue( ret, FormatKey( "PV", iaxis + 1, m, ' ' ),
                                (void *) &dval, AST__FLOAT, 
-                               "TPN projection parameter" );
+                               "TAN projection parameter" );
                   }
 
                   start += nch;
@@ -17149,11 +17157,19 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
             outa = astFree( outa );
             outb = astFree( outb );
 
-/* Otherwise, create a WcsMap with the specified projection. The WcsMap is 
-   equivalent to a unit mapping for all axes other than "axlat" and 
-   "axlon". */
+/* Otherwise, create a WcsMap with the specified projection. The WcsMap
+   is equivalent to a unit mapping for all axes other than "axlat" and 
+   "axlon". If CTYPE specified "-TAN" we defer creation of the WcsMap
+   until we know if there are any correction terms (given by PV keywords). 
+   If correction terms are found we use the AST__TPN projection instead 
+   of the AST__TAN projection. */
          } else {
-            map2 = (AstMapping *) astWcsMap( naxes, latprj, axlon + 1, axlat + 1, "" );
+            if( latprj != AST__TAN ) {
+               map2 = (AstMapping *) astWcsMap( naxes, latprj, axlon + 1, 
+                                                axlat + 1, "" );
+            } else {
+               map2 = NULL;
+            }
 
 /* If the FITS header contains any projection parameters, store them in
    the WcsMap. */
@@ -17161,11 +17177,18 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
             for( m = 0; m <= np; m++ ){
       
                pv = GetItem( &(store->pv), axlat, m, s, NULL, method, class );
-               if( pv != AST__BAD ) astSetPV( map2, axlat, m, pv );
+               if( pv != AST__BAD ) {
+                  if( !map2 ) map2 = (AstMapping *) astWcsMap( naxes, AST__TPN, 
+                                                               axlon + 1, axlat + 1, "" );
+                  astSetPV( map2, axlat, m, pv );
+               }
       
                pv = GetItem( &(store->pv), axlon, m, s, NULL, method, class );
-               if( pv != AST__BAD ) astSetPV( map2, axlon, m, pv );
-      
+               if( pv != AST__BAD ) {
+                  if( !map2 ) map2 = (AstMapping *) astWcsMap( naxes, AST__TPN, 
+                                                               axlon + 1, axlat + 1, "" );
+                  astSetPV( map2, axlon, m, pv );      
+               }
             }
 
 /* Invert the WcsMap to get a DEprojection. */
@@ -20473,7 +20496,7 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
    into absolute physical coordinates using map3b. Note, the reference 
    pixel given by CRPIX does not necessarily map onto physical 
    reference point given by CRVAL. For instance, the two points will be
-   different for a TPN projection in which any of the PVi_0 projection
+   different for a TAN projection in which any of the PVi_0 projection
    parameters are not zero. */
       for( i = 0; i < niwcs; i++ ) ptr1[ i ][ 0 ] = 0.0;
       natlat = astGetNatLat( map2 );
@@ -22585,8 +22608,7 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     The projections supported include all those in the fits-wcs standard.
 *     In addition, it supports the "TAN with polynomial correction terms"
 *     projection which was included in a draft of the FITS-WCS paper, but
-*     was not present in the final version. This projection is identified
-*     by the code "TPN" within AST.
+*     was not present in the final version.
 *
 c     When reading a FITS-WCS encoded Object (using astRead), the FitsChan
 f     When reading a FITS-WCS encoded Object (using AST_READ), the FitsChan
@@ -22666,14 +22688,14 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *
 *     In addition, the experimental IRAF "ZPX" and "TNX" sky projections will 
 *     be accepted when reading, but will never be written (the corresponding
-*     FITS "ZPN" or "TPN" projection being used instead). However, there
-*     are restrictions on the use of these experimental projections. For
-*     "ZPX", longitude and latitude correction surfaces (appearing as
+*     FITS "ZPN" or "distorted TAN" projection being used instead). However, 
+*     there are restrictions on the use of these experimental projections. 
+*     For "ZPX", longitude and latitude correction surfaces (appearing as
 *     "lngcor" or "latcor" terms in the IRAF-specific "WAT" keywords) are
 *     not supported. For "TNX" projections, only cubic surfaces encoded as 
 *     simple polynomials with "half cross-terms" are supported. If an
 *     un-usable "TNX" or "ZPX" projection is encountered while reading 
-*     from a FitsChan, a simpler form of TPN or ZPN projection is used
+*     from a FitsChan, a simpler form of TAN or ZPN projection is used
 *     which ignores the unsupported features and may therefore be
 *     inaccurate. If this happens, a warning message is added to the 
 *     contents of the FitsChan as a set of cards using the keyword "ASTWARN".
