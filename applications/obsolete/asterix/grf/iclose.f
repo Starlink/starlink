@@ -33,17 +33,22 @@
       CALL USI_INIT()
 
       CALL MSG_PRNT(VERSION)
-
+	print *,1
       CALL PSF_RELEASE(I_PSF,STATUS)
+	print *,2
       CALL PSF_CLOSE(STATUS)
+	print *,2
       CALL BDA_ANNUL(I_LOC,STATUS)
+	print *,3
 
       CALL ARX_CLOSE(I_ARD_ID,STATUS)
+	print *,4
 
       IF (I_NPOS.GT.0) THEN
         CALL GRP_DELET(I_POS_ID,STATUS)
         I_NPOS=0
       ENDIF
+	print *,5
 
       CALL GCB_ATTACH('IMAGE',STATUS)
       CALL GCB_DETACH(STATUS)
