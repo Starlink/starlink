@@ -112,6 +112,9 @@
 *     History:
 *     $Id$
 *     $Log$
+*     Revision 1.4  1997/05/20 23:41:13  timj
+*     Forgot to delete var NSPEC
+*
 *     Revision 1.3  1997/05/20 23:39:46  timj
 *     Can't decode more than one SPEC at any one call!!
 *     Go back to how it was in v1.1
@@ -188,7 +191,6 @@
       LOGICAL      MEAS_SELECTED ! .TRUE. if measurement
                                 ! selected
       INTEGER      NEXT         ! index of ; in spec
-      INTEGER      NSPEC        ! index of N_SPEC
       INTEGER      N_COMP       ! number of components in spec
       INTEGER      START_COMP   ! index of start of a component
       CHARACTER*80 STRING       ! internal copy of SPEC
