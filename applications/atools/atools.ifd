@@ -1459,7 +1459,7 @@ iraf! {
           }
       }
 
-      action astsetactiveunit {
+      action astsetactunit {
 
          helplib {$ATOOLS_HELP}
 
@@ -1490,7 +1490,7 @@ iraf! {
           }
 
       }
-      action astgetactiveunit {
+      action astgetactunit {
 
          helplib {$ATOOLS_HELP}
 

@@ -1,7 +1,7 @@
       SUBROUTINE ASTSETACTIVEUNIT( STATUS )
 *+
 *  Name:
-*     ASTSETACTIVEUNIT
+*     ASTSETACTUNIT
 
 *  Purpose:
 *     Set the ActiveUnit flag for a Frame.
@@ -69,7 +69,7 @@
 *     take into account the change in Units).
 
 *  Usage:
-*     astsetactiveunit this value result
+*     astsetactunit this value result
 
 *  ADAM Parameters:
 *     RESULT = LITERAL (Read)
@@ -82,6 +82,11 @@
 *        supplied, the WCS FrameSet will be used.
 *     VALUE = _LOGICAL (Read)
 *        The value to assign to the ActiveUnit flag.
+
+*  Notes:
+*     - This application corresponds to the AST routine AST_SETACTIVEUNIT. 
+*     The name has been abbreviated due to a limitation on the length of 
+*     ADAM command names.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

@@ -1,7 +1,7 @@
       SUBROUTINE ASTGETACTIVEUNIT( STATUS )
 *+
 *  Name:
-*     ASTGETACTIVEUNIT
+*     ASTGETACTUNIT
 
 *  Purpose:
 *     Get the value of the ActiveUnit flag for a rame.
@@ -26,7 +26,7 @@
 *     written to an output parameter.
 
 *  Usage:
-*     astgetactiveunit this 
+*     astgetactunit this 
 
 *  ADAM Parameters:
 *     THIS = LITERAL (Read)
@@ -35,6 +35,11 @@
 *     VALUE = _LOGICAL (Write)
 *        On exit, this holds a boolean value indicating if the ActiveUnit
 *        flag was set or not.
+
+*  Notes:
+*     - This application corresponds to the AST routine AST_GETACTIVEUNIT. 
+*     The name has been abbreviated due to a limitation on the length of 
+*     ADAM command names.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

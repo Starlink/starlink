@@ -22,11 +22,13 @@
   - New command astformat. Formats one or more axis values using the
   attributes of a supplied Frame.
 
-  - New command astsetactiveunit. Sets the value of the ActiveUnit flag
+  - New command astsetactunit. Sets the value of the ActiveUnit flag
   for a Frame, which determines how the Unit attribute of the Frame is used.
+  This corresponds to the AST_SETACTIVEUNIT routine (the name has been
+  abbreviated because fo a limitation on th elength of ADAM command names).
 
-  - New command astgetactiveunit. Returns the value of the ActiveUnit flag
-  for a Frame.
+  - New command astgetactunit. Returns the value of the ActiveUnit flag
+  for a Frame. This corresponds to the AST_GETACTIVEUNIT routine.
 
   - The informational messages which say where the output data has been
   written to are now only produced if the environment variable
