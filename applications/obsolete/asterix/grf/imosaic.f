@@ -838,14 +838,12 @@ c                              ! axis units
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Map the output data
-        CALL BDI_MAPR( OFID, 'Data', 'WRITE', PNTROD, STATUS )
-        CALL ARR_INIT1R( 0.0, ONELM, %VAL(PNTROD), STATUS )
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', PNTROD, STATUS )
 
 *      Create and map the output variance array if required
         IF ( LVAR ) THEN
 
-          CALL BDI_MAPR( OFID, 'Variance', 'WRITE', PNTROV, STATUS )
-          CALL ARR_INIT1R( 0.0, ONELM, %VAL(PNTROV), STATUS )
+          CALL BDI_MAPR( OFID, 'Variance', 'WRITE/ZERO', PNTROV, STATUS )
 
         ELSE
 
