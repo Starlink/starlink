@@ -31,7 +31,7 @@
            `grp_link` `trn_link` \
            `prm_link` `mag_link` \
            `psx_link` `pda_link` \
-           -lkapgrf `pgplot_link`  \
+           `pgplot_link`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
@@ -45,7 +45,7 @@
            `grp_link` `trn_link` \
            `prm_link` `mag_link` \
            `psx_link` `pda_link` \
-           -lkapgrf `pgp_link`  \
+           `pgp_link`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
