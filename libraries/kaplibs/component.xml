@@ -13,7 +13,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><build>tk</build><build>snx</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>tcl</link><link>tk</link><link>snx</link><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>snx</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>snx</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

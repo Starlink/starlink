@@ -2,7 +2,6 @@
 
 SUBDIRS = aif fts ira irq ctg lpg kpg kgs kapgrf
 
-# The link script is generated at configure so should not be distributed
 bin_SCRIPTS = kaplibs_link_adam kaplibs_link
 dist_noinst_SCRIPTS = kaplibs_test_link kaplibs_noadam_test_link
 

@@ -16,10 +16,6 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
-dnl    Look for tcl/tk system
-STAR_PATH_TCLTK(8.2, [tk])
-AC_CHECK_HEADERS([tcl.h tk.h])
-
 STAR_CHECK_PROGS([generic])
 
 dnl    Other options here, such as
@@ -27,8 +23,8 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_MONOLITHS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf sae mers subpar gks gns idi agi ast cat ndg hds chr fio grp ndf prm par psx tcl tk snx])
-STAR_DECLARE_DEPENDENCIES(link, [cat mers subpar psx ndg ndf ast agi fio grp trn prm mag psx pda pgplot tcl tk snx])
+STAR_DECLARE_DEPENDENCIES(build, [cnf sae mers subpar gks gns idi agi ast cat ndg hds chr fio grp ndf prm par psx snx])
+STAR_DECLARE_DEPENDENCIES(link, [cat mers subpar psx ndg ndf ast agi fio grp trn prm mag psx pda pgplot snx])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
@@ -40,8 +36,6 @@ AC_CONFIG_FILES([Makefile component.xml
     aif/Makefile  ira/Makefile     kgs/Makefile
     ctg/Makefile  irq/Makefile     kpg/Makefile
     fts/Makefile  kapgrf/Makefile  lpg/Makefile])
-AC_CONFIG_FILES([kaplibs_link_adam],[chmod +x kaplibs_link_adam])
-AC_CONFIG_FILES([kaplibs_link],[chmod +x kaplibs_link])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
