@@ -1,9 +1,13 @@
-declare nmin i4
-declare nmax i4
-declare nspec i4
-declare fitsoutfile c18
+declare nmin        i4
+declare nmax        i4
+declare nspec       i4
+declare fitsoutfile c21
 declare cscan       c4
-declare csscan      c3
+declare csscan      c4
+declare fcen_a      i4
+declare fcen_b      i4
+
+fitsoutfile = 'xxxxxxxxxxxxxxxxxxxxx'
 
 print ' '
 print 'Routine to directly convert GSD DAS/AOSC files to FITS using CONCAT'
@@ -26,60 +30,94 @@ last_error = 0
 ! do over requested range of scan numbers
 do n nmin nmax
 
-! find out how many scans in file
+  ! find out how many scans in file
   r-g-d n 1
-  index-gsd-files n
-  nspec = no_gsd_spectra
 
-! check for predictable errors and reset
-
+  ! check for predictable errors and reset
   if (last_error = 10)
+    print ' Scan ',n,' not found - skipping to next file'
     last_error = 0
-    nspec = 0
+    nspec = -1
   elseif (last_error = 38)
+    print ' Scan ',n,' contains no data - skipping to next file'
     last_error = 0
-    nspec = 0
+    nspec = -1
   elseif (last_error<>0)
     print ' Other error - terminating fitsloop'
     return
+  else
+    index-gsd-files n
+    nspec = no_gsd_spectra
   endif
 
-! read in each spectrum in turn, write to fits file named 
-! jcmt_####_###.fits
+  ! read in each spectrum in turn, write to fits file named 
+  ! jcmt_####_###.fits
 
   if (nspec>0)
     do m 1 nspec
-      r-g-d\n\m\
+      r-g-d \n\m\
 
       cscan = scan_title
       csscan = subscan_no
       fitsoutfile = ' '
-      write fitsoutfile 'jcmt_',cscan,'_',csscan,'.fits'
+      write fitsoutfile 'jcmt_',cscan,'_',csscan,'_a.fits'
 
       if (no_new_spectra=1)
         if nquad > 1
-           das-merge\\y\
+           das-merge\\n\n\
         endif
-        open-fits\o\d\fitsoutfile\y\
+        open-fits\fitsoutfile\\
         write-fits-spec
         close-fits
+        print 'G2F> -------------------------------------------------'
+        print 'G2F> converted scan ',n:i4.4,'_',m:i4.4,' to ',fitsoutfile
+        print 'G2F> -------------------------------------------------'
 
-! if two subbands, concatenate first
+      ! if two subbands, concatenate first
       elseif (no_new_spectra=2)
-        concat
-        if nquad > 1
-           das-merge\\y\
-        endif
-        open-fits\o\d\fitsoutfile\y\
-        write-fits-spec
-        close-fits
-      endif
 
-    print 'G2F> ---------------------------------------------'
-    print 'G2F> converted scan ',n:i4.4,'_',m:i3.3,' to ',fitsoutfile
-    print 'G2F> ---------------------------------------------'
+        ! Compare freq. setup to decide between wideband and dual-pol
+        fcen_b = f_cen(1)
+        xy
+        fcen_a = f_cen(1)
+
+        ! Wideband: use wideband option in das-merge
+        if (fcen_a <> fcen_b)
+          xy
+          das-merge\\n\y\
+          open-fits\fitsoutfile\\
+          write-fits-spec
+          close-fits
+          print 'G2F> -------------------------------------------------'
+          print 'G2F> converted scan ',n:i4.4,'_',m:i4.4,' to ',fitsoutfile
+          print 'G2F> -------------------------------------------------'
+        ! Dual pol spectrum
+        else
+          if nquad > 1
+            das-merge\\n\n\
+          endif
+          open-fits\fitsoutfile\\
+          write-fits-spec
+          close-fits
+          print 'G2F> -------------------------------------------------'
+          print 'G2F> converted scan ',n:i4.4,'_',m:i4.4,' to ',fitsoutfile
+          print 'G2F> -------------------------------------------------'
+          xy
+          write fitsoutfile 'jcmt_',cscan,'_',csscan,'_b.fits'
+          if nquad > 1
+            das-merge\\n\n\
+          endif
+          open-fits\fitsoutfile\\
+          write-fits-spec
+          close-fits
+          print 'G2F> -------------------------------------------------'
+          print 'G2F> converted scan ',n:i4.4,'_',m:i4.4,' to ',fitsoutfile
+          print 'G2F> -------------------------------------------------'
+        endif
+      endif
 
     enddo
   endif
   last_error = 0
 enddo
+last_error = 0
