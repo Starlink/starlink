@@ -81,6 +81,7 @@
 *     25 Feb 94 : V1.7-2  Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *     28 Mar 95 : V1.8-1  Use new data interface (DJA)
+*     11 Dec 95 : V2.0-0  ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -169,7 +170,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER            ( VERSION = 'RATIO Version 1.8-1' )
+        PARAMETER            ( VERSION = 'RATIO Version 2.0-0' )
 *-
 
 *    Check status
@@ -327,11 +328,6 @@
                DATEXT = 'Axis data unreadable. '
                USE_PIXELS = .TRUE.
                CALL ERR_FLUSH( STATUS )
-
-             ELSE IF ( TLEN .NE. IDIMS(I) ) THEN
-               DATEXT = 'Axis wrong size! '
-               USE_PIXELS = .TRUE.
-
              END IF
 
            ELSE
