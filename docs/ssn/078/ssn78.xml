@@ -4085,7 +4085,7 @@ M Makefile.dependencies
                 hand, this will cause the hierarchy to be preserved.
                 This is documented rather in passing in the automake
                 manual, in the section <webref
-                url="&automakehtml/Alternative.html" >An Alternative
+                url="&automakehtml;/Alternative.html" >An Alternative
                 Approach to Subdirectories</webref> (and no, I don't
                 know why `nobase' is supposed to be intuitive,
                 either).</p>
