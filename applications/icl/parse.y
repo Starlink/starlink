@@ -473,6 +473,7 @@
  */
 
 %{
+#include <stdio.h>
 #include "icl.h"
 #include "expr.h"
 #include "control.h"

@@ -15,7 +15,9 @@
  *
  ******************************************************************************
  */
+#include <stdio.h>
 #include "sae_par.h"
+#include "ems.h"
 #include "icl.h"
 #include "expr.h"
 #include "interp.h"
@@ -24,18 +26,10 @@
 #include "procs.h"
 #include "f77.h"
 #include "cnf.h"
+#include "output.h"
+#include "control.h"
 
-#ifdef DEBUG
-#include <stdio.h>
-#endif
-
-extern value comment_interpret(node *n, int op);		/* control.c */
-extern void indent(void);					/* control.c */
 extern char *currentproc(void);					/* main.c */
-extern void outfpstring(char *mess);				/* output.c */
-
-extern int indent_count;					/* control.c */
-extern int checkpars;						/* procs.c */
 
 /******************************************************************************
  * 		T O D O

@@ -342,7 +342,7 @@ expand_name(char **fullfilename, char *filename)
 char *
 which_exec(char *filename)
 {
-    char *p, *dir, *getenv(), *path, *tmppath;
+    char *p, *dir, *path, *tmppath;
     static char buffer[200];
 
     if ( (path = getenv("PATH")) == CHARNIL)

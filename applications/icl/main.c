@@ -21,10 +21,13 @@
 #include <setjmp.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "icl.h"
 #include "sae_par.h"
 #include "icl_io.h"
 #include "ams.h"
+#include "output.h"
 #include "messys_len.h"
 #include "messys_par.h"
 #include "messys_err.h"

@@ -21,8 +21,11 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <termios.h>
+#include <unistd.h>
 #include "icl.h"
 #include "input.h"
+#include "output.h"
+#include "uface_functions.h"
 #include "icl_io.h"
 #include "sae_par.h"
 #include "messys_err.h"

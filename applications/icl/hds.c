@@ -35,6 +35,9 @@
  ******************************************************************************
  */
 #include <string.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "icl.h"
 #include "node.h"
 #include "interp.h"

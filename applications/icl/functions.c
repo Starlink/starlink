@@ -20,6 +20,8 @@
  ******************************************************************************
  */
 #include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "icl.h"
 #include "parse.h"
@@ -39,16 +41,6 @@
 
 extern node *arglist[];					/* interp.c */
 extern char *version;					/* main.c   */
-
-extern char *getenv(const char *);
-extern int sscanf(const char *, const char *,...);
-
-/* incredibly, these are not declared in <math.h> ! */
-
-#ifndef linux
-extern double copysign(double x, double y),
-	      rint    (double x);
-#endif
 
 /******************************************************************************
  *
