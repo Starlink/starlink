@@ -145,12 +145,10 @@ class InputByteStream {
     Byte *p_;			/* current position in buffer */
     Byte *eob_;			/* end of buffer */
     bool eof_;			/* true on end of file */
-    void (*close_callback_)(void);
     void read_buf_(void)
 	    throw (InputByteStreamError);
     size_t certainly_read_(int fd, Byte *b, size_t len)
 	    throw (InputByteStreamError);
-    void close_fd_(void);
 
     static verbosities verbosity_;
     static unsigned int default_buffer_length_;
