@@ -17,7 +17,7 @@ check_res.f check_statii.f check_tols.f chkenv.f chkparr.f cla_med.f \
 clone_it.f clone_match.f clone_mode.f clone_plot.f comb_centrd.f \
 comb_contin.f comb_menu.f comb_spacing.f comb_window.f compare.f \
 contin_corr.f contrl_cpoly2.f control_cpoly.f cop_2_1d_err.f \
-cophdr2hds.f cophdr2iraf.f copy_res.f copyit.f correct.f correct2.f \
+cophdr2hds.f copy_res.f copyit.f correct.f correct2.f \
 count.f create_ext.f crres.f csub_st.f darsort.f data_window.f \
 decode_status.f decodetolfail.f delete_fit.f delta_fit.f \
 describe_fit.f diagnosis_plt.f disp_window.f display_line.f \
@@ -31,7 +31,7 @@ get_flux.f get_lincnt.f get_line_ids.f get_parnum.f get_peak.f \
 get_substr.f get_template.f get_wave.f getres.f getrow.f \
 getx_template.f gety_template.f grvel.f gryplt.f hardcopy_plot.f \
 hartman.f hpfil.f identify_line.f iflab.f init_res.f init_tols.f \
-intrpl.f intrpl_s.f irafemess.f iroutp.f itplbv2.f line_plot.f \
+intrpl.f intrpl_s.f iroutp.f itplbv2.f line_plot.f \
 line_plot_sub.f line_show.f line_vplot.f linepick.f list_lines.f \
 long_edit.f long_opts.f look.f manual_menu.f manual_mode.f \
 map_data.f map_data2.f map_ext.f map_res.f mk_synth_data.f \
@@ -40,10 +40,10 @@ ofill_params.f oget_parnum.f one_line.f output_fit.f outsub.f \
 pick_lines.f pick_regions.f pick_regions3.f pldiagnosis.f \
 plot_all_fits.f plot_arc.f plot_av_rot.f plot_cube.f plot_cut.f \
 plot_data.f plot_datatn.f plot_dcurv.f plot_flux.f plot_line.f \
-plot_linrat.f plot_old_fit.f plot_opts.f plot_order.f plot_sdist.f \ 
+plot_linrat.f plot_old_fit.f plot_opts.f plot_order.f plot_sdist.f \
 plot_teeth.f plot_trams.f plotall.f plotvel.f print_tols.f \
 profile_fit.f prvel.f prvel_sub.f quick_plot.f range_in.f rangeblk.f \
-\ rchn2rx.f rdcinf.f rdids.f rdinf.f rdiraf.f read_coeffs.f \
+\ rchn2rx.f rdcinf.f rdids.f rdinf.f read_coeffs.f \
 read_defaults.f redo_all_fits.f refine_res.f reject_data.f \
 reject_teeth.f remove_sky.f resid_v_ht.f resid_v_width.f rms.f \
 rv.f rv_correct.f save_cheby.f search.f seek_order.f seek_order2.f \
@@ -57,3 +57,6 @@ tay2cheb.f test_areas.f tol_rej.f tram_opts.f tram_weights.f \
 transfer.f two_open.f underscore.f unmap_res.f updtmsk.f wave2vel.f \
 wft.f window_limits.f window_scan.f window_width.f windplot.f \
 wrtab.f 
+
+# Not called. Require iraf I/O library (eg from convert)
+IRAF_ROUTINES = rdiraf.f cophdr2iraf.f irafemess.f
