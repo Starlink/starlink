@@ -79,6 +79,7 @@
                                         ! input file
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
+      CHARACTER*132 FNAME               ! Input filename
       INTEGER      I                    ! DO loop variable
       INTEGER      INDF                 ! NDF identifier of input file
       INTEGER      ITEMP                ! scratch integer
@@ -107,6 +108,7 @@
       INTEGER      N_POS                ! the total number of positions measured
       CHARACTER*30 OBJECT               ! name of object observed
       CHARACTER*15 OBSERVING_MODE       ! type of observation
+      CHARACTER*132 OUTFILE             ! Output filename
       INTEGER      OUTNDF               ! NDF identifier of output file
       INTEGER      OUT_DATA_PTR         ! pointer to data array in output
       INTEGER      OUT_QUALITY_PTR      ! pointer to quality array in output 
@@ -118,6 +120,10 @@
       CHARACTER*80 STATE                ! 'state' of SCUCD at end of
                                         ! observation
       CHARACTER*80 STEMP                ! scratch string
+      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
+
+*  Local Data:
+      DATA SUFFIX_STRINGS /'_rlb','b'/
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -130,6 +136,10 @@
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', INDF, STATUS)
+
+*     Get the name of the filename associated with 'IN'
+
+      CALL SCULIB_GET_FILENAME('IN', FNAME, STATUS)
 
 * Read in badbit mask
       CALL NDF_BB(INDF, BADBIT, STATUS)
@@ -331,9 +341,16 @@
      :        'of measurement ^N_M', STATUS)
       END IF         
 
+*     Generate a default name for the output file
+      CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
+     :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
+
+*     set the default
+      CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
+
 *  now open the output NDF, propagating it from the input file
 
-      CALL NDF_PROP (INDF, ' ', 'OUT', OUTNDF, STATUS)
+      CALL NDF_PROP (INDF, 'Units,Axis', 'OUT', OUTNDF, STATUS)
 
 *  map the various components of the output data array
 
