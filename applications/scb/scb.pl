@@ -862,7 +862,7 @@ sub search_keys {
 
    foreach $index (qw/file func/) {
       while (($name, $loc) = ${$index . '_index'}->each($package)) {
-         if ($name =~ m`$regex`io) {
+         if ($name =~ m'$regex'io) {
             $pack = starpack $loc;
             $match{$index}{$pack}{$name} = $loc;
          }
@@ -952,6 +952,26 @@ sub regex_validate {
 #     This routine checks that Perl thinks a regular expression is correct.
 #     If so, no action is taken.
 #     If not, the error() routine is called to give an informative error.
+#
+#     As well as correctness, the expression must be checked for security
+#     reasons.  In order to assess whether it matches the keys, a string
+#     like "$key =~ m%$regex%" must be executed.  This expression must not
+#     be allowed to execute arbitrary Perl code (like, for instance 
+#     'system "cat /etc/passwd";').
+#     Two things which could cause this are the following: interpolation
+#     of references, like:
+#
+#        $key =~ m%   @{[system "cat /etc/passwd"]};    %;
+#
+#     and inclusion of the delimiter character in the pattern, like:
+#
+#        $key =~ m%   %; system "cat /etc/passwd"; m%   %;
+#
+#     We defeat the first case by using the single quote character "'" as
+#     delimiter, which blocks any variable interpolation, and the second
+#     case by refusing any regular expression which contains the delimiter.
+#     Neither of these restrictions is likely to prevent legitimate
+#     attempts to match files or functions.
 
 #  Arguments:
 #     $regex = string.
@@ -982,20 +1002,31 @@ sub regex_validate {
 
    my $regex = shift;
 
-#  Evaluate the regular expression, and return if it generates no error.
-#  We use a weird character for the delimiter in order not to interfere
-#  with characters which might be within the regular expression.
+#  Prepare regular expression in a printable form.
 
-   my $delimiter = "`";
+   my $prregex = $html ? demeta ($regex) : $regex;
+
+#  Evaluate the regular expression, and return if it generates no error.
+#  By using the single quote character "'" as delimiter, any variable
+#  interpolation into the regular expression is blocked.
+
+   my $delimiter = "'";
+
+#  Disallow tricky expressions containing the delimiter.
+
+   if (index ($regex, $delimiter) >= 0) {
+      error "Disallowed regular expression '$prregex'",
+         'You may not use the character "' . $delimiter . 
+         '" in the regular expression';
+   }
+
+#  Try out the regular expression to see if it generates an error.
+
    my $evalstr = 'my $dummy = ""; $dummy =~ ';
    $evalstr .= "m" . $delimiter . $regex . $delimiter;
    eval $evalstr;
 
    if ($@) {
-
-#     Prepare regular expression in a printable form.
-
-      my $prregex = $html ? demeta ($regex) : $regex;
 
 #     Call error reporting routine.
 
@@ -1727,7 +1758,7 @@ sub error {
 
 #  Output terse message to standard error and exit with error status.
 
-   die "$message\n";
+   die "$self: $message\n";
 
 }
 
