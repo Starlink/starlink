@@ -90,6 +90,7 @@ Time for few documentation updates.
 
 <distribution string="DR-0.6-unreleased" date="30-SEP-1999" author="ng" versionid="v0.6">
 Added sgml2docs command.  Significant changes to programcode.
+Incorporates decisions from Durham SGML meeting.
 </distribution>
 
 </history>
@@ -535,6 +536,7 @@ given in <ref id=table.entities>.
 <caption>Entities predefined in the Starlink general DTD.</caption>
 <tabular>
 <tgroup cols="3">
+<colspec colnum=2 align=center>
 <thead>
 <row><entry>Entity reference<entry>Replacement<entry>Description
 <tbody>
@@ -821,7 +823,7 @@ online.  The Starlink general DTD defines two parameter entities
 use to include or ignore text in a marked section.  By default, both
 of these are set to the string 
 `IGNORE', but when you use the <code/sgml2docs/ script (see <ref
-id=proc.sgml2docs>), one or the other of these will be set to `include', as
+id=proc.sgml2docs>), one or the other of these will be set to `INCLUDE', as
 appropriate for the type of file being generated.
 
 <p>You would use this facility as follows:
@@ -1155,7 +1157,7 @@ add it to a document type which does not have it by default, and you do this by
 invoking the SSN DTD (for example) as follows
 <verbatim><![CDATA[
 <!DOCTYPE ssn PUBLIC "-//Starlink//DTD Starlink SSN//EN" [
-  <!ENTITY % Feature.Routinelist 'include'>
+  <!ENTITY % Feature.Routinelist 'INCLUDE'>
 ]>
 ]]></verbatim>
 Note that the entity names are case-sensitive.
@@ -1407,7 +1409,7 @@ entity which refers to the document as follows:
 &lt;!DOCTYPE sun PUBLIC "-//Starlink//DTD Starlink SUN//EN" [
   ...
   &lt;!ENTITY otherdoc 
-    PUBLIC "-//Starlink//DOCUMENT Summary SUN/123//EN" subdoc>
+    PUBLIC "-//Starlink//DOCUMENT Summary SUN/123//EN" SUBDOC>
   ...
 ]>
 </verbatim>
@@ -1488,6 +1490,8 @@ id=el.sun.verbatim text='verbatim'> element) as figure content.
 <update versionid="v0-4">Include description of new tabular element</update>
 <update versionid="post-v0-4">
 Clarified description of tabular element, and linebreaks.</update>
+<update versionid="v0.6">
+Principal table attributes now supported in &latex; down-converter.</update>
 
 
 <p>Includes
@@ -1521,8 +1525,43 @@ url='http://www.oasis-open.org/html/a503.htm' >Oasis
 Exchange Table Model</webref> as the basis for their tables.  Even
 though it is only a portable subset of a more elaborate standard (the
 industry-standard CALS table model), there is more in the table model
-than has yet been implemented in the Starlink application.
+than has yet been implemented in the Starlink application.  You may
+use in your documents all of the elements and attributes in the Oasis
+model, but some of the lesser-used attributes are not recognised.
 
+<p>The support for Oasis table attributes is as shown in <ref
+id=table.oasis>.
+<table id=table.oasis>
+<caption>
+Support for Oasis table attributes in Starlink DTDs
+</caption>
+<tabular>
+<tgroup cols="3" align=center>
+<colspec colnum=1 align=left>
+<thead>
+<row>
+<entry>Element<entry>Supported<entry>Unsupported
+<tbody>
+<row>
+<entry>tabular<entry>colsep, frame, rowsep<entry>pgwide
+<row>
+<entry>tgroup<entry>align, cols, colsep, rowsep<entry>(none)
+<row>
+<entry>thead<entry>(none)<entry>valign
+<row>
+<entry>tbody<entry>(none)<entry>valign
+<row>
+<entry>colspec<entry>align, colname, colnum, colsep, rowsep
+	<entry>char, charoff, colwidth
+<row>
+<entry>row<entry>rowsep<entry>valign
+<row>
+<entry>entry<entry>colname, namest, nameend
+	<entry>align, char, charoff, colsep, morerows, rowsep, valign
+</tabular>
+</table>
+
+<!--
 <p>In the current release of the Starlink SGML set, all of the
 elements and attributes in the Oasis model are permitted in the
 documents you write, but most of the attributes are ignored.  Support
@@ -1530,6 +1569,7 @@ for these will likely be added in future releases, but the only real
 inconvenience is that there is currently no control over column
 alignment.  Please let me know which features you would like to be
 given priority.
+-->
 
 <p>You lay out a table as follows:
 <verbatim><![CDATA[
@@ -1537,11 +1577,12 @@ given priority.
 <caption>Entities predefined in the Starlink general DTD.</caption>
 <tabular>
 <tgroup cols="3">
+<colspec colnum=2 align=center>
 <thead>
 <row><entry>Entity reference<entry>Replacement<entry>Description
 <tbody>
-<row><entry><code>&amp;copy;</code><entry>&copy<entry>Copyright symbol
-<row><entry><code>&amp;amp;</code><entry><code>&amp</code><entry>ampersand
+<row><entry><code/&amp;copy;/<entry>&copy<entry>Copyright symbol
+<row><entry><code/&amp;amp;/<entry><code/&amp/<entry>ampersand
 </tabular>
 </table>
 ]]></verbatim>
@@ -1674,7 +1715,7 @@ recognises these bits of markup only in context: only if an ampersand
 or less-than symbol is immediately followed by a name-start character
 (an upper- or lowercase letter) is it recognised as an entity
 reference or element start-tag.  Thus the following element is
-correctly formed (with <code>&lt!entity dec "\delta"></code>):
+correctly formed (with <code>&lt!ENTITY dec "\delta"></code>):
 <verbatim><![CDATA[
 <meqnarray><mline>\alpha&<& x<mline>&dec&=&amp;4< x</meqnarray>
 ]]></verbatim>
@@ -2424,14 +2465,26 @@ not give an absolute pathname, it will be located relative to the
 current directory.
 <dt><code/--jadeflags flags/
 <dd>Pass the given flags to Jade.
+<dt><code/--options opt,opt,.../
+<dd>Set options (see below).
 <dt><code/--help/
 <dd>Show brief usage instructions.
+<dt><code/--version/
+<dd>Display the version of the script, and exit.
 <dt><code/--debug/
 <dd>Don't delete the working directory at the end (allows you to explore).
 </dl>
 
 <p>The final option, <code/--jadeflags/, allows you to do some limited
 customisation of the output.  See <ref id=appx.system.paramdsssl>.
+Jade flags can most conveniently be set using options, using the
+<code/--options/ argument.  There are no options (yet) for the HTML
+output, but the &latex; output has options <code/cts-sect/ (do not
+start a new page with each new section), <code/cts-appx/ (same, for
+appendices), and <code/onepass/ (produce output which needs
+only a single pass through &latex;, which means that the
+table-of-contents ends up printed last, requiring trivial
+rearrangement).
 
 <subsect id=proc.makefile export>Processing documents -- using the Makefile
 <update versionid="v0.6">Makefile approach no longer supported</update>
@@ -3261,7 +3314,7 @@ id=what.sgml> for alternatives.
            whose value is a Uniform Resource Locator,
            See RFC1808 (June 95) and RFC1738 (Dec 94).
         -->
-<!attlist link
+<!ATTLIST link
     href  %URL          #REQUIRED  -- URL for linked resource --
     rel   (next | prev) #IMPLIED   -- reverse link types --
     >
@@ -3396,7 +3449,7 @@ has <em/three/ comments within it, the third of which is empty.
 
 <p>Now we declare the attributes for the <code/link/ element.
 <verbatim><![ CDATA [
-<!attlist link
+<!ATTLIST link
     href  %URL          #REQUIRED  -- URL for linked resource --
 ]]></verbatim>
 This declares an <code/href/ attribute.  After expansion of the
