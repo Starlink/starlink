@@ -185,12 +185,11 @@
 
 *  Cannot locate the named extension item.  Report that this NDF will
 *  be ignored but take no other action.
-               CALL NDF_MSG( 'NDF', NDFID )
+               CALL MSG_SETC( 'NDF', NNAME )
                CALL MSG_SETC( 'ITEM', ITEM )
                CALL CCD1_MSG( ' ',
-     :'  The CCDPACK extension of NDF ^NDF does not contain'//
-     :' the item ^ITEM.', STATUS )
-               CALL NDF_MSG( 'NDF', NDFID )
+     :'  The CCDPACK extension of NDF ^NDF has no item ^ITEM.', STATUS )
+               CALL MSG_SETC( 'NDF', NNAME )
                CALL CCD1_MSG( ' ', '    NDF ^NDF will be ignored.',
      :                        STATUS )
                CALL CCD1_MSG( ' ', ' ', STATUS )
