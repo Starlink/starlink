@@ -1336,7 +1336,7 @@ c        ENDDO
           GCB(J)=ICHAR(STR(I:I))
           J=J+1
         ENDDO
-        DO I=L=1,SIZ
+        DO I=L+1,SIZ
           GCB(J)=ICHAR(' ')
           J=J+1
         ENDDO
