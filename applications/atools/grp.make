@@ -18,7 +18,7 @@ astpermmap.ifl astpermmap.f astremapframe.ifl astremapframe.f \
 astremoveframe.f astremoveframe.ifl astset.f astset.ifl astshow.tcl \
 astskyframe.ifl astskyframe.f asttest.f asttest.ifl astunitmap.f \
 astunitmap.ifl atl1_gtgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
-atl1_ptobj.f atl1_rm.c atl1_setop.f atlhelp.f atlhelp.ifl atools.csh \
+atl1_ptobj.f atl1_rm.c atl1_setop.f atl1_notif.f atlhelp.f atlhelp.ifl atools.csh \
 atools.hlp atools.icl atools_link_adam atools_mon.f atools_mon.ifl \
 atl1_rdgrp.f atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f \
 astlutmap.ifl astpcdmap.f astpcdmap.ifl astwinmap.f astshiftmap.f \
@@ -27,7 +27,8 @@ astfindframe.f astfindframe.ifl astpermaxes.f astpermaxes.ifl \
 astpickaxes.f astpickaxes.ifl astsimplify.f astsimplify.ifl asttrann.ifl \
 asttrann.f atl1_cpcol.f gethlp.f astinvert.f astinvert.ifl astmapbox.f \
 astmapbox.ifl astgetrefpos.f astsetrefpos.f astspecframe.f astgetrefpos.ifl \
-astsetrefpos.ifl astspecframe.ifl
+astsetrefpos.ifl astspecframe.ifl astformat.ifl asttran2.ifl astformat.f \
+asttran2.f
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc astcopy.par astaddframe.par astclear.par astget.par astset.par \
@@ -37,7 +38,7 @@ astpermmap.par astremoveframe.par astremapframe.par astmatrixmap.par \
 astconvert.par astlutmap.par astpcdmap.par astwinmap.par astfindframe.par \
 astpermaxes.par astpickaxes.par astsimplify.par asttrann.par astinvert.par \
 astmapbox.par astgetrefpos.par astsetrefpos.par astspecframe.par \
-astshiftmap.par
+astshiftmap.par astformat.par asttran2.par
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
@@ -46,7 +47,8 @@ asttest.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astgetmapping.f \
 astunitmap.f astskyframe.f astframeset.f astpermmap.f astremoveframe.f \
 astremapframe.f astmatrixmap.f astconvert.f astlutmap.f astpcdmap.f \
 astwinmap.f astshiftmap.f astfindframe.f astpermaxes.f astpickaxes.f astsimplify.f \
-asttrann.f astinvert.f astmapbox.f astgetrefpos.f astsetrefpos.f astspecframe.f
+asttrann.f astinvert.f astmapbox.f astgetrefpos.f astsetrefpos.f \
+astspecframe.f astformat.f asttran2.f 
 
 #  Contents of the doc/ directory in atools_iraf.tar
 IRAF_DOCS = astcopy.hlp astaddframe.hlp astclear.hlp astget.hlp astset.hlp \
@@ -55,7 +57,8 @@ astgetmapping.hlp astunitmap.hlp astskyframe.hlp astframeset.hlp \
 astpermmap.hlp astremoveframe.hlp astremapframe.hlp astmatrixmap.hlp \
 astconvert.hlp astlutmap.hlp astpcdmap.hlp astwinmap.hlp astshiftmap.hlp astfindframe.hlp \
 astpermaxes.hlp astpickaxes.hlp astsimplify.hlp asttrann.hlp astinvert.hlp \
-astmapbox.hlp astgetrefpos.hlp astsetrefpos.hlp astspecframe.hlp
+astmapbox.hlp astgetrefpos.hlp astsetrefpos.hlp astspecframe.hlp \
+astformat.hlp asttran2.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.

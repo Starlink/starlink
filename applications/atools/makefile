@@ -394,7 +394,7 @@ PKG_LINK = ATOOLS
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.6-1
+PKG_VERS = 1.6-2
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -463,7 +463,8 @@ astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f astpermaxes.f
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
 astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f astmapbox.f astinvert.f \
-astspecframe.f astsetrefpos.f astgetrefpos.f astshiftmap.f
+astspecframe.f astsetrefpos.f astgetrefpos.f astshiftmap.f atl1_notif.f \
+astformat.f asttran2.f
 
 F_SUB2 = 
 
@@ -501,7 +502,9 @@ TASKS = astcopy astaddframe astclear astget astset asttest astcmpframe \
 astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
 astlutmap astpcdmap astwinmap astshiftmap astfindframe astpermaxes astpickaxes \
-astsimplify asttrann astmapbox astinvert astspecframe astsetrefpos astgetrefpos
+astsimplify asttrann astmapbox astinvert astspecframe astsetrefpos \
+astgetrefpos astformat asttran2
+
 
 #  Monolith routine source name.
 
@@ -1365,6 +1368,8 @@ astframeset.o  : SAE_PAR AST_PAR
 astget.o       : SAE_PAR AST_PAR
 astgetframe.o  : SAE_PAR AST_PAR       
 astgetmapping.o: SAE_PAR AST_PAR     
+astformat.o    : SAE_PAR NDF_PAR AST_PAR GRP_PAR PAR_ERR
+asttran2.o     : SAE_PAR NDF_PAR AST_PAR GRP_PAR
 astinvert.o    : SAE_PAR AST_PAR 
 astlutmap.o    : SAE_PAR AST_PAR
 astmapbox.o    : SAE_PAR NDF_PAR AST_PAR 
@@ -1393,6 +1398,7 @@ atl1_gtfrm.o: SAE_PAR AST_PAR
 atl1_gtgrp.o: SAE_PAR GRP_PAR
 atl1_gtobj.o: SAE_PAR AST_PAR NDF_PAR 
 atl1_gtofl.o: SAE_PAR GRP_PAR 
+atl1_notif.o: SAE_PAR 
 atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
 atl1_rdch.o : SAE_PAR AST_PAR
 atl1_rdfch.o: SAE_PAR AST_PAR
