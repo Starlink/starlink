@@ -1,6 +1,0 @@
-FACILITY GWM
-155,ERROR,Undefined error condition
-156,INOPT,Invalid option
-157,NODIS,Unable to open display
-5,WINNF,Window not found
-6,XERR,X error

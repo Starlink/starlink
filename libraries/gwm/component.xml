@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gwm">
+  <version>1.5-1</version>
+  <path>libraries/gwm</path>
+  <description>GWM - X Graphics Window Manager</description>
+  <abstract><p>These applications provide a means to create graphics
+  windows on an X display that do not disappear when a program
+  terminates.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>ems</build><link>starx</link><link>ems</link><link>cnf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Nicholas Eaton</name>
+      <uname>ne</uname>
+    </person>
+  </developers>
+  <documentation> sun130</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

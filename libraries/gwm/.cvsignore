@@ -1,0 +1,5 @@
+*.lo
+*.la
+fac_*_err
+GWM_ERR
+Makefile

@@ -105,5 +105,9 @@
   99  CONTINUE
       CALL GWM_CLOSE( STATUS )
 
+*   Exit with bad error status to shell if we have an error
+*   so that the test system knows we have failed
+      IF (STATUS .NE. SAI__OK) CALL EXIT( 1 )
+
       END
 
