@@ -9,7 +9,7 @@
 *
 *	Contents:	functions for the management of object lists.
 *
-*	Last modify:	27/09/97
+*	Last modify:	05/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -85,7 +85,7 @@ int	addobj(int objnb, objliststruct *objl1, objliststruct *objl2)
   plist2 += j;
   for(i=objl1->obj[objnb].firstpix; i!=-1; i=PLIST(plist1+i,nextpix))
     {
-    memcpy(plist2,plist1+i,plistsize);
+    memcpy(plist2, plist1+i, (size_t)plistsize);
     PLIST(plist2,nextpix) = (j+=plistsize);
     plist2 += plistsize;
     }

@@ -5,17 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP/Leiden.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	02/02/98
+*	Last modify:	02/05/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
 /*----------------------------- Internal constants --------------------------*/
 #define	BACK_BUFSIZE		1048576		/* bkgnd buffer */
+#define	BACK_MINGOODFRAC	0.5		/* min frac with good weights*/
 #define	QUANTIF_NSIGMA		5		/* histogram limits */
 #define	QUANTIF_NMAXLEVELS	4096		/* max nb of quantif. levels */
 #define	QUANTIF_AMIN		4		/* min nb of "mode pixels" */
@@ -40,12 +41,15 @@ typedef struct structback
 
 
 /*------------------------------- functions ---------------------------------*/
-void		backstat(backstruct *, PIXTYPE *, size_t, int, int, int),
+void		backhisto(backstruct *, backstruct *, PIXTYPE *, PIXTYPE *,
+			size_t, int, int, int, PIXTYPE),
+		backstat(backstruct *, backstruct *, PIXTYPE *, PIXTYPE *,
+			size_t, int, int, int, PIXTYPE),
 		backrmsline(picstruct *, int, PIXTYPE *),
 		copyback(picstruct *infield, picstruct *outfield),
 		endback(picstruct *),
 		filterback(picstruct *),
-		makeback(picstruct *),
+		makeback(picstruct *, picstruct *),
 		subbackline(picstruct *, int, PIXTYPE *);
 
 float		backguess(backstruct *, float *, float *),

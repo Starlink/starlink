@@ -9,7 +9,7 @@
 *
 *	Contents:	Simplified versin of the LDACTools: main include file
 *
-*	Last modify:	26/11/98
+*	Last modify:	07/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -59,11 +59,13 @@ typedef enum		{T_BYTE, T_SHORT, T_LONG, T_FLOAT, T_DOUBLE, T_STRING}
 				t_type;		/* Type of data */
 typedef enum		{WRITE_ONLY, READ_ONLY}
 				access_type;	/* Type of access */
+typedef enum		{SHOW_ASCII, SHOW_SKYCAT}
+				output_type;    /* Type of output */
+
 
 /*------------------------------- constants ---------------------------------*/
 
 static int	t_size[] = {1, 2, 4, 4, 8, 1};	/* size in bytes per t_type */
-
 
 /*---------------------------------- key ------------------------------------*/
 
@@ -84,7 +86,7 @@ typedef struct structkey
   struct structkey	*prevkey;	/* previous key within the chain */
   struct structkey	*nextkey;	/* next key within the chain */
   struct structtab	*tab;		/* (original) parent tab */
-  int		allocflag;		/* true if ptr dynamically allocated */
+  int         allocflag;              /* true if ptr dynamically allocated */
   }		keystruct;
 
 /*------------------------------- catalog  ---------------------------------*/
@@ -157,6 +159,10 @@ extern void	end_readobj(tabstruct *keytab, tabstruct *tab),
 		readbasic_head(tabstruct *tab),
 		save_cat(catstruct *cat, char *filename),
 		save_tab(catstruct *cat, tabstruct *tab),
+		show_keys(tabstruct *tab, char **keynames, keystruct **keys,
+			int nkeys, unsigned char *mask, FILE *stream,
+			int strflag,int banflag, int leadflag,
+                        output_type o_type),
 		swapbytes(void *, int, int),
 		*ttypeconv(void *ptr, t_type ttypein, t_type ttypeout),
 		warning(char *, char *);
@@ -168,6 +174,7 @@ extern char	*tdisptoprintf(char *tdisp),
 		**keys_list(tabstruct *tab, int *n);
 
 extern int	about_cat(catstruct *cat, FILE *stream),
+		about_tab(catstruct *cat, char *tabname, FILE *stream),
 		addhistoryto_cat(catstruct *cat, char *str),
 		add_key(keystruct *key, tabstruct *tab, int pos),
 		addkeyto_head(tabstruct *tab, keystruct *key),

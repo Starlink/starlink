@@ -474,6 +474,7 @@ int	vignet_resample(double *pix1, int w1, int h1,
   xc1 = (double)(w1/2);	/* Im1 center x-coord*/
   xc2 = (double)(w2/2);	/* Im2 center x-coord*/
   xs1 = xc1 + dx - xc2*step2;	/* Im1 start x-coord */
+
   if ((int)xs1 >= w1)
     return RETURN_ERROR;
   ixs2 = 0;			/* Int part of Im2 start x-coord */
@@ -489,7 +490,7 @@ int	vignet_resample(double *pix1, int w1, int h1,
   nx2 = (int)((w1-1-xs1)/step2+1);/* nb of interpolated Im2 pixels along x */
   if (nx2>(ix2=w2-ixs2))
     nx2 = ix2;
-  if (!nx2)
+  if (nx2<=0)
     return RETURN_ERROR;
   yc1 = (double)(h1/2);	/* Im1 center y-coord */
   yc2 = (double)(h2/2);	/* Im2 center y-coord */
@@ -509,7 +510,7 @@ int	vignet_resample(double *pix1, int w1, int h1,
   ny2 = (int)((h1-1-ys1)/step2+1);/* nb of interpolated Im2 pixels along y */
   if (ny2>(iy2=h2-iys2))
     ny2 = iy2;
-  if (!ny2)
+  if (ny2<=0)
     return RETURN_ERROR;
 
 /* Set the yrange for the x-resampling with some margin for interpolation */

@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	parameter list for catalog data.
 *
-*	Last modify:	29/08/98
+*	Last modify:	20/07/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -71,6 +71,15 @@ keystruct	objkey[] = {
   {"MAGERR_BEST", "RMS error for MAG_BEST",
 	&outobj2.magerr_best, H_FLOAT, T_FLOAT, "%8.4f", "mag"},
 
+  {"FLUX_PROFILE", "Flux weighted by the FILTERed profile",
+	&outobj2.flux_prof, H_FLOAT, T_FLOAT, "%12g", "count"},
+  {"FLUXERR_PROFILE", "RMS error for PROFILE flux",
+	&outobj2.fluxerr_prof, H_FLOAT, T_FLOAT, "%12g", "count"},
+  {"MAG_PROFILE", "Magnitude weighted by the FILTERed profile",
+	&outobj2.mag_prof, H_FLOAT, T_FLOAT, "%8.4f", "mag"},
+  {"MAGERR_PROFILE", "RMS error for MAG_PROFILE",
+	&outobj2.magerr_prof, H_FLOAT, T_FLOAT, "%8.4f", "mag"},
+
   {"FLUX_SOMFIT", "Flux derived from SOM fit",
 	&outobj2.flux_somfit, H_FLOAT, T_FLOAT, "%12g", "count"},
   {"FLUXERR_SOMFIT", "RMS error for SOMFIT flux",
@@ -84,6 +93,40 @@ keystruct	objkey[] = {
   {"VECTOR_SOMFIT", "Position vector of the winning SOM node",
 	&outobj2.vector_somfit, H_FLOAT, T_FLOAT, "%5.2f", "", 1,
 	&prefs.somfit_vectorsize},
+
+  {"FLUX_GALFIT", "Flux derived from the galaxy fit",
+	&outobj2.flux_galfit, H_FLOAT, T_FLOAT, "%12g", "count"},
+/*
+  {"FLUXERR_GALFIT", "RMS error for GALFIT flux",
+	&outobj2.fluxerr_galfit, H_FLOAT, T_FLOAT, "%12g", "count"},
+*/
+  {"MAG_GALFIT", "Magnitude derived from galaxy fit",
+	&outobj2.mag_galfit, H_FLOAT, T_FLOAT, "%8.4f", "mag"},
+
+/*
+  {"MAGERR_GALFIT", "Magnitude error derived from galaxy fit",
+	&outobj2.magerr_galfit, H_FLOAT, T_FLOAT, "%8.4f", "mag"},
+  {"ERROR_GALFIT", "Reduced Chi-square error of the galaxy fit",
+	&outobj2.stderr_galfit, H_FLOAT, T_FLOAT, "%10g", ""},
+*/
+  {"GALDANG_IMAGE", "Galaxy disk position angle  from the galaxy fit",
+	&outobj2.gdposang, H_FLOAT, T_FLOAT, "%5.1f", "deg"},
+  {"GALDSCALE_IMAGE", "Galaxy disk-scale from the galaxy fit",
+	&outobj2.gdscale, H_FLOAT, T_FLOAT, "%9.3f", "pixel"},
+  {"GALDASPEC_IMAGE", "Galaxy disk aspect ratio from the galaxy fit",
+	&outobj2.gdaspect, H_FLOAT, T_FLOAT, "%5.3f", ""},
+  {"GALDE1_IMAGE", "Galaxy disk ellipticity #1 from the galaxy fit",
+	&outobj2.gde1, H_FLOAT, T_FLOAT, "%6.4f", ""},
+  {"GALDE2_IMAGE", "Galaxy disk ellipticity #2 from the galaxy fit",
+	&outobj2.gde2, H_FLOAT, T_FLOAT, "%6.4f", ""},
+  {"GALBRATIO_IMAGE", "Galaxy bulge ratio from the galaxy fit",
+	&outobj2.gbratio, H_FLOAT, T_FLOAT, "%5.3f", ""},
+  {"GALBANG_IMAGE", "Galaxy bulge position angle  from the galaxy fit",
+	&outobj2.gbposang, H_FLOAT, T_FLOAT, "%5.1f", "deg"},
+  {"GALBSCALE_IMAGE", "Galaxy bulge-scale from the galaxy fit",
+	&outobj2.gbscale, H_FLOAT, T_FLOAT, "%9.3f", "pixel"},
+  {"GALBASPEC_IMAGE", "Galaxy bulge aspect ratio from the galaxy fit",
+	&outobj2.gbaspect, H_FLOAT, T_FLOAT, "%5.3f", ""},
 
   {"KRON_RADIUS", "Kron apertures in units of A or B",
 	&outobj2.kronfactor, H_FLOAT, T_FLOAT, "%5.2f", ""},
@@ -190,9 +233,9 @@ keystruct	objkey[] = {
 	&outobj2.cxyw, H_EXPO, T_FLOAT, "%12e", "deg**(-2)"},
 
   {"A_IMAGE", "Profile RMS along major axis",
-	&outobj.a, H_FLOAT, T_FLOAT, "%8.2f", "pixel"},
+	&outobj.a, H_FLOAT, T_FLOAT, "%9.3f", "pixel"},
   {"B_IMAGE", "Profile RMS along minor axis",
-	&outobj.b, H_FLOAT, T_FLOAT, "%8.2f", "pixel"},
+	&outobj.b, H_FLOAT, T_FLOAT, "%9.3f", "pixel"},
   {"THETA_IMAGE", "Position angle (CCW/x)",
 	&outobj.theta, H_FLOAT, T_FLOAT, "%5.1f", "deg"},
   {"A_WORLD", "Profile RMS along major axis (world units)",
@@ -279,9 +322,9 @@ keystruct	objkey[] = {
 	&outobj.iso[7], H_INT, T_LONG, "%8d", "pixel**2"},
 
   {"FLAGS", "Extraction flags",
-	&outobj.flag, H_INT, T_SHORT, "%03d", ""},
+	&outobj.flag, H_INT, T_SHORT, "%3d", ""},
   {"IMAFLAGS_ISO", "FLAG-image flags OR'ed over the iso. profile",
-	outobj.imaflag, H_INT, T_LONG, "%09u", "",
+	outobj.imaflag, H_INT, T_LONG, "%9u", "",
 	1, &prefs.imaflag_size},
   {"NIMAFLAGS_ISO", "Number of flagged pixels entering IMAFLAGS_ISO",
 	outobj.imanflag, H_INT, T_LONG, "%9d", "",
@@ -327,37 +370,51 @@ keystruct	objkey[] = {
 	1, &prefs.flux_radiussize},
 
   {"XPSF_IMAGE", "X coordinate from PSF-fitting",
-	&outobj2.x_psf, H_FLOAT, T_FLOAT, "%10.3f", "pixel"},
+	&outobj2.x_psf, H_FLOAT, T_FLOAT, "%10.3f", "pixel",
+	1, &prefs.psf_xsize},
   {"YPSF_IMAGE", "Y coordinate from PSF-fitting",
-	&outobj2.y_psf, H_FLOAT, T_FLOAT, "%10.3f", "pixel"},
+	&outobj2.y_psf, H_FLOAT, T_FLOAT, "%10.3f", "pixel",
+	1, &prefs.psf_ysize},
   {"XPSF_WORLD", "PSF position along world x axis",
-	&outobj2.xw_psf, H_FLOAT, T_DOUBLE, "%15e", "deg"},
+	&outobj2.xw_psf, H_FLOAT, T_DOUBLE, "%15e", "deg",
+	1, &prefs.psf_xwsize},
   {"YPSF_WORLD", "PSF position along world y axis",
-	&outobj2.yw_psf, H_FLOAT, T_DOUBLE, "%15e", "deg"},
+	&outobj2.yw_psf, H_FLOAT, T_DOUBLE, "%15e", "deg",
+	1, &prefs.psf_ywsize},
 
   {"ALPHAPSF_SKY", "Right ascension of the fitted PSF (native)",
-	&outobj2.alphas_psf, H_FLOAT, T_DOUBLE, "%11.7f", "deg"},
+	&outobj2.alphas_psf, H_FLOAT, T_DOUBLE, "%11.7f", "deg",
+	1, &prefs.psf_alphassize},
   {"DELTAPSF_SKY", "Declination of the fitted PSF (native)",
-	&outobj2.deltas_psf, H_FLOAT, T_DOUBLE, "%+11.7f", "deg"},
+	&outobj2.deltas_psf, H_FLOAT, T_DOUBLE, "%+11.7f", "deg",
+	1, &prefs.psf_deltassize},
 
   {"ALPHAPSF_J2000", "Right ascension of the fitted PSF (J2000)",
-	&outobj2.alpha2000_psf, H_FLOAT, T_DOUBLE, "%11.7f", "deg"},
+	&outobj2.alpha2000_psf, H_FLOAT, T_DOUBLE, "%11.7f", "deg",
+	1, &prefs.psf_alpha2000size},
   {"DELTAPSF_J2000", "Declination of the fitted PSF (J2000)",
-	&outobj2.delta2000_psf, H_FLOAT, T_DOUBLE, "%+11.7f", "deg"},
+	&outobj2.delta2000_psf, H_FLOAT, T_DOUBLE, "%+11.7f", "deg",
+	1, &prefs.psf_delta2000size},
 
   {"ALPHAPSF_B1950", "Right ascension of the fitted PSF (B1950)",
-	&outobj2.alpha1950_psf, H_FLOAT, T_DOUBLE, "%11.7f", "deg"},
+	&outobj2.alpha1950_psf, H_FLOAT, T_DOUBLE, "%11.7f", "deg",
+	1, &prefs.psf_alpha1950size},
   {"DELTAPSF_B1950", "Declination of the fitted PSF (B1950)",
-	&outobj2.delta1950_psf, H_FLOAT, T_DOUBLE, "%+11.7f", "deg"},
+	&outobj2.delta1950_psf, H_FLOAT, T_DOUBLE, "%+11.7f", "deg",
+	1, &prefs.psf_delta1950size},
 
   {"FLUX_PSF", "Flux from PSF-fitting",
-	&outobj2.flux_psf, H_FLOAT, T_FLOAT, "%12g", "count"},
+	&outobj2.flux_psf, H_FLOAT, T_FLOAT, "%12g", "count",
+	1, &prefs.psf_fluxsize},
   {"FLUXERR_PSF", "RMS flux error for PSF-fitting",
-	&outobj2.fluxerr_psf, H_FLOAT, T_FLOAT, "%12g", "count"},
+	&outobj2.fluxerr_psf, H_FLOAT, T_FLOAT, "%12g", "count",
+	1, &prefs.psf_fluxerrsize},
   {"MAG_PSF", "Magnitude from PSF-fitting",
-	&outobj2.mag_psf, H_FLOAT, T_FLOAT, "%8.4f", "mag"},
+	&outobj2.mag_psf, H_FLOAT, T_FLOAT, "%8.4f", "mag",
+	1, &prefs.psf_magsize},
   {"MAGERR_PSF", "RMS magnitude error from PSF-fitting",
-	&outobj2.magerr_psf, H_FLOAT, T_FLOAT, "%8.4f", "mag"},
+	&outobj2.magerr_psf, H_FLOAT, T_FLOAT, "%8.4f", "mag",
+	1, &prefs.psf_magsize},
 
   {"NITER_PSF", "Number of iterations for PSF-fitting",
 	&outobj2.niter_psf, H_INT, T_SHORT, "%3d", ""},
@@ -422,6 +479,9 @@ keystruct	objkey[] = {
 	&outobj2.b_pc, H_FLOAT, T_FLOAT, "%8.2f", "pixel"},
   {"THETAPC_IMAGE", "PC position angle (CCW/x)",
 	&outobj2.theta_pc, H_FLOAT, T_FLOAT, "%5.1f", "deg"},
+  {"PC", "Principal components",
+	&outobj2.vector_pc, H_FLOAT, T_FLOAT, "%15e", "",
+	1, &prefs.pc_vectorsize},
 /*
 	{"RETINOUT", T_FLOAT, &outobj.retinout, "%13g "},
 */

@@ -9,7 +9,7 @@
 *
 *	Contents:	Functions related to the management of keys.
 *
-*	Last modify:	28/07/97
+*	Last modify:	13/03/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -192,7 +192,8 @@ OUTPUT	A pointer to the relevant key, or NULL if the desired key is not
 	found in the table.
 NOTES	If key->ptr is not NULL, the function doesn't do anything.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/97
+        E.R. Deul (Sterrewacht Leiden) (Added open_cat error checking)
+VERSION	13/03/99
  ***/
 keystruct *read_key(tabstruct *tab, char *keyname)
 
@@ -200,7 +201,7 @@ keystruct *read_key(tabstruct *tab, char *keyname)
    catstruct	*cat;
    keystruct	*key;
    char		*buf, *ptr, *fptr,*fptr0;
-   int		i,j, larray,narray,nfields,size;
+   int		i,j, larray,narray,size;
 #ifdef BSWAP
    int		esize;
 #endif
@@ -224,11 +225,11 @@ keystruct *read_key(tabstruct *tab, char *keyname)
 
 /*Size and number of lines in the binary table*/
   larray = tab->naxisn[0];
-  nfields= tab->tfields;
   narray = tab->naxisn[1];
 
 /*Positioning to the first element*/
-  open_cat(cat, READ_ONLY);
+  if (open_cat(cat, READ_ONLY) == RETURN_ERROR)
+     error(EXIT_FAILURE, "*Error*: opening catalog ",cat->filename);
   QFSEEK(cat->file, tab->bodypos , SEEK_SET, cat->filename);
 
 /*allocate memory for the buffer where we put one line of data*/
@@ -255,7 +256,6 @@ keystruct *read_key(tabstruct *tab, char *keyname)
     }
 
   free(buf);
-
   return key;
   }
 
@@ -274,7 +274,7 @@ NOTES	The array of pointers pointed by keys is filled with pointers
 	A NULL keynames pointer means read ALL keys belonging to the table.
 	A NULL mask pointer means NO selection for reading.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/97
+VERSION	13/03/99
  ***/
 void	read_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 		BYTE *mask)
@@ -284,7 +284,7 @@ void	read_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
    keystruct	*key, **ckeys;
    BYTE		*mask2;
    char		*buf, *ptr, *fptr;
-   int		i,j,k,n, larray,narray,nfields, nb, kflag = 0, size;
+   int		i,j,k,n, larray,narray, nb, kflag = 0, size;
 #ifdef BSWAP
    int		esize;
 #endif
@@ -302,7 +302,6 @@ void	read_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 
 /*Size and number of lines in the binary table*/
   larray = tab->naxisn[0];
-  nfields= tab->tfields;
   narray = tab->naxisn[1];
 
   nb = 0;
@@ -450,7 +449,7 @@ INPUT	Pointer to the table.
 OUTPUT	RETURN_OK if keys were found, and RETURN_ERROR otherwise.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	20/03/96
+VERSION	13/03/99
  ***/
 int	remove_keys(tabstruct *tab)
 
@@ -460,7 +459,7 @@ int	remove_keys(tabstruct *tab)
   if (!tab->key)
     return RETURN_ERROR;
 
-  for (k=0; k<tab->nkey; k++)
+  for (k=tab->nkey; k--;)
     remove_key(tab, "");
 
   return RETURN_OK;
@@ -553,7 +552,8 @@ keystruct	*pos_to_key(tabstruct *tab, int pos)
 PROTO	void show_keys(tabstruct *tab, char **keynames,
 			keystruct **keys, int nkeys,
 			BYTE *mask, FILE *stream,
-			int strflag, int banflag, int leadflag)
+			int strflag, int banflag, int leadflag, 
+                        output_type o_type)
 PURPOSE	Convert a binary table to an ASCII file.
 INPUT	pointer to the table,
 	pointer to an array of char *,
@@ -564,6 +564,7 @@ INPUT	pointer to the table,
 	a flag to indicate if arrays should be displayed (0=NO),
 	a flag to indicate if a banner with keynames should be added (0=NO).
 	a flag to indicate if a leading row number should be added (0=NO).
+        the output type
 OUTPUT	-.
 NOTES	This is approximately the same code as for read_keys.
 	The array of pointers pointed by keys is filled with pointers
@@ -572,19 +573,46 @@ NOTES	This is approximately the same code as for read_keys.
 	A NULL keynames pointer means read ALL keys belonging to the table.
 	A NULL mask pointer means NO selection for reading.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	28/07/97
+VERSION	13/03/99
  ***/
 void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 		BYTE *mask, FILE *stream,
-		int strflag, int banflag, int leadflag)
+		int strflag, int banflag, int leadflag, output_type o_type)
 
   {
    catstruct	*cat;
    keystruct	*key, **ckeys;
    BYTE		*mask2;
    char		*buf, *rfield, *ptr;
-   int		i,j,k,n,c, larray,narray,nfields, nb, kflag, maxnbytes, nelem,
-		esize;
+   int		i,j,k,n,c, larray,narray, nb, kflag, maxnbytes, nelem,
+		esize, *key_col;
+   typedef struct structreq_keyname
+      {
+      char    oldname[80];         /* Name of the original pipeline key */
+      char    newname[80];         /* Name of the skycat required key   */
+      } req_keynamestruct;
+
+   req_keynamestruct objectmap[] =
+      {
+        {"SeqNr", "id"},
+        {"Ra", "ra"},
+        {"Dec", "dec"},
+        {"MAG_ISO", "Mag"},
+        {"", ""}
+      };
+   req_keynamestruct *map;
+
+   char    skycathead[] = "QueryResult\n\n"
+        "# Config entry for original catalog server:\n"
+        "serv_type: catalog\n"
+        "long_name: ldactoskycat catalog\n"
+        "short_name: ldactoaskycat\n"
+        "symbol: id circle %4.1f\n"
+        "search_cols: mag {Brightest (min)} {Faintest (max)}\n"
+        "# End config entry\n\n";
+
+   char    *t, skycattail[] = "";
+
 
 /* !! It is not necessarily the original table */
   if (tab->key)
@@ -600,7 +628,6 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 
 /* Size and number of lines in the binary table */
   larray = tab->naxisn[0];
-  nfields= tab->tfields;
   narray = tab->naxisn[1];
 
   nb = 0;
@@ -613,8 +640,18 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 
   if (!keynames)
     nkeys = tab->nkey;
-
+  QCALLOC(key_col, int, nkeys);
+  if (keynames) {
+    for (i=0;i<nkeys;i++)
+       if ((t=strchr(keynames[i], ')'))!=NULL) {
+          *t='\0'; 
+          t=strchr(keynames[i], '(');
+          *t='\0'; 
+          key_col[i] = atoi(++t);
+       }
+  }
 /* Allocate memory to store the list of keys to be read */
+  kflag = 0;
   if (!keys)
     {
     QMALLOC(keys, keystruct *, nkeys);
@@ -622,8 +659,16 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
     }
 
   n=1;
-  if (leadflag)
-    fprintf(stream, "# %3d %-15.15s %.47s\n", n++, "(row_pos)", "running row");
+  switch (o_type) {
+  case SHOW_ASCII:
+              if (leadflag)
+                 fprintf(stream, "# %3d %-15.15s %.47s\n", n++, 
+                                 "(row_pos)", "running row");
+              break;
+  case SHOW_SKYCAT:
+              fprintf(stream, skycathead, 6.0);
+              break;
+  }
 
 /* Allocate memory for the arrays */
   maxnbytes = 0;
@@ -633,17 +678,33 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
       {
       if ((key = name_to_key(tab, *(keynames++))))
         {
+        for (map=objectmap; map->oldname[0]&&o_type == SHOW_SKYCAT; map++) {
+            if (strcmp(key->name, map->oldname) == 0) {
+	      strcpy(key->name,  map->newname);
+           }
+        }
         *(ckeys++) = key;
-        if (banflag)
-          {
-          if (*key->unit)
-            fprintf(stream, "# %3d %-15.15s %-47.47s [%s]\n",
-                n, key->name,key->comment, key->unit);
-          else
-            fprintf(stream, "# %3d %-15.15s %.47s\n",
-                n, key->name,key->comment);
-          n += key->nbytes/t_size[key->ttype];
-          }
+        switch (o_type) {
+        case SHOW_ASCII:
+              if (banflag)
+                {
+                if (*key->unit)
+                  fprintf(stream, "# %3d %-19.19s %-47.47s [%s]\n",
+                      n, key->name,key->comment, key->unit);
+                else
+                  fprintf(stream, "# %3d %-19.19s %.47s\n",
+                      n, key->name,key->comment);
+                n += key->nbytes/t_size[key->ttype];
+              }
+              break;
+        case SHOW_SKYCAT:
+              if (key->nbytes/t_size[key->ttype] > 1)
+                 for (j=0;j<key->nbytes/t_size[key->ttype];j++)
+                    fprintf(stream, "%s(%d)\t", key->name,j+1);
+              else
+                    fprintf(stream, "%s\t", key->name);
+              break;
+        }
         if (key->nbytes>maxnbytes)
           maxnbytes = key->nbytes;
         }
@@ -656,31 +717,55 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
     for (i=nkeys; i--; key = key->nextkey)
       if (strflag || key->naxis==0)
         {
-        *(ckeys++) = key;
-        if (banflag)
-          {
-          if (*key->unit)
-            fprintf(stream, "# %3d %-15.15s %-47.47s [%s]\n",
-                n, key->name,key->comment, key->unit);
-          else
-            fprintf(stream, "# %3d %-15.15s %.47s\n",
-                n, key->name,key->comment);
-          n += key->nbytes/t_size[key->ttype];
-          }
-        if (key->nbytes>maxnbytes)
-          maxnbytes = key->nbytes;
+        for (map=objectmap; map->oldname[0]&&o_type == SHOW_SKYCAT; map++) {
+           if (strcmp(key->name, map->oldname) == 0) {
+              strcpy(key->name, map->newname);
+           }
         }
+        *(ckeys++) = key;
+        switch (o_type) {
+        case SHOW_ASCII:
+              if (banflag)
+                {
+                if (*key->unit)
+                  fprintf(stream, "# %3d %-19.19s %-47.47s [%s]\n",
+                      n, key->name,key->comment, key->unit);
+                else
+                  fprintf(stream, "# %3d %-19.19s %.47s\n",
+                      n, key->name,key->comment);
+                n += key->nbytes/t_size[key->ttype];
+                }
+              break;
+         case SHOW_SKYCAT:
+              if (key->nbytes/t_size[key->ttype] > 1)
+                 for (j=0;j<key->nbytes/t_size[key->ttype];j++)
+                    fprintf(stream, "%s(%d)\t", key->name,j+1);
+              else
+                    fprintf(stream, "%s\t", key->name);
+              break;
+         }
+           if (key->nbytes>maxnbytes)
+             maxnbytes = key->nbytes;
+           }
       else
         {
-        if (*key->unit)
-          fprintf(stream, "#     %-15.15s %-47.47s [%s]\n",
-		key->name,key->comment, key->unit);
-        else
-          fprintf(stream, "#     %-15.15s %.47s\n",
-		key->name,key->comment);
+        switch (o_type) {
+        case SHOW_ASCII:
+              if (*key->unit)
+                fprintf(stream, "#     %-19.19s %-47.47s [%s]\n",
+	            	key->name,key->comment, key->unit);
+              else
+                fprintf(stream, "#     %-19.19s %.47s\n",
+            		key->name,key->comment);
+              break;
+        case SHOW_SKYCAT:
+              break;
+        }
         *(ckeys++) = NULL;
         }
     }
+   if (o_type == SHOW_SKYCAT)
+      fprintf(stream, "\n------------------\n");
 
 /* Allocate memory for the buffer where we put one line of data */
   QMALLOC(buf, char, larray);
@@ -707,7 +792,7 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
         if (k)
           putc(' ', stream);
         }
-      for (k=nkeys; k--;)
+      for (k=0; k<nkeys; k++)
         {
         if ((key = *(ckeys++)) && (strflag || key->naxis==0))
           {
@@ -720,62 +805,114 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
           switch(key->ttype)
             {
             case T_SHORT:
-              for (j = nelem; j--; ptr += esize)
+              for (j = 0; j<nelem; j++, ptr += esize)
                 {
-                fprintf(stream, *key->printf?key->printf:"%d",
-				*(short *)ptr);
-                if (j)
-                  putc(' ', stream);
+                if (key_col[k] == 0 || key_col[k] == j+1) {
+                   fprintf(stream, *key->printf?key->printf:"%d",
+		   		*(short *)ptr);
+                   if (j < nelem-1) {
+                      switch (o_type) {
+                      case SHOW_ASCII:
+                         putc(' ', stream);
+                         break;
+                      case SHOW_SKYCAT:
+                         putc('\t', stream);
+                         break;
+                      }
+                      }
+                   }
                 }
               break;
 
             case T_LONG:
-              for (j = nelem; j--; ptr += esize)
+              for (j = 0; j<nelem; j++,ptr += esize)
                 {
-                fprintf(stream, *key->printf?key->printf:"%d",
-				*(int *)ptr);
-                if (j)
-                  putc(' ', stream);
+                if (key_col[k] == 0 || key_col[k] == j+1) {
+                   fprintf(stream, *key->printf?key->printf:"%d",
+		         		*(int *)ptr);
+                   if (j < nelem-1) {
+                      switch (o_type) {
+                      case SHOW_ASCII:
+                         putc(' ', stream);
+                         break;
+                      case SHOW_SKYCAT:
+                         putc('\t', stream);
+                         break;
+                      }
+                      }
+                   }
                 }
               break;
 
             case T_FLOAT:
-              for (j = nelem; j--; ptr += esize)
+              for (j = 0; j<nelem; j++,ptr += esize)
                 {
-                fprintf(stream, *key->printf?key->printf:"%g",
+                if (key_col[k] == 0 || key_col[k] == j+1) {
+                    fprintf(stream, *key->printf?key->printf:"%g",
 			*(float *)ptr);
-                if (j)
-                  putc(' ', stream);
+                   if (j < nelem-1) {
+                       switch (o_type) {
+                       case SHOW_ASCII:
+                          putc(' ', stream);
+                          break;
+                       case SHOW_SKYCAT:
+                          putc('\t', stream);
+                          break;
+                       }
+                       }
+                   }
                 }
               break;
 
             case T_DOUBLE:
-              for (j = nelem; j--; ptr += esize)
+              for (j = 0; j<nelem; j++,ptr += esize)
                 {
-                fprintf(stream, *key->printf?key->printf:"%f",
+                if (key_col[k] == 0 || key_col[k] == j+1) {
+                   fprintf(stream, *key->printf?key->printf:"%f",
 			*(double *)ptr);
-                if (j)
-                  putc(' ', stream);
+                   if (j < nelem-1) {
+                      switch (o_type) {
+                      case SHOW_ASCII:
+                         putc(' ', stream);
+                         break;
+                      case SHOW_SKYCAT:
+                         putc('\t', stream);
+                         break;
+                      }
+                      }
+                   }
                 }
               break;
 
             case T_BYTE:
               if (key->htype==H_BOOL)
-                for (j = nelem; j--; ptr += esize)
-                  {
-                  if (*(char *)ptr)
-                    fprintf(stream, "T");
-                  else
-                    fprintf(stream, "F");
-                  }
+                 for (j = 0; j<nelem; j++,ptr += esize)
+                   {
+                   if (key_col[k] == 0 || key_col[k] == j+1) {
+                      if (*(char *)ptr)
+                        fprintf(stream, "T");
+                      else
+                        fprintf(stream, "F");
+                      }
+                   }
               else
-                for (j = nelem; j--; ptr += esize)
-                  {
-                  fprintf(stream, *key->printf?key->printf:"%d",
+                for (j = 0; j<nelem; j++,ptr += esize)
+                   {
+                   if (key_col[k] == 0 || key_col[k] == j+1) {
+                     fprintf(stream, *key->printf?key->printf:"%d",
 			(int)*((unsigned char *)ptr));
-                  if (j)
-                    putc(' ', stream);
-                  }
+                   if (j) {
+                      switch (o_type) {
+                      case SHOW_ASCII:
+                         putc(' ', stream);
+                         break;
+                      case SHOW_SKYCAT:
+                         putc('\t', stream);
+                         break;
+                      }
+                      }
+                    }
+                 }
               break;
 
             case T_STRING:
@@ -788,18 +925,27 @@ void	show_keys(tabstruct *tab, char **keynames, keystruct **keys, int nkeys,
 			"show_keys()");
             break;
             }
-          if (k)
-            putc(' ', stream);
+          if (k < nkeys - 1) {
+                   switch (o_type) {
+                   case SHOW_ASCII:
+                      putc(' ', stream);
+                      break;
+                   case SHOW_SKYCAT:
+                      putc('\t', stream);
+                      break;
+                   }
+                   }
           }
         }
       putc('\n', stream);
       }
     }
-
+  free(key_col);
   free(buf);
   if (kflag)
     free(keys);
-
+  if (o_type == SHOW_SKYCAT) 
+     fprintf(stream, skycattail);
   return;
   }
 

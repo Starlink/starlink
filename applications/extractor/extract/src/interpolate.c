@@ -9,7 +9,7 @@
 *
 *	Contents:	Interpolation of input data.
 *
-*	Last modify:	29/04/98
+*	Last modify:	05/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -34,7 +34,7 @@ void    init_interpolate(picstruct *field, int xtimeout, int ytimeout)
   if (ytimeout>=0)
     {
     QMALLOC(field->interp_ytimeoutbuf, int, field->width);
-    memset(field->interp_ytimeoutbuf, 0, field->width*sizeof(int));
+    memset(field->interp_ytimeoutbuf, 0, (size_t)(field->width*sizeof(int)));
     }
 
   field->interp_xtimeout = xtimeout;

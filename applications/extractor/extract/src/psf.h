@@ -9,18 +9,19 @@
 *
 *	Contents:	Include file for psffit.c.
 *
-*	Last modify:	13/01/99
+*	Last modify:	11/11/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
 /*----------------------------- Internal constants --------------------------*/
 
-#define	PSF_MAXSHIFT	3.0	/* Max shift from initial guess (pixels)*/
+#define	PSF_MAXSHIFT	20.0	/* Max shift from initial guess (pixels)*/
 #define	PSF_MINSHIFT	1e-3	/* Min shift from previous guess (pixels)*/
-#define PSF_NPSF	1	/* Number of fitted components */
 #define PSF_NITER	20	/* Maximum number of iterations in fit */
-#define PSF_NA		(3*PSF_NPSF)	/* Number of fitted parameters */
+#define PSF_NA		3	/* Number of fitted parameters per component */
+#define PSF_NTOT	(PSF_NA*PSF_NPSFMAX) /* Number of fitted parameters */
+#define	PC_NITER	1	/* Maximum number of iterations in PC fit */
 
 /* NOTES:
 One must have:	PSF_MAXSHIFT > 0.0
@@ -29,6 +30,15 @@ One must have:	PSF_MAXSHIFT > 0.0
 */
 
 /*--------------------------- structure definitions -------------------------*/
+
+typedef struct code
+  {
+  float		*pc;
+  float		**param;
+  int		*parammod;
+  int		ncode;
+  int		nparam;
+  }		codestruct;
 
 typedef struct pc
   {
@@ -46,6 +56,7 @@ typedef struct pc
   double	*mx2,*my2,*mxy;	/* 2nd order moments for each component */
   double	*flux;		/* Flux of each component */
   double	*bt;		/* B/T for each component */
+  codestruct	*code;
   }	pcstruct;
 
 typedef struct
@@ -67,16 +78,23 @@ typedef struct
   float		pixstep;	/* PSF sampling step */
   }	psfstruct;
 
+typedef struct
+  {
+  int		niter;		/* Number of iterations required */
+  int		npsf;		/* Number of fitted stars for this detection */
+  float		*x,*y;		/* Position derived from the PSF-fitting */
+  float		*flux;		/* Flux derived from the PSF-fitting */
+  }	psfitstruct;
+
 /*----------------------------- Global variables ----------------------------*/
 psfstruct	*thepsf;
+psfitstruct	*thepsfit;
 PIXTYPE		*checkmask;
 
 /*-------------------------------- functions --------------------------------*/
 extern void	psf_build(psfstruct *psf),
 		psf_end(psfstruct *psf),
 		psf_init(psfstruct *psf),
-		psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
-		objstruct *obj),
 		svdfit(double *a, double *b, int m, int n, double *sol,
 			double *vmat, double *wmat),
 		svdvar(double *vmat, double *wmat, int n, double *covmat);
@@ -86,7 +104,9 @@ extern psfstruct	*psf_load(char *filename);
 extern void	pc_end(pcstruct *pc),
 		pc_fit(psfstruct *psf, double *data, double *weight,
 		int width, int height, int ix, int iy, double dx, double dy,
-		int npc),
+		int npc, float backrms),
+		psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
+		objstruct *obj),
 		psf_readcontext(psfstruct *psf, picstruct *field);
 
 extern pcstruct	*pc_load(catstruct *cat);

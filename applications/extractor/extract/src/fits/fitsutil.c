@@ -9,7 +9,7 @@
 *
 *	Contents:	functions for handling FITS keywords.
 *
-*	Last modify:	23/07/98
+*	Last modify:	30/09/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -231,7 +231,7 @@ INPUT	pointer to the FITS buffer,
 OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	The buffer MUST contain the ``END     '' keyword.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	02/05/98
+VERSION	29/09/99
  ***/
 int	fitsread(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 		t_type ttype)
@@ -270,8 +270,12 @@ int	fitsread(char *fitsbuf, char *keyword, void *ptr, h_type htype,
     case H_STRING:	st = ptr;
 			st2= str+10;
 			for (i=70; i-- && *(st2++)!=(char)'\'';);
-			while (i-->0 && *st2!=(char)'\'')
+			while (i-->0)
+			  {
+			  if (*st2 == '\'' && *(++st2) != '\'')
+			    break;
 			  *(st++) = *(st2++);
+			  }
 			do
 			  {
 			  *(st--) = (char)'\0';
@@ -303,17 +307,19 @@ OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	'?' wildcard allowed;
 	Don't remove the ``END'' keyword with this!!!
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	15/02/96
+VERSION	08/04/99
  ***/
 
 int	fitsremove(char *fitsbuf, char *keyword)
 
   {
-   int     endpos,pos, n;
+   char	*cp1,*cp2;
+   int	endpos,pos, i,n;
 
   endpos = fitsfind(fitsbuf, "END     ");
   for (n=0; (pos = fitsfind(fitsbuf, keyword))>=0; n++, endpos--)
-    memcpy(fitsbuf+80*pos, fitsbuf+80*(pos+1), 80*(endpos - pos));
+    for (cp1=fitsbuf+80*(pos+1), cp2=fitsbuf+80*pos, i=80*(endpos - pos); i--;)
+      *(cp2++) = *(cp1++);
 
   if (!n)  
     return RETURN_ERROR;
@@ -337,7 +343,7 @@ OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	The buffer MUST contain the ``END     '' keyword.
 	The keyword must already exist in the buffer (use fitsadd()).
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	23/07/98
+VERSION	29/09/99
  ***/
 int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 		t_type ttype)
@@ -345,7 +351,8 @@ int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
   {
    int		i, l, pos, posoff, flag;
    static char	str[81],str2[81];
-   char		*cstr;
+   char		*cstr, *cstr1,*cstr2,
+		c;
 
   if ((pos = fitsfind(fitsbuf, keyword)) < 0)
     return RETURN_ERROR;
@@ -371,15 +378,26 @@ int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 			  sprintf(str, "                   F");
 			break;
 
-    case H_STRING:	if (strlen(ptr)<=18)
+    case H_STRING:	/* Handle the famous quote */
+			cstr1 = (char *)ptr;
+			cstr2 = str2;
+			for (i=0; i<80; i++)
+			  if (!(c=*(cstr2++) = *(cstr1++)))
+			    break;
+			  else if (c == '\'')
+			    {
+			    *(cstr2++) = '\'';
+			    i++;
+			    }
+			if (strlen(str2)<=18)
 			  {
-			  sprintf(str, "'%-18.18s ", (char *)ptr);
+			  sprintf(str, "'%-18.18s ", str2);
 			  cstr = str+18;
 			  i = 10;
 			  }
 			else
 			  {
-			  sprintf(str, "'%-68.68s ", (char *)ptr);
+			  sprintf(str, "'%-68.68s ", str2);
 			  cstr = str+68;
 			  i = 60;
 			  }

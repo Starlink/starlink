@@ -112,7 +112,7 @@ int	read_field(tabstruct *tab, char **keynames, keystruct **keys,
      key = fkey;
   }
 
-  if (ftab)
+  if (ftab) 
     nb = narray = ((int *)key->ptr)[field-1];
   else
     nb = DEFAULT_NUMBER;	/* Some value to start with */
@@ -193,13 +193,13 @@ int	read_field(tabstruct *tab, char **keynames, keystruct **keys,
 			/* milder progression if necessary */
         ckeys = keys;
         for (j=nkeys; j--;)
-          if (key = *(ckeys++))
+          if ((key = *(ckeys++)))
             QREALLOC(key->ptr, char, key->nbytes*nb);
         }
 
       ckeys = keys;
       for (k=nkeys; k--;)
-        if (key = *(ckeys++))
+        if ((key = *(ckeys++)))
           {
           fptr = buf+key->pos;
           ptr = (char *)key->ptr+n*(size=key->nbytes);
@@ -223,12 +223,12 @@ int	read_field(tabstruct *tab, char **keynames, keystruct **keys,
     warning(mess, cat->filename);
     ckeys = keys;
     for (i=nkeys; i--;)
-      if (key = *(ckeys++))
+      if ((key = *(ckeys++)))
         QFREE(key->ptr);
     }
   else {
     for (i=nkeys; i--;)
-      if (key = *(ckeys++))
+      if ((key = *(ckeys++)))
         QREALLOC(key->ptr, char, key->nbytes*n);
     }
   free(buf);

@@ -9,7 +9,7 @@
 *
 *	Contents:	functions for converting LDAC FITS catalogs.
 *
-*	Last modify:	28/11/98
+*	Last modify:	13/03/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -34,7 +34,7 @@ OUTPUT	RETURN_OK if the ASCII table was transformed, and RETURN_ERROR
 NOTES	This function can be used to stick the binary translation of
         similar ASCII tables.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	28/11/98
+VERSION	13/03/99
  ***/
 tabstruct *asc2bin_tab(catstruct *catin, char *tabinname, catstruct *catout,
 		char *taboutname)
@@ -78,7 +78,7 @@ tabstruct *asc2bin_tab(catstruct *catin, char *tabinname, catstruct *catout,
       strncpy(line, lptr, 80);
       line[80] = '\0';
       QFPRINTF(OUTPUT, line);
-      error(EXIT_FAILURE, "*Error*: incorrect FITS field in ",
+      warning("*Warning*: incorrect FITS field will be ignored in ",
 	tabcat->filename);
     }
     if (htype != H_COMMENT)

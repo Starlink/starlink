@@ -10,7 +10,7 @@
 *	Contents:	functions that remove spurious detections from the
 *			catalog
 *
-*	Last modify:	28/11/98
+*	Last modify:	06/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -31,5 +31,6 @@ extern void	addcleanobj(objstruct *),
 		initclean(void),
 		subcleanobj(int);
 
-extern int	clean(int, objliststruct *);
+extern int	clean(picstruct *field, picstruct *dfield,
+			int, objliststruct *);
 

@@ -9,7 +9,7 @@
 *
 *	Contents:	Stuff related to Principal Component Analysis (PCA).
 *
-*	Last modify:	18/12/98
+*	Last modify:	06/09/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -34,13 +34,15 @@ INPUT   pcstruct pointer.
 OUTPUT  -.
 NOTES   -.
 AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 28/08/98
+VERSION 15/07/99
  ***/
 void	pc_end(pcstruct *pc)
   {
+   int	i;
 
   free(pc->maskcomp);
   free(pc->omaskcomp);
+  free(pc->omasksize);
   free(pc->maskcurr);
   free(pc->masksize);
   free(pc->mx2);
@@ -48,6 +50,14 @@ void	pc_end(pcstruct *pc)
   free(pc->mxy);
   free(pc->flux);
   free(pc->bt);
+  if (pc->code)
+    {
+    free(pc->code->pc);
+    for (i=0; i<pc->code->nparam;i++)
+      free(pc->code->param[i]);
+    free(pc->code->param);
+    free(pc->code);
+    }
   free(pc);
 
   return;
@@ -63,8 +73,9 @@ pcstruct	*pc_load(catstruct *cat)
    pcstruct	*pc;
    tabstruct	*tab;
    keystruct	*key;
+   codestruct	*code;
    char		*head, str[80], *ci, *filename;
-   int		i;
+   int		i, ncode,nparam;
 
   if (!(tab = name_to_tab(cat, "PC_DATA", 0)))
     return NULL;
@@ -103,6 +114,10 @@ pcstruct	*pc_load(catstruct *cat)
 
   pc->npc = pc->masksize[pc->maskdim-1];
 
+  ncode = 0;
+  fitsread(head, "NCODE", &ncode, H_INT, T_LONG);
+  fitsread(head, "NCODEPAR", &nparam, H_INT, T_LONG);
+
 /* Load the PC mask data */
   key = read_key(tab, "PC_CONVMASK");
   pc->maskcomp = key->ptr;
@@ -130,6 +145,26 @@ pcstruct	*pc_load(catstruct *cat)
   key = read_key(tab, "PC_BRATIO");
   pc->bt = key->ptr;
 
+  if (ncode)
+    {
+    QMALLOC(pc->code, codestruct, 1);
+    code = pc->code;
+    QMALLOC(code->param, float *, nparam);
+    QMALLOC(code->parammod, int, nparam);
+    code->ncode = ncode;
+    code->nparam = nparam;
+    key = read_key(tab, "CODE_PC");
+    code->pc = (float *)key->ptr;
+    for (i=0; i<nparam; i++)
+      {
+      sprintf(str, "CODE_P%d", i+1);
+      key = read_key(tab, str);
+      code->param[i] = (float *)key->ptr;
+      sprintf(str, "CODE_M%d", i+1);
+      fitsread(head, str, &code->parammod[i], H_INT, T_LONG);
+      }
+    }
+
   QMALLOC(pc->maskcurr, double, pc->masksize[0]*pc->masksize[1]*pc->npc);
 
 /* But don't touch my arrays!! */
@@ -148,17 +183,21 @@ Fit the PC data to the current data.
 */
 void	pc_fit(psfstruct *psf, double *data, double *weight,
 		int width, int height,int ix, int iy,
-		double dx, double dy, int npc)
+		double dx, double dy, int npc, float backrms)
   {
    pcstruct	*pc;
    checkstruct	*check;
+   codestruct	*code;
    double	*basis,*basis0, *cpix,*cpix0, *pcshift,*wpcshift,
-		*spix,*wspix, *w,
-		*vmat, *wmat, *sol,*solt, *cxm2,*cym2,*cxym,*cflux,
-		val, xm2,ym2,xym,flux, temp,temp2, theta, pmx2,pmy2;
-   float	*ppix, *ospix,
-		pixstep;
-   int		c,n,p, npix,npix2, ncoeff;
+		*spix,*wspix, *w, *sumopc,*sumopct, *sumwspix, *checkbuf,
+		*sol,*solt, *cxm2,*cym2,*cxym,*cflux, *datat,
+		*mx2t, *my2t, *mxyt,
+		val,val2, xm2,ym2,xym,flux, temp,temp2, theta, pmx2,pmy2,
+		wnorm, ellip, norm, snorm;
+   float	**param, *ppix, *ospix, *cpc,*cpc2, *fparam,
+		pixstep, fval, fvalmax, fscale, dparam;
+   int		*parammod,
+		i,c,n,p, npix,npix2,nopix, ncoeff, nparam, nmax,nmax2, ncode;
 
   pc = psf->pc;
 /* Build the "local PCs", using the basis func. coeffs computed in psf_fit() */
@@ -176,7 +215,7 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
   cpix0 = pc->maskcurr;
   ppix = pc->maskcomp;
 
-/* Sum each component */
+/* Sum each (PSF-dependent) component */
   for (c=npc; c--; cpix0 += npix)
     {
     basis = basis0;
@@ -192,8 +231,6 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
 /* Allocate memory for temporary buffers */
   QMALLOC(pcshift, double, npix2*npc);
   QMALLOC(wpcshift, double, npix2*npc);
-  QMALLOC(vmat, double, npc*npc);
-  QMALLOC(wmat, double, npc);
   QMALLOC(sol, double, npc);
 
 /* Now shift and scale to the right position, and weight the PCs */
@@ -209,30 +246,147 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
       *(wspix++) = *(spix++)**(w++);
     }
 
-  svdfit(wpcshift, data, npix2, npc, sol, vmat, wmat);
+/* Compute the weight normalization */
+  wnorm = 0.0;
+  w = weight;
+  for (p=npix2; p--;)
+    {
+    val = *(w++);
+    wnorm += val*val;
+    }
+
+/* Scalar product of data and (approximately orthogonal) basis functions */
+  wspix = wpcshift;
+  solt = sol;
+  snorm = 0.0;
+  for (c=npc; c--;)
+    {
+    datat = data;
+    val = 0.0;
+    for (p=npix2; p--;)    
+      val += *(datat++)**(wspix++);
+    val2 = *(solt++) = val*npix2/wnorm;
+    snorm += val2*val2;
+    }
+
+
+/* Normalize solution vector */
+  snorm = sqrt(snorm);
+  solt = sol;
+  for (c=npc; c--;)
+    *(solt++) /= snorm;
+
+  if (code = pc->code)
+    {
+    ncode = code->ncode;
+/*-- Codebook search */
+    cpc = code->pc;
+    fvalmax = -BIG;
+    nmax = 0;
+    for (n=ncode; n--;)
+      {
+      fval = 0.0;
+      solt = sol;
+      for (p=npc; p--;)
+        fval += *(solt++)**(cpc++);
+      if (fval>fvalmax)
+        {
+        fvalmax = fval;
+        nmax = n;
+        }
+      }
+    nmax = ncode - 1 - nmax;
+
+/*-- Interpolation */
+    param = code->param;
+    parammod = code->parammod;
+    nparam = code->nparam;
+    QMALLOC(fparam, float, nparam);
+    for (p=0; p<nparam; p++)
+      {
+      dparam = 0.0;
+      if (parammod[p])
+        {
+        val2 = 0.0;
+        if ((nmax2 = nmax+parammod[p]) < ncode)
+          {
+          cpc = code->pc+npc*nmax;
+          cpc2 = code->pc+npc*nmax2;
+          solt = sol;
+          norm = 0.0;
+          for (c=npc; c--;)
+            {
+            val = *(cpc2++)-*cpc;
+            val2 += val*(*(solt++) - *(cpc++));
+            norm += val*val;
+            }
+          if (norm>0.0)
+            dparam = val2/norm*(param[p][nmax2]-param[p][nmax]);
+          else
+            val2 = 0.0;
+          }
+/*------ If dot product negative of something went wrong, try other side */
+        if (val2<=0.0 && (nmax2 = nmax-parammod[p]) >= 0)
+          {
+          cpc = code->pc+npc*nmax;
+          cpc2 = code->pc+npc*nmax2;
+          solt = sol;
+          norm = val2 = 0.0;
+          for (c=npc; c--;)
+            {
+            val = *(cpc2++)-*cpc;
+            val2 += val*(*(solt++) - *(cpc++));
+            norm += val*val;
+            }          
+          if (norm>0.0)
+            dparam = val2/norm*(param[p][nmax2]-param[p][nmax]);
+          }
+        fparam[p] = param[p][nmax] + dparam;
+        }
+      }
+
+    solt = sol;
+    cpc = code->pc+npc*nmax;
+    fscale = fvalmax*code->param[0][nmax]*snorm;
+    for (p=npc; p--;)
+      *(solt++) = fscale**(cpc++);
+
+/*-- Copy the derived physical quantities to output parameters */
+/*-- (subject to changes) */
+    obj2->flux_galfit = fscale;
+    obj2->gdposang = fparam[1];
+    if (obj2->gdposang>90.0)
+      obj2->gdposang -= 180.0;
+    else if (obj2->gdposang<-90.0)
+      obj2->gdposang += 180.0;
+    obj2->gdscale = fparam[2];
+    obj2->gdaspect = fparam[3];
+    ellip = (1.0 - obj2->gdaspect)/(1.0 + obj2->gdaspect);
+    obj2->gde1 = (float)(ellip*cos(2*obj2->gdposang*PI/180.0));
+    obj2->gde2 = (float)(ellip*sin(2*obj2->gdposang*PI/180.0));
+/*---- Copy the best-fitting PCs to the VECTOR_PC output vector */
+    if (FLAG(obj2.vector_pc))
+      {
+      solt = sol;
+      ppix = obj2->vector_pc;
+      for (c=prefs.pc_vectorsize>npc?npc:prefs.pc_vectorsize; c--;)
+        *(ppix++) = *(solt++);
+      }
+
+    free(fparam);
+    }
 
   xm2 = ym2 = xym = flux = 0.0;
-  cxm2 = pc->mx2;
-  cym2 = pc->my2;
-  cxym = pc->mxy;
-  cflux = pc->flux;
   solt = sol;
+  mx2t = pc->mx2;
+  my2t = pc->my2;
+  mxyt = pc->mxy;
   for (c=npc; c--;)
     {
     val = *(solt++);
-    xm2 += val**(cxm2++);
-    ym2 += val**(cym2++);
-    xym += val**(cxym++);
-    flux += val**(cflux++);
-    }
-
-  if (flux==0.0)
-    xm2 = ym2 = xym = 0.0;
-  else
-    {
-    xm2 /= flux;
-    ym2 /= flux;
-    xym /= flux;
+    xm2 += val**(mx2t++);
+    ym2 += val**(my2t++);
+    xym += val**(mxyt++);
     }
 
   obj2->mx2_pc = xm2;
@@ -265,11 +419,9 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
     }
 
 /* CHECK-Images */
-  if (prefs.check[CHECK_SUBPCPROTOS] || prefs.check[CHECK_PCPROTOS]
-	|| prefs.check[CHECK_PCOPROTOS])
+  if (prefs.check[CHECK_SUBPCPROTOS] || prefs.check[CHECK_PCPROTOS])
     {
     spix = pcshift;
-    ospix = pc->omaskcomp;
     solt = sol;
     for (c=npc; c--; solt++)
       {
@@ -279,27 +431,38 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
       if (check = prefs.check[CHECK_SUBPCPROTOS])
         addcheck(check, checkmask, width,height, ix,iy, -*solt);
       if (check = prefs.check[CHECK_PCPROTOS])
-/*
         addcheck(check, checkmask, width,height, ix,iy, *solt);
-*/
-	{
-        addcheck(check, ospix, pc->omasksize[0],pc->omasksize[1],ix,iy, *solt);
-        ospix += pc->omasksize[0]*pc->omasksize[1];
-	}
-      if (check = prefs.check[CHECK_PCOPROTOS])
-        {
-        addcheck(check, checkmask, width,height, ix,iy, -*solt);
-        addcheck(check, ospix, pc->omasksize[0],pc->omasksize[1],ix,iy, *solt);
-        ospix += pc->omasksize[0]*pc->omasksize[1];
-        }
       }
+    }
+  if (check = prefs.check[CHECK_PCOPROTOS])
+    {
+/*- Reconstruct the unconvolved profile */
+    nopix = pc->omasksize[0]*pc->omasksize[1];
+    QCALLOC(sumopc, double, nopix);
+    solt = sol;
+    ospix = pc->omaskcomp;
+    for (c=npc; c--;)
+      {
+      val = *(solt++);
+      sumopct = sumopc;
+      for (p=nopix; p--;)
+        *(sumopct++) += val*(double)*(ospix++);
+      }
+    QMALLOC(checkbuf, double, npix2);
+    vignet_resample(sumopc, pc->omasksize[0], pc->omasksize[1],
+		checkbuf, width, height, -dx, -dy, pixstep);
+    ppix = checkmask;
+    spix = checkbuf;
+    for (p=npix2; p--;)
+      *(ppix++) = (PIXTYPE)*(spix++);
+    addcheck(check, checkmask, width,height, ix,iy, 1.0);
+    free(checkbuf);
+    free(sumopc);
     }
 
 /* Free memory */
   free(pcshift);
   free(wpcshift);
-  free(vmat);
-  free(wmat);
   free(sol);
 
   return;

@@ -135,3 +135,4 @@ typedef	int		LONG;			/* for DEC-Alpha... */
 			keyname); \
 	 dest = key->ptr;}
 
+#define MIN(a,b) (a<b?a:b)
