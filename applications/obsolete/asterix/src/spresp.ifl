@@ -10,6 +10,14 @@ INTERFACE SPRESP
     HELP        'Can be 2D, 3D or an event dataset'
   ENDPARAMETER
 
+  PARAMETER ROLL
+    TYPE '_REAL'
+    DEFAULT 0.0
+    PPATH 'CURRENT'
+    VPATH 'PROMPT,DEFAULT'
+    HELP 'Use HTRACE to find ROLL ANGLE value in data file header'
+  ENDPARAMETER
+
   PARAMETER RADIAL
     TYPE        '_LOGICAL'
     DEFAULT     Y

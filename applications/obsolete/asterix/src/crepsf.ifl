@@ -93,5 +93,12 @@ INTERFACE CREPSF
       HELP 'Reduce weights of large pen. depths to allow for events lost behind bars'
    ENDPARAMETER
 
+  PARAMETER ROLL
+    TYPE '_REAL'
+    DEFAULT 0.0
+    PPATH 'CURRENT'
+    VPATH 'PROMPT,DEFAULT'
+    HELP 'Use HTRACE on data file header'
+  ENDPARAMETER
 
 endinterface

@@ -8,6 +8,14 @@ INTERFACE IMSIM
     PROMPT 'Name of output image dataset(s)'
   ENDPARAMETER
 
+  PARAMETER ROLL
+    TYPE '_REAL'
+    DEFAULT 0.0
+    PPATH 'CURRENT'
+    VPATH 'PROMPT,DEFAULT'
+    HELP 'Use HTRACE to find ROLL ANGLE value in data file header'
+  ENDPARAMETER
+
   PARAMETER PIXSIZE
     TYPE '_REAL'
     DEFAULT 1

@@ -20,6 +20,21 @@ INTERFACE PSS
     HELP 'A filename, a real value, or ! for none'
   ENDPARAMETER
 
+  PARAMETER DEBUG
+    TYPE '_LOGICAL'
+    DEFAULT N
+    PPATH 'CURRENT'
+    VPATH 'DEFAULT,PROMPT'
+  ENDPARAMETER
+
+  PARAMETER ROLL
+    TYPE '_REAL'
+    DEFAULT 0.0
+    PPATH 'CURRENT'
+    VPATH 'PROMPT,DEFAULT'
+    HELP 'Use HTRACE to find ROLL ANGLE value in data file header'
+  ENDPARAMETER
+
   PARAMETER OUT
     TYPE 'LITERAL'
     ASSOCIATION '->GLOBAL.SSDS'
@@ -325,6 +340,7 @@ INTERFACE PSS
     TYPE '_CHAR'
     VPATH 'PROMPT'
     PPATH 'DYNAMIC,DEFAULT'
+    DEFAULT AXAF_MARX
     PROMPT 'Choose PSF to use for source model'
     HELP 'Enter one of the capitalised names above'
   ENDPARAMETER
