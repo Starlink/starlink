@@ -1706,6 +1706,109 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
 
       </subsect>
 
+      <subsect id="fortran" export="export">
+        <subhead>
+          <title>Preprocessable Fortran</title>
+        </subhead>
+
+        <p>The Starlink build system includes support for
+          preprocessable Fortran, in both autoconf and automake.</p>
+
+        <p>As described in <ref id="gnutools"/>, the installed version
+          of autoconf is extended with support for preprocessable
+          Fortran, by adding the two macros <code>AC_PROG_FC</code> and
+          <code>AC_PROG_FPP</code>.</p>
+
+        <p>You should use <code>AC_PROG_FC</code> in preference to the
+          macro <code>AC_PROG_F77</code> described in the autoconf
+          manual, since the `FC' support in autoconf is more flexible
+          and more developed than the `F77' support, and the
+          older macro is likely to be deprecated in coming autoconf
+          releases.  However a potential problem with the
+          <code>AC_PROG_FC</code> macro is that it searches for Fortran
+          9x compilers before Fortran 77 ones.  Fortran 9x incorporates
+          all of <em>strict</em> Fortran 77 as a subset, but no more, so
+          if you have used any of the common Fortran extensions (which
+          is sometimes unavoidable), you might find the Fortran compiler
+          objecting.  In this case, you should use the second optional
+          argument to <code>AC_PROG_FC</code> to specify Fortran 77 as
+          the required dialect:
+          <verbatim>
+AC_PROG_FC([], 77)
+</verbatim>
+          See <ref id="macro-ac-prog-fc"/> for full details.</p>
+
+        <p>Unlike C, there is no preprocessor defined as part of the
+          Fortran standard, and this is inconvenient if you wish to
+          use a Fortran extension if it is available, but not have the
+          compilation fail if it is absent.  This most commonly
+          applies to the <code>READONLY</code> keyword on the Fortran
+          <code>OPEN</code> statement.  It is possible to use the C
+          preprocessor, <em>cpp</em>, with Fortran, though not
+          completely reliably, since the underlying syntaxes of C and
+          Fortran are so different that <em>cpp</em> is capable of
+          emitting invalid Fortran in some circumstances.</p>
+
+        <p>Both the Sun and GNU Fortran compilers can handle cpp-style
+          preprocessor constructs in a Fortran file, avoiding any
+          separate preprocessing stage.  Sun have produced a Fortran
+          preprocessor, <em>fpp</em>, which is available at
+          <url>http://www.netlib.org/fortran/</url>: it's freely
+          available, but not open-source.  And more often than not we
+          can in fact fall back on simple <em>cpp</em>, as long as we have
+          confined ourselves to the <code>#include</code>,
+          <code>#define</code> and <code>#if...</code> constructs.  If
+          it comes to that, such simple preprocessing could be mostly
+          handled with a simple Perl script.</p>
+
+        <p>Starlink autoconf and automake between them add support for
+          preprocessable Fortran.  Autoconf supplies the
+          <code>AC_PROG_FPP</code> macro described in <ref
+            id="macro-ac-prog-fpp"/>, to investigate what compiler and
+          preprocessor are available, and automake works with the
+          results of that test to add appropriate support to the
+          generated <code>Makefile.in</code>.</p>
+
+        <p>For example, you might have in your
+          <code>configure.ac</code> file the lines
+          <verbatim>
+AC_PROG_FC
+AC_PROG_FPP
+STAR_HAVE_FC_OPEN_READONLY
+</verbatim>
+          and have in your <code>my_io.fpp</code> the lines
+          <verbatim>
+#include &lt;config.h&gt;
+      SUBROUTINE MYIO(...)
+
+* blah...
+
+      OPEN ( UNIT = LUCON, FILE = IFCNAM, STATUS = 'OLD',
+#ifdef HAVE_FC_OPEN_READONLY
+     :       READONLY, 
+#endif
+     :       FORM = 'UNFORMATTED', IOSTAT = ISTAT )
+</verbatim></p>
+
+        <p>The file <code>my_io.fpp</code> is listed in the
+          <code>Makefile.am</code> as one of the <code>_SOURCES</code> of
+          whatever library or application it contributes to, alongside
+          the other Fortran files.  If the compiler discovered by
+          the <code>./configure</code> script can support preprocessor
+          statements itself, then the <code>.fpp</code> file is
+          treated like any other; if not, and a separate preprocessing
+          stage is required, then the Makefile handles this
+          itself.</p>
+
+        <p>Note that we are using <code>.fpp</code> here as the file
+          extension for preprocessable Fortran.  The extension
+          <code>.F</code> is more common, but causes problems on
+          case-insensitive filesystems, such as the default HFS+ on
+          MacOS X, and Windows filesystems, since it is
+          indistinguishable from plain <code>.f</code>.</p>
+
+      </subsect>
+
     </sect>
 
     <sect id="building" export="export">
@@ -2786,9 +2889,108 @@ M Makefile.dependencies
           maintainer to have the documentation changed, and the
           behaviour thus fixed.</p>
 
+        <subsect id="macro-ac-prog-fc" export="export">
+          <subhead>
+            <title>AC_PROG_FC</title>
+          </subhead>
+
+          <p><strong><code>AC_PROG_FC([COMPILERS...], [DIALECT])</code></strong></p>
+
+          <p><code>[COMPILERS...]</code> is a list of specific
+            compilers you want it to try, so you could give it
+            <code>[f77 g77]</code> as an argument.  That's useful if you
+            have rather specific demands or need to more-or-less
+            customize this.</p>
+
+          <p>More useful is the <code>DIALECT</code>, which can
+            be 77, 90, 95 or 2000.  Thus if you give this as
+            <code>AC_PROG_FC([], 77)</code> or
+            <code>AC_PROG_FC([], 1977)</code> then this will
+            search only its internal list of Fortran 77 compilers
+            (which happens to be [g77 f77 xlf frt pgf77 fort77
+            fl32 af77] currently).</p>
+        </subsect>
+
+        <subsect id="macro-ac-prog-fpp" export="export">
+          <subhead>
+            <title>AC_PROG_FPP</title>
+          </subhead>
+
+          <p><strong><code>AC_PROG_FPP(required-features, [FPP-SRC-EXT=fpp])</code></strong></p>
+
+          <p><code>required-features</code> is a space-separated
+            list of features that the Fortran preprocessor must
+            have for the code to compile.  It is up to the package
+            maintainer to properly set these requirements. </p>
+
+          <p><code>FPP-SRC-EXT</code> is an optional specification
+            of the file extension for preprocessable Fortran
+            source files (without a leading dot).  It defaults to
+            <code>fpp</code>: <code>.fpp</code> is better than
+            <code>.F</code> in general, since <code>.F</code> and
+            <code>.f</code> are indistinguishable on
+            case-insensitive filesystems (such as HFS+ on MacOS
+            X).</p>
+
+          <p><strong>NOTE</strong>: There are some features of this
+            macro support which are arguably bad autoconf style, and it
+            is <em>very</em> likely that this macro will change.  The
+            documentation below is only for completeness, and you are
+            advised not to pay any attention to it.  See <ref
+              id="developments"/>.</p>
+
+          <p>Supported features are:
+            <dl>
+              <dt>include</dt>
+              <dd><p>the preprocessor must correctly process
+                  <code>#include</code> directives and
+                  <code>-I</code> options</p></dd>
+
+              <dt>define</dt>
+              <dd><p>correctly process <code>-D</code> options</p></dd>
+
+              <dt>substitute</dt>
+              <dd><p>substitute macros in Fortran code 
+                  (some preprocessors touch only lines starting with #)</p>
+              </dd>
+
+              <dt>wrap</dt>
+              <dd><p>wrap lines that become too long through macro
+                  substitution.  <code>fpp</code> is probably the
+                  only preprocessor that does this.</p></dd>
+
+              <dt>cstyle</dt>
+              <dd><p>Do not suppress C style comments (the
+                  <code>-C</code> option in cpp)</p>
+              </dd>
+
+              <dt>CSTYLE</dt>
+              <dd><p><em>Do</em> suppress C style comments
+                  (e.g. code contains C-style comments, and
+                  compiler may not know how to handle them)</p>
+              </dd>
+            </dl></p>
+
+          <p>Features can be abbreviated: i, in, inc etc. are
+            equivalent to include. Features can be deselected
+            (feature not needed) by prepending "no",  e.g. nodef
+            (=nodefine), now (=nowrap).</p>
+
+          <p>Default for the feature list is 
+            [include define substitute nowrap nocstyle noCSTYLE]</p>
+
+          <p>Feature requirements corresponding to the defaults may be
+            omitted</p>
+
+          <p>Note that "wrap" implies "substitute", and CSTYLE and
+            cstyle cannot be requested at the same time. The macro
+            adjusts this automatically. </p>
+
+        </subsect>
+
         <subsect id='macro-check-progs' export='export'>
           <subhead>
-            <title>STAR_CHECK_PROGS(progs-to-check-for, [package=''])</title>
+            <title>STAR_CHECK_PROGS</title>
           </subhead>
 
           <p><strong><code>STAR_CHECK_PROGS(progs-to-check-for, [package=''])</code></strong></p>
@@ -2875,7 +3077,7 @@ M Makefile.dependencies
 
         <subsect id='macro-declare-dependencies' export='export'>
           <subhead>
-            <title>STAR_DECLARE_DEPENDENCIES(type, deplist, [option='']</title>
+            <title>STAR_DECLARE_DEPENDENCIES</title>
           </subhead>
 
           <p><strong><code>STAR_DECLARE_DEPENDENCIES(type, deplist, [option=''])</code></strong></p>
@@ -2969,7 +3171,7 @@ M Makefile.dependencies
 
         <subsect id='macro-defaults' export='export'>
           <subhead>
-            <title>STAR_DEFAULTS([options=''])</title>
+            <title>STAR_DEFAULTS</title>
           </subhead>
 
           <p><strong><code>STAR_DEFAULTS([options=''])</code></strong></p>
@@ -3020,7 +3222,7 @@ M Makefile.dependencies
 
         <subsect id='macro-doc-files' export='export'>
           <subhead>
-            <title>STAR_DOC_FILES(docfiles)</title>
+            <title>STAR_DOC_FILES</title>
           </subhead>
 
           <p><strong><code>STAR_DOC_FILES(docfiles)</code></strong></p>
@@ -3037,7 +3239,7 @@ M Makefile.dependencies
 
         <subsect id='macro-etc-files' export='export'>
           <subhead>
-            <title>STAR_ETC_FILES(etcfiles)</title>
+            <title>STAR_ETC_FILES</title>
           </subhead>
 
           <p><strong><code>STAR_ETC_FILES(etcfiles)</code></strong></p>
@@ -3059,14 +3261,19 @@ M Makefile.dependencies
 
           <p><strong><code>STAR_HAVE_FC_OPEN_READONLY</code></strong></p>
 
-          <p>Tests if the Fortran compiler supports the READONLY
-            option on the OPEN command.</p>
+          <p>Tests if the Fortran compiler supports the
+            <code>READONLY</code> option on the <code>OPEN</code>
+            command.  If it does, it defines
+            <code>HAVE_FC_OPEN_READONLY</code> to 1.</p>
+
+          <p>See <ref id="fortran"/> for an example of using this
+            preprocessor definition in a Fortran program.</p>
 
         </subsect>
 
         <subsect id='macro-help-files' export='export'>
           <subhead>
-            <title>STAR_HELP_FILES(helpfiles)</title>
+            <title>STAR_HELP_FILES</title>
           </subhead>
 
           <p><strong><code>STAR_HELP_FILES(helpfiles)</code></strong></p>
@@ -3083,7 +3290,7 @@ M Makefile.dependencies
 
         <subsect id='macro-latex-documentation' export='export'>
           <subhead>
-            <title>STAR_LATEX_DOCUMENTATION(documentcode, [targets=''])</title>
+            <title>STAR_LATEX_DOCUMENTATION</title>
           </subhead>
 
           <p><strong><code>STAR_LATEX_DOCUMENTATION(documentcode, [targets=''])</code></strong></p>
@@ -3150,7 +3357,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
         <subsect id='macro-messgen' export='export'>
           <subhead>
-            <title>STAR_MESSGEN(msgfile-list)</title>
+            <title>STAR_MESSGEN</title>
           </subhead>
 
           <p><strong><code>STAR_MESSGEN(msgfile-list)</code></strong></p>
@@ -3211,7 +3418,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
         <subsect id='macro-platform-sources' export='export'>
           <subhead>
-            <title>STAR_PLATFORM_SOURCES(target-file-list, platform-list)</title>
+            <title>STAR_PLATFORM_SOURCES</title>
           </subhead>
 
           <p><strong><code>STAR_PLATFORM_SOURCES(target-file-list, platform-list)</code></strong></p>
@@ -3286,89 +3493,10 @@ AC_SUBST(STAR_MANIFEST_DIR)
           which point the Starlink autoconf will revert to
           being an unmodified one.</p>
 
-        <p>The additions are as follows:
-          <dl>
-            <dt><code>AC_PROG_FC([COMPILERS...], [DIALECT])</code></dt>
-            <dd>
-              <p><code>[COMPILERS...]</code> is a list of specific
-                compilers you want it to try, so you could give it
-                <code>[f77 g77]</code> as an argument.  That's useful if you
-                have rather specific demands or need to more-or-less
-                customize this.  More useful is the DIALECT, which can
-                be 77, 90, 95 or 2000.  Thus if you give this as
-                <code>AC_PROG_FC([], 77)</code> or
-                <code>AC_PROG_FC([], 1977)</code> then this will
-                search only its internal list of Fortran 77 compilers
-                (which happens to be [g77 f77 xlf frt pgf77 fort77
-                fl32 af77] currently).</p>
-            </dd>
-
-            <dt><code>AC_PROG_FPP(required-features,
-                [FPP-SRC-EXT=.fpp])</code></dt>
-            <dd>
-              <p><code>required-features</code> is a space-separated
-                list of features that the Fortran preprocessor must
-                have for the code to compile.  It is up to the package
-                maintainer to properly set these requirements. </p>
-              <p><code>FPP-SRC-EXT</code> is an optional specification
-                of the file extension for preprocessable Fortran
-                source files (without a leading dot).  It defaults to
-                <code>.fpp</code>, which is better than
-                <code>.F</code> in general, since <code>.F</code> and
-                <code>.f</code> are indistinguishable on
-                case-insensitive filesystems (such as HFS+ on MacOS
-                X).</p>
-              <p>Supported features are:
-                <dl>
-                  <dt>include</dt>
-                  <dd><p>the preprocessor must correctly process
-                      <code>#include</code> directives and
-                      <code>-I</code> options</p></dd>
-
-                  <dt>define</dt>
-                  <dd><p>correctly process <code>-D</code> options</p></dd>
-
-                  <dt>substitute</dt>
-                  <dd><p>substitute macros in Fortran code 
-                      (some preprocessors touch only lines starting with #)</p>
-                  </dd>
-
-                  <dt>wrap</dt>
-                  <dd><p>wrap lines that become too long through macro
-                      substitution.  <code>fpp</code> is probably the
-                      only preprocessor that does this.</p></dd>
-
-                  <dt>cstyle</dt>
-                  <dd><p>Do not suppress C style comments (the
-                      <code>-C</code> option in cpp)</p>
-                  </dd>
-
-                  <dt>CSTYLE</dt>
-                  <dd><p><em>Do</em> suppress C style comments
-                      (e.g. code contains C-style comments, and
-                      compiler may not know how to handle them)</p>
-                  </dd>
-                </dl></p>
-
-              <p>Features can be abbreviated: i, in, inc etc. are
-                equivalent to include. Features can be deselected
-                (feature not needed) by prepending "no",  e.g. nodef
-                (=nodefine), now (=nowrap).</p>
-              <p>Default for the feature list is 
-                [include define substitute nowrap nocstyle noCSTYLE]</p>
-          <p>Feature requirements corresponding to the defaults may be
-                omitted</p> 
-<p>Note that "wrap" implies "substitute", and CSTYLE and cstyle cannot
-                be requested at the same time. The macro adjusts this
-                automatically. </p>
-            </dd>
-          </dl>
-          There are some features of this macro support which are
-          arguably bad autoconf style, and it is <em>very</em> likely that this
-          macro will change.  The above documentation is only for
-          completeness, and you are advised not to pay any attention
-          to it.  See <ref id="developments"/>.
-          </p>
+        <p>The additions are the two macros <code>AC_PROG_FC</code>
+          and <code>AC_PROG_FPP</code>, described in <ref
+            id="macro-ac-prog-fc"/> and <ref
+            id="macro-ac-prog-fpp"/>.</p>
 
         <p>The Starlink automake is a more heavily modified
           version of automake version 1.8.2.  There are a few
