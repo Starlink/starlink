@@ -512,37 +512,36 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  List of files that should be created and copied into the runtime
 #  directory for a sucessful built of GAIA.
 
-GAIA_FILES = Gaia.tcl \
- Batch.tcl CanvasPrint.tcl ETable.tcl FileSelect.tcl FrameWidget.tcl \
- GaiaConvertTable.tcl GaiaForeignExec.tcl GaiaImage.tcl \
- GaiaImageCtrl.tcl GaiaImageCut.tcl GaiaImagePanel.tcl \
- GaiaImageSpectrum.tcl GaiaQuery.tcl GaiaQueryResult.tcl GaiaSearch.tcl \
- GaiaSextractor.tcl GraphPrint.tcl LabelEntry.tcl LabelEntryMenu.tcl \
- LabelEntryScale.tcl LabelFileChooser.tcl LabelRule.tcl \
- ManyLabelEntry.tcl NameChooser.tcl \
- Queue.tcl RtdImage.tcl RtdImageCtrl.tcl RtdImagePick.tcl \
- RtdImagePixTable.tcl RtdImageTrans.tcl RtdImageZoomView.tcl \
- ScrollText.tcl Scrollbox.tcl StarApp.tcl StarAppFilter.tcl StarArd.tcl \
- StarArdAnnBox.tcl StarArdAnnCircle.tcl StarArdAnnColumn.tcl \
- StarArdAnnEllipse.tcl StarArdAnnList.tcl StarArdAnnPixel.tcl \
- StarArdAnnPoly.tcl StarArdAnnRect.tcl StarArdAnnRotBox.tcl \
- StarArdAnnRow.tcl StarArdAnnTool.tcl StarArdBox.tcl StarArdCircle.tcl \
- StarArdColumn.tcl StarArdEllipse.tcl StarArdLine.tcl StarArdList.tcl \
- StarArdPixel.tcl StarArdPoly.tcl StarArdPrim.tcl StarArdRect.tcl \
- StarArdRotBox.tcl StarArdRow.tcl StarArdTool.tcl StarAstCopy.tcl \
- StarAstDefine.tcl StarAstGrid.tcl StarAstReference.tcl \
- StarAstRefine.tcl StarAstSystem.tcl StarAstTable.tcl StarBlink.tcl \
- StarCanvasDraw.tcl StarCanvasObject.tcl StarDemo.tcl \
- StarEnterObject.tcl StarHelp.tcl StarLabelCheck.tcl StarPatch.tcl \
+GAIA_FILES = \
+ Batch.tcl ETable.tcl FileSelect.tcl Gaia.tcl GaiaAstTransfer.tcl \
+ GaiaAstTransferTable.tcl GaiaContour.tcl GaiaConvertTable.tcl \
+ GaiaForeignExec.tcl GaiaImageCtrl.tcl GaiaImageCut.tcl \
+ GaiaImageMBand.tcl GaiaImagePanel.tcl GaiaImagePick.tcl \
+ GaiaImagePrint.tcl GaiaImageSpectrum.tcl GaiaQuery.tcl \
+ GaiaQueryResult.tcl GaiaSearch.tcl GaiaSextractor.tcl \
+ LabelCommandMenu.tcl LabelEntry.tcl LabelEntryMenu.tcl \
+ LabelEntryScale.tcl LabelFileChooser.tcl LabelMenu.tcl LabelRule.tcl \
+ ManyLabelEntry.tcl NameChooser.tcl NewStarBlink.tcl Queue.tcl \
+ ScrollArrows.tcl ScrollText.tcl Scrollbox.tcl StarApp.tcl \
+ StarAppFilter.tcl StarArd.tcl StarArdAnnBox.tcl StarArdAnnCircle.tcl \
+ StarArdAnnColumn.tcl StarArdAnnEllipse.tcl StarArdAnnList.tcl \
+ StarArdAnnPixel.tcl StarArdAnnPoly.tcl StarArdAnnRect.tcl \
+ StarArdAnnRotBox.tcl StarArdAnnRow.tcl StarArdAnnTool.tcl \
+ StarArdBox.tcl StarArdCircle.tcl StarArdColumn.tcl StarArdEllipse.tcl \
+ StarArdLine.tcl StarArdList.tcl StarArdPixel.tcl StarArdPoly.tcl \
+ StarArdPrim.tcl StarArdRect.tcl StarArdRotBox.tcl StarArdRow.tcl \
+ StarArdTool.tcl StarAstCopy.tcl StarAstDefine.tcl StarAstGrid.tcl \
+ StarAstReference.tcl StarAstRefine.tcl StarAstSystem.tcl \
+ StarAstTable.tcl StarBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
+ StarDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
  StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
- StarPhotomList.tcl StarPhotomObject.tcl \
- defaults.tcl gaiaMain.tcl graphics_features.tcl udialog.tcl \
- ScrollArrows.tcl \
- Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp StarArd.hlp \
- StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp StarAstGrid.hlp \
- StarAstReference.hlp StarAstRefine.hlp StarAstSystem.hlp \
- StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
- skycat.cfg gaiawcs2tab tclIndex \
+ StarPhotomList.tcl StarPhotomObject.tcl gaia2astrom.tcl gaiaMain.tcl \
+ gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl
+ Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
+ StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
+ StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
+ StarAstSystem.hlp StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
+ skycat.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
  gaia_wish ardstat ardstat.ifc autocrop autocrop.ifc \
  cat2tab cat2tab.ifc tab2cat tab2cat.ifc asc2tab asc2tab.ifc tab2asc \
  tab2asc.ifc \
@@ -550,49 +549,65 @@ GAIA_FILES = Gaia.tcl \
 
 
 SKYCAT_FILES = \
- AstroCat.tcl AstroImage.tcl ButtonFrame.tcl CanvasDraw.tcl \
- CanvasWidget.tcl CheckEntry.tcl ChoiceDialog.tcl \
- Chooser.tcl DoubleList.tcl DoubleTableList.tcl DialogWidget.tcl EnterObject.tcl \
- EntryForm.tcl InputDialog.tcl LabelCheck.tcl \
- LabelChoice.tcl LabelMenu.tcl LabelMessage.tcl LabelNumber.tcl \
- LabelValue.tcl LabelWidget.tcl ListDialog.tcl ListboxWidget.tcl \
- PreviewPlot.tcl PrintDialog.tcl ProgressBar.tcl Rtd.tcl \
- RtdImageColorRamp.tcl RtdImageColors.tcl RtdImageCut.tcl \
- RtdImageFrame.tcl RtdImageGrid.tcl RtdImageIcon.tcl RtdImageMBand.tcl \
- RtdImagePan.tcl RtdImagePanel.tcl RtdImagePopup.tcl \
- RtdImageSpectrum.tcl RtdImageZoom.tcl RtdServerTool.tcl SkyCat.tcl \
- SkyCatCtrl.tcl TableList.tcl TableListConfigFile.tcl \
- TableListConfig.tcl TableListPrint.tcl TableListSort.tcl \
- TextDialog.tcl bltGraph.tcl canvastext.tcl catdefaults.tcl list.tcl \
- mkIndex.tcl pkgIndex.tcl rtdClient rtdServer rtd_version.tcl \
- skycat_version.tcl tclutil.tcl tkutil.tcl rtd_defaults.tcl \
- skycat_defaults.tcl tclutil_defaults.tcl SkySearch.tcl \
- SkyQuery.tcl SkyQueryResult.tcl SearchConfig.tcl SymbolConfig.tcl \
- AstroQuery.tcl cat_version.tcl CatalogInfo.tcl QueryResult.tcl \
- RtdImageCopy.tcl RtdImagePerf.tcl RtdImagePrint.tcl RtdRecorder.tcl \
- RtdRemoteTcl.tcl TopLevelWidget.tcl tclutil_version.tcl astrotcl_version.tcl
+ SkyCat.tcl SkyCatCtrl.tcl SkyCatHduChooser.tcl SkyQuery.tcl \
+ SkyQueryResult.tcl SkySearch.tcl skycat_defaults.tcl \
+ skycat_version.tcl \
+ AstroCat.tcl AstroImage.tcl AstroQuery.tcl CatalogInfo.tcl \
+ EnterObject.tcl PreviewPlot.tcl ProxyDialog.tcl QueryResult.tcl \
+ SearchConfig.tcl SymbolConfig.tcl cat_version.tcl \
+ catdefaults.tcl \
+ Rtd.tcl RtdImage.tcl RtdImageColorRamp.tcl RtdImageColors.tcl \
+ RtdImageCtrl.tcl RtdImageCut.tcl RtdImageFrame.tcl RtdImageGrid.tcl \
+ RtdImageIcon.tcl RtdImageMBand.tcl RtdImagePan.tcl RtdImagePanel.tcl \
+ RtdImagePerf.tcl RtdImagePick.tcl RtdImagePixTable.tcl \
+ RtdImagePopup.tcl RtdImagePrint.tcl RtdImageSpectrum.tcl \
+ RtdImageTrans.tcl RtdImageZoom.tcl RtdImageZoomView.tcl \
+ RtdRecorder.tcl RtdRemoteTcl.tcl RtdServerTool.tcl \
+ rtd_defaults.tcl rtd_version.tcl \
+ astrotcl_version.tcl \
+ LabelChoice.tcl TableListSort.tcl ButtonFrame.tcl \
+ TextDialog.tcl CanvasDraw.tcl TopLevelWidget.tcl \
+ CanvasPrint.tcl LabelMenu.tcl CanvasWidget.tcl LabelMessage.tcl \
+ bltGraph.tcl CheckEntry.tcl LabelNumber.tcl canvastext.tcl \
+ ChoiceDialog.tcl LabelValue.tcl Chooser.tcl LabelWidget.tcl \
+ list.tcl DialogWidget.tcl ListDialog.tcl DoubleList.tcl \
+ ListboxWidget.tcl DoubleTableList.tcl PasswdDialog.tcl \
+ EntryForm.tcl PrintDialog.tcl tclutil.tcl ProgressBar.tcl \
+ tclutil_defaults.tcl FrameWidget.tcl \
+ tclutil_version.tcl GraphPrint.tcl TableList.tcl tkutil.tcl \
+ HelpWin.tcl TableListConfig.tcl udialog.tcl InputDialog.tcl \
+ TableListConfigFile.tcl LabelCheck.tcl TableListPrint.tcl
 
 TCL_FILES = \
- Archetype.itk Toplevel.itk Widget.itk adamMessageRelay adamtask.tcl \
- atclsh autoload.tcl bgerror.tcl buildidx.tcl button.tcl buttonbox.itk \
- calendar.itk canvasprintbox.itk canvasprintdialog.itk checkbox.itk \
- clrpick.tcl combobox.itk comdlg.tcl console.tcl dateentry.itk \
- datefield.itk dialog.itk dialog.tcl dialogshell.itk \
- disjointlistbox.itk entry.tcl entryfield.itk extfileselectionbox.itk \
- extfileselectiondialog.itk feedback.itk fileselectionbox.itk \
- fileselectiondialog.itk finddialog.itk focus.tcl hierarchy.itk \
- history.tcl hyperhelp.itk init.tcl itk.tcl iwidgets.tcl \
- labeledframe.itk labeledwidget.itk ldAout.tcl listbox.tcl \
- mainwindow.itk menu.tcl menubar.itk messagebox.itk messagedialog.itk \
- msgbox.tcl notebook.itk obsolete.tcl optMenu.tcl optionmenu.itk \
- palette.tcl pane.itk panedwindow.itk parray.tcl pkgIndex.tcl prolog.ps \
- promptdialog.itk pushbutton.itk radiobox.itk regexpfield.itk safe.tcl \
- safetk.tcl scale.tcl scrlbar.tcl scrolledcanvas.itk scrolledframe.itk \
- scrolledhtml.itk scrolledlistbox.itk scrolledtext.itk \
- scrolledwidget.itk selectionbox.itk selectiondialog.itk shell.itk \
- spindate.itk spinint.itk spinner.itk spintime.itk tabnotebook.itk \
- tabset.itk tclx.tcl tearoff.tcl text.tcl timeentry.itk timefield.itk \
- tk.tcl tkfbox.tcl toolbar.itk watch.itk word.tcl xmfbox.tcl
+ history.tcl init.tcl ldAout.tcl parray.tcl safe.tcl word.tcl \
+ bgerror.tcl dialog.tcl msgbox.tcl scale.tcl button.tcl entry.tcl \
+ obsolete.tcl scrlbar.tcl tkfbox.tcl clrpick.tcl focus.tcl \
+ optMenu.tcl xmfbox.tcl comdlg.tcl palette.tcl tearoff.tcl
+ console.tcl listbox.tcl prolog.ps text.tcl menu.tcl safetk.tcl
+ tk.tcl \
+ bltCanvEps.pro bltHier.tcl bltDnd.tcl bltTabset.tcl \
+ itcl.tcl \
+ Archetype.itk Widget.itk Topplevel.itk itk.tcl \
+ iwidgets.tcl \
+ buttonbox.itk pane.itk calendar.itk panedwindow.itk \
+ canvasprintbox.itk promptdialog.itk canvasprintdialog.itk \
+ pushbutton.itk checkbox.itk radiobox.itk colors.itcl \
+ regexpfield.itk combobox.itk roman.itcl dateentry.itk
+ scopedobject.itcl datefield.itk scrolledcanvas.itk dialog.itk \
+ scrolledframe.itk dialogshell.itk scrolledhtml.itk \
+ disjointlistbox.itk scrolledlistbox.itk entryfield.itk \
+ scrolledtext.itk extfileselectionbox.itk scrolledwidget.itk \
+ extfileselectiondialog.itk selectionbox.itk feedback.itk \
+ selectiondialog.itk fileselectionbox.itk shell.itk \
+ fileselectiondialog.itk spindate.itk finddialog.itk spinint.itk \
+ hierarchy.itk spinner.itk hyperhelp.itk spintime.itk \
+ labeledframe.itk tabnotebook.itk labeledwidget.itk tabset.itk \
+ mainwindow.itk menubar.itk timeentry.itk messagebox.itk \
+ timefield.itk messagedialog.itk toolbar.itk notebook.itk \
+ unknownimage.gif optionmenu.itk watch.itk \
+ adamMessageRelay adamtask.tcl \
+ autoload.tcl tcl.tndx tclx.tcl buildidx.tcl tcl.tlib \
+ tkx.tcl
 
 GAIA_COLORMAP_FILES = bgyrw.lasc
 
@@ -765,7 +780,7 @@ $(TCL_FILES): .tcl.built
 	touch .tcl.built
 
 #  Rule for building the rtd installation. Again we will actually only
-#  install part of this. Note SKYCAT_WRAPPER_DIR works around need for 
+#  install part of this. Note SKYCAT_WRAPPER_DIR works around need for
 #  tclpro (et build succeeds, but produces an invalid binary).
 $(SKYCAT_FILES) $(SKYCAT_COLORMAP_FILES): .skycat.built
 
