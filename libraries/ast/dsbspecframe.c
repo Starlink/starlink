@@ -59,6 +59,10 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *  History:
 *     5-AUG-2004 (DSB):
 *        Original version.
+*     7-OCT-2004 (DSB):
+*        Fixed SetAttrib code which assigns values to SideBand. Previously 
+*        all supplied values were ignored, leaving SideBand unchanged.
+
 *class--
 
 *  Implementation Deficiencies:
@@ -1204,18 +1208,22 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 0 == astSscanf( setting, "sideband= %n%*s %n", &ival, &nc ) )
                && ( nc >= len ) ) {
 
-      if( astChrMatch( "usb", setting ) ) {
+      if( astChrMatch( "usb", setting+ival ) ) {
          astSetSideBand( this, USB );
 
-      } else if( astChrMatch( "lsb", setting ) ) {
+      } else if( astChrMatch( "lsb", setting+ival ) ) {
          astSetSideBand( this, LSB );
 
-      } else if( astChrMatch( "observed", setting ) ) {
+      } else if( astChrMatch( "observed", setting+ival ) ) {
          astSetSideBand( this, ( astGetIF( this ) > 0 ) ? LSB : USB );
 
-      } else if( astChrMatch( "image", setting ) ) {
+      } else if( astChrMatch( "image", setting+ival ) ) {
          astSetSideBand( this, ( astGetIF( this ) <= 0 ) ? LSB : USB );
 
+      } else {
+         astError( AST__ATTIN, "astSetAttrib(%s): The setting \"%s\" is "
+                   "invalid for a %s.", astGetClass( this ), setting,
+                   astGetClass( this ) );
       }
 
 /* Read-only attributes. */
