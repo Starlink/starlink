@@ -280,7 +280,9 @@
       END IF
 
 *  Abort point
- 99   CONTINUE
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'PSF_2D_DATA', STATUS )
+      END IF
 
       END
 
