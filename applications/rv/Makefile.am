@@ -4,7 +4,7 @@ bin_SCRIPTS = rv xrv
 
 bin_PROGRAMS = rv.x
 
-rv_x_SOURCES = input.f  ktest.f  opr.f  opw.f  rvmain.f  rvml.f  tran.f
+rv_x_SOURCES = input.f  ktest.f  opr.fpp  opw.f  rvmain.f  rvml.f  tran.f
 
 rv_x_LDADD = `sla_link`
 

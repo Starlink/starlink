@@ -17,6 +17,9 @@ STAR_DEFAULTS
  
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_PROG_FPP
+
+AC_FC_OPEN_SPECIFIERS(readonly)
 
 dnl    Probably should look for any expectk in the PATH rather than
 dnl    assuming the Starlink location. Note that this path should be
