@@ -3457,7 +3457,7 @@ proc ShowMe {doc args} {
       if { ![catch {exec showme -n $doc $args} mess] } {
          set ret [CCDShowHelp $mess]
       } { 
-         Daig "Failed to find document $doc (label $args) - $mess."
+         Diag "Failed to find document $doc (label $args) - $mess."
       }
    } {
       if { ![catch {exec showme -n $doc} mess] } {
