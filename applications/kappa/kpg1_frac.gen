@@ -269,7 +269,8 @@
 *  Set the number of bins.  This is adjusted because the clipping itself
 *  may make the histogram sparse artificially.  Set a reasonable
 *  minimum number of bins.  
-            CLNBIN = INT( MAX( 0.5 / FILLIM, REAL( NBIN ) * SCALE ) )
+            CLNBIN = INT( MAX( 0.5 / REAL( FILLIM ), 
+     :                    REAL( NBIN ) * SCALE ) )
             DNBIN = DBLE( CLNBIN )
 
 *  Generate the histogram between the current data bounds.  Do not
