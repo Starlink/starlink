@@ -1,0 +1,217 @@
+#!/bin/csh
+#+
+#  Name:
+#     softlink
+
+#  Purpose:
+#     Create a soft link to a file in another directory
+
+#  Language:
+#     C-shell
+
+#  Description:
+#     This shell script creates soft links in the current directory pointing to
+#     files in another directory. The name of the soft link is found by taking
+#     the last part of the name of the file to be pointed to by the link.
+#     The name of the soft link can be created in lower case, upper case or
+#     with the same case as the name of the file being pointed to.
+#     The soft links can also be removed with this script.
+#     It is also possible to create a file containing the ln commands,
+#     rather than have then executed.
+
+#  Usage:
+#     softlink file [option]
+
+#  Examples:
+#     -  softlink /star/include/sae_par both
+#        This will create two soft links, sae_par and SAE_PAR that point to the
+#        file /star/include/sae_par
+#     -  softlink /star/include/sae_par both mlinks
+#        This will create a file called mlinks containing the commands
+#        to create the links. This is useful for insertion in make
+#        files.
+
+#  Parameters:
+#     The first parameter is the name of the file that the soft link will point
+#        to.
+#     The second parameter is optional. Allowed values are:
+#        lower = Create the soft link in lower case
+#        upper = Create the soft link in upper case
+#        both  = Create the soft link in lower case and upper case
+#        all   = Create the soft link in lower case, upper case and in the same
+#                case as the name of the file being pointed to
+#        remove = Remove the soft links
+#        The default is to create the soft link in the same case as the name
+#           of the file being pointed to.
+#     The third parameter is the name of the output file. If this
+#        parameter is present, no links are created and the output file
+#        will contain the ln or rm commands. The commands are appended to the
+#        file, so the script can be invoked several times to build up a
+#        file. 
+#        If the name of the file is mfile then the commands are output in a
+#        form suitable for inclusion in a make file.
+
+#  Authors:
+#     PMA: Peter Allan (Starlink, RAL)
+#     BLY: Martin Bly (Starlink, RAL)
+
+#  History:
+#     23-MAR-1992 (PMA):
+#        First version.
+#     27-AUG-1992 (PMA):
+#        Add the ability to create an output file.
+#     9-SEP-1992 (PMA):
+#        Add the ability to output `make file' style commands when the output
+#        file is called mfile.
+#     22-NOV-1993 (PMA):
+#        Change the arguments to tr from the style a-z to "[a-z]".
+#        This is needed for Solaris and works on all other systems.
+#     11-JUL-1994 (BLY):
+#        Modify parsing of $1 to work round bug in OSF/1 v1.3 c-shell.
+
+#-
+
+#  Define local variables.
+
+set name = $1
+set name = $name:t
+set uname = `echo $name | tr '[a-z]' '[A-Z]'`
+set lname = `echo $name | tr '[A-Z]' '[a-z]'`
+set option = `echo $2 | tr '[A-Z]' '[a-z]'`
+
+# If the is no third parameter, set a flag to execute the ln or rm commands.
+if ( $3 == "" ) then
+   set exec = 1
+#
+# otherwise, make sure that the output file exists and set the shell variables
+# ln and rm to the appropriate values for creating a normal shell script or a
+# make file.
+else
+   set exec = 0
+   touch $3
+   chmod +x $3
+   if ( $3 == "mfile" ) then
+      set ln = "	ln"  # There is a single tab after the first quote.
+      set rm = "	-rm" # There is a single tab after the first quote.
+   else
+      set ln = "ln"
+      set rm = "rm"
+   endif
+endif
+
+if ( $option == "" ) then
+#
+#  Add a symbolic link to the given pathname in the current directory.
+#  The name of the link is derived from the name of the file being pointed to
+#  and may be of mixed case.
+#
+   if ( $exec ) then
+      ln -s  $1 $name
+   else
+      echo "$ln -s  $1 $name" >>$3
+   endif
+
+else if ( $option == "lower" ) then
+#
+#  Add the link, but the link name is now in lower case.
+#
+   if ( $exec ) then
+      ln -s  $1 $lname
+   else
+      echo "$ln -s  $1 $lname" >>$3
+   endif
+
+else if ( $option == "upper" ) then
+#
+#  Add the link, but the link name is now in upper case.
+#
+   if ( $exec ) then
+      ln -s  $1 $uname
+   else
+      echo "$ln -s  $1 $uname" >>$3
+   endif
+
+else if ( $option == "both" ) then
+#
+#  Add the link, both in lower case and upper case.
+#
+   if ( $exec ) then
+      ln -s  $1 $lname
+      ln -s  $1 $uname
+   else
+      echo "$ln -s  $1 $lname" >>$3
+      echo "$ln -s  $1 $uname" >>$3
+   endif
+
+else if ( $option == "all" ) then
+#
+#  Add the link, both in lower case, upper case and mixed case (if the link
+#  name is not just in lower or upper case).
+#
+   if ( $exec ) then
+      ln -s  $1 $lname
+      ln -s  $1 $uname
+      if( ( $name != $lname ) && ( $name != $uname ) ) ln -s $1 $name
+   else
+      echo "$ln -s  $1 $lname" >>$3
+      echo "$ln -s  $1 $uname" >>$3
+      if ( ( $name != $lname ) && ( $name != $uname ) ) \
+         echo "$ln -s $1 $name" >>$3
+   endif
+
+else if ( $option == "remove" ) then
+#
+#  Remove a link.
+#  Remove lower, upper and mixed case links if they are present.
+#  Check to see that the file actually is a link before removing it.
+#
+   if ( $exec ) then
+      if( -f $lname ) \
+         if( `ls -l $lname | awk '{print substr($1,1,1)}'` == "l" ) \
+            rm $lname
+      if( -f $uname ) \
+         if( `ls -l $uname | awk '{print substr($1,1,1)}'` == "l" ) \
+            rm $uname
+      if( -f $name ) \
+         if( `ls -l $name | awk '{print substr($1,1,1)}'` == "l" ) \
+            rm $name
+   else
+#
+# If the output file is called mfile, output commands suitable for a make file.
+      if ( $3 == "mfile" ) then
+         echo "$rm $lname" >>$3
+         echo "$rm $uname" >>$3
+         if( ( $name != $uname ) && ( $name != $lname ) ) then
+            echo "$rm $name" >>$3
+         endif
+      else
+#
+# If the output file is not a make file, output commands that check to see that
+# the file is a link before removing it.
+# There is an x appended to the characters being compared to prevent a syntax
+# error when the awk command evaluated to the character "-".
+         echo "if test -f $lname" >>$3
+         echo 'then if expr `ls -l '$lname" |"\
+            "awk '{print substr("'$'"1,1,1)}'"'`x == lx >/dev/null' >>$3
+         echo "then $rm $lname" >>$3
+         echo "fi" >>$3
+         echo "fi" >>$3
+         echo "if test -f $uname" >>$3
+         echo 'then if expr `ls -l '$uname" |"\
+            "awk '{print substr("'$'"1,1,1)}'"'`x == lx >/dev/null' >>$3
+         echo "then $rm $uname" >>$3
+         echo "fi" >>$3
+         echo "fi" >>$3
+         echo "if test -f $name" >>$3
+         echo 'then if expr `ls -l '$name" |"\
+            "awk '{print substr("'$'"1,1,1)}'"'`x == lx >/dev/null' >>$3
+         echo "then $rm $name" >>$3
+         echo "fi" >>$3
+         echo "fi" >>$3
+      endif
+   endif
+
+else
+   echo softlink: Invalid option
+
+endif
