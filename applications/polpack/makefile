@@ -521,7 +521,7 @@ HELP_SOURCES = polpack.hlp
 #  List of ancilliary data files.
 
 DATA_FILES = blank.bit feature.bit vertex.bit rfeature.bit rvertex.bit \
-left_arrow.bit right_arrow.bit tick.bit polimp.tab
+left_arrow.bit right_arrow.bit tick.bit 
 
 #  Name of test script.
 
