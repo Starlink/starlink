@@ -107,6 +107,12 @@ itcl::class gaia::GaiaDemo {
                -command [code $this set_font_ "$font"]
       }
 
+      #  Add control for "rolling" demo.
+      set Option [add_menubutton "Option" left]
+      $Option add checkbutton -label "Rolling demo" \
+	  -onvalue 1 -offvalue 0 \
+          -variable [scope itk_option(-rolling)]
+
       #  Create a text area for describing the demo. XXX must be bug
       #  in ScrollText as configuration can only be done after creation.
       itk_component add text {
@@ -283,7 +289,7 @@ itcl::class gaia::GaiaDemo {
   That's all for now. If you don't want to see it all happen again
   then press the "stop" button and wait a while (control-q in 
   the main window will exit somewhat more quickly).
-	 }
+         }
       } else {
 	 $itk_component(text) insert 0.0 {
 
@@ -294,7 +300,7 @@ itcl::class gaia::GaiaDemo {
   then press the "start" button.
 	 }
       }
-      set running_ 0
+      #set running_ 0
       wait_ [expr $readtime_*3]
    }
 
@@ -334,10 +340,14 @@ itcl::class gaia::GaiaDemo {
 
    #  Start the demo.
    method start {} {
-      if { ! $running_ } {
-	 set running_ 1
-         while { $running_ } {
-            if { ! $quick_start_ } { 
+      set running_ 1
+      loop_
+   }
+   
+   #  Main loop method.
+   protected method loop_ {} {
+       while { $running_ } {
+	   if { ! $quick_start_ } { 
                display {
 
 		       Welcome to the GAIA demo
@@ -395,20 +405,25 @@ itcl::class gaia::GaiaDemo {
  may affect you.
                        
                     }
-            }
-            # Main loop.
-            foreach demo $demolist_ {
+	   }
+	   # Main loop.
+	   foreach demo $demolist_ {
                if { $running_ } {
-                  catch { $demo }
+		   catch { $demo }
                } else {
-                  really_stop_
-                  return
+		   really_stop_
+		   return
                }
-            }
-            really_stop_
-            set running_ 1
-         }
-      }
+	   }
+
+           #  Demo runs until stopped.
+           if { $itk_option(-rolling) } {
+	       set running_ 1
+	   } else {
+	       set running_ 0
+	   }
+	   really_stop_
+       }
    }
 
    #  Refresh the display and pause a while.
@@ -929,8 +944,7 @@ itcl::class gaia::GaiaDemo {
  other.
       }
       show_image_ frame.sdf 90 1
-      set clone .gaia[expr $clone_cnt_+1]
-      $itk_option(-gaiamain) noblock_clone $clone "$demo_dir_/frame.sdf(5:,5:)"
+      set clone [$itk_option(-gaiamain) noblock_clone "" "$demo_dir_/frame.sdf(5:,5:)"]
       set cloneimg [[$clone get_image] get_image]
       update
       $clone make_toolbox blink
@@ -1460,6 +1474,9 @@ $catlist
    #  If this is a clone, then it should die rather than be withdrawn.
    itk_option define -really_die really_die Really_Die 0
 
+   #  Is demo "rolling"?
+   itk_option define -rolling rollong Rolling 0
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -1476,9 +1493,9 @@ $catlist
 
    #  List of all known demos.
    protected variable demolist_ \
-      "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
-         contour_ detection_ blink_ grid_ astdefine_ astreference_ astrefine_ \
-         astcopy_ skycat_ archives_"
+       "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
+        contour_ detection_ blink_ grid_ astdefine_ astreference_ \
+       astrefine_ astcopy_ skycat_ archives_"
    
    #  Interval to wait while reading text
    protected variable readtime_ 15000
