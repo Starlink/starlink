@@ -2847,6 +2847,73 @@ wish-list}{http://www.jach.hawaii.edu/jcmt\_sw/bin/scuba\_wish.pl}.
 
 \section{\xlabel{relnotes}Release Notes\label{relnotes}}
 
+\subsection{Changes in Version 1.4}
+
+The main purpose of this upgrade is to add polarimetry support to 
+SURF.
+
+\begin{description}
+
+\item[\textbf{New Tasks}] \mbox{}
+
+\begin{itemize}
+\item \remip\ can be used to remove instrumental polarisation.
+\item \adddbm\ can be used to generate simulated dual beam images
+\item \scusetenv\ for setting environment variables at the JAC.
+\end{itemize}
+
+\item[\textbf{Changes to existing tasks}] \mbox{}
+
+\begin{itemize}
+
+\item Units should now be propagated correctly through all tasks
+    (ie calibration units are not lost after \rebin\ or \scuphot)
+
+\item \scusoft\ version number is now written to history information
+
+\item \scanrlb : The -filter option will filter out how frequencies
+           before inverting the Fourier transform.
+
+\item \rebin :
+\begin{itemize}
+\item Add TRIM parameter to trim edge regions from rebinned
+           images (useful when trying to mosaic)
+
+\item Astrometry information is now entirely contained in 
+           the AST/WCS component. No longer written to FITS or
+           IRAS90 extensions. Also, the pixel origin is now centred
+           on the specified RA/Dec centre of the image and not
+           the bottom left hand corner.
+
+\item  REFPIX parameter has been added to make it easier to specify
+           the reference pixel location when changing the map size
+           (in the past the reference pixel was always the middle of the
+           map when specifying the map size)
+
+\item  The output file is now propagated from the input when
+           processing a single file (keeps history intact)
+
+\end{itemize}
+
+\item \intrebin : Waveplate position and sky rotation angle are now
+        written to the fits headers for polarimetry observations.
+
+\item \ext : Can process FAST\_AXIS polarimetry information correctly.
+
+\item \skydip : Add preliminary support for RASTER mode (not yet stable)
+
+\item \obssum : POLMAP and POLPHOT are now supported modes.
+
+\item \scuphot : now recognizes measurements as well as integrations
+      (required for polarimetry observing)
+
+\item \scumakewt : Now can make a weights image like a reference image
+     (ie same size, chop throw and position angle). See the LIKE parameter.
+
+\end{itemize}
+
+\end{description}
+
 \subsection{Changes in Version 1.3}
 
 This is only a minor upgrade. All scripts have been updated so that
@@ -3165,8 +3232,8 @@ Proc. SPIE \textbf{3357}, in press
 \bibitem{mnscu}
 Robson~E.I., Holland~W.~S., Gear~W.K., Lightfoot~J.~F., Jenness~T.,
 Ivison~R.~J., Stevens~J.~A., Cunningham~C.~R., Ade~P.~A.~R.,
-Griffin~M.~J., Duncan~W.~D., Murphy~J.~A., Naylor~D.~A., 1998,
-\textit{MNRAS}, submitted
+Griffin~M.~J., Duncan~W.~D., Murphy~J.~A., Naylor~D.~A., 1999,
+\textit{MNRAS}, \textbf{303}, 659
 
 \bibitem{ndf}
 Warren-Smith~R.~F., 1995, {\it NDF -- Routines for Accessing the Extensible
@@ -3307,6 +3374,7 @@ Jenness~T., Bly~M.~J., 1998,
 \section{\xlabel{alphabet}An alphabetical summary of \scusoft\ commands\label{alphabet}}
 
 \begin{description}
+\quickdes{ADD\_DBM}{Generate simulated dual beam images}{surf:adddbm}
 \quickdes{BOLREBIN}{Generate a separate regridded image for each bolometer.}{surf:bolrebin}
 \quickdes{CALCSKY}{Calculate sky variation independent of source structure}{surf:calcsky}
 \quickdes{CHANGE\_DATA}{Change data (or variance) values in a dataset.}{surf:chgdata}
@@ -3333,6 +3401,7 @@ Jenness~T., Bly~M.~J., 1998,
 \quickdes{REDUCE\_SWITCH}{Convert raw demodulated data to standard format and
 process individual switches.}{surf:resw}
 \quickdes{REMDBM}{Remove dual beam signature from SCAN/MAP images (requires \Kappa).}{surf:remdbm}
+\quickdes{REMIP}{Remove instrumental polarisation from polarimetry data}{surf:remip}
 \quickdes{REMSKY}{Remove sky contribution from each jiggle}{surf:remsky}
 \quickdes{RESTORE}{Remove dual-beam response from SCAN/MAP data.}{surf:restore}
 \quickdes{RLINPLOT}{Interactive data inspection via \mlinplot\ (Requires \Kappa)}{surf:rlinplot}
@@ -3348,6 +3417,7 @@ process individual switches.}{surf:resw}
 \quickdes{SCUPHOT}{Reduces photometry data to a single point per integration}{surf:scuphot}
 \quickdes{SCUPLOT}{Interactive despiking and data inspection (Requires \Kappa)}{surf:scuplot}
 \quickdes{SCUQUICK}{Semi-automated data reduction pipeline.}{surf:scuquick}
+\quickdes{SCUSETENV}{Set SCUBA environment variables (JAC only)}{surf:scusetenv}
 \quickdes{SCUSHIFT}{Shift bolometers on A-to-D card}{surf:scushift}
 \quickdes{SDIP}{Script to reduce and display skydip data (requires \Kappa).}{surf:sdip}
 \quickdes{SETBOLWT}{Calculate and set bolometer weights (requires \Kappa)}{surf:setbolwt}
@@ -3397,6 +3467,8 @@ to a text file.
 
 \item[\htmlref{SCUPA}{SCUPA}:] Show position angle of array (requires \Kappa).
 
+\item[\htmlref{SCUSETENV}{SCUSETENV}:] Set SCUBA environment variables (JAC only)
+
 \item[\htmlref{SCUQUICK}{SCUQUICK}:] Semi-automated data reduction pipeline.
 
 \item[\htmlref{SCUSHIFT}{SCUSHIFT}:] Shift data along an A-to-D card.
@@ -3441,6 +3513,7 @@ weak sources.
 \item \textbf{Processing SCAN/MAP data:}
 
 \begin{description}
+\item[\htmlref{ADD\_DBM}{ADD_DBM}:] Add dual-beam to single-beam data.
 \item[\htmlref{DESPIKE2}{DESPIKE2}:] Despike SCAN/MAP data.
 \item[\htmlref{REMDBM}{REMDBM}:] Remove dual-beam response from SCAN/MAP
 images (requires \Kappa).
@@ -3449,6 +3522,12 @@ data (EKH method).
 \item[\htmlref{SCAN\_RLB}{SCAN_RLB}:] Remove baselines from scans.
 \item[\htmlref{SCUMAKEWT}{SCUMAKEWT}:] Generate Fourier weights (used by
 \remdbm).
+\end{description}
+
+\item \textbf{Polarimetry:}
+
+\begin{description}
+\item[\htmlref{REMIP}{REMIP}:] Remove instrumental polarisation from polarimetry data.
 \end{description}
 
 \item \textbf{Data inspection:}
@@ -3529,6 +3608,108 @@ NDF.
 \section{\xlabel{complete}Complete routine descriptions\label{complete}}
 
 The \scusoft\ routines are described in the following pages:
+
+
+\newpage
+\label{surf:adddbm}
+\sstroutine{
+   ADD\_DBM
+}{
+   Generate a dual beam map from a single beam map
+}{
+   \sstdescription{
+      Create a dual beam map from a single beam input map.
+      Simply finds the signal detected at each pixel by looking
+      at the difference between the pixels nearest to each chop
+      beam. This calculates a middle beam response. (ie the response
+      at each pixel is the difference between the L and the R
+      beams).
+
+      This task can be used to generate test data for \remdbm.
+   }
+   \sstusage{
+      add\_dbm in chop pa out
+   }
+   \sstparameters{
+      \sstsubsection{
+         CHOP = REAL (Read)
+      }{
+         Chop throw in pixels of the input image. There is no default.
+         The range of this parameter should lie between 1 and the
+         size of the input image.
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input single beam image.
+      }
+      \sstsubsection{
+         MSG\_FILTER = CHAR (Read)
+      }{
+         Message filter level. Options are QUIET, NORMAL and
+         VERBOSE. Default is NORM.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output Dual beam image. Default output name is input name
+         plus \_dbm\_int(pa)\_int(chop).
+      }
+      \sstsubsection{
+         PA = REAL (Read)
+      }{
+         Position angle of chop throw. Positive is anti-clockwise starting
+         from North. The angle should be specified in degrees.
+      }
+      \sstsubsection{
+         PIXSIZE = REAL (Read)
+      }{
+         Pixel size in arcseconds. This is required for compatibility
+         with \remdbm\ (since the CHOP\_THR FITS keyword has to be in
+         arcseconds rather than pixels and REMDBM requires SCUPIXSZ
+         FITS keyword). A null value will be treated as 1 arcsec.
+         Default is to use the value of SCUPIXSZ from the FITS header
+         (if present).
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         add\_dbm gaussian 0 30 dbm\_out
+      }{
+         Generate a dual beam image from the single beam {\tt '}gaussian{\tt '}
+         input NDF using a 30 pixel chop at 0 degrees. Write the
+         resulting image to dbm\_out.sdf.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The output images are compatible with REMDBM.
+
+         \sstitem
+         All extensions and AST/WCS information are propogated to the
+           output image.
+
+         \sstitem
+         A variance array is created if present in the input image.
+
+         \sstitem
+         If a quality array is present in the input image it is used
+           to generate a bad pixel mask in the output image and is removed.
+
+         \sstitem
+        Bad pixels in the input image are treated as zeroes for the
+       dual beam calculation.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      SURF: \remdbm
+   }
+}
+
 
 \newpage
 \label{surf:bolrebin}
@@ -3728,6 +3909,25 @@ The \scusoft\ routines are described in the following pages:
          See the notes. REF can include a \htmlref{SCUBA section}{sections}.
       }
       \sstsubsection{
+         REFPIX ( 2 ) = INTEGER (Read)
+      }{
+         The coordinate of the reference pixel in the output data
+         array. This corresponds to the pixel associated with the
+         specified RA/Dec centre. Default is to use the middle pixel
+         if a size is specified or the optimal pixel if the default
+         size is used (see the SIZE parameter).
+      }
+      \sstsubsection{
+         TRIM = INTEGER (Read)
+      }{
+        This parameter determines the amount of good data that should
+        be trimmed from the final image to correct for edge effects.
+        The supplied value should be in arcseconds. All pixels closer
+        to a bad pixel than this distance will be set to bad in the
+        output image (by setting bit 1 in the quality array). 
+        Default is 0.0.
+      }
+      \sstsubsection{
          SCALE = REAL (Read)
       }{
          Radius of one scale size in arcsec. This effectively governs the
@@ -3838,6 +4038,10 @@ The \scusoft\ routines are described in the following pages:
          \sstitem
          Bolometer weights will be used if a BOLWT extension is found
          in the input data file (usually set with \setbolwt).
+
+        \sstitem
+Astrometry information is stored in the WCS component and not 
+  the FITS extension.
 
       }
    }
@@ -5612,6 +5816,25 @@ proceeding.
          See the notes. REF can include a \htmlref{SCUBA section}{sections}.
       }
       \sstsubsection{
+         REFPIX ( 2 ) = INTEGER (Read)
+      }{
+         The coordinate of the reference pixel in the output data
+         array. This corresponds to the pixel associated with the
+         specified RA/Dec centre. Default is to use the middle pixel
+         if a size is specified or the optimal pixel if the default
+         size is used (see the SIZE parameter).
+      }
+      \sstsubsection{
+         TRIM = INTEGER (Read)
+      }{
+        This parameter determines the amount of good data that should
+        be trimmed from the final image to correct for edge effects.
+        The supplied value should be in arcseconds. All pixels closer
+        to a bad pixel than this distance will be set to bad in the
+        output image (by setting bit 1 in the quality array). 
+        Default is 0.0.
+      }
+      \sstsubsection{
          SCALE = REAL (Read)
       }{
          Radius of one scale size in arcsec. This effectively governs the
@@ -5722,6 +5945,12 @@ proceeding.
          \sstitem
          Bolometer weights will be used if a BOLWT extension is found
          in the input data file (usually set with \setbolwt).
+
+       \sstitem
+Astrometry information is stored in the WCS component and not 
+  the FITS extension.
+
+
       }
    }
    \sstdiytopic{
@@ -6599,7 +6828,9 @@ menu.
          OUT = NDF (Write)
       }{
          This is the name of the NDF that will contain the rebinned
-         map. 
+         map.   A null value can be supplied to shut down rebin without error.
+         This can be used to determine the size of the output map
+         without creating it. 
       }
       \sstsubsection{
          OUT\_COORDS = CHAR (Read)
@@ -6684,6 +6915,25 @@ menu.
          The name of the first NDF to be rebinned. The name may also be the
          name of an ASCII text file containing NDF and parameter values.
          See the notes. REF can include a \htmlref{SCUBA section}{sections}.
+      }
+      \sstsubsection{
+         REFPIX ( 2 ) = INTEGER (Read)
+      }{
+         The coordinate of the reference pixel in the output data
+         array. This corresponds to the pixel associated with the
+         specified RA/Dec centre. Default is to use the middle pixel
+         if a size is specified or the optimal pixel if the default
+         size is used (see the SIZE parameter).
+      }
+      \sstsubsection{
+         TRIM = INTEGER (Read)
+      }{
+        This parameter determines the amount of good data that should
+        be trimmed from the final image to correct for edge effects.
+        The supplied value should be in arcseconds. All pixels closer
+        to a bad pixel than this distance will be set to bad in the
+        output image (by setting bit 1 in the quality array). 
+        Default is 0.0.
       }
       \sstsubsection{
          SCALE = REAL (Read)
@@ -6796,6 +7046,12 @@ menu.
          \sstitem
          Bolometer weights will be used if a BOLWT extension is found
          in the input data file (usually set with \setbolwt).
+
+       \sstitem
+Astrometry information is stored in the WCS component and not 
+  the FITS extension.
+
+
       }
    }
    \sstdiytopic{
@@ -7018,7 +7274,7 @@ can be the number of the observation rather than the full filename.
       The deconvolution is performed using Fast Fourier techniques.
    }
    \sstusage{
-      remdbm [-h] [-v] [-out=] [-noams] files
+      remdbm [-h] [-v] [-out=] [-noams] [-filter] files
    }
    \sstparameters{
       \sstsubsection{
@@ -7044,6 +7300,12 @@ can be the number of the observation rather than the full filename.
          Ignored if ADAM messaging is not available.
       }
       \sstsubsection{
+         $-$filter
+      }{
+         Turns on high frequency filtering. When used, data at frequencies
+         greater than that to which the telescope is sensitive are set to zero.
+      }
+      \sstsubsection{
          files
       }{
          List of input files to be processed. Shell wildcards are allowed.
@@ -7062,6 +7324,12 @@ can be the number of the observation rather than the full filename.
       }{
          Process the four input images. The output filename is set to
          \texttt{m82.sdf}.
+      }
+      \sstexamplesubsection{
+         remdbm -filter -noams *\_reb.sdf
+      }{
+        Process the supplied files with high frequency filtering. Do not
+        use the messaging system.
       }
    }
    \sstnotes{
@@ -7083,11 +7351,99 @@ can be the number of the observation rather than the full filename.
    \sstdiytopic{
       Related Applications
    }{
-      SURF: \scumakewt\newline
+      SURF: \scumakewt\,  \adddbm\newline
       \xref{KAPPA}{sun95}{}: \fourier
    }
 }
 
+
+\newpage
+\label{surf:remip}
+\sstroutine{
+   REMIP
+}{
+   Remove instrumental polarisation from SCUBA pol data
+}{
+   \sstdescription{
+      This task calculates and removes the instrumental polarisation
+      signal from SCUBA polarimeter data.
+
+      For a percentage instrumental polarisation $P_I(e)$ at angle $\theta(e)$
+      and elevation $e$ (the instrumental polarisation is elevation dependent) 
+      the correction to the measured flux at waveplate angle $W$ is:
+
+      \begin{equation}
+        S_{Actual} = S_{Measured} - S_{Mean} P_I(e) ( 1 + \cos(4W - 2\theta(e)))
+      \end{equation}
+
+      For SCUBA, we can not trivially measure the mean flux level (since each bolometer
+      is jiggling to different areas on the sky) so this task uses an
+      approximate form of the above equation to correct for instrumental
+      polarisation that is valid for IPs of a few percent:
+
+      \begin{equation}
+          S_{Actual} \approx \frac{S_{Measured}}{1 + P_I(e) \cos(4W - 2\theta(e))}
+      \end{equation}
+
+   }
+   \sstusage{
+      remip in ipfile out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input data file.
+      }
+      \sstsubsection{
+         IPFILE = FILE (Read)
+      }{
+         File containing the IP `flatfield{\tt '}
+      }
+      \sstsubsection{
+         MSG\_FILTER = CHAR (Read)
+      }{
+         Message filter level. Options are QUIET, NORMAL and
+         VERBOSE. Default is NORM.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output file containing IP removed data. Default output
+         filename is `\_ip{\tt '} (`i{\tt '} for short form).
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         remip file1 ipfile.dat $\backslash$$\backslash$
+      }{
+         Correct file1.sdf using ipfile.dat and write IP corrected
+         data to the default output file (eg file1\_ip).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Variance is propagated correctly.
+
+         \sstitem
+         This task writes out the waveplate angles and rotation angles.
+           The waveplate angle per integration is written to .MORE.REDS.WPLATE.
+           The rotation angle (waveplate 0 to X pixel axis) is written
+           to .MORE.REDS.ANGROT (angle per integration). The angle
+           between nasmyth and the ra/dec frame (ie ANGROT - 90 degrees)
+           is stored in .MORE.REDS.NASMYTH\_ANG (angle per sample).
+           These are written as NDFs and so can be displayed in the normal way.
+           The angles are in degrees.
+
+         \sstitem
+         An array containing the fast axis angle is also written
+           to the REDS extension (FAST\_AXIS). The size of this array
+           matches the number of sub-instruments in the file.
+      }
+   }
+}
 
 
 \newpage
@@ -7483,7 +7839,10 @@ menu.
          Governs the method to be used for calculating the baseline.
          Options are MEDIAN: Remove the median from each scan, 
          MEAN: remove the mean level from each scan, LINEAR: fit a linear
-         baseline to the ends of the scan. Default is LINEAR.
+         baseline to the ends of the scan.SECTION: Use a SCUBA section to 
+         specify regions of each integration that are thought to be flux free.
+         Remove the median of the specified section from the associated 
+         integration. Default is LINEAR.
       }
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
@@ -7502,6 +7861,47 @@ menu.
          This parameter governs whether the baseline fit is removed from the
          input data or stored instead of the data. If RLB is .TRUE. the
          corrected data are returned. If RLB is .FALSE. the fit is returned.
+      }
+      \sstsubsection{
+         SECTION = CHAR (Read)
+      }{
+   This array parameter can be used to specify SCUBA sections
+   to be used for baseline calculation. It is requested when 
+   METHOD=SECTION. In general the SCUBA section should
+   include scan (exposure) or position (p) specifiers which 
+   will be applied to each bolometer and integration. It is
+   possible to be more specific and to provide multiple sections
+   singling out certain bolometers or integrations. If entire
+   integrations are selected no baseline removal will occur
+   on unselected integrations (this will be stated).
+   The median of the section supplied for each integration
+   is subtracted from every exposure in that integration (remember
+   that if no integration is specified, all integrations are assumed).
+
+   Curly brackets must still be given. Since this is an array
+   parameter square brackets must be used to specify more than
+   one component:
+
+       SECTION $>$ [ \{e1\} , \{e4;b2\} ]
+
+   would select exposure one from each integration along with
+   exposure 4 for bolometer 2.
+   be used if the square brackets are not used. 
+
+   Care must also be taken when using commas in SCUBA sections -
+   the parameter system will split multiple entries on commas 
+   unless the entire section is quoted:
+
+       SECTION $>$ "\{e1,4\}"
+
+   If necessary the negation character should come after a
+   section (ie after the closing curly bracket) and that 
+   negation applies to the combined section and not just the string 
+   containing the negation character:
+
+       SECTION $>$ \{e3\}-
+
+   implies that the section consists of everything except exposure 3.
       }
    }
    \sstexamples{
@@ -7523,6 +7923,12 @@ menu.
           Calculate the fit using the median of each scan but do not
           remove the baseline from the data. Store the baseline determination
           for later analysis.
+      }
+      \sstexamplesubsection{
+         scan\_rlb method=section rlb section={e1,4}
+      }{
+   Calculate the baseline using the first and 4th exposures of
+   each integration.
       }
    }
    \sstnotes{
@@ -8131,12 +8537,6 @@ menu.
          Chop throw in arcseconds. There is no default
       }
       \sstsubsection{
-         PA = REAL (Read)
-      }{
-         Position angle of chop throw. Positive is anti-clockwise starting
-         from North. The angle should be specified in degrees.
-      }
-      \sstsubsection{
          FTCHOP = NDF (Write)
       }{
          Output NDF containing fourier transform of the chop function.
@@ -8144,12 +8544,46 @@ menu.
          by parameter SIZE
       }
       \sstsubsection{
+         LIKE = NDF (Read)
+      }{
+   This parameter may be used to supply an NDF which is to be
+   used as a template.  If such a template is supplied, then its
+   origin (its lower pixel-index bounds) and extent will be read
+   used for the output NDFs. By default no template will be used
+   and the size information will be read from the SIZE parameter.
+   Additionally, the PA, PIXSIZE and CHOP parameters are searched
+   for in the FITS extension if one is present (using keywords
+   of CHOP\_PA, SCUPIXSZ and CHOP\_THR respectively). These parameters
+   values are requested if not found in the FITS extension.
+      }
+      \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
          Message filter level. Default is NORM.
       }
       \sstsubsection{
-         PIXSIZE = INTEGER (Read)
+         OUTCHOP = REAL (Write)
+      }{
+         Chop throw angle actually used.
+      }
+      \sstsubsection{
+         OUTPA = REAL (Write)
+      }{
+         Position angle actually used.
+      }
+      \sstsubsection{
+         OUTPIXSZ = REAL (Write)
+      }{
+         Actual pixel size used (arcsec)
+      }
+      \sstsubsection{
+         PA = REAL (Read)
+      }{
+         Position angle of chop throw. Positive is anti-clockwise starting
+         from North. The angle should be specified in degrees.
+      }
+      \sstsubsection{
+         PIXSIZE = REAL (Read)
       }{
          Pixel size to be used for output images. Should be in arcseconds
          (ie same units as used for the CHOP parameter)
@@ -8941,6 +9375,64 @@ the files produced with SCUBA\_SUFFIX=long):
 
 
 \newpage
+\label{surf:scusetenv}
+\sstroutine{
+   SCUSETENV
+}{
+   Set the startup environment variables for SURF
+}{
+   \sstdescription{
+      This script sets the standard DATADIR and SCUBA\_PREFIX
+      environment variables given a UT date.
+   }
+   \sstusage{
+      scusetenv [UTdate]
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         scusetenv
+      }{
+         Set DATADIR and SCUBA\_PREFIX for the current UT date
+      }
+      \sstexamplesubsection{
+         scusetenv 19980201
+      }{
+         Set DATADIR and SCUBA\_PREFIX for the data observed on date
+         19980201
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Currently this routine only works for the JAC and JCMT systems.
+           This is because the data are stored in standard
+           directories and indexed by YYYYMMDD UT date.
+
+         \sstitem
+         ORAC\_DATA\_IN environment variable is also set (only relevant
+           for users of the ORAC-DR pipeline)
+
+         \sstitem
+         If this routine is run from a non-JAC/JCMT site DATADIR
+           will not be set but SCUBA\_PREFIX will be set.
+      }
+   }
+   \sstdiytopic{
+      Parameters
+   }{
+      UTdate = YYYYMMDD format string (Optional)
+        The UT date of the data to be processed (in YYYYMMDD format).
+        The default value is to use the current UT date
+   }
+   \sstimplementationstatus{
+      This script should be sourced (not executed) since the
+      environment variables should be set after the script has been read.
+   }
+}
+
+
+\newpage
 \label{surf:scushift}
 \sstroutine{
    SCUSHIFT
@@ -9416,6 +9908,8 @@ $\backslash$
 
       If the \param{CVAR} parameter is true the reduced $\chi^2$ value can not
       be used to compare the goodness of fit between datasets.
+
+      Both RASTER and DISCRETE skydips are supported.
 
       See Appendix \ref{skydips} for more information on skydips.
    }
