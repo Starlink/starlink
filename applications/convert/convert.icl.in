@@ -179,7 +179,7 @@ GZIP(.sdf.gz)'
 
 {  Formats recognised when creating new datasets.
 setenv NDF_FORMATS_OUT ~
-'FITS(.fit),~
+'.,FITS(.fit),~
 FIGARO(.dst),~
 IRAF(.imh),~
 STREAM(.das),~
