@@ -10,7 +10,7 @@
 
       END
 
-      SUBROUTINE PSF_TASSOCI( ID, SLOT, STATUS )
+      SUBROUTINE PSF_TASSOCI( FID, SLOT, STATUS )
 *
 *    Description :
 *

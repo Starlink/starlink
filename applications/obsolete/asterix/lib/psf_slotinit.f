@@ -1,5 +1,5 @@
 *+  PSF_SLOTINIT - Initialise slot pointed to by SLOT
-      SUBROUTINE PSF_SLOTINIT( LOC, SLOT, STATUS )
+      SUBROUTINE PSF_SLOTINIT( SLOT, STATUS )
 *
 *    Author :
 *
@@ -13,6 +13,7 @@
 *     15 Dec 93 : Use internal PSF1_ routines to access axis data. Finds
 *                 number of radial model bins properly (DJA)
 *     23 Dec 93 : Added search for hint routine (DJA)
+*     25 Apr 95 : Use new data interfaces (DJA)
 *
 *    Type declarations :
 *
@@ -25,7 +26,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -34,8 +34,7 @@
 *
 *    Import :
 *
-      CHARACTER        LOC*(DAT__SZLOC)       ! Dataset locator
-      INTEGER          SLOT                   ! Psf slot
+      INTEGER          		SLOT                   	! Psf slot
 *
 *    Function :
 *
@@ -72,73 +71,67 @@
 *    Allocate internal storage
       CALL PSF1_ALLOC( P_INST(SLOT), STATUS )
 
-*    Look for axis units if good locator
-      CALL DAT_VALID( LOC, VALID, STATUS )
-      IF ( VALID ) THEN
+*    Get axis data from dataset
+      CALL PSF_CHKAXES( SLOT, STATUS )
 
-*      Get axis data from dataset
-        CALL PSF_CHKAXES( SLOT, STATUS )
+*    Identify axes
+      CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
-*      Identify axes
-        CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
+*    Update model arguments if needed
+      IF ( P_MODEL(SLOT) ) THEN
 
-*      Update model arguments if needed
-        IF ( P_MODEL(SLOT) ) THEN
+*      Extract axis data from internal storage
+        CALL PSF1_GETAXVAL( P_INST(SLOT), X_AX, X_DIM, X_REG, X_PTR,
+     :                      X_BR, X_DR, X_TOR, STATUS )
+        CALL PSF1_GETAXVAL( P_INST(SLOT), Y_AX, Y_DIM, Y_REG, Y_PTR,
+     :                      Y_BR, Y_DR, Y_TOR, STATUS )
 
-*        Extract axis data from internal storage
-          CALL PSF1_GETAXVAL( P_INST(SLOT), X_AX, X_DIM, X_REG, X_PTR,
-     :                        X_BR, X_DR, X_TOR, STATUS )
-          CALL PSF1_GETAXVAL( P_INST(SLOT), Y_AX, Y_DIM, Y_REG, Y_PTR,
-     :                        Y_BR, Y_DR, Y_TOR, STATUS )
+*      Polar model?
+        IF ( SM_TYPE(SLOT) .EQ. PSF_PGRID ) THEN
 
-*        Polar model?
-          IF ( SM_TYPE(SLOT) .EQ. PSF_PGRID ) THEN
+*        Regular radial bins?
+          IF ( SM_P_REG(SLOT) ) THEN
 
-*          Regular radial bins?
-            IF ( SM_P_REG(SLOT) ) THEN
+*          Convert model args to radians
+            SM_P_DR(SLOT) = ABS(SM_P_DR(SLOT) * X_TOR)
 
-*            Convert model args to radians
-              SM_P_DR(SLOT) = ABS(SM_P_DR(SLOT) * X_TOR)
-
-*            Find maximum radius of image corners (with a half-pixel margin),
-*            in radians from the field centre
-              XLO = X_BR - X_DR
-              XHI = XLO + (X_DIM+1)*X_DR
-              YLO = Y_BR - Y_DR
-              YHI = YLO + (Y_DIM+1)*Y_DR
-              MAXR = SQRT(MAX( XLO*XLO + YLO*YLO, XLO*XLO + YHI*YHI,
+*          Find maximum radius of image corners (with a half-pixel margin),
+*          in radians from the field centre
+            XLO = X_BR - X_DR
+            XHI = XLO + (X_DIM+1)*X_DR
+            YLO = Y_BR - Y_DR
+            YHI = YLO + (Y_DIM+1)*Y_DR
+            MAXR = SQRT(MAX( XLO*XLO + YLO*YLO, XLO*XLO + YHI*YHI,
      :                    XHI*XHI + YLO*YLO, XHI*XHI + YHI*YHI ) )
 
-*            Find number of radial bins
-              SM_P_NR(SLOT) = INT( MAXR/SM_P_DR(SLOT) ) + 1
+*          Find number of radial bins
+            SM_P_NR(SLOT) = INT( MAXR/SM_P_DR(SLOT) ) + 1
 
-            ELSE
-
-*            Convert to radian**2
-              DO I = 1, SM_P_NR(SLOT)
-                SM_P_RUP(I,SLOT) = SM_P_RUP(I,SLOT) * (X_TOR**2)
-              END DO
-
-            END IF
-
-*          Hence number of polar bins
-            SM_NMOD(SLOT) = SM_P_NR(SLOT) * SM_P_NA(SLOT)
-
-*        Assume rectangular
           ELSE
 
-*          Convert bin widths to radians
-            SM_R_DX(SLOT) = SM_R_DX(SLOT) * X_TOR
-            SM_R_DY(SLOT) = SM_R_DY(SLOT) * Y_TOR
-
-*          Numbers of bins in X and Y axes
-            SM_R_NX(SLOT) = INT( X_DIM * X_DR/ SM_R_DX(SLOT) )
-            SM_R_NY(SLOT) = INT( Y_DIM * Y_DR/ SM_R_DY(SLOT) )
-
-*          Hence number of rectangular bins
-            SM_NMOD(SLOT)  = MAX(1,SM_R_NX(SLOT)*SM_R_NY(SLOT) )
+*          Convert to radian**2
+            DO I = 1, SM_P_NR(SLOT)
+              SM_P_RUP(I,SLOT) = SM_P_RUP(I,SLOT) * (X_TOR**2)
+            END DO
 
           END IF
+
+*        Hence number of polar bins
+          SM_NMOD(SLOT) = SM_P_NR(SLOT) * SM_P_NA(SLOT)
+
+*      Assume rectangular
+        ELSE
+
+*        Convert bin widths to radians
+          SM_R_DX(SLOT) = SM_R_DX(SLOT) * X_TOR
+          SM_R_DY(SLOT) = SM_R_DY(SLOT) * Y_TOR
+
+*        Numbers of bins in X and Y axes
+          SM_R_NX(SLOT) = INT( X_DIM * X_DR/ SM_R_DX(SLOT) )
+          SM_R_NY(SLOT) = INT( Y_DIM * Y_DR/ SM_R_DY(SLOT) )
+
+*        Hence number of rectangular bins
+          SM_NMOD(SLOT)  = MAX(1,SM_R_NX(SLOT)*SM_R_NY(SLOT) )
 
         END IF
 
@@ -200,8 +193,8 @@
 
 *    Call the INIT routine if defined
       IF ( L_MOD_I(MID,LID) .NE. 0 ) THEN
-        CALL PSF_PSF_INIT_EXEC( %VAL(L_MOD_I(MID,LID)),
-     :                          LOC, SLOT, STATUS )
+        CALL PSF_PSF_INIT_EXEC( %VAL(L_MOD_I(MID,LID)), SLOT,
+     :                          P_FID(SLOT), P_INST(SLOT), STATUS )
       END IF
 
  99   CONTINUE
@@ -270,7 +263,7 @@
 
 
 *+  PSF_PSF_INIT_EXEC - Call initialisation routine for a given slot
-      SUBROUTINE PSF_PSF_INIT_EXEC( ROUTINE, LOC, SLOT, STATUS )
+      SUBROUTINE PSF_PSF_INIT_EXEC( ROUTINE, SLOT, FID, INST, STATUS )
 *
 *    Authors :
 *
@@ -292,32 +285,19 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      CHARACTER        LOC*(DAT__SZLOC)       ! Dataset locator
-      EXTERNAL         ROUTINE                ! Psf initialiser
-      INTEGER          SLOT                   ! Psf system slot
-*
-*    Local variables :
-*
-      INTEGER          PASS(2)
+      EXTERNAL			ROUTINE			! Psf initialiser
+      INTEGER			SLOT			! Dataset id
+      INTEGER			FID			! Dataset id
+      INTEGER          		INST                   	! Internal data
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Set up arguments
-      PASS(1) = SLOT
-      PASS(2) = P_INST(SLOT)
-
-*    Invoke initialisation routine
-      CALL ROUTINE( PASS, LOC, STATUS )
+*  Invoke initialisation routine
+      CALL ROUTINE( SLOT, FID, INST, STATUS )
 
       END
