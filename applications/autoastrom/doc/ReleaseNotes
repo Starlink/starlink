@@ -1,7 +1,7 @@
 <subsect id="release-0.3" export="export">
 <subhead><title>Version 0.3</title></subhead>
 
-<p>This is release 0.3</p>
+<p>This is release 0.3 $Date$</p>
 
 <p><strong>THIS IS BETA SOFTWARE.  Some features work only partially or
 unreliably.  It does not have all the functionality of a
@@ -10,13 +10,13 @@ change.</strong></p>
 
 <p>This release is still lacking some functionality.  In particular
 <ul>
-<li>the initial approximate astrometry must be supplied as a WCS
+<li><p>the initial approximate astrometry must be supplied as a WCS
 component in the input NDF -- a future version will allow this to be
 either specified on the command line or picked up from any FITS
-headers in the file;</li>
-<li>this can handle only single CCDs, rather than mosaics;</li>
-<li>I need to do some experimentation to discover how robust the whole 
-kit is to errors in the initial astrometry.</li>
+headers in the file;</p></li>
+<li><p>this can handle only single CCDs, rather than mosaics;</p></li>
+<li><p>I need to do some experimentation to discover how robust the whole 
+kit is to errors in the initial astrometry.</p></li>
 </ul></p>
 
 </subsect>
