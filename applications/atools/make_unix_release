@@ -31,6 +31,9 @@
 #  Ensure the sdt grp command is available.
       source $SDT_DIR/startup.csh
 
+#  Ensure the sst prohlp command is available.
+      source /dsbwork/bin/sst/start
+
 #  Store the name of the release directory, and go there.
       set REL_DIR = ${TEMPDIR}/atools_${SYSTEM}
       cd ${REL_DIR}
@@ -55,11 +58,11 @@
 
 #  Generate the ifl files, and the icl and csh start-up scripts. 
       echo "Generating ifl files, etc form the ifd file"
-      ifd2star atools
+      ifd2star atools_mon
 
 #  Generate the IRAF files.
       echo "Generating iraf files"
-      ifd2iraf atools
+      ifd2iraf atools_mon
 
 #  Generate the IRAF documentation.
       mv atools.star-hlp atools.hlp
@@ -134,7 +137,7 @@ FOO5
       tar -cvh -f ${TEMPDIR}/atools.tar `grp unix_total` 
       rm `grp unix_total` 
       mv ${TEMPDIR}/atools.tar ${REL_DIR}
-      rm -rf doc atools.ifd
+      rm -rf doc atools_mon.ifd
 
 #  Compress it.
       echo "Compressing atools.tar"

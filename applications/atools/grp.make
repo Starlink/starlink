@@ -39,7 +39,7 @@ UNIX_OTHERS = makefile mk atools.news
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_OTHERS) atools.star-hlp atools.ifd \
+UNIX_RELEASE =  $(UNIX_OTHERS) atools.star-hlp atools_mon.ifd \
 $(ATOOLS_SOURCE) 
 
 #  The contents of atools.tar.
