@@ -663,8 +663,10 @@
 *  unmap the pointing correction arrays
 
             CALL DTA_FRVAR (PLST_DTA_NAME, DSTAT)
-            CALL DTA_FRVAR (PDAZ_DTA_NAME, DSTAT)
-            CALL DTA_FRVAR (PDALT_DTA_NAME, DSTAT)
+            IF (POINTING_CORRECTION) THEN
+               CALL DTA_FRVAR (PDAZ_DTA_NAME, DSTAT)
+               CALL DTA_FRVAR (PDALT_DTA_NAME, DSTAT)
+            END IF
             DSTAT = 0
 
 *  unmap the LST array and data arrays for this file, then close the file
@@ -708,15 +710,30 @@
          ELSE
             CALL PAR_WRUSER ('Coordinates are FK5 J2000.0', IGNORE)
          END IF
- 
-         CALL SLA_DR2TF (1, RACEN, SIGN, HMSF)
-         print *,'HMSF',HMSF(1),HMSF(2), HMSF(3),HMSF(4),RACEN
+
+*  On linux if we call SLA_DR2TF only once we get "4h" rather than
+*  the correct answer of "5h". Very bad heisenbug. No errors from valgrind.
+*  If we call SLA_DR2TF a second time everything works. Bug is specific
+*  to this area in the code. If I try SLA_DR2TF at start or later on it
+*  works fine.
+*         print *,'RACEN and DECCEN',RACEN,DECCEN
+*         print *,RACEN*180/(3.14159D0*15.0D0)
+         CALL SLA_DR2TF (2, RACEN, SIGN, HMSF)
+*         print *,'HMSF',HMSF(1),HMSF(2), HMSF(3),HMSF(4),RACEN,SIGN
+
+*         print *,'RACEN and DECCEN',RACEN,DECCEN
+*         print *,RACEN*180/(3.14159D0*15.0D0)
+         CALL SLA_DR2TF (2, RACEN, SIGN, HMSF)
+*         print *,'HMSF',HMSF(1),HMSF(2), HMSF(3),HMSF(4),RACEN,SIGN
+
 
 *     Check self-consistency
-         SECONDS = DBLE(HMSF(3))+(DBLE(HMSF(4))/100)
+         SECONDS = DBLE(HMSF(3))+(DBLE(HMSF(4))/100.0D0)
          CALL SLA_DTF2R (HMSF(1), HMSF(2), SECONDS, CHECK, J)
 
-         IF (STATUS .EQ. 0) THEN
+*         print *,'Status: ',J,SECONDS,CHECK
+
+         IF (STATUS .EQ. SAI__OK) THEN
             IF (ABS(RACEN-CHECK) .GT. 1D-3) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETD('RA',RACEN)
