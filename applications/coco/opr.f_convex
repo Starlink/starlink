@@ -1,0 +1,36 @@
+      SUBROUTINE OPR (LU, FILE, IOS)
+*+
+*  - - - -
+*   O P R
+*  - - - -
+*
+*  !!! Convex version !!!
+*
+*  Open an input file, avoiding any platform-specific need for write
+*  access.
+*
+*  Given:
+*     LU     i      I/O unit number
+*     FILE   c*(*)  file name
+*
+*  Returned:
+*     IOS    i      I/O status (0=OK)
+*
+*  P T Wallace   Starlink   27 June 1994
+*-
+
+      IMPLICIT NONE
+
+      INTEGER LU
+      CHARACTER*(*) FILE
+      INTEGER IOS
+
+
+
+      IF (LU.EQ.5) THEN
+         IOS=0
+      ELSE
+         OPEN (LU,FILE=FILE,STATUS='OLD',IOSTAT=IOS)
+      ENDIF
+
+      END

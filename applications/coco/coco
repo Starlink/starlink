@@ -1,0 +1,74 @@
+#!/bin/csh -f
+#
+#  To invoke the coco utility, type:
+#
+#     coco  [input]  [report]  [output]
+#
+#  Any combination of parameters may be defaulted, by omission
+#  or by using "".
+#
+#  Common invocations:
+#
+#    coco                       interactive use, no output
+#
+#    coco input                 batch use, no output
+#
+#    coco input report          files for input & report, no output
+#
+#    coco input report output   files for input & report, raw output
+#                               to a file
+#
+#  P.T.Wallace   Starlink   8 December 1993
+#
+
+#  Declare interrupt handler
+      onintr end
+
+#  String to indicate defaulted terminal I/O arguments
+      set _tty = `tty`
+
+#  Name of null device
+      set _null = /dev/null
+
+#  Copy arguments
+      set _input = $1
+      set _report = $2
+      set _output = $3
+
+#  Prompts to terminal unless input file specified
+      if ($_input == "") then
+         set _prompts = $_tty
+      else
+         set _prompts = $_null
+      endif
+
+#  Echo to terminal if input file specified
+      if ($_input != "") then
+         set _echo = $_tty
+      else
+         set _echo = $_null
+      endif
+
+#  Errors to terminal if report file specified
+      if ($_report != "") then
+         set _errors = $_tty
+      else
+         set _errors = $_null
+      endif
+
+#  Resolve defaults
+      if ($_input == "") then
+         set _input = $_tty
+      endif
+      if ($_report == "") then
+         set _report = $_tty
+      endif
+      if ($_output == "") then
+         set _output = $_null
+      endif
+
+#  Run the job
+      INSTALL_BIN/coco.x $_tty $_output $_echo $_report $_input $_prompts $_errors
+
+end:
+      exit
