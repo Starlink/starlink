@@ -1,4 +1,6 @@
 use ExtUtils::MakeMaker;
+use strict;
+use vars qw| %StarConfig |;
 
 # This makefile tries to find the libgsd library in
 # a Starlink environment
@@ -15,21 +17,29 @@ if ($@) {
 
 # Define your math libraries here
 # Only need sun math if we are on a sun
+my $mathlibs;
 if ($^O eq 'solaris') {
   $mathlibs = '-L/opt/SUNWspro/lib -lsunmath -lm';
 } else {
   $mathlibs = '-lm'
 }
 
+# Locate the GSD library list
+my $gsdlibs = `gsd_link`;
+
+die "No GSD libraries were found.\n This may imply that the gsd_link command is not in your path." 
+   if $gsdlibs !~ /./;
+
+my $arrays = "";
 # Uncomment this if you are explicitly linking with libarrays
 # $arrays = "-Larrays -larrays";
 
-$libs = "$arrays $mathlibs";
+my $libs = "$arrays $mathlibs";
 
 WriteMakefile(
     'NAME'      => 'GSD',
     'VERSION_FROM' => 'GSD.pm',
-    'LIBS'      => "-L$StarConfig{Star_Lib} -lgsd $libs",
+    'LIBS'      => "-L$StarConfig{Star_Lib} $gsdlibs $libs",
     'PREREQ_PM' => {
                               'Test' => undef,
                              },
