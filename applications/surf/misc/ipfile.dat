@@ -1,39 +1,57 @@
-{
-{ This is a test file for REMIP
-{
-{  It contains some dummy IP measurements - do not use for real data
-{
-{  Created on 19990115 by Tim Jenness
-{
-{  OK, now the data are real for the LW array (NB at 850 microns)
-{  and for G12 (since re-mounting, 11/98 onwards)
-{  - JSG, 19990120
-{  Added some modified 850 data
-{  - JSG, 19990423
-{  Added 450 micron values (only 8 are individual real measurements)
-{  - JSG, 19990625
+{+
+{  Name:
+{    ipfile.dat
+
+{  Purpose:
+{    Instrumental Polarisation measurements for SCUBA
+
+{  Description:
+{    This file contains the point source instrumental polarisation
+{    measurements for SCUBA with the 450/850 and PHOT filters.
+{    It is used by the REMIP task.
+
+{  Authors:
+{    Jane Greaves (JAC)
+{    Tim Jenness (JAC)
 
 {  Copyright:
 {     Copyright (C) 1999 Particle Physics and Astronomy
 {     Research Council. All Rights Reserved.
 
+{  History:
+{    15 Jan 1999 (TIMJ)
+{      Created with dummy measurements
+{    20 Jan 1999 (JSG)
+{      OK, now the data are real for the LW array (NB at 850 microns)
+{      and for G12 (since re-mounting, 11/98 onwards)
+{    23 Apr 1999 (JSG)
+{      Added some modified 850 data
+{    25 Jun 1999 (JSG)
+{      Added 450 micron values (only 8 are individual real measurements)
+{    10 Aug 1999 (TIMJ)
+{      Correct sign of FAST axis data.
+
+
+{  Notes:
+{    File contains data in the following columns:
 {
-{  File contains data the following data:
-{
-{   BolName   - Name of bolometer (eg H7,G12..)
-{   P0        - IP percentage polarization at the horizon
-{   P0Err     - Error in P0
-{   PSlope    - Gradient in P (ie P = P0 + Pslope * Elevation)
-{   PSlopeErr - Error in PSlope
-{   Theta0    - polarization angle of IP (degrees)
-{   Theta0Err - Error in polarisation angle
-{   ThetaSlope- Gradient in Theta (ie Theta = Theta0 + ThetaSlope * El)
-{   ThSlErr   - Error in ThetaSlope
+{     - BolName   - Name of bolometer (eg H7,G12..)
+{     - P0        - IP percentage polarization at the horizon
+{     - P0Err     - Error in P0
+{     - PSlope    - Gradient in P (ie P = P0 + Pslope * Elevation)
+{     - PSlopeErr - Error in PSlope
+{     - Theta0    - polarization angle of IP (degrees)
+{     - Theta0Err - Error in polarisation angle
+{     - ThetaSlope- Gradient in Theta (ie Theta = Theta0 + ThetaSlope * El)
+{     - ThSlErr   - Error in ThetaSlope
+
+{-
+{.
 
 { FAST axis angles
 
-FAST 850 -2.5
-FAST 450  3.5
+FAST 850  2.5
+FAST 450 -3.5
 
 { Long-wave array
 G1  1.03  0.27 0.0  0.0   135  7  1   0
