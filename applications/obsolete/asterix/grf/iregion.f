@@ -1250,10 +1250,12 @@ c        ENDIF
 *    Status :
 *    Function declarations :
 *    Local constants :
-      INTEGER NLINE
-      PARAMETER (NLINE=7)
+      INTEGER MLINE
+      PARAMETER (MLINE=7)
+      INTEGER PLINE
+      PARAMETER (PLINE=7)
 *    Local variables :
-      CHARACTER*79 TEXT(NLINE)
+      CHARACTER*79 MTEXT(MLINE)
      :/' CIRcle  - circular region     BOX     - box parallel to axes',
      : ' POLygon - irregular polygon   SLIce   - rectangular slice',
      : ' ANNulus - annular region      ELLipse - elliptical region',
@@ -1261,65 +1263,33 @@ c        ENDIF
      : ' SHOw    - outline all regions LISt    - list ARD text',
      : ' IMPort  - input ARD           EXPort  - output ARD',
      : ' INVert  - invert region'/
-      INTEGER ILINE
-*-
-
-      CALL MSG_BLNK()
-      CALL MSG_PRNT('Valid modes are:')
-      CALL MSG_BLNK()
-      DO ILINE=1,NLINE
-        CALL MSG_PRNT(TEXT(ILINE))
-      ENDDO
-
-      CALL MSG_BLNK()
-      CALL MSG_PRNT('*** WARNING - ellipse doesn''t work yet!!')
-      CALL MSG_BLNK()
-
-      END
-
-
-
-
-*+
-      SUBROUTINE IREGION_SUBHELP()
-*    Description :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     BHVAD::RJV
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-*    Global variables :
-*    Import :
-*    Export :
-*    Status :
-*    Function declarations :
-*    Local constants :
-      INTEGER NLINE
-      PARAMETER (NLINE=9)
-*    Local variables :
-      CHARACTER*79 TEXT(NLINE)
-     :/' NEW     - discard previous region and start new definition ',
-     : ' ADD     - add a new region to previous definition',
-     : ' OR      -  "     "    "     "    "         "',
+      CHARACTER*79 PTEXT(PLINE)
+     :/' ADD     - add a new region to previous definition',
      : ' AND     - select only overlap of new region with existing one',
      : ' NOT     - select pixels outside the specified region',
-     : ' EXClude -   "      "       "     "      "       "',
-     : ' ORNOT   - add pixels outside new region to existing region',
+     : ' EXC     -   "      "       "     "      "       "',
+     : ' ADDNOT  - add pixels outside new region to existing region',
      : ' ANDNOT  - select overlap of pixels outside new region',
      : '           with existing region'/
       INTEGER ILINE
 *-
 
       CALL MSG_BLNK()
-      CALL MSG_PRNT('Valid sub-modes are:')
+      CALL MSG_PRNT('Available modes are:')
       CALL MSG_BLNK()
-      DO ILINE=1,NLINE
-        CALL MSG_PRNT(TEXT(ILINE))
+      DO ILINE=1,MLINE
+        CALL MSG_PRNT(MTEXT(ILINE))
       ENDDO
 
+      CALL MSG_BLNK()
+      CALL MSG_PRNT('With the following prefixes:')
+      CALL MSG_BLNK()
+      DO ILINE=1,PLINE
+        CALL MSG_PRNT(PTEXT(ILINE))
+      ENDDO
+
+      CALL MSG_BLNK()
+      CALL MSG_PRNT('*** WARNING - ellipse doesn''t work yet!!')
       CALL MSG_BLNK()
 
       END
