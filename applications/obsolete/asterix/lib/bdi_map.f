@@ -116,7 +116,7 @@
 *  Local Variables:
       CHARACTER*4               INIT                    ! Initialiser
       CHARACTER*20		LITEM			! Local item name
-      CHARACTER*6               LMODE			! Local copy of mode
+      CHARACTER*12              LMODE			! Local copy of mode
       CHARACTER*7 		LTYPE			! Local copy of type
 
       INTEGER			ARGS(5)			! Function args
