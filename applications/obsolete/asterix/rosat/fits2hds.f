@@ -38,6 +38,8 @@
 *     23-May-1994 (LTVAD::JKA) (v1.7-3) close BDA common areas for images
 *     06-Jun-1994 (LTVAD::JKA) (v1.7-4) correct error in calculating total
 *                 exposure time for image and duration.
+*     31-Oct-1994 (jka@star.le) (v1.7-5) adds axis information for
+*                 non-asterix images.
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -76,7 +78,7 @@
       LOGICAL SAME                      ! Same arrays as the last time
       LOGICAL FNEW                      ! Create NEW HDS file ?
       LOGICAL HDSOPEN                   ! HDS file open
-      REAL*4 BASE(2), SCALE(2)          ! Axis scaling on images
+      REAL BASE(2), SCALE(2)          ! Axis scaling on images
       CHARACTER*5 ORIGIN		! FITS file origin
       INTEGER ISTATUS                   ! Status for FIO routines
       CHARACTER*12 TTYPE(512),TTSAVE(512)
@@ -106,10 +108,13 @@
       INTEGER IND                       ! Index into names
       INTEGER SLEN                      ! String Length
       LOGICAL JOIN                      ! Join similar tables
+      CHARACTER*80 COMMENT
+      CHARACTER*80 CTYPE(2)
+      REAL CRVAL(2),CRPIX(2),CDELT(2)
       PARAMETER (MAXRECS = 10000)
 *    VersIon :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'FITS2HDS Version 1.7-4')
+      PARAMETER (VERSION = 'FITS2HDS Version 1.7-5')
 *-
       IF (STATUS.NE.SAI__OK) RETURN
 
@@ -124,7 +129,7 @@
       S_EXTNAME = ' '
 
 ***   Get Input FITS fIle name
-      CALL USI_GET0C('INPUT',FNAME, STATUS)
+      CALL PAR_GET0C('INPUT',FNAME, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 ***   Open the FITS fIle
@@ -137,18 +142,18 @@
       ENDIF
 
 ***   is header info required
-      CALL USI_GET0L('ASTERIX',ASTERIX,STATUS)
+      CALL PAR_GET0L('ASTERIX',ASTERIX,STATUS)
 
 ***   Read Image header InformatIon for image data
       CALL FTGKYJ(IUNIT,'NAXIS',NAXIS,CDUM,ISTATUS)
       IF (ASTERIX.AND.NAXIS.NE.0) THEN
-         CALL USI_GET0C('ORIGIN',ORIGIN,STATUS)
+         CALL PAR_GET0C('ORIGIN',ORIGIN,STATUS)
          CALL CHR_UCASE(ORIGIN)
 *
 *        Auto detect data origins
          IF (ORIGIN.EQ.'AUTO') THEN
             CALL RAT_FITSSTYLE(IUNIT,ORIGIN,STATUS)
-            CALL USI_PUT0C('ORIGIN',ORIGIN,STATUS)
+            CALL PAR_PUT0C('ORIGIN',ORIGIN,STATUS)
          ENDIF
 *
 *        is header information of a known type
@@ -175,11 +180,11 @@
       CALL FTMAHD(IUNIT,1,HTYPE,ISTATUS)
 
 ***   Get the generIc output fIlename
-      CALL USI_GET0C('OUTPUT',HNAME,STATUS)
+      CALL PAR_GET0C('OUTPUT',HNAME,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
 
 ***   Get action required for joining similar tables
-      CALL USI_GET0L('JOIN',JOIN,STATUS)
+      CALL PAR_GET0L('JOIN',JOIN,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
 
 ***   Loop for each header
@@ -264,6 +269,32 @@ C              CALL BDA_INIT()
      &                                                   ,512,STATUS)
                ENDDO
                CALL BDA_CLOSE()
+            ELSEIF (FNEW) THEN
+	       ISTATUS = 0
+	       CALL FTGKYS(IUNIT,'CTYPE1',CTYPE(1),COMMENT,ISTATUS)
+	       CALL FTGKYS(IUNIT,'CTYPE2',CTYPE(2),COMMENT,ISTATUS)
+	       CALL FTGKYE(IUNIT,'CRVAL1',CRVAL(1),COMMENT,ISTATUS)
+	       CALL FTGKYE(IUNIT,'CRVAL2',CRVAL(2),COMMENT,ISTATUS)
+	       CALL FTGKYE(IUNIT,'CRPIX1',CRPIX(1),COMMENT,ISTATUS)
+	       CALL FTGKYE(IUNIT,'CRPIX2',CRPIX(2),COMMENT,ISTATUS)
+	       CALL FTGKYE(IUNIT,'CDELT1',CDELT(1),COMMENT,ISTATUS)
+	       CALL FTGKYE(IUNIT,'CDELT2',CDELT(2),COMMENT,ISTATUS)
+	       IF (ISTATUS.NE.0) THEN
+		  CALL MSG_PRNT('*** Cannot add axis information ***')
+		  ISTATUS = 0
+               ELSE
+	          CALL BDA_INIT()
+	          CALL BDA_CREAXES(LOC,NAXIS,STATUS)
+	          DO II = 1,NAXIS
+		     BASE(II) = -(CDELT(II) * CRPIX(II))
+		     SCALE(II) = CDELT(II)
+		     CALL BDA_PUTAXUNITS(LOC,II,CTYPE(II),STATUS)
+		     CALL BDA_CREAXVAL(LOC,II,.TRUE.,NAXES(II),STATUS)
+		     CALL BDA_PUTAXVAL(LOC,II,BASE(II),SCALE(II),
+     &                                             NAXES(II),STATUS)
+                  ENDDO
+	          CALL BDA_CLOSE()
+               ENDIF
             ENDIF
          ENDIF
 
