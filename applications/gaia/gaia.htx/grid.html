@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Grid Overlay Toolbox</title>
+</head>
+
+<body>
+<blockquote>
+<h2 align=center><font color=red>Grid Overlay Toolbox</font></h2>
+<img src="grid.gif"><br>
+<h3>Drawing your first grid</h3>
+<p>Just press the "Draw" button at the bottom of the window. Sensible
+defaults exist for all parameters.
+
+<h3>Drawing a grid showing pixels rather than celestial coordinates</h3>
+<p>Just select the "System" tab, now select the "System:" menu and
+choose the option "pixels".
+
+<h3>Drawing a grid showing celestial coordinates</h3>
+<p>If your image doesn't show celestial coordinates then it doesn't
+have a recognised calibration. See the astrometry toolboxes for how to
+add or define a calibration (assuming this doesn't mean that there's a
+really problem with an existing one).
+
+<h3>Getting a hardcopy</h3>
+<p>To get a hardcopy pull down the "File" menu in the main window and
+select the "Print..." "Image..." option. This creates a dialog window
+in which you can either save the displayed image and grid to a
+postscript file or have it spooled directly to a printer. If the grid
+graphics extends beyond the edges of the image then you will need to
+select the "Capture Whole Canvas" option.
+
+<h3>Using a different celestial coordinate system</h3>
+<p>Just select the "System" tab and the three fields "System:",
+"Epoch:" and "Equinox:" will appear. There are 7 different coordinate
+systems to choose from, just pick the one that you want. If
+appropriate you'll also be able to set the epoch and equinox of the
+system.
+
+<h3>Changing the separation between the grid lines</h3>
+<p>Press the "Spacing" tab and the fields headed "Relative Grid
+Spacing:" will appear. To decrease the separation between the grid
+lines move the "X Axis:" and "Y Axis:" sliders to the right
+(increasing value). Now press the "Draw" button and the spacing
+between the grid lines should be smaller. If it doesn't change then
+you may need to increase the spacing factor some more (there is a
+rounding algorithm that tries to keep the labels nice numbers, which
+sometimes gets in the way).
+
+<h3>Changing the positions of the grid lines (and the number labels)</h3>
+<p>This can be done using the "Place Numeric Labels Along:" section
+under the "Position" tab. In the entry fields identified for the X and
+Y axes you need to enter an HH/DD:MM:SS value that describes the line
+you want the axis drawn down. So for instance if you wanted to draw
+the Y axis along the RA "03:19:50" you enter this value and vice versa
+for the X axis. Note that you select an X axis value to draw the Y
+axis along and a Y axis value to draw the X axis along. Any values you
+enter must be visible on the image (and be in the correct celestial
+coordinate system).
+
+<h3>Changing the plot title</h3>
+<p>The plot title and the X and Y axis labels can be changed by the
+controls revealed when you press the "Labelling" tab. Just type your
+new title into the "Main Title:" area and press "Draw".
+
+<p>If you want to include any characters not available on your
+keyboard then you need to know the escape sequence for them. The
+values you need can be found out using the xfd command (the numbers
+you require are those display on the right), so for instance if you
+needed to display a copyright sign you'd enter "\251" as part of the
+string.
+
+<p>A symbol font is also available. You can view all the characters
+available in this using the command:
+<pre>
+   %  xfd -fn "*symbol*"
+</pre>
+One thing to note before getting carried away is that you can only use
+a single font at a time, so the range of options is very limited.
+
+<h3>Saving the options for another day</h3>
+<p>Using the "Save options..." option in the file menu you can select
+a file which will have a description of the current options written to
+it. This file can then be used, at a later time, to restore the
+options using the "Restore options..." option. The file produced is a
+simple text file, but is not really intended for editing by hand.
+
+<h3>Moving the text positions, increasing the lines thickness, get
+    rid of the grid <i>etc. etc. </i></h3>
+<p>There are loads of options (far too many to detail here) so just
+work your way through the tabs and have a play. If you have a very
+fast machine you might like to select the "Options" menu and switch on
+auto-redraw.
+</blockquote>
+</body>
+</html>
