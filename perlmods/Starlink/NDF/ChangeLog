@@ -1,3 +1,10 @@
+2000-08-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* t/fitshdr.t: Create to test fits header stuff
+
+	* NDF.pm (fits_extract_key_val): Do the fits header stuff properly
+	after reading the FITS standard !
+
 2000-07-12  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm: Remove @EXPORT. Add msg_tune and err_tune 
