@@ -35,11 +35,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 December 20 (MJC):
 *        Original version.
+*     1999 June 1 (TDCA):
+*        Modified to use the finite() and isnan() functions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -48,22 +51,13 @@
 *- */
       
 /*  Global Constants: */
+# include <math.h>                     /* finite and isnan function declarations */
 # include "sae_par.h"                  /* Environment global constants */
 # include "f77.h"
 # include "float.h"                    /* Special floating-point constants */
 
 /*  Global Variables: */
 # define VAL__BADD -DBL_MAX            /* Undefined value */
-
-  union ieeef {
-        double value;                     /* the raw number */
-        struct {                          /* IEEE components bit fields */
-           unsigned int fract1   : 32;    /* Fraction part 1 */
-           unsigned int fract2   : 20;    /* Fraction part 2 */
-           unsigned int exponent : 11;    /* Exponent with bias */
-           unsigned int sign     :  1;    /* Sign bit */
-        } fform; 
-  } ;
 
 F77_SUBROUTINE(fts1_rnand)( INTEGER(el), DOUBLE(buf), INTEGER(status) )
 
@@ -83,7 +77,6 @@ F77_SUBROUTINE(fts1_rnand)( INTEGER(el), DOUBLE(buf), INTEGER(status) )
 
 /* Local Variables: */
   int i;                  /* Loop counter */
-  union ieeef ieee;       /* IEEE number */
 
 /*. */
 
@@ -94,14 +87,16 @@ F77_SUBROUTINE(fts1_rnand)( INTEGER(el), DOUBLE(buf), INTEGER(status) )
 /* Loop for every element of the array to be converted. */
     for ( i=0; i<*el; i++ ) {
 
-/* Copy the element into the union. */
-        ieee.value = buf[ i ]; 
+/* Check for not a number (NaN) or +/- Infinity, and assign 
+   the element the bad-pixel value if necessary. */
+        if ( !finite( buf[ i ] ) || isnan( buf [ i ] ) ) buf[ i ] = VAL__BADD;
 
-/* First check for not a number (NaN) or +/- Infinity.  Both have an
-*  exponent of 2047.  The difference is whether the fraction is 0 or not.
-*  NaN has a non-zero fraction.  However, we can regard both has been an
-*  undefined value, hence we assign it the bad-pixel value. */
-        if ( ieee.fform.exponent == 2047 )
-           buf[i] = VAL__BADD;
     }
 }
+
+
+
+
+
+
+
