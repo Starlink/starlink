@@ -141,7 +141,7 @@
         ELSE
 	  CALL FIT_CHISQ_ACCUM( OBDAT(N).NDAT, %VAL(OBDAT(N).GDPTR),
      :                         OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
-     :          %VAL(OBDAT(N).GVPTR), %VAL(PREDDAT(N).GDPTR(1)), DSTAT,
+     :          %VAL(OBDAT(N).GWPTR), %VAL(PREDDAT(N).GDPTR(1)), DSTAT,
      :             STATUS )
         END IF
 

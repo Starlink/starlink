@@ -44,18 +44,31 @@
 *
 *    History :
 *
-*      3 Feb 87 : Original (BHVAD::TJP)
-*      8 Apr 87 : Double precision accumulation of derivs (TJP)
-*     29 Apr 87 : Parameter increments passed in (TJP)
-*     14 Apr 88 : Changed structures, global eliminated (TJP)
-*      8 Jul 88 : Bug causing _DERIVS_ACCUM crash fixed (TJP)
-*     25 Mar 92 : FIT_PREDDAT made external PREDICTOR (RJV)
-*     27 May 92 : Changes to do maximum likelihood fitting. Error handling
-*                 corrected. Use D.P. so no REAL accumulator needed (DJA)
-*     12 Jun 92 : Pass observed data quality to FIT_DERIVS_ACCUM (DJA)
-*     15 Jun 92 : Added FSTAT argument (DJA)
-*     15 Mar 94 : Allocate DFDPPTR in routine if set to VAL__BADI (DJA)
-*     19 May 94 : Added constraint handling (DJA)
+*      3 Feb 1987 (TJP):
+*        Original version
+*      8 Apr 1987 (TJP):
+*        Double precision accumulation of derivs
+*     29 Apr 1987 (TJP):
+*        Parameter increments passed in
+*     14 Apr 1988 (TJP):
+*        Changed structures, global eliminated
+*      8 Jul 1988 (TJP):
+*        Bug causing _DERIVS_ACCUM crash fixed
+*     25 Mar 1992 (RJV):
+*        FIT_PREDDAT made external PREDICTOR
+*     27 May 1992 (DJA):
+*        Changes to do maximum likelihood fitting. Error handling
+*        corrected. Use D.P. so no REAL accumulator needed
+*     12 Jun 1992 (DJA):
+*        Pass observed data quality to FIT_DERIVS_ACCUM
+*     15 Jun 1992 (DJA):
+*        Added FSTAT argument
+*     15 Mar 1994 (DJA):
+*        Allocate DFDPPTR in routine if set to VAL__BADI
+*     19 May 1994 (DJA):
+*        Added constraint handling
+*      5 Mar 1996 (DJA):
+*        Added grouping
 *
 *    Type definitions :
 *
@@ -64,7 +77,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'FIT_PAR'
 *
@@ -110,11 +122,11 @@
       INTEGER             N			! Dataset index
 *-
 
-*    Status check
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Set up upper and lower increments for parameters, taking bounds into account
-      DO J=1,NPAR
+*  Set up upper and lower increments for parameters, taking bounds into account
+      DO J = 1, NPAR
 	IF ( .NOT. FROZEN(J) ) THEN
 	  IF ( PARAM(J)+DPAR(J) .LE. UB(J) )THEN
 	    DPUP(J) = DPAR(J)
@@ -129,7 +141,7 @@
 	END IF
       END DO
 
-*    Zero derivative accumulators
+*  Zero derivative accumulators
       DO J = 1, NPAR
 	DERIV1(J) = 0.0D0
 	DO K = 1, NPAR
@@ -137,36 +149,28 @@
 	END DO
       END DO
 
-*    Call subroutine to accumulate contributions to the derivs from each dataset
+*  Call subroutine to accumulate contributions to the derivs from each dataset
       DO N = 1, NDS
 
-*      Derivatives array wasn't pre-allocated
+*    Derivatives array wasn't pre-allocated
         IF ( PREDDAT(N).DFDPPTR .EQ. VAL__BADI ) THEN
           CALL DYN_MAPR( 1, PREDDAT(N).NMDAT*NPAR, PREDDAT(N).DFDPPTR,
      :                   STATUS )
         END IF
 
-*      Check workspace allocated
-	IF((PREDDAT(N).PREDPTR(1).EQ.0).OR.(PREDDAT(N).PREDPTR(2).EQ.0)
-     :    .OR.(PREDDAT(N).DFDPPTR.EQ.0))THEN
-	  STATUS = SAI__ERROR
-          CALL ERR_REP('NOWKSP','No workspace available for statistic'//
-     :      ' gradient calculation',STATUS)
-	  GOTO 99
-	END IF
-
-D	print *,'iteration',n,'   - entering fit_derivs_accum'
+*    Accumulate derivates for this dataset
 	CALL FIT_DERIVS_ACCUM(NDS,OBDAT,INSTR,MODEL,FSTAT,PREDICTOR,
      :    PREDDAT,NPAR,PARAM,LB,UB,FROZEN,DPUP,DPDOWN,N,OBDAT(N).NDAT,
      :    %VAL(OBDAT(N).DPTR),%VAL(OBDAT(N).WPTR),
      :    OBDAT(N).QFLAG, %VAL(OBDAT(N).QPTR),
      :    %VAL(PREDDAT(N).DPTR),DERIV1,DERIV2,%VAL(PREDDAT(N).DFDPPTR),
      :    %VAL(PREDDAT(N).PREDPTR(1)),%VAL(PREDDAT(N).PREDPTR(2)),
+     :    %VAL(PREDDAT(N).GDPTR(1)),%VAL(PREDDAT(N).GDPTR(2)),
      :    STATUS)
 
       END DO
 
-*    Double to obtain the derivatives, and fill in upper triangle of DERIV2
+*  Double to obtain the derivatives, and fill in upper triangle of DERIV2
       DO K = 1, NPAR
         DERIV1(K) = 2*DERIV1(K)
 	DO J = 1, NPAR
@@ -178,8 +182,8 @@ D	print *,'iteration',n,'   - entering fit_derivs_accum'
 	END DO
       END DO
 
-*    Exit
- 99   IF ( STATUS .NE. SAI__OK ) THEN
+*  Exit
+      IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_DERIVS', STATUS )
       END IF
 

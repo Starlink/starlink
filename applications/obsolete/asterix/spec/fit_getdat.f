@@ -213,14 +213,8 @@
         INTEGER 		CHR_LEN
 
 *  Local Variables:
-	CHARACTER*100 FILE		! File name for HDS_TRACE
-	CHARACTER*2 SPECH		! Spectrum number (within set)
-
-	LOGICAL LOG			! General purpose logical
-	LOGICAL OK			! Data present and defined?
-	LOGICAL QUAL			! Data quality info available?
-	LOGICAL BG			! B/g data file found?
-	LOGICAL BGSUB			! B/g subtracted flag set in data?
+      CHARACTER*100 		FILE			! File name for HDS_TRACE
+      CHARACTER*2 		SPECH			! Spectrum number (within set)
 
       REAL			RSUM			! Real SSCALE
       REAL 			TEFF			! Effective exposure time
@@ -229,8 +223,16 @@
       INTEGER			BFID(NDSMAX)		! Bgnd datasets
       INTEGER			CNGOOD			! Current # good points
       INTEGER			DCFID(NDSMAX)		! Source datasets
+      INTEGER 			DETNO(NDSCMAX)		! # detectors selected from set
+      INTEGER 			DETSEL(NDETMAX,NDSCMAX)	! Detectors selected from set
       INTEGER 			DIMS(ADI__MXDIM)	! Data array dimensions
       INTEGER 			I			! Index
+      INTEGER 			IERR,NERR		! Error args for VEC_*
+      INTEGER 			INDEX			! Current spectral set selection no
+      INTEGER			LDIM(2), UDIM(2)	! Slice pixel bounds
+      INTEGER			N			! Dataset index
+      INTEGER			NBDIM			! Bgnd dimensionality
+      INTEGER 			NCH			! String length
       INTEGER 			NDIM			! I/p dimensionality
       INTEGER 			NDSC			! # dataset files
       INTEGER 			NDSTOP			! NDS at end of current container
@@ -238,30 +240,24 @@
       INTEGER			NVDIM			! Vignetting dim'ality
       INTEGER 			PTR			! General pointer
       INTEGER 			SETSIZE			! # spectra in set
+      INTEGER			SPECNO			! Current spec in set
       INTEGER			TIMID			! Timing info
       INTEGER			TPTR			! Temp pointer
       INTEGER			VDIMS(ADI__MXDIM)	! Vignetting dims
       INTEGER			VFID(NDSMAX)		! Vignetting datasets
 
+      LOGICAL 			BG			! B/g data file found?
       LOGICAL 			BGCOR			! B/g data been exposure corrected?
+      LOGICAL 			BGSUB			! B/g subtracted flag set in data?
       LOGICAL 			CHISTAT			! Chi-squared fitting?
       LOGICAL			GROUPS			! Grouping available
       LOGICAL 			LIKSTAT			! Likelihood fitting?
+      LOGICAL 			LOG			! General purpose logical
+      LOGICAL 			OK			! Data present and defined?
+      LOGICAL 			QUAL			! Data quality info available?
       LOGICAL 			REF			! Input from ref file?
       LOGICAL 			SPECSET(NDSCMAX)	! I/p is spectral set?
       LOGICAL			VIG			! Vignetting present?
-
-	INTEGER NBDIM			! B/g array dimensionality
-	INTEGER N			! Dataset index
-	INTEGER INDEX			! Current spectral set selection no
-	INTEGER LDIM(2)			! Lower bound for array slice
-	INTEGER UDIM(2)			! Upper bound for array slice
-	INTEGER NGDAT			! No of good data in dataset
-	INTEGER NCH			! No of characters in string
-	INTEGER DETNO(NDSCMAX)		! No of detectors selected from set
-	INTEGER DETSEL(NDETMAX,NDSCMAX)	! Detectors selected from set
-        INTEGER SPECNO			! Current spectrum no (from set)
-	INTEGER IERR,NERR		! Error arguments for VEC_* routines
 *.
 
 *  Check inherited global status.
@@ -280,7 +276,7 @@
 	CHISTAT = .TRUE.
       END IF
 
-* Find datasets - get locators
+*  Find datasets - get identifiers
       IF ( .NOT. REF ) THEN
 
 *    Single input dataset container (directly referenced)
@@ -289,7 +285,9 @@
 
 *    Spectral set?
         CALL SPEC_SETSRCH( DCFID(NDSC), SPECSET(NDSC), STATUS )
-	IF (SPECSET(1)) DETNO(1)=0		! Flag to use all spectra
+
+*    Flag to use all spectra
+	IF (SPECSET(1)) DETNO(1) = 0
 
       ELSE
 
