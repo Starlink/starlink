@@ -36,6 +36,7 @@
         INTEGER                 CURDAT			! Current data id
         BYTE                    VPATH(5), PPATH(5)
         CHARACTER*16		NAME			! Parameter name
+        LOGICAL			WRITE			! Write access?
       END STRUCTURE
 
 *    Task storage
