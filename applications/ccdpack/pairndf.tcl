@@ -142,10 +142,11 @@
                          -viewport [ list $PREVX $PREVY ] \
                          -percentiles [ list $PERCLO $PERCHI ] 
 
-#  Create an exit confirmation widget which may or may not be used.
-#  We construct it here rather than at time of use since this allows it
-#  to be posted with less delay after invoking the exit button, which 
-#  makes it look more intuitive.
+#  Create some dialog boxes which may or may not be used.  Since they
+#  may be used more than once, it may be more efficient to construct
+#  them here than at time of use.
+
+#  Construct a dialog box for abnormal exit of the chooser.
       set confirmtext "Not enough images have been paired\n"
       append confirmtext "to register them all.\n"
       append confirmtext "Do you really wish to exit?"
@@ -158,6 +159,25 @@
       $quitdialog buttonconfigure OK -text "Continue processing"
       $quitdialog hide Help
 
+#  Create a warning dialog for unsuccessful use of the aligner widget.
+      global aligndialog
+      global aligner
+      set aligndialog [ iwidgets::messagedialog $aligner.qd \
+                           -modality application \
+                           -bitmap questhead \
+                           -title "PAIRNDF: No pairs" ]
+      $aligndialog buttonconfigure Cancel -text "Pick another pair"
+      $aligndialog buttonconfigure OK -text "Try again"
+      $aligndialog hide Help
+      proc carryon { args } {
+         global aligndialog
+         global aligner
+         lappend args "No pairing was made."
+         $aligndialog configure -text [ join $args "\n" ]
+         $aligndialog center $aligner
+         return [ $aligndialog activate ]
+      }
+
 #  Loop until all the NDFs have been paired.
       while { [ array size Done ] < $nndf } {
 
@@ -168,11 +188,11 @@
          while { [ llength $pair ] != 2 } {
             $chooser configure -state active
             tkwait variable choosestate
-
+  
             set pair [ $chooser getpair ]
             set iA [ lindex $pair 0 ]
             set iB [ lindex $pair 1 ]
-
+ 
             if { [ $chooser cget -state ] == "done" } {
                $quitdialog center $chooser
                set response [ $quitdialog activate ]
@@ -200,68 +220,79 @@
          set percB [ $chooser percentiles $iB ]
          $aligner loadndf A $ndfs($iA) CURRENT $percA $MAXCANV
          $aligner loadndf B $ndfs($iB) CURRENT $percB $MAXCANV
-         $aligner activate
-         tkwait variable alignstate
-         set MAXCANV [ $aligner maxcanvas ]
-         set ZOOM [ $aligner cget -zoom ]
+
+#  Loop until the user is happy with the outcome.
+         set tryagain 1
+         while { $tryagain } {
+            set tryagain 0
+            $aligner activate
+            tkwait variable alignstate
+            set MAXCANV [ $aligner maxcanvas ]
+            set ZOOM [ $aligner cget -zoom ]
 
 #  Get the resulting lists of points.
-         set pA [ $aligner pointsndf A CURRENT ]
-         set pB [ $aligner pointsndf B CURRENT ]
-         set npoints [ llength $pA ]
+            set pA [ $aligner pointsndf A CURRENT ]
+            set pB [ $aligner pointsndf B CURRENT ]
+            set npoints [ llength $pA ]
 
 #  We have a usable list of objects.  Try to centroid them.
-         if { $npoints > 0 } {
-            set pts {}
-            for { set i 0 } { $i < $npoints } { incr i } {
-               lappend pts [ list [ lindex [ lindex $pA $i ] 1 ] \
-                                  [ lindex [ lindex $pA $i ] 2 ] \
-                                  [ lindex [ lindex $pB $i ] 1 ] \
-                                  [ lindex [ lindex $pB $i ] 2 ] ]
-            }
-	    set scale [ $aligner cget -zoom ]
-            set offset [ ndfcentroffset $ndfs($iA) CURRENT $ndfs($iB) CURRENT \
-                         $pts $scale ]
-            set nmatch [ lindex $offset 0 ]
+            if { $npoints > 0 } {
+               set pts {}
+               for { set i 0 } { $i < $npoints } { incr i } {
+                  lappend pts [ list [ lindex [ lindex $pA $i ] 1 ] \
+                                     [ lindex [ lindex $pA $i ] 2 ] \
+                                     [ lindex [ lindex $pB $i ] 1 ] \
+                                     [ lindex [ lindex $pB $i ] 2 ] ]
+               }
+	       set scale [ $aligner cget -zoom ]
+               set offset [ ndfcentroffset $ndfs($iA) CURRENT $ndfs($iB) \
+                            CURRENT $pts $scale ]
+               set nmatch [ lindex $offset 0 ]
 
 #  We have a successful match.
-            if { $nmatch > 0 } {
-               set xoff [ lindex $offset 1 ]
-               set yoff [ lindex $offset 2 ]
-               set matchpts [ lindex $offset 3 ]
+               if { $nmatch > 0 } {
+                  set xoff [ lindex $offset 1 ]
+                  set yoff [ lindex $offset 2 ]
+                  set matchpts [ lindex $offset 3 ]
 
 #  Tell the user that the match succeeded.
-               ccdputs -log \
-               "    Centroiding successful: $nmatch/$npoints objects matched."
+                  ccdputs -log \
+                "    Centroiding successful: $nmatch/$npoints objects matched."
 
 #  Add this datum to the results list.  By storing these in a hash at
 #  this stage, we ensure we don't pass back duplicate pairings to the
 #  calling routine.
-               set pairs($iA,$iB) [ list $nmatch $xoff $yoff $matchpts ]
+                  set pairs($iA,$iB) [ list $nmatch $xoff $yoff $matchpts ]
 
 #  Record the fact that these images have been connected.
-               set Done($iA) 1
-               set Done($iB) 1
+                  set Done($iA) 1
+                  set Done($iB) 1
 
 #  Visually reflect the fact that they have been connected.
-               $chooser highlight $iA 1
-               $chooser highlight $iB 1
+                  $chooser highlight $iA 1
+                  $chooser highlight $iB 1
 
 #  No objects were matched between frames.
-            } else {
-               ccdputs -log \
-               "    Centroiding failed, no offset determined - ignored."
-            }
+               } else {
+                  set tryagain [ carryon "Centroiding failed." ]
+                  ccdputs -log \
+                  "    Centroiding failed, no offset determined - ignored."
+               }
 
 #  There was an overlap, but the user failed to indicate any points to 
 #  be centroided.
-         } elseif { [ $aligner overlapping ] } {
-            ccdputs -log "    No points selected in overlap - ignored."
+            } elseif { [ $aligner overlapping ] } {
+               set tryagain \
+                   [ carryon "No points were selected in the overlap." ]
+               ccdputs -log "    No points selected in overlap - ignored."
 
 #  The user decided there was no overlap between the selected images.
-         } else {
-            ccdputs -log "    Images do not overlap - ignored."
+            } else {
+               set tryagain [ carryon "Images do not overlap." ]
+               ccdputs -log "    Images do not overlap - ignored."
+            }
          }
+         $aligner unbindall
          wm withdraw $aligner
       }
 
