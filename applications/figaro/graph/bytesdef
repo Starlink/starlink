@@ -1,0 +1,20 @@
+*+
+*   B Y T E S D E F
+*
+* Include file
+*
+*  To define the parameters to enable the number of bytes for each
+*  data type to be defined only here, so that they are not explicitely
+*  encoded in the source code (aprat from here).
+*    T. N. Wilkins Manchester 28/11/88
+*+
+      integer bytes_float
+      integer bytes_dble
+      integer bytes_int
+      integer bytes_short
+      integer bytes_logical
+      parameter (bytes_float = 4)
+      parameter (bytes_dble = 8)
+      parameter (bytes_int = 4)
+      parameter (bytes_short = 2)
+      parameter (bytes_logical = 4)

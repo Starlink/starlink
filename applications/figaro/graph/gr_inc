@@ -1,0 +1,58 @@
+*+
+*    G R _ I N C
+*
+* Include file
+*
+* Graphics include file for longslit etc.
+*
+* Removal of DIAGRAM base zones, T.N.Wilkins Manchester 1/12/87
+* Inclusion of most of the graphics variables passed in common,
+*    TNW 30/6/88
+*    TNW 31/5/90 CAVAD, Hardcopy device type obtained in CLGRAP, not in
+*    here any more
+*    TNW 4/9/91 MAX_HPLOT etc. added
+*-
+
+* If terminal device open
+
+      logical terminal
+
+* If hardcopy device open
+
+      logical hardcopy
+
+* If greyscale device open
+
+      logical greyscale
+
+* Number of hardcopy plots in this file
+
+      integer nhplot
+
+* Number of greyscale plots in this file
+
+      integer ngplot
+
+* If a blank pen is defined
+
+      logical blank_pen
+
+* Maximum number of hardcopy plots in a file
+
+      integer MAX_HPLOT
+      parameter (MAX_HPLOT = 6)
+
+* Maximum number of greyscale plots in a file (i.e. only applies to
+* hardcopy)
+
+      integer MAX_GPLOT
+      parameter (MAX_GPLOT = 1)
+
+* Print file name
+
+      character*72 prname
+      common/plot_commands/terminal,hardcopy,greyscale,nhplot,blank_pen
+     :            ,ngplot
+      common/gr_prfil/prname
+      save/plot_commands/
+      save/gr_prfil/

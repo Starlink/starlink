@@ -1,0 +1,17 @@
+*+
+*  G R _ I N C
+*
+* Include file
+*
+*   Second graphics include file
+*+
+      integer nz
+      integer zonid
+      integer old_dia
+      integer max_dia
+      parameter (max_dia=10)
+      integer gr_slot(max_dia)
+      real diastate(8,max_dia)
+      logical if_old
+      common/gr_common2/zonid,nz,old_dia,if_old,gr_slot,diastate
+      save/gr_common2/
