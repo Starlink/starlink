@@ -543,14 +543,17 @@
 
 # Add menu items to the File menu.
    $filemenu add command -label "Save        " -command Save -accelerator "Ctrl-s"
+   $filemenu add command -label "Save As     " -command SaveAs -accelerator "Ctrl-a"
    $filemenu add command -label "Exit        " -command {Finish 1} -accelerator "Ctrl-e"
    $filemenu add command -label "Quit        " -command {Finish 0} -accelerator "Ctrl+q"
 
-   MenuHelp $filemenu "Save        " ".  Extract the mask areas from the input images, register them, and save them in the output images."
+   MenuHelp $filemenu "Save        " ".  Create the output images and save them."
+   MenuHelp $filemenu "Save As     " ".  Create the output images and save them to named files."
    MenuHelp $filemenu "Exit        " ".  Store the current image registration information and exit the application."
    MenuHelp $filemenu "Quit        " ".  Quit the application, thowing away the current image registration information."
 
    bind . <Control-s> Save
+   bind . <Control-a> SaveAs
    bind . <Control-e> {Finish 1}
    bind . <Control-q> {Finish 0}
 
@@ -709,6 +712,14 @@
    }
    set env(NDF_FORMATS_OUT) "."
 
+# Save the number of E and O output images to create.
+   set NOOUT [llength $o_list]
+   if { $DBEAM } { 
+      set NEOUT [llength $e_list]
+   } {
+      set NEOUT 0
+   }
+
 # Go through every supplied image section.
    set maximwid 0
    set maxrimwid 0
@@ -740,15 +751,15 @@
 # If these will be the output images, then use the names supplied by the
 # A-task. If they will be temporary files needed only as input to the
 # Stokes parameter calculation, then store temporary names.
-      if { $i < [llength $o_list] } {
+      if { $i < $NOOUT } {
          set OUTIMS($image,O) [lindex $o_list $i] 
       } {
          set OUTIMS($image,O) [UniqueFile]
       }
 
       if { $DBEAM } {
-         if { $i < [llength $e_list] } {
-            set OUTIMS($image,E) [lindex $o_list $i] 
+         if { $i < $NEOUT } {
+            set OUTIMS($image,E) [lindex $e_list $i] 
          } {
             set OUTIMS($image,E) [UniqueFile]
          }

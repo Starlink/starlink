@@ -9978,6 +9978,278 @@ proc Save {} {
 
 }
 
+proc SaveAs {} {
+#+
+#  Name:
+#     SaveAs
+#
+#  Purpose:
+#     Get new names for all the output files, and then call Save to
+#     create the required output images.
+#
+#  Arguments:
+#     None.
+#
+#  Returned Value:
+#     Zero if an error occurred creating the output images. One otherwise.
+#
+#  Globals:
+#     DBEAM (Read)
+#        Is PolReg being run in dual-beam mode?
+#     IMAGES (Read)
+#        A list of the input images (without any section specifiers).
+#     NEOUT (Read)
+#        The number of E-ray output intensity images to be created.
+#     NOOUT (Read)
+#        The number of O-ray, or single-beam, output intensity images to be 
+#        created.
+#     OUTIMS (Read and Write)
+#        A 2-D array, indexed by input image and ray, giving the name of
+#        the corresponding output image.
+#     RB_FONT (Read)
+#        The default font used for radiobuttons.
+#     SAVEAS_EXIT (Write)
+#        The label from the button which was pressed to close the
+#        dialogue box.
+#     STKOUT (Read and Write)
+#        The name of the output cube to hold Stokes parameters (if $STOKES
+#        is non-zero).
+#     STOKES (Read)
+#        If non-zero, then Stokes parameters are calculated and stored in
+#        a cube with name given by $STKOUT.
+#
+#-
+   global DBEAM
+   global IMAGES
+   global OUTIMS
+   global STOKES
+   global STKOUT
+   global NOOUT
+   global NEOUT
+   global RB_FONT
+   global SAVEAS_EXIT
+
+# Create the top level window for the dialogue box.
+   set top .saveas
+   set topf [MakeDialog $top "Specify output file names" 1]
+   pack [label $topf.title -text "Give new output file names:"] -side top \
+        -pady 4m
+
+#  Save the number of input images for which output image names are
+#  required.
+   if { $NOOUT > $NEOUT } {
+      set nout $NOOUT
+   } {
+      set nout $NEOUT
+   }
+
+#  Find the length of the longest input file name. Use a minimum of 14.
+   set maxl 14
+   foreach im $IMAGES {
+      set l [string length $im]
+      if { $l > $maxl } { set maxl $l }
+   }
+
+#  Create a label and entry for the user to enter a new name for the
+#  Stokes cube file name (if one is being produced).
+   if { $STOKES } { 
+      set f [frame $topf.fs]
+      set lb [label $f.l -text "Stokes cube: " -width $maxl -justify left] 
+      set ens [entry $f.e -width 40 -font $RB_FONT]
+      $ens delete 0 end
+      $ens insert 0 $STKOUT
+      pack $lb $ens -side left
+      pack $f -side top -pady 2m -padx 2m -expand 1 -fill x
+   }
+
+#  Create a label and entry for the user to enter a new name for each of
+#  the output aligned intensity images.
+   for {set i 0} {$i < $nout} {incr i} {
+      set im [lindex $IMAGES $i]
+
+      set f [frame $topf.f$i]
+      if { $DBEAM } {
+         if { $i < $NOOUT } {
+            set fo [frame $f.o]
+            set lb [label $fo.l -text "$im (O-ray): " -width $maxl -justify left] 
+            set en($im,O) [entry $fo.e -width 40 -font $RB_FONT]
+            $en($im,O) delete 0 end
+            $en($im,O) insert 0 $OUTIMS($im,O)
+            pack $lb $en($im,O) -side left
+         }
+
+         if { $i < $NEOUT } {
+            set fe [frame $f.e]
+            set lb [label $fe.l -text "$im (E-ray): " -width $maxl -justify left] 
+            set en($im,E) [entry $fe.e -width 40 -font $RB_FONT]
+            $en($im,E) delete 0 end
+            $en($im,E) insert 0 $OUTIMS($im,E)
+            pack $lb $en($im,E) -side left
+         }
+
+         pack $fo $fe -side top
+
+      } {
+         set lb [label $f.l -text "$im : " -width $maxl -justify left] 
+         set en($im,O) [entry $f.e -width 40 -font $RB_FONT]
+         $en($im,O) delete 0 end
+         $en($im,O) insert 0 $OUTIMS($im,O)
+         pack $lb $en($im,O) -side left
+      }
+      pack $f -side top -pady 2m -padx 2m -expand 1 -fill x
+   }
+
+# Create the OK, Clear, Cancel, Restore, Help buttons, but don't pack them yet.
+   set butfrm [frame $topf.butfrm]
+   set b1 [button $butfrm.ok -text "OK" -command "set SAVEAS_EXIT ok"]
+   set b2 [button $butfrm.clear -text "Clear" -command "set SAVEAS_EXIT clear"]
+   set b3 [button $butfrm.cancel -text "Cancel" -command "set SAVEAS_EXIT cancel"]
+   set b4 [button $butfrm.restore -text "Restore" -command "set SAVEAS_EXIT  restore"]
+   set b5 [button $butfrm.help -text "Help" -command "set SAVEAS_EXIT help"]
+
+   SetHelp $b1 ".  Press to close the dialog box, adopting the currently displayed file names."
+   SetHelp $b2 ".  Press to clear all file names."
+   SetHelp $b3 ".  Press to close the dialog box, re-instating the original file names."
+   SetHelp $b4 ".  Press to restore the original file names."
+   SetHelp $b5 ".  Press to see more help on this window."
+
+# Now pack the OK, Clear, Cancel, Restore, Help buttons so that they appear 
+# at the bottom of the dialog box.
+   pack $butfrm -fill x -expand 1
+   pack $b1 $b2 $b3 $b4 $b5 -side left -expand 1
+
+# Ensure that closing the window from the window manager is like pressing
+# the Cancel button.
+   wm protocol $top WM_DELETE_WINDOW "set SAVEAS_EXIT cancel"
+
+# Loop until an exit button is pressed.
+   set exit 0
+   while { !$exit } {
+
+# Wait for the user to press a button.
+      tkwait variable SAVEAS_EXIT
+
+# If the cancel button was pressed, exit without changing the stored
+# file names.
+      if { $SAVEAS_EXIT == "cancel" } {
+         set exit 1
+
+# If the OK button was pressed, check that all file names have been
+# supplied, store the new file names, and exit.
+      } elseif { $SAVEAS_EXIT == "ok" } {
+
+         set exit 1
+         for {set i 0} {$i < $nout} {incr i} {
+            set im [lindex $IMAGES $i]
+            if { $DBEAM } {
+               if { $i < $NOOUT } {
+                  if { [$en($im,O) get] == "" } {
+                     Message "No file given to receive O-ray intensity from $im."
+                     set exit 0
+                     break
+                  }
+               }
+               if { $i < $NEOUT } {
+                  if { [$en($im,E) get] == "" } {
+                     Message "No file given to receive E-ray intensity from $im."
+                     set exit 0
+                     break
+                  }
+               }
+            } {
+               if { $i < $NOOUT } {
+                  if { [$en($im,O) get] == "" } {
+                     Message "No file given to receive intensity from $im."
+                     set exit 0
+                     break
+                  }
+               }
+            }
+         }
+         if { $exit } {
+            if { $STOKES } {
+               if { [$ens get] == "" } {
+                  Message "No file given to receive Stokes cube."
+                  set exit 0
+               }
+            }
+         }
+
+# If all files have been give, store the local file names in the appropriate 
+# global variables.
+         if { $exit } {
+            for {set i 0} {$i < $nout} {incr i} {
+               set im [lindex $IMAGES $i]
+               if { $i < $NOOUT } { 
+                  set OUTIMS($im,O) [$en($im,O) get]
+               }
+               if { $i < $NEOUT } {
+                  set OUTIMS($im,E) [$en($im,E) get]
+               }
+            }
+            if { $STOKES } { set STKOUT [$ens get] }
+         }
+
+# If the Clear button was pressed, clear the file names.
+      } elseif { $SAVEAS_EXIT == "clear" } {
+         for {set i 0} {$i < $nout} {incr i} {
+            set im [lindex $IMAGES $i]
+
+            if { $i < $NOOUT } { 
+               $en($im,O) delete 0 end
+            }
+
+            if { $i < $NEOUT } {
+               $en($im,E) delete 0 end
+            }
+         }
+
+         if { $STOKES } { 
+            $ens delete 0 end
+         }
+
+# If the Restore button was pressed, restore the original file names.
+      } elseif { $SAVEAS_EXIT == "restore" } {
+         for {set i 0} {$i < $nout} {incr i} {
+            set im [lindex $IMAGES $i]
+
+            if { $i < $NOOUT } { 
+               $en($im,O) delete 0 end
+               $en($im,O) insert 0 $OUTIMS($im,O)
+            }
+
+            if { $i < $NEOUT } {
+               $en($im,E) delete 0 end
+               $en($im,E) insert 0 $OUTIMS($im,E)
+            }
+         }
+
+         if { $STOKES } { 
+            $ens delete 0 end
+            $ens insert 0 $STKOUT
+         }
+   
+# If the Help button was pressed, give more help.
+      } elseif { $SAVEAS_EXIT == "help" } {
+         ShowHelp "POLREG_SAVEAS_DIALOG" 
+
+      }
+   }
+
+# Destroy the dialog box.
+   destroy $top
+
+# If the OK button was pressed, call Save to create the output images.
+   if { $SAVEAS_EXIT == "ok" } { 
+      set ret [Save]
+   } {
+      set ret 1
+   }   
+
+   return $ret
+
+}
+
 proc SaveOptions {} {
 #+
 #  Name:
