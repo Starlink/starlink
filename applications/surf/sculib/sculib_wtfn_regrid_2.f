@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_BESSEL_REGRID_2 (IN_DATA, IN_VARIANCE,
      :  IN_QUALITY, WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
      :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
-     :  CONV_WEIGHT, STATUS)
+     :  CONV_WEIGHT, BADBIT, STATUS)
 *+
 *  Name:
 *     SCULIB_BESSEL_REGRID_2
@@ -15,7 +15,7 @@
 *     SUBROUTINE SCULIB_BESSEL_REGRID_2 (IN_DATA, IN_VARIANCE,
 *    :  IN_QUALITY, WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
 *    :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM,
-*    :  CONV_WEIGHT, STATUS)
+*    :  CONV_WEIGHT, BADBIT, STATUS)
 
 *  Description:
 
@@ -24,7 +24,7 @@
 *        The input data values.
 *     IN_VARIANCE (NPIX)               = REAL (Given)
 *        Variance on IN_DATA.
-*     IN_QUALITY (NPIX)                = INTEGER (Given)
+*     IN_QUALITY (NPIX)                = BYTE (Given)
 *        Quality on IN_DATA.
 *     WEIGHT                           = REAL (Given)
 *        The weight of this dataset.
@@ -54,6 +54,8 @@
 *        the variance convolution sum for each output pixel.
 *     CONV_WEIGHT (NI,NJ)              = REAL (Given and returned)
 *        the convolution weight for each output pixel.
+*     BADBIT                         = BYTE (Given)
+*           the bit mask
 *     STATUS                           = INTEGER (Given and Returned)
 *        The global status.
 *  Authors:
@@ -73,10 +75,11 @@
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
 
 *  Arguments Given:
+      BYTE    BADBIT
       INTEGER NPIX
       REAL IN_DATA (NPIX)
       REAL IN_VARIANCE (NPIX)
-      INTEGER IN_QUALITY (NPIX)
+      BYTE IN_QUALITY (NPIX)
       REAL WEIGHT
       DOUBLE PRECISION X(NPIX)
       DOUBLE PRECISION Y(NPIX)
@@ -139,6 +142,8 @@
       REAL    YPIX                               ! y offset of output pixel
       
 *   local data
+*    Local function:
+      INCLUDE 'NDF_FUNC'                     ! Bit mask
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -181,7 +186,7 @@
 
       DO PIX = 1, NPIX
 
-         IF (IN_QUALITY(PIX) .EQ. 0) THEN
+         IF (NDF_QMASK(IN_QUALITY(PIX),BADBIT)) THEN
          
 *  find the coords (INEAR, JNEAR) of the output pixel nearest to the current
 *  input pixel. 
