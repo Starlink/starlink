@@ -1,4 +1,8 @@
 # $Id$
+#
+# Note that this has a hard-coded directory path, which points to a
+# perlSGML installation.  This isn't included in the distribution system, so
+# the targets in this directory ARE NOT BUILDABLE after distribution.
 
 include $(STARLINK_SGML_DIR)/lib/Makefile.common
 
