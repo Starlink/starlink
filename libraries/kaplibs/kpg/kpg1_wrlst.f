@@ -170,7 +170,8 @@
  
 *  Use a UnitMap if there is only 1 Frame in the FrameSet.
       ELSE
-         MAP = AST_UNITMAP( AST_GETI( IWCS, 'NIN', STATUS ), STATUS )
+         MAP = AST_UNITMAP( AST_GETI( IWCS, 'NIN', STATUS ), ' ',
+     :                      STATUS )
       END IF
 
 *  If the forward transformation is not defined, store the positions in
