@@ -20,6 +20,8 @@
 #        Add BOL
 #     1997 Spetember 4 (TIMJ)
 #        Change message in DUMMY
+#     1998 April 22 (TIMJ)
+#        Add METHOD
 #-
 
 INTERFACE SCUCAT
@@ -59,6 +61,12 @@ INTERFACE SCUCAT
         DEFAULT  'NORM'
         VPATH    'DEFAULT'
         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER METHOD
+         TYPE     '_CHAR'
+         PROMPT   'Concatenation method'
+         HELPKEY  '*'
       ENDPARAMETER
  
       PARAMETER IN
