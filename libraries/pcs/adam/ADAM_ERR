@@ -1,0 +1,17 @@
+*+  ADAMERRS - general error and status codes for the ADAM system
+*    Description:
+*     Global parameter definitions used generally through the ADAM system.
+*    Authors:
+*     John Cooke (REVS::JAC) 21Mar84
+*    History:
+*     30Apr84 (REVS:JAC) context error added
+*     18Jun84 (REVA:ADAM) change status names (John Cooke)
+*     21Jun84 (REVA::ADAM) remove ss errs (used by messys) (John Cooke)
+*     27Aug86 (REVA::ADAM) remove ILLCONTEXT status to dtaskmsg (John Cooke)
+*    endhistory
+*    Global constants:
+
+      INTEGER ADAM__OK
+      PARAMETER ( ADAM__OK = 0 )   !  normal subroutine return status
+
+*-

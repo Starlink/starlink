@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="adam">
+  <version>3.0</version>
+  <path>libraries/pcs/adam</path>
+  <description>ADAM -- The Control Subsystem</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build> sae messys</build>
+    <use> chr psx ems messys mers</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>John Cooke (REVAD::JAC)</name>
+    </person>
+    <person>
+      <name>Charlie Richardson (REVA::DCR)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>ssn77 sun115 @STAR_DOCUMENTATION@</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Part of the PCS system.</p></notes>
+</component>

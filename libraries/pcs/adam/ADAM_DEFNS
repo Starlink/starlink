@@ -1,0 +1,31 @@
+*+  ADAMDEFNS - general parameter definitions for the ADAM system
+*    Description:
+*     Global parameter definitions used generally through the ADAM system.
+*    Authors:
+*     John Cooke (REVS::JAC) 21Mar84
+*    History:
+*     03May84 REVS:JAC message types added
+*     20Aug84 REVA::JAC release 0.1
+*     28Nov84 REVA::(JAC) changed version number for release 0.5
+*             (This wasn't done for the released tapes!)
+*                          removed 'loader' task name definition
+*     06.06.1986:  remove version number (REVAD::BDK)
+*     06.04.1992:  Add task CONTROL context (RLVAD::BKM)
+*    endhistory
+*    Global constants:
+
+      INTEGER NAMELEN   !  length of character strings holding names
+      PARAMETER ( NAMELEN = 32 )
+
+*   message types.....
+      INTEGER SET   !  set a task parameter
+      PARAMETER ( SET = 1 )
+      INTEGER GET   !  get a task parameter
+      PARAMETER ( GET = 2 )
+      INTEGER OBEY   !  obey a task action
+      PARAMETER ( OBEY = 3 )
+      INTEGER CANCEL   !  cancel a task action in progress
+      PARAMETER ( CANCEL = 4 )
+      INTEGER CONTROL  !  Send control message to task fixed part
+      PARAMETER ( CONTROL = 5 )
+*-
