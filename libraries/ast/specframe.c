@@ -34,6 +34,7 @@ f     AST_SPECFRAME
 *     - RefRA: Right ascension of the source (FK5 J2000)
 *     - RestFreq: Rest frequency
 *     - SourceVel: Source velocity
+*     - SourceVRF: Source velocity rest frame
 *     - StdOfRest: Standard of rest 
 *
 *     Several of the Frame attributes inherited by the SpecFrame class 
@@ -179,29 +180,33 @@ static AstSystemType SystemCode( AstFrame *, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
 static const char *DefUnit( AstSystemType, const char *, const char * );
 static const char *GetDomain( AstFrame * );
-static int GetActiveUnit( AstFrame * );
-static int TestActiveUnit( AstFrame * );
 static const char *GetLabel( AstFrame *, int );
 static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
-static void ClearUnit( AstFrame *, int );
-static void SetUnit( AstFrame *, int, const char * );
+static const char *SpecMapUnit( AstSystemType, const char *, const char * );
 static const char *StdOfRestString( AstStdOfRestType );
-static const char *SystemString( AstFrame *, AstSystemType );
 static const char *SystemLabel( AstSystemType );
-static int SorConvert( AstSpecFrame *, AstSpecMap *, AstStdOfRestType, double, AstStdOfRestType, double);
+static const char *SystemString( AstFrame *, AstSystemType );
+static double ConvertSourceVel( AstSpecFrame *, AstStdOfRestType );
+static int GetActiveUnit( AstFrame * );
 static int MakeSpecMapping( AstSpecFrame *, AstSpecFrame *, AstSystemType, AstStdOfRestType, double, int, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
+static int SorConvert( AstSpecFrame *, AstSpecMap *, AstStdOfRestType, double, AstStdOfRestType, double);
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
+static int TestActiveUnit( AstFrame * );
+static void ClearUnit( AstFrame *, int );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void GetRefPos( AstSpecFrame *, AstSkyFrame *, double *, double * );
-static void SetRefPos( AstSpecFrame *, AstSkyFrame *, double, double );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
+static void SetRefPos( AstSpecFrame *, AstSkyFrame *, double, double );
+static void SetUnit( AstFrame *, int, const char * );
+
+
 
 static AstSystemType GetSystem( AstFrame * );
 static void SetSystem( AstFrame *, AstSystemType );
@@ -251,6 +256,11 @@ static double GetRefDec( AstSpecFrame * );
 static int TestRefDec( AstSpecFrame * );
 static void ClearRefDec( AstSpecFrame * );
 static void SetRefDec( AstSpecFrame *, double );
+
+static AstStdOfRestType GetSourceVRF( AstSpecFrame * );
+static int TestSourceVRF( AstSpecFrame * );
+static void ClearSourceVRF( AstSpecFrame * );
+static void SetSourceVRF( AstSpecFrame *, AstStdOfRestType );
 
 /* Member functions. */
 /* ================= */
@@ -361,6 +371,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* ---------- */
    } else if ( !strcmp( attrib, "sourcevel" ) ) {
       astClearSourceVel( this );
+
+/* SourceVRF */
+/* --------- */
+   } else if ( !strcmp( attrib, "sourcevrf" ) ) {
+      astClearSourceVRF( this );
 
 /* StdOfRest. */
 /* ---------- */
@@ -499,6 +514,92 @@ static void ClearUnit( AstFrame *this_frame, int axis ) {
    (*parent_clearunit)( this_frame, axis );
 }
 
+static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
+/*
+*  Name:
+*     ConvertSourceVel
+
+*  Purpose:
+*     Convert the SourceVel value to a specified rest frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specframe.h"
+*     double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new )
+
+*  Class Membership:
+*     SpecFrame member function 
+
+*  Description:
+*     This function convert the SourceVel value to a specified rest frame
+*     and returns the new value.
+
+*  Parameters:
+*     this
+*        Pointer to the SpecFrame.
+*     new
+*        The rest frame in which the source velocity is required.
+
+*  Returned Value:
+*     The converted source velocity (m/s).
+
+*  Notes:
+*     - This function returns zero if an error occurs.
+*/
+
+/* Local Variables: */
+   AstSpecMap *specmap;    /* Pointer to a SpecMap */
+   AstStdOfRestType sor;   /* Standard of rest in which SourceVel is defined */
+   double temp;            /* Temporary storage */
+   double ret;             /* The returned value */
+   double rf;              /* Rest frequency (Hz) */
+
+/* Initialise */
+   ret = 0.0;
+
+/* Check the global error status. */
+   if ( !astOK ) return ret;
+
+/* Get the value of the SourceVel attribute. */
+   ret = astGetSourceVel( this );
+
+/* Get the rest frame to which value refers. */
+   sor = astGetSourceVRF( this );
+
+/* If necessary, convert to the requested rest frame. */
+   if( sor != new ) {
+      specmap = astSpecMap( 1, 0, "" );
+
+/* Add a conversion from velocity to frequency since SorConvert converts
+   frequencies. */
+      rf = astGetRestFreq( this );
+      astSpecAdd( specmap, "VLTOFR", &rf );
+
+/* Now add a conversion from frequency in the SourveVRF standard of rest to 
+   frequency in the required rest frame. */
+      SorConvert( this, specmap, sor, 0.0, new, 0.0 );
+
+/* Finally, add a conversion from frequency back to velocity. Note, the
+   value of the rest frequency does not affect the overall conversion. */
+      astSpecAdd( specmap, "FRTOVL", &rf );
+
+/* Use the SpecMap to convert the source velocity in the SourceVRF
+   standard of rest to the required rest frame. */
+      temp = ret;
+      astTran1( specmap, 1, &temp, 1, &ret );
+      specmap = astAnnul( specmap );
+   }
+
+/* Return zero if an error has occurred. */
+   if( !astOK ) ret = 0.0;
+
+/* Return the answer. */
+   return ret;
+
+}
+
 static const char *DefUnit( AstSystemType system, const char *method,
                             const char *class ){
 /*
@@ -554,25 +655,25 @@ static const char *DefUnit( AstSystemType system, const char *method,
 
 /* Get an identifier for the default units. */
    if( system == AST__FREQ ) {
-      result = "Hz";
+      result = "GHz";
    } else if( system == AST__ENERGY ) {
       result = "J";
    } else if( system == AST__WAVENUM ) {
       result = "1/m";
    } else if( system == AST__WAVELEN ) {
-      result = "m";
+      result = "Angstrom";
    } else if( system == AST__AIRWAVE ) {
-      result = "m";
+      result = "Angstrom";
    } else if( system == AST__VRADIO ) {
-      result = "m/s";
+      result = "km/s";
    } else if( system == AST__VOPTICAL ) {
-      result = "m/s";
+      result = "km/s";
    } else if( system == AST__REDSHIFT ) {
       result = "";
    } else if( system == AST__BETA ) {
       result = "";
    } else if( system == AST__VREL ) {
-      result = "m/s";
+      result = "km/s";
 
 /* Report an error if the coordinate system was not recognised. */
    } else {
@@ -672,14 +773,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #define BUFF_LEN 50              /* Max. characters in result buffer */
 
 /* Local Variables: */
-   AstSpecMap *specmap;          /* Pointer to a SpecMap */
    AstSpecFrame *this;           /* Pointer to the SpecFrame structure */
    AstStdOfRestType sor;         /* Standard of rest */
    char *new_attrib;             /* Pointer value to new attribute name */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Attribute value */
-   double dtemp;                 /* Temporary attribute value */
-   double rf;                    /* Rest frequency */
    int len;                      /* Length of attrib string */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
@@ -804,53 +902,31 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
-/* SourceVel. */
-/* ---------- */
-/* Convert from the stored heliocentric velocity, to the system specified
-   by the current value of the StdOfRest attribute. */
+/* SourceVel */
+/* --------- */
    } else if ( !strcmp( attrib, "sourcevel" ) ) {
       dval = astGetSourceVel( this );
       if ( astOK ) {
-         sor = astGetStdOfRest( this );
-         if( sor != AST__HLSOR ) {
-            specmap = astSpecMap( 1, 0, "" );
 
-/* Add a conversion from velocity to frequency since SorConvert converts
-   frequencies. */
-            rf = astGetRestFreq( this );
-            if( rf == AST__BAD && astOK ) {
-               astError( AST__NORSF, "astGet(SpecFrame): Cannot convert "
-                         "the source velocity (SourceVel attribute) into "
-                         "the current standard of rest because the "
-                         "rest frequency (attributes RestFreq) is "
-                         "undefined." );
-            }
-            astSpecAdd( specmap, "VLTOFR", &rf );
-
-/* Now add a conversion from heliocentric frequency to frequency in the
-   current standard of rest. */
-            if( !SorConvert( this, specmap, AST__HLSOR, 0.0, sor, dval ) && 
-                astOK ) {
-               astError( AST__NOSOR, "astGet(SpecFrame): Cannot convert "
-                         "the source velocity (SourceVel attribute) into "
-                         "the current standard of rest because the "
-                         "source position (attributes RefRA and RefDec) is "
-                         "undefined." );
-            }
-
-/* Finally, add a conversion from frequency back to velocity. */
-            astSpecAdd( specmap, "FRTOVL", &rf );
-
-/* Use the SpecMap to conver the stored heliocentric velocity to a
-   velocity in the current standard of rest. */  
-            astTran1( specmap, 1, &dval, 1, &dtemp );
-            dval = dtemp;
-            specmap = astAnnul( specmap );
-         }
-
-/* Format the converted value, converting from m/s to km/s. */
-         (void) sprintf( buff, "%.*g", DBL_DIG, 0.001*dval );
+/* Convert from "m/s" to "km/s" */
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval*1.0E-3 );
          result = buff;
+      }
+
+/* SourceVRF */
+/* ----------*/
+   } else if ( !strcmp( attrib, "sourcevrf" ) ) {
+      sor = astGetSourceVRF( this );
+      if ( astOK ) {
+         result = StdOfRestString( sor );
+
+/* Report an error if the value was not recognised. */
+         if ( !result ) {
+            astError( AST__SCSIN,
+                     "astGetAttrib(%s): Corrupt %s contains invalid SourceVRF "
+                     "identification code (%d).", astGetClass( this ), 
+                     astGetClass( this ), (int) sor );
+         }
       }
 
 /* StdOfRest. */
@@ -1183,107 +1259,6 @@ f     invoked with STATUS set to an error value, or if it should fail for
    }  
 }
 
-static double GetSourceVel( AstSpecFrame *this ) {
-/*
-*  Name:
-*     astGetSourceVel
-
-*  Purpose:
-*     Obtain the value of the SourceVel attribute for a SpecFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "specframe.h"
-*     double GetSourceVel( AstSpecFrame *this )
-
-*  Class Membership:
-*     SpecFrame member function.
-
-*  Description:
-*     This function returns the value of the SourceVel attribute for a 
-*     SpecFrame. If the attribute has not been set, the returned default 
-*     value corresponds to zero velocity within the rest frame given by 
-*     the current value of the StdOfRest attribute.
-
-*  Parameters:
-*     this
-*        Pointer to the SpecFrame.
-
-*  Returned Value:
-*     The SourceVel value in m/s. This is a heliocentric velocity.
-
-*  Notes:
-*     -  A value of 0.0 is returned if this function is invoked with the
-*     global error status set, or if it should fail for any reason.
-*/
-
-/* Local Variables: */
-   AstSpecMap *specmap;          /* Pointer to a SpecMap */
-   AstStdOfRestType sor;         /* Standard of rest type code */
-   double dval;                  /* The SourceVel value in StdOfRest */
-   double result;                /* Value to return */
-   double rf;                    /* Rest frequency */
-
-/* Initialise */
-   result = 0.0;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* If a value has been set for the SourceVel attribute, return it. */
-   if( astTestSourceVel( this ) ){
-      result = this->sourcevel;
-
-/* Otherwise, we convert zero velocity within the StdOfRest rest frame
-   into a heliocentric velocity. */
-   } else {
-
-      sor = astGetStdOfRest( this );
-      if( sor != AST__HLSOR && sor != AST__SCSOR ) {
-         specmap = astSpecMap( 1, 0, "" );
-
-/* Add a conversion from velocity to frequency since SorConvert converts
-   frequencies. */
-         rf = astGetRestFreq( this );
-         if( rf == AST__BAD && astOK ) {
-            astError( AST__NORSF, "astSet(SpecFrame): Cannot convert "
-                      "the source velocity (SourceVel attribute) to "
-                      "the heliocentric standard of rest because the "
-                      "rest frequency (attributes RestFreq) is "
-                      "undefined." );
-         }
-         astSpecAdd( specmap, "VLTOFR", &rf );
-
-/* Now add a conversion from frequency in the current standard of rest to 
-   heliocentric frequency. */
-         if( !SorConvert( this, specmap, sor, 0.0, AST__HLSOR, 0.0 ) && astOK ) {
-            astError( AST__NOSOR, "astSet(SpecFrame): Cannot convert "
-                      "the source velocity (SourceVel attribute) to "
-                      "the heliocentric standard of rest because the "
-                      "source position (attributes RefRA and RefDec) is "
-                      "undefined." );
-         }
-
-/* Finally, add a conversion from frequency back to velocity. */
-         astSpecAdd( specmap, "FRTOVL", &rf );
-
-/* Use the SpecMap to convert the zero velocity in the current 
-   standard of rest to the heliocentric velocity to be returned. */
-         dval = 0.0;
-         astTran1( specmap, 1, &dval, 1, &result );
-         specmap = astAnnul( specmap );
-      }
-   }
-
-/* If an error occurred, clear the returned value. */
-   if ( !astOK ) result = 0.0;
-
-/* Return the result. */
-   return result;
-}
-
 static const char *GetSymbol( AstFrame *this, int axis ) {
 /*
 *  Name:
@@ -1578,10 +1553,10 @@ static const char *GetTitle( AstFrame *this_frame ) {
    AstStdOfRestType sor;         /* Code identifying standard of rest */
    AstSystemType system;         /* Code identifying type of coordinates */
    const char *sor_string;       /* Pointer to SOR description */
-   const char *label;            /* Pointer to axis label */
    const char *result;           /* Pointer to result string */
    double epoch;                 /* Value of Epoch attribute */
    double rf;                    /* Rest frequency */
+   int nc;                       /* No. of characters added */
    int pos;                      /* Buffer position to enter text */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
@@ -1607,7 +1582,6 @@ static const char *GetTitle( AstFrame *this_frame ) {
       sor = astGetStdOfRest( this );
       sor_string = StdOfRestString( sor );
       rf = astGetRestFreq( this );
-      label = astGetLabel( this, 0 );
 
 /* Classify the coordinate system type and create an appropriate Title
    string.  (Note that when invoking the astFmtDecimalYr function we must
@@ -1616,12 +1590,15 @@ static const char *GetTitle( AstFrame *this_frame ) {
       if ( astOK ) {
          result = buff;
 
-/* Begin with the axis label. */
-         pos = sprintf( buff, "%s", label );
+/* Begin with the system's default label. */
+         pos = sprintf( buff, "%s", SystemLabel( system ) );
+         buff[ 0 ] = toupper( buff[ 0 ] );
 
 /* Append the standard of rest in parentheses, if set. */
          if( astTestStdOfRest( this ) ) {
-            pos += sprintf( buff+pos, " (%s)", sor_string );
+            nc = sprintf( buff+pos, " (%s)", sor_string );
+            buff[ pos + 2 ] = tolower( buff[ pos + 2 ] );
+            pos += nc;
          }
 
 /* Append the rest frequency if relevant. */
@@ -1778,6 +1755,11 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name ) {
    vtab->TestAlignStdOfRest = TestAlignStdOfRest;
    vtab->GetAlignStdOfRest = GetAlignStdOfRest;
    vtab->SetAlignStdOfRest = SetAlignStdOfRest;
+
+   vtab->ClearSourceVRF = ClearSourceVRF;
+   vtab->TestSourceVRF = TestSourceVRF;
+   vtab->GetSourceVRF = GetSourceVRF;
+   vtab->SetSourceVRF = SetSourceVRF;
 
    vtab->ClearGeoLat = ClearGeoLat;
    vtab->TestGeoLat = TestGeoLat;
@@ -1955,8 +1937,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *     align_sor
 *        The standard of rest in which to align the two SpecFrames.
 *     align_svel
-*        The velocity pf the "Source" standard of rest in which to align 
-*        the two SpecFrames. Only used if "align_sor" is AST__SCSOR.
+*        The heliocentric velocity of the "Source" standard of rest in which 
+*        to align the two SpecFrames. Only used if "align_sor" is AST__SCSOR.
 *     report
 *        Should errors be reported if no match is possible? These reports
 *        will describe why no match was possible.
@@ -2034,8 +2016,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    same source velocity. */
    target_sor = astGetStdOfRest( target );
    result_sor = astGetStdOfRest( result );
-   target_svel = astGetSourceVel( target );
-   result_svel = astGetSourceVel( result );
+   target_svel = ConvertSourceVel( target, AST__HLSOR );
+   result_svel = ConvertSourceVel( result, AST__HLSOR );
    if( EQUALSOR(target_sor,target_svel,
                 result_sor,result_svel) ) {
       align_sor = target_sor;
@@ -2441,21 +2423,21 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* The SpecMap class assumes that the axis values supplied to its
    Transform method are in units which correspond to the default units 
-   of this class (the returned values also use these units). However,
+   for its class (the returned values also use these units). However,
    the Unit attributes of the supplied Frames may have been set to some
    non-default value, and so we need to add Mappings before and after the
    SpecMap which convert to and from the default units. Find the Mapping
    from the target Frame Units to the default Units for the target's system. */
    utarg = astGetUnit( target, 0 );
    umap1 = astUnitMapper( utarg, 
-                          DefUnit( astGetSystem( target ), "MakeSpecMap", 
-                                   "SpecFrame" ), NULL, NULL );
+                          SpecMapUnit( astGetSystem( target ), "MakeSpecMap", 
+                                       "SpecFrame" ), NULL, NULL );
 
 /* Find the Mapping from the default Units for the result's system to the
    Units of the result Frame. */
    ures = astGetUnit( result, 0 );
-   umap2 = astUnitMapper( DefUnit( astGetSystem( result ), "MakeSpecMap", 
-                                   "SpecFrame" ), 
+   umap2 = astUnitMapper( SpecMapUnit( astGetSystem( result ), "MakeSpecMap", 
+                                       "SpecFrame" ), 
                           ures, NULL, NULL );
 
 /* If both unit Mappings were created OK, sandwich the SpecMap between
@@ -2772,15 +2754,17 @@ static void Overlay( AstFrame *template, const int *template_axes,
    old_class = astGetClass( result );   
    method = "astOverlay";
 
+/* Get the old and new systems. */
+   old_system = astGetSystem( result );
+   new_system = astGetSystem( template );
+
 /* If the result Frame is a SpecFrame, we must test to see if overlaying its
    System attribute will change the type of coordinate system it describes. 
    Determine the value of this attribute for the result and template 
    SpecFrames. */
    resetSystem = 0;
    specframe = astIsASpecFrame( result );
-   if ( specframe ) {
-      old_system = astGetSystem( result );
-      new_system = astGetSystem( template );
+   if( specframe ) {
 
 /* If the coordinate system will change, any value already set for the result
    SpecFrame's Title will no longer be appropriate, so clear it. */
@@ -2807,7 +2791,6 @@ static void Overlay( AstFrame *template, const int *template_axes,
    appropriate to this class. */
    } else {
       if( astTestSystem( template ) ) {
-         new_system = astGetSystem( template );
          astClearSystem( template );
          resetSystem = 1;
       }
@@ -2840,6 +2823,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
       OVERLAY(RefRA)
       OVERLAY(RestFreq)
       OVERLAY(SourceVel)
+      OVERLAY(SourceVRF)
       OVERLAY(StdOfRest)
    }
 
@@ -2896,15 +2880,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Vaiables: */
    AstMapping *umap;             /* Mapping between units */
-   AstSpecMap *specmap;          /* Pointer to a SpecMap */
    AstSpecFrame *this;           /* Pointer to the SpecFrame structure */
    AstStdOfRestType sor;         /* Standard of rest type code */
    char *a;                      /* Pointer to next character */
    char *new_setting;            /* Pointer value to new attribute setting */
    double dval;                  /* Double atribute value */
    double dtemp;                 /* Temporary double atribute value */
-   double rf;                    /* Rest frequency */
-   double svel;                  /* Original source velocity */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int ulen;                     /* Used length of setting string */
@@ -3138,55 +3119,29 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* SourceVel. */
 /* ---------- */
-/* Convert from the the system specified by the current value of the 
-   StdOfRest attribute, to the stored heliocentric velocity. */
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "sourcevel= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
 
-/* Convert the supplied value from km/s to m/s. */
-      dval *= 1000.0;    
+/* Convert from km/s to m/s */
+      astSetSourceVel( this, dval*1.0E3 );
 
-/* If necessary, convert to a heliocentric velocity. */
-      sor = astGetStdOfRest( this );
-      svel = astGetSourceVel( this );
-      if( sor != AST__HLSOR ) {
-         specmap = astSpecMap( 1, 0, "" );
+/* SourceVRF */
+/* --------- */
+   } else if ( nc = 0,
+        ( 0 == astSscanf( setting, "sourcevrf=%n%*s %n", &off, &nc ) )
+        && ( nc >= len ) ) {
 
-/* Add a conversion from velocity to frequency since SorConvert converts
-   frequencies. */
-         rf = astGetRestFreq( this );
-         if( rf == AST__BAD && astOK ) {
-            astError( AST__NORSF, "astSet(SpecFrame): Cannot convert "
-                      "the source velocity (SourceVel attribute) to "
-                      "the heliocentric standard of rest because the "
-                      "rest frequency (attributes RestFreq) is "
-                      "undefined." );
-         }
-         astSpecAdd( specmap, "VLTOFR", &rf );
+/* Convert the string to a StdOfRest code before use. */
+      sor = StdOfRestCode( setting + off );
+      if ( sor != AST__BADSOR ) {
+         astSetSourceVRF( this, sor );
 
-/* Now add a conversion from frequency in the current standard of rest to 
-   heliocentric frequency. */
-         if( !SorConvert( this, specmap, sor, svel, AST__HLSOR, 0.0 ) && astOK ) {
-            astError( AST__NOSOR, "astSet(SpecFrame): Cannot convert "
-                      "the source velocity (SourceVel attribute) to "
-                      "the heliocentric standard of rest because the "
-                      "source position (attributes RefRA and RefDec) is "
-                      "undefined." );
-         }
-
-/* Finally, add a conversion from frequency back to velocity. */
-         astSpecAdd( specmap, "FRTOVL", &rf );
-
-/* Use the SpecMap to convert the supplied velocity in the current 
-   standard of rest to a heliocentric velocity for storage. */
-         astTran1( specmap, 1, &dval, 1, &dtemp );
-         dval = dtemp;
-         specmap = astAnnul( specmap );
+/* Report an error if the string value wasn't recognised. */
+      } else {
+         astError( AST__ATTIN, "astSetAttrib(%s): Invalid standard of rest "
+                   "description \"%s\".", astGetClass( this ), setting+off );
       }
-
-/* Store the converted value. */
-      astSetSourceVel( this, dval );
 
 /* StdOfRest. */
 /* ---------- */
@@ -3589,11 +3544,11 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 *     from
 *        The input standard of rest.
 *     from_svel
-*        The input source velocity (only used if "from" is AST_SCSOR).
+*        The input heliocentric source velocity (only used if "from" is AST_SCSOR).
 *     to
 *        The output standard of rest.
 *     to_svel
-*        The output source velocity (only used if "to" is AST_SCSOR).
+*        The output heliocentric source velocity (only used if "to" is AST_SCSOR).
 
 *  Returned Value:
 *     Zero is returned if the conversion could not be performed because the
@@ -3717,6 +3672,96 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 #undef TRANSFORM_2
 #undef TRANSFORM_3
 #undef TRANSFORM_5
+}
+
+static const char *SpecMapUnit( AstSystemType system, const char *method,
+                                const char *class ){
+/*
+*  Name:
+*     SpecMapUnit
+
+*  Purpose:
+*     Return the default units for a spectral coordinate system type used
+*     by the SpecMap class.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specframe.h"
+*     const char *SpecMapUnit( AstSystemType system, const char *method,
+*                              const char *class )
+
+*  Class Membership:
+*     SpecFrame member function.
+
+*  Description:
+*     This function returns a textual representation of the 
+*     units used by the SpecMap class for the specified spectral 
+*     coordinate system. In general, the SpecMap class uses SI units
+*     (m/s, Hz, m, etc), but this class (SpecFrame) has default units 
+*     more appropriate to astronomers (km/s, GHz, Angstroms, etc).
+
+*  Parameters:
+*     system
+*        The spectral coordinate system.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     A string describing the default units. This string follows the
+*     units syntax described in FITS WCS paper I "Representations of world
+*     coordinates in FITS" (Greisen & Calabretta).
+
+*  Notes:
+*     - A NULL pointer is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   const char *result;           /* Value to return */
+
+/* Initialize */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get an identifier for the default units. */
+   if( system == AST__FREQ ) {
+      result = "Hz";
+   } else if( system == AST__ENERGY ) {
+      result = "J";
+   } else if( system == AST__WAVENUM ) {
+      result = "1/m";
+   } else if( system == AST__WAVELEN ) {
+      result = "m";
+   } else if( system == AST__AIRWAVE ) {
+      result = "m";
+   } else if( system == AST__VRADIO ) {
+      result = "m/s";
+   } else if( system == AST__VOPTICAL ) {
+      result = "m/s";
+   } else if( system == AST__REDSHIFT ) {
+      result = "";
+   } else if( system == AST__BETA ) {
+      result = "";
+   } else if( system == AST__VREL ) {
+      result = "m/s";
+
+/* Report an error if the coordinate system was not recognised. */
+   } else {
+      astError( AST__SCSIN, "%s(%s): Corrupt %s contains illegal System "
+                "identification code (%d).", method, class, class, 
+                (int) system );
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static AstStdOfRestType StdOfRestCode( const char *sor ) {
@@ -3878,7 +3923,7 @@ static const char *StdOfRestString( AstStdOfRestType sor ) {
       break;
 
    case AST__LKSOR:
-      result = "LSR";
+      result = "LSRK";
       break;
 
    case AST__LGSOR:
@@ -4052,7 +4097,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          if( astIsASpecFrame( template ) ) {
             align_sys = astGetAlignSystem( template );
             align_sor = astGetAlignStdOfRest( template );
-            align_svel = astGetSourceVel( template );
+            align_svel = ConvertSourceVel( (AstSpecFrame *) template, AST__HLSOR );
 
 /* Since we now know that both the template and target are SpecFrames, it 
    should usually be possible to convert betwen them. If conversion is
@@ -4065,7 +4110,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          } else {
             align_sys = astGetAlignSystem( target );
             align_sor = astGetAlignStdOfRest( target );
-            align_svel = astGetSourceVel( target );
+            align_svel = ConvertSourceVel( target, AST__HLSOR );
          }
 
 /* If no template was supplied, align in the System and StdOfRest of the
@@ -4594,6 +4639,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "sourcevel" ) ) {
       result = astTestSourceVel( this );
 
+/* SourceVRF */
+/* --------- */
+   } else if ( !strcmp( attrib, "sourcevrf" ) ) {
+      result = astTestSourceVRF( this );
+
 /* StdOfRest. */
 /* ---------- */
    } else if ( !strcmp( attrib, "stdofrest" ) ) {
@@ -5006,19 +5056,16 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 *     Floating point.
 
 *  Description:
-*     This attribute (together with RefRA and RefDec) defines the "Source" 
-*     standard of rest (see attribute StdOfRest). This is a rest frame
+*     This attribute (together with SourceVRF, RefRA and RefDec) defines the 
+*     "Source" standard of rest (see attribute StdOfRest). This is a rest frame
 *     which is moving towards the position given by RefRA and RefDec at a 
-*     velocity given by SourceVel (in km/s). The value is stored internally
-*     as a heliocentric velocity, but is converted to and from the rest
-*     frame specified by the StdOfRest attribute when accessed using 
-c     astGet or astSet.
-f     AST_GET or AST_SET.
+*     velocity given by SourceVel (in km/s). When setting a value for
+*     SourceVel, the velocity should be supplied in the rest frame
+*     specified by the SourceVRF attribute. Likewise, when getting the
+*     value of SourceVel, it will be returned in the rest frame specified
+*     by the SourceVRF attribute.
 *
-*     The default value results in the "Source" standard of rest being 
-*     equivalent to the standard of rest specified by the StdOfrest 
-*     attribute (i.e. a source velocity of zero within the specified rest
-*     frame).
+*     The default value is zero.
 
 *  Applicability:
 *     SpecFrame
@@ -5026,13 +5073,72 @@ f     AST_GET or AST_SET.
 
 *att--
 */
-/* The source velocity (stored internally as a heliocentric speed in m/s). 
-   Clear it by setting it to AST__BAD, which is returns a default value 
-   corresponding to zero within the StdOfRest rest frame. Any value is 
-   acceptable. */
+/* The source velocity (stored internally as a speed in m/s). Clear it by 
+   setting it to AST__BAD, which returns a default value of zero. Any 
+   value is acceptable. */
 astMAKE_CLEAR(SpecFrame,SourceVel,sourcevel,AST__BAD)
 astMAKE_SET(SpecFrame,SourceVel,double,sourcevel,value)
 astMAKE_TEST(SpecFrame,SourceVel,( this->sourcevel != AST__BAD ))
+astMAKE_GET(SpecFrame,SourceVel,double,0.0,((this->sourcevel!=AST__BAD)?this->sourcevel:0.0))
+
+/*
+*att++
+*  Name:
+*     SourceVRF
+
+*  Purpose:
+*     Rest frame in which the source velocity is stored.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute identifies the rest frame in which the source
+*     velocity is stored (the source velocity is accessed using attribute
+*     SourceVel). When setting a new value for the SourceVel attribute,
+*     the source velocity should be supplied in the rest frame indicated
+*     by this attribute. Likewise, when getting the value of the SourceVel
+*     attribute, the velocity will be returned in this rest frame.
+*
+*     If the value of SourceVRF is changed, the value stored for SourceVel 
+*     will be converted from the old to the new rest frame.
+*
+*     The values which can be supplied are the same as for the StdOfrest 
+*     attribute (except that SourceVRF cannot be set to "Source"). The 
+*     default value is "Helio".
+
+*  Applicability:
+*     SpecFrame
+*        All SpecFrames have this attribute.
+*att--
+*/
+/* The SourceVRF value has a value of AST__BADSOR when not set yielding 
+   a default of AST__HLSOR. */
+astMAKE_TEST(SpecFrame,SourceVRF,( this->sourcevrf != AST__BADSOR ))
+astMAKE_GET(SpecFrame,SourceVRF,AstStdOfRestType,AST__BADSOR,(
+            ( this->sourcevrf == AST__BADSOR ) ? AST__HLSOR : this->sourcevrf ) )
+
+/* When clearing SourceVRF, convert the SourceVel value to heliocentric
+  (but only if set)*/
+astMAKE_CLEAR(SpecFrame,SourceVRF,sourcevrf,(astTestSourceVel( this )?
+astSetSourceVel( this, ConvertSourceVel( this, AST__HLSOR ) ):NULL,AST__BADSOR))
+
+/* Validate the SourceVRF value being set and report an error if necessary. 
+   If OK, convert the stored SourceVel value into the new rest frame (but
+only if set)*/
+astMAKE_SET(SpecFrame,SourceVRF,AstStdOfRestType,sourcevrf,(
+            ( ( value >= FIRST_SOR ) && ( value <= LAST_SOR ) && value != AST__SCSOR ) ?
+                 astTestSourceVel( this )?
+                 astSetSourceVel( this, ConvertSourceVel( this, value ) ):NULL, value:
+                 ( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
+                             "given for SourceVRF attribute.",
+                             "astSetSourceVRF", astGetClass( this ), (int) value ),
+
+/* Leave the value unchanged on error. */
+                                            this->sourcevrf ) ) )
 
 /*
 *att++
@@ -5089,7 +5195,7 @@ astMAKE_TEST(SpecFrame,SourceVel,( this->sourcevel != AST__BAD ))
 *     This standard of rest must be qualified using the RefRA and RefDec 
 *     attributes. 
 *
-*     - "LSR", "LSRK": The rest-frame of the kinematical Local Standard of 
+*     - "LSRK", "LSR": The rest-frame of the kinematical Local Standard of 
 *     Rest. Spectra recorded in this standard of rest suffer a Doppler shift 
 *     which depends on the velocity of the kinematical Local Standard of Rest 
 *     through the galaxy. This standard of rest must be qualified using the 
@@ -5317,6 +5423,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* If set, convert explicitly to a string for the external
    representation. */
+   sval = "";
    if ( set ) {
       if ( astOK ) {
          sval = StdOfRestString( sor );
@@ -5401,7 +5508,35 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ---------- */
    set = TestSourceVel( this );
    dval = set ? GetSourceVel( this ) : astGetSourceVel( this );
-   astWriteDouble( channel, "SrcVel", set, 0, dval, "Heliocentric source velocity (m/s)" );
+   astWriteDouble( channel, "SrcVel", set, 0, dval, "Source velocity (m/s)" );
+
+/* SourceVRF. */
+/* ---------- */
+   set = TestSourceVRF( this );
+   sor = set ? GetSourceVRF( this ) : astGetSourceVRF( this );
+
+/* If set, convert explicitly to a string for the external representation. */
+   if ( set ) {
+      if ( astOK ) {
+         sval = StdOfRestString( sor );
+
+/* Report an error if the value was not recognised. */
+         if ( !sval ) {
+            astError( AST__SCSIN,
+                     "%s(%s): Corrupt %s contains invalid source velocity "
+                     "rest frame identification code (%d).", "astWrite", 
+                     astGetClass( channel ), astGetClass( this ), (int) sor );
+         }
+      }
+
+/* If not set, use astGetAttrib which returns a string value using
+   (possibly over-ridden) methods. */
+   } else {
+      sval = astGetAttrib( this_object, "sourcevrf" );
+   }
+
+/* Write out the value. */
+   astWriteString( channel, "SrcVRF", set, 0, sval, "Source velocity rest frame" );
 
 /* UsedUnits */
 /* --------- */
@@ -5613,6 +5748,7 @@ AstSpecFrame *astInitSpecFrame_( void *mem, size_t size, int init,
       new->refra = AST__BAD;
       new->restfreq = AST__BAD;
       new->sourcevel = AST__BAD;
+      new->sourcevrf = AST__BADSOR;    
       new->stdofrest = AST__BADSOR;
       new->nuunits = 0;
       new->usedunits = NULL;
@@ -5824,6 +5960,29 @@ AstSpecFrame *astLoadSpecFrame_( void *mem, size_t size,
       new->sourcevel = astReadDouble( channel, "srcvel", AST__BAD );
       if ( TestSourceVel( new ) ) SetSourceVel( new, new->sourcevel );
 
+/* SourceVRF */
+/* --------- */
+/* Set the default and read the external representation as a string. */
+       new->sourcevrf = AST__BADSOR;
+       sval = astReadString( channel, "srcvrf", NULL );
+
+/* If a value was read, convert from a string to a StdOfRest code. */
+       if ( sval ) {
+          if ( astOK ) {
+             new->sourcevrf = StdOfRestCode( sval );
+
+/* Report an error if the value wasn't recognised. */
+             if ( new->sourcevrf == AST__BADSOR ) {
+                astError( AST__ATTIN,
+                          "astRead(%s): Invalid source velocity rest frame "
+                          "description \"%s\".", astGetClass( channel ), sval );
+             }
+          }
+
+/* Free the string value. */
+          sval = astFree( sval );
+       }
+
 /* UsedUnits */
 /* --------- */
       new->nuunits = 0;
@@ -5878,10 +6037,6 @@ void astSetRefPos_( AstSpecFrame *this, AstSkyFrame *frm, double lon,
                     double lat ){
    if ( !astOK ) return;
    (**astMEMBER(this,SpecFrame,SetRefPos))(this,frm,lon,lat);
-}
-double astGetSourceVel_( AstSpecFrame *this ){
-   if ( !astOK ) return 0.0;
-   return (**astMEMBER(this,SpecFrame,GetSourceVel))(this);
 }
 
 /* Special public interface functions. */
@@ -6060,3 +6215,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Return an ID value for the new SpecFrame. */
    return astMakeId( new );
 }
+
+
+
+

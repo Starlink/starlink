@@ -8102,21 +8102,52 @@ could say:
    The source velocity (SpecFrames only)
 }{
    \sstdescription{
-      This attribute (together with \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec}) defines the {\tt{"}}Source{\tt{"}}
-      standard of rest (see attribute \htmlref{StdOfRest}{StdOfRest}). This is a rest frame
-      which is moving towards the position given by RefRA and RefDec at a
-      velocity given by SourceVel (in km/s). The value is stored internally
-      as a heliocentric velocity, but is converted to and from the rest
-      frame specified by the StdOfRest attribute when accessed using
-      WCSATTRIB.
 
-      The default value corresponds to zero velocity within the
-      restframe specified by the {\tt StdOfRest} attribute.
+      This attribute (together with \htmlref{SourceVRF}{SourceVRF},
+      \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec}) defines the
+      {\tt{"}}Source{\tt{"}} standard of rest (see attribute
+      \htmlref{StdOfRest}{StdOfRest}). This is a rest frame which is
+      moving towards the position given by RefRA and RefDec at a velocity
+      given by SourceVel (in km/s). When setting a value for SourceVel
+      using \htmlref{WCSATTRIB}{WCSATTRIB}, the velocity should be
+      supplied in the rest frame specified by the SourceVRF attribute.
+      Likewise, when getting the value of SourceVel, it will be returned
+      in the rest frame specified by the SourceVRF attribute.
+
+      The default value is zero.
+
    }
    \sstattributetype{
       Floating point.
    }
 }
+
+\sstroutine{
+   SourceVRF
+}{
+   Rest frame in which the source velocity is stored (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute identifies the rest frame in which the source
+      velocity is stored (the source velocity is accessed using attribute
+      \htmlref{SourceVel}{SourceVel}). When setting a new value for the
+      SourceVel attribute, the source velocity should be supplied in the
+      rest frame indicated by this attribute. Likewise, when getting the
+      value of the SourceVel attribute, the velocity will be returned in
+      this rest frame.
+
+      If the value of SourceVRF is changed, the value stored for
+      SourceVel will be converted from the old to the new rest frame.
+
+      The values which can be supplied are the same as for the 
+      \htmlref{StdOfrest}{StdOfRest} attribute (except that SourceVRF
+      cannot be set to ``Source''). The default value is ``Helio''.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+
 \sstroutine{
    StdOfRest
 }{

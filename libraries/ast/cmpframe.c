@@ -89,6 +89,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        axes.
 *        - Override astGetEpoch astGetSystem, astGetAlignSystem.
 *        astValidateSystem, astSystemString, astSystemCode.
+*     27-FEB-2003 (DSB):
+*        - Modify the default Domain name for a CmpFrame to be the
+*        domains of the two subFrames separated by a "-".
 *class--
 */
 
@@ -2100,7 +2103,10 @@ static const char *GetDomain( AstFrame *this_frame ) {
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to CmpFrame structure */
+   const char *dom1;             /* Pointer to first sub domain */
+   const char *dom2;             /* Pointer to second sub domain */
    const char *result;           /* Pointer value to return */
+   static const char buff[ 100 ];/* Buffer for returned domain name */
 
 /* Initialise. */
    result = NULL;
@@ -2118,7 +2124,14 @@ static const char *GetDomain( AstFrame *this_frame ) {
 
 /* Otherwise, provide a pointer to a suitable default string. */
    } else {
-      result = "CMP";
+      dom1 = astGetDomain( this->frame1 );
+      dom2 = astGetDomain( this->frame2 );
+      if( strlen( dom1 ) > 0 || strlen( dom2 ) > 0 ) {
+         sprintf( (char *) buff, "%s-%s", dom1, dom2 );
+         result = buff;         
+      } else {
+         result = "CMP";
+      }
    }
 
 /* Return the result. */

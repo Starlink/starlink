@@ -8670,7 +8670,9 @@ f     used (by AST_FINDFRAME) as a template to match another (target)
 *        "SKY".
 *     CmpFrame
 *        The CmpFrame class re-defines the default Domain value to be
-*        "CMP".
+*        of the form "<dom1>-<dom2>", where <dom1> and <dom2> are the
+*        Domains of the two component Frames. If both these Domains are
+*        blank, then the string "CMP" is used as the default Domain name.
 *     FrameSet
 *        The Domain attribute of a FrameSet is the same as that of its
 *        current Frame (as specified by the Current attribute).
@@ -8981,16 +8983,16 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        associated spectral coordinate systems (the default is "WAVE" -
 *        wavelength):
 *
-*        - "FREQ": Frequency (Hz)
+*        - "FREQ": Frequency (GHz)
 *        - "ENER" or "ENERGY": Energy (J)
 *        - "WAVN" or "WAVENUM": Wave-number (1/m)
-*        - "WAVE" or "WAVELEN": Vacuum wave-length (m)
-*        - "AWAV" or "AIRWAVE": Wave-length in air (m)
-*        - "VRAD" or "VRADIO": Radio velocity (m/s)
-*        - "VOPT" or "VOPTICAL": Optical velocity (m/s)
+*        - "WAVE" or "WAVELEN": Vacuum wave-length (Angstrom)
+*        - "AWAV" or "AIRWAVE": Wave-length in air (Angstrom)
+*        - "VRAD" or "VRADIO": Radio velocity (km/s)
+*        - "VOPT" or "VOPTICAL": Optical velocity (km/s)
 *        - "ZOPT" or "REDSHIFT": Reshift (dimensionless)
 *        - "BETA": Beta factor (dimensionless)
-*        - "VELO" or "VREL": Relativistic velocity (m/s)
+*        - "VELO" or "VREL": Relativistic velocity (km/s)
 *
 *        The default value for the Unit attribute for each system is shown
 *        in parentheses. Note that the default value for the ActiveUnit flag 

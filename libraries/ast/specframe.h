@@ -93,6 +93,7 @@ typedef struct AstSpecFrame {
    double refra;                 /* RA (FK5 J2000) of source */
    double restfreq;              /* Rest frequency (Hz)*/
    double sourcevel;             /* Source velocity (heliocentric, m/s) */
+   AstStdOfRestType sourcevrf;   /* Code identifying source vel. StdOfRest */
    int nuunits;                  /* Size of usedunits array */
    char **usedunits;             /* Last used units for each system */
 } AstSpecFrame;
@@ -123,6 +124,11 @@ typedef struct AstSpecFrameVtab {
    int (* TestAlignStdOfRest)( AstSpecFrame * );
    void (* ClearAlignStdOfRest)( AstSpecFrame * );
    void (* SetAlignStdOfRest)( AstSpecFrame *, AstStdOfRestType );
+
+   AstStdOfRestType (* GetSourceVRF)( AstSpecFrame * );
+   int (* TestSourceVRF)( AstSpecFrame * );
+   void (* ClearSourceVRF)( AstSpecFrame * );
+   void (* SetSourceVRF)( AstSpecFrame *, AstStdOfRestType );
 
    double (* GetRestFreq)( AstSpecFrame * );
    int (* TestRestFreq)( AstSpecFrame * );
@@ -203,6 +209,11 @@ AstStdOfRestType astGetAlignStdOfRest_( AstSpecFrame * );
 int astTestAlignStdOfRest_( AstSpecFrame * );
 void astClearAlignStdOfRest_( AstSpecFrame * );
 void astSetAlignStdOfRest_( AstSpecFrame *, AstStdOfRestType );
+
+AstStdOfRestType astGetSourceVRF_( AstSpecFrame * );
+int astTestSourceVRF_( AstSpecFrame * );
+void astClearSourceVRF_( AstSpecFrame * );
+void astSetSourceVRF_( AstSpecFrame *, AstStdOfRestType );
 
 double astGetRestFreq_( AstSpecFrame * );
 int astTestRestFreq_( AstSpecFrame * );
@@ -301,6 +312,11 @@ astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astTestAlignStdOfRest(this) astINVOKE(V,astTestAlignStdOfRest_(astCheckSpecFrame(this)))
 #define astClearAlignStdOfRest(this) astINVOKE(V,astClearAlignStdOfRest_(astCheckSpecFrame(this)))
 #define astSetAlignStdOfRest(this,value) astINVOKE(V,astSetAlignStdOfRest_(astCheckSpecFrame(this),value))
+
+#define astGetSourceVRF(this) astINVOKE(V,astGetSourceVRF_(astCheckSpecFrame(this)))
+#define astTestSourceVRF(this) astINVOKE(V,astTestSourceVRF_(astCheckSpecFrame(this)))
+#define astClearSourceVRF(this) astINVOKE(V,astClearSourceVRF_(astCheckSpecFrame(this)))
+#define astSetSourceVRF(this,value) astINVOKE(V,astSetSourceVRF_(astCheckSpecFrame(this),value))
 
 #define astGetRestFreq(this) astINVOKE(V,astGetRestFreq_(astCheckSpecFrame(this)))
 #define astTestRestFreq(this) astINVOKE(V,astTestRestFreq_(astCheckSpecFrame(this)))
