@@ -1069,9 +1069,9 @@ int astTest##attribute##_( Ast##class *this ) { \
 /* define macros containing the library major version, minor version and 
    release numbers. The values of these macros are edited in automatically
    when the AST release is prepared. */
-#define AST__VMAJOR 3
-#define AST__VMINOR 2
-#define AST__RELEASE 4
+#define AST__VMAJOR <MAJOR_VERSION_NUMBER>
+#define AST__VMINOR <MINOR_VERSION_NUMBER>
+#define AST__RELEASE <RELEASE_NUMBER>
 
 /* Type Definitions. */
 /* ================= */
