@@ -1,7 +1,7 @@
-      SUBROUTINE CCD1_FLMUL( IMAGE, NCOLS, NLINES, STATUS )
+      SUBROUTINE CCDB1_FLMUL( IMAGE, NCOLS, NLINES, STATUS )
 *+
 *  Name:
-*     CCD1_FLMUL
+*     CCDB1_FLMUL
 
 *  Purpose:
 *     Multiplies an image in place by a ramp.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_FLMUL( IMAGE, NCOLS, NLINES, STATUS )
+*     CALL CCDB1_FLMUL( IMAGE, NCOLS, NLINES, STATUS )
 
 *  Notes:
 *     Assumes there are no bad pixels.  Since multiplication is by a 
@@ -65,4 +65,4 @@
       END DO
 
       END
-* $Id: ccd1_flmul.f,v 1.1 1998/06/15 15:16:41 mbt Exp mbt $
+* $Id: ccdb1_flmul.f,v 1.2 1998/06/15 15:19:54 mbt Exp $
