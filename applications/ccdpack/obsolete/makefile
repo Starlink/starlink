@@ -563,7 +563,8 @@ F_ROUTINES = $(TASKSRC) $(SUBSRC) $(HELPSRC) $(IRHSRC) $(IRGSRC) \
 
 TASKSRC = $(REDTASKS:=.f) $(REGTASKS:=.f) $(RESTASKS:=.f) $(SCRTASKS:=.f)
 
-SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
+SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
+ ccd1_agtmd.f ccd1_aldif.f \
  ccd1_anoi.f ccd1_appnd.f ccd1_asfio.f ccd1_asnk.f ccd1_asrc.f \
  ccd1_auto.f ccd1_cen2.f \
  ccd1_cent.f ccd1_cext.f ccd1_cff.f ccd1_ckcdb.f \
@@ -2145,6 +2146,7 @@ ccd1_achan.o: AST_PAR CCD1_FDCM SAE_PAR
 ccd1_acmsk.o: DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR SAE_PAR
 ccd1_adds.o: SAE_PAR
 ccd1_adkey.o: SAE_PAR
+ccd1_agtmd.o: FIO_ERR CCD1_PAR SAE_PAR
 ccd1_aldif.o: PRM_PAR SAE_PAR
 ccd1_anoi.o: PRM_PAR SAE_PAR
 ccd1_appnd.o: SAE_PAR
