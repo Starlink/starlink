@@ -1044,8 +1044,6 @@ c     INTEGER                  FILE_END       !   "     "   "   "   " end key
 *    Global constants :
       INCLUDE 'SAE_PAR'
 
-c      RECORD /POS_REC/ POS
-
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
 
 *  Arguments Given:
@@ -1191,22 +1189,17 @@ c      RECORD /POS_REC/ POS
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definitions :
-      STRUCTURE /POS_REC/
-         INTEGER UT				! hk clock (1/2s) time
-         REAL SATGEO(3)		! Sat vector in geo frame
-         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
-         INTEGER*2 IBGLONG                      ! long and lat
-         INTEGER*2 IBGLAT                       !
-      END STRUCTURE
 *
 *    Local constants :
 *
       DOUBLE PRECISION		S2_REF_MJD
         PARAMETER               ( S2_REF_MJD = 47892.0D0 )
 *-
-
-      RECORD /POS_REC/ POS
+      INTEGER POS_UT				! hk clock (1/2s) time
+      REAL POS_SATGEO(3)	         	! Sat vector in geo frame
+      INTEGER*2 POS_IXRT(3)		        ! RA, dec, roll, arcmin
+      INTEGER*2 POS_IBGLONG                     ! long and lat
+      INTEGER*2 POS_IBGLAT                      !
 
       DOUBLE PRECISION RMATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
@@ -1260,13 +1253,13 @@ c     REAL                 TRIGGER               !current trigger time
       IF( POS_FILE_OK)THEN
           CURRENT_KEY = BARY_MJD2HK(MJD_CURRENT)
 * read ATT POS SAT file
-           POS.UT = 0
+           POS_UT = 0
 *          READ(LUN_POS,KEYGE=CURRENT_KEY)POS
 *read ATT POS SAT record into local variables
-          UT = POS.UT
+          UT = POS_UT
           DO J = 1,3
-            SATGEO(J) = REAL(POS.SATGEO(J))
-            IXRT(J) =   INT(POS.IXRT(J))
+            SATGEO(J) = REAL(POS_SATGEO(J))
+            IXRT(J) =   INT(POS_IXRT(J))
           ENDDO
 
 *          MJD_CURRENT = BARY_HK2MJD(UT)
