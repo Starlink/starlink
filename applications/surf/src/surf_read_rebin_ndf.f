@@ -120,53 +120,54 @@
       INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Local Constants:
-      INTEGER     MAX_DIM              ! max number of dims in array
+      INTEGER          MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
-      CHARACTER*25 TSKNAME       ! Name of task
+      CHARACTER*25     TSKNAME              ! Name of task
       PARAMETER (TSKNAME = 'REDS_READ_REBIN_NDFS')
 
 *  Arguements Given:
-      CHARACTER*(*)     DATA_SPEC(SCUBA__MAX_SECT)
-      INTEGER IN_NDF
-      INTEGER NSPEC
-      CHARACTER*(*)     OUT_COORDS
-      LOGICAL SECPAR
-      LOGICAL USE_SECTION
+      CHARACTER*(*)    DATA_SPEC(SCUBA__MAX_SECT)
+      INTEGER          IN_NDF
+      INTEGER          NSPEC
+      CHARACTER*(*)    OUT_COORDS
+      LOGICAL          SECPAR
+      LOGICAL          USE_SECTION
 
 *  Arguments Given & Returned:
-      CHARACTER*(*) SUB_INSTRUMENT
-      REAL WAVELENGTH
+      CHARACTER*(*)    SUB_INSTRUMENT
+      REAL             WAVELENGTH
 
 *  Arguments Returned:
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-      INTEGER BOL_DEC_END
-      INTEGER BOL_DEC_PTR
-      INTEGER BOL_RA_END
-      INTEGER BOL_RA_PTR
-      INTEGER DATA_END
-      INTEGER DATA_PTR
-      INTEGER INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
-      INTEGER MAX_FILE
+      INTEGER          BOL_DEC_END
+      INTEGER          BOL_DEC_PTR
+      INTEGER          BOL_RA_END
+      INTEGER          BOL_RA_PTR
+      INTEGER          DATA_END
+      INTEGER          DATA_PTR
+      INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
+      INTEGER          MAX_FILE
       DOUBLE PRECISION MJD_STANDARD
-      INTEGER N_BOL
-      INTEGER N_FILE
-      INTEGER N_INTS
-      INTEGER N_POS
+      INTEGER          N_BOL
+      INTEGER          N_FILE
+      INTEGER          N_INTS
+      INTEGER          N_POS
       DOUBLE PRECISION OUT_RA_CEN
       DOUBLE PRECISION OUT_DEC_CEN
-      CHARACTER*(*) SOBJECT
-      CHARACTER*(*) SUTDATE
-      CHARACTER*(*) SUTSTART
-      INTEGER VARIANCE_END
-      INTEGER VARIANCE_PTR
+      CHARACTER*(*)    SOBJECT
+      CHARACTER*(*)    SUTDATE
+      CHARACTER*(*)    SUTSTART
+      INTEGER          VARIANCE_END
+      INTEGER          VARIANCE_PTR
 
 *  Status
-      INTEGER STATUS
+      INTEGER          STATUS
 
 *  Local Variables:
       LOGICAL          ABORTED         ! .TRUE. if an observation has been
                                        ! aborted
+      BYTE             BIT_VALUE       ! Temporary byte
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! dU3 Nasmyth coord of bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
@@ -176,6 +177,9 @@
                                           ! selected in data-spec, 0 otherwise
       CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! bolometer types
+      BYTE             BTEMP           ! Temporary byte
+      INTEGER          BYTE_END        ! Mask byte array
+      INTEGER          BYTE_PTR        ! Mask byte array
       INTEGER          DATA_OFFSET     ! Offset for pointer arrays
       INTEGER          DIM (MAX_DIM)   ! array dimensions
       INTEGER          DUMMY_ENDVAR_PTR
@@ -322,8 +326,6 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*      print *,'In REABIN_NDF'
-
 *     get some general descriptive parameters of the observation
 
       CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC,
@@ -332,8 +334,6 @@
      :     IN_SCUBAX_LOC, STATUS)
       CALL NDF_XLOC (IN_NDF, 'SCUCD', 'READ', 
      :     IN_SCUCDX_LOC, STATUS)
-
-*      print *,'Reading Extensions'
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL NDF_XLOC (IN_NDF, 'REDS', 'READ', IN_REDSX_LOC,
@@ -793,20 +793,9 @@
          CALL SCULIB_MALLOC (N_POS * VAL__NBI, POS_S_PTR, 
      :        POS_S_END, STATUS)
 
-*     decode the data specification
-         
-         SWITCH_EXPECTED = .FALSE.
-         
-         CALL SCULIB_DECODE_SPEC (NSPEC,DATA_SPEC,%val(IN_DEM_PNTR_PTR),
-     :        1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
-     :        N_POS, N_BOL, SWITCH_EXPECTED,
-     :        POS_SELECTED, %val(POS_S_PTR), SWITCH_S, EXP_S, 
-     :        INT_S, MEAS_S, BOL_S, STATUS)
-
 *     Is section good or bad
 
          IF (SECPAR) THEN
-            print *,'Using value from text file for USE_INTS'
             USE_INTS = USE_SECTION
          ELSE
             CALL PAR_GET0L ('USE_SECTION', USE_INTS, STATUS)
@@ -817,12 +806,52 @@
 *     section to be set bad and not the section itself.
          USE_INTS = .NOT.USE_INTS
 
-*     and set quality for the selected bolometers and positions
+*     Use a byte array to decode sections
+*     Setup a byte array to keep track of the sections
+*     I do this so that I can handle multiple sections (the bytes
+*     are only switched on or off and so can handle overlap of different
+*     sections)
 
-         CALL SCULIB_SET_DATA (USE_INTS, %val(DATA_PTR), 
-     :        N_BOL, N_POS, 1, BOL_S, %val(POS_S_PTR), 
-     :        VAL__BADR, STATUS)
+         BYTE_PTR = 0
+         BYTE_END = 0
+         CALL SCULIB_MALLOC(N_POS * N_BOL * VAL__NBUB, BYTE_PTR,
+     :        BYTE_END, STATUS)
+
+*     If we are using section then fill array with 0 and then set selected
+*     regions to 1. Reverse if I am selecting the rest.
+
+         IF (USE_INTS) THEN
+            BIT_VALUE = 1
+            BTEMP = 0
+         ELSE
+            BIT_VALUE = 0
+            BTEMP = 1
+         END IF
+         CALL SCULIB_CFILLB(N_POS * N_BOL, BTEMP, %VAL(BYTE_PTR))
+
+*     decode the data specifications
          
+         SWITCH_EXPECTED = .FALSE.
+         
+         DO I = 1, NSPEC
+         
+            CALL SCULIB_DECODE_SPEC (DATA_SPEC(I),%val(IN_DEM_PNTR_PTR),
+     :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
+     :           N_POS, N_BOL, SWITCH_EXPECTED,
+     :           POS_SELECTED, %val(POS_S_PTR), SWITCH_S, EXP_S, 
+     :           INT_S, MEAS_S, BOL_S, STATUS)
+
+*     Set the byte array to reflect this particular section
+            CALL SCULIB_SET_QUAL (.TRUE.,%val(BYTE_PTR), N_BOL, N_POS,
+     :           1, BOL_S, %val(POS_S_PTR), 0, BIT_VALUE, STATUS)
+        
+         END DO
+
+*     Set the data to bad corresponding to this section
+         CALL SCULIB_SET_DATA (.TRUE., N_BOL, N_POS, 1, %VAL(BYTE_PTR), 
+     :        VAL__BADR, %val(DATA_PTR), STATUS)
+
+         CALL SCULIB_FREE ('BYTE_PTR', BYTE_PTR, BYTE_END, STATUS)
          CALL SCULIB_FREE ('POS_S', POS_S_PTR, POS_S_END, STATUS)
 
       END IF
