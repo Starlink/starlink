@@ -63,8 +63,9 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 	    else :; fi; \
 	  else :; fi; \
 	done
-## Now install each of the IFC files into the %DIR% directory, but not as
+## Now install each of the IFC files into the %DIR% directory, but as
 ## data rather than executables.
+##
 ## The following comes from data.am, but with $(%DIR%_%PRIMARY%)
 ## replaced with $(%DIR%_MONOLITH_IFCS), and $(%DIR%%PRIMARY%_INSTALL)
 ## replaced with $(INSTALL_DATA)
