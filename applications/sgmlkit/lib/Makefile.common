@@ -140,6 +140,11 @@ DVI2BITMAP=dvi2bitmap
 		bibtex $$ROOT.latexbib; \
 	fi
 
+# The XML stylesheet, like the HTML stylesheet, outputs a stamp.
+%.xml.stamp: %.sgml
+	$(JADE) -t xml $(JADEFLAGS) \
+		-d $(STYLESHEET)/xml/sl.dsl#xml $< > $@
+
 %.ps: %.dvi
 	dvips $< -o
 
