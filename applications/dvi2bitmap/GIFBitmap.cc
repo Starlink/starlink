@@ -89,15 +89,36 @@ void GIFBitmap::write (const string filename)
     int *RedCT   = new int[ncolours];
     int *GreenCT = new int[ncolours];
     int *BlueCT  = new int[ncolours];
-    int diffred   = fg_red_  -bg_red_;
-    int diffgreen = fg_green_-bg_green_;
-    int diffblue  = fg_blue_ -bg_blue_;
+    int diffred   = fg_.red  -bg_.red;
+    int diffgreen = fg_.green-bg_.green;
+    int diffblue  = fg_.blue -bg_.blue;
     for (int i=0; i<ncolours; i++)
     {
+	// Following is a rather `steeper' colour table than the
+	// obvious linear one, which should plausibly therefore be
+	// less prone to the `halo' you can get when transparent
+	// images are viewed against a substantially different
+	// background from the one they were intended for.  Having
+	// said that, however, I can't see much difference when I
+	// examine them.
+#if 1
+	double rat = sqrt(static_cast<double>(i)/(ncolours-1));
+#else
 	float rat = static_cast<float>(i)/(ncolours-1);
-	RedCT[i]   = bg_red_   + iround(rat*diffred);
-	GreenCT[i] = bg_green_ + iround(rat*diffgreen);
-	BlueCT[i]  = bg_blue_  + iround(rat*diffblue);
+#endif
+	RedCT[i]   = bg_.red   + iround(rat*diffred);
+	GreenCT[i] = bg_.green + iround(rat*diffgreen);
+	BlueCT[i]  = bg_.blue  + iround(rat*diffblue);
+    }
+
+    if (verbosity_ > normal)
+    {
+	cerr << "GIFBitmap colour tables:\n";
+	for (int i=0; i<ncolours; i++)
+	    cerr << i << '\t'
+		 << RedCT[i] << '\t'
+		 << GreenCT[i] << '\t'
+		 << BlueCT[i] << '\n';
     }
 
     //const int step = 256 >> bpp_;
