@@ -23,7 +23,8 @@ dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [agi ast cat chr fio grp hds ndf par mers pda prm psx sae sgs shl subpar])
+STAR_DECLARE_DEPENDENCIES(build, [ast cat chr fio grp hds ndf par mers pda prm psx sae shl sgs subpar])
+STAR_DECLARE_DEPENDENCIES(build, agi, link)
 
 STAR_LATEX_DOCUMENTATION(sun180)
 
