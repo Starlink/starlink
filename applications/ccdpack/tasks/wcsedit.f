@@ -365,7 +365,7 @@
             ELSE IF ( MODE .EQ. 'SET' ) THEN
                FRTARG = AST_GETFRAME( IWCS, JTARG, STATUS )
                CALL PAR_GET0C( 'SET', SET, STATUS )
-               CALL AST_SET( FRTARG, SET, STATUS )
+               CALL AST_SET( FRTARG, SET( :CHR_LEN( SET ) ), STATUS )
                CALL MSG_SETC( 'DOM', DMTARG )
                CALL MSG_SETC( 'SET', SET )
                CALL CCD1_MSG( ' ',  '      Setting "^SET"' //

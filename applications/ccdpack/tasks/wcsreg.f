@@ -224,6 +224,10 @@
       INTEGER MXDMN              ! Maximum number of domains in list
       PARAMETER ( MXDMN = 12 )
 
+*  External References:
+      EXTERNAL CHR_LEN
+      INTEGER CHR_LEN            ! Length of string excluding trailing
+
 *  Local variables:
       CHARACTER * ( AST__SZCHR ) DMNS( MXDMN ) ! Domains in list
       CHARACTER * ( AST__SZCHR ) OUTDM ! Name of domain for output frames
@@ -339,7 +343,8 @@
       OUTFR = AST_COPY( AST_GETFRAME( IWCS( REFPOS ), JREF, STATUS ),
      :                  STATUS )
       CALL AST_SETC( OUTFR, 'Title', 'Alignment by WCSREG', STATUS )
-      CALL AST_SETC( OUTFR, 'Domain', OUTDM, STATUS )
+      CALL AST_SETC( OUTFR, 'Domain', OUTDM( 1:CHR_LEN( OUTDM ) ), 
+     :               STATUS )
 
 *  Check that the reference NDF has at least one frame in the supplied
 *  domain list.

@@ -625,7 +625,8 @@
 
 *  Change the Domain of the Current frame before putting it in the export 
 *  frameset.
-         CALL AST_SETC( FRCUR, 'Domain', OUTDOM, STATUS )
+         CALL AST_SETC( FRCUR, 'Domain', OUTDOM( 1:CHR_LEN( OUTDOM ) ),
+     :                  STATUS )
 
 *  Change the Title of the Current frame before putting it in the export
 *  frameset.

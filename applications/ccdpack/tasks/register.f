@@ -1448,7 +1448,8 @@
 *  Generate a frame in domain called OUTDM, the purpose of which is to 
 *  group the frames produced by this application.
                FRREG = AST_FRAME( 2, ' ', STATUS )
-               CALL AST_SETC( FRREG, 'Domain', OUTDM, STATUS )
+               CALL AST_SETC( FRREG, 'Domain', 
+     :                        OUTDM( 1:CHR_LEN( OUTDM ) ), STATUS )
                CALL AST_SETC( FRREG, 'Title', 
      :                        'Alignment by REGISTER', STATUS )
 
