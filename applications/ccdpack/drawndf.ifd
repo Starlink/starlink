@@ -95,7 +95,7 @@
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default NAME DOT
-            prompt {Labelling mode (0 or more of NAME,INDEX,DOT)}
+            prompt {Labelling mode (1 or more of NAME,INDEX,DOT, or NULL(!))}
             helpkey *
          }
 
