@@ -1,3 +1,9 @@
+2000-08-28  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+
+	* tofits.spx &
+	* gsd2fits.spx: Changed mixer-id in Fits name to lower-case since
+	              CFITS (CLASS) can not handle upper-case.
+
 2000-08-23  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
 
 	* tofits.spx: Added option to specify mixer name so that fits
