@@ -49,6 +49,7 @@
 *     21 Feb 95 : V1.8-2  Don't die if axes unrecognised (DJA)
 *     13 Dec 1995 : V2.0-0 ADI port (DJA)
 *     26 Apr 96 : V2.0-1  Option to set outside circle (RJV)
+*      6 Oct 97 : V2.0-2 Linux port (RJV)
 *
 *    Type Definitions :
 *
@@ -88,7 +89,7 @@
 							! array
       INTEGER                	DIMS(ADI__MXDIM)       ! Length of each dimension
       INTEGER                FSTAT                  ! i/o status
-      INTEGER                I                      ! Loop counters
+      INTEGER                I,L                      ! Loop counters
       INTEGER			IFID			! Input dataset id
       INTEGER                INORDER(ADI__MXDIM)    ! Inverse of AORDER
       INTEGER                NCH                    ! Points changed
@@ -119,7 +120,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 2.2-0')
+        PARAMETER           (VERSION = 'CQUALITY Version 2.1-2')
 *-
 
       CALL MSG_PRNT( VERSION )
@@ -391,10 +392,16 @@
         TEXT(2) = ' Only points having QUALITY = '//MODQUAL//' altered'
       END IF
 
- 80   FORMAT( A,<NXPTS>(E10.4) )
-      WRITE( TEXT(3), 80, IOSTAT=FSTAT ) 'X-pos : ',(XC(I),I=1,NXPTS)
-      WRITE( TEXT(4), 80, IOSTAT=FSTAT ) 'Y-pos : ',(YC(I),I=1,NXPTS)
-      WRITE( TEXT(5), 80, IOSTAT=FSTAT ) 'Radii : ',(RC(I),I=1,NRPTS)
+      TEXT(3)='X-pos : '
+      TEXT(4)='Y-pos : '
+      TEXT(5)='Radii : '
+      L=9
+      DO I=1,NXPTS
+        WRITE(TEXT(3)(L:),'(E10.4)') XC(I)
+        WRITE(TEXT(4)(L:),'(E10.4)') YC(I)
+        WRITE(TEXT(5)(L:),'(E10.4)') RC(I)
+        L=L+10
+      ENDDO
 
 *  Write history
       CALL HSI_PTXT( OFID, 5, TEXT, STATUS )

@@ -111,6 +111,7 @@
 *        Now use USI for user interface
 *     15 Aug 1995 V2.0-0 (DJA):
 *        Full ADI port.
+*      6 Oct 1997 V2.0-1 : Linux port (RJV)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,7 +133,7 @@
         PARAMETER		( MAXCOLS = 7 )		! display on page
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVLIST Version 2.2-0' )
+        PARAMETER		( VERSION = 'EVLIST Version 2.1-1' )
 
 *  Local Variables:
       CHARACTER*14		C(MAXCOLS)      	! Formatted list values
@@ -145,7 +146,7 @@
       DOUBLE PRECISION		DVAL			! List value
 
       INTEGER			FSTAT			! Fortran i/o status
-      INTEGER                	I, J, K      	      	! Loop counters
+      INTEGER                	I, J, K,L      	      	! Loop counters
       INTEGER			IDXPTR			! Display index
       INTEGER			IE1, IE2		! List range values
       INTEGER			IFID			! Input file identifier
@@ -284,8 +285,12 @@
         WRITE( OBUF, '(A1,8X,A1,7A17)') '|', '|',
      :                      (' '//LUNIT(I)(1:15)//'|', I = 1, NLDISP)
         CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
- 12     FORMAT( '|--------|', <NLDISP>(' ',15('-'),'|'))
-        WRITE( OBUF, 12 )
+        OBUF='|--------|'
+        L=11
+        DO I=1,NLDISP
+          OBUF(L:)=' ---------------|'
+          L=L+17
+        ENDDO
         CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
 
 *    Loop over the ranges to display

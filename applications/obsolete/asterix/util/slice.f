@@ -41,6 +41,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     21 Apr 95 : V1.8-1 Updated data interface (DJA)
 *     12 Dec 1995 : V2.0-0 ADI port (DJA)
+*      6 Oct 1997 : V2.0-1 Linux port (RJV)
 *
 *   Type Definitions :
 *
@@ -67,7 +68,7 @@
 
       INTEGER		      	DIMSD(ADI__MXDIM) 	! I/p dimensions
       INTEGER			DPTR			! I/p data
-      INTEGER			I, K			! Loop counters
+      INTEGER			I, K,L			! Loop counters
       INTEGER			IFID			! Input dataset id
       INTEGER		      	INDICES(ADI__MXDIM) 	! Array indices of point
       INTEGER			OCI			! AIO channel id
@@ -86,7 +87,7 @@
 *    Version id:
 *
       CHARACTER*21		VERSION
-	PARAMETER	        ( VERSION='SLICE Version 2.2-0' )
+	PARAMETER	        ( VERSION='SLICE Version 2.1-1' )
 *-
 
 *    Check status
@@ -257,13 +258,12 @@
             CALL UTIL_INDEX( NDIMD, DIMSD, I, INDICES )
 
 *        Write line containing value and indices
-	    IF ( NDIMD .EQ. 1 ) THEN
-	      WRITE( TBUF, 15 ) D, INDICES(1)
- 15           FORMAT( 1PG14.6, 3X, I7 )
-	    ELSE
-              WRITE( TBUF, 20 ) D, INDICES(1), (INDICES(K),K=2,NDIMD)
- 20           FORMAT( 1PG14.6, 3X, I7, <NDIMDR>(', ',I7) )
-	    END IF
+            WRITE(TBUF,'(1PG14.6,3X,I7)') D,INDICES(1)
+            L=35
+            DO K=2,NDIMD
+              WRITE(TBUF(L:),'(A2,I7)') ', ',INDICES(K)
+              L=L+9
+            ENDDO
             CALL AIO_IWRITE( OCI, 6, TBUF, STATUS )
 
           ELSE

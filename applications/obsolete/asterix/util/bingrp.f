@@ -146,7 +146,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINGRP Version 2.2-0' )
+        PARAMETER		( VERSION = 'BINGRP Version 2.1-0' )
       INTEGER			MXRNG
         PARAMETER		( MXRNG = 100 )
 
@@ -703,7 +703,7 @@
         DO I = 1, NX
 
 *      Pixel inside ARD region?
-          IF ( MASK(I,J) ) THEN
+          IF ( MASK(I,J).NE.0 ) THEN
             GROUPS(I,J) = INGRP
           ELSE IF ( .NOT. UPDATE ) THEN
             GROUPS(I,J) = 2

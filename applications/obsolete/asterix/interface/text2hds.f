@@ -28,6 +28,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     30 Jul 95 : V1.8-1 Use new history routines (DJA)
 *     25 Aug 95 : V1.8-2 Use ADI top create event datasets (DJA)
+*      6 Oct 97 : V2.1-1 Linux port (rjv)
 *
 *    Type definitions :
 *
@@ -47,7 +48,7 @@
          PARAMETER (MAXCOL=40)
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TEXT2HDS Version 2.2-0')
+      PARAMETER (VERSION = 'TEXT2HDS Version 2.1-1')
 *    Local variables :
       CHARACTER*3 STRING
       CHARACTER*40 CNAME(MAXCOL)
@@ -274,7 +275,7 @@
       INTEGER NREAD                       ! Number of lines of text found
 *    Local constants :
       CHARACTER*1 SPACE,COMMA,TAB
-      PARAMETER (SPACE=' ',COMMA=',',TAB=CHAR(9))
+      PARAMETER (SPACE=' ',COMMA=',')
       INTEGER MAXCOL
          PARAMETER (MAXCOL=40)
 *    Local variables :
@@ -286,6 +287,8 @@
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+      TAB=CHAR(9)
 
       NREAD=0
       DO LP=1,NROWS
