@@ -2,9 +2,19 @@
 #  This is a Bourne shell script.  In order to be POSIX-compliant, the
 #  first line must be blank.
 
-if test -f makefile; then
-  :
-else
-  ./configure
-fi
+# Echo a command then run it, terminating the script if the command fails
+echorun() { echo $*; eval $* || exit 1; }
+echorunnoexit() { echo $*; eval $*; }
+
+test -d moggy || {
+    # Try tar then pax to unpack the source tarball
+    if echorunnoexit tar -xf autoastrom_source.tar; then
+        :
+    else
+        echorun pax -r -f autoastrom_source.tar
+    fi
+}
+
+test -f makefile || echorun ./configure
+
 make $*
