@@ -1,8 +1,8 @@
-      SUBROUTINE FTS_$GKEY<T>( NCARD, BUFFER, SCARD, NAME, THERE, VALUE,
+      SUBROUTINE FTS1_GKEY<T>( NCARD, BUFFER, SCARD, NAME, THERE, VALUE,
      :                         CARD, STATUS )
 *+
 *  Name:
-*     FTS_$GKEYx
+*     FTS1_GKEYx
 
 *  Purpose:
 *     Get the value of a named header of type <COMM> from a buffer of
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS_$GKEYx( NCARD, BUFFER, SCARD, NAME, THERE, VALUE, CARD,
+*     CALL FTS1_GKEYx( NCARD, BUFFER, SCARD, NAME, THERE, VALUE, CARD,
 *    :                 STATUS )
 
 *  Description:
@@ -99,7 +99,7 @@
 *     1989 Jul 28 (MJC):
 *        Added extra argument CARD.
 *     1990 November 19 (MJC):
-*        Renamed from FTS_$GKEY, and converted the prologue to the SST
+*        Renamed from FTS1_GKEY, and converted the prologue to the SST
 *        style.
 *     1991 February 28 (MJC):
 *        Converted BUFFER from an assumed-size to an adjustable array
@@ -250,7 +250,7 @@
 
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'NAME', NAME( :NC ) )
-                  CALL ERR_REP( 'FTS_$GKEY<T>_TYPCNV',
+                  CALL ERR_REP( 'FTS1_GKEY<T>_TYPCNV',
      :              'Error converting ^NAME to the desired type.',
      :              STATUS )
                END IF
@@ -350,7 +350,7 @@
 
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL MSG_SETC( 'NAME', KEYWRD( :NCK ) )
-                     CALL ERR_REP( 'FTS_$GKEY<T>_TYPCNV',
+                     CALL ERR_REP( 'FTS1_GKEY<T>_TYPCNV',
      :                 'Error converting ^NAME to the desired type.',
      :                 STATUS )
                   END IF
