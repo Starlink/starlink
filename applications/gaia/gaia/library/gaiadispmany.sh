@@ -38,10 +38,14 @@ if { $argc == 0 } {
 #  Add GAIA_DIR to autopath for some GAIA classes.
 lappend auto_path $env(GAIA_DIR)
 
+#  Useful to know when instance is created.
+set created_instance 0
+
 #  Open a socket to a GAIA application and return the file descriptor
 #  for remote commands. If a GAIA isn't found then start one up.
 proc connect_to_gaia {} {
    global env
+   global created_instance
 
    #  Get the hostname and port info from the file ~/.rtd-remote,
    #  which is created by rtdimage when the remote subcommand is
@@ -72,6 +76,7 @@ proc connect_to_gaia {} {
       #  loop already, then start a new GAIA.
       if { $needed && $tries == 0 } {
          puts stderr "Failed to connect to GAIA, starting new instance..."
+         set created_instance 1
          exec $env(GAIA_DIR)/gaia.sh &
          #exec $env(GAIA_DIR)/tgaia &
       }
@@ -136,8 +141,15 @@ foreach image $argv {
    #  If it has a FITS extension then we need to protect the [].
    $namer protect
    
-   #  Construct the command needed to display the image.
-   set cmd "$gaia noblock_clone -1 [$namer fullname]"
+   #  Construct the command needed to display the image. Note
+   #  complication when we create GAIA, need to display into the first
+   #  clone.
+   if { $created_instance } {
+      set cmd "$gaia open [$namer fullname]"
+      set created_instance 0
+   } else {
+      set cmd "$gaia noblock_clone -1 [$namer fullname]"
+   }
  
    #  And send the command.
    set ret [send_to_gaia remotetcl $cmd]
