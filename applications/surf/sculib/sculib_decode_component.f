@@ -5,22 +5,32 @@
 
 *  Purpose:
 *     This routine decodes the value of a single component in a SCUBA
-*   data-spec. It is called by SCULIB_DECODE_SPEC. The component can be:-
+*     data-spec. 
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL SCULIB_DECODE_COMPONENT (COMPONENT, N, SELECT, STATUS)
+
+*  Description:
+*     This routine decodes the value of a single component in a SCUBA
+*     data-spec. It is called by SCULIB_DECODE_SPEC. The component can be:-
 *
-*   1   *                     select all data
-*   2   <index>               select data at position <index>
-*   3   <index1>,<index2>     select data at positions <index1> and
-*                             <index2>
-*   4   <index1>:<index2>     select all data in the range <index1> to
-*                             <index2>
+*     1   *                     select all data
+*     2   <index>               select data at position <index>
+*     3   <index1>,<index2>     select data at positions <index1> and
+*                               <index2>
+*     4   <index1>:<index2>     select all data in the range <index1> to
+*                               <index2>
 *
-*   or any combination of 2, 3 and 4 separated by commas. Example 
-*   component values are:-
+*     or any combination of 2, 3 and 4 separated by commas. Example 
+*     component values are:-
 *
 *       *                     select all data
 *       1,5                   select data at indices 1 and 5
 *       5:10,16               select data at indices 5 through 10 and 16 
-*
+*     
 *     Errors will occur if:-
 *      
 *       You mix the * format with selection by index.
@@ -29,16 +39,8 @@
 *       The component does not conform to the design syntax.
 *
 *     Output from the routine is in the form of a mask array SELECT. 
-*   Data indices selected will be marked as 1 in SELECT, while indices
-*   not selected will be zeroes.
-*
-*  Language:
-*     Starlink Fortran 77
-
-*  Invocation:
-*     CALL SCULIB_DECODE_COMPONENT (COMPONENT, N, SELECT, STATUS)
-
-*  Description:
+*     Data indices selected will be marked as 1 in SELECT, while indices
+*     not selected will be zeroes.
 
 *  Arguments:
 *     COMPONENT                        = CHARACTER*(*) (Given)
@@ -55,6 +57,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.2  1999/07/30 19:58:14  timj
+*     Minor header tweaks.
+*
 *     Revision 1.1  1997/04/02 03:07:37  jfl
 *     Initial revision
 *

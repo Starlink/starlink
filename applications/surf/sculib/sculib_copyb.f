@@ -1,4 +1,4 @@
-*+  SCULIB_COPYI - copy one byte array to another
+*+  SCULIB_COPYB - copy one byte array to another
       SUBROUTINE SCULIB_COPYB (N, FROM, TO)
 *    Description :
 *     copies one integer array into another

@@ -1,3 +1,4 @@
+
 *+
 *  Name:
 *     SCULIB_PAR_GET0I
@@ -10,7 +11,6 @@
 
 *  Invocation:
 *     CALL SCULIB_PAR_GET0?(PARAM, VALUE, STATUS)
-
 
 *  Description:
 *     This routine provides a wrapper for PAR_GET0? so that
@@ -34,6 +34,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/07/30 19:58:15  timj
+*     Minor header tweaks.
+*
 *     Revision 1.1  1997/10/07 07:04:16  timj
 *     Initial revision
 *

@@ -1,4 +1,4 @@
-*+  SCULIB_CFILLI - fill a byte array with a constant
+*+  SCULIB_CFILLB - fill a byte array with a constant
       SUBROUTINE SCULIB_CFILLB (N, IVAL, ARRAY)
 *    Description :
 *     fills an byte array with a constant
