@@ -1,0 +1,49 @@
+%!PS-Adobe-1.0
+%%DocumentFonts: Times-Italic Courier
+%%BoundingBox: @BB@
+%%EndComments
+/Module @MODULE@ def
+/LineGap Module 1.2 mul def
+/ScriptFont /Courier findfont Module scalefont def
+/CommentFont /Times-Italic findfont Module 0.9 mul scalefont def
+%%EndProlog
+
+ScriptFont setfont
+@COLOUR@
+% @GREY@ setgray
+
+/Nlines 6 def
+
+/Vpos LineGap Nlines mul def
+/NL {
+    /Vpos Vpos LineGap sub def
+    0 Vpos moveto
+} def
+
+% LongLine is the longest line printed
+/LongLine (% cvs -d <starlink> co .) def
+
+NL
+LongLine show
+/LongLineLength LongLine stringwidth pop def
+% NL
+% (% more README) show
+NL
+(% ./bootstrap) show
+NL
+(% make configure-deps) show
+NL
+(% ./configure -C) show
+NL
+(% make world) show
+NL
+
+CommentFont setfont
+(.....2300 kLOC) show
+
+% Print out a tight bounding box, for reference
+(%%BoundingBox: 0 0 ) print
+LongLineLength 8 string cvs print
+( ) print
+LineGap Nlines mul 8 string cvs print
+(\n) print

@@ -1,0 +1,296 @@
+\documentclass[a0]{a0poster}
+% You might find the 'draft' option to a0 poster useful if you have
+% lots of graphics, because they can take some time to process and
+% display. (\documentclass[a0,draft]{a0poster})
+
+\pagestyle{empty}
+\setcounter{secnumdepth}{0}
+
+% The textpos package is necessary to position textblocks at arbitary 
+% places on the page.
+\usepackage[absolute]{textpos}
+
+\usepackage{graphics,times,url}
+
+% These colours are tried and tested for titles and headers. Don't
+% over use color!
+\usepackage{color}
+\definecolor{DarkBlue}{rgb}{0.1,0.1,0.5}
+\definecolor{Red}{rgb}{0.9,0.0,0.1}
+
+% see documentation for a0poster class for the size options here
+\let\Textsize\normalsize
+\def\Head#1{\noindent\hbox to \hsize{\hfil{\LARGE\color{DarkBlue} #1}}\bigskip}
+\def\LHead#1{\noindent{\LARGE\color{DarkBlue} #1}\bigskip}
+\def\Subhead#1{\noindent{\large\color{DarkBlue} #1}\bigskip}
+\def\Title#1{\noindent{\VeryHuge\color{Red} #1}}
+
+
+\TPGrid[40mm,40mm]{23}{12}      % 3 cols of width 7, plus 2 gaps width 1
+
+\parindent=0pt
+\parskip=0.5\baselineskip
+
+\begin{document}
+
+\begin{textblock}{23}(0,0)
+\Title{P2.1.10: The Starlink Software Collection vs.\ GNU Autoconf}
+\end{textblock}
+
+
+
+\begin{textblock}{23}(0,1.0)
+\LHead{\strut
+  Norman Gray$^1$, Tim Jenness$^2$, Alasdair Allan$^1$, David Berry$^1$,
+  Malcolm Currie$^1$, Peter Draper$^1$, Mark Taylor$^1$ and Brad Cavanagh$^2$
+\hfil\break
+\textsl{%
+  \strut 1: Starlink, UK\\
+  \strut 2: Joint Astronomy Centre, Hawai'i, USA}}
+\end{textblock}
+
+
+%% The original abstract was:
+%%
+%% P2.1.10 Porting the Starlink Software Collection to GNU Autoconf
+%% Norman Gray, Starlink, Tim Jenness, Joint Astronomy Centre, Alasdair
+%% Allan, Starlink, David Berry, Starlink, Malcolm Currie, Starlink,
+%% Peter Draper, Starlink, Mark Taylor, Starlink, Brad Cavanagh, Joint
+%% Astronomy Centre
+%% 
+%% 
+%% The Starlink Classic Software Collection (USSC) currently runs on
+%% three different unix platforms and contains approximately 130 separate
+%% software items, totaling over 6 million lines of code using a mix of
+%% Fortran, C, Tcl and Perl. The proliferation of requests for ports to
+%% new operating systems (including multiple variants of Linux), in
+%% conjunction with a decrease in the level of support for the classic
+%% software collection, has lead to a decision to modify the build system
+%% from the current collection of makefiles with hard-wired OS
+%% configurations to a scheme involving feature-discovery via GNU
+%% Autoconf.
+%% 
+%% As a result of this work, we have already ported the USSC to Mac OSX
+%% and Cygwin. This poster will present the issues involved in a
+%% substantial reorganization of a large legacy code base, including the
+%% difficulties in extending the autoconf system to properly support
+%% Fortran.
+
+
+
+
+\begin{textblock}{2}(18,-0.5)
+\includegraphics{starlink_logo}
+\end{textblock}
+
+% Graphics
+% In both cases, place the centre of the graphic at the centre of the
+% lower region, extending from (0,2)..(23,12).
+\begin{textblock}{7}[0.5,0.5](11.5,7)
+\vbox to 0pt{\vss\hbox to 0pt{\hss\includegraphics{script-big}\hss}\vss}%
+\vbox to 0pt{\vss\hbox to 0pt{\hss\includegraphics{script-little}\hss}\vss}%
+\end{textblock}
+
+
+
+\begin{textblock}{7}(0,2)
+\hrule\medskip
+
+\Head{Summary}
+
+\slshape
+
+The Starlink Classic Software Collection (the `USSC') currently runs
+on three different unix platforms and contains approximately 130 separate
+software items, totaling millions of lines of code, in a mix of
+Fortran, C, Tcl, Perl and a few others. The proliferation of requests
+for ports to
+new operating systems (including multiple variants of Linux), in
+conjunction with a decrease in the level of support for the classic
+software collection, has lead to a decision to modify the build system
+from the current collection of makefiles with hard-wired OS
+configurations to a scheme involving feature-discovery via GNU
+Autoconf.
+
+As a result of this work, we have already ported the USSC to Mac OSX
+and Cygwin. 
+
+This had some unexpected benefits and costs, and a few valuable lessons.
+
+\bigskip
+\hrule
+\end{textblock}
+
+
+\begin{textblock}{7}(0,5)
+
+\Head{The problems}
+
+\begin{itemize}
+\item It's Big!  About 130 items, with around 1700kSLOC of our
+  legacy code (Fortran, C, C++ and others), 300kSLOC of Java (not included in
+  this build system), plus another 600kSLOC of thirdparty code, some
+  tweaked, and all built at the same time.
+
+\item Just by the way\dots.  According to David A Wheeler's SLOCCount,
+  that's \$110M worth.  And it works out larger than everything in the
+  RH7.1 distribution except the kernel, Mozilla and XFree86
+  \url{http://www.dwheeler.com/sloc/redhat71-v1/redhat71sloc.html}.
+  Busy types, aren't we?
+
+\item It's Crusty!  Some of that code dates back quite a long way, and
+  some of it comes from community donations.  While the majority of it
+  is well-written, there are a few gems in there.
+
+\item It (was) Scattered!  For historical reasons, the master copies
+  of all our code weren't kept in the one place.  Simply
+  \emph{finding} all our code was slightly harder than we expected.
+
+\item Did I mention funding problems?
+
+\end{itemize}
+\end{textblock}
+
+
+\begin{textblock}{7}(0,8)
+
+\Head{History}
+
+Starlink was set up originally in the late seventies, as a way of
+supplying UK astronomy with hardware (`astronomers will never need
+more than six VAXes\dots'), naturally along with the data-analysis
+software to go with them, and the system management to make it all
+work smoothly.
+
+We switched the hardware to Unix in the early nineties -- ending up
+supporting specifically Solaris, Alpha and a Linux distribution.  We
+also ported the software collection then.  That meant that some
+software was dropped, and the rest preened quite extensively.
+The build system we are now moving away from was designed in this
+period.
+
+In the late nineties, Starlink slimmed down, dropped the hardware and
+management provision, and focused on maintaining and developing the
+large legacy codebase.
+
+Now we're concentrating on new software, we need to make the classic
+software as accessible and maintainable as possible, since we expect
+the community will have to take a larger role in its curation.
+
+\end{textblock}
+
+
+\begin{textblock}{7}(8,2)
+\Head{The Outcome}
+
+\begin{itemize}
+\item As of October 2004, we have 2300kSLOC building unattended on
+  Linux (RHEL), Solaris, Cygwin (incomplete), and OSX (almost).  Other
+  platforms should be easy (but we can only cope with so much pain at
+  one time).
+
+\item All available in one place, via anonymous CVS (see `Contacts' box).
+
+\item Unexpected but valuable preening, refactoring, bugfixing.
+
+\item We extended the autoconf support for Fortran, and this will be
+  offered back to the autoconf mainline.
+
+\item GPLed wherever possible.
+
+\item The project has always obsessed about coding standards and
+  coding discipline.  This really did pay off here.
+
+\end{itemize}  
+\end{textblock}
+
+
+\begin{textblock}{7}(8,9)
+\Head{Patching autoconf and automake}
+
+We have a number of project-specific code and installation
+conventions, which we wanted to preserve.  This is what
+\texttt{automake} is for.
+
+Since we had to have autoconf, automake and libtool snapshots in our
+repository in any case, it was a natural (though nerve-wracking) move
+to start using patched versions.
+
+This paid off, since \dots.  Was easier than we expected.
+  
+\end{textblock}
+
+
+%\begin{textblock}{7}(16,4)
+%\Head{Payoffs}
+%
+%\begin{itemize}
+%\item The project has always obsessed about coding standards and
+%  coding discipline.  This really did pay off here.
+%\end{itemize}
+%\end{textblock}
+
+
+\begin{textblock}{7}(16,5)
+
+\Head{Lessons and Warnings}
+
+\begin{itemize}
+\item The Fortran support in autoconf is rather slim.
+
+\item The port to OSX was easier, in some ways, than we expected,
+  partly because the OSX system compiler is a modified GCC.  We needed
+  the Fink/OpenDarwin port of \texttt{g77}, and that causes lots of
+  linking problems (the whole \texttt{restFP/saveFP} saga).  Be
+  warned: the OSX linker has some very fixed ideas about things.
+
+\item We couldn't automatically convert our old build system to the
+  new one, because it was mostly hand-maintained.  But that wasn't a
+  problem: disciplined coding in the past meant that packages could
+  generally be ported to the new system very mechanically, and this
+  turned out to be a small part of the effort.
+
+\item The original plan was to autoconf everything with only necessary
+  code changes.  However it was impossible to stop ourselves
+  refactoring and tidying, fairly extensively in some cases.  This is
+  both a warning to other projects that they won't be able to stop
+  developers doing this, and a benefit, in the sense that a lot of
+  code-hygiene tasks which have been too boring, confusing or risky in
+  the past, become a lot less so when you're adjusting everything
+  anyway.
+
+\item We should have bowed to the inevitable, and started tweaking the
+  autotools earlier.
+
+\item GPLing was harder than we expected.  This is largely because of
+  the donations in the past, of code written in gentler times, with
+  bizarre `licences'.
+
+\item It tool a \emph{lot} longer than we expected.  Around 6
+  person-months to get the initial system up and running, and then
+  another 6 to put the remainder into the system.
+
+\end{itemize}
+
+\end{textblock}
+
+\begin{textblock}{7}(16,10)
+\Head{Contacts}
+\raggedright
+\begin{itemize}
+\item Norman Gray: \texttt{norman@astro.gla.ac.uk},
+  \url{http://www.astro.gla.ac.uk/users/norman}
+\item Tim Jenness: \texttt{t.jenness@jach.hawaii.edu},
+  \url{http://www.jach.hawaii.edu/~timj/}
+\item Starlink: \url{http://www.starlink.ac.uk} and
+  \url{http://dev.starlink.ac.uk}
+\item AnonCVS: access at
+  \texttt{:pserver:anonymous@cvs.starlink.ac.uk:/cvs} 
+  with password `starlink'
+\item CVS browser: \url{http://cvsweb.starlink.ac.uk}
+\end{itemize}
+  
+\end{textblock}
+
+
+\end{document}

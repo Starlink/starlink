@@ -1,0 +1,67 @@
+From: Brad Cavanagh <b.cavanagh@JACH.HAWAII.EDU>
+Date: 2004 July 30  21.36.10 BST
+To: STARDEV@JISCMAIL.AC.UK
+Subject: SLOCCount
+Reply-To: Starlink development <STARDEV@JISCMAIL.AC.UK>
+
+Reading Slashdot this morning I came across an application called
+SLOCCount (http://www.dwheeler.com/sloccount/sloccount.html) that does
+line counts for projects, breaks it up per language, and gives a monetary
+value for the project. Of course I had to run it on the Starlink CVS tree,
+and here are the results:
+
+SLOC    Directory       SLOC-by-Language (Sorted)
+1237817 applications    ansic=484933,fortran=427138,tcl=194822,cpp=52297,
+                       perl=38879,sh=27109,csh=3873,python=2955,
+                        yacc=1914,lex=1810,lisp=1601,awk=289,
+                        cs=150,sed=29,java=18
+639497  thirdparty      ansic=461014,tcl=65043,fortran=50233,sh=31767,
+                        cpp=13983,perl=11726,yacc=4623,lex=512,lisp=347,
+                        pascal=233,csh=16
+516135  libraries       fortran=345746,ansic=168339,tcl=585,csh=523,
+                        sh=405,perl=341,pascal=196
+360125  java            java=340866,ansic=8875,perl=7971,sh=1501,jsp=604,
+                        csh=100,haskell=81,tcl=73,python=54
+2895    docs            csh=1159,perl=570,lisp=524,ansic=495,fortran=124,
+                        sh=23
+748     buildsupport    java=414,perl=210,sh=124
+400     etc             csh=400
+185     top_dir         sh=185
+0       buildlog        (none)
+0       CVS             (none)
+0       CVSROOT         (none)
+0       pubs            (none)
+
+
+Totals grouped by language (dominant language first):
+ansic:      1123656 (40.74%)
+fortran:     823241 (29.85%)
+java:        341298 (12.38%)
+tcl:         260523 (9.45%)
+cpp:          66280 (2.40%)
+sh:           61114 (2.22%)
+perl:         59697 (2.16%)
+yacc:          6537 (0.24%)
+csh:           6071 (0.22%)
+python:        3009 (0.11%)
+lisp:          2472 (0.09%)
+lex:           2322 (0.08%)
+jsp:            604 (0.02%)
+pascal:         429 (0.02%)
+awk:            289 (0.01%)
+cs:             150 (0.01%)
+haskell:         81 (0.00%)
+sed:             29 (0.00%)
+
+Total Physical Source Lines of Code (SLOC)                = 2,757,802
+Development Effort Estimate, Person-Years (Person-Months) = 819.64
+(9,835.64)
+ (Basic COCOMO model, Person-Months = 2.4 * (KSLOC**1.05))
+Schedule Estimate, Years (Months)                         = 6.86 (82.26)
+ (Basic COCOMO model, Months = 2.5 * (person-months**0.38))
+Estimated Average Number of Developers (Effort/Schedule)  = 119.56
+Total Estimated Cost to Develop                           = $ 110,721,729
+ (average salary = $56,286/year, overhead = 2.40).
+SLOCCount is Open Source Software/Free Software, licensed under the FSF
+GPL. Please credit this data as "generated using David A. Wheeler's
+'SLOCCount'."
