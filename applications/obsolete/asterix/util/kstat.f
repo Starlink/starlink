@@ -159,7 +159,6 @@
 *  Obtain data object, access and check it
       CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
       CALL ADI_DERVD( IFID, 'Array', INPRIM, STATUS )
-      INPRIM = (.NOT.INPRIM)
       CALL BDI_CHK( IFID, 'Data', OK, STATUS )
       CALL BDI_GETSHP( IFID, ADI__MXDIM, DIM, NDIMS, STATUS )
       NDAT = DIM(1)
@@ -189,7 +188,6 @@
               CALL USI_ASSOC( 'INP2', 'BinDS|Array', 'READ', IFID2,
      :                 STATUS )
               CALL ADI_DERVD( IFID2, 'Array', INPRIM, STATUS )
-              INPRIM = (.NOT.INPRIM)
               IF (STATUS .NE. SAI__OK) GOTO 99
 
               IF ( INPRIM ) THEN
