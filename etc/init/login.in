@@ -313,8 +313,8 @@ endif
 
 #
 #  JPL
-if ( -e @staretcdir@/jpl/jpleph.dat ) then
-   setenv JPL_DIR @staretcdir@/jpl
+if ( -e @staretcdir@/jpleph.dat ) then
+   setenv JPL_DIR @staretcdir@/
 endif
 
 #
