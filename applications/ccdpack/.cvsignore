@@ -1,0 +1,13 @@
+.deps
+.libs
+*.shl
+*.ifc
+Makefile.in
+Makefile
+config.*
+*.m4
+configure
+*.lo
+*.la
+libtool
+
