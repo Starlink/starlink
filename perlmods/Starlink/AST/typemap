@@ -1,0 +1,29 @@
+TYPEMAP
+AstFitsChan *	T_PTROBJ
+AstObject *	T_PTROBJ
+AstChannel * 	T_PTROBJ
+AstFrame *	T_PTROBJ
+AstCmpFrame *	T_PTROBJ
+AstMapping *	T_PTROBJ
+AstCmpMap *	T_PTROBJ
+AstFrameSet *	T_PTROBJ
+AstGrismMap *	T_PTROBJ
+AstIntraMap *	T_PTROBJ
+AstLutMap *	T_PTROBJ
+const char *	T_PV
+AstMathMap *	T_PTROBJ
+AstMatrixMap *	T_PTROBJ
+AstPcdMap *	T_PTROBJ
+AstPermMap *	T_PTROBJ
+AstPolyMap *	T_PTROBJ
+AstShiftMap *	T_PTROBJ
+AstSkyFrame *	T_PTROBJ
+AstSlaMap *	T_PTROBJ
+AstSpecFrame *	T_PTROBJ
+AstSpecMap *	T_PTROBJ
+AstUnitMap *	T_PTROBJ
+AstWcsMap *	T_PTROBJ
+AstWinMap *	T_PTROBJ
+AstXmlChan *	T_PTROBJ
+AstZoomMap *	T_PTROBJ
+
