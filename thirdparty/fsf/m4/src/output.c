@@ -459,6 +459,7 @@ insert_file (FILE *file)
 {
   char buffer[COPY_BUFFER_SIZE];
   size_t length;
+  int saved_errno;
 
   /* Optimize out inserting into a sink.  */
 
@@ -469,8 +470,11 @@ insert_file (FILE *file)
 
   errno = 0;
   while (length = fread (buffer, 1, COPY_BUFFER_SIZE, file),
-	 length != 0)
+	 length != 0) {
+    saved_errno = errno;
     output_text (buffer, length);
+    errno = saved_errno;
+  }
   if (errno)
     M4ERROR ((EXIT_FAILURE, errno, "ERROR: Reading inserted file"));
 }
