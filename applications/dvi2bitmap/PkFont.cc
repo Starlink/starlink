@@ -109,7 +109,7 @@ string PkFont::fontSearchCommandTemplate_ = "";
 string PkFont::fontgenCommandTemplate_ = FONT_GEN_TEMPLATE;
 bool PkFont::makeMissingFonts_ = true;
 #else
-string PkFont::fontgenCommandTemplate_ = FONT_GEN_TEMPLATE;
+string PkFont::fontgenCommandTemplate_ = "";
 bool PkFont::makeMissingFonts_ = false;
 #endif /* defined FONT_GEN_TEMPLATE */
 
@@ -1278,14 +1278,19 @@ void PkFont::setFontgenCommand(string cmd)
  * should return a single line containing the path to the generated
  * font file.  Return an empty string on errors, or if such a command
  * is not supported on a particular platform.
- * @return a font file path
+ *
+ * <p>Note that if a font-generation
+ * command template is defined but automatic font generation is
+ * disabled, this still returns a font-generation command.
+ *
+ * @return a font generation command, suitable for passing to a shell
  */
 string PkFont::fontgenCommand (void)
     const
 {
     string rval;
 
-    if (makeMissingFonts_) {
+    if (fontgenCommandTemplate_.length() > 0) {
 	try
 	{
 	    rval = substitute_font_string (fontgenCommandTemplate_,
