@@ -1,14 +1,104 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>Simple Automated Astrometry Toolbox</title>
+<title>Advanced Automated Astrometry Toolbox</title>
 </head>
 
 <body>
-<h1>Simple Automated Astrometry Toolbox</h1>
+<a name="xref_advancedautoastrom"></a>
+<h2 align=center>
+<font color=red>Advanced Automated Astrometry Toolbox</font></h2>
 
-    
+<p align=center>
+<img src="autoastromexpert_position.gif">
+<br>
+<p>
 
+<h3>Preliminaries</h3>
+
+<p>The basic requirements and usage of this toolbox are the same as those of
+the <a href="autoastromsimple.html">simple version</a>. To use these advanced
+features it is strongly suggested that you also read the AUTOASTROM document
+SUN/242.
+
+<h3>Advanced features</h3>
+
+<p>The main features that this offers over those of the simple toolbox are:
+<ul>
+      <li>using a pre-calculated catalogue of detections,</li>
+      <li>using a local catalogue as a reference catalogue,</li>
+      <li>supplying a full set of observation parameters,</li>
+      <li>switching between the FINDOFF and MATCH algorithms,</li>
+      <li>using a 7 parameter fit, not just 6 or 9,</li>
+      <li>configuration of the defect removal stage,</li>
+      <li>log of the commands used to run AUTOASTROM.</li>
+</ul>
+
+<h3>AUTOASTROM overview</h3>
+
+<p>Here's a very simplified run-down of what AUTOASTROM does, it should help
+you understand how to use this toolbox effectively:
+<ul>
+      <li>Stage 1: a catalogue of object positions on your image is
+      obtained. This should be the output of a run of EXTRACTOR (SUN/243)
+      formatted in the correct way (i.e. with the right columns available). By
+      default AUTOASTROM runs this program for you, but you can provide your
+      own pre-determined catalogue.</li>
+      
+      <li>Stage 2: a catalogue of reference positions on the sky is obtained
+      using your initial estimate of the position on the sky. Usually you
+      tell AUTOASTROM about one of the known on-line catalogues you'd like to
+      use (USNO, GSC etc.) which it then proceeds to obtain a download from,
+      but again you can provide your own local copy.</li>
+
+      <li>Stage 3: the two catalogues are matched. There are two algorithms
+      available to perform this most tricky part, one based on triangle
+      tessellations, the other on simple pair offsetting.</li>
+
+      <li>Stage 4: the matched positions (sky against image coordinates) are
+      used to determine the astrometric solution using the ASTROM (SUN/5)
+      program.</li>
+</ul>
+<p>After this last stage the solution is attached to your image by GAIA (at
+this time in memory only) and the catalogue of matched positions is plotted
+over the image.
+
+<h3>Using a pre-calculated detection catalogue</h3>
+
+<p>AUTOASTROM runs the EXTRACTOR (SUN/243) program to detect all the objects
+in your image, if you need to fine tune the detection parameters (say to
+reduce the number of objects detected), then you can use the GAIA "Object
+detection" toolbox to pre-calculate the object positions. To do this open a
+"Object detection" toolbox and selected the "AUTOASTROM mode" from the
+"Options" menu. Once you've created your catalogue of detections is should be
+selectable in the "Detection catalogue" menu (note that catalogues only become
+available in this menu when they are opened in a catalogue window).
+
+<h3>Using a local reference catalogue</h3>
+
+<p>You can download or read in an existing catalogue and get AUTOASTROM to use
+that as the reference positions catalogue. Obviously this has two advantages,
+you get to pre-select the reference positions being used (useful if you know
+stars with significant proper motions are in the field) and you can work
+off-line.
+
+<p>To download a catalogue when the image doesn't have a WCS already you will
+need to use a clone window (all catalogues regardless of the image they are
+attached to are made available, so it doesn't matter where you open this
+catalogue). You should leave the clone window empty (i.e. not displaying an
+image) and the download will not be constrained to the displayed image.
+
+<h3>Fine tune the fit</h3>
+
+<p>The options in the "Observation" and "Tuning" tabs allow you to provide the
+full set of AUTOASTROM options, read the AUTOASTROM and ASTROM documentation
+to understand how these effect your fit.
+
+<p>You can also improve your fit by re-using the match catalogue as the
+reference catalogue for the next run. The match catalogue includes a column
+that contains the shift in position, so you could sort on this and remove any
+obvious problem objects (like high motions stars, galaxies blends etc.),
+before re-fitting.
 
 </body>
 </html>
