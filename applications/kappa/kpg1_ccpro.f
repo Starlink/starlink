@@ -83,11 +83,9 @@
 *  See if the component is defined in the input NDF.
       CALL NDF_STATE( NDFI, COMP, THERE, STATUS )
 
-*  If so, use the current value as the parameter's dynamic default, and
-*  store it as an initial value in the output NDF.
+*  If so, use the current value as the initial value in the output NDF.
       IF( THERE ) THEN
         CALL NDF_CGET( NDFI, COMP, VALUE, STATUS )
-        CALL PAR_DEF0C( PNCOMP, VALUE, STATUS )
         CALL NDF_CPUT( VALUE, NDFO, COMP, STATUS )
       END IF
 
