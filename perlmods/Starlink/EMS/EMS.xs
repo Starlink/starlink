@@ -34,8 +34,8 @@ ems1_get_facility_error(inmsg_status, facility, ident, text)
   char * text  = NO_INIT
  CODE:
   facility = str1;
-  ident = str1;
-  text  = str1;
+  ident = str2;
+  text  = str3;
   ems1_get_facility_error(inmsg_status, &facility, &ident, &text);
  OUTPUT:
   facility
