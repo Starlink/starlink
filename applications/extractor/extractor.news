@@ -5,7 +5,8 @@
      - The range of output WCS coordinates should now always be 
        correctly normalised (i.e. RA's in range 0-24hrs).
 
-     - Apertures should now be visible in the "APERTURES" checkimage.
+     - Apertures should now be actually visible in the "APERTURES" 
+       checkimage.
 
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
@@ -13,5 +14,5 @@
 
     % showme sun226
 
- Peter W. Draper 22nd October 1999 (P.W.Draper@durham.ac.uk).
+ Peter W. Draper 1th November 1999 (P.W.Draper@durham.ac.uk).
 
