@@ -800,8 +800,8 @@ GKS_PAR:   $(STAR_INC)/gks_par;   $(LINK) $? $@
 GNS_PAR:   $(STAR_INC)/gns_par;   $(LINK) $? $@
 IDI_ERR:   $(STAR_INC)/idi_err;   $(LINK) $? $@
 AGI_PAR:   $(STAR_INC)/agi_par;   $(LINK) $? $@
-AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
-AST_ERR:   $(INSTALL)/include/ast_err;   $(LINK) $? $@
+AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
+AST_ERR:   $(STAR_INC)/ast_err;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 CAT_ERR:   $(STAR_INC)/cat_err;   $(LINK) $? $@
 NDG_ERR:   $(STAR_INC)/ndg_err;   $(LINK) $? $@
