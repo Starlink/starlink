@@ -130,6 +130,8 @@
 *     30 Jul 1995 : V1.8-2 Get locators from ADI (DJA)
 *     11 Nov 1995 V2.0-0 (DJA) Full ADI port
 *     26 Mar 1996 V2.0-1 Fix boundary leakage (RJV)
+*     12 Apr 1996 V2.0-2 (DJA):
+*        Stopped Grouping beingm propogated
 *     {enter_changes_here}
 
 *  Bugs:
@@ -500,7 +502,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
       CALL HSI_PTXTI( OFID, OFILES, .TRUE., STATUS )
 
 *  Copy over ancillary components
-      CALL UDI_COPANC( IFID, ' ', OFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grp', OFID, STATUS )
 
 * Tidy up
  9000 CALL USI_ANNUL( 'OUT', STATUS )
