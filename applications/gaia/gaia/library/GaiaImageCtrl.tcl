@@ -382,7 +382,6 @@ itcl::class gaia::GaiaImageCtrl {
       set w [winfo toplevel $w_]
       wm title $w "GAIA::Skycat: $file ([$w cget -number])"
       wm iconname $w $file
-      puts "Component = [$image_ cget -component]"
    }
 
    #  Add a generated image to display the colors in the colormap
@@ -551,8 +550,20 @@ itcl::class gaia::GaiaImageCtrl {
             set center_ok_ 0
             if {[catch {$image_ config -file [$namer_ fullname] \
                            -component $itk_option(-component)} msg]} {
-               error_dialog $msg $w_
-               clear
+
+               #  If component isn't "data" then try that.
+               if { $itk_option(-component) != "data" } {
+                  if {[catch {$image_ config -file [$namer_ fullname] \
+                                 -component "data"} msg]} {
+                     error_dialog $msg $w_
+                     clear
+                  } else {
+                     configure -component "data"
+                  }
+               } else {
+                  error_dialog $msg $w_
+                  clear
+               }
             }
             set center_ok_ 1
          }

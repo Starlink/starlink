@@ -257,7 +257,7 @@ itcl::class gaia::GaiaNDFChooser {
          $image_ hdu $ndf $component
          $itk_option(-image) configure -component $component
          $itk_option(-image) update_title
-         
+
          for {set i 0} {$i < $num_images_} {incr i} {
             if {[info exists ext_($i,frame)]} {
                if {"$ext_($i,ndf)" == "$ndf"} {
@@ -267,7 +267,6 @@ itcl::class gaia::GaiaNDFChooser {
                }
             }
          }
-         update
          catch "$table_ select_row [expr $ndf-1]"
          select_ndf_
       }
