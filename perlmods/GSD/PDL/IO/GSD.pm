@@ -4,7 +4,7 @@ package PDL::IO::GSD;
 
   PDL::IO::GSD - PDL module for reading JCMT GSD format files
 
-=head1 SNYOPSIS
+=head1 SYNOPSIS
 
   use PDL::IO::GSD;
 
