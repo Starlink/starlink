@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/spt</path>
+  <description>Software Porting Tools</description>
+  <abstract><p>
+SPT is an inhomogeneous set ofsoftware tools designed to assist in the
+conversion of code from one operating system to another (principally
+from VMS to UNIX and vice-versa, and between different flavours of
+UNIX).
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>D L Terrett</name>
+    </person>
+    <person>
+      <name>P M Allan</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
