@@ -1,5 +1,5 @@
-      SUBROUTINE RTD1_DOFIT( NFIT, MASK, DIM1, DIM2, TYPE, 
-     :                       HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX, 
+      SUBROUTINE RTD1_DOFIT( NFIT, MASK, DIM1, DIM2, TYPE,
+     :                       HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX,
      :                       IPTY, NY, FP, STATUS )
 *+
 *  Name:
@@ -21,7 +21,7 @@
 *     greater than zero in the INTEGER array MASK (this is usually an
 *     ARD generated array). The fit is a polynomial of degree
 *     NFIT in X and Y. Variances may be used to weight the fit
-*     if available. 
+*     if available.
 *
 *     The fit is described by the coefficients IPC and the knots
 *     IPTX and IPTY, which should be passed to PDA_BISPEV for
@@ -38,11 +38,11 @@
 *     DIM2 = INTEGER (Given)
 *        The second dimension of MASK and IMAGE.
 *     TYPE = CHARACTER * ( * ) (Given)
-*        The numeric type of the data pointed to by IPIMG. Any 
+*        The numeric type of the data pointed to by IPIMG. Any
 *        variances are also assumed to be in this type.
 *     HAVVAR = LOGICAL (Given)
 *        Whether or not any variances are available for the image
-*        data. These are used as weights in the surface fit. 
+*        data. These are used as weights in the surface fit.
 *     IPVAR = INTEGER (Given)
 *        Pointer to variance data if it exists.
 *     IPIMG = INTEGER (Given)
@@ -70,14 +70,14 @@
 *      selecting own knots.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1996-2001 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     14-MAR-1996 (PDRAPER):
+*     14-MAR-1996 (PWD):
 *        Original version.
 *     {enter_changes_here}
 
@@ -158,42 +158,42 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Estimate the size of the workspace that we will require for
-*  containinmg the lists of X, Y and data values.
-      IF ( TYPE .EQ. '_BYTE' ) THEN 
-         CALL RTD1_MSTB( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
-      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN 
-         CALL RTD1_MSTUB( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                    YMIN, YMAX, NVALID, STATUS )
-      ELSE IF ( TYPE .EQ. '_WORD' ) THEN 
-         CALL RTD1_MSTW( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
-      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN 
-         CALL RTD1_MSTUW( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                    YMIN, YMAX, NVALID, STATUS )
-      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN 
-         CALL RTD1_MSTI( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
-      ELSE IF ( TYPE .EQ. '_REAL' ) THEN 
-         CALL RTD1_MSTR( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
-      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN 
-         CALL RTD1_MSTD( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
-      ELSE 
+*  containing the lists of X, Y and data values.
+      IF ( TYPE .EQ. '_BYTE' ) THEN
+         CALL RTD1_MSTB( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+         CALL RTD1_MSTUB( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
+     :                    XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+         CALL RTD1_MSTW( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+         CALL RTD1_MSTUW( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
+     :                    XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+         CALL RTD1_MSTI( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+         CALL RTD1_MSTR( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+         CALL RTD1_MSTD( MASK, DIM1, DIM2, %VAL( IPIMG ), .TRUE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
+      ELSE
 
 *  Incorrect data type. Complain and give up.
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'TYPE', TYPE )
-         CALL ERR_REP( 'RTD1_DOFIT', 
+         CALL ERR_REP( 'RTD1_DOFIT',
      :   'RTD1_DOFIT: Unknown data type ^TYPE', STATUS )
          GO TO 99
       END IF
 
 *  If no valid pixels then stop now.
-      IF ( NVALID .LE. 0 ) THEN 
+      IF ( NVALID .LE. 0 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'RTD1_DOFITNOPIX', 
+         CALL ERR_REP( 'RTD1_DOFITNOPIX',
      : 'Fit region contains no pixels.', STATUS )
          GO TO 99
       END IF
@@ -205,38 +205,38 @@
       CALL PSX_CALLOC( NVALID, '_REAL', IPW, STATUS )
 
 *  And copy the data values into these.
-      IF ( TYPE .EQ. '_BYTE' ) THEN 
-         CALL RTD1_SUFITB( MASK, %VAL( IPIMG ), %VAL( IPVAR ), 
+      IF ( TYPE .EQ. '_BYTE' ) THEN
+         CALL RTD1_SUFITB( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
      :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
      :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
      :                     NVALID, SIGSUM, STATUS )
-      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN 
-         CALL RTD1_SUFITUB( MASK, %VAL( IPIMG ), %VAL( IPVAR ), 
+      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+         CALL RTD1_SUFITUB( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
      :                      DIM1, DIM2, HAVVAR, %VAL( IPX ),
      :                      %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
      :                      NVALID, SIGSUM, STATUS )
-      ELSE IF ( TYPE .EQ. '_WORD' ) THEN 
-         CALL RTD1_SUFITW( MASK, %VAL( IPIMG ), %VAL( IPVAR ), 
+      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+         CALL RTD1_SUFITW( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
      :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
      :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
      :                     NVALID, SIGSUM, STATUS )
-      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN 
-         CALL RTD1_SUFITUW( MASK, %VAL( IPIMG ), %VAL( IPVAR ), 
+      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+         CALL RTD1_SUFITUW( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
      :                      DIM1, DIM2, HAVVAR, %VAL( IPX ),
      :                      %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
      :                      NVALID, SIGSUM, STATUS )
-      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN 
-         CALL RTD1_SUFITI( MASK, %VAL( IPIMG ), %VAL( IPVAR ), 
+      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+         CALL RTD1_SUFITI( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
      :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
      :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
      :                     NVALID, SIGSUM, STATUS )
-      ELSE IF ( TYPE .EQ. '_REAL' ) THEN 
-         CALL RTD1_SUFITR( MASK, %VAL( IPIMG ), %VAL( IPVAR ), 
+      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+         CALL RTD1_SUFITR( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
      :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
      :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
      :                     NVALID, SIGSUM, STATUS )
-      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN 
-         CALL RTD1_SUFITD( MASK, %VAL( IPIMG ), %VAL( IPVAR ), 
+      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+         CALL RTD1_SUFITD( MASK, %VAL( IPIMG ), %VAL( IPVAR ),
      :                     DIM1, DIM2, HAVVAR, %VAL( IPX ),
      :                     %VAL( IPY ), %VAL( IPZ ), %VAL( IPW ),
      :                     NVALID, SIGSUM, STATUS )
@@ -288,11 +288,11 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
          EPSR = VAL__EPSR
          CALL PDA_SURFIT( 0, NVALID, %VAL( IPX ), %VAL( IPY ),
-     :                    %VAL( IPZ ), %VAL( IPW ), XMIN, XMAX, YMIN, 
-     :                    YMAX, KX, KY, S, NXEST, NYEST, NMAX, EPSR, 
-     :                    NX, %VAL( IPTX ), NY, %VAL( IPTY ), 
-     :                    %VAL( IPC ), FP, %VAL( IPWRK1 ), LWRK1, 
-     :                    %VAL( IPWRK2 ), LWRK2, %VAL( IPWRK3 ), 
+     :                    %VAL( IPZ ), %VAL( IPW ), XMIN, XMAX, YMIN,
+     :                    YMAX, KX, KY, S, NXEST, NYEST, NMAX, EPSR,
+     :                    NX, %VAL( IPTX ), NY, %VAL( IPTY ),
+     :                    %VAL( IPC ), FP, %VAL( IPWRK1 ), LWRK1,
+     :                    %VAL( IPWRK2 ), LWRK2, %VAL( IPWRK3 ),
      :                    LWRK3, IERROR, STATUS )
 
          IF ( STATUS .NE. SAI__OK ) THEN
@@ -303,10 +303,10 @@
       END IF
 
 *  FP to standard deviation. Weights are already SDs if using variances.
-      IF ( NVALID .GT. 0 ) THEN 
+      IF ( NVALID .GT. 0 ) THEN
          IF ( HAVVAR ) THEN
             FP = FP / SIGSUM
-         ELSE 
+         ELSE
             FP = SQRT( FP / REAL( NVALID ) )
          END IF
       END IF

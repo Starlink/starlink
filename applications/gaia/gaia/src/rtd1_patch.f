@@ -1,5 +1,5 @@
       SUBROUTINE RTD1_PATCH( FITGRP, NEWGRP, SCALE, NFIT, LBND, UBND,
-     :                       DIM1, DIM2, TYPE, HAVVAR, IPVAR, HVQUAL, 
+     :                       DIM1, DIM2, TYPE, HAVVAR, IPVAR, HVQUAL,
      :                       IPQUAL, BADBIT, IPIMG, STATUS )
 *+
 * Name:
@@ -16,7 +16,7 @@
 *                      DIM1, DIM2, TYPE, HAVVAR, IPVAR, IPIMG, STATUS )
 
 *  Description:
-*     This routine replaces the pixels with a given ARD region by a 
+*     This routine replaces the pixels with a given ARD region by a
 *     function that is derived by a polynomial fit to pixels in another
 *     region (this region is also made to exclude any pixels from
 *     the first region). A noise parameter is derived from the
@@ -26,7 +26,7 @@
 *     scaled if the fit estimate isn't good enough) makes the
 *     replaced region look like a genuine part of the image.
 *
-*     The input data may be of any non-complex numeric HDS type 
+*     The input data may be of any non-complex numeric HDS type
 *     and may have noise estimates (variances) associated with them.
 *     The variances of any replaced pixels are set to the standard
 *     deviation of the noise distribution.
@@ -53,14 +53,14 @@
 *     DIM2 = INTEGER (Given)
 *        Second dimension of the data array.
 *     TYPE = CHARACTER * ( * ) (Given)
-*        The numeric type of the data pointed to by IPIMG. Any 
+*        The numeric type of the data pointed to by IPIMG. Any
 *        variances are also assumed to be in this type.
 *     HAVVAR = LOGICAL (Given)
 *        Whether or not any variances are available for the image
-*        data. These are used as weights in the surface fit. 
+*        data. These are used as weights in the surface fit.
 *     IPVAR = INTEGER (Given)
 *        Pointer to variance data if it exists. Replaced pixels are
-*        modified to the standard deviation of the replacement 
+*        modified to the standard deviation of the replacement
 *        function.
 *     HVQUAL = LOGICAL (Given)
 *        Whether or not a quality array has been given.
@@ -74,20 +74,20 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1996-2001 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     5-MAR-1996 (PDRAPER):
+*     5-MAR-1996 (PWD):
 *        Original version.
-*     26-FEB-1997 (PDRAPER):
+*     26-FEB-1997 (PWD):
 *        Now releases ARD group (stops limit of 100 patches).
-*     17-NOV-1997 (PDRAPER):
+*     17-NOV-1997 (PWD):
 *        Added changes to support quality.
-*     19-NOV-1997 (PDRAPER):
+*     19-NOV-1997 (PWD):
 *        Increases workspace for noise array to 2047 from 511.
 *     {enter_changes_here}
 
@@ -170,13 +170,13 @@
 *  as a full description. So we do this the hard way.
       TMPGRP = GRP__NOID
       CALL GRP_GRPSZ( NEWGRP, SIZE, STATUS )
-      CALL ARD_GRPEX( 'INPUT .AND. .NOT. (', 
+      CALL ARD_GRPEX( 'INPUT .AND. .NOT. (',
      :                GRP__NOID, TMPGRP, FLAG, STATUS )
-      DO 1 I = 1, SIZE 
+      DO 1 I = 1, SIZE
          CALL GRP_GET( NEWGRP, I, 1, LINE, STATUS )
          CALL ARD_GRPEX( LINE, GRP__NOID, TMPGRP, FLAG, STATUS )
  1    CONTINUE
-      CALL ARD_GRPEX( ')', 
+      CALL ARD_GRPEX( ')',
      :                GRP__NOID, TMPGRP, FLAG, STATUS )
 
 *  Get workspace for storing mask.
@@ -193,8 +193,8 @@
      :               STATUS )
 
 *  Now fit this region.
-      CALL RTD1_DOFIT( NFIT, %VAL( IPMASK ), DIM1, DIM2, TYPE, 
-     :                 HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX, IPTY, 
+      CALL RTD1_DOFIT( NFIT, %VAL( IPMASK ), DIM1, DIM2, TYPE,
+     :                 HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX, IPTY,
      :                 NY, SIGMA, STATUS )
 
 *  Generate image mask of region to replace.

@@ -642,7 +642,6 @@ int GaiaSkySearch::originCmd( int argc, char *argv[] )
         char buf[80];
         sprintf( buf, "%f %f", xOrigin_, yOrigin_ );
         set_result( buf );
-        return TCL_OK;
     } else {
 
         double xo;
@@ -657,6 +656,7 @@ int GaiaSkySearch::originCmd( int argc, char *argv[] )
         xOrigin_ = xo;
         yOrigin_ = yo;
     }
+    return TCL_OK;
 }
 
 /**

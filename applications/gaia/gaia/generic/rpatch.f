@@ -69,7 +69,7 @@
 *     display tool and is not intended for use in other ways.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1996-2001 Central Laboratory of the Research Councils
 
 *  Authors:
 *     PWD: P.W. Draper (STARLINK-Durham University)

@@ -70,16 +70,16 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1996-2001 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     14-MAR-1996 (PDRAPER):
+*     14-MAR-1996 (PWD):
 *        Original version.
-*     17-NOV-1997 (PDRAPER):
+*     17-NOV-1997 (PWD):
 *        Added changes to support quality reset.
 *     {enter_changes_here}
 
@@ -150,26 +150,26 @@
 
 *  Calculate useful parameters about the masked region.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL RTD1_MSTB( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTB( MASK, DIM1, DIM2, %VAL( IPIMG ), .FALSE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL RTD1_MSTUB( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                    YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTUB( MASK, DIM1, DIM2, %VAL( IPIMG ), .FALSE.,
+     :                    XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL RTD1_MSTW( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTW( MASK, DIM1, DIM2, %VAL( IPIMG ), .FALSE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL RTD1_MSTUW( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                    YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTUW( MASK, DIM1, DIM2, %VAL( IPIMG ), .FALSE.,
+     :                    XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL RTD1_MSTI( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTI( MASK, DIM1, DIM2, %VAL( IPIMG ), .FALSE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL RTD1_MSTR( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTR( MASK, DIM1, DIM2, %VAL( IPIMG ), .FALSE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL RTD1_MSTD( MASK, DIM1, DIM2, %VAL( IPIMG ), XMIN, XMAX,
-     :                   YMIN, YMAX, NVALID, STATUS )
+         CALL RTD1_MSTD( MASK, DIM1, DIM2, %VAL( IPIMG ), .FALSE.,
+     :                   XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
       ELSE
 
 *  Incorrect data type. Complain and give up.
@@ -222,37 +222,37 @@
       IF ( TYPE .EQ. '_BYTE' ) THEN
          CALL RTD1_DOFILB( INT( XMIN ), INT( YMIN ), XSIZE, YSIZE,
      :                     %VAL( IPZ ), DIM1, DIM2, MASK, ER, NERROR,
-     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT, 
+     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT,
      :                     %VAL( IPIMG ), %VAL( IPVAR ), STATUS )
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
          CALL RTD1_DOFILUB( INT( XMIN ), INT( YMIN ), XSIZE, YSIZE,
      :                      %VAL( IPZ ), DIM1, DIM2, MASK, ER, NERROR,
-     :                      HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT, 
+     :                      HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT,
      :                      %VAL( IPIMG ), %VAL( IPVAR ), STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
          CALL RTD1_DOFILW( INT( XMIN ), INT( YMIN ), XSIZE, YSIZE,
      :                     %VAL( IPZ ), DIM1, DIM2, MASK, ER, NERROR,
-     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT, 
+     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT,
      :                     %VAL( IPIMG ), %VAL( IPVAR ), STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          CALL RTD1_DOFILUW( INT( XMIN ), INT( YMIN ), XSIZE, YSIZE,
      :                      %VAL( IPZ ), DIM1, DIM2, MASK, ER, NERROR,
-     :                      HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT, 
+     :                      HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT,
      :                      %VAL( IPIMG ), %VAL( IPVAR ), STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL RTD1_DOFILI( INT( XMIN ), INT( YMIN ), XSIZE, YSIZE,
      :                     %VAL( IPZ ), DIM1, DIM2, MASK, ER, NERROR,
-     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT, 
+     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT,
      :                     %VAL( IPIMG ), %VAL( IPVAR ), STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL RTD1_DOFILR( INT( XMIN ), INT( YMIN ), XSIZE, YSIZE,
      :                     %VAL( IPZ ), DIM1, DIM2, MASK, ER, NERROR,
-     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT, 
+     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT,
      :                     %VAL( IPIMG ), %VAL( IPVAR ), STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL RTD1_DOFILD( INT( XMIN ), INT( YMIN ), XSIZE, YSIZE,
      :                     %VAL( IPZ ), DIM1, DIM2, MASK, ER, NERROR,
-     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT, 
+     :                     HAVVAR, HVQUAL, %VAL( IPQUAL ), BADBIT,
      :                     %VAL( IPIMG ), %VAL( IPVAR ), STATUS )
       END IF
 

@@ -1,5 +1,5 @@
-      SUBROUTINE RTD1_MST<T>( MASK, DIM1, DIM2, IMAGE, XMIN, XMAX,
-     :                        YMIN, YMAX, NVALID, STATUS )
+      SUBROUTINE RTD1_MST<T>( MASK, DIM1, DIM2, IMAGE, VALID,
+     :                        XMIN, XMAX, YMIN, YMAX, NVALID, STATUS )
 *+
 *  Name:
 *     RTD1_MST<T>
@@ -15,10 +15,10 @@
 *                       YMIN, YMAX, NVALID, STATUS )
 
 *  Description:
-*     This routine returns the extent and number of valid non-masked
-*     pixels in a image. The mask is an INTEGER array in which valid
-*     pixels have a value greater than zero (this is as produced by the
-*     ARD subroutine library).
+*     This routine returns the extent and number of (optionally) valid
+*     non-masked pixels in a image. The mask is an INTEGER array in
+*     which included pixels have a value greater than zero (this is as
+*     produced by the ARD subroutine library).
 
 *  Arguments:
 *     MASK( DIM1, DIM2 ) = INTEGER (Given)
@@ -28,7 +28,10 @@
 *     DIM2 = INTEGER (Given)
 *        The second dimension of MASK and IMAGE.
 *     IMAGE( DIM1, DIM2 ) = <TYPE> (Given)
-*        The image.
+*        The image. Only used if pixels also need to be valid.
+*     VALID = LOGICAL (Given)
+*        If true then pixels in the mask must also be valid in the
+*        image to be included.
 *     XMIN = REAL (Returned)
 *        The X index of the first valid pixel in the image.
 *     XMAX = REAL (Returned)
@@ -39,8 +42,8 @@
 *        The Y index of the last valid pixel in the image.
 *     NVALID = INTEGER (Returned)
 *        The number of valid pixels in the image (that is a count of
-*        the ones with a valid data value that correspond to a
-*        positive value in the mask).
+*        positive values in the mask that are also non-BAD if VALID is
+*        true).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -60,15 +63,17 @@
 *     the data type that you want to process.
 
 *  Copyright:
-*     Copyright (C) 1997 Central Laboratory of the Research Councils
+*     Copyright (C) 1996-2001 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     18-MAR-1996 (PDRAPER):
+*     18-MAR-1996 (PWD):
 *        Original version.
+*     01-JUN-2001 (PWD):
+*        Made test for non-BAD pixels optional.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,6 +93,7 @@
       INTEGER DIM2
       INTEGER MASK( DIM1, DIM2 )
       <TYPE> IMAGE( DIM1, DIM2 )
+      LOGICAL VALID
 
 *  Arguments Returned:
       REAL XMIN
@@ -114,18 +120,35 @@
       XMIN = REAL( DIM1 )
       YMIN = REAL( DIM2 )
 
-*  Now work out spans and counted non-masked, pixels with valid data.
-      DO 1 J = 1, DIM2
-         DO 2 I = 1, DIM1
-            IF ( MASK( I, J ) .GT. 0 ) THEN
-               IF ( IMAGE( I, J ) .NE. VAL__BAD<T> ) THEN
+      IF ( VALID ) THEN
+
+*  Image pixels need to be valid.
+         DO 1 J = 1, DIM2
+            DO 2 I = 1, DIM1
+               IF ( MASK( I, J ) .GT. 0 ) THEN
+                  IF ( IMAGE( I, J ) .NE. VAL__BAD<T> ) THEN
+                     NVALID = NVALID + 1
+                     XMAX = MAX( REAL( I ), XMAX )
+                     YMAX = MAX( REAL( J ), YMAX )
+                     XMIN = MIN( REAL( I ), XMIN )
+                     YMIN = MIN( REAL( J ), YMIN )
+                  END IF
+               END IF
+ 2          CONTINUE
+ 1       CONTINUE
+      ELSE
+
+*  Image pixels do not need to be valid.
+         DO 4 J = 1, DIM2
+            DO 3 I = 1, DIM1
+               IF ( MASK( I, J ) .GT. 0 ) THEN
                   NVALID = NVALID + 1
                   XMAX = MAX( REAL( I ), XMAX )
                   YMAX = MAX( REAL( J ), YMAX )
                   XMIN = MIN( REAL( I ), XMIN )
                   YMIN = MIN( REAL( J ), YMIN )
                END IF
-            END IF
- 2       CONTINUE
- 1    CONTINUE
+ 3          CONTINUE
+ 4       CONTINUE
+      END IF
       END
