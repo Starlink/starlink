@@ -107,7 +107,7 @@ dnl   Note that the make-starconf.in file is _not_ to be
 dnl   substituted by this command -- since it involves the
 dnl   installation directory variables, it should have them replaced
 dnl   at `make' time, not configure time.  See Makefile.am for details.
-AC_CONFIG_FILES(Makefile starconf.m4 bootstrap.installed)
+AC_CONFIG_FILES(Makefile starconf.m4 bootstrap.installed component.xml)
 AC_CONFIG_FILES(java/Makefile)
 AC_CONFIG_FILES(starconf-finder, [chmod +x starconf-finder])
 AC_CONFIG_FILES(starconf-validate, [chmod +x starconf-validate])

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="starconf" buildsupport="yes">
-  <version>1.2</version>
+<component id="@PACKAGE@" buildsupport="yes">
+  <version>@PACKAGE_VERSION@</version>
   <path>buildsupport/starconf</path>
   <description>Starlink autoconf support</description>
   <dependencies>
@@ -15,6 +15,6 @@
       <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
 </component>
 
