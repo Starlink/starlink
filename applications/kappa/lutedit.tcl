@@ -4879,7 +4879,7 @@ proc WaitFor {name args} {
    set ZOOMY 1
    set TKT 0
 
-   set LOGFILE_ID stdio
+#   set LOGFILE_ID stdio
 
 #  Name this application (for xresources etc.)
    tk appname lutedit
