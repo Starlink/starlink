@@ -103,8 +103,11 @@
 <!ENTITY % language.attr
         "language NOTATION (%notationlist;) #IMPLIED">
 
-<!-- Just for convenience, also define a LT ENTITY -->
+<!-- Just for convenience, also define &lt, &gt and &amp entities -->
 <!ENTITY lt "<">
+<!ENTITY gt ">">
+<!ENTITY amp "&">
+<!ENTITY quot '"'>
 
 <!-- Language notations are declared here.  The DTDs which INCLUDE
      this one may declare attributes to these notations (for example, the
