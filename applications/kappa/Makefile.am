@@ -192,7 +192,7 @@ MEM_IFL = $(MEM_F_ROUTINES:.f=.ifl)
 
 MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
-DYNSCRIPTS = kappa.csh kappa.icl
+DYNSCRIPTS = kappa.csh kappa.icl kappa.sh
 
 #  Generate ifl and startup scripts from the ifd file and then do any 
 #  necessary post processing of the generated files to overcome 
