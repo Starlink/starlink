@@ -13,8 +13,10 @@
 #  History:
 #     10-JUL-1992 (PDRAPER):
 #     	 Original version.
-#     16-FEB-1998 (MBT):
+#     16-FEB-1999 (MBT):
 #        Added OUTFORMAT.
+#     16-APR-1999 (MBT):
+#        Added OUTDOMAIN.
 #     {enter_changes_here}
 
 #-
@@ -43,6 +45,16 @@ interface REGISTER
       default  5
       range    1, 6
       prompt   'Type of fit to be performed (1-6) '
+      helpkey  '*'
+   endparameter
+
+   parameter OUTDOMAIN
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      default  'CCD_REG'
+      prompt   'Name of registration frame domain'
       helpkey  '*'
    endparameter
 
