@@ -49,9 +49,10 @@ See the C<extract()> method's documentation for further information.
 use Carp;
 use strict;
 use File::Spec;
+use Starlink::ADAM;
 use Starlink::AMS::Init;
 use Starlink::AMS::Task;
-use Starlink::EMS qw/ :sai /;
+use Starlink::EMS qw/ :sai get_facility_error /;
 use Astro::Catalog;
 
 use base qw/Exporter/;
@@ -270,8 +271,9 @@ sub extract {
     croak "Could not contact EXTRACTOR monolith";
   }
   $STATUS = $TASK->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
-  if( $STATUS != SAI__OK ) {
-    croak "Error in running EXTRACTOR: $STATUS";
+  if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+    ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+    croak "Error in running EXTRACTOR: $STATUS - $text";
   }
 
 # Form a catalogue from Astro::Catalog.
@@ -498,6 +500,7 @@ temp_dir method) and the filename "config<n>.sex", where
 
 sub _config_file_name {
   my $self = shift;
+  print "config file is " . File::Spec->catdir( $self->temp_dir, "config$$.sex" ) . "\n" if $DEBUG;
   return File::Spec->catdir( $self->temp_dir, "config$$.sex" );
 }
 
@@ -516,6 +519,7 @@ temp_dir method) and the filename "extract<n>.param", where
 
 sub _param_file_name {
   my $self = shift;
+  print "param file is " . File::Spec->catdir( $self->temp_dir, "extract$$.param" ) . "\n" if $DEBUG;
   return File::Spec->catdir( $self->temp_dir, "extract$$.param" );
 }
 
@@ -534,6 +538,7 @@ temp_dir method) and the filename "extract<n>.cat", where
 
 sub _catalog_file_name {
   my $self = shift;
+  print "catalog file is " . File::Spec->catdir( $self->temp_dir, "extract$$.cat" ) . "\n" if $DEBUG;
   return File::Spec->catdir( $self->temp_dir, "extract$$.cat" );
 }
 
