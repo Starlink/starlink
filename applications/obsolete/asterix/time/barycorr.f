@@ -1208,7 +1208,6 @@ c      RECORD /POS_REC/ POS
 
       RECORD /POS_REC/ POS
 
-      DOUBLE PRECISION BARY                         ! Barycentric  correction in Secs
       DOUBLE PRECISION RMATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
         INTEGER UT
