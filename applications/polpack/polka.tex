@@ -2013,26 +2013,39 @@ re-establish the $O$ and $E$ ray masks.
 \subsection {\mylabel{POLKA_MULTI_RUN}Align Data from Several Runs}
 If you want to process your data using POLKA in several batches, you will
 need to take care to ensure that the results of each batch are aligned on
-the sky. To do this, you should ensure that the first file supplied as
-input to POLKA is the same for each batch. The first file defines the
-reference frame to which the output images are aligned. Thus if you have
-data files \texttt{D1, D2, D3 ... D16}, and you want to process them in 4
-batches, you should run POLKA four times. If, for the first run, you
-specify the inputs images as \texttt{D1, D2, D3, D4}, then the list of
-input images supplied for each subsequent run should start with image
-\texttt{D1}. Thus for instance, you could specify the input images for
-the second run as \texttt{D1, D5, D6, D7, D8}, and \texttt{D1, D9, D10, 
-D11, D12} for the third run, etc.
+the sky. To do this, follow this procedure:
 
-Note, you should give a null (!) response to parameter STOKES when
-running POLKA each time in order to prevent Stokes vectors from being 
-calculated for each batch. Once all batches have been processed by POLKA, 
-you then run POLCAL a single time to create Stokes vectors from all the 
-aligned, extracted $O$ and $E$ ray images.
+\begin{enumerate}
 
-This method has the slight problem that the first image (D1 in the above
-example) is processed several times by POLKA. In a future release POLKA will 
-be modified to provide a better system than this.
+\item Process the first batch. Give your chosen reference image as the 
+first input image when specifying parameter IN, and give a null (!) value
+for parameter OUT\_S (we will create Stokes vectors later using POLCAL
+directly). Once you have identified all the feature positions, masks and
+sky areas in the reference image, save them in a file using the
+\htmlref{{\em Dump}} {POLKA_DUMP}/{\em Displayed Image} command in the
+\htmlref{{\em File}}{POLKA_FILE_MENU} menu. Then carry on to identify the 
+required features and masks in the other images, and create the
+aligned extracted images using the \htmlref{{\em File}}
+{POLKA_FILE_MENU}/{\em Exit} command as usual.
+
+\item Process each subsequent batch. Assign the name of the reference
+image (i.e. the first image used in the first batch) to the POLKA
+parameter REFIN, and assign the names of the new images to be processed
+to parameter IN. The reference image will be displayed initially when the
+Polka GUI is created. Restore the image features, masks and sky areas
+from the saved file using the \htmlref{{\em Restore}}{POLKA_RESTORE}/{\em
+Displayed Image} command in the \htmlref{{\em File}}{POLKA_FILE_MENU}
+menu. Then carry on to identify the required features and masks in the
+other images, and create the aligned extracted images using the
+\htmlref{{\em File}} {POLKA_FILE_MENU}/{\em Exit} command as usual. Note,
+the reference image will not be processed again, because it was not
+specified using the IN parameter.
+
+\item Once all batches have been processed, run POLCAL to create the
+Stokes vectors from the aligned extracted files created by each run of
+Polka.
+
+\end{enumerate}
 
 \subsection {\mylabel{POLKA_STOP_START}Stop and Re-start POLKA}
 Use the \htmlref{{\em Dump}}{POLKA_DUMP}/{\em Everything} and 

@@ -14,6 +14,11 @@
    o  A new command POLSIM for creating simulated intensity images from
    a cube of Stokes vectorsd and a set of template intensity images.
 
+   o POLKA now has a REFIN parameter which may be used to specify a 
+   reference image to which the other images should be aligned. A 
+   reference image specified in this way will not be processed to create
+   any output files.
+
    o  Stokes vectors are now created using north as the reference direction
    if the data contains World Coordinate System information defining a
    celestial co-ordinate Frame. Otherwise, the reference direction is the 
