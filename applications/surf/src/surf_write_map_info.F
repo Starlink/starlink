@@ -1,5 +1,5 @@
       SUBROUTINE SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
-     :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
+     :     OUT_UNITS, MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
      :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH,
      :     FILTER, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
      :     WPLATE, ANGROT,
@@ -20,7 +20,10 @@
 
 *  Description:
 *     This routine writes Axis, FITS and WCS information to a rebinned
-*     map file.
+*     map file. Note that this routine does not write WCS information
+*     to the FITS header - that is stored in the WCS information.
+*     Keywords CRVAL, CRPIX and CTYPE are used here to generate the
+*     WCS only.
 
  
 *  Arguments:
@@ -30,6 +33,8 @@
 *        Output coordinate system
 *     OUT_TITLE = CHAR (Given)
 *        Title of map
+*     OUT_UNITS = CHAR (Given)
+*        Output units
 *     MJD_STANDARD = DOUBLE (Given)
 *        Modified Julian date of map
 *     NFILE = INTEGER (Given)
@@ -80,6 +85,12 @@
 *        Extract from reds_wtfn_rebin.f
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
+* $Log$
+* Revision 1.12  1999/05/15 01:52:14  timj
+* Remove IRAS90 code.
+* Make sure that WCS extracts FITS keywords before
+* writing them to disk.
+*
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -115,6 +126,7 @@
       INTEGER          OUT_NDF
       REAL             OUT_PIXEL
       CHARACTER * (*)  OUT_TITLE
+      CHARACTER * (*)  OUT_UNITS
       LOGICAL          USEWCS
       REAL             WAVELENGTH
       REAL             WPLATE
@@ -145,7 +157,6 @@
       INTEGER          ICARD    ! Counter for FITS cards
       INTEGER          ID       ! day of an input observation
       INTEGER          IM       ! month in which observation started
-      CHARACTER*(DAT__SZLOC) IMAGE_LOC ! locator of IMAGE_INFO in output file
       CHARACTER*40     INSTRUMENT ! FITS instrument entry
       INTEGER          ITEMP    ! Temporary variable
       INTEGER          IY       ! year in which input observation started
@@ -158,7 +169,6 @@
       CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
                                 ! locator of FITS extension in output
                                 ! file
-      CHARACTER*(DAT__SZLOC) OUT_XLOC ! locator of IRAS item in output file
       REAL             RTEMP    ! Scratch real
       CHARACTER*30     SCS      ! name of sky coordinate system
       CHARACTER*80     STEMP    ! scratch string
@@ -169,14 +179,7 @@
       CHARACTER * (80) YLAB     ! Y axis label 
       INTEGER          WCSINFO  ! WCS AST information
 
-#ifdef HAS_IRAS90
-*     IRAS90 variables
-      INTEGER          NP       ! size of P array in call to IRA_CREAT
-      DOUBLE PRECISION P (8)    ! input array to IRA_CREAT
-#endif
-
-
-*     .
+*.
 
 *     Check status
       IF (STATUS .NE. SAI__OK) RETURN
@@ -234,7 +237,7 @@
 *     and a title
 
       CALL NDF_CPUT(OUT_TITLE, OUT_NDF, 'Title', STATUS)
-      CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
+      CALL NDF_CPUT(OUT_UNITS, OUT_NDF, 'UNITS', STATUS)
 
 *     Sort out the astrometry stuff
 
@@ -277,59 +280,6 @@
             CTYPE2 = 'GLAT-TAN'
          END IF
 
-#ifdef HAS_IRAS90
-*     Create the IRAS extension
-         CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0,0,
-     :        OUT_XLOC, STATUS)
-         NP = 8
-
-*     Initialise the IRA software
-         CALL IRA_INIT (STATUS)
-
-*     Set up the astrometry array
-         P (1) = OUT_LONG
-         P (2) = OUT_LAT
-         P (3) = DBLE (I_CENTRE) - 0.5D0
-         P (4) = DBLE (J_CENTRE) - 0.5D0
-         P (5) = DBLE (OUT_PIXEL)
-         P (6) = DBLE (OUT_PIXEL)
-         P (7) = 0.0D0
-         P (8) = 0.0D0
-
-*     Create the ASTROMETRY extension
-         CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, 
-     :        OUT_NDF, ITEMP, STATUS)
-
-         CALL IRA_CLOSE (STATUS)
-
-*     Create the IMAGE_INFO extension to fool IRAS90 software
-         CALL DAT_NEW(OUT_XLOC, 'IMAGE_INFO', 'IMAGE_INFO',
-     :        0,0,STATUS)
-         
-         CALL DAT_FIND(OUT_XLOC, 'IMAGE_INFO', IMAGE_LOC,
-     :        STATUS)
-
-         CALL DAT_NEW(IMAGE_LOC, 'INSTRUMENT', '_CHAR*6',
-     :        0,0,STATUS)
-         CALL CMP_PUT0C(IMAGE_LOC, 'INSTRUMENT', 'SURVEY',
-     :        STATUS)
-
-         CALL DAT_NEW(IMAGE_LOC, 'BAND', '_INTEGER',
-     :        0,0,STATUS)
-         CALL CMP_PUT0I(IMAGE_LOC, 'BAND', 1,
-     :        STATUS)
-
-         CALL DAT_NEW(IMAGE_LOC, 'TYPE', '_CHAR*8',
-     :        0,0,STATUS)
-         CALL CMP_PUT0C(IMAGE_LOC, 'TYPE', 'UNKNOWN',
-     :        STATUS)
-         
-         CALL DAT_ANNUL(IMAGE_LOC, STATUS)
-         
-         CALL DAT_ANNUL(OUT_XLOC, STATUS)
-
-#endif
-
       END IF
 
 *     PLanet is special
@@ -349,8 +299,10 @@
 *     and write out the same information to a .MORE.FITS section
 
       N_FITS = 0
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'OBJECT', OUT_TITLE, 'name of object', STATUS)
+
+*     Dont store OBJECT - NDF Title takes priority
+*      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+*     :     'OBJECT', OUT_TITLE, 'name of object', STATUS)
 
       DO I = 1, NFILE
          STEMP = 'FILE_'
@@ -525,14 +477,6 @@
 
       END IF
 
-*     write out the FITS extension
-
-      NDIM =1 
-      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', NDIM, N_FITS, 
-     :     OUT_FITSX_LOC, STATUS)
-      CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
-      CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)
-
 *     Create the AST extension
 
       IF (USEWCS) THEN
@@ -557,9 +501,36 @@
 *     Write the channel to the NDF
          CALL NDF_PTWCS( WCSINFO, OUT_NDF, STATUS )
 
+*     Now copy the remaining FITS keywords from the FITSCHAN
+*     back into the FITS array so that we can write them
+*     We do this so that the information in the WCS-AST structure
+*     is not duplicated by information in the FITS array
+*     This would lead to confusion
+
+*     Rewind the FITSCHAN
+         CALL AST_CLEAR (FITSCHAN, 'Card', STATUS)
+
+*     Loop over all fits cards and copy back into the FITS array
+         N_FITS = 0
+         DO WHILE (AST_FINDFITS( FITSCHAN, '%f', STEMP, .TRUE.,
+     :        STATUS))
+            N_FITS = N_FITS + 1
+            FITS(N_FITS) = STEMP
+         END DO
+
 *     Shut down AST
          CALL AST_END( STATUS )
 
       END IF
+
+*     write out the FITS extension
+
+      NDIM =1 
+      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', NDIM, N_FITS, 
+     :     OUT_FITSX_LOC, STATUS)
+      CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+      CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)
+
+
 
       END
