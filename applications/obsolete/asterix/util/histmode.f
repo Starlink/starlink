@@ -71,7 +71,7 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get input
-      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'UPDATE', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    History already present?
