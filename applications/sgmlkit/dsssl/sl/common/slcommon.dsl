@@ -173,7 +173,11 @@ unavailable (because DOCNUMBER isn't defined)
     ;; the summary one.  Refer to it, at least at present, by
     ;; referring to the section it lives in
     (process-node-list (ancestor-member (current-node)
-					(target-element-list)))))
+					(target-element-list))))
+  (element table
+    (literal (car (get-caption-details))))
+  (element figure
+    (literal (car (get-caption-details)))))
 
 
 ;; return the title of a section
@@ -212,6 +216,26 @@ unavailable (because DOCNUMBER isn't defined)
 	(normalize "routinelist")
 	(normalize "codecollection")))
 </misccode>
+
+<func>
+<routinename>get-caption-details
+<description>Return generated details for a caption
+<returnvalue type='list of strings'>A list containing, in order,
+   the caption legend
+  (ie, `Fig 1.3' or whatever); either a unique identifying string
+  which is usable as a link target, or <code/#f/ if the element's ID attribute
+  is implied.
+<parameter optional default='(current-node)'>nd
+  <type>singleton node-list<description>An element (typically the
+  <code/TABLE/ or <code/FIGURE/ element the caption is a member of)
+  which has an ID attribute, and which will be used to generate the 
+  caption reference.
+<codebody>
+(define (get-caption-details #!optional (nd (current-node)))
+  (let ((id (attribute-string (normalize "id") nd)))
+    (list (string-append (gi nd) " " (number->string (element-number nd)))
+	  (and id
+	       (string-append (gi nd) "." id)))))
 
 <misccode>
 <description>
