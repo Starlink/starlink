@@ -264,7 +264,7 @@ begin
    print "  which objects correspond."
    print " "
    findoff ( inlist="reduced_data?.imh", ndfnames=yes,
-             usewcs=yes, restrict=yes, maxdisp=INDEF,
+             usewcs=no, restrict=yes, maxdisp=INDEF,
              outlist="*|.imh|.off|", error=1, fast=yes, failsafe=yes )
    if ( local_dev != "NONE" ) {
      #  Display the objects located.
@@ -293,21 +293,8 @@ begin
    print "  transformation types. It also writes the information into the"
    print "  images so that other routines may use it."
    print " "
-   register ( inlist="reduced_data?.imh", refpos=1, outformat="wcs", 
-              outdomain="ccd_reg", fittype=2 )
-
-   #  Export the registration information to an AST file.
-   print " "
-   print "  Write World Coordinate System information about the alignment"
-   print "  of these frames to an external file 'ccdexercise.ast' as a"
-   print "  record of their mutual alignment."
-   print " "
-   if ( access ( "ccdexercise.ast" ) ) {
-     delete ccdexercise.ast
-   }
-   astexp ( in="reduced_data?.imh", astfile="ccdexercise.ast", 
-            idtype="fitsid", fitsid="ISEQ", outdomain="matched",
-            outtitle=INDEF, baseframe="axis" )
+   register ( inlist="reduced_data?.imh", refpos=1, usewcs=no,
+              outformat="transform", outdomain="ccd_reg", fittype=2 )
 
    #  Resample the data.
    print " "
@@ -318,7 +305,7 @@ begin
    print "  exposure time) into a single frame which shows the complete"
    print "  data coverage for the target area."
    print " "
-   tranndf ( in="reduced_data?.imh", out="*|reduced|resamp|" )
+   tranndf ( in="reduced_data?.imh", usewcs=no, out="*|reduced|resamp|" )
 
 
    #  Normalise it.
