@@ -21,11 +21,10 @@
       INTEGER DIMS(2)
       REAL BASE(2)
       REAL SCALE(2)
-      CHARACTER*(*)(2)
+      CHARACTER*(*)(2) UNITS
 *    Import-Export :
 *    Export :
       INTEGER MASK(*)
-      INTEGER I1,I2,J1,J2
 *    Status :
       INTEGER STATUS
 *    External references :
