@@ -71,6 +71,8 @@
 *     27-OCT-2000 (DSB):
 *        Modify loop exit condition so that the last line of the file is
 *        read even if it is terminated with an EOF rather than a newline.
+*     7-JAN-2003 (DSB):
+*        Expand shell meta-characters using GRP1_WILD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,6 +110,8 @@
       INTEGER CHR_LEN            ! Used length of a string
       INTEGER GRP1_INDEX         ! Finds un-escaped control characters
       LOGICAL GRP1_CHKCC         ! See if a character is a control character
+      INTEGER GRP1_WILD          ! Start a wild card file search
+      INTEGER GRP1_EWILD         ! End a wild card file search
 
 *  Local Variables:
       CHARACTER COMC*1           ! Groups current omment character.
@@ -120,8 +124,10 @@
       CHARACTER LINE*(GRP__SZNAM)! A line of text read from the file
       INTEGER COM                ! Index of the comment character
       INTEGER GF                 ! First free character in GEXP.
+      INTEGER ICONTX             ! Context for grp1_wild
       INTEGER INDIND             ! Index within the FILES array
       INTEGER IOERR              ! Fortran IO status value
+      INTEGER ISTAT              ! Local status value
       INTEGER TLEN               ! Used length of the group expression
       LOGICAL COMOK              ! .TRUE. if COMC is not NULL.
       LOGICAL EOF                ! Has end of file has been reached ?
@@ -135,150 +141,189 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise the context value used by GRP1_WILD so that a new file
+*  searching context will be started.
+      ICONTX = 0
+
+*  Use GRP1_WILD to expand any shell meta-characters in the supplied file
+*  name. If the file name includes any wild-cards, the first matching file
+*  name is returned.
+      ISTAT = GRP__OK
+      FILE = ' '
+      ISTAT = GRP1_WILD( INFILE, FILE, ICONTX )
+
+*  If a file was found which matches the name...
+      IF( ISTAT .EQ. GRP__OK ) THEN
+
 *  Open the text file specified after the first character.
-      OPEN( UNIT = UNIT, FILE = INFILE, STATUS = 'OLD', IOSTAT = IOERR )
+         OPEN( UNIT = UNIT, FILE = FILE, STATUS = 'OLD', 
+     :         IOSTAT = IOERR )
 
 *  Check for errors, setting a suitable STATUS value and reporting the
 *  error.
-      IF ( IOERR .NE. 0 ) THEN
-         STATUS = GRP__FIOER
-         CALL MSG_SETC( 'FNAME', INFILE )
-         CALL MSG_SETI( 'UNIT', UNIT )
-         CALL ERR_FIOER( 'MESSAGE', IOERR )
-         CALL ERR_REP( 'GRP1_EXPAN_ERR1', 'GRP1_EXPAN: Error opening '//
-     :                 'text file ^FNAME on Fortran unit ^UNIT - '//
-     :                 '"^MESSAGE".', STATUS )
-         GO TO 999
-      END IF
+         IF ( IOERR .NE. 0 ) THEN
+            STATUS = GRP__FIOER
+            CALL MSG_SETC( 'FNAME', FILE )
+            CALL MSG_SETI( 'UNIT', UNIT )
+            CALL ERR_FIOER( 'MESSAGE', IOERR )
+            CALL ERR_REP( 'GRP1_RDIND_ERR1', 'GRP1_RDIND: Error '//
+     :                    'opening text file ^FNAME on Fortran '//
+     :                    'unit ^UNIT - "^MESSAGE".', STATUS )
+            GO TO 999
+         END IF
 
 *  Get the group's current escape character.
-      CALL GRP1_CONC( SLOT, GRP__PESCC, ESCC, ESCOK, STATUS )
+         CALL GRP1_CONC( SLOT, GRP__PESCC, ESCC, ESCOK, STATUS )
 
 *  Get the group's current comment and flag characters.
-      CALL GRP1_CONC( SLOT, GRP__PCOMC, COMC, COMOK, STATUS )
-      CALL GRP1_CONC( SLOT, GRP__PFLGC, FLAGC, FLAGOK, STATUS )
+         CALL GRP1_CONC( SLOT, GRP__PCOMC, COMC, COMOK, STATUS )
+         CALL GRP1_CONC( SLOT, GRP__PFLGC, FLAGC, FLAGOK, STATUS )
 
 *  Store the file name in the FILES array for this group, extending
 *  the size of the array by one to make room for it. The index at which
 *  te file name is stored within the FILES array is returned in INDIND.
-      CALL GRP1_PTIND( SLOT, INFILE, INDIND, STATUS )
+         CALL GRP1_PTIND( SLOT, INFILE, INDIND, STATUS )
 
 *  Initialise the number of elements added.
-      NADDED = 0
+         NADDED = 0
 
 *  Initialise the first character of the group expression to hold an
 *  opening kernel delimiter (if one is defined).
-      CALL GRP1_CONC( SLOT, GRP__POPKC, KOPCC, KOPOK, STATUS )
-      CALL GRP1_CONC( SLOT, GRP__PCLKC, KCLCC, KCLOK, STATUS )
-      IF( KOPOK .AND. KCLOK ) THEN
-         GEXP( 1 : 1 ) = KOPCC
-         GF = 2
-      ELSE
-         GF = 1
-      END IF
+         CALL GRP1_CONC( SLOT, GRP__POPKC, KOPCC, KOPOK, STATUS )
+         CALL GRP1_CONC( SLOT, GRP__PCLKC, KCLCC, KCLOK, STATUS )
+         IF( KOPOK .AND. KCLOK ) THEN
+            GEXP( 1 : 1 ) = KOPCC
+            GF = 2
+         ELSE
+            GF = 1
+         END IF
 
 *  Read the first record from the file.
-      CALL GRP1_READF( UNIT, LINE, EOF, STATUS )
+         CALL GRP1_READF( UNIT, LINE, EOF, STATUS )
 
 *  Indicate that no flag character has yet been found.
-      FLAG = .FALSE.
+         FLAG = .FALSE.
 
 *  Indicate that we are currently not in a verbatim section.
-      VERB = .FALSE.
+         VERB = .FALSE.
 
 *  Loop round while text can be read from the file, and no error occurs.
-      DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND. 
-     :          STATUS .EQ. SAI__OK )
+         DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND. 
+     :             STATUS .EQ. SAI__OK )
 
 *  Create a copy of the text read form the file in which any control
 *  characters within verbatim sections (delimited by "<!!" and !!>"
 *  strings) are preceeded by escape charaters. The copy is stored in
 *  GEXP, following any opening kernel delimiter.
-         CALL GRP1_VRBTM( SLOT, LINE, VERB, GEXP( GF : ), STATUS )
+            CALL GRP1_VRBTM( SLOT, LINE, VERB, GEXP( GF : ), STATUS )
 
 *  If a comment character is defined...
-         IF( COMOK ) THEN
+            IF( COMOK ) THEN
 
 *  Search for the first occurrence of the comment character in the 
 *  group expression.
-            COM = GRP1_INDEX( GEXP, COMC, ESCC, ESCOK )
+               COM = GRP1_INDEX( GEXP, COMC, ESCC, ESCOK )
 
 *  If a comment character was found, set the rest of the group 
 *  expression blank (including the comment character itself).
-            IF( COM .GT. 0 ) GEXP( COM : ) = ' '
+               IF( COM .GT. 0 ) GEXP( COM : ) = ' '
 
-         ELSE
-            COM = 0
+            ELSE
+               COM = 0
 
-         END IF
+            END IF
 
 *  If a comment character was found in the first column, ignore this 
 *  record.
-         IF( COM .NE. GF ) THEN
+            IF( COM .NE. GF ) THEN
 
 *  Get the used length of the group expression.
-            TLEN = CHR_LEN( GEXP )
+               TLEN = CHR_LEN( GEXP )
 
 *  See if the last character is a flag character.
-            IF( TLEN .GT. 0 ) THEN
-               FLAG = GRP1_CHKCC( GEXP, TLEN, FLAGC, ESCC, ESCOK ) .AND. 
-     :                FLAGOK
-            ELSE
-               FLAG = .FALSE.
-            END IF
+               IF( TLEN .GT. 0 ) THEN
+                  FLAG = GRP1_CHKCC( GEXP, TLEN, FLAGC, ESCC, ESCOK ) 
+     :                   .AND. FLAGOK
+               ELSE
+                  FLAG = .FALSE.
+               END IF
 
 *  If kernel delimiters are defined, append a closing kernel delimiter
 *  to the group expression. Report an error if there is no room for the
 *  closing kernel delimiter.
-            IF( GF .EQ. 2 ) THEN
-               IF( TLEN .EQ. LEN( GEXP ) ) THEN
-                  STATUS = GRP__INVEL
-                  CALL MSG_SETC( 'REC', GEXP( GF: ) )
-                  CALL ERR_REP( 'GRP1_RDIND_ERR2', 'GRP1_RDIND: '//
-     :                       ' Group expression too long - ''^REC''',
-     :                       STATUS )
-                  GO TO 999
+               IF( GF .EQ. 2 ) THEN
+                  IF( TLEN .EQ. LEN( GEXP ) ) THEN
+                     STATUS = GRP__INVEL
+                     CALL MSG_SETC( 'REC', GEXP( GF: ) )
+                     CALL ERR_REP( 'GRP1_RDIND_ERR2', 'GRP1_RDIND: '//
+     :                          ' Group expression too long - ''^REC''',
+     :                          STATUS )
+                     GO TO 999
+                  END IF
+                  CALL CHR_APPND( KCLCC, GEXP, TLEN )
                END IF
-               CALL CHR_APPND( KCLCC, GEXP, TLEN )
-            END IF
 
 *  Store this record in the group, giving it an indirection depth of
 *  one more than that of the supplied group expression, and storing the
 *  index of the file given in the indirection element.
-            CALL GRP1_PTELM( SLOT, INDX + NADDED, GEXP, EDEP + 1, 
-     :                       INDIND, EMODGP, EMODIN, STATUS )
+               CALL GRP1_PTELM( SLOT, INDX + NADDED, GEXP, EDEP + 1, 
+     :                          INDIND, EMODGP, EMODIN, STATUS )
 
 *  Save a copy of the record.
-            LGEXP = GEXP            
+               LGEXP = GEXP            
 
 *  Increment the number of elements added to the group.
-            NADDED = NADDED + 1
+               NADDED = NADDED + 1
 
-         END IF
+            END IF
 
 *  Read the next record from the file.
-         CALL GRP1_READF( UNIT, LINE, EOF, STATUS )
+            CALL GRP1_READF( UNIT, LINE, EOF, STATUS )
 
-      END DO
+         END DO
 
 *  Close the text file.
-      CLOSE( UNIT )
+         CLOSE( UNIT )
 
 *  If the last record read from the file terminated with a flag 
 *  character, remove it.
-      IF( FLAG ) THEN
-         IF( GF .EQ. 2 ) THEN
-            LGEXP( TLEN - 1 : TLEN - 1 ) = ' '
-         ELSE
-            LGEXP( TLEN : TLEN ) = ' '
-         END IF
+         IF( FLAG ) THEN
+            IF( GF .EQ. 2 ) THEN
+               LGEXP( TLEN - 1 : TLEN - 1 ) = ' '
+            ELSE
+               LGEXP( TLEN : TLEN ) = ' '
+            END IF
 
 *  Save the new value.
-         CALL GRP1_PTELM( SLOT, INDX + NADDED - 1, LGEXP, EDEP + 1, 
-     :                    INDIND, EMODGP, EMODIN, STATUS )
+            CALL GRP1_PTELM( SLOT, INDX + NADDED - 1, LGEXP, EDEP + 1, 
+     :                       INDIND, EMODGP, EMODIN, STATUS )
 
+         END IF
+
+*  If a system error was detected by GRP1_WILD, report it.
+      ELSE IF ( ISTAT .EQ. GRP__WPER ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'GRP1_APPEN_ERR1', 'GRP1_RDIND: Error'//
+     :                 ' getting pipe from forked process', 
+     :                 STATUS )
+
+      ELSE IF ( ISTAT .EQ. GRP__WMER ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'GRP1_APPEN_ERR2', 'GRP1_RDIND: '//
+     :                 'Cannot allocate memory', STATUS )
+
+*  Report an error if no file matched the supplied template.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = GRP__FIOER
+         CALL MSG_SETC( 'FNAME', INFILE )
+         CALL MSG_SETI( 'UNIT', UNIT )
+         CALL ERR_REP( 'GRP1_RDIND_ERR1', 'GRP1_RDIND: Error '//
+     :                 'opening text file ^FNAME on Fortran '//
+     :                 'unit ^UNIT - "File not found".', STATUS )
       END IF
 
+*  End the search context.
  999  CONTINUE
+      ISTAT = GRP1_EWILD( ICONTX )
 
       END

@@ -23,6 +23,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     7-JAN-2003 (DSB):
+*        Added private status values returned by GRP1_WILD
 *     {enter_further_changes_here}
 
 *-
@@ -58,5 +60,20 @@
 *  Max. length of a file name.
       INTEGER GRP__SZFNM
       PARAMETER ( GRP__SZFNM = 256 )
+
+*  Private status values returned by GRP1_WILD.
+      INTEGER GRP__OK           ! GRP1_WILD success
+      INTEGER GRP__WNMF         ! GRP1_WILD no more files
+      INTEGER GRP__WPER         ! GRP1_WILD pipe error
+      INTEGER GRP__WLER         ! GRP1_WILD length error
+      INTEGER GRP__WMER         ! GRP1_WILD malloc error
+
+      PARAMETER (
+     :           GRP__OK     =   0,
+     :           GRP__WNMF   = 101,
+     :           GRP__WPER   = 102,
+     :           GRP__WLER   = 103,
+     :           GRP__WMER   = 104 )
+
 
 *.
