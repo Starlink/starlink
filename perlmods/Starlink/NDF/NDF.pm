@@ -310,12 +310,12 @@ sub par_get ($$$) {
 
   # Just in case a reference isn't passed
   if (!ref($status)) {
-    print "Warning! STATUS will not be returned unless you pass the reference\n";
+    carp "Warning! STATUS will not be returned unless you pass the reference\n";
     $tempstat = $status;
     $status = \$tempstat;
 
   } elsif (ref($status) ne "SCALAR") {
-    print "ref($status) is not a valid type for STATUS\n";
+    carp "ref($status) is not a valid type for STATUS\n";
     return;
   }
 
@@ -518,6 +518,7 @@ sub fits_read_header ($) {
 	# or the END FITS tag
 	for (@fits) {
 	  my ($item, $value, $comment) = fits_extract_key_val($_);
+	  next unless defined $item;
 	  next if $item eq 'END';
 	  $fitsitem{$item} = $value if defined $value;
 	}
@@ -616,12 +617,17 @@ sub fits_get_item (\@$) {
 
 # This all means that a quick pattern match is not good enough
 
+# END is a special case and returns undef,undef
+
 sub fits_extract_key_val ($) {
 
   # Value is only present if an = is found in position 9
   my ($value, $comment) = ('', '');
-  my $keyword = substr($_[0], 0, 8);
+  my $keyword = uc(substr($_[0], 0, 8));
   $keyword =~ s/\s+$//;
+
+  return ("END",undef,undef) if ($keyword eq 'END');
+  return (undef, undef, undef) if length($_[0]) == 0;
 
   # Check for comment or HISTORY
   if ($keyword eq 'COMMENT' || $keyword eq 'HISTORY' ||
@@ -713,34 +719,47 @@ sub fits_extract_key_val ($) {
     } elsif ($pos != -1) {
       # Found value and comment
       $value = substr($rest, 0, $pos-1);
-      $comment = substr($rest, $pos+2);
-      $comment =~ s/\s+$//;
-      print "$pos, $value\n";
+
+      # Check for case where / is last character
+      if (length($rest) > ($pos + 1)) {
+        $comment = substr($rest, $pos+2);
+        $comment =~ s/\s+$//;
+      } else {
+        $comment = undef;
+      }
+
     } else {
       # Only found a value
       $value = $rest;
-      $comment = '';
+      $comment = undef;
     }
 
-    # Replace D or E with and e - D is not allowed as an exponent in perl
-    $value =~ tr/DE/ee/;
+    if (defined $value) {
 
-    # Check for a Logical
-    $value = 1 if $value eq 'T';
-    $value = 0 if $value eq 'F';
+      # Replace D or E with and e - D is not allowed as an exponent in perl
+      $value =~ tr/DE/ee/;
 
-    # Remove trailing spaces
-    $value =~ s/\s+$//;
+      # Check for a Logical
+      $value = 1 if $value eq 'T';
+      $value = 0 if $value eq 'F';
 
+      # Remove trailing spaces
+      $value =~ s/\s+$//;
+    }
   }
 
   # Tidy up comment
-  $comment =~ s/\s+$//;
-  $comment =~ s/^\s+//;
+  if (defined $comment) {
+    if ($comment =~ /^\s+$/) {
+      $comment  = ' ';
+    } else {
+      # Trim it 
+      $comment =~ s/\s+$//;
+      $comment =~ s/^\s+//;
+    }
+  }
 
-  $value = '' unless length($value);
   $keyword = "NONE" unless length($keyword);
-  print "$keyword || $value || $comment ||\n";
 
   # Value is allowed to be ''
   return($keyword, $value, $comment);
@@ -751,31 +770,44 @@ sub fits_extract_key_val ($) {
 
 # Special cases the COMMENT and HISTORY keywords
 # Single quotes are escaped as ''
+# Can not currently handle logicals since there is no way to distinguish
+# a T from 'T' or 1. Would need an extra, optional, argument forcing
+# whether the value is Logical, String, Number or Comment (ie no =)
 
 sub fits_construct_string ($$$) {
   my ($keyword, $value, $comment) = @_;
+  $keyword = uc( $keyword ); # must be upper case
 
   my ($fitsent);
 
   if ($keyword eq 'COMMENT' || $keyword eq 'HISTORY') {
-    $fitsent = $keyword . " $comment";
+    $fitsent = $keyword . "  $comment";
 
   } else {
 
     $fitsent = substr($keyword,0,8); # Key must be <= 8 characters
-    $fitsent .= (' 'x(8-length($fitsent)));
 
-    # Chedk that a value is there
+    # Can add the = even if the value is undefined
+    # without the = sign a keyword is not really a keyword
+    # but is a comment
+    $fitsent .= (' 'x(8-length($fitsent))) . "= ";
+
+    # Check that a value is there
     if (defined $value) {
-
-      # Can add the equals sign
-      $fitsent .= "= " if defined $value;
-
+	
       # Check whether we have a number or character string or nothing
-      if ($value =~ /^(-?)(\d*)(\.?)(\d*)([Ee][-\+]?\d+)?$/) {
+      if ($value eq '') {
+	$value = "''" . (" " x 18);
+      } elsif ($value =~ /^(-?)(\d*)(\.?)(\d*)([EeDd][-\+]?\d+)?$/) {
 	# Number (chop to 67 characters)
 	$value = substr($value,0,67);
 	$value = (' 'x(20-length($value))).$value;
+
+	# Translate lower case e to upper
+        # Probably should test length of exponent to decide
+	# whether we should be using D instead of E
+	# [depends whether the argument is stringified or not]
+	$value =~ tr /ed/ED/;
 
       } else {
 	# Character
