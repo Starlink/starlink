@@ -1,0 +1,122 @@
+## PAR_TEST - Tests a release of PAR has been made successfully.
+
+#+
+#  Name:
+#     PAR_TEST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     AJC: Alan J. Chipperfield (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1992 October 9 (MJC):
+#     	 Original version.
+#     1999 September 17 (AJC):
+#        Add MSG_FILTER
+#        Change G to vpath DEFAULT, default !
+#     {enter_changes_here}
+
+#-
+
+interface PAR_TEST
+
+   parameter      A              # Integer scalar A
+      position    1
+      type        _INTEGER
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     1
+      prompt      'Integer scalar A'
+   endparameter
+
+   parameter      B              # Real array B
+      position    2
+      type        _REAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     1.0,2.0
+      prompt      'Real array B'
+   endparameter
+
+   parameter      C              # Integer scalar C
+      position    3
+      type        _INTEGER
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      default     1
+      prompt      'Integer scalar C'
+   endparameter
+
+   parameter      D              # D.p. scalar D
+      position    4
+      type        _DOUBLE
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      default     0.0D0
+      prompt      'Double-precision scalar D'
+   endparameter
+
+   parameter      E              # Logical scalar E
+      position    5
+      type        _LOGICAL
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      default     FALSE
+      prompt      'Logical scalar E'
+   endparameter
+
+   parameter      F              # Character scalar F
+      position    6
+      type        _CHAR
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      default     NDF
+      prompt      'Character scalar F'
+   endparameter
+
+   parameter      G              # Character scalar G
+      position    7
+      type        _CHAR
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
+      prompt      'Character scalar G'
+   endparameter
+
+   parameter      H              # Integer scalar H
+      position    8
+      type        _INTEGER
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      default     3
+      prompt      'Integer scalar H'
+   endparameter
+
+   parameter      I              # Real array I
+      position    9
+      type        _REAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     20.0,40.0,75.0
+      prompt      'Real array I'
+   endparameter
+
+   parameter      J              # Real scalar output result.
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0
+   endparameter
+
+   parameter      MSG_FILTER
+      type        LITERAL
+      access      READ
+      vpath       'DEFAULT'
+      default     'NORM'
+   endparameter
+
+endinterface

@@ -1,0 +1,55 @@
+*+
+*  Name:
+*     PAR_PAR
+
+*  Purpose:
+*     Defines the PAR_ global constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE FILE
+
+*  Authors:
+*     AJC: Alan Chipperfield (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1984 November 18 (AJC):
+*        Original version.
+*     1992 February 20 (MJC):
+*        Added the prologue.
+*     1993 June 3 (MJC):
+*        Added PAR states and removed tabs.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
+      INTEGER PAR__SZNAM                ! Size of PAR Name
+      PARAMETER( PAR__SZNAM = 15 )
+      INTEGER PAR__SZTYP                ! Size of PAR Type
+      PARAMETER( PAR__SZTYP = 15 )
+      INTEGER PAR__SZMOD                ! Size of PAR Mode
+      PARAMETER( PAR__SZMOD = 15 )
+      INTEGER PAR__MXDIM                ! Maximum No. of dimensions
+      PARAMETER( PAR__MXDIM = 7 )
+
+*  PAR states.  For historical reasons these must have the same
+*  values as their SUBPAR counterparts.
+      INTEGER PAR__GROUND               ! Ground state
+      PARAMETER( PAR__GROUND = 0 )
+      INTEGER PAR__ACTIVE               ! Active state
+      PARAMETER( PAR__ACTIVE = 1 )
+      INTEGER PAR__CANCEL               ! Cancelled state
+      PARAMETER( PAR__CANCEL = 2 )
+      INTEGER PAR__NULLST               ! Null state
+      PARAMETER( PAR__NULLST = 3 )
+
+
+*.
