@@ -50,7 +50,7 @@ int testConvertFromScaledPoints(void)
 	double tvalue = DviFile::convertFromScaledPoints(testset[i].testvalue,
 							 testset[i].unit);
  
-	if (tvalue != testset[i].expected) {
+	if (! EQTOL(tvalue, testset[i].expected)) {
 	    cerr << "Converting: " << testset[i].testvalue
 		 << "sp = " << tvalue << testset[i].unitname
 		 << ", expected "
