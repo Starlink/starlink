@@ -141,7 +141,6 @@
       FSTAT = 0
       CALL FTPHBN( LUN, NROWS, NFLDS, NAMES, TYPES, UNITS, HDU,
      :             VARIDAT, FSTAT )
-      CALL FTRDEF( LUN, FSTAT )
       IF ( FSTAT .EQ. 0 ) THEN
         CALL ADI_CPUT0L( HID, '.DEF_START', .TRUE., STATUS )
         CALL ADI_CPUT0L( HID, '.DEF_END', (VARIDAT.EQ.0), STATUS )
@@ -150,7 +149,7 @@
       END IF
 
 *  Define its size
-      CALL FTBDEF( LUN, NFLDS, TYPES, VARIDAT, STATUS )
+      CALL FTBDEF( LUN, NFLDS, TYPES, VARIDAT, NENER, FSTAT )
 
 *  Free the buffer
       CALL ADI_ERASE( HID, STATUS )
