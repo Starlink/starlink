@@ -50,6 +50,10 @@
 *  History:
 *     1-NOV-1999 (MBT):
 *        Original version.
+*     25-JAN-2001 (MBT):
+*        Modified message to say that it's an approximate offset, to
+*        reflect the fact that it's not been properly best fit yet,
+*        and in FINDOFF may contain the effect of duplicate points.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -95,10 +99,10 @@
       CALL CCD1_MSG( ' ', ' ', STATUS )
       IF ( USEFRM ) THEN
          CALL CCD1_MSG( ' ', 
-     :'  Offset units are in image Current coordinate system:', STATUS )
+     :'  Approximate offsets in image Current coordinates:', STATUS )
       ELSE
          CALL CCD1_MSG( ' ', 
-     :'  Offset units are in pixels:', STATUS )
+     :'  Approximate offsets in pixels:', STATUS )
       END IF
 
 *  Construct a header string.

@@ -31,7 +31,7 @@
 *     The results from this routine are labelled position lists (one
 *     for each input list) which may be used to complete image
 *     registration using the REGISTER routine. The estimated offsets are
-*     also reported.
+*     reported, but REGISTER should be used to get accurate values.
 
 *  Usage:
 *     findoff inlist error outlist
@@ -441,6 +441,9 @@
 *        Fixed a bug in place probably since MAR-1999 which altogether
 *        prevented FINDOFF working when NDFNAMES=false (failure to
 *        initialise PSIZE).
+*     25-JAN-2001 (MBT):
+*        Fixed an old bug which caused good positions to be discarded
+*        when USECOMP=TRUE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -485,6 +488,7 @@
       DOUBLE PRECISION MAXDIS   ! Maximum displacement for matching
       DOUBLE PRECISION NEDFAC   ! Minimum completeness factor required
       DOUBLE PRECISION PSIZE( CCD1__MXLIS ) ! Linear size of a pixel
+      DOUBLE PRECISION WEIGHT( CCD1__MXLIC ) ! Weights of matched positions
       DOUBLE PRECISION XOFF( CCD1__MXLIC ) ! Determined X translation
       DOUBLE PRECISION XOFFN( CCD1__MXLIS ) ! Final X translation
       DOUBLE PRECISION YOFF( CCD1__MXLIC ) ! Determined Y translation
@@ -530,6 +534,7 @@
       INTEGER IPYO1( CCD1__MXLIC ) ! Pointer to list 1 output Y coords
       INTEGER IPYO2( CCD1__MXLIC ) ! Pointer to list 2 output Y coords
       INTEGER IPYT              ! Pointer to temporary Y coords
+      INTEGER IWCS              ! AST pointer to WCS component
       INTEGER J                 ! Loop variable
       INTEGER JPIX              ! Index of frame in Pixel domain
       INTEGER LBND( 2 )         ! Lower pixel-index bounds of NDF 
@@ -557,7 +562,6 @@
       INTEGER OUTGRP            ! Output group identifier
       INTEGER TOTNOD            ! Total number of nodes in graph
       INTEGER UBND( 2 )         ! Upper pixel-index bounds of NDF
-      INTEGER IWCS              ! AST pointer to WCS component
       LOGICAL ALLOK             ! Trur no input positions removed in preselection phase
       LOGICAL COMPL             ! True if graph is complete
       LOGICAL CYCLIC            ! True if graph is cyclic
@@ -1279,12 +1283,12 @@
                   IPYO2( COUNT ) = IPYT
                END IF
 
-*  If using completeness as a weight modify the number of matches.
-               IF ( USECOM ) THEN 
-                  NMAT( COUNT ) = NINT( DBLE( NMAT( COUNT ) ) * COMFAC )
-                  NMAT( COUNT ) = MAX( 1, NMAT( COUNT ) )
-               END IF
-
+*  Generate the weight; it is the number of matches, perhaps multiplied
+*  by the completeness.  This ought really to be a floating point number,
+*  but for convenience (so it can go in the graph) it is stored as an
+*  integer.
+               WEIGHT( COUNT ) = DBLE( NMAT( COUNT ) )
+               IF ( USECOM ) WEIGHT( COUNT ) = WEIGHT( COUNT ) * COMFAC
             END IF
 
 *  Free resources used for handling overlap information.
@@ -1418,8 +1422,8 @@
 *  Graph is complete -- all nodes connected. Determine the most likely
 *  spanning sub-graph. The most likely one is the graph which is most
 *  strongly connected (largest count of matched pairs).
-         CALL CCD1_MLSPG( %VAL( IPGRA ), NEDGES, TOTNOD, %VAL( IPQUE ),
-     :                    %VAL( IPBEEN ), %VAL( IPSPAN ),
+         CALL CCD1_MLSPG( %VAL( IPGRA ), WEIGHT, NEDGES, TOTNOD, 
+     :                    %VAL( IPQUE ), %VAL( IPBEEN ), %VAL( IPSPAN ),
      :                    %VAL( IPSUB ), NEWED, NNODE, STATUS )
 
 *  Determine the "complete" solution.

@@ -1,5 +1,5 @@
-      SUBROUTINE CCD1_MLSPG( GRAPH, NEDGES, TOTNOD, QUEUE, BEEN, SPAN,
-     :                       SUBGRP, NEWED, NNODE, STATUS )
+      SUBROUTINE CCD1_MLSPG( GRAPH, WEIGHT, NEDGES, TOTNOD, QUEUE, BEEN,
+     :                       SPAN, SUBGRP, NEWED, NNODE, STATUS )
 *+
 *  Name:
 *     CCD1_MLSPG
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_MLSPG( GRAPH, NEDGES, TOTNOD, QUEUE, BEEN, SPAN, SUBGRP,
-*                      NEWED, NNODE, STATUS )
+*     CALL CCD1_MLSPG( GRAPH, WEIGHT, NEDGES, TOTNOD, QUEUE, BEEN, SPAN, 
+*                      SUBGRP, NEWED, NNODE, STATUS )
 
 *  Description:
 *     This routine determines the most likely spanning graph of a
@@ -28,10 +28,13 @@
 *  Arguments:
 *     GRAPH( 4, NEDGES ) = INTEGER (Given and Returned)
 *        The edges of the graph. The node numbers are held in elements
-*        1 and 2 the weights in position 3, original intercomparison
-*        index in position 4. This graph should be complete (i.e. fully
+*        1 and 2 and the original intercomparison index (unique for each
+*        node) in position 4.  This graph should be complete (i.e. fully
 *        connected) on entry. On exit the graph will be sorted into
 *        decreasing weight order.
+*     WEIGHT( NEDGES ) = DOUBLE PRECISION (Given and Returned)
+*        The weights associated with each edge.  On exit this will be
+*        sorted to match the positions in the graph.
 *     NEDGES = INTEGER (Given)
 *        The number of edges in the graph.
 *     TOTNOD = INTEGER (Given)
@@ -61,11 +64,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     11-DEC-1992 (PDRAPER):
 *        Original version.
+*     26-JAN-2001 (MBT):
+*        Modified to allow use of an external weights array.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -87,6 +93,7 @@
       INTEGER GRAPH( 4, NEDGES )
       INTEGER QUEUE( * )
       INTEGER SPAN( 4, * )
+      DOUBLE PRECISION WEIGHT( NEDGES )
 
 *  Arguments Returned:
       INTEGER BEEN( * )
@@ -103,8 +110,9 @@
       INTEGER NAT                ! Offset into graph
       INTEGER NSPAN              ! Offset into new graph
       INTEGER START              ! Starting point for graph tests
-      INTEGER SUM                ! Sum of weights
       INTEGER VAL( 4 )           ! Dummy storage
+      DOUBLE PRECISION SUM       ! Sum of weights
+      DOUBLE PRECISION WT        ! Weight of current edge
       LOGICAL COMPL              ! Graph is Complete flag
       LOGICAL CYCLIC             ! Graph is cyclic flag
 
@@ -119,12 +127,14 @@
          VAL( 2 ) = GRAPH( 2, I )
          VAL( 3 ) = GRAPH( 3, I )
          VAL( 4 ) = GRAPH( 4, I )
+         WT = WEIGHT( I )
          DO 2 J = I - 1, 1, -1
-            IF( VAL( 3 ) .LT. GRAPH( 3, J ) ) GO TO 3
+            IF ( WT .LT. WEIGHT( J ) ) GO TO 3
             GRAPH( 1, J + 1 ) = GRAPH( 1, J )
             GRAPH( 2, J + 1 ) = GRAPH( 2, J )
             GRAPH( 3, J + 1 ) = GRAPH( 3, J )
             GRAPH( 4, J + 1 ) = GRAPH( 4, J )
+            WEIGHT( J + 1 ) = WEIGHT( J )
  2       CONTINUE
          J = 0
  3       CONTINUE
@@ -132,6 +142,7 @@
          GRAPH( 2, J + 1 ) = VAL( 2 )
          GRAPH( 3, J + 1 ) = VAL( 3 )
          GRAPH( 4, J + 1 ) = VAL( 4 )
+         WEIGHT( J + 1 ) = WT
  1    CONTINUE
 
 *  Pick first edge as starting point.
@@ -179,15 +190,26 @@
       CALL CCD1_MSG( ' ', ' ', STATUS )
       SUM = 0
       DO 5 I = 1, NSPAN
+
+*  Find the weight associated with this edge by matching unique
+*  intercomparison index with the input graph.
+         WT = -1D0
+         DO 6 J = 1, NEDGES
+            IF ( SPAN( 4, I ) .EQ. GRAPH( 4, J ) ) THEN
+               WT = WEIGHT( J )
+               GO TO 7
+            END IF
+ 6       CONTINUE
+ 7       CONTINUE
          CALL MSG_SETI( 'S1', SPAN( 1, I ) )
          CALL MSG_SETI( 'S2', SPAN( 2, I ) )
-         CALL MSG_SETI( 'S3', SPAN( 3, I ) )
+         CALL MSG_SETR( 'WT', REAL( WT ) )
          CALL MSG_SETI( 'I', I )
          CALL CCD1_MSG( ' ',
-     :'  Lists ^S1) and ^S2) with weight ^S3', STATUS )
-         SUM = SUM + SPAN( 3, I )
+     :'  Lists ^S1) and ^S2) with weight ^WT', STATUS )
+         SUM = SUM + WT
  5    CONTINUE
-      CALL MSG_SETI( 'SUM', SUM )
+      CALL MSG_SETR( 'SUM', REAL( SUM ) )
       CALL CCD1_MSG( ' ',
      :'    Sum of weights: ^SUM', STATUS )
       END

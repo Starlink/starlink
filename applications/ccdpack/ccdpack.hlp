@@ -4102,7 +4102,7 @@ Description:
    The results from this routine are labelled position lists (one
    for each input list) which may be used to complete image
    registration using the REGISTER routine. The estimated offsets are
-   also reported.
+   reported, but REGISTER should be used to get accurate values.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COMPLETE
