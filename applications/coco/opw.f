@@ -29,4 +29,12 @@
 
       OPEN (LU,FILE=FILE,STATUS='UNKNOWN',IOSTAT=IOS)
 
+C Convex version did the following test for unit=6
+C      IF (LU.EQ.6) THEN
+C         IOS=0
+C      ELSE
+C         OPEN (LU,FILE=FILE,STATUS='UNKNOWN',IOSTAT=IOS)
+C      ENDIF
+
+
       END

@@ -1,5 +1,5 @@
-#!/bin/csh -f
-#
+#!@CSH@ -f
+#  @edited_input@
 #  To invoke the coco utility, type:
 #
 #     coco  [input]  [report]  [output]
@@ -68,7 +68,7 @@
       endif
 
 #  Run the job
-      INSTALL_BIN/coco.x $_tty $_output $_echo $_report $_input $_prompts $_errors
+      @bindir@/cocomain $_tty $_output $_echo $_report $_input $_prompts $_errors
 
 end:
       exit

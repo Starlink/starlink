@@ -1,11 +1,13 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
       SUBROUTINE OPR (LU, FILE, IOS)
 *+
 *  - - - -
 *   O P R
 *  - - - -
 *
-*  !!! Platform-independent version, also suitable for !!!
-*  !!! Sun SPARCstation                                !!!
+*  !!! Autoconfed version !!!
 *
 *  Open an input file, avoiding any platform-specific need for write
 *  access.
@@ -28,6 +30,10 @@
 
 
 
-      OPEN (LU,FILE=FILE,STATUS='OLD',IOSTAT=IOS)
+      OPEN (LU,FILE=FILE,STATUS='OLD',
+#if HAVE_FC_OPEN_READONLY
+     :     READONLY,
+#endif
+     :     IOSTAT=IOS)
 
       END
