@@ -151,4 +151,30 @@ INTERFACE SPRESP
       HELP 'Reduce weights of large pen. depths to allow for events lost behind bars'
    ENDPARAMETER
 
+
+  PARAMETER PERTURB
+    TYPE        '_LOGICAL'
+    DEFAULT     N
+    VPATH       'DEFAULT'
+    PPATH       'DEFAULT'
+    PROMPT      'Perturb psfs before storing them in the file'
+    HELP        'Use this option to investigate the dependence of your results on uncertainties in the psf'
+  ENDPARAMETER
+
+  PARAMETER POPT
+    TYPE        '_INTEGER'
+    DEFAULT     1
+     VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    PROMPT 'Perturbation option (? for list)'
+    HELP '(1) perturb enclosed energy profile, (2) 2-D smooth'
+  ENDPARAMETER
+
+  PARAMETER PFILE
+    TYPE 'LITERAL'
+    VPATH 'PROMPT'
+    PROMPT 'Perturbation file info'
+    HELP 'Contains radial redistribution or 2-D array'
+  ENDPARAMETER
+
 ENDINTERFACE
