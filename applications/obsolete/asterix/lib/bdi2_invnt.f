@@ -94,6 +94,8 @@
 *        Had forgotten to divide ASCALE by two for LoWidth and HiWidth
 *     14 Feb 1997 (RB):
 *        Add code for Axis_n_Bounds
+*     17 Jul 1997 (RB):
+*        Add code for Error
 *     {enter_changes_here}
 
 *  Bugs:
@@ -139,11 +141,14 @@
       INTEGER			I			! Loop variable
       INTEGER			IAX			! Axis number
       INTEGER			PHDU			! Primary HDU id
+      INTEGER			VHDU			! Variance HDU id
       INTEGER			PSID			! Private item storage
       INTEGER			WPTR			! Workspace
       INTEGER			BDIMS(2)		! Axis bounds dimension
       INTEGER			BPTR			! Axis bounds values
       INTEGER			BITID			! Axis bounds item ID
+      INTEGER			NELM			! Number of data elements
+      INTEGER			PTR			! Pointer to copied data
 
       LOGICAL			RMODE			! READ mode?
       LOGICAL			WMODE			! WRITE mode?
@@ -200,11 +205,11 @@
           CALL ADI2_HGKYD( PHDU, 'CDELT'//CAX, PIXW, CMNT, STATUS )
 
           if (cax.eq.'1' .and. pixw.gt.0.0d0 .and. status.eq.0) then
-            print*, '*** Warning: CDELT1 made -ve, trying to correct'
-            pixw = -1.0d0 * pixw
+            print*, '*** Warning: CDELT1 is +ve, trying to correct'
+            pixw = +1.0d0 * pixw
             call adi2_hpkyd( phdu, 'CDELT1', pixw, cmnt, status )
             CALL ADI2_HGKYD( PHDU, 'CDELT1', PIXW, CMNT, STATUS )
-	    print*, 'CDELT1',real(pixw),' ',cmnt(:chr_len(cmnt)),status
+c           print*, 'CDELT1',real(pixw),' ',cmnt(:chr_len(cmnt)),status
           end if
 
 *      Standard keywords there?
@@ -309,6 +314,41 @@
       ELSE IF ( ITEM .EQ. 'Units' ) THEN
         CALL ADI_NEWV0C( ' ', ITID, STATUS )
 
+      ELSE IF ( ITEM .EQ. 'Error' ) THEN
+
+*    Locate variance data from the file
+        CALL BDI2_CFIND( BDID, FITID, 'Variance', (MODE(1:1).EQ.'W'),
+     :                   .FALSE., VHDU, NDIM, DIMS, STATUS )
+
+*    Copy file data to invented object if appropriate
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          CALL ADI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
+          CALL ADI2_DMAP( BDID, FITID, VHDU, TYPE, MODE, NDIM, DIMS,
+     :                    PSID, PTR, NELM, STATUS )
+
+*      Create and map the new identifier
+          CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
+          CALL ADI_MAP( ITID, TYPE, 'WRITE', WPTR, STATUS )
+
+*      Convert to error
+          IF ( TYPE .EQ. 'REAL' ) THEN
+            CALL BDI2_INVNT_V2ER( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+          ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
+            CALL BDI2_INVNT_V2ED( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+          ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
+            CALL BDI2_INVNT_V2EI( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+          ELSE
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'T', TYPE )
+            CALL ERR_REP( ' ', 'Error converting variance to error '/
+     :                    /'for type ^T', STATUS )
+          END IF
+
+*      Unmap the error data
+          CALL ADI_ERASE( VHDU, STATUS )
+          CALL ADI_UNMAP( ITID, WPTR, STATUS )
+
+        END IF
       ELSE
 
 *    Report error
@@ -323,7 +363,7 @@
 *    Report error
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'IT', ITEM )
-        CALL ERR_REP( 'BDI2_INVNT_1', 'Don''t know how to invent '/
+        CALL ERR_REP( 'BDI2_INVNT', 'Don''t know how to invent '/
      :                /'data for Item ^IT', STATUS )
 
       END IF
@@ -1036,6 +1076,123 @@
           ERR(I) = SQRT( VAR(I) )
         ELSE
           ERR(I) = 0.0D0
+        END IF
+      END DO
+
+      END
+
+
+
+      SUBROUTINE BDI2_INVNT_V2EI( NVAL, VAR, ERR, STATUS )
+*+
+*  Name:
+*     BDI2_INVNT_V2EI
+
+*  Purpose:
+*     Invent errors from INTEGER variances
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI2_INVNT_V2EI( NVAL, VAR, ERR, STATUS )
+
+*  Description:
+
+*  Arguments:
+*     NVAL = INTEGER (given)
+*        Number of axis widths to invent
+*     VAR(*) = INTEGER (given)
+*        Variance values
+*     ERR(*) = INTEGER (returned)
+*        Error values
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1997
+
+*  Authors:
+*     RB: Richard Beard (ROSAT, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*    18 Jul 1997 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   NVAL
+      INTEGER			VAR(*)
+
+*  Arguments Returned:
+      INTEGER			ERR(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert values to half-widths
+      DO I = 1, NVAL
+        IF ( VAR(I) .GT. 0 ) THEN
+          ERR(I) = NINT( SQRT( REAL( VAR(I) ) ) )
+        ELSE
+          ERR(I) = 0
         END IF
       END DO
 
