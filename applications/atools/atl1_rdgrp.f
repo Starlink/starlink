@@ -53,26 +53,11 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Global Variables.
-      INTEGER IGRPC
-      INTEGER NEXT
-      INTEGER SIZE
-      COMMON /ATL1SRC/ IGRPC, NEXT, SIZE
-
-*  External References:
-      EXTERNAL ATL1_SRC1
-      EXTERNAL ATL1_SRC2
-
-*  Local Constants:
-      INTEGER NCHAN
-      PARAMETER ( NCHAN = 2 )
 
 *  Local Variables:
       CHARACTER TEXT*(GRP__SZNAM)
-      INTEGER CH( NCHAN )
-      INTEGER CHAN
-      INTEGER FCHAN
       INTEGER I
+      INTEGER SIZE
       LOGICAL DUMP
 *.
 
@@ -100,44 +85,28 @@
       END DO
  10   CONTINUE
 
-*  We now create channels through which to read the Objects stored in the
-*  group. 
-       CHAN = AST_CHANNEL( ATL1_SRC1, AST_NULL, ' ', STATUS ) 
-       FCHAN = AST_FITSCHAN( ATL1_SRC2, AST_NULL, ' ', STATUS ) 
-
-*  We use the least likely one first, so that he errors from the
-*  most likely one are reported to the user at the end.
-      IF( DUMP ) THEN
-         CH( 1 ) = FCHAN
-         CH( 2 ) = CHAN
-      ELSE
-         CH( 1 ) = CHAN
-         CH( 2 ) = FCHAN
-      END IF
-
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Loop round each channel.
-      DO I = 1, NCHAN
+*  If the file probably contains a dump of an AST object, try to read it
+*  first as a set of FITS headers, then as a object dump. This means 
+*  that any errors produced while reading it as an object dump will be
+*  reported to the user.
+      IF( DUMP ) THEN
+         CALL ATL1_RDFCH( IGRP, IAST, STATUS )
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL1_RDCH( IGRP, IAST, STATUS )
+         
+*  If the file probably contains FITS headers, try to read it
+*  first as an Object dump, then as a set of FITS headers. This means 
+*  that any errors produced while reading it as a FITS file will be
+*  reported to the user.
+      ELSE
+         CALL ATL1_RDCH( IGRP, IAST, STATUS )
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IF( IAST .EQ. AST__NULL ) CALL ATL1_RDFCH( IGRP, IAST, STATUS )
 
-*  Reset the group.
-         NEXT = 1
-
-*  Attempt to read an object from the current channel.
-         IAST = AST_READ( CH( I ), STATUS )
-
-*  If no error occurred, leave the loop.
-         IF( STATUS .EQ. SAI__OK ) THEN 
-            GO TO 999
-
-*  Otherwise, if any channels remain to be tried, annul the error.
-         ELSE IF( I .NE. NCHAN ) THEN
-            CALL AST_ANNUL( IAST, STATUS )
-            CALL ERR_ANNUL( STATUS )
-         END IF
-
-      END DO
+      END IF
 
 *  Arrive here when finished.
  999  CONTINUE
@@ -149,85 +118,5 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
-
-      END
-
-
-      SUBROUTINE ATL1_SRC1( STATUS )
-*+
-*  A source function for use with a standard AST Channel.
-*-
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'GRP_PAR'
-      
-*  Arguments:
-      INTEGER STATUS
-
-*  Global Variables.
-      INTEGER IGRPC
-      INTEGER NEXT
-      INTEGER SIZE
-      COMMON /ATL1SRC/ IGRPC, NEXT, SIZE
-
-*  External References:
-      INTEGER CHR_LEN
-
-*  Local Variables:
-      CHARACTER BUF*(GRP__SZNAM)
-
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  If there are no more lements in the group, return a length of -1.
-      IF( NEXT .GT. SIZE ) THEN
-         CALL AST_PUTLINE( ' ', -1, STATUS )
-
-*  Otherwise, get the element from the group, store it in the channel,
-*  and increment the index of the next element to be read from the group.
-      ELSE
-         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS ) 
-         CALL AST_PUTLINE( BUF, CHR_LEN( BUF ), STATUS )
-         NEXT = NEXT + 1
-      END IF
-
-      END
-
-
-      INTEGER FUNCTION ATL1_SRC2( BUF, STATUS )
-*+
-*  A source function for use with an AST FitsChan.
-*-
-      INCLUDE 'SAE_PAR'
-      
-*  Arguments:
-      CHARACTER BUF*(*)
-      INTEGER STATUS
-
-*  Global Variables.
-      INTEGER IGRPC
-      INTEGER NEXT
-      INTEGER SIZE
-      COMMON /ATL1SRC/ IGRPC, NEXT, SIZE
-
-*  Initialise things to indicate "no more headers".
-      BUF = ' '
-      ATL1_SRC2 = 0
-
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  If any elements remain to be read, get the next element from the group,
-*  and increment the index of the next element to be read from the group. 
-*  If this is not the last element in the group, return a function value of 
-*  one.
-      IF( NEXT .LE. SIZE ) THEN 
-         CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS ) 
-
-         IF( NEXT .LT. SIZE ) THEN
-            NEXT = NEXT + 1
-            ATL1_SRC2 = 1
-         END IF
-
-      END IF
 
       END

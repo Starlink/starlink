@@ -87,6 +87,11 @@
 *  Create a new group. 
       CALL GRP_NEW( ' ', IGRP, STATUS )
 
+*  Switch off all control characters so that nothing gets interpreted by
+*  GRP.
+      CALL GRP_SETCC( IGRP, 'COM,DEL,NAM,SEP,OPEN_N,CLOSE_N,FL,'//
+     :                'OPEN_K,CLOSE_K', '%%%%%%%%%', STATUS ) 
+
 *  Read the file into the group.
       CALL GRP_GRPEX( GRPEXP( : IAT ), GRP__NOID, IGRP, SIZE, ADDED,
      :                FLAG, STATUS )     
