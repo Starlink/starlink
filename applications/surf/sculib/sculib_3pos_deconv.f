@@ -69,6 +69,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                        ! for VAL__BADI
+      INCLUDE 'MSG_PAR'                        ! MSG__ constants
 *    Import :
       INTEGER N_EXPOSURES
       INTEGER N_INTEGRATIONS
