@@ -295,7 +295,7 @@
       INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
-      CHARACTER*80
+      CHARACTER*80 TEXT
       REAL XC,YC,IRAD,ORAD
       INTEGER L
 *-
