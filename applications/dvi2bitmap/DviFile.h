@@ -36,13 +36,6 @@
 #include <list>
 #include <map>
 
-#ifdef HAVE_STD_NAMESPACE
-#define STD std
-#else
-#define STD
-#endif
-
-
 #include <Byte.h>
 #include <DviError.h>
 #include <FileByteStream.h>

@@ -27,15 +27,11 @@
 #ifndef UTIL_HEADER_READ
 #define UTIL_HEADER_READ 1
 
+#include <config.h>
+
 //#include <vector>
 #include <list>
 #include <string>
-
-#ifdef HAVE_STD_NAMESPACE
-#define STD std
-#else
-#define STD
-#endif
 
 #include "DviError.h"
 #include "Bitmap.h"

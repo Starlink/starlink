@@ -27,22 +27,14 @@
 #include <config.h>
 
 #ifdef HAVE_CSTD_INCLUDE
-//#include <cstdlib>
 #include <cstdio>
 #include <cstdarg>
 #else
-//#include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #endif
 #include <string>
 #include <iostream>
-
-#ifdef HAVE_STD_NAMESPACE
-#define STD std
-#else
-#define STD
-#endif
 
 #include "DviError.h"
 

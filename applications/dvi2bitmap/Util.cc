@@ -41,16 +41,13 @@
 #include <unistd.h>		// this is standard according to single-unix, 
 				// how POSIXy is that?  How C++?
 #include <sys/wait.h>
-#include <map>
+//#include <map>
 
 #ifdef HAVE_STD_NAMESPACE
 using std::ostream;
 using std::ends;
 using std::endl;
 using std::cerr;
-#define STD std
-#else
-#define STD
 #endif
 
 #include "Util.h"

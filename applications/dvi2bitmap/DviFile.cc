@@ -25,12 +25,11 @@
 //    $Id$
 
 
-#define NULL 0
+#include <config.h>
+
 #include <iostream>
 #include <assert.h>
 #include <string>
-
-#include <config.h>
 
 #include <unistd.h>		// for STDIN_FILENO
 #ifdef HAVE_FCNTL_H
@@ -46,9 +45,6 @@
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::endl;
-#define STD std
-#else
-#define STD
 #endif
 
 #include <DviFile.h>

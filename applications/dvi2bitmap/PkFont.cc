@@ -49,9 +49,6 @@ using std::endl;
 using std::ends;
 using std::ofstream;
 using std::ios;
-#define STD std
-#else
-#define STD 
 #endif
 
 #include <DviError.h>
