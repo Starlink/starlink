@@ -1,0 +1,80 @@
+Installing SURF
+
+SURF is distributed in binary form using a Starlink distribution makefile.
+It can be installed using the following steps:
+
+    1.Download the relevant distribution from the ftp site. 
+
+    2.Create a directory (usually in the /star tree but it doesn't matter
+      where it goes) and unpack the archive into
+      this directory. Note that you will need about 5Mb of disk space for SURF. 
+
+       % cd /star
+       % mkdir surf
+       % cd surf
+
+       % tar zxvf surf_latest_<SYSTEM>.tar.gz  (if you are using Gnu tar)
+         or
+       %  zcat surf_latest_<SYSTEM>.tar.Z | tar xvf - (using a standard tar)
+
+      where <SYSTEM> is one of sun4_Solaris, alpha_OSF1 or ix86_Linux. 
+
+    3.Set the environment variable SYSTEM to the system you are using 
+
+       % setenv SYSTEM sun4_Solaris   (for Sun Solaris 2.5 for Sparc)
+       % setenv SYSTEM alpha_OSF1     (for Alpha Digital Unix 4.0)
+       % setenv SYSTEM ix86_Linux     (for Intel Linux (ELF format))
+
+    4.Set the INSTALL environment variable to correspond to the location
+      in which the software should be
+      installed (this is the directory in which the bin, docs, help and
+      dates directories are created. Usually this is /star: 
+
+       % setenv INSTALL /star
+
+      $INSTALL defaults to the users home directory if it is left unset. 
+
+    5.Install the built software (make sure that you have deinstalled
+       ('./mk deinstall') earlier versions of SURF first):
+
+       % ./mk install
+
+      This will install the monolith into $INSTALL/bin the help library
+into $INSTALL/help and the documentation into $INSTALL/docs. The final
+part of the installation may fail if you are not on a Starlink system
+(since the hlink package will not be available to cross-reference the
+hypertext documentation) but this is okay. The documentation can be found
+as latex (in $INSTALL/docs/sun216.tex and HTML
+$INSTALL/docs/sun216.htx/sun216.html. 
+
+    6. Once the system is installed it is now necessary to setup the
+environment for use. Usually this is performed during the Starlink
+software initialisation in /star/etc/login and /star/etc/cshrc but the
+entries can be placed in a system wide initialisation file or in the
+individual users .cshrc and .login just as easily.
+
+      The .login file (ie user .login, system login or Starlink login)
+must contain:
+
+       if (-e $install/bin/surf/surf.csh) then
+         setenv SURF_DIR $install/bin/surf
+         setenv SURF_HELP $install/help/surf/surf
+       endif
+
+      and the .cshrc file must contain: 
+
+      if ( -e $install/bin/surf/surf.csh ) then
+        alias surf source $install/bin/surf/surf.csh
+      else
+        alias surf echo SURF is not available
+      endif
+
+      Where $install is the root directory used for the installation (ie
+put the value of $INSTALL into the file and not $install.) 
+
+    7.If necessary the NDFPERL module should also be installed.
+
+      This is available separately from the Starlink software store.
+      (SUN/222)
+
+

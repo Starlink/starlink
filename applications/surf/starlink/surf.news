@@ -1,0 +1,68 @@
+1 SURF - SCUBA User Reduction Facility
+                                                     Expires: 98.**.**
+
+  This is the fourth public release of SURF (v1.3). It will be 
+  distributed on the Spring 1999 Starlink CD-ROM.
+
+  The SCUBA User Reduction Facility (SURF) is a collection of applications
+  for use in reducing mapping and photometry data from the Submillimetre
+  Common-User Bolometer Array (SCUBA) at the James Clerk Maxwell Telescope.
+
+  Support is provided for the following SCUBA observing modes:
+
+    o JIGGLE/MAP (including map version of POINTING, FOCUS and ALIGN)
+    o PHOTOM
+    o SKYDIP
+    o SCAN/MAP
+    o NOISE
+
+  ***
+  ***  In order to obtain the full functionality described in SUN/216 it 
+  ***  is also necessary to install NDFPERL. NDFPERL is available
+  ***  from Starlink and is present on the Starlink CD (SUN/222)
+  ***  Alternatively NDFPERL can be obtained from the 
+  ***  JCMT Software WWW page ((http://www.jach.hawaii.edu/jcmt_sw/scuba).
+  ***
+
+  More information can be found in document SUN/216 (use `findme surf'
+  or `showme sun216' on a Starlink system), or on the JCMT software WWW
+  pages (http://www.jach.hawaii.edu/jcmt_sw/scuba).
+
+  A mailing list now exists for discussing SCUBA data reduction techniques.
+  The list is at scubadr@jach.hawaii.edu.
+  To subscribe please send a message to majordomo@jach.hawaii.edu with
+  an empty subject and containing the message 'subscribe scubadr <your email>'
+
+  **
+  **  SCUNOISE requires perl/Tk version 800.001 or higher. Available
+  **  from CPAN (http://www.perl.org/CPAN/)
+  ** 
+
+2 Changes in version 1.3
+
+  This release is only a minor upgrade to SURF.
+  The changes can be grouped into three categories:
+ 
+New_Tasks
+
+  - Demodulated noise data can now be reduced with REDUCE_NOISE 
+ 
+Changes_to_existing_tasks
+ 
+  - REBIN now writes an AST extension to output files. This means
+    that it is no longer necessary to delete a .AXIS extension
+    before converting to FITS.
+
+  - REBIN can now combine up to 256 files
+
+  - The Guard ring is now optional in rebin (it was removed in v1.2)
+
+  - SCUNOISE can accept data files written by REDUCE_NOISE
+
+  - REMDBM output contains AXIS information
+ 
+Comments
+
+  - SURF is compatible with KAPPA v0.13
+
+
