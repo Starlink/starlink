@@ -39,8 +39,8 @@ public:
                double bscale, const Mem& header, const Mem& data,
                fitsfile *fitsio);
     
-    // Destructor
-    ~StarFitsIO() {};
+    //  Destructor
+    ~StarFitsIO();
     
     // Return the class name as a string
     const char* classname() const {return "StarFitsIO";}
@@ -86,6 +86,11 @@ protected:
 
     // Whether a header merge is needed, given the current settings.
     int mergeNeeded();
+
+    // CNF registered pointers.
+    void *cnfHeaderPtr_;
+    void *cnfDataPtr_;
+
 };
 
 #endif _StarFitsIO_h_
