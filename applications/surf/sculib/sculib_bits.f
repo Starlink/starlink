@@ -9,6 +9,11 @@
 *     T. Jenness (timj@jach.hawaii.edu)
 *    History:
 *     $Log$
+*     Revision 1.5  1997/05/30 18:31:50  timj
+*     Use generic BYTE functions (IBSET instead of IIBSET etc).
+*     Use NUM_ functions to convert BITNUM to BYTE (easier than changing
+*     all the calls)
+*
 *     Revision 1.4  1997/05/29 20:50:17  timj
 *     Remove SCULIB_BTOI (use NUM_UBTOI instead)
 *
@@ -50,7 +55,10 @@ c
 *    Local variables :
 *-
 
-      SCULIB_BITON = IIBSET(IZEXT(VAL), BIT)
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+
+      SCULIB_BITON = IBSET(VAL, NUM_ITOUB(BIT))
 
       END
 
@@ -79,8 +87,10 @@ c
 *    Local Constants :
 *    Local variables :
 *-
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
 
-      SCULIB_BITOFF = IIBCLR(IZEXT(VAL), BIT)
+      SCULIB_BITOFF = IBCLR(VAL, NUM_ITOUB(BIT))
 
       END
 
@@ -109,7 +119,7 @@ c
 *    Local variables :
 *-
 
-      SCULIB_BITOR = IIOR(IZEXT(VAL1), IZEXT(VAL2))
+      SCULIB_BITOR = IOR(VAL1, VAL2)
 
       END
 
@@ -138,6 +148,6 @@ c
 *    Local variables :
 *-
 
-      SCULIB_BITAND = IIAND(IZEXT(VAL1), IZEXT(VAL2))
+      SCULIB_BITAND = IAND(VAL1, VAL2)
 
       END
