@@ -186,6 +186,8 @@ c     RECORD /MODEL_SPEC/	MODEL
 	CALL MSG_BLNK()
       END IF
 
+      CALL FLUSH(6)
+
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FIT_PRGRS', STATUS )
 
