@@ -75,9 +75,13 @@ SUFFIXES+=.tex .dvi .ps .htx_tar
 # .PRECIOUS, but that's not completely straightforward to arrange.
 # Requires that the STAR2HTML substitution was made in
 # configure.ac, probably implicitly by the STAR_LATEX_DOCUMENTATION macro.
-.tex.htx_tar:
-	- @STAR2HTML@ $<
-	tar cf $@ ${<:.tex=.htx}
+#
+# We do not require that star2html be available on the build system,
+# and so we distribute built HTX documentation.  Thus the following rules
+# should be active only in the predist state.
+@PREDIST@.tex.htx_tar:
+@PREDIST@	- @STAR2HTML@ $<
+@PREDIST@	tar cf $@ ${<:.tex=.htx}
 endif %?LATEXDOCS%
 
 if %?COMPIFL%
