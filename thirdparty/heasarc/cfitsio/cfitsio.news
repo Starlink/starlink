@@ -1,7 +1,6 @@
 1 CFITSIO - C FITS I/O functions - update
-                                                   Expires: 2003.05.29
 
- The CFITSIO function library v2.4.40b is now available.
+ The CFITSIO function library v2.4.90 is now available.
 
  CFITSIO provides a C interface for reading and writing FITS files and 
  conforms to the Y2K FITS standards.  There is also a FORTRAN `wrapper'
