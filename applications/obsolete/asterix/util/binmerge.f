@@ -41,6 +41,8 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *      7 Feb 95 : V1.8-1 Various bugs fixed (DJA)
 *      5 Sep 95 : V1.8-2 Partial ADI port (DJA)
+*     16 Jan 1996 V2.0-0 (DJA):
+*        Full ADI port
 *
 *    Type Definitions :
 *
@@ -57,6 +59,7 @@
       INTEGER STATUS
 *    External references :
       INTEGER CHR_LEN
+      LOGICAL CHR_SIMLR
 *    Global variables :
       INTEGER                MXINP             ! maximum number of input datasets
          PARAMETER          (MXINP = 10)
@@ -66,7 +69,6 @@
       CHARACTER              		C               ! character value
       CHARACTER*(PAR__SZNAM)	PARNAM            	! Parameter name
       CHARACTER*1            LAST              ! number of axis to be merged
-      CHARACTER*80           TEXT(4*MXINP+2)   ! History text
       CHARACTER*80           LABEL             ! An axis label
       CHARACTER*80           LABEL1(ADI__MXDIM)! Axis labels for first dataset
       CHARACTER*80           UNITS(ADI__MXDIM,MXINP)    ! Axis units
@@ -74,7 +76,6 @@
 
       DOUBLE PRECISION       AXIS_DEC(MXINP)   ! AXIS_DEC of datasets
       DOUBLE PRECISION       AXIS_RA(MXINP)    ! AXIS_RA of datasets
-      DOUBLE PRECISION       BASE_TAI(MXINP)   ! BASE_TAI of datasets
       DOUBLE PRECISION       C1,C2,C3,C4,C5,C6 ! Used in transforming between axes
       DOUBLE PRECISION       F_DEC             ! Field_Dec of current dataset
       DOUBLE PRECISION       F_DEC1            ! Field_Dec of first dataset
@@ -82,6 +83,7 @@
       DOUBLE PRECISION       F_RA1             ! Field_RA of first dataset
       DOUBLE PRECISION       	PA(MXINP) 		! PA of datasets
       DOUBLE PRECISION		SPOINT(2)		! Pointing direction
+      DOUBLE PRECISION		TOFFS(MXINP)		! Timing offsets
 
       REAL                   ADD               ! Add to timetag of current dataset
       REAL                   YMIN              ! Minimium Y axis value
@@ -94,7 +96,7 @@
       INTEGER                IAXPTR            ! pointer to input AXISn_DATA
       INTEGER                IDPTR             ! pointer to input DATA_ARRAY
       INTEGER			IFID(MXINP)		! Input dataset ids
-      INTEGER                ILDIMS(ADI__MXDIM)! dimensions of input  dataset component.
+      INTEGER			IFILES			! Input file info
       INTEGER                INAXW             ! pointer to input AXIS(n) WIDTH
       INTEGER                INP, AX ,I        ! loop counters
       INTEGER                IQPTR             ! pointer to input QUALITY
@@ -102,7 +104,6 @@
       INTEGER                LENGTH            ! Of character strings
       INTEGER                NDIMS             ! # of dimensions of a dataset DATA_ARRAY
       INTEGER                NDIMS1            ! # of dimensions of dataset 1 DATA_ARRAY
-      INTEGER                NLINES            ! Number of history TEXT lines
       INTEGER                NPTS              ! Number of points in output dataset
       INTEGER			PRJID(MXINP)		! WCS projection data
       INTEGER			PIXID(MXINP)		! WCS pixel data
@@ -117,6 +118,8 @@
       INTEGER                SIZ               ! Dummy variable
       INTEGER                IVPTR             ! pointer to input VARIANCE
       INTEGER                OVPTR            ! pointer to output VARIANCE
+      INTEGER			OTIMID			! O/p timing data
+      INTEGER			TBASE			! Time reference
       INTEGER			TIMID(MXINP)		! Timing data
       INTEGER			X_AX, Y_AX, T_AX	! Axis numbers
       INTEGER                	XAXPTR            	! X axis data
@@ -131,137 +134,153 @@
       LOGICAL                	INPUT             	! Loops over input
       LOGICAL                	OK                	! Data item acceptable
       LOGICAL                	QUAL              	! Data quality present
-      LOGICAL                	REG               	! Regular axis data
-      LOGICAL			TO_SAME			! Assume T origin same?
       LOGICAL                	VAROK             	! Data errors present?
 *
 *    Version id :
 *
       CHARACTER*24           VERSION
-         PARAMETER          (VERSION = 'BINMERGE version 1.8-2' )
+         PARAMETER          (VERSION = 'BINMERGE version 2.0-0' )
 *-
 
 *    Version announcement
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
-      CALL AST_INIT
-      CALL ARR_INIT1I( 1, ADI__MXDIM*MXINP, LDIMS, STATUS )
+*  Initialise
+      CALL AST_INIT()
 
+      CALL ARR_INIT1I( 1, ADI__MXDIM*MXINP, LDIMS, STATUS )
       DO I = 1, ADI__MXDIM
         AXOFF(I)  = 0
         OFFSET(I) = 0
         OLDIMS(I) = 1
       END DO
+      AXISOK = .TRUE.
 
-*    Get first input file
-      CALL USI_TASSOCI( 'INP1', '*', 'READ', IFID(1), STATUS )
+*  Get first input file
+      CALL USI_ASSOC( 'INP1', 'BinDS|Array', 'READ', IFID(1), STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      CALL BDI_CHKDATA( IFID(1), OK, NDIMS1, LDIMS(1,1), STATUS)
+*  Check its data
+      CALL BDI_CHK( IFID(1), 'Data', OK, STATUS)
+      IF ( .NOT. OK ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FATAL ERROR: Invalid dataset - '/
+     :                /'Bad data', STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      IF (OK) THEN
-        CALL CHR_ITOC (NDIMS1, LAST, LENGTH)
+*  Get its dimensions
+      CALL BDI_GETSHP( IFID(1), ADI__MXDIM, LDIMS(1,1), NDIMS1, STATUS)
+      CALL CHR_ITOC (NDIMS1, LAST, LENGTH)
 
-        DO AX = 1, NDIMS1
-          CALL BDI_CHKAXVAL( IFID(1), AX, AXISOK, REG, SIZ, STATUS )
-          CALL BDI_GETAXLABEL( IFID(1), AX, LABEL1(AX), STATUS )
-          CALL CHR_UCASE( LABEL1(AX) )
+*  Check out the axes
+      DO AX = 1, NDIMS1
 
-          IF (CHR_LEN(LABEL1(AX)) .EQ. 0) THEN
-            CHKLABEL(AX) = .FALSE.
-            CALL MSG_SETI ('AX', AX)
-            CALL MSG_PRNT ('WARNING: Axis ^AX has no LABEL - '//
+*    Data ok?
+        CALL BDI_AXCHK( IFID(1), AX, 'Data', OK, STATUS )
+        AXISOK = (AXISOK.AND.OK)
+
+*    Get label
+        CALL BDI_AXGET0C( IFID(1), AX, 'Label', LABEL1(AX), STATUS )
+        IF ( LABEL1(AX) .LE. ' ' ) THEN
+          CHKLABEL(AX) = .FALSE.
+          CALL MSG_SETI ('AX', AX)
+          CALL MSG_PRNT ('WARNING: Axis ^AX has no LABEL - '//
      :                             'Unable to check for consistency')
-
-          ELSE
-            CHKLABEL(AX) = .TRUE.
-
-          END IF
-          CALL BDI_GETAXUNITS( IFID(1), AX, UNITS(AX,1), STATUS )
-          CALL CHR_UCASE( UNITS(AX,1) )
-
-          IF (CHR_LEN(UNITS(AX,1)) .EQ. 0) THEN
-            CHKUNITS(AX) = .FALSE.
-            CALL MSG_SETI ('AX', AX)
-            CALL MSG_PRNT ('WARNING: Axis ^AX has no UNITS')
-
-          ELSE
-            CHKUNITS(AX) = .TRUE.
-
-          END IF
-        END DO
-
-        IF (AXISOK) THEN
-          CALL AXIS_TFINDXYT( IFID(1), NDIMS1, X_AX, Y_AX, T_AX,
-     :                        STATUS )
-
         ELSE
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'FATAL ERROR: Invalid dataset - '/
-     :                  /'Bad axis data', STATUS )
-
+          CHKLABEL(AX) = .TRUE.
         END IF
 
-*    Get world coordinates & timing
-        CALL WCI_GETIDS( IFID(1), PIXID(1), PRJID(1), SYSID(1), STATUS )
-        CALL TCI_GETID( IFID(1), TIMID(1), STATUS )
-
-*    Extract pointing
-        IF ( PRJID(1) .NE. ADI__NULLID ) THEN
-          CALL ADI_CGET1D( PRJID(1), 'SPOINT', 2, SPOINT, SIZ, STATUS )
-          AXIS_RA(1) = SPOINT(1)
-          AXIS_DEC(1) = SPOINT(2)
-        END IF
-        IF ( PIXID(1) .NE. ADI__NULLID ) THEN
-          CALL ADI_CGET0D( PIXID(1), 'ROTATION', PA(1), STATUS )
+*    Get units
+        CALL BDI_AXGET0C( IFID(1), AX, 'Units', UNITS(AX,1), STATUS )
+        CALL CHR_UCASE( UNITS(AX,1) )
+        IF ( UNITS(AX,1) .LE. ' ' ) THEN
+          CHKUNITS(AX) = .FALSE.
+          CALL MSG_SETI ('AX', AX)
+          CALL MSG_PRNT ('WARNING: Axis ^AX has no UNITS')
         ELSE
-          PA(1) = 0D0
+          CHKUNITS(AX) = .TRUE.
         END IF
+      END DO
 
-*    Get equinox of dataset
-        CALL ADI_CGET0I( SYSID(1), EQUINOX1, STATUS )
+*  If all axes ok, look for important ones
+      IF ( AXISOK ) THEN
 
-*    Extract time origin
-        CALL ADI_CGET0D( TIMID(1), 'TAIObs', BASE_TAI(1), STATUS )
-        IF ( STATUS .EQ. SAI__OK ) THEN
-          TO_SAME = .TRUE.
-        ELSE
-          TO_SAME = .FALSE.
+*    Look for X, Y and time axes
+        CALL BDI0_FNDAXC( IFID(1), 'X', X_AX, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          CALL MSG_PRNT( 'No time origin in header, datasets '/
-     :                      /'assumed to have same origin...' )
-          BASE_TAI(1) = 0.0D0
+          X_AX = 0
+        END IF
+        CALL BDI0_FNDAXC( IFID(1), 'Y', Y_AX, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          Y_AX = 0
+        END IF
+        CALL BDI0_FNDAXC( IFID(1), 'T', T_AX, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          Y_AX = 0
         END IF
 
       ELSE
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'FATAL ERROR: Invalid dataset - '/
-     :                /'Bad data', STATUS )
+     :                  /'Bad axis data', STATUS )
 
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check status
+*  Get world coordinates & timing
+      CALL WCI_GETIDS( IFID(1), PIXID(1), PRJID(1), SYSID(1), STATUS )
+      CALL TCI_GETID( IFID(1), TIMID(1), STATUS )
+
+*  Extract pointing
+      IF ( PRJID(1) .NE. ADI__NULLID ) THEN
+        CALL ADI_CGET1D( PRJID(1), 'SPOINT', 2, SPOINT, SIZ, STATUS )
+        AXIS_RA(1) = SPOINT(1)
+        AXIS_DEC(1) = SPOINT(2)
+      ELSE
+        AXIS_RA(1) = 0D0
+        AXIS_DEC(1) = 0D0
+      END IF
+      IF ( PIXID(1) .NE. ADI__NULLID ) THEN
+        CALL ADI_CGET0D( PIXID(1), 'ROTATION', PA(1), STATUS )
+      ELSE
+        PA(1) = 0D0
+      END IF
+
+*  Get equinox of dataset
+      CALL ADI_CGET0I( SYSID(1), EQUINOX1, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Obtain list of input datasets
+*  Obtain other inputs
       DSETS  = 2
       INPUT  = .TRUE.
-
       DO WHILE (INPUT)
+
 *      Deduce parameter name and associate with dataset.
         CALL CHR_ITOC (DSETS, C, LENGTH)
         PARNAM = 'INP'//C(1:LENGTH)
-        CALL USI_TASSOCI( PARNAM, '*', 'READ', IFID(DSETS), STATUS )
+        CALL USI_ASSOC( PARNAM, 'BinDS|Array', 'READ',
+     :                   IFID(DSETS), STATUS )
 
-        IF (STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT) THEN
-*	 End of input
+*    Null denotes end of input
+        IF ( STATUS .EQ. PAR__NULL ) THEN
           CALL ERR_ANNUL (STATUS)
           INPUT  = .FALSE.
 
+*    Abort for other bad status
+        ELSE IF ( STATUS .NE. SAI__OK ) THEN
+          GOTO 99
+
+*    Otherwise process the file
         ELSE
-          CALL BDI_CHKDATA( IFID(DSETS), OK, NDIMS, LDIMS(1,DSETS),
-     :                                                     STATUS )
+
+*      Check it out
+          CALL BDI_CHK( IFID(DSETS), 'Data', OK, STATUS )
+          CALL BDI_GETSHP( IFID(DSETS), ADI__MXDIM, LDIMS(1,DSETS),
+     :                     NDIMS, STATUS )
 
           IF (OK .AND. NDIMS .EQ. NDIMS1) THEN
             AX = 0
@@ -269,14 +288,13 @@
             DO WHILE (OK .AND. AX .LT. NDIMS1)
               AX = AX + 1
 
+*          Still checking axis AX units?
               IF (CHKUNITS(AX)) THEN
-                CALL BDI_GETAXUNITS( IFID(DSETS), AX, UNITS(AX,DSETS),
-     :                                                        STATUS )
-                CALL CHR_UCASE( UNITS(AX,DSETS) )
+                CALL BDI_AXGET0C( IFID(DSETS), AX, 'Units',
+     :                            UNITS(AX,DSETS), STATUS )
                 UNITS(AX,DSETS)=TESTUN
                 UNITS(AX,1)=TESTUN1
-                IF (TESTUN(1:CHR_LEN(TESTUN)) .NE.
-     :                           TESTUN1(1:CHR_LEN(TESTUN1))) THEN
+                IF ( .NOT. CHR_SIMLR( TESTUN, TESTUN1 ) ) THEN
                   CALL MSG_PRNT ('WARNING: Axis units mismatch - '//
      :                                         'OUTPUT MAY BE GARBAGE!')
 
@@ -288,12 +306,14 @@
 
               END IF
 
+*          Still checking axis AX labels?
               IF (CHKLABEL(AX)) THEN
-                CALL BDI_GETAXLABEL( IFID(DSETS), AX, LABEL, STATUS )
-                CALL CHR_UCASE( LABEL )
 
-                IF (LABEL(1:CHR_LEN(LABEL)) .NE.
-     :                           LABEL1(AX)(1:CHR_LEN(LABEL1(AX)))) THEN
+*            Get this datasets axis label
+                CALL BDI_AXGET0C( IFID(DSETS), AX, 'Label', LABEL,
+     :                            STATUS )
+
+                IF ( .NOT. CHR_SIMLR( LABEL, LABEL1(AX) ) ) THEN
                   CALL MSG_PRNT ('WARNING: Axis label mismatch - '//
      :                                         'OUTPUT MAY BE GARBAGE!')
 
@@ -316,6 +336,9 @@
      :                         SIZ, STATUS )
               AXIS_RA(DSETS) = SPOINT(1)
               AXIS_DEC(DSETS) = SPOINT(2)
+            ELSE
+              AXIS_RA(DSETS) = 0D0
+              AXIS_DEC(DSETS) = 0D0
             END IF
             IF ( PIXID(DSETS) .NE. ADI__NULLID ) THEN
               CALL ADI_CGET0D( PIXID(DSETS), 'ROTATION',
@@ -327,16 +350,7 @@
 *        Get equinox of dataset
             CALL ADI_CGET0I( SYSID(DSETS), EQUINOX, STATUS )
 
-            IF ( EQUINOX .EQ. EQUINOX1 ) THEN
-
-              IF ( TO_SAME ) THEN
-                BASE_TAI(DSETS) = BASE_TAI(1)
-              ELSE
-                CALL ADI_CGET0D( TIMID(DSETS), 'TAIObs',
-     :                           BASE_TAI(DSETS), STATUS )
-              END IF
-
-            ELSE
+            IF ( EQUINOX .NE. EQUINOX1 ) THEN
               CALL MSG_PRNT
      :                 ('ERROR: Datasets have different EQUINOX values')
               OK = .FALSE.
@@ -365,36 +379,20 @@
 
           END IF
 
-          IF (INPUT .AND. (STATUS .NE. SAI__OK .OR. .NOT. OK)) THEN
-            STATUS = SAI__OK
+          IF (INPUT .AND. ((STATUS .NE. SAI__OK) .OR. .NOT. OK)) THEN
+            IF (STATUS.NE.SAI__OK) CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT ('Invalid input - try again.')
             CALL USI_CANCL (PARNAM, STATUS)
 
           END IF
         END IF
       END DO
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    End of input
+*  End of input
       DSETS = DSETS - 1
 
-
-      IF (DSETS .LT. 1) THEN
-        CALL MSG_PRNT ('FATAL ERROR: No valid inputs!')
-        STATUS = SAI__ERROR
-        GOTO 99
-
-      END IF
-
-*    Create output dataset
-      CALL USI_TASSOCO( 'OUT', 'BinDS', OFID, STATUS )
-
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
-*    Obtain output array size
+*  Obtain output array size
       DO AX = 1, NDIMS1
         OLDIMS(AX) = LDIMS(AX,1)
         DO INP = 2, DSETS
@@ -402,75 +400,66 @@
         END DO
       END DO
 
-*    Find length of output dataset
+*  Create output dataset
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+      CALL BDI_LINK( 'BinDS', NDIMS1, OLDIMS, 'REAL', OFID, STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
+
+*  Find length of output dataset
       CALL ARR_SUMDIM( NDIMS1, OLDIMS, NPTS )
 
-*    Copy across subsidiary data from first input dataset
-      CALL BDI_COPTEXT( IFID(1), OFID, STATUS )
-      CALL BDI_COPMORE( IFID(1), OFID, STATUS )
-
+*  Copy across subsidiary data from first input dataset
+      CALL BDI_COPY( IFID(1), 'QualityMask,Title,Label,Units',
+     :               OFID, ' ', STATUS )
+      CALL UDI_COPANC( IFID(1), 'grf', OFID, STATUS )
       CALL HSI_COPY( IFID(1), OFID, STATUS )
 
-*    Check status
+*  Merge timing data and write it
+      CALL TCI_MERGE( DSETS, TIMID, OTIMID, TBASE, TOFFS, STATUS )
+      CALL TCI_PUTID( OFID, OTIMID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Create output data
-      CALL BDI_CREDATA( OFID, NDIMS1, OLDIMS, STATUS )
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
-
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
+*  Create output data
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
       CALL ARR_INIT1R( 0.0, NPTS, %VAL(ODPTR), STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Create output axes
-      CALL BDI_CREAXES( OFID, NDIMS1, STATUS )
-
-*    Check AXIS WIDTH
-      CALL BDI_CHKAXWID( IFID(1), NDIMS1, AXWOK, REG, SIZ, STATUS )
-
+*  Get first lot of axis data
       DO AX = 1, NDIMS1
-        CALL BDI_CREAXVAL( OFID, AX, .FALSE., OLDIMS(AX), STATUS )
-        CALL BDI_MAPAXVAL( OFID, 'WRITE', AX, OAXPTR(AX), STATUS )
 
-        CALL BDI_COPAXTEXT( IFID(1), OFID, AX, AX, STATUS )
+*    Map data
+        CALL BDI_AXMAPR( OFID, AX, 'Data', 'WRITE', OAXPTR(AX), STATUS )
 
+*    Copy stuff to output
+        CALL BDI_AXCOPY( IFID(1), AX, 'Label,Units,Normalised',
+     :                   OFID, AX, STATUS )
+
+*    Map widths if present
+        CALL BDI_AXCHK( IFID(1), AX, 'Width', AXWOK, STATUS )
         IF ( AXWOK ) THEN
-          CALL BDI_CREAXWID( OFID, AX, .FALSE., OLDIMS(AX), STATUS )
-          CALL BDI_MAPAXWID( OFID, 'WRITE', AX, OAXW(AX), STATUS )
+          CALL BDI_AXMAPR( OFID, AX, 'Width', 'WRITE', OAXW(AX),
+     :                     STATUS )
         END IF
 
       END DO
 
-*    Check QUALITY
-      CALL BDI_CHKQUAL( IFID(1), QUAL, NDIMS, ILDIMS, STATUS )
-
+*  Check quality
+      CALL BDI_CHK( IFID(1), 'Quality', QUAL, STATUS )
       IF ( QUAL ) THEN
-        CALL BDI_CREQUAL( OFID, NDIMS1,  OLDIMS, STATUS )
-        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
-
-*      Check status
-        IF (STATUS .NE. SAI__OK) GOTO 99
-
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
         CALL ARR_INIT1B( QUAL__GOOD, NPTS, %VAL(OQPTR), STATUS )
-
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check VARIANCE
-      CALL BDI_CHKVAR( IFID(1), VAROK, NDIMS, ILDIMS, STATUS )
-
-      IF (VAROK) THEN
-        CALL BDI_CREVAR( OFID, NDIMS1,  OLDIMS, STATUS )
-        CALL BDI_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
-
-*      Check status
-        IF (STATUS .NE. SAI__OK) GOTO 99
-
+*  Check variance
+      CALL BDI_CHK( IFID(1), 'Variance', VAROK, STATUS )
+      IF ( VAROK ) THEN
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
         CALL ARR_INIT1R( 0.0, NPTS, %VAL(OVPTR), STATUS )
-
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Loop through input objects merging arrays
+*  Loop through input objects merging arrays
       DO INP = 1, DSETS
         CALL MSG_SETI( 'INP', INP )
         CALL MSG_PRNT( ' Writing input dataset ^INP to output file' )
@@ -569,7 +558,8 @@
           END IF
 
           IF (CONTINUE) THEN
-            CALL BDI_MAPAXVAL( IFID(INP), 'READ', AX, IAXPTR, STATUS )
+            CALL BDI_AXMAPR( IFID(INP), AX, 'Data', 'READ',
+     :                       IAXPTR, STATUS )
 
 *          Check status
             IF (STATUS .NE. SAI__OK) GOTO 99
@@ -593,29 +583,28 @@
               END IF
             END IF
 
-*          Allow for possible diffence in BASE_TAI.
-            IF (AX .EQ. T_AX .AND. BASE_TAI(1)
-     :                                          .NE. BASE_TAI(INP)) THEN
-              ADD = REAL((BASE_TAI(1) - BASE_TAI(INP)) * 86400.0D0) !Assumes T_AX is in seconds.
-              CALL MSG_PRNT('Assuming BASE_TAI in seconds')
+*        Adjust timing axis
+            IF ( (AX .EQ. T_AX) .AND. (TOFFS(INP).NE.0D0) ) THEN
+
+*          Assumes T_AX is in seconds.
+              ADD = REAL(TOFFS(INP))
               CALL BINMERGE_AXCOPYA (%VAL(IAXPTR), ADD, AXOFF(AX),
      :                                 LDIMS(AX, INP), %VAL(OAXPTR(AX)))
             ELSE
-              CALL BINMERGE_AXCOPY (%VAL(IAXPTR), AXOFF(AX),
+              CALL BINMERGE_AXCOPYA(%VAL(IAXPTR), 0.0, AXOFF(AX),
      :                                 LDIMS(AX, INP), %VAL(OAXPTR(AX)))
 
             END IF
-            CALL BDI_UNMAPAXVAL( IFID(INP), AX, STATUS )
+            CALL BDI_AXUNMAP( IFID(INP), AX, 'Data', IAXPTR, STATUS )
 
           END IF
 
 *        Merge AXIS(n) WIDTH - delete if not present in all datasets
           IF (AXWOK) THEN
-            CALL BDI_CHKAXWID( IFID(INP), AX, OK, REG, LDIMS(AX,INP),
-     :                                                       STATUS )
-
+            CALL BDI_AXCHK( IFID(INP), AX, 'Width', OK, STATUS )
             IF (OK) THEN
-              CALL BDI_MAPAXWID( IFID(INP), 'READ', AX, INAXW, STATUS )
+              CALL BDI_AXMAPR( IFID(INP), AX, 'Width', 'READ',
+     :                         INAXW, STATUS )
 
               IF (AX .EQ. X_AX) THEN
                 CALL BINMERGE_SCALEXY (UNITS(AX,1), UNITS(AX,INP),
@@ -626,9 +615,9 @@
      :                     LDIMS(AX,INP), INAXW, .FALSE., INAXW, STATUS)
 
               END IF
-              CALL BINMERGE_AXCOPY(%VAL(INAXW), AXOFF(AX),
+              CALL BINMERGE_AXCOPYA(%VAL(INAXW), 0.0, AXOFF(AX),
      :                       LDIMS(AX,INP), %VAL(OAXW(AX)))
-              CALL BDI_UNMAPAXWID( IFID(INP), AX, STATUS )
+              CALL BDI_AXUNMAP( IFID(INP), AX, 'Width', INAXW, STATUS )
 
             ELSE
               CALL MSG_SETI ('NSET', INP)
@@ -646,22 +635,22 @@
 
         END DO
 
-*      Merge DATA_ARRAY
-        CALL BDI_MAPDATA( IFID(INP), 'READ', IDPTR, STATUS )
+*    Merge primary data
+        CALL BDI_MAPR( IFID(INP), 'Data', 'READ', IDPTR, STATUS )
         CALL BINMERGE_COPY (%VAL(IDPTR), OFFSET, LDIMS(1,INP),
      :                   LDIMS(2,INP), LDIMS(3,INP), LDIMS(4,INP),
      :                   LDIMS(5,INP), LDIMS(6,INP), LDIMS(7,INP),
      :                   OLDIMS(1),OLDIMS(2),OLDIMS(3),OLDIMS(4),
      :                   OLDIMS(5),OLDIMS(6),OLDIMS(7), %VAL(ODPTR))
+        CALL BDI_UNMAP( IFID(INP), 'Data', IDPTR, STATUS )
 
-        CALL BDI_UNMAPDATA( IFID(INP), STATUS )
+*    Merge QUALITY - if missing from odd data sets then assume it is good
+        IF ( QUAL ) THEN
+          CALL BDI_CHK( IFID(INP), 'Quality', OK, STATUS )
+          IF ( OK ) THEN
+            CALL BDI_MAPUB( IFID(INP), 'Quality', 'READ', IQPTR,
+     :                      STATUS )
 
-*      Merge QUALITY - if missing from odd data sets then assume it is good
-        IF (QUAL) THEN
-          CALL BDI_CHKQUAL( IFID(INP), OK, NDIMS, ILDIMS, STATUS )
-
-          IF (OK) THEN
-            CALL BDI_MAPQUAL( IFID(INP), 'READ', IQPTR, STATUS )
             CALL BINMERGE_QCOPY( %VAL(IQPTR), OFFSET, LDIMS(1,INP),
      :                   LDIMS(2,INP), LDIMS(3,INP), LDIMS(4,INP),
      :                   LDIMS(5,INP), LDIMS(6,INP), LDIMS(7,INP),
@@ -675,22 +664,22 @@
 
           END IF
         ENDIF
-*        Check status
-          IF (STATUS .NE. SAI__OK) GOTO 99
+        IF (STATUS .NE. SAI__OK) GOTO 99
 
 *        Merge VARIANCE - delete if not present in all datasets
           IF (VAROK) THEN
-            CALL BDI_CHKVAR( IFID(INP), OK, NDIMS, ILDIMS, STATUS )
+            CALL BDI_CHK( IFID(INP), 'Variance', OK, STATUS )
 
             IF (OK) THEN
-              CALL BDI_MAPVAR( IFID(INP), 'READ', IVPTR, STATUS )
+              CALL BDI_MAPR( IFID(INP), 'Variance', 'READ', IVPTR,
+     :                         STATUS )
         CALL BINMERGE_COPY (%VAL(IVPTR), OFFSET, LDIMS(1,INP),
      :                   LDIMS(2,INP), LDIMS(3,INP), LDIMS(4,INP),
      :                   LDIMS(5,INP), LDIMS(6,INP), LDIMS(7,INP),
      :                   OLDIMS(1),OLDIMS(2),OLDIMS(3),OLDIMS(4),
      :                   OLDIMS(5),OLDIMS(6),OLDIMS(7), %VAL(OVPTR))
 
-              CALL BDI_UNMAPVAR( IFID(INP), STATUS )
+              CALL BDI_UNMAP( IFID(INP), 'Variance', IVPTR, STATUS )
 
             ELSE
               CALL MSG_SETI ('NSET', INP)
@@ -725,13 +714,11 @@ C        END IF
 *    Set up history - add in names of objects merged
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Write input filenames to TEXT
-      TEXT(1) = '  Previous HISTORY copied from input file 1'
-      TEXT(2) = ' '
-      CALL USI_NAMEI( NLINES, TEXT(3), STATUS )
-      CALL HSI_PTXT( OFID, NLINES+2, TEXT, STATUS )
+*  Write input filenames to TEXT
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
 
-*    Clean up
+*  Clean up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -763,35 +750,6 @@ C        END IF
         AXISOUT (I + START) = AXISIN (I) + SLIP
 
       END DO
-      END
-
-
-
-*+  BINMERGE_AXCOPY - Copies Axis values with offset
-      SUBROUTINE BINMERGE_AXCOPY (AXISIN, START, NVALS, AXISOUT)
-*    Description :
-*     Copies NVALS values from AXISIN to AXISOUT, placing them at
-*     START in AXISOUT.
-*    History :
-*     26/9/88:  original (PLA_AST88%UK.AC.BHAM.SR.STAR)
-*    Type Definitions :
-      IMPLICIT NONE
-*    Import :
-      INTEGER                START           ! Start position for the copy
-      INTEGER                NVALS           ! Number of values to copy
-
-      REAL                   AXISIN(NVALS)   ! Axis values to be copied
-
-*    Import-Export :
-      REAL                   AXISOUT(*)      ! Output axis values
-
-*    Local variables :
-      INTEGER                I               ! Loop counter
-*-
-      DO I = 1, NVALS
-        AXISOUT (I + START) = AXISIN (I)
-      END DO
-
       END
 
 
@@ -943,12 +901,11 @@ C        END IF
       LOGICAL                CONTINUE
 *-
 
-*    Check status
+*  Check status
       IF (STATUS .NE. SAI__OK) RETURN
 
-      CALL BDI_MAPAXVAL( FID, 'READ', AX, TPTR, STATUS )
-
-*    Check status
+*  Map the axis data
+      CALL BDI_AXMAPR( FID, AX, 'Data', 'READ', TPTR, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
       CONTINUE = .TRUE.
