@@ -38,8 +38,12 @@ Added page-selection features, and documented them.
 </change>
 
 <distribution string="1.0-6" date="18-SEP-1999" author="ng" versionid=upd6>
-Add --enable-fake-progname.
+Add &ddash;enable-fake-progname.
 </distribution>
+
+<change date="19-SEP-1999" versionid="post-upd6">
+Documentation tweaks.
+</change>
 
 </history>
 
@@ -72,14 +76,13 @@ installation instructions.
 <p>The <code/dvi2bitmap/ application is available for download at 
 <url>http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/</url>.
 <![ %Only.web [
-This HTML documetation is also available as a 
+This HTML documentation is also available as a 
 <webref url='dvi2bitmap.single.html' >single file</webref>
 ]]>
 
-<p>This document matches version 1.0-5 of the program (you can see
+<p>This document matches version 1.0-6 of the program (you can see
 what version you have with the command <kbd/dvi2bitmap -V/).  This
-should currently be regarded as beta software (OK, the version
-number doesn't suggest beta software, but &ellip; it's a long story).
+should currently be regarded as beta software.
 
 <sect id=usage export>Usage
 <update versionid=upd3>Added a description of my usage model, to help
@@ -100,8 +103,10 @@ dvi2bitmap
 <p>The motivation for this program was the need for a helper program
 to produce small bitmaps for inclusion in web pages.  Accordingly, my
 model of the way the program is used is that it will process a file of
-(typically) equations generated specifically for it.  For example, the
-processor which generates the HTML could spit out a file such as
+&tex; or &latex; material generated specifically for it.  These will
+typically be equations, but any other &tex; material should work as
+well.  For example, the processor which generates the HTML could spit
+out a file such as
 <verbatim>
 \documentclass{article}
 \pagestyle{empty}
@@ -118,13 +123,14 @@ typically be generated on the fly specifically for processing by a
 tool like this, this wasn't really necessary.
 
 <p>I hope that the program is (or can be made to be) flexible enough
-to support other models of use.
+to support other modes of use.
 
 <subsect id=usage.options export>Options
 <update versionid="upd5">Added documentation of -c and -C options</update>
-<update versionid="post-upd5">Added documentation of -p -l -pp
+<update versionid="post-upd5">Added documentation of -p, -l, -pp
 options.  Note that the old -l and -L options have changed into the
 new -L and -LL options.</update>
+<update versionid="post-upd6">Clarified the -p, -l and -pp options.</update>
 
 <p><dl>
 <dt><code>-bh size, -bw size</code>
@@ -160,9 +166,20 @@ takes no account of any magnification in the DVI file.
 <p>See <ref id=usage.special> for &tex; <code/\special/ commands which
 set this within the &tex; file.
 
-<dt><code>-f font-path</code>
+<dt><code>-fp font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
 also <ref id=usage.fonts>.
+
+<dt><code>-fm mode</code>
+<dd>Specify the MetaFont mode which is to be used when generating fonts.
+The default is <code/ibmvga/, but see
+<code/&ddash;enable-fontgen/ in <ref id=install.nonstarlink>.
+
+<dt><code/-fg/
+<dd>Switch off automatic font-generation.
+
+<dt><code/-fG/
+<dd>Switch on automatic font-generation.
 
 <dt><code>-l pagenum</code>
 <dd>See option <code/-p/
@@ -193,9 +210,6 @@ postamble.  Useful in conjunction with the
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
 
-<dt><code>-nf</code>
-<dd>Do process the DVI file, but don't generate missing fonts.
-
 <dt><code>-o output</code>
 <dd>Choose the output filename pattern.  The value is a 
 `printf' formatting string, with a single <code>%d</code>
@@ -206,24 +220,34 @@ id=usage.special>).  If there is no
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 
-<dt><code/-p p-spec/, <code/-l l-spec/, <code/-pp pp-spec/
+<dt><code/-p pnum/, <code/-l lnum/, <code/-pp pagelist/
 <dd>These select page ranges, using a slight extension of the notation
-used by <code/dvips/ (and the same option letters).  The <code/p-spec/
-and <code/l-spec/ are single page numbers; if either of these are
-given, then the program will process pages from page <code/p-spec/ to
-page <code/l-spec/, and if either is missing, it implies the
-corresponding extreme.  The <code/pp-spec/ consists of a sequence of
-page numbers and ranges (<code/number1-number2/); only those pages,
-and the pages falling in those ranges (inclusive of the end pages) are
-processed.  Any of these may be prefixed by either <code/=/ or
-<code/:$n$,/.  In the former case, DVI page numbers are used rather
-than &tex; <code/\count/$n$ registers; in the latter case, the program
-examines the <code/\count/$n$ register rather than the default
-<code/\count0/.  You can specify both of these prefixes in one or more
-options, and the
-program will respect only the last one, but you cannot mix <code/-p/
-and <code/-l/ options with the <code/-pp/ option.  There may be no
-spaces in the <code/pp-spec/.  The page numbers may be negative.
+used by <code/dvips/ (and the same option letters).
+
+<p>The <code/-p/ and <code/-l/ options take single page numbers; if
+either of these is given, then the program will process pages from
+page <code/pnum/ to page <code/lnum/, with the defaults being the
+corresponding extremes.  The <code/pagelist/ consists of a
+comma-separated sequence of page numbers and ranges (<code/a-b/); only
+those pages, and the pages falling in those ranges (inclusive of the
+end pages) are processed.  Any of these specifications may be prefixed
+by either `<code/=/' or `<code/:n,/'.  In the former case, DVI page
+numbers are used rather than &tex; <code/\count/ registers; in the
+latter case, the program examines the <code/\count/<m/n/ register
+rather than the default <code/\count0/.
+
+<p>You can specify both of these prefixes one or more times, but you
+cannot mix the <code/-p/ and <code/-l/ options with the <code/-pp/
+option.  The program will respect only the last <code/-p/ and
+<code/-l/ options, but the <code/-pp/ options are cumulative.  There
+may be no spaces in the <code/pagelist/.  The page numbers may be
+negative.
+
+<p>Examples:
+<verbatim>
+dvi2bitmap -pp 3,6-10 ... # process only the specified pages
+dvi2bitmap -pp :2,1 ... # process only pages where \count2 was 1
+</verbatim>
 
 <dt><code/-P[bt]/
 <dd>Specifies processing of the output bitmap.
@@ -245,7 +269,8 @@ that's supported by the particular format you choose using option
 
 <dt><code/-r resolution/
 <dd>Specifies the output resolution, in pixels-per-inch.  This is used
-when deciding which PK files to use. The default is 72.
+when deciding which PK files to use.  The default is 110, but see
+<code/&ddash;enable-fontgen/ in <ref id=install.nonstarlink>.
 
 <dt><code/-s scalefactor/
 <dd>Reduces the linear size of the output bitmap by a factor
@@ -544,7 +569,8 @@ project machines).
 Largely rewrote the configuration instructions, in an attempt to make
 them clearer.
 </update>
-<update versionid="upd6">Mentioned --enable-fake-progname</update>
+<update versionid="upd6">Mentioned &ddash;enable-fake-progname</update>
+<update versionid="post-upd6">Described &ddash;enable-fontgen</update>
 
 <p>To configure and build:
 <verbatim>
@@ -627,6 +653,29 @@ But don't listen to me: there's a much fuller account of the whole
 sorry business in the <webref
 url='http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html'
 >comp.graphics.misc FAQ</webref>
+
+<dt><code/&ddash;enable-fontgen/
+
+<dd>By default, the program will attempt to generate fonts, and will
+do so using the MetaFont mode <code/ibmvga/, which has a resolution of
+110 dots-per-inch.
+
+<p>If you wish to disable this automatic font
+generation, give the option <code/--disable-fontgen/.
+Note that this does not completely disable font generation -- it
+merely sets the default for font generation to `off', and it can be
+switched back on again using the option <code/-fG./
+
+<p>If you wish
+to change the default mode, you can do so with an argument to this
+option.  For example, the option
+<code/&ddash;enable-fontgen=pcprevw,118/ will make <code/pcprevw/,
+which has a resolution of 118 dpi, the default MetaFont mode.  Note
+that the resolution you specify <em/must/ match the mode: see file
+<code/modes.mf/ for a list of modes and resolutions (use
+<kbd/kpsewhich mf modes.mf/ to find this).  You can change the
+resolution and mode on the fly using the <code/-fm/ and <code/-r/
+options to the compiled program (<ref id=usage.options>).
 
 <dt><code/&ddash;enable-fake-progname/
 
