@@ -1,6 +1,7 @@
       SUBROUTINE SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
      :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
-     :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, STATUS)
+     :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, 
+     :     WAVELENGTH, STATUS)
 *+
 *  Name:
 *     SURF_WRITE_MAP_INFO
@@ -46,6 +47,8 @@
 *        Size of output map in X direction
 *     NY_OUT = INTEGER (Given)
 *        Size of output map in Y direction
+*     WAVELENGTH = REAL (Given)
+*        Wavelength of the map (microns)
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -88,6 +91,7 @@
       INTEGER          OUT_NDF
       REAL             OUT_PIXEL
       CHARACTER * (*)  OUT_TITLE
+      REAL             WAVELENGTH
 
 *  Status
       INTEGER STATUS
@@ -96,6 +100,10 @@
       INTEGER          CHR_LEN
       DOUBLE PRECISION SLA_EPJ
 
+*  Local Constants:
+      DOUBLE PRECISION VLIGHT   ! Speed of light in metres per second
+      PARAMETER (VLIGHT = 299792458.0D0)
+
 *  Local Variables:
       CHARACTER*10     CTYPE1   ! Coordinate type of output FITS
       CHARACTER*10     CTYPE2   ! Coordinate type of output FITS
@@ -103,6 +111,7 @@
       DOUBLE PRECISION DTEMP    ! Scratch double
       REAL             FITS_OUT_PIXEL  ! size of pixels in output map (degrees)
       CHARACTER * 80   FITS(SCUBA__MAX_FITS) ! Output FITS array
+      DOUBLE PRECISION FREQ     ! Frequency of observation
       INTEGER          I        ! Counter
       INTEGER          ID       ! day of an input observation
       INTEGER          IM       ! month in which observation started
@@ -111,9 +120,6 @@
       INTEGER          ITEMP    ! Temporary variable
       INTEGER          IY       ! year in which input observation started
       INTEGER          NDIM     ! Number of dimensions in FITS array
-#ifdef HAS_IRAS90
-      INTEGER          NP       ! size of P array in call to IRA_CREAT
-#endif
       INTEGER          N_FITS   ! Number of FITS entries
       DOUBLE PRECISION OBSRA    ! RA of output map (degrees)
       DOUBLE PRECISION OBSDEC   ! Dec of output map (degrees)
@@ -123,14 +129,21 @@
                                 ! locator of FITS extension in output
                                 ! file
       CHARACTER*(DAT__SZLOC) OUT_XLOC ! locator of IRAS item in output file
-      DOUBLE PRECISION P (8)    ! input array to IRA_CREAT
       CHARACTER*30     SCS      ! name of sky coordinate system
       CHARACTER*80     STEMP    ! scratch string
-      CHARACTER*10     TELESCOPE ! FITS telescope entry
+      CHARACTER*11     TELESCOPE ! FITS telescope entry
       CHARACTER*5      RADECSYS ! Type of coordinate system
       DOUBLE PRECISION RDEPOCH  ! Julian epoch of given MJD
       CHARACTER * (80) XLAB     ! X axis label
       CHARACTER * (80) YLAB     ! Y axis label 
+
+#ifdef HAS_IRAS90
+*     IRAS90 variables
+      INTEGER          NP       ! size of P array in call to IRA_CREAT
+      DOUBLE PRECISION P (8)    ! input array to IRA_CREAT
+#endif
+
+
 *     .
 
 *     set up the output axes
@@ -180,23 +193,10 @@
             CALL NDF_CPUT(OUT_TITLE, OUT_NDF, 'Title', STATUS)
             CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
 
-*     create the IRAS astrometry structure
+*     Sort out the astrometry stuff
 
             IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ' .AND.
      :           OUT_COORDS .NE. 'PL') THEN
-
-#ifdef HAS_IRAS90
-               CALL IRA_INIT (STATUS)
-#endif
-
-               P (1) = OUT_LONG
-               P (2) = OUT_LAT
-               P (3) = DBLE (I_CENTRE) - 0.5D0
-               P (4) = DBLE (J_CENTRE) - 0.5D0
-               P (5) = DBLE (OUT_PIXEL)
-               P (6) = DBLE (OUT_PIXEL)
-               P (7) = 0.0D0
-               P (8) = 0.0D0
 
                IF (OUT_COORDS .EQ. 'RB') THEN
                   SCS = 'EQUATORIAL(1950.0)'
@@ -241,12 +241,24 @@
      :              OUT_XLOC, STATUS)
                NP = 8
 
+*     Initialise the IRA software
+               CALL IRA_INIT (STATUS)
+
+*     Set up the astrometry array
+               P (1) = OUT_LONG
+               P (2) = OUT_LAT
+               P (3) = DBLE (I_CENTRE) - 0.5D0
+               P (4) = DBLE (J_CENTRE) - 0.5D0
+               P (5) = DBLE (OUT_PIXEL)
+               P (6) = DBLE (OUT_PIXEL)
+               P (7) = 0.0D0
+               P (8) = 0.0D0
+
 *     Create the ASTROMETRY extension
                CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, 
      :              OUT_NDF, ITEMP, STATUS)
 
                CALL IRA_CLOSE (STATUS)
-#endif
 
 *     Create the IMAGE_INFO extension to fool IRAS90 software
                CALL DAT_NEW(OUT_XLOC, 'IMAGE_INFO', 'IMAGE_INFO',
@@ -273,6 +285,8 @@
                CALL DAT_ANNUL(IMAGE_LOC, STATUS)
 
                CALL DAT_ANNUL(OUT_XLOC, STATUS)
+
+#endif
 
             END IF
 
@@ -334,6 +348,17 @@
             CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :           'INSTRUME', INSTRUMENT, 'name of instrument', STATUS)
 
+*     Store the wavelength (in metres) and frequency (in Hz)
+
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'WAVELEN', DBLE(WAVELENGTH) * 1.0D-6,
+     :           'Wavelength of the observation (metres)', STATUS)
+
+            FREQ = VLIGHT * 1.0D6 / DBLE(WAVELENGTH)
+
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'FREQ', FREQ, 'Frequency of observation (Hz)', STATUS)
+
 *     Store SCUBA projection name
 
             CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
@@ -346,9 +371,11 @@
 
             ITEMP = 0
             CALL CHR_PUTI(IY, DATEOBS, ITEMP)
-            CALL CHR_APPND('/',DATEOBS, ITEMP)
+            CALL CHR_APPND('-',DATEOBS, ITEMP)
+            IF (IM .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
             CALL CHR_PUTI(IM, DATEOBS, ITEMP)
-            CALL CHR_APPND('/',DATEOBS, ITEMP)
+            CALL CHR_APPND('-',DATEOBS, ITEMP)
+            IF (ID .LT. 10) CALL CHR_PUTI(0, DATEOBS, ITEMP)
             CALL CHR_PUTI(ID, DATEOBS, ITEMP)
 
             CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
@@ -359,7 +386,8 @@
 *     Now need to calculate the FITS Axis info
 *     If this is NA then NDF2FITS will do this for us
 
-            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ') THEN
+            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ'
+     :           .AND. OUT_COORDS .NE. 'PL') THEN
 
                OBSRA = OUT_LONG * 180.0D0 / PI
                OBSDEC= OUT_LAT  * 180.0D0 / PI
@@ -403,6 +431,14 @@
      :              STATUS)
                CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :              'CUNIT2','deg','physical units of axis 2', STATUS)
+
+            ELSE IF (OUT_COORDS .EQ. 'PL') THEN
+*     We should still write out tangent plane
+
+               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'CTYPE1', CTYPE1,'TAN projection used', STATUS)
+               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'CTYPE2', CTYPE2,'TAN projection used', STATUS)
 
             END IF
 
