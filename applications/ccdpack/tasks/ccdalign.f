@@ -160,10 +160,6 @@
 *     global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
-*
-*     The DEVICE parameter also has a global association. This is not
-*     controlled by the usual CCDPACK mechanisms, instead it works in
-*     co-operation with KAPPA (SUN/95) image display/control routines.
 
 *     Note - test it with NDFs in different directories.
 
@@ -207,7 +203,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'MSG_PAR'         ! Message system constants
       INCLUDE 'FIO_ERR'         ! FIO error codes
       INCLUDE 'FIO_PAR'         ! FIO system constants
       INCLUDE 'GRP_PAR'         ! Standard GRP system constants
@@ -238,17 +233,13 @@
 *  Local Variables:
       CHARACTER * ( 1024 ) LINE ! Output message line (long)
       CHARACTER * ( 256 ) CMD   ! Command string
-      CHARACTER * ( 30 ) DEVICE ! The display device
-      CHARACTER * ( 30 ) HDEV   ! Hardcopy device
       CHARACTER * ( 5 ) NULL    ! Parameter NULL symbol
-      CHARACTER * ( 30 ) PERC   ! Percentiles as string
       CHARACTER * ( 30 ) LISTID ! Identifier in filename for list
-      CHARACTER * ( MSG__SZMSG ) NDFNAM ! Name of NDF
-      CHARACTER * ( MSG__SZMSG ) REFNAM ! Name of reference NDF
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) REFNAM ! Name of reference NDF
       CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list file
       CHARACTER * ( FIO__SZFNM ) NAMLST ! File name list
       CHARACTER * ( 30 ) CCDREG ! Message system name for ccdpack_reg
-      CHARACTER * ( 30 ) KAPVIE ! Message system name for kapview_mon
       CHARACTER * ( GRP__SZNAM ) NDFNMS( MAXGRP ) ! Names of lead NDFs in groups
       INTEGER CCDGID            ! Id for CCDPACK_REG monolith
       INTEGER FD                ! File identifier
@@ -256,7 +247,6 @@
       INTEGER FITTYP            ! Transformation type
       INTEGER GRPOFF            ! Offset in NDF list group
       INTEGER I                 ! Loop variable
-      INTEGER IGROUP            ! Index of the current group
       INTEGER INDEX( MAXPOS )   ! Identifiers for points in position list
       INTEGER IPIND             ! Pointer to identifiers for list positions
       INTEGER IPXPOS            ! Pointer to X coordinates of list positions
@@ -274,9 +264,7 @@
       INTEGER REFPOS            ! Position of the reference NDF in the list
       INTEGER WINDIM( 2 )       ! Window dimensions for display
       LOGICAL CONT              ! Continue processing
-      LOGICAL EXISTS            ! File exists
       LOGICAL HAVREF            ! Have a reference NDF
-      LOGICAL HCOPY             ! Print hardcopy
       LOGICAL OK                ! OK to loop
       DOUBLE PRECISION PERCNT( 2 ) ! The display percentiles
       DOUBLE PRECISION XPOS( MAXPOS ) ! X coordinates of positions in list
@@ -429,8 +417,7 @@
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_PUT1D( 'PERCENTILES', 2, PERCNT, STATUS )
 
-*  Start up monliths which are used later in this task.
-*  CCDPACK_REG
+*  Start up the CCDPACK_REG monliths which is used later in this task.
       CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
       CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_reg'
       CCDREG = 'ccdpack_reg'//PID
@@ -493,61 +480,6 @@
       CALL CCD1_MFREE( IPYPOS, STATUS )
       CALL CCD1_MFREE( IPXPOS, STATUS )
       CALL CCD1_MFREE( IPIND, STATUS )
-
-*  Set the number of NDF groups we need to process.
-c     IF ( HAVREF ) THEN 
-c        GRPOFF = 1
-c     ELSE
-c        GRPOFF = 2
-c     END IF
-
-*  Introduction to next stage
-c     CALL MSG_BLANK( STATUS )
-c     LINE = 
-c    :'Now the first member of each NDF group or each NDF will be '//
-c    :'displayed. You will then be given the opportunity to use the '//
-c    :'cursor to mark the image features which correspond to those '//
-c    :'which you marked on the first (reference) NDF. The order in '//
-c    :'which you identify the image features must be the same. If an '//
-c    :'image feature does not exist mark a position off the frame. '//
-c    :'You may extend the complete set of positions by indicating '//
-c    :'image features after the last one in the reference set.'
-c     CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
-c     CALL MSG_BLANK( STATUS )
-
-*  Have used the first NDF group as reference set. Set start from next group.
-c3    CONTINUE
-c     IF ( GRPOFF .NE. NGROUP .AND. STATUS .EQ. SAI__OK ) THEN 
-
-*  Extract the name of the first member of this group.
-c        CALL MSG_SETI( 'NGROUP', GRPOFF ) 
-c        CALL MSG_LOAD( ' ', 'ccdalign_ndf^NGROUP.list', NAMLST,
-c    :                  OPLEN, STATUS )
-c        CALL CCD1_OPFIO( NAMLST, 'READ', 'LIST', 0, FD, STATUS )
-c        CALL FIO_READ( FD, NDFNAM, NDFLEN, STATUS )
-c        CALL FIO_CLOSE( FD, STATUS )
-         
-*  Display this NDF. Note we need to reset the monolith parameters
-*  as display centre & x/ymagn are not updated.
-c        CALL MSG_SETC( 'NDFNAM', NDFNAM( :NDFLEN ) )
-c        CALL CCD1_MSG( ' ',  '  Displaying NDF ^NDFNAM', STATUS )
-c        CALL MSG_BLANK( STATUS )
-c        CMD = 'in='//NDFNAM( :NDFLEN )//' '//
-c    :         'mode=percentiles '//
-c    :         'percentiles='//PERC//' accept'
-c        CALL SLV_RESET( KAPVIE, STATUS )
-c        CALL SLV_OBEYW( KAPVIE, 'display', CMD, ' ', STATUS )
-
-*  Activate the cursor routine. Use all the NDF names of this group as the IN
-*  parameter. This will associate this position list with all the NDFs.
-c        CMD = 'outlist = '//NDFNAM( :NDFLEN )//'.fea '//
-c    :         'in='//NDFNAM( :NDFLEN )//' accept reset'
-c        CALL SLV_OBEYW( CCDREG, 'idicurs', CMD, ' ', STATUS )
-
-*  Increment offset for next group.
-c        GRPOFF = GRPOFF + 1
-c        GO TO 3
-c     END IF
 
 *  Now centroid all the image feature positions to get accurate ones.
       CALL MSG_BLANK( STATUS )
