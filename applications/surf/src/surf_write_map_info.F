@@ -142,6 +142,7 @@
                                 ! locator of FITS extension in output
                                 ! file
       CHARACTER*(DAT__SZLOC) OUT_XLOC ! locator of IRAS item in output file
+      REAL             RTEMP    ! Scratch real
       CHARACTER*30     SCS      ! name of sky coordinate system
       CHARACTER*80     STEMP    ! scratch string
       CHARACTER*11     TELESCOPE ! FITS telescope entry
@@ -377,6 +378,14 @@
             CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :           'SCUPROJ',OUT_COORDS, 'SCUBA output coordinate system', 
      :           STATUS)
+
+*     Pixel size as chosen in REBIN (arcsec)
+
+            RTEMP = OUT_PIXEL * REAL(R2AS) ! Generate rounding errors
+
+            CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'SCUPIXSZ', DBLE(RTEMP), 
+     :           'Pixel size (arcsec)', STATUS)
 
 *     Store the chop information
 
