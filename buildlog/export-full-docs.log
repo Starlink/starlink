@@ -174,27 +174,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/StoreConfigurator.java:33: package uk.ac.starlink.ast.gui.images does not exist
   [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
   [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppEngineConfigurationFactory.java:5: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.EngineConfigurationFactory;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppEngineConfigurationFactory.java:6: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.EngineConfiguration;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppEngineConfigurationFactory.java:19: cannot resolve symbol
-  [javadoc] symbol  : class EngineConfigurationFactory 
-  [javadoc] location: class uk.ac.starlink.soap.AppEngineConfigurationFactory
-  [javadoc]     implements EngineConfigurationFactory
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppEngineConfigurationFactory.java:47: cannot resolve symbol
-  [javadoc] symbol  : class EngineConfiguration 
-  [javadoc] location: class uk.ac.starlink.soap.AppEngineConfigurationFactory
-  [javadoc]     public EngineConfiguration getClientEngineConfig()
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppEngineConfigurationFactory.java:57: cannot resolve symbol
-  [javadoc] symbol  : class EngineConfiguration 
-  [javadoc] location: class uk.ac.starlink.soap.AppEngineConfigurationFactory
-  [javadoc]     public EngineConfiguration getServerEngineConfig()
-  [javadoc]            ^
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppLogSink.java:5: package org.mortbay.util does not exist
   [javadoc] import org.mortbay.util.LogSink;
   [javadoc]                         ^
@@ -214,27 +193,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:13: package javax.servlet does not exist
   [javadoc] import javax.servlet.Servlet;
   [javadoc]                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:14: package javax.xml.rpc does not exist
-  [javadoc] import javax.xml.rpc.ServiceException;
-  [javadoc]                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:16: package org.apache.axis.client does not exist
-  [javadoc] import org.apache.axis.client.Call;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:17: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.AxisEngine;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:18: package org.apache.axis.client does not exist
-  [javadoc] import org.apache.axis.client.Service;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:19: package org.apache.axis.configuration does not exist
-  [javadoc] import org.apache.axis.configuration.SimpleProvider;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:20: package org.apache.axis.message does not exist
-  [javadoc] import org.apache.axis.message.SOAPBodyElement;
-  [javadoc]                                ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:21: package org.apache.axis.transport.http does not exist
-  [javadoc] import org.apache.axis.transport.http.AxisServlet;
-  [javadoc]                                       ^
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:22: package org.mortbay.http does not exist
   [javadoc] import org.mortbay.http.HttpContext;
   [javadoc]                         ^
@@ -277,83 +235,6 @@ javadoc-sources:
   [javadoc] location: class uk.ac.starlink.soap.AppHttpSOAPServer
   [javadoc]     public WebApplicationContext addAxisSOAPServices( String direct )
   [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:5: package org.apache.axis.configuration does not exist
-  [javadoc] import org.apache.axis.configuration.FileProvider;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:6: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.EngineConfiguration;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:7: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.ConfigurationException;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:8: package org.apache.axis.deployment.wsdd does not exist
-  [javadoc] import org.apache.axis.deployment.wsdd.WSDDDeployment;
-  [javadoc]                                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:9: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.AxisEngine;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:10: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.Handler;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:11: package org.apache.axis.handlers.soap does not exist
-  [javadoc] import org.apache.axis.handlers.soap.SOAPService;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:12: package org.apache.axis.encoding does not exist
-  [javadoc] import org.apache.axis.encoding.TypeMappingRegistry;
-  [javadoc]                                 ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:14: package javax.xml.namespace does not exist
-  [javadoc] import javax.xml.namespace.QName;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:34: cannot resolve symbol
-  [javadoc] symbol  : class FileProvider 
-  [javadoc] location: class uk.ac.starlink.soap.AppFileProvider
-  [javadoc] public class AppFileProvider extends FileProvider
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:42: cannot resolve symbol
-  [javadoc] symbol  : class ConfigurationException 
-  [javadoc] location: class uk.ac.starlink.soap.AppFileProvider
-  [javadoc]         throws ConfigurationException
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:55: cannot resolve symbol
-  [javadoc] symbol  : class AxisEngine 
-  [javadoc] location: class uk.ac.starlink.soap.AppFileProvider
-  [javadoc]     public void writeEngineConfig( AxisEngine engine )
-  [javadoc]                                    ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:56: cannot resolve symbol
-  [javadoc] symbol  : class ConfigurationException 
-  [javadoc] location: class uk.ac.starlink.soap.AppFileProvider
-  [javadoc]         throws ConfigurationException 
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:5: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.AxisEngine;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:6: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.AxisFault;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:7: package org.apache.axis does not exist
-  [javadoc] import org.apache.axis.EngineConfiguration;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:8: package org.apache.axis.server does not exist
-  [javadoc] import org.apache.axis.server.DefaultAxisServerFactory;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:9: package org.apache.axis.server does not exist
-  [javadoc] import org.apache.axis.server.AxisServer;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: cannot resolve symbol
-  [javadoc] symbol  : class DefaultAxisServerFactory 
-  [javadoc] location: class uk.ac.starlink.soap.AppAxisServerFactory
-  [javadoc] public class AppAxisServerFactory extends DefaultAxisServerFactory
-  [javadoc]                                           ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:36: cannot resolve symbol
-  [javadoc] symbol  : class AxisServer 
-  [javadoc] location: class uk.ac.starlink.soap.AppAxisServerFactory
-  [javadoc]     public AxisServer getServer( Map environment )
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:37: cannot resolve symbol
-  [javadoc] symbol  : class AxisFault 
-  [javadoc] location: class uk.ac.starlink.soap.AppAxisServerFactory
-  [javadoc]         throws AxisFault
-  [javadoc]                ^
   [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:87: package diva.canvas does not exist
   [javadoc] import diva.canvas.GraphicsPane;
   [javadoc]                    ^
@@ -512,6 +393,125 @@ javadoc-sources:
   [javadoc]                               ^
   [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:40: package diva.canvas.interactor does not exist
   [javadoc] import diva.canvas.interactor.SelectionEvent;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:41: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionInteractor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:42: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionListener;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:43: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionModel;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:44: package diva.canvas.toolbox does not exist
+  [javadoc] import diva.canvas.toolbox.BasicHighlighter;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:81: package Polyline2D does not exist
+  [javadoc]     protected Polyline2D.Double polyline;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:84: package Polygon2D does not exist
+  [javadoc]     protected Polygon2D.Double polygon;
+  [javadoc]                        ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:87: package Polyline2D does not exist
+  [javadoc]     protected Polyline2D.Double freehand;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:90: cannot resolve symbol
+  [javadoc] symbol  : class AbstractFigure 
+  [javadoc] location: class jsky.image.graphics.gui.CanvasDraw
+  [javadoc]     protected AbstractFigure figure;
+  [javadoc]               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:66: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.gui.FITSGraphics
+  [javadoc]     protected SelectionInteractor interactor;
+  [javadoc]               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:10: package gnu.jel does not exist
+  [javadoc] import gnu.jel.CompilationException;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:11: package gnu.jel does not exist
+  [javadoc] import gnu.jel.CompiledExpression;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:12: package gnu.jel does not exist
+  [javadoc] import gnu.jel.DVResolver;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:13: package gnu.jel does not exist
+  [javadoc] import gnu.jel.Evaluator;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:14: package gnu.jel does not exist
+  [javadoc] import gnu.jel.Library;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:27: cannot resolve symbol
+  [javadoc] symbol  : class DVResolver 
+  [javadoc] location: class jsky.util.JavaExpr
+  [javadoc] public class JavaExpr implements DVResolver {
+  [javadoc]                                  ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:69: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private GraphicsPane _graphicsPane;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:72: cannot resolve symbol
+  [javadoc] symbol  : class FigureLayer 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private FigureLayer _figureLayer;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:78: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionInteractor _selectionInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:81: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionInteractor _lineInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:84: cannot resolve symbol
+  [javadoc] symbol  : class DragInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private DragInteractor _dragInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:87: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionInteractor _fixedSelectionInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:90: cannot resolve symbol
+  [javadoc] symbol  : class SelectionListener 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionListener _selectionListener;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:20: package diva.canvas does not exist
+  [javadoc] import diva.canvas.Figure;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:21: package diva.canvas does not exist
+  [javadoc] import diva.canvas.FigureDecorator;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:22: package diva.canvas does not exist
+  [javadoc] import diva.canvas.FigureLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:23: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GeometricSet;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:24: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GraphicsPane;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:25: package diva.canvas does not exist
+  [javadoc] import diva.canvas.OverlayLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:26: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.EventLayer;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:27: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.LayerEvent;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:28: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.LayerListener;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:29: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.MouseFilter;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:30: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.DragInteractor;
   [javadoc]                               ^
   [javadoc] Standard Doclet version 1.4.1
 
@@ -756,14 +756,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:31: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:32: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/soap/AppAxisServerFactory.html...
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: Tag @see: Malformed: Plot, PlotConfigurator
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppFileProvider.java:34: warning - Tag @see: reference not found: org.apache.axis.configuration.FileProvider
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/BufferedDataInputStream.java:349: warning - @returns is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/ColumnTable.java:254: warning - Tag @see: reference not found: ColumnTable.getColumn.
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/FitsDate.java:39: warning - Tag @return cannot be used in constructor documentation.  It can only be used in the following types of documentation: method.
@@ -771,10 +770,10 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 191 warnings
+  [javadoc] 190 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 56 seconds
+Total time: 1 minute 4 seconds

@@ -11,11 +11,13 @@ call_package_ant:
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/junit/.junit.install
      [echo] Executing tamfits target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/tamfits/.tamfits.install
      [echo] Executing axis target: deinstall
 
 deinstall:
@@ -158,4 +160,4 @@ deinstall:
 real_deinstall:
 
 BUILD SUCCESSFUL
-Total time: 9 seconds
+Total time: 11 seconds

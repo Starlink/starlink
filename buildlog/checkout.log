@@ -8372,6 +8372,7 @@ U java/source/table/src/main/uk/ac/starlink/table/WrapperRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/formats
+U java/source/table/src/main/uk/ac/starlink/table/formats/HTMLTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/LatexTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/TextStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/TextTableBuilder.java
