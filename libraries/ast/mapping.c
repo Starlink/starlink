@@ -317,7 +317,7 @@ c        Pointer to an optional second array with the same size and
 c        type as the "in" array. If given, this will contain the set
 c        of variance values associated with the input data and will be
 c        the same array as was passed to astResample<X> via the
-c        "in_var" argument.
+c        "in_var" parameter.
 f        An optional second array with the same size and type as the
 f        IN array. This will only be given if the AST__USEVAR flag is
 f        set via the FLAGS argument (below). If given, it will contain
@@ -339,13 +339,13 @@ c     offset
 f     OFFSET( NPOINT ) = INTEGER (Given)
 c        Pointer to an array of integers with "npoint" elements. For
 c        each interpolation point, this will contain the zero-based
-c        index in the "out" (and "out_var") arrays at which the
+c        index in the "out" (and "out_var") array(s) at which the
 c        interpolated value (and its variance, if required) should be
 c        stored. For example, the interpolated value for point number
 c        "point" should be stored in "out[offset[point]]" (assuming
 c        the index "point" is zero-based).
 f        For each interpolation point, this array will contain the
-f        offset from the start of the OUT (and OUT_VAR) arrays at
+f        offset from the start of the OUT (and OUT_VAR) array(s) at
 f        which the interpolated value (and its variance, if required)
 f        should be stored. For example, the interpolated value for
 f        point number POINT should be stored in OUT(1+OFFSET(POINT)).
@@ -386,7 +386,7 @@ f        The value given for the FLAGS argument of
 f        AST_RESAMPLE<X>. You may test this value in order to provide
 *        detailed control over the operation of your resampling
 *        algorithm. Note that the special flag values AST__UINTERP1,
-*        2, 3 and 4 are reserved for you to use for your own purposes
+*        2, 3 & 4 are reserved for you to use for your own purposes
 c        (see astResample<X>).
 f        (see AST_RESAMPLE<X>).
 c     badval
@@ -990,7 +990,7 @@ c     their values via the "flags" argument:
 f     selected a set of flags, you should supply the sum of
 f     their values via the FLAGS argument:
 *
-*     - AST__UINTERP1, 2, 3 and 4: A set of four flags which are
+*     - AST__UINTERP1, 2, 3 & 4: A set of four flags which are
 *     reserved for your own use. They may be used to pass private
 *     information to any sub-pixel interpolation algorithm which you
 *     implement yourself. They are ignored by all the pre-defined
