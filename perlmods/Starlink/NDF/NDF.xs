@@ -38,6 +38,30 @@ extern "C" {
 #include "dat_par.h"
 #include "sae_par.h"
 
+/* Include BAD values */
+#include "img.h"
+
+/* If img.h is not available in /star/include it may be possible
+ * to circumvent the problem by using the following instead:
+ * (copied directly from img.h)
+ *
+ * #include <float.h>
+ * #include <limits.h>
+ * 
+ * #define VAL__BADF    -FLT_MAX
+ * #define VAL__BADD    -DBL_MAX
+ * #define VAL__BADI    INT_MIN
+ * #define VAL__BADS    SHRT_MIN
+ * #define VAL__BADUS   USHRT_MAX
+ * #define VAL__BADB    CHAR_MIN
+ * #define VAL__BADUB   UCHAR_MAX
+ *
+ */
+
+/* These are extra include files that are supported by the NDF
+ * extension but may not be in a standard Starlink distribution 
+ */
+
 /*
 #include "err_err.h"
 #include "ems_err.h"
@@ -381,6 +405,66 @@ DAT__NOLOC()
   stringCtof77(RETVAL, DAT__SZLOC);
  OUTPUT:
   RETVAL
+
+
+# Bad values -- these have to be typed so dont bother autoloading
+# Add aliases for Fortran equivalents
+
+ndffloat
+VAL__BADF()
+ CODE:
+  RETVAL = VAL__BADF;
+ ALIAS:
+  NDF::VAL__BADR = 2
+ OUTPUT:
+  RETVAL
+
+ndfdouble
+VAL__BADD()
+ CODE:
+  RETVAL = VAL__BADD;
+ OUTPUT:
+  RETVAL
+
+ndfint
+VAL__BADI()
+ CODE:
+  RETVAL = VAL__BADI;
+ OUTPUT:
+  RETVAL
+
+short
+VAL__BADS()
+ CODE:
+  RETVAL = VAL__BADS;
+ ALIAS:
+  NDF::VAL__BADW = 2
+ OUTPUT:
+  RETVAL
+
+unsigned short
+VAL__BADUS()
+ CODE:
+  RETVAL = VAL__BADUS;
+ ALIAS:
+  NDF::VAL__BADUW = 2
+ OUTPUT:
+  RETVAL
+
+char
+VAL__BADB()
+ CODE:
+  RETVAL = VAL__BADB;
+ OUTPUT:
+  RETVAL
+
+unsigned char
+VAL__BADUB()
+ CODE:
+  RETVAL = VAL__BADUB;
+ OUTPUT:
+  RETVAL
+
 
 
 
