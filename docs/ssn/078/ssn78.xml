@@ -2197,7 +2197,7 @@ AC_PROG_FC([], 77)
         <p>Both the Sun and GNU Fortran compilers can handle cpp-style
           preprocessor constructs in a Fortran file, avoiding any
           separate preprocessing stage.  Sun have produced a Fortran
-          preprocessor, <em>fpp</em><index>fortran!fpp (Sun Fortran
+          preprocessor, <em>fpp</em><index>Fortran!fpp (Sun Fortran
           preprocessor)</index>, which is available at 
           <url>http://www.netlib.org/fortran/</url>: it's freely
           available, but not open-source.  And more often than not we
@@ -4883,6 +4883,30 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             intrinsic function were available (there are probably
             rather few Fortrans which don't have this function).
           </p>
+
+          <p>There are some functions, such as <code>getcwd</code>,
+            <code>getenv</code> and <code>chdir</code>, which are
+            provided as intrinsics by some Fortran compilers, but
+            which others supply as external routines in the Fortran
+            runtime<index>Fortran!intrinsics and external
+            functions</index>.  To deal with this (exasperating)
+            situation, you need a construction like this in your
+            <code>configure.ac</code>:
+<verbatim>
+AC_FC_CHECK_INTRINSICS([getcwd])
+AC_LANG_PUSH([Fortran])
+AC_CHECK_FUNCS([getcwd])
+AC_LANG_POP([Fortran])
+</verbatim>
+            and then conditionalise on the defines
+            <code>HAVE_GETCWD</code> and
+            <code>HAVE_INTRINSIC_GETCWD</code> in your preprocessable
+            code.  That is, you use the standard macro
+            <code>AC_CHECK_FUNCS</code>, but wrapped in declarations
+            which force the check to use Fortran (this doesn't work in
+            standard autoconf, since the required support is
+            missing).</p>
+
         </subsect>
 
         <subsect id="macro-ac-fc-check-headers" export="export"
@@ -5000,7 +5024,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             <title>AC_PROG_FPP</title>
           </subhead>
 
-          <p><strong><code>AC_PROG_FPP(required-features,[FPP-SRC-EXT=fpp])</code></strong><index>fortran</index></p> 
+          <p><strong><code>AC_PROG_FPP(required-features,[FPP-SRC-EXT=fpp])</code></strong><index>Fortran</index></p> 
 
           <p><code>required-features</code> is a space-separated
             list of features that the Fortran preprocessor must
