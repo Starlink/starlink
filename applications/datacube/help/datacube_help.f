@@ -105,7 +105,7 @@
 
 *  Local Constants:
       CHARACTER * ( 12 ) LIBNAM ! Name of the DATACUBE_ help library
-      PARAMETER ( LIBNAM = 'DATACUBE_HLP' )
+      PARAMETER ( LIBNAM = 'DATACUBE' )
 
 *  Local Variables:
 
