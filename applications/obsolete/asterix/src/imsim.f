@@ -116,7 +116,6 @@
       INTEGER           	ACTSRC                 	! Actual # sources
       INTEGER           	ACTWID                 	! Actual number of widths given
       INTEGER			BID			! Output data object
-      INTEGER           	DIMS(ADI__MXDIM)       	! Bgnd dimensions
       INTEGER           	FFILE                  	! Index of first file
       INTEGER			FOFID			! 1st output dataset id
       INTEGER           	IFILE                  	! Loop over files
@@ -131,7 +130,6 @@
       INTEGER           	MQPTR                  	! Model quality ptr
       INTEGER           	NPT                    	! # points in position lists
       INTEGER           	NBACK                  	! # background counts
-      INTEGER           	NDIM                   	! Bgnd dimensionality
       INTEGER           	NELM                   	! Bgnd elements
       INTEGER           	NFILE                  	! # files to create
       INTEGER           NOUT                   ! # events outside field ranges
@@ -215,21 +213,18 @@
 
 *      Check dimensions and map
         CALL BDI_CHK( MFID, 'Data', OK, STATUS )
-        CALL BDI_GETSHP( MFID, 2, DIMS, NDIM, STATUS )
+        CALL BDI_GETSHP( MFID, 2, ODIMS, ONDIM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Check dimensionality
         IF ( .NOT. OK ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Invalid model data', STATUS )
-        ELSE IF ( NDIM .NE. 2 ) THEN
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Background must be 2D', STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Map model array
-        NELM = DIMS(1)*DIMS(2)
+        NELM = ODIMS(1)*ODIMS(2)
         CALL BDI_MAPR( MFID, 'Data', 'READ', MDPTR, STATUS )
 
 *      Quality present?
@@ -298,11 +293,6 @@
         YBASE = SPARR(1)
         YSCALE = SPARR(2)
         CALL BDI_AXGET0C( MFID, 1, 'Units', UNITS, STATUS )
-
-*      Output dimensions
-        ONDIM = NDIM
-        ODIMS(1) = DIMS(1)
-        ODIMS(2) = DIMS(2)
 
 *      Unmap model values
         PSIZE = ABS(XSCALE)
