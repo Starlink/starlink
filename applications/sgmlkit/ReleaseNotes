@@ -85,7 +85,11 @@ id=final.development>.
 <dt>Bundle Jade with the system
 <dd>At present, the distribution consists only of the SGML library stuff.
 I need to work out the magic to get Jade to build on Suns and Alphas,
-and then distribute them together.
+and then distribute them together.  Since Jade is needed to build the
+documetation during installation, you can't even install the package
+on systems which don't have Jade.  I therefore haven't tested the
+installation makefile other than on Linux: Tru64's make is dumb enough
+that I can just about guarantee that there'll be problems there.
 
 <dt>Finish documentation
 <dd>Read-through for style, plus more expansive installation notes.

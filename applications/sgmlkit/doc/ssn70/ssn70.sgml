@@ -3388,7 +3388,7 @@ The HyTime reader's guide
 <dt><url>http://www.isogen.com/papers/archintro.html</url>
 <dd>A very good tutorial introduction to SGML architectures
 
-<dt><url>http://www.cogsci.ed.ac.uk/~ht/grove.html</url>
+<dt><url>http://www.cogsci.ed.ac.uk/%7eht/grove.html</url>
 <dd>A picture of a grove.
 
 <dt><url>http://www.hytime.org/materials/sgmlpropset/index.html</url>
@@ -3408,7 +3408,7 @@ set, but once you have that, it's invaluable.
 <dt><url>http://www.oasis-open.org/cover/dsssl.html</url>
 <dd>The DSSSL pages at the Oasis SGML site
 
-<dt><url>http://itrc.uwaterloo.ca/~papresco/dsssl/tutorial.html</url>
+<dt><url>http://itrc.uwaterloo.ca/%7epapresco/dsssl/tutorial.html</url>
 <dd>Paul Prescod's excellent DSSSL tutorial
 
 <dt><url>http://www.mulberrytech.com/dsssl/</url>

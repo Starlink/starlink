@@ -74,26 +74,42 @@
 # all on one line.  I've had to do the same with \(sub)*section parsing.
 # This will fail sometimes, but the result will be a
 # thin but <em/valid/ SGML document, and will not cause this code to spin
-# its wheels indefinitely.
+# its wheels indefinitely.  If you include the option <code/--force/, then
+# even if there's some fatal error, such as an input file not being present,
+# then the script will still return with a zero exit status.
 #
 #<returnvalue none>
-#<parameter>input-file-name<type>Star2HTML file
-#  <description>A file marked up using the Star2HTML extensions to LaTeX2HTML
-#<parameter>index-file-name<type>SGML file
-#  <description>A file conforming to the DocumentSummary DTD
-#<parameter>--prefix=url-prefix<type>option
-#  <description>The prefix is added to each of the filenames in the
-# HTX index, to make the generated URLs relative to the appropriate
-# root of the document server, which is set in the DSSSL variable 
-# <code>%starlink-document-server%<code>, and might have the value
-# <code>`file:///star/docs/'</code>
-#<parameter>--output=outfile<type>option
-#  <description>The name of the file to receive the generated output.
-#<author id=ng webpage='http://www.astro.gla.ac.uk/users/norman/'
-#  affiliation='Glasgow'>Norman Gray
+#  <parameter>input-file-name
+#    <type>Star2HTML file
+#    <description>A file marked up using the Star2HTML extensions to LaTeX2HTML
+#
+#  <parameter>index-file-name
+#    <type>SGML file
+#    <description>A file conforming to the DocumentSummary DTD
+#
+#  <parameter>--prefix=url-prefix
+#    <type>option
+#    <description>The prefix is added to each of the filenames in the
+#      HTX index, to make the generated URLs relative to the appropriate
+#      root of the document server, which is set in the DSSSL variable 
+#      <code>%starlink-document-server%<code>, and might have the value
+#      <code>`file:///star/docs/'</code>
+#
+#  <parameter>--output=outfile
+#    <type>option
+#    <description>The name of the file to receive the generated output.
+#
+#  <parameter>--force
+#    <type>option
+#    <description>If present, then any errors which emerge after this will
+#      terminate the program, but return with a zero exit status.
+#
+#  <author id=ng webpage='http://www.astro.gla.ac.uk/users/norman/'
+#    affiliation='Glasgow'>Norman Gray
 
 $ident_string = "Starlink SGML system, release ((PKG_VERS))";
 
+$dontfail = 0;
 $programname = $0;
 $urlprefix = '';
 while ($#ARGV >= 0)
@@ -102,6 +118,8 @@ while ($#ARGV >= 0)
 	$urlprefix = $1;
     } elsif ($ARGV[0] =~ /^--output=(\S*)/) {
 	$outputfile = $1;
+    } elsif ($ARGV[0] eq '--force') { # fail quietly (ie, zero exit status)
+	$dontfail = 1;
     } elsif (!defined ($inputfilename)) {
 	$inputfilename = $ARGV[0];
     } elsif (!defined ($indexfilename)) {
@@ -117,14 +135,14 @@ defined ($indexfilename) || Usage ();
 # Arguments parsed...
 
 open (TF, $inputfilename)
-    || die "Can't open TeX file $inputfilename to read";
+    || Error ("Can't open TeX file $inputfilename to read");
 
 open (IDX, $indexfilename)
-    || die "Can't open index file $indexfilename to read";
+    || Error ("Can't open index file $indexfilename to read");
 
 if (defined $outputfile) {
     open (OUTFILE, ">$outputfile")
-	|| die "Can't open output file $outputfile to write";
+	|| Error ("Can't open output file $outputfile to write");
 } else {
     open (OUTFILE, ">&STDOUT");
 }
@@ -361,5 +379,15 @@ sub check_markup {
 
 
 sub Usage {
-    die "$ident_string\nUsage: $programname [--prefix=url-prefix] [--output=outfile] input-file-name index-file-name\n";
+    Error ("$ident_string\nUsage: $programname [--prefix=url-prefix] [--output=outfile] [--force] input-file-name index-file-name\n");
+}
+
+sub Error {
+    my $msg = shift;
+    if ($dontfail) {
+	print STDERR $msg;
+	exit (0);
+    } else {
+	die $msg;
+    }
 }
