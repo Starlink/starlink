@@ -28,6 +28,11 @@
   <!ENTITY fig-versinfo-gif   SYSTEM "ssn78-5.gif" NDATA gif89a>
   <!ENTITY fig-versinfo-eps   SYSTEM "ssn78-5.eps" NDATA eps>
   <!ENTITY fig-versinfo-pdf   SYSTEM "ssn78-5.pdf" NDATA pdf>
+
+  <!-- References to other Starlink documents -->
+  <!ENTITY sgp28  PUBLIC "-//Starlink//DOCUMENT Summary SGP/28//EN" NDATA XML>
+  <!ENTITY ssn70  PUBLIC "-//Starlink//DOCUMENT Summary SSN/70//EN" NDATA XML>
+  <!ENTITY sun199 PUBLIC "-//Starlink//DOCUMENT Summary SUN/199//EN" NDATA XML>
 ]>
 <!-- $Revision$ -->
 
@@ -2985,7 +2990,7 @@ bin_MONOLITHS = foo
 
     <sect id="autoconfing" export="export">
       <subhead>
-        <title>Adapting a package to the Starlink build system</title>
+        <title>Incorporating a package into the Starlink build system</title>
       </subhead>
 
       <p>The process of adding a package to the build system, and
@@ -4308,6 +4313,104 @@ $(RECURSIVE_TARGETS):
           <p>That's it!</p>
 
         </subsubsect>
+      </subsect>
+
+      <subsect id="autoconfing-docs" export="export"
+        indexkey="documentation">
+        <subhead>
+          <title>Documentation</title>
+        </subhead>
+
+        <p>There is fairly complete support for documentation within
+          the build system.  Most Starlink documentation is in the
+          form of &latex; files respecting certain conventions (see
+          <docxref doc="sgp28" >SGP/28: Writing Starlink
+            documents</docxref> and <docxref doc="sun199" >SUN/199:
+          Star2HTML</docxref> for some further details), but a small
+          amount is in a custom XML DTD, converted using the kit contained in
+          the <code>sgmlkit</code> component, documented in <docxref
+            doc="ssn70" >SSN/70</docxref>.</p>
+
+        <p>The simplest case is where you have one or more
+          <code>.tex</code> files in the component directory (that is,
+          the directory which contains the <code>component.xml</code>
+          file).  In this case, you simply declare the document
+          numbers, and the files named after them, in a
+          <code>STAR_LATEX_DOCUMENTATION</code> macro, as in:
+<verbatim>
+STAR_LATEX_DOCUMENTATION([sun123 sc99])
+</verbatim>
+          This will put these document codes into the substitution
+          variable <code>@STAR_DOCUMENTATION@</code>, which you can
+          use to substitute in <code>component.xml.in</code>, and it
+          will arrange to compile the &latex; files
+          <code>sun123.tex</code> and <code>sc99.tex</code>.  This
+          macro is documented fully in <ref
+          id="macro-latex-documentation" />.</p>
+
+        <p>The final step in this case is to declare that the
+          documentation is to be built and installed in the Starlink
+          documentation directory.  You do that by including the
+          following line in the component's <code>Makefile.am</code>:
+<verbatim>
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+</verbatim>
+          (see <ref id="variable-starxxxdata" />).  This substitution
+          variable expands to the default list of documentation
+          targets (at present comprising <code>.tex</code>,
+          <code>.ps</code> and <code>.htx_tar</code>, but subject to
+          change in principle).</p>
+
+        <p>The next simplest case is where the source files are in a
+          different directory from the <code>component.xml</code>.
+          Indicate this by appending a slash to the end of each of the
+          document codes located elsewhere:
+<verbatim>
+STAR_LATEX_DOCUMENTATION([sun123/ sc99])
+</verbatim>
+          This will behave as above for the <code>sc99.tex</code>
+          file, but differently for the <code>sun123</code> document.
+          That code, <code>sun123</code> is still included in
+          <code>@STAR_DOCUMENTATION@</code>, but it is the variable
+          <code>@STAR_LATEX_DOCUMENTATION_SUN123@</code> which is set
+          to the default target list, and not
+          <code>@STAR_LATEX_DOCUMENTATION@</code>.  Documentation
+          specified in this way does not -- perhaps contrary to
+          appearances -- have to live in a similarly-named
+          subdirectory of the component directory; instead you specify
+          where the documentation is using the standard mechanisms
+          available to <code>Makefile.am</code> files.  That is, you
+          create a <code>Makefile.am</code> in the documentation
+          directory containing at least
+<verbatim>
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION_SUN123@
+</verbatim>
+          and make sure that that directory is built via the usual
+          method of mentioning the directory in a <code>SUBDIRS =
+          ...</code> specification in the component
+          <code>Makefile.am</code>.  The <code>datacube</code>
+          component uses this mechanism to build its
+          documentation.</p>
+
+        <p>Sometimes you need to do more elaborate things to build
+          your documentation -- the <code>ast</code> component is a
+          good example, here.  In this case, you can give a non-null
+          second argument to the <code>STAR_LATEX_DOCUMENTATION</code>
+          macro, giving a list of makefile targets which should be
+          built.  The document codes in the first argument are still
+          included in <code>@STAR_DOCUMENTATION@</code>, but the
+          second argument is included verbatim in
+          <code>@STAR_LATEX_DOCUMENTATION@</code> without any
+          defaulting.  You are responsible for adding the given
+          targets to the Makefile and, as before, you should add
+          <code>@STAR_LATEX_DOCUMENTATION@</code> to the
+          <code>stardocs_DATA</code> Makefile variable.</p>
+
+        <p>If you have produced XML documentation, use the
+          <ref id="macro-xml-documentation"
+          ><code>STAR_XML_DOCUMENTATION</code></ref> macro, which is
+          closely analogous to the &latex; one.</p>
+
       </subsect>
 
       <subsect id="autoconfing-final" export="export">
@@ -5903,17 +6006,21 @@ target: dependency
 
           <p><strong><code>STAR_LATEX_DOCUMENTATION(documentcode, [targets=''])</code></strong></p>
 
-          <p>Generate the standard makefile targets to handle
-            &latex; documentation source<index>documentation</index>.
-            The parameter <code>documentcode</code> 
-            should be something like `sun123' -- it should not include
-            any <code>.tex</code> extension.</p>
+          <p>Generate the standard makefile targets to handle &latex;
+            documentation source<index>documentation</index>.  The
+            parameter <code>documentcode</code> should be a
+            space-separated list of codes like `sun123' -- they must
+            not include any <code>.tex</code> extension.  Each of the
+            documentcodes may optionally be followed by a slash, to
+            indicate that the source file is not in the current
+            directory; see below.</p>
 
           <p>The second, optional, argument gives an explicit list
             of the targets which are build.  If this is <em>not</em>
             specified, then a standard list is used
             (<code>.tex</code>, <code>.ps</code> and
-            <code>.tar_htx</code>) and corresponding rules added to
+            <code>.tar_htx</code> at present, though this is in
+            principle subject to change) and corresponding rules added to
             the generated makefile.  If it is specified, it must be
             non-null, and its value is a list of files which are to be
             added to the distribution, and no extra Makefile rules are
@@ -5949,10 +6056,18 @@ LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1'
 
           <p>This macro defines the substitution variable
             <code>@STAR_LATEX_DOCUMENTATION@</code> to be the second
-            macro argument if that is present, or the default file
+            macro argument if that is present, or the default target
             list if not.  This variable must therefore be used as a value
             for the <code>stardocs_DATA</code> Makefile variable (see
             <ref id="variable-starxxxdata"/>).</p>
+
+          <p>If any <code>documentcode</code> is followed by a slash,
+            then the default target list is assigned to
+            <code>@STAR_LATEX_DOCUMENTATION_&lt;DOCUMENTCODE&gt;@</code>
+            instead; you may not use this latter feature if the second
+            argument is non-null.</p>
+
+          <p>See <ref id="autoconfing-docs" /> for more discussion.</p>
 
           <p>The configure option
             <code>--without-stardocs</code><index>configure!options!--without-stardocs</index>
@@ -6387,8 +6502,9 @@ BUILT_SOURCES = $(include_MESSAGES)
               </li>
 
               <li>
-                <p>This macro defines the substitution variable
-                <code>@STAR_XML_DOCUMENTATION@</code></p>
+                <p>This macro defines the substitution variables
+                <code>@STAR_XML_DOCUMENTATION@</code> and
+                <code>@STAR_XML_DOCUMENTATION_&lt;DOCUMENTCODE&gt;@</code>.</p>
               </li>
 
               <li>
@@ -6422,16 +6538,17 @@ BUILT_SOURCES = $(include_MESSAGES)
             of files to be installed as data in the corresponding
             place.</p>
 
-          <p>Since the list of documentation files is not necessarily
-            known in advance (since the macro <ref
+          <p>The list of documentation files is not necessarily known
+            in advance, since the macro <ref
               id="macro-latex-documentation"
             >STAR_LATEX_DOCUMENTATION</ref> has a default list of
-            targets it will generate, you can give the value of the
+            targets it will generate.  You can give the value of the
             <code>stardocs_DATA</code> as a substitution variable:
 <verbatim>
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 </verbatim>
-            (plus any other documentation files you require).</p>
+            (plus any other documentation files you require).  See
+            <ref id="autoconfing-docs" /> for more discussion.</p>
 
         </subsect>
 
