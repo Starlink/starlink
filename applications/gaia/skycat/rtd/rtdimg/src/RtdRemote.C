@@ -321,7 +321,7 @@ int RtdRemote::fileEvent()
     fd_set readMask, readFds;
     FD_ZERO(&readMask);
     FD_SET(socket_, &readMask);
-    memcpy(&readFds, &readMask, sizeof(struct fd_set));
+    memcpy(&readFds, &readMask, sizeof(fd_set));
     timeval timeout; timeout.tv_sec = timeout.tv_usec = 0;
 #ifdef HAVE_SELECT_FD_SET
     int status = select(32, (fd_set *)&readFds, 0, 0, &timeout);
@@ -335,7 +335,7 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-	int addrSize = (int) sizeof(addr);
+	socklen_t addrSize = (int) sizeof(addr);
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");
