@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 3;
+use Test::More tests => 4;
 require_ok("Starlink::AST");
 
 # Implement astShow
@@ -20,3 +20,9 @@ for (@cards) {
   print "# $_\n";
 }
 ok( $#cards > -1, "Something present in array");
+
+# And put them back
+$ch = new Starlink::AST::Channel( source => sub { return shift(@cards)} );
+my $newobj = $ch->Read();
+isa_ok( $newobj, "Starlink::AST::UnitMap");
+
