@@ -25,6 +25,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.8  2003/04/01 01:10:17  timj
+*     Increase the max number of FITS headers to allow for the increased
+*     number of maps in REBIN.
+*
 *     Revision 1.7  1999/08/19 03:37:43  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -95,8 +99,10 @@
       INTEGER SCUBA__MAX_POINT              ! max number of pointing corrections
       PARAMETER (SCUBA__MAX_POINT = 20)
 
+*     Has to be large enough to include all the files that we read in
+*     with REBIN (specified in MAX_FILE parameter in surf_rebin.f)      
       INTEGER SCUBA__MAX_FITS               ! max number of FITS items in file
-      PARAMETER (SCUBA__MAX_FITS = 200)
+      PARAMETER (SCUBA__MAX_FITS = 356)
 
       INTEGER SCUBA__MAX_SECT               ! max number of SCUBA sections
       PARAMETER (SCUBA__MAX_SECT = 10)      ! that can be specified
