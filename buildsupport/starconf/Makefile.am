@@ -14,25 +14,22 @@ CLEANFILES=starconf make-starconf starconf.m4
 
 # Include (possibly) required files in the starconf script.
 #     starconf.m4               to add Starlink autoconf macros;
-#     install-with-manifest.in  since the STAR_DEFAULTS macro depends on it;
-#     Makefile.starconf         included in Makefile.am
 #     bootstrap                 standardised bootstrap script
-#     extra-fortran.m4          macros for handling fpp
 #
-# make-starconf allows filenames to be preceded by a question mark
-# '?': files which are _not_ thus prefixed are always unpacked; files
-# with the `?' are unpacked only if starconf detects certain features
+# make-starconf allows filenames to be preceded by options `-xxx'.
+# Option q: files which are _not_ thus prefixed are always unpacked; files
+# with the `q' are unpacked only if starconf detects certain features
 # in the configure.ac.
 #
-# Filenames preceded with `!' are always unpacked, overwriting any more
+# Filenames preceded with `f' are always unpacked, overwriting any more
 # recent file in the directory; those without are only
 # unpacked if there is no file present (again, this is now an empty set).
 starconf: make-starconf \
 		starconf.m4 \
 		bootstrap.installed
 	./make-starconf \
-		!starconf.m4 \
-		*?bootstrap:bootstrap.installed
+		-f:starconf.m4 \
+		-xq:bootstrap:bootstrap.installed
 
 # The edits of replacement variables (prefix and co) in
 # starlink.m4.in and starconf.in must be done at `make' time rather
