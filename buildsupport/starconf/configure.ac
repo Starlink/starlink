@@ -82,6 +82,7 @@ AC_PATH_PROG([JAVAC], [javac], [NOJAVAC])
 AC_ARG_VAR([JAVAC], [Location of java compiler])
 AC_PATH_PROG([JAVA], [java], [NOJAVA])
 AC_ARG_VAR([JAVA], [Location of java runtime])
+AC_PATH_PROG([JAR], [jar], [NOJAR])
 
 # We install material in the aclocal macro directory with aclocal_DATA
 # (as recommended in the automake manual).  However (slightly
