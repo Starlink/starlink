@@ -6898,7 +6898,7 @@ proc LoadOptions {} {
    global ATASK_VIEW
    global ATASK_XHAIR
    global ATASK_XHRCOL
-   global ATASK_SKNOTS
+   global ATASK_SKYPAR
    global BADCOL      
    global CHAR_LIST
    global CHAR_STOP
@@ -6919,7 +6919,7 @@ proc LoadOptions {} {
    global SI_LIST
    global SI_VARS
    global SKYOFF               
-   global SKY_KNOTS
+   global SKYPAR
    global VIEW
    global XHAIR
    global XHRCOL
@@ -6978,11 +6978,11 @@ proc LoadOptions {} {
      set INTERP Linear
    }
 
-   if { [info exists ATASK_SKNOTS] } {
-     set SKY_KNOTS $ATASK_SKNOTS
+   if { [info exists ATASK_SKYPAR] } {
+     set SKYPAR $ATASK_SKYPAR
      set ATASK 1
    } {
-     set SKY_KNOTS 1
+     set SKYPAR 1
    }
 
    if { [info exists ATASK_PLO] } {
@@ -9423,7 +9423,7 @@ proc SaveOptions {} {
    global ATASK_SAREA
    global ATASK_SELCOL
    global ATASK_SI
-   global ATASK_SKNOTS
+   global ATASK_SKYPAR
    global ATASK_SKYOFF
    global ATASK_VIEW
    global ATASK_XHAIR
@@ -9446,7 +9446,7 @@ proc SaveOptions {} {
    global SI_LIST
    global SI_VARS
    global SKYOFF           
-   global SKY_KNOTS
+   global SKYPAR
    global VIEW
    global XHAIR
    global XHRCOL
@@ -9469,7 +9469,7 @@ proc SaveOptions {} {
      set ATASK_PHI $PHI_REQ
      set ATASK_INTERP $INTERP
      set ATASK_VIEW $VIEW
-     set ATASK_SKNOTS $SKY_KNOTS
+     set ATASK_SKYPAR $SKYPAR
 
      foreach fittype [array names MAPTYPE] {
         if { $MAPTYPE($fittype) == $FITTYPE } { break } 
@@ -10739,6 +10739,9 @@ proc SkyOff {} {
 #    SKYTEXT (Write)
 #        The text to appear in the status area describing the current sky
 #        subtraction method.
+#    SKYTEXT2 (Write)
+#        The text to appear in the status area describing the current
+#        number of fitting parameter used when fitting sky surfaces.
 #    SKY_AREA (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by fitting
@@ -10763,6 +10766,7 @@ proc SkyOff {} {
    global SKYIMS    
    global SKYOFF   
    global SKYTEXT
+   global SKYTEXT2
    global SKY_AREA
    global SKY_FRAME
    global SKY_METHOD
@@ -10774,9 +10778,11 @@ proc SkyOff {} {
 # and determine whether the sky area buttons should be enabled or disabled.
       if { $SKY_METHOD == $SKY_FRAME } {
          set SKYTEXT $SKYIMS($IMAGE_DISP)
+         set SKYTEXT2 "(not applicable)"
          set state disabled
       } {
          set SKYTEXT "displayed image"
+         set SKYTEXT2 $SKYPAR
          set state normal
       }
 
@@ -10791,6 +10797,7 @@ proc SkyOff {} {
 
 # Set the text for the status item describing the sky subtraction.
       set SKYTEXT "(disabled)"
+      set SKYTEXT2 "(disabled)"
 
 # If the current object is a sky area, change it to "O Ray features".
       if { $CUROBJ_REQ == $E_RAY_SKY || $CUROBJ_REQ == $O_RAY_SKY } {
@@ -10976,18 +10983,21 @@ proc SkySub {data image args} {
             break
          }
 
-# Fit a surface to the data within the sky areas.
+# Fit a surface to the data within the sky areas. If 3 or fewer fitting
+# parameters are being used, use a polynomial surface otherwise use a spline
+# surface, converting the number of free parameters to the number of
+# interior knots.
          set fit($ray) [UniqueFile]
-
-#------------ Temporary bit until SURFIT is available ----------------
-
-         if { ![Obey kappa stats "ndf=$sky"] } {
-            set ok 0
-            break
+         if { $SKYPAR < 4 } {
+            set pars "fittype=poly order=$SKYPAR"
+         } {
+            set pars "fittype=spline knots=[expr $SKYPAR - 3]"
          }
 
-         set mean [GetParam kappa stats:mean]
-         if { ![Obey kappa maths "exp=IA*0+PA ia=$data pa=$mean out=$fit($ray)"] } {
+
+#------------ Temporary bit; SURFIT will eventually be in task kappa ---------
+
+         if { ![Obey surfit surfit "in=$sky out=$fit($ray) evaluate=all $pars"] } {
             set ok 0
             break
          }

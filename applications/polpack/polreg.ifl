@@ -214,13 +214,13 @@ interface POLREG
       helpkey  '*'
    endparameter
 
-   parameter SKYKNOTS
+   parameter SKYPAR
       type     _INTEGER
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
       default  1
-      prompt   'No. of interior knots per axis for each sky surface'
+      prompt   'No. of fitting parameters per axis for each sky surface'
       helpkey  '*'
    endparameter
 

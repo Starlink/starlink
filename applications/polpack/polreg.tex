@@ -310,12 +310,17 @@ one sky frame is supplied, then it is used for all input object frames.
 The sky frames must be specified when PolReg is run; they may not be
 specified within the GUI.
 
-\item If no sky frames are supplied, then the user can identify sky areas
+\item If no sky frames are supplied, then the user should identify sky areas
 within each of the input object frames (this is done in a similar way to
-the identification of the $O$ and $E$ ray masks). In dual beam mode,
-separate sky areas must be identified for the $O$ and $E$ ray pictures.
-Bi-cubic spline surfaces are then fitted to these sky areas, and removed
-from the corresponding areas of the input object frame.
+the identification of the $O$ and $E$ ray masks).\footnote{In dual beam
+mode, separate sky areas must be identified for the $O$ and $E$ ray
+pictures. In single-beam mode, only $O$-ray sky areas need be supplied.}
+Upon completion, these sky areas are extracted and cleaned by removing
+any small bright features. The KAPPA application SURFIT is then used to
+fit a bi-cubic spline surface to the sky areas for each ray (the
+flexibility of this surface may be controlled by the user), and
+extrapolated to cover the rest of the output image. Finally, this fitted
+surface is subtracted from the output image.
 
 \end{enumerate}
 
@@ -569,7 +574,7 @@ the list of sky frames to the SKYFRAMES parameter when starting {\tt
 polreg}. If this is done you need not identify any sky areas.} 
 To do this, click on the {\em O-ray sky area} button in the box
 labelled \htmlref{{\em Current:}}{POLREG_CURRENT}. Sky areas within
-the $O$-ray picture can then be identified using the cursor in just the 
+the $O$-ray picture should then be identified using the cursor in just the 
 same way as the $O$-ray mask. More than one polygon may be supplied if
 necessary. 
 
@@ -582,12 +587,15 @@ areas, if necessary. Note, default sky areas are created using the
 current mappings. No attempt is made to modify these areas to take
 account of any subsequently changes in the mappings.
 
-When the output images are created, the mean value in these sky areas
-will be found and subtracted from the corresponding output images. Options
-exist to subtract a surface fitted to the sky areas, instead of the mean
-sky value (see \hyperref{here}{section }{}{POLREG_SKY} for details).
+By default, a flat surface equal to the mean value in these sky areas
+will be subtracted from the corresponding output images upon completion.
+The flexibility of the fitted surfaces may be controlled using the
+\htmlref{{\em Sky}}{POLREG_SKY} item in the 
+\htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu.
 
-
+If you do not wish to subtract any sky background, then clear the 
+\htmlref{{\em Remove Sky}}{POLREG_REMOVE_SKY} box in the 
+\htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu.
 
 \subsubsection {Identifying $O$-ray features in the next input image.}
 Now, you need to supply features which allow the next image to be
@@ -662,16 +670,16 @@ positioned then you probably need to over-ride the default $OE$ mapping
 by explicitly identifying some $E$-ray features. To do this, you should
 use the same technique as for the $O$-ray features.
 
-\subsubsection {Identifying masks in the next input image.}
-In general, you will not need to identify any masks in the other images.
-By default, the masks identified in the first image will be mapped into
-the frame of the new image. To see the results of this, select the {\em
-O-ray mask} or {\em E-ray mask} button in the box labelled 
+\subsubsection {Identifying masks and sky areas in the next input image.}
+In general, you will not need to identify any masks or sky areas in the
+other images. By default, the masks and sky areas identified in the first
+image will be mapped into the frame of the new image. To see the results
+of this, select one of the buttons in the box labelled
 \htmlref{{\em Current:}}{POLREG_CURRENT}. The corresponding default mask
-will be drawn in red. This mask may be edited if necessary using the
+or sky area will be drawn in red. This may be edited if necessary using the
 usual techniques for adding, deleting or dragging vertices. Note, 
-default masks are based on the mappings current when the mask
-is first displayed. No attempt is made to change these masks to take
+default masks and sky areas are based on the mappings current when they
+were first displayed. No attempt is made to change them to take
 account of any subsequent changes in the mappings.
 
 \subsubsection {Finishing the job.}

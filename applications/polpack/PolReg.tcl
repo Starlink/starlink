@@ -195,14 +195,6 @@
       set CCDPACK_DIR /star/bin/ccdpack
    }
 
-   if { $OS == "Linux" } {
-      if { [info exists env(IRCAMPACK_DIR)] } {
-         set IRCAMPACK_DIR $env(IRCAMPACK_DIR)
-      } else {
-         set IRCAMPACK_DIR /star/bin/ircampack
-      }
-   }
-
 #  Name this application (for xresources etc.)
    tk appname PolReg
 
@@ -296,12 +288,10 @@
 # causes the polreg A-task to die in an uncontrolled manner! Do away with it.
    bind . <Destroy> ""
 
-# Load the required ADAM monoliths. IRCAMPACK is only needed for SEGMENT.
-# When KAPPA:SEGMENT is available under Linux, then IRCAMPACK can be
+# Load the required ADAM monoliths. 
+# When KAPPA:SURFIT is available under Linux, then the surfit task can be
 # removed.
-   if { $OS == "Linux" } {
-      LoadTask ircampack $IRCAMPACK_DIR/ircampack_mon
-   }
+   LoadTask surfit   $POLPACK_DIR/surfit
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa    $KAPPA_DIR/kappa_mon
    LoadTask ndfpack  $KAPPA_DIR/ndfpack_mon
@@ -601,7 +591,7 @@
    MenuHelp $OPTSMENU "Feature Size"    ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
    MenuHelp $OPTSMENU "Interpolation method" ".  The interpolation method to use when finding pixel values in the input images."
    MenuHelp $OPTSMENU "Mapping Types"   ".  The type of mapping to use when aligning images, or when aligning the O and E rays."
-   MenuHelp $OPTSMENU "Sky"             ".  The number of interior knots used along each axis in the fitted sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
+   MenuHelp $OPTSMENU "Sky"             ".  The number of fitting parameters used on each axis when fitting sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
    MenuHelp $OPTSMENU "Status Items..."      ".  Select which items of information to display in the status area."
    MenuHelp $OPTSMENU "View"            ".  The section to be displayed when a new image is selected from the \"Images\" menu."
    MenuHelp $OPTSMENU "Display Status Area"  ".  Toggle the display of status information underneath the displayed image."
@@ -650,14 +640,12 @@
 
 # Add items to the "Sky" sub-menu.
    set skymenu [menu $OPTSMENU.sky]
-   $skymenu add radiobutton -label "1 knot" -variable SKY_KNOTS \
-           -selectcolor $RB_COL -value 1
-   for {set i 2} {$i < 12} {incr i} {
-      $skymenu add radiobutton -label "$i knots" -variable SKY_KNOTS \
+   for {set i 1} {$i < 15} {incr i} {
+      $skymenu add radiobutton -label " $i " -variable SKYPAR \
               -selectcolor $RB_COL -value $i 
    }
 
-   SetHelp $skymenu ".  The number of interior knots used along each axis in the fitted sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
+   SetHelp $skymenu ".  The number of fitting parameters used on each axis when fitting sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
 
 # Add items to the "Mapping Types" sub-menu.
    set mapmenu [menu $OPTSMENU.map]
@@ -1074,6 +1062,7 @@
    StatusItem FITTYPE      "Image mappings: "        "The type of mapping being used to align images.\n(To change the mapping type, use the \"Options\" menu.)" 34
    StatusItem VIEW         "Image view: "            "What section of the image will be displayed when a new image is selected using the \"Images\" menu?\n(To change the value use the \"Options\" menu.)" 9
    StatusItem OEFITTYPE    "O-E mappings: "          "The type of mapping being used to align the O and E rays.\n(To change the mapping type, use the \"Options\" menu.)" 34
+   StatusItem SKYTEXT2     "Sky fit parameters: "    "The number of fitting parameters used on each axis when fitting a sky surface.\n(To change the value, use the \"Options\" menu.)" 10
    StatusItem INTERP       "Interpolation method: "  "The interpolation method to use when sampling the input images.\n(To change the method, use the \"Options\" menu.)" 20
    StatusItem SKYTEXT      "Sky estimated in:"       "The image in which the sky background will be determined. This will either be one of the supplied sky frames, or the displayed image (if no sky frames were supplied)." $maxsfwid
 
