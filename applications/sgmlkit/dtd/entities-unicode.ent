@@ -21,6 +21,8 @@
 <!ENTITY hash		"&#x0023;"> <!-- NUMBER SIGN -->
 <!ENTITY quot		"&#x0022;"> <!-- QUOTATION MARK -->
 <!ENTITY underscore	"&#x005F;"> <!-- underscore		-->
+<!ENTITY backslash	"&#x005C;"> <!-- backslash -->
+<!ENTITY verticalbar	"&#x007C;"> <!-- vertical bar -->
 
 <!ENTITY latex  "LaTeX"	> <!-- might as well...	-->
 <!ENTITY tex	"TeX"	> <!-- might as well...	-->

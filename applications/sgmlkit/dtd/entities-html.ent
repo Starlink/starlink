@@ -8,37 +8,39 @@
   $Id$
 -->
 
-<!ENTITY amp    CDATA "&"	-- ampersand		-->
-<!ENTITY gt     CDATA ">"	-- greater than		-->
-<!ENTITY lt     CDATA "<"	-- less than		-->
-<!ENTITY quot   CDATA '"'	-- double quote		-->
+<!ENTITY amp    	CDATA "&"	-- ampersand		-->
+<!ENTITY gt     	CDATA ">"	-- greater than		-->
+<!ENTITY lt     	CDATA "<"	-- less than		-->
+<!ENTITY quot   	CDATA '"'	-- double quote		-->
 
 <![ INCLUDE [
-<!ENTITY nbsp   SDATA "&#160;"  -- non breaking space	-->
-<!ENTITY pounds SDATA "&#163;" -- pound sign	-->
-<!ENTITY deg    SDATA "&#176;"	-- degree	-->
-<!ENTITY copy	SDATA "&#169;"	-- copyright -->
+<!ENTITY nbsp   	SDATA "&#160;"  -- non breaking space	-->
+<!ENTITY pounds 	SDATA "&#163;" -- pound sign	-->
+<!ENTITY deg    	SDATA "&#176;"	-- degree	-->
+<!ENTITY copy		SDATA "&#169;"	-- copyright -->
 ]]>
-<!ENTITY nbsp   CDATA " " 	-- non breaking space	-->
-<!ENTITY pounds CDATA "UKP" 	-- pound sign		-->
-<!ENTITY deg    CDATA "(deg)"	-- degree		-->
-<!ENTITY copy   CDATA "(c)"	-- copyright sign	-->
+<!ENTITY nbsp   	CDATA " " 	-- non breaking space	-->
+<!ENTITY pounds 	CDATA "UKP" 	-- pound sign		-->
+<!ENTITY deg    	CDATA "(deg)"	-- degree		-->
+<!ENTITY copy   	CDATA "(c)"	-- copyright sign	-->
 
-<!ENTITY emdash CDATA "--"	-- em dash 		-->
-<!ENTITY endash CDATA "-"	-- en dash		-->
-<!ENTITY hash   CDATA "#"	-- hash sign		-->
-<!ENTITY dollar CDATA "$"	-- dollar sign		-->
-<!ENTITY ellip  CDATA "..."	-- ellipses		-->
-<!ENTITY percent CDATA "%"	-- percent sign		-->
-<!ENTITY tilde	CDATA "~"	-- tilde		-->
-<!ENTITY underscore CDATA "_"	-- underscore		-->
-<!ENTITY dot	CDATA "."	-- non-sentence-ending period -->
+<!ENTITY emdash 	CDATA "--"	-- em dash 		-->
+<!ENTITY endash 	CDATA "-"	-- en dash		-->
+<!ENTITY hash   	CDATA "#"	-- hash sign		-->
+<!ENTITY dollar 	CDATA "$"	-- dollar sign		-->
+<!ENTITY ellip  	CDATA "..."	-- ellipses		-->
+<!ENTITY percent 	CDATA "%"	-- percent sign		-->
+<!ENTITY tilde		CDATA "~"	-- tilde		-->
+<!ENTITY underscore	CDATA "_"	-- underscore		-->
+<!ENTITY dot		CDATA "."	-- non-sentence-ending period -->
+<!ENTITY backslash	CDATA "\"	-- backslash		-->
+<!ENTITY verticalbar 	CDATA "|"	-- vertical bar		-->
 
 <![ INCLUDE [
-<!ENTITY latex	SDATA "L<sup>a</sup>T<small>E</small>X" >
-<!ENTITY tex	SDATA "T<small>E</small>X" >
+<!ENTITY latex		SDATA "L<sup>a</sup>T<small>E</small>X" >
+<!ENTITY tex		SDATA "T<small>E</small>X" >
 <!-- <!ENTITY tex	SDATA "T<sub><big>E</big></sub>X" > -->
 ]]>
-<!ENTITY latex	CDATA "LaTeX"	-- might as well...	-->
-<!ENTITY tex    CDATA "TeX"	-- might as well...	-->
+<!ENTITY latex		CDATA "LaTeX"	-- might as well...	-->
+<!ENTITY tex    	CDATA "TeX"	-- might as well...	-->
 
