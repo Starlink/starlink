@@ -570,7 +570,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Determine if the replacement Mapping can be a UnitMap. This will be
    the case only if the accumulated zoom factor is unity (within some
    tolerable error). */
-      unit = ( fabs( zoom - 1.0 ) <= ( 16.0 * DBL_EPSILON ) );
+      unit = ( fabs( zoom - 1.0 ) <= ( 8.0 * DBL_EPSILON ) );
 
 /* Determine if simplification is possible. This will be so if (a)
    Mappings can be eliminated ("ngone" is non-zero), or (b) the

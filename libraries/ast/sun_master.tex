@@ -16,13 +16,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.3}
+\newcommand{\stardocnumber}    {211.4}
 c-
 f+
-\newcommand{\stardocnumber}    {210.3}
+\newcommand{\stardocnumber}    {210.4}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {18th December 1998}
+\newcommand{\stardocdate}      {4th June 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -373,8 +373,6 @@ f-
 % Main text of document.
 \vspace{7mm}
 
-%\include{introduction}
-%docstatus introduction:     I(cf),G(cf),      T(cf)
 \section{Introduction}
 
 Welcome to the AST library. If you are writing software for astronomy
@@ -554,8 +552,6 @@ library.  In fact, it turns out that astrometry forms only a minor
 component, but the name AST has stuck.
 
 \cleardoublepage
-%\include{overview}
-%docstatus overview:         I(cf)
 \section{Overview of AST Concepts}
 
 This section presents a brief overview of AST concepts. It is intended
@@ -1119,8 +1115,6 @@ Plots and how to produce graphical output, see \secref{ss:plots}. Also
 see the Plot entry in \appref{ss:classdescriptions}.
 
 \cleardoublepage
-%\include{howto}
-%docstatus howto:
 \section{\label{ss:howto}How To\ldots}
 
 For those of you with a plane to catch, this section provides some
@@ -2884,8 +2878,6 @@ individual attribute ({\em{e.g.}}\ those above), see the attribute's
 entry in \appref{ss:attributedescriptions}.
 
 \cleardoublepage
-%\include{primer}
-%docstatus primer:           I(cf),      F(cf)
 \section{\label{ss:primer}An AST Object Primer}
 
 c+
@@ -4654,8 +4646,6 @@ interface to the AST library.
 c-
 
 \cleardoublepage
-%docstatus mappings:         I(cf),      F(cf)
-%\include{mappings}
 \section{\label{ss:mappings}Inter-Relating Coordinate Systems (Mappings)}
 
 In \secref{ss:primer} we used the ZoomMap as an example of a
@@ -5301,8 +5291,6 @@ reduce the number of dimensions, such as when selecting a ``slice''
 from a multi-dimensional array.
 
 \cleardoublepage
-%docstatus cmpmaps:          I(cf),     ,F(cf)
-%\include{cmpmaps}
 \section{\label{ss:cmpmaps}Compound Mappings (CmpMaps)}
 
 We now turn to a rather special form of Mapping, the CmpMap. The
@@ -5848,8 +5836,6 @@ most common and important cases.
 f-
 
 \cleardoublepage
-%docstatus frames:           I(cf),G(cf),F(cf),T(cf)
-%\include{frames}
 \section{\label{ss:frames}Representing Coordinate Systems (Frames)}
 
 An AST Frame is an Object that is used to represent a coordinate
@@ -7436,8 +7422,6 @@ preferred (at the level of data handling being discussed in this
 document) and we recommend it.
 
 \cleardoublepage
-%docstatus skyframes:        I(cf)
-%\include{skyframes}
 \section{\label{ss:skyframes}Celestial Coordinate Systems (SkyFrames)}
 
 A Frame which is specialised for representing coordinate systems on
@@ -8090,13 +8074,9 @@ otherwise identified. This is the normal behaviour unless an explicit
 Format(axis) value has been set to override the default.
 
 %\cleardoublepage
-%docstatus cmpframes:
-%\include{cmpframes}
 %\section{\label{ss:cmpframes}TBW - Compound Frames (CmpFrames)}
 
 \cleardoublepage
-%docstatus converting:       I(cf)
-%\include{converting}
 \section{\label{ss:introducingconversion}An Introduction to Coordinate System Conversions}
 
 In this section, we start to look at techniques for converting between
@@ -8673,8 +8653,6 @@ represent the same coordinate system.
 %distinguishable and others aren't.
 
 \cleardoublepage
-%docstatus framesets:        I(cf),G(cf),F(cf),T(cf)
-%\include{framesets}
 \section{\label{ss:framesets}Coordinate System Networks (FrameSets)}
 
 c+
@@ -9451,8 +9429,6 @@ relationship between Frames~2 and 3 would still be preserved, although
 they would be re-numbered as Frames~1 and 2.
 
 \cleardoublepage
-%docstatus fshigher:         I(cf)
-%\include{fshigher}
 \section{\label{ss:fshigher}Higher Level Operations on FrameSets}
 
 c+
@@ -10695,13 +10671,9 @@ unchanged.
 f-
 
 %\cleardoublepage
-%docstatus searching
-%\include{searching}
 %\section{\label{ss:searching}TBW - Searching for Coordinate Systems}
 
 \cleardoublepage
-%docstatus channel:          I(cf),G(cf),F(cf),T(cf)
-%\include{channel}
 \section{\label{ss:channels}Saving and Restoring Objects (Channels)}
 
 Facilities are provided by the AST library for performing input and
@@ -11901,8 +11873,6 @@ also be implemented {\em{via}} source and sink functions in basically
 the same way.
 
 \cleardoublepage
-%docstatus nativefits:       I(cf),G(cf),F(cf),T(cf)
-%\include{nativefits}
 \section{\label{ss:nativefits}Storing AST Objects in FITS Headers (FitsChans)}
 
 \begin{latexonly}
@@ -13025,8 +12995,6 @@ true FITS file.
 f-
 
 \cleardoublepage
-%docstatus foreignfits:      I(cf),     F(cf)
-%\include{foreignfits}
 \section{\label{ss:foreignfits}Using Foreign FITS Encodings}
 
 We saw in the previous section (\secref{ss:nativefits}) how to store
@@ -13859,7 +13827,6 @@ software. Whether you consider this a worthwhile risk probably depends
 on the use to which you expect your data to be put.
 
 \cleardoublepage
-%\include{selfmappings}
 \section{\label{ss:intramaps}Creating Your Own Private Mappings (IntraMaps)}
 
 \subsection{The Need for Extensibility}
@@ -15146,8 +15113,6 @@ will use, so they must all be available in order to avoid an error.
 f-
 
 \cleardoublepage
-%docstatus plots:            I(cf)
-%\include{plots}
 \section{\label{ss:plots}Producing Graphical Output (Plots)}
 
 Graphical output from AST is performed though an Object called a Plot,
@@ -15830,8 +15795,6 @@ by the particular Plot. The appearance of the output can be modified
 in a wide variety of ways by setting various Plot attributes.
 
 \cleardoublepage
-%docstatus building:         I(cf)
-%\include{building}
 \section{Compiling and Linking Software that Uses AST}
 
 A small number of UNIX commands are provided by AST to assist with the
@@ -16394,7 +16357,6 @@ the ``ast\_link\_adam'' command description in
 % @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
 
 \cleardoublepage
-%docstatus classhierarchy:   I(cf)
 \section{\label{ss:classhierarchy}The AST Class Hierarchy}
 The following table shows the hierarchy of classes in the AST library.
 For a description of each class, you should consult
@@ -16430,7 +16392,6 @@ Object            - Base class for all AST Objects
 \normalsize
 
 \cleardoublepage
-%docstatus functiondescriptions:     I(cf)
 c+
 \section{\label{ss:functiondescriptions}AST Function Descriptions}
 \small
@@ -16445,7 +16406,6 @@ f+
 f-
 
 \cleardoublepage
-%docstatus attributedescriptions: I(cf)
 \section{\label{ss:attributedescriptions}AST Attribute Descriptions}
 \small
 c+
@@ -16457,7 +16417,6 @@ f-
 \normalsize
 
 \cleardoublepage
-%docstatus classdescriptions:I(cf)
 \section{\label{ss:classdescriptions}AST Class Descriptions}
 \small
 c+
@@ -16469,7 +16428,6 @@ f-
 \normalsize
 
 \cleardoublepage
-%docstatus commanddescriptions: I(cf)
 \section{\label{ss:commanddescriptions}UNIX Command Descriptions}
 The commands described here are provided for use from the UNIX shell
 to assist with developing software which uses AST. To use these
@@ -16632,11 +16590,11 @@ drawn on a coordinate axis close to a singularity in the coordinate
 system.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.2}
+\subsection{Changes Introduced in V1.2}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.1 and V1.2 (the
-current version):
+The following describes the most significant changes which occurred in
+the AST library between versions V1.1 and V1.2 (not the most recent
+version):
 
 \begin{enumerate}
 c+
@@ -16753,17 +16711,58 @@ possible when, in fact, it wasn't.
 f-
 \end{enumerate}
 
-Programs which are statically linked will need to be re-linked in
-order to take advantage of these new facilities. In addition,
-procedures for linking AST programs may need modification to
-accommodate the changes to the ``$-$pgp'' and ``$-$pgplot'' options
-described above.
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.3}
 
-%docstatus
-%docstatus Key
-%docstatus ---
-%docstatus   I = Section is included in document
-%docstatus   G = Checked for gaffs (wrong info, latex formatting errors, etc)
-%docstatus   F = All required information is present
-%docstatus   T = Text tidied for smoother reading pleasure
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.2 and V1.3 (the
+current version):
+
+\begin{enumerate}
+c+
+\item A new set of functions, astResample<X>, has been introduced to
+provide	efficient resampling of gridded data, such as spectra and
+images, under the control of a geometrical transformation specified by
+a Mapping. A variety of sub-pixel interpolation schemes are supported.
+c-
+f+
+\item A new set of functions, AST\_RESAMPLE<X>, has been introduced to
+provide	efficient resampling of gridded data, such as spectra and
+images, under the control of a geometrical transformation specified by
+a Mapping. A variety of sub-pixel interpolation schemes are supported.
+f-
+
+\item A new class, PcdMap, has been introduced. This is a specialised
+form of Mapping which implements 2-dimensional pincushion or barrel
+distortion.
+
+\item A bug has been fixed which could cause a FitsChan to produce too
+many digits when formatting floating point values for inclusion in a
+FITS header if the numerical value was in the range -0.00099999\ldots
+to -0.0001.
+
+\item a bug has been fixed which could cause a FitsChan to lose the
+comment associated with a string value in a FITS header.
+
+\item A bug has been fixed which could cause a program to crash if
+FrameSets were nested inside each other (for example, if one FrameSet
+had another FrameSet added to it for use as a Frame or Mapping). The
+problem only occured if the nested structure was loaded from a data
+c+
+file (using astRead) and happened to be the first instance of that
+c-
+f+
+file (using AST\_READ) and happened to be the first instance of that
+f-
+class of Object.
+
+\item Further improvements have been made to the simplification of
+compound Mappings, including fixes for several bugs which could cause
+indefinite looping or unwanted error messages.
+
+\item A small number of documentation errors have been corrected.
+\end{enumerate}
+
+Programs which are statically linked will need to be re-linked in
+order to take advantage of these new facilities.
+
 \end{document}
