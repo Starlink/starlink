@@ -46,6 +46,7 @@ set include = "INSTALL_INC"
 foreach name ( \
    ira_err \
    ira_par \
+   ctg_err \
    )
    if ( $1 == "" ) then
       ln -s $include/$name `echo $name | tr '[a-z]' '[A-Z]'`

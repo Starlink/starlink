@@ -514,7 +514,7 @@ PLATFORM_F =
 IRA_C_ROUTINES = 
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
-C_ROUTINES = $(IRA_C_ROUTINES) $(LPG_C_ROUTINES) $(LPG_C_ROUTINES)
+C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES)
 
 #  The facility error file.
 
@@ -562,8 +562,8 @@ $(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS)
 #  code.
 
 IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM 
-CTG_INCLUDE_LINKS CTG_ERR CTG_CONST
-LPG_INCLUDE_LINKS LPG_CONST LPG_COM
+CTG_INCLUDE_LINKS = CTG_ERR CTG_CONST
+LPG_INCLUDE_LINKS = LPG_CONST LPG_COM
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS) $(CTG_INCLUDE_LINKS) \
                 $(LPG_INCLUDE_LINKS)
 
@@ -582,7 +582,7 @@ DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
-GRP_ERR:   $(STAR_INC)/err_err;   $(LINK) $? $@
+GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
 SUBPAR_PAR:  $(STAR_INC)/subpar_par;   $(LINK) $? $@
