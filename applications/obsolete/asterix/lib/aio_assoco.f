@@ -56,7 +56,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get response
-      CALL PAR_GET0C( PAR, VALUE, STATUS )
+      CALL USI_GET0C( PAR, VALUE, STATUS )
 
 *    Open device
       CALL AIO_OPEN( VALUE, TYPE, ID, WIDTH, STATUS )

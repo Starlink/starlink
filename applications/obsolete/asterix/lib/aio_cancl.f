@@ -49,7 +49,7 @@
 *    Check parameter
       IF ( PAR .EQ. AIO_PARNAM ) THEN
         CALL AIO_CLOSE( AIO_MODE, STATUS )
-        CALL PAR_CANCL( PAR, STATUS )
+        CALL USI_CANCL( PAR, STATUS )
       END IF
 
 *    Tidy up

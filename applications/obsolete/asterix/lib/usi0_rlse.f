@@ -48,7 +48,9 @@
 
 *  Lower context count
       USI_CTX(USI_ICTX).TYPE = 0
-      CALL DAT_ANNUL( USI_CTX(USI_ICTX).PSTORE, STATUS )
+      IF ( USI_CTX(USI_ICTX).PSTORE .NE. DAT__NOLOC ) THEN
+        CALL DAT_ANNUL( USI_CTX(USI_ICTX).PSTORE, STATUS )
+      END IF
       USI_ICTX = USI_ICTX - 1
 
       END
