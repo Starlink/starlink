@@ -403,7 +403,7 @@
 *        the input NDFs should contain all the information necessary to
 *        process them).
 *        
-*        The parameters that this effects are:
+*        The parameters that this affects are:
 *           ADC
 *           BOUNDS
 *           DEFERRED
