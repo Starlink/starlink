@@ -12,7 +12,7 @@
 #     Unix C-shell
 
 #  Invocation:
-#     makecube i q u cube
+#     makecube i q u cube angrot
 
 #  Description:
 #     This stacks the three input 2-dimensional NDFs holding I, Q and U 
@@ -29,6 +29,10 @@
 #        The 2-d input NDF holding the u values.
 #     cube ...
 #        The 3-d output NDF to create.
+#     angrot
+#        The anticlockwise angle in degrees from the positive X axis 
+#        direction, to the reference direction of the Stokes vectors 
+#        supplied in i, q and u. 
 
 #  Prior Requirements:
 #     For ease of use, it's recommended that you set up an alias for
@@ -42,14 +46,16 @@
 #  History:
 #     22-MAR-1999 (DSB):
 #        Original version.
+#     30-MAR-1999 (DSB):
+#        Added angrot parameter.
 #     {enter_further_changes_here}
 
 #-
 
 #  Check that there are 4 arguments present.
       set args = ($argv[1-])
-      if ( $#args != 4 ) then
-         echo "Usage: makecube i q u cube"
+      if ( $#args != 5 ) then
+         echo "Usage: makecube i q u cube angrot"
          exit
       endif
 
@@ -96,6 +102,9 @@
 # Set up the POLPACK extension in the cube.
       setext $4 xname=polpack xtype=polpack option=put noloop cname=STOKES \
              ctype="_char*3" shape=0 cvalue=IQU
+
+      setext $4 xname=polpack option=put noloop cname=ANGROT ctype="_REAL" \
+             shape=0 cvalue=$5
 
 # Set the Label of the cube.
       setlabel $4 "'Stokes parameters (I, Q, U)'"
