@@ -20,6 +20,7 @@
 *     14 Dec 88 : V0.6-2 Freeze multiple parameters, allow param resetting (TJP)
 *     20 Jun 89 : V1.0-1 ASTERIX88 initial release (TJP)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     17 Jan 1996 : V1.8-1 Use new USI routine (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -57,16 +58,19 @@
 	INTEGER PARNO(MAXFREEZE)		! Nos of parameters to be frozen
 	INTEGER I,J				! Loop indices
 	REAL VAL(MAXFREEZE)			! Values for frozen params
+        INTEGER			FID			! Model file id
 *    Local data :
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'FREEZE Version 1.8-0')
+	PARAMETER		(VERSION = 'FREEZE Version 1.8-1')
 *-
 
         CALL AST_INIT()
 
 * Access and check fit_model object
-	CALL USI_ASSOCI('MODEL','UPDATE',FLOC,INPRIM,STATUS)
+* Access and check fit_model object
+        CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', FID, STATUS )
+        CALL ADI1_GETLOC( FID, FLOC, STATUS )
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 	CALL DAT_TYPE(FLOC,TYP,STATUS)
 	IF(TYP.NE.'FIT_MODEL')THEN
