@@ -54,6 +54,8 @@ proc CCDSetGenGlobals { Topwin args } {
 #        No longer runs any application so just use OK to exit.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     22-JUN-2001 (MBT):
+#        Added USESET parameter.
 #     {enter_changes_here}
 
 #-
@@ -86,6 +88,9 @@ proc CCDSetGenGlobals { Topwin args } {
    if { ![info exists CCDglobalpars(PRESERVE)] } {
       set CCDglobalpars(PRESERVE) TRUE
    }
+   if { ![info exists CCDglobalpars(USESET)] } {
+      set CCDglobalpars(USESET) FALSE
+   }
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Widget creation.
@@ -112,6 +117,13 @@ proc CCDSetGenGlobals { Topwin args } {
       Ccd_labent $Frame.logfile \
                    -text "Name of logfile:" \
                    -textvariable CCDglobalpars(LOGFILE)
+
+#  Radioarray for USESET value.
+   CCDCcdWidget Useset useset \
+      Ccd_radioarray $Frame.useset \
+                 -label "Images are grouped into Sets:" \
+                 -variable CCDglobalpars(USESET) \
+                 -standard 1 -adampars 1
 
 #  Radioarray for SATURATE value.
    CCDCcdWidget Satur satur \
@@ -159,7 +171,7 @@ proc CCDSetGenGlobals { Topwin args } {
        global CCDimportfile
        global CCDimportfilter
        set CCDimportfilter \"*.DAT\"
-       CCDGetFileName $Top.restore \"Read restoration file\"
+       CCDGetFileName $Top.restore \"Read restoration file\" 0
        if { \$CCDimportexists } {
           CCDReadRestoreFile \"\$CCDimportfile\"
        }
@@ -186,7 +198,7 @@ proc CCDSetGenGlobals { Topwin args } {
       {Select logfile from existing files ....} \
       "global CCDimportexists
        global CCDimportfile
-       CCDGetFileName $Top.restore \"Select existing logfile\"
+       CCDGetFileName $Top.restore \"Select existing logfile\" 0
        if { \$CCDimportexists } {
           $Logfile clear 0 end
           $Logfile insert 0 \"\$CCDimportfile\"
@@ -219,6 +231,7 @@ proc CCDSetGenGlobals { Topwin args } {
    pack $choice     -side bottom -fill x
    pack $keeplog    -fill x
    pack $logfile    -fill x
+   pack $useset     -fill x
    pack $satur      -fill x
    pack $setsat     -fill x
    pack $genvar     -fill x
