@@ -282,6 +282,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -332,6 +333,10 @@
 *        and further examples.  Improved efficiency by using PSX to
 *        obtain workspace.  Rewrote the Notes on contour colour and line
 *        style.
+*     6-MAY-1998 (DSB):
+*        Update the GKS workstation after changing polyline
+*        representations. This prevents the screen being cleared when the
+*        workstation is closed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -889,6 +894,12 @@
 
          END IF
       END DO
+
+*  Ensure that the pen changes have been applied. This may cause GKS to 
+*  redraw or clear the screen. It must be done now because otherwise, it
+*  would be done when the workstation is closed, resulting in the newly
+*  drawn graphics being erased.
+      CALL GUWK( IWKID, 1 )
 
 *    Set the line width.
 *    ===================

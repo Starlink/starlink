@@ -153,6 +153,7 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,6 +163,11 @@
 *        Expanded the documentation.  Fixed a bug that caused the final
 *        line always to be solid.  Added AXIS parameter.  Standardised
 *        the code style.  Renamed parameter LINSTYLE to LINESTYLE.
+*     6-MAY-1998 (DSB):
+*        Update the GKS workstation after changing polyline
+*        representations, and do not re-instate original representations
+*        at end. This prevents the screen being cleared when the
+*        workstation is closed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -400,6 +406,12 @@
       CALL GSPLR( IWKID, MPEN, LNTYPE, THICK, CI )
       SETPLR = .TRUE.
 
+*  Ensure that the pen changes have been applied. This may cause GKS to 
+*  redraw or clear the screen. It must be done now because otherwise, it
+*  would be done when the workstation is closed, resulting in the newly
+*  drawn graphics being erased.
+      CALL GUWK( IWKID, 1 )
+
 *  See if a GKS error has occurred.
       CALL GKS_GSTAT( STATUS )
 
@@ -546,9 +558,8 @@
       CALL NDF_END( STATUS )
 
 *  If necessary, re-instate the original colour index for the marker
-*  pen, and reinstate the original pen.
+*  pen.
       CALL SGS_SPEN( PEN )
-      IF ( SETPLR ) CALL GSPLR( IWKID, MPEN, LNTYPI, LWIDTH, COLI )
 
 *  AGI closedown
 *  =============
