@@ -2295,6 +2295,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Function declarations :
 *
       INTEGER                 CHR_LEN
+      EXTERNAL			PSF_TABULAR
 *
 *    Local variables :
 *
@@ -2395,6 +2396,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
+
+*  Set methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_TABULAR, STATUS )
 
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
