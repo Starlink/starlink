@@ -27,21 +27,21 @@
 *    Local Constants :
 *    Local variables :
       INTEGER K
-      LOGICAL OK(GCB__MXCONTLEV)
+      LOGICAL OK(GCB__MXCONTLEV),LOK
 *    External references :
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL GCB_GETI('CONT_N',OK,NL,STATUS)
-        IF (.NOT.OK) THEN
+        CALL GCB_GETI('CONT_N',LOK,NL,STATUS)
+        IF (.NOT.LOK) THEN
           NL=GCB__DEFCONTLEV
           DO K=1,NL
             LEVEL(K)=ZMIN + REAL(K-1)* (ZMAX-ZMIN)/REAL(NL-1)
           ENDDO
         ELSE
           CALL GCB_GET1R('CONT_LEVS',1,NL,OK,LEVEL,STATUS)
-          IF (.NOT.OK) THEN
+          IF (.NOT.OK(1)) THEN
             DO K=1,NL
               LEVEL(K)=ZMIN + REAL(K-1)* (ZMAX-ZMIN)/REAL(NL-1)
             ENDDO
