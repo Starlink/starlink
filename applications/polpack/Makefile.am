@@ -29,6 +29,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 polpack.hlp: $(POLPACK_F1_ROUTINES) polpack_master.hlp
 	cat $(POLPACK_F1_ROUTINES) > all.f
+	PATH=$(PATH):$(STARLINK)/bin/sst; \
 	@PROHLP@ in=all.f out=all.hlp single=no
 	cat polpack_master.hlp all.hlp > polpack.hlp
 	-rm -f all.hlp
