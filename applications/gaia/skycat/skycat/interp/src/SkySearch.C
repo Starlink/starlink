@@ -17,6 +17,7 @@
  */
 static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.5 1998/05/28 13:15:10 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
 
 #include <string.h>
 #include <ctype.h>
@@ -25,7 +26,16 @@ static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.5 1998/05/28 13:15:10 
 #include <stdlib.h>
 #include <unistd.h>
 #include <fstream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include "TabTable.h"
 #include "Mem.h"
 #include "error.h"
@@ -188,7 +198,7 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
     // all symbols for this instance by the instance name. The row number
     // is coded as row#$rownum. The general tag "objects" is also included.
     char symbol_tags[1024];
-    std::ostrstream symbol_os(symbol_tags, sizeof(symbol_tags));
+    STRSTD::ostrstream symbol_os(symbol_tags, sizeof(symbol_tags));
     symbol_os << "{cat" << id << "} " 
 	      << this->instname() 
 	      << ' ' << this->instname() << ".objects"
@@ -203,7 +213,7 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
     char label_tags[1024];
     label_tags[0] = '\0';
     if (label && strlen(label)) {
-	std::ostrstream label_os(label_tags, sizeof(label_tags));
+	STRSTD::ostrstream label_os(label_tags, sizeof(label_tags));
 	label_os 
 	    << "{label" << id << "} " 
 	    << this->instname() 

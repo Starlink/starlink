@@ -13,12 +13,23 @@
  */
 static const char* const rcsId="@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
+
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <stdio.h>
 #include <iostream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include <fstream.h>
 #include <sys/types.h>
 #include <new.h>
@@ -30,7 +41,6 @@ static const char* const rcsId="@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 ab
 #include "error.h"
 #include "define.h"
 #include "util.h"
-#include "config.h"
 #include "SkySearch.h"
 #include "TcsSkySearch.h"
 #include "FitsIO.hxx"
@@ -344,7 +354,7 @@ int Skycat::draw_circle(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create oval "
 	   << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
@@ -391,7 +401,7 @@ int Skycat::draw_square(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create rect "
 	   << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
@@ -438,7 +448,7 @@ int Skycat::draw_cross(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
@@ -493,7 +503,7 @@ int Skycat::draw_triangle(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << x0 << ' ' << y1 << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y1
@@ -540,7 +550,7 @@ int Skycat::draw_diamond(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << x0 << ' ' << y << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y << ' ' << x << ' ' << y1
@@ -691,7 +701,7 @@ int Skycat::draw_plus(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << nx << ' ' << ny << ' ' << sx << ' ' << sy
@@ -748,7 +758,7 @@ int Skycat::draw_ellipse(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << nx << ' ' << ny << ' ' << ex << ' ' << ey << ' ' 
@@ -793,7 +803,7 @@ int Skycat::draw_compass(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << cx << ' ' << cy << ' ' << nx << ' ' << ny
@@ -848,7 +858,7 @@ int Skycat::draw_line(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << nx << ' ' << ny << ' ' << sx << ' ' << sy
@@ -889,7 +899,7 @@ int Skycat::draw_arrow(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << cx << ' ' << cy << ' ' << nx << ' ' << ny
@@ -1389,7 +1399,7 @@ int Skycat::hduCmdList(int argc, char** argv, FitsIO* fits)
 
 	// save current HDU, then loop through all HDUs to get info
     int curHDU = fits->getHDUNum();
-    std::ostrstream os;
+    STRSTD::ostrstream os;
     int status = 0;
     int count = 0;
     for (int i = 1; i <= numHDUs; i++) {

@@ -18,12 +18,22 @@
  */
 static const char* const rcsId="@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
 
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <iostream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include "error.h"
@@ -47,7 +57,7 @@ static void (*msghandler_)(const char*) = NULL;
 int error(const char* msg1, const char* msg2, int code)
 {
     char buf[sizeof(errmsg_)];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     os << msg1 << msg2 << ends;
     
     if (errhandler_)
@@ -78,7 +88,7 @@ int sys_error(const char* msg1, const char* msg2)
     }
 
     char buf[sizeof(errmsg_)];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     os << msg1 << msg2 << ": " << s << ends;
 
     if (errhandler_)
