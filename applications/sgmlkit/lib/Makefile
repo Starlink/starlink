@@ -22,11 +22,11 @@ JADEFLAGS=
 # (in fact, as of March 1999, the stylesheet _doesn't_ generate these links,
 # but it will as soon as I start generating something to link to!)
 %.html.stamp: %.sgml
-	$(JADE) -t sgml -iHTML.sdata $(JADEFLAGS) \
+	$(JADE) -t sgml -iHTML.entities $(JADEFLAGS) \
 		-d $(STYLESHEET)/html/sl.dsl#html $< > $@
 
 %.single.html: %.sgml
-	$(JADE) -t sgml -isingle.file -V stream-output $(JADEFLAGS) -d $(STYLESHEET)/html/sl.dsl#html $< > $@
+	$(JADE) -t sgml -isingle.file -iHTML.entities -V stream-output $(JADEFLAGS) -d $(STYLESHEET)/html/sl.dsl#html $< > $@
 
 %.parse: %.sgml
 	$(SGMLPARSE) -wall -ru $(DECL) $< >$@
@@ -37,6 +37,14 @@ JADEFLAGS=
 %.fot: %.sgml
 	$(JADE) -t fot -d $(STYLESHEET)/html/sl.dsl $< >$@
 
+# The target %.maths.stamp is satisfied when the maths has been extracted from 
+# a document, and tth has been used to convert it to HTML.  Note that,
+# although it's feasible, maths is _not_ routinely re-extracted by each
+# run of the main stylesheet - the model is that the maths will be converted
+# to HTML once, and then reused on subsequent production of the main document.
+# The justification for this is that, in the typical case, this system
+# won't be used for drafting, but for generating a final document
+# in one run.
 %.maths.stamp: %.sgml
 	$(JADE) -t sgml $(JADEFLAGS) \
 		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< > $@
@@ -61,7 +69,7 @@ tidy:
 	rm -f *.parse *~
 
 clean:	tidy
-	rm -f *.html *.stamp HTML.manifest
+	rm -f *.html *.stamp HTML.manifest *.tth-eqlist *.tth-html
 
 checkhtml:
 	for i in *.html; do echo $$i; $(SGMLPARSE) -s $(DECL) $$i; done
