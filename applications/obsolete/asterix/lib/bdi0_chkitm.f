@@ -243,7 +243,8 @@
               IF ( IAX .LE. NDIM ) THEN
 
 *            Must exist in the list
-                IF ( CHR_INSET( AXSUBS, LCOP(8:) ) ) THEN
+                IF ( (LCOP(8:).GT.' ') .AND.
+     :               CHR_INSET( AXSUBS, LCOP(8:) ) ) THEN
 
 *              Correct case of item
                   WRITE( LITEM, '(A,I1.1,A)' ) 'Axis_', IAX,
@@ -259,7 +260,7 @@
                     LITEM(8:) = 'ScalarWidth'
                   END IF
 
-                ELSE
+                ELSE IF ( LCOP(8:) .GT. ' ' ) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETC( 'NAME', ITEM )
                   CALL ERR_REP( 'BDI0_CHKITM_A', 'Axis item name is '/
