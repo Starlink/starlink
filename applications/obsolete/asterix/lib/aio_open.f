@@ -31,11 +31,13 @@
 *    Authors :
 *
 *     David J. Allan (JET-X, University of Birmingham)
+*     Richard Beard (University of Birmingham)
 *
 *    History :
 *
 *      4 May 94 : Original. Derived from old UTIL_SELOUT routine (DJA)
 *     24 Jul 94 : Renames existing output file on UNIX to allow cobbering (DJA)
+*      7 Apr 98 : Try to get full width screens (RB)
 *
 *    Type definitions :
 *
@@ -78,6 +80,7 @@
 *    Local variables :
 *
       CHARACTER*30		DEVARG			! Option device arg
+      CHARACTER*30		COLS			! Number of colums
 
       INTEGER			IFILE			! File counter
       INTEGER			LD			! Length of DEVICE
@@ -208,7 +211,13 @@
 
 *      Set mode
         ID = AIO__M_CONSOLE
-        AIO_WIDTH = 132
+        CALL PSX_GETENV( 'COLUMNS', COLS, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          CALL CHR_CTOI( COLS, AIO_WIDTH, STATUS )
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+          AIO_WIDTH = 80
+        END IF
 
 *    Simple filename mode
       ELSE
