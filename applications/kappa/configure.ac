@@ -34,10 +34,12 @@ dnl    Look for tcl/tk system
 STAR_PATH_TCLTK(8.2, [tk])
 AC_CHECK_HEADERS([tcl.h tk.h])
 
-dnl    Build dependencies for this package.
-dnl    Includes: fio, par, sae; 
-dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [fio prm par sae shl hds kaplibs ard mag pgplot tcl tk])
+dnl KAPPA source files depend on include files from the following components 
+STAR_DECLARE_DEPENDENCIES([build], [agi ast chr cnf kaplibs hds fio grp mag mers ndf one par prm psx sae shl subpar tcl tk trn])
+
+dnl The KAPPA link script links against the following components
+STAR_DECLARE_DEPENDENCIES([build], [ard kaplibs shl one], [link])
+
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun95 sun221)
