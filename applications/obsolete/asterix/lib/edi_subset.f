@@ -112,7 +112,6 @@
       INTEGER                 	BLEN      	   	! Block length
       INTEGER			CBPTR			! Counts per block store
       INTEGER		      	CCOUNT			! Events to copy per block
-      INTEGER                 	COPY                 	! Pointer to copy array
       INTEGER                 	EVENTS               	! Number of events in EVDS
       INTEGER                 	I              		! Loop counters
       INTEGER                 	IBLOCK               	! Loop over blocks
