@@ -56,8 +56,8 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER NDIM,DIMS(ADI__MXDIM),NVAL
-      LOGICAL DOK,VOK,QOK,AOK,WOK
+      INTEGER NDIM,DIMS(ADI__MXDIM)
+      LOGICAL DOK,AOK,WOK
 *-
       DOK=.FALSE.
 
@@ -113,6 +113,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
@@ -126,10 +127,9 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER DPTR,VPTR,APTR,WPTR,QPTR
-      INTEGER NVAL,TIMID,IDUM
-      INTEGER BASEMJD,BASEUTC
-      LOGICAL OK,HOK
+      INTEGER WPTR
+      INTEGER NVAL,TIMID
+      LOGICAL OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -138,7 +138,7 @@
 
 *  data
         CALL DYN_MAPR(1,T_NVAL,T_DPTR,STATUS)
-        CALL BDI_GET1R( FID, 'Data', T_NVAL, %VAL(T_DPTR), IDUM, STATUS )
+        CALL BDI_GET1R( FID, 'Data', T_NVAL, %VAL(T_DPTR), NVAL, STATUS )
         CALL BDI_GET0C( FID, 'Title', T_TITLE,STATUS)
         CALL BDI_GET0C( FID ,'Label',T_LABEL,STATUS)
         CALL BDI_GET0C( FID,'Units',T_UNITS,STATUS)
@@ -146,14 +146,14 @@
 *  axis values
         CALL DYN_MAPR(1,T_NVAL,T_APTR,STATUS)
         CALL BDI_AXGET1R( FID, 1, 'Data', T_NVAL, %VAL(T_APTR),
-     :                    IDUM, STATUS )
+     :                    NVAL, STATUS )
         CALL ARR_CHKREG( %VAL(T_APTR), T_NVAL, T_REG, T_ABASE, T_ASCALE,
      :                   STATUS )
 
 *  axis widths
         CALL DYN_MAPR(1,T_NVAL,T_WPTR,STATUS)
         CALL BDI_AXGET1R( FID, 1, 'WIDTH', T_NVAL, %VAL(T_WPTR),
-     :                    IDUM, STATUS )
+     :                    NVAL, STATUS )
         CALL ARR_COP1R(T_NVAL,%VAL(WPTR),%VAL(T_WPTR),STATUS)
 
 *  axis ancilliaries
@@ -166,15 +166,15 @@
           CALL ARR_COP1R(T_NVAL,%VAL(T_DPTR),%VAL(T_VPTR),STATUS)
         ELSE
           CALL BDI_GET1R( FID, 'Variance', T_NVAL, %VAL(T_VPTR),
-     :                    IDUM, STATUS )
+     :                    NVAL, STATUS )
         ENDIF
 *  QUALITY
         CALL DYN_MAPB(1,T_NVAL,T_QPTR,STATUS)
         IF ( T_QOK ) THEN
           CALL BDI_GET( FID, 'Quality', 'UBYTE', 1, T_NVAL, %VAL(T_QPTR),
-     :                    IDUM, STATUS )
+     :                    NVAL, STATUS )
           CALL BDI_GET( FID, 'QualityMask', 'UBYTE', 0, 0, T_MASK,
-     :                  IDUM, STATUS )
+     :                  NVAL, STATUS )
         ELSE
           CALL ARR_INIT1B(QUAL__GOOD,T_NVAL,%VAL(T_QPTR),STATUS)
           T_MASK=QUAL__MASK
@@ -765,8 +765,8 @@
       INCLUDE 'TIM_CMN'
 *  Local constants :
 *  Local variables :
+      REAL	SPARR(2)
       INTEGER TID
-      INTEGER DPTR,VPTR,QPTR,APTR,WPTR
 *-
 
 *  Check inherited global status
@@ -820,7 +820,7 @@
       CALL BDI_AXPUT0C(FID,1,'Units',T_AUNITS,STATUS)
 
 *  Copy ancilliary stuff from input
-      CALL UDI_COPANC(T_FID,'grf',LOC,STATUS)
+      CALL UDI_COPANC(T_FID,'grf',FID,STATUS)
 
       IF (STATUS.NE.SAI__OK) THEN
         CALL AST_REXIT('TIM_SAVEALL',STATUS)
@@ -845,8 +845,8 @@
       INCLUDE 'TIM_CMN'
 *  Local constants :
 *  Local variables :
-      REAL BASE
-      INTEGER DPTR,VPTR,QPTR,APTR,WPTR
+      REAL	SPARR(2)
+      INTEGER DPTR,VPTR,QPTR,APTR,WPTR,TID
       INTEGER NVAL
       INTEGER I1,I2
 *-
