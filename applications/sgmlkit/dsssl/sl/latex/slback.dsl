@@ -104,14 +104,19 @@ specifically not as part of the backmatter processing below.  We
 cannot, therefore, automake index processing here.
 <codebody>
 (element index
-  (let ((range (attribute-string (normalize "range"))))
-    (make command name: "index"
-          (literal
-           (string-append
-            (trim-data (current-node))
-            (if range            ; generate makeindex range specifiers
-                (if (string=? range "open") "|(" "|)")
-                ""))))))
+  (make command name: "index"
+        (literal
+         (string-append
+          (trim-data (current-node))
+          (cond
+           ((attribute-string "range")  ; generate makeindex range specifiers
+            (if (string=? (attribute-string "range"))
+                "|)"
+                "|)"))
+           ((attribute-string "seealso")
+            (string-append "|seealso{" (attribute-string "seealso") "}"))
+           (else
+            ""))))))
 
 (define (make-index)
   (let ((indexents (select-elements

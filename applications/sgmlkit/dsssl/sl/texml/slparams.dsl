@@ -284,6 +284,8 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 \\def\\dmsminutes#1{\\,#1\\raisebox{-0.5ex}{$^{'}$}}
 \\def\\dmsseconds#1{\\,#1}
 \\def\\dmsfraction#1{\\hbox to 0pt{${}^{\\prime\\mskip-1.5mu \\prime}\\hss$}.#1}
+<!-- index cross-references: see slback.dsl -->
+\\def\\seealso#1#2{\\emph{See also:} #1}
 ")
 
 (define %latex-ordinary-toc%

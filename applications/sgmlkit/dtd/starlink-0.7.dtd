@@ -511,9 +511,11 @@
              topic!subtopic!detail. -->
 <!ATTLIST index
 	range	(open|close) #IMPLIED
+	seealso	CDATA #IMPLIED
 	>
 	<!-- attributes:
 		range   open and close delimit range for entry
+		seealso	cross-reference from index key to seealso value
 	-->
 
 <!-- coderef element is for linking to code elements via a

@@ -819,6 +819,11 @@ argument&lt;/update&gt;In this section...
       beginning or ending of a range of pages associated with a
       particular keyword</p>
     </attribute>
+    <attribute name="seealso">
+      <p>Adds an index cross-reference.  This adds an index entry,
+      keyed by the element content, which has a `See also:' cross
+      reference to the index entry specified in the attribute value.</p>
+    </attribute>
   </element>
 
 

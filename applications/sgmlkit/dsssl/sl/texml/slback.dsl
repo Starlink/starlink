@@ -101,26 +101,31 @@ Jade pass.
 Index support.  Very simple -- just emit an <code>\\index</code>
 command.  We can only process the index after a LaTeX run, and
 specifically not as part of the backmatter processing below.  We
-cannot, therefore, automake index processing here.
+cannot, therefore, automate index processing here.
 <codebody>
 (element index
   (make-latex-command name: "index"
-        (literal (trim-data (current-node)))))
-; ;; The following version also handles the range attribute, but is currently
-; ;; disabled, and this attribute ignored -- it requires TeXML
-; ;; escaping turned off, but if an index is used within, say,
-; ;; a "dt", then the result is invalid TeXML.
-; (element index
-;   (let ((range (attribute-string (normalize "range"))))
-;     (make element gi: "TeXML" attributes: '(("escape" "0"))
-;           (make-latex-command name: "index"
-;                 (literal
-;                  (string-append
-;                   (trim-data (current-node))
-;                   (if range       ; generate makeindex range specifiers
-;                       (if (string=? range "open") "|(" "|)")
-;                       ""))
-;                  )))))
+        ;; Lots of escaping, here.  The more obvious use of the TeXML
+        ;; element results in invalid XML if an 'index' element is used
+        ;; within a 'dt' for example.
+        (cond
+         ((attribute-string "seealso")
+          (sosofo-append
+           (literal (string-append (trim-data (current-node))))
+           (make empty-element gi: "spec" attributes: '(("cat" "vert")))
+           (literal "seealso")
+           (make empty-element gi: "spec" attributes: '(("cat" "bg")))
+           (literal (attribute-string "seealso"))
+           (make empty-element gi: "spec" attributes: '(("cat" "eg")))))
+         ((attribute-string "range")
+          (sosofo-append
+           (trim-data (current-node))
+           (make empty-element gi: "spec" attributes: '(("cat" "vert")))
+           (literal (if (string=? (attribute-string "range")"open")
+                        "("
+                        ")"))))
+         (else
+          (literal (trim-data (current-node)))))))
 
 (define (make-index)
   (let ((indexents (select-elements

@@ -648,13 +648,18 @@ Indexing support.
                ;; index key
                (*index-string-to-key* key n)
                ;; reference -- an "a" element
-               (list (make element gi: "a"
-                           attributes: `(("href" ,(href-to n)))
-                           (make-section-reference
-                            target: (ancestor-member
-                                     n
-                                     (section-element-list))))))
+               (list
+                (if (attribute-string "seealso" n)
+                    (literal (string-append "See also: "
+                                            (attribute-string "seealso" n)))
+                    (make element gi: "a"
+                          attributes: `(("href" ,(href-to n)))
+                          (make-section-reference
+                           target: (ancestor-member
+                                    n
+                                    (section-element-list)))))))
               result))))
+
 
 ;; The same, but from a list of sub*section nodes which have an
 ;; "indexkey" attribute.
