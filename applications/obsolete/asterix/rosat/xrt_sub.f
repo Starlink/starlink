@@ -1959,7 +1959,7 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Functions :
 *    Local constants :
       REAL OFFMAX
-      PARAMETER (OFFMAX=25.0)
+      PARAMETER (OFFMAX=22.0)
       INTEGER NQE
       PARAMETER (NQE=9)
 *    Local variables :
@@ -2020,7 +2020,7 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Functions :
 *    Local constants :
       REAL OFFMAX
-      PARAMETER (OFFMAX=25.0)
+      PARAMETER (OFFMAX=22.0)
 *    Local variables :
       REAL OFF
 *-
