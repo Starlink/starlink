@@ -517,7 +517,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 
 GAIA_LIB_FILES =  \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
- StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
+ GaiaArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
  StarAstSystem.hlp StarBlink.hlp StarPatch.hlp GaiaApPhotom.hlp \
  GaiaOptPhotom.hlp GaiaContour.hlp GaiaAstTransfer.hlp \
