@@ -19,6 +19,8 @@
 *                       measurements based on area and angle etc.
 *                       25/09/99 (PWD): Added astNorm calls after all
 *                       astTran2s.
+*                       Added R2D and D2R as these have been lost from
+*                       AST (2.0).
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 #include	<math.h>
@@ -29,6 +31,15 @@
 #include	"globals.h"
 #include	"astrom.h"
 
+#ifndef PI 
+# define PI = 3.14159265358979323846;
+#endif
+#ifndef R2D
+#define R2D = (PI/180.0);
+#endif
+#ifndef D2R
+#define D2R = (180.0/PI);
+#endif
 
 /****************************** initastrom **********************************/
 /*
