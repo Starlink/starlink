@@ -192,6 +192,10 @@ appropriate arguments
 	(make element gi: "em"
 	      (literal "Equation not found")))))
 
+;; mdefs has no output in this, default, mode
+(element mdefs
+  (empty-sosofo))
+
 ;; cross-referencing
 (define (href-to-fragid-mlabel target)
   (img-eqnref target))
