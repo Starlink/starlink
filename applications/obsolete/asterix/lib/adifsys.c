@@ -35,6 +35,7 @@ ADIobj   ADI_G_replist = ADI__nullid;
 
 void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
+printf("Calling base Newlink\n" );
   adic_cput0i( id, "ADIlink", (UT_CTYPE_i) lid, status );
   }
 

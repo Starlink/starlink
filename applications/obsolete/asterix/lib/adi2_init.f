@@ -14,7 +14,7 @@
      :                   'PRIMARY,EXTENSIONS', DID,
      :                   STATUS )
 
-        CALL ADI_DEFMTH( '@NewLink(Array,FITSfile)', ADI2_NEWLNK_ARR,
+        CALL ADI_DEFMTH( 'NewLink(Array,FITSfile)', ADI2_NEWLNK_ARR,
      :                   did, STATUS )
 
         CALL ADI_DEFRCB( ID, 'CREAT_RTN', ADI2_FCREAT, STATUS )

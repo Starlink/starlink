@@ -118,6 +118,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+	print *,'In NewLink(Array,FITSfile)'
+
 *  Get attributes from "Array" object which are needed for the mandatory
 *  keywords in the FITS file
       CALL ADI_CGET0C( AID, 'TYPE', TYPE, STATUS )
@@ -195,5 +197,8 @@ c          CALL FTPPRL( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
 *  Report any errors
       IF ( STATUS .NE. SAI__OK )
      :     CALL AST_REXIT( 'ADI2_NEWLNK_ARR', STATUS )
+
+*  Invoke next method
+      CALL ADI_CALNXT( STATUS )
 
       END
