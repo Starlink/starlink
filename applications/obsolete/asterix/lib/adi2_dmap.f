@@ -82,11 +82,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     Richard Beard: (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     5 Jun 1996 (DJA):
 *        Original version.
+*     11 Feb 1997 (RB):
+*        Axis data and axis width capability
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,7 +133,7 @@
       INTEGER			IAX, I
       INTEGER			AXID, AXPTR
       REAL			BASE, DELTA
-      LOGICAL			ISAXDAT
+      LOGICAL			ISAXDAT, ISAXWID
 *.
 
 *  Check inherited global status.
@@ -139,15 +142,19 @@
 *  Expected number of data elements
       CALL ARR_SUMDIM( ENDIM, EDIMS, ENELM )
 
-*  Are we getting axis data? (mega fudge - rb)
+*  Are we getting axis data or axis widths? (mega fudge - rb)
       CALL ADI_NAME( PSID, ITEM, STATUS )
       ISAXDAT = .FALSE.
       IF ( ITEM(1:4) .EQ. 'Axis' .AND. ITEM(8:11) .EQ. 'Data' ) THEN
         ISAXDAT = .TRUE.
       END IF
+      ISAXWID = .FALSE.
+      IF ( ITEM(1:4) .EQ. 'Axis' .AND. ITEM(8:12) .EQ. 'Width' ) THEN
+        ISAXWID = .TRUE.
+      END IF
 
 *  Get array shape and total number of elements
-      IF ( ISAXDAT ) THEN
+      IF ( ISAXDAT .OR. ISAXWID ) THEN
         NDIM = ENDIM
         DO I = 1, ENDIM
           DIMS(I) = EDIMS(I)
@@ -176,14 +183,30 @@
         CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
         CALL ADI2_GKEY0R( FITID, ' ', 'CRPIX'//ITEM(6:6), .FALSE.,
      :                    .FALSE., BASE, ' ', STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          BASE = 0.0
+        END IF
         CALL ADI2_GKEY0R( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
      :                    .FALSE., DELTA, ' ', STATUS )
         CALL ADI2_GKEY0I( FITID, ' ', 'NAXIS'//ITEM(6:6), .FALSE.,	! try for img_check
      :                    .FALSE., DIMS(IAX), ' ', STATUS )
         CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
         CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
-        CALL ADI2_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR), STATUS )
+        CALL ADI2_DMAP_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR), STATUS )
         PTR = AXPTR
+
+*  Or invent some axis widths
+      ELSE IF ( ISAXWID ) THEN
+        CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
+        CALL ADI2_GKEY0R( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
+     :                    .FALSE., DELTA, ' ', STATUS )
+        CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
+        CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
+        CALL ADI2_DMAP_AXWID ( DELTA, DIMS(IAX), %VAL(AXPTR), STATUS )
+        PTR = AXPTR
+
+*  Otherwise carry on as normal
       ELSE
         CALL ADI_THERE( CACHEID, 'Value', THERE, STATUS )
         IF ( THERE ) THEN
@@ -215,7 +238,7 @@
       END
 
 
-      SUBROUTINE ADI2_AXINV( BASE, DELTA, NELM, AXDAT, STATUS )
+      SUBROUTINE ADI2_DMAP_AXINV( BASE, DELTA, NELM, AXDAT, STATUS )
 
       REAL			BASE
       REAL			DELTA
@@ -229,6 +252,24 @@
 
       DO I = 1, NELM
         AXDAT(I) = (I - BASE) * DELTA
+      END DO
+
+      END
+
+
+      SUBROUTINE ADI2_DMAP_AXWID( DELTA, NELM, AXDAT, STATUS )
+
+      REAL			DELTA
+      INTEGER			NELM
+      REAL			AXDAT(*)
+      INTEGER			STATUS
+
+      INTEGER			I
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      DO I = 1, NELM
+        AXDAT(I) = DELTA
       END DO
 
       END
