@@ -5215,7 +5215,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
 
 *    Position dependent
-      ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
+      ELSE IF ( HINT .EQ. PSF_H_POSDEP ) THEN
 
 *      The ONAXIS psf isn't position dependent
         CALL ARR_COP1L( 1, (RX_OPTION(SLOT).NE.PSF_PSPC__ONAX3),
