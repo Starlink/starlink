@@ -12,7 +12,7 @@ AC_PROG_MAKE_SET
 dnl    The following list must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS([astrom autoastrom daophot extractor generic htx ifd pisa rv sgmlkit messgen sst star2html startcl starx])
+AC_CONFIG_SUBDIRS([htx ifd rv messgen sst star2html starx])
 
 AC_CONFIG_FILES(Makefile)
 
