@@ -3,8 +3,18 @@
 # Simple XML Channel
 
 use strict;
-use Test::More tests => 3;
-require_ok("Starlink::AST");
+use Test::More;
+
+BEGIN {
+ use Starlink::AST;
+ if ( Starlink::AST::Version() < 3000000 ) {
+   plan skip_all => "Skip Starlink::AST not available.";
+   exit;
+ } else {
+   plan tests => 2;
+ }  
+};
+
 
 # Implement astShow
 my $obj = new Starlink::AST::UnitMap( 1, "" );
@@ -15,7 +25,7 @@ ok(1, "Write complete");
 
 # Try again, but storing to an array
 my @cards;
-my $ch = new Starlink::AST::XmlChan ( sink => sub {push(@cards, $_[0]) } );
+$ch = new Starlink::AST::XmlChan ( sink => sub {push(@cards, $_[0]) } );
 $ch->Write( $obj );
 
 for (@cards) {
