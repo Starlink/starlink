@@ -252,6 +252,9 @@
 
       END IF
 
+*  Abort point
+ 99   CONTINUE
+
       END
 
 
