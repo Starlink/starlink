@@ -1,2 +1,10 @@
 interface IPATCH
+  parameter MODE
+    position 1
+    type '_CHAR'
+    default 'INTERP'
+    vpath 'DEFAULT'
+    prompt 'Patching method'
+    help 'INTERP, PASTE'
+  endparameter
 endinterface
