@@ -3,7 +3,7 @@
      :                        POSTIV, OUTARR, LOWER, UPPER, STATUS )
 *+
 *  Name:
-*     KPS1_DSCLx
+*     KPS1_DSCLI
  
 *  Purpose:
 *     Scales a 2-d INTEGER array between user-defined
@@ -36,7 +36,7 @@
 *        The first dimension of the 2-d arrays.
 *     DIM2 = INTEGER (Given)
 *        The second dimension of the 2-d arrays.
-*     INARR( DIM1, DIM2 ) = ? (Given)
+*     INARR( DIM1, DIM2 ) = INTEGER (Given)
 *        The original, unscaled image data.
 *     INVERT = LOGICAL (Given)
 *        True if the image is to be inverted for display.
@@ -53,18 +53,18 @@
 *     BADCI = INTEGER (Given)
 *         The colour index to be assigned to bad pixels in the scaled
 *         array.
-*     MINV = ? (Given)
+*     MINV = INTEGER (Given)
 *        The minimum value of the image.
-*     MAXV = ? (Given)
+*     MAXV = INTEGER (Given)
 *        The maximum value of the image.
 *     POSTIV = LOGICAL (Given)
 *        True if the defaults for %PARLOW and %PARUPP are the minimum
 *        and maximum values respectively.
 *     OUTARR( DIM1, DIM2 ) = INTEGER (Returned)
 *        The scaled version of the image.
-*     LOWER = ? (Returned)
+*     LOWER = INTEGER (Returned)
 *        The lower limit used for scaling the image.
-*     UPPER = ? (Returned)
+*     UPPER = INTEGER (Returned)
 *        The upper limit used for scaling the image.
 *     STATUS = INTEGER( READ, WRITE )
 *        Value of the status on entering this subroutine.
@@ -87,6 +87,7 @@
  
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
@@ -97,6 +98,9 @@
 *     1992 March 3 (MJC):
 *        Replaced AIF parameter-system calls by the extended PAR
 *        library.
+*     25-AUG-1999 (DSB):
+*        Do not cancel the PARLOW and PARUPP parameters after valid
+*        values have been obtained.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -148,6 +152,9 @@
       INTEGER
      :  LP                      ! Lower pen (constrained LOWCI)
  
+      LOGICAL 
+     :  FIRST                   ! First time through loop?
+
       DOUBLE PRECISION
      :  DEFMAX,                 ! Default value for %PARUPP
      :  DEFMIN,                 ! Default value for %PARLOW
@@ -159,9 +166,9 @@
  
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
-      INCLUDE 'NUM_DEC_I'    ! NUM declarations for functions
+      INCLUDE 'NUM_DEC_R'    ! NUM declarations for functions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
-      INCLUDE 'NUM_DEF_I'    ! NUM definitions for functions
+      INCLUDE 'NUM_DEF_R'    ! NUM definitions for functions
  
 *.
  
@@ -204,9 +211,17 @@
       CALL ERR_MARK
  
 *    Loop until the values are different or a bad status is encountered.
- 
+
+      FIRST = .TRUE.
       DO WHILE ( ABS( DUPPER - DLOWER ) .LT. DSML .AND.
      :           STATUS .EQ. SAI__OK )
+ 
+*       Cancel the parameters if this is not the first time through the loop.
+
+         IF( .NOT. FIRST ) THEN 
+            CALL PAR_CANCL( PARUPP, STATUS )
+            CALL PAR_CANCL( PARLOW, STATUS )
+         END IF
  
 *       Prompt the user for the lower and upper limits to be used in
 *       the scaling using the maximum precision.
@@ -215,11 +230,6 @@
      :                   STATUS )
          CALL PAR_GDR0D( PARUPP, DEFMAX, DTMIN, DTMAX, .TRUE., DUPPER,
      :                   STATUS )
- 
-*       Cancel the parameters as we are in a loop.
- 
-         CALL PAR_CANCL( PARUPP, STATUS )
-         CALL PAR_CANCL( PARLOW, STATUS )
  
 *       Check that there is indeed a range.
  
@@ -242,6 +252,8 @@
                UPPER = NUM_DTOI( DUPPER )
             END IF
          END IF
+
+         FIRST = .FALSE.
  
       END DO
  
