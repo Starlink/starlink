@@ -238,6 +238,7 @@ int main(int argc, char *argv[])
 {
   PGbind *pg=NULL;     /* pgbind state container */
   int waserr = 0;      /* True after any error */
+  FILE *ofile;         /* file handle for the old cpgplot.c wrapper file */
 
 
 /*
@@ -246,6 +247,13 @@ int main(int argc, char *argv[])
   pg = new_PGbind(argc, argv);
   if(pg==NULL)
     exit(usage());
+    
+ /* 
+  * delete the previous bindings and header files, just in case
+  */
+  unlink("cpgplot.c");  
+  /*unlink("cpgplot.h"); */ /* should we do this? */
+    
 /*
  * If a list of files was provided, process each of them in turn, otherwise
  * take input from stdin.
@@ -888,7 +896,7 @@ static int write_prototype(FILE *hfile, Function *fn)
 /*
  * Write the type and function name and introduce the argument list.
  */
-    fprintf(hfile, "%s %s(", type_name(fn->type), "cpgplot");
+    fprintf(hfile, "%s %s(", type_name(fn->type),  fn->name);
 /*
  * Write the function arguments.
  */
