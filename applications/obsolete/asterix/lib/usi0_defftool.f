@@ -45,6 +45,11 @@
       EXTERNAL                  USI3_GET0I
       EXTERNAL                  USI3_GET0L
       EXTERNAL                  USI3_GET0R
+      EXTERNAL			UCLPSB
+      EXTERNAL			UCLPSR
+      EXTERNAL			UCLPSI
+      EXTERNAL			UCLPST
+      EXTERNAL			UCLPSD
 *-
 
 *   Define the new system
