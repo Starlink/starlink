@@ -339,7 +339,7 @@ Error m_SXList( Object *in, Object*out){
             fwrite( &cr, sizeof( char ), 1, fd );
 
          } else {
-            *p = NULL;
+            p = NULL;
             DXMessage("%s",buf);
          }
 
