@@ -143,7 +143,7 @@
 
 *  If have gotten the mask file as an NDF.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL GRP_DELET( MASKGR, STATUS )
+            CALL CCD1_GRDEL( MASKGR, STATUS )
             CALL NDF_MSG( 'NAME', ID )
             CALL MSG_LOAD( ' ', '^NAME', FILENM, IAT, STATUS )
          ELSE
@@ -162,7 +162,7 @@
 
 *  This is an ARD file so create a new group for this.
                CALL GRP_GETCC( MASKGR, 'INDIRECTION', INDIR, STATUS )
-               CALL GRP_DELET( MASKGR, STATUS )
+               CALL CCD1_GRDEL( MASKGR, STATUS )
                CALL CHR_PREFX( INDIR, INFILE, IAT )
                ID = GRP__NOID
                CALL ARD_GRPEX( INFILE, GRP__NOID, ID, FLAG, STATUS )

@@ -244,7 +244,7 @@
          IAT = CHR_LEN( FNAME )
 
 *  Release the ARD group.
-         CALL GRP_DELET( ID, STATUS )
+         CALL CCD1_GRDEL( ID, STATUS )
 
 *  Pass out the mask NDF identifier.
          ID = IDMSK

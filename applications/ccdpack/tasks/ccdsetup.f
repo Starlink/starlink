@@ -578,7 +578,7 @@
             MSKNAM( IAT + 2 : ) = '(ARD)'
 
 *  Release the mask group.
-            CALL GRP_DELET( ID, STATUS )
+            CALL CCD1_GRDEL( ID, STATUS )
          ELSE
 
 *  NDF file.
