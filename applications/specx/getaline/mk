@@ -277,6 +277,26 @@
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
+#  PC systems:
+#  ==========
+#  Intel PC running Linux.
+#  ----------------------
+            ix86_Linux)
+               AR_IN='ar r'
+               CC='gcc'
+               CFLAGS='-O -D${SYSTEM} -D${READLINE} -D${RINDEX}'
+               FC='g77'
+               FFLAGS='-fno-second-underscore -O1 -w -temp=. -e -D${SYSTEM} -D${READLINE} -D${RINDEX}'
+               FCPPFLAGS="-D$SYSTEM"
+               LINK='ln -s'
+               RANLIB='ranlib'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+
+
 #  Issue a warning if SYSTEM is not recognised.
 	    *)
                READLINE='NO_READLINE'
