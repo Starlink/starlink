@@ -5417,6 +5417,7 @@ proc exit {args} {
 
 # Re-instate the original exit command in case anything goes wrong in
 # this procedure.
+   rename exit {}
    rename tcl_exit exit
 
 # Close any log file.
