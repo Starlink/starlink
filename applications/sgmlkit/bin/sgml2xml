@@ -54,7 +54,7 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #    warnings. 
 #
 #    <li> It's not clear what one should do with SUBDOC entities.  This
-#    translates them to <code>NDATA XML</> entities, and warns that it's done
+#    translates them to <code>NDATA XML</code> entities, and warns that it's done
 #    this, but the referenced document might well be SGML rather than
 #    XML.
 #
@@ -92,8 +92,8 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #    </dl>
 #
 #  <diytopic>Environment
-#    <p>If the environment variable <code>SX</> is defined, then this is
-#    used as the command to invoke <code>sx</>, otherwise a default value
+#    <p>If the environment variable <code>SX</code> is defined, then this is
+#    used as the command to invoke <code>sx</code>, otherwise a default value
 #    is used.
 #
 #  <authorlist>
@@ -115,8 +115,8 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #
 #  <diytopic>Notes
 #
-#    <p><code>sx</> is available as part of James Clark's <webref
-#    url='http://www.jclark.com/sp/' >SP</> package.
+#    <p><code>sx</code> is available as part of James Clark's <webref
+#    url='http://www.jclark.com/sp/' >SP</webref> package.
 #
 #    <p>References to `productions' are to the productions of the 
 #    SGML standard.

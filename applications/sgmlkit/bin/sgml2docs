@@ -55,22 +55,22 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #           doesn't suppress output from TeX).
 #     <dt>--options opt,opt,...<dd>set format-specific options.
 #	    <p>With <code>--latex</code>: options are
-#	    <code>cts-sect</> and <code>cts-appx</>, which suppresses
+#	    <code>cts-sect</code> and <code>cts-appx</code>, which suppresses
 #	    any page-break between sections in the main text and
-#	    appendices; and <code>onepass-latex</>, which generates
+#	    appendices; and <code>onepass-latex</code>, which generates
 #	    LaTeX which should need only a single pass to produce a
 #	    table of contents.
-#	    <p>With <code>--html</>: options are <code>nonorm</>,
-#	    <code>simplenorm</> and <code>sgmlnorm</>.  These control
+#	    <p>With <code>--html</code>: options are <code>nonorm</code>,
+#	    <code>simplenorm</code> and <code>sgmlnorm</code>.  These control
 #	    how much the generated HTML files are normalised.  In the
 #	    first case, no normalisation is done: this is fine if you
 #	    simply want to display the resulting HTML, but the
 #	    resulting output confuses the HTX system something
 #	    rotten.  The simple normalisation (done using sed) should
 #	    be enough for HTX, but isn't bulletproof; the full
-#	    normalisation, using the <code>sgmlnorm</> application
+#	    normalisation, using the <code>sgmlnorm</code> application
 #	    should indeed be bulletproof, but is also rather slow.
-#	    the default is currently <code>simplenorm</>, but might well
+#	    the default is currently <code>simplenorm</code>, but might well
 #	    change in future.
 #     <dt>--help<dd>display usage and exit.
 #     <dt>--version<dd>display version and exit.
@@ -83,9 +83,9 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #     <example>
 #       sgml2docs --html --tarball mydocs.tar docfile.sgml
 #     <examplenote>
-#       This converts the document <code>docfile.sgml</> to a set of
+#       This converts the document <code>docfile.sgml</code> to a set of
 #       HTML files, bundling the result into a tarball
-#       <code>mydocs.tar</>, rather than the default based on the
+#       <code>mydocs.tar</code>, rather than the default based on the
 #       source file's name.
 #     <example>
 #       sgml2docs --latex --options cts-sect,cts-appx docfile.sgml
@@ -94,16 +94,16 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #       LaTeXed.  The page breaks between sections are suppressed.
 #       
 #  <diytopic>Environment
-#     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</> is
+#     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</code> is
 #     properly set, pointing to the root of the Starlink SGML kit.  It
-#     also requires that <code>dvi2bitmap</> is in the <code>PATH</>  The
+#     also requires that <code>dvi2bitmap</code> is in the <code>PATH</code>  The
 #     script is currently rather sensitive to the available version of
-#     <code>dvi2bitmap</>, and does a rather cautious check.
+#     <code>dvi2bitmap</code>, and does a rather cautious check.
 #
 #     <p>The script creates a work directory and does its processing
 #     there.  If it is necessary to run BibTeX, it will be done with
 #     that temporary directory as the current directory, so that it
-#     might be necessary to set <code>BIBINPUTS</> (for example) to let the
+#     might be necessary to set <code>BIBINPUTS</code> (for example) to let the
 #     system find the bibliography database.
 #
 #  <authorlist>

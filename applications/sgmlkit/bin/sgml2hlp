@@ -25,7 +25,7 @@
 #
 #  <diytopic>Environment
 #     <p>The program requires that the environment variable 
-#     <code>STARLINK_SGML_DIR</> is properly set, pointing to the root 
+#     <code>STARLINK_SGML_DIR</code> is properly set, pointing to the root 
 #     of the Starlink SGML kit.
 #
 #     <p>The following binaries must be in the path:
