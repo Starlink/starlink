@@ -126,6 +126,7 @@
 *  Local Variables:
       CHARACTER*80            	HTXT(5)    		! History text
       CHARACTER*10              NSTR              	!
+      CHARACTER*5		TYPE			! Mapping type
 
       INTEGER                   DIMS(ADI__MXDIM)  	! Input dimensions
       INTEGER                   HLEN              	! Length of history text
@@ -151,7 +152,7 @@
      :                                'LoWidth','HiWidth'/
       CHARACTER*8               OBJ(NOBJ)
       DATA                      OBJ/'Data','Quality','Variance',
-     :                              'LoError,HiError'/
+     :                              'LoError', 'HiError'/
 *.
 
 *  Check inherited global status.
@@ -244,13 +245,13 @@
           DO J = 1, NAXOBJ
 
 *        Does it exist?
-            CALL BDI_AXCHK( IFID, AXN, AXOBJ(J), OK, STATUS )
+            CALL BDI_AXCHK( IFID, I, AXOBJ(J), OK, STATUS )
             IF ( OK ) THEN
 
 *          Map for read and write
-              CALL BDI_AXMAPR( IFID, AXN, AXOBJ(J) , 'READ', IPTR,
+              CALL BDI_AXMAPR( IFID, I, AXOBJ(J) , 'READ', IPTR,
      :                         STATUS )
-              CALL BDI_AXMAPR( OFID, AXN, AXOBJ(J) , 'WRITE', OPTR,
+              CALL BDI_AXMAPR( OFID, I, AXOBJ(J) , 'WRITE', OPTR,
      :                         STATUS )
 
 *          Perform 1-D flip
@@ -258,8 +259,8 @@
      :                         STATUS )
 
 *          Release data
-              CALL BDI_AXUNMAP( IFID, AXN, AXOBJ(J), IPTR, STATUS )
-              CALL BDI_AXUNMAP( OFID, AXN, AXOBJ(J), OPTR, STATUS )
+              CALL BDI_AXUNMAP( IFID, I, AXOBJ(J), IPTR, STATUS )
+              CALL BDI_AXUNMAP( OFID, I, AXOBJ(J), OPTR, STATUS )
 
             END IF
 

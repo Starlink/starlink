@@ -40,12 +40,13 @@
 
       DO I = 1, NDIM
         CALL BDI_AXCHK( ID, I, 'Data', OK, STATUS )
-        CALL MSG_SETI ('I', I)
         IF ( OK ) THEN
           CALL BDI_AXGET0C( ID, I, 'Label', LABEL, STATUS )
+          CALL MSG_SETI ('I', I)
           CALL MSG_SETC( 'LABEL', LABEL )
           CALL MSG_PRNT( ' ^I ^LABEL' )
         ELSE
+          CALL MSG_SETI ('I', I)
           CALL MSG_PRNT (' ^I WARNING: Axis information missing')
         END IF
       END DO
