@@ -64,11 +64,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     4-DEC-1992 (PDRAPER):
 *        Original version.
+*     12-SEP-2000 (MBT):
+*        Added check that NEDGES is not zero.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -114,6 +117,13 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that we have at least one edge.
+      IF ( NEDGES .LT. 1 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'CCD1_GRAPC: Graph has no edges', STATUS )
+         GO TO 99
+      END IF
 
 *  Find the span of node numbers.
       FNODE = VAL__MAXI
@@ -255,6 +265,7 @@ D      write(*,*)( been( i ), i = fnode, lnode )
       ELSE               
          CYCLIC = .FALSE.
       END IF             
-                         
+
+ 99   CONTINUE                         
       END                
 * $Id$
