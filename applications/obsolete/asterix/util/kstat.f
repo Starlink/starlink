@@ -1,5 +1,5 @@
 *+  KSTAT - Calculates Kendall's K statistic for a 1D data array class object
-      SUBROUTINE KSTAT(STATUS)
+      SUBROUTINE KSTAT( STATUS )
 *    Description :
 *     Calculates Kendall's K statistic (a measure of correlation) for the
 *     DATA_ARRAY and AXIS(1) data of a 1D dataset.
@@ -24,6 +24,7 @@
 *     16 Jul 86 : V0.5-2  Double precision accumulation (TJP)
 *     13 Sep 88 : V1.0-1  Rewritten for ASTERIX88 BDA_ etc...
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     15 Jan 95 : V1.8-1  Use new data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -32,26 +33,25 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Status :
       INTEGER STATUS
 *    External references :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) ILOC                ! Input data object locator
-      CHARACTER*(DAT__SZLOC) ILOC2               ! 2nd input data object locator
-
       LOGICAL                OK                  ! Component present & filled?
       LOGICAL                QOK                 ! Data quality available?
       LOGICAL                CONTINUE            ! Used to control input
       LOGICAL                INPRIM              ! Is input object primitive?
       LOGICAL                BAD                 ! Any bad QUALITY points?
 
+      INTEGER			IFID			! Input file identifier
+      INTEGER			IFID2			! Input file identifier
       INTEGER                NDIMS               ! Number of dimensions in dataset
       INTEGER                NDIMS2              ! Number of dimensions in 2nd dataset
-      INTEGER                DIM(DAT__MXDIM)     ! Size of each dimension
-      INTEGER                DIM2(DAT__MXDIM)    ! Size of each dimension of 2nd input
+      INTEGER                DIM(ADI__MXDIM)     ! Size of each dimension
+      INTEGER                DIM2(ADI__MXDIM)    ! Size of each dimension of 2nd input
       INTEGER                QNDIMS              ! Number of dimensions in QUALITY
-      INTEGER                QDIM(DAT__MXDIM)    ! Size of each dimension in QUALITY
+      INTEGER                QDIM(ADI__MXDIM)    ! Size of each dimension in QUALITY
       INTEGER                NDAT                ! Number of data points
       INTEGER                NDAT2               ! Number of data points in 2nd array
       INTEGER                NTD                 ! # tied ranks in data array
@@ -66,62 +66,64 @@
 
 * Version :
       CHARACTER*22 VERSION
-         PARAMETER         ( VERSION = ' KSTAT version 1.8-0' )
+         PARAMETER         ( VERSION = ' KSTAT version 1.8-1' )
 *-
 
 *    Version announcement
-      CALL MSG_PRNT (VERSION)
+      CALL MSG_PRNT( VERSION )
 
-*    Initialize BDA_ routines
+*    Initialize ASTERIX
       CALL AST_INIT
 
 *    Obtain data object, access and check it
-      CALL USI_ASSOCI ('INP', 'READ', ILOC, INPRIM, STATUS)
-      CALL BDA_CHKDATA (ILOC, OK, NDIMS, DIM, STATUS)
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_PRIM( IFID, INPRIM, STATUS )
+      CALL BDI_CHKDATA (IFID, OK, NDIMS, DIM, STATUS)
       NDAT = DIM(1)
 
       IF ( OK ) THEN
         IF (NDIMS .EQ. 1) THEN
-          CALL BDA_MAPDATA (ILOC, 'READ', DPTR, STATUS )
+          CALL BDI_MAPDATA (IFID, 'READ', DPTR, STATUS )
 
           IF (.NOT. INPRIM) THEN
-            CALL BDA_CHKQUAL (ILOC, QOK, QNDIMS, QDIM, STATUS)
+            CALL BDI_CHKQUAL (IFID, QOK, QNDIMS, QDIM, STATUS)
 
             IF ( QOK ) THEN
-              CALL BDA_MAPLQUAL (ILOC, 'READ', BAD, QPTR, STATUS)
+              CALL BDI_MAPLQUAL (IFID, 'READ', BAD, QPTR, STATUS)
 
               IF (.NOT. BAD) THEN
-                CALL BDA_UNMAPLQUAL (ILOC, STATUS)
+                CALL BDI_UNMAPLQUAL (IFID, STATUS)
                 QOK = .FALSE.
 
               END IF
             END IF
 
-            CALL BDA_CHKAXIS (ILOC, 1, OK, STATUS)
+            CALL BDI_CHKAXIS (IFID, 1, OK, STATUS)
 
             IF ( OK ) THEN
-              CALL BDA_MAPAXVAL (ILOC, 'READ', 1, XPTR, STATUS)
+              CALL BDI_MAPAXVAL (IFID, 'READ', 1, XPTR, STATUS)
 
             ELSE
               CALL MSG_PRNT ('FATAL ERROR: No axis information')
 
             END IF
 
-          ELSE ! Primative
+          ELSE ! Primitive
             CONTINUE = .TRUE.
 
             DO WHILE ( CONTINUE )
-              CALL USI_ASSOCI ('INP2', 'READ', ILOC2, INPRIM, STATUS)
+              CALL USI_TASSOCI( 'INP2', '*', 'READ', IFID2, STATUS )
+              CALL USI_PRIM( IFID2, INPRIM, STATUS )
 
               IF (STATUS .NE. SAI__OK) GOTO 99
 
               IF ( INPRIM ) THEN
-                CALL BDA_CHKDATA (ILOC2, OK, NDIMS2, DIM2, STATUS)
+                CALL BDI_CHKDATA (IFID2, OK, NDIMS2, DIM2, STATUS)
                 NDAT2 = DIM2(1)
 
                 IF ( OK ) THEN
                   IF (NDIMS2 .EQ. 1) THEN
-                    CALL BDA_MAPDATA (ILOC2, 'READ', XPTR, STATUS)
+                    CALL BDI_MAPDATA (IFID2, 'READ', XPTR, STATUS)
 
                     IF (NDAT2 .EQ. NDAT ) THEN
                       CONTINUE = .FALSE.
@@ -146,7 +148,7 @@
 
               IF ( CONTINUE ) THEN
                 CALL USI_CANCL ('INP2', STATUS)
-                ILOC2 = ' '
+                IFID2 = ADI__NULLID
 
               END IF
             END DO
@@ -168,7 +170,7 @@
 
 *    Pass to main subroutine to calculate K statistic
       CALL KSTAT_DOIT (NDAT, %VAL(DPTR), %VAL(XPTR), QOK, %VAL(QPTR),
-     :                                                K, NTD, NTX, NBAD)
+     :                                             K, NTD, NTX, NBAD)
 
 *    Output results.
       CALL MSG_PRNT (' ')
@@ -237,7 +239,7 @@
 
 *+ KSTAT_DOIT - Calculate Kendall's statistic
       SUBROUTINE KSTAT_DOIT( NDAT, DATA, AXIS, QOK, QUAL, K, NTD, NTX,
-     :                                                            NBAD )
+     :                                                          NBAD )
 *    Description :
 *     Calculates K statistic.
 *    Method :
