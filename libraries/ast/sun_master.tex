@@ -8971,6 +8971,9 @@ to work together in various combinations while appearing as a single
 Object. A CmpFrame's behaviour is therefore not pre-defined, but is
 determined by the other Frames it contains (its ``component'' Frames).
 
+As with compound Mappings, compound Frames can be nested within each
+other, forming arbitrarily complex Frames.
+
 \subsection{Creating a CmpFrame}
 A very common use for a CmpFrame within astronomy is to represent a
 ``spectral cube''. This is a 3-dimensional Frame in which one of the axes
@@ -9044,9 +9047,11 @@ f+
 f-
 
 \subsection{The Attributes of a CmpFrame}
-A CmpFrame has no extra attributes over and above those common to all
-Frames. The default value for its Domain attribute is ``CMP'' and the
-(fixed) value for its System attribute is ``Compound''. 
+The default value for its Domain attribute is ``CMP'' and the
+(fixed) value for its System attribute is ``Compound''. A CmpFrame has no 
+extra attributes over and above those common to all Frames. However,
+attributes of the two component Frames can be accessed as if they were
+attributes of the CmpFrame, as described below.
 
 Frame attributes which are specific to individual axes (such as Label(2),
 Format(1), \emph{etc}) simply mirror the corresponding axes of the
@@ -9074,6 +9079,22 @@ value to the ``Equinox(2)'' attribute of the CmpFrame. Since the SkyFrame
 defines both axes 2 and 3 of the CmpFrame, we could equivalently have set
 a value for ``Equinox(3)'' since this would also result in the attribute
 access being forwarded to the SkyFrame.
+
+Finally, if an attribute is not qualified by a axis index, attempts will
+be made to access it using each of the CmpFrame axes in turn. Using the
+above example of the spectral cube, if an attempt was made to get the
+value of attribute ``Equinox'' (with no axis index), each axis in turn
+would be used. Since axis 1 is contained within a SpecFrame, the first
+attempt would fail since the SpecFrame class does not have an Equinox
+attribute. However, the second attempt would succeed because axis 2 is
+contained within a SkyFrame which \emph{does} have an Equinox attribute. Thus
+the returned attribute value would be that obtained from the SkyFrame
+containing axis 2. When getting or testing an attribute value, the
+returned value is determined by the \emph{first} axis which recognises
+the attribute. When setting an attribute value, \emph{all} axes
+which recognises the attribute have the attribute value set to the given
+value. Likewise, when clearing an attribute value, all axes
+which recognises the attribute have the attribute value cleared.
 
 \cleardoublepage
 \section{\label{ss:introducingconversion}An Introduction to Coordinate System Conversions}
