@@ -67,6 +67,8 @@ itcl::class gaia::GaiaNDFCube {
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
+      set lwidth 20
+
       #  Set window properties.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
       wm title $w_ "Display image sections of NDF cube ($itk_option(-number))"
@@ -93,7 +95,7 @@ itcl::class gaia::GaiaNDFCube {
       #  Name of input NDF.
       itk_component add ndfcube {
          LabelFileChooser $w_.ndfcube \
-            -labelwidth 15 \
+            -labelwidth $lwidth \
             -text "Input NDF cube:" \
             -textvariable [scope itk_option(-ndfcube)] \
             -command [code $this set_chosen_ndf_] \
@@ -110,7 +112,7 @@ itcl::class gaia::GaiaNDFCube {
       itk_component add axis {
          LabelMenu $w_.axis \
             -text "Axis:" \
-            -labelwidth 15
+            -labelwidth $lwidth
       }
       foreach {label value} { one 1 two 2 three 3 } {
          $itk_component(axis) add \
@@ -129,7 +131,7 @@ itcl::class gaia::GaiaNDFCube {
          LabelEntryScale $w_.index \
             -text {Index of plane:} \
             -value $plane_ \
-            -labelwidth 15 \
+            -labelwidth $lwidth \
             -valuewidth 20 \
             -from 1 \
             -to 100 \
@@ -144,18 +146,32 @@ itcl::class gaia::GaiaNDFCube {
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
 
+      #  Add tab window for choosing either the animation or collapse
+      #  controls. 
+      itk_component add tabnotebook {
+         iwidgets::tabnotebook $w_.tab \
+            -angle 0 -tabpos n -width 350 -height 200
+      }
+      pack $itk_component(tabnotebook) -fill both -expand 1
+
+      $itk_component(tabnotebook) add -label Animation
+      set animationTab [$itk_component(tabnotebook) childsite 0]
+
+      $itk_component(tabnotebook) add -label Collapse
+      set collapseTab [$itk_component(tabnotebook) childsite 1]
+
       #  Animation section. Choose upper and lower limits and then set it
       #  away, need to loop around...
       itk_component add aruler {
-         LabelRule $w_.aruler -text "Animation controls:"
+         LabelRule $animationTab.aruler -text "Animation controls:"
       }
       pack $itk_component(aruler) -side top -fill x
 
       itk_component add lower {
-         LabelEntryScale $w_.lower \
+         LabelEntryScale $animationTab.lower \
             -text {Lower index:} \
             -value 1 \
-            -labelwidth 15 \
+            -labelwidth $lwidth \
             -valuewidth 20 \
             -from 1 \
             -to 100 \
@@ -171,10 +187,10 @@ itcl::class gaia::GaiaNDFCube {
          {Lower index used during animation}
 
       itk_component add upper {
-         LabelEntryScale $w_.upper \
+         LabelEntryScale $animationTab.upper \
             -text {Upper index:} \
             -value 1 \
-            -labelwidth 15 \
+            -labelwidth $lwidth \
             -valuewidth 20 \
             -from 1 \
             -to 100 \
@@ -190,7 +206,7 @@ itcl::class gaia::GaiaNDFCube {
          {Upper index used during animation}
 
       itk_component add animation {
-         frame $w_.animation
+         frame $animationTab.animation
       }
       pack $itk_component(animation) -side top -fill x -ipadx 1m -ipady 2m
 
@@ -212,7 +228,76 @@ itcl::class gaia::GaiaNDFCube {
       #  Use a section to pass to COLLAPSE so we do not need to know the world
       #  coordinates.
 
+      itk_component add cruler {
+         LabelRule $collapseTab.cruler -text "Collapse controls:"
+      }
+      pack $itk_component(cruler) -side top -fill x
 
+      itk_component add collower {
+         LabelEntryScale $collapseTab.collower \
+            -text {Lower index:} \
+            -value 1 \
+            -labelwidth $lwidth \
+            -valuewidth 20 \
+            -from 1 \
+            -to 100 \
+            -increment 1 \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -delay 25 \
+            -command [code $this set_collapse_lower_bound_]
+      }
+      pack $itk_component(collower) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(collower) \
+         {Lower index used for creating collapsed image}
+
+      itk_component add colupper {
+         LabelEntryScale $collapseTab.colupper \
+            -text {Upper index:} \
+            -value 1 \
+            -labelwidth $lwidth \
+            -valuewidth 20 \
+            -from 1 \
+            -to 100 \
+            -increment 1 \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -delay 25 \
+            -command [code $this set_collapse_upper_bound_]
+      }
+      pack $itk_component(colupper) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(colupper) \
+         {Upper index used for creating collapsed image}
+
+      #  Method used for collapse.
+      itk_component add combination {
+         LabelMenu $collapseTab.cattype \
+            -labelwidth $lwidth \
+            -text "Combination method:" \
+            -variable [scope combination_type_]
+      }
+      pack $itk_component(combination) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(combination) \
+         {Method to use when combining data, use median with care}
+
+      foreach {sname lname} \
+         {Mean Mean WMean {Weighted Mean} Mode Mode Median Median} {
+            $itk_component(combination) add \
+               -label $lname \
+               -value $sname \
+               -command [code $this set_combination_type_ $sname]
+      }
+
+      itk_component add collapse {
+         button $collapseTab.collapse -text Collapse \
+            -command [code $this collapse_]
+      }
+      pack $itk_component(collapse) -side top -expand 1 -pady 3 -padx 3
+      add_short_help $itk_component(collapse) \
+         {Display the combined image collapsed along the range}
+      
       #  Close window.
       itk_component add close {
          button $w_.close -text Close \
@@ -220,6 +305,9 @@ itcl::class gaia::GaiaNDFCube {
       }
       pack $itk_component(close) -side right -expand 1 -pady 3 -padx 3
       add_short_help $itk_component(close) {Close window}
+
+      #  Reveal first page of controls.
+      $itk_component(tabnotebook) select 0
    }
 
    #  Destructor:
@@ -229,7 +317,15 @@ itcl::class gaia::GaiaNDFCube {
       if { $id_ != 0 } {
          $rtdimage_ ndf close $id_
       }
+
+      #  Stop animation.
       stop_
+
+      #  Release collapser task.
+      if { $collapser_ != {} } {
+         catch {$collapser_ delete_sometime}
+         set collapser_ {}
+      }
    }
 
    #  Methods:
@@ -271,18 +367,26 @@ itcl::class gaia::GaiaNDFCube {
          set axis_ $value
          set plane_min_ [lindex $bounds_ [expr (${axis_}-1)*2]]
          set plane_max_ [lindex $bounds_ [expr (${axis_}-1)*2+1]]
-
+         
          $itk_component(index) configure -from $plane_min_ -to $plane_max_
+
          $itk_component(lower) configure -from $plane_min_ -to $plane_max_
          $itk_component(upper) configure -from $plane_min_ -to $plane_max_
+
+         $itk_component(collower) configure -from $plane_min_ -to $plane_max_
+         $itk_component(colupper) configure -from $plane_min_ -to $plane_max_
+
          set_lower_bound_ $plane_min_
          set_upper_bound_ $plane_max_
 
+         set_collapse_lower_bound_ $plane_min_
+         set_collapse_upper_bound_ $plane_max_
+         
          set plane_ $plane_min_
          set_display_plane_ [expr (${plane_max_}- ${plane_min_})/2]
       }
    }
-
+   
    #  Set the plane to display.
    protected method set_display_plane_ { newvalue } {
       if { $newvalue != $plane_ && $ndfname_ != {} } {
@@ -293,7 +397,7 @@ itcl::class gaia::GaiaNDFCube {
          } else {
             set plane_ $newvalue
          }
-
+         
          if { $axis_ == 1 } {
             set section "($plane_,,)"
          } elseif { $axis_ == 2 } {
@@ -304,12 +408,13 @@ itcl::class gaia::GaiaNDFCube {
          display_ ${ndfname_}$section
       }
    }
-
+   
    #  Display an NDF.
-   protected method display_ {name} {
+   protected method display_ {name {istemp 0} } {
       $itk_option(-gaia) open $name
+      $itk_option(-gaia) configure -temporary $istemp
    }
-
+      
    #  Set the animation lower bound.
    protected method set_lower_bound_ {bound} {
       set lower_bound_ $bound
@@ -353,6 +458,69 @@ itcl::class gaia::GaiaNDFCube {
       }
    }
 
+   #  Set the collapse lower bound.
+   protected method set_collapse_lower_bound_ {bound} {
+      set lower_collapse_bound_ $bound
+   }
+
+   #  Set the collapse upper bound.
+   protected method set_collapse_upper_bound_ {bound} {
+      set upper_collapse_bound_ $bound
+   }
+
+   # Set the combination type
+   protected method set_combination_type_ {type} {
+      set combination_type_ $type
+   }
+
+   #  Collapse image and the display the result.
+   protected method collapse_ {} {
+      set range "$lower_collapse_bound_:$upper_collapse_bound_"
+      if { $axis_ == 1 } {
+         set section "($range,,)"
+      } elseif { $axis_ == 2 } {
+         set section "(,$range,)"
+      } else {
+         set section "(,,$range)"
+      }
+
+      #  Now startup the COLLAPSE application.
+      if { $collapser_ == {} } {
+         global env
+         set collapser_ [GaiaApp \#auto -application \
+                            $env(KAPPA_DIR)/collapse \
+                            -notify [code $this collapse_completed_]]
+      }
+
+      #  Create a temporary file name.
+      set tmpimage_ "GaiaNDFCube${count_}"
+      incr count_
+
+      blt::busy hold $w_
+      puts "$collapser_ runwiths in=${ndfname_}$section out=$tmpimage_ axis=$axis_ \
+                            estimator=$combination_type_ accept"
+      $collapser_ runwiths "in=${ndfname_}$section out=$tmpimage_ axis=$axis_ \
+                            estimator=$combination_type_ accept"
+   }
+
+   #  Display a collapsed image. 
+   private method collapse_completed_ {} {
+      set file {}
+      if { ! [file readable $tmpimage_] } {
+         if { ! [file readable ${tmpimage_}.sdf] } {
+            blt::busy release $w_
+            return
+         }
+         set file ${tmpimage_}.sdf
+      } else {
+         set file $tmpimage_
+      }
+      if { $file != {} } {
+         display_ $file 1
+      }
+      blt::busy release $w_
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -393,6 +561,16 @@ itcl::class gaia::GaiaNDFCube {
    protected variable lower_bound_ 0
    protected variable upper_bound_ 0
 
+   #  Collapse bounds.
+   protected variable lower_collapse_bound_ 0
+   protected variable upper_collapse_bound_ 0
+
+   #  The COLLAPSE task.
+   protected variable collapser_ {}
+
+   #  Combination method.
+   protected variable combination_type_ "Mean"
+
    #  The current axis.
    protected variable axis_ 1
 
@@ -402,8 +580,14 @@ itcl::class gaia::GaiaNDFCube {
    #  Id of the animation thread.
    protected variable afterId_ {}
 
+   #  Name of the temporary image just created.
+   protected variable tmpimage_
+
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  The temporary image count.
+   common count_ 0
 
 #  End of class definition.
 }
