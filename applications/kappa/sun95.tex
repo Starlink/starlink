@@ -43765,6 +43765,19 @@ Domain ``NDC'' associated with it. This Frame covers the whole graphics
 device is (0,0) at the bottom left corner and (1,1) at the top right
 corner. The name ``NDC'' can now be used with applications such as 
 \htmlref{GDSTATE}{GDSTATE}.
+
+\item Applicatons which read positions lists from catalogue files can now
+read lists from catalogues which do not contain a WCS FrameSet. If no WCS
+FrameSet is found, then a search is made for columns called ``RA'' and
+``DEC''. If these columns are found, they are used (is possible), and
+qualified by any EPOCH and EQUINOX parameters in the catalogue. If no
+such columns are found, a search is made for columns called ``X'' and
+``Y''. If found, they are assumed to hold positions in the GRID
+co-ordinate Frame. GRID co-ordinates are like PIXEL co-ordinates except
+the centre of the bottom left pixel always has GRID co-ordinates ( 1.0,
+1.0 ). If a ``Z'' column also exists, the GRID co-ordinates are assumed
+to be 3-dimensional.
+
 \end{itemize}
 
 \subsection{New Commands}
