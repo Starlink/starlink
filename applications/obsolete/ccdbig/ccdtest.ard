@@ -1,0 +1,8 @@
+#
+# ARD description file supplied as part of CCDEXERCISE test.
+#
+# Bad lines
+#
+COLUMN( 25 )
+ROW( 54 )
+# @(#)ccdtest_ard.dat	2.4     10/26/95     2
