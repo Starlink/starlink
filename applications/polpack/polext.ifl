@@ -26,7 +26,7 @@ interface POLEXT
    parameter ANGROT
       type     _REAL
       access   READ
-      ppath    'CURRENT,DEFAULT'
+      ppath    'DEFAULT'
       vpath    'DEFAULT'
       default  !
       prompt   'A new ANGROT value'
@@ -35,7 +35,7 @@ interface POLEXT
    parameter FILTER
       type     LITERAL
       access   READ
-      ppath    'CURRENT,DEFAULT'
+      ppath    'DEFAULT'
       vpath    'DEFAULT'
       default  !
       prompt   'A new FILTER value'
@@ -44,7 +44,7 @@ interface POLEXT
    parameter IMGID
       type     LITERAL
       access   READ
-      ppath    'CURRENT,DEFAULT'
+      ppath    'DEFAULT'
       vpath    'DEFAULT'
       default  !
       prompt   'New IMGID value(s)'
@@ -82,7 +82,7 @@ interface POLEXT
    parameter WPLATE
       type     LITERAL
       access   READ
-      ppath    'CURRENT,DEFAULT'
+      ppath    'DEFAULT'
       vpath    'DEFAULT'
       default  !
       prompt   'A new WPLATE value'
