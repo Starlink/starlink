@@ -7,7 +7,7 @@ lib_LTLIBRARIES = libadam_adam.la
 libadam_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(F_ROUTINES)
-libadam_adam_la_FCFLAGS = -I../messys
+libadam_adam_la_FCFLAGS = $(AM_FCFLAGS) -I../messys
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
