@@ -2,7 +2,6 @@
 -- Starting monoliths...
 -- Monoliths OK
 -- Processing NDF <testndf1>
--- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
 -- NDF <testndf1> examined OK
 -- WCS information from AST
 -- Obtaining catalogue from usno@eso...
@@ -50,12 +49,6 @@ BITPIX  =                    8 / number of bits per data pixel
 NAXIS   =                    2 / number of data axes                            
 NAXIS1  =                    1 / length of data axis 1                          
 NAXIS2  =                    1 / length of data axis 2                          
-COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
-COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
-COMMENT   Contact the NASA Science Office of Standards and Technology for the   
-COMMENT   FITS Definition document #100 and other FITS information.             
-HISTORY   Written by ASTROM                                                     
-COMMENT   ASTROM astrometric solution:  9-component solution                    
 CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
 CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
@@ -67,13 +60,10 @@ CRPIX1  =         4104.1839381 / Projection pole -- x-pixels
 CRPIX2  =         3090.1668025 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-COMMENT   Mean scale  0.33arcsec, nonperp  0.08, angle 89.10, inv? T            
 CD1_1   =       -1.5176769E-06 / Transformation to intermed. world coords       
 CD2_1   =       -9.2548725E-05                                                  
 CD1_2   =       -9.2563023E-05                                                  
 CD2_2   =        1.3903583E-06                                                  
-COMMENT   Projection geometry: Pincushion distortion, coeff = +202.1100         
-COMMENT   ASTROM q=  202.1124rad**-2 =     0.0616deg**-2                        
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
 PV1_7   =       -6.1566967E-02 / a_7 x^3   = -q                                 
@@ -96,7 +86,6 @@ END
 -- Starting monoliths...
 -- Monoliths OK
 -- Processing NDF <testndf2>
--- HTTP proxy: http://wwwcache.gla.ac.uk:8080/
 -- NDF <testndf2> examined OK
 -- WCS information from AST
 -- Obtaining catalogue from usno@eso...
@@ -144,12 +133,6 @@ BITPIX  =                    8 / number of bits per data pixel
 NAXIS   =                    2 / number of data axes                            
 NAXIS1  =                    1 / length of data axis 1                          
 NAXIS2  =                    1 / length of data axis 2                          
-COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
-COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
-COMMENT   Contact the NASA Science Office of Standards and Technology for the   
-COMMENT   FITS Definition document #100 and other FITS information.             
-HISTORY   Written by ASTROM                                                     
-COMMENT   ASTROM astrometric solution:  6-component solution                    
 CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
 CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
@@ -161,13 +144,10 @@ CRPIX1  =          177.3639579 / Projection pole -- x-pixels
 CRPIX2  =          176.5394624 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-COMMENT   Mean scale  1.70arcsec, nonperp  0.17, angle  0.66, inv? T            
 CD1_1   =       -4.7196756E-04 / Transformation to intermed. world coords       
 CD2_1   =       -4.7082042E-06                                                  
 CD1_2   =       -6.0873915E-06                                                  
 CD2_2   =        4.7062821E-04                                                  
-COMMENT   Projection geometry: Astrograph                                       
-COMMENT   ASTROM q=    0.0000rad**-2 =     0.0000deg**-2                        
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
 PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 
