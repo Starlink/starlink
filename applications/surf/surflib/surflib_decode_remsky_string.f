@@ -28,7 +28,8 @@
 *  Arguments:
 *     SUB_INSTRUMENT = CHARACTER (Given)
 *        Sub instrument name. This governs the bolometers that
-*        are allowed to be returned.
+*        are allowed to be returned and the definition of negative ring
+*        numbers.
 *     N_ELEMENTS = INTEGER (Given)
 *        Number of elements in the input array
 *     BOL_DESC( N_ELEMENTS ) = CHARACTER*(*) (Given)
@@ -38,6 +39,7 @@
 *          id     -   bolometer id (eg H7)
 *          all    -   all bolometers
 *          rn     -   ring of bolometers
+*          r-n    -   bolometer rings counting from the outside in
 *        Can be prefixed with a minus sign to indicate that a bolometer
 *        should be removed from the final list. The calculation is sequential.
 *     N_BOLS = INTEGER (Given)
@@ -58,6 +60,9 @@
 *  Syntax:
 *    [all]                                 - Whole array
 *    [r0]                                  - Ring zero (central pixel)
+*    [r-1]                                 - outer ring
+*    [r-4]                                 - central pixel of LONG array
+*    (all,-r-1)                            - everything except outer ring
 *    [h7,r1]                               - inner ring and h7
 *    [r1,-h8]                              - inner ring without h8
 *    [r1,-18]                              - inner ring without bolometer 18
@@ -66,6 +71,7 @@
 *    [all,-r3,g1]                          - all pixels except ring 3 but with
 *                                             g1 (which happens to be in r3)
 *    [all,-r1,-r2,-r3,-r4,-r5]             - Selects the central pixel!!
+*    [outer]                               - selects the outermost ring
 *
 *     Note that the sequence is evaluated in turn so that [all,-all,h7] will
 *     still end up with pixel h7.
@@ -81,6 +87,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.8  2000/06/03 03:03:57  timj
+*     Support negative ring numbers
+*
 *     Revision 1.7  1999/08/19 03:37:49  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -156,6 +165,8 @@
       INTEGER POS                     ! Position in negative array
       INTEGER RINGS(N_BPR,0:N_RINGS,N_SUBS)
                                       ! Bolometers in each ring and sub_inst
+      INTEGER RING_MAX_SUB( N_SUBS )  ! Max ring number for each sub in ARRAYS
+      INTEGER RMAX                    ! Outermost ring number for this subinst
       INTEGER RNUM                    ! Ring number
       CHARACTER*(10) STEMP            ! Modified remsky string
       INTEGER SUB_INDEX               ! Index to specify sub instrument in RINGS
@@ -186,6 +197,8 @@
      :     /1,2,3,4,5,6,13,21,30,40,51,61,70,78,85,91,90,
      :     89,88,87,86,79,71,62,52,41,31,22,14,7/
 
+      DATA RING_MAX_SUB / 3, 5 /
+
       DATA BOLS_TEMP / MAX_N_BOLS * 0 /
       DATA BOLS_SOFAR / MAX_N_BOLS * 0 /
 *.
@@ -214,6 +227,8 @@
      :        ' is not supported.', STATUS)
       END IF
 
+*     Set the outermost ring number
+      RMAX = RING_MAX_SUB( SUB_INDEX )
       
 *     Loop through each element
 
@@ -316,15 +331,29 @@
                      CALL CHR_CTOI(STEMP(2:), RNUM, STATUS)
 
                      IF (STATUS .EQ. SAI__OK) THEN
-*     We have a number. Now check the range
 
-                        IF (RNUM .LT. 0 .OR. RNUM .GT. N_RINGS) THEN
+*     We have a number. Now check the range
+*     If we have a negative number we assume the user is counting
+*     from the outside in. Valid range therefore includes -1 (the
+*     outermost ring) to -(RMAX+1) 
+                        IF (RNUM .LT. 0 .AND. 
+     :                       RNUM .GE. -1 * (RMAX + 1) ) THEN
+
+*     Recalculate RNUM
+                           RNUM = RNUM + RMAX + 1
+
+                        END IF
+
+*     Check range after possible modification
+
+                        IF (RNUM .LT. 0 .OR. RNUM .GT. RMAX) THEN
 *     Oh dear. Out of range so report
 
                            CALL MSG_SETI('RN', RNUM)
                            CALL MSG_OUTIF(MSG__QUIET, ' ',
      :                          'DECODE_STRING: Ring ^RN is not '//
-     :                          'available', STATUS)
+     :                          'available for this sub instrument', 
+     :                          STATUS)
 
                         ELSE
 *     Can now process this ring.
