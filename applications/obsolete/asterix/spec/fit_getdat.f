@@ -388,14 +388,19 @@
 	    CALL MSG_PRNT('Error accessing vignetting data array')
 	    VIG=.FALSE.
           END IF
-	  IF (NVDIM.EQ.NDIM) THEN
-	    DO I=1,NDIM
-	      IF (VDIMS(I).NE.DIMS(I)) VIG=.FALSE.
-	    END DO
-          ELSE
-	    VIG=.FALSE.
+          IF ( VIG ) THEN
+	    IF (NVDIM.EQ.NDIM) THEN
+	      DO I=1,NDIM
+	        IF (VDIMS(I).NE.DIMS(I)) VIG=.FALSE.
+	      END DO
+            ELSE
+	      VIG=.FALSE.
+            END IF
+            IF ( .NOT. VIG ) THEN
+	      CALL MSG_PRNT('Ignoring vignetting data array as '/
+     :                           /'dimensions don''t match data')
+            END IF
           END IF
-
         END IF
 
 *    Likelihood case?
