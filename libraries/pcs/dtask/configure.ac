@@ -36,12 +36,6 @@ STAR_DECLARE_DEPENDENCIES([use],   [hdspar])
 
 STAR_MESSGEN(act_err.msg dtask_err.msg)
 
-dnl    We need some further configuration: see the original dtask
-dnl    makefile, which edits in extra libraries on Solaris (such as
-dnl    -lsocket); see the installs of LINK_SCRIPTS in that makefile.
-dnl    This is probably part of a more general bit of configuration
-dnl    necessary on Solaris.
-
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES(Makefile component.xml)
 
