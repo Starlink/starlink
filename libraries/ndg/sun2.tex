@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun2.2}
-\newcommand{\stardocnumber}    {2.2}
+\newcommand{\stardocsource}    {sun2.3}
+\newcommand{\stardocnumber}    {2.3}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {7th July 2000}
+\newcommand{\stardocdate}      {28th February 2001}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 4.0}
+\newcommand{\stardocversion}   {Version 5.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -273,13 +273,13 @@ the names of a group of {\em existing} NDFs to be used as inputs by
 the application. For instance, the group expression may be 
 
 \begin{verbatim}
-     m51_b3s1_ds,m51_b3s2_ds,m51_b3s2?_ds,^files.lis
+     m51_b[23]s1_ds,m51_b[23]s2_ds,m51_b[23]s2?_ds,^files.lis
 \end{verbatim}
 
-This is a complicated example, probably more complicated than would be used in
-practice, but it highlights the facilities of the GRP and NDG packages, e.g.
-wild cards (``?'' or ``$*$''), lists of files, or indirection through 
-a text file (``\verb+^+''). 
+This is a complicated example, probably more complicated than would be
+used in practice, but it highlights the facilities of the GRP and NDG
+packages, e.g. wild cards (``?'', ``$*$'' or ``[..]'' ), lists of files,
+or indirection through a text file (``\verb+^+'').
 
 The \htmlref{NDG\_ASSOC}{NDG\_ASSOC} routine produces a list of explicit NDF names, which are stored
 internally within the GRP system. 
@@ -913,13 +913,14 @@ to add further members.
       \sstitemlist{
 
          \sstitem
-         Any file names containing wildcards are expanded into a list of NDF
-         names. The supplied strings are intepreted by a shell (/bin/tcsh if
-         it exists, otherwise /bin/csh, otherwise /bin/sh), and so may
-         contain shell meta-characters (eg twiddle, \$HOME, even command
-         substitution and pipes - but pipe characters {\tt "}$|${\tt "} need to be escaped
-         using a backslash {\tt "}$\backslash${\tt "} to avoid them being interpreted as GRP
-         editing characters).
+         Any file names containing wildcards or "[..]" globbing patterns
+	 are expanded into a list of NDF names. The supplied strings are
+	 intepreted by a shell (/bin/tcsh if it exists, otherwise
+	 /bin/csh, otherwise /bin/sh), and so may contain shell
+	 meta-characters (eg twiddle, \$HOME, even command substitution
+	 and pipes - but pipe characters {\tt "}$|${\tt "} need to be
+	 escaped using a backslash {\tt "}$\backslash${\tt "} to avoid
+	 them being interpreted as GRP editing characters).
 
          \sstitem
          Each supplied name may include an HDS path. For instance,
@@ -951,6 +952,20 @@ to add further members.
          types specified in NDF\_FORMATS\_OUT. If no file type is given by
          the user, the highest priority available file type is used. If an
          explicit file type is given, then that file type is used.
+
+         \sstitem
+
+         Care should be taken if a trailing string enclosed in square
+	 brackets is appended to the end of the file name. These are
+	 interpreted first as a globbing pattern. Thus {\tt
+	 "}fred[12]{\tt "} would match files with base names {\tt
+	 "}fred1{\tt "} and {\tt "}fred2{\tt "}. If the pattern does not
+	 match any existing files, then the trailing {\tt "}[..]{\tt "}
+	 string is next interpreted as a foreign extension specifier.
+	 Thus if fred.fit is a multi-extension FITS file, {\tt
+	 "}fred[12]{\tt "} would be interpreted as the twelth image
+	 extension in fred.fit only if files cannot be found with
+	 basenames {\tt "}fred1{\tt "} or {\tt "}fred2{\tt "}.
 
          \sstitem
          NDFs contained within HDS files are opened in order to ensure

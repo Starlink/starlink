@@ -45,12 +45,12 @@
 *        The global status.
 
 *  Notes:
-*     -  Any file names containing wildcards are expanded into a list of NDF 
-*     names. The supplied strings are intepreted by a shell (/bin/tcsh if
-*     it exists, otherwise /bin/csh, otherwise /bin/sh), and so may
-*     contain shell meta-characters (eg twiddle, $HOME, even command
-*     substitution and pipes - but pipe characters "|" need to be escaped
-*     using a backslash "\" to avoid them being interpreted as GRP
+*     -  Any file names containing wildcards or "[..]" globbing patterns are 
+*     expanded into a list of NDF names. The supplied strings are intepreted 
+*     by a shell (/bin/tcsh if it exists, otherwise /bin/csh, otherwise 
+*     /bin/sh), and so may contain shell meta-characters (eg twiddle, $HOME, 
+*     even command substitution and pipes - but pipe characters "|" need to 
+*     be escaped using a backslash "\" to avoid them being interpreted as GRP
 *     editing characters).
 *     -  Each supplied name may include an HDS path. For instance,
 *     "/home/dsb/mydata.a.c(1).b" refers to an NDF stored in component
@@ -77,6 +77,15 @@
 *     types specified in NDF_FORMATS_OUT. If no file type is given by
 *     the user, the highest priority available file type is used. If an
 *     explicit file type is given, then that file type is used.
+*     -  Care should be taken if a trailing string enclosed in square
+*     brackets is appended to the end of the file name. These are
+*     interpreted first as a globbing pattern. Thus "fred[12]" would
+*     match files with base names "fred1" and "fred2". If the pattern
+*     does not match any existing files, then the trailing "[..]" string
+*     is next interpreted as a foreign extension specifier. Thus if fred.fit 
+*     is a multi-extension FITS file, "fred[12]" would be interpreted as
+*     the twelth image extension in fred.fit only if files cannot be found
+*     with basenames "fred1" or "fred2".
 *     -  NDFs contained within HDS files are opened in order to ensure
 *     that they are valid NDFs. The user is notified if there are no 
 *     valid NDFs matching a supplied name, and they are asked to supply 
