@@ -402,9 +402,6 @@
 
          IF (READING) THEN
 
-* Make sure automatic BAD value processing is performed
-            CALL NDF_SQMF(.TRUE., IN_NDF, STATUS)
-
 *  get some general descriptive parameters of the observation
 
             CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC,
@@ -735,6 +732,8 @@
 *  dimensions
 
             CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
+
+            CALL NDF_SQMF(.TRUE., IN_NDF, STATUS)
             CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', 
      :        FILE_DATA_PTR, ITEMP, STATUS)
 
@@ -882,7 +881,6 @@
             CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
-
 
 *  get the bolometer description arrays
 
@@ -1605,14 +1603,13 @@
       UBND (1) = NX_OUT
       UBND (2) = NY_OUT
       CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, OUT_NDF, STATUS)
-      CALL NDF_SQMF(.FALSE., OUT_NDF, STATUS)
 
+      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :  OUT_QUALITY_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE/ZERO', 
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE/ZERO',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-     :  OUT_QUALITY_PTR, ITEMP, STATUS)
 
       CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
@@ -1642,10 +1639,11 @@
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
             CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT(I), 
-     :        %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
-     :        N_BOL(I) * N_POS(I), DBLE(OUT_PIXEL), NX_OUT, 
-     :        NY_OUT, I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR), 
-     :        %val(REGRID1_PTR), STATUS)
+     :           %val(IN_DATA_PTR(I)),
+     :           %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
+     :           N_BOL(I) * N_POS(I), DBLE(OUT_PIXEL), NX_OUT, 
+     :           NY_OUT, I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR), 
+     :           %val(REGRID1_PTR), STATUS)
          END DO
       END IF
 
