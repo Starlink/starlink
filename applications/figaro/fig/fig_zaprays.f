@@ -75,6 +75,7 @@ C
 C     Functions used
 C
       REAL FIG_CLOSEST
+      EXTERNAL FIG_CLOSEST
       INTEGER ICH_LEN
 C
 C     Local variables

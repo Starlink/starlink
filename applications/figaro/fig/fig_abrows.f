@@ -62,6 +62,7 @@ C
 C     Functions
 C
       LOGICAL FIG_QBROW
+      EXTERNAL FIG_QBROW
 C
 C     Local variables
 C
