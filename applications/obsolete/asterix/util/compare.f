@@ -13,7 +13,7 @@
 *      	    Dataset containing data values
 *     MODEL=UNIV(R)
 *           Dataset containing model values
-*     POISS_ERR=LOGICAL(R)
+*     POISSON=LOGICAL(R)
 *           Poisson data errors to be assumed
 *
 *    Method :
@@ -154,7 +154,7 @@
       ELSE
 
 *      No existing errors - options are Poisson errors or unit errors
-	CALL USI_GET0L( 'POISS_ERR', POISS, STATUS )
+	CALL USI_GET0L( 'POISSON', POISS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
         CALL DYN_MAPR( 1, NELM, DVPTR, STATUS )

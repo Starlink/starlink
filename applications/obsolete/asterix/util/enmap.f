@@ -96,7 +96,7 @@
       CALL AST_INIT
 
 *    Get name of input file and output file
-      CALL USI_ASSOC2( 'INPUT', 'OUTPUT', 'READ', ILOC, OLOC,
+      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC,
      :                                       INPRIM, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
 

@@ -23,7 +23,7 @@
 *     OR        - OR qualiity with specified value?      (Logical(F), read)
 *     EOR       - EOR qualiity with specified value?     (Logical(F), read)
 *     NOT       - NOT existing qualiity value?           (Logical(F), read)
-*     OVERWRITE - Overwrite input file?                  (Logical(T), read)
+*     OVER      - Overwrite input file?                  (Logical(T), read)
 *     QSEL      - Specify a quality value to alter?      (Logical(F), read)
 *     INP       - Input file name.                       (Univ, read)
 *     OUT       - Output filename                        (Univ, write)
@@ -174,7 +174,7 @@
       END IF
 
 *    Overwrite?
-      CALL USI_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
 
 *    Get input
       IF ( OVERWRITE ) THEN
