@@ -221,10 +221,9 @@
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
-      IF ( ISTAT .GT. IMOK ) THEN
-         CALL COI_FIOER( ISTAT, 'COI_WHEAD_ERR3', 'IMAKWC',
-     :                   'Error writing an EXTNAME or HDUCLASn '/
-     :                   /'header card.', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'COI_WHEAD_ERR3',
+     :     'Error writing an EXTNAME or HDUCLASn header card.', STATUS )
          GOTO 999
       END IF
 
@@ -355,7 +354,8 @@
 *  Just skip over non-valid cards.  Thus defective cards are not
 *  propagated.  There is no warning, but users should check their
 *  headers anyway, and we should aim to have header-validation
-*  software.
+*  software.  ISAT no longer used, but retain this in case ADLINE is
+*  given a status argument.
                IF ( ISTAT .GT. IMOK ) ISTAT = IMOK
             END IF
          END DO
@@ -393,14 +393,6 @@
 *  Write the header card.
                      CALL ADLINE( IMDESC, FITSTR )
 
-*  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.
-                     IF ( ISTAT .GT. IMOK ) THEN
-                        CALL COI_FIOER( ISTAT, 'COI_WHEAD_ERR2',
-     :                    'ADLINE', 'Error copying FITS axis-rotation '/
-     :                    /'header card to the OIF file.', STATUS )
-                        GOTO 999
-                     END IF
                   END IF
                END DO
             END IF

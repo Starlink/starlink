@@ -186,13 +186,4 @@
          END DO
       END IF
 
-*  Check for an error.  Handle a bad status.  Negative values are
-*  reserved for non-fatal warnings.
-      IF ( ISTAT .NE. IMOK ) THEN
-         STATUS = SAI__ERROR
-         CALL COI_FIOER( ISTAT, 'COI_WHISR_ERR', 'ADLINE',
-     :                   'Error writing to HISTORY header card.',
-     :                   STATUS )
-      END IF
-
       END

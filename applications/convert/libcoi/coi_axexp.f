@@ -824,10 +824,9 @@
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
-            IF ( ISTAT .NE. IMOK ) THEN
-               CALL COI_FIOER( ISTAT, 'COI_AXEXP_ERR2', 'IMPKWA',
-     :                         'Error writing axis'//C//' header '/
-     :                         /'cards.', STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_REP('COI_AXEXP_ERR2',
+     :           'Error writing axis'//C//' header '//'cards.', STATUS )
                GOTO 999
             END IF
          END DO

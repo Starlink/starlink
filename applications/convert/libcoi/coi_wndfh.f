@@ -304,12 +304,11 @@
          UNTFND = .TRUE.
       END IF
 
-*  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.
-      IF ( ISTAT .GT. IMOK ) THEN
-         CALL COI_FIOER( ISTAT, 'COI_WNDFH_ERR3', 'ADLINE',
-     :                   'Error writing an NDF character component '/
-     :                   /'to a header card. ', STATUS )
+*  Handle a bad status.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'COI_WNDFH_ERR3',
+     :     'Error writing an NDF character component to a header card.',
+     :     STATUS )
          GOTO 999
       END IF
 
@@ -337,10 +336,9 @@
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
-         IF ( ISTAT .NE. IMOK ) THEN
-            CALL COI_FIOER( ISTAT, 'COI_WNDFH_ERR6', 'ADLINE',
-     :                      'Error writing the BLANK header card.',
-     :                      STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'COI_WNDFH_ERR6',
+     :        'Error writing the BLANK header card.', STATUS )
             GOTO 999
          END IF
 
