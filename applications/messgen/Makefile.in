@@ -74,13 +74,18 @@ DLLTOOL = @DLLTOOL@
 ECHO = @ECHO@
 ERR_FACILITY_CODE = @ERR_FACILITY_CODE@
 ERR_FACILITY_FILES = @ERR_FACILITY_FILES@
+EXTRA_DIST = @EXTRA_DIST@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+MANIFESTS = @MANIFESTS@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STARLINK = @STARLINK@
+STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
+STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 am__include = @am__include@
@@ -91,13 +96,11 @@ bin_PROGRAMS = messgen cremsg
 
 messgen_SOURCES = messgen.c
 cremsg_SOURCES = cremsg.c
-
-EXTRA_DIST = $(STAR_DOCUMENTATION)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = install-with-manifest
+CONFIG_CLEAN_FILES = component.xml install-with-manifest
 bin_PROGRAMS = messgen$(EXEEXT) cremsg$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
@@ -130,9 +133,9 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 CFLAGS = @CFLAGS@
 DIST_SOURCES = $(cremsg_SOURCES) $(messgen_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in acinclude.m4 aclocal.m4 \
-	config.guess config.h.in config.sub configure configure.ac \
-	depcomp install-sh install-with-manifest.in ltmain.sh missing \
-	mkinstalldirs
+	component.xml.in config.guess config.h.in config.sub configure \
+	configure.ac depcomp install-sh install-with-manifest.in \
+	ltmain.sh missing mkinstalldirs
 SOURCES = $(cremsg_SOURCES) $(messgen_SOURCES)
 
 all: config.h
@@ -173,6 +176,8 @@ $(srcdir)/config.h.in:  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+component.xml: $(top_builddir)/config.status component.xml.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-with-manifest: $(top_builddir)/config.status install-with-manifest.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
