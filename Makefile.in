@@ -42,7 +42,9 @@ ALL_TARGETS = \
 	$(MANIFEST)/hlp \
 	$(MANIFEST)/idi \
 	$(MANIFEST)/img \
+	$(MANIFEST)/init \
         $(MANIFEST)/itcl \
+	$(MANIFEST)/jpl \
 	$(MANIFEST)/kappa \
 	$(MANIFEST)/lex \
 	$(MANIFEST)/mag \
