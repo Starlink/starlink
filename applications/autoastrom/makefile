@@ -295,7 +295,7 @@ STARLINK = /star
 
 #  Path of the Perl binary we will use
 
-STARPERL = /stardev/Perl/bin/perl
+STARPERL = /star/Perl/bin/perl
 
 #  Pathnames of Starlink sub-directories that may be referenced when
 #  building this package.
@@ -388,7 +388,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5-9
+PKG_VERS = 0.5-10
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -396,7 +396,7 @@ PKG_VERS = 0.5-9
 #  script and any documentation files).
 
 #  List of the source files bundled into the export_source distribution
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk VERSION $(DOCUMENTATION) \
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile.in mk VERSION $(DOCUMENTATION) \
 	$(MATCHPROG).tar
 
 #  Source directory for catlib is ./catlib; the directory it's
@@ -1129,8 +1129,10 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # distribution, we can tolerate this missing dependency, and simply
 # remember to delete autoastrom_source.tar when it's no longer needed.
 $(PKG_NAME)_source.tar:
-	cd astrom && test -f configure || sh bootstrap || (echo "Need newer version of autoconf!" && false)
-	cd moggy && test -f configure || sh bootstrap || (echo "Need newer version of autoconf!" && false)
+	cd astrom && sh bootstrap || \
+		{ echo "Need newer version of autoconf!"; false; }
+	cd moggy && AUTOMAKE='automake --foreign' autoreconf || \
+		{ echo "Need newer version of autoconf!"; false; }
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
 # Do not include the t/images directory -- large files!
