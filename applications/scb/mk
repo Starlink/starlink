@@ -153,11 +153,6 @@
 #           to resolve xref_-type cross-references.  Thus a URL
 #           pointing to the top of the /star/docs tree would be suitable.
 #
-#        MIMETYPES_FILE (/etc/mime.types)
-#           This should give the location of a MIME type mapping file.  
-#           However, not much functionality is lost if the file named
-#           by this variable does not exist.
-#
 #     The following "local" make macros are used in the associated
 #     makefile and should normally be overridden by environment variable
 #     definitions within this script.  All the local macros that are
@@ -316,7 +311,6 @@
       export SCB_BROWSER_TMP
       export SCB_INDEXER_TMP
       export HTX_SERVER
-      export MIMETYPES_FILE
 
 #  Check that the SYSTEM environment variable is defined.
       if test "$SYSTEM" = ""; then
@@ -333,7 +327,6 @@
 #  DEC Alpha machines running OSF1.
 #  -------------------------------
             alpha_OSF1)
-               MIMETYPES_FILE=/usr/local/etc/httpd/conf/mime.types
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-O -std1'
@@ -387,7 +380,6 @@
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
             sun4_Solaris)
-               MIMETYPES_FILE=/etc/http/mime.types
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-O'
@@ -408,7 +400,6 @@
 #  Intel PC running Linux.
 #  ----------------------
             ix86_Linux)
-               MIMETYPES_FILE=/etc/mime.types
                AR_IN='ar r'
                CC='gcc'
                CFLAGS='-O'
