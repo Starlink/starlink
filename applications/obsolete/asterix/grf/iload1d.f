@@ -84,7 +84,6 @@ c     ENDIF
         ENDIF
 
         CALL ADI_FCLOSE(IFID,STATUS)
-        CALL USI_ANNUL('INP',STATUS)
 
       ENDIF
 
