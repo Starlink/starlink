@@ -444,8 +444,10 @@ sub parse_args {
 #  metacharacters.
 
    foreach $key (keys %arg) {
-      $arg{$key} =~ tr/+/ /;
-      $arg{$key} =~ s/%(..)/pack("c",hex($1))/ge;
+      if ($cgi) {
+         $arg{$key} =~ tr/+/ /;
+         $arg{$key} =~ s/%(..)/pack("c",hex($1))/ge;
+      }
       $arg{$key} =~ s/</&lt;/g;
       $arg{$key} =~ s/>/&gt;/g;
    }
