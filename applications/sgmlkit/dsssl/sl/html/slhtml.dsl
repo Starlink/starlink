@@ -39,25 +39,27 @@ depending on whether the element is to be chunked.
   <description>The body of the element
 <codebody>
 (define (html-document title-sosofo body-sosofo)
-  (let ((doc-sosofo 
-	 (if (or (chunk?) (node-list=? (current-node) (document-element)))
-	     (make element gi: "HTML"
-		   (make element gi: "HEAD"
-			 (make element gi: "TITLE" title-sosofo)
-			 ($standard-html-header$))
-		   (make element gi: "BODY" 
-			 attributes: %body-attr%
-			 (header-navigation (current-node))
-			 body-sosofo
-			 ;(whereami "html-document")
-			 (footer-navigation (current-node))
-			 ))
-	     body-sosofo)))
+  (let* ((is-de? (node-list=? (current-node) (document-element)))
+	 (doc-sosofo 
+	  (if (or (chunk?) is-de?)
+	      (make element gi: "HTML"
+		    (make element gi: "HEAD"
+			  (make element gi: "TITLE" title-sosofo)
+			  ($standard-html-header$))
+		    (make element gi: "BODY" 
+			  attributes: %body-attr%
+			  (header-navigation (current-node))
+			  body-sosofo
+			  (footer-navigation (current-node))
+			  ))
+	      body-sosofo)))
     (if stream-output
 	(make sequence
-	  (make document-type
-	    name: "HTML"
-	    public-id: %html-pubid%)
+	  (if is-de?
+	      (make document-type
+		name: "HTML"
+		public-id: %html-pubid%)
+	      (empty-sosofo))
 	  doc-sosofo)
 	(if (or (chunk?)
 		(node-list=? (current-node) (document-element)))
