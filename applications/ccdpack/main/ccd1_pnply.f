@@ -134,8 +134,8 @@
          NX = X( J ) .GE. 0D0
          MY = Y( I ) .GE. 0D0
          NY = Y( J ) .GE. 0D0
-         IF ( .NOT. ( (MY .OR. NY) .AND. (MX .OR. NX) )
-     :      .OR. (MX .AND. NX) ) GO TO 2
+         IF ( .NOT. ( ( MY .OR. NY ) .AND. ( MX .OR. NX ) )
+     :      .OR. ( MX .AND. NX ) ) GO TO 2
          IF ( .NOT. ( MY .AND. NY .AND. ( MX .OR. NX ) .AND. .NOT.
      :      (MX .AND .NX)) ) GO TO 3
          INOUT = -INOUT
