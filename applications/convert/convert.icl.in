@@ -24,17 +24,17 @@
 {     {enter_further_changes_here}
 
 {-
-define   ascii2{ndf}   convert_dir:convert
-define   bdf2{ndf}     convert_dir:convert
-define   dipso2{ndf}   convert_dir:convert
-define   dst2{ndf}     convert_dir:convert
-define   ndf2a{scii}   convert_dir:convert
-define   ndf2b{df}     convert_dir:convert
-define   ndf2di{pso}   convert_dir:convert
-define   ndf2ds{t}     convert_dir:convert
-define   ndf2i{raf}    convert_dir:convert
-define   ndf2u{nf}     convert_dir:convert
-define   unf2{ndf}     convert_dir:convert
+define   ascii2(ndf)   convert_dir:convert
+define   bdf2(ndf)     convert_dir:convert
+define   dipso2(ndf)   convert_dir:convert
+define   dst2(ndf)     convert_dir:convert
+define   ndf2a(scii)   convert_dir:convert
+define   ndf2b{df)     convert_dir:convert
+define   ndf2di(pso)   convert_dir:convert
+define   ndf2ds(t)     convert_dir:convert
+define   ndf2i(raf)    convert_dir:convert
+define   ndf2u(nf)     convert_dir:convert
+define   unf2(ndf)     convert_dir:convert
 
 defhelp  ascii2ndf     convert_dir:convert
 defhelp  bdf2ndf       convert_dir:convert
