@@ -2,9 +2,9 @@ INTERFACE EXPORT
 
  PARAMETER INP
   POSITION 1
-  TYPE     'UNIV'
+  TYPE     'LITERAL'
   ASSOCIATION '<-GLOBAL.BINDS'
-  PROMPT   'Input binned dataset'
+  PROMPT   'Input dataset'
   HELP     'May be primitive, up to 7 dimensions'
  ENDPARAMETER
 
