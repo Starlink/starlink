@@ -146,12 +146,15 @@ $SIG{'INT'} = sub {tidyup; exit;};
 
 my $fmode = @ARGV ? 'update' : 'new';
 
-$func_index = StarIndex->new($func_indexfile, $fmode);
-$file_index = StarIndex->new($file_indexfile, $fmode);
+foreach $iname (@indexes) {
+   $index{$iname} = StarIndex->new("$indexdir/$iname", $fmode);
+}
 
-#  If task file exists, read values from it into @tasks.
+#  If task file exists, and we are updating, read values from it into @tasks.
 
-if (open TASKS, "$taskfile") {
+$taskfile = "$indexdir/tasks";
+
+if (@ARGV && open TASKS, $taskfile) {
    my ($pack, $tasks);
    while (<TASKS>) {
       ($pack, $tasks) = /^ *(\S+) *: *(.*)$/;
@@ -195,8 +198,8 @@ foreach $pack (sort keys %tasks) {
 
       $module = $task;
       $module .= "_" if ($module !~ /_$/);
-      chop $module unless ($func_index->get($module, packmust => $pack));
-      $line .= " $module"  if ($func_index->get($module, packmust => $pack));
+      chop $module unless ($index{'func'}->get($module, packmust => $pack));
+      $line .= " $module"  if ($index{'func'}->get($module, packmust => $pack));
    }
    print TASKS "$line\n";
 }
@@ -305,8 +308,10 @@ sub index_pack {
 #  or file index, delete them.
 
    my ($key, $value);
-   $func_index->delpack($package);
-   $file_index->delpack($package);
+
+   foreach $iname (@indexes) {
+      $index{$iname}->delpack($package);
+   }  
 
 #  If any tasks exist for this package delete them.
 
@@ -314,7 +319,7 @@ sub index_pack {
 
 #  Store fully qualified pathname of package in file index.
 
-   $file_index->put("$package#", $fqpack_file);
+   $index{'file'}->put("$package#", $fqpack_file);
 
 #  Clear hash of files which have been tagged in this package already 
 #  (used so that duplicate entries inside and outside of tar files are 
@@ -840,11 +845,11 @@ sub index_includes {
 
 #  Erase old entries.
 
-   $file_index->delpack($packname);
+   $index{'file'}->delpack($packname);
 
 #  Store location of directory in file StarIndex object.
 
-   $file_index->put("$packname#", $dir);
+   $index{'file'}->put("$packname#", $dir);
 
 #  Index all files in directory.
 
@@ -912,7 +917,7 @@ sub write_entry {
 
 #  Write entry to StarIndex object.
 
-   $func_index->put($name, $location);
+   $index{'func'}->put($name, $location);
 
 #  Optionally log entry to stdout.
 
@@ -984,7 +989,7 @@ sub index_files {
 
 #     Write entry
 
-      $file_index->put($name, $location);
+      $index{'file'}->put($name, $location);
 
 #     Optionally log entry to stdout.
 
@@ -1095,8 +1100,9 @@ sub tidyup {
 
 #  Sync StarIndex objects to disk.
 
-   $func_index->finish();
-   $file_index->finish();
+   foreach $iname (@indexes) {
+      $index{$iname}->finish();
+   }
 
 #  Remove any straggling temporary files.
 
@@ -1157,4 +1163,5 @@ sub error {
 
    die @_;
 }
+
 # $Id$

@@ -57,11 +57,11 @@ use Exporter;
 #  Names of routines and variables defined here to be exported.
 
 @EXPORT = qw/tarxf mkdirp popd pushd starpack rmrf parsetag taggable 
-             $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
+             $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir $indexdir
              $mimetypes_file
              $htxserver
              $docslisfile
-             $func_indexfile $file_indexfile $taskfile
+             @indexes 
              %tagged %tagger/;
 
 @EXPORT_OK = qw/error/;
@@ -69,11 +69,11 @@ use Exporter;
 #  Declare all variables explicitly.
 
 use strict 'vars';
-use vars qw/ $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
+use vars qw/ $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir $indexdir
              $mimetypes_file
              $htxserver
              $docslisfile
-             $func_indexfile $file_indexfile $taskfile
+             @indexes 
              %tagger %tagged/;
 
 #  Map error handler routine to that from the main:: namespace.
@@ -136,18 +136,19 @@ $htxserver = "$HTXSERVER_URL";
 #  Index file locations.
 
 my $SCB_INDEX = cwd;
-my $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
-$func_indexfile = "$indexdir/func";
-$file_indexfile = "$indexdir/file";
-$taskfile       = "$indexdir/tasks";
+$indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 
-#  List of files which are not to be tagged.  Each entry is a regular
-#  expression; if it matches the file's logical pathname then no tagging
-#  will be attempted on the file.  Files can be excluded for any reason
-#  you like, but one would be files which are known to take a very long
-#  time to tag in the current implementation of the tagging routine.
+#  Names of indexes (independent name spaces).
+#     By adding entries to this list, additional name spaces for indexing 
+#     may be added, for instance to index callable routines in a different
+#     language such as Tcl.  The indexing program (and possibly the browsing 
+#     program) would need to be modified to take advantage of these.
+#
+#     Current indexes are:
+#        func:  Routine names as used by Un*x C/fortran compilers.
+#        file:  File names (includes special 'package#' records).
 
-my @notag = qw/tixSamLib.c$/;
+@indexes = qw/func file/;
 
 #  Language-specific tagging routines.
 #     By defining the hash of references to functions %tagger, file tagging 
@@ -176,6 +177,15 @@ use FortranTag;
             f   => \&FortranTag::tag,
             gen => \&FortranTag::tag,
           );
+
+#  List of files which are not to be tagged.  Each entry is a regular
+#  expression; if it matches the file's logical pathname then no tagging
+#  will be attempted on the file.  Files can be excluded for any reason
+#  you like, but one would be files which are known to take a very long
+#  time to tag in the current implementation of the tagging routine.
+
+my (@notag) = ();
+push @notag, 'tixSamLib.c$';  #  2MB file with 6e6 character literals, yuk.
 
 
 ########################################################################
