@@ -208,12 +208,6 @@ BITPIX  =                    8 / number of bits per data pixel
 NAXIS   =                    2 / number of data axes                            
 NAXIS1  =                    1 / length of data axis 1                          
 NAXIS2  =                    1 / length of data axis 2                          
-COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
-COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
-COMMENT   Contact the NASA Science Office of Standards and Technology for the   
-COMMENT   FITS Definition document #100 and other FITS information.             
-HISTORY   Written by ASTROM                                                     
-COMMENT   ASTROM astrometric solution:  4-component solution                    
 CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
 CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
@@ -225,13 +219,10 @@ CRPIX1  =         1012.5201473 / Projection pole -- x-pixels
 CRPIX2  =         2018.9278316 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-COMMENT   Mean scale  0.33arcsec, nonperp  0.00, angle 88.86, inv? T            
 CD1_1   =       -1.8281422E-06 / Transformation to intermed. world coords       
 CD2_1   =       -9.2240926E-05                                                  
 CD1_2   =       -9.2240926E-05                                                  
 CD2_2   =        1.8281422E-06                                                  
-COMMENT   Projection geometry: Astrograph                                       
-COMMENT   ASTROM q=    0.0000rad**-2 =     0.0000deg**-2                        
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
 PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 
@@ -257,12 +248,6 @@ BITPIX  =                    8 / number of bits per data pixel
 NAXIS   =                    2 / number of data axes                            
 NAXIS1  =                    1 / length of data axis 1                          
 NAXIS2  =                    1 / length of data axis 2                          
-COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
-COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
-COMMENT   Contact the NASA Science Office of Standards and Technology for the   
-COMMENT   FITS Definition document #100 and other FITS information.             
-HISTORY   Written by ASTROM                                                     
-COMMENT   ASTROM astrometric solution:  6-component solution                    
 CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
 CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
@@ -274,13 +259,10 @@ CRPIX1  =         1011.7752847 / Projection pole -- x-pixels
 CRPIX2  =         2020.0308714 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-COMMENT   Mean scale  0.33arcsec, nonperp  0.35, angle 88.83, inv? T            
 CD1_1   =       -2.1600490E-06 / Transformation to intermed. world coords       
 CD2_1   =       -9.2015132E-05                                                  
 CD1_2   =       -9.2066602E-05                                                  
 CD2_2   =        1.6063685E-06                                                  
-COMMENT   Projection geometry: Astrograph                                       
-COMMENT   ASTROM q=    0.0000rad**-2 =     0.0000deg**-2                        
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
 PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 
