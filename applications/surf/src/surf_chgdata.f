@@ -142,11 +142,14 @@
       INTEGER          BOL_S (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                           ! array containing 1 for bolometers
                                           ! selected in data-spec, 0 otherwise
+      BYTE             BIT_VALUE          ! Value of bit to change
+      BYTE             BTEMP              ! Temporary byte
       BYTE             BVALUE             ! Value of byte
-      INTEGER          CURLY              ! index of { in IN
+      INTEGER          BYTE_END           ! Byte mask array end
+      INTEGER          BYTE_PTR           ! Byte mask array 
       CHARACTER*10     COMP               ! Selected component
       CHARACTER*80     COMPLIS            ! List of allowed components
-      CHARACTER*80     DATA_SPEC          ! data-spec part of IN
+      CHARACTER*80     DATA_SPEC(SCUBA__MAX_SECT)  ! data-spec part of IN
       INTEGER          DIM (MAX__DIM)     ! dimensions of array
       INTEGER          EXP_S (SCUBA__MAX_EXP)   ! array containing 1 for
                                           ! exposures selected in
@@ -192,6 +195,7 @@
                                           ! observation
       INTEGER          N_POS              ! number of positions measured
                                           ! in observation
+      INTEGER          N_SPEC             ! number of specifications
       CHARACTER*40     OBJECT             ! name of observed object
       CHARACTER*40     OBSERVING_MODE     ! observing mode of file
       INTEGER          OUT_DATA_PTR       ! Mapped output data
@@ -244,23 +248,9 @@
 
       CALL PAR_GET0C ('IN', IN, STATUS)
 
-      CURLY = INDEX (IN,'{')
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (CURLY .EQ. 0) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC ('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: no data section specified',
-     :        STATUS)
-         ELSE IF (CURLY .EQ. 1) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC ('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: no filename specified',
-     :        STATUS)
-         ELSE
-            FILE = IN (:CURLY-1)
-            DATA_SPEC = IN (CURLY:)
-         END IF
-      END IF
+*     Split up into filename and data spec
+      CALL SCULIB_SPLIT_FILE_SPEC(IN, SCUBA__MAX_SECT, FILE, N_SPEC,
+     :     DATA_SPEC, STATUS)
 
 *     open the data NDF
 
@@ -406,17 +396,6 @@
       CALL SCULIB_MALLOC (N_POS * VAL__NBI, POS_S_PTR, POS_S_END,
      :  STATUS)
 
-*     decode the data specification
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         SWITCH_EXPECTED = .FALSE.
-
-         CALL SCULIB_DECODE_SPEC (DATA_SPEC, %val(IN_DEM_PNTR_PTR),
-     :     1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
-     :     N_BOLS, SWITCH_EXPECTED, POS_SELECTED, %val(POS_S_PTR),
-     :     SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
-      END IF
-      
 *     Now propogate the output file from the input and open it.
 
       CALL NDF_PROP (IN_NDF, 'Data,Variance,Quality,Axis', 'OUT', 
@@ -550,19 +529,60 @@
 
 *     Are we setting the section or the inverse section
       CALL PAR_GET0L('USE_SECTION', USE_SECT, STATUS)
+
+
+*     Setup a byte array to keep track of the sections
+*     I do this so that I can handle multiple sections (the bytes
+*     are only switched on or off and so can handle overlap of different
+*     sections)
+
+      CALL SCULIB_MALLOC(N_POS * N_BOLS * VAL__NBUB, BYTE_PTR, BYTE_END,
+     :     STATUS)
+
+*     If we are using section then fill array with 0 and then set selected
+*     regions to 1. Reverse if I am selecting the rest.
+      IF (USE_SECT) THEN
+         BIT_VALUE = 1
+         BTEMP = 0
+      ELSE
+         BIT_VALUE = 0
+         BTEMP = 1
+      END IF
+      CALL SCULIB_CFILLB(N_POS * N_BOLS, BTEMP, %VAL(BYTE_PTR))
+
+*     decode each data specification
+
+      IF (STATUS .EQ. SAI__OK) THEN
+
+         SWITCH_EXPECTED = .FALSE.
+
+         DO I = 1, N_SPEC
+            CALL SCULIB_DECODE_SPEC (DATA_SPEC(I), 
+     :           %val(IN_DEM_PNTR_PTR),
+     :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
+     :           N_BOLS, SWITCH_EXPECTED, POS_SELECTED, %val(POS_S_PTR),
+     :           SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
+
+*     Set the byte array to reflect this particular section
+            CALL SCULIB_SET_QUAL (.TRUE., %val(BYTE_PTR), N_BOLS, N_POS,
+     :           N_BEAM, BOL_S, %val(POS_S_PTR), 0, BIT_VALUE, STATUS)
       
+         END DO
+
 *     and set data for the selected bolometers and positions
 
-      IF (COMP .EQ. 'QUALITY') THEN
+         IF (COMP .EQ. 'QUALITY') THEN
+            
+            CALL SCULIB_SET_DATA_UB (.TRUE., 
+     :           N_BOLS, N_POS, N_BEAM, %VAL(BYTE_PTR),
+     :           BVALUE, %val(OUT_DATA_PTR), STATUS)
+         ELSE
 
-         CALL SCULIB_SET_DATA_UB (USE_SECT, %val(OUT_DATA_PTR), 
-     :        N_BOLS, N_POS, N_BEAM, BOL_S, %val(POS_S_PTR), 
-     :        BVALUE, STATUS)
-      ELSE
+            CALL SCULIB_SET_DATA (.TRUE., N_BOLS, N_POS, 
+     :           N_BEAM, %VAL(BYTE_PTR), 
+     :           VALUE, %val(OUT_DATA_PTR), STATUS)
+         END IF
 
-         CALL SCULIB_SET_DATA (USE_SECT, %val(OUT_DATA_PTR), 
-     :        N_BOLS, N_POS, N_BEAM, BOL_S, %val(POS_S_PTR), 
-     :        VALUE, STATUS)
       END IF
 
 *     Close file and tidy up
@@ -574,5 +594,6 @@
 
       GOOD = SAI__OK
       CALL SCULIB_FREE ('POS_S', POS_S_PTR, POS_S_END, GOOD)
+      CALL SCULIB_FREE ('BYTES', BYTE_PTR, BYTE_END, GOOD)
 
       END
