@@ -5123,16 +5123,16 @@ astMAKE_GET(SpecFrame,SourceVRF,AstStdOfRestType,AST__BADSOR,(
 
 /* When clearing SourceVRF, convert the SourceVel value to heliocentric
   (but only if set)*/
-astMAKE_CLEAR(SpecFrame,SourceVRF,sourcevrf,(astTestSourceVel( this )?
-astSetSourceVel( this, ConvertSourceVel( this, AST__HLSOR ) ):NULL,AST__BADSOR))
+astMAKE_CLEAR(SpecFrame,SourceVRF,sourcevrf,((astTestSourceVel( this )?
+astSetSourceVel( this, ConvertSourceVel( this, AST__HLSOR ) ),NULL:NULL),AST__BADSOR))
 
 /* Validate the SourceVRF value being set and report an error if necessary. 
    If OK, convert the stored SourceVel value into the new rest frame (but
 only if set)*/
 astMAKE_SET(SpecFrame,SourceVRF,AstStdOfRestType,sourcevrf,(
             ( ( value >= FIRST_SOR ) && ( value <= LAST_SOR ) && value != AST__SCSOR ) ?
-                 astTestSourceVel( this )?
-                 astSetSourceVel( this, ConvertSourceVel( this, value ) ):NULL, value:
+                 (astTestSourceVel( this )?
+                 astSetSourceVel( this, ConvertSourceVel( this, value )),NULL:NULL), value:
                  ( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
                              "given for SourceVRF attribute.",
                              "astSetSourceVRF", astGetClass( this ), (int) value ),

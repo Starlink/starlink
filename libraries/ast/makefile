@@ -1418,7 +1418,7 @@ skyframe.o: skyframe.c error.h memory.h object.h channel.h pointset.h \
  frame.h frameset.h skyframe.h slalib.h ast_err.h
 specframe.o: specframe.c error.h memory.h object.h channel.h pointset.h \
  unitmap.h mapping.h permmap.h cmpmap.h slamap.h skyaxis.h axis.h \
- frame.h frameset.h specframe.h slalib.h ast_err.h 
+ frame.h frameset.h specframe.h slalib.h ast_err.h unit.h specmap.h skyframe.h
 sla.o: sla.c memory.h error.h f77.h slalib.h
 slamap.o: slamap.c slalib.h error.h memory.h object.h channel.h \
  pointset.h mapping.h unitmap.h slamap.h ast_err.h
