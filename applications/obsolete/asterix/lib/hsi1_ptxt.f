@@ -72,6 +72,8 @@
 *  History:
 *     14 Feb 1995 (DJA):
 *        Original version.
+*     13 Feb 1996 (DJA):
+*        Protect against primitive HDS file
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +127,7 @@
       INTEGER			NLINE 			! # lines to write
       INTEGER			NNUL			! # nulls in LINE
 
+      LOGICAL			PRIM			! Object is primitive?
       LOGICAL			THERE			! Exists already?
 *.
 
@@ -136,6 +139,10 @@
 
 *  Extract locator
       CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
+
+*  Ensure not primitive
+      CALL DAT_PRIM( LOC, PRIM, STATUS )
+      IF ( PRIM ) GOTO 99
 
 *  Ensure history exists
       CALL DAT_THERE( LOC, 'HISTORY', THERE, STATUS )
