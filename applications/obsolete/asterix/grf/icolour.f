@@ -994,12 +994,13 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Global variables :
+      INCLUDE 'PRM_PAR'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
 *    Local constants :
 *    Global variables :
+      INCLUDE 'IMG_CMN'
       REAL COL(3,16)
       INTEGER NCOL,NSHADE,FIRST,LAST
       COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
