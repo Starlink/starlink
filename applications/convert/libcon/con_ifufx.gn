@@ -15,7 +15,7 @@
 *  Description:
 *     This routine reads a numeric array in character form from a
 *     sequential unformatted file, and converts it to numbers.  File
-*     records may be skipped before transfter of the array occurs.
+*     records may be skipped before transfer of the array occurs.
 
 *  Arguments:
 *     FD = INTEGER (Given)
@@ -122,7 +122,7 @@
       K = 0
       DO  I = 1, NREC
 
-*  Write a record of the values.
+*  Read a record of the values.
          READ( LUN, IOSTAT=FIOSTA ) ( A( J ), J = K + 1,
      :     MIN( EL, K + NOVPRE ) )
 
