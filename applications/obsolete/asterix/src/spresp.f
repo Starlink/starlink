@@ -187,6 +187,9 @@
 *  Version
       CHARACTER*30       VERSION
         PARAMETER        ( VERSION = 'SPRESP Version 1.8-1' )
+
+*  Local Data:
+      DATA EVDS/.FALSE./
 *.
 
 *    Check inherited global status.

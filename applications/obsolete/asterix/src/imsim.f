@@ -149,7 +149,6 @@
       INTEGER           PSW                    ! Psf access width in pixels
       INTEGER           PSW2                   ! Psf model width in pixels
       INTEGER           	ODIMS(ADI__MXDIM)      	! Output dimensions
-      INTEGER           	OFID                   	! Output file id
       INTEGER           	ONDIM                  	! Output dimensionality
       INTEGER           	SCOUNT(MAXSRC)         	! Actual source counts
       INTEGER           	SEED                   	! Random number seed

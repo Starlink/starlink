@@ -204,8 +204,8 @@
         WRITE( OBUF, '(A1,8X,A1,7A17)') '|', '|',
      :                      (' '//LUNIT(I)(1:15)//'|', I = START, NDISP)
         CALL AIO_WRITE( OCH, OBUF, STATUS )
-        WRITE( OBUF, '(''|'',8(''-''),''|'',
-     :                         <NDISP-START+1>('' '',15(''-''),''|''))')
+ 12     FORMAT( '|--------|', <NDISP-START+1>(' ',15('-'),'|'))
+        WRITE( OBUF, 12 )
         CALL AIO_WRITE( OCH, OBUF, STATUS )
 
 *      Print the list values

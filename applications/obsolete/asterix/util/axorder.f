@@ -27,6 +27,7 @@
 *      6 Mar 92 : V1.6-0  OUT prompt moved back to pre-processing (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *     26 Mar 95 : V1.8-1  Use new data interface (DJA)(
+*     17 Jul 95 : V1.8-2  Corrected bug copying 1-D axis widths (DJA)
 *
 *    Type definitions :
 *
@@ -85,7 +86,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'AXORDER Version 1.8-1')
+        PARAMETER  (VERSION = 'AXORDER Version 1.8-2')
 *-
 
 *    Check status
@@ -232,6 +233,9 @@
         END IF
         CALL BDI_CHKAXWID( IFID, 1, IWOK, UNIF, NWID, STATUS )
         IF ( IWOK ) THEN
+
+*        Map input widths
+          CALL BDI_MAPAXWID( IFID, 'READ', 1, IWPTR, STATUS )
 
 *        Create variance array, and map it
           CALL BDI_CREVAR( OFID, 1, ODIMS, STATUS )

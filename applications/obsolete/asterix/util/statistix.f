@@ -736,8 +736,8 @@
 *    Calculate error on the standard deviation.
       IF ( NVALID .GT. 1 ) THEN
         ERRORONSTDDEV = STDDEV / SQRT( 2.0D0 * NVALID )
-        WRITE( OBUF, '(7x,a1,2x,a20,1x,1Pg15.7,1x,a3,1x,1Pg15.7,
-     :    3x,a1)' )
+        WRITE( OBUF, '(7x,a1,2x,a20,1x,1Pg15.7,1x,a3,1x,1Pg15.7,'/
+     :    /'3x,a1)' )
      :  '*', 'Standard deviation =', STDDEV, '+/-', ERRORONSTDDEV, '*'
         CALL AIO_WRITE( OCH, OBUF, STATUS )
         WRITE( OBUF, 10 )

@@ -351,12 +351,13 @@
 *    Bin the events
       IF ( REG ) THEN
         CALL EVPOLAR_REGBIN( NAZ, NRAD, RBINSIZE, NEV, %VAL(WPTR),
-     :                       QUALITY, QKEEP, %VAL(IQPTR),
+     :                       QUALITY, QKEEP, %VAL(IQPTR), BADQUAL,
      :                     %VAL(ODPTR), %VAL(OQPTR), NREJ, STATUS )
       ELSE
         CALL EVPOLAR_IRREGBIN( NAZ, NRAD, RANGE, NEV,
      :                     %VAL(WPTR), QUALITY, QKEEP, %VAL(IQPTR),
-     :                     %VAL(ODPTR), %VAL(OQPTR), NREJ, STATUS )
+     :                     BADQUAL, %VAL(ODPTR), %VAL(OQPTR), NREJ,
+     :                      STATUS )
       END IF
 
 *    Inform of events binned
@@ -492,7 +493,8 @@
 
 *+  EVPOLAR_REGBIN - Regular bin polar binning
       SUBROUTINE EVPOLAR_REGBIN( NAZ, NRAD, RBINSIZE, NEV, POL,
-     :              GOTQUAL, QKEEP, IQUAL, DATA, QUAL, NREJ, STATUS )
+     :              GOTQUAL, QKEEP, IQUAL, BADQUAL, DATA, QUAL,
+     :              NREJ, STATUS )
 *
 *    Description :
 *
@@ -629,7 +631,8 @@
 
 *+  EVPOLAR_IRREGBIN - Irregular polar binning
       SUBROUTINE EVPOLAR_IRREGBIN( NAZ, NRAD, RANGE, NEV, POL,
-     :              GOTQUAL, QKEEP, IQUAL, DATA, QUAL, NREJ, STATUS )
+     :              GOTQUAL, QKEEP, IQUAL, BADQUAL, DATA, QUAL,
+     :              NREJ, STATUS )
 *
 *    Description :
 *

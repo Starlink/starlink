@@ -64,9 +64,9 @@
 *
 *    Local constants :
 *
-      INTEGER                	TYP_INT, TYP_CHAR, TYP_DBLE, TYP_LOG
+      INTEGER                	TYP_INT, TYP_CHAR, TYP_DBLE
         PARAMETER            	( TYP_INT = 1, TYP_CHAR = 2,
-     :                            TYP_LOG = 3, TYP_DBLE = 4 )
+     :                            TYP_DBLE = 3 )
 *
 *    Local variables :
 *
@@ -92,13 +92,7 @@
 
       LOGICAL                	ECHO             	! Echo to standard output?
       LOGICAL		     	IS_SET			! SSDS is a set?
-      LOGICAL                	LVALUE           	! Logical attribute
       LOGICAL                	OK               	! Validity check
-*
-*    Local data :
-*
-      CHARACTER*5            TRUTH(-1:1)
-        DATA                 TRUTH/'TRUE','FALSE','TRUE'/
 *
 *    Version id :
 *
@@ -212,10 +206,6 @@
       IF ( ATYPE .EQ. TYP_INT ) THEN
         CALL USI_PUT0I( 'ATTR', IVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETI( 'VAL', IVALUE )
-      ELSE IF ( ATYPE .EQ. TYP_LOG ) THEN
-        CVALUE = TRUTH(LVALUE)
-        CALL USI_PUT0C( 'ATTR', CVALUE(:5), TSTAT )
-        IF ( ECHO ) CALL MSG_SETC( 'VAL', CVALUE(1:5) )
       ELSE IF ( ATYPE .EQ. TYP_DBLE ) THEN
         CALL USI_PUT0D( 'ATTR', DVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETD( 'VAL', DVALUE )
