@@ -53,7 +53,7 @@
       REAL			SPARR(2)		! Spaced array data
 
       INTEGER			IFID			! Input dataset id
-      INTEGER 			NDIM, DIMS(ADI__MXDIM)	! Input dimensions
+      INTEGER 			NDIM			! Input dimensionality
       INTEGER			OFID			! Output dataset id
 
 	INTEGER DPTR
@@ -87,15 +87,8 @@
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
 
 *  Check 1-D
-      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
-      IF ( NDIM .NE. 1 ) THEN
-	STATUS=SAI__ERROR
-	CALL ERR_REP( ' ', 'Dataset is not 1-D', STATUS )
-      END IF
+      CALL BDI_GETSHP( IFID, 1, NDAT, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*  Input and output dimensions
-      NDAT = DIMS(1)
 
 *  Map input data
       CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
