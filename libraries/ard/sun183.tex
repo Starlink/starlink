@@ -2428,7 +2428,10 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
          TRCOEF( 0:NDIM, NDIM ) = REAL (Given)
       }{
          The co-efficients of the mapping from application co-ordinates
-         to pixel co-ordinates (see {\tt "}Notes:{\tt "} below).
+         (i.e. default user coordinates) to pixel co-ordinates. If the
+         first element is equal to VAL\_\_BADR, then a unit mapping is used.
+         This argument is ignored if a call to ARD\_WCS has already been
+         made to establish WCS Information.
       }
       \sstsubsection{
          CONCAT = LOGICAL (Given)
@@ -2497,21 +2500,6 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
          An error is reported if the dimensionality of the ARD
          description is different to that of the mask array (as specified
          by argument NDIM).
-
-         \sstitem
-         If the first element of TRCOEF (i.e. TRCOEF(0,1) ) is supplied
-         equal to the symbolic value VAL\_\_BADR, then a unit mapping is
-         assumed (i.e. application co-ordinates are assumed to be the same
-         as pixel co-ordinates).
-
-         \sstitem
-         Knowledge of how to convert other coordinate systems (RA/DEC for
-         instance) into pixel positions within the mask can be specified
-         using routine ARD\_WCS.
-
-         \sstitem
-         VAL\_\_BADR is defined in the PRIMDAT include file PRM\_PAR
-         (see SUN/39).
       }
    }
 }

@@ -14,14 +14,16 @@
 
 *  Description:
 *     This routine creates a FrameSet in which the Base Frame corresponds
-*     to pixel coordinates within the mask.
+*     to pixel coordinates within the mask, and the current Frame is the
+*     default user coordinate system.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The number of axes required in the Current Frame.
 *     TR( * ) = REAL (Given)
 *        The coefficients of the linear transformation from application
-*        coords to pixel coords, supplied to ARD_WORK.
+*        coords to pixel coords, supplied to ARD_WORK. Ignored if a call
+*        to ARD_WCS has already been made.
 *     AWCS = INTEGER (Returned)
 *        An AST pointer to the returned Object. AST__NULL is returned if 
 *        an error occurs.
@@ -96,59 +98,6 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Create a Frame representing ARD application coords.
-      F1 = AST_FRAME( NDIM, 'DOMAIN=ARDAPP,Title=ARD application '//
-     :                ' coordinates', STATUS )
-
-*  If the first element of the supplied transformation is bad, use a 
-*  UnitMap to connect this Frame to the PIXEL Frame.
-      IF( TR( 1 ) .EQ. VAL__BADR ) THEN      
-         M3 = AST_UNITMAP( NDIM, ' ', STATUS )
-
-*  Otherwise, create a CmpMap representing the Mapping from this
-*  Frame to the PIXEL Frame.
-      ELSE     
-
-*  First create a MatrixMap representing the matrix part of the mapping 
-*  (i.e. skipping over the elements of TR which represent the constant 
-*  offset vector).
-         K = 1
-         L = 1
-         DO I = 1, NDIM
-            L = L + 1
-            DO J = 1, NDIM
-               M( K ) = TR( L )
-               K = K + 1
-               L = L + 1
-            END DO
-         END DO         
-   
-         M1 = AST_MATRIXMAP( NDIM, NDIM, 0, M, ' ', STATUS ) 
-
-*  Now create a WinMap representing the vector offset elements.
-         DO I = 1, NDIM
-            OFFV = TR( ( 1 + NDIM )*I - NDIM )
-            INA( I ) = 0.0
-            INB( I ) = OFFV
-            OUTA( I ) = OFFV
-            OUTB( I ) = 2*OFFV
-         END DO
-   
-         M2 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS ) 
-
-*  Combine the MatrixMap and the WinMap. This is the Mapping from
-*  application coords to pixel coords.
-         M3 = AST_CMPMAP( M1, M2, .TRUE., ' ', STATUS )
-
-*  Annull AST objects.
-         CALL AST_ANNUL( M1, STATUS )
-         CALL AST_ANNUL( M2, STATUS )
-
-*  Invert the Mapping to get the Mapping from PIXEL to ARDAPP.
-         CALL AST_INVERT( M3, STATUS )
-
-      END IF
-
 *  If ARD_WCS has been called, take a copy of the FrameSet supplied to
 *  ARD_WCS.
       IF( CMN_AWCS .NE. AST__NULL ) THEN
@@ -175,6 +124,12 @@
          IF( IPIX .NE. AST__NOFRAME ) THEN
             CALL AST_SETI( AWCS, 'BASE', IPIX, STATUS )
          
+*  Application coordinates are given by the current Frame of the WCS 
+*  FrameSet. Therefore, the Mapping from the current Frame to Application 
+*  Coordinates Frame is a UnitMap.
+            M3 = AST_UNITMAP( AST_GETI( AWCS, 'NAXIS', STATUS ), ' ',
+     :                        STATUS )  
+
 *  Report an error if no pixel frame was found.
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = ARD__NOPIX 
@@ -183,16 +138,73 @@
      :                  'programming error).', STATUS )
          END IF
 
-*  Otherwise, create a new FrameSet containing just a PIXEL Frame.
+*  If no WCS FrameSet was supplied, create a new FrameSet containing just 
+*  a PIXEL Frame.
       ELSE
          F2 = AST_FRAME( NDIM, 'DOMAIN=PIXEL,Title=Pixel coordinates',
      :                   STATUS )
          AWCS = AST_FRAMESET( F2, ' ', STATUS ) 
          CALL AST_ANNUL( F2, STATUS )
+
+*  The Mapping from PIXEL to application coords is given by argument TR. If 
+*  the first element of the supplied  transformation is bad, use a UnitMap to 
+*  connect this Frame to the PIXEL Frame.
+         IF( TR( 1 ) .EQ. VAL__BADR ) THEN      
+            M3 = AST_UNITMAP( NDIM, ' ', STATUS )
+
+*  Otherwise, create a CmpMap representing the Mapping from this
+*  Frame to the PIXEL Frame.
+         ELSE     
+
+*  First create a MatrixMap representing the matrix part of the mapping 
+*  (i.e. skipping over the elements of TR which represent the constant 
+*  offset vector).
+            K = 1
+            L = 1
+            DO I = 1, NDIM
+               L = L + 1
+               DO J = 1, NDIM
+                  M( K ) = TR( L )
+                  K = K + 1
+                  L = L + 1
+               END DO
+            END DO         
+      
+            M1 = AST_MATRIXMAP( NDIM, NDIM, 0, M, ' ', STATUS ) 
+
+*  Now create a WinMap representing the vector offset elements.
+            DO I = 1, NDIM
+               OFFV = TR( ( 1 + NDIM )*I - NDIM )
+               INA( I ) = 0.0
+               INB( I ) = OFFV
+               OUTA( I ) = OFFV
+               OUTB( I ) = 2*OFFV
+            END DO
+      
+            M2 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+
+*  Combine the MatrixMap and the WinMap. This is the Mapping from
+*  application coords to pixel coords.
+            M3 = AST_CMPMAP( M1, M2, .TRUE., ' ', STATUS )
+
+*  Annull AST objects.
+            CALL AST_ANNUL( M1, STATUS )
+            CALL AST_ANNUL( M2, STATUS )
+
+*  Invert the Mapping to get the Mapping from PIXEL to ARDAPP.
+            CALL AST_INVERT( M3, STATUS )
+
+         END IF
+
       END IF
 
-*  Add in the ARDAPP Frame.
-      CALL AST_ADDFRAME( AWCS, AST__BASE, M3, F1, STATUS ) 
+*  Create a Frame representing ARD application coords.
+      F1 = AST_FRAME( AST_GETI( AWCS, 'NAXIS', STATUS ), 
+     :                'DOMAIN=ARDAPP,Title=ARD application coordinates', 
+     :                STATUS )
+
+*  Add this Frame into the returned FrameSet.
+      CALL AST_ADDFRAME( AWCS, AST__CURRENT, M3, F1, STATUS ) 
 
 *  Annull AST objects.
       CALL AST_ANNUL( M3, STATUS )

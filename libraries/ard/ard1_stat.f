@@ -35,8 +35,8 @@
 *        A pointer to an AST FrameSet supplied by the application. This
 *        should have a Base Frame with Domain PIXEL referring to pixel
 *        coords within the pixel mask and another Frame with Domain 
-*        ARDAPP referring to "Application co-ordinates" (as defined by
-*        the TRCOEF argument of ARD_WORK).
+*        ARDAPP referring to "Application co-ordinates" (i.e. default
+*        user coordinates).
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
 *     DUBND( * ) = DOUBLE PRECISION (Given)
@@ -53,10 +53,9 @@
 *     UWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the user. If not
 *        AST__NULL, this should at least have a Frame with Domain ARDAPP 
-*        referring to "Application co-ordinates" (as defined by the TRCOEF 
-*        argument of ARD_WORK). The current Frame in this FrameSet should
-*        refer to "User co-ordinates" (i.e. the coord system in which
-*        positions are supplied in the ARD description).
+*        referring to "Application co-ordinates". The current Frame in this 
+*        FrameSet should refer to "User co-ordinates" (i.e. the coord system 
+*        in which positions are supplied in the ARD description).
 *     MAP = INTEGER (Returned)
 *        A pointer to an AST Mapping from the pixel coords in the mask,
 *        to the coordinate system in which positions are specified in the 

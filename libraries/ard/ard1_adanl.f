@@ -35,9 +35,8 @@
 *        A pointer to an AST FrameSet supplied by the application. This
 *        should have a Base Frame with Domain PIXEL referring to pixel
 *        coords within the pixel mask and another Frame with Domain 
-*        ARDAPP referring to "Application co-ordinates" (as defined by
-*        the TRCOEF argument of ARD_WORK). The current Frame should be
-*        the preferred user coordinate system.
+*        ARDAPP referring to "Application co-ordinates" (i.e. default
+*        user coords).
 *     DLBND( * ) = DOUBLE PRECISION (Given)
 *        The lower bounds of pixel coordinates.
 *     DUBND( * ) = DOUBLE PRECISION (Given)
@@ -226,7 +225,8 @@
 *  Create a default user FrameSet in which application coords and user
 *  coords are connected by a UnitMap.
       UWCS = AST__NULL
-      CALL ARD1_COWCS( NDIM, AST__BAD, UWCS, STATUS )
+      CALL ARD1_COWCS( AST_GETI( AWCS, 'NAXES', STATUS ), AST__BAD, 
+     :                 UWCS, STATUS )
 
 *  Merge the UWCS and AWCS to get the Mapping from PIXEL to user coords.
       CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT, 

@@ -31,7 +31,10 @@
 *        The upper pixel index bounds of the mask array.
 *     TRCOEF( 0:NDIM, NDIM ) = REAL (Given)
 *        The co-efficients of the mapping from application co-ordinates
-*        to pixel co-ordinates (see "Notes:" below).
+*        (i.e. default user coordinates) to pixel co-ordinates. If the
+*        first element is equal to VAL__BADR, then a unit mapping is used.
+*        This argument is ignored if a call to ARD_WCS has already been 
+*        made to establish WCS Information.
 *     CONCAT = LOGICAL (Given)
 *        If .TRUE., then an INPUT keyword is inserted at the start of
 *        the ARD description so long as the ARD description does not
@@ -72,15 +75,6 @@
 *     -  An error is reported if the dimensionality of the ARD
 *     description is different to that of the mask array (as specified
 *     by argument NDIM).
-*     -  If the first element of TRCOEF (i.e. TRCOEF(0,1) ) is supplied
-*     equal to the symbolic value VAL__BADR, then a unit mapping is
-*     assumed (i.e. application co-ordinates are assumed to be the same
-*     as pixel co-ordinates). 
-*     -  Knowledge of how to convert other coordinate systems (RA/DEC for 
-*     instance) into pixel positions within the mask can be specified
-*     using routine ARD_WCS.
-*     -  VAL__BADR is defined in the PRIMDAT include file PRM_PAR
-*     (see SUN/39). 
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -214,10 +208,9 @@
 *  Create an AST FrameSet describing the known coordinate Frames. This
 *  FrameSet will contain a Frame with Domain PIXEL referring to pixel
 *  coords within the pixel mask and another Frame with Domain ARDAPP 
-*  referring to "Application co-ordinates" (as defined by the TRCOEF 
-*  argument). It may also contain other Frames specified using the
-*  ARD_WCS routine. The PIXEL Frame will be the Base Frame. The current
-*  Frame will be the preferred user coordinate system.
+*  referring to "Application co-ordinates" (i.e. the default user
+*  coordinate system). It may also contain other Frames specified using
+*  the ARD_WCS routine. The PIXEL Frame will be the Base Frame.
       CALL ARD1_APWCS( NDIM, TRCOEF, AWCS, STATUS )
 
 *  Get work space to hold the algebraic Boolean expression
