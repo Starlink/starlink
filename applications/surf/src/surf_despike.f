@@ -116,6 +116,9 @@
 
 *    History :
 *     $Log$
+*     Revision 1.6  1997/12/23 21:44:16  timj
+*     Set badbit mask for despiking.
+*
 *     Revision 1.5  1997/12/22 23:57:06  timj
 *     Add note to documentation. Remove locator to SCUCD extension. Map input data
 *     after checking the data dimensions.
@@ -151,6 +154,9 @@
 
 *    Status:
       INTEGER STATUS
+
+*    External References:
+      BYTE    SCULIB_BITON              ! Turn on a bit
 
 *    Local Constants:
       INTEGER MAXDIM
@@ -424,8 +430,11 @@
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
 
-*  Bad bit mask
+*     Set the output bad bit mask
+*     There is a chance that we can set bit 4 (need to put bit numbers
+*     in include file
 
+      BADBIT = SCULIB_BITON(BADBIT, 4)
       CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
