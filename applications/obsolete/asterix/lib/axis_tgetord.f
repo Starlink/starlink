@@ -50,6 +50,11 @@
 *
       INTEGER 			STATUS
 *
+*    Externals:
+*
+      EXTERNAL			CHR_ISDIG
+        LOGICAL			CHR_ISDIG
+*
 *    Local variables :
 *
       INTEGER                         IAX                  ! Loop over axes
@@ -79,7 +84,11 @@
             DO IAX = 1, LEN(AXORD)
 
 *          Try to locate next axis quantity
-              CALL BDI0_FNDAXC( FID, AXORD(IAX:IAX), MIAX, STATUS )
+              IF ( CHR_ISDIG( AXORD(IAX:IAX) ) THEN
+                CALL CHR_CTOI( AXORD(IAX:IAX), MIAX, STATUS )
+              ELSE
+                CALL BDI0_FNDAXC( FID, AXORD(IAX:IAX), MIAX, STATUS )
+              END IF
               IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *          Store axis no
