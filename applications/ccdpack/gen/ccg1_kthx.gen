@@ -124,7 +124,7 @@
 *  End of do until I is greater than J.
          IF ( I .LE. J ) GO TO 2
          IF ( J .LT. K ) L = I
-         IF ( K .GT. I ) M = J
+         IF ( K .LT. I ) M = J
          GO TO 1
       END IF
 
