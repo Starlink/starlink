@@ -51,8 +51,16 @@ if %?LATEXDOCS%
 # We do not require that star2html be available on the build system,
 # and so we distribute built HTX documentation.  Thus the following rules
 # should be active only in the predist state.
+#
+# If file $(<:.tex=.htx_tar.extras) is present, then it contains a list
+# of files, each one of which should be added to the .htx directory before
+# it is rolled up into a tarball.
 @PREDIST@.tex.htx_tar:
 @PREDIST@	- @STAR2HTML@ $<
+@PREDIST@	if test -f ${<:.tex=.htx_tar.extras}; then \
+@PREDIST@	  for f in `cat ${<:.tex=.htx_tar.extras}`; do \
+@PREDIST@	    test -f "$$f" && cp "$$f" ${<:.tex=.htx} || true; \
+@PREDIST@	  done; else :; fi
 @PREDIST@	tar cf $@ ${<:.tex=.htx}
 endif %?LATEXDOCS%
 if %?XMLDOCS%
