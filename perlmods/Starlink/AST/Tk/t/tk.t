@@ -17,11 +17,14 @@ $x[1] = 0.2; $y[1] = 0.2;
 $x[2] = 0.3; $y[2] = 0.3;
 $x[3] = 0.4; $y[3] = 0.4;
 
+# create GExternal array
+my $e = [ $c, 0.0, 1.0, 0.0, 1.0 ];
+
 # _Gline( \@x, \@y );
-is( Starlink::AST::Tk::_GLine( $c, \@x, \@y ), 1, "Calling _GLine()" );
+is( Starlink::AST::Tk::_GLine( $e, \@x, \@y ), 1, "Calling _GLine()" );
 
 # _GMark( \@x, \@y, $type );
-is( Starlink::AST::Tk::_GMark( $c, \@x, \@y, 20 ), 1, "Calling _GMark()" );
+is( Starlink::AST::Tk::_GMark( $e, \@x, \@y, 20 ), 1, "Calling _GMark()" );
 
 
 # _GAttrb
@@ -32,7 +35,7 @@ is( $status, 1, "Calling _GAttr()" );
 is( $old_value, undef, "Checking old GRF__COLOUR value" );
 
 # _GFlush( $c );
-is( Starlink::AST::Tk::_GFlush( $c ), 1, "Calling _GFlush()" );
+is( Starlink::AST::Tk::_GFlush( $e ), 1, "Calling _GFlush()" );
 
 # enter Tk mainloop()
 MainLoop();
