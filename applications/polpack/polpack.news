@@ -20,3 +20,8 @@
    o  The POLSTACK command is now included in the latex and hypertext 
       documentation, as well as the on-line help library.
 
+   o  The use of the MARGIN parameter to determine the width of the
+      margins to place around annotated axes produced by POLPLOT has been
+      changed. The widths of the margins used to be specified as
+      fractions of the height or width of the DATA plot. They are now
+      given as fractions of the height or width of the current picture.
