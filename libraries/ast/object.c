@@ -100,6 +100,9 @@ f     - AST_TEST: Test if an attribute value is set for an Object
 *        storing any new values in the memory.
 *     3-APR-2001 (DSB):
 *        Added the Ident attribute. 
+*     28-SEP-2001 (DSB):
+*        Modified VSet to ensure a non-null string always follows the equal 
+*        sign in the attribute setting passed to SetAttrib.
 *class--
 */
 
@@ -2351,6 +2354,7 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
    char *assign_end;             /* Pointer to null at end of assignment */
    char *buff1;                  /* Pointer to temporary string buffer */
    char *buff2;                  /* Pointer to temporary string buffer */
+   char *buff3;                  /* Pointer to temporary string buffer */
    int buff_len;                 /* Length of temporary buffer */
    int i;                        /* Loop counter for characters */
    int j;                        /* Offset for revised assignment character */
@@ -2449,7 +2453,26 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
    to make the assignment (unless the string was all blank, in which
    case we ignore it). */
                   assign[ j ] = '\0';
-                  if ( j ) astSetAttrib( this, assign );
+                  if ( j ) {
+
+/* If there are no characters to the right of the equals sign append a
+   space after the equals sign. Without this, a string such as "Title=" 
+   would not be succesfully matched against the attribute name "Title"
+   within SetAttrib. */
+                     if( assign[ j - 1 ] == '=' ) {
+                        buff3 = astStore( NULL, assign, 
+                                          (size_t) j + 2 );
+                        if ( astOK ) {
+                           buff3[ j ] = ' ';
+                           buff3[ j + 1 ] = '\0';
+                           astSetAttrib( this, buff3 );
+                        }
+                        buff3 = astFree( buff3 );
+
+                     } else {
+                        astSetAttrib( this, assign );
+                     }
+                  }
 
 /* Check for errors and abort if any assignment fails. Otherwise,
    process the next assignment substring. */
