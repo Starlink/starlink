@@ -51,6 +51,8 @@
 *  History:
 *     25-MAY-1999 (MBT):
 *        Original version.
+*     3-JUL-2000 (MBT):
+*        Modified to allow comment lines at the start of the file.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,6 +111,9 @@
          CALL ERR_ANNUL( STATUS )
          GO TO 99
       END IF
+
+*  Ignore if comment line.
+      IF ( LINE( 1:1 ) .EQ. '#' ) GO TO 1
 
 *  Exit if blank line.
       IF ( LINE .EQ. ' ' ) GO TO 99
