@@ -59,7 +59,14 @@
 #        not defined. This target is intended to assist a similar target in
 #        the principal make file. That will use several of these subsidiary
 #        make files to gather sources from several subdirectories.
-#
+#     make export_run
+#        This adds all the built files to a tar file in the $EXPORT directory.
+#        Note that it adds to an existing file and that the
+#        tar file is not compressed. The current directory is used if EXPORT is
+#        not defined. This target is intended to assist a similar target in
+#        the principal make file. That will use several of these subsidiary
+#        make files to gather sources from several subdirectories.
+
 #  Prior Requirements:
 #     This makefile uses a number of macros to allow it to be configured for
 #     different computer systems and file organisations.  These macros all have
@@ -81,6 +88,7 @@
 #  Authors:
 #     hme: Horst Meyerdierks (UoE, Starlink)
 #     pdraper: P.W. Draper (Starlink, Durham University)
+#     timj: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -90,6 +98,8 @@
 #        Change export and export_source so that all makefiles gather a single
 #        file list, which then is used in a single tar command. The motivation
 #        is that "tar r" does not work on Solaris.
+#     28 May 2003 (timj):
+#        Add export_run target
 #     {note_further_changes_here}
 #
 #-
@@ -306,6 +316,34 @@ export:
 	@ echo
 	@ echo \
 "*** Export copy of the built $(PKG_NAME)/$(LIB_NAME) sub-package was added"
+	@ echo \
+"    to the tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar"
+	@ echo
+
+#  Export_run target.
+#  ==============
+
+#  Export all the built files to a new user.
+
+#  Since the export_run target is designed to add to an existing tar file, its
+#  exsitence or date cannot be used to say whether it is up to date. So this
+#  target will just add all files to the tar file without looking left or
+#  right. For the archiving command, the LIB_NAME is prepended to each file
+#  name. See prologue. export requires the built library. But we rely on the
+#  superior makefile to take care of the proper target sequence.
+#  *** Note that this now uses a filelist ***
+
+export_run:
+	files=''; \
+	for file in \
+	      $(BUILT_FILES); \
+	   do \
+	      files=$$files' '$(LIB_NAME)/$$file; \
+	done; \
+	echo $$files >> $(EXPORT)/filelist
+	@ echo
+	@ echo \
+"*** Export_run copy of the built $(PKG_NAME)/$(LIB_NAME) sub-package was added"
 	@ echo \
 "    to the tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar"
 	@ echo
