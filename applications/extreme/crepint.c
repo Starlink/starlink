@@ -91,6 +91,24 @@
       return 1;
    }
 
+   char *stlitcat( struct tokitem *ptok, int *nlittok ) {
+      int buflen = 0;
+      int slen;
+      char *buf = NULL;
+
+      *nlittok = 0;
+      while ( ptok->tokval == STRING_LITERAL ) {
+         (*nlittok)++;
+         slen = strlen( ptok->strmat ) - 2;  /* Omit quote characters */
+         buf = memok( realloc( buf, buflen + slen + 1 ) );
+         strncpy( buf + buflen, ptok->strmat + 1, slen );
+         buflen += slen;
+         buf[ buflen ] = '\0';
+         ptok++;
+      }
+      return buf;
+   }
+
    struct tokitem *nextarg( struct tokitem *ptok ) {
       int blev = 0;
       int plev = 0;
@@ -236,15 +254,18 @@
       int j;
       int leng = 0;
       int lost;
+      int nlittok;
       int skipspc;
       int t;
       int t1;
+      int tn;
       int tbufsiz = 0;
       int tok;
       char c;
       char c1;
       char *interp;
       char line[ 100 ];
+      char *stlit;
       char *string;
       char *strmat;
       char *warn;
@@ -295,25 +316,23 @@
             subst( tbuf + i, "INT_BIG_MAX" );
          if ( idmatch( tbuf + i, "INT_MIN" ) )
             subst( tbuf + i, "INT_BIG_MIN" );
+
          if ( t1 == '(' && ( idmatch( tbuf + i, "printf" ) 
                           || idmatch( tbuf + i, "fprintf" )
                           || idmatch( tbuf + i, "sprintf" ) ) ) {
             arg = i + 2;
             if ( ! idmatch( tbuf + i, "printf" ) )
                arg = nextarg( tbuf + arg ) - tbuf;
+            stlit = stlitcat( tbuf + arg, &nlittok );
+            tn = tbuf[ arg + nlittok ].tokval;
             warn = "";
-            if ( tokmatch( tbuf + arg, STRING_LITERAL, ',', 0 ) ||
-                 tokmatch( tbuf + arg, STRING_LITERAL, ')', 0 ) ) {
-               strmat = tbuf[ arg ].strmat;
+            if ( tn == ',' || tn == ')' ) {
                hasint = hasintp = lost = 0;
-               /* newstr = memok( malloc( 2 * strlen( strmat ) + 1 ) ); */
-               /* k = 0; */
-               for ( j = 0; strmat[ j ]; j++ ) {
-                  /* newstr[ k++ ] = strmat[ j ]; */
-                  if ( strmat[ j ] == '%' ) {
+               for ( j = 0; stlit[ j ]; j++ ) {
+                  if ( stlit[ j ] == '%' ) {
                      done = 0;
-                     while ( strmat[ ++j ] && ! done ) {
-                        switch ( strmat[ j ] ) {
+                     while ( stlit[ ++j ] && ! done ) {
+                        switch ( stlit[ j ] ) {
                            case '-': case '+': case ' ': case '0': case '#':
                            case '1': case '2': case '3': case '4': case '5':
                            case '6': case '7': case '8': case '9': case '.':
@@ -336,43 +355,38 @@
                               lost = 1;
                               done = 1;
                         }
-                        /* newstr[ k++ ] = strmat[ j ]; */
                      }
                   }
-                  /* newstr[ k++ ] = strmat[ j ]; */
                }
-               /* newstr[ k++ ] = '\0'; */
                if ( lost )
                   warn = "Failed to parse format string";
                else if ( hasintp )
                   warn = "Format string contains %n";
                else if ( hasint )
                   warn = "Format string contains %[cdiouxX*]";
-
-               /* if ( hasint && ! lost && ! hasintp )  *
-                *    subst( tbuf + arg, newstr );       */
             }
             else {
                warn = "Non-literal format string";
             }
             if ( *warn ) comment( tbuf + i, warn );
          }
+
          if ( t1 == '(' && ( idmatch( tbuf + i, "scanf" )
                           || idmatch( tbuf + i, "fscanf" )
                           || idmatch( tbuf + i, "sscanf" ) ) ) {
             arg = i + 2;
             if ( ! idmatch( tbuf + i, "scanf" ) ) 
                arg = nextarg( tbuf + arg ) - tbuf;
+            stlit = stlitcat( tbuf + arg, &nlittok );
+            tn = tbuf[ arg + nlittok ].tokval;
             warn = "";
-            if ( tokmatch( tbuf + arg, STRING_LITERAL, ',', 0 ) ||
-                 tokmatch( tbuf + arg, STRING_LITERAL, ')', 0 ) ) {
-               strmat = tbuf[ arg ].strmat;
+            if ( tn == ',' || tn == ')' ) {
                hasintp = lost = 0;
-               for ( j = 0; strmat[ j ]; j++ ) {
-                  if ( strmat[ j ] == '%' ) {
+               for ( j = 0; stlit[ j ]; j++ ) {
+                  if ( stlit[ j ] == '%' ) {
                      done = 0;
-                     while ( strmat[ ++j ] && ! done ) {
-                        switch( strmat[ j ] ) {
+                     while ( stlit[ ++j ] && ! done ) {
+                        switch( stlit[ j ] ) {
                            case '1': case '2': case '3': case '4': case '5':
                            case '6': case '7': case '8': case '9': case '0':
                               break;
