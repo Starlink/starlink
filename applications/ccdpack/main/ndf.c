@@ -82,6 +82,11 @@
 *        may be any attribute possessed by a frame; a useful attname 
 *        is "Domain".
 *
+*        If the special value "index" is supplied as the attname argument,
+*        then the numeric value(s) of the frame(s) specified by the
+*        frame argument is returned instead of the value of a real 
+*        attribute of the frame.
+*
 *        The optional frame may be specified either as a numerical frame
 *        index, as a domain name, or as one of the special strings 
 *        "BASE" or "CURRENT".
@@ -169,6 +174,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <math.h>
 #include "sae_par.h"
@@ -656,6 +662,7 @@
 /* "frameatt" command                                                 */
 /**********************************************************************/
       else if ( ! strcmp( command, "frameatt" ) ) {
+         int getindex;
          int ifrm;
          char *attname;
          const char (*aval);
@@ -669,6 +676,7 @@
 
 /* Get string argument. */
          attname = Tcl_GetString( objv[ 2 ] );
+         getindex = strcasecmp( attname, "index" ) ? 0 : 1;
 
 /* Get frame argument. */
          ifrm = AST__NOFRAME;
@@ -684,26 +692,36 @@
 
 /* Get values and place them in the result object. */
          if ( ifrm != AST__NOFRAME ) {
-            ASTCALL( 
-               frame = astGetFrame( ndf->wcs, ifrm );
-               aval = astGetC( frame, attname );
-            )
-            result = Tcl_NewStringObj( aval, -1 );
+            if ( getindex ) {
+               result = Tcl_NewIntObj( ifrm );
+            }
+            else {
+               ASTCALL( 
+                  frame = astGetFrame( ndf->wcs, ifrm );
+                  aval = astGetC( frame, attname );
+               )
+               result = Tcl_NewStringObj( aval, -1 );
+            }
          }
          else {
             Tcl_Obj *ob;
             result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
             for ( ifrm = 1; ifrm <= astGetI( ndf->wcs, "Nframe" ); ifrm++ ) {
-               ASTCALL(
-                  frame = astGetFrame( ndf->wcs, ifrm );
-               )
-               ASTCALL(
-                  ob = Tcl_NewStringObj( astGetC( frame, attname ), -1 );
-                  if ( ! astOK ) {
-                     astClearStatus;
-                     ob = Tcl_NewDoubleObj( astGetD( frame, attname ) );
-                  }
-               )
+               if ( getindex ) {
+                  ob = Tcl_NewIntObj( ifrm );
+               }
+               else {
+                  ASTCALL(
+                     frame = astGetFrame( ndf->wcs, ifrm );
+                  )
+                  ASTCALL(
+                     ob = Tcl_NewStringObj( astGetC( frame, attname ), -1 );
+                     if ( ! astOK ) {
+                        astClearStatus;
+                        ob = Tcl_NewDoubleObj( astGetD( frame, attname ) );
+                     }
+                  )
+               }
                Tcl_ListObjAppendElement( interp, result, ob );
             }
          }
@@ -1546,10 +1564,10 @@
 
 /* See if it is a special string. */
          if ( ! strcmp( text, "BASE" ) ) {
-            *iframe = AST__BASE;
+            *iframe = astGetI( fset, "Base" );
          }
          else if ( ! strcmp( text, "CURRENT" ) ) {
-            *iframe = AST__CURRENT;
+            *iframe = astGetI( fset, "Current" );
          }
 
 /* See if it is an integer. */
