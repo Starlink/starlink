@@ -10,8 +10,11 @@
 * History:
 *   17 Jun 98 V2.3-0 (RB):
 *     Original version.
+*   07 Mar 00 V2.3-1 (DGED):
+*     Linux compatible.
 *-
 
+	IMPLICIT NONE
 * External constants:
 	include 'SAE_PAR'
 	include 'DAT_PAR'
@@ -21,7 +24,7 @@
 
 * Local constants:
 	character*30		version
-	  parameter		( version = 'XRTARD Version 2.3-0' )
+	  parameter		( version = 'XRTARD Version 2.3-1' )
 
 * Local variables
 	character*132		rootname
@@ -38,11 +41,12 @@
 	real			fraction
 
 	integer			srcid
-	integer			xptr, yptr
+	integer 		xptr, yptr
+        integer                 nsrc
 *.
 
 * Check initial status
-	if (status.ne.sae__ok) return
+	if (status.ne.sai__ok) return
 
 * Version id
 	call msg_prnt(version)
@@ -94,7 +98,10 @@
 	end
 
 
-	subroutine xrtard_regions(n, xpos, ypos, fraction, energy, status)
+        subroutine xrtard_regions(n, xpos, ypos, fraction,energy,status)
+
+	IMPLICIT NONE
+	include 'SAE_PAR'
 
 * Import/Export:
 	integer			n
@@ -113,7 +120,7 @@
 	integer			ardunit, ardid
 
 * Check initial status
-	if (status.ne.sae__ok) return
+	if (status.ne.sai__ok) return
 
 * Open up the ARDFILE for append
 	call usi_get0c('ARDFILE', ardfile, status)
