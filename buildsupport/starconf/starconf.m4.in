@@ -206,8 +206,10 @@ dnl                    [Integer version number, in the form major*1e6+minor*1e3+
 current_MANIFESTS=$STARLINK/manifests
 
 # When we install manifests, however, they should go in the
-# installation directory.
-STAR_MANIFEST_DIR='$(prefix)/manifests'
+# installation directory.  Allow this to be defaulted from the environment.
+# In particular, if it is set to null in the environment, this will
+# suppress the installation of manifests.
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
 AC_SUBST(STAR_MANIFEST_DIR)
 
 # Although PACKAGE_VERSION is a default output variable, it isn't
