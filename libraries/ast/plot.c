@@ -501,6 +501,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        which the position is undefined in grapics coords). Therfoer
 *        Norm1 has been modified to use 3 different reference values
 *        in an attempt to find one which gives good axis values.
+*     25-AUG-2004 (DSB):
+*        - Correct handling of "fmt" pointer in TickMarks function (identified 
+*        and reported by Bill Joye).
 *class--
 */
 
@@ -22997,6 +23000,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    char **labels;      /* Pointer to list of formatted labels */
    char **new;         /* Pointer to list of shortened formatted labels */
    char *fields[ MAXFLD ]; /* Pointers to starts of fields in a label */
+   char *used_fmt;     /* Copy of format string actually used */
    const char *fmt;    /* Format string actually used */
    const char *old_format; /* Original Format string */
    double *ticks;      /* Pointer to major tick mark values */
@@ -23048,6 +23052,10 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Initialise the pointer to the list of formatted tick mark values to
    indicate that no memory has yet been obtained. */
    labels = NULL;
+
+/* Initialise the pointer to a copy of the used format string to indicate 
+   that no memory has yet been obtained. */
+   used_fmt = NULL;
 
 /* Get a pointer to the axis. */
    ax = astGetAxis( frame, axis );
@@ -23106,6 +23114,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    which are identical. If there are not, the labels are formatted and 
    returned in "labels". */
       fmt = astGetFormat( frame, axis );
+      used_fmt = (char *) astStore( used_fmt, (void *) fmt, strlen( fmt ) + 1 );
       ok = CheckLabels( frame, axis, ticks, nmajor, 1, labels, refval );
 
    }
@@ -23155,6 +23164,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Break out of the loop if a Digits value has been found which results
    in all adjacent labels being different. */
          fmt = astGetFormat( frame, axis );
+         used_fmt = (char *) astStore( used_fmt, (void *) fmt, strlen( fmt ) + 1 );
          if( CheckLabels( frame, axis, ticks, nmajor, 0, labels, refval ) ) {
             ok = 1;
             top_digits = digits;
@@ -23182,6 +23192,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    are longer than the corresponding old labels, then a null pointer is
    returned. Otherwise, a pointer is returned to the new set of labels. */
             fmt = astGetFormat( frame, axis );
+            used_fmt = (char *) astStore( used_fmt, (void *) fmt, strlen( fmt ) + 1 );
             new = CheckLabels2( frame, axis, ticks, nmajor, labels, refval );
 
 /* Free the old labels. */
@@ -23228,6 +23239,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
             for( digits = bot_digits; digits < 1000; digits++ ){
                astSetAxisDigits( ax, digits );
                fmt = astGetFormat( frame, axis );
+               used_fmt = (char *) astStore( used_fmt, (void *) fmt, strlen( fmt ) + 1 );
                if( CheckLabels( frame, axis, ticks, nmajor, 0, labels, refval ) ) {
                   ok = 1;
                   break;
@@ -23281,11 +23293,12 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
          ret->nminor = nminor;
          ret->ticks = ticks;
          ret->labels = labels;
-         ret->fmt = (char *) astStore( NULL, (void *) fmt, strlen( fmt ) + 1 );
+         ret->fmt = used_fmt;
+         used_fmt = NULL;
          ret->start = NULL;
          ret->length = NULL;
          ret->nsect = 0;
-      }
+      } 
 
 /* If no suitable labels were found report an error. */
    } else if( astOK ){
@@ -23301,8 +23314,9 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
       }
    }
 
-/* Release the pointer to the current Frame from the Plot. */
+/* Release any remaining resources. */
    frame = astAnnul( frame );
+   if( used_fmt ) used_fmt = astFree( used_fmt );
 
 /* If an error has occurred, release the returned information. */
    if( !astOK ){
