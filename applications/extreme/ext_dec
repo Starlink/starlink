@@ -1,0 +1,36 @@
+*+
+*  Name:
+*     EXT_DEC
+*
+*  Purpose:
+*     Declarations of EXTREME conversion routines and arguments.
+*
+*  Language:
+*     Fortran 77
+*
+*  Type of Module:
+*     Include file.
+*
+*  Description:
+*     This file contains the declarations for statement functions and
+*     their arguments to be used with the EXTREME package. 
+*     It currently contains declarations required for the function 
+*     EXT_ITOL which converts an INTEGER value to a long integer value, 
+*     where a long integer is the type declared as INTEGER * 8 in the 
+*     original (pre-built) source code of a package.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     15-FEB-2000 (MBT):
+*        Original version.
+*-
+
+*  Declaration of statement function.
+      INTEGER * 8 EXT_ITOL
+
+*  Declaration of statement function dummy arguments.
+      INTEGER     EXT_ARGL
+
+* $Id$

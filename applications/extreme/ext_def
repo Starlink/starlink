@@ -1,0 +1,32 @@
+*+
+*  Name:
+*     EXT_DEF
+*
+*  Purpose:
+*     Definitions of EXTREME conversion routines.
+*
+*  Language:
+*     Fortran 77
+*
+*  Type of Module:
+*     Include file.
+*
+*  Description:
+*     This file contains the definitions for statement functions to be
+*     used with the EXTREME package.  It currently contains the definition
+*     of the function EXT_ITOL which converts an INTEGER value to a long
+*     integer value, where a long integer is the type declared as 
+*     INTEGER * 8 in the original (pre-built) source code of a package.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     15-FEB-2000 (MBT):
+*        Original version.
+*-
+
+*  Definition of statement function.
+      EXT_ITOL( EXT_ARGL ) = EXT_ARGL
+
+* $Id$
