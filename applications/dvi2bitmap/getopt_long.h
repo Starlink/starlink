@@ -32,8 +32,12 @@ extern "C" {
 /* We're building this with a C++ compiler, essentially.  Such
    compilers are not required to define __STDC__, but the path we
    should follow, below, is indeed that marked by __STDC__.  So define
-   it here.  This might possibly cause a warning on some compilers. */
-#ifndef __STDC__
+   it here.  This is a Bad Thing in general, but does the Correct Thing
+   here.  This might possibly cause a warning on some compilers. */
+#if !defined(__STDC__) || !__STDC__
+#  ifdef __STDC__
+#  undef __STDC__
+#  endif
 #define __STDC__ 1
 #endif
 
