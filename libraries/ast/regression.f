@@ -114,6 +114,7 @@
 
 *  We loop round testing several sorts of FITS Headers.
       DO I = 1, NFITS_TESTS
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Tell the REG_SOURCE function which FITS header to load.
 	 CMN_FTEST = I
@@ -215,12 +216,7 @@
 
       END DO
 
-
-
-
-
-
-
+ 999  CONTINUE
 
       END
 
