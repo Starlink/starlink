@@ -14,8 +14,14 @@
                          documentation?,
                          bugreports?,
                          notes?)>
+<!-- The component's id attribute is the name of this component, and
+     should generally match the package name as declared in
+     configure.ac.  The buildsupport attribute is "yes" if this component
+     is configured and built during bootstrapping; if so, it might
+     need special handling in the top-level bootstrap file. -->
 <!ATTLIST component
-        id      ID      #REQUIRED
+        id      	ID      #REQUIRED
+	buildsupport	CDATA	#IMPLIED
         >
 
 <!-- Version number of this component, which should be the same as the
