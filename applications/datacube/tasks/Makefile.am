@@ -5,10 +5,8 @@ AM_FCFLAGS = -I../include
 
 noinst_LTLIBRARIES = libdatacube_tasks.la
 
-libdatacube_tasks_la_SOURCES = $(F_ROUTINES) $(PRIVATE_INCLUDES)
+libdatacube_tasks_la_SOURCES = $(F_ROUTINES)
 
 F_ROUTINES = \
   copyaxis.f getbound.f putaxis.f
 
-PRIVATE_INCLUDES = \
-  CUB1_PAR

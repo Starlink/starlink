@@ -15,5 +15,6 @@ datacube_mon_LDADD = \
    tasks/libdatacube_tasks.la subs/libdatacube_subs.la  `ndf_link_adam`
 
 dist_pkgdata_DATA = datacube.news
+dist_noinst_HEADERS = include/CUB1_PAR
 
 SUBDIRS = demo help subs tasks sc16 sun237
