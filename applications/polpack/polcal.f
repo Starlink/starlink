@@ -527,6 +527,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  initialise flags to show that none of the images have been treated yet.
       DO IVAL = 1, NVAL
          USED( IVAL ) = .FALSE.
+         IPAIR( IVAL ) = 0
       ENDDO
 
 *  Each image should have a polarimetric pair - an image from the same
@@ -534,25 +535,37 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  (different RAY). Find each image's pair. Count the number of valid
 *  pairs. In principle it is possible to use unpaired images in the
 *  processing, but at some cost to the final error - however this is
-*  not supported here, unpaired images are not used.
+*  not supported here, unpaired images are not used. Report an error
+*  if any NDF has more than one pair.
       NPAIR = 0
       DO IVAL = 1, NVAL
          DO PVAL = 1, NVAL
             IF ( PAIRED( IVAL, PVAL ) ) THEN
-               IPAIR( IVAL ) = PVAL
-               NPAIR = NPAIR + 1
-               GOTO 1
+               IF( IPAIR( IVAL ) .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL NDF_MSG( 'NDF1', NDFVAL( IPAIR( IVAL ) ) )
+                  CALL NDF_MSG( 'NDF2', NDFVAL( PVAL ) )
+                  CALL ERR_REP( 'POLCAL_DUPL', 'Images ''^NDF1'' and '//
+     :                          '''^NDF2'' seem to contain the same '//
+     :                          'data.', STATUS )
+                  GO TO 99
+               ELSE
+                  IPAIR( IVAL ) = PVAL
+                  NPAIR = NPAIR + 1
+               END IF
             ENDIF
          ENDDO
                
 *  If an image does not have a pair give a warning and flag it as 'used'
 *  so that it will not take part in the processing.
-         CALL NDF_MSG( 'NDF', NDFVAL( IVAL ) )
-         CALL MSG_OUT( ' ', ' POLCAL: ''^NDF'' does not have a '//
-     :                 'polarimetric pair and will not be used.', 
-     :                 STATUS )
-         USED( IVAL ) = .TRUE.
- 1       CONTINUE
+         IF( IPAIR( IVAL ) .EQ. 0 ) THEN
+            CALL NDF_MSG( 'NDF', NDFVAL( IVAL ) )
+            CALL MSG_OUT( ' ', ' POLCAL: ''^NDF'' does not have a '//
+     :                    'polarimetric pair and will not be used.', 
+     :                    STATUS )
+            USED( IVAL ) = .TRUE.
+         END IF
+
       ENDDO
       NPAIR = NPAIR / 2
       
