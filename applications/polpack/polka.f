@@ -450,8 +450,10 @@
      :            SIZE, STATUS )
 
 *  Tell the user how many images were supplied.
+      CALL MSG_BLANK( STATUS )
       CALL MSG_SETI( 'I', SIZE )
       CALL MSG_OUT( 'POLKA_MSG_1', '  Using ^I input images.', STATUS ) 
+      CALL MSG_BLANK( STATUS )
 
 *  Get a group containing the names of the sky frames to be used. If no
 *  sky frames are supplied, then the sky is estimated within the object
