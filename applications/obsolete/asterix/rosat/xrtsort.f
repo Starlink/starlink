@@ -3899,7 +3899,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       CALL SLN_PUTRNGI(SID,'Time',ASRT.NTIME,
      :             ASRT.MIN_T,ASRT.MAX_T,STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
-      CALL DAT_ANNUL(LOCT, STATUS)
 
 
 *  write PH channel selection
