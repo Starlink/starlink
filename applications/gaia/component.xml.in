@@ -9,7 +9,7 @@
   <abstract><p>
 GAIA is an image display and analysis tool for astronomy. It provides the
 usual facilities of image display tools, plus more astronomically useful ones
-such as aperture & optimal photometry, contouring, source detection, surface
+such as aperture &amp; optimal photometry, contouring, source detection, surface
 photometry, arbitrary region analysis, celestial coordinate readout,
 calibration and modification, grid overlays, blink comparison, defect patching
 and the ability to query on-line (WWW) catalogues.
