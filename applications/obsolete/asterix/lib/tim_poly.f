@@ -44,7 +44,7 @@
       REAL       XN(*)            ! Normalized X
       REAL       SUMSQ            ! Sum of squares of weighted residuals
 *    Status :
-      INTEGER    STATUS
+c     INTEGER    STATUS
 *    External references :
 *    Global variables :
 *    Local Constants :

@@ -150,7 +150,7 @@
       REAL 		  PSCALE(NPAMAX)	! Parameter scale factors
       SAVE 		  PSCALE
 
-      INTEGER             FSTAT                 ! Statistic to use
+c     INTEGER             FSTAT                 ! Statistic to use
       INTEGER 		  NUNFROZEN		! No of unfrozen parameters
       INTEGER 		  NPFREE		! No of free parameters
       INTEGER 		  IPFREE(NPAMAX)	! Free parameter indices
