@@ -1056,9 +1056,6 @@
      :    BASE_UTC,BASE_TAI,UPDATE_PERIOD,EQUINOX,STATUS)
 *    Description :
 *     <description of what the subroutine does - for user info>
-*    Environment parameters :
-*     parameter(dimensions) =type(access,i.e. R,W or U)
-*           <description of parameter>
 *    Method :
 *     <description of how the subroutine works - for programmer info>
 *    Deficiencies :
@@ -1096,8 +1093,7 @@ c      RECORD /POS_REC/ POS
         INTEGER*2 LVAL_MILLERAD
         INTEGER KEY              ! Key for indexed read
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
-        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
-*     <specification of FORTRAN structures>
+
 *    Import :
       INTEGER              NEVENT              ! No events in list
       INTEGER              BASE_MJD              ! whole part MJD only
@@ -1115,19 +1111,20 @@ c      RECORD /POS_REC/ POS
       LOGICAL              IGNORE_POS            ! pos_sat info to be ignored
       LOGICAL              BINNED                ! AXIS is binned
       LOGICAL              AX_WID_OK             ! AXIS widths OK
+
 *    Import-Export :
       DOUBLE PRECISION     INTIMES(NEVENT)     ! timelist
       DOUBLE PRECISI0N     OUTTIMES(NEVENT)    ! timelist
       DOUBLE PRECISION     WIDTHS(NEVENT)      ! timelist binwidths
-*    Export :
-*     <declarations and descriptions for exported arguments>
 
 *  Status :
-      INTEGER STATUS
+      INTEGER 			STATUS
 
 *  External References:
       EXTERNAL			BARY_MJD2HK
         INTEGER 		BARY_MJD2HK
+      EXTERNAL			BARY_HK2MJD
+        DOUBLE PRECISION        BARY_HK2MJD
 
 *  Local constants :
       DOUBLE PRECISION		S2_REF_MJD
