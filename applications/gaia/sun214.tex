@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.8}
 \newcommand{\stardocauthors}   {Peter W. Draper \& Norman Gray}
-\newcommand{\stardocdate}      {15 May 2000}
+\newcommand{\stardocdate}      {17 July 2000}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.5}
@@ -474,9 +474,11 @@ astronomical work with images:
   determine the distance and offsets between any two points on
   your image (in arc minutes).
 
-\item Real time profiling. This allows you to move a line around on
-  the image and see the image data values displayed as a
-  profile change. This profile can also be saved as a spectrum.
+\item Real time profiling. Two separate toolboxes allow you to either 
+  move a line around on the image and see the image data values
+  displayed as a profile change (this profile can also be saved as a
+  spectrum), or do the same with a rectangle, in which case the mean
+  profiles along the X and Y directions are shown. 
 
 \item Object parameterization. This allows you to select a single
   object on the image. Details such as its full width half
@@ -553,10 +555,11 @@ just to make clear where they should be placed. The TST format is also
 recognised by the CURSA package (\xref{SUN/190}{sun190}{}), which also
 contains a description of this format.
 
-Additional formats that can be also read by GAIA (with a performance
-penalty) are those supported by the \xref{CURSA}{sun190}{} package
-({\em i.e.} FITS-tables and STL format) and the ``ASCII\_HEAD'' format
-of the SExtractor/EXTRACTOR package (\xref{SUN/226}{sun226}{}).
+Additional formats that can be also read and written by GAIA (with a
+performance penalty) are those supported by the \xref{CURSA}{sun190}{}
+package ({\em i.e.} FITS-tables and STL format) and the
+``ASCII\_HEAD'' format of the SExtractor/EXTRACTOR package
+(\xref{SUN/226}{sun226}{}).
 
 The format that is used to open or write a catalogue, is determined by
 the file extension:
@@ -666,7 +669,8 @@ more interesting are:
  -demo\_mode         &  Make the demo toolbox available \\
  -component          &  The NDF component (data, variance or quality) \\
  -focus\_follows\_mouse & Image and entry focus follows mouse pointer \\
- -visual             & X visual to use (pseudocolor, truecolor, visual id...)
+ -visual             & X visual to use (pseudocolor, truecolor, visual id...)\\
+ -quiet\_exit        & Issue a warning before exiting GAIA (default 0)
 \end{tabular}
 }
 
@@ -899,27 +903,30 @@ This is a minor update to GAIA with the following fixes:
 \end{itemize}
 
 \subsection{This release - 2.5}
-  This release includes a new toolbox and some improvements and bug
-  fixes.
+  This release includes two new toolboxes, various significant
+  improvements and some bug fixes.
 
-  The new toolbox provides the long awaited ability to identify and
-  record image positions interactively. It also allows the import of
-  coordinates stored in text files (of various formats) and the
-  transformation of these positions from various celestial coordinate
-  systems to that of a displayed image (for instance this allows you
-  to read positions in FK4 and transform to FK5). Each position can
-  also be labelled for visual identification in plots and mean image
-  properties (such as seeing) can be calculated.
+  The first new toolbox provides the long awaited ability to identify
+  and record image positions interactively. It also allows the import
+  of coordinates stored in text files (of various formats) and their
+  transformation to the celestial coordinate system of the displayed
+  image (for instance this allows you to read FK4 positions and
+  correctly position these over an image with an FK5 astrometry). Each
+  position can also be labelled and cumulative image properties
+  (including seeing) are calculated.
 
-  Another major change in this release is support for multiple
-  extension FITS files. It is now possible to select amongst images
-  stored in these files and to view any FITS catalogues. A similar
-  feature has also been introduced for accessing multiple NDFs stored
-  in the same container file (and their components. i.e. variances and
-  quality). This facility should be obvious when an MEF is loaded into
-  GAIA.
+  The second toolbox displays the mean X and Y profiles of a
+  rectangular region. If the rectangle is moved the profiles will
+  update in real time. This is useful for detecting background trends
+  and binning up linear features.
 
-  Minor changes are detailed below:
+  A further major change is the addition of support for displaying
+  multiple extension FITS files (MEFs). It is now possible to examine
+  images and catalogues stored in these files. A similar feature has
+  also been introduced for NDFs that are stored in the same container
+  file.
+
+  Additional minor changes are:
   \begin{itemize}
 
     \item The SExtractor toolbox has been updated to work with the

@@ -1,50 +1,54 @@
 1 Update to GAIA
 
   A new release of GAIA, v2.5, is now available. This release includes
-  a new toolbox and some improvements and bug fixes.
+  two new toolboxes, various significant improvements and some bug
+  fixes.
 
-  The new toolbox provides the long awaited ability to identify and
-  record image positions interactively. It also allows the import of
-  coordinates stored in text files (of various formats) and the
-  transformation of these positions from various celestial coordinate
-  systems to that of a displayed image (for instance this allows you
-  to read positions in FK4 and transform to FK5). Each position can
-  also be labelled for visual identification in plots and mean image
-  properties (such as seeing) can be calculated.
+  The first new toolbox provides the long awaited ability to identify
+  and record image positions interactively. It also allows the import
+  of coordinates stored in text files (of various formats) and their
+  transformation to the celestial coordinate system of the displayed
+  image (for instance this allows you to read FK4 positions and
+  correctly position these over an image with an FK5 astrometry). Each
+  position can also be labelled and cumulative image properties
+  (including seeing) are calculated.
 
-  Another major change in this release is support for multiple
-  extension FITS files. It is now possible to select amongst images
-  stored in these files and to view any FITS catalogues. A similar
-  feature has also been introduced for accessing multiple NDFs stored
-  in the same container file (and their components. i.e. variances and
-  quality). This facility should be obvious when an MEF is loaded into
-  GAIA.
+  The second toolbox displays the mean X and Y profiles of a
+  rectangular region. If the rectangle is moved the profiles will
+  update in real time. This is useful for detecting background trends
+  and binning up linear features.
 
-  Minor changes are detailed below:
+  A further major change is the addition of support for displaying
+  multiple extension FITS files (MEFs). It is now possible to examine
+  images and catalogues stored in these files. A similar feature has
+  also been introduced for NDFs that are stored in the same container
+  file.
 
-      - The SExtractor toolbox has been updated to work with the
-        latest version of EXTRACTOR and SExtractor (see SUN/226).
+  Additional minor changes are:
 
-      - The SExtractor toolbox no longer requires that you press
-        <Return> to update any text fields (this seemed to cause a lot
-        of confusion).
+     - The SExtractor toolbox has been updated to work with the latest
+     version of EXTRACTOR and SExtractor (see SUN/226).
 
-      - A new command-line option -quiet_exit has been
-        introduced. This can make GAIA ask before exiting the main
-        window. The default remains to not ask.
+     - The SExtractor toolbox no longer requires that you press
+     <Return> to update any text fields (this seemed to cause a lot of
+     confusion).
 
-      - The file selection dialog now attempts to preserve the last
-        filter pattern.
+     - A new command-line option -quiet_exit has been introduced. This
+     can make GAIA ask before exiting the main window. The default
+     remains to not ask.
 
-      - GAIA should now work correctly with X servers whose default
-        visual doesn't match the requested visual.
+     - The file selection dialog now attempts to preserve the last
+     filter pattern.
 
-      - A bug in the aperture photometry toolbox that caused some 
-        detached sky regions to randomly move has been fixed.
+     - GAIA should now work correctly with X servers whose default
+     visual doesn't match the requested visual.
+
+     - A bug in the aperture photometry toolbox that caused some
+     detached sky regions to randomly move has been fixed.
  
-      - Broken image headers that do not have an equinox value are
-        no longer shown as having a default value. Problems with the
-        equinox, epoch and coordinate system can now be viewed.
+     - Broken image headers that do not have an equinox value are no
+     longer shown as having a default value. Problems with the
+     equinox, epoch and coordinate system can now be viewed.
 
 
   To try out GAIA for yourself type the following command:
@@ -59,4 +63,4 @@
 
   Peter W. Draper (P.W.Draper@durham.ac.uk)
 
-  15th May 2000.
+  18th July 2000.
