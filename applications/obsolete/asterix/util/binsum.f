@@ -119,7 +119,7 @@
          PARAMETER                (MAXLINES = 5)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINSUM Version V2.0-0' )
+        PARAMETER		( VERSION = 'BINSUM Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*132             TEXT(MAXLINES)   	! Hostory text

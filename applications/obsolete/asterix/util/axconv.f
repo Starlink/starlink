@@ -69,7 +69,7 @@
 
 *  Version
       CHARACTER*20 VERSION
-          PARAMETER (VERSION='AXCONV version 2.0-0')
+          PARAMETER (VERSION='AXCONV Version 2.1-0')
 *.
 
 *  Check inherited global status.

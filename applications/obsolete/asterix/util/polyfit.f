@@ -141,7 +141,7 @@
         PARAMETER               ( Fmt = '(1X,G15.6,A,I2,A)' )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'POLYFIT Version V2.0-1' )
+        PARAMETER		( VERSION = 'POLYFIT Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80              HTXT			! History text

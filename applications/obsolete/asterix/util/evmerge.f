@@ -168,7 +168,7 @@
         PARAMETER         	( MXLST = 50 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVMERGE Version V2.0-0' )
+        PARAMETER		( VERSION = 'EVMERGE Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*20  	        LNAME(MXLST)  		! Names of input lists

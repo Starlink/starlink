@@ -142,7 +142,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER               ( VERSION = 'HIST Version 1.8-1' )
+        PARAMETER               ( VERSION = 'HIST Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*30		CDATE			! Creation date

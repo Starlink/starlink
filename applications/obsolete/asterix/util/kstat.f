@@ -120,7 +120,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'KSTAT Version V2.0-0' )
+        PARAMETER		( VERSION = 'KSTAT Version 2.1-0' )
 
 *  Local Variables:
       DOUBLE PRECISION		K                   	! Kendall's K statistic

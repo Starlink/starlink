@@ -157,7 +157,7 @@
       INTEGER                   MXTEXT
          PARAMETER             (MXTEXT = 7)
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVPOLAR Version V2.0-1' )
+        PARAMETER		( VERSION = 'EVPOLAR Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*20              BNAME(2)         ! List names

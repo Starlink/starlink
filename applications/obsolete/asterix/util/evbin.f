@@ -196,7 +196,7 @@
         PARAMETER		( MAXNAX = ADI__MXDIM+1)! quality
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVBIN Version V2.0-0' )
+        PARAMETER		( VERSION = 'EVBIN Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80              ACTION(MX_HTEXT) 	! History text

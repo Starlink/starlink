@@ -146,7 +146,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINGRP Version V2.0-3' )
+        PARAMETER		( VERSION = 'BINGRP Version 2.1-0' )
       INTEGER			MXRNG
         PARAMETER		( MXRNG = 100 )
 

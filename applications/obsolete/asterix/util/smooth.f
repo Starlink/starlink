@@ -155,7 +155,7 @@
         PARAMETER               ( NMAX = 16384 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SMOOTH Version V2.0-0' )
+        PARAMETER		( VERSION = 'SMOOTH Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*1             DO                ! Are gaps to be restored (Y/N)

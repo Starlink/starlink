@@ -120,7 +120,7 @@
          PARAMETER              ( MAXLIN = 10 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SYSERR Version V2.0-0' )
+        PARAMETER		( VERSION = 'SYSERR Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80 		ACTION(MAXLIN)		! History file entries

@@ -166,7 +166,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'STATISTIX Version V2.0-3' )
+        PARAMETER		( VERSION = 'STATISTIX Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*150          	PATH               	! Path to input object

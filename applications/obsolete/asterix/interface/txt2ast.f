@@ -208,7 +208,7 @@
         PARAMETER        	( NMASKS = 6 )		! mask names
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'IMPORT Version V2.0-1' )
+        PARAMETER		( VERSION = 'IMPORT Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80		AX_LABEL(ADI__MXDIM) 	! Axis labels

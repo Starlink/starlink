@@ -191,7 +191,7 @@
         PARAMETER	        ( MXBIN=2000 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FREQUENCY Version V2.0-2' )
+        PARAMETER		( VERSION = 'FREQUENCY Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER			TEXT(MAXLINES)*80	! History text

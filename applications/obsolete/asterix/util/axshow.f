@@ -107,7 +107,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AXSHOW Version V2.0-0' )
+        PARAMETER		( VERSION = 'AXSHOW Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80              LABEL, UNITS      	! Axis attributes

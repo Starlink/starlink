@@ -117,7 +117,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EXPORT Version V2.0-1' )
+        PARAMETER		( VERSION = 'EXPORT Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80              LABUN(2)                ! Label & units
