@@ -1,53 +1,62 @@
 1 Using_Help
- You are situated in a VMS HELP library which contains help information
- about CONVERT arranged in an hierarchical structure.  The help system
- enables you to navigate the library by prompting when it has completed
- displaying the previously requested help. 
+ You are situated in a portable HELP library which contains help
+ information about CONVERT arranged in an hierarchical structure. 
+ The help system enables you to navigate the library by prompting
+ when it  has completed displaying the previously requested help.
+ The information displayed by the help system on a particular topic
+ includes a description of the topic and a list of subtopics that
+ further describe the topic.  These topic names are called keywords. 
+
+ At a prompt you may enter:
+
+   o  a topic or subtopic name to display the help for that topic or
+      subtopic;
+
+   o  just a <CR> to move up one level in the hierarchy, and if you
+      are at the top level it will terminate the help session;
+
+   o  a CTRL/D will terminate the help session;
+
+   o  a question mark "?" to redisplay the text for the current topic,
+      including the list of topic or subtopic names, or
+
+   o  an ellipsis "..." to display all the text below the current point 
+      in the hierarchy.  For example, "GLITCH..." displays information 
+      on the GLITCH topic as well as information on all the subtopics
+      under GLITCH.
+
+ You can abbreviate any keyword using the following rules:
+
+   1) Just give the first few characters, e.g. 'PARA' for 'Parameters'.
+
+   2) Some keywords are composed of several words separated by
+   underscores.  Each word of the keyword may be abbreviated,
+   e.g. "Colour_Set" can be shortened to "C_S".
+
+   3) The characters "%" and "*" act as wildcards, where the percent
+   sign matches any single character, and asterisk matches any
+   sequence of characters.  Thus to display information on all
+   available topics, type an asterisk (*) in reply to a help prompt.
+
+   4) If a word contains but does end with an asterisk wildcard, it
+   must not be truncated.
+
+   5) The entered string must not contain leading or embedded spaces.
+
+ Ambiguous abbreviations result in all matches being displayed. 
  
- To obtain information on a particular topic, respond to the prompt by
- typing the name of the topic and pressing the RETURN key.  You can 
- abbreviate any topic name, although ambiguous abbreviations result in
- all matches being displayed.  The information displayed by the help
- system on a particular topic includes a description of the topic and
- a list of subtopics that further describe the topic.  To display
- subtopic information, type one of the subtopic names from the list in
- response to the "Subtopic?" prompt.
-
- You can specify percent signs (%) and asterisks (*) in the keyword as
- wild card (i.e., match all) characters.  Thus to display information 
- on all available topics, type an asterisk (*) in reply to a prompt.
-
- To display all the information on a topic, type the topic name
- immediately followed by an ellipsis (...), e.g., NDF2ASCII...
- displays information on the NDF2ASCII topic as well as information on
- all the subtopics under NDF2ASCII.
-
- You can type a question mark (?) in response to any of the prompts to
- to redisplay the most recently requested text and a list of topic or 
- subtopic names.  For example, if you type ? in response to the
- "Subtopic?" prompt, a list of subtopics is displayed followed by the
- "Subtopic?" prompt.
-
- If you wish to move up a level in hierarchy just press RETURN in
- response to the "Subtopic?" prompt instead of typing a subtopic name,
- the "Topic?" prompt reappears,  enabling you to enter another topic
- name.  If you press RETURN in response to the "Topic?" prompt, you
- will exit from HELP.  You can also exit DCL HELP directly from any
- level by typing CTRL/Z (pressing the control and Z keys
- simultaneously).
-
 2 Help_Parameters
 
  keyword ...
 
-  Specifies one or more keywords separated by spaces that refer to the
-  topic  or  subtopic on  which  you want  information  from  the help
-  library.  Information  within  the help  library  is  arranged in an
-  hierarchical  manner.   The levels are:
+  Specifies one or more keywords that refer to the topic  or  subtopic
+  on  which you  want  information from the help library.  Information
+  within the help library is arranged in a hierarchical  manner.   The
+  levels are:
 
-  1.  None--- If you do not specify a keyword,  HELP introduces the 
-      CONVERT help system  and lists  the top-level topics.  Each item
-      in the list is a keyword in the first level of the hierarchy.
+  1.  None--- If you do not specify a keyword,  CONHELP introduces the 
+      help system  and  lists the  top-level topics.  Each item in the
+      list is a keyword in the first level of the hierarchy.
 
   2.  Topic-name---If you specify  a keyword  by naming  a topic,  the
       help facility  describes  the  topic.  Keywords  for  additional
