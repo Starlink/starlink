@@ -57,6 +57,8 @@ WriteMakefile(
     'LIBS'      => [ $libs ],   # e.g., '-lm' 
     'INC'       => "-I$StarConfig{Star_Inc}", # e.g., '-I/usr/include/other' 
     'TYPEMAPS'  => \@typemaps,
+    'OBJECT'    => 'AST.o arrays.o grf_perl.o',
+    'depend'    => { 'AST.o' => "AST_ERR.xsh AST_WCSMAP.xsh"},
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
                     'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

@@ -81,7 +81,6 @@ typedef void AstXmlChan;
 
 /* Helper functions */
 #include "arrays.h"
-#include "arrays.c"
 
 char ** pack1Dchar( AV * avref ) {
   int i;
