@@ -3025,6 +3025,14 @@ package kappa {
             helpkey *
           }
 
+         parameter pen1 {
+            size *
+            type _INTEGER
+            access UPDATE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter penrot {
             type _LOGICAL
             prompt {Is the graphics pen to be cycled through 3 colours?}

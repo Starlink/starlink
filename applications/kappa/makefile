@@ -755,7 +755,7 @@ kps1_agnls.f kps1_ardmb.f kps1_agncp.f kps1_agnst.f kps1_agncv.f \
 kps1_agnms.f kps1_ardmd.f kps1_ardmi.f kps1_ardmub.f kps1_ardmuw.f \
 kps1_agncm.f kps1_ardmr.f kps1_agndl.f kps1_ardmw.f kps1_bafid.f \
 kps1_bafir.f kps1_cnvfp.f kps1_cnvlv.f kps1_cnvrp.f kps1_cuxyr.f \
-kps1_cnser.f kps1_cntur.f kps1_cntky.f kps1_cntdr.f kps1_cntsc.f \
+kps1_cnser.f kps1_cntur.f kps1_cntky.f kps1_cntdr.f kps1_cntst.f kps1_cntsc.f \
 kps1_cntpn.f kps1_cff2r.f kps1_clnsr.f kps1_clpal.f kps1_cff2d.f \
 kps1_dsclr.f kps1_dtpcl.f kps1_dsclw.f kps1_dscli.f kps1_discl.f \
 kps1_dsclb.f kps1_dscld.f kps1_elpr1.f kps1_elgau.f kps1_errcl.f \
@@ -3329,6 +3329,7 @@ kps1_clpsd.o:    SAE_PAR PRM_PAR NDF_PAR
 kps1_clpsr.o:    SAE_PAR PRM_PAR NDF_PAR
 kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cntdr.o:	 SAE_PAR AST_PAR PRM_PAR GRP_PAR
+kps1_cntst.o:	 SAE_PAR GRP_PAR
 kps1_cntky.o:	 SAE_PAR AST_PAR
 kps1_cntpn.o:	 SAE_PAR GRP_PAR PRM_PAR CTM_PAR AST_PAR PAR_ERR
 kps1_cntsc.o:	 SAE_PAR AST_PAR NDF_PAR

@@ -1,9 +1,9 @@
       SUBROUTINE KPS1_CNSER( PNMODE, PNCONT, PNSTRT, PNSTEP, PNVAL,
-     :                         PNPER, BAD, EL, ARRAY, MXCONT, CNTLEV,
-     :                         PERCNT, AREA, NCONT, STATUS )
+     :                       PNPER, BAD, EL, ARRAY, MXCONT, CNTLEV,
+     :                       PERCNT, AREA, NCONT, MODE, STATUS )
 *+
 *  Name:
-*     KPS1_CNSEx
+*     KPS1_CNSER
  
 *  Purpose:
 *     Selects contour levels in a variety of ways.
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*      CALL KPS1_CNSEx( PNMODE, PNCONT, PNSTRT, PNSTEP, PNVAL, PNPER,
+*      CALL KPS1_CNSER( PNMODE, PNCONT, PNSTRT, PNSTEP, PNVAL, PNPER,
 *                       BAD, EL, ARRAY, MXCONT, CNTLEV, PERCNT, AREA,
-*                       NCONT, STATUS )
+*                       NCONT, MODE, STATUS )
  
 *  Description:
 *     This subroutine obtains a method of selecting the contour heights
@@ -22,8 +22,8 @@
 *     parameters are obtained from the environment, and the contour
 *     heights returned in argument CNTLEV.
  
-*     There are five methods for selecting contours.  The
-*     options are:
+*     Contour levels may be selected using the following methods:
+*
 *        a) 'Free'        - The user defines a series of contour values.
 *                           (Default value)
 *        b) 'Automatic'   - The specified number of contours are equally
@@ -43,6 +43,10 @@
 *        f) 'Percentiles' - The user defines a series of percentiles.
 *        g) 'Equalised'   - The user defines the of equally spaced
 *                           percentiles.
+*        h) 'Good'        - Draw a single "contour" outlining the good pixel
+*                           values.
+*        i) 'Bounds'      - Draw a single "contour" (a rectangle in pixel
+*                           coordinates) marking the bounds of the array.
  
 *  Arguments:
 *     PNMODE = CHARACTER (Given)
@@ -74,6 +78,8 @@
 *        The areas between contour heights, practically a work array.
 *     NCONT = INTEGER (Write)
 *        Number of contour heights selected.
+*     MODE = CHARACTER * ( * ) (Write)
+*        Selected mode.
 *     STATUS = INTEGER( UPDATE )
 *        The global inherited status.
  
@@ -82,76 +88,9 @@
 *     replace "x" in the routine name by R or D as appropriate.  The
 *     arguments ARRAY and CNTLEV must have the data type specified.
  
-*  Algorithm:
-*     If no error on entry then return
-*     Obtain method for defining contour heights
-*     If no error then
-*        If automatic method then
-*           Compute maximum and minimum of the array
-*           If an error has occurred then
-*              Report it
-*           Else if maximum equal minimum then
-*              Report error and set bad status
-*           Else
-*              Obtain number of contours
-*              If no error then
-*                 Derive first contour height and the interval between
-*                   contour heights
-*                 Evaluate contour heights
-*              Else
-*                 Report error
-*              Endif
-*           Endif
-*        Else if area method then
-*           Obtain number of contours
-*           If no error then
-*              Define arbitrary, but realistic boundary areas
-*              Assign contours such that they enclose an area in the
-*                array for which the equivalent radius increases by
-*                equal increments
-*              Find the pixel values corresponding to the areas ---
-*                these are the contour heights
-*           Else
-*              Report error context
-*           Endif
-*        Else if linear or magnitude method then
-*           Obtain the number of contours, the start height, and the
-*             interval between contours
-*           If no error then
-*              Evaluate contour heights linearly or in magnitudes as
-*                required
-*           Else
-*              Report error context
-*           Endif
-*        Else if free method then
-*           Obtain list of explicit contour heights
-*           If an error occurred then report context
-*        Else if percentiles or equalised method then
-*           Compute maximum and minimum of the array
-*           If an error has occurred then
-*              Report it
-*           Else if maximum equal minimum then
-*              Report error and set bad status
-*           Else
-*              Form histogram
-*              If percentiles method then
-*                 Obtain the percentiles
-*              Else
-*                 Obtain number of contours
-*                  If no error then
-*                    Derive first contour percentile and the interval
-*                    between contour percentiles
-*              Else
-*                 Report error
-*              Endif
-*              Evaluate contour heights from the percentiles
-*           Endif
-*        Endif
-*     Endif
-*     Return
- 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK).
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
@@ -175,6 +114,8 @@
 *     1997 May 12 (MJC):
 *        Added percentile and equalised options, and hence PNPER and
 *        PERCNT arguments.
+*     25-JAN-2001 (DSB):
+*        Added methods 'Bounds' and 'Good'. Added argument MODE.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -207,6 +148,7 @@
       REAL PERCNT( MXCONT )
       REAL AREA( MXCONT )
       INTEGER NCONT
+      CHARACTER * ( * ) MODE
  
 *  Status:
       INTEGER STATUS             ! Global status
@@ -225,7 +167,6 @@
       REAL MAXVAL             ! Maximum value in array
       INTEGER MINPOS( 2 )        ! Position of minimum found in array
       REAL MINVAL             ! Minimum value in array
-      CHARACTER * ( 9 ) MODE     ! Method of selecting contours
       INTEGER NINVAL             ! Number of bad pixels in array
       REAL OFFSET             ! First contour height
       REAL SCALE              ! Step interval between areas
@@ -248,8 +189,8 @@
  
 *  Get the method of selecting contour levels
       CALL PAR_CHOIC( PNMODE, 'Free', 'Free,Automatic,Area,Linear,'/
-     :                /'Magnitude,Percentiles,Equalised', .TRUE., MODE,
-     :                STATUS )
+     :                /'Magnitude,Percentiles,Equalised,Good,Bounds', 
+     :                .TRUE., MODE, STATUS )
  
       IF ( STATUS .EQ. SAI__OK ) THEN
  
@@ -450,6 +391,27 @@
  
             END IF
  
+*  Good method.
+*  ============
+         ELSE IF ( MODE( 1:2 ) .EQ. 'GO' ) THEN
+
+*  The usual contouring algorithm is used to draw a single contour at a 
+*  value slightly different to VAL_BADR. Can't make it exactly VAL__BADR
+*  because the algorithm cannot handle large areas of pixel which are
+*  identically equal to the contour level.
+            CNTLEV( 1 ) = 0.95*VAL__BADR
+            NCONT = 1
+            BAD = .FALSE.
+
+*  Bounds method.
+*  =============
+         ELSE IF ( MODE( 1:2 ) .EQ. 'BO' ) THEN
+
+*  A contour value of VAL__BADR is used as a flag meaning "do not use the 
+*  normal contouring algorithm but draw a simple box instead".
+            CNTLEV( 1 ) = VAL__BADR
+            NCONT = 1
+
 *  End of mode check.
          END IF
  

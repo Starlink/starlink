@@ -441,7 +441,7 @@ mamore.f manyg.f masame.f med3d.f medref.f medrep.f medset.f medwts.f \
 medwv.f mfnext.f mfopen.f moscad.f moscdv.f namsrv.f opus.f \
 otstsb.f peepsb.f setcr.f setknt.f shifts.f shiftx.f shifty.f slc2t1.f \
 slc2t3.f sqshs.f sqshx.f sqshy.f stat3d.f statsb.f statv.f strx.f stry.f \
-thrsr.f trgscl.f trigsb.f tropus.f uget.f uput.f kps1_cntky.f \
+thrsr.f trgscl.f trigsb.f tropus.f uget.f uput.f kps1_cntky.f kps1_cntst.f \
 kps1_cntpn.f kps1_cntsc.f kps1_discl.f kps1_lmkpc.f kps1_lmkst.f \
 kps1_lplfs.f kps1_lpllm.f kps1_lplnm.f kps1_lshcp.f kps1_lshct.f \
 kps1_lshfm.f kps1_lshpl.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f \

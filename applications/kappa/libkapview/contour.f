@@ -19,7 +19,9 @@
 *     This application produces a contour map of a 2-dimensional NDF on 
 *     the current graphics device, with single-pixel resolution. Contour
 *     levels can be chosen automatically in various ways, or specified 
-*     explicitly (see parameter MODE). 
+*     explicitly (see parameter MODE). In addition, this application can
+*     also draw an outline around either the whole data array, or around
+*     the good pixels in the data array (set MODE to "Bounds" or "Good").
 *
 *     The plot is produced within the current graphics database picture,
 *     and may be aligned with an existing DATA picture if the existing
@@ -156,6 +158,13 @@
 *        be used in place of value 1). Contour values are formatted 
 *        using attributes Format(2), etc (the synonym Value can be used in 
 *        place of the value 2). [current value] 
+*     LABOUT = _LOGICAL (Read)
+*        Only used if parameter MODE is set to "Good" or "Bounds". If a TRUE 
+*        value is supplied then the name of the input NDF is included in
+*        the plot as a label. The label is positioned so that its bottom
+*        left corner is close to the bottom left pixel in the NDF. The
+*        appearance of the label can be set by using the STYLE parameter
+*        (for instance "Size(strings)=2"). [TRUE]
 *     LENGTH() = _REAL (Write)
 *        On exit this holds the total length in pixels of the contours at each 
 *        selected height.  These values are only computed when parameter STATS 
@@ -183,10 +192,17 @@
 *          the maximum and minimum pixel values in the array.  You supply 
 *          the number of contour levels.
 *
+*          - "Bounds" -- A single "contour" is drawn representing the
+*          bounds of the input array. A label may also be added (see 
+*          parameter LABOUT).
+*
 *          - "Equalised" -- You define the number of equally spaced 
 *          percentiles.
 *
 *          - "Free" -- You specify a series of contour values explicitly.
+*
+*          - "Good" -- A single "contour" is drawn outlining the good pixel
+*          values. A label may also be added (see parameter LABOUT).
 *
 *          - "Linear" -- You define the number of contours, the start
 *          contour level and linear step between contours.
@@ -205,10 +221,10 @@
 *        enclosing the existing DATA picture. Data values outside this 
 *        section are ignored.
 *     NCONT = _INTEGER (Read)
-*        The number of contours required (in all modes except Free and
-*        Percentiles).  It must be between 1 and 50.  If the number is
-*        large, the plot may be cluttered and take longer to produce.
-*        The initial suggested default of 6 gives reasonable results.
+*        The number of contours to draw (only required in certain modes).
+*        It must be between 1 and 50.  If the number is large, the plot 
+*        may be cluttered and take longer to produce. The initial 
+*        suggested default of 6 gives reasonable results.
 *     NDF = NDF (Read)
 *        NDF structure containing the 2-dimensional image to be
 *        contoured.
@@ -477,6 +493,8 @@
 *     26-OCT-1999 (DSB):
 *        Margin changed to be a fraction of the current picture instead
 *        of the DATA picture.
+*     25-JAN-2001 (DSB):
+*        Added modes Good and Bounds, and parameter LABOUT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -520,10 +538,15 @@
       CHARACTER DTYPE*(NDF__SZFTP)! Type of the image after processing
       CHARACTER ITYPE*(NDF__SZTYP)! Processing type of the image
       CHARACTER MCOMP*8           ! Component to be mapped
+      CHARACTER MODE*20           ! Method for selecting contour heights
       CHARACTER NDFNAM*255        ! Full NDF specification 
       CHARACTER TITLE*255         ! Default title for the plot
       CHARACTER UNITS*(CUNITS + 5)! Units of the data
       DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
+      DOUBLE PRECISION POS( 2 )! Label reference position
+      DOUBLE PRECISION UP( 2 ) ! Label up-vector
+      DOUBLE PRECISION XP( 2 ) ! Label text positions
+      DOUBLE PRECISION YP( 2 ) ! Label test positions
       INTEGER CNTCLS( MXCONT ) ! Number of closed contours at each height
       INTEGER DIMS( NDIM )     ! Dimensions of input array
       INTEGER EL               ! Number of elements in the input array
@@ -539,12 +562,12 @@
       INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
       INTEGER IPLOTK           ! Pointer to AST Plot for KEY picture
       INTEGER IWCS             ! Pointer to the WCS FrameSet from the NDF
-      INTEGER NCONT            ! Number of contour heights
       INTEGER NC               ! Number of characters in NDFNAM
+      INTEGER NCONT            ! Number of contour heights
       INTEGER NCU              ! Number of characters in the units
       INTEGER NFRM             ! Frame index increment between IWCS and IPLOT
-      INTEGER NMARG            ! No. of margin values given
       INTEGER NKP              ! No. of values supplied for parameter KEYPOS
+      INTEGER NMARG            ! No. of margin values given
       INTEGER PNTR             ! Pointer to array data
       INTEGER SDIM( NDIM )     ! The significant NDF axes
       INTEGER SLBND( NDIM )    ! Significant lower bounds of the image
@@ -556,6 +579,7 @@
       LOGICAL CNTUSD( MXCONT ) ! Contour plotted at height in CNTLEV?
       LOGICAL FAST             ! Draw contours quickly?
       LOGICAL KEY              ! Key of the contour heights to be produced?
+      LOGICAL LABOUT           ! Create labels in Good and Bounds mode?
       LOGICAL STATS            ! Contour statistics required?
       REAL AREA( MXCONT )      ! Work array for storing areas in CNTSEL
       REAL ASPECT              ! Aspect ratio of the input array
@@ -760,7 +784,7 @@
       CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
      :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
      :                 %VAL( PNTR ), MXCONT, CNTLEV, PERCNT,
-     :                 AREA, NCONT, STATUS )
+     :                 AREA, NCONT, MODE, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -799,10 +823,10 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Draw the contour plot.
-      CALL KPS1_CNTDR( IPLOT, IGRP, DIMS( 1 ), DIMS( 2 ), %VAL( PNTR ),
-     :                 1, 1, DIMS( 1 ), DIMS( 2 ), NCONT, CNTLEV,
-     :                 STATS, FAST, %VAL( WKPNTR ), CNTUSD, CNTLEN, 
-     :                 CNTCLS, STATUS )
+      CALL KPS1_CNTDR( BAD, IPLOT, IGRP, DIMS( 1 ), DIMS( 2 ), 
+     :                 %VAL( PNTR ), 1, 1, DIMS( 1 ), DIMS( 2 ), NCONT, 
+     :                 CNTLEV, STATS, FAST, %VAL( WKPNTR ), CNTUSD, 
+     :                 CNTLEN, CNTCLS, STATUS )
 
 *  Add a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
@@ -816,12 +840,63 @@
          CALL PAR_PUT1R( 'LENGTH', NCONT, CNTLEN, STATUS )
       END IF
 
+*  If required, label outlines using the NDF name.
+      CALL PAR_GET0L( 'LABOUT', LABOUT, STATUS )
+      IF( LABOUT .AND. MODE .EQ. 'BOUNDS' .OR. MODE .EQ. 'GOOD' ) THEN
+
+*  We want the up-vector for the label to be parallel to the Y pixel
+*  axis, so transform two positions from GRID to GRAPHICS to find the 
+*  the corresponding up-vector in graphics coords.
+         XP( 1 ) = 1.0D0
+         YP( 1 ) = 1.0D0
+         XP( 2 ) = XP( 1 )
+         YP( 2 ) = YP( 1 ) + 1.0D0
+         CALL AST_TRAN2( IPLOT, 2, XP, YP, .FALSE., XP, YP, STATUS )
+
+*  Check these are good.
+         IF( XP( 1 ) .NE. AST__BAD .AND. YP( 1 ) .NE. AST__BAD .AND.
+     :       XP( 2 ) .NE. AST__BAD .AND. YP( 2 ) .NE. AST__BAD ) THEN
+
+*  Form the up-vector. Negate it if the text would be upside-down.
+            UP( 1 ) = XP( 2 ) - XP( 1 )
+            UP( 2 ) = YP( 2 ) - YP( 1 )
+            IF( UP( 2 ) .LT. 0 ) THEN
+               UP( 1 ) = -UP( 1 )
+               UP( 2 ) = -UP( 2 )
+            END IF
+
+*  Find the GRID position at which to place the bottom left corner fo the
+*  text. This is about 2mm (GRAPHICS coords) in both directions from the 
+*  bottom left corner.
+            POS( 1 ) = 2.0/SQRT( UP( 1 )**2 + UP( 2 )**2 )
+            POS( 2 ) = POS( 1 )
+
+*  Choose the colour for the text. 
+            IF( IGRP .NE. GRP__NOID ) THEN 
+               CALL KPS1_CNTST( IPLOT, IGRP, 1, STATUS )
+            ELSE IF( .NOT. AST_TEST( IPLOT, 'COLOUR(STRINGS)', 
+     :                               STATUS ) ) THEN
+               CALL AST_SETI( IPLOT, 'COLOUR(STRINGS)', 
+     :                     AST_GETI( IPLOT, 'COLOUR(CURVES)', STATUS ),
+     :                     STATUS )
+            END IF
+
+*  Get the NDF basename and write it out.            
+            CALL KPG1_NDFNM( INDF, NDFNAM, NC, STATUS )
+            CALL AST_TEXT( IPLOT, NDFNAM( : NC ), POS, UP, 'BL', 
+     :                     STATUS )
+
+         END IF
+
+      END IF
+
 *  Re-instate the original Current Frame and draw the axes if required.
       CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
-*  Plot the key if necessary.
-      IF( KEY ) THEN
+*  Plot the key if necessary (no key is needed if no real contours have
+*  been drawn).
+      IF( KEY .AND. MODE .NE. 'GOOD' .AND. MODE .NE. 'BOUNDS' ) THEN
 
 *  If no value was supplied for the vertical position of the KEY using 
 *  parameter KEYPOS, find the value which puts the top of the key level 
@@ -899,7 +974,9 @@
 
 *  Report the heights actually used as they are not always clearly
 *  visible on small plots and/or on low-resolution workstations.
-      CALL CNTHLT( NCONT, CNTLEV, CNTUSD, STATUS )
+      IF( MODE .NE. 'GOOD' .AND. MODE .NE. 'BOUNDS' ) THEN
+         CALL CNTHLT( NCONT, CNTLEV, CNTUSD, STATUS )
+      END IF
 
 *  Tidy up.
 *  ========

@@ -59,6 +59,10 @@
 *  History:
 *     16-MAR-1998 (DSB):
 *        Original version.
+*     25-JAN-2001 (DSB):
+*        Add parameter PEN1 which is used to remember the last pen colour
+*        used when rotating pens. This enables rotation to continue between
+*        invocations of the application. Changed NROT from 3 to 5.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,7 +101,7 @@
 
 *  Local Constants:
       INTEGER NROT                ! No. of pens in one rotation cycle
-      PARAMETER( NROT = 3 )
+      PARAMETER( NROT = 5 )
 
       INTEGER NPGSTY              ! No. of line styles available in PGPLOT
       PARAMETER( NPGSTY = 5 )
@@ -209,26 +213,39 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If so...
-         IF( PENROT ) THEN
+         IF( PENROT .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Get the number of colour indices available on the choosen device.
             CALL PGQCOL( DOWN, UP )
 
 *  If this is more than NROT (ignoring the background colour), create pen 
 *  definitions which rotate the pen colour indices starting with the 
-*  colour index in the Plot.
+*  next colour index after the one used previously.
             IF( UP .GE. NROT ) THEN
-               NPEN = NCONT
-               IPEN = AST_GETI( IPLOT, 'COLOUR(CURVES)', STATUS )
-               PENHI = MIN( IPEN + NROT - 1, MIN( CTM__RSVPN, UP ) )
 
+*  Parameter PEN1 should have a vpath of INTERNAL in order to hide it
+*  form the user. It is used to hold the index of the last pen used, so
+*  that subsequent invocations can use a different pen. This allows pen
+*  rotation to continue between invocations of CONTOUR.
+               CALL PAR_GET0I( 'PEN1', IPEN, STATUS )
+               IF( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  IPEN = AST_GETI( IPLOT, 'COLOUR(CURVES)', STATUS )
+               END IF
+               IPEN = MOD( IPEN, NROT ) + 1
+
+*  Create the pen definitions.
+               NPEN = NCONT
+               PENHI = MIN( NROT, MIN( CTM__RSVPN, UP ) )
                DO I = 1, NCONT
-                  IF( IPEN .GT. PENHI ) IPEN = IPEN - NROT
                   ATTR = 'COLOUR='
                   CALL CHR_ITOC( IPEN, ATTR( 8 : ), NC )
                   CALL GRP_PUT( IGRP, 1, ATTR, 0, STATUS )
-                  IPEN = IPEN + 1
+                  IPEN = MOD( IPEN, NROT ) + 1
                END DO
+
+*  Set the first pen to use next time.
+               CALL PAR_PUT0I( 'PEN1', IPEN, STATUS )
 
 *  If there are fewer than NROT colours available, create pen definitions 
 *  which rotate the pen styles (so long as there are enough styles).
