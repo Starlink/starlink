@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
-<!-- component.xml.  Generated from component.xml.in by configure. -->
+<!-- @configure_input@ -->
 
-<component id="automake" buildsupport="yes">
-  <version>1.8.2-starlink</version>
+<component id="@PACKAGE@" buildsupport="yes">
+  <version>@PACKAGE_VERSION@</version>
   <path>thirdparty/fsf/automake</path>
   <description>GNU automake, patched</description>
   <!-- <abstract><p></p></abstract> -->
@@ -21,7 +21,7 @@
       <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <notes><p>This version of automake has been patched to include
       Fortran preprocessor support, and a variety of Starlink-specific
       targets.  The Fortran patches were submitted
