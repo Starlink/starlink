@@ -26,6 +26,35 @@ $nbslibs = qx/nbs_link/;
 die "No NDF libraries were found.\n This may imply that the
 nbs_link command is not in your path." if $nbslibs !~ /./;
 
+
+undef $linkopts;
+
+if ($osname eq 'dec_osf') {
+
+  print "This is a $osname machine\n";
+  @temp = split /\s+/, $nbslibs;
+  undef $nbslibs;
+
+
+  foreach my $entry (@temp) {
+    if ($entry =~ /^-Wl/) {
+#      $linkopts .= (split(/,/))[1] . " ";
+      $linkopts .= $entry . " ";
+    } else {
+      $nbslibs .= $entry . " ";
+    }
+  }
+  print "Link options are $linkopts\n";
+
+}
+
+# This is a kludge but I need to pass the linker options through
+# to the compiler. The only way I can see to do this is via the 
+# Optimize flag. Just append the link options to the optimize
+
+$optimize = $Config{optimize} . " $linkopts";
+
+
 $fortranlibs = ExtUtils::F77->runtime;
 
 # This is the location of the Starlink NDF libraries
@@ -38,6 +67,7 @@ $libs = "$starlibs $nbslibs $fortranlibs ";
 WriteMakefile(
     'NAME'      => 'Starlink::NBS',
     'PREREQ_PM' => { 'Starlink::EMS' => 0 },
+    'OPTIMIZE'  => $optimize,
     'VERSION_FROM' => 'NBS.pm', # finds $VERSION
     'LIBS'      => [ "$libs"],   # e.g., '-lm' 
     'DEFINE'    => '',     # e.g., '-DHAVE_SOMETHING' 
