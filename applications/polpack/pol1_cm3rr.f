@@ -65,6 +65,9 @@
 *  Notes:
 *     - No propagation of variances is performed using this routine.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)

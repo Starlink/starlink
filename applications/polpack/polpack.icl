@@ -19,6 +19,9 @@
 {  Description:
 {     This procedure defines the command names for each POLPACK command.
 
+{  Copyright:
+{     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 {  Authors:
 {     DSB: D.S. Berry (STARLINK)
 {     {enter_new_authors_here}

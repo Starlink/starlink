@@ -46,6 +46,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *         Global status value
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     MJC: Malcolm Currie (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK)

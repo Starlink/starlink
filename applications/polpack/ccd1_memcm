@@ -17,6 +17,9 @@
 *     number of memory requests that have been made that cannot be
 *     fitted into this space.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}

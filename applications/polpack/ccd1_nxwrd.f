@@ -42,6 +42,9 @@
 *     routine, NOTFND is returned .FALSE., and FIRST and LAST are returned
 *     equal to one.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)

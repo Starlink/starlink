@@ -29,6 +29,9 @@
 *        The status.  If the line was output correctly a value of 1 is
 *        returned.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     (PTW) P.T.Wallace (STARLINK)
 *     (MJC) Malcolm J. Currie (STARLINK)

@@ -33,6 +33,9 @@
 *     routine. This initialises the common block, this is not necessary
 *     if this routine is called with STATUS set.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)

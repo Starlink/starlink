@@ -32,6 +32,9 @@
 *     This routine has versions for B, UB, W, UW, I, R, D, C and L data
 *     types.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (DSB)

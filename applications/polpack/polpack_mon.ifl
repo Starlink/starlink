@@ -1,227 +1,4 @@
 Monolith polpack_mon
-
-#  Name:
-#     POLBIN.IFL
-
-#  Type of module:
-#     ADAM A-task parameter interface.
-
-#  Authors:
-#     DSB: David S. Berry (STARLINK)
-#     {enter_new_authors_here}
-
-#  History:
-#     24-FEB-1998 (DSB):
-#     	 Original version.
-#     {enter_further_changes_here}
-
-#-
-
-interface POLBIN
-
-   helplib        'POLPACK_HELP:'
-
-   parameter      BOX          
-      type        '_REAL'
-      ppath       'CURRENT'
-      prompt      'Bin size'
-      helpkey     '*'
-   endparameter
-
-   parameter      IN
-      position    1
-      type        LITERAL
-      ppath       'CURRENT'
-      prompt      'Input catalogue'
-      helpkey     '*'
-   endparameter
-
-   parameter      OUT
-      position    2
-      type        LITERAL
-      prompt      'Output catalogue'
-      helpkey     '*'
-   endparameter
-
-   parameter      DEBIAS         
-      type        _LOGICAL
-      vpath       'DEFAULT'
-      ppath       'DEFAULT'
-      default     !
-      prompt      'Remove statistical bias?'
-      helpkey     '*'
-   endparameter
-
-   parameter      METHOD         
-      type        'LITERAL'
-      vpath       'PROMPT,CURRENT,DEFAULT'
-      ppath       'CURRENT,DEFAULT '
-      default     'MEDIAN'
-      prompt      'Binning method'
-      helpkey     '*'
-   endparameter
-
-   parameter      MINVAL         
-      type        '_INTEGER'
-      vpath       'DEFAULT'
-      ppath       'DEFAULT'
-      default     1
-      prompt      'Min. number of good input values per bin'
-      helpkey     '*'
-   endparameter
-
-   parameter      SIGMAS         
-      type        _REAL
-      vpath       'PROMPT,CURRENT,DEFAULT '
-      ppath       'CURRENT,DEFAULT '
-      default     4.0
-      prompt      'Clipping limit (standard deviations)'
-      helpkey     '*'
-   endparameter
-
-endinterface
-
-#+
-#  Name:
-#     POLCAL.IFL
-
-#  Type of Module:
-#     ADAM A-task parameter interface.
-
-#  Authors:
-#     TMG: Tim Gledhill  (STARLINK)
-#     {enter_new_authors_here}
-
-#  History:
-#     23-JUN-1997 (TMG):
-#     	 Original version.
-#     {enter_changes_here}
-
-#-
-
-interface POLCAL
-
-   helplib 'POLPACK_HELP:'
-
-   parameter IN
-      position 1
-      type     NDF
-      access   READ
-      vpath    'PROMPT '
-      ppath    'GLOBAL '
-      association <->GLOBAL.DATA_ARRAY
-      prompt   'Input polarisation images'
-      helpkey  '*'
-   endparameter
-
-   parameter PMODE
-      type     LITERAL
-      access   READ
-      vpath    'CURRENT, DEFAULT'
-      default  'LINEAR'
-      ppath    'DEFAULT'
-      prompt   'Polarimetric mode (LINEAR or CIRCULAR)'
-   endparameter
-
-   parameter TITLE
-      type     LITERAL
-      access   READ
-      vpath    'DYNAMIC, DEFAULT'
-      default  'Output from POLPACK'
-      ppath    'DYNAMIC, DEFAULT'
-      prompt   'Title for output NDF'
-   endparameter
-
-   parameter VARIANCE		 # Variances required?
-      type     _LOGICAL
-      access   READ
-      vpath    'DEFAULT '
-      ppath    'DEFAULT '
-      default  !
-      prompt   'Are variance values to be generated?'
-      helpkey  '*'
-   endparameter
-
-   parameter   TOLS              # scale facto tolerance
-      type     _REAL
-      access   READ
-      vpath    'CURRENT, DEFAULT'
-      ppath    'CURRENT, DEFAULT'
-      default  0.01
-      prompt   'Scale factor tolerance for image inter-comparisons'
-      helpkey  '*'
-   endparameter
-
-   parameter   TOLZ              # zero point tolerance
-      type     _REAL
-      access   READ
-      vpath    'CURRENT, DEFAULT'
-      ppath    'CURRENT, DEFAULT'
-      default  0.01
-      prompt   'Zero point tolerance for image inter-comparisons'
-      helpkey  '*'
-   endparameter
-
-   parameter   MAXIT              # maximum number of intercomparison iterations
-      type     _INTEGER
-      access   READ
-      vpath    'CURRENT, DEFAULT'
-      ppath    'CURRENT, DEFAULT'
-      default  15
-      prompt   'Maximum number of interations during image inter-comparisons'
-      helpkey  '*'
-   endparameter
-
-   parameter   SKYSUP              # Sky supression factor 
-      type     _REAL
-      access   READ
-      vpath    'CURRENT, DEFAULT'
-      ppath    'CURRENT, DEFAULT'
-      default  1.0
-      prompt   'Sky supression factor'
-      helpkey  '*'
-   endparameter
-
-   parameter   ILEVEL              # user information level
-      type     _INTEGER
-      access   READ
-      vpath    'CURRENT, DEFAULT'
-      ppath    'CURRENT, DEFAULT'
-      default  2
-      prompt   'User information level'
-      helpkey  '*'
-   endparameter
-
-   parameter   ETOL              # tolerence for E factor convergence
-      type     _REAL
-      access   READ
-      vpath    'CURRENT, DEFAULT'
-      ppath    'CURRENT, DEFAULT'
-      default  0.01
-      prompt   'Tolerence for E factor convergence'
-      helpkey  '*'
-   endparameter
-
-   parameter   OUT              # Output NDF
-      type     NDF
-      access   WRITE
-      vpath    'CURRENT, PROMPT'
-      ppath    'CURRENT'
-      prompt   'Output NDF'
-      helpkey  '*'
-   endparameter
-
-#   parameter  TSPOUT           # TEMPORARY TSP OUTPUT
-#      type    NDF
-#      access  WRITE
-#      vpath   'CURRENT,PROMPT'
-#      ppath   'CURRENT'
-#      prompt  'TEMPORARY TSP OUTPUT - DELETE THIS!!'
-#      helpkey '*'
-#   endparameter
-
-endinterface
-
 #+
 #  Name:
 #     DATAPIC.IFL
@@ -229,6 +6,9 @@ endinterface
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 #  Authors:
 #     DSB: D. Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -326,7 +106,222 @@ interface DATAPIC
    endparameter
 
 endinterface
+#  Name:
+#     POLBIN.IFL
 
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-FEB-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLBIN
+
+   helplib        'POLPACK_HELP:'
+
+   parameter      BOX          
+      type        '_REAL'
+      ppath       'CURRENT'
+      prompt      'Bin size'
+      helpkey     '*'
+   endparameter
+
+   parameter      IN
+      position    1
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Input catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT
+      position    2
+      type        LITERAL
+      prompt      'Output catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      DEBIAS         
+      type        _LOGICAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
+      prompt      'Remove statistical bias?'
+      helpkey     '*'
+   endparameter
+
+   parameter      METHOD         
+      type        'LITERAL'
+      vpath       'PROMPT,CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT '
+      default     'MEDIAN'
+      prompt      'Binning method'
+      helpkey     '*'
+   endparameter
+
+   parameter      MINVAL         
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     1
+      prompt      'Min. number of good input values per bin'
+      helpkey     '*'
+   endparameter
+
+   parameter      SIGMAS         
+      type        _REAL
+      vpath       'PROMPT,CURRENT,DEFAULT '
+      ppath       'CURRENT,DEFAULT '
+      default     4.0
+      prompt      'Clipping limit (standard deviations)'
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     POLCAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     TMG: Tim Gledhill  (STARLINK)
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-JUN-1997 (TMG):
+#     	 Original version.
+#     15-MAY-1998 (DSB):
+#        Parameters re-order. Defaults changed. CURRENT removed from
+#        VPATHs and PPATHS. TSP bits removed.
+#     {enter_changes_here}
+
+#-
+
+interface POLCAL
+
+   helplib 'POLPACK_HELP:'
+
+   parameter   ETOL              # tolerence for E factor convergence
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.01
+      prompt   'Tolerence for E factor convergence'
+      helpkey  '*'
+   endparameter
+
+   parameter   ILEVEL              # user information level
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  1
+      prompt   'Level of information to display'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'Input intensity images'
+      helpkey  '*'
+   endparameter
+
+   parameter   MAXIT              # maximum number of intercomparison iterations
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  30
+      prompt   'Maximum number of interations during image inter-comparisons'
+      helpkey  '*'
+   endparameter
+
+   parameter   OUT              # Output NDF
+      position 2
+      type     NDF
+      access   WRITE
+      ppath    'CURRENT'
+      prompt   'Output Stokes cube'
+      helpkey  '*'
+   endparameter
+
+   parameter PMODE
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'LINEAR'
+      ppath    'DEFAULT'
+      prompt   'Polarimetric mode (LINEAR or CIRCULAR)'
+   endparameter
+
+   parameter   SKYSUP              # Sky supression factor 
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  10.0
+      prompt   'Sky supression factor'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DYNAMIC, DEFAULT'
+      default  'Output from POLCAL'
+      ppath    'DYNAMIC, DEFAULT'
+      prompt   'Title for output NDF'
+   endparameter
+
+   parameter   TOLS              # scale facto tolerance
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.001
+      prompt   'Scale factor tolerance for image inter-comparisons'
+      helpkey  '*'
+   endparameter
+
+   parameter   TOLZ              # zero point tolerance
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.05
+      prompt   'Zero point tolerance for image inter-comparisons'
+      helpkey  '*'
+   endparameter
+
+   parameter VARIANCE		 # Variances required?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Are variance values to be generated?'
+      helpkey  '*'
+   endparameter
+
+endinterface
 #+
 #  Name:
 #     POLCENT.IFL
@@ -434,7 +429,6 @@ interface POLCENT
    endparameter
 
 endinterface
-
 #+
 #  Name:
 #     POLEXP.IFL 
@@ -487,7 +481,6 @@ interface POLEXP
    endparameter
 
 endinterface
-
 #+
 #  Name:
 #     POLHELP.IFL
@@ -617,172 +610,6 @@ interface POLIMP
    endparameter
 
 endinterface
-
-#+
-#  Name:
-#     POLMAP.IFL
-
-#  Type of Module:
-#     ADAM A-task parameter interface.
-
-#  Authors:
-#     DSB: David Berry (STARLINK)
-#     {enter_new_authors_here}
-
-#  History:
-#     27-AUG-1997 (DSB):
-#     	 Original version.
-#     {enter_changes_here}
-
-#-
-
-interface POLMAP
-
-   helplib 'POLPACK_HELP:'
-
-   parameter BADCOL
-      type     _CHAR
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  'CYAN'
-      prompt   'Colour with which to mark missing pixel data'
-      helpkey  '*'
-   endparameter
-
-   parameter DPI                
-      type     _INTEGER
-      access   READ
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  !
-      prompt   'Screen dots per inch'
-      helpkey  '*'
-   endparameter
-
-   parameter HELPAREA           
-      type     _LOGICAL
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  YES
-      prompt   'Display the help area?'
-      helpkey  '*'
-   endparameter
-
-   parameter IN                  
-      position 1
-      type     NDF
-      access   READ
-      vpath    'PROMPT '
-      ppath    'GLOBAL '
-      association <->GLOBAL.DATA_ARRAY
-      prompt   'Input image'
-      helpkey  '*'
-   endparameter
-
-   parameter ITEMS
-      type     _CHAR
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  '.0'
-      prompt   'Required items in the status area (private)'
-      helpkey  '*'
-   endparameter
-
-   parameter LOGFILE
-      type     _CHAR
-      access   READ
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      default  !
-      prompt   'The name of a file in which to store all ATASK messages.'
-      helpkey  '*'
-   endparameter
-
-   parameter NEWCOLMAP
-      type     _LOGICAL
-      access   READ
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      default  NO
-      prompt   'Use a private colour map?'
-      helpkey  '*'
-   endparameter
-
-   parameter PERCENTILES
-      type     '_REAL'
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  5,95
-      prompt   'Percentiles for scaling'
-      helpkey  '*'
-   endparameter
-
-   parameter POLCOL
-      type     _CHAR
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  'RED'
-      prompt   'Colour in which to draw polygons'
-      helpkey  '*'
-   endparameter
-
-   parameter SELCOL
-      type     _CHAR
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  'RED'
-      prompt   'Colour with which to mark the selected area'
-      helpkey  '*'
-   endparameter
-
-   parameter STATUSAREA           
-      type     _LOGICAL
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  YES
-      prompt   'Display the status area?'
-      helpkey  '*'
-   endparameter
-
-   parameter STARTHELP
-      type     _LOGICAL
-      access   READ
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  YES
-      prompt   'Display hyper-text help automatically at start-up?'
-      helpkey  '*'
-   endparameter
-
-   parameter XHAIR
-      type     _LOGICAL
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  YES
-      prompt   'Use a cross-hair over the image display area?"
-      helpkey  '*'
-   endparameter
-
-   parameter XHAIRCOL
-      type     _CHAR
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  'YELLOW'
-      prompt   'Colour with which to draw the cross-hair (if required)'
-      helpkey  '*'
-   endparameter
-
-endinterface
-
 #+
 #  Name:
 #     POLKA.IFL
@@ -975,6 +802,16 @@ interface POLKA
       helpkey  '*'
    endparameter
 
+   parameter POL
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  YES
+      prompt   'Processing polarimetry data?'
+      helpkey  '*'
+   endparameter
+
    parameter PSFSIZE
       type     _INTEGER
       access   UPDATE
@@ -1087,8 +924,6 @@ interface POLKA
    endparameter
 
 endinterface
-
-#+
 #  Name:
 #     POLPLOT.IFL
 
@@ -1110,7 +945,7 @@ interface POLPLOT
 
    helplib        'POLPACK_HELP:'
 
-   parameter      ANGROT         # Angle to add on to vector orientations
+   parameter      ANGROT         
       type        '_REAL'
       prompt      'Angle by which to rotate the vectors (in degrees)'
       vpath       'DEFAULT'
@@ -1119,7 +954,7 @@ interface POLPLOT
       default     0.0
    endparameter
 
-   parameter      ARROW         # Size of arrow head.
+   parameter      ARROW         
       type        '_REAL'
       prompt      'Fractional size of arrow heads'
       vpath       'DEFAULT'
@@ -1128,10 +963,11 @@ interface POLPLOT
       default     0.0
    endparameter
 
-   parameter      AXES           # Axes or no axes?
+   parameter      AXES           
       type        '_LOGICAL'
       prompt      'Are annotated axes to be drawn?'
       vpath       'DEFAULT'
+      ppath       'DEFAULT'
       default     T
       helpkey     '*'
    endparameter
@@ -1144,9 +980,10 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      CLEAR          # Clear before plotting?
+   parameter      CLEAR          
       type        '_LOGICAL'
       vpath       'DEFAULT'
+      ppath       'DEFAULT'
       prompt      'Is the current picture to be cleared before plotting?'
       helpkey     '*'
       default     Y
@@ -1154,33 +991,41 @@ interface POLPLOT
 
    parameter      COLANG
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
       prompt      'Name of catalogue column holding vector angles'
+      default     'ANG'
       helpkey     '*'
    endparameter
 
    parameter      COLMAG
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      default     'P'
       prompt      'Name of catalogue column holding vector lengths'
       helpkey     '*'
    endparameter
 
    parameter      COLX
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      default     'X'
       prompt      'Name of catalogue column holding vector X position'
       helpkey     '*'
    endparameter
 
    parameter      COLY
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      default     'Y'
       prompt      'Name of catalogue column holding vector Y position'
       helpkey     '*'
    endparameter
 
-   parameter      COSYS          # Co-ordinate system
+   parameter      COSYS          
       type        'LITERAL'
       ppath       'DEFAULT'
       vpath       'DEFAULT'
@@ -1189,7 +1034,7 @@ interface POLPLOT
       default     !
    endparameter
 
-   parameter      DEVICE         # Graphics device
+   parameter      DEVICE         
       ptype       'DEVICE'
       vpath       'GLOBAL,PROMPT'
       ppath       'GLOBAL,CURRENT'
@@ -1198,15 +1043,16 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      FILL           # Fill the plotting region?
+   parameter      FILL           
       type        '_LOGICAL'
       prompt      'Fill the plotting area?'
       vpath       'DEFAULT'
+      ppath       'DEFAULT'
       default     N
       helpkey     '*'
    endparameter
 
-   parameter      JUST           # Vector justification
+   parameter      JUST           
       type        'LITERAL'
       vpath       'DEFAULT'
       ppath       'CURRENT,DEFAULT'
@@ -1216,7 +1062,7 @@ interface POLPLOT
 #     in          'CENTRE', 'START', 'END'
    endparameter
 
-   parameter      KEY            # Plot a key?
+   parameter      KEY            
       type        '_LOGICAL'
       prompt      'Do you want a key showing the vector scale?'
       vpath       'DEFAULT'
@@ -1225,16 +1071,16 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      KEYPOS         # Horizontal and vertical position of key
+   parameter      KEYPOS         
       type        '_REAL'
       prompt      'Horizontal and vertical position of key'
       vpath       'DEFAULT'
       ppath       'DEFAULT'
       helpkey     '*'
-      default     0.15
+      default     0.03
    endparameter
 
-   parameter      KEYSTYLE       # Style for key
+   parameter      KEYSTYLE       
       type        'LITERAL'
       ppath       'DEFAULT'
       vpath       'DEFAULT'
@@ -1243,7 +1089,7 @@ interface POLPLOT
       default     !
    endparameter
 
-   parameter      KEYVEC         # Key vector magnitude
+   parameter      KEYVEC         
       type        '_REAL'
       prompt      'Key vector magnitude'
       vpath       'DYNAMIC'
@@ -1251,7 +1097,24 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      PXSIZE         # X size of plot
+   parameter      LBND
+      type        '_REAL'
+      prompt      'Co-ordinates at lower left corner of plotting area'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      NEGATE
+      type        '_LOGICAL'
+      prompt      'Are the supplied angles to be negated?'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     F
+      helpkey     '*'
+   endparameter
+
+   parameter      PXSIZE         
       type        '_REAL'
       prompt      'Size of the plot in the x-direction in metres'
       vpath       'DYNAMIC'
@@ -1259,7 +1122,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      PYSIZE         # Y size of plot
+   parameter      PYSIZE         
       type        '_REAL'
       prompt      'Size of the plot in the y-direction in metres'
       vpath       'DYNAMIC'
@@ -1267,7 +1130,7 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      STYLE          # Plotting style
+   parameter      STYLE          
       type        'LITERAL'
       ppath       'DEFAULT'
       vpath       'DEFAULT'
@@ -1276,7 +1139,15 @@ interface POLPLOT
       default     !
    endparameter
 
-   parameter      VSCALE         # Vector scale, centimetres per data unit
+   parameter      UBND
+      type        '_REAL'
+      prompt      'Co-ordinates at upper right corner of plotting area'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      VSCALE         
       type        '_REAL'
       prompt      'Data value for a 1-centimetre vector'
       ppath       'DYNAMIC'
@@ -1285,7 +1156,145 @@ interface POLPLOT
    endparameter
 
 endinterface
+#+
+#  Name:
+#     POLVEC.IFL
 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JAN-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLVEC
+
+   helplib 'POLPACK_HELP:'
+
+   parameter      BOX            # Bin size
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     1
+      prompt      'Bin size'
+      helpkey     '*'
+   endparameter
+
+   parameter      CAT
+      position    2
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Output catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      DEBIAS         # Remove statistical bias?
+      type        _LOGICAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
+      prompt      'Remove statistical bias?'
+      helpkey     '*'
+   endparameter
+
+   parameter      I              # Total intensity
+      position    3
+      type        NDF
+      access      WRITE
+      vpath       default
+      ppath       default
+      default     !
+      prompt      'Total intensity '
+      helpkey     '*'
+   endparameter
+
+   parameter      IN
+      position    1
+      type        NDF
+      access      READ
+      ppath       'GLOBAL'
+      association <-GLOBAL.DATA_ARRAY
+      prompt      'Input Stokes cube'
+      helpkey     '*'
+   endparameter
+
+   parameter      IP             # Polarised intensity 
+      position    6
+      type        NDF
+      access      WRITE
+      vpath       default
+      ppath       default
+      default     !
+      prompt      'Polarised intensity'
+      helpkey     '*'
+   endparameter
+
+   parameter      METHOD         # Combination mode
+      type        'LITERAL'
+      vpath       'PROMPT,CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT '
+      default     'MEDIAN'
+      prompt      'Binning method'
+      helpkey     '*'
+   endparameter
+
+   parameter      P              # Percentage polarisation
+      position    4
+      type        NDF
+      access      WRITE
+      vpath       default
+      ppath       default
+      default     !
+      prompt      'Percentage polarisation'
+      helpkey     '*'
+   endparameter
+
+   parameter      SIGMAS         # Number of sigmas for clipping SIGMA
+      type        _REAL
+      vpath       'PROMPT,CURRENT,DEFAULT '
+      ppath       'CURRENT,DEFAULT '
+      default     4.0
+      prompt      'Clipping limit (standard deviations)'
+      helpkey     '*'
+   endparameter
+
+   parameter      ANG            # Polarisation angle
+      position    5
+      type        NDF
+      access      WRITE
+      vpath       default
+      ppath       default
+      default     !
+      prompt      'Polarisation angle'
+      helpkey     '*'
+   endparameter
+
+   parameter      VARIANCE       # Variances required?
+      type        _LOGICAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     YES
+      prompt      'Are variance values to be generated?'
+      helpkey     '*'
+   endparameter
+
+   parameter      WLIM           # Weight limit for good output pixels
+      type        '_REAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     0.0
+      prompt      'Min. fraction of good input values per bin'
+      helpkey     '*'
+   endparameter
+
+endinterface
 #+
 #  Name:
 #     SEGMENT.IFL
@@ -1305,6 +1314,8 @@ endinterface
 #-
 
 interface SEGMENT
+
+   helplib        'KAPPA_HELP:'
 
    parameter AXES
       type        '_INTEGER'
@@ -1585,145 +1596,4 @@ interface SEGMENT
    endparameter
 
 endinterface
-
-#+
-#  Name:
-#     POLVEC.IFL
-
-#  Type of Module:
-#     ADAM A-task parameter interface.
-
-#  Authors:
-#     DSB: David Berry (STARLINK)
-#     {enter_new_authors_here}
-
-#  History:
-#     15-JAN-1998 (DSB):
-#     	 Original version.
-#     {enter_further_changes_here}
-
-#-
-
-interface POLVEC
-
-   helplib 'POLPACK_HELP:'
-
-   parameter      BOX            # Bin size
-      type        '_INTEGER'
-      vpath       'PROMPT'
-      ppath       'DEFAULT'
-      default     !
-      prompt      'Bin size'
-      helpkey     '*'
-   endparameter
-
-   parameter      CAT
-      position    2
-      type        LITERAL
-      ppath       'CURRENT'
-      prompt      'Output catalogue'
-      helpkey     '*'
-   endparameter
-
-   parameter      DEBIAS         # Remove statistical bias?
-      type        _LOGICAL
-      vpath       'DEFAULT'
-      ppath       'DEFAULT'
-      default     !
-      prompt      'Remove statistical bias?'
-      helpkey     '*'
-   endparameter
-
-   parameter      I              # Total intensity
-      position    3
-      type        NDF
-      access      WRITE
-      vpath       default
-      ppath       default
-      default     !
-      prompt      'Total intensity '
-      helpkey     '*'
-   endparameter
-
-   parameter      IN
-      position    1
-      type        NDF
-      access      READ
-      ppath       'GLOBAL'
-      association <-GLOBAL.DATA_ARRAY
-      prompt      'Input Stokes cube'
-      helpkey     '*'
-   endparameter
-
-   parameter      IP             # Polarised intensity 
-      position    6
-      type        NDF
-      access      WRITE
-      vpath       default
-      ppath       default
-      default     !
-      prompt      'Polarised intensity'
-      helpkey     '*'
-   endparameter
-
-   parameter      METHOD         # Combination mode
-      type        'LITERAL'
-      vpath       'PROMPT,CURRENT,DEFAULT'
-      ppath       'CURRENT,DEFAULT '
-      default     'MEDIAN'
-      prompt      'Binning method'
-      helpkey     '*'
-   endparameter
-
-   parameter      P              # Percentage polarisation
-      position    4
-      type        NDF
-      access      WRITE
-      vpath       default
-      ppath       default
-      default     !
-      prompt      'Percentage polarisation'
-      helpkey     '*'
-   endparameter
-
-   parameter      SIGMAS         # Number of sigmas for clipping SIGMA
-      type        _REAL
-      vpath       'PROMPT,CURRENT,DEFAULT '
-      ppath       'CURRENT,DEFAULT '
-      default     4.0
-      prompt      'Clipping limit (standard deviations)'
-      helpkey     '*'
-   endparameter
-
-   parameter      ANG            # Polarisation angle
-      position    5
-      type        NDF
-      access      WRITE
-      vpath       default
-      ppath       default
-      default     !
-      prompt      'Polarisation angle'
-      helpkey     '*'
-   endparameter
-
-   parameter      VARIANCE       # Variances required?
-      type        _LOGICAL
-      vpath       'DEFAULT'
-      ppath       'DEFAULT'
-      default     YES
-      prompt      'Are variance values to be generated?'
-      helpkey     '*'
-   endparameter
-
-   parameter      WLIM           # Weight limit for good output pixels
-      type        '_REAL'
-      vpath       'DEFAULT'
-      ppath       'DEFAULT'
-      default     0.0
-      prompt      'Min. fraction of good input values per bin'
-      helpkey     '*'
-   endparameter
-
-endinterface
-
 endmonolith

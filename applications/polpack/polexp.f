@@ -63,6 +63,9 @@
 *        "names.lis". The information stored in the POLPACK extension of
 *        each is exported to the FITS extension.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}

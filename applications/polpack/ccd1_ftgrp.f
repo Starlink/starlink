@@ -75,6 +75,9 @@
 *     - The input groups should have their case sensitivity switched
 *     off.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}

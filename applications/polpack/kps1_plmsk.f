@@ -53,6 +53,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     CUR: Malcolm Currie (STARLINK)

@@ -110,6 +110,9 @@
 
 *  [optional_subroutine_items]...
 *
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -134,6 +137,8 @@
 *        Removed 10 character restriction on image identifiers. Swapped 
 *        order of arguments ID and IMGID to use of mapped dyanmic memory
 *        for ID.
+*     24-JUN-1998 (DSB):
+*        Continue processing if the image inter-comparisons fail to converge.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -330,6 +335,7 @@
 * information is not used here.
 
          DO IPAIR = 1, NPAIR
+            NITER = 0
             CALL CCD1_CMPRR( BAD, .FALSE., NEL, %VAL( IPMED ), 
      :                       %VAL( IPMED ), TI1( 1, IPAIR ),
      :                       TI1( 1, IPAIR ),
@@ -338,6 +344,18 @@
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
      :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
      :                       %VAL( IPWRK4 ), STATUS )
+
+*  If the iteration limit was reached before convergence was achieved, an
+*  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
+*  resulting approximate solution will probably be OK, so just flush the
+*  error and carry on.
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+               CALL ERR_REP( ' ', 'Continuing anyway... The E factors'//
+     :                       ' may only be approximate!', STATUS )
+               CALL ERR_FLUSH( STATUS )
+            END IF
+
+*  Store the values returned by CCD1_CMPRR.
             E = SNGL( SCALE )
             VE( IPAIR ) = SNGL( DSCALE ) ** 2
             ZEST( IPAIR ) = SNGL( ZERO )

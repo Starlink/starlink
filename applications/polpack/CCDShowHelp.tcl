@@ -21,6 +21,9 @@
 #     url = string (read)
 #        The URL of the help page to be displayed.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 #  Authors:
 #     DLT: D L Terrett (Starlink, RAL)
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -41,9 +44,6 @@
 #        Supplied argument changed from a file name to a URL (and the 
 #        netscape remote openFILE command changed to openURL).
 #     {enter_further_changes_here}
-
-#  Copyright:
-#     Copyright (C) 1993 Science & Engineering Research Council
 
 #-
 

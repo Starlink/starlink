@@ -248,6 +248,9 @@
 *        arrow, starting at the position of the corresponding pixel.  No key
 *        to the vector scale and justification is produced.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}

@@ -5,6 +5,9 @@
 #  Purpose:
 #     Defines Tcl procedures needed by POLKA.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #
@@ -4537,11 +4540,11 @@ proc Effects {im effect nodisp} {
 # Run KAPPA:STATS and display the output if succesful.
             if { [Obey kappa stats "ndf=${image}${section}"] } {
                set mess "\nPixel statistics within section $section:\n"
-               append mess "Total data sum     \t\t:  [format "%.5g" [GetParamED kappa stats:total]]\n"
-               append mess "Mean value         \t\t:  [format "%.5g" [GetParamED kappa stats:mean]]\n"
-               append mess "Standard deviation \t:  [format "%.5g" [GetParamED kappa stats:sigma]]\n"
-               append mess "Maximum value      \t:  [format "%.5g" [GetParamED kappa stats:maximum]]\n"
-               append mess "Minimum value      \t:  [format "%.5g" [GetParamED kappa stats:minimum]]\n"
+               append mess "Total data sum     \t\t:  [format "%.13g" [GetParamED kappa stats:total]]\n"
+               append mess "Mean value         \t\t:  [format "%.13g" [GetParamED kappa stats:mean]]\n"
+               append mess "Standard deviation \t:  [format "%.13g" [GetParamED kappa stats:sigma]]\n"
+               append mess "Maximum value      \t:  [format "%.13g" [GetParamED kappa stats:maximum]]\n"
+               append mess "Minimum value      \t:  [format "%.13g" [GetParamED kappa stats:minimum]]\n"
                append mess "No. of good pixels \t\t:  [GetParamED kappa stats:numgood]\n"
                append mess "Total no. of pixels\t\t:  [GetParamED kappa stats:numpix]\n"
                Message $mess
@@ -8954,23 +8957,21 @@ proc Obey {task action params args} {
       }
    }
 
-# Set the return status. If any error messages were generated, assume the
-# action failed.
-   if { $ADAM_ERRORS != "" } {
+# Set the return status. If the final status does not contain the string
+# DTASK__ACTCOMPLET, assume the action failed.
+   if { ![regexp {DTASK__ACTCOMPLET} $STATUS] } {
       set ok 0
    } {
       set ok 1
    }
 
 # Display any error messages.
-   if { !$ok } {
-      if { $report } {
-         Message "$task action \"$action\" failed.\n$ADAM_ERRORS"
-      }
+   if { $report && $ADAM_ERRORS != "" } {
+      Message "$task action \"$action\" reported:\n$ADAM_ERRORS"
+   }
 
 # If failure is fatal, shut down.
-      if { $abort } {exit 1}
-   }
+   if { !$ok && $abort } {exit 1}
 
 # Indicate that we are no longer executing an ADAM action.
    set ACTION ""

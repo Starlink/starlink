@@ -20,17 +20,25 @@
 *        The global status.
 
 *  Description:
-*     This application calculates values of percentage polarization, polarization 
-*     angle, total intensity and polarized intensity, based on Stokes 
-*     parameters in the supplied input cube (which will normally have been 
-*     created by POLKA or POLCAL). These calculated values may be stored either in
-*     a series of 2D NDFs, or in a single catalogue which may be
-*     examined and manipulated using the CURSA package (see SUN/190).
+*     This application calculates values of percentage polarization, 
+*     polarization angle, total intensity and polarized intensity, based 
+*     on Stokes parameters in the supplied input cube (which will 
+*     normally have been created by POLKA or POLCAL). These calculated 
+*     values may be stored either in a series of 2D NDFs, or in a single 
+*     catalogue which may be examined and manipulated using the CURSA 
+*     package (see SUN/190).
 
 *  Usage:
-*     polvec in cat [p] [ang] [i] [ip]
+*     polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
 
 *  ADAM Parameters:
+*     ANG = NDF (Write)
+*        An output NDF holding the polarization angle (anti-clockwise from 
+*        the pixel X axis to the plane of polarization - in degrees). In the
+*        the case of circular polarization, a value of zero is stored 
+*        if the normalised Stokes parameter V is positive, and a value
+*        of 90 is stored otherwise. A null value can be supplied if this 
+*        output image is not required. [!]
 *     BOX( 2 ) = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the bins to be used when
 *        binning the supplied Stokes parameters prior to estimating the
@@ -112,16 +120,18 @@
 *     P = NDF (Write)
 *        An output NDF holding percentage polarization. A null value can be
 *        supplied if this output image is not required. [!]
+*     Q = NDF (Write)
+*        An output NDF holding the Q Stokes parameter. A null value can be
+*        supplied if this output image is not required. [!]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
-*     ANG = NDF (Write)
-*        An output NDF holding the polarization angle (anti-clockwise from 
-*        the pixel X axis to the plane of polarization - in degrees). In the
-*        the case of circular polarization, a value of zero is stored 
-*        if the normalised Stokes parameter V is positive, and a value
-*        of 90 is stored otherwise. A null value can be supplied if this 
-*        output image is not required. [!]
+*     U = NDF (Write)
+*        An output NDF holding the U Stokes parameter. A null value can be
+*        supplied if this output image is not required. [!]
+*     V = NDF (Write)
+*        An output NDF holding the V Stokes parameter. A null value can be
+*        supplied if this output image is not required. [!]
 *     VARIANCE = _LOGICAL (Read)
 *        TRUE if output variances are to be calculated.  This parameter
 *        is only accessed if the supplied Stokes cube contains variances, 
@@ -146,6 +156,9 @@
 *     -  The output NDFs are deleted if there is an error during the
 *     formation of the polarization parameters.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -153,6 +166,8 @@
 *  History:
 *     13-JAN-1998 (DSB):
 *        Original version.
+*     24-JUN-1998 (DSB):
+*        Added parameter Q, U and V.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,6 +191,7 @@
       CHARACTER METH*6           ! Binning method
       CHARACTER STOKES*(NDF__MXDIM) ! Identifiers for each plane of input
       CHARACTER UNITS*40         ! Units from input Stokes cube
+      DOUBLE PRECISION TR( 4 )   ! Coeffs. of linear mapping produced by binning
       INTEGER BOX( 2 )           ! Bin size
       INTEGER CI                 ! CAT identifier for output catalogue
       INTEGER DIM( 3 )           ! Dimensions of input Stokes cube
@@ -185,7 +201,10 @@
       INTEGER INDFI              ! Identifier for total intensity output
       INTEGER INDFIP             ! Identifier for polarised int. output
       INTEGER INDFP              ! Identifier for % polarisation output
+      INTEGER INDFQ              ! Identifier for Q output
       INTEGER INDFT              ! Identifier for angle output
+      INTEGER INDFU              ! Identifier for U output
+      INTEGER INDFV              ! Identifier for V output
       INTEGER IPDBIN             ! Pointers to binned input DATA arrays
       INTEGER IPDIN              ! Pointers to input DATA arrays
       INTEGER IPI                ! Pointer to total intensity output
@@ -204,13 +223,13 @@
       INTEGER IPTV               ! Pointer to angle variance
       INTEGER IPU                ! Pointer to U output
       INTEGER IPUV               ! Pointer to U variance
+      INTEGER IPV                ! Pointer to V output
       INTEGER IPVBIN             ! Pointers to binned input VARIANCE arrays
       INTEGER IPVIN              ! Pointers to input VARIANCE arrays
+      INTEGER IPVV               ! Pointer to V variance
       INTEGER IWCS               ! AST FrameSet holding o/p NDFs WCS component
       INTEGER LBND( 3 )          ! Lower bounds of input NDF
       INTEGER MINPIX             ! Min. no. of good input pixels per bin
-      INTEGER NDFQ               ! Identifier for Q output
-      INTEGER NDFU               ! Identifier for U output
       INTEGER NDIM               ! No. of dimensions in input Stokes cube
       INTEGER NVAL               ! No. of values obtained
       INTEGER NXBIN              ! No. of bins along X axis
@@ -223,13 +242,15 @@
       LOGICAL MAKEI              ! Total intensity output required?
       LOGICAL MAKEIP             ! Polarised int. output required?
       LOGICAL MAKEP              ! % polarisation output required?
+      LOGICAL MAKEQ              ! Q output required?
       LOGICAL MAKET              ! Angle output required?
+      LOGICAL MAKEU              ! U output required?
+      LOGICAL MAKEV              ! V output required?
       LOGICAL VAR                ! Output variances required?
       REAL ANGROT                ! ACW angle from X axis to analyser axis (degs)
       REAL NSIGMA                ! No. of sigmas to clip at
       REAL TR2( 4 )              ! Coeffs. of mapping from cell indices to coordinates
       REAL WLIM                  ! Min. fraction of good input pixels per bin
-      DOUBLE PRECISION TR( 4 )   ! Coeffs. of linear mapping produced by binning
 *.
 
 *  Check the inherited global status.
@@ -512,6 +533,102 @@
          MAKEIP = .FALSE.
       END IF
 
+*  Obtain the NDF for Q.
+*  =====================
+
+*  Attempt to get an output NDF to hold Q.
+      CALL NDF_CREAT( 'Q', '_REAL', 2, LBND, UBND, INDFQ, STATUS ) 
+
+*  If successful, set a flag indicating that a polarised-intensity NDF
+*  is to be produced.
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         MAKEQ = .TRUE.
+
+*  Set up the WCS information 
+         CALL NDF_PTWCS( IWCS, INDFQ, STATUS )
+
+*  Set the LABEL and TITLE in the output NDF to 'Q'.
+         CALL NDF_CPUT( 'Q', INDFQ, 'LABEL', STATUS )
+         CALL NDF_CPUT( 'Q', INDFQ, 'TITLE', STATUS )
+
+*  Map the DATA array and if necessary, the VARIANCE array.
+         CALL NDF_MAP( INDFQ, 'DATA', '_REAL', 'WRITE/BAD', IPQ, EL,
+     :                 STATUS )
+         IPQV = IPQ
+         IF ( VAR ) CALL NDF_MAP( INDFQ, 'VARIANCE', '_REAL', 
+     :                            'WRITE/BAD', IPQV, EL, STATUS )
+
+*  If no polarised-intensity NDF was obtained, annul the error and set a
+*  flag to indicate that no Q NDF need be produced.
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         MAKEQ = .FALSE.
+      END IF
+
+*  Obtain the NDF for U.
+*  =====================
+
+*  Attempt to get an output NDF to hold U.
+      CALL NDF_CREAT( 'U', '_REAL', 2, LBND, UBND, INDFU, STATUS ) 
+
+*  If successful, set a flag indicating that a polarised-intensity NDF
+*  is to be produced.
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         MAKEU = .TRUE.
+
+*  Set up the WCS information 
+         CALL NDF_PTWCS( IWCS, INDFU, STATUS )
+
+*  Set the LABEL and TITLE in the output NDF to 'U'.
+         CALL NDF_CPUT( 'U', INDFU, 'LABEL', STATUS )
+         CALL NDF_CPUT( 'U', INDFU, 'TITLE', STATUS )
+
+*  Map the DATA array and if necessary, the VARIANCE array.
+         CALL NDF_MAP( INDFU, 'DATA', '_REAL', 'WRITE/BAD', IPU, EL,
+     :                 STATUS )
+         IPUV = IPU
+         IF ( VAR ) CALL NDF_MAP( INDFU, 'VARIANCE', '_REAL', 
+     :                            'WRITE/BAD', IPUV, EL, STATUS )
+
+*  If no polarised-intensity NDF was obtained, annul the error and set a
+*  flag to indicate that no U NDF need be produced.
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         MAKEU = .FALSE.
+      END IF
+
+*  Obtain the NDF for V.
+*  =====================
+
+*  Attempt to get an output NDF to hold V.
+      CALL NDF_CREAT( 'V', '_REAL', 2, LBND, UBND, INDFV, STATUS ) 
+
+*  If successful, set a flag indicating that a polarised-intensity NDF
+*  is to be produced.
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         MAKEV = .TRUE.
+
+*  Set up the WCS information 
+         CALL NDF_PTWCS( IWCS, INDFV, STATUS )
+
+*  Set the LABEL and TITLE in the output NDF to 'V'.
+         CALL NDF_CPUT( 'V', INDFV, 'LABEL', STATUS )
+         CALL NDF_CPUT( 'V', INDFV, 'TITLE', STATUS )
+
+*  Map the DATA array and if necessary, the VARIANCE array.
+         CALL NDF_MAP( INDFV, 'DATA', '_REAL', 'WRITE/BAD', IPV, EL,
+     :                 STATUS )
+         IPVV = IPV
+         IF ( VAR ) CALL NDF_MAP( INDFV, 'VARIANCE', '_REAL',
+     :                            'WRITE/BAD', IPVV, EL, STATUS )
+
+*  If no polarised-intensity NDF was obtained, annul the error and set a
+*  flag to indicate that no V NDF need be produced.
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         MAKEV = .FALSE.
+      END IF
+
 *  Obtain the CAT catalogue to hold everything.
 *  ============================================
 
@@ -543,9 +660,9 @@
 
 *  Abort if no output images are required.
       IF ( .NOT. ( MAKEI .OR. MAKEIP .OR. MAKEP .OR. MAKET .OR. 
-     :             MAKECT ) ) THEN
+     :             MAKEQ .OR. MAKEU .OR. MAKEV .OR. MAKECT ) ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLVEC_ERR2', 'No output NDFs requested',
+         CALL ERR_REP( 'POLVEC_ERR2', 'No outputs requested',
      :                 STATUS )
          GO TO 999
       END IF         
@@ -588,12 +705,13 @@
 
 *  Call the routine to do the work.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, DIM( 3 ), %VAL( IPDBIN ), 
-     :                 %VAL( IPVBIN ), ANGROT, STOKES, DEBIAS, VAR, 
-     :                 MAKEI, 
-     :                 MAKEP, MAKET, MAKEIP, MAKECT, CI, %VAL( IPI ), 
-     :                 %VAL( IPP ), %VAL( IPT ), %VAL( IPIP ), 
-     :                 %VAL( IPIV ), %VAL( IPPV ), %VAL( IPTV ), 
-     :                 %VAL( IPIPV ), STATUS )
+     :                %VAL( IPVBIN ), ANGROT, STOKES, DEBIAS, VAR, 
+     :                MAKEI, MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
+     :                MAKECT, CI, %VAL( IPI ), %VAL( IPP ), %VAL( IPT ),
+     :                %VAL( IPIP ), %VAL( IPQ ), %VAL( IPU ), 
+     :                %VAL( IPV ), %VAL( IPIV ), %VAL( IPPV ), 
+     :                %VAL( IPTV ), %VAL( IPIPV ), %VAL( IPQV ), 
+     :                %VAL( IPUV ), %VAL( IPVV ), STATUS )
 
 *  Closedown.
 *  ==========
@@ -617,6 +735,9 @@
          IF ( MAKEP ) CALL NDF_DELET( INDFP, STATUS )
          IF ( MAKET ) CALL NDF_DELET( INDFT, STATUS )
          IF ( MAKEIP ) CALL NDF_DELET( INDFIP, STATUS )
+         IF ( MAKEQ ) CALL NDF_DELET( INDFQ, STATUS )
+         IF ( MAKEU ) CALL NDF_DELET( INDFU, STATUS )
+         IF ( MAKEV ) CALL NDF_DELET( INDFV, STATUS )
       END IF
 
 *  End the NDF context.

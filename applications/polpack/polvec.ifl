@@ -5,6 +5,9 @@
 #  Type of Module:
 #     ADAM A-task parameter interface.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 #  Authors:
 #     DSB: David Berry (STARLINK)
 #     {enter_new_authors_here}
@@ -12,6 +15,8 @@
 #  History:
 #     15-JAN-1998 (DSB):
 #     	 Original version.
+#     24-JUN-1998 (DSB):
+#        Added Q, U and V.
 #     {enter_further_changes_here}
 
 #-
@@ -20,7 +25,18 @@ interface POLVEC
 
    helplib 'POLPACK_HELP:'
 
-   parameter      BOX            # Bin size
+   parameter      ANG            
+      position    5
+      type        NDF
+      access      WRITE
+      vpath       default
+      ppath       default
+      default     !
+      prompt      'Polarisation angle'
+      helpkey     '*'
+   endparameter
+
+   parameter      BOX            
       type        '_INTEGER'
       vpath       'DEFAULT'
       ppath       'DEFAULT'
@@ -37,7 +53,7 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      DEBIAS         # Remove statistical bias?
+   parameter      DEBIAS         
       type        _LOGICAL
       vpath       'DEFAULT'
       ppath       'DEFAULT'
@@ -46,7 +62,7 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      I              # Total intensity
+   parameter      I              
       position    3
       type        NDF
       access      WRITE
@@ -67,7 +83,7 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      IP             # Polarised intensity 
+   parameter      IP             
       position    6
       type        NDF
       access      WRITE
@@ -78,7 +94,7 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      METHOD         # Combination mode
+   parameter      METHOD         
       type        'LITERAL'
       vpath       'PROMPT,CURRENT,DEFAULT'
       ppath       'CURRENT,DEFAULT '
@@ -87,7 +103,7 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      P              # Percentage polarisation
+   parameter      P              
       position    4
       type        NDF
       access      WRITE
@@ -98,7 +114,18 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      SIGMAS         # Number of sigmas for clipping SIGMA
+   parameter      Q
+      position    7
+      type        NDF
+      access      WRITE
+      vpath       default
+      ppath       default
+      default     !
+      prompt      'Stokes parameter Q'
+      helpkey     '*'
+   endparameter
+
+   parameter      SIGMAS         
       type        _REAL
       vpath       'PROMPT,CURRENT,DEFAULT '
       ppath       'CURRENT,DEFAULT '
@@ -107,18 +134,29 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      ANG            # Polarisation angle
-      position    5
+   parameter      U
+      position    8
       type        NDF
       access      WRITE
       vpath       default
       ppath       default
       default     !
-      prompt      'Polarisation angle'
+      prompt      'Stokes parameter U'
       helpkey     '*'
    endparameter
 
-   parameter      VARIANCE       # Variances required?
+   parameter      V
+      position    9
+      type        NDF
+      access      WRITE
+      vpath       default
+      ppath       default
+      default     !
+      prompt      'Stokes parameter V'
+      helpkey     '*'
+   endparameter
+
+   parameter      VARIANCE       
       type        _LOGICAL
       vpath       'DEFAULT'
       ppath       'DEFAULT'
@@ -127,7 +165,7 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      WLIM           # Weight limit for good output pixels
+   parameter      WLIM           
       type        '_REAL'
       vpath       'DEFAULT'
       ppath       'DEFAULT'

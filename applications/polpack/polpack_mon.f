@@ -28,6 +28,9 @@
 *     called after a successful matching of the input string with a valid task
 *     name.  If there is no match, an error report is made.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}

@@ -49,6 +49,9 @@
 *  Notes:
 *     - the routine should only be used at real or better precisions.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     RFWS: Rodney Warren-Smith (Durham University)
 *     PDRAPER: Peter Draper (STARLINK)

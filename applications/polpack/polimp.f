@@ -218,6 +218,9 @@
 *     angle of rotation is given by the ANGROT item in the POLPACK extension
 *     and defaults to zero if ANGROT is not specified in the control table.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}

@@ -37,6 +37,9 @@
 
 *  [optional_subroutine_items]...
 *
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     {enter_new_authors_here}

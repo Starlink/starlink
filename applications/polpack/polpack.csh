@@ -18,6 +18,9 @@
 #     HELP_DIR is likewise replaced by the path to the directory containing 
 #     help libraries.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 #  Authors:
 #     DSB: D.S. Berry (STARLINK)
 #     {enter_new_authors_here}

@@ -80,6 +80,9 @@
 *        along both the X and Y axes, and has a value based on the median 
 *        of the corresponding input Stokes values.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -702,8 +705,10 @@
 *  they are ignored. Use IPI as a safe pointer.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, NSTOKE, %VAL( IPBIN ), 
      :                 %VAL( IPVBIN ), ANGROT, STOKES, DEBIAS, VAR, 
-     :                 .FALSE., 
-     :                 .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
+     :                 .FALSE., .FALSE., .FALSE., .FALSE., .FALSE., 
+     :                 .FALSE., .FALSE., .TRUE., CIOUT, 
+     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
+     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), STATUS )

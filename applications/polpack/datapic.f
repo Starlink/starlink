@@ -60,6 +60,9 @@
 *     exactly spans the shorter of the two axes, and thus extends beyond
 *     1.0 in the direction of the other (longer) axis.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: D. Berry (STARLINK)
 *     {enter_new_authors_here}

@@ -191,6 +191,9 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     FR: R.W.Floyd and R.L Rivest (CACM)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)

@@ -51,6 +51,9 @@
 #     NDF_FORMATS_IN string will be returned (even if this second
 #     name is "only" picked up from pattern).
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 #  Authors:
 #     RFWS: Rodney Warren-Smith (Starlink)
 #     PDRAPER: P.W. Draper (STARLINK, Durham University)

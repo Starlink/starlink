@@ -16,6 +16,9 @@
 #     Starts up the POLPACK package and runs the POLHELP application.
 #     The NDF /star/sources/kappa/cw.sdf must exist.
 #
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#
 #  Authors:
 #     DSB: D.S. Berry (Starlink)
 #     {enter_new_authors_here}

@@ -339,6 +339,9 @@
 *       stored in the corresponding plane of the data array, and will be one 
 *       of I, Q, U or V. 
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}

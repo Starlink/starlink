@@ -85,6 +85,9 @@
 *
 *     - NMAT = NLINES * ( NLINES + 1 )/ 2 at least.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)

@@ -82,6 +82,9 @@
 *
 *     Ambiguous abbreviations result in all matches being displayed.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)

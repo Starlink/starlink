@@ -30,6 +30,9 @@
 *  Notes:
 *     The input line should have its leading blanks removed.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}

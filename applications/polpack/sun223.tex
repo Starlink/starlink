@@ -2154,8 +2154,10 @@ for NDF applications.
       \sstsubsection{
          PMODE = LITERAL (Read)
       }{
-         The mode of operation; CIRCULAR for measuring circular polarization,
-         or LINEAR for measuring linear polarization. [LINEAR]
+         The mode of operation; CIRCULAR for measuring circular polarization, 
+         or LINEAR for measuring linear polarization. In circular mode,
+         the only legal values for the WPLATE item in the POLPACK
+         extension are 0.0 and 45.0. [LINEAR]
       }
       \sstsubsection{
          SKYSUP = \_REAL (Read)
@@ -3443,16 +3445,24 @@ for NDF applications.
       This application calculates values of percentage polarization, polarization
       angle, total intensity and polarized intensity, based on Stokes
       parameters in the supplied input cube (which will normally have been
-      created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}). These 
-      calculated values may be stored either in
+      created by POLKA or POLCAL). These calculated values may be stored either in
       a series of 2D NDFs, or in a single catalogue which may be
-      examined and manipulated using the \xref{CURSA}{sun190}{} package
-      {\latexonly (see SUN/190)}.
+      examined and manipulated using the CURSA package (see SUN/190).
    }
    \sstusage{
-      polvec in cat [p] [ang] [i] [ip]
+      polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
    }
    \sstparameters{
+      \sstsubsection{
+         ANG = NDF (Write)
+      }{
+         An output NDF holding the polarization angle (anti-clockwise from
+         the pixel X axis to the plane of polarization - in degrees). In the
+         the case of circular polarization, a value of zero is stored
+         if the normalised Stokes parameter V is positive, and a value
+         of 90 is stored otherwise. A null value can be supplied if this
+         output image is not required. [!]
+      }
       \sstsubsection{
          BOX( 2 ) = \_INTEGER (Read)
       }{
@@ -3466,8 +3476,8 @@ for NDF applications.
          performed).
 
          Note, if the output vectors are being stored in a catalogue, it
-         is usually better to use the \htmlref{POLBIN}{POLBIN} application 
-         to bin the Stokes vectors. [1]
+         is usually better to use the POLBIN application to bin the Stokes
+         vectors. [1]
       }
       \sstsubsection{
          CAT = LITERAL (Read)
@@ -3521,13 +3531,13 @@ for NDF applications.
          binning the Stokes vectors in this application (see parameter BOX).
          Information describing the mappings between pixel coordinates and
          any other known coordinate Frames will be stored in the catalogue
-         in textual form, as an AST FrameSet (see \xref{SUN/210}{sun210}{}).
+         in textual form, as an AST FrameSet (see SUN/210).
 
-         The storage format of the catalogue is determined by the \texttt{"}file
-         type\texttt{"} specified with the file name. If no file type is supplied,
+         The storage format of the catalogue is determined by the {\tt "}file
+         type{\tt "} specified with the file name. If no file type is supplied,
          the catalogue will be stored in the form of a FITS binary table
-         with file extension \texttt{"}.FIT\texttt{"}. Other possibilities are described in
-         \xref{SUN/190}{sun190}{}.
+         with file extension {\tt "}.FIT{\tt "}. Other possibilities are described in
+         SUN/190.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
@@ -3551,13 +3561,14 @@ for NDF applications.
          IN = NDF (Read)
       }{
          The 3D cube holding the Stokes parameters. This should have been
-         created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}.
+         created by POLKA or POLCAL.
       }
       \sstsubsection{
          IP = NDF (Write)
       }{
-         An output NDF holding the polarized intensity. A null value can be
-         supplied if this output image is not required. [!]
+         An output NDF holding the polarized intensity. This will have
+         the same sign as the total intensity. A null value can be supplied
+         if this output image is not required. [!]
       }
       \sstsubsection{
          METHOD = LITERAL (Read)
@@ -3581,24 +3592,33 @@ for NDF applications.
       \sstsubsection{
          P = NDF (Write)
       }{
-         An output NDF holding percentage polarization. A null value can be
+         An output NDF holding percentage polarization. These will always
+         be positive or zero. A null value can be supplied if this output
+         image is not required. [!]
+      }
+      \sstsubsection{
+         Q = NDF (Write)
+      }{
+         An output NDF holding the Q Stokes parameter. A null value can be
          supplied if this output image is not required. [!]
       }
       \sstsubsection{
          SIGMAS = \_REAL (Read)
       }{
          Number of standard deviations to reject data at. Only used if
-         METHOD is set to \texttt{"}SIGMA\texttt{"}. [4.0]
+         METHOD is set to {\tt "}SIGMA{\tt "}. [4.0]
       }
       \sstsubsection{
-         ANG = NDF (Write)
+         U = NDF (Write)
       }{
-         An output NDF holding the polarization angle (anti-clockwise from
-         the pixel X axis to the plane of polarization - in degrees). In the
-         the case of circular polarization, a value of zero is stored
-         if the normalised Stokes parameter V is positive, and a value
-         of 90 is stored otherwise. A null value can be supplied if this
-         output image is not required. [!]
+         An output NDF holding the U Stokes parameter. A null value can be
+         supplied if this output image is not required. [!]
+      }
+      \sstsubsection{
+         V = NDF (Write)
+      }{
+         An output NDF holding the V Stokes parameter. A null value can be
+         supplied if this output image is not required. [!]
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
@@ -3635,7 +3655,6 @@ for NDF applications.
       }
    }
 }
-
 \newpage
 \section{\label{APP:POL}\xlabel{calculatingthepolarization}Calculating the Polarization}
 This section gives a mathematical description of the calculation of the

@@ -96,7 +96,9 @@
 *        value of parameter PMODE.
 *     PMODE = LITERAL (Read)
 *        The mode of operation; CIRCULAR for measuring circular polarization, 
-*        or LINEAR for measuring linear polarization. [LINEAR]
+*        or LINEAR for measuring linear polarization. In circular mode, the
+*        only legal values for the POLPACK extension item "WPLATE" are 0.0
+*        and 45.0. [LINEAR]
 *     SKYSUP = _REAL (Read)
 *        A positive "sky noise suppression factor" used to control the
 *        effects of sky noise when pairs of input images are
@@ -155,6 +157,9 @@
 *     the cube. For linear polarimetry, it is set to "IQU", and for
 *     circular polarimetry it is set to "IV".
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -371,7 +376,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
          CALL NDF_XGT0C( NDFIN( I ), 'POLPACK', 'RAY', RAY( IVAL ),
      :                   STATUS )
          CALL NDF_XGT0R( NDFIN( I ), 'POLPACK', 'ANGROT', 
-     :                   ANGROT( I ), STATUS )
+     :                   ANGROT( IVAL ), STATUS )
 
 *  If the descriptors were obtained, check them for validity. The
 *  WPLATE descriptor is checked against a constant array containing

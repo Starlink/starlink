@@ -86,6 +86,9 @@
 
 *  [optional_subroutine_items]...
 *
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -102,6 +105,8 @@
 *        Dimension IPDIN, IPVIN and IMGID correctly.
 *     4-JUN-1998 (DSB):
 *        Removed 10 character restrictions on image identifiers.
+*     24-JUN-1998 (DSB):
+*        Continue processing if the image inter-comparisons fail to converge.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -230,7 +235,7 @@
          
 * Calculate the ratio of the first pair of like `Q' polarisation states,
 * I4/I1.
-
+            NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 1, ISET ) ),
      :                       %VAL( IPVIN( 1, ISET ) ),
@@ -241,12 +246,24 @@
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
      :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
      :                       %VAL( IPWRK4 ), STATUS )
+
+*  If the iteration limit was reached before convergence was achieved, an
+*  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
+*  resulting approximate solution will probably be OK, so just flush the
+*  error and carry on.
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
+     :                       ' may only be approximate!', STATUS )
+               CALL ERR_FLUSH( STATUS )
+            END IF
+
+*  Store the values returned by CCD1_CMPRR.
             F1 = SNGL( SCALE )
             DF1 = SNGL( DSCALE )
 
 * Calculate the ratio of the second pair of like `Q' polarisation
 * states, I2/I3.
-
+            NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 3, ISET ) ),
      :                       %VAL( IPVIN( 3, ISET ) ),
@@ -257,6 +274,13 @@
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
      :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
      :                       %VAL( IPWRK4 ), STATUS )
+
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
+     :                       ' may only be approximate!', STATUS )
+               CALL ERR_FLUSH( STATUS )
+            END IF
+
             F2 = SNGL( SCALE )
             DF2 = SNGL( DSCALE )
 
@@ -311,7 +335,7 @@
 
 * Calculate the ratio of the first pair of like `U' polarisation states,
 * I8/I5.
-
+            NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 5, ISET ) ),
      :                       %VAL( IPVIN( 5, ISET ) ),
@@ -322,13 +346,20 @@
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
      :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
      :                       %VAL( IPWRK4 ), STATUS )
+
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
+     :                       ' may only be approximate!', STATUS )
+               CALL ERR_FLUSH( STATUS )
+            END IF
+
             F1 = SNGL( SCALE )
             DF1 = SNGL( DSCALE )
       
 * Calculate the ratio of the second pair of like `U' polarisation
 * states, I6/I7.
 
-
+            NITER = 0
             CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 7, ISET ) ),
      :                       %VAL( IPVIN( 7, ISET ) ),
@@ -339,6 +370,13 @@
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
      :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
      :                       %VAL( IPWRK4 ), STATUS )
+
+            IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
+               CALL ERR_REP( ' ', 'Continuing anyway... The F factors'//
+     :                       ' may only be approximate!', STATUS )
+               CALL ERR_FLUSH( STATUS )
+            END IF
+
             F2 = SNGL( SCALE )
             DF2 = SNGL( DSCALE )
 

@@ -59,6 +59,9 @@
 *        in the message, this will need to be performed by the calling
 *        application.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     RFWS: Rodney Warren-Smith (Durham Polarimetry Group)
 *     PDRAPER: Peter Draper (STARLINK)

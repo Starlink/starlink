@@ -123,9 +123,8 @@
 *        case if (GETS.AND.(GETZ.OR.VAR)) is .TRUE.). The routine will
 *        return once MAXIT iterations have been performed unless
 *        convergence is achieved earlier. An error will be reported if
-*        convergence has not been achieved after MAXIT iterations (see
-*        the Notes section).  A MAXIT value of at least 1 is always
-*        used.
+*        convergence has not been achieved after MAXIT iterations 
+*        A MAXIT value of at least 1 is always used.
 *     SKYSUP = REAL (Given)
 *        Sky noise suppression factor. When a relative scale factor is
 *        being calculated, it can often be biased by the large number
@@ -241,6 +240,9 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     DSB: David S. Berry (STARLINK)

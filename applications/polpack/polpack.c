@@ -4,7 +4,10 @@
 *
 *  Purpose:
 *     Contains all the C functions defined within POLPACK.
-*
+
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 

@@ -76,6 +76,9 @@
 
 *  [optional_subroutine_items]...
 *
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
 *     DSB: David S. Berry (STARLINK)

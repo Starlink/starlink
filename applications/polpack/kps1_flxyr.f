@@ -38,6 +38,9 @@
 *     -  The number of points read from the file is reported at the
 *     normal reporting level.
  
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
  

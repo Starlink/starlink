@@ -74,6 +74,9 @@
 *     - Bad pixels can be handled. The NDF is accessed as an array of
 *     single precision values. 
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}

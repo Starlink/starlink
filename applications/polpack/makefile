@@ -671,7 +671,7 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) grf_kappa.o
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) \
+            -L$(KAPPA_SOURCE) $(ADDLIBS) \
             `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 
@@ -1663,6 +1663,7 @@ polka.o:	PRM_PAR
 polka.o:	SAE_PAR     
 polpack_mon.o:	SAE_PAR PAR_PAR
 polvec.o:	NDF_PAR
+polvec.o:	PRM_PAR
 polvec.o:	PAR_ERR
 polvec.o:	SAE_PAR
 pthlpo.o:	HLPCMD      

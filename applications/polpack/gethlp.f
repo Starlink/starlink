@@ -20,6 +20,9 @@
 *     Prints help text from an help library. A specific keyword/topic
 *     can be specified.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)

@@ -39,6 +39,9 @@
 #        Aligns the two input images "a" and "b", and stores them in 
 #        images "a_R" and "b_R" (single-beam mode). Calculate 
 #
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
 #

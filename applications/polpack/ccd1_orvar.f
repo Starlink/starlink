@@ -48,6 +48,9 @@
 *
 *     - It is assumed that NSET cannot be any larger than CCD1__MXNDF.    
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}

@@ -28,6 +28,9 @@
 *     CCD1_HVCON = LOGICAL
 *        Set true if a continuation character has been located.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}

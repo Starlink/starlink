@@ -39,6 +39,9 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)

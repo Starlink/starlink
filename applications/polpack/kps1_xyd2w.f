@@ -43,6 +43,9 @@
 *        where PIXEL is a pixel co-ordinate for the I'th dimension, and
 *        DATA is the corresponding axis co-ordinate.
   
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}

@@ -54,6 +54,9 @@
 *     -  The GRP groups GROUPS( * ) and LINGRP, should be deleted
 *     before the calling application exits.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}

@@ -1,7 +1,8 @@
       SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
      :                       ANGROT, STKID, DEBIAS, VAR, MAKEI, MAKEP, 
-     :                       MAKET, MAKEIP, MAKECT, CI, AI, AP, AT, AIP, 
-     :                       AIV, APV, ATV, AIPV, STATUS )
+     :                       MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
+     :                       CI, AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, 
+     :                       ATV, AIPV, AQV, AUV, AVV, STATUS )
 *+
 *  Name:
 *     POL1_PLVEC
@@ -13,9 +14,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, ANG, STOKE, VSTOKE, ANGROT, 
-*                     STKID, DEBIAS, VAR, MAKEI, MAKEP, MAKET, MAKEIP, MAKECT, 
-*                     CI, AI, AP, AT, AIP, AIV, APV, ATV, AIPV, STATUS )
+*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
+*                      ANGROT, STKID, DEBIAS, VAR, MAKEI, MAKEP, 
+*                      MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
+*                      CI, AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, 
+*                      ATV, AIPV, AQV, AUV, AVV, STATUS )
 
 *  Description:
 *     This routine calculates the polarisation parameters and (if
@@ -60,6 +63,15 @@
 *        It is .TRUE. if a polarisation angle output array is required.
 *     MAKEIP = LOGICAL (Given)
 *        It is .TRUE. if a polarised intensity output array is required.
+*     MAKEQ = LOGICAL (Given)
+*        It is .TRUE. if a Q output array is required. Ignored in
+*        circular mode.
+*     MAKEU = LOGICAL (Given)
+*        It is .TRUE. if a U output array is required. Ignored in
+*        circular mode.
+*     MAKEV = LOGICAL (Given)
+*        It is .TRUE. if a V output array is required. Ignored in
+*        linear mode.
 *     MAKECT = LOGICAL (Given)
 *        It is .TRUE. if a catalogue containing everything is required.
 *     CI = INTEGER (Given)
@@ -73,6 +85,12 @@
 *        plane of polarization - in degrees)
 *     AIP( NPIX, NROW ) = REAL (Returned)
 *        An array holding polarised intensity values.
+*     AQ( NPIX, NROW ) = REAL (Returned)
+*        An array holding Q values.
+*     AU( NPIX, NROW ) = REAL (Returned)
+*        An array holding Q values.
+*     AV( NPIX, NROW ) = REAL (Returned)
+*        An array holding Q values.
 *     AIV( NPIX, NROW ) = REAL (Returned)
 *        An array holding the variance of AI.
 *     APV( NPIX, NROW ) = REAL (Returned)
@@ -81,9 +99,18 @@
 *        An array holding the variance of AT.
 *     AIPV( NPIX, NROW ) = REAL (Returned)
 *        An array holding the variance of AIP.
+*     AQV( NPIX, NROW ) = REAL (Returned)
+*        An array holding the variance of AQ.
+*     AUV( NPIX, NROW ) = REAL (Returned)
+*        An array holding the variance of AU.
+*     AVV( NPIX, NROW ) = REAL (Returned)
+*        An array holding the variance of AV.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -95,6 +122,8 @@
 *        Corrected structuring of IF blocks which caused BAD values
 *        to be used within calculations, resulting in NaN and Inf values
 *        being stored in output images.
+*     24-JUN-1998 (DSB):
+*        Added Q,U and V outputs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,6 +153,9 @@
       LOGICAL MAKEP
       LOGICAL MAKET
       LOGICAL MAKEIP
+      LOGICAL MAKEQ
+      LOGICAL MAKEU
+      LOGICAL MAKEV
       LOGICAL MAKECT
       INTEGER CI
 
@@ -132,10 +164,16 @@
       REAL AP( NPIX, NROW )
       REAL AT( NPIX, NROW )
       REAL AIP( NPIX, NROW )
+      REAL AQ( NPIX, NROW )
+      REAL AU( NPIX, NROW )
+      REAL AV( NPIX, NROW )
       REAL AIV( NPIX, NROW )
       REAL APV( NPIX, NROW )
       REAL ATV( NPIX, NROW )
       REAL AIPV( NPIX, NROW )
+      REAL AQV( NPIX, NROW )
+      REAL AUV( NPIX, NROW )
+      REAL AVV( NPIX, NROW )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -414,12 +452,16 @@
                END IF
 
                IF ( MAKEIP ) AIP( PIX, ROW ) = IP
+               IF ( MAKEQ ) AQ( PIX, ROW ) = QIN
+               IF ( MAKEU ) AU( PIX, ROW ) = UIN
       
                IF ( VAR ) THEN
                   IF ( MAKEI ) AIV( PIX, ROW ) = VI
                   IF ( MAKEP ) APV( PIX, ROW ) = VP
                   IF ( MAKET ) ATV( PIX, ROW ) = VT
                   IF ( MAKEIP ) AIPV( PIX, ROW ) = VIP
+                  IF ( MAKEQ ) AQV( PIX, ROW ) = VQIN
+                  IF ( MAKEU ) AUV( PIX, ROW ) = VUIN
                END IF
 
 *  Append a row to the catalogue if required, and if some of the values
@@ -632,12 +674,14 @@
                IF ( MAKEP ) AP( PIX, ROW ) = P
                IF ( MAKET ) AT( PIX, ROW ) = T
                IF ( MAKEIP ) AIP( PIX, ROW ) = IP
+               IF ( MAKEV ) AV( PIX, ROW ) = VIN
       
                IF ( VAR ) THEN
                   IF ( MAKEI ) AIV( PIX, ROW ) = VI
                   IF ( MAKEP ) APV( PIX, ROW ) = VP
                   IF ( MAKET ) ATV( PIX, ROW ) = VT
                   IF ( MAKEIP ) AIPV( PIX, ROW ) = VIP
+                  IF ( MAKEV ) AVV( PIX, ROW ) = VVIN
                END IF
    
 *  Append a row to the catalogue if required, and if some of the values

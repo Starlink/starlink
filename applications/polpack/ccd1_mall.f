@@ -43,6 +43,9 @@
 *     consider released memory via CCD1_MFREE calls that do not rely on
 *     the -1 mechanism.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
