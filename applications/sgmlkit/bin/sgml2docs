@@ -1,6 +1,6 @@
 #! /bin/sh -
 #
-# $Id$
+RCSID='$Id$'
 #
 #+
 #  Name:
@@ -33,14 +33,15 @@
 #     SGML file to be processed.
 #
 #  Options:
-#     --html: generate HTML (the default)
-#     --htmlsingle: generate HTML in a single file
-#     --latex: generate LaTeX
-#     --package-dir my-dir: package up the generated files into a
+#     --html: generate HTML (the default).
+#     --htmlsingle: generate HTML in a single file.
+#     --latex: generate LaTeX.
+#     --packagedir my-dir: package up the generated files into a
 #           directory called `my-dir'.
 #     --tarball my.tar: bundle the package-dir into a tarball named `my.tar'
-#     --jadeflags flags: add the given flags to the invocation of Jade
-#     --help: display usage
+#     --jadeflags flags: add the given flags to the invocation of Jade.
+#     --help: display usage and exit.
+#     --version: display version and exit.
 #     --debug: do some debugging.  Specifically, don't tidy up at end.
 #
 #  Authors:
@@ -84,7 +85,7 @@ trap tidy-up 0
 # Start parsing the arguments
 
 USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
-	[--package-dir directory] [--tarball file.tar] [--jadeflags flags]\
+	[--packagedir directory] [--tarball file.tar] [--jadeflags flags]\
 	[--help]\
 	sgml-file"
 
@@ -95,11 +96,12 @@ while [ $# -gt 0 ]; do
 	--latex) TARGETFORMAT=1 ;;
 	--htmlsingle) TARGETFORMAT=0; 
 	    JADEFLAGS="$JADEFLAGS -V nochunks -isingle.file" ;;
-	--package-dir) PACKAGEDIR=$2; shift ;;
+	--packagedir) PACKAGEDIR=$2; shift ;;
 	--tarball) TARNAME=$2; shift ;;
-	--jadeflags) JADEFLAGS=$2; shift ;;
-	--help) echo $USAGE; exit 0;;
+	--jadeflags) JADEFLAGS="$JADEFLAGS $2"; shift ;;
 	--debug) DEBUGGING=true ;;
+	--help) echo $USAGE; exit 0;;
+	--version) echo $RCSID; exit 0;;
 	-*) echo $USAGE; exit 1 ;;
 	*) SGMLSRC=$1 ;;
     esac
@@ -144,10 +146,6 @@ if [ -d $WORKDIR -o -f $WORKDIR ]; then
 	exit 1
 fi
 
-if $DEBUGGING; then
-	echo "WORKDIR=$WORKDIR
-fi
-
 mkdir -p $WORKDIR
 if [ $? -ne 0 ]; then
     echo "$0: Can't make temp dir $WORKDIR"
@@ -170,11 +168,18 @@ if [ ! -d $PACKAGEDIR ]; then
     exit 1
 fi
 
+if $DEBUGGING; then
+	echo "WORKDIR=$WORKDIR"
+	echo "JADEFLAGS=$JADEFLAGS"
+	echo "TARGETFORMAT=$TARGETFORMAT"
+fi
+
 
 
 # Start processing
 
 if [ $TARGETFORMAT -eq 0 ]; then
+    # Generate HTML
     # generate $ROOT.imgeq.list and convert it to a set of bitmaps
     echo "Pre-processing..."
     $JADE -t sgml -iOnly.web $JADEFLAGS \
@@ -188,7 +193,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	$IMGEQ $ROOT.imgeq.list
 
 	echo "LaTeXing maths..."
-	$LATEX $ROOT.imgeq
+	$LATEX $ROOT.imgeq.tex
 
 	echo "dvi2bitmap..."
 	$DVI2BITMAP -m 2 -s 2 -Pt -t gif $ROOT.imgeq.dvi
@@ -214,8 +219,10 @@ if [ $TARGETFORMAT -eq 0 ]; then
     test -r HTML.manifest && sort HTML.manifest | uniq > MANIFEST
 
 elif [ $TARGETFORMAT -eq 1 ]; then
+    # Generate LaTeX
 
-    $JADE -t sgml -d $STYLESHEET/latex/slback.dsl#back.main \
+    $JADE -t sgml -iLaTeX.entiies -iOnly.paper $JADEFLAGS \
+	-d $STYLESHEET/latex/slback.dsl#back.main \
 	$DECL $SGMLSRC \
 	> tmp.stamp
     ROOT=`awk -F: '{print $1}' tmp.stamp`
