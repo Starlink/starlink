@@ -541,11 +541,11 @@ GAIA_FILES = \
  StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
  StarAstSystem.hlp StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
- skycat.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
+ skycat.cfg gaiawcs2tab tclIndex pix2wcs \
  gaia_wish ardstat ardstat.ifc autocrop autocrop.ifc \
  cat2tab cat2tab.ifc tab2cat tab2cat.ifc asc2tab asc2tab.ifc tab2asc \
  tab2asc.ifc \
- gaia.sh gaiadisp.sh gaiaremote.sh
+ gaia.sh gaiadisp.sh gaiaremote.sh gaia_logo.xpm
 
 
 SKYCAT_FILES = \
@@ -567,7 +567,7 @@ SKYCAT_FILES = \
  astrotcl_version.tcl \
  LabelChoice.tcl TableListSort.tcl ButtonFrame.tcl \
  TextDialog.tcl CanvasDraw.tcl TopLevelWidget.tcl \
- CanvasPrint.tcl LabelMenu.tcl CanvasWidget.tcl LabelMessage.tcl \
+ CanvasPrint.tcl CanvasWidget.tcl LabelMessage.tcl \
  bltGraph.tcl CheckEntry.tcl LabelNumber.tcl canvastext.tcl \
  ChoiceDialog.tcl LabelValue.tcl Chooser.tcl LabelWidget.tcl \
  list.tcl DialogWidget.tcl ListDialog.tcl DoubleList.tcl \
@@ -576,7 +576,8 @@ SKYCAT_FILES = \
  tclutil_defaults.tcl FrameWidget.tcl \
  tclutil_version.tcl GraphPrint.tcl TableList.tcl tkutil.tcl \
  HelpWin.tcl TableListConfig.tcl udialog.tcl InputDialog.tcl \
- TableListConfigFile.tcl LabelCheck.tcl TableListPrint.tcl
+ TableListConfigFile.tcl LabelCheck.tcl TableListPrint.tcl \
+ pkgIndex.tcl rtdServer rtdClient
 
 TCL_FILES = \
  history.tcl init.tcl ldAout.tcl parray.tcl safe.tcl word.tcl \
@@ -604,8 +605,8 @@ TCL_FILES = \
  labeledframe.itk tabnotebook.itk labeledwidget.itk tabset.itk \
  mainwindow.itk menubar.itk timeentry.itk messagebox.itk \
  timefield.itk messagedialog.itk toolbar.itk notebook.itk \
- unknownimage.gif optionmenu.itk watch.itk \
- adamMessageRelay adamtask.tcl \
+ optionmenu.itk watch.itk \
+ atclsh adamMessageRelay adamtask.tcl \
  autoload.tcl tcl.tndx tclx.tcl buildidx.tcl tcl.tlib \
  tkx.tcl
 
