@@ -59,9 +59,10 @@ static const char RCSID[] =
 #include <unistd.h>		// for getsubopt
 #include "getopt_long.h"
 
-using STD::cout;
+using STD::cout;		// these are used multiple times
 using STD::cerr;
 using STD::endl;
+using STD::strcmp;
 
 #include "DviFile.h"
 #include "PkFont.h"
@@ -112,11 +113,13 @@ static void Usage (bool);
 static void show_help();
 static char *progname;
 
-#if !HAVE_DECL_GETSUBOPT
-extern "C" {
-    extern int getsubopt(char** options, char*const* tokens, char** value);
-}
-#endif
+/* Declare the getsubopt function.  Do not attempt to check the 
+ * HAVE_DECL_GETSUBOPT macro, as this will have been tested with a C
+ * compiler, and so we could incorrectly omit this declaration.
+ * [XXX is this bogus?  It appears to work, but when was that ever a
+ * good argument.]
+ */
+extern "C" int getsubopt(char** options, char*const* tokens, char** value);
 
 verbosities verbosity = normal;
 int bitmapH = -1;
@@ -240,12 +243,12 @@ int main (int argc, char **argv)
 		bool haveValue;
 		int cropmargin;
 		while (*options) {
-		    int suboptch = getsubopt(&options, tokens, &value);
+		    int suboptch = ::getsubopt(&options, tokens, &value);
 		    if (!value)	// no option value: should be absolute/relative
 			haveValue = false;
 		    else {
 			cropmargin
-				= static_cast<int>(magmag*atof(value)/72.0
+				= static_cast<int>(magmag*STD::atof(value)/72.0
 						   *resolution);
 			haveValue = true;
 		    }
@@ -358,7 +361,7 @@ int main (int argc, char **argv)
 		    // parse_boolean_string returned false, 
 		    // because it did find a valid boolean
 		    PkFont::setFontgen(false);
-		} else if (strncmp(optarg, "command", 7) == 0) {
+		} else if (STD::strncmp(optarg, "command", 7) == 0) {
 		    char* cmd;
 		    for (cmd=optarg; *cmd!='=' && *cmd!='\0'; cmd++)
 			;		// find equals sign or eos
@@ -418,7 +421,7 @@ int main (int argc, char **argv)
 	    break;
 
 	  case 'h':		// --height
-	    bitmapH = atoi(optarg);
+	    bitmapH = STD::atoi(optarg);
 	    break;
 
 	  case 'l':		// --end-page
@@ -433,7 +436,7 @@ int main (int argc, char **argv)
 	    break;
 
 	  case 'm':		// --magnification
-	    magmag = atof (optarg);
+	    magmag = STD::atof (optarg);
 	    break;
 
 	  case 'n':		// --nodvi
@@ -558,7 +561,7 @@ int main (int argc, char **argv)
 	    break;
 
 	  case 'r':		// --resolution
-	    PkFont::setResolution (atoi(optarg));
+	    PkFont::setResolution (STD::atoi(optarg));
 	    resolution = PkFont::dpiBase();
 	    break;
 
@@ -585,7 +588,7 @@ int main (int argc, char **argv)
 	    break;		    
 
 	  case 's':		// --scaledown
-	    bm.bitmap_scale_factor = atoi (optarg);
+	    bm.bitmap_scale_factor = STD::atoi (optarg);
 	    break;
 
 	  case 't':		// --paper-size
@@ -704,7 +707,7 @@ int main (int argc, char **argv)
 	    break;
 
 	  case 'w':		// --width
-	    bitmapW = atoi(optarg);
+	    bitmapW = STD::atoi(optarg);
 	    break;
 
 	  case 'X':		// --process
@@ -801,7 +804,7 @@ int main (int argc, char **argv)
     }
     
     if (processing_.none())
-	exit (0);
+	STD::exit (0);
 
     argc -= optind;
     argv += optind;
@@ -824,7 +827,7 @@ int main (int argc, char **argv)
 	if (verbosity > silent)
 	    cerr << "Error: Can't make output filename pattern from "
 		 << dviname << endl;
-	exit(1);
+	STD::exit(1);
     }
 
     bool fonts_ok = true;	// are there accumulated font errors?
@@ -838,7 +841,7 @@ int main (int argc, char **argv)
 	    if (verbosity > silent)
 		cerr << "Error: Can't open file " << dviname
 		     << " to read" << endl;
-	    exit(1);
+	    STD::exit(1);
 	}
 
 	bool all_fonts_present = true; // are all expected fonts found?
@@ -960,7 +963,7 @@ int main (int argc, char **argv)
     // exit zero/success if (a) we were processing the DVI
     // file normally and we found at least one font, or (b) we were
     // just checking the preamble and we found _all_ the fonts.
-    exit(fonts_ok ? 0 : 1);
+    STD::exit(fonts_ok ? 0 : 1);
 }
 
 void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
@@ -1300,7 +1303,7 @@ bool process_special (DviFile *dvif, string specialString,
 		Bitmap::Margin side = Bitmap::All;
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
-		int dimen = atoi (s->c_str());
+		int dimen = STD::atoi (s->c_str());
 		// scale from points to pixels
 		double npixels = DviFile::convertUnits(dimen,
 						       special_unit,
@@ -1379,13 +1382,13 @@ bool process_special (DviFile *dvif, string specialString,
 		Bitmap::BitmapColour rgb;
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
-		rgb.red   = static_cast<Byte>(strtol (s->c_str(), 0, 0));
+		rgb.red   = static_cast<Byte>(STD::strtol (s->c_str(), 0, 0));
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
-		rgb.green = static_cast<Byte>(strtol (s->c_str(), 0, 0));
+		rgb.green = static_cast<Byte>(STD::strtol (s->c_str(), 0, 0));
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
-		rgb.blue  = static_cast<Byte>(strtol (s->c_str(), 0, 0));
+		rgb.blue  = static_cast<Byte>(STD::strtol (s->c_str(), 0, 0));
 
 		if (stringOK)
 		{
@@ -1412,12 +1415,12 @@ bool process_special (DviFile *dvif, string specialString,
 			stringOK = false;
 			break;
 		    }
-		    double x = DviFile::convertUnits(strtod(s->c_str(),0),
+		    double x = DviFile::convertUnits(STD::strtod(s->c_str(),0),
 						     special_unit,
 						     DviFile::unit_pixels,
 						     dvif);
 		    strut_lrtb[i] = static_cast<int>
-			    (DviFile::convertUnits(strtod(s->c_str(),0),
+			    (DviFile::convertUnits(STD::strtod(s->c_str(),0),
 						   special_unit,
 						   DviFile::unit_pixels,
 						   dvif)
@@ -1478,6 +1481,19 @@ bool process_special (DviFile *dvif, string specialString,
     return stringOK;
 }
 
+#if HAVE_SNPRINTF
+#  if SNPRINTF_NAMESPACE == 3
+#    define SNPRINTF std::snprintf
+#  elif SNPRINTF_NAMESPACE == 2
+#    define SNPRINTF ::snprintf
+#  elif SNPRINTF_NAMESPACE == 1
+#    define SNPRINTF snprintf
+#  else
+#    define SNPRINTF snprintf
+     extern "C" int snprintf(char *, int, const char*, ...);
+#  endif
+#endif
+
 string substitute_ofn_pattern(string pattern, int pagenum)
 {
     static char *buf = 0;
@@ -1487,16 +1503,21 @@ string substitute_ofn_pattern(string pattern, int pagenum)
 
     if (buf == 0)
 	buf = new char[buflen];
-#ifdef HAVE_SNPRINTF
-    // snprintf is in the global namespace, not std::, and some compilers
-    // require this to be explicit.
-    int wanted = ::snprintf(buf, buflen, pattern.c_str(), pagenum);
+
+    /* The C++ <cstdio> definition does _not_ list snprintf as one of
+     * the members, though it is listed in the definition of <stdio.h>
+     * in the C standard.  So different compilers seem to have different
+     * ideas of where it should be.
+     */
+#if HAVE_SNPRINTF
+    int wanted = SNPRINTF(buf, buflen, pattern.c_str(), pagenum);
     if (wanted >= buflen) {
 	delete[] buf;
 	buflen = wanted+1;      // include space for trailing null
 	buf = new char[buflen];
-        ::snprintf(buf, buflen, pattern.c_str(), pagenum);
+        SNPRINTF(buf, buflen, pattern.c_str(), pagenum);
     }
+#  undef SNPRINTF
 #else
     if (pattern.length() + 12 > buflen) {
 	// 12 is longer than the longest integer
@@ -1660,5 +1681,5 @@ void Usage (bool andExit)
 "  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)" << endl;
 #endif
     if (andExit)
-        exit (1);
+        STD::exit (1);
 }

@@ -652,10 +652,10 @@ const PkFont* DviFile::getFallbackFont(const PkFont* desired)
 	const PkFont* f = *ci;
 	if (desired == 0)
 	    return f;
-	double diff = fabs(desired->designSize() - f->designSize());
+	double diff = STD::fabs(desired->designSize() - f->designSize());
 	if (diff == 0.0)
 	    return f;
-	if (diff < fabs(desired->designSize() - best_so_far->designSize()))
+	if (diff < STD::fabs(desired->designSize()-best_so_far->designSize()))
 	    best_so_far = f;
     }
     return best_so_far;
@@ -1129,7 +1129,7 @@ void DviFile::updateV_ (int vup)
 	range = 0;
     else
 	range = 0.8 * current_font_->quad();
-    if (abs(vup) < range)
+    if (STD::abs(vup) < range)
 	vv_ += pixel_round(vup);
     else
 	vv_ = pixel_round(v_ + vup);
@@ -1504,7 +1504,7 @@ DviFileSetChar::DviFileSetChar(int charno, DviFile *dptr)
 {
     if (verbosity_ > normal)
 	cerr << "Char " << charno << "="
-	     << (isprint(charno) ? static_cast<char>(charno) : '?')
+	     << (STD::isprint(charno) ? static_cast<char>(charno) : '?')
 	     << endl;
 }
 
@@ -1520,7 +1520,7 @@ DviFileSetChar::DviFileSetChar(int opcode, int charno, DviFile *dptr)
 {
     if (verbosity_ > normal)
 	cerr << "Char " << charno << "="
-	     << (isprint(charno) ? static_cast<char>(charno) : '?')
+	     << (STD::isprint(charno) ? static_cast<char>(charno) : '?')
 	     << endl;
 }
 

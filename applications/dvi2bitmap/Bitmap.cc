@@ -36,11 +36,13 @@
 #include <climits>		// g++ doesn't have <limits>
 #include <cmath>
 #include <cassert>
+#include <cstring>		// for memcpy and friends
 #else
 #include <stdarg.h>
 #include <limits.h>
 #include <math.h>
 #include <assert.h>
+#include <string.h>
 #endif
 
 using STD::cout;
@@ -176,7 +178,7 @@ Bitmap::~Bitmap()
  */
 void Bitmap::clear()
 {
-    memset ((void*)B, 0, W*H);
+    STD::memset ((void*)B, 0, W*H);
     
     bbL = bbT = INT_MAX;	// numeric_limits<int>::max();
     bbR = bbB = INT_MIN;	// numeric_limits<int>::min();
@@ -233,7 +235,7 @@ void Bitmap::usesBitmapArea_(const int ulx, const int uly,
 	assert (tWf > 0 && magfactor > 1);
 	while (tWf<lrx && tWf<maxW_)
 	    tWf *= magfactor;
-	tW = static_cast<int>(ceil(tWf));
+	tW = static_cast<int>(STD::ceil(tWf));
 	if (tW > maxW_)
 	    tW = maxW_;
     }
@@ -244,7 +246,7 @@ void Bitmap::usesBitmapArea_(const int ulx, const int uly,
 	assert (tHf > 0 && magfactor > 1);
 	while (tHf<lry && tHf<maxH_)
 	    tHf *= magfactor;
-	tH = static_cast<int>(ceil(tHf));
+	tH = static_cast<int>(STD::ceil(tHf));
 	if (tH > maxH_)
 	    tH = maxH_;
     }
@@ -263,9 +265,9 @@ void Bitmap::usesBitmapArea_(const int ulx, const int uly,
 	// But there's absolutely no need to bother with them yet.
 	Byte* oldB = B;
 	B = new Byte[tW*tH];
-	memset((void*)B, 0, tW*tH);
+	STD::memset((void*)B, 0, tW*tH);
 	for (int row=0; row<H; row++)
-	    memcpy((void*)&B[row*tW], (void*)&oldB[row*W], W);
+	    STD::memcpy((void*)&B[row*tW], (void*)&oldB[row*W], W);
 	if (verbosity_ > normal) {
 	    cerr << "Bitmap:: expanded from (" << W << ',' << H << ") to ("
 		 << tW << ',' << tH << "): max (" 
@@ -799,7 +801,7 @@ void Bitmap::blur ()
 	return;			// ...silently
 
     Byte *newB = new Byte[W*H];
-    memset ((void*)newB, 0, W*H);
+    STD::memset ((void*)newB, 0, W*H);
 
     int newbpp = (bpp_ < 2 ? 2 : bpp_);
     Byte new_max_colour = static_cast<Byte>((1<<newbpp) - 1);

@@ -43,10 +43,12 @@
 #include <sys/wait.h>
 //#include <map>
 
-using STD::ostream;
+using STD::ostream;		// following are used several times
 using STD::ends;
 using STD::endl;
 using STD::cerr;
+using STD::strtoul;
+using STD::strncpy;
 
 #include "Util.h"
 #include "stringstream.h"
@@ -80,18 +82,18 @@ string_list& Util::tokenise_string (string str)
     unsigned int i=0;
 
     // skip leading whitespace
-    while (i < str.length() && isspace(str[i]))
+    while (i < str.length() && STD::isspace(str[i]))
 	i++;
     while (i < str.length())
     {
 	unsigned int wstart = i;
-	while (i < str.length() && !isspace(str[i]))
+	while (i < str.length() && !STD::isspace(str[i]))
 	    i++;
 	string t = str.substr(wstart,i-wstart);
 	if (verbosity_ > normal)
 	    cerr << "tokenise:" << t << ":" << endl;
 	l->push_back(t);
-	while (i < str.length() && isspace(str[i]))
+	while (i < str.length() && STD::isspace(str[i]))
 	    i++;
     }
     return *l;
@@ -115,7 +117,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, const char* s)
     const char *p = s;
     unsigned long val;
 
-    while (*p != '\0' && isspace(*p))
+    while (*p != '\0' && STD::isspace(*p))
 	p++;
     
     if (*p == '#') {
@@ -148,7 +150,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, const char* s)
 	if (*p == '\0')		// end of string
 	    return false;
 	s = p;
-	while (!isxdigit(*s))
+	while (!STD::isxdigit(*s))
 	{
 	    if (*s == '\0') return false;
 	    s++;
@@ -162,7 +164,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, const char* s)
 	if (*p == '\0')		// end of string
 	    return false;
 	s = p;
-	while (!isxdigit(*s))
+	while (!STD::isxdigit(*s))
 	{
 	    if (*s == '\0') return false;
 	    s++;
@@ -197,7 +199,7 @@ char** Util::string_list_to_array(string_list& l)
 	 ci++) {
 	string s = *ci;
 	sl[i] = new char[s.size()+1];
-	strcpy(sl[i], s.c_str());
+	STD::strcpy(sl[i], s.c_str());
 	i++;
     }
     sl[i] = 0;

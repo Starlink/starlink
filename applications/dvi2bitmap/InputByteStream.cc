@@ -36,13 +36,28 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
-#include <cerrno>
 #else
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <errno.h>
 #endif
+
+#if HAVE_SYS_ERRNO_H
+/* If it's available, use sys/errno.h rather than <cerrno> or <errno.h>.
+ * If we're compiling in a strict-ansi mode, these will _not_ have errors
+ * which are specific to Unix/POSIX, which are, of course, precisely the
+ * ones we're hoping to use.
+ */
+#  include <sys/errno.h>
+#else
+/* what else can we do? */
+#  if HAVE_CSTD_INCLUDE
+#    include <cerrno>
+#  else
+#    include <errno.h>
+#  endif
+#endif
+
 #include <unistd.h>
 
 #ifdef HAVE_SYS_TYPES_H
@@ -57,9 +72,10 @@
 #include <sys/mman.h>
 #endif
 
-using STD::cerr;
+using STD::cerr;		// these functions are used many times
 using STD::sprintf;
 using STD::endl;
+using STD::strerror;
 
 // Static debug switch
 verbosities InputByteStream::verbosity_ = normal;
@@ -352,7 +368,7 @@ int InputByteStream::openSourceSpec(string srcspec)
     } else if (srcspec.substr(0,6).compare("<osfd>") == 0) {
 	string fdstr = srcspec.substr(6);
 	errno = 0;
-	fd = strtol(fdstr.c_str(), 0, 10);
+	fd = STD::strtol(fdstr.c_str(), 0, 10);
 	if (errno != 0) {
 	    string errmsg = "InputByteStream: Invalid source fd:";
 	    errmsg += fdstr;
@@ -509,7 +525,7 @@ const Byte *InputByteStream::getBlock(unsigned int length)
 	int mustread = length-inbufalready; // so (p_=(buf_+length)) <= eob_
 	if (length <= buflen_) {
 	    // whole block will fit in current buffer
-	    memmove((void*)buf_, (void*)p_, inbufalready);
+	    STD::memmove((void*)buf_, (void*)p_, inbufalready);
 	    read_ok = (certainly_read_(fd_,
 				       buf_+inbufalready,
 				       mustread)
@@ -519,7 +535,7 @@ const Byte *InputByteStream::getBlock(unsigned int length)
 	    // must expand buffer
 	    int newbuflen = length * 3 / 2; // decent size
 	    Byte* newbuf = new Byte[newbuflen];
-	    memcpy((void*)newbuf, (void*)p_, inbufalready);
+	    STD::memcpy((void*)newbuf, (void*)p_, inbufalready);
 	    read_ok = (certainly_read_(fd_,
 				       newbuf+inbufalready,
 				       mustread)

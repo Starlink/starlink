@@ -8,14 +8,15 @@
 
 #include <iostream>
 
-using STD::cerr;
-using STD::endl;
-
 #if HAVE_CSTD_INCLUDE
 #include <cmath>
 #else
 #include <math.h>
 #endif
+
+using STD::cerr;
+using STD::endl;
+using STD::fabs;
 
 // could do with boosting accuracy, but that would involve being
 // cleverer in convertUnits
@@ -211,6 +212,6 @@ int main(int argc, char** argv)
 	cerr << "Test threw DviError: " << e.problem() << endl;
     }
 
-    exit(nerrors);
+    STD::exit(nerrors);
 }
 

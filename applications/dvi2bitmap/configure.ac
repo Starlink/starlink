@@ -63,7 +63,7 @@ dnl   Checks for header files (note unistd.h and stdlib are
 dnl   automatically checked for, and the corresponding HAVE_ macros
 dnl   defined).
 AC_HEADER_STDC
-AC_CHECK_HEADERS([assert.h fcntl.h signal.h sys/stat.h sys/wait.h sys/time.h sys/mman.h sys/types.h])
+AC_CHECK_HEADERS([assert.h fcntl.h signal.h sys/signal.h sys/errno.h sys/stat.h sys/wait.h sys/time.h sys/mman.h sys/types.h])
 AC_HEADER_STAT
 
 dnl   Checks for library functions
@@ -180,6 +180,50 @@ AC_DEFINE_UNQUOTED(STD,
 	 	   $stdprefix,
                    [Define as `std' (no quotes) if standard functions are in 
                     the std namespace; define as empty otherwise])
+
+dnl  Some C++ compilers seem to have snprintf in std::, some in the global
+dnl  namespace, and some just don't care....
+AC_CACHE_CHECK([where snprintf is],
+   [my_cv_snprintfns],
+   [my_cv_snprintfns=
+    AC_TRY_COMPILE([
+#if HAVE_CSTD_INCLUDE
+#include <cstdio>
+#else
+#include <stdio.h>
+#endif
+],
+	[char s[1]; int x = std::snprintf(s, 1, "");],
+	 my_cv_snprintfns=std,
+	[AC_TRY_COMPILE([
+#if HAVE_CSTD_INCLUDE
+#include <cstdio>
+#else
+#include <stdio.h>
+#endif
+],
+	    [char s[1]; int x = ::snprintf(s, 1, "");],
+	     my_cv_snprintfns=global,
+	    [AC_TRY_COMPILE([
+#if HAVE_CSTD_INCLUDE
+#include <cstdio>
+#else
+#include <stdio.h>
+#endif
+],
+	        [char s[1]; int x = snprintf(s, 1, "");],
+		 my_cv_snprintfns=nons,
+		 my_cv_snprintfns=broken)])])])
+case $my_cv_snprintfns in
+  std)    nscode=3 ;;
+  global) nscode=2 ;;
+  nons)   nscode=1 ;;
+  *)      nscode=0 ;;
+esac
+AC_DEFINE_UNQUOTED(SNPRINTF_NAMESPACE, $nscode,
+  [Define to 3 if snprintf is in the std:: namespace; to 2 if it is in
+   the global namespace; and 1 if it is in no namespace.  Test only if
+   HAVE_SNPRINTF is true.])
 
 dnl  Do we have string clear() method? (it's in the standard, but not
 dnl  every compiler supports it)

@@ -427,11 +427,11 @@ string& PkFont::search_pkpath (string path, string name, double resolution)
     static string fname;		// return value
 
     int size_low, size_high;
-    size_low  = static_cast<int>(ceil  (0.998*resolution));
-    size_high = static_cast<int>(floor (1.002*resolution));
+    size_low  = static_cast<int>(STD::ceil  (0.998*resolution));
+    size_high = static_cast<int>(STD::floor (1.002*resolution));
     if (size_low > size_high)
 	// simply round it
-	size_low = size_high = static_cast<int>(floor(resolution+0.5));
+	size_low = size_high = static_cast<int>(STD::floor(resolution+0.5));
     if (verbosity_ > normal)
 	cerr << "PkFont::search_pkpath: searching "
 	     << size_low << ".." << size_high << endl;
@@ -1026,8 +1026,8 @@ PkGlyph::PkGlyph(unsigned int cc,
       longform_(true), bitmap_(0)
 {
     tfmwidth_ = (double)tfmwidth/(double)two20_ * f->designSize();
-    dx_ = static_cast<int>(floor(dx / (double)two16_ + 0.5));
-    dy_ = static_cast<int>(floor(dy / (double)two16_ + 0.5));
+    dx_ = static_cast<int>(STD::floor(dx / (double)two16_ + 0.5));
+    dy_ = static_cast<int>(STD::floor(dy / (double)two16_ + 0.5));
 }
 
 /**

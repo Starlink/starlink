@@ -49,8 +49,15 @@
 #  include <assert.h>
 #endif
 
-#if HAVE_SIGNAL_H
-// <csignal> is odd -- I don't understand what's there and what's not
+#if HAVE_SYS_SIGNAL_H
+/* If it's available, use sys/signal.h rather than <csignal> or <signal.h>.
+ * If we're compiling in a strict-ansi mode, these will _not_ have signals
+ * which are specific to Unix/POSIX, which are, of course, precisely the
+ * ones we're hoping to use.
+ */
+#  include <sys/signal.h>
+#elif HAVE_SIGNAL_H
+/* Let's hope these do the job */
 #  include <signal.h>
 #endif
 
@@ -96,7 +103,7 @@ namespace PipeStreamSignalHandling {
     void expectAnother() throw (InputByteStreamError);
     extern "C" void childcatcher(int);
     extern "C" void alarmcatcher(int);
-};
+}
 
 
 /**
@@ -228,7 +235,7 @@ PipeStream::PipeStream (string cmd, string envs)
 	// This is an error
         if (getVerbosity() > normal)
             cerr << "Error executing " << argv[0]
-                 << ": " << strerror(errno) << endl;
+                 << ": " << STD::strerror(errno) << endl;
 
         // Children should exit with _exit rather than exit.  See, eg.,
         // <http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC6> 
@@ -334,7 +341,7 @@ void PipeStream::close(void)
 		    if (getVerbosity() > normal)
 			cerr << "PipeStream::close: can't send signal "
 			     << sigtosend << " to process " << pid_
-			     << " (" << strerror(errno) << ")"
+			     << " (" << STD::strerror(errno) << ")"
 			     << endl;
 		}
 
@@ -364,7 +371,7 @@ int PipeStream::getTerminationStatus(void)
 {
     close();
     return pipe_status_;
-};
+}
 
 /**
  * Returns the contents of the stream as a string.  If some of the

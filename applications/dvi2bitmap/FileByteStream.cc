@@ -104,7 +104,7 @@ FileByteStream::FileByteStream(string& filename,
     struct stat S;
     if (fstat (newfd, &S))
     {
-	string errstr = strerror (errno);
+	string errstr = STD::strerror (errno);
 	throw InputByteStreamError ("Can't stat open file (" + errstr + ")");
     }
     filesize_ = S.st_size;
@@ -144,7 +144,7 @@ void FileByteStream::seek(int pos)
 	// no need to reload buffer
     } else {
 	if (lseek(fd, offset, SEEK_SET) < 0) {
-	    string errmsg = strerror(errno);
+	    string errmsg = STD::strerror(errno);
 	    throw InputByteStreamError("Can't seek (" + errmsg + ")");
 	}
 	if (getVerbosity() > normal)

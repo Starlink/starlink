@@ -149,7 +149,7 @@ int main (int argc, char **argv)
     } catch (DviError& e) {
 	cerr << "Can't open DVI file " << dviname
 	     << ": " << e.problem() << endl;
-	exit (1);
+	STD::exit (1);
     }
     
     DviFileEvent *ev;
@@ -229,13 +229,13 @@ int main (int argc, char **argv)
     
     delete dvi;
 
-    exit (0);
+    STD::exit (0);
 }
 
 void Usage()
 {
     cerr << "Usage: " << progname
 	 << " [-F] [-s[cfrsA]] [-u[bcdimpx]] dvifile" << endl;
-    exit (1);
+    STD::exit (1);
 }
 

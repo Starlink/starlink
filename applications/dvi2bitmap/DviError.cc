@@ -29,9 +29,11 @@
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cstdarg>
+#include <cstring>		// for strlen
 #else
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #endif
 #include <string>
 #include <iostream>
@@ -40,7 +42,7 @@
 
 DviError::DviError(const char *fmt,...)
 {
-    char *p = new char[2*strlen(fmt)];
+    char *p = new char[2*STD::strlen(fmt)];
     va_list ap;
     va_start(ap,fmt);
     STD::vsprintf (p, fmt, ap);
@@ -56,7 +58,7 @@ void DviBug::print() const {
 
 DviBug::DviBug(const char *fmt,...)
 {
-    char *p = new char[2*strlen(fmt)];
+    char *p = new char[2*STD::strlen(fmt)];
     va_list ap;
     va_start(ap,fmt);
     vsprintf (p, fmt, ap);

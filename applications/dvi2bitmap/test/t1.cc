@@ -119,11 +119,11 @@ int main (int argc, char **argv)
     compare_string_array(res, sa);
     Util::delete_string_array(sa);
 
-    exit (nfails);
+    STD::exit (nfails);
 }
 
 void Usage(void)
 {
     cerr << "Usage: " << progname << " [-v]" << endl;
-    exit (1);
+    STD::exit (1);
 }
