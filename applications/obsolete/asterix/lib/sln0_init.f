@@ -84,11 +84,13 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			SLN0_ERASE
       EXTERNAL			SLN1_GETREC
       EXTERNAL			SLN1_NREC
       EXTERNAL			SLN1_PUTREC
 
 *  Local Variables:
+      INTEGER			CLSID			! Class definitin
       INTEGER			DID			! Method identifier
 *.
 
@@ -105,6 +107,10 @@
      :                 SLN1_GETREC, DID, STATUS )
       CALL ADI_DEFMTH( 'PutSelRec(_HDSfile,_SelectionRecord)',
      :                 SLN1_PUTREC, DID, STATUS )
+
+*  Add selection record destructor
+      CALL ADI_LOCCLS( 'SelectionRecord', CLSID, STATUS )
+      CALL ADI_DEFDES( CLSID, SLN0_ERASE, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'SLN0_INIT', STATUS )

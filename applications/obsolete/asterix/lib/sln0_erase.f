@@ -111,7 +111,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Locate the Selectors structure
-      CALL ADI_FIND( ARGS(1), SID, STATUS )
+      CALL ADI_FIND( ARGS(1), 'Selectors', SID, STATUS )
 
 *  Loop over each component
       CALL ADI_NCMP( SID, NCMP, STATUS )
