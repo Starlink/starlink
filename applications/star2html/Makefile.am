@@ -12,7 +12,7 @@ dist_data_DATA = sun.tex ssn.tex sgp.tex sg.tex sc.tex sst.tex
 # `by hand' below.
 l2hdir=$(datadir)/star2html-l2hsys
 
-# Distribute the l2h directories as a tarball.
+# Distribute the l2h directory and all the .in scripts.
 EXTRA_DIST = l2h_source.tar star2html.in latex2html.in xlabel.in
 
 # The tarball consists of the contents of the l2h directory, minus any
@@ -25,6 +25,17 @@ l2h_source.tar:
 	    for d in `find . -type d -name CVS`; do rm -Rf $$d; done; \
 	    tar cf ../l2h_source.tar *
 
+# The l2h directory is required for building the local documentation. 
+# When distributed we need to unpack the source tarball to get this back
+# (normally part of CVS repository). Do not depend on source tarball as
+# we do not want to create l2h if it exists (part of CVS checkout) or
+# create the tarball if not doing a "dist".
+l2h:
+	rm -Rf l2h
+	mkdir l2h
+	cd l2h; \
+	    tar xf ../l2h_source.tar
+
 # Extra install hook.  Unpack the l2h_source.tar tarball into $(l2hdir).
 install-data-local: l2h_source.tar
 	rm -Rf $(l2hdir)
@@ -34,7 +45,7 @@ install-data-local: l2h_source.tar
 	    tar tf l2h_source.tar | sed 's,^,$(l2hdir)/,' >>$$MANIFEST_FILE; \
 	else :; fi
 
-sun199.htx_tar: sun199.tex star2html latex2html
+sun199.htx_tar: sun199.tex star2html latex2html l2h
 	env CURRENT_L2H=`pwd`/l2h/current PATH=`pwd`/"${PATH}" ./star2html sun199.tex
 	tar cf sun199.htx_tar sun199.htx
 
