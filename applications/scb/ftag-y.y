@@ -59,10 +59,10 @@
 %start file
 
 %{
-#define YYSTYPE char *
 
-char *snew( char * );
-char *scat( int, ... );
+typedef char * STRING;
+#define YYSTYPE STRING
+#include "tag.h"
 
 %}
 
@@ -75,7 +75,7 @@ file
 
 unit
 	: line
-			{ printf( "%s", $1 ); }
+			{ printf( "%s", $1 ); uclear(); }
 	;
 
 line
@@ -93,7 +93,7 @@ line
 	| BLANK_LINE
 			{ $$ = $1; }
 	| error LINE_END
-			{ $$ = ""; handle_error(); }
+			{ handle_error(); $$ = ""; }
 	;
 
 module_start_line
@@ -209,6 +209,8 @@ declaration_constant
 			{ $$ = $1; }
 	| declaration_constant otherchar declaration_term
 			{ $$ = scat( 3, $1, $2, $3 ); }
+	| declaration_constant '*' '*' declaration_term
+			{ $$ = scat( 4, $1, $2, $3, $4 ); }
 	;
 
 declaration_term
@@ -357,16 +359,11 @@ token_brac
 #include "ftag-l.c"
 
 #include <stdio.h>
-
-   extern char *yytext;
-
-   yyerror(char *s) { /* No action. */ }
-
-
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 
+   yyerror(char *s) { /* No action. */ }
 
    char *refname( char *name ) {
 /*
@@ -490,7 +487,7 @@ token_brac
 /* Work out how much space is needed for the final string and allocate it. */
       leng = strlen( attrib ) + strlen( rname ) + strlen( name ) + 13
            + ( ( genpos != NULL ) ? ( ( strlen( rname ) + 8 ) * 9 + 2 ) : 0 );
-      string = malloc( leng );
+      string = (char *) malloc( leng );
 
 /* Write the start tag and the tagged text. */
       sprintf( string, "<a %s=\"%s_\">%s", attrib, rname, name );
@@ -554,7 +551,7 @@ token_brac
 
 /* Find out how many characters we need and allocate it. */
       leng = strlen( attrib ) + strlen( name ) + strlen( rname ) + 20;
-      string = malloc( leng );
+      string = (char *) malloc( leng );
 
 /* Write any text up to and including the first quote. */
       i = strcspn( name, "'" ) + 1;
@@ -621,13 +618,7 @@ token_brac
 
 
 
-/* Set up list structure, base elements, and pointers for list of 
-   declared arrays. */
-   struct element {
-      char *name;
-      struct element *next;
-   };
-   typedef struct element ELEMENT;              /* Linked list element struct */
+/* Set up base elements and pointers for list of declared arrays. */
    ELEMENT listbase = { "", (ELEMENT *) NULL }; /* Zero'th element of list. */
    ELEMENT *listfirst = &listbase;              /* Pointer to list start.   */
    ELEMENT *listlast = &listbase;               /* Pointer to list end.     */
@@ -660,7 +651,7 @@ token_brac
 /* Walk through the list an item at a time. */
       found = 0;
       while ( ! found && ( list = list->next ) != NULL )
-         found |= ( strcmp( name, list->name ) == 0 );
+         found |= ( strcmp( name, list->text ) == 0 );
 
 /* Return. */
       return( found );
@@ -695,8 +686,8 @@ token_brac
       listlast->next = (ELEMENT *) malloc( sizeof( ELEMENT ) );
       listlast = listlast->next;
       listlast->next = NULL;
-      listlast->name = (char *) malloc( strlen( rname ) + 1 );
-      strcpy( listlast->name, rname );
+      listlast->text = (char *) malloc( strlen( rname ) + 1 );
+      strcpy( listlast->text, rname );
    }
 
 
@@ -731,7 +722,6 @@ token_brac
 /* Otherwise, tag the name as a function call. */
       else {
          retval = fanchor( "href", name );
-         free( name );
       }
 
 /* Return. */
@@ -763,6 +753,8 @@ token_brac
       i = listfirst->next;
       while ( i != NULL ) {
          j = i->next;
+         if ( i->text != NULL )
+            free( i->text );
          free( i );
          i = j;
       }
@@ -773,10 +765,6 @@ token_brac
    }
 
 
-   extern int strict;
-   extern char line_text[];
-   extern int line_length;
-
    void handle_error() {
 /*
 *+
@@ -784,7 +772,7 @@ token_brac
 *     handle_error
 *
 *  Purpose:
-*     Deal with a line which the grammar cannot parse.
+*     Deal with a unit which the grammar cannot parse.
 *
 *  Description:
 *     This routine takes over when the yacc 'error' state is detected.
@@ -796,28 +784,25 @@ token_brac
 *
 *     Since yacc pops everything off the stack before we are able to
 *     intercept this and discards all the associated state, we cannot
-*     use yylval as usual.  Instead, we use a buffer set up by the lexer
-*     for this purpose, which stores all the text of the line since the
-*     last LINE_START.  Note that because of this interrelation between
-*     lex and yacc, it is not OK to put an error token anywhere else
-*     in the grammar.
-*
-*  Bugs:
-*     Note that in case of a syntax error the malloc'd storage for the
-*     tokens which formed part of the error is never free'd.  Thus there
-*     is a memory leak here.
+*     use yylval as usual.  Instead, we use the ucontent() routine which
+*     gets a string consisting of all the text the lexer has encountered
+*     since the last uclear() was called.  Note that because of this 
+*     interrelation between uclear() calls and handle_error() calls,
+*     it is not OK to put an error token just anywhere in the grammar.
 *-
 */
+      char *text;
+      text = ucontent();
       if ( strict ) {
-         fprintf( stderr, "\nError at this line:\n%s\n", line_text );
+         fprintf( stderr, "\nError in this line:\n\n   %s\n", text );
          exit( 1 );
       }
       else {
-         line_text[ line_length ] = '\0';
-         printf( line_text );
+         printf( "%s", text );
          yyerrok;
          yyclearin;
       }
+      free( text );
    }
       
 
