@@ -51,7 +51,7 @@ c      END IF
       CALL ADI_CGET0I( PSID, 'FileID', FID, STATUS )
 
 *  Erase the psf property
-      CALL ADI_CERASE( PSID, PSF__PROP, STATUS )
+c      CALL ADI_CERASE( PSID, PSF__PROP, STATUS )
 
       END
 
