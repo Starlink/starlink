@@ -479,6 +479,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 * Check if the HK data is complete
       IF (TIME(1) .GT. (OARR(1) + 10.)) THEN
+	print *,time(1),oarr(1)
          CALL MSG_PRNT('** The HK file is incomplete - times not '/
      &               /'covered by the file will be INCLUDED in the '/
      &               /'output file **')
