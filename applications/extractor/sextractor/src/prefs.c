@@ -477,7 +477,7 @@ void	useprefs()
   /* PWD: deal with selected extension numbers */
   for ( i = 0; i < prefs.nfimage_name; i++ ) {
     base = strdup( prefs.fimage_name[i] );
-    if ( sscanf( str,"%[^[][%d]", prefs.fimage_name[i], &extension ) == 2 ) {
+    if ( sscanf( prefs.fimage_name[i], "%[^[][%d]", base, &extension ) == 2 ) {
         prefs.fextnum[i] = extension;
         prefs.fimage_name[i] = base;
     }
@@ -555,7 +555,7 @@ void	useprefs()
     /* PWD: deal with selected extension numbers */
     for ( i = 0; i < 2; i++ ) {
       base = strdup( prefs.wimage_name[i] );
-      if ( sscanf( str,"%[^[][%d]", prefs.wimage_name[i], &extension ) == 2 ) {
+      if ( sscanf( prefs.wimage_name[i],"%[^[][%d]", base, &extension ) == 2) {
         prefs.wextnum[i] = extension;
         prefs.wimage_name[i] = base;
       }
