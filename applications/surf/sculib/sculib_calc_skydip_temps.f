@@ -212,10 +212,18 @@
      :        STEMP, SUB_WAVE(I), STATUS)
       END DO
 
-* Read the hot load temperature
+*     Read the hot load temperature from the FITS data and then
+*     get the required value from the parameter.
 
       CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 'T_HOT',
      :  T_HOT, STATUS)
+
+      CALL PAR_DEF0R('T_HOT',T_HOT, STATUS)
+      CALL PAR_GET0R('T_HOT', T_HOT, STATUS)
+
+*     Update the FITS entry
+      CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS, 'T_HOT',
+     :     T_HOT, STATUS)
 
       
 * Read the COLD temperatures from FITS information
