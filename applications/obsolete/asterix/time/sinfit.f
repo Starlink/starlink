@@ -1,5 +1,5 @@
 *+  SINFIT - Computes power spectrum for 1D data with general spacing
-      SUBROUTINE SINFIT(STATUS)
+      SUBROUTINE SINFIT( STATUS )
 *    Description :
 *     Calls subroutine PERIODS to calculate the power spectrum of a
 *     1D data object by least squares fitting of sine and cos waves.
@@ -24,28 +24,28 @@
 *
 *    History :
 *
-*      5 Dec 83: Original.
-*     13 Dec 84: Version 4.
-*     17 Dec 85: Case of zero data error handled (v 0.4-1).
-*     10 Jan 86: Now uses TIM_PERIODS - zero frequency properly handled.
-*     22 Jan 86: Sensible message if data array is too long.
-*      2 Mar 87: Converted to ROSAT spec, renamed SINFIT
-*                                                      (old name PGRAM).
-*     25 Aug 87: Bug fix to PHASE: now gives phase for SIN curve, in range
-*                0, 2PI. (pla)
-*     25 Aug 88: Major rewrite, now maps input file & creates dynamical
-*                storage for work arrays. Also now uses SINFIT_PGRAM, a
-*                rewritten version of TIM_PERIODS. (PLA)
-*
-*     13 Jun 90: V1.2-0  Several bug fixes done (DJA)
+*      5 Dec 83 : Original.
+*     13 Dec 84 : Version 4.
+*     17 Dec 85 : Case of zero data error handled (v 0.4-1).
+*     10 Jan 86 : Now uses TIM_PERIODS - zero frequency properly handled.
+*     22 Jan 86 : Sensible message if data array is too long.
+*      2 Mar 87 : Converted to ROSAT spec, renamed SINFIT (old name PGRAM).
+*     25 Aug 87 : Bug fix to PHASE: now gives phase for SIN curve, in range
+*                 0, 2PI. (pla)
+*     25 Aug 88 : Major rewrite, now maps input file & creates dynamical
+*                 storage for work arrays. Also now uses SINFIT_PGRAM, a
+*                 rewritten version of TIM_PERIODS. (PLA)
+*     13 Jun 90 : V1.2-0 Several bug fixes done (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1 Updated data interface. Phase object written to
+*                        separate dataset (DJA)
 *
 *    Type Definitions :
 *
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -53,10 +53,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ASTLOC        ! Locator to ASTERIX box.
-      CHARACTER*(DAT__SZLOC) INLOC         ! Locator to input file.
-      CHARACTER*(DAT__SZLOC) OUTLOC        ! Power spectrum object locator
-      CHARACTER*(DAT__SZLOC) PHASELOC      ! Locator to PHASE_SPECTRUM
       CHARACTER*80           DUNITS        ! Data units
       CHARACTER*80           TUNITS        ! Time units
       CHARACTER*80           TEXT(5)       ! For history record
@@ -79,12 +75,15 @@
       INTEGER                PHAPTR        ! Pointer to output PHASE array
       INTEGER                I             ! Dummy for DO loops.
       INTEGER                IERR          ! Error flag from PERIODS
-      INTEGER                LDIM(DAT__MXDIM)! Length of each dimension.
+      INTEGER			IFID			! Input dataset id
+      INTEGER                LDIM(ADI__MXDIM)! Length of each dimension.
       INTEGER                NBAD          ! # of bad quality points
       INTEGER                NDATA         ! No.of data points
       INTEGER                NDIMS         ! Number of dimension of input data
       INTEGER                NFREQ         ! No.of frequencies
       INTEGER                NLINES        ! No. of history text lines
+      INTEGER			OFID			! Output dataset id
+      INTEGER			PFID			! Phase spectrum id
 
       LOGICAL                AST_THERE     ! ASTERIX structure present?
       LOGICAL                AXOK          ! AXIS(1) OK
@@ -98,8 +97,8 @@
 *
 *    Version id :
 *
-      CHARACTER*21            VERSION
-         PARAMETER           (VERSION = 'SINFIT Version 1.8-0')
+      CHARACTER*21		VERSION
+        PARAMETER           	( VERSION = 'SINFIT Version 1.8-1' )
 *-
 
 *    Check status.
@@ -108,28 +107,27 @@
 *    Version ID.
       CALL MSG_PRNT(VERSION)
 
-*    Initialize BDA_, DYN_ HIST_, USI_, etc routines
-      CALL AST_INIT
+*    Initialize ASTERIX
+      CALL AST_INIT()
 
 *    Obtain data object name.
-      CALL USI_ASSOCI ('INP', 'READ', INLOC, PRIM, STATUS)
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
 
 *    Create output dataset
-      CALL USI_ASSOCO ('OUT', 'POWER_SPECTRUM', OUTLOC, STATUS)
+      CALL USI_TASSOCO( 'OUT', 'POWER_SPECTRUM', OFID, STATUS )
 
 *    Map input data.
-      CALL BDA_CHKDATA (INLOC, OK, NDIMS, LDIM, STATUS)
+      CALL BDI_PRIM( IFID, PRIM, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIMS, LDIM, STATUS )
 
       IF (OK) THEN
-         CALL BDA_MAPDATA(INLOC, 'READ', DATPTR, STATUS)
+         CALL BDI_MAPDATA(IFID, 'READ', DATPTR, STATUS)
          CALL ARR_SUMDIM( NDIMS, LDIM, NDATA, STATUS )
       ELSE
-         CALL MSG_PRNT( 'FATAL ERROR: Unable to find suitable data'/
-     :                                              /' component.' )
          STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'FATAL ERROR: Unable to find suitable data'/
+     :                                          /' component.', STATUS )
       END IF
-
-*    Check status.
       IF (STATUS .NE. SAI__OK) GOTO 999
 
       IF (NDIMS .NE. 1) THEN
@@ -138,7 +136,7 @@
 
       IF (.NOT. PRIM .AND. NDIMS .EQ. 1) THEN
 *      Map axis data
-        CALL BDA_CHKAXIS (INLOC, 1, AXOK, STATUS)
+        CALL BDI_CHKAXIS (IFID, 1, AXOK, STATUS)
 
       ELSE
         AXOK = .FALSE.
@@ -146,7 +144,7 @@
       END IF
 
       IF ( AXOK ) THEN
-         CALL BDA_MAPAXVAL (INLOC, 'READ', 1, AXPTR, STATUS)
+         CALL BDI_MAPAXVAL (IFID, 'READ', 1, AXPTR, STATUS)
 
       ELSE
          CALL MSG_PRNT('WARNING: Axis data invalid'//
@@ -158,9 +156,9 @@
       END IF
 
 *    Map VARIANCE if present
-      CALL BDA_CHKVAR (INLOC, VAROK, NDIMS, LDIM, STATUS)
+      CALL BDI_CHKVAR (IFID, VAROK, NDIMS, LDIM, STATUS)
       IF (VAROK) THEN
-         CALL BDA_MAPVAR (INLOC, 'READ', VARPTR, STATUS)
+         CALL BDI_MAPVAR (IFID, 'READ', VARPTR, STATUS)
       END IF
 
 *    User information
@@ -168,7 +166,7 @@
       CALL MSG_PRNT('^NDAT data points entered')
 
       IF ( AXOK ) THEN
-         CALL BDA_GETAXUNITS (INLOC, 1, TUNITS, STATUS)
+         CALL BDI_GETAXUNITS (IFID, 1, TUNITS, STATUS)
 
          IF (CHR_LEN(TUNITS) .GT. 0) THEN
             CALL MSG_SETC ('TUNITS', TUNITS)
@@ -182,10 +180,10 @@
 
 *    Map QUALITY as a logical.
       BAD = .FALSE.
-      CALL BDA_CHKQUAL (INLOC, QUALOK, NDIMS, LDIM, STATUS)
+      CALL BDI_CHKQUAL (IFID, QUALOK, NDIMS, LDIM, STATUS)
 
       IF ( QUALOK ) THEN
-         CALL BDA_MAPLQUAL (INLOC, 'READ', BAD, QPTR, STATUS)
+         CALL BDI_MAPLQUAL (IFID, 'READ', BAD, QPTR, STATUS)
 
          IF ( BAD ) THEN
             CALL ARR_NBAD( NDATA, %VAL(QPTR), NBAD, STATUS )
@@ -193,90 +191,88 @@
             CALL MSG_PRNT( 'There are ^NBAD bad quality points'/
      :                                         /' in the data' )
          ELSE
-            CALL BDA_UNMAPLQUAL (INLOC, STATUS)
+            CALL BDI_UNMAPLQUAL (IFID, STATUS)
             QUALOK = .FALSE.
          END IF
 
       END IF
 
 *    User input.
-      CALL USI_GET0R ('BASE',      BASEFREQ, STATUS)
-      CALL USI_GET0R ('INC', FREQSTEP, STATUS)
-      CALL USI_GET0I ('NUM',    NFREQ,    STATUS)
-      CALL USI_GET0L ('PHASE',          PHASE,    STATUS)
+      CALL USI_GET0R( 'BASE', BASEFREQ, STATUS )
+      CALL USI_GET0R( 'INC', FREQSTEP, STATUS )
+      CALL USI_GET0I( 'NUM', NFREQ, STATUS )
+
+*    Phase output dataset
+      CALL USI_TASSOCO( 'PHASE', 'PHASE_SPECTRUM', PFID, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+        CALL ERR_ANNUL( STATUS )
+        PHASE = .FALSE.
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+        PHASE = .TRUE.
+      ELSE
+        GOTO 99
+      END IF
 
 *    Create dynamic arrays
-      CALL DYN_MAPR (1, NFREQ, COSPTR,  STATUS)
-      CALL DYN_MAPR (1, NFREQ, SINPTR,  STATUS)
-      CALL DYN_MAPR (1, NFREQ, WORKPTR, STATUS)
+      CALL DYN_MAPR( 1, NFREQ, COSPTR, STATUS )
+      CALL DYN_MAPR( 1, NFREQ, SINPTR, STATUS )
+      CALL DYN_MAPR( 1, NFREQ, WORKPTR, STATUS )
 
 *    Check status.
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Create components in output dataset
-      CALL BDA_CREDATA (OUTLOC, 1, NFREQ,        STATUS)
-      CALL BDA_MAPDATA (OUTLOC, 'WRITE', PWRPTR, STATUS)
+      CALL BDI_CREDATA (OFID, 1, NFREQ,        STATUS)
+      CALL BDI_MAPDATA (OFID, 'WRITE', PWRPTR, STATUS)
 
-      CALL BDA_PUTAXVAL   (OUTLOC, 1, BASEFREQ, FREQSTEP, NFREQ, STATUS)
-      CALL BDA_PUTAXLABEL (OUTLOC, 1, 'Frequency', STATUS)
+      CALL BDI_PUTAXVAL   (OFID, 1, BASEFREQ, FREQSTEP, NFREQ, STATUS)
+      CALL BDI_PUTAXLABEL (OFID, 1, 'Frequency', STATUS)
 
-      CALL BDA_PUTLABEL (OUTLOC, 'Power', STATUS)
+      CALL BDI_PUTLABEL (OFID, 'Power', STATUS)
 
       IF (.NOT. PRIM) THEN
-        CALL BDA_GETUNITS (INLOC, DUNITS, STATUS)
+        CALL BDI_GETUNITS (IFID, DUNITS, STATUS)
 
         IF (CHR_LEN(DUNITS) .GT. 0) THEN
            DUNITS = '('//DUNITS(1:CHR_LEN(DUNITS))//')**2'
-           CALL BDA_PUTUNITS (OUTLOC, DUNITS, STATUS)
+           CALL BDI_PUTUNITS (OFID, DUNITS, STATUS)
 
         END IF
 
         IF (CHR_LEN(TUNITS) .GT. 0) THEN
           TUNITS = '('//TUNITS(1:CHR_LEN(TUNITS))//')**-1'
-          CALL BDA_PUTAXUNITS (OUTLOC, 1, TUNITS, STATUS)
+          CALL BDI_PUTAXUNITS (OFID, 1, TUNITS, STATUS)
 
         END IF
-        CALL BDA_GETTITLE (INLOC,  TITLE, STATUS)
-        CALL BDA_PUTTITLE (OUTLOC, TITLE, STATUS)
+        CALL BDI_GETTITLE (IFID,  TITLE, STATUS)
+        CALL BDI_PUTTITLE (OFID, TITLE, STATUS)
 
       END IF
 
-      CALL BDA_CREVAR (OUTLOC, 1, NFREQ,        STATUS)
-      CALL BDA_MAPVAR (OUTLOC, 'WRITE', VAROUT, STATUS)
+      CALL BDI_CREVAR (OFID, 1, NFREQ,        STATUS)
+      CALL BDI_MAPVAR (OFID, 'WRITE', VAROUT, STATUS)
 
-      IF ( PRIM ) THEN
-        THERE = .FALSE.
-      ELSE
-        CALL DAT_THERE (OUTLOC, 'MORE', THERE, STATUS)
-      END IF
+*  Copy ancillary stuff
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
 
-      IF (THERE) THEN
-         CALL BDA_COPMORE( INLOC, OUTLOC, STATUS )
-      END IF
-
+*  Create phase spectrum?
       IF ( PHASE ) THEN
-         CALL BDA_CHKAST( OUTLOC, AST_THERE, STATUS )
-         IF ( .NOT. AST_THERE ) THEN
-            CALL BDA_CREAST( OUTLOC, STATUS )
-         END IF
-         CALL BDA_LOCAST( OUTLOC, ASTLOC, STATUS )
 
-         CALL DAT_NEW  (ASTLOC, 'PHASE_SPECTRUM', 'NDF', 0, 0, STATUS)
-         CALL DAT_FIND (ASTLOC, 'PHASE_SPECTRUM', PHASELOC,    STATUS)
+        CALL BDI_CREDATA  (PFID, 1, NFREQ,        STATUS)
+        CALL BDI_MAPDATA  (PFID, 'WRITE', PHAPTR, STATUS)
+        CALL BDI_PUTLABEL (PFID, 'Phase',         STATUS)
+        CALL BDI_PUTUNITS (PFID, 'radians',       STATUS)
 
-         CALL BDA_CREDATA  (PHASELOC, 1, NFREQ,        STATUS)
-         CALL BDA_MAPDATA  (PHASELOC, 'WRITE', PHAPTR, STATUS)
-         CALL BDA_PUTLABEL (PHASELOC, 'Phase',         STATUS)
-         CALL BDA_PUTUNITS (PHASELOC, 'radians',       STATUS)
+        CALL BDI_PUTAXVAL (PFID, 1, BASEFREQ, FREQSTEP, NFREQ, STATUS)
 
-         CALL BDA_PUTAXVAL (PHASELOC, 1, BASEFREQ, FREQSTEP, NFREQ,
-     :                                                      STATUS)
-         CALL DAT_ANNUL( PHASELOC, STATUS )
+        IF (CHR_LEN(TUNITS) .GT. 0) THEN
+          CALL BDI_PUTAXTEXT( OFID, 1, 'Frequency', TUNITS, STATUS)
+        END IF
 
-         IF (CHR_LEN(TUNITS) .GT. 0) THEN
-            CALL BDA_PUTAXUNITS (OUTLOC, 1, TUNITS,      STATUS)
-            CALL BDA_PUTAXLABEL (OUTLOC, 1, 'Frequency', STATUS)
-         END IF
+*    Copy ancillary stuff
+        CALL BDI_COPMORE( IFID, PFID, STATUS )
+        CALL HSI_COPY( IFID, PFID, STATUS )
+        CALL HSI_ADD( PFID, VERSION, STATUS )
 
       END IF
 
@@ -312,10 +308,10 @@
       END IF
 
 *    Copy history
-      CALL HIST_COPY (INLOC, OUTLOC, STATUS)
+      CALL HSI_COPY( IFID, OFID, STATUS )
 
 *    Add new history component
-      CALL HIST_ADD  (OUTLOC, VERSION, STATUS)
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
       TEXT(1) = 'Input {INP}'
       I       = 1
@@ -328,15 +324,12 @@
 
       END IF
 
-      CALL USI_TEXT  (I, TEXT, NLINES, STATUS)
-      CALL HIST_PTXT (OUTLOC, NLINES, TEXT, STATUS)
+      CALL USI_TEXT( I, TEXT, NLINES, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, TEXT, STATUS )
 
 *   Exit
-999   IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP ('EXERR', 'from SINFIT', STATUS)
-      END IF
-
-      CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 
@@ -424,7 +417,6 @@
       IMPLICIT NONE
 *    Include
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status :
       INTEGER                STATUS
 *    Import : (in same order as arguments)
