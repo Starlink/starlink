@@ -1,4 +1,4 @@
-dnl  Autoconf script for configuring the Makeifle for the
+dnl  Autoconf script for configuring the Makefile for the
 dnl  SC/13 demo programs.
 
 AC_INIT(fpp.c)
@@ -8,15 +8,6 @@ AC_CONFIG_AUX_DIR(config)
 
 AC_PROG_CC
 AC_PROG_F77
-
-dnl  What bytesex does this machine have?  Strictly redundant with the 
-dnl  AC_CANONICAL_SYSTEM test below, but more direct.
-AC_C_BIGENDIAN
-if test "$ac_cv_c_bigendian" = "yes"; then
-    AC_DEFINE(BIGENDIAN,1)
-else
-    AC_DEFINE(BIGENDIAN,0)
-fi
 
 
 dnl  What options do we need to pass to the compiler to get it to
