@@ -164,6 +164,9 @@ case $basic_machine in
 	i[3456]86)
 	  basic_machine=$basic_machine-pc
 	  ;;
+        x86_64-pc)
+          basic_machine=x86_64-pc
+          ;;
 	# Object if more than one company name word.
 	*-*-*)
 		echo Invalid configuration \`$1\': machine \`$basic_machine\' not recognized 1>&2
