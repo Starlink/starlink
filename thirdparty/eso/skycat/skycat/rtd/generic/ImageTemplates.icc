@@ -36,7 +36,7 @@
  * Before including, the following #defines need to be made:
  *
  * #define CLASS_NAME <...> - as the name of the derived class
- * #define DATA_TYPE as the raw image data type (short, long, float,...)
+ * #define DATA_TYPE as the raw image data type (short, long, float, double...)
  * #define NTOH(x)   to be just (x) if you're sure your type never requires
  *                   byte-swapping.  Otherwise leave it undefined and the
  *                   code below should do the right thing.

@@ -730,6 +730,7 @@ int FitsIO::write(const char *filename)
     case 16:
     case 32:
     case -32:
+    case -64:
 	fwrite((char*)data_.ptr(), tsize, width_*height_, f);
 	break;
     case -16:

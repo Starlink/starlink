@@ -54,6 +54,7 @@
  *                           are used when screen visual differs to
  *                           requested one and would not otherwise be
  *                           installed. 
+ *                 30/05/01  Added "double" as a valid data type.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $";
 
@@ -3653,6 +3654,8 @@ int RtdImage::typeCmd(int argc, char* argv[])
 	return TCL_OK;
 
     switch (image_->dataType()) {
+    case DOUBLE_IMAGE:
+	return set_result("double");
     case FLOAT_IMAGE:
 	return set_result("float");
     case SHORT_IMAGE:

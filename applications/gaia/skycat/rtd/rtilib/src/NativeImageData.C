@@ -55,4 +55,11 @@
 #undef DATA_TYPE
 #undef ISNAN
 
+#define DoubleImageData NativeDoubleImageData
+#include "DoubleImageData.C"
+#undef DoubleImageData
+#undef CLASS_NAME
+#undef DATA_TYPE
+#undef ISNAN
+
 #endif /* defined(i386) ... */

@@ -123,6 +123,7 @@ int RtdCamera::fileEvent()
     case 16:
     case 32:
     case -32:
+    case -64:
 	size = width * height * (abs(type)/8); // number of bytes
 	break;
     default:

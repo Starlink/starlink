@@ -21,13 +21,18 @@ TOPDIR      	= @DESTDIR@
 LIBDIR      	= @LIBDIR@
 DEPEND_TARGET	= @DEPEND_TARGET@
 
-SRCS 		=  LookupTable.C ImageData.C ByteImageData.C XImageData.C ShortImageData.C \
-		   UShortImageData.C LongImageData.C FloatImageData.C NativeImageData.C \
-		   iqefunc.c mrqfit.c indexx.c sort.c gaussj.c covsrt.c \
-		   histdist.c histeql.c histlist.c histmap.c histscan.c histzero.c saoutil.c
+SRCS 		=  LookupTable.C ImageData.C ByteImageData.C \
+                   XImageData.C ShortImageData.C UShortImageData.C \
+                   LongImageData.C FloatImageData.C DoubleImageData.C \
+                   NativeImageData.C \
+                   iqefunc.c mrqfit.c indexx.c sort.c gaussj.c covsrt.c \
+		   histdist.c histeql.c histlist.c histmap.c histscan.c \
+                   histzero.c saoutil.c
 
-OBJS 		=  LookupTable.o ImageData.o ByteImageData.o XImageData.o ShortImageData.o \
-		   UShortImageData.o LongImageData.o FloatImageData.o  NativeImageData.o \
+OBJS 		=  LookupTable.o ImageData.o ByteImageData.o \
+                   XImageData.o ShortImageData.o UShortImageData.o \
+                   LongImageData.o FloatImageData.o DoubleImageData.o \
+                   NativeImageData.o \
 		   iqefunc.o mrqfit.o indexx.o sort.o gaussj.o covsrt.o \
 		   histdist.o histeql.o histlist.o histmap.o histscan.o histzero.o saoutil.o
 

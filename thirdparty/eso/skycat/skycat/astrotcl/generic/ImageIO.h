@@ -25,6 +25,7 @@
  * Peter W. Draper 04/02/00  Changed constness of write so that
  *                           non-const member can be used within this
  *                           member. 
+ *                 30/05/01  Added DOUBLE_IMAGE enumeration.
  */
 
 
@@ -42,7 +43,8 @@ enum ImageDataType {
     SHORT_IMAGE = 16,		// 16 bit signed                
     USHORT_IMAGE = -16,		// 16 bit unsigned              
     LONG_IMAGE = 32,		// 32 bit integer               
-    FLOAT_IMAGE = -32		// 32 bit floating point        
+    FLOAT_IMAGE = -32,		// 32 bit floating point        
+    DOUBLE_IMAGE = -64		// 64 bit floating point        
 };
 
 

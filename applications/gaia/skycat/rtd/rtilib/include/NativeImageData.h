@@ -21,6 +21,7 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  20/03/98  Created
+ * Peter W. Draper 30/05/01  Added double support.
  */
 
 #if defined(i386) || defined(__i386__) || defined(__alpha) || \
@@ -59,6 +60,14 @@
 #include "FloatImageData.h"
 #undef FloatImageData
 
+#ifndef _DoubleImageData_h_
+#include "DoubleImageData.h"
+#endif
+#define DoubleImageData NativeDoubleImageData
+#undef _DoubleImageData_h_
+#include "DoubleImageData.h"
+#undef DoubleImageData
+
 #else  /* ! defined(i386) ... */
 
 // no byte swapping needed, so just use existing classes
@@ -66,6 +75,7 @@
 #define NativeUShortImageData UShortImageData
 #define NativeLongImageData LongImageData
 #define NativeFloatImageData FloatImageData
+#define NativeDoubleImageData DoubleImageData
 
 #endif /* defined(i386) ... */
 
