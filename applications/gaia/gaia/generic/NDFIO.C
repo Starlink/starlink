@@ -39,6 +39,9 @@
 //        Updated for Skycat/Gaia plugin (get() methods)
 //        Removed static put_keyword, blankImage methods (not used)
 //        Changed constructor to initialize WCS object.
+//     18-JUN-1999 (PDRAPER):
+//        Now frees PSX_MALLOC'd memory using cnf_free. Using plain
+//        free no longer works (64 bit pointers & FORTRAN).
 //     {enter_changes_here}
 
 //-
@@ -51,6 +54,9 @@
 #include "error.h"
 #include "StarWCS.h"
 #include "NDFIO.h"
+extern "C" {
+#include "cnf.h"
+}
 
 
 /*
@@ -112,7 +118,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component, int
       header = Mem( header_length * header_records + 1, mem_options );
       memcpy( (void *) header.ptr(), inheader, header_length * header_records + 1);
       
-      free(inheader);  /*  Memory allocated by PSX_ routines */
+      cnf_free(inheader); /*  Memory allocated by PSX_ routines */
 
       // Create NDFIO object with data and size.
       return new NDFIO( width, height, bitpix, bzero, bscale, header,
