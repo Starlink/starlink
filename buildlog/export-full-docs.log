@@ -426,4 +426,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 8 minutes 25 seconds
+Total time: 8 minutes 21 seconds
