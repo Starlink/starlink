@@ -1,4 +1,4 @@
-#!/star/bin/awish -file
+#!STAR_BIN/awish -file
 #+
 # tcl/tk interface to the cgs4dr system.
 #-
@@ -8,10 +8,10 @@
     global cgs4drBitmaps
 
 # Path and file names that may need to be cutomised
-    set tclAdamLib    /star/lib/tk/adam
+    set tclAdamLib    STAR_LIB/tk/adam
     set cgs4drTclLib  $env(CGS4DR_ROOT)/tcl
     set cgs4drBitmaps $env(CGS4DR_ROOT)/tcl
-    set cgs4drHtml    /star/docs/sun27.htx
+    set cgs4drHtml    STAR_DOCS/sun27.htx
 
 # Set up library search path
     lappend auto_path $tclAdamLib [exec /usr/bin/pwd] $cgs4drTclLib 
@@ -336,6 +336,7 @@
       bind .cred4.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
 
       .cred4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $Cred4Task $cmd"
+      .cred4.mb.options.menu add command -underline 0 -label "List Masks" -command "cred4ListMasks $Cred4Task"
       .cred4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $Cred4Task $Cred4NoticeBoard"
       .cred4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $Cred4Task $Cred4NoticeBoard"
       .cred4.mb.options.menu add checkbutton -underline 9 -label "Pause on Error" -variable Cred4Widgets(POE)
