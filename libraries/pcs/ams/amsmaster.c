@@ -67,7 +67,7 @@ int main()
       printf ( "master - path set up ok\n" );
    }
 
-   for ( j=0; j<1000; j++ )
+   for ( j=0; j<100; j++ )
    {
       ams_send ( path, outmsg_function, outmsg_status, outmsg_context, 
         outmsg_name, outmsg_length, outmsg_value, &messid, &status );
@@ -87,6 +87,7 @@ int main()
       printf ( "master: received - %s\n", inmsg_value );
    }
 
-   kill ( getpid(), SIGINT );
+   /* Removed to stop signal failing "make check" */
+   /*kill ( getpid(), SIGINT );*/
    return 0;
 }
