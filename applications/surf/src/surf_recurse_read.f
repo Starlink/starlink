@@ -1,6 +1,6 @@
       SUBROUTINE SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
      :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
-     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, WAVELENGTH, 
+     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -18,7 +18,7 @@
 *  Invocation:
 *      SUBROUTINE SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
 *     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
-*     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, WAVELENGTH, 
+*     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
 *     :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -60,6 +60,10 @@
 *        RA of centre for each file
 *     IN_DEC_CEN( MAX_FILE ) = DOUBLE (Returned)
 *        Dec of centre for each file
+*     FITS ( N_FITS, MAX_FILE) = CHARACTER*(80) (Returned)
+*        FITS entries for each file
+*     N_FITS = INTEGER (Given)
+*        Size of FITS array for each file
 *     WAVELENGTH = REAL (Given & Returned)
 *        Wavelength of map
 *     SUB_INSTRUMENT = CHAR (Given & Returned)
@@ -188,11 +192,13 @@
       INTEGER          DATA_END(MAX_FILE)
       INTEGER          DATA_PTR(MAX_FILE)
       CHARACTER*(*)    FILENAME(MAX_FILE)
+      CHARACTER*(*)    FITS(SCUBA__MAX_FITS, MAX_FILE)
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
       DOUBLE PRECISION IN_DEC_CEN(MAX_FILE)
       DOUBLE PRECISION IN_RA_CEN(MAX_FILE)
       DOUBLE PRECISION IN_UT1(MAX_FILE)
       INTEGER          N_BOL(MAX_FILE)
+      INTEGER          N_FITS(MAX_FILE)
       INTEGER          N_INTS(MAX_FILE)
       INTEGER          N_POS(MAX_FILE)
       INTEGER          NPARS
@@ -311,7 +317,8 @@
      :           NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
      :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE),
      :           1, IN_UT1(1), IN_UT1(N_FILE), IN_RA_CEN(N_FILE), 
-     :           IN_DEC_CEN(N_FILE), WAVELENGTH, SUB_INSTRUMENT, 
+     :           IN_DEC_CEN(N_FILE), FITS(1, N_FILE), N_FITS(N_FILE),
+     :           WAVELENGTH, SUB_INSTRUMENT, 
      :           OBJECT(N_FILE), UTDATE(N_FILE), UTSTART(N_FILE), 
      :           BOL_ADC, BOL_CHAN, BOL_RA_PTR(N_FILE),
      :           BOL_RA_END(N_FILE), BOL_DEC_PTR(N_FILE),
@@ -429,7 +436,7 @@
                      CALL SURF_PSEUDO_RECURSE( RLEV, SNAME, 
      :                    MAX_FILE, OUT_COORDS, N_FILE, N_BOL, N_POS, 
      :                    N_INTS, IN_UT1, IN_RA_CEN, 
-     :                    IN_DEC_CEN, WAVELENGTH, 
+     :                    IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :                    SUB_INSTRUMENT, OBJECT, UTDATE, 
      :                    UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
      :                    BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -468,7 +475,7 @@
 
       SUBROUTINE SURF_PSEUDO_RECURSE( RLEV, SNAME, MAX_FILE,
      :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
-     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, WAVELENGTH, 
+     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -528,11 +535,13 @@
       INTEGER          DATA_END(MAX_FILE)
       INTEGER          DATA_PTR(MAX_FILE)
       CHARACTER*(*)    FILENAME(MAX_FILE)
+      CHARACTER*(*)    FITS(SCUBA__MAX_FITS, MAX_FILE)
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
       DOUBLE PRECISION IN_DEC_CEN(MAX_FILE)
       DOUBLE PRECISION IN_RA_CEN(MAX_FILE)
       DOUBLE PRECISION IN_UT1(MAX_FILE)
       INTEGER          N_BOL(MAX_FILE)
+      INTEGER          N_FITS(MAX_FILE)
       INTEGER          N_INTS(MAX_FILE)
       INTEGER          N_POS(MAX_FILE)
       INTEGER          NPARS
@@ -559,7 +568,7 @@
       CALL SURF_RECURSE_READ( RLEV, SNAME, MAX_FILE,
      :     OUT_COORDS, N_FILE, N_BOL, N_POS, 
      :     N_INTS, IN_UT1, IN_RA_CEN, 
-     :     IN_DEC_CEN, WAVELENGTH, 
+     :     IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, OBJECT, UTDATE, 
      :     UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
