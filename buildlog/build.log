@@ -61,7 +61,7 @@ check_packages:
 
 build_classes:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/classes
-    [javac] Compiling 44 source files to /apps/cvsbuild/java/source/jniast/build/classes
+    [javac] Compiling 48 source files to /apps/cvsbuild/java/source/jniast/build/classes
 
 unpack_jni:
 
@@ -94,8 +94,6 @@ build:
 prepare:
 
 check_packages:
-[available] Feb 6, 2004 5:13:54 AM uk.ac.starlink.util.Loader starjavaDirectory
-[available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astgui/build/classes
@@ -312,7 +310,7 @@ execute_mk_script:
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e build
      [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
-     [exec] In file included from NDFJImpl.c:1425:
+     [exec] In file included from NDFJImpl.c:1424:
      [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet2DInt':
      [exec] NDFJImplGet.h:147: warning: passing arg 5 of pointer to function from incompatible pointer type
      [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet1DInt':
@@ -446,4 +444,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 59 seconds
+Total time: 1 minute 54 seconds

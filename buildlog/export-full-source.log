@@ -291,7 +291,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
-     [copy] Copying 45 files to /apps/cvsbuild/java/source/jniast/build/java
+     [copy] Copying 49 files to /apps/cvsbuild/java/source/jniast/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
@@ -420,11 +420,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1841 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1849 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 44 seconds
+Total time: 25 seconds

@@ -858,11 +858,11 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStyleBox.java:16: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstTitle.html...
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisLabelControls.java:51: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisNumLabControls.java:46: warning - Tag @see: reference not found: AstNumerLabels
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
@@ -886,11 +886,11 @@ javadoc-sources:
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -965,9 +965,9 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/CompositeElement.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/MultiStrokeRecognizer.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/Scene.java:28: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/recognition/SceneElement.html...
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: Tag @see: Malformed: Scene, StrokeElement, CompositeElement, ChoiceElement
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneElement.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/SceneRecognizer.java:16: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/StrokeElement.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/StrokeRecognizer.java:19: warning - @rating is an unknown tag.
@@ -1401,6 +1401,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/GraphLogger.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:23: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e. how to render a node if it
+  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Channel.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Delta.java:45: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Generator.java:31: warning - @rating is an unknown tag.
@@ -1410,13 +1417,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/View.java:37: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Protocol.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWEdge.java:18: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e. how to render a node if it
-  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWNode.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWPort.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/BasicLWEdge.java:24: warning - @rating is an unknown tag.
@@ -1656,7 +1656,7 @@ dist:
 
 install:
 [loggedcopy] Copying 8 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 67 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 71 files to /apps/cvsbuild/starjava/docs
      [echo] Executing DIVA target: install
 
 prepare:
@@ -1688,8 +1688,6 @@ install:
 prepare:
 
 check_packages:
-[available] Feb 6, 2004 6:00:43 AM uk.ac.starlink.util.Loader starjavaDirectory
-[available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
 
@@ -2128,7 +2126,7 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
-[loggedcopy] Copying 25 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 11 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 211 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 224 files to /apps/cvsbuild/starjava/docs
@@ -2317,4 +2315,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 9 minutes 44 seconds
+Total time: 4 minutes 45 seconds

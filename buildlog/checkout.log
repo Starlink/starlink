@@ -5794,6 +5794,7 @@ U java/source/frog/test/V405Aur/rband.bjd
 U java/source/frog/test/V405Aur/soft.bjd
 cvs checkout: Updating java/source/frog/test/perl_scripts
 U java/source/frog/test/perl_scripts/display_series.pl
+U java/source/frog/test/perl_scripts/get_fourier_transform.pl
 U java/source/frog/test/perl_scripts/get_version.pl
 cvs checkout: Updating java/source/hds
 U java/source/hds/.properties
@@ -6393,6 +6394,7 @@ U java/source/jniast/src/jni/CmpMap.c
 U java/source/jniast/src/jni/FitsChan.c
 U java/source/jniast/src/jni/Frame.c
 U java/source/jniast/src/jni/FrameSet.c
+U java/source/jniast/src/jni/GrismMap.c
 U java/source/jniast/src/jni/IntraMap.c
 U java/source/jniast/src/jni/LutMap.c
 U java/source/jniast/src/jni/Mapping.c
@@ -6401,6 +6403,8 @@ U java/source/jniast/src/jni/MatrixMap.c
 U java/source/jniast/src/jni/PcdMap.c
 U java/source/jniast/src/jni/PermMap.c
 U java/source/jniast/src/jni/Plot.c
+U java/source/jniast/src/jni/PolyMap.c
+U java/source/jniast/src/jni/ShiftMap.c
 U java/source/jniast/src/jni/SkyFrame.c
 U java/source/jniast/src/jni/SlaMap.c
 U java/source/jniast/src/jni/SpecFrame.c
@@ -6443,6 +6447,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/FitsChan.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Frame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/FrameSet.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Grf.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/GrismMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/IntraMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/LutMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Mapping.java
@@ -6452,6 +6457,8 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/NeedsChannelizing.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/PcdMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/PermMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Plot.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/PolyMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/ShiftMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SkyAxis.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SkyFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SlaMap.java
@@ -6466,6 +6473,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/Ukern1Calculator.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/UnitMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/WcsMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/WinMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/XmlChan.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/ZoomMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/package.html
 cvs checkout: Updating java/source/jniast/src/main/uk/ac/starlink/ast/grf
@@ -6475,7 +6483,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrfFontManager.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrfMarker.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrfState.java
 cvs checkout: Updating java/source/jniast/src/main/uk/ac/starlink/ast/xml
-U java/source/jniast/src/main/uk/ac/starlink/ast/xml/XAstNames.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/xml/BufferXmlChan.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/xml/XAstReader.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/xml/XAstWriter.java
 cvs checkout: Updating java/source/jniast/src/perl
@@ -6486,6 +6494,7 @@ U java/source/jniast/src/perl/CmpMap.pl
 U java/source/jniast/src/perl/FitsChan.pl
 U java/source/jniast/src/perl/Frame.pl
 U java/source/jniast/src/perl/FrameSet.pl
+U java/source/jniast/src/perl/GrismMap.pl
 U java/source/jniast/src/perl/JMaker.pm
 U java/source/jniast/src/perl/LutMap.pl
 U java/source/jniast/src/perl/Mapping.pl
@@ -6494,6 +6503,8 @@ U java/source/jniast/src/perl/MatrixMap.pl
 U java/source/jniast/src/perl/PcdMap.pl
 U java/source/jniast/src/perl/PermMap.pl
 U java/source/jniast/src/perl/Plot.pl
+U java/source/jniast/src/perl/PolyMap.pl
+U java/source/jniast/src/perl/ShiftMap.pl
 U java/source/jniast/src/perl/SkyFrame.pl
 U java/source/jniast/src/perl/SlaMap.pl
 U java/source/jniast/src/perl/SpecFrame.pl
@@ -6504,6 +6515,7 @@ U java/source/jniast/src/perl/UinterpCalculator.pl
 U java/source/jniast/src/perl/UnitMap.pl
 U java/source/jniast/src/perl/WcsMap.pl
 U java/source/jniast/src/perl/WinMap.pl
+U java/source/jniast/src/perl/XmlChan.pl
 U java/source/jniast/src/perl/ZoomMap.pl
 cvs checkout: Updating java/source/jniast/src/testcases
 cvs checkout: Updating java/source/jniast/src/testcases/uk
@@ -6511,8 +6523,14 @@ cvs checkout: Updating java/source/jniast/src/testcases/uk/ac
 cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink/ast
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/AstTest.java
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/MemoryXmlChan.java
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/XmlChanTest.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/alcyone.ast
 cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink/ast/xml
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/xml/OldXAstReader.java
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/xml/OldXAstTest.java
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/xml/OldXAstWriter.java
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/xml/XAstNames.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/xml/XAstTest.java
 cvs checkout: Updating java/source/jnihds
 U java/source/jnihds/.properties
@@ -8422,6 +8440,7 @@ U java/source/splat/src/script/.splat_autoloads
 U java/source/splat/src/script/BasicMaths.java
 U java/source/splat/src/script/MyLocalClass.java
 U java/source/splat/src/script/apidocs
+U java/source/splat/src/script/deblend
 U java/source/splat/src/script/detached_splat
 U java/source/splat/src/script/example_plugin1.bsh
 U java/source/splat/src/script/example_plugin2.bsh

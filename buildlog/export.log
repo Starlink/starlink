@@ -206,11 +206,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jniast-2.0-4-Linux.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/jniast/jniast-2.0-4-Linux.tar
-     [gzip] Building: /apps/cvsbuild/export/jniast-2.0-4-Linux.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jniast-2.0-4-Linux.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/jniast/jniast-2.0-4-Linux.tar
+      [zip] Building zip: /apps/cvsbuild/export/jniast-3.1-5-Linux.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jniast/jniast-3.1-5-Linux.tar
+     [gzip] Building: /apps/cvsbuild/export/jniast-3.1-5-Linux.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jniast-3.1-5-Linux.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jniast/jniast-3.1-5-Linux.tar
      [echo] Executing DIVA target: export
 
 export:
@@ -248,8 +248,6 @@ export:
 prepare:
 
 check_packages:
-[available] Feb 6, 2004 5:39:46 AM uk.ac.starlink.util.Loader starjavaDirectory
-[available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
 
@@ -760,7 +758,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 create_archives:
@@ -975,4 +972,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 18 minutes 32 seconds
+Total time: 13 minutes 8 seconds

@@ -34,7 +34,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
-     [copy] Copying 45 files to /apps/cvsbuild/java/source/jniast/build/java
+     [copy] Copying 49 files to /apps/cvsbuild/java/source/jniast/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
@@ -845,7 +845,6 @@ javadoc-sources:
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/package.html: warning - Tag @link: reference not found: DrawGraphicsMenu
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/jaiutil/package-summary.html...
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -854,6 +853,7 @@ javadoc-sources:
   [javadoc]  processed the same as FITSImages, i.e. are flipped top to bottom by
   [javadoc]  default and have their bad pixel flags set correctly.
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
@@ -1541,4 +1541,4 @@ javadoc-sources:
   [javadoc] 580 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 37 seconds
+Total time: 1 minute 2 seconds
