@@ -47,6 +47,10 @@
 *        coordinates.
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
+*     NBEAMS = INTEGER (Read)
+*         Number of output beams to be written to file. NBEAMS=1 just
+*         writes the Middle beam, NBEAMS=2 writes the Left (negative)
+*         and Right beams, NBEAMS=3 writes Middle, Left and Right beams.
 *     OUT = NDF (Write)
 *         This parameter specifies the name of the output file to be used
 *         to store the positional information.
@@ -105,6 +109,9 @@
  
 *  History:
 *     $Log$
+*     Revision 1.10  1999/07/14 20:39:10  timj
+*     Add documentation for NBEAMS for SCUBA2MEM
+*
 *     Revision 1.9  1999/07/14 20:13:31  timj
 *     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
 *     a parameter.
