@@ -161,7 +161,7 @@ static Error DoSXEnum( Object o, char *name, char *dep ){
 
          a = (Array) DXGetComponentValue( (Field) o, dep );
          if( !a ) {
-            DXSetError( ERROR_INVALID_DATA, "field has no \"%s\" component", dep );
+            DXSetError( ERROR_DATA_INVALID, "field has no \"%s\" component", dep );
             return( ERROR );
          }
 
