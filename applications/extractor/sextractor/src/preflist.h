@@ -6,10 +6,14 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP)
+*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	Keywords for the configuration file.
 *
 *	Last modify:	24/01/2003
+*                       15/03/2004
+*                                 (PWD): merged my changes from "prefs.h"
+*                                        Added RAD_THRESH and RAD_TYPE
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -95,6 +99,10 @@ pkeystruct key[] =
   {"MEMORY_BUFSIZE", P_INT, &prefs.mem_bufsize, 8, 65534},
   {"MEMORY_OBJSTACK", P_INT, &prefs.clean_stacksize, 16,65536},
   {"MEMORY_PIXSTACK", P_INT, &prefs.mem_pixstack, 1000, 10000000},
+  {"RAD_THRESH", P_FLOATLIST, prefs.rad, 0,0, -BIG, BIG,
+   {""}, 0, 3, &prefs.nrad, 1},
+  {"RAD_TYPE", P_KEY, &prefs.rad_type, 0, 0, 0.0, 0.0,
+   {"SB","INT",""}, 0, 1, &prefs.nrad_type, 1},
   {"PARAMETERS_NAME", P_STRING, prefs.param_name},
   {"PHOT_APERTURES", P_FLOATLIST, prefs.apert, 0,0, 0.0,2*MAXPICSIZE,
    {""}, 1, MAXNAPER, &prefs.naper},
