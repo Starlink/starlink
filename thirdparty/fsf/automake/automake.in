@@ -4711,6 +4711,19 @@ sub handle_starlink
           }
       }
 
+    if ($havelatex) 
+      {
+        # the starlink.am file defines template rules to generate
+        # documentation.  These include a .tex.htx_tar rule, which
+        # isn't picked up as a new suffix unless we declare the suffix
+        # rule here.  Simply adding to the SUFFIXES variable doesn't
+        # work, since that variable is special.  The other two rules
+        # aren't really necessary, but do no harm.
+        register_suffix_rule (INTERNAL, '.tex', '.dvi');
+        register_suffix_rule (INTERNAL, '.tex', '.htx_tar');
+        register_suffix_rule (INTERNAL, '.dvi', '.ps');
+      }
+
     $output_rules .= &file_contents ('starlink',
                                      new Automake::Location,
                                      INSTALLMANIFEST => $manifestdir,

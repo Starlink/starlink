@@ -86,7 +86,6 @@ install-manifest-am: # nothing to do
 endif !%?INSTALLMANIFEST%
 
 if %?LATEXDOCS%
-SUFFIXES+=.tex .dvi .ps .htx_tar
 # Templates to generate documentation
 .tex.dvi:
 	latex $<
