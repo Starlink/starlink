@@ -27,6 +27,7 @@
 *    Authors :
 *     Trevor Ponman  (BHVAD::TJP)
 *     Phillip Andrews (BHVAD::PLA)
+*     Richard Beard (University of Birmingham)
 *    History :
 *
 *     25 Jul 84 : Original
@@ -41,6 +42,7 @@
 *      6 Aug 93 : V1.7-1 MAP_MOV to ARR_COP translation (DJA)
 *     20 Apr 95 : V1.8-0 Updated data interface - use GMI_ to create o/p (DJA)
 *     13 Dec 1995 : V2.0-0 ADI port (DJA)
+*      9 Jun 1997 : Convert to PDA (RB)
 *
 *    Type Definitions :
 *
@@ -363,10 +365,12 @@
 *    Authors :
 *
 *     Phil Andrews (BHVAD::PLA)
+*     Richard Beard (ROSAT, University of Birmingham)
 *
 *    History :
 *
 *     12 Jan 89 : Original (BHVAD::PLA)
+*      9 Jun 97 : Convert to PDA (RB)
 *
 *    Type Definitions :
 *
@@ -401,32 +405,32 @@
       REAL             C, D1, D2              ! values of the wrk arrays.
 
       INTEGER          I                      ! Loop counter
-      INTEGER          IFAIL                  ! Status report from NAG routine
-      INTEGER          WKPTR                  ! Pointer to work array for NAG
+      INTEGER          WKPTR                  ! Pointer to work array for PDA
       INTEGER          WORK1                  ! Pointer to work array
       INTEGER          WORK2                  ! Pointer to work array
       INTEGER          WORK3                  ! Pointer to work array
       INTEGER          WORK4                  ! Pointer to work array
+      INTEGER	       CMPLX		      ! For PDA
+      INTEGER	       DIMS(2)		      ! For PDA
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get dynamic memory for nag routine
-      CALL DYN_MAPD( 1, NTOT, WKPTR, STATUS )
+*    Get dynamic memory for PDA routine
+      DIMS(1) = 2
+      DIMS(2) = NTOT
+      CALL DYN_MAPD( 2, DIMS, CMPLX, STATUS )
+      CALL DYN_MAPD( 1, 4*NTOT+15, WKPTR, STATUS )
+      CALL CROSSPEC_TO_CMPLX( NTOT, IN1, IN2, %VAL(CMPLX) )
 
-*    Call NAG routine
-      IFAIL = 0
-      CALL C06FCF( IN1, IN2, NTOT, %VAL(WKPTR), IFAIL )
+*    Call PDA routines
+      CALL PDA_DCFFTI( NTOT, %VAL(WKPTR) )
+      CALL PDA_DCFFTF( NTOT, %VAL(CMPLX), %VAL(WKPTR) )
+      CALL PDA_DC2NAG( NTOT, %VAL(CMPLX), IN1, IN2 )
 
       CALL DYN_UNMAP( WKPTR, STATUS )
-
-      IF (IFAIL .NE. 0) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'FATAL ERROR: An error has occured in'/
-     :                               /' the NAG routine', STATUS )
-        GOTO 999
-      END IF
+      CALL DYN_UNMAP( CMPLX, STATUS )
 
       DO I = 1, NV
         IF (I .GT. 1) THEN
@@ -491,6 +495,26 @@
 
       END
 
+*+  CROSSPEC_TO_CMPLX - To values into new array for PDA
+      SUBROUTINE CROSSPEC_TO_CMPLEX( N, X, Y, C )
+* Author:
+*   RB: Richard Beard (ROSAT, University of Birmingham)
+* History:
+*    9 Jun 1997: RB
+*      Original version
+*-
+
+      DOUBLE PRECISION X(N), Y(N), C(2,N)
+      INTEGER N
+
+      INTEGER I
+
+      DO I = 1, M
+        C(1,I) = X(I)
+        C(2,I) = Y(I)
+      END DO
+
+      END
 
 
 *+  CROSSPEC_VAR - Calculate the variance on the Phase & coherency spectra
