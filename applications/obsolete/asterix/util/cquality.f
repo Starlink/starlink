@@ -81,7 +81,7 @@
       REAL                   	XC(MX_PTS), YC(MX_PTS) 	! Circular centres
       REAL                   	RC(MX_PTS)             	! Circular radii
 
-      INTEGER                	AORDER(ADI__MXDIM)     	!
+      INTEGER                	AXORDER(ADI__MXDIM)     	!
       INTEGER                	TCPTR, CPTR            	! Pointer to dynamic
 							! array
       INTEGER                	DIMS(ADI__MXDIM)       ! Length of each dimension
