@@ -1821,7 +1821,9 @@
 
 *      Get the various probabilities
         IFAIL = 0
-        CALL PDA_POIPRB( DBLE(BSUM), NINT(DSUM), PLEK, PGTK, PEQK, IFAIL )
+        PLEK = 0.0D0
+        CALL PDA_POIPRB( DBLE(BSUM), NINT(DSUM),
+     :                   PLEK, PGTK, PEQK, IFAIL )
 
 *      We want upper tail AND the probability of observed counts
         PPROB = PGTK + PEQK
