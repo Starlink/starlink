@@ -338,7 +338,7 @@
 *   headers, the first will be a dummy header.
          CALL CON_MANDH( .TRUE., NCARD, %VAL( HPNTR ), HSTART( NHEADS ),
      :                   BITPIX, NDIM, DIMS, DARRAY, NONSDA, EL,
-     :                   STATUS )
+     :                   STATUS, %VAL( 80 ) )
 
 *   Cannot handle grouped data, or no data array, so set a bad status
 *   and make an error report follows.
@@ -364,7 +364,7 @@
 *  Obtain the scale and zero, the blank value.
          CALL CON_FTYPE( BITPIX, HSTART( NHEADS ), NCARD,
      :                   %VAL( HPNTR ), BSCALE, BZERO, BLANK,
-     :                   BADPIX, UNSIGN, STATUS )
+     :                   BADPIX, UNSIGN, STATUS, %VAL( 80 ) )
 
 *  Determine the HDS data type of the data array.  Note that the QUALITY
 *  component must be unsigned byte.
@@ -469,7 +469,8 @@
 *  the headers up to the end of the current header.
       IF ( HEADER ) THEN
          CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, %VAL( HPNTR ),
-     :                   HSTART( NHEADS ), .NOT. UPDATE, NDF, STATUS )
+     :                   HSTART( NHEADS ), .NOT. UPDATE, NDF, STATUS,
+     :                   %VAL( 80 ) )
       END IF
 
 *  End the NDF context.
