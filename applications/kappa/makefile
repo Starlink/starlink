@@ -830,7 +830,7 @@ DATA_FILES = $(LUTS) $(TEST_FILES)
 
 LUTS = \
 bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf \
-ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf
+ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf
 
 #  Define the package test data.
 
