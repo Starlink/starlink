@@ -438,7 +438,7 @@
 *
 *    Local variables :
 *
-      CHARACTER*5	   	GRP			! Object names
+      CHARACTER*5	   	OBJ			! Object names
 
       DOUBLE PRECISION       SIGMA              ! Criterion for ignoring data points.
       DOUBLE PRECISION       MEAN               ! Mean of data points.
