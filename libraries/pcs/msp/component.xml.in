@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs/msp</path>
+  <description>Message System Primitives library</description>
+  <abstract><p>MSP uses a single STREAM socket (path) in the INET
+      domain to communicate between any two tasks and a STREAM socket pair
+      in the UNIX domain to send/receive local (internal)
+      messages. Messages on the sockets specify a `queue' in the
+      receiving task for which they are intended and a queue in the
+      sending task to which replies should be sent.</p></abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly (ROE)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@ral.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <notes><p>Documented in SUN/241 in PCS system</p></notes>
+</component>

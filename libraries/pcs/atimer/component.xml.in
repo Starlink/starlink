@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs/atimer</path>
+  <description>ATIMER -- millisecond interval timers</description>
+  <abstract><p>This library provides a system of millisecond interval
+      timers used by the message system and DTASK.  Each timer has an
+      associated handler which is invoked when the timer expires.  The
+      library is written in C but a Fortran interface, FATIMER, is
+      provided.</p></abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <notes><p>Described in SSN/29</p></notes>
+</component>
