@@ -905,8 +905,8 @@ BUILT_SOURCES = PAR_ERR par_err.h
             indicates to automake that these source files are to be
             distributed as part of the final tarball, and that it must
             emit makefile rules to install the library in the correct
-            place, with the correct installation commands.  See
-            section <webref
+            place, with the correct installation commands.
+            For the list of such associated primaries, see section <webref
               url="&automakehtml;/Program-and-Library-Variables.html"
               >Program and Library Variables</webref> of the automake
             documentation.</p>
@@ -915,6 +915,41 @@ BUILT_SOURCES = PAR_ERR par_err.h
             replace this line with <code>lib_LIBRARIES =
               libpar_adam.a</code>, and the given library would be
             built in the usual way, without involving libtool.</p>
+
+          <p>The <code>LIBRARIES</code> and <code>LTLIBRARIES</code>
+            primaries can have any one of the prefixes
+            <code>libdir</code>, <code>pkglibdir</code>,
+            <code>check</code> or <code>noinst</code>, with the latter
+            indicating that the library should be built but not
+            installed.  Having non-installed libraries can be useful
+            when you are building a library conditionally, or in stages.
+            Libtool refers to these as `convenience libraries', and they
+            are discussed in section <webref
+              url="&automakehtml;/Libtool-Convenience-Libraries.html"
+              >Libtool Convenience Libraries</webref> of the automake
+            manual.</p>
+
+          <p>The other very important primary (not shown here) is
+            <code>PROGRAMS</code>, which describes programs which are to
+            be built and installed (the special Starlink case of
+            monoliths is described below).  This can have the prefixes
+            <code>bin</code>, <code>sbin</code>, <code>libexec</code>,
+            <code>pkglib</code>, <code>check</code> or
+            <code>noinst</code>: <code>check</code> is for tests, and is
+            described in <ref id="regressiontests"/>;
+            <code>noinst</code> indicates that the program should be
+            built but not installed, and is useful for programs which
+            are used during the build -- for generating header files for
+            example -- but which are not part of the final product.
+            There is no single standard list of prefixes, since each
+            primary supports only a subset of them (you cannot declare
+            <code>bin_LIBRARIES</code>, for example), but several are
+            mentioned in automake's <webref
+              url="&automakehtml;/Install.html" >What Gets
+              Installed</webref>, and the directories in question are
+            discussed in autoconf's <webref
+              url="&autoconfhtml;/autoconf_24.html" >4.7.2 Installation
+              Directory Variables</webref>.</p>
 
           <p>The <code>include_HEADERS</code> line is similar: it
             indicates that the listed files are to be distributed, and
@@ -1048,6 +1083,10 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             automake allows variable reuse and rewriting very similar
             to that supported by make.</p>
 
+          <p>The <code>MONOLITH</code> primary allows the prefixes
+            <code>bin</code>, <code>check</code> and
+            <code>noinst</code>, rather like <code>PROGRAMS</code>.</p>
+
           <p>When we are linking this monolith, we need to add a
             couple of link options, and we do this with a
             <code>LDADD</code> primary associated with the
@@ -1086,6 +1125,38 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             variable, as eventually substituted (see section <webref
               url="&automakehtml;/Uniform.html" >The Uniform Naming
               Scheme</webref> in the automake manual).</p>
+
+          <p>This is a rather special case, and you should not have to
+            do this sort of semi-licensed hacking very often.  In
+            particular, you do not need to do it in the case of the
+            Starlink standard directories <code>/star/docs</code>,
+            <code>/star/etc</code> and <code>/star/help</code>, since
+            you can give these directories as prefixes to the
+            <code>DATA</code> primary.  As an example, the HDS
+            makefile installs a file containing the information it has
+            determined about the build machine's floating point model,
+            and this is declared there as follows:
+            <verbatim>
+noinst_PROGRAMS = hds_machine
+starhelp_DATA = hds_machine.txt
+
+hds_machine_SOURCES = hds_machine.f
+hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
+
+hds_machine.txt: hds_machine
+        ./hds_machine >$@
+</verbatim>
+            This is enough to build the <code>hds_machine</code>
+            application at install time, run it, and install the
+            results in <code>/star/help</code> (with the obvious
+            changes for prefixes <code>stardocs</code> and
+            <code>staretc</code>).  The Starlink autoconf macros <ref
+            id="macro-doc-files" ><code>STAR_DOC_FILES</code></ref>,
+            <ref id="macro-etc-files"
+            ><code>STAR_ETC_FILES</code></ref> and <ref
+            id="macro-help-files" ><code>STAR_HELP_FILES</code></ref>
+            allow you to do the same thing from within the
+            <code>configure.ac</code> file.</p>
 
           <p>The remaining magic in this file is the
             <code>EXTRA_DIST</code> variable.  For all its cleverness,
@@ -1187,7 +1258,7 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             case of components which include a compiler, an
             environment variable such as <code>CC</code> or
             <code>FC</code> which allows you to override the compiler
-            which the configure script will find, which can be useful
+            which the configure script will find.  This is useful
             if you want to avoid a default compiler and use a specific
             one instead.  For example, if you wished to use
             the Sun C++ compiler specifically (while on a Sun,
@@ -1210,14 +1281,32 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
 % ./configure CXX=CC
 </verbatim>
             This doesn't set <code>CXX</code> as an environment
-            variable, but in a similar-looking way as one of the
+            variable, but sets it in a similar-looking way as one of the
             <code>./configure</code> arguments.  This second way is
             preferable for two reasons: firstly, it does not leave the
             variable set; secondly this way <code>./configure</code>
             `knows' that the compiler has been overridden, so that if
+            you are using a configure cache, and
             you <em>fail</em> to do this when the directory is
             reconfigured, <code>./configure</code> can warn you of
             this, in case this is not deliberate.</p>
+
+          <p>If you change one of these variables between runs, and
+            are using a configure cache, then the
+            <code>./configure</code> script will warn you like this:
+<verbatim>
+% ./configure -C
+configure: loading cache config.cache
+configure: error: `STARLINK' has changed since the previous run:
+configure:   former value:  /somewhere/else
+configure:   current value: /export3/sun
+configure: error: changes in the environment can compromise the build
+configure: error: run `make distclean' and/or `rm config.cache' and start over
+</verbatim>
+            To deal with this, simply remove the
+            <code>config.cache</code> file, check that the environment
+            variable is indeed set as you wish, and rerun
+            <code>./configure</code>.</p>
 
           <p>The down-side of this is that these environment variables
             <em>do matter</em>, and implicitly <em>change the
@@ -2953,7 +3042,35 @@ M Makefile.dependencies
           <title>General FAQs</title>
         </subhead>
 
-        <p>More to come (so ask me questions!).</p>
+        <p><dl>
+            <dt>If a executable is built that is used to create some
+              file during the build, how do I prevent it from being
+              installed?</dt>
+            <dd>
+              <p>Use the <code>noinst</code> prefix when you declare
+                the program.  See <ref id="automakeoverview"/>.</p>
+            </dd>
+
+            <dt>How do I put things in
+              <code>/star/{docs,etc,help}</code>?</dt>
+            <dd>
+              <p>Use the <code>stardocs</code>, <code>staretc</code>
+                and <code>starhelp</code> <code>DATA</code> prefixes.
+                See <ref id="automakeoverview"/>.</p>
+            </dd>
+
+            <dt>What's the best way to generate files at build
+              time?</dt>
+            <dd>
+              <p>Look at the <code>Makefile.am</code> for the
+                <code>prm</code> component.  It's a good example of
+                using <code>noinst_</code> tools, the Fortran
+                preprocessor, and <code>./configure</code> variables
+                in a reasonably tidy way.</p>
+            </dd>
+
+          </dl>
+        </p>
         
       </subsect>
 
@@ -2981,12 +3098,15 @@ M Makefile.dependencies
               <p>The nuclear option for clearing state from a
                 directory <code>ping</code> is to delete it and check
                 it out afresh:
-                <verbatim>
-                  % cd ..
-                  % rm -rf ping # or: mv ping ping-old
-                  % cvs update -d ping
-                </verbatim>
-                though do make sure that you have no modified but
+<verbatim>
+% cd ..
+% cvs release -d ping      # or: mv ping ping-old
+% cvs update -d ping
+</verbatim>
+                The CVS `release' command tells CVS you have finished
+                with a particular checkout.  With the <code>-d</code>
+                option, it is basically <kbd>rm -rf</kbd>
+                <em>except</em> that it checks you have no modified but
                 uncommited files left within <code>ping</code>.</p>
             </dd>
 
@@ -3019,9 +3139,9 @@ M Makefile.dependencies
                   <li>
                     <p>You can specify an installation prefix at
                       install time:
-                      <verbatim>
-                        % make prefix=/odd/place install # or install-manifest
-                      </verbatim>
+<verbatim>
+% make prefix=/odd/place install # or install-manifest
+</verbatim>
                       This might break your installation if there was
                       a prefix baked in to your component at build
                       time.  Do this only if you have a particular
@@ -3029,9 +3149,9 @@ M Makefile.dependencies
                   </li>
                   <li>
                     <p>At make time:
-                      <verbatim>
-                        % make prefix=/odd/place
-                      </verbatim>
+<verbatim>
+% make prefix=/odd/place
+</verbatim>
                       This builds your component with the Makefile
                       variable <code>${prefix}</code> set to the given
                       value.  The component will be installed into
@@ -3042,30 +3162,30 @@ M Makefile.dependencies
                   </li>
                   <li>
                     <p>At configure time:
-                      <verbatim>
-                        % ./configure --prefix=/odd/place
-                      </verbatim>
+<verbatim>
+% ./configure --prefix=/odd/place
+</verbatim>
                       This is usually the most appropriate way to do
                       this.</p>
                   </li>
                   <li>
                     <p>By setting a `sticky variable':
-                      <verbatim>
-                        % ./starconf.status STARCONF_DEFAULT_PREFIX=/odd/place
-                      </verbatim>
+<verbatim>
+% ./starconf.status STARCONF_DEFAULT_PREFIX=/odd/place
+</verbatim>
                       This sets the default for the
                       <code>./configure</code> script's
                       <code>--prefix</code> option.</p>
                   </li>
                   <li>
                     <p>By configuring <em>starconf</em>:
-                      <verbatim>
-                        % pwd
-                        .../buildsupport/starconf
-                        % ./configure STARCONF_DEFAULT_PREFIX=/odd/place
-                        ...
-                        % make; make install-manifest
-                      </verbatim>
+<verbatim>
+% pwd
+.../buildsupport/starconf
+% ./configure STARCONF_DEFAULT_PREFIX=/odd/place
+...
+% make; make install-manifest
+</verbatim>
                       This sets the default for all directories
                       configured using this <em>starconf</em> application.
                       This is effectively what you do when you set the
@@ -3088,11 +3208,11 @@ M Makefile.dependencies
                 as you want them, as described in <ref
                   id="bootstrapping"/>, and in the top level of the
                 checkout, do
-                <verbatim>
-                  % rm &lt;my-star&gt;/manifests/starconf
-                  % ./bootstrap
-                  % rm config.cache
-                </verbatim>
+<verbatim>
+% rm &lt;my-star&gt;/manifests/starconf
+% ./bootstrap
+% rm config.cache
+</verbatim>
                 The first command forces the bootstrap to remake and
                 reinstall the starconf component (since its manifest
                 file is present, it would not otherwise bother),
@@ -3148,7 +3268,7 @@ M Makefile.dependencies
                 top level of the checkout.</p>
             </dd>
 
-            <dt>What does this mean: <code>required file
+            <dt>What does this mean?: <code>required file
                 `./install-sh' not found</code></dt>
             <dd>
               <p>It means that you need to run
@@ -3166,6 +3286,24 @@ M Makefile.dependencies
                 installs required files, and does so by symlinking
                 rather than copying them.</p>
 
+            </dd>
+
+            <dt>What does this mean?: <code>configure: error:
+                `&lt;env-var&gt;' has changed since the previous
+                run</code></dt>
+            <dd>
+              <p>The message might say:
+<verbatim>
+% ./configure -C
+configure: loading cache config.cache
+configure: error: `STARLINK' has changed since the previous run:
+configure:   former value:  /somewhere/else
+configure:   current value: /export3/sun
+configure: error: changes in the environment can compromise the build
+configure: error: run `make distclean' and/or `rm config.cache' and start over
+</verbatim>
+              You have changed an `influential environment variable'.
+                See <ref id="configure-script"/>.</p>
             </dd>
 
           </dl>
@@ -3310,7 +3448,7 @@ M Makefile.dependencies
             need to run the preprocessor `by hand' for some reason,
             then a suitable stanza in a <code>Makefile.am</code>
             or <code>Makefile.in</code> would be:
-            <verbatim>
+<verbatim>
 file.f: file.$(FPP_SRC_EXT)
         $(FPP) $(FPPFLAGS) $(CPPFLAGS) file.$(FPP_SRC_EXT) $(FPP_OUTPUT)
 </verbatim>
@@ -3734,7 +3872,7 @@ file.f: file.$(FPP_SRC_EXT)
             the generated <code>Makefile.in</code>.</p>
 
           <p>You define it as follows:
-            <verbatim>
+<verbatim>
 : ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
 AC_SUBST(STAR_MANIFEST_DIR)
 </verbatim>
