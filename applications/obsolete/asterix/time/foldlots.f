@@ -334,9 +334,9 @@ C          NBINS = INBINS
       END IF
       CALL BDI_AXPUT0L( FFID, 1, 'Normalised', .TRUE., STATUS )
       CALL BDI_AXPUT0L( FFID, 2, 'Normalised', .TRUE., STATUS )
-      CALL BDI_AXPUT0C( FFID, 1,'Label', 'Phase', STATUS )
-      CALL BDI_AXPUTAXTEXT( CFID, 1,'Label', 'Period', STATUS )
-      CALL BDI_AXPUTAXTEXT( CFID, 1,'Units', 'seconds', STATUS )
+      CALL BDI_AXPUT0C( FFID, 1, 'Label', 'Phase', STATUS )
+      CALL BDI_AXPUT0C( CFID, 1, 'Label', 'Period', STATUS )
+      CALL BDI_AXPUT0C( CFID, 1, 'Units', 'seconds', STATUS )
 
 *  Add history records
       CALL HSI_COPY( IFID, FFID, STATUS )
