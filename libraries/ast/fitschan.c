@@ -124,7 +124,7 @@ c     - astPutCards: Stores a set of FITS header card in a FitsChan
 f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: David Berry (Starlink)
@@ -605,6 +605,11 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        non-celestial axes (same for AIPSFromSTore).
 *     4-OCT-2004 (DSB):
 *        Correct rounding of CRPIX in AddVersion to avoid integer overflow.
+*     11-NOV-2004 (DSB):
+*        - WcsFcRead: Avoid issuing warnings about bad keywords which
+*        have already been translated into equivalent good forms.
+*        - SpecTrans: If both PROJP and PV keywords are present, use PV
+*        in favour of PROJP only if the PV values look correct.
 *class--
 */
 
@@ -1148,7 +1153,7 @@ static void SetValue( AstFitsChan *, const char *, void *, int, char * );
 static void SinkWrap( void (*)( const char * ), const char * );
 static void SkyPole( AstWcsMap *, AstMapping *, int, int, int *, char, FitsStore *, const char *, const char * );
 static void Warn( AstFitsChan *, const char *, const char *, const char *, const char * );
-static void WcsFcRead( AstFitsChan *, FitsStore *, const char *, const char * );
+static void WcsFcRead( AstFitsChan *, AstFitsChan *, FitsStore *, const char *, const char * );
 static void WcsToStore( AstFitsChan *, AstFitsChan *, FitsStore *, const char *, const char * );
 static void WorldAxes( AstMapping *, double *, int * );
 static void WriteBegin( AstChannel *, const char *, const char * );
@@ -22372,7 +22377,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int norot;                     /* Non-zero if there is no axis rotation */
    int ok;                        /* Can projection be represented in FITS-WCS?*/
    int porder;                    /* Order of polynomial */
+   int tlbnd[ 2 ];                /* Lower index bounds */
+   int tubnd[ 2 ];                /* Upper index bounds */
    int ubnd[ 2 ];                 /* Upper index bounds */
+   int use_projp;                 /* Use PROJP keywors in favour of PV keywords? */
    int watlen;                    /* Length of total WAT string (inc. term null)*/
    size_t size;                   /* Length of string value */
 
@@ -22742,15 +22750,53 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* PROJP keywords
    -------------- */
-         if( astKeyFields( this, "PROJP%d", 1, ubnd, lbnd ) && 
-             !astKeyFields( this, "PV%d_%d", 2, ubnd, lbnd ) && axlat != -1 ){
-            for( i = lbnd[ 0 ]; i <= ubnd[ 0 ]; i++ ){
-               if( GetValue2( ret, this, FormatKey( "PROJP", i, -1, ' ' ), 
-                             AST__FLOAT, (void *) &dval, 0, method, class ) &&
-                   ( encoding == FITSPC_ENCODING || 
-                     encoding == FITSIRAF_ENCODING ) ){
-                  SetValue( ret, FormatKey( "PV", axlat + 1, i, ' ' ),
-                            (void *) &dval, AST__FLOAT, CardComm( this ) );
+         if( astKeyFields( this, "PROJP%d", 1, ubnd, lbnd ) && axlat != -1 ) {
+
+/* Some people produce headers with both PROJP and PV. Even worse, the
+   PROJP and PV values are sometimes inconsistent. In this case we trust
+   the PV values rather than the PROJP values, but only if the PV values
+   are not obviously incorrect for some reason. In particularly, we check
+   that, *if* either PVi_1 or PVi_2 (where i=longitude axis) is present, 
+   then PVi_0 is also present. Conversely we check that if PVi_0 is
+   present then at least one of PVi_1 or PVi_2 is present. */
+            use_projp = 1;
+            if( axlat != -1 &&
+                astKeyFields( this, "PV%d_%d", 2, tubnd, tlbnd ) ){
+               use_projp = 0;
+
+/* Are there any PV values for the longitude axis? */
+               if( tlbnd[ 0 ] <= axlon + 1 <= tubnd[ 0 ] ) {
+
+/* Are either PVi_1 or PVi_2 available? */
+                  if( SearchCard( this, FormatKey( "PV", axlon + 1, 1, ' ' ),
+                                  method, class ) || 
+                      SearchCard( this, FormatKey( "PV", axlon + 1, 2, ' ' ),
+                                  method, class ) ) {
+                     
+/* If so use PROJP if PVi_0 is not also available. */
+                     if( !SearchCard( this, FormatKey( "PV", axlon + 1, 0, ' ' ),
+                                      method, class ) ) use_projp = 1;
+
+/* If neither PVi_1 or PVi_2 are available, use PROJP if PVi_0 is
+   available. */
+                  } else if( SearchCard( this, FormatKey( "PV", axlon + 1, 0, ' ' ),
+                                         method, class ) ) {
+                     use_projp = 1;
+
+                  }
+               }
+            }
+
+/* Translate PROJP to PV if required. */
+            if( use_projp ) {
+               for( i = lbnd[ 0 ]; i <= ubnd[ 0 ]; i++ ){
+                  if( GetValue2( ret, this, FormatKey( "PROJP", i, -1, ' ' ), 
+                                AST__FLOAT, (void *) &dval, 0, method, class ) &&
+                      ( encoding == FITSPC_ENCODING || 
+                        encoding == FITSIRAF_ENCODING ) ){
+                     SetValue( ret, FormatKey( "PV", axlat + 1, i, ' ' ),
+                               (void *) &dval, AST__FLOAT, CardComm( this ) );
+                  }
                }
             }
          }
@@ -25902,8 +25948,8 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    return ret;
 }
 
-static void WcsFcRead( AstFitsChan *fc, FitsStore *store, const char *method, 
-                        const char *class ){
+static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store, 
+                       const char *method, const char *class ){
 /*
 *  Name:
 *     WcsFcRead
@@ -25917,8 +25963,8 @@ static void WcsFcRead( AstFitsChan *fc, FitsStore *store, const char *method,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     void WcsFcRead( AstFitsChan *fc, FitsStore *store, const char *method, 
-*                      const char *class )
+*     void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store, 
+*                     const char *method, const char *class )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -25939,6 +25985,11 @@ static void WcsFcRead( AstFitsChan *fc, FitsStore *store, const char *method,
 *        Pointer to the FitsChan containing the cards read from the
 *        original FITS header. This should not include any un-used 
 *        non-standard keywords.
+*     fc2
+*        Pointer to a second FitsChan. If a card read from "fc" fails to
+*        be converted to its correct data type, a warning is only issued
+*        if there is no card for this keyword in "fc2". "fc2" may be NULL
+*        in which case a warning is always issued.
 *     store
 *        Pointer to the FitsStore structure.
 *     method
@@ -26427,11 +26478,15 @@ static void WcsFcRead( AstFitsChan *fc, FitsStore *store, const char *method,
 /* Issue a warning if the value could not be converted to the expected
    type. */
          if( !ok ) {
-            sprintf( buf, "The original FITS header contained a value for "
-                     "keyword %s which could not be converted to a %s.",
-                     keynam, ( type==AST__FLOAT ? "floating point number":
-                     "character string" ) );
-            Warn( fc, "badval", buf, "astRead", "FitsChan" );
+
+/* First check that the keyword is not included in "fc2". */
+            if( !SearchCard( fc2, keynam, method, class ) ) {
+               sprintf( buf, "The original FITS header contained a value for "
+                        "keyword %s which could not be converted to a %s.",
+                        keynam, ( type==AST__FLOAT ? "floating point number":
+                        "character string" ) );
+               Warn( fc, "badval", buf, "astRead", "FitsChan" );
+            }
          }
       }   
 
@@ -29034,12 +29089,12 @@ static void WcsToStore( AstFitsChan *this, AstFitsChan *trans,
    if ( !astOK ) return;
 
 /* Read all usable cards out of the main FitsChan, into the FitsStore. */
-   WcsFcRead( this, store, method, class );
+   WcsFcRead( this, trans, store, method, class );
 
 /* If a FitsChan containing standard translations was supplied, read all 
    cards out of it, into the FitsStore, potentially over-writing the
    non-standard values stored in the previous call to WcsFcRead. */
-   if( trans ) WcsFcRead( trans, store, method, class );
+   if( trans ) WcsFcRead( trans, NULL, store, method, class );
 
 }
 
