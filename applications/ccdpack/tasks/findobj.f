@@ -298,6 +298,9 @@
 *        Changed to write the output parameter COUNTS and to add the
 *        ability to continue after not finding objects on a frame (added
 *        for ORAC-DR)
+*     15-OCT-1999 (PDRAPER):
+*        Fixed a bug in above that was actually reporting number of
+*        pixels above the threshold, not number of objects.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -363,6 +366,7 @@
       INTEGER NEED              ! Number of bins required for oversampling
       INTEGER NNDF              ! Number of input NDFs
       INTEGER NOBJ( CCD1__MXNDF ) ! Number of objects found in each image
+      INTEGER NPIXEL            ! Number of pixels above threshold
       INTEGER NOUT              ! Number of output positions
       INTEGER NRET              ! Number of returns
       INTEGER OVSAMP            ! Oversampling factor
@@ -404,7 +408,6 @@
 *  Process each of the NDFs in turn.
       CALL ERR_MARK
       DO 1 INDEX = 1, NNDF
-         NOBJ( INDEX ) = 0
 
 *  Access the NDF.
          CALL IRG_NDFEX( NDFGRP, INDEX, IDIN, STATUS )
@@ -617,26 +620,26 @@
 *  Determine the connectivity of images above the threshold.
             CALL CCD1_DCON( ITYPE, IPIN, XDIM, YDIM, BAD, THRESH, TOUCH,
      :                      %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ),
-     :                      %VAL( IPGRP ), NOBJ( INDEX ), NABOVE, 
+     :                      %VAL( IPGRP ), NPIXEL, NABOVE, 
      :                      STATUS )
 
 *  Get workspace for the centroiding results
-            IF ( NOBJ( INDEX ) .GT. 0 ) THEN
-               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPXC, STATUS )
-               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPYC, STATUS )
-               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPMIN, STATUS )
-               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPSUM1, 
+            IF ( NPIXEL .GT. 0 ) THEN
+               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPXC, STATUS )
+               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPYC, STATUS )
+               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPMIN, STATUS )
+               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPSUM1, 
      :                         STATUS )
-               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPSUM2, 
+               CALL CCD1_MALL( NPIXEL, '_DOUBLE', IPSUM2, 
      :                         STATUS )
-               CALL CCD1_MALL( NOBJ( INDEX ), '_INTEGER', IPCON, 
+               CALL CCD1_MALL( NPIXEL, '_INTEGER', IPCON, 
      :                         STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 98
                
 *  Now form the centroids.
                CALL CCD1_DCEN( NABOVE, %VAL( IPX ), %VAL( IPY ),
      :                         %VAL( IPINT ), %VAL( IPGRP ), 
-     :                         NOBJ( INDEX ), MINPIX, %VAL( IPSUM1 ), 
+     :                         NPIXEL, MINPIX, %VAL( IPSUM1 ), 
      :                         %VAL( IPSUM2 ), %VAL( IPCON ), 
      :                         %VAL( IPXC ), %VAL( IPYC ),
      :                         %VAL( IPMIN), NOUT, STATUS )
@@ -729,6 +732,8 @@
             CALL ERR_REP( ' ', 
      :      '  Warning - Failed to detect any objects', STATUS )
             CALL ERR_FLUSH( STATUS )
+         ELSE
+            NOBJ( INDEX ) = NOUT
          END IF
          IF ( STATUS .NE. SAI__OK ) THEN 
             CALL ERR_RLSE
