@@ -7,6 +7,13 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 icl_SOURCES = parse.y lex.l $(F_ROUTINES) $(C_ROUTINES)
 icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs_link_adam` @FCLIBS@
 
+#  Make sure we use the C compiler for linking. Using Fortran causes
+#  problems with multiple mains (Tru64 UNIX). Either of the next three 
+#  lines should do this.
+#icl_LINK = $(CCLD) -o $@
+#icl_LINK = $(LINK) -o $@
+FCLD = $(CC)
+
 # May not be portable. We need the y.tab.h file to be created
 # By default YACC does not create one. Note that we expect parse.h
 # to be created from parse.y
