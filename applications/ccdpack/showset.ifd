@@ -35,7 +35,7 @@
          parameter pickindex {
             type LITERAL
             access READ
-            vpath PROMPT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             prompt {Selection criteria for Set Index (ALL,EQUAL,LIKE)}
             in ALL EQUAL LIKE
@@ -46,7 +46,7 @@
          parameter pickname {
             type LITERAL
             access READ
-            vpath PROMPT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             prompt {Selection criteria for Set Name (ALL,EQUAL,LIKE)}
             in ALL EQUAL LIKE
@@ -105,8 +105,8 @@
             access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            prompt {Primary sort key (INDEX or NAME)}
-            in INDEX NAME
+            prompt {Primary sort key (INDEX, NAME or NONE)}
+            in INDEX NAME NONE
             default NAME
             helpkey *
          }

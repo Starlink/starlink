@@ -52,6 +52,16 @@
 *        indirection) each member of which represents an image to
 *        be used as a template.  Only images with a Set Index value 
 *        matching that of one of the template images will be selected.
+*     LISTBY = LITERAL (Read)
+*        Indicates the way in which NDFs should be grouped for output.
+*        It may take the values 'NAME', 'INDEX' or 'NONE'. 
+*        If set to NAME, then all the NDFs in the same Set are grouped
+*        together in the output; if set to INDEX then all the 
+*        corresponding NDFs from different Sets are grouped together,
+*        and if set to NONE NDFs will be listed in the same order as
+*        the IN parameter.  If only NDFs with the same Name or with 
+*        the same Index are being output, this will have no effect.
+*        [NAME]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -124,15 +134,6 @@
 *        If SETLESS is true, they are selected for output, but if 
 *        SETLESS is false, they are discarded.
 *        [FALSE]
-*     LISTBY = LITERAL (Read)
-*        Indicates the way in which NDFs should be grouped for output.
-*        It may take the value 'NAME' or 'INDEX'; if NDFs which differ
-*        in both Name and Index attribute are being output, then
-*        those with the same Name, or those with the same Index,
-*        will be grouped together according to the value of this
-*        parameter.  If only NDFs with the same Name or with the
-*        same Index are being output, this will have no effect.
-*        [NAME]
 
 *  Examples:
 *     showset *
@@ -281,7 +282,7 @@
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NNDF, STATUS )
 
 *  Get the primary sort key.
-      CALL PAR_CHOIC( 'LISTBY', ' ', 'INDEX,NAME', .FALSE., SRTKEY,
+      CALL PAR_CHOIC( 'LISTBY', ' ', 'INDEX,NAME,NONE', .FALSE., SRTKEY,
      :                STATUS )
 
 *  How will we filter by Set Name?
@@ -418,7 +419,7 @@
          LINE( 24: ) = '--------'
          LINE( 64: ) = '-------------'
          CALL CCD1_MSG( ' ', LINE, STATUS )
-      ELSE
+      ELSE IF ( SRTKEY .EQ. 'INDEX' .OR. SRTKEY .EQ. 'NONE' ) THEN
          LINE( 2: ) = 'Set index'
          LINE( 12: ) = 'Set name'
          LINE( 40: ) = 'NDF name'
@@ -494,11 +495,11 @@
 
 *  If this is the first line to be output for this subgroup, write a
 *  header line through the log system.
-               IF ( NSEL .EQ. 1 ) THEN
+               IF ( NSEL .EQ. 1 .AND. SRTKEY .NE. 'NONE' ) THEN
                   LINE = ' '
                   IF ( SRTKEY .EQ. 'NAME' ) THEN
                      LINE( 2: ) = NAME
-                  ELSE
+                  ELSE IF ( SRTKEY .EQ. 'INDEX' ) THEN
                      LINE( 2: ) = SINDEX
                   END IF
                   LINE( CHR_LEN( LINE ) + 1: ) = ':'
@@ -516,6 +517,9 @@
                      LINE( 70: ) = 'no '
                   END IF
                ELSE
+                  IF ( SRTKEY .EQ. 'NONE' ) THEN
+                     LINE( 2: ) = SINDEX
+                  END IF
                   LINE( 10:38 ) = NAME
                   LINE( 40:66 ) = NDFNAM
                   IF ( JSET .GT. 0 ) THEN
