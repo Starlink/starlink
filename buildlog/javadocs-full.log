@@ -300,8 +300,8 @@ javadoc-sources:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] This sentence is different from what will be interpreted as the first sentence in the
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] next major release (when that interpretation will be internationalized), which is:
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g. a frame or an applet)."
@@ -1549,4 +1549,4 @@ javadoc-sources:
   [javadoc] 577 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 6 seconds
+Total time: 1 minute 5 seconds
