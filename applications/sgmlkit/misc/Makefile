@@ -6,7 +6,8 @@
 LIBSCRIPTS=../lib/img-eqlist.pl ../lib/abstract-star2html.pl
 BINSCRIPTS=../bin/sgml2docs ../bin/sgml2xml ../bin/sgml2hlp
 
-docs: libdocs.sgml bindocs.sgml
+misc.stamp: libdocs.sgml bindocs.sgml
+	touch $@
 
 libdocs.sgml: $(LIBSCRIPTS)
 	cp libdocs.head $@
