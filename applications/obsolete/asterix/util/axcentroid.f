@@ -366,31 +366,31 @@
 *  Accumulate the data from I_D into W_D and O_D
       IF ( AXIS .EQ. 7 ) THEN
         CALL AXCENTROID_7( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 6 ) THEN
         CALL AXCENTROID_6( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 5 ) THEN
         CALL AXCENTROID_5( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 4 ) THEN
         CALL AXCENTROID_4( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 3 ) THEN
         CALL AXCENTROID_3( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 2 ) THEN
         CALL AXCENTROID_2( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 1 ) THEN
         CALL AXCENTROID_1( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       END IF
 
