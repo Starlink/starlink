@@ -18,7 +18,7 @@
 *
 *     The only mappings it can properly deal with are linear.  A check
 *     is made to see whether the mapping does in fact appear to be 
-*     linear; if it does not then a linear approximation to it is 
+*     significantly nonlinear; if so then a linear approximation to it is 
 *     still output, but a warning is given to the effect that the
 *     mapping appears to be nonlinear.  The check is fairly rudimentary,
 *     so that false negatives and false positives are both possible.
@@ -90,8 +90,17 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Check that the supplied mapping is valid.
+      IF ( MAP .EQ. AST__NULL ) THEN
+         STATUS = SAI__ERROR
+         CALL CCD1_ERREP( 'CCD1_TCOUT_NULLMAP',
+     :                    'Mapping supplied is null', STATUS )
+      ELSE
+
 *  Get mapping between frames and transform points.
-      CALL AST_TRAN2( MAP, 4, PXI, PYI, .TRUE., PXO, PYO, STATUS )
+         CALL AST_TRAN2( MAP, 4, PXI, PYI, .TRUE., PXO, PYO, STATUS )
+
+      END IF
 
 *  Check that the transformation has been successful.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -121,31 +130,31 @@
 
 *  Output the coefficients.
          BUFFER = ' '
-         IAT = 2
-         BUFFER( IAT: ) = '  A ='
-         IAT = IAT + 7
+         IAT = 4
+         BUFFER( IAT: ) = ' A ='
+         IAT = IAT + 5
          CALL CHR_DTOC( TR( 1 ), BUFFER( IAT: ), NCHAR )
-         IAT = 27
-         BUFFER( IAT: ) = '  B ='
-         IAT = IAT + 7
+         IAT = 29
+         BUFFER( IAT: ) = ' B ='
+         IAT = IAT + 5
          CALL CHR_DTOC( TR( 2 ), BUFFER( IAT: ), NCHAR )
-         IAT = 52
-         BUFFER( IAT: ) = '  C ='
-         IAT = IAT + 7
+         IAT = 54
+         BUFFER( IAT: ) = ' C ='
+         IAT = IAT + 5
          CALL CHR_DTOC( TR( 3 ), BUFFER( IAT: ), NCHAR )
          CALL CCD1_MSG( ' ', BUFFER, STATUS )
          BUFFER = ' '
-         IAT = 2
-         BUFFER( IAT: ) = '  D ='
-         IAT = IAT + 7
+         IAT = 4
+         BUFFER( IAT: ) = ' D ='
+         IAT = IAT + 5
          CALL CHR_DTOC( TR( 4 ), BUFFER( IAT: ), NCHAR )
-         IAT = 27
-         BUFFER( IAT: ) = '  E ='
-         IAT = IAT + 7
+         IAT = 29
+         BUFFER( IAT: ) = ' E ='
+         IAT = IAT + 5
          CALL CHR_DTOC( TR( 5 ), BUFFER( IAT: ), NCHAR )
-         IAT = 52
-         BUFFER( IAT: ) = '  F ='
-         IAT = IAT + 7
+         IAT = 54
+         BUFFER( IAT: ) = ' F ='
+         IAT = IAT + 5
          CALL CHR_DTOC( TR( 6 ), BUFFER( IAT: ), NCHAR )
          CALL CCD1_MSG( ' ', BUFFER, STATUS )
        
