@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <cstdio>
+#include <cerrno>
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 
@@ -19,33 +20,30 @@ InputByteStream::InputByteStream (string s, bool preload=false)
 
     eof_ = false;
 
-    if (!eof_)
-    {
-	if (preload)
-	{
-	    struct stat S;
-	    if (fstat (fd_, &S))
-		throw DviError ("Can't stat open file");
-	    buflen_ = S.st_size;
-	    buf_ = new Byte[buflen_];
-	    int bufcontents = read (fd_, buf_, buflen_);
-	    if (bufcontents != buflen_)
-		throw DviError ("Couldn't preload file");
-	    eob_ = buf_ + bufcontents;
-	    cerr << "stat.st_size="<<buflen_
-		 <<" bufcontents="<<bufcontents<<'\n';
+    struct stat S;
+    if (fstat (fd_, &S))
+	throw InputByteStreamError ("Can't stat open file");
+    filesize_ = S.st_size;
 
-	    close (fd_);
-	    fd_ = -1;
-	}
-	else
-	{
-	    buflen_ = 512;
-	    buf_ = new Byte[buflen_];
-	    eob_ = buf_;	// nothing read in yet - eob at start
-	}
-	p_ = buf_;
+    if (preload)
+    {
+	buflen_ = filesize_;
+	buf_ = new Byte[buflen_];
+	int bufcontents = read (fd_, buf_, buflen_);
+	if (bufcontents != buflen_)
+	    throw InputByteStreamError ("Couldn't preload file");
+	eob_ = buf_ + bufcontents;
+
+	close (fd_);
+	fd_ = -1;
     }
+    else
+    {
+	buflen_ = 512;
+	buf_ = new Byte[buflen_];
+	eob_ = buf_;	// nothing read in yet - eob at start
+    }
+    p_ = buf_;
 }
 
 InputByteStream::~InputByteStream ()
@@ -80,67 +78,60 @@ Byte InputByteStream::getByte(int n=1)
     return result;
 }
 
-void InputByteStream::gotoEnd()
-{
-    if (preloaded_)
-    {
-	p_ = eob_ - 1;
-    }
-    else
-    {
-	if (lseek (fd_, -buflen_, SEEK_END) < 0)
-	    throw InputByteStreamError ("gotoEnd: can\'t seek");
-	read_buf_();
-	p_ = eob_ - 1;		// point at last byte
-    }
-}
-void InputByteStream::backspace (int n=1)
-{
-    if (n < 0)
-	throw DviBug ("InputByteStream::backspace: n < 0");
-    if (preloaded_)
-    {
-	p_ -= n;
-	if (p_ < eob_)
-	    throw DviBug
-	      ("InputByteStream::backspace: backspace past beginning of file");
-    }
-    else
-    {
-	p_ -= n;
-	if (p_ < buf_)
-	{
-	    // at beginning of buffer - read previous block
-	    if (lseek (fd_, 2*buflen_, SEEK_CUR) < 0)
-		throw DviBug ("InputByteStream::backspace: can\'t seek");
-	    read_buf_();
-	    p_ += buflen_;
-	}
-    }
-}   
-
-const Byte *InputByteStream::getBlock (unsigned int pos, unsigned int length)
+const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 {
     if (eof_)
 	return 0;
 
-    Byte *blockp = buf_ + pos;
-    if (blockp < buf_)
-	throw DviBug ("InputByteStream: pointer before buffer start");
-    if (blockp > eob_)
+    Byte *blockp;
+
+    if (pos < 0)
     {
-	char buf[100];
-	sprintf (buf, "InputByteStream::getBlock: pointer beyond EOF (%d,%d)",
-		 pos, length);
-	throw DviBug (buf);
+	if (preloaded_)
+	{
+	    blockp = buf_ + buflen_ - length;
+	    if (blockp < buf_)
+		throw DviBug
+		  ("InputByteStream::getBlock: requested more than bufferful");
+	}
+	else
+	{
+	    if (length > buflen_)
+		throw InputByteStreamError ("getBlock: length too large");
+	    if (lseek (fd_, filesize_-length, SEEK_SET) < 0)
+		throw InputByteStreamError ("getBlock: can\'t seek");
+	    read_buf_();
+	    blockp = buf_;
+	}
     }
-    if (blockp+length > eob_)
+    else
     {
-	char buf[100];
-	sprintf (buf,
+	if (preloaded_)
+	{
+	    blockp = buf_ + pos;
+	    if (blockp < buf_)
+		throw DviBug
+		    ("InputByteStream::getBlock: pointer before buffer start");
+	    if (blockp > eob_)
+	    {
+		char buf[100];
+		sprintf (buf,
+		      "InputByteStream::getBlock: pointer beyond EOF (%d,%d)",
+			 pos, length);
+		throw DviBug (buf);
+	    }
+	    if (blockp+length > eob_)
+	    {
+		char buf[100];
+		sprintf (buf,
 		"InputByteStream::getBlock: requested block too large (%d,%d)",
-		 pos,length);
-	throw DviBug (buf);
+			 pos,length);
+		throw DviBug (buf);
+	    }
+	}
+	else
+	    throw DviBug
+		("InputByteStream::getBlock: implemented only for preloaded");
     }
 
     return blockp;
@@ -162,12 +153,15 @@ void InputByteStream::seek (unsigned int pos)
     else
     {
 	if (lseek (fd_, pos, SEEK_SET) < 0)
-	    throw DviBug ("InputByteStream::seek: can\'t seek");
+	{
+	    string errstr = strerror(errno);
+	    throw DviBug ("InputByteStream::seek: can\'t seek ("+errstr+")");
+	}
 	read_buf_();
 	p_ = buf_;
     }
 }
-unsigned int InputByteStream::pos ()
+int InputByteStream::pos ()
 {
     if (!preloaded_)
 	throw DviBug ("Can't get pos in non-preloaded file");
@@ -273,6 +267,16 @@ unsigned int InputByteStream::getUIU(int n)
 	t *= 256;
 	t += getByte();
     }
+    return t;
+}
+
+unsigned int InputByteStream::getUIU(int n, const Byte *p)
+{
+    if (n<0 || n>4)
+	throw DviBug("bad argument to getUIU");
+    unsigned int t = 0;
+    for (const Byte *b=p; n>0; n--, b++)
+	t = t*256 + static_cast<unsigned int>(*b);
     return t;
 }
 
