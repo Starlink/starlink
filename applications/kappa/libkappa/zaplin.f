@@ -46,22 +46,22 @@
 *  ADAM Parameters:
 *     COLIN =  FILENAME (Read)
 *        The name of a text file containing the bounds of the areas to be
-*	 replaced. This parameter is only accessed if parameter MODE is
-*	 set to "File". Each record in the file must be either a blank
-*	 line, a comment (indicated by a "!" or "#" in column 1 ), or a
-*	 definition of an area to be replaced, consisting of three of
-*	 four space-separated fields. If a range of columns is to be
-*	 replaced, each of the first two fields should be a formatted
-*	 value for the first axis of the current co-ordinate Frame of the
-*	 input NDF, and the third field should be the single character
-*	 "C". If a range of lines is to be replaced, each of the first
-*	 two fields should be a formatted value for the second axis of
-*	 the current co-ordinate Frame, and the third field should be the
-*	 single character "L". If a rectangular region is to be replaced,
-*	 the first two fields should give the formatted values on axes 1
-*	 and 2 at one corner of the box, and the second two fields should
-*	 give the formatted values on axes 1 and 2 at the opposite corner
-*	 of the box.
+*        replaced. This parameter is only accessed if parameter MODE is
+*        set to "File". Each record in the file must be either a blank
+*        line, a comment (indicated by a "!" or "#" in column 1 ), or a
+*        definition of an area to be replaced, consisting of three of
+*        four space-separated fields. If a range of columns is to be
+*        replaced, each of the first two fields should be a formatted
+*        value for the first axis of the current co-ordinate Frame of the
+*        input NDF, and the third field should be the single character
+*        "C". If a range of lines is to be replaced, each of the first
+*        two fields should be a formatted value for the second axis of
+*        the current co-ordinate Frame, and the third field should be the
+*        single character "L". If a rectangular region is to be replaced,
+*        the first two fields should give the formatted values on axes 1
+*        and 2 at one corner of the box, and the second two fields should
+*        give the formatted values on axes 1 and 2 at the opposite corner
+*        of the box.
 *     COLOUT =  FILENAME (Read)
 *        The name of an output text file in which to store descriptions of
 *        the areas replaced by the current invocation of this application. 
@@ -128,14 +128,14 @@
 *        parameter LINCOL. 
 *
 *        - "Cursor": bounds are obtained using the graphics cursor of the
-*	 device specified by parameter DEVICE. The type of area to be
-*	 replaced is specified using parameter LINCOL. The WCS
-*	 information stored with the picture in the graphics database is
-*	 used to map the supplied cursor positions into the pixel
-*	 co-ordinate Frame of the input NDF. A message is displayed
-*	 indicating the co-ordinate Frame in which the picture and the
-*	 output NDF were aligned. Graphics may be drawn over the image
-*	 indicating the region to be replaced (see parameter PLOT).
+*        device specified by parameter DEVICE. The type of area to be
+*        replaced is specified using parameter LINCOL. The WCS
+*        information stored with the picture in the graphics database is
+*        used to map the supplied cursor positions into the pixel
+*        co-ordinate Frame of the input NDF. A message is displayed
+*        indicating the co-ordinate Frame in which the picture and the
+*        output NDF were aligned. Graphics may be drawn over the image
+*        indicating the region to be replaced (see parameter PLOT).
 *
 *        - "File": the bounds and type of each area to be replaced are 
 *        supplied in the text file specified by parameter COLIN.
@@ -359,7 +359,7 @@
 *        Fixed bug in cursor mode where the region bounds were half a
 *        pixel too small, i.e. in co-ordinates not pixel indices.
 *     1995 September 20 (MJC):
-*     	 Changed default of TITLE to null.
+*         Changed default of TITLE to null.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     18-JAN-2000 (DSB):
