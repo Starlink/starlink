@@ -201,17 +201,16 @@
 *        then INLIST just accesses the position list names directly.
 *
 *        If the names of the lists are stored in the CCDPACK NDF
-*        extension then the final WCS frame information or 
-*        transformation structure is also written to the NDF 
-*        extension.
+*        extension then the final WCS coordinate system information or 
+*        transformation structure is also written into the NDF.
 *
 *        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [TRUE]
 *     OUTDOMAIN = LITERAL (Read)
 *        If OUTFORMAT is 'WCS', the transformation information is 
-*        written as a new coordinate frame to the WCS component of the
-*        NDF.  The frame normally has a Domain name of 'CCD_REG', but
+*        written as a new coordinate system to the WCS component of the
+*        NDF.  The coordinate system is normally labelled 'CCD_REG', but
 *        that can be overridden with this parameter.  When this frame
 *        is added, any previously existing frame which has the same
 *        Domain is removed.
@@ -227,19 +226,16 @@
 *           - TRANSFORM -- written as a TRANSFORM structure into the 
 *                          .MORE.CCDPACK extension of the NDF
 *
-*        If WCS is chosen, then a new coordinate frame, with a Domain
+*        If WCS is chosen, then a new coordinate system, with a Domain
 *        (name) value given by OUTDOMAIN, is added to the WCS
 *        component of the NDF (a new WCS component is created if none
 *        previously existed).  A mapping between these coordinates and
 *        pixel coordinates is defined, which is the unit mapping in
 *        the case that the NDF in question is the reference set.  If
-*        any frame in the domain OUTDOMAIN already exists in the WCS
-*        component, it will be erased, so that after successful
+*        any coordinate system with the domain OUTDOMAIN is already
+*        attached to the NDF it will be erased, so that after successful
 *        processing by REGISTER it will contain only one frame so
 *        named.
-*
-*        OUTFORMAT=WCS is currently only possible for linear
-*        transformations (FITTYPE values between 1 and 5).
 *        [WCS]
 *     PA-PZ = LITERAL (Read)
 *        When FITTYPE=6 these parameters are used for supplying initial
@@ -281,7 +277,7 @@
 *        into the Current coordinate system of the associated NDF
 *        before use.  It should normally be set TRUE, in which case
 *        the transformation type set by the FITTYPE parameter is the
-*        type which will be fit between the Current coordinate frames
+*        type which will be fit between the Current coordinate systems
 *        of the NDFs.  Otherwise the fit will be between the positions
 *        in pixel coordinates.
 *
@@ -355,14 +351,14 @@
 *        This example works as above but this time the global
 *        transformations are derived for a full 6-parameter linear fit
 *        (which allows offset, rotation, magnification and shear).
-*        The results are coded as coordinate frames with the Domain 
+*        The results are coded as attached coordinate systems labelled
 *        'RESULT-SET1'.
 *
 *     register inlist='"myndf1,myndf2"' fittype=4 refpos=2
 *        In this example a solid body fit is performed between the
 *        position lists associated with the NDFs myndf1 and myndf2.
 *        The reference positions are chosen to be those associated with
-*        myndf2, so that the CCD_REG frame coordinates will be the
+*        myndf2, so that the CCD_REG coordinates will be the
 *        same as the pixel coordinates of NDF myndf2.
 *
 *     register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
