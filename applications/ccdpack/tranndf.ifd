@@ -110,7 +110,6 @@
             vpath PROMPT DYNAMIC CURRENT DEFAULT
             ppath DYNAMIC CURRENT DEFAULT
             prompt {Lower bounds of the output NDFs}
-            dynamic yes
             size *
             helpkey *
           }
@@ -122,7 +121,6 @@
             vpath PROMPT DYNAMIC CURRENT DEFAULT
             ppath DYNAMIC CURRENT DEFAULT
             prompt {Upper bounds of the output NDFs}
-            dynamic yes
             size *
             helpkey *
           }
