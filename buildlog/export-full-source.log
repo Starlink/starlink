@@ -327,7 +327,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 70 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 71 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -364,7 +364,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/java
-     [copy] Copying 27 files to /apps/cvsbuild/java/source/votable/build/java
+     [copy] Copying 28 files to /apps/cvsbuild/java/source/votable/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -413,11 +413,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1607 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1611 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 59 seconds
+Total time: 50 seconds
