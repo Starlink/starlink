@@ -132,7 +132,7 @@
          DO I = 1, EL
             D = DATA( I )
             IF( D .NE. VAL__BADR .AND. (
-     :          D .NE. ZERO .OR. .NOT. EXZERO ) ) THEN        
+     :          D .NE. 0.0 .OR. .NOT. EXZERO ) ) THEN        
 
 *  Update the limits.
                DMIN = MIN( DMIN, D )
@@ -172,7 +172,7 @@
             DO I = 1, EL
                D = DATA( I )
                IF( D .NE. VAL__BADR .AND. (
-     :             D .NE. ZERO .OR. .NOT. EXZERO ) ) THEN        
+     :             D .NE. 0.0 .OR. .NOT. EXZERO ) ) THEN        
                   IBIN = INT( ( D - DMIN )/DELTA ) + 1
                   IF( IBIN .GE. 1 .AND. IBIN .LE. NBIN ) THEN
                      HIST( IBIN ) = HIST( IBIN ) + 1.0
