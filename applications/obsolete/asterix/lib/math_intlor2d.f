@@ -96,7 +96,7 @@
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
+	print *,xwid,ywid,dx,dy
 *    Width squared
       WID2 = XWID*YWID
 

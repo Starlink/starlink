@@ -114,7 +114,7 @@
 *    King profile
       ELSE IF ( KIND .EQ. ANAL_KING ) THEN
 
-*      Get the full-widths in each dimension, and convert to sigmas
+*      Get the profile control parameters
         RC = AN_PW(SLOT,1)
         ALPHA = AN_PW(SLOT,2)
 
@@ -610,7 +610,7 @@
 
         AN_KIND(SLOT(1)) = ANAL_LORENTZ
 
-*      We need a width for the gaussian
+*      We need a width for the Lorentzian
         PROMPT = 'Lorentzian HWHM in '//UNITS(:CHR_LEN(UNITS))
         CALL USI_PROMT( 'AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
         CALL USI_DEF0R( 'AUX', ABS(X_DR/X_TOR), STATUS )
