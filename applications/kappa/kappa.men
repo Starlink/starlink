@@ -93,8 +93,9 @@ interaction_mode -
         kstest - Compare data sets using the Kolmogorov-Smirnov test.
        laplace - Perform a Laplacian convolution as an edge detector in a 2-d
                   data array.
-       linplot - Draw a line plot of a 1-d NDF's data values against their axis
-                  co-ordinates.
+       linplot - Draw a line plot of the data values in a 1-d NDF.
+      listmake - Create a text file holding a positions list.
+      listshow - Report the positions stored in a positions list.
          log10 - Take the base-10 logarithm of each pixel of a data array.
          logar - Take the logarithm of each pixel of a data array (specified
                   base).
@@ -184,6 +185,7 @@ masking_bad_values_and_quality -
            pow - Take the specified power of each pixel of a data array.
 problems_problems - 
     procedures - 
+       profile - Create a 1-d profile through an N-d NDF.
            psf - Determine the parameters of a model star profile by fitting 
                   star images in a 2-d NDF.
          quilt - Generate a mosaic from equally sized 2-d data arrays,
@@ -238,6 +240,12 @@ selecting_graphics_devices -
      turbocont - Contour a 2-d NDF quickly.
     unix_usage - Using KAPPA from Unix shell.
        vecplot - Plot a 2-d vector map.
+        wcsadd - Add a new co-ordinate Frame into an NDF.
+      wcsalign - Aligns a group of 2-d NDFs using WCS information.
+     wcsattrib - Manage attribute values associated wth an NDF WCS component.
+       wcscopy - Copy WCS information from one NDF to another.
+      wcsframe - Change the current co-ordinate Frame in an NDF.
+     wcsremove - Remove co-ordinate Frames from an NDF.
         wiener - Apply a Wiener filter to a 1- or 2-d array.
         zaplin - Replace regions in a 2-d NDF by bad values or by linear
                   interpolation.
