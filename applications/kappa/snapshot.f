@@ -107,7 +107,7 @@
 *     outside this application.
 
 *  Related Applications:
-*     KAPPA: DISPLAY, GREYPLOT.
+*     KAPPA: DISPLAY.
 
 *  Implementation Status:
 *     No origin information is passed to the output NDF.

@@ -436,7 +436,7 @@
 *     therefore only NDF-compliant applications can process it.
 
 *  Related Applications:
-*     KAPPA: GREYPLOT, WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+*     KAPPA: WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
