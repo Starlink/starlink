@@ -1347,7 +1347,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       IF (INDEX(CHEAD_DET, 'PSPCB') .NE. 0) THEN
          DETB = .TRUE.
       ELSE
-         DETB = .FALSE.
+         DETB = .FALSE.
       ENDIF
 *
 * Loop over each output time bin, Energy bin and radial bin
