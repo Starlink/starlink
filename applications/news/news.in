@@ -1,4 +1,4 @@
-#!PERL -s
+#!@PERL@ -s
 #
 # Program: news
 # Version: 2.1

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/news</path>
+  <description>Starlink online information system</description>
+  <abstract><p>Simple interactive tool for reading release notes.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>G R Mellor</name>
+      <uname>grm</uname>
+    </person>
+    <person>
+      <name>Martin Dunstan</name>
+      <uname>mnd</uname>
+    </person>
+    <person>
+      <name>Martin J Bly</name>
+      <uname>bly</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
