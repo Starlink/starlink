@@ -121,7 +121,7 @@
 
 *  Report an error if the WPLATE extension item does not exist.
       CALL DAT_THERE( LOC, 'WPLATE', THERE, STATUS )
-      IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK .AND. NOT. QUIET ) THEN
+      IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK .AND. .NOT. QUIET ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLIMP_NOWPL', 'Mandatory extension item '//
      :                 'WPLATE has no value.', STATUS )

@@ -89,6 +89,9 @@ setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp in=^ndf quiet=y'
 setenv NDF_IMP_POLPACK_COMPRESSED ' '
 setenv NDF_EXP_POLPACK_COMPRESSED ' '
 #
+setenv NDF_IMP_POLPACK_GZIP ' '
+setenv NDF_EXP_POLPACK_GZIP ' '
+#
 #
 # Tell the user that POLPACK commands are now available.
 #
