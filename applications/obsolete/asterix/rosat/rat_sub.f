@@ -2524,7 +2524,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                DO LP2=1,SDIM2
                   DO LP1=1,SDIM1
                      IF (.NOT. QVAL .OR. SMASK(LP1,LP2)) THEN
-                       SQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=QUAL_MISSING
+                       SQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=QUAL__MISSING
                      ENDIF
                   ENDDO
                ENDDO
@@ -2532,9 +2532,9 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                IF (SRT.BCKGND) THEN
                   DO LP2=1,BDIM2
                      DO LP1=1,BDIM1
-                        IF (.NOT. QVAL .OR. BMASK(LP1,LP2)) THEN
-                         BQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=QUAL_MISSING
-                        ENDIF
+                       IF (.NOT. QVAL .OR. BMASK(LP1,LP2)) THEN
+                        BQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=QUAL__MISSING
+                       ENDIF
                      ENDDO
                   ENDDO
                ENDIF
