@@ -84,7 +84,7 @@ FITS)
    case $1 in
    from)
       appl=FITS2NDF
-      $CONVERT_DIR/fits2ndf in=$3$4$5 out=$6 FMTCNV=T $NDF_FROM_FITS_PARS \
+      $CONVERT_DIR/fits2ndf in=$3$4$5 out=$6 fmtcnv=T $NDF_FROM_FITS_PARS \
       </dev/null 2>&1 | \
       sed 's/^\!\!/\! /' | \
       awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
