@@ -24,7 +24,7 @@
 *     the supplied long and Lat using knowledge of the transputer system.
 
 *  Arguments:
-*     VERSION = INTEGER (Given)
+*     VERSION = REAL (Given)
 *       Version number of the file. This governs whether we need to 
 *       even run this subroutine.
 *     CENTRE_COORDS = CHAR (Given)
@@ -69,6 +69,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1998/02/05 19:41:36  timj
+*     Change VERSION to REAL
+*
 *     Revision 1.1  1997/11/24 23:39:36  timj
 *     Initial revision
 *
@@ -89,7 +92,7 @@
       CHARACTER*(*)    CENTRE_COORDS
       DOUBLE PRECISION LST
       DOUBLE PRECISION MJD
-      INTEGER          VERSION
+      REAL             VERSION
       
 *  Arguments Returned:
       DOUBLE PRECISION RA_APP
