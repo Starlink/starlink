@@ -1,0 +1,49 @@
+## DIPSO2NDF - Converts a DIPSO file (as produced by the DIPSO WRITE command to an NDF.
+
+#+
+#  Name:
+#     DIPSO2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JM: Jo Murray (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1990 August 21st (JM):
+#	 Original version.
+#     1992 February 4 (MJC):
+#     	 Renamed the file parameters to IN and OUT.  Added help from
+#	 a library.  Corrected the caption.
+#     1992 August 27 (MJC):
+#     	 Made the output NDF the current data-array.
+#     {enter_further_changes_here}
+
+#-
+
+interface         DIPSO2NDF
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter      IN               # Input Dipso file
+      position    1
+      access      'READ'
+      ppath       'CURRENT'
+      prompt      'Input Dipso file'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT              # Output NDF
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      ppath       'CURRENT'
+      prompt      'Output NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+endinterface
