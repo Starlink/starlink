@@ -136,6 +136,7 @@
       INTEGER			NDIM, DIMS(ADI__MXDIM)	! Dataset shape
       INTEGER			PSID			! Private item storage
       INTEGER			PTR			! Mapped data address
+      INTEGER			TNDIM, TDIMS(ADI__MXDIM)! Temp dims
       INTEGER			WPTR			! Workspace
 
       BYTE			MASK			! Quality mask
@@ -155,15 +156,12 @@
       RMODE = (MODE(1:1).EQ.'R')
       WMODE = (MODE(1:1).EQ.'W')
 
-*  Get dimensions of BinDS
-      CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
-
 *  Axis widths?
       IF ( (ITEM(1:5).EQ.'Axis_') .AND. (ITEM(8:).EQ.'Width') ) THEN
 
 *    Locate the data
         CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
-     :                   .FALSE., CLOC, STATUS )
+     :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
 *    Private storage for axis data
@@ -171,7 +169,7 @@
      :                    STATUS )
 
 *    Map it
-        CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', PSID, PTR,
+        CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', NDIM, DIMS, PSID, PTR,
      :                    NELM, STATUS )
 
 *    Create invented object and map
@@ -193,6 +191,9 @@
 *  Logical quality
       ELSE IF ( ITEM .EQ. 'LogicalQuality' ) THEN
 
+*    Get dimensions of BinDS
+        CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
+
 *    Create invented object
         CALL ADI_NEW( 'LOGICAL', NDIM, DIMS, ITID, STATUS )
 
@@ -200,11 +201,12 @@
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *    Locate quality object
-        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC, STATUS )
+        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC,
+     :                   TNDIM, TDIMS, STATUS )
 
 *    And the mask
         CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .FALSE.,
-     :                   MLOC, STATUS )
+     :                   MLOC, TNDIM, TDIMS, STATUS )
 
 *    Map logical quality array
         CALL ADI_MAPL( ITID, 'WRITE', WPTR, STATUS )
@@ -254,18 +256,20 @@
 *  Masked quality
       ELSE IF ( ITEM .EQ. 'MaskedQuality' ) THEN
 
+*    Get dimensions of BinDS
+        CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL ARR_SUMDIM( NDIM, DIMS, NELM )
+
 *    Create invented object
         CALL ADI_NEW( 'UBYTE', NDIM, DIMS, ITID, STATUS )
 
-*    The size of the invented data
-        CALL ARR_SUMDIM( NDIM, DIMS, NELM )
-
 *    Locate quality object
-        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC, STATUS )
+        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC,
+     :                   TNDIM, TDIMS, STATUS )
 
 *    And the mask
         CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .FALSE.,
-     :                   MLOC, STATUS )
+     :                   MLOC, TNDIM, TDIMS, STATUS )
 
 *    Map logical quality array
         CALL ADI_MAP( ITID, 'UBYTE', 'WRITE', WPTR, STATUS )
@@ -308,7 +312,8 @@
       ELSE IF ( ITEM .EQ. 'Error' ) THEN
 
 *    Locate variance, creating if necessary
-        CALL BDI1_CFIND( BDID, HFID, 'Variance', WMODE, CLOC, STATUS )
+        CALL BDI1_CFIND( BDID, HFID, 'Variance', WMODE, CLOC,
+     :                   NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
 *    Create invented object
@@ -321,8 +326,8 @@
           CALL BDI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
 
 *      Map it
-          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', PSID, PTR,
-     :                        NELM, STATUS )
+          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID, PTR,
+     :                      NELM, STATUS )
 
 *      Map the invented object
           CALL ADI_MAP( ITID, TYPE, 'WRITE', WPTR, STATUS )
@@ -356,71 +361,60 @@
      :            ((ITEM(8:).EQ.'LoWidth').OR.
      :             (ITEM(8:).EQ.'HiWidth')) ) THEN
 
-*       Real widths present?
-          CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width',
-     :                     .FALSE., CLOC, STATUS )
+*    Real widths present?
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width',
+     :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
+        IF ( CLOC .NE. DAT__NOLOC ) THEN
+
+*      Locate the BDI private storage for the item, creating if required
+          CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
+
+*      Map it
+          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID, PTR,
+     :                      NELM, STATUS )
+
+*      Create dynamic array
+          CALL ADI_NEW1( TYPE, 1, NELM, ITID, STATUS )
+          CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
+
+*      Convert to widths to half-widths
+          CALL BDI1_INVNT_W2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+
+*      Free mapped data
+          CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+          CALL ADI_UNMAP( ITID, WPTR, STATUS )
+
+        ELSE
+
+*      Clear any bad status
+          IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+
+*      Locate the main axis data
+          CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
+     :                     .FALSE., CLOC, NDIM, DIMS, STATUS )
           IF ( CLOC .NE. DAT__NOLOC ) THEN
 
 *        Locate the BDI private storage for the item, creating if required
             CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *        Map it
-            CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', PSID, PTR,
-     :                        NELM, STATUS )
+            CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID,
+     :                        PTR, NELM, STATUS )
 
 *        Create dynamic array
-            CALL DYN_MAPR( 1, NELM, WPTR, STATUS )
+            CALL ADI_NEW1( TYPE, 1, NELM, ITID, STATUS )
+            CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
-*        Convert to widths to half-widths
-            CALL BDI1_INVNT_W2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+*        Convert to values to half-widths
+            CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
 
 *        Free mapped data
             CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
-
-*         Return widths
-            PTR = WPTR
-
-*       Store dynamic mapped widths
-            CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR, 'REAL',
-     :                        'READ', STATUS )
-
-          ELSE
-
-*        Clear any bad status
-            IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-
-*        Locate the main data
-            CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
-     :                       .FALSE., CLOC, STATUS )
-            IF ( CLOC .NE. DAT__NOLOC ) THEN
-
-*          Locate the BDI private storage for the item, creating if required
-              CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
-
-*          Map it
-              CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', PSID, PTR,
-     :                          NELM, STATUS )
-
-*          Create dynamic array
-              CALL DYN_MAPR( 1, NELM, WPTR, STATUS )
-
-*          Convert to values to half-widths
-              CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR),
-     :                              STATUS )
-
-*          Free mapped data
-              CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
-
-*          Return widths
-              PTR = WPTR
-
-*          Store dynamic mapped widths
-              CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR,
-     :                          'REAL', 'READ', STATUS )
-
-            END IF
+            CALL ADI_UNMAP( ITID, WPTR, STATUS )
 
           END IF
+
+        END IF
 
       ELSE
 
