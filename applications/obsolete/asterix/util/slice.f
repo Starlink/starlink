@@ -39,6 +39,7 @@
 *     28 Jul 94 : V1.7-1 Output using AIO routines - DEV parameter to
 *                        use standard system. (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     21 Apr 95 : V1.8-1 Updated data interface (DJA)
 *
 *   Type Definitions :
 *
@@ -47,17 +48,15 @@
 *   Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 
 *   Status :
       INTEGER			STATUS          ! Run-time status
 *
 *   Local Variables :
 *
-      CHARACTER*(DAT__SZLOC)  ILOC		! Input data object locator
-      CHARACTER*(DAT__SZTYP)  OBTYPE		! Type of data object
-      CHARACTER*80            UNITS             ! Units of data
-      CHARACTER*200           PATH,FILE         ! Trace information
+      CHARACTER*80            	UNITS             	! Units of data
+      CHARACTER*200           	PATH,FILE         	! Trace information
       CHARACTER*50		TBUF			! Output text buffer
 
       REAL		      	RMIN,RMAX		! Min & max values of slice
@@ -68,10 +67,11 @@
       INTEGER		      DIMSD(DAT__MXDIM) ! Sizes of data dimensions
       INTEGER		      DIMSQ(DAT__MXDIM) ! Sizes of quality dimensions
       INTEGER			DPTR		! Pointer to input data array
-      INTEGER			I, K		! Loop counters
-      INTEGER		      INDICES(DAT__MXDIM) ! Array indices of point
-      INTEGER			OCI		! AIO channel id
-      INTEGER			NELM		! No.of data points
+      INTEGER			I, K			! Loop counters
+      INTEGER			IFID			! Input dataset id
+      INTEGER		      	INDICES(DAT__MXDIM) 	! Array indices of point
+      INTEGER			OCI			! AIO channel id
+      INTEGER			NELM			! # data points
       INTEGER			NDIMD		! Dimensionality of data
       INTEGER			NDIMDR		! Dimensionality of data - 1
       INTEGER			NDIMQ		! Dimensionality of quality
@@ -89,7 +89,7 @@
 *    Version id:
 *
       CHARACTER*21		VERSION
-	PARAMETER	        ( VERSION='SLICE Version 1.8-0' )
+	PARAMETER	        ( VERSION='SLICE Version 1.8-1' )
 *-
 
 *    Check status
@@ -102,16 +102,12 @@
       CALL AST_INIT()
 
 *    Obtain data object, access and check it
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, PRIM, STATUS )
-
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
       CALL USI_SHOW( 'Input dataset {INP}', STATUS )
 
-      CALL DAT_TYPE( ILOC, OBTYPE, STATUS )
-      CALL MSG_SETC( 'OTYPE', OBTYPE )
-      CALL MSG_PRNT( 'Data object is of type ^OTYPE' )
-
 *    Is the input object the array required?
-      CALL BDA_CHKDATA( ILOC, OK, NDIMD, DIMSD, STATUS )
+      CALL BDI_PRIM( IFID, PRIM, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIMD, DIMSD, STATUS )
       IF ( .NOT. OK ) THEN
 	 CALL MSG_PRNT( 'ERROR : No data object found.' )
          STATUS = SAI__ERROR
@@ -120,16 +116,16 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map in data. and quality - find range
-      CALL BDA_MAPDATA( ILOC, 'READ', DPTR, STATUS )
+      CALL BDI_MAPDATA( IFID, 'READ', DPTR, STATUS )
       CALL ARR_SUMDIM( NDIMD, DIMSD, NELM )
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      CALL BDA_CHKQUAL( ILOC, QUAL_OK, NDIMQ, DIMSQ, STATUS )
+      CALL BDI_CHKQUAL( IFID, QUAL_OK, NDIMQ, DIMSQ, STATUS )
 
       IF ( QUAL_OK .AND. ( STATUS .EQ. SAI__OK ) ) THEN
-	 CALL BDA_MAPLQUAL( ILOC, 'READ', SOMEBAD, QPTR, STATUS )
+	 CALL BDI_MAPLQUAL( IFID, 'READ', SOMEBAD, QPTR, STATUS )
       END IF
 
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -152,7 +148,7 @@
 *    Try to get data units
       UNITS = 'data units'
       IF (.NOT. PRIM ) THEN
-         CALL BDA_GETUNITS( ILOC, UNITS, STATUS )
+         CALL BDI_GETUNITS( IFID, UNITS, STATUS )
          IF ( (UNITS .GT. ' ') .OR. (STATUS.NE.SAI__OK)) THEN
             STATUS = SAI__OK
             UNITS = 'data units'
@@ -224,7 +220,7 @@
       CALL AIO_TITLE( OCI, VERSION, STATUS )
 
 *    Report file name
-      CALL HDS_TRACE( ILOC, I, PATH, FILE, STATUS )
+      CALL ADI_FTRACE( IFID, I, PATH, FILE, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
       ELSE
