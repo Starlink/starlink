@@ -83,6 +83,8 @@
 *        Original version.
 *     20 Nov 1995 (DJA):
 *        Added MagicFlag item.
+*      4 Mar 1996 (DJA):
+*        Added Grouping item.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -117,10 +119,10 @@
         PARAMETER		( AXSUBS =
      :   'SCALARWIDTH,SPACEDDATA,DATA,WIDTH,LABEL,UNITS,NORMALISED,'/
      :       /'LOWIDTH,HIWIDTH,BOUNDS' )
-      CHARACTER*124		SUBS
+      CHARACTER*133		SUBS
         PARAMETER		( SUBS =
      :   'DATA,VARIANCE,ERROR,QUALITY,QUALITYMASK,LABEL,'/
-     :   /'UNITS,MAGICFLAG,'/
+     :   /'UNITS,MAGICFLAG,GROUPING,'/
      :  /'TITLE,LOGICALQUALITY,LOERROR,HIERROR,AXES,MASKEDQUALITY' )
 
 *  Local Variables:

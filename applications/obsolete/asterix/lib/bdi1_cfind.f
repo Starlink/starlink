@@ -95,6 +95,8 @@
 *        in max( REAL, dataset preferred type )
 *     22 Feb 1996 (DJA):
 *        Changes in string concatenation for Linux port
+*      4 Mar 1996 (DJA):
+*        Added Grouping element
 *     {enter_changes_here}
 
 *  Bugs:
@@ -348,6 +350,22 @@
 
 *      Release the AXIS cell
           CALL DAT_ANNUL( ALOC, STATUS )
+
+        END IF
+
+*  Grouping array
+      ELSE IF ( ITEM .EQ. 'Grouping' ) THEN
+
+*    Locate the ASTERIX box, creating if allowed
+        CALL ADI1_LOCAST( HID, CREATE, ALOC, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Define dimensions
+          CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
+
+*      Does grouping array exist?
+          CALL BDI1_CFIND1( ALOC, 'GROUPING', CREATE, '_INTEGER', NDIM,
+     :                        DIMS, THERE, CLOC, STATUS )
 
         END IF
 
