@@ -32,6 +32,8 @@
 *        Original version.
 *     13-DEC-1996 (RFWS)
 *        Added AST_SIMPLIFY.
+*     28-MAY-1998 (RFWS):
+*        Added AST_MAPBOX.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -68,6 +70,37 @@ F77_LOGICAL_FUNCTION(ast_isamapping)( INTEGER(THIS),
       RESULT = astIsAMapping( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
    )
    return RESULT;
+}
+
+F77_SUBROUTINE(ast_mapbox)( INTEGER(THIS),
+                            DOUBLE_ARRAY(LBND_IN),
+                            DOUBLE_ARRAY(UBND_IN),
+                            LOGICAL(FORWARD),
+                            INTEGER(COORD_OUT),
+                            DOUBLE(LBND_OUT),
+                            DOUBLE(UBND_OUT),
+                            DOUBLE_ARRAY(XL),
+                            DOUBLE_ARRAY(XU),
+                            INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(LBND_IN)
+   GENPTR_DOUBLE_ARRAY(UBND_IN)
+   GENPTR_LOGICAL(FORWARD)
+   GENPTR_INTEGER(COORD_OUT)
+   GENPTR_DOUBLE(LBND_OUT)
+   GENPTR_DOUBLE(UBND_OUT)
+   GENPTR_DOUBLE_ARRAY(XL)
+   GENPTR_DOUBLE_ARRAY(XU)
+   double lbnd_out;
+   double ubnd_out;
+   
+   astAt( "AST_MAPBOX", NULL, 0 );
+   astWatchSTATUS(
+      astMapBox( astI2P( *THIS ), LBND_IN, UBND_IN, F77_ISTRUE( *FORWARD ),
+                 *COORD_OUT, &lbnd_out, &ubnd_out, XL, XU );
+      *LBND_OUT = lbnd_out;
+      *UBND_OUT = ubnd_out;
+   )
 }
 
 F77_INTEGER_FUNCTION(ast_simplify)( INTEGER(THIS),
