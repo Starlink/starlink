@@ -1,0 +1,191 @@
+/apps/jdk
+Buildfile: build.xml
+
+prepare:
+
+install:
+
+call_package_ant:
+     [echo] Executing JUnit target: install
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 55 files to /apps/cvsbuild/star/docs
+     [echo] Executing tamfits target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/tamfits/lib/tamfits
+      [jar] Building jar: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/tamfits/docs/tamfits
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/tamfits
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/tamfits
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 76 files to /apps/cvsbuild/star/docs
+     [echo] Executing axis target: install
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/axis
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/axis
+[loggedcopy] Copying 16 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 1551 files to /apps/cvsbuild/star/docs
+     [echo] Executing dom4j target: install
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/dom4j
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/dom4j
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 733 files to /apps/cvsbuild/star/docs
+     [echo] Executing Jetty target: install
+
+install:
+[loggedcopy] Copying 5 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 397 files to /apps/cvsbuild/star/docs
+     [echo] Executing JSky target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
+     [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/bin/jsky
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/jsky
+[loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 11 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 434 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copied 17 empty directories to /apps/cvsbuild/star/docs
+     [echo] Executing UTIL target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
+      [jar] Building jar: /apps/cvsbuild/java/source/util/lib/util/util.jar
+      [zip] Building zip: /apps/cvsbuild/java/source/util/lib/util/util_src.zip
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/util/etc
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/util/bin
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/util/etc
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/util
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/util
+[loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/etc
+[loggedcopy] Copying 29 files to /apps/cvsbuild/star/docs
+     [echo] Executing Task target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/task/lib/task/task.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/bin/task
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/task
+    [mkdir] Created dir: /apps/cvsbuild/star/etc/task
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/task
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 27 files to /apps/cvsbuild/star/docs
+     [echo] Executing JNIAST target: install
+
+prepare:
+
+check_packages:
+
+get_ast_source:
+    [untar] Expanding: /apps/cvsbuild/java/source/jniast/src/ast/ast_source.tar into /apps/cvsbuild/java/source/jniast/build/ast
+
+assemble_java:
+
+build_classes:
+
+assemble_jni:
+
+build_jni:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_02/jre
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e shared
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_02/jre/../include -I/apps/j2sdk1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c jniast.c
+     [exec] In file included from jniast.c:32:
+     [exec] jniast.h:60: parse error before `AstSpecFrame'
+     [exec] jniast.h:60: warning: no semicolon at end of struct or union
+     [exec] jniast.h:61: warning: data definition has no type or storage class
+     [exec] jniast.h:68: parse error before `}'
+     [exec] jniast.h:68: warning: data definition has no type or storage class
+     [exec] jniast.h:91: parse error before `jniastGetPointerField'
+     [exec] jniast.h:91: warning: data definition has no type or storage class
+     [exec] jniast.h:92: parse error before `AstPointer'
+     [exec] jniast.c:206: parse error before `jniastGetPointerField'
+     [exec] jniast.c: In function `jniastGetPointerField':
+     [exec] jniast.c:224: parse error before `pointer'
+     [exec] jniast.c:225: `pointer' undeclared (first use in this function)
+     [exec] jniast.c:225: (Each undeclared identifier is reported only once
+     [exec] jniast.c:225: for each function it appears in.)
+     [exec] jniast.c: At top level:
+     [exec] jniast.c:232: parse error before `AstPointer'
+     [exec] jniast.c: In function `jniastSetPointerField':
+     [exec] jniast.c:257: parse error before `old'
+     [exec] jniast.c:258: `env' undeclared (first use in this function)
+     [exec] jniast.c:259: `old' undeclared (first use in this function)
+     [exec] jniast.c:259: `object' undeclared (first use in this function)
+     [exec] jniast.c:272: `pointer' undeclared (first use in this function)
+     [exec] jniast.c: In function `jniastMakeObject':
+     [exec] jniast.c:315: parse error before `pointer'
+     [exec] jniast.c:365: `pointer' undeclared (first use in this function)
+     [exec] make: *** [jniast.o] Error 1
+
+BUILD FAILED
+file:/apps/cvsbuild/java/source/jniast/build.xml:472: exec returned: 2
+
+Total time: 16 seconds

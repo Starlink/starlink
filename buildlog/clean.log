@@ -1,0 +1,134 @@
+/apps/jdk
+Buildfile: build.xml
+
+prepare:
+
+clean:
+
+call_package_ant:
+     [echo] Executing JUnit target: clean
+
+clean:
+     [echo] Executing tamfits target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/tamfits/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/tamfits/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/tamfits/docs
+     [echo] Executing axis target: clean
+
+clean:
+     [echo] Executing dom4j target: clean
+
+clean:
+     [echo] Executing Jetty target: clean
+
+clean:
+     [echo] Executing JSky target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/docs
+     [echo] Executing UTIL target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/etc
+     [echo] Executing Task target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/task/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/task/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/task/docs
+     [echo] Executing JNIAST target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jniast/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/jniast/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/jniast/docs
+     [echo] Executing ASTGUI target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/astgui/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/astgui/docs
+     [echo] Executing JNIHDS target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jnihds/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/jnihds/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/jnihds/docs
+     [echo] Executing HDX target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/hdx/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/hdx/docs
+     [echo] Executing compatibility NDArray target: clean
+
+clean:
+     [echo] Executing NDArray target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/array/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/array/docs
+     [echo] Executing NDX target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/ndx/build
+     [echo] Executing Table target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/table/build
+     [echo] Executing NDTools target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/ndtools/build
+     [echo] Executing HDS target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/hds/build
+     [echo] Executing FITS target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/fits/build
+     [echo] Executing VOTable target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/votable/build
+     [echo] Executing JAIUtil target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jaiutil/build
+     [echo] Executing SOAPSERVER target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/build
+     [echo] Executing SOG target: clean
+
+clean:
+     [echo] Executing SPLAT target: clean
+
+clean:
+     [echo] Executing Treeview target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/build
+     [echo] Executing Pal target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/build
+     [echo] Executing Coco target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/coco/build
+     [echo] Executing RV target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/rv/build
+
+BUILD SUCCESSFUL
+Total time: 6 seconds

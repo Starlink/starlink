@@ -1,0 +1,39 @@
+/apps/jdk
+Buildfile: build.xml
+
+prepare:
+
+jars:
+
+prepare:
+
+check_for_optional_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build
+    [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/ant/build/lib
+    [javac] Compiling 469 source files to /apps/cvsbuild/java/source/ant/build/classes
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/ant/build/classes
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/ant/build/classes
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/ant/build/classes/org/apache/tools/ant/taskdefs/optional/junit/xsl
+
+jars:
+     [copy] Copying 4 files to /apps/cvsbuild/java/source/ant/build
+      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/ant.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/ant/build/lib/optional.jar
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/ant/lib
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/etc/ant
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/ant
+     [copy] Copying 9 files to /apps/cvsbuild/star/bin
+     [copy] Copying 4 files to /apps/cvsbuild/star/lib
+     [copy] Copying 1031 files to /apps/cvsbuild/star/docs/ant
+
+BUILD SUCCESSFUL
+Total time: 19 seconds

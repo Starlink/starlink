@@ -1,0 +1,212 @@
+/apps/jdk
+Buildfile: build.xml
+
+prepare:
+
+build:
+
+call_package_ant:
+     [echo] Executing JUnit target: build
+
+prepare:
+
+build:
+     [echo] Executing tamfits target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/tamfits/build/classes
+    [javac] Compiling 45 source files to /apps/cvsbuild/java/source/tamfits/build/classes
+     [echo] Executing axis target: build
+
+prepare:
+
+build:
+      [jar] Updating jar: /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
+     [echo] Executing dom4j target: build
+
+build:
+     [echo] Executing Jetty target: build
+
+prepare:
+
+build:
+      [jar] Updating jar: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+     [echo] Executing JSky target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/build/classes
+    [javac] Compiling 332 source files to /apps/cvsbuild/java/source/jsky/build/classes
+     [copy] Copying 185 files to /apps/cvsbuild/java/source/jsky/build/classes
+     [copy] Copying 10 files to /apps/cvsbuild/java/source/jsky/lib/jsky
+     [echo] Executing UTIL target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 14 source files to /apps/cvsbuild/java/source/util/build/classes
+     [echo] Executing Task target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/task/build/classes
+    [javac] Compiling 12 source files to /apps/cvsbuild/java/source/task/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/task/lib/task
+     [echo] Executing JNIAST target: build
+
+prepare:
+
+check_packages:
+
+get_ast_source:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/ast
+    [untar] Expanding: /apps/cvsbuild/java/source/jniast/src/ast/ast_source.tar into /apps/cvsbuild/java/source/jniast/build/ast
+
+assemble_java:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
+     [copy] Copying 21 files to /apps/cvsbuild/java/source/jniast/build/java
+
+build_classes:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/classes
+    [javac] Compiling 44 source files to /apps/cvsbuild/java/source/jniast/build/classes
+
+assemble_jni:
+     [copy] Copying 32 files to /apps/cvsbuild/java/source/jniast/build/jni
+    [javah] ClassArgument.name=uk.ac.starlink.ast.AstException
+    [javah] ClassArgument.name=uk.ac.starlink.ast.AstObject
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Channel
+    [javah] ClassArgument.name=uk.ac.starlink.ast.CmpFrame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.CmpMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.FitsChan
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Frame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.FrameSet
+    [javah] ClassArgument.name=uk.ac.starlink.ast.IntraMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.LutMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Mapping
+    [javah] ClassArgument.name=uk.ac.starlink.ast.MathMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.MatrixMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.PcdMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.PermMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.Plot
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SkyFrame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SlaMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SpecFrame
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SpecMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.SphMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.UnitMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.WcsMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.WinMap
+    [javah] ClassArgument.name=uk.ac.starlink.ast.ZoomMap
+    [javah] [Search path = /apps/j2sdk1.4.1_02/jre/lib/rt.jar:/apps/j2sdk1.4.1_02/jre/lib/i18n.jar:/apps/j2sdk1.4.1_02/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.1_02/jre/lib/jsse.jar:/apps/j2sdk1.4.1_02/jre/lib/jce.jar:/apps/j2sdk1.4.1_02/jre/lib/charsets.jar:/apps/j2sdk1.4.1_02/jre/classes:/apps/cvsbuild/java/source/jniast/build/classes]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstException.class]
+    [javah] [Loaded /apps/j2sdk1.4.1_02/jre/lib/rt.jar(java/lang/RuntimeException.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_02/jre/lib/rt.jar(java/lang/Exception.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_02/jre/lib/rt.jar(java/lang/Throwable.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_02/jre/lib/rt.jar(java/lang/Object.class)]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstException.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstObject.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstObject.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Channel.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Channel.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/CmpFrame.class]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Frame.class]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Mapping.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_CmpFrame.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/CmpMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_CmpMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/FitsChan.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_FitsChan.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/FrameSet.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Frame.h]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_FrameSet.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/IntraMap.class]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Transformer.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_IntraMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/LutMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_LutMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Mapping$Interpolator.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Mapping.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/MathMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_MathMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/MatrixMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_MatrixMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/PcdMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_PcdMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/PermMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_PermMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Plot.class]
+    [javah] [Loaded /apps/j2sdk1.4.1_02/jre/lib/rt.jar(java/awt/geom/Rectangle2D.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_02/jre/lib/rt.jar(java/awt/geom/RectangularShape.class)]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Plot.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SkyFrame.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SkyFrame.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SlaMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SlaMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SpecFrame.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SpecFrame.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SpecMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SpecMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SphMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SphMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/UnitMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_UnitMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/WcsMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_WcsMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/WinMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_WinMap.h]
+    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/ZoomMap.class]
+    [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_ZoomMap.h]
+
+build_jni:
+
+execute_mk_script:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/lib/i386
+     [echo] java.home=/apps/j2sdk1.4.1_02/jre
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e shared
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_02/jre/../include -I/apps/j2sdk1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c jniast.c
+     [exec] In file included from jniast.c:32:
+     [exec] jniast.h:60: parse error before `AstSpecFrame'
+     [exec] jniast.h:60: warning: no semicolon at end of struct or union
+     [exec] jniast.h:61: warning: data definition has no type or storage class
+     [exec] jniast.h:68: parse error before `}'
+     [exec] jniast.h:68: warning: data definition has no type or storage class
+     [exec] jniast.h:91: parse error before `jniastGetPointerField'
+     [exec] jniast.h:91: warning: data definition has no type or storage class
+     [exec] jniast.h:92: parse error before `AstPointer'
+     [exec] jniast.c:206: parse error before `jniastGetPointerField'
+     [exec] jniast.c: In function `jniastGetPointerField':
+     [exec] jniast.c:224: parse error before `pointer'
+     [exec] jniast.c:225: `pointer' undeclared (first use in this function)
+     [exec] jniast.c:225: (Each undeclared identifier is reported only once
+     [exec] jniast.c:225: for each function it appears in.)
+     [exec] jniast.c: At top level:
+     [exec] jniast.c:232: parse error before `AstPointer'
+     [exec] jniast.c: In function `jniastSetPointerField':
+     [exec] jniast.c:257: parse error before `old'
+     [exec] jniast.c:258: `env' undeclared (first use in this function)
+     [exec] jniast.c:259: `old' undeclared (first use in this function)
+     [exec] jniast.c:259: `object' undeclared (first use in this function)
+     [exec] jniast.c:272: `pointer' undeclared (first use in this function)
+     [exec] jniast.c: In function `jniastMakeObject':
+     [exec] jniast.c:315: parse error before `pointer'
+     [exec] jniast.c:365: `pointer' undeclared (first use in this function)
+     [exec] make: *** [jniast.o] Error 1
+
+BUILD FAILED
+file:/apps/cvsbuild/java/source/jniast/build.xml:472: exec returned: 2
+
+Total time: 20 seconds
