@@ -32,6 +32,7 @@
 *   Nick Eaton   16-MAR-1992  Initialise the connection id arrays
 *   D L Terrett  25-JUL-1995  Search for data files
 *   Tim Jenness  15-APR-2004  Use autoconf for RECL
+*   P W Draper   29-JUL-2004  Increase file and device names to 256 chars
 
       IMPLICIT NONE
       INCLUDE 'GNS_PAR'
@@ -46,8 +47,8 @@
       LOGICAL LUNOPN, NMD
       CHARACTER*132 REC
       CHARACTER*6 NODE, LOCNOD
-      CHARACTER*64 FNAME, TNAME
-      CHARACTER*64 NAMFNG, DEVFNG
+      CHARACTER*256 FNAME, TNAME
+      CHARACTER*256 NAMFNG, DEVFNG
       SAVE FNAME, OPEN
 
 *   Size of each record in platform specific units
