@@ -149,10 +149,8 @@
 
             ALLGOOD = .TRUE.
             DO J = 1, J_COUNT
-               PRINT *, J_COUNT, J, BADBIT, QUALITY(BOL,J)
                IF (JDATA(BOL,J) .EQ. VAL__BADR .OR. 
      :              .NOT.NDF_QMASK(QUALITY(BOL,J), BADBIT)) THEN
-                  PRINT *, 'Bad int ',BADBIT, QUALITY(BOL,J)
                   ALLGOOD = .FALSE.
                END IF
             END DO
@@ -178,7 +176,7 @@
             ELSE
 
                RESULT_D = VAL__BADR
-               RESULT_V = VAL__BADR
+               RESULT_V = 0.0
                RESULT_Q = 1
 
             END IF
