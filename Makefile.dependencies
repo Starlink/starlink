@@ -625,6 +625,7 @@ $(MANIFEST)/echomop: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/htx \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/lex \
@@ -649,6 +650,7 @@ $(MANIFEST)/echomop: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \

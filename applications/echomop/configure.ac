@@ -28,6 +28,7 @@ STAR_CHECK_PROGS(hlib star2html hlink)
 
 STAR_DECLARE_DEPENDENCIES(build, [cnf fio hds hlp mers ndf par pda pgp prm sae sla shl mers])
 STAR_DECLARE_DEPENDENCIES(build, kaplibs, link)
+STAR_DECLARE_DEPENDENCIES(sourceset, htx)
 
 # Documented in SUN/152.  The source is in doc/, and the listed products
 # are built there.  Then links are made from the current directory by
