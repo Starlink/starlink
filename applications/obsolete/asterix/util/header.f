@@ -34,10 +34,6 @@
 *
       INTEGER STATUS
 *
-*    Function :
-*
-      INTEGER                CHR_LEN
-*
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC) ASTLOC             ! Locator to ASTERIX struc
@@ -45,15 +41,12 @@
       CHARACTER*(DAT__SZLOC) LOC                ! Locator to input object
       CHARACTER*(DAT__SZLOC) PLOC               ! Locator to PROCESSING struc
       CHARACTER              LINE*80, NAME*132
-      CHARACTER*80           STRING             ! FIX - DELETE WHEN FIX REMOVED
 
       INTEGER			FID			! Dataset id
       INTEGER                	L
       INTEGER                	OCH                	! Output channel
       INTEGER                	WIDTH              	! Output width
 
-      LOGICAL                ASTOK              ! ASTERIX struc OK?
-      LOGICAL                HOK                ! HEADER struc OK?
       LOGICAL                POK                ! PROCESSING struc OK?
       LOGICAL                PRIM               ! Input primitive?
       LOGICAL 		     EDIT
@@ -149,7 +142,7 @@
 
 
 *+  HEADER_OUT - Output the information
-      SUBROUTINE HEADER_OUT (SLOC, OCH, STATUS)
+      SUBROUTINE HEADER_OUT( SLOC, OCH, STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -225,7 +218,7 @@
 
 
 *+  HEADER_EDIT - edit header
-      SUBROUTINE HEADER_EDIT (LOC,STATUS)
+      SUBROUTINE HEADER_EDIT( HLOC, STATUS )
 *    Description :
 *    Method :
 *    Authors :
