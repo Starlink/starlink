@@ -1,0 +1,231 @@
+*+  ROTAS4 - rotates input array into output array for ROTATE
+
+      SUBROUTINE ROTAS4( NUMRA, LONG, SHORT, ROTSIZ, XLARGE, IDIM1,
+     :                   IDIM2, ARRIN, ODIM1, ODIM2, ARROUT, WORK,
+     :                   STATUS )
+*
+*    Description :
+*
+*     The input array, ARRIN, is rotated through NUMRA right angles in
+*     the clockwise direction as a number of ROTSIZ by ROTSIZ sections.
+*     The rotated array is put into ARROUT.
+*     An immediate return will occur if STATUS has an error value on
+*     entry.
+*
+*    Invocation :
+*
+*      CALL ROTAS4( NUMRA, LONG, SHORT, ROTSIZ, XLARGE, IDIM1, IDIM2,
+*     :             ARRIN, ODIM1, ODIM2, ARROUT, WORK, STATUS )
+*
+*    Arguments :
+*
+*     NUMRA = INTEGER( READ )
+*         Number of right-angles through which data will be rotated.
+*     LONG = INTEGER( READ )
+*         Longest dimension of the array to be rotated.
+*     SHORT = INTEGER( READ )
+*         Shortest dimension of the array to be rotated.
+*     ROTSIZ = INTEGER( READ )
+*         Size of the subsections to be rotated.
+*     XLARGE = LOGICAL( READ )
+*         Should be .TRUE. if first dimension of the array to be
+*           rotated is greater than the second.
+*     IDIM1 = INTEGER( READ )
+*         The first dimension of the 2-d array to be rotated.
+*     IDIM2 = INTEGER( READ )
+*         The second dimension of the 2-d array to be rotated.
+*     ARRIN( IDIM1, IDIM2 ) = REAL( READ )
+*         Data to be rotated.
+*     ODIM1 = INTEGER( READ )
+*         The first dimension of the output 2-d array.
+*     ODIM2 = INTEGER( READ )
+*         The second dimension of the output 2-d array.
+*     ARROUT( ODIM1, ODIM2 ) = REAL( WRITE )
+*         Will contain the rotated data.
+*     WORK( ROTSIZ, ROTSIZ ) = REAL( WRITE )
+*         Workspace to hold the subsection for rotation.
+*     STATUS = INTEGER( UPDATE )
+*         This is the global status, if this variable has an error
+*           value on entry then an immediate return will occur. If an
+*           error occurs during the execution of this routine STATUS 
+*           will be returned containing the appropriate error value.
+*
+*    Method :
+*     If no error on entry then
+*        ENDL is the position of the start of the last rotation box
+*          along the longer side of the input array
+*        ENDS is the position of the start of the last rotation box
+*          along the shorter side of the input array
+*        INDEXL is a pointer to the position of the start of the
+*          rotation box along the longer side of the input array
+*        INDEXS is a pointer to the position of the start of the
+*          rotation box along the shorter side of the input array
+*        ROTSIZ is the size of the rotation box
+*        Move along longest side of input array
+*        For INDEXL from 1, in steps of ROTSIZ, to a value less than or
+*          equal to ENDL
+*           Move along shortest side of input array
+*           For INDEXS from 1, in steps or ROTSIZ, to a value less than
+*             or equal to ENDS
+*              Rotate box pointed at by INDEXL, INDEXS
+*           End for
+*           If shorter dimension of input array is not exactly divisible 
+*             by ROTSIZ then
+*              There will be some data left unrotated so set INDEXS to
+*                point at ENDS
+*              Rotate box
+*           Endif
+*        Endfor
+*        If the longer dimension of the input array is not exactly
+*          divisible by ROTSIZ then
+*           There will be some data left unrotated so set INDEXL to
+*             point at ENDL
+*           Move along shortest side of input array
+*           For INDEXS from 1, in steps or ROTSIZ, to a value less than
+*             or equal to ENDS
+*              Rotate box pointed at by INDEXL, INDEXS
+*           End for
+*           If shorter dimension of input array is not exactly divisible
+*             by ROTSIZ then
+*              There will be some data left unrotated so set INDEXS to
+*                point at ENDS
+*              Rotate box
+*           Endif
+*        Endif
+*     Endif
+*
+*    Authors :
+*
+*     Dave Baines (ROE::ASOC5)
+*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
+*
+*    History :
+*
+*     27/07/1983 : Original version                     (ROE::ASOC5)
+*     17/02/1984 : Documentation brought up to standard (ROE::ASOC5)
+*     1986 Sep 9 : Renamed parameters section to arguments and tidied
+*                  (RL.STAR::CUR).
+*     1989 Aug  7: Passed array dimensions as separate variables
+*                  (RL.STAR::CUR).
+*
+*    Type Definitions :
+
+      IMPLICIT NONE
+
+*    Global constants :
+
+      INCLUDE 'SAE_PAR'
+
+*    Import :
+
+      INTEGER
+     :  IDIM1, IDIM2,
+     :  ODIM1, ODIM2,
+     :  NUMRA,
+     :  LONG,
+     :  SHORT,
+     :  ROTSIZ
+
+      LOGICAL
+     :  XLARGE
+
+      REAL
+     :  ARRIN( IDIM1, IDIM2 )
+
+*    Import-Export :
+
+      REAL
+     :  WORK( ROTSIZ, ROTSIZ )
+
+*    Export :
+
+      REAL
+     :  ARROUT( ODIM1, ODIM2 )
+
+*    Status :
+
+      INTEGER STATUS
+
+*    Local variables :
+
+      INTEGER
+     :  ENDL,                  ! Position of last rotation box along
+                               ! longest side
+     :  ENDS,                  ! Position of last rotation box along
+                               ! shortest side
+     :  INDEXL,                ! Pointer to subsection, long dimension
+     :  INDEXS                 !    "     "      "      short    "
+*-
+
+*    check for error on entry
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*       set up positions of last rotation box along long and short
+*       dimensions
+
+         ENDL = LONG  + 1 - ROTSIZ
+         ENDS = SHORT + 1 - ROTSIZ
+
+*       rotate the array as a number of ROTSIZ by ROTSIZ boxes
+*       move along longer side
+
+         DO  INDEXL = 1, ENDL, ROTSIZ
+
+*          move along shorter side
+            DO  INDEXS = 1, ENDS, ROTSIZ
+
+               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
+     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
+     :                      ARROUT, WORK, STATUS )
+            END DO
+
+*          check for unrotated data along shorter side of input array
+
+            IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
+
+*             pointer set to position af last rotation box along
+*             shorter side
+
+               INDEXS = ENDS
+
+               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
+     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
+     :                      ARROUT, WORK, STATUS )
+            END IF
+         END DO
+
+*       check for unrotated data along longer side of input array
+
+         IF ( MOD( LONG, ROTSIZ ) .NE. 0 ) THEN
+
+*          pointer set to position of last rotaton box along longer side
+
+            INDEXL = ENDL
+
+*          move along shorter side
+
+            DO INDEXS = 1, ENDS, ROTSIZ
+
+               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
+     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
+     :                      ARROUT, WORK, STATUS )
+            END DO
+
+*          check for unrotated data along shorter side of input array
+
+            IF ( MOD( SHORT, ROTSIZ ) .NE. 0 ) THEN
+
+*             pointer set to position af last rotation box along
+*             shorter side
+
+               INDEXS = ENDS
+
+               CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, ENDL, ENDS, INDEXL,
+     :                      INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
+     :                      ARROUT, WORK, STATUS )
+            END IF
+         END IF
+      END IF
+
+      END
