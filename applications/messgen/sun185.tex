@@ -12,7 +12,7 @@
 \newcommand{\stardocdate}      {4 November 1994}
 \newcommand{\stardoctitle}     {MESSGEN\\ [1ex]
                                 Starlink Facility Error Message Generation}
-\newcommand{\stardocversion}   {Version 1.1}
+\newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {}
 \newcommand{\stardocabstract}  {This document describes the Starlink 
 MESSGEN program which creates files
@@ -326,7 +326,7 @@ will ensure that the same error values are generated.
 \section{\xlabel{running_messgen}Running MESSGEN}
 To produce the required files from MESSGEN source files, on UNIX, type:
 \begin{quote} 
-\verb!% messgen -[cfev]! {\em files}
+\verb!% messgen -[cfFev]! {\em files}
 \end{quote}
 where {\em files} may be any number of MESSGEN source files and the options
  may be one or more of:
@@ -334,6 +334,8 @@ where {\em files} may be any number of MESSGEN source files and the options
 \begin{description}
 \item[-c] Generate a C header file ({\em facility}\_err.h).
 \item[-f] Generate a Fortran INCLUDE file ({\em facility}\_err).
+\item[-F] As for option -f, but with an uppercased output filename
+          ({\em FACILITY}\_ERR).
 \item[-e] Generate a facility message file (fac\_{\em facnum}\_err).
 \item[-v] Output diagnostic information.
 \end{description}
@@ -395,6 +397,7 @@ See
 \xref{SSN/4}{ssn4}{operating_system_specific_routines}
 (Appendix on Portability) for a description of how the routine operates on UNIX.
 
+% Should the following not be subsections of a \section{Changes} section?
 \section{Changes in Version 1.1}
 \begin{itemize}
 \item The CREMSG utility is added (Section 4).
@@ -410,4 +413,7 @@ repeat definitions.
 \item A hypertext version of this document is released. Apart from the 
 addition of this section, there are no changes to the text.
 \end{itemize}
+
+\section{Changes in Version 1.2}
+Added the -F option to generate Fortran output files with uppercase filenames.
 \end {document}
