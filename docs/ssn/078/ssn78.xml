@@ -61,6 +61,9 @@
       <p>The Starlink build system consists of
         <ul>
           <li>
+            <p>the Starlink CVS repository;</p>
+          </li>
+          <li>
             <p>build tools, consisting of modified versions of the GNU
               autotools <code>autoconf</code> <code>automake</code>
               and <code>libtool</code>;</p>
@@ -77,6 +80,24 @@
           </li>
         </ul>
       </p>
+
+      <p>The repository is on the machine
+        <code>cvs.starlink.ac.uk</code>, and when you are making a
+        fresh checkout, or giving other commands not within the
+        context of a local check-out, you should refer to it as
+        <verbatim>
+% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs &lt;cvs-command&gt;
+</verbatim>
+        where <code>username</code> is your username on that system.
+        You will need to set the environment variable
+        <code>CVS_RSH</code> to <code>ssh</code> to connect to the
+        repository.  If you need an account on this machine, get in
+        touch with <webref url="mailto:ussc@star.rl.ac.uk"
+          ><code>ussc@star.rl.ac.uk</code></webref>.  There is
+        currently anonymous web-based access to the repository at
+        <url>http://cvsweb.starlink.ac.uk</url>, and we expect to
+        offer anonymous CVS access in the near future.  See
+        <url>http://dev.starlink.ac.uk/</url> for news.</p>
 
       <p>The build system is intended to cover two main cases.
         Firstly, it covers the problem of building code directly from
@@ -257,14 +278,14 @@
           through the <webref url="http://www.cygwin.com/" >cygwin
             environment</webref>.</p>
 
-        <p>Having said that, if all you need to do is work with a set
-          of sources already in the repository, and don't need to add
-          or remove any files, then you probably won't have to do any
-          reconfiguration, and don't have to worry at all about the
-          autotools (this might change, if we decide not to keep
-          generated files such as <code>./configure</code> checked in
-          to the repository -- see <ref id="developments"/>).  Given
-          that you do, here's how.</p>
+        <p>The minimum required contact with the autotools is to
+          generate the files which will let you configure a freshly
+          checked-out directory before working on it, since these
+          configuration files are not checked in to the repository.
+          The <code>./bootstrap</code> script (see <ref
+            id="starconf"/>) will do this for
+          you, but it can only do this if the autotools are installed
+          (see <ref id="bootstrappingonly"/>).</p>
 
         <p>The aim of the notes below is to give you an overview of
           autoconf and automake functionality, enough to make it
@@ -1152,11 +1173,13 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
                 <code>acinclude.m4</code>;</p>
             </li>
             <li>
-              <p>checks that your <code>configure.ac</code> and
+              <p>runs the <em>starconf-validate</em> application to
+                check that your <code>configure.ac</code> and 
                 <code>Makefile.am</code> files look at least
                 plausible by checking, amongst other things, for the
                 presence of a <code>STAR_DEFAULTS</code> invocation
-                in the former;</p>
+                in the former, and to check that the right files have
+                been checked in to the repository;</p>
             </li>
             <li>
               <p>creates the script <code>./starconf.status</code>
@@ -1173,9 +1196,27 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
           includes an updated bootstrap script.  If you <em>do</em>
           have some pressing reason to change it, then remove the word
           `original' from the second line of the bootstrap file, which
-          signals to starconf that it should leave the file untouched.</p>
+          signals to starconf that it should leave the file
+          untouched.  The standard bootstrap script:
+          <ul>
+            <li>
+              <p>runs <em>starconf</em>, using
+                <code>./starconf.status</code> if necessary to find
+                the path to the program;</p>
+            </li>
+            <li>
+              <p>bootstraps any subdirectories named in the
+                <code>AC_CONFIG_SUBDIRS</code> macro within
+                <code>configure.ac</code>;</p>
+            </li>
+            <li>
+              <p>runs <em>autoreconf</em> to regenerate configuration
+                files if necessary.</p>
+            </li>
+          </ul>
+        </p>
 
-        <p>You need to explicitly run starconf only once, when you
+        <p>You need to run starconf explicitly only once, when you
           first prepare a directory for configuration.  The
           <code>./bootstrap</code> file which this creates itself
           runs starconf, so that each time you run the bootstrap
@@ -1403,6 +1444,137 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
           build tree.  This section contains a few notes on where this
           state is, and how to handle it.</p>
 
+        <p>Since most of the details here are rather intricate, here
+          are a few FAQs which might save you reading them.
+          <dl>
+            <dt>How do I get rid of state in a checked-out directory?</dt>
+            <dd>
+              <p>One of <kbd>make clean</kbd>, <kbd>make
+                  distclean</kbd> or <kbd>make maintainer-clean</kbd>
+                should do what you want.  The first gets rid of
+                compiled files, the second everything but distributed
+                files, and the third returns the directory to an
+                almost pristine state, though without deleting
+                <code>./configure</code> or the files it needs to
+                run.</p>
+              <p>The nuclear option for clearing state from a
+                directory <code>ping</code> is to delete it and check
+                it out afresh:
+                <verbatim>
+% cd ..
+% rm -rf ping # or: mv ping ping-old
+% cvs update -d ping
+</verbatim>
+                though do make sure that you have no modified but
+                uncommited files left within <code>ping</code>.</p>
+            </dd>
+
+            <dt>Why does <kbd>make world</kbd> not do anything?</dt>
+            <dd>
+              <p>The <kbd>make world</kbd> build works by comparing
+                timestamps of the <em>installed</em> files in the
+                manifests directory -- that is, in something like
+                <code>/my-star/manifests</code>, outside of the build
+                tree.  It only checks whether each component was
+                <em>installed</em> after each of the components it
+                depends on.  If you wish to use this to (rebuild and)
+                reinstall a given component, then simply delete the
+                manifest file for the component in question and re-run
+                <kbd>make world</kbd>.</p>
+              <p>Alternatively, <kbd>make</kbd> in the top-level
+                checkout directory will recurse, and invoke <kbd>make
+                  all</kbd> in each of its children, and thus bring
+                the whole tree up to date.</p>
+              <p>You can check the default installation location --
+                shown as <code>/my-star</code> above -- with
+                <kbd>./starconf-status --show STARCONF_DEFAULT_PREFIX</kbd></p>
+            </dd>
+
+            <dt>I know the buildsupport tools have been updated in the
+              repository.  What's the best way to install the new
+              versions locally?</dt>
+            <dd>
+              <p>The most straightforward way is to update your
+                checkout of the component in question, then invoke
+                <kbd>./configure; make; make install-manifest</kbd></p>
+              <p>Alternatively, and much as described above, you could
+                update your checkout of the component in question,
+                then delete its manifest file and run <kbd>make
+                  world</kbd> from the top level of the checkout.</p>
+            </dd>
+
+            <dt>How do I determine where a component is installed?</dt>
+            <dd>
+              <p>In a variety of ways.  In the list below, each mechanism
+                effectively supplies the default for the mechanism
+                before it.
+                <ol>
+                  <li>
+                    <p>You can specify an installation prefix at
+                      install time:
+                      <verbatim>
+% make prefix=/odd/place install # or install-manifest
+</verbatim>
+                      This might break your installation if there was
+                      a prefix baked in to your component at build
+                      time.  Do this only if you have a particular
+                      reason for doing so, and know what you're doing.</p>
+                  </li>
+                  <li>
+                    <p>At make time:
+                      <verbatim>
+% make prefix=/odd/place
+</verbatim>
+                      This builds your component with the Makefile
+                      variable <code>${prefix}</code> set to the given
+                      value.  The component will be installed into
+                      this location at install time, unless you
+                      override the location as described above.  See
+                      the discussion of `installation directory
+                      variables' in <ref id="automakeoverview"/>.</p>
+                  </li>
+                  <li>
+                    <p>At configure time:
+                      <verbatim>
+% ./configure --prefix=/odd/place
+</verbatim>
+                      This is usually the most appropriate way to do this.</p>
+                  </li>
+                  <li>
+                    <p>By setting a `sticky variable':
+                      <verbatim>
+% ./starconf.status STARCONF_DEFAULT_PREFIX=/odd/place
+</verbatim>
+                      This sets the default for the
+                      <code>./configure</code> script's
+                      <code>--prefix</code> option.</p>
+                  </li>
+                  <li>
+                    <p>By configuring <em>starconf</em>:
+                      <verbatim>
+% pwd
+.../buildsupport/starconf
+% ./configure STARCONF_DEFAULT_PREFIX=/odd/place
+...
+% make; make install-manifest
+</verbatim>
+                      This sets the default for all directories
+                      configured using this <em>starconf</em> application.
+                      This is effectively what you do when you set the
+                      environment variable
+                      <code>STARCONF_DEFAULT_PREFIX</code> before you
+                      run the top-level <code>./bootstrap</code>
+                      script, as described in <ref
+                        id="bootstrapping"/>.</p>
+                  </li>
+                </ol>
+              </p>
+            </dd>
+          </dl>
+        </p>
+
+        <p>Here are the details.</p>
+
         <p><em>Autotool state</em>: The most obvious state within the
           tree is the existence of the <code>configure</code> and
           <code>Makefile.in</code> files which are the generated by
@@ -1561,8 +1733,9 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
         <kbd>make install-manifest</kbd>, which has the same function as
         <kbd>make install</kbd> except that it installs a manifest file,
         listing the files actually installed, in the directory
-        <code>/star/manifests</code> (depending on
-        <code>--prefix</code>).</p>
+        <code>/star/manifests</code> (depending on the value of
+        <code>--prefix</code>, which defaults to the value shown by
+        <kbd>./starconf.status --show STARCONF_DEFAULT_PREFIX</kbd>).</p>
 
       <p>Most users of this document will likely be concerned only
         with the details of building a particular component, and thus
@@ -1572,6 +1745,87 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
         tree, for example for the nightly build: this is dealt with in
         <ref id="bootstrapping"/>.</p>
 
+      <subsect id="top-level-makefile" export="export">
+        <subhead>
+          <title>The top-level Makefile</title>
+        </subhead>
+
+        <p>The important targets in the top-level makefile are:
+          <dl>
+            <dt><code>make world</code></dt>
+            <dd>
+              <p>This target builds the whole tree, in an order which
+                respects the dependencies between components.  It builds
+                all the targets listed in the variable
+                <code>ALL_TARGETS</code> within the top-level
+                <code>Makefile.in</code>.  Those targets are install
+                manifests, in the default manifest directory
+                (<code>/local/star/manifests</code> in the example
+                below), so that <kbd>make world</kbd> both builds and
+                installs the entire software set.</p>
+              <p>The bootstrap that this is part of is described in
+                more detail in <ref id="bootstrapping">the next
+                  section</ref>.</p>
+            </dd>
+
+            <dt><code>make &lt;manifest-file&gt;</code></dt>
+            <dd>
+              <p>As an alternative to <kbd>make world</kbd>, you may
+                specify a single manifest file.  This builds and
+                installs the corresponding component, and all of its
+                dependencies.  Note that this does nothing if the
+                given manifest file is up-to-date with respect to its
+                dependencies on other manifest files.  If you have
+                just updated a component, then you can rebuild and
+                reinstall it by deleting the component's manifest file
+                and remaking it.</p>
+            </dd>
+
+            <dt><code>make</code> or <code>make all</code></dt>
+            <dd>
+              <p>This recurses into each of the directories listed in
+                <code>AC_CONFIG_SUBDIRS</code> within the top-level
+                <code>configure.ac</code>, and invokes <kbd>make
+                  all</kbd> there.  This target brings the tree up-to-date
+                after a CVS update, but it does so without respecting
+                the dependencies between components.  This target is
+                present for the sake of consistency, and as a
+                convenience for bringing the local tree up-to-date
+                after a CVS update, and you should not use it as a
+                shorthand or alternative for <kbd>make world</kbd>
+                above.</p>
+            </dd>
+
+            <dt><code>make clean</code></dt>
+            <dd>
+              <p>The targets <code>clean</code>,
+                <code>distclean</code> and
+                <code>maintainer-clean</code> simply recurse into the
+                children and invoke the corresponding target there.</p>
+            </dd>
+
+            <dt><code>make install</code> and <code>make
+                install-manifest</code></dt>
+            <dd>
+              <p>These targets do nothing, and are also present
+                largely for the sake of consistency.  Depending on the
+                context, you should use <kbd>make world</kbd> or, if you
+                have just updated and rebuild a particular component,
+                then either delete and remake its manifest file (as
+                mentioned above), or go to the component's directory and
+                use <kbd>make install</kbd> or <kbd>make
+                  install-manifest</kbd>.</p>
+            </dd>
+
+          </dl>
+          Note that the building above presumes that all the required
+          code is checked out of the repository -- it does not handle
+          the checkouts for you, and if you do not have a required
+          component checked out, it will simply fail.
+        </p>
+
+      </subsect>
+
       <subsect id="bootstrapping" export="export">
         <subhead>
           <title>Bootstrapping and building the entire tree</title>
@@ -1580,9 +1834,13 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
         <p>If you wish to build the entire tree after a fresh
           checkout, you do so at the top level, using the
           <code>./bootstrap</code> script and <code>Makefile.in</code>
-          located there.  Neither of these is a `standard' one.</p>
+          located there.  Neither of these is a `standard' one, as
+          installed by <em>starconf</em> or Starlink automake.</p>
 
-        <p>The procedure is as shown
+        <p>These instructions are echoed in the file
+          <code>README</code> in the top-level directory.</p>
+
+        <p>The complete procedure for a full build is as shown
           below, for an installation into the notional directory
           <code>/local/star</code>; explanations follow.
           <verbatim>
@@ -1597,7 +1855,7 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
 ... takes quite a while
 8% ./configure -C
 ... mucho blah-blah-blah
-9% make
+9% make world
 ... etc
 10% ls /local/star/manifests
 adam      automake  ems     hlp      messgen  par       sae   star2html  task
@@ -1666,7 +1924,9 @@ autoconf (GNU Autoconf) 2.59
           <code>AC_CONFIG_SUBDIRS</code> in this
           <code>configure.ac</code> and those below it.</p>
 
-        <p>Line 9: build the entire tree.  The make builds all the
+        <p>Line 9: build the entire tree, using the <kbd>make
+            world</kbd> target described in <ref
+            id="top-level-makefile"/>.  The make builds all the
           components in an order which ensures that each component is
           build after the components it depends on, as declared in
           <code><ref id="macro-declare-dependencies"
@@ -1726,28 +1986,24 @@ autoconf (GNU Autoconf) 2.59
 % make
 % make install
 </verbatim>
-          (or <kbd>make install-manifest</kbd>) to build the single
+          (or more often <kbd>make install-manifest</kbd>) to build the single
           component from a CVS checkout.</p>
 
-        <p>In fact, you may not even need to do that.  The main
-          function of the bootstrap script is to update the directory
-          and regenerate the configuration scripts by rerunning starconf
-          and autoreconf.  However, the <code>./configure</code> and
-          <code>Makefile.in</code> files, though formally generated,
-          are checked in to the repository, so the bootstrap may be
-          redundant (this behaviour might change: see <ref
-            id="developments"/>).  You should still run the bootstrap
-          script when building such a checkout for the first time.</p>
+        <p>One of the functions of the <code>./bootstrap</code> script
+          is to regenerate the <code>./configure</code> script if
+          necessary, since it is not checked in to the repository.  This
+          requires that the Starlink-specific autotools are in your
+          path, and so you must first install these `buildsupport'
+          tools if they are not installed already.  Instructions for
+          that are in the <ref id="bootstrappingonly">next
+            section</ref>.</p>
 
-        <p>If you don't have starconf installed, that's fine -- the
-          bootstrap script can cope with that.  If you need to change
-          any of the autotools source files (that is,
-          <code>configure.ac</code> or <code>Makefile.am</code>) then
-          you will need to install starconf and the Starlink-specific
-          autotools, instructions for which are in <ref
-            id="bootstrappingonly">the next section</ref>.</p>
+        <p>That should be all you have to do before starting work.
+          The above will generate a <code>Makefile</code> which will
+          build the current component, and install it in the default
+          location which <em>starconf</em> has been configured with.</p>
 
-        <p>If you do want to adjust things, here's how.</p>
+        <p>If you do need to adjust things, however, here's how.</p>
 
         <p>You control where the component is to be installed with the
           <code>--prefix</code> option to the <code>./configure</code>
@@ -1787,7 +2043,7 @@ autoconf (GNU Autoconf) 2.59
         <p>Note that part of the function of the
           <code>./configure</code> script is to find the location of
           important files and freeze them in to the Makefile.  Thus
-          you cannot, in general, change the STARLINK variable or
+          you cannot, in general, change the <code>STARLINK</code> variable or
           change your path, and have new binaries picked up.</p>
 
       </subsect>
@@ -1799,21 +2055,21 @@ autoconf (GNU Autoconf) 2.59
 
         <p>If you intend to work only on a single component, then you
           can configure and build it as described in <ref
-            id="buildingcomponents" >the previous section</ref>.  If
-          you don't need to change any of the autotool source files --
-          namely <code>configure.ac</code> and
-          <code>Makefile.am</code> -- then this is all you need to do,
-          and you don't need to read this section.</p>
+            id="buildingcomponents" >the previous section</ref>.  As
+          described there, the bootstrapping procedure requires that the
+          `buildsupport' tools -- <em>starconf</em> plus
+          Starlink-specific autotools -- be installed and in your
+          path.</p>
 
-        <p>If you need to rebuild the autotool source files, then you
-          <em>must</em> install the autotools which are part of the
-          CVS repository, since these have been extended and
+        <p>You <em>must</em> install the autotools which are part of
+          the CVS repository, since these have been extended and
           customised specially for the Starlink build tree (for the
           details of the differences, see <ref id="gnutools"/>).  The
           standard autotools will not work.</p>
 
         <p>The most straightforward way of doing this is to make sure
-          you have the required components checked out (<kbd>cvs -d xxx
+          you have the required components checked out (<kbd>cvs -d
+            username@cvs.starlink.ac.uk:/cvs 
           checkout -l .</kbd> plus similar checkouts of
           <code>buildsupport</code> and <code>thirdparty/fsf</code>
           should be sufficient), then go to the
@@ -2139,7 +2395,7 @@ sed -n \
 starconf-validate: the following files are required but do not exist:
         bootstrap
 starconf-validate: the following files should be checked in, but aren't
-        Makefile.am configure.ac bootstrap component.xml.in component.xml configure starconf.status
+        Makefile.am configure.ac bootstrap component.xml.in component.xml starconf.status
 Configuring with STARCONF_DEFAULT_STARLINK=/export3/sun
 Configuring with STARCONF_DEFAULT_PREFIX=/export3/sun
 Creating starconf.m4
@@ -2163,7 +2419,7 @@ Creating acinclude.m4 from starconf.m4
 <verbatim>
 % ./bootstrap 
 starconf-validate: the following files should be checked in, but aren't
-        Makefile.am configure.ac bootstrap component.xml.in component.xml configure starconf.status
+        Makefile.am configure.ac bootstrap component.xml.in component.xml starconf.status
 Configuring with STARCONF_DEFAULT_STARLINK=/export3/sun
 Configuring with STARCONF_DEFAULT_PREFIX=/export3/sun
 Creating starconf.m4
@@ -3228,19 +3484,6 @@ AC_SUBST(STAR_MANIFEST_DIR)
           document maintainer), and as a note of what aspects might
           need further discussion.
           <ul>
-            <li>
-              <p>The files generated by autoconf and automake are
-                currently checked in to the repository.  Though this
-                is good practice in general, since we use extended or
-                customised versions of autoconf and automake we can
-                always control what versions of those applications are
-                being used, which possibly makes the various and
-                much-discussed disadvantages of
-                this policy outweigh the advantages.  This affects the
-                discussion in <ref id="buildingcomponents"/> and the
-                overview in <ref id="tooloverview"/>.</p>
-            </li>
-
             <li>
               <p>The starconf application currently only generates two
                 files -- you should not assume this will always be so.</p>
