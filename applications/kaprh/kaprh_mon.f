@@ -121,6 +121,15 @@
          ELSE IF ( NAME .EQ. 'IDPAZO' ) THEN
             CALL IDPAZO ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'IDSET' ) THEN
+            CALL IDSET ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'IDCLEAR' ) THEN
+            CALL IDCLEAR ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'IDSTATE' ) THEN
+            CALL IDSTATE ( STATUS )
+
          ELSE IF ( NAME .EQ. 'INSPECT' ) THEN
             CALL INSPECT ( STATUS )
 
