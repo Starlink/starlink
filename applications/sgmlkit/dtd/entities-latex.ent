@@ -26,6 +26,7 @@
 <!ENTITY endash SDATA "--"		-- en dash		-->
 <!ENTITY percent SDATA "\%"		-- percent sign		-->
 <!ENTITY deg    SDATA "\ensuremath{{}^\circ}"	-- degree	-->
+<!ENTITY dot	SDATA ".{}"		-- non-sentence-ending period -->
 <!ENTITY tilde	CDATA "~"		-- tilde		-->
 <!ENTITY underscore SDATA "\Underscore{}" -- underscore		-->
 <!ENTITY latex  SDATA "\LaTeX{}"	-- might as well...	-->

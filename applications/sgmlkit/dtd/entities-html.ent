@@ -32,6 +32,7 @@
 <!ENTITY percent CDATA "%"	-- percent sign		-->
 <!ENTITY tilde	CDATA "~"	-- tilde		-->
 <!ENTITY underscore CDATA "_"	-- underscore		-->
+<!ENTITY dot	CDATA "."	-- non-sentence-ending period -->
 
 <![ INCLUDE [
 <!ENTITY latex	SDATA "L<sup>a</sup>T<small>E</small>X" >

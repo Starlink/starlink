@@ -17,6 +17,7 @@
 <!ENTITY endash CDATA "--"	-- en dash		-->
 <!ENTITY percent CDATA "%"	-- percent sign		-->
 <!ENTITY deg    CDATA "^o"	-- degree		-->
+<!ENTITY dot	CDATA "."	-- non-sentence-ending period -->
 <!ENTITY tilde	CDATA "~"	-- tilde		-->
 <!ENTITY underscore CDATA "_"	-- underscore		-->
 <!ENTITY latex  CDATA "LaTeX"	-- might as well...	-->
