@@ -188,8 +188,8 @@
 
                      CALL MSG_SETC('TASK',TSKNAME)
                      CALL MSG_SETC('PRE', PREFIX_ENV)
-                     CALL ERR_REP(' ', '^TASK: Error reading the ^PRE'//
-     :                    '^PRE environemnt variable.', STATUS)
+                     CALL ERR_REP(' ', '^TASK: Error reading the '//
+     :                    '^PRE environment variable.', STATUS)
                      
                      CALL MSG_SETC('PRE', PREFIX_ENV)
                      CALL ERR_REP(' ', ' Numbers can only be '//
