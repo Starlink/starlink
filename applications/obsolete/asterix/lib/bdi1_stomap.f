@@ -1,4 +1,4 @@
-      SUBROUTINE BDI1_STOMAP( PSID, ISDYN, LOC, FPTR, PTR, TYPE,
+      SUBROUTINE BDI1_STOMAP( PSID, ISINV, LOC, FPTR, PTR, TYPE,
      :                        NELM, MODE, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_STOMAP( PSID, ISDYN, LOC, FPTR, PTR, TYPE, NELM, MODE, STATUS )
+*     CALL BDI1_STOMAP( PSID, ISINV, LOC, FPTR, PTR, TYPE, NELM, MODE, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -19,12 +19,12 @@
 *  Arguments:
 *     PSID = INTEGER (given)
 *        Item's private storage
-*     ISDYN = LOGICAL (given)
-*        Is mapped memory dynamic?
+*     ISINV = LOGICAL (given)
+*        Does mapped memory belong to an invented object
 *     LOC = CHARACTER*(DAT__SZLOC) (given)
 *        Locator to object
 *     FPTR = INTEGER (given)
-*        Address of mapped file object
+*        Address of mapped file object, or identifier of invented object
 *     PTR = INTEGER (given)
 *        Address of item mapped memory
 *     TYPE = CHARACTER*(*) (given)
@@ -100,7 +100,7 @@
 
 *  Arguments Given:
       INTEGER			PSID, FPTR, PTR, NELM
-      LOGICAL			ISDYN
+      LOGICAL			ISINV
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*(*)		TYPE, MODE
 
@@ -117,10 +117,14 @@
 
 *  Store the various items in the storage block
       CALL ADI_CNEWV0C( PSID, 'Locator', LOC, STATUS )
-      CALL ADI_CNEWV0I( PSID, 'FilePtr', FPTR, STATUS )
       CALL ADI_CNEWV0I( PSID, 'Ptr', PTR, STATUS )
       CALL ADI_CNEWV0I( PSID, 'Nelm', NELM, STATUS )
-      CALL ADI_CNEWV0L( PSID, 'Dynamic', ISDYN, STATUS )
+      CALL ADI_CNEWV0L( PSID, 'Invented', ISINV, STATUS )
+      IF ( ISINV ) THEN
+        CALL ADI_CNEWREF( PSID, 'InvObj', FPTR, STATUS )
+      ELSE
+        CALL ADI_CNEWV0I( PSID, 'FilePtr', FPTR, STATUS )
+      END IF
       CALL ADI_CPUT0C( PSID, 'Type', TYPE(:CHR_LEN(TYPE)), STATUS )
       CALL ADI_CPUT0C( PSID, 'Mode', MODE(:CHR_LEN(MODE)), STATUS )
 
