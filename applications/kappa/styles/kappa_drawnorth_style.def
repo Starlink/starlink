@@ -1,0 +1,39 @@
+#+
+#  Name:
+#     kappa_drawnorth_style.def
+
+#  Purpose:
+#     Defines the default style produced by the drawnorth application.
+
+#  Description:
+#     This file contains default settings for plotting style attributes
+#     to be used by drawnorth. These defaults can be over-ridden by the user 
+#     by supplying a value for the STYLE parameter when running drawnorth. 
+#     The defaults in this file over-ride the defaults in kappa_style.def.
+#     See $KAPPA_DIR/kappa_style.def for more information on KAPPA style
+#     files.
+
+#  Notes:
+#     -  Always include attribute axis qualifiers, etc, explcitly in this
+#     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
+#     just "textlab=1".
+
+#  Authors:
+#     David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-AUG-2002 (DSB):
+#        Original version.
+#-
+
+      Width(TextLab)=2
+      Width(Axes)=5
+      TextLab=1
+      Colour(TextLab)=white
+      Colour(Axes)=red
+      Size(TextLab)=1.5
+      Width(TextLab)=3
+      TextLabGap=0.02
+#      TextBackColour=clear
+
