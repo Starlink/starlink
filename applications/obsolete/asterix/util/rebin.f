@@ -956,6 +956,14 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 *      Status check
       IF (STATUS.NE.SAI__OK) RETURN
 
+	do i=1,dims(1)
+          print *,frbnd1(1,i),frbnd1(2,i)
+	enddo
+        print *,' '
+	do i=1,nbin(1)
+          print *,tobnd1(1,i),tobnd1(2,i)
+	enddo
+
 *  set up array of flags to record whether output bins have been filled
       CALL DYN_MAPB(7,NBIN,FPTR,STATUS)
 
