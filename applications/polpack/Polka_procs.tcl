@@ -15051,6 +15051,7 @@ proc Transfer {} {
 #  Notes:
 #    - 
 #-
+   global BACKCOL
    global CB_COL
    global IMAGES
    global IM_TRAN
@@ -15086,16 +15087,14 @@ proc Transfer {} {
    set TRAN_LIST ""
 
 # Create a check button for each image name, place them alternately in
-# the left and right of the two frames just created.
+# the frames just created.
    set f $fr1   
    for {set i 0} {$i < [llength $IMAGES]} {incr i} {
       set IM_TRAN($i) 0
       set im [lindex $IMAGES $i]
 
-# Each line in the Frame consists of a checkbutton, with an optional
-# label at the end of it. The label is only included if the image already
-# has features associated with it, and consists of a tick mark.
-# Create the frame for this line.
+# Each line in the Frame consists of a checkbutton, with a label at the 
+# end of it, consisting of a tick mark. Create the frame for this line.
       set lfrm [frame $f.f_$i]
 
 # If this image is the currently displayed image, then disable the check
@@ -15121,11 +15120,18 @@ proc Transfer {} {
         
          pack $cb($i) -side left 
 
-# If the image already has features, pack a label containing a
-# tick mark to the right of the checkbutton.
+# Pack a label containing a tick mark to the right of the checkbutton. If
+# image has features make the tick visible by setting its foreground
+# colour to red. Otherwise, hide the tick by setting its foreground
+# colour to the background colour.
       if { [HasFea $im] } {
-         pack [label $lfrm.tk -bitmap @$POLPACK_DIR/tick.bit -foreground red] -side left
+         set col red
+      } {
+         set col $BACKCOL
       }
+      set tick($im) [label $lfrm.tk -bitmap @$POLPACK_DIR/tick.bit \
+                                    -foreground $col]
+      pack $tick($im) -side left
 
 # Pack the line frame.
       pack $lfrm -side top -pady 1m -anchor nw 
@@ -15187,7 +15193,10 @@ proc Transfer {} {
 # Transfer the positions.
          for {set i 0} {$i < [llength $IMAGES]} {incr i} {
             if { $IM_TRAN($i) } { 
-               TransFea $IMAGE_DISP [lindex $IMAGES $i]
+               set im [lindex $IMAGES $i]
+               TransFea $IMAGE_DISP $im 
+               $tick($im) configure -foreground red
+               update idletasks
             }
          }
          set exit 1

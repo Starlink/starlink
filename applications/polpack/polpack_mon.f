@@ -118,6 +118,9 @@
       ELSE IF ( NAME .EQ. 'POLPLOT' ) THEN
          CALL POLPLOT( STATUS )
 
+      ELSE IF ( NAME .EQ. 'POLPREP' ) THEN
+         CALL POLPREP( STATUS )
+
       ELSE IF ( NAME .EQ. 'POLSIM' ) THEN
          CALL POLSIM( STATUS )
 
