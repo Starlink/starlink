@@ -1,142 +1,213 @@
-#!/usr/local/bin/perl -s
-# Simulates gsd_print.c - Much smaller!!!
-#
-# Tim Jenness (JACH)  - April 1996
+#!/usr/local/bin/perl
 
+# This is a reimplementation of the gsdprint command
+# using Perl rather than C or Fortran.
+# The C version forms part of the GSD C library distribution.
+# This version is much more compact.
+
+# History:
+#  April 1996 (TIMJ)
+#    Original version
+#  May 2000 (TIMJ)
+#    Use modern perl and the new OO interfacce
 
 # Load in the GSD module
-use GSD;
+use GSD qw//;
 use Term::ReadLine;
+use Getopt::Long;
+use Pod::Usage;
 
-$version = "1.0";
+use strict;
+
+# Version number
+my $VERSION = '1.01';
+
+
+# Read the options
+my $man = 0;
+my $help = 0;
+my $version = 0;
+my $printdata = 0;
+my $noread = 0;
+my $noarray = 0;
+
+# Parse options
+GetOptions('help|?' => \$help, man => \$man, noread => \$noread, 
+	   'data' => \$printdata, 'version' => \$version,
+	   'noarray' => \$noarray) 
+  or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
 
 # Version
-($v) && do {
-    print "JCMT GSD file lister ($0) version $version\n";
-    print "Contact Tim Jenness for more information\n";
+($version) && do {
+    print "JCMT GSD file lister ($0) version $VERSION\n";
+    print "Use the -h option for more information\n";
     exit;
 };
 
 
-# Help listing
-($h) && do {
-    print "Usage: $0 [-h] [-v] [-nodata]\n";
-    print "Options\n\t -h \t help\n";
-    print "\t -v \t version \n";
-    print "\t -nodata\t Only list header\n";
-    exit;
+# Read the argument if there is one
 
-};
-
-$term = new Term::ReadLine 'gsdprint' unless ($noread);
-
-# Need a file name
-
-$filename = $ARGV[0];
-
-if ($filename !~ /./) {
-    $prompt = "Which GSD file to list : ";
-    ($noread) && do {print $prompt; chomp($filename = <>)} ||
+my $filename;
+if (@ARGV) {
+  $filename = shift;
+} else {
+  my $term = new Term::ReadLine 'gsdprint' unless ($noread);
+  my $prompt = "Which GSD file to list : ";
+  ($noread) && do {print $prompt; chomp($filename = <>)} ||
     ($filename = $term->readline($prompt));
 }
 
+# Explicitly test for the existence of the filename
+# before trying to open it. This is not really necessary apart
+# from allowing us to distinguish error states 
 
-# Strip the trailing dat
-#$filename = (split(/\./,$filename))[0];
-
-# Open the file 
-
-die "$!: $filename does not exist\n" unless ((-e "$filename") ||
-					     (-e "$filename.dat") ||
-					     (-e "$filename.gsd") || 
-					     (-e $ENV{'DATADIR'}."/$filename") ||
-					     (-e $ENV{'DATADIR'}."/$filename.dat") ||
-					     (-e $ENV{'DATADIR'}."/$filename.gsd"));
-
+die "$!: $filename does not exist\n" 
+  unless ((-e "$filename") ||
+	  (-e "$filename.dat") ||
+	  (-e "$filename.gsd") || 
+	  (-e $ENV{'DATADIR'}."/$filename") ||
+	  (-e $ENV{'DATADIR'}."/$filename.dat") ||
+	  (-e $ENV{'DATADIR'}."/$filename.gsd"));
 
 
-$status = gsdOpenRead($filename,$version,$label,$no_items,$fptr,$file_dsc,
-		      $item_dsc,$data_ptr);
+# Open the GSD file
+my $gsd = new GSD($filename);
+
+die "Problem opening file. $filename may not be a GSD file\n"
+  unless defined $gsd;
 
 
-die "Problem opening file. $filename may not be a GSD file\n" if ($status);
-
-# Strip trailing spaces from the label
-$label =~ s/\s+$//g;
-
-
+# Print an informative header
 print "-"x78,"\n";
 print " G S D    P R I N T\n";
 print "-"x78,"\n";
 print "\n";
-print " Filename        : $filename\n";
-printf " GSD version     : %5.3f\n",$version;
-print " Label           : $label\n";
-print " Number of items : $no_items\n";
-print "\n\n\n";
-print "Name\t\tUnit\t\tType\tArr?\tValue\n";
-print "-"x78,"\n";
+print  " Filename        : $filename\n";
+printf " GSD version     : %5.3f\n", $gsd->version;
+print  " Label           : ", $gsd->label, "\n";
+print  " Number of items : ", $gsd->nitems, "\n";
+print  "\n\n\n";
+print  "Name\t\tUnit\t\tType\tArr?\tValue\n";
+print  "-"x78,"\n";
 
-for ($i=1; $i<=$no_items; $i++) {
+for my $i (1.. $gsd->nitems) {
 
-    $status = gsdItem($file_dsc,$item_dsc,$i,$name,$unit,$type,$array);
+  my ($name, $unit, $type, $array) = $gsd->Item($i);
+  next if ($array && $noarray);
 
-    print "-"x78,"\n" if ($array);    
-    print "$name\t$unit\t$type\t$array\t";
+  print "-"x78,"\n" if ($array);    
+  printf "%-16s%-16s$type\t$array\t", $name, $unit;
 
-    $call = "gsdGet$array\l$type";
+  if ($array) {
 
-    if ($array) {
-
-
-	@dimnm = ();
-	@dimunt = (); 
-	@dimvals = ();
-	$actdims = 0;
-	$status = gsdInqSize($file_dsc,$item_dsc,$data_ptr,$i,\@dimnm,\@dimunt,
-			     \@dimvals,$actdims,$size);
-	print "Size = $size\n";
+    # Find out how big it is
+    my ($dimnm, $dimunt, $dimvals, $size) = $gsd->InqSize($i);
+    print "Size = $size\n";
 	
-	$status = &{$call}($file_dsc,$item_dsc,$data_ptr,$i,1,$size,1,$size,
-			   \@values,$actvals);
-	# Remove white space
-	grep(s/\s+//g,@dimunt);
-	grep(s/\s+//g,@dimvals);
-	grep(s/\s+//g,@dimnm);
-	
-	# Write the array definition
-	for ($j=0; $j < $actdims; $j++) {
-	    print "  > $dimnm[$j]:\t$dimvals[$j]\t $dimunt[$j]\n";
-	}
+    # Now get the data
+    my @values = $gsd->GetByNum($i);
 
-	# Write the data
-	unless ($nodata && ($i == $no_items) ) {
-	    print "  Data:\n";
-	    for ($j=0; $j <$actvals; $j++) {
-	      if ($type =~ /C/i) {
-		printf "%20s ",$values[$j];
-	      } else {
-		printf "%15g",$values[$j];
-	      }
-	      print "\n" unless ((1+$j)%4);
-	    }
-	    print "\n" if ($actvals%4);
+    # Write the array definition - looping over each dimension
+    for my $j (0..$#$dimvals) {
+      printf("  > %s: %d\t%s\n", $dimnm->[$j], $dimvals->[$j], $dimunt->[$j]);
+    }
+
+    # Write the data - skipping if this is the last item
+    # unless $printdata is true
+    if (($i != $gsd->nitems) || $printdata)  {
+      print "  Data:\n";
+
+      # Print the data in blocks of 4
+      for my $j (0..$#values) {
+	if ($type =~ /C/i) {
+	  printf "%20s ",$values[$j];
+	} else {
+	  printf "%15g",$values[$j];
 	}
+	print "\n" unless ((1+$j)%4);
+      }
+      print "\n" if (scalar(@values)%4);
+    }
 
 
     } else {
 
-	$status = &{$call}($file_dsc,$item_dsc,$data_ptr,$i,$newdata);
-	$newdata =~ s/\s+$//g if $type eq "C";
-	print "$newdata\n";
+      my $newdata = $gsd->GetByNum($i);
+      print "$newdata\n";
     }
 
 }
 
 print "-"x78,"\n";
-$status = gsdClose($fptr,$file_dsc,$item_dsc,$data_ptr);
 
+exit;
 
+__END__
 
+=head1 NAME
 
+gsdprint - Print the contents of a GSD file to standard output
 
+=head1 SYNOPSIS
+
+  gsdprint obs_das_0141.dat
+  gsdprint -nodata obs_das_0141
+  gsdprint test.gsd
+
+  gsdprint
+
+  gsdprint -v
+  gsdprint -man
+
+=head1 DESCRIPTION
+
+This command prints the contents of the GSD file to the screen
+with some formatting. By default the data component C<C13DAT>
+is not printed since this can be very large (the B<-data> option
+will print the data as well as the header).
+
+A prompt will be issued if no filename is given.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-data>
+
+Print the C<C13DAT> field as well as the header fields. 
+In reality without this option the program  simply misses off the 
+last GSD item assuming that it is the main data array.
+
+=item B<-noarray>
+
+Only list scalar items.
+
+=item B<-noread>
+
+Turn off readline support. Sometimes this is necessary 
+if the command is run from a script or web page. Readline
+support is only required when the user is prompted for input
+(ie no filename supplied at the command-line). 
+
+=back
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+Copyright (C) 1996-2000 Tim Jenness and the UK Particle Physics and
+Astronomy Research Council. All Rights Reserved.
+
+=cut
