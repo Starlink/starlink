@@ -1931,7 +1931,7 @@ ccdedit mode=erase in=image_with_bad_transform name=transform
    In this example the TRANSFORM structure in the CCDPACK
    extension of the image image_with_bad_transform is removed.
 
-ccdedit mode=erase fixwcs=yes in='*' 
+ccdedit mode=erase name=set fixwcs=yes in='*' 
    All Set header information, and any CCD_SET coordinate
    frames which are associated with it, will be removed from
    the images in the current directory.
