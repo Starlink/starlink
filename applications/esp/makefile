@@ -480,12 +480,14 @@ PAR_PAR AGI_ERR FIO_ERR MSG_PAR SUBPAR_PAR DAT_PAR PSX_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
-#  routines and the main routine, which are treated separately).  
+#  routines and the main routine, which are treated separately).
+#
+#  Include the platform-specific variants as source files.
 
 F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
 
 F_SUB1 = corr.f ellfou.f ellpro.f esphelp.f fastmed.f gaufit.f \
-	gaufit2.f dnsg.f \
+	gaufit2.f dnsg.f d1mach.f_bigieee d1mach.f_littleieee \
 	graphs.f histpeak.f hsub.f loback.f mask.f mixup.f sector.f \
 	selfc.f selfcw.f skew.f topped.f ards.f
 
@@ -603,7 +605,7 @@ MSG_PAR:      $(STAR_INC)/msg_par;   $(LINK) $? $@
 SUBPAR_PAR:   $(STAR_INC)/subpar_par;   $(LINK) $? $@
 NDF_ERR:      $(STAR_INC)/ndf_err;   $(LINK) $? $@
 NDF_PAR:      $(STAR_INC)/ndf_par;   $(LINK) $? $@
-SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+SAE_PAR:      $(STAR_INC)/sae_par;   $(LINK) $? $@
 PSX_ERR:      $(STAR_INC)/psx_err;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
@@ -625,7 +627,7 @@ $(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1):
 new_$(PKG_NAME)_source.tar: $(PUBLIC_SCRIPTS) $(DATA_FILES) \
 		$(LINK_SCRIPT) $(MONO_SOURCE) $(HELP_SOURCES) $(MONO_IFL) \
 		$(STARTUP_SCRIPTS) $(IFL_FILES) $(ICL_SCRIPT) \
-		$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1) $(PF_SUB1)
+		$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1)
 	$(TAR_IN) new_$(PKG_NAME)_source.tar $?
 
 $(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2):
@@ -640,11 +642,14 @@ $(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2):
 #  and that the macro PF_SUBn is empty. To prevent a syntax error in
 #  make, a dummy target is present.
 
-$(PF_SUB1) dummy_target1:
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
-	@ if test -f $@_$(SOURCE_VARIANT); then :;\
-           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
-	mv $@_$(SOURCE_VARIANT) $@
+#$(PF_SUB1) dummy_target1:
+#	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
+#	@ if test -f $@_$(SOURCE_VARIANT); then :;\
+#           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
+#	mv $@_$(SOURCE_VARIANT) $@
+
+d1mach.f: d1mach.f_$(SOURCE_VARIANT)
+	$(LINK) $< $@
 
 $(PF_SUB2) dummy_target2:
 	$(TAR_OUT) $(PKG_NAME)_sub2.tar $@_$(SOURCE_VARIANT)

@@ -342,7 +342,7 @@
                LINK='ln -s'
                RANLIB='ranlib'
                SOURCE_VARIANT='littleieee'
-               TAR_IN='tar -cvhf'
+               TAR_IN='tar -chf'
                TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;

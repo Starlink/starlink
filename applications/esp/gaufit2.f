@@ -480,7 +480,6 @@ c$$$      endif
       real driftmetric, gau2_drift
       
       character *(80)line       ! output line
-      character *(80)errmsg     ! error message
       integer nchar             ! running line length
 
       if (status .ne. sai__ok) return
@@ -570,28 +569,32 @@ c$$$      endif
             keeplooping = .false.
             
 *         Why has this happened?
-*         See return codes in NSG sect. 3
+*         See return codes in NSG Usage Summary, sect. 3
             if (iv(1) .ge. 3 .and. iv(1) .le. 6) then
                gau2par(gau2status) = 0 ! that's OK
                gau2par(gau2xstatus) = iv(1) ! for reference
             else if (iv(1) .eq. 7 .or. iv(1) .eq. 8) then
                gau2par(gau2status) = gau2noconv
-               errmsg = 'gaufit: convergence tests failed in NSG'
+               status = sai__error
+               call err_rep (' ','convergence tests failed in NSG',
+     :              status)
             else if (iv(1) .eq. 9 .or. iv(1) .eq. 10) then
                gau2par(gau2status) = gau2maxiter
                gau2par(gau2xstatus) = iv(18) ! pass back the iteration limit
-               errmsg = 'gaufit: too many iterations in NSG'
+               status = sai__error
+               call err_rep (' ','too many iterations in NSG',status)
             else
                gau2par(gau2status) = gau2unkerror ! odd...
                gau2par(gau2xstatus) = iv(1)
-               errmsg = 'gaufit: unknown error in NSG'
-            endif
-            
-            if (gau2par(gau2status) .ne. 0) then
                status = sai__error
-               call err_rep (' ',errmsg,status)
+               call msg_seti ('ECODE',iv(1))
+               call err_rep (' ','unknown error (^ECODE) in NSG',
+     :              status)
             endif
 
+*         If there's any error, bail out
+            if (status .ne. sai__ok) goto 999
+            
          endif
 
 *      iv(niter)=iv(31) is iteration number.  NSG p17
@@ -604,6 +607,7 @@ c$$$      endif
 *23456789012345678901234567890123456789012345678901234567890123456789012345678
 *  IT    NF     DRIFT    NL'D RESID
 * iii  iiii  ffffffffff  ffffffffff
+               nchar=0
                call chr_putc ('   IT    NF     DRIFT    NL''D RESID',
      :              line, nchar)
                call msg_out (' ', line(1:nchar), status)
@@ -622,6 +626,8 @@ c$$$      endif
          endif
 
       enddo
+
+ 999  continue
       
       end
 
