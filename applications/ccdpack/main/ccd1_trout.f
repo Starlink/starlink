@@ -28,6 +28,12 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Notes:
+*     The coefficients are converted from DOUBLE PRECISION to REAL 
+*     before being converted to strings.  This is so that the resulting
+*     strings are short enough to be output three to a line without
+*     truncation.  
+
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 
@@ -73,29 +79,29 @@
       IAT = 4
       BUFFER( IAT: ) = ' A ='
       IAT = IAT + 5
-      CALL CHR_DTOC( TR( 1 ), BUFFER( IAT: ), NCHAR )
+      CALL CHR_RTOC( REAL( TR( 1 ) ), BUFFER( IAT: ), NCHAR )
       IAT = 29
       BUFFER( IAT: ) = ' B ='
       IAT = IAT + 5
-      CALL CHR_DTOC( TR( 2 ), BUFFER( IAT: ), NCHAR )
+      CALL CHR_RTOC( REAL( TR( 2 ) ), BUFFER( IAT: ), NCHAR )
       IAT = 54
       BUFFER( IAT: ) = ' C ='
       IAT = IAT + 5
-      CALL CHR_DTOC( TR( 3 ), BUFFER( IAT: ), NCHAR )
+      CALL CHR_RTOC( REAL( TR( 3 ) ), BUFFER( IAT: ), NCHAR )
       CALL CCD1_MSG( ' ', BUFFER, STATUS )
       BUFFER = ' '
       IAT = 4
       BUFFER( IAT: ) = ' D ='
       IAT = IAT + 5
-      CALL CHR_DTOC( TR( 4 ), BUFFER( IAT: ), NCHAR )
+      CALL CHR_RTOC( REAL( TR( 4 ) ), BUFFER( IAT: ), NCHAR )
       IAT = 29
       BUFFER( IAT: ) = ' E ='
       IAT = IAT + 5
-      CALL CHR_DTOC( TR( 5 ), BUFFER( IAT: ), NCHAR )
+      CALL CHR_RTOC( REAL( TR( 5 ) ), BUFFER( IAT: ), NCHAR )
       IAT = 54
       BUFFER( IAT: ) = ' F ='
       IAT = IAT + 5
-      CALL CHR_DTOC( TR( 6 ), BUFFER( IAT: ), NCHAR )
+      CALL CHR_RTOC( REAL( TR( 6 ) ), BUFFER( IAT: ), NCHAR )
       CALL CCD1_MSG( ' ', BUFFER, STATUS )
 
       END
