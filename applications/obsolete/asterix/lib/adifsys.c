@@ -268,12 +268,12 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
       {
       ADIboolean	there=ADI__false;
 
-      repid = _CAR(curp);
+      rid = _CAR(curp);
 
-      adic_there( repid, "CREAT_RTN", &there, status );
+      adic_there( rid, "CREAT_RTN", &there, status );
 
       if ( there ) {
-        adix_locrcb( repid, "CREAT_RTN",	/* Locate the opening routine */
+        adix_locrcb( rid, "CREAT_RTN",	/* Locate the opening routine */
                      _CSM, &ortn, status );
 
 /* Try to create the file */
@@ -336,7 +336,6 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
   ADIobj	mid;			/* ADI version of mode */
   ADIobj	ortn;			/* Open routine */
   char		*ppos;
-  ADIobj	repid;
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
   int		rlen;
 
@@ -380,12 +379,12 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
       {
       ADIboolean	there=ADI__false;
 
-      repid = _CAR(curp);
+      rid = _CAR(curp);
 
-      adic_there( repid, "OPEN_RTN", &there, status );
+      adic_there( rid, "OPEN_RTN", &there, status );
 
       if ( there ) {
-        adix_locrcb( repid, "OPEN_RTN",	/* Locate the opening routine */
+        adix_locrcb( rid, "OPEN_RTN",	/* Locate the opening routine */
                      _CSM, &ortn, status );
 
         adix_fopen_int( ortn, fid, mid,	/* Try to open file */
@@ -418,7 +417,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
 /* Opened ok? If so, write in details of representation and access mode */
   if ( _ok(status) ) {
-    adic_cput0i( *id, "REP", repid, status );
+    adic_cput0i( *id, "REP", rid, status );
     adic_cputid( *id, "MODE", mid, status );
     }
 
