@@ -25,6 +25,9 @@ STAR_CHECK_PROGS(prohlp,sst)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl    Look for tck/tk system
+STAR_PATH_TCLTK(8.2, [tcl])
+
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
@@ -37,6 +40,7 @@ STAR_PREDIST_SOURCES(polka.tex)
 
 AC_CONFIG_FILES([Makefile component.xml polpack_mon.f polpack.ifd
     ccdpack/Makefile polsub/Makefile polsub/pol1_ptvrc.f polsub/pol1_ptvrs.f])
+AC_CONFIG_FILES(polpack_link_adam, [chmod +x polpack_link_adam])
 AC_CONFIG_FILES(Polka.tcl, [chmod +x Polka.tcl])
 AC_CONFIG_FILES(adamMessageRelay, [chmod +x adamMessageRelay])
 
