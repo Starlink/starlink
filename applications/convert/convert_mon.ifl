@@ -1,0 +1,1619 @@
+monolith convert_mon
+## ASCII2NDF - Converts an ASCII file to an NDF.
+
+#+
+#  Name:
+#     ASCII2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1991 September 18 (MJC):
+#	 Original version.
+#     1997 December 2 (MJC):
+#     	 Added MAXLEN.
+#     {enter_further_changes_here}
+
+#-
+
+interface ASCII2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy from the ASCII file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      FITS           # Extract the FITS header
+      type        '_LOGICAL'
+      prompt      'Read a FITS header from the ASCII file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input ASCII file
+      position    1
+      type        'FILENAME'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'ASCII file'
+      helpkey     '*'
+   endparameter
+
+   parameter      MAXLEN         # Maximum length of input records
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Maximum length in bytes of text-file records'
+      helpkey     '*'
+      default     512
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'NDF'
+      access      'UPDATE'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      SHAPE          # Shape of the output NDF
+      position    5
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Shape of the output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      SKIP           # Number of records to skip
+      position    4
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Number of records to skip'
+      helpkey     '*'
+      default     0
+   endparameter
+
+   parameter      TYPE           # Output data type
+      position    6
+      type        'LITERAL'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      default     'R'
+      prompt      'Interim data type required'
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     AST2NDF.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     13/7/97 (ACD): Original version.
+#     3/9/97  (ACD): First stable version.
+#-
+
+interface AST2NDF
+
+   helplib 'CONVERT_HELP:'
+
+   parameter IN                          # Name of the input Asterix file.
+      position 1
+      type     '_CHAR'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'CURRENT'
+      prompt   'input Asterix file:'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                         # Name of the output cube.
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'output cube:'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## CONHELP - Gives help about CONVERT.
+
+#+
+#  Name:
+#     CONHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 July 30 (MJC):
+#	 Original version.
+#     {enter_any_changes_here}
+
+#-
+
+
+interface CONHELP
+
+   helplib        CONVERT_HELP:
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+endinterface
+
+## DA2NDF - Converts a direct-access unformatted file to an NDF.
+
+#+
+#  Name:
+#     DA2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1996 October 19 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface DA2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy from the unformatted file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      IN             # Input direct-aceess unformatted file
+      position    1
+      type        'FILENAME'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Direct-access unformatted file'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per input record
+      position    4
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'DYNAMIC'
+      prompt      'Number of data values per unformatted record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'NDF'
+      access      'UPDATE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      SHAPE          # Shape of the output NDF
+      position    5
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Shape of the output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      TYPE           # Output data type
+      position    6
+      type        'LITERAL'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      default     'R'
+      prompt      'NDF data type required'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## DST2NDF - Converts a Figaro (.DST) file to an NDF.
+
+#+
+#  Name:
+#     DST2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JM: Jo Murray (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-JUN-1990 (JM):
+#	 Original version.
+#     1992 January 31 (MJC):
+#        Renamed the parameters for the DST and NDF files to IN and OUT
+#        respectively to agree with SUN/55 and consistency.  Added help
+#	 library.
+#     1992 August 27 (MJC):
+#     	 Made the output NDF the current data-array.
+#     1992 September 28 (MJC):
+#     	 Made OUT have type NDF and WRITE access.
+#     1993 October 25 (MJC):
+#     	 Added FORM.
+#     {enter_further_changes_here}
+
+#-
+
+interface DST2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      FORM           # NDF storage form
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT'
+      prompt      'Storage form of the NDF data and variance arrays'
+      default     'Simple'
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Name of Figaro file
+      position    1
+      type        '_CHAR'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Name of Figaro (.DST) file to be converted'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Name of NDF
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Name of output NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## FITS2NDF - Converts FITS files into NDFs
+
+#+
+#  Name:
+#     FITS2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     DSB: David S. Berry (STARLINK)
+#     AJC: Alan J. Chipperfield (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1996 January 26 (MJC):
+#	 Original version.
+#     1997 March 11 (MJC):
+#     	 Changed from GROUP types back to LITERAL.
+#     18-DEC-1997 (DSB):
+#        Added ENCODINGS.
+#      4-APR-2000 (AJC):
+#        Added EXTABLE
+#     31-AUG-2000 (AJC):
+#        Added CONTAINER
+#     {enter_further_changes_here}
+
+#-
+
+interface FITS2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      CONTAINER        # Create a container file
+      type        '_LOGICAL'
+      prompt      'Create a container file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      ENCODINGS      # AST encodings for WCS components
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT,CURRENT'
+      prompt      'FITS keywords to use when creating NDF WCS components'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      EXTABLE
+      type        'FILENAME'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Table of extension specifiers'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      FMTCNV         # Apply scale and zero
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Apply BSCALE and BZERO to data values in the FITS file(s)?'
+      helpkey     '*'
+      default     'TRUE'
+   endparameter
+
+   parameter      IN             # Input FITS file(s)
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      prompt      'Input FITS file(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # Log-file name
+      position    4
+      type        'FILENAME'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Filename to store FITS headers'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF(s)
+      position    2
+      type        'LITERAL'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+# Omit output association until wildcards are commonly accepted.
+#     association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      PROEXTS        # Propagate the FITS-file's extensions
+      type        '_LOGICAL'
+      prompt      'Propagate the extensions of the FITS file?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFITS        # Propagate the FITS headers 
+      type        '_LOGICAL'
+      prompt      'Create a NDF extension called FITS to store the headers?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      WCSATTRS      # AST attributes for WCS FitsChan
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT,CURRENT'
+      prompt      'Attributes for WCS conversion'
+      helpkey     '*'
+      default     !
+   endparameter
+
+endinterface
+## GASP2NDF - Converts an image in GASP format to an NDF.
+
+#+
+#  Name:
+#     GASP2NDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JAN-1993 (RAHM):
+#         Original version.
+#     1993 July 27 (MJC):
+#        Renamed parameters for consistency.  Combined NCOLS and NROWS
+#        into SHAPE.  Added help library.  Fixed helpkey bugs.
+#     {enter_further_changes_here}
+
+#-
+
+interface GASP2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      IN             # Name of the GASP file
+      position    1
+      type        LITERAL
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of GASP file (.dat suffix not required)'
+      helpkey    '*'
+   endparameter
+
+   parameter      OUT            # Name of output NDF
+      position    2
+      type        NDF
+      access      WRITE
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Output NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      helpkey    '*'
+   endparameter
+
+   parameter      SHAPE          # Dimensions of the GASP image
+      type        _INTEGER
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Dimensions of the GASP image'
+      helpkey    '*'
+   endparameter
+
+endinterface
+## IRCAM2NDF - Converts an IRCAM data file to a series of NDFs.
+
+#+
+#  Name:
+#     IRCAM2NDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 September 2 (MJC):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface IRCAM2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      CONFIG         # Select the data array to copy
+      position    4
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Data-array configuration to copy'
+      default     'stare'
+      helpkey     '*'
+   endparameter
+
+   parameter      FMTCNV         # Apply scale and zero?
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Apply non-null scale and zero?'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Name of IRCAM file
+      position    1
+      type        'IRCAM'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of IRCAM file to be converted'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Name of NDF
+      type        'NDF'
+      access      'WRITE'
+      vpath       'NOPROMPT
+      prompt      'Name of output NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      OBS            # Observation numbers
+      position    3
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'List of observations to convert'
+      default     '*'
+      helpkey     '*'
+   endparameter
+
+   parameter      PREFIX         # Prefix for the output NDF names
+      position    2
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Data-array configuration to copy'
+      default     'STARE'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## NDF2ASCII - Converts an NDF to an ASCII file.
+
+#+
+#  Name:
+#     NDF2ASCII.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1991 January 28 (MJC):
+#	 Original version.
+#     1992 September 16 (MJC):
+#	 Added parameters to provide more control of the formatting of
+#	 the output file.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2ASCII
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy to the ASCII file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      FITS           # Extract the FITS file
+      type        '_LOGICAL'
+      prompt      'Write a FITS header in the ASCII file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      FIXED          # Fixed formatting of the data values
+      type        '_LOGICAL'
+      prompt      'Fixed format of the array values?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per ASCII record
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of data values per ASCII record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output ASCII file
+      position    2
+      type        'FILENAME'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'ASCII file'
+      helpkey     '*'
+   endparameter
+
+   parameter      RECLEN         # ASCII file recordlength
+      position    4 
+      type        '_INTEGER'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      prompt      'Maximum recordsize of the ASCII file.'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## NDF2DA - Converts an NDF to a unformatted direct-access file.
+
+#+
+#  Name:
+#     NDF2DA.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1996 October 20 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface NDF2DA
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy to the unformatted file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per output record
+      position    4 
+      type        '_INTEGER'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of data values per output record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output unformatted file
+      position    2
+      type        'FILENAME'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Unformatted direct-access file'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## NDF2DST - Converts an NDF to a Figaro DST file.
+
+#+
+#  Name:
+#     NDF2DST.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JM: Jo Murray (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-JUN-1990 (JM):
+#	 Original version.
+#     1992 January 30 (MJC):
+#     	 Renamed the file parameters to IN and OUT.  Added help from
+#	 a library.
+#     1992 August 27 (MJC):
+#     	 Make the current NDF the suggested default for IN.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2DST
+
+   helplib        'CONVERT_HELP:'
+
+   parameter	  IN             # Name of input NDF
+      position    1
+      type	  'NDF'
+      ppath       'GLOBAL,CURRENT'
+      prompt      'NDF to be converted'
+      association '<->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter       OUT           # Name of output Figaro file
+      position     2
+      type         '_CHAR'
+      ppath        'CURRENT'
+      prompt       'Name of output Figaro file'
+      helpkey      '*'
+   endparameter
+
+endinterface
+## NDF2FITS - Converts NDFs into FITS files.
+
+#+
+#  Name:
+#     NDF2FITS.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1994 June 26 (MJC):
+#	 Original version.
+#     1997 January 13 (MJC):
+#     	 Added PROHIS.  Changed from GROUP types back to LITERAL.
+#     18-DEC-1997 (DSB):
+#        Added ENCODINGS.
+#     9-NOV-1998 (DSB):
+#        Replaced ENCODINGS by NATIVE.
+#     22-JUN-1999 (DSB):
+#        Added ENCODING.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2FITS
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      BITPIX         # No. of bits per pixel
+      position    4
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of bits per pixel'
+      helpkey     '*'
+#     in          '0', '8', '16', '32', '-32', '-64'
+      default     '0'
+   endparameter
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT,CURRENT,DYNAMIC'
+      prompt      'Array components to copy to the FITS file(s)'
+      helpkey     '*'
+#     in          'A', 'D', 'V', 'Q', 'DV', 'VD', 'DQ', 'QD', 'VQ', 'QV'
+      default     'A'
+   endparameter
+
+   parameter      ENCODING       # Encoding to use for WCS info
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Encoding to use for WCS information'
+      helpkey     '*'
+      default     'Auto'
+   endparameter
+
+   parameter      IN             # Input NDF(s)
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+# Omit output association until wildcards are commonly accepted.
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      NATIVE          # Produce a NATIVE WCS encoding?
+      type        '_LOGICAL'
+      prompt      'Include a native WCS encoding in the FITS header?'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+    parameter      OUT            # Output FITS file(s)
+      position    2
+      type        'LITERAL'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Output FITS file(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      ORIGIN         # Origin of the FITS files
+      position    5
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT'
+      prompt      'Origin of the FITS files (for the FITS header)'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      PROEXTS        # Propagate the NDF's extensions
+      type        '_LOGICAL'
+      prompt      'Propagate the NDF extensions?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFITS        # Propagate the NDF's FITS extension
+      type        '_LOGICAL'
+      prompt      'Merge the FITS extension of the NDF in the FITS header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROHIS         # Propagate the NDF's HISTORY information
+      type        '_LOGICAL'
+      prompt      'Relay any NDF history information to the FITS header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+endinterface
+## NDF2GASP - Converts a two-dimensional NDF into a GASP image.
+
+#+
+#  Name:
+#     NDF2GASP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-JAN-1993 (RAHM):
+#        Original version.
+#     1993 July 27 (MJC):
+#        Added help.  Renamed parameters to standard.  Made FILLBAD type
+#	 _INTEGER.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2GASP
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      IN            # Input image
+      position    1
+      type        NDF
+      prompt      'Input NDF image?'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT           # Output GASP image
+      position    2
+      type        LITERAL
+      prompt      'Output GASP image (.dat suffix not required)'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      helpkey     '*'
+   endparameter
+
+   parameter      FILLBAD       # Value to use when replacing bad pixels
+      type        '_INTEGER'
+      vpath       'DEFAULT,NOPROMPT'
+      default     -10000
+      helpkey     '*'
+   endparameter
+    
+endinterface
+## NDF2PGM - Converts an NDF into a PBMPLUS-style PGM-format file.
+
+#+
+#  Name:
+#     NDF2PGM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     AJP: A.J. Chipperfield (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-NOV-1995 (GJP):
+#        Original version.
+#      5-DEC-1995 (AJC):
+#        Added helplib.
+#     1996 February 12 (MJC):
+#     	 Converted to standard (and more readable) style, and added
+#	 function banner.
+#     {enter_further_changes_here}
+
+#-    
+
+interface NDF2PGM
+
+   helplib        $CONVERT_HELP
+
+   parameter      IN             # The name of the source NDF image to be used.
+      position    1
+      type        'NDF'
+      access      'READ'
+      prompt      'NDF to convert'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      vpath       'PROMPT'
+      association '<->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # The output PGM file.
+      position    2
+      type        '_CHAR'
+      access      'UPDATE'
+      prompt      'PGM filename'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'PROMPT'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# NDF2TIFF - Converts an NDF into an 8-bit TIFF-6.0-format file.
+
+#+
+#  Name:
+#     NDF2TIFF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     AJC: Alan J. Chipperfield (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-NOV-1995 (GJP):
+#        Original version.
+#      5-DEC-1995 (AJC):
+#        Added helplib
+#     19-FEB-1996 (MJC):
+#     	 Converted to standard (and more readable) style, and added
+#	 function banner.
+#      4-FEB-1999 (AJC):
+#        Added Scaling parameters
+#     {enter_further_changes_here}
+
+#-    
+
+interface NDF2TIFF
+
+   helplib        $CONVERT_HELP
+
+   parameter      IN             # The name of the source NDF image to be used.
+      position    1
+      type        'NDF'
+      access      'READ'
+      prompt      'NDF to convert'
+      ppath       'GLOBAL,CURRENT'
+      vpath       'PROMPT'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # The output TIFF file.
+      position    2
+      type        '_CHAR'
+      access      'UPDATE'
+      prompt      'TIFF file'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'PROMPT'
+      helpkey     '*'
+   endparameter
+
+   parameter      SCALE           # Scaling method
+      position    3
+      type        'LITERAL'
+      keyword     'SCALE'
+      vpath       'DEFAULT'
+      default     'Range'
+      prompt      'Method to define the scaling limits'
+      helpkey     '*'
+#     in          'Flash', 'Faint', 'Percentiles', 'Scale', 'Range', 'Sigma'
+   endparameter
+
+   parameter      HIGH           # Upper scaling limit
+      type        '_DOUBLE'
+      keyword     'HIGH'
+      prompt      'High value for display'
+      vpath       'PROMPT'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      LOW            # Lower scaling limit
+      type        '_DOUBLE'
+      keyword     'LOW'
+      prompt      'Low value for display'
+      vpath       'PROMPT'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      NUMBIN         # Number of histogram bins
+      keyword     'NUMBIN'
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      default     2048
+      prompt      'Number of bins to compute percentiles'
+      helpkey     '*'
+   endparameter
+
+   parameter      PERCENTILES    # Percentiles for scaling
+      keyword     'PERCENTILES'
+      type        '_REAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      default     10,90
+      prompt      'Percentiles for scaling'
+      helpkey     '*'
+   endparameter
+
+   parameter      SCAHIGH        # Upper scaling value
+      keyword     'SCAHIGH'
+      access      'WRITE'
+      type        '_DOUBLE'
+      vpath       'DEFAULT'
+      prompt      'Object to contain the upper scaling value.'
+      default     0.0
+   endparameter
+
+   parameter      SCALOW         # Lower scaling value
+      keyword     'SCALOW'
+      access      'WRITE'
+      type        '_DOUBLE'
+      vpath       'DEFAULT'
+      prompt      'Object to contain the lower scaling value.'
+      default     0.0
+   endparameter
+
+   parameter      SIGMAS         # Standard-deviation scaling limits
+      keyword     'SIGMAS'
+      type        '_REAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      default     -2,2
+      prompt      'Standard-deviation limits for scaling'
+      helpkey     '*'
+   endparameter
+
+   parameter      MSG_FILTER     # MSG filtering level
+      keyword     'MSG_FILTER'
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      default     'NORMAL'
+      prompt      'Message filtering level'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## NDF2UNF - Converts an NDF to a sequential unformatted file.
+
+#+
+#  Name:
+#     NDF2UNF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1992 September 16 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface NDF2UNF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy to the unformatted file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      FITS           # Extract the FITS file
+      type        '_LOGICAL'
+      prompt      'Write a FITS header in the unformatted file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per output record
+      position    4 
+      type        '_INTEGER'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of data values per output record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output unformatted file
+      position    2
+      type        'FILENAME'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Sequential unformatted file'
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SPECX2NDF.IFL
+#
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#
+#  History:
+#     25/6/97 (ACD): Original version.
+#     8/1/98  (ACD): First stable version.
+#     6/3/03 (DSB): Removed several parameters.
+#-
+
+interface SPECX2NDF
+
+   helplib 'CONVERT_HELP:'
+
+   parameter GRIDFILE                     # Flag; write map schematic?
+      position 3
+      type     'LITERAL'
+      default  !
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Map schematic file'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                          # Name of the input SPECX map.
+      position 1
+      type     'NDF'
+      access   'READ'
+      ppath    'CURRENT'
+      vpath    'DEFAULT'
+      prompt   'Input SPECX map'
+      helpkey  '*'
+   endparameter
+
+   parameter LATITUDE                 # Latitude of telescope.
+      position 5
+      type     'LITERAL'
+      default  '19:49:33'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Geodetic (geographic) latitude of telescope'
+      helpkey  '*'
+   endparameter
+
+   parameter LONGITUDE                 # Longitude of telescope.
+      position 6
+      type     'LITERAL'
+      default  '155:28:47'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Geodetic (geographic) longitude of telescope'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                         # Name of the output cube.
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF cube'
+      helpkey     '*'
+   endparameter
+
+   parameter TELESCOPE                 # Name of the telescope.
+      position 4
+      type     'LITERAL'
+      default  'JCMT'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Telescope'
+      helpkey  '*'
+   endparameter
+
+endinterface
+## UNF2NDF - Converts a Sequential unformatted file to an NDF.
+
+#+
+#  Name:
+#     UNF2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1991 September 18 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface UNF2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy from the unformatted file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      FITS           # Extract the FITS header
+      type        '_LOGICAL'
+      prompt      'Read a FITS header from the unformatted file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input sequential unformatted file
+      position    1
+      type        'FILENAME'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Sequential unformatted file'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per input record
+      position    4
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of data values per unformatted record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'NDF'
+      access      'UPDATE'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      SHAPE          # Shape of the output NDF
+      position    6
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Shape of the output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      SKIP           # Number of records to skip
+      position    5
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Number of records to skip'
+      helpkey     '*'
+      default     0
+   endparameter
+
+   parameter      TYPE           # Output data type
+      position    7
+      type        'LITERAL'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      default     'R'
+      prompt      'NDF data type required'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## IRAF2NDF - Converts an IRAF image to an NDF.
+
+#+
+#  Name:
+#     IRAF2NDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-AUG-1992 (RAHM):
+#     	 Original version.
+#     1993 July 22 (MJC):
+#     	 Added help library.  Used global association for OUT.  Renamed
+#	 the parameters to IN and OUT.  Removed unused parameter.
+#     1997 July 25 (MJC):
+#     	 Added PROFITS and PROHIS.
+#     {enter_further_changes_here}
+
+#-
+
+interface IRAF2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      IN            # The input IRAF name
+      position    1
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of IRAF image to be converted'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT           # The output NDF
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFITS        # Propagate the FITS headers 
+      type        '_LOGICAL'
+      prompt      'Create a NDF extension called FITS to store the headers?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROHIS         # Propagate the NDF-style history
+      type        '_LOGICAL'
+      prompt      'Restore NDF HISTORY records from IRAF headers?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+endinterface
+
+## NDF2IRAF - Converts an NDF to an IRAF image.
+
+#+
+#  Name:
+#     NDF2IRAF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-AUG-1992 (RAHM):
+#     	 Original version.
+#     1992 September 29 (MJC):
+#     	 Added help library.  Used global association for IN.  Renamed
+#	 the parameteres to IN and OUT.  Removed unused parameter.
+#     1993 July 21 (MJC):
+#     	 Added FILLBAD.
+#     1997 March 28 (MJC):
+#     	 Added PROFITS and PROHIS.  Made default for FILLBAD 0.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2IRAF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      FILLBAD       # Replacement value for bad pixels
+      position    3
+      type        '_REAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT'
+      prompt      'Value to replace any bad values'
+      default     0
+      helpkey     '*'
+   endparameter
+
+   parameter      IN            # The input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT           # The output IRAF name
+      position    2
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of IRAF image to be produced'
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFITS        # Propagate the NDF's FITS extension
+      type        '_LOGICAL'
+      prompt      'Merge the FITS extension of the NDF in the OIF header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROHIS         # Propagate the NDF's HISTORY information
+      type        '_LOGICAL'
+      prompt      'Relay any NDF history information to the OIF header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+endinterface
+
+endmonolith

@@ -412,7 +412,7 @@ setenv NDF_SHCVT 0
 
 { Print the CONVERT initialisation message.
 print  " "
-print  " CONVERT commands are now available -- (Version PKG_VERS)"
+print  " CONVERT commands are now available -- (Version @PACKAGE_VERSION@)"
 print  " "
 print  " Defaults for automatic NDF conversion are set."
 print  ""

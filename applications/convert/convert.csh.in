@@ -366,7 +366,7 @@ endif
 #  Tell the user that CONVERT commands are now available.
 
 echo ""
-echo "   CONVERT commands are now available -- (Version PKG_VERS)"
+echo "   CONVERT commands are now available -- (Version @PACKAGE_VERSION@)"
 echo " "
 echo "   Defaults for automatic NDF conversion are set."
 echo " "

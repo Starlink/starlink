@@ -198,7 +198,7 @@ else
 fi
 
 # Use PBMPLUS tools to convert the TIFF file to a GIF image
-tifftopnm convert_temp_$name.tif 2> convert_err1_$name.lis | \
+@TIFFTOPNM@ convert_temp_$name.tif 2> convert_err1_$name.lis | \
   ppmtogif 2> convert_err2_$name.lis > ${out}.gif || \
   { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
     rm -f convert_err?_$name.lis convert_temp_$name.tif

@@ -108,10 +108,10 @@ out=${2:-$name}
 # Convert image from TIFF format to FITS, flipping it from top to bottom.
 # The error output is written to temporary files.  Make the error look as
 # if it came from MSG.
-tifftopnm ${root}.tif 2> convert_err1_$name.lis | \
-  ppmtopgm 2> convert_err2_$name.lis | \
-  pnmflip -topbottom 2> convert_err3_$name.lis | \
-  pnmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
+@TIFFTOPNM@ ${root}.tif 2> convert_err1_$name.lis | \
+  @PPMTOPGM@ 2> convert_err2_$name.lis | \
+  @PNMFLIP@ -topbottom 2> convert_err3_$name.lis | \
+  @PNMTOFITS@ 2> convert_err4_$name.lis > convert_temp_$name.fit || \
   { sed 's/^/!  TIFF2NDF:/' convert_err?_$name.lis 1>&2
     rm -f convert_err?_$name.lis convert_temp_$name.fit
     exit 1
