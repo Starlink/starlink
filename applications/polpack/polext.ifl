@@ -1,0 +1,91 @@
+#+
+#  Name:
+#     POLEXT.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLEXT
+
+   helplib 'POLPACK_HELP:'
+
+   parameter ANGROT
+      type     _REAL
+      access   READ
+      ppath    'CURRENT,DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'A new ANGROT value'
+   endparameter
+
+   parameter FILTER
+      type     LITERAL
+      access   READ
+      ppath    'CURRENT,DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'A new FILTER value'
+   endparameter
+
+   parameter IMGID
+      type     LITERAL
+      access   READ
+      ppath    'CURRENT,DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'New IMGID value(s)'
+   endparameter
+
+   parameter IN                  # List of Input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input images'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'File to contain a list of the NDFs'
+   endparameter
+
+   parameter QUIET
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  F
+      prompt   'Should all screen output be suppressed?'
+   endparameter
+
+   parameter WPLATE
+      type     LITERAL
+      access   READ
+      ppath    'CURRENT,DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'A new WPLATE value'
+   endparameter
+
+endinterface
