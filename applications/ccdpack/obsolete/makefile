@@ -220,9 +220,11 @@
 #        Removed NAG dependency. Added STAR_SHARE macro.
 #     4-OCT-1996 (PDRAPER):
 #        Added targets for NAGMAKEMOS.
-#     13-MAR-1997 (PDRAPE):
+#     13-MAR-1997 (PDRAPER):
 #        Added CCDIMP and CCDEXP and associated files. Added changes
 #        for supporting foreign data access.
+#     04-JUL-1997 (PDRAPER):
+#        Added targets and other changes for IRAF interoperability.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -325,6 +327,7 @@ STAR_HELP = $(STARLINK)/help
 STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
 STAR_SHARE = $(STARLINK)/share
+STAR_IRAF = $(STARLINK)/iraf
 
 #  Pathname of the root directory beneath which the built files for
 #  this package should be installed for use.  This defaults to the
@@ -418,7 +421,8 @@ PKG_VERS = 2.2-0
 
 SOURCE_FILES = makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
  $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_dgen.tar \
- $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar irg.tar irh.tar $(DATA_FILES)
+ $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar irg.tar irh.tar \
+ $(DATA_FILES) $(PKG_NAME)_iraf.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -479,6 +483,15 @@ CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  TEK1STANDARD.DAT TEK2QUICK.DAT TEK2STANDARD.DAT TEK3QUICK.DAT \
  TEK3STANDARD.DAT TEK4QUICK.DAT TEK4STANDARD.DAT TEK5QUICK.DAT \
  TEK5STANDARD.DAT WHTFLAT.DAT WHTSKY.DAT
+
+#  List of IRAF script files. These will be installed in
+#  $(INSTALL_BIN_IRAF). This also includes any other miscellaneous
+#  IRAF files that go into this directory (like the help databases).
+#  All these files will be installed with read permissions.
+
+IRAF_SCRIPTS = ccdexercise.cl ccdpack.cl use_globals.cl \
+               $(MONOLITHS:=.tcl) ccdpack.hd ccdpack.men \
+               _ccdpack.hd root.hd
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases
@@ -594,9 +607,9 @@ SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_touch.f \
  ccd1_ckdeb.f ccd1_ckccl.f ccd1_ckflc.f ccd1_resta.f \
  ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f \
- ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f pda_dgeir.f pda_sdddot.f \
+ ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f \
  pda_drnor.f nag1_szprd.f nag1_szslv.f nag1_szlsf.f nag1_szlsm.f \
- ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f \
+ ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f ccd1_setex.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f
 
 IRGSRC = irg1_axlim.f irg1_brack.f irg1_check.f irg1_fspec.f \
@@ -709,6 +722,11 @@ MONOLITH5 = $(PKG_NAME)_scr
 MONO_IFL = $(PKG_NAME)_red.ifl $(PKG_NAME)_reg.ifl $(PKG_NAME)_res.ifl \
            $(PKG_NAME)_nag.ifl $(PKG_NAME)_scr.ifl
 
+#  IRAF parameter files.
+
+IRAF_PAR = $(REDTASKS:=.par) $(REGTASKS:=.par) $(RESTASKS:=.par) \
+  $(NAGTASKS:=.par) $(SCRTASKS:=.par)
+
 #  List of task interface files.
 
 IFL_FILES = $(REDTASKS:=.ifl) $(REGTASKS:=.ifl) $(RESTASKS:=.ifl) \
@@ -717,6 +735,15 @@ IFL_FILES = $(REDTASKS:=.ifl) $(REGTASKS:=.ifl) $(RESTASKS:=.ifl) \
 #  List of help library sources.
 
 HELP_SOURCES = $(PKG_NAME).hlp
+
+IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
+   ccdclear.hlp makeflat.hlp ccdedit.hlp makemos.hlp ccdfork.hlp \
+   pairndf.hlp ccdndfac.hlp plotlist.hlp ccdnote.hlp position_lists.hlp \
+   present.hlp ccdsetup.hlp processing_lists_of_data.hlp \
+   ccdshow.hlp reduce.hlp command_descriptions.hlp register.hlp \
+   debias.hlp schedule.hlp findcent.hlp tranlist.hlp findobj.hlp \
+   tranndf.hlp findoff.hlp typical_initial_reduction.hlp flatcor.hlp \
+   use_globals.hlp idicurs.hlp xreduce.hlp import.hlp
 
 #  Name of the help task.
 
@@ -770,8 +797,9 @@ HAVE_NAG = 0
 
 BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
  $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITHS) $(IFC_FILES) \
- $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) \
- $(HELPTASK) $(PLATFORM_TCLBINARIES)
+ $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) $(HELPTASK) \
+ $(PLATFORM_TCLBINARIES) $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) \
+ helpdb.mip
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -904,16 +932,19 @@ $(HELPSRC) : $(HELPTASK).tar
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
+$(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip: $(PKG_NAME)_iraf.tar
+	$(TAR_OUT) $(PKG_NAME)_iraf.tar $@
+	@ if test -f $@; then :;\
+	   else echo $@ is not in the tar file; exit 1; fi
 
-#  Personal rules for building source code archives from SCCS and
+#  Personal rules for building source code archives from RCS and
 #  other places.
 check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
  $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_dgen.tar \
  $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar irg.tar irh.tar \
- $(DOCUMENTATION) $(DATA_FILES)
+ $(DOCUMENTATION) $(DATA_FILES) $(PKG_NAME)_iraf.tar
 
-
-#  Rules for building release files from SCCS repository.
+#  Rules for building release files from RCS repository.
 
 $(PKG_NAME)_source.tar :
 	co $(PRIVATE_INCLUDES)
@@ -1015,6 +1046,13 @@ $(DOCUMENTATION):
 $(DATA_FILES):
 	co $(DATA_FILES)
 	chmod 644 $(DATA_FILES)
+
+$(PKG_NAME)_iraf.tar:
+	co $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP)
+	cp $(HOME)/ccdpack/documents/helpdb.mip ./
+	   $(TAR_IN) $(PKG_NAME)_iraf.tar $(IRAF_SCRIPTS) $(IRAF_PAR) \
+	   $(IRAF_HELP) helpdb.mip
+	@- $(RM) $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
 #  Rules for extracting platform specific source files from the source
 #  archive.
@@ -1244,7 +1282,12 @@ INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
 #  List of directories actually used for installation (selected from
 #  those above) and rules to create them.
 
-INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) $(INSTALL_HELP)
+#  And the IRAF equivalents.
+INSTALL_IRAF_BIN = $(INSTALL)/iraf/$(PKG_NAME)
+INSTALL_IRAF_DOC = $(INSTALL)/iraf/$(PKG_NAME)/doc
+
+INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) \
+               $(INSTALL_HELP) $(INSTALL_IRAF_BIN) $(INSTALL_IRAF_DOC)
 
 $(INSTALL_DIRS):
 	mkdir -p $@
@@ -1549,6 +1592,35 @@ install:
 	   chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
 	else :; fi
 #
+#   Install the IRAF files. Thes go into INSTALL_IRAF_BIN and
+#   INSTALL_IRAF_DOC.
+	for f in $(IRAF_SCRIPTS) $(IRAF_PAR) helpdb.mip ""; do \
+           if test -n "$$f"; then \
+              $(CP) $$f $(INSTALL_IRAF_BIN);\
+              chmod 644 $(INSTALL_IRAF_BIN)/$$f;\
+              $(RM) $$f;\
+              $(LINK) $(INSTALL_IRAF_BIN)/$$f $$f;\
+           else :; fi;\
+        done
+	for f in $(IRAF_HELP) ""; do \
+           if test -n "$$f"; then \
+              $(CP) $$f $(INSTALL_IRAF_DOC);\
+              chmod 644 $(INSTALL_IRAF_DOC)/$$f;\
+              $(RM) $$f;\
+              $(LINK) $(INSTALL_IRAF_DOC)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#    Set up the various links necessary to work from this directory.
+	(cd $(INSTALL_IRAF_BIN); \
+	 for f in $(MONOLITHS) ""; do \
+	    if test -n "$$f"; then \
+	       $(LINK) $(INSTALL_BIN)/$$f $$f;\
+	       $(LINK) $(INSTALL_BIN)/$${f}.ifc $${f}.ifc;\
+	       $(LINK) $(STAR_IRAF)/irafstar/aitclsh $${f}.e;\
+	    else :; fi;\
+	 done)
+#
 #  Install the Latex documentation, giving it world read permission,
 #  leaving the source copy in place.
 	for f in $(LATEX_DOCS) ""; do \
@@ -1745,6 +1817,39 @@ do_deinstall:
            else :; fi ;\
            $(MAKE) $(STARTUP_SCRIPT);\
         else :; fi
+#
+#   Deinstall the IRAF files. These are in INSTALL_IRAF_BIN and
+#   INSTALL_IRAF_DOC.
+	- for f in $(IRAF_SCRIPTS) $(IRAF_PAR) helpdb.mip ""; do \
+	   if test -n "$$f" -a -f $(INSTALL_IRAF_BIN)/$$f; then \
+	      $(RM) $$f;\
+	      $(CP) $(INSTALL_IRAF_BIN)/$$f .;\
+	      $(RM) $(INSTALL_IRAF_BIN)/$$f;\
+	   else :; fi;\
+	done
+	- for f in $(IRAF_HELP) ""; do \
+	   if test -n "$$f" -a -f $(INSTALL_IRAF_DOC)/$$f; then \
+	      $(RM) $$f;\
+	      $(CP) $(INSTALL_IRAF_DOC)/$$f .;\
+	      $(RM) $(INSTALL_IRAF_DOC)/$$f;\
+	   else :; fi;\
+	done
+#
+#   And remove the various links setup to work from this directory.
+	(cd $(INSTALL_IRAF_BIN); \
+	 for f in $(MONOLITHS) ""; do \
+	    if test -n "$$f"; then \
+	       if test -f $$f; then \
+	          $(RM) $$f;\
+               else :; fi;\
+	       if test -f $${f}.ifc; then \
+	          $(RM) $${f}.ifc;\
+               else :; fi;\
+	       if test -f $${f}.e; then \
+	          $(RM) $${f}.e;\
+               else :; fi;\
+	    else :; fi;\
+	 done)
 #
 #  Deinstall the package ICL file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
@@ -2440,3 +2545,4 @@ xreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
+ccd1_setex.o: SAE_PAR PSX_ERR
