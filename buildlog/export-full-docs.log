@@ -193,11 +193,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:215: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -224,13 +219,6 @@ javadoc-sources:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -299,10 +287,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: AstDoubleDocument
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: DecimalField
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: SelectCharacters
-  [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxDocument
-  [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxDocument#createElement(HdxResourceType,DOMFacade)
-  [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxFactory#registerHdxDocumentFactory
-  [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxFactory
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/jaiutil/package-summary.html...
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
@@ -313,38 +297,13 @@ javadoc-sources:
   [javadoc]  default and have their bad pixel flags set correctly.
   [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/util/XMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:91: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotController.java:36: warning - Tag @link: reference not found: PlotConfiguration.getAst
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotControls.java:27: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharactersListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:45: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:45: warning - Tag @link: reference not found: ChangeEvents
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:98: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:235: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstAxes.html...
   [javadoc] "Set position along the X axis at which to start labelling
@@ -429,7 +388,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/soap/AppAxisServerFactory.html...
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: Tag @see: Malformed: Plot, PlotConfigurator
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/BufferedDataInputStream.java:349: warning - @returns is an unknown tag.
@@ -439,10 +398,10 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 92 warnings
+  [javadoc] 82 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 6 minutes 4 seconds
+Total time: 6 minutes 39 seconds

@@ -129,6 +129,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -144,7 +145,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 16 source files to /apps/cvsbuild/java/source/util/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
@@ -170,48 +171,13 @@ javadocs:
   [javadoc]                        ^
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/index-all.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
-  [javadoc] next major release (when that interpretation will be internationalized), which is:
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/uk/ac/starlink/util/XMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:91: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 9 warnings
+  [javadoc] 4 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
@@ -225,7 +191,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/etc
-[loggedcopy] Copying 30 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 32 files to /apps/cvsbuild/star/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -450,7 +416,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 17, 2003 4:35:25 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 18, 2003 4:36:15 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -789,6 +755,27 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.hdx...
   [javadoc] Constructing Javadoc information...
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/AbstractHdxFacade.java:9: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.URLUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DomHdxContainer.java:3: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.DOMUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DomHdxContainer.java:4: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.NodeDescendants;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocument.java:5: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.DOMUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxElement.java:5: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.NodeDescendants;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFactory.java:3: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.DOMUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFactory.java:4: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.URLUtils;
+  [javadoc]                            ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -796,14 +783,12 @@ javadocs:
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: uk.ac.starlink.ndx.Ndx
   [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: uk.ac.starlink.array.NDArray
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxDocument
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxDocument#createElement(HdxResourceType,DOMFacade)
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxFactory#registerHdxDocumentFactory
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxFactory
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DOMFacade.java:75: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DOMFacade.java:75: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocumentFactory.java:104: warning - Tag @link: reference not found: uk.ac.starlink.ndx.NdxHandler
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocumentFactory.java:104: warning - Tag @link: reference not found: uk.ac.starlink.ndx.BridgeNdx
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFacade.java:159: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFacade.java:159: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
   [javadoc] Generating /apps/cvsbuild/java/source/hdx/docs/hdx/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 13 warnings
 
 dist:
 
@@ -811,7 +796,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/hdx
     [mkdir] Created dir: /apps/cvsbuild/star/docs/hdx
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 28 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 29 files to /apps/cvsbuild/star/docs
      [echo] Executing compatibility NDArray target: install
 
 install:
@@ -938,10 +923,11 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:32: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:32: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 9 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/bin
@@ -1037,9 +1023,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/classes
-    [javac] Compiling 10 source files to /apps/cvsbuild/java/source/fits/build/classes
-    [javac] Note: /apps/cvsbuild/java/source/fits/src/main/uk/ac/starlink/fits/FitsNdxHandler.java uses or overrides a deprecated API.
-    [javac] Note: Recompile with -deprecation for details.
+    [javac] Compiling 11 source files to /apps/cvsbuild/java/source/fits/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/lib/fits
@@ -1066,7 +1050,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/fits
     [mkdir] Created dir: /apps/cvsbuild/star/docs/fits
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 20 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 21 files to /apps/cvsbuild/star/docs
      [echo] Executing VOTable target: install
 
 prepare:
@@ -2511,10 +2495,10 @@ execute_mk_script:
      [exec]          ar x $f; \
      [exec]       fi;\
      [exec] done)
-     [exec] g77: temp/*.o: No such file or directory
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar

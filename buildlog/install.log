@@ -111,7 +111,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/etc
-[loggedcopy] Copying 30 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 32 files to /apps/cvsbuild/star/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -283,7 +283,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 17, 2003 4:15:00 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 18, 2003 4:15:13 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -365,7 +365,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/hdx
     [mkdir] Created dir: /apps/cvsbuild/star/docs/hdx
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 28 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 29 files to /apps/cvsbuild/star/docs
      [echo] Executing compatibility NDArray target: install
 
 install:
@@ -523,7 +523,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/fits
     [mkdir] Created dir: /apps/cvsbuild/star/docs/fits
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 20 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 21 files to /apps/cvsbuild/star/docs
      [echo] Executing VOTable target: install
 
 prepare:
@@ -838,4 +838,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 41 seconds
+Total time: 43 seconds

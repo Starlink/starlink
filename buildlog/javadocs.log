@@ -104,48 +104,13 @@ javadocs:
   [javadoc]                        ^
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/index-all.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
-  [javadoc] next major release (when that interpretation will be internationalized), which is:
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/uk/ac/starlink/util/XMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:91: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 9 warnings
+  [javadoc] 4 warnings
      [echo] Executing Task target: javadocs
 
 prepare:
@@ -436,6 +401,27 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.hdx...
   [javadoc] Constructing Javadoc information...
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/AbstractHdxFacade.java:9: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.URLUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DomHdxContainer.java:3: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.DOMUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DomHdxContainer.java:4: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.NodeDescendants;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocument.java:5: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.DOMUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxElement.java:5: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.NodeDescendants;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFactory.java:3: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.DOMUtils;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFactory.java:4: package uk.ac.starlink.util does not exist
+  [javadoc] import uk.ac.starlink.util.URLUtils;
+  [javadoc]                            ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -443,14 +429,12 @@ javadocs:
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: uk.ac.starlink.ndx.Ndx
   [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: uk.ac.starlink.array.NDArray
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxDocument
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxDocument#createElement(HdxResourceType,DOMFacade)
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxFactory#registerHdxDocumentFactory
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/package.html: warning - Tag @link: reference not found: HdxFactory
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DOMFacade.java:75: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
-  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/DOMFacade.java:75: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocumentFactory.java:104: warning - Tag @link: reference not found: uk.ac.starlink.ndx.NdxHandler
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocumentFactory.java:104: warning - Tag @link: reference not found: uk.ac.starlink.ndx.BridgeNdx
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFacade.java:159: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
+  [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFacade.java:159: warning - Tag @see: reference not found: uk.ac.starlink.util.SourceReader
   [javadoc] Generating /apps/cvsbuild/java/source/hdx/docs/hdx/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 13 warnings
      [echo] Executing compatibility NDArray target: javadocs
 
 javadocs:
@@ -522,10 +506,11 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:32: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:32: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 9 warnings
      [echo] Executing NDTools target: javadocs
 
 prepare:

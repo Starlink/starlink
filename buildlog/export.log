@@ -158,7 +158,6 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/jsky-2.0.zip
@@ -176,7 +175,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 16 source files to /apps/cvsbuild/java/source/util/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
@@ -202,48 +201,13 @@ javadocs:
   [javadoc]                        ^
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/index-all.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
-  [javadoc] next major release (when that interpretation will be internationalized), which is:
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:43: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/uk/ac/starlink/util/XMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:52: warning - The first sentence is interpreted to be:
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return a name for the Element that will be the parent of any
-  [javadoc]  contents that can be encoded and decoded (i.e. name of
-  [javadoc]  rootElement);"
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:91: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.html...
-  [javadoc] "Decode (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Decode (i.e. restore) the internal state of this object from an
-  [javadoc]  Element."
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 9 warnings
+  [javadoc] 4 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
@@ -294,4 +258,4 @@ create_archives:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/task/build.xml:516: /apps/cvsbuild/java/source/task/bin not found.
 
-Total time: 4 minutes 51 seconds
+Total time: 4 minutes 53 seconds
