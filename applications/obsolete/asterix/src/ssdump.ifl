@@ -2,7 +2,6 @@ INTERFACE SSDUMP
    PARAMETER INP
      TYPE    'UNIV'
      POSITION 1
-     KEYWORD 'INP'
      PPATH   'GLOBAL'
      PROMPT  'Source dataset'
      HELP    'Filename of source search results'

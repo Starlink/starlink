@@ -19,7 +19,6 @@
     PARAMETER AXIS
        POSITION    3
        TYPE        '_INTEGER'
-       KEYWORD     'AXIS'
        VPATH       'PROMPT'
        PROMPT      'Axis to centroid on'
        HELP        'Axis number less than or equal to dimensionality of data'

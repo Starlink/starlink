@@ -3,7 +3,6 @@
     PARAMETER INP
        POSITION 1
        TYPE 'UNIV'
-       KEYWORD 'INP'
        PPATH 'GLOBAL'
        ASSOCIATION '<-GLOBAL.BINDS'
        PROMPT 'Input object'
@@ -13,40 +12,35 @@
     PARAMETER OUT
        POSITION 2
        TYPE 'UNIV'
-       KEYWORD 'OUT'
        ASSOCIATION '->GLOBAL.BINDS'
        PROMPT 'Dataset to receive distribution'
        HELP 'This will be a 1D binned dataset'
     ENDPARAMETER
 
-    PARAMETER    REG_SPACED
+    PARAMETER    REG
        TYPE        '_LOGICAL'
-       KEYWORD     'REG'
        DEFAULT     Y
        PPATH       'DEFAULT'
        PROMPT      'Are the output bins to be regularly spaced'
        HELP 'Answer Y if you want the output bins to be all the same size'
     ENDPARAMETER
 
-    PARAMETER    BIN_SPACING
+    PARAMETER    SPACING
        POSITION    3
        TYPE        '_REAL'
-       KEYWORD     'SPACING'
        PROMPT      'Enter the bin spacing'
        HELP 'The spacing between the (regularly spaced) output bins'
     ENDPARAMETER
 
-    PARAMETER    BIN_BOUNDARIES
+    PARAMETER    BOUNDARIES
        POSITION    4
        TYPE        'LITERAL'
-       KEYWORD     'BOUNDARIES'
        PROMPT      'Enter the bin boundaries'
        HELP 'A sequence of bounds is required, eg. 1:10:20:40:55:60:65'
     ENDPARAMETER
 
-    PARAMETER NORMALISE
+    PARAMETER NORM
        TYPE '_LOGICAL'
-       KEYWORD 'NORM'
        PROMPT 'Normalise (Y/N)'
        HELP 'Answer Y if you want the "area" under the curve to be 1'
     ENDPARAMETER
