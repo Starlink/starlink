@@ -57,6 +57,11 @@ rm -f $tempmakefile
 # because GenerateDependencies cannot be built yet (unconfigured)
 touch Makefile.dependencies
 
+# Same for the componentinfo.dtd.  Link to the uninstalled version of the file
+# (we just have to hope that `ln -s' works on this platform...).
+test -f componentinfo.dtd || 
+    ln -s buildsupport/starconf/componentinfo.dtd componentinfo.dtd
+
 sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 (
 
@@ -110,9 +115,6 @@ done
 
 
 # NOW do the autoreconf in all the children
-# First, make sure that the config directory (referred to in configure.ac)
-# does exist
-test -d config || mkdir config
 
 # (Re)configure, installing missing files
 echorun autoreconf --install --symlink
@@ -132,16 +134,6 @@ if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
     test -n "$def" || { echo "Eeeek! Can't get default prefix!"; exit 1; }
     echorun "sed -e s,%%PREFIX%%,$def, configure >configure.tmp && mv configure.tmp configure && chmod +x configure"
 fi
-
-
-# Make sure that the config directory has its install-sh (I'm slightly
-# surprised that autoreconf doesn't add these -- ought I to be?).
-# Note that these copy the target file, not the link; copying the link doesn't
-# seem to be possible to do in a portable way (no big deal).
-for f in install-sh missing
-do
-    test -f config/$f || cp libraries/$f config
-done
 
 
 exit 0
