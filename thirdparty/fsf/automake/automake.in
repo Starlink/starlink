@@ -3452,18 +3452,27 @@ sub handle_data
         # user variable, am__bin_DATA is ours (is this the right way
         # to do this? --  I rather suspect it isn't, but can't work
         # out what would be preferred)
-        push (@stardirs, 'bin', 'am__bin');
+        push (@stardirs, 'bin');
 
-        # Additionally, in this case, cause the magic extra file version.dat
-        # to be installed in the binaries directory.
-        Automake::Variable::define('am__bindir', VAR_MAKEFILE,
-                                   '', TRUE,
-                                   '$(bindir)',
-                                   '', INTERNAL, VAR_ASIS);
-        Automake::Variable::define('am__bin_DATA', VAR_MAKEFILE,
-                                   '', TRUE, # set in all conditions
-                                   'version.dat',
-                                   '', INTERNAL, VAR_ASIS);
+        if (var('bin_SCRIPTS') || var('bin_PRORGRAMS') || var('bin_MONOLITHS'))
+          {
+            # Additionally, in this case, cause the magic extra file
+            # version.dat to be (created and) installed in the
+            # binaries directory.  Do this only if the user is already
+            # planning to install programs in this directory.
+            # This will cause version.dat to be installed more than
+            # once, if there happens to be installed binaries in more
+            # than one (sub)directory, but that's harmless.
+            push (@stardirs, 'am__bin');
+            Automake::Variable::define('am__bindir', VAR_MAKEFILE,
+                                       '', TRUE,
+                                       '$(bindir)',
+                                       '', INTERNAL, VAR_ASIS);
+            Automake::Variable::define('am__bin_DATA', VAR_MAKEFILE,
+                                       '', TRUE, # set in all conditions
+                                       'version.dat',
+                                       '', INTERNAL, VAR_ASIS);
+          }
       }
 
     &am_install_var ('-noextra', '-candist', 'data', 'DATA',
@@ -5026,6 +5035,9 @@ sub handle_starlink
     push_dist_common ('$(stardocs_DATA)')
       if (var 'stardocs_DATA');
 
+    # Include the rule for version.dat if the per-package-dirs option was seen
+    # (note that the resulting rule is redundant unless version.dat
+    # was added to am__bin_DATA in handle_data above).
     my $want_version_dat = defined $starlink_seen_features{'per-package-dirs'};
 
     $output_rules .= &file_contents ('starlink',

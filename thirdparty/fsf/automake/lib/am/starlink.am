@@ -87,9 +87,10 @@ endif %?COMPIFL%
 
 if %?VERSIONDAT%
 # Create the version.dat file.  This is installed in the binaries directory,
-# only because we saw STAR_DEFAULTS(per-package-dir) in the configure.ac.
-# This is installed as a result of this file being included in the
-# value of the am__bin_DATA variable.
+# only because we saw STAR_DEFAULTS(per-package-dir) in configure.ac.
+# This rule is included in the generated Makefile.in more often than it is
+# needed -- it is (created and) installed only if version.dat is mentioned
+# in the am__bin_DATA variable.
 version.dat: $(top_srcdir)/configure.ac
 	rm -f version.dat
 	echo $(PACKAGE_VERSION) >version.dat
