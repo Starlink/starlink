@@ -227,7 +227,7 @@
 *  Assign the constant to each point.  Note the convention where the
 *  first coefficient is halved.
          DO K = 1, NPTS
-            EVAL( I ) = CC( 1 ) / 2<CONST>
+            EVAL( K ) = CC( 1 ) / 2<CONST>
          END DO
 
 *  Now tackle the general case.
