@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 dist_bin_SCRIPTS = chr_link chr_link_adam
-include_HEADERS = CHR_ERR
+include_HEADERS = $(PUBLIC_INCLUDES)
 
 lib_LTLIBRARIES = libchr.la
 libchr_la_SOURCES = \
