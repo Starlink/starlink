@@ -1,0 +1,16 @@
+<!DOCTYPE programcode PUBLIC '-//Starlink//DTD Script Source Code//EN' [
+
+   <!-- Entity declarations for included source code files -->
+      <!ENTITY src-code2sgml    SYSTEM 'code2sgml'>
+      <!ENTITY src-latex2sgml   SYSTEM 'latex2sgml'>
+      <!ENTITY src-parse        SYSTEM 'parse'>
+]>
+
+<programcode><title>Upconverter tools
+
+   <routine id=code2sgml>   &src-code2sgml;
+   <routine id=latex2sgml>  &src-latex2sgml;
+   <routine id=parse>       &src-parse;
+
+</programcode>
+

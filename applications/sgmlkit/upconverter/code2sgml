@@ -1,0 +1,1986 @@
+#!/usr/bin/perl -w
+
+#+
+#  <routinename>
+#     code2sgml
+#
+#  <purpose>
+#     Convert source code prologue to SGML.
+#
+#  <usage>
+#     code2sgml [-d|-D] [-1] [-l language] [-c config-file] source-files
+#
+#  <description>
+#     This script takes one or several source code files with code
+#     prologues more or less resembling the SST prologue conventions and
+#     marks them up as SGML conforming to the Starlink Programcode DTD.
+#     It does this using a combination of special knowledge about 
+#     the likely contents of Starlink prologues and rules or
+#     guesses about the meaning of indentation, spacing, key words and so
+#     on in the source.  Some of this processing can be influenced by
+#     use of an optional configuration file specified on the command
+#     line.  This is not normally necessary, but can be done to tailor
+#     the program's behaviour to particular foibles of the source 
+#     code to be converted.
+#     <p>
+#     According to the command-line flags, the output may or
+#     may not contain enough surrounding markup for it to constitute
+#     an entire SGML programcode document.  The SGML is in all cases 
+#     written to standard output.
+#     <p>
+#     The nature of the output is controlled by the <code>-d</> and 
+#     <code>-D</> flags as follows:
+#     <ul>
+#     <li>If the <code>-D</code> flag is given, then output will be a 
+#         monolithic document which contains the marked up prologues
+#         of the given source-files and the surrounding markup 
+#         necessary to constitute a free-standing SGML document 
+#         conforming to the programcode DTD.  In this case the
+#         parts of the source code which are not the prologue 
+#         (i.e. the body of the code) will be discarded.
+#
+#     <li>If the <code>-d</code> flag is given, then output will be a
+#         container document which refers to the given source-files
+#         by way of entity references.
+#
+#     <li>If neither the <code>-d</code> nor <code>-D</code> flag is given,
+#         then output will be a version of the source code in the given 
+#         source-files in which the prologue is marked up with SGML tags.
+#         This output does not constitute a free-standing SGML document,
+#         but may be included in a suitable container document.  The 
+#         output contains the original source code, and will look just 
+#         the same to a compiler as the input file.  The resulting 
+#         file can, if desired, be used as the new primary copy of the
+#         source code.
+#     </ul>
+#     <p>
+#     The default configuration is designed to convert Fortran source
+#     code, but since many Starlink C source files contain prologues 
+#     which look identical to those of Fortran files (each comment line
+#     begins with a <code>*</code>) the program may be used on 
+#     suitable C files too.
+#
+#  <diytopic><title>Flags</title>
+#     <dl>
+#     <dt><code>-1</code>
+#     <dd>If this flag is given, then only the first prologue identified
+#         in the file will be marked up.  Otherwise, all prologues
+#         will be converted.
+#
+#     <dt><code>-c config-file</code>
+#     <dd>Specify a user configuration file, which is executable Perl code,
+#         to fine-tune conversion parameters.  See below for a detailed 
+#         description of what may be configured in such a file.
+#
+#     <dt><code>-D</code>
+#     <dd>Output a monolithic SGML document containing prologues from
+#         all the listed source-files, but omitting non-prologue parts
+#         of the code.
+#
+#     <dt><code>-d</code>
+#     <dd>Output only a container SGML document referring to
+#         constituent files via entity references.  The named source-files
+#         do not need to exist when this program is invoked, but will
+#         need to be present when the document is subsequently processed.
+#
+#     <dt><code>-l language</code>
+#     <dd>Specify the language to be assumed by the converter.
+#         This determines the default configuration file to be used -
+#         a file called <code>c2s.</code><em>language</em> is loaded
+#         from <code>code2sgml</code>'s home directory.  Currently 
+#         the values `fortran' and `script' are available; `fortran'
+#         is the default and will work for many C prologues too (as long
+#         as they follow the convention of starting each prologue 
+#         comment line with an asterisk).  The `script' file should 
+#         work, on the whole, for files in which prologue comment lines
+#         begin with a hash character.
+#         <p>
+#         All the values implied by the value of this flag can in any
+#         case be overridden from the user configuration file
+#         (see the <code>-c</code> flag).
+#     </dl>
+#     If neither the <code>-d</> nor <code>-D</> flags is given, 
+#     a marked up copy of the named file, which does not constitute a
+#     complete SGML document, will be written.
+#
+#  <diytopic>Notes
+#     <p>The quality of markup made by this program is inevitably not perfect.
+#     For prologues which conform to the usages common in, say, KAPPA,
+#     it should provide quite good output, but peculiar indentations,
+#     spellings, linebreaks, lists, verbatim-type blocks etc are bound
+#     to confuse it.  For some of these, if usage is consistent within
+#     a package to be converted, it may be worthwhile to write a 
+#     configuration file.
+#     In any case it will always be advisable to cast an eye over the 
+#     SGML output, or failing that, over the resulting downconverted 
+#     documentation.
+#     <p>
+#     A particular idiosyncracy which the program has is to convert
+#     miscellaneous blocks of text into one-element <code>ul</code> 
+#     lists.  This is often not the best markup for such text (depending
+#     on context it may have the sense of a block quote, verbatim text, 
+#     a list of some sort ...), but without knowing the semantics of 
+#     the text it's hard to come up with anything better.  It may 
+#     therefore be a good idea to look for <verbatim>
+#        &lt;ul>&lt;li>
+#     </verbatim>
+#     sequences in the output with a view to replacing them by 
+#     something more appropriate.
+#     <p>
+#     Another thing to look for particularly is normal text marked up
+#     as <code>verbatim</code> and, especially, <foreign>vice 
+#     versa</foreign>.
+#     <p>
+#     The converter currently discards any top-level sections which 
+#     have no (non-ignored) content, so that placeholders for content,
+#     e.g. an empty `Bugs:' heading, will not be propagated into 
+#     the output document.
+#
+#  <diytopic><title>Configuration file</title>
+#     A configuration file may be named on the command line using the
+#     <code>-c</code> flag as described above.  This takes the form of
+#     executable Perl code which can override the default values of
+#     certain variables and functions used by the program.  Many of
+#     these are regular expressions.  By adjusting these to the 
+#     conventions used in a given set of source files the upconversion
+#     can be tailored to work better than it would do with the default
+#     settings.  Modifying the default settings does not require much
+#     expertise in Perl programming as such, but it is necessary to 
+#     understand Perl regular expressions for modifying the pattern
+#     matching variables.  Perl regular expressions are a superset of
+#     normal (<code>grep(1)</code>-style) regular expressions.
+#     <p>
+#     The program actually executes the file 
+#     <code>c2s.fortran</code> (or <code>c2s.script</code> -- see the 
+#     description of the <code>-l</code> flag) from its own home directory
+#     before executing the user config file 
+#     if one has been specified.  All or parts of 
+#     <code>c2s.fortran</code> or <code>c2s.script</code> can therefore 
+#     be used as a skeleton for modification if required.
+#     <p>
+#     The following are regular expressions which can be modified.  They 
+#     are written using the normal Perl 5 regular expression syntax.
+#     Except where noted, they should not contain backreferencing
+#     parentheses.
+#     <dl>
+#     <dt><code>$Blank_rx</code></dt>
+#     <dd>This matches a whole blank line in the source code -- blank
+#         lines are significant as paragraph breaks etc.  It should
+#         start with a `<code>^</code>'.
+#
+#     <dt><code>$Bullet_rx</code></dt>
+#     <dd>This matches a bullet in a normal list which is indented
+#         from its parent comment text.  it is assumed to follow 
+#         <code>$Prefix_rx</code> and should not contain a `<code>^</code>'.
+#         Normally only blocks in which all the elements can be matched
+#         against this expression will be interpreted as a list.
+#
+#     <dt><code>$Comment_rx</code></dt>
+#     <dd>This matches any comment line.  Only comment lines 
+#         will become part of the marked up SGML.  It should start 
+#         with a `<code>^</code>'.
+#
+#     <dt><code>$Default_rx</code></dt>
+#     <dd>This identifies the parameter default value at the end of 
+#         an argument description block -- the default value identifies 
+#         any text in square brackets.  The expression should contain
+#         one set of parentheses which surround the default value itself.
+#         It is assumed to be at the end of a line so the `<code>$</code>' 
+#         character should not be used.
+#
+#     <dt><code>$Discard_rx</code></dt>
+#     <dd>This matches the whole of any comment line which should be 
+#         discarded altogether.  It should start with a `<code>^</code>'.
+#         The default value ignores the placeholder lines such as
+#         <verbatim>
+#            {insert_further_arguments_here}
+#         </verbatim>
+#         which pepper some Starlink prologues.
+#
+#     <dt><code>$ForceLi_rx</code></dt>
+#     <dd>This indicates that a normal list item is certainly starting here 
+#         (unless we are specifically expecting something else, for
+#         instance inside a verbatim block).  If we are not already 
+#         within a list a new <code>ul</code> element will be begun here.
+#         In this case the list item continues until the end of the 
+#         block, or until another list item of the same sort or a blank
+#         line is encountered.  Note that if <code>$ForceLi_rx</code> 
+#         is defined too broadly it can begin lists where they are not 
+#         intended, for instance if set simply to `<code>- </code>' 
+#         it may interpret a punctuation dash at the start of a line 
+#         as the start of a list.  The pattern is assumed to follow 
+#         <code>$Prefix_rx</code> and so should not contain the 
+#         `<code>^</code>' character.
+#
+#     <dt><code>$ForceDt_rx</code></dt>
+#     <dd>This indicates that a <code>dt</code> (item description in a
+#         <code>dl</code>-type list) is certainly starting here
+#         (unless we are specifically expecting something else, for
+#         instance inside a verbatim block).  If we are not already 
+#         within a list a new <code>dl</code> element will be begun here.
+#         In this case the list item continues until the end of the 
+#         block, or until another list item of the same sort or a blank
+#         line is encountered.  The expression should contain one set
+#         of parentheses which surround the content of the <code>dt</code>
+#         element.  Note that if <code>$ForceDt_rx</code> 
+#         is defined too broadly it can begin lists where they are not 
+#         intended.  The pattern is assumed to follow
+#         <code>$Prefix_rx</code> and so should not contain the 
+#         `<code>^</code>' character.  The default expression will 
+#         recognise list items which look like 
+#         <verbatim>
+#            - Item -- Description
+#         </verbatim>
+#         See also the <code>$Dt_maxlines</code> variable.
+#
+#     <dt><code>@Headings</code></dt>
+#     <dd>This is an array of regular expressions which match top-level
+#         headings in the prologue such as <code>Name</code>, 
+#         <code>Usage</code> etc. which get turned into top-level children
+#         of the <code>routineprologue</code> element.  It is used
+#         in conjunction with the <code>$Posthead_rx</code> pattern.
+#         Each expression will be surrounded in grouping parentheses
+#         (so the disjunction character `<code>|</code>' may be used)
+#         and matched insensitive to case.  The form of 
+#         <code>@Headings</code> is a list of pairs of (element-type,
+#         regular expression).  Earlier matches in the list are 
+#         preferred.
+#
+#     <dt><code>$Posthead_rx</code></dt>
+#     <dd>This matches any text, usually punctuation, at the end of a 
+#         top-level heading which is to be ignored.  The default value
+#         allows a trailing colon to be ignored.
+#
+#     <dt><code>$Prefix_rx</code></dt>
+#     <dd>This matches the leading part of a comment line which should
+#         be ignored (except during verbatim processing).  It should start
+#         with a `<code>^</code>'.  The default value just ignores leading
+#         whitespace.
+#
+#     <dt><code>$Probegin_rx</code></dt>
+#     <dd>This matches the line which introduces the beginning of a code
+#         prologue block.  If found within a prologue block which has
+#         already started, it is ignored.  Otherwise it triggers 
+#         conversion to SGML of the text following it until a line
+#         matching <code>$Proend_rx</code>.  It should start with a
+#         `<code>^</code>' character and may end with a `<code>$</code>'
+#         character.  The default value will match a leading comment-start
+#         character followed by one or more plus signs.
+#
+#     <dt><code>$Proend_rx</code></dt>
+#     <dd>This matches the line which terminates a code prologue block.
+#         It should start with a `<code>^</code>' character and may
+#         end with a `<code>$</code>' character.  The default value 
+#         will match a leading comment-start character followed by one 
+#         or more minus signs.
+#
+#     <dt><code>$Verbatim_rx</code></dt>
+#     <dd>If any line in a block matches <code>$Verbatim_rx</code> then
+#         the whole block is assumed to be verbatim text.  The default
+#         value is at least four whitespace characters, since if a line
+#         contains these it is probably using spacing for text formatting.
+#         Note that trailing spaces are stripped by the code before 
+#         this is assessed and leading spaces will normally get mopped
+#         up by <code>$Prefix_rx</code> matching.
+#     </dl>
+#
+#     <p>
+#     The following are other variables which affect the operation of
+#     the converter:
+#     <dl>
+#
+#     <dt><code>$Brkleng</code></dt>
+#     <dd>The converter will sometimes break lines which have become too 
+#         long (see <code>$Maxleng</code>).  This gives the length
+#         to which the lines will be truncated by preference.  
+#         <code>$Brkleng</code> should be shorter than 
+#         <code>$Maxleng</code>, unless <code>$Maxleng</code> is zero.
+#
+#     <dt><code>$Commbegin</code></dt>
+#     <dd>Text to place at the start of new comment lines.
+#
+#     <dt><code>$Doctitle</code></dt>
+#     <dd>This gives the text of the top level <code>title</code>
+#         element in the output document.
+#
+#     <dt><code>$Dt_maxlines</code></dt>
+#     <dd>If a block looks like
+#         <verbatim>
+#             Some text
+#                Some more text
+#         </verbatim>
+#         under certain circumstances this will be identified as a list
+#         item description and its describing text, and it will be
+#         converted to a <code>dt</code>, <code>dd</code> pair in a
+#         <code>dl</code> list element.  <code>$Dt_maxlines</code>
+#         gives the largest number of lines which the would-be 
+#         <code>dt</code> block may occupy in the source prologue for 
+#         this identification to be made -- if larger it's assumed to
+#         be something else.  The default value is 1.
+#
+#     <dt><code>$Exactindent</code></dt>
+#     <dd>If all blocks are indented such that one bit of text is 
+#         subordinate to another bit of text <em>only</em> where the
+#         block is indented by exactly <em>N</em> spaces, then set
+#         <code>$Exactindent</code> to <em>N</em>.  This makes the
+#         interpretation of block hierarchies more reliable.  However,
+#         if this may sometimes not be the case, then this variable is
+#         best set to zero, in which case the program will try to make
+#         more relaxed intelligent decisions about hierarchies.
+#         The default value is zero.
+#
+#     <dt><code>$Fpi</code></dt>
+#     <dd>This gives the Formal Public Identifier of the DTD to which
+#         the output document will claim to conform.
+#
+#     <dt><code>$Maxleng</code></dt>
+#     <dd>Lines will often become longer when markup tags are inserted.
+#         If any line becomes longer than <code>$Maxleng</code> an
+#         attempt is made to break it (to the size given by
+#         <code>$Brkleng</code>).  Only the minimum number of line
+#         breaks is made to satisfy this criterion.  
+#         If <code>$Maxleng</code> is zero, then no line breaks will 
+#         be made.  
+#
+#     <dt><code>$Normleng</code></dt>
+#     <dd>This gives the `normal' minimum length of a line.  If two 
+#         consecutive lines within a block (not at the end of it)
+#         are shorter than this, the block is assumed to be for
+#         verbatim formatting.  This isn't always a good indication,
+#         but for many prologues it works quite well.  If set to zero
+#         then blocks will not be identified as verbatim on the basis
+#         of line lengths.
+#
+#     <dt><code>$Verbose</code></dt>
+#     <dd>Determines whether warnings are given for unexpected input.
+#         The default value is 1.  This should not normally be changed.
+#     </dl>
+#     <p>
+#     The following are subroutines used for parsing and manipulating
+#     certain strings.  More detailed descriptions of their arguments 
+#     and return values are given with their default definitions in 
+#     the code.
+#     <dl>
+#     <dt><code>Auth_parse( $authline ) = ( $id, $name, $affil )</code></dt>
+#     <dd>This extracts the ID, name, and affiliation of an author from
+#         an author description line.  The default definition will decode
+#         lines of the form:
+#         <verbatim>
+#            MBT: Mark Taylor (STARLINK)
+#         </verbatim>
+#
+#     <dt><code>Hist_parse( $histline ) = ( $id, $date )</code></dt>
+#     <dd>This extracts the author ID and date from a history change
+#         description line.  The default definition will decode lines
+#         of the form:
+#         <verbatim>
+#            25-MAY-2000 (MBT):
+#         </verbatim>
+#
+#     <dt><code>Name2id( $routinename ) = ( $id )</code></dt>
+#     <dd>This turns the contents of the <code>routinename</code> 
+#         element into a value to use for the referencing ID of the
+#         <code>routinename</code> element.  The default definition
+#         simply discards any words after the first one and uses that
+#         as the result.  Depending on what IDs the main SUN document 
+#         uses to refer to routines in the routinelist, changes may 
+#         need to be made to this, for instance some sort of case folding.  
+#     </dl>
+#
+#  <examplelist>
+#     <example>
+#     code2sgml -1 -D sub.f subwrap.c > subs.sgml
+#        <examplenote>
+#        The first prologue from each of the named files is marked up 
+#        and written, with appropriate pre- and post-amble, to a new file 
+#        <code>subs.sgml</code> which constitutes a complete freestanding
+#        SGML document.  This will not include the main body of the 
+#        source code from the original files.
+#     <example>
+#     code2sgml -l script -c config.pl sub.f > new/sub.f
+#        <examplenote>
+#        A new version of the named file is written to a different 
+#        directory; any prologues in it will be marked up, but changes
+#        will only be made in comment lines, so that the new file
+#        will appear identical to the old one as far as the compiler
+#        is concerned.  The file <code>config.pl</> is used to override
+#        some of the default configuration options of the program. 
+#        The default configuration options are those appropriate for
+#        script-type source code.
+#        Once it has been checked that the markup is satisfactory,
+#        the old source file can be discarded and the new one
+#        used as a replacement.  The new file does not by itself 
+#        consitute a complete SGML document.
+#     <example>
+#        code2sgml -d *.f > routines.sgml
+#        <examplenote>
+#        A container document is written which references all <code>.f</> 
+#        files in the current directory.  This constitutes a complete
+#        SGML document, but requires the same <code>.f</> files, with 
+#        prologues marked up in SGML as in the previous example, to be 
+#        in its directory for subsequent processing.
+#
+#  <authorlist>
+#     <author id=MBT affiliation=STARLINK>Mark Taylor
+#
+#  <history>
+#     <change author=MBT date='5-OCT-1999'>
+#        Original version.
+#     <change author=MBT date='22-MAY-2000'>
+#        Upgrades for modifications made to DTD and changes to usage so
+#        that it is controlled by command-line flags not config files.
+#-
+# <![ CDATA [
+
+#  Safe programming.
+   use strict;
+
+#  The following variables are imported from external configuration files,
+#  so cannot be lexically scoped.
+   use vars qw( $Blank_rx $Bullet_rx $Comment_rx $Default_rx 
+                $Discard_rx $ForceDt_rx $ForceLi_rx @Headings 
+                $Probegin_rx $Proend_rx $Posthead_rx $Prefix_rx $Verbatim_rx 
+                $Brkleng $Commbegin $Doctitle $Dt_maxlines $Exactindent
+                $Fpi $Maxleng $Normleng $Verbose
+
+                $Line $Lnum
+              );
+
+
+
+########################################################################
+#  Main code start.
+########################################################################
+
+#  Interpret command line options.
+      my( $self, $c2sdir ) = filedir( $0 );
+      my( $usage ) = 
+         "Usage:  $self [-d|-D] [-1] [-l language] [-c config-file] "
+        ."source-files\n";
+      my( $mode ) = '';
+      my( $multiple ) = 1;
+      my( $configfile ) = '';
+      my( $language ) = 'fortran';
+      while ( @ARGV && $ARGV[ 0 ] =~ /^-/ ) {
+         my( $flag ) = shift( @ARGV );
+         if ( $flag =~ /^-c(.*)/ ) {
+            $configfile = $1 || shift( @ARGV );
+         }
+         elsif ( $flag =~ /^-d/ && ! $mode ) {
+            $mode = 'd';
+         }
+         elsif ( $flag =~ /^-D/ && ! $mode ) {
+            $mode = 'D';
+         }
+         elsif ( $flag =~ /^-1$/ ) {
+            $multiple = 0;
+         }
+         elsif ( $flag =~ /^-l(.*)/ ) {
+            $language = lc( $1 || shift( @ARGV ) );
+            if ( $language ne 'fortran' && $language ne 'script' ) {
+               die( "$self: Only `fortran' and `script' languages supported\n"
+                  . "           (note `fortran' may work for C source\n" );
+            }
+         }
+         else {
+            die( $usage );
+         }
+      }
+
+#  Get list of files to process.
+      my( @files ) = @ARGV;
+      if ( @files == 0 ) {
+         die( $usage );
+      }
+
+#  Bring in definitions of documented configuration variables and 
+#  functions from default file.
+      my( $defaultconfigfile ) = "$c2sdir/c2s.$language";
+      do( $defaultconfigfile )
+         or die( "Configuration file '$defaultconfigfile' unreadable or "
+               . "returned false.\n" );
+
+#  Here we import any overridden definitions of variables or functions
+#  made by the user in a configuration file.  If the file does not 
+#  exist, cannot be read, or does not return a non-false value,
+#  warn appropriately.
+      if ( $configfile ) {
+         if ( -r $configfile ) {
+            print( STDERR "Using configuration file '$configfile'\n" );
+            do( $configfile ) 
+               or die( "Configuration file '$configfile' " .
+                       " returned false status.\n" );
+         }
+         else {
+            die( "Cannot read '$configfile'\n" );
+         }
+      }
+
+#  Preprocess %Headings regular expressions: enclose each whole
+#  expression in a grouping, but non-backreferencing, parenthesis.
+      my( $i );
+      for ( $i = 1; $i < @Headings; $i += 2 ) {
+         $Headings[ $i ] = '(?:' . $Headings[ $i ] . ')';
+      }
+
+#  Begin output.  If we are writing a complete SGML document with all
+#  content inline, write necessary preamble here.
+      if ( $mode eq 'D' ) {
+
+#  Output empty declaration subset.
+         print( "<!DOCTYPE programcode PUBLIC '$Fpi' [ ]>\n\n" );
+
+#  Output required heading elements.
+         print( "<programcode><title>$Doctitle\n\n" );
+      }
+
+#  If we are writing a skeleton SGML document, write the start of the
+#  declaration subset so that we can write an entity declaration in it
+#  for each file.
+      elsif ( $mode eq 'd' ) {
+         print( "<!DOCTYPE programcode PUBLIC '$Fpi' [\n\n" );
+         print( "   <!-- Entity declarations for included source code",
+                " files -->\n\n" );
+      }
+
+#  Operate on each file in turn, writing output to stdout as appropriate.
+      my( $file, @entities );
+      foreach $file ( @files ) {
+
+#  If we are only generating a skeleton container document, then here we 
+#  just need to write entity declarations for each of the files.
+         if ( $mode eq 'd' ) {
+            my( $entity ) = $file;
+            $entity =~ s%^.*/%%;
+            $entity = "src-" . $entity;
+            push( @entities, $entity );
+            printf( "      <!ENTITY %-16s SYSTEM '%s'>\n", $entity, $file );
+         }
+
+#  Otherwise, we need to parse the file and write its output in some form.
+         else {
+
+#  Open the input file.
+            open( INFILE, "<$file" ) 
+               or die( "Failed to open file '$file' for reading.\n" );
+            print( STDERR "Processing file '$file'\n" );
+
+#  If we are writing all the prologues to one SGML document, output 
+#  a header comment, followed by the marked up prologue but omitting
+#  the executable part of the source code.
+            if ( $mode eq 'D' ) {
+               print( "<!--  ", '*' x 60, "\n",
+                      "      *  $file\n",
+                      "      ", '*' x 60, "  -->\n\n" );
+               srcfile2sgml( *INFILE, *STDOUT, prologue_only => 1, 
+                                               multiple => $multiple );
+            }
+
+#  If we are writing only a marked up source file, output the whole
+#  thing including the executable part.
+            elsif ( $mode eq '' ) {
+               srcfile2sgml( *INFILE, *STDOUT, multiple => $multiple );
+            }
+
+#  Finish off and close the input file.
+            print( STDERR "\n" );
+            close( INFILE );
+         }
+      }
+
+#  If we are writing a skeleton SGML document then we now need to do 
+#  everything apart from declare the entities.
+      if ( $mode eq 'd' ) {
+
+#  Close the declaration subset.
+         print( "]>\n\n" );
+
+#  Output heading elements.
+         print( "<programcode><title>$Doctitle\n\n" );
+
+#  Write references to all the entities which we have declared.
+         my( $entity );
+         foreach $entity ( @entities ) {
+            printf( "   <routine><codeopener>  &%s;\n", $entity );
+         }
+      }
+
+#  Finish the document off.
+      if ( $mode eq 'd' || $mode eq 'D' ) {
+         print( "\n</programcode>\n\n" );
+      }
+
+#  End execution.
+      exit;
+   
+
+
+
+########################################################################
+#  Main translation subroutine
+########################################################################
+
+   sub srcfile2sgml {
+#+
+#  Name:
+#     srcfile2sgml
+#
+#  Purpose:
+#     Turn a source file into SGML.
+#
+#  Description:
+#     This routine takes an entire source code file and 
+#     turns it into a source code file which does the same
+#     thing, (i.e. it is still compilable) but also can be parsed 
+#     as part of an SGML document conforming to the 
+#     programcode DTD.  It currently produces a ROUTINE element.
+#
+#  Arguments:
+#     *IN = filehandle
+#        Filehandle on which the input source file is presented.
+#        Does not need to be seekable.
+#     *OUT = filehandle
+#        Filehandle to which the output SGML/source code document is 
+#        written.
+#     %options = hash
+#        The hash may contain the following entries:
+#           prologue_only = boolean
+#              If true, then the main part of the source code text 
+#              itself will not be output; only the prologue lines
+#              are output.  In this case, the whole thing is preceded
+#              by a start tag for the element.  [false]
+#           no_output = boolean
+#              If true, then no output is written to the output 
+#              filehandle.  Only byproduct actions are performed.
+#              There are currently no byproduct actions.
+#           multiple = boolean
+#              If true, then each prologue identified in the source
+#              file is converted.  If false, then only the first one
+#              is marked up and any subsequent ones are passed through
+#              unchanged.
+#
+#  Return value:
+#     $gi = string
+#        The GI of the element which the output document represents.
+#        If there is more than one prologue represented, this gives the
+#        gi of the first one.
+#-
+
+#  Get arguments.
+      local( *IN, *OUT ) = ( shift, shift );
+      my( %options ) = @_;
+      my( $onlypro ) = $options{ 'prologue_only' } || 0;
+      my( $noout ) = $options{ 'no_output' } || 0;
+      my( $multiple ) = $options{ 'multiple' } || 0;
+
+#  Initialise state.
+      my( $in_codebody ) = 0;
+      my( $in_prologue ) = 0;
+      my( $prologue ) = '';
+      my( $done ) = 0;
+      my( $gi );
+
+#  Loop through lines of source.  While within the prologue, just
+#  accumulate lines and pass them to the sgmlizing routine when we
+#  have the whole thing.  While outside the prologue, output each 
+#  line as it is encountered.
+      while( <IN> ) {
+
+#  Record line text and number for error reporting.
+         $Lnum++;
+         $Line = $_;
+
+#  Prologue start line.
+         if ( /($Probegin_rx)/ ) {
+            my( $probegin ) = $1;
+            chomp( $probegin );
+            if ( $in_prologue ) {
+               $probegin =~ s/\s*$//;
+               starwarn( "Ignored `$probegin' inside prologue" );
+            }
+            elsif ( $multiple || ! $done ) {
+               if ( $in_codebody ) {
+                  unless ( $onlypro || $noout ) {
+                     print( OUT "* ]", "]></codebody>\n", $_ );
+                  }
+                  $in_codebody = 0;
+               }
+               $in_prologue = 1;
+               $prologue = '';
+               unless ( $onlypro || $noout ) {
+                  print( OUT $_ ) unless ( $onlypro );
+               }
+            }
+            else {
+               print( OUT $_ ) unless ( $onlypro || $noout );
+            }
+         }
+
+#  Prologue end line.  Pass the whole prologue as one string to the 
+#  prologue translation subroutine and output the result, followed by
+#  the start of a marked section for the CODEBODY element.
+         elsif ( /($Proend_rx)/ ) {
+            my( $proend ) = $1;
+            chomp( $proend );
+            if ( $in_prologue ) {
+               $Line = $Lnum = undef;
+               $in_prologue = 0;
+               $in_codebody = 1;
+               my( $sgmlpro, $thisgi ) = pro2sgml( $prologue );
+               $gi ||= $thisgi;
+               unless ( $noout ) {
+                  if ( $onlypro ) {
+                     print( OUT "<$thisgi>\n", 
+                                $sgmlpro,  
+                                "<codebody empty>\n" );
+                  }
+                  else {
+                     print( OUT $sgmlpro, $proend, "\n", $Commbegin, 
+                                "<![ CDATA [\n" );
+                  }
+               }
+               $done++;
+            }
+            elsif ( $multiple || ! $done ) {
+               $proend =~ s/\s*$//;
+               starwarn( "Ignored `$proend' outside prologue" );
+            }
+            else {
+               print( OUT $_ ) unless ( $onlypro || $noout );
+            }
+         }
+
+#  Line is within the prologue.
+         elsif ( $in_prologue ) {
+
+#  Check it's a comment line.
+            if ( ! /$Comment_rx/o ) {
+               fail( "Non comment lines in prologue not allowed" );
+            }
+
+#  If it's effectively blank and precedes any non-blank lines in the
+#  prologue, just output it.
+            elsif ( $prologue eq '' && /$Blank_rx/o ) {
+               unless ( $onlypro || $noout ) {
+                  print( OUT $_ );
+               }
+            }
+
+#  Otherwise, it's a line which looks like it is significant within the
+#  prologue.  Append it to the prologue text string for later processing.
+            else {
+               $prologue .= $_;
+            }
+         }
+
+#  Outside prologue.
+         else {
+
+#  Marked section end occurs in source - this is pretty unlikely, but if
+#  it occurs we'll have to get the user to do something about it.
+            if ( /\]\]\>/ ) {
+               fail( "Can't cope with MSC, MDC sequence (`]" .
+                     "]>') in source." );
+            }
+
+#  Output unmodified source code line.
+            unless ( $onlypro || $noout ) {
+               print( OUT $_ );
+            }
+         }
+
+      }
+
+#  Check that we seem to be in a sensible state at the end of the file.
+      if ( ! $in_codebody || $in_prologue ) {
+         starwarn( "End of file found at an unexpected point." );
+      }
+
+#  Finish marked section off at end of file.
+      if ( $in_codebody ) {
+         unless ( $onlypro || $noout ) {
+            print( OUT $Commbegin, "]" , "]></codebody>\n" );
+         }
+         $in_codebody = 0;
+      }
+
+#  End of processing.
+      return( $gi );
+   }
+
+
+########################################################################
+#  General utility routines.
+
+   sub fail {
+      $Verbose = 1;
+      starwarn( @_ );
+      starwarn( "Conversion failed" );
+      exit( 1 );
+   }
+
+   sub starwarn {
+      if ( $Verbose ) {
+         chomp( $_[ -1 ] );
+         my( $num ) = $Lnum ? sprintf( "Line%5d: ", $Lnum ) : "         ";
+         my( $line ) = $Line ? $Line : "";
+         chomp( $line );
+         print( STDERR $num, $line, "\n" ) unless ( "$num$line" =~ /^\s*$/ );
+         print( STDERR "    ", @_, "\n" );
+      }
+   }
+
+
+   sub depth {
+#+
+#  Debugging routine - tells you what calling depth you're at.
+#-
+      my( $lev ) = shift || 0;
+      return( ( caller( $lev * 2 ) )[ 0 ] ? depth( $lev + 1 ) : $lev );
+   }
+
+
+   sub filedir {
+#+
+#  Returns the base filename and the absolute directory from a filename.
+#-
+      my( $arg ) = @_;
+      my( $file, $directory );
+      my( $origdir ) = cwd();
+      if ( -d $arg ) {
+         $file = '';
+         chdir( $arg ) or die( "Failed to enter directory `$arg'\n" );
+         $directory = cwd();
+      }
+      elsif ( $arg =~ m%(.*)/(.*)% ) {
+         $file = $2;
+         chdir( $1 ) or die( "Failed to enter directory `$1'\n" );
+         $directory = cwd();
+      }
+      else {
+         $file = $arg;
+         $directory = cwd();
+      }
+      chdir( $origdir ) or die( "Failed to re-enter directory `$origdir'\n" );
+      return( $file, $directory );
+   }
+
+   sub cwd {
+#+
+#  Return current working directory.
+#-
+      my( $cwd ) = `pwd`;
+      chomp( $cwd );
+      return( $cwd );
+   }
+
+
+
+   sub qattrib {
+#+
+#  This generates a 'key=value' type attribute value.  It does two things:
+#     - wrap the value in the right sort of quotes
+#     - omit the tag altogether if the value is the empty string
+#
+#  Currently quotes are omitted if they are not required by SGML.
+#  Quotes could be included always to make it more XML-like.
+#-
+      my ( $out ) = '';
+      while ( @_ ) {
+         my( $delim );
+         my ( $key, $value ) = ( shift, shift );
+         if ( $value =~ /^[a-zA-Z0-9]+$/ ) {
+            $delim = "";
+         }
+         elsif ( $value !~ /'/ ) {
+            $delim = "'";
+         }
+         elsif ( $value !~ /"/ ) {
+            $delim = '"';
+         }
+         else {
+            $delim = "'";
+            $value =~ s/'/&quot;/g;
+         }
+         $out .= join( '', ' ', lc( $key ), '=', $delim, $value, $delim )
+            unless ( $value eq '' );
+      }
+      return( $out );
+   }
+
+
+   sub lines {
+#+
+#  Name:
+#     lines
+#
+#  Purpose:
+#     Turn a string into an array of lines.
+#
+#  Description:
+#     This routine takes a flat text string and breaks it into an array
+#     of strings which each terminates with a "\n" character.  A simple
+#     invocation of Perl's split() function won't quite do this because
+#     it tries to be too clever.
+#
+#  Arguments:
+#     $input = string
+#        A string with "\n" characters where the ends of lines should be.
+#
+#  Return value:
+#     @lines = list of strings.
+#        An array of strings each ending with a "\n".
+#-
+      my( $l );
+      my( @lines ) = ();
+      foreach $l ( split( "\n", $_[ 0 ], 9999999 ) ) {
+         push( @lines, ( $l . "\n" ) );
+      }
+      pop( @lines );
+      return( @lines );
+   }
+
+
+
+########################################################################
+#  Prologue parsing subroutines.
+
+#  In order to understand the structure of the prologue text well enough
+#  to mark it up into SGML, it is first turned from its original flat
+#  text form into a hierarchical, and recursive, 'block' structure.  
+#  Each block has a 'text' and a 'children' attribute.
+#  The 'text' attribute is the text associated directly 
+#  with it (this is the lines of code exactly as in the source 
+#  file), and the 'children' attribute is a ref to a list of zero or 
+#  more further blocks.
+#  Each source line therefore appears in the text attribute of exactly
+#  one block.
+
+
+   sub ckblk {
+#+
+#  Debugging routine - invoke this to check that a blocklist has a legal
+#  form.  It will print a warning, and exit with non-zero return, if not.
+#-
+      my( $name, $level, @blocks ) = @_;
+      my( $x );
+      my( $bad ) = 0;
+      my( $n ) = 0;
+      foreach $x (@blocks) {
+         if ( exists( $x->{ 'text' } ) ) {
+            if ( $x->{ 'text' } eq '' ) {
+               print STDERR 
+                  "--- $name: Empty text at block $n level $level --- \n";
+               $bad = 1;
+            }
+         }
+         else {
+            print STDERR "--- $name: No text at block $n level $level --- \n";
+            $bad = 1;
+         }
+         $bad ||= ckblk( $name, $level + 1, @{$x->{ 'children' }} );
+         $n++;
+      }
+      return $bad;
+   }    
+
+
+
+   sub pro2blk {
+#+
+#  Name:
+#     pro2blk
+#
+#  Purpose:
+#     Turn code prologue source into a hierarchical block structure.
+#
+#  Description:
+#     This routine goes through a chunk of source code and turns it into
+#     a list of blocks according to the following rules:
+#
+#        The indentation of the first line is the block base indentation.
+#        Consecutive lines with the base indentation are appended to the 
+#           text attribute of this block.
+#        If a line with a larger indentation is found, all subsequent lines
+#           until another line with the base indentation or a smaller one
+#           are processed (recursively) as children of this block.
+#        If the next line after children has the base indentation, it 
+#           is processed as a sibling of the first block.  If it has 
+#           an indentation smaller than the base, processing of this set 
+#           of blocks finishes and processing of their parents continues.
+#
+#     Blank lines (ones matching the $Blank_rx regular expression) are 
+#     regarded as having the same indentation as the last non-blank line,
+#     and are generally regarded as belonging to the last thing which was
+#     being processed.  The first line in the text passed to this routine
+#     must be non-blank (because the base indentation is determined from
+#     this).
+#
+#     Thus the blocks are identified within this routine entirely by 
+#     looking at the indentation of the body of the line (that part 
+#     of the line which is matched by the $Prefix_rx regular expression)
+#     and not, for instance, according to blank lines.  The 'text'
+#     attribute of a block is a set of consecutive lines all sharing
+#     the same indentation, and is guaranteed to begin with at least one 
+#     non-blank line.  Any following lines with larger indentation
+#     become the 'children' of that block.
+#
+#     As an example, the following text would be blocked as follows 
+#     according to indentation:
+#
+#        *  Block 0 text
+#        *     Block 0.0 text
+#        *     Block 0.0 text
+#        *        Block 0.0.0 text
+#        *     Block 0.1 text
+#        *        Block 0.1.0 text
+#        *        Block 0.1.0 text
+#        *     Block 0.2 text
+#        *  Block 1 text
+#        *     Block 1.0 text
+#
+#     The children of block 0 are blocks 0.0, 0.1 and 0.2.
+#     Note that blank lines play no purpose in delimiting blocks, only 
+#     changes in indentation length.
+#
+#  Arguments:
+#     $input = string
+#        A string containing a set of source code lines, with
+#        its structure illustrated by suitable indentation conventions.
+#        Lines are separated by a "\n" character.  The leading (non-text)
+#        part of each line should match the $Prefix_rx regular expression.
+#        Blank lines should match the $Blank_rx regular expression. 
+#        The first line must be non-blank.
+#
+#  Return value:
+#     @blocks = list of refs to hash.
+#        A list of zero or more block objects is returned.  Each block 
+#        object is a ref to a hash with two keys: the `text' value is
+#        the text of the block itself (consecutive lines sharing the
+#        same indentation) and the `children' value is a ref to a list
+#        of blocks which share the same (`base') indentation which is 
+#        greater than the base indentation.
+#-
+
+#  Get argument.
+      my( $input ) = @_;
+
+#  Set initial state.
+      my( $line );
+      my( $baseindent ) = 0;
+      my( $in_heading ) = 1;
+      my( $head ) = '';
+      my( $body ) = '';
+      my( @blocks ) = ();
+
+      foreach $_ ( lines( $input ) ) {
+
+#  If the line matches the discard pattern, ignore it altogether.
+         if ( /$Discard_rx/ ) {
+            next;
+         }
+
+#  Strip trailing whitespace since it is never relevant, and knowing it
+#  is absent simplifies parsing somewhat.
+         s/[ \t]*$//;
+
+#  Set variable for error reporting.
+         local( $Line ) = $_;
+
+#  Work out the indent size; first time through only, set the base
+#  indentation value.
+         /($Prefix_rx)/o;
+         my( $indent ) = length( $1 );
+         $baseindent ||= $indent;
+
+#  Currently processing the head (text attribute).
+         if ( $in_heading ) {
+
+#  Work out whether the current line is in the same block as the last 
+#  one.  Blank lines are considered always to continue whatever was
+#  going before.
+            my( $new );
+            if ( /$Blank_rx/o ) {
+               $new = 0;
+            }
+            else {
+               if ( $Exactindent ) {
+                  $new = ( $indent - $baseindent == $Exactindent );
+                  if ( $indent < $baseindent ) {
+                     starwarn( "Indentation looks wrong" );  # shouldn't happen
+                  }
+               }
+               else {
+                  $new = ( $indent - $baseindent > 0 );
+                  if ( ! $new && $indent != $baseindent ) {
+                     starwarn( "Indentation looks funny" );
+                     $baseindent = $indent;
+                  }
+               }
+            }
+
+#  Blank lines are considered to continue whatever was going before.
+            if ( /$Blank_rx/o ) {
+               $head .= $_;
+            }
+
+#  Indentation increased - start a new body (which will become children
+#  attribute).
+            elsif ( $new ) {
+               $in_heading = 0;
+               $body = '';
+               $body .= $_;
+            }
+
+#  No change in indentation - add line to head (which will become 
+#  text attribute).
+            else {
+               $head .= $_;
+            }
+         }
+
+#  Currently processing the body (children attribute).
+         else {
+
+#  Blank lines are considered to continue whatever was going before.
+            if ( /$Blank_rx/o ) {
+               $body .= $_;
+            }
+
+#  Add this line to body (which will become children).
+            elsif ( $indent > $baseindent ) {
+               $body .= $_;
+            }
+
+#  End of body - store the completed block and start a new head.
+            elsif ( $indent == $baseindent ) {
+               my( $block ) = { text => $head, 
+                                children => [ pro2blk( $body ) ] };
+               push( @blocks, $block );
+               $in_heading = 1;
+               $head = $body = '';
+               $head .= $_;
+            }
+            else {
+               starwarn( "Indentation looks wrong" );  # shouldn't happen
+            }
+         }
+      }
+
+#  Processed all lines - make a final block out of anything which is
+#  left.
+      if ( $head || $body ) {
+         my( $block ) = { text => $head,
+                          children => [ pro2blk( $body ) ] };
+         push( @blocks, $block );
+      }
+
+#  Return.
+      return( @blocks );
+   }
+
+
+   sub unblock {
+#+
+#  This routine unwraps a list of blocks to generate a single text string.
+#  No additional markup is inserted.
+#-
+      my( @blocks ) = @_;
+      my( $text ) = '';
+      my( $block );
+      foreach $block ( @blocks ) {
+         $text .= $block->{ 'text' } . unblock( @{ $block->{ 'children' } } );
+      }
+      return( $text );
+   }
+
+
+
+   sub blktype {
+#+
+#  Name:
+#     blktype
+#
+#  Purpose:
+#     Identify block type.
+#
+#  Description:
+#     This routine tries to guess what kind of element the list of blocks
+#     it is presented with should be represented as, taking cues from the
+#     block structure and the text itself.  A certain amount of guesswork
+#     is involved.
+#
+#  Arguments:
+#     @blocks = list of refs to hash
+#        A set of blocks.
+#
+#  Return value:
+#     $gi = string
+#        The generic identifier of the element which should enclose all
+#        the blocks in the input list.  This can currently be one of
+#        "ul", "dl", "verbatim" or "".  The empty string indicates
+#        that it just looks like plain text.
+#-
+      my( @blocks ) = @_;
+
+#  If there is no text to process, call it plain text.
+      if ( @blocks == 0 ) {
+         return( "" );
+      }
+
+#  If the first block starts by matching the pattern $ForceLi_rx or 
+#  $ForceDt_rx then we must try to treat these blocks as the 
+#  corresponding type of list.
+      my( $line ) = ( $blocks[ 0 ]->{ 'text' } =~ /^(.*\n)/ );
+      if ( $line =~ /$Prefix_rx$ForceDt_rx/o ) {
+         return( "dl" );
+      }
+      elsif ( $line =~ /$Prefix_rx$ForceLi_rx/o ) {
+         return( "ul" );
+      }
+
+#  Go through each block line by line taking a cursory look at each
+#  line of the text (not children) to see what it looks like.
+      my( $type ) = 'plain';
+      my( $bullrx );
+      my( $l, $b );
+      my( $hasplain ) = 0;
+      my( $maxlines ) = 0;
+      for ( $b = 0; $b <= $#blocks; $b++ ) {
+         my( @lines ) = lines( $blocks[ $b ]->{ 'text' } );
+
+#  Record some information about this block.
+         if ( scalar( @lines ) > $maxlines ) {
+            $maxlines = scalar( @lines );
+         }
+         my( @subblocks ) = @{ $blocks[ $b ]->{ 'children' } };
+         if ( @subblocks > 0 && blktype( @subblocks ) eq '' ) {
+            $hasplain++;
+         }
+
+#  Examine each line in the block text.
+         for ( $l = 0; $l <= $#lines; $l++ ) {
+            my( $line ) = $lines[ $l ];
+            $line =~ /^($Prefix_rx)(.*?)\s*$/o;
+            my( $body ) = $2 || "";
+
+#  First line starts with a bullet-like string - suppose it is the first
+#  item in an unordered list.
+            if ( $l == 0 && $b == 0 && ( $body =~ /^($Bullet_rx)/o ) ) {
+               $bullrx = quotemeta( $1 );
+               $type = 'list';
+            }
+
+#  Line starts with the same bullet-like string as the first list item
+#  (or is blank) - continue processing as list.
+            elsif ( ( $type eq 'list' ) && ( $body =~ /^($bullrx)/ ) ) {
+            }
+
+#  Block doesn't start with the same bullet-like string as the first list
+#  item - this is not a list after all.
+            elsif ( $type eq 'list' && $line !~ /$Blank_rx/o ) {
+               $type = 'plain';
+            }
+   
+#  If block contains something which looks like it would be in verbatim,
+#  or contains consecutive lines much shorter than normal line length,
+#  treat as verbatim.
+            else {
+               if ( $b == 0 ) {
+                  my( $endpara ) = ( $l == $#lines )
+                                || ( $line =~ /$Blank_rx/o )
+                                || ( $lines[ $l + 1 ] =~ /$Blank_rx/o );
+                  if ( $body =~ /$Verbatim_rx/o ) {
+                     $type = 'verbatim';
+                  }
+                  if ( $l > 0 && $Normleng && ! $endpara ) {
+                     if ( length( $lines[ $l ] ) < $Normleng &&
+                          length( $lines[ $l - 1 ] ) < $Normleng ) {
+                        $type = 'verbatim';
+                     }
+                  }
+               }
+            }
+         }
+      }
+      my( $gi );
+      if ( ( $maxlines <= $Dt_maxlines && $hasplain == @blocks )
+         && ( $type eq 'plain' ) ) {
+         $gi = 'dl';
+      }
+      elsif ( $type eq 'list' ) {
+         $gi = 'ul';
+      }
+      elsif ( $type eq 'verbatim' ) {
+         $gi = 'verbatim';
+      }
+      elsif ( $type eq 'plain' ) {
+         $gi = '';
+      }
+      return( $gi );
+   }
+
+
+   sub reblock {
+#+
+#  This one goes through a set of blocks and subdivides it further under
+#  some circumstances.  The purpose of this is so that by the end each
+#  set of siblings only contains a single high-level element, and you don't, 
+#  for instance, have a DL in the middle of a plain text block.  Normally,
+#  if indentation conventions are strictly adhered to, the original 
+#  blocking will have achieved this, but sometimes you have lists at
+#  the same indentation level as the main body of text.  We identify
+#  these using the $ForceLi_rx and $ForceDt_rx patterns.
+#
+#  Note that this routine should not be invoked recursively (and hence 
+#  should not be invoked within a recursive routine such as blk2sgml),
+#  since in that case multiple items in the same list would appear to
+#  be successively nested lists.
+#-
+      my( @blocks ) = @_;
+      my( @outblocks ) = ( );
+
+#  See what element the set of blocks starts off looking like.
+      my( $topel ) = '';
+      if ( @blocks ) {
+         my( $firstline ) = ( $blocks[ 0 ]->{ 'text' } =~ /(^.*)/ );
+         if ( $firstline =~ /$Prefix_rx$ForceDt_rx/o ) {
+            $topel = "dl";
+         }
+         elsif ( $firstline =~ /$Prefix_rx$ForceLi_rx/o ) {
+            $topel = "ul";
+         }
+      }
+      my( $inel ) = $topel;
+
+#  Go thorough the set of blocks a line at a time.
+      my( $l, $b );
+      for ( $b = 0; $b <= $#blocks; $b++ ) {
+         my( $block ) = $blocks[ $b ];
+         my( @lines ) = lines( $block->{ 'text' } );
+         my( $content ) = '';
+         for ( $l = 0; $l <= $#lines; $l++ ) {
+            my( $line ) = $lines[ $l ];
+
+#  Check whether this looks like the start of an embedded list element.
+            if ( $inel eq '' ) {
+               my( $startel ) = '';
+               if ( $line =~ /$Prefix_rx$ForceDt_rx/o ) {
+                  $startel = 'dl';
+               }
+               elsif ( $line =~ /$Prefix_rx$ForceLi_rx/o ) {
+                  $startel = 'ul';
+               }
+               if ( $startel ) {
+                  push( @outblocks, { text => $content, children => [ ] } );
+                  $content = '';
+                  $inel = $startel;
+               }
+            }
+
+#  See if this looks like the end of the list.  This is the case if 
+#  the last line was blank (or not there in some sense) and the next 
+#  line is non-blank and does not look like the start of another item.
+            my( $start ) = 
+                  ( $l == 0 )
+               || ( $l > 0 && $lines[ $l - 1 ] =~ /$Blank_rx/o
+                           && $line !~ /$Blank_rx/o );
+            my( $itemline ) = 
+                  ( $inel eq 'dl' && $line =~ /$Prefix_rx$ForceDt_rx/o ) 
+               || ( $inel eq 'ul' && $line =~ /$Prefix_rx$ForceLi_rx/o );
+            if ( $inel ne $topel && $start && ! $itemline && $content ) {
+               $outblocks[ -1 ]->{ 'children' } = 
+                  [ { text => $content, children => [ ] } ];
+               $inel = $topel;
+               $content = '';
+            }
+
+#  In any case add the current line to the current running string.
+            $content .= $line;
+         }
+
+#  If there are lines we haven't dealt with or children of this block
+#  then incorporate them at the end of the current block or as a child
+#  of it as appropriate.
+         my( @subblocks ) = @{ $block->{ 'children' } };
+         if ( $content ne '' ) {
+            my( $newblock ) = { text => $content,
+                                children => [ reblock( @subblocks ) ] };
+            if ( $inel ne $topel ) {
+               push( @{ $outblocks[ -1 ]->{ 'children' } }, $newblock );
+            }
+            else {
+               push( @outblocks, $newblock );
+            }
+         }
+         elsif ( $content eq '' && @subblocks > 0 ) {
+            if ( $inel ne $topel ) {
+               push( @{ $outblocks[ -1 ]->{ 'children' } }, @subblocks );
+            }
+            else {
+               push( @outblocks, @subblocks );
+            }
+         }
+      }
+      return( @outblocks );
+   }
+            
+
+   sub blk2sgml {
+#+
+#  This routine unwraps a list of blocks and turns them into a marked up
+#  string, taking cues from the block structure and the text itself to
+#  try to identify lists, verbatims, etc and add appropriate markup.
+#  Quite a lot of guesswork is involved.
+#  The routine doesn't treat each block separately, it treats each
+#  set of siblings in one go, examining them line by line.
+#-
+      my( @blocks ) = @_;
+      my( $out ) = '';
+
+#  If there is no text to process, return an empty string.
+      if ( @blocks == 0 ) {
+         return( '' );
+      }
+
+#  Get the prefix string, which should be the same for each block.
+      my( $block ) = $blocks[ 0 ];
+      my( $prefix ) = ( $block->{ 'text' } =~ /^($Prefix_rx)/o );
+
+#  Work out what sort of text this looks like.
+      my( $gi ) = blktype( @blocks );
+
+#  Now go through the text properly, bundling up block text and children
+#  as appropriate for the type of output we've guessed.
+      my( $b, $l );
+      my( $inlist ) = '';
+      my( $indt ) = '';
+      for ( $b = 0; $b <= $#blocks; $b++ ) {
+         my( @lines ) = lines( $blocks[ $b ]->{ 'text' } );
+         for ( $l = 0; $l <= $#lines; $l++ ) {
+            my( $line ) = $lines[ $l ];
+
+#  List type text - insert LI start tags in front of each line.
+            if ( $gi eq 'ul' ) {
+               my( $lineout ) = $line;
+               if ( $line =~ /^($Prefix_rx)($ForceLi_rx)(.*\n)/o ) {
+                  my( $pre, $bullet, $content ) = ( $1, $2, $3 );
+                  $lineout = $pre . ( " " x length( $bullet ) ) . $content;
+                  substr( $lineout, length( $pre . $bullet ) - 4, 4 ) = "<li>";
+               }
+               elsif ( $line =~ /^($Prefix_rx)($Bullet_rx)(.*\n)/o ) {
+                  my( $pre, $bullet, $content ) = ( $1, $2, $3 );
+                  $lineout = $pre . ( " " x length( $bullet ) ) . $content;
+                  substr( $lineout, length( $pre . $bullet ) - 4, 4 ) = "<li>";
+               }
+               $out .= $lineout;
+            }
+
+#  DL type text - wrap each block text in DT tags (the children form the
+#  DD element).
+            elsif ( $gi eq 'dl' ) {
+               my( $lineout ) = $line;
+               if ( $lineout =~ s%($Prefix_rx)$ForceDt_rx%$1<dt>$2<dd>% ) {
+                  $indt = 0;
+               }
+               elsif ( $l == 0 ) {
+                  $lineout =~ /^($Prefix_rx)((?:$Bullet_rx)?)(.*\n)/o;
+                  my( $pre, $bullet, $content ) = ( $1, $2, $3 );
+                  if ( $bullet ne '' ) {
+                     $lineout = $pre . ( " " x length( $bullet ) ) . $content;
+                     substr( $lineout, length( $pre . $bullet ) - 4, 4 ) 
+                        = "<dt>";
+                  }
+                  else {
+                     $lineout = $pre . "<dt>" . $content;
+                  }
+                  $indt = 1;
+               }
+               if ( $l == $#lines && $indt ) {
+                  $lineout =~ s% *\n%<dd>\n%;
+                  $indt = 0;
+               }
+               $out .= $lineout;
+            }
+
+#  Plain text - insert P tags for blank lines and watch out for hidden
+#  list elements.
+            elsif ( $gi eq '' ) {
+               my( $lineout ) = $line;
+
+#  If there is a blank line which is not followed by another blank or the
+#  end of the block, replace it with a P start tag.
+                  if ( ( $l < $#lines ) && 
+                     ( $lines[ $l + 1 ] !~ /$Blank_rx/o ) ) {
+                     $lineout =~ s/$Blank_rx/$prefix<p>\n/;
+                  }
+               $out .= $lineout;
+            }
+
+#  Verbatim - insert text without additional processing.
+            elsif ( $gi eq 'verbatim' ) {
+               $out .= $line;
+            }
+         }
+
+#  End of the block - process children appropriately.
+         if ( $gi eq 'verbatim' ) {
+            $out .= unblock( @{ $blocks[ $b ]->{ 'children' } } );
+         }
+         else {
+
+#  If it looks like both this block and its children are non-empty plain
+#  text, then we probably want to offset the children somehow.  Without
+#  knowing the semantics of the block, there is no very satisfactory way
+#  of doing this - <blockquote> might be best (though it's not particularly
+#  likely to be a quote as such) but this has the disadavantage that it
+#  requires <px> paragraph children instead of <p> ones.  So we use 
+#  a single element <ul>.
+            my( @subblocks ) = @{ $blocks[ $b ]->{ 'children' } };
+            my( $children ) = blk2sgml( reblock( @subblocks ) );
+            my( $quote ) = ( blktype( @subblocks ) eq '' )
+                        && ( $gi eq '' )
+                        && ( @subblocks > 0 );
+            if ( $quote ) {
+               my( $start, $end ) = ( "<ul><li>", "</ul>" );
+               $children =~ s%(\n(?:$Blank_rx)?)\Z%\n$prefix$end$1%m;
+               $children =~ s%^%$prefix$start\n%;
+            }
+            $out .= $children;
+         }
+      }
+
+#  Terminate any embedded list we may have started.
+      if ( $inlist ) {
+         $out .= "$prefix</$inlist>\n";
+      }
+
+#  Wrap the output in start and end tags if necessary, and return.
+#  If there is a blank line at the end of the section, try to put the
+#  end tag before it rather than after it.
+      if ( $gi ) {
+         $out =~ s%(\n(?:$Blank_rx)?)\Z%\n$prefix</$gi>$1%m;
+         $out =~ s%^%$prefix<$gi>\n%;
+      }
+      return( $out );
+   }
+
+
+   sub breaklines {
+#+
+#  Name:
+#     breaklines
+#
+#  Purpose:
+#     Break prologue text into short enough lines.
+#
+#  Description:
+#     This routine takes text and breaks any lines which are too
+#     long at some sensible place.  It does not attempt to reformat
+#     the whole lot a la fmt(1), on the grounds that many of the
+#     existing line breaks will be at useful places.  Trailing
+#     whitespace may be stripped.
+#
+#  Arguments:
+#     $max = integer
+#        Maximum character length of a line to allow.  If zero, no
+#        reformatting is done at all.
+#     $norm = integer
+#        Normal length of a line to allow.  This is the length to
+#        which the line will be truncated by preference.
+#     @lines = list of strings
+#        The concatenation of this list contains all the text.  Line
+#        breaks in the input text do not need to be aligned with 
+#        element boundaries in this list.
+#
+#  Return value:
+#     $out = string
+#        The reformatted text.
+#-
+      my( $max, $norm ) = ( shift, shift ); 
+      my( $in ) = join( '', @_ );
+      my( $out );
+      my( $line );
+
+#  Check whether we should refrain from all formatting.
+      if ( $max == 0 ) {
+         $out = $in;
+      }
+
+#  Otherwise, go through a line at a time breaking at spaces when
+#  the line length exceeds the maximum.
+      else {
+         $out = '';
+         foreach $line ( lines( $in ) ) {
+            $line =~ s/\s*$//;
+            my( $pre ) = ( $line =~ /($Prefix_rx)/o );
+            while ( length( $line ) > $max ) {
+               my( $brk ) = rindex( $line, ' ', $norm );
+               my( $car ) = substr( $line, 0, $brk ) . "\n";
+               last if ( $car =~ /$Blank_rx/o || $brk < 1 );
+               $out .= $car;
+               my( $cdr ) = substr( $line, $brk + 1 );
+               $cdr =~ s/^\s*//;
+               $line = $pre . $cdr;
+            }
+            $out .= $line . "\n";
+         }
+      }
+
+#  Return reformatted string.
+      return( $out );
+   }
+
+
+   sub cdata2rcdata {
+#+
+#  Name:
+#     cdata2rcdata
+#
+#  Purpose:
+#     Escape delimiters in context in non-SGML text.
+#
+#  Description:
+#     This routine takes a plain text string and edits it so that it
+#     is suitable to appear in RCDATA or PCDATA contexts having no
+#     tags.  It finds delimiters in context and modifies the text
+#     so that they will be no longer recognised as such by an SGML
+#     parser.
+#
+#     See figure 3 of ISO 8879 and accompanying notes to understand
+#     the regular expressions being used here.  The delimiters which 
+#     need to be avoided are all those which can occur in mode CON.
+#
+#  Arguments:
+#     $in = string
+#        Input CDATA.
+#
+#  Return value:
+#     $out = string
+#        Output RCDATA.
+#-
+      local( $_ ) = @_;
+      s{ &(
+            [a-zA-Z\(]           # ERO (constraint NMS)
+          | \#[a-zA-Z0-9]        # CRO (constraint CREF)
+         )} {&amp;$1}gx;
+      s{ <(
+            [a-zA-Z>\(]          # STAGO (constraint GI)
+          | / [a-zA-Z>\(]        # ETAGO (constraint GI)
+          | \?                   # PIO
+          | ! [a-zA-Z\[>-]       # MDO (constraint DCL)
+         )} {&lt;$1}gx;
+      return( $_ );
+   }
+
+
+
+   sub pro2sgml {
+#+
+#  Name:
+#     pro2sgml
+#
+#  Purpose:
+#     Turn a block of prologue text into SGML.
+#
+#  Description:
+#     This routine takes an entire prologue and marks it up as SGML.
+#
+#  Arguments:
+#     $prologue = string
+#        Single text string comprising everything from the first non-blank
+#        line after the #+ to the last line before the #- in a source
+#        prologue.  Lines should be presented exactly as in the
+#        source.
+#
+#  Return values:
+#     $sgml = string
+#        A string which resembles the input string as closely as possible,
+#        but is marked up according to the programcode DTD.
+#     $gi = string
+#        This gives the GI of the of the element that this prologue is
+#        an example of.
+#-
+
+#  Get argument.
+      my( $prologue ) = @_;
+
+#  Escape delimiters in context.
+      $prologue = cdata2rcdata( $prologue );
+
+#  Process text to generate a hierarchical block structure.
+      my( @sections ) = pro2blk( $prologue );
+
+#  Examine text for separator strings.
+      my( $head_indent ) = ( $prologue =~ /($Prefix_rx)/ );
+      my( $blankline ) = ( $prologue =~ /^ *$/m ) ? '' : $Commbegin;
+      $blankline =~ s/ *$//;
+      $blankline .= "\n";
+      
+
+#  Initialise.
+      local( $Line, $Lnum );
+
+#  Set up defaults to be used when no explicit assignments are found in
+#  the prologue text.
+      my( $lastelname ) = 'routinename';
+      my( @els );
+      my( %content );
+   
+#  Go through section blocks one at a time.
+      my( $sect );
+      foreach $sect ( @sections ) {
+
+#  Get top level section heading and contents.
+         my( $head ) = $sect->{ 'text' };
+         my( @subblocks ) = @{ $sect->{ 'children' } };
+         if ( $head =~ /\n./ ) {
+            local( $Line ) = ( $head =~ /(^.*\n)/ );
+            if ( $Exactindent ) {
+               fail( "Multiple line heading "
+                       . "(indent not exactly $Exactindent?)" );
+            }
+            else {
+               fail( "Multiple line heading?" );
+            }
+         }
+         
+#  Try to find which of the known elements this heading corresponds to,
+#  by matching the line with each of the patterns in the @Headings 
+#  array.
+         my( $i );
+         my( $elname, $prefix, $headname );
+         for ( $i = 0; $i <= $#Headings; ) {
+            my( $headel, $headregex ) = @Headings[ $i++, $i++ ];
+            if ( $head =~ /($Prefix_rx)($headregex)$Posthead_rx/i ) {
+               ( $elname, $prefix, $headname ) = ( $headel, $1, $2 );
+               last;
+            }
+            if ( $i > $#Headings ) {
+               chomp( $head );
+               $Line = $head;
+               fail( "Failed to identify line `$head' as heading" );
+            }
+         }
+
+#  We have to do something about headings without any children, since 
+#  they cause problems with start tag omissability.  So we do not
+#  propagate them to the output at all.  Alternatively it would be 
+#  possible to add dummy content; in most cases a lone <p> start tag
+#  would do.
+         if ( @subblocks == 0 ) {
+            $head =~ /$Prefix_rx(.*?)$Posthead_rx/i;
+            my( $h ) = $1;
+            starwarn( "Omitting contentless heading `$h'" );
+         }
+
+#  Miscellaneous heading item.
+         elsif ( $elname eq 'OTHER' ) {
+            starwarn( 
+               "Using <diytopic> element for unknown heading `$headname'" );
+            $content{ $lastelname } .= 
+               $prefix . "<diytopic><title>$headname</title>\n";
+            $content{ $lastelname } .= blk2sgml( reblock( @subblocks ) );
+         }
+
+#  ARGUMENTLIST or PARAMETERLIST element.
+         elsif ( $elname eq 'argumentlist' || $elname eq 'parameterlist' ) {
+            $content{ $elname } = $prefix . "<$elname>\n";
+
+#  Each block is presumed to be the description of a separate parameter.
+            my( $block );
+            foreach $block ( @subblocks ) {
+
+#  Get the heading line and description block.
+               my( $head ) = $block->{ 'text' };
+               my( @subblocks ) = @{ $block->{ 'children' } };
+
+#  Break the heading line up.
+               $head =~ /($Prefix_rx)(.*?)(\([ a-zA-Z&,]*\))?[: ]*$/;
+               my( $prefix, $argspec, $dirspec ) = ( $1, $2, $3 );
+               $dirspec ||= '';
+
+#  Try to identify if we have an explicit direction attribute for the
+#  PARAMETER element.
+               my( $direction ) = '';
+               if ( $dirspec =~ /given|read/i ) {
+                  $direction .= ' given';
+               }
+               if ( $dirspec =~ /writ|return/i ) {
+                  $direction .= ' returned';
+               }
+
+#  Try to find a default value at the end of the description text (in 
+#  square brackets).  If so, then record it and remove it from the text.
+               my( $default ) = '';
+               if ( scalar( @subblocks ) && $subblocks[ -1 ]->{ 'text' } 
+                       =~ s/((?:$Prefix_rx)?)$Default_rx\Z// ) {
+                  my( $def ) = $2;
+                  $def =~ s/\n$Prefix_rx/ /mg;
+                  $default = qattrib( default => $def );
+                  chomp( $subblocks[ -1 ]->{ 'text' } );
+                  $subblocks[ -1 ]->{ 'text' } .= "\n";
+               }
+
+
+
+               #   s/((?:$Prefix_rx)?)$Default_rx((?:$Blank_rx)?)\Z/$2/m;
+               #if ( defined( $1 ) && $1 !~ /$Blank_rx/o ) {
+               #   $default = qattrib( default => $1 );
+               #}
+
+#  Make text out of the description block
+               my( $argbody ) = blk2sgml( reblock( @subblocks ) );
+
+#  Construct the final text of the PARAMETER element and add it to the
+#  content of the ARGUMENTLIST element.
+               if ( $prefix && $argspec ) {
+                  my( $argtext ) = "$prefix<parameter$direction$default>\n" 
+                                 . "$prefix$argspec\n"
+                                 . $argbody;
+                  $content{ $elname } .= $argtext;
+               }
+            }
+         }
+
+#  AUTHORLIST element.
+         elsif ( $elname eq 'authorlist' ) {
+            my( @auth, $aprefix, $line );
+            my( $bodytext ) = unblock( @subblocks );
+            foreach $line ( split( /\n/, $bodytext ) ) {
+               if ( $line =~ /($Prefix_rx)\s*(\S.*)/ ) {
+                  my( $authline );
+                  ( $aprefix, $authline ) = ( $1, $2 );
+                  my( $id, $name, $affil ) = Auth_parse( $authline );
+                  if ( $id ) {
+                     push( @auth, { id => $id, 
+                                    name => $name, 
+                                    affil => $affil } );
+                  }
+                  elsif ( ! defined( $id ) ) {
+                     starwarn( "Failed to parse Author line" );
+                  }
+               }
+            }
+            if ( @auth ) {
+               $content{ $elname } = $prefix . "<$elname>\n";
+               my( $auth );
+               foreach $auth ( @auth ) {
+                  $content{ $elname } .= 
+                     $aprefix . "<author"
+                              . qattrib( id => $auth->{ 'id' } )
+                              . qattrib( affiliation => $auth->{ 'affil' } )
+                              . ">"
+                              . $auth->{ 'name' }
+                              . "\n";
+               }
+               $content{ $elname } .= $blankline;
+            }
+         }
+
+#  HISTORY element.
+         elsif ( $elname eq 'history' ) {
+            my( @hist, $block, $hprefix );
+            foreach $block ( @subblocks ) {
+               my( $head ) = $block->{ 'text' };
+               my( $content ) = 
+                  blk2sgml( reblock( @{ $block->{ 'children' } } ) );
+               my( $histline );
+               ( $hprefix, $histline ) = 
+                  ( $head =~ /($Prefix_rx)\s*(\S.*)/ );
+               my( $id, $date ) = Hist_parse( $histline );
+               if ( $id ) {
+                  push( @hist, { id => $id, 
+                                 date => $date, 
+                                 content => $content } );
+               }
+               elsif ( ! defined( $id ) ) {
+                  starwarn( "Failed to parse History line" );
+               }
+            }
+            if ( @hist ) {
+               $content{ $elname } = $prefix . "<$elname>\n";
+               my( $hist );
+               foreach $hist ( @hist ) {
+                  $content{ $elname } .=
+                     $hprefix . "<change"
+                              . qattrib( author => $hist->{ 'id' },
+                                         date => $hist->{ 'date' } )
+                              . ">\n"
+                              . $hist->{ 'content' };
+               }
+               $content{ $elname } .= $blankline;
+            }
+         }
+
+#  EXAMPLELIST element.
+         elsif ( $elname eq 'examplelist' ) {
+            $content{ $elname } = $prefix . "<$elname>\n";
+            my( $block );
+            foreach $block ( @subblocks ) {
+               my( $head ) = $block->{ 'text' };
+               my( $prefix1 ) = ( $block->{ 'text' } =~ /^($Prefix_rx)/o );
+               my( $prefix2 ) = 
+                  ( $block->{ 'children' }->[ 0 ]->{ 'text' } 
+                     =~ /^($Prefix_rx)/o );
+               my( $content ) = 
+                  blk2sgml( reblock( @{ $block->{ 'children' } } ) );
+               $content{ $elname } .= $prefix1 . "<example>\n" . $head 
+                                    . $prefix2 . "<examplenote>\n" . $content;
+            }
+            $content{ $elname } .= $blankline;
+         }
+
+#  ROUTINENAME element.
+         elsif ( $elname eq 'routinename' ) {
+            my( $name ) = $subblocks[ 0 ]->{ 'text' };
+            $name =~ s/$Prefix_rx/ /mg;
+            $name =~ s/\s+/ /g;
+            $name =~ s/^\s*//;
+            $name =~ s/\s*$//;
+            $content{ $elname } = $prefix 
+                                . "<" 
+                                . $elname
+                                . qattrib( id => Name2id( $name ) ) 
+                                . ">\n"
+                                . blk2sgml( reblock( @subblocks ) );
+         }
+
+#  A block which has been recognised from the Headings array but does
+#  not require any special treatment.
+         else {
+            $content{ $elname } = $prefix . "<" . $elname . ">\n"
+                                . blk2sgml( reblock( @subblocks ) );
+         }
+
+#  Record element name so that OTHER blocks can be appended.
+         unless ( $elname eq 'OTHER' ) {
+            push( @els, $elname );
+            $lastelname = $elname;
+         }
+      }
+
+#  The following assignment could be used to override the order of output
+#  of prologue sections.  DIYTOPICs will be interspersed after the section
+#  they follow in the original. 
+      # my( @els ) = qw/ routinename purpose description returnvalue
+      #                  argumentlist parameterlist authorlist history
+      #                  usage invocation examplelist implementationstatus
+      #                  bugs /;
+
+#  Collect the sections for output.
+      my( $out ) = '';
+      my( $el );
+      foreach $el ( @els ) {
+         if ( $content{ $el } ) {
+            $out .= breaklines( $Maxleng, $Brkleng, $content{ $el } );
+         }
+      }
+      my( $gi ) = 'routine';
+      return( $out, $gi );
+   }
+
+
+
+# $Id$
+# ]]></codebody>

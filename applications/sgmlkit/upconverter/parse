@@ -1,0 +1,141 @@
+#!/bin/sh
+
+#+
+#  <routinename>
+#     parse
+#
+#  <purpose>
+#     Do SGML parsing of a document.
+#
+#  <usage>
+#     parse [nsgmls-flags] doc
+#
+#  <description>
+#     This script performs the minor convenience of invoking the SGML
+#     parser <code>nsgmls</code> with the right SGML declaration 
+#     and catalog; this is almost trivial but making sure you have the
+#     right declaration is just fiddly enough that it's useful to not
+#     have to think about it.  It determines what declaration to use
+#     by its inside knowledge about which DTDs use which declarations.
+#     In fact, the default starsgml setup will allow use of 
+#     <code>nsgmls</code>
+#     without explicitly specifying a declaration on Starlink documents, 
+#     but in this case the declaration is wrong for non-Starlink
+#     documents, such as those in HTML.  The main difference is that
+#     the Starlink declaration is case-sensitive.
+#     <p>
+#     All flags are passed unchanged to the <code>nsgmls</code> program.
+#     <p>
+#     The <code>nsgmls</code> binary must be in the path, and the
+#     STARLINK_SGML_DIR directory must be set correctly.
+#
+#  <diytopic><title>nsgmls</title>
+#     The <webref url='http://www.jclark.com/sp/nsgmls.htm'>nsgmls</webref>
+#     program and its 
+#     <webref url='http://www.jclark.com/sp/sgmlsout.htm'>output format
+#     </webref> are documented fully elsewhere.  A representation 
+#     of the ESIS of the document (this is very verbose) is written to 
+#     standard output, unless suppressed with the <code>-s</code> flag.
+#     Any discrepancies with the DTD which the parser encounters 
+#     cause a message to be written to standard error (this may be 
+#     redirected using the <code>-f</code> flag).  This error message
+#     consists of 5 colon-separated fields as follows:
+#     <ol>
+#     <li>The name of the parser (nsgmls)
+#     <li>The name of the document being parsed
+#     <li>The line number on which the error occurred
+#     <li>The character column on that line on which the error occurred
+#     <li>A letter indicating the kind of message this is:
+#         <dl compact>
+#         <dt>W<dd>Warning
+#         <dt>X<dd>Crossreference failed
+#         <dt>E<dd>Conformance error
+#         </dl>
+#     <li>Text describing the error
+#     </ol>
+#     Note that warnings of type `W' which complain about not being able
+#     to generate system identifiers for document <em>summaries</em> 
+#     are harmless and can be ignored.
+#
+#  <examplelist>
+#     <example>
+#     parse -s sun123.sgml
+#        <examplenote>
+#        This runs <code>nsgmls</code> on the named file, suppressing 
+#        normal output.  Any parse errors will be written to standard
+#        error.  If there is no output then the document conforms to 
+#        the DTD.
+#
+#  <authorlist>
+#     <author id=MBT affiliation=STARLINK>Mark Taylor
+#
+#  <history>
+#     <change author=MBT date='25-MAY-2000'>
+#         Initial version.
+#-
+# <![ CDATA [
+
+
+#  Set paths.
+      nsgmls=nsgmls
+
+#  Get directory of this script.
+      reldir=`echo $0 | sed 's%[^/]*$%.%'`
+      l2sdir=`cd "$reldir"; pwd`
+
+#  Check that we have the SGML path defined.
+      if [ "$STARLINK_SGML_DIR" = "" ]
+      then
+         echo "The environment variable STARLINK_SGML_DIR is not defined"
+         exit 1
+      fi
+
+#  Get arguments and validate.
+      while [ $# -gt 1 ]
+      do
+         nflags="$nflags $1"
+         shift
+      done
+      doc=$1
+      if [ -z doc ]
+      then
+         echo "Usage:  parse [nsgmls-flags] doc"
+         exit 1
+      fi
+      if [ ! -f ]
+      then
+         echo "parse: no file $doc"
+         exit 1
+      fi
+
+#  Work out what DTD we're using.
+      dtd=`tr a-z A-Z <$doc | sed -ne's/^ *<!DOCTYPE *//p' | sed -e'1s/ .*//' -e1q`
+
+#  Get the right declaration.
+      case $dtd in
+         SUN | SSN | SC | SG | SGP | SUG | MUD | PROGRAMCODE )
+            decl=$STARLINK_SGML_DIR/dtd/starlink.decl
+            catflags=-c$STARLINK_SGML_DIR/dtd/CATALOG
+            ;;
+         L2S)
+            decl=$STARLINK_SGML_DIR/dtd/html/html.decl.std
+            catflags=-c$l2sdir/l2s-catalog
+            ;;
+         *)
+            decl=$STARLINK_SGML_DIR/dtd/html/html.decl.std
+            catflags=-c$STARLINK_SGML_DIR/dtd/CATALOG
+            ;;
+      esac
+
+#  Test requisite files are readable.
+      if [ ! -r $decl ]
+      then
+         echo "parse: Cannot read file '$decl'"
+         exit 1
+      fi
+      
+#  Execute nsgmls.
+      $nsgmls $nflags $catflags $decl $doc
+
+
+# $Id$ ]]></codebody>

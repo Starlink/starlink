@@ -1,0 +1,413 @@
+#! /bin/sh
+
+#+
+#  <routinename>
+#     latex2sgml
+#
+#  <purpose>
+#     Translate a LaTeX Starlink document into SGML.
+#
+#  <usage>
+#     latex2sgml [-R routinesdoc] doc
+#
+#  <description>
+#     This program converts a LaTeX Starlink document into an SGML version
+#     of the same thing, conforming to the appropriate SGML DTD (SUN, 
+#     SSN, etc).  If a programcode document containing marked up 
+#     routine prologues is specified, it will ensure that references
+#     to routines therein are handled properly.
+#     <p>
+#     The upconversion process is somewhat complicated and error-prone
+#     for a number of reasons, and some manual intervention is likely
+#     to be required to generate an SGML document which conforms
+#     to the appropriate DTD, is semantically equivalent to the 
+#     LaTeX original, and whose SGML source is clear and maintainable.
+#
+#  <diytopic><title>Output</title>
+#     The program tries to provide as much helpful information about
+#     how the conversion has gone as it can.  
+#     <p>
+#     The first part of the 
+#     output to the screen is the result of an invocation of 
+#     <code>latex2html</code>, and provides the normal, rather verbose, 
+#     output which that generates.
+#     <p>
+#     Subsequent screen output is restricted to a brief
+#     summary of what stage the conversion is currently at.  
+#     When conversion is complete (or has encountered a fatal
+#     error) a summary is written giving the name, 
+#     <em>doc</em><code>.translog</code>, of a log file into
+#     which more detailed information has been written.
+#     The log file provides line-based reports on items
+#     which might need attention.  Here is an example of what it
+#     might look like:
+#     <verbatim>
+#     2:1:     Beginning l2s -> Starlink final SGML transformation
+#     2:1:     Verbosity level 5
+#     5:26:    Apparently duplicate author initials - using ID `auto.id-auth.1'
+#     5:55:    Ignoring line break in element H1
+#     4:56:    Eight-bit character &amp;#244; may cause trouble for LaTeX
+#                 ...
+#     4:368:   Extra info from includegraphics ignored:
+#     4:            clip,height=118mm
+#     2:377:   References stable - no further passes required
+#     2:377:   Ending l2s -> Starlink final SGML transformation
+#     </verbatim>
+#     The first digit on each line is an integer indicating the severity 
+#     of the message, as follows:
+#     <dl compact>
+#        <dt>0 <dd>fatal
+#        <dt>1 <dd>serious
+#        <dt>2 <dd>control information
+#        <dt>3 <dd>almost certainly requires attention to the 
+#                  converted document
+#        <dt>4 <dd>probably requires attention to the converted document
+#        <dt>5 <dd>can probably be ignored
+#        <dt>6 <dd>debugging
+#     </dl>
+#     The second number is the line number of the output SGML file to which
+#     the message refers; if there is no second number the line is a
+#     continuation of the message on the previous line.
+#     The text on the rest of the line is intended to explain what the
+#     problem is, or may be.
+#     <p>
+#     Finally, the script attempts to parse the resulting document,
+#     and reports on whether it conformed to the Starlink DTD.
+#     If it failed to conform, the program shows how to use the 
+#     <ref id=parse>parse</> command to see the errors.
+#     <p>
+#     On exit a file <em>doc</em><code>.sgml</code> is left in the
+#     current directory.  If conversion has been entirely successful
+#     then intermediate files will be removed, but otherwise 
+#     some intermediate files will be left since they may be useful
+#     for post-mortem analysis and to aid in future runs of the code.
+#
+#  <diytopic><title>Flags</title>
+#     <dl>
+#     <dt><code>-R routinesdoc</code></dt>
+#     <dd>The argument of the <code>-R</code> flag names a file 
+#         containing an SGML programcode document to which the 
+#         main SGML document will refer.  
+#         A <code>routinelist</code> element referring to this file will
+#         be added at the end of the document (note, if this is not the
+#         desired place for it you will have to move it by hand), and
+#         any references in the LaTeX document to IDs in this file
+#         (typically each routine in the file will have an ID
+#         with its own name) will become appropriate <code>coderef</code> 
+#         elements.
+#     </dl>
+#
+#  <diytopic><title>LaTeX extensions</title>
+#     As well as understanding the various extra commands provided by
+#     <code>latex2html</code>, this program provides a new command
+#     <verbatim>
+#        \sgml{}
+#     </verbatim>
+#     and a new environment
+#     <verbatim>
+#        \begin{rawsgml} ... \end{rawsgml}
+#     </verbatim>
+#     for specifying particular SGML to be output at given places in
+#     the LaTeX source.  They do what you would expect them to:
+#     their contents, after normal expansion of any LaTeX macros,
+#     appear verbatim in the output SGML document.
+#     These may be useful when defining, or redefining, high-level
+#     user LaTeX macros defined in the document.
+#
+#  <diytopic><title>Internals</title>
+#     This program operates in two stages.  First the script
+#     <code>l2s.pl</code> is invoked to convert the LaTeX source into
+#     SGML conforming to a temporary DTD called `L2S' which preserves 
+#     the structure of the original but is rather messy
+#     (<code>l2s.pl</code> is a harness for a modified version of
+#     <code>latex2html</code>, and suffers from the same deficiencies as
+#     that program as well as a few of its own).
+#     This produces a file with the extension <code>.l2s</code>.
+#     Secondly the script <code>trans.pl</code> is invoked to
+#     perform an SGML transformation from text marked up in the
+#     L2S DTD to the appropriate Starlink document DTD.
+#     This second part is a multiple pass process -- normally the first
+#     pass produces badly non-conforming SGML, the second pass produces
+#     something nearly right, and after three passes the document is 
+#     stable.
+#     <p>
+#     For long documents, all of these stages may take a long time,
+#     and it may be possible to speed matters up by not repeating 
+#     unnecessary stages.  Therefore the adventurous user may wish to
+#     run the <code>l2s.pl</code> and <code>trans.pl</code> scripts by
+#     hand, tweaking the intermediate <code>.l2s</code>
+#     file in between.  If the first part of the conversion has gone
+#     very badly the program may warn that the intermediate 
+#     <code>.l2s</code> document fails to conform to the L2S DTD.
+#     This is not good news but may not necessarily scupper the rest
+#     of the conversion; in any case running the <ref id=parse>parse</> 
+#     utility on the <code>.l2s</code> file will show where errors are,
+#     and may give a clue about how the original LaTeX can be fixed to
+#     prevent the problem.
+#
+#  <examplelist>
+#     <example>
+#     latex2sgml sun321.tex
+#        <examplenote>
+#        The named LaTeX document is converted, and the output written to
+#        <code>sun321.sgml</code>.  Progress messages are printed, 
+#        including one at the end which says to look in 
+#        <code>sun321.translog</code> for detailed warnings about the
+#        conversion, and indicates whether the resulting document
+#        conforms to the appropriate Starlink DTD.
+#     <example>
+#     latex2sgml -R routines.sgml sun321.tex
+#        <examplenote>
+#        In this example the same conversion is done, but with reference
+#        to the document <code>routines.sgml</code> which contains the 
+#        marked up prologues of the routines which are to be documented in
+#        an appendix of the SUN.  Appropriately identified references 
+#        (<code>\ref</code> commands) in the text of the SUN will reference
+#        into the routines document (they will be translated into 
+#        <code>coderef</code> elements).
+#
+#  <diytopic>Deficiencies
+#     <p>Output of the program is by no means perfect; as well as the 
+#     (hopefully fixable) <em>Bugs</em> listed separately, the following
+#     problems resulting from the conversion are more or less unavoidable, 
+#     or at least no fix is planned.  They will have to be tackled by
+#     modifying the LaTeX input file of the the SGML output file by hand.
+#     <dl>
+#     <dt>Tabbing environments
+#     <dd>Tabbing environments in the LaTeX original will almost certainly
+#         get badly mangled and will have to be recoded as something else
+#         (e.g. <code>tabular</code> or <code>verbatim</code> elements).
+#     <dt>Ugly LaTeX-notation maths
+#     <dd>Maths is embedded in latex notation in the final document 
+#         within <code>m</code>, <code>mequation</code> or 
+#         <code>meqnarray</code> elements, and should give the same 
+#         output as the original.  However, all user-defined macros 
+#         (<code>\newcommand</code>s) are expanded before being 
+#         put into the output, which can lead to
+#         verbose and ugly inline latex-notation source.
+#         This is hard to avoid, since each latex-notation element is
+#         treated separately, so that a <code>\newcommand</code> near the
+#         start of the document is not visible to an <code>m</> element 
+#         later, and it is very difficult to know which definitions 
+#         are required for a given bit of LaTeX.
+#         If the original document makes heavy use of user-defined macros
+#         for mathematics, the only way of getting maintainable SGML
+#         may be to cut and paste source from the original document.
+#     <dt>Latex lengths
+#     <dd>Unlike commands, LaTeX lengths are not expanded, so that when
+#         a length is reset somewhere in a document and used later, 
+#         this setting will be wrong.  This most frequently causes 
+#         problems in LaTeX <code>picture</> environments -- a
+#         <code>figurecontent</code> element with attribute 
+#         <code>notation=latexgraphics</> may come out with 
+#         entirely the wrong dimensions.
+#         In this case it is necessary to identify by hand where the
+#         relevant lengths are set in the LaTeX source and put them
+#         into each bit of LaTeX where they are used.
+#     <dt>History and author information
+#     <dd>The program constructs basic <code>history</> and 
+#         <code>authorlist</> elements but doesn't try to be too clever.
+#         You may wish to modify these.
+#     <dt>Line breaks
+#     <dd>The upconverter sometimes makes a poor job of getting
+#         line breaks in the right place.
+#         It inserts some and removes some near tags, and the result may
+#         be ugly.  This might undergo some improvement in future versions.
+#         It does <em>not</em> attempt to insert line breaks other than near
+#         certain tags, and this can result in overlong lines if 
+#         long tags have been inserted.
+#     <dt>Garbage in, garbage out
+#     <dd>Some LaTeX source which has only ever been processed by 
+#         <code>latex2html</> and not by LaTeX (e.g. within an
+#         <code>htmlonly</> environment or similar) may not make much 
+#         sense; historically <code>latex2html</code> has done the
+#         best it can and written non-conforming HTML which browsers
+#         will do their best to render,
+#         and which may coincidentally look perfectly OK, so that the
+#         weirdness of the source has never been noticed (some of the
+#         SST macros provide fine examples of this, which case is
+#         dealt with explicitly).
+#         Other parts may make sense but not in fact look very good in
+#         existing <code>star2html</code>'d form.
+#         In either case, if the <code>latex2html</code> source 
+#         which the upconverter is presented with isn't very good, then 
+#         the output will suffer too.
+#         You have been warned.
+#     </dl>
+#
+#  <bugs>
+#     This program has a number of inadequacies, some of them as a
+#     consequence of the underlying <code>latex2html</code> program 
+#     and some of its own.  The following are known bugs thought to
+#     be within this program, which should get fixed in the future:
+#     <ul>
+#     <li>Line breaks are occasionally lost or messed up in long 
+#         latex-notation math elements.
+#     <li>As a consequence of the (necessarily?) complicated way in which
+#         the program works out where paragraphs go, it sometimes outputs
+#         <code>&lt;p></code> start tags where it should not, e.g. 
+#         resulting in empty paragraphs.
+#     <li>Some entities -- non-breaking spaces, endashes and emdashes --
+#         seem to get mapped erroneously to ordinary spaces and single
+#         dashes respectively.
+#     </ul>
+#     
+#  <authorlist>
+#     <author id=MBT affiliation=STARLINK>Mark Taylor
+#
+#  <history>
+#     <change author=MBT date='4-OCT-1999'>
+#        Initial version.
+#     <change author=MBT date='25-MAY-2000'>
+#        Upgraded for version 0.7 of the SGML system.
+#-
+# <![ CDATA [
+
+#  Get directory of this script.
+      reldir=`echo $0 | sed 's%[^/]*$%.%'`
+      l2sdir=`cd "$reldir"; pwd`
+
+#  Set up subordinate script locations etc.
+      l2s=$l2sdir/l2s.pl
+      trans=$l2sdir/trans.pl
+      parse=$l2sdir/parse
+      self=`echo $0 | sed 's%^.*/%%'`
+      usage="Usage: $self [-Rroutinesdoc] doc"
+
+#  Set up logging text.
+      sep="--------------------------------------------------------------------"
+
+#  Process arguments.  The last argument is the name of the document to 
+#  be processed (possibly with some trailing extension) and anything else
+#  is a flag to be passed to l2strans.
+      arg=`eval echo '$'$#`
+      if [ $# -gt 1 ]
+      then
+         flags=$@
+         flags=`echo $flags | sed 's% [^ ][^ ]* *$%%'`
+      else
+         flags=''
+      fi
+
+#  Get argument and normalise.
+      arg=`echo $arg | sed -e's%\.tex$%%'`
+      infile="$arg.tex"
+      doc=`echo $arg | sed -e's%.*/%%'`
+      if [ "$infile" = ".tex" ] 
+      then
+         echo $usage
+         exit 1
+      fi
+      if [ ! -r "$infile" ]
+      then
+         echo "latex2sgml: Failed to open file '$infile'"
+         exit 1
+      fi
+
+#  Run l2s.pl.
+      echo " "
+      echo $sep
+      echo "--- latex2sgml: Running l2s.pl ($infile -> $doc.l2s)"
+      echo $sep
+      echo " "
+      if $l2s $infile
+      then
+         :
+      else
+         echo " "
+         echo $sep
+         echo "                l2s.pl failed - aborting"
+         echo $sep
+         exit 1
+      fi
+
+#  Run trans.pl in a loop.
+      okl2s=0
+      for pass in 1 2 3
+      do
+         echo " "
+         echo $sep
+         echo "--- latex2sgml: Running trans.pl ($doc.l2s -> $doc.sgml) - pass $pass"
+         echo $sep
+         echo " "
+         if [ $pass -ge 3 ]
+         then
+            verb="-v5"
+         else
+            verb="-v2"
+         fi
+         if $trans $verb $flags $doc > $doc.translog
+         then
+            okl2s=1
+            break
+         else
+            :
+         fi
+         if grep -i -q "</DOCBODY>" $doc.sgml
+         then
+            :
+         else
+            echo " "
+            echo $sep
+            echo "--- latex2sgml: trans.pl failed - aborting"
+            echo $sep
+            exit 1
+         fi
+      done
+
+#  Remove intermediate files.
+
+#  Assess success of transformation step.
+      echo " "
+      echo $sep
+      if [ "$okl2s" = "1" ]
+      then
+         echo "--- latex2sgml: Transformer apparently successful"
+      else
+         echo "--- latex2sgml: 3 passes of trans.pl not enough -"
+         echo "---             possibly needs more or possibly there is trouble"
+      fi
+      echo "---             See $doc.translog for comments on transformation"
+      echo $sep
+      echo " "
+
+#  Parse the final output.
+      oktrans=0
+      echo $sep
+      echo "--- latex2sgml: Parsing final output file $doc.sgml"
+      errs=`$parse -s $doc.sgml 2>&1 \
+          | awk -F: '$5=="E"{e++}$5=="X"{x++}END{printf "e=%d;x=%d",e,x}'`
+      eval $errs
+      parse_errs=$e
+      xref_errs=$x
+
+#  Report on errors in parsing.
+      if [ "$parse_errs" = "0" -a "$xref_errs" = "0" ]
+      then
+         oktrans=1
+         echo "---             Document $doc.sgml conforms to DTD"
+      else
+         echo "---             Document $doc.sgml does not conform to DTD:"
+         if [ "$parse_errs" != "0" ]
+         then
+            echo "---                 Parse errors: $parse_errs"
+         fi
+         if [ "$xref_errs" != "0" ]
+         then 
+            echo "---                 Crossreference errors: $xref_errs"
+         fi
+         echo "---             Use 'parse -s $doc.sgml |& grep -v :W:' to see messages."
+      fi
+      if [ "$oktrans" = "1" -a "$okl2s" = "1" ]
+      then
+         echo "---             Removing intermediate files."
+         rm -f $doc.l2s $doc.l2s.refs $doc.l2s.reflog
+      else
+         echo "---             Leaving intermediate files ($doc.l2s*)"
+      fi
+      echo $sep
+      echo " "
+      
+
+# $Id$
+# ]]></codebody>
