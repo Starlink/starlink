@@ -524,7 +524,7 @@ mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
 palread.f palsave.f piccur.f picdef.f \
 picempty.f picentire.f picin.f piclabel.f \
 piclist.f picsel.f pictrans.f picvis.f \
-scatter.f snapshot.f turbocont.f vecplot.f 
+scatter.f turbocont.f vecplot.f 
 
 # Special kappa f routines for commands which clash with the C 
 # run-time-library. These are separate because the names of the atask
@@ -2804,7 +2804,6 @@ shifty.o:	 SAE_PAR PRM_PAR
 slc2t1.o:	 SAE_PAR PRM_PAR
 slc2t3.o:	 SAE_PAR
 slide.o:	 SAE_PAR DAT_PAR PAR_ERR
-snapshot.o:	 SAE_PAR DAT_PAR CTM_PAR PAR_ERR NDF_PAR IDI_PAR IDI_ERR
 sqorst.o:	 SAE_PAR DAT_PAR PAR_ERR
 sqshs.o:	 SAE_PAR
 sqshx.o:	 SAE_PAR PRM_PAR

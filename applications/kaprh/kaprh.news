@@ -7,6 +7,5 @@
 
    This release adds the following commands to KAPRH:
 
-   - CONTOVER
-   - GREYPLOT
+   CONTOVER, GREYPLOT, SNAPSHOT
 

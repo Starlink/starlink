@@ -67,7 +67,7 @@ picin.par piclabel.par piclist.par picsel.par pictrans.par picvis.par \
 picxy.par pixdupe.par psf.par quilt.par rift.par rotate.par segment.par \
 setaxis.par setbad.par setbb.par setbound.par setext.par setlabel.par \
 setmagic.par setnorm.par setorigin.par setsky.par settitle.par \
-settype.par setunits.par setvar.par shadow.par slide.par snapshot.par \
+settype.par setunits.par setvar.par shadow.par slide.par \
 sqorst.par stats.par sub.par substitute.par surfit.par thresh.par \
 trandat.par traninvert.par tranjoin.par tranmake.par transformer.par \
 trantrace.par trig.par turbocont.par vecplot.par wiener.par zaplin.par \
@@ -112,7 +112,7 @@ procedures.hlp psf.hlp quilt.hlp requests.hlp rift.hlp sub.hlp \
 role_of_kappa.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb.hlp \
 setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
 setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
-shadow.hlp slide.hlp snapshot.hlp sqorst.hlp stats.hlp substitute.hlp \
+shadow.hlp slide.hlp sqorst.hlp stats.hlp substitute.hlp \
 summary.hlp surfit.hlp thresh.hlp trandat.hlp traninvert.hlp tranjoin.hlp \
 tranmake.hlp transformer.hlp trantrace.hlp trig.hlp turbocont.hlp \
 unix_usage.hlp using_help.hlp vecplot.hlp wiener.hlp zaplin.hlp \
@@ -151,7 +151,7 @@ idstate.ifl inspect.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
 lutrot.ifl lutsave.ifl luttweak.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
 ovset.ifl paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
 picdef.ifl picempty.ifl picentire.ifl picin.ifl piclabel.ifl piclist.ifl \
-picsel.ifl pictrans.ifl picvis.ifl snapshot.ifl turbocont.ifl vecplot.ifl \
+picsel.ifl pictrans.ifl picvis.ifl turbocont.ifl vecplot.ifl \
 axconv.ifl axlabel.ifl axunits.ifl erase.ifl fitsdin.ifl fitsexp.ifl \
 fitsimp.ifl fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl hiscom.ifl \
 hislist.ifl hisset.ifl native.ifl ndfcopy.ifl ndftrace.ifl setaxis.ifl \
@@ -279,7 +279,7 @@ idinvisible.f idpazo.f idset.f idstate.f inspect.f linplot.f lutable.f \
 lutflip.f luthilite.f lutrot.f lutsave.f luttweak.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
-pictrans.f picvis.f scatter.f snapshot.f turbocont.f vecplot.f colcomp.f
+pictrans.f picvis.f scatter.f turbocont.f vecplot.f colcomp.f
 
 # The contents of the ndfpack_sub.tar file:
 NDFPACK_SUB = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \

@@ -6647,94 +6647,6 @@ package kappa {
 
       }
 
-      action snapshot {
-         alias {snap(shot)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter device {
-            ptype DEVICE
-            access READ
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Display device}
-            helpkey *
-          }
-
-         parameter negative {
-            position 5
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Negative of the display?}
-            helpkey *
-            default TRUE
-          }
-
-         parameter odevice {
-            ptype DEVICE
-            position 1
-            vpath PROMPT
-            ppath CURRENT GLOBAL
-            association <-GLOBAL.GRAPHICS_DEVICE
-            prompt {Name of output device}
-            helpkey *
-          }
-
-         parameter out {
-            position 2
-            type NDF
-            access WRITE
-            vpath DEFAULT
-            prompt {Output NDF}
-            helpkey *
-            default !
-          }
-
-         parameter planes {
-            size *
-            position 7
-            type _INTEGER
-            prompt {Image memory planes to dump}
-            vpath DEFAULT
-            ppath DEFAULT
-            helpkey *
-            default !
-          }
-
-         parameter scale {
-            position 4
-            type _REAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default 0.707
-            prompt {Scale factor for output}
-            helpkey *
-          }
-
-         parameter title {
-            position 6
-            type LITERAL
-            prompt {Give the title of the plot}
-            vpath DEFAULT
-            helpkey *
-            default !
-          }
-
-         parameter whole {
-            position 3
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
-            prompt {Whole memory? (As opposed to what is visible.) }
-            helpkey *
-            default FALSE
-          }
- 
-      }
-
       action turbocont {
          alias {turb(ocont)}
 
@@ -17791,12 +17703,16 @@ iraf! {
       }
    }
 
+   command contover {
+      obsolete { The contover command has been retired. Use "contour clear=no" instead, or use the contover command in the KAPRH package (see SUN/xxx). }
+   } 
+
    command greyplot {
       obsolete { The greyplot command has been retired. Use "display key=y" instead, or use the greyplot command in the KAPRH package (see SUN/xxx). }
    } 
 
-   command contover {
-      obsolete { The contover command has been retired. Use "contour clear=no" instead, or use the contover command in the KAPRH package (see SUN/xxx). }
+   command snapshot {
+      obsolete { The snapshot command has been retired. Use a utility such as xv, or use the snapshot command in the KAPRH package (see SUN/xxx). }
    } 
 
    icl {defhelp kappa $KAPPA_HELP 0}

@@ -300,11 +300,6 @@
          ELSE IF ( NAME .EQ. 'SCATTER' ) THEN
             CALL SCATTER( STATUS )
 
-*  Dumps an image-display memory to a graphics hardcopy and optionally
-*  to an NDF.
-         ELSE IF ( NAME .EQ. 'SNAPSHOT' ) THEN
-            CALL SNAPSHOT ( STATUS )
-
 *  Contours a 2-d NDF quickly.
          ELSE IF ( NAME .EQ. 'TURBOCONT' ) THEN
             CALL TURBOCONT ( STATUS )

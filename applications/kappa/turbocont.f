@@ -596,8 +596,9 @@
                                ! used)
      :  FOUNT * 4,             ! Fount type
      :  ITYPE * ( NDF__SZTYP ),! Processing type of the image
-     :  MCOMP * 8,             ! Component to be mapped
      :  ORDLAB,                ! Label for the ordinate of the plot
+     :  MCOMP * 8,             ! Component to be mapped
+     :  MODE * 20,             ! Contour mode
      :  PLTITL,                ! Title of the plot
      :  UNITS * ( CUNITS+5 )   ! Units of the data
 
@@ -1120,7 +1121,7 @@
       CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
      :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
      :                 %VAL( PNTRI( 1 ) ), MXCONT, CNTLEV, PERCNT,
-     :                 AREA, NCONT, STATUS )
+     :                 AREA, NCONT, MODE, STATUS )
 
 *    Sort the contour heights into increasing order.
 

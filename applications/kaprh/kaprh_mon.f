@@ -115,6 +115,9 @@
          ELSE IF ( NAME .EQ. 'KRHHELP' ) THEN
             CALL KRHHELP ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'SNAPSHOT' ) THEN
+            CALL SNAPSHOT ( STATUS )
+
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'CMD', NAME )

@@ -1011,7 +1011,6 @@ a selection of scaling modes and many options such as axes;
 \item creation, selection, saving and manipulation of \htmlref{colour
 tables and palettes}{se:coltab} (for axes, annotation, coloured markers
 and borders);
-\item \htmlref{snapshot}{SNAPSHOT} of an image display to hardcopy; and
 \item line graphics: \htmlref{contouring}{CONTOUR}; histogram; \htmlref{line
 plots}{LINPLOT} of 1-dimensional arrays, and \htmlref{multiple-line
 plot}{MLINPLOT} of images; \htmlref{pie sections}{ELPROF}, and slices
@@ -11570,8 +11569,6 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Enhances edges in a 2-dimensional NDF using a shadow effect.}
 \menuitem{SLIDE}{
  Realigns a 2-d data array via an $x$-$y$ shift.}
-\menuitem{SNAPSHOT}{
- Dumps an image-display memory to a graphics hardcopy and optionally to an NDF.}
 \menuitem{SQORST}{
  Squashes or stretches a 2-d  data array in either or both axes.}
 \menuitem{STATS}{
@@ -11845,9 +11842,6 @@ functions as follows.
  Draws the outline of a 2-d NDF.
 \classitem{SCATTER}
  Displays a scatter plot between data in two NDFs.
-\classitem{SNAPSHOT}
- Dumps an image-display memory to a graphics hardcopy and
- optionally to an NDF.
 \classitem{VECPLOT}
  Plots a 2-dimensional vector map.
 \end{description}
@@ -37758,153 +37752,6 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
   Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
 \end{manroutinedescription}
 
- 
-\sstroutine{
-   SNAPSHOT
-}{
-   Dumps an image-display memory to a graphics hardcopy and
-   optionally to an NDF
-}{
-   \sstdescription{
-      This routine captures the data in the memory of an image-display
-      device, and writes these data to a different GKS device.  For
-      example, the contents of an X-windows memory might be captured and
-      sent to a PostScript laser printer.
-
-      Various options are available:
-      \begin{itemize}
-         \item you may choose to capture a whole or part of what is visible
-           on the screen, or the entire contents of the memory.  For the
-           former you adjust a rubber-band region until the desired
-           area is enclosed. Instructions for controlling the
-           rubber-band are given at run time.
-         \item A title may be included in the output.
-         \item The array may be output to an NDF.
-      \end{itemize}
-   }
-   \sstusage{
-      snapshot odevice [out] [whole] [scale] [negativ] [title] [planes]
-   }
-   \sstparameters{
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         Input image-display device.  {\tt [}Current image-display 
-         device{\tt ]}
-      }
-      \sstsubsection{
-         NEGATIVE = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, the output hardcopy is a negative version of what is
-         stored in the image display.  On some output devices a
-         constant dark background can give a non-uniform result, and
-         so a negative representation is the default. {\tt [TRUE]}
-      }
-      \sstsubsection{
-         ODEVICE = DEVICE (Read)
-      }{
-         Name of the output device.  The suggested default is the
-         graphics device last used in SNAPSHOT, and if there is not one,
-         the suggested default is the global current graphics device.
-         The device must be in the GNS category MATRIX\_PRINTER, and
-         have at least 24 greyscale intensities.
-      }
-      \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         Name given to the output NDF data structure used to store the
-         contents of the image-display memory.  If it is null ({\tt !}) no
-         NDF will be created. {\tt [!]}
-      }
-      \sstsubsection{
-         PLANES = \_INTEGER (Read)
-      }{
-         The numbers of the image memory planes not be output.  All
-         unspecified planes become visible.  If PLANES is null ({\tt !}), all
-         memory planes will be used to form the snapshot.  The base
-         memory is 0 and overlays are numbered consecutively from 1.
-         The value must be between 0 and the number of image memories
-         minus 1.  For an Ikon the only overlay plane is 1.  {\tt [!]}
-      }
-      \sstsubsection{
-         SCALE = \_REAL (Read)
-      }{
-         Scale factor for output.  Unity gives the largest possible
-         output, but it takes longest to compute and print (goes as the
-         square of the scale factor).  On the other hand unity does
-         provide maximum resolution. SCALE must be between 0 and 1.
-         {\tt [0.707]}
-      }
-      \sstsubsection{
-         TITLE = LITERAL (Read)
-      }{
-         Title of the plot and the output NDF.  There is only space on
-         the plot for about 25 characters in the title.  If it is null
-         ({\tt !}) no title will be plotted, and the title in the output NDF
-         becomes {\tt "KAPPA - Snapshot"}. {\tt [!]}
-      }
-      \sstsubsection{
-         WHOLE = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, the whole image-display memory is recorded, otherwise
-         a selected region of what is visible on the screen is plotted.
-         Dumping the whole memory can require considerable disc space
-         for work arrays and the output NDF. {\tt [FALSE]}
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         snapshot whole odevice=canon\_l
-      }{
-         This will dump the whole of the current image display's 
-         memories to the canon\_l device.  The plot will occupy half 
-         of the maximum area available on the device, {\it i.e.}
-         $\surd2/2$ magnification.
-      }
-      \sstexamplesubsection{
-         snapshot scale=1.0 $\backslash$
-      }{
-         This will capture a the whole or part of what is visible on
-         the screen of the current image display and dump it to the
-         current snapshot device at the largest magnification.
-      }
-      \sstexamplesubsection{
-         snapshot postscript views device=xw whole
-      }{
-         This dumps the whole of the xw device's memories to the postscript
-         device, and also to a NDF called views.  The area magnification
-         is a half.
-      }
-      \sstexamplesubsection{
-         snapshot ps\_l device=ikon whole planes=0 title="Hardcopy Base"
-      }{
-         This dumps the whole of the Ikon's base memory to the ps\_l
-         device.  The plot is entitled {\tt "Hardcopy Base"}.  The entire
-         output plot occupies half of the maximum area available on the
-         device.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The whole of the screen and the whole of the memory may be
-         different, for example, the image may have been zoomed or panned.
-
-         \sstitem
-         Files are not spooled to laserprinters.  They must be printed
-         outside this application.
-      }
-   }
-   \sstdiytopic{
-       Related Applications
-   }{
-       KAPPA: DISPLAY.
-   }
-   \sstimplementationstatus{
-      No origin information is passed to the output NDF.
-   }
-}
 \manroutine {{\manheadstyle{SQORST}}}{ Squashes or stretches a 2-d
   data array in either or both axes.}
 \begin{manroutinedescription}
@@ -45770,9 +45617,6 @@ functions as follows.
  co-ordinates.
 \classitem{OUTLINE}
  Draws the outline of a 2-d NDF.
-\classitem{SNAPSHOT}
- Dumps an image-display memory to a graphics hardcopy and
- optionally to an NDF.
 \classitem{SCATTER}
  Displays a scatter plot between data in two NDFs.
 \classitem{VECPLOT}
