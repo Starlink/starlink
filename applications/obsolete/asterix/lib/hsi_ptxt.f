@@ -21,7 +21,7 @@
 *     NLINE = INTEGER (given)
 *        Number of lines to write
 *     LINES[] = CHARACTER*(*) (given)
-*        THE TEXT STRINGS TO WRITE
+*        The text strings to write
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
