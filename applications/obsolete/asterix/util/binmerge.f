@@ -937,9 +937,11 @@ C        END IF
       INTEGER                CHR_LEN
 
 *    Local variables :
-      INTEGER                TPTR             ! Temporary pointer
-      INTEGER                OUTLEN           ! Legth of output units string
-      INTEGER                INLEN            ! Length of input units string
+      REAL			MAX			! Not used
+
+      INTEGER                	TPTR             ! Temporary pointer
+      INTEGER                	OUTLEN           ! Legth of output units string
+      INTEGER                	INLEN            ! Length of input units string
 
       LOGICAL                CONTINUE
 *-
@@ -972,7 +974,7 @@ C        END IF
         CALL MSG_PRNT ('WARNING: possible Y axis units mismatch')
 
       END IF
-      CALL ARR_MINR( LEN, %VAL(PTR), MIN)
+      CALL ARR_RANG1R( LEN, %VAL(PTR), MIN, MAX, STATUS )
 
 *    Exit
  999  IF (STATUS .NE. SAI__OK) THEN
