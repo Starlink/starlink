@@ -98,6 +98,7 @@
 *     PLA: Phil Andrews (ROSAT, University of Birmingham)
 *     SRD: Simon Duck (ROSAT, University of Birmingham)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -146,6 +147,8 @@
 *        Removed simple mode
 *      3 Apr 1996 V2.0-3 (DJA):
 *        Added grouping handling
+*      2 Sep 1997 V2.2-0 (RB):
+*        Add ONCE parameter for SIGMA looping
 *     {enter_changes_here}
 
 *  Bugs:
@@ -192,6 +195,7 @@
       LOGICAL                	DATAOK, VAROK      	! Various input
       LOGICAL                	QUALOK, AXOK       	! objects there?
       LOGICAL                	LOOP               	! Loop with sigma rejection?
+      LOGICAL			ONCE			! Only loop once for sigma rejection
       LOGICAL			USEGRP			! Use grouping?
 *.
 
@@ -269,6 +273,11 @@
       CALL USI_GET0L( 'LOOP', LOOP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
+*  ...and how much looping (RB)
+      CALL USI_GET0L( 'ONCE', ONCE, STATUS )
+      IF ( ONCE ) LOOP = .TRUE.
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
 *  Map data
       CALL BDI_MAPD( IFID, 'Data', 'READ', IDPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -302,7 +311,8 @@
 *    Do the statistics
         CALL STATISTIX_INT( USEGRP, NGRP, %VAL(GDPTR), %VAL(WPTR),
      :                      VAROK, %VAL(GVPTR), QUALOK, %VAL(GQPTR),
-     :                      1, NGRP, .FALSE., 0, OCH, LOOP, STATUS )
+     :                      1, NGRP, .FALSE., 0, OCH, LOOP, ONCE,
+     :                      STATUS )
 
 *    Release grouping workspace
         CALL DYN_UNMAP( GDPTR, STATUS )
@@ -313,8 +323,9 @@
 
 *    Do the statistics
         CALL STATISTIX_INT( USEGRP, NELM, %VAL(IDPTR), %VAL(WPTR),
-     :              VAROK, %VAL(IVPTR), QUALOK, %VAL(IQPTR), NDIM,
-     :                     DIMS, AXOK, AXPTR, OCH, LOOP, STATUS )
+     :                      VAROK, %VAL(IVPTR), QUALOK, %VAL(IQPTR),
+     :                      NDIM, DIMS, AXOK, AXPTR, OCH, LOOP, ONCE,
+     :                      STATUS )
 
       END IF
 
@@ -336,7 +347,7 @@
 *+  STATISTIX_INT - Internal routine to evaluate numeric statistics
       SUBROUTINE STATISTIX_INT( GRP, N, DATA, WEIGHTS, VAROK, VAR,
      :                          QUALOK, QUAL, NDIM, DIMS, AXOK,
-     :                          AXPTR, OCH, LOOP, STATUS )
+     :                          AXPTR, OCH, LOOP, ONCE, STATUS )
 *
 *    Description :
 *
@@ -361,10 +372,12 @@
 *    Authors :
 *
 *     David Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham::RB)
 *
 *    History :
 *
 *      17 Feb 90 : Original (DJA)
+*       2 Sep 97 : Add ONCE parameter for SIGMA looping
 *
 *    Type Definitions :
 *
@@ -395,6 +408,7 @@
 
       LOGICAL                AXOK               ! Axis data ok?
       LOGICAL                LOOP               ! Loop over data?
+      LOGICAL                ONCE		! Only do SIGMA loop once?
       LOGICAL                QUALOK             ! Use QUALITY array ?
       LOGICAL                VAROK              ! Use VARIANCE array?
 *
@@ -542,12 +556,14 @@
      :                     WTSUM, NVALID, CHISQUARE, ENZ, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Display results
-      CALL STATISTIX_DISPLAY( OBJ, NDIM, DIMS, N, USEWEIGHT, VAROK,
-     :                        MEAN, SUM,
-     :                        STDDEV, SKEWNESS, KURTOSIS, MINVALUE,
-     :                        MAXVALUE, MINP, MAXP, MEANERR, NVALID,
-     :                        CHISQUARE, ENZ, OCH, STATUS )
+*    Display results (if not in ONCE mode)
+      IF (.NOT. ONCE ) THEN
+        CALL STATISTIX_DISPLAY( OBJ, NDIM, DIMS, N, USEWEIGHT, VAROK,
+     :                          MEAN, SUM,
+     :                          STDDEV, SKEWNESS, KURTOSIS, MINVALUE,
+     :                          MAXVALUE, MINP, MAXP, MEANERR, NVALID,
+     :                          CHISQUARE, ENZ, OCH, STATUS )
+      END IF
 
 *    Abort if no looping
       IF ( .NOT. LOOP ) GOTO 99
@@ -654,11 +670,14 @@
      :                 WTSUM, NVALID, CHISQUARE, ENZ, STATUS )
 
 *        ...and display
-      CALL STATISTIX_DISPLAY( OBJ, NDIM, DIMS, N, USEWEIGHT, VAROK,
-     :                        MEAN, SUM,
-     :                  STDDEV, SKEWNESS, KURTOSIS, MINVALUE, MAXVALUE,
-     :                   MINP, MAXP, MEANERR, NVALID, CHISQUARE, ENZ,
-     :                                                    OCH, STATUS )
+           CALL STATISTIX_DISPLAY( OBJ, NDIM, DIMS, N, USEWEIGHT,
+     :            VAROK, MEAN, SUM,
+     :            STDDEV, SKEWNESS, KURTOSIS, MINVALUE, MAXVALUE,
+     :            MINP, MAXP, MEANERR, NVALID, CHISQUARE, ENZ,
+     :            OCH, STATUS )
+
+*        Have we had enough of this?
+           IF ( ONCE ) GOTO 99
 
         END IF
 

@@ -65,4 +65,12 @@ INTERFACE STATISTIX
       HELP      'If yes, then points greater than N sigma from the current mean may be ignored.'
    ENDPARAMETER
 
+   PARAMETER ONCE
+      TYPE	'_LOGICAL'
+      VPATH	'DEFAULT'
+      DEFAULT	NO
+      PROMPT	'Do SIGMA looping only once?'
+      HELP	'If yes, then the program will not prompt further.'
+   ENDPARAMETER
+
 ENDINTERFACE
