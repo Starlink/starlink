@@ -25,7 +25,8 @@ dnl    PISA is a couple of monoliths.
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [agi cat chr fio ndf par pda prm sae shl])
+STAR_DECLARE_DEPENDENCIES([build], [agi cat chr fio ndf par pda prm sae shl],[link])
+STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need "hlib" command to build the help library.
 STAR_CHECK_PROGS(hlib)
