@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.17  1997/05/27 23:10:27  timj
+*     Remove GET_DEMOD, MODIFY and KSTEST from monolith
+*
 *     Revision 1.16  1997/05/23 18:09:43  timj
 *     Add SCAN_RLB
 *
@@ -140,9 +143,9 @@ c
 
          CALL REDS_FLATFIELD (STATUS)
 
-      ELSE IF (NAME .EQ. 'GET_DEMOD') THEN
+*      ELSE IF (NAME .EQ. 'GET_DEMOD') THEN
 
-         CALL REDS_GET_DEMOD (STATUS)
+*         CALL REDS_GET_DEMOD (STATUS)
 
       ELSE IF (NAME .EQ. 'GET_FLAT') THEN
 
@@ -152,9 +155,9 @@ c
 
          CALL REDS_REBIN (NAME, STATUS)
 
-      ELSE IF (NAME .EQ. 'MODIFY') THEN
+*      ELSE IF (NAME .EQ. 'MODIFY') THEN
 
-         CALL REDS_MODIFY (STATUS)
+*         CALL REDS_MODIFY (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUPHOT') THEN
 
@@ -195,9 +198,9 @@ c
 
          CALL SCUHELP (STATUS)
 
-      ELSE IF (NAME .EQ. 'KSTEST') THEN
+*      ELSE IF (NAME .EQ. 'KSTEST') THEN
 
-         CALL REDS_KSTEST (STATUS)
+*         CALL REDS_KSTEST (STATUS)
 
       ELSE IF (NAME .EQ. 'DRAWSIG') THEN
          CALL DRAWSIG (STATUS) 
