@@ -1,0 +1,92 @@
+#+
+#  Name:
+#     CCDGENERATE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CCDGENERATE
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter FILE                # Name of input list
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'List containing object positions etc.'
+      helpkey  '*'
+   endparameter
+
+   parameter NSEQ                # Number of test sequences to create
+      position 2
+      type     _INTEGER
+      vpath    'PROMPT,CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5
+      range    1, 26
+      prompt   'How many data sequences do you want'
+      helpkey  '*'
+   endparameter
+
+   parameter UBNDS
+      type     _INTEGER
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Upper bounds'
+      helpkey  '*'
+   endparameter
+
+   parameter TYPE
+      type     _CHAR
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '.sdf'
+      prompt   'Output data type'
+      helpkey  '*'
+   endparameter
+
+   parameter LBNDS
+      type     _INTEGER
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Lower bounds'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+       type        LITERAL
+       access      UPDATE
+       vpath       'GLOBAL,CURRENT,DEFAULT'
+       ppath       'GLOBAL,CURRENT,DEFAULT'
+       association '<-global.ccdpack_logto'
+       prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+       default     'Both'
+       helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey     '*'
+   endparameter
+
+endinterface
+# $Id: ccdgenerate.ifl,v 1.1 1997/06/27 09:01:41 pwd Exp $
