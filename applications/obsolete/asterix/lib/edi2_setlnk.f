@@ -100,6 +100,7 @@
         PARAMETER               ( TSTRING = 'BIJEDC' )
 
 *  Local Variables:
+      CHARACTER*6		ETABLE			! Extension for events
       CHARACTER*40		NAME			! Column name
       CHARACTER*20		TYPE			! Column type
       CHARACTER*40		UNITS			! Column name
@@ -129,21 +130,26 @@
       OARG = ADI__NULLID
       RDF = .FALSE.
 
-*  Try to locate the EVENTS extension
-      CALL ADI2_FNDHDU( ARGS(2), 'EVENTS', EVHDU, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_ANNUL( STATUS )
-        CALL ADI2_FNDHDU( ARGS(2), 'STDEVT', EVHDU, STATUS )
-        RDF = .TRUE.
+*  Try to locate the extension containing events. If no HDU has been
+*  supplied search for EVENTS or STDEVT, otherwise use main HDU
+      CALL ADI_CGET0I( ARGS(2), 'UserHDU', UIHDU, STATUS )
+      IF ( UIHDU .GT. 0 ) THEN
+        CALL ADI2_FNDHDU( ARGS(2), ' ', EVHDU, STATUS )
+        ETABLE = '      '
+      ELSE
+        CALL ADI2_FNDHDU( ARGS(2), 'EVENTS', EVHDU, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          CALL ADI2_FNDHDU( ARGS(2), 'STDEVT', EVHDU, STATUS )
+          ETABLE = 'STDEVT'
+        ELSE
+          ETABLE = 'EVENTS'
+        END IF
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Write the event extension name as property
-      IF ( RDF ) THEN
-        CALL ADI_CPUT0C( ARGS(2), '.Etable', 'STDEVT', STATUS )
-      ELSE
-        CALL ADI_CPUT0C( ARGS(2), '.Etable', 'EVENTS', STATUS )
-      END IF
+      CALL ADI_CPUT0C( ARGS(2), '.Etable', ETABLE, STATUS )
 
 *  Read the keywords defining the number of events and columns
       CALL ADI2_HGKYI( EVHDU, 'TFIELDS', NLIST, STATUS )
