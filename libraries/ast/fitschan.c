@@ -19347,15 +19347,15 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *  The FITS-WCS Encoding:
 *     The FITS-WCS convention uses FITS header cards to describe the
 *     relationship between pixels in an image (not necessarily
-*     2-dimensional) and a related "world coordinate system" (often,
-*     although not necessarily, a celestial coordinate system) in
-*     terms of a sequence of transformations which convert between
-*     various intermediate coordinate systems. One of the
-*     transformations involved is a "sky projection" (e.g. as
+*     2-dimensional) and one or more related "world coordinate systems".
+*     Often, although not necessarily, one of these systems will be a 
+*     celestial coordinate system, in which case the sequence of 
+*     transformations which convert between the various intermediate 
+*     coordinate systems will include a "sky projection" (e.g. as
 *     implemented by a WcsMap).  The FITS-WCS encoding may only be
 *     used to store a single AST Object in any set of FITS header
 *     cards, and that Object must be a FrameSet which conforms to the
-*     FITS-WCS model.
+*     FITS-WCS model (the FrameSet may, however, contain multiple Frames).
 *
 c     When reading a FITS-WCS encoded Object (using astRead), the FitsChan
 f     When reading a FITS-WCS encoded Object (using AST_READ), the FitsChan
