@@ -15,7 +15,7 @@
 ### General DTD
 
 Implement a FOREIGN element (Mark)
-	Support such things as <foreign/et. al./
+	Support such things as <foreign/et. al./.  Dead easy to do.
 
 Non-sentence-ending periods (Rodney)
 	Abbrev element?  nbsp entity?
@@ -26,15 +26,17 @@ LaTeX as alt format (DSB)
 	could be used as an _alternative_, but legitimately ignored.
 
 hours and degrees elements (ACD)
-	Clive even supplied SGML _and_ LaTeX to support this!
+	Clive even supplied SGML _and_ LaTeX to support this!  Just a
+	matter of slotting them in when I'm next fiddling with that DTD.
 
 admonition (Norman/Mark)
 	At same level as BLOCKQUOTE, with a couple of `class'
-	attributes.  Could one of these classes be `quotation'?
+	attributes.  Should one of these classes be `epigraph'...?
 
 bibliography within source document (prog meeting)
-	Some folk don't (want to) use BibTeX, so it might be worth
-	supporting bib elements within the document.
+	Some folk don't (want to) use BibTeX, so it may be worth
+	supporting bib elements within the document _if_ that doesn't
+	make things too complicated (could I simply mimic BibTeX?).
 
 cross-references to CODECOLLECTIONs (Mark, 15 Sep)
 	Mark pointed out that this is OK from within the document
@@ -45,35 +47,39 @@ cross-references to CODECOLLECTIONs (Mark, 15 Sep)
 
 ### Programcode DTD
 
-allow `&' in codeprologue (prog meeting) [DTD, 19 Sept]
-	[ Supported in HTML DTD as of 19 Sept, but not yet in LaTeX
-	(but that'll be easy) ]
+allow `&' in codeprologue (prog meeting) [DTD+DC, 19 Sept]
+	[ Supported in DCs as of 19 Sept, but it _doesn't_ look very
+	nice ]
 
-programcode content modifications (Mark, and prog meeting) [DTD, 19 Sept]
-	Use SST elements.  [ Supported in HTML DTD as of 19 Sept, but
-	not yet in LaTeX.  Not hard, nor even particularly time-consuming. ]
+programcode content modifications (Mark, and prog meeting) [DTD+DC, 19 Sept]
+	Use SST elements.  [ Supported in DCs as of 19 Sept, but it
+	_doesn't_ look very nice ]
 
 shortrefs in programcode DTD (Mark)
 	Shortrefs to make lists in prologues tidier.  Nice, but I'm
 	always nervous of having too much cleverness in this area,
 	because the more shortrefs there are, the easier it is to type
 	one by accident, and so provoke a completely unintelligible
-	error message.
+	error message.  I don't plan to do anything with this before
+	we've discussed it at greater length.
 
 AUTHORREF element (Mark, 14 Sept)
 	`The AUTHORLIST element is a nasty example of SGML forcing one
 	to write something which one otherwise wouldn't want to'.
+	This is probably true, but there are no ideal alternatives, I
+	don't think.
 
 DL/DD/DT/BLOCKQUOTE/VERBATIM/M in prologues (Mark, 14 Sept) [DTD+DC]
 	Easy, I think.
 	[ Implemented by restructuring the General and Programcode
 	DTDs so that they both include a common set of para-level
 	elements.  No additional DC support needed, since the DC
-	support for the General DTD takes care of this. ]
+	support for the General DTD takes care of this.  Just needs
+	documented quickly. ]
 
 | func opener (Mark, 3/5 Aug and Norman, 4 Aug) [DTD+DC+DOC, 19 Sept]
 |	[ `opener' element named `codeopener' in DTD.  Neither DC support
-|	nor documentation needed.]
+|	nor documentation needed.  Finished. ]
 
 ### Down-converters
 
