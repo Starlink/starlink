@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun2.3}
-\newcommand{\stardocnumber}    {2.3}
+\newcommand{\stardocsource}    {sun2.4}
+\newcommand{\stardocnumber}    {2.4}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {28th February 2001}
+\newcommand{\stardocdate}      {15th June 2001}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.0}
+\newcommand{\stardocversion}   {Version 5.1}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -266,11 +266,14 @@ As a broad outline, applications use the NDG\_ package as follows:
 
 \begin{enumerate}
 
-\item A call is made to \htmlref{NDG\_ASSOC}{NDG\_ASSOC} which causes the user to be prompted for a
-single parameter. This parameter can be of any type. The
-user replies with a ``group expression'' (see \xref{SUN/150}{sun150}{}), which contains
-the names of a group of {\em existing} NDFs to be used as inputs by
-the application. For instance, the group expression may be 
+\item A call is made to \htmlref{NDG\_ASSOC}{NDG\_ASSOC} which causes the user 
+to be prompted for a single parameter. This parameter can be of any type.
+The user replies with a ``group expression'' (see
+\xref{SUN/150}{sun150}{}), which contains the names of a group of {\em
+existing} NDFs to be used as inputs by the application\footnote{The routine
+\htmlref{NDG\_ASEXP}{NDG\_ASEXP} performs the same function but does not
+use the parameter system - it expects the group expression to be supplied by 
+the calling routine.}. For instance, the group expression may be
 
 \begin{verbatim}
      m51_b[23]s1_ds,m51_b[23]s2_ds,m51_b[23]s2?_ds,^files.lis
@@ -442,6 +445,12 @@ to add further members.
 
 \section{List of Routines}
 
+\noteroutine{
+      CALL NDG\_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, STATUS )
+}{
+   Store names of existing NDFs supplied as a group expression by the
+   calling routine.
+}
 \noteroutine{
       CALL NDG\_ASSO1( PARAM, VERB, MODE, INDF, FIELDS, STATUS )
 }{
@@ -788,6 +797,166 @@ to add further members.
 
 
 \newpage
+\sstroutine{
+   NDG\_ASEXP
+}{
+   Store names of existing NDFs supplied as a group expression
+}{
+   \sstdescription{
+      The supplied group expression is parsed (using the facilities of
+      the GRP routine GRP\_GROUP, see SUN/150) to produce a list of
+      explicit names for existing NDFs which are appended to the end of
+      the supplied group (a new group is created if none is supplied).
+      NDF identifiers for particular members of the group can be obtained
+      using NDG\_NDFAS.
+
+      If any of the NDFs specified by the group expression cannot be
+      accessed, an error is reported and STATUS is returned equal to
+      NDG\_\_NOFIL. If this happens strings holding the name of each
+      bad NDF are appended to the group identified by IGRP1 (so long
+      as IGRP1 is not equal to GRP\_\_NOID).
+   }
+   \sstinvocation{
+      CALL NDG\_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         GRPEXP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The group expression specifying the NDF names to be stored
+         in the group.
+      }
+      \sstsubsection{
+         VERB = LOGICAL (Given)
+      }{
+         If TRUE then errors which occur whilst accessing supplied NDFs
+         are flushed so that the user can see the details ({\tt "}verbose{\tt "} mode).
+         Otherwise, they are annulled and a general {\tt "}Cannot access file xyz{\tt "}
+         message is reported instead.
+      }
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         The identifier of a group to which the names of any
+         inaccessable NDFs will be appended. The group should already
+         have been created by a call to GRP\_NEW, and should be deleted
+         when no longer needed by a call to GRP\_DELET. If IGRP1 is
+         supplied equal to symbolic constant GRP\_\_NOID, then no
+         information is stored describing the bad NDFs.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given and Returned)
+      }{
+         The identifier of the group in which the NDF names are to be
+         stored. A new group is created if the supplied value is GRP\_\_NOID.
+         It should be deleted when no longer needed using GRP\_DELET.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The total number of NDF names in the returned group IGRP2.
+      }
+      \sstsubsection{
+         FLAG = LOGICAL (Returned)
+      }{
+         If the group expression was terminated by the GRP {\tt "}flag
+         character{\tt "}, then FLAG is returned .TRUE. Otherwise it is
+         returned .FALSE. Returned .FALSE. if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Any file names containing wildcards are expanded into a list of NDF
+         names. The supplied strings are intepreted by a shell (/bin/tcsh if
+         it exists, otherwise /bin/csh, otherwise /bin/sh), and so may
+         contain shell meta-characters (eg twiddle, \$HOME, even command
+         substitution and pipes - but pipe characters {\tt "}$|${\tt "} need to be escaped
+         using a backslash {\tt "}$\backslash${\tt "} to avoid them being interpreted as GRP
+         editing characters).
+
+         \sstitem
+         Each supplied name may include an HDS path. For instance,
+         {\tt "}/home/dsb/mydata.a.c(1).b{\tt "} refers to an NDF stored in component
+         {\tt "}a.c(1).b{\tt "} in the HDS container file /home/dsb/mydata.sdf. Note,
+         wild cards are not allowed within HDS component paths (i.e. they
+         are only allowed within the specification of the container file).
+
+         \sstitem
+         If an HDS object is specified which is not an NDF, then the
+         object will be searched for NDF components. This search is
+         recursive, in that any components of the specified object are also
+         searched. The supplied name will be expanded into a group of names,
+         one for each NDF found within the specified HDS object. Note, NDFs
+         are not themselves searched for other NDFs. That is, the expanded
+         group of names will not include any NDF which is contained within
+         another NDF (i.e. NDFs which are stored as an extension item of
+         another NDF are not included in the group). For instance, if the
+         string {\tt "}fred{\tt "} is given, the HDS file fred.sdf will be searched for
+         NDFs and the returned group will contain references for all NDFs
+         found within fred.sdf.
+
+         \sstitem
+         If the environment variable NDF\_FORMATS\_IN is defined (see
+         SSN/20) then all possible NDFs matching the supplied string are
+         included in the returned group. For instance, if the string {\tt "}fred{\tt "}
+         is supplied, then the returned group will contain references to all
+         files with basename fred which also have a file type specified in
+         NDF\_FORMATS\_IN. If a FITS file {\tt "}fred.fit{\tt "} exists, and HDS file
+         {\tt "}fred.sdf{\tt "} also exists (and contains an NDF), then supplying the
+         name {\tt "}fred{\tt "} will result in both being included in the returned
+         group. If the file {\tt "}fred.sdf{\tt "} contains a component called {\tt "}.fit{\tt "},
+         then this will be included in the returned group in place of
+         {\tt "}fred.sdf{\tt "}.
+
+         \sstitem
+         NDFs contained within HDS files are opened in order to ensure
+         that they are valid NDFs. The NDF name is returned in IGRP1 if there
+         are no valid NDFs matching a supplied name. No check is made that any
+         foreign data files contain valid NDFs since this would involve a
+         potentially expensive data conversion. So, for instance, {\tt "}$*$.fit{\tt "} could
+         pick up FITS catalogues as well as FITS images. If a foreign data file
+         does not contain a valid NDF, an error will be reported when the NDF
+         is accessed using NDG\_NDFAS.
+
+         \sstitem
+         Each element in the returned group contains a full specification
+         for an NDF. Several other groups are created by this routine, and
+         are associated with the returned group by means of a GRP {\tt "}owner-slave{\tt "}
+         relationship. These supplemental groups are automatically deleted
+         when the returned group is deleted using GRP\_DELET. The returned
+         group should not be altered using GRP directly because corresponding
+         changes may need to be made to the supplemental groups. Routines
+         NDG\_SETSZ, NDG\_GTSUP and NDG\_PTSUP are provided to manipulate the
+         entire chain of groups. The full chain (starting from the head) is
+         as follows:
+
+         \sstitem
+            NDF slice specifications
+
+         \sstitem
+            HDS paths
+
+         \sstitem
+            File types
+
+         \sstitem
+            Base file names
+
+         \sstitem
+            Directory paths
+
+         \sstitem
+            Full NDF specification (this is the returned group IGRP)
+      }
+   }
+}
 \sstroutine{
    NDG\_ASSO1
 }{
@@ -1717,5 +1886,15 @@ to add further members.
       }
    }
 }
+
+\newpage
+\section{Changes Introduced in NDG Version 5.1}
+\begin{itemize}
+   \item A new routine NDG\_ASEXP has been added which allows a group of
+         existing NDFs to be created from a group expression supplied as 
+         a subroutine argument. This is very similar to NDG\_ASSOC except
+         that NDG\_ASSOC gets the group expression from the parameter system
+         instead of from its argument list.
+\end{itemize}
 
 \end{document}

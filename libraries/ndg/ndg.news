@@ -1,21 +1,10 @@
 1 NDG_library
 
-Version 5.0 of the NDG library (a library of fortran subroutines for
-accessing groups of NDFs) has been released. This release re-instates the
-use of glob strings such as "[a-z]" to match a single character from a
-given set of characters when specifying a group of existing NDFs.
+Version 5.1 of the NDG library (a library of fortran subroutines for
+accessing groups of NDFs) has been released. 
 
-Care should be taken if there is any ambiguity as to whether such a
-string is to be interpreted as a globbing pattern, or as a FITS image
-extension specifier. This can happen for instance if a file name ends
-with such a string. In this case, the string is first interpreted as a
-globbing pattern. Thus "fred[12]" would match files with base names
-"fred1" and "fred2". If the pattern does not match any existing files,
-then the trailing "[..]" string is next interpreted as a FITS extension
-specifier. Thus if fred.fit is a multi-extension FITS file, "fred[12]"
-would be interpreted as the twelth image extension in fred.fit only if
-files cannot be found with basenames "fred1" or "fred2". Specify
-"fred.fit[12]" instead of "fred[12]" if there is any danger of this.
-
-A bug is also fixed in V5.0 which could cause erroneous attempts to 
-access non-NDF objects as if they were NDFs.
+   o A new routine NDG_ASEXP has been added which allows a group of
+     existing NDFs to be created from a group expression supplied as a
+     subroutine argument. This is very similar to NDG_ASSOC except that
+     NDG_ASSOC gets the group expression from the parameter system
+     instead of from its argument list. 

@@ -107,7 +107,7 @@
 
 *  Get a group containing the three sdf names.
       IGRP2 = GRP__NOID
-      CALL NDG1_ASEXP( 'TOM,DICK,HARRY', .TRUE., GRP__NOID, IGRP2, 
+      CALL NDG_ASEXP( 'TOM,DICK,HARRY', .TRUE., GRP__NOID, IGRP2, 
      :                 SIZE, FLAG, STATUS )
 
 *  Delete the original group.

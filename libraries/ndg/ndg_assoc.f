@@ -237,7 +237,7 @@
 
 *  Expand the group expression into a list of NDF names and append
 *  them to the end of the specified group.
-      CALL NDG1_ASEXP( GRPEXP, VERB, IGRP2, IGRP, SIZE, FLAG, STATUS )
+      CALL NDG_ASEXP( GRPEXP, VERB, IGRP2, IGRP, SIZE, FLAG, STATUS )
 
 *  If some of the files were not valid NDFs, annul the error and then
 *  re-report a more friendly message for each bad NDF.
