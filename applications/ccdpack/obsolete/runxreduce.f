@@ -40,11 +40,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     5-JUN-1997 (PDRAPER):
 *        Original version.
+*     29-AUG-2004 (TIMJ):
+*        Use ONE_EXEC rather than CCD1_EXEC
 *     {enter_changes_here}
 
 *  Bugs:
@@ -76,7 +79,7 @@
       CALL PSX_GETENV( 'CCDPACK_DIR', CCDDIR, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
          CCDDIR = CCDDIR( :CHR_LEN( CCDDIR ) ) // '/xreduce &'
-         CALL CCD1_EXEC( CCDDIR, STATUS )
+         CALL ONE_EXEC( CCDDIR, STATUS )
       END IF
 
 *  If an error occurred, then report a contextual message.

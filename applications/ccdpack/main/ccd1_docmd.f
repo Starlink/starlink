@@ -36,6 +36,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *        Original version.
 *     4-SEP-1995 (PDRAPER):
 *        Added ICL support.
+*     29-AUG-2004 (TIMJ):
+*        Use ONE_EXEC rather than CCD1_EXEC
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,7 +95,7 @@
       COMMAND( IAT :IAT ) = '"'
 
 *  Execute it.
-      CALL CCD1_EXEC( COMMAND, STATUS )
+      CALL ONE_EXEC( COMMAND, STATUS )
 
 *  Check the return status.
       IF ( STATUS .NE. SAI__OK ) THEN
