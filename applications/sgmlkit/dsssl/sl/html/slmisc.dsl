@@ -197,6 +197,17 @@ to need explanation or elaboration.
   (make element
     (process-children-trim)))
 
+
+(element (li p)
+  (if (equal? (child-number (current-node)) 1)
+      (process-children-trim)
+      (make element gi: "p" (process-children-trim))))
+
+(element (dd p)
+  (if (equal? (child-number (current-node)) 1)
+      (process-children-trim)
+      (make element gi: "p" (process-children-trim))))
+
 ;;; Paragraphing
 
 ;(element p
