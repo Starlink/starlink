@@ -7247,8 +7247,9 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 
 /* Report an error if there are too few good points. */
       if( ngood[ j ] < MAJTICKS_OPT ){
-         astError( AST__VSMAL, "%s(%s): The area of the plot containing "
-                      "valid coordinates is too small.", method, class );
+         astError( AST__VSMAL, "%s(%s): The range of coordinate values "
+                   "covered by axis %d is too small to plot.", method, 
+                   class, j + 1 );
          break;
       }
 
