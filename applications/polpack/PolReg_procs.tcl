@@ -8990,7 +8990,7 @@ proc Save {} {
          set topf [MakeDialog $top "Progress,,," 1]
          SetHelp $topf ".  This dialog box indicates the progress which has been made towards creating and saving the output images."
 
-# Create abd pack all the items in the dialog box.
+# Create and pack all the items in the dialog box.
          set back "#b0b0b0"
 
          set fr0 [frame $topf.fr0]
@@ -9005,7 +9005,8 @@ proc Save {} {
          pack $imlist $pfrm -side left -fill both -padx 4m -pady 4m
 
          foreach image $IMAGES {
-            set fr [frame $imlist.$image -background $back]
+            regsub -all "." $image "" ni
+            set fr [frame $imlist.$ni -background $back]
             pack $fr -side top -fill x
 
             set lb($image) [label $fr.lb -text $image -anchor w \
@@ -9207,6 +9208,9 @@ proc Save {} {
                Wop $metick($ray) configure -foreground black
                Wop $ialab configure -foreground red 
 
+# Get the name of a tempotrary file to hold the output image in NDF format.
+               set outndf [UniqueFile]
+
 # Determine the output image name.
                set outim $OUTIMS($image,$ray)
 
@@ -9246,7 +9250,7 @@ proc Save {} {
                   }         
 
 # Transform the mask area using the mapping (if defined). 
-                  if { ![TranImage $maskarea $map $outim $sect] } {
+                  if { ![TranImage $maskarea $map $outndf $sect] } {
                      set ok 0
                      break
                   }
@@ -9284,7 +9288,7 @@ proc Save {} {
 # Add the required components to the POLPACK extension...
 # The ray label (only in dual-beam mode).
                   if { $DBEAM } {
-                     if { ![Extension $outim RAY _CHAR*1 $ray ""] } {
+                     if { ![Extension $outndf RAY _CHAR*1 $ray ""] } {
                         set ok 0
                         break
                      }
@@ -9292,7 +9296,7 @@ proc Save {} {
 
 # The axis rotations. If the input image already has an X axis rotation,
 # add the new rotation onto it.
-                  if { ![Extension $outim ROTATION _REAL "" old_rot] } { 
+                  if { ![Extension $outndf ROTATION _REAL "" old_rot] } { 
                      set ok 0 
                      break
                   }
@@ -9304,14 +9308,14 @@ proc Save {} {
                   }
 
 # Write out the X axis rotation.
-                  if { ![Extension $outim ROTATION _REAL $rot ""] } {
+                  if { ![Extension $outndf ROTATION _REAL $rot ""] } {
                      set ok 0
                      break
                   }
 
 # If the input image already has an Y axis rotation, add the new rotation 
 # onto it (and note that the output may contain shear).
-                  if { ![Extension $outim YROTATION _REAL "" old_rot] } { 
+                  if { ![Extension $outndf YROTATION _REAL "" old_rot] } { 
                      set ok 0 
                      break
                   }
@@ -9325,7 +9329,7 @@ proc Save {} {
 
 # If the output image may contain shear, write out the YROTATION keyword.
                   if { $shear } {
-                     if { ![Extension $outim YROTATION _REAL $yrot ""] } {
+                     if { ![Extension $outndf YROTATION _REAL $yrot ""] } {
                         set ok 0
                         break
                      }
@@ -9334,17 +9338,24 @@ proc Save {} {
 # The image identifier. This is only assigned a value if the IMGID component 
 # does not already exist. In this case, the name of the input image is
 # used.
-                  if { ![Extension $outim IMGID _CHAR "" old_plate] } { 
+                  if { ![Extension $outndf IMGID _CHAR "" old_plate] } { 
                      set ok 0 
                      break
                   }
 
                   if { $old_plate == "" } {
                      set plate [file tail $image]
-                     if { ![Extension $outim IMGID _CHAR $plate ""] } { 
+                     if { ![Extension $outndf IMGID _CHAR $plate ""] } { 
                         set ok 0 
                         break
                      }
+                  }
+
+# Copy the temporary output NDF to the requiested output image.
+                  exec cp ${outndf}.sdf /home/mips/dsb/ndf.sdf
+                  if { ![Obey ndfpack ndfcopy "in=$outndf out=$outim"] } {
+                     set ok 0
+                     break
                   }
 
 # Make the "header information" label (and associated tick mark) in the 
@@ -11659,6 +11670,9 @@ proc TranImage {data map trandata section} {
          }
 
          set ok [Obey ccdpack tranndf "inext=no logto=neither method=$method out=$trandata in=$data $shape transform=$trn"] 
+         catch "exec ls -al ${trandata}*"
+
+
 
 # Delete the TRANSFORM structure.
          HdsDel $trn

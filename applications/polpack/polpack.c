@@ -202,10 +202,10 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
    SetLVar( interp, "ATASK_HAREA", HAREA, STATUS );
    SetLVar( interp, "ATASK_SAREA", SAREA, STATUS );
    SetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
-   SetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
    SetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
    SetSVar( interp, "ATASK_POLCOL", POLCOL, POLCOL_length, STATUS );
    SetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
+   SetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
    SetRVar( interp, "ATASK_PLO", *PLO, STATUS );
    SetRVar( interp, "ATASK_PHI", *PHI, STATUS );
 
@@ -301,10 +301,10 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
    GetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
    GetRVar( interp, "ATASK_PLO", PLO, STATUS );
    GetRVar( interp, "ATASK_PHI", PHI, STATUS );
-   GetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
    GetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
    GetSVar( interp, "ATASK_POLCOL", POLCOL, POLCOL_length, STATUS );
    GetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
+   GetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
 
 #if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
 
@@ -548,12 +548,13 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    SetSVar( interp, "ATASK_CURCOL", CURCOL, CURCOL_length, STATUS );
    SetSVar( interp, "ATASK_REFCOL", REFCOL, REFCOL_length, STATUS );
    SetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
+   SetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
    SetIVar( interp, "ATASK_FIT", *FIT, STATUS );
    SetIVar( interp, "ATASK_OEFIT", *OEFIT, STATUS );
    SetRVar( interp, "ATASK_PLO", *PLO, STATUS );
    SetRVar( interp, "ATASK_PHI", *PHI, STATUS );
    if( LOGFIL_length > 0 ) {
-      SetSVar( interp, "ATASK_LOGFIL", LOGFIL, LOGFIL_length, STATUS );
+      SetSVar( interp, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
    }
 
 #if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
