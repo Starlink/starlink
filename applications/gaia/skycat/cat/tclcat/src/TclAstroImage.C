@@ -16,6 +16,7 @@
  */
 static const char* const rcsId="@(#) $Id: TclAstroImage.C,v 1.14 1998/08/21 10:45:59 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
 
 #include <string.h>
 #include <ctype.h>
@@ -23,7 +24,16 @@ static const char* const rcsId="@(#) $Id: TclAstroImage.C,v 1.14 1998/08/21 10:4
 #include <iostream.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include "TclAstroCat.h"
 #include "TclAstroImage.h"
 
@@ -268,7 +278,7 @@ int TclAstroImage::getimageCmd(int argc, char* argv[])
 int TclAstroImage::centerposCmd(int argc, char* argv[])
 {
     char buf[126];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
 
     pos_.print(os, equinox_);	// print coords in given equinox
     if (im_->isWcs())
@@ -430,7 +440,7 @@ int TclAstroImage::authorizeCmd(int argc, char* argv[])
     if (argc == 0) {
 	HTTP& http = im_->http();
 	char buf[1024];
-	std::ostrstream os(buf, sizeof(buf));
+	STRSTD::ostrstream os(buf, sizeof(buf));
 	os << http.authorizationRequired() 
 	   << " " << http.www_auth_realm()
 	   << " " << http.hostname() << ends;

@@ -15,12 +15,22 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
+#include "config.h"  //  From skycat util
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iostream.h>
 #include <fstream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -131,7 +141,7 @@ int AstroImage::getImage(const WorldOrImageCoords& pos, double width, double hei
 
 	// generate the http url command
 	char url[1024];	
-	std::ostrstream os(url, sizeof(url));
+	STRSTD::ostrstream os(url, sizeof(url));
 
 	// expand the variables in the http server command
 	const char* p = urls[i];

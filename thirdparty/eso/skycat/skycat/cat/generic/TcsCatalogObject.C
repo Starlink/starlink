@@ -12,12 +12,22 @@
  */
 static const char* const rcsId="@(#) $Id: TcsCatalogObject.C,v 1.6 1996/11/21 15:17:02 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
 
 #include <string.h>
 #include <stdlib.h>
 #include <iostream.h>
 #include <fstream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include "error.h"
 #include "WorldCoords.hxx"
 #include "TcsCatalogObject.h"
@@ -264,7 +274,7 @@ int TcsCatalogObject::printTableRow(ostream& os)
  */
 void TcsCatalogObject::print(char* buf, int bufsize) 
 {
-    std::ostrstream os(buf, bufsize);
+    STRSTD::ostrstream os(buf, bufsize);
     os << *this << ends;
 }
 
@@ -289,7 +299,7 @@ void TcsCatalogObject::printHeadings(ostream& os)
  */
 void TcsCatalogObject::printHeadings(char* buf, int bufsize) 
 {
-    std::ostrstream os(buf, bufsize);
+    STRSTD::ostrstream os(buf, bufsize);
     printHeadings(os);
     os << ends;
 }

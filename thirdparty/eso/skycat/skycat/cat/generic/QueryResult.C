@@ -12,13 +12,23 @@
  */
 static const char* const rcsId="@(#) $Id: QueryResult.C,v 1.22 1999/03/11 20:59:15 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <iostream.h>
 #include <fstream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include <unistd.h>
 #include "error.h"
 #include "QueryResult.h"
@@ -131,7 +141,7 @@ int QueryResult::circularSearch(
 	return 0;
 
     // search rows and put matching rows in "os"
-    std::ostrstream os;
+    STRSTD::ostrstream os;
     int n = 0;
     int i = 0;
     
@@ -355,7 +365,7 @@ void QueryResult::entry(CatalogInfoEntry* e, const char* result)
     entry_ = e;
 
     if (result) {
-	std::istrstream is(result);
+	STRSTD::istrstream is(result);
 	CatalogInfo::updateConfigEntry(is, e);
     }
 }

@@ -18,6 +18,7 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
+#include "config.h"  //  From skycat util
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -26,7 +27,16 @@ static const char* const rcsId="@(#) $Id$";
 #include <unistd.h>
 #include <iostream.h>
 #include <fstream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include "error.h"
 #include "Compress.h"
 #include "WorldOrImageCoords.h"
@@ -453,7 +463,7 @@ int AstroCatalog::genHttpQuery(char* buf, int bufsz, const AstroQuery& q, const 
     if (q.pos().status() != 0)
 	return ERROR;
 
-    std::ostrstream os(buf, bufsz);
+    STRSTD::ostrstream os(buf, bufsz);
     int i;
     int url_has_id = 0, 
 	url_has_radec = 0, 
