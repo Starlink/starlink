@@ -1,4 +1,3 @@
-
 sub tarxf {
 
 #  Extracts from a (optionally compressed) tar archive.
@@ -58,5 +57,25 @@ sub tarxf {
 
    return @fextracted;
 }
+
+########################################################################
+sub pushd {
+
+#  Pushd does the same thing as its C-shell namesake.
+
+   my $dir = shift;
+   push @dirstack, cwd;
+   chdir $dir or die "Couldn't change directory to $dir\n";
+}
+
+########################################################################
+sub popd {
+
+#  Popd does the same thing as its C-shell namesake.
+
+   my $dir = pop @dirstack;
+   chdir $dir or die "Couldn't change directory to $dir\n";
+}
+
 
 1;
