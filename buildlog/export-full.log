@@ -1,4 +1,6 @@
-shell-init: could not get curre
+/apps/jdk
+Buildfile: build.xml
+
 prepare:
 
 deinstall:
@@ -15,7 +17,8 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/sBuildfile: build.xml does not e     [echo] Executing axis target: deinstall
+   [delete] Deleting: /apps/cvsbuild/java/source/tamfits/.tamfits.install
+     [echo] Executing axis target: deinstall
 
 deinstall:
 
@@ -205,9 +208,17 @@ clean:
      [echo] Executing UTIL target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/util/etc
      [echo] Executing Task target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/task/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/task/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/task/docs
      [echo] Executing JNIAST target: clean
 
 clean:
@@ -798,7 +809,7 @@ install:
 prepare:
 
 check_packages:
-[available] Oct 22, 2003 9:30:14 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Oct 23, 2003 4:27:57 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -2005,10 +2016,10 @@ javadocs:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/GraphModel.html...
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node, i.e."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphViewListener.java:21: warning - @rating is an unknown tag.
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node, i.e. it can contain children."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphViewListener.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/MutableGraphModel.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeController.java:59: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeRenderer.java:20: warning - @rating is an unknown tag.
@@ -4343,8 +4354,10 @@ javadoc-sources:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsHints.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: Tag @see: Malformed: Plot, PlotConfig.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/LineControls.java:38: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: Tag @see: Malformed: AstAxisLabels,
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -4352,16 +4365,14 @@ javadoc-sources:
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/LineControls.java:38: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/SelectCharacters.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: Tag @see: Malformed: InsertCharacters, SelectCharactersModel
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharactersEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharactersModel.java:18: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectTextField.java:31: warning - @copyright is an unknown tag.
@@ -4393,4 +4404,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 15 minutes 17 seconds
+Total time: 15 minutes 20 seconds

@@ -288,9 +288,9 @@ javadoc-sources:
   [javadoc]  processed the same as FITSImages, i.e. are flipped top to bottom by
   [javadoc]  default and have their bad pixel flags set correctly.
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:280: warning - The first sentence is interpreted to be:
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:280: warning - The first sentence is interpreted to be:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e. get this Element then write the configuration data
@@ -475,4 +475,4 @@ javadoc-sources:
   [javadoc] 92 warnings
 
 BUILD SUCCESSFUL
-Total time: 6 minutes 50 seconds
+Total time: 6 minutes 25 seconds
