@@ -183,7 +183,8 @@
       FLAG = .FALSE.
 
 *  Loop round while text can be read from the file, and no error occurs.
-      DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND. STATUS .EQ. SAI__OK )
+      DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND. 
+     :          STATUS .EQ. SAI__OK )
          GEXP( GF : ) = LINE
 
 *  If a comment character is defined...
