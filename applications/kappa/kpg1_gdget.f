@@ -45,12 +45,21 @@
 *     present, it will be the Current Frame in the Plot on exit. See
 *     "Usage" below for warnings about using this option.
 *
-*     Finally, another Frame is added to the Plot representing normalised
-*     co-ordinates in the BASE picture. The axis scales are equal in this 
-*     Frame, and the co-ordinates of the bottom left corner are (0,0). The
-*     shorter axis has length 1.0, and the other axis has a length greater
-*     than 1.0. If the Plot read from the database already contains a
-*     BASEPIC Frame then it is retained and no new BASEPIC Frame is added.
+*     Finally, two other Frames are added to the Plot representing normalised
+*     co-ordinates in the BASE and current picture. The two Frames have
+*     Domain BASEPIC and CURPIC, and the axis scales are equal in both 
+*     this Frames:
+*
+*     BASEPIC: The co-ordinates of the bottom left corner of the BASE
+*     picture are (0,0). The shorter dimension of the BASE picture has 
+*     length 1.0, and the other axis has a length greater than 1.0. 
+*
+*     CURPIC: The co-ordinates of the bottom left corner of the current
+*     picture are (0,0). The shorter dimension of the current picture has 
+*     length 1.0, and the other axis has a length greater than 1.0. 
+*
+*     If the Plot read from the database already contains either of these
+*     Frames then it is retained and no new Frame is added.
 
 *  Usage:
 *     -  To create a new AGI picture, an AST-based application should 
@@ -143,6 +152,8 @@
 *        Original version.
 *     15-DEC-1998 (DSB):
 *        Modified to include the BASEPIC Frame in the returned Plot.
+*     14-OCT-1999 (DSB):
+*        Added CURPIC Frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -179,11 +190,13 @@
       DOUBLE PRECISION DBX( 4 )    ! D.P. version of BX
       DOUBLE PRECISION INA( 2 )    ! Corner A in GRAPHICS co-ords
       DOUBLE PRECISION INB( 2 )    ! Corner B in GRAPHICS co-ords
-      DOUBLE PRECISION OUTA( 2 )   ! Corner A in BASEPIC co-ords
-      DOUBLE PRECISION OUTB( 2 )   ! Corner B in BASEPIC co-ords
-      INTEGER WMAP                 ! GRAPHICS->BASEPIC WinMap
+      DOUBLE PRECISION OUTA( 2 )   ! Corner A in BASEPIC or CURPIC co-ords
+      DOUBLE PRECISION OUTB( 2 )   ! Corner B in BASEPIC or CURPIC co-ords
+      INTEGER WMAP                 ! GRAPHICS->BASEPIC/CURPIC WinMap
       INTEGER BPIC                 ! BASEPIC Frame
+      INTEGER CPIC                 ! CURPIC Frame
       INTEGER IBPIC                ! Index of BASEPIC Frame
+      INTEGER ICPIC                ! Index of CURPIC Frame
       INTEGER ICURR                ! Index of original current Frame
       INTEGER IPICL                ! AGI identifier for picture to use
       INTEGER IWOCO                ! Index of AGI world co-ordinates Frame
@@ -379,6 +392,65 @@
          IF( NAME .EQ. 'DATA' ) THEN
             CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
          END IF
+
+      END IF
+
+*  Add a Frame representing a normalised co-ordinate system in the current
+*  picture. This Frame has equals scales on both axes, and the shorter axis
+*  has a length of 1.0. This Frame is given the Domain CURPIC.
+*  ====================================================================
+
+*  See if the Plot already contains a CURPIC Frame.
+      CALL KPG1_ASFFR( IPLOT, 'CURPIC', ICPIC, STATUS )
+
+*  If not, add one into the Plot now.
+      IF( ICPIC .EQ. AST__NOFRAME ) THEN
+
+*  Get the bounds of the current window (in millimetres).
+         CALL PGQWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+
+*  Store these as the GRAPHICS co-ordinates.
+         INA( 1 ) = DBLE( BX( 1 ) )
+         INA( 2 ) = DBLE( BX( 2 ) )
+         INB( 1 ) = DBLE( BX( 3 ) )
+         INB( 2 ) = DBLE( BX( 4 ) )
+
+*  We now find the bounds of the current window in CURPIC co-ordinates (i.e.
+*  co-ordinates normalised so that the shorter axis has length 1.0).
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+     :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+     :                        ABS( BX( 4 ) - BX( 2 ) ) )
+            OUTB( 2 ) = 1.0D0
+         ELSE
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = 1.0D0
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+     :                        ABS( BX( 3 ) - BX( 1 ) ) )
+         END IF
+
+*  Create a WinMap which scales millimetres into CURPIC co-ordinates.
+         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+
+*  Create the CURPIC Frame.
+         CPIC = AST_FRAME( 2, 'DOMAIN=CURPIC,TITLE=Normalised world '//
+     :                     'co-ordinates in the current AGI picture.,'//
+     :                     'Symbol(1)=X,Symbol(2)=Y,'//
+     :                     'Label(1)=Horizontal offset,'//
+     :                     'Label(2)=Vertical offset',
+     :                     STATUS )
+
+*  Save the original current Frame index.
+         ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+
+*  Add the CURPIC Frame into the Plot.      
+         CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, CPIC, STATUS )
+
+*  Re-instate the original current Frame index. 
+         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
 

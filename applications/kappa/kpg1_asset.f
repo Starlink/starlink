@@ -37,16 +37,25 @@
 *     "defaults" text file. This file is found using the following search 
 *     path:
 *
-*     1) If the environment variable KAPPA_<PARAM> is defined, its value
-*     is taken to be the full path to the defaults file. No error is 
-*     reported and no defaults are used if the specified file cannot be 
-*     accessed.
+*     1) If the environment variable <APP>_<PARAM> is defined (<APP> and 
+*     <PARAM> in upper case), its value is taken to be the full path to 
+*     the defaults file. 
 *
-*     2) If KAPPA_<param> is not defined, the file $HOME/kappa_<param>.def
+*     2) If <APP>_<PARAM> is not defined, the file $HOME/<app>_<param>.def
+*     is used (<app> and <param> in lower case).
+*
+*     3) If the file $HOME/<app>_<param>.def cannot be accessed, the file
+*     $KAPPA_DIR/<app>_<param>.def is used.
+*
+*     4) If the file $KAPPA_DIR/<app>_<param>.def cannot be accessed, the
+*     value of environment variable KAPPA_<PARAM> is taken to be the full 
+*     path to the defaults file. 
+*
+*     5) If KAPPA_<PARAM> is not defined, the file $HOME/kappa_<param>.def
 *     is used.
 *
-*     3) If the file $HOME/kappa_<param>.def cannot be accessed, the file
-*     $KAPPA_DIR/<param>.def is used.
+*     6) If the file $HOME/kappa_<param>.def cannot be accessed, the file
+*     $KAPPA_DIR/kappa_<param>.def is used.
 *
 *     Each attribute setting within a group of settings should be of the 
 *     form "<name>=<value>", where <name> is taken to be the name of a 
@@ -87,6 +96,12 @@
 *  History:
 *     12-AUG-1998 (DSB):
 *        Original version.
+*     14-OCT-1999 (DSB):
+*        Added options for different defaults to be specified for each 
+*        application (items 1, 2 and 3 in the above defaults search path).
+*        Changed the final default from $KAPPA_DIR/<param>.def to
+*        $KAPPA_DIR/kappa_<param>/def to be consistent with the other
+*        files.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,11 +131,13 @@
 
 *  Local Variables:
       CHARACTER CLASS*20         ! Object class name
+      CHARACTER GRPEXP*(GRP__SZGEX)! Group expression to read file
       CHARACTER DFILE*(GRP__SZFNM)! Defaults file name
       CHARACTER TEXT*(GRP__SZNAM)! Gerenal character string
       INTEGER ADDED              ! No. of elements added to group
       INTEGER DSIZE              ! Size of defaults group
       INTEGER I                  ! String index
+      INTEGER LEXP               ! String length
       INTEGER IAT                ! Length of a string
       INTEGER IGRP1              ! GRP identifier for user-supplied strings
       INTEGER IGRP2              ! GRP identifier for default strings
@@ -199,9 +216,11 @@
 *  Create a group to hold the default attribute settings.
          CALL GRP_NEW( 'Default attributes', IGRP2, STATUS )
 
-*  Is the environment variable "KAPPA_<param>" defined?
-         TEXT = 'KAPPA_'
-         IAT = 6
+*  Is the environment variable "<APP>_<PARAM>" defined?
+         TEXT = ' '
+         IAT = 0
+         CALL CHR_APPND( APP, TEXT, IAT )
+         CALL CHR_APPND( '_', TEXT, IAT )
          CALL CHR_APPND( PARAM, TEXT, IAT )
          CALL CHR_UCASE( TEXT ( : IAT ) )
          CALL CHR_RMBLK( TEXT ( : IAT ) )
@@ -210,11 +229,11 @@
 *  If so, attempt to read the contents of the file into the group.
          IF( STATUS .EQ. SAI__OK ) THEN
             IF( DFILE .NE. ' ' ) THEN
-               TEXT = '^'
-               IAT = 1
-               CALL CHR_APPND( DFILE, TEXT, IAT )
-               CALL GRP_GRPEX( TEXT( : IAT ), GRP__NOID, IGRP2, DSIZE, 
-     :                         ADDED, FLAG, STATUS ) 
+               GRPEXP = '^'
+               LEXP = 1
+               CALL CHR_APPND( DFILE, GRPEXP, LEXP )
+               CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
+     :                         DSIZE, ADDED, FLAG, STATUS ) 
 
 *  Annul or flush (if verbose) the error if the file could not be read.
                IF( STATUS .NE. SAI__OK ) THEN
@@ -228,27 +247,25 @@
 
             END IF
 
-*  If the environment variable KAPPA_<param> was not defined, annul the 
-*  error, and attempt to read defaults from the file $HOME/kappa_<param>.def
+*  If the environment variable <APP>_<PARAM> was not defined, annul the 
+*  error, and attempt to read defaults from the file $HOME/<app>_<param>.def
          ELSE IF( STATUS .EQ. PSX__NOENV ) THEN
             CALL ERR_ANNUL( STATUS )
 
 *  Get the name of the file.
-            TEXT = 'kappa_'
-            IAT = 6
-            CALL CHR_APPND( PARAM, TEXT, IAT )
+            CALL CHR_LCASE( TEXT ( : IAT ) )
             CALL CHR_APPND( '.def', TEXT, IAT )
-            CALL CHR_LCASE( TEXT( : IAT ) )
 
 *  Get the full file path.
-            CALL KPG1_FLPTH( 'HOME', TEXT( : IAT ), DFILE, IAT, STATUS )
+            CALL KPG1_FLPTH( 'HOME', TEXT( : IAT ), DFILE, LEXP, 
+     :                       STATUS )
 
 *  Attempt to read the contents of the file into the group.
-            TEXT = '^'
-            IAT = 1
-            CALL CHR_APPND( DFILE, TEXT, IAT )
-            CALL GRP_GRPEX( TEXT( : IAT ), GRP__NOID, IGRP2, DSIZE, 
-     :                      ADDED, FLAG, STATUS ) 
+            GRPEXP = '^'
+            LEXP = 1
+            CALL CHR_APPND( DFILE, GRPEXP, LEXP )
+            CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
+     :                         DSIZE, ADDED, FLAG, STATUS ) 
 
 *  Annul or flush (if verbose) the error if the file could not be read.
             IF( STATUS .NE. SAI__OK ) THEN
@@ -259,22 +276,15 @@
                END IF
                DSIZE = 0
 
-*  Finally, try to use $KAPPA_DIR/<param>.def. Get the name of the file.
-               TEXT = ' '
-               IAT = 0
-               CALL CHR_APPND( PARAM, TEXT, IAT )
-               CALL CHR_APPND( '.def', TEXT, IAT )
-               CALL CHR_LCASE( TEXT( : IAT ) )
-
-*  Get the full file path.
+*  Next, try to use $KAPPA_DIR/<app>_<param>.def. Get the full file path.
                CALL KPG1_FLPTH( 'KAPPA_DIR', TEXT( : IAT ), DFILE, 
-     :                          IAT, STATUS )
+     :                          LEXP, STATUS )
 
 *  Attempt to read the contents of the file into the group.
-               TEXT = '^'
-               IAT = 1
-               CALL CHR_APPND( DFILE, TEXT, IAT )
-               CALL GRP_GRPEX( TEXT( : IAT ), GRP__NOID, IGRP2, 
+               GRPEXP = '^'
+               LEXP = 1
+               CALL CHR_APPND( DFILE, GRPEXP, LEXP )
+               CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
      :                         DSIZE, ADDED, FLAG, STATUS ) 
 
 *  Annul or flush (if verbose) the error if the file could not be read.
@@ -285,6 +295,90 @@
                      CALL ERR_ANNUL( STATUS )
                   END IF
                   DSIZE = 0
+
+*  Is the environment variable "KAPPA_<PARAM>" defined?
+                  TEXT = 'KAPPA_'
+                  IAT = 6
+                  CALL CHR_APPND( PARAM, TEXT, IAT )
+                  CALL CHR_UCASE( TEXT ( : IAT ) )
+                  CALL CHR_RMBLK( TEXT ( : IAT ) )
+                  CALL PSX_GETENV( TEXT( : IAT ), DFILE, STATUS )
+
+*  If so, attempt to read the contents of the file into the group.
+                  IF( STATUS .EQ. SAI__OK ) THEN
+                     IF( DFILE .NE. ' ' ) THEN
+                        GRPEXP = '^'
+                        LEXP = 1
+                        CALL CHR_APPND( DFILE, GRPEXP, LEXP )
+                        CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, 
+     :                               IGRP2, DSIZE, ADDED, FLAG, STATUS ) 
+
+*  Annul or flush (if verbose) the error if the file could not be read.
+                        IF( STATUS .NE. SAI__OK ) THEN
+                           IF( VERB ) THEN
+                              CALL ERR_FLUSH( STATUS )
+                           ELSE
+                              CALL ERR_ANNUL( STATUS )
+                           END IF
+                           DSIZE = 0
+                        END IF
+         
+                     END IF
+
+*  If the environment variable KAPPA_<PARAM> was not defined, annul the 
+*  error, and attempt to read defaults from the file $HOME/kappa_<param>.def
+                  ELSE IF( STATUS .EQ. PSX__NOENV ) THEN
+                     CALL ERR_ANNUL( STATUS )
+
+*  Get the name of the file.
+                     CALL CHR_LCASE( TEXT ( : IAT ) )
+                     CALL CHR_APPND( '.def', TEXT, IAT )
+
+*  Get the full file path.
+                     CALL KPG1_FLPTH( 'HOME', TEXT( : IAT ), DFILE,
+     :                                 LEXP, STATUS )
+
+*  Attempt to read the contents of the file into the group.
+                     GRPEXP = '^'
+                     LEXP = 1
+                     CALL CHR_APPND( DFILE, GRPEXP, LEXP )
+                     CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, IGRP2,
+     :                               DSIZE, ADDED, FLAG, STATUS ) 
+
+*  Annul or flush (if verbose) the error if the file could not be read.
+                     IF( STATUS .NE. SAI__OK ) THEN
+                        IF( VERB ) THEN
+                           CALL ERR_FLUSH( STATUS )
+                        ELSE
+                           CALL ERR_ANNUL( STATUS )
+                        END IF
+                        DSIZE = 0
+
+*  Next, try to use $KAPPA_DIR/kappa_<param>.def. Get the full file path.
+                        CALL KPG1_FLPTH( 'KAPPA_DIR', TEXT( : IAT ), 
+     :                                   DFILE, LEXP, STATUS )
+
+*  Attempt to read the contents of the file into the group.
+                        GRPEXP = '^'
+                        LEXP = 1
+                        CALL CHR_APPND( DFILE, GRPEXP, LEXP )
+                        CALL GRP_GRPEX( GRPEXP( : LEXP ), GRP__NOID, 
+     :                               IGRP2, DSIZE, ADDED, FLAG, STATUS ) 
+
+*  Annul or flush (if verbose) the error if the file could not be read.
+                        IF( STATUS .NE. SAI__OK ) THEN
+                           IF( VERB ) THEN
+                              CALL ERR_FLUSH( STATUS )
+                           ELSE
+                              CALL ERR_ANNUL( STATUS )
+                           END IF
+                           DSIZE = 0
+
+                        END IF
+         
+                     END IF                                    
+         
+                  END IF
 
                END IF
 
