@@ -131,77 +131,83 @@ die "This is not a photometry output file\n" if $#names == -1;
 ndf_begin;
 
 
-
 # Loop over each name
 foreach $name (@names) {
 
-   # Read the header info
-   ($hashref,$status) = fits_read_header("$file.$name");
+  # Read the header info
+  ($hashref,$status) = fits_read_header("$file.$name");
 
-   # If $run_no is undefined we need to read it from the fits header
-   $run_no = $hashref->{RUN} unless (defined $run_no);
+  # If $run_no is undefined we need to read it from the fits header
+  $run_no = $hashref->{RUN} unless (defined $run_no);
 
-   # Construct output file name if necessary
-   # and open the file
-   unless (defined $output_file) {
-     $output_file = "obs${run_no}.dat";
-     print "Output filename is $output_file\n";
-     open(OUT, "> $output_file") || die "Error could not open output file: $!";
-     select OUT;
-   }
-
+  # Bolometer name
   $name =~ /(.*)_PEAK/ & ($bol = $1);
 
-  print "\n";
+  # Get the root output name
+  if (defined $out) {
+    $root = $out;
+  } else {
+    $root = "obs${run_no}";
+  }
+
+  # Construct output file name if necessary
+  # Use the bolometer name as well
+  # and open the file. Treat $out as a root name.
+  
+  $output_file = $root . "_$bol"  . ".dat";
+
+  print "Output filename is $output_file\n";
+
+  open(OUT, "> $output_file") || die "Error could not open output file: $!";
+
   # print the first line of the header
-  print "$$hashref{OBJECT} $$hashref{WAVE_1} ${bol}_$$hashref{RUN} $$hashref{UTDATE}\n";
+  print OUT "$$hashref{OBJECT} $$hashref{WAVE_1} ${bol}_$$hashref{RUN} $$hashref{UTDATE}\n";
+  
+  # Now need to find out how many integrations we have so that
+  # we can split it into sections
 
-    # Now need to find out how many integrations we have so that
-    # we can split it into sections
+  ndf_find(&NDF::DAT__ROOT, "$file.$name", $indf, $status);
 
-    ndf_find(&NDF::DAT__ROOT, "$file.$name", $indf, $status);
+  #    ndf_size($indf, $npix, $status);
+  @dim = ();
+  ndf_dim($indf, 1, @dim, $ndim, $status);
+  #    ndf_size($indf, $npix, $status);
+  $npix = $dim[0];
+  ndf_annul($indf, $status);
+  
+  # Now that I know the size print the second header line
+  $nposplate = int($npix/$int_per_wp + 0.99);
+  $ncycle = int($nposplate/16.0);
+  
+  # Convert the time to hours
+  (@times) = split(/:/,$$hashref{STSTART});
+  $lst = $times[0] + ($times[1] / 60) + ($times[2] / 3600); 
+  
+  print OUT "$nposplate $ncycle $$hashref{MEANRA} $$hashref{MEANDEC} $lst\n";
+  
+  # Number of time round the loop depends on $npix
+  
+  for ($i = 1; $i <= $npix; $i += $int_per_wp) {
+    $start = $i;
+    $end = $start + $int_per_wp - 1;
+    $end = "" if $end > $npix;
+    
+    # Find stats of section (using Kappa for now)
+    $section = "$file.$name($start:$end)";
+    $exstat = system("$kappa/stats '$section' > /dev/null");
+    
+    ($mean) =  par_get("mean", "stats", \$status);
+    ($sigma) = par_get("sigma", "stats", \$status);
+    
+    print OUT "$mean   $sigma\n";
 
-#    ndf_size($indf, $npix, $status);
-    @dim = ();
-    ndf_dim($indf, 1, @dim, $ndim, $status);
-#    ndf_size($indf, $npix, $status);
-    $npix = $dim[0];
-    ndf_annul($indf, $status);
+  }
 
-    # Now that I know the size print the second header line
-    $nposplate = int($npix/$int_per_wp + 0.99);
-    $ncycle = int($nposplate/16.0);
-
-    # Convert the time to hours
-    (@times) = split(/:/,$$hashref{STSTART});
-    $lst = $times[0] + ($times[1] / 60) + ($times[2] / 3600); 
-
-    print "$nposplate $ncycle $$hashref{MEANRA} $$hashref{MEANDEC} $lst\n";
-
-    # Number of time round the loop depends on $npix
-
-    for ($i = 1; $i <= $npix; $i += $int_per_wp) {
-      $start = $i;
-      $end = $start + $int_per_wp - 1;
-      $end = "" if $end > $npix;
-
-      # Find stats of section (using Kappa for now)
-      $section = "$file.$name($start:$end)";
-      $exstat = system("$kappa/stats '$section' > /dev/null");
-
-      ($mean) =  par_get("mean", "stats", \$status);
-      ($sigma) = par_get("sigma", "stats", \$status);
-
-      print "$mean   $sigma\n";
-
-    }
-
-
+  # Close output file
+  close(OUT);
 
 }
 
-# Close output file
-close(OUT);
 
 # Shut down NDF
 
