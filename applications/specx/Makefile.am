@@ -3,7 +3,7 @@
 SUBDIRS = @subdirs@
 
 
-dist_pkgdata_DATA = $(RUNTIME_FILES) $(EXAMPLES_FILES)
+dist_pkgdata_DATA = $(RUNTIME_FILES) $(EXAMPLES_FILES) $(COMFILES)
 
 
 # These files are needed for specx to run
