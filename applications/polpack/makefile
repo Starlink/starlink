@@ -416,23 +416,22 @@ F_SUB1 = ndg1_expan.f ndg1_lasto.f ndg1_ndfch.f ndg_annul.f ndg_asexp.f \
 ndg_assoc.f ndg_creat.f ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f \
 ndg_ndfpr.f ndg1_hspec.f ndg1_mspec.f ndg1_match.f ndg1_subst.f 
 
-F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f \
-polcent.f polhelp.f polka.f pthlpo.f rdndf.f sread.f \
-wrndf.f polcal.f ndfac.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f \
-ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
-ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
-ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
-ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f polext.f \
-pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f \
-polvec.f pol1_plvec.f pol1_gtwcs.f ccd1_orvar.f pol1_stk.f \
-pol1_stbin.f pol1_cm1rr.f pol1_cm3rr.f ccg1_mer1r.f ccg1_mer3r.f \
-ccg1_scr1r.f ccg1_scr3r.f ccg1_clipr.f pol1_mkcat.f pol1_clcat.f \
-pol1_cpctd.f pol1_cpctr.f pol1_vect.f \
-pol1_gtcta.f pol1_gtctc.f \
-pol1_vecky.f pol1_vecpl.f polplot.f \
-pol1_squar.f pol1_clcnt.f \
-pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f \
-ccd1_repc.f pol1_rmbnd.f pol1_gtctw.f
+F_SUB2 =  \
+ccd1_asfio.f ccd1_cfgrp.f ccd1_cmprr.f ccd1_ftgrp.f ccd1_hvcon.f \
+ccd1_iscom.f ccd1_mall.f ccd1_mfree.f ccd1_nxwrd.f ccd1_orvar.f \
+ccd1_qntlr.f ccd1_qsrtr.f ccd1_rdlin.f ccd1_repc.f ccd1_rmcom.f \
+ccd1_skysr.f ccg1_cenr.f ccg1_clipr.f ccg1_cmltr.f ccg1_is2r.f \
+ccg1_is3r.f ccg1_is4d.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_mer1r.f \
+ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f ccg1_wtm2r.f ccg1_wtm3r.f \
+datapic.f gethlp.f gthlpi.f ndfac.f pol1_chkex.f pol1_clcat.f \
+pol1_clcnt.f pol1_cm1rr.f pol1_cm3rr.f pol1_cpctd.f pol1_cpctr.f \
+pol1_ctclm.f pol1_deftb.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
+pol1_gtwcs.f pol1_imfit.f pol1_knext.f pol1_lnam.f pol1_mkcat.f \
+pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
+pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_vecky.f pol1_vecpl.f \
+pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
+polcal.f polcent.f polexp.f polext.f polhelp.f polimp.f polka.f \
+polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f 
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -1400,231 +1399,90 @@ strip:
 #  Object file dependencies on include files (or links to those include
 #  files).  These are normally generated automatically from the source
 #  files.
-ccd1_asfio.o:	FIO_PAR     
-ccd1_asfio.o:	PAR_ERR     
-ccd1_asfio.o:	SAE_PAR     
-ccd1_cfgrp.o:	CCD1_PAR    
-ccd1_cfgrp.o:	SAE_PAR     
-ccd1_cmprr.o:	PRM_PAR     
-ccd1_cmprr.o:	SAE_PAR     
-ccd1_ftgrp.o:	GRP_PAR     
-ccd1_ftgrp.o:	SAE_PAR     
-ccd1_ftgrp.o:	TRN_ERR     
-ccd1_hvcon.o:	SAE_PAR     
-ccd1_iscom.o:	SAE_PAR     
-ccd1_mall.o:	CCD1_MEMCM  
-ccd1_mall.o:	CCD1_PAR    
-ccd1_mall.o:	PRM_PAR     
-ccd1_mall.o:	SAE_PAR     
-ccd1_mfree.o:	CCD1_MEMCM  
-ccd1_mfree.o:	CCD1_PAR    
-ccd1_nxwrd.o:	CHR_ERR     
-ccd1_nxwrd.o:	SAE_PAR     
-ccd1_orvar.o:	CCD1_PAR
-ccd1_orvar.o:	SAE_PAR
-ccd1_qntlr.o:	SAE_PAR     
-ccd1_qsrtr.o:	SAE_PAR     
-ccd1_rdlin.o:	FIO_ERR     
-ccd1_rdlin.o:	SAE_PAR     
-ccd1_rmcom.o:	SAE_PAR     
-ccd1_skysr.o:	PRM_PAR     
-ccd1_skysr.o:	SAE_PAR     
-ccg1_cenr.o:	NUM_DEC_CVT 
-ccg1_cenr.o:	NUM_DEF_CVT 
-ccg1_cenr.o:	PRM_PAR     
-ccg1_cenr.o:	SAE_PAR     
-ccg1_clipr.o:	PRM_PAR
-ccg1_clipr.o:	SAE_PAR
-ccg1_cmltr.o:	NUM_CMN     
-ccg1_cmltr.o:	NUM_DEC_CVT 
-ccg1_cmltr.o:	NUM_DEC_R   
-ccg1_cmltr.o:	NUM_DEF_CVT 
-ccg1_cmltr.o:	NUM_DEF_R
-ccg1_cmltr.o:	PRM_PAR     
-ccg1_cmltr.o:	SAE_PAR     
-ccg1_is2r.o:	SAE_PAR     
-ccg1_is3r.o:	SAE_PAR     
-ccg1_is4d.o:	SAE_PAR     
-ccg1_mdr1r.o:	NUM_CMN     
-ccg1_mdr1r.o:	NUM_DEC_CVT 
-ccg1_mdr1r.o:	NUM_DEF_CVT 
-ccg1_mdr1r.o:	PRM_PAR     
-ccg1_mdr1r.o:	SAE_PAR     
-ccg1_mdr3r.o:	NUM_CMN     
-ccg1_mdr3r.o:	NUM_DEC_CVT 
-ccg1_mdr3r.o:	NUM_DEF_CVT 
-ccg1_mdr3r.o:	PRM_PAR     
-ccg1_mdr3r.o:	SAE_PAR     
-ccg1_mer1r.o:	NUM_CMN
-ccg1_mer1r.o:	NUM_DEC_CVT
-ccg1_mer1r.o:	NUM_DEF_CVT
-ccg1_mer1r.o:	PRM_PAR
-ccg1_mer1r.o:	SAE_PAR
-ccg1_mer3r.o:	NUM_CMN
-ccg1_mer3r.o:	NUM_DEC_CVT
-ccg1_mer3r.o:	NUM_DEF_CVT
-ccg1_mer3r.o:	PRM_PAR
-ccg1_mer3r.o:	SAE_PAR
-ccg1_scr1r.o:	NUM_CMN
-ccg1_scr1r.o:	NUM_DEC_CVT
-ccg1_scr1r.o:	NUM_DEF_CVT
-ccg1_scr1r.o:	PRM_PAR
-ccg1_scr1r.o:	SAE_PAR
-ccg1_scr3r.o:	NUM_CMN
-ccg1_scr3r.o:	NUM_DEC_CVT
-ccg1_scr3r.o:	NUM_DEF_CVT
-ccg1_scr3r.o:	PRM_PAR
-ccg1_scr3r.o:	SAE_PAR
-ccg1_wtm2r.o:	NUM_DEC_CVT 
-ccg1_wtm2r.o:	NUM_DEF_CVT 
-ccg1_wtm2r.o:	SAE_PAR     
-ccg1_wtm3r.o:	NUM_DEC_CVT 
-ccg1_wtm3r.o:	NUM_DEF_CVT 
-ccg1_wtm3r.o:	SAE_PAR     
-datapic.o:	SAE_PAR     
-gethlp.o:	HLPCMD      
-gethlp.o:	SAE_PAR     
-gthlpi.o:	HLPCMD      
-gthlpi.o:	SAE_PAR     
-pol1_cpctd.o:	SAE_PAR PRM_PAR
-pol1_cpctr.o:	SAE_PAR PRM_PAR
-pol1_gtcta.o:	SAE_PAR AST_PAR CAT_PAR
-pol1_gtctw.o:	SAE_PAR AST_PAR CAT_PAR
-pol1_gtctc.o:	SAE_PAR CAT_PAR CAT_ERR PAR_ERR
-pol1_vecky.o:	SAE_PAR AST_PAR
-ndfac.o:	SAE_PAR     
-ndg1_expan.o:	DAT_PAR
-ndg1_expan.o:	GRP_PAR
-ndg1_expan.o:	NDG_CONST
-ndg1_expan.o:	NDG_ERR
-ndg1_expan.o:	SAE_PAR
-ndg1_hspec.o:	GRP_PAR
-ndg1_hspec.o:	SAE_PAR
-ndg1_lasto.o:	SAE_PAR
-ndg1_match.o:	GRP_PAR
-ndg1_match.o:	NDG_CONST
-ndg1_match.o:	SAE_PAR
-ndg1_mspec.o:	GRP_PAR
-ndg1_mspec.o:	SAE_PAR
-ndg1_ndfch.o:	GRP_PAR
-ndg1_ndfch.o:	NDG_ERR
-ndg1_ndfch.o:	PSX_ERR
-ndg1_ndfch.o:	SAE_PAR
-ndg1_subst.o:	SAE_PAR
-ndg_asexp.o:	GRP_PAR
-ndg_asexp.o:	NDG_CONST
-ndg_asexp.o:	NDG_ERR
-ndg_asexp.o:	SAE_PAR
-ndg_assoc.o:	GRP_ERR
-ndg_assoc.o:	GRP_PAR
-ndg_assoc.o:	NDG_ERR
-ndg_assoc.o:	PAR_ERR
-ndg_assoc.o:	SAE_PAR
-ndg_creat.o:	GRP_PAR
-ndg_creat.o:	PAR_ERR
-ndg_creat.o:	SAE_PAR
-ndg_crexp.o:	GRP_PAR
-ndg_crexp.o:	NDG_CONST
-ndg_crexp.o:	PSX_ERR
-ndg_crexp.o:	SAE_PAR
-ndg_ndfas.o:	DAT_PAR
-ndg_ndfas.o:	GRP_PAR
-ndg_ndfas.o:	NDF_PAR
-ndg_ndfas.o:	NDG_CONST
-ndg_ndfas.o:	SAE_PAR
-ndg_ndfcr.o:	DAT_PAR
-ndg_ndfcr.o:	GRP_PAR
-ndg_ndfcr.o:	NDF_PAR
-ndg_ndfcr.o:	NDG_CONST
-ndg_ndfcr.o:	SAE_PAR
-ndg_ndfpr.o:	DAT_PAR
-ndg_ndfpr.o:	GRP_PAR
-ndg_ndfpr.o:	NDF_PAR
-ndg_ndfpr.o:	NDG_CONST
-ndg_ndfpr.o:	SAE_PAR
-pol1_chkex.o:	AST_PAR     
-pol1_chkex.o:	DAT_PAR     
-pol1_chkex.o:	GRP_PAR     
-pol1_chkex.o:	NDF_PAR     
-pol1_chkex.o:	SAE_PAR     
-pol1_clcat.o:	AST_PAR
-pol1_clcat.o:	SAE_PAR
-pol1_cm1rr.o:	SAE_PAR
-pol1_cm3rr.o:	SAE_PAR
-pol1_gtwcs.o:	AST_PAR
-pol1_gtwcs.o:	NDF_PAR
-pol1_gtwcs.o:	SAE_PAR
-pol1_imfit.o:	DAT_PAR     
-pol1_imfit.o:	GRP_PAR     
-pol1_imfit.o:	MSG_PAR     
-pol1_imfit.o:	SAE_PAR     
-pol1_knext.o:	SAE_PAR     
-pol1_lnam.o:	FIO_PAR     
-pol1_lnam.o:	GRP_PAR     
-pol1_lnam.o:	SAE_PAR     
-pol1_mkcat.o:	CAT_PAR
-pol1_mkcat.o:	SAE_PAR
-pol1_plvec.o:	PRM_PAR
-pol1_plvec.o:	SAE_PAR
-pol1_rmbnd.o:	SAE_PAR
-pol1_rmbnd.o:	PRM_PAR
-pol1_setft.o: 	DAT_PAR
-pol1_setft.o: 	SAE_PAR
-pol1_stbin.o:	SAE_PAR
-pol1_stk.o:	SAE_PAR
-pol1_sto0.o:	SAE_PAR DAT_PAR PRM_PAR     
-pol1_stoc.o:	SAE_PAR DAT_PAR PRM_PAR     
-pol1_vecpl.o:	SAE_PAR PRM_PAR MSG_PAR                                       
-pol_cale.o:	PRM_PAR     
-pol_cale.o:	SAE_PAR     
-pol_calf.o:	PRM_PAR     
-pol_calf.o:	SAE_PAR     
-pol_calp.o:	SAE_PAR     
-pol_calti.o:	PRM_PAR     
-pol_calti.o:	SAE_PAR     
-polcal.o:	NDF_PAR     
-polcal.o:	PRM_PAR     
-polcal.o:	SAE_PAR     
-polcal.o:	PAR_ERR
-polcal.o:	DAT_PAR
-polcent.o:	PAR_ERR SAE_PAR FIO_ERR
-polexp.o:	DAT_PAR
-polexp.o:	GRP_PAR
-polexp.o:	SAE_PAR
-polext.o:	SAE_PAR
-polext.o:	DAT_PAR
-polext.o:	GRP_PAR
-polext.o:	PAR_ERR
-polhelp.o:	PAR_ERR     
-polhelp.o:	SAE_PAR     
-polimp.o:	DAT_PAR
-polimp.o:	FIO_PAR
-polimp.o:	SAE_PAR
-polka.o:	GRP_PAR PAR_ERR PRM_PAR NDF_PAR SAE_PAR     
-polpack_mon.o:	SAE_PAR PAR_PAR
-polvec.o:	NDF_PAR
-polvec.o:	PRM_PAR
-polvec.o:	PAR_ERR
-polvec.o:	SAE_PAR
-pthlpo.o:	HLPCMD      
-pthlpo.o:	SAE_PAR     
-rdndf.o:	GRP_PAR     
-rdndf.o:	MSG_PAR     
-rdndf.o:	NDG_ERR     
-rdndf.o:	PAR_ERR     
-rdndf.o:	SAE_PAR     
-wrndf.o:	GRP_PAR     
-wrndf.o:	MSG_PAR     
-wrndf.o:	NDG_ERR     
-wrndf.o:	PAR_ERR     
-wrndf.o:	SAE_PAR     
-grf_polpack.o:	grf.h ast.h
-pol1_squar.o:	SAE_PAR PRM_PAR
-pol1_clcnt.o:	SAE_PAR PRM_PAR
-pol1_stk2.o:	SAE_PAR PRM_PAR
-pol1_ctclm.o:	SAE_PAR PRM_PAR
-pol1_setd.o:	SAE_PAR 
-polbin.o:	SAE_PAR PRM_PAR AST_PAR CAT_PAR PAR_ERR
+ccd1_asfio.o:	 SAE_PAR PAR_ERR FIO_PAR
+ccd1_cfgrp.o:	 SAE_PAR CCD1_PAR
+ccd1_cmprr.o:	 SAE_PAR PRM_PAR
+ccd1_ftgrp.o:	 SAE_PAR GRP_PAR TRN_ERR
+ccd1_hvcon.o:	 SAE_PAR
+ccd1_iscom.o:	 SAE_PAR
+ccd1_mall.o:	 SAE_PAR PRM_PAR CCD1_PAR CCD1_MEMCM
+ccd1_mfree.o:	 CCD1_PAR CCD1_MEMCM
+ccd1_nxwrd.o:	 SAE_PAR CHR_ERR
+ccd1_orvar.o:	 SAE_PAR CCD1_PAR
+ccd1_qntlr.o:	 SAE_PAR
+ccd1_qsrtr.o:	 SAE_PAR
+ccd1_rdlin.o:	 SAE_PAR FIO_ERR
+ccd1_repc.o:	 SAE_PAR
+ccd1_rmcom.o:	 SAE_PAR
+ccd1_skysr.o:	 SAE_PAR PRM_PAR
+ccg1_cenr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_clipr.o:	 SAE_PAR PRM_PAR
+ccg1_cmltr.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+ccg1_is2r.o:	 SAE_PAR
+ccg1_is3r.o:	 SAE_PAR
+ccg1_is4d.o:	 SAE_PAR
+ccg1_mdr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mdr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mer1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mer3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_scr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_scr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm2r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm3r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+datapic.o:	 SAE_PAR
+gethlp.o:	 SAE_PAR HLPCMD
+gthlpi.o:	 SAE_PAR HLPCMD
+ndfac.o:	 SAE_PAR
+pol1_cext.o:	 SAE_PAR
+pol1_chkex.o:	 SAE_PAR GRP_PAR DAT_PAR NDF_PAR AST_PAR
+pol1_clcat.o:	 SAE_PAR AST_PAR
+pol1_clcnt.o:	 SAE_PAR PRM_PAR
+pol1_cm1rr.o:	 SAE_PAR
+pol1_cm3rr.o:	 SAE_PAR
+pol1_cpctd.o:	 SAE_PAR PRM_PAR
+pol1_cpctr.o:	 SAE_PAR PRM_PAR
+pol1_ctclm.o:	 SAE_PAR PRM_PAR
+pol1_deftb.o:	 SAE_PAR GRP_PAR
+pol1_gtcta.o:	 SAE_PAR AST_PAR CAT_PAR
+pol1_gtctc.o:	 SAE_PAR CAT_PAR CAT_ERR PAR_ERR
+pol1_gtctw.o:	 SAE_PAR AST_PAR CAT_PAR
+pol1_gtwcs.o:	 SAE_PAR AST_PAR
+pol1_imfit.o:	 SAE_PAR GRP_PAR DAT_PAR MSG_PAR TRN_ERR
+pol1_knext.o:	 SAE_PAR
+pol1_lnam.o:	 SAE_PAR GRP_PAR FIO_PAR
+pol1_mkcat.o:	 SAE_PAR AST_PAR CAT_PAR
+pol1_plvec.o:	 SAE_PAR PRM_PAR
+pol1_prwcs.o:	 SAE_PAR NDF_PAR
+pol1_rmbnd.o:	 SAE_PAR PRM_PAR
+pol1_setd.o:	 SAE_PAR
+pol1_setft.o:	 SAE_PAR DAT_PAR
+pol1_squar.o:	 SAE_PAR PRM_PAR
+pol1_stats.o:	 SAE_PAR PRM_PAR
+pol1_stbin.o:	 SAE_PAR
+pol1_stk.o:	 SAE_PAR
+pol1_stk2.o:	 SAE_PAR PRM_PAR
+pol1_subst.o:	 SAE_PAR
+pol1_vecky.o:	 SAE_PAR AST_PAR
+pol1_vecpl.o:	 SAE_PAR PRM_PAR MSG_PAR
+pol1_vect.o:	 SAE_PAR
+pol_cale.o:	 SAE_PAR PRM_PAR
+pol_calf.o:	 SAE_PAR PRM_PAR
+pol_calp.o:	 SAE_PAR
+pol_calti.o:	 SAE_PAR PRM_PAR
+polbin.o:	 SAE_PAR PRM_PAR AST_PAR CAT_PAR PAR_ERR
+polcal.o:	 SAE_PAR PRM_PAR NDF_PAR DAT_PAR PAR_ERR
+polcent.o:	 SAE_PAR FIO_ERR PAR_ERR
+polexp.o:	 SAE_PAR DAT_PAR GRP_PAR
+polext.o:	 SAE_PAR DAT_PAR GRP_PAR PAR_ERR
+polhelp.o:	 SAE_PAR PAR_ERR
+polimp.o:	 SAE_PAR DAT_PAR FIO_PAR GRP_PAR
+polka.o:	 SAE_PAR GRP_PAR PAR_ERR PRM_PAR NDF_PAR
+polpack_mon.o:	 SAE_PAR PAR_PAR
+polplot.o:	 SAE_PAR PRM_PAR AST_PAR CAT_PAR PAR_ERR
+polvec.o:	 SAE_PAR PAR_ERR PRM_PAR NDF_PAR AST_PAR
+pthlpo.o:	 SAE_PAR HLPCMD
+rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
+wrndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 
 #-------------------------------------------------------------------------------
 #

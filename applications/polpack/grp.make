@@ -19,33 +19,31 @@ polvec.f polplot.f polbin.f polext.f
 IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext
 
 #  The contents of polpack_source.tar. 
-UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl \
-adamMessageRelay adamtask.tcl dialog.tcl blank.bit tick.bit feature.bit \
-ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f \
-lablist left_arrow.bit polcent.f \
-polcent.ifl polhelp.f polhelp.ifl polpack.csh polpack.hlp polpack.icl \
-polpack_link_adam polpack_mon.f polpack_mon.ifl polpack_test polka.f \
-polka.ifl pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit \
-sread.f vertex.bit wrndf.f datapic.ifl polpack.c \
-gui.gif hlpcmd polcal.f polcal.ifl ndfac.f pol_cale.f \
-pol_calf.f pol_calp.f pol_calti.f ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f \
-ccd1_skysr.f ccg1_cenr.f ccg1_cmltr.f ccg1_is2r.f ccg1_is3r.f ccg1_is4d.f \
-ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f pol1_sto0.glrdic \
-pol1_stoc.glrdic ccd1_asfio.f ccd1_cfgrp.f ccd1_ftgrp.f ccd1_hvcon.f \
-ccd1_iscom.f ccd1_mall.f ccd1_mfree.f ccd1_nxwrd.f ccd1_rdlin.f \
-ccd1_rmcom.f pol1_chkex.f pol1_imfit.f pol1_knext.f pol1_deftb.f \
-pol1_lnam.f polimp.ifl polimp.f ccd1_par ccd1_memcm polexp.f polexp.ifl \
-pol1_setft.f polimp.tab irg_wild polimp.csh polexp.csh polvec.f polvec.ifl \
-pol1_plvec.f ccd1_orvar.f ccg1_clipr.f \
-ccg1_mer1r.f ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f pol1_clcat.f \
-pol1_cm1rr.f pol1_cm3rr.f pol1_gtwcs.f pol1_mkcat.f pol1_stbin.f \
-pol1_stk.f ctm_par grf.h grf_polpack.c \
-pol1_cpctd.f pol1_cpctr.f \
-pol1_gtcta.f pol1_gtctc.f \
-pol1_vecky.f polplot.f polplot.ifl pol1_vecpl.f pol1_clcnt.f \
-pol1_ctclm.f pol1_setd.f pol1_squar.f pol1_stk2.f polbin.f polbin.ifl \
-ccd1_repc.f polext.f polext.ifl pol1_gtctw.f \
-pol1_rmbnd.f pol1_vect.f
+UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl adamMessageRelay \
+adamtask.tcl blank.bit ccd1_asfio.f ccd1_cfgrp.f ccd1_cmprr.f \
+ccd1_ftgrp.f ccd1_hvcon.f ccd1_iscom.f ccd1_mall.f ccd1_memcm \
+ccd1_mfree.f ccd1_nxwrd.f ccd1_orvar.f ccd1_par ccd1_qntlr.f \
+ccd1_qsrtr.f ccd1_rdlin.f ccd1_repc.f ccd1_rmcom.f ccd1_skysr.f \
+ccg1_cenr.f ccg1_cenr.f ccg1_clipr.f ccg1_cmltr.f ccg1_is2r.f \
+ccg1_is3r.f ccg1_is4d.f ccg1_is4d.f ccg1_mdr1r.f ccg1_mdr3r.f \
+ccg1_mer1r.f ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f ccg1_wtm2r.f \
+ccg1_wtm3r.f ctm_par datapic.f datapic.ifl dialog.tcl feature.bit \
+gethlp.f grf.h grf_polpack.c gthlpi.f gui.gif hlpcmd irg_wild \
+lablist left_arrow.bit ndfac.f pol1_chkex.f pol1_clcat.f \
+pol1_clcnt.f pol1_cm1rr.f pol1_cm3rr.f pol1_cpctd.f pol1_cpctr.f \
+pol1_ctclm.f pol1_deftb.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
+pol1_gtwcs.f pol1_imfit.f pol1_knext.f pol1_lnam.f pol1_mkcat.f \
+pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
+pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_sto0.glrdic \
+pol1_stoc.glrdic pol1_vecky.f pol1_vecpl.f pol1_vect.f pol_cale.f \
+pol_calf.f pol_calp.f pol_calti.f polbin.f polbin.ifl polcal.f \
+polcal.ifl polcent.f polcent.ifl polexp.csh polexp.f polexp.ifl \
+polext.f polext.ifl polhelp.f polhelp.ifl polimp.csh polimp.f \
+polimp.ifl polimp.tab polka.f polka.ifl polpack.c polpack.csh \
+polpack.hlp polpack.icl polpack_link_adam polpack_mon.ifl \
+polpack_mon.f polpack_test polplot.f polplot.ifl polvec.f polvec.ifl \
+pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit sread.f \
+tick.bit vertex.bit wrndf.f 
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.

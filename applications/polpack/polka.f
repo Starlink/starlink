@@ -561,7 +561,7 @@
             END DO
 
          ELSE
-            CALL GRP_DELET( IGRP4 )
+            CALL GRP_DELET( IGRP4, STATUS )
          END IF
 
       END IF
