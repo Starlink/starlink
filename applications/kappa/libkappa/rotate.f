@@ -132,6 +132,9 @@
 *     12-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component. Fixed bug which
 *        prevented 2-D slices from n-D cubes being processed.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -401,9 +404,9 @@
             IF ( THERE ) THEN      
                CALL NDF_TYPE( NDFI, COMP( ICOMP ), TYPE, STATUS )
 
-               CALL NDF_MAP( NDFI, COMP( ICOMP ), TYPE, 'READ', PNTRI,
+               CALL KPG1_MAP( NDFI, COMP( ICOMP ), TYPE, 'READ', PNTRI,
      :                       EL, STATUS )
-               CALL NDF_MAP( NDFO, COMP( ICOMP ), TYPE, 'WRITE', PNTRO,
+               CALL KPG1_MAP( NDFO, COMP( ICOMP ), TYPE, 'WRITE', PNTRO,
      :                       EL, STATUS )
 
 *  Call the appropriate routine to generate the output array using
@@ -494,8 +497,8 @@
          CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, COMPS, TYPE,
      :                   DTYPE, STATUS )
 
-         CALL NDF_MAP( NDFI, COMPS, TYPE, 'READ', PNTRI, EL, STATUS )
-         CALL NDF_MAP( NDFO, COMPS, TYPE, 'WRITE', PNTRO, EL, STATUS )
+         CALL KPG1_MAP( NDFI, COMPS, TYPE, 'READ', PNTRI, EL, STATUS )
+         CALL KPG1_MAP( NDFO, COMPS, TYPE, 'WRITE', PNTRO, EL, STATUS )
 
 *  Call the appropriate routine to generate the output array using
 *  the nearest-neighbour method, depending on its numeric type.
@@ -539,9 +542,9 @@
          IF ( QUAL ) THEN
 
 *  Map the quality arrays using the only valid type, unsigned byte.
-            CALL NDF_MAP( NDFI, 'Quality', '_UBYTE', 'Read', PNTRI,
+            CALL KPG1_MAP( NDFI, 'Quality', '_UBYTE', 'Read', PNTRI,
      :                    EL, STATUS )
-            CALL NDF_MAP( NDFO, 'Quality', '_UBYTE', 'Write', PNTRO,
+            CALL KPG1_MAP( NDFO, 'Quality', '_UBYTE', 'Write', PNTRO,
      :                    EL, STATUS )
 
 *  Assign the QUALITY array using the nearest-neghbour technique.  This
@@ -589,14 +592,14 @@
      :                            COMP( ICOMP ), TYPE, DTYPE, STATUS )
                END IF
 
-               CALL NDF_MAP( NDFI, COMP( ICOMP ), TYPE, 'READ', PNTRI,
+               CALL KPG1_MAP( NDFI, COMP( ICOMP ), TYPE, 'READ', PNTRI,
      :                       EL, STATUS )
 
                IF ( NUMRA .EQ. 2 ) THEN
-                  CALL NDF_MAP( NDFO, COMP( ICOMP ), TYPE, 'UPDATE',
+                  CALL KPG1_MAP( NDFO, COMP( ICOMP ), TYPE, 'UPDATE',
      :                          PNTRO, EL, STATUS )
                ELSE
-                  CALL NDF_MAP( NDFO, COMP( ICOMP ), TYPE, 'WRITE',
+                  CALL KPG1_MAP( NDFO, COMP( ICOMP ), TYPE, 'WRITE',
      :                          PNTRO, EL, STATUS )
                END IF
 

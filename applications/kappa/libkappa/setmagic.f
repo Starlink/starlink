@@ -113,6 +113,9 @@
 *        Made messages conditional.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -294,9 +297,9 @@
          IF ( LCOMP( I ) ) THEN
       
 *  Map the data arrays.
-            CALL NDF_MAP( NDFI, COMP( I ), ITYPE, 'READ', PNTRI, EL,
+            CALL KPG1_MAP( NDFI, COMP( I ), ITYPE, 'READ', PNTRI, EL,
      :                    STATUS )
-            CALL NDF_MAP( NDFO, COMP( I ), ITYPE, 'WRITE', PNTRO, EL,
+            CALL KPG1_MAP( NDFO, COMP( I ), ITYPE, 'WRITE', PNTRO, EL,
      :                    STATUS )
 
 *  Process each data type directly.

@@ -140,6 +140,9 @@
 *        Added calls to make the memories visible on the Ikon.  To
 *        enable planes not to be output, a new parameter, PLANES, has
 *        been added.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs: 
@@ -958,7 +961,7 @@
 
 *   Map the NDF's data component for WRITE access.
 
-         CALL NDF_MAP( NDF, 'DATA', '_INTEGER', 'WRITE', PNTR( 1 ), EL,
+         CALL KPG1_MAP( NDF, 'DATA', '_INTEGER', 'WRITE', PNTR( 1 ), EL,
      :                STATUS )
 
 *   Move the contents from the snapshot call to the NDF data component.

@@ -135,6 +135,9 @@
 *        Use the bad-pixel flag.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -271,8 +274,8 @@
       CALL NDF_TYPE( NDFI, COMP, ITYPE, STATUS )
 
 *  Map the array components.
-      CALL NDF_MAP( NDFI, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
-      CALL NDF_MAP( NDFO, MCOMP, ITYPE, 'WRITE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFI, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDFO, MCOMP, ITYPE, 'WRITE', PNTRO, EL, STATUS )
 
 *  Find whether there may be bad pixels present.  There is no explicit
 *  check.  It just relies on the current value.

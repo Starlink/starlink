@@ -320,6 +320,9 @@
 *     	 Changed default of TITLE to null.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -708,7 +711,7 @@
 *    Map the output data array and variance. Check whether or not bad
 *    pixels may be present in the variance.
 
-      CALL NDF_MAP( NDFO, COMP, ITYPE, 'UPDATE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFO, COMP, ITYPE, 'UPDATE', PNTRO, EL, STATUS )
 
       IF ( VARNCE ) THEN
          CALL NDF_BAD( NDFO, 'Variance', .FALSE., BAD( 2 ), STATUS )

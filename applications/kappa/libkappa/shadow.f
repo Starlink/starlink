@@ -80,6 +80,9 @@
 *        Original NDF version.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,9 +179,9 @@
       CALL NDF_STYPE( DTYPE, NDFO, 'Data,Variance', STATUS )
 
 *  Map the input and output data arrays.
-      CALL NDF_MAP( NDFI, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
-      CALL NDF_MAP( NDFS, 'Data', ITYPE, 'READ', PNTRS, EL, STATUS )
-      CALL NDF_MAP( NDFO, 'Data', ITYPE, 'WRITE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFI, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDFS, 'Data', ITYPE, 'READ', PNTRS, EL, STATUS )
+      CALL KPG1_MAP( NDFO, 'Data', ITYPE, 'WRITE', PNTRO, EL, STATUS )
 
 *  Merge the bad pixel flag values for the input data arrays to see if
 *  checks for bad pixels are needed.
@@ -241,11 +244,11 @@
 *  output variance arrays.
       CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
       IF ( VAR ) THEN
-         CALL NDF_MAP( NDFI, 'Variance', ITYPE, 'READ', PNTRI, EL,
+         CALL KPG1_MAP( NDFI, 'Variance', ITYPE, 'READ', PNTRI, EL,
      :                 STATUS )
-         CALL NDF_MAP( NDFS, 'Variance', ITYPE, 'READ', PNTRS, EL,
+         CALL KPG1_MAP( NDFS, 'Variance', ITYPE, 'READ', PNTRS, EL,
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'Variance', ITYPE, 'WRITE', PNTRO, EL,
+         CALL KPG1_MAP( NDFO, 'Variance', ITYPE, 'WRITE', PNTRO, EL,
      :                 STATUS )
 
 *  See if checks for bad pixels are necessary.

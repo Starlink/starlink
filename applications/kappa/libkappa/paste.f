@@ -105,6 +105,9 @@
 *        Original version.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -375,11 +378,11 @@
 
 *  Map the output data array component.
 *  ====================================
-      CALL NDF_MAP( NDFO, 'Data', ITYPE, 'WRITE/BAD', PNTRO, ELO,
+      CALL KPG1_MAP( NDFO, 'Data', ITYPE, 'WRITE/BAD', PNTRO, ELO,
      :              STATUS )
-      IF ( VARPRS ) CALL NDF_MAP( NDFO, 'Variance', ITYPEV, 'WRITE/BAD',
-     :                            PNTROV, ELO, STATUS )
-      IF ( QUAPRS ) CALL NDF_MAP( NDFO, 'Quality', '_UBYTE',
+      IF ( VARPRS ) CALL KPG1_MAP( NDFO, 'Variance', ITYPEV, 
+     :                            'WRITE/BAD', PNTROV, ELO, STATUS )
+      IF ( QUAPRS ) CALL KPG1_MAP( NDFO, 'Quality', '_UBYTE',
      :                            'WRITE/ZERO', PNTROQ, ELO, STATUS )
 
 *  Main loop to paste in the NDFs in turn.
@@ -404,7 +407,7 @@
 *  =====================
 
 *  Map the input NDF data array.
-            CALL NDF_MAP( NDFI( I ), 'Data', ITYPE, 'READ', PNTRI, ELI,
+            CALL KPG1_MAP( NDFI( I ), 'Data', ITYPE, 'READ', PNTRI, ELI,
      :                    STATUS )
 
 *  Call the appropriate routine that performs the pasting of the data
@@ -456,7 +459,7 @@
 
 *  Map the input NDF variance, obtaining an array of bad values if
 *  there is no variance array in this NDF.
-               CALL NDF_MAP( NDFI( I ), 'Variance', ITYPE, 'READ/BAD',
+               CALL KPG1_MAP( NDFI( I ), 'Variance', ITYPE, 'READ/BAD',
      :                       PNTRI, ELI, STATUS )
 
 *  Call the appropriate routine that performs the pasting of the data
@@ -508,7 +511,7 @@
 
 *  Map the input NDF quality, which has type unsigned byte.  This will
 *  be an array of zeroes if there is no quality array in this NDF.
-               CALL NDF_MAP( NDFI( I ), 'Quality', '_UBYTE',
+               CALL KPG1_MAP( NDFI( I ), 'Quality', '_UBYTE',
      :                       'READ/ZERO', PNTRI, ELI, STATUS )
 
 *  Call the routine that performs the pasting.

@@ -82,6 +82,9 @@
 *        Original NDF version.
 *     11-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -252,8 +255,8 @@
       CALL NDF_TYPE( NDFI, 'Data', ITYPE, STATUS )
 
 *  Map the full input, and output data arrays.
-      CALL NDF_MAP( NDFI, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
-      CALL NDF_MAP( NDFO, 'Data', ITYPE, 'WRITE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFI, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDFO, 'Data', ITYPE, 'WRITE', PNTRO, EL, STATUS )
 
 *  Duplicate the data array, using the routine approriate for the data
 *  type.
@@ -306,9 +309,9 @@
          CALL NDF_TYPE( NDFI, 'Variance', ITYPE, STATUS )
 
 *  Map the full input, and output variance arrays.
-         CALL NDF_MAP( NDFI, 'Variance', ITYPE, 'READ', PNTRI, EL,
+         CALL KPG1_MAP( NDFI, 'Variance', ITYPE, 'READ', PNTRI, EL,
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'Variance', ITYPE, 'WRITE', PNTRO, EL,
+         CALL KPG1_MAP( NDFO, 'Variance', ITYPE, 'WRITE', PNTRO, EL,
      :                 STATUS )
 
 *  Duplicate the variance array, using the routine approriate for the
@@ -357,9 +360,9 @@
 
 *  Map the full input, and output Quality arrays.  The data type must be
 *  unsigned byte.
-         CALL NDF_MAP( NDFI, 'Quality', '_UBYTE', 'READ', PNTRI, EL,
+         CALL KPG1_MAP( NDFI, 'Quality', '_UBYTE', 'READ', PNTRI, EL,
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'Quality', '_UBYTE', 'WRITE', PNTRO, EL,
+         CALL KPG1_MAP( NDFO, 'Quality', '_UBYTE', 'WRITE', PNTRO, EL,
      :                 STATUS )
 
 *  Expand the quality array.

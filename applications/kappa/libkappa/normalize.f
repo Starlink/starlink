@@ -247,6 +247,9 @@
 *        lowercase.  Added Related Applications.  Title propagated.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -399,9 +402,9 @@
       CALL NDF_MBND( 'TRIM', NDF1S, NDF2S, STATUS )
 
 *  Map the data arrays of the two NDF sections.
-      CALL NDF_MAP( NDF1S, 'DATA', '_REAL', 'READ', PNT1S, NELS,
+      CALL KPG1_MAP( NDF1S, 'DATA', '_REAL', 'READ', PNT1S, NELS,
      :              STATUS )
-      CALL NDF_MAP( NDF2S, 'DATA', '_REAL', 'READ', PNT2S, NELS,
+      CALL KPG1_MAP( NDF2S, 'DATA', '_REAL', 'READ', PNT2S, NELS,
      :              STATUS )
 
 *  If an error has occured, abort.
@@ -594,9 +597,9 @@
          END IF
 
 *  Map data arrays from base IN1 and output NDFs.
-         CALL NDF_MAP( NDF1B, 'DATA', '_REAL', 'READ', PNT1BD, NEL1B,
+         CALL KPG1_MAP( NDF1B, 'DATA', '_REAL', 'READ', PNT1BD, NEL1B,
      :                 STATUS )
-         CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE', PNTOD, NEL1B,
+         CALL KPG1_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE', PNTOD, NEL1B,
      :                 STATUS )
 
          IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -622,9 +625,9 @@
 
          IF ( VAR1 ) THEN
 
-            CALL NDF_MAP( NDF1B, 'VARIANCE', '_REAL', 'READ', PNT1BV,
+            CALL KPG1_MAP( NDF1B, 'VARIANCE', '_REAL', 'READ', PNT1BV,
      :                    NEL1B, STATUS )
-            CALL NDF_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE', PNTOV,
+            CALL KPG1_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE', PNTOV,
      :                    NEL1B, STATUS )
 
             IF ( STATUS .NE. SAI__OK ) GOTO 999

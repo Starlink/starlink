@@ -230,6 +230,9 @@
 *        reporting conditional.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -339,7 +342,7 @@
      :                 SLBND2, SUBND2, STATUS )
 
 *  Map the PSF DATA array.
-      CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'READ', IPN2, NEL2,
+      CALL KPG1_MAP( INDF2, 'DATA', '_REAL', 'READ', IPN2, NEL2,
      :              STATUS )
 
 *  See if the PSF contains any bad pixels.  If it does then abort.
@@ -450,7 +453,7 @@
 *  ====================================
 *  
 *  Map the DATA array of the input NDF.
-      CALL NDF_MAP( INDF1, 'Data', '_REAL', 'READ', IPN1, NEL1,
+      CALL KPG1_MAP( INDF1, 'Data', '_REAL', 'READ', IPN1, NEL1,
      :              STATUS )
 
 *  Get space to hold the internal version of the data array and copy
@@ -540,7 +543,7 @@
          UBND( SDIM3( 2 ) ) = SUBND1( 2 )
 
          CALL NDF_SECT( INDF3, NDIM, LBND, UBND, INDF3S, STATUS )
-         CALL NDF_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S, 
+         CALL KPG1_MAP( INDF3S, 'DATA', '_REAL', 'READ', IPN3S, NEL3S, 
      :                 STATUS )
 
 *  Copy it to the centre of internal file 6 . The margins are filled by
@@ -617,7 +620,7 @@
 *  array.
       CALL NDF_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF4,
      :               STATUS )
-      CALL NDF_MAP( INDF4, 'Data', '_REAL', 'WRITE', IPN4, NEL4,
+      CALL KPG1_MAP( INDF4, 'Data', '_REAL', 'WRITE', IPN4, NEL4,
      :              STATUS )
 
 *  Copy the reconstructed array to the output DATA array.

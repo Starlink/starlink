@@ -87,6 +87,9 @@
 *        Added Usage and Examples items.
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 
@@ -190,10 +193,10 @@
 *  Disable automatic quality masking and map the data array and
 *  variance array for reading and writing, respectively.
                CALL NDF_SQMF( .FALSE., INDF, STATUS )
-               CALL NDF_MAP( INDF, 'Data', TYPE, 'READ', DPNTR, EL,
+               CALL KPG1_MAP( INDF, 'Data', TYPE, 'READ', DPNTR, EL,
      :                       STATUS )
-               CALL NDF_MAP( INDF, 'Variance', TYPE, 'WRITE', VPNTR, EL,
-     :                       STATUS )
+               CALL KPG1_MAP( INDF, 'Variance', TYPE, 'WRITE', VPNTR, 
+     :                       EL, STATUS )
 
 *  See if bad pixels need to be checked for during the calculations.
                CALL NDF_BAD( INDF, 'Data', .FALSE., BAD, STATUS )

@@ -234,6 +234,9 @@
 *        Used PSX for workspace.  Introduced an improved determination
 *        of the extreme co-ordinates using the pixel vertices as test
 *        points.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1186,9 +1189,9 @@
                   CALL NDF_TYPE( NDFI, COMP( ICOMP ), ITYPE, STATUS )
 
 *  Map the input and output arrays.
-                  CALL NDF_MAP( NDFIS, COMP( ICOMP ), ITYPE, 'READ',
+                  CALL KPG1_MAP( NDFIS, COMP( ICOMP ), ITYPE, 'READ',
      :                          IPNTR, ELIN, STATUS )
-                  CALL NDF_MAP( NDFOS, COMP( ICOMP ), ITYPE,
+                  CALL KPG1_MAP( NDFOS, COMP( ICOMP ), ITYPE,
      :                          'WRITE/BAD', OPNTR, ELOUT, STATUS )
 
 *  When there is flux conservation there is a two-stage process, so
@@ -1363,10 +1366,10 @@
      :                         'Data,Variance', ITYPE, DTYPE, STATUS )
 
 *  Map the input and output arrays.
-               CALL NDF_MAP( NDFIS, 'Data,Variance', ITYPE, 'READ',
+               CALL KPG1_MAP( NDFIS, 'Data,Variance', ITYPE, 'READ',
      :                       IPNTR, ELIN, STATUS )
-               CALL NDF_MAP( NDFOS, 'Data,Variance', ITYPE, 'WRITE/BAD',
-     :                       OPNTR, ELOUT, STATUS )
+               CALL KPG1_MAP( NDFOS, 'Data,Variance', ITYPE, 
+     :                       'WRITE/BAD', OPNTR, ELOUT, STATUS )
 
                IF ( DPAXIS ) THEN
 
@@ -1540,9 +1543,9 @@
 
 *  Map the input and output arrays.  Use a dummy variance value.  It is
 *  not assigned as it will not be used.
-               CALL NDF_MAP( NDFIS, 'Data', ITYPE, 'READ', IPNTR, ELIN,
+               CALL KPG1_MAP( NDFIS, 'Data', ITYPE, 'READ', IPNTR, ELIN,
      :                       STATUS )
-               CALL NDF_MAP( NDFOS, 'Data', ITYPE, 'WRITE/BAD', OPNTR,
+               CALL KPG1_MAP( NDFOS, 'Data', ITYPE, 'WRITE/BAD', OPNTR,
      :                       ELOUT, STATUS )
 
                IF ( DPAXIS ) THEN

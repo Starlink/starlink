@@ -318,6 +318,9 @@
 *        Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
 *        parameters for adjustment of the plotting style, for scaling
 *        from pixels to physical units, and for minor-axis profiles.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -547,7 +550,7 @@
       END DO
 
 *  Map the image.
-      CALL NDF_MAP( NDF, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDF, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
 
 *  Get the type of co-ordinates to input.
 *  ======================================
@@ -672,7 +675,7 @@
          CALL NDF_TEMP( DCPLCE, STATUS )
          CALL NDF_NEW( '_DOUBLE', 2, WLBND, WUBND, DCPLCE, NDFDC,
      :                 STATUS )
-         CALL NDF_MAP( NDFDC, 'Data', '_DOUBLE', 'WRITE', DCPNTR, EL,
+         CALL KPG1_MAP( NDFDC, 'Data', '_DOUBLE', 'WRITE', DCPNTR, EL,
      :                 STATUS )
 
          CALL NDF_TEMP( WCPLCE, STATUS )
@@ -731,10 +734,10 @@
             WLBND( 1 ) = I
             WUBND( 1 ) = I
             CALL NDF_SECT( NDFDC, 2, WLBND, WUBND, NDFDCS, STATUS )
-            CALL NDF_MAP( NDFDCS, 'Data', '_DOUBLE', 'READ', DCPNTR, EL,
-     :                    STATUS )
+            CALL KPG1_MAP( NDFDCS, 'Data', '_DOUBLE', 'READ', DCPNTR, 
+     :                    EL, STATUS )
             CALL NDF_SECT( NDFWC, 2, WLBND, WUBND, NDFWCS, STATUS )
-            CALL NDF_MAP( NDFWCS, 'Data', '_DOUBLE', 'WRITE', WCPNTR,
+            CALL KPG1_MAP( NDFWCS, 'Data', '_DOUBLE', 'WRITE', WCPNTR,
      :                    EL, STATUS )
       
 *  Derive its world equivalent, i.e. pixel indices.
@@ -753,7 +756,7 @@
 
 *  Map the array of world co-ordinates as single precision.  Use the
 *  same pointer as for world co-ordinates.
-         CALL NDF_MAP( NDFWC, 'Data', '_REAL', 'READ', WPNTR( 2 ), EL,
+         CALL KPG1_MAP( NDFWC, 'Data', '_REAL', 'READ', WPNTR( 2 ), EL,
      :                 STATUS )
       END IF
 
@@ -938,7 +941,8 @@
       CALL NDF_CREP( 'OUT', '_REAL', NDIM, PSFDIM, NDFO, STATUS )
 
 *  Map it for write access.
-      CALL NDF_MAP( NDFO, 'Data', '_REAL', 'WRITE', PSFPTR, EL, STATUS )
+      CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', PSFPTR, EL, 
+     :               STATUS )
 
 *  Fill the data array with the evaluated point-spread function.
 *  Exclude origin information. (Eventually would like to have the PSF

@@ -265,6 +265,9 @@
 *        and typo's corrected.  Called KPG1_GTNDF.  Constrained ANGROT.
 *        Used modern-style variable declarations.  Added headings to
 *        the commentary.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -462,7 +465,7 @@
 
 *  Map the required component as an array of _REAL values.  Note that
 *  the component may be 'Error'.
-      CALL NDF_MAP( INDF1, MCOMP, '_REAL', 'READ', PNTR1, EL1, STATUS )
+      CALL KPG1_MAP( INDF1, MCOMP, '_REAL', 'READ', PNTR1, EL1, STATUS )
 
 *  Access the first input NDF.
 *  ===========================
@@ -478,7 +481,8 @@
       CALL KPG1_DAUNI( INDF2, 'Data', UNITS2, NCU2, STATUS )
 
 *  Map the DATA component as an array of _REAL values.
-      CALL NDF_MAP( INDF2, 'Data', '_REAL', 'READ', PNTR2, EL2, STATUS )
+      CALL KPG1_MAP( INDF2, 'Data', '_REAL', 'READ', PNTR2, EL2, 
+     :               STATUS )
 
 *  Find the conversion factor for the angle data.
 *  ==============================================

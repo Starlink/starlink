@@ -189,6 +189,9 @@
 *        Original NDF version.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     23-JUN-1998 (DSB):
+*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
+*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1030,8 +1033,8 @@
 *  ================================
 
 *  Map the input and output data arrays.
-      CALL NDF_MAP( NDFI, 'Data', '_REAL', 'READ', PNTRI, EL, STATUS )
-      CALL NDF_MAP( NDFO, 'Data', '_REAL', 'WRITE', PNTRO, EL, STATUS )
+      CALL KPG1_MAP( NDFI, 'Data', '_REAL', 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', PNTRO, EL, STATUS )
 
 *  Bin the data.
 *  =============
