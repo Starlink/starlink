@@ -139,6 +139,7 @@
       CHARACTER*(DAT__SZLOC)	MLOC			! Quality mask
       CHARACTER*(DAT__SZLOC)	WLOC			! Widths locator
 
+      INTEGER			IAX			! Axis number
       INTEGER			IERR, NERR		! Error info from VEC_
       INTEGER			NELM			! # invented elements
       INTEGER			PSID, WPSID		! Private item storage
@@ -163,8 +164,37 @@
       RMODE = (MODE(1:1).EQ.'R')
       WMODE = (MODE(1:1).EQ.'W')
 
+*  Axis data?
+      IF ( (ITEM(1:5).EQ.'Axis_') .AND. (ITEM(8:).EQ.'Data') ) THEN
+
+*    Get dimensions of BinDS
+        CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
+
+*    Extract axis number
+        CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
+
+*    Private storage for axis data
+        CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
+     :                    STATUS )
+
+*    Create invented object and map
+        CALL ADI_NEW1R( DIMS(IAX), ITID, STATUS )
+        CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
+        CALL ARR_REG1R( 1.0, 1.0, DIMS(IAX), %VAL(WPTR), STATUS )
+        CALL ADI_UNMAP( ITID, WPTR, STATUS )
+
+*    Set dimensions
+        DIMS(1) = DIMS(IAX)
+        NDIM = 1
+
+*    Set the WriteBack function
+        IF ( .NOT. RMODE ) THEN
+          WBPTR = UTIL_PLOC( BDI1_WBGEN )
+        END IF
+
 *  Axis widths?
-      IF ( (ITEM(1:5).EQ.'Axis_') .AND. (ITEM(8:).EQ.'Width') ) THEN
+      ELSE IF ( (ITEM(1:5).EQ.'Axis_') .AND.
+     :          (ITEM(8:).EQ.'Width') ) THEN
 
 *    Locate the data
         CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
