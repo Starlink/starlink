@@ -711,7 +711,7 @@
       END IF
 
 *  Access an NDG group containing a list of NDF names.
-      CALL CCD1_NDFGR( 'IN', ACCESS, GIDIN, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', GIDIN, NNDF, STATUS )
 
 *  Access a second list of NDF names for the outputs. Use the input
 *  names as a modification list.

@@ -393,7 +393,7 @@
 
 *  Get a list of NDFs.
       CALL NDF_BEGIN
-      CALL CCD1_NDFGR( 'IN', 'UPDATE', NDFGRP, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', NDFGRP, NNDF, STATUS )
 
 *  Get the names of the corresponding lists of positions.
       CALL CCD1_STRGR( 'OUTLIST', NDFGRP, NNDF, NNDF, FIOGRP, NRET,

@@ -421,8 +421,7 @@
 
 *  Try to access an NDF if an output list is to be written. The CCDPACK 
 *  extension of this will be updated to contain the name of the output file.
-         CALL CCD1_NDFGL( 'IN', 'UPDATE', 1, CCD1__MXNDF, NDFGR, NNDF,
-     :                    STATUS )
+         CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGR, NNDF, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
          ELSE

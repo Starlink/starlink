@@ -370,7 +370,7 @@
       CALL NDF_BEGIN
 
 *  Access the input name list.
-      CALL CCD1_NDFGR( 'IN', 'READ', GIDIN, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', GIDIN, NNDF, STATUS )
 
 *  Because of the way in which this group is manipulated by the rest of
 *  this task, it ought to be treated as a simple GRP group, without the

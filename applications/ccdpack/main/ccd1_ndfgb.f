@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_NDFGB( CNAME, USEEXT, NDFNAM, ACCESS, FACNAM,
+      SUBROUTINE CCD1_NDFGB( CNAME, USEEXT, NDFNAM, FACNAM,
      :                       NDFGID, FACGID, NNDF, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_NDFGB( CNAME, USEEXT, NDFNAM, ACCESS, FACNAM, NDFGID,
+*     CALL CCD1_NDFGB( CNAME, USEEXT, NDFNAM, FACNAM, NDFGID,
 *                      FACGID, NNDF, STATUS )
 
 *  Description:
@@ -41,8 +41,6 @@
 *         actually gotten from the NDF extensions.
 *     NDFNAM = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name used to prompt for the NDFs.
-*     ACCESS = CHARACTER * ( * ) (Given)
-*        The NDF access type. Should be one of 'READ' or 'UPDATE'.
 *     FACNAM = CHARACTER * ( * ) (Given)
 *        The associated factor name.
 *     NDFGID = INTEGER (Returned)
@@ -93,7 +91,6 @@
       CHARACTER * ( * ) CNAME
       CHARACTER * ( * ) NDFNAM
       CHARACTER * ( * ) FACNAM
-      CHARACTER * ( * ) ACCESS
 
 *  Arguments Given and Returned:
       LOGICAL USEEXT
@@ -122,7 +119,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Access a list of NDFs.
-      CALL CCD1_NDFGR( NDFNAM, ACCESS, NDFGID, NNDF, STATUS )
+      CALL CCD1_NDFGR( NDFNAM, NDFGID, NNDF, STATUS )
 
 *  If we're to get the names of the NDFs from the extension then
 *  try to do this.

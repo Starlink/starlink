@@ -1,5 +1,4 @@
-      SUBROUTINE CCD1_NDFGL( NAME, ACCESS, MINNDF, MAXNDF, GID, NNDF,
-     :                       STATUS )
+      SUBROUTINE CCD1_NDFGL( NAME, MINNDF, MAXNDF, GID, NNDF, STATUS )
 *+
 *  Name:
 *     CCD1_NDFGL
@@ -11,10 +10,10 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_NDFGL( NAME, ACCESS, MINNDF, MAXNDF, GID, NNDF, STATUS )
+*     CALL CCD1_NDFGL( NAME, MINNDF, MAXNDF, GID, NNDF, STATUS )
 
 *  Description:
-*     The routine gets a group of NDFs with access mode ACCESS using
+*     The routine gets a group of NDFs with using
 *     the ADAM parameter NAME, coping with various errors that may
 *     occur. The NDF group identifier is returned in GID. The number of
 *     NDFs is restricted to between MINNDF to MAXNDF. The actual number
@@ -27,8 +26,6 @@
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name.
-*     ACCESS = CHARACTER * ( * ) (Given)
-*        The access mode for the NDFs (READ, WRITE or UPDATE).
 *     MINNDF = INTEGER (Given)
 *        The minimum number of NDFs allowed.
 *     MAXNDF = INTEGER (Given)
@@ -73,7 +70,6 @@
 *  Arguments Given:
       INTEGER MAXNDF
       INTEGER MINNDF
-      CHARACTER ACCESS * ( * )
       CHARACTER NAME * ( * )
 
 *  Arguments Returned:

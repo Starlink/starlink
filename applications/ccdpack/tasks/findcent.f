@@ -380,7 +380,7 @@
       ELSE
 
 *  Just get a group of NDF names.
-         CALL CCD1_NDFGR( 'IN', ACCESS, NDFGR, NNDF, STATUS )
+         CALL CCD1_NDFGR( 'IN', NDFGR, NNDF, STATUS )
 
 *  Write out the NDF names so that the comparison between the lists
 *  and NDFs is obvious.

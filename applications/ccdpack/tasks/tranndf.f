@@ -438,7 +438,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the group identifier for the NDFs.
-      CALL CCD1_NDFGR( 'IN', 'READ', GIDIN, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', GIDIN, NNDF, STATUS )
 
 *  And get the names of the corresponding output NDFs.
       CALL CCD1_NDFPG( 'OUT', GIDIN, NNDF, GIDOUT, STATUS )

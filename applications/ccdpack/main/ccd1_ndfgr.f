@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_NDFGR( NAME, ACCESS, GID, NNDF, STATUS )
+      SUBROUTINE CCD1_NDFGR( NAME, GID, NNDF, STATUS )
 *+
 *  Name:
 *     CCD1_NDFGR
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_NDFGR( NAME, ACCESS, GID, NNDF, STATUS )
+*     CALL CCD1_NDFGR( NAME, GID, NNDF, STATUS )
 
 *  Description:
 *     The routine accesses a group of NDFs whose ADAM parameter is
@@ -25,9 +25,6 @@
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name.
-*     ACCESS = CHARACTER * ( * ) (Given)
-*        The access mode for the NDFs - should be one of WRITE, READ
-*        or UPDATE.
 *     GID = INTEGER (Returned)
 *        NDG identifier for the group of NDF names.
 *     NNDF = INTEGER (Returned)
@@ -66,7 +63,6 @@
 
 *  Arguments Given:
       CHARACTER NAME * ( * )
-      CHARACTER ACCESS * ( * )
 
 *  Arguments Returned:
       INTEGER GID

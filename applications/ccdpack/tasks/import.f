@@ -299,7 +299,7 @@
 
 *  Access a group of NDFs for processing.
       CALL NDF_BEGIN
-      CALL CCD1_NDFGR( 'IN', 'UPDATE', GIDIN, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', GIDIN, NNDF, STATUS )
 
 *  Access the control table for items in the FITS block.
       CALL CCD1_ASFIO( 'TABLE', 'READ', 'LIST', 0, FDIN, TOPEN, STATUS )

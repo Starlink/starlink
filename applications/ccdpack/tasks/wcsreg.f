@@ -279,7 +279,7 @@
 
 *  Get group of NDFs to operate on.
       NNDF = 0
-      CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', INGRP, NNDF, STATUS )
 
 *  Write the names and node indices of the NDFs to the user.
       CALL CCD1_MSG( ' ', ' ', STATUS )

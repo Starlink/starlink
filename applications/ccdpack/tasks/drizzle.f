@@ -584,7 +584,7 @@
 *  =====================
 *  Obtain an NDF group specifying the input NDFs.
       NIN = 0
-      CALL CCD1_NDFIN( 'IN', ACMODE, INGRP, NIN, STATUS )
+      CALL CCD1_NDFIN( 'IN', INGRP, NIN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Report progress so far

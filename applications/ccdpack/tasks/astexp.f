@@ -418,7 +418,7 @@
       CALL NDF_BEGIN
 
 *  Get group of NDFs to operate on.
-      CALL CCD1_NDFGR( 'IN', 'READ', INGRP, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', INGRP, NNDF, STATUS )
       IF ( NNDF .GT. MXFSET ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'ASTEXP_MAXNDF', 'ASTEXP: Too many NDFs', 

@@ -178,7 +178,7 @@
       END IF
 
 *  Get the list of NDF names.
-      CALL CCD1_NDFGL( 'IN', 'READ', 1, MAXNDF, GID, NNDF, STATUS )
+      CALL CCD1_NDFGL( 'IN', 1, MAXNDF, GID, NNDF, STATUS )
       CALL PAR_CANCL( 'IN', STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN 
 

@@ -612,8 +612,7 @@
       END IF
 
 *  Get a list of NDF names.
-      CALL CCD1_NDFGL( 'IN', 'UPDATE', 2, CCD1__MXNDF, NDFGR, NNDF,
-     :                       STATUS )
+      CALL CCD1_NDFGL( 'IN', 2, CCD1__MXNDF, NDFGR, NNDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Get the percentage histogram range for image display.

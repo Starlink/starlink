@@ -305,7 +305,7 @@
 
 *  Access an NDG group containing a list of NDF names.
       CALL NDF_BEGIN
-      CALL CCD1_NDFGR( 'IN', ACCESS, GIDIN, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', GIDIN, NNDF, STATUS )
 
 *  Ask for a flatfield NDF. Check for its variance also.
       CALL CCD1_NDFAC( 'FLAT', 'READ', 1, 1, IVAL, IDFLT, STATUS )

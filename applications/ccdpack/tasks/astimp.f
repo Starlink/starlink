@@ -473,7 +473,7 @@
 *  is no more processing to do.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       NNDF = 0
-      CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', INGRP, NNDF, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GO TO 99

@@ -320,7 +320,7 @@
       CALL NDF_BEGIN
 
 *  Get group of NDFs to operate on.
-      CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
+      CALL CCD1_NDFGR( 'IN', INGRP, NNDF, STATUS )
 
 *  Get mode.
       CALL PAR_CHOIC( 'MODE', 'CURRENT', 'CURRENT,ADD,REMOVE,SET,SHOW', 

@@ -376,8 +376,8 @@
 *  Do not allow this if the frame type is unknown.
       CALL NDF_BEGIN
       IF ( FTYPE .EQ. 'NONE' ) USEEXT = .FALSE.
-      CALL CCD1_NDFGB( FTYPE, USEEXT, 'IN', ACCESS, 'EXPOSE', GIDIN,
-     :                 FACGID, NNDF, STATUS )
+      CALL CCD1_NDFGB( FTYPE, USEEXT, 'IN', 'EXPOSE', GIDIN, FACGID,
+     :                 NNDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Ask for a calibration NDF. Check for its variance also.

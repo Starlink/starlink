@@ -140,8 +140,7 @@
       IF ( NDFS ) THEN
 
 *  Access a list of NDF names.
-         CALL CCD1_NDFGL( PARNAM, 'UPDATE', MINOPN, MAXOPN, NDFGR,
-     :                    NRET, STATUS )
+         CALL CCD1_NDFGL( PARNAM, MINOPN, MAXOPN, NDFGR, NRET, STATUS )
       ELSE
 
 *  Not a list of NDFs, just get a group of names.

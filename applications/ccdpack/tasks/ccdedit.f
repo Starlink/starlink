@@ -495,8 +495,7 @@
      :                .FALSE., MODE, STATUS )
 
 *  Get a group of NDFs.
-      CALL CCD1_NDFGL( 'IN', 'UPDATE', 1, CCD1__MXNDF, NDFGRP, NNDF,
-     :                 STATUS )
+      CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGRP, NNDF, STATUS )
 
 *  Write there names out to the user.
       CALL CCD1_MSG( ' ', ' ', STATUS )

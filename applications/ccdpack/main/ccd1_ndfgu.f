@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_NDFGL( GID, NNDF, NAME, MAXNDF, MINNDF, STATUS )
+*     CALL CCD1_NDFGU( GID, NNDF, NAME, MAXNDF, MINNDF, STATUS )
 
 *  Description:
 *     The routine accesses a group of NDFs whose ADAM parameter is

@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_NDFIN( NAME, MODE, GID, NNDF, STATUS )
+      SUBROUTINE CCD1_NDFIN( NAME, GID, NNDF, STATUS )
 *+
 *  Name:
 *     CCD1_NDFIN
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_NDFIN( NAME, MODE, GID, NNDF, STATUS )
+*     CALL CCD1_NDFIN( NAME, GID, NNDF, STATUS )
 
 *  Description:
 *     The routine accesses a group of NDFs whose ADAM parameter is
@@ -25,9 +25,6 @@
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name.
-*     MODE = CHARACTER * ( * ) (Given)
-*        The access mode required for the NDFs: 'READ', 'UPDATE' or
-*        'WRITE'.
 *     GID = INTEGER (Returned)
 *        NDG identifier for the group of NDF names.
 *     NNDF = INTEGER (Returned)
@@ -70,7 +67,6 @@
 
 *  Arguments Given:
       CHARACTER NAME * ( * )
-      CHARACTER MODE * ( * )
 
 *  Arguments Returned:
       INTEGER GID
