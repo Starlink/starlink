@@ -15988,15 +15988,15 @@ as a template for writing your own.
 f+
 Currently, it is not possible to write such ``grf modules'' in Fortran.
 If you want to use wrapper functions written in Fortran, then you must 
-use the AST_GRFFUN method as described below.
+use the AST_SETGRFFUN method as described below.
 f-
 
 \item The 
 c+
-astGrfFun 
+astSetGrfFun 
 c-
 f+
-AST_GRFFUN
+AST_SETGRFFUN
 f-
 method of the Plot class can be used to ``register''
 wrapper functions at run-time. This allows an application to switch
@@ -16009,10 +16009,10 @@ method described above.
 For details of the interfaces of the wrapper routines, see 
 c+
 either the {\tt grf\_pgplot.c} file included in the AST source
-distribution, or the reference documentation for the astGrfFun method.
+distribution, or the reference documentation for the astSetGrfFun method.
 c-
 f+
-the reference documentation for the AST_GRFFUN method.
+the reference documentation for the AST_SETGRFFUN method.
 f-
 
 \cleardoublepage
@@ -17293,10 +17293,10 @@ current version):
 
 \item The Plot class has a new method called 
 f+
-AST_GRFFUN 
+AST_SETGRFFUN 
 f-
 c+
-astGrfFun 
+astSetGrfFun 
 c-
 which allows the underlying primitive graphics functions to be selected
 at run-time. Previously, the functions used by the Plot class to produce

@@ -140,7 +140,7 @@ f        attributes for both axes, AST_TEST tests the attribute for axis 1,
 f        and AST_GET gets the value for axis 1.
 *     Grf (int)
 *        This attribute, if non-zero, indicates that the graphics
-*        functions registered using astGrfFun are to be used to draw 
+*        functions registered using astSetGrfFun are to be used to draw 
 *        graphics. Otherwise, the graphics interface selected at
 *        link-time (using ast_link options) is used.
 *     Grid (int)
@@ -519,7 +519,7 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
 *     13-JUN-2001 (DSB):
-*        Added function astGrfFun, and attribute Grf.
+*        Added function astSetGrfFun, and attribute Grf.
 *-
 */
 
@@ -648,7 +648,7 @@ typedef struct AstPlotVtab {
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
    void (* PolyCurve)( AstPlot *, int, int, int, const double * );
-   void (* GrfFun)( AstPlot *, const char *, void (*)() );
+   void (* SetGrfFun)( AstPlot *, const char *, void (*)() );
    void (* GrfWrapper)( AstPlot *, const char *, void (*)() );
    void (* Grid)( AstPlot * ); 
    void (* Mark)( AstPlot *, int, int, int, const double *, int  ); 
@@ -809,7 +809,7 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astCurve_( AstPlot *, const double [], const double [] );
    void astGrid_( AstPlot * );
    void astMark_( AstPlot *, int, int, int, const double *, int  ); 
-   void astGrfFun_( AstPlot *, const char *, void (*)() );
+   void astSetGrfFun_( AstPlot *, const char *, void (*)() );
    void astPolyCurve_( AstPlot *, int, int, int, const double * );
    void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
 
@@ -1036,8 +1036,8 @@ astINVOKE(V,astCurve_(astCheckPlot(this),start,finish))
 #define astPolyCurve(this,npoint,ncoord,dim,in) \
 astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in))
 
-#define astGrfFun(this,name,fun) \
-astINVOKE(V,astGrfFun_(astCheckPlot(this),name,fun))
+#define astSetGrfFun(this,name,fun) \
+astINVOKE(V,astSetGrfFun_(astCheckPlot(this),name,fun))
 
 
 #define astGrfFunID astGrfFunID_

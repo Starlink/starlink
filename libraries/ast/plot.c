@@ -106,7 +106,7 @@ f     following routines may also be applied to all Plots:
 c     - astBorder: Draw a border around valid regions of a Plot
 c     - astClip: Set up or remove clipping for a Plot
 c     - astCurve: Draw a geodesic curve
-c     - astGrfFun: Register a graphics routine for use by the Plot class
+c     - astSetGrfFun: Register a graphics routine for use by the Plot class
 c     - astGrid: Draw a set of labelled coordinate axes
 c     - astGridLine: Draw a grid line (or axis) for a Plot
 c     - astMark: Draw a set of markers for a Plot
@@ -115,7 +115,7 @@ c     - astText: Draw a text string for a Plot
 f     - AST_BORDER: Draw a border around valid regions of a Plot
 f     - AST_CLIP: Set up or remove clipping for a Plot
 f     - AST_CURVE: Draw a geodesic curve
-f     - AST_GRFFUN: Register a graphics routine for use by the Plot class
+f     - AST_SETGRFFUN: Register a graphics routine for use by the Plot class
 f     - AST_GRID: Draw a set of labelled coordinate axes
 f     - AST_GRIDLINE: Draw a grid line (or axis) for a Plot
 f     - AST_MARK: Draw a set of markers for a Plot
@@ -276,7 +276,7 @@ f     using AST_GRID
 *        Added a check when using interior labelling, to ensure that the
 *        most appropriate edges are used for text labels.
 *     13-JUN-2001 (DSB):
-*        Added public method astGrfFun.
+*        Added public method astSetGrfFun.
 *class--
 */
 
@@ -1399,7 +1399,7 @@ static void GQch( AstPlot *, float *, float *, const char *, const char * );
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GraphGrid( int, double, double, double, double, double ** );
-static void GrfFun( AstPlot *, const char *,  void (*)() );
+static void SetGrfFun( AstPlot *, const char *,  void (*)() );
 static void GrfWrapper( AstPlot *, const char *,  void (*)() );
 static void Grid( AstPlot * );
 static void GridLine( AstPlot *, int, const double [], double );
@@ -1667,8 +1667,8 @@ astMAKE_TEST(Plot,ClipOp,( this->clipop != -1 ))
 *     Grf
 
 *  Purpose:
-c     Use Grf functions registered through astGrfFun?
-f     Use Grf routines registered through AST_GRFFUN?
+c     Use Grf functions registered through astSetGrfFun?
+f     Use Grf routines registered through AST_SETGRFFUN?
 
 *  Type:
 *     Public attribute.
@@ -1680,14 +1680,14 @@ f     Use Grf routines registered through AST_GRFFUN?
 c     This attribute selects the functions which are used to draw graphics by 
 c     the Plot class. If it is zero, then the functions in the graphics 
 c     interface selected at link-time are used (see the ast_link script). 
-c     Otherwise, functions registered using astGrfFun are used. In this
+c     Otherwise, functions registered using astSetGrfFun are used. In this
 c     case, if a function is needed which has not been registered,
 c     then the function in the graphics interface selected at link-time is 
 c     used.
 f     This attribute selects the routines which are used to draw graphics by 
 f     the Plot class. If it is zero, then the routines in the graphics 
 f     interface selected at link-time are used (see the ast_link script). 
-f     Otherwise, routines registered using AST_GRFFUN are used. In this
+f     Otherwise, routines registered using AST_SETGRFFUN are used. In this
 f     case, if a routine is needed which has not been registered,
 f     then the routine in the graphics interface selected at link-time is 
 f     used.
@@ -1707,7 +1707,7 @@ f     a Plot using AST_READ, the attribute will be cleared, resulting in the
 
 *att--
 */
-/* Use Grf routines registered using astGrfFun? Has a 
+/* Use Grf routines registered using astSetGrfFun? Has a 
 value of -1 when not set yielding a default of 0. */
 astMAKE_CLEAR(Plot,Grf,grf,-1)
 astMAKE_GET(Plot,Grf,int,0,(this->grf == -1 ? 0 : this->grf))
@@ -10203,9 +10203,9 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
 *  Description:
 *     This function calls the GAttr grf function to enquire or set a 
 *     graphics attribute value. It either calls the version registered using 
-*     astGrfFun, or the version in the linked grf module. The linked version 
+*     astSetGrfFun, or the version in the linked grf module. The linked version 
 *     is used if the Grf attribute is zero, or if no function has been 
-*     registered for GAttr using astGrfFun.
+*     registered for GAttr using astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10247,7 +10247,7 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GATTR ] ) {
@@ -10290,10 +10290,10 @@ static void GAxScale( AstPlot *this, float *alpha, float *beta,
 
 *  Description:
 *     This function calls the GAxScale grf function to get the axis scales,
-*     either calling the version registered using astGrfFun, or the version 
+*     either calling the version registered using astSetGrfFun, or the version 
 *     in the linked grf module. The linked version is used if the Grf 
 *     attribute is zero, or if no function has been registered for GAxScale 
-*     using astGrfFun.
+*     using astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10320,7 +10320,7 @@ static void GAxScale( AstPlot *this, float *alpha, float *beta,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GAXSCALE ] ) {
@@ -10363,10 +10363,10 @@ static void GFlush( AstPlot *this, const char *method,
 
 *  Description:
 *     This function calls the Gflush grf function to flush graphics, either
-*     calling the version registered using astGrfFun, or the version in the
+*     calling the version registered using astSetGrfFun, or the version in the
 *     linked grf module. The linked version is used if the Grf attribute
 *     is zero, or if no function has been registered for Gflush using
-*     astGrfFun.
+*     astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10387,7 +10387,7 @@ static void GFlush( AstPlot *this, const char *method,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GFLUSH ] ) {
@@ -10432,10 +10432,10 @@ static void GLine( AstPlot *this, int n, const float *x,
 
 *  Description:
 *     This function calls the Gline grf function to draw a polyline, either
-*     calling the version registered using astGrfFun, or the version in the
+*     calling the version registered using astSetGrfFun, or the version in the
 *     linked grf module. The linked version is used if the Grf attribute
 *     is zero, or if no function has been registered for Gline using
-*     astGrfFun.
+*     astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10462,7 +10462,7 @@ static void GLine( AstPlot *this, int n, const float *x,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GLINE ] ) {
@@ -10507,10 +10507,10 @@ static void GMark( AstPlot *this, int n, const float *x,
 
 *  Description:
 *     This function calls the GMark grf function to draw markers, either
-*     calling the version registered using astGrfFun, or the version in the
+*     calling the version registered using astSetGrfFun, or the version in the
 *     linked grf module. The linked version is used if the Grf attribute
 *     is zero, or if no function has been registered for GMark using
-*     astGrfFun.
+*     astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10540,7 +10540,7 @@ static void GMark( AstPlot *this, int n, const float *x,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GMARK ] ) {
@@ -10583,10 +10583,10 @@ static void GQch( AstPlot *this, float *chv, float *chh,
 
 *  Description:
 *     This function calls the GQch grf function to get character heights, 
-*     either calling the version registered using astGrfFun, or the version
+*     either calling the version registered using astSetGrfFun, or the version
 *     in the linked grf module. The linked version is used if the Grf 
 *     attribute is zero, or if no function has been registered for GQch 
-*     using astGrfFun.
+*     using astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10615,7 +10615,7 @@ static void GQch( AstPlot *this, float *chv, float *chh,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GQCH ] ) {
@@ -10660,10 +10660,10 @@ static void GText( AstPlot *this, const char *text, float x, float y,
 
 *  Description:
 *     This function calls the GText grf function to draw a text string, either
-*     calling the version registered using astGrfFun, or the version in the
+*     calling the version registered using astSetGrfFun, or the version in the
 *     linked grf module. The linked version is used if the Grf attribute
 *     is zero, or if no function has been registered for GText using
-*     astGrfFun.
+*     astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10712,7 +10712,7 @@ static void GText( AstPlot *this, const char *text, float x, float y,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GTEXT ] ) {
@@ -10758,9 +10758,9 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
 *  Description:
 *     This function calls the GTxExt grf function to find the extent
 *     of a text string, either calling the version registered using 
-*     astGrfFun, or the version in the linked grf module. The linked 
+*     astSetGrfFun, or the version in the linked grf module. The linked 
 *     version is used if the Grf attribute is zero, or if no function 
-*     has been registered for GTxExt using astGrfFun.
+*     has been registered for GTxExt using astSetGrfFun.
 
 *  Parameters:
 *     this
@@ -10815,7 +10815,7 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
    if ( !astOK ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astGrfFun (so long as a function has been supplied).
+   registered using astSetGrfFun (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GTXEXT ] ) {
@@ -11970,12 +11970,12 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 
 }
 
-static void GrfFun( AstPlot *this, const char *name, void (* fun)() ){
+static void SetGrfFun( AstPlot *this, const char *name, void (* fun)() ){
 /*
 *++
 *  Name:
-c     astGrfFun
-f     AST_GRFFUN
+c     astSetGrfFun
+f     AST_SETGRFFUN
 
 *  Purpose:
 c     Register a graphics function for use by the Plot class.
@@ -11986,8 +11986,8 @@ f     Register a graphics routine for use by the Plot class.
 
 *  Synopsis:
 c     #include "plot.h"
-c     void astGrfFun( AstPlot *this, const char *name, void (* fun)() )
-f     CALL AST_GRFFUN( THIS, NAME, FUN, STATUS )
+c     void astSetGrfFun( AstPlot *this, const char *name, void (* fun)() )
+f     CALL AST_SETGRFFUN( THIS, NAME, FUN, STATUS )
 
 *  Class Membership:
 *     Plot member function.
@@ -12055,14 +12055,14 @@ c        functionality indicated by parameter name.
 f        The name of the routine to be used to provide the
 f        functionality indicated by parameter NAME (the name
 f        should also appear in a Fortran EXTERNAL statement in the
-f        routine which invokes AST_GRFFUN). 
+f        routine which invokes AST_SETGRFFUN). 
 *
 c        Once a function has been provided, a null pointer can be supplied 
-c        in a subsequent call to astGrfFun to reset the function to the 
+c        in a subsequent call to astSetGrfFun to reset the function to the 
 c        corresponding function in the graphics interface selected at
 c        link-time.
 f        Once a routine has been provided, the "null" routine AST_NULL can 
-f        be supplied in a subsequent call to astGrfFun to reset the routine 
+f        be supplied in a subsequent call to astSetGrfFun to reset the routine 
 f        to the corresponding routine in the graphics interface selected at
 f        link-time. AST_NULL is defined in the AST_PAR include file.
 f     STATUS = INTEGER (Given and Returned)
@@ -12272,7 +12272,7 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
 
 /* Store the current method and class for inclusion in error messages
    generated by lower level functions. */
-   method = "astGrfFun";
+   method = "astSetGrfFun";
    class = astClass( this );
 
 /* Identify the supplied function name and get its integer index into the
@@ -12503,7 +12503,7 @@ static void GrfWrapper( AstPlot *this, const char *name, void (* wrapper)() ) {
 *        The plot.
 *     name
 *        A name indicating the graphics function which is called by the
-*        supplied wrapper function. See astGrfFun for details.
+*        supplied wrapper function. See astSetGrfFun for details.
 *     wrapper
 *        A pointer to the wrapper function. This will be cast to an
 *        appropriate type for the named grf function before being store 
@@ -14247,7 +14247,7 @@ static void InitVtab( AstPlotVtab *vtab ) {
    vtab->Clip = Clip; 
    vtab->GridLine = GridLine;
    vtab->Curve = Curve;
-   vtab->GrfFun = GrfFun;
+   vtab->SetGrfFun = SetGrfFun;
    vtab->GrfWrapper = GrfWrapper;
    vtab->PolyCurve = PolyCurve;
    vtab->CvBrk = CvBrk;
@@ -20915,7 +20915,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    cause a default value of 0 (no, i.e. a logical AND) to be used. */
       new->clipop = -1;
 
-/* Is the graphics interface registered using astGrfFun to be used?
+/* Is the graphics interface registered using astSetGrfFun to be used?
    Store a value of -1 to indicate that no value has yet been set. This will 
    cause a default value of 0 (no, i.e. use the graphics interface
    selected at link-time) to be used. */
@@ -21568,9 +21568,9 @@ void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim,
    (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in);
 }
 
-void astGrfFun_( AstPlot *this, const char *name, void (* fun)() ){
+void astSetGrfFun_( AstPlot *this, const char *name, void (* fun)() ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,GrfFun))(this,name,fun);
+   (**astMEMBER(this,Plot,SetGrfFun))(this,name,fun);
 }
 
 void astGrfWrapper_( AstPlot *this, const char *name, void (* wrapper)() ){
