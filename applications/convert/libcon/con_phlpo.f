@@ -98,7 +98,7 @@
      :        '(/1X,''Press RETURN to continue ...'',$)' )
 
 *  Get a line of uppercase input.
-            CALL SREAD( LUCMD, BUFA, BUFB, CMD, J )
+            CALL CON_SREAD( LUCMD, BUFA, BUFB, CMD, J )
 
 *  Treat a comment or EOF as blank input.
             IF ( J .NE. 0 ) CMD = ' '

@@ -101,7 +101,7 @@
      :        WRITE ( LUTERM, '(1X,A,$)' ) PROMPT
 
 *  Get a line of uppercase input.
-            CALL SREAD( LUCMD, BUFA, BUFB, STRING, J )
+            CALL CON_SREAD( LUCMD, BUFA, BUFB, STRING, J )
 
 *  Treat comment or EOF as blank input.
             IF ( J .GT. 0 ) STRING = ' '
