@@ -239,12 +239,11 @@ increase from bottom to top.
 =cut
 
 sub _GScales {
-  my $alpha = shift;
-  my $beta = shift;
-
+  # Query device for world and viewport coordinates
   my ( $nx1, $nx2, $ny1, $ny2 ) = plgvpd();
   my ( $wx1, $wx2, $wy1, $wy2 ) = plgvpw();
 
+  my ($alpha, $beta);
   if( $wx2 != $wx1 && $wy2 != $wy1 && $nx2 != $nx1 && $ny2 != $ny1 ) {
     $alpha = ( $nx2 - $nx1 ) / ( $wx2 - $wx1 );
     $beta = ( $ny2 - $ny1 ) / ( $wy2 - $wy1 );
@@ -495,7 +494,10 @@ sub _GCap {
   my $cap = shift;
   my $value = shift;
 
-  warn "_GCap: not yet implemented in PLplot [assume lack capability $cap]\n";
+  # We have got a SCALES routine
+  if ($cap == &Starlink::AST::Grf::GRF__SCALES) {
+    return 1;
+  }
   return 0;
 }
 
