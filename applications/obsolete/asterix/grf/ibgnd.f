@@ -114,6 +114,10 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL			CHR_SIMLR
+        LOGICAL			CHR_SIMLR
+
 *  Local Constants:
       CHARACTER*30		VERSION
         PARAMETER		( VERSION = 'IBGND Version V2.0-0' )
@@ -121,6 +125,7 @@
 *  Local Variables:
       CHARACTER*16		CMD			! Major mode
       CHARACTER*7		MODE			! Sampling mode
+      CHARACTER*80		OFILE			! Output file name
 
       REAL			XPOS, YPOS, R		! Source position
 
@@ -252,6 +257,14 @@
 *      Display model residuals
           ELSE IF ( CMD .EQ. 'RDISP' ) THEN
             CALL IBGND_DISP_SURF( -1, STATUS )
+
+*      Save sources to file
+          ELSE IF ( CMD .EQ. 'SAVESRC' ) THEN
+            CALL USI_GET0C( 'SUBMODE', SUBMODE, STATUS )
+            IF ( .NOT. CHR_SIMLR( SUBMODE, 'internal' ) ) THEN
+              CALL USI_GET0C( 'OUT', OFILE, STATUS )
+            END IF
+            CALL IBGND_SAVESRC( SUBMODE, OFILE, STATUS )
 
 *      Save model to file
           ELSE IF ( CMD .EQ. 'SAVE' ) THEN
@@ -1314,6 +1327,228 @@
 
 *  Copy ancilliary stuff from input
       CALL UDI_COPANC( I_FID, ' ', FID, STATUS )
+
+      END
+
+
+
+      SUBROUTINE IBGND_SAVESRC( MODE, FILE, STATUS )
+*+
+*  Name:
+*     IBGND_SAVESRC
+
+*  Purpose:
+*     Save current source list
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_SAVESRC( MODE, FILE, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     MODE = CHARACTER*(*) (given)
+*        Output mode
+*     FILE = CHARACTER*(*) (given)
+*        Output filename
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      CHARACTER*(*)		MODE, FILE
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_SIMLR
+        LOGICAL			CHR_SIMLR
+
+*  Local Constants:
+      INTEGER			M_INT			! Internal mode flag
+        PARAMETER		( M_INT = 1 )
+
+      INTEGER			M_TXT			! Ascii mode flag
+        PARAMETER		( M_TXT = 2 )
+
+*  Local Variables:
+      CHARACTER*18		CTIME			! Date and time string
+      CHARACTER*11		RAS, DECS		! Formatted coords
+
+      DOUBLE PRECISION		RA, DEC			! Source position
+
+      REAL			X, Y, R			! Source attributes
+
+      INTEGER			I			! Loop over sources
+      INTEGER			IMODE			! Output mode
+      INTEGER			OCH			! Output channel
+      INTEGER			OWID			! Channel width
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Internal mode?
+      IF ( CHR_SIMLR( MODE, 'internal' ) ) THEN
+        IMODE = M_INT
+      ELSE
+        IMODE = M_TXT
+      END IF
+
+*  Sources to output?
+      IF ( I_BGM_NSRC .GT. 0 ) THEN
+
+*    Start the listing. Internal mode?
+        IF ( IMODE .EQ. M_INT ) THEN
+
+*      Get group id for storing positions
+          IF ( I_NPOS .EQ. 0 ) THEN
+            CALL GRP_NEW( 'Source list', I_POS_ID, STATUS )
+
+*      Should give choice of appending here
+          ELSE
+            CALL GRP_SETSZ( I_POS_ID, 0, STATUS )
+            I_NPOS = 0
+
+          END IF
+
+*    Ascii text file mode
+        ELSE IF ( IMODE .EQ. M_TXT ) THEN
+
+*      Open the file
+          CALL AIO_OPEN( FILE, 'LIST', OCH, OWID, STATUS )
+
+*      Write a header
+          CALL TCI_CTIME( CTIME, STATUS )
+          CALL AIO_WRITE( OCH, '# Source list written by IBGND at '/
+     :                    /CTIME, STATUS )
+
+        END IF
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    Read each source in turn
+        DO I = 1, I_BGM_NSRC
+
+*      Get source data
+          CALL IBGND_GETSRC( I, X, Y, R, STATUS )
+
+*      Convert X,Y to RA,DEC
+          CALL IMG_WORLDTOCEL( X, Y, RA, DEC, STATUS )
+
+*      Switch on mode. Internal mode
+          IF ( IMODE .EQ. M_INT ) THEN
+
+*        Add to internal list
+            CALL IMG_PUTPOS( RA, DEC, STATUS )
+
+*      Ascii mode
+          ELSE IF ( IMODE .EQ. M_TXT ) THEN
+
+*        Format text
+            CALL STR_DRADTOC( RA*MATH__DDTOR, 'HH:MM:SS.SS', RAS,
+     :                        STATUS )
+            CALL STR_DRADTOC( DEC*MATH__DDTOR, 'SDD:MM:SS.S', DECS,
+     :                        STATUS )
+
+*        Write it out, with radius as third column
+            CALL MSG_SETR( 'R', R )
+            CALL AIO_WRITE( OCH, RAS//' '//DECS//' ^R', STATUS )
+
+          END IF
+
+        END DO
+
+*    End the listing
+        IF ( IMODE .EQ. M_INT ) THEN
+        ELSE IF ( IMODE .EQ. M_TXT ) THEN
+
+*      Close the file
+          CALL AIO_CLOSE( OCH, STATUS )
+          IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+        END IF
+
+      ELSE
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'No sources to output', STATUS )
+
+      END IF
+
+*  Abort point
+  99  CONTINUE
 
       END
 
@@ -3320,13 +3555,14 @@
 *    Function declarations :
 *    Local constants :
       INTEGER MLINE
-      PARAMETER (MLINE=17)
+      PARAMETER (MLINE=18)
 *    Local variables :
       CHARACTER*79 MTEXT(MLINE)
      :/' Source commands:',' ',
      : '  ADDSRC  - Add a source to the source database',
      : '  DELSRC  - Delete a source from the source database',
      : '  MARKSRC - Mark source positions on current display',
+     : '  SAVESRC - Save source list',
      : ' ', ' Sampling commands:',' ',
      : '  SETSAMP - Set sampling mode (WHOLE, ANNULUS or BOX)',
      : '  SETFIT  - Method of sample interpolation',
