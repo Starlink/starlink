@@ -292,7 +292,7 @@ same effect as <code>&ddash;font-search=none</code>.</p>
 <dt><code>-G, &ddash;font-gen=[boolean], &ddash;font-gen=command[=script]</code></dt>
 
 <dd><p>Switch automatic generation of fonts off and on.  
-If <code>--fontgen=command</code>
+If <code>--font-gen=command</code>
 is given, then the command specified at compile time is used to
 generate fonts.  If, further, a font-generation script is specified, then it
 will be used instead of the default.  The specified script is a
@@ -358,7 +358,7 @@ options.  If this option is present, then the program returns non-zero
 if any fonts were missing (see also <ref id=usage.exit/>).  The
 <code>-n</code> is for brevity and consistency with other tools -- the
 behaviour can be more rationally specified as
-<code>&ddash;process=preamble-only</code></p></dd>
+<code>&ddash;process=nodvi,nopostamble</code></p></dd>
 
 <dt><code>-o, &ddash;output=[filename-pattern]</code></dt>
 
@@ -479,7 +479,13 @@ font-generation commands for found fonts are also listed, prefixed by
 <code>&ddash;query=all-fonts</code>,
 <code>&ddash;query=missing-fontgen</code> and
 <code>&ddash;query=all-fontgen</code> should be specified -- if more
-than one appears, only the last one is respected.</p></dd>
+than one appears, only the last one is respected -- if more than one
+appears, only the last 
+one is respected.  In each of these four cases, plus their short
+forms, font-generation is automatically suppressed.  This is probably
+what you want (it's not obvious why you're querying this otherwise),
+but if you do not want this, then you can reenable font generation with 
+<code>--font-gen=true</code></p></dd>
 
 <dt><code>&ddash;query=paper</code></dt>
 <dd>Show the list of paper sizes which are predefined for the
@@ -537,28 +543,40 @@ chatter, and does not display warnings or errors either.</dd>
 <dt><code>-X, &ddash;process=[keyword-value-list]</code></dt>
 <dd><p>Specifies the processing to be done.  Keywords are as follows:</p>
 
-<p><code>options-only=[boolean]</code>: if true, then do not process a
-DVI file at all, and do not require one to be present on the command
-line.  Useful with some of the <code>&ddash;query</code> options.</p>
+<p><code>dvi</code> and <code>nodvi</code>
+: enable or disable processing of the DVI file.  If disabled, we do
+not require a DVI file to be present on the command line.  The 
+<code>nodvi</code> option is useful with some of the 
+<code>--query</code> options.</p>
 
-<p><code>preamble-only=[boolean]</code>: if true, then only examine
-the preamble (and therefore necessarily also the postamble) of the DVI
-file.</p>
+<p><code>postamble</code> and <code>nopostamble</code>: enable or
+disable processing of the DVI postamble.  If dvi2bitmap is
+called to invoke a non-seekable device such as a pipe, you should
+disable processing of the postamble.  Disabling the postamble
+processing is incompatible with the 
+<code>--query</code> options which examine the fonts in the file.  By
+default, both the DVI body and the postamble are processed.</p>
 
-<p><code>blur=[boolean]</code>: if true, blurs the bitmap, making a
-half-hearted attempt to make a low-resolution bitmap look better.
-This really isn't up to much -- if you have the fonts available, or
-are prepared to wait for them to be generated, a better way is to use
-the <code>&ddash;magnification</code> option to magnify the DVI file,
-and then the <code>&ddash;scale</code> option to scale it back down to
-the correct size.</p>
+<p><code>--process=preamble-only</code>: shorthand for 
+<code>--process=nodvi,nopostamble</code>.  Only the preamble is
+examined.  This can be expressed more compactly with the conventional
+<code>-n</code> option.</p>
 
-<p><code>transparent=[boolean]</code>: if true, this makes the output
-bitmap have a transparent background, if that's supported by the
-particular format you choose using option
+<p><code>blur</code> and <code>noblur</code>: if true, blurs the
+bitmap, making a half-hearted attempt to make a low-resolution bitmap
+look better.  This really isn't up to much -- if you have the fonts
+available, or are prepared to wait for them to be generated, a better
+way is to use the <code>&ddash;magnification</code> option to magnify
+the DVI file, and then the <code>&ddash;scale</code> option to scale
+it back down to the correct size.</p>
+
+<p><code>transparent</code> and <code>notransparent</code>: if true,
+this makes the output bitmap have a transparent background, if that's
+supported by the particular format you choose using option
 <code>&ddash;output-type</code></p>
 
-<p><code>crop=[boolean]</code>: if true, specifies that you want the
+<p><code>crop</code> and <code>nocrop</code>: if true, specifies that
+you want the
 output bitmap to be cropped.  This is true by default, so you'll most
 often use the <code>crop=false</code> to specify that you do not want
 the output cropped (for example, if you're using the
