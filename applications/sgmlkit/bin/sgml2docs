@@ -1,7 +1,8 @@
 #! /bin/sh -
-#
+
 RCSID='$Id$'
-#
+ident_string='Starlink SGML Kit, release ((PKG_VERS))'
+
 #+
 #  <routinename id=sgml2docs>
 #     sgml2docs
@@ -28,18 +29,18 @@ RCSID='$Id$'
 #
 #  <diytopic>Options
 #     <dl>
-#     --html: generate HTML (the default).
-#     --htmlsingle: generate HTML in a single file.
-#     --latex: generate LaTeX.
-#     --packagedir my-dir: package up the generated files into a
+#     <dt>--html<dd>generate HTML (the default).
+#     <dt>--htmlsingle<dd>generate HTML in a single file.
+#     <dt>--latex<dd>generate LaTeX.
+#     <dt>--packagedir my-dir<dd>package up the generated files into a
 #           directory called `my-dir'.
-#     --tarball my.tar: bundle the package-dir into a tarball named `my.tar'
-#     --jadeflags flags: add the given flags to the invocation of Jade.
-#     --options opt,opt,...: set format-specific options.
-#     --help: display usage and exit.
-#     --version: display version and exit.
-#     --debug: do some debugging.  Specifically, don't tidy up at end.
-#     -n: don't actually run anything, just show what would happen.
+#     <dt>--tarball my.tar<dd>bundle the package-dir into a tarball named `my.tar'
+#     <dt>--jadeflags flags<dd>add the given flags to the invocation of Jade.
+#     <dt>--options opt,opt,...<dd>set format-specific options.
+#     <dt>--help<dd>display usage and exit.
+#     <dt>--version<dd>display version and exit.
+#     <dt>--debug<dd>do some debugging.  Specifically, don't tidy up at end.
+#     <dt>-n<dd>don't actually run anything, just show what would happen.
 #     </dl>
 #
 #     <p>The available extra options, for the <code>--options</>
@@ -75,9 +76,7 @@ RCSID='$Id$'
 #     system find the bibliography database.
 #
 #  <authorlist>
-#  <author id=ng 
-#          email='norman@astro.gla.ac.uk'
-#          affiliation='Starlink, Glasgow'>
+#  <author id=ng email='norman@astro.gla.ac.uk' affiliation='Starlink, Glasgow'>
 #     Norman Gray
 #
 #  <history>
@@ -145,7 +144,7 @@ while [ $# -gt 0 ]; do
 	--debug) DEBUGGING=true ;;
 	--options) OPTIONS=$2; shift ;;
 	--help) echo $USAGE; exit 0;;
-	--version) echo $RCSID; exit 0;;
+	--version) echo $ident_string; echo $RCSID; exit 0;;
 	-n) run=echo; runn=: ; tempdest=/dev/stdout; ;;
 	-*) echo $USAGE; exit 1 ;;
 	*) SGMLSRC=$1 ;;

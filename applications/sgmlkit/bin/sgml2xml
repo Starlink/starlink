@@ -1,6 +1,7 @@
 #! /usr/bin/perl -w
 
-RCSID="$Id$"
+$RCSID='$Id$';
+$ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 
 #+
 #  <routinename id=sgml2xml>
@@ -145,7 +146,8 @@ while ($#ARGV >= 0) {
 	$#ARGV >= 0 || Usage();
 	$docdecl = $ARGV[0];
     } elsif ($ARGV[0] eq '--version') {
-	echo $RCSID; exit 0;
+	print "$ident_string\n$RCSID\n";
+	exit 0;
     } elsif ($ARGV[0] =~ /^-/) {
 	Usage();
     } else {
@@ -280,7 +282,8 @@ sub gettoken {
 	#my @t;
 	# [A-Za-z] are the characters in production `name start character[53]',
 	# and [A-Za-z0-9.-] the characters in production `name character[52]'
-	# (in the SGML RCS).  Also recognise tokens starting with RNI (`#').
+	# (in the SGML RCS).
+	# Also recognise tokens starting with RNI (`#').
 	# Also add PERO (`%').
 	while ($token_line !~ /<!|[\[\]>%]|#?[A-Za-z][A-Za-z0-9.-]*|'.*?'|".*?"|--.*?--/s) {
 	    my $l = <INFILE>;
@@ -288,17 +291,16 @@ sub gettoken {
 	    if (defined($l)) {
 		$token_line .= $l;
 	    } else {
-		# this logic will fail if a syntactically correct file 
-		# does not have a final newline.
+		# This logic will fail if a syntactically correct file 
+		# does not have a final newline.  That'll only be a
+		# problem if the file ends within or immediately after
+		# the internal declaration subset.
 		return $l;	# return undefined -- EOF
 	    }
 	}
 	push (@token_array,
 	      ($token_line =~ /\s*(<!|[\[\]>%]|#?[A-Za-z][A-Za-z0-9.-]*|'.*?'|".*?"|--.*?--)\s*/sg));
 	$token_line = '';
-#	@t = ($token_line =~ /\s*(<!|[\[\]>%]|#?[A-Za-z][A-Za-z0-9.-]*|'.*?'|".*?"|--.*?--)\s*/sg);
-#	$token_line = '';
-#	push (@token_array, @t);
 
 	# again siphon off any leading comments into @comment_buffer
 	while ($#token_array >= 0 && $token_array[0] =~ /^--/) {
