@@ -8,7 +8,7 @@
 *     Write bolometer positions and values to text file
 
 *  RealName: 
-*     SURF_WRITE_DATA (Use first name for help files)
+*     SURF_WRITE_DATA
  
 *  Language:
 *     Starlink Fortran 77
@@ -68,7 +68,7 @@
 *        - RB:  RA/Dec (B1950)
 *        - RJ:  RA/Dec (J2000)
 *        - RD:  RA/Dec (epoch of observation)
-*        - GA:  Galactic coordinates (J2000
+*        - GA:  Galactic coordinates (J2000)
 *     REF = CHAR (Read)
 *        The name of the first NDF to be rebinned. The name may also be the
 *        name of an ASCII text file containing NDF and parameter values.
@@ -107,6 +107,10 @@
 
 *  Related Applications:
 *     SURF: REBIN, BOLREBIN, INTREBIN, CHANGE_QUALITY
+
+*  Algorithm:
+*     This task is part of the REBIN package and this subroutine simply
+*     deals with the file I/O.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
