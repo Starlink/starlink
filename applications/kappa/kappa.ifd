@@ -10438,76 +10438,68 @@ package kappa {
       action glitch {
          alias {glit(ch)}
 
-         parameter inpic {
+         helplib {$KAPPA_HELP}
+
+          parameter in {
             position 1
-            type IMAGE
+            type NDF
             access READ
             vpath PROMPT
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {Image to be deglitched}
-            help "Name of the IMAGE structure containing the 2-d data array to be deglitched."
+            prompt {Input image}
+            helpkey *
           }
 
-         parameter outpic {
+          parameter incat {
+            type FILENAME
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.CATALOGUE
+            prompt {Positions list containing bad pixel positions}
+            helpkey *
+          }
+
+          parameter infile {
+            type FILENAME
+            vpath PROMPT
+            ppath CURRENT
+            prompt {File containing the bad pixel positions}
+            helpkey *
+          }
+
+          parameter mode {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Mode to obtain pixel positions}
+            default Interface
+            helpkey *
+          }
+
+          parameter out {
             position 2
-            type IMAGE
+            type NDF
             access WRITE
             vpath PROMPT
             association ->GLOBAL.DATA_ARRAY
-            prompt {Image after being deglitched}
-            help "Name given to the IMAGE structure to hold the data array after being deglitched."
+            prompt {Output image}
+            helpkey *
           }
 
-         parameter otitle {
+          parameter pixpos {
+            type LITERAL
+            ppath DYNAMIC
+            prompt {Bad pixel position}
+            helpkey *
+          }
+
+          parameter title {
             position 3
             type LITERAL
             vpath DEFAULT
             prompt {Title for output image}
-            default {KAPPA - Glitch}
-            help "Character string used as a title for the output IMAGE structure."
-          }
-
-         parameter where {
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Source of glitch positions}
-            help "File for free-format file list, Interface for input from environment, Bad for automatic removal of bad (magic) pixels."
-          }
-
-         parameter filename {
-            type FILENAME
-            vpath PROMPT
-            ppath DEFAULT
-            prompt {Glitch list file name}
-            default glitch.lis
-            help "Give the name of the free-format file containing x,y positions of pixels."
-          }
-
-         parameter xcoord {
-            type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {x pixel index of pixel to be replaced}
-            help "Give the x pixel index of the pixel to be deglitched."
-          }
-
-         parameter ycoord {
-            type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {y pixel index of pixel to be replaced}
-            help "Give the y pixel index of the pixel to be deglitched."
-          }
-
-         parameter again {
-            type _LOGICAL
-            vpath PROMPT
-            ppath DEFAULT
-            prompt {Another pixel ?}
-            default TRUE
-            help "Whether or not another pixel is to be deglitched."
+            default !
+            helpkey *
           }
 
       }
