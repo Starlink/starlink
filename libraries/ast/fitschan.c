@@ -236,6 +236,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Corrected values of macros DSS_ENCODING and MAX_ENCODING.
 *        - Corrected erroneous success indication in IrafStore.
 *        - Included checks for bad values in function LinearMap.
+*     17-NOV-1998 (DSB):
+*        The Domain name GRID is now given to the Base Frame in any FrameSets
+*        created by astRead when using FitsChans with DSS, FITS-WCS or
+*        FITS-IRAF encodings.
 *class--
 */
 
@@ -8939,8 +8943,9 @@ static AstFrameSet *ReadDSS( AstFitsChan *this ){
    the mandatory PLTRAH keyword. */
    if( !astTestCard( this ) && astKeyFields( this, "PLTRAH", 0, NULL, NULL ) ){
 
-/* Create a Frame describing the pixel coordinate system. */
-      pframe = astFrame( 2, "Title=Pixel Coordinates" );
+/* Create a Frame describing the pixel coordinate system. Give it the
+   Domain name GRID. */
+      pframe = astFrame( 2, "Title=Pixel Coordinates,Domain=GRID" );
 
 /* Store labels for each pixel axis. */
       if( astOK ){
@@ -9103,8 +9108,9 @@ static AstFrameSet *ReadWcs( AstFitsChan *this ){
       Skipping = 0;
 
 /* Create a Frame describing the pixel coordinate system. This is known as 
-   the "actual pixel coordinate system" in FITS WCS documentation. */
-      frame = astFrame( naxis, "Title=Pixel Coordinates" );
+   the "actual pixel coordinate system" in FITS WCS documentation. Give it
+   the Domain GRID. */
+      frame = astFrame( naxis, "Title=Pixel Coordinates,Domain=GRID" );
 
 /* Store labels for each pixel axis. */
       if( astOK ){
