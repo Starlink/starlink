@@ -45912,6 +45912,23 @@ The following applications have been modified:
 
 \section{\xlabel{se_changes}Release Notes---V0.16\label{se:changes}}
 
+
+\subsection{Modified applications}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{FITSEDIT}{FITSEDIT}] \mbox{}
+      \begin{itemize}
+         \item FITSEDIT and FITSTEXT both now allow blank keyword values
+               to be supplied. They also allow the equals sign to be omitted so 
+               long as the keyword value is blank.
+         \item A bug has been fixed which caused comments to be lost if
+               they abut the keyword value in the text file.
+      \end{itemize}
+
+\end{description}
+
 \subsection{New applications}
 A new command called \htmlref{LUTWARM}{LUTWARM} has been added. It loads a
 colour table which goes from black to white, passing through warm shades
