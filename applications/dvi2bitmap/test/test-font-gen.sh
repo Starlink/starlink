@@ -80,6 +80,10 @@ else
 	echo "You have enabled font-generation.  Either you have disabled"
 	echo "use of the kpathsea library, or else it is not available."
 	echo
+	echo "You therefore MUST set the environment variable"
+	echo "DVI2BITMAP_PK_PATH (or use the -fp option), if dvi2bitmap"
+	echo "is to find the fonts it asks the system to generate."
+	echo
 	echo "I will now try to generate the fonts required for the test file."
 	echo "This might be redundant, but it won't be wrong."
 	echo $preline
