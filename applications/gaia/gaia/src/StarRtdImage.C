@@ -112,11 +112,16 @@
 //        Added changes to support NDFs stored within container files.
 //     15-OCT-1999 (PWD):
 //        Added changes to astsystem to select a pixel coordinate system.
-//     178-NOV-1999 (PWD):
+//     17-NOV-1999 (PWD):
 //        Changed dumpCmd to attempt to write a native encoding of the
 //        WCS, if the default encoding isn't Native (this happens -
 //        sometimes - when the channel contains a known WCS that is
 //        illegal?).
+//     01-FEB-2000 (PWD):
+//        Override RTD "remote" command so that we use GaiaRtdRemote
+//        instead of RtdImageRemote class. This cleans up the control
+//        of the ~/.rtd-remote file (which can become invalid when
+//        main windows are closed).
 //-
 
 #include <string.h>
@@ -142,6 +147,7 @@
 #include "grf_tkcan.h"
 #include "tcl_err.h"
 #include "rtdDtrn.h"
+#include "GaiaRtdRemote.h"
 
 // Include any foreign commands. These are processed by the "foreign"
 // member function when requested.
@@ -188,11 +194,12 @@ public:
   { "contour",       &StarRtdImage::contourCmd,      1, 6 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
-  { "gband",         &StarRtdImage::gbandCmd,        6,  6},
-  { "hdu",           &StarRtdImage::hduCmd,          0,  6},
+  { "gband",         &StarRtdImage::gbandCmd,        6, 6 },
+  { "hdu",           &StarRtdImage::hduCmd,          0, 6 },
   { "origin",        &StarRtdImage::originCmd,       2, 2 },
   { "percentiles",   &StarRtdImage::percentCmd,      1, 1 },
   { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
+  { "remote",        &StarRtdImage::remoteCmd,       0, 1 },
   { "slice",         &StarRtdImage::sliceCmd,       11, 11},
   { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
   { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 }
@@ -4359,4 +4366,45 @@ int StarRtdImage::fileExists( const char *filename )
     }
   }
   return 0;
+}
+
+//+
+//   StarRtdImage::remoteCmd
+//
+//   Purpose:
+//     Override "remote" command so that the GaiaRtdRemote class is
+//     used to present the remote control interface. This has better
+//     facilities for keeping the ~/.rtd-remote interface up to date.
+//
+//-
+int StarRtdImage::remoteCmd( int argc, char *argv[] )
+{
+   //  If no arguments return the current port number.
+   if ( argc == 0 ) {
+      if ( remote_ ) {
+         return set_result( remote_->port() );
+      }
+      return TCL_OK;
+   }
+
+   //  Get port number (0 means that one is chosen for us).
+   char *cmd = "";
+   int port = 0;
+   if ( Tcl_GetInt(interp_, argv[0], &port) == TCL_ERROR ) {
+      return TCL_ERROR;
+   }
+   
+   //  Delete existing remote object.
+   if ( remote_ ) {
+      delete remote_;
+   }
+
+
+   //  Create control object with the given port (if 0 the port number 
+   //  is available as remote_->port().
+   remote_ = new GaiaRtdRemote( this, port );
+   if ( remote_ ) {
+      return remote_->status();
+   }
+   return TCL_ERROR;
 }

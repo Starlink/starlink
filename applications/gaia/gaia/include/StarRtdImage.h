@@ -165,6 +165,9 @@ public:
   //  List of percentiles.
   int percentCmd( int argc, char *argv[] );
 
+  //  Enable remote control interface.
+  int remoteCmd( int argc, char *argv[] );
+
   //  Draw a Skycat-like ellipse and rotbox
   virtual int draw_symbol(const char *shape,
                   double x, double y, const char *xy_units,
