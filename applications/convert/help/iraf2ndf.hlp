@@ -14,63 +14,119 @@ For information on individual parameters, select from the list below:
 3 IN
 IN = LITERAL (Read)
    The name of the IRAF image.  Note that this excludes the
-   extension.
+   ".imh" file extension.
 3 OUT
-OUT = NDF (Write).
+OUT = NDF (Write)
    The name of the NDF to be produced.
+3 PROFITS
+PROFITS = _LOGICAL (Read)
+   If TRUE, the headers of the IRAF file are written
+   verbatim to the NDF's FITS extension.  Any IRAF history
+   records are also appended to FITS extension. [TRUE]
+3 PROHIS
+PROHIS = _LOGICAL (Read)
+   This parameter decides whether or not to create NDF HISTORY
+   records.  Only the IRAF headers with keyword HISTORY, and
+   which originated from NDF HISTORY records are used.  If
+   PROHIS=TRUE, NDF HISTORY records are created.  [TRUE]
 2 Examples
 iraf2ndf ell_galaxy new_galaxy
    Converts the IRAF image ell_galaxy (comprising files
-   ell_galaxy.imh and ell_galaxy.hdr) to an NDF called new_galaxy.
+   ell_galaxy.imh and ell_galaxy.pix) to an NDF called new_galaxy.
+
+iraf2ndf ell_galaxy new_galaxy noprofits noprohis
+   As above, except no FITS extension is created, and NDF-style
+   HISTORY lines in ell_galaxy.imh are not transferred to HISTORY
+   records in NDF new_galaxy.
 2 Notes
 The rules for the conversion are as follows:
 
 -  The NDF data array is copied from the ".pix" file.
 
 -  The title of the IRAF image (object i_title in the ".imh"
-header file) becomes the NDF title.
+header file) becomes the NDF title.  Likewise headers OBJECT and
+BUNIT become the NDF label and units respectively.
 
--  Lines from the IRAF image header file are transferred to the
-FITS extension of the NDF, any compulsory FITS keywords that are
-missing are added.
+-  Lines from the IRAF image header file may be transferred to
+the FITS extension of the NDF, when PROFITS=TRUE.  Any
+compulsory FITS keywords that are missing are added.  Certain
+other keywords are not propagated.  These are the IRAF "Mini
+World Coordinate System" (MWCS) keywords WCSDIM, DC_FLAG,
+WATd_nnn (d is dimension, nnn is the line number).  Certain
+NDF-style HISTORY lines in the header may also be ignored when
+PROHIS=TRUE (see two notes below).
 
--  If there is a FITS extension in the NDF, then the elements up
-to the first END keyword of this are added to the `user area' of
-the IRAF header file.
+-  When PROFITS=TRUE, lines from the HISTORY section of the IRAF
+image are also extracted and added to the NDF's FITS extension as
+FITS HISTORY lines.  Two extra HISTORY lines are added to record
+the original name of the image and the date of the format
+conversion.
 
--  Lines from the HISTORY section of the IRAF image are also
-extracted and added to the NDF's FITS extension as FITS HISTORY
-lines.  Two extra HISTORY lines are added to record the original
-name of the image and the date of the format conversion.
+-  When PROHIS=TRUE, any HISTORY lines in the IRAF headers, which
+originated from an NDF2IRAF conversion of NDF HISTORY records.
+Such headers are not transferred to the FITS airlock, when
+PROFITS=TRUE.
+
+-  Most axis information can be propagated either from standard
+FITS-like keywords, or certain MCWS headers.  Supported systems
+and formats are listed below.
+   o  FITS
+
+      - linear
+
+      - log-linear
+   o  Equispec
+
+      - linear
+
+      - log-linear
+   o  Multispec
+
+      - linear
+
+      - log-linear
+
+      - Chebyshev and Legendre polynomials
+
+      - Linear and cubic Spline
+
+      - Explicit list of co-ordinates
+
+However, for Multispec axes, only the first (spec1) axis
+co-ordinates are transferred to the NDF AXIS centres.  Any
+spec2...specn co-ordinates, present when the data array is not
+one-dimensional or multiple fits have been stored, are ignored.
+The weights for multiple fits are thus also ignored.  The data
+type of the axis centres is _REAL or _DOUBLE depending on the
+number of significant digits in the co-ordinates or coefficients.
+
+The axis labels and units are also propagated, where present, to
+the NDF AXIS structure.  In the FITS system, these are derived
+from the CTYPEn and CUNITn keywords.  In the MWCS, these
+components originate in the label and units parameters.
+
+The redshift correction, when present, is applied to the MCWS
+axis co-ordinates.
 2 Related_Applications
    CONVERT: NDF2IRAF.
 2 Pitfalls
    -  Bad pixels in the IRAF image are not replaced.
 
    -  Some of the routines required for accessing the IRAF header
-   file are written in SPP. Macros are used to find the start of the
+   file are written in SPP.  Macros are used to find the start of the
    header line section, this constitutes an `Interface violation' as
    these macros are not part of the IMFORT interface specification.
    It is possible that these may be changed in the future, so
    beware.
-2 External_Routines_Used
-   IRAF IMFORT subroutine library:
-      IMOPEN(), IMGSIZ(), IMGKWC(), IMCLOS(), IMEMSG()
-   Home-grown routines:
-      NLINES(), NHIST(), GETLIN(), GETHIS()
 2 References
-   -  IRAF User Handbook Volume 1A
-   "A User's Guide to FORTRAN Programming in IRAF, The IMFORT
-   Interface", by Doug Tody
-2 Machine-specific_features_used
-   -  Linking
-   See makefile
+   IRAF User Handbook Volume 1A: "A User's Guide to FORTRAN
+   Programming in IRAF, the IMFORT Interface", by Doug Tody.
 2 Keywords
    CONVERT, IRAF
-2 *
-   Bugs:
 2 Authors
 RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+
+GJP: Grant Privett (STARLINK, University of Wales, Cardiff)
 
 MJC: Malcolm J. Currie (STARLINK)
 2 History
@@ -99,7 +155,7 @@ MJC: Malcolm J. Currie (STARLINK)
 
  08-AUG-1995 (GJP):
     Modified the method used to obtain the date/time string to
-    avoid the use of pointer. Gave up PSX_ASCTIME and used
+    avoid the use of pointer.  Gave up PSX_ASCTIME and used
     PSX_CTIME instead.
 
  09-AUG 1995 (GJP):
@@ -113,9 +169,13 @@ MJC: Malcolm J. Currie (STARLINK)
  11-AUG-1995 (GJP):
     Added a check to see if any header lines were found before
     calling GETLIN to obtain them.
-2 Implementation_Status
-   -  It is only supported for sun4_Solaris and alpha_OSF1 systems.
 
+ 1997 April and July (MJC):
+    Added PROFITS and PROHIS facilities.  Now propagates axis
+    information, and the NDF label and units.  Expanded and
+    corrected the documentation, including a second example.
+    Improved the code structure.
+2 Implementation_Status
    -  Only handles one-, two-, and three-dimensional IRAF files.
 
    -  The NDF produced has type _WORD or _REAL corresponding to the

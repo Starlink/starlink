@@ -5,8 +5,8 @@
    Converts an IRAF image to an NDF
 }{
    \sstdescription{
-      This application converts an IRAF image to an NDF.
-      See the Notes for details of the conversion.
+      This application converts an IRAF image to an NDF.  See the Notes
+      for details of the conversion.
    }
    \sstusage{
       iraf2ndf in out
@@ -15,21 +15,44 @@
       \sstsubsection{
          IN = LITERAL (Read)
       }{
-         The name of the IRAF image.  Note that this excludes the extension.
+         The name of the IRAF image.  Note that this excludes the
+         {\tt ".imh"} file extension.
       }
       \sstsubsection{
-         OUT = NDF (Write).
+         OUT = NDF (Write)
       }{
          The name of the NDF to be produced.
+      }
+      \sstsubsection{
+         PROFITS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the headers of the IRAF file are written
+         verbatim to the NDF's FITS extension.  Any IRAF history
+         records are also appended to FITS extension. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         PROHIS = \_LOGICAL (Read)
+      }{
+         This parameter decides whether or not to create NDF HISTORY
+         records.  Only the IRAF headers with keyword HISTORY, and
+         which originated from NDF HISTORY records are used.  If
+         PROHIS={\tt TRUE}, NDF HISTORY records are created.  {\tt [TRUE]}
       }
    }
    \sstexamples{
       \sstexamplesubsection{
          iraf2ndf ell\_galaxy new\_galaxy
       }{
-         Converts the IRAF image ell\_galaxy (comprising
-         files {\tt ell\_galaxy.imh} and {\tt ell\_galaxy.hdr}) to an NDF
+         Converts the IRAF image ell\_galaxy (comprising files
+         {\tt ell\_galaxy.imh} and {\tt ell\_galaxy.pix}) to an NDF
          called new\_galaxy.
+      }
+      \sstexamplesubsection{
+         iraf2ndf ell\_galaxy new\_galaxy noprofits noprohis
+      }{
+         As above, except no FITS extension is created, and NDF-style
+         HISTORY lines in {\tt ell\_galaxy.imh} are not transferred to HISTORY
+         records in NDF new\_galaxy.
       }
    }
    \sstnotes{
@@ -41,45 +64,145 @@
 
          \sstitem
          The title of the IRAF image (object i\_title in the {\tt ".imh"}
-         header file) becomes the NDF title.
+         header file) becomes the NDF title.  Likewise headers OBJECT and
+         BUNIT become the NDF label and units respectively.
 
          \sstitem
-         Lines from the IRAF image header file are transferred to the
-         FITS extension of the NDF, any compulsory FITS keywords that are
-         missing are added.
+         Lines from the IRAF image header file may be transferred to
+         the FITS extension of the NDF, when PROFITS={\tt TRUE}.  Any
+         compulsory FITS keywords that are missing are added.  Certain
+         other keywords are not propagated.  These are the IRAF ``Mini
+         World Coordinate System'' (MWCS) keywords WCSDIM, DC\_FLAG,
+         WAT$d$\_$nnn$ ($d$ is dimension, $nnn$ is the line number).
+         Certain NDF-style HISTORY lines in the header may also
+         be ignored when PROHIS={\tt TRUE} (see two notes below).
 
          \sstitem
-         If there is a FITS extension in the NDF, then the elements up
-         to the first END keyword of this are added to the `user area' of
-         the IRAF header file.
+         When PROFITS={\tt TRUE}, lines from the HISTORY section of the IRAF
+         image are also extracted and added to the NDF's FITS extension as
+         FITS HISTORY lines.  Two extra HISTORY lines are added to record
+         the original name of the image and the date of the format
+         conversion.
 
          \sstitem
-         Lines from the HISTORY section of the IRAF image are also
-         extracted and added to the NDF's FITS extension as FITS HISTORY
-         lines.  Two extra HISTORY lines are added to record the original
-         name of the image and the date of the format conversion.
+         When PROHIS={\tt TRUE}, any HISTORY lines in the IRAF headers, which
+         originated from an NDF2IRAF conversion of NDF HISTORY records.
+         Such headers are not transferred to the FITS airlock, when
+         PROFITS={\tt TRUE}.
+
+         \sstitem
+         Most axis information can be propagated either from standard
+         FITS-like keywords, or certain MCWS headers.  Supported systems
+         and formats are listed below.
+
+         \sstitemlist{
+            \sstitem
+            FITS
+
+            \sstitemlist{
+               \sstitem
+               linear
+
+               \sstitem
+               log-linear
+            }
+
+            \sstitem
+            Equispec
+
+            \sstitemlist{
+               \sstitem
+               linear
+
+               \sstitem
+               log-linear
+            }
+
+            \sstitem
+            Multispec
+
+            \sstitemlist{
+               \sstitem
+               linear
+
+               \sstitem
+               log-linear
+
+               \sstitem
+               Chebyshev and Legendre polynomials
+
+               \sstitem
+               Linear and cubic Spline
+
+               \sstitem
+               Explicit list of co-ordinates
+            }
+         }
+
+         However, for Multispec axes, only the first (spec1) axis
+         co-ordinates are transferred to the NDF AXIS centres.  Any
+         spec2 \dots spec$n$ co-ordinates, present when the data array is not
+         one-dimensional or multiple fits have been stored, are ignored.
+         The weights for multiple fits are thus also ignored.  The data
+         type of the axis centres is \_REAL or \_DOUBLE depending on the
+         number of significant digits in the co-ordinates or coefficients.
+
+         The axis labels and units are also propagated, where present, to
+         the NDF AXIS structure.  In the FITS system, these are derived
+         from the CTYPE$n$ and CUNIT$n$ keywords.  In the MWCS, these
+         components originate in the label and units parameters.
+
+         The redshift correction, when present, is applied to the MCWS
+         axis co-ordinates.
+
       }
    }
    \sstdiytopic{
       Related Applications
    }{
-      \CONVERT: NDF2IRAF.
+      CONVERT: NDF2IRAF.
    }
-   \sstimplementationstatus{
+   \sstdiytopic{
+      Pitfalls
+   }{
       \sstitemlist{
 
          \sstitem
-         It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
+         Bad pixels in the IRAF image are not replaced.
+
+         \sstitem
+         Some of the routines required for accessing the IRAF header
+         file are written in SPP.  Macros are used to find the start of the
+         header line section, this constitutes an `Interface violation' as
+         these macros are not part of the IMFORT interface specification.
+         It is possible that these may be changed in the future, so
+         beware.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      IRAF User Handbook Volume 1A: ``A User's Guide to FORTRAN
+      Programming in IRAF, the IMFORT Interface'', by Doug Tody.
+   }
+   \sstdiytopic{
+      Keywords
+   }{
+      CONVERT, IRAF
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
 
          \sstitem
          Only handles one-, two-, and three-dimensional IRAF files.
 
          \sstitem
          The NDF produced has type \_WORD or \_REAL corresponding to the
-         type of the IRAF image.  (The IRAF imfort FORTRAN subroutine
+         type of the IRAF image.  (The IRAF IMFORT FORTRAN subroutine
          library only supports these data types: signed words and real.)
          The pixel type of the image can be changed from within IRAF using
-         the {\bf chpixtype} task in the {\bf images} package.
+         the `chpixtype' task in the `images' package.
       }
    }
 }
+
