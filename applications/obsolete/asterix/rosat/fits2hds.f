@@ -285,7 +285,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FITS2HDS Version rb test' )
+        PARAMETER		( VERSION = 'FITS2HDS Version 2.2-0' )
 
       INTEGER                   MXRECS
         PARAMETER               ( MXRECS = 10000 )
