@@ -1,3 +1,15 @@
+1 SPECX - v6.7-13
+
+  o Add new command: SET-DATA-DIRECTORY to change $DATADIR without restarting SPECX
+
+  o Fix problem on linux with interactive plotting mode where the cursor would 
+    move to random position after selecting a point on the spectrum
+
+  o WRITE-ASCII-SPECTRUM now includes more significant figures for the frequency
+    scale
+
+  o SET-GSD-FILENAME can now support a prefix up to 100 characters.
+
 1 SPECX - v6.7-12
 
  Fixes a bug causing false Fortran I/O error reports on Linux.
