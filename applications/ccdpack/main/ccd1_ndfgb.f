@@ -161,7 +161,7 @@
      : STATUS )
 
 *  Delete the group in preparation for the creation of a new one.
-            CALL GRP_DELET( FACGID, STATUS )
+            CALL CCD1_GRDEL( FACGID, STATUS )
 
 *  Set USEEXT to false to indicate this.
             USEEXT = .FALSE.

@@ -379,7 +379,7 @@
 *  leaving an unowned group containing only full file specifications.
       CALL GRP_OWN( GIDIN, GIDOWN, STATUS )
       CALL GRP_SOWN( GIDIN, GRP__NOID, STATUS )
-      IF ( GIDOWN .NE. GRP__NOID ) CALL GRP_DELET( GIDOWN, STATUS )
+      CALL CCD1_GRDEL( GIDOWN, STATUS )
 
 *  Create a list of the NDF frame and filter types. The presence of
 *  extension items which are concerned with the type of DEBIASsing are
@@ -628,7 +628,7 @@
       IF ( SCROPN ) CALL FIO_CLOSE( SCRFD, STATUS )
 
 *  Release group resources.
-      CALL GRP_DELET( GIDIN, STATUS )
+      CALL CCD1_GRDEL( GIDIN, STATUS )
 
 *  Close NDF.
       CALL NDF_END( STATUS )

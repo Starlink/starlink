@@ -533,7 +533,7 @@
 
 *  Whoops, try again. Annul the current group. See how many attempts
 *  we've had and then maybe try again.
-               CALL GRP_DELET( FIOGRP, STATUS )
+               CALL CCD1_GRDEL( FIOGRP, STATUS )
                IF ( NTRY .LE. 10 ) THEN 
                   CALL MSG_SETI( 'NNDF', NNDF )
                   CALL MSG_OUT( ' ',
@@ -886,8 +886,8 @@
       CALL NDF_END( STATUS )
 
 *  Release the groups.
-      CALL GRP_DELET( NDFGRP, STATUS )
-      IF ( HAVFIO ) CALL GRP_DELET( FIOGRP, STATUS )
+      CALL CCD1_GRDEL( NDFGRP, STATUS )
+      CALL CCD1_GRDEL( FIOGRP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

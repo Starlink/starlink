@@ -149,7 +149,7 @@
      :      STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL GRP_DELET( IDH2, STATUS )
+            CALL CCD1_GRDEL( IDH2, STATUS )
             CALL GRP_NEW( 'CCD1_IRHL<T>:FACTS', IDH2, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
@@ -168,7 +168,7 @@
      :       STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL GRP_DELET( IDH2, STATUS )
+            CALL CCD1_GRDEL( IDH2, STATUS )
             CALL GRP_NEW( 'CCD1_IRHL<T>:FACTS', IDH2, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
@@ -189,7 +189,7 @@
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-            CALL GRP_DELET( IDH2, STATUS )
+            CALL CCD1_GRDEL( IDH2, STATUS )
             CALL GRP_NEW( 'CCD1_IRHL<T>:FACTS', IDH2, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
@@ -221,7 +221,7 @@
 
 *  See if translation occurred successfully.
             IF ( STATUS .EQ. SAI__ERROR ) THEN
-               CALL GRP_DELET( IDH2, STATUS )
+               CALL CCD1_GRDEL( IDH2, STATUS )
                CALL ERR_ANNUL( STATUS )
 
 *  Bad value try again.
@@ -248,7 +248,7 @@
 
 *  See if translation occurred successfully.
          IF ( STATUS .EQ. SAI__ERROR ) THEN
-            CALL GRP_DELET( IDH2, STATUS )	
+            CALL CCD1_GRDEL( IDH2, STATUS )	
             CALL ERR_ANNUL( STATUS )
 
 *  Bad value try again.
@@ -273,7 +273,7 @@
 99    CONTINUE
 
 *  Release resources associated with the group.
-      CALL GRP_DELET( IDH2, STATUS )
+      CALL CCD1_GRDEL( IDH2, STATUS )
 
       END
 * $Id$

@@ -322,10 +322,10 @@
          CALL CCD1_MFREE( IPLOG, STATUS )
 
 *  Free table groups.
-         CALL GRP_DELET( WRDGRP( 1 ), STATUS )
-         CALL GRP_DELET( WRDGRP( 2 ), STATUS )
-         CALL GRP_DELET( WRDGRP( 3 ), STATUS )
-         CALL GRP_DELET( LINGRP, STATUS )
+         CALL CCD1_GRDEL( WRDGRP( 1 ), STATUS )
+         CALL CCD1_GRDEL( WRDGRP( 2 ), STATUS )
+         CALL CCD1_GRDEL( WRDGRP( 3 ), STATUS )
+         CALL CCD1_GRDEL( LINGRP, STATUS )
 
 *  If this section has a bad status, must be to do with the contents of
 *  the table. Issue the name of this file.
@@ -446,12 +446,12 @@
       CALL CCD1_MFREE( -1, STATUS )
 
 *  Free GRP groups.
-      CALL GRP_DELET( GIDIN, STATUS )
-      CALL GRP_DELET( FITGRP( 1 ), STATUS )
-      CALL GRP_DELET( FITGRP( 2 ), STATUS )
-      CALL GRP_DELET( DESGRP( 1 ), STATUS )
-      CALL GRP_DELET( DESGRP( 2 ), STATUS )
-      CALL GRP_DELET( DESGRP( 3 ), STATUS )
+      CALL CCD1_GRDEL( GIDIN, STATUS )
+      CALL CCD1_GRDEL( FITGRP( 1 ), STATUS )
+      CALL CCD1_GRDEL( FITGRP( 2 ), STATUS )
+      CALL CCD1_GRDEL( DESGRP( 1 ), STATUS )
+      CALL CCD1_GRDEL( DESGRP( 2 ), STATUS )
+      CALL CCD1_GRDEL( DESGRP( 3 ), STATUS )
 
 *  Close the translation table (if open).
       IF ( TOPEN ) CALL FIO_CLOSE( FDIN, STATUS )

@@ -670,9 +670,9 @@
  99   CONTINUE
 
 *  Release group resources.
-      CALL GRP_DELET( NDFGR, STATUS )
-      CALL GRP_DELET( FIOGR, STATUS )
-      CALL GRP_DELET( FIOGRO, STATUS )
+      CALL CCD1_GRDEL( NDFGR, STATUS )
+      CALL CCD1_GRDEL( FIOGR, STATUS )
+      CALL CCD1_GRDEL( FIOGRO, STATUS )
 
 *  Free any allocated dynamic memory.
       CALL CCD1_MFREE( -1, STATUS )

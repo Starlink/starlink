@@ -492,7 +492,7 @@
       CALL NDF_END( STATUS )
 
 *  Release group resources.
-      CALL GRP_DELET( INGRP, STATUS )
+      CALL CCD1_GRDEL( INGRP, STATUS )
 
 *  End AST context.
       CALL AST_END( STATUS )

@@ -152,7 +152,7 @@
      :                       '^MAXVAL - try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL GRP_DELET( GID, STATUS )
+            CALL CCD1_GRDEL( GID, STATUS )
             CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
@@ -170,7 +170,7 @@
      :      '- try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL GRP_DELET( GID, STATUS )
+            CALL CCD1_GRDEL( GID, STATUS )
             CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
@@ -191,7 +191,7 @@
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-            CALL GRP_DELET( GID, STATUS )
+            CALL CCD1_GRDEL( GID, STATUS )
             CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
@@ -223,7 +223,7 @@
 
 *  See if translation occurred successfully.
             IF ( STATUS .EQ. SAI__ERROR ) THEN
-               CALL GRP_DELET( GID, STATUS )
+               CALL CCD1_GRDEL( GID, STATUS )
                CALL ERR_ANNUL( STATUS )
 
 *  Bad value try again.
@@ -249,7 +249,7 @@
 
 *  See if translation occurred successfully.
          IF ( STATUS .EQ. SAI__ERROR ) THEN
-            CALL GRP_DELET( GID, STATUS )
+            CALL CCD1_GRDEL( GID, STATUS )
             CALL ERR_ANNUL( STATUS )
 
 *  Bad value try again.

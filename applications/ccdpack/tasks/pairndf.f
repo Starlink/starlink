@@ -1276,8 +1276,8 @@
       CALL CCD1_FRTMP( -1, STATUS )
 
 *  Release group resources.
-      CALL GRP_DELET( NDFGR, STATUS )
-      CALL GRP_DELET( OUTGRP, STATUS )
+      CALL CCD1_GRDEL( NDFGR, STATUS )
+      CALL CCD1_GRDEL( OUTGRP, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

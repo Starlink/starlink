@@ -209,7 +209,7 @@
  2       CONTINUE
 
 *  Annul the original NDF group identifier, since it is no longer required.
-         CALL GRP_DELET( NDF1GR, STATUS )
+         CALL CCD1_GRDEL( NDF1GR, STATUS )
 
       ELSE
 

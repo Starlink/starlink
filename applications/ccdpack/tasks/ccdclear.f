@@ -391,7 +391,7 @@
 99    CONTINUE
 
 *  Release the GRP group of names.
-      IF ( BYNAME ) CALL GRP_DELET( NAMGRP, STATUS )
+      CALL CCD1_GRDEL( NAMGRP, STATUS )
 
 *  Close the globals file.
       IF ( OPEN ) CALL HDS_CLOSE( LOC, STATUS )

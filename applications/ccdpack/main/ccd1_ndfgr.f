@@ -19,7 +19,7 @@
 *     The actual  number of NDFs is returned is NNDF.
 
 *  Notes:
-*     - the GID identifier should be annulled (by calling GRP_DELET)
+*     - the GID identifier should be annulled (by calling CCD1_GRDEL)
 *     after use of the group has finished.
 
 *  Arguments:
@@ -130,8 +130,7 @@
              CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GID, STATUS )
-             GID = GRP__NOID
+             CALL CCD1_GRDEL( GID, STATUS )
              NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
@@ -152,8 +151,7 @@
      :                          ' try again', STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GID, STATUS )
-             GID = GRP__NOID
+             CALL CCD1_GRDEL( GID, STATUS )
              NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1

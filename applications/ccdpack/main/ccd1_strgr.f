@@ -139,7 +139,7 @@
      :                       '^MAXVAL - try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL GRP_DELET( OUTGRP, STATUS )
+            CALL CCD1_GRDEL( OUTGRP, STATUS )
             NRET = 0
             CALL GRP_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
             AGAIN = .TRUE.
@@ -154,7 +154,7 @@
      :      '- try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL GRP_DELET( OUTGRP, STATUS )
+            CALL CCD1_GRDEL( OUTGRP, STATUS )
             CALL GRP_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
             NRET = 0
             AGAIN = .TRUE.
@@ -175,7 +175,7 @@
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-            CALL GRP_DELET( OUTGRP, STATUS )
+            CALL CCD1_GRDEL( OUTGRP, STATUS )
             CALL GRP_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
             NRET = 0
             AGAIN = .TRUE.

@@ -976,7 +976,7 @@
 
 *  Jump to here on error
 940   CONTINUE
-      CALL GRP_DELET( OUTGRP, STATUS )
+      CALL CCD1_GRDEL( OUTGRP, STATUS )
       
 *  Time at the bar please...      
 999   END

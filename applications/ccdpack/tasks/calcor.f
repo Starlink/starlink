@@ -644,9 +644,9 @@
       CALL NDF_END( STATUS )
 
 *  Release group resources.
-      CALL GRP_DELET( GIDIN, STATUS )
-      CALL GRP_DELET( GIDOUT, STATUS )
-      CALL GRP_DELET( FACGID, STATUS )
+      CALL CCD1_GRDEL( GIDIN, STATUS )
+      CALL CCD1_GRDEL( GIDOUT, STATUS )
+      CALL CCD1_GRDEL( FACGID, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

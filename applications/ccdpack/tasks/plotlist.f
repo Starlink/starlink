@@ -442,8 +442,8 @@
       CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
 
 *  Relase group resources.
-      CALL GRP_DELET( FIOGR, STATUS )
-      IF ( NDFS ) CALL GRP_DELET( NDFGR, STATUS )
+      CALL CCD1_GRDEL( FIOGR, STATUS )
+      CALL CCD1_GRDEL( NDFGR, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

@@ -1590,8 +1590,8 @@
       CALL NDF_END( STATUS )
 
 *  Release group resources.
-      CALL GRP_DELET( GIDIN, STATUS )
-      CALL GRP_DELET( GIDOUT, STATUS )
+      CALL CCD1_GRDEL( GIDIN, STATUS )
+      CALL CCD1_GRDEL( GIDOUT, STATUS )
 
   999 CONTINUE
 *  If an error occurred, then report a contextual message.

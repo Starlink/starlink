@@ -211,14 +211,15 @@
 *  Close the output file.
          CALL FIO_CLOSE( FD, STATUS )
 
-*  Annul group resources.
-         CALL GRP_DELET( GID, STATUS )
 
       ELSE  IF ( STATUS .EQ. PAR__NULL ) THEN 
 
 *  A null is acceptable, just get rid of the errors and continue.
          CALL ERR_ANNUL( STATUS )
       END IF
+
+*  Annul group resources.
+      CALL CCD1_GRDEL( GID, STATUS )
 
 *  Release any NDF resources.
       CALL NDF_END( STATUS )

@@ -808,8 +808,8 @@
       CALL NDF_END( STATUS )
 
 *  Annul all group identifiers.
-      CALL GRP_DELET( NDFGRP, STATUS )
-      CALL GRP_DELET( FIOGRP, STATUS )
+      CALL CCD1_GRDEL( NDFGRP, STATUS )
+      CALL CCD1_GRDEL( FIOGRP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

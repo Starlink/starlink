@@ -118,7 +118,7 @@
 *  Create a new group to associate names with if this isn't the first
 *  time and a problem has occurred.
          IF ( RENEW ) THEN
-            CALL GRP_DELET( IDH2, STATUS )
+            CALL CCD1_GRDEL( IDH2, STATUS )
             ADDED = -1
             CALL GRP_NEW( 'CCD1_PRINT:INPUT', IDH2, STATUS )
             RENEW = .FALSE.

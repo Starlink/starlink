@@ -919,7 +919,7 @@ C         END IF
  99   CONTINUE
 
 *  Release group resources.
-      IF ( GOTNDF ) CALL GRP_DELET( NDFGR, STATUS )
+      CALL CCD1_GRDEL( NDFGR, STATUS )
 
 *  Report any IDI errors.
       IF ( ISTAT .NE. IDI__OK ) THEN

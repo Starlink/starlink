@@ -1336,8 +1336,8 @@
       CALL CCD1_MFREE( -1, STATUS )
 
 *  Release group resources.
-      IF ( PLACE .EQ. 'EACH' ) CALL GRP_DELET( NDFGR, STATUS )
-      CALL GRP_DELET( FIOGR, STATUS )
+      CALL CCD1_GRDEL( NDFGR, STATUS )
+      CALL CCD1_GRDEL( FIOGR, STATUS )
 
 *  End AST context.
       CALL AST_END( STATUS )

@@ -148,8 +148,7 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GID, STATUS )
-             GID = GRP__NOID
+             CALL CCD1_GRDEL( GID, STATUS )
              NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
@@ -169,8 +168,7 @@
              CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GID, STATUS )
-             GID = GRP__NOID
+             CALL CCD1_GRDEL( GID, STATUS )
              NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
@@ -193,8 +191,7 @@
      :                     STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GID, STATUS )
-             GID = GRP__NOID
+             CALL CCD1_GRDEL( GID, STATUS )
              NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
@@ -232,7 +229,7 @@
  99   CONTINUE
 
 *  Release group resources.
-      CALL GRP_DELET( GID, STATUS )
+      CALL CCD1_GRDEL( GID, STATUS )
 
       END
 * $Id$

@@ -125,8 +125,7 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GIDOUT, STATUS )
-             GIDOUT = GRP__NOID
+             CALL CCD1_GRDEL( GIDOUT, STATUS )
              NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
@@ -139,8 +138,7 @@
      :                     'NDF names - try again', STATUS )
 
 *  and try again.
-             CALL GRP_DELET( GIDOUT, STATUS )
-             GIDOUT = GRP__NOID
+             CALL CCD1_GRDEL( GIDOUT, STATUS )
              NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
@@ -160,8 +158,7 @@
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-            CALL GRP_DELET( GIDOUT, STATUS )
-            GIDOUT = GRP__NOID
+            CALL CCD1_GRDEL( GIDOUT, STATUS )
             NNDF = 0
             AGAIN = .TRUE.
             NTRY = NTRY + 1

@@ -950,8 +950,8 @@
  99   CONTINUE
 
 *  Release group resources.
-      CALL GRP_DELET( FIOGRP, STATUS )
-      IF ( NDFS ) CALL GRP_DELET( NDFGRP, STATUS )
+      CALL CCD1_GRDEL( FIOGRP, STATUS )
+      CALL CCD1_GRDEL( NDFGRP, STATUS )
 
 *  Free any memory still accessed.
       CALL CCD1_MFREE( -1, STATUS )

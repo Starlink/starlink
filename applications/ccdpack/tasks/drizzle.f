@@ -1401,7 +1401,7 @@
       CALL NDF_END( STATUS )
 
 *  Annul the input NDF group.
-      CALL GRP_DELET( INGRP, STATUS )
+      CALL CCD1_GRDEL( INGRP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

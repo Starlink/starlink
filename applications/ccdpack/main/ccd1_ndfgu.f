@@ -20,7 +20,7 @@
 *     The NDFs are set access for UPDATE.
 
 *  Notes:
-*     - the GID identifier should be annulled (by calling GRP_DELET)
+*     - the GID identifier should be annulled (by calling CCD1_GRDEL)
 *     after use of the group has finished.
 
 *  Arguments:
@@ -124,8 +124,7 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GID, STATUS )
-             GID = GRP__NOID
+             CALL CCD1_GRDEL( GID, STATUS )
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -135,8 +134,7 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL GRP_DELET( GID, STATUS )
-             GID = GRP__NOID
+             CALL CCD1_GRDEL( GID, STATUS )
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -161,8 +159,7 @@
             AGAIN =.TRUE.
 
 *  Reset everything and try again.
-            CALL GRP_DELET( GID, STATUS )
-            GID = GRP__NOID
+            CALL CCD1_GRDEL( GID, STATUS )
             NTRY = NTRY + 1
             CALL PAR_CANCL( NAME, STATUS )
          END IF
