@@ -90,7 +90,6 @@ javadoc-sources:
      [echo] Executing SPLAT target: javadoc-sources
 
 javadoc-sources:
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -130,6 +129,7 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.fits...
   [javadoc] Loading source files for package uk.ac.starlink.votable...
+  [javadoc] Loading source files for package uk.ac.starlink.votable.dom...
   [javadoc] Loading source files for package uk.ac.starlink.hdx...
   [javadoc] Loading source files for package uk.ac.starlink.jaiutil...
   [javadoc] Loading source files for package uk.ac.starlink.mirage...
@@ -790,6 +790,7 @@ javadoc-sources:
   [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/dom/package.html: warning - Tag @link: reference not found: DelegateDocument
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/URLUtils.java:177: warning - Tag @link: reference not found: java.net.File#toURI
@@ -1475,7 +1476,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 580 warnings
+  [javadoc] 581 warnings
 
 install:
 
@@ -2000,354 +2001,40 @@ prepare:
 check_packages:
 
 build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing JAIUtil target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing SOAPSERVER target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 19 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing JPCS target: install
-
-prepare:
-
-check_packages:
-
-build_classes:
-
-assemble_jni:
-
-build_jni:
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e shared
-     [exec] make: Nothing to be done for `shared'.
-
-build:
-
-jars:
-
-javadoc_check:
-
-javadocs:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 37 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing SOG target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 48 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing SPLAT target: install
-
-prepare:
-
-check_packages:
-
-build:
-    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/splat/build/classes
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] make: Nothing to be done for `build'.
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
-
-install:
-[loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 251 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
-     [echo] Executing Mirage target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing TOPCAT target: install
-
-prepare:
-
-check_packages:
-
-build_demo:
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
-      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
-
-build:
-
-docs_check:
-
-docs:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 206 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 86 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing Treeview target: install
-
-prepare:
-
-really_check_packages:
-
-check_packages:
-
-build_demo:
-     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
-      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
-     [echo] Executing Coco target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing RV target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing FROG target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../frog_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
-     [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
-
-export-full-docs:
-      [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
-
-BUILD SUCCESSFUL
-Total time: 5 minutes 34 seconds
+    [javac] Compiling 23 source files to /apps/cvsbuild/java/source/votable/build/classes
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:91: cannot resolve symbol
+    [javac] symbol  : constructor FieldElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
+    [javac] location: class uk.ac.starlink.votable.FieldElement
+    [javac]             return new FieldElement( node, this );
+    [javac]                    ^
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:94: cannot resolve symbol
+    [javac] symbol  : constructor LinkElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
+    [javac] location: class uk.ac.starlink.votable.LinkElement
+    [javac]             return new LinkElement( node, this );
+    [javac]                    ^
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:97: cannot resolve symbol
+    [javac] symbol  : constructor ParamElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
+    [javac] location: class uk.ac.starlink.votable.ParamElement
+    [javac]             return new ParamElement( node, this );
+    [javac]                    ^
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:100: cannot resolve symbol
+    [javac] symbol  : constructor TableElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
+    [javac] location: class uk.ac.starlink.votable.TableElement
+    [javac]             return new TableElement( node, this );
+    [javac]                    ^
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:103: cannot resolve symbol
+    [javac] symbol  : constructor ValuesElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
+    [javac] location: class uk.ac.starlink.votable.ValuesElement
+    [javac]             return new ValuesElement( node, this );
+    [javac]                    ^
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:106: cannot resolve symbol
+    [javac] symbol  : constructor VOElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
+    [javac] location: class uk.ac.starlink.votable.VOElement
+    [javac]             return new VOElement( node, this );
+    [javac]                    ^
+    [javac] 6 errors
+
+BUILD FAILED
+file:/apps/cvsbuild/java/source/votable/build.xml:362: Compile failed; see the compiler error output for details.
+
+Total time: 3 minutes 21 seconds
