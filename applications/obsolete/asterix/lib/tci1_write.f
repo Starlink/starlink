@@ -100,6 +100,7 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! HEADER object
+      CHARACTER*(DAT__SZLOC)	LLOC			! LIVE_TIME object
 
       DOUBLE PRECISION		DMJD			! D.P. MJD from TIMID
 
@@ -135,6 +136,20 @@
      :                 STATUS )
       CALL ADI1_CCA2HD( TIMID, 'TAIObs', HLOC, 'BASE_TAI', STATUS )
       CALL ADI1_CCA2HR( TIMID, 'ObsLength', HLOC, 'OBS_LENGTH', STATUS )
+
+*  Live times present?
+      CALL ADI_THERE( TIMID, 'LiveOn', THERE, STATUS )
+      IF ( THERE ) THEN
+
+*    Ensure container structure exists
+        CALL ADI1_LOCLIVE( ARGS(1), .TRUE., LLOC, STATUS )
+
+*    Copy components
+        CALL ADI1_CCA2HR( TIMID, 'LiveOn', LLOC, 'ON', STATUS )
+        CALL ADI1_CCA2HR( TIMID, 'LiveOff', LLOC, 'OFF', STATUS )
+        CALL ADI1_CCA2HR( TIMID, 'LiveDur', LLOC, 'DURATION', STATUS )
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'TCI1_WRITE', STATUS )
