@@ -26,7 +26,9 @@ $!
 $!  History:
 $!     1992 September 10 (MJC):
 $!        Original version.
-$!     {enter_changes_here}
+$!     1992 September 29 (MJC):
+$!        Added NDF2IRAF.
+$!     {enter_further_changes_here}
 $!
 $!  Bugs:
 $!     {note_any_bugs_here}
@@ -42,12 +44,17 @@ $!
 $!  Define symbols for the applications.
 $!  ====================================
 $!
-$ BDF2NDF    :== $CONVERT_DIR:BDF2NDF
-$ DIPSO2NDF  :== $CONVERT_DIR:DIPSO2NDF
-$ DST2NDF    :== $CONVERT_DIR:DST2NDF
-$ NDF2BDF    :== $CONVERT_DIR:NDF2BDF
-$ NDF2DIPSO  :== $CONVERT_DIR:NDF2DIPSO
-$ NDF2DST    :== $CONVERT_DIR:NDF2DST
+$ ASCII2*NDF  :== $CONVERT_DIR:ASCII2NDF
+$ BDF2*NDF    :== $CONVERT_DIR:BDF2NDF
+$ DIPSO2*NDF  :== $CONVERT_DIR:DIPSO2NDF
+$ DST2*NDF    :== $CONVERT_DIR:DST2NDF
+$ UNF2*NDF    :== $CONVERT_DIR:UNF2NDF
+$ NDF2A*SCII  :== $CONVERT_DIR:NDF2ASCII
+$ NDF2B*DF    :== $CONVERT_DIR:NDF2BDF
+$ NDF2DI*PSO  :== $CONVERT_DIR:NDF2DIPSO
+$ NDF2DS*T    :== $CONVERT_DIR:NDF2DST
+$ NDF2I*RAF   :== $CONVERT_DIR:NDF2IRAF
+$ NDF2U*NF    :== $CONVERT_DIR:NDF2UNF
 $!
 $!  Set up the help libraries.
 $!  ==========================
