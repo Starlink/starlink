@@ -3179,6 +3179,47 @@ c      LOGICAL VOK,QOK
       END
 
 
+
+*+ IMG_DELCACHE - delete cache image
+	SUBROUTINE IMG_DELCACHE(STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL DYN_UNMAP(I_DPTR_M,STATUS)
+        CALL DYN_UNMAP(I_XPTR_M,STATUS)
+        CALL DYN_UNMAP(I_YPTR_M,STATUS)
+        I_DPTR_M=0
+        I_XPTR_M=0
+        I_YPTR_M=0
+        IF (I_VOK_M)
+          CALL DYN_UNMAP(I_VPTR_M,STATUS)
+          I_VPTR_M=0
+        ENDIF
+        IF (I_QOK_M) THEN
+          CALL DYN_UNMAP(I_QPTR_M,STATUS)
+          I_QPTR_M=0
+        ENDIF
+        CALL GCB_DELCACHE(I_CACHE_M,STATUS)
+        I_MEM=.FALSE.
+
+      ENDIF
+
+      END
+
+
 *+ IMG_CIRCLE
 	SUBROUTINE IMG_CIRCLE(XC,YC,RAD,STATUS)
 

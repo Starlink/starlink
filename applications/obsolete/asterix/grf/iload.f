@@ -116,7 +116,7 @@
           IF (MX.NE.I_NX.OR.MY.NE.I_NY) THEN
             CALL MSG_PRNT(
      :        'AST_ERR: image is different size to cached image - '/
-     :        'deleting cacheds image')
+     :        /'deleting cacheds image')
             CALL IMG_DELCACHE(STATUS)
             I_MEM=.FALSE.
           ENDIF
