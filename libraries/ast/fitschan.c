@@ -21879,11 +21879,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    wavelength of the filter. The actual value used for CDELT shouldn't 
    matter since the axis only spans a single pixel anyway. */
             if( cdeltj == 0.0 ){
-               GetValue2( ret, this, FormatKey( "CRVAL", j + 1, -1, s ), AST__FLOAT, 
+               GetValue2( ret, this, FormatKey( "CDELT", j + 1, -1, s ), AST__FLOAT, 
                          (void *) &dval, 1, method, class );
                cdeltj = 1.0E-6*dval;
                if( cdeltj == 0.0 ) cdeltj = 1.0;
-               SetValue( ret, FormatKey( "CRVAL", j + 1, -1, s ), (void *) &cdeltj, 
+               SetValue( ret, FormatKey( "CDELT", j + 1, -1, s ), (void *) &cdeltj, 
                          AST__FLOAT, NULL );
             }
          }
@@ -32387,7 +32387,5 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
       MoveCard( this, 1, "List", "FitsChan" );
    }
    this->card = cardo;
-}
-*/
-
+}*/
 
