@@ -2,6 +2,7 @@ ADAM.pm
 ADAM.xs
 Makefile.PL
 MANIFEST
-test.pl
 ChangeLog
+t/basic.t
+t/fork.t
 
