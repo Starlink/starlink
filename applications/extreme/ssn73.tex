@@ -836,14 +836,10 @@ If there are any calls to functions or subroutines in the converted
 code which have literal integer constants as actual arguments,
 these will need to be replaced with expressions of the right type.
 There is no way of specifying the length of a literal integer constant
-in Fortran, so you should either use a variable for the purpose 
-(perhaps assigned using the Fortran PARAMETER statement) 
-or ensure that the expression
-has the correct type.  This can be done using a call to the statement
-function EXT\_ITOX, which returns an integer equal in value to its
-argument, but of the correct type for a large integer
-(it behaves just like the NUM\_xTOy functions in the 
-\xref{PRIMDAT}{sun39}{} package).
+in Fortran, so you must ensure that the expression has the correct type
+in some other way.
+The recommended method for doing this is to use a variable for the
+purpose, which may be assigned using a PARAMETER statement.
 Thus
 \begin{squote}
 \begin{verbatim}
@@ -853,37 +849,19 @@ Thus
 must be changed to something like
 \begin{squote}
 \begin{verbatim}
-      INTEGER * 8 IFIVE
-      PARAMETER( IFIVE = 5 )
+      INTEGER * 8 INT__5
+      PARAMETER( INT__5 = 5 )
         ...
-      CALL SUB( IFIVE, STATUS )
+      CALL SUB( INT__5, STATUS )
 \end{verbatim}
 \end{squote}
-or
-\begin{squote}
-\begin{verbatim}
-      INCLUDE 'EXT_DEC'          ! EXTREME conversion declarations
-      INCLUDE 'EXT_DEF'          ! EXTREME conversion definitions
-        ...
-      CALL SUB( EXT_ITOX( 5 ), STATUS )
-\end{verbatim}
-\end{squote}
-Note that, as for the PRIMDAT file PRM\_DEF, the EXT\_DEF 
-file must be included after all variable declarations but before
-the first executable statement of the routine.
-
-For convenience another mechanism is provided by the EXTREME package;
-the file \file{EXT\_PAR} includes definitions of the integers
-$-10$\ldots 10, with names EXT\_\_M10\ldots EXT\_\_10.
-So a third alternative for the above situation would be
-\begin{squote}
-\begin{verbatim}
-      INCLUDE 'EXT_PAR'          ! Integer constant definitions
-        ...
-      CALL SUB( EXT__5, STATUS )
-\end{verbatim}
-\end{squote}
-{\it (Perhaps this functionality should be handed to PRIMDAT?)}
+Other methods of getting around this are possible,
+for instance using statement functions.
+The include files \file{EXT\_PAR}, which contains a set of predefined
+integer constants, and \file{EXT\_DEC} and \file{EXT\_DEF},
+which define statement functions in the same way as the
+\xref{PRIMDAT}{sun39}{} package are provided with the EXTREME 
+package by way of example of alternative strategies.
 \html{\begin{squote}\end{squote}}
 %
 \ditem{Intrinsic functions}
@@ -1640,12 +1618,14 @@ makefile by the package developer (commonly called {\tt archive}),
 and effectively means that it is not possible to tweak package source
 code in the build directory prior to re-exporting it.
 
-The script \xroutine{extmk} is provided to make the necessary 
-modifications to \file{mk} files, and is described fully in 
-\latexhtml{appendix \ref{sec:commands}}{\htmlref{the appendix}{extmk}}.
-No automatic tool is provided for modifying \file{makefile}s, 
-since they tend to be more varied and may require more ingenious
-changes.
+The scripts \xroutine{extmk} and \xroutine{makefile} 
+are provided to make the necessary 
+modifications to \file{mk} and \file{makefile} files respectively, 
+and are described fully in \ref{sec:commands}.
+\xroutine{extmk} can normally make all the required changes to \file{mk},
+but \xroutine{extmakefile} can only add some of the required parts;
+other edits such as deciding which files need to be extracted as Fortran
+and which as non-Fortran files must be made by hand.
 
 
 \section{Overview of tools for making the modifications\label{sec:tools}}
@@ -1657,16 +1637,16 @@ The details of their operation are given in \ref{sec:commands}.
 One tool is provided for each of the source code conversion
 tasks described in the previous section:
 \begin{description}
-\item[inscnf:] Inserts CNF\_PVAL calls where required in Fortran source code
-\item[frepint:] Converts INTEGER to INTEGER*8 in Fortran source code
-\item[crepint:] Converts \cc{int} to \cc{INT\_BIG} in C source code
-\item[extmk:] Makes the necessary edits to a package \file{mk} file
+\item[\xroutine{inscnf}:] Inserts CNF\_PVAL calls where required in Fortran source code
+\item[\xroutine{frepint}:] 
+     Converts INTEGER to INTEGER*8 in Fortran source code
+\item[\xroutine{crepint}:] 
+     Converts \cc{int} to \cc{INT\_BIG} in C source code
+\item[\xroutine{extmk}:] 
+     Makes the necessary edits to a package \file{mk} file
+\item[\xroutine{extmakefile}:]
+     Makes some of the necessary edits to a package \file{makefile}
 \end{description}
-No tool is provided for making edits to the \file{makefile};
-this normally requires a bit of human intelligence for identifying
-which files are Fortran and processing them separately.
-
-
 Each of these is a normal Unix filter command with usage like \file{cat}, 
 so may be given zero, one or two arguments to specify its input and output.
 Where no change needs to be made, the input is written with no changes 
@@ -1859,6 +1839,16 @@ Identify all C source files and all Fortran source files.
 \end{squote}
 %
 \item
+Start up the EXTREME package
+\begin{squote}
+\begin{verbatim}
+% extreme
+ 
+   EXTREME commands are now available -- Version 0.1-0
+\end{verbatim}
+\end{squote}
+%
+\item
 Run \xdofilter{inscnf} on Fortran files 
 to wrap \%VAL arguments in CNF\_PVAL calls,
 if this has not already been done.
@@ -1994,6 +1984,9 @@ If you think this may not be the case, compiler warnings may be of help.
 \begin{verbatim}
 % gcc -fsyntax-only -Wimplicit -Wstrict-prototypes *.c \
      |& egrep 'function declaration|declaration of function'
+tmp.c:160: warning: implicit declaration of function `pipe'
+% man pipe
+    ...
 \end{verbatim}
 \end{squote}
 %
@@ -2136,20 +2129,29 @@ two new platforms.
 \html{\begin{squote}\end{squote}}
 %
 \item
-Edit the \file{makefile} as discussed in section \ref{sec:makefile}.
-You must make the following changes:
+Use \xroutine{extmakefile} to make some of the necessary modifications 
+to the \file{makefile}, and check the changes made.
+\begin{squote}
+\begin{verbatim}
+% mv makefile makefile.orig
+% extmakefile < makefile.orig >makefile
+% diff makefile.orig makefile
+\end{verbatim}
+\end{squote}
+%
+\item
+If \routine{extmakefile} indicated that it failed to make any of the
+changes that it wanted to, insert the relevant bits of code by hand
+with reference to section \ref{sec:makefile}.
+\html{\begin{squote}\end{squote}}
+%
+\item
+Edit the \file{makefile} by hand to make the rest of the necessary changes
+as discussed in \ref{sec:makefile}:
 \begin{itemize}
-\item
-Add \cc{-DINT\_BIG=int} to the default value of the CFLAGS macro.
-\item
-Add a default value for the INTEGER8 macro.
-\item
-Insert the definition of the REPLACE\_INTEGER8 macro.
 \item
 Ensure that any extractions of Fortran source files from source archives
 are processed using the REPLACE\_INTEGER8 macro.
-\item
-Record the value of the INTEGER8 macro in the DATE\_STAMP file.
 \item
 Add rules for building any new include files required by the changes
 (\file{CNF\_PAR}, \file{EXT\_PAR} or \file{extreme.h}).
