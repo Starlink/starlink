@@ -29,6 +29,12 @@
 *     After the calculation, the mean value removed from each jiggle
 *     can be added back onto the data -- this should protect against removing
 *     flux from MAP data.
+*
+*     If a SKY NDF is found in the REDS extension, it is assumed that
+*     the sky variation has already been determined (eg by CALCSKY) and
+*     this sky signature is removed. The 'ADD' parameter is ignored in
+*     this case.
+
 
 *  Usage:
 *     remsky in out
@@ -126,6 +132,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.15  1998/06/03 21:57:38  timj
+*     Add support for reading SKY NDF from input file.
+*
 *     Revision 1.14  1997/11/30 01:12:15  timj
 *     Change it so that ADD is true for MAP but FALSE otherwise.
 *
@@ -247,6 +256,7 @@
       CHARACTER*132    OUTFILE          ! Default output filename
       INTEGER          OUTNDF           ! NDF identifier of output file
       INTEGER          OUT_DATA_PTR     ! pointer to data array in output file
+      CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC ! Locator to REDS extension
       INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
@@ -258,10 +268,15 @@
                                                ! bolometers whose data are to
                                                ! be treated as sky
       INTEGER          SKYBOLS(MAX__BOL)! Indices of sky bolometers
+      INTEGER          SKYDATA_PTR      ! Pointer to sky NDF array
+      INTEGER          SKYNDF           ! NDF identifier of SKY NDF
+      INTEGER          SKYVAR_PTR       ! Pointer to Sky NDF variance
       CHARACTER*80     STEMP            ! scratch string
       CHARACTER*10     SUB_INSTRUMENT   ! Sub instrument name
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
+      LOGICAL          THERE            ! Is there a REDS component?
       INTEGER          UBND(MAXDIM)     ! Upper bounds of section
+      LOGICAL          USESKYNDF        ! Are we using the SKY NDF extension
 
 *  Local Data:
       DATA SUFFIX_STRINGS /'!_sky','s','_sky'/
@@ -497,59 +512,108 @@
 
       CALL NDF_PROP (INDF, 'Data,Var,Qual,Axis', 'OUT', OUTNDF, STATUS)
 
+*     Check for a 'SKY' extension in REDS.
+*     If there is one then we will simply use it
+
+      USESKYNDF = .FALSE.
+         
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL NDF_XSTAT(OUTNDF, 'REDS', THERE, STATUS)
+
+         IF (THERE) THEN
+            CALL NDF_XLOC (OUTNDF, 'REDS', 'READ', OUT_REDSX_LOC,
+     :           STATUS)
+
+*     Have REDS. Now check for SKY
+            CALL DAT_THERE(OUT_REDSX_LOC, 'SKY', THERE, STATUS)
+
+*     Okay. We have it so open it for reading
+            IF (THERE) THEN
+               USESKYNDF = .TRUE.
+               CALL NDF_FIND(OUT_REDSX_LOC, 'SKY', SKYNDF, STATUS)
+
+*     Map the variance and sky value
+               CALL NDF_MAP(SKYNDF, 'DATA', '_REAL', 'READ',
+     :              SKYDATA_PTR, ITEMP, STATUS)
+               CALL NDF_MAP(SKYNDF, 'VARIANCE', '_REAL', 'READ',
+     :              SKYVAR_PTR, ITEMP, STATUS)
+
+               CALL MSG_SETC('TSK', TSKNAME)
+               CALL MSG_OUTIF(MSG__NORM, ' ', '^TSK: Using '//
+     :              'SKY extension to determine sky contribution',
+     :              STATUS)
+
+            END IF
+
+         ELSE
+            OUT_REDSX_LOC = DAT__NOLOC
+         END IF
+      END IF
+
+
 *  get the bad bit mask
 
       CALL NDF_BB(OUTNDF, BADBIT, STATUS)
 
+*     Ask for sky bolometers and sky removal method if we
+*     are not using the internal sky NDF.
+*     Leave this here for the moment. At some point probably
+*     want to shift this part to CALCSKY and leave REMSKY
+*     for the subtraction of the sky (Although NOTE that
+*     if we fit a plane to the data then a single sky value
+*     per time slice is not sufficient.
+
+      IF (.NOT.USESKYNDF) THEN
+
 *  Get the list of SKY bolometers if not a photometry pixel
 
-      IF (N_BOLS .GT. 1) THEN
+         IF (N_BOLS .GT. 1) THEN
 
-         CALL PAR_GET1C ('BOLOMETERS', MAX__BOL, SKYBOLC,
-     :        N_SKYBOLS, STATUS)
+            CALL PAR_GET1C ('BOLOMETERS', MAX__BOL, SKYBOLC,
+     :           N_SKYBOLS, STATUS)
 
 *     Decode the array strings into a list of bolometer numbers
-         CALL SURFLIB_DECODE_REMSKY_STRING(SUB_INSTRUMENT,
-     :        N_SKYBOLS, SKYBOLC, N_BOLS, BOL_ADC, BOL_CHAN,
-     :        SKYBOLS, N_GOODBOLS, STATUS)
+            CALL SURFLIB_DECODE_REMSKY_STRING(SUB_INSTRUMENT,
+     :           N_SKYBOLS, SKYBOLC, N_BOLS, BOL_ADC, BOL_CHAN,
+     :           SKYBOLS, N_GOODBOLS, STATUS)
 
 
 *     Raise an error if no bolometers are present
 
-         IF (N_GOODBOLS .LE. 0 .AND. STATUS .EQ. SAI__OK) THEN
+            IF (N_GOODBOLS .LE. 0 .AND. STATUS .EQ. SAI__OK) THEN
 
-            STATUS = SAI__ERROR
-            CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP(' ', '^TASK: None of the selected '//
-     :           'bolometers  were present in the data',
-     :           STATUS)
+               STATUS = SAI__ERROR
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP(' ', '^TASK: None of the selected '//
+     :              'bolometers  were present in the data',
+     :              STATUS)
 
-         END IF
-
+            END IF
+         
 *     Print a message informing the user of the number of selected bolometers
-         CALL MSG_SETI('NB',N_GOODBOLS)
-         CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ',
-     :        '^PKG: Using ^NB sky bolometers', STATUS)
+            CALL MSG_SETI('NB',N_GOODBOLS)
+            CALL MSG_SETC('PKG', PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ',
+     :           '^PKG: Using ^NB sky bolometers', STATUS)
 
 *     Check the message filter level. If it is VERBOSE then we can
 *     construct a string of the bolometer names
 *     Otherwise it is a waste of time
 
-         CALL MSG_IFLEV(MSG_LEV)
+            CALL MSG_IFLEV(MSG_LEV)
 
-         IF (MSG_LEV .EQ. MSG__VERB) THEN
+            IF (MSG_LEV .EQ. MSG__VERB) THEN
 
-            CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__VERB, ' ', 
-     :           '^PKG: Selected sky bolometers:', STATUS)
-
+               CALL MSG_SETC('PKG',PACKAGE)
+               CALL MSG_OUTIF(MSG__VERB, ' ', 
+     :              '^PKG: Selected sky bolometers:', STATUS)
+               
 *     Write the bolometers into a string 
 
-            IF (STATUS .EQ. SAI__OK) THEN
-               LINE = ' '
-               IPOSN = 0
-               DO I = 1, N_GOODBOLS
+               IF (STATUS .EQ. SAI__OK) THEN
+                  LINE = ' '
+                  IPOSN = 0
+                  DO I = 1, N_GOODBOLS
 
 *     If the string is now longer than MSG__SZMSG - 28
 *     then we end up with ellipsis (...).
@@ -560,51 +624,53 @@
 *     The extra check is there to make sure that LLEN is smaller than
 *     MSG__SZMSG. The '10' is there to account for the package name.
 
-                  IF ((IPOSN .GT. (MSG__SZMSG - 10)) .OR.
-     :                 (IPOSN .GT. (LLEN - 10))) THEN
-                     CALL MSG_SETC('BL',LINE)
-                     CALL MSG_SETC('PKG', PACKAGE)
-                     CALL MSG_OUTIF(MSG__VERB, ' ',
-     :                    '^PKG: ^BL', STATUS)
-                     
-                     IPOSN = 0
-                     LINE = ' '
+                     IF ((IPOSN .GT. (MSG__SZMSG - 10)) .OR.
+     :                    (IPOSN .GT. (LLEN - 10))) THEN
+                        CALL MSG_SETC('BL',LINE)
+                        CALL MSG_SETC('PKG', PACKAGE)
+                        CALL MSG_OUTIF(MSG__VERB, ' ',
+     :                       '^PKG: ^BL', STATUS)
+                        
+                        IPOSN = 0
+                        LINE = ' '
                   
-                  END IF
+                     END IF
 
 *     Convert the index to a string
-                  CALL CHR_ITOC(SKYBOLS(I), STEMP, ITEMP)
-                  IF(IPOSN.GT.0) THEN 
-                     CALL CHR_APPND(', ',LINE,IPOSN)
-                     IPOSN = IPOSN + 1 ! Since len does not see last space
-                  END IF
-                  CALL CHR_APPND(STEMP, LINE, IPOSN)
-               END DO
-            END IF
+                     CALL CHR_ITOC(SKYBOLS(I), STEMP, ITEMP)
+                     IF(IPOSN.GT.0) THEN 
+                        CALL CHR_APPND(', ',LINE,IPOSN)
+                        IPOSN = IPOSN + 1 ! Since len does not see last space
+                     END IF
+                     CALL CHR_APPND(STEMP, LINE, IPOSN)
+                  END DO
+               END IF
 
 *     Print more information in verbose mode
 *     Have to deal with the problem of the string being longer than
 *     MSG__SZMSG and not being able to display all the bolometers
             
-            CALL MSG_SETC('BL',LINE)
-            CALL MSG_SETC('PKG', PACKAGE)
-            CALL MSG_OUTIF(MSG__VERB, ' ',
-     :           '^PKG: ^BL', STATUS)
+               CALL MSG_SETC('BL',LINE)
+               CALL MSG_SETC('PKG', PACKAGE)
+               CALL MSG_OUTIF(MSG__VERB, ' ',
+     :              '^PKG: ^BL', STATUS)
 
 
-         END IF
+            END IF
 
 * Which mode of sky removal
-         CALL PAR_CHOIC('MODE', 'MEAN','MEAN,MEDIAN', .TRUE., MODE,
-     :        STATUS)
+            CALL PAR_CHOIC('MODE', 'MEAN','MEAN,MEDIAN', .TRUE., MODE,
+     :           STATUS)
 
-         IF (MODE .EQ. 'MEAN') THEN
-            CALL PAR_GET0R('ITER_SIGMA',ITERCLIP, STATUS)
-         ELSE
-            ITERCLIP = -1.0
+            IF (MODE .EQ. 'MEAN') THEN
+               CALL PAR_GET0R('ITER_SIGMA',ITERCLIP, STATUS)
+            ELSE
+               ITERCLIP = -1.0
+            END IF
+
          END IF
 
-      END IF
+      END IF ! End of sidetrack from USESKYNDF
 
 *     Find out if we want to add back the constant offset
 *     The default behaviour should depend on the observation 
@@ -655,12 +721,26 @@
          CALL NDF_MAP (SECNDF, 'VARIANCE', '_REAL', 'UPDATE',
      :        OUT_VARIANCE_PTR, ITEMP, STATUS)
 
-         IF (N_BOLS .GT. 1) THEN
-            CALL SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, 
-     :           %val(OUT_DATA_PTR),
-     :           %val(OUT_VARIANCE_PTR), 
-     :           %val(OUT_QUALITY_PTR),
-     :           ITERCLIP, N_GOODBOLS, SKYBOLS, BADBIT, STATUS)
+*     If we are removing the SKY ndf then simply do it
+*     else calculate the sky
+         IF (USESKYNDF) THEN
+
+            CALL SURFLIB_REM_TIMESERIES(N_BOLS, N_POS,
+     :           %VAL(SKYDATA_PTR), %VAL(SKYVAR_PTR),
+     :           %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR),
+     :           STATUS)
+
+
+         ELSE
+
+            IF (N_BOLS .GT. 1) THEN
+               CALL SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, 
+     :              %val(OUT_DATA_PTR),
+     :              %val(OUT_VARIANCE_PTR), 
+     :              %val(OUT_QUALITY_PTR),
+     :              ITERCLIP, N_GOODBOLS, SKYBOLS, BADBIT, STATUS)
+            END IF
+
          END IF
 
 *  unmap the main data array
@@ -679,7 +759,13 @@
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
       CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
+      CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
 
+      IF (USESKYNDF) THEN
+         CALL NDF_UNMAP(SKYNDF, '*', STATUS)
+         CALL NDF_ANNUL(SKYNDF, STATUS)
+      END IF
+         
       CALL NDF_ANNUL (INDF, STATUS)
       CALL NDF_ANNUL (OUTNDF, STATUS)
 
