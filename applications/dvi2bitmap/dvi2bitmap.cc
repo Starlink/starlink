@@ -464,7 +464,7 @@ int main (int argc, char **argv)
     if (bm.ofile_pattern.length() == 0)
     {
 	if (verbosity > silent)
-	    cerr << "Can't make output filename pattern from "
+	    cerr << "Error: Can't make output filename pattern from "
 		 << dviname << '\n';
 	exit(1);
     }
@@ -475,7 +475,7 @@ int main (int argc, char **argv)
 	if (dvif->eof())
 	{
 	    if (verbosity > silent)
-		cerr << "Can't open file " << dviname << " to read\n";
+		cerr << "Error: Can't open file " << dviname << " to read\n";
 	    exit(1);
 	}
 
@@ -490,10 +490,20 @@ int main (int argc, char **argv)
 	    if (f->loaded())
 	    {
 		no_font_present = false;
-		// Set the fallback font to be the first loaded font.
-		// Could be more sophisticated - first cmr10?
+		// Set the fallback font to be the first font named cmr10,
+		// or the first font if there are none such.
+		if (verbosity > normal)
+		    cerr << "dvi2bitmap: loaded font " << f->name() << '\n';
 		if (fallback_font == 0)
 		    fallback_font = f;
+		else if (f->name() == "cmr10"
+			 && fallback_font->name() != "cmr10")
+		{
+		    fallback_font = f;
+		    if (verbosity > normal)
+			cerr << "dvi2bitmap: fallback font now "
+			     << fallback_font->name() << '\n';
+		}
 	    }
 	    else		// flag at least one missing
 		all_fonts_present = false;
@@ -506,6 +516,9 @@ int main (int argc, char **argv)
 			// If f->loaded() is true, then we're here
 			// because FONT_INCFOUND was set, so indicate
 			// this in the output.
+			string cmd = f->fontgenCommand();
+			if (cmd.length() == 0)
+			    throw DviError ("configuration problem: I can't create a font-generation command");
 			cout << (f->loaded() ? "QG " : "Qg ")
 			     << f->fontgenCommand()
 			     << '\n';
@@ -572,11 +585,13 @@ int main (int argc, char **argv)
     }
     catch (DviBug& e)
     {
-	e.print();
+	if (verbosity > silent)
+	    e.print();
     }
     catch (DviError& e)
     {
-	e.print();
+	if (verbosity > silent)
+	    e.print();
     }
 
     // Exit non-zero if we were just checking the pre- and postambles,
@@ -679,13 +694,13 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			throw DviBug ("bitmap uninitialised at page end");
 		    else if (bitmap->empty())
 		    {
-			if (verbosity > silent)
+			if (verbosity > quiet)
 			    cerr << "Warning: page " << pagenum
 				 << " empty: nothing written\n";
 		    }
 		    else
 		    {
-			if (bitmap->overlaps() && verbosity > silent)
+			if (bitmap->overlaps() && verbosity > quiet)
 			{
 			    int *bb = bitmap->boundingBox();
 			    cerr << "Warning: p." << pagenum
@@ -787,7 +802,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 	    if (!process_special (dvif,
 				  special.specialString,
 				  bitmap, b))
-		if (verbosity > silent)
+		if (verbosity > quiet)
 		    cerr << "Warning: unrecognised special: "
 			 << special.specialString
 			 << '\n';
@@ -928,7 +943,7 @@ bool process_special (DviFile *dvif, string specialString,
 		else
 		{
 		    b.ofile_type = *s;
-		    if (!setDefault)
+		    if (!setDefault && verbosity > quiet)
 			cerr << "Warning: imageformat special should be prefixed with `default'\n";
 		}
 	    }
@@ -1003,7 +1018,7 @@ bool process_special (DviFile *dvif, string specialString,
 	}
     }
 
-    if (!stringOK && verbosity > silent)
+    if (!stringOK && verbosity > quiet)
 	cerr << "Warning: unrecognised special: " << specialString << '\n';
 
     return stringOK;
