@@ -644,7 +644,7 @@ normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
 kpg1_wcatw.f kpg1_srcta.f kpg1_ctass.f kpg1_ctcre.f kpg1_fit1d.f \
 kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f kpg1_mkpos.f \
-kpg1_pseed.f
+kpg1_pseed.f kpg1_ndfnm.f kpg1_graph.f kpg1_grphw.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -2723,6 +2723,9 @@ kpg1_cadduw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_D
 kpg1_caddw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
 kpg1_ccpro.o:	 SAE_PAR
 kpg1_ceil.o:	 SAE_PAR
+kpg1_ndfnm.o:    SAE_PAR
+kpg1_graph.o:    SAE_PAR
+kpg1_grphw.o:    SAE_PAR PRM_PAR PAR_ERR AST_PAR
 kpg1_chaxd.o:	 SAE_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_chaxr.o:	 SAE_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_che2d.o:	 SAE_PAR PRM_PAR

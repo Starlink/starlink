@@ -39,8 +39,7 @@
 *
 *     A plot is produced after the final iteration showing the bin
 *     centres, with error bars representing the spread of values in each
-*     bin.  This plot is produced within the current AGI picture and is 
-*     of a size you specify.
+*     bin.  The best fitting straight line is overlayed on this plot.
 *
 *     Optionally, an output NDF can be created containing a normalised 
 *     version of the data array from the first input NDF.
@@ -49,48 +48,55 @@
 *     normalize in1 in2 out
 
 *  ADAM Parameters:
-*     ABSLAB = LITERAL (Read)
-*        A title for the plot's x axis.  Only the first 50 characters
-*        are used.  The default is "Data value in ^NDF" where ^NDF is
-*        replaced by the name of the NDF associated with IN2. []
+*     AXES = _LOGICAL (Read)
+*        TRUE if labelled and annotated axes are to be drawn around the
+*        plot. The width of the margins left for the annotation may be 
+*        controlled using parameter MARGIN. The appearance of the axes 
+*        (colours, fonts, etc) can be controlled using the parameter
+*        STYLE. [TRUE]
 *     CLEAR = _LOGICAL (Read)
-*        Determines if the graphics workstation is to be cleared before
-*        producing the plot. [TRUE]
+*        If TRUE the current picture is cleared before the plot is 
+*        drawn. If CLEAR is FALSE not only is the existing plot retained, 
+*        but also an attempt is made to align the new picture with the
+*        existing picture. Thus you can generate a composite plot within 
+*        a single set of axes, say using different colours or modes to 
+*        distinguish data from different datasets. [TRUE]
 *     DATARANGE( 2 ) = _REAL (Read)
-*        This parameter may be used to override the plot auto-scaling
+*        This parameter may be used to override the auto-scaling
 *        feature.  If given, two real numbers should be supplied
 *        specifying the lower and upper data values in IN2, between
 *        which data will be used.  If not given, the default is to use
 *        the auto-scaled values, calculated according to the value of
-*        PCRANGE. [,]
+*        PCRANGE. Note, this parameter controls the range of data used in
+*        the fitting algorithm. The range of data displayed in the plot can
+*        be specified separately using parameters XLEFT, XRIGHT, YBOT and
+*        YTOP. [,]
 *     DEVICE = DEVICE (Read)
-*        The graphics workstation on which to produce the plot.  If it
-*        is null, !, there will be no plot made.
-*        [Current graphics device]
-*     FONT = LITERAL (Read)
-*        The fount to be used for the line graphics.  It can be either
-*        "NCAR" for the NCAR fancy characters and "GKS" for the standard
-*        GKS san-serif fount.   The former is intended for hardcopy
-*        publication-quality plots, since it is relatively slow; the
-*        latter is intended for normal interactive graphics requiring
-*        rapid plotting, and it is clearer on small plots.  The
-*        suggested default is the current value. ["GKS"]
+*        The graphics workstation on which to produce the plot.  If a
+*        null value (!) is supplied no plot will be made. [Current graphics 
+*        device]
 *     IN1 = NDF (Read)
 *        The NDF to be normalised.
 *     IN2 = NDF (Read)
 *        The NDF to which IN1 will be normalised. 
-*     MAJTIC( 2 ) = _REAL (Read)
-*        The parameter controlling the numbers of major tick marks
-*        for the x and y axes.  (Number used is between MAJTIC+2 and
-*        5*MAJTIC/2+4.) [3.,3.]
+*     MARGIN( 4 ) = _REAL (Read)
+*        The widths of the margins to leave for axis annotation, given 
+*        as fractions of the corresponding dimension of the DATA picture. 
+*        Four values may be given, in the order - bottom, right, top, left. 
+*        If less than four values are given, extra values are used equal to 
+*        the first supplied value. If these margins are too narrow any axis 
+*        annotation may be clipped. The dynamic default is 0.18 (for all 
+*        edges) if annotated axes are produced, and zero otherwise. []
+*     MARKER = _INTEGER (Read)
+*        Specifies the symbol with which each position should be marked in
+*        the plot. It should be given as an integer PGPLOT marker type. For 
+*        instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives 
+*        an asterisk, 7 gives a triangle. The value must be larger than or 
+*        equal to -31. [current value]
 *     MINPIX = _INTEGER (Read)
 *        The minimum number of good pixels required in a bin before it
 *        contributes to the fitted line.  It must be in the range 1 to
 *        the number of pixels per bin. [2]
-*     MINTIC( 2 ) = _REAL (Read)
-*        The number of minor tick marks between each major tick mark
-*        for the x and y axes.  A negative value forces the graphics
-*        package to compute appropriate values. [-1.,-1.]
 *     NBIN = _INTEGER (Read)
 *        The number of bins to use when binning the scatter plot prior
 *        to fitting a straight line, in the range 2 to 10000. [50]
@@ -103,46 +109,87 @@
 *     OFFSET = _REAL (Write)
 *        An output parameter giving the offset in the linear
 *        normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
-*     ORDLAB = LITERAL (Read)
-*        A title for the plots y axis.  Only the first 50 characters
-*        are used.  The default is "Data value in ^NDF" where ^NDF is
-*        replaced by the name of the NDF associated with IN1.
-*        []
 *     OUT = NDF (Write)
 *        An optional output NDF to hold a version of IN1 which is 
 *        normalised to IN2.  A null (!) value indicates that an output
 *        NDF is not required.
-*     OUTTIC = _LOGICAL (Read)
-*        TRUE if the axis tick marks are to appear on the outside of
-*        the axes instead of inside. [FALSE]
 *     PCRANGE( 2 ) = _REAL (Read)
 *        This parameter takes two real values in the range 0 to 100 and
 *        is used to modify the action of the auto-scaling algorithm
-*        which scales the plots.  The two values correspond to the
-*        percentage points in the histogram of IN2 at which the lower
-*        and upper cuts on data value are placed.  With the default
-*        value, the plots will omit those pixels which lie in the lower
-*        and upper 2 percent intensity range of IN2. [2,98]
-*     PTITLE = LITERAL (Read)
-*        A title for the top of the plot.  Only the first 50 characters
-*        are used. ["Normalization plot"]
-*     PXSIZE = _REAL (Read)
-*        The horizontal size of the plot in metres.  If a value less
-*        than the default is requested, then the plot will appear at
-*        the bottom left of the current picture. [The size of the
-*        current picture]
-*     PYSIZE = _REAL (Read)
-*        The vertical size of the plot in metres.  If a value less than
-*        the default is requested, then the plot will appear at the
-*        bottom left of the current picture. [The size of the current
-*        picture]
+*        which selects the data to use in the fitting algorithm. The two 
+*        values correspond to the percentage points in the histogram of 
+*        IN2 at which the lower and upper cuts on data value are placed.  
+*        With the default value, the plots will omit those pixels which 
+*        lie in the lower and upper 2 percent intensity range of IN2. 
+*        Note, this parameter controls the range of data used in the 
+*        fitting algorithm. The range of data displayed in the plot can
+*        be specified separately using parameters XLEFT, XRIGHT, YBOT and
+*        YTOP. [2,98]
 *     SLOPE = _REAL (Write)
 *        An output parameter giving the slope of the linear
 *        normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
+*     STYLE = LITERAL (Read)
+*        A group of attribute settings describing the plotting style to use 
+*        when drawing the annotated axes, data values, error bars, and
+*        best fitting line. 
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The appearance of the best fitting straight line is controlled by 
+*        the attributes Colour(Curves), Width(Curves), etc (the synonym Line
+*        may be used in place of Curves). The appearance of markers is 
+*        controlled by Colour(Markers), Width(Markers), etc (the synonym 
+*        Symbols may be used in place of Markers). The appearance of the 
+*        error bars is controlled using Colour(ErrBars), Width(ErrBars), 
+*        etc. Note, Size(ErrBars) controls the length of the serifs (i.e.
+*        the cross pieces at each end of the error bar), and defaults to
+*        1.0. [current value]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN1 to be used
 *        instead. [!]
+*     XLEFT = _REAL (Read)
+*        The axis value to place at the left hand end of the horizontal
+*        axis of the plot. The dynamic default is the minimum data value 
+*        used by the fitting algorithm from IN2 (with a small margin). 
+*        The value supplied may be greater than or less than the value 
+*        supplied for XRIGHT. []
+*     XRIGHT = _REAL (Read)
+*        The axis value to place at the right hand end of the horizontal
+*        axis of the plot. The dynamic default is the maximum data value 
+*        used by the fitting algorithm from IN2 (with a small margin). 
+*        The value supplied may be greater than or less than the value 
+*        supplied for XLEFT. []
+*     YBOT = _REAL (Read)
+*        The axis value to place at the bottom end of the vertical axis of 
+*        the plot. The dynamic default is the minimum data value used by 
+*        the fitting algorithm from IN1 (with a small margin). The value 
+*        supplied may be greater than or less than the value supplied for 
+*        YTOP. []
+*     YTOP = _REAL (Read)
+*        The axis value to place at the top end of the vertical axis of 
+*        the plot. The dynamic default is the maximum data value used by 
+*        the fitting algorithm from IN1 (with a small margin). The value 
+*        supplied may be greater than or less than the value supplied for 
+*        YBOT. []
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -156,11 +203,10 @@
 *        normalize.sdf parameter file (as in the all the examples below
 *        except where noted).  The NDF cl123c is the normalised version
 *        of the input cl123a.
-*     normalize cl123a cl123b cl123c title="Gain calibration"
+*     normalize cl123a cl123b style="'size(errba)=0,title=Gain calibration'"
 *        This normalises NDF cl123a to the NDF cl123b.  A plot of the
 *        fit is made on the current graphics device with the title
-*        "Gain calibration".  The NDF cl123c is the normalised version
-*        of the input cl123a.
+*        "Gain calibration".  The error bars are drawn with no serifs.
 *     normalize cl123a cl123b cl123c offset=(shift) slope=(scale)
 *        This normalises NDF cl123a to the NDF cl123b.  A plot of the
 *        fit is made on the current graphics device.  The resulting
@@ -168,9 +214,10 @@
 *        variables SCALE and SHIFT respectively, where they could be
 *        passed to another application via an ICL procedure.  The NDF
 *        cl123c is the normalised version of the input cl123a.
-*     normalize in2=old in1=new out=! device=xwindows
+*     normalize in2=old in1=new out=! device=xwindows style=^normstyle
 *        This normalises NDF new to the NDF old.  A plot of the fit is
-*        made on the xwindows device.  No output NDF is produced.
+*        made on the xwindows device, using the plotting style defined in
+*        text file normstyle.  No output NDF is produced.
 *     normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
 *        This normalises NDF new to the NDF old.  It has five iterations
 *        to reject outliers from the linear regression, and forms the
@@ -181,12 +228,13 @@
 *        the input new.
 
 *  Notes:
-*     -  Provided the application does not fail two pictures are stored
-*     in the graphics database: a FRAME of the specified size containing
-*     the title, annotated axes and the plot; and a DATA picture with
-*     each world co-ordinate being the pixel value of each NDF.  Both
-*     pictures have comment "KAPPA - Normalize".  The associated NDFs
-*     are not stored in the database.
+*     -  The application stores two pictures in the graphics database in 
+*     the following order: a FRAME picture containing the annotated axes 
+*     and data plot, and a DATA picture containing just the data plot.
+*     Note, the FRAME picture is only created if annotated axes have been 
+*     drawn, or if non-zero margins were specified using parameter 
+*     MARGIN. The world co-ordinates in the DATA picture will correspond
+*     to data value in the two NDFs.
 
 *  Implementation Status:
 *     -  The routine correctly processes the AXIS, DATA, QUALITY,
@@ -217,9 +265,6 @@
 *     -  Variances in the input data could be used in the fitting
 *     algorithm but are not at the moment.
 *     -  Bad pixels are nearly always assumed to be present.
-*     -  NCAR does strange things if the plot is too small, so ensure
-*     that the current picture covers at least 10 per cent of the
-*     plotting area.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -247,6 +292,8 @@
 *        lowercase.  Added Related Applications.  Title propagated.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     17-JUN-1998 (DSB):
+*        Converted graphics to AST/PGPLOT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -272,81 +319,45 @@
       PARAMETER ( HISIZE = 1000 )
 
 *  Local Variables:
-      LOGICAL  BAD               ! True if any bad pixels found
-      LOGICAL  DEFIND            ! True if an NDF component is in a 
-                                 ! defined state
       INTEGER  DEFMIN            ! Default for minimum number of pixels
-      REAL     DRANGE( 2 )       ! Limits on IN2 data values to be used
-      REAL     DRDEF( 2 )        ! Suggested default limits on IN2 data
-                                 ! values
-      CHARACTER * ( 4 ) FOUNT    ! Fount type
       INTEGER  ISTAT             ! Temporary status value
-      INTEGER  LENGTH            ! Used length of a character string
-      REAL     MAJTIC( 2 )       ! Parameters controlling the numbers of
-                                 ! major tick marks along x and y axes
-                                 ! respectively
-      REAL     MAX2              ! Max. value in IN2 data array
       INTEGER  MAXPOS( 2 )       ! Position of maximum in IN2 data array
-      REAL     MIN2              ! Min. value in IN2 data array
+      INTEGER  MINPIX            ! Min. no. of good pixels per bin when fitting
       INTEGER  MINPOS( 2 )       ! Position of minimum in IN2 data array
-      INTEGER  MINPIX            ! Min. no. of good pixels required per
-                                 ! bin in the fitting algorithm
-      REAL     MINTIC( 2 )       ! Numbers of minor tick marks along x
-                                 ! and y axes respectively
       INTEGER  NBAD2             ! No. of bad pixels in IN2 data array
-      INTEGER  NBIN              ! No. of bins to use in the fitting
-                                 ! algorithm
+      INTEGER  NBIN              ! No. of bins to use when fitting
+      INTEGER  NDF1B             ! Base NDF identifier for input IN1
       INTEGER  NDF1S             ! NDF section identifier for input IN1
       INTEGER  NDF2S             ! NDF section identifier for input IN2
-      INTEGER  NDF1B             ! Base NDF identifier for input IN1
       INTEGER  NDFOUT            ! NDF identifier for OUT
-      INTEGER  NELS              ! No. of elements mapped from the NDF 
-                                 ! sections
-      INTEGER  NEL1B             ! No. of elements mapped from base
-                                 ! NDF of IN1
-      INTEGER  NEWPIC            ! The AGI identifier for the FRAME
-                                 ! picture
-      INTEGER  NITER             ! No. of rejection iterations to
-                                 ! perform in the fitting algorithm
-      REAL     NSIGMA            ! No. of standard deviations at which
-                                 ! data is rejected in fitting algorithm
-      REAL     OFFSET            ! Constant offset in final fit
-      LOGICAL  OUTRQD            ! True if an output NDF is to be
-                                 ! generated, false otherwise.
-      LOGICAL  OUTTIC            ! True if axis tick marks are to be
-                                 ! placed outside the box instead of
-                                 ! inside
-      REAL     PCDEF( 2 )        ! Suggested default percentage range
-      REAL     PCRANG( 2 )       ! Percentage range for autoscaling
-      INTEGER  PIC0              ! AGI identifier for current picture
-      LOGICAL  PLOT              ! True if a plot is to be produced
-      INTEGER  PNT1S( 1 )        ! Pointer to mapped IN1 section data
-                                 ! array
-      INTEGER  PNT2S( 1 )        ! Pointer to mapped IN2 section data
-                                 ! array
-      INTEGER  PNT1BD( 1 )       ! Pointer to mapped base IN1 data
-                                 ! array
+      INTEGER  NEL1B             ! No. of elements mapped from base NDF of IN1
+      INTEGER  NELS              ! No. of elements mapped from the NDF sections
+      INTEGER  NITER             ! No. of rejection iterations to perform 
+      INTEGER  PNT1BD( 1 )       ! Pointer to mapped base IN1 data array
+      INTEGER  PNT1BV( 1 )       ! Pointer to mapped base IN1 variance array
+      INTEGER  PNT1S( 1 )        ! Pointer to mapped IN1 section data array
+      INTEGER  PNT2S( 1 )        ! Pointer to mapped IN2 section data array
       INTEGER  PNTOD( 1 )        ! Pointer to mapped output data array
-      INTEGER  PNT1BV( 1 )       ! Pointer to mapped base IN1 variance
-                                 ! array
-      INTEGER  PNTOV( 1 )        ! Pointer to mapped output variance
-                                 ! array
+      INTEGER  PNTOV( 1 )        ! Pointer to mapped output variance array
       INTEGER  PNTW0             ! Pointer to temporary work space
       INTEGER  PNTW1             ! Pointer to temporary work space
       INTEGER  PNTW2             ! Pointer to temporary work space
       INTEGER  PNTW3             ! Pointer to temporary work space
       INTEGER  PNTW4             ! Pointer to temporary work space
       INTEGER  PNTW5             ! Pointer to temporary work space
+      LOGICAL  BAD               ! Any bad pixels found?
+      LOGICAL  DEFIND            ! NDF component is in a defined state?
+      LOGICAL  OUTRQD            ! Is an output NDF is to be generated?
+      LOGICAL  VAR1              ! True if IN1 has a defined variance component
+      REAL     DRANGE( 2 )       ! Limits on IN2 data values to be used
+      REAL     DRDEF( 2 )        ! Suggested default limits on IN2 values
+      REAL     MAX2              ! Max. value in IN2 data array
+      REAL     MIN2              ! Min. value in IN2 data array
+      REAL     NSIGMA            ! No. of std.devs to clip at
+      REAL     OFFSET            ! Constant offset in final fit
+      REAL     PCDEF( 2 )        ! Suggested default percentage range
+      REAL     PCRANG( 2 )       ! Percentage range for autoscaling
       REAL     SLOPE             ! Gradient of final fit
-      REAL     TICDEF( 2 )       ! Suggested default axis-tick values
-      CHARACTER * 50    TTL      ! The title for the plot
-      CHARACTER * 50    TTLX     ! The title for the X axis of the plot
-      CHARACTER * 50    TTLY     ! The title for the Y axis of the plot
-      LOGICAL  VAR1              ! True if IN1 has a defined variance
-                                 ! component
-      INTEGER        ZONE        ! The SGS zone corresponding to the 
-                                 ! plot FRAME picture
-
 *.
 
 *  Check the inherited global status.
@@ -467,72 +478,7 @@
       CALL PAR_GDR0I( 'MINPIX', DEFMIN, 1, MIN( DEFMIN, NELS / NBIN ),
      :                .FALSE., MINPIX, STATUS )
 
-*  Start a new error context.
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL ERR_MARK
-
-*  Open a graphics workstation for NCAR AUTOGRAPH output.
-         CALL NCROPN( 'CLEAR', 'DEVICE', 'PXSIZE', 'PYSIZE', 
-     :                'KAPPA - Normalize', PLOT, PIC0, NEWPIC, ZONE,
-     :                STATUS )
-
-*  Get titles for the plot, and labels for the X and Y axes.
-         CALL PAR_DEF0C( 'PTITLE', 'normalisation plot', STATUS )
-         CALL PAR_GET0C( 'PTITLE', TTL, STATUS )
-
-         CALL NDF_MSG( 'XNAME', NDF2S )
-         CALL MSG_LOAD( 'REPORT', 'Data value in ^XNAME', TTLX, LENGTH, 
-     :                   STATUS )
-         CALL PAR_DEF0C( 'ABSLAB', TTLX( :LENGTH ), STATUS )
-         CALL PAR_GET0C( 'ABSLAB', TTLX, STATUS )
-         
-         CALL NDF_MSG( 'YNAME', NDF1S )
-         CALL MSG_LOAD( 'REPORT', 'Data value in ^YNAME', TTLY, LENGTH, 
-     :                   STATUS )
-         CALL PAR_DEF0C( 'ORDLAB', TTLY( :LENGTH ), STATUS )
-         CALL PAR_GET0C( 'ORDLAB', TTLY, STATUS )
-
-*  Get the number of minor ticks, assigning the dynamic defaults.
-         TICDEF( 1 ) = -1.
-         TICDEF( 2 ) = -1.
-         CALL PAR_GDR1R( 'MINTIC', 2, TICDEF, -1., VAL__MAXR, .FALSE.,
-     :                   MINTIC, STATUS )
-
-*  Get the parameter controlling the number of major ticks per axis,
-*  assigning the dynamic defaults.
-         TICDEF( 1 ) = 3.
-         TICDEF( 2 ) = 3.
-         CALL PAR_GDR1R( 'MAJTIC', 2, TICDEF, -1., VAL__MAXR, .FALSE.,
-     :                   MAJTIC, STATUS )
-
-*  Are the tick marks on the outside of the axes?
-         CALL PAR_GTD0L( 'OUTTIC', .TRUE., .TRUE., OUTTIC, STATUS )
-
-*  Get the fount.  Although NCAR is the default, either must be
-*  selected to prevent persistence from earlier invocations.
-         CALL PAR_CHOIC( 'FONT', 'GKS', 'GKS,NCAR', .TRUE., FOUNT,
-     :                   STATUS )
-         IF ( FOUNT .EQ. 'GKS ' ) THEN
-            CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, -100 )
-         ELSE IF ( FOUNT .EQ. 'NCAR' ) THEN
-            CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, 100 )
-         END IF
-
-*  If an error occured in the current error context, then no graphics
-*  will be produced, but the fit will still be calculated.  PLOT
-*  will be true at this point if the device was opened.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP('NORMALIZE_NOPLOT',
-     :                   'NORMALIZE: No plot will be produced', STATUS )
-            CALL ERR_FLUSH( STATUS )
-            PLOT = .FALSE.
-         END IF
-
-*  End the current error context.
-         CALL ERR_RLSE
-      END IF
-
-*  Get temporary workspace for use in NMPLOT, and map it.
+*  Get temporary workspace for use in KPS1_NMPLT, and map it.
       CALL PSX_CALLOC( NBIN, '_INTEGER', PNTW1, STATUS )
       CALL PSX_CALLOC( NBIN, '_REAL', PNTW2, STATUS )
       CALL PSX_CALLOC( NBIN, '_REAL', PNTW3, STATUS )
@@ -553,14 +499,13 @@
          GOTO 999
       END IF
 
-*  Call NMPLOT to calculate the linear function which normalises IN1 to
+*  Call KPS1_NMPLT to calculate the linear function which normalises IN1 to
 *  IN2.
-      CALL NMPLOT( %VAL( PNT2S( 1 ) ), %VAL( PNT1S( 1 ) ), NELS,
+      CALL KPS1_NMPLT( %VAL( PNT2S( 1 ) ), %VAL( PNT1S( 1 ) ), NELS,
      :             DRANGE( 1 ), DRANGE( 2 ), NBIN, NITER, NSIGMA,
-     :             MINPIX, NDF2S, NDF1S, PLOT, TTL, TTLX, TTLY, MINTIC,
-     :             MAJTIC, OUTTIC, PIC0, %VAL( PNTW1 ), %VAL( PNTW2 ),
-     :              %VAL( PNTW3 ), %VAL( PNTW4 ), %VAL( PNTW5 ), SLOPE,
-     :             OFFSET, STATUS )
+     :             MINPIX, NDF2S, NDF1S, %VAL( PNTW1 ), %VAL( PNTW2 ),
+     :             %VAL( PNTW3 ), %VAL( PNTW4 ), %VAL( PNTW5 ), 
+     :             SLOPE, OFFSET, STATUS )
 
 *  Unmap and release the temporary work space.
       CALL PSX_FREE( PNTW1, STATUS )
@@ -568,9 +513,6 @@
       CALL PSX_FREE( PNTW3, STATUS )
       CALL PSX_FREE( PNTW4, STATUS )
       CALL PSX_FREE( PNTW5, STATUS )
-
-*  Close down AGI and SGS if plotting occurred.
-      CALL AGS_DEASS( 'DEVICE', .NOT. PLOT, STATUS )
 
 *  Unmap the NDF sections.
       CALL NDF_UNMAP( NDF1S, '*', STATUS )
