@@ -194,6 +194,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.48  1998/03/24 00:26:02  timj
+*     Add support for BOLWT
+*
 *     Revision 1.47  1998/03/04 03:14:27  timj
 *     Make sure that OUT_WEIGHT_PTR is initialised with zeroes
 *
@@ -389,6 +392,8 @@ c
       BYTE             BADB            ! Bad bit mask for despiking
       INTEGER          BITNUM          ! Bit set by DESPIKE
       LOGICAL          BOLREBIN        ! Am I rebinning bols separately?
+      REAL             BOLWT (SCUBA__NUM_CHAN*SCUBA__NUM_ADC, MAX_FILE)
+                                       ! Bolometer weights
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
                                        ! input file
@@ -749,7 +754,7 @@ c
      :           BOL_DEC_END, IN_DATA_PTR, IN_DATA_END, 
      :           IN_VARIANCE_PTR, IN_VARIANCE_END,
      :           QMF, IN_QUALITY_PTR, IN_QUALITY_END, QBITS,
-     :           INT_LIST, WEIGHT, SHIFT_DX, 
+     :           INT_LIST, BOLWT, WEIGHT, SHIFT_DX, 
      :           SHIFT_DY, NPARS, PARS,
      :           STATUS)
 
@@ -1470,8 +1475,9 @@ c
                      CALL SCULIB_WTFN_REGRID( NFILES, N_PTS, WTFNRAD, 
      :                    WTFNRES, WEIGHTSIZE, DIAMETER, WAVELENGTH, 
      :                    OUT_PIXEL, MAP_SIZE(1), MAP_SIZE(2), 
-     :                    I_CENTRE, J_CENTRE, 
-     :                    WTFN, WEIGHT, ABOL_DATA_PTR, ABOL_VAR_PTR, 
+     :                    I_CENTRE, J_CENTRE, WTFN, WEIGHT,
+     :                    BOLWT, N_BOL, SCUBA__NUM_ADC*SCUBA__NUM_CHAN,
+     :                    ABOL_DATA_PTR, ABOL_VAR_PTR, 
      :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
      :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
      :                    %VAL(OUT_WEIGHT_PTR), STATUS )
