@@ -18,7 +18,7 @@ FILES        = \
  LabelEntryScale.tcl LabelFileChooser.tcl LabelMenu.tcl LabelRule.tcl \
  ManyLabelEntry.tcl NameChooser.tcl NewStarBlink.tcl Queue.tcl \
  ScrollArrows.tcl ScrollText.tcl Scrollbox.tcl StarApp.tcl \
- StarAppFilter.tcl StarArd.tcl StarArdAnnBox.tcl StarArdAnnCircle.tcl \
+ StarAppFilter.tcl GaiaArd.tcl StarArdAnnBox.tcl StarArdAnnCircle.tcl \
  StarArdAnnColumn.tcl StarArdAnnEllipse.tcl StarArdAnnList.tcl \
  StarArdAnnPixel.tcl StarArdAnnPoly.tcl StarArdAnnRect.tcl \
  StarArdAnnRotBox.tcl StarArdAnnRow.tcl StarArdAnnTool.tcl \
@@ -35,7 +35,7 @@ FILES        = \
  gaia2astrom.tcl gaiaMain.tcl \
  gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
- StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
+ GaiaArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
  StarAstSystem.hlp StarBlink.hlp StarPatch.hlp GaiaApPhotom.hlp \
  GaiaOptPhotom.hlp GaiaContour.hlp GaiaAstTransfer.hlp \
