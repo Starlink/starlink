@@ -1,0 +1,6 @@
+#  Help directory for the gaia package
+
+$doc = "./doc/"
+
+gaia        hlp = doc$gaia.hlp, src = gaia.f
+gaiadisp        hlp = doc$gaiadisp.hlp, src = gaiadisp.f

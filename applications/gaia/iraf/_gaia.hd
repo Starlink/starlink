@@ -1,0 +1,6 @@
+# Help definitions for the gaia package
+gaia men = gaia.men,
+         hlp = ..,
+         sys = gaia.hlp,
+         pkg = gaia.hd,
+         src = gaia.cl

@@ -1,0 +1,15 @@
+.help gaiadisp Starlink gaia
+.nf
+Display an image in GAIA
+
+Usage:
+   gaiadisp image plane
+
+Description:
+
+   This command will either display an image in an existing GAIA, or
+   startup a new GAIA and display the image in that. The plane number
+   defines which GAIA clone will receive the image (this can vary from
+   0, the base clone, to 9999). More help about GAIA is available in its
+   Help menus and in SUN/214.
+.endhelp
