@@ -29,7 +29,7 @@ define   bdf2(ndf)     convert_dir:convert
 define   dipso2(ndf)   convert_dir:convert
 define   dst2(ndf)     convert_dir:convert
 define   ndf2a(scii)   convert_dir:convert
-define   ndf2b{df)     convert_dir:convert
+define   ndf2b(df)     convert_dir:convert
 define   ndf2di(pso)   convert_dir:convert
 define   ndf2ds(t)     convert_dir:convert
 define   ndf2i(raf)    convert_dir:convert
