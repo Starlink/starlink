@@ -191,11 +191,11 @@
         PARAMETER	        ( MXBIN=2000 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FREQUENCY Version V2.0-1' )
+        PARAMETER		( VERSION = 'FREQUENCY Version V2.0-2' )
 
 *  Local Variables:
       CHARACTER			TEXT(MAXLINES)*80	! History text
-      CHARACTER*8     		AXTXT(2)                ! O/p axis label,units
+      CHARACTER*80     		AXTXT(2)                ! O/p axis label,units
 
       REAL          		BOUNDS(MXBIN+1)         ! Bin boundaries
       REAL          		DMIN,DMAX		! Input object range
