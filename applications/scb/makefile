@@ -350,7 +350,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME)_test.tar \
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = scb.pl scbindex.pl dbmcat dbmdo
+PUBLIC_SCRIPTS = scb.pl scbindex.pl
 
 #  List of CGI scripts.  These are executables which will be installed
 #  in the $(INSTALL_CGI) directory with execute permission set and may
@@ -361,7 +361,7 @@ CGI_SCRIPTS = scb.pl
 #  List of all scripts including $(CGI_SCRIPTS) and $(PUBLIC_SCRIPTS)
 #  (but without duplicated entries).
 
-ALL_SCRIPTS = scb.pl scbindex.pl dbmcat dbmdo
+ALL_SCRIPTS = scb.pl scbindex.pl
 
 #  List of Perl modules.  These are library modules required by the 
 #  public script files $(PUBLIC_SCRIPTS) and will be installed in the
