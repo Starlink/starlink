@@ -9,17 +9,23 @@ DTDDIR=$(STARLINK_SGML_DIR)/dtd
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl $< >$@ #2>/dev/null
 
-%.text: %.dtdsummary
+%.sgmltext: %.dtdsummary
 	jade -t sgml -d dtd2sgml.dsl $< >$@
 
 # This stamp file is tested by ../ssn70/Makefile -- do not rename!
-text.stamp: starlink-0.2.text programcode-0.2.text
+sgmltext.stamp: starlink-0.2.sgmltext programcode-0.2.sgmltext
 	touch text.stamp
 
-starlink-everything.dtdsummary: $(DTDDIR)/starlink-everything.dtd
+starlink-0.2.dtdsummary: $(DTDDIR)/starlink-everything.dtd $(DTDDIR)/starlink-0.2.dtd
+	SGML_SEARCH_PATH=$(DTDDIR) \
+	perl -I $(PERLSGML_DIR) dtd2sgml.pl --descrip starlink-0.2.description \
+		$< >$@ 2>/dev/null
 
-starlink-0.2.text: starlink-0.2.description starlink-everything.dtdsummary
+starlink-0.2.sgmltext: starlink-0.2.dtdsummary starlink-0.2.description
 
-programcode-0.2.text: programcode-0.2.description programcode-0.2.dtdsummary
+programcode-0.2.sgmltext: programcode-0.2.dtdsummary programcode-0.2.description
 
-test.html.stamp: test.sgml programcode-0.2.text
+test.html.stamp: test.sgml programcode-0.2.sgmltext
+
+clean:
+	rm -f *.sgmltext *.dtdsummary sgmltext.stamp
