@@ -320,17 +320,22 @@
          CALL DAT_ANNUL( FTLOC, STATUS )
       END IF
 
-*  Add the default NDF WCS (GRID, PIXEL and AXIS) if no WCS component
-*  exists in the NDF or FITS headers.
+*  If the NDF WCS component doesn't exist (if it does we know there's a
+*  WCS encoded so we need to do nothing more), then check the FITS
+*  headers for a WCS. If that isn't found, then we just pick up the
+*  default NDF WCS (GRID, AXIS and PIXEL) and encode that.
       IF ( .NOT. EXISTS .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Read the existing headers so we know if a WCS exists. If the headers
-*  are bad for any reason this can fail, so trap any errors.
+*  Read the FITS headers looking for a WCS. If the headers are bad for
+*  any reason this can fail, so trap any errors.
          CALL RTD1_DEWCS( %VAL( IPHEAD ), NHEAD, .FALSE., IWCS,
      :                    STATUS, %VAL(80) )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF
+
+*  Fall-back to basic NDF WCS. Simplify for AXIS structures that are
+*  really just WinMaps.
          IF ( IWCS .EQ. AST__NULL ) THEN
             CALL NDF_GTWCS( NDF, IWCS, STATUS )
             CALL RTD1_ENWCS( IWCS, IPHEAD, NHEAD, AVAIL, STATUS )
