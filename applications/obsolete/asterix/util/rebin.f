@@ -443,8 +443,10 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
      :                        STATUS )
 
           ELSE
-            CALL BDI_AXMAPR( OFID, I, 'Data', AXVPO(I), STATUS )
-            CALL BDI_AXMAPR( OFID, I, 'Width', AXWPO(I), STATUS )
+            CALL BDI_AXMAPR( OFID, I, 'Data', 'WRITE', AXVPO(I),
+     :                       STATUS )
+            CALL BDI_AXMAPR( OFID, I, 'Width', 'WRITE', AXWPO(I),
+     :                       STATUS )
             CALL REBIN_WRTAXIS(OPT,MXBIN,BNDS(1,1,I),ODIM(I),
      :                      %VAL(AXVP(I)),%VAL(AXWP(I)),DIR(I),RAT(I),
      :                           %VAL(AXVPO(I)),%VAL(AXWPO(I)),STATUS)
@@ -455,9 +457,9 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         ELSE
           CALL BDI_AXCOPY( IFID, I, ' ', OFID, I, STATUS )
 
-        ENDIF
+        END IF
 
-      ENDDO
+      END DO
 
       IF (STATUS.EQ.SAI__OK) THEN
         CALL MSG_PRNT('Rebinning...')
