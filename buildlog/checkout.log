@@ -9188,12 +9188,15 @@ U java/source/util/src/main/uk/ac/starlink/util/Compression.java
 U java/source/util/src/main/uk/ac/starlink/util/DOMUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/DataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/ErrorDialog.java
+U java/source/util/src/main/uk/ac/starlink/util/FastPipedInputStream.java
+U java/source/util/src/main/uk/ac/starlink/util/FastPipedOutputStream.java
 U java/source/util/src/main/uk/ac/starlink/util/FileDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/GenericNioBuffer.java
 U java/source/util/src/main/uk/ac/starlink/util/IOUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/Loader.java
 U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
 U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
+U java/source/util/src/main/uk/ac/starlink/util/PipeReaderThread.java
 U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/ProxySetup.java
 U java/source/util/src/main/uk/ac/starlink/util/ReaderThread.java
@@ -9257,6 +9260,8 @@ U java/source/util/src/testcases/uk/ac/starlink/util/DOMUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/DataSourceTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/IOUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/NodeDescendantsTest.java
+U java/source/util/src/testcases/uk/ac/starlink/util/PipeReaderThreadBench.java
+U java/source/util/src/testcases/uk/ac/starlink/util/PipeReaderThreadTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/ReaderThreadTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/TestCaseTest.java
