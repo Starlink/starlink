@@ -3778,6 +3778,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'PSF_HCUBE_CMN'
 *
 *    Import :
 *
@@ -3806,6 +3807,10 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 *    Set methods
       CALL PSF0_SETRTN( PSID, 'Data', PSF_XMM_ANAL, STATUS )
       CALL PSF0_SETRTN( PSID, 'Hint', PSF_XMM_ANAL_HINT, STATUS)
+
+*    Or get name from the parameter system?
+      HX_PSF_NAME = 'XMM_ANAL'
+
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_XMM_ANAL_INIT', STATUS )
@@ -3876,7 +3881,6 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
       REAL DX, DY
 
 *     Local Variables
-      INTEGER I,J                                  ! Loop variable
       INTEGER LP                                   ! Loop variable
       INTEGER NX,NY                                ! Array size
 
@@ -3884,7 +3888,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
       REAL SIGMA_BLUR
       REAL TOTAL                                   ! Counter
 
-      REAL  X01,Y01,DX1,DY1,QX1,QY1
+      REAL DX1,DY1
 
 *    Export :
        REAL ARRAY(NX,NY)
@@ -3898,19 +3902,11 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
          DATA SIGMA /4.1450, 8.6218, 22.372, 66.698/
 
 *    Pixel sizes required in seconds
-      X01 = X0 * MATH__RTOD * 3600
-      Y01 = Y0 * MATH__RTOD * 3600
       DX1 = DX * MATH__RTOD * 3600
       DY1 = DY * MATH__RTOD * 3600
-      QX1 = QX * MATH__RTOD * 3600
-      QY1 = QY * MATH__RTOD * 3600
 
 *    Initialise the array
-      DO I = 1, NX
-        DO J = 1,NY
-           ARRAY(I,J) = 0
-        END DO
-      END DO
+      CALL ARR_INIT1R(0.0,NX*NY,ARRAY,STATUS)
 
 *    The offaxis angle is given in ARCMIN
 
@@ -3923,35 +3919,22 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 
          SIGMA_BLUR = 0.0647 * (OFF_AXIS**2)
          SIGMA(LP)  = SQRT((SIGMA_BLUR**2)+(SIGMA(LP)**2))
-         TOTAL = SIGMA_BLUR
-
       END IF
 
-      CALL XMM_INTGAU2D( NORM(LP), SIGMA(LP), SIGMA(LP), LP, X01,
-     :           Y01, QX1, QY1, DX1, DY1, NX, NY, ARRAY, STATUS )
+      CALL XMM_INTGAU2D( NORM(LP), SIGMA(LP),
+     :                   DX1, DY1, NX, NY, ARRAY, STATUS )
 
       END DO !(LP)
 
       END
 
 
-*+  PSF_XMM_ANAL_HINT - XRT PSPC psf hint handler
+*+  PSF_XMM_ANAL_HINT - XMM psf hint handler
       SUBROUTINE PSF_XMM_ANAL_HINT( PSID, HINT, DATA, STATUS )
 *
 *    Description :
 *
-*     Return hints about the XRT PSPC psf.
-*
-*    Method :
-*    Deficiencies :
-*    Authors :
-*
-*     David J. Allan (ROSAT, University of Birmingham)
-*
-*    History :
-*
-*     23 Dec 93 : Original (DJA)
-*      3 Mar 94 : POSDEP hint added (DJA)
+*     Return hints about the XMM_ANAL.
 *
 *    Type definitions :
 *
@@ -4005,11 +3988,11 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
         CALL ARR_COP1L( 1, .FALSE., DATA, STATUS )
         CALL MSG_PRNT('Using energy hint')
 
-*  Field size?
+*   Field size?
       ELSE IF ( HINT .EQ. PSF_H_FLDSIZ ) THEN
 
-*    Write value
-*    XMM FOV ~ 30 arcmin
+
+*    XMM radial FOV @ 30 arcmin
         CALL ARR_COP1R( 1, 0.5*MATH__DTOR, DATA, STATUS )
         CALL MSG_PRNT('Using FOV hint')
 
@@ -4024,8 +4007,8 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 
 
 *+  XMM_INTGAU2D - Return array of integrated 2D gaussian distribution
-      SUBROUTINE XMM_INTGAU2D( MY_NORM, XSIG, YSIG, LP,
-     :                  X0, Y0, QX, QY, DX, DY, NX, NY, ARRAY, STATUS )
+      SUBROUTINE XMM_INTGAU2D( MY_NORM, SIG,
+     :                         DX, DY, NX, NY, ARRAY, STATUS )
 *
 *    Description :
 *
@@ -4062,9 +4045,6 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 *    History :
 *
 *     09 Jun 99 : Original (::DGED)
-*     27 Jan 00 : Ammended the third gaussian component (divided by 2) in
-*                 accordance with an error in the original technical note
-*                 SSC-AIP-TN-0002
 *
 *    Type definitions :
 *
@@ -4080,9 +4060,9 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
       REAL                      MY_NORM
       REAL                      TEMP
       REAL                      R
-      REAL                      XSIG, YSIG             ! The gaussian params
-      REAL                      DX, DY, X0, Y0,QX,QY
-      INTEGER                   LP                     ! Gaussian component
+      REAL                      SIG                     ! The gaussian param
+      REAL                      DX, DY
+
       INTEGER                   NX,NY
 *
 *    Export :
@@ -4096,7 +4076,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 *    Functions :
 *
       REAL			MATH_EXPR
-      INTEGER			SPIX1
+C     INTEGER			SPIX1
 *
 *    Local variables :
 *
@@ -4114,7 +4094,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
       INTEGER                   MNX, MNY                ! Local calc bounds
       INTEGER                   XSUB, YSUB              ! Sub-pixel factors
 
-      LOGICAL                   SYMMETRIC               ! Symmetric about centre?
+C      LOGICAL                   SYMMETRIC               ! Symmetric about centre?
 
 *-
 
@@ -4126,40 +4106,25 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
       YPA0 = ( - REAL(NY)/2.0 ) * DY
 
 *    Base coordinates
-      XP0 = ( - REAL(NX)/2.0 ) * DX + X0 + QX
-      YP0 = ( - REAL(NY)/2.0 ) * DY + Y0 + QY
-
-*    Symmetric?
-      SYMMETRIC = ( ( X0 .EQ. 0.0 ) .AND. ( Y0 .EQ. 0.0 )
-     :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
-
-*    Bounds for calculation
-      IF ( SYMMETRIC ) THEN
+      XP0 = ( - REAL(NX)/2.0 ) * DX
+      YP0 = ( - REAL(NY)/2.0 ) * DY
 
 *      The "lower left corner" of the array. The +1 guarantees that the
 *      centre pixel gets done for odd values of NX/Y
-        MNX = (NX+1)/2
-        MNY = (NY+1)/2
-
-      ELSE
-
-*      The whole array
-        MNX = NX
-        MNY = NY
-
-      END IF
+      MNX = (NX+1)/2
+      MNY = (NY+1)/2
 
 *    Constants in the equation
-      CNST =  MY_NORM/(2 * MATH__PI * (XSIG**2))
-      CNST1 = 2 * (XSIG**2)
-      CNST1 = CNST1 - (2*CNST1)
+      CNST =  MY_NORM/(2 * MATH__PI * (SIG**2))
+      CNST1 = 2 * (SIG**2)
+      CNST1 = SIGN(CNST1,-1.0)
 
 *    For each point requiring calculation
       DO J = 1, MNY
 
 *      Find Y sub-pixelling
-*      Change made here
-        YSUB = SPIX1( YPA0 + DY*REAL(J-1) + 0.5*DY, YSIG, DY )
+C        YSUB = SPIX1( YPA0 + DY*REAL(J-1) + 0.5*DY, SIG, DY )
+        YSUB=7
         SDY = DY / YSUB
 
 *      Y contribution to normalisation
@@ -4171,7 +4136,8 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
           SUM = 0.0
 
 *        Find X sub-pixelling
-          XSUB = SPIX1( XPA0 + DX*REAL(I-1) + 0.5*DX, XSIG, DX )
+C          XSUB = SPIX1( XPA0 + DX*REAL(I-1) + 0.5*DX, SIG, DX )
+          XSUB=7
           SDX = DX / XSUB
 
 *        X contribution to normalisation - hence total normalisation
@@ -4211,21 +4177,14 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
           END DO
 
 *        Set ARRAY value
-          IF (LP .EQ. 3) THEN
-*           See ammendment to the technical note.
-             ARRAY(I,J) = ARRAY(I,J) + (SUM *NORM)/2
-          ELSE
              ARRAY(I,J) = ARRAY(I,J) + (SUM * NORM)
-          ENDIF
         END DO
 
       END DO
 
-*    Copy array around if symmetrical
-      IF ( SYMMETRIC ) THEN
 *      Transfer data to other 3 quadrants
-        JJ = NY
-        DO J = 1, MNY
+      JJ = NY
+      DO J = 1, MNY
           II = NX
           DO I = 1, MNX
             ARRAY(II,J) = ARRAY(I,J)
@@ -4233,9 +4192,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
             ARRAY(I,JJ) = ARRAY(I,J)
             II = II - 1
           END DO
-          JJ = JJ - 1
-        END DO
-
-      END IF
+         JJ = JJ - 1
+      END DO
 
       END

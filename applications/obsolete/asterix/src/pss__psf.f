@@ -5,7 +5,7 @@
 *
 *     All psf resources are released within a new error context to try
 *     and guarantee a graceful exit, even in ICL, without residual file
-*     locking prolems.
+*     locking problems.
 *
 *    Authors :
 *
@@ -51,6 +51,7 @@
       CALL PSF_CLOSE( STATUS )
 
       END
+*
 *+  PSS_PSF_CONVOLVE - Convolve psf with gaussian of given FWHM
       SUBROUTINE PSS_PSF_CONVOLVE( NX, NY, IN, GAU, FWHM, OUT, STATUS )
 *
@@ -161,6 +162,7 @@
       LAST_FWHM = FWHM
 
       END
+
 *+  PSS_PSF_INIT - Find a psf and map required workspace
       SUBROUTINE PSS_PSF_INIT( STATUS )
 *
@@ -193,6 +195,7 @@
 *     11 Sep 92 : Writes extrema of accessed image area (DJA)
 *     10 Jul 93 : No longer uses inline functions (DJA)
 *     20 Nov 95 : Add support for specifying PSFPIX by percentage (DJA)
+*     25 Sep 00 : New psfs added (DGED)
 *
 *    Type definitions :
 *
@@ -208,6 +211,7 @@
 *    Global variables :
 *
       INCLUDE 'PSS_CMN'
+      INCLUDE 'PSF_HCUBE_CMN'
 *
 *    Status :
 *
@@ -217,11 +221,11 @@
 *
       INTEGER			CHR_LEN
 *
+
 *    Local variables :
 *
       CHARACTER*80		PDATA			! PSFPIX response
       CHARACTER*80     		TEXT                    ! Output data
-      CHARACTER*80		FORMAT, FORMAT2		! Format statment
 
       REAL             		MAXOFF                  ! Maximum off-axis angle
       REAL             		X0, Y0                  ! Image position
@@ -247,10 +251,37 @@
       REAL             		ELEVS(NPSFLEV)
       DATA             		ELEVS/0.5,0.68,0.9,0.95/
       DATA             		FIR_TRUNC/.TRUE./
+
+*
+*    Axaf variables and data
+*
+      REAL                      AXAF_DATA(4,3)           ! Radii size in pixels
+      DATA                      AXAF_DATA/0.7,1.0,2.6,5.6,
+     :                                    0.8,2.0,3.7,6.6,
+     :                                    4.4,8.0,11.4,14.2/
+
+      INTEGER                   MAX_PROFILE              ! Max length of a profile
+        PARAMETER                  ( MAX_PROFILE = 200)
+
+      INTEGER                   MAX_PSF_SIZE
+      INTEGER                   N1                       ! Any integer
+      INTEGER                   PIXCNT                   ! Pix count
+      INTEGER                   PROFILE                  ! Size of PSF profile
+      INTEGER                   PSF_ARRAY_PTR            ! Pointer to PSF array
+      INTEGER                   PSF_PRO_PTR              ! Pointer to profile
+
+      REAL                      INP(MAX_PROFILE)         !
+      REAL                      RVAL                     ! Return val
+
+      REAL TEMPA(61,61),TOTAL
+      INTEGER I,J
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Set the maximum PSF size
+      MAX_PSF_SIZE  = PSS__MXHWID
 
 *    Using a psf model
       CALL PSF_QMODEL( PSF_HAN, MODEL, STATUS )
@@ -288,38 +319,189 @@
         IF ( .NOT. HOK ) THEN
           MAXOFF = 1.5*MATH__DTOR
         END IF
-
       END IF
 
-*    Use centre of f.o.v
+*    Use centre of FOV
       X0 = 0.0
       Y0 = 0.0
 
-*    Perform energy profiling
-      DO IPOS = 1, NIPOS
+*     XMM Analytic option
+      IF (HX_PSF_NAME(1:8) .EQ. "XMM_ANAL") THEN
 
-*      Choose image position
-        PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
+*       XMM  fov 30 arcmins
+         MAXOFF = 0.2*MATH__DTOR
 
-*      Get profile
-        CALL PSF_ENERGY_PFL( PSF_HAN, NPSFLEV, ELEVS, X0, Y0,
+*       Include in user option
+         HX_PSF_ARRAY_X = 61
+         HX_PSF_ARRAY_Y = 61
+
+         AX_DR(1)=AX_DR(2)
+
+         DO IPOS = 1, NIPOS
+
+*           Choose image position
+             PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
+
+*           Pointer to the PSF array
+             CALL DYN_MAPR(1,HX_PSF_ARRAY_X*HX_PSF_ARRAY_Y,
+     :                                    PSF_ARRAY_PTR,STATUS)
+
+*           Get PSF array
+             CALL PSF_2D_DATA( PSF_HAN, X0, 0.0, 0.0, 0.0, AX_DR(1),
+     :                         AX_DR(2), .TRUE.,HX_PSF_ARRAY_X,
+     :                HX_PSF_ARRAY_Y, %VAL(PSF_ARRAY_PTR), STATUS )
+
+
+*           Normalise array
+             CALL ARR_NORM1R(HX_PSF_ARRAY_X *  HX_PSF_ARRAY_Y,
+     :                       %VAL(PSF_ARRAY_PTR),STATUS)
+
+*           Pointer to the PSF profile
+             PROFILE = (HX_PSF_ARRAY_X-1)/2
+             CALL DYN_MAPR(1,HX_PSF_ARRAY_X,PSF_PRO_PTR,STATUS)
+             CALL ARR_INIT1R(1.0,PROFILE,%val(PSF_PRO_PTR),STATUS)
+             CALL CPA_PROFILE(%VAL(PSF_ARRAY_PTR),%VAL(PSF_PRO_PTR),
+     :                                              PROFILE,1,STATUS)
+
+             CALL ARR_COP1R(PROFILE+1,%VAL(PSF_PRO_PTR),INP,STATUS)
+
+                 DO ILEV = 1, NPSFLEV
+*                   Linear interpolation
+                     PIXCNT = 0
+                     DO N1 = 1,PROFILE
+                        IF (ELEVS(ILEV) .GT. INP(N1)) PIXCNT = PIXCNT+1
+                     ENDDO
+
+                     IF (PIXCNT .EQ. 0) THEN
+                        PSF_PIXL(ILEV,IPOS) = (ELEVS(ILEV)/INP(1))
+                     ELSE IF (PIXCNT .EQ. PROFILE) THEN
+                        PSF_PIXL(ILEV,IPOS) = PIXCNT
+                     ELSE
+                        RVAL = (ELEVS(ILEV)- INP(PIXCNT))
+     :                   /(INP(PIXCNT+1) - INP(PIXCNT))
+                        PSF_PIXL(ILEV,IPOS) = PIXCNT+RVAL
+
+                     ENDIF
+                  ENDDO
+
+               CALL DYN_UNMAP(PSF_PRO_PTR)
+               CALL DYN_UNMAP(PSF_ARRAY_PTR)
+*          Next radius
+               IF ( NIPOS .GT. 1 ) X0 = X0 + MAXOFF/REAL(NIPOS-1)
+            END DO
+      ENDIF
+
+*    Other options
+      IF (HX_PSF_NAME(1:9) .NE. 'AXAF_MARX' .AND.
+     :    HX_PSF_NAME(1:8) .NE. 'XMM_ANAL' ) THEN
+
+*       Perform energy profiling
+         DO IPOS = 1, NIPOS
+
+*         Choose image position
+           PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
+
+*         Get profile
+           CALL PSF_ENERGY_PFL( PSF_HAN, NPSFLEV, ELEVS, X0, Y0,
      :                             PSF_PIXL(1,IPOS), STATUS )
 
-*      Divide to get radii in pixels
-        DO ILEV = 1, NPSFLEV
-          PSF_PIXL(ILEV,IPOS) = PSF_PIXL(ILEV,IPOS)/ABS(AX_DR(1))
-        END DO
+*         Divide to get radii in pixels
+           DO ILEV = 1, NPSFLEV
+             PSF_PIXL(ILEV,IPOS) = PSF_PIXL(ILEV,IPOS)/ABS(AX_DR(1))
+           END DO
 
-*      Next radius
-        IF ( NIPOS .GT. 1 ) X0 = X0 + MAXOFF/REAL(NIPOS-1)
+*         Next radius
+           IF ( NIPOS .GT. 1 ) X0 = X0 + MAXOFF/REAL(NIPOS-1)
+         END DO
+         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      END DO
+      ENDIF
+
+*  Because the CHANDRA CCD pix is a fixed size and because the distances
+*  and % at which values are taken are fixed. A fixed table of values can
+*  be given. However if the pix size varies then a method of generating
+*  profiles is ALSO required
+
+      IF (HX_PSF_NAME(1:9) .EQ. 'AXAF_MARX') THEN
+*       Set maximum size
+         MAX_PSF_SIZE = MAX((HX_PSF_ARRAY_X/2),(HX_PSF_ARRAY_Y/2))
+
+         IF ( AX_DR(1) .EQ. 2.42E-06 .AND. PSF_CONSTANT ) THEN
+            NIPOS = 1
+            CALL ARR_COP1R(4,AXAF_DATA,PSF_PIXL,STATUS)
+         ELSEIF ( AX_DR(1) .EQ. 2.42E-06 .AND. .NOT. PSF_CONSTANT ) THEN
+            NIPOS = 3
+            CALL ARR_COP1R(12,AXAF_DATA,PSF_PIXL,STATUS)
+         ELSE
+            MAX_PSF_SIZE = MAX((HX_PSF_ARRAY_X/2),(HX_PSF_ARRAY_Y/2))
+            DO IPOS = 1, NIPOS
+*             Needs fixing.
+               MAXOFF = 0.13*MATH__DTOR ! 13 = 7.8 arcmin
+
+*             Choose image position
+               PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
+
+*             Pointer to the PSF array
+               CALL DYN_MAPR(1,HX_PSF_ARRAY_X*HX_PSF_ARRAY_Y,
+     :                                    PSF_ARRAY_PTR,STATUS)
+
+*             Get PSF array
+               CALL PSF_2D_DATA( PSF_HAN, X0, 0.0, 0.0, 0.0,AX_DR(1),
+     :                  AX_DR(2), .TRUE.,HX_PSF_ARRAY_X,
+     :                  HX_PSF_ARRAY_Y, %VAL(PSF_ARRAY_PTR), STATUS )
+
+*             Pointer to the PSF profile
+               PROFILE = (HX_PSF_ARRAY_X-1)/2
+               CALL DYN_MAPR(1,HX_PSF_ARRAY_X,PSF_PRO_PTR,STATUS)
+               CALL ARR_INIT1R(1.0,PROFILE,%val(PSF_PRO_PTR),STATUS)
+               CALL CPA_PROFILE(%VAL(PSF_ARRAY_PTR),%VAL(PSF_PRO_PTR),
+     :                                              PROFILE,1,STATUS)
+
+               IF (PROFILE .GT. MAX_PROFILE) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP(' ','PSF larger than profile',STATUS)
+                  GOTO 99
+               ELSE
+                  CALL ARR_COP1R(PROFILE+1,%VAL(PSF_PRO_PTR),INP,
+     :                                                         STATUS)
+                  DO ILEV = 1, NPSFLEV
+*                   Linear interpolation
+                     PIXCNT = 0
+                     DO N1 = 1,PROFILE
+                        IF (ELEVS(ILEV) .GT. INP(N1)) PIXCNT = PIXCNT+1
+                     ENDDO
+
+                     IF (PIXCNT .EQ. 0) THEN
+                        PSF_PIXL(ILEV,IPOS) = (ELEVS(ILEV)/INP(1))
+                     ELSE IF (PIXCNT .EQ. PROFILE) THEN
+                        PSF_PIXL(ILEV,IPOS) = PIXCNT
+                     ELSE
+                        RVAL = (ELEVS(ILEV)- INP(PIXCNT))
+     :                   /(INP(PIXCNT+1) - INP(PIXCNT))
+                        PSF_PIXL(ILEV,IPOS) = PIXCNT+RVAL
+                     ENDIF
+                  ENDDO
+               ENDIF
+
+               CALL DYN_UNMAP(PSF_PRO_PTR)
+               CALL DYN_UNMAP(PSF_ARRAY_PTR)
+*          Next radius
+               IF ( NIPOS .GT. 1 ) X0 = X0 + MAXOFF/REAL(NIPOS-1)
+            END DO
+         ENDIF
+      ENDIF
+
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Set default at 68% radius
       DO IPOS = 1, 3
         R68(IPOS) = MAX(1,NINT(PSF_PIXL(2,IPOS)))
       END DO
+
+*  Display pixel size
+      CALL MSG_SETR( 'X', AX_DR(1))
+      CALL MSG_SETR( 'Y', AX_DR(2))
+      CALL MSG_PRNT('Dataset Pixel Size xy : ^X ^Y')
 
 *  Display table in expert mode
       IF ( CP_EXPERT ) THEN
@@ -331,10 +513,12 @@
           CALL MSG_PRNT( 'Energy fraction    Off-axis angle' )
         END IF
         IF ( .NOT. PSF_CONSTANT ) THEN
-          WRITE( FORMAT, 2, IOSTAT=FSTAT ) NIPOS
-  2       FORMAT ( '(18X, ', I3, '(I3,3X), ''arcmin'')' )
-          WRITE( TEXT, FORMAT, IOSTAT=FSTAT ) (NINT(PSF_PPR(IPOS)*
-     :                             MATH__RTOD*60.0) ,IPOS=1,NIPOS)
+  2       FORMAT( 18X, I3,3X, 'arcmin' )
+  3       FORMAT( 18X, I3,3X,I3,3X,I3,3X, 'arcmin' )
+          IF (NIPOS .EQ. 1) WRITE( TEXT, 2, IOSTAT=FSTAT )
+     :       (NINT(PSF_PPR(IPOS)* MATH__RTOD*60.0) ,IPOS=1,NIPOS)
+          IF (NIPOS .EQ. 3) WRITE( TEXT, 3, IOSTAT=FSTAT )
+     :       (NINT(PSF_PPR(IPOS)* MATH__RTOD*60.0) ,IPOS=1,NIPOS)
           CALL MSG_PRNT( TEXT )
         END IF
         CALL MSG_PRNT( ' ' )
@@ -342,24 +526,32 @@
         DO ILEV = 1, NPSFLEV
 
 *        Check radius isn't an lower bound
-          WRITE ( FORMAT, 5, IOSTAT=FSTAT) NIPOS
-          WRITE ( FORMAT2, 15, IOSTAT=FSTAT) NIPOS
-  5       FORMAT( '(4X,I4,''%'',8X,', I3, '(F4.1,2X),'' pixels'')' )
- 15       FORMAT( '(4X,I4,''%'',8X,', I3, '(F5.1,2X),'' pixels'')' )
+ 5         FORMAT( 4X,I4,'%',8X, F4.1,2X,' pixels' )
+ 6         FORMAT( 4X,I4,'%',8X, F4.1,2X, F4.1,2X, F4.1,2X,' pixels' )
+ 15        FORMAT( 4X,I4,'%',8X,'> ',F5.1,2X, ' pixels' )
+ 16        FORMAT( 4X,I4,'%',8X,'> ',F5.1,2X,F5.1,2X,F5.1,2X,' pixels' )
+
 
           IF ( PSF_PIXL(ILEV,NIPOS) .GT. 0 ) THEN
-            WRITE( TEXT, FORMAT, IOSTAT=FSTAT ) NINT(ELEVS(ILEV)*100.0),
-     :                     (ABS(PSF_PIXL(ILEV,IPOS)),IPOS=1,NIPOS)
+            IF (NIPOS .EQ. 1) WRITE( TEXT, 5, IOSTAT=FSTAT )
+     :       NINT(ELEVS(ILEV)*100.0),(ABS(PSF_PIXL(ILEV,IPOS)),
+     :       IPOS=1,NIPOS)
+            IF (NIPOS .EQ. 3) WRITE( TEXT, 6, IOSTAT=FSTAT )
+     :       NINT(ELEVS(ILEV)*100.0),(ABS(PSF_PIXL(ILEV,IPOS)),
+     :       IPOS=1,NIPOS)
           ELSE
-            WRITE( TEXT, FORMAT2,IOSTAT=FSTAT ) NINT(ELEVS(ILEV)*100.0),
-     :                     (ABS(PSF_PIXL(ILEV,IPOS)),IPOS=1,NIPOS)
+             IF (NIPOS .EQ. 1) WRITE( TEXT,15, IOSTAT=FSTAT )
+     :        NINT(ELEVS(ILEV)*100.0),(ABS(PSF_PIXL(ILEV,IPOS)),
+     :        IPOS=1,NIPOS)
+             IF (NIPOS .EQ. 1) WRITE( TEXT,16, IOSTAT=FSTAT )
+     :        NINT(ELEVS(ILEV)*100.0),(ABS(PSF_PIXL(ILEV,IPOS)),
+     :        IPOS=1,NIPOS)
           END IF
 
           CALL MSG_PRNT( TEXT )
-
         END DO
-        CALL MSG_PRNT( ' ' )
 
+        CALL MSG_PRNT( ' ' )
 *    Set default to 68% energy
         CALL USI_DEF0C( 'PSFPIX', '68%', STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -450,7 +642,8 @@
 
 *    Enforce maximum box size
       PSF_BORDER = 1
-      MAXW = (PSS__MXHWID-PSF_BORDER)
+      MAXW = (MAX_PSF_SIZE - PSF_BORDER)
+
       DO IPOS = 1, NIPOS
         IF ( PSF_PPS(IPOS) .GT. MAXW ) THEN
           IF ( FIR_TRUNC ) THEN
@@ -481,6 +674,7 @@
       END IF
 
       END
+
 *+  PSS_PSF_RCRIT - Find critical radius for source separation
       REAL FUNCTION PSS_PSF_RCRIT( POS )
 *    Description :
@@ -559,6 +753,8 @@
       PSS_PSF_RCRIT = ABS( P50 * AX_DR(1) )
 
       END
+
+
 *+  PSS_PSF_SUBSET - Access psf for smaller than maxium area
       SUBROUTINE PSS_PSF_SUBSET( POS, OFF, PSFV, STATUS )
 *
@@ -622,12 +818,15 @@
 *    Move data to correct place in array. The psf routine has stuffed the
 *    data into the first (PSF_UPNR*2+1)**2 memory locations of PSFV. We
 *    transfer the data in reverse order to avoid overwrite corruption.
+
       IF ( PSF_UDIMS(1) .LT. PSF_DIMS(1) ) THEN
         CALL PSS_PSF_SUBSET_INT( PSF_UDIMS(1), PSFV, PSF_DIMS(1),
      :                                                       PSFV )
       END IF
 
       END
+
+
 *+  PSS_PSF_SUBSET_INT - Copy a section of psf array
       SUBROUTINE PSS_PSF_SUBSET_INT( W, IN, OW, OUT )
 *

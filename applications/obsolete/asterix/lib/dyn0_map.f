@@ -129,7 +129,7 @@
 
 *  Local Constants:
       INTEGER			MAXSYS
-        PARAMETER		( MAXSYS = 1024*1024*4 )
+        PARAMETER		( MAXSYS = 1024*1024*32 )
 
 *  Local Variables:
       CHARACTER*132           	FNAME      		! Scratch file name

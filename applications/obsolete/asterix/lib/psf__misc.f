@@ -234,7 +234,6 @@
       END
 
 
-
 *+  PSF_ENERGY_PFL_INT - Internal psf access routine
       SUBROUTINE PSF_ENERGY_PFL_INT( PSID, X0, Y0, DX, NX, ARRAY,
      :                                              TOT, STATUS )
@@ -289,7 +288,6 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get the psf data
  10   CALL PSF_2D_DATA( PSID, X0, Y0, (NX+1)*DX/2.0, 0.0, DX,
      :      ABS(DX/YFAC), .TRUE., NX+1, 1, ARRAY(0), STATUS )
 
