@@ -1264,6 +1264,21 @@ $(MANIFEST)/pda: \
 	cd libraries/pda \
 	  && $(MAKE_CPT)
 
+$(MANIFEST)/period: \
+		$(MANIFEST)/cfitsio \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/gwm \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/pgplot \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx
+	cd applications/obosolete/period \
+	  && $(MAKE_CPT)
+
 $(MANIFEST)/pgp: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
