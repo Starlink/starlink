@@ -17,11 +17,11 @@
 *        The global status.
 
 *  Description: 
-*     This application converts an NDF to a PBMPLUS PGM format file.
-*     The programme first finds the brightest and darkest pixel values in the 
-*     image.  It then uses these to determine suitable scaling factors
-*     to convert the image into an 8 bit representation.  These are then
-*     output to a simple greyscale PBMPLUS PGM file.
+*     This application converts an NDF to a PBMPLUS PGM-format file.
+*     The programme first finds the brightest and darkest pixel values
+*     in the image.  It then uses these to determine suitable scaling
+*     factors convert the image into an 8-bit representation.  These
+*     are then to a simple greyscale PBMPLUS PGM file.
 
 *  Usage:
 *     ndf2pgm in out
@@ -38,7 +38,7 @@
 
 *  Implementation Status:
 *     Bad values in the data array are replaced with zero in the output
-*     pgm file.
+*     PGM file.
 
 *  Examples:
 *     ndf2pgm old new
