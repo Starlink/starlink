@@ -14,12 +14,12 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {216.2}
+\newcommand{\stardocnumber}    {216.3}
 \newcommand{\stardocauthors}   {T. Jenness, J.~F. Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {1 February 1998}
+\newcommand{\stardocdate}      {15 June 1998}
 \newcommand{\stardoctitle}     {SURF -- SCUBA User Reduction Facility}
-\newcommand{\stardocversion}   {1.1}
+\newcommand{\stardocversion}   {1.2}
 \newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {%
 \scusoft\ is a set of ADAM tasks necessary for reducing demodulated 
@@ -54,6 +54,7 @@ descriptions of each task.
 \newcommand{\rebin}{\htmlref{\task{rebin}}{REBIN}}
 \newcommand{\bolrebin}{\htmlref{\task{bolrebin}}{BOLREBIN}}
 \newcommand{\intrebin}{\htmlref{\task{intrebin}}{INTREBIN}}
+\newcommand{\calcsky}{\htmlref{\task{calcsky}}{CALCSKY}}
 \newcommand{\chgqual}{\htmlref{\task{change\_quality}}{CHANGE_QUALITY}}
 \newcommand{\chgflat}{\htmlref{\task{change\_flat}}{CHANGE_FLAT}}
 \newcommand{\chgpnt}{\htmlref{\task{change\_pointing}}{CHANGE_POINTING}}
@@ -90,9 +91,17 @@ descriptions of each task.
 \newcommand{\pltbol}{\htmlref{\task{pltbol}}{PLTBOL}}
 \newcommand{\rlinplot}{\htmlref{\task{rlinplot}}{RLINPLOT}}
 \newcommand{\scuplot}{\htmlref{\task{scuplot}}{SCUPLOT}}
+\newcommand{\remdbm}{\htmlref{\task{remdbm}}{REMDBM}}
+\newcommand{\scumakewt}{\htmlref{\task{scumakewt}}{SCUMAKEWT}}
+\newcommand{\chgnacent}{\htmlref{\task{change\_nacentre}}{CHANGE_NACENTRE}}
+\newcommand{\scunoise}{\htmlref{\task{scunoise}}{SCUNOISE}}
+\newcommand{\setbolwt}{\htmlref{\task{setbolwt}}{SETBOLWT}}
+
 
 % Non surf tasks
 
+\newcommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
+\newcommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
 \newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
 \newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
 \newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
@@ -104,6 +113,7 @@ descriptions of each task.
 \newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 \newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
 \newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\newcommand{\fourier}{\xref{\task{fourier}}{sun95}{FOURIER}}
 \newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
 \newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
 \newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
@@ -640,7 +650,8 @@ descriptions of each task.
 
 \section{\xlabel{introduction}Introduction\label{introduction}}
 
-The Submillimetre Common-User Bolometer Array (SCUBA) is a continuum
+The Submillimetre Common-User Bolometer Array (SCUBA) \cite{spiewsh,mnscu} 
+is a continuum
 instrument on the \htmladdnormallinkfoot{James Clerk Maxwell
 Telescope}{http://www.jach.hawaii.edu/JCMT/}, Mauna Kea, Hawaii.  SCUBA has two
 arrays and can observe simultaneously at two wavelengths (three wavelengths
@@ -695,7 +706,7 @@ The \scusoft\ environment can be initialised from the C-shell using the
 % surf
  
    SURF - SCUBA User Reduction Facility
-     Commands are now available -- (Version 1.1)
+     Commands are now available -- (Version 1.2)
  
      Type scuhelp for help on SURF commands.
  
@@ -749,7 +760,7 @@ A mailing list now exists for discussing SCUBA data reduction techniques.  The
 list is at
 \htmladdnormallink{\texttt{scubadr@jach.hawaii.edu}}{mailto:scubadr@jach.hawaii.edu}. To
 subscribe, send an email message to
-\htmladdnormallink{\texttt{majordomo@jach.hawaii.edu}}{mailto:majordomo@jach.hawaii.edi}
+\htmladdnormallink{\texttt{majordomo@jach.hawaii.edu}}{mailto:majordomo@jach.hawaii.edu}
 with an empty subject and containing the message:
 \begin{myquote}
 \begin{verbatim}
@@ -962,14 +973,17 @@ the \Kappa\ \centroid\ task.
 In SCAN/MAP mode (also known as `on-the-fly' mapping) the telescope is
 continuously scanned across the sky (usually at a Nasmyth position angle of 18
 degrees so that the image is fully-sampled on a single pass) whilst using the
-secondary mirror to chop in the scan direction so that atmospheric 
-contributions can be minimized. Scan rates of up to 21 arcseconds per second
+secondary mirror to chop so that atmospheric 
+contributions can be minimized. Scan rates of up to 24 arcseconds per second
 are possible in this mode and it is the most efficient SCUBA mapping mode.
 One problem with this mode is that the data is taken in dual-beam mode; each
 data point is the difference between the left and the right chop positions.
 This means that sources appear twice in data, separated by the chop throw:
 a positive beam and a negative beam -- this dual beam response must
-be taken out in software (e.g.\ by using \restore).
+be taken out in software. Two forms of data taking are implemented: one
+involves chopping along the scan direction \cite{ekh} whilst the
+other involves chopping in a fixed direction on the sky but combining
+data from many chop configurations \cite{EII,spietj}.
 
 \item {\bf SKYDIP}
 
@@ -1283,8 +1297,13 @@ Task & Short & Long & Verbose \\ \hline
 
 \subsection{Other useful environment variables}
 
-One non-\scusoft\ environment variable that can affect the behaviour of
-\scusoft\ is HDS\_SCRATCH. As described in
+Two non-\scusoft\ environment variables can be used to affect the
+behaviour of \scusoft.
+
+\begin{description}
+\item[HDS\_SCRATCH] \mbox{}
+
+As described in
 \xref{(SUN/92)}{sun92}{scratch_files}, this variable defines the directory in
 which HDS will create temporary files. This variable must sometimes be set
 when you are accessing data from directories in which you do not have write
@@ -1299,7 +1318,14 @@ Usually, this variable should be set to a local scratch disk:
 This has the additional advantage that NFS traffic can be reduced when
 accessing data on remote disks as the scratch files can be written locally.
 
+\item[ADAM\_ABBRV] \mbox{}
 
+Another useful environment variable is 
+\xref{ADAM\_ABBRV}{sun95}{se_parabbrev}. If this envrionment
+variable is set, parameter abbreviation is turned on (e.g., PIXSIZE\_OUT
+can be referenced as PIX).
+
+\end{description}
 
 
 \section{\xlabel{outline}Basic outline of SCUBA data reduction\label{outline}}
@@ -1327,8 +1353,9 @@ contains information on the jiggle pattern, the coordinates of the
 bolometers relative to the central pixel, flatfield information, internal
 calibrator signal and general observation parameters.
 
-All SCUBA data reduction must include the following stages (see Fig.\
-\ref{flowpath} for a flow diagram):
+All SCUBA data reduction must include the following stages (see Figs.\
+\ref{flowpath_phot}, \ref{flowpath_jig} and \ref{flowpath_scan} for flow 
+diagrams):
 \begin{enumerate}
 \item {\bf Nod compensation} 
 
@@ -1337,15 +1364,6 @@ off-position from the on-position (`nods'). If required, this task also
 divides the data with the internal calibrator signal (this is stored in
 the demodulated data file as well as the switch information) and sets the
 level at which spikes detected by the transputers become significant. 
-
-\item {\bf Single-beam restoration}
-
-The dual-beam SCAN/MAP data must be restored to a single-beam map
-before further processing can be performed. At present this is achieved
-by using the EKH algorithm \cite{ekh} as implemented in the 
-\restore\ task. In future it is hoped that a maximum entropy algorithm
-can be implemented \cite{R92}.
-
 
 \item {\bf Flatfielding}
 
@@ -1376,11 +1394,28 @@ point that the two arrays must be dealt with independently -- the output of
 this task will contain data for one sub-instrument.
 
 
+\item {\bf Single-beam restoration}
+
+The dual-beam SCAN/MAP data must be restored to a single-beam map
+at some stage. For data taken whilst chopping along the scan, this 
+is achieved by using the EKH algorithm \cite{ekh} as implemented in the 
+\restore\ task. In this case the restoration must occur before regridding.
+
+For data taken whilst chopping in a fixed direction on the sky
+(the so-called ``Emerson-II'' technique \cite{EII}), individual
+chop configurations must be rebinned independently and then combined
+using the \remdbm\ task.
+
+In future it is hoped that a maximum entropy algorithm
+can be implemented \cite{R92} for both chopping techniques.
+
+
 \end{enumerate}
 
 At this stage the data reduction path diverges depending on the observation
 type. Map data must be regridded onto a rectangular grid using the \rebin\
-task whereas photometry data must be processed using the \scuphot\ task.
+task (followed by \remdbm\ for SCAN/MAP data if necessary) whereas photometry
+data must be processed using the \scuphot\ task.
 
 The data reduction process can be automated to a certain extent by using the 
 \scuquick\ script. This script can take as arguments any parameter that is
@@ -1388,12 +1423,41 @@ expected by the \scusoft\ tasks.
 
 \begin{figure}
 \htmlimage{scale=0.9}
-\epsfig{width=\textwidth,file=sun216_flow.eps}
-\caption{The \scusoft\ data reduction flow diagram. Optional tasks are
+\begin{center}
+\epsfig{width=5in,file=sun216_flow_photom.eps}
+\end{center}
+\caption{The \scusoft\ data reduction flow diagram for PHOTOM
+data. Optional tasks are
 indicated by dashed lines. Note that map data can follow the photometry
-path and photometry data can follow the map path if necessary. Currently,
-neither \remsky\ nor \despike\ work with SCAN/MAP data.}
-\label{flowpath}
+path and photometry data can follow the map path if necessary.
+}
+\label{flowpath_phot}
+\end{figure}
+
+\begin{figure}
+\htmlimage{scale=0.9}
+\begin{center}
+\epsfig{width=5in,file=sun216_flow_jig.eps}
+\end{center}
+\caption{The \scusoft\ data reduction flow diagram for Jiggle/map
+data. Optional tasks are
+indicated by dashed lines. Note that map data can follow the photometry
+path and photometry data can follow the map path if necessary.
+}
+\label{flowpath_jig}
+\end{figure}
+
+\begin{figure}
+\htmlimage{scale=0.9}
+\epsfig{width=\textwidth,file=sun216_flow_scan.eps}
+\caption{The \scusoft\ data reduction flow diagram for Scan/map
+data. Optional tasks are
+indicated by dashed lines. Tasks annotated with a single asterisk 
+can not process EKH scan data (ie chopping along the scan direction).
+Conversely, tasks annotated with a double asterisk can not process
+``Emerson II'' data (chopping in a fixed direction).
+}
+\label{flowpath_scan}
 \end{figure}
 
 
@@ -1414,9 +1478,9 @@ care.
 
 \item {\bf Sky noise removal}
 
-Instrumental variations and sky-noise can be removed by using the task \remsky.
-At present this task is rather simplistic and should be used with care.
-\remsky\ can not be used for SCAN/MAP data.
+Instrumental variations and sky-noise can be removed either by using the task
+\remsky\ (when sky bolometers can be identified) or by using \calcsky\ in
+combination with \remsky\ (for more complicated sources and scan map data).
 
 \item {\bf Despiking}
 
@@ -1535,11 +1599,13 @@ SURF: file contains data for the following sub-instrument(s)
  - LONG with filter 850
 SUB_INSTRUMENT - Name of sub-instrument to be analysed /'SHORT'/ > l
 SURF: file contains data for 20 integration(s) in 10 measurement(s)
+T_HOT - Temperature of hot load (K) /278/ > 
 T_COLD - Temperature of cold load for LONG_DC /73.6/ > 
 ETA_TEL - Telescope efficiency /0.91/ >
 B_VAL - B parameter /-1/ > 
 SCULIB: fit for filter 850 and sub-instrument LONG_DC
- eta =   0.91          b =   0.86  tau =   0.220  X=    18.4  N=    9
+ eta =  0.91 +/-  0.00  b =  0.86 +/-  0.00  tau =   0.220 +/- 0.002
+ Standard Deviation of fit residual =   0.74 K (X=     1.0 N=    9)
 \end{verbatim}
 \end{myquote}
 
@@ -1558,9 +1624,13 @@ noting are that the local sidereal time of the observation is printed (this is
 useful later when running \ext), a fixed $\eta_{tel}$ and a floating value of
 B (the default value for $\eta_{tel}$ is read from the file header) were used
 and the tau agrees with the on-line system (which is not surprising since the
-same code is used on-line as in \scusoft). Note also that the `X' indicates
-the reduced $\chi^2$ of the fit and the `N' indicates the number of iterations
-required to converge on the fit.
+same code is used on-line as in \scusoft). The errors derived for the fit can
+sometimes be suspect since the parameters are not completely independent.  The
+standard deviation of the fit residual gives a measure of the scatter in the
+points about the model fit.  Note also that the `X' indicates the reduced
+$\chi^2$ of the fit (forced to be approximately 1.0 by the program when it
+determines the errors) and the `N' indicates the number of iterations required
+to converge on the fit.
 
 Occasionally, it is necessary to remove some points from the fit. This
 can be achieved by using \resw\ and \chgqual\ before running \skydip.
@@ -1666,15 +1736,26 @@ this value can simply be added. In addition, most of the time a constant tau
 value is used and for the case of a constant tau the LST is irrelevant.
 
 
-If desired, sky noise can now be removed with \remsky. \remsky\ works in a very
+
+If desired, sky noise can now be removed.  Sky signal can be identified
+in two ways: firstly using bolometers that are known to be looking at sky
+(implemented in \remsky) and secondly, using a model of the source structure
+to enable the sky signal to be calculated with the source subtracted from
+the data (implemented in \calcsky). In this section we will examine the
+first method since this is the simplest and can be used 
+for jiggle observations. The more complex approach will be dealt with
+in \S\ref{scan:sky} where sky removal from scan map data is discussed.
+\remsky\ works in a very
 simplistic way: Sky bolometers are specified, each jiggle is then analysed in
 turn, the average value for the sky bolometers (either MEDIAN or MEAN) is then
 removed from the entire array. At present it is not possible to specify sky
 regions, only sky bolometers can be specified. This may cause problems with
 extended sources (rebin the map in NA coordinates initially to find the sky
-bolometers). \remsky\ should normally be run after \rebin\ in order to
-choose sky bolometers that are really looking at sky, for this example
-we will skip that step. 
+bolometers). \remsky\ should normally be run after \rebin\ in order to choose
+sky bolometers that are really looking at sky, for this example we will skip
+that step. \remsky\ is sufficient for the mapping of compact sources in jiggle
+mode and for photometry; if the source structure is complex then \calcsky\
+should be considered (\S\ref{scan:sky}).
 
 \begin{myquote}
 \begin{verbatim}
@@ -1717,8 +1798,8 @@ bolometer number along the X-axis and integration number up the Y-axis.
 Now that the data have been extinction corrected and, optionally, processed
 with \remsky, the data reduction path diverges according to the type of
 observation. Map making\footnote{It is possible to rebin photometry data
-although, obviously, the image will not be fully-sampled} and photometry will
-be dealt with separately. Note that \scuquick\ can be used to automate some of
+although, obviously, the image will not be fully-sampled} (jiggle and scan) 
+and photometry will be dealt with separately. Note that \scuquick\ can be used to automate some of
 the more repetitive tasks during this stage of the data reduction process.
 
 Before diverging though, we should first take a diversion into the question of
@@ -1733,7 +1814,7 @@ SCUBA data.
 
 Manual despiking simply involves examining the data with \linplot\ and
 \display, identifying bad regions by eye and then running \chgqual\ to
-turn off the bad points. In general this is very time consuming (espcially
+turn off the bad points. In general this is very time consuming (especially
 working out the pixel number of a spike so that \chgqual\ can be told the
 exact location) so two interactive techniques are available:
 
@@ -1811,7 +1892,8 @@ point further than \param{NSIGMA} from the mean for a given cell is then
 treated as a spike\footnote{More details on \despike\ can be found in appendix
 \ref{despiking_eg}.}.  All modes are supported with the caveat that SCAN/MAP
 data should not have been restored (spikes must be removed before the
-single-beam restoration phase).
+single-beam restoration phase -- also EKH data can not strictly be processed
+in this way beacause the chop angle is not fixed on the sky).
 
 \textit{Disadvantages:} For small data sets the number of points per bin is
 not sufficient to perform accurate statistics calculations.
@@ -1825,7 +1907,7 @@ This task is designed specifically for SCAN/MAP data. Each scan for each
 bolometer is analysed in turn and spikes are detected using a running mean
 calculation. 
 
-\textit{Advantages:} The only option for SCAN/MAP.
+\textit{Advantages:}  Finds the large spikes in SCAN/MAP data.
 
 \textit{Disadvantages:} Care must be taken when despiking bright sources
 (e.g.\ planets).
@@ -1844,7 +1926,9 @@ after \scuphot\ (or \scucat).
 
 \item[scan/maps] \mbox{}
 
-\despikeb\ should be used.
+\despikeb\ should be used initially. For ``Emerson II'' data it is also
+possible to use \despike\ since the chop angle is fixed on the sky (only
+despike data that were taken with the same chop configuration).
 
 \item[Jiggle maps of strong sources] \mbox{}
 
@@ -1898,13 +1982,27 @@ A number of questions need to be asked before regridding the data :-
 \begin{description}
 \item {\bf What rebin method should be used?}
 
-Currently, two methods are available. The data can be regridded with a
-weighting function or interpolated using spline fitting.  Bessel and linear
-weighting functions are available; in theory the Bessel function interpolation
-should give the best results but in practice the linear function is better
-since it is much faster and is affected less by edge effects (both of these
-advantages are because the convolution function has a much smaller radius for
-linear interpolation). The spline fitting algorithms are experimental and have
+Currently, three methods are available. The data can be regridded with a
+weighting function, interpolated using spline fitting or by calculating
+the median data value in each cell of the output grid.
+
+Bessel, Gaussian and linear weighting functions are available; in theory the
+Bessel function interpolation should give the best results but in practice the
+Gaussian or linear functions should be used (they are much faster and less
+affected by edge effects).  The Gaussian function should be used if you are
+interested in beam shape (since it is easier to work out what is going on when
+you convolve a JCMT beam with a Gaussian than when you convolve it with a
+cone).
+
+The MEDIAN regridding technique can be used if many data points are 
+available (since for small output grids at least one input data point
+[preferably many more] must be
+available in each cell in the output to avoid bad pixels). If fewer
+points are available (only a few integrations) consider using larger cells
+or use the \Kappa\ routines \fillbad\ or \glitch\ to interpolate over the
+holes.
+
+The spline fitting algorithms are experimental and have
 not been thoroughly tested -- please use with care.
 
 \item {\bf What coordinate system should be used?}
@@ -1914,7 +2012,7 @@ The data can be rebinned in the following coordinate systems:
 \begin{tabular}{ll}
 NA & Nasmyth (SCUBA) coordinate frame\\
 AZ & Azimuth-Elevation offsets\\
-PL & Moving source (eg planet) \\
+PL & Moving source (e.g. planet) \\
 RB & RA/Dec B1950 \\
 RJ & RA/Dec J2000 \\
 RD & RA/Dec epoch of observation\\
@@ -1925,9 +2023,9 @@ The first two coordinate systems are fixed on the telescope so that the source
 rotates during long observations. They are most useful for taking beam maps
 (AZ) or examining the properties of the SCUBA bolometers (NA). Obviously AZ
 and NA contain no astrometry information. The PL coordinate system should be
-used for moving sources (eg planets or comets) where the RA and Dec of the
+used for moving sources (e.g.\ planets or comets) where the RA and Dec of the
 source is changing with time; offsets from this moving centre are calculated
-and no astrometry informtaion is stored.  The remaining coordinate systems
+and no astrometry information is stored.  The remaining coordinate systems
 correct for source rotation and do have associated FITS
 World-Coordinate-Systems (WCS) astrometry information \cite{WCS}.
 
@@ -2058,7 +2156,7 @@ package and work is progressing on a list of secondary calibrators.
 \subsubsection{Rebinning multiple datasets}
 \label{batch}
 
-On many occassions it is necessary to combine multiple observations into one
+On many occasions it is necessary to combine multiple observations into one
 regridded image to attain the desired signal-to-noise for a source map. One
 way of doing this is to enter into \rebin\ (or related task) each map in turn
 along with the \param{WEIGHT}, \param{SHIFT\_DX} and \param{SHIFT\_DY}. For a
@@ -2147,7 +2245,7 @@ Note that \wdfits\ always writes integer FITS whereas \ndffits\
 would by default write REAL FITS (bitpix=$-32$). \ndffits\ also writes
 the Variance and Quality arrays to FITS tables in the output file (this can be
 turned off by specifying just the data component with \param{COMP=D}).  Also
-note that if the coordinate system of the NDF is changed in some way (eg by
+note that if the coordinate system of the NDF is changed in some way (e.g.\ by
 making a section with \Kappa\ \cadd) then the WCS information stored in
 the FITS array {\bf WILL BE WRONG}. The WCS information is only correct for
 the image produced by \rebin.
@@ -2181,17 +2279,25 @@ FILE - Name of ASCII file to contain results summary /!/ > n56.txt
 In this example n56\_sky\_lon.sdf is processed with \scuphot.  This
 observation consisted of 10 integrations and used a 9-point jiggle pattern.
 The value of each integration was determined by taking the average of the
-jiggle pattern. This information is written to a text file (n56.txt in this
-case) and also to n56\_pht\_lon.sdf. Since photometry observations can use
-multiple bolometers n56\_pht\_lon.sdf is in fact a HDS container \cite{hds}
-which contains two NDFs per bolometer: $<$BOL$>$\_peak contains the photometry
-data for each integration and $<$BOL$>$\_map contains the integrated jiggle
-pattern (assuming the jiggle pattern was on a regular grid -- irregular jiggle
-patterns are written as 1-D images and no map is written for zero offset
-jiggles).  In this example the bolometer used was H7 so that
+jiggle pattern. In some cases a better signal-to-noise can be achieved
+by processing the individual two second samples rather than averaging
+over the nine samples that comprise an integration. For these cases, usually
+short observations, where the scatter on the averaged data is not
+representative of the standard deviation of the raw data (small number
+statistics) ANALYSIS=SAMPLE is recommended.
+
+Information on samples or integrations is written to a text file (n56.txt in
+this case) and also to n56\_pht\_lon.sdf. Since photometry observations can
+use multiple bolometers n56\_pht\_lon.sdf is in fact a HDS container
+\cite{hds} which contains two NDFs per bolometer: $<$BOL$>$\_peak contains the
+photometry data for each integration and $<$BOL$>$\_map contains the
+integrated jiggle pattern (assuming the jiggle pattern was on a regular grid
+-- irregular jiggle patterns are written as 1-D images and no map is written
+for zero offset jiggles).  In this example the bolometer used was H7 so that
 n56\_pht\_lon.h7\_peak would be the NDF containing the integration data (the
 ascii version of which can be found in n56.txt) and n56\_phot\_lon.h7\_map
 which would contain the integrated jiggle pattern
+
 
 
 Since many photometry observations are usually combined to give the final
@@ -2203,8 +2309,9 @@ case we have combined the three photometry observations listed in
 \begin{myquote}
 \begin{verbatim}
 % scucat 
+METHOD - Concatenation method /'SEPARATE'/ > 
 OUT - Rootname of files to contain concatenated data > 3c279
-IN - Name of input file containing photometry data /'n56_pht_lon'/ > 
+IN - Name of input file containing photometry data /'n56_pht_lon'/ >
 SURF: Found data for the following bolometers: h7
 SURF: This is a PHOTOM observation of 3c279. There are 10 integrations
 IN - Name of input file containing photometry data /!/ > n57_pht_lon
@@ -2224,6 +2331,31 @@ independently, a new file is created for each bolometer. In this example
 2-bolometer chopping there would have been another file called 3c279\_h9.sdf
 (for example). These files can now be analysed with standard statistics
 packages (e.g.\ \Kappa\ \stats\ and \kstest).
+
+An alternative to the above for \scucat\ is to use a text file to contain
+the list of filenames to be processed (useful for scripts):
+\begin{myquote}
+\begin{verbatim}
+% scucat noloop
+METHOD - Concatenation method /'SEPARATE'/ > 
+OUT - Rootname of files to contain concatenated data > 3c279
+IN - Name of input file containing photometry data /'n56_pht_lon'/ > ^in.lis
+SURF: Found data for the following bolometers: h7
+SURF: This is a PHOTOM observation of 3c279. There are 10 integrations
+SURF: Found data for the following bolometers: h7
+SURF: This is a PHOTOM observation of 3c279. There are 10 integrations
+SURF: Found data for the following bolometers: h7
+SURF: This is a PHOTOM observation of 3c279. There are 10 integrations
+\end{verbatim}
+\end{myquote}
+where \texttt{in.lis} contains the names of the 3 filenames to be
+processed (a comma separated list is also allowed).
+
+If you do not want to process different bolometers independently, the
+METHOD parameter can be set to CATALL, in which case all data will
+be concatenated together regardless of bolometer and the output filename
+will match that specified in OUT (rather than being OUT + bolometer name).
+
 
 \subsubsection{\scusoft\ photometry and \xref{{\sc Kappa}}{sun95}{}}
 
@@ -2264,6 +2396,222 @@ self-consistency of the photometry data by performing a Kolmogorov-Smirnov
 test on the data (e.g.\ \cite{dhh}).
 
 
+\subsection{Scan maps}
+
+Scan map data can be taken using two techniques (both based on chopping).  The
+first technique is to chop in the direction of the scan and deconvolve each
+scan independently (the EKH method \cite{ekh}).  This technique must be used
+for single pixel mapping although it can also be used for array scan mapping.
+Problems with this technique are that it is very sensitive to spikes, 
+every scan must be completely off-source at both ends and correlations
+with adjacent scans/pixels are ignored.
+
+For array scan maps we scan the array across the source whilst chopping in a
+fixed direction on the sky. Following the work of Emerson\cite{EII} we take
+data using a number of different chop configurations in order to sample as
+many spatial frequencies as possible (we are not sensitive to structure that
+is larger than the chop throw). Multiple chop throws in 2 orthogonal
+directions are used with chop amplitudes chosen so that, except at the origin,
+the zeroes in the Fourier transform of one do not coincide with the zeroes in
+the FT of the other up to the spatial frequency limit of the telescope
+beam. For SCUBA, it is recommended that 6 different chop configurations should
+be used: Chop throws of 20, 30 and 65 arcsec each with chop position angles of
+0 (Dec chopping) and 90 degrees (RA chopping) in a coordinate frame fixed on
+the sky. This will give the best coverage of spatial frequencies but reasonable
+maps can also be obtained by combining four of the chop configurations.
+This mode also has the advantage that the deconvolution occurs after the
+images have been regridded; this means that data can be salvaged even if
+a scan did not go completely off source (by combining with data that does)
+and small spikes will be averaged out.
+
+During commissioning it has been shown that the new method can result in 
+a substantial improvement in signal-to-noise over the EKH
+method\cite{spietj}. 
+
+\subsubsection{Baseline removal}
+
+The EKH method guarantees that the mean of every scan should be zero
+(the transputers remove the mean on-line). In the absence of spikes
+the data would not need baseline removal but in some cases a large spike
+can adjust the mean of the scan and the baseline should be recalculated
+after spike removal (with \despikeb).
+
+For the ``Emerson II'' method the situation is more complicated
+since the mean of each scan is now not guaranteed to be zero (and in
+fact the transputers do not attempt to remove a baseline in this case).
+\scanrlb\ must be run in order to remove the baseline (each bolometer
+sees a slightly different background). For data where the scans
+are long enough to be off-source LINEAR baseline removal can be used.
+For more complicated source structure MEDIAN is worth a try although
+extremely complicated regions (e.g. OMC-1) may cause problems. 
+
+Improvements to the baseline removal system are being considered but
+currently this is probably the weakest link in SCAN/MAP data reduction.
+
+\subsubsection{Sky removal\label{scan:sky}}
+
+\remsky\ can not be used to calculate the sky contribution for scan
+map data because it is no longer possible to select bolometers that
+are guaranteed to be on sky (since most bolometers will see `source'
+at some point during the observation).
+
+In order to overcome this problem the source signal must be removed
+from the data before attempting to calculate the sky. This is achieved
+with the \calcsky\ task.
+
+For each point in the input datasets \calcsky\ finds the expected flux
+at that position by comparison with a model of the source and removes
+that flux from the input data. The source model can be calculated internally
+by \calcsky\ or an external image can be supplied (usually generated from
+the same input data using \rebin). 
+
+\begin{figure}
+\begin{center}
+\epsfig{width=5.0in,file=sun216_scansky.eps}
+\caption{Sky noise calculated by \task{calcsky} for a short interval
+of the M82 data.}
+\label{fig:scansky}
+\end{center}
+\end{figure}
+
+
+The source model is calculated in exactly the same way as for MEDIAN rebinning
+and \despike: the input data are placed in bins related to position on the
+output image; the median of each bin is then taken to be a good measure of the
+flux in that region of sky. This approach is an approximation since the bin
+size (quarter beam width) can accommodate large gradient changes towards
+point sources but in general these errors are smoothed out by the average
+taken over the whole array. An alternative approach is to \rebin\ the input
+data on a fine grid (e.g.\ 1 arcsec or finer) and use that as the input model
+(with the restriction that the number of pixels in the model must match the
+number of pixels chosen by \rebin\ as the default).
+
+Once the source has been removed a sky signal is calculated from the residual
+signal by finding the average signal across the array for each time. 
+In addition the time series can be smoothed since scan data are sampled
+much faster (approx. 8~Hz) than the sky emission is expected to vary
+(a few seconds). These
+time series are then stored in an extension inside the file (stored in
+.MORE.REDS.SKY).  Once the sky has been calculated it can be removed by using
+\remsky. \remsky\ recognises the presence of a SKY extension and removes this
+signal from the main data array.
+
+Fig.\ \ref{fig:scansky} shows the sky signal for some of the M82 data.
+In general the sky noise on scan data is below the noise but correlations
+are visible in the smoothed time series.
+
+
+This technique is not limited to scan map data. Jiggle maps can benefit
+from using \calcsky\ in cases where sky bolometers can not be identified
+or when the sky removal needs to be automated. One caveat is that the
+quality of the sky removal depends critically on the quality of the
+sky model. For extreme cases of sky noise in jiggle data where 
+the individual switches are visible as hexagonal patterns across the
+image, \calcsky\ can not disentangle the source from the hexagonal
+pattern (no other data are available for that position on the sky) and
+sky removal will fail.
+
+More information on sky removal for jiggle and scan data can be found
+in Jenness et al.\cite{spietj}
+
+\subsubsection{Dual beam deconvolution}
+
+Chopping whilst scanning results in an image that contains two beams (a plus
+and minus image of the source). To restore the source profile we must
+deconvolve the chop from the measured map. The problems associated with this
+step can best be appreciated by considering the Fourier transform (FT) of the
+chop function, which is a sine wave with zeroes at the origin and at harmonics
+of the inverse chop throw.  Deconvolving the chop function is equivalent to
+dividing the FT of the measured map by the FT of the chop and then
+transforming back to image space. Clearly, problems arise at spatial
+frequencies where the sine wave of the chop FT has a low value or is
+zero. Noise at these frequencies is blown up and significantly reduces the
+signal-to-noise of the restored map \cite{ekh}.  
+
+\paragraph{EKH method}
+
+The \restore\ task must be used to remove the dual beam response whilst
+chopping in the scan direction. This must be run \emph{before} rebinning.
+Since the chop direction rotates slowly on the sky (since it is dependent on
+the scan direction, which is in Nasmyth coordinates, and not the sky
+orientation) tasks that try to map the chopped data onto a sky plane
+(\despike, \calcsky, \rebin) can not be used before the dual beam has been
+removed (\despike\ is useless \emph{after} restoration since spikes propagate
+through the entire scan and show up as sine waves after \restore).
+
+\paragraph{Emerson II method}
+
+To remove the dual beam signature from ``Emerson II'' data,
+rebinned images of each chop configuration must be generated (they can
+be coadds of lots of observations). These images must have the same
+map centre, the same pixel scale, the same dimensions and must be 
+regridded in the same coordinate frame as the chop (RJ for RJ, RB and GA 
+data, PL or RD for moving sources). Fig. \ref{scan:chops} shows examples
+of four dual beam images of M82.
+
+\begin{figure}
+\begin{center}
+\epsfig{width=5.0in,file=sun216_4chops.eps}
+\caption{4 dual beam images of M82. The chop throws are 20 arcsec
+RA chopping, 30 arcsec RA chopping, 20 arcsec dec chopping and
+30 arcsec dec chopping.
+}
+\label{scan:chops}
+\end{center}
+\end{figure}
+
+Once these images have been generated, they can be processed by 
+\remdbm:
+
+\begin{myquote}
+\begin{verbatim}
+% remdbm o8?_lon_reb.sdf -out=m82
+Starting monoliths...Done
+Loop number 1
+Chop: PA=90 THROW=20
+ 
+Doing forward transformation
+ 
+Loop number 2
+Chop: PA=90 THROW=30
+ 
+Doing forward transformation
+ 
+Loop number 3
+Chop: PA=0 THROW=20
+ 
+Doing forward transformation
+ 
+Loop number 4
+Chop: PA=0 THROW=30
+ 
+Doing forward transformation
+ 
+Maximum difference between estimates of the same Fourier component is
+0.02414273.
+ 
+Doing inverse transformation
+ 
+Result stored in m82
+%
+\end{verbatim}
+\end{myquote}
+Note the use of shell wildcards. The final image can be seen in
+Fig.\ \ref{m82:final}.
+
+
+
+\begin{figure}
+\begin{center}
+\epsfig{width=4.0in,file=sun216_m82_remdbm.eps}
+\caption{Final image of M82 after single beam restoration.}
+\label{m82:final}
+\end{center}
+\end{figure}
+
+
+
+
 \section{\xlabel{future}Future Work\label{future}}
 
 The \scusoft\ software is in constant development at the
@@ -2273,15 +2621,16 @@ Upgrades currently on the work list are:
 
 \begin{itemize}
 
-\item Upgrades to the sky removal software to allow removal of planes 
-      and support for SCAN/MAP mode.
+\item Upgrades to the sky removal software to allow removal of planes.
 
 \item Support for heterodyne receiver beam maps.
 
 \item Enhancements to the reduction pipeline software (\scuquick), possibly
-      including an X-windows interface.
+      including an X-windows interface. This is currently underway and is
+      based on the ORAC data reduction pipeline \cite{oracdr}; testing at the
+      telescope is planned for autumn 1998.
 
-\item A task to fit gaussians to dual-beam images. [This may well be
+\item A task to fit Gaussians to dual-beam images. [This may well be
 implemented in a future release of \ESP\ \cite{esp} as an upgrade to the
 \gaufit\ task]
 
@@ -2292,6 +2641,87 @@ software please consult the \htmladdnormallinkfoot{SCUBA software
 wish-list}{http://www.jach.hawaii.edu/jcmt\_sw/bin/scuba\_wish.pl}.
 
 \section{\xlabel{relnotes}Release Notes\label{relnotes}}
+
+\subsection{Changes in Version 1.2}
+
+\begin{description}
+
+\item[\textbf{New Tasks}] \mbox{}
+
+\begin{itemize}
+\item Sky removal for SCAN map is now available using the \calcsky\ task.
+
+\item Dual beam images taken using the new SCAN map observing mode can now be
+reduced using the \remdbm\ task (also uses \scumakewt).
+
+\item The offset between the arrays can be compensated for by using
+\chgnacent. 
+
+\item Noise data can now be displayed with \scunoise.
+
+\item Bolometer weights can be set with \setbolwt. 
+
+\end{itemize}
+
+\item[\textbf{Changes to existing tasks}] \mbox{}
+
+\begin{itemize}
+
+\item \scucat\ can now accept a comma separated list of input files
+or a text file containing a list of files rather than having to supply one
+at a time. Also, there is now a METHOD option in \scucat\ to control whether
+bolometers are treated independently or combined regardless of bolometer name.
+
+\item \scuphot\ can now propagate all samples to the output file. This is
+necessary for observations where the number of integrations is small and the
+variance can not be calculated reliably.
+
+\item \scanrlb\ now has two extra modes for baseline removal (MEAN and
+MEDIAN). 
+
+\item A Gaussian regridding option has been added to \rebin\ (\bolrebin,
+\intrebin). Also, the radius and footprint size of the convolution functions
+can now be configured.
+
+\item A median regridding option is available. This option simply calculates
+the median value of all points in an output cell.
+
+\item A histogram of the distribution of data samples on the output image
+      can be obtained with the TIMES parameter in \rebin.
+
+\item Bolometer weighting has been added to \rebin. This is still in alpha
+   test since it has been shown not to conserve flux for small data
+   sets (for larger datasets -- hours -- there is a signal-to-noise
+   gain without turning off bad pixels).
+
+\item \skydip\ now provides an estimate of the errors.
+
+\end{itemize}
+
+\item[\textbf{Minor fixes}] \mbox{}
+
+\begin{itemize}
+
+\item \despike\ can now be told to write output files automatically via the
+  DEFOUT parameter.
+
+\item \scuclip\ now performs an iterative clip by default.
+
+\item Units are propagated through \scuphot.
+
+\item \sdip\ now resets the \linplot\ colour settings to their original values
+  after use.
+
+\item The size of the 'IN' parameter has been increased in \chgqual\ and
+  \chgdata.
+
+\item A memory leak has been fixed in \despike.
+
+
+\end{itemize}
+
+\end{description}
+
 
 \subsection{Changes in Version 1.1}
 
@@ -2326,7 +2756,7 @@ supported.
 (\despikeb). 
 
 \item The data clipping functionality has been moved from \remsky\ to a
-standalone task (\scuclip).
+stand-alone task (\scuclip).
 
 \item There is now a task for extracting flatfield information from data
 files. (\extflat).
@@ -2484,6 +2914,19 @@ variation seen with UKT14).
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
 
+\bibitem{spiewsh}
+Holland~W.~S, Cunningham~C.~R., Gear~W.K., Jenness~T., Laidlaw~K.,
+Lightfoot~J.~F., Robson~E.~I., 1998, \textit{``SCUBA -- A submillimetre camera
+operating on the James Clerk Maxwell Telescope''} in \textit{Advanced
+Technology MMW, Radio and Terahertz Telescopes}, Philips~T.~G. (ed),
+Proc. SPIE \textbf{3357}, in press
+
+\bibitem{mnscu}
+Robson~E.I., Holland~W.~S., Gear~W.K., Lightfoot~J.~F., Jenness~T.,
+Ivison~R.~J., Stevens~J.~A., Cunningham~C.~R., Ade~P.~A.~R.,
+Griffin~M.~J., Duncan~W.~D., Murphy~J.~A., Naylor~D.~A., 1998,
+\textit{MNRAS}, submitted
+
 \bibitem{ndf}
 Warren-Smith~R.~F., 1995, {\it NDF -- Routines for Accessing the Extensible
 N-Dimensional Data Format}, \xref{Starlink User Note 33}{sun33}{}
@@ -2518,12 +2961,21 @@ cookbook},
 Sandell~G., 1997, {\it The SCUBA mapping cookbook: A first step to
 proper map reduction}, \xref{Starlink Cookbook 11}{sc11}{}
 
+\bibitem{ekh}
+Emerson~D.~T., Klein~U., Haslam~C.~G.~T., 1979, {\it ApJ}, {\bf 76}, 92
+
+\bibitem{EII}
+Emerson~D.~T., \textit{A.S.P. Conf. Ser} \textbf{75}, 309
+
+\bibitem{spietj}
+Jenness~T., Lightfoot~J.~F., Holland~W.~S., 1998, 
+\textit{``Removing Sky contributions from SCUBA data''} in \textit{Advanced
+Technology MMW, Radio and Terahertz Telescopes}, Philips~T.~G. (ed),
+Proc. SPIE \textbf{3357}, in press
+
 \bibitem{specx}
 Matthews~H.~E., Jenness~T., 1997,
 \textit{The Specx cookbook}, \xref{Starlink Cookbook 8}{sc8}{}
-
-\bibitem{ekh}
-Emerson~D.~T., Klein~U., Haslam~C.~G.~T., 1979, {\it ApJ}, {\bf 76}, 92
 
 \bibitem{R92}
 Richer~J.~S., 1992, {\it MNRAS}, {\bf 254}, 165
@@ -2561,8 +3013,14 @@ Shortridge~K., Meyerdierks~H.~M., Currie~M.~J., Clayton~M.,
 \bibitem{dhh}
 Hughes~D.~H., 1993, {\it JCMT--UKIRT Newsletter}, {\bf 4}, 32
 
+\bibitem{oracdr}
+Economou~F., Bridger~A., Wright~G.~S., Rees~N.~P., Jenness~T., 1998, 
+\htmladdnormallink{\textit{``The future of data reduction at UKIRT''}}{http://www.stsci.edu/stsci/meetings/adassVII/economouf.html},
+\emph{Astronomical Data Analysis Software and Systems VII}, Albrecht~R.,
+Hook~R.~N., Bushouse~H.~A. (eds), ASP Conference Series, \textbf{145}, 195
+
 \bibitem{esp}
-Privett,~G., 1997, {\it ESP -- Extended Source Photometry},
+Gray~N., Privett,~G., 1998, {\it ESP -- Extended Surface Photometry},
 \xref{Starlink User Note 180}{sun180}{}
 
 
@@ -2575,14 +3033,23 @@ Meyerdierks~H.~M., Berry~D., Draper~P., Privett~G., Currie~M.~J., 1997,
 \textit{PDA -- Public Domain Algorithms}, 
 \xref{Starlink User Note 194}{sun194}{}
 
+\bibitem{grp}
+Berry,~D.~S., 1996, 
+\textit{GRP -- Routines for Managing Groups of Objects},
+\xref{Starlink User Note 150}{sun150}{}
+
+\bibitem{skydip}
+Duncan,~W.~D., SCUBA project documentation, SCU/WDD/31.1/1093
+
 \bibitem{Perl}
 Wall~L., Christiansen~T., Schwartz~R.~L., 1996, 
 \htmladdnormallink{\textit{Programming Perl}}{http://www.perl.org/}, 2nd
 edn., \htmladdnormallink{O'Reilly \& Associates, Inc.}{http://www.ora.com/}
 
-\bibitem{skydip}
-Duncan,~W.~D., SCUBA project documentation, SCU/WDD/31.1/1093
-
+\bibitem{ndfperl}
+Jenness~T., Bly~M.~J., 1998,
+\textit{NDFPERL -- Perl interface to NDF},
+\xref{Starlink User Note 222}{sun222}{}
 
 \end{thebibliography}
 
@@ -2595,8 +3062,10 @@ Duncan,~W.~D., SCUBA project documentation, SCU/WDD/31.1/1093
 
 \begin{description}
 \quickdes{BOLREBIN}{Generate a separate regridded image for each bolometer.}{surf:bolrebin}
+\quickdes{CALCSKY}{Calculate sky variation independent of source structure}{surf:calcsky}
 \quickdes{CHANGE\_DATA}{Change data (or variance) values in a dataset.}{surf:chgdata}
 \quickdes{CHANGE\_FLAT}{Change the stored flatfield information.}{surf:chgflat}
+\quickdes{CHANGE\_NACENTRE}{Shift Nasmyth centre of array}{surf:chgnacent}
 \quickdes{CHANGE\_POINTING}{Change Az and El pointing offsets for map data.}{surf:chgpnt}
 \quickdes{CHANGE\_QUALITY}{Change data quality.}{surf:chgqual}
 \quickdes{DESPIKE}{Despike JIGGLE/MAP data}{surf:despike}
@@ -2616,6 +3085,7 @@ Duncan,~W.~D., SCUBA project documentation, SCU/WDD/31.1/1093
 \quickdes{REBIN}{Rebin all data onto a rectangular grid}{surf:rebin}
 \quickdes{REDUCE\_SWITCH}{Convert raw demodulated data to standard format and
 process individual switches.}{surf:resw}
+\quickdes{REMDBM}{Remove dual beam signature from SCAN/MAP images (requires \Kappa).}{surf:remdbm}
 \quickdes{REMSKY}{Remove sky contribution from each jiggle}{surf:remsky}
 \quickdes{RESTORE}{Remove dual-beam response from SCAN/MAP data.}{surf:restore}
 \quickdes{RLINPLOT}{Interactive data inspection via \mlinplot\ (Requires \Kappa)}{surf:rlinplot}
@@ -2624,6 +3094,8 @@ process individual switches.}{surf:resw}
 \quickdes{SCUCLIP}{Perform sigma clipping of each bolometer}{surf:scuclip}
 \quickdes{SCUHELP}{Interactive help system}{surf:scuhelp}
 \quickdes{SCULOG}{Provide detailed descriptions of all observation data.}{surf:sculog}
+\quickdes{SCUMAKEWT}{Generate fourier weights of chop function}{surf:scumakewt}
+\quickdes{SCUNOISE}{Display SCUBA noise data}{surf:scunoise}
 \quickdes{SCUOVER}{Overlay bolometer array on image}{surf:scuover}
 \quickdes{SCUPA}{Show position angle of array (Requires \Kappa)}{surf:scupa}
 \quickdes{SCUPHOT}{Reduces photometry data to a single point per integration}{surf:scuphot}
@@ -2631,6 +3103,7 @@ process individual switches.}{surf:resw}
 \quickdes{SCUQUICK}{Semi-automated data reduction pipeline.}{surf:scuquick}
 \quickdes{SCUSHIFT}{Shift bolometers on A-to-D card}{surf:scushift}
 \quickdes{SDIP}{Script to reduce and display skydip data (requires \Kappa).}{surf:sdip}
+\quickdes{SETBOLWT}{Calculate and set bolometer weights (requires \Kappa)}{surf:setbolwt}
 \quickdes{SIGCLIP}{Remove spikes from photometry data (requires \Kappa).}{surf:sigclip}
 \quickdes{SKYDIP}{Calculate sky opacity from skydip data}{surf:skydip}
 \quickdes{SKYSUM}{Generate a summary of skydip observations}{surf:skysum}
@@ -2699,6 +3172,7 @@ flatfield volumes.
 \item[\htmlref{EXTINCTION}{EXTINCTION}:] Correct the data for atmospheric
 extinction. 
 
+\item[\htmlref{CALCSKY}{CALCSKY}:] Calculate sky signal.
 
 \end{description}
 
@@ -2719,9 +3193,13 @@ weak sources.
 
 \begin{description}
 \item[\htmlref{DESPIKE2}{DESPIKE2}:] Despike SCAN/MAP data.
+\item[\htmlref{REMDBM}{REMDBM}:] Remove dual-beam response from SCAN/MAP
+images (requires \Kappa).
 \item[\htmlref{RESTORE}{RESTORE}:] Remove dual-beam response from SCAN/MAP
-data. 
-\item[\htmlref{SCAN\_RLB}{SCAN_RLB}:] Remove linear baselines from scans.
+data (EKH method). 
+\item[\htmlref{SCAN\_RLB}{SCAN_RLB}:] Remove baselines from scans.
+\item[\htmlref{SCUMAKEWT}{SCUMAKEWT}:] Generate Fourier weights (used by
+\remdbm).
 \end{description}
 
 \item \textbf{Data inspection:}
@@ -2730,6 +3208,7 @@ data.
 \item[\htmlref{PLTBOL}{PLTBOL}:] Interactive bolometer display (requires \Kappa)
 \item[\htmlref{RLINPLOT}{RLINPLOT}:] Interactive display via \mlinplot
 (requires \Kappa).
+\item[\htmlref{SCUNOISE}{SCUNOISE}:] Plot SCUBA noise data.
 \item[\htmlref{SCUPLOT}{SCUPLOT}:] Interactive display and despiking (requires 
 \Kappa).
 \end{description}
@@ -2743,6 +3222,9 @@ in a dataset.
 
 \item[\htmlref{CHANGE\_FLAT}{CHANGE_FLAT}:] Change the stored flatfield
 information. 
+
+\item[\htmlref{CHANGE\_NACENTRE}{CHANGE_NACENTRE}:] Change Nasmyth coordinates 
+of array centre.
 
 \item[\htmlref{CHANGE\_POINTING}{CHANGE_POINTING}:] Change Az and El pointing
 offsets for map data. 
@@ -2770,6 +3252,9 @@ each integration.
 data to text file. 
 
 \item[\htmlref{SCUOVER}{SCUOVER}:] Overlay bolometer array on image.
+
+\item[\htmlref{SETBOLWT}{SETBOLWT}:] Calculate and set bolometer weights
+(Requires \Kappa). 
 
 \end{description}
 
@@ -2806,26 +3291,33 @@ The \scusoft\ routines are described in the following pages:
    \sstdescription{
       This routine rebins the demodulated data from SCUBA MAP observations
       onto a rectangular mesh by a variety of methods.
-      Currently convolution by weighting functions and splines are
-      supported.
+      Currently convolution by weighting functions,  spline interpolation 
+      and median are supported.
       \sstitemlist{
 
          \sstitem
          Weighting functions:
 
-           Currently linear and bessel weighting functions are supported.  The
-           width of the Bessel function is such that it should preserve all
-           spatial information obtained by the telescope at the wavelength of
-           observation, but suppress higher spatial frequencies. To minimise
-           edge effects the Bessel function is truncated at a radius of 10
-           half-widths from the centre, and apodized over its outer third by a
+           Currently linear, Bessel and Gaussian weighting functions are
+           supported.  The width of the Bessel function is such that it should
+           preserve all spatial information obtained by the telescope at the
+           wavelength of observation, but suppress higher spatial
+           frequencies. To minimise edge effects the Bessel function is
+           truncated at a radius of 10 half-widths from the centre (although
+           this is configurable), and apodized over its outer third by a
            cosine function. Viewed in frequency space the method consists of
            Fourier transforming the input dataset(s), multiplying the
            transform by a cylindrical top-hat (the F.T. of the Bessel
            function), then transforming back into image space.  A linear
            weighting function is also available which works out to one
            half-width - this has the advantage that it is much faster to
-           process and is much less susceptible to edge effects.
+           process and is much less susceptible to edge effects.  The Gaussian
+           weighting function is probably the best compromise between the
+           Bessel (slow and prone to edge effects) and Linear (fast but the
+           point spread function is non-trivial for modeling).
+
+           The radius and size of `footprint' for the weighting functions
+           are configurable using the WTFNRAD and SCALE parameters.
 
          \sstitem
          Splines:
@@ -2836,10 +3328,20 @@ The \scusoft\ routines are described in the following pages:
            input data in one go. At present the spline routines are
            experimental and comments are welcomed.
 
+         \sstitem
+         Median:
+ 
+           A regridding option derived from \despike\ is available. This
+           method simply puts all data points in an output grid and calculates
+           the median of each output cell. Small pixel scales require large
+           datasets (since not all cells in a 1 arcsecond grid will contain
+           data points) although the \Kappa\ commands \fillbad\ and \glitch\
+           can be used to smooth over bad pixels.
+
       }
    }
    \sstusage{
-      bolrebin
+      bolrebin ref
    }
    \sstparameters{
       \sstsubsection{
@@ -2871,7 +3373,8 @@ The \scusoft\ routines are described in the following pages:
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB. 
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -2896,7 +3399,7 @@ The \scusoft\ routines are described in the following pages:
             NA:  Nasmyth offsets
 
             \sstitem
-            PL:  RA/Dec Offsets from moving centre (eg Planets)
+            PL:  RA/Dec Offsets from moving centre (e.g.\ Planets)
 
             \sstitem
             RB:  RA/Dec (B1950)
@@ -2934,6 +3437,9 @@ The \scusoft\ routines are described in the following pages:
             LINEAR:  Linear weighting function
 
             \sstitem
+            GAUSSIAN: Gaussian weighting function
+
+            \sstitem
             BESSEL:  Bessel weighting function
 
             \sstitem
@@ -2948,6 +3454,9 @@ The \scusoft\ routines are described in the following pages:
             SPLINE3: Interpolating spline 
                 (\xref{PDA\_IDSFFT}{sun194}{PDA_IDSFFT})
 
+            \sstitem
+            MEDIAN: Median regridding
+
          }
          Please refer to the PDA documentation 
          (\xref{SUN/194}{sun194}{}) for more information
@@ -2961,6 +3470,15 @@ The \scusoft\ routines are described in the following pages:
          See the notes. REF can include a \htmlref{SCUBA section}{sections}.
       }
       \sstsubsection{
+         SCALE = REAL (Read)
+      }{
+         Radius of one scale size in arcsec. This effectively governs the
+         size of the weighting function. For LINEAR one scale size corresponds
+         to the zero of the cone, for BESSEL it is the first zero of the
+         Bessel function ($\pi$) and for Gaussian it is the half-width
+         half maximum (HWHM).
+      }
+      \sstsubsection{
          SIZE ( 2 ) = INTEGER (Read)
       }{
          This array parameter sets the size of the output grid in pixels
@@ -2971,13 +3489,23 @@ The \scusoft\ routines are described in the following pages:
          SHIFT\_DX = REAL (Read)
       }{
          The pointing shift (in X) to be applied that would bring the
-         maps in line. This is a shift in the output coordinte frame.
+         maps in line. This is a shift in the output coordinate frame.
       }
       \sstsubsection{
          SHIFT\_DY = REAL (Read)
       }{
          The pointing shift (in Y) to be applied that would bring the
          maps in line. This is a shift in the output coordinate frame.
+      }
+      \sstsubsection{
+         TIMES = LOGICAL (Read)
+      }{
+         Store an extra NDF in the output map containing the 2-D histogram
+         of the data. This can be used to make an estimate of the actual
+         number of samples responsible for each point in the output grid.
+         Note that, in general, the number of pixels in the output grid
+         exceeds the number of independent beams in the image.
+         The data can be accessed as OUT.more.reds.times. Default is FALSE. 
       }
       \sstsubsection{
          WEIGHT = REAL (Read)
@@ -2990,6 +3518,15 @@ The \scusoft\ routines are described in the following pages:
          This parameter governs whether the convolution weights array
          will be stored in the output NDF. The default is FALSE (i.e.\
          do not store the weights array).
+      }
+      \sstsubsection{
+         WTFNRAD = INTEGER (Read)
+      }{
+        Size of the weighting function in scale sizes. This parameter
+        is irrelevant for LINEAR regridding. For Gaussian the default
+        is 3 (i.e. a diameter of 3 FWHM for the footprint), and for
+        Bessel it is 10. The smaller the weighting function is (a
+        combination of WTFNRAD and SCALE) the faster the regridding goes.
       }
    }
    \sstexamples{
@@ -3032,11 +3569,18 @@ The \scusoft\ routines are described in the following pages:
          SCUBA sections can be given along with any input NDF
 
          \sstitem
-         The relative weights associated with each point in the output map
-         are stored in a WEIGHTS NDF in the REDS extension of the output
-         data. For spline rebinning each point is equivalent to the number
-         of integrations added into the final data point. For weight function
-         regridding the situation is more complicated.
+         The relative weights associated with each point in the output map are
+         stored in a WEIGHTS NDF in the REDS extension of the output data (For
+         WEIGHTS=TRUE). For spline rebinning each point is equivalent to the
+         number of integrations added into the final data point. For weight
+         function regridding the situation is more complicated. The actual
+         number of points contributing to each cell can be stored using the 
+         TIMES parameter.
+
+         \sstitem
+         Bolometer weights will be used if a BOLWT extension is found
+         in the input data file (usually set with \setbolwt).
+
       }
    }
    \sstdiytopic{
@@ -3071,6 +3615,191 @@ The \scusoft\ routines are described in the following pages:
       SURF: \rebin, \intrebin, \extdata
    }
 }
+
+
+\newpage
+\label{surf:calcsky}
+\sstroutine{
+   CALCSKY
+}{
+   Calculate sky contribution from median image
+}{
+   \sstdescription{
+      This routine calculates the sky contribution by attempting
+      to remove the source from the input data stream. The source
+      signal can either be calculated by this routine or by reading
+      in a model of the source from a file.
+
+      When calculating the source structure internally a similar
+      method to that used by DESPIKE is employed. The input data
+      are placed into bins of size one quarter beamwidth. The median
+      of each bin is calculated and this is treated as the source
+      model (cf. REBIN\_METHOD=MEDIAN in \rebin).
+
+      Once the source model is available, it is removed from
+      all of the input data. The source-removed data are then analysed
+      with the sky emission derived from the mean of the signal across
+      the array for all the sample times.
+
+      Since the sky signal is expected to vary on timescales of the
+      order of one second, an option is included for smoothing the
+      sky signal. This is especially useful for scan map data where
+      samples are taken at 7.8$\sim$Hz.
+   }
+   \sstusage{
+      calcsky ref
+   }
+   \sstparameters{
+      \sstsubsection{
+         BOXSZ = INTEGER (Given)
+      }{
+         Size of smoothing box in seconds. This is used to smooth
+         the time series. Default is 2.0 seconds.
+      }
+      \sstsubsection{
+         IN = CHAR (Read)
+      }{
+         The name of the input file to be processed. This parameter is
+         requested repeatedly until a NULL value (!) is supplied.
+         LOOP must be TRUE. IN can include a SCUBA section.
+         Like the REF parameter this parameter accepts a text file.
+      }
+      \sstsubsection{
+         LOOP = LOGICAL (Read)
+      }{
+         Task will ask for multiple input files if true. Only REF is read
+         if noloop.
+      }
+      \sstsubsection{
+         MODEL = NDF (Read)
+      }{
+         NDF containing the model of the source. The size of the
+         input image must (currently) match the default size of the
+         image that would be generated by \rebin\ with the current input
+         files. The coordinate frame of this image must match that
+         specified in OUT\_COORDS.
+      }
+      \sstsubsection{
+         MSG\_FILTER = CHAR (Read)
+      }{
+         Message filter level. Allowed values are QUIET, NORM and
+         VERB. Default is NORM.
+      }
+      \sstsubsection{
+         NOSRC = NDF (Write)
+      }{
+         File to store source removed data. This can be used to
+         check the source removal. Note that this output file can
+         not be used directly by SURF for further processing since
+         the header is incomplete. No file is written by default.
+      }
+      \sstsubsection{
+         OUT\_COORDS = CHAR (Read)
+      }{
+         The coordinate system to be used for the model determination.
+         Available coordinate systems are:
+         \sstitemlist{
+
+            \sstitem
+            AZ:  Azimuth/elevation offsets
+
+            \sstitem
+            NA:  Nasmyth offsets
+
+            \sstitem
+            PL:  RA/Dec Offsets from moving centre (e.g.\ Planets)
+
+            \sstitem
+            RB:  RA/Dec (B1950)
+
+            \sstitem
+            RJ:  RA/Dec (J2000)
+
+            \sstitem
+            RD:  RA/Dec (epoch of observation)
+
+            \sstitem
+            GA:  Galactic coordinates (J2000)
+
+         }
+         For RD current epoch is taken from the first input file.
+      }
+      \sstsubsection{
+         REF = CHAR (Given)
+      }{
+         The name of the first NDF to be processed. The name may also be the
+         name of an ASCII text file containing NDF and parameter values.
+         REF can include a SCUBA section. See \rebin\ for more information
+         on the format of the ASCII input file.
+      }
+      \sstsubsection{
+         SHIFT\_DX = REAL (Read)
+      }{
+         The pointing shift (in X) to be applied that would bring the
+         maps in line. This is a shift in the output coordinate frame.
+      }
+      \sstsubsection{
+         SHIFT\_DY = REAL (Read)
+      }{
+         The pointing shift (in Y) to be applied that would bring the
+         maps in line. This is a shift in the output coordinate frame.
+      }
+      \sstsubsection{
+         WEIGHT = REAL (Read)
+      }{
+         This parameter does nothing in \calcsky. It must be present
+         when using text file input. Any value is allowed.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         calcsky test\_rlb model=! $\backslash$$\backslash$
+      }{
+         Calculate sky for test\_rlb.sdf. Only read in one file and
+         don{\tt '}t use an external source model.
+      }
+      \sstexamplesubsection{
+         calcsky list.inp model=m82 noloop$\backslash$$\backslash$
+      }{
+         Read in the files specified in list.inp and use m82.sdf
+         as a model of the source.
+      }
+      \sstexamplesubsection{
+         calcsky file nosrc=nosrc boxsz=10.0 $\backslash$$\backslash$
+      }{
+         Calculate sky for file.sdf. Store the source subtracted image
+         in nosrc.sdf. Use a smoothing size of 10 seconds.
+      }
+   }
+
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The model itself is only an approximation
+           to the data (since the data points can fall anywhere within
+           a given cell) so some source signal will remain after source
+           subtraction.
+
+         \sstitem
+         If a model is supplied externally (via MODEL parameter) the
+           cell size of the model is used for the source subtraction.
+
+         \sstitem
+         The sky signal is stored in an NDF extension (.MORE.REDS.SKY).
+           The file must be processed by \remsky\ to actually remove the
+           sky contribution.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      SURF: \remsky
+   }
+}
+
+
+
 
 \newpage
 \label{surf:chgdata}
@@ -3115,7 +3844,8 @@ The \scusoft\ routines are described in the following pages:
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages
+         Message filter level.  Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -3252,7 +3982,8 @@ The \scusoft\ routines are described in the following pages:
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level (Default is NORM).
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM.
       }
       \sstsubsection{
          NEW\_FLAT = CHAR (Read)
@@ -3272,6 +4003,76 @@ The \scusoft\ routines are described in the following pages:
       Related Application
    }{
       SURF: \flatf, \scuquick
+   }
+}
+
+
+\newpage
+\label{surf:chgnacent}
+\sstroutine{
+   CHANGE\_NACENTRE
+}{
+   Shift the Nasmyth centre of the array
+}{
+   \sstdescription{
+      This routine shifts the position of the Nasmyth centre of a
+      SCUBA array. It can be used to take out the small difference
+      between the centres of the LONG and SHORT wave arrays.
+      Should be run after \ext.
+   }
+   \sstusage{
+      change\_nacentre [-h $|$ -v] infile dx dy
+   }
+   \sstparameters{
+      \sstsubsection{
+         $-$h
+      }{
+         Return a help message only.
+      }
+      \sstsubsection{
+         $-$v
+      }{
+         Return the version number of scunoise
+      }
+      \sstsubsection{
+         infile
+      }{
+         Input file name. The file is modified in place.
+      }
+      \sstsubsection{
+         dx
+      }{
+         Shift in Nasmyth X (du3) direction
+      }
+      \sstsubsection{
+         dy
+      }{
+         Shift in Nasmyth Y (du4) direction
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         change\_nacentre
+      }{
+         Will prompt for input file name and shift
+      }
+      \sstexamplesubsection{
+         change\_nacentre file 5 $-3$
+      }{
+         Will move the array centre of file.sdf by (5,$-3$) arcsec.
+      }
+   }
+   \sstnotes{
+      This command can only be reversed by running \task{change\_nacentre}
+      with minus the previous X,Y shift.
+      \ext\ must have been run on the input file (otherwise the
+      file will contain more than 1 array) -- this is not checked
+      for explicitly.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      SURF: \rebin
    }
 }
 
@@ -3318,7 +4119,8 @@ The \scusoft\ routines are described in the following pages:
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. (Default is NORM)
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM.
       }
       \sstsubsection{
          POINT\_DAZ = REAL (Read)
@@ -3407,7 +4209,8 @@ The \scusoft\ routines are described in the following pages:
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM.
+         Message filter level. Allowed values are QUIET, NORM and VERB. 
+         Default is NORM.
       }
       \sstsubsection{
          SECTION() = CHAR (Read)
@@ -3532,6 +4335,13 @@ The \scusoft\ routines are described in the following pages:
    }
    \sstparameters{
       \sstsubsection{
+         DEFOUT = LOGICAL (Read)
+      }{
+        Determines whether output files should be written automatically
+        (using the default output names) or whether the user should
+        be prompted. Default is FALSE.
+      }
+      \sstsubsection{
 	 DEVICE = DEVICE (Read)
       }{
 	The device on which to display the binned data. Can be null (!)
@@ -3573,7 +4383,8 @@ The \scusoft\ routines are described in the following pages:
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. In VERBOSE mode the positions 
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. In VERBOSE mode the positions 
 	 of detected spikes are listed.
       }
       \sstsubsection{
@@ -3644,7 +4455,7 @@ The \scusoft\ routines are described in the following pages:
          SHIFT\_DX = REAL (Read)
       }{
          The pointing shift (in X) to be applied that would bring the
-         maps in line. This is a shift in the output coordinte frame.
+         maps in line. This is a shift in the output coordinate frame.
       }
       \sstsubsection{
          SHIFT\_DY = REAL (Read)
@@ -3814,7 +4625,8 @@ The \scusoft\ routines are described in the following pages:
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. No verbose messages are used.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. No verbose messages are used.
       }
       \sstsubsection{
          NSIGMA = REAL (Read)
@@ -3874,7 +4686,7 @@ The \scusoft\ routines are described in the following pages:
       the user to accept the new set and de-zoom to the original
       scale. To reset a previously flagged point, flag the point again
       but do \textit{not} accept it: the point will be set to GOOD again.  
-      Please read the note below the derscription of the menu on the use of the
+      Please read the note below the description of the menu on the use of the
       mouse.
 
       The menu consists of:
@@ -3923,7 +4735,7 @@ The \scusoft\ routines are described in the following pages:
       }{
          name of a second file: e.g. the despiked version of the NDF
          file. The same bolometers will be plotted in a second window or
-         overlayed for comparison.
+         overlaid for comparison.
       }
       \sstsubsection{
          -s min max
@@ -4027,7 +4839,8 @@ proceeding.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -4133,7 +4946,8 @@ proceeding.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT\_COORDS = CHAR (Read)
@@ -4149,7 +4963,7 @@ proceeding.
             NA:  Nasmyth offsets
 
             \sstitem
-            PL:  RA/Dec Offsets from moving centre (eg Planets)
+            PL:  RA/Dec Offsets from moving centre (e.g.\ Planets)
 
             \sstitem
             RB:  RA/Dec (B1950)
@@ -4175,7 +4989,7 @@ proceeding.
          SHIFT\_DX = REAL (Read)
       }{
          The pointing shift (in X) to be applied that would bring the
-         maps in line. This is a shift in the output coordinte frame.
+         maps in line. This is a shift in the output coordinate frame.
       }
       \sstsubsection{
          SHIFT\_DY = REAL (Read)
@@ -4262,7 +5076,8 @@ proceeding.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          FILE = FILE (Write)
@@ -4312,7 +5127,8 @@ proceeding.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -4345,26 +5161,33 @@ proceeding.
    \sstdescription{
       This routine rebins the demodulated data from SCUBA MAP observations
       onto a rectangular mesh by a variety of methods.
-      Currently convolution by weighting functions and splines are
-      supported.
+      Currently convolution by weighting functions,  spline interpolation 
+      and median are supported.
       \sstitemlist{
 
          \sstitem
          Weighting functions:
 
-           Currently linear and bessel weighting functions are supported.  The
-           width of the Bessel function is such that it should preserve all
-           spatial information obtained by the telescope at the wavelength of
-           observation, but suppress higher spatial frequencies. To minimise
-           edge effects the Bessel function is truncated at a radius of 10
-           half-widths from the centre, and apodized over its outer third by a
+           Currently linear, Bessel and Gaussian weighting functions are
+           supported.  The width of the Bessel function is such that it should
+           preserve all spatial information obtained by the telescope at the
+           wavelength of observation, but suppress higher spatial
+           frequencies. To minimise edge effects the Bessel function is
+           truncated at a radius of 10 half-widths from the centre (although
+           this is configurable), and apodized over its outer third by a
            cosine function. Viewed in frequency space the method consists of
            Fourier transforming the input dataset(s), multiplying the
            transform by a cylindrical top-hat (the F.T. of the Bessel
            function), then transforming back into image space.  A linear
            weighting function is also available which works out to one
            half-width - this has the advantage that it is much faster to
-           process and is much less susceptible to edge effects.
+           process and is much less susceptible to edge effects.  The Gaussian
+           weighting function is probably the best compromise between the
+           Bessel (slow and prone to edge effects) and Linear (fast but the
+           point spread function is non-trivial for modeling).
+
+           The radius and size of `footprint' for the weighting functions
+           are configurable using the WTFNRAD and SCALE parameters.
 
          \sstitem
          Splines:
@@ -4375,10 +5198,20 @@ proceeding.
            input data in one go. At present the spline routines are
            experimental and comments are welcomed.
 
+         \sstitem
+         Median:
+ 
+           A regridding option derived from \despike\ is available. This
+           method simply puts all data points in an output grid and calculates
+           the median of each output cell. Small pixel scales require large
+           datasets (since not all cells in a 1 arcsecond grid will contain
+           data points) although the \Kappa\ commands \fillbad\ and \glitch\
+           can be used to smooth over bad pixels.
+
       }
    }
    \sstusage{
-      intrebin
+      intrebin ref
    }
    \sstparameters{
       \sstsubsection{
@@ -4410,7 +5243,8 @@ proceeding.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -4435,7 +5269,7 @@ proceeding.
             NA:  Nasmyth offsets
 
             \sstitem
-            PL:  RA/Dec Offsets from moving centre (eg Planets)
+            PL:  RA/Dec Offsets from moving centre (e.g.\ Planets)
 
             \sstitem
             RB:  RA/Dec (B1950)
@@ -4473,6 +5307,10 @@ proceeding.
             LINEAR:  Linear weighting function
 
             \sstitem
+            GAUSSIAN: Gaussian weighting function
+
+
+            \sstitem
             BESSEL:  Bessel weighting function
 
             \sstitem
@@ -4487,6 +5325,8 @@ proceeding.
             SPLINE3: Interpolating spline 
                 (\xref{PDA\_IDSFFT}{sun194}{PDA_IDSFFT})
 
+            \sstitem
+            MEDIAN: Median regridding
          }
          Please refer to the PDA documentation 
          (\xref{SUN/194}{sun194}{}) for more information
@@ -4500,6 +5340,15 @@ proceeding.
          See the notes. REF can include a \htmlref{SCUBA section}{sections}.
       }
       \sstsubsection{
+         SCALE = REAL (Read)
+      }{
+         Radius of one scale size in arcsec. This effectively governs the
+         size of the weighting function. For LINEAR one scale size corresponds
+         to the zero of the cone, for BESSEL it is the first zero of the
+         Bessel function ($\pi$) and for Gaussian it is the half-width
+         half maximum (HWHM).
+      }
+      \sstsubsection{
          SIZE ( 2 ) = INTEGER (Read)
       }{
          This array parameter sets the size of the output grid in pixels
@@ -4510,13 +5359,23 @@ proceeding.
          SHIFT\_DX = REAL (Read)
       }{
          The pointing shift (in X) to be applied that would bring the
-         maps in line. This is a shift in the output coordinte frame.
+         maps in line. This is a shift in the output coordinate frame.
       }
       \sstsubsection{
          SHIFT\_DY = REAL (Read)
       }{
          The pointing shift (in Y) to be applied that would bring the
          maps in line. This is a shift in the output coordinate frame.
+      }
+      \sstsubsection{
+         TIMES = LOGICAL (Read)
+      }{
+         Store an extra NDF in the output map containing the 2-D histogram
+         of the data. This can be used to make an estimate of the actual
+         number of samples responsible for each point in the output grid.
+         Note that, in general, the number of pixels in the output grid
+         exceeds the number of independent beams in the image.
+         The data can be accessed as OUT.more.reds.times. Default is FALSE.
       }
       \sstsubsection{
          WEIGHT = REAL (Read)
@@ -4529,7 +5388,17 @@ proceeding.
          This parameter governs whether the convolution weights array
          will be stored in the output NDF. The default is FALSE (i.e.\
          do not store the weights array).
-      }   }
+      }   
+      \sstsubsection{
+         WTFNRAD = INTEGER (Read)
+      }{
+        Size of the weighting function in scale sizes. This parameter
+        is irrelevant for LINEAR regridding. For Gaussian the default
+        is 3 (i.e. a diameter of 3 FWHM for the footprint), and for
+        Bessel it is 10. The smaller the weighting function is (a
+        combination of WTFNRAD and SCALE) the faster the regridding goes.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          intrebin rebin\_method=LINEAR out\_coords=RJ
@@ -4570,11 +5439,17 @@ proceeding.
          SCUBA sections can be given along with any input NDF
 
          \sstitem
-         The relative weights associated with each point in the output map
-         are stored in a WEIGHTS NDF in the REDS extension of the output
-         data. For spline rebinning each point is equivalent to the number
-         of integrations added into the final data point. For weight function
-         regridding the situation is more complicated.
+         The relative weights associated with each point in the output map are
+         stored in a WEIGHTS NDF in the REDS extension of the output data (For
+         WEIGHTS=TRUE). For spline rebinning each point is equivalent to the
+         number of integrations added into the final data point. For weight
+         function regridding the situation is more complicated. The actual
+         number of points contributing to  each cell can be stored using the 
+         TIMES parameter.
+
+         \sstitem
+         Bolometer weights will be used if a BOLWT extension is found
+         in the input data file (usually set with \setbolwt).
       }
    }
    \sstdiytopic{
@@ -5090,7 +5965,7 @@ proceeding.
       }{
          name of a second file: e.g. the despiked version of the NDF
          file. The same bolometers will be plotted in a second window or
-         overlayed for comparison.
+         overlaid for comparison.
       }
       \sstsubsection{
          -s min max
@@ -5354,26 +6229,33 @@ menu.
    \sstdescription{
       This routine rebins the demodulated data from SCUBA MAP observations
       onto a rectangular mesh by a variety of methods.
-      Currently convolution by weighting functions and splines are
-      supported.
+      Currently convolution by weighting functions,  spline interpolation 
+      and median are supported.
       \sstitemlist{
 
          \sstitem
          Weighting functions:
 
-           Currently linear and bessel weighting functions are supported.  The
-           width of the Bessel function is such that it should preserve all
-           spatial information obtained by the telescope at the wavelength of
-           observation, but suppress higher spatial frequencies. To minimise
-           edge effects the Bessel function is truncated at a radius of 10
-           half-widths from the centre, and apodized over its outer third by a
+           Currently linear, Bessel and Gaussian weighting functions are
+           supported.  The width of the Bessel function is such that it should
+           preserve all spatial information obtained by the telescope at the
+           wavelength of observation, but suppress higher spatial
+           frequencies. To minimise edge effects the Bessel function is
+           truncated at a radius of 10 half-widths from the centre (although
+           this is configurable), and apodized over its outer third by a
            cosine function. Viewed in frequency space the method consists of
            Fourier transforming the input dataset(s), multiplying the
            transform by a cylindrical top-hat (the F.T. of the Bessel
            function), then transforming back into image space.  A linear
            weighting function is also available which works out to one
            half-width - this has the advantage that it is much faster to
-           process and is much less susceptible to edge effects.
+           process and is much less susceptible to edge effects.  The Gaussian
+           weighting function is probably the best compromise between the
+           Bessel (slow and prone to edge effects) and Linear (fast but the
+           point spread function is non-trivial for modeling).
+
+           The radius and size of `footprint' for the weighting functions
+           are configurable using the WTFNRAD and SCALE parameters.
 
          \sstitem
          Splines:
@@ -5384,10 +6266,20 @@ menu.
            input data in one go. At present the spline routines are
            experimental and comments are welcomed.
 
+         \sstitem
+         Median:
+ 
+           A regridding option derived from \despike\ is available. This
+           method simply puts all data points in an output grid and calculates
+           the median of each output cell. Small pixel scales require large
+           datasets (since not all cells in a 1 arcsecond grid will contain
+           data points) although the \Kappa\ commands \fillbad\ and \glitch\
+           can be used to smooth over bad pixels.
+
       }
    }
    \sstusage{
-      rebin
+      rebin ref
    }
    \sstparameters{
       \sstsubsection{
@@ -5419,7 +6311,8 @@ menu.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -5441,7 +6334,7 @@ menu.
             NA:  Nasmyth offsets
 
             \sstitem
-            PL:  RA/Dec Offsets from moving centre (eg Planets)
+            PL:  RA/Dec Offsets from moving centre (e.g.\ Planets)
 
             \sstitem
             RB:  RA/Dec (B1950)
@@ -5479,6 +6372,9 @@ menu.
             LINEAR:  Linear weighting function
 
             \sstitem
+            GAUSSIAN: Gaussian weighting function
+
+            \sstitem
             BESSEL:  Bessel weighting function
 
             \sstitem
@@ -5493,6 +6389,9 @@ menu.
             SPLINE3: Interpolating spline 
                 (\xref{PDA\_IDSFFT}{sun194}{PDA_IDSFFT})
 
+            \sstitem
+            MEDIAN: Median regridding
+
          }
          Please refer to the PDA documentation 
          (\xref{SUN/194}{sun194}{}) for more information
@@ -5506,6 +6405,15 @@ menu.
          See the notes. REF can include a \htmlref{SCUBA section}{sections}.
       }
       \sstsubsection{
+         SCALE = REAL (Read)
+      }{
+         Radius of one scale size in arcsec. This effectively governs the
+         size of the weighting function. For LINEAR one scale size corresponds
+         to the zero of the cone, for BESSEL it is the first zero of the
+         Bessel function ($\pi$) and for Gaussian it is the half-width
+         half maximum (HWHM).
+      }
+      \sstsubsection{
          SIZE ( 2 ) = INTEGER (Read)
       }{
          This array parameter sets the size of the output grid in pixels
@@ -5516,13 +6424,23 @@ menu.
          SHIFT\_DX = REAL (Read)
       }{
          The pointing shift (in X) to be applied that would bring the
-         maps in line. This is a shift in the output coordinte frame.
+         maps in line. This is a shift in the output coordinate frame.
       }
       \sstsubsection{
          SHIFT\_DY = REAL (Read)
       }{
          The pointing shift (in Y) to be applied that would bring the
          maps in line. This is a shift in the output coordinate frame.
+      }
+      \sstsubsection{
+         TIMES = LOGICAL (Read)
+      }{
+         Store an extra NDF in the output map containing the 2-D histogram
+         of the data. This can be used to make an estimate of the actual
+         number of samples responsible for each point in the output grid.
+         Note that, in general, the number of pixels in the output grid
+         exceeds the number of independent beams in the image.
+         The data can be accessed as OUT.more.reds.times. Default is FALSE.
       }
       \sstsubsection{
          WEIGHT = REAL (Read)
@@ -5535,6 +6453,15 @@ menu.
          This parameter governs whether the convolution weights array
          will be stored in the output NDF. The default is FALSE (i.e.\
          do not store the weights array).
+      }
+      \sstsubsection{
+         WTFNRAD = INTEGER (Read)
+      }{
+        Size of the weighting function in scale sizes. This parameter
+        is irrelevant for LINEAR regridding. For Gaussian the default
+        is 3 (i.e. a diameter of 3 FWHM for the footprint), and for
+        Bessel it is 10. The smaller the weighting function is (a
+        combination of WTFNRAD and SCALE) the faster the regridding goes.
       }
    }
    \sstexamples{
@@ -5577,11 +6504,17 @@ menu.
          SCUBA sections can be given along with any input NDF
 
          \sstitem
-         The relative weights associated with each point in the output map
-         are stored in a WEIGHTS NDF in the REDS extension of the output
-         data. For spline rebinning each point is equivalent to the number
-         of integrations added into the final data point. For weight function
-         regridding the situation is more complicated.
+         The relative weights associated with each point in the output map are
+         stored in a WEIGHTS NDF in the REDS extension of the output data (For
+         WEIGHTS=TRUE). For spline rebinning each point is equivalent to the
+         number of integrations added into the final data point. For weight
+         function regridding the situation is more complicated. The actual
+         number of points contributing to  each cell can be stored using the
+         TIMES parameter.
+
+         \sstitem
+         Bolometer weights will be used if a BOLWT extension is found
+         in the input data file (usually set with \setbolwt).
       }
    }
    \sstdiytopic{
@@ -5650,7 +6583,8 @@ can be the number of the observation rather than the full filename.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Read)
@@ -5723,6 +6657,90 @@ can be the number of the observation rather than the full filename.
    }
 }
 
+\newpage
+\label{surf:remdbm}
+\sstroutine{
+   REMDBM
+}{
+   Remove dual beam signature from scan maps
+}{
+   \sstdescription{
+      This program should be used to reduce SCAN/MAP data taken
+      using the technique described by Emerson (1995, ASP Conf Ser 75, 309).
+      The deconvolution is performed using Fast Fourier techniques.
+   }
+   \sstusage{
+      remdbm [-h] [-v] [-out=] [-noams] files
+   }
+   \sstparameters{
+      \sstsubsection{
+         $-$h
+      }{
+         Help message
+      }
+      \sstsubsection{
+         $-$v
+      }{
+         Version number. Also indicates whether ADAM communication is
+         enabled.
+      }
+      \sstsubsection{
+         $-$out=file
+      }{
+         Filename of output image. Default is `\texttt{final.sdf}'
+      }
+      \sstsubsection{
+         $-$noams
+      }{
+         Turn off ADAM messaging if available. Default is false.
+         Ignored if ADAM messaging is not available.
+      }
+      \sstsubsection{
+         files
+      }{
+         List of input files to be processed. Shell wildcards are allowed.
+         See notes for restrictions.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         remdbm $*$\_reb.sdf
+      }{
+         Process all files matching the pattern and write the result
+         to \texttt{final.sdf}.
+      }
+      \sstexamplesubsection{
+         remdbm -out=m82 o66\_lon\_reb o67\_lon\_reb o68\_lon\_reb o69\_lon\_reb
+      }{
+         Process the four input images. The output filename is set to
+         \texttt{m82.sdf}.
+      }
+   }
+   \sstnotes{
+      The following restrictions apply:
+      \sstitemlist{
+
+         \sstitem
+         Each image should contain a single chop configuration.
+
+         \sstitem
+         Each image must have identical dimensions and pixel size
+           (they do not need to be square)
+
+         \sstitem
+         The images must be rebinned in the same coordinate system
+           as the chop throw.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      SURF: \scumakewt\newline
+      \xref{KAPPA}{sun95}{}: \fourier
+   }
+}
+
+
 
 \newpage
 \label{surf:remsky}
@@ -5772,7 +6790,7 @@ can be the number of the observation rather than the full filename.
    all  & All bolometers     &     all  (select the entire array) \\
    \end{tabular}
 
-   Each value must be comma separated but can be preceeded by a minus sign to
+   Each value must be comma separated but can be preceded by a minus sign to
 remove the bolometer(s) from the list. The definitions of ring number and
 `all' are dependent on the selected sub-instrument.
 
@@ -5822,7 +6840,7 @@ would leave you with bolometer H7.
 
             \sstitem
             Median -- the median value for all the sky bolometers is taken
-                       from each bolomoter signal.
+                       from each bolometer signal.
 
             \sstitem
             Mean   -- the mean of the sky bolometers is used as the average.
@@ -5837,7 +6855,8 @@ would leave you with bolometer H7.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message output level. Default is NORM. In VERBOSE mode a list of 
+         Message output level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. In VERBOSE mode a list of 
 	 the selected bolometers is returned along with the value of the 
 	 sky offset removed for each jiggle.
       }
@@ -5915,7 +6934,7 @@ MODE=median.
       \sstsubsection{
          CHOP = INTEGER (Read)
       }{
-         Chop throw in arcseconds. The defualt chop throw is read from
+         Chop throw in arcseconds. The default chop throw is read from
          the FITS header of the input file.
       }
       \sstsubsection{
@@ -5926,7 +6945,8 @@ MODE=median.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -6013,7 +7033,7 @@ MODE=median.
       }{
          name of a second file: e.g. the despiked version of the NDF
          file. The same bolometers will be plotted in a second window or
-         overlayed for comparison.
+         overlaid for comparison.
       }
       \sstsubsection{
          -s min max
@@ -6081,12 +7101,13 @@ menu.
 \sstroutine{
    SCAN\_RLB
 }{
-   Remove the linear baseline from SCAN/MAP data
+   Remove baselines from SCAN/MAP data
 }{
    \sstdescription{
-      This routine removes a linear baseline from each scan.
-      It does this by fitting a straight line to the scan ends and then
-      removing this from the entire scan.
+      This routine removes a baseline from each scan.
+      The baseline is determined in a number of ways. For removal of 
+      a linear baseline, a fit is made to the scan ends before removing
+      this from the entire scan.
    }
    \sstusage{
       scan\_rlb in out
@@ -6095,7 +7116,7 @@ menu.
       \sstsubsection{
          CHOP = INTEGER (Read)
       }{
-         The baseline fit is calculated over regions \param{CHOP} 
+         The linear baseline fit is calculated over regions \param{CHOP} 
          arcseconds from the
          scan ends. This region should be as large as possible but should
          only include baseline regions -- any scan that includes a source
@@ -6109,9 +7130,18 @@ menu.
          The name of the input file containing demodulated SCUBA data.
       }
       \sstsubsection{
+         METHOD = CHAR (Read)
+      }{
+         Governs the method to be used for calculating the baseline.
+         Options are MEDIAN: Remove the median from each scan, 
+         MEAN: remove the mean level from each scan, LINEAR: fit a linear
+         baseline to the ends of the scan. Default is LINEAR.
+      }
+      \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         The messaging level. Default is NORM. There are no verbose messages.
+         The messaging level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -6128,16 +7158,23 @@ menu.
    }
    \sstexamples{
       \sstexamplesubsection{
-         scan\_rlb infile $\backslash$
+         scan\_rlb infile method=linear $\backslash$
       }{
          Remove linear baselines from each scan using baseline regions the
          same size as the chop. Write the results to the default output file.
       }
       \sstexamplesubsection{
-         scan\_rlb infile rlb chop=30 $\backslash$
+         scan\_rlb infile rlb method=linear chop=30 $\backslash$
       }{
          Calculate the linear baseline for each scan using the specified
          baseline region. Write the results to the default output file.
+      }
+      \sstexamplesubsection{
+         scan\_rlb infile norlb method=median $\backslash$
+      }{
+          Calculate the fit using the median of each scan but do not
+          remove the baseline from the data. Store the baseline determination
+          for later analysis.
       }
    }
    \sstnotes{
@@ -6165,10 +7202,13 @@ menu.
       This routine reads in a list of user specified files and concatenates
       their data, variance and quality arrays so that \Kappa\ routines like
       \stats\ and \kstest\ can analyse a complete set of photometry
-      observations.  Data for each individual bolometer is written to a
-      different file.  If a file contained data for H7 and H9 then two output
-      files would be created (eg test\_h7 and test\_h9 - if the OUT parameter
-      was set to `test'). For each new bolometer a new file is created
+      observations.  \task{scucat} can be configured so that either all
+      data are concatenated into one file regardless of bolometer
+      (METHOD=catall) or data for each bolometer is kept separate 
+      (METHOD=separate). In the latter case, if
+      a file contained data for H7 and H9 then two output
+      files would be created (e.g.\ test\_h7 and test\_h9 - if the OUT parameter
+      was set to `test') and for each new bolometer a new file is created
       (existing files are overwritten) and data is appended to these files
       when more data for these bolometers is supplied.
    }
@@ -6188,7 +7228,10 @@ menu.
       }{
          The input dataset(s). This parameter is requested repeatedly
          until a NULL (!) value is given. The input dataset can either
-         be output from SCUPHOT or an NDF file.
+         be output from \scuphot\ or an NDF file. A comma-separated list
+         of files is allowed. A text file containing a list of files
+         can be specified using the up-carat symbol ($^\wedge$) in 
+         front of the text file name.
       }
       \sstsubsection{
          LOOP = LOGICAL (Read)
@@ -6196,14 +7239,25 @@ menu.
          Turns the looping on (default is true) or off (false)
       }
       \sstsubsection{
+         METHOD = CHAR (Read)
+      }{
+         Governs whether data from different bolometers are combined
+         regardless (CATALL) or written to separate files (SEPARATE).
+         Default is `SEPARATE'. The choice of this parameter governs
+         the behaviour of the OUT parameter.
+      }
+      \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = CHAR (Write)
       }{
-         The root name of the output NDF.
+         If METHOD=separate this parameter governs the  root name of 
+         the output NDF (i.e. $<$OUT$>$\_bol). If METHOD=catall this
+         parameter can be used to specify the actual output file name.
       }
    }
    \sstexamples{
@@ -6222,12 +7276,25 @@ menu.
          This will copy all the data from ext\_long.sdf to test\_$<$bol$>$.sdf
          and will then exit without asking further questions.
       }
+      \sstexamplesubsection{
+         scucat outfile 'file1,file2,file3' noloop method=separate
+      }{
+         Concatenate the data from file1, file2 and file3 into output
+         files containing the rootname of `outfile'.
+      }
+      \sstexamplesubsection{
+         scucat outfile in=$^\wedge$input.lis noloop method=catall
+      }{
+	 This will copy all the data contained in the files listed in
+         \texttt{input.lis} and write it to a file called 
+         \texttt{outfile.sdf}.
+      }
    }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         SCUCAT can process output data from scuphot (eg file.sdf as an
+         SCUCAT can process output data from scuphot (e.g.\ file.sdf as an
            HDS container containing NDF files with the names $<$bol$>$\_peak) or
            NDF files.
 
@@ -6254,7 +7321,13 @@ menu.
          NDF sections can not be used
 
          \sstitem
-         All input pixels are propogated to the output file
+         All input pixels are propagated to the output file
+
+         \sstitem
+         See the \xref{GRP}{sun150}{} documentation \cite{grp} for 
+         more information on
+         specifying multiple input files for the 'IN' parameter.
+
       }
    }
 }
@@ -6278,7 +7351,7 @@ menu.
       source.
    }
    \sstusage{
-      scuclip in out
+      scuclip in out nsigma
    }
    \sstparameters{
       \sstsubsection{
@@ -6289,7 +7362,8 @@ menu.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message output level. Default is NORM. If MSG\_FILTER is set
+         Message output level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. If MSG\_FILTER is set
          to VERBOSE the number of spikes removed from each bolometer is
          reported.
       }
@@ -6297,6 +7371,10 @@ menu.
          NSIGMA = DOUBLE (Read)
       }{
          Number of sigma beyond which data are thought to be spikes.
+         If this number is positive an iterative clip will be performed
+         (ie the standard deviation is recalculated after clipping and
+         points lying outside the new range are removed).
+         If it is negative then iterative clipping is switched off.         
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -6306,11 +7384,19 @@ menu.
    }
    \sstexamples{
       \sstexamplesubsection{
-         scuclip infile outfile nsigma=5
+         scuclip infile outfile 5
       }{
          Clip any data points that are further than 5 sigma from the mean.
-         The clipping is done on a per bolometer basis.
+         The clipping is done on a per bolometer basis and is iterative.
       }
+      \sstexamplesubsection{
+         scuclip infile outfile -5
+      }{
+         Clip any data points that are further than 5 sigma from the mean.
+         The clipping is done on a per bolometer basis and only one pass
+         of clipping is performed.
+      }
+
    }
    \sstnotes{
       \sstitemlist{
@@ -6676,6 +7762,164 @@ menu.
 %$
 
 \newpage
+\label{surf:scumakewt}
+\sstroutine{
+   SCUMAKEWT
+}{
+   Create weights array for dual beam deconvolution
+}{
+   \sstdescription{
+      Construct an NDF holding the weights array for a particular
+      chop throw and the Fourier Transform (FT) of the chop function
+      (a sine wave).
+   }
+   \sstusage{
+      scumakewt chop pa pixsize size ftchop wtchop
+   }
+   \sstparameters{
+      \sstsubsection{
+         CHOP = REAL (Read)
+      }{
+         Chop throw in arcseconds. There is no default
+      }
+      \sstsubsection{
+         PA = REAL (Read)
+      }{
+         Position angle of chop throw. Positive is anti-clockwise starting
+         from North. The angle should be specified in degrees.
+      }
+      \sstsubsection{
+         FTCHOP = NDF (Write)
+      }{
+         Output NDF containing fourier transform of the chop function.
+         The size of the output array matches the dimensions supplied
+         by parameter SIZE
+      }
+      \sstsubsection{
+         MSG\_FILTER = CHAR (Read)
+      }{
+         Message filter level. Default is NORM.
+      }
+      \sstsubsection{
+         PIXSIZE = INTEGER (Read)
+      }{
+         Pixel size to be used for output images. Should be in arcseconds
+         (ie same units as used for the CHOP parameter)
+      }
+      \sstsubsection{
+         SIZE( 2 ) = INTEGER (Read)
+      }{
+         Array parameter containing the number of pixels (X, Y)
+         in the output images.
+      }
+      \sstsubsection{
+         WTCHOP = NDF (Write)
+      }{
+         Output NDF containing the weights contributed by this chop
+         configuration. This is FTCHOP squared.
+         The size of the output array matches the dimensions supplied
+         by parameter SIZE
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         scumakewt 20 90 3 {\tt '}[256,256]{\tt '} ft wt
+      }{
+         Generate the FT and weight of a 20 arcsec RA chop using
+         3 arcsec pixels and a 256 square output image. The weight
+         is written to wt.sdf and the FT to ft.sdf.
+      }
+      \sstexamplesubsection{
+         scumakewt chop=20 size=[256,512] ftchop=fft wtchop=weights
+      }{
+         Generate the weight and ft of a chop of size 20 arcseconds
+         on a 256 x 512 image. The pixel scale will be requested.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      SURF: \remdbm
+   }
+}
+
+
+\newpage
+\label{surf:scunoise}
+\sstroutine{
+   SCUNOISE
+}{
+   Display SCUBA noise data
+}{
+   \sstdescription{
+      Scunoise can read in a directory of noise summaries (the .dat
+      files produced by the real-time system) and plot them. A date
+      must be supplied so that SCUNOISE can pick up the correct file
+      associated with a given run number.
+      Once the noise data are displayed the pointer can be moved over
+      a point to determine the associated bolometer name. Double
+      on the window will bring up a diagram of the array with all
+      bolometers above the specified noise level (specified by the position
+      of the pointer for the double click) highlighted in a different
+      colour.
+   }
+   \sstusage{
+      scunoise [-h $|$ -v $|$ -d] [obsdate] [runnr]
+   }
+   \sstparameters{
+      \sstsubsection{
+         $-$h
+      }{
+         Return a help message only.
+      }
+      \sstsubsection{
+         $-$v
+      }{
+         Return the version number of scunoise
+      }
+      \sstsubsection{
+         $-$d
+      }{
+         Switch on debug output
+      }
+      \sstsubsection{
+         obsdate
+      }{
+         Observation directory/date (e.g. 19980210)
+      }
+      \sstsubsection{
+         runnr
+      }{
+         SCUBA observation number of noise measurement.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         scunoise
+      }{
+         Prompt for date and run number
+      }
+      \sstexamplesubsection{
+         scunoise 19980210 5
+      }{
+         Display the noise data for observation 5 on 19980210
+      }
+      \sstexamplesubsection{
+         scunoise 19980315
+      }{
+         Prompt user for observation number, using data from 19980315.
+      }
+   }
+   \sstnotes{
+      SCUNOISE has been developed for use at the JAC and therefore knows
+      where to find the archived data. The current directory and \$DATADIR
+      are searched for files when the program is run outside of JAC.
+   }
+}
+
+%% $
+
+\newpage
 \label{surf:scuover}
 \sstroutine{
    SCUOVER
@@ -6714,7 +7958,7 @@ menu.
       \sstsubsection{
          EXPOSURE = INTEGER (Read)
       }{
-         Ues the bolometer positions at the specified exposure within the
+         Use the bolometer positions at the specified exposure within the
          specified INTEGRATION and MEASUREMENT. For SCAN/MAP data the
          start of an exposure (ie scan) is used. Default is exposure 1.
       }
@@ -6728,7 +7972,7 @@ menu.
          INTEGRATION = INTEGER (Read)
       }{
          Use the bolometer positions at the specified integration. Default
-         is measuremnt 1.
+         is measurement 1.
       }
       \sstsubsection{
          MEASUREMENT = INTEGER (Read)
@@ -6739,7 +7983,8 @@ menu.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -6879,7 +8124,7 @@ menu.
 
          \sstitem
           Second, an ndf called $<$bolname$>$\_peak (e.g. h7\_peak) will be created
-            in the OUT file to hold the fit results to the data for each
+            in the OUT file to hold the fitted results to the data for each
             integration. The results stored are the fit peak, its variance and
             quality and they are held as a 1-d array suitable for plotting as
             a graph. The fit results are also written in ASCII form to FILE, as
@@ -6887,7 +8132,7 @@ menu.
       }
    }
    \sstusage{
-      scuphot analysis in out file
+      scuphot in analysis out file
    }
    \sstparameters{
       \sstsubsection{
@@ -6903,8 +8148,17 @@ menu.
       \sstsubsection{
          ANALYSIS = CHAR (Read)
       }{
-         The method used to detemine peak. Either average or parabola.
-         Parabola is not recommended at this time.
+         The method used to determine the peak for each integration.  
+  	 Either average or parabola.
+         Parabola is not recommended at this time. Alternatively, all the
+         samples can be propagated without processing (`samples') -- 
+         this will give the same result for the signal as `average' 
+         (since `average' returns a smoothing of all the data) 
+         but for small datasets may give a more accurate measure of the error.
+         The discrepancy is especially noticeable for calibration measurements
+         where N\_INTEGRATIONS may only be 6 -- the noise statistics on 6 
+         averaged numbers are less reliable than those of 6 $\times$ 9 numbers
+         (assuming 9 samples per integration).
       }
       \sstsubsection{
          FILE = FILENAME (Write)
@@ -6920,7 +8174,8 @@ menu.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message output level. Default is NORM. There are no verbose messages.
+         Message output level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = CHAR (Write)
@@ -6928,6 +8183,14 @@ menu.
          The name of the HDS output file to contain the NDFs described above.
          This file will have the extension .sdf but this should not be
          specified in the name.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         scuphot o56\_lon\_ext average o56\_lon\_pht !
+      }{
+	Process o56\_lon\_ext by averaging integrations. Do not write
+        a text file containing the results.
       }
    }
    \sstnotes{
@@ -6951,7 +8214,7 @@ menu.
       SURF: \scucat
    }
    \sstimplementationstatus{
-      Ideally SCUPHOT should process MAP data on a per exposure basis.
+      Ideally \task{scuphot} should process MAP data on a per exposure basis.
       Currently only per integration is supported.
    }
 }
@@ -7002,7 +8265,7 @@ menu.
       the user to accept the new set and de-zoom to the original
       scale. To reset a previously flagged point, flag the point again
       but do \textit{not} accept it: the point will be set to GOOD again.  
-      Please read the note below the derscription of the menu on the use of the
+      Please read the note below the description of the menu on the use of the
       mouse.
 
       For each mode the menu items are a subset of:
@@ -7045,7 +8308,7 @@ menu.
          -m      mode:
       }{
          Select usage mode:
-           p: plot bolometers one by one, optionally overlayed with
+           p: plot bolometers one by one, optionally overlaid with
               data from the second input file (equivalent to \pltbol)
            d: interactively despike the data for the bolometers in
               specified file (equivalent to \dspbol).
@@ -7062,7 +8325,7 @@ menu.
       }{
          name of a second file: e.g. the despiked version of the NDF
          file. The same bolometers will be plotted in a second window or
-         overlayed for comparison.
+         overlaid for comparison.
       }
       \sstsubsection{
          -s min max
@@ -7193,12 +8456,12 @@ menu.
          Invoke the \scuclip\ task after \ext.
       }
       \sstsubsection{
-         -remsky
+         $-$remsky
       }{
          Invoke the \remsky\ task after \ext\ (or \scuclip).
       }
       \sstsubsection{
-         -rebin
+         $-$rebin
       }{
          Invoke the \rebin\ package after \ext\ (or \remsky)
       }
@@ -7467,6 +8730,117 @@ the files produced with SCUBA\_SUFFIX=long):
 
 
 \newpage
+\label{surf:setbolwt}
+\sstroutine{
+   SETBOLWT
+}{
+   Calculate or set bolometer weights
+}{
+   \sstdescription{
+      This routine sets the bolometer weights.
+      It can do this in two ways:
+
+       1. Calculate the statistics for each bolometer then generate the
+          weights relative to the central pixel. Should not be used when
+          a strong source is present. The weights are calculated by
+          using \Kappa\ \stats\ to calculate the standard deviation of
+          each bolometer in turn. The weight is defined as the relative
+          variance between this bolometer and the reference bolometer.
+
+       2. Read the weights from a text file using the -wtfile option.
+
+      Writes to the BOLWT extension. This extension is then read by \rebin.
+
+      Multiple files can be referenced to the first file by specifying
+      multiple files on the command line or by using a \task{rebin}-style 
+      input file and the -filelist option. In conjunction with the 
+      \texttt{-wtfile} option all input files are given the same weights.
+   }
+   \sstusage{
+      setbolwt [-h] [-wtfile=] [-filelist=] filenames...
+   }
+   \sstparameters{
+      \sstsubsection{
+         $-$h
+      }{
+         Return a usage message.
+      }
+      \sstsubsection{
+         $-$wtfile=file
+      }{
+         An ASCII text file containing the weights, one weight per line
+         corresponding to the order of bolometers stored in the file.
+      }
+      \sstsubsection{
+         $-$filelist=file
+      }{
+         An ASCII text file containing a list of files to be processed.
+         There must be one file per line and it must be in a form
+         acceptable to \rebin\ (ie comments can be included).
+      }
+      \sstsubsection{
+         filenames
+      }{
+         List of filenames to be processed. Wild cards can be used.
+         eg $*$\_lon\_ext.sdf.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         setbolwt
+      }{
+         The user will be prompted for a list of input NDFs. The weights
+         will be calculated by setbolwt.
+      }
+      \sstexamplesubsection{
+         setbolwt -wtfile=weights.dat file1
+      }{
+         Set the weights in file1.sdf from the list contained in
+         weights.dat
+      }
+      \sstexamplesubsection{
+         setbolwt file1 file2 file3 file4
+      }{
+         Calculate the weights of each bolometer in all four files
+         relative to the central pixel in file1.sdf.
+      }
+      \sstexamplesubsection{
+         setbolwt -wtfile=wt.dat -filelist=rebin.inp
+      }{
+         Set the weights of the files listed in rebin.inp to those
+         stored in wt.dat (same weights for each file).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Input files must have been extinction corrected so that only
+           one sub-instrument is present per file.
+
+         \sstitem
+         When multiple files are used bolometers are compared to the
+           central bolometer of the first file.
+
+         \sstitem
+         If source signal is present in any bolometer at a level
+           significantly above the noise, the automatic weighting will
+           be skewed (in fact the bolometer with the source signal will
+           be down-weighted relative to all the others since the standard
+           deviation on the bolometer will be much higher.). The weights
+           must be set via an external file in this case.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      SURF: \rebin\newline
+      \xref{KAPPA}{sun95}{}: \stats
+   }
+}
+
+
+\newpage
 \label{surf:sigclip}
 \sstroutine{
    SIGCLIP
@@ -7548,6 +8922,11 @@ the files produced with SCUBA\_SUFFIX=long):
 	 raw skydip data. The file can be located in \$DATADIR.   %%%%$
       }
       \sstsubsection{
+         B\_ERR = REAL (Write)
+      }{
+         Error in the fitted value of B. Set to bad if the fit has failed.
+      }
+      \sstsubsection{
          B\_FIT = REAL (Write)
       }{
          The fitted value of the B parameter (Filter transmission).
@@ -7577,6 +8956,12 @@ the files produced with SCUBA\_SUFFIX=long):
          The default value is read from the file header.
       }
       \sstsubsection{
+         ETA\_TEL\_ERR = REAL (Write)
+      }{
+         Error in the fitted value of ETA\_TEL. 
+         Set to bad if the fit has failed.
+      }
+      \sstsubsection{
          ETA\_TEL\_FIT = REAL (Write)
       }{
         The fitted value of ETA\_TEL. Set to bad if the fit has failed.
@@ -7595,7 +8980,8 @@ the files produced with SCUBA\_SUFFIX=long):
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Default is NORM. There are no verbose messages.
+         Message filter level. Allowed values are QUIET, NORM and VERB.
+         Default is NORM. There are no verbose messages.
       }
       \sstsubsection{
          OUT = CHAR (Write)
@@ -7604,11 +8990,21 @@ the files produced with SCUBA\_SUFFIX=long):
          sky temperatures.
       }
       \sstsubsection{
+         SIGMA = REAL (Write)
+      }{
+         Standard deviation of the residuals of the fit (Kelvin).
+      }
+      \sstsubsection{
          SUB\_INSTRUMENT = CHAR (Read)
       }{
          The name of the sub-instrument whose data are to be
          selected from the input file and fitted. Permitted
          values are SHORT, LONG, P1100, P1350 and P2000
+      }
+      \sstsubsection{
+         TAUZ\_ERR = REAL (Write)
+      }{
+         Error in the fitted value of TAUZ. Set to bad if the fit has failed.
       }
       \sstsubsection{
          TAUZ\_FIT = REAL (Write)
@@ -7637,7 +9033,9 @@ the files produced with SCUBA\_SUFFIX=long):
       \sstsubsection{
         XISQ = REAL (Write)
       }{
-        The reduced $\chi^2$ of the fit.
+        The reduced $\chi^2$ of the fit. The nature of the error determination
+        forces the reduced $\chi^2$ to be approximately 1. The SIGMA
+        parameter provides a better guide to the goodness of fit.
       }
    }
    \sstexamples{
@@ -8482,7 +9880,7 @@ For more information see \cite{skydip}.
 
 Occasionally it is necessary to remove bad points from skydip data prior to
 fitting. This is implemented in the same way as it is implemented for 
-other SCUBA data by using \chgqual. The following extra steps are reuquired:
+other SCUBA data by using \chgqual. The following extra steps are required:
 
 \begin{enumerate}
 
@@ -8520,7 +9918,7 @@ map data: it contains a 2 dimensional data array of sub-instrument (bolometer)
 number along the first axis and sample number (number of integrations times
 number of measurements) along the second axis. You can find the sub-instrument corresponding to each `bolometer' 
 number either by running \skydip\ and noting the order of the listed
-sub-instruemnts or by using the \Kappa\ \fitslist\ command:
+sub-instruments or by using the \Kappa\ \fitslist\ command:
 \begin{myquote}
 \begin{verbatim}
 % fitslist o70 | grep SUB_
@@ -8558,7 +9956,7 @@ The main thing here is that the \texttt{m} identifier should be used to specify
 measurements\footnote{Of course it is still possible to specify an integration 
 to be marked bad but remember to specify also the measurement otherwise the 
 `nth' integration for each measurement will be marked bad rather than the
-`nth' integration of the `mth' measuremtn.} and that only bolometer (i.e.\
+`nth' integration of the `mth' measurement.} and that only bolometer (i.e.\
 sub-instrument) 2 should be affected. 
 
 
@@ -8578,7 +9976,8 @@ SURF: file contains data for 10 integration(s) in 10 measurement(s)
 ETA_TEL - Telescope efficiency /0.87/ > 
 B_VAL - B parameter /-1/ > 
 SCULIB: fit for filter 750 and sub-instrument LONG_DC
- eta =   0.87          b =   0.69  tau =   0.698  X=    13.1  N=   12
+ eta =  0.87 +/-  0.00  b =  0.86 +/-  0.01  tau =   0.667 +/- 0.007
+ Standard Deviation of fit residual =   0.81 K (X=     0.9 N=    7)
 \end{verbatim}
 \end{myquote}
 The fit is shown in Fig.\ \ref{fitsdip}. \skydip\ is the only task that can
@@ -8642,7 +10041,7 @@ astronomical signals. The pattern of the calibrator signal from the SCUBA
 bolometers forms a signature that is constant over long periods and can be
 used to detect shifts in the data.
 
-To illustrate this point there are four datafiles distributed with this
+To illustrate this point there are four data files distributed with this
 package.\footnote{The files can be found in \$SURF\_DIR/}         
 These files contain the calibrator signal for this period for the
 450- and 850~$\mu$m filters\footnote{for the calibrator signal prior to April
@@ -8790,17 +10189,22 @@ file calsig\_450\_850\_photom.sdf.
 
 \section{\xlabel{ndfperl}Notes on scripts\label{ndfperl}}
 
-\sculog, \scushift\ and the scripts \scuquick, \qdraw\ and \sigclip\ do not form part of
+\sculog, \scushift\ and the scripts \scuquick, \qdraw, \remdbm, \chgnacent,
+\setbolwt\  and \sigclip\ do not form part of
 the \scusoft\ monolith and are all written in perl \cite{Perl}. They all use
-the Perl NDF module and therefore require at least version 5.003 of perl. The
-perl NDF binary will be installed as /star/bin/ndfperl on Starlink sites but
+the \xref{Perl NDF module}{sun222}{} \cite{ndfperl}  and therefore require at least version 5.003 of perl. The
+perl NDF binary will be installed as /star/bin/ndfperl on Starlink sites.
+\xref{NDFPERL}{sun222}{} is distributed by Starlink and 
 can also be obtained from
 \htmladdnormallinkfoot{JCMT software web pages}{http://www.jach.hawaii.edu/jcmt\_sw/perl/}.
 
 The \sdip, \scuplot\ and \scupa\ scripts are written in C-shell.
 
-Additionally, \qdraw, \sigclip, \sdip, \scuplot\ and \scupa\ require that
-\Kappa\ is installed.
+\scunoise\ is written in perl/Tk (version 800.001 or newer, available from
+\htmladdnormallink{CPAN}{http://www.perl.org/CPAN/}).
+
+Additionally, \qdraw, \sigclip, \sdip, \scuplot, \setbolwt, \remdbm\ and 
+\scupa\ require that \Kappa\ is installed.
 
 
 \end{document}
