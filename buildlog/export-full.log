@@ -809,7 +809,7 @@ install:
 prepare:
 
 check_packages:
-[available] Sep 12, 2003 4:27:13 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 13, 2003 4:25:38 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1666,9 +1666,9 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeProxy.java:58: warning - The first sentence is interpreted to be:
   [javadoc] "Return whether this classifier is incremental, i.e. whether
   [javadoc]  this classifier can support multiple calls to "train"."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeProxy.java:58: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if this attribute is "visible." This tells
   [javadoc]  attribute editors and so on whether or not to display
   [javadoc]  this attribute."
@@ -2015,6 +2015,12 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphModel.java:101: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphViewListener.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/MutableGraphModel.java:22: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/GraphModel.html...
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node, i.e. it can contain children."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeController.java:59: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeRenderer.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/AbstractGraphController.java:31: warning - @rating is an unknown tag.
@@ -2027,12 +2033,6 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphPane.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphUtilities.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphViewEvent.java:25: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/GraphModel.html...
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node, i.e. it can contain children."
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/JGraph.html...
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/JGraph.java:28: Tag @see: Malformed: GraphModel, GraphPane
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeDragInteractor.java:32: warning - @rating is an unknown tag.
@@ -3625,45 +3625,45 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: Tag @see: Malformed: TimeSeriesImpl, FITSTimeSeriesImpl
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:51: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/GramAccess.html...
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:45: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:68: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:57: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:51: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:45: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:68: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:57: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/DataLimits.java:15: warning - Tag @see: reference not found: SpecDataComp
   [javadoc] "Get the full range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the full range (i.e. data limits plus standard deviations)
   [javadoc]   of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:45: warning - The first sentence is interpreted to be:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the range (i.e. data limits) of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:68: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time and data value)
   [javadoc]   that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:57: warning - The first sentence is interpreted to be:
   [javadoc] "Get the dimension of the time series (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the dimension of the time series (i.e. the number of values
   [javadoc]   it contains)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:51: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/TimeSeriesAccess.html...
   [javadoc] "Get the full range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the full range (i.e. data limits plus standard deviations)
   [javadoc]   of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:45: warning - The first sentence is interpreted to be:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the range (i.e. data limits) of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:68: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time and data value)
   [javadoc]   that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:57: warning - The first sentence is interpreted to be:
   [javadoc] "Get the dimension of the time series (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the dimension of the time series (i.e. the number of values
   [javadoc]   it contains)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/DataLimits.java:15: warning - Tag @see: reference not found: SpecDataComp
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/Ephemeris.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Ephemeris.java:14: Tag @see: Malformed: TimeSeries, FoldSeriesDialog
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:29: warning - @created is an unknown tag.
@@ -4363,11 +4363,11 @@ javadoc-sources:
   [javadoc]  attached to it). "
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontControls.java:30: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsEdges.html...
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsHints.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: Tag @see: Malformed: Plot, PlotConfig.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
@@ -4421,4 +4421,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 15 minutes 6 seconds
+Total time: 15 minutes 2 seconds

@@ -352,7 +352,7 @@ install:
 prepare:
 
 check_packages:
-[available] Sep 12, 2003 4:42:31 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 13, 2003 4:41:01 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -392,26 +392,26 @@ javadocs:
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
   [javadoc] "AstStrings is a model for all the general text elements shown in
   [javadoc]  an AST Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "AstStrings is a model for all the general text elements shown in
   [javadoc]  an AST Plot (i.e. those with element name "strings"). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
   [javadoc] "The number of digits used to determine gap between major axes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
@@ -1637,6 +1637,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/toolbox/GraphLogger.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/toolbox/TypedNodeRenderer.java:23: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e. how to render a node if it
+  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/tutorial/EditorTutorial.java:43: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/tutorial/NestedTutorial.java:38: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/tutorial/NodeRendererTutorial.java:40: warning - @rating is an unknown tag.
@@ -1645,32 +1652,25 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeAdapter.java:41: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeProxy.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeProxy.java:58: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeAdapter.java:46: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeAdapter.java:49: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeController.java:78: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphController.java:68: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:47: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e. how to render a node if it
-  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/AttributeProxy.html...
   [javadoc] "Return true if this attribute is "visible." This tells
   [javadoc]  attribute editors and so on whether or not to display
   [javadoc]  this attribute."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if this attribute is "visible." "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeAdapter.java:46: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeAdapter.java:49: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeController.java:78: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphController.java:68: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:47: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/GraphModel.html...
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeController.java:90: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/NodeController.html...
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeController.java:268: Tag @see: Malformed: GraphController#rerenderSubgraph(Iterator);
@@ -1750,6 +1750,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/lwgraph/Topology.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/lwgraph/Traversal.java:50: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/test/LightweightGraphTest.java:243: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/SketchListener.java:19: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/Symbol.java:22: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/pod/test/LightweightGraphTest.html...
   [javadoc] "A test case containing the following test graph, where the labels
   [javadoc]  are the 'name' attribute of the nodes and edges:
@@ -1766,8 +1768,6 @@ javadocs:
   [javadoc]  b --q---+  \      V   |
   [javadoc]              +-s-> e --+
   [javadoc]  </pre>"
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/SketchListener.java:19: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/Symbol.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/BasicInterpreter.java:37: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/CheckSelectionAction.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/CompositeSymbol.java:22: warning - @rating is an unknown tag.
@@ -2061,6 +2061,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -3211,22 +3212,22 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Ephemeris.java:14: Tag @see: Malformed: TimeSeries, FoldSeriesDialog
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:29: warning - @created is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:221: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:215: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:165: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:281: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/Gram.html...
   [javadoc] "The full range of coordinates spanned (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
   [javadoc]  yPos, plus the standard deviations in yPos)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:215: warning - The first sentence is interpreted to be:
   [javadoc] "The range of coordinates spanned (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The range of coordinates spanned (i.e. min/max values in xPos and
   [javadoc]  yPos)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:165: warning - The first sentence is interpreted to be:
   [javadoc] "The TimeSeriesComp object associated with Periodogram, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The TimeSeriesComp object associated with Periodogram, i.e. the
   [javadoc]  time series of which this is a periodogram."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:281: warning - The first sentence is interpreted to be:
   [javadoc] "Whether this gram should be used when auto-ranging (certain classes
   [javadoc]  of gram, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -3539,4 +3540,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 46 seconds
+Total time: 5 minutes 51 seconds
