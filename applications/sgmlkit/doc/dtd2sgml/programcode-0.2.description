@@ -10,6 +10,175 @@
 <p>If this attribute is present, it indicates that the function has no
 arguments.  In this case, there should be no <elemref gi=parameter> content.
 
+<element gi='author'>
+<p>Describes the author of a function.
+
+<p>The <elemref self gi='author'> element includes full details about
+an author and has a required ID attribute, the <elemref
+gi='authorref'> element simply refers to an <elemref self gi='author'>
+element elsewhere using an IDREF.  We need the distinction since it
+follows from the fact that the element has a (unique) ID attribute,
+that a document can have only one <elemref self gi='author'> element
+per author.  If the actual text of a document is scattered amongst
+several source-code files, then it would be appropriate for the
+scattered files to have <elemref gi='authorref'> elements, and for the
+corresponding <elemref self gi='author'> element to be in a <elemref
+gi='codegroup'> element in a `master' file which collects together
+the source-code files for documentation purposes.
+
+<attribute name='id'>
+<p>A unique ID for the author.  This is used within <elemref
+gi='authorref'> and <elemref gi=change> elements.
+
+<attribute name='affiliation'>
+<p>An optional affiliation for the author.  It contains text such as
+`Starlink, University of Glasgow'.
+
+<attribute name='email'>
+<p>An email address for the author.
+
+<attribute name='webpage'>
+<p>A URL for the author.
+
+<element gi='authorlist'>
+<p>Contains the collection of authors who have contributed to a
+particular function.  Authors who have indirectly contributed code --
+perhaps a package you've based the function on -- can be credited in
+the <elemref gi='otherauthors'> element.
+
+<element gi='authornote'>
+<p>Optional further information about an author.
+
+<element gi='authorref'>
+<p>A reference to an author whose details are in the <elemref
+gi=author> element referred to by the ID attribute.
+
+<attribute name='id'>
+<p>The link to the <elemref gi=author> element.
+
+<attribute name='note'>
+<p>A note giving further information about the author, in this
+context.  For example, ISO 10179 was listed as an `author' of some of
+the routines in the DSSSL stylesheet, and this attribute was used to
+list the section of the standard where the code was defined.
+
+<element gi='change'>
+<p>A description of a change made to the code.
+
+<attribute name='author'>
+<p>The ID of the author who made the change, linking to a previous
+<elemref gi=author> element.
+<attribute name='date'>
+<p>The date the change was made.  Format is dd-MMM-yyyy -- a two-digit
+day of month, a three-letter abbreviation for the month (uppercase),
+and a four-digit year.
+
+<element gi='code'>
+<p>Text which is to be presented as `code'.  The text is not escaped
+in any way, so that characters which are significant to an SGML parser
+should either be escaped by entity references, or the text included
+within a <code/CDATA/ marked section.
+
+<element gi='codebody'>
+<p>The actual code of the function.
+
+<attribute name='empty'>
+<p>The <elemref gi=codebody> element is required, buf if there is no
+code actually included within the document, so that the element is
+empty, then this may be indicated by the presence of this attribute.
+
+<element gi='codegroup'>
+<p>A codegroup is a collection of functions or other
+code which can sensibly be grouped together.
+There's no particular semantics implied by the
+grouping, as far as this DTD is (currently)
+concerned.
+
+<p>However, the DTDs which include this programcode DTD may add
+semantics to this element.  For example, the DSSSL DTD maps this
+element to the <code/style-specification/ element in the DSSSL architecture.
+
+<attribute name='language'>
+<p>The programming language used by the code within the group.  This
+will be set by the DTD which includes this programcode DTD, and you
+need not (indeed cannot) set it.
+
+<element gi='codeprologue'>
+<p>This is the header which documents the routine, or other code, to follow.
+
+<element gi='codereference'>
+<p>Make a link to code in another document.  There is no defined
+semantics attached to this link in general, but it might be used to
+document a dependency between two modules, such as a source code file
+depending on an include file.
+
+<p>The document referred to should be marked up using this programcode DTD.
+
+<p>As with the <elemref gi=codegroup> element, the DSSSL DTD adds
+semantics to this element.  It maps this element to the
+<code/external-specification/ element in the DSSSL architecture.
+
+<attribute name='docid'>
+<p>An ID within the target document, if required.
+
+<attribute name='doc'>
+<p>A subdoc entity which references the document being linked to.
+
+<element gi='copyright'>
+<p>A copyright statement attached to the code.
+
+<element gi='description'>
+<p>A detailed description of the code to follow.  If this is
+extensive, then a brief statement should be included within the
+optional <elemref gi=purpose> element.
+
+<element gi='docblock'>
+<p>A block of documentation, introducing either a complete document,
+or one of the <elemref gi=codegroup> or <elemref gi=codereference> blocks.
+
+<element gi='em'>
+<p>Text to be emphasised.
+
+<element gi='func'>
+<p>One function or procedure.
+
+<element gi='funcname'>
+<p>Another function name presumably in the same collection of code.
+There are no restrictions on what function names you can list here.
+The formatting system might, for example, be able to make a link to
+the documentation of that function, if it can find it.
+
+<element gi='history'>
+<p>The change history for the document or block.  The changes should
+be in chronological order, with newest last.
+
+<element gi='li'>
+<p>A list item.
+
+<element gi='misccode'>
+<p>Other code, not categorised as a function or procedure.
+
+<element gi='miscprologue'>
+<p>The prologue for miscellaneous code.
+
+<element gi='name'>
+<p>The author/function/parameter name, depending on context.
+
+<element gi='otherauthors'>
+<p>Other contributors to a package, with a less direct involvement with
+it than would be appropriate for inclusion in an <elemref gi=author>
+element.
+
+<element gi='othernames'>
+<p>Sometimes a function will have a generic form, as well as specific
+forms for, for example, single and double precision.  In this case,
+the function's generic name can be given in the <elemref
+gi=routinename>'s <elemref gi=name> element, and other names for it
+can be included as <elemref self gi=othernames>.
+
+<element gi='p'>
+<p>A paragraph of text.
+
 <element gi='parameter'>
 <p>A single parameter for a function.
 <attribute name='direction'>
@@ -27,49 +196,37 @@ and keyword means that the parameter is
 specified with a keyword.  Both mechanisms
 are used in both DSSSL and IDL (for
 example). 
-<!--
-<element gi='author'>
-<attribute name='id'>
-<attribute name='affiliation'>
-<element gi='authorlist'>
-<element gi='authornote'>
-<element gi='authorref'>
-<attribute name='id'>
-<attribute name='note'>
-<element gi='change'>
-<attribute name='author'>
-<attribute name='date'>
-<element gi='code'>
-<element gi='codebody'>
-<attribute name='empty'>
-<element gi='codegroup'>
-<attribute name='language'>
-<element gi='codeprologue'>
-<element gi='codereference'>
-<attribute name='docid'>
-<attribute name='doc'>
-<element gi='copyright'>
-<element gi='description'>
-<element gi='docblock'>
-<element gi='em'>
-<element gi='func'>
-<element gi='funcname'>
-<element gi='history'>
-<element gi='li'>
-<element gi='misccode'>
-<element gi='miscprologue'>
-<element gi='name'>
-<element gi='otherauthors'>
-<element gi='othernames'>
-<element gi='p'>
+
 <element gi='programcode'>
+<p>The top-level element.
+
 <element gi='purpose'>
+<p>A brief description of the function being documented.  If this is
+missing, then the contents of the <elemref gi=description> are used
+instead, but if that element has a lot of content, then you should
+provide a <elemref self gi=purpose> element, to be used in contexts
+where only a brief function description is required.
+
 <element gi='returnvalue'>
+<p>The return value of a function.  If there is none, then the
+attribute none should be present.
+
 <attribute name='none'>
+<p>If there is no return value, then give this attribute.
 <attribute name='type'>
+<p>A string indicating the type of the return value of the function.
+
 <element gi='routinename'>
+<p>The name of the routine being documented.
+
 <element gi='title'>
+<p>The title of the document, or code block.
+
 <element gi='type'>
+<p>The type of a parameter, as a string.
+
 <element gi='ul'>
+<p>An unordered list.
+
 <element gi='url'>
--->
+<p>A reference to a URL.
