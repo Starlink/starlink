@@ -479,7 +479,7 @@
           DO YBIN = 1, DIMS(3)
 
 *          This Y position in radians
-            X = (YBASE + (REAL(YBIN)-1.0) * PYSCALE) * TOR
+            Y = (YBASE + (REAL(YBIN)-1.0) * PYSCALE) * TOR
 
 *          Loop over X psf bins
             DO XBIN = 1, DIMS(4)
