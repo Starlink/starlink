@@ -1,0 +1,49 @@
+!+
+!  Catalogue: testcat
+!
+!  This catalogue is formatted as a CURSA small text list (STL).
+!  For a description of this format see Starlink User Note 190 or URL
+!  http://www.roe.ac.uk/acdwww/cursa/home.html.
+!-
+
+C  COLI     INTEGER   1     EXFMT=I6
+:    COMMENTS='Integer column'
+C  COLR     REAL      2     EXFMT=E12.3
+:    COMMENTS='Real column'
+C  COLC     CHAR*10   3     EXFMT=A12
+:    COMMENTS='Character column'
+
+
+P  PARI     INTEGER   23    EXFMT=I6
+:    COMMENTS='Integer parameter'
+P  PARR     REAL      42    EXFMT=E12.3
+:    COMMENTS='Real parameter'
+P  PARC     CHAR*20   'Example string'   EXFMT=A22
+:    COMMENTS='Character parameter'
+
+BEGINTABLE
+     1     0.240E+02  ' Loop   1%'
+     2     0.250E+02  ' Loop   2%'
+     3     0.260E+02  ' Loop   3%'
+     4     0.270E+02  ' Loop   4%'
+     5     0.280E+02  ' Loop   5%'
+     6     0.290E+02  ' Loop   6%'
+     7     0.300E+02  ' Loop   7%'
+     8     0.310E+02  ' Loop   8%'
+     9     0.320E+02  ' Loop   9%'
+<null>  <null>  <null>
+    11     0.340E+02  ' Loop  11%'
+    12     0.350E+02  ' Loop  12%'
+    13     0.360E+02  ' Loop  13%'
+    14     0.370E+02  ' Loop  14%'
+    15     0.380E+02  ' Loop  15%'
+    16     0.390E+02  ' Loop  16%'
+    17     0.400E+02  ' Loop  17%'
+    18     0.410E+02  ' Loop  18%'
+    19     0.420E+02  ' Loop  19%'
+    20     0.430E+02  ' Loop  20%'
+    21     0.440E+02  ' Loop  21%'
+    22     0.450E+02  ' Loop  22%'
+    23     0.460E+02  ' Loop  23%'
+    24     0.470E+02  ' Loop  24%'
+    25     0.480E+02  ' Loop  25%'
