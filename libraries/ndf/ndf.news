@@ -1,6 +1,10 @@
 NDF Library
 -----------
-   A new release (V1.5-6) of the NDF library is now available.
+   A new release (V1.5-9) of the NDF library is now available.
+
+   - This is a maintenance release. The build system has changed.
+
+V1.5-6
 
    - A bug has been fixed in the C interface for function ndfChunk.
 
