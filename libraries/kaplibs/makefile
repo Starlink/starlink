@@ -432,7 +432,7 @@ irq_source.tar lpg_source.tar kapgrf_source.tar
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-GEN_PUBLIC_SCRIPTS = $(PKG_NAME)_link_adam kplsearch
+GEN_PUBLIC_SCRIPTS = $(PKG_NAME)_link_adam $(PKG_NAME)_link kplsearch
 PUBLIC_SCRIPTS = $(GEN_PUBLIC_SCRIPTS) 
 
 #  Startup script.  This is the file that must be executed by a

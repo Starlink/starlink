@@ -413,7 +413,7 @@ PKG_LINK = DIPSO
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 3.5-7
+PKG_VERS = 3.6
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -478,7 +478,7 @@ PI_SUB2 =
 #  the files.
 
 EXTERNAL_INCLUDES = DAT_PAR DAT_ERR SAE_PAR PAR_ERR MSG_PAR NDF_PAR PRM_PAR \
-CAT_PAR CAT_ERR
+CAT_PAR CAT_ERR AST_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -620,6 +620,7 @@ NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 CAT_ERR:   $(STAR_INC)/cat_err;   $(LINK) $? $@
+AST_ERR:   $(STAR_INC)/ast_err;   $(LINK) $? $@
 
 KUSE_COM:       kuse_com;         $(LINK) $? $@
 KARS_COM:       kars_com;         $(LINK) $? $@
@@ -1447,7 +1448,7 @@ pwritit.o: SAE_PAR
 rdcat.o:  SAE_PAR MSG_PAR CAT_PAR     
 rdctd.o:  SAE_PAR CAT_PAR PRM_PAR DECLARE_STKS DECLARE_DATA
 rdkybd.o: DSB_CLR
-rdndf.o: DAT_PAR DECLARE_DATA DECLARE_STKS PRM_PAR SAE_PAR
+rdndf.o: DAT_PAR DECLARE_DATA DECLARE_STKS PRM_PAR SAE_PAR AST_PAR
 rdstr.o: PAR_ERR SAE_PAR
 read.o: DAT_PAR MSG_PAR SAE_PAR
 reca.o: DSB_CLR SAE_PAR
@@ -1470,7 +1471,7 @@ upush.o: declare_stks.f
 wrcopy.o: SAE_PAR
 write.o: DAT_PAR DECLARE_DATA DECLARE_STKS MSG_PAR PAR_ERR SAE_PAR
 write_ndf.o: DAT_PAR SAE_PAR
-wrndf.o: DAT_PAR DECLARE_DATA DECLARE_LBLS DECLARE_STKS SAE_PAR
+wrndf.o: DAT_PAR DECLARE_DATA DECLARE_LBLS DECLARE_STKS SAE_PAR AST_PAR
 wrprop.o: DAT_PAR SAE_PAR
 xhelp.o: SAE_PAR
 #-------------------------------------------------------------------------------

@@ -16,9 +16,10 @@
 *     The NDF is created as the top level object in a new container
 *     file.  The FLUX data is copied from the common array to the NDF's
 *     DATA array. The WAVE data is copied from common to the NDF's AXIS
-*     CENTRE array. The supplied title is stored. The NDF label is set
-*     to the current Y axis label. The label for axis 1 is set to the
-*     current X axis label. A DIPSO_EXTRA extension is created
+*     CENTRE array. An appropriate SpecFrame is created and added into
+*     the default NDF WCS FrameSet. The supplied title is stored. The NDF 
+*     label is set to the current Y axis label. The label for axis 1 is 
+*     set to the current X axis label. A DIPSO_EXTRA extension is created
 *     containing the WORV value and the current BREAK array. If an
 *     error occurs during this routine the new NDF is deleted.
 
@@ -43,6 +44,8 @@
 *        Original version.
 *     13-DEC-1995 (DSB):
 *        Modified to use NDF_PLACE instead of HDS_NEW.
+*     17-FEB-2003 (DSB):
+*        Modified to add a WCS component to the NDF.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -56,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'AST_PAR'          ! AST__ constants and functions
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! DIPSO array sizes, etc.
@@ -99,8 +103,13 @@
 *  External References:
       INTEGER CHR_LEN                   ! Used length of a string
 
+*  Local Constants:
+      REAL C                            ! Speed of light (km/s)
+      PARAMETER ( C = 2.9979246E+05 )
+
 *  Local Variables:
       CHARACTER 
+     :        BUFF*50,                  ! Buffer for formatted attribute value
      :        ROOT*9,                   ! Root of stack array names
      :        XLOC*(DAT__SZLOC)         ! Locator to DIPSO_EXTRA extension
 
@@ -109,10 +118,12 @@
      :        INDF,			! NDF identifier
      :        IPAXIS,                   ! Pointer to mapped AXIS CENTRE array
      :        IPDATA,                   ! Pointer to mapped DATA array
+     :        IWCS,                     ! Pointer to WCS FrameSet
+     :        JUNK,                     ! Pointer to an unused FrameSet
      :        L,                        ! Index of last non-blank character
      :        NDFSIZ,                   ! Size of the NDF
-     :        PLACE                     ! Place holder for new NDF
-      
+     :        PLACE,                    ! Place holder for new NDF
+     :        SPCFRM                    ! Pointer to new SpecFrame
 *.
 
 *  Check inherited global status.
@@ -130,6 +141,9 @@
      :                 'given. Use ''.sdf'' or omit the file type '//
      :                 'altogether.', STATUS )
       END IF
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
@@ -214,10 +228,48 @@
 
       END IF
 
+*  Now create a WCS component within the NDF: we create a SpecFrame
+*  describing the contents of the AXIS structure, and then add it into
+*  the default NDF WCS FrameSet using a UnitMap to connect it to the AXIS
+*  Frame. First create a default SpecFrame.
+      SPCFRM = AST_SPECFRAME( ' ', STATUS )
+
+*  Now set its attributes appropriately.
+      IF( WORV .EQ. 1.0 ) THEN
+         CALL AST_SETC( SPCFRM, 'SYSTEM', 'WAVE', STATUS )
+         CALL AST_SETC( SPCFRM, 'UNIT', 'Angstrom', STATUS )
+      ELSE 
+         CALL AST_SETC( SPCFRM, 'SYSTEM', 'VOPT', STATUS )
+         CALL AST_SETC( SPCFRM, 'UNIT', 'km/s', STATUS )
+         WRITE( BUFF, * ) WORV*C,' Angstrom'
+         CALL AST_SETC( SPCFRM, 'RESTFREQ', BUFF, STATUS )
+      END IF
+  
+*  Get the default WCS FrameSet for the NDF. This will contain GRID,
+*  PIXEL and AXIS Frames.
+      CALL NDF_GTWCS( INDF, IWCS, STATUS )
+
+*  Find the AXIS Frame and make it the current Frame within the IWCS
+*  FrameSet.
+      JUNK = AST_FINDFRAME( IWCS, AST_FRAME( 1, 'DOMAIN=AXIS', STATUS ), 
+     :                      ' ', STATUS ) 
+
+*  Add the SpecFrame into the IWCS FrameSet, using a 1-dimensional
+*  UnitMap to connect it to the current (AXIS) Frame. 
+      CALL AST_ADDFRAME( IWCS, AST__CURRENT, AST_UNITMAP( 1, ' ', 
+     :                                                    STATUS ),
+     :                   SPCFRM, STATUS ) 
+
+*  Store the modified FrameSet back in the NDF.
+      CALL NDF_PTWCS( IWCS, INDF, STATUS )
+
 *  If an error has occurred, attempt to delete the NDF.
       IF( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF, STATUS )
 
 *  End the NDF context. This will annul the NDF identifier, INDF.
       CALL NDF_END( STATUS )
+
+*  End the AST context. This will annul all AST objects references.
+      CALL AST_END( STATUS )
 
       END
