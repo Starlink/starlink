@@ -233,7 +233,7 @@
 *  Implementation Status:
 *     - The routine supports BAD pixels and all numeric data types
 *       except COMPLEX.  All combinational arithmetic is performed using
-*       floating values.  The UNITS, AXIS, TITLE and QUALITY components
+*       floating values.  The UNITS, AXIS and TITLE components
 *       are correctly propagated. Any input variances are ignored.
 
 *  Notes:
@@ -298,6 +298,10 @@
 *        Updated for CCDPACK 2.0.
 *     31-JAN-1998 (PDRAPER):
 *        Added clipmed combination method.
+*     25-JUN-1998 (PDRAPER):
+*        Stopped the propagation of quality from the first NDF to the
+*        output. This was not the right thing to do when the NDFs are
+*        padded to match bounds (regions of BAD quality are introduced).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -540,11 +544,11 @@
      :              STATUS )
 
 *  Create the output NDF to contain the result. Propagating axis,
-*  quality, label, history, units from the first NDF. Do NOT propagate
+*  label, history, units from the first NDF. Do NOT propagate
 *  the CCDPACK extension (the information in this only applies to the
-*  input NDF).
+*  input NDF) or the QUALITY component.
       CALL CCD1_NDFPR( 'OUT', STACK( 1 ),
-     :                 'Axis,Quality,Units,Noext(CCDPACK) ', NDFOUT,
+     :                 'Axis,Units,Noext(CCDPACK) ', NDFOUT,
      :                 STATUS )
 
 *  Set the output types (as explained above) to the processing

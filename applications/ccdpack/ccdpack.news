@@ -6,6 +6,10 @@
   to 100 input and 100 output files. Previously these programs where
   limited to 40 files in total. 
 
+  The propagation of QUALITY in the MAKEBIAS, MAKECAL, MAKEFLAT and
+  MAKEMOS applications has been suppressed. A bug in TRANNDF when
+  propagating QUALITY has been corrected.
+
   CCDPACK is fully described in SUN/139 and can be viewed on-line using 
   the "showme sun139" command. The latest information about CCDPACK 
   problems is always available at:

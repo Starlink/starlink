@@ -592,7 +592,7 @@
 *       types, with arithmetic being performed using the appropriate
 *       floating point type. It can process NDFs with any number of
 *       dimensions. The DATA, TITLE and VARIANCE components of an NDF
-*       are directly supported, with the AXIS, HISTORY, LABEL, QUALITY
+*       are directly supported, with the AXIS, HISTORY, LABEL
 *       and UNITS components and all extensions being propagated from 
 *       the first input NDF supplied (note that AXIS values, if 
 *       present, will normally be extrapolated as a result of 
@@ -654,6 +654,10 @@
 *        Removed top-level locator control (foreign data access upgrade).
 *     31-JAN-1998 (PDRAPER):
 *        Added clipmed combination method.
+*     25-JUN-1998 (PDRAPER):
+*        Stopped the propagation of quality from the first NDF to the
+*        output. This was not the right thing to do when the NDFs are
+*        padded to match bounds (regions of BAD quality are introduced).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1044,11 +1048,12 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Mark the error stack and attempt to create the output NDF by
-*  propagating from this section.
+*  propagating from this section. Do NOT propagate QUALITY as this may
+*  be padded with BAD values and only applies to the first NDF.
       CALL ERR_MARK
  10   CONTINUE
       DOOUT = .TRUE.
-      CALL NDF_PROP( NDFX, 'Units,Quality,Axis', 'OUT', NDFOUT, STATUS )
+      CALL NDF_PROP( NDFX, 'Units,Axis', 'OUT', NDFOUT, STATUS )
 
 *  If a null output NDF is given, and the input NDFs are being
 *  modified, then note that no output NDF has been given, annul the

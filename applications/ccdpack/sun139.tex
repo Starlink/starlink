@@ -7980,7 +7980,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          \sstitem
          The routine supports BAD pixels and all numeric data types
            except COMPLEX.  All combinational arithmetic is performed using
-           floating values.  The UNITS, AXIS, TITLE and QUALITY components
+           floating values.  The UNITS, AXIS and TITLE components
            are correctly propagated. Any input variances are ignored.
       }
    }
@@ -8308,7 +8308,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          \sstitem
          The routine supports BAD pixels and all data types except
            COMPLEX. All combinational arithmetic is performed in floating
-           point. The AXIS, TITLE and QUALITY components are correctly
+           point. The AXIS and TITLE components are correctly
            propagated. The variances are propagated through the combination
            processing, assuming that the input data have a normal
            distribution.
@@ -8640,7 +8640,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          \sstitem
          The routine supports BAD pixels and all data types except
            COMPLEX.  All combinational arithmetic is performed using
-           floating point.  The AXIS, TITLE and QUALITY components are
+           floating point.  The AXIS and TITLE components are
            correctly propagated. The output is a ratio so the units are set
            to blank. The variances are propagated through the combination
            processing, assuming that the input data have a normal
@@ -9398,7 +9398,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
            types, with arithmetic being performed using the appropriate
            floating point type. It can process NDFs with any number of
            dimensions. The DATA, TITLE and VARIANCE components of an NDF
-           are directly supported, with the AXIS, HISTORY, LABEL, QUALITY
+           are directly supported, with the AXIS, HISTORY, LABEL 
            and UNITS components and all extensions being propagated from
            the first input NDF supplied (note that AXIS values, if
            present, will normally be extrapolated as a result of
@@ -12699,6 +12699,12 @@ More minor changes include:
 The applications \xroutine{FINDOFF} and \xroutine{REGISTER} have been
 modified to open up to 100 input and 100 output files. Previously
 these programs where limited to 40 files in total.
+
+The propagation of QUALITY in the \xroutine{MAKEBIAS},
+\xroutine{MAKECAL}, \xroutine{MAKEFLAT} and
+\xroutine{MAKEMOS} applications has been suppressed. A bug in 
+\xroutine{TRANNDF} when
+propagating QUALITY has been corrected.
 
 \begin{latexonly}
 

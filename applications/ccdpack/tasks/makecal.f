@@ -21,16 +21,16 @@
 
 *  Description:
 *     This routine performs the combination of a series of dark count
-*     or pre-flash exposure frames. The input NDFs should have been 
-*     bias subtracted. The input data are divided by the exposure 
+*     or pre-flash exposure frames. The input NDFs should have been
+*     bias subtracted. The input data are divided by the exposure
 *     factors before combination into a calibration "master", giving an
-*     output NDF whose data represent one unit of the given exposure 
-*     time per pixel. Thus the calibration frame should be multiplied 
-*     by the appropriate factor before subtracting from other frames 
-*     (i.e. by the dark time or the flash-exposure time). This can be 
+*     output NDF whose data represent one unit of the given exposure
+*     time per pixel. Thus the calibration frame should be multiplied
+*     by the appropriate factor before subtracting from other frames
+*     (i.e. by the dark time or the flash-exposure time). This can be
 *     performed by CALCOR and should be done prior to the production of
 *     a flatfield and flatfield correction. The data combination methods
-*     give a mixture of very robust (median) to very efficient (mean) 
+*     give a mixture of very robust (median) to very efficient (mean)
 *     methods to suit the data.
 
 *  Usage:
@@ -42,7 +42,7 @@
 *  ADAM Parameters:
 *     ALPHA = _REAL (Read)
 *        The fraction of extreme values to remove before combining
-*        the data at any pixel. This fraction is removed from each 
+*        the data at any pixel. This fraction is removed from each
 *        extreme so can only take a value in the range 0 to 0.5.
 *        Only used if METHOD="TRIMMED"
 *        [0.2]
@@ -74,12 +74,12 @@
 *        not. Deleting the input NDFs has the advantage of saving disk
 *        space, but should probably only be used if this program is part
 *        of a sequence of commands and the intermediary data used by
-*        it are not important. 
+*        it are not important.
 *
 *        The default for this parameter is TRUE and this cannot be
 *        overridden except by assignment on the command line or in
-*        reponse to a forced prompt.  
-*        [TRUE] 
+*        reponse to a forced prompt.
+*        [TRUE]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -107,9 +107,9 @@
 *        [BOTH]
 *     MAX = _REAL (Read)
 *        If METHOD = "THRESH" then this value defines the upper limit
-*        for values which can be used when combining the data. This 
+*        for values which can be used when combining the data. This
 *        limit applies to the range of the output data (i.e. the values
-*        after the exposure factors have been divided into the input 
+*        after the exposure factors have been divided into the input
 *        data).
 *     METHOD = LITERAL (Read)
 *        The method to be used to combine the data components of
@@ -134,9 +134,9 @@
 *        [MEDIAN]
 *     MIN = _REAL (Read)
 *        If METHOD = "THRESH" then this value defines the lower limit
-*        for values which can be used when combining the data. This 
+*        for values which can be used when combining the data. This
 *        limit applies to the range of the output data (i.e. the values
-*        after the exposure factors have been divided into the input 
+*        after the exposure factors have been divided into the input
 *        data).
 *     MINPIX = _INTEGER (Read)
 *        The minimum number of good (ie. not BAD) pixels required
@@ -172,7 +172,7 @@
 *        only be used if the NDFs have been "imported" using the
 *        programs PRESENT or IMPORT. Typically it is used when
 *        processing using CCDPACK's "automated" methods.
-*        
+*
 *        Values obtained from the CCDPACK extension are identified in
 *        the output log by the presence of a trailing asterisk (*).
 *        [FALSE]
@@ -209,8 +209,8 @@
 *  Implementation Status:
 *     - The routine supports BAD pixels and all data types except
 *       COMPLEX. All combinational arithmetic is performed in floating
-*       point. The AXIS, TITLE and QUALITY components are correctly
-*       propagated. The variances are propagated through the combination
+*       point. The AXIS and TITLE components are correctly propagated.
+*       The variances are propagated through the combination
 *       processing, assuming that the input data have a normal
 *       distribution.
 
@@ -264,6 +264,10 @@
 *        Updated to CCDPACK 2.0.
 *     31-JAN-1998 (PDRAPER):
 *        Added clipmed combination method.
+*     25-JUN-1998 (PDRAPER):
+*        Stopped the propagation of quality from the first NDF to the
+*        output. This was not the right thing to do when the NDFs are
+*        padded to match bounds (regions of BAD quality are introduced).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -381,7 +385,7 @@
 *  factors, defaulting to the value(s) supplied by the parameter.
       CALL NDF_BEGIN
       IF ( FTYPE .EQ. 'NONE' ) USEEXT = .FALSE.
-      IF ( DELETE ) THEN 
+      IF ( DELETE ) THEN
          CALL CCD1_NDFAB( FTYPE, USEEXT, 'IN', 'UPDATE', CCD1__MXNDF,
      :                    'EXPOSE', STACK, NNDF, EFACT, STATUS )
       ELSE
@@ -482,11 +486,11 @@
       INSTA = MXPIX * NNDF
 
 *  Create the output NDF to contain the result. Propagating axis,
-*  quality, label and history, do not propagate units these may no
+*  label and history, do not propagate units these may no
 *  longer apply. Do NOT propagate the CCDPACK extension (the
-*  information in this only applies to the input NDF).
+*  information in this only applies to the input NDF) or the QUALITY.
       CALL CCD1_NDFPR( 'OUT', STACK( 1 ),
-     :                 'Axis,Quality,Units,Noext(CCDPACK)', NDFOUT,
+     :                 'Axis,Units,Noext(CCDPACK)', NDFOUT,
      :                  STATUS )
 
 *  Make sure that its data are in the processing precision.
@@ -508,13 +512,13 @@
          NCON( I ) = 0.0D0
  1    CONTINUE
 
-*  If we have variances then will process covariances - get the required 
+*  If we have variances then will process covariances - get the required
 *  workspace.
-      IF ( HAVVAR ) THEN 
+      IF ( HAVVAR ) THEN
          NWRK4 = MAX( 1, ( ( NNDF+ 1 )**3 ) / 2 )
          CALL CCD1_MKTMP( NWRK4, '_DOUBLE', IDWRK4, STATUS )
          NWRK4 = MAX( 1, NWRK4 / NNDF )
-         CALL CCD1_MPTMP( IDWRK4, 'WRITE', IPWRK4, STATUS ) 
+         CALL CCD1_MPTMP( IDWRK4, 'WRITE', IPWRK4, STATUS )
       ENDIF
 
 *  For each chunk of an NDF, find other chunks and enter them onto the
@@ -576,14 +580,14 @@
      :                          %VAL( IPVWRK ), IMETH, MINPIX, NITER,
      :                          NSIGMA, ALPHA, RMIN, RMAX,
      :                          %VAL( IPDOUT ), %VAL( IPVOUT ), WRK1,
-     :                          WRK2, WRK3, %VAL( IPWRK4 ), NWRK4, 
+     :                          WRK2, WRK3, %VAL( IPWRK4 ), NWRK4,
      :                          NCON, POINT, USED, STATUS )
             ELSE IF ( PTYPE .EQ. '_DOUBLE ' ) THEN
                CALL CCG1_CM1DD( %VAL( IPDWRK ), EL, NNDF,
      :                          %VAL( IPVWRK ), IMETH, MINPIX, NITER,
      :                          NSIGMA, ALPHA, RMIN, RMAX,
      :                          %VAL( IPDOUT ), %VAL( IPVOUT ), WRK1,
-     :                          WRK2, WRK3, %VAL( IPWRK4 ), NWRK4, 
+     :                          WRK2, WRK3, %VAL( IPWRK4 ), NWRK4,
      :                          NCON, POINT, USED, STATUS )
             END IF
          ELSE
@@ -619,11 +623,11 @@
       CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
 
 *  Add the frame type to the output NDF.
-      IF (  FTYPE .EQ. 'DARK' ) THEN 
+      IF (  FTYPE .EQ. 'DARK' ) THEN
          CALL CCG1_STO0C( NDFOUT, 'FTYPE', 'MASTER_DARK', STATUS )
       ELSE IF ( FTYPE .EQ. 'FLASH' ) THEN
          CALL CCG1_STO0C( NDFOUT, 'FTYPE', 'MASTER_FLASH', STATUS )
-      ELSE 
+      ELSE
          CALL CCG1_STO0C( NDFOUT, 'FTYPE', 'MASTER_CAL', STATUS )
       END IF
 

@@ -153,7 +153,12 @@
 
  The applications FINDOFF and REGISTER have been modified to open up
  to 100 input and 100 output files. Previously these programs where
- limited to 40 files in total. 
+ limited to 40 files in total.
+
+ The propagation of QUALITY in the MAKEBIAS, MAKECAL, MAKEFLAT and
+ MAKEMOS applications has been suppressed. A bug in TRANNDF when
+ propagating QUALITY has been corrected.
+
 
 1 CALCOR
 Subtracts a scaled dark or flash calibration image from a series of
@@ -4005,7 +4010,7 @@ PDRAPER: Peter Draper (STARLINK)
 2 Implementation_Status
    - The routine supports BAD pixels and all numeric data types
      except COMPLEX.  All combinational arithmetic is performed using
-     floating values.  The UNITS, AXIS, TITLE and QUALITY components
+     floating values.  The UNITS, AXIS and TITLE components
      are correctly propagated. Any input variances are ignored.
 1 MAKECAL
 Produces a dark or pre-flash calibration image.
@@ -4280,10 +4285,9 @@ PDRAPER: Peter Draper (STARLINK)
 2 Implementation_Status
    - The routine supports BAD pixels and all data types except
      COMPLEX. All combinational arithmetic is performed in floating
-     point. The AXIS, TITLE and QUALITY components are correctly
-     propagated. The variances are propagated through the combination
-     processing, assuming that the input data have a normal
-     distribution.
+     point. The AXIS and TITLE components are correctly propagated.
+     The variances are propagated through the combination processing,
+     assuming that the input data have a normal distribution.
 1 MAKEFLAT
 Produces a flatfield calibration image.
 
@@ -4495,7 +4499,7 @@ makeflat in='ff*' out=master_flat gamma=10 iter=1
 - The input images are normalised to have a mean of one
   before being combined. This makes sure that all input images
   contribute to the final result (even though, for instance,
-  they were taken on a source of varying brightness, e.g. the 
+  they were taken on a source of varying brightness, e.g. the
   twilight sky).
 
 2 Behaviour_of_parameters
@@ -4540,9 +4544,9 @@ PDRAPER: Peter Draper (STARLINK)
 2 Implementation_Status
    - The routine supports BAD pixels and all data types except
      COMPLEX.  All combinational arithmetic is performed using
-     floating point.  The AXIS, TITLE and QUALITY components are
-     correctly propagated. The output is a ratio so the units are set
-     to blank. The variances are propagated through the combination
+     floating point.  The AXIS and TITLE components are correctly
+     propagated. The output is a ratio so the units are set to blank.
+     The variances are propagated through the combination
      processing, assuming that the input data have a normal
      distribution.
 1 MAKEMOS
@@ -5214,7 +5218,7 @@ PDRAPER: Peter Draper (STARLINK)
      types, with arithmetic being performed using the appropriate
      floating point type. It can process images with any number of
      dimensions. The DATA, TITLE and VARIANCE components of an NDF
-     are directly supported, with the AXIS, HISTORY, LABEL, QUALITY
+     are directly supported, with the AXIS, HISTORY, LABEL
      and UNITS components and all extensions being propagated from
      the first input NDF supplied (note that AXIS values, if
      present, will normally be extrapolated as a result of

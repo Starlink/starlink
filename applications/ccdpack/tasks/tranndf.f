@@ -33,7 +33,7 @@
 *     with one invocation.
 
 *  Usage:
-*     tranndf in out [method] 
+*     tranndf in out [method]
 
 *  ADAM Parameters:
 *     CONSERVE = _LOGICAL (Read)
@@ -91,9 +91,9 @@
 *        and "LININT" for linear interpolation.
 *        [NEAREST]
 *     OUT = LITERAL (Write)
-*        Names of the output -- transformed -- NDFs. These may be 
+*        Names of the output -- transformed -- NDFs. These may be
 *        specified as list of comma separated names, using indirection
-*        if required, or, as a single modification element (of the 
+*        if required, or, as a single modification element (of the
 *        input names). The simplest modification element is the
 *        asterisk "*" which means call each of the output NDFs the same
 *        name as the corresponding input NDFs. So,
@@ -115,17 +115,17 @@
 *        NDFs. Can take one of the values "AUTO", "SAME", "SPECIFY".
 *        With the meanings.
 *
-*           - AUTO    -- automatically determine the bounds of the 
-*                        output NDFs such that all of the input data 
+*           - AUTO    -- automatically determine the bounds of the
+*                        output NDFs such that all of the input data
 *                        appears. This is achieved by transforming test
-*                        points along the current bounds so assumes 
+*                        points along the current bounds so assumes
 *                        that the transformation will behave reasonably.
 *           - SAME    -- set the output NDF bounds to those of the
 *                        corresponding input NDFs.
-*           - SPECIFY -- you will specify a single set of bounds for 
+*           - SPECIFY -- you will specify a single set of bounds for
 *                        all the output NDFs. (See the LBOUND and UBOUND
 *                        parameters.)
-*        [AUTO]  
+*        [AUTO]
 *     TITLE = LITERAL (Read)
 *        Title for the output images.
 *        [Output from TRANNDF]
@@ -178,7 +178,7 @@
 *        -  AXES, LABEL, UNITS, HISTORY, and extensions are merely
 *           propagated.
 *        -  QUALITY is not derived from the input NDF for a linearly
-*           interpolated NDF. The DATA and VARIANCE arrays are 
+*           interpolated NDF. The DATA and VARIANCE arrays are
 *           resampled.
 *     -  Bad pixels, including automatic quality masking, are supported.
 *     -  All non-complex numeric data types are supported.
@@ -200,8 +200,8 @@
 *     Retaining parameter values has the advantage of allowing you to
 *     define the default behaviour of the application but does mean
 *     that additional care needs to be taken when using the application
-*     after a break of sometime. The intrinsic default behaviour of 
-*     the application may be restored by using the RESET keyword on 
+*     after a break of sometime. The intrinsic default behaviour of
+*     the application may be restored by using the RESET keyword on
 *     the command line.
 *
 *     Certain parameters (LOGTO and LOGFILE) have global values. These
@@ -225,13 +225,15 @@
 *        Removed AIF_ calls.
 *     6-SEP-1995 (PDRAPER):
 *        Updated for CCDPACK version 2.0.
+*     25-JUN-1998 (PDRAPER):
+*        Stopped quality bad flag from being set (isn't possible).
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -259,7 +261,7 @@
 *  Local Variables:
       BYTE VARB                  ! Dummy input variance
       BYTE VARBO                 ! Dummy output variance
-      CHARACTER * ( 5 ) COMP( NACOMP ) ! NDF array component names
+      CHARACTER * ( 8 ) COMP( NACOMP ) ! NDF array component names
       CHARACTER * ( 7 ) METHOD   ! Resampling method
       CHARACTER * ( 7 ) SHAPE    ! How output NDF shape is determined
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locator to NDF extension
@@ -395,7 +397,7 @@
       CALL CCD1_MSG( ' ', '    -----------------', STATUS )
 
 *  Resampling method.
-      IF ( METHOD .EQ. 'LININT' ) THEN 
+      IF ( METHOD .EQ. 'LININT' ) THEN
          CALL CCD1_MSG( ' ',
      : '  Data resampling method: Linear interpolation', STATUS )
       ELSE
@@ -404,7 +406,7 @@
       END IF
 
 *  If flux levels are conserved.
-      IF ( NORM ) THEN 
+      IF ( NORM ) THEN
          CALL CCD1_MSG( ' ', '  Total flux levels conserved', STATUS )
       ELSE
          CALL CCD1_MSG( ' ', '  Total flux levels not conserved',
@@ -412,7 +414,7 @@
       END IF
 
 *  Are we using a structure from the NDFs or user?
-      IF ( INEXT ) THEN 
+      IF ( INEXT ) THEN
          CALL CCD1_MSG( ' ',
      :'  Using transform structures in NDF CCDPACK extensions', STATUS )
       ELSE
@@ -453,14 +455,14 @@
      :                  STATUS )
          CALL CCD1_MSG( ' ',  ' ', STATUS )
 
-         IF ( INEXT ) THEN 
+         IF ( INEXT ) THEN
 *  Get the transformation associated with this NDF. This should be
 *  stored in the CCDPACK extension item TRANSFORM.
 *  First get a CCDPACK extension.
             CALL CCD1_CEXT( IDIN, .FALSE., 'READ', LOCEXT, STATUS )
 
 *  Now Look for a transformation structure.
-            IF ( STATUS .EQ. SAI__OK ) THEN 
+            IF ( STATUS .EQ. SAI__OK ) THEN
                CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE, STATUS )
 
 *  If have one get a locator to it.
@@ -468,7 +470,7 @@
                   CALL DAT_FIND( LOCEXT, 'TRANSFORM', LOCTR, STATUS )
                ELSE
 
-*  Failed to find component TRANSFORM. 
+*  Failed to find component TRANSFORM.
                   STATUS = SAI__ERROR
                   CALL NDF_MSG( 'NDFNAME', IDIN )
                   CALL ERR_REP( 'TRANNDF_NOEXT', '  NDF ^NDFNAME '//
@@ -484,12 +486,12 @@
                CALL ERR_REP( 'TRANNDF_NOEXT',
      : '  NDF ^NDFNAME does not have a CCDPACK extension', STATUS )
                GO TO 940
-            END IF            
+            END IF
          END IF
 
 *  Now validate the transformation.  Need forward and backward
 *  transformations.
-         IF ( INEXT .OR. INDEX .EQ. 1 ) THEN 
+         IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
             CALL TRN_COMP( LOCTR, .TRUE., TRIDF, STATUS )
             CALL TRN_COMP( LOCTR, .FALSE., TRIDI, STATUS )
 
@@ -528,7 +530,7 @@
 
 *  Validate dimensions and number of input coordinates.
 *  =====================================================
-*  
+*
 *  Check that processing is possible.  The number of dimensions in the
 *  NDF must be at least the number of input variables for the
 *  transformation to be applied.
@@ -579,10 +581,10 @@
          CALL KPG1_TRBOD( NVIN, ASTART, AEND, TRIDF, NVOUT, DDLBND,
      :                    DDUBND, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 940
-      
+
 *  Set the bounds of the output NDF.
 *  =================================
-      
+
 *  Find the dimensions and bounds of the output array. There are three
 *  options for these values. If autosize has been chosen then dynamic
 *  bounds will be created which ensure that all the output data is
@@ -590,24 +592,24 @@
 *  same bounds as the input NDFs, otherwise the user will be prompted
 *  once for bounds which will apply to all output NDFs.
          IF ( SHAPE .EQ. 'SPECIFY' ) THEN
-           IF ( INDEX .EQ. 1 ) THEN 
+           IF ( INDEX .EQ. 1 ) THEN
 
 *  User specified bounds - just this once. Report the current extents
 *  of the pixel coordinates as an aid to the user.
                DO IAXIS = 1, NVOUT
-                  CALL MSG_SETI( 'AXIS', IAXIS )                       
+                  CALL MSG_SETI( 'AXIS', IAXIS )
                   CALL MSG_SETD( 'LOW', DDLBND( IAXIS ) )
                   CALL MSG_SETD( 'HIGH', DDUBND( IAXIS ) )
                   IF ( IAXIS .EQ. 1 ) THEN
                         CALL CCD1_MSG( 'OUTBOUNDS',
      :           '  coordinates limits for axis ^AXIS: ^LOW to ^HIGH',
      :                                 STATUS )
-                  ELSE              
+                  ELSE
                      CALL CCD1_MSG( 'OUTBOUNDS',
      :           '                               ^AXIS: ^LOW to ^HIGH',
      :                                          STATUS )
                   END IF
-      
+
 *  Set the defaults for the output NDF extent.
                   DLBND( IAXIS ) = VAL_DTOI( .FALSE.,
      :                             DDLBND( IAXIS ) - 0.5D0, STATUS )
@@ -702,7 +704,7 @@
 *  Create the output NDF.
 *  ======================
          CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 'Axis,Units', IDOUT,
-     :                   STATUS )        
+     :                   STATUS )
 
 *  Tell user the name of the output NDF.
          CALL NDF_MSG( 'OUTNDF', IDOUT )
@@ -723,7 +725,7 @@
      :'                    : ^LOW to ^HIGH', STATUS )
             END IF
          END DO
-                                                 
+
 *  Change its shape to the required output shape.
          CALL NDF_SBND( NDIMI, OLBND, OUBND, IDOUT, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 940
@@ -779,11 +781,11 @@
 *  See if there is any conservation of flux required.
          CONSRV = ABS( FLUX - 1.0D0 ) .GT. VAL__EPSD
          IF ( STATUS .NE. SAI__OK ) GO TO 940
-         
+
 *  Resample using the nearest-neighbour technique.
 *  ===============================================
          IF ( METHOD .EQ. 'NEAREST' ) THEN
-         
+
 *  This method is applicable to the data, variance and quality arrays.
 *  First determine the vector indices of the nearest neighbours applying
 *  the transformation.  To do this we need some work space for the
@@ -797,7 +799,7 @@
             WDIMS( 2 ) = NDIMI
             CALL CCD1_MALL( WDIMS( 1 ) * WDIMS( 2 ), '_DOUBLE', WPNTR3,
      :                      STATUS )
-         
+
 *  Get workspace to hold the indices of the nearest neighbours. There
 *  is one for each output array element.
             EL = 1
@@ -806,134 +808,134 @@
             END DO
             CALL CCD1_MKTMP( EL, '_INTEGER', INDID, STATUS )
             CALL CCD1_MPTMP( INDID, 'WRITE', INPNTR, STATUS )
-         
+
 *  Generate the list of vector indices for the resampling.
             CALL KPG1_TRPID( NDIMI, IDIMS, TRIDI, %VAL( CAXPTR ),
      :                       WDIMS( 1 ), NVOUT, OLBND, ODIMS,
      :                       %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                       %VAL( WPNTR2 ), %VAL( INPNTR ), STATUS )
-         
+
 *  Free the workspace that is no longer needed.
             CALL CCD1_MFREE( WPNTR1, STATUS )
             CALL CCD1_MFREE( WPNTR2, STATUS )
             CALL CCD1_MFREE( WPNTR3, STATUS )
-         
+
 *  Apply the transformation with n-n resampling.
 *  =============================================
 *  Loop through all the components.
             DO ICOMP = 1, NACOMP
-         
+
 *  See if the component is present.
                IF ( COMP( ICOMP ) .NE. 'Data' ) THEN
                   CALL NDF_STATE( IDIN, COMP( ICOMP ), THERE, STATUS )
                ELSE
                   THERE = .TRUE.
                END IF
-         
+
 *  Can only process when the array component is present.
                IF ( THERE ) THEN
-         
+
 *  Get the type of the array.
                   CALL NDF_TYPE( IDIN, COMP( ICOMP ), ITYPE, STATUS )
-         
+
 *  Map the input and output arrays.
                   CALL NDF_MAP( IDIN, COMP( ICOMP ), ITYPE, 'READ',
      :                          IPNTR, ELIN, STATUS )
                   CALL NDF_MAP( IDOUT, COMP( ICOMP ), ITYPE,
      :                          'WRITE/BAD', OPNTR, ELOUT, STATUS )
-                                     
+
 *  When there is flux conservation there is a two-stage process, so
 *  workspace is needed to hold the uncorrected values.  Use the same
 *  pointer for both cases to save code.  Flux conservation is not
-*  required for the QUALITY array.   
+*  required for the QUALITY array.
                   IF ( CONSRV .AND. COMP( ICOMP ) .NE. 'Quality' ) THEN
                      CALL CCD1_MKTMP( ELOUT, ITYPE, WKID4, STATUS )
                      CALL CCD1_MPTMP( WKID4, 'WRITE', OPNTRW, STATUS )
-                  ELSE          
+                  ELSE
                      OPNTRW = OPNTR( 1 )
-                  END IF        
-                                
+                  END IF
+
 *  Perform the transformation on the data array for the numeric data
 *  type.  First for a byte array
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
                      CALL KPG1_VASVB( ELOUT, %VAL( INPNTR ), ELIN,
      :                                %VAL( IPNTR( 1 ) ),
      :                                %VAL( OPNTRW ), NBAD, STATUS )
-                                
+
 *  Transform a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPG1_VASVD( ELOUT, %VAL( INPNTR ), ELIN,
      :                                %VAL( IPNTR( 1 ) ),
      :                                %VAL( OPNTRW ), NBAD, STATUS )
-                                
-*  Transform an integer array.  
+
+*  Transform an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                      CALL KPG1_VASVI( ELOUT, %VAL( INPNTR ), ELIN,
      :                                %VAL( IPNTR( 1 ) ),
      :                                %VAL( OPNTRW ), NBAD, STATUS )
-                                
+
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                      CALL KPG1_VASVR( ELOUT, %VAL( INPNTR ), ELIN,
      :                                %VAL( IPNTR( 1 ) ),
      :                                %VAL( OPNTRW ), NBAD, STATUS )
-                                
+
 *  Transform an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                      CALL KPG1_VASVUB( ELOUT, %VAL( INPNTR ), ELIN,
      :                                 %VAL( IPNTR( 1 ) ),
      :                                 %VAL( OPNTRW ), NBAD, STATUS )
-                                
+
 *  Transform an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                      CALL KPG1_VASVUW( ELOUT, %VAL( INPNTR ), ELIN,
      :                                 %VAL( IPNTR( 1 ) ),
      :                                 %VAL( OPNTRW ), NBAD, STATUS )
-                                
-*  Transform a word array.      
+
+*  Transform a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                      CALL KPG1_VASVW( ELOUT, %VAL( INPNTR ), ELIN,
      :                                %VAL( IPNTR( 1 ) ),
      :                                %VAL( OPNTRW ), NBAD, STATUS )
-                  END IF        
-                                
+                  END IF
+
 *  If there is no flux conservation we only need to unmap the output
-*  array.                       
+*  array.
                   IF ( CONSRV .AND. COMP( ICOMP ) .NE. 'Quality' ) THEN
-                                
+
 *  Decide whether or not we need to test for bad pixels.
                      BAD = NBAD .NE. 0
-                                
+
 *  Select the appropriate routine for the data type being processed and
 *  multiply the data array by the constant.
-                     CALL CCD1_CMUL( BAD, ITYPE, OPNTRW, EL, FLUX, 
+                     CALL CCD1_CMUL( BAD, ITYPE, OPNTRW, EL, FLUX,
      :                               OPNTR( 1 ), STATUS )
 
 *  Tidy the workspace.
                      CALL CCD1_FRTMP( WKID4, STATUS )
                   END IF
-                  
+
 *  Set the bad pixel flag when bad pixels have been found.
-                  IF ( BAD ) THEN
+                  IF ( BAD .AND. COMP( ICOMP ) .NE. 'Quality' ) THEN
                      CALL NDF_SBAD( .TRUE., IDOUT, COMP( ICOMP ),
      :                              STATUS )
                   END IF
-                  
+
 *  Unmap the output array.
                   CALL NDF_UNMAP( IDOUT, COMP( ICOMP ), STATUS )
 
 *  Unmap the input NDF array.
                   CALL NDF_UNMAP( IDIN, COMP( ICOMP ), STATUS )
-               END IF                  
-            END DO                     
-         
+               END IF
+            END DO
+
 *  Free the workspace holding the resampled vector indices.
             CALL CCD1_FRTMP( INDID, STATUS )
-         
+
 *  Apply linear-interpolation resampling.
 *  ======================================
          ELSE IF ( METHOD .EQ. 'LININT' ) THEN
-         
+
 *  Get work arrays for the transformation. Needed is space for the input
 *  and output coordinates, and input fractional indices.
             WDIMS( 1 ) = ODIMS( 1 )
@@ -945,23 +947,23 @@
             WDIMS( 2 ) = NDIMI
             CALL CCD1_MALL( WDIMS( 1 ) * WDIMS( 2 ), '_DOUBLE', WPNTR3,
      :                      STATUS )
-                             
+
 *  See if the variance component is present.  Note that a quality array
 *  cannot be linearly interpolated.
             CALL NDF_STATE( IDIN, 'Variance', VAR, STATUS )
-            IF ( VAR ) THEN  
-                             
+            IF ( VAR ) THEN
+
 *  Get the implementation type of the arrays.
                CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,'/
      :                         /'_REAL,_DOUBLE', IDIN, IDIN,
      :                         'Data,Variance', ITYPE, DTYPE, STATUS )
-                             
+
 *  Map the input and output arrays.
                CALL NDF_MAP( IDIN, 'Data,Variance', ITYPE, 'READ',
      :                       IPNTR, ELIN, STATUS )
                CALL NDF_MAP( IDOUT, 'Data,Variance', ITYPE, 'WRITE/BAD',
      :                       OPNTR, ELOUT, STATUS )
-                             
+
 *  Perform the transformation on the data array for the numeric data
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
@@ -973,7 +975,7 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-                       
+
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPG1_TDLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
@@ -984,7 +986,7 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-                       
+
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_TDLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
@@ -995,7 +997,7 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-                       
+
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPG1_TDLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
@@ -1006,7 +1008,7 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-                       
+
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPG1_TDLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
@@ -1017,7 +1019,7 @@
      :                              %VAL( OPNTR( 2 ) ),
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-                       
+
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPG1_TDLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
@@ -1028,7 +1030,7 @@
      :                              %VAL( OPNTR( 2 ) ),
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-                       
+
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPG1_TDLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
@@ -1041,89 +1043,89 @@
      :                             %VAL( WPNTR2 ), STATUS )
                END IF
             ELSE
-            
+
 *  Get the type of the data array.
                CALL NDF_TYPE( IDIN, 'Data', ITYPE, STATUS )
-            
+
 *  Map the input and output arrays.  Use a dummy variance value.  It is
 *  not assigned as it will not be used.
                CALL NDF_MAP( IDIN, 'Data', ITYPE, 'READ', IPNTR, ELIN,
      :                       STATUS )
                CALL NDF_MAP( IDOUT, 'Data', ITYPE, 'WRITE/BAD', OPNTR,
      :                       ELOUT, STATUS )
-               
+
 *  Perform the transformation on the data array for the numeric data
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   CALL KPG1_TDLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARB, TRIDI, FLUX, 
+     :                             VAR, VARB, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
-                  
+
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPG1_TDLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARD, TRIDI, FLUX, 
+     :                             VAR, VARD, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
-                  
+
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_TDLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARI, TRIDI, FLUX, 
+     :                             VAR, VARI, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
-                  
+
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPG1_TDLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARR, TRIDI, FLUX, 
+     :                             VAR, VARR, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
-                  
+
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPG1_TDLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                              VAR, VARB, TRIDI, FLUX, 
+     :                              VAR, VARB, TRIDI, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ), VARBO,
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-                  
+
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPG1_TDLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                              VAR, VARW, TRIDI, FLUX, 
+     :                              VAR, VARW, TRIDI, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ), VARBO,
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-                  
+
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPG1_TDLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
-     :                             VAR, VARW, TRIDI, FLUX, 
+     :                             VAR, VARW, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
                END IF
-            
+
 *  Free the workspace that is no longer needed.
                CALL CCD1_MFREE( WPNTR1, STATUS )
                CALL CCD1_MFREE( WPNTR2, STATUS )
@@ -1136,7 +1138,7 @@
 
 *  Release NDFs and close container files. Retain locator to transform
 *  structure if INEXT is false.
-         IF ( INEXT ) THEN 
+         IF ( INEXT ) THEN
             CALL DAT_ANNUL( LOCEXT, STATUS )
             CALL DAT_ANNUL( LOCTR, STATUS )
             CALL TRN_ANNUL( TRIDF, STATUS )
@@ -1154,36 +1156,36 @@
 *  End of main processing loop.
 
 99999 CONTINUE
-         
+
 *  Tidy resources.
 *  ===============
-         
+
 *  Free any workspace.
-  940 CONTINUE  
+  940 CONTINUE
       CALL CCD1_MFREE( -1, STATUS )
       CALL CCD1_FRTMP( -1, STATUS )
-         
+
 *  Tidy the NDF context.
-  960 CONTINUE  
+  960 CONTINUE
       CALL NDF_END( STATUS )
 
 *  Close down IRH/IRG.
       CALL IRH_CLOSE( STATUS )
-         
+
 *  Free any remaining transformation resources.
       CALL TRN_CLOSE( STATUS )
-         
+
   999 CONTINUE
-         
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'TRANNDF_ERR',
      :     'TRANNDF: Unable to transform the NDF.',
      :     STATUS )
       END IF
-         
+
 *  Close the log file.
       CALL CCD1_END( STATUS )
-         
+
       END
 * $Id$
