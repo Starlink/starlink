@@ -127,7 +127,7 @@ F77_CALL/{S}\(			{ count(); return(F77_CALL); }
 {D}*"."{D}+({E})?{FS}?		{ count(); return(CONSTANT); }
 {D}+"."{D}*({E})?{FS}?		{ count(); return(CONSTANT); }
 
-\"(\\.|[^\\"])*\"		{ ecount(); return(STRING_LITERAL); }
+\"(\\.|\\\n|[^\\"])*\"		{ ecount(); return(STRING_LITERAL); }
 
 ";"				{ count(); return(';'); }
 "{"				{ count(); return('{'); }
@@ -164,6 +164,12 @@ F77_CALL/{S}\(			{ count(); return(F77_CALL); }
 #include <ctype.h>
 #include <stdlib.h>
 
+#include <stdio.h>
+#ifdef FLEX_SCANNER
+#define LEXEOF EOF
+#else
+#define LEXEOF 0
+#endif
 
 extern char *yylval;
 extern int yyleng;
@@ -266,7 +272,7 @@ extern int yyleng;
       char c, cl;
       sappend( yytext );
       c = ' ';
-      while ( c && ( cl != '*' || c != '/' ) ) {
+      while ( c != LEXEOF && ( cl != '*' || c != '/' ) ) {
          cl = c;
          c = input();
          cappend( c );
@@ -286,7 +292,7 @@ extern int yyleng;
 */
       char c;
       sappend( yytext );
-      while( ( c = input() ) && c != '\n' )
+      while( ( c = input() ) != LEXEOF && c != '\n' )
          cappend( c );
       cappend( c );
    }
@@ -295,7 +301,7 @@ extern int yyleng;
    void cpprest() {
       char c, cl;
       c = ' ';
-      while ( c && ( c != '\n' || cl == '\\' ) ) {
+      while ( c != LEXEOF && ( c != '\n' || cl == '\\' ) ) {
          cl = c;
          c = input();
          cappend( c );
@@ -347,7 +353,7 @@ extern int yyleng;
 
 /* Add the name of the included file to attribute value. */
       p1 = preleng;
-      while ( ( c = input() ) && c != '"' && c != '\n' )
+      while ( ( c = input() ) != LEXEOF && c != '"' && c != '\n' )
          cappend( c );
       p2 = preleng;
 
@@ -398,7 +404,7 @@ extern int yyleng;
 
 /* Add definiendum, remembering where it starts and finishes. */
       p1 = preleng;
-      while ( ( c = input() ) && ( isalnum( c ) || c == '_' ) )
+      while ( ( c = input() ) != LEXEOF && ( isalnum( c ) || c == '_' ) )
          cappend( c );
       p2 = preleng;
 
