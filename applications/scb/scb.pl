@@ -147,7 +147,7 @@ if ($arg{'module'}) {
 #  Check if module exists in index; try capitalising it if the input form
 #  has no entry.
 
-   $arg{'module'} =~ tr/a-z/A-Z/ unless ($locate{$arg{'module'}});
+   $arg{'module'} .= "_" unless ($locate{$arg{'module'}});
    unless ($locate{$arg{'module'}}) {
       error "Failed to find module $arg{'module'}",
          "This may be a result of a deficiency in the source
@@ -155,7 +155,7 @@ if ($arg{'module'}) {
           requested doesn't exist, or because the index 
           database <code>$indexfile</code> has become out of date.";
    }
-   get_module $arg{'module'}, uc ($arg{'package'});
+   get_module $arg{'module'}, $arg{'package'};
 }
 else {
 
@@ -163,7 +163,7 @@ else {
 #  usage message (command-line mode).
 
    if ($cgi) {
-      query_form uc ($arg{'package'});
+      query_form $arg{'package'};
    }
    else {
       die $usage;
@@ -272,7 +272,7 @@ sub query_form {
       while (($mod, $locs) = each %locate) {
          foreach $loc (split ' ', $locs) {
             if ($loc =~ /^$package#/io) {
-               $mod =~ /^([^_]*_)/;
+               $mod =~ /^([^_]*_)./;
                $prefix = $1 || '';
                push @{$modules{$prefix}}, $mod;
             }
@@ -293,8 +293,8 @@ sub query_form {
          foreach $prefix (sort quasialph keys %modules) {
             print "<dt> $prefix <br>\n<dd>\n";
             foreach $mod (sort @{$modules{$prefix}}) {
-               if ($mod =~ /^(.*)&lt;T&gt;(.*)$/i) {
-                  $ignore = "$1(" . join ('|', qw/I R D L C B UB W UW/) . ")$2";
+               if ($mod =~ /^(.*)&lt;t&gt;(.*)$/i) {
+                  $ignore = "$1(" . join ('|', qw/i r d l c b ub w uw/) . ")$2";
                }
                if ($ignore) {
                   next if ($mod =~ $ignore);
@@ -383,8 +383,8 @@ sub get_module {
    foreach $location (@locations) {
       $locname = $location;
       $location =~ /^(.+)#(.+)/i;
-      ($head, $tail) = (lc ($1), $2);
-      last if (uc ($head) eq uc ($package));
+      ($head, $tail) = ($1, $2);
+      last if ($head eq $package);
    }
 
 #  Interpret the first element of the location as a package or symbolic
@@ -440,7 +440,7 @@ sub extract_file {
    $location =~ /^([^>]+)>?([^>]*)(>?.*)$/;
    ($file, $tarcontents, $tail) = ($1, $2, $3);
    if ($tarcontents) {
-      tarxf $file, $tarcontents unless (-f $file);
+      tarxf $file, $tarcontents unless (-f $tarcontents);
       extract_file "$tarcontents$tail", $package;
       unlink $tarcontents;
    }
@@ -479,7 +479,7 @@ sub output {
       print STDERR "$locname\n";
    }
 
-   my ($body, $name, @names, $include, $sub);
+   my ($body, $name, @names, $include, $sub, $copyright);
    while (<FILE>) {
       if ($html) {
 
@@ -492,7 +492,7 @@ sub output {
                $body =~ s/^......//;        #  Discard first six characters.
                $body =~ s/!.*//;            #  Discard inline comments.
                $body =~ s/\s//g;            #  Discard spaces.
-               $body =~ y/a-z/A-Z/;         #  Fold to upper case.
+               $body =~ tr/a-z/A-Z/;        #  Fold to upper case.
             }
          }
 
@@ -520,13 +520,15 @@ sub output {
                
 #              Embolden module name.
 
-               s%($name)%<b>$1</b>%i;
+               my $lname = $name;
+               $lname =~ s%_$%%;
+               s%($lname)%<b>$1</b>%i;
 
 #              Add anchors (multiple ones if generic function).
 
                if ($ftype eq 'gen' && $name =~ /^(.*)&lt;T&gt;(.*)/i) {
                   ($g1, $g2) = ($1, $2);
-                  @names = map "$g1$_$g2", qw/&lt;T&gt; I R D L C B UB W UW/; 
+                  @names = map "$g1$_$g2", qw/&lt;t&gt; i r d l c b ub w uw/; 
                }
                else {
                   @names = ($name);
@@ -542,14 +544,17 @@ sub output {
 
                if ($body =~ /\bINCLUDE['"]([^'"]+)['"]/) {
                   $include = $1;
-                  s%$include%<a href='$scb?$include'>$include</a>%;
+                  s%$include%<a href='$scb?$include'>$include</a>%
+                     if ($locate{$include});
                }
 
 #              Identify and deal with fortran subroutine calls.
 
                if ($body =~ /\bCALL(\w+)[^=]*$/) {
-                  $sub = $1;
-                  s%$sub%<a href='$scb?$sub&$package#$sub'>$sub</a>%;
+                  $lsub = $1;
+                  $sub = lc ($lsub) . '_';
+                  s%$lsub%<a href='$scb?$sub&$package#$sub'>$lsub</a>%
+                     if ($locate{$sub});
                }
             }
             elsif ($ftype eq 'c' || $ftype eq 'h') {
@@ -558,15 +563,17 @@ sub output {
 
                if ($body =~ /F77_CALL\s*\(\s*(\w+)\s*\)/) {
                   $sub = $1;
-                  $module = uc $sub;
-                  s%$sub%<a href='$scb?$module&$package#$module'>$sub</a>%;
+                  $module = $sub . "_";
+                  s%$sub%<a href='$scb?$module&$package#$module'>$sub</a>%
+                     if ($locate{$module});
                }
 
 #              Identify and deal with C includes.
 
                if ($body =~ /#include\s*"\s*(\S+)\s*"/) {
                   $include = $1;
-                  s%$include%<a href='$scb?$include'>$include</a>%;
+                  s%$include%<a href='$scb?$include'>$include</a>%
+                     if ($locate{$include});
                }
             }
          }
@@ -574,12 +581,22 @@ sub output {
 
 #     Output (modified or unmodified) line of source.
 
+      $copyright ||= /copyright/i;
       print;
    }
    close FILE;
 
 #  Output appropriate footer text.
 
+   print "</pre>\n" if ($html);
+   if ($html && !$copyright) {
+      my $year = 1900 + (localtime)[5];
+      hprint "
+         <hr><i>
+         Copyright &copy; $year Central Laboratories Research Council
+         </i>
+      ";
+   }
    footer;
 
 }
