@@ -1,0 +1,42 @@
+*+
+*  Name:
+*     FIOUNT_CMN
+
+*  Purpose:
+*     FIO unit numbers
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIOUNT_CMN'
+
+*  Description:
+*     Common blocks containing information on FIO unit numbers
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-JAN-1992 (PMA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global variables:
+      LOGICAL FREUN( FIO__MXUNT ) ! Unit number available ?
+      INTEGER FRUNT( FIO__MXUNT ) ! Fortran unit numbers.
+
+*  Common blocks:
+      COMMON /FIOUNT_CMN_1/ FREUN, FRUNT
+      SAVE /FIOUNT_CMN_1/
+
+*.

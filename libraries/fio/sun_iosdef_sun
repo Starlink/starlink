@@ -1,0 +1,111 @@
+*+
+*  Name:
+*     sun_iosdef
+
+*  Purpose:
+*     Set error status
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'sun_iosdef'
+
+*  Description:
+*     Error codes for Sun Fortran compiler 1.4
+*     These are not defined in a system file as far as I know.
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-JAN-1992 (PMA):
+*        First version.
+*     {enter_further_changes_here}
+
+      INTEGER SUN__ERFMT         ! Error in format
+      PARAMETER( SUN__ERFMT = 100 )
+
+      INTEGER SUN__ILLUN         ! Illegal unit number
+      PARAMETER( SUN__ILLUN = 101 )
+
+      INTEGER SUN__FIONA         ! Formatted I/O not allowed
+      PARAMETER( SUN__FIONA = 102 )
+
+      INTEGER SUN__UIONA         ! Unformatted I/O not allowed
+      PARAMETER( SUN__UIONA = 103 )
+
+      INTEGER SUN__DIONA         ! Direct I/O not allowed
+      PARAMETER( SUN__DIONA = 104 )
+
+      INTEGER SUN__SIONA         ! Sequential I/O not allowed
+      PARAMETER( SUN__SIONA = 105 )
+
+      INTEGER SUN__CNTBF         ! Cannot backspace file
+      PARAMETER( SUN__CNTBF = 106 )
+
+      INTEGER SUN__OFBOR         ! Off beginning of record
+      PARAMETER( SUN__OFBOR = 107 )
+
+      INTEGER SUN__CNTSF         ! Cannot stat file
+      PARAMETER( SUN__CNTSF = 108 )
+
+      INTEGER SUN__NAARC         ! No * after repeat count
+      PARAMETER( SUN__NAARC = 109 )
+
+      INTEGER SUN__OFEOR         ! Off end of record
+      PARAMETER( SUN__OFEOR = 110 )
+
+      INTEGER SUN__TRUNF         ! Truncation failed
+      PARAMETER( SUN__TRUNF = 111 )
+
+      INTEGER SUN__ILSTI         ! Incomprehensible list input
+      PARAMETER( SUN__ILSTI = 112 )
+
+      INTEGER SUN__OOFSP         ! Out of free space
+      PARAMETER( SUN__OOFSP = 113 )
+
+      INTEGER SUN__UNTNC         ! Unit not connected
+      PARAMETER( SUN__UNTNC = 114 )
+
+      INTEGER SUN__RUNCH         ! Read unexpected character
+      PARAMETER( SUN__RUNCH = 115 )
+
+      INTEGER SUN__BLINP         ! Blank logical input field
+      PARAMETER( SUN__BLINP = 116 )
+
+      INTEGER SUN__NFEXI         ! 'new' file exists
+      PARAMETER( SUN__NFEXI = 117 )
+
+      INTEGER SUN__CFOLF         ! Cannot find 'old' file
+      PARAMETER( SUN__CFOLF = 118 )
+
+      INTEGER SUN__UNKNO         ! Unknown system error
+      PARAMETER( SUN__UNKNO = 119 )
+
+      INTEGER SUN__REQSA         ! Requires seek ability
+      PARAMETER( SUN__REQSA = 120 )
+
+      INTEGER SUN__ILARG         ! Illegal argument
+      PARAMETER( SUN__ILARG = 121 )
+
+      INTEGER SUN__NEGRC         ! Negative repeat count
+      PARAMETER( SUN__NEGRC = 122 )
+
+      INTEGER SUN__ILOPU         ! Illegal operation for unit
+      PARAMETER( SUN__ILOPU = 123 )
+
+      INTEGER SUN__TOOMF         ! Too many file open - no free
+                                 ! descriptors
+      PARAMETER( SUN__TOOMF = 124 )
+
+      INTEGER SUN__UNTNO         ! Attempted operation on unit that is
+                                 ! not open
+      PARAMETER( SUN__UNTNO = 125 )
+
+      INTEGER SUN__IINAM         ! Illegal input for namelist
+      PARAMETER( SUN__IINAM = 126 )
+
+      INTEGER SUN__FILEO         ! Error in FILEOPT parameter
+      PARAMETER( SUN__FILEO = 127 )

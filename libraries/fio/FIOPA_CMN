@@ -1,0 +1,48 @@
+*+
+*  Name:
+*     FIOPA_CMN
+
+*  Purpose:
+*     FIO ADAM parameter common blocks
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIOPA_CMN'
+
+*  Description:
+*     This file contains the FIOPA common block.
+*     This common block provides the relationship between ADAM
+*     parameters and FIO file descriptors.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-FEB-1992 (PMA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Variables:
+      LOGICAL PFREE( FIO__MXPAR ) ! Whether slot used
+      INTEGER PDESC( FIO__MXPAR ) !  File descriptor for parameter
+      CHARACTER * (  PAR__SZNAM ) PTNAME( FIO__MXPAR ) ! Parameter names
+      CHARACTER * ( PAR__SZMOD ) PACMOD( FIO__MXPAR ) ! Parameter
+                                                      ! access modes
+
+*  Common blocks:
+      COMMON /FIO_PA_1/ PFREE, PDESC
+      SAVE /FIO_PA_1/
+      COMMON /FIO_PA_2/ PTNAME, PACMOD
+      SAVE /FIO_PA_2/
+*.

@@ -1,0 +1,50 @@
+*+
+*  Name:
+*     FIO_SYS
+
+*  Purpose:
+*     FIO internal constants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIO_SYS'
+
+*  Description:
+*     This file contains the internal global constants for FIO.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-OCT-1986 (AJC):
+*        Add null FIO__BASE
+*     25-FEB-1988 (AJC):
+*        Combine FIO.SYS and FIOF77.SYS
+*        Remove FIO__SZLIN=400
+*        Remove include 'fio_err'
+*     12-FEB-1992 (PMA):
+*       Added ADAM prologue
+*     10-MAR-1992 (PMA):
+*        Add the constant FIO__BSUNT
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Constants:
+      INTEGER FIO__BASE          ! Base address for package
+      PARAMETER ( FIO__BASE = 0 )
+      INTEGER FIO__MXFIL         ! Maximum number of files
+      PARAMETER ( FIO__MXFIL = 40 )
+      INTEGER FIO__MXUNT         ! Maximum number of units
+      PARAMETER ( FIO__MXUNT = 40 )
+      INTEGER FIO__BSUNT         ! Base Fortran unit number 
+      PARAMETER ( FIO__BSUNT = 40 )

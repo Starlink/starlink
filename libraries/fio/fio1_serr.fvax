@@ -1,0 +1,196 @@
+      SUBROUTINE FIO1_SERR( SYSERR, STATUS )
+*+
+*  Name:
+*     FIO1_SERR
+
+*  Purpose:
+*     Set error status
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL FIO1_SERR( SYSERR, STATUS )
+
+*  Description:
+*     Get the error number from the operating system and convert it
+*     into an FIO error.
+
+*  Arguments:
+*     SYSERR = INTEGER (Given)
+*        Variable containing the operating system error number.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*        This is set to the FIO status.
+
+*  Notes:
+*     -  No errors are reported by this routine. They are reported by
+*        FIO_SERR.
+*     -  Consequently, this routine should only be called from FIO_SERR.
+
+*  Algorithm:
+*     Get the error number from the operating system, compare it with
+*     FIO errors and select one.
+*     If there is no match, set STATUS to FIO__ERROR.
+
+*  VMS-specific features used:
+*     The Fortran error codes handled by this routine are specific to
+*     DEC Fortran. They are defined in the INCLUDE text module
+*     SYS$LIBRARY:FORSYSDEF.TLB($FORIOSDEF)
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council
+
+*  Authors:
+*     SLW: Sid Wright (Starlink, UCL)
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-AUG-1980 (SLW):
+*        Original.
+*     10-MAY-1983 (SLW):
+*        Tidy up for Starlink version.
+*     23-OCT-1987 (BDK):
+*        Handle full list of VMS errors.
+*     10-FEB-1988 (AJC):
+*        Rationalize include files.
+*     29-OCT-1991 (PMA):
+*        Changed references to FIO_$xxxxx to FIO1_xxxxx 
+*     10-JAN-1992 (PMA):
+*        Remove machine specific features and hide them in INCLUDE
+*        statements.
+*     25-FEB-1992 (PMA):
+*        Add the machine specific features back in.
+*     12-MAR-1992 (PMA):
+*        Move all error reporting with EMS up to FIO_SERR.
+*     26-MAR-1992 (PMA):
+*        Comment out IMPLICIT NONE as it can cause problems with the
+*        parameters defined in FORIOSDEF.
+*     2-APR-1992 (PMA):
+*        Remove unused variable TOKEN.
+*     3-APR-1992 (PMA):
+*        Change the name of include files to lower case.
+*     13-MAY-1992 (PMA):
+*        Re-sort the items in the DATA statement to have them in the
+*        numerical order of the error numbers and add new error code
+*        FOR$IOS_INVMATKEY.
+*        Increase MXERR from 50 to 51.
+*     8-SEP-1992 (PMA):
+*        Return STATUS set to SAI__OK if SYSERR is zero.
+*     19-FEB-1993 (PMA):
+*        Change the name of include files to upper case.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+*      IMPLICIT NONE              ! Do not use - No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'FIO_ERR'          ! FIO error numbers
+      INCLUDE 'SYS$LIBRARY:FORSYSDEF.TLB($FORIOSDEF)'
+                                 ! VMS error codes
+
+*  Arguments Given:
+      INTEGER SYSERR             ! Operating system error number
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER MXERR              ! Maximum number of error codes
+      PARAMETER( MXERR = 51 )
+
+*  Local Variables:
+      INTEGER SYSERN( MXERR )    ! Table of operating system error codes
+      INTEGER FIOERN( MXERR )    ! Table of FIO error codes
+      INTEGER I                  ! Loop index
+
+*  Local Data:
+      DATA (SYSERN( I ), FIOERN( I ), I = 1, MXERR) /
+     :   FOR$IOS_SYNERRNAM,   FIO__SYNAM,
+     :   FOR$IOS_TOOMANVAL,   FIO__TOOMV,
+     :   FOR$IOS_INVREFVAR,   FIO__INVRV,
+     :   FOR$IOS_REWERR,      FIO__REWER,
+     :   FOR$IOS_DUPFILSPE,   FIO__DUPFL,
+     :   FOR$IOS_INPRECTOO,   FIO__RECTL,
+     :   FOR$IOS_BACERR,      FIO__BACER,
+     :   FOR$IOS_ENDDURREA,   FIO__EOF,  
+     :   FOR$IOS_RECNUMOUT,   FIO__OUTFL,
+     :   FOR$IOS_OPEDEFREQ,   FIO__OPREQ,
+     :   FOR$IOS_TOOMANREC,   FIO__TOORC,
+     :   FOR$IOS_CLOERR,      FIO__CLSER,
+     :   FOR$IOS_FILNOTFOU,   FIO__FILNF,
+     :   FOR$IOS_OPEFAI,      FIO__OPNER,
+     :   FOR$IOS_MIXFILACC,   FIO__MIXFL,
+     :   FOR$IOS_INVLOGUNI,   FIO__IVUNT,
+     :   FOR$IOS_ENDFILERR,   FIO__ENDFL,
+     :   FOR$IOS_UNIALROPE,   FIO__ALOPN,
+     :   FOR$IOS_SEGRECFOR,   FIO__SEGRC,
+     :   FOR$IOS_ATTACCNON,   FIO__OUTFL,
+     :   FOR$IOS_INCRECLEN,   FIO__INCRC,
+     :   FOR$IOS_ERRDURWRI,   FIO__WRTER,
+     :   FOR$IOS_ERRDURREA,   FIO__RDER, 
+     :   FOR$IOS_RECIO_OPE,   FIO__RECIO,
+     :   FOR$IOS_INSVIRMEM,   FIO__INSVR,
+     :   FOR$IOS_NO_SUCDEV,   FIO__NODEV,
+     :   FOR$IOS_FILNAMSPE,   FIO__NAMER,
+     :   FOR$IOS_INCRECTYP,   FIO__INCRT,
+     :   FOR$IOS_KEYVALERR,   FIO__KEYVL,
+     :   FOR$IOS_INCOPECLO,   FIO__INCOC,
+     :   FOR$IOS_WRIREAFIL,   FIO__ILLAC,
+     :   FOR$IOS_INVARGFOR,   FIO__INVRG,
+     :   FOR$IOS_INVKEYSPE,   FIO__INVKY,
+     :   FOR$IOS_INCKEYCHG,   FIO__INCKC,
+     :   FOR$IOS_INCFILORG,   FIO__INCRG,
+     :   FOR$IOS_SPERECLOC,   FIO__SPLOC,
+     :   FOR$IOS_NO_CURREC,   FIO__NOCRC,
+     :   FOR$IOS_REWRITERR,   FIO__REWRT,
+     :   FOR$IOS_DELERR,      FIO__DLTER,
+     :   FOR$IOS_UNLERR,      FIO__UNLER,
+     :   FOR$IOS_FINERR,      FIO__FINER,
+     :   FOR$IOS_LISIO_SYN,   FIO__LISYN,
+     :   FOR$IOS_INFFORLOO,   FIO__INFOR,
+     :   FOR$IOS_FORVARMIS,   FIO__FORVR,
+     :   FOR$IOS_SYNERRFOR,   FIO__SYNER,
+     :   FOR$IOS_OUTCONERR,   FIO__OUTCN,
+     :   FOR$IOS_INPCONERR,   FIO__INPCN,
+     :   FOR$IOS_OUTSTAOVE,   FIO__OUTOV,
+     :   FOR$IOS_INPSTAREQ,   FIO__INREQ,
+     :   FOR$IOS_VFEVALERR,   FIO__VFVAL,
+     :   FOR$IOS_INVMATKEY,   FIO__INVMK /
+           
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If SYSERR is zero, return a status value of SAI__OK.
+      IF ( SYSERR .EQ. 0 ) THEN
+         STATUS = SAI__OK
+         GOTO 999
+
+*  Is the error number set to end of file?
+      ELSE IF ( SYSERR .EQ. -1 ) THEN
+         STATUS = FIO__EOF
+         GOTO 999
+      ENDIF
+
+*  Convert error number to FIO error number.
+      DO I = 1, MXERR
+         IF ( SYSERN( I ) .EQ. SYSERR ) THEN
+            STATUS = FIOERN( I )
+            GOTO 999
+         ENDIF
+      ENDDO
+
+*  No conversion was done.
+      STATUS = FIO__ERROR
+
+  999 CONTINUE
+      END

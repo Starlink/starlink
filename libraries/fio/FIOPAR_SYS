@@ -1,0 +1,37 @@
+*+
+*  Name:
+*     FIOPAR_SYS
+
+*  Purpose:
+*     FIO internal ADAM parameter constants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIOPAR_SYS'
+
+*  Description:
+*     Define FIO internal constants used in conjunction with the ADAM
+*     parameter system.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-FEB-1992 (PMA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Constants:
+      INTEGER  FIO__MXPAR        !  Maximum number of file parameters
+      PARAMETER ( FIO__MXPAR = 40 )

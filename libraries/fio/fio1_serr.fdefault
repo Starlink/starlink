@@ -1,0 +1,96 @@
+      SUBROUTINE FIO1_SERR( SYSERR, STATUS )
+*+
+*  Name:
+*     FIO1_SERR
+
+*  Purpose:
+*     Set error status
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL FIO1_SERR( SYSERR, STATUS )
+
+*  Description:
+*     Get the error number from the operating system and convert it
+*     into an FIO error.
+
+*  Arguments:
+*     SYSERR = INTEGER (Given)
+*        Variable containing the operating system error number.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*        This is set to the FIO status.
+
+*  Notes:
+*     -  No errors are reported by this routine. They are reported by
+*        FIO_SERR.
+*     -  Consequently, this routine should only be called from FIO_SERR.
+
+*  Algorithm:
+*     -  Handle values of SYSERR of zero or minus one.
+*     -  Otherwise, set STATUS to a catch-all error value.
+
+*  Machine-specific features used:
+*     -  There is no machine specific code as this is the version
+*        of the routine for use on previously unsupported architectures.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-JUN-1993 (PMA):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+*      IMPLICIT NONE              ! Do not use - No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'FIO_ERR'          ! FIO error numbers
+
+*  Arguments Given:
+      INTEGER SYSERR             ! Operating system error number
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If SYSERR is zero, return a status value of SAI__OK.
+      IF ( SYSERR .EQ. 0 ) THEN
+         STATUS = SAI__OK
+         GOTO 999
+
+*  Is the error number set to end of file?
+      ELSE IF ( SYSERR .EQ. -1 ) THEN
+         STATUS = FIO__EOF
+         GOTO 999
+      ENDIF
+
+*  At this point, you should loop round testing the value of SYSERR to
+*  see if it is one of the known system dependent IOSTAT values. If it
+*  is, you should set STATUS to the corresponding FIO__const.
+*  However, since this is the machine independent version of this
+*  routine, there are no machine specific IOSTAT values, so assume that
+*  no such value was found.
+
+*  No conversion was done.
+      STATUS = FIO__ERROR
+
+  999 CONTINUE
+      END

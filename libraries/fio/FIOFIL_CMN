@@ -1,0 +1,46 @@
+*+
+*  Name:
+*     FIOFIL_CMN
+
+*  Purpose:
+*     FIO common blocks
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIOFIL_CMN'
+
+*  Description:
+*     FIO common blocks containing file information.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-JAN-1992 (PMA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Variables:
+      LOGICAL FREE( FIO__MXFIL ) ! File descriptor available ?
+      INTEGER FUNIT( FIO__MXFIL ) ! Fortran unit number for file.
+      INTEGER FRECSZ( FIO__MXFIL ) ! Record size
+      CHARACTER * ( FIO__SZFNM ) FNAME( FIO__MXFIL ) ! File name
+      CHARACTER * ( FIO__SZMOD ) FACMOD( FIO__MXFIL ) ! File access mode
+
+*  Common blocks:
+      COMMON /FIOFIL_CMN_1/ FREE, FUNIT, FRECSZ
+      COMMON /FIOFIL_CMN_2/ FNAME, FACMOD
+      SAVE /FIOFIL_CMN_1/, /FIOFIL_CMN_2/
+
+*.

@@ -1,0 +1,42 @@
+*+
+*  Name:
+*     FIOGOPA_CMN
+
+*  Purpose:
+*     FIO common block
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIOGOPA_CMN'
+
+*  Description:
+*     FIO implicit initialisation data
+
+*  Copyright:
+*     Copyright (C) 2002 CCLRC
+
+*  Authors:
+*     AJC: Alan Chipperfield (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     31-JUL-2002 (AJC):
+*        Original version. Split fiogo_cmn and fiogopa_cmn to avoid problems
+*        with shared libraries
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global variables:
+      LOGICAL FIOSLP             ! Whether fio parameter system is started
+
+*  Common blocks:
+      COMMON /FIO_GOPA/ FIOSLP
+      SAVE /FIO_GOPA/
+
+*.

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>librarries/fio</path>
+  <description>FORTRAN file I/O routines</description>
+  <abstract>FIO/RIO is a subroutine package that allows a FORTRAN
+      programmer to access sequential and direct access data files in
+      a machine independent manner. The package consists of stand
+      alone FIO and RIO routines, which can be used independently of
+      the Starlink software environment, plus routines to interface to
+      the Starlink parameter system.</abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter M Allan</name>
+      <uname>NONE</uname>
+      <email>P.M.Allan@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

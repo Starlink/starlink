@@ -1,0 +1,44 @@
+*+
+*  Name:
+*     FIOGO_CMN
+
+*  Purpose:
+*     FIO common block
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIOGO_CMN'
+
+*  Description:
+*     FIO implicit initialisation data
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     AJC: Alan Chipperfield (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-JAN-1992 (PMA):
+*        Original version.
+*     31-JUL-2002 (AJC):
+*        Split parameter system part to fiogopa_cmn
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global variables:
+      LOGICAL FIOINT             ! Whether Fio is started
+
+*  Common blocks:
+      COMMON /FIO_GO/ FIOINT
+      SAVE /FIO_GO/
+
+*.

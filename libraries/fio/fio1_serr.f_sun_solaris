@@ -1,0 +1,138 @@
+      SUBROUTINE FIO1_SERR( IOSTAT, STATUS )
+*+
+*  Name:
+*     FIO1_SERR
+
+*  Purpose:
+*     Convert a Fortran IOSTAT value to an FIO error status
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL FIO1_SERR( IOSTAT, STATUS )
+
+*  Description:
+*     Take the IOSTAT value returned by the Fortran I/O system and
+*     convert it into an FIO error code.
+
+*  Arguments:
+*     IOSTAT = INTEGER (Given)
+*        Fortran I/O status number.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*        This is set to the FIO status.
+
+*  Notes:
+*     -  No errors are reported by this routine. They are reported by
+*        FIO_SERR.
+*     -  Consequently, this routine should only be called from FIO_SERR.
+
+*  Algorithm:
+*     Take the error number from the I/O system and compare it with
+*     known Fortran error codes.
+*     If there is a match, set STATUS to a suitable bad value.
+*     If there is no match, see if IOSTAT corresponds to an operating
+*     system error code.
+*     If there is still no match, set STATUS to FIO__ERROR.
+
+*  Sun-specific features used:
+*     The Fortran error codes handled by this routine are specific to
+*     Sun Fortran. They are defined in the INCLUDE file sun_iosdef.
+*     Error codes in the range 1 to 200 are assumed to be operating
+*     system error codes.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-OCT-1993 (PMA):
+*        Original sun4_Solaris version.
+*     23-DEC-1993 (PMA):
+*        Change FIO__ILSPE to FIO__INSPE
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'FIO_ERR'          ! FIO error numbers
+      INCLUDE 'sun_iosdef'       ! Fortran I/O error numbers
+
+*  Arguments Given:
+      INTEGER IOSTAT
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Constants:
+      INTEGER MXERR              ! Maximum number of error codes in the
+      PARAMETER( MXERR = 26 )    ! table
+
+*  Local Variables:
+      INTEGER SYSERN( MXERR )    ! Table of I/O system error codes
+      INTEGER FIOERN( MXERR )    ! Table of FIO error codes
+      INTEGER I                  ! Loop index
+
+*  Local Data:
+      DATA SYSERN/
+     :   SUN__ERFMT, SUN__ILLUN, SUN__FIONA, SUN__UIONA, SUN__DIONA,
+     :   SUN__SIONA, SUN__CNTBF, SUN__OFBOR, SUN__CNTSF, SUN__NAARC,
+     :   SUN__OFEOR,             SUN__ILSTI, SUN__OOFSP, SUN__UNTNC,
+     :   SUN__RUNCH, SUN__ILINP, SUN__NFEXI, SUN__CFOLF, SUN__UNKNO,
+     :   SUN__REQSA, SUN__ILARG, SUN__NEGRC, SUN__ILOPU,
+     :   SUN__INSPE, SUN__IINAM, SUN__FILEO /
+      DATA FIOERN/
+     :   FIO__ERFMT, FIO__ILLUN, FIO__FIONA, FIO__UIONA, FIO__DIONA,
+     :   FIO__SIONA, FIO__CNTBF, FIO__OFBOR, FIO__CNTSF, FIO__NAARC,
+     :   FIO__OFEOR,             FIO__ILSTI, FIO__OOFSP, FIO__UNTNC,
+     :   FIO__RUNCH, FIO__ILINP, FIO__NFEXI, FIO__CFOLF, FIO__UNKNO,
+     :   FIO__REQSA, FIO__ILARG, FIO__NEGRC, FIO__ILOPU,
+     :   FIO__INSPE, FIO__IINAM, FIO__FILEO /
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If IOSTAT is zero, return a status value of SAI__OK.
+      IF ( IOSTAT .EQ. 0 ) THEN
+         STATUS = SAI__OK
+         GOTO 999
+
+*  Is the error number set to end of file?
+      ELSE IF ( IOSTAT .EQ. -1 ) THEN
+         STATUS = FIO__EOF
+         GOTO 999
+      ENDIF
+
+*  Convert the IOSTAT error number to FIO error number.
+      DO I = 1, MXERR
+         IF ( SYSERN( I ) .EQ. IOSTAT ) THEN
+            STATUS = FIOERN( I )
+            GOTO 999
+         ENDIF
+      ENDDO
+
+*  The IOSTAT value was not a Fortran specific code. See if it is a
+*  general operating system error code.
+      IF( IOSTAT .GE. 1 .AND. IOSTAT .LE. 200 ) THEN
+         STATUS = FIO__OSERR
+         GOTO 999
+      END IF
+
+*  No conversion was done.
+      STATUS = FIO__ERROR
+
+  999 CONTINUE
+      END

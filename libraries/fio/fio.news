@@ -1,0 +1,24 @@
+FIO Version 1.5-3 is released.
+
+This version corrects problems arising from the use of a single BLOCK_DATA
+segment with two different shared libraries.
+
+FIO Version 1.5-2 is released.
+
+The value of the public parameter FIO__SZFNM is increased from 80 to
+200.
+
+The Linux version has been brought in line with other platforms to return
+status FIO__FILNF rather than the obsolete FIO__NOTFD if it cannot find a
+file which is supposed to exist.
+
+Other minor changes are made to improve the consistency of behaviour
+on different platforms under error conditions. A note on the effect of EOF
+terminated records has been added to the descriptions of FIO_READ and
+FIO_READF in SUN/143.
+
+The makefile has been brought up to date - amongst other things, shared
+libraries will now be produced on Linux.
+
+The format of SUN/143 has been updated and early `Changes' sections have been
+removed but there is no change in other sections.

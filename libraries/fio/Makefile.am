@@ -1,0 +1,81 @@
+## Process this file with automake to produce Makefile.in
+
+include $(srcdir)/Makefile.starconf
+
+lib_LTLIBRARIES = libfio.la libfio_adam.la
+
+libfio_la_SOURCES = $(BLOCK_DATA_STANDALONE) $(F_ROUTINES) $(PLATFORM_F)
+libfio_adam_la_SOURCES = $(BLOCK_DATA_ADAM) $(F_ROUTINES_ADAM)
+
+include_HEADERS = $(PUBLIC_INCLUDES)
+
+#  List of Fortran routines required for building the package.  This is
+#  just a list of all the Fortran source files (excluding BLOCK DATA
+#  routines, which are treated separately).
+F_ROUTINES = \
+        fio1_chkfd.f \
+        fio1_getfd.f \
+        fio_close.f \
+        fio_erase.f \
+        fio_fname.f \
+        fio_gunit.f \
+        fio_open.f \
+        fio_punit.f \
+        fio_read.f \
+        fio_readf.f \
+        fio_rep.f \
+        fio_rwind.f \
+        fio_serr.f \
+        fio_start.f \
+        fio_stop.f \
+        fio_test.f \
+        fio_unit.f \
+        fio_write.f \
+	rio_close.f \
+	rio_erase.f \
+        rio_open.f \
+	rio_read.f \
+	rio_write.f
+
+#  List of Fortran routines which are specific to the operation under ADAM
+F_ROUTINES_ADAM = \
+        fio1_chkfp.f \
+        fio1_fndfp.f \
+        fio1_getfp.f \
+        fio_activ.f \
+        fio_annul.f \
+        fio_assoc.f \
+        fio_cancl.f \
+        fio_deact.f \
+        rio_annul.f \
+        rio_assoc.f \
+        rio_cancl.f
+
+# Platform-specific Fortran routines.  See corresponding stanza in configure.ac
+PLATFORM_F = \
+	fio1_open.f \
+        fio1_serr.f \
+	rio1_open.f
+
+#  List of Fortran BLOCK DATA routines, for both the standalone and
+# ADAM versions of the library.
+BLOCK_DATA_STANDALONE = fio_blk.f
+BLOCK_DATA_ADAM = fiopa_blk.f
+
+#  List of public include files.  These are include files which form
+#  part of the package and may be required by users of it.
+PUBLIC_INCLUDES = FIO_ERR FIO_PAR
+
+#  List of private include files.  These are additional include files
+#  which form part of the package and are required in order to build
+#  it, but which are not required by users of it, and which are not installed
+PRIVATE_INCLUDES = \
+	FIO_SYS \
+	FIOFIL_CMN \
+	FIOGO_CMN \
+	FIOGOPA_CMN \
+	FIOUNT_CMN \
+        FIOPAR_SYS \
+	FIOPA_CMN
+
+

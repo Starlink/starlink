@@ -1,0 +1,138 @@
+      SUBROUTINE RIO1_OPEN( UNIT, FILE, ACMODU, FORMU, RECSZ, RECLEN,
+     :   STATUS )
+*+
+*  Name:
+*     RIO1_OPEN
+
+*  Purpose:
+*     Do the actual Fortran OPEN statement
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL RIO1_OPEN( UNIT, FILE, ACMODU, FORMU, RECSZ, RECLEN, STATUS )
+
+*  Description:
+*     Execute the actual Fortran OPEN statement. This is isolated in a
+*     subroutine as it contains machine dependent code.
+
+*  Arguments:
+*     UNIT = INTEGER (Given)
+*        The FORTRAN unit number to be opened
+*     FILE = CHARACTER * ( * ) (Given)
+*        The name of the file to be opened.
+*     ACMODU = CHARACTER * ( * ) (Given)
+*        The file access mode (in upper case).
+*     FORMU = CHARACTER * ( * ) (Given)
+*        The format of the file (in upper case).
+*     RECSZ = INTEGER (Given)
+*        The record length used when opening the file.
+*     RECLEN = INTEGER (Returned)
+*        The record length (in bytes) found by inquiry.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  VMS-specific features used:
+*     -  The READONLY option is allowed.
+*     -  The ORGANIZATION option is allowed.
+*     -  The BLOCKSIZE option is allowed.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     17-MAR-1992 (PMA):
+*        Original version.
+*     17-MAR-1992 (PMA):
+*        Fix an apparent bug whereby the result of the INQUIRE statement
+*        was always multiplied by 4, rather then just in the case of
+*        unformatted files.
+*     31-MAR-1992 (PMA):
+*        Reorganise the layout of the OPEN statements. This does not
+*        change the code at all.
+*     3-APR-1992 (PMA):
+*        Change the name of include files to lower case.
+*     19-FEB-1993 (PMA):
+*        Change the name of include files to upper case.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'FIO_PAR'          ! FIO symbolic constants
+
+*  Arguments Given:
+      CHARACTER * ( * ) ACMODU
+      CHARACTER * ( * ) FILE
+      CHARACTER * ( * ) FORMU
+      INTEGER RECSZ
+      INTEGER UNIT
+
+*  Arguments Returned:
+      INTEGER RECLEN
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER IOERR              ! The Fortran I/O status value
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert the number of bytes to the number of longwords.
+      IF ( FORMU .EQ. 'UNFORMATTED' ) THEN
+         RECLEN = ( RECSZ + 3 ) / 4
+      ELSE
+         RECLEN = RECSZ
+      END IF
+
+*  Open the file.
+      IF ( ACMODU .EQ. 'READ' ) THEN
+         OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
+     :      ERR=10, IOSTAT=IOERR,
+     :      STATUS='OLD', READONLY )
+      ELSE IF ( ACMODU .EQ. 'WRITE' ) THEN
+         OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
+     :      ERR=10, IOSTAT=IOERR,
+     :      ORGANIZATION='RELATIVE', BLOCKSIZE=FIO__SZBKT,
+     :      RECL=RECLEN, STATUS='NEW' )
+      ELSE IF ( ACMODU .EQ. 'UPDATE' ) THEN
+         OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
+     :      ERR=10, IOSTAT=IOERR,
+     :      STATUS='OLD' )
+      ELSE IF ( ACMODU .EQ. 'APPEND') THEN
+         OPEN( UNIT=UNIT, FILE=FILE, ACCESS='DIRECT', FORM=FORMU,
+     :      ORGANIZATION='RELATIVE', BLOCKSIZE=FIO__SZBKT,
+     :      ERR=10, IOSTAT=IOERR,
+     :      RECL=RECLEN, STATUS='UNKNOWN' )
+      END IF
+
+*  Inquire the record length of the file.
+*  Convert this number from longwords to bytes for unformatted files.
+      INQUIRE( UNIT=UNIT, RECL=RECLEN )
+      IF ( FORMU .EQ. 'UNFORMATTED' ) THEN
+         RECLEN = RECLEN * 4
+      END IF
+      GOTO 999
+
+*  Handle any error condition.
+   10 CALL FIO_SERR( IOERR, STATUS )
+      CALL FIO_PUNIT( UNIT, STATUS )
+
+  999 CONTINUE
+      END

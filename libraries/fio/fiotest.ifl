@@ -1,0 +1,17 @@
+interface fiotest
+
+parameter newfile
+  position 1
+  type 'filename'
+  vpath 'default'
+  default NEWFILE.DAT
+endparameter
+
+parameter createfile
+  position 2
+  type 'filename'
+  vpath 'default'
+  default CREATEFILE.DAT
+endparameter
+
+ENDINTERFACE

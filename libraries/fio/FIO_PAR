@@ -1,0 +1,53 @@
+*+
+*  Name:
+*     FIO_PAR
+
+*  Purpose:
+*     FIO symbolic constants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'FIO_PAR'
+
+*  Description:
+*     This INCLUDE file contains the symbolic constants used by FIO.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     AJC: Alan Chipperfield (Starlink, RAL)
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     Not sure (AJC):
+*        Original version.
+*     29-FEB-1988 (AJC):
+*        Remove FIO__SZSNM(12),UKNWN(0),ASCII(1),BINAR(2), SEQEN(3) and
+*        DIREC(4)
+*     15-JAN-1992 (PMA):
+*        Added new style prologue
+*     31-OCT-2000 (AJC):
+*        FIO__SZFNM increased to 200 from 80
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Constants:
+      INTEGER FIO__SZFNM          ! Maximum size of full file name
+      PARAMETER ( FIO__SZFNM = 200 )
+      INTEGER FIO__SZMOD         ! Maximum size of access mode
+      PARAMETER ( FIO__SZMOD = 15 )
+      INTEGER FIO__SZBKT         ! Bucket size of the direct access file
+      PARAMETER ( FIO__SZBKT = 11*512 )
+                                 ! SI EAGLE tracksize = 55 blocks
+                                 ! RP04,5,6 tracksize = 22 blocks
+                                 ! RP07     tracksize = 50 blocks
+
+*.
