@@ -508,7 +508,7 @@
 
 *    Unused variables
       PSS_PPIX = 0
-      PSS_CONVERGED = .FALSE
+      PSS_CONVERGED = .FALSE.
       PVAL = 0.0
       NITER = 0
 
