@@ -13,16 +13,16 @@ do
     case $1 in
 
     --buildsupport)
-        buildsupportonly=true
+        buildsupportonly=:
         ;;
 
     --buildsupport-only)
         echo "Use --buildsupport rather than --buildsupport-only" >&2
-        buildsupportonly=true
+        buildsupportonly=:
         ;;
 
     --dry-run|-n)
-        dryrun=true
+        dryrun=:
         ;;
 
     --force-starconf)
@@ -88,19 +88,38 @@ fi
 
 # Test whether system m4 (or at least the first m4 in the path) is GNU m4.
 # The autotools built below require features present only in GNU m4.
-if m4 --version >conftest.m4version 2>/dev/null; then
-    if grep -i 'gnu *m4' conftest.m4version >/dev/null 2>&1; then
-        # this is GNU m4
-        need_gnu_m4=false
-    else
-        # m4 accepts the --version option, but it seems not to be the GNU one
-        need_gnu_m4=true
-    fi
-else
-    # m4 doesn't accept the --version option, so it's not GNU m4
-    need_gnu_m4=true
+# Environment variable M4 overrides test for m4 in path.
+if test -z "$M4"; then
+    for prog in gm4 gnum4 m4
+    do
+        for d in `IFS=:; echo $PATH`
+        do
+            if test -f $d/$prog; then
+                M4=$d/$prog
+                break 2
+            fi
+        done
+    done
 fi
-rm -f conftest.m4version
+# We now (should) have a m4 binary in the path.  Check it's GNU m4, and if it is,
+# check it has frozen state files (should mean version 1.3 or better).
+# Cf. macro AC_PROG_GNU_M4 in the autoconf distribution.
+need_gnu_m4=true
+if test "x$M4" != x; then
+    if test `echo 'changequote([,])ifdef([__gnu__], isgnu, notgnu)' | $M4` = isgnu; then
+        case `$M4 --help </dev/null 2>&1` in
+          *reload-state*) need_gnu_m4=false ;;
+        esac
+    fi
+fi
+if $need_gnu_m4; then
+    echo "m4 at $M4 is no good -- bootstrap will build GNU m4"
+    echo "You can specify a location for GNU m4 with env. variable M4"
+else
+    # Use the m4 binary we found
+    echo "m4 at $M4 is OK"
+    export M4
+fi
 
 # Makefile.dependencies uses BUILDSUPPORT_PREFIX to configure
 # the buildsupport tools
@@ -128,7 +147,7 @@ do
         echo "This causes unavoidable problems with the autoconf system,"
         echo "so, unfortunately, we can't proceed."
         # Exit below
-        dryrun=true
+        dryrun=:
     fi
 done
 
