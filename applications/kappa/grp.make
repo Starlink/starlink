@@ -370,7 +370,7 @@ kps1_pgftd.f kps1_pgfti.f kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f \
 kps1_pgftw.f kps1_clpsr.f kps1_clpsd.f
 
 # Generic source files needed for kapsub_sub.tar:
-KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen
+KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen
 
 # Non-generic source files needed for kapsub_sub.tar:
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
