@@ -46,6 +46,8 @@
 *     12-OCT-2004 (DSB):
 *        Call to PGERAS replaced by KPG1_PGCLR in order to clear the current 
 *        picture rather than the whole device if mode is WRITE.
+*     6-JAN-2005 (DSB):
+*        Check STATUS before calling PGQCR.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,7 +111,8 @@
 *  We have now loaded a potentially different user pallette, which may
 *  have a different background colour, so clear the screen again if the
 *  backgrond colour has changed.
-      IF( CHR_UPPER( MODE( 1:1 ) ) .EQ. 'W' ) THEN
+      IF( STATUS .EQ. SAI__OK .AND. 
+     :    CHR_UPPER( MODE( 1:1 ) ) .EQ. 'W' ) THEN
          CALL PGQCR( 0, R, G, B )
          IF( R .NE. ROLD .OR. G .NE. GOLD .OR. B .NE. BOLD ) THEN
             CALL KPG1_PGCLR( STATUS )
